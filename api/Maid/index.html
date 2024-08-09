@@ -38,8 +38,8 @@ maid:GiveTask(workspace.ChildAdded:Connect(print))
 -- Disconnects all events, and executes all functions
 maid:DoCleaning()
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Maid"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Maid" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Maid" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.4fb85269.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.b5e97460.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.5fdd1ce2.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.c45b8205.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -63,18 +63,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
 <span class="token comment">-- Disconnects all events, and executes all functions</span>
 maid<span class="token punctuation">:</span><span class="token function">DoCleaning</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L37"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Maid">Maid</a></code></div><div>
-<p>Constructs a new Maid object</p>
-<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> maid <span class="token operator">=</span> Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-</code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isMaid"><code style="text-decoration:none">isMaid</code><a href="#isMaid" class="hash-link" aria-label="Direct link to isMaid" title="Direct link to isMaid">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L54"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">isMaid</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
-<p>Returns true if the class is a maid, and false otherwise.</p>
-<pre class="language-lua"><code class="language-lua"><span class="token function">print</span><span class="token punctuation">(</span>Maid<span class="token punctuation">.</span><span class="token function">isMaid</span><span class="token punctuation">(</span>Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> true</span>
-<span class="token function">print</span><span class="token punctuation">(</span>Maid<span class="token punctuation">.</span><span class="token function">isMaid</span><span class="token punctuation">(</span><span class="token keyword">nil</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> false</span>
-</code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L263"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
-<p>Alias for <a href="/NevermoreEngine/api/Maid#DoCleaning">Maid.DoCleaning()</a></p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/loader/src/Maid.lua#L37"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Maid">Maid</a></code></div><div>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/loader/src/Maid.lua#L37"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Maid">Maid</a></code></div><div>
 <p>Constructs a new Maid object</p>
 <pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> maid <span class="token operator">=</span> Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre>
@@ -85,75 +74,17 @@ maid<span class="token punctuation">:</span><span class="token function">DoClean
 </code></pre>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/loader/src/Maid.lua#L263"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Alias for <a href="/NevermoreEngine/api/Maid#DoCleaning">Maid.DoCleaning()</a></p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="__index"><code style="text-decoration:none">__index</code><a href="#__index" class="hash-link" aria-label="Direct link to __index" title="Direct link to __index">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L73"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">__index</code><code>(</code><code>index<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div><div>
-<p>Returns Maid[key] if not part of Maid metatable</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L37"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Maid">Maid</a></code></div><div>
+<p>Constructs a new Maid object</p>
 <pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> maid <span class="token operator">=</span> Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-maid<span class="token punctuation">.</span>_current <span class="token operator">=</span> Instance<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"Part"</span><span class="token punctuation">)</span>
-<span class="token function">print</span><span class="token punctuation">(</span>maid<span class="token punctuation">.</span>_current<span class="token punctuation">)</span> <span class="token comment">--> Part</span>
-
-maid<span class="token punctuation">.</span>_current <span class="token operator">=</span> <span class="token keyword">nil</span>
-<span class="token function">print</span><span class="token punctuation">(</span>maid<span class="token punctuation">.</span>_current<span class="token punctuation">)</span> <span class="token comment">--> nil</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="__newindex"><code style="text-decoration:none">__newindex</code><a href="#__newindex" class="hash-link" aria-label="Direct link to __newindex" title="Direct link to __newindex">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L100"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">__newindex</code><code>(</code><div class="inset_uKQm"><div><code>index<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>newTask<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
-<p>
-  Add a task to clean up. Tasks given to a maid will be cleaned when
-  maid[index] is set to a different value.
-</p>
-<p>
-  Task cleanup is such that if the task is an event, it is disconnected.
-  If it is an object, it is destroyed.
-</p>
-<pre><code>Maid[key] = (function)         Adds a task to perform
-Maid[key] = (event connection) Manages an event connection
-Maid[key] = (thread)           Manages a thread
-Maid[key] = (Maid)             Maids can act as an event connection, allowing a Maid to have other maids to clean up.
-Maid[key] = (Object)           Maids can cleanup objects with a `Destroy` method
-Maid[key] = nil                Removes a named task.
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isMaid"><code style="text-decoration:none">isMaid</code><a href="#isMaid" class="hash-link" aria-label="Direct link to isMaid" title="Direct link to isMaid">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L54"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">isMaid</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>Returns true if the class is a maid, and false otherwise.</p>
+<pre class="language-lua"><code class="language-lua"><span class="token function">print</span><span class="token punctuation">(</span>Maid<span class="token punctuation">.</span><span class="token function">isMaid</span><span class="token punctuation">(</span>Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> true</span>
+<span class="token function">print</span><span class="token punctuation">(</span>Maid<span class="token punctuation">.</span><span class="token function">isMaid</span><span class="token punctuation">(</span><span class="token keyword">nil</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> false</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Add"><code style="text-decoration:none">Add</code><a href="#Add" class="hash-link" aria-label="Direct link to Add" title="Direct link to Add">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L144"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">Add</code><code>(</code><div class="inset_uKQm"><div><code>task<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code><span class="inlineDescription_G7Er">-- <span>
-<p>An item to clean</p>
-</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div><div>
-<p>Gives a task to the maid for cleanup and returns the resulting value</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GiveTask"><code style="text-decoration:none">GiveTask</code><a href="#GiveTask" class="hash-link" aria-label="Direct link to GiveTask" title="Direct link to GiveTask">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L164"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">GiveTask</code><code>(</code><div class="inset_uKQm"><div><code>task<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code><span class="inlineDescription_G7Er">-- <span>
-<p>An item to clean</p>
-</span></span></div></div><code>) → </code><code class="blue_P4bS">number</code><span class="inlineDescription_G7Er">-- <span>
-<p>taskId</p>
-</span></span></div><div>
-<p>Gives a task to the maid for cleanup, but uses an incremented number as a key.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GivePromise"><code style="text-decoration:none">GivePromise</code><a href="#GivePromise" class="hash-link" aria-label="Direct link to GivePromise" title="Direct link to GivePromise">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L185"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">GivePromise</code><code>(</code><code>promise<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
-<p>Gives a promise to the maid for clean.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="DoCleaning"><code style="text-decoration:none">DoCleaning</code><a href="#DoCleaning" class="hash-link" aria-label="Direct link to DoCleaning" title="Direct link to DoCleaning">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L217"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">DoCleaning</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
-<p>Cleans up all tasks and removes them as entries from the Maid.</p>
-<div class="admonition admonition-note alert alert--secondary">
-  <div class="admonition-heading">
-    <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16">
-          <path d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path>
-        </svg></span>note</h5>
-  </div>
-  <div class="admonition-content">
-    <p>
-      Signals that are already connected are always disconnected first. After that
-      any signals added during a cleaning phase will be disconnected at random times.
-    </p>
-  </div>
-</div>
-<div class="admonition admonition-tip alert alert--success">
-  <div class="admonition-heading">
-    <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16">
-          <path d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path>
-        </svg></span>tip</h5>
-  </div>
-  <div class="admonition-content">
-    <p>
-      DoCleaning() may be recursively invoked. This allows the you to ensure that
-      tasks or other tasks. Each task will be executed once.
-    </p>
-    <p>
-      However, adding tasks while cleaning is not generally a good idea, as if you add a
-      function that adds itself, this will loop indefinitely.
-    </p>
-  </div>
-</div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L263"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Alias for <a href="/NevermoreEngine/api/Maid#DoCleaning">Maid.DoCleaning()</a></p>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="__index"><code style="text-decoration:none">__index</code><a href="#__index" class="hash-link" aria-label="Direct link to __index" title="Direct link to __index">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/loader/src/Maid.lua#L73"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">__index</code><code>(</code><code>index<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div><div>
 <p>Returns Maid[key] if not part of Maid metatable</p>
 <pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> maid <span class="token operator">=</span> Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -223,6 +154,75 @@ Maid[key] = nil                Removes a named task.
     </p>
   </div>
 </div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="__index"><code style="text-decoration:none">__index</code><a href="#__index" class="hash-link" aria-label="Direct link to __index" title="Direct link to __index">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L73"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">__index</code><code>(</code><code>index<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div><div>
+<p>Returns Maid[key] if not part of Maid metatable</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> maid <span class="token operator">=</span> Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+maid<span class="token punctuation">.</span>_current <span class="token operator">=</span> Instance<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"Part"</span><span class="token punctuation">)</span>
+<span class="token function">print</span><span class="token punctuation">(</span>maid<span class="token punctuation">.</span>_current<span class="token punctuation">)</span> <span class="token comment">--> Part</span>
+
+maid<span class="token punctuation">.</span>_current <span class="token operator">=</span> <span class="token keyword">nil</span>
+<span class="token function">print</span><span class="token punctuation">(</span>maid<span class="token punctuation">.</span>_current<span class="token punctuation">)</span> <span class="token comment">--> nil</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="__newindex"><code style="text-decoration:none">__newindex</code><a href="#__newindex" class="hash-link" aria-label="Direct link to __newindex" title="Direct link to __newindex">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L100"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">__newindex</code><code>(</code><div class="inset_uKQm"><div><code>index<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>newTask<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+<p>
+  Add a task to clean up. Tasks given to a maid will be cleaned when
+  maid[index] is set to a different value.
+</p>
+<p>
+  Task cleanup is such that if the task is an event, it is disconnected.
+  If it is an object, it is destroyed.
+</p>
+<pre><code>Maid[key] = (function)         Adds a task to perform
+Maid[key] = (event connection) Manages an event connection
+Maid[key] = (thread)           Manages a thread
+Maid[key] = (Maid)             Maids can act as an event connection, allowing a Maid to have other maids to clean up.
+Maid[key] = (Object)           Maids can cleanup objects with a `Destroy` method
+Maid[key] = nil                Removes a named task.
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Add"><code style="text-decoration:none">Add</code><a href="#Add" class="hash-link" aria-label="Direct link to Add" title="Direct link to Add">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L144"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">Add</code><code>(</code><div class="inset_uKQm"><div><code>task<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code><span class="inlineDescription_G7Er">-- <span>
+<p>An item to clean</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div><div>
+<p>Gives a task to the maid for cleanup and returns the resulting value</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GiveTask"><code style="text-decoration:none">GiveTask</code><a href="#GiveTask" class="hash-link" aria-label="Direct link to GiveTask" title="Direct link to GiveTask">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L164"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">GiveTask</code><code>(</code><div class="inset_uKQm"><div><code>task<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code><span class="inlineDescription_G7Er">-- <span>
+<p>An item to clean</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS">number</code><span class="inlineDescription_G7Er">-- <span>
+<p>taskId</p>
+</span></span></div><div>
+<p>Gives a task to the maid for cleanup, but uses an incremented number as a key.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GivePromise"><code style="text-decoration:none">GivePromise</code><a href="#GivePromise" class="hash-link" aria-label="Direct link to GivePromise" title="Direct link to GivePromise">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L185"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">GivePromise</code><code>(</code><code>promise<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
+<p>Gives a promise to the maid for clean.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="DoCleaning"><code style="text-decoration:none">DoCleaning</code><a href="#DoCleaning" class="hash-link" aria-label="Direct link to DoCleaning" title="Direct link to DoCleaning">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/maid/src/Shared/Maid.lua#L217"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Maid<!-- -->:</code><code class="green_DgR4">DoCleaning</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Cleans up all tasks and removes them as entries from the Maid.</p>
+<div class="admonition admonition-note alert alert--secondary">
+  <div class="admonition-heading">
+    <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16">
+          <path d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path>
+        </svg></span>note</h5>
+  </div>
+  <div class="admonition-content">
+    <p>
+      Signals that are already connected are always disconnected first. After that
+      any signals added during a cleaning phase will be disconnected at random times.
+    </p>
+  </div>
+</div>
+<div class="admonition admonition-tip alert alert--success">
+  <div class="admonition-heading">
+    <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16">
+          <path d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path>
+        </svg></span>tip</h5>
+  </div>
+  <div class="admonition-content">
+    <p>
+      DoCleaning() may be recursively invoked. This allows the you to ensure that
+      tasks or other tasks. Each task will be executed once.
+    </p>
+    <p>
+      However, adding tasks while cleaning is not generally a good idea, as if you add a
+      function that adds itself, this will loop indefinitely.
+    </p>
+  </div>
+</div>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
         {
@@ -238,7 +238,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 37,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -260,7 +260,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 54,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -282,7 +282,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 73,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -304,7 +304,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 100,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -326,7 +326,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 144,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -348,7 +348,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 164,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -370,7 +370,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 185,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -381,7 +381,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 217,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -392,7 +392,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 263,
-                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
             }
         },
         {
@@ -408,7 +408,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 37,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         },
         {
@@ -430,7 +430,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 54,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         },
         {
@@ -452,7 +452,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 73,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         },
         {
@@ -474,7 +474,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 100,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         },
         {
@@ -496,7 +496,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 144,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         },
         {
@@ -518,7 +518,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 164,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         },
         {
@@ -540,7 +540,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 185,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         },
         {
@@ -551,7 +551,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 217,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         },
         {
@@ -562,7 +562,7 @@ Maid[key] = nil                Removes a named task.
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 263,
-                &quot;path&quot;: &quot;src/loader/src/Maid.lua&quot;
+                &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
             }
         }
     ],
@@ -575,7 +575,7 @@ Maid[key] = nil                Removes a named task.
         &quot;path&quot;: &quot;src/maid/src/Shared/Maid.lua&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#__index" class="table-of-contents__link toc-highlight">:__index</a></li><li><a href="#__index" class="table-of-contents__link toc-highlight">:__index</a></li><li><a href="#__newindex" class="table-of-contents__link toc-highlight">:__newindex</a></li><li><a href="#__newindex" class="table-of-contents__link toc-highlight">:__newindex</a></li><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#DoCleaning" class="table-of-contents__link toc-highlight">:DoCleaning</a></li><li><a href="#DoCleaning" class="table-of-contents__link toc-highlight">:DoCleaning</a></li><li><a href="#GivePromise" class="table-of-contents__link toc-highlight">:GivePromise</a></li><li><a href="#GivePromise" class="table-of-contents__link toc-highlight">:GivePromise</a></li><li><a href="#GiveTask" class="table-of-contents__link toc-highlight">:GiveTask</a></li><li><a href="#GiveTask" class="table-of-contents__link toc-highlight">:GiveTask</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">.Destroy</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">.Destroy</a></li><li><a href="#isMaid" class="table-of-contents__link toc-highlight">.isMaid</a></li><li><a href="#isMaid" class="table-of-contents__link toc-highlight">.isMaid</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.4fb85269.js"></script>
-<script src="/NevermoreEngine/assets/js/main.b5e97460.js"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.5fdd1ce2.js"></script>
+<script src="/NevermoreEngine/assets/js/main.c45b8205.js"></script>
 </body>
 </html>
