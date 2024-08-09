@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.4.1...@quenty/snackbar@11.5.0) (2024-08-09)
+
+**Note:** Version bump only for package @quenty/snackbar
+
+
+
+
+
 ## [11.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.4.0...@quenty/snackbar@11.4.1) (2024-05-14)
 
 

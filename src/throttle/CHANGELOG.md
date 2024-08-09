@@ -1,19 +1,18 @@
-# v10.4.0 (Fri Aug 09 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add __call metamethod to ThrottledFunction [#484](https://github.com/Quenty/NevermoreEngine/pull/484) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/throttle@10.3.0...@quenty/throttle@10.4.0) (2024-08-09)
+
+
+### Features
+
+* Added __call metamethod to ThrottledFunction ([#484](https://github.com/Quenty/NevermoreEngine/issues/484)) ([b74baa6](https://github.com/Quenty/NevermoreEngine/commit/b74baa6ec5b85ed3f7ec33b2a487343b3e6b2726))
+
+
+
+
 
 # [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/throttle@10.2.0...@quenty/throttle@10.3.0) (2024-05-09)
 
