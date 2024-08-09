@@ -1,20 +1,18 @@
-# v8.3.1 (Fri Aug 09 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Fix Blend converter plugin erroring [#485](https://github.com/Quenty/NevermoreEngine/pull/485) ([@unrooot](https://github.com/unrooot))
-- fix: Check permissions for new Capabilities and Sandboxed properties ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.3.0...@quenty/roblox-api-dump@8.3.1) (2024-08-09)
+
+
+### Bug Fixes
+
+* Check permissions for new Capabilities and Sandboxed properties ([76a3e22](https://github.com/Quenty/NevermoreEngine/commit/76a3e227e8ea25e86d900f3e20be617eca35d5bd))
+
+
+
+
 
 # [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.2.0...@quenty/roblox-api-dump@8.3.0) (2024-05-09)
 
