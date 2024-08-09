@@ -1,3 +1,16 @@
+# (Fri Aug 09 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/roblox-api-dump@8.3.1`
+  - fix: Fix Blend converter plugin erroring [#485](https://github.com/Quenty/NevermoreEngine/pull/485) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Tue Jul 16 2024)
 
 #### 🚀 Enhancement

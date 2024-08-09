@@ -1,3 +1,16 @@
+# v8.3.1 (Fri Aug 09 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Fix Blend converter plugin erroring [#485](https://github.com/Quenty/NevermoreEngine/pull/485) ([@unrooot](https://github.com/unrooot))
+- fix: Check permissions for new Capabilities and Sandboxed properties ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
