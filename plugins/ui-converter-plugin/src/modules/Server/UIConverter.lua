@@ -123,7 +123,9 @@ function UIConverter:PromisePropertiesForClass(className)
 						or property:IsWriteNotAccessibleSecurity()
 						or property:IsReadNotAccessibleSecurity()
 						or property:IsWriteLocalUserSecurity()
-						or property:IsReadLocalUserSecurity())
+						or property:IsReadLocalUserSecurity()
+						or property:IsWriteRobloxScriptSecurity()
+						or property:IsReadRobloxScriptSecurity())
 					then
 
 					table.insert(valid, property)

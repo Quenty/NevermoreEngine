@@ -137,6 +137,22 @@ function RobloxApiMember:IsReadLocalUserSecurity()
 end
 
 --[=[
+	Returns whether this member has read RobloxScriptSecurity
+	@return boolean
+]=]
+function RobloxApiMember:IsReadRobloxScriptSecurity()
+	return self:GetReadSecurity() == "RobloxScriptSecurity"
+end
+
+--[=[
+	Returns whether this member has write RobloxScriptSecurity
+	@return boolean
+]=]
+function RobloxApiMember:IsWriteRobloxScriptSecurity()
+	return self:GetWriteSecurity() == "RobloxScriptSecurity"
+end
+
+--[=[
 	Returns whether this can serialize save
 	@return boolean?
 ]=]
