@@ -24,7 +24,10 @@ local function roundNumber(value)
 	elseif value == -math.huge then
 		return "-math.huge"
 	else
-		return string.format("%0.6f", value):gsub("%.?0+$", "")
+		local formatted = string.format("%0.6f", value)
+		local stripped = formatted:gsub("%.?0+$", "")
+
+		return stripped
 	end
 end
 
