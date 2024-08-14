@@ -110,8 +110,8 @@ end
 	@return Observable<Brio<boolean>>
 ]=]
 function BasicPane:ObserveVisibleBrio(predicate)
-	return self._visible:ObserveBrio(predicate or function(value)
-		return value
+	return self._visible:ObserveBrio(predicate or function(isVisible)
+		return isVisible
 	end)
 end
 
