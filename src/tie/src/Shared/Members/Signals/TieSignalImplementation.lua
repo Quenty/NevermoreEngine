@@ -44,11 +44,11 @@ function TieSignalImplementation:SetImplementation(signal)
 		end))
 
 		-- TODO: Listen to the event and fire off our own event (if we aren't the source).
-		maid:GiveTask(self._bindableEvent.Event:Connect(function(...)
-			if not self._thisIsUsFiring then
-				signal:Fire(TieUtils.decode(...))
-			end
-		end))
+		-- maid:GiveTask(self._bindableEvent.Event:Connect(function(...)
+		-- 	if not self._thisIsUsFiring then
+		-- 		signal:Fire(TieUtils.decode(...))
+		-- 	end
+		-- end))
 	end
 
 	self._maid._implementationMaid = maid
