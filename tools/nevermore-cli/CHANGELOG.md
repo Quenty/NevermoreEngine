@@ -1,23 +1,18 @@
-# v4.3.1 (Sat Aug 24 2024)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, David Regla ([@dreglad](https://github.com/dreglad)), for all your work!
-
-#### 🐛 Bug Fix
-
-- Update .editorconfig keys from game template [#488](https://github.com/Quenty/NevermoreEngine/pull/488) ([@dreglad](https://github.com/dreglad))
-
-#### Authors: 1
-
-- David Regla ([@dreglad](https://github.com/dreglad))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.3.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.3.0...@quenty/nevermore-cli@4.3.1) (2024-08-24)
+
+
+### Bug Fixes
+
+* Update .editorconfig keys from game template ([#488](https://github.com/Quenty/Nevermore/issues/488)) ([f8bf623](https://github.com/Quenty/Nevermore/commit/f8bf6230e2ba143400da35bd903c2ca8c37cf46f))
+
+
+
+
 
 # [4.3.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.2.0...@quenty/nevermore-cli@4.3.0) (2024-08-24)
 
