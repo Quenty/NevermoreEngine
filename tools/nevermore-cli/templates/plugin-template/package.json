@@ -1,0 +1,15 @@
+{
+  "name": "{{pluginName}}",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {},
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
