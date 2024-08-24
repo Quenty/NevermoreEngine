@@ -37,7 +37,7 @@ yargs(hideBin(process.argv))
   .recommendCommands()
   .demandCommand(
     1,
-    OutputHelper.formatHint("Hint: See 'raven help' for more help")
+    OutputHelper.formatHint("Hint: See 'nevermore help' for more help")
   )
   .wrap(null)
   .strict().argv;
