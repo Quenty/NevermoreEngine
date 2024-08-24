@@ -1,3 +1,19 @@
+# v4.3.1 (Sat Aug 24 2024)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, David Regla ([@dreglad](https://github.com/dreglad)), for all your work!
+
+#### 🐛 Bug Fix
+
+- Update .editorconfig keys from game template [#488](https://github.com/Quenty/NevermoreEngine/pull/488) ([@dreglad](https://github.com/dreglad))
+
+#### Authors: 1
+
+- David Regla ([@dreglad](https://github.com/dreglad))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

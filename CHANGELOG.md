@@ -1,5 +1,22 @@
 # (Sat Aug 24 2024)
 
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, David Regla ([@dreglad](https://github.com/dreglad)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.3.1`
+  - Update .editorconfig keys from game template [#488](https://github.com/Quenty/NevermoreEngine/pull/488) ([@dreglad](https://github.com/dreglad))
+
+#### Authors: 1
+
+- David Regla ([@dreglad](https://github.com/dreglad))
+
+---
+
+# (Sat Aug 24 2024)
+
 #### 🚀 Enhancement
 
 - `@quenty/nevermore-cli@4.3.0`
