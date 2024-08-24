@@ -1,3 +1,23 @@
+# v4.3.0 (Sat Aug 24 2024)
+
+#### 🚀 Enhancement
+
+- feat: Add init-plugin command [#489](https://github.com/Quenty/NevermoreEngine/pull/489) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
+- feat: Add init-plugin command ([@unrooot](https://github.com/unrooot))
+- feat: Add plugin template ([@unrooot](https://github.com/unrooot))
+
+#### 🐛 Bug Fix
+
+- docs: Update README.md ([@Quenty](https://github.com/Quenty))
+- fix: Hint is right for cli ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

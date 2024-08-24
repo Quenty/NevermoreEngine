@@ -1,3 +1,17 @@
+# (Sat Aug 24 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.3.0`
+  - feat: Add init-plugin command [#489](https://github.com/Quenty/NevermoreEngine/pull/489) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Aug 09 2024)
 
 #### 🚀 Enhancement
