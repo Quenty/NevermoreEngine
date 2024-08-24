@@ -1,27 +1,24 @@
-# v4.3.0 (Sat Aug 24 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add init-plugin command [#489](https://github.com/Quenty/NevermoreEngine/pull/489) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
-- feat: Add init-plugin command ([@unrooot](https://github.com/unrooot))
-- feat: Add plugin template ([@unrooot](https://github.com/unrooot))
-
-#### 🐛 Bug Fix
-
-- docs: Update README.md ([@Quenty](https://github.com/Quenty))
-- fix: Hint is right for cli ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.3.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.2.0...@quenty/nevermore-cli@4.3.0) (2024-08-24)
+
+
+### Bug Fixes
+
+* Hint is right for cli ([3e45f0a](https://github.com/Quenty/Nevermore/commit/3e45f0aba165ee03b360c9f3af828a48a83f1b48))
+
+
+### Features
+
+* Add init-plugin command ([e80fdb6](https://github.com/Quenty/Nevermore/commit/e80fdb6a2a84e5530ac010d15fbeb735e19abd34))
+* Add plugin template ([22c0d2e](https://github.com/Quenty/Nevermore/commit/22c0d2eb2bdd37d32d9c0da24a87de1cbd1cecb3))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.1.0...@quenty/nevermore-cli@4.2.0) (2024-05-09)
 
