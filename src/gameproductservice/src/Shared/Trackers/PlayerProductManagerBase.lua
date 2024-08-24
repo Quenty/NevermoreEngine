@@ -26,10 +26,11 @@ PlayerProductManagerBase.ClassName = "PlayerProductManagerBase"
 PlayerProductManagerBase.__index = PlayerProductManagerBase
 
 --[=[
-	Constructs a new PlayerProductManagerBase in charge of handling market connections
+	Constructs a new PlayerProductManagerBase, which provides helper methods for
+	the PlayerProductManager.
 
 	@param player Player
-	@param configPicker GameConfigPicker
+	@param serviceBag ServiceBag
 	@return PlayerProductManagerBase
 ]=]
 function PlayerProductManagerBase.new(player, serviceBag)

@@ -328,6 +328,7 @@ end
 --[=[
 	Observes whether the adornee implements the interface.
 	@param adornee Instance
+	@param tieRealm TieRealm?
 	@return Observable<boolean>>
 ]=]
 function TieDefinition:ObserveIsImplemented(adornee: Instance, tieRealm): boolean
@@ -441,6 +442,7 @@ TieDefinition.ObserveLastImplementationBrio = TieDefinition.ObserveBrio
 --[=[
 	Observes valid implementations wrapped in a brio if it exists.
 	@param adornee Instance
+	@param tieRealm TieRealm?
 	@return Observable<Brio<TieImplementation<T>>>
 ]=]
 function TieDefinition:ObserveImplementationsBrio(adornee: Instance, tieRealm)
