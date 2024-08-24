@@ -10,5 +10,5 @@ insert_final_newline = false
 indent_style = tab
 
 [*.{json,yml}]
-indent_style = spaces
-indent_width = 2
+indent_style = space
+indent_size = 2
