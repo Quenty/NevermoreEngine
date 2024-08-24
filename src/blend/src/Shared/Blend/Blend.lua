@@ -17,13 +17,12 @@ local BrioUtils = require("BrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Signal = require("Signal")
-local Spring = require("Spring")
-local SpringUtils = require("SpringUtils")
 local StepUtils = require("StepUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
 local ValueObjectUtils = require("ValueObjectUtils")
 local RxBrioUtils = require("RxBrioUtils")
+local SpringObject
 
 local Blend = {}
 
@@ -410,53 +409,16 @@ end
 	@return Observable?
 ]=]
 function Blend.Spring(source, speed, damper)
-	local sourceObservable = Blend.toPropertyObservable(source) or Rx.of(source)
-	local speedObservable = Blend.toNumberObservable(speed)
-	local damperObservable = Blend.toNumberObservable(damper)
-
-	local function createSpring(maid, initialValue)
-		local spring = Spring.new(initialValue)
-
-		if speedObservable then
-			maid:GiveTask(speedObservable:Subscribe(function(value)
-				assert(type(value) == "number", "Bad value")
-				spring.Speed = value
-			end))
-		end
-
-		if damperObservable then
-			maid:GiveTask(damperObservable:Subscribe(function(value)
-				assert(type(value) == "number", "Bad value")
-
-				spring.Damper = value
-			end))
-		end
-
-		return spring
+	if not SpringObject then
+		SpringObject = require("SpringObject")
 	end
 
-	-- TODO: Centralize and cache
 	return Observable.new(function(sub)
-		local spring
 		local maid = Maid.new()
 
-		local startAnimate, stopAnimate = StepUtils.bindToRenderStep(function()
-			local animating, position = SpringUtils.animating(spring)
-			sub:Fire(SpringUtils.fromLinearIfNeeded(position))
-			return animating
-		end)
+		local spring = maid:Add(SpringObject.new(source, speed, damper))
 
-		maid:GiveTask(stopAnimate)
-		maid:GiveTask(sourceObservable:Subscribe(function(value)
-			if value then
-				local linearValue = SpringUtils.toLinearIfNeeded(value)
-				spring = spring or createSpring(maid, linearValue)
-				spring.t = SpringUtils.toLinearIfNeeded(value)
-				startAnimate()
-			else
-				warn("Got nil value from emitted source")
-			end
-		end))
+		maid:GiveTask(spring:Observe():Subscribe(sub:GetFireFailComplete()))
 
 		return maid
 	end)
