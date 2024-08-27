@@ -45,7 +45,7 @@ function SpringObject.new(target, speed, damper)
 	self._maid:GiveTask(self.Changed)
 
 	if target then
-		self.Target = target
+		self:SetTarget(target)
 	else
 		self:_getSpringForType(0)
 	end
@@ -287,8 +287,10 @@ function SpringObject:__index(index)
 		return self._epsilon
 	elseif SpringObject[index] then
 		return SpringObject[index]
+	elseif index == "_currentSpring" then
+		return rawget(self, "_currentSpring")
 	else
-		error(("%q is not a member of SpringObject"):format(tostring(index)))
+		error(string.format("%q is not a member of SpringObject", tostring(index)))
 	end
 end
 
@@ -323,6 +325,7 @@ function SpringObject:__newindex(index, value)
 		end)
 	elseif index == "Speed" or index == "s" then
 		local observable = assert(Blend.toNumberObservable(value), "Invalid speed")
+		assert(self._currentSpring, "No self._currentSpring")
 
 		self._maid._speedSub = observable:Subscribe(function(unconverted)
 			assert(type(unconverted) == "number", "Bad damper")
@@ -337,15 +340,22 @@ function SpringObject:__newindex(index, value)
 		assert(type(value) == "function", "Bad clock value")
 		self._currentSpring.Clock = value
 		self.Changed:Fire()
+	elseif index == "_currentSpring" then
+		rawset(self, "_currentSpring", value)
 	else
-		error(("%q is not a member of SpringObject"):format(tostring(index)))
+		error(string.format("%q is not a member of SpringObject", tostring(index)))
 	end
+end
+
+function SpringObject:_ensureSpringOrInitSpring()
+
 end
 
 function SpringObject:_getSpringForType(converted)
 	if rawget(self, "_currentSpring") == nil then
 		-- only happens on init
-		rawset(self, "_currentSpring", Spring.new(converted))
+		local created = Spring.new(converted)
+		rawset(self, "_currentSpring", created)
 		return self._currentSpring
 	else
 		local currentType = typeof(SpringUtils.fromLinearIfNeeded(self._currentSpring.Value))
