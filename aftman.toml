@@ -3,7 +3,7 @@
 
 # To add a new tool, add an entry to this table.
 [tools]
-rojo = "quenty/rojo@7.4.3-quenty-npm-canary.1"
+rojo = "quenty/rojo@7.4.3-quenty-npm-canary.2"
 run-in-roblox = "rojo-rbx/run-in-roblox@0.3.0"
 selene = "Kampfkarren/selene@0.26.1"
 moonwave-extractor = "UpliftGames/moonwave@1.1.2"
