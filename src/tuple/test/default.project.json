@@ -1,0 +1,12 @@
+{
+  "name": "TupleTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "tuple": {
+        "$path": ".."
+      }
+    }
+  }
+}

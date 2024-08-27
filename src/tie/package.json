@@ -40,6 +40,7 @@
     "@quenty/string": "file:../string",
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table",
+    "@quenty/tuple": "file:../tuple",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
     "@quenty/valueobject": "file:../valueobject"
   },

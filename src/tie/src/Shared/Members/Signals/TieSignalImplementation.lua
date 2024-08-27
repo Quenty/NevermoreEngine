@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local TieUtils = require("TieUtils")
 local Maid = require("Maid")
+local Tuple = require("Tuple")
 
 local TieSignalImplementation = setmetatable({}, BaseObject)
 TieSignalImplementation.ClassName = "TieSignalImplementation"
@@ -23,12 +24,6 @@ function TieSignalImplementation.new(memberDefinition, implParent, initialValue)
 	self._bindableEvent.Name = memberDefinition:GetMemberName()
 	self._bindableEvent.Parent = self._implParent
 
-	-- Abuse the fact that the first signal connected is the first
-	-- signal to fire!
-	self._maid:GiveTask(self._bindableEvent.Event:Connect(function()
-		self._thisIsUsFiring = false
-	end))
-
 	self:SetImplementation(initialValue)
 
 	return self
@@ -38,17 +33,37 @@ function TieSignalImplementation:SetImplementation(signal)
 	local maid = Maid.new()
 
 	if type(signal) == "table" then
+		-- Prevent re-entrance from stuff fired from ourselves when forwarding events in either direction
+		local signalFiredArgs = {}
+		local bindableEventFiredArgs = {}
+
 		maid:GiveTask(signal:Connect(function(...)
-			self._thisIsUsFiring = true
-			self._bindableEvent:Fire(TieUtils.encode(...))
+			local args = Tuple.new(TieUtils.encode(...))
+			for pendingArgs, _ in pairs(bindableEventFiredArgs) do
+				if pendingArgs == args then
+					-- Remove from queue
+					bindableEventFiredArgs[pendingArgs] = nil
+					return
+				end
+			end
+
+			signalFiredArgs[args] = true
+			self._bindableEvent:Fire(args:Unpack())
 		end))
 
-		-- TODO: Listen to the event and fire off our own event (if we aren't the source).
-		-- maid:GiveTask(self._bindableEvent.Event:Connect(function(...)
-		-- 	if not self._thisIsUsFiring then
-		-- 		signal:Fire(TieUtils.decode(...))
-		-- 	end
-		-- end))
+		maid:GiveTask(self._bindableEvent.Event:Connect(function(...)
+			local args = Tuple.new(TieUtils.decode(...))
+			for pendingArgs, _ in pairs(signalFiredArgs) do
+				if pendingArgs == args then
+					-- Remove from queue
+					signalFiredArgs[pendingArgs] = nil
+					return
+				end
+			end
+
+			bindableEventFiredArgs[args] = true
+			signal:Fire(args:Unpack())
+		end))
 	end
 
 	self._maid._implementationMaid = maid
