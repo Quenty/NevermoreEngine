@@ -71,13 +71,74 @@ function RxRagdollUtils.enforceHeadCollision(character)
 			return
 		end
 
-		local head = brio:GetValue()
-		local maid = brio:ToMaid()
-
+		local maid, head = brio:ToMaidAndValue()
 		head.CanCollide = true
 
 		maid:GiveTask(function()
 			head.CanCollide = false
+		end)
+	end))
+
+	return topMaid
+end
+
+function RxRagdollUtils.enforceHumanoidStateMachineOff(character, humanoid)
+	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
+
+	local topMaid = Maid.new()
+
+	topMaid:GiveTask(RxInstanceUtils.observePropertyBrio(humanoid, "EvaluateStateMachine", function(evaluateStateMachine)
+		return not evaluateStateMachine
+	end):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid = brio:ToMaid()
+		maid:GiveTask(RxRagdollUtils.enforceLimbCollisions(character))
+	end))
+
+	return topMaid
+end
+
+function RxRagdollUtils.enforceLimbCollisions(character)
+	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
+
+	local topMaid = Maid.new()
+
+	local LIMB_NAMES = {
+		-- R6
+		["Left Arm"] = true;
+		["Right Arm"] = true;
+		["Left Leg"] = true;
+		["Right Leg"] = true;
+
+		-- R15
+		["LeftUpperArm"] = true;
+		["LeftLowerArm"] = true;
+		["LeftHand"] = true;
+		["LeftUpperLeg"] = true;
+		["LeftLowerLeg"] = true;
+		["LeftFoot"] = true;
+		["RightUpperArm"] = true;
+		["RightLowerArm"] = true;
+		["RightHand"] = true;
+		["RightUpperLeg"] = true;
+		["RightLowerLeg"] = true;
+		["RightFoot"] = true;
+	}
+
+	topMaid:GiveTask(RxInstanceUtils.observeChildrenBrio(character, function(child)
+		return child:IsA("BasePart") and LIMB_NAMES[child.Name]
+	end):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid, part = brio:ToMaidAndValue()
+		part.CanCollide = true
+		maid:GiveTask(function()
+			part.CanCollide = false
 		end)
 	end))
 
@@ -108,6 +169,7 @@ function RxRagdollUtils.runLocal(humanoid)
 
 						maid:GiveTask(RxRagdollUtils.suppressRootPartCollision(character, rigType))
 						maid:GiveTask(RxRagdollUtils.enforceHeadCollision(character))
+						maid:GiveTask(RxRagdollUtils.enforceHumanoidStateMachineOff(character, humanoid))
 
 						-- Do motors
 						maid:GiveTask(RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings))
