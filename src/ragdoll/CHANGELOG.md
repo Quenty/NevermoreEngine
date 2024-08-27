@@ -1,19 +1,18 @@
-# v15.7.1 (Tue Aug 27 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Upgrade ragdoll to support humanoid state machine off [#491](https://github.com/Quenty/NevermoreEngine/pull/491) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [15.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.7.0...@quenty/ragdoll@15.7.1) (2024-08-27)
+
+
+### Bug Fixes
+
+* Upgrade ragdoll to support humanoid state machine off ([#491](https://github.com/Quenty/NevermoreEngine/issues/491)) ([891e9f1](https://github.com/Quenty/NevermoreEngine/commit/891e9f1063c465496be293fba8eebaf02b747377))
+
+
+
+
 
 # [15.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.6.1...@quenty/ragdoll@15.7.0) (2024-08-09)
 

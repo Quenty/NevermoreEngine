@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.8.0...@quenty/ik@15.8.1) (2024-08-27)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
 # [15.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.7.1...@quenty/ik@15.8.0) (2024-08-09)
 
 **Note:** Version bump only for package @quenty/ik
