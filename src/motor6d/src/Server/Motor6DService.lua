@@ -11,6 +11,9 @@ function Motor6DService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	-- Services
+	self._serviceBag:GetService(require("TieRealmService"))
+
 	-- Binders
 	self._serviceBag:GetService(require("Motor6DStack"))
 	self._serviceBag:GetService(require("Motor6DStackHumanoid"))
