@@ -73,6 +73,12 @@ function CancelToken.fromMaid(maid)
 	return token
 end
 
+--[=[
+	Constructs a new CancelToken that automatically cancels when the given time in seconds has elapsed.
+
+	@param seconds number
+	@return CancelToken
+]=]
 function CancelToken.fromSeconds(seconds)
 	assert(type(seconds) == "number", "Bad seconds")
 
