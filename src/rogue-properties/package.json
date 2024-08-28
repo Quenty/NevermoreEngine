@@ -34,6 +34,7 @@
     "@quenty/linkutils": "file:../linkutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/rx": "file:../rx",
     "@quenty/rxbinderutils": "file:../rxbinderutils",
     "@quenty/rxsignal": "file:../rxsignal",
@@ -41,6 +42,7 @@
     "@quenty/signal": "file:../signal",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table",
+    "@quenty/tie": "file:../tie",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
     "@quenty/valueobject": "file:../valueobject",
     "@quentystudios/t": "^3.0.0"

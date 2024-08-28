@@ -4,19 +4,20 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RogueAdditiveProvider = require("RogueAdditiveProvider")
-local RogueMultiplierProvider = require("RogueMultiplierProvider")
-local RoguePropertyBinderGroups = require("RoguePropertyBinderGroups")
-local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
-local RoguePropertyService = require("RoguePropertyService")
+local RogueAdditive = require("RogueAdditive")
+local RogueModifierInterface = require("RogueModifierInterface")
+local RogueMultiplier = require("RogueMultiplier")
+local RoguePropertyModifierData = require("RoguePropertyModifierData")
 local RoguePropertyUtils = require("RoguePropertyUtils")
-local RogueSetterProvider = require("RogueSetterProvider")
+local RogueSetter = require("RogueSetter")
 local Rx = require("Rx")
-local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local RxValueBaseUtils = require("RxValueBaseUtils")
 local RxSignal = require("RxSignal")
+local ValueBaseUtils = require("ValueBaseUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local ObservableSortedList = require("ObservableSortedList")
 
 local RogueProperty = {}
 RogueProperty.ClassName = "RogueProperty"
@@ -26,16 +27,12 @@ function RogueProperty.new(adornee, serviceBag, definition)
 	local self = {}
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._roguePropertyBinderGroups = self._serviceBag:GetService(RoguePropertyBinderGroups)
-	self._roguePropertyService = self._serviceBag:GetService(RoguePropertyService)
 
 	self._adornee = assert(adornee, "Bad adornee")
 	self._definition = assert(definition, "Bad definition")
 	self._canInitialize = false
 
-	setmetatable(self, RogueProperty)
-
-	return self
+	return setmetatable(self, RogueProperty)
 end
 
 function RogueProperty:SetCanInitialize(canInitialize)
@@ -131,9 +128,10 @@ function RogueProperty:SetValue(value)
 	end
 
 	local current = value
-	-- TODO: Consider applying inverted chain here
-	for _, item in pairs(self._roguePropertyService:GetProviders()) do
-		current = item:GetInvertedVersion(baseValue, self, current)
+
+	local modifiers = self:GetRogueModifiers()
+	for i=#modifiers, 1, -1 do
+		current = modifiers[i]:GetInvertedVersion(current, value)
 	end
 
 	baseValue.Value = self:_encodeValue(current)
@@ -156,8 +154,8 @@ function RogueProperty:GetValue()
 
 	local current = self:_decodeValue(propObj.Value)
 
-	for _, item in pairs(self._roguePropertyService:GetProviders()) do
-		current = item:GetModifiedVersion(propObj, self, current)
+	for _, rogueModifier in pairs(self:GetRogueModifiers()) do
+		current = rogueModifier:GetModifiedVersion(current)
 	end
 
 	return current
@@ -167,73 +165,99 @@ function RogueProperty:GetDefinition()
 	return self._definition
 end
 
-function RogueProperty:ObserveModifiersBrio()
-	return self:_observeBaseValueBrio()
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(baseValue)
-				if baseValue then
-					return RxBinderUtils.observeBoundChildClassesBrio(self._roguePropertyBinderGroups.RogueModifiers:GetBinders(), baseValue)
-				else
-					return Rx.EMPTY
-				end
-			end);
-		})
+function RogueProperty:GetRogueModifiers()
+	local propObj = self:GetBaseValueObject()
+	if not propObj then
+		return {}
+	end
+
+	local found = RogueModifierInterface:GetChildren(propObj)
+
+	local orders = {}
+	for _, item in pairs(found) do
+		orders[item] = item.Order.Value
+	end
+	table.sort(found, function(a, b)
+		return orders[a] < orders[b]
+	end)
+
+	return found
 end
 
-function RogueProperty:ObserveSourcesBrio()
-	return self:ObserveModifiersBrio()
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(rogueModifier)
-				return RoguePropertyModifierUtils.observeSourceLinksBrio(rogueModifier:GetObject())
+function RogueProperty:_observeModifierSortedList()
+	return Observable.new(function(sub)
+		local topMaid = Maid.new()
+
+		local sortedList = topMaid:Add(ObservableSortedList.new())
+
+		topMaid:GiveTask(self:_observeBaseValueBrio():Pipe({
+			RxBrioUtils.flatMapBrio(function(baseValue)
+				return RogueModifierInterface:ObserveChildrenBrio(baseValue)
 			end);
-		})
+		}):Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
+			local maid, rogueModifier = brio:ToMaidAndValue()
+			maid:GiveTask(sortedList:Add(rogueModifier, rogueModifier.Order:Observe()))
+		end))
+
+		sub:Fire(sortedList)
+
+		return topMaid
+	end):Pipe({
+		Rx.cache();
+	})
 end
 
 function RogueProperty:Observe()
-	return self._roguePropertyService:ObserveProviderList():Pipe({
-		RxBrioUtils.toBrio();
-		RxBrioUtils.switchMapBrio(function()
-			return self:_observeBaseValueBrio()
-		end);
+	local observeInitialValue = self:_observeBaseValueBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(baseValue)
-			local current
-			if baseValue then
-				current = RxValueBaseUtils.observeValue(baseValue)
-
-				if self._definition:GetValueType() == "table" then
-					current = current:Pipe({
-						Rx.map(function(value)
-							return self:_decodeValue(value)
-						end)
-					})
-				end
-			else
-				current = Rx.of(self._definition:GetDefaultValue())
-			end
-
-			for _, provider in pairs(self._roguePropertyService:GetProviders()) do
-				current = provider:ObserveModifiedVersion(baseValue, self, current)
-			end
-
-			return current
+			return RxInstanceUtils.observeProperty(baseValue, "Value")
 		end);
 		RxBrioUtils.emitOnDeath(self._definition:GetDefaultValue());
 		Rx.defaultsTo(self._definition:GetDefaultValue());
 		Rx.distinct();
+	})
+
+	return self:_observeModifierSortedList():Pipe({
+		Rx.switchMap(function(sortedList)
+			return sortedList:Observe()
+		end);
+		Rx.switchMap(function(rogueModifierList)
+			local current = observeInitialValue
+			for _, rogueModifier in pairs(rogueModifierList) do
+				current = rogueModifier:ObserveModifiedVersion(current)
+			end
+			return current
+		end);
 	})
 end
 
 function RogueProperty:CreateMultiplier(amount, source)
 	assert(type(amount) == "number", "Bad amount")
 
-	local provider = self._serviceBag:GetService(RogueMultiplierProvider)
 	local baseValue = self:GetBaseValueObject()
-
 	if not baseValue then
 		warn(string.format("[RogueProperty.CreateMultiplier] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
 	end
 
-	local multiplier = provider:Create(amount, source)
+	local className = ValueBaseUtils.getClassNameFromType(typeof(amount))
+	if not className then
+		error(string.format("[RogueProperty.CreateMultiplier] - Can't set to type %q", typeof(amount)))
+		return nil
+	end
+
+	local multiplier = Instance.new(className)
+	multiplier.Name = "Multiplier"
+	multiplier.Value = amount
+
+	local data = RoguePropertyModifierData:Create(multiplier)
+	data.Order.Value = 2
+	data.RoguePropertySourceLink.Value = source
+
+	RogueMultiplier:Tag(multiplier)
+
 	multiplier.Parent = baseValue
 
 	return multiplier
@@ -242,35 +266,78 @@ end
 function RogueProperty:CreateAdditive(amount, source)
 	assert(type(amount) == "number", "Bad amount")
 
-	local provider = self._serviceBag:GetService(RogueAdditiveProvider)
 	local baseValue = self:GetBaseValueObject()
-
 	if not baseValue then
 		warn(string.format("[RogueProperty.CreateAdditive] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		return nil
 	end
 
-	local multiplier = provider:Create(amount, source)
-	multiplier.Parent = baseValue
+	local className = ValueBaseUtils.getClassNameFromType(typeof(amount))
+	if not className then
+		error(string.format("[RogueProperty.CreateAdditive] - Can't set to type %q", typeof(amount)))
+		return nil
+	end
 
-	return multiplier
+	local additive = Instance.new(className)
+	additive.Name = "Additive"
+	additive.Value = amount
+
+	local data = RoguePropertyModifierData:Create(additive)
+	data.Order.Value = 1
+	data.RoguePropertySourceLink.Value = source
+
+	RogueAdditive:Tag(additive)
+
+	additive.Parent = baseValue
+
+	return additive
+end
+
+function RogueProperty:GetNamedAdditive(name, source)
+	local baseValue = self:GetBaseValueObject()
+	if not baseValue then
+		warn(string.format("[RogueProperty.GetNamedAdditive] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		return nil
+	end
+
+	local searchName = name .. "Additive"
+
+	local found = baseValue:FindFirstChild(searchName)
+	if found then
+		return found
+	end
+
+	local created = self:CreateAdditive(0, source)
+	created.Name = searchName
+	return created
 end
 
 function RogueProperty:CreateSetter(value, source)
-	local provider = self._serviceBag:GetService(RogueSetterProvider)
 	local baseValue = self:GetBaseValueObject()
-
 	if not baseValue then
 		warn(string.format("[RogueProperty.CreateSetter] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		return nil
 	end
 
-	local setter = provider:Create(value, source)
+	local className = ValueBaseUtils.getClassNameFromType(typeof(value))
+	if not className then
+		error(string.format("[RogueProperty.CreateSetter] - Can't set to type %q", typeof(value)))
+		return nil
+	end
+
+	local setter = Instance.new(className)
+	setter.Name = "Setter"
+	setter.Value = value
+
+	local data = RoguePropertyModifierData:Create(setter)
+	data.Order.Value = 0
+	data.RoguePropertySourceLink.Value = source
+
+	RogueSetter:Tag(setter)
+
 	setter.Parent = baseValue
 
 	return setter
-end
-
-function RogueProperty:_observeModifiersBrio()
-	return RxBinderUtils.observeBoundChildClassesBrio(self._roguePropertyBinderGroups.RogueModifiers:GetAll(), self._adornee)
 end
 
 function RogueProperty:__index(index)
