@@ -166,6 +166,8 @@ function PlayerProductManagerClient:_connectGamePassTracker()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
 
 	self._maid:GiveTask(MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
+		assert(type(isPurchased) == "boolean", "Bad isPurchased")
+
 		if player == self._obj then
 			tracker:HandlePromptClosedEvent(gamePassId)
 			tracker:HandlePurchaseEvent(gamePassId, isPurchased)

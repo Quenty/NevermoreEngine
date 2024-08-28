@@ -107,8 +107,8 @@ function PlayerProductManager:_setupPassTracker()
 
 	self._maid:GiveTask(self._remoting.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
 		assert(player == self._obj, "Bad player")
-		assert(gamePassId, "Bad gamePassId")
-		assert(isPurchased, "Bad isPurchased")
+		assert(type(gamePassId) == "number", "Bad gamePassId")
+		assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
 		-- TODO: Validate in purchased scenario
 		tracker:HandlePromptClosedEvent(gamePassId)
