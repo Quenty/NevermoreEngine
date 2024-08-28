@@ -174,15 +174,13 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 	lastTransformSpring.t = QFrame.new()
 
 	-- transform changed event doesn't fire, so let's use this to proxy it
-	local transformValue = Instance.new("CFrameValue")
+	local transformValue = maid:Add(Instance.new("CFrameValue"))
 	transformValue.Value = motor.Transform
-	maid:GiveTask(transformValue)
 
 	-- replacing this weld ensures interpolation for some reason
-	local weldContainer = Instance.new("Camera")
+	local weldContainer = maid:Add(Instance.new("Camera"))
 	weldContainer.Name = "TempWeldContainer"
 	weldContainer.Parent = part0
-	maid:GiveTask(weldContainer)
 
 	local function setupWeld(weldType)
 		local weldMaid = Maid.new()

@@ -7,8 +7,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local AttributeUtils = require("AttributeUtils")
 local RagdollServiceConstants = require("RagdollServiceConstants")
+local AttributeValue = require("AttributeValue")
 
 local Players = game:GetService("Players")
 
@@ -32,9 +32,10 @@ function RagdollServiceClient:Init(serviceBag)
 	self._serviceBag:GetService(require("RagdollableClient"))
 	self._serviceBag:GetService(require("RagdollHumanoidOnDeathClient"))
 	self._serviceBag:GetService(require("RagdollHumanoidOnFallClient"))
+	self._serviceBag:GetService(require("RagdollCameraShakeClient"))
 	self._serviceBag:GetService(require("RagdollBindersClient"))
 
-	self._screenShakeEnabled = true
+	self._screenShakeEnabled = AttributeValue.new(Players.LocalPlayer, "RagdollScreenShakeEnabled", true)
 end
 
 --[=[
@@ -44,7 +45,7 @@ end
 function RagdollServiceClient:SetScreenShakeEnabled(value)
 	assert(type(value) == "boolean", "Bad value")
 
-	Players.LocalPlayer:SetAttribute(RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE, value)
+	self._screenShakeEnabled.Value = value
 end
 
 --[=[
@@ -54,8 +55,7 @@ end
 function RagdollServiceClient:GetScreenShakeEnabled()
 	assert(self._serviceBag, "Not initialized")
 
-	return AttributeUtils.getAttribute(Players.LocalPlayer, RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE, true)
+	return self._screenShakeEnabled.Value
 end
-
 
 return RagdollServiceClient

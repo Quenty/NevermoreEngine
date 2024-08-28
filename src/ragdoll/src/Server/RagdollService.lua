@@ -30,6 +30,7 @@ function RagdollService:Init(serviceBag)
 	self._serviceBag:GetService(require("RagdollHumanoidOnDeath"))
 	self._serviceBag:GetService(require("RagdollHumanoidOnFall"))
 	self._serviceBag:GetService(require("UnragdollAutomatically"))
+	self._serviceBag:GetService(require("RagdollCameraShake"))
 
 	-- Configure
 	self._serviceBag:GetService(require("RagdollHumanoidOnDeath")):SetAutomaticTagging(false)
