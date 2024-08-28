@@ -35,7 +35,11 @@ function Tuple:ToArray()
 end
 
 function Tuple:__tostring()
-	return table.concat(self, ", ")
+	local converted = {}
+	for i=1, self.n do
+		converted[i] = tostring(self[i])
+	end
+	return table.concat(converted, ", ")
 end
 
 function Tuple:__len()
