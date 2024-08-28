@@ -38,21 +38,7 @@ function TieSignalImplementation:SetImplementation(signal)
 		local bindableEventFiredArgs = {}
 
 		maid:GiveTask(signal:Connect(function(...)
-			local args = Tuple.new(TieUtils.encode(...))
-			for pendingArgs, _ in pairs(bindableEventFiredArgs) do
-				if pendingArgs == args then
-					-- Remove from queue
-					bindableEventFiredArgs[pendingArgs] = nil
-					return
-				end
-			end
-
-			signalFiredArgs[args] = true
-			self._bindableEvent:Fire(args:Unpack())
-		end))
-
-		maid:GiveTask(self._bindableEvent.Event:Connect(function(...)
-			local args = Tuple.new(TieUtils.decode(...))
+			local args = Tuple.new(...)
 			for pendingArgs, _ in pairs(signalFiredArgs) do
 				if pendingArgs == args then
 					-- Remove from queue
@@ -62,6 +48,20 @@ function TieSignalImplementation:SetImplementation(signal)
 			end
 
 			bindableEventFiredArgs[args] = true
+			self._bindableEvent:Fire(TieUtils.encode(...))
+		end))
+
+		maid:GiveTask(self._bindableEvent.Event:Connect(function(...)
+			local args = Tuple.new(TieUtils.decode(...))
+			for pendingArgs, _ in pairs(bindableEventFiredArgs) do
+				if pendingArgs == args then
+					-- Remove from queue
+					bindableEventFiredArgs[pendingArgs] = nil
+					return
+				end
+			end
+
+			signalFiredArgs[args] = true
 			signal:Fire(args:Unpack())
 		end))
 	end

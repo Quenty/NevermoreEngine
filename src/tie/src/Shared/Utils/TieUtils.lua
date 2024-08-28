@@ -14,7 +14,10 @@ function TieUtils.encode(...)
 	local results = table.pack(...)
 
 	for i=1, results.n do
-		if type(results[i]) == "table" or type(results[i])  == "function" then
+		if type(results[i]) == "table"
+			or type(results[i])  == "function"
+			or typeof(results[i]) == "userdata" then -- newproxy() symbols
+
 			local saved = results[i]
 			results[i] = function()
 				return saved -- Pack into a callback so we can transfer data.
