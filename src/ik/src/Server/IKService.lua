@@ -50,6 +50,7 @@ function IKService:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("Motor6DService"))
+	self._serviceBag:GetService(require("TieRealmService"))
 	self._humanoidTrackerService = self._serviceBag:GetService(require("HumanoidTrackerService"))
 
 	-- Binders
