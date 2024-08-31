@@ -276,9 +276,10 @@ function Blend.Attached(constructor)
 
 			if MaidTaskUtils.isValidTask(resource) then
 				maid:GiveTask(resource)
+				sub:Fire(resource)
+			elseif Observable.isObservable(resource) then
+				maid:GiveTask(resource:Subscribe(sub:GetFireFailComplete()))
 			end
-
-			sub:Fire(resource)
 
 			return maid
 		end)
