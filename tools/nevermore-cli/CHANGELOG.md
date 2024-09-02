@@ -1,20 +1,18 @@
-# v4.3.2 (Mon Sep 02 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Fix plugin template to fix Rojo build issues [#494](https://github.com/Quenty/NevermoreEngine/pull/494) ([@unrooot](https://github.com/unrooot))
-- fix: Fix default.project.json so Rojo can build properly ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.3.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.3.1...@quenty/nevermore-cli@4.3.2) (2024-09-02)
+
+
+### Bug Fixes
+
+* Fix default.project.json so Rojo can build properly ([dab53e6](https://github.com/Quenty/Nevermore/commit/dab53e689fc61f937a284b4ff3e76fd7b093c01c))
+
+
+
+
 
 ## [4.3.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.3.0...@quenty/nevermore-cli@4.3.1) (2024-08-24)
 
