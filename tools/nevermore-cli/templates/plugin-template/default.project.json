@@ -2,15 +2,10 @@
   "name": "{{pluginNameProper}}",
   "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
-    "$className": "DataModel",
-    "ServerScriptService": {
-      "{{pluginNameProper}}": {
-        "$path": "src",
-        "node_modules": {
-          "$className": "Folder",
-          "$path": "node_modules"
-        }
-      }
+    "$path": "src",
+    "node_modules": {
+      "$className": "Folder",
+      "$path": "node_modules"
     }
   }
 }
