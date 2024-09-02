@@ -1,3 +1,16 @@
+# v4.3.2 (Mon Sep 02 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Fix plugin template to fix Rojo build issues [#494](https://github.com/Quenty/NevermoreEngine/pull/494) ([@unrooot](https://github.com/unrooot))
+- fix: Fix default.project.json so Rojo can build properly ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

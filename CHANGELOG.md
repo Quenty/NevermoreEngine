@@ -1,3 +1,16 @@
+# (Mon Sep 02 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.3.2`
+  - fix: Fix plugin template to fix Rojo build issues [#494](https://github.com/Quenty/NevermoreEngine/pull/494) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Tue Aug 27 2024)
 
 #### 🐛 Bug Fix
