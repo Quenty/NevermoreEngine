@@ -28,13 +28,13 @@ SOFTWARE.
 local LRUCache = {}
 LRUCache.ClassName = "LRUCache"
 
-function LRUCache.new(max_size, max_bytes)
-    assert(max_size >= 1, "max_size must be >= 1")
-    assert(not max_bytes or max_bytes >= 1, "max_bytes must be >= 1")
+function LRUCache.new(maxSize, maxBytes)
+    assert(maxSize >= 1, "maxSize must be >= 1")
+    assert(not maxBytes or maxBytes >= 1, "maxBytes must be >= 1")
 
     -- current size
     local size = 0
-    local bytes_used = 0
+    local bytesUsed = 0
 
     -- map is a hash map from keys to tuples
     -- tuple: value, prev, next, key
@@ -94,15 +94,15 @@ function LRUCache.new(max_size, max_bytes)
         map[key] = nil
         cut(tuple)
         size = size - 1
-        bytes_used = bytes_used - (tuple[BYTES] or 0)
+        bytesUsed = bytesUsed - (tuple[BYTES] or 0)
         removed_tuple = tuple
     end
 
     -- removes elemenets to provide enough memory
     -- returns last removed element or nil
     local function makeFreeSpace(bytes)
-        while size + 1 > max_size or
-            (max_bytes and bytes_used + bytes > max_bytes)
+        while size + 1 > maxSize or
+            (maxBytes and bytesUsed + bytes > maxBytes)
         do
             assert(oldest, "not enough storage for cache")
             del(oldest[KEY], oldest)
@@ -126,15 +126,15 @@ function LRUCache.new(max_size, max_bytes)
         end
         if value ~= nil then
             -- the value is not removed
-            bytes = max_bytes and (bytes or #value) or 0
+            bytes = maxBytes and (bytes or #value) or 0
             makeFreeSpace(bytes)
             local tuple1 = removed_tuple or {}
             map[key] = tuple1
             tuple1[VALUE] = value
             tuple1[KEY] = key
-            tuple1[BYTES] = max_bytes and bytes
+            tuple1[BYTES] = maxBytes and bytes
             size = size + 1
-            bytes_used = bytes_used + bytes
+            bytesUsed = bytesUsed + bytes
             setNewest(tuple1)
         else
             assert(key ~= nil, "Key may not be nil")
