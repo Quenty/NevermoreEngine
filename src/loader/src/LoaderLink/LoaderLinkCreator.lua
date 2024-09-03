@@ -113,12 +113,12 @@ function LoaderLinkCreator:_handleChildAdded(child)
 	assert(typeof(child) == "Instance", "Bad child")
 
 	if child:IsA("ModuleScript") then
-		if child.Name ~= "loader" then
-			self._maid[child] = self:_incrementNeededLoader(1)
-		else
+		if child.Name == "loader" then
 			if child ~= self._lastProvidedLoader then
 				self._maid[child] = self:_addToHasLoaderCount(1)
 			end
+		else
+			self._maid[child] = self:_incrementNeededLoader(1)
 		end
 	elseif child:IsA("Folder") then
 		-- TODO: Maybe add to children with node_modules explicitly in its list.
