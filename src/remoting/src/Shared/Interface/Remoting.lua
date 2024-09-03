@@ -27,6 +27,7 @@ local RAW_MEMBERS = {
 	_instance = true;
 	_remoteObjects = true;
 	_container = true;
+	_defaultRemotingRealm = true;
 }
 
 local REMOTE_EVENT_SUFFIX = "Event"
@@ -37,6 +38,18 @@ Remoting.ClassName = "Remoting"
 Remoting.__index = Remoting
 
 Remoting.Realms = RemotingRealms
+
+Remoting.Server = {
+	new = function(instance, name)
+		return Remoting.new(instance, name, RemotingRealms.SERVER)
+	end;
+}
+
+Remoting.Client = {
+	new = function(instance, name)
+		return Remoting.new(instance, name, RemotingRealms.CLIENT)
+	end;
+}
 
 --[=[
 	Creates a new remoting instance
