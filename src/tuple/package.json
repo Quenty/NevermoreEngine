@@ -25,7 +25,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "file:../loader",
+    "@quenty/lrucache": "file:../lrucache"
   },
   "publishConfig": {
     "access": "public"

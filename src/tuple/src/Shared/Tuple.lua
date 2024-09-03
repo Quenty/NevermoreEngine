@@ -8,10 +8,21 @@ local Tuple = {}
 Tuple.ClassName = "Tuple"
 Tuple.__index = Tuple
 
+--[=[
+	Constructs a new tuple
+
+	@param ... any
+	@return Tuple<T>
+]=]
 function Tuple.new(...)
 	return setmetatable(table.pack(...), Tuple)
 end
 
+--[=[
+	Returns true of the value is a tuple
+
+	@return boolean
+]=]
 function Tuple.isTuple(value)
 	return getmetatable(value) == Tuple
 end
@@ -34,6 +45,9 @@ function Tuple:ToArray()
 	return { self:Unpack() }
 end
 
+--[=[
+	Converts the tuple to a string for easy debugging
+]=]
 function Tuple:__tostring()
 	local converted = {}
 	for i=1, self.n do
@@ -42,10 +56,19 @@ function Tuple:__tostring()
 	return table.concat(converted, ", ")
 end
 
+--[=[
+	Returns the length of the tuple
+
+	@return number
+]=]
 function Tuple:__len()
 	return self.n
 end
 
+--[=[
+	Compares the tuple to another tuple
+	@param other Tuple
+]=]
 function Tuple:__eq(other)
 	if not Tuple.isTuple(other) then
 		return false
@@ -64,6 +87,10 @@ function Tuple:__eq(other)
 	return true
 end
 
+--[=[
+	Combines the tuple
+	@param other Tuple
+]=]
 function Tuple:__add(other)
 	assert(Tuple.isTuple(other), "Can only add tuples")
 
@@ -76,6 +103,11 @@ function Tuple:__add(other)
 	return result
 end
 
+--[=[
+	Unpacks the tuple
+
+	@return ...
+]=]
 function Tuple:__call()
 	return table.unpack(self, 1, self.n)
 end
