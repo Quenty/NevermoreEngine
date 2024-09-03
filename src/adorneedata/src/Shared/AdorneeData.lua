@@ -258,6 +258,21 @@ function AdorneeData:Set(adornee, data)
 end
 
 --[=[
+	Unsets the adornee's attributes (only for baseline attributes)
+
+	@param adornee Instance
+]=]
+function AdorneeData:Unset(adornee)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	for key, _ in pairs(self._attributePrototype) do
+		adornee:SetAttribute(key, nil)
+	end
+
+	-- TODO: Unset value object values
+end
+
+--[=[
 	Sets the attributes for the adornee
 
 	@param adornee Instance
