@@ -24,7 +24,7 @@ end
 
 local loader = waitForValue(script:WaitForChild("LoaderLink"))
 if not loader:IsDescendantOf(game) then
-	error("Cannot load loader that is unparented from game")
+	error("[LoaderLink] - Cannot load loader that is unparented from game")
 end
 
 return require(loader)

@@ -115,7 +115,7 @@ function DependencyUtils.iterPackagesInModuleModules(nodeModules)
 									warn("[DependencyUtils] - Bad link value type")
 								end
 							else
-								warn("[DependencyUtils] - Nothing linked")
+								warn(string.format("[DependencyUtils] - Nothing linked on %s", child:GetFullName()))
 							end
 						end
 					end
@@ -133,7 +133,7 @@ function DependencyUtils.iterPackagesInModuleModules(nodeModules)
 						warn("[DependencyUtils] - Bad link value type")
 					end
 				else
-					warn("[DependencyUtils] - Nothing linked")
+					warn(string.format("[DependencyUtils] - Nothing linked on %s", item:GetFullName()))
 				end
 			end
 		end
