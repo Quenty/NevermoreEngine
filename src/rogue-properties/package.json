@@ -24,6 +24,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/adorneedata": "file:../adorneedata",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
@@ -40,6 +41,7 @@
     "@quenty/rxsignal": "file:../rxsignal",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
+    "@quenty/spring": "file:../spring",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table",
     "@quenty/tie": "file:../tie",
