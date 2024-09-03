@@ -24,7 +24,7 @@ function ResetService:Init()
 	assert(not self._remoteEvent, "Already initialized")
 	self._maid = Maid.new()
 
-	self._remoting = self._maid:Add(Remoting.new(ReplicatedStorage, "ResetService", Remoting.Realms.CLIENT))
+	self._remoting = self._maid:Add(Remoting.Server.new(ReplicatedStorage, "ResetService"))
 
 	self._maid:GiveTask(self._remoting.ResetCharacter:Bind(function(player)
 		return self:PromiseResetCharacter(player)
