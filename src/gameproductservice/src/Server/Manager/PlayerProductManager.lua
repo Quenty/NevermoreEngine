@@ -55,7 +55,7 @@ function PlayerProductManager.new(player, serviceBag)
 end
 
 function PlayerProductManager:_setupRemoting()
-	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager", Remoting.Realms.SERVER))
+	self._remoting = self._maid:Add(Remoting.Server.new(self._obj, "PlayerProductManager", Remoting.Realms.SERVER))
 end
 
 function PlayerProductManager:_setupAssetTracker()
