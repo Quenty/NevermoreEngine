@@ -87,7 +87,7 @@ function InputKeyMapRegistryServiceShared:ObserveInputKeyMapList(providerName, i
 	}):Pipe({
 		Rx.map(function(state)
 			if not (type(state.inputKeyMapListName) == "string" and type(state.providerName) == "string") then
-				return Rx.of(nil)
+				return nil
 			end
 
 			local found = self:FindInputKeyMapList(state.providerName, state.inputKeyMapListName)
@@ -99,7 +99,7 @@ function InputKeyMapRegistryServiceShared:ObserveInputKeyMapList(providerName, i
 				tostring(state.providerName),
 				tostring(state.inputKeyMapListName)))
 
-			return Rx.of(nil)
+			return nil
 		end);
 	})
 end
