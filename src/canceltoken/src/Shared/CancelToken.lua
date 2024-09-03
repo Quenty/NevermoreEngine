@@ -10,6 +10,8 @@ local Signal = require("Signal")
 local Maid = require("Maid")
 local DuckTypeUtils = require("DuckTypeUtils")
 
+local EMPTY_FUNCTION = function() end
+
 local CancelToken = {}
 CancelToken.ClassName = "CancelToken"
 CancelToken.__index = CancelToken
@@ -30,9 +32,14 @@ function CancelToken.new(executor)
 	self.PromiseCancelled = Promise.new()
 	self.Cancelled = Signal.new()
 
-	self.PromiseCancelled:Then(function()
+	self._maid:GiveTask(function()
+		self.PromiseCancelled:Resolve()
 		self.Cancelled:Fire()
 		self.Cancelled:Destroy()
+	end)
+
+	self.PromiseCancelled:Then(function()
+		self._maid:DoCleaning()
 	end)
 
 	executor(function()
@@ -50,8 +57,6 @@ end
 function CancelToken.isCancelToken(value)
 	return DuckTypeUtils.isImplementation(CancelToken, value)
 end
-
-local EMPTY_FUNCTION = function() end
 
 --[=[
 	Constructs a new CancelToken that cancels whenever the maid does.
@@ -73,6 +78,12 @@ function CancelToken.fromMaid(maid)
 	return token
 end
 
+--[=[
+	Cancels after the set amount of seconds
+
+	@param seconds number
+	@return CancelToken
+]=]
 function CancelToken.fromSeconds(seconds)
 	assert(type(seconds) == "number", "Bad seconds")
 
@@ -100,7 +111,6 @@ end
 
 function CancelToken:_cancel()
 	self._maid:DoCleaning()
-	self.PromiseCancelled:Resolve()
 end
 
 return CancelToken
