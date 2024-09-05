@@ -417,6 +417,7 @@ function Blend.Spring(source, speed, damper)
 		local maid = Maid.new()
 
 		local spring = maid:Add(SpringObject.new(source, speed, damper))
+		spring.Epsilon = 1e-3
 
 		maid:GiveTask(spring:Observe():Subscribe(sub:GetFireFailComplete()))
 
