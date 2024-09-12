@@ -1,3 +1,24 @@
+# v14.9.0 (Thu Sep 12 2024)
+
+#### 🚀 Enhancement
+
+- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
+- feat: Better remoting code ([@Quenty](https://github.com/Quenty))
+- feat: Add gamepass purchased boolean checks ([@Quenty](https://github.com/Quenty))
+- feat: Upgrade product manager to process ownership properly ([@Quenty](https://github.com/Quenty))
+- feat: Declarative remoting realms allows for safer calls ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Sort imports ([@Quenty](https://github.com/Quenty))
+- style: Fix linting ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

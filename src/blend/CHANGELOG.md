@@ -1,3 +1,21 @@
+# v12.5.0 (Thu Sep 12 2024)
+
+#### 🚀 Enhancement
+
+- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
+- feat: Update Blend.Spring to use SpringObject underneath ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Blend spring uses a default spring object, fixing any errors ([@Quenty](https://github.com/Quenty))
+- fix: Fix some spring object stuff ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

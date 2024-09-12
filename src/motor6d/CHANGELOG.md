@@ -1,3 +1,21 @@
+# v7.7.0 (Thu Sep 12 2024)
+
+#### 🚀 Enhancement
+
+- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
+- feat: Unedited all changes ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Motor6D uses tie realm ([@Quenty](https://github.com/Quenty))
+- refactor: Use new Maid API ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

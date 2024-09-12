@@ -1,3 +1,22 @@
+# v12.6.0 (Thu Sep 12 2024)
+
+#### 🚀 Enhancement
+
+- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
+- feat: Add new remoting .Server and .Client methods ([@Quenty](https://github.com/Quenty))
+- feat: Declarative remoting realms allows for safer calls ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- refactor: Sort imports ([@Quenty](https://github.com/Quenty))
+- refactor: Remoting has declarable realms ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

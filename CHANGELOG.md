@@ -1,3 +1,16 @@
+# (Thu Sep 12 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.5.0`, `@quenty/accessorytypeutils@1.1.0`, `@quenty/adorneedata@7.6.0`, `@quenty/attributeutils@14.5.0`, `@quenty/avatareditorutils@7.6.0`, `@quenty/basicpane@13.5.0`, `@quenty/binder@14.6.0`, `@quenty/blend@12.5.0`, `@quenty/brio@14.5.0`, `@quenty/canceltoken@11.4.0`, `@quenty/characterutils@12.5.0`, `@quenty/clienttranslator@14.6.0`, `@quenty/cmdrservice@13.7.0`, `@quenty/colorpalette@10.6.0`, `@quenty/coreguienabler@12.5.0`, `@quenty/datastore@13.7.0`, `@quenty/friendutils@12.5.0`, `@quenty/gameconfig@12.9.0`, `@quenty/gameproductservice@14.9.0`, `@quenty/humanoidtracker@13.5.0`, `@quenty/idleservice@13.8.0`, `@quenty/ik@15.9.0`, `@quenty/inputkeymaputils@14.8.0`, `@quenty/inputobjectutils@4.6.0`, `@quenty/loader@10.4.0`, `@quenty/localizedtextutils@12.5.0`, `@quenty/lrucache@1.2.0`, `@quenty/maid@3.3.0`, `@quenty/marketplaceutils@11.5.0`, `@quenty/memoize@1.2.0`, `@quenty/motor6d@7.7.0`, `@quenty/observablecollection@12.5.0`, `@quenty/promise@10.4.0`, `@quenty/racketingropeconstraint@12.7.0`, `@quenty/ragdoll@15.8.0`, `@quenty/receiptprocessing@7.6.0`, `@quenty/remotefunctionutils@10.4.0`, `@quenty/remoting@12.6.0`, `@quenty/resetservice@11.7.0`, `@quenty/rogue-humanoid@10.7.0`, `@quenty/rogue-properties@11.7.0`, `@quenty/rx@13.5.0`, `@quenty/scoredactionservice@16.9.0`, `@quenty/servicebag@11.5.0`, `@quenty/settings-inputkeymap@10.10.0`, `@quenty/settings@11.8.0`, `@quenty/snackbar@11.6.0`, `@quenty/softshutdown@9.8.0`, `@quenty/spring@10.4.0`, `@quenty/tie@10.7.0`, `@quenty/tuple@1.1.0`, `@quenty/uiobjectutils@6.4.0`, `@quenty/viewport@11.8.0`, `@quenty/nevermore-cli@4.4.0`
+  - feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Sep 02 2024)
 
 #### 🐛 Bug Fix
