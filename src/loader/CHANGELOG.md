@@ -1,26 +1,24 @@
-# v10.4.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Unedited all changes ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Swap around loader position ([@Quenty](https://github.com/Quenty))
-- fix: Better warnings in loader ([@Quenty](https://github.com/Quenty))
-- fix: Fix maid formatting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.3.0...@quenty/loader@10.4.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Better warnings in loader ([b504df9](https://github.com/Quenty/NevermoreEngine/commit/b504df94854d3191be998f935440ee80fc1f3049))
+* Fix maid formatting ([d4cc336](https://github.com/Quenty/NevermoreEngine/commit/d4cc336f86c82de76670f0e3e1061741b0e9b998))
+
+
+### Features
+
+* Unedited all changes ([60e64e3](https://github.com/Quenty/NevermoreEngine/commit/60e64e3efce17c10c4b8965871187d231b338dd4))
+
+
+
+
 
 # [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.2.0...@quenty/loader@10.3.0) (2024-05-09)
 

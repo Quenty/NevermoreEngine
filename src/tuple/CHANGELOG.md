@@ -1,3 +1,25 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2024-09-12)
+
+
+### Bug Fixes
+
+* Fix tuple string conversion ([9b907d5](https://github.com/Quenty/NevermoreEngine/commit/9b907d5d068e2b73fb9de6a8aef89504b30ccb22))
+
+
+### Features
+
+* Add tuple package and fix tie signal ([134f90c](https://github.com/Quenty/NevermoreEngine/commit/134f90c03b265b9d2232198475ca27f4d5e87071))
+* Add TupleLookup ([4de1c5f](https://github.com/Quenty/NevermoreEngine/commit/4de1c5fcd226fdcb5f23f26cd0b3ec31005a5330))
+
+
+
+
+
 # v1.1.0 (Thu Sep 12 2024)
 
 #### 🚀 Enhancement

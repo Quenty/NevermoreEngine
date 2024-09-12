@@ -1,23 +1,18 @@
-# v13.7.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Prevent CmdrService from running cmdr when in hoarcekat ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.6.0...@quenty/cmdrservice@13.7.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Prevent CmdrService from running cmdr when in hoarcekat ([39e555d](https://github.com/Quenty/NevermoreEngine/commit/39e555d5791089c238fc69f7d2b31e981d288257))
+
+
+
+
 
 # [13.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.5.0...@quenty/cmdrservice@13.6.0) (2024-08-09)
 

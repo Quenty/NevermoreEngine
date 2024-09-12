@@ -1,28 +1,26 @@
-# v14.9.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Better remoting code ([@Quenty](https://github.com/Quenty))
-- feat: Add gamepass purchased boolean checks ([@Quenty](https://github.com/Quenty))
-- feat: Upgrade product manager to process ownership properly ([@Quenty](https://github.com/Quenty))
-- feat: Declarative remoting realms allows for safer calls ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Sort imports ([@Quenty](https://github.com/Quenty))
-- style: Fix linting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.8.0...@quenty/gameproductservice@14.9.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Sort imports ([2801f00](https://github.com/Quenty/NevermoreEngine/commit/2801f00e2650bc489a90fedd4613c5ccc9d6f449))
+
+
+### Features
+
+* Add gamepass purchased boolean checks ([0b62393](https://github.com/Quenty/NevermoreEngine/commit/0b6239312c7809586a86c62b6b17b3d6998dd3e0))
+* Better remoting code ([cecd9ad](https://github.com/Quenty/NevermoreEngine/commit/cecd9ad74c0baf26b8d3feaf1615dc894235a398))
+* Declarative remoting realms allows for safer calls ([7264fd1](https://github.com/Quenty/NevermoreEngine/commit/7264fd1eb7b9d812a7383ec62db63ed90e78472a))
+* Upgrade product manager to process ownership properly ([58ebd65](https://github.com/Quenty/NevermoreEngine/commit/58ebd6516b7a652ca2f305a1e4a9878318679ee8))
+
+
+
+
 
 # [14.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.7.1...@quenty/gameproductservice@14.8.0) (2024-08-09)
 

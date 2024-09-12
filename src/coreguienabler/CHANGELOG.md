@@ -1,23 +1,18 @@
-# v12.5.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: CoreGuiEnabler does not error on lack of local player ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.4.0...@quenty/coreguienabler@12.5.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* CoreGuiEnabler does not error on lack of local player ([0ab4d30](https://github.com/Quenty/NevermoreEngine/commit/0ab4d304a4232c94b218fc04fdcb5be5681c2e67))
+
+
+
+
 
 # [12.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.3.0...@quenty/coreguienabler@12.4.0) (2024-08-09)
 

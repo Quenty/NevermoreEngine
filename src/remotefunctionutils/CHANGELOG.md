@@ -1,20 +1,18 @@
-# v10.4.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Declarative remoting realms allows for safer calls ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remotefunctionutils@10.3.0...@quenty/remotefunctionutils@10.4.0) (2024-09-12)
+
+
+### Features
+
+* Declarative remoting realms allows for safer calls ([7264fd1](https://github.com/Quenty/NevermoreEngine/commit/7264fd1eb7b9d812a7383ec62db63ed90e78472a))
+
+
+
+
 
 # [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remotefunctionutils@10.2.0...@quenty/remotefunctionutils@10.3.0) (2024-05-09)
 

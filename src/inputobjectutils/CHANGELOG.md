@@ -1,24 +1,23 @@
-# v4.6.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Recreate InputObjectTracker to be easier to use ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: InputObjectUtils didn't load dependencies properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.5.0...@quenty/inputobjectutils@4.6.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* InputObjectUtils didn't load dependencies properly ([bfeb42c](https://github.com/Quenty/NevermoreEngine/commit/bfeb42c9fe16ce5a8ba50e0451fdc1d304e6bc9c))
+
+
+### Features
+
+* Recreate InputObjectTracker to be easier to use ([dc78fe7](https://github.com/Quenty/NevermoreEngine/commit/dc78fe7b83d4be3a08eadf690b13685111e38e25))
+
+
+
+
 
 # [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.4.0...@quenty/inputobjectutils@4.5.0) (2024-08-09)
 

@@ -1,20 +1,18 @@
-# v16.9.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add better warnings and code cleanup ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [16.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.8.0...@quenty/scoredactionservice@16.9.0) (2024-09-12)
+
+
+### Features
+
+* Add better warnings and code cleanup ([d8c0d8d](https://github.com/Quenty/NevermoreEngine/commit/d8c0d8d5a850b3293e424ed06ad1acd171899a19))
+
+
+
+
 
 # [16.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.7.2...@quenty/scoredactionservice@16.8.0) (2024-08-09)
 

@@ -1,29 +1,26 @@
-# v10.7.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add tuple package and fix tie signal ([@Quenty](https://github.com/Quenty))
-- feat: Allow default values to be defined for TiePropertyDefinition ([@Quenty](https://github.com/Quenty))
-- feat: Unedited all changes ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Tie signal implementation fix ([@Quenty](https://github.com/Quenty))
-- style: Fix linting ([@Quenty](https://github.com/Quenty))
-- fix: TODO FIX THIS ([@Quenty](https://github.com/Quenty))
-- refactor: Tie threads realms all the way through the system ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.6.0...@quenty/tie@10.7.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Tie signal implementation fix ([8dc23bb](https://github.com/Quenty/NevermoreEngine/commit/8dc23bb8300598431a58b273ee2382ee90e76243))
+* TODO FIX THIS ([3731acd](https://github.com/Quenty/NevermoreEngine/commit/3731acdf4cf888bdac55157670fc61d6a6ba7c3d))
+
+
+### Features
+
+* Add tuple package and fix tie signal ([134f90c](https://github.com/Quenty/NevermoreEngine/commit/134f90c03b265b9d2232198475ca27f4d5e87071))
+* Allow default values to be defined for TiePropertyDefinition ([89112f1](https://github.com/Quenty/NevermoreEngine/commit/89112f15ffdc8c637681ba9f4e7aa1c60e2c7e23))
+* Unedited all changes ([60e64e3](https://github.com/Quenty/NevermoreEngine/commit/60e64e3efce17c10c4b8965871187d231b338dd4))
+
+
+
+
 
 # [10.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.5.0...@quenty/tie@10.6.0) (2024-08-09)
 

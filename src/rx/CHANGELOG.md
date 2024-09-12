@@ -1,23 +1,18 @@
-# v13.5.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fx.defaultsTo() ensures emission of event at least once ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.4.0...@quenty/rx@13.5.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Fx.defaultsTo() ensures emission of event at least once ([c03f1ef](https://github.com/Quenty/NevermoreEngine/commit/c03f1ef72a339d6196e3067c0dd44f9700e5ff85))
+
+
+
+
 
 # [13.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.3.0...@quenty/rx@13.4.0) (2024-08-09)
 

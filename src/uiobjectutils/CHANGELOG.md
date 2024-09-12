@@ -1,20 +1,18 @@
-# v6.4.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add GuiInteractionUtils.observeInteractionEnabled ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.3.0...@quenty/uiobjectutils@6.4.0) (2024-09-12)
+
+
+### Features
+
+* Add GuiInteractionUtils.observeInteractionEnabled ([2e27110](https://github.com/Quenty/NevermoreEngine/commit/2e2711020665371e1c1d3b1ba35f44dc9a9ad3a7))
+
+
+
+
 
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.2.0...@quenty/uiobjectutils@6.3.0) (2024-05-09)
 

@@ -1,27 +1,24 @@
-# v15.8.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Split out ragdoll camera code ([@Quenty](https://github.com/Quenty))
-- feat: Declare tie interface we're implementing ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix linting docs ([@Quenty](https://github.com/Quenty))
-- fix: Upgrade ragdoll to support humanoid state machine off ([@Quenty](https://github.com/Quenty))
-- refactor: Use new AdorneeData API ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.7.1...@quenty/ragdoll@15.8.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Upgrade ragdoll to support humanoid state machine off ([fed4769](https://github.com/Quenty/NevermoreEngine/commit/fed47690c13fdda689b80158cf9f28c8a3a00a47))
+
+
+### Features
+
+* Declare tie interface we're implementing ([e7150c1](https://github.com/Quenty/NevermoreEngine/commit/e7150c13a685ce88db9c1280a14841c81191a40a))
+* Split out ragdoll camera code ([f596a06](https://github.com/Quenty/NevermoreEngine/commit/f596a066e224d3c46aed4d1ba0065793327f4a88))
+
+
+
+
 
 ## [15.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.7.0...@quenty/ragdoll@15.7.1) (2024-08-27)
 

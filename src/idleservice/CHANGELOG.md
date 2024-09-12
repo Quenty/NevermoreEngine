@@ -1,20 +1,18 @@
-# v13.8.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Handle humanoid tracker not having a value (Happens in studio hot reloading) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.7.1...@quenty/idleservice@13.8.0) (2024-09-12)
+
+
+### Features
+
+* Handle humanoid tracker not having a value (Happens in studio hot reloading) ([2ebf6d9](https://github.com/Quenty/NevermoreEngine/commit/2ebf6d95a6ffe8563ec315b4cdc0be4d38dbd840))
+
+
+
+
 
 ## [13.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.7.0...@quenty/idleservice@13.7.1) (2024-08-27)
 

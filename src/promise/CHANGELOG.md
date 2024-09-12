@@ -1,20 +1,18 @@
-# v10.4.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add PromiseUtils.firstSuccessOrLastFailure(promises) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.3.0...@quenty/promise@10.4.0) (2024-09-12)
+
+
+### Features
+
+* Add PromiseUtils.firstSuccessOrLastFailure(promises) ([1dc9bd7](https://github.com/Quenty/NevermoreEngine/commit/1dc9bd7a6851a29339fa8f61bd887d64fc4fed92))
+
+
+
+
 
 # [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.2.0...@quenty/promise@10.3.0) (2024-05-09)
 

@@ -1,20 +1,18 @@
-# v11.4.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: More consistent CancelToken state ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.3.0...@quenty/canceltoken@11.4.0) (2024-09-12)
+
+
+### Features
+
+* More consistent CancelToken state ([d15009d](https://github.com/Quenty/NevermoreEngine/commit/d15009d6ba8a3b7fc2cd5c20114249b7012ba430))
+
+
+
+
 
 # [11.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.2.0...@quenty/canceltoken@11.3.0) (2024-05-09)
 

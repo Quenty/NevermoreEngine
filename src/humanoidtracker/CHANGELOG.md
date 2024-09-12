@@ -1,23 +1,18 @@
-# v13.5.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Handle HumanoidTrackerService not having stuff ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidtracker@13.4.0...@quenty/humanoidtracker@13.5.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Handle HumanoidTrackerService not having stuff ([f3c1292](https://github.com/Quenty/NevermoreEngine/commit/f3c12926658a0c5ff0cff60c21f3b5278b04b086))
+
+
+
+
 
 # [13.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidtracker@13.3.0...@quenty/humanoidtracker@13.4.0) (2024-08-09)
 

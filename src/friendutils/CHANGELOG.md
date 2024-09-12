@@ -1,23 +1,18 @@
-# v12.5.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Prevent observing friends in server from doing anything while the game is not running in studio ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.4.0...@quenty/friendutils@12.5.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Prevent observing friends in server from doing anything while the game is not running in studio ([3e5b46a](https://github.com/Quenty/NevermoreEngine/commit/3e5b46afe8d92207863af0ac6907e6976e3b32b3))
+
+
+
+
 
 # [12.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.3.0...@quenty/friendutils@12.4.0) (2024-08-09)
 

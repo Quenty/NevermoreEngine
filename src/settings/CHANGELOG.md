@@ -1,26 +1,19 @@
-# v11.8.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Simplified settings manager usage ([@Quenty](https://github.com/Quenty))
-- feat: Unedited all changes ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix linting docs ([@Quenty](https://github.com/Quenty))
-- refactor: Settings uses new remoting and setting system ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.7.0...@quenty/settings@11.8.0) (2024-09-12)
+
+
+### Features
+
+* Simplified settings manager usage ([71fdb58](https://github.com/Quenty/NevermoreEngine/commit/71fdb5870c07e8b73b36bd4b938c4fcca914ba1b))
+* Unedited all changes ([60e64e3](https://github.com/Quenty/NevermoreEngine/commit/60e64e3efce17c10c4b8965871187d231b338dd4))
+
+
+
+
 
 # [11.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.6.1...@quenty/settings@11.7.0) (2024-08-09)
 

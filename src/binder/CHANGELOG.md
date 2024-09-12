@@ -1,24 +1,19 @@
-# v14.6.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Binder can clean up properly without erroring everything else ([@Quenty](https://github.com/Quenty))
-- fix: Fix indexing error on cleanup of BinderGroupProvider ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.5.0...@quenty/binder@14.6.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Binder can clean up properly without erroring everything else ([23fe067](https://github.com/Quenty/NevermoreEngine/commit/23fe0676bc9800d659be547ebd4eea612b29806c))
+* Fix indexing error on cleanup of BinderGroupProvider ([083cbce](https://github.com/Quenty/NevermoreEngine/commit/083cbce0ee476c2809bd68bfd481e217bfecd110))
+
+
+
+
 
 # [14.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.4.0...@quenty/binder@14.5.0) (2024-08-09)
 

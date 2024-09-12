@@ -1,24 +1,18 @@
-# v4.4.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Upgrade to latest npm ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- ci: Upgrade rojo ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.4.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.3.2...@quenty/nevermore-cli@4.4.0) (2024-09-12)
+
+
+### Features
+
+* Upgrade to latest npm ([211e09e](https://github.com/Quenty/Nevermore/commit/211e09ec811d87f8ad4596230f8ee53f81eb6eaa))
+
+
+
+
 
 ## [4.3.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.3.1...@quenty/nevermore-cli@4.3.2) (2024-09-02)
 

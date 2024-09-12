@@ -1,24 +1,23 @@
-# v14.8.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add InputKeyMapRegistryServiceShared:ObserveInputKeyMapList ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix return value ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.7.0...@quenty/inputkeymaputils@14.8.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Fix return value ([277ee08](https://github.com/Quenty/NevermoreEngine/commit/277ee080da567177abe8e1778ecc2db7e28648e2))
+
+
+### Features
+
+* Add InputKeyMapRegistryServiceShared:ObserveInputKeyMapList ([db86a30](https://github.com/Quenty/NevermoreEngine/commit/db86a30872163a5f5b2dc705d92b80f04c372d7e))
+
+
+
+
 
 # [14.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.6.2...@quenty/inputkeymaputils@14.7.0) (2024-08-09)
 

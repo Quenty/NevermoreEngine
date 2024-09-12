@@ -1,21 +1,19 @@
-# v7.6.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add CatalogSearchServiceCache ([@Quenty](https://github.com/Quenty))
-- feat: Add AccessoryTypeUtils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.5.0...@quenty/avatareditorutils@7.6.0) (2024-09-12)
+
+
+### Features
+
+* Add AccessoryTypeUtils ([dd92f34](https://github.com/Quenty/NevermoreEngine/commit/dd92f349d0331a92921046cdb3e446dad8052f10))
+* Add CatalogSearchServiceCache ([b71203a](https://github.com/Quenty/NevermoreEngine/commit/b71203aabeabe614df60da1e74d7019b11525e8b))
+
+
+
+
 
 # [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.4.0...@quenty/avatareditorutils@7.5.0) (2024-08-09)
 

@@ -1,24 +1,23 @@
-# v12.9.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add additional game config types ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: GameConfigAsset does not export empty description or name ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.8.0...@quenty/gameconfig@12.9.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* GameConfigAsset does not export empty description or name ([1a9de5c](https://github.com/Quenty/NevermoreEngine/commit/1a9de5c899cc7b47aedabacc78006883b4236c95))
+
+
+### Features
+
+* Add additional game config types ([c6fdf4a](https://github.com/Quenty/NevermoreEngine/commit/c6fdf4a34ea26135c6aa16a6a268a966062f4a2f))
+
+
+
+
 
 # [12.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.7.1...@quenty/gameconfig@12.8.0) (2024-08-09)
 

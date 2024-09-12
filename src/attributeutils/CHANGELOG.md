@@ -1,24 +1,18 @@
-# v14.5.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add AttributeValue.AttributeName ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- feat> Allow EnumItem in attributes ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.4.0...@quenty/attributeutils@14.5.0) (2024-09-12)
+
+
+### Features
+
+* Add AttributeValue.AttributeName ([25863db](https://github.com/Quenty/NevermoreEngine/commit/25863db3d88e7bb524c28bebff6fc687c072a53b))
+
+
+
+
 
 # [14.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.3.0...@quenty/attributeutils@14.4.0) (2024-08-09)
 

@@ -1,24 +1,23 @@
-# v11.7.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Declarative remoting realms allows for safer calls ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix reset service calls ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.6.0...@quenty/resetservice@11.7.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Fix reset service calls ([75b45be](https://github.com/Quenty/NevermoreEngine/commit/75b45bea314f73a2b999212a3f50d83400ef4421))
+
+
+### Features
+
+* Declarative remoting realms allows for safer calls ([7264fd1](https://github.com/Quenty/NevermoreEngine/commit/7264fd1eb7b9d812a7383ec62db63ed90e78472a))
+
+
+
+
 
 # [11.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.5.0...@quenty/resetservice@11.6.0) (2024-08-09)
 

@@ -1,26 +1,19 @@
-# v12.6.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Add new remoting .Server and .Client methods ([@Quenty](https://github.com/Quenty))
-- feat: Declarative remoting realms allows for safer calls ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Sort imports ([@Quenty](https://github.com/Quenty))
-- refactor: Remoting has declarable realms ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.5.0...@quenty/remoting@12.6.0) (2024-09-12)
+
+
+### Features
+
+* Add new remoting .Server and .Client methods ([89862e8](https://github.com/Quenty/NevermoreEngine/commit/89862e852456ada3a1b1eefde682229c4ca033fa))
+* Declarative remoting realms allows for safer calls ([7264fd1](https://github.com/Quenty/NevermoreEngine/commit/7264fd1eb7b9d812a7383ec62db63ed90e78472a))
+
+
+
+
 
 # [12.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.4.0...@quenty/remoting@12.5.0) (2024-08-09)
 

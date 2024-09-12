@@ -1,24 +1,19 @@
-# v10.7.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix humanoid scaling via hack ([@Quenty](https://github.com/Quenty))
-- fix: Fix dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.6.0...@quenty/rogue-humanoid@10.7.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Fix dependencies ([c18fcc4](https://github.com/Quenty/NevermoreEngine/commit/c18fcc4a83d77221d9695bbb708ec0403a094e07))
+* Fix humanoid scaling via hack ([60bc727](https://github.com/Quenty/NevermoreEngine/commit/60bc7272cc0291a6a3934b4ed991afebd449d878))
+
+
+
+
 
 # [10.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.5.0...@quenty/rogue-humanoid@10.6.0) (2024-08-09)
 

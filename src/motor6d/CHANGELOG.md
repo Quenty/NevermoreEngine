@@ -1,25 +1,23 @@
-# v7.7.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Unedited all changes ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Motor6D uses tie realm ([@Quenty](https://github.com/Quenty))
-- refactor: Use new Maid API ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.6.0...@quenty/motor6d@7.7.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Motor6D uses tie realm ([cc327e5](https://github.com/Quenty/NevermoreEngine/commit/cc327e5b264eb8832b7afa6f0208fce1afd30c38))
+
+
+### Features
+
+* Unedited all changes ([60e64e3](https://github.com/Quenty/NevermoreEngine/commit/60e64e3efce17c10c4b8965871187d231b338dd4))
+
+
+
+
 
 # [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.5.0...@quenty/motor6d@7.6.0) (2024-08-09)
 

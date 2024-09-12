@@ -1,23 +1,18 @@
-# v3.3.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix maid formatting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@3.2.0...@quenty/maid@3.3.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Fix maid formatting ([d4cc336](https://github.com/Quenty/NevermoreEngine/commit/d4cc336f86c82de76670f0e3e1061741b0e9b998))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@3.1.0...@quenty/maid@3.2.0) (2024-05-09)
 

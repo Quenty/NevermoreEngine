@@ -1,25 +1,23 @@
-# v15.9.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-- feat: Unedited all changes ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix tie realm dependency ([@Quenty](https://github.com/Quenty))
-- refactor: Use new AdorneeData API ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.8.1...@quenty/ik@15.9.0) (2024-09-12)
+
+
+### Bug Fixes
+
+* Fix tie realm dependency ([d0dc3ee](https://github.com/Quenty/NevermoreEngine/commit/d0dc3ee3084e51e7ba0d7ddb309bab2e28202d58))
+
+
+### Features
+
+* Unedited all changes ([60e64e3](https://github.com/Quenty/NevermoreEngine/commit/60e64e3efce17c10c4b8965871187d231b338dd4))
+
+
+
+
 
 ## [15.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.8.0...@quenty/ik@15.8.1) (2024-08-27)
 

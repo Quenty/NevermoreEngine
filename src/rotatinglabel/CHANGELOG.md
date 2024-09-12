@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.3.0...@quenty/rotatinglabel@11.4.0) (2024-09-12)
+
+**Note:** Version bump only for package @quenty/rotatinglabel
+
+
+
+
+
 # [11.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.2.0...@quenty/rotatinglabel@11.3.0) (2024-05-09)
 
 

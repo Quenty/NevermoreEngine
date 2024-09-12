@@ -1,23 +1,15 @@
-# v10.10.0 (Thu Sep 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support hot-reloading from a hoarcekat story [#478](https://github.com/Quenty/NevermoreEngine/pull/478) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: string.format() usage ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.9.0...@quenty/settings-inputkeymap@10.10.0) (2024-09-12)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+
+
+
 
 # [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.8.2...@quenty/settings-inputkeymap@10.9.0) (2024-08-09)
 
