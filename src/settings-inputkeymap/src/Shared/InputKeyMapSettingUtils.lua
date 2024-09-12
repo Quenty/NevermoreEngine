@@ -22,7 +22,7 @@ local InputKeyMapSettingUtils = {}
 	@return string
 ]=]
 function InputKeyMapSettingUtils.getSettingName(inputKeyMapList, inputModeType)
-	return ("Keybind_%s_%s"):format(String.toCamelCase(inputKeyMapList:GetListName()), inputModeType.Name)
+	return string.format("Keybind_%s_%s", String.toCamelCase(inputKeyMapList:GetListName()), inputModeType.Name)
 end
 
 --[=[
@@ -40,7 +40,7 @@ function InputKeyMapSettingUtils.encodeInputTypeList(list)
 		elseif InputTypeUtils.isKnownInputType(inputType) then
 			table.insert(newList, inputType)
 		else
-			warn(("[InputKeyMapSettingUtils] - Unknown inputType %q"):format(tostring(inputType)))
+			warn(string.format("[InputKeyMapSettingUtils] - Unknown inputType %q", tostring(inputType)))
 			table.insert(newList, inputType) -- Encode anyway
 		end
 	end
@@ -77,7 +77,7 @@ function InputKeyMapSettingUtils.decodeInputTypeList(encoded)
 		elseif InputTypeUtils.isKnownInputType(inputType) then
 			table.insert(decodedList, inputType)
 		else
-			warn(("[InputKeyMapSettingUtils] - Unknown inputType %q"):format(tostring(inputType)))
+			warn(string.format("[InputKeyMapSettingUtils] - Unknown inputType %q", tostring(inputType)))
 			table.insert(decodedList, inputType) -- Decode anyway
 		end
 	end

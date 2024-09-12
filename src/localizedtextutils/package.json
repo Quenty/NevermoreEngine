@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/loader": "file:../loader",
+    "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/rx": "file:../rx"
   }
 }

@@ -19,9 +19,7 @@ function ScoredActionPicker.new()
 	local self = setmetatable(BaseObject.new(), ScoredActionPicker)
 
 	self._actionSet = {}
-
-	self._currentPreferred = ValueObject.new()
-	self._maid:GiveTask(self._currentPreferred)
+	self._currentPreferred = self._maid:Add(ValueObject.new())
 
 	self._maid:GiveTask(self._currentPreferred.Changed:Connect(function(new, _)
 		local maid = Maid.new()
@@ -53,8 +51,7 @@ function ScoredActionPicker:Update()
 	end)
 
 	if #actionList > MAX_ACTION_LIST_SIZE_BEFORE_WARN then
-		warn(("[ScoredActionPicker.Update] - Action list has size of %d/%d")
-			:format(#actionList, MAX_ACTION_LIST_SIZE_BEFORE_WARN))
+		warn(string.format("[ScoredActionPicker.Update] - Action list has size of %d/%d", #actionList, MAX_ACTION_LIST_SIZE_BEFORE_WARN))
 	end
 
 	self._currentPreferred.Value = self:_tryGetValidPreferredAction(actionList[1])

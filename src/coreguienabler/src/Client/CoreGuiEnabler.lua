@@ -40,12 +40,14 @@ function CoreGuiEnabler.new()
 
 	self._states = {}
 
-	self._stateSubs = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._stateSubs)
+	self._stateSubs = self._maid:Add(ObservableSubscriptionTable.new())
 
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
-		CharacterUtils.unequipTools(Players.LocalPlayer)
+
+		if Players.LocalPlayer then
+			CharacterUtils.unequipTools(Players.LocalPlayer)
+		end
 	end)
 
 	self:AddState(Enum.CoreGuiType.SelfView, function(_isEnabled)

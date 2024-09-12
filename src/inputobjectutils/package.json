@@ -29,7 +29,9 @@
   },
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx"
+    "@quenty/rx": "file:../rx",
+    "@quenty/rxsignal": "file:../rxsignal"
   }
 }

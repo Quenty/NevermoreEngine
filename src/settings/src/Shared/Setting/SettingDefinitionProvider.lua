@@ -15,9 +15,9 @@
 	local SettingDefinition = require("SettingDefinition")
 
 	return require("SettingDefinitionProvider").new({
-		SettingDefinition.new("KeyBinding", Enum.KeyCode.X);
-		SettingDefinition.new("CameraShake", true);
-		SettingDefinition.new("CameraSensitivity", 1);
+		KeyBinding = Enum.KeyCode.X;
+		CameraShake = true;
+		CameraSensitivity = 1;
 	})
 	```
 
@@ -26,8 +26,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
 local Maid = require("Maid")
+local SettingDefinition = require("SettingDefinition")
 
 local SettingDefinitionProvider = {}
 SettingDefinitionProvider.ClassName = "SettingDefinitionProvider"
@@ -38,13 +38,29 @@ SettingDefinitionProvider.__index = SettingDefinitionProvider
 	Constructs a new provider with a list of [SettingDefinition]'s.
 
 	```lua
+	-- In one location
 	local SettingDefinition = require("SettingDefinition")
 
 	return require("SettingDefinitionProvider").new({
-		SettingDefinition.new("KeyBinding", Enum.KeyCode.X);
-		SettingDefinition.new("CameraShake", true);
-		SettingDefinition.new("CameraSensitivity", 1);
+		KeyBinding = Enum.KeyCode.X;
+		CameraShake = true;
+		CameraSensitivity = 1;
 	})
+	```
+
+	Usage:
+
+	```lua
+	local ourSettings = serviceBag:GetService(require("OurSettings"))
+
+	print(ourSettings.CameraShake:Get(Players.LocalPlayer), true)
+
+	ourSettings.CameraShake:Set(Players.LocalPlayer, false)
+
+	ourSettings.CameraShake:Promise(Players.LocalPlayer)
+		:Then(function(cameraShake)
+			print(cameraShake)
+		end)
 	```
 
 	@param settingDefinitions { SettingDefinition }
@@ -53,15 +69,34 @@ SettingDefinitionProvider.__index = SettingDefinitionProvider
 function SettingDefinitionProvider.new(settingDefinitions)
 	local self = setmetatable({}, SettingDefinitionProvider)
 
-	self._settingDefinitions = {}
+	self._settingDefinitionList = {}
 	self._lookup = {}
 
-	for _, settingDefinition in pairs(settingDefinitions) do
-		table.insert(self._settingDefinitions, settingDefinition)
-		self._lookup[settingDefinition:GetSettingName()] = settingDefinition
+	for key, value in pairs(settingDefinitions) do
+		if type(key) == "number" then
+			assert(SettingDefinition.isSettingDefinition(key), "Bad settingDefinition")
+
+			self:_addSettingDefinition(key)
+		elseif type(key) == "string" then
+			if SettingDefinition.isSettingDefinition(value) then
+				self:_addSettingDefinition(value)
+			else
+				local definition = SettingDefinition.new(key, value)
+				self:_addSettingDefinition(definition)
+			end
+		else
+			error("Bad key for settingDefinitions")
+		end
 	end
 
 	return self
+end
+
+function SettingDefinitionProvider:_addSettingDefinition(settingDefinition)
+	assert(SettingDefinition.isSettingDefinition(settingDefinition), "Bad settingDefinition")
+
+	table.insert(self._settingDefinitionList, settingDefinition)
+	self._lookup[settingDefinition:GetSettingName()] = settingDefinition
 end
 
 --[=[
@@ -74,10 +109,17 @@ function SettingDefinitionProvider:Init(serviceBag)
 	assert(not self._maid, "Already initialized")
 
 	self._maid = Maid.new()
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	local settingRegistryServiceShared = serviceBag:GetService(SettingRegistryServiceShared)
-	for _, settingDefinition in pairs(self._settingDefinitions) do
-		self._maid:GiveTask(settingRegistryServiceShared:RegisterSettingDefinition(settingDefinition))
+	self._initializedDefinitionLookup = {}
+
+	-- Register our setting definitions
+	for _, settingDefinition in pairs(self._settingDefinitionList) do
+		local initialized = self._serviceBag:GetService(settingDefinition)
+		self._initializedDefinitionLookup[settingDefinition] = initialized
+
+		-- Store lookup to overcome metatable lookup
+		self[settingDefinition:GetSettingName()] = initialized
 	end
 end
 
@@ -94,7 +136,17 @@ end
 	@return { SettingDefinition }
 ]=]
 function SettingDefinitionProvider:GetSettingDefinitions()
-	return self._settingDefinitions
+	if self._serviceBag then
+		local copy = table.clone(self._settingDefinitionList)
+
+		for key, settingDefinition in pairs(copy) do
+			copy[key] = assert(self._initializedDefinitionLookup[settingDefinition], "Missing settingDefinition")
+		end
+
+		return copy
+	end
+
+	return table.clone(self._settingDefinitionList)
 end
 
 --[=[
@@ -104,9 +156,9 @@ end
 	local SettingDefinition = require("SettingDefinition")
 
 	local provider = require("SettingDefinitionProvider").new({
-		SettingDefinition.new("KeyBinding", Enum.KeyCode.X);
-		SettingDefinition.new("CameraShake", true);
-		SettingDefinition.new("CameraSensitivity", 1);
+		KeyBinding = Enum.KeyCode.X;
+		CameraShake = true;
+		CameraSensitivity = 1;
 	})
 
 	local service = serviceBag:GetService(provider)
@@ -123,18 +175,27 @@ function SettingDefinitionProvider:__index(index)
 		error("[SettingDefinitionProvider] - Cannot index provider with nil value")
 	elseif SettingDefinitionProvider[index] then
 		return SettingDefinitionProvider[index]
-	elseif index == "_lookup" or index == "_settingDefinitions" or index == "_maid" then
+	elseif index == "_lookup"
+		or index == "_settingDefinitionList"
+		or index == "_maid"
+		or index == "_initializedDefinitionLookup"
+		or index == "_serviceBag" then
+
 		return rawget(self, index)
 	elseif type(index) == "string" then
 		local lookup = rawget(self, "_lookup")
 		local settingDefinition = lookup[index]
 		if not settingDefinition then
-			error(("Bad index %q into SettingDefinitionProvider"):format(tostring(index)))
+			error(string.format("Bad index %q into SettingDefinitionProvider", tostring(index)))
+		end
+
+		if self._serviceBag then
+			return assert(self._initializedDefinitionLookup[settingDefinition], "Missing settingDefinition")
 		else
 			return settingDefinition
 		end
 	else
-		error(("Bad index %q into SettingDefinitionProvider"):format(tostring(index)))
+		error(string.format("Bad index %q into SettingDefinitionProvider", tostring(index)))
 	end
 end
 
@@ -147,7 +208,16 @@ end
 function SettingDefinitionProvider:Get(settingName)
 	assert(type(settingName) == "string", "Bad settingName")
 
-	return self._lookup[settingName]
+	local found = self._lookup[settingName]
+	if not found then
+		return nil
+	end
+
+	if self._serviceBag then
+		return assert(self._initializedDefinitionLookup[found], "Missing settingDefinition")
+	else
+		return found
+	end
 end
 
 --[=[

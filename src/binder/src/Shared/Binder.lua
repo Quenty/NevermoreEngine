@@ -677,9 +677,7 @@ end
 function Binder:Destroy()
 	local inst, class = next(self._instToClass)
 	while class ~= nil do
-		self:_remove(inst)
-		assert(self._instToClass[inst] == nil, "Failed to remove")
-
+		task.spawn(self._remove, self, inst)
 		inst, class = next(self._instToClass)
 	end
 

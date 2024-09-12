@@ -21,13 +21,12 @@ PlayerDataStoreService.ServiceName = "PlayerDataStoreService"
 ]=]
 function PlayerDataStoreService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-
 	self._maid = Maid.new()
 
 	-- External
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
 
-	self._started = self._maid:Add(Promise.new())
+	self._promiseStarted = self._maid:Add(Promise.new())
 
 	self._dataStoreName = "PlayerData"
 	self._dataStoreScope = "SaveData"
@@ -38,7 +37,7 @@ end
 ]=]
 function PlayerDataStoreService:Start()
 	-- Give time for configuration
-	self._started:Resolve()
+	self._promiseStarted:Resolve()
 end
 
 --[=[
@@ -52,8 +51,8 @@ end
 ]=]
 function PlayerDataStoreService:SetDataStoreName(dataStoreName)
 	assert(type(dataStoreName) == "string", "Bad dataStoreName")
-	assert(self._started, "Not initialized")
-	assert(self._started:IsPending(), "Already started, cannot configure")
+	assert(self._promiseStarted, "Not initialized")
+	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
 
 	self._dataStoreName = dataStoreName
 end
@@ -69,8 +68,8 @@ end
 ]=]
 function PlayerDataStoreService:SetDataStoreScope(dataStoreScope)
 	assert(type(dataStoreScope) == "string", "Bad dataStoreScope")
-	assert(self._started, "Not initialized")
-	assert(self._started:IsPending(), "Already started, cannot configure")
+	assert(self._promiseStarted, "Not initialized")
+	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
 
 	self._dataStoreScope = dataStoreScope
 end
@@ -108,7 +107,7 @@ function PlayerDataStoreService:PromiseManager()
 		return self._dataStoreManagerPromise
 	end
 
-	self._dataStoreManagerPromise = self._started
+	self._dataStoreManagerPromise = self._promiseStarted
 		:Then(function()
 			return DataStorePromises.promiseDataStore(self._dataStoreName, self._dataStoreScope)
 		end)

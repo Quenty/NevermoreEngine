@@ -10,8 +10,8 @@
 	local SettingDefinition = require("SettingDefinition")
 
 	return require("SettingDefinitionProvider").new({
-		SettingDefinition.new("LastTimeUpdateSeen", 0);
-		SettingDefinition.new("LastTimeShopSeen", 0);
+		LastTimeUpdateSeen = 0;
+		LastTimeShopSeen = 0;
 	})
 	```
 
@@ -22,8 +22,11 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
 local SettingProperty = require("SettingProperty")
 local ServiceBag = require("ServiceBag")
+local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
 
 local SettingDefinition = {}
 SettingDefinition.ClassName = "SettingDefinition"
@@ -38,17 +41,109 @@ SettingDefinition.__index = SettingDefinition
 	@return SettingDefinition<T>
 ]=]
 function SettingDefinition.new(settingName, defaultValue)
-	local self = setmetatable({}, SettingDefinition)
-
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "DefaultValue cannot be nil")
+
+	local self = setmetatable({}, SettingDefinition)
 
 	self._settingName = settingName
 	self._defaultValue = defaultValue
 
-	self.ServiceName = self._settingName
+	self.ServiceName = self._settingName .. "SettingDefinition"
 
 	return self
+end
+
+--[=[
+	Initializes the setting definition from a service bag.
+
+	@param serviceBag ServiceBag
+]=]
+function SettingDefinition:Init(serviceBag)
+	assert(serviceBag, "No serviceBag")
+	assert(not self._maid, "Already initialized")
+
+	self._maid = Maid.new()
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
+	local settingRegistryServiceShared = self._serviceBag:GetService(SettingRegistryServiceShared)
+	self._maid:GiveTask(settingRegistryServiceShared:RegisterSettingDefinition(self))
+end
+
+--[=[
+	Gets the value for the given player
+
+	@param player Player
+	@return T
+]=]
+function SettingDefinition:Get(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+	assert(self._serviceBag, "Retrieve from serviceBag")
+
+	return self:GetSettingProperty(self._serviceBag, player):GetValue()
+end
+
+--[=[
+	Sets the value
+
+	@param player Player
+	@param value T
+]=]
+function SettingDefinition:Set(player, value)
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+	assert(self._serviceBag, "Retrieve from serviceBag")
+
+	return self:GetSettingProperty(self._serviceBag, player):SetValue(value)
+end
+
+--[=[
+	Promise gets the value
+
+	@param player Player
+	@return Promise<T>
+]=]
+function SettingDefinition:Promise(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+	assert(self._serviceBag, "Retrieve from serviceBag")
+
+	return self:GetSettingProperty(self._serviceBag, player):PromiseValue()
+end
+
+--[=[
+	Promise gets the value
+
+	@param player Player
+	@param value T
+	@return Promise<T>
+]=]
+function SettingDefinition:PromiseSet(player, value)
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+	assert(self._serviceBag, "Retrieve from serviceBag")
+
+	return self:GetSettingProperty(self._serviceBag, player):PromiseSetValue(value)
+end
+
+--[=[
+	Promise gets the value
+
+	@param player Player
+	@return Promise<T>
+]=]
+function SettingDefinition:Observe(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+	assert(self._serviceBag, "Retrieve from serviceBag")
+
+	return self:GetSettingProperty(self._serviceBag, player):Observe()
+end
+
+--[=[
+	Returns true if the value is a setting definition
+
+	@param value any
+	@return boolean
+]=]
+function SettingDefinition.isSettingDefinition(value)
+	return DuckTypeUtils.isImplementation(SettingDefinition, value)
 end
 
 --[=[
@@ -60,7 +155,9 @@ end
 ]=]
 function SettingDefinition:GetSettingProperty(serviceBag, player)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+
+	player = player or Players.LocalPlayer
 
 	return SettingProperty.new(serviceBag, player, self)
 end
@@ -91,6 +188,10 @@ end
 ]=]
 function SettingDefinition:GetDefaultValue()
 	return self._defaultValue
+end
+
+function SettingDefinition:Destroy()
+	self._maid:DoCleaning()
 end
 
 return SettingDefinition

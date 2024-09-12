@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/tuple",
+  "version": "1.0.0",
+  "description": "Tuple utility package",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "tuple"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/tuple/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/lrucache": "file:../lrucache"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

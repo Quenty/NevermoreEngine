@@ -48,6 +48,7 @@ function IKServiceClient:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("CameraStackService"))
+	self._serviceBag:GetService(require("TieRealmService"))
 	self._serviceBag:GetService(require("Motor6DServiceClient"))
 
 	-- Internal

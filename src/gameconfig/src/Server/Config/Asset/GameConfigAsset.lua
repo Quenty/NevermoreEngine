@@ -23,7 +23,7 @@ function GameConfigAsset.new(obj, serviceBag)
 		assetType = self:ObserveAssetType();
 		text = self:ObserveCloudName();
 	}):Subscribe(function(state)
-		if state.text then
+		if state.text and state.text ~= "" then
 			local prefix = string.format("assets.%s.%s.name", state.assetType, state.assetKey)
 			self:SetNameTranslationKey(self._translator:ToTranslationKey(prefix, state.text))
 		else
@@ -36,7 +36,7 @@ function GameConfigAsset.new(obj, serviceBag)
 		assetType = self:ObserveAssetType();
 		text = self:ObserveCloudDescription();
 	}):Subscribe(function(state)
-		if state.text then
+		if state.text and state.text ~= "" then
 			local prefix = string.format("assets.%s.%s.description", state.assetType, state.assetKey)
 			self:SetDescriptionTranslationKey(self._translator:ToTranslationKey(prefix, state.text))
 		else

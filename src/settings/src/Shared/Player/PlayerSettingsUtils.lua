@@ -20,16 +20,12 @@ local PlayerSettingsUtils = {}
 --[=[
 	Creates a new player settings
 
-	@param binder Binder<PlayerSettings>
 	@return Folder
 ]=]
-function PlayerSettingsUtils.create(binder)
-	assert(Binder.isBinder(binder), "No binder")
-
+function PlayerSettingsUtils.create()
 	local playerSettings = Instance.new("Folder")
 	playerSettings.Name = PlayerSettingsConstants.PLAYER_SETTINGS_NAME
-
-	binder:Bind(playerSettings)
+	playerSettings:AddTag("PlayerSettings")
 
 	return playerSettings
 end

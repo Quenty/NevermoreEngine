@@ -45,9 +45,7 @@ function SpringObject.new(target, speed, damper)
 	self._maid:GiveTask(self.Changed)
 
 	if target then
-		self.Target = target
-	else
-		self:_getSpringForType(0)
+		self:SetTarget(target)
 	end
 
 	if speed then
@@ -287,8 +285,17 @@ function SpringObject:__index(index)
 		return self._epsilon
 	elseif SpringObject[index] then
 		return SpringObject[index]
+	elseif index == "_currentSpring" then
+		local found = rawget(self, "_currentSpring")
+		if found then
+			return found
+		end
+
+		-- Note that sometimes the current spring isn't loaded yet as a type so
+		-- we use a number for this.
+		return self:_getSpringForType(0)
 	else
-		error(("%q is not a member of SpringObject"):format(tostring(index)))
+		error(string.format("%q is not a member of SpringObject", tostring(index)))
 	end
 end
 
@@ -323,6 +330,7 @@ function SpringObject:__newindex(index, value)
 		end)
 	elseif index == "Speed" or index == "s" then
 		local observable = assert(Blend.toNumberObservable(value), "Invalid speed")
+		assert(self._currentSpring, "No self._currentSpring")
 
 		self._maid._speedSub = observable:Subscribe(function(unconverted)
 			assert(type(unconverted) == "number", "Bad damper")
@@ -337,16 +345,19 @@ function SpringObject:__newindex(index, value)
 		assert(type(value) == "function", "Bad clock value")
 		self._currentSpring.Clock = value
 		self.Changed:Fire()
+	elseif index == "_currentSpring" then
+		rawset(self, "_currentSpring", value)
 	else
-		error(("%q is not a member of SpringObject"):format(tostring(index)))
+		error(string.format("%q is not a member of SpringObject", tostring(index)))
 	end
 end
 
 function SpringObject:_getSpringForType(converted)
 	if rawget(self, "_currentSpring") == nil then
 		-- only happens on init
-		rawset(self, "_currentSpring", Spring.new(converted))
-		return self._currentSpring
+		local created = Spring.new(converted)
+		rawset(self, "_currentSpring", created)
+		return created
 	else
 		local currentType = typeof(SpringUtils.fromLinearIfNeeded(self._currentSpring.Value))
 		if currentType == typeof(SpringUtils.fromLinearIfNeeded(converted)) then
@@ -356,11 +367,12 @@ function SpringObject:_getSpringForType(converted)
 			local oldSpeed = self._currentSpring.s
 			local clock = self._currentSpring.Clock
 
-			self._currentSpring = Spring.new(converted)
-			self._currentSpring.Clock = clock
-			self._currentSpring.Speed = oldSpeed
-			self._currentSpring.Damper = oldDamper
-			return self._currentSpring
+			local newSpring = Spring.new(converted)
+			newSpring.Clock = clock
+			newSpring.Speed = oldSpeed
+			newSpring.Damper = oldDamper
+			rawset(self, "_currentSpring", newSpring)
+			return newSpring
 		end
 	end
 end

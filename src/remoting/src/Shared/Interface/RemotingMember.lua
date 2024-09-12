@@ -5,7 +5,9 @@
 	@class RemotingMember
 ]=]
 
-local RunService = game:GetService("RunService")
+local require = require(script.Parent.loader).load(script)
+
+local RemotingRealms = require("RemotingRealms")
 
 local RemotingMember = {}
 RemotingMember.ClassName = "RemotingMember"
@@ -16,13 +18,15 @@ RemotingMember.__index = RemotingMember
 
 	@param remoting Remoting
 	@param memberName string
+	@param remotingRealm RemotingRealms
 	@return RemotingMember
 ]=]
-function RemotingMember.new(remoting, memberName)
+function RemotingMember.new(remoting, memberName, remotingRealm)
 	local self = setmetatable({}, RemotingMember)
 
 	self._remoting = assert(remoting, "No remoting")
 	self._memberName = assert(memberName, "No memberName")
+	self._remotingRealm = assert(remotingRealm, "Bad remotingRealm")
 
 	return self
 end
@@ -80,7 +84,7 @@ end
 	@param ... any
 ]=]
 function RemotingMember:FireServer(...)
-	assert(RunService:IsClient(), "FireServer must be called on client")
+	assert(self._remotingRealm == RemotingRealms.CLIENT, "FireServer must be called on client")
 	self._remoting:FireServer(self._memberName, ...)
 end
 
@@ -91,7 +95,7 @@ end
 	@param ... any
 ]=]
 function RemotingMember:InvokeServer(...)
-	assert(RunService:IsClient(), "InvokeServer must be called on client")
+	assert(self._remotingRealm == RemotingRealms.CLIENT, "InvokeServer must be called on client")
 
 	return self._remoting:InvokeServer(self._memberName, ...)
 end
@@ -103,7 +107,7 @@ end
 	@param ... any
 ]=]
 function RemotingMember:PromiseInvokeServer(...)
-	assert(RunService:IsClient(), "PromiseInvokeServer must be called on client")
+	assert(self._remotingRealm == RemotingRealms.CLIENT, "PromiseInvokeServer must be called on client")
 
 	return self._remoting:PromiseInvokeServer(self._memberName, ...)
 end
@@ -116,7 +120,7 @@ end
 	@return Promise
 ]=]
 function RemotingMember:PromiseFireServer(...)
-	assert(RunService:IsClient(), "PromiseInvokeServer must be called on client")
+	assert(self._remotingRealm == RemotingRealms.CLIENT, "PromiseInvokeServer must be called on client")
 
 	return self._remoting:PromiseFireServer(self._memberName, ...)
 end
@@ -134,7 +138,7 @@ end
 ]=]
 function RemotingMember:PromiseInvokeClient(player, ...)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(RunService:IsServer(), "PromiseInvokeClient must be called on client")
+	assert(self._remotingRealm == RemotingRealms.SERVER, "PromiseInvokeClient must be called on client")
 
 	return self._remoting:PromiseInvokeClient(self._memberName, player, ...)
 end
@@ -151,7 +155,7 @@ end
 ]=]
 function RemotingMember:InvokeClient(player, ...)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(RunService:IsServer(), "InvokeClient must be called on client")
+	assert(self._remotingRealm == RemotingRealms.SERVER, "InvokeClient must be called on client")
 
 	return self._remoting:InvokeClient(self._memberName, player, ...)
 end
@@ -165,7 +169,7 @@ end
 	@param ... any
 ]=]
 function RemotingMember:FireAllClients(...)
-	assert(RunService:IsServer(), "FireAllClients must be called on client")
+	assert(self._remotingRealm == RemotingRealms.SERVER, "FireAllClients must be called on client")
 
 	self._remoting:FireAllClients(self._memberName, ...)
 end
@@ -180,11 +184,10 @@ end
 ]=]
 function RemotingMember:FireAllClientsExcept(excludePlayer, ...)
 	assert(typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil, "Bad excludePlayer")
-	assert(RunService:IsServer(), "FireAllClientsExcept must be called on server")
+	assert(self._remotingRealm == RemotingRealms.SERVER, "FireAllClientsExcept must be called on server")
 
 	self._remoting:FireAllClientsExcept(self._memberName, excludePlayer, ...)
 end
-
 
 --[=[
 	Fires the client with the data
@@ -196,7 +199,7 @@ end
 	@param ... any
 ]=]
 function RemotingMember:FireClient(player, ...)
-	assert(RunService:IsServer(), "FireClient must be called on client")
+	assert(self._remotingRealm == RemotingRealms.SERVER, "FireClient must be called on client")
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	self._remoting:FireClient(self._memberName, player, ...)

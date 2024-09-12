@@ -5,11 +5,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local Rx = require("Rx")
 
 local RxCharacterUtils = {}
 
@@ -35,6 +38,57 @@ end
 ]=]
 function RxCharacterUtils.observeCharacter(player)
 	return RxInstanceUtils.observeProperty(player, "Character")
+end
+
+function RxCharacterUtils.observeCharacterBrio(player)
+	return RxInstanceUtils.observePropertyBrio(player, "Character", function(character)
+		return character ~= nil
+	end)
+end
+
+function RxCharacterUtils.observeIsOfLocalCharacter(instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	local localPlayer = Players.LocalPlayer
+	if not localPlayer then
+		warn("[RxCharacterUtils] - No localPlayer")
+		return Rx.EMPTY
+	end
+
+	return Rx.combineLatest({
+		character = RxCharacterUtils.observeLocalPlayerCharacter();
+		_ancestry = RxInstanceUtils.observeAncestry(instance)
+	}):Pipe({
+		Rx.map(function(state)
+			if state.character then
+				return instance == state.character or instance:IsDescendantOf(state.character)
+			else
+				return false
+			end
+		end);
+		Rx.distinct();
+	})
+end
+
+function RxCharacterUtils.observeIsOfLocalCharacterBrio(instance)
+	return RxCharacterUtils.observeIsOfLocalCharacter(instance):Pipe({
+		RxBrioUtils.switchToBrio(function(value)
+			return value
+		end)
+	})
+end
+
+function RxCharacterUtils.observeLocalPlayerCharacter()
+	return RxInstanceUtils.observeProperty(Players, "LocalPlayer"):Pipe({
+		Rx.switchMap(function(player)
+			if player then
+				return RxCharacterUtils.observeCharacter(player)
+			else
+				return Rx.of(nil)
+			end
+		end);
+		Rx.distinct();
+	})
 end
 
 --[=[

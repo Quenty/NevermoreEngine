@@ -36,6 +36,53 @@ function LinearValue.isLinear(value)
 	return DuckTypeUtils.isImplementation(LinearValue, value)
 end
 
+local function convertUDim2(scaleX, offsetX, scaleY, offsetY)
+	-- Roblox UDim2.new(0, 9.999, 0, 9.999) rounds to UDim2.new(0, 9, 0, 9) which means small floating point
+	-- errors can cause shaking UI.
+
+	return UDim2.new(scaleX, math.round(offsetX), scaleY, math.round(offsetY))
+end
+
+local function convertUDim(scale, offset)
+	-- Roblox UDim.new(0, 9.999) rounds to UDim.new(0, 9) which means small floating point
+	-- errors can cause shaking UI.
+
+	return UDim.new(scale, math.round(offset))
+end
+
+--[=[
+	Converts an arbitrary value to a LinearValue if Roblox has not defined this value
+	for multiplication and addition.
+
+	@param value T
+	@return LinearValue<T> | T
+]=]
+function LinearValue.toLinearIfNeeded(value)
+	if typeof(value) == "Color3" then
+		return LinearValue.new(Color3.new, {value.r, value.g, value.b})
+	elseif typeof(value) == "UDim2" then
+		return LinearValue.new(convertUDim2, {value.X.Scale, math.round(value.X.Offset), value.Y.Scale, math.round(value.Y.Offset)})
+	elseif typeof(value) == "UDim" then
+		return LinearValue.new(convertUDim, {value.Scale, math.round(value.Offset)})
+	else
+		return value
+	end
+end
+
+--[=[
+	Extracts the base value out of a packed linear value if needed.
+
+	@param value LinearValue<T> | any
+	@return T | any
+]=]
+function LinearValue.fromLinearIfNeeded(value)
+	if LinearValue.isLinear(value) then
+		return value:ToBaseValue()
+	else
+		return value
+	end
+end
+
 --[=[
 	Converts the value back to the base value
 

@@ -62,6 +62,15 @@ local MarketplaceUtils = {}
 ]=]
 
 --[=[
+	Subscription Status
+
+	@interface UserSubscriptonStatus
+	.IsSubscribed boolean -- True if the user's subscription is active.
+	.IsRenewing boolean -- True if the user is set to renew this subscription after the current subscription period ends.
+	@within MarketplaceUtils
+]=]
+
+--[=[
 	Wraps [MarketplaceService.GetProductInfo] and retrieves information about
 	@param assetId number
 	@param infoType InfoType | nil
@@ -88,39 +97,29 @@ function MarketplaceUtils.promiseProductInfo(assetId, infoType)
 end
 
 --[=[
-	Converts an enum value (retrieved from MarketplaceService) into a proper enum if possible
+	Returns the subscription status
 
-	@param assetTypeId number
-	@return AssetType | nl
+	@param player Player
+	@param subscriptionId string
+	@return UserSubscriptonStatus
 ]=]
-function MarketplaceUtils.convertAssetTypeIdToAssetType(assetTypeId)
-	assert(type(assetTypeId) == "number", "Bad assetTypeId")
+function MarketplaceUtils.promiseUserSubscriptionStatus(player, subscriptionId)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(type(subscriptionId) == "string", "Bad subscriptionId")
 
-	for _, enumItem in pairs(Enum.AssetType:GetEnumItems()) do
-		if enumItem.Value == assetTypeId then
-			return enumItem
+	return Promise.spawn(function(resolve, reject)
+		local subStatus
+		local ok, err = pcall(function()
+			subStatus = MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId)
+		end)
+		if not ok then
+			return reject(err)
 		end
-	end
-
-	return nil
-end
-
---[=[
-	Converts an enum value (retrieved from MarketplaceService) into a proper enum if possible
-
-	@param assetTypeId number
-	@return AvatarAssetType | nil
-]=]
-function MarketplaceUtils.convertAssetTypeIdToAvatarAssetType(assetTypeId)
-	assert(type(assetTypeId) == "number", "Bad assetTypeId")
-
-	for _, enumItem in pairs(Enum.AvatarAssetType:GetEnumItems()) do
-		if enumItem.Value == assetTypeId then
-			return enumItem
+		if type(subStatus) ~= "table" then
+			return reject("Bad subStatus type")
 		end
-	end
-
-	return nil
+		return resolve(subStatus)
+	end)
 end
 
 --[=[

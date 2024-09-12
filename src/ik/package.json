@@ -48,6 +48,7 @@
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
+    "@quenty/tie": "file:../tie",
     "@quenty/valueobject": "file:../valueobject"
   },
   "devDependencies": {

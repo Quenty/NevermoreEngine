@@ -32,3 +32,7 @@ This package does two things. First of all, it basically automates the creation 
 1. Support tagged ties with
 1. Ensure ties can be queried via CollectionService
 1. Allow client implementation of server-based ties
+
+## Realms
+
+1. By default everything is a "shared" realm

@@ -29,6 +29,7 @@
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/memoize": "file:../memoize",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
     "@quenty/symbol": "file:../symbol"

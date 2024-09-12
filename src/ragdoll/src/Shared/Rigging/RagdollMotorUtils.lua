@@ -168,21 +168,19 @@ end
 function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 	local maid = Maid.new()
 
-	local ragdollMotorData = RagdollMotorData:CreateValue(motor)
+	local ragdollMotorData = RagdollMotorData:Create(motor)
 
 	local lastTransformSpring = Spring.new(QFrame.fromCFrameClosestTo(motor.Transform, QFrame.new()))
 	lastTransformSpring.t = QFrame.new()
 
 	-- transform changed event doesn't fire, so let's use this to proxy it
-	local transformValue = Instance.new("CFrameValue")
+	local transformValue = maid:Add(Instance.new("CFrameValue"))
 	transformValue.Value = motor.Transform
-	maid:GiveTask(transformValue)
 
 	-- replacing this weld ensures interpolation for some reason
-	local weldContainer = Instance.new("Camera")
+	local weldContainer = maid:Add(Instance.new("Camera"))
 	weldContainer.Name = "TempWeldContainer"
 	weldContainer.Parent = part0
-	maid:GiveTask(weldContainer)
 
 	local function setupWeld(weldType)
 		local weldMaid = Maid.new()
@@ -257,7 +255,7 @@ function RagdollMotorUtils.setupRagdollMotor(motor, part0, part1)
 	maid:GiveTask(function()
 		local implemention = Motor6DStackInterface:FindFirstImplementation(motor)
 		if implemention then
-			local ragdollMotorData = RagdollMotorData:CreateValue(motor)
+			local ragdollMotorData = RagdollMotorData:Create(motor)
 			local initialTransform = (part0.CFrame * motor.C0):toObjectSpace(part1.CFrame * motor.C1)
 			local speed = ragdollMotorData.RagdollSpringReturnSpeed.Value
 
@@ -279,7 +277,7 @@ function RagdollMotorUtils.suppressJustRootPart(character, rigType)
 
 	local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName):Pipe({
 		RxBrioUtils.switchMapBrio(function(motor)
-			local ragdollMotorData = RagdollMotorData:CreateValue(motor)
+			local ragdollMotorData = RagdollMotorData:Create(motor)
 
 			return Rx.combineLatest({
 				motor = motor;
@@ -323,7 +321,7 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 	for _, data in pairs(RagdollMotorUtils.getMotorData(rigType)) do
 		local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName):Pipe({
 			RxBrioUtils.switchMapBrio(function(motor)
-				local ragdollMotorData = RagdollMotorData:CreateValue(motor)
+				local ragdollMotorData = RagdollMotorData:Create(motor)
 
 				return RxBrioUtils.flatCombineLatest({
 					motor = motor;

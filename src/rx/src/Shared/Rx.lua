@@ -665,6 +665,8 @@ end
 	}):Subscribe(print) --> Hello
 	```
 
+	If empty (or failed) the the sub will fire with the value before it completes.
+
 	@param value any
 	@return (source: Observable) -> Observable
 ]=]
@@ -682,7 +684,16 @@ function Rx.defaultsTo(value)
 					fired = true
 					sub:Fire(...)
 				end,
-				sub:GetFailComplete()))
+				function(...)
+					fired = true
+					sub:Fire(value)
+					sub:Fail(...)
+				end,
+				function(...)
+					fired = true
+					sub:Fire(value)
+					sub:Complete(...)
+				end))
 
 			if not fired then
 				sub:Fire(value)

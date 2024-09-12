@@ -8,65 +8,38 @@ local require = require(script.Parent.loader).load(script)
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 
-local BaseObject = require("BaseObject")
+local Binder = require("Binder")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
-local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
-local GameConfigServiceClient = require("GameConfigServiceClient")
-local PlayerMarketeer = require("PlayerMarketeer")
+local PlayerProductManagerBase = require("PlayerProductManagerBase")
+local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Remoting = require("Remoting")
 
-local PlayerProductManagerClient = setmetatable({}, BaseObject)
+local PlayerProductManagerClient = setmetatable({}, PlayerProductManagerBase)
 PlayerProductManagerClient.ClassName = "PlayerProductManagerClient"
 PlayerProductManagerClient.__index = PlayerProductManagerClient
 
 function PlayerProductManagerClient.new(obj, serviceBag)
-	local self = setmetatable(BaseObject.new(obj), PlayerProductManagerClient)
-
-	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._gameConfigServiceClient = self._serviceBag:GetService(GameConfigServiceClient)
+	local self = setmetatable(PlayerProductManagerBase.new(obj, serviceBag), PlayerProductManagerClient)
 
 	if self._obj == Players.LocalPlayer then
-		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager"))
-		self._marketeer = self._maid:Add(PlayerMarketeer.new(self._obj, self._gameConfigServiceClient:GetConfigPicker()))
+		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager", Remoting.Realms.CLIENT))
 
-		self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT):SetReceiptProcessingExpected(true)
+		self:_setupAssetTracker()
+		self:_setupMembershipTracker()
+		self:_setupSubscriptionTracker()
+		self:_setupProductTracker()
+		self:_setupBundleTracker()
+		self:_connectGamePassTracker()
 
-		self._maid:GiveTask(self._remoting.NotifyReceiptProcessed:Connect(function(receipt)
-			local assetTracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
-			assetTracker:HandleProcessReceipt(self._obj, receipt)
-		end))
-
-		self:_connectMarketplace()
-
-		-- Configure remote events
-		self:_replicateRemoteEventType(GameConfigAssetTypes.ASSET)
-		self:_replicateRemoteEventType(GameConfigAssetTypes.BUNDLE)
-		self:_replicateRemoteEventType(GameConfigAssetTypes.PASS)
-		self:_replicateRemoteEventType(GameConfigAssetTypes.PRODUCT)
+		self:_connectBulkPurchaseMarketplace()
 	end
+
+	local impl = self._maid:Add(PlayerProductManagerInterface.Client:Implement(self._obj, self))
+	self:ExportMarketTrackers(impl:GetImplParent())
 
 	return self
 end
 
---[=[
-	@return PlayerMarketeer
-]=]
-function PlayerProductManagerClient:GetMarketeer()
-	return self._marketeer
-end
-
-function PlayerProductManagerClient:_replicateRemoteEventType(assetType)
-	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
-
-	local tracker = self._marketeer:GetAssetTrackerOrError(assetType)
-
-	self._maid:GiveTask(tracker.PromptFinished:Connect(function(assetId, isPurchased)
-		assert(type(assetId) == "number", "Bad assetId")
-		assert(type(isPurchased) == "boolean", "Bad isPurchased")
-
-		self._remoting.NotifyPromptFinished:FireServer(assetType, assetId, isPurchased)
-	end))
-end
 
 --[=[
 	Gets the current player
@@ -76,38 +49,145 @@ function PlayerProductManagerClient:GetPlayer()
 	return self._obj
 end
 
-function PlayerProductManagerClient:_connectMarketplace()
-	-- Assets
+function PlayerProductManagerClient:_setupAssetTracker()
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)
+
 	self._maid:GiveTask(MarketplaceService.PromptPurchaseFinished:Connect(function(player, assetId, isPurchased)
 		if player == self._obj then
-			local tracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)
+			tracker:HandlePromptClosedEvent(assetId)
 			tracker:HandlePurchaseEvent(assetId, isPurchased)
+			self._remoting.AssetPromptPurchaseFinished:FireServer(assetId, isPurchased)
 		end
 	end))
 
-	-- Products
-	self._maid:GiveTask(MarketplaceService.PromptProductPurchaseFinished:Connect(function(userId, productId, isPurchased)
-		if self._obj.UserId == userId then
-			local tracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
-			tracker:HandlePurchaseEvent(productId, isPurchased)
-		end
+end
+
+function PlayerProductManagerClient:_setupMembershipTracker()
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.MEMBERSHIP)
+
+	self._maid:GiveTask(MarketplaceService.PromptPremiumPurchaseFinished:Connect(function()
+		tracker:HandlePromptClosedEvent(Enum.MembershipType.Premium)
+
+		-- Not great behavior but whatever
+		tracker:HandlePurchaseEvent(Enum.MembershipType.Premium, self._obj.MembershipType == true)
 	end))
 
-	-- Game passes
-	self._maid:GiveTask(MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
+	-- I think this only fires on the server...
+	self._maid:GiveTask(Players.PlayerMembershipChanged:Connect(function(player)
 		if player == self._obj then
-			local tracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
-			tracker:HandlePurchaseEvent(gamePassId, isPurchased)
-		end
-	end))
-
-	-- Bundles
-	self._maid:GiveTask(MarketplaceService.PromptBundlePurchaseFinished:Connect(function(player, bundleId, isPurchased)
-		if player == self._obj then
-			local tracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE)
-			tracker:HandlePurchaseEvent(bundleId, isPurchased)
+			if player.MembershipType == Enum.MembershipType.Premium then
+				tracker:HandlePurchaseEvent(player.MembershipType, true)
+			end
 		end
 	end))
 end
 
-return PlayerProductManagerClient
+function PlayerProductManagerClient:_setupSubscriptionTracker()
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.SUBSCRIPTION)
+
+	-- Main event
+	self._maid:GiveTask(MarketplaceService.PromptSubscriptionPurchaseFinished:Connect(function(player, subscriptionId, didTryPurchasing)
+		if player == self._obj then
+			self._remoting.PromptSubscriptionPurchaseFinished:FireServer(subscriptionId, didTryPurchasing)
+			tracker:HandlePromptClosedEvent(subscriptionId)
+
+			if not didTryPurchasing then
+				tracker:HandlePurchaseEvent(subscriptionId, didTryPurchasing)
+			end
+		end
+	end))
+
+	-- In case it comes from the server
+	self._maid:GiveTask(self._remoting.PromptSubscriptionPurchaseFinished:Connect(function(subscriptionId, didTryPurchasing)
+		tracker:HandlePromptClosedEvent(subscriptionId)
+
+		if not didTryPurchasing then
+			tracker:HandlePurchaseEvent(subscriptionId, didTryPurchasing)
+		end
+	end))
+
+	self._maid:GiveTask(self._remoting.UserSubscriptionStatusChanged:Connect(function(subscriptionId)
+		tracker:HandlePurchaseEvent(subscriptionId, true)
+	end))
+end
+
+function PlayerProductManagerClient:_connectBulkPurchaseMarketplace()
+	self._maid:GiveTask(MarketplaceService.PromptBulkPurchaseFinished:Connect(function(player, status, results)
+		if player ~= self._obj then
+			return
+		end
+
+		-- Update ownership information
+		if status == Enum.MarketplaceBulkPurchasePromptStatus.Completed then
+			for _, item in pairs(results.Items) do
+				local tracker
+				if item.type == Enum.MarketplaceProductType.AvatarAsset then
+					tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)
+				elseif item.type == Enum.MarketplaceProductType.AvatarBundle then
+					tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE)
+				else
+					warn(string.format("[PlayerProductManagerClient] - Unknown Enum.MarketplaceProductType %q", tostring(item.type)))
+					continue
+				end
+
+				if item.status == Enum.MarketplaceItemPurchaseStatus.Success then
+					tracker:HandlePurchaseEvent(tonumber(item.id) or item.id, true)
+				else
+					tracker:HandlePurchaseEvent(tonumber(item.id) or item.id, false)
+				end
+			end
+		end
+	end))
+end
+
+function PlayerProductManagerClient:_setupProductTracker()
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
+
+	self._maid:GiveTask(MarketplaceService.PromptProductPurchaseFinished:Connect(function(userId, productId, isPurchased)
+		if self._obj.UserId == userId then
+			tracker:HandlePromptClosedEvent(productId)
+
+			-- We only read from the server purchase event
+			if not isPurchased then
+				tracker:HandlePurchaseEvent(productId, isPurchased)
+			end
+
+			self._remoting.PromptProductPurchaseFinished:FireServer(productId, isPurchased)
+		end
+	end))
+
+	self._maid:GiveTask(self._remoting.DeveloperProductPurchased:Connect(function(productId)
+		local assetTracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
+		assetTracker:HandlePurchaseEvent(productId, true)
+	end))
+end
+
+function PlayerProductManagerClient:_connectGamePassTracker()
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
+
+	self._maid:GiveTask(MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
+		assert(type(isPurchased) == "boolean", "Bad isPurchased")
+
+		if player == self._obj then
+			tracker:HandlePromptClosedEvent(gamePassId)
+			tracker:HandlePurchaseEvent(gamePassId, isPurchased)
+
+			self._remoting.PromptGamePassPurchaseFinished:FireServer(gamePassId, isPurchased)
+		end
+	end))
+end
+
+function PlayerProductManagerClient:_setupBundleTracker()
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE)
+
+	self._maid:GiveTask(MarketplaceService.PromptBundlePurchaseFinished:Connect(function(player, bundleId, isPurchased)
+		if player == self._obj then
+			tracker:HandlePromptClosedEvent(bundleId)
+			tracker:HandlePurchaseEvent(bundleId, isPurchased)
+
+			self._remoting.PromptBundlePurchaseFinished:FireServer(bundleId, isPurchased)
+		end
+	end))
+end
+
+return Binder.new("PlayerProductManager", PlayerProductManagerClient)

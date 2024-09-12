@@ -5,6 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local LRUCache = require("LRUCache")
+local Tuple = require("Tuple")
+local TupleLookup = require("TupleLookup")
 
 local MemorizeUtils = {}
 
@@ -20,18 +22,21 @@ function MemorizeUtils.memoize(func, cacheConfig)
 
 	cacheConfig = cacheConfig or MemorizeUtils.createCacheConfig()
 
-	local cache = MemorizeUtils._createCacheNode(cacheConfig)
+	local tupleLookup = TupleLookup.new()
+	local cache = LRUCache.new(cacheConfig.maxSize)
 
 	return function(...)
-		local params = table.pack(...)
+		local params = tupleLookup:ToTuple(...)
 
-		local results = MemorizeUtils._cache_get(cache, params)
-		if not results then
-			results = table.pack(func(...))
-			MemorizeUtils._cache_put(cache, params, results, cacheConfig)
+		local found = cache:get(params)
+		if found then
+			return found:Unpack()
 		end
 
-		return unpack(results, 1, results.n)
+		local result = Tuple.new(func(...))
+		cache:set(params, result)
+
+		return result:Unpack()
 	end
 end
 
@@ -59,43 +64,6 @@ function MemorizeUtils.createCacheConfig(cacheConfig)
 	return {
 		maxSize = cacheConfig.maxSize or 128;
 	}
-end
-
-function MemorizeUtils._createCacheNode(cacheConfig)
-	return {
-		childrenLRUCache = LRUCache.new(cacheConfig.maxSize);
-	}
-end
-
-function MemorizeUtils._cache_get(cache, params)
-	local node = cache
-	for i=1, #params do
-		node = node.childrenLRUCache:get(params[i])
-		if not node then
-			return nil
-		end
-	end
-
-	return node.results
-end
-
-function MemorizeUtils._cache_put(cache, params, results, cacheConfig)
-	local node = cache
-
-	for i=1, params.n do
-		local param = params[i]
-
-		local paramNode = node.childrenLRUCache:get(param)
-		if paramNode then
-			node = paramNode
-		else
-			paramNode = MemorizeUtils._createCacheNode(cacheConfig)
-			node.childrenLRUCache:set(param, paramNode)
-			node = paramNode
-		end
-	end
-
-	node.results = results
 end
 
 return MemorizeUtils

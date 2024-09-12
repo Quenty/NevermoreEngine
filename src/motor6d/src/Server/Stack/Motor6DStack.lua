@@ -12,7 +12,7 @@ Motor6DStack.ClassName = "Motor6DStack"
 Motor6DStack.__index = Motor6DStack
 
 function Motor6DStack.new(obj, serviceBag)
-	local self = setmetatable(Motor6DStackBase.new(obj), Motor6DStack)
+	local self = setmetatable(Motor6DStackBase.new(obj, serviceBag), Motor6DStack)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

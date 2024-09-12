@@ -88,6 +88,37 @@ function PromiseUtils.all(promises)
 	return returnPromise
 end
 
+function PromiseUtils.firstSuccessOrLastFailure(promises)
+	if #promises == 0 then
+		return Promise.resolved()
+	elseif #promises == 1 then
+		return promises[1]
+	end
+
+	local remainingCount = #promises
+	local returnPromise = Promise.new()
+
+	local function syncronize(isFullfilled)
+		return function(...)
+			remainingCount = remainingCount - 1
+
+			if isFullfilled then
+				return returnPromise:Resolve(...)
+			end
+
+			if remainingCount == 0 then
+				return returnPromise:Reject(...)
+			end
+		end
+	end
+
+	for _, promise in pairs(promises) do
+		promise:Then(syncronize(true), syncronize(false))
+	end
+
+	return returnPromise
+end
+
 --[=[
 	Combines the result of promises together
 

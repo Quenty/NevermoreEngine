@@ -30,10 +30,12 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
+    "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/pseudolocalize": "file:../pseudolocalize",
     "@quenty/rx": "file:../rx",
     "@quenty/string": "file:../string",
-    "@quenty/table": "file:../table"
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

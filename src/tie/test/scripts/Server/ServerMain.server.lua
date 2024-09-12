@@ -25,7 +25,7 @@ if DO_DOOR_WINDOW_TEST then
 	window.Parent = workspace
 	Window.new(window)
 
-	local doorInterface = OpenableInterface:Get(door)
+	local doorInterface = OpenableInterface:Find(door)
 	doorInterface.Opening:Connect(function()
 		print("Opening event fired")
 	end)
@@ -47,7 +47,7 @@ if DO_DOOR_WINDOW_TEST then
 	doorInterface:PromiseClose()
 
 	print("door:IsImplemented()", doorInterface:IsImplemented())
-	print("door:IsImplemented()", OpenableInterface:Get(workspace):IsImplemented())
+	print("door:IsImplemented()", OpenableInterface:Find(workspace) ~= nil)
 
 	door.Openable.PromiseOpen:Invoke()():Then(function()
 		print("Opened promise resolved")
@@ -73,7 +73,7 @@ do
 
 	-- Implement via interface calls
 	do
-		local thrust = ActionInterface:Implement(adornee)
+		local thrust = ActionInterface.Server:Implement(adornee)
 		-- thrust:GetFolder().Name = "Action_Thrust"
 		thrust.DisplayName.Value = "Thrust"
 

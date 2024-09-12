@@ -173,11 +173,7 @@ function DataStoreWriter:_computeTableDiff(original, incoming)
 	if not DataStoreSnapshotUtils.isEmptySnapshot(diffSnapshot) then
 		return table.freeze(diffSnapshot)
 	else
-		if next(keys) then
-			return nil -- No delta
-		else
-			return DataStoreDeleteToken
-		end
+		return nil
 	end
 end
 

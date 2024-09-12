@@ -13,6 +13,7 @@ local require = require(script.Parent.loader).load(script)
 local Maid = require("Maid")
 local ObservableList = require("ObservableList")
 local RxBrioUtils = require("RxBrioUtils")
+local Rx = require("Rx")
 
 local InputKeyMapRegistryServiceShared = {}
 InputKeyMapRegistryServiceShared.ServiceName = "InputKeyMapRegistryServiceShared"
@@ -76,11 +77,32 @@ function InputKeyMapRegistryServiceShared:GetProvider(providerName)
 	return self._providerLookupByName[providerName]
 end
 
--- function InputKeyMapRegistryServiceShared:ObserveInputKeyMapList(providerName, inputKeyMapListName)
--- 	assert(type(providerName) == "string", "Bad providerName")
--- 	assert(type(inputKeyMapListName) == "string", "Bad inputKeyMapListName")
+function InputKeyMapRegistryServiceShared:ObserveInputKeyMapList(providerName, inputKeyMapListName)
+	assert(providerName, "Bad providerName")
+	assert(inputKeyMapListName, "Bad inputKeyMapListName")
 
--- end
+	return Rx.combineLatest({
+		providerName = providerName;
+		inputKeyMapListName = inputKeyMapListName;
+	}):Pipe({
+		Rx.map(function(state)
+			if not (type(state.inputKeyMapListName) == "string" and type(state.providerName) == "string") then
+				return nil
+			end
+
+			local found = self:FindInputKeyMapList(state.providerName, state.inputKeyMapListName)
+			if found then
+				return found
+			end
+
+			warn(string.format("[TriggerModel.ObserveInputKeyMapList] - Bad inputKey name %q %q\n%s",
+				tostring(state.providerName),
+				tostring(state.inputKeyMapListName)))
+
+			return nil
+		end);
+	})
+end
 
 function InputKeyMapRegistryServiceShared:FindInputKeyMapList(providerName, inputKeyMapListName)
 	assert(type(providerName) == "string", "Bad providerName")

@@ -28,7 +28,10 @@
     "access": "public"
   },
   "dependencies": {
+    "@quenty/brio": "file:../brio",
     "@quenty/enumutils": "file:../enumutils",
-    "@quenty/loader": "file:../loader"
+    "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx"
   }
 }

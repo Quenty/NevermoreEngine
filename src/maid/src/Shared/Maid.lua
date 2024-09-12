@@ -99,7 +99,7 @@ end
 ]=]
 function Maid:__newindex(index, newTask)
 	if Maid[index] ~= nil then
-		error(("Cannot use '%s' as a Maid key"):format(tostring(index)), 2)
+		error(string.format("Cannot use '%s' as a Maid key", tostring(index)), 2)
 	end
 
 	local tasks = self._tasks

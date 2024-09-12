@@ -93,6 +93,8 @@ function AttributeValue:__index(index)
 		end
 	elseif index == "Changed" then
 		return self._object:GetAttributeChangedSignal(self._attributeName)
+	elseif index == "AttributeName" then
+		return rawget(self, "_attributeName")
 	elseif AttributeValue[index] then
 		return AttributeValue[index]
 	else

@@ -35,6 +35,7 @@ local VALID_ATTRIBUTE_TYPES = {
 	["NumberRange"] = true;
 	["Rect"] = true;
 	["Font"] = true;
+	["EnumItem"] = true;
 }
 
 --[=[

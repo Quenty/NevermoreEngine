@@ -65,7 +65,7 @@ function Ragdollable.new(humanoid, serviceBag)
 	end))
 	self:_onRagdollChanged()
 
-	self._maid:GiveTask(RagdollableInterface:Implement(self._obj, self))
+	self._maid:GiveTask(RagdollableInterface.Server:Implement(self._obj, self))
 
 	return self
 end

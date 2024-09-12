@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
+local Rx = require("Rx")
 
 local RoguePropertyArrayHelper = setmetatable({}, BaseObject)
 RoguePropertyArrayHelper.ClassName = "RoguePropertyArrayHelper"
@@ -183,6 +184,19 @@ function RoguePropertyArrayHelper:GetArrayValues()
 		result[index] = rogueProperty:GetValue()
 	end
 	return result
+end
+
+function RoguePropertyArrayHelper:ObserveArrayValues()
+	warn("[RoguePropertyArrayHelper] - Observing arrays is only partially supported")
+
+	-- TODO: Allow for observing
+	local observables = {}
+
+	for _, rogueProperty in pairs(self:GetArrayRogueProperties()) do
+		table.insert(observables, rogueProperty:Observe())
+	end
+
+	return Rx.combineLatest(observables)
 end
 
 return RoguePropertyArrayHelper

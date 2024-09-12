@@ -30,7 +30,7 @@ function ResetServiceClient:Init()
 	self._maid = Maid.new()
 
 	-- Configure
-	self._remoting = self._maid:Add(Remoting.new(ReplicatedStorage, "ResetService"))
+	self._remoting = self._maid:Add(Remoting.Client.new(ReplicatedStorage, "ResetService"))
 
 	self._resetBindable = self._maid:Add(Instance.new("BindableEvent"))
 	self._resetBindable.Event:connect(function()

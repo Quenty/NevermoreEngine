@@ -17,20 +17,15 @@ Door.__index = Door
 function Door.new(obj)
 	local self = setmetatable(BaseObject.new(obj), Door)
 
-	self.Opening = Signal.new()
-	self._maid:GiveTask(self.Opening)
+	self.Opening = self._maid:Add(Signal.new())
+	self.Closing = self._maid:Add(Signal.new())
 
-	self.Closing = Signal.new()
-	self._maid:GiveTask(self.Closing)
-
-	self.IsOpen = Instance.new("BoolValue")
+	self.IsOpen = self._maid:Add(Instance.new("BoolValue"))
 	self.IsOpen.Value = false
-	self._maid:GiveTask(self.IsOpen)
 
-	self.LastPromise = ValueObject.new()
-	self._maid:GiveTask(self.LastPromise)
+	self.LastPromise = self._maid:Add(ValueObject.new())
 
-	self._maid:GiveTask(OpenableInterface:Implement(self._obj, self))
+	self._maid:GiveTask(OpenableInterface.Server:Implement(self._obj, self))
 
 	return self
 end

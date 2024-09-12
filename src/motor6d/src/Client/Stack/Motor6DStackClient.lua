@@ -12,7 +12,7 @@ Motor6DStackClient.ClassName = "Motor6DStackClient"
 Motor6DStackClient.__index = Motor6DStackClient
 
 function Motor6DStackClient.new(obj, serviceBag)
-	local self = setmetatable(Motor6DStackBase.new(obj), Motor6DStackClient)
+	local self = setmetatable(Motor6DStackBase.new(obj, serviceBag), Motor6DStackClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
