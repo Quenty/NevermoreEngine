@@ -7,7 +7,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RagdollServiceConstants = require("RagdollServiceConstants")
 local AttributeValue = require("AttributeValue")
 
 local Players = game:GetService("Players")

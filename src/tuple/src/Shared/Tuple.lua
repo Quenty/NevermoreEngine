@@ -21,6 +21,7 @@ end
 --[=[
 	Returns true of the value is a tuple
 
+	@param value any
 	@return boolean
 ]=]
 function Tuple.isTuple(value)

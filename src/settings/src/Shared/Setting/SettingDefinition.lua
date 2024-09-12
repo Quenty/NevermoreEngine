@@ -54,6 +54,11 @@ function SettingDefinition.new(settingName, defaultValue)
 	return self
 end
 
+--[=[
+	Initializes the setting definition from a service bag.
+
+	@param serviceBag ServiceBag
+]=]
 function SettingDefinition:Init(serviceBag)
 	assert(serviceBag, "No serviceBag")
 	assert(not self._maid, "Already initialized")
@@ -66,10 +71,10 @@ function SettingDefinition:Init(serviceBag)
 end
 
 --[=[
-	Gets the value
+	Gets the value for the given player
 
 	@param player Player
-	@param value T
+	@return T
 ]=]
 function SettingDefinition:Get(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")

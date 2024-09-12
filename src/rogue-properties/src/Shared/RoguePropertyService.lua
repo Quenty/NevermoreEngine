@@ -9,7 +9,6 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local Signal = require("Signal")
 local Maid = require("Maid")
 
 local RoguePropertyService = {}
