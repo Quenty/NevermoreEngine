@@ -5,13 +5,15 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
-local BaseObject = require("BaseObject")
 local AttributeUtils = require("AttributeUtils")
-local Rx = require("Rx")
-local ValueObject = require("ValueObject")
-local RogueHumanoidProperties = require("RogueHumanoidProperties")
+local BaseObject = require("BaseObject")
 local CharacterUtils = require("CharacterUtils")
+local RogueHumanoidProperties = require("RogueHumanoidProperties")
+local Rx = require("Rx")
+local RxRootPartUtils = require("RxRootPartUtils")
+local ValueObject = require("ValueObject")
 
 local GROWTH_VALUE_NAMES = {
 	"HeadScale";
@@ -30,6 +32,11 @@ function RogueHumanoidBase.new(humanoid, serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._properties = RogueHumanoidProperties:GetPropertyTable(self._serviceBag, self._obj)
+	self._scaleState = self._maid:Add(ValueObject.fromObservable(Rx.combineLatest({
+		scale = self._properties.Scale:Observe();
+		maxSize = self._properties.ScaleMax:Observe();
+		minSize = self._properties.ScaleMin:Observe();
+	})))
 
 	if CharacterUtils.getPlayerFromCharacter(self._obj) == Players.LocalPlayer then
 		self._maid:GiveTask(self._properties.WalkSpeed:Observe():Subscribe(function(walkSpeed)
@@ -44,19 +51,11 @@ function RogueHumanoidBase.new(humanoid, serviceBag)
 		self._maid:GiveTask(self._properties.JumpHeight:Observe():Subscribe(function(jumpHeight)
 			self._obj.JumpHeight = jumpHeight
 		end))
-	end
 
-	self._scaleState = self._maid:Add(ValueObject.fromObservable(Rx.combineLatest({
-		scale = self._properties.Scale:Observe();
-		maxSize = self._properties.ScaleMax:Observe();
-		minSize = self._properties.ScaleMin:Observe();
-	})))
-
-	self._maid:GiveTask(self._scaleState:Observe():Subscribe(function(state)
-		if state then
-			self:_updateScale(state)
+		if RunService:IsClient() then
+			self:_setupIgnoreCFrameChangesOnScaleChange()
 		end
-	end))
+	end
 
 	self._maid:GiveTask(self._properties.MaxHealth:Observe():Subscribe(function(maxHealth)
 		local newMaxHealth = math.max(maxHealth, 1)
@@ -74,21 +73,67 @@ function RogueHumanoidBase.new(humanoid, serviceBag)
 		end
 	end))
 
+	self:_setupScaling()
+
+	return self
+end
+
+function RogueHumanoidBase:_setupScaling()
+	self._maid:GiveTask(self._scaleState:Observe():Pipe({
+		Rx.where(function(state)
+			return state ~= nil
+		end);
+	}):Subscribe(function(state)
+		self:_updateScale(state)
+	end))
+
 	self._maid:GiveTask(self._obj.ChildAdded:Connect(function(child)
-		if GROWTH_VALUE_NAMES[child.Name] then
+		if GROWTH_VALUE_NAMES[child.Name] and child:IsA("NumberValue") then
 			local state = self._scaleState.Value
 			if state then
 				self:_updateScaleValue(child, state)
 			end
 		end
 	end))
-	return self
+end
+
+function RogueHumanoidBase:_setupIgnoreCFrameChangesOnScaleChange()
+	self._maid:GiveTask(RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(self._obj):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid, rootPart = brio:ToMaidAndValue()
+		local lastSafeRootPartCFrame = rootPart.CFrame
+		local rootPartExperiencedTeleport = false
+
+		-- Unfortunately have to run every frame to capture this data
+		maid:GiveTask(RunService.PostSimulation:Connect(function()
+			lastSafeRootPartCFrame = rootPart.CFrame
+			rootPartExperiencedTeleport = false
+		end))
+
+		maid:GiveTask(rootPart:GetPropertyChangedSignal("CFrame"):Connect(function()
+			rootPartExperiencedTeleport = true
+		end))
+		maid:GiveTask(rootPart:GetPropertyChangedSignal("Size"):Connect(function()
+			rootPartExperiencedTeleport = true
+		end))
+
+		maid:GiveTask(self._scaleState.Changed:Connect(function()
+			if not rootPartExperiencedTeleport then
+				return
+			end
+
+			rootPart.CFrame = lastSafeRootPartCFrame
+		end))
+	end))
 end
 
 function RogueHumanoidBase:_updateScale(state)
 	for _, name in pairs(GROWTH_VALUE_NAMES) do
 		local numberValue = self._obj:FindFirstChild(name)
-		if not numberValue then
+		if not (numberValue and numberValue:IsA("NumberValue")) then
 			continue
 		end
 
