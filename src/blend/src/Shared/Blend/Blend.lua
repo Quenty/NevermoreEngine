@@ -604,7 +604,7 @@ end
 function Blend.Tags(parent, value)
 	assert(typeof(parent) == "Instance", "Bad parent")
 
-	local observe = Blend._observeTags(value, parent)
+	local observe = Blend._observeTags(value)
 
 	if observe then
 		return observe:Pipe({
@@ -626,13 +626,9 @@ function Blend._observeTags(tags)
 	if type(tags) == "string" then
 		return Rx.of(tags)
 	elseif type(tags) == "table" then
-		if Observable.isObservable(tags) then
-			return tags
-		else
-			error("Bad tags")
-		end
+		return Blend.toPropertyObservable(tags) or Rx.of(unpack(tags))
 	else
-		error("Bad tags")
+		return nil
 	end
 end
 
