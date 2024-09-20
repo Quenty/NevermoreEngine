@@ -73,7 +73,7 @@ function BasePermissionProvider:IsPermissionLevel(player, permissionLevel)
 
 	local ok, result = promise:Yield()
 	if not ok then
-		warnstring.format("[BasePermissionProvider] - %s", tostring(result))
+		warn(string.format("[BasePermissionProvider] - %s", tostring(result))
 		return false
 	end
 
