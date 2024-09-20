@@ -12,7 +12,7 @@ local UTF8 = {}
 ]=]
 function UTF8.upper(str: string): string
 	local UPPER_MAP = UTF8.UPPER_MAP
-	str = str:upper()
+	str = string.upper(str)
 	local newStr = ""
 	for start, stop in utf8.graphemes(str) do
 		local chr = string.sub(str, start, stop)
@@ -31,7 +31,7 @@ end
 ]=]
 function UTF8.lower(str: string): string
 	local LOWER_MAP = UTF8.LOWER_MAP
-	str = str:lower()
+	str = string.lower(str)
 	local newStr = ""
 	for start, stop in utf8.graphemes(str) do
 		local chr = string.sub(str, start, stop)

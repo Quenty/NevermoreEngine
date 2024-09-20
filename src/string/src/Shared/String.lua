@@ -29,7 +29,7 @@ end
 	@return string
 ]=]
 function String.toCamelCase(str: string): string
-	str = str:lower()
+	str = string.lower(str)
 	str = string.gsub(str, "[ _](%a)", string.upper)
 	str = string.gsub(str, "^%a", string.upper)
 	str = string.gsub(str, "%p", "")
@@ -52,7 +52,7 @@ end
 	@return string
 ]=]
 function String.toLowerCamelCase(str: string): string
-	str = str:lower()
+	str = string.lower(str)
 	str = string.gsub(str, "[ _](%a)", string.upper)
 	str = string.gsub(str, "^%a", string.lower)
 	str = string.gsub(str, "%p", "")
@@ -66,7 +66,7 @@ end
 	@return string
 ]=]
 function String.toPrivateCase(str: string): string
-	return "_" .. string.sub(str, 1, 1):lower() .. str:sub(2, #str)
+	return "_" .. string.lower(string.sub(str, 1, 1)) .. str:sub(2, #str)
 end
 
 --[=[
