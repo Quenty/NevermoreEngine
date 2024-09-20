@@ -333,12 +333,12 @@ function Time.getFormattedTime(format, currentTime)
 	end
 
 	for _, formatType in pairs(formatsRequired) do
-		returnString = returnString:gsub(formatType, formatType:rep(3))
+		returnString = returnString:gsub(formatType, string.rep(formatType, 3))
 	end
 
 	for _, formatType in pairs(formatsRequired) do
 		local replacement = ISO_FORMAT_STRINGS[formatType](currentTime)
-		returnString = returnString:gsub(formatType:rep(3), replacement)
+		returnString = returnString:gsub(string.rep(formatType, 3), replacement)
 	end
 
 	return returnString

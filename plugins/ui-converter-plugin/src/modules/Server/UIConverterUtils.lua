@@ -61,7 +61,7 @@ end
 function UIConverterUtils.toMultiLineEscape(text)
 	if text:find("\n") then
 		for i=0, 250 do
-			local equals = ("="):rep(i)
+			local equals = string.rep("=", i)
 			local sep = string.format("%%[%s%%[", equals)
 			local endSep = string.format("%%]%s%%]", equals)
 
