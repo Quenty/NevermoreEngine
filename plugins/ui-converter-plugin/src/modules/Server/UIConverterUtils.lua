@@ -198,7 +198,7 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 		if value.Weight == Enum.FontWeight.Regular and value.Style == Enum.FontStyle.Normal then
 			return string.format("Font.new(%q)", value.Family)
 		else
-			return string.formatstring.format("Font.new(%q, %s, %s)", value.Family, tostring(value.Weight, value.Style))
+			return string.format("Font.new(%q, %s, %s)", value.Family, tostring(value.Weight, value.Style))
 		end
 	elseif valueType == "userdata" then
 		-- FontFace
