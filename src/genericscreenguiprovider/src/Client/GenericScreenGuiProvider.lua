@@ -152,7 +152,7 @@ end
 ]=]
 function GenericScreenGuiProvider:GetDisplayOrder(orderName)
 	assert(type(orderName) == "string", "Bad orderName")
-	assert(self._order[orderName], ("No DisplayOrder with orderName '%s'"):format(tostring(orderName)))
+	assert(self._order[orderName], string.format("No DisplayOrder with orderName '%s'", tostring(orderName)))
 
 	return self._order[orderName]
 end

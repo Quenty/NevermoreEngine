@@ -641,7 +641,7 @@ function DataStoreStage:GetNewWriter()
 
 	for key, store in pairs(self._stores) do
 		if not store.Destroy then
-			warn(("[DataStoreStage] - Substore %q destroyed"):format(key))
+			warn(string.format("[DataStoreStage] - Substore %q destroyed", key))
 			continue
 		end
 
@@ -697,7 +697,7 @@ function DataStoreStage:_createFullBaseDataSnapshot()
 
 		for key, store in pairs(self._stores) do
 			if not store.Destroy then
-				warn(("[DataStoreStage] - Substore %q destroyed"):format(key))
+				warn(string.format("[DataStoreStage] - Substore %q destroyed", key))
 				continue
 			end
 

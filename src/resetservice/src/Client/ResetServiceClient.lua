@@ -39,7 +39,7 @@ function ResetServiceClient:Init()
 
 	CoreGuiUtils.promiseRetrySetCore(RETRY_ATTEMPTS, INITIAL_WAIT_TIME, "ResetButtonCallback", self._resetBindable)
 		:Catch(function(err)
-			warn(("[ResetServiceClient] - Failed to SetCore due to %q"):format(tostring(err)))
+			warn(string.format("[ResetServiceClient] - Failed to SetCore due to %q", tostring(err)))
 		end)
 end
 

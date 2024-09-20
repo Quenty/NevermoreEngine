@@ -40,7 +40,7 @@ function GameConfigAssetClient:_setupEntrySet(observeTranslationKey, observeTran
 				and #state.text > 0
 				and state.assetKey then
 
-				local context = ("GameConfigAsset.%s"):format(state.assetKey)
+				local context = string.format("GameConfigAsset.%s", state.assetKey)
 				local localeId = "en"
 
 				self._configTranslator:SetEntryValue(state.translationKey, state.text, context, localeId, state.text)

@@ -52,7 +52,7 @@ function RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType)
 	elseif rigType == Enum.HumanoidRigType.R6 then
 		return R6_ADDITIONAL_ATTACHMENTS
 	else
-		error(("[RagdollAdditionalAttachmentUtils] - Unknown rigType %q"):format(tostring(rigType)))
+		error(string.format("[RagdollAdditionalAttachmentUtils] - Unknown rigType %q", tostring(rigType)))
 	end
 end
 

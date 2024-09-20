@@ -87,7 +87,7 @@ function PlayerSettings:_setSettingsMap(settingsMap)
 		local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 
 		if self._obj:GetAttribute(attributeName) == nil then
-			warn(("[PlayerSettings] - Cannot set setting %q on attribute that is not defined on the server."):format(attributeName))
+			warn(string.format("[PlayerSettings] - Cannot set setting %q on attribute that is not defined on the server.", attributeName))
 			continue
 		end
 

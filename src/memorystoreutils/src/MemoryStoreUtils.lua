@@ -28,7 +28,7 @@ function MemoryStoreUtils.promiseAdd(queue, value, expirationSeconds, priority)
 
 	return Promise.spawn(function(resolve, reject)
 		if DEBUG_QUEUE then
-			print(("[MemoryStoreUtils.promiseAdd] - Queuing %q"):format(HttpService:JSONEncode(value)))
+			print(string.format("[MemoryStoreUtils.promiseAdd] - Queuing %q", HttpService:JSONEncode(value)))
 		end
 
 		local ok, err = pcall(function()
@@ -37,7 +37,7 @@ function MemoryStoreUtils.promiseAdd(queue, value, expirationSeconds, priority)
 
 		if not ok then
 			if DEBUG_QUEUE then
-				warn(("Failed to queue due to %q"):format(err or "nil"))
+				warn(string.format("Failed to queue due to %q", err or "nil"))
 			end
 			return reject(err or "[MemoryStoreUtils.promiseAdd] - Failed to AddAsync to the queue")
 		end
@@ -73,7 +73,7 @@ function MemoryStoreUtils.promiseRead(queue, count, allOrNothing, waitTimeout)
 		if not ok then
 			if DEBUG_QUEUE then
 				print("[MemoryStoreUtils.promiseRead] - Read from queue", ok, values, removeId)
-				warn(("[MemoryStoreUtils.promiseRead] - Failed to read queue due to %q"):format(err or "nil"))
+				warn(string.format("[MemoryStoreUtils.promiseRead] - Failed to read queue due to %q", err or "nil"))
 			end
 
 			return reject(err or "[MemoryStoreUtils.promiseRead] - Failed to ReadAsync from the queue")
@@ -99,7 +99,7 @@ function MemoryStoreUtils.promiseRemove(queue, id)
 
 	return Promise.spawn(function(resolve, reject)
 		if DEBUG_QUEUE then
-			print(("[MemoryStoreUtils.promiseRemove] - Removing %q"):format(HttpService:JSONEncode(id)))
+			print(string.format("[MemoryStoreUtils.promiseRemove] - Removing %q", HttpService:JSONEncode(id)))
 		end
 
 		local ok, err = pcall(function()
@@ -108,7 +108,7 @@ function MemoryStoreUtils.promiseRemove(queue, id)
 
 		if not ok then
 			if DEBUG_QUEUE then
-				warn(("Failed to remove queue id %q due to %q"):format(id, err or "nil"))
+				warn(string.format("Failed to remove queue id %q due to %q", id, err or "nil"))
 			end
 
 			return reject(err or "[MemoryStoreUtils.promiseRemove] - Failed to RemoveAsync from the queue")

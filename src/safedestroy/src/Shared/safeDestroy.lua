@@ -14,7 +14,7 @@ return function(instance)
 		err = tostring(err)
 		-- rip
 		if err:sub(1, #PARENT_PROPERTY_LOCKED) ~= PARENT_PROPERTY_LOCKED then
-			warn(("[safeDestroy] - %q"):format(err))
+			warn(string.format("[safeDestroy] - %q", err))
 		end
 	end)
 end

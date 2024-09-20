@@ -43,7 +43,7 @@ function GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType)
 			return found
 		end;
 		Validate = function(keys)
-			return #keys > 0, ("No %s with that name could be found."):format(assetType)
+			return #keys > 0, string.format("No %s with that name could be found.", assetType)
 		end,
 		Autocomplete = function(keys)
 			local stringified = {}

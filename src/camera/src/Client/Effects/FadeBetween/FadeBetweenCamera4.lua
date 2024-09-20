@@ -58,7 +58,7 @@ function FadeBetweenCamera4:__newindex(index, value)
 		self._state0, self._position0 = self:_computeCameraState(position)
 		rawset(self, index, value)
 	else
-		error(("%q is not a valid member of FadeBetweenCamera4"):format(tostring(index)))
+		error(string.format("%q is not a valid member of FadeBetweenCamera4", tostring(index)))
 	end
 end
 
@@ -88,7 +88,7 @@ function FadeBetweenCamera4:__index(index)
 	elseif FadeBetweenCamera4[index] then
 		return FadeBetweenCamera4[index]
 	else
-		error(("%q is not a valid member of FadeBetweenCamera4"):format(tostring(index)))
+		error(string.format("%q is not a valid member of FadeBetweenCamera4", tostring(index)))
 	end
 end
 

@@ -121,7 +121,7 @@ end
 			return result + 1
 		end);
 		Rx.map(function(value)
-			return ("%0.2f"):format(value)
+			return string.format("%0.2f", value)
 		end);
 	}):Subscribe(print)
 

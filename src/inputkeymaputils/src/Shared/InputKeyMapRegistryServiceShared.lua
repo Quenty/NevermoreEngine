@@ -39,7 +39,7 @@ function InputKeyMapRegistryServiceShared:Init(serviceBag)
 		local providerName = provider:GetProviderName()
 
 		if self._providerLookupByName[providerName] then
-			error(("Already have a provider with name %q"):format(providerName))
+			error(string.format("Already have a provider with name %q", providerName))
 		end
 
 		self._providerLookupByName[providerName] = provider

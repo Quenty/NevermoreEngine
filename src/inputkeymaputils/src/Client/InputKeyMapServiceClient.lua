@@ -42,7 +42,7 @@ function InputKeyMapServiceClient:_ensureLocalizationEntries()
 		local localizationTable = self._translator:GetLocalizationTable()
 		local key = inputKeyMapList:GetBindingTranslationKey()
 		local source = text
-		local context = ("InputKeyMapServiceClient.%s"):format(inputKeyMapList:GetListName())
+		local context = string.format("InputKeyMapServiceClient.%s", inputKeyMapList:GetListName())
 		local localeId = "en"
 		local value = text
 

@@ -46,7 +46,7 @@ function PlayerUtils.formatDisplayName(name, displayName)
 	if name:lower() == displayName:lower() then
 		return displayName
 	else
-		return ("%s (@%s)"):format(displayName, name)
+		return string.format("%s (@%s)", displayName, name)
 	end
 end
 

@@ -72,8 +72,7 @@ end
 
 function ModuleProvider:_addToRegistery(moduleScript)
 	if self._registry[moduleScript.Name] then
-		error(("[ModuleProvider._addToRegistery] - Duplicate %q in registery")
-			:format(moduleScript.Name))
+		error(string.format("[ModuleProvider._addToRegistery] - Duplicate %q in registery", moduleScript.Name))
 	end
 
 	if not moduleScript.Parent:FindFirstChild("loader") then
@@ -87,15 +86,13 @@ function ModuleProvider:_addToRegistery(moduleScript)
 	xpcall(function()
 		_module = require(moduleScript)
 	end, function(err)
-		error(("[ModuleProvider._addToRegistery] - Failed to load %q due to %q")
-			:format(moduleScript:GetFullName(), tostring(err)))
+		error(string.format("[ModuleProvider._addToRegistery] - Failed to load %q due to %q", moduleScript:GetFullName(), tostring(err)))
 	end)
 
 	if self._checkModule then
 		local ok, err = self._checkModule(_module, moduleScript)
 		if not ok then
-			error(("[ModuleProvider] - Bad module %q - %q")
-				:format(moduleScript:GetFullName(), tostring(err)))
+			error(string.format("[ModuleProvider] - Bad module %q - %q", moduleScript:GetFullName(), tostring(err)))
 		end
 	end
 

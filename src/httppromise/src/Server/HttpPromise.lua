@@ -61,7 +61,7 @@ function HttpPromise.request(request)
 		end)
 
 		if DEBUG_RESPONSE then
-			print(("Response: %d %s %s"):format(response.StatusCode, request.Method, request.Url), response.Body)
+			print(string.format("Response: %d %s %s", response.StatusCode, request.Method, request.Url), response.Body)
 		end
 
 		if not ok then
@@ -144,7 +144,7 @@ function HttpPromise.logFailedRequests(...)
 		if type(item) == "string" then
 			warn(item)
 		elseif type(item) == "table" and type(item.StatusCode) == "number" then
-			warn(("Failed request %d %q"):format(item.StatusCode, tostring(item.Body)))
+			warn(string.format("Failed request %d %q", item.StatusCode, tostring(item.Body)))
 		end
 	end
 end
@@ -159,7 +159,7 @@ function HttpPromise.decodeJson(response)
 	assert(response, "Bad response")
 
 	if type(response.Body) ~= "string" then
-		return Promise.rejected(("Body is not of type string, but says %q"):format(tostring(response.Body)))
+		return Promise.rejected(string.format("Body is not of type string, but says %q", tostring(response.Body)))
 	end
 
 	return Promise.new(function(resolve, reject)

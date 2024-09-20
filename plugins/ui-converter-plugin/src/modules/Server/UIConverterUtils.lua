@@ -88,24 +88,24 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 		if multiline then
 			return multiline
 		else
-			return ("%q"):format(value)
+			return string.format("%q", value)
 		end
 	elseif valueType == "number" then
 		return roundNumber(value)
 	elseif valueType == "boolean" then
 		return tostring(value)
 	elseif valueType == "Color3" then
-		return ("Color3.fromRGB(%d, %d, %d)"):format(value.R*255, value.G*255, value.B*255)
+		return string.format("Color3.fromRGB(%d, %d, %d)", value.R*255, value.G*255, value.B*255)
 	elseif valueType == "Vector2" then
-		return ("Vector2.new(%s, %s)"):format(applyToTuple(roundNumber, value.x, value.y))
+		return string.format("Vector2.new(%s, %s)", applyToTuple(roundNumber, value.x, value.y))
 	elseif valueType == "Vector3" then
-		return ("Vector3.new(%s, %s, %s)"):format(applyToTuple(roundNumber, value.x, value.y, value.z))
+		return string.format("Vector3.new(%s, %s, %s)", applyToTuple(roundNumber, value.x, value.y, value.z))
 	elseif valueType == "CFrame" then
 		if value.Rotation == CFrame.new() then
-			return ("CFrame.new(%s, %s, %s)"):format(applyToTuple(roundNumber, value.x, value.y, value.z))
+			return string.format("CFrame.new(%s, %s, %s)", applyToTuple(roundNumber, value.x, value.y, value.z))
 		elseif value.x == 0 and value.y == 0 and value.z == 0 then
 			local x, y, z = value:toEulerAnglesXYZ()
-			return ("CFrame.Angles(%s, %s, %s)"):format(applyToTuple(roundNumber, x, y, z))
+			return string.format("CFrame.Angles(%s, %s, %s)", applyToTuple(roundNumber, x, y, z))
 		else
 			local x, y, z = value:toEulerAnglesXYZ()
 			local roundX, roundY, roundZ = roundToPi(x), roundToPi(y), roundToPi(z)
@@ -131,7 +131,7 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 	elseif valueType == "ColorSequence" then
 		local keypoints = value.Keypoints
 		if #keypoints == 1 then
-			return ("ColorSequence.new(%s)"):format(UIConverterUtils.toLuaPropertyString(keypoints[1].Value, debugHint))
+			return string.format("ColorSequence.new(%s)", UIConverterUtils.toLuaPropertyString(keypoints[1].Value, debugHint))
 		elseif #keypoints == 2 and keypoints[1].Time == 0 and keypoints[2].Time == 1 then
 			return ("ColorSequence.new(%s, %s)"):format(
 				UIConverterUtils.toLuaPropertyString(value.Keypoints[1].Value, debugHint),
@@ -141,12 +141,12 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 			for _, keypoint in pairs(keypoints) do
 				table.insert(strings, "\n\t" .. UIConverterUtils.toLuaPropertyString(keypoint, debugHint))
 			end
-			return ("ColorSequence.new({%s\n})"):format(table.concat(strings, ","))
+			return string.format("ColorSequence.new({%s\n})", table.concat(strings, ","))
 		end
 	elseif valueType == "NumberSequence" then
 		local keypoints = value.Keypoints
 		if #keypoints == 1 then
-			return ("NumberSequence.new(%s)"):format(roundNumber(keypoints[1].Value))
+			return string.format("NumberSequence.new(%s)", roundNumber(keypoints[1].Value))
 		elseif #keypoints == 2 and keypoints[1].Time == 0 and keypoints[2].Time == 1 then
 			return ("NumberSequence.new(%s, %s)"):format(
 				roundNumber(keypoints[1].Value),
@@ -156,7 +156,7 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 			for _, keypoint in pairs(keypoints) do
 				table.insert(strings, "\n\t" .. UIConverterUtils.toLuaPropertyString(keypoint, debugHint))
 			end
-			return ("NumberSequence.new({%s\n})"):format(table.concat(strings, ","))
+			return string.format("NumberSequence.new({%s\n})", table.concat(strings, ","))
 		end
 	elseif valueType == "ColorSequenceKeypoint" then
 		return ("ColorSequenceKeypoint.new(%s, %s)"):format(
@@ -167,28 +167,27 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 			roundNumber(value.Time),
 			UIConverterUtils.toLuaPropertyString(value.Value, debugHint))
 	elseif valueType == "BrickColor" then
-		return ("BrickColor.new(%q)"):format(value.Name)
+		return string.format("BrickColor.new(%q)", value.Name)
 	elseif valueType == "UDim" then
-		return ("UDim.new(%s, %s)"):format(roundNumber(value.Scale), roundNumber(value.Offset))
+		return string.format("UDim.new(%s, %s)", roundNumber(value.Scale), roundNumber(value.Offset))
 	elseif valueType == "UDim2" then
 		if value.X.Scale == 0 and value.Y.Scale == 0 and
 			(value.X.Offset ~= 0 or value.Y.Offset ~= 0) then
-			return ("UDim2.fromOffset(%s, %s)"):format(roundNumber(value.X.Offset), roundNumber(value.Y.Offset))
+			return string.format("UDim2.fromOffset(%s, %s)", roundNumber(value.X.Offset), roundNumber(value.Y.Offset))
 		elseif value.X.Offset == 0 and value.Y.Offset == 0
 			and (value.X.Scale ~= 0 or value.Y.Scale ~= 0) then
-			return ("UDim2.fromScale(%s, %s)"):format(roundNumber(value.X.Scale), roundNumber(value.Y.Scale))
+			return string.format("UDim2.fromScale(%s, %s)", roundNumber(value.X.Scale), roundNumber(value.Y.Scale))
 		else
-			return ("UDim2.new(%s, %s, %s, %s)"):format(
-				roundNumber(value.X.Scale), roundNumber(value.X.Offset), roundNumber(value.Y.Scale), roundNumber(value.Y.Offset))
+			return string.format("UDim2.new(%s, %s, %s, %s)", roundNumber(value.X.Scale), roundNumber(value.X.Offset), roundNumber(value.Y.Scale), roundNumber(value.Y.Offset))
 		end
 	elseif valueType == "NumberRange" then
 		if value.Min == value.Max then
-			return ("NumberRange.new(%s)"):format(roundNumber(value.Min))
+			return string.format("NumberRange.new(%s)", roundNumber(value.Min))
 		else
-			return ("NumberRange.new(%s, %s)"):format(roundNumber(value.Min), roundNumber(value.Max))
+			return string.format("NumberRange.new(%s, %s)", roundNumber(value.Min), roundNumber(value.Max))
 		end
 	elseif valueType == "EnumItem" then
-		return ("Enum.%s.%s"):format(tostring(value.EnumType), value.Name)
+		return string.format("Enum.%s.%s", tostring(value.EnumType), value.Name)
 	elseif valueType == "PhysicalProperties" then
 		if value.FrictionWeight == 1 and value.ElasticityWeight == 1 then
 			return ("PhysicalProperties.new(%s, %s, %s)"):format(
@@ -199,15 +198,15 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 		end
 	elseif valueType == "Font" then
 		if value.Weight == Enum.FontWeight.Regular and value.Style == Enum.FontStyle.Normal then
-			return ("Font.new(%q)"):format(value.Family)
+			return string.format("Font.new(%q)", value.Family)
 		else
-			return ("Font.new(%q, %s, %s)"):format(value.Family, tostring(value.Weight), tostring(value.Style))
+			return string.formatstring.format("Font.new(%q, %s, %s)", value.Family, tostring(value.Weight, value.Style))
 		end
 	elseif valueType == "userdata" then
 		-- FontFace
-		warn(("Bad property type %s for %s - Cannot serialize."):format(valueType, debugHint and tostring(debugHint) or "?"))
+		warn(string.format("Bad property type %s for %s - Cannot serialize.", valueType, debugHint and tostring(debugHint) or "?"))
 	else
-		error(("Unknown property type %s for %s"):format(valueType, debugHint and tostring(debugHint) or "?"))
+		error(string.format("Unknown property type %s for %s", valueType, debugHint and tostring(debugHint) or "?"))
 	end
 end
 
@@ -266,7 +265,7 @@ function UIConverterUtils.propertiesTableToString(library, properties)
 
 	local data = {}
 	for _, key in pairs(keys) do
-		table.insert(data, ("%s = %s;"):format(key, properties[key]))
+		table.insert(data, string.format("%s = %s;", key, properties[key]))
 	end
 
 	return table.concat(data, "\n")
@@ -302,19 +301,19 @@ function UIConverterUtils.getChildrenKey(library)
 	elseif library == "FusionUnpacked" or library == "BlendUnpacked" then
 		return "[Children]"
 	else
-		error(("Unknown library %q"):format(tostring(library)))
+		error(string.format("Unknown library %q", tostring(library)))
 	end
 end
 
 function UIConverterUtils.getLibraryNewClass(library, instance, propertiesString)
 	if library == "Blend" then
-		return ("Blend.New %q {\n%s\n}"):format(instance.ClassName, propertiesString)
+		return string.format("Blend.New %q {\n%s\n}", instance.ClassName, propertiesString)
 	elseif library == "Fusion" then
-		return ("Fusion.New %q {\n%s\n}"):format(instance.ClassName, propertiesString)
+		return string.format("Fusion.New %q {\n%s\n}", instance.ClassName, propertiesString)
 	elseif library == "FusionUnpacked" or library == "BlendUnpacked" then
-		return ("New %q {\n%s\n}"):format(instance.ClassName, propertiesString)
+		return string.format("New %q {\n%s\n}", instance.ClassName, propertiesString)
 	else
-		error(("Unknown library %q"):format(tostring(library)))
+		error(string.format("Unknown library %q", tostring(library)))
 	end
 end
 
@@ -342,7 +341,7 @@ function UIConverterUtils.getOverrideMap(library)
 		cachedFusionOverrideMap = require(blendDefaultProps)
 		return cachedFusionOverrideMap
 	else
-		error(("Unknown library %q"):format(tostring(library)))
+		error(string.format("Unknown library %q", tostring(library)))
 	end
 end
 
@@ -524,7 +523,7 @@ function UIConverterUtils.getEntryListCode(library, refLookupMap)
 	if library == "Blend" then
 		local items = {}
 		for _, value in pairs(refLookupMap) do
-			table.insert(items, ("local %s = Blend.State()"):format(value))
+			table.insert(items, string.format("local %s = Blend.State()", value))
 		end
 
 		return table.concat(items, "\n") .. "\n\nreturn "
@@ -541,7 +540,7 @@ function UIConverterUtils.convertListOfItemsToTable(results)
 		end
 	end
 	local childrenText = table.concat(strings, "\n")
-	return ("{\n%s\n}"):format(UIConverterUtils.indent(childrenText))
+	return string.format("{\n%s\n}", UIConverterUtils.indent(childrenText))
 end
 
 return UIConverterUtils

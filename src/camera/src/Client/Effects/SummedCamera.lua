@@ -93,7 +93,7 @@ function SummedCamera:__index(index)
 	elseif SummedCamera[index] then
 		return SummedCamera[index]
 	else
-		error(("[SummedCamera] - '%s' is not a valid member"):format(tostring(index)))
+		error(string.format("[SummedCamera] - '%s' is not a valid member", tostring(index)))
 	end
 end
 

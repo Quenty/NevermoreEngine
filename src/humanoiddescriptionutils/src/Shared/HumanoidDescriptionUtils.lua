@@ -125,8 +125,7 @@ function HumanoidDescriptionUtils.getAssetIdsFromString(assetString)
 		if num then
 			table.insert(assetIds, num)
 		elseif assetIdStr ~= "" then
-			warn(("[HumanoidDescriptionUtils/getAssetIdsFromString] - Failed to convert %q to assetId")
-				:format(assetIdStr))
+			warn(string.format("[HumanoidDescriptionUtils/getAssetIdsFromString] - Failed to convert %q to assetId", assetIdStr))
 		end
 	end
 

@@ -64,8 +64,7 @@ function PseudoLocalize.addToLocalizationTable(localizationTable, preferredLocal
 			if line then
 				entry.Values[localeId] = PseudoLocalize.pseudoLocalize(line)
 			else
-				warn(("[PseudoLocalize.addToLocalizationTable] - No entry in key %q for locale %q")
-					:format(entry.Key, fromLocale))
+				warn(string.format("[PseudoLocalize.addToLocalizationTable] - No entry in key %q for locale %q", entry.Key, fromLocale))
 			end
 		end
 	end

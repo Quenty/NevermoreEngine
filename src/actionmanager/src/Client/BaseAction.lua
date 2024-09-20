@@ -29,7 +29,7 @@ function BaseAction.new(actionData)
 
 	self._maid = Maid.new()
 	self._name = actionData.Name or error("No name")
-	self._contextActionKey = ("%s_ContextAction"):format(tostring(self._name))
+	self._contextActionKey = string.format("%s_ContextAction", tostring(self._name))
 	self._activateData = nil -- Data to be fired with the Activated event
 
 	self.Activated = Signal.new() -- :Fire(actionMaid, ... (activateData))
@@ -147,7 +147,7 @@ function BaseAction:Activate(...)
 	if self:IsEnabled() then
 		self.IsActivatedValue.Value = true
 	else
-		warn(("[%s.Activate] - Not activating. Disabled!"):format(self:GetName()))
+		warn(string.format("[%s.Activate] - Not activating. Disabled!", self:GetName()))
 	end
 end
 

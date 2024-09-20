@@ -82,7 +82,7 @@ function StepUtils.bindToSignal(signal, update)
 		error("signal must be of type RBXScriptSignal")
 	end
 	if type(update) ~= "function" then
-		error(("update must be of type function, got %q"):format(type(update)))
+		error(string.format("update must be of type function, got %q", type(update)))
 	end
 
 	local conn = nil
@@ -135,7 +135,7 @@ function StepUtils.onceAtRenderPriority(priority, func)
 	assert(type(priority) == "number", "Bad priority")
 	assert(type(func) == "function", "Bad func")
 
-	local key = ("StepUtils.onceAtPriority_%s"):format(HttpService:GenerateGUID(false))
+	local key = string.format("StepUtils.onceAtPriority_%s", HttpService:GenerateGUID(false))
 
 	local function cleanup()
 		RunService:UnbindFromRenderStep(key)

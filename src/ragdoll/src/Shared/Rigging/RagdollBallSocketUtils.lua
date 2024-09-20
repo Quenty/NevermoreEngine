@@ -186,7 +186,7 @@ function RagdollBallSocketUtils.getRigData(rigType)
 	elseif rigType == Enum.HumanoidRigType.R6 then
 		return R6_RAGDOLL_RIG
 	else
-		error(("[RagdollBallSocketUtils] - Unknown rigType %q"):format(tostring(rigType)))
+		error(string.format("[RagdollBallSocketUtils] - Unknown rigType %q", tostring(rigType)))
 	end
 end
 

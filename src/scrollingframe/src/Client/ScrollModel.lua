@@ -102,7 +102,7 @@ function ScrollModel:__index(index)
 	elseif ScrollModel[index] then
 		return ScrollModel[index]
 	else
-		error(("[ScrollModel] - '%s' is not a valid member"):format(tostring(index)))
+		error(string.format("[ScrollModel] - '%s' is not a valid member", tostring(index)))
 	end
 end
 
@@ -134,7 +134,7 @@ function ScrollModel:__newindex(index, value)
 	elseif index == "Velocity" then
 		self._spring.Velocity = value
 	else
-		error(("[ScrollModel] - '%s' is not a valid member"):format(tostring(index)))
+		error(string.format("[ScrollModel] - '%s' is not a valid member", tostring(index)))
 	end
 end
 

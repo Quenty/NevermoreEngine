@@ -34,8 +34,7 @@ function Utils.getOrCreateValue(parent, instanceType, name, defaultValue)
 	local foundChild = parent:FindFirstChild(name)
 	if foundChild then
 		if not foundChild:IsA(instanceType) then
-			warn(("[Utils.getOrCreateValue] - Value of type %q of name %q is of type %q in %s instead")
-				:format(instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
+			warn(string.format("[Utils.getOrCreateValue] - Value of type %q of name %q is of type %q in %s instead", instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
 		end
 
 		return foundChild
@@ -59,8 +58,7 @@ function Utils.getValue(parent, instanceType, name, default)
 		if foundChild:IsA(instanceType) then
 			return foundChild.Value
 		else
-			warn(("[Utils.getValue] - Value of type %q of name %q is of type %q in %s instead")
-				:format(instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
+			warn(string.format("[Utils.getValue] - Value of type %q of name %q is of type %q in %s instead", instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
 			return nil
 		end
 	else
@@ -76,8 +74,7 @@ function Utils.setValue(parent, instanceType, name, value)
 	local foundChild = parent:FindFirstChild(name)
 	if foundChild then
 		if not foundChild:IsA(instanceType) then
-			warn(("[Utils.setValue] - Value of type %q of name %q is of type %q in %s instead")
-				:format(instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
+			warn(string.format("[Utils.setValue] - Value of type %q of name %q is of type %q in %s instead", instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
 		end
 
 		foundChild.Value = value

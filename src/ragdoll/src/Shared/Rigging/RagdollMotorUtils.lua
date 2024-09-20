@@ -139,7 +139,7 @@ function RagdollMotorUtils.getMotorData(rigType)
 	elseif rigType == Enum.HumanoidRigType.R6 then
 		return R6_MOTORS
 	else
-		error(("[RagdollMotorUtils] - Unknown rigType %q"):format(tostring(rigType)))
+		error(string.format("[RagdollMotorUtils] - Unknown rigType %q", tostring(rigType)))
 	end
 end
 

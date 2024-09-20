@@ -92,7 +92,7 @@ function RagdollCollisionUtils.getCollisionData(rigType)
 	elseif rigType == Enum.HumanoidRigType.R6 then
 		return R6_NO_COLLIDES
 	else
-		error(("[RagdollCollisionUtils] - Unknown rigType %q"):format(tostring(rigType)))
+		error(string.format("[RagdollCollisionUtils] - Unknown rigType %q", tostring(rigType)))
 	end
 end
 

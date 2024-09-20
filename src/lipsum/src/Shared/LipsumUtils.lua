@@ -49,7 +49,7 @@ function LipsumUtils.username(random)
 	if number <= 0.1 then
 		return "xXx" .. RandomUtils.choice(WORDS) .. "xXx"
 	elseif number <= 0.6 then
-		return ("%s%03d"):format(word, random:NextInteger(0, 999))
+		return string.format("%s%03d", word, random:NextInteger(0, 999))
 	else
 		return word
 	end

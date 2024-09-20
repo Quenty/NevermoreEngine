@@ -116,13 +116,13 @@ function CmdrService:RegisterCommand(commandData, execute)
 	assert(commandData.Name, "No commandData.Name")
 	assert(execute, "No execute")
 
-	local commandId = ("%s_%s"):format(commandData.Name, HttpService:GenerateGUID(false))
+	local commandId = string.format("%s_%s", commandData.Name, HttpService:GenerateGUID(false))
 
 	self._definitionData[commandId] = commandData
 	self._executeData[commandId] = execute
 
 	local commandServerScript = self._cmdrTemplateProviderServer:Clone("CmdrExecutionTemplate")
-	commandServerScript.Name = ("%sServer"):format(commandId)
+	commandServerScript.Name = string.format("%sServer", commandId)
 
 	local cmdrServiceTarget = Instance.new("ObjectValue")
 	cmdrServiceTarget.Name = "CmdrServiceTarget"
@@ -166,7 +166,7 @@ function CmdrService:__executeCommand(cmdrCommandId, ...)
 
 	local execute = self._executeData[cmdrCommandId]
 	if not execute then
-		error(("[CmdrService] - No command definition for cmdrCommandId %q"):format(tostring(cmdrCommandId)))
+		error(string.format("[CmdrService] - No command definition for cmdrCommandId %q", tostring(cmdrCommandId)))
 	end
 
 	return execute(...)

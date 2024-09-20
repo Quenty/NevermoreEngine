@@ -85,14 +85,14 @@ function MarkdownRender:Render(data)
 					height = height + self.SpaceAfterHeader
 				end
 			else
-				error(("Bad data type '%s'"):format(tostring(item.Type)))
+				error(string.format("Bad data type '%s'", tostring(item.Type)))
 			end
 		else
 			error("Bad data type")
 		end
 
 		if gui then
-			gui.Name = ("%d_%s"):format(index, gui.Name)
+			gui.Name = string.format("%d_%s", index, gui.Name)
 		end
 	end
 
@@ -178,7 +178,7 @@ function MarkdownRender:_renderList(listData)
 	assert(type(listData.Level) == "number" and listData.Level > 0, "Bad listData")
 
 	local frame = self:_getFrame()
-	frame.Name = ("List_%d"):format(listData.Level)
+	frame.Name = string.format("List_%d", listData.Level)
 	frame.Size = UDim2.new(1, -(listData.Level)*self.Indent, 0, 0)
 	frame.Position = UDim2.new(0, -frame.Size.X.Offset, 0, 0)
 	frame.Parent = self._gui
@@ -186,7 +186,7 @@ function MarkdownRender:_renderList(listData)
 	local height = 0
 	for index, text in ipairs(listData) do
 		local textLabel = self:_renderParagraph(text, { Parent = frame })
-		textLabel.Name = ("%d_%s"):format(index, textLabel.Name)
+		textLabel.Name = string.format("%d_%s", index, textLabel.Name)
 		textLabel.Position = UDim2.new(textLabel.Position.X, UDim.new(0, height))
 
 		local bullet = self:_getBullet(listData.Level)

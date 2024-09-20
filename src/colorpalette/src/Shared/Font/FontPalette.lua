@@ -165,7 +165,7 @@ function FontPalette:DefineFont(fontName, defaultFont)
 	assert(typeof(defaultFont) == "EnumItem" or typeof(defaultFont) == "Font", "Bad defaultFont")
 
 	if self._fonts[fontName] then
-		warn(("Already defined defaultFont of name %q"):format(fontName))
+		warn(string.format("Already defined defaultFont of name %q", fontName))
 		return
 	end
 

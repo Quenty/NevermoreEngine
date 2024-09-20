@@ -46,7 +46,7 @@ function ColorGradePalette:GetGrade(gradeName)
 
 	local observable = self._grades[gradeName]
 	if not observable then
-		error(("No grade for gradeName %q defined"):format(gradeName))
+		error(string.format("No grade for gradeName %q defined", gradeName))
 		return
 	end
 
@@ -57,7 +57,7 @@ function ColorGradePalette:GetGrade(gradeName)
 
 	local ok, grade = promise:Yield()
 	if not ok then
-		error(("Failed to retrieve grade %q due to %s"):format(gradeName, tostring(grade)))
+		error(string.format("Failed to retrieve grade %q due to %s", gradeName, tostring(grade)))
 	end
 
 	assert(type(grade) == "number", "Bad grade retrieved")
@@ -69,7 +69,7 @@ function ColorGradePalette:GetVividness(gradeName)
 
 	local observable = self._vividness[gradeName]
 	if not observable then
-		error(("No vividness for gradeName %q defined"):format(gradeName))
+		error(string.format("No vividness for gradeName %q defined", gradeName))
 		return
 	end
 
@@ -80,7 +80,7 @@ function ColorGradePalette:GetVividness(gradeName)
 
 	local ok, vividness = promise:Yield()
 	if not ok then
-		error(("Failed to retrieve vividness %q due to %s"):format(gradeName, tostring(vividness)))
+		error(string.format("Failed to retrieve vividness %q due to %s", gradeName, tostring(vividness)))
 	end
 
 	assert(type(vividness) == "number", "Bad vividness retrieved")
@@ -98,7 +98,7 @@ function ColorGradePalette:ObserveGrade(gradeName)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	if not self._grades[gradeName] then
-		error(("No grade for gradeName %q defined"):format(gradeName))
+		error(string.format("No grade for gradeName %q defined", gradeName))
 		return
 	end
 
@@ -196,7 +196,7 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 		})
 	end
 
-	error(("No grade for gradeName %q"):format(tostring(gradeName)))
+	error(string.format("No grade for gradeName %q", tostring(gradeName)))
 end
 
 function ColorGradePalette:ObserveDefaultSurfaceGrade()

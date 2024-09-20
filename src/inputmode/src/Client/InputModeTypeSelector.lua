@@ -147,7 +147,7 @@ function InputModeTypeSelector:__index(index)
 		if value then
 			return value
 		else
-			error(("[InputModeTypeSelector] - Bad index '%s'"):format(tostring(index)))
+			error(string.format("[InputModeTypeSelector] - Bad index '%s'", tostring(index)))
 		end
 	end
 end

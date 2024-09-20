@@ -229,7 +229,7 @@ Q.length=length
 Q.magnitude=length
 local function Qtostring(q,precision)
 	precision=precision or 3
-	return (", %."..precision.."f"):rep(4):sub(3):format(q.w,q.x,q.y,q.z)
+	return string.format(", %."..precision.."f"):rep(4):sub(3, q.w,q.x,q.y,q.z)
 end
 metatable.__tostring=Qtostring
 Q.tostring=Qtostring

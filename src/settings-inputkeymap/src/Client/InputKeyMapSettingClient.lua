@@ -49,10 +49,10 @@ function InputKeyMapSettingClient.new(serviceBag, inputKeyMapList)
 					if decoded then
 						inputKeyMap:SetInputTypesList(decoded)
 					else
-						warn(("[InputKeyMapSettingClient] - Failed to decode setting value from %q"):format(tostring(currentValue)))
+						warn(string.format("[InputKeyMapSettingClient] - Failed to decode setting value from %q", tostring(currentValue)))
 					end
 				else
-					warn(("[InputKeyMapSettingClient] - Failed to decode setting value from %q"):format(tostring(currentValue)))
+					warn(string.format("[InputKeyMapSettingClient] - Failed to decode setting value from %q", tostring(currentValue)))
 				end
 			end))
 

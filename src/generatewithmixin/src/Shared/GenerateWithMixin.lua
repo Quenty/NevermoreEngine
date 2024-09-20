@@ -38,13 +38,13 @@ function GenerateWithMixin._generateWith(class, resources)
 	for _, resourceName in ipairs(resources) do
 		local storeName = String.toPrivateCase(resourceName)
 
-		class[("With%s"):format(resourceName)] = function(self, resource)
-			self[storeName] = resource or error(("Failed to set '%s', %s"):format(resourceName, tostring(resource)))
+		class[string.format("With%s", resourceName)] = function(self, resource)
+			self[storeName] = resource or error(string.format("Failed to set '%s', %s", resourceName, tostring(resource)))
 			self[resourceName] = resource -- inject publically too, for now
 			return self
 		end
 
-		class[("Get%s"):format(resourceName)] = function(self)
+		class[string.format("Get%s", resourceName)] = function(self)
 			return self[storeName]
 		end
 	end

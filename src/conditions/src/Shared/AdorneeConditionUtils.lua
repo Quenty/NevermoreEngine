@@ -213,7 +213,7 @@ function AdorneeConditionUtils.createOrConditionGroup(): BindableFunction
 			})
 	end)
 
-	container.Name = ("OrConditionGroup%s"):format(AdorneeConditionUtils.getConditionNamePostfix())
+	container.Name = string.format("OrConditionGroup%s", AdorneeConditionUtils.getConditionNamePostfix())
 	AdorneeConditionUtils.setValueWhenEmpty(container, true)
 
 	return container
@@ -235,7 +235,7 @@ function AdorneeConditionUtils.createAndConditionGroup(): BindableFunction
 			})
 	end)
 
-	container.Name = ("AndConditionGroup%s"):format(AdorneeConditionUtils.getConditionNamePostfix())
+	container.Name = string.format("AndConditionGroup%s", AdorneeConditionUtils.getConditionNamePostfix())
 	AdorneeConditionUtils.setValueWhenEmpty(container, true)
 
 	return container
@@ -486,15 +486,13 @@ function AdorneeConditionUtils._getObservableFromConditionObj(conditionObj: Inst
 
 	-- TODO: Allow yielding here
 	if coroutine.status(current) ~= "dead" then
-		warn(("[AdorneeConditionUtils.observeAllowed] - Getting condition yielded from %q")
-			:format(conditionObj:GetFullName()))
+		warn(string.format("[AdorneeConditionUtils.observeAllowed] - Getting condition yielded from %q", conditionObj:GetFullName()))
 		return Rx.EMPTY
 	end
 
 	-- TODO: Allow non-observables.
 	if not (observable and Observable.isObservable(observable)) then
-		warn(("[AdorneeConditionUtils.observeAllowed] - Failed to get observable from %q. Got %q")
-			:format(conditionObj:GetFullName(), tostring(observable)))
+		warn(string.format("[AdorneeConditionUtils.observeAllowed] - Failed to get observable from %q. Got %q", conditionObj:GetFullName(), tostring(observable)))
 		return Rx.EMPTY
 	end
 

@@ -133,7 +133,7 @@ function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, metho
 		end
 
 		if called[class] then
-			warn(("[BoundLinkUtils.callMethodOnLinkedClasses] - Double-linked class %q for method %q"):format(tag, methodName))
+			warn(string.format("[BoundLinkUtils.callMethodOnLinkedClasses] - Double-linked class %q for method %q", tag, methodName))
 			return
 		end
 
