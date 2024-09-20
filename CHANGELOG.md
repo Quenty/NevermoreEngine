@@ -1,3 +1,16 @@
+# (Fri Sep 20 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/transitionmodel@7.6.0`
+  - feat: TimedTransitionModel - Allow transition time to be set at creation [#495](https://github.com/Quenty/NevermoreEngine/pull/495) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # (Thu Sep 12 2024)
 
 #### 🚀 Enhancement
