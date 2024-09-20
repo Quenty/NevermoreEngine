@@ -1,3 +1,15 @@
+# v1.4.1 (Fri Sep 20 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Spring object initializes properly [#496](https://github.com/Quenty/NevermoreEngine/pull/496) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

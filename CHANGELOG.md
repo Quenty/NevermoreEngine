@@ -1,5 +1,18 @@
 # (Fri Sep 20 2024)
 
+#### 🐛 Bug Fix
+
+- `@quenty/blend@12.5.1`, `@quenty/servicebag@11.5.1`, `@quenty/uiobjectutils@6.4.1`, `@quenty/nevermore-cli@4.4.1`
+  - fix: Spring object initializes properly [#496](https://github.com/Quenty/NevermoreEngine/pull/496) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Sep 20 2024)
+
 #### 🚀 Enhancement
 
 - `@quenty/transitionmodel@7.6.0`
