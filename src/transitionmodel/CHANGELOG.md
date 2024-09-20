@@ -1,19 +1,15 @@
-# v7.6.0 (Fri Sep 20 2024)
-
-#### 🚀 Enhancement
-
-- feat: TimedTransitionModel - Allow transition time to be set at creation [#495](https://github.com/Quenty/NevermoreEngine/pull/495) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.5.0...@quenty/transitionmodel@7.6.0) (2024-09-20)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
 
 # [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.4.0...@quenty/transitionmodel@7.5.0) (2024-09-12)
 
