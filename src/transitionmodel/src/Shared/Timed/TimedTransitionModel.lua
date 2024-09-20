@@ -18,18 +18,16 @@ TimedTransitionModel.__index = TimedTransitionModel
 	A transition model that has a spring underlying it. Very useful
 	for animations on tracks that need to be on a spring.
 
+	@param transitionTime number? -- Optional
 	@return TimedTransitionModel<T>
 ]=]
-function TimedTransitionModel.new()
+function TimedTransitionModel.new(transitionTime)
 	local self = setmetatable(BasicPane.new(), TimedTransitionModel)
 
-	self._transitionModel = TransitionModel.new()
+	self._transitionModel = self._maid:Add(TransitionModel.new())
 	self._transitionModel:BindToPaneVisbility(self)
-	self._maid:GiveTask(self._transitionModel)
 
-
-	self._timedTween = TimedTween.new(0.15)
-	self._maid:GiveTask(self._timedTween)
+	self._timedTween = self._maid:Add(TimedTween.new(transitionTime))
 
 	-- State
 	self._transitionModel:SetPromiseShow(function(maid, doNotAnimate)
