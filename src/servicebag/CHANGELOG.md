@@ -1,20 +1,18 @@
-# v11.5.1 (Fri Sep 20 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Spring object initializes properly [#496](https://github.com/Quenty/NevermoreEngine/pull/496) ([@Quenty](https://github.com/Quenty))
-- fix: Better error for serviceType ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.5.0...@quenty/servicebag@11.5.1) (2024-09-20)
+
+
+### Bug Fixes
+
+* Better error for serviceType ([e9a34f9](https://github.com/Quenty/NevermoreEngine/commit/e9a34f9e6f17bb6abd080fe23f88c2ab7b7bbe16))
+
+
+
+
 
 # [11.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.4.0...@quenty/servicebag@11.5.0) (2024-09-12)
 

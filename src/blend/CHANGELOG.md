@@ -1,20 +1,18 @@
-# v12.5.1 (Fri Sep 20 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Spring object initializes properly [#496](https://github.com/Quenty/NevermoreEngine/pull/496) ([@Quenty](https://github.com/Quenty))
-- fix: SpringObject initializes properly in Blend ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.5.0...@quenty/blend@12.5.1) (2024-09-20)
+
+
+### Bug Fixes
+
+* SpringObject initializes properly in Blend ([8729989](https://github.com/Quenty/NevermoreEngine/commit/8729989788b482b3a4f0da223e2f2d49c12ff707))
+
+
+
+
 
 # [12.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.4.0...@quenty/blend@12.5.0) (2024-09-12)
 
