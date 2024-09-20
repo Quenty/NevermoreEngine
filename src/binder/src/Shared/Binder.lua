@@ -450,8 +450,7 @@ end
 ]=]
 function Binder:Bind(inst)
 	if RunService:IsClient() then
-		warn(("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s")
-			:format(self._tagName, debug.traceback()))
+		warn(string.format("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s", self._tagName, debug.traceback()))
 	end
 
 	CollectionService:AddTag(inst, self._tagName)
@@ -605,8 +604,7 @@ function Binder:_add(inst)
 	if self._pendingInstSet[inst] ~= true then
 		-- Got GCed in the process of loading?!
 		-- Constructor probably yields. Yikes.
-		warn(("[Binder._add] - Failed to load instance %q of %q, removed while loading!")
-			:format(
+		warn(string.format("[Binder._add] - Failed to load instance %q of %q, removed while loading!",
 				inst:GetFullName(),
 				tostring(type(self._constructor) == "table" and self._constructor.ClassName or self._constructor)))
 		return

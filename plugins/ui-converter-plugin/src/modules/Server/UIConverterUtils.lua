@@ -111,8 +111,7 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 			local roundX, roundY, roundZ = roundToPi(x), roundToPi(y), roundToPi(z)
 
 			if roundX and roundY and roundZ then
-				return ("CFrame.new(%s, %s, %s) * CFrame.Angles(%s, %s, %s)")
-					:format(
+				return string.format("CFrame.new(%s, %s, %s) * CFrame.Angles(%s, %s, %s)",
 						roundNumber(value.x),
 						roundNumber(value.y),
 						roundNumber(value.z),
@@ -120,12 +119,11 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 						roundY,
 						roundZ)
 			else
-				return ("CFrame.new(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"):format(
-					applyToTuple(roundNumber, value:components()))
+				return string.format("CFrame.new(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", applyToTuple(roundNumber, value:components()))
 			end
 		end
 	elseif valueType == "Rect" then
-		return ("Rect.new(%s, %s)"):format(
+		return string.format("Rect.new(%s, %s)",
 			UIConverterUtils.toLuaPropertyString(value.Min, debugHint),
 			UIConverterUtils.toLuaPropertyString(value.Max, debugHint))
 	elseif valueType == "ColorSequence" then
@@ -133,7 +131,7 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 		if #keypoints == 1 then
 			return string.format("ColorSequence.new(%s)", UIConverterUtils.toLuaPropertyString(keypoints[1].Value, debugHint))
 		elseif #keypoints == 2 and keypoints[1].Time == 0 and keypoints[2].Time == 1 then
-			return ("ColorSequence.new(%s, %s)"):format(
+			return string.format("ColorSequence.new(%s, %s)",
 				UIConverterUtils.toLuaPropertyString(value.Keypoints[1].Value, debugHint),
 				UIConverterUtils.toLuaPropertyString(value.Keypoints[2].Value, debugHint))
 		else
@@ -148,7 +146,7 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 		if #keypoints == 1 then
 			return string.format("NumberSequence.new(%s)", roundNumber(keypoints[1].Value))
 		elseif #keypoints == 2 and keypoints[1].Time == 0 and keypoints[2].Time == 1 then
-			return ("NumberSequence.new(%s, %s)"):format(
+			return string.format("NumberSequence.new(%s, %s)",
 				roundNumber(keypoints[1].Value),
 				roundNumber(keypoints[2].Value))
 		else
@@ -159,11 +157,11 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 			return string.format("NumberSequence.new({%s\n})", table.concat(strings, ","))
 		end
 	elseif valueType == "ColorSequenceKeypoint" then
-		return ("ColorSequenceKeypoint.new(%s, %s)"):format(
+		return string.format("ColorSequenceKeypoint.new(%s, %s)",
 			roundNumber(value.Time),
 			UIConverterUtils.toLuaPropertyString(value.Value, debugHint))
 	elseif valueType == "NumberSequenceKeypoint" then
-		return ("NumberSequenceKeypoint.new(%s, %s)"):format(
+		return string.format("NumberSequenceKeypoint.new(%s, %s)",
 			roundNumber(value.Time),
 			UIConverterUtils.toLuaPropertyString(value.Value, debugHint))
 	elseif valueType == "BrickColor" then
@@ -190,10 +188,10 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 		return string.format("Enum.%s.%s", tostring(value.EnumType), value.Name)
 	elseif valueType == "PhysicalProperties" then
 		if value.FrictionWeight == 1 and value.ElasticityWeight == 1 then
-			return ("PhysicalProperties.new(%s, %s, %s)"):format(
+			return string.format("PhysicalProperties.new(%s, %s, %s)",
 				applyToTuple(roundNumber, value.Density, value.Friction, value.Elasticity))
 		else
-			return ("PhysicalProperties.new(%s, %s, %s, %s, %s)"):format(
+			return string.format("PhysicalProperties.new(%s, %s, %s, %s, %s)",
 				applyToTuple(roundNumber, value.Density, value.Friction, value.Elasticity, value.FrictionWeight, value.ElasticityWeight))
 		end
 	elseif valueType == "Font" then

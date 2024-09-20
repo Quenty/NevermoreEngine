@@ -146,7 +146,7 @@ function AdorneeConditionUtils.createRequiredProperty(propertyName: string, requ
 			end);
 		})
 	end)
-	condition.Name = ("RequiredProperty%s_%s_%s"):format(
+	condition.Name = string.format("RequiredProperty%s_%s_%s",
 		AdorneeConditionUtils.getConditionNamePostfix(),
 		tostring(propertyName),
 		tostring(requiredValue))
@@ -171,7 +171,7 @@ function AdorneeConditionUtils.createRequiredAttribute(attributeName: string, at
 		})
 	end)
 
-	condition.Name = ("RequiredAttribute%s_%s_%s"):format(
+	condition.Name = string.format("RequiredAttribute%s_%s_%s",
 		AdorneeConditionUtils.getConditionNamePostfix(),
 		tostring(attributeName),
 		tostring(attributeValue))
@@ -190,7 +190,7 @@ function AdorneeConditionUtils.createRequiredTieInterface(tieInterfaceDefinition
 		return tieInterfaceDefinition:ObserveIsImplemented(adornee)
 	end)
 
-	condition.Name = ("RequiredInterface%s_%s"):format(
+	condition.Name = string.format("RequiredInterface%s_%s",
 		AdorneeConditionUtils.getConditionNamePostfix(),
 		tieInterfaceDefinition:GetName())
 

@@ -30,8 +30,7 @@ function TemplateContainerUtils.reparentFromWorkspaceIfNeeded(parent, name)
 	end
 
 	if not parentedContainer then
-		error(("No template container with name %q in %q")
-			:format(parent:GetFullName(), name))
+		error(string.format("No template container with name %q in %q", parent:GetFullName(), name))
 	end
 
 	return parentedContainer

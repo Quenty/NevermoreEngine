@@ -141,8 +141,7 @@ function TemplateProvider:PromiseClone(templateName)
 
 		task.delay(5, function()
 			if promise:IsPending() then
-				warn(("[TemplateProvider.PromiseClone] - May fail to replicate template %q from cloud. %s")
-					:format(templateName, self:_getReplicationHint()))
+				warn(string.format("[TemplateProvider.PromiseClone] - May fail to replicate template %q from cloud. %s", templateName, self:_getReplicationHint()))
 			end
 		end)
 	end
