@@ -134,7 +134,7 @@ end
 function MarkdownRender:_renderParagraphLabel(label, text)
 	local labelWidth = label.Size.X.Scale*self._width + label.Size.X.Offset
 
-	local strippedText = text:gsub("(%p+)$", "")
+	local strippedText = string.gsub(text, "(%p+)$", "")
 	local textSize = TextService:GetTextSize(strippedText, label.TextSize, label.Font,
 		Vector2.new(labelWidth, label.TextSize*20))
 

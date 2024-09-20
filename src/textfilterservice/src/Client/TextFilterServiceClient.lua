@@ -119,8 +119,8 @@ end
 
 function TextFilterServiceClient:_fakeTestFilter(text)
 	local filteredText = text
-	filteredText = filteredText:gsub("[fF][uU][cC][kK]", "####")
-	filteredText = filteredText:gsub("\n", "")
+	filteredText = string.gsub(filteredText, "[fF][uU][cC][kK]", "####")
+	filteredText = string.gsub(filteredText, "\n", "")
 
 	return Promise.spawn(function(resolve, _)
 		-- Simulate testing

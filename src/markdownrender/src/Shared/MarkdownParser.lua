@@ -36,9 +36,9 @@ function MarkdownParser:ParseList(oldLines)
 		end
 
 		if space and bullet and text then
-			space = space:gsub("    ", "X")
-			space = space:gsub(" ", "")
-			space = space:gsub("\t", "X")
+			space = string.gsub(space, "    ", "X")
+			space = string.gsub(space, " ", "")
+			space = string.gsub(space, "\t", "X")
 			local Level = #space + 1
 
 			if currentList and currentList.Level ~= Level then

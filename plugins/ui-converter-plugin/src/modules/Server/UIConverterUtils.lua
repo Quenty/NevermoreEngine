@@ -25,7 +25,7 @@ local function roundNumber(value)
 		return "-math.huge"
 	else
 		local formatted = string.format("%0.6f", value)
-		local stripped = formatted:gsub("%.?0+$", "")
+		local stripped = string.gsub(formatted, "%.?0+$", "")
 
 		return stripped
 	end

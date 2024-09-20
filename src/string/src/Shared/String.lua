@@ -30,9 +30,9 @@ end
 ]=]
 function String.toCamelCase(str: string): string
 	str = str:lower()
-	str = str:gsub("[ _](%a)", string.upper)
-	str = str:gsub("^%a", string.upper)
-	str = str:gsub("%p", "")
+	str = string.gsub(str, "[ _](%a)", string.upper)
+	str = string.gsub(str, "^%a", string.upper)
+	str = string.gsub(str, "%p", "")
 
 	return str
 end
@@ -43,7 +43,7 @@ end
 	@return string
 ]=]
 function String.uppercaseFirstLetter(str: string): string
-	return str:gsub("^%a", string.upper)
+	return string.gsub(str, "^%a", string.upper)
 end
 
 --[=[
@@ -53,9 +53,9 @@ end
 ]=]
 function String.toLowerCamelCase(str: string): string
 	str = str:lower()
-	str = str:gsub("[ _](%a)", string.upper)
-	str = str:gsub("^%a", string.lower)
-	str = str:gsub("%p", "")
+	str = string.gsub(str, "[ _](%a)", string.upper)
+	str = string.gsub(str, "^%a", string.lower)
+	str = string.gsub(str, "%p", "")
 
 	return str
 end
@@ -77,7 +77,7 @@ end
 ]=]
 function String.trimFront(str: string, pattern: string?): string
 	pattern = pattern or "%s";
-	return (str:gsub("^"..pattern.."*(.-)"..pattern.."*", "%1"))
+	return (string.gsub(str, "^"..pattern.."*(.-)"..pattern.."*", "%1"))
 end
 
 --[=[
