@@ -100,7 +100,9 @@ function ServiceBag:GetService(serviceType)
 		serviceType = require(serviceType)
 	end
 
-	assert(type(serviceType) == "table", "Bad serviceType definition")
+	if type(serviceType) ~= "table" then
+		error(string.format("Bad serviceType definition of type %s of type %s", tostring(serviceType), typeof(serviceType)))
+	end
 
 	local service = self._services[serviceType]
 	if service then
