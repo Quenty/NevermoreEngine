@@ -19,10 +19,16 @@ local GuiInteractionUtils = {}
 function GuiInteractionUtils.observeInteractionEnabled(gui)
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad gui")
 
-	return RxInstanceUtils.observeProperty(gui, "GuiState"):Pipe({
+	return Rx.combineLatest({
+		visible = RxInstanceUtils.observeProperty(gui, "Visible");
+		guiState = RxInstanceUtils.observeProperty(gui, "GuiState");
+		dataModel = RxInstanceUtils.observeFirstAncestorBrio(gui, "DataModel");
+	}):Pipe({
 		Rx.map(function(state)
-			-- Ensure we have interaction enabled (visible, et cetera)
-			return state ~= Enum.GuiState.NonInteractable
+			return state.visible
+				and state.guiState ~= Enum.GuiState.NonInteractable
+				and state.dataModel
+				and true or false
 		end);
 		Rx.distinct();
 	})
