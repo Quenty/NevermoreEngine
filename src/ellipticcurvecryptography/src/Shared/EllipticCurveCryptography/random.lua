@@ -43,7 +43,7 @@ local function ensureEntropyInit()
 	feed(DateTime.now().UnixTimestampMillis)
 	feed("|")
 	for _ = 1, 10000 do
-		feed(tostring({}):sub(-8))
+		feed(string.sub(tostring({}), -8))
 	end
 	digest()
 	feed(DateTime.now().UnixTimestampMillis)

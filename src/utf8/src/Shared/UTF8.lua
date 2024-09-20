@@ -15,7 +15,7 @@ function UTF8.upper(str: string): string
 	str = str:upper()
 	local newStr = ""
 	for start, stop in utf8.graphemes(str) do
-		local chr = str:sub(start, stop)
+		local chr = string.sub(str, start, stop)
 		if UPPER_MAP[chr] then
 			chr = UPPER_MAP[chr]
 		end
@@ -34,7 +34,7 @@ function UTF8.lower(str: string): string
 	str = str:lower()
 	local newStr = ""
 	for start, stop in utf8.graphemes(str) do
-		local chr = str:sub(start, stop)
+		local chr = string.sub(str, start, stop)
 		if LOWER_MAP[chr] then
 			chr = LOWER_MAP[chr]
 		end

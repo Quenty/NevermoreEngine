@@ -60,8 +60,8 @@ function LocalizationEntryParserUtils.decodeFromTable(tableName, localeId, dataT
 end
 
 function LocalizationEntryParserUtils._parseLocaleFromName(name)
-	if name:sub(-5) == ".json" then
-		return name:sub(1, #name-5)
+	if string.sub(name, -5) == ".json" then
+		return string.sub(name, 1, #name-5)
 	else
 		return name
 	end

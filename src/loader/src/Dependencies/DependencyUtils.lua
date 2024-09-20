@@ -141,7 +141,7 @@ function DependencyUtils.iterPackagesInModuleModules(nodeModules)
 end
 
 function DependencyUtils.isPackageGroup(itemName)
-	return itemName:sub(1, 1) == "@"
+	return string.sub(itemName, 1, 1) == "@"
 end
 
 return DependencyUtils

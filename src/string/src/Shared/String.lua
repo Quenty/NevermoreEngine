@@ -66,7 +66,7 @@ end
 	@return string
 ]=]
 function String.toPrivateCase(str: string): string
-	return "_" .. str:sub(1, 1):lower() .. str:sub(2, #str)
+	return "_" .. string.sub(str, 1, 1):lower() .. str:sub(2, #str)
 end
 
 --[=[
@@ -125,7 +125,7 @@ end
 ]=]
 function String.elipseLimit(str: string, characterLimit: number): string
 	if #str > characterLimit then
-		str = str:sub(1, characterLimit-3).."..."
+		str = string.sub(str, 1, characterLimit-3).."..."
 	end
 	return str
 end
@@ -137,8 +137,8 @@ end
 	@return string
 ]=]
 function String.removePrefix(str: string, prefix: string): string
-	if str:sub(1, #prefix) == prefix then
-		return str:sub(#prefix + 1)
+	if string.sub(str, 1, #prefix) == prefix then
+		return string.sub(str, #prefix + 1)
 	else
 		return str
 	end
@@ -151,8 +151,8 @@ end
 	@return string
 ]=]
 function String.removePostfix(str: string, postfix: string): string
-	if str:sub(-#postfix) == postfix then
-		return str:sub(1, -#(postfix) - 1)
+	if string.sub(str, -#postfix) == postfix then
+		return string.sub(str, 1, -#(postfix) - 1)
 	else
 		return str
 	end
@@ -165,7 +165,7 @@ end
 	@return boolean
 ]=]
 function String.endsWith(str: string, postfix: string): boolean
-	return str:sub(-#postfix) == postfix
+	return string.sub(str, -#postfix) == postfix
 end
 
 --[=[
@@ -175,7 +175,7 @@ end
 	@return boolean
 ]=]
 function String.startsWith(str: string, prefix: string): boolean
-	return str:sub(1, #prefix) == prefix
+	return string.sub(str, 1, #prefix) == prefix
 end
 
 --[=[

@@ -20,7 +20,7 @@ function PseudoLocalize.pseudoLocalize(line)
 	local isParam = false
 
 	for start, stop in utf8.graphemes(line) do
-		local char = line:sub(start, stop)
+		local char = string.sub(line, start, stop)
 		if char == "{" or char == "[" or char == "<" then
 			isParam = true
 			out = out .. char

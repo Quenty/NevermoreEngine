@@ -566,7 +566,7 @@ function ConverterPane:_previewCode(codeValue)
 				Text = Blend.Computed(codeValue, function(value)
 					if type(value) == "string" then
 						-- Apparently the max value... :/
-						return value:sub(1, 16384)
+						return string.sub(value, 1, 16384)
 					else
 						return value
 					end

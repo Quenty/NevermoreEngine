@@ -181,7 +181,7 @@ function RotatingLabel:__newindex(topindex, value)
 		self._text = value
 
 		for index = 1, #self.Text do
-			self._labels:Get(index).TargetCharacter = self.Text:sub(index, index)
+			self._labels:Get(index).TargetCharacter = string.sub(self.Text, index, index)
 		end
 
 		for index, label in pairs(self._labels) do
