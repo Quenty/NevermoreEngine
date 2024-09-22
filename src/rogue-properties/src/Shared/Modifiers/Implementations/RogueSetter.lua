@@ -21,7 +21,7 @@ function RogueSetter.new(valueObject, serviceBag)
 	return self
 end
 
-function RogueSetter:GetModifiedValue()
+function RogueSetter:GetModifiedVersion()
 	return self._obj.Value
 end
 
