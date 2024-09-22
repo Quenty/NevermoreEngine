@@ -7,12 +7,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
 local AnimationUtils = require("AnimationUtils")
-local ValueObject = require("ValueObject")
-local Maid = require("Maid")
+local BaseObject = require("BaseObject")
 local EnumUtils = require("EnumUtils")
+local Maid = require("Maid")
 local RbxAssetUtils = require("RbxAssetUtils")
+local ValueObject = require("ValueObject")
 
 local AnimationSlotPlayer = setmetatable({}, BaseObject)
 AnimationSlotPlayer.ClassName = "AnimationSlotPlayer"
