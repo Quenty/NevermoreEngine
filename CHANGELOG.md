@@ -1,3 +1,16 @@
+# (Sun Sep 22 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.5.1`, `@quenty/blend@12.5.2`, `@quenty/radial-image@9.5.2`, `@quenty/rogue-properties@11.7.2`, `@quenty/spring@10.4.1`
+  - fix: Fix SpringObject and a few other bugs in the system [#498](https://github.com/Quenty/NevermoreEngine/pull/498) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Sep 20 2024)
 
 #### 🐛 Bug Fix

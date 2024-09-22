@@ -1,3 +1,16 @@
+# v8.5.1 (Sun Sep 22 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Fix SpringObject and a few other bugs in the system [#498](https://github.com/Quenty/NevermoreEngine/pull/498) ([@Quenty](https://github.com/Quenty))
+- refactor: Sort imports ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
