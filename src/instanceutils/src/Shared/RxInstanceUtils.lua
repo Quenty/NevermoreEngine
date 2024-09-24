@@ -34,14 +34,12 @@ function RxInstanceUtils.observeProperty(instance, propertyName)
 	assert(type(propertyName) == "string", "'propertyName' should be of type string")
 
 	return Observable.new(function(sub)
-		local maid = Maid.new()
-
-		maid:GiveTask(instance:GetPropertyChangedSignal(propertyName):Connect(function()
+		local connection = instance:GetPropertyChangedSignal(propertyName):Connect(function()
 			sub:Fire(instance[propertyName], instance)
-		end))
+		end)
 		sub:Fire(instance[propertyName], instance)
 
-		return maid
+		return connection
 	end)
 end
 
@@ -122,8 +120,6 @@ function RxInstanceUtils.observeFirstAncestor(instance, className)
 	assert(type(className) == "string", "Bad className")
 
 	return Observable.new(function(sub)
-		local maid = Maid.new()
-
 		local lastFound = UNSET_VALUE
 		local function handleAncestryChanged()
 			local found = instance:FindFirstAncestorWhichIsA(className)
@@ -133,10 +129,10 @@ function RxInstanceUtils.observeFirstAncestor(instance, className)
 			end
 		end
 
-		maid:GiveTask(instance.AncestryChanged:Connect(handleAncestryChanged))
+		local connection = instance.AncestryChanged:Connect(handleAncestryChanged)
 		handleAncestryChanged()
 
-		return maid
+		return connection
 	end)
 end
 

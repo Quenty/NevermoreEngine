@@ -37,24 +37,7 @@ end
 function ValueObjectUtils.observeValue(valueObject)
 	assert(ValueObject.isValueObject(valueObject), "Bad valueObject")
 
-	return Observable.new(function(sub)
-		if not valueObject.Destroy then
-			warn("[ValueObjectUtils.observeValue] - Connecting to dead ValueObject")
-			-- No firing, we're dead
-			sub:Complete()
-			return
-		end
-
-		local maid = Maid.new()
-
-		maid:GiveTask(valueObject.Changed:Connect(function()
-			sub:Fire(valueObject.Value)
-		end))
-
-		sub:Fire(valueObject.Value)
-
-		return maid
-	end)
+	return valueObject:Observe()
 end
 
 --[=[

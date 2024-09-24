@@ -148,11 +148,11 @@ function ValueObject:Observe()
 			return
 		end
 
-		local maid = Maid.new()
+		local connection
 
-		maid:GiveTask(self.Changed:Connect(function(newValue, _, ...)
+		connection = self.Changed:Connect(function(newValue, _, ...)
 			sub:Fire(newValue, ...)
-		end))
+		end)
 
 		local args = rawget(self, "_lastEventContext")
 		if args then
@@ -161,7 +161,7 @@ function ValueObject:Observe()
 			sub:Fire(self.Value)
 		end
 
-		return maid
+		return connection
 	end)
 end
 
