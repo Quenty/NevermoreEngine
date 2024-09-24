@@ -51,7 +51,7 @@ function Raycaster:Ignore(tableOrInstance)
 			table.insert(ignoreList, item)
 		end
 	else
-		error(("[Raycaster.Ignore] - Bad arg type %q"):format(type(tableOrInstance)))
+		error(string.format("[Raycaster.Ignore] - Bad arg type %q", type(tableOrInstance)))
 	end
 end
 
@@ -74,7 +74,7 @@ function Raycaster:FindPartOnRay(ray)
 		casts = casts - 1
 	end
 
-	warn(("[Raycaster.FindPartOnRay] - Cast %d times, ran out of casts\n%s"):format(self.MaxCasts, debug.traceback()))
+	warn(string.format("[Raycaster.FindPartOnRay] - Cast %d times, ran out of casts\n%s", self.MaxCasts, debug.traceback()))
 	return nil
 end
 
@@ -111,7 +111,7 @@ function Raycaster:__index(index)
 	elseif Raycaster[index] then
 		return Raycaster[index]
 	else
-		error(("Unknown index %q"):format(tostring(index)))
+		error(string.format("Unknown index %q", tostring(index)))
 	end
 end
 
@@ -126,7 +126,7 @@ function Raycaster:__newindex(index, value)
 		assert(type(value) == "function", "Bad value")
 		rawset(self, "_filter", value)
 	else
-		error(("Unknown index %q"):format(tostring(index)))
+		error(string.format("Unknown index %q", tostring(index)))
 	end
 end
 

@@ -101,7 +101,7 @@ function RotatingLabel:__index(index)
 	elseif index == "Width" then
 		return self._width
 	elseif index == "Transparency" or index == "Damper" or index == "Speed" then
-		return self["_" .. index:lower()]
+		return self["_" .. string.lower(index)]
 	elseif index == "TextXAlignment" then
 		return self._textXAlignment
 	else
@@ -181,7 +181,7 @@ function RotatingLabel:__newindex(topindex, value)
 		self._text = value
 
 		for index = 1, #self.Text do
-			self._labels:Get(index).TargetCharacter = self.Text:sub(index, index)
+			self._labels:Get(index).TargetCharacter = string.sub(self.Text, index, index)
 		end
 
 		for index, label in pairs(self._labels) do
@@ -196,7 +196,7 @@ function RotatingLabel:__newindex(topindex, value)
 			label.Gui.Position = self:_getLabelPosition(index)
 		end
 	elseif topindex == "Transparency" or topindex == "Damper" or topindex == "Speed" then
-		self["_" .. topindex:lower()] = value
+		self["_" .. string.lower(topindex)] = value
 		for _, label in pairs(self._labels) do
 			label[topindex] = value
 		end

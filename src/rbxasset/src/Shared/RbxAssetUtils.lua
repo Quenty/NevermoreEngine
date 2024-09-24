@@ -13,7 +13,7 @@ local RbxAssetUtils = {}
 ]=]
 function RbxAssetUtils.toRbxAssetId(id: string? | number): string
 	if type(id) == "number" then
-		return ("rbxassetid://%d"):format(id)
+		return string.format("rbxassetid://%d", id)
 	else
 		return id
 	end

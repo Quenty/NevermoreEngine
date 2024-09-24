@@ -29,10 +29,10 @@ end
 	@return string
 ]=]
 function String.toCamelCase(str: string): string
-	str = str:lower()
-	str = str:gsub("[ _](%a)", string.upper)
-	str = str:gsub("^%a", string.upper)
-	str = str:gsub("%p", "")
+	str = string.lower(str)
+	str = string.gsub(str, "[ _](%a)", string.upper)
+	str = string.gsub(str, "^%a", string.upper)
+	str = string.gsub(str, "%p", "")
 
 	return str
 end
@@ -43,7 +43,7 @@ end
 	@return string
 ]=]
 function String.uppercaseFirstLetter(str: string): string
-	return str:gsub("^%a", string.upper)
+	return string.gsub(str, "^%a", string.upper)
 end
 
 --[=[
@@ -52,10 +52,10 @@ end
 	@return string
 ]=]
 function String.toLowerCamelCase(str: string): string
-	str = str:lower()
-	str = str:gsub("[ _](%a)", string.upper)
-	str = str:gsub("^%a", string.lower)
-	str = str:gsub("%p", "")
+	str = string.lower(str)
+	str = string.gsub(str, "[ _](%a)", string.upper)
+	str = string.gsub(str, "^%a", string.lower)
+	str = string.gsub(str, "%p", "")
 
 	return str
 end
@@ -66,7 +66,7 @@ end
 	@return string
 ]=]
 function String.toPrivateCase(str: string): string
-	return "_" .. str:sub(1, 1):lower() .. str:sub(2, #str)
+	return "_" .. string.lower(string.sub(str, 1, 1)) .. str:sub(2, #str)
 end
 
 --[=[
@@ -77,7 +77,7 @@ end
 ]=]
 function String.trimFront(str: string, pattern: string?): string
 	pattern = pattern or "%s";
-	return (str:gsub("^"..pattern.."*(.-)"..pattern.."*", "%1"))
+	return (string.gsub(str, "^"..pattern.."*(.-)"..pattern.."*", "%1"))
 end
 
 --[=[
@@ -125,7 +125,7 @@ end
 ]=]
 function String.elipseLimit(str: string, characterLimit: number): string
 	if #str > characterLimit then
-		str = str:sub(1, characterLimit-3).."..."
+		str = string.sub(str, 1, characterLimit-3).."..."
 	end
 	return str
 end
@@ -137,8 +137,8 @@ end
 	@return string
 ]=]
 function String.removePrefix(str: string, prefix: string): string
-	if str:sub(1, #prefix) == prefix then
-		return str:sub(#prefix + 1)
+	if string.sub(str, 1, #prefix) == prefix then
+		return string.sub(str, #prefix + 1)
 	else
 		return str
 	end
@@ -151,8 +151,8 @@ end
 	@return string
 ]=]
 function String.removePostfix(str: string, postfix: string): string
-	if str:sub(-#postfix) == postfix then
-		return str:sub(1, -#(postfix) - 1)
+	if string.sub(str, -#postfix) == postfix then
+		return string.sub(str, 1, -#(postfix) - 1)
 	else
 		return str
 	end
@@ -165,7 +165,7 @@ end
 	@return boolean
 ]=]
 function String.endsWith(str: string, postfix: string): boolean
-	return str:sub(-#postfix) == postfix
+	return string.sub(str, -#postfix) == postfix
 end
 
 --[=[
@@ -175,7 +175,7 @@ end
 	@return boolean
 ]=]
 function String.startsWith(str: string, prefix: string): boolean
-	return str:sub(1, #prefix) == prefix
+	return string.sub(str, 1, #prefix) == prefix
 end
 
 --[=[

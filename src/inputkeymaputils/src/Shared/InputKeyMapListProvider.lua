@@ -106,7 +106,7 @@ end
 function InputKeyMapListProvider:GetInputKeyMapList(keyMapListName)
 	local keyMapList = self:FindInputKeyMapList(keyMapListName)
 	if not keyMapList then
-		error(("Bad keyMapListName %q"):format(tostring(keyMapListName)))
+		error(string.format("Bad keyMapListName %q", tostring(keyMapListName)))
 	end
 
 	return keyMapList
@@ -139,7 +139,7 @@ function InputKeyMapListProvider:Add(inputKeyMapList)
 	assert(self._maid, "Not initialized")
 
 	if self._inputKeyMapLists[inputKeyMapList:GetListName()] then
-		error(("Already added %q"):format(inputKeyMapList:GetListName()))
+		error(string.format("Already added %q", inputKeyMapList:GetListName()))
 	end
 
 	self._inputKeyMapLists[inputKeyMapList:GetListName()] = inputKeyMapList

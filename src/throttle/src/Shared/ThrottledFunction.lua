@@ -89,7 +89,7 @@ function ThrottledFunction:_configureOrError(throttleConfig)
 		elseif key == "leadingFirstTimeOnly" then
 			self._callLeadingFirstTime = value
 		else
-			error(("Bad key %q in config"):format(tostring(key)))
+			error(string.format("Bad key %q in config", tostring(key)))
 		end
 	end
 

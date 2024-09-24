@@ -46,8 +46,7 @@ function PreferredParentUtils.getPreferredParent(parent, name, forceCreate)
 			if not found then
 				found = item
 			else
-				error(("[PreferredParentUtils.getPreferredParent] - Duplicate of %q")
-					:format(tostring(item:GetFullName())))
+				error(string.format("[PreferredParentUtils.getPreferredParent] - Duplicate of %q", tostring(item:GetFullName())))
 			end
 		end
 	end

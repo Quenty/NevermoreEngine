@@ -153,7 +153,7 @@ function RxBrioUtils.emitWhileAllDead(valueToEmitWhileAllDead)
 			topMaid:GiveTask(source:Subscribe(
 				function(brio)
 					if not Brio.isBrio(brio) then
-						warn(("[RxBrioUtils.emitWhileAllDead] - Not a brio, %q"):format(tostring(brio)))
+						warn(string.format("[RxBrioUtils.emitWhileAllDead] - Not a brio, %q", tostring(brio)))
 						topMaid._lastBrio = nil
 						sub:Fail("Not a brio")
 						return
@@ -253,7 +253,7 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 			topMaid:GiveTask(source:Subscribe(
 				function(brio)
 					if not Brio.isBrio(brio) then
-						warn(("[RxBrioUtils.mergeToAliveList] - Not a brio, %q"):format(tostring(brio)))
+						warn(string.format("[RxBrioUtils.mergeToAliveList] - Not a brio, %q", tostring(brio)))
 						topMaid._lastBrio = nil
 						sub:Fail("Not a brio")
 						return
@@ -293,7 +293,7 @@ function RxBrioUtils.reemitLastBrioOnDeath()
 					maid._conn = nil
 
 					if not Brio.isBrio(brio) then
-						warn(("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q"):format(tostring(brio)))
+						warn(string.format("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q", tostring(brio)))
 						sub:Fail("Not a brio")
 						return
 					end
@@ -748,7 +748,7 @@ function RxBrioUtils.onlyLastBrioSurvives()
 
 			maid:GiveTask(source:Subscribe(function(brio)
 				if not Brio.isBrio(brio) then
-					warn(("[RxBrioUtils.onlyLastBrioSurvives] - Not a brio, %q"):format(tostring(brio)))
+					warn(string.format("[RxBrioUtils.onlyLastBrioSurvives] - Not a brio, %q", tostring(brio)))
 					maid._lastBrio = nil
 					sub:Fail("Not a brio")
 					return

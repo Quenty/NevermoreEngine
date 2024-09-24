@@ -968,7 +968,7 @@ function Blend._observeChildren(value, parent)
 				return maid
 			end
 
-			warn(("Unknown type in brio %q"):format(typeof(result)))
+			warn(string.format("Unknown type in brio %q", typeof(result)))
 			return nil
 		end)
 	end
@@ -1015,7 +1015,7 @@ function Blend._observeChildren(value, parent)
 					end)
 					maid[innerMaid] = innerMaid
 				else
-					warn(("Failed to convert %q into children"):format(tostring(result)))
+					warn(string.format("Failed to convert %q into children", tostring(result)))
 				end
 			end, function(...)
 				sub:Fire(...)
@@ -1034,7 +1034,7 @@ function Blend._observeChildren(value, parent)
 			if observe then
 				table.insert(observables, observe)
 			else
-				warn(("Failed to convert [%s] %q into children"):format(tostring(key), tostring(item)))
+				warn(string.format("Failed to convert [%s] %q into children", tostring(key), tostring(item)))
 			end
 		end
 
@@ -1114,14 +1114,14 @@ function Blend.mount(instance, props)
 			if Observable.isObservable(observable) then
 				table.insert(dependentObservables, {observable, value})
 			else
-				warn(("Unable to apply event listener %q"):format(tostring(key)))
+				warn(string.format("Unable to apply event listener %q", tostring(key)))
 			end
 		elseif type(key) == "number" then
 			-- Treat this as an implicit children contract
 			-- Thus, we don't need an explicit [Blend.Children] call.
 			table.insert(dependentObservables, { Blend.Children(instance, value), value })
 		else
-			warn(("Unable to apply property %q"):format(tostring(key)))
+			warn(string.format("Unable to apply property %q", tostring(key)))
 		end
 	end
 

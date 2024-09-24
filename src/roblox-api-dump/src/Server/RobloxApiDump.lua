@@ -92,7 +92,7 @@ function RobloxApiDump:_promiseClassDataAndAncestorList(className)
 		:Then(function(classMap)
 			local current = classMap[className]
 			if not current then
-				return Promise.rejected(("Could not find data for %q"):format(className))
+				return Promise.rejected(string.format("Could not find data for %q", className))
 			end
 
 			local dataList = {}
@@ -103,7 +103,7 @@ function RobloxApiDump:_promiseClassDataAndAncestorList(className)
 				if superclass and superclass ~= RobloxApiDumpConstants.ROOT_CLASS_NAME then
 					current = classMap[superclass]
 					if not current then
-						return Promise.rejected(("Could not find data for super class %q"):format(superclass))
+						return Promise.rejected(string.format("Could not find data for super class %q", superclass))
 					end
 				else
 					current = nil
@@ -125,7 +125,7 @@ function RobloxApiDump:_promiseRawClassData(className)
 			if data then
 				return data
 			else
-				return Promise.rejected(("Could not find data for %q"):format(className))
+				return Promise.rejected(string.format("Could not find data for %q", className))
 			end
 		end)
 end
@@ -144,7 +144,7 @@ function RobloxApiDump:_promiseClassMap()
 			assert(type(entry.Name) == "string", "Bad entry.Name")
 
 			if classMap[entry.Name] then
-				warn(("[RobloxApiDump] - Duplicate entry for %q"):format(tostring(entry.Name)))
+				warn(string.format("[RobloxApiDump] - Duplicate entry for %q", tostring(entry.Name)))
 				return
 			end
 

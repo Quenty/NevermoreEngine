@@ -158,7 +158,7 @@ function BinderUtils.getLinkedChildren(binder, linkName, parent)
 					seen[obj] = true
 					table.insert(objects, obj)
 				else
-					warn(("[BinderUtils.getLinkedChildren] - Double linked children at %q"):format(item:GetFullName()))
+					warn(string.format("[BinderUtils.getLinkedChildren] - Double linked children at %q", item:GetFullName()))
 				end
 			end
 		end

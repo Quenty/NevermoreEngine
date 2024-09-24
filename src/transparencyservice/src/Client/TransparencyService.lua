@@ -103,8 +103,7 @@ function TransparencyService:_set(key, part, property, newValue)
 	end
 
 	if count >= 5 then
-		warn(("[TransparencyService] - Part %q has %d transparency instances set to it, memory leak possible")
-			:format(part:GetFullName(), count))
+		warn(string.format("[TransparencyService] - Part %q has %d transparency instances set to it, memory leak possible", part:GetFullName(), count))
 	end
 
 	if not valueToSet then

@@ -136,8 +136,7 @@ function LinkUtils.getLinkValue(linkName, from)
 	end
 
 	if not objectValue:IsA("ObjectValue") then
-		warn(("[LinkUtils.getLinkValue] - Bad link %q not an object value, from %q")
-			:format(objectValue:GetFullName(), from:GetFullName()))
+		warn(string.format("[LinkUtils.getLinkValue] - Bad link %q not an object value, from %q", objectValue:GetFullName(), from:GetFullName()))
 		return nil
 	end
 

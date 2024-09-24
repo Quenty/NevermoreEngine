@@ -62,7 +62,7 @@ end
 
 function SoundUtils.applyPropertiesFromId(sound, id)
 	local soundId = SoundUtils.toRbxAssetId(id)
-	sound.Name = ("Sound_%s"):format(soundId)
+	sound.Name = string.format("Sound_%s", soundId)
 	sound.SoundId = soundId
 	sound.RollOffMode = Enum.RollOffMode.InverseTapered
 	sound.Volume = 0.25

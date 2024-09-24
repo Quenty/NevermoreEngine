@@ -25,7 +25,7 @@ function MessagingServiceUtils.promisePublish(topic, message)
 
 	return Promise.spawn(function(resolve, reject)
 		if DEBUG_PUBLISH then
-			print(("Publishing on %q: "):format(topic), HttpService:JSONEncode(message))
+			print(string.format("Publishing on %q: ", topic), HttpService:JSONEncode(message))
 		end
 
 		local ok, err = pcall(function()
@@ -33,7 +33,7 @@ function MessagingServiceUtils.promisePublish(topic, message)
 		end)
 		if not ok then
 			if DEBUG_PUBLISH then
-				warn(("Failed to publish on %q due to %q"):format(topic, err or "nil"))
+				warn(string.format("Failed to publish on %q due to %q", topic, err or "nil"))
 			end
 			return reject(err)
 		end
@@ -52,11 +52,11 @@ function MessagingServiceUtils.promiseSubscribe(topic, callback)
 	assert(type(callback) == "function", "Bad callback")
 
 	if DEBUG_SUBSCRIBE then
-		print(("Listening on %q"):format(topic))
+		print(string.format("Listening on %q", topic))
 
 		local oldCallback = callback
 		callback = function(message)
-			print(("Recieved on %q"):format(topic), HttpService:JSONEncode(message))
+			print(string.format("Recieved on %q", topic), HttpService:JSONEncode(message))
 			oldCallback(message)
 		end
 	end
@@ -68,7 +68,7 @@ function MessagingServiceUtils.promiseSubscribe(topic, callback)
 		end)
 		if not ok then
 			if DEBUG_PUBLISH then
-				warn(("Failed to subscribe on %q due to %q"):format(topic, err or "nil"))
+				warn(string.format("Failed to subscribe on %q due to %q", topic, err or "nil"))
 			end
 			return reject(err)
 		end

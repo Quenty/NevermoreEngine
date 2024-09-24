@@ -57,7 +57,7 @@ function SettingsCmdrService:_setupCommands()
 			table.insert(givenTo, PlayerUtils.formatName(player))
 		end
 
-		return ("Reset settings for %s"):format(table.concat(givenTo, ", "))
+		return string.format("Reset settings for %s", table.concat(givenTo, ", "))
 	end)
 end
 

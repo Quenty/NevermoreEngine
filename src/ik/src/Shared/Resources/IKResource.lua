@@ -50,7 +50,7 @@ end
 function IKResource:Get(descendantName)
 	local resource = self._descendantLookupMap[descendantName]
 	if not resource then
-		error(("[IKResource.Get] - Resource %q does not exist"):format(tostring(descendantName)))
+		error(string.format("[IKResource.Get] - Resource %q does not exist", tostring(descendantName)))
 	end
 
 	local result = resource:GetInstance()

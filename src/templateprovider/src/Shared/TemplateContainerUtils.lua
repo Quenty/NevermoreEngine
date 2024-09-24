@@ -16,7 +16,7 @@ function TemplateContainerUtils.reparentFromWorkspaceIfNeeded(parent, name)
 	local parentedContainer = parent:FindFirstChild(name)
 	if workspaceContainer then
 		if parentedContainer then
-			error(("Duplicate container in %q and %q"):format(
+			error(string.format("Duplicate container in %q and %q",
 				workspaceContainer:GetFullName(),
 				parentedContainer:GetFullName()))
 		end
@@ -30,8 +30,7 @@ function TemplateContainerUtils.reparentFromWorkspaceIfNeeded(parent, name)
 	end
 
 	if not parentedContainer then
-		error(("No template container with name %q in %q")
-			:format(parent:GetFullName(), name))
+		error(string.format("No template container with name %q in %q", parent:GetFullName(), name))
 	end
 
 	return parentedContainer

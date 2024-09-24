@@ -123,7 +123,7 @@ for _, action in pairs(ActionInterface:GetImplementations(adornee)) do
 	action.Activated:Fire()
 
 	action.DisplayName.Changed:Connect(function()
-		print(("Display name changed to %q"):format(tostring(action.DisplayName.Value)))
+		print(string.format("Display name changed to %q", tostring(action.DisplayName.Value)))
 	end)
 end
 
@@ -140,12 +140,12 @@ end
 -- 	count += 1
 
 -- 	maid:GiveTask(interface.DisplayName:Observe():Subscribe(function(name)
--- 			print(("See %d actions (added %q)"):format(count, tostring(name)))
+-- 			print(string.format("See %d actions (added %q)", count, tostring(name)))
 -- 	end))
 
 -- 	brio:ToMaid():GiveTask(function()
 -- 		count -= 1
--- 		print(("See %d actions (removed %q)"):format(count, tostring(interface.DisplayName.Value)))
+-- 		print(string.format("See %d actions (removed %q)", count, tostring(interface.DisplayName.Value)))
 -- 	end)
 -- end)
 

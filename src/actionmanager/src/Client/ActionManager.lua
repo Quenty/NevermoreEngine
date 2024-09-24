@@ -52,7 +52,7 @@ function ActionManager.new()
 
 		-- Immediately deactivate
 		if value and not value.IsActivatedValue.Value then
-			warn(("[ActionManager.ActiveAction.Changed] - Immediate deactivation of %q"):format(tostring(value:GetName())))
+			warn(string.format("[ActionManager.ActiveAction.Changed] - Immediate deactivation of %q", tostring(value:GetName())))
 			self.ActiveAction.Value = nil
 		end
 	end))
@@ -69,7 +69,7 @@ function ActionManager:ActivateAction(name, ...)
 	if action then
 		action:Activate(...)
 	else
-		error(("[ActionManager] - No action with name '%s'"):format(tostring(name)))
+		error(string.format("[ActionManager] - No action with name '%s'", tostring(name)))
 	end
 end
 
@@ -91,7 +91,7 @@ function ActionManager:AddAction(action)
 	local name = action:GetName()
 
 	if self._actions[name] then
-		error(("[ActionManager] - action with name '%s' already exists"):format(tostring(name)))
+		error(string.format("[ActionManager] - action with name '%s' already exists", tostring(name)))
 		return
 	end
 

@@ -120,7 +120,7 @@ function ImpulseCamera:__newindex(index, value)
 		assert(type(value) == "number", "Bad value")
 		self._defaultSpring.Speed = value
 	else
-		error(("%q is not a valid member of impulse camera"):format(tostring(index)))
+		error(string.format("%q is not a valid member of impulse camera", tostring(index)))
 	end
 end
 

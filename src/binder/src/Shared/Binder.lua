@@ -144,7 +144,7 @@ function Binder:Init(...)
 	end
 
 	self._maid._warning = task.delay(5, function()
-		warn(("Binder %q is not loaded. Call :Start() on it!"):format(self._tagName))
+		warn(string.format("Binder %q is not loaded. Call :Start() on it!", self._tagName))
 	end)
 end
 
@@ -450,8 +450,7 @@ end
 ]=]
 function Binder:Bind(inst)
 	if RunService:IsClient() then
-		warn(("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s")
-			:format(self._tagName, debug.traceback()))
+		warn(string.format("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s", self._tagName, debug.traceback()))
 	end
 
 	CollectionService:AddTag(inst, self._tagName)
@@ -501,8 +500,7 @@ function Binder:Unbind(inst)
 	assert(typeof(inst) == "Instance", "Bad inst'")
 
 	if RunService:IsClient() then
-		warn(("[Binder.Bind] - Unbinding '%s' done on the client! Might be disrupted upon server replication! %s")
-			:format(self._tagName, debug.traceback()))
+		warn(string.format("[Binder.Bind] - Unbinding '%s' done on the client! Might be disrupted upon server replication! %s", self._tagName, debug.traceback()))
 	end
 
 	CollectionService:RemoveTag(inst, self._tagName)
@@ -520,8 +518,7 @@ end
 ]=]
 function Binder:BindClient(inst)
 	if not RunService:IsClient() then
-		warn(("[Binder.BindClient] - Bindings '%s' done on the server! Will be replicated!")
-			:format(self._tagName))
+		warn(string.format("[Binder.BindClient] - Bindings '%s' done on the server! Will be replicated!", self._tagName))
 	end
 
 	CollectionService:AddTag(inst, self._tagName)
@@ -607,8 +604,7 @@ function Binder:_add(inst)
 	if self._pendingInstSet[inst] ~= true then
 		-- Got GCed in the process of loading?!
 		-- Constructor probably yields. Yikes.
-		warn(("[Binder._add] - Failed to load instance %q of %q, removed while loading!")
-			:format(
+		warn(string.format("[Binder._add] - Failed to load instance %q of %q, removed while loading!",
 				inst:GetFullName(),
 				tostring(type(self._constructor) == "table" and self._constructor.ClassName or self._constructor)))
 		return

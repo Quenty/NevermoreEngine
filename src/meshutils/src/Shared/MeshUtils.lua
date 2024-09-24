@@ -33,7 +33,7 @@ function MeshUtils.getOrCreateMesh(part)
 			mesh.Parent = part
 			return mesh
 		else
-			warn(("Unsupported part shape %q"):format(tostring(part.Shape)))
+			warn(string.format("Unsupported part shape %q", tostring(part.Shape)))
 			return nil
 		end
 	elseif part:IsA("VehicleSeat") or part:IsA("Seat") then

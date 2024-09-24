@@ -90,7 +90,7 @@ end
 ]=]
 function Signal:Fire(...)
 	if not self._bindableEvent then
-		warn(("Signal is already destroyed. %s"):format(self._source))
+		warn(string.format("Signal is already destroyed. %s", self._source))
 		return
 	end
 
@@ -111,7 +111,7 @@ end
 ]=]
 function Signal:Connect(handler)
 	if not (type(handler) == "function") then
-		error(("connect(%s)"):format(typeof(handler)), 2)
+		error(string.format("connect(%s)", typeof(handler)), 2)
 	end
 
 	return self._bindableEvent.Event:Connect(function(key)
@@ -134,7 +134,7 @@ end
 ]=]
 function Signal:Once(handler)
 	if not (type(handler) == "function") then
-		error(("once(%s)"):format(typeof(handler)), 2)
+		error(string.format("once(%s)", typeof(handler)), 2)
 	end
 
 	return self._bindableEvent.Event:Once(function(key)

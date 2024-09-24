@@ -35,13 +35,13 @@ function LipsumUtils.username(random)
 	-- leet speak
 	if random:NextNumber() <= 0.5 then
 		if random:NextNumber() <= 0.75 then
-			word = word:gsub("o", "0")
+			word = string.gsub(word, "o", "0")
 		end
 		if random:NextNumber() <= 0.75 then
-			word = word:gsub("i", "1")
+			word = string.gsub(word, "i", "1")
 		end
 		if random:NextNumber() <= 0.75 then
-			word = word:gsub("l", "1")
+			word = string.gsub(word, "l", "1")
 		end
 	end
 
@@ -49,7 +49,7 @@ function LipsumUtils.username(random)
 	if number <= 0.1 then
 		return "xXx" .. RandomUtils.choice(WORDS) .. "xXx"
 	elseif number <= 0.6 then
-		return ("%s%03d"):format(word, random:NextInteger(0, 999))
+		return string.format("%s%03d", word, random:NextInteger(0, 999))
 	else
 		return word
 	end

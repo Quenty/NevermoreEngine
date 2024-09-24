@@ -159,7 +159,7 @@ function Kinematics:__index(index)
 	elseif index == "Clock" then
 		return rawget(self, "_clock")
 	else
-		error(("%q is not a valid member of Kinematics"):format(tostring(index)), 2)
+		error(string.format("%q is not a valid member of Kinematics", tostring(index)), 2)
 	end
 end
 
@@ -190,7 +190,7 @@ function Kinematics:__newindex(index, value)
 		rawset(self, "_clock", value)
 		rawset(self, "_time0", value())
 	else
-		error(("%q is not a valid member of Kinematics"):format(tostring(index)), 2)
+		error(string.format("%q is not a valid member of Kinematics", tostring(index)), 2)
 	end
 	rawset(self, "_time0", now)
 end

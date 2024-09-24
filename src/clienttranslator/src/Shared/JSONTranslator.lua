@@ -226,7 +226,7 @@ function JSONTranslator:ToTranslationKey(prefix, text)
 	assert(type(text) == "string", "Bad text")
 
 	local translationKey = TranslationKeyUtils.getTranslationKey(prefix, text)
-	local context = ("automatic.%s"):format(translationKey)
+	local context = string.format("automatic.%s", translationKey)
 
 	-- TODO: Only set if we don't need it
 	self:SetEntryValue(translationKey, text, context, "en", text)

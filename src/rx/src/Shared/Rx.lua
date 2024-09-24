@@ -1258,8 +1258,7 @@ function Rx.unpacked(observable)
 			if type(value) == "table" then
 				sub:Fire(unpack(value))
 			else
-				warn(("[Rx.unpacked] - Observable didn't return a table got type %q")
-					:format(type(value)))
+				warn(string.format("[Rx.unpacked] - Observable didn't return a table got type %q", type(value)))
 			end
 		end, sub:GetFailComplete())
 	end)

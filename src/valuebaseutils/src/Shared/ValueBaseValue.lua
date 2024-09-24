@@ -55,7 +55,7 @@ function ValueBaseValue:__index(index)
 	elseif ValueBaseValue[index] or index == "_defaultValue" then
 		return ValueBaseValue[index]
 	else
-		error(("%q is not a member of ValueBaseValue"):format(tostring(index)))
+		error(string.format("%q is not a member of ValueBaseValue", tostring(index)))
 	end
 end
 
@@ -63,7 +63,7 @@ function ValueBaseValue:__newindex(index, value)
 	if index == "Value" then
 		ValueBaseUtils.setValue(self._parent, self._className, self._name, value)
 	else
-		error(("%q is not a member of ValueBaseValue"):format(tostring(index)))
+		error(string.format("%q is not a member of ValueBaseValue", tostring(index)))
 	end
 end
 

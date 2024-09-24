@@ -20,7 +20,7 @@ local EnumUtils = {}
 function EnumUtils.encodeAsString(enumItem)
 	assert(typeof(enumItem) == "EnumItem", "Bad enumItem")
 
-	return ("Enum.%s.%s"):format(tostring(enumItem.EnumType), enumItem.Name)
+	return string.format("Enum.%s.%s", tostring(enumItem.EnumType), enumItem.Name)
 end
 
 --[=[
@@ -39,13 +39,13 @@ function EnumUtils.isOfType(expectedEnumType, enumItem)
 	assert(typeof(expectedEnumType) == "Enum", "Bad enum")
 
 	if typeof(enumItem) ~= "EnumItem" then
-		return false, ("Bad enumItem. Expected enumItem to be %s, got %s '%s'"):format(tostring(expectedEnumType), typeof(enumItem), tostring(enumItem))
+		return false, string.format("Bad enumItem. Expected enumItem to be %s, got %s '%s'", tostring(expectedEnumType), typeof(enumItem), tostring(enumItem))
 	end
 
 	if enumItem.EnumType == expectedEnumType then
 		return true
 	else
-		return false, ("Bad enumItem. Expected enumItem to be %s, got %s"):format(tostring(expectedEnumType), EnumUtils.encodeAsString(enumItem))
+		return false, string.format("Bad enumItem. Expected enumItem to be %s, got %s", tostring(expectedEnumType), EnumUtils.encodeAsString(enumItem))
 	end
 end
 
@@ -121,7 +121,7 @@ function EnumUtils.decodeFromString(value)
 			enumValue = Enum[enumType][enumName]
 		end)
 		if not ok then
-			warn(err, ("[EnumUtils.decodeFromString] - Failed to decode %q into an enum value due to %q"):format(value, tostring(err)))
+			warn(err, string.format("[EnumUtils.decodeFromString] - Failed to decode %q into an enum value due to %q", value, tostring(err)))
 			return nil
 		end
 

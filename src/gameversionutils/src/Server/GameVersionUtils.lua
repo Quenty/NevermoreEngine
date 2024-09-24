@@ -15,7 +15,7 @@ function GameVersionUtils.getBuild()
 	if RunService:IsStudio() then
 		return "studio"
 	else
-		return ("%d"):format(game.PlaceVersion)
+		return string.format("%d", game.PlaceVersion)
 	end
 end
 

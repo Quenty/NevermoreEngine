@@ -139,7 +139,7 @@ function Fzy.hasMatch(config, needle: string, haystack: string)
 
 	local j = 1
 	for i = 1, string.len(needle) do
-		j = string.find(haystack, needle:sub(i, i), j, true)
+		j = string.find(haystack, string.sub(needle, i, i), j, true)
 		if not j then
 			return false
 		else
@@ -163,7 +163,7 @@ local function precomputeBonus(config, haystack: string)
 
 	local last_char = "/"
 	for i = 1, string.len(haystack) do
-		local this_char = haystack:sub(i, i)
+		local this_char = string.sub(haystack, i, i)
 		if last_char == "/" or last_char == "\\" then
 			matchBonus[i] = config.slashMatchScore
 		elseif last_char == "-" or last_char == "_" or last_char == " " then
@@ -199,7 +199,7 @@ local function compute(config, needle: string, haystack: string, D, M)
 	-- get all the characters from the haystack once now, to reuse below.
 	local haystackChars = {}
 	for i = 1, m do
-		haystackChars[i] = haystack:sub(i, i)
+		haystackChars[i] = string.sub(haystack, i, i)
 	end
 
 	for i = 1, n do
@@ -208,7 +208,7 @@ local function compute(config, needle: string, haystack: string, D, M)
 
 		local prevScore = MIN_SCORE
 		local gapScore = i == n and config.gapTrailingScore or config.gapInnerScore
-		local needle_char = needle:sub(i, i)
+		local needle_char = string.sub(needle, i, i)
 
 		for j = 1, m do
 			if needle_char == haystackChars[j] then

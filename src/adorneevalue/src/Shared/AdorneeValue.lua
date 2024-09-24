@@ -73,7 +73,7 @@ function AdorneeValue:__index(index)
 		-- Edge-case
 		return rawget(self, index)
 	else
-		error(("%q is not a member of AdorneeValue"):format(tostring(index)))
+		error(string.format("%q is not a member of AdorneeValue", tostring(index)))
 	end
 end
 
@@ -90,9 +90,9 @@ function AdorneeValue:__newindex(index, value)
 		-- Edge-case
 		return
 	elseif AdorneeValue[index] or index == "Changed" then
-		error(("%q is not writable"):format(tostring(index)))
+		error(string.format("%q is not writable", tostring(index)))
 	else
-		error(("%q is not a member of AdorneeValue"):format(tostring(index)))
+		error(string.format("%q is not a member of AdorneeValue", tostring(index)))
 	end
 end
 

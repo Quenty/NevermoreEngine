@@ -62,7 +62,7 @@ function BinderGroupProvider:__index(index)
 		return BinderGroupProvider[index]
 	end
 
-	error(("%q Not a valid index"):format(tostring(index)))
+	error(string.format("%q Not a valid index", tostring(index)))
 end
 
 --[=[

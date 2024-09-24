@@ -111,10 +111,10 @@ Connection.Destroy = Connection.Disconnect
 -- Make Connection strict
 setmetatable(Connection, {
 	__index = function(_, key)
-		error(("Attempt to get Connection::%s (not a valid member)"):format(tostring(key)), 2)
+		error(string.format("Attempt to get Connection::%s (not a valid member)", tostring(key)), 2)
 	end,
 	__newindex = function(_, key, _)
-		error(("Attempt to set Connection::%s (not a valid member)"):format(tostring(key)), 2)
+		error(string.format("Attempt to set Connection::%s (not a valid member)", tostring(key)), 2)
 	end
 })
 
@@ -254,10 +254,10 @@ Signal.Destroy = Signal.DisconnectAll
 -- Make signal strict
 setmetatable(Signal, {
 	__index = function(_, key)
-		error(("Attempt to get Signal::%s (not a valid member)"):format(tostring(key)), 2)
+		error(string.format("Attempt to get Signal::%s (not a valid member)", tostring(key)), 2)
 	end,
 	__newindex = function(_, key, _)
-		error(("Attempt to set Signal::%s (not a valid member)"):format(tostring(key)), 2)
+		error(string.format("Attempt to set Signal::%s (not a valid member)", tostring(key)), 2)
 	end
 })
 

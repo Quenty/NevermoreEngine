@@ -198,7 +198,7 @@ function ObservableSortedList:ObserveIndex(indexToObserve)
 
 	local key = self._keyList[indexToObserve]
 	if not key then
-		error(("No entry at index %q, cannot observe changes"):format(indexToObserve))
+		error(string.format("No entry at index %q, cannot observe changes", indexToObserve))
 	end
 
 	return self:ObserveIndexByKey(key)

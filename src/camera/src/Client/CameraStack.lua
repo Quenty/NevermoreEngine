@@ -84,7 +84,7 @@ function CameraStack:GetTopState()
 	end
 
 	if #self._stack > 10 then
-		warn(("[CameraStack] - Stack is bigger than 10 in CameraStack (%d)"):format(#self._stack))
+		warn(string.format("[CameraStack] - Stack is bigger than 10 in CameraStack (%d)", #self._stack))
 	end
 	local topState = self._stack[#self._stack]
 
@@ -124,7 +124,7 @@ function CameraStack:GetNewStateBelow()
 				return self._stack[1].CameraState
 			end
 		else
-			warn(("[CameraStack] - Could not get state from %q, returning default"):format(tostring(_stateToUse)))
+			warn(string.format("[CameraStack] - Could not get state from %q, returning default", tostring(_stateToUse)))
 			return self._stack[1].CameraState
 		end
 	end), function(newStateToUse)

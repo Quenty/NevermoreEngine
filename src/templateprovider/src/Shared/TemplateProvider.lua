@@ -141,8 +141,7 @@ function TemplateProvider:PromiseClone(templateName)
 
 		task.delay(5, function()
 			if promise:IsPending() then
-				warn(("[TemplateProvider.PromiseClone] - May fail to replicate template %q from cloud. %s")
-					:format(templateName, self:_getReplicationHint()))
+				warn(string.format("[TemplateProvider.PromiseClone] - May fail to replicate template %q from cloud. %s", templateName, self:_getReplicationHint()))
 			end
 		end)
 	end
@@ -181,7 +180,7 @@ function TemplateProvider:Clone(templateName)
 
 	local template = self._registry[templateName]
 	if not template then
-		error(("[TemplateProvider.Clone] - Cannot provide %q"):format(tostring(templateName)))
+		error(string.format("[TemplateProvider.Clone] - Cannot provide %q", tostring(templateName)))
 		return nil
 	end
 
@@ -370,8 +369,7 @@ end
 function TemplateProvider:_addToRegistery(child)
 	local childName = child.Name
 	-- if self._registry[childName] then
-		-- warn(("[TemplateProvider._addToRegistery] - Duplicate %q in registery. Overridding")
-		-- 	:format(childName))
+		-- warn(string.format("[TemplateProvider._addToRegistery] - Duplicate %q in registery. Overridding", childName))
 	-- end
 
 	self._registry[childName] = child

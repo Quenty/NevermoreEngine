@@ -132,7 +132,7 @@ end
 function ColorPalette:GetColorSwatch(colorName)
 	local swatch = self._swatches[colorName]
 	if not swatch then
-		error(("No swatch with name %q"):format(colorName))
+		error(string.format("No swatch with name %q", colorName))
 	end
 
 	return swatch
@@ -229,7 +229,7 @@ function ColorPalette:GetColorValue(colorName)
 
 	local colorValue = self._colorValues[colorName]
 	if not colorValue then
-		error(("No color with name %q"):format(colorName))
+		error(string.format("No color with name %q", colorName))
 	end
 
 	return colorValue
@@ -238,7 +238,7 @@ end
 function ColorPalette:GetGradeValue(gradeName)
 	local gradeValue = self._colorGradeValues[gradeName]
 	if not gradeValue then
-		error(("No grade with name %q"):format(gradeName))
+		error(string.format("No grade with name %q", gradeName))
 	end
 
 	return gradeValue
@@ -247,7 +247,7 @@ end
 function ColorPalette:GetVividnessValue(gradeName)
 	local vividnessValue = self._vividnessValues[gradeName]
 	if not vividnessValue then
-		error(("No grade with name %q"):format(gradeName))
+		error(string.format("No grade with name %q", gradeName))
 	end
 
 	return vividnessValue
@@ -275,7 +275,7 @@ function ColorPalette:GetSwatch(swatchName)
 
 	local swatch = self._swatches[swatchName]
 	if not swatch then
-		error(("No swatch with name %q"):format(swatchName))
+		error(string.format("No swatch with name %q", swatchName))
 	end
 
 	return swatch
@@ -285,7 +285,7 @@ function ColorPalette:SetColor(colorName, color)
 	assert(type(colorName) == "string", "Bad colorName")
 
 	if not self._colorValues[colorName] then
-		error(("No color grade with name %q"):format(colorName))
+		error(string.format("No color grade with name %q", colorName))
 	end
 
 	self._colorMaid[colorName] = self._colorValues[colorName]:Mount(color)
@@ -295,7 +295,7 @@ function ColorPalette:SetVividness(gradeName, vividness)
 	assert(type(gradeName) == "string", "Bad colorName")
 
 	if not self._vividnessValues[gradeName] then
-		error(("No vividness with name %q"):format(gradeName))
+		error(string.format("No vividness with name %q", gradeName))
 	end
 
 	self._vividMaid[gradeName] = self._vividnessValues[gradeName]:Mount(vividness)
@@ -306,7 +306,7 @@ function ColorPalette:SetColorGrade(gradeName, grade)
 	assert(grade, "Bad grade")
 
 	if not self._colorGradeValues[gradeName] then
-		error(("No color grade with name %q"):format(gradeName))
+		error(string.format("No color grade with name %q", gradeName))
 	end
 
 	self._gradeMaid[gradeName] = self._colorGradeValues[gradeName]:Mount(grade)
@@ -323,7 +323,7 @@ function ColorPalette:DefineColorGrade(gradeName, gradeValue, vividnessValue)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	if self._colorGradeValues[gradeName] then
-		warn(("[ColorPalette.DefineColorGrade] - Already defined grade of name %q"):format(gradeName))
+		warn(string.format("[ColorPalette.DefineColorGrade] - Already defined grade of name %q", gradeName))
 		return
 	end
 
@@ -350,7 +350,7 @@ function ColorPalette:DefineColorSwatch(colorName, value)
 	assert(type(colorName) == "string", "Bad colorName")
 
 	if self._swatches[colorName] then
-		warn(("[ColorPalette.DefineColorGrade] -Already defined color of name %q"):format(colorName))
+		warn(string.format("[ColorPalette.DefineColorGrade] -Already defined color of name %q", colorName))
 		return
 	end
 

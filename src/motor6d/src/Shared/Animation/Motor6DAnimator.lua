@@ -47,7 +47,7 @@ function Motor6DAnimator:Push(transformer)
 	end)
 
 	if #self._stack > 10 then
-		warn(("[Motor6DAnimator] - Motor stack overflow (%d)"):format(#self._stack))
+		warn(string.format("[Motor6DAnimator] - Motor stack overflow (%d)", #self._stack))
 	end
 
 	self._maid[symbol] = maid

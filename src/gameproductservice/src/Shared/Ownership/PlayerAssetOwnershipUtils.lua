@@ -15,13 +15,13 @@ function PlayerAssetOwnershipUtils.toKeyOwnedAttribute(assetType, assetKey)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "bad assetKey")
 
-	return ("Owns_%s_%s"):format(String.toCamelCase(assetType), assetKey)
+	return string.format("Owns_%s_%s", String.toCamelCase(assetType), assetKey)
 end
 
 function PlayerAssetOwnershipUtils.toIdOwnedAttribute(assetType, id)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
-	return ("Owns_%s_Id_%d"):format(String.toCamelCase(assetType), id)
+	return string.format("Owns_%s_Id_%d", String.toCamelCase(assetType), id)
 end
 
 function PlayerAssetOwnershipUtils.getAttributeNames(configPicker, assetType, idOrKey)

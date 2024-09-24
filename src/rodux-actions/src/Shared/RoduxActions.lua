@@ -32,7 +32,7 @@ function RoduxActions:CreateReducer(initialState, handlers)
 	for actionType, func in pairs(handlers) do
 		assert(type(func) == "function", "Bad handler")
 		if not self:Get(actionType) then
-			error(("[RoduxActions.CreateReducer] - %q type is not registered"):format(tostring(actionType)), 2)
+			error(string.format("[RoduxActions.CreateReducer] - %q type is not registered", tostring(actionType)), 2)
 		end
 	end
 
@@ -61,7 +61,7 @@ function RoduxActions:Validate(action)
 
 	local actionFactory = self:Get(action.type)
 	if not actionFactory then
-		return false, ("%q is not a valid action type"):format(tostring(action.type))
+		return false, string.format("%q is not a valid action type", tostring(action.type))
 	end
 
 	return actionFactory:Validate(action)
@@ -94,7 +94,7 @@ function RoduxActions:__index(index)
 	if actionFactories[index] then
 		return actionFactories[index]
 	else
-		error(("%q Not a valid index"):format(tostring(index)))
+		error(string.format("%q Not a valid index", tostring(index)))
 	end
 end
 

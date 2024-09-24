@@ -72,7 +72,7 @@ function PlayerInputModeService:_handleServerEvent(player, request, ...)
 	if request == PlayerInputModeServiceConstants.REQUEST_SET_INPUT_MODE then
 		self:_setPlayerInputModeType(player, ...)
 	else
-		error(("[PlayerInputModeService] - Bad request %q"):format(tostring(request)))
+		error(string.format("[PlayerInputModeService] - Bad request %q", tostring(request)))
 	end
 end
 

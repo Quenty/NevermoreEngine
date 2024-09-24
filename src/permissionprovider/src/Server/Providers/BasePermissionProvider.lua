@@ -73,7 +73,7 @@ function BasePermissionProvider:IsPermissionLevel(player, permissionLevel)
 
 	local ok, result = promise:Yield()
 	if not ok then
-		warn("[BasePermissionProvider] - %s"):format(tostring(result))
+		warn(string.format("[BasePermissionProvider] - %s", tostring(result)))
 		return false
 	end
 
@@ -138,7 +138,7 @@ function BasePermissionProvider:_onServerInvoke(player)
 	local promise = self:PromiseIsAdmin(player)
 	local ok, result = promise:Yield()
 	if not ok then
-		warn(("[BasePermissionProvider] - Failed retrieval due to %q"):format(tostring(result)))
+		warn(string.format("[BasePermissionProvider] - Failed retrieval due to %q", tostring(result)))
 		return false
 	end
 

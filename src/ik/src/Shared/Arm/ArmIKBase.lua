@@ -47,7 +47,7 @@ function ArmIKBase.new(humanoid, armName, serviceBag)
 	elseif self._armName == "Right" then
 		self._direction = -1
 	else
-		error(("[ArmIKBase] - Bad armName %q"):format(tostring(armName)))
+		error(string.format("[ArmIKBase] - Bad armName %q", tostring(armName)))
 	end
 
 	self._gripping = ValueObject.new(false, "boolean")

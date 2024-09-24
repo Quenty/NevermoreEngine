@@ -62,7 +62,7 @@ function FadeBetweenCamera2:__newindex(index, value)
 		self._time0 = now
 		rawset(self, index, value)
 	else
-		error(("%q is not a valid member of FadeBetweenCamera2"):format(tostring(index)))
+		error(string.format("%q is not a valid member of FadeBetweenCamera2", tostring(index)))
 	end
 end
 
@@ -89,7 +89,7 @@ function FadeBetweenCamera2:__index(index)
 	elseif FadeBetweenCamera2[index] then
 		return FadeBetweenCamera2[index]
 	else
-		error(("%q is not a valid member of FadeBetweenCamera2"):format(tostring(index)))
+		error(string.format("%q is not a valid member of FadeBetweenCamera2", tostring(index)))
 	end
 end
 

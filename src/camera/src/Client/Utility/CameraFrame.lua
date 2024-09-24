@@ -79,7 +79,7 @@ function CameraFrame:__index(index)
 	elseif CameraFrame[index] then
 		return CameraFrame[index]
 	else
-		error(("'%s' is not a valid index of CameraState"):format(tostring(index)))
+		error(string.format("'%s' is not a valid index of CameraState", tostring(index)))
 	end
 end
 
@@ -99,7 +99,7 @@ function CameraFrame:__newindex(index, value)
 	elseif index == "FieldOfView" or index == "QFrame" then
 		rawset(self, index, value)
 	else
-		error(("'%s' is not a valid index of CameraState"):format(tostring(index)))
+		error(string.format("'%s' is not a valid index of CameraState", tostring(index)))
 	end
 end
 

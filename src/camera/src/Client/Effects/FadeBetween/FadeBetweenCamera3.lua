@@ -53,7 +53,7 @@ function FadeBetweenCamera3:__newindex(index, value)
 	elseif index == "CameraA" or index == "CameraB" then
 		rawset(self, index, value)
 	else
-		error(("%q is not a valid member of FadeBetweenCamera3"):format(tostring(index)))
+		error(string.format("%q is not a valid member of FadeBetweenCamera3", tostring(index)))
 	end
 end
 
@@ -131,7 +131,7 @@ function FadeBetweenCamera3:__index(index)
 	elseif FadeBetweenCamera3[index] then
 		return FadeBetweenCamera3[index]
 	else
-		error(("%q is not a valid member of FadeBetweenCamera3"):format(tostring(index)))
+		error(string.format("%q is not a valid member of FadeBetweenCamera3", tostring(index)))
 	end
 end
 

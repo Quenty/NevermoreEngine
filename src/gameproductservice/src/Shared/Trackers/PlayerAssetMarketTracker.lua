@@ -223,7 +223,7 @@ function PlayerAssetMarketTracker:HasPurchasedThisSession(idOrKey)
 
 	local id = self._convertIds(idOrKey)
 	if not id then
-		warn(("[PlayerAssetMarketTracker] - No %s with key %q"):format(self._assetType, tostring(idOrKey)))
+		warn(string.format("[PlayerAssetMarketTracker] - No %s with key %q", self._assetType, tostring(idOrKey)))
 		return false
 	end
 

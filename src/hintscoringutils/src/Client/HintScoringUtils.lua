@@ -83,7 +83,7 @@ if DEBUG_ENABLED then
 	function HintScoringUtils.debugScore(adornee, score)
 		assert(adornee, "Bad adornee")
 
-		debugMaid:GiveTask(Draw.text(AdorneeUtils.getCenter(adornee), ("%0.6f"):format(score)))
+		debugMaid:GiveTask(Draw.text(AdorneeUtils.getCenter(adornee), string.format("%0.6f", score)))
 	end
 else
 	function HintScoringUtils.debugScore(_, _)

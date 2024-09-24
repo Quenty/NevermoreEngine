@@ -80,7 +80,7 @@ function CameraState:__newindex(index, value)
 	elseif index == "CameraFrame" or index == "CameraFrameDerivative" then
 		rawset(self, index, value)
 	else
-		error(("'%s' is not a valid index of CameraState"):format(tostring(index)))
+		error(string.format("'%s' is not a valid index of CameraState", tostring(index)))
 	end
 end
 

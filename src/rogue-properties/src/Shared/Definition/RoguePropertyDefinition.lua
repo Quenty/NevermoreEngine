@@ -148,7 +148,7 @@ function RoguePropertyDefinition:_computeStorageInstanceType()
 	elseif self._valueType == "CFrame" then
 		return "CFrameValue"
 	else
-		error(("Unknown valueType %q"):format(tostring(self._valueType)))
+		error(string.format("Unknown valueType %q", tostring(self._valueType)))
 	end
 end
 

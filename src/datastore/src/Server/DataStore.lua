@@ -142,7 +142,7 @@ end
 	@return string
 ]=]
 function DataStore:GetFullPath()
-	return ("RobloxDataStore@%s"):format(self._key)
+	return string.format("RobloxDataStore@%s", self._key)
 end
 
 --[=[
