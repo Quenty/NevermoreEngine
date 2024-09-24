@@ -53,6 +53,9 @@ function SpringObject.new(target, speed, damper)
 
 	if target then
 		self:SetTarget(target)
+	else
+		-- Ensure we initialize at 0 so we can emit a value immediately
+		self:SetTarget(0)
 	end
 
 	if speed then

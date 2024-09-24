@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.7.1...@quenty/rogue-properties@11.7.2) (2024-09-22)
+
+
+### Bug Fixes
+
+* Can get modified version of RogueSetter ([4e1b5a3](https://github.com/Quenty/NevermoreEngine/commit/4e1b5a308fa53a00f1d84700720b70b09cc8031e))
+
+
+
+
+
 ## [11.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.7.0...@quenty/rogue-properties@11.7.1) (2024-09-20)
 
 **Note:** Version bump only for package @quenty/rogue-properties

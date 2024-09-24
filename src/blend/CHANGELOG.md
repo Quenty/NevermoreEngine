@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.5.1...@quenty/blend@12.5.2) (2024-09-22)
+
+
+### Bug Fixes
+
+* SpringObject wouldn't emit a value initially when observing the default spring ([d37c6ab](https://github.com/Quenty/NevermoreEngine/commit/d37c6abe0218d8a74ec3a6855b54f0fc39836286))
+
+
+
+
+
 ## [12.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.5.0...@quenty/blend@12.5.1) (2024-09-20)
 
 

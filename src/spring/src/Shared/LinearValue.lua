@@ -50,6 +50,10 @@ local function convertUDim(scale, offset)
 	return UDim.new(scale, math.round(offset))
 end
 
+local function convertBoolean(value)
+	return value ~= 0
+end
+
 --[=[
 	Converts an arbitrary value to a LinearValue if Roblox has not defined this value
 	for multiplication and addition.
@@ -64,6 +68,8 @@ function LinearValue.toLinearIfNeeded(value)
 		return LinearValue.new(convertUDim2, {value.X.Scale, math.round(value.X.Offset), value.Y.Scale, math.round(value.Y.Offset)})
 	elseif typeof(value) == "UDim" then
 		return LinearValue.new(convertUDim, {value.Scale, math.round(value.Offset)})
+	elseif type(value) == "boolean" then
+		return LinearValue.new(convertBoolean, { value and 1 or 0 })
 	else
 		return value
 	end

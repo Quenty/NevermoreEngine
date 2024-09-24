@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@10.4.0...@quenty/spring@10.4.1) (2024-09-22)
+
+
+### Bug Fixes
+
+* Support boolean values in LinearValue ([2833ad3](https://github.com/Quenty/NevermoreEngine/commit/2833ad343e1fa8bb2de5dec6027bc3aca2d36e1b))
+
+
+
+
+
 # [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@10.3.0...@quenty/spring@10.4.0) (2024-09-12)
 
 

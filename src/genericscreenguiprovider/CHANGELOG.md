@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.7.1...@quenty/genericscreenguiprovider@13.7.2) (2024-09-22)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
 ## [13.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.7.0...@quenty/genericscreenguiprovider@13.7.1) (2024-09-20)
 
 **Note:** Version bump only for package @quenty/genericscreenguiprovider
