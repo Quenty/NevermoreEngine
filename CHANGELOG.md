@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/attributeutils@14.7.0`, `@quenty/colorpalette@10.8.0`, `@quenty/instanceutils@13.7.0`, `@quenty/signal@7.6.0`, `@quenty/trajectory@2.4.0`, `@quenty/valuebaseutils@13.7.0`, `@quenty/valueobject@13.7.0`
+  - Users/quenty/signal memory tracking [#500](https://github.com/Quenty/NevermoreEngine/pull/500) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Sep 25 2024)
+
+#### 🚀 Enhancement
+
 - `@quenty/coreguienabler@12.6.0`, `@quenty/rx@13.6.0`, `@quenty/softshutdown@9.9.0`
   - fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
 
