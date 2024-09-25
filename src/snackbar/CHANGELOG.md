@@ -1,23 +1,18 @@
-# v11.9.1 (Wed Sep 25 2024)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Loek Gerrits ([@LDGerrits](https://github.com/LDGerrits)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: No matching version found for @quentystudios/t@^3.0.1 while installing @quenty/snackbar [#486](https://github.com/Quenty/NevermoreEngine/pull/486) ([@LDGerrits](https://github.com/LDGerrits))
-
-#### Authors: 1
-
-- Loek Gerrits ([@LDGerrits](https://github.com/LDGerrits))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.9.0...@quenty/snackbar@11.9.1) (2024-09-25)
+
+
+### Bug Fixes
+
+* set dependency version for @quentystudios/t to ^3.0.0 in package.json ([#486](https://github.com/Quenty/NevermoreEngine/issues/486)) ([b0d3707](https://github.com/Quenty/NevermoreEngine/commit/b0d3707a7debf1b0bed15cba29f35764d85060bd))
+
+
+
+
 
 # [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.8.0...@quenty/snackbar@11.9.0) (2024-09-25)
 
