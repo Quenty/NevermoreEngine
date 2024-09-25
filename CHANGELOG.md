@@ -1,3 +1,22 @@
+# (Wed Sep 25 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/coreguienabler@12.6.0`, `@quenty/rx@13.6.0`, `@quenty/softshutdown@9.9.0`
+  - fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/actionmanager@13.6.0`, `@quenty/adorneevalue@10.6.0`, `@quenty/animationgroup@10.5.0`, `@quenty/binder@14.7.0`, `@quenty/blend@12.6.0`, `@quenty/boundlinkutils@14.7.0`, `@quenty/brio@14.6.0`, `@quenty/camera@14.8.0`, `@quenty/clienttranslator@14.7.0`, `@quenty/cmdrservice@13.8.0`, `@quenty/colorpalette@10.7.0`, `@quenty/conditions@10.8.0`, `@quenty/datastore@13.8.0`, `@quenty/ellipticcurvecryptography@1.5.0`, `@quenty/enumutils@3.3.0`, `@quenty/fzy@5.5.0`, `@quenty/gameconfig@12.10.0`, `@quenty/gameproductservice@14.10.0`, `@quenty/gameversionutils@3.4.0`, `@quenty/generatewithmixin@11.5.0`, `@quenty/genericscreenguiprovider@13.8.0`, `@quenty/hintscoringutils@14.8.0`, `@quenty/httppromise@10.5.0`, `@quenty/humanoiddescriptionutils@10.5.0`, `@quenty/ik@15.10.0`, `@quenty/inputkeymaputils@14.9.0`, `@quenty/inputmode@13.7.0`, `@quenty/kinematics@2.3.0`, `@quenty/linkutils@13.6.0`, `@quenty/lipsum@14.6.0`, `@quenty/loader@10.5.0`, `@quenty/markdownrender@2.3.0`, `@quenty/memorystoreutils@6.5.0`, `@quenty/meshutils@2.3.0`, `@quenty/messagingserviceutils@7.5.0`, `@quenty/motor6d@7.8.0`, `@quenty/observablecollection@12.6.0`, `@quenty/permissionprovider@14.8.0`, `@quenty/playerinputmode@9.8.0`, `@quenty/playerutils@8.6.0`, `@quenty/preferredparentutils@4.3.0`, `@quenty/pseudolocalize@3.4.0`, `@quenty/quaternion@2.5.0`, `@quenty/ragdoll@15.9.0`, `@quenty/raycaster@3.4.0`, `@quenty/rbxasset@5.5.0`, `@quenty/resetservice@11.8.0`, `@quenty/roblox-api-dump@8.5.0`, `@quenty/rodux-actions@9.5.0`, `@quenty/rogue-properties@11.8.0`, `@quenty/rotatinglabel@11.5.0`, `@quenty/rx@13.6.0`, `@quenty/safedestroy@1.4.0`, `@quenty/scrollingframe@12.5.0`, `@quenty/settings-inputkeymap@10.11.0`, `@quenty/settings@11.9.0`, `@quenty/signal@7.5.0`, `@quenty/sounds@10.5.0`, `@quenty/steputils@3.5.0`, `@quenty/string@3.3.0`, `@quenty/templateprovider@11.5.0`, `@quenty/textfilterservice@13.7.0`, `@quenty/throttle@10.6.0`, `@quenty/tie@10.8.0`, `@quenty/time@2.4.0`, `@quenty/transparencyservice@11.5.0`, `@quenty/utf8@2.3.0`, `@quenty/valuebaseutils@13.6.0`
+  - refactor: Bulk rename `:format()` to `string.format()` [#497](https://github.com/Quenty/NevermoreEngine/pull/497) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Sep 22 2024)
 
 #### 🐛 Bug Fix

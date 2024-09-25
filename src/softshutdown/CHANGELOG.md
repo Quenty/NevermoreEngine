@@ -1,3 +1,21 @@
+# v9.9.0 (Wed Sep 25 2024)
+
+#### 🚀 Enhancement
+
+- fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
+- feat: Add PushDisable() to CoreGuiEnabler ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/unrooot/function-renaming ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
