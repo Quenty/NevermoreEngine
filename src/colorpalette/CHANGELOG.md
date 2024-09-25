@@ -1,24 +1,18 @@
-# v10.8.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/signal memory tracking [#500](https://github.com/Quenty/NevermoreEngine/pull/500) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Ensure backwards compatibility ([@Quenty](https://github.com/Quenty))
-- refactor: ColorPalette changes to avoid memory leaks ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.7.0...@quenty/colorpalette@10.8.0) (2024-09-25)
+
+
+### Bug Fixes
+
+* Ensure backwards compatibility ([97995a8](https://github.com/Quenty/NevermoreEngine/commit/97995a812c8d1d8489104b16e7ac443fbb2effec))
+
+
+
+
 
 # [10.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.6.2...@quenty/colorpalette@10.7.0) (2024-09-25)
 

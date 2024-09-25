@@ -1,20 +1,18 @@
-# v2.4.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/signal memory tracking [#500](https://github.com/Quenty/NevermoreEngine/pull/500) ([@Quenty](https://github.com/Quenty))
-- feat: Add TrajectoryDrawUtils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.3.0...@quenty/trajectory@2.4.0) (2024-09-25)
+
+
+### Features
+
+* Add TrajectoryDrawUtils ([6b7f1bf](https://github.com/Quenty/NevermoreEngine/commit/6b7f1bf9905a1cfa5864dcd5de4b811ad0b6f0a5))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.2.0...@quenty/trajectory@2.3.0) (2024-05-09)
 

@@ -1,24 +1,23 @@
-# v7.6.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/signal memory tracking [#500](https://github.com/Quenty/NevermoreEngine/pull/500) ([@Quenty](https://github.com/Quenty))
-- feat: MemoryCategory is tracked properly in signal (Not sure what the perf implications of this are) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Selene doesn't know debug.getmemorycategory() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.5.0...@quenty/signal@7.6.0) (2024-09-25)
+
+
+### Bug Fixes
+
+* Selene doesn't know debug.getmemorycategory() ([0c613a3](https://github.com/Quenty/NevermoreEngine/commit/0c613a3ae0b6ba6a4cda511f572220bfa951c70d))
+
+
+### Features
+
+* MemoryCategory is tracked properly in signal (Not sure what the perf implications of this are) ([4d43b0c](https://github.com/Quenty/NevermoreEngine/commit/4d43b0c0c07fd5d24335b1801ca96c58d37ba149))
+
+
+
+
 
 # [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.4.0...@quenty/signal@7.5.0) (2024-09-25)
 
