@@ -46,6 +46,24 @@ end
 --[=[
 	Observes all available font names as they are added starting with
 	existing fonts.
+	@return Observable<string>
+]=]
+function FontPalette:ObserveFontNames()
+	return Rx.fromSignal(self.FontAdded):Pipe({
+		Rx.startFrom(function()
+			if self.Destroy then
+				return self:GetFontNames()
+			else
+				warn("[FontPalette.ObserveFontNames] - Calling when FontPalette is already dead")
+				return {}
+			end
+		end)
+	})
+end
+
+--[=[
+	Observes all available font names as they are added starting with
+	existing fonts.
 
 	@return Observable<Brio<string>>
 ]=]

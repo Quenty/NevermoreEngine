@@ -40,6 +40,14 @@ function ColorPalette:GetSwatchNames()
 end
 
 function ColorPalette:ObserveSwatchNames()
+	return Rx.fromSignal(self.ColorSwatchAdded):Pipe({
+		Rx.startFrom(function()
+			return self:GetSwatchNames()
+		end)
+	})
+end
+
+function ColorPalette:ObserveSwatchNameList()
 	return self._swatchMap:ObserveKeyList()
 end
 
@@ -51,8 +59,16 @@ function ColorPalette:GetGradeNames()
 	return self._colorGradeMap:GetKeyList()
 end
 
-function ColorPalette:ObserveGradeNames()
+function ColorPalette:ObserveGradeNameList()
 	return self._colorGradeMap:ObserveKeyList()
+end
+
+function ColorPalette:ObserveGradeNames()
+	return Rx.fromSignal(self.ColorGradeAdded):Pipe({
+		Rx.startFrom(function()
+			return self:GetGradeNames()
+		end)
+	})
 end
 
 function ColorPalette:ObserveGradeNamesBrio()
