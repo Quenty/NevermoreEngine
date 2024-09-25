@@ -44,25 +44,33 @@
 ]=]
 
 -- The currently idle thread to run the next handler on
-local freeRunnerThread = nil
+local freeRunnerThreadLookup = {}
 
 -- Function which acquires the currently idle handler runner thread, runs the
 -- function fn on it, and then releases the thread, returning it to being the
 -- currently idle one.
 -- If there was a currently idle runner thread already, that's okay, that old
 -- one will just get thrown and eventually GCed.
-local function acquireRunnerThreadAndCallEventHandler(fn, ...)
-	local acquiredRunnerThread = freeRunnerThread
-	freeRunnerThread = nil
+local function acquireRunnerThreadAndCallEventHandler(memoryCategory, fn, ...)
+	debug.setmemorycategory(memoryCategory)
+
+	local acquiredRunnerThread = freeRunnerThreadLookup[memoryCategory]
+	freeRunnerThreadLookup[memoryCategory] = nil
 	fn(...)
 	-- The handler finished running, this runner thread is free again.
-	freeRunnerThread = acquiredRunnerThread
+	freeRunnerThreadLookup[memoryCategory] = acquiredRunnerThread
 end
 
 -- Coroutine runner that we create coroutines of. The coroutine can be
 -- repeatedly resumed with functions to run followed by the argument to run
 -- them with.
-local function runEventHandlerInFreeThread()
+local function runEventHandlerInFreeThread(memoryCategory)
+	if #memoryCategory == 0 then
+		debug.setmemorycategory("signal_unknown")
+	else
+		debug.setmemorycategory(memoryCategory)
+	end
+
 	-- Note: We cannot use the initial set of arguments passed to
 	-- runEventHandlerInFreeThread for a call to the handler, because those
 	-- arguments would stay on the stack for the duration of the thread's
@@ -186,15 +194,17 @@ end
 	@param ... T -- Variable arguments to pass to handler
 ]=]
 function Signal:Fire(...)
+	local memoryCategory = debug.getmemorycategory()
+
 	local item = self._handlerListHead
 	while item do
 		if item._connected then
-			if not freeRunnerThread then
-				freeRunnerThread = coroutine.create(runEventHandlerInFreeThread)
+			if not freeRunnerThreadLookup[memoryCategory] then
+				freeRunnerThreadLookup[memoryCategory] = coroutine.create(runEventHandlerInFreeThread)
 				-- Get the freeRunnerThread to the first yield
-				coroutine.resume(freeRunnerThread)
+				coroutine.resume(freeRunnerThreadLookup[memoryCategory], memoryCategory)
 			end
-			task.spawn(freeRunnerThread, item._fn, ...)
+			task.spawn(freeRunnerThreadLookup[memoryCategory], memoryCategory, item._fn, ...)
 		end
 		item = item._next
 	end
