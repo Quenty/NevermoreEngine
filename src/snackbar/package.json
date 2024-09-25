@@ -48,7 +48,7 @@
     "@quenty/transitionmodel": "file:../transitionmodel",
     "@quenty/utf8": "file:../utf8",
     "@quenty/valueobject": "file:../valueobject",
-    "@quentystudios/t": "^3.0.1"
+    "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {
     "access": "public"
