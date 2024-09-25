@@ -7,10 +7,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Signal = require("Signal")
-local Table = require("Table")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
+local ObservableSet = require("ObservableSet")
 
 local FontPalette = setmetatable({}, BaseObject)
 FontPalette.ClassName = "FontPalette"
@@ -28,7 +27,9 @@ function FontPalette.new()
 	self._fontFaces = {}
 	self._defaultFontMap = {} -- [name] = Enum.Font.?
 
-	self.FontAdded = self._maid:Add(Signal.new()) -- :Fire(name)
+	self._fontKeys = self._maid:Add(ObservableSet.new())
+
+	self.FontAdded = assert(self._fontKeys.ItemAdded, "No ItemAdded") -- :Fire(name)
 
 	return self
 end
@@ -39,13 +40,12 @@ end
 	@return { string }
 ]=]
 function FontPalette:GetFontNames()
-	return Table.keys(self._fonts)
+	return self._fontKeys:GetList()
 end
 
 --[=[
 	Observes all available font names as they are added starting with
 	existing fonts.
-
 	@return Observable<string>
 ]=]
 function FontPalette:ObserveFontNames()
@@ -59,6 +59,16 @@ function FontPalette:ObserveFontNames()
 			end
 		end)
 	})
+end
+
+--[=[
+	Observes all available font names as they are added starting with
+	existing fonts.
+
+	@return Observable<Brio<string>>
+]=]
+function FontPalette:ObserveFontNamesBrio()
+	return self._fontKeys:ObserveItemsBrio()
 end
 
 --[=[
@@ -181,11 +191,8 @@ function FontPalette:DefineFont(fontName, defaultFont)
 		error("Bad defaultFont")
 	end
 
-	local fontValue = ValueObject.new(defaultFontEnum)
-	self._maid:GiveTask(fontValue)
-
-	local fontFaceValue = ValueObject.new(defaultFontFace)
-	self._maid:GiveTask(fontFaceValue)
+	local fontValue = self._maid:Add(ValueObject.new(defaultFontEnum))
+	local fontFaceValue = self._maid:Add(ValueObject.new(defaultFontFace))
 
 	self._fonts[fontName] = fontValue
 	self._fontFaces[fontName] = fontFaceValue
@@ -204,7 +211,7 @@ function FontPalette:DefineFont(fontName, defaultFont)
 		end
 	end))
 
-	self.FontAdded:Fire(fontName)
+	self._fontKeys:Add(fontName)
 
 	return fontValue
 end

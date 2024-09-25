@@ -26,7 +26,6 @@ function RxAttributeUtils.observeAttribute(instance, attributeName, defaultValue
 	assert(type(attributeName) == "string", "Bad attributeName")
 
 	return Observable.new(function(sub)
-		local maid = Maid.new()
 
 		local function handleAttributeChanged()
 			local attributeValue = instance:GetAttribute(attributeName)
@@ -37,10 +36,10 @@ function RxAttributeUtils.observeAttribute(instance, attributeName, defaultValue
 			end
 		end
 
-		maid:GiveTask(instance:GetAttributeChangedSignal(attributeName):Connect(handleAttributeChanged))
+		local connection = instance:GetAttributeChangedSignal(attributeName):Connect(handleAttributeChanged)
 		handleAttributeChanged()
 
-		return maid
+		return connection
 	end)
 end
 
