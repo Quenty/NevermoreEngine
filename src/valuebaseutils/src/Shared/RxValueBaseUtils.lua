@@ -60,6 +60,8 @@ end
 	@return Observable<T>
 ]=]
 function RxValueBaseUtils.observeValue(valueObject)
+	assert(typeof(valueObject) == "Instance", "Bad valueObject")
+
 	return RxInstanceUtils.observeProperty(valueObject, "Value")
 end
 
