@@ -194,6 +194,7 @@ end
 	@param ... T -- Variable arguments to pass to handler
 ]=]
 function Signal:Fire(...)
+	-- selene: allow(incorrect_standard_library_use)
 	local memoryCategory = debug.getmemorycategory()
 
 	local item = self._handlerListHead
