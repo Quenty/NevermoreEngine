@@ -5,7 +5,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local Workspace = game:GetService("Workspace")
-local UserInputService = game:GetService("UserInputService")
 local TeleportService = game:GetService("TeleportService")
 
 local AttributeValue = require("AttributeValue")
@@ -155,13 +154,7 @@ function SoftShutdownServiceClient:_showSoftShutdownUI(titleKey, subtitleKey, do
 end
 
 function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
-	-- Hide all other ui
-	if not UserInputService.ModalEnabled then
-		UserInputService.ModalEnabled = true
-		maid:GiveTask(function()
-			UserInputService.ModalEnabled = false
-		end)
-	end
+	maid:GiveTask(CoreGuiEnabler:PushDisable("ModalEnabled"))
 
 	local playerGui = PlayerGuiUtils.getPlayerGui()
 

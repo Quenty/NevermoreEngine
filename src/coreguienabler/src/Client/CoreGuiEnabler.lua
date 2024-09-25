@@ -193,6 +193,16 @@ function CoreGuiEnabler:Disable(key, coreGuiState)
 	end
 end
 
+function CoreGuiEnabler:PushDisable(coreGuiState)
+	local maid = Maid.new()
+
+	self:Disable(maid, coreGuiState)
+
+	return function()
+		maid:DoCleaning()
+	end
+end
+
 --[=[
 	Enables a state for a given key
 	@param key any

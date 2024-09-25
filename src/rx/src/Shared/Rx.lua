@@ -685,17 +685,22 @@ function Rx.defaultsTo(value)
 					sub:Fire(...)
 				end,
 				function(...)
-					fired = true
-					sub:Fire(value)
+					if not fired then
+						fired = true
+						sub:Fire(value)
+					end
 					sub:Fail(...)
 				end,
 				function(...)
-					fired = true
-					sub:Fire(value)
+					if not fired then
+						fired = true
+						sub:Fire(value)
+					end
 					sub:Complete(...)
 				end))
 
 			if not fired then
+				fired = true
 				sub:Fire(value)
 			end
 
