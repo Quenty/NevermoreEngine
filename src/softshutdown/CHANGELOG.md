@@ -1,25 +1,18 @@
-# v9.9.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
-- feat: Add PushDisable() to CoreGuiEnabler ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/unrooot/function-renaming ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.8.2...@quenty/softshutdown@9.9.0) (2024-09-25)
+
+
+### Features
+
+* Add PushDisable() to CoreGuiEnabler ([ed08e0e](https://github.com/Quenty/NevermoreEngine/commit/ed08e0e84517940ca82a8a31065c7fd30a8265e3))
+
+
+
+
 
 ## [9.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.8.1...@quenty/softshutdown@9.8.2) (2024-09-22)
 

@@ -1,27 +1,18 @@
-# v8.6.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Bulk rename `:format()` to `string.format()` [#497](https://github.com/Quenty/NevermoreEngine/pull/497) ([@unrooot](https://github.com/unrooot))
-- Merge branch 'main' into users/unrooot/function-renaming ([@unrooot](https://github.com/unrooot))
-- fix: Rename `:upper()` to `string.upper` ([@unrooot](https://github.com/unrooot))
-- refactor: Bulk rename `:format()` to `string.format()` ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.5.0...@quenty/playerutils@8.6.0) (2024-09-25)
+
+
+### Bug Fixes
+
+* Rename `:upper()` to `string.upper` ([2df557a](https://github.com/Quenty/NevermoreEngine/commit/2df557a9a5463c2c7beb257ff9f7786ac8ad746a))
+
+
+
+
 
 # [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.4.0...@quenty/playerutils@8.5.0) (2024-09-12)
 

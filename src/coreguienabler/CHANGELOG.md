@@ -1,20 +1,18 @@
-# v12.6.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
-- feat: Add PushDisable() to CoreGuiEnabler ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.5.0...@quenty/coreguienabler@12.6.0) (2024-09-25)
+
+
+### Features
+
+* Add PushDisable() to CoreGuiEnabler ([ed08e0e](https://github.com/Quenty/NevermoreEngine/commit/ed08e0e84517940ca82a8a31065c7fd30a8265e3))
+
+
+
+
 
 # [12.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.4.0...@quenty/coreguienabler@12.5.0) (2024-09-12)
 

@@ -1,19 +1,15 @@
-# v11.9.0 (Wed Sep 25 2024)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/unrooot/function-renaming ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.8.2...@quenty/viewport@11.9.0) (2024-09-25)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
 
 ## [11.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.8.1...@quenty/viewport@11.8.2) (2024-09-22)
 

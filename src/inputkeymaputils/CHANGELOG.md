@@ -1,26 +1,15 @@
-# v14.9.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Bulk rename `:format()` to `string.format()` [#497](https://github.com/Quenty/NevermoreEngine/pull/497) ([@unrooot](https://github.com/unrooot))
-- Merge branch 'main' into users/unrooot/function-renaming ([@unrooot](https://github.com/unrooot))
-- refactor: Bulk rename `:format()` to `string.format()` ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.8.2...@quenty/inputkeymaputils@14.9.0) (2024-09-25)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
 
 ## [14.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.8.1...@quenty/inputkeymaputils@14.8.2) (2024-09-22)
 

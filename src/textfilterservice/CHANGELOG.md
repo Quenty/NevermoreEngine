@@ -1,26 +1,18 @@
-# v13.7.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Bulk rename `:format()` to `string.format()` [#497](https://github.com/Quenty/NevermoreEngine/pull/497) ([@unrooot](https://github.com/unrooot))
-- Merge branch 'main' into users/unrooot/function-renaming ([@unrooot](https://github.com/unrooot))
-- fix: Rename `:gsub()` to `string.gsub` ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@13.6.0...@quenty/textfilterservice@13.7.0) (2024-09-25)
+
+
+### Bug Fixes
+
+* Rename `:gsub()` to `string.gsub` ([9a730cb](https://github.com/Quenty/NevermoreEngine/commit/9a730cbd7001706787c5e5db0efe2306b2234b3a))
+
+
+
+
 
 # [13.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@13.5.0...@quenty/textfilterservice@13.6.0) (2024-09-12)
 

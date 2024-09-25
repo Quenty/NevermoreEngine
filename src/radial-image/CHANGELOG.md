@@ -1,19 +1,15 @@
-# v9.6.0 (Wed Sep 25 2024)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/unrooot/function-renaming ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.5.2...@quenty/radial-image@9.6.0) (2024-09-25)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
 
 ## [9.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.5.1...@quenty/radial-image@9.5.2) (2024-09-22)
 

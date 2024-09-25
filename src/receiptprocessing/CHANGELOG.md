@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@7.6.1...@quenty/receiptprocessing@7.7.0) (2024-09-25)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
 ## [7.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@7.6.0...@quenty/receiptprocessing@7.6.1) (2024-09-20)
 
 **Note:** Version bump only for package @quenty/receiptprocessing

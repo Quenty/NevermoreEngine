@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.6.0...@quenty/adorneedata@7.7.0) (2024-09-25)
+
+**Note:** Version bump only for package @quenty/adorneedata
+
+
+
+
+
 # [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.5.0...@quenty/adorneedata@7.6.0) (2024-09-12)
 
 

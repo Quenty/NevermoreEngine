@@ -1,6 +1,6 @@
 {
   "name": "@quenty/transparencyservice",
-  "version": "11.4.0",
+  "version": "11.5.0",
   "description": "Service that orchistrates transparency setting from multiple colliding sources and handle the transparency appropriately. This means that 2 systems can work with transparency without knowing about each other.",
   "keywords": [
     "Roblox",

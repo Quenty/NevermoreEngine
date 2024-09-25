@@ -1,28 +1,19 @@
-# v14.8.0 (Wed Sep 25 2024)
-
-#### 🚀 Enhancement
-
-- fix: Rx.defaultsTo() would fire events during completion or fail, which it should not [#499](https://github.com/Quenty/NevermoreEngine/pull/499) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Bulk rename `:format()` to `string.format()` [#497](https://github.com/Quenty/NevermoreEngine/pull/497) ([@unrooot](https://github.com/unrooot))
-- Merge branch 'main' into users/unrooot/function-renaming ([@unrooot](https://github.com/unrooot))
-- fix: Fix syntax error ([@unrooot](https://github.com/unrooot))
-- fix: Fix renaming errors ([@unrooot](https://github.com/unrooot))
-- refactor: Bulk rename `:format()` to `string.format()` ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.7.1...@quenty/permissionprovider@14.8.0) (2024-09-25)
+
+
+### Bug Fixes
+
+* Fix renaming errors ([db49cf5](https://github.com/Quenty/NevermoreEngine/commit/db49cf5177c834efe284e3e4e4a0d97490866b03))
+* Fix syntax error ([496fc5b](https://github.com/Quenty/NevermoreEngine/commit/496fc5bb230a226ec6c86a8dfd025b8e326d92d8))
+
+
+
+
 
 ## [14.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.7.0...@quenty/permissionprovider@14.7.1) (2024-09-20)
 
