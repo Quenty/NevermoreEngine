@@ -35,6 +35,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
+    "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",

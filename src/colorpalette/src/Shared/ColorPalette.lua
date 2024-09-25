@@ -9,13 +9,11 @@ local ValueObject = require("ValueObject")
 local ColorSwatch = require("ColorSwatch")
 local ColorGradePalette = require("ColorGradePalette")
 local Rx = require("Rx")
-local Maid = require("Maid")
 local Blend = require("Blend")
 local Observable = require("Observable")
-local Signal = require("Signal")
-local Table = require("Table")
 local ColorGradeUtils = require("ColorGradeUtils")
 local LuvColor3Utils = require("LuvColor3Utils")
+local ObservableMap = require("ObservableMap")
 
 local ColorPalette = setmetatable({}, BaseObject)
 ColorPalette.ClassName = "ColorPalette"
@@ -25,43 +23,40 @@ function ColorPalette.new()
 	local self = setmetatable(BaseObject.new(), ColorPalette)
 
 	self._gradePalette = self._maid:Add(ColorGradePalette.new())
-	self._gradeMaid = self._maid:Add(Maid.new())
-	self._colorMaid = self._maid:Add(Maid.new())
-	self._vividMaid = self._maid:Add(Maid.new())
 
-	self._swatches = {}
+	self._swatchMap = self._maid:Add(ObservableMap.new())
+	self._colorGradeMap = self._maid:Add(ObservableMap.new())
 	self._colorValues = {}
-	self._colorGradeValues = {}
 	self._vividnessValues = {}
 
-	self.ColorSwatchAdded = self._maid:Add(Signal.new()) -- :Fire(name)
-	self.ColorGradeAdded = self._maid:Add(Signal.new()) -- :Fire(name)
+	self.ColorSwatchAdded = assert(self._swatchMap.KeyAdded, "No KeyAdded") -- :Fire(name)
+	self.ColorGradeAdded = assert(self._colorGradeMap.KeyAdded, "No KeyAdded") -- :Fire(name) -- :Fire(name)
 
 	return self
 end
 
 function ColorPalette:GetSwatchNames()
-	return Table.keys(self._swatches)
+	return self._swatchMap:GetKeyList()
 end
 
 function ColorPalette:ObserveSwatchNames()
-	return Rx.fromSignal(self.ColorSwatchAdded):Pipe({
-		Rx.startFrom(function()
-			return self:GetSwatchNames()
-		end)
-	})
+	return self._swatchMap:ObserveKeyList()
+end
+
+function ColorPalette:ObserveSwatchNamesBrio()
+	return self._swatchMap:ObserveKeysBrio()
 end
 
 function ColorPalette:GetGradeNames()
-	return Table.keys(self._colorGradeValues)
+	return self._colorGradeMap:GetKeyList()
 end
 
 function ColorPalette:ObserveGradeNames()
-	return Rx.fromSignal(self.ColorGradeAdded):Pipe({
-		Rx.startFrom(function()
-			return self:GetGradeNames()
-		end)
-	})
+	return self._colorGradeMap:ObserveKeyList()
+end
+
+function ColorPalette:ObserveGradeNamesBrio()
+	return self._colorGradeMap:ObserveKeysBrio()
 end
 
 function ColorPalette:GetColorValues()
@@ -130,7 +125,7 @@ function ColorPalette:SetDefaultSurfaceName(surfaceName)
 end
 
 function ColorPalette:GetColorSwatch(colorName)
-	local swatch = self._swatches[colorName]
+	local swatch = self._swatchMap:Get(colorName)
 	if not swatch then
 		error(string.format("No swatch with name %q", colorName))
 	end
@@ -236,7 +231,7 @@ function ColorPalette:GetColorValue(colorName)
 end
 
 function ColorPalette:GetGradeValue(gradeName)
-	local gradeValue = self._colorGradeValues[gradeName]
+	local gradeValue = self._colorGradeMap:Get(gradeName)
 	if not gradeValue then
 		error(string.format("No grade with name %q", gradeName))
 	end
@@ -273,7 +268,7 @@ end
 function ColorPalette:GetSwatch(swatchName)
 	assert(type(swatchName) == "string", "Bad swatchName")
 
-	local swatch = self._swatches[swatchName]
+	local swatch = self._swatchMap:Get(swatchName)
 	if not swatch then
 		error(string.format("No swatch with name %q", swatchName))
 	end
@@ -281,6 +276,10 @@ function ColorPalette:GetSwatch(swatchName)
 	return swatch
 end
 
+--[=[
+	@param colorName string
+	@param color Observable<Color3> | Color3
+]=]
 function ColorPalette:SetColor(colorName, color)
 	assert(type(colorName) == "string", "Bad colorName")
 
@@ -288,7 +287,7 @@ function ColorPalette:SetColor(colorName, color)
 		error(string.format("No color grade with name %q", colorName))
 	end
 
-	self._colorMaid[colorName] = self._colorValues[colorName]:Mount(color)
+	return self._colorValues[colorName]:Mount(color)
 end
 
 function ColorPalette:SetVividness(gradeName, vividness)
@@ -298,18 +297,19 @@ function ColorPalette:SetVividness(gradeName, vividness)
 		error(string.format("No vividness with name %q", gradeName))
 	end
 
-	self._vividMaid[gradeName] = self._vividnessValues[gradeName]:Mount(vividness)
+	return self._vividnessValues[gradeName]:Mount(vividness)
 end
 
 function ColorPalette:SetColorGrade(gradeName, grade)
 	assert(type(gradeName) == "string", "Bad colorName")
 	assert(grade, "Bad grade")
 
-	if not self._colorGradeValues[gradeName] then
+	local gradeValue = self._colorGradeMap:Get(gradeName)
+	if not gradeValue then
 		error(string.format("No color grade with name %q", gradeName))
 	end
 
-	self._gradeMaid[gradeName] = self._colorGradeValues[gradeName]:Mount(grade)
+	return gradeValue:Mount(grade)
 end
 
 
@@ -322,26 +322,21 @@ end
 function ColorPalette:DefineColorGrade(gradeName, gradeValue, vividnessValue)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
-	if self._colorGradeValues[gradeName] then
+	if self._colorGradeMap:Get(gradeName) then
 		warn(string.format("[ColorPalette.DefineColorGrade] - Already defined grade of name %q", gradeName))
 		return
 	end
 
-	local colorGrade = ValueObject.new(0, "number")
-	self._maid:GiveTask(colorGrade)
+	local colorGrade = self._maid:Add(ValueObject.new(0, "number"))
+	colorGrade:Mount(gradeValue or 0)
 
-	local vividness = ValueObject.new(nil)
-	self._maid:GiveTask(vividness)
+	local vividness = self._maid:Add(ValueObject.new(nil))
+	vividness:Mount(vividnessValue)
 
-	self._gradePalette:Add(gradeName, colorGrade, vividness)
-
-	self._colorGradeValues[gradeName] = colorGrade
 	self._vividnessValues[gradeName] = vividness
 
-	self:SetVividness(gradeName, vividnessValue)
-	self:SetColorGrade(gradeName, gradeValue or 0)
-
-	self.ColorGradeAdded:Fire(gradeName)
+	self._gradePalette:Add(gradeName, colorGrade, vividness)
+	self._colorGradeMap:Set(gradeName, colorGrade)
 
 	return colorGrade
 end
@@ -349,21 +344,17 @@ end
 function ColorPalette:DefineColorSwatch(colorName, value)
 	assert(type(colorName) == "string", "Bad colorName")
 
-	if self._swatches[colorName] then
+	if self._swatchMap:Get(colorName) then
 		warn(string.format("[ColorPalette.DefineColorGrade] -Already defined color of name %q", colorName))
 		return
 	end
 
-	local colorValue = ValueObject.new(value or Color3.new(0, 0, 0), "Color3")
-	self._maid:GiveTask(colorValue)
-
-	local colorSwatch = ColorSwatch.new(colorValue)
-	self._maid:GiveTask(colorSwatch)
+	local colorValue = self._maid:Add(ValueObject.new(value or Color3.new(0, 0, 0), "Color3"))
+	local colorSwatch = self._maid:Add(ColorSwatch.new(colorValue))
 
 	self._colorValues[colorName] = colorValue
-	self._swatches[colorName] = colorSwatch
 
-	self.ColorSwatchAdded:Fire(colorName)
+	self._swatchMap:Set(colorName, colorSwatch)
 
 	return colorSwatch
 end
