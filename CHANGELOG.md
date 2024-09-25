@@ -1,5 +1,22 @@
 # (Wed Sep 25 2024)
 
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Loek Gerrits ([@LDGerrits](https://github.com/LDGerrits)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/snackbar@11.9.1`
+  - fix: No matching version found for @quentystudios/t@^3.0.1 while installing @quenty/snackbar [#486](https://github.com/Quenty/NevermoreEngine/pull/486) ([@LDGerrits](https://github.com/LDGerrits))
+
+#### Authors: 1
+
+- Loek Gerrits ([@LDGerrits](https://github.com/LDGerrits))
+
+---
+
+# (Wed Sep 25 2024)
+
 #### 🚀 Enhancement
 
 - `@quenty/attributeutils@14.7.0`, `@quenty/colorpalette@10.8.0`, `@quenty/instanceutils@13.7.0`, `@quenty/signal@7.6.0`, `@quenty/trajectory@2.4.0`, `@quenty/valuebaseutils@13.7.0`, `@quenty/valueobject@13.7.0`
