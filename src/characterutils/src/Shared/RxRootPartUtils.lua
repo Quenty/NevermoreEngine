@@ -16,7 +16,10 @@ local RxRootPartUtils = {}
 	@return Brio<BasePart>
 ]=]
 function RxRootPartUtils.observeHumanoidRootPartBrio(character)
-	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", "HumanoidRootPart")
+	-- let's make a reasonable assumption here about name not changing
+	return RxInstanceUtils.observeChildrenBrio(character, function(part)
+		return part:IsA("BasePart") and part.Name == "HumanoidRootPart"
+	end)
 end
 
 --[=[
