@@ -58,7 +58,13 @@ function Counter:Add(amount)
 	if type(amount) == "number" then
 		self._count.Value = self._count.Value + amount
 
+		local cleanedUp = false
 		return function()
+			if cleanedUp then
+				return
+			end
+
+			cleanedUp = true
 			if self._count.Destroy then
 				self._count.Value = self._count.Value - amount
 			end
