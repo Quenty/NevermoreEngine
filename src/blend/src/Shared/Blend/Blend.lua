@@ -159,30 +159,32 @@ end
 	@return Observable<T>
 ]=]
 function Blend.Computed(...)
-	local values = {...}
 	local n = select("#", ...)
-	local compute = values[n]
-
+	local compute = select(n, ...)
 	assert(type(compute) == "function", "Bad compute")
 
-	local args = {}
-	for i=1, n - 1 do
-		local observable = Blend.toPropertyObservable(values[i])
-		if observable then
-			args[i] = observable
-		else
-			args[i] = Rx.of(values[i])
-		end
-	end
-
-	if #args == 0 then
+	if n == 1 then
 		-- static value?
 		return Observable.new(function(sub)
 			sub:Fire(compute())
 		end)
-	elseif #args == 1 then
-		return Rx.map(compute)(args[1])
+	elseif n == 2 then
+		local arg = ...
+		local observable = Blend.toPropertyObservable(arg) or Rx.of(arg)
+		return Rx.map(compute)(observable)
 	else
+		local args = table.create(n - 1)
+
+		for i=1, n - 1 do
+			local found = select(i, ...)
+			local observable = Blend.toPropertyObservable(found)
+			if observable then
+				args[i] = observable
+			else
+				args[i] = found
+			end
+		end
+
 		return Rx.combineLatest(args)
 			:Pipe({
 				Rx.map(function(result)
@@ -432,24 +434,26 @@ end
 	@return Observable?
 ]=]
 function Blend.toPropertyObservable(value)
-	if Observable.isObservable(value) then
-		return value
-	elseif typeof(value) == "Instance" then
-		-- IntValue, ObjectValue, et cetera
-		if ValueBaseUtils.isValueBase(value) then
-			return RxValueBaseUtils.observeValue(value)
-		end
-	elseif type(value) == "table" then
-		if ValueObject.isValueObject(value) then
-			return ValueObjectUtils.observeValue(value)
+	if type(value) == "table" then
+		if Observable.isObservable(value) then
+			return value
 		elseif Promise.isPromise(value) then
 			return Rx.fromPromise(value)
 		elseif value.Observe then
 			return value:Observe()
+		else
+			return nil
 		end
+	elseif typeof(value) == "Instance" then
+		-- IntValue, ObjectValue, et cetera
+		if ValueBaseUtils.isValueBase(value) then
+			return RxValueBaseUtils.observeValue(value)
+		else
+			return nil
+		end
+	else
+		return nil
 	end
-
-	return nil
 end
 
 --[=[
