@@ -149,7 +149,7 @@ function Maid:Add(task)
 	self[#self._tasks+1] = task
 
 	if type(task) == "table" and (not task.Destroy) then
-		warn("[Maid.GiveTask] - Gave table task without .Destroy\n\n" .. debug.traceback())
+		warn("[Maid.Add] - Gave table task without .Destroy\n\n" .. debug.traceback())
 	end
 
 	return task
