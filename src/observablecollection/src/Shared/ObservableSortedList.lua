@@ -58,11 +58,8 @@ function ObservableSortedList.new(isReversed, compare)
 
 	self._keyList = {} -- { [number]: Symbol } -- immutable
 
-	self._indexObservers = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._indexObservers)
-
-	self._contentIndexObservers = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._contentIndexObservers)
+	self._indexObservers = self._maid:Add(ObservableSubscriptionTable.new())
+	self._contentIndexObservers = self._maid:Add(ObservableSubscriptionTable.new())
 
 	self._sortValue = {} -- { [Symbol]: number }
 	self._contents = {} -- { [Symbol]: T }
@@ -127,6 +124,16 @@ function ObservableSortedList:Observe()
 	})
 end
 
+function ObservableSortedList:Contains(value)
+	-- TODO: Binary search
+	for _, item in pairs(self._contents) do
+		if item == value then
+			return true
+		end
+	end
+
+	return false
+end
 
 --[=[
 	Returns whether the value is an observable list
@@ -446,11 +453,11 @@ function ObservableSortedList:_updateIndex(key, item, newIndex)
 		error("Bad state")
 	end
 
-	local itemAdded = {
+	local itemAdded = table.freeze({
 		key = key;
 		newIndex = newIndex;
 		item = item;
-	}
+	})
 
 	-- ensure ourself is considered changed
 	table.insert(changed, itemAdded)
@@ -493,11 +500,11 @@ function ObservableSortedList:_removeItemByKey(key, item)
 	end
 	self._keyList[n] = nil
 
-	local itemRemoved = {
+	local itemRemoved = table.freeze({
 		key = key;
 		item = item;
 		previousIndex = index;
-	}
+	})
 
 	-- TODO: Defer item removed as a changed event?
 
