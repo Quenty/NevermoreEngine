@@ -44,7 +44,7 @@
 ]=]
 
 -- The currently idle thread to run the next handler on
-local freeRunnerThreadLookup = {}
+local weakFreeRunnerThreadLookup = setmetatable({}, {__mode = "kv"})
 
 -- Function which acquires the currently idle handler runner thread, runs the
 -- function fn on it, and then releases the thread, returning it to being the
@@ -54,11 +54,11 @@ local freeRunnerThreadLookup = {}
 local function acquireRunnerThreadAndCallEventHandler(memoryCategory, fn, ...)
 	debug.setmemorycategory(memoryCategory)
 
-	local acquiredRunnerThread = freeRunnerThreadLookup[memoryCategory]
-	freeRunnerThreadLookup[memoryCategory] = nil
+	local acquiredRunnerThread = weakFreeRunnerThreadLookup[memoryCategory]
+	weakFreeRunnerThreadLookup[memoryCategory] = nil
 	fn(...)
 	-- The handler finished running, this runner thread is free again.
-	freeRunnerThreadLookup[memoryCategory] = acquiredRunnerThread
+	weakFreeRunnerThreadLookup[memoryCategory] = acquiredRunnerThread
 end
 
 -- Coroutine runner that we create coroutines of. The coroutine can be
@@ -87,6 +87,8 @@ Connection.__index = Connection
 
 function Connection.new(signal, fn)
 	return setmetatable({
+		-- selene: allow(incorrect_standard_library_use)
+		_memoryCategory = debug.getmemorycategory(),
 		_connected = true,
 		_signal = signal,
 		_fn = fn,
@@ -194,18 +196,15 @@ end
 	@param ... T -- Variable arguments to pass to handler
 ]=]
 function Signal:Fire(...)
-	-- selene: allow(incorrect_standard_library_use)
-	local memoryCategory = debug.getmemorycategory()
-
 	local item = self._handlerListHead
 	while item do
 		if item._connected then
-			if not freeRunnerThreadLookup[memoryCategory] then
-				freeRunnerThreadLookup[memoryCategory] = coroutine.create(runEventHandlerInFreeThread)
+			if not weakFreeRunnerThreadLookup[item._memoryCategory] then
+				weakFreeRunnerThreadLookup[item._memoryCategory] = coroutine.create(runEventHandlerInFreeThread)
 				-- Get the freeRunnerThread to the first yield
-				coroutine.resume(freeRunnerThreadLookup[memoryCategory], memoryCategory)
+				coroutine.resume(weakFreeRunnerThreadLookup[item._memoryCategory], item._memoryCategory)
 			end
-			task.spawn(freeRunnerThreadLookup[memoryCategory], memoryCategory, item._fn, ...)
+			task.spawn(weakFreeRunnerThreadLookup[item._memoryCategory], item._memoryCategory, item._fn, ...)
 		end
 		item = item._next
 	end
@@ -224,11 +223,13 @@ end
 ]=]
 function Signal:Wait()
 	local waitingCoroutine = coroutine.running()
-	local cn;
-	cn = self:Connect(function(...)
-		cn:Disconnect()
+
+	local connection
+	connection = self:Connect(function(...)
+		connection:Disconnect()
 		task.spawn(waitingCoroutine, ...)
 	end)
+
 	return coroutine.yield()
 end
 
@@ -244,14 +245,14 @@ end
 	@return RBXScriptConnection
 ]=]
 function Signal:Once(fn)
-	local cn;
-	cn = self:Connect(function(...)
-		if cn._connected then
-			cn:Disconnect()
+	local connection
+	connection = self:Connect(function(...)
+		if connection._connected then
+			connection:Disconnect()
 		end
 		fn(...)
 	end)
-	return cn
+	return connection
 end
 
 --[=[
