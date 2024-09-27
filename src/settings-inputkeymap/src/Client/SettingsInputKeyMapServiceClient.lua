@@ -28,8 +28,7 @@ function SettingsInputKeyMapServiceClient:Start()
 			return
 		end
 
-		local maid = brio:ToMaid()
-		local inputKeyMapList = brio:GetValue()
+		local maid, inputKeyMapList = brio:ToMaidAndValue()
 
 		maid:GiveTask(InputKeyMapSettingClient.new(self._serviceBag, inputKeyMapList))
 	end))

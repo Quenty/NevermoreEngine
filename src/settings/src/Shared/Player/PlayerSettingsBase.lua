@@ -37,7 +37,7 @@ end
 	@return Player
 ]=]
 function PlayerSettingsBase:GetPlayer()
-	return self._obj.Parent
+	return self._obj:FindFirstAncestorWhichIsA("Player")
 end
 
 --[=[
