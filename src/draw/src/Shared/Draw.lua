@@ -357,7 +357,7 @@ function Draw.updateRay(rayPart, ray, color, diameter)
 	assert(typeof(rayPart) == "Instance", "Bad rayPart")
 	assert(typeof(ray) == "Ray", "Bad typeof(ray) for Ray")
 	color = Draw._toColor3(color) or rayPart.Color
-	diameter = diameter or rayPart.Size.x
+	diameter = diameter or rayPart.Size.z
 
 	local rayCenter = ray.Origin + ray.Direction/2
 	local distance = ray.Direction.Magnitude
@@ -366,11 +366,11 @@ function Draw.updateRay(rayPart, ray, color, diameter)
 	rayPart.Size = Vector3.new(distance, diameter, diameter)
 	rayPart.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(0, math.pi/2, 0)
 
-	local lineHandleAdornment = rayPart:FindFirstChildWhichIsA("CylinderHandleAdornment")
-	if lineHandleAdornment then
-		lineHandleAdornment.Height = ray.Direction.Magnitude
-		lineHandleAdornment.Radius = 5*diameter
-		lineHandleAdornment.Color3 = color
+	local cylinderHandleAdornment = rayPart:FindFirstChildWhichIsA("CylinderHandleAdornment")
+	if cylinderHandleAdornment then
+		cylinderHandleAdornment.Height = ray.Direction.Magnitude
+		cylinderHandleAdornment.Radius = diameter/4
+		cylinderHandleAdornment.Color3 = color
 	end
 
 	local partSize = rayPart.Size
