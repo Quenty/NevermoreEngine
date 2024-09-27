@@ -212,6 +212,13 @@ function RoguePropertyTable:__newindex(index, value)
 		error("Cannot set .Changed event")
 	elseif RoguePropertyTable[index] then
 		error(string.format("Cannot set %q", tostring(index)))
+	elseif type(index) == "string" then
+		local property = self:GetRogueProperty(index)
+		if not property then
+			error(string.format("Bad index %q", tostring(index)))
+		end
+
+		error(string.format("Use RoguePropertyTable.%s.Value to assign", index))
 	else
 		error(string.format("Bad index %q", tostring(index)))
 	end
