@@ -82,6 +82,14 @@ function PerformanceUtils.countCalls(label, object, method)
 	end
 end
 
+function PerformanceUtils.countLibraryCalls(prefix, library)
+	for key, value in pairs(library) do
+		if type(value) == "function" then
+			PerformanceUtils.countCalls(prefix .. "_" .. key, library, key)
+		end
+	end
+end
+
 function PerformanceUtils.countCallTime(label, object, method)
 	PerformanceUtils.setLabelFormat(label, PerformanceUtils.formatAsMilliseconds)
 	PerformanceUtils.countCalls(label .. "_calls", object, method)
