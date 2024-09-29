@@ -119,7 +119,13 @@ end
 	@return Observable<string>
 ]=]
 function TranslatorService:ObserveLocaleId()
-	return self._translator:Observe():Pipe({
+	if self._localeIdValue then
+		return self._localeIdValue:Observe()
+	end
+
+	self._localeIdValue = self._maid:Add(ValueObject.new("en-us", "string"))
+
+	self._localeIdValue:Mount(self._translator:Observe():Pipe({
 		Rx.switchMap(function(translator)
 			if translator then
 				return RxInstanceUtils.observeProperty(translator, "LocaleId")
@@ -137,7 +143,9 @@ function TranslatorService:ObserveLocaleId()
 			end
 		end);
 		Rx.distinct();
-	})
+	}))
+
+	return self._localeIdValue:Observe()
 end
 
 --[=[
