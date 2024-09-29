@@ -26,7 +26,6 @@ function RxAttributeUtils.observeAttribute(instance, attributeName, defaultValue
 	assert(type(attributeName) == "string", "Bad attributeName")
 
 	return Observable.new(function(sub)
-
 		local function handleAttributeChanged()
 			local attributeValue = instance:GetAttribute(attributeName)
 			if attributeValue == nil then
