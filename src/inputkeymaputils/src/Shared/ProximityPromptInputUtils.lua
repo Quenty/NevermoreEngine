@@ -10,6 +10,7 @@ local InputKeyMapList = require("InputKeyMapList")
 local InputModeTypes = require("InputModeTypes")
 local InputKeyMap = require("InputKeyMap")
 local InputModeType = require("InputModeType")
+local SlottedTouchButtonUtils = require("SlottedTouchButtonUtils")
 
 local ProximityPromptInputUtils = {}
 
@@ -25,7 +26,7 @@ function ProximityPromptInputUtils.newInputKeyMapFromPrompt(prompt)
 	return InputKeyMapList.new("custom", {
 		InputKeyMap.new(InputModeTypes.Gamepads, { prompt.GamepadKeyCode });
 		InputKeyMap.new(InputModeTypes.KeyboardAndMouse, { prompt.KeyboardKeyCode });
-		InputKeyMap.new(InputModeTypes.Touch, { "Tap" });
+		InputKeyMap.new(InputModeTypes.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary1") });
 	}, {
 		bindingName = prompt.ActionText;
 		rebindable = false;
