@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
 local Rx = require("Rx")
+local RxSignal = require("RxSignal")
 
 local SettingProperty = {}
 SettingProperty.ClassName = "SettingProperty"
@@ -69,15 +70,11 @@ function SettingProperty:__index(index)
 			return self._definition:GetDefaultValue()
 		end
 	elseif index == "Changed" then
-		return {
-			Connect = function(callback)
-				return self:Observe():Pipe({
+		return RxSignal.new(self:Observe():Pipe({
 					-- TODO: Handle scenario where we're loading and .Value changes because of what
 					-- we queried.
 					Rx.skip(1);
-				}):Subscribe(callback)
-			end;
-		}
+				}))
 	elseif index == "DefaultValue" then
 		return self._definition:GetDefaultValue()
 	elseif SettingProperty[index] then

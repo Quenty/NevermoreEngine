@@ -42,6 +42,7 @@
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
     "@quenty/rxbinderutils": "file:../rxbinderutils",
+    "@quenty/rxsignal": "file:../rxsignal",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
