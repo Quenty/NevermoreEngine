@@ -83,7 +83,9 @@ end
 	@within AttributeValue
 ]=]
 function AttributeValue:__index(index)
-	if index == "Value" then
+	if AttributeValue[index] then
+		return AttributeValue[index]
+	elseif index == "Value" then
 		local result = self._object:GetAttribute(rawget(self, "_attributeName"))
 		local default = rawget(self, "_defaultValue")
 		if result == nil then
@@ -95,8 +97,6 @@ function AttributeValue:__index(index)
 		return self._object:GetAttributeChangedSignal(self._attributeName)
 	elseif index == "AttributeName" then
 		return rawget(self, "_attributeName")
-	elseif AttributeValue[index] then
-		return AttributeValue[index]
 	else
 		error(string.format("%q is not a member of AttributeValue", tostring(index)))
 	end
