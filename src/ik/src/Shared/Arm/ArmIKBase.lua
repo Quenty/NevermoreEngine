@@ -120,8 +120,7 @@ function ArmIKBase:_ensureAnimator(character, partName, motorName, getTranform)
 			return
 		end
 
-		local maid = brio:ToMaid()
-		local motor6DStack = brio:GetValue()
+		local maid, motor6DStack = brio:ToMaidAndValue()
 
 		local transformer = Motor6DSmoothTransformer.new(getTranform)
 		transformer:SetTarget(1)
