@@ -26,9 +26,18 @@ function BrioUtils.clone(brio)
 
 	local newBrio = Brio.new(brio:GetValue())
 
-	newBrio:ToMaid():GiveTask(brio:GetDiedSignal():Connect(function()
+	local connection
+	local otherConnection
+	connection = brio:GetDiedSignal():Connect(function()
+		connection:Disconnect()
+		otherConnection:Disconnect()
 		newBrio:Kill()
-	end))
+	end)
+
+	otherConnection = newBrio:GetDiedSignal():Connect(function()
+		otherConnection:Disconnect()
+		connection:Disconnect()
+	end)
 
 	return newBrio
 end
