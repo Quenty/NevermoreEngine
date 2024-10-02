@@ -237,7 +237,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableSortedList:ObserveIndexByKey(key)
-	assert(type(key) == "userdata", "Bad key")
+	assert(Symbol.isSymbol(key), "Bad key")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -296,9 +296,9 @@ end
 	@return { T }
 ]=]
 function ObservableSortedList:GetList()
-	local list = {}
-	for _, key in pairs(self._keyList) do
-		table.insert(list, self._contents[key])
+	local list = table.create(#self._keyList)
+	for index, key in pairs(self._keyList) do
+		list[index] = self._contents[key]
 	end
 	return list
 end

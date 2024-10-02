@@ -132,7 +132,7 @@ end
 	@return { TKey }
 ]=]
 function ObservableMapSet:GetKeyList()
-	local list = {}
+	local list = table.create(self._setCount.Value)
 	for key, _ in pairs(self._observableSetMap) do
 		table.insert(list, key)
 	end
