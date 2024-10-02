@@ -6,14 +6,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local GoodSignal = require("GoodSignal")
-local Maid = require("Maid")
-local Observable = require("Observable")
-local ValueBaseUtils = require("ValueBaseUtils")
-local RxValueBaseUtils = require("RxValueBaseUtils")
 local Brio = require("Brio")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
 local MaidTaskUtils = require("MaidTaskUtils")
+local Observable = require("Observable")
+local RxValueBaseUtils = require("RxValueBaseUtils")
+local Signal = require("Signal")
+local ValueBaseUtils = require("ValueBaseUtils")
 
 local EMPTY_FUNCTION = function() end
 
@@ -23,18 +23,25 @@ ValueObject.ClassName = "ValueObject"
 --[=[
 	Constructs a new value object
 	@param baseValue T
-	@param checkType string | nil
+	@param checkType string | nil | (value: T) -> (boolean, string)
 	@return ValueObject
 ]=]
 function ValueObject.new(baseValue, checkType)
-	local self = {
+	local self = setmetatable({
 		_value = baseValue;
 		_checkType = checkType;
-	}
+	}, ValueObject)
 
-	if checkType and typeof(baseValue) ~= checkType then
-		error(string.format("Expected value of type %q, got %q instead", checkType, typeof(baseValue)))
+	if type(checkType) == "stirng" then
+		if typeof(baseValue) ~= checkType then
+			error(string.format("Expected value of type %q, got %q instead", checkType, typeof(baseValue)))
+		end
+	elseif type(checkType) == "function" then
+		assert(checkType(baseValue))
 	end
+
+	return self
+end
 
 --[=[
 	Event fires when the value's object value change
@@ -42,14 +49,10 @@ function ValueObject.new(baseValue, checkType)
 	@within ValueObject
 ]=]
 
-	return setmetatable(self, ValueObject)
-end
-
-
 --[=[
 	Returns the current check type, if any
 
-	@return string | nil
+	@return string | nil | (value: T) -> (boolean, string)
 ]=]
 function ValueObject:GetCheckType()
 	return rawget(self, "_checkType")
@@ -236,8 +239,12 @@ function ValueObject:SetValue(value, ...)
 	local previous = rawget(self, "_value")
 	local checkType = rawget(self, "_checkType")
 
-	if checkType and typeof(value) ~= checkType then
-		error(string.format("Expected value of type %q, got %q instead", checkType, typeof(value)))
+	if type(checkType) == "string" then
+		if typeof(value) ~= checkType then
+			error(string.format("Expected value of type %q, got %q instead", checkType, typeof(value)))
+		end
+	elseif typeof(checkType) == "function" then
+		assert(checkType(value))
 	end
 
 	if previous ~= value then
@@ -261,19 +268,19 @@ end
 	@within ValueObject
 ]=]
 function ValueObject:__index(index)
-	if index == "Value" then
+	if ValueObject[index] then
+		return ValueObject[index]
+	elseif index == "Value" then
 		return self._value
 	elseif index == "Changed" then
 		-- Defer construction of Changed event until something needs it, since a lot
 		-- of times we don't need it
 
-		local signal = GoodSignal.new() -- :Fire(newValue, oldValue, ...)
+		local signal = Signal.new() -- :Fire(newValue, oldValue, ...)
 
 		rawset(self, "Changed", signal)
 
 		return signal
-	elseif ValueObject[index] then
-		return ValueObject[index]
 	elseif index == "LastEventContext" then
 		local args = rawget(self, "_lastEventContext")
 		if args then
@@ -307,12 +314,13 @@ end
 function ValueObject:Destroy()
 	rawset(self, "_value", nil)
 
+	self:_cleanupLastMountedSub()
+
 	-- Avoid using a maid here because we make a LOT of ValueObjects
 	local changed = rawget(self, "Changed")
 	if changed then
 		changed:Destroy()
 	end
-	self:_cleanupLastMountedSub()
 
 	setmetatable(self, nil)
 end
