@@ -90,9 +90,7 @@ end
 	@return Brio
 ]=]
 function Brio.new(...) -- Wrap
-	return setmetatable({
-		_values = table.pack(...);
-	}, Brio)
+	return setmetatable(table.pack(...), Brio)
 end
 
 --[=[
@@ -159,7 +157,7 @@ end
 	@return boolean
 ]=]
 function Brio:IsDead()
-	return self._values == nil
+	return self.n == nil
 end
 
 --[=[
@@ -170,7 +168,7 @@ end
 	```
 ]=]
 function Brio:ErrorIfDead()
-	if not self._values then
+	if not self.n then
 		error("[Brio.ErrorIfDead] - Brio is dead")
 	end
 end
@@ -195,7 +193,7 @@ end
 	@return Maid
 ]=]
 function Brio:ToMaid()
-	assert(self._values ~= nil, "Brio is dead")
+	assert(self.n ~= nil, "Brio is dead")
 
 	local maid = Maid.new()
 
@@ -229,9 +227,9 @@ end
 	@return any
 ]=]
 function Brio:GetValue()
-	assert(self._values, "Brio is dead")
+	assert(self.n, "Brio is dead")
 
-	return unpack(self._values, 1, self._values.n)
+	return unpack(self, 1, self.n)
 end
 
 --[=[
@@ -241,9 +239,9 @@ end
 	@return { n: number, ... T }
 ]=]
 function Brio:GetPackedValues()
-	assert(self._values, "Brio is dead")
+	assert(self.n, "Brio is dead")
 
-	return self._values
+	return self
 end
 
 --[=[
@@ -262,16 +260,19 @@ end
 	```
 ]=]
 function Brio:Destroy()
-	if not self._values then
+	if not self.n then
 		return
 	end
 
-	self._values = nil
+	local diedEvent = self._diedEvent
 
-	if self._diedEvent then
-		self._diedEvent:Fire()
-		self._diedEvent:Destroy()
-		self._diedEvent = nil
+	table.clear(self)
+	table.freeze(self)
+
+	if diedEvent then
+		diedEvent:Fire()
+		diedEvent:Destroy()
+		diedEvent = nil
 	end
 end
 
