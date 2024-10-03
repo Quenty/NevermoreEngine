@@ -13,11 +13,10 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local String = require("String")
 local Symbol = require("Symbol")
-local TiePropertyChangedSignalConnection = require("TiePropertyChangedSignalConnection")
 local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
 local TieUtils = require("TieUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
-local ValueObject = require("ValueObject")
+local RxSignal = require("RxSignal")
 local TieMemberInterface = require("TieMemberInterface")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
@@ -119,21 +118,9 @@ function TiePropertyInterface:_getFullName()
 end
 
 function TiePropertyInterface:_getChangedEvent()
-	return {
-		Connect = function(_, callback)
-			assert(type(callback) == "function", "Bad callback")
-			return TiePropertyChangedSignalConnection.new(function(connMaid)
-				local valueObject = connMaid:Add(ValueObject.new(nil)		)
-
-				connMaid:GiveTask(self:Observe():Subscribe(function(value)
-					valueObject.Value = value
-				end))
-
-				-- After observing, so we can emit only changes.
-				connMaid:GiveTask(valueObject.Changed:Connect(callback))
-			end)
-		end;
-	}
+	return RxSignal.new(self:Observe():Pipe({
+		Rx.skip(1)
+	}))
 end
 
 local IMPLEMENTATION_TYPES = {
