@@ -204,7 +204,7 @@ function GameConfigPicker:PromisePriceInRobux(assetType, assetIdOrKey)
 			return asset:PromiseCloudPriceInRobux()
 		end
 
-		return GameConfigAssetUtils.promiseCloudDataForAssetType(assetType, assetIdOrKey)
+		return GameConfigAssetUtils.promiseCloudDataForAssetType(self._serviceBag, assetType, assetIdOrKey)
 			:Then(function(cloudData)
 				if type(cloudData.PriceInRobux) == "number" then
 					return cloudData.PriceInRobux

@@ -259,7 +259,7 @@ function GameConfigAssetBase:_observeCloudDataFromState()
 end
 
 function GameConfigAssetBase:_promiseCloudDataForState(state)
-	return GameConfigAssetUtils.promiseCloudDataForAssetType(state.assetType, state.assetId)
+	return GameConfigAssetUtils.promiseCloudDataForAssetType(self._serviceBag, state.assetType, state.assetId)
 end
 
 return GameConfigAssetBase
