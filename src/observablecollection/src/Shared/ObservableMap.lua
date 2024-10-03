@@ -184,10 +184,9 @@ function ObservableMap:ObserveAtKeyBrio(key)
 	assert(key ~= nil, "Bad key")
 
 	return self:ObserveAtKey(key):Pipe({
-		RxBrioUtils.toBrio();
-		RxBrioUtils.where(function(value)
+		RxBrioUtils.switchToBrio(function(value)
 			return value ~= nil
-		end)
+		end);
 	})
 end
 
@@ -275,7 +274,7 @@ end
 	@return { TValue }
 ]=]
 function ObservableMap:GetValueList()
-	local list = {}
+	local list = table.create(self._countValue.Value)
 	for _, value in pairs(self._map) do
 		table.insert(list, value)
 	end
@@ -287,7 +286,7 @@ end
 	@return { TKey }
 ]=]
 function ObservableMap:GetKeyList()
-	local list = {}
+	local list = table.create(self._countValue.Value)
 	for key, _ in pairs(self._map) do
 		table.insert(list, key)
 	end
@@ -303,7 +302,10 @@ function ObservableMap:ObserveKeyList()
 		local topMaid = Maid.new()
 
 		-- TODO: maybe don't allocate as much here?
-		local keyList = {}
+		local keyList = table.create(self._countValue.Value)
+		for key, _ in pairs(self._map) do
+			table.insert(keyList, key)
+		end
 
 		topMaid:GiveTask(self.KeyAdded:Connect(function(addedKey)
 			table.insert(keyList, addedKey)
@@ -317,10 +319,6 @@ function ObservableMap:ObserveKeyList()
 			end
 			sub:Fire(table.clone(keyList))
 		end))
-
-		for key, _ in pairs(self._map) do
-			table.insert(keyList, key)
-		end
 
 		sub:Fire(table.clone(keyList))
 
