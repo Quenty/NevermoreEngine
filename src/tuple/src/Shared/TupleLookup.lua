@@ -16,6 +16,7 @@ function TupleLookup.new()
 	local self = setmetatable({}, TupleLookup)
 
 	self._tuples = setmetatable({}, { __mode = "k"})
+	self._singleArgTuples = setmetatable({}, { __mode = "kv"})
 
 	return self
 end
@@ -27,6 +28,14 @@ end
 	@return Tuple<T>
 ]=]
 function TupleLookup:ToTuple(...)
+	local n = select("#", ...)
+	if n == 1 then
+		local arg = ...
+		if self._singleArgTuples[arg] then
+			return self._singleArgTuples[arg]
+		end
+	end
+
 	local created = Tuple.new(...)
 
 	for item, _ in pairs(self._tuples) do
@@ -35,6 +44,9 @@ function TupleLookup:ToTuple(...)
 		end
 	end
 
+	if n == 1 then
+		self._singleArgTuples[...] = created
+	end
 	self._tuples[created] = true
 
 	return created

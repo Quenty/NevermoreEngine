@@ -30,7 +30,9 @@ function MarketplaceServiceCache:_ensureInit()
 		return
 	end
 
-	self._promiseProductInfo = MemorizeUtils.memoize(MarketplaceUtils.promiseProductInfo)
+	self._promiseProductInfo = MemorizeUtils.memoize(MarketplaceUtils.promiseProductInfo, {
+		maxSize = 2048;
+	})
 end
 
 return MarketplaceServiceCache
