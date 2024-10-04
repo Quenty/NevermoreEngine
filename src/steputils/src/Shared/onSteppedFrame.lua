@@ -15,11 +15,5 @@ local RunService = game:GetService("RunService")
 return function(func)
 	assert(type(func) == "function", "Bad func")
 
-	local conn
-	conn = RunService.Stepped:Connect(function()
-		conn:Disconnect()
-		func()
-	end)
-
-	return conn
+	return RunService.Stepped:Once(func)
 end
