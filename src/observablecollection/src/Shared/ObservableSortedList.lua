@@ -58,11 +58,8 @@ function ObservableSortedList.new(isReversed, compare)
 
 	self._keyList = {} -- { [number]: Symbol } -- immutable
 
-	self._indexObservers = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._indexObservers)
-
-	self._contentIndexObservers = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._contentIndexObservers)
+	self._indexObservers = self._maid:Add(ObservableSubscriptionTable.new())
+	self._contentIndexObservers = self._maid:Add(ObservableSubscriptionTable.new())
 
 	self._sortValue = {} -- { [Symbol]: number }
 	self._contents = {} -- { [Symbol]: T }
@@ -127,6 +124,16 @@ function ObservableSortedList:Observe()
 	})
 end
 
+function ObservableSortedList:Contains(value)
+	-- TODO: Binary search
+	for _, item in pairs(self._contents) do
+		if item == value then
+			return true
+		end
+	end
+
+	return false
+end
 
 --[=[
 	Returns whether the value is an observable list
@@ -230,7 +237,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableSortedList:ObserveIndexByKey(key)
-	assert(type(key) == "userdata", "Bad key")
+	assert(Symbol.isSymbol(key), "Bad key")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -289,9 +296,9 @@ end
 	@return { T }
 ]=]
 function ObservableSortedList:GetList()
-	local list = {}
-	for _, key in pairs(self._keyList) do
-		table.insert(list, self._contents[key])
+	local list = table.create(#self._keyList)
+	for index, key in pairs(self._keyList) do
+		list[index] = self._contents[key]
 	end
 	return list
 end
@@ -307,41 +314,27 @@ end
 --[=[
 	Adds the item to the list at the specified index
 	@param item T
-	@param observeValue Observable<Comparable>
+	@param observeValue Observable<Comparable> | Comparable
 	@return callback -- Call to remove
 ]=]
 function ObservableSortedList:Add(item, observeValue)
 	assert(item ~= nil, "Bad item")
-	assert(Observable.isObservable(observeValue), "Bad observeValue")
+	assert(Observable.isObservable(observeValue) or observeValue ~= nil, "Bad observeValue")
 
 	local key = Symbol.named("entryKey")
 	local maid = Maid.new()
 
 	self._contents[key] = item
 
-	maid:GiveTask(observeValue:Subscribe(function(sortValue)
-		self:_debugVerifyIntegrity()
-
-		if sortValue ~= nil then
-			local currentIndex = self._indexes[key]
-			local targetIndex = self:_findCorrectIndex(sortValue, currentIndex)
-
-			self._sortValue[key] = sortValue
-			self:_updateIndex(key, item, targetIndex, sortValue)
-		else
-			local observableSubs = self._keyObservables[key]
-
-			-- calling this also may unsubscribe some observables.
-			self:_removeItemByKey(key, item)
-
-			if observableSubs then
-				-- fire nil index
-				self:_fireSubs(observableSubs, nil)
-			end
-		end
-
-		self:_debugVerifyIntegrity()
-	end))
+	if Observable.isObservable(observeValue) then
+		maid:GiveTask(observeValue:Subscribe(function(sortValue)
+			self:_assignSortValue(key, item, sortValue)
+		end))
+	elseif observeValue ~= nil then
+		self:_assignSortValue(key, item, observeValue)
+	else
+		error("Bad observeValue")
+	end
 
 	maid:GiveTask(function()
 		local observableSubs = self._keyObservables[key]
@@ -364,6 +357,31 @@ function ObservableSortedList:Add(item, observeValue)
 		self._maid[key] = nil
 	end
 end
+
+function ObservableSortedList:_assignSortValue(key, item, sortValue)
+	self:_debugVerifyIntegrity()
+
+	if sortValue ~= nil then
+		local currentIndex = self._indexes[key]
+		local targetIndex = self:_findCorrectIndex(sortValue, currentIndex)
+
+		self._sortValue[key] = sortValue
+		self:_updateIndex(key, item, targetIndex, sortValue)
+	else
+		local observableSubs = self._keyObservables[key]
+
+		-- calling this also may unsubscribe some observables.
+		self:_removeItemByKey(key, item)
+
+		if observableSubs then
+			-- fire nil index
+			self:_fireSubs(observableSubs, nil)
+		end
+	end
+
+	self:_debugVerifyIntegrity()
+end
+
 
 --[=[
 	Gets the current item at the index, or nil if it is not defined.
@@ -446,11 +464,11 @@ function ObservableSortedList:_updateIndex(key, item, newIndex)
 		error("Bad state")
 	end
 
-	local itemAdded = {
+	local itemAdded = table.freeze({
 		key = key;
 		newIndex = newIndex;
 		item = item;
-	}
+	})
 
 	-- ensure ourself is considered changed
 	table.insert(changed, itemAdded)
@@ -493,11 +511,11 @@ function ObservableSortedList:_removeItemByKey(key, item)
 	end
 	self._keyList[n] = nil
 
-	local itemRemoved = {
+	local itemRemoved = table.freeze({
 		key = key;
 		item = item;
 		previousIndex = index;
-	}
+	})
 
 	-- TODO: Defer item removed as a changed event?
 

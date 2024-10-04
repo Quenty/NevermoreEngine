@@ -24,7 +24,7 @@ local Subscription = {}
 Subscription.ClassName = "Subscription"
 Subscription.__index = Subscription
 
-local stateTypes = {
+local SubscriptionStateTypes = {
 	PENDING = "pending";
 	FAILED = "failed";
 	COMPLETE = "complete";
@@ -46,8 +46,8 @@ function Subscription.new(fireCallback, failCallback, completeCallback, observab
 	assert(type(completeCallback) == "function" or completeCallback == nil, "Bad completeCallback")
 
 	return setmetatable({
-		_state = stateTypes.PENDING;
-		_source = ENABLE_STACK_TRACING and debug.traceback() or nil;
+		_state = SubscriptionStateTypes.PENDING;
+		_source = if ENABLE_STACK_TRACING then debug.traceback() else nil;
 		_observableSource = observableSource;
 		_fireCallback = fireCallback;
 		_failCallback = failCallback;
@@ -61,11 +61,11 @@ end
 	@param ... any
 ]=]
 function Subscription:Fire(...)
-	if self._state == stateTypes.PENDING then
+	if self._state == SubscriptionStateTypes.PENDING then
 		if self._fireCallback then
 			self._fireCallback(...)
 		end
-	elseif self._state == stateTypes.CANCELLED then
+	elseif self._state == SubscriptionStateTypes.CANCELLED then
 		warn("[Subscription.Fire] - We are cancelled, but events are still being pushed")
 
 		if ENABLE_STACK_TRACING then
@@ -80,11 +80,11 @@ end
 	Fails the subscription, preventing anything else from emitting.
 ]=]
 function Subscription:Fail()
-	if self._state ~= stateTypes.PENDING then
+	if self._state ~= SubscriptionStateTypes.PENDING then
 		return
 	end
 
-	self._state = stateTypes.FAILED
+	self._state = SubscriptionStateTypes.FAILED
 
 	if self._failCallback then
 		self._failCallback()
@@ -152,11 +152,11 @@ end
 	emitted.
 ]=]
 function Subscription:Complete()
-	if self._state ~= stateTypes.PENDING then
+	if self._state ~= SubscriptionStateTypes.PENDING then
 		return
 	end
 
-	self._state = stateTypes.COMPLETE
+	self._state = SubscriptionStateTypes.COMPLETE
 	if self._completeCallback then
 		self._completeCallback()
 	end
@@ -169,26 +169,34 @@ end
 	@return boolean
 ]=]
 function Subscription:IsPending()
-	return self._state == stateTypes.PENDING
+	return self._state == SubscriptionStateTypes.PENDING
 end
 
 function Subscription:_assignCleanup(task)
-	assert(not self._cleanupTask, "Already have _cleanupTask")
+	assert(self._cleanupTask == nil, "Already have _cleanupTask")
 
-	if task then
-		if self._state ~= stateTypes.PENDING then
+	if MaidTaskUtils.isValidTask(task) then
+		if self._state ~= SubscriptionStateTypes.PENDING then
 			MaidTaskUtils.doTask(task)
 			return
 		end
 
 		self._cleanupTask = task
+	elseif task ~= nil then
+		error("Bad cleanup task")
 	end
 end
 
 function Subscription:_doCleanup()
-	if self._cleanupTask then
-		local task = self._cleanupTask
-		self._cleanupTask = nil
+	local task = self._cleanupTask
+	if not task then
+		return
+	end
+
+	self._cleanupTask = nil
+
+	-- The validity can change
+	if MaidTaskUtils.isValidTask(task) then
 		MaidTaskUtils.doTask(task)
 	end
 end
@@ -202,8 +210,8 @@ end
 	:::
 ]=]
 function Subscription:Destroy()
-	if self._state == stateTypes.PENDING then
-		self._state = stateTypes.CANCELLED
+	if self._state == SubscriptionStateTypes.PENDING then
+		self._state = SubscriptionStateTypes.CANCELLED
 	end
 
 	self:_doCleanup()

@@ -20,14 +20,17 @@ GameConfigPicker.__index = GameConfigPicker
 --[=[
 	Constructs a new game config picker. Should be gotten by [GameConfigService].
 
+	@param serviceBag ServiceBag
 	@param gameConfigBinder Binder<GameConfig>
 	@param gameConfigAssetBinder Binder<GameConfigAsset>
+	@return GameConfigPicker
 ]=]
-function GameConfigPicker.new(gameConfigBinder, gameConfigAssetBinder)
+function GameConfigPicker.new(serviceBag, gameConfigBinder, gameConfigAssetBinder)
 	local self = setmetatable(BaseObject.new(), GameConfigPicker)
 
 	self._gameConfigBinder = assert(gameConfigBinder, "No gameConfigBinder")
 	self._gameConfigAssetBinder = assert(gameConfigAssetBinder, "No gameConfigAssetBinder")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._gameIdToConfigSet = self._maid:Add(ObservableMapSet.new())
 
@@ -204,7 +207,7 @@ function GameConfigPicker:PromisePriceInRobux(assetType, assetIdOrKey)
 			return asset:PromiseCloudPriceInRobux()
 		end
 
-		return GameConfigAssetUtils.promiseCloudDataForAssetType(assetType, assetIdOrKey)
+		return GameConfigAssetUtils.promiseCloudDataForAssetType(self._serviceBag, assetType, assetIdOrKey)
 			:Then(function(cloudData)
 				if type(cloudData.PriceInRobux) == "number" then
 					return cloudData.PriceInRobux

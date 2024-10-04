@@ -5,18 +5,18 @@
 local require = require(script.Parent.loader).load(script)
 
 local ServiceBag = require("ServiceBag")
-local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
+local SettingsDataService = require("SettingsDataService")
 
 local SettingsCmdrUtils = {}
 
 function SettingsCmdrUtils.registerSettingDefinition(cmdr, serviceBag)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
-	local settingRegistryService = serviceBag:GetService(SettingRegistryServiceShared)
+	local settingsDataService = serviceBag:GetService(SettingsDataService)
 
 	local settingDefinitionType = {
 		Transform = function(text)
-			local definitions = settingRegistryService:GetSettingDefinitions()
+			local definitions = settingsDataService:GetSettingDefinitions()
 			local settingNames = {}
 			for _, settingDefinition in pairs(definitions) do
 				table.insert(settingNames, settingDefinition:GetSettingName())
@@ -34,7 +34,7 @@ function SettingsCmdrUtils.registerSettingDefinition(cmdr, serviceBag)
 		Parse = function(keys)
 			local name = keys[1]
 
-			local definitions = settingRegistryService:GetSettingDefinitions()
+			local definitions = settingsDataService:GetSettingDefinitions()
 			for _, settingDefinition in pairs(definitions) do
 				if settingDefinition:GetSettingName() == name then
 					return settingDefinition

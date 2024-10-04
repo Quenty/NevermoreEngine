@@ -4,10 +4,10 @@
 
 	:::tip
 	These settings providers should be used on both the client and the server. On the client, these
-	are registered with the [SettingRegistryServiceShared] so that they can be shown in UI automatically
+	are registered with the [SettingsDataService] so that they can be shown in UI automatically
 	if desired.
 
-	On the server, these are registered with [SettingRegistryServiceShared] and then are checked before
+	On the server, these are registered with [SettingsDataService] and then are checked before
 	arbitrary data can e sent.
 	:::
 
@@ -100,7 +100,7 @@ function SettingDefinitionProvider:_addSettingDefinition(settingDefinition)
 end
 
 --[=[
-	Initializes the provider, storing the data in [SettingRegistryServiceShared]
+	Initializes the provider, storing the data in [SettingsDataService]
 
 	@param serviceBag ServiceBag
 ]=]

@@ -100,11 +100,12 @@ function JSONTranslator:Init(serviceBag)
 		self._localizationTable:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
 	end
 
-	self._maid:GiveTask(RxInstanceUtils.observeProperty(self._localizationTable, "SourceLocaleId"):Subscribe(function(localeId)
-		self._sourceTranslator.Value = self._localizationTable:GetTranslator(localeId)
-	end))
+	-- TODO: Maybe don't hold these unless needed
 	self._maid:GiveTask(self._translatorService:ObserveLocaleId():Subscribe(function(localeId)
 		self._localTranslator.Value = self._localizationTable:GetTranslator(localeId)
+	end))
+	self._maid:GiveTask(RxInstanceUtils.observeProperty(self._localizationTable, "SourceLocaleId"):Subscribe(function(localeId)
+		self._sourceTranslator.Value = self._localizationTable:GetTranslator(localeId)
 	end))
 end
 
@@ -119,13 +120,17 @@ function JSONTranslator:ObserveFormatByKey(translationKey, translationArgs)
 	assert(type(translationKey) == "string", "Key must be a string")
 
 	return Rx.combineLatest({
-		translator = self:ObserveTranslator();
+		cloudTranslator = self:ObserveTranslator();
 		translationKey = translationKey;
 		translationArgs = self:_observeArgs(translationArgs);
 	}):Pipe({
 		Rx.switchMap(function(mainState)
-			if mainState.translator then
-				return Rx.of(self:_doTranslation(mainState.translator, mainState.translationKey, mainState.translationArgs))
+			if mainState.cloudTranslator then
+				return self._translatorService:ObserveLocaleId():Pipe({
+					Rx.map(function()
+						return self:_doTranslation(mainState.cloudTranslator, mainState.translationKey, mainState.translationArgs)
+					end);
+				})
 			end
 
 			-- Fall back to local or source translator

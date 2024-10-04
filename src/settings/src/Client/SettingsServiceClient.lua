@@ -10,8 +10,6 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local PlayerSettingsUtils = require("PlayerSettingsUtils")
-local Rx = require("Rx")
 local Maid = require("Maid")
 local SettingsCmdrUtils = require("SettingsCmdrUtils")
 
@@ -31,8 +29,10 @@ function SettingsServiceClient:Init(serviceBag)
 	self._serviceBag:GetService(require("CmdrServiceClient"))
 
 	-- Internal
-	self._serviceBag:GetService(require("SettingRegistryServiceShared")):RegisterSettingService(self)
-	self._playerSettingsBinder = self._serviceBag:GetService(require("PlayerSettingsClient"))
+	self._settingsDataService = self._serviceBag:GetService(require("SettingsDataService"))
+
+	-- Binders
+	self._serviceBag:GetService(require("PlayerSettingsClient"))
 end
 
 function SettingsServiceClient:Start()
@@ -84,7 +84,7 @@ end
 function SettingsServiceClient:ObservePlayerSettings(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.observePlayerSettings(self._playerSettingsBinder, player)
+	return self._settingsDataService:ObservePlayerSettings(player)
 end
 
 --[=[
@@ -96,7 +96,7 @@ end
 function SettingsServiceClient:ObservePlayerSettingsBrio(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.observePlayerSettingsBrio(self._playerSettingsBinder, player)
+	return self._settingsDataService:ObservePlayerSettingsBrio(player)
 end
 
 --[=[
@@ -108,7 +108,7 @@ end
 function SettingsServiceClient:GetPlayerSettings(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.getPlayerSettings(self._playerSettingsBinder, player)
+	return self._settingsDataService:GetPlayerSettings(player)
 end
 
 --[=[
@@ -121,11 +121,7 @@ end
 function SettingsServiceClient:PromisePlayerSettings(player, cancelToken)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return Rx.toPromise(self:ObservePlayerSettings(player):Pipe({
-		Rx.where(function(x)
-			return x ~= nil
-		end)
-	}), cancelToken)
+	return self._settingsDataService:PromisePlayerSettings(player, cancelToken)
 end
 
 

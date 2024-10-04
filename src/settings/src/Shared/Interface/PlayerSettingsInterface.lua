@@ -13,4 +13,5 @@ return TieDefinition.new("PlayerSettings", {
 	ObserveValue = TieDefinition.Types.METHOD;
 	RestoreDefault = TieDefinition.Types.METHOD;
 	EnsureInitialized = TieDefinition.Types.METHOD;
+	GetPlayer = TieDefinition.Types.METHOD;
 })

@@ -91,5 +91,14 @@ function RxR15Utils.observeHumanoidScaleProperty(humanoid, scaleValueName)
 	})
 end
 
+function RxR15Utils.observeShoulderRigAttachmentBrio(character, side)
+	if side == "Left"  then
+		return RxR15Utils.observeRigAttachmentBrio(character, "UpperTorso", "LeftShoulderRigAttachment")
+	elseif side == "Right" then
+		return RxR15Utils.observeRigAttachmentBrio(character, "UpperTorso", "RightShoulderRigAttachment")
+	else
+		error("Bad side")
+	end
+end
 
 return RxR15Utils

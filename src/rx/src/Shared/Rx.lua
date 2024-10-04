@@ -1444,20 +1444,19 @@ end
 function Rx.combineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
-	local initialPending = 0
-	local defaultLatest = {}
-	for key, value in pairs(observables) do
-		if Observable.isObservable(value) then
-			initialPending = initialPending + 1
-			defaultLatest[key] = UNSET_VALUE
-		else
-			defaultLatest[key] = value
-		end
-	end
-
 	return Observable.new(function(sub)
-		local pending = initialPending
-		local latest = table.clone(defaultLatest)
+		local pending = 0
+		local latest = {}
+
+		-- Instead of caching this, use extra compute here
+		for key, value in pairs(observables) do
+			if Observable.isObservable(value) then
+				pending = pending + 1
+				latest[key] = UNSET_VALUE
+			else
+				latest[key] = value
+			end
+		end
 
 		if pending == 0 then
 			sub:Fire(latest)
@@ -1474,7 +1473,19 @@ function Rx.combineLatest(observables)
 				end
 			end
 
-			sub:Fire(table.clone(latest))
+			sub:Fire(table.freeze(table.clone(latest)))
+		end
+
+		local function failOnFirst(...)
+			pending = pending - 1
+			sub:Fail(...)
+		end
+
+		local function completeOnAllPendingDone()
+			pending = pending - 1
+			if pending == 0 then
+				sub:Complete()
+			end
 		end
 
 		for key, observer in pairs(observables) do
@@ -1484,16 +1495,8 @@ function Rx.combineLatest(observables)
 						latest[key] = value
 						fireIfAllSet()
 					end,
-					function(...)
-						pending = pending - 1
-						sub:Fail(...)
-					end,
-					function()
-						pending = pending - 1
-						if pending == 0 then
-							sub:Complete()
-						end
-					end))
+					failOnFirst,
+					completeOnAllPendingDone))
 			end
 		end
 
@@ -1859,30 +1862,37 @@ function Rx.throttleDefer()
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			local maid = Maid.new()
+			local lastResult = nil
+			local currentQueue = nil
 
-			local lastResult
-
-			maid:GiveTask(source:Subscribe(function(...)
-				if not lastResult then
+			local sourceSub = source:Subscribe(function(...)
+				if lastResult then
 					lastResult = table.pack(...)
-
-					-- Queue up our result
-					maid._currentQueue = task.defer(function()
-						local current = lastResult
-						lastResult = nil
-
-						if sub:IsPending() then
-							sub:Fire(table.unpack(current, 1, current.n))
-						end
-					end)
-				else
-
-					lastResult = table.pack(...)
+					return
 				end
-			end, sub:GetFailComplete()))
 
-			return maid
+				lastResult = table.pack(...)
+
+				-- Queue up our result
+				currentQueue = task.defer(function()
+					local current = lastResult
+					lastResult = nil
+					currentQueue = nil
+
+					if sub:IsPending() then
+						sub:Fire(table.unpack(current, 1, current.n))
+					end
+				end)
+			end, sub:GetFailComplete())
+
+			return function()
+				if currentQueue then
+					task.cancel(currentQueue)
+					currentQueue = nil
+				end
+
+				sourceSub:Destroy()
+			end
 		end)
 	end
 end

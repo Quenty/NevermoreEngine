@@ -27,18 +27,8 @@ local DuckTypeUtils = require("DuckTypeUtils")
 local ValueObject = require("ValueObject")
 
 local BasicPane = {}
-BasicPane.__index = BasicPane
 BasicPane.ClassName = "BasicPane"
-
---[=[
-	Returns whether the value is a basic pane
-	@param value any
-	@return boolean
-]=]
-function BasicPane.isBasicPane(value)
-	return DuckTypeUtils.isImplementation(BasicPane, value)
-end
-
+BasicPane.__index = BasicPane
 
 --[=[
 	Constructs a new BasicPane with the .Gui property set.
@@ -80,6 +70,15 @@ function BasicPane.new(gui)
 	end
 
 	return self
+end
+
+--[=[
+	Returns whether the value is a basic pane
+	@param value any
+	@return boolean
+]=]
+function BasicPane.isBasicPane(value)
+	return DuckTypeUtils.isImplementation(BasicPane, value)
 end
 
 --[=[

@@ -182,16 +182,15 @@ function Promise:Wait()
 	elseif self._rejected then
 		return error(tostring(self._rejected[1]), 2)
 	else
-		local bindable = Instance.new("BindableEvent")
+		local waitingCoroutine = coroutine.running()
 
 		self:Then(function()
-			bindable:Fire()
+			task.spawn(waitingCoroutine)
 		end, function()
-			bindable:Fire()
+			task.spawn(waitingCoroutine)
 		end)
 
-		bindable.Event:Wait()
-		bindable:Destroy()
+		coroutine.yield()
 
 		if self._rejected then
 			return error(tostring(self._rejected[1]), 2)
@@ -215,21 +214,22 @@ function Promise:Yield()
 	elseif self._rejected then
 		return false, unpack(self._rejected, 1, self._valuesLength)
 	else
-		local bindable = Instance.new("BindableEvent")
+		local waitingCoroutine = coroutine.running()
 
 		self:Then(function()
-			bindable:Fire()
+			task.spawn(waitingCoroutine)
 		end, function()
-			bindable:Fire()
+			task.spawn(waitingCoroutine)
 		end)
 
-		bindable.Event:Wait()
-		bindable:Destroy()
+		coroutine.yield()
 
 		if self._fulfilled then
 			return true, unpack(self._fulfilled, 1, self._valuesLength)
 		elseif self._rejected then
 			return false, unpack(self._rejected, 1, self._valuesLength)
+		else
+			error("Bad state")
 		end
 	end
 end

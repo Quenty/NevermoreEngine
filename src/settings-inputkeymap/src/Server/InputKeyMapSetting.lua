@@ -7,10 +7,9 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local InputKeyMapSettingUtils = require("InputKeyMapSettingUtils")
-local SettingsService = require("SettingsService")
 local InputKeyMapSettingConstants = require("InputKeyMapSettingConstants")
 local SettingDefinition = require("SettingDefinition")
-local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
+local SettingsDataService = require("SettingsDataService")
 
 local InputKeyMapSetting = setmetatable({}, BaseObject)
 InputKeyMapSetting.ClassName = "InputKeyMapSetting"
@@ -20,8 +19,7 @@ function InputKeyMapSetting.new(serviceBag, inputKeyMapList)
 	local self = setmetatable(BaseObject.new(), InputKeyMapSetting)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._settingService = self._serviceBag:GetService(SettingsService)
-	self._settingRegistryServiceShared = self._serviceBag:GetService(SettingRegistryServiceShared)
+	self._settingDataService = self._serviceBag:GetService(SettingsDataService)
 
 	self._inputKeyMapList = assert(inputKeyMapList, "No inputKeyMapList")
 
@@ -37,7 +35,7 @@ function InputKeyMapSetting.new(serviceBag, inputKeyMapList)
 		local settingName = InputKeyMapSettingUtils.getSettingName(inputKeyMapList, inputModeType)
 		local definition = SettingDefinition.new(settingName, InputKeyMapSettingConstants.DEFAULT_VALUE)
 
-		maid:GiveTask(self._settingRegistryServiceShared:RegisterSettingDefinition(definition))
+		maid:GiveTask(self._settingDataService:RegisterSettingDefinition(definition))
 	end))
 
 	return self

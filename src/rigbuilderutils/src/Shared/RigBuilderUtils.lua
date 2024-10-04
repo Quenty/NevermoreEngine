@@ -38,6 +38,19 @@ local function addAttachment(part, name, position, orientation)
 	return attachment
 end
 
+--[=[
+	Typically we don't want to remove the animate script completely, just disable it.
+
+	@param rig Model
+]=]
+function RigBuilderUtils.disableAnimateScript(rig: Model)
+	local animate = rig:FindFirstChild("Animate")
+	if animate and (animate:IsA("LocalScript") or animate:IsA("Script")) then
+		animate.Enabled = false
+	end
+end
+
+
 function RigBuilderUtils.createR6BaseRig()
 	local character = Instance.new("Model")
 	character.Name = "Dummy"

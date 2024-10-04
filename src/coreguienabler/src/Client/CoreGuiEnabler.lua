@@ -18,6 +18,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 
@@ -37,7 +38,6 @@ function CoreGuiEnabler.new()
 	local self = setmetatable({}, CoreGuiEnabler)
 
 	self._maid = Maid.new()
-
 	self._states = {}
 
 	self._stateSubs = self._maid:Add(ObservableSubscriptionTable.new())
@@ -196,7 +196,9 @@ end
 function CoreGuiEnabler:PushDisable(coreGuiState)
 	local maid = Maid.new()
 
-	self:Disable(maid, coreGuiState)
+	local key = HttpService:GenerateGUID(false)
+
+	maid:GiveTask(self:Disable(key, coreGuiState))
 
 	return function()
 		maid:DoCleaning()

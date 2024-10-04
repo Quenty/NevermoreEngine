@@ -17,25 +17,23 @@ function InputKeyMapSettingClient.new(serviceBag, inputKeyMapList)
 	local self = setmetatable(BaseObject.new(), InputKeyMapSettingClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._settingService = self._serviceBag:GetService(SettingsServiceClient)
+	self._settingServiceClient = self._serviceBag:GetService(SettingsServiceClient)
 
 	self._inputKeyMapList = assert(inputKeyMapList, "No inputKeyMapList")
 
-	self._maid:GiveTask(self._settingService:ObserveLocalPlayerSettingsBrio():Subscribe(function(settingsBrio)
+	self._maid:GiveTask(self._settingServiceClient:ObserveLocalPlayerSettingsBrio():Subscribe(function(settingsBrio)
 		if settingsBrio:IsDead() then
 			return
 		end
 
-		local settingMaid = settingsBrio:ToMaid()
-		local settings = settingsBrio:GetValue()
+		local settingMaid, settings = settingsBrio:ToMaidAndValue()
 
 		settingMaid:GiveTask(self._inputKeyMapList:ObservePairsBrio():Subscribe(function(brio)
 			if brio:IsDead() then
 				return
 			end
 
-			local maid = brio:ToMaid()
-			local inputModeType, inputKeyMap = brio:GetValue()
+			local maid, inputModeType, inputKeyMap = brio:ToMaidAndValue()
 
 			local settingName = InputKeyMapSettingUtils.getSettingName(inputKeyMapList, inputModeType)
 			local settingProperty = settings:GetSettingProperty(settingName, InputKeyMapSettingConstants.DEFAULT_VALUE)

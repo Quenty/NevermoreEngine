@@ -27,7 +27,7 @@ function TieImplementation.new(tieDefinition, adornee, implementer, implementati
 	self._actualSelf = implementer or {}
 	self._implementationTieRealm = assert(implementationTieRealm, "Bad implementationTieRealm")
 
-	self._implParent = self._maid:Add(Instance.new(tieDefinition:GetImplClass()))
+	self._implParent = self._maid:Add(Instance.new(tieDefinition:GetNewImplClass(implementationTieRealm)))
 	self._implParent.Archivable = false
 
 	self._memberImplementations = {}

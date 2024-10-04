@@ -18,12 +18,10 @@ BaseObject.__index = BaseObject
 	@return BaseObject
 ]=]
 function BaseObject.new(obj)
-	local self = setmetatable({}, BaseObject)
-
-	self._maid = Maid.new()
-	self._obj = obj
-
-	return self
+	return setmetatable({
+		_maid = Maid.new();
+		_obj = obj;
+	}, BaseObject)
 end
 
 --[=[

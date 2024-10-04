@@ -6,13 +6,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local GoodSignal = require("GoodSignal")
-local Maid = require("Maid")
-local Observable = require("Observable")
-local ValueBaseUtils = require("ValueBaseUtils")
-local RxValueBaseUtils = require("RxValueBaseUtils")
 local Brio = require("Brio")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
+local MaidTaskUtils = require("MaidTaskUtils")
+local Observable = require("Observable")
+local RxValueBaseUtils = require("RxValueBaseUtils")
+local Signal = require("Signal")
+local ValueBaseUtils = require("ValueBaseUtils")
 
 local EMPTY_FUNCTION = function() end
 
@@ -22,35 +23,36 @@ ValueObject.ClassName = "ValueObject"
 --[=[
 	Constructs a new value object
 	@param baseValue T
-	@param checkType string | nil
+	@param checkType string | nil | (value: T) -> (boolean, string)
 	@return ValueObject
 ]=]
 function ValueObject.new(baseValue, checkType)
-	local self = {
+	local self = setmetatable({
 		_value = baseValue;
 		_checkType = checkType;
-		_maid = Maid.new();
-	}
+	}, ValueObject)
 
-	if checkType and typeof(baseValue) ~= checkType then
-		error(string.format("Expected value of type %q, got %q instead", checkType, typeof(baseValue)))
+	if type(checkType) == "stirng" then
+		if typeof(baseValue) ~= checkType then
+			error(string.format("Expected value of type %q, got %q instead", checkType, typeof(baseValue)))
+		end
+	elseif type(checkType) == "function" then
+		assert(checkType(baseValue))
 	end
+
+	return self
+end
 
 --[=[
 	Event fires when the value's object value change
 	@prop Changed Signal<T> -- fires with oldValue, newValue, ...
 	@within ValueObject
 ]=]
-	self.Changed = self._maid:Add(GoodSignal.new()) -- :Fire(newValue, oldValue, ...)
-
-	return setmetatable(self, ValueObject)
-end
-
 
 --[=[
 	Returns the current check type, if any
 
-	@return string | nil
+	@return string | nil | (value: T) -> (boolean, string)
 ]=]
 function ValueObject:GetCheckType()
 	return rawget(self, "_checkType")
@@ -96,6 +98,7 @@ function ValueObject:_toMountableObservable(value)
 
 	return nil
 end
+
 --[=[
 	Mounts the value to the observable. Overrides the last mount.
 
@@ -105,33 +108,33 @@ end
 function ValueObject:Mount(value)
 	local observable = self:_toMountableObservable(value)
 	if observable then
-		self._maid._mount = nil
+		self:_cleanupLastMountedSub()
 
-		local maid = Maid.new()
-
-		maid:GiveTask(observable:Subscribe(function(...)
+		local sub = observable:Subscribe(function(...)
 			self:SetValue(...)
-		end))
-
-		maid:GiveTask(function()
-			if self._maid._mount == maid then
-				self._maid._mount = nil
-			end
 		end)
 
-		self._maid._mount = maid
+		rawset(self, "_lastMountedSub", sub)
 
 		return function()
-			if self._maid._mount == maid then
-				self._maid._mount = nil
+			if rawget(self, "_lastMountedSub") == sub then
+				self:_cleanupLastMountedSub()
 			end
 		end
 	else
-		self._maid._mount = nil
+		self:_cleanupLastMountedSub()
 
 		self:SetValue(value)
 
 		return EMPTY_FUNCTION
+	end
+end
+
+function ValueObject:_cleanupLastMountedSub()
+	local lastSub = rawget(self, "_lastMountedSub")
+	if lastSub then
+		rawset(self, "_lastMountedSub", nil)
+		MaidTaskUtils.doTask(lastSub)
 	end
 end
 
@@ -140,7 +143,12 @@ end
 	@return Observable<T>
 ]=]
 function ValueObject:Observe()
-	return Observable.new(function(sub)
+	local found = rawget(self, "_observable")
+	if found then
+		return found
+	end
+
+	local created = Observable.new(function(sub)
 		if not self.Destroy then
 			warn("[ValueObject.observeValue] - Connecting to dead ValueObject")
 			-- No firing, we're dead
@@ -148,21 +156,24 @@ function ValueObject:Observe()
 			return
 		end
 
-		local connection
-
-		connection = self.Changed:Connect(function(newValue, _, ...)
+		local connection = self.Changed:Connect(function(newValue, _, ...)
 			sub:Fire(newValue, ...)
 		end)
 
 		local args = rawget(self, "_lastEventContext")
+		local value = rawget(self, "_value")
 		if args then
-			sub:Fire(self.Value, table.unpack(args, 1, args.n))
+			sub:Fire(value, table.unpack(args, 1, args.n))
 		else
-			sub:Fire(self.Value)
+			sub:Fire(value)
 		end
 
 		return connection
 	end)
+
+	-- We use a lot of these so let's cache the result which reduces the number of tables we have here
+	rawset(self, "_observable", created)
+	return created
 end
 
 --[=[
@@ -228,8 +239,12 @@ function ValueObject:SetValue(value, ...)
 	local previous = rawget(self, "_value")
 	local checkType = rawget(self, "_checkType")
 
-	if checkType and typeof(value) ~= checkType then
-		error(string.format("Expected value of type %q, got %q instead", checkType, typeof(value)))
+	if type(checkType) == "string" then
+		if typeof(value) ~= checkType then
+			error(string.format("Expected value of type %q, got %q instead", checkType, typeof(value)))
+		end
+	elseif typeof(checkType) == "function" then
+		assert(checkType(value))
 	end
 
 	if previous ~= value then
@@ -240,8 +255,10 @@ function ValueObject:SetValue(value, ...)
 		end
 
 		rawset(self, "_value", value)
-
-		self.Changed:Fire(value, previous, ...)
+		local changed = rawget(self, "Changed")
+		if changed then
+			changed:Fire(value, previous, ...)
+		end
 	end
 end
 
@@ -251,10 +268,19 @@ end
 	@within ValueObject
 ]=]
 function ValueObject:__index(index)
-	if index == "Value" then
-		return self._value
-	elseif ValueObject[index] then
+	if ValueObject[index] then
 		return ValueObject[index]
+	elseif index == "Value" then
+		return self._value
+	elseif index == "Changed" then
+		-- Defer construction of Changed event until something needs it, since a lot
+		-- of times we don't need it
+
+		local signal = Signal.new() -- :Fire(newValue, oldValue, ...)
+
+		rawset(self, "Changed", signal)
+
+		return signal
 	elseif index == "LastEventContext" then
 		local args = rawget(self, "_lastEventContext")
 		if args then
@@ -287,7 +313,15 @@ end
 ]=]
 function ValueObject:Destroy()
 	rawset(self, "_value", nil)
-	self._maid:DoCleaning()
+
+	self:_cleanupLastMountedSub()
+
+	-- Avoid using a maid here because we make a LOT of ValueObjects
+	local changed = rawget(self, "Changed")
+	if changed then
+		changed:Destroy()
+	end
+
 	setmetatable(self, nil)
 end
 

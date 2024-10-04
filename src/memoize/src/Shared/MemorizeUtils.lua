@@ -26,6 +26,7 @@ function MemorizeUtils.memoize(func, cacheConfig)
 	local cache = LRUCache.new(cacheConfig.maxSize)
 
 	return function(...)
+		-- O(n)
 		local params = tupleLookup:ToTuple(...)
 
 		local found = cache:get(params)

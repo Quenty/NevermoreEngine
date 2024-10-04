@@ -22,7 +22,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
+local SettingsDataService = require("SettingsDataService")
 local SettingProperty = require("SettingProperty")
 local ServiceBag = require("ServiceBag")
 local DuckTypeUtils = require("DuckTypeUtils")
@@ -66,8 +66,8 @@ function SettingDefinition:Init(serviceBag)
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	local settingRegistryServiceShared = self._serviceBag:GetService(SettingRegistryServiceShared)
-	self._maid:GiveTask(settingRegistryServiceShared:RegisterSettingDefinition(self))
+	local settingsDataService = self._serviceBag:GetService(SettingsDataService)
+	self._maid:GiveTask(settingsDataService:RegisterSettingDefinition(self))
 end
 
 --[=[

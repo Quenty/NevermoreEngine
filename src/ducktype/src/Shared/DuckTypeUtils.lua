@@ -28,7 +28,7 @@ function DuckTypeUtils._checkInterface(template, target)
 	if targetMetatable and type(targetMetatable.__index) == "function" then
 		-- Indexing into this target could cause an error. Treat it differently and fast-fail
 		if templateMetatable then
-			return targetMetatable.__index == templateMetatable.__index
+			return templateMetatable.__index == targetMetatable.__index
 		end
 
 		return false

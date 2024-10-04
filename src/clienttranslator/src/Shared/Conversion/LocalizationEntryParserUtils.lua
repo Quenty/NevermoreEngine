@@ -82,29 +82,32 @@ function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sour
 		elseif type(text) == "string" then
 			local found = lookupTable[key]
 			if found then
-				found.Values[localeId] = key
+				found.Values[localeId] = text
 			else
-				-- Guarantee the context is unique. This is important because Roblox will not
-				-- allow something with the same source without a differing context text.
-				local context = string.format("Generated from %s with key %s", tableName, key)
-
 				found = {
-					Context = context;
 					Example = text;
 					Key = key;
-					Source = sourceLocaleId;
+					Context = string.format("[TEMP] - Generated from %s with key %s", tableName, key);
+					Source = text; -- Tempt!
 					Values = {
 						[localeId] = text;
 					};
 				};
 
-				if RunService:IsStudio() and sourceLocaleId == localeId then
-					found.Values[PseudoLocalize.getDefaultPseudoLocaleId()] = PseudoLocalize.pseudoLocalize(text)
-				end
-
 				lookupTable[key] = found;
 			end
 
+			-- Ensure assignment
+			if sourceLocaleId == localeId then
+				-- Guarantee the context is unique. This is important because Roblox will not
+				-- allow something with the same source without a differing context text.
+				found.Context = string.format("Generated from %s with key %s", tableName, key)
+				found.Source = text
+
+				if RunService:IsStudio() then
+					found.Values[PseudoLocalize.getDefaultPseudoLocaleId()] = PseudoLocalize.pseudoLocalize(text)
+				end
+			end
 		else
 			error(string.format("Bad type for text at key '%s'", key))
 		end

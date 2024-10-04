@@ -9,12 +9,10 @@ local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local Observable = require("Observable")
+local ObservableMap = require("ObservableMap")
 local ObservableSet = require("ObservableSet")
-local Signal = require("Signal")
-local Brio = require("Brio")
-local RxBrioUtils = require("RxBrioUtils")
-local ValueObject = require("ValueObject")
 local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
 
 local ObservableMapSet = {}
 ObservableMapSet.ClassName = "ObservableMapSet"
@@ -28,7 +26,7 @@ function ObservableMapSet.new()
 	local self = setmetatable({}, ObservableMapSet)
 
 	self._maid = Maid.new()
-	self._observableSetMap = {} -- [key] = ObservableSet<TEntry>
+	self._observableMapOfSets = self._maid:Add(ObservableMap.new())
 
 --[=[
 	Fires when an item is added
@@ -36,7 +34,7 @@ function ObservableMapSet.new()
 	@prop SetAdded Signal<TKey>
 	@within ObservableMapSet
 ]=]
-	self.SetAdded = self._maid:Add(Signal.new()) -- :Fire(key, set)
+	self.SetAdded = assert(self._observableMapOfSets.KeyAdded, "Bad KeyAdded") -- :Fire(key, set)
 
 --[=[
 	Fires when an item is removed
@@ -44,9 +42,14 @@ function ObservableMapSet.new()
 	@prop SetRemoved Signal<TKey>
 	@within ObservableMapSet
 ]=]
-	self.SetRemoved = self._maid:Add(Signal.new()) -- :Fire(key)
+	self.SetRemoved = assert(self._observableMapOfSets.KeyRemoved, "Bad KeyRemoved") -- :Fire(key)
 
-	self._setCount = self._maid:Add(ValueObject.new(0, "number"))
+--[=[
+	Fires when the count changes.
+	@prop CountChanged RBXScriptSignal
+	@within ObservableMap
+]=]
+	self.CountChanged = assert(self._observableMapOfSets.CountChanged, "Bad CountChanged")
 
 	return self
 end
@@ -68,31 +71,19 @@ function ObservableMapSet:Push(observeKey, entry)
 	assert(observeKey ~= nil, "Bad observeKey")
 	assert(entry ~= nil, "Bad entry")
 
-	if not Observable.isObservable(observeKey) then
-		observeKey = Rx.of(observeKey)
-	end
-
 	local maid = Maid.new()
 
-	local lastKey = nil
-	local function removeLastEntry()
-		if lastKey ~= nil then
-			self:_removeFromObservableSet(lastKey, entry)
-		end
-		lastKey = nil
+	if Observable.isObservable(observeKey) then
+		maid:GiveTask(observeKey:Subscribe(function(key)
+			maid._currentAddValue = nil
+
+			if key ~= nil then
+				maid._currentAddValue = self:_addToSet(key, entry)
+			end
+		end))
+	else
+		maid:GiveTask(self:_addToSet(observeKey, entry))
 	end
-
-	maid:GiveTask(observeKey:Subscribe(function(key)
-		removeLastEntry()
-
-		if key ~= nil then
-			self:_addToObservableSet(key, entry)
-		end
-
-		lastKey = key
-	end))
-
-	maid:GiveTask(removeLastEntry)
 
 	-- Ensure self-cleanup when map cleans up
 	self._maid[maid] = maid
@@ -131,12 +122,8 @@ end
 	Gets a list of all keys.
 	@return { TKey }
 ]=]
-function ObservableMapSet:GetKeyList()
-	local list = {}
-	for key, _ in pairs(self._observableSetMap) do
-		table.insert(list, key)
-	end
-	return list
+function ObservableMapSet:ObserveKeyList()
+	return self._observableMapOfSets:GetKeyList()
 end
 
 --[=[
@@ -144,33 +131,15 @@ end
 	@return Observable<{ TKey }>
 ]=]
 function ObservableMapSet:ObserveKeyList()
-	return Observable.new(function(sub)
-		local topMaid = Maid.new()
+	return self._observableMapOfSets:ObserveKeyList()
+end
 
-		-- TODO: maybe don't allocate as much here?
-		local keyList = {}
-
-		topMaid:GiveTask(self.SetAdded:Connect(function(addedKey)
-			table.insert(keyList, addedKey)
-			sub:Fire(table.clone(keyList))
-		end))
-
-		topMaid:GiveTask(self.SetRemoved:Connect(function(removedKey)
-			local index = table.find(keyList, removedKey)
-			if index then
-				table.remove(keyList, index)
-			end
-			sub:Fire(table.clone(keyList))
-		end))
-
-		for key, _ in pairs(self._observableSetMap) do
-			table.insert(keyList, key)
-		end
-
-		sub:Fire(table.clone(keyList))
-
-		return topMaid
-	end)
+--[=[
+	Observes all keys in the map
+	@return Observable<Brio<TKey>>
+]=]
+function ObservableMapSet:ObserveKeysBrio()
+	return self._observableMapOfSets:ObserveKeysBrio()
 end
 
 --[=[
@@ -178,7 +147,7 @@ end
 	@return number
 ]=]
 function ObservableMapSet:GetSetCount()
-	return self._setCount.Value
+	return self._observableMapOfSets:GetCount()
 end
 
 --[=[
@@ -186,7 +155,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableMapSet:ObserveSetCount()
-	return self._setCount:Observe()
+	return self._observableMapOfSets:ObserveCount()
 end
 
 --[=[
@@ -197,49 +166,26 @@ end
 function ObservableMapSet:ObserveItemsForKeyBrio(key)
 	assert(key ~= nil, "Bad key")
 
-	return Observable.new(function(sub)
-		local topMaid = Maid.new()
-
-		local function connect()
-			local maid = Maid.new()
-
-			local set = self._observableSetMap[key]
+	return self._observableMapOfSets:ObserveAtKeyBrio(key):Pipe({
+		RxBrioUtils.switchMapBrio(function(set)
 			if set then
-				maid:GiveTask(set:ObserveItemsBrio():Subscribe(function(brio)
-					sub:Fire(brio)
-				end))
+				return set:ObserveItemsBrio()
+			else
+				return Rx.EMPTY
 			end
-
-			topMaid._current = maid
-		end
-
-		topMaid:GiveTask(self.SetAdded:Connect(function(addedKey)
-			if addedKey == key then
-				connect()
-			end
-		end))
-
-		topMaid:GiveTask(self.SetRemoved:Connect(function(removedKey)
-			if removedKey == key then
-				connect()
-			end
-		end))
-
-		connect()
-
-		return topMaid
-	end)
+		end);
+	})
 end
 
 --[=[
 	Gets the first item for the given key
 	@param key TKey
-	@return TValue
+	@return TValue | nil
 ]=]
 function ObservableMapSet:GetFirstItemForKey(key)
 	assert(key ~= nil, "Bad key")
 
-	local observableSet = self._observableSetMap[key]
+	local observableSet = self:GetObservableSetForKey(key)
 	if not observableSet then
 		return nil
 	end
@@ -255,7 +201,7 @@ end
 function ObservableMapSet:GetListForKey(key)
 	assert(key ~= nil, "Bad key")
 
-	local observableSet = self._observableSetMap[key]
+	local observableSet = self:GetObservableSetForKey(key)
 	if not observableSet then
 		return {}
 	end
@@ -271,45 +217,27 @@ end
 function ObservableMapSet:GetObservableSetForKey(key)
 	assert(key ~= nil, "Bad key")
 
-	return self._observableSetMap[key]
+	return self._observableMapOfSets:Get(key)
 end
 
+--[=[
+	Observes the observable set for the given key
+
+	@param key TKey
+	@return Observable<Brio<ObservableSet<TValue>>>
+]=]
 function ObservableMapSet:ObserveSetBrio(key)
 	assert(key ~= nil, "Bad key")
 
-	return Observable.new(function(sub)
-		local topMaid = Maid.new()
-
-		local function connect()
-			local brio
-
-			local set = self._observableSetMap[key]
-			if set then
-				brio = Brio.new(set)
-				sub:Fire(brio)
-			end
-
-			topMaid._current = brio
-		end
-
-		topMaid:GiveTask(self.SetAdded:Connect(function(addedKey)
-			if addedKey == key then
-				connect()
-			end
-		end))
-
-		topMaid:GiveTask(self.SetRemoved:Connect(function(removedKey)
-			if removedKey == key then
-				connect()
-			end
-		end))
-
-		connect()
-
-		return topMaid
-	end)
+	return self._observableMapOfSets:ObserveAtKeyBrio(key)
 end
 
+--[=[
+	Observes the number of entries for the given key
+
+	@param key TKey
+	@return Observable<number>
+]=]
 function ObservableMapSet:ObserveCountForKey(key)
 	assert(key ~= nil, "Bad key")
 
@@ -321,66 +249,30 @@ function ObservableMapSet:ObserveCountForKey(key)
 	})
 end
 
-function ObservableMapSet:_addToObservableSet(key, entry)
-	local set = self:_getOrCreateObservableSet(key)
-	set:Add(entry)
+
+function ObservableMapSet:_addToSet(key, entry)
+	local set = self:_getOrCreateSet(key)
+	return set:Add(entry)
 end
 
-function ObservableMapSet:_removeFromObservableSet(key, entry)
-	local set = self._observableSetMap[key]
-	if not set then
-		return
-	end
-
-	-- This happens when we're cleaning up sometimes
-	if not set.Destroy then
-		return
-	end
-
-	if set:Contains(entry) then
-		set:Remove(entry)
-		if set:GetCount() == 0 then
-			self:_removeObservableSet(key)
-		end
-	end
-end
-
-function ObservableMapSet:_removeObservableSet(key)
-	local set = self._observableSetMap[key]
-	if set then
-		self._observableSetMap[key] = nil
-
-		-- Cleanup
-		self._maid[set] = nil
-
-		if self.SetRemoved.Destroy then
-			self.SetRemoved:Fire(key)
-		end
-
-		if self._setCount.Destroy then
-			self._setCount.Value = self._setCount.Value - 1
-		end
-	end
-end
-
-function ObservableMapSet:_getOrCreateObservableSet(key)
-	if self._observableSetMap[key] then
-		return self._observableSetMap[key]
+function ObservableMapSet:_getOrCreateSet(key)
+	local existing = self._observableMapOfSets:Get(key)
+	if existing then
+		return existing
 	end
 
 	local maid = Maid.new()
-	local set = ObservableSet.new()
-	maid:GiveTask(set)
+	local set = maid:Add(ObservableSet.new(nil))
 
-	self._observableSetMap[key] = set
+	maid:GiveTask(set.CountChanged:Connect(function(count)
+		if count <= 0 then
+			self._maid[set] = nil
+		end
+	end))
 
-	self.SetAdded:Fire(key, set)
-
-	if self._setCount.Destroy then
-		self._setCount.Value = self._setCount.Value + 1
-	end
-
+	maid:GiveTask(self._observableMapOfSets:Set(key, set))
 	self._maid[set] = maid
+
 	return set
 end
 

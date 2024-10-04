@@ -89,6 +89,7 @@ function TieDefinition.new(definitionName, members)
 	local self = setmetatable({}, TieDefinition)
 
 	self._definitionName = assert(definitionName, "No definitionName")
+	self._validContainerNameSetWeakCache = setmetatable({}, {__mode = "kv"})
 	self._memberMap = {}
 	self._defaultTieRealm = TieRealms.SHARED
 
@@ -156,8 +157,41 @@ function TieDefinition:GetImplementations(adornee: Instance, tieRealm)
 	return implementations
 end
 
-function TieDefinition:GetImplClass()
-	return "Camera"
+function TieDefinition:GetNewImplClass(tieRealm)
+	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
+
+	if tieRealm == TieRealms.CLIENT then
+		return "Configuration"
+	else
+		return "Camera"
+	end
+end
+
+local IMPL_CLIENT_SET = table.freeze({
+	["Configuration"] = true;
+})
+
+local IMPL_SERVER_SET = table.freeze({
+	["Camera"] = true;
+})
+
+local IMPL_SHARED_SET = table.freeze({
+	["Camera"] = true;
+	["Configuration"] = true;
+})
+
+function TieDefinition:GetImplClassSet(tieRealm)
+
+	if tieRealm == TieRealms.CLIENT then
+		-- Shared implements both...
+		return IMPL_CLIENT_SET
+	elseif tieRealm == TieRealms.SERVER then
+		return IMPL_SERVER_SET
+	elseif tieRealm == TieRealms.SHARED then
+		return IMPL_SHARED_SET
+	else
+		error("Unknwon tieRealm")
+	end
 end
 
 function TieDefinition:GetImplementationParents(adornee, tieRealm)
@@ -464,10 +498,11 @@ function TieDefinition:ObserveValidContainerChildrenBrio(adornee, tieRealm)
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 
 	local validContainerNameSet = self:GetValidContainerNameSet(tieRealm)
+	local validImplClassSet = self:GetImplClassSet(tieRealm)
 
 	return RxInstanceUtils.observeChildrenBrio(adornee, function(value)
 		-- Just assume our name doesn't change
-		return value:IsA(self:GetImplClass()) and validContainerNameSet[value.Name] and true or false
+		return validImplClassSet[value.ClassName] and validContainerNameSet[value.Name] and true or false
 	end)
 end
 
@@ -597,26 +632,34 @@ end
 ]=]
 function TieDefinition:GetValidContainerNameSet(tieRealm)
 	-- TODO: Still generate unique datamodel key here?
+	if self._validContainerNameSetWeakCache[tieRealm] then
+		return self._validContainerNameSetWeakCache[tieRealm]
+	end
 
 	if tieRealm == TieRealms.CLIENT then
 		-- Shared implements both...
-		return {
+		self._validContainerNameSetWeakCache[tieRealm] = table.freeze({
 			[self._definitionName .. "Client"] = true;
 			[self._definitionName .. "Shared"] = true;
-		}
+		})
+		return self._validContainerNameSetWeakCache[tieRealm]
 	elseif tieRealm == TieRealms.SERVER then
-		return {
+		self._validContainerNameSetWeakCache[tieRealm] = table.freeze({
 			[self._definitionName] = true;
 			[self._definitionName .. "Shared"] = true;
-		}
+		})
+		return self._validContainerNameSetWeakCache[tieRealm]
 	elseif tieRealm == TieRealms.SHARED then
 		-- Technically on the implementation shared is very strict,
 		-- but we allow any calls here for discovery
-		return {
+		self._validContainerNameSetWeakCache[tieRealm] = table.freeze({
 			[self._definitionName] = true;
 			[self._definitionName .. "Client"] = true;
 			[self._definitionName .. "Shared"] = true;
-		}
+		})
+		return self._validContainerNameSetWeakCache[tieRealm]
+	else
+		error("Unknwon tieRealm")
 	end
 end
 

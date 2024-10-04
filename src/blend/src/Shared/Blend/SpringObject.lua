@@ -13,7 +13,6 @@ local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
-local Rx = require("Rx")
 local Signal = require("Signal")
 local Spring = require("Spring")
 local SpringUtils = require("SpringUtils")
@@ -265,28 +264,34 @@ end
 function SpringObject:SetTarget(target, doNotAnimate)
 	assert(target ~= nil, "Bad target")
 
-	local observable = Blend.toPropertyObservable(target) or Rx.of(target)
+	local observable = Blend.toPropertyObservable(target)
+	if not observable then
+		self._maid._targetSub = nil
+		self:_applyTarget(target, doNotAnimate)
+		return
+	end
 
 	if doNotAnimate then
 		local isFirst = true
-
 		self._maid._targetSub = observable:Subscribe(function(unconverted)
 			local converted = SpringUtils.toLinearIfNeeded(unconverted)
 			assert(converted, "Not a valid converted target")
 
-			local spring = self:_getSpringForType(converted)
-			spring:SetTarget(converted, isFirst)
+			local wasFirst = isFirst
 			isFirst = false
-
-			self.Changed:Fire()
+			self:_applyTarget(unconverted, wasFirst)
 		end)
 	else
 		self._maid._targetSub = observable:Subscribe(function(unconverted)
-			local converted = SpringUtils.toLinearIfNeeded(unconverted)
-			self:_getSpringForType(converted).Target = converted
-			self.Changed:Fire()
+			self:_applyTarget(unconverted, doNotAnimate)
 		end)
 	end
+end
+
+function SpringObject:_applyTarget(unconverted, doNotAnimate)
+	local converted = SpringUtils.toLinearIfNeeded(unconverted)
+	self:_getSpringForType(converted):SetTarget(converted, doNotAnimate)
+	self.Changed:Fire()
 end
 
 --[=[
@@ -297,14 +302,22 @@ end
 function SpringObject:SetVelocity(velocity)
 	assert(velocity ~= nil, "Bad velocity")
 
-	local observable = Blend.toPropertyObservable(velocity) or Rx.of(velocity)
+	local observable = Blend.toPropertyObservable(velocity)
+	if not observable then
+		self._maid._velocitySub = nil
+		self:_applyVelocity(velocity)
+	else
+		self._maid._velocitySub = observable:Subscribe(function(unconverted)
+			self:_applyVelocity(unconverted)
+		end)
+	end
+end
 
-	self._maid._velocitySub = observable:Subscribe(function(unconverted)
-		local converted = SpringUtils.toLinearIfNeeded(unconverted)
+function SpringObject:_applyVelocity(unconverted)
+	local converted = SpringUtils.toLinearIfNeeded(unconverted)
 
-		self:_getSpringForType(0*converted).Velocity = converted
-		self.Changed:Fire()
-	end)
+	self:_getSpringForType(0*converted).Velocity = converted
+	self.Changed:Fire()
 end
 
 --[=[
@@ -315,13 +328,21 @@ end
 function SpringObject:SetPosition(position)
 	assert(position ~= nil, "Bad position")
 
-	local observable = Blend.toPropertyObservable(position) or Rx.of(position)
+	local observable = Blend.toPropertyObservable(position)
+	if not observable then
+		self._maid._positionSub = nil
+		self:_applyPosition(position)
+	else
+		self._maid._positionSub = observable:Subscribe(function(unconverted)
+			self:_applyPosition(unconverted)
+		end)
+	end
+end
 
-	self._maid._positionSub = observable:Subscribe(function(unconverted)
-		local converted = SpringUtils.toLinearIfNeeded(unconverted)
-		self:_getSpringForType(converted).Value = converted
-		self.Changed:Fire()
-	end)
+function SpringObject:_applyPosition(unconverted)
+	local converted = SpringUtils.toLinearIfNeeded(unconverted)
+	self:_getSpringForType(converted).Value = converted
+	self.Changed:Fire()
 end
 
 --[=[
@@ -332,20 +353,29 @@ end
 function SpringObject:SetDamper(damper)
 	assert(damper ~= nil, "Bad damper")
 
-	local observable = assert(Blend.toNumberObservable(damper), "Invalid damper")
+	if type(damper) == "number" then
+		self._maid._damperSub = nil
+		self:_applyDamper(damper)
+	else
+		local observable = assert(Blend.toPropertyObservable(damper), "Invalid damper")
 
-	self._maid._damperSub = observable:Subscribe(function(unconverted)
-		assert(type(unconverted) == "number", "Bad damper")
+		self._maid._damperSub = observable:Subscribe(function(unconverted)
+			self:_applyDamper(unconverted)
+		end)
+	end
+end
 
-		local currentSpring = rawget(self, "_currentSpring")
-		if currentSpring then
-			currentSpring.Damper = unconverted
-		else
-			self:_getInitInfo().Damper = unconverted
-		end
+function SpringObject:_applyDamper(unconverted)
+	assert(type(unconverted) == "number", "Bad damper")
 
-		self.Changed:Fire()
-	end)
+	local currentSpring = rawget(self, "_currentSpring")
+	if currentSpring then
+		currentSpring.Damper = unconverted
+	else
+		self:_getInitInfo().Damper = unconverted
+	end
+
+	self.Changed:Fire()
 end
 
 --[=[
@@ -356,20 +386,29 @@ end
 function SpringObject:SetSpeed(speed)
 	assert(speed ~= nil, "Bad speed")
 
-	local observable = assert(Blend.toNumberObservable(speed), "Invalid speed")
+	if type(speed) == "number" then
+		self._maid._speedSub = nil
+		self:_applySpeed(speed)
+	else
+		local observable = assert(Blend.toPropertyObservable(speed), "Invalid speed")
 
-	self._maid._speedSub = observable:Subscribe(function(unconverted)
-		assert(type(unconverted) == "number", "Bad damper")
+		self._maid._speedSub = observable:Subscribe(function(unconverted)
+			self:_applySpeed(unconverted)
+		end)
+	end
+end
 
-		local currentSpring = rawget(self, "_currentSpring")
-		if currentSpring then
-			currentSpring.Speed = unconverted
-		else
-			self:_getInitInfo().Speed = unconverted
-		end
+function SpringObject:_applySpeed(unconverted)
+	assert(type(unconverted) == "number", "Bad damper")
 
-		self.Changed:Fire()
-	end)
+	local currentSpring = rawget(self, "_currentSpring")
+	if currentSpring then
+		currentSpring.Speed = unconverted
+	else
+		self:_getInitInfo().Speed = unconverted
+	end
+
+	self.Changed:Fire()
 end
 
 --[=[

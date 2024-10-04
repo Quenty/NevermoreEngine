@@ -8,10 +8,6 @@ local require = require(script.Parent.loader).load(script)
 
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local String = require("String")
-local RxBinderUtils = require("RxBinderUtils")
-local BinderUtils = require("BinderUtils")
-local Binder = require("Binder")
-local RxStateStackUtils = require("RxStateStackUtils")
 local EnumUtils = require("EnumUtils")
 local DataStoreStringUtils = require("DataStoreStringUtils")
 
@@ -28,47 +24,6 @@ function PlayerSettingsUtils.create()
 	playerSettings:AddTag("PlayerSettings")
 
 	return playerSettings
-end
-
---[=[
-	Observe a player settings for a player.
-
-	@param binder Binder<PlayerSettings>
-	@param player Player
-	@return Observable<PlayerSettings>
-]=]
-function PlayerSettingsUtils.observePlayerSettingsBrio(binder, player)
-	assert(Binder.isBinder(binder), "No binder")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-
-	return RxBinderUtils.observeBoundChildClassBrio(binder, player)
-end
-
---[=[
-	Observe a player's latest settings
-
-	@param binder Binder<PlayerSettings>
-	@param player Player
-	@return Observable<PlayerSettings>
-]=]
-function PlayerSettingsUtils.observePlayerSettings(binder, player)
-	return RxBinderUtils.observeBoundChildClassBrio(binder, player):Pipe({
-		RxStateStackUtils.topOfStack()
-	})
-end
-
---[=[
-	Gets a player's latest settings
-
-	@param binder Binder<PlayerSettings>
-	@param player Player
-	@return PlayerSettings
-]=]
-function PlayerSettingsUtils.getPlayerSettings(binder, player)
-	assert(Binder.isBinder(binder), "No binder")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-
-	return BinderUtils.findFirstChild(binder, player)
 end
 
 --[=[

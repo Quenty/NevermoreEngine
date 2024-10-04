@@ -27,6 +27,29 @@ function ObservableMapList.new()
 	self._maid = Maid.new()
 	self._observableMapOfLists = self._maid:Add(ObservableMap.new())
 
+--[=[
+	Fires when an item is added
+	@readonly
+	@prop ListAdded Signal<TKey>
+	@within ObservableMapSet
+]=]
+	self.ListAdded = assert(self._observableMapOfLists.KeyAdded, "Bad KeyAdded") -- :Fire(key, set)
+
+--[=[
+	Fires when an item is removed
+	@readonly
+	@prop ListRemoved Signal<TKey>
+	@within ObservableMapSet
+]=]
+	self.ListRemoved = assert(self._observableMapOfLists.KeyRemoved, "Bad KeyRemoved") -- :Fire(key)
+
+--[=[
+	Fires when the count changes.
+	@prop CountChanged RBXScriptSignal
+	@within ObservableMap
+]=]
+	self.CountChanged = assert(self._observableMapOfLists.CountChanged, "Bad CountChanged")
+
 	return self
 end
 
@@ -46,19 +69,19 @@ function ObservableMapList:Push(observeKey, entry)
 	assert(observeKey ~= nil, "Bad observeKey")
 	assert(entry ~= nil, "Bad entry")
 
-	if not Observable.isObservable(observeKey) then
-		observeKey = Rx.of(observeKey)
-	end
-
 	local maid = Maid.new()
 
-	maid:GiveTask(observeKey:Subscribe(function(key)
-		maid._currentAddValue = nil
+	if Observable.isObservable(observeKey) then
+		maid:GiveTask(observeKey:Subscribe(function(key)
+			maid._currentAddValue = nil
 
-		if key ~= nil then
-			maid._currentAddValue = self:_addToList(key, entry)
-		end
-	end))
+			if key ~= nil then
+				maid._currentAddValue = self:_addToList(key, entry)
+			end
+		end))
+	else
+		maid:GiveTask(self:_addToList(observeKey, entry))
+	end
 
 	-- Ensure self-cleanup when map cleans up
 	self._maid[maid] = maid
@@ -221,18 +244,36 @@ function ObservableMapList:GetListForKey(key)
 	return self._observableMapOfLists:Get(key)
 end
 
+--[=[
+	Observes the observable list for the given key
+
+	@param key TKey
+	@return Observable<ObservableList<TValue>>
+]=]
 function ObservableMapList:ObserveList(key)
 	assert(key ~= nil, "Bad key")
 
 	return self._observableMapOfLists:ObserveAtKey(key)
 end
 
+--[=[
+	Observes the observable list for the given key
+
+	@param key TKey
+	@return Observable<Brio<ObservableList<TValue>>>
+]=]
 function ObservableMapList:ObserveListBrio(key)
 	assert(key ~= nil, "Bad key")
 
 	return self._observableMapOfLists:ObserveAtKeyBrio(key)
 end
 
+--[=[
+	Observes the number of entries for the given key
+
+	@param key TKey
+	@return Observable<number>
+]=]
 function ObservableMapList:ObserveCountForKey(key)
 	assert(key ~= nil, "Bad key")
 
@@ -247,10 +288,6 @@ end
 function ObservableMapList:_addToList(key, entry)
 	local list = self:_getOrCreateList(key)
 	return list:Add(entry)
-end
-
-function ObservableMapList:_removeList(list)
-	self._maid[list] = nil
 end
 
 function ObservableMapList:_getOrCreateList(key)

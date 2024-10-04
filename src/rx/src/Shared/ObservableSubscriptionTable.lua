@@ -35,7 +35,9 @@ function ObservableSubscriptionTable:Fire(key, ...)
 
 	-- Make a copy so we don't have to worry about our last changing
 	for _, sub in pairs(table.clone(subs)) do
-		task.spawn(sub.Fire, sub, ...)
+		if sub:IsPending() then
+			task.spawn(sub.Fire, sub, ...)
+		end
 	end
 end
 
@@ -49,7 +51,9 @@ function ObservableSubscriptionTable:Complete(key, ...)
 	self._subMap[key] = nil
 
 	for _, sub in pairs(subsToComplete) do
-		task.spawn(sub.Complete, sub, ...)
+		if sub:IsPending() then
+			task.spawn(sub.Complete, sub, ...)
+		end
 	end
 end
 
@@ -74,11 +78,11 @@ function ObservableSubscriptionTable:Observe(key, retrieveInitialValue)
 		end
 
 		return function()
-			if not self._subMap[key] then
+			local current = self._subMap[key]
+			if not current then
 				return
 			end
 
-			local current = self._subMap[key]
 			local index = table.find(current, sub)
 			if not index then
 				return

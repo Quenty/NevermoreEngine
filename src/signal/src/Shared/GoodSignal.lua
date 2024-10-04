@@ -44,7 +44,7 @@
 ]=]
 
 -- The currently idle thread to run the next handler on
-local freeRunnerThreadLookup = {}
+local weakFreeRunnerThreadLookup = setmetatable({}, {__mode = "kv"})
 
 -- Function which acquires the currently idle handler runner thread, runs the
 -- function fn on it, and then releases the thread, returning it to being the
@@ -52,13 +52,11 @@ local freeRunnerThreadLookup = {}
 -- If there was a currently idle runner thread already, that's okay, that old
 -- one will just get thrown and eventually GCed.
 local function acquireRunnerThreadAndCallEventHandler(memoryCategory, fn, ...)
-	debug.setmemorycategory(memoryCategory)
-
-	local acquiredRunnerThread = freeRunnerThreadLookup[memoryCategory]
-	freeRunnerThreadLookup[memoryCategory] = nil
+	local acquiredRunnerThread = weakFreeRunnerThreadLookup[memoryCategory]
+	weakFreeRunnerThreadLookup[memoryCategory] = nil
 	fn(...)
 	-- The handler finished running, this runner thread is free again.
-	freeRunnerThreadLookup[memoryCategory] = acquiredRunnerThread
+	weakFreeRunnerThreadLookup[memoryCategory] = acquiredRunnerThread
 end
 
 -- Coroutine runner that we create coroutines of. The coroutine can be
@@ -83,40 +81,56 @@ end
 
 -- Connection class
 local Connection = {}
+Connection.ClassName = "Connection"
 Connection.__index = Connection
 
 function Connection.new(signal, fn)
 	return setmetatable({
-		_connected = true,
+		-- selene: allow(incorrect_standard_library_use)
+		_memoryCategory = debug.getmemorycategory(),
 		_signal = signal,
 		_fn = fn,
-		_next = false,
 	}, Connection)
 end
 
-function Connection:Disconnect()
-	self._connected = false
+function Connection:IsConnected()
+	return rawget(self, "_signal") ~= nil
+end
 
-	-- Unhook the node, but DON'T clear it. That way any fire calls that are
-	-- currently sitting on this node will be able to iterate forwards off of
-	-- it, but any subsequent fire calls will not hit it, and it will be GCed
-	-- when no more fire calls are sitting on it.
-	if self._signal._handlerListHead == self then
-		self._signal._handlerListHead = self._next
+function Connection:Disconnect()
+	local signal = rawget(self, "_signal")
+	if not signal then
+		return
+	end
+
+	-- Unhook the node. Originally the good signal would not clear this signal and
+	-- rely upon GC. However, this means that connections would keep themselves and other
+	-- disconnected nodes in the chain alive, keeping the function closure alive, and in return
+	-- keeping the signal alive. This means a `Maid` could keep full object trees alive if a
+	-- connection was made to them.
+
+	local ourNext = rawget(self, "_next")
+
+	if signal._handlerListHead == self then
+		signal._handlerListHead = ourNext or false
 	else
-		local prev = self._signal._handlerListHead
-		while prev and prev._next ~= self do
-			prev = prev._next
+		local prev = signal._handlerListHead
+		while prev and rawget(prev, "_next") ~= self do
+			prev = rawget(prev, "_next")
 		end
 		if prev then
-			prev._next = self._next
+			rawset(prev, "_next", ourNext)
 		end
 	end
+
+	-- Clear all member variables that aren't _next so keeping a connection
+	-- indexed allows for GC of other components
+	table.clear(self)
 end
 
 Connection.Destroy = Connection.Disconnect
 
--- Make Connection strict
+-- Make signal strict
 setmetatable(Connection, {
 	__index = function(_, key)
 		error(string.format("Attempt to get Connection::%s (not a valid member)", tostring(key)), 2)
@@ -161,7 +175,7 @@ end
 function Signal:Connect(fn)
 	local connection = Connection.new(self, fn)
 	if self._handlerListHead then
-		connection._next = self._handlerListHead
+		rawset(connection, "_next", self._handlerListHead)
 		self._handlerListHead = connection
 	else
 		self._handlerListHead = connection
@@ -194,20 +208,26 @@ end
 	@param ... T -- Variable arguments to pass to handler
 ]=]
 function Signal:Fire(...)
-	-- selene: allow(incorrect_standard_library_use)
-	local memoryCategory = debug.getmemorycategory()
+	local connection = self._handlerListHead
+	while connection do
+		-- capture our next node, which could after this be cleared or disconnected.
+		-- any connections occuring during fire will be added to the _handerListHead and not be fired
+		-- in this round. Any disconnections in the chain will still work here.
+		local nextNode = rawget(connection, "_next")
 
-	local item = self._handlerListHead
-	while item do
-		if item._connected then
-			if not freeRunnerThreadLookup[memoryCategory] then
-				freeRunnerThreadLookup[memoryCategory] = coroutine.create(runEventHandlerInFreeThread)
-				-- Get the freeRunnerThread to the first yield
-				coroutine.resume(freeRunnerThreadLookup[memoryCategory], memoryCategory)
+		if rawget(connection, "_signal") ~= nil then -- isConnected
+			local memoryCategory = connection._memoryCategory
+
+			-- Get the freeRunnerThread to the first yield
+			if not weakFreeRunnerThreadLookup[memoryCategory] then
+				weakFreeRunnerThreadLookup[memoryCategory] = coroutine.create(runEventHandlerInFreeThread)
+				coroutine.resume(weakFreeRunnerThreadLookup[memoryCategory], memoryCategory)
 			end
-			task.spawn(freeRunnerThreadLookup[memoryCategory], memoryCategory, item._fn, ...)
+
+			task.spawn(weakFreeRunnerThreadLookup[memoryCategory], memoryCategory, connection._fn, ...)
 		end
-		item = item._next
+
+		connection = nextNode
 	end
 end
 
@@ -224,11 +244,13 @@ end
 ]=]
 function Signal:Wait()
 	local waitingCoroutine = coroutine.running()
-	local cn;
-	cn = self:Connect(function(...)
-		cn:Disconnect()
+
+	local connection
+	connection = self:Connect(function(...)
+		connection:Disconnect()
 		task.spawn(waitingCoroutine, ...)
 	end)
+
 	return coroutine.yield()
 end
 
@@ -244,14 +266,12 @@ end
 	@return RBXScriptConnection
 ]=]
 function Signal:Once(fn)
-	local cn;
-	cn = self:Connect(function(...)
-		if cn._connected then
-			cn:Disconnect()
-		end
+	local connection
+	connection = self:Connect(function(...)
+		connection:Disconnect()
 		fn(...)
 	end)
-	return cn
+	return connection
 end
 
 --[=[

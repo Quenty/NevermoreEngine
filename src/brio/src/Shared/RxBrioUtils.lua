@@ -782,29 +782,24 @@ function RxBrioUtils.switchToBrio(predicate)
 			local topMaid = Maid.new()
 
 			topMaid:GiveTask(source:Subscribe(function(result, ...)
+				-- Always kill previous brio first
+				topMaid._last = nil
+
 				if Brio.isBrio(result) then
 					if result:IsDead() then
-						topMaid._last = nil
 						return
 					end
 
 					if predicate == nil or predicate(result:GetValue()) then
-						local maid = result:ToMaid()
-						local newBrio = maid:Add(Brio.new(result:GetValue()))
+						local newBrio = BrioUtils.clone(result)
+						topMaid._last = newBrio
 						sub:Fire(newBrio)
-
-						topMaid._last = maid
-					else
-						topMaid._last = nil
 					end
 				else
 					if predicate == nil or predicate(result, ...) then
 						local newBrio = Brio.new(result, ...)
-
 						topMaid._last = newBrio
 						sub:Fire(newBrio)
-					else
-						topMaid._last = nil
 					end
 				end
 			end, sub:GetFailComplete()))

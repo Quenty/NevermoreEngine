@@ -26,9 +26,18 @@ function BrioUtils.clone(brio)
 
 	local newBrio = Brio.new(brio:GetValue())
 
-	newBrio:ToMaid():GiveTask(brio:GetDiedSignal():Connect(function()
+	local connection
+	local otherConnection
+	connection = brio:GetDiedSignal():Connect(function()
+		connection:Disconnect()
+		otherConnection:Disconnect()
 		newBrio:Kill()
-	end))
+	end)
+
+	otherConnection = newBrio:GetDiedSignal():Connect(function()
+		otherConnection:Disconnect()
+		connection:Disconnect()
+	end)
 
 	return newBrio
 end
@@ -164,7 +173,7 @@ function BrioUtils.extend(brio, ...)
 		return Brio.DEAD
 	end
 
-	local values = brio._values
+	local values = brio:GetPackedValues()
 	local current = {}
 	for i=1, values.n do
 		current[i] = values[i]
@@ -202,7 +211,7 @@ function BrioUtils.prepend(brio, ...)
 		return Brio.DEAD
 	end
 
-	local values = brio._values
+	local values = brio:GetPackedValues()
 	local current = {}
 	local otherValues = table.pack(...)
 	for i=1, otherValues.n do
@@ -241,13 +250,13 @@ function BrioUtils.merge(brio, otherBrio)
 		return Brio.DEAD
 	end
 
-	local values = brio._values
+	local values = brio:GetPackedValues()
 	local current = {}
 	for i=1, values.n do
 		current[i] = values[i]
 	end
 
-	local otherValues = otherBrio._values
+	local otherValues = otherBrio:GetPackedValues()
 	for i=1, otherValues.n do
 		current[values.n+i] = otherValues[i]
 	end

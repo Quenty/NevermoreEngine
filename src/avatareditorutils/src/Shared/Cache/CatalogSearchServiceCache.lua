@@ -18,6 +18,9 @@ function CatalogSearchServiceCache:Init(serviceBag)
 		return AvatarEditorUtils.promiseSearchCatalog(params)
 	end)
 
+	self._promiseInventoryPages = MemorizeUtils.memoize(function(avatarAssetTypes)
+		return AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes)
+	end)
 end
 
 
@@ -25,5 +28,8 @@ function CatalogSearchServiceCache:PromiseSearchCatalog(params)
 	return self._promiseSearchCatalog(params)
 end
 
+function CatalogSearchServiceCache:PromiseInventoryPages(avatarAssetTypes)
+	return self._promiseInventoryPages(avatarAssetTypes)
+end
 
 return CatalogSearchServiceCache

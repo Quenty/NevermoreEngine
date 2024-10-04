@@ -223,7 +223,7 @@ end
 	@return { T }
 ]=]
 function ObservableSet:GetList()
-	local list = {}
+	local list = table.create(self._countValue.Value)
 	for item, _ in pairs(self._set) do
 		table.insert(list, item)
 	end

@@ -186,7 +186,7 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 	end)
 
 	for _, coreGuiType in pairs(DISABLE_CORE_GUI_TYPES) do
-		maid:GiveTask(CoreGuiEnabler:Disable(self, coreGuiType))
+		maid:GiveTask(CoreGuiEnabler:PushDisable(coreGuiType))
 	end
 end
 

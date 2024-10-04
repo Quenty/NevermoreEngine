@@ -11,7 +11,7 @@ local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local Remoting = require("Remoting")
-local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
+local SettingsDataService = require("SettingsDataService")
 
 local PlayerSettings = setmetatable({}, PlayerSettingsBase)
 PlayerSettings.ClassName = "PlayerSettings"
@@ -21,11 +21,11 @@ function PlayerSettings.new(obj, serviceBag)
 	local self = setmetatable(PlayerSettingsBase.new(obj, serviceBag), PlayerSettings)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._settingRegistryServiceShared = self._serviceBag:GetService(SettingRegistryServiceShared)
+	self._settingsDataService = self._serviceBag:GetService(SettingsDataService)
 
 	self:_setupRemoting()
 
-	self._maid:GiveTask(self._settingRegistryServiceShared:ObserveRegisteredDefinitionsBrio():Subscribe(function(brio)
+	self._maid:GiveTask(self._settingsDataService:ObserveRegisteredDefinitionsBrio():Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end

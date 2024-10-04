@@ -11,14 +11,13 @@ local Observable = require("Observable")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local RxSignal = require("RxSignal")
 local String = require("String")
 local Symbol = require("Symbol")
-local TiePropertyChangedSignalConnection = require("TiePropertyChangedSignalConnection")
+local TieMemberInterface = require("TieMemberInterface")
 local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
 local TieUtils = require("TieUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
-local ValueObject = require("ValueObject")
-local TieMemberInterface = require("TieMemberInterface")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -48,18 +47,22 @@ end
 function TiePropertyInterface:Observe()
 	return self:_observeValueBaseBrio():Pipe({
 		Rx.switchMap(function(brio)
-			if brio:IsDead() then
-				return Rx.of(nil)
-			end
-			local valueBase = brio:GetValue()
-			if not valueBase then
-				return Rx.of(nil)
-			end
-
 			return Observable.new(function(sub)
-				local maid = Maid.new()
+				if brio:IsDead() then
+					sub:Fire(nil)
+					sub:Complete()
+					return
+				end
 
-				sub:Fire(valueBase.Value)
+				local valueBase = brio:GetValue()
+				if not valueBase then
+					sub:Fire(nil)
+					sub:Complete()
+					return
+				end
+
+				local maid = brio:ToMaid()
+
 				maid:GiveTask(valueBase.Changed:Connect(function()
 					sub:Fire(valueBase.Value)
 				end))
@@ -69,6 +72,8 @@ function TiePropertyInterface:Observe()
 						sub:Fire(nil)
 					end
 				end))
+
+				sub:Fire(valueBase.Value)
 
 				return maid
 			end)
@@ -119,21 +124,9 @@ function TiePropertyInterface:_getFullName()
 end
 
 function TiePropertyInterface:_getChangedEvent()
-	return {
-		Connect = function(_, callback)
-			assert(type(callback) == "function", "Bad callback")
-			return TiePropertyChangedSignalConnection.new(function(connMaid)
-				local valueObject = connMaid:Add(ValueObject.new(nil)		)
-
-				connMaid:GiveTask(self:Observe():Subscribe(function(value)
-					valueObject.Value = value
-				end))
-
-				-- After observing, so we can emit only changes.
-				connMaid:GiveTask(valueObject.Changed:Connect(callback))
-			end)
-		end;
-	}
+	return RxSignal.new(self:Observe():Pipe({
+		Rx.skip(1)
+	}))
 end
 
 local IMPLEMENTATION_TYPES = {
@@ -196,29 +189,29 @@ function TiePropertyInterface:_observeFromImplParent(implParent)
 			end
 		end
 
-		-- Subscribe to named children
-		topMaid:GiveTask(RxInstanceUtils.observeChildrenOfNameBrio(implParent, "Instance", self._memberDefinition:GetMemberName())
-			:Subscribe(function(brio)
-				if brio:IsDead() then
-					return
+		-- Subscribe to named children, assuming no name changes...
+		topMaid:GiveTask(RxInstanceUtils.observeChildrenBrio(implParent, function(value)
+			return value.Name == memberName
+		end):Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
+
+			local innerMaid, child = brio:ToMaidAndValue()
+
+			innerMaid:GiveTask(function()
+				local index = table.find(validNamedChildren, child)
+
+				if index then
+					table.remove(validNamedChildren, index)
 				end
 
-				local innerMaid = brio:ToMaid()
-				local child = brio:GetValue()
-
-				innerMaid:GiveTask(function()
-					local index = table.find(validNamedChildren, child)
-
-					if index then
-						table.remove(validNamedChildren, index)
-					end
-
-					update()
-				end)
-
-				table.insert(validNamedChildren, child)
 				update()
-			end))
+			end)
+
+			table.insert(validNamedChildren, child)
+			update()
+		end))
 
 		topMaid:GiveTask(implParent:GetAttributeChangedSignal(memberName):Connect(update))
 		update()
