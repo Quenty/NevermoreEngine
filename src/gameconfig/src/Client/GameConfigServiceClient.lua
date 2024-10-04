@@ -24,7 +24,7 @@ function GameConfigServiceClient:Init(serviceBag)
 	self._serviceBag:GetService(require("GameConfigDataService"))
 	self._binders = self._serviceBag:GetService(require("GameConfigBindersClient"))
 
-	self._configPicker = self._maid:Add(GameConfigPicker.new(self._binders.GameConfig, self._binders.GameConfigAsset))
+	self._configPicker = self._maid:Add(GameConfigPicker.new(self._serviceBag, self._binders.GameConfig, self._binders.GameConfigAsset))
 
 	self._serviceBag:GetService(require("GameConfigDataService")):SetConfigPicker(self._configPicker)
 end

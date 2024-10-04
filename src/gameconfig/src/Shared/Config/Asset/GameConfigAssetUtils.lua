@@ -36,6 +36,7 @@ end
 --[=[
 	Promises cloud data for a given asset type
 
+	@param serviceBag ServiceBag
 	@param assetType GameConfigAssetType
 	@param assetId number
 	@return Promise<any>
