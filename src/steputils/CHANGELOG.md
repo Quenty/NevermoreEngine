@@ -1,19 +1,15 @@
-# v3.5.1 (Fri Oct 04 2024)
-
-#### 🐛 Bug Fix
-
-- onSteppedFrame - Refactor to utilize RBXScriptSignal:Once() [#502](https://github.com/Quenty/NevermoreEngine/pull/502) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.5.0...@quenty/steputils@3.5.1) (2024-10-04)
+
+**Note:** Version bump only for package @quenty/steputils
+
+
+
+
 
 # [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.4.0...@quenty/steputils@3.5.0) (2024-09-25)
 
