@@ -18,6 +18,7 @@
 	maid:DoCleaning()
 	```
 
+	@ignore
 	@class Maid
 ]]
 -- luacheck: pop
@@ -32,6 +33,7 @@ Maid.ClassName = "Maid"
 	local maid = Maid.new()
 	```
 
+	@ignore
 	@return Maid
 ]=]
 function Maid.new()
@@ -48,6 +50,7 @@ end
 	print(Maid.isMaid(nil)) --> false
 	```
 
+	@ignore
 	@param value any
 	@return boolean
 ]=]
@@ -67,6 +70,7 @@ end
 	print(maid._current) --> nil
 	```
 
+	@ignore
 	@param index any
 	@return MaidTask
 ]=]
@@ -94,6 +98,7 @@ end
 	Maid[key] = nil                Removes a named task.
 	```
 
+	@ignore
 	@param index any
 	@param newTask MaidTask
 ]=]
@@ -143,6 +148,7 @@ end
 --[=[
 	Gives a task to the maid for cleanup and returns the resulting value
 
+	@ignore
 	@param task MaidTask -- An item to clean
 	@return MaidTask
 ]=]
@@ -163,6 +169,7 @@ end
 --[=[
 	Gives a task to the maid for cleanup, but uses an incremented number as a key.
 
+	@ignore
 	@param task MaidTask -- An item to clean
 	@return number -- taskId
 ]=]
@@ -184,6 +191,7 @@ end
 --[=[
 	Gives a promise to the maid for clean.
 
+	@ignore
 	@param promise Promise<T>
 	@return Promise<T>
 ]=]
@@ -218,6 +226,8 @@ end
 	However, adding tasks while cleaning is not generally a good idea, as if you add a
 	function that adds itself, this will loop indefinitely.
 	:::
+
+	@ignore
 ]=]
 function Maid:DoCleaning()
 	local tasks = self._tasks
@@ -265,6 +275,7 @@ end
 --[=[
 	Alias for [Maid.DoCleaning()](/api/Maid#DoCleaning)
 
+	@ignore
 	@function Destroy
 	@within Maid
 ]=]
