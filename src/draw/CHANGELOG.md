@@ -1,23 +1,18 @@
-# v7.6.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Draw.updateRay renders properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.5.0...@quenty/draw@7.6.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* Draw.updateRay renders properly ([ec1fd94](https://github.com/Quenty/NevermoreEngine/commit/ec1fd94ba5f1edd3332975d97bc26cdcf85f65c3))
+
+
+
+
 
 # [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.4.0...@quenty/draw@7.5.0) (2024-09-25)
 

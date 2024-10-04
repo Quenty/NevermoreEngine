@@ -1,20 +1,18 @@
-# v13.8.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxR15Utils.observeShoulderRigAttachmentBrio(character, side) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.7.0...@quenty/r15utils@13.8.0) (2024-10-04)
+
+
+### Features
+
+* Add RxR15Utils.observeShoulderRigAttachmentBrio(character, side) ([fd78992](https://github.com/Quenty/NevermoreEngine/commit/fd78992905ee18966043feeb9c07756332e9dab5))
+
+
+
+
 
 # [13.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.6.0...@quenty/r15utils@13.7.0) (2024-09-25)
 

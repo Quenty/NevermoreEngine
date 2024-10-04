@@ -1,28 +1,25 @@
-# v12.8.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-- feat: ObservableSortedList can take non rx-value and still be performant ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableSortedList:Contains(value) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Optimize ObservableMapList ([@Quenty](https://github.com/Quenty))
-- refactor: ObservableMapSet is backed by ObservableMap instead of custom implementation ([@Quenty](https://github.com/Quenty))
-- perf: Use switchToBrio() and table.create ([@Quenty](https://github.com/Quenty))
-- perf: Predeclare size of lists to allocate for lists ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.7.0...@quenty/observablecollection@12.8.0) (2024-10-04)
+
+
+### Features
+
+* Add ObservableSortedList:Contains(value) ([049c9df](https://github.com/Quenty/NevermoreEngine/commit/049c9df1df0cc765124c624a1276a456ff3e7700))
+* ObservableSortedList can take non rx-value and still be performant ([e5c1d4f](https://github.com/Quenty/NevermoreEngine/commit/e5c1d4fb272f22d2559fba6f1a533686a730fca8))
+
+
+### Performance Improvements
+
+* Predeclare size of lists to allocate for lists ([b662bbb](https://github.com/Quenty/NevermoreEngine/commit/b662bbb814f91a1853a549b217fa8af8a9f74d3d))
+* Use switchToBrio() and table.create ([f73644e](https://github.com/Quenty/NevermoreEngine/commit/f73644e56a9ffd0991833bd147c705c210553539))
+
+
+
+
 
 # [12.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.6.0...@quenty/observablecollection@12.7.0) (2024-09-25)
 

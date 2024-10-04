@@ -1,24 +1,19 @@
-# v14.9.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Localization should change whenever entries change ([@Quenty](https://github.com/Quenty))
-- fix: Output parsing was wrong for LocalizationEntryParserUtils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.8.0...@quenty/clienttranslator@14.9.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* Localization should change whenever entries change ([9d2f0b7](https://github.com/Quenty/NevermoreEngine/commit/9d2f0b7a41d97902520a0adb41bfeab85cce3302))
+* Output parsing was wrong for LocalizationEntryParserUtils ([8de8872](https://github.com/Quenty/NevermoreEngine/commit/8de8872d5ef9c432bc91b581f8534810fd32f0e7))
+
+
+
+
 
 # [14.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.7.0...@quenty/clienttranslator@14.8.0) (2024-09-25)
 

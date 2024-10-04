@@ -1,23 +1,15 @@
-# v3.2.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Symbol uses table.freeze() instead of newproxy() for memory benefits ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/symbol@3.1.0...@quenty/symbol@3.2.0) (2024-10-04)
+
+**Note:** Version bump only for package @quenty/symbol
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/symbol@3.0.0...@quenty/symbol@3.1.0) (2024-05-09)
 

@@ -1,23 +1,18 @@
-# v10.13.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- perf: Fix settings to use a cache which reduces memory usage by 10 MB approximately ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.12.0...@quenty/settings-inputkeymap@10.13.0) (2024-10-04)
+
+
+### Performance Improvements
+
+* Fix settings to use a cache which reduces memory usage by 10 MB approximately ([990d0a6](https://github.com/Quenty/NevermoreEngine/commit/990d0a678ad405740acd045f041c0bbd51eca660))
+
+
+
+
 
 # [10.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.11.0...@quenty/settings-inputkeymap@10.12.0) (2024-09-25)
 

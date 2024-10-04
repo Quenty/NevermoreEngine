@@ -1,20 +1,18 @@
-# v10.10.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-- feat: Add RigBuilderUtils.disableAnimateScript(rig: Model) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.9.0...@quenty/rigbuilderutils@10.10.0) (2024-10-04)
+
+
+### Features
+
+* Add RigBuilderUtils.disableAnimateScript(rig: Model) ([0a4b88a](https://github.com/Quenty/NevermoreEngine/commit/0a4b88a2aaf5acb96e0fad3480733e2ab9fba99f))
+
+
+
+
 
 # [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.8.0...@quenty/rigbuilderutils@10.9.0) (2024-09-25)
 

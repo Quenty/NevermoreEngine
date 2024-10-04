@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ducktype",
-  "version": "5.5.0",
+  "version": "5.6.0",
   "description": "Utility functions to duck type a value",
   "keywords": [
     "Roblox",

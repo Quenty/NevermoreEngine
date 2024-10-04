@@ -1,23 +1,18 @@
-# v11.10.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Better errors when trying to assign a rogue property ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.9.0...@quenty/rogue-properties@11.10.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* Better errors when trying to assign a rogue property ([0cc2573](https://github.com/Quenty/NevermoreEngine/commit/0cc2573fde14e7318e0bc49f6d0f33b0b841c838))
+
+
+
+
 
 # [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.8.0...@quenty/rogue-properties@11.9.0) (2024-09-25)
 

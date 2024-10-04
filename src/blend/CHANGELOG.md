@@ -1,26 +1,24 @@
-# v12.8.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Remoe unused Rx ([@Quenty](https://github.com/Quenty))
-- fix: Blend unparents children before destruction saving any instances that need to be reparented ([@Quenty](https://github.com/Quenty))
-- perf: Avoid connecting to Rx if not needed in SpringObject ([@Quenty](https://github.com/Quenty))
-- fix: Avoid additional table construction in Blend.Computed for performance gain ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.7.0...@quenty/blend@12.8.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* Avoid additional table construction in Blend.Computed for performance gain ([40ff0c0](https://github.com/Quenty/NevermoreEngine/commit/40ff0c05ed62fec4d6033bdabd477223bbc96a6a))
+* Blend unparents children before destruction saving any instances that need to be reparented ([2728331](https://github.com/Quenty/NevermoreEngine/commit/272833178a1cbe833b35121c707ec8061c3891aa))
+
+
+### Performance Improvements
+
+* Avoid connecting to Rx if not needed in SpringObject ([a5ca4b8](https://github.com/Quenty/NevermoreEngine/commit/a5ca4b8cd4e4855b58a61478c9ecf9ff4a8a2cfe))
+
+
+
+
 
 # [12.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.6.0...@quenty/blend@12.7.0) (2024-09-25)
 

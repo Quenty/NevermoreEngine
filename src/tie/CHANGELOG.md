@@ -1,26 +1,24 @@
-# v10.10.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-- feat: Use configuration instead of folder. While this forces a datamodel event to fire, it means we scan less classes on the client, and it's easier to see in the explorer ([@Quenty](https://github.com/Quenty))
-- feat: Use RxSignal for the TiePropertyInterface ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Reduce memory usage of tie properties by assuming name ([@Quenty](https://github.com/Quenty))
-- perf: TieImplementation uses Folder on client instead of camera, which results in a memory improvement ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.9.0...@quenty/tie@10.10.0) (2024-10-04)
+
+
+### Features
+
+* Use configuration instead of folder. While this forces a datamodel event to fire, it means we scan less classes on the client, and it's easier to see in the explorer ([06a342f](https://github.com/Quenty/NevermoreEngine/commit/06a342f5726282c46174ddec3dc7f54eeb768c46))
+* Use RxSignal for the TiePropertyInterface ([5ea04b8](https://github.com/Quenty/NevermoreEngine/commit/5ea04b85402e994f13a81a9b32e5971e1a262eb5))
+
+
+### Performance Improvements
+
+* TieImplementation uses Folder on client instead of camera, which results in a memory improvement ([bc55d76](https://github.com/Quenty/NevermoreEngine/commit/bc55d76fd296c8923e47c3830145c8e75d8a7b69))
+
+
+
+
 
 # [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.8.0...@quenty/tie@10.9.0) (2024-09-25)
 

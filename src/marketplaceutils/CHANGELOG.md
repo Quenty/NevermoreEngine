@@ -1,23 +1,18 @@
-# v11.7.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- perf: Increase cache size for tuple lookup ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.6.0...@quenty/marketplaceutils@11.7.0) (2024-10-04)
+
+
+### Performance Improvements
+
+* Increase cache size for tuple lookup ([5817760](https://github.com/Quenty/NevermoreEngine/commit/5817760b869500376f5654dfd312c2fdca2cef36))
+
+
+
+
 
 # [11.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.5.0...@quenty/marketplaceutils@11.6.0) (2024-09-25)
 

@@ -1,20 +1,18 @@
-# v14.11.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-- feat: Default to SlottedTouchButton instead of "Tap" for ProximityPromptInput ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.10.0...@quenty/inputkeymaputils@14.11.0) (2024-10-04)
+
+
+### Features
+
+* Default to SlottedTouchButton instead of "Tap" for ProximityPromptInput ([68518eb](https://github.com/Quenty/NevermoreEngine/commit/68518eb22ed3b7eb7aa1660f35d0819241ad0f87))
+
+
+
+
 
 # [14.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.9.0...@quenty/inputkeymaputils@14.10.0) (2024-09-25)
 

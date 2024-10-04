@@ -1,27 +1,20 @@
-# v13.8.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Allow cleanup to be done in a safer way if the object is already cleaned up ([@Quenty](https://github.com/Quenty))
-- fix: Do not fire observables that are cancelled ([@Quenty](https://github.com/Quenty))
-- refactor: Reduce number of maids being used ([@Quenty](https://github.com/Quenty))
-- refactor: refactor stateTypes ([@Quenty](https://github.com/Quenty))
-- fix: Use nil instead of empty string for source here to save a bit of memory ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.7.0...@quenty/rx@13.8.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* Allow cleanup to be done in a safer way if the object is already cleaned up ([20b3ef1](https://github.com/Quenty/NevermoreEngine/commit/20b3ef1802e4bf92d0f46de99f3ec85660f17002))
+* Do not fire observables that are cancelled ([2098b28](https://github.com/Quenty/NevermoreEngine/commit/2098b2809f40c9a813200b4f2789340901c6baee))
+* Use nil instead of empty string for source here to save a bit of memory ([f1edd7f](https://github.com/Quenty/NevermoreEngine/commit/f1edd7f823ec0307517f1cba2717de147445608f))
+
+
+
+
 
 # [13.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.6.0...@quenty/rx@13.7.0) (2024-09-25)
 

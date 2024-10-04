@@ -1,6 +1,6 @@
 {
   "name": "@quenty/snackbar",
-  "version": "11.9.1",
+  "version": "11.10.0",
   "description": "Snackbars provide lightweight feedback on an operation at the base of the screen. They automatically disappear after a timeout or user interaction. There can only be one on the screen at a time.",
   "keywords": [
     "Roblox",

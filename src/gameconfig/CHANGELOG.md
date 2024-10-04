@@ -1,24 +1,23 @@
-# v12.12.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix stuff ([@Quenty](https://github.com/Quenty))
-- perf: Use marketplace info cache when querying cloud data ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.11.0...@quenty/gameconfig@12.12.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* Fix stuff ([016376c](https://github.com/Quenty/NevermoreEngine/commit/016376c87911329b9059f7644bcb4f9de8245f2f))
+
+
+### Performance Improvements
+
+* Use marketplace info cache when querying cloud data ([12ed4a6](https://github.com/Quenty/NevermoreEngine/commit/12ed4a60ef5d908a99dc2a96134024db659077bf))
+
+
+
+
 
 # [12.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.10.0...@quenty/gameconfig@12.11.0) (2024-09-25)
 

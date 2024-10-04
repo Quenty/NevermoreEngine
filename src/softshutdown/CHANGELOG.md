@@ -1,23 +1,18 @@
-# v9.11.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: PushDisable preventing any memory leaks ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.10.0...@quenty/softshutdown@9.11.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* PushDisable preventing any memory leaks ([4df041a](https://github.com/Quenty/NevermoreEngine/commit/4df041a2e435845928babe3675fc6735703ca70a))
+
+
+
+
 
 # [9.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.9.0...@quenty/softshutdown@9.10.0) (2024-09-25)
 

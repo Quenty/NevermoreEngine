@@ -1,25 +1,24 @@
-# v14.8.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Brio values are fixed ([@Quenty](https://github.com/Quenty))
-- perf: Avoid creating a new maid when needed ([@Quenty](https://github.com/Quenty))
-- perf: Brio wraps table.pack directly which reduces table count ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.7.0...@quenty/brio@14.8.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* Brio values are fixed ([7170cb0](https://github.com/Quenty/NevermoreEngine/commit/7170cb0c5ec9cd9af7e298f6eb521cda04eebf34))
+
+
+### Performance Improvements
+
+* Avoid creating a new maid when needed ([cbbb482](https://github.com/Quenty/NevermoreEngine/commit/cbbb48295e602eddf20ee0d4ca3af98a7edac86e))
+* Brio wraps table.pack directly which reduces table count ([4bb32c0](https://github.com/Quenty/NevermoreEngine/commit/4bb32c0b2859762fb6400c2f0153092bc0e914c6))
+
+
+
+
 
 # [14.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.6.0...@quenty/brio@14.7.0) (2024-09-25)
 

@@ -1,24 +1,23 @@
-# v3.4.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- perf: Order maid tasks by most common access scenarios and reduce query of typeof() calls ([@Quenty](https://github.com/Quenty))
-- fix: Maid:Add reports the correct method name in error ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@3.3.0...@quenty/maid@3.4.0) (2024-10-04)
+
+
+### Bug Fixes
+
+* Maid:Add reports the correct method name in error ([3d31b0d](https://github.com/Quenty/NevermoreEngine/commit/3d31b0d5c6aa7c3bf280e102b1b37a3219ef2dba))
+
+
+### Performance Improvements
+
+* Order maid tasks by most common access scenarios and reduce query of typeof() calls ([2f6c713](https://github.com/Quenty/NevermoreEngine/commit/2f6c7130f462188e77ee4789315e5692302280eb))
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@3.2.0...@quenty/maid@3.3.0) (2024-09-12)
 

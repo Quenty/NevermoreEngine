@@ -1,23 +1,18 @@
-# v10.6.0 (Fri Oct 04 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- perf: Reorganize constructor to let Lua table size casting work it's magic ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/baseobject@10.5.0...@quenty/baseobject@10.6.0) (2024-10-04)
+
+
+### Performance Improvements
+
+* Reorganize constructor to let Lua table size casting work it's magic ([0bdd2bf](https://github.com/Quenty/NevermoreEngine/commit/0bdd2bf7c78e8764cb7c0b530cd0ff301f14e476))
+
+
+
+
 
 # [10.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/baseobject@10.4.0...@quenty/baseobject@10.5.0) (2024-09-25)
 
