@@ -20,7 +20,6 @@ local Signal = require("Signal")
 local StepUtils = require("StepUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
-local ValueObjectUtils = require("ValueObjectUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local SpringObject
 
@@ -49,23 +48,23 @@ local Blend = {}
 	@param className string
 	@return (props: { [string]: any; }) -> Observable<Instance>
 ]=]
-function Blend.New(className)
+function Blend.New(className: string)
 	assert(type(className) == "string", "Bad className")
-
-	local defaults = BlendDefaultProps[className]
 
 	return function(props)
 		return Observable.new(function(sub)
 			local instance = Instance.new(className)
 
-			if defaults then
-				for key, value in pairs(defaults) do
+			if BlendDefaultProps[className] then
+				for key, value in pairs(BlendDefaultProps[className]) do
 					instance[key] = value
 				end
 			end
 
 			local maid = Blend.mount(instance, props)
-			maid:GiveTask(instance)
+			maid:GiveTask(function()
+				Blend._safeCleanupInstance(instance)
+			end)
 
 			sub:Fire(instance)
 
@@ -271,17 +270,16 @@ end
 function Blend.Attached(constructor)
 	return function(parent)
 		return Observable.new(function(sub)
-			local maid = Maid.new()
-
 			local resource = constructor(parent)
 
+			local cleanup = nil
 			if MaidTaskUtils.isValidTask(resource) then
-				maid:GiveTask(resource)
+				cleanup = resource
 			end
 
 			sub:Fire(resource)
 
-			return maid
+			return cleanup
 		end)
 	end;
 end
@@ -416,14 +414,12 @@ function Blend.Spring(source, speed, damper)
 	end
 
 	return Observable.new(function(sub)
-		local maid = Maid.new()
-
-		local spring = maid:Add(SpringObject.new(source, speed, damper))
+		local spring = SpringObject.new(source, speed, damper)
 		spring.Epsilon = 1e-3
 
-		maid:GiveTask(spring:Observe():Subscribe(sub:GetFireFailComplete()))
+		spring._maid:GiveTask(spring:Observe():Subscribe(sub:GetFireFailComplete()))
 
-		return maid
+		return spring
 	end)
 end
 
@@ -582,11 +578,11 @@ function Blend.Children(parent, value)
 	local observe = Blend._observeChildren(value, parent)
 
 	if observe then
-		return observe:Pipe({
-			Rx.tap(function(child)
-				child.Parent = parent;
-			end);
-		})
+		return Observable.new(function(_sub)
+			return observe:Subscribe(function(child)
+				child.Parent = parent
+			end)
+		end)
 	else
 		return Rx.EMPTY
 	end
@@ -686,35 +682,42 @@ function Blend.Find(className)
 		-- Return observable and assume we're being used in anexternal context
 		-- TODO: Maybe not this
 		if props.Parent then
-			local propertyObservable = Blend.toPropertyObservable(props.Parent) or Rx.of(props.Parent)
+			local propertyObservable = Blend.toPropertyObservable(props.Parent)
 
-			return propertyObservable:Pipe({
-				RxBrioUtils.toBrio();
-				RxBrioUtils.where(function(parent)
-					return parent ~= nil
-				end);
-				RxBrioUtils.switchMapBrio(function(parent)
-					assert(typeof(parent) == "Instance", "Bad parent retrieved during find spec")
+			local function handleChildBrio(brio)
+				if brio:IsDead() then
+					return
+				end
 
-					return RxInstanceUtils.observeChildrenOfNameBrio(parent, className, props.Name)
-				end);
-				Rx.flatMap(function(brio)
-					if brio:IsDead() then
-						return
-					end
+				local maid, instance = brio:ToMaidAndValue()
 
-					local maid = brio:ToMaid()
-					local instance = brio:GetValue()
-					maid:GiveTask(Blend.mount(instance, props))
+				maid:GiveTask(Blend.mount(instance, props))
 
-					if brio:IsDead() then
-						maid:DoCleaning()
-					end
+				if brio:IsDead() then
+					maid:DoCleaning()
+				end
 
-					-- Emit back found value (we're used in property scenario)
-					return Rx.of(instance)
-				end);
-			})
+				-- Emit back found value (we're used in property scenario)
+				return Rx.of(instance)
+			end
+
+			if propertyObservable then
+				return propertyObservable:Pipe({
+					RxBrioUtils.switchToBrio(function(parent)
+						return parent ~= nil
+					end);
+					RxBrioUtils.switchMapBrio(function(parent)
+						assert(typeof(parent) == "Instance", "Bad parent retrieved during find spec")
+
+						return RxInstanceUtils.observeChildrenOfNameBrio(parent, className, props.Name)
+					end);
+					Rx.flatMap(handleChildBrio);
+				})
+			else
+				return RxInstanceUtils.observeChildrenOfNameBrio(props.Parent, className, props.Name):Pipe({
+					Rx.flatMap(handleChildBrio);
+				})
+			end
 		end
 
 		-- Return callback
@@ -734,8 +737,8 @@ function Blend._mountToFinding(props)
 			return
 		end
 
-		local maid = brio:ToMaid()
-		local instance = brio:GetValue()
+		local maid, instance = brio:ToMaidAndValue()
+
 		maid:GiveTask(Blend.mount(instance, props))
 
 		-- Dead after mounting? Clean up...
@@ -862,6 +865,14 @@ function Blend.Single(observable)
 	end)
 end
 
+function Blend._safeCleanupInstance(result)
+	-- Unparent all children incase we want to resurrect them
+	for _, child in pairs(result:GetChildren()) do
+		child.Parent = nil
+	end
+	result:Destroy()
+end
+
 --[=[
 	Observes children and ensures that the value is cleaned up
 	afterwards.
@@ -947,7 +958,9 @@ function Blend._observeChildren(value, parent)
 			local result = value:GetValue()
 			if typeof(result) == "Instance" then
 				local maid = value:ToMaid()
-				maid:GiveTask(result)
+				maid:GiveTask(function()
+					Blend._safeCleanupInstance(result)
+				end)
 				sub:Fire(result)
 
 				return maid
@@ -994,7 +1007,9 @@ function Blend._observeChildren(value, parent)
 			maid:GiveTask(value:Subscribe(function(result)
 				if typeof(result) == "Instance" then
 					-- lifetime of subscription
-					maid:GiveTask(result)
+					maid:GiveTask(function()
+						Blend._safeCleanupInstance(result)
+					end)
 					sub:Fire(result)
 					return
 				end
@@ -1093,6 +1108,7 @@ function Blend.mount(instance, props)
 
 	local parent = nil
 	local dependentObservables = {}
+	local children = {}
 
 	for key, value in pairs(props) do
 		if type(key) == "string" then
@@ -1102,14 +1118,16 @@ function Blend.mount(instance, props)
 				local observable = Blend.toPropertyObservable(value)
 				if observable then
 					maid:GiveTask(observable:Subscribe(function(result)
-						task.spawn(function()
-							instance[key] = result
-						end)
+						instance[key] = result
+						-- task.spawn(function()
+						-- 	instance[key] = result
+						-- end)
 					end))
 				else
-					task.spawn(function()
-						instance[key] = value
-					end)
+					-- task.spawn(function()
+					-- 	instance[key] = value
+					-- end)
+					instance[key] = value
 				end
 			end
 		elseif type(key) == "function" then
@@ -1123,10 +1141,15 @@ function Blend.mount(instance, props)
 		elseif type(key) == "number" then
 			-- Treat this as an implicit children contract
 			-- Thus, we don't need an explicit [Blend.Children] call.
-			table.insert(dependentObservables, { Blend.Children(instance, value), value })
+			table.insert(children, value)
 		else
 			warn(string.format("Unable to apply property %q", tostring(key)))
 		end
+	end
+
+
+	if #children > 0 then
+		maid:GiveTask(Blend.Children(instance, children):Subscribe())
 	end
 
 	-- Subscribe dependentObservables (which includes adding children)
