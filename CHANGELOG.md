@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/settings@11.11.2`
+  - refactor: SettingProperty - Use RxSignal for Changed event [#501](https://github.com/Quenty/NevermoreEngine/pull/501) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
+# (Fri Oct 04 2024)
+
+#### 🐛 Bug Fix
+
 - `@quenty/steputils@3.5.1`
   - onSteppedFrame - Refactor to utilize RBXScriptSignal:Once() [#502](https://github.com/Quenty/NevermoreEngine/pull/502) ([@InvisibleWater](https://github.com/InvisibleWater))
 
