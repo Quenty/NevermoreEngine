@@ -23,11 +23,12 @@ local MaidTaskUtils = {}
 	@return boolean
 ]=]
 function MaidTaskUtils.isValidTask(job)
-	return type(job) == "function"
-		or type(job) == "thread"
-		or typeof(job) == "RBXScriptConnection"
-		or type(job) == "table" and type(job.Destroy) == "function"
-		or typeof(job) == "Instance"
+	local jobType = typeof(job)
+	return jobType == "function"
+		or jobType == "thread"
+		or jobType == "RBXScriptConnection"
+		or jobType == "Instance"
+		or (jobType == "table" and type(job.Destroy) == "function")
 end
 
 --[=[
@@ -36,9 +37,16 @@ end
 	@param job MaidTask -- Task to execute
 ]=]
 function MaidTaskUtils.doTask(job)
-	if type(job) == "function" then
+	local jobType = typeof(job)
+	if jobType == "function" then
 		job()
-	elseif type(job) == "thread" then
+	elseif jobType == "table" then
+		if type(job.Destroy) == "function" then
+			job:Destroy()
+		end
+	elseif jobType == "Instance" then
+		job:Destroy()
+	elseif jobType == "thread" then
 		local cancelled
 		if coroutine.running() ~= job then
 			cancelled = pcall(function()
@@ -51,15 +59,10 @@ function MaidTaskUtils.doTask(job)
 				task.cancel(job)
 			end)
 		end
-	elseif typeof(job) == "RBXScriptConnection" then
+	elseif jobType == "RBXScriptConnection" then
 		job:Disconnect()
-	elseif type(job) == "table" and type(job.Destroy) == "function" then
-		job:Destroy()
-	-- selene: allow(if_same_then_else)
-	elseif typeof(job) == "Instance" then
-		job:Destroy()
 	else
-		error("Bad job")
+		error(string.format("[MaidTaskUtils.doTask] - Bad job of type %q", typeof(job)))
 	end
 end
 
