@@ -1,19 +1,15 @@
-# v11.11.2 (Fri Oct 04 2024)
-
-#### 🐛 Bug Fix
-
-- refactor: SettingProperty - Use RxSignal for Changed event [#501](https://github.com/Quenty/NevermoreEngine/pull/501) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.11.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.11.1...@quenty/settings@11.11.2) (2024-10-04)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
 
 ## [11.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.11.0...@quenty/settings@11.11.1) (2024-10-04)
 
