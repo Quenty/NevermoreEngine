@@ -175,20 +175,28 @@ end
 function Subscription:_assignCleanup(task)
 	assert(self._cleanupTask == nil, "Already have _cleanupTask")
 
-	if task then
+	if MaidTaskUtils.isValidTask(task) then
 		if self._state ~= SubscriptionStateTypes.PENDING then
 			MaidTaskUtils.doTask(task)
 			return
 		end
 
 		self._cleanupTask = task
+	elseif task ~= nil then
+		error("Bad cleanup task")
 	end
 end
 
 function Subscription:_doCleanup()
-	if self._cleanupTask then
-		local task = self._cleanupTask
-		self._cleanupTask = nil
+	local task = self._cleanupTask
+	if not task then
+		return
+	end
+
+	self._cleanupTask = nil
+
+	-- The validity can change
+	if MaidTaskUtils.isValidTask(task) then
 		MaidTaskUtils.doTask(task)
 	end
 end
