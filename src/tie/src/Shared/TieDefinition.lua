@@ -161,14 +161,14 @@ function TieDefinition:GetNewImplClass(tieRealm)
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 
 	if tieRealm == TieRealms.CLIENT then
-		return "Folder"
+		return "Configuration"
 	else
 		return "Camera"
 	end
 end
 
 local IMPL_CLIENT_SET = table.freeze({
-	["Folder"] = true;
+	["Configuration"] = true;
 })
 
 local IMPL_SERVER_SET = table.freeze({
@@ -177,7 +177,7 @@ local IMPL_SERVER_SET = table.freeze({
 
 local IMPL_SHARED_SET = table.freeze({
 	["Camera"] = true;
-	["Folder"] = true;
+	["Configuration"] = true;
 })
 
 function TieDefinition:GetImplClassSet(tieRealm)
