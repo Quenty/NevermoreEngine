@@ -1,3 +1,16 @@
+# (Fri Oct 04 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@14.8.0`, `@quenty/avatareditorutils@7.9.0`, `@quenty/baseobject@10.6.0`, `@quenty/basicpane@13.8.0`, `@quenty/blend@12.8.0`, `@quenty/brio@14.8.0`, `@quenty/characterutils@12.8.0`, `@quenty/clienttranslator@14.9.0`, `@quenty/coreguienabler@12.8.0`, `@quenty/counter@7.8.0`, `@quenty/draw@7.6.0`, `@quenty/ducktype@5.6.0`, `@quenty/gameconfig@12.12.0`, `@quenty/ik@15.12.0`, `@quenty/inputkeymaputils@14.11.0`, `@quenty/loader@10.6.0`, `@quenty/maid@3.4.0`, `@quenty/marketplaceutils@11.7.0`, `@quenty/memoize@1.4.0`, `@quenty/observablecollection@12.8.0`, `@quenty/performanceutils@4.6.0`, `@quenty/promise@10.6.0`, `@quenty/r15utils@13.8.0`, `@quenty/rigbuilderutils@10.10.0`, `@quenty/rogue-properties@11.10.0`, `@quenty/rx@13.8.0`, `@quenty/settings-inputkeymap@10.13.0`, `@quenty/settings@11.11.0`, `@quenty/signal@7.7.0`, `@quenty/softshutdown@9.11.0`, `@quenty/symbol@3.2.0`, `@quenty/tie@10.10.0`, `@quenty/tuple@1.3.0`, `@quenty/valueobject@13.8.0`
+  - users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Sep 25 2024)
 
 :tada: This release contains work from a new contributor! :tada:

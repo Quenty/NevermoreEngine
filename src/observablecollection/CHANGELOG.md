@@ -1,3 +1,24 @@
+# v12.8.0 (Fri Oct 04 2024)
+
+#### 🚀 Enhancement
+
+- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
+- feat: ObservableSortedList can take non rx-value and still be performant ([@Quenty](https://github.com/Quenty))
+- feat: Add ObservableSortedList:Contains(value) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- refactor: Optimize ObservableMapList ([@Quenty](https://github.com/Quenty))
+- refactor: ObservableMapSet is backed by ObservableMap instead of custom implementation ([@Quenty](https://github.com/Quenty))
+- perf: Use switchToBrio() and table.create ([@Quenty](https://github.com/Quenty))
+- perf: Predeclare size of lists to allocate for lists ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

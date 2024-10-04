@@ -1,3 +1,19 @@
+# v10.6.0 (Fri Oct 04 2024)
+
+#### 🚀 Enhancement
+
+- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- perf: Use coroutine.running() for promise yielding ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

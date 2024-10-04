@@ -1,3 +1,23 @@
+# v13.8.0 (Fri Oct 04 2024)
+
+#### 🚀 Enhancement
+
+- users/quenty/signal memory tracking [#503](https://github.com/Quenty/NevermoreEngine/pull/503) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Allow cleanup to be done in a safer way if the object is already cleaned up ([@Quenty](https://github.com/Quenty))
+- fix: Do not fire observables that are cancelled ([@Quenty](https://github.com/Quenty))
+- refactor: Reduce number of maids being used ([@Quenty](https://github.com/Quenty))
+- refactor: refactor stateTypes ([@Quenty](https://github.com/Quenty))
+- fix: Use nil instead of empty string for source here to save a bit of memory ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
