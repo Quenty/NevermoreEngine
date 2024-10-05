@@ -23,10 +23,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
 
-local StateStack = setmetatable({}, BaseObject)
+local StateStack = {}
 StateStack.ClassName = "StateStack"
 StateStack.__index = StateStack
 
@@ -37,9 +36,20 @@ StateStack.__index = StateStack
 	@return StateStack
 ]=]
 function StateStack.new(defaultValue, checkType)
-	local self = setmetatable(BaseObject.new(), StateStack)
+	-- ValueObject has a built-in typecheck, but we shouldn't use it.
+	-- If we assign an improper value, we'll error in __newindex.
+	-- We need to update _stateStack alongside, so there's two scenarios.
+		-- 1) Update _stateStack before setting. If .Value = throws, we've now got junk in the stack.
+		-- 2) Update _stateStack after. Now our immediate-mode-subscribers get an oudated value from :GetCount().
+	-- Therefore we need to typecheck before doing anything, and we need to update the stack first.
+	if checkType and typeof(defaultValue) ~= checkType then
+		error(string.format("Expected value of type %q, got %q instead", checkType, typeof(defaultValue)))
+	end
 
-	self._state = self._maid:Add(ValueObject.new(defaultValue, checkType))
+	local self = {}
+
+	self._checkType = checkType
+	self._state = ValueObject.new(defaultValue)
 	self._defaultValue = defaultValue
 	self._stateStack = {}
 
@@ -50,7 +60,7 @@ function StateStack.new(defaultValue, checkType)
 ]=]
 	self.Changed = self._state.Changed
 
-	return self
+	return setmetatable(self, StateStack)
 end
 
 --[=[
@@ -92,33 +102,23 @@ end
 	@return function -- Cleanup function to invoke
 ]=]
 function StateStack:PushState(state)
+	if self._checkType and typeof(state) ~= self._checkType then
+		error(string.format("Expected value of type %q, got %q instead", self._checkType, typeof(state)))
+	end
+
 	local data = { state }
 	table.insert(self._stateStack, data)
-	self:_updateState()
+	self._state.Value = state
 
 	return function()
 		if self.Destroy then
-			self:_popState(data)
+			local index = table.find(self._stateStack, data)
+			table.remove(self._stateStack, index)
+			if index > #self._stateStack then
+				local dataContainer: {any}? = self._stateStack[#self._stateStack]
+				self._state.Value = if dataContainer then dataContainer[1] else self._defaultValue
+			end
 		end
-	end
-end
-
-function StateStack:_popState(data)
-	local index = table.find(self._stateStack, data)
-	if index then
-		table.remove(self._stateStack, index)
-		self:_updateState()
-	else
-		warn("[StateStack] - Failed to find index")
-	end
-end
-
-function StateStack:_updateState()
-	local dataContainer = self._stateStack[#self._stateStack]
-	if dataContainer == nil then
-		self._state.Value = self._defaultValue
-	else
-		self._state.Value = dataContainer[1]
 	end
 end
 
@@ -128,8 +128,12 @@ end
 	:::tip
 	Be sure to call this to clean up the state stack!
 	:::
-	@method Destroy
-	@within StateStack
 ]=]
+function StateStack:Destroy()
+	setmetatable(self, nil)
+	self._state:Destroy()
+	self.Changed = nil
+	self._stateStack = nil
+end
 
 return StateStack
