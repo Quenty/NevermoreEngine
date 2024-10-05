@@ -26,10 +26,17 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
+    "@quenty/collectionserviceutils": "file:../collectionserviceutils",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/insertserviceutils": "file:../insertserviceutils",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/promise": "file:../promise",
+    "@quenty/promisemaid": "file:../promisemaid",
+    "@quenty/rx": "file:../rx",
     "@quenty/string": "file:../string"
   },
   "publishConfig": {

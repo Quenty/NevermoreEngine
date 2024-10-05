@@ -20,28 +20,12 @@ Base of a template retrieval system
 npm install @quenty/templateprovider --save
 ```
 
-## Usage
-Usage is designed to be simple.
+## Deferred replication template behavior
 
-### `TemplateProvider.new(container, replicationParent)`
+1. We want to defer replication of templates until client requests the template
+2. Then we want to send the template to the client via PlayerGui methods
+3. We want to decide whether or not to bother doing this
 
-If `replicationParent` is given then contents loaded from the cloud will be replicated to the replicationParent when on the server.
+This will prevent memory usage of unused templates on the client, which happens with the cars and a variety of other game-systems.
 
-### `TemplateProvider:Init()`
-
-Initializes the template provider, downloading components and other things needed
-
-### `TemplateProvider:Clone(templateName)`
-
-### `TemplateProvider:Get(templateName)`
-
-### `TemplateProvider:AddContainer(container)`
-
-### `TemplateProvider:RemoveContainer(container)`
-
-### `TemplateProvider:IsAvailable(templateName)`
-
-### `TemplateProvider:GetAll()`
-
-### `TemplateProvider:GetContainers()`
-
+We can't store the stuff initially in cameras or in team-create Roblox won't replicate the stuff. But we can move on run-time and hope...

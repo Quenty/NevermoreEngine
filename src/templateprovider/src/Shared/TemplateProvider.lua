@@ -1,19 +1,27 @@
 --[=[
-	Base of a template retrieval system. Templates can be retrieved from Roblox, or from the cloud,
-	and then retrieved by name. Folders are ignored, so assets may be organized however you want.
+	Base of a template retrieval system. Templates can be retrieved from Roblox and then retrieved by name. If a folder is used
+	all of their children are also included as templates, which allows for flexible organization by artists.
 
-	Templates can repliate to client if desired.
+	Additionally, you can provide template overrides as the last added template will always be used.
 
 	```lua
-	-- shared/Templates.lua
+	-- shared/CarTemplates.lua
 
-	return TemplateProvider.new(182451181, script) -- Load from Roblox cloud
+	return TemplateProvider.new(script.Name, script) -- Load locally
 	```
+
+	:::tip
+	If the TemplateProvider is initialized on the server, the the templates will be hidden from the client until the
+	client requests them.
+
+	This prevents large amounts of templates from being rendered to the client, taking up memory on the client. This especially
+	affects meshes, but can also affect sounds and other similar templates.
+	:::
 
 	```lua
 	-- Server
 	local serviceBag = ServiceBag.new()
-	local templates = serviceBag:GetService(require("Templates"))
+	local templates = serviceBag:GetService(require("CarTemplates"))
 	serviceBag:Init()
 	serviceBag:Start()
 	```
@@ -21,12 +29,12 @@
 	```lua
 	-- Client
 	local serviceBag = ServiceBag.new()
-	local templates = serviceBag:GetService(require("Templates"))
+	local templates = serviceBag:GetService(require("CarTemplates"))
 	serviceBag:Init()
 	serviceBag:Start()
 
-	templates:PromiseClone("Crate"):Then(function(crate)
-		print("Got crate from the cloud!")
+	templates:PromiseCloneTemplate("CopCar"):Then(function(crate)
+		print("Got crate!")
 	end)
 	```
 
@@ -35,13 +43,27 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-local StarterGui = game:GetService("StarterGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
 
+local Brio = require("Brio")
+local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
-local String = require("String")
-local InsertServiceUtils = require("InsertServiceUtils")
+local Observable = require("Observable")
+local ObservableCountingMap = require("ObservableCountingMap")
+local ObservableMapList = require("ObservableMapList")
 local Promise = require("Promise")
+local PromiseMaidUtils = require("PromiseMaidUtils")
+local Remoting = require("Remoting")
+local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
+local String = require("String")
+local TemplateReplicationModes = require("TemplateReplicationModes")
+local TemplateReplicationModesUtils = require("TemplateReplicationModesUtils")
+
+local TOMBSTONE_ID_ATTRIBUTE = "UnreplicatedTemplateId"
+local TOMBSTONE_NAME_POSTFIX_UNLOADED = "_Unloaded"
+local TOMBSTONE_NAME_POSTFIX_LOADED = "_Loaded"
 
 local TemplateProvider = {}
 TemplateProvider.ClassName = "TemplateProvider"
@@ -49,118 +71,371 @@ TemplateProvider.ServiceName = "TemplateProvider"
 TemplateProvider.__index = TemplateProvider
 
 --[=[
-	Constructs a new [TemplateProvider].
-	@param container Instance | table | number -- Value
-	@param replicationParent Instance? -- Place to replicate instances to.
+	@type Template Instance | Observable<Brio<Instance>> | table
+	@within TemplateProvider
 ]=]
-function TemplateProvider.new(container, replicationParent)
+
+--[=[
+	Constructs a new [TemplateProvider].
+
+	@param providerName string
+	@param initialTemplates Template
+]=]
+function TemplateProvider.new(providerName, initialTemplates)
+	assert(type(providerName) == "string", "Bad providerName")
 	local self = setmetatable({}, TemplateProvider)
 
-	self._replicationParent = replicationParent
-	self._containersToInitializeSet = {}
-	self._containersToInitializeList = {}
+	self.ServiceName = assert(providerName, "No providerName")
+	self._initialTemplates = initialTemplates
 
-	if typeof(container) == "Instance" or type(container) == "number" then
-		self:_registerContainer(container)
-	elseif typeof(container) == "table" then
-		for _, item in pairs(container) do
-			assert(typeof(item) == "Instance" or type(item) == "number", "Bad item in initialization set")
-
-			self:_registerContainer(item)
-
-			-- For easy debugging/iteration loop
-			if typeof(item) == "Instance"
-				and item:IsDescendantOf(StarterGui)
-				and item:IsA("ScreenGui")
-				and RunService:IsRunning() then
-
-				item.Enabled = false
-			end
-		end
-	end
-
-	-- Make sure to replicate our parent
-	if self._replicationParent then
-		self:_registerContainer(self._replicationParent)
+	if not (self:_isValidTemplate(self._initialTemplates) or self._initialTemplates == nil) then
+		error(string.format("[TemplateProvider.%s] - Bad initialTemplates of type %s", self.ServiceName, typeof(initialTemplates)))
 	end
 
 	return self
 end
 
-function TemplateProvider:_registerContainer(container)
-	assert(typeof(container) == "Instance" or type(container) == "number", "Bad container")
+--[=[
+	Returns if the value is a template provider
 
-	if not self._containersToInitializeSet[container] then
-		self._containersToInitializeSet[container] = true
-		table.insert(self._containersToInitializeList, container)
-	end
+	@param value any
+	@return boolean
+]=]
+
+function TemplateProvider.isTemplateProvider(value)
+	return DuckTypeUtils.isImplementation(TemplateProvider, value)
 end
 
 --[=[
 	Initializes the container provider. Should be done via [ServiceBag].
 ]=]
-function TemplateProvider:Init()
-	assert(not self._initialized, "Already initialized")
-
+function TemplateProvider:Init(serviceBag)
+	assert(not self._serviceBag, "Already initialized")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
-	self._initialized = true
-	self._registry = {} -- [name] = rawTemplate
-	self._containersSet = {} -- [parentOrAssetId] = true
 
-	self._promises = {} -- [name]  = Promise
+	self._replicationMode = TemplateReplicationModesUtils.inferReplicationMode()
 
-	for _, container in pairs(self._containersToInitializeList) do
-		self:AddContainer(container)
+	-- There can be multiple templates for a given name
+	self._templateMapList = self._maid:Add(ObservableMapList.new())
+	self._unreplicatedTemplateMapList = self._maid:Add(ObservableMapList.new())
+
+	self._containerRootCountingMap = self._maid:Add(ObservableCountingMap.new())
+	self._pendingTemplatePromises = {} -- [templateName] = Promise
+
+	self:_setupTemplateCache()
+end
+
+function TemplateProvider:_setupTemplateCache()
+	if self._replicationMode == TemplateReplicationModes.SERVER then
+		self._tombstoneLookup = {}
+		self._remoting = self._maid:Add(Remoting.Server.new(ReplicatedStorage, self.ServiceName .. "TemplateProvider"))
+
+		-- TODO: Maybe de-duplicate and use a centralized service
+		self._maid:GiveTask(self._remoting.ReplicateTemplate:Bind(function(player, tombstoneId)
+			assert(type(tombstoneId) == "string", "Bad tombstoneId")
+			assert(self._tombstoneLookup[tombstoneId], "Not a valid tombstone")
+
+			-- Stuff doesn't replicate in the PlayerGui
+			local playerGui = player:FindFirstChildWhichIsA("PlayerGui")
+			if not playerGui then
+				return Promise.rejected("No playerGui")
+			end
+
+			-- Just group stuff to simplify things
+			local replicationParent = playerGui:FindFirstChild("TemplateProviderReplication")
+			if not replicationParent then
+				replicationParent = Instance.new("Folder")
+				replicationParent.Name = "TemplateProviderReplication"
+				replicationParent.Archivable = false
+				replicationParent.Parent = playerGui
+			end
+
+			local copy = self._tombstoneLookup[tombstoneId]:Clone()
+			copy.Parent = playerGui
+
+			task.delay(0.1, function()
+				copy:Remove()
+			end)
+
+			return copy
+		end))
+	elseif self._replicationMode == TemplateReplicationModes.CLIENT then
+		self._pendingTombstoneRequests = {}
+
+		self._remoting = self._maid:Add(Remoting.Client.new(ReplicatedStorage, self.ServiceName .. "TemplateProvider"))
 	end
+
+	if self._initialTemplates then
+		self._maid:GiveTask(self:AddTemplates(self._initialTemplates))
+	end
+
+	-- Recursively adds roots, but also de-duplicates them as necessary
+	self._maid:GiveTask(self._containerRootCountingMap:ObserveKeysBrio():Subscribe(function(containerBrio)
+		if containerBrio:IsDead() then
+			return
+		end
+
+		local containerMaid, container = containerBrio:ToMaidAndValue()
+		self:_handleContainer(containerMaid,  container)
+	end))
+end
+
+function TemplateProvider:_handleContainer(containerMaid, container)
+	if self._replicationMode == TemplateReplicationModes.SERVER
+		and not container:IsA("Camera")
+		and not container:FindFirstAncestorWhichIsA("Camera") then
+		-- Prevent replication to client immediately
+
+		local camera = containerMaid:Add(Instance.new("Camera"))
+		camera.Name = "PreventReplication"
+		camera.Parent = container
+
+		local function handleChild(child)
+			if child == camera then
+				return
+			end
+			if child:GetAttribute(TOMBSTONE_ID_ATTRIBUTE) then
+				return
+			end
+
+			child.Parent = camera
+		end
+
+		containerMaid:GiveTask(container.ChildAdded:Connect(handleChild))
+
+		for _, child in pairs(container:GetChildren()) do
+			handleChild(child)
+		end
+
+		self:_replicateTombstones(containerMaid, camera, container)
+
+		return
+	end
+
+	containerMaid:GiveTask(RxInstanceUtils.observeChildrenBrio(container):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid, child = brio:ToMaidAndValue()
+		self:_addInstanceTemplate(maid, child)
+	end))
+end
+
+function TemplateProvider:_replicateTombstones(topMaid, unreplicatedParent, replicatedParent)
+	assert(self._replicationMode == TemplateReplicationModes.SERVER, "Only should be invoked on server")
+
+	-- Tombstone each child so the client knows what is replicated
+	topMaid:GiveTask(RxInstanceUtils.observeChildrenBrio(unreplicatedParent):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid, child = brio:ToMaidAndValue()
+		self:_addInstanceTemplate(maid, child)
+
+		local tombstoneId = HttpService:GenerateGUID(false)
+
+		-- Tell the client something exists here
+		local tombstone = maid:Add(Instance.new("Folder"))
+		tombstone.Name = child.Name .. TOMBSTONE_NAME_POSTFIX_UNLOADED
+		tombstone:SetAttribute(TOMBSTONE_ID_ATTRIBUTE, tombstoneId)
+
+		-- Recursively replicate other tombstones
+		if self:_shouldAddChildrenAsTemplates(child) then
+			self:_replicateTombstones(maid, child, tombstone)
+		end
+
+		self._tombstoneLookup[tombstoneId] = child
+
+		maid:GiveTask(function()
+			self._tombstoneLookup[tombstoneId] = nil
+		end)
+
+		tombstone.Parent = replicatedParent
+	end))
 end
 
 --[=[
-	Promises to clone the template as soon as it exists.
+	Observes the given template by name
+
+	@param templateName string
+	@return Observable<Instance>
+]=]
+function TemplateProvider:ObserveTemplate(templateName)
+	assert(type(templateName) == "string", "templateName must be a string")
+
+	return self._templateMapList:ObserveList(templateName):Pipe({
+		Rx.switchMap(function(list)
+			if not list then
+				return Rx.of(nil);
+			end
+
+			return list:ObserveAtIndex(-1)
+		end);
+	})
+end
+
+function TemplateProvider:ObserveTemplateNamesBrio()
+	return self._templateMapList:ObserveKeysBrio()
+end
+
+function TemplateProvider:ObserveUnreplicatedTemplateNamesBrio()
+	return self._unreplicatedTemplateMapList:ObserveKeysBrio()
+end
+
+--[=[
+	Returns the raw template
+
+	@param templateName string
+	@return Instance?
+]=]
+function TemplateProvider:GetTemplate(templateName)
+	assert(type(templateName) == "string", "templateName must be a string")
+
+	return self._templateMapList:GetItemForKeyAtIndex(templateName, -1)
+end
+
+--[=[
+	Promises to clone the template as soon as it exists
+
 	@param templateName string
 	@return Promise<Instance>
 ]=]
-function TemplateProvider:PromiseClone(templateName)
+function TemplateProvider:PromiseCloneTemplate(templateName)
 	assert(type(templateName) == "string", "templateName must be a string")
 
-	self:_verifyInit()
-
-	local template = self._registry[templateName]
-	if template then
-		return Promise.resolved(self:Clone(templateName))
-	end
-
-	if not self._promises[templateName] then
-		local promise = Promise.new()
-		self._promises[templateName] = promise
-
-		-- Make sure to clean up the promise afterwards
-		self._maid[promise] = promise
-		promise:Then(function()
-			self._maid[promise] = nil
-		end)
-
-		task.delay(5, function()
-			if promise:IsPending() then
-				warn(string.format("[TemplateProvider.PromiseClone] - May fail to replicate template %q from cloud. %s", templateName, self:_getReplicationHint()))
-			end
-		end)
-	end
-
-	return self._promises[templateName]
-		:Then(function()
-			-- Get a new copy
-			return self:Clone(templateName)
+	return self:PromiseTemplate(templateName)
+		:Then(function(template)
+			return self:_cloneTemplate(template)
 		end)
 end
 
-function TemplateProvider:_getReplicationHint()
-	local hint = ""
+--[=[
+	Promise to resolve the raw template as soon as it exists
 
-	if RunService:IsClient() then
-		hint = "Make sure the template provider is initialized on the server."
+	@param templateName string
+	@return Promise<Instance>
+]=]
+function TemplateProvider:PromiseTemplate(templateName)
+	assert(type(templateName) == "string", "templateName must be a string")
+
+	local foundTemplate = self._templateMapList:GetItemForKeyAtIndex(templateName, -1)
+	if foundTemplate then
+		return Promise.resolved(foundTemplate)
 	end
 
-	return hint
+	if self._pendingTemplatePromises[templateName] then
+		return self._pendingTemplatePromises[templateName]
+	end
+
+	local promiseTemplate = Promise.new()
+
+	-- Observe thet template
+	PromiseMaidUtils.whilePromise(promiseTemplate, function(topMaid)
+		topMaid:GiveTask(self:ObserveTemplate(templateName):Subscribe(function(template)
+			if template then
+				promiseTemplate:Resolve(template)
+			end
+		end))
+
+		if self._replicationMode == TemplateReplicationModes.SERVER then
+			-- There's a chance an external process will stream in our template
+
+			topMaid:GiveTask(task.delay(5, function()
+				warn(string.format("[TemplateProvider.%s.PromiseTemplate] - Missing template %q", self.ServiceName, templateName))
+			end))
+		elseif self._replicationMode == TemplateReplicationModes.CLIENT then
+			-- Replicate from the unfound area
+			topMaid:GiveTask(self._unreplicatedTemplateMapList:ObserveAtListIndexBrio(templateName, -1):Subscribe(function(brio)
+				if brio:IsDead() then
+					return
+				end
+
+				local maid, templateTombstone = brio:ToMaidAndValue()
+
+				local originalName = templateTombstone.Name
+
+				maid:GivePromise(self:_promiseReplicateTemplateFromTombstone(templateTombstone))
+					:Then(function(template)
+						-- Cache the template here which then loads it into the known templates naturally
+						templateTombstone.Name = String.removePostfix(originalName, TOMBSTONE_NAME_POSTFIX_UNLOADED) .. TOMBSTONE_NAME_POSTFIX_LOADED
+						template.Parent = templateTombstone
+
+						promiseTemplate:Resolve(template)
+					end)
+			end))
+
+			topMaid:GiveTask(task.delay(5, function()
+				if self._unreplicatedTemplateMapList:GetListForKey(templateName) then
+					warn(string.format("[TemplateProvider.%s.PromiseTemplate] - Failed to replicate template %q from server to client", self.ServiceName, templateName))
+				else
+					warn(string.format("[TemplateProvider.%s.PromiseTemplate] - Template %q is not a known template", self.ServiceName, templateName))
+				end
+			end))
+		elseif self._replicationMode == TemplateReplicationModes.SHARED then
+			-- There's a chance an external process will stream in our template
+
+			topMaid:GiveTask(task.delay(5, function()
+				warn(string.format("[TemplateProvider.%s.PromiseTemplate] - Missing template %q", self.ServiceName, templateName))
+			end))
+		else
+			error("Bad replicationMode")
+		end
+	end)
+
+	self._maid[promiseTemplate] = promiseTemplate
+	self._pendingTemplatePromises[templateName] = promiseTemplate
+
+	promiseTemplate:Finally(function()
+		self._maid[promiseTemplate] = nil
+		self._pendingTemplatePromises[templateName] = nil
+	end)
+
+	return promiseTemplate
+end
+
+function TemplateProvider:_promiseReplicateTemplateFromTombstone(templateTombstone)
+	assert(self._replicationMode == TemplateReplicationModes.CLIENT, "Bad replicationMode")
+	assert(typeof(templateTombstone) == "Instance", "Bad templateTombstone")
+
+	local tombstoneId = templateTombstone:GetAttribute(TOMBSTONE_ID_ATTRIBUTE)
+	if type(tombstoneId) ~= "string" then
+		return Promise.rejected("tombstoneId must be a string")
+	end
+
+	if self._pendingTombstoneRequests[tombstoneId] then
+		return self._pendingTombstoneRequests[tombstoneId]
+	end
+
+	local promiseTemplate = Promise.new()
+
+	PromiseMaidUtils.whilePromise(promiseTemplate, function(topMaid)
+		topMaid:GivePromise(self._remoting.ReplicateTemplate:PromiseInvokeServer(tombstoneId))
+			:Then(function(tempTemplate)
+				if not tempTemplate then
+					return Promise.rejected("Failed to get any template")
+				end
+
+				-- This tempTemplate will get destroyed by the server soon to free up server memory
+				-- TODO: cache on client
+				local copy = tempTemplate:Clone()
+				promiseTemplate:Resolve(copy)
+			end, function(...)
+				promiseTemplate:Reject(...)
+			end)
+	end)
+
+	self._maid[promiseTemplate] = promiseTemplate
+	self._pendingTombstoneRequests[tombstoneId] = promiseTemplate
+
+	promiseTemplate:Finally(function()
+		self._maid[promiseTemplate] = nil
+		self._pendingTombstoneRequests[tombstoneId] = nil
+	end)
+
+	return promiseTemplate
 end
 
 --[=[
@@ -173,79 +448,132 @@ end
 	@param templateName string
 	@return Instance?
 ]=]
-function TemplateProvider:Clone(templateName)
+function TemplateProvider:CloneTemplate(templateName)
 	assert(type(templateName) == "string", "templateName must be a string")
 
-	self:_verifyInit()
-
-	local template = self._registry[templateName]
+	local template = self._templateMapList:GetItemForKeyAtIndex(templateName, -1)
 	if not template then
-		error(string.format("[TemplateProvider.Clone] - Cannot provide %q", tostring(templateName)))
+		local unreplicated = self._unreplicatedTemplateMapList:GetListForKey(templateName)
+
+		if unreplicated then
+			error(string.format("[TemplateProvider.%s.CloneTemplate] - Template %q is not replicated. Use PromiseCloneTemplate instead", self.ServiceName, tostring(templateName)))
+		else
+			error(string.format("[TemplateProvider.%s.CloneTemplate] - Cannot provide template %q", self.ServiceName, tostring(templateName)))
+		end
+
 		return nil
 	end
 
-	local newItem = template:Clone()
-	newItem.Name = String.removePostfix(templateName, "Template")
-	return newItem
+	return self:_cloneTemplate(template)
 end
 
 --[=[
-	Returns the raw template
+	Adds a new container to the provider for provision of assets. The initial container
+	is considered a template. Additionally, we will include any children that are in a folder
+	as a potential root
 
-	@param templateName string
-	@return Instance?
+	:::tip
+	The last template with a given name added will be considered the canonical template.
+	:::
+
+	@param container Template
+	@return MaidTask
 ]=]
-function TemplateProvider:Get(templateName)
-	assert(type(templateName) == "string", "templateName must be a string")
-	self:_verifyInit()
+function TemplateProvider:AddTemplates(container)
+	assert(self:_isValidTemplate(container), "Bad container")
 
-	return self._registry[templateName]
-end
+	if typeof(container) == "Instance" then
+		-- Always add this instance as we explicitly asked for it to be added as a root. This could be a
+		-- module script, or other component.
+		return self._containerRootCountingMap:Add(container)
+	elseif Observable.isObservable(container) then
+		local topMaid = Maid.new()
 
---[=[
-	Adds a new container to the provider for provision of assets.
+		self:_addObservableTemplates(topMaid, container)
 
-	@param container Instance | number
-]=]
-function TemplateProvider:AddContainer(container)
-	assert(typeof(container) == "Instance" or type(container) == "number", "Bad container")
-	self:_verifyInit()
+		self._maid[topMaid] = topMaid
+		topMaid:GiveTask(function()
+			self._maid[topMaid] = nil
+		end)
 
-	if not self._containersSet[container] then
-		self._containersSet[container] = true
-		if type(container) == "number" then
-			self._maid[container] = self:_loadCloudAsset(container)
-		elseif typeof(container) == "Instance" then
-			self._maid[container] = self:_loadFolder(container)
-		else
-			error("Unknown container type to load")
+		return topMaid
+	elseif type(container) == "table" then
+		local topMaid = Maid.new()
+
+		for _, value in pairs(container) do
+			if typeof(value) == "Instance" then
+				-- Always add these as we explicitly ask for this to be a root too.
+				topMaid:GiveTask(self._containerRootCountingMap:Add(value))
+			elseif Observable.isObservable(value) then
+				self:_addObservableTemplates(topMaid, value)
+			else
+				error(string.format("[TemplateProvider.%s] - Bad value of type %q in container table", self.ServiceName, typeof(value)))
+			end
 		end
+
+		self._maid[topMaid] = topMaid
+		topMaid:GiveTask(function()
+			self._maid[topMaid] = nil
+		end)
+
+		return topMaid
+	else
+		error(string.format("[TemplateProvider.%s] - Bad container of type %s", self.ServiceName, typeof(container)))
 	end
 end
 
---[=[
-	Removes a container from the provisioning set.
+function TemplateProvider:_addObservableTemplates(topMaid, observable)
+	topMaid:GiveTask(observable:Subscribe(function(result)
+		if Brio.isBrio(result) then
+			if result:IsDead() then
+				return
+			end
 
-	@param container Instance | number
-]=]
-function TemplateProvider:RemoveContainer(container)
-	assert(typeof(container) == "Instance", "Bad container")
-	self:_verifyInit()
+			local maid, template = result:ToMaidAndValue()
+			if typeof(template) == "Instance" then
+				self:_addInstanceTemplate(maid, template)
+			else
+				error("Cannot add non-instance from observable template")
+			end
+		else
+			error("Cannot add non Brio<Instance> from observable")
+		end
+	end))
+end
 
-	self._containersSet[container] = nil
-	self._maid[container] = nil
+function TemplateProvider:_addInstanceTemplate(topMaid, template)
+	if self:_shouldAddChildrenAsTemplates(template) then
+		topMaid:GiveTask(self._containerRootCountingMap:Add(template))
+	end
+
+	if template:GetAttribute(TOMBSTONE_ID_ATTRIBUTE) then
+		topMaid:GiveTask(self._unreplicatedTemplateMapList:Push(RxInstanceUtils.observeProperty(template, "Name"):Pipe({
+			Rx.map(function(name)
+				if String.endsWith(name, TOMBSTONE_NAME_POSTFIX_UNLOADED) then
+					return String.removePostfix(name, TOMBSTONE_NAME_POSTFIX_UNLOADED)
+				elseif String.endsWith(name, TOMBSTONE_NAME_POSTFIX_LOADED) then
+					return String.removePostfix(name, TOMBSTONE_NAME_POSTFIX_LOADED)
+				else
+					return name
+				end
+			end);
+			Rx.distinct();
+		}), template))
+	else
+		topMaid:GiveTask(self._templateMapList:Push(RxInstanceUtils.observeProperty(template, "Name"), template))
+	end
 end
 
 --[=[
 	Returns whether or not a template is registered at the time
+
 	@param templateName string
 	@return boolean
 ]=]
-function TemplateProvider:IsAvailable(templateName)
+function TemplateProvider:IsTemplateAvailable(templateName)
 	assert(type(templateName) == "string", "templateName must be a string")
-	self:_verifyInit()
 
-	return self._registry[templateName] ~= nil
+	return self._templateMapList:GetItemForKeyAtIndex(templateName, -1) ~= nil
 end
 
 --[=[
@@ -253,139 +581,40 @@ end
 
 	@return { Instance }
 ]=]
-function TemplateProvider:GetAll()
-	self:_verifyInit()
-
-	local list = {}
-	for _, item in pairs(self._registry) do
-		table.insert(list, item)
-	end
-
-	return list
+function TemplateProvider:GetTemplateList()
+	return self._templateMapList:GetListOfValuesAtListIndex(-1)
 end
 
 --[=[
 	Gets all current the containers.
 
-	@return { Instance | number }
+	@return { Instance }
 ]=]
-function TemplateProvider:GetContainers()
-	self:_verifyInit()
-
-	local list = {}
-	for parent, _ in pairs(self._containersSet) do
-		table.insert(list, parent)
-	end
-	return list
+function TemplateProvider:GetContainerList()
+	return self._containerRootCountingMap:GetList()
 end
 
-function TemplateProvider:_verifyInit()
-	if not RunService:IsRunning() then
-		if not self._initialized then
-			-- Initialize for hoarcecat!
-			self:Init()
-		end
-	end
+-- Backwards compatibility
+TemplateProvider.IsAvailable = assert(TemplateProvider.IsTemplateAvailable, "Missing method")
+TemplateProvider.Get = assert(TemplateProvider.GetTemplate, "Missing method")
+TemplateProvider.Clone = assert(TemplateProvider.CloneTemplate, "Missing method")
+TemplateProvider.PromiseClone = assert(TemplateProvider.PromiseCloneTemplate, "Missing method")
+TemplateProvider.GetAllTemplates = assert(TemplateProvider.GetTemplateList, "Missing method")
 
-	assert(self._initialized, "TemplateProvider is not initialized")
+function TemplateProvider:_cloneTemplate(template)
+	local newItem = template:Clone()
+	newItem.Name = String.removePostfix(template.Name, "Template")
+	return newItem
 end
 
-function TemplateProvider:_loadCloudAsset(assetId)
-	assert(type(assetId) == "number", "Bad assetId")
-	local maid = Maid.new()
-
-	-- Load on server
-	if RunService:IsServer() or not RunService:IsRunning() then
-		maid:GivePromise(InsertServiceUtils.promiseAsset(assetId)):Then(function(result)
-			if RunService:IsRunning() then
-				for _, item in pairs(result:GetChildren()) do
-					-- Replicate in children
-					item.Parent = self._replicationParent
-				end
-			else
-				-- Load without parenting
-				maid:GiveTask(self:_loadFolder(result))
-			end
-		end)
-	end
-
-	return maid
+function TemplateProvider:_shouldAddChildrenAsTemplates(container)
+	return container:IsA("Folder")
 end
 
-function TemplateProvider:_transformParent(getParent)
-	if typeof(getParent) == "Instance" then
-		return getParent
-	elseif type(getParent) == "function" then
-		local container = getParent()
-		assert(typeof(container) == "Instance", "Bad container")
-		return container
-	else
-		error("Bad getParent type")
-	end
-end
-
-function TemplateProvider:_loadFolder(parent)
-	local maid = Maid.new()
-
-	-- Only connect events if we're running
-	if RunService:IsRunning() then
-		maid:GiveTask(parent.ChildAdded:Connect(function(child)
-			self:_handleChildAdded(maid, child)
-		end))
-		maid:GiveTask(parent.ChildRemoved:Connect(function(child)
-			self:_handleChildRemoved(maid, child)
-		end))
-	end
-
-	for _, child in pairs(parent:GetChildren()) do
-		self:_handleChildAdded(maid, child)
-	end
-
-	maid:GiveTask(function()
-		maid:DoCleaning()
-
-		-- Deregister children
-		for _, child in pairs(parent:GetChildren()) do
-			self:_handleChildRemoved(maid, child)
-		end
-	end)
-
-	return maid
-end
-
-function TemplateProvider:_handleChildRemoved(maid, child)
-	maid[child] = nil
-	self:_removeFromRegistry(child)
-end
-
-function TemplateProvider:_handleChildAdded(maid, child)
-	if child:IsA("Folder") then
-		maid[child] = self:_loadFolder(child)
-	else
-		self:_addToRegistery(child)
-	end
-end
-
-function TemplateProvider:_addToRegistery(child)
-	local childName = child.Name
-	-- if self._registry[childName] then
-		-- warn(string.format("[TemplateProvider._addToRegistery] - Duplicate %q in registery. Overridding", childName))
-	-- end
-
-	self._registry[childName] = child
-
-	if self._promises[childName] then
-		self._promises[childName]:Resolve(child)
-		self._promises[childName] = nil
-	end
-end
-
-function TemplateProvider:_removeFromRegistry(child)
-	local childName = child.Name
-
-	if self._registry[childName] == child then
-		self._registry[childName] = nil
-	end
+function TemplateProvider:_isValidTemplate(container)
+	return typeof(container) == "Instance"
+		or Observable.isObservable(container)
+		or type(container) == "table"
 end
 
 --[=[

@@ -9,4 +9,4 @@ local require = require(script.Parent.loader).load(script)
 
 local TaggedTemplateProvider = require("TaggedTemplateProvider")
 
-return TaggedTemplateProvider.new("AnimationContainer")
+return TaggedTemplateProvider.new(script.Name, "AnimationContainer")
