@@ -28,28 +28,28 @@ There are different types of packages in Nevermore. It's useful to reason about 
 ### Utility libraries
 Library packages tend to be packages that export one or multiple libraries. These are usually pure utility functions. Here are some sample library packages:
 
-* [Table]
-* [Math]
-* [RandomUtils]
-* [Set]
-* [Elo]
+* [Table](/api/Table)
+* [Math](/api/Math)
+* [RandomUtils](/api/RandomUtils)
+* [Set](/api/Set)
+* [Elo](/api/Elo)
 
 ### Object utility libraries
 These are very similiar to libraries but they tend to export an object, and some supporting objects. These objects are concepts that are useful to learn, and generally exist outside of Roblox (although they may not). These are fundamental building blocks and patterns in Roblox.
 
-* [Octree]
-* [Maid]
-* [Rx]
-* [Promise]
-* [Binder]
-* [Queue]
+* [Octree](/api/Octree)
+* [Maid](/api/Maid)
+* [Rx](/api/RxUtils)
+* [Promise](/api/Promise)
+* [Binder](/api/Binder)
+* [Queue](/api/Queue)
 
 ### Integration services
 There services are primary about providing a contract between two services.
 
-* [GameConfigService]
-* [CameraStackService]
-* [PlayerDataStoreService]
+* [GameConfigService](/api/GameConfigService)
+* [CameraStackService](/api/CameraStackService)
+* [PlayerDataStoreService](/api/PlayerDataStoreService)
 
 
 
