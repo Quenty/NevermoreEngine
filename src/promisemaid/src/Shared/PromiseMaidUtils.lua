@@ -33,6 +33,11 @@ function PromiseMaidUtils.whilePromise(promise, callback)
 
 	callback(maid)
 
+	-- Cleanup immediately if the callback resolves the promise immeidately
+	if not promise:IsPending() then
+		maid:DoCleaning()
+	end
+
 	return maid
 end
 
