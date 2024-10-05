@@ -122,7 +122,7 @@ end
 	Gets a list of all keys.
 	@return { TKey }
 ]=]
-function ObservableMapSet:ObserveKeyList()
+function ObservableMapSet:GetKeyList()
 	return self._observableMapOfSets:GetKeyList()
 end
 
