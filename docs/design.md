@@ -32,14 +32,14 @@ Library packages tend to be packages that export one or multiple libraries. Thes
 * [Math](/api/Math)
 * [RandomUtils](/api/RandomUtils)
 * [Set](/api/Set)
-* [Elo](/api/Elo)
+* [Elo](/api/EloUtils)
 
 ### Object utility libraries
 These are very similiar to libraries but they tend to export an object, and some supporting objects. These objects are concepts that are useful to learn, and generally exist outside of Roblox (although they may not). These are fundamental building blocks and patterns in Roblox.
 
 * [Octree](/api/Octree)
 * [Maid](/api/Maid)
-* [Rx](/api/RxUtils)
+* [Rx](/api/Rx)
 * [Promise](/api/Promise)
 * [Binder](/api/Binder)
 * [Queue](/api/Queue)
