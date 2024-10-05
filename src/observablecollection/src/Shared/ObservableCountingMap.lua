@@ -363,7 +363,7 @@ end
 	@return { T }
 ]=]
 function ObservableCountingMap:GetKeyList()
-	local list = {}
+	local list = table.create(self._totalKeyCountValue.Value)
 	for key, _ in pairs(self._map) do
 		table.insert(list, key)
 	end
