@@ -94,6 +94,7 @@ end
 
 --[=[
 	Gets the first item for the given key
+
 	@param key TKey
 	@return TValue | nil
 ]=]
@@ -109,7 +110,36 @@ function ObservableMapList:GetFirstItemForKey(key)
 end
 
 --[=[
+	Gets the item for the given key at the index
+
+	```
+	mapList:Push("fruits", "apple")
+	mapList:Push("fruits", "orange")
+	mapList:Push("fruits", "banana")
+
+	-- Print the last item
+	print(mapList:GetItemForKeyAtIndex("fruits", -1)) ==> banana
+	```
+
+	@param key TKey
+	@param index number
+	@return TValue | nil
+]=]
+function ObservableMapList:GetItemForKeyAtIndex(key, index)
+	assert(key ~= nil, "Bad key")
+	assert(type(index) == "number", "Bad index")
+
+	local observableList = self:GetListForKey(key)
+	if not observableList then
+		return nil
+	end
+
+	return observableList:Get(index)
+end
+
+--[=[
 	Gets how many lists exist
+
 	@return number
 ]=]
 function ObservableMapList:GetListCount()
@@ -118,6 +148,7 @@ end
 
 --[=[
 	Observes how many lists exist
+
 	@return Observable<number>
 ]=]
 function ObservableMapList:ObserveListCount()
