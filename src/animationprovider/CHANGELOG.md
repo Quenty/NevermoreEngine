@@ -1,3 +1,16 @@
+# v11.7.0 (Sun Oct 06 2024)
+
+#### 🚀 Enhancement
+
+- feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
+- feat: Modernize template provider to new specifications ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

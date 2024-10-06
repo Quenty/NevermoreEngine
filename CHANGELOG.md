@@ -1,3 +1,16 @@
+# (Sun Oct 06 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/animationprovider@11.7.0`, `@quenty/cmdrservice@13.11.0`, `@quenty/loader@10.7.0`, `@quenty/observablecollection@12.9.0`, `@quenty/promise@10.7.0`, `@quenty/promisemaid@5.7.0`, `@quenty/table@3.6.0`, `@quenty/templateprovider@11.7.0`, `@quenty/tuple@1.4.0`
+  - feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Oct 04 2024)
 
 #### 🐛 Bug Fix

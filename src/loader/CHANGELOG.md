@@ -1,3 +1,25 @@
+# v10.7.0 (Sun Oct 06 2024)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, supertree-wook ([@st-Wook](https://github.com/st-Wook)), for all your work!
+
+#### 🚀 Enhancement
+
+- feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Replicator replicates attributes and tags properly ([@Quenty](https://github.com/Quenty))
+- docs: Fix duplicate entries on docs \[skip ci\] [#416](https://github.com/Quenty/NevermoreEngine/pull/416) ([@st-Wook](https://github.com/st-Wook))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- supertree-wook ([@st-Wook](https://github.com/st-Wook))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

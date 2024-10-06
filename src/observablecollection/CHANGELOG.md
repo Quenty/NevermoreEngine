@@ -1,3 +1,24 @@
+# v12.9.0 (Sun Oct 06 2024)
+
+#### 🚀 Enhancement
+
+- feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
+- feat: Add ObservableMapList:GetItemForKeyAtIndex(key, index) ([@Quenty](https://github.com/Quenty))
+- feat: Add ObservableMapList:GetFirstItemForKey(key) and ObservableMapList:GetListOfValuesAtListIndex(index) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Brios sometime cleanup wrongly ([@Quenty](https://github.com/Quenty))
+- perf: Improve :GetKeyList() allocation performance ([@Quenty](https://github.com/Quenty))
+- docs: Add documentation to ObservableList:ObserveAtIndex(indexToObserve) ([@Quenty](https://github.com/Quenty))
+- fix: Add ObservableMapSet:GetKeyList() ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
