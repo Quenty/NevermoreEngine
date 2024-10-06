@@ -79,7 +79,7 @@ end
 ]=]
 function ObservableCountingMap:ObserveKeysList()
 	return self:_observeDerivedDataStructureFromKeys(function()
-		local list = {}
+		local list = table.create(self._totalKeyCountValue.Value)
 
 		for key, _ in pairs(self._map) do
 			table.insert(list, key)
@@ -184,21 +184,27 @@ end
 function ObservableCountingMap:ObserveKeysBrio()
 	return Observable.new(function(sub)
 		local maid = Maid.new()
+		local keyMaid = maid:Add(Maid.new())
 
 		local function handleItem(key)
-			local brio = Brio.new(key)
-			maid[key] = brio
-			sub:Fire(brio)
-		end
+			-- Happens upon key added re-entrance
+			if keyMaid[key] then
+				return
+			end
 
-		for key, _ in pairs(self._map) do
-			handleItem(key)
+			local brio = Brio.new(key)
+			keyMaid[key] = brio
+			sub:Fire(brio)
 		end
 
 		maid:GiveTask(self.KeyAdded:Connect(handleItem))
 		maid:GiveTask(self.KeyRemoved:Connect(function(key)
-			maid[key] = nil
+			keyMaid[key] = nil
 		end))
+
+		for key, _ in pairs(self._map) do
+			handleItem(key)
+		end
 
 		self._maid[sub] = maid
 		maid:GiveTask(function()
@@ -286,8 +292,10 @@ function ObservableCountingMap:Add(key, amount)
 		return
 	end
 
-	if self._map[key] then
-		local newValue = self._map[key] + amount
+	local oldValue = self._map[key]
+
+	if oldValue then
+		local newValue = oldValue + amount
 		if newValue == 0 then
 			-- Remove item
 			self._map[key] = nil
