@@ -144,6 +144,11 @@ end
 	Observes the current value at a given index. This can be useful for observing
 	the first entry, or matching stuff up to a given slot.
 
+	```
+	list:ObserveAtIndex(1):Subscribe(print) --> prints first item
+	list:ObserveAtIndex(-1):Subscribe(print) --> prints last item
+	```
+
 	@param indexToObserve number
 	@return Observable<T?>
 ]=]

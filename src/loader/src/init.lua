@@ -148,7 +148,11 @@ function Loader:_findDependency(request)
 	-- Just standard dependency search
 	local foundBackup = DependencyUtils.findDependency(self._packages, request, self._replicationType)
 	if foundBackup then
-		warn(string.format("[Loader] - Failed to find package %q in package tracker of root %s\n%s", request, self._packages:GetFullName(), debug.traceback()))
+		if packageTracker then
+			warn(string.format("[Loader] - No package tracker for root %s (while loading %s)\n%s", self._packages:GetFullName(), request, debug.traceback()))
+		else
+			warn(string.format("[Loader] - Failed to find package %q in package tracker of root %s\n%s", request, self._packages:GetFullName(), debug.traceback()))
+		end
 
 		-- Ensure hoarcekat story has a link to use
 		-- TODO: Maybe add to global package cache instead...

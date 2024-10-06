@@ -12,6 +12,7 @@ local HttpService = game:GetService("HttpService")
 local ENABLE_TRACEBACK = false
 local _emptyRejectedPromise = nil
 local _emptyFulfilledPromise = nil
+local EMPTY_PACKED_TUPLE = table.freeze({ n = 0; })
 
 local Promise = {}
 Promise.ClassName = "Promise"
@@ -138,7 +139,7 @@ function Promise.rejected(...)
 	end
 
 	local promise = Promise.new()
-	promise:_reject({...}, n)
+	promise:_reject(table.pack(...))
 	return promise
 end
 
@@ -178,7 +179,7 @@ end
 ]=]
 function Promise:Wait()
 	if self._fulfilled then
-		return unpack(self._fulfilled, 1, self._valuesLength)
+		return table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	elseif self._rejected then
 		return error(tostring(self._rejected[1]), 2)
 	else
@@ -195,7 +196,7 @@ function Promise:Wait()
 		if self._rejected then
 			return error(tostring(self._rejected[1]), 2)
 		else
-			return unpack(self._fulfilled, 1, self._valuesLength)
+			return table.unpack(self._fulfilled, 1, self._fulfilled.n)
 		end
 	end
 end
@@ -210,9 +211,9 @@ end
 ]=]
 function Promise:Yield()
 	if self._fulfilled then
-		return true, unpack(self._fulfilled, 1, self._valuesLength)
+		return true, table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	elseif self._rejected then
-		return false, unpack(self._rejected, 1, self._valuesLength)
+		return false, table.unpack(self._rejected, 1, self._rejected.n)
 	else
 		local waitingCoroutine = coroutine.running()
 
@@ -225,9 +226,9 @@ function Promise:Yield()
 		coroutine.yield()
 
 		if self._fulfilled then
-			return true, unpack(self._fulfilled, 1, self._valuesLength)
+			return true, table.unpack(self._fulfilled, 1, self._fulfilled.n)
 		elseif self._rejected then
-			return false, unpack(self._rejected, 1, self._valuesLength)
+			return false, table.unpack(self._rejected, 1, self._rejected.n)
 		else
 			error("Bad state")
 		end
@@ -247,7 +248,7 @@ function Promise:Resolve(...)
 
 	local len = select("#", ...)
 	if len == 0 then
-		self:_fulfill({}, 0)
+		self:_fulfill(EMPTY_PACKED_TUPLE)
 	elseif self == (...) then
 		self:Reject("TypeError: Resolved to self")
 	elseif Promise.isPromise(...) then
@@ -266,16 +267,16 @@ function Promise:Resolve(...)
 				function(...)
 					-- Still need to verify at this point that we're pending!
 					if self._pendingExecuteList then
-						self:_reject({...}, select("#", ...))
+						self:_reject(table.pack(...))
 					end
 				end,
 				nil
 			}
 		elseif promise2._rejected then -- rejected
 			promise2._unconsumedException = false
-			self:_reject(promise2._rejected, promise2._valuesLength)
+			self:_reject(promise2._rejected)
 		elseif promise2._fulfilled then -- fulfilled
-			self:_fulfill(promise2._fulfilled, promise2._valuesLength)
+			self:_fulfill(promise2._fulfilled)
 		else
 			error("[Promise.Resolve] - Bad promise2 state")
 		end
@@ -291,23 +292,21 @@ function Promise:Resolve(...)
 		-- TODO: Handle thenable promises!
 		-- Problem: Lua has :andThen() and also :Then() as two methods in promise
 		-- implementations.
-		self:_fulfill({...}, len)
+		self:_fulfill(table.pack(...))
 	end
 end
 
---[=[
+--[[
 	Fulfills the promise with the value
 	@param values { T } -- Params to fulfil with
-	@param valuesLength number
 	@private
-]=]
-function Promise:_fulfill(values, valuesLength)
+]]
+function Promise:_fulfill(values)
 	if not self._pendingExecuteList then
 		return
 	end
 
 	self._fulfilled = values
-	self._valuesLength = valuesLength
 
 	local list = self._pendingExecuteList
 	self._pendingExecuteList = nil
@@ -321,16 +320,15 @@ end
 	@param ... T -- Params to reject with
 ]=]
 function Promise:Reject(...)
-	self:_reject({...}, select("#", ...))
+	self:_reject(table.pack(...))
 end
 
-function Promise:_reject(values, valuesLength)
+function Promise:_reject(values)
 	if not self._pendingExecuteList then
 		return
 	end
 
 	self._rejected = values
-	self._valuesLength = valuesLength
 
 	local list = self._pendingExecuteList
 	self._pendingExecuteList = nil
@@ -339,7 +337,7 @@ function Promise:_reject(values, valuesLength)
 	end
 
 	-- Check for uncaught exceptions
-	if self._unconsumedException and self._valuesLength > 0 then
+	if self._unconsumedException and self._rejected.n > 0 then
 		task.defer(function()
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
@@ -461,11 +459,12 @@ function Promise:Catch(onRejected)
 	return self:Then(nil, onRejected)
 end
 
+
 --[=[
 	Rejects the current promise. Utility left for Maid task
 ]=]
 function Promise:Destroy()
-	self:_reject({}, 0)
+	self:_reject(EMPTY_PACKED_TUPLE)
 end
 
 --[=[
@@ -480,9 +479,9 @@ end
 ]=]
 function Promise:GetResults()
 	if self._rejected then
-		return false, unpack(self._rejected, 1, self._valuesLength)
+		return false, table.unpack(self._rejected, 1, self._rejected.n)
 	elseif self._fulfilled then
-		return true, unpack(self._fulfilled, 1, self._valuesLength)
+		return true, table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	else
 		error("Still pending")
 	end
@@ -492,7 +491,7 @@ function Promise:_getResolveReject()
 	return function(...)
 		self:Resolve(...)
 	end, function(...)
-		self:_reject({...}, select("#", ...))
+		self:_reject(table.pack(...))
 	end
 end
 
@@ -510,10 +509,10 @@ function Promise:_executeThen(onFulfilled, onRejected, promise2)
 			-- If either onFulfilled or onRejected returns a value x, run
 			-- the Promise Resolution Procedure [[Resolve]](promise2, x).
 			if promise2 then
-				promise2:Resolve(onFulfilled(unpack(self._fulfilled, 1, self._valuesLength)))
+				promise2:Resolve(onFulfilled(table.unpack(self._fulfilled, 1, self._fulfilled.n)))
 				return promise2
 			else
-				local results = table.pack(onFulfilled(unpack(self._fulfilled, 1, self._valuesLength)))
+				local results = table.pack(onFulfilled(table.unpack(self._fulfilled, 1, self._fulfilled.n)))
 				if results.n == 0 then
 					return _emptyFulfilledPromise
 				elseif results.n == 1 and Promise.isPromise(results[1]) then
@@ -530,7 +529,7 @@ function Promise:_executeThen(onFulfilled, onRejected, promise2)
 			-- If onFulfilled is not a function and promise1 is fulfilled,
 			-- promise2 must be fulfilled with the same value as promise1.
 			if promise2 then
-				promise2:_fulfill(self._fulfilled, self._valuesLength)
+				promise2:_fulfill(self._fulfilled)
 				return promise2
 			else
 				return self
@@ -541,10 +540,10 @@ function Promise:_executeThen(onFulfilled, onRejected, promise2)
 			-- If either onFulfilled or onRejected returns a value x, run
 			-- the Promise Resolution Procedure [[Resolve]](promise2, x).
 			if promise2 then
-				promise2:Resolve(onRejected(unpack(self._rejected, 1, self._valuesLength)))
+				promise2:Resolve(onRejected(table.unpack(self._rejected, 1, self._rejected.n)))
 				return promise2
 			else
-				local results = table.pack(onRejected(unpack(self._rejected, 1, self._valuesLength)))
+				local results = table.pack(onRejected(table.unpack(self._rejected, 1, self._rejected.n)))
 				if results.n == 0 then
 					return _emptyFulfilledPromise
 				elseif results.n == 1 and Promise.isPromise(results[1]) then
@@ -561,7 +560,7 @@ function Promise:_executeThen(onFulfilled, onRejected, promise2)
 			-- If onRejected is not a function and promise1 is rejected, promise2 must be
 			-- rejected with the same reason as promise1.
 			if promise2 then
-				promise2:_reject(self._rejected, self._valuesLength)
+				promise2:_reject(self._rejected)
 
 				return promise2
 			else
@@ -575,9 +574,9 @@ end
 
 -- Initialize promise values
 _emptyFulfilledPromise = Promise.new()
-_emptyFulfilledPromise:_fulfill({}, 0)
+_emptyFulfilledPromise:_fulfill(EMPTY_PACKED_TUPLE)
 
 _emptyRejectedPromise = Promise.new()
-_emptyRejectedPromise:_reject({}, 0)
+_emptyRejectedPromise:_reject(EMPTY_PACKED_TUPLE)
 
 return Promise

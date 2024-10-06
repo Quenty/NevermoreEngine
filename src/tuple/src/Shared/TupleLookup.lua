@@ -31,7 +31,7 @@ function TupleLookup:ToTuple(...)
 	local n = select("#", ...)
 	if n == 1 then
 		local arg = ...
-		if self._singleArgTuples[arg] then
+		if arg ~= nil and self._singleArgTuples[arg] then
 			return self._singleArgTuples[arg]
 		end
 	end

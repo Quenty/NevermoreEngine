@@ -78,19 +78,25 @@ function ObservableSet:ObserveItemsBrio()
 		local maid = Maid.new()
 
 		local function handleItem(item)
+			if maid[item] then
+				-- Happens when we're re-entrance
+				return
+			end
+
 			local brio = Brio.new(item)
 			maid[item] = brio
 			sub:Fire(brio)
 		end
 
-		for item, _ in pairs(self._set) do
-			handleItem(item)
-		end
 
 		maid:GiveTask(self.ItemAdded:Connect(handleItem))
 		maid:GiveTask(self.ItemRemoved:Connect(function(item)
 			maid[item] = nil
 		end))
+
+		for item, _ in pairs(self._set) do
+			handleItem(item)
+		end
 
 		self._maid[sub] = maid
 		maid:GiveTask(function()
