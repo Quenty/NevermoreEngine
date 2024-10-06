@@ -309,10 +309,13 @@ end
 	@return table -- List with the entries retrieved
 ]=]
 function Table.take(source, count)
-	local newTable = {}
-	for i=1, math.min(#source, count) do
+	local n = math.min(#source, count)
+	local newTable = table.create(n)
+
+	for i=1, n do
 		newTable[i] = source[i]
 	end
+
 	return newTable
 end
 
@@ -333,7 +336,7 @@ local READ_ONLY_METATABLE = {
 	@return table -- The same table, with the metatable set to readonly
 ]=]
 function Table.readonly(target)
-	return setmetatable(target, READ_ONLY_METATABLE)
+	return table.freeze(setmetatable(target, READ_ONLY_METATABLE))
 end
 
 --[=[
