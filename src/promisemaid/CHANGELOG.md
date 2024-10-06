@@ -1,23 +1,18 @@
-# v5.7.0 (Sun Oct 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: PromiseMaidUtils ensures maid invocation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promisemaid@5.6.0...@quenty/promisemaid@5.7.0) (2024-10-06)
+
+
+### Bug Fixes
+
+* PromiseMaidUtils ensures maid invocation ([42432c2](https://github.com/Quenty/NevermoreEngine/commit/42432c2e789b5c97d2d38e40cec16c8ec2130136))
+
+
+
+
 
 # [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promisemaid@5.5.0...@quenty/promisemaid@5.6.0) (2024-10-04)
 

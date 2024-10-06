@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memoize@1.4.0...@quenty/memoize@1.5.0) (2024-10-06)
+
+**Note:** Version bump only for package @quenty/memoize
+
+
+
+
+
 # [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memoize@1.3.0...@quenty/memoize@1.4.0) (2024-10-04)
 
 

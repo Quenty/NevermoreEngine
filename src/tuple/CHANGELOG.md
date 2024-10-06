@@ -1,23 +1,18 @@
-# v1.4.0 (Sun Oct 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Handle arg that is nil ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tuple@1.3.0...@quenty/tuple@1.4.0) (2024-10-06)
+
+
+### Bug Fixes
+
+* Handle arg that is nil ([3878c3e](https://github.com/Quenty/NevermoreEngine/commit/3878c3e8cb90df650d569abfbc5b5d96b09bdb62))
+
+
+
+
 
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tuple@1.2.0...@quenty/tuple@1.3.0) (2024-10-04)
 

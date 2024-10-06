@@ -1,28 +1,30 @@
-# v12.9.0 (Sun Oct 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableMapList:GetItemForKeyAtIndex(key, index) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableMapList:GetFirstItemForKey(key) and ObservableMapList:GetListOfValuesAtListIndex(index) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Brios sometime cleanup wrongly ([@Quenty](https://github.com/Quenty))
-- perf: Improve :GetKeyList() allocation performance ([@Quenty](https://github.com/Quenty))
-- docs: Add documentation to ObservableList:ObserveAtIndex(indexToObserve) ([@Quenty](https://github.com/Quenty))
-- fix: Add ObservableMapSet:GetKeyList() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.8.1...@quenty/observablecollection@12.9.0) (2024-10-06)
+
+
+### Bug Fixes
+
+* Add ObservableMapSet:GetKeyList() ([e5d3461](https://github.com/Quenty/NevermoreEngine/commit/e5d3461e5f835c9442e49eb0f304dc5fb360cb28))
+* Brios sometime cleanup wrongly ([e546588](https://github.com/Quenty/NevermoreEngine/commit/e546588d97b2e8f8386d9795f04929c9b45a27d1))
+
+
+### Features
+
+* Add ObservableMapList:GetFirstItemForKey(key) and ObservableMapList:GetListOfValuesAtListIndex(index) ([bdfc759](https://github.com/Quenty/NevermoreEngine/commit/bdfc7596d8e25350e65a3cc841debcfa0ad444de))
+* Add ObservableMapList:GetItemForKeyAtIndex(key, index) ([224dd25](https://github.com/Quenty/NevermoreEngine/commit/224dd250f2794b7f584d756828dffd9e49b0d009))
+
+
+### Performance Improvements
+
+* Improve :GetKeyList() allocation performance ([b8043cf](https://github.com/Quenty/NevermoreEngine/commit/b8043cfad4e4cfdb2c8ec5d73988bb8bae723c42))
+
+
+
+
 
 ## [12.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.8.0...@quenty/observablecollection@12.8.1) (2024-10-04)
 

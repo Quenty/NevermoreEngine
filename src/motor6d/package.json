@@ -1,6 +1,6 @@
 {
   "name": "@quenty/motor6d",
-  "version": "7.10.1",
+  "version": "7.11.0",
   "description": "Centralized service to override motors on humanoids and other places",
   "keywords": [
     "Roblox",

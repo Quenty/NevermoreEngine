@@ -1,20 +1,18 @@
-# v3.6.0 (Sun Oct 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
-- feat: Freeze Table.readonly and avoid extra work in Table.take ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/table@3.5.0...@quenty/table@3.6.0) (2024-10-06)
+
+
+### Features
+
+* Freeze Table.readonly and avoid extra work in Table.take ([ab24009](https://github.com/Quenty/NevermoreEngine/commit/ab240099ad24b5f0709b6ea5bfe766d84f7acf3a))
+
+
+
+
 
 # [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/table@3.4.0...@quenty/table@3.5.0) (2024-05-09)
 

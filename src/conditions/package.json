@@ -1,6 +1,6 @@
 {
   "name": "@quenty/conditions",
-  "version": "10.10.1",
+  "version": "10.11.0",
   "description": "Adornee based conditional system that is sufficiently generic to script gameplay.",
   "keywords": [
     "Roblox",

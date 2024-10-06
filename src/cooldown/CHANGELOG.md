@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.10.1...@quenty/cooldown@11.11.0) (2024-10-06)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
 ## [11.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.10.0...@quenty/cooldown@11.10.1) (2024-10-04)
 
 **Note:** Version bump only for package @quenty/cooldown

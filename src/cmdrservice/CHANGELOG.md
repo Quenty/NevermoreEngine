@@ -1,20 +1,18 @@
-# v13.11.0 (Sun Oct 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Streaming template provider [#505](https://github.com/Quenty/NevermoreEngine/pull/505) ([@Quenty](https://github.com/Quenty))
-- feat: Modernize template provider to new specifications ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.10.1...@quenty/cmdrservice@13.11.0) (2024-10-06)
+
+
+### Features
+
+* Modernize template provider to new specifications ([7b5df24](https://github.com/Quenty/NevermoreEngine/commit/7b5df24cd0759668d2a5a7d59f1798bca9ddf0f9))
+
+
+
+
 
 ## [13.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.10.0...@quenty/cmdrservice@13.10.1) (2024-10-04)
 
