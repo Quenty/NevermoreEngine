@@ -307,6 +307,7 @@ function Replicator:_doStandardReplication(maid, replicator, child, copy)
 	assert(typeof(child) == "Instance", "Bad child")
 
 	self:_setupAttributeReplication(maid, child, copy)
+	self:_setupTagReplication(maid, child, copy)
 	self:_setupNameReplication(maid, child, copy)
 	self:_setupParentReplication(maid, copy)
 	self:_setupReference(maid, child, copy)
@@ -468,6 +469,44 @@ function Replicator:_setupParentReplication(maid, copy)
 end
 
 --[[
+	Sets up tag replication explicitly.
+
+	@param maid Maid
+	@param child Instance
+	@param copy Instance
+]]
+function Replicator:_setupTagReplication(maid, child, copy)
+	assert(Maid.isMaid(maid), "Bad maid")
+	assert(typeof(child) == "Instance", "Bad child")
+	assert(typeof(copy) == "Instance", "Bad copy")
+
+	for _, tag in pairs(child:GetTags()) do
+		copy:AddTag(tag)
+	end
+
+	maid:GiveTask(child.Changed:Connect(function(property)
+		if property == "Tags" then
+			local ourTagSet = {}
+			for _, tag in pairs(copy:GetTags()) do
+				ourTagSet[tag] = true
+			end
+
+			for _, tag in pairs(child:GetTags()) do
+				if not ourTagSet[tag] then
+					copy:AddTag(tag)
+				end
+
+				ourTagSet[tag] = nil
+			end
+
+			for tag, _ in pairs(ourTagSet) do
+				copy:RemoveTag(tag)
+			end
+		end
+	end))
+end
+
+--[[
 	Sets up the object value replication to point towards new values.
 
 	@param maid Maid
@@ -528,7 +567,7 @@ end
 
 function Replicator:_setupAttributeReplication(maid, child, copy)
 	for key, value in pairs(child:GetAttributes()) do
-		child:SetAttribute(key, value)
+		copy:SetAttribute(key, value)
 	end
 
 	maid:GiveTask(child.AttributeChanged:Connect(function(attribute)
