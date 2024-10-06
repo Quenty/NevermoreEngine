@@ -108,6 +108,8 @@ end
 
 --[=[
 	Initializes the container provider. Should be done via [ServiceBag].
+
+	@param serviceBag ServiceBag
 ]=]
 function TemplateProvider:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
