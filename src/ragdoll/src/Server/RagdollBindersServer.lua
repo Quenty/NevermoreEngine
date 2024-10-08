@@ -7,6 +7,7 @@
 	:::
 
 	@server
+	@deprecated 15.11.2
 	@class RagdollBindersServer
 ]=]
 
