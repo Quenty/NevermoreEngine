@@ -1,19 +1,18 @@
-# v3.5.2 (Wed Oct 09 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Deprecate some signal APIs and qGUI [#506](https://github.com/Quenty/NevermoreEngine/pull/506) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.5.1...@quenty/steputils@3.5.2) (2024-10-09)
+
+
+### Bug Fixes
+
+* Deprecate a large set of APIs ([#506](https://github.com/Quenty/NevermoreEngine/issues/506)) ([d6bdd65](https://github.com/Quenty/NevermoreEngine/commit/d6bdd6567668f238c45d3bd0c85bedb763d30e5c))
+
+
+
+
 
 ## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.5.0...@quenty/steputils@3.5.1) (2024-10-04)
 

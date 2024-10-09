@@ -1,19 +1,18 @@
-# v15.12.1 (Wed Oct 09 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Deprecate some signal APIs and qGUI [#506](https://github.com/Quenty/NevermoreEngine/pull/506) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [15.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.12.0...@quenty/ragdoll@15.12.1) (2024-10-09)
+
+
+### Bug Fixes
+
+* Deprecate a large set of APIs ([#506](https://github.com/Quenty/NevermoreEngine/issues/506)) ([d6bdd65](https://github.com/Quenty/NevermoreEngine/commit/d6bdd6567668f238c45d3bd0c85bedb763d30e5c))
+
+
+
+
 
 # [15.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.11.1...@quenty/ragdoll@15.12.0) (2024-10-06)
 
