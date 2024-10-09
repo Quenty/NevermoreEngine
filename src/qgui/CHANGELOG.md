@@ -1,3 +1,15 @@
+# v2.3.1 (Wed Oct 09 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Deprecate some signal APIs and qGUI [#506](https://github.com/Quenty/NevermoreEngine/pull/506) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

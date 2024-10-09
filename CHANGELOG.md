@@ -1,3 +1,18 @@
+# (Wed Oct 09 2024)
+
+#### 🐛 Bug Fix
+
+- docs: add links in design.md [#504](https://github.com/Quenty/NevermoreEngine/pull/504) ([@anscg](https://github.com/anscg))
+- `@quenty/qgui@2.3.1`, `@quenty/ragdoll@15.12.1`, `@quenty/steputils@3.5.2`
+  - fix: Deprecate some signal APIs and qGUI [#506](https://github.com/Quenty/NevermoreEngine/pull/506) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- Anson Chung ([@anscg](https://github.com/anscg))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Oct 06 2024)
 
 #### 🚀 Enhancement
