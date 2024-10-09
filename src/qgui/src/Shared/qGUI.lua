@@ -1,5 +1,7 @@
 --[=[
 	A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
+
+	@deprecated 2.3.1
 	@class qGui
 ]=]
 

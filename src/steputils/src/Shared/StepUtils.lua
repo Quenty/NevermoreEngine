@@ -43,13 +43,9 @@ end
 	Yields until the frame deferral is done
 ]=]
 function StepUtils.deferWait()
-	local signal = Instance.new("BindableEvent")
-	task.defer(function()
-		signal:Fire()
-		signal:Destroy()
-	end)
-
-	signal.Event:Wait()
+	local current = coroutine.running()
+	task.defer(task.spawn, current)
+	coroutine.yield()
 end
 
 --[=[
@@ -158,26 +154,44 @@ end
 		part.CFrame = CFrame.new(0, 0, )
 	end))
 	```
+
+	:::tip
+	use `RunService.Stepped:Once()` instead
+	:::
+
+	@deprecated 3.5.2
 	@param func function -- Function to call
 	@return function -- Call this function to cancel call
 ]=]
 function StepUtils.onceAtStepped(func)
-	return StepUtils.onceAtEvent(RunService.Stepped, func)
+	local conn = RunService.Stepped:Once(func)
+	return function()
+		conn:Disconnect()
+	end
 end
 
 --[=[
 	Invokes the function once at renderstepped, unless the cancel callback is called.
 
+	:::tip
+	use `RunService.RenderStepped:Once()` instead
+	:::
+
+	@deprecated 3.5.2
 	@param func function -- Function to call
 	@return function -- Call this function to cancel call
 ]=]
 function StepUtils.onceAtRenderStepped(func)
-	return StepUtils.onceAtEvent(RunService.RenderStepped, func)
+	local conn = RunService.RenderStepped:Once(func)
+	return function()
+		conn:Disconnect()
+	end
 end
 
 --[=[
 	Invokes the function once at the given event, unless the cancel callback is called.
 
+	@deprecated 3.5.2
 	@param event Signal | RBXScriptSignal
 	@param func function -- Function to call
 	@return function -- Call this function to cancel call
