@@ -3,7 +3,7 @@
 
 	Author: xXxMoNkEyMaNxXx
 
-	@class Quaternion
+	@class QuaternionObject
 ]=]
 
 local require = require(script.Parent.loader).load(script)

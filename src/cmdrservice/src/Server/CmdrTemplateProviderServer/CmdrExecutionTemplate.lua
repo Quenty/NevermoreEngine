@@ -1,6 +1,6 @@
 --[=[
 	Generic command definition template which we can use to
-	@class CmdrCommandDefinitionTemplate
+	@class CmdrExecutionTemplate
 ]=]
 
 local function waitForValue(objectValue)
