@@ -64,6 +64,27 @@ function ObservableList.new()
 end
 
 --[=[
+	Constructs an ObservableList populated via an observable of Brios
+	@param observable Observable<Brio<T>>
+	@return ObservableList<T>
+]=]
+function ObservableList.fromObservableBrio(observable)
+	local list = ObservableList.new()
+
+	list._maid:GiveTask(observable:Subscribe(function(value)
+		assert(Brio.isBrio(value), "Observable must emit brio")
+
+		if value:IsDead() then
+			return
+		end
+
+		value:ToMaid():GiveTask(list:Add(value:GetValue()))
+	end))
+
+	return list
+end
+
+--[=[
 	Returns whether the value is an observable list
 	@param value any
 	@return boolean
