@@ -1,6 +1,6 @@
 ---
 title: Design
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 # Nevermore design principles
@@ -69,4 +69,3 @@ to as wide of an audience as possible, in many ways document and design notes ar
 ## Loading system
 
 Nevermore's loading system has changed over time, but is generally responsible for loading many modules.
-
