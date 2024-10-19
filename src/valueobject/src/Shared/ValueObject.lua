@@ -32,7 +32,7 @@ function ValueObject.new(baseValue, checkType)
 		_checkType = checkType;
 	}, ValueObject)
 
-	if type(checkType) == "stirng" then
+	if type(checkType) == "string" then
 		if typeof(baseValue) ~= checkType then
 			error(string.format("Expected value of type %q, got %q instead", checkType, typeof(baseValue)))
 		end
