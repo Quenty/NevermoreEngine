@@ -1982,7 +1982,7 @@ function Rx.skipUntil(notifier)
 end
 
 --[=[
-	Skips over values emitted by the source observable until the given predicate is false.
+	Skips over values emitted by the source observable as long as the given predicate is true.
 
 	https://rxjs.dev/api/index/function/skipWhile
 
@@ -2014,7 +2014,7 @@ function Rx.skipWhile(predicate)
 end
 
 --[=[
-	Emits values from the source observable until the given predicate is false, then completes.
+	Emits values from the source observable as long as the given predicate is true. Completes if the predicate is false.
 
 	https://rxjs.dev/api/index/function/takeWhile
 
