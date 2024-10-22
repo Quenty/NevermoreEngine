@@ -1956,7 +1956,7 @@ end
 	@return (source: Observable) -> Observable
 ]=]
 function Rx.skipUntil(notifier)
-	assert(Observable.isObservable(source), "Bad observable")
+	assert(Observable.isObservable(notifier), "Bad observable")
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
