@@ -2028,11 +2028,12 @@ function Rx.takeWhile(predicate)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			local index = 1
+			local index = 0
 
 			return source:Subscribe(function(...)
+				index += 1
+																													
 				if predicate(index, ...) then
-					index += 1
 					sub:Fire(...)
 				else
 					sub:Complete()
