@@ -1947,4 +1947,100 @@ function Rx.throttle(durationSelector)
 	end
 end
 
+--[=[
+	Skips over values emitted by the source observable until a passed-in notifier observable emits a value.
+
+	https://rxjs.dev/api/operators/skipUntil
+
+	@param notifier Observable
+	@return (source: Observable) -> Observable
+]=]
+function Rx.skipUntil(notifier)
+	assert(Observable.isObservable(notifier), "Bad observable")
+
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+			local taking = false
+
+			maid._skipping = notifier:Subscribe(function()
+				maid._skipping = nil
+				taking = true
+			end)
+
+			maid:GiveTask(source:Subscribe(function(...)
+				if taking then
+					sub:Fire(...)
+				end
+			end, sub:GetFailComplete()))
+
+			return maid
+		end)
+	end
+end
+
+--[=[
+	Skips over values emitted by the source observable as long as the given predicate is true.
+
+	https://rxjs.dev/api/index/function/skipWhile
+
+	@param predicate (index: number, ...: any) -> boolean
+	@return (source: Observable) -> Observable
+]=]
+function Rx.skipWhile(predicate)
+	assert(type(predicate) == "function", "Bad predicate")
+
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local skipping = true
+			local index = 0
+
+			return source:Subscribe(function(...)
+				if not skipping then
+					sub:Fire(...)
+					return
+				end
+
+				index += 1
+
+				skipping = predicate(index, ...)
+			end, sub:GetFailComplete())
+		end)
+	end
+end
+
+--[=[
+	Emits values from the source observable as long as the given predicate is true. Completes if the predicate is false.
+
+	https://rxjs.dev/api/index/function/takeWhile
+
+	@param predicate (index: number, ...: any) -> boolean
+	@return (source: Observable) -> Observable
+]=]
+function Rx.takeWhile(predicate)
+	assert(type(predicate) == "function", "Bad predicate")
+
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local index = 0
+
+			return source:Subscribe(function(...)
+				index += 1
+																													
+				if predicate(index, ...) then
+					sub:Fire(...)
+				else
+					sub:Complete()
+				end
+			end, sub:GetFailComplete())
+		end)
+	end
+end
+
 return Rx
