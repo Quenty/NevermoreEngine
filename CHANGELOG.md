@@ -1,3 +1,23 @@
+# (Wed Oct 23 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/rx@13.10.0`
+  - feat: Rx.skipUntil, Rx.skipWhile, and Rx.takeWhile [#512](https://github.com/Quenty/NevermoreEngine/pull/512) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### 🐛 Bug Fix
+
+- docs: Update docs for latest loader & improve sections [#510](https://github.com/Quenty/NevermoreEngine/pull/510) ([@unrooot](https://github.com/unrooot))
+- `@quenty/valueobject@13.10.0`
+  - ValueObject - Fix of typo in initial type check [#511](https://github.com/Quenty/NevermoreEngine/pull/511) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # (Wed Oct 09 2024)
 
 #### 🐛 Bug Fix
