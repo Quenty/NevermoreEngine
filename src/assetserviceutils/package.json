@@ -1,6 +1,6 @@
 {
   "name": "@quenty/assetserviceutils",
-  "version": "5.11.1",
+  "version": "5.12.0",
   "description": "Provides a wrapper for AssetService&#x27;s async calls",
   "keywords": [
     "Roblox",

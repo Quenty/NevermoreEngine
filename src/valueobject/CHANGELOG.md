@@ -1,19 +1,15 @@
-# v13.10.0 (Wed Oct 23 2024)
-
-#### 🐛 Bug Fix
-
-- ValueObject - Fix of typo in initial type check [#511](https://github.com/Quenty/NevermoreEngine/pull/511) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.9.1...@quenty/valueobject@13.10.0) (2024-10-23)
+
+**Note:** Version bump only for package @quenty/valueobject
+
+
+
+
 
 ## [13.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.9.0...@quenty/valueobject@13.9.1) (2024-10-09)
 

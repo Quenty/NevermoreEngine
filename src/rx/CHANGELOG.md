@@ -1,19 +1,18 @@
-# v13.10.0 (Wed Oct 23 2024)
-
-#### 🚀 Enhancement
-
-- feat: Rx.skipUntil, Rx.skipWhile, and Rx.takeWhile [#512](https://github.com/Quenty/NevermoreEngine/pull/512) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.9.0...@quenty/rx@13.10.0) (2024-10-23)
+
+
+### Features
+
+* Rx.skipUntil, Rx.skipWhile, and Rx.takeWhile ([#512](https://github.com/Quenty/NevermoreEngine/issues/512)) ([5765535](https://github.com/Quenty/NevermoreEngine/commit/57655352cd1696fd1fffb8c819fb3b3a9c1c64f7))
+
+
+
+
 
 # [13.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.8.0...@quenty/rx@13.9.0) (2024-10-06)
 
