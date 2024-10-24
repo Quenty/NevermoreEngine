@@ -47,7 +47,7 @@ function Subscription.new(fireCallback, failCallback, completeCallback, observab
 
 	return setmetatable({
 		_state = SubscriptionStateTypes.PENDING;
-		_source = if ENABLE_STACK_TRACING then debug.traceback() else nil;
+		_source = if ENABLE_STACK_TRACING then debug.traceback("Subscription.new()", 3) else nil;
 		_observableSource = observableSource;
 		_fireCallback = fireCallback;
 		_failCallback = failCallback;
@@ -66,12 +66,19 @@ function Subscription:Fire(...)
 			self._fireCallback(...)
 		end
 	elseif self._state == SubscriptionStateTypes.CANCELLED then
-		warn("[Subscription.Fire] - We are cancelled, but events are still being pushed")
+		if self._fireCountAfterDeath then
+			self._fireCountAfterDeath += 1
+		else
+			self._fireCountAfterDeath = 1
+		end
 
-		if ENABLE_STACK_TRACING then
-			print(debug.traceback())
-			print(self._source)
-			print(self._observableSource)
+		if self._fireCountAfterDeath > 1 then
+			warn(debug.traceback(string.format("Subscription:Fire(%s) called %d times after death. Be sure to disconnect all events.", tostring(...), self._fireCountAfterDeath), 2))
+
+			if ENABLE_STACK_TRACING then
+				print(self._observableSource)
+				print(self._source)
+			end
 		end
 	end
 end
@@ -172,33 +179,35 @@ function Subscription:IsPending()
 	return self._state == SubscriptionStateTypes.PENDING
 end
 
-function Subscription:_assignCleanup(task)
+function Subscription:_assignCleanup(cleanupTask)
 	assert(self._cleanupTask == nil, "Already have _cleanupTask")
 
-	if MaidTaskUtils.isValidTask(task) then
+	if MaidTaskUtils.isValidTask(cleanupTask) then
 		if self._state ~= SubscriptionStateTypes.PENDING then
-			MaidTaskUtils.doTask(task)
+			MaidTaskUtils.doTask(cleanupTask)
 			return
 		end
 
-		self._cleanupTask = task
-	elseif task ~= nil then
-		error("Bad cleanup task")
+		self._cleanupTask = cleanupTask
+	elseif cleanupTask ~= nil then
+		error("Bad cleanup cleanupTask")
 	end
 end
 
 function Subscription:_doCleanup()
-	local task = self._cleanupTask
-	if not task then
-		return
+	local cleanupTask = self._cleanupTask
+	if cleanupTask then
+		self._cleanupTask = nil
+
+		-- The validity can change
+		if MaidTaskUtils.isValidTask(cleanupTask) then
+			MaidTaskUtils.doTask(cleanupTask)
+		end
 	end
 
-	self._cleanupTask = nil
-
-	-- The validity can change
-	if MaidTaskUtils.isValidTask(task) then
-		MaidTaskUtils.doTask(task)
-	end
+	self._fireCallback = nil
+	self._failCallback = nil
+	self._completeCallback = nil
 end
 
 --[=[
@@ -215,6 +224,7 @@ function Subscription:Destroy()
 	end
 
 	self:_doCleanup()
+
 end
 
 --[=[
