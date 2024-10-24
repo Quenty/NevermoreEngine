@@ -138,6 +138,8 @@ end
 	@return Promise<T>
 ]=]
 function Rx.toPromise(observable, cancelToken)
+	assert(Observable.isObservable(observable), "Bad observable")
+
 	local maid = Maid.new()
 
 	local newCancelToken = CancelToken.new(function(cancel)
@@ -1008,7 +1010,7 @@ function Rx.switchAll()
 							if currentInside == observable then
 								sub:Fire(...)
 							else
-								warn(string.format("[Rx.switchAll] - Observable is still firing despite disconnect (%q)", observable._source))
+								warn(string.format("[Rx.switchAll] - Observable is still firing despite disconnect (%q)", tostring(observable._source)))
 							end
 						end, -- Merge each inner observable
 						function(...)
@@ -1466,38 +1468,57 @@ function Rx.combineLatest(observables)
 
 		local maid = Maid.new()
 
-		local function fireIfAllSet()
+		local allSet = false
+		local function canFire()
+			if not latest then
+				return false
+			end
+			if allSet then
+				return true
+			end
+
 			for _, value in pairs(latest) do
 				if value == UNSET_VALUE then
-					return
+					return false
 				end
 			end
 
-			sub:Fire(table.freeze(table.clone(latest)))
+			allSet = true
+			return true
+		end
+
+		local function fireIfAllSet()
+			if canFire() then
+				sub:Fire(table.freeze(table.clone(latest)))
+			end
 		end
 
 		local function failOnFirst(...)
-			pending = pending - 1
+			pending -= 1
+			latest = nil
 			sub:Fail(...)
 		end
 
 		local function completeOnAllPendingDone()
-			pending = pending - 1
+			pending -= 1
 			if pending == 0 then
+				latest = nil
 				sub:Complete()
 			end
 		end
 
 		for key, observer in pairs(observables) do
-			if Observable.isObservable(observer) then
-				maid:GiveTask(observer:Subscribe(
-					function(value)
-						latest[key] = value
-						fireIfAllSet()
-					end,
-					failOnFirst,
-					completeOnAllPendingDone))
+			if not Observable.isObservable(observer) then
+				continue
 			end
+
+			maid:GiveTask(observer:Subscribe(
+				function(value)
+					latest[key] = value
+					fireIfAllSet()
+				end,
+				failOnFirst,
+				completeOnAllPendingDone))
 		end
 
 		return maid
