@@ -60,12 +60,11 @@ function ObservableSortedList.new(isReversed, compare)
 
 	self._indexObservers = self._maid:Add(ObservableSubscriptionTable.new())
 	self._contentIndexObservers = self._maid:Add(ObservableSubscriptionTable.new())
+	self._keyObservables = self._maid:Add(ObservableSubscriptionTable.new())
 
 	self._sortValue = {} -- { [Symbol]: number }
 	self._contents = {} -- { [Symbol]: T }
 	self._indexes = {} -- { [Symbol]: number }
-
-	self._keyObservables = {} -- { [Symbol]: { Subscription } }
 
 	self._isReversed = isReversed or false
 	self._compare = compare or defaultCompare
@@ -122,6 +121,19 @@ function ObservableSortedList:Observe()
 			return self:GetList();
 		end);
 	})
+end
+
+--[=[
+	Allows iteration over the observable map
+
+	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
+]=]
+function ObservableSortedList:__iter()
+	return coroutine.wrap(function()
+		for index, value in self._keyList do
+			coroutine.yield(index, self._contents[value])
+		end
+	end)
 end
 
 function ObservableSortedList:Contains(value)
@@ -239,33 +251,16 @@ end
 function ObservableSortedList:ObserveIndexByKey(key)
 	assert(Symbol.isSymbol(key), "Bad key")
 
-	return Observable.new(function(sub)
-		local maid = Maid.new()
-		self._keyObservables[key] = self._keyObservables[key] or {}
-		table.insert(self._keyObservables[key], sub)
-
-		local currentIndex = self._indexes[key]
-		if currentIndex then
-			sub:Fire(currentIndex)
-		end
-
-		maid:GiveTask(function()
-			local list = self._keyObservables[key]
-			if not list then
-				return
+	return self._keyObservables:Observe(key):Pipe({
+		Rx.startFrom(function()
+			local currentIndex = self._indexes[key]
+			if currentIndex then
+				return { currentIndex }
+			else
+				return {}
 			end
-
-			local index = table.find(list, sub)
-			if index then
-				table.remove(list, index)
-				if #list == 0 then
-					self._keyObservables[key] = nil
-				end
-			end
-		end)
-
-		return maid
-	end)
+		end);
+	})
 end
 
 --[=[
@@ -337,15 +332,10 @@ function ObservableSortedList:Add(item, observeValue)
 	end
 
 	maid:GiveTask(function()
-		local observableSubs = self._keyObservables[key]
-		self._keyObservables[key] = nil
-
 		self:_removeItemByKey(key, item)
 
 		-- Fire off the index change on the value
-		if observableSubs then
-			self:_completeSubs(observableSubs)
-		end
+		self._keyObservables:Complete(key)
 
 		self._contents[key] = nil
 		self._sortValue[key] = nil
@@ -359,7 +349,7 @@ function ObservableSortedList:Add(item, observeValue)
 end
 
 function ObservableSortedList:_assignSortValue(key, item, sortValue)
-	self:_debugVerifyIntegrity()
+	-- self:_debugVerifyIntegrity()
 
 	if sortValue ~= nil then
 		local currentIndex = self._indexes[key]
@@ -368,18 +358,12 @@ function ObservableSortedList:_assignSortValue(key, item, sortValue)
 		self._sortValue[key] = sortValue
 		self:_updateIndex(key, item, targetIndex, sortValue)
 	else
-		local observableSubs = self._keyObservables[key]
-
 		-- calling this also may unsubscribe some observables.
 		self:_removeItemByKey(key, item)
-
-		if observableSubs then
-			-- fire nil index
-			self:_fireSubs(observableSubs, nil)
-		end
+		self._keyObservables:Complete(key)
 	end
 
-	self:_debugVerifyIntegrity()
+	-- 	self:_debugVerifyIntegrity()
 end
 
 
@@ -596,11 +580,7 @@ function ObservableSortedList:_queueDeferredChange()
 				if self._indexes[lastChange.key] == lastChange.newIndex then
 					changed = true
 
-					local subs = self._keyObservables[lastChange.key]
-					if subs then
-						self:_fireSubs(subs, lastChange.newIndex)
-					end
-
+					self._keyObservables:Fire(lastChange.key, lastChange.newIndex)
 					self._indexObservers:Fire(lastChange.newIndex, self._contents[lastChange.key])
 				end
 			end
@@ -682,7 +662,9 @@ function ObservableSortedList:_lowBinarySearch(sortValue)
 	while true do
 		local mid = math.floor((minIndex + maxIndex) / 2)
 		local compareValue = self._compare(self._sortValue[self._keyList[mid]], sortValue)
-		assert(type(compareValue) == "number", "Expecting number")
+		if type(compareValue) ~= "number" then
+			error(string.format("Bad compareValue, expected number, got %q", type(compareValue)))
+		end
 
 		if self._isReversed then
 			compareValue = -compareValue
@@ -700,16 +682,6 @@ function ObservableSortedList:_lowBinarySearch(sortValue)
 			end
 		end
 	end
-end
-
-function ObservableSortedList:_debugSortValuesToString()
-	local values = {}
-
-	for _, key in pairs(self._keyList) do
-		table.insert(values, string.format("%4d", self._sortValue[key]))
-	end
-
-	return table.concat(values, ", ")
 end
 
 function ObservableSortedList:_debugVerifyIntegrity()
@@ -730,23 +702,14 @@ function ObservableSortedList:_debugVerifyIntegrity()
 	end
 end
 
-function ObservableSortedList:_fireSubs(list, index)
-	for _, sub in pairs(list) do
-		if sub:IsPending() then
-			task.spawn(function()
-				sub:Fire(index)
-			end)
-		end
-	end
-end
+function ObservableSortedList:_debugSortValuesToString()
+	local values = {}
 
-function ObservableSortedList:_completeSubs(list)
-	for _, sub in pairs(list) do
-		if sub:IsPending() then
-			sub:Fire(nil)
-			sub:Complete()
-		end
+	for _, key in pairs(self._keyList) do
+		table.insert(values, string.format("%4d", self._sortValue[key]))
 	end
+
+	return table.concat(values, ", ")
 end
 
 --[=[
