@@ -47,7 +47,7 @@ function RootPartUtils.promiseRootPart(humanoid)
 
 	task.delay(MAX_YIELD_TIME, function()
 		if promise:IsPending() then
-			warn("[RootPartUtils.promiseRootPart] - TImed out on root part", debug.traceback())
+			warn(debug.traceback("[RootPartUtils.promiseRootPart] - Timed out on root part"))
 			promise:Reject("Timed out")
 		end
 	end)

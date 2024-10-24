@@ -103,6 +103,31 @@ function StateStack:PushState(state)
 	end
 end
 
+--[=[
+	Pushes the brio's content onto the stack for the lifetime of the brio
+
+	@param brio Brio
+	@return function -- Cleanup function
+]=]
+function StateStack:PushBrio(brio)
+	if brio:IsDead() then
+		return
+	end
+
+	local maid, state = brio:ToMaidAndValue()
+	maid:GiveTask(self:PushState(state))
+
+	maid:GiveTask(function()
+		self._maid[maid] = nil
+	end)
+
+	self._maid[maid] = maid
+
+	return function()
+		self._maid[maid] = nil
+	end
+end
+
 function StateStack:_popState(data)
 	local index = table.find(self._stateStack, data)
 	if index then

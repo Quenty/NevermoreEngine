@@ -31,6 +31,7 @@
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/rectutils": "file:../rectutils",
     "@quenty/rx": "file:../rx",
     "@quenty/steputils": "file:../steputils",
     "@quenty/valueobject": "file:../valueobject"

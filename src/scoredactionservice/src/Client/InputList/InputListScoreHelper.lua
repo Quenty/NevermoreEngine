@@ -88,11 +88,13 @@ function InputListScoreHelper:_unregisterAction(inputType)
 
 	self._currentTypes[inputType] = nil
 
-	local pickerForType = self._provider:FindPicker(inputType)
-	if pickerForType then
-		pickerForType:RemoveAction(self._scoredAction)
-	else
-		warn("No pickerForType was registered. This should not occur.")
+	if self._provider.Destroy then
+		local pickerForType = self._provider:FindPicker(inputType)
+		if pickerForType then
+			pickerForType:RemoveAction(self._scoredAction)
+		else
+			warn("No pickerForType was registered. This should not occur.")
+		end
 	end
 end
 

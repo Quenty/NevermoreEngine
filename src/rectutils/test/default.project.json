@@ -1,0 +1,12 @@
+{
+  "name": "RectUtilsTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "rectutils": {
+        "$path": ".."
+      }
+    }
+  }
+}
