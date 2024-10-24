@@ -90,6 +90,19 @@ function ObservableList:Observe()
 end
 
 --[=[
+	Allows iteration over the observable map
+
+	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
+]=]
+function ObservableList:__iter()
+	return coroutine.wrap(function()
+		for index, value in self._keyList do
+			coroutine.yield(index, self._contents[value])
+		end
+	end)
+end
+
+--[=[
 	Observes all items in the list
 	@return Observable<Brio<T>>
 ]=]

@@ -74,6 +74,15 @@ function ObservableCountingMap.isObservableMap(value)
 end
 
 --[=[
+	Allows iteration over the observable counting map
+
+	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
+]=]
+function ObservableCountingMap:__iter()
+	return pairs(self._map)
+end
+
+--[=[
 	Observes the current set of active keys
 	@return Observable<{ T }>
 ]=]
