@@ -36,11 +36,27 @@ function ObservableSubscriptionTable:Fire(key, ...)
 	-- Make a copy so we don't have to worry about our last changing
 	for _, sub in pairs(table.clone(subs)) do
 		if sub:IsPending() then
+			-- TODO: Use connection here
 			task.spawn(sub.Fire, sub, ...)
 		end
 	end
 end
 
+--[=[
+	Returns true if subscription exists
+
+	@param key TKey
+	@return boolean
+]=]
+function ObservableSubscriptionTable:HasSubscriptions(key)
+	return self._subMap[key] ~= nil
+end
+
+--[=[
+	Completes the subscription
+
+	@param key TKey
+]=]
 function ObservableSubscriptionTable:Complete(key, ...)
 	local subs = self._subMap[key]
 	if not subs then
@@ -83,6 +99,7 @@ function ObservableSubscriptionTable:Observe(key, retrieveInitialValue)
 				return
 			end
 
+			-- TODO: Linked list
 			local index = table.find(current, sub)
 			if not index then
 				return

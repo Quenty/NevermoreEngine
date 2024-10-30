@@ -4,13 +4,7 @@
     "$className": "DataModel",
     "ServerScriptService": {
       "observablecollection": {
-        "$className": "Folder",
-        "observablecollection": {
-          "$path": ".."
-        },
-        "instanceutils": {
-          "$path": "../../instanceutils"
-        }
+        "$path": ".."
       },
       "Script": {
         "$path": "scripts/Server"
