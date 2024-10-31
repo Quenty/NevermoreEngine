@@ -28,7 +28,11 @@ function RxClippedRectUtils.observeClippedRect(gui)
 		parentRect = RxClippedRectUtils._observeParentClippedRect(gui);
 	}):Pipe({
 		Rx.map(function(state)
-			return RxClippedRectUtils._computeClippedRect(state)
+			if state.parentRect then
+				return RxClippedRectUtils._computeClippedRect(state)
+			else
+				return Rect.new(Vector2.zero, Vector2.zero)
+			end
 		end);
 		Rx.distinct();
 	})
