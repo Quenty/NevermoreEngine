@@ -599,9 +599,9 @@ end
 	invoking interface methods, or querying the interface will result
 	in errors.
 
-	```tip
+	:::tip
 	Probably use :Find() instead of Get, since this always returns an interface.
-	```
+	:::
 
 	@param adornee Instance -- Adornee to get interface on
 	@param tieRealm TieRealm?
