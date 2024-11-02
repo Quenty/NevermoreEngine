@@ -173,7 +173,6 @@ end
 ]=]
 function SortedNode:ContainsNode(node: SortedNode): boolean
 	assert(SortedNode.isSortedNode(node), "Bad SortedNode")
-	assert(self.parent == nil, "Should only be called on root")
 
 	local current = node
 	while current do
@@ -237,6 +236,9 @@ function SortedNode:InsertNode(node): SortedNode<T>
 end
 
 function SortedNode:_leftRotate(root, node): SortedNode<T>
+	assert(root, "No root")
+	assert(node, "No node")
+
 	local rightChild = node.right
 	node:_setRight(rightChild.left)
 
@@ -257,6 +259,9 @@ function SortedNode:_leftRotate(root, node): SortedNode<T>
 end
 
 function SortedNode:_rightRotate(root, node): SortedNode<T>
+	assert(root, "No root")
+	assert(node, "No node")
+
 	local leftChild = node.left
 	node:_setLeft(leftChild.right)
 
@@ -289,7 +294,6 @@ function SortedNode:_fixDoubleRed(root, node): SortedNode
 	local parent = node.parent
 	local grandparent = node:_grandparent()
 	local uncle = node:_uncle()
-
 
 	if not grandparent then
 		return root
@@ -334,53 +338,7 @@ function SortedNode:_fixDoubleRed(root, node): SortedNode
 		end
 	end
 
-	end
-	-- local current = node
-	-- while current.parent ~= nil and current.parent.color == Color.RED do
-	-- 	local grandparent = current:_grandparent()
-	-- 	if not grandparent then
-	-- 		break
-	-- 	end
-
-	-- 	if current.parent == grandparent.left then
-	-- 		local uncle = current:_uncle()
-	-- 		if uncle ~= nil and uncle.color == Color.RED then
-	-- 			current.parent.color = Color.BLACK
-	-- 			uncle.color = Color.BLACK
-	-- 			grandparent.color = Color.RED
-	-- 			current = grandparent
-	-- 		else
-	-- 			if current == current.parent.right then
-	-- 				current = current.parent
-	-- 				root = self:_leftRotate(root, current)
-	-- 			end
-	-- 			current.parent.color = Color.BLACK
-	-- 			current:_grandparent().color = Color.RED
-	-- 			root = self:_rightRotate(root, current:_grandparent())
-	-- 		end
-	-- 	elseif current.parent == grandparent.right then
-	-- 		local uncle = current:_uncle()
-	-- 		if uncle ~= nil and uncle.color == Color.RED then
-	-- 			current.parent.color = Color.BLACK
-	-- 			uncle.color = Color.BLACK
-	-- 			grandparent.color = Color.RED
-	-- 			current = grandparent
-	-- 		else
-	-- 			if current == current.parent.left then
-	-- 				current = current.parent
-	-- 				root = self:_rightRotate(root, current)
-	-- 			end
-	-- 			current.parent.color = Color.BLACK
-	-- 			current:_grandparent().color = Color.RED
-	-- 			root = self:_leftRotate(root, current:_grandparent())
-	-- 		end
-	-- 	else
-	-- 		error("Bad parent state")
-	-- 	end
-	-- end
-
-	-- root.color = Color.BLACK
-	-- return root
+	return root
 end
 
 function SortedNode:_setLeft(node: SortedNode)
@@ -390,7 +348,7 @@ function SortedNode:_setLeft(node: SortedNode)
 		return
 	end
 
-	self:_assertIntegrity()
+	-- self:_assertIntegrity()
 
 	if self.left then
 		self.left.parent = nil
@@ -398,7 +356,7 @@ function SortedNode:_setLeft(node: SortedNode)
 	end
 
 	if node then
-		assert(node.value <= self.value, "Bad node value")
+		-- assert(node.value <= self.value, "Bad node value") -- only true during insertion
 
 		if node.parent then
 			node:_unparent()
@@ -406,12 +364,12 @@ function SortedNode:_setLeft(node: SortedNode)
 
 		self.left = node
 		self.left.parent = self
-		self.left:_assertIntegrity()
+		-- self.left:_assertIntegrity()
 	end
 
 	self:_updateAllParentDescendantCount()
-	self:_assertIntegrity()
-	self:_assertFullIntegritySlow()
+	-- self:_assertIntegrity()
+	-- self:_assertFullIntegritySlow() -- only true during insertion
 end
 
 function SortedNode:_setRight(node: SortedNode)
@@ -421,7 +379,7 @@ function SortedNode:_setRight(node: SortedNode)
 		return
 	end
 
-	self:_assertIntegrity()
+	-- self:_assertIntegrity()
 
 	if self.right then
 		self.right.parent = nil
@@ -429,7 +387,7 @@ function SortedNode:_setRight(node: SortedNode)
 	end
 
 	if node then
-		assert(node.value >= self.value, "Bad node value")
+		-- assert(node.value >= self.value, "Bad node value") -- only true during insertion
 
 		if node.parent then
 			node:_unparent()
@@ -437,12 +395,12 @@ function SortedNode:_setRight(node: SortedNode)
 
 		self.right = node
 		self.right.parent = self
-		self.right:_assertIntegrity()
+		-- self.right:_assertIntegrity()
 	end
 
 	self:_updateAllParentDescendantCount()
-	self:_assertIntegrity()
-	self:_assertFullIntegritySlow()
+	-- self:_assertIntegrity()
+	-- self:_assertFullIntegritySlow() -- only true during insertion
 end
 
 function SortedNode:_updateAllParentDescendantCount()
@@ -474,61 +432,9 @@ function SortedNode:RemoveNode(node: SortedNode): SortedNode
 		return self
 	end
 
-	if node.left == nil and node.right == nil then
-		if node.color == Color.RED then
-			-- Black height invariant is maintained
-			root = self:_replaceNode(root, node, nil)
-		else
-			root = self:_replaceNode(root, node, nil)
-			-- TODO: Fixup required
-			error("Fixup requird")
-		end
-	elseif node.left == nil then
-		local replacement = node.right
-		root = self:_replaceNode(root, node, replacement)
-		replacement.color = Color.BLACK
-	elseif node.right == nil then
-		local replacement = node.left
-		root = self:_replaceNode(root, node, replacement)
-		replacement.color = Color.BLACK
-	else
-		local replacement = node.right:_minimumNode()
-		local originalColor = node.color
-		local originalReplacementColor = replacement.color
+	print("RemoveNode called with ", node.value, node:GetIndex())
 
-		-- Remove replacement from tree
-		local replacementRight = replacement.right
-		local replacementParent = replacement.parent
-		if replacementParent.left == replacement then
-			replacementParent:_setLeft(replacementRight)
-		elseif replacementParent.right == replacement then
-			replacementParent:_setRight(replacementRight)
-		end
-
-		-- Give node children to the replacement
-		assert(replacement.left == nil, "Successor should have no children")
-		assert(replacement.right == nil, "Successor should have no children")
-
-		replacement:_setLeft(node.left)
-		replacement:_setRight(node.right)
-
-		-- Put replacement where node is
-		root = self:_replaceNode(root, node, replacement)
-		replacement.color = originalColor
-
-		if originalReplacementColor == Color.BLACK then
-			error("Cannot patch up")
-		end
-	end
-
-	node:_assertIntegrity()
-	assert(node.parent == nil, "Parent should be cleared")
-	assert(node.left == nil, "Left should be cleared")
-	assert(node.right == nil, "Right should be cleared")
-
-	if root then
-		root:_assertDescendantCount(originalCount - 1)
-	end
+	root = self:_removeNodeHelper(root, node)
 
 	if root then
 		root:_assertIntegrity()
@@ -538,11 +444,211 @@ function SortedNode:RemoveNode(node: SortedNode): SortedNode
 		root:_assertRedBlackFullIntegritySlow()
 
 		root:_assertDescendantCount(originalCount - 1)
+	else
+		if originalCount ~= 1 then
+			error(string.format("Removed %d nodes instead of 1", originalCount - 1))
+		end
 	end
+
 	return root
 end
 
-function SortedNode:_minimumNode()
+function SortedNode:_removeNodeHelper(root, node, depth)
+	assert(root, "Bad root")
+	assert(node, "Bad node")
+	depth = (depth or 0) + 1
+
+	if depth > 2 then
+		error("Should not recursively call remove node helper more than once")
+	end
+
+	local replacement = self:_findReplacement(node)
+	local bothBlack = (replacement == nil or replacement.color == Color.BLACK) and node.color == Color.BLACK
+	local parent = node.parent
+
+	print("removing", node.value)
+	print(root)
+
+	if replacement == nil then
+		-- Node is a leaf or only has 1 child
+		if node == root then
+			root = nil
+		else
+			if bothBlack then
+				root = self:_fixDoubleBlack(root, node)
+				assert(root, "Should have root")
+			else
+				local sibling = node:_sibling()
+				if sibling then
+					sibling.color = Color.RED
+				end
+			end
+
+			assert(node.descendantCount == 1, "Cannot unparent")
+			node:_unparent()
+		end
+	elseif node.left == nil or node.right == nil then
+		-- Node to be deleted has only one child
+
+		if node == root then
+			root = self:_swapNodes(root, node, replacement)
+			root = self:_removeNodeHelper(root, node, depth)
+		else
+			assert(node.parent, "Node must have parent")
+
+			if node:_isOnLeft() then
+				parent:_setLeft(replacement)
+			elseif node:_isOnRight() then
+				parent:_setRight(replacement)
+			else
+				error("Bad state")
+			end
+
+			if bothBlack then
+				root = self:_fixDoubleBlack(root, replacement)
+				assert(root, "Should have root")
+			else
+				-- One of these are red, swap to black
+				replacement.color = Color.BLACK
+			end
+		end
+	else
+		-- two children
+		root = self:_swapNodes(root, node, replacement)
+		root = self:_removeNodeHelper(root, node, depth)
+	end
+
+	if root then
+		root:_assertIntegrity()
+		root:_assertRootIntegrity()
+		root:_assertFullIntegritySlow()
+		root:_assertRedBlackIntegrity()
+		root:_assertRedBlackFullIntegritySlow()
+	end
+
+	return root
+end
+
+function SortedNode:_swapNodes(root, node, replacement)
+	assert(root, "No root")
+	assert(node, "No node")
+	assert(replacement, "No replacement")
+	assert(node ~= replacement, "Node can not be the replacement")
+
+	-- In direct descendant scenario node is always parent
+	if replacement:ContainsNode(node) then
+		node, replacement = replacement, node
+	end
+
+	assert(replacement ~= root, "Replacement cannot be root")
+	assert(replacement.parent, "Replacement must have parent")
+	local descendantCount = root.descendantCount
+
+	local nodeParent = node.parent
+	local nodeLeft = node.left
+	local nodeRight = node.right
+	local nodeOnLeft = nodeParent and node:_isOnLeft()
+	local nodeColor = node.color
+	local replacementLeft = replacement.left
+	local replacementRight = replacement.right
+	local replacementParent = replacement.parent
+	local replacementOnLeft = replacement:_isOnLeft()
+	local replacementColor = replacement.color
+
+	if replacement.parent == node then
+		node:_unparent()
+		replacement:_unparent()
+
+		-- Special case for direct descendants, node is always parent in this scenario
+		if nodeParent == nil then
+			if node == root then
+				root = replacement
+			else
+				error("Should be root if our item's parent is nil")
+			end
+		elseif nodeOnLeft then
+			nodeParent:_setLeft(replacement)
+		else
+			nodeParent:_setRight(replacement)
+		end
+
+		-- Transformed to: Replacement -> Node
+		if replacementOnLeft then
+			replacement:_setLeft(node)
+			replacement:_setRight(nodeRight)
+		else
+			replacement:_setRight(node)
+			replacement:_setLeft(nodeLeft)
+		end
+
+		node:_setLeft(replacementLeft)
+		node:_setRight(replacementRight)
+
+		assert(node.parent == replacement, "Swap failed on node.parent")
+		assert(replacement.parent == nodeParent, "Swap failed on replacement.parent")
+		assert(node.left == replacementLeft, "Swap failed on node.left")
+		assert(node.right == replacementRight, "Swap failed on node.right")
+	else
+		node:_unparent()
+		replacement:_unparent()
+
+		-- Unparent everything
+		node:_setLeft(replacementLeft)
+		node:_setRight(replacementRight)
+		replacement:_setLeft(nodeLeft)
+		replacement:_setRight(nodeRight)
+
+		if nodeParent == nil then
+			if node == root then
+				root = replacement
+			else
+				error("Bad state")
+			end
+		elseif nodeOnLeft then
+			nodeParent:_setLeft(replacement)
+		else
+			nodeParent:_setRight(replacement)
+		end
+
+		if replacementOnLeft then
+			replacementParent:_setLeft(node)
+		else
+			replacementParent:_setRight(node)
+		end
+
+		assert(node.parent == replacementParent, "Swap failed on node.parent")
+		assert(replacement.parent == nodeParent, "Swap failed on replacement.parent")
+		assert(node.left == replacementLeft, "Swap failed on node.left")
+		assert(node.right == replacementRight, "Swap failed on node.right")
+		assert(replacement.left == nodeLeft, "Swap failed on replacement.left")
+		assert(replacement.right == nodeRight, "Swap failed on replacement.right")
+	end
+
+	node.color = replacementColor
+	replacement.color = nodeColor
+
+	root:_assertDescendantCount(descendantCount)
+
+	return root
+end
+
+function SortedNode:_findReplacement(node)
+	if node.left and node.right then
+		return node.right:_successor()
+	end
+
+	if node.left and node.right then
+		return nil
+	end
+
+	if node.left then
+		return node.left
+	else
+		return node.right
+	end
+end
+
+function SortedNode:_successor()
 	local node = self
     while node.left ~= nil do
         node = node.left
@@ -550,82 +656,105 @@ function SortedNode:_minimumNode()
     return node
 end
 
-function SortedNode:_fixDelete(root, x)
-	while x ~= root and x.color == Color.BLACK do
-		if x == x.parent.left then
-			local sibling = x:_sibling()
-			if sibling.color == Color.RED then
-				sibling.color = Color.BLACK
-				x.parent.color = Color.RED
-				root = self:_leftRotate(root, x.parent)
-				sibling = x:_sibling()
-			end
+--[[
+	https://www.geeksforgeeks.org/deletion-in-red-black-tree/?ref=oin_asr9
+]]
+function SortedNode:_fixDoubleBlack(root, node)
+	assert(root, "No root")
+	assert(node, "No node")
 
-			if (sibling.left == nil or sibling.left.color == Color.BLACK) and (sibling.right == nil or sibling.right.color == Color.BLACK) then
-				sibling.color = Color.RED
-				x = x.parent
-			else
-				if sibling.right == nil or sibling.right.color == Color.BLACK then
-					if sibling.left ~= nil then
-						sibling.left.color = Color.BLACK
-					end
-					sibling.color = Color.RED
-					root = self:_rightRotate(root, sibling)
-					sibling = x:_sibling()
-				end
+	if node == root then
+		return root
+	end
 
-				sibling.color = x.parent.color
-				x.parent.color = Color.BLACK
+	local sibling = node:_sibling()
+	local parent = node.parent
+	if sibling == nil then
+		return self:_fixDoubleBlack(root, parent)
+	end
 
-				if sibling.right ~= nil then
-					sibling.right.color = Color.BLACK
-				end
+	if sibling.color == Color.RED then
+		parent.color = Color.RED
+		sibling.color = Color.BLACK
 
-				root = self:_leftRotate(root, x.parent)
-				x = root
-			end
-		elseif x == x.parent.right then
-			local sibling = x:_sibling()
-			if sibling.color == Color.RED then
-				sibling.color = Color.BLACK
-				x.parent.color = Color.RED
-				root = self:_rightRotate(root, x.parent)
-				sibling = x:_sibling()
-			end
-
-			if (sibling.left == nil or sibling.left.color == Color.BLACK) and (sibling.right == nil or sibling.right.color == Color.BLACK) then
-				sibling.color = Color.RED
-				x = x.parent
-			else
-				if sibling.left == nil or sibling.left.color == Color.BLACK then
-					if sibling.right ~= nil then
-						sibling.right.color = Color.BLACK
-					end
-					sibling.color = Color.RED
-					root = self:_leftRotate(root, sibling)
-					sibling = x:_sibling()
-				end
-
-				sibling.color = x.parent.color
-				x.parent.color = Color.BLACK
-
-				if sibling.left ~= nil then
-					sibling.left.color = Color.BLACK
-				end
-
-				root = self:_rightRotate(root, x.parent)
-				x = root
-			end
+		if sibling:_isOnLeft() then
+			-- Left case
+			root = self:_rightRotate(root, parent)
+		elseif parent.right == sibling then
+			-- Right case
+			root = self:_leftRotate(root, parent)
 		else
 			error("Bad state")
 		end
-	end
 
-	if x ~= nil then
-		x.color = Color.BLACK
+		root = self:_fixDoubleBlack(root, node)
+	elseif sibling.color == Color.BLACK then
+		if sibling:_hasRedChild() then
+			-- At least 1 red child
+
+			if sibling.left and sibling.left.color == Color.RED then
+				if sibling:_isOnLeft() then
+					-- Left-left
+					sibling.left.color = sibling.color
+					sibling.color = parent.color
+					root = self:_rightRotate(root, parent)
+				else
+					-- Right-left
+					sibling.left.color = parent.color
+					root = self:_rightRotate(root, sibling)
+					root = self:_leftRotate(root, parent)
+				end
+			else
+				if sibling:_isOnLeft() then
+					-- Left-right
+					sibling.right.color = parent.color
+					root = self:_leftRotate(root, sibling)
+					root = self:_rightRotate(root, parent)
+				else
+					-- Right-right
+					sibling.right.color = sibling.color
+					sibling.color = parent.color
+					root = self:_leftRotate(root, parent)
+				end
+			end
+		else
+			-- 2 black children
+			sibling.color = Color.RED
+			if parent.color == Color.BLACK then
+				root = self:_fixDoubleBlack(root, parent)
+			else
+				parent.color = Color.BLACK
+			end
+		end
+	else
+		error("Bad state")
 	end
 
 	return root
+end
+
+function SortedNode:_isOnLeft()
+	assert(self.parent, "Must have parent to invoke this method")
+
+	return self.parent.left == self
+end
+
+function SortedNode:_isOnRight()
+	assert(self.parent, "Must have parent to invoke this method")
+
+	return self.parent.right == self
+end
+
+function SortedNode:_hasRedChild()
+	if self.left and self.left.color == Color.RED then
+		return true
+	end
+
+	if self.right and self.right.color == Color.RED then
+		return true
+	end
+
+	return false
 end
 
 --[[
@@ -661,20 +790,28 @@ function SortedNode:_unparent()
 		return
 	end
 
-	if self.parent.left == self then
+	if self:_isOnLeft() then
 		self.parent:_setLeft(nil)
-	elseif self.parent.right == self then
+	elseif self:_isOnRight() then
 		self.parent:_setRight(nil)
 	else
 		error("Bad state")
 	end
 end
 
-function SortedNode:_root()
+function SortedNode:_debugGetRoot()
+	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
+	local seen = {}
 	local root = self
+	seen[root] = true
 
 	while root.parent ~= nil do
 		root = root.parent
+		if seen[root] then
+			error("Loop in parents")
+		end
+		seen[root] = true
 	end
 
 	return root
@@ -721,10 +858,15 @@ function SortedNode:__tostring()
 	local result = "BinarySearchTree\n"
 
 	local stack = {} -- Stack to hold nodes and their details
+	local seen = {}
 	table.insert(stack, { node = self, indent = "", hasChildren = false })
 
 	while #stack > 0 do
 		local current = table.remove(stack) -- Pop from the stack
+		local wasSeen = seen[current.node]
+
+		seen[current.node] = true
+
 		local node = current.node
 		local indent = current.indent
 		local hasChildren = current.hasChildren
@@ -738,20 +880,29 @@ function SortedNode:__tostring()
 			result = result .. "└── "
 			indent = indent .. "    "
 		end
+
 		local text = string.format("SortedNode { index=%d, value=%s, descendants=%d, color=%s }",
 			node:GetIndex(),
 			tostring(node.value),
 			node.descendantCount,
 			node.color)
+
+		if wasSeen then
+			result = result .. "<LOOPED> "
+		end
+
 		result = result .. text .. "\n"
 
-		-- Push right and left children to the stack with updated indentation
-		-- Right child is pushed first so that left child is processed first
-		if node.right ~= nil then
-			table.insert(stack, { node = node.right, indent = indent, hasChildren = false })
-		end
-		if node.left ~= nil then
-			table.insert(stack, { node = node.left, indent = indent, hasChildren = node.right ~= nil })
+
+		if not wasSeen then
+			-- Push right and left children to the stack with updated indentation
+			-- Right child is pushed first so that left child is processed first
+			if node.right ~= nil then
+				table.insert(stack, { node = node.right, indent = indent, hasChildren = false })
+			end
+			if node.left ~= nil then
+				table.insert(stack, { node = node.left, indent = indent, hasChildren = node.right ~= nil })
+			end
 		end
 	end
 
@@ -796,14 +947,22 @@ if DEBUG_ASSERTION_SLOW then
 	end
 
 	function SortedNode:_assertRedBlackFullIntegritySlow()
-		local root = self:_root()
+		local root = self:_debugGetRoot()
 
 		for _, node in root:IterateNodes() do
 			node:_assertRedBlackIntegrity()
 		end
 
+		local seen = {}
+
 		local maxDepth = nil
 		local function recurse(node, ancestorBlackCount)
+			if seen[node] then
+				error("Loop in nodes")
+			end
+
+			seen[node] = true
+
 			if node.color == Color.BLACK then
 				ancestorBlackCount += 1
 			end
@@ -884,10 +1043,15 @@ if DEBUG_ASSERTION_SLOW then
 	end
 
 	function SortedNode:_assertFullIntegritySlow()
-		local root = self:_root()
+		local root = self:_debugGetRoot()
 		local previous = nil
-
+		local seen = {}
 		for index, node in root:IterateNodes() do
+			if seen[node] then
+				error("Loop in nodes")
+			end
+
+			seen[node] = true
 			if previous then
 				assert(previous.value <= node.value, "Node is out of order")
 			end
@@ -912,6 +1076,8 @@ if DEBUG_ASSERTION_SLOW then
 		end
 	end
 else
+	function SortedNode:_assertNoLoops()
+	end
 	function SortedNode:_assertDescendantCount()
 	end
 	function SortedNode:_assertRedBlackIntegrity()
