@@ -602,6 +602,7 @@ TemplateProvider.Get = assert(TemplateProvider.GetTemplate, "Missing method")
 TemplateProvider.Clone = assert(TemplateProvider.CloneTemplate, "Missing method")
 TemplateProvider.PromiseClone = assert(TemplateProvider.PromiseCloneTemplate, "Missing method")
 TemplateProvider.GetAllTemplates = assert(TemplateProvider.GetTemplateList, "Missing method")
+TemplateProvider.GetAll = assert(TemplateProvider.GetTemplateList, "Missing method")
 
 function TemplateProvider:_cloneTemplate(template)
 	local newItem = template:Clone()

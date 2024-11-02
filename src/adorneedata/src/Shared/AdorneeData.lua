@@ -327,7 +327,7 @@ end
 AdorneeData.GetAttributes = AdorneeData.Get
 AdorneeData.SetAttributes = AdorneeData.Set
 AdorneeData.CreateAdorneeDataValue = AdorneeData.Create
-AdorneeData.CreateValue = AdorneeData.CreateValue
+AdorneeData.CreateValue = AdorneeData.Create
 AdorneeData.SetStrictAttributes = AdorneeData.SetStrict
 
 --[=[
