@@ -19,34 +19,23 @@
 local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
+local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Rx = require("Rx")
 local Signal = require("Signal")
-local ValueObject = require("ValueObject")
-local DuckTypeUtils = require("DuckTypeUtils")
 local SortedNode = require("SortedNode")
-
--- Higher numbers last
-local function defaultCompare(a, b)
-	-- equivalent of `return a - b` except it supports comparison of strings and stuff
-	if b > a then
-		return -1
-	elseif b < a then
-		return 1
-	else
-		return 0
-	end
-end
-
-local function emptyIterator()
-
-end
+local SortedNodeValue = require("SortedNodeValue")
+local ValueObject = require("ValueObject")
+local SortFunctionUtils = require("SortFunctionUtils")
 
 local ObservableSortedList = {}
 ObservableSortedList.ClassName = "ObservableSortedList"
 ObservableSortedList.__index = ObservableSortedList
+
+local function emptyIterator()
+end
 
 --[=[
 	Constructs a new ObservableSortedList
@@ -69,9 +58,7 @@ function ObservableSortedList.new(isReversed, compare)
 	self._nodesAdded = {}
 	self._nodesRemoved = {}
 
-	-- TODO: Use compare
-	self._isReversed = isReversed or false
-	self._compare = compare or defaultCompare
+	self._compare = if isReversed then SortFunctionUtils.reverse(compare) else compare
 
 	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
@@ -146,6 +133,14 @@ function ObservableSortedList:__iter()
 	end
 end
 
+function ObservableSortedList:_iterateNodes()
+	if self._root then
+		return self._root:IterateNodes()
+	else
+		return emptyIterator
+	end
+end
+
 function ObservableSortedList:_containsNode(node)
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
@@ -194,6 +189,10 @@ function ObservableSortedList:FindFirstKey(content)
 	return self:_findNodeForDataLinearSearchSlow(content)
 end
 
+function ObservableSortedList:PrintDebug()
+	print(self._root)
+end
+
 --[=[
 	Returns true if the value exists
 
@@ -214,22 +213,26 @@ function ObservableSortedList:ObserveItemsBrio()
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local function handleItem(data, _index, includeKey)
-			local brio = Brio.new(data, includeKey)
-			maid[includeKey] = brio
+		-- TODO: Optimize this so we don't have to make so many brios and connect
+		-- to so many events
+
+		local function handleItem(data, _index, node)
+			local brio = Brio.new(data, node)
+			maid[node] = brio
 			sub:Fire(brio)
 		end
 
 		-- NOTE: This can modify the list...?
-		for index, node in self:__iter() do
+		for index, node in self:_iterateNodes() do
 			handleItem(node.data, index, node)
 		end
 
 		maid:GiveTask(self.ItemAdded:Connect(handleItem))
-		maid:GiveTask(self.ItemRemoved:Connect(function(_item, includeKey)
-			maid[includeKey] = nil
+		maid:GiveTask(self.ItemRemoved:Connect(function(_item, node)
+			maid[node] = nil
 		end))
 
+		-- TODO: Prevent this stuff from happening too
 		self._maid[sub] = maid
 		maid:GiveTask(function()
 			self._maid[sub] = nil
@@ -351,6 +354,8 @@ function ObservableSortedList:Add(data, observeValue)
 	assert(Observable.isObservable(observeValue) or observeValue ~= nil, "Bad observeValue")
 
 	local node = SortedNode.new(data)
+
+	-- TODO: Store maid in node to prevent lookup of node -> index
 	local maid = Maid.new()
 
 	if Observable.isObservable(observeValue) then
@@ -364,9 +369,8 @@ function ObservableSortedList:Add(data, observeValue)
 	end
 
 	maid:GiveTask(function()
-		if self:_containsNode(node) then
-			self:_removeNode(node)
-		end
+		-- TODO: Avoid cleaning up all these nodes when global maid cleans up
+		self:_removeNode(node)
 
 		-- TODO: Move this list to inside of the node to reduce chance of memory leak
 		self._nodeIndexObservables:Complete(node)
@@ -380,15 +384,23 @@ function ObservableSortedList:Add(data, observeValue)
 end
 
 function ObservableSortedList:_assignSortValue(node, value)
-	if node.value == value then
+	if SortedNodeValue.isSortedNodeValue(node.value) then
+		if node.value:GetValue() == value then
+			return
+		end
+	elseif node.value == value then
 		return
 	end
 
 	if value == nil then
 		self:_removeNode(node)
-		node.value = value
+		node.value = nil
 	else
-		-- TODO: Remove node
+		if self._compare ~= nil then
+			value = SortedNodeValue.new(value, self._compare)
+		end
+
+		-- TODO: Remove node later
 		self:_removeNode(node)
 		node.value = value
 		self:_insertNode(node)
@@ -409,6 +421,8 @@ function ObservableSortedList:_queueFireEvents()
 end
 
 function ObservableSortedList:_fireEvents()
+	-- print(self._root)
+
 	local nodesAdded = self._nodesAdded
 	self._nodesAdded = {}
 
@@ -416,7 +430,8 @@ function ObservableSortedList:_fireEvents()
 	self._nodesRemoved = {}
 
 	for node in nodesAdded do
-		-- TODO: O(n^2) operation
+		-- TODO: O(n log(n)) operation
+		-- TODO: Prevent Rx.of(itemAdded) stuff in our UI
 		local index = self:_findNodeIndex(node)
 		self.ItemAdded:Fire(node.data, index, node)
 	end
@@ -427,7 +442,7 @@ function ObservableSortedList:_fireEvents()
 
 	do
 		-- TODO: not this O(n^2)
-		for index, node in self._root:IterateNodes() do
+		for index, node in self:_iterateNodes() do
 			self._nodeIndexObservables:Fire(node, index)
 		end
 	end
@@ -435,9 +450,11 @@ function ObservableSortedList:_fireEvents()
 	self.OrderChanged:Fire()
 
 	-- Fire count changed
-	self._countValue.Value = self._root.descendantCount
-
-	print(self._root)
+	if self._root then
+		self._countValue.Value = self._root.descendantCount
+	else
+		self._countValue.Value = 0
+	end
 
 	if self._mainObservables:HasSubscriptions("list") then
 		local list = self:GetList()
@@ -455,7 +472,7 @@ function ObservableSortedList:_insertNode(node)
 		node:MarkBlack()
 		self._root = node
 	else
-		self._root:InsertNode(node)
+		self._root = self._root:InsertNode(node)
 	end
 end
 

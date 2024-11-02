@@ -6,7 +6,10 @@ local require = require(script.Parent.loader).load(script)
 
 local ListIndexUtils = {}
 
-function ListIndexUtils.toPositiveIndex(listLength, index)
+--[=[
+	Converts a negative index to a positive one for the list indexing
+]=]
+function ListIndexUtils.toPositiveIndex(listLength: number, index: number): number
 	assert(type(listLength) == "number", "Bad listLength")
 	assert(type(index) == "number", "Bad index")
 
@@ -19,7 +22,10 @@ function ListIndexUtils.toPositiveIndex(listLength, index)
 	end
 end
 
-function ListIndexUtils.toNegativeIndex(listLength, index)
+--[=[
+	Converts a positive index to a negative one for list indexing
+]=]
+function ListIndexUtils.toNegativeIndex(listLength: number, index: number): number
 	assert(type(listLength) == "number", "Bad listLength")
 	assert(type(index) == "number", "Bad index")
 

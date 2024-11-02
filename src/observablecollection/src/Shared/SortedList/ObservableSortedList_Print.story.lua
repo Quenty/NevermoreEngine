@@ -7,33 +7,48 @@ local require = require(game:GetService("ServerScriptService"):FindFirstChild("L
 local Maid = require("Maid")
 local ObservableSortedList = require("ObservableSortedList")
 
-return function(target)
+return function(_target)
 	local maid = Maid.new()
 
-	local observableSortedList = maid:Add(ObservableSortedList.new())
+	print("----")
 
-	local function add(number)
-		observableSortedList:Add(tostring(number), number)
-	end
+	task.spawn(function()
+		local observableSortedList = maid:Add(ObservableSortedList.new())
 
-	for i=1, 10 do
-		add(math.random())
-	end
+		local toRemove = {}
 
-	-- for i=1, 10 do
-	-- 	add(-i)
-	-- 	add(i)
-	-- end
+		local function add(number)
+			table.insert(toRemove, observableSortedList:Add(tostring(number), number))
+		end
 
-	-- add(2)
-	-- add(1)
-	-- add(3)
-	-- add(4)
-	-- add(5)
-	-- add(0)
+		local random = Random.new(5000)
+		for i=1, 10 do
+			add(random:NextNumber())
+		end
 
-	print(observableSortedList:GetList())
-	observableSortedList:Destroy()
+		-- observableSortedList:PrintDebug()
+
+		for _, item in toRemove do
+			item()
+		end
+
+		-- observableSortedList:PrintDebug()
+		observableSortedList:Destroy()
+	end)
+
+		-- for i=1, 10 do
+		-- 	add(-i)
+		-- 	add(i)
+		-- end
+
+		-- add(2)
+		-- add(1)
+		-- add(3)
+		-- add(4)
+		-- add(5)
+		-- add(0)
+
+		-- print(observableSortedList:GetList())
 
 	return function()
 		maid:DoCleaning()

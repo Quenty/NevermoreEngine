@@ -23,7 +23,7 @@ return function(target)
 
 	local values = {}
 	for i=1, ENTRIES do
-		local scoreValue = maid:Add(ValueObject.new(random:NextNumber(), "number"))
+		local scoreValue = maid:Add(ValueObject.new(0 or random:NextNumber(), "number"))
 
 		local data = {
 			originalIndex = i;
