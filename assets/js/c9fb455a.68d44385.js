@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[97051],{15725:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TieRealms","desc":"Realms sort of have to be a first class citizen...","source":{"line":6,"path":"src/tie/src/Shared/Realms/TieRealms.lua"}}')}}]);

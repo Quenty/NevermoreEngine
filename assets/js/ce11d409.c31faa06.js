@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[34163],{31079:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SettingsBindersClient","desc":"","source":{"line":4,"path":"src/settings/src/Client/SettingsBindersClient.lua"}}')}}]);

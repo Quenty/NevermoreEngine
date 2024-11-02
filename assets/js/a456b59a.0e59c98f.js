@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[60784],{6284:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SettingsBindersServer","desc":"","source":{"line":4,"path":"src/settings/src/Server/SettingsBindersServer.lua"}}')}}]);
