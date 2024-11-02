@@ -1,20 +1,18 @@
-# v10.12.1 (Sat Nov 02 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Fix docs build [#514](https://github.com/Quenty/NevermoreEngine/pull/514) ([@unrooot](https://github.com/unrooot))
-- fix: Fix tip ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.12.0...@quenty/tie@10.12.1) (2024-11-02)
+
+
+### Bug Fixes
+
+* Fix tip ([c328cc1](https://github.com/Quenty/NevermoreEngine/commit/c328cc18a6ee28d7380f9f42a662889dc04186fa))
+
+
+
+
 
 # [10.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.11.1...@quenty/tie@10.12.0) (2024-10-23)
 
