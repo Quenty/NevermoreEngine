@@ -1,3 +1,16 @@
+# v10.12.1 (Sat Nov 02 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Fix docs build [#514](https://github.com/Quenty/NevermoreEngine/pull/514) ([@unrooot](https://github.com/unrooot))
+- fix: Fix tip ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

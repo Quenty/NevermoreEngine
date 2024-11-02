@@ -1,3 +1,16 @@
+# (Sat Nov 02 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/tie@10.12.1`
+  - fix: Fix docs build [#514](https://github.com/Quenty/NevermoreEngine/pull/514) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Wed Oct 23 2024)
 
 #### 🚀 Enhancement
