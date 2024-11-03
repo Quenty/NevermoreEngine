@@ -1,3 +1,16 @@
+# (Sun Nov 03 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/rx@13.11.0`
+  - feat: Rx.switchScan and Rx.mergeScan [#516](https://github.com/Quenty/NevermoreEngine/pull/516) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # (Sat Nov 02 2024)
 
 #### 🐛 Bug Fix

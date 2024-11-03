@@ -1,3 +1,15 @@
+# v13.11.0 (Sun Nov 03 2024)
+
+#### 🚀 Enhancement
+
+- feat: Rx.switchScan and Rx.mergeScan [#516](https://github.com/Quenty/NevermoreEngine/pull/516) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
