@@ -2032,7 +2032,7 @@ function Rx.takeWhile(predicate)
 
 			return source:Subscribe(function(...)
 				index += 1
-																													
+
 				if predicate(index, ...) then
 					sub:Fire(...)
 				else
@@ -2041,6 +2041,46 @@ function Rx.takeWhile(predicate)
 			end, sub:GetFailComplete())
 		end)
 	end
+end
+
+--[=[
+	Applies an accumulator function over the source Observable where the accumulator function itself returns an Observable,
+	emitting values only from the most recently returned Observable.
+
+	https://rxjs.dev/api/index/function/switchScan
+
+	@param accumulator function
+	@param seed any | nil
+	@return (source: Observable) -> Observable
+]=]
+function Rx.switchScan(accumulator, seed)
+	assert(type(accumulator) == "function", "Bad accumulator")
+
+	return Rx.pipe({
+		Rx.scan(accumulator, seed),
+		Rx.switchAll()
+	})
+end
+
+--[=[
+	Applies an accumulator function over the source Observable where the accumulator function itself returns an Observable,
+	then each intermediate Observable returned is merged into the output Observable.
+
+	https://rxjs.dev/api/operators/mergeScan
+
+	@param accumulator function
+	@param seed any | nil
+	@return (source: Observable) -> Observable
+]=]
+function Rx.mergeScan(accumulator, seed)
+	assert(type(accumulator) == "function", "Bad accumulator")
+
+	return Rx.pipe({
+		Rx.scan(accumulator, seed),
+		Rx.flatMap(function(x)
+			return x
+		end)
+	})
 end
 
 return Rx
