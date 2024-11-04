@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pillbacking@10.7.0...@quenty/pillbacking@10.7.1) (2024-11-04)
+
+**Note:** Version bump only for package @quenty/pillbacking
+
+
+
+
+
 # [10.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pillbacking@10.6.0...@quenty/pillbacking@10.7.0) (2024-10-06)
 
 **Note:** Version bump only for package @quenty/pillbacking

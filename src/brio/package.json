@@ -1,6 +1,6 @@
 {
   "name": "@quenty/brio",
-  "version": "14.11.0",
+  "version": "14.11.1",
   "description": "Brios wrap an object and either are alive or dead",
   "keywords": [
     "Roblox",

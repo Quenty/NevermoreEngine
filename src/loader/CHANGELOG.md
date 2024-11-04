@@ -1,19 +1,15 @@
-# v10.7.1 (Mon Nov 04 2024)
-
-#### 🐛 Bug Fix
-
-- docs: Fix serviceBag init and other documentation errors [#508](https://github.com/Quenty/NevermoreEngine/pull/508) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.7.0...@quenty/loader@10.7.1) (2024-11-04)
+
+**Note:** Version bump only for package @quenty/loader
+
+
+
+
 
 # [10.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.6.0...@quenty/loader@10.7.0) (2024-10-06)
 

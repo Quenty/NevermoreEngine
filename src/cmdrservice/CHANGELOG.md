@@ -1,19 +1,15 @@
-# v13.13.2 (Mon Nov 04 2024)
-
-#### 🐛 Bug Fix
-
-- docs: Fix serviceBag init and other documentation errors [#508](https://github.com/Quenty/NevermoreEngine/pull/508) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.13.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.13.1...@quenty/cmdrservice@13.13.2) (2024-11-04)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
 
 ## [13.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.13.0...@quenty/cmdrservice@13.13.1) (2024-11-04)
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.13.0...@quenty/deathreport@10.13.1) (2024-11-04)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
+
 # [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.12.0...@quenty/deathreport@10.13.0) (2024-11-03)
 
 **Note:** Version bump only for package @quenty/deathreport
