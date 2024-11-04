@@ -19,6 +19,11 @@
 	serviceBag:Start()
 	```
 
+	:::tip
+	ServiceBag does not allow services to yield on :Init() or :Start(), nor
+	does it allow you to add services after :Init() or :Start()
+	:::
+
 	@class ServiceBag
 ]=]
 
@@ -241,7 +246,8 @@ function ServiceBag:_addServiceType(serviceType)
 	end
 
 	if self:IsStarted() then
-		error(string.format("Already started, cannot add %q", self:_getServiceName(serviceType)))
+		local hint = "HINT: Be sure to call serviceBag:GetService(require(\"MyService\")) either before calling serviceBag:Init() or during serviceBag:Init() (within another service:Init)"
+		error(string.format("Already started, cannot add %q. \n%s", self:_getServiceName(serviceType), hint))
 		return
 	end
 

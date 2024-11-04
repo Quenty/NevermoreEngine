@@ -26,7 +26,7 @@
 local Maid = {}
 Maid.ClassName = "Maid"
 
---[=[
+--[[
 	Constructs a new Maid object
 
 	```lua
@@ -35,14 +35,14 @@ Maid.ClassName = "Maid"
 
 	@ignore
 	@return Maid
-]=]
+]]
 function Maid.new()
 	return setmetatable({
 		_tasks = {}
 	}, Maid)
 end
 
---[=[
+--[[
 	Returns true if the class is a maid, and false otherwise.
 
 	```lua
@@ -53,12 +53,12 @@ end
 	@ignore
 	@param value any
 	@return boolean
-]=]
+]]
 function Maid.isMaid(value)
 	return type(value) == "table" and value.ClassName == "Maid"
 end
 
---[=[
+--[[
 	Returns Maid[key] if not part of Maid metatable
 
 	```lua
@@ -73,7 +73,7 @@ end
 	@ignore
 	@param index any
 	@return MaidTask
-]=]
+]]
 function Maid:__index(index)
 	if Maid[index] then
 		return Maid[index]
@@ -82,7 +82,7 @@ function Maid:__index(index)
 	end
 end
 
---[=[
+--[[
 	Add a task to clean up. Tasks given to a maid will be cleaned when
 	maid[index] is set to a different value.
 
@@ -101,7 +101,7 @@ end
 	@ignore
 	@param index any
 	@param newTask MaidTask
-]=]
+]]
 function Maid:__newindex(index, newTask)
 	if Maid[index] ~= nil then
 		error(string.format("Cannot use '%s' as a Maid key", tostring(index)), 2)
@@ -145,13 +145,13 @@ function Maid:__newindex(index, newTask)
 	end
 end
 
---[=[
+--[[
 	Gives a task to the maid for cleanup and returns the resulting value
 
 	@ignore
 	@param task MaidTask -- An item to clean
 	@return MaidTask
-]=]
+]]
 function Maid:Add(task)
 	if not task then
 		error("Task cannot be false or nil", 2)
@@ -166,13 +166,13 @@ function Maid:Add(task)
 	return task
 end
 
---[=[
+--[[
 	Gives a task to the maid for cleanup, but uses an incremented number as a key.
 
 	@ignore
 	@param task MaidTask -- An item to clean
 	@return number -- taskId
-]=]
+]]
 function Maid:GiveTask(task)
 	if not task then
 		error("Task cannot be false or nil", 2)
@@ -188,13 +188,13 @@ function Maid:GiveTask(task)
 	return taskId
 end
 
---[=[
+--[[
 	Gives a promise to the maid for clean.
 
 	@ignore
 	@param promise Promise<T>
 	@return Promise<T>
-]=]
+]]
 function Maid:GivePromise(promise)
 	if not promise:IsPending() then
 		return promise
@@ -211,7 +211,7 @@ function Maid:GivePromise(promise)
 	return newPromise
 end
 
---[=[
+--[[
 	Cleans up all tasks and removes them as entries from the Maid.
 
 	:::note
@@ -228,7 +228,7 @@ end
 	:::
 
 	@ignore
-]=]
+]]
 function Maid:DoCleaning()
 	local tasks = self._tasks
 
@@ -272,13 +272,13 @@ function Maid:DoCleaning()
 	end
 end
 
---[=[
+--[[
 	Alias for [Maid.DoCleaning()](/api/Maid#DoCleaning)
 
 	@ignore
 	@function Destroy
 	@within Maid
-]=]
+]]
 Maid.Destroy = Maid.DoCleaning
 
 return Maid

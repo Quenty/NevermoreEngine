@@ -40,7 +40,7 @@
 	stravant - July 31st, 2021 - Created the file.
 	Quenty - Auguest 21st, 2023 - Modified to fit Nevermore contract, with Moonwave docs
 
-	@class Signal
+	@class GoodSignal
 ]=]
 
 -- The currently idle thread to run the next handler on
