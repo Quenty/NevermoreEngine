@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/cmdrservice@13.13.2`, `@quenty/loader@10.7.1`, `@quenty/quaternion@2.5.1`, `@quenty/servicebag@11.9.1`, `@quenty/signal@7.8.1`
+  - docs: Fix serviceBag init and other documentation errors [#508](https://github.com/Quenty/NevermoreEngine/pull/508) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Nov 04 2024)
+
+#### 🐛 Bug Fix
+
 - `@quenty/actionmanager@13.11.1`, `@quenty/adorneedata@7.12.1`, `@quenty/datastore@13.13.1`, `@quenty/settings@11.14.1`, `@quenty/templateprovider@11.9.1`
   - fix: Miscellaneous fixes [#515](https://github.com/Quenty/NevermoreEngine/pull/515) ([@unrooot](https://github.com/unrooot))
 
