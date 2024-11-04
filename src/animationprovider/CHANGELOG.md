@@ -1,19 +1,15 @@
-# v11.9.1 (Mon Nov 04 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Miscellaneous fixes [#515](https://github.com/Quenty/NevermoreEngine/pull/515) ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.9.0...@quenty/animationprovider@11.9.1) (2024-11-04)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
 
 # [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.8.0...@quenty/animationprovider@11.9.0) (2024-11-03)
 

@@ -1,20 +1,18 @@
-# v13.13.1 (Mon Nov 04 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Miscellaneous fixes [#515](https://github.com/Quenty/NevermoreEngine/pull/515) ([@unrooot](https://github.com/unrooot))
-- fix: Remove empty print ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.13.0...@quenty/datastore@13.13.1) (2024-11-04)
+
+
+### Bug Fixes
+
+* Remove empty print ([552eb30](https://github.com/Quenty/NevermoreEngine/commit/552eb309458eed3e91b91f3f7b0623aa2d59474f))
+
+
+
+
 
 # [13.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.12.0...@quenty/datastore@13.13.0) (2024-11-03)
 

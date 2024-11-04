@@ -1,20 +1,18 @@
-# v11.14.1 (Mon Nov 04 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Miscellaneous fixes [#515](https://github.com/Quenty/NevermoreEngine/pull/515) ([@unrooot](https://github.com/unrooot))
-- fix: Install missing dependency ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.14.0...@quenty/settings@11.14.1) (2024-11-04)
+
+
+### Bug Fixes
+
+* Install missing dependency ([9ed6363](https://github.com/Quenty/NevermoreEngine/commit/9ed6363f0b4b1aee504b6b86f0abd73ede7d0fec))
+
+
+
+
 
 # [11.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.13.1...@quenty/settings@11.14.0) (2024-11-03)
 

@@ -1,20 +1,18 @@
-# v13.11.1 (Mon Nov 04 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Miscellaneous fixes [#515](https://github.com/Quenty/NevermoreEngine/pull/515) ([@unrooot](https://github.com/unrooot))
-- fix: Add destroy method ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.11.0...@quenty/actionmanager@13.11.1) (2024-11-04)
+
+
+### Bug Fixes
+
+* Add destroy method ([164dec2](https://github.com/Quenty/NevermoreEngine/commit/164dec29395e0d93e8e9d7223e828c281ab64730))
+
+
+
+
 
 # [13.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.10.0...@quenty/actionmanager@13.11.0) (2024-11-03)
 
