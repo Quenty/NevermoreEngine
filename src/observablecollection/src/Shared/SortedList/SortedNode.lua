@@ -225,12 +225,14 @@ function SortedNode:InsertNode(node): SortedNode<T>
 	-- Fix the tree after insertion
 	root = self:_fixDoubleRed(root, node)
 
-	root:_assertIntegrity()
-	root:_assertRootIntegrity()
-	root:_assertFullIntegritySlow()
-	root:_assertRedBlackIntegrity()
-	root:_assertRedBlackFullIntegritySlow()
-	root:_assertDescendantCount(originalCount + 1)
+	if DEBUG_ASSERTION_SLOW then
+		root:_assertIntegrity()
+		root:_assertRootIntegrity()
+		root:_assertFullIntegritySlow()
+		root:_assertRedBlackIntegrity()
+		root:_assertRedBlackFullIntegritySlow()
+		root:_assertDescendantCount(originalCount + 1)
+	end
 
 	return root
 end
@@ -239,21 +241,21 @@ function SortedNode:_leftRotate(root, node): SortedNode<T>
 	assert(root, "No root")
 	assert(node, "No node")
 
-	local rightChild = node.right
-	node:_setRight(rightChild.left)
+	local newParent = node.right
+	node:_setRight(newParent.left)
 
 	if node == root then
-		rightChild:_unparent()
-		root = rightChild
+		newParent:_unparent()
+		root = newParent
 	elseif node == node.parent.right then
-		node.parent:_setRight(rightChild)
+		node.parent:_setRight(newParent)
 	elseif node == node.parent.left then
-		node.parent:_setLeft(rightChild)
+		node.parent:_setLeft(newParent)
 	else
 		error("Bad state")
 	end
 
-	rightChild:_setLeft(node)
+	newParent:_setLeft(node)
 
 	return root
 end
@@ -262,21 +264,22 @@ function SortedNode:_rightRotate(root, node): SortedNode<T>
 	assert(root, "No root")
 	assert(node, "No node")
 
-	local leftChild = node.left
-	node:_setLeft(leftChild.right)
+
+	local newParent = node.left
+	node:_setLeft(newParent.right)
 
 	if node == root then
-		leftChild:_unparent()
-		root = leftChild
+		newParent:_unparent()
+		root = newParent
 	elseif node == node.parent.right then
-		node.parent:_setRight(leftChild)
+		node.parent:_setRight(newParent)
 	elseif node == node.parent.left then
-		node.parent:_setLeft(leftChild)
+		node.parent:_setLeft(newParent)
 	else
 		error("Bad state")
 	end
 
-	leftChild:_setRight(node)
+	newParent:_setRight(node)
 
 	return root
 end
@@ -432,21 +435,21 @@ function SortedNode:RemoveNode(node: SortedNode): SortedNode
 		return self
 	end
 
-	print("RemoveNode called with ", node.value, node:GetIndex())
-
 	root = self:_removeNodeHelper(root, node)
 
-	if root then
-		root:_assertIntegrity()
-		root:_assertRootIntegrity()
-		root:_assertFullIntegritySlow()
-		root:_assertRedBlackIntegrity()
-		root:_assertRedBlackFullIntegritySlow()
+	if DEBUG_ASSERTION_SLOW then
+		if root then
+			root:_assertIntegrity()
+			root:_assertRootIntegrity()
+			root:_assertFullIntegritySlow()
+			root:_assertRedBlackIntegrity()
+			root:_assertRedBlackFullIntegritySlow()
 
-		root:_assertDescendantCount(originalCount - 1)
-	else
-		if originalCount ~= 1 then
-			error(string.format("Removed %d nodes instead of 1", originalCount - 1))
+			root:_assertDescendantCount(originalCount - 1)
+		else
+			if originalCount ~= 1 then
+				error(string.format("Removed %d nodes instead of 1", originalCount - 1))
+			end
 		end
 	end
 
@@ -465,9 +468,6 @@ function SortedNode:_removeNodeHelper(root, node, depth)
 	local replacement = self:_findReplacement(node)
 	local bothBlack = (replacement == nil or replacement.color == Color.BLACK) and node.color == Color.BLACK
 	local parent = node.parent
-
-	print("removing", node.value)
-	print(root)
 
 	if replacement == nil then
 		-- Node is a leaf or only has 1 child
@@ -518,12 +518,14 @@ function SortedNode:_removeNodeHelper(root, node, depth)
 		root = self:_removeNodeHelper(root, node, depth)
 	end
 
-	if root then
-		root:_assertIntegrity()
-		root:_assertRootIntegrity()
-		root:_assertFullIntegritySlow()
-		root:_assertRedBlackIntegrity()
-		root:_assertRedBlackFullIntegritySlow()
+	if DEBUG_ASSERTION_SLOW then
+		if root then
+			root:_assertIntegrity()
+			root:_assertRootIntegrity()
+			root:_assertFullIntegritySlow()
+			root:_assertRedBlackIntegrity()
+			root:_assertRedBlackFullIntegritySlow()
+		end
 	end
 
 	return root
@@ -667,8 +669,11 @@ function SortedNode:_fixDoubleBlack(root, node)
 		return root
 	end
 
+	assert(node.parent, "Should have parent")
+
 	local sibling = node:_sibling()
 	local parent = node.parent
+
 	if sibling == nil then
 		return self:_fixDoubleBlack(root, parent)
 	end
@@ -695,12 +700,14 @@ function SortedNode:_fixDoubleBlack(root, node)
 			if sibling.left and sibling.left.color == Color.RED then
 				if sibling:_isOnLeft() then
 					-- Left-left
-					sibling.left.color = sibling.color
+					sibling.left.color = Color.BLACK
 					sibling.color = parent.color
+					parent.color = Color.BLACK -- This should be true, but the guide I'm following doesn't specify this?
 					root = self:_rightRotate(root, parent)
 				else
 					-- Right-left
 					sibling.left.color = parent.color
+					parent.color = Color.BLACK -- This should be true, but the guide I'm following doesn't specify this?
 					root = self:_rightRotate(root, sibling)
 					root = self:_leftRotate(root, parent)
 				end
@@ -708,12 +715,14 @@ function SortedNode:_fixDoubleBlack(root, node)
 				if sibling:_isOnLeft() then
 					-- Left-right
 					sibling.right.color = parent.color
+					parent.color = Color.BLACK -- This should be true, but the guide I'm following doesn't specify this?
 					root = self:_leftRotate(root, sibling)
 					root = self:_rightRotate(root, parent)
 				else
 					-- Right-right
 					sibling.right.color = sibling.color
 					sibling.color = parent.color
+					parent.color = Color.BLACK -- This should be true, but the guide I'm following doesn't specify this?
 					root = self:_leftRotate(root, parent)
 				end
 			end
@@ -799,23 +808,6 @@ function SortedNode:_unparent()
 	end
 end
 
-function SortedNode:_debugGetRoot()
-	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
-
-	local seen = {}
-	local root = self
-	seen[root] = true
-
-	while root.parent ~= nil do
-		root = root.parent
-		if seen[root] then
-			error("Loop in parents")
-		end
-		seen[root] = true
-	end
-
-	return root
-end
 
 function SortedNode:_uncle()
 	local grandparent = self:_grandparent()
@@ -855,25 +847,35 @@ function SortedNode:_grandparent()
 end
 
 function SortedNode:__tostring()
-	local result = "BinarySearchTree\n"
+	local result
+	if self.parent == nil then
+		result = "BinarySearchTree\n"
+	else
+		result = "SortedNode\n"
+	end
 
 	local stack = {} -- Stack to hold nodes and their details
 	local seen = {}
-	table.insert(stack, { node = self, indent = "", hasChildren = false })
+	table.insert(stack, { node = self, indent = "", isLeft = false })
 
 	while #stack > 0 do
 		local current = table.remove(stack) -- Pop from the stack
-		local wasSeen = seen[current.node]
+		local wasSeen
 
-		seen[current.node] = true
+		if current.node then
+			wasSeen = seen[current.node]
+			seen[current.node] = true
+		else
+			wasSeen = false
+		end
 
 		local node = current.node
 		local indent = current.indent
-		local hasChildren = current.hasChildren
+		local isLeft = current.isLeft
 
 		-- Add current node to result with indentation
 		result = result .. indent
-		if hasChildren then
+		if isLeft then
 			result = result .. "├── "
 			indent = indent .. "│   "
 		else
@@ -881,28 +883,27 @@ function SortedNode:__tostring()
 			indent = indent .. "    "
 		end
 
-		local text = string.format("SortedNode { index=%d, value=%s, descendants=%d, color=%s }",
-			node:GetIndex(),
-			tostring(node.value),
-			node.descendantCount,
-			node.color)
+		if node then
+			local text = string.format("SortedNode { index=%d, value=%s, descendants=%d, color=%s }",
+				node:GetIndex(),
+				tostring(node.value),
+				node.descendantCount,
+				node.color)
 
-		if wasSeen then
-			result = result .. "<LOOPED> "
+			if wasSeen then
+				result = result .. "<LOOPED> "
+			end
+
+			result = result .. text .. "\n"
+		else
+			result = result .. "nil" .. "\n"
 		end
 
-		result = result .. text .. "\n"
-
-
-		if not wasSeen then
+		if node and not wasSeen and (node.left or node.right) then
 			-- Push right and left children to the stack with updated indentation
 			-- Right child is pushed first so that left child is processed first
-			if node.right ~= nil then
-				table.insert(stack, { node = node.right, indent = indent, hasChildren = false })
-			end
-			if node.left ~= nil then
-				table.insert(stack, { node = node.left, indent = indent, hasChildren = node.right ~= nil })
-			end
+			table.insert(stack, { node = node.right, indent = indent, isLeft = false })
+			table.insert(stack, { node = node.left, indent = indent, isLeft = true })
 		end
 	end
 
@@ -920,33 +921,65 @@ function SortedNode:_childCount()
 end
 
 if DEBUG_ASSERTION_SLOW then
+	function SortedNode:_debugGetRoot()
+		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
+		local seen = {}
+		local root = self
+		seen[root] = true
+
+		while root.parent ~= nil do
+			root = root.parent
+			if seen[root] then
+				error("Loop in parents")
+			end
+			seen[root] = true
+		end
+
+		return root
+	end
+
 	function SortedNode:_assertRedBlackIntegrity()
+		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
 		-- https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
 		if self.color == Color.RED then
 			-- Check adjacency
 			if self.left then
-				assert(self.left.color ~= Color.RED, "A red node should not have a red child")
+				if self.left.color == Color.RED then
+					error(string.format("A red node should not have a red child %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+				end
 			end
 
 			if self.right then
-				assert(self.right.color ~= Color.RED, "A red node should not have a red child")
+				if self.right.color == Color.RED then
+					error(string.format("A red node should not have a red child %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+				end
 			end
 
 			if self.parent then
-				assert(self.parent.color ~= Color.RED, "A red node should not be have a red parent")
+				if self.parent.color == Color.RED then
+					error(string.format("A red node should not be have a red parent %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+				end
 			end
 		end
 
 		if self.left ~= nil and self.right == nil then
-			assert(self.left.color == Color.RED, "Any node with 1 child must be red")
+			if self.left.color ~= Color.RED then
+				error(string.format("Any node with 1 child must be red %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+			end
 		end
 
 		if self.left == nil and self.right ~= nil then
-			assert(self.right.color == Color.RED, "Any node with 1 child must be red")
+			if self.right.color ~= Color.RED then
+				error(string.format("Any node with 1 child must be red %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+			end
 		end
 	end
 
 	function SortedNode:_assertRedBlackFullIntegritySlow()
+		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
 		local root = self:_debugGetRoot()
 
 		for _, node in root:IterateNodes() do
@@ -993,6 +1026,7 @@ if DEBUG_ASSERTION_SLOW then
 	end
 
 	function SortedNode:_assertIntegrity()
+		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 		assert(self.left ~= self, "Node cannot be parented to self")
 		assert(self.right ~= self, "Node cannot be parented to self")
 		assert(self.parent ~= self, "Node cannot be parented to self")
@@ -1043,6 +1077,8 @@ if DEBUG_ASSERTION_SLOW then
 	end
 
 	function SortedNode:_assertFullIntegritySlow()
+		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
 		local root = self:_debugGetRoot()
 		local previous = nil
 		local seen = {}
@@ -1066,16 +1102,22 @@ if DEBUG_ASSERTION_SLOW then
 	end
 
 	function SortedNode:_assertRootIntegrity()
+		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 		assert(self.parent == nil, "Root should not have a parent")
 		assert(self.color == Color.BLACK, "Root should be black")
 	end
 
 	function SortedNode:_assertDescendantCount(expected)
+		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
 		if self.descendantCount ~= expected then
 			error(string.format("Bad descendantCount, expected %d descendants, have %d", expected, self.descendantCount), 2)
 		end
 	end
 else
+	function SortedNode:_debugGetRoot()
+
+	end
 	function SortedNode:_assertNoLoops()
 	end
 	function SortedNode:_assertDescendantCount()

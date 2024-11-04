@@ -21,12 +21,17 @@ return function(_target)
 			table.insert(toRemove, observableSortedList:Add(tostring(number), number))
 		end
 
-		local random = Random.new(5000)
+		-- local random = Random.new(5000)
+		-- for i=1, 10 do
+		-- 	add(random:NextNumber())
+		-- end
+
+		local random = Random.new()
 		for i=1, 10 do
-			add(random:NextNumber())
+			add(math.floor(100*random:NextNumber()))
 		end
 
-		-- observableSortedList:PrintDebug()
+		observableSortedList:PrintDebug()
 
 		for _, item in toRemove do
 			item()

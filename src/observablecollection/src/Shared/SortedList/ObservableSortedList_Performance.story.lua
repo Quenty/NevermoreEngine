@@ -63,7 +63,7 @@ return function(_target)
 		print("\n")
 	end
 
-	local n = 100
+	local n = 1000
 	runTest("test random_order", n, getRandomElement)
 	runTest("test in_order", n, inOrder)
 	runTest("same", n, same)
