@@ -275,7 +275,6 @@ function DataStoreStage:Observe(key, defaultValue)
 		local maid = Maid.new()
 
 		maid:GiveTask(self._keySubscriptions:Observe(key):Subscribe(function(value)
-			print()
 			if value == nil then
 				sub:Fire(defaultValue)
 			else

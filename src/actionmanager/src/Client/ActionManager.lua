@@ -112,4 +112,8 @@ function ActionManager:AddAction(action)
 	return self
 end
 
+function ActionManager:Destroy()
+	self._maid:Destroy()
+end
+
 return ActionManager
