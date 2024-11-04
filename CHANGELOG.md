@@ -1,3 +1,16 @@
+# (Mon Nov 04 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/actionmanager@13.11.1`, `@quenty/adorneedata@7.12.1`, `@quenty/datastore@13.13.1`, `@quenty/settings@11.14.1`, `@quenty/templateprovider@11.9.1`
+  - fix: Miscellaneous fixes [#515](https://github.com/Quenty/NevermoreEngine/pull/515) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Sun Nov 03 2024)
 
 #### 🚀 Enhancement
