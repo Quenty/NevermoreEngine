@@ -88,6 +88,65 @@ function SortedNode:IterateData()
 	end)
 end
 
+--[=[
+	Inclusive iterator like string.sub. Faster than skipping because we
+	binary search our initial node
+
+	@param start number
+	@param finish number
+	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
+]=]
+function SortedNode:IterateNodesRange(start, finish)
+	assert(type(start) == "number", "Bad start")
+	assert(type(finish) == "number" or finish == nil, "Bad finish")
+	assert(self.parent == nil, "Should only be called on root")
+
+	if start == 1 and (finish == nil or finish == -1) then
+		return self:IterateNodes()
+	end
+
+	return coroutine.wrap(function()
+		local target = ListIndexUtils.toPositiveIndex(self.descendantCount, start)
+		local endTarget = ListIndexUtils.toPositiveIndex(self.descendantCount, finish or -1)
+		local current = self:FindNodeAtIndex(target)
+
+		-- We're out of range
+		if not current then
+			return
+		end
+
+		local index = target
+
+		while current do
+			coroutine.yield(index, current)
+			index += 1
+
+			if index > endTarget then
+				return
+			end
+
+			-- Emit right most tree first
+			if current.right then
+				for _, value in current.right:IterateNodes() do
+					coroutine.yield(index, value)
+					index += 1
+
+					if index > endTarget then
+						return
+					end
+				end
+			end
+
+			-- Skip all scenarios where we're on the right
+			while current.parent and current:_isOnRight() do
+				current = current.parent
+			end
+
+			current = current.parent
+		end
+	end)
+end
+
 function SortedNode:FindNodeAtIndex(searchIndex)
 	assert(type(searchIndex) == "number", "Bad searchIndex")
 	assert(self.parent == nil, "Should only be called on root")
@@ -401,6 +460,7 @@ function SortedNode:_setLeft(node: SortedNode)
 	end
 
 	self:_updateAllParentDescendantCount()
+
 	-- self:_assertIntegrity()
 	-- self:_assertFullIntegritySlow() -- only true during insertion
 end
@@ -688,10 +748,10 @@ end
 
 function SortedNode:_successor()
 	local node = self
-    while node.left ~= nil do
-        node = node.left
-    end
-    return node
+	while node.left ~= nil do
+		node = node.left
+	end
+	return node
 end
 
 --[[

@@ -25,4 +25,7 @@ function SortFunctionUtils.default(a, b)
 	end
 end
 
+function SortFunctionUtils.emptyIterator()
+end
+
 return SortFunctionUtils

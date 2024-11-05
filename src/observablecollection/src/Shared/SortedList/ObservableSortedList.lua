@@ -29,13 +29,11 @@ local SortedNode = require("SortedNode")
 local SortedNodeValue = require("SortedNodeValue")
 local ValueObject = require("ValueObject")
 local SortFunctionUtils = require("SortFunctionUtils")
+local ListIndexUtils = require("ListIndexUtils")
 
 local ObservableSortedList = {}
 ObservableSortedList.ClassName = "ObservableSortedList"
 ObservableSortedList.__index = ObservableSortedList
-
-local function emptyIterator()
-end
 
 --[=[
 	Constructs a new ObservableSortedList
@@ -130,15 +128,38 @@ function ObservableSortedList:__iter()
 	if self._root then
 		return self._root:IterateData()
 	else
-		return emptyIterator
+		return SortFunctionUtils.emptyIterator
 	end
+end
+
+--[=[
+	Iterates over an index range
+
+	@param start number
+	@param finish number
+	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
+]=]
+function ObservableSortedList:IterateRange(start, finish)
+	return coroutine.wrap(function()
+		for index, node in self:_iterateNodesRange(start, finish) do
+			coroutine.yield(index, node.data)
+		end
+	end)
 end
 
 function ObservableSortedList:_iterateNodes()
 	if self._root then
 		return self._root:IterateNodes()
 	else
-		return emptyIterator
+		return SortFunctionUtils.emptyIterator
+	end
+end
+
+function ObservableSortedList:_iterateNodesRange(start, finish)
+	if self._root then
+		return self._root:IterateNodesRange(start, finish)
+	else
+		return SortFunctionUtils.emptyIterator
 	end
 end
 
@@ -268,7 +289,7 @@ end
 	the first entry, or matching stuff up to a given slot.
 
 	@param indexToObserve number
-	@return Observable<T>
+	@return Observable<(T, Key)>
 ]=]
 function ObservableSortedList:ObserveAtIndex(indexToObserve)
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
@@ -276,11 +297,13 @@ function ObservableSortedList:ObserveAtIndex(indexToObserve)
 	return self._indexObservers:Observe(indexToObserve)
 		:Pipe({
 			Rx.start(function()
-				return self:Get(indexToObserve)
+				local node = self:_findNodeAtIndex(indexToObserve)
+				if node then
+					return node.data, node
+				else
+					return nil
+				end
 			end);
-
-			-- TODO: Avoid needing this
-			Rx.distinct();
 		})
 end
 
@@ -474,10 +497,10 @@ function ObservableSortedList:_fireEvents()
 		self._countValue.Value = 0
 	end
 
+	-- TODO: Prevent Rx.of(itemAdded) stuff in our UI
 	for node in nodesAdded do
-		-- TODO: O(n log(n)) operation
-		-- TODO: Prevent Rx.of(itemAdded) stuff in our UI
-		local index = self:_findNodeIndex(node)
+		-- TODO: Prevent query slow here...?
+		local index = node:GetIndex()
 		self.ItemAdded:Fire(node.data, index, node)
 	end
 
@@ -487,17 +510,20 @@ function ObservableSortedList:_fireEvents()
 
 	self.OrderChanged:Fire()
 
-	-- TODO: Iterate from this nth node to the end
 	do
-		-- TODO: not this O(n^2)
-		-- TODO: Handle negative observations to avoid refiring upon insertion
-
-		for index, node in self:_iterateNodes() do
+		for index, node in self:_iterateNodesRange(lowestIndexChanged) do
+			-- TODO: Handle negative observations to avoid refiring upon insertion
+			-- TODO: Handle our state changing while we're firing
+			-- TODO: Avoid looping over nodes if we don't need to (track observations in node itself?)
+			local negative = ListIndexUtils.toNegativeIndex(self._root.descendantCount, index)
 			self._nodeIndexObservables:Fire(node, index)
+			self._indexObservers:Fire(index, node)
+			self._indexObservers:Fire(negative, node)
 		end
 	end
 
 	if self._mainObservables:HasSubscriptions("list") then
+		-- TODO: Reuse list
 		local list = self:GetList()
 		self._mainObservables:Fire("list", list)
 	end

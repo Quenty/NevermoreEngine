@@ -27,8 +27,12 @@ return function(_target)
 		-- end
 
 		local random = Random.new()
-		for i=1, 10 do
+		for _i=1, 10 do
 			add(math.floor(100*random:NextNumber()))
+		end
+
+		for index, node in observableSortedList._root:IterateNodesRange(3, 7) do
+			print(index, node:GetIndex())
 		end
 
 		observableSortedList:PrintDebug()
