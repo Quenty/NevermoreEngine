@@ -57,7 +57,7 @@ end
 
 	@param key TKey
 ]=]
-function ObservableSubscriptionTable:Complete(key, ...)
+function ObservableSubscriptionTable:Complete(key)
 	local subs = self._subMap[key]
 	if not subs then
 		return
@@ -68,7 +68,7 @@ function ObservableSubscriptionTable:Complete(key, ...)
 
 	for _, sub in pairs(subsToComplete) do
 		if sub:IsPending() then
-			task.spawn(sub.Complete, sub, ...)
+			task.spawn(sub.Complete, sub)
 		end
 	end
 end
@@ -112,9 +112,7 @@ function ObservableSubscriptionTable:Observe(key, retrieveInitialValue)
 
 			-- Complete the subscription
 			if sub:IsPending() then
-				task.spawn(function()
-					sub:Complete()
-				end)
+				task.spawn(sub.Complete, sub)
 			end
 		end
 	end)
@@ -130,9 +128,7 @@ function ObservableSubscriptionTable:Destroy()
 
 		for _, sub in pairs(list) do
 			if sub:IsPending() then
-				task.spawn(function()
-					sub:Complete()
-				end)
+				task.spawn(sub.Complete, sub)
 			end
 		end
 	end
