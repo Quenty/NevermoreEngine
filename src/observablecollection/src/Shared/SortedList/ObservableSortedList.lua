@@ -57,6 +57,7 @@ function ObservableSortedList.new(isReversed, compare)
 
 	self._nodesAdded = {}
 	self._nodesRemoved = {}
+	self._lowestIndexChanged = nil
 
 	self._compare = if isReversed then SortFunctionUtils.reverse(compare) else compare
 
@@ -202,6 +203,7 @@ end
 function ObservableSortedList:Contains(content)
 	assert(content ~= nil, "Bad content")
 
+	-- TODO: Speed up
 	return self:_findNodeForDataLinearSearchSlow(content) ~= nil
 end
 
@@ -276,6 +278,9 @@ function ObservableSortedList:ObserveAtIndex(indexToObserve)
 			Rx.start(function()
 				return self:Get(indexToObserve)
 			end);
+
+			-- TODO: Avoid needing this
+			Rx.distinct();
 		})
 end
 
@@ -326,8 +331,6 @@ end
 	@return { T }
 ]=]
 function ObservableSortedList:GetList()
-	-- TODO: Cache as needed
-
 	local list = table.create(self._countValue.Value)
 	for index, data in self:__iter() do
 		list[index] = data
@@ -370,9 +373,7 @@ function ObservableSortedList:Add(data, observeValue)
 
 	maid:GiveTask(function()
 		-- TODO: Avoid cleaning up all these nodes when global maid cleans up
-		self:_removeNode(node)
-
-		-- TODO: Move this list to inside of the node to reduce chance of memory leak
+		self:_assignSortValue(node, nil)
 		self._nodeIndexObservables:Complete(node)
 	end)
 
@@ -393,20 +394,54 @@ function ObservableSortedList:_assignSortValue(node, value)
 	end
 
 	if value == nil then
-		self:_removeNode(node)
-		node.value = nil
-	else
-		if self._compare ~= nil then
-			value = SortedNodeValue.new(value, self._compare)
+		if self._root and self._root:ContainsNode(node) then
+			self._nodesRemoved[node] = true
+			self:_applyLowestIndexChanged(node:GetIndex())
+			self:_removeNode(node)
+			node.value = nil
+			self:_queueFireEvents()
+		else
+			node.value = nil
 		end
 
-		-- TODO: Remove node later
-		self:_removeNode(node)
-		node.value = value
-		self:_insertNode(node)
+		return
 	end
 
+	if self._compare ~= nil then
+		value = SortedNodeValue.new(value, self._compare)
+	end
+
+	-- our value changing didn't change anything
+	if not node:NeedsToMove(self._root, value) then
+		node.value = value
+		return
+	end
+
+	self._nodesRemoved[node] = nil
+
+	if self._root and self._root:ContainsNode(node) then
+		self:_applyLowestIndexChanged(node:GetIndex())
+		self:_removeNode(node)
+	else
+		self._nodesAdded[node] = true
+	end
+
+	node.value = value
+
+	self:_insertNode(node)
+	self:_applyLowestIndexChanged(node:GetIndex())
 	self:_queueFireEvents()
+end
+
+function ObservableSortedList:_applyLowestIndexChanged(index)
+	if self._lowestIndexChanged == nil then
+		self._lowestIndexChanged = index
+		return
+	end
+
+	if index < self._lowestIndexChanged then
+		self._lowestIndexChanged = index
+	end
 end
 
 function ObservableSortedList:_queueFireEvents()
@@ -423,11 +458,21 @@ end
 function ObservableSortedList:_fireEvents()
 	-- print(self._root)
 
+	local lowestIndexChanged = self._lowestIndexChanged
+	self._lowestIndexChanged = nil
+
 	local nodesAdded = self._nodesAdded
 	self._nodesAdded = {}
 
 	local nodesRemoved = self._nodesRemoved
 	self._nodesRemoved = {}
+
+	-- Fire count changed first
+	if self._root then
+		self._countValue.Value = self._root.descendantCount
+	else
+		self._countValue.Value = 0
+	end
 
 	for node in nodesAdded do
 		-- TODO: O(n log(n)) operation
@@ -440,20 +485,16 @@ function ObservableSortedList:_fireEvents()
 		self.ItemRemoved:Fire(node.data, node)
 	end
 
+	self.OrderChanged:Fire()
+
+	-- TODO: Iterate from this nth node to the end
 	do
 		-- TODO: not this O(n^2)
+		-- TODO: Handle negative observations to avoid refiring upon insertion
+
 		for index, node in self:_iterateNodes() do
 			self._nodeIndexObservables:Fire(node, index)
 		end
-	end
-
-	self.OrderChanged:Fire()
-
-	-- Fire count changed
-	if self._root then
-		self._countValue.Value = self._root.descendantCount
-	else
-		self._countValue.Value = 0
 	end
 
 	if self._mainObservables:HasSubscriptions("list") then
@@ -464,9 +505,6 @@ end
 
 function ObservableSortedList:_insertNode(node)
 	assert(SortedNode.isSortedNode(node), "Bad SortedNode")
-
-	self._nodesAdded[node] = true
-	self._nodesRemoved[node] = nil
 
 	if self._root == nil then
 		node:MarkBlack()
@@ -481,9 +519,6 @@ function ObservableSortedList:_removeNode(nodeToRemove)
 
 	if self._root ~= nil then
 		self._root = self._root:RemoveNode(nodeToRemove)
-
-		self._nodesAdded[nodeToRemove] = nil
-		self._nodesRemoved[nodeToRemove] = true
 	end
 end
 

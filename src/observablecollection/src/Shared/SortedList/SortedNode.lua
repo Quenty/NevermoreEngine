@@ -10,7 +10,7 @@ local ListIndexUtils = require("ListIndexUtils")
 local DuckTypeUtils = require("DuckTypeUtils")
 local Table = require("Table")
 
-local DEBUG_ASSERTION_SLOW = true
+local DEBUG_ASSERTION_SLOW = false
 
 local Color = Table.readonly({
 	BLACK = "BLACK";
@@ -166,6 +166,36 @@ function SortedNode:FindFirstNodeForData(data)
 	end
 
 	return nil
+end
+
+function SortedNode:NeedsToMove(root, newValue)
+	assert(newValue ~= nil, "Bad newValue")
+
+	if self.parent ~= nil then
+		if self:_isOnLeft() then
+			if self.parent.value < newValue then
+				return true
+			end
+		else
+			if self.parent.value > newValue then
+				return true
+			end
+		end
+	else
+		if self ~= root or root == nil then
+			return true
+		end
+	end
+
+	if self.left and self.left.value > newValue then
+		return true
+	end
+
+	if self.right and self.right.value < newValue then
+		return true
+	end
+
+	return false
 end
 
 --[=[
@@ -586,10 +616,12 @@ function SortedNode:_swapNodes(root, node, replacement)
 		node:_setLeft(replacementLeft)
 		node:_setRight(replacementRight)
 
-		assert(node.parent == replacement, "Swap failed on node.parent")
-		assert(replacement.parent == nodeParent, "Swap failed on replacement.parent")
-		assert(node.left == replacementLeft, "Swap failed on node.left")
-		assert(node.right == replacementRight, "Swap failed on node.right")
+		if DEBUG_ASSERTION_SLOW then
+			assert(node.parent == replacement, "Swap failed on node.parent")
+			assert(replacement.parent == nodeParent, "Swap failed on replacement.parent")
+			assert(node.left == replacementLeft, "Swap failed on node.left")
+			assert(node.right == replacementRight, "Swap failed on node.right")
+		end
 	else
 		node:_unparent()
 		replacement:_unparent()
@@ -618,18 +650,22 @@ function SortedNode:_swapNodes(root, node, replacement)
 			replacementParent:_setRight(node)
 		end
 
-		assert(node.parent == replacementParent, "Swap failed on node.parent")
-		assert(replacement.parent == nodeParent, "Swap failed on replacement.parent")
-		assert(node.left == replacementLeft, "Swap failed on node.left")
-		assert(node.right == replacementRight, "Swap failed on node.right")
-		assert(replacement.left == nodeLeft, "Swap failed on replacement.left")
-		assert(replacement.right == nodeRight, "Swap failed on replacement.right")
+		if DEBUG_ASSERTION_SLOW then
+			assert(node.parent == replacementParent, "Swap failed on node.parent")
+			assert(replacement.parent == nodeParent, "Swap failed on replacement.parent")
+			assert(node.left == replacementLeft, "Swap failed on node.left")
+			assert(node.right == replacementRight, "Swap failed on node.right")
+			assert(replacement.left == nodeLeft, "Swap failed on replacement.left")
+			assert(replacement.right == nodeRight, "Swap failed on replacement.right")
+		end
 	end
 
 	node.color = replacementColor
 	replacement.color = nodeColor
 
-	root:_assertDescendantCount(descendantCount)
+	if DEBUG_ASSERTION_SLOW then
+		root:_assertDescendantCount(descendantCount)
+	end
 
 	return root
 end
@@ -920,217 +956,197 @@ function SortedNode:_childCount()
 	end
 end
 
-if DEBUG_ASSERTION_SLOW then
-	function SortedNode:_debugGetRoot()
-		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+function SortedNode:_debugGetRoot()
+	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 
-		local seen = {}
-		local root = self
+	local seen = {}
+	local root = self
+	seen[root] = true
+
+	while root.parent ~= nil do
+		root = root.parent
+		if seen[root] then
+			error("Loop in parents")
+		end
 		seen[root] = true
-
-		while root.parent ~= nil do
-			root = root.parent
-			if seen[root] then
-				error("Loop in parents")
-			end
-			seen[root] = true
-		end
-
-		return root
 	end
 
-	function SortedNode:_assertRedBlackIntegrity()
-		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+	return root
+end
 
-		-- https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
-		if self.color == Color.RED then
-			-- Check adjacency
-			if self.left then
-				if self.left.color == Color.RED then
-					error(string.format("A red node should not have a red child %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
-				end
-			end
+function SortedNode:_assertRedBlackIntegrity()
+	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 
-			if self.right then
-				if self.right.color == Color.RED then
-					error(string.format("A red node should not have a red child %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
-				end
-			end
-
-			if self.parent then
-				if self.parent.color == Color.RED then
-					error(string.format("A red node should not be have a red parent %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
-				end
+	-- https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
+	if self.color == Color.RED then
+		-- Check adjacency
+		if self.left then
+			if self.left.color == Color.RED then
+				error(string.format("A red node should not have a red child %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
 			end
 		end
 
-		if self.left ~= nil and self.right == nil then
-			if self.left.color ~= Color.RED then
-				error(string.format("Any node with 1 child must be red %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+		if self.right then
+			if self.right.color == Color.RED then
+				error(string.format("A red node should not have a red child %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
 			end
 		end
 
-		if self.left == nil and self.right ~= nil then
-			if self.right.color ~= Color.RED then
-				error(string.format("Any node with 1 child must be red %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+		if self.parent then
+			if self.parent.color == Color.RED then
+				error(string.format("A red node should not be have a red parent %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
 			end
 		end
 	end
 
-	function SortedNode:_assertRedBlackFullIntegritySlow()
-		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
-
-		local root = self:_debugGetRoot()
-
-		for _, node in root:IterateNodes() do
-			node:_assertRedBlackIntegrity()
-		end
-
-		local seen = {}
-
-		local maxDepth = nil
-		local function recurse(node, ancestorBlackCount)
-			if seen[node] then
-				error("Loop in nodes")
-			end
-
-			seen[node] = true
-
-			if node.color == Color.BLACK then
-				ancestorBlackCount += 1
-			end
-
-			if node.left then
-				recurse(node.left, ancestorBlackCount)
-			else
-				if maxDepth == nil then
-					maxDepth = ancestorBlackCount
-				elseif maxDepth ~= ancestorBlackCount then
-					error(string.format("Leaf nodes must all pass through the same amount (%d) of black nodes to root, but we are at %d", maxDepth, ancestorBlackCount))
-				end
-			end
-
-			if node.right then
-				recurse(node.right, ancestorBlackCount)
-			else
-				if maxDepth == nil then
-					maxDepth = ancestorBlackCount
-				elseif maxDepth ~= ancestorBlackCount then
-					error(string.format("Leaf nodes must all pass through the same amount (%d) of black nodes to root but we are at %d", maxDepth, ancestorBlackCount))
-				end
-			end
-		end
-
-		assert(root.color == Color.BLACK, "Root must be black")
-		recurse(root, 0)
-	end
-
-	function SortedNode:_assertIntegrity()
-		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
-		assert(self.left ~= self, "Node cannot be parented to self")
-		assert(self.right ~= self, "Node cannot be parented to self")
-		assert(self.parent ~= self, "Node cannot be parented to self")
-
-		local parent = self.parent
-		if parent then
-			assert(parent.left == self or parent.right == self, "We are parented without parent data being set")
-
-			if parent.left == self then
-				if self.value > parent.value then
-					error(string.format("self.parent.left.value %0.2f >= parent.value %0.2f", self.value, parent.value))
-				end
-			end
-
-			if parent.right == self then
-				if self.value < parent.value then
-					error(string.format("self.parent.right.value %0.2f <= parent.value %0.2f", self.value, parent.value))
-				end
-			end
-		end
-
-		local descendantCount = 1
-		local left = self.left
-		if left then
-			assert(left.parent == self, "Left parent is not set to us")
-
-			if left.value > self.value then
-				error(string.format("left.value %0.2f > self.value %0.2f", left.value, self.value))
-			end
-
-			descendantCount += left.descendantCount
-		end
-
-		local right = self.right
-		if right then
-			assert(right.parent == self, "Right parent is not set to us")
-
-			if right.value < self.value then
-				error(string.format("right.value %0.2f <= self.value %0.2f", right.value, self.value))
-			end
-
-			descendantCount += right.descendantCount
-		end
-
-		if self.descendantCount ~= descendantCount then
-			error(string.format("Bad descendantCount on node (%d, should be %d)", self.descendantCount, descendantCount))
+	if self.left ~= nil and self.right == nil then
+		if self.left.color ~= Color.RED then
+			error(string.format("Any node with 1 child must be red %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
 		end
 	end
 
-	function SortedNode:_assertFullIntegritySlow()
-		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+	if self.left == nil and self.right ~= nil then
+		if self.right.color ~= Color.RED then
+			error(string.format("Any node with 1 child must be red %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+		end
+	end
+end
 
-		local root = self:_debugGetRoot()
-		local previous = nil
-		local seen = {}
-		for index, node in root:IterateNodes() do
-			if seen[node] then
-				error("Loop in nodes")
+function SortedNode:_assertRedBlackFullIntegritySlow()
+	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
+	local root = self:_debugGetRoot()
+
+	for _, node in root:IterateNodes() do
+		node:_assertRedBlackIntegrity()
+	end
+
+	local seen = {}
+
+	local maxDepth = nil
+	local function recurse(node, ancestorBlackCount)
+		if seen[node] then
+			error("Loop in nodes")
+		end
+
+		seen[node] = true
+
+		if node.color == Color.BLACK then
+			ancestorBlackCount += 1
+		end
+
+		if node.left then
+			recurse(node.left, ancestorBlackCount)
+		else
+			if maxDepth == nil then
+				maxDepth = ancestorBlackCount
+			elseif maxDepth ~= ancestorBlackCount then
+				error(string.format("Leaf nodes must all pass through the same amount (%d) of black nodes to root, but we are at %d", maxDepth, ancestorBlackCount))
 			end
+		end
 
-			seen[node] = true
-			if previous then
-				assert(previous.value <= node.value, "Node is out of order")
-			end
-
-			previous = node
-			node:_assertIntegrity()
-
-			if node:GetIndex() ~= index then
-				error(string.format("Node index at %d should be %d", index, node:GetIndex()))
+		if node.right then
+			recurse(node.right, ancestorBlackCount)
+		else
+			if maxDepth == nil then
+				maxDepth = ancestorBlackCount
+			elseif maxDepth ~= ancestorBlackCount then
+				error(string.format("Leaf nodes must all pass through the same amount (%d) of black nodes to root but we are at %d", maxDepth, ancestorBlackCount))
 			end
 		end
 	end
 
-	function SortedNode:_assertRootIntegrity()
-		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
-		assert(self.parent == nil, "Root should not have a parent")
-		assert(self.color == Color.BLACK, "Root should be black")
-	end
+	assert(root.color == Color.BLACK, "Root must be black")
+	recurse(root, 0)
+end
 
-	function SortedNode:_assertDescendantCount(expected)
-		assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+function SortedNode:_assertIntegrity()
+	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+	assert(self.left ~= self, "Node cannot be parented to self")
+	assert(self.right ~= self, "Node cannot be parented to self")
+	assert(self.parent ~= self, "Node cannot be parented to self")
 
-		if self.descendantCount ~= expected then
-			error(string.format("Bad descendantCount, expected %d descendants, have %d", expected, self.descendantCount), 2)
+	local parent = self.parent
+	if parent then
+		assert(parent.left == self or parent.right == self, "We are parented without parent data being set")
+
+		if parent.left == self then
+			if self.value > parent.value then
+				error(string.format("self.parent.left.value %0.2f >= parent.value %0.2f", self.value, parent.value))
+			end
+		end
+
+		if parent.right == self then
+			if self.value < parent.value then
+				error(string.format("self.parent.right.value %0.2f <= parent.value %0.2f", self.value, parent.value))
+			end
 		end
 	end
-else
-	function SortedNode:_debugGetRoot()
 
+	local descendantCount = 1
+	local left = self.left
+	if left then
+		assert(left.parent == self, "Left parent is not set to us")
+
+		if left.value > self.value then
+			error(string.format("left.value %0.2f > self.value %0.2f", left.value, self.value))
+		end
+
+		descendantCount += left.descendantCount
 	end
-	function SortedNode:_assertNoLoops()
+
+	local right = self.right
+	if right then
+		assert(right.parent == self, "Right parent is not set to us")
+
+		if right.value < self.value then
+			error(string.format("right.value %0.2f <= self.value %0.2f", right.value, self.value))
+		end
+
+		descendantCount += right.descendantCount
 	end
-	function SortedNode:_assertDescendantCount()
+
+	if self.descendantCount ~= descendantCount then
+		error(string.format("Bad descendantCount on node (%d, should be %d)", self.descendantCount, descendantCount))
 	end
-	function SortedNode:_assertRedBlackIntegrity()
+end
+
+function SortedNode:_assertFullIntegritySlow()
+	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
+	local root = self:_debugGetRoot()
+	local previous = nil
+	local seen = {}
+	for index, node in root:IterateNodes() do
+		if seen[node] then
+			error("Loop in nodes")
+		end
+
+		seen[node] = true
+		if previous then
+			assert(previous.value <= node.value, "Node is out of order")
+		end
+
+		previous = node
+		node:_assertIntegrity()
+
+		if node:GetIndex() ~= index then
+			error(string.format("Node index at %d should be %d", index, node:GetIndex()))
+		end
 	end
-	function SortedNode:_assertRedBlackFullIntegritySlow()
-	end
-	function SortedNode:_assertIntegrity()
-	end
-	function SortedNode:_assertFullIntegritySlow()
-	end
-	function SortedNode:_assertRootIntegrity()
+end
+
+function SortedNode:_assertRootIntegrity()
+	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+	assert(self.parent == nil, "Root should not have a parent")
+	assert(self.color == Color.BLACK, "Root should be black")
+end
+
+function SortedNode:_assertDescendantCount(expected)
+	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
+
+	if self.descendantCount ~= expected then
+		error(string.format("Bad descendantCount, expected %d descendants, have %d", expected, self.descendantCount), 2)
 	end
 end
 
