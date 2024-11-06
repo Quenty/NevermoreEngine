@@ -23,16 +23,16 @@ function Symbol.named(name)
 	assert(type(name) == "string", "Symbols must be created using a string name!")
 
 	return table.freeze(setmetatable({
-		_name = name;
+		_symbolName = name;
 	}, Symbol))
 end
 
 function Symbol.isSymbol(value)
-	return type(value) == "table" and value.ClassName == "Symbol"
+	return type(value) == "table" and getmetatable(value) == Symbol
 end
 
 function Symbol:__tostring()
-	return string.format("Symbol(%s)", self._name)
+	return string.format("Symbol(%s)", self._symbolName)
 end
 
-return Symbol
+return table.freeze(Symbol)
