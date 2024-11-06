@@ -157,7 +157,10 @@ function SortedNode:FindNodeAtIndex(searchIndex)
 	end
 
 	local current = self
-	local index = current:GetIndex()
+	local index = 1
+	if self.left then
+		index += self.left.descendantCount
+	end
 
 	while current do
 		if index == target then
@@ -292,14 +295,14 @@ function SortedNode:InsertNode(node): SortedNode<T>
 	node.color = Color.RED
 
 	local parent = nil
-	local x = root
+	local current = root
 
-	while x ~= nil do
-		parent = x
-		if node.value < x.value then
-			x = x.left
+	while current ~= nil do
+		parent = current
+		if node.value < current.value then
+			current = current.left
 		else
-			x = x.right
+			current = current.right
 		end
 	end
 
@@ -353,7 +356,6 @@ function SortedNode:_rightRotate(root, node): SortedNode<T>
 	assert(root, "No root")
 	assert(node, "No node")
 
-
 	local newParent = node.left
 	node:_setLeft(newParent.right)
 
@@ -384,7 +386,7 @@ function SortedNode:_fixDoubleRed(root, node): SortedNode
 	end
 
 	local parent = node.parent
-	local grandparent = node:_grandparent()
+	local grandparent = node.parent and node.parent.parent
 	local uncle = node:_uncle()
 
 	if not grandparent then
@@ -440,29 +442,21 @@ function SortedNode:_setLeft(node: SortedNode)
 		return
 	end
 
-	-- self:_assertIntegrity()
-
 	if self.left then
 		self.left.parent = nil
 		self.left = nil
 	end
 
 	if node then
-		-- assert(node.value <= self.value, "Bad node value") -- only true during insertion
-
 		if node.parent then
 			node:_unparent()
 		end
 
 		self.left = node
 		self.left.parent = self
-		-- self.left:_assertIntegrity()
 	end
 
 	self:_updateAllParentDescendantCount()
-
-	-- self:_assertIntegrity()
-	-- self:_assertFullIntegritySlow() -- only true during insertion
 end
 
 function SortedNode:_setRight(node: SortedNode)
@@ -472,7 +466,6 @@ function SortedNode:_setRight(node: SortedNode)
 		return
 	end
 
-	-- self:_assertIntegrity()
 
 	if self.right then
 		self.right.parent = nil
@@ -480,20 +473,15 @@ function SortedNode:_setRight(node: SortedNode)
 	end
 
 	if node then
-		-- assert(node.value >= self.value, "Bad node value") -- only true during insertion
-
 		if node.parent then
 			node:_unparent()
 		end
 
 		self.right = node
 		self.right.parent = self
-		-- self.right:_assertIntegrity()
 	end
 
 	self:_updateAllParentDescendantCount()
-	-- self:_assertIntegrity()
-	-- self:_assertFullIntegritySlow() -- only true during insertion
 end
 
 function SortedNode:_updateAllParentDescendantCount()
@@ -862,42 +850,12 @@ function SortedNode:_hasRedChild()
 	return false
 end
 
---[[
-	Replaces one subtree as a child of its parent with another subtree preserving the node color
-]]
-function SortedNode:_replaceNode(root, oldNode, newNode)
-	if newNode and newNode.parent then
-		newNode:_unparent()
-	end
-
-	local parentNode = oldNode.parent
-	if parentNode == nil then
-		if oldNode == root then
-			root = newNode
-		else
-			error("Should be root if our item's parent is nil")
-		end
-	elseif oldNode == parentNode.left then
-		parentNode:_setLeft(newNode)
-		parentNode:_assertIntegrity()
-	elseif oldNode == parentNode.right then
-		parentNode:_setRight(newNode)
-		parentNode:_assertIntegrity()
-	else
-		error("Bad state")
-	end
-
-	return root
-end
-
 function SortedNode:_unparent()
 	if not self.parent then
 		return
-	end
-
-	if self:_isOnLeft() then
+	elseif self.parent.left == self then
 		self.parent:_setLeft(nil)
-	elseif self:_isOnRight() then
+	elseif self.parent.right == self then
 		self.parent:_setRight(nil)
 	else
 		error("Bad state")
