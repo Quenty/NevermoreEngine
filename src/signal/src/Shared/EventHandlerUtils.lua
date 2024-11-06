@@ -28,7 +28,7 @@ end
 -- repeatedly resumed with functions to run followed by the argument to run
 -- them with.
 function EventHandlerUtils._initializeThread(memoryCategory)
-	if #memoryCategory == 0 then
+	if memoryCategory == "" then
 		debug.setmemorycategory("signal_unknown")
 	else
 		debug.setmemorycategory(memoryCategory)
