@@ -74,6 +74,27 @@ function ObservableSubscriptionTable:Complete(key)
 end
 
 --[=[
+	Fails the subscription
+
+	@param key TKey
+]=]
+function ObservableSubscriptionTable:Fail(key)
+	local subs = self._subMap[key]
+	if not subs then
+		return
+	end
+
+	local subsToFail = table.clone(subs)
+	self._subMap[key] = nil
+
+	for _, sub in pairs(subsToFail) do
+		if sub:IsPending() then
+			task.spawn(sub.Fail, sub)
+		end
+	end
+end
+
+--[=[
 	Observes for the key
 	@param key TKey
 	@param retrieveInitialValue callback -- Optional
