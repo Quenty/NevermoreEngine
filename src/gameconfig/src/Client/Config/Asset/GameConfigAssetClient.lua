@@ -28,12 +28,10 @@ function GameConfigAssetClient.new(obj, serviceBag)
 end
 
 function GameConfigAssetClient:_setupEntrySet(observeTranslationKey, observeTranslationValue)
-	self._maid:GiveTask(Rx.combineLatest({
+	self._maid:GiveTask(Rx.combineLatestDefer({
 		assetKey = self:ObserveAssetKey();
 		translationKey = observeTranslationKey;
 		text = observeTranslationValue;
-	}):Pipe({
-		Rx.throttleDefer();
 	}):Subscribe(function(state)
 			if type(state.translationKey) == "string"
 				and type(state.text) == "string"

@@ -167,10 +167,8 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 		renderMaid._syncing = syncMaid
 	end))
 
-	maid:GiveTask(Rx.combineLatest({
+	maid:GiveTask(Rx.combineLatestDefer({
 		loopSchedule = self._currentLoopSchedule:Observe();
-	}):Pipe({
-		Rx.throttleDefer();
 	}):Subscribe(function(state)
 		local scheduleMaid = Maid.new()
 

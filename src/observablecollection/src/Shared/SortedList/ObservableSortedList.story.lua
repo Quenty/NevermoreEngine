@@ -19,11 +19,11 @@ return function(target)
 
 	local observableSortedList = maid:Add(ObservableSortedList.new())
 
-	local random = Random.new()
+	local random = Random.new(35)
 
 	local values = {}
 	for i=1, ENTRIES do
-		local scoreValue = maid:Add(ValueObject.new(0, "number"))
+		local scoreValue = maid:Add(ValueObject.new(0 or random:NextNumber(), "number"))
 
 		local data = {
 			originalIndex = i;
@@ -105,6 +105,7 @@ return function(target)
 						};
 
 						Blend.New "TextLabel" {
+							Name = "Score";
 							Text = data.scoreValue:Observe():Pipe({
 								Rx.map(tostring)
 							});
@@ -116,17 +117,8 @@ return function(target)
 							TextXAlignment = Enum.TextXAlignment.Left;
 						};
 
-						Blend.New "TextLabel" {
-							Text = data.originalIndex;
-							Size = UDim2.fromScale(1, 1);
-							BackgroundTransparency = 1;
-							Position = UDim2.new(0, -10, 0.5, 0);
-							AnchorPoint = Vector2.new(1, 0.5);
-							TextColor3 = Color3.new(1, 1, 1);
-							TextXAlignment = Enum.TextXAlignment.Right;
-						};
-
 						Blend.New "TextBox" {
+							Name = "SetScore";
 							Size = UDim2.fromScale(1, 1);
 							Text = tostring(data.scoreValue.Value);
 							BackgroundTransparency = 1;
@@ -138,6 +130,17 @@ return function(target)
 									valid.Value = false
 								end
 							end;
+						};
+
+						Blend.New "TextLabel" {
+							Name = "OriginalIndex";
+							Text = data.originalIndex;
+							Size = UDim2.fromScale(1, 1);
+							BackgroundTransparency = 1;
+							Position = UDim2.new(0, -10, 0.5, 0);
+							AnchorPoint = Vector2.new(1, 0.5);
+							TextColor3 = Color3.new(1, 1, 1);
+							TextXAlignment = Enum.TextXAlignment.Right;
 						};
 					}
 				end)

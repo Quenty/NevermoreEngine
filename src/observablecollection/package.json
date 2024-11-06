@@ -37,6 +37,7 @@
     "@quenty/signal": "file:../signal",
     "@quenty/steputils": "file:../steputils",
     "@quenty/symbol": "file:../symbol",
+    "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"
   },
   "devDependencies": {

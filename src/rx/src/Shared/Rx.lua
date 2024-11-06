@@ -19,6 +19,7 @@ local Symbol = require("Symbol")
 local ThrottledFunction = require("ThrottledFunction")
 local cancellableDelay = require("cancellableDelay")
 local CancelToken = require("CancelToken")
+local MaidTaskUtils = require("MaidTaskUtils")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -138,6 +139,8 @@ end
 	@return Promise<T>
 ]=]
 function Rx.toPromise(observable, cancelToken)
+	assert(Observable.isObservable(observable), "Bad observable")
+
 	local maid = Maid.new()
 
 	local newCancelToken = CancelToken.new(function(cancel)
@@ -1008,7 +1011,7 @@ function Rx.switchAll()
 							if currentInside == observable then
 								sub:Fire(...)
 							else
-								warn(string.format("[Rx.switchAll] - Observable is still firing despite disconnect (%q)", observable._source))
+								warn(string.format("[Rx.switchAll] - Observable is still firing despite disconnect (%q)", tostring(observable._source)))
 							end
 						end, -- Merge each inner observable
 						function(...)
@@ -1446,12 +1449,14 @@ function Rx.combineLatest(observables)
 
 	return Observable.new(function(sub)
 		local pending = 0
+		local unset = 0
 		local latest = {}
 
 		-- Instead of caching this, use extra compute here
 		for key, value in pairs(observables) do
 			if Observable.isObservable(value) then
-				pending = pending + 1
+				pending += 1
+				unset += 1
 				latest[key] = UNSET_VALUE
 			else
 				latest[key] = value
@@ -1466,43 +1471,129 @@ function Rx.combineLatest(observables)
 
 		local maid = Maid.new()
 
-		local function fireIfAllSet()
-			for _, value in pairs(latest) do
-				if value == UNSET_VALUE then
-					return
-				end
-			end
-
-			sub:Fire(table.freeze(table.clone(latest)))
-		end
-
 		local function failOnFirst(...)
-			pending = pending - 1
+			pending -= 1
+			latest = nil
 			sub:Fail(...)
 		end
 
 		local function completeOnAllPendingDone()
-			pending = pending - 1
+			pending -= 1
 			if pending == 0 then
+				latest = nil
 				sub:Complete()
 			end
 		end
 
 		for key, observer in pairs(observables) do
-			if Observable.isObservable(observer) then
-				maid:GiveTask(observer:Subscribe(
-					function(value)
-						latest[key] = value
-						fireIfAllSet()
-					end,
-					failOnFirst,
-					completeOnAllPendingDone))
+			if not Observable.isObservable(observer) then
+				continue
 			end
+
+			maid:GiveTask(observer:Subscribe(
+				function(value)
+					if latest[key] == UNSET_VALUE then
+						unset -= 1
+					end
+
+					latest[key] = value
+
+					if unset == 0 then
+						sub:Fire(table.freeze(table.clone(latest)))
+					end
+				end,
+				failOnFirst,
+				completeOnAllPendingDone))
 		end
 
 		return maid
 	end)
 end
+
+--[=[
+	Equivalent of [Rx.combineLatest] and [Rx.throttleDefer] but avoids copying and emitting a new table
+	until after the frame ends. Helpful in scenarios where we write multiple times to a single value in a
+	frame, and we don't want to create a lot of work for the garbage collector.
+
+	@param observables { [TKey]: Observable<TEmitted> | TEmitted }
+	@return Observable<{ [TKey]: TEmitted }>
+]=]
+function Rx.combineLatestDefer(observables)
+	assert(type(observables) == "table", "Bad observables")
+
+	return Observable.new(function(sub)
+		local pending = 0
+		local unset = 0
+		local latest = {}
+
+		-- Instead of caching this, use extra compute here
+		for key, value in pairs(observables) do
+			if Observable.isObservable(value) then
+				pending += 1
+				unset += 1
+				latest[key] = UNSET_VALUE
+			else
+				latest[key] = value
+			end
+		end
+
+		if pending == 0 then
+			sub:Fire(latest)
+			sub:Complete()
+			return
+		end
+
+		local maid = Maid.new()
+
+		local function failOnFirst(...)
+			pending -= 1
+			latest = nil
+			sub:Fail(...)
+		end
+
+		local function completeOnAllPendingDone()
+			pending -= 1
+			if pending == 0 then
+				latest = nil
+				sub:Complete()
+			end
+		end
+
+		local queueThread = nil
+		maid:GiveTask(function()
+			if queueThread then
+				MaidTaskUtils.doTask(queueThread)
+			end
+		end)
+
+		for key, observer in pairs(observables) do
+			if not Observable.isObservable(observer) then
+				continue
+			end
+
+			maid:GiveTask(observer:Subscribe(
+				function(value)
+					if latest[key] == UNSET_VALUE then
+						unset -= 1
+					end
+
+					latest[key] = value
+
+					if unset == 0 and not queueThread then
+						queueThread = task.defer(function()
+							queueThread = nil
+							sub:Fire(table.freeze(table.clone(latest)))
+						end)
+					end
+				end,
+				failOnFirst,
+				completeOnAllPendingDone))
+		end
+
+		return maid
+	end)
+end
+
 
 --[=[
 	http://reactivex.io/documentation/operators/using.html

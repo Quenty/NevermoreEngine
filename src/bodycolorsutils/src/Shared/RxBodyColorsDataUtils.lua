@@ -28,9 +28,9 @@ function RxBodyColorsDataUtils.observeFromAttributes(instance)
 
 	return Rx.combineLatest(observables):Pipe({
 		Rx.map(function(latestValues)
-			for key, attributeName in pairs(BodyColorsDataConstants.ATTRIBUTE_MAPPING) do
-				local bodyColorsData = {}
+			local bodyColorsData = {}
 
+			for key, attributeName in pairs(BodyColorsDataConstants.ATTRIBUTE_MAPPING) do
 				local value = latestValues[key]
 				if typeof(value) == "Color3" then
 					bodyColorsData[key] = value
@@ -39,9 +39,9 @@ function RxBodyColorsDataUtils.observeFromAttributes(instance)
 						attributeName,
 						typeof(value)))
 				end
-
-				return BodyColorsDataUtils.createBodyColorsData(bodyColorsData)
 			end
+
+			return BodyColorsDataUtils.createBodyColorsData(bodyColorsData)
 		end);
 	})
 end

@@ -75,6 +75,16 @@ function ObservableMap.isObservableMap(value)
 end
 
 --[=[
+	Allows iteration over the observable map
+
+	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
+]=]
+function ObservableMap:__iter()
+	return pairs(self._map)
+end
+
+
+--[=[
 	Observes all keys in the map
 	@return Observable<Brio<TKey>>
 ]=]

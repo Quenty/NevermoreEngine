@@ -66,6 +66,15 @@ function ObservableSet.isObservableSet(value)
 end
 
 --[=[
+	Allows iteration over the observable set
+
+	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
+]=]
+function ObservableSet:__iter()
+	return pairs(self._set)
+end
+
+--[=[
 	Observes all items in the set
 	@return Observable<Brio<T>>
 ]=]

@@ -42,6 +42,8 @@ local Maid = require("Maid")
 local Rx = require("Rx")
 local StepUtils = require("StepUtils")
 local ValueObject = require("ValueObject")
+local RectUtils = require("RectUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local ButtonHighlightModel = setmetatable({}, BaseObject)
 ButtonHighlightModel.ClassName = "ButtonHighlightModel"
@@ -67,6 +69,11 @@ function ButtonHighlightModel.new(button, onUpdate)
 	self._isMouseOver = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._isKeyDown = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._isHighlighted = self._maid:Add(ValueObject.new(false, "boolean"))
+
+	-- Mouse state
+	self._isMouseOverBasedUponMouseMovement = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isMouseOverScrollingCheck = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._lastMousePositionForScrollingCheck = self._maid:Add(ValueObject.new(nil))
 
 --[=[
 	@prop InteractionEnabledChanged Signal<boolean>
@@ -153,7 +160,8 @@ function ButtonHighlightModel:SetButton(button: Instance)
 	if button then
 		maid:GiveTask(button.InputEnded:Connect(function(inputObject)
 			if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-				self._isMouseOver.Value = false
+				self._lastMousePositionForScrollingCheck.Value = inputObject.Position
+				self._isMouseOverBasedUponMouseMovement.Value = false
 			end
 
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -175,7 +183,9 @@ function ButtonHighlightModel:SetButton(button: Instance)
 
 		maid:GiveTask(button.InputBegan:Connect(function(inputObject)
 			if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-				self._isMouseOver.Value = true
+				self._isMouseOverBasedUponMouseMovement.Value = true
+				self._isMouseOverScrollingCheck.Value = true
+				self._lastMousePositionForScrollingCheck.Value = inputObject.Position
 			end
 
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -186,6 +196,25 @@ function ButtonHighlightModel:SetButton(button: Instance)
 				self:_trackTouch(inputObject)
 			end
 		end))
+
+		-- Track until something indicates removal
+		maid:GiveTask(self._isMouseOverBasedUponMouseMovement:ObserveBrio(function(mouseOver)
+			return mouseOver
+		end):Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
+
+			self:_trackIfButtonMovedOutFromMouse(brio:ToMaid(), button)
+		end))
+
+		-- We have to track as long as the mouse hasn't moved
+		maid:GiveTask(Rx.combineLatest({
+			isMouseOverFromInput = self._isMouseOverBasedUponMouseMovement:Observe();
+			isMouseOverScrollingCheck = self._isMouseOverScrollingCheck:Observe();
+		}):Subscribe(function(state)
+			self._isMouseOver.Value = state.isMouseOverFromInput and state.isMouseOverScrollingCheck
+		end))
 	end
 
 	self._maid._buttonMaid = maid
@@ -195,6 +224,44 @@ function ButtonHighlightModel:SetButton(button: Instance)
 			self._maid._buttonMaid = nil
 		end
 	end
+end
+
+function ButtonHighlightModel:_trackIfButtonMovedOutFromMouse(maid, button)
+	maid:GiveTask(button.InputChanged:Connect(function(inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+			self._lastMousePositionForScrollingCheck.Value = inputObject.Position
+		end
+	end))
+
+	maid:GiveTask(Rx.combineLatest({
+		mousePosition = self._lastMousePositionForScrollingCheck:Observe();
+		absolutePosition = RxInstanceUtils.observeProperty(button, "AbsolutePosition");
+		absoluteSize = RxInstanceUtils.observeProperty(button, "AbsoluteSize");
+	}):Pipe({
+		Rx.map(function(state)
+			if not state.mousePosition then
+				return true
+			end
+
+			local area = Rect.new(state.absolutePosition, state.absolutePosition + state.absoluteSize)
+
+			if RectUtils.contains(area, Vector2.new(state.mousePosition.x, state.mousePosition.y)) then
+				return true
+			end
+
+			-- TODO: check rounded corners and rotated guis
+
+			return false
+		end)
+	}):Subscribe(function(state)
+		self._isMouseOverScrollingCheck.Value = state
+	end))
+
+	maid:GiveTask(function()
+		self._isMouseOverScrollingCheck.Value = false
+		self._lastMousePositionForScrollingCheck.Value = nil
+	end)
+
 end
 
 --[=[

@@ -36,12 +36,28 @@ function ObservableSubscriptionTable:Fire(key, ...)
 	-- Make a copy so we don't have to worry about our last changing
 	for _, sub in pairs(table.clone(subs)) do
 		if sub:IsPending() then
+			-- TODO: Use connection here
 			task.spawn(sub.Fire, sub, ...)
 		end
 	end
 end
 
-function ObservableSubscriptionTable:Complete(key, ...)
+--[=[
+	Returns true if subscription exists
+
+	@param key TKey
+	@return boolean
+]=]
+function ObservableSubscriptionTable:HasSubscriptions(key)
+	return self._subMap[key] ~= nil
+end
+
+--[=[
+	Completes the subscription
+
+	@param key TKey
+]=]
+function ObservableSubscriptionTable:Complete(key)
 	local subs = self._subMap[key]
 	if not subs then
 		return
@@ -52,7 +68,28 @@ function ObservableSubscriptionTable:Complete(key, ...)
 
 	for _, sub in pairs(subsToComplete) do
 		if sub:IsPending() then
-			task.spawn(sub.Complete, sub, ...)
+			task.spawn(sub.Complete, sub)
+		end
+	end
+end
+
+--[=[
+	Fails the subscription
+
+	@param key TKey
+]=]
+function ObservableSubscriptionTable:Fail(key)
+	local subs = self._subMap[key]
+	if not subs then
+		return
+	end
+
+	local subsToFail = table.clone(subs)
+	self._subMap[key] = nil
+
+	for _, sub in pairs(subsToFail) do
+		if sub:IsPending() then
+			task.spawn(sub.Fail, sub)
 		end
 	end
 end
@@ -83,6 +120,7 @@ function ObservableSubscriptionTable:Observe(key, retrieveInitialValue)
 				return
 			end
 
+			-- TODO: Linked list
 			local index = table.find(current, sub)
 			if not index then
 				return
@@ -95,9 +133,7 @@ function ObservableSubscriptionTable:Observe(key, retrieveInitialValue)
 
 			-- Complete the subscription
 			if sub:IsPending() then
-				task.spawn(function()
-					sub:Complete()
-				end)
+				task.spawn(sub.Complete, sub)
 			end
 		end
 	end)
@@ -113,9 +149,7 @@ function ObservableSubscriptionTable:Destroy()
 
 		for _, sub in pairs(list) do
 			if sub:IsPending() then
-				task.spawn(function()
-					sub:Complete()
-				end)
+				task.spawn(sub.Complete, sub)
 			end
 		end
 	end

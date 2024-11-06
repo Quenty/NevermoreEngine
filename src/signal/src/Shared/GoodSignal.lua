@@ -43,41 +43,9 @@
 	@class GoodSignal
 ]=]
 
--- The currently idle thread to run the next handler on
-local weakFreeRunnerThreadLookup = setmetatable({}, {__mode = "kv"})
+	local require = require(script.Parent.loader).load(script)
 
--- Function which acquires the currently idle handler runner thread, runs the
--- function fn on it, and then releases the thread, returning it to being the
--- currently idle one.
--- If there was a currently idle runner thread already, that's okay, that old
--- one will just get thrown and eventually GCed.
-local function acquireRunnerThreadAndCallEventHandler(memoryCategory, fn, ...)
-	local acquiredRunnerThread = weakFreeRunnerThreadLookup[memoryCategory]
-	weakFreeRunnerThreadLookup[memoryCategory] = nil
-	fn(...)
-	-- The handler finished running, this runner thread is free again.
-	weakFreeRunnerThreadLookup[memoryCategory] = acquiredRunnerThread
-end
-
--- Coroutine runner that we create coroutines of. The coroutine can be
--- repeatedly resumed with functions to run followed by the argument to run
--- them with.
-local function runEventHandlerInFreeThread(memoryCategory)
-	if #memoryCategory == 0 then
-		debug.setmemorycategory("signal_unknown")
-	else
-		debug.setmemorycategory(memoryCategory)
-	end
-
-	-- Note: We cannot use the initial set of arguments passed to
-	-- runEventHandlerInFreeThread for a call to the handler, because those
-	-- arguments would stay on the stack for the duration of the thread's
-	-- existence, temporarily leaking references. Without access to raw bytecode
-	-- there's no way for us to clear the "..." references from the stack.
-	while true do
-		acquireRunnerThreadAndCallEventHandler(coroutine.yield())
-	end
-end
+local EventHandlerUtils = require("EventHandlerUtils")
 
 -- Connection class
 local Connection = {}
@@ -216,15 +184,7 @@ function Signal:Fire(...)
 		local nextNode = rawget(connection, "_next")
 
 		if rawget(connection, "_signal") ~= nil then -- isConnected
-			local memoryCategory = connection._memoryCategory
-
-			-- Get the freeRunnerThread to the first yield
-			if not weakFreeRunnerThreadLookup[memoryCategory] then
-				weakFreeRunnerThreadLookup[memoryCategory] = coroutine.create(runEventHandlerInFreeThread)
-				coroutine.resume(weakFreeRunnerThreadLookup[memoryCategory], memoryCategory)
-			end
-
-			task.spawn(weakFreeRunnerThreadLookup[memoryCategory], memoryCategory, connection._fn, ...)
+			EventHandlerUtils.fire(connection._memoryCategory, connection._fn, ...)
 		end
 
 		connection = nextNode

@@ -43,7 +43,7 @@ function Promise.new(func)
 	local self = setmetatable({
 		_pendingExecuteList = {};
 		_unconsumedException = true;
-		_source = ENABLE_TRACEBACK and debug.traceback() or "";
+		_source = ENABLE_TRACEBACK and debug.traceback("Promise.new()", 2) or "";
 	}, Promise)
 
 	if type(func) == "function" then

@@ -57,7 +57,7 @@ end
 	@param color3 Color3
 	@return BodyColorsData
 ]=]
-function BodyColorsDataUtils.fromSingleColor(color3)
+function BodyColorsDataUtils.fromUniformColor(color3)
 	assert(typeof(color3) == "Color3", "Bad color3")
 
 	return BodyColorsDataUtils.createBodyColorsData({
@@ -160,7 +160,7 @@ end
 	@param bodyColorsData BodyColorsData
 	@return boolean
 ]=]
-function BodyColorsDataUtils.isSingleColor(bodyColorsData)
+function BodyColorsDataUtils.isUniformColor(bodyColorsData)
 	assert(BodyColorsDataUtils.isBodyColorsData(bodyColorsData), "Bad bodyColorsData")
 
 	local headColor = bodyColorsData.headColor
@@ -189,6 +189,14 @@ function BodyColorsDataUtils.isSingleColor(bodyColorsData)
 	end
 
 	return true
+end
+
+function BodyColorsDataUtils.getUniformColor(bodyColorsData)
+	if BodyColorsDataUtils.isUniformColor(bodyColorsData) then
+		return bodyColorsData.headColor
+	end
+
+	return nil
 end
 
 --[=[

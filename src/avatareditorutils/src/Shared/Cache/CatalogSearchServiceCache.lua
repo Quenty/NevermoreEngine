@@ -23,6 +23,14 @@ function CatalogSearchServiceCache:Init(serviceBag)
 	end)
 end
 
+function CatalogSearchServiceCache:PromiseAvatarRules()
+	if self._avatarRulesPromise then
+		return self._avatarRulesPromise
+	end
+
+	self._avatarRulesPromise = AvatarEditorUtils.promiseAvatarRules()
+	return self._avatarRulesPromise
+end
 
 function CatalogSearchServiceCache:PromiseSearchCatalog(params)
 	return self._promiseSearchCatalog(params)

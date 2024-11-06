@@ -69,11 +69,12 @@ local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStorePromises = require("DataStorePromises")
 local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
-local Promise = require("Promise")
-local Signal = require("Signal")
 local Math = require("Math")
-local ValueObject = require("ValueObject")
+local Promise = require("Promise")
 local Rx = require("Rx")
+local Signal = require("Signal")
+local Symbol = require("Symbol")
+local ValueObject = require("ValueObject")
 
 local DEFAULT_DEBUG_WRITING = false
 
@@ -118,8 +119,7 @@ function DataStore.new(robloxDataStore, key)
 	@prop Saving Signal<Promise>
 	@within DataStore
 ]=]
-	self.Saving = Signal.new() -- :Fire(promise)
-	self._maid:GiveTask(self.Saving)
+	self.Saving = self._maid:Add(Signal.new()) -- :Fire(promise)
 
 	self:_setupAutoSaving()
 
@@ -222,6 +222,7 @@ end
 ]=]
 function DataStore:SetUserIdList(userIdList)
 	assert(type(userIdList) == "table" or userIdList == nil, "Bad userIdList")
+	assert(not Symbol.isSymbol(userIdList), "Should not be symbol")
 
 	self._userIdList = userIdList
 end
@@ -376,6 +377,8 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 				result = {}
 			end
 
+			self:_checkSnapshotIntegrity("writer:WriteMerge(original)", result)
+
 			if self._debugWriting then
 				print("[DataStore] - Writing", result)
 			end
@@ -417,7 +420,7 @@ end
 function DataStore:_promiseGetAsyncNoCache()
 	return self._maid:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key))
 		:Catch(function(err)
-			warn(string.format("DataStorePromises.getAsync(%q) -> warning - ", self._key), err)
+			warn(string.format("DataStorePromises.getAsync(%q) -> warning - %s", tostring(self._key), tostring(err or "empty error")))
 			return Promise.rejected(err)
 		end)
 		:Then(function(data)
@@ -427,7 +430,7 @@ function DataStore:_promiseGetAsyncNoCache()
 			self:MergeDiffSnapshot(diffSnapshot)
 
 			if self._debugWriting then
-				print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data, "with diff snapshot", diffSnapshot, "to view", self._viewSnapshot)
+				print(string.format("DataStorePromises.getAsync(%q) -> Got ", tostring(self._key)), data, "with diff snapshot", diffSnapshot, "to view", self._viewSnapshot)
 				-- print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data)
 			end
 		end)

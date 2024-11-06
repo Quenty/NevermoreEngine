@@ -9,12 +9,12 @@ local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
-local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local Signal = require("Signal")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
+local ListIndexUtils = require("ListIndexUtils")
 
 local ObservableList = {}
 ObservableList.ClassName = "ObservableList"
@@ -78,15 +78,38 @@ end
 	@return Observable<{ T }>
 ]=]
 function ObservableList:Observe()
-	return Rx.combineLatest({
-		Rx.fromSignal(self.ItemAdded):Pipe({ Rx.startWith({ true }) });
-		Rx.fromSignal(self.ItemRemoved):Pipe({ Rx.startWith({ true }) });
-	}):Pipe({
-		Rx.throttleDefer();
-		Rx.map(function()
-			return self:GetList();
-		end);
-	})
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local function queueFire()
+			if maid._queue then
+				return
+			end
+
+			maid._queue = task.defer(function()
+				maid._queue = nil
+				sub:Fire(self:GetList())
+			end)
+		end
+
+		maid:GiveTask(self.ItemAdded:Connect(queueFire))
+		maid:GiveTask(self.ItemRemoved:Connect(queueFire))
+
+		return maid
+	end)
+end
+
+--[=[
+	Allows iteration over the observable map
+
+	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
+]=]
+function ObservableList:__iter()
+	return coroutine.wrap(function()
+		for index, value in self._keyList do
+			coroutine.yield(index, self._contents[value])
+		end
+	end)
 end
 
 --[=[
@@ -265,7 +288,7 @@ end
 function ObservableList:Get(index)
 	assert(type(index) == "number", "Bad index")
 
-	index = self:_toPositiveIndex(index)
+	index = ListIndexUtils.toPositiveIndex(#self._keyList, index)
 
 	local key = self._keyList[index]
 	if not key then
@@ -319,12 +342,12 @@ function ObservableList:InsertAt(item, index)
 	-- Fire off the index change on the value
 	self._keyIndexObservables:Fire(key, index)
 	self._indexObservers:Fire(index, item)
-	self._indexObservers:Fire(self:_toNegativeIndex(listLength, index), item)
+	self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), item)
 
 	for _, data in pairs(changed) do
 		if self._indexes[data.key] == data.newIndex then
 			self._indexObservers:Fire(data.newIndex, self._contents[data.key])
-			self._indexObservers:Fire(self:_toNegativeIndex(listLength, index), self._contents[data.key])
+			self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), self._contents[data.key])
 			self._keyIndexObservables:Fire(data.key, data.newIndex)
 		end
 	end
@@ -409,7 +432,7 @@ function ObservableList:RemoveByKey(key)
 	for _, data in pairs(changed) do
 		if self._indexes[data.key] == data.newIndex then
 			self._indexObservers:Fire(data.newIndex, self._contents[data.key])
-			self._indexObservers:Fire(self:_toNegativeIndex(listLength, index), self._contents[data.key])
+			self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), self._contents[data.key])
 			self._keyIndexObservables:Fire(data.key, data.newIndex)
 		end
 	end
@@ -427,20 +450,6 @@ function ObservableList:GetList()
 		list[index] = self._contents[key]
 	end
 	return list
-end
-
-function ObservableList:_toPositiveIndex(index)
-	if index > 0 then
-		return index
-	elseif index < 0 then
-		return #self._keyList + index + 1
-	else
-		error(string.format("[ObservableList._toPositiveIndex] - Bad index %d", index))
-	end
-end
-
-function ObservableList:_toNegativeIndex(listLength, index)
-	return -listLength + index - 1
 end
 
 --[=[

@@ -107,7 +107,7 @@ function Observable.new(onSubscribe)
 	assert(type(onSubscribe) == "function", "Bad onSubscribe")
 
 	return setmetatable({
-		_source = if ENABLE_STACK_TRACING then debug.traceback() else nil;
+		_source = if ENABLE_STACK_TRACING then debug.traceback("Observable.new()", 2) else nil;
 		_onSubscribe = onSubscribe;
 	}, Observable)
 end
