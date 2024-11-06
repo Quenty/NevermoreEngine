@@ -35,12 +35,10 @@ function CooldownModel.new()
 		end)
 	end
 
-	self._maid:GiveTask(Rx.combineLatest({
+	self._maid:GiveTask(Rx.combineLatestDefer({
 		length = self._length:Observe();
 		clock = self._clock:Observe();
 		startTime = self._startTime:Observe();
-	}):Pipe({
-		Rx.throttleDefer();
 	}):Subscribe(function(state)
 		local now = state.clock()
 		local waitTime = state.length + state.startTime - now
