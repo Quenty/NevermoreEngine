@@ -18,6 +18,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
+local DataStoreSnapshotUtils = require("DataStoreSnapshotUtils")
 local DataStoreWriter = require("DataStoreWriter")
 local GoodSignal = require("GoodSignal")
 local Maid = require("Maid")
@@ -26,10 +27,10 @@ local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local Set = require("Set")
+local Symbol = require("Symbol")
 local Table = require("Table")
-local DataStoreSnapshotUtils = require("DataStoreSnapshotUtils")
 
-local SLOW_INTEGRITY_CHECK_ENABLED = true
+local SLOW_INTEGRITY_CHECK_ENABLED = false
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
@@ -172,10 +173,10 @@ function DataStoreStage:GetSubStore(key)
 	end
 
 	local maid = Maid.new()
-	local newStore = DataStoreStage.new(key, self)
-	maid:GiveTask(newStore)
+	local newStore = maid:Add(DataStoreStage.new(key, self))
 
-	if type(self._baseDataSnapshot) == "table" then
+	-- TODO: Transfer delete tokens too?
+	if type(self._baseDataSnapshot) == "table" and not Symbol.isSymbol(self._baseDataSnapshot) then
 		local baseDataToTransfer = self._baseDataSnapshot[key]
 		if baseDataToTransfer ~= nil then
 			local newSnapshot = table.clone(self._baseDataSnapshot)
@@ -186,7 +187,7 @@ function DataStoreStage:GetSubStore(key)
 	end
 
 	-- Transfer save data to substore
-	if type(self._saveDataSnapshot) == "table" then
+	if type(self._saveDataSnapshot) == "table" and not Symbol.isSymbol(self._saveDataSnapshot) then
 		local saveDataToTransfer = self._saveDataSnapshot[key]
 
 		if saveDataToTransfer ~= nil then
@@ -507,7 +508,7 @@ function DataStoreStage:Overwrite(data)
 		data = DataStoreDeleteToken
 	end
 
-	if type(data) == "table" then
+	if type(data) == "table" and data ~= DataStoreDeleteToken then
 		local newSaveSnapshot = {}
 
 		local remaining = Set.fromKeys(self._stores)
@@ -719,6 +720,8 @@ function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(
 	if diffSnapshot == DataStoreDeleteToken then
 		return nil
 	elseif type(diffSnapshot) == "table" then
+		assert(not Symbol.isSymbol(diffSnapshot), "diffSnapshot should not be symbol")
+
 		local newBaseDataSnapshot
 		if type(self._baseDataSnapshot) == "table" then
 			newBaseDataSnapshot = table.clone(self._baseDataSnapshot)
@@ -976,6 +979,42 @@ function DataStoreStage:_storeAtKey(key, value)
 	self:_checkIntegrity()
 end
 
+function DataStoreStage:_checkSnapshotIntegrity(label, result)
+	assert(type(label) == "string", "Bad label")
+
+	if not SLOW_INTEGRITY_CHECK_ENABLED then
+		return
+	end
+
+	if result == DataStoreDeleteToken then
+		error(string.format("%s should not be a DataStoreDeleteToken", label))
+	end
+
+	local function recurse(innerLabel, value)
+		if type(value) ~= "table" then
+			return
+		end
+
+		for key, item in pairs(value) do
+			local keyLabel = innerLabel .. "." .. tostring(key)
+
+			if not (type(key) == "string" or type(key) == "number") then
+				 error(string.format("%s should be a number or string", keyLabel))
+			end
+
+			if item == DataStoreDeleteToken then
+				error(string.format("%s should not contain a DataStoreDeleteToken", keyLabel))
+			end
+
+			if type(item) == "table" then
+				recurse(keyLabel, item)
+			end
+		end
+	end
+
+	recurse(label, result)
+end
+
 function DataStoreStage:_checkIntegrity()
 	if not SLOW_INTEGRITY_CHECK_ENABLED then
 		return
@@ -986,6 +1025,7 @@ function DataStoreStage:_checkIntegrity()
 
 	if type(self._baseDataSnapshot) == "table" then
 		assert(table.isfrozen(self._baseDataSnapshot), "Base snapshot should be frozen")
+		self:_checkSnapshotIntegrity("self._baseDataSnapshot", self._baseDataSnapshot)
 	end
 
 	if type(self._saveDataSnapshot) == "table" then
@@ -994,6 +1034,7 @@ function DataStoreStage:_checkIntegrity()
 
 	if type(self._viewSnapshot) == "table" then
 		assert(table.isfrozen(self._viewSnapshot), "View snapshot should be frozen")
+		self:_checkSnapshotIntegrity("self._viewSnapshot", self._viewSnapshot)
 	end
 
 	for key, _ in pairs(self._stores) do
@@ -1005,16 +1046,6 @@ function DataStoreStage:_checkIntegrity()
 			error(string.format("[DataStoreStage] - Duplicate saveData at key %q", key))
 		end
 	end
-
-	if type(self._viewSnapshot) == "table" then
-		for key, value in pairs(self._viewSnapshot) do
-			assert(type(key) == "string" or type(key) == "number", "Bad key")
-			if value == DataStoreDeleteToken then
-				error(string.format("[DataStoreStage] - View at key %q is delete token", key))
-			end
-		end
-	end
 end
-
 
 return DataStoreStage

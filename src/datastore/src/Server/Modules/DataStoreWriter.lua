@@ -46,7 +46,7 @@ function DataStoreWriter:SetSaveDataSnapshot(saveDataSnapshot)
 
 	if saveDataSnapshot == DataStoreDeleteToken then
 		self._saveDataSnapshot = DataStoreDeleteToken
-	elseif type(saveDataSnapshot) == "table" then
+	elseif type(saveDataSnapshot) == "table" and not Symbol.isSymbol(saveDataSnapshot) then
 		self._saveDataSnapshot = Table.deepCopy(saveDataSnapshot)
 	else
 		self._saveDataSnapshot = saveDataSnapshot
@@ -67,6 +67,7 @@ end
 
 function DataStoreWriter:SetFullBaseDataSnapshot(fullBaseDataSnapshot)
 	assert(type(fullBaseDataSnapshot) ~= "table" or table.isfrozen(fullBaseDataSnapshot), "fullBaseDataSnapshot should be frozen")
+	assert(not Symbol.isSymbol(fullBaseDataSnapshot), "fullBaseDataSnapshot should not be symbol")
 
 	if fullBaseDataSnapshot == DataStoreDeleteToken then
 		error("[DataStoreWriter] - fullBaseDataSnapshot should not be a delete token")
@@ -109,6 +110,7 @@ end
 ]=]
 function DataStoreWriter:ComputeDiffSnapshot(incoming)
 	assert(incoming ~= DataStoreDeleteToken, "Incoming value should not be DataStoreDeleteToken")
+	assert(not Symbol.isSymbol(incoming), "Incoming should not be symbol")
 
 	if type(incoming) == "table" then
 		local keys = Set.union(Set.fromKeys(self._writers), Set.fromKeys(incoming))
@@ -147,6 +149,8 @@ end
 function DataStoreWriter:_computeValueDiff(original, incoming)
 	assert(original ~= DataStoreDeleteToken, "original cannot be DataStoreDeleteToken")
 	assert(incoming ~= DataStoreDeleteToken, "incoming cannot be DataStoreDeleteToken")
+	assert(not Symbol.isSymbol(original), "original should not be symbol")
+	assert(not Symbol.isSymbol(incoming), "incoming should not be symbol")
 
 	if original == incoming then
 		return nil
@@ -162,6 +166,8 @@ end
 function DataStoreWriter:_computeTableDiff(original, incoming)
 	assert(type(original) == "table", "Bad original")
 	assert(type(incoming) == "table", "Bad incoming")
+	assert(not Symbol.isSymbol(original), "original should not be symbol")
+	assert(not Symbol.isSymbol(incoming), "incoming should not be symbol")
 
 	local keys = Set.union(Set.fromKeys(original), Set.fromKeys(incoming))
 
@@ -203,7 +209,9 @@ end
 
 function DataStoreWriter:_writeMergeWriters(original)
 	local copy
-	if type(original) == "table" then
+	if Symbol.isSymbol(original) then
+		copy = original
+	elseif type(original) == "table" then
 		copy = table.clone(original)
 	else
 		copy = original
@@ -211,7 +219,7 @@ function DataStoreWriter:_writeMergeWriters(original)
 
 	if next(self._writers) ~= nil then
 		-- Original was not a table. We need to swap to one.
-		if type(copy) ~= "table" then
+		if type(copy) ~= "table" or Symbol.isSymbol(original) then
 			copy = {}
 		end
 
@@ -227,7 +235,7 @@ function DataStoreWriter:_writeMergeWriters(original)
 	end
 
 	-- Write our save data next
-	if type(self._saveDataSnapshot) == "table" and next(self._saveDataSnapshot) ~= nil then
+	if not Symbol.isSymbol(self._saveDataSnapshot) and type(self._saveDataSnapshot) == "table" and next(self._saveDataSnapshot) ~= nil then
 		-- Original was not a table. We need to swap to one.
 		if type(copy) ~= "table" then
 			copy = {}
@@ -248,7 +256,7 @@ function DataStoreWriter:_writeMergeWriters(original)
 
 	-- Handle empty table scenario..
 	-- This would also imply our original is nil somehow...
-	if type(copy) == "table" and next(copy) == nil then
+	if not Symbol.isSymbol(copy) and type(copy) == "table" and next(copy) == nil then
 		if type(self._saveDataSnapshot) ~= "table" then
 			return nil
 		end
