@@ -45,10 +45,11 @@ function EventHandlerUtils._initializeThread(memoryCategory)
 end
 
 --[=[
-	Safely fires an event
+	Safely fires an event in the given memory category we're in
 
 	@param memoryCategory string
 	@param callback any
+	@param ... any
 ]=]
 function EventHandlerUtils.fire(memoryCategory, callback, ...)
 	assert(type(memoryCategory) == "string", "Bad memoryCategory")
