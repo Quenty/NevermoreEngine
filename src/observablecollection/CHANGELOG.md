@@ -1,3 +1,27 @@
+# v12.12.0 (Wed Nov 06 2024)
+
+#### 🚀 Enhancement
+
+- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
+- feat: More stuff broken, but it's getting there ([@Quenty](https://github.com/Quenty))
+- feat: Broken observable list ([@Quenty](https://github.com/Quenty))
+- feat: Add unfinished observable sorted list ([@Quenty](https://github.com/Quenty))
+- feat: Add __iter implementations ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Slightly cleaner code ([@Quenty](https://github.com/Quenty))
+- perf: Improve iteration perf ([@Quenty](https://github.com/Quenty))
+- fix: Fix some state issues and improve performance ([@Quenty](https://github.com/Quenty))
+- fix: Apparently working list ([@Quenty](https://github.com/Quenty))
+- perf: Use ObservableSubscriptionTable and stop debug validating integrity ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

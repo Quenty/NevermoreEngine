@@ -1,3 +1,21 @@
+# v7.9.0 (Wed Nov 06 2024)
+
+#### 🚀 Enhancement
+
+- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Update docs ([@Quenty](https://github.com/Quenty))
+- perf: Better perf check on category ([@Quenty](https://github.com/Quenty))
+- refactor: Event handling is reusable for classes besides Signal ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# (Wed Nov 06 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/avatareditorutils@7.13.0`, `@quenty/bodycolorsutils@7.12.0`, `@quenty/buttonhighlightmodel@14.12.0`, `@quenty/characterutils@12.12.0`, `@quenty/cooldown@11.14.0`, `@quenty/datastore@13.14.0`, `@quenty/gameconfig@12.16.0`, `@quenty/observablecollection@12.12.0`, `@quenty/promise@10.8.0`, `@quenty/rectutils@1.1.0`, `@quenty/rx@13.12.0`, `@quenty/scoredactionservice@16.16.0`, `@quenty/signal@7.9.0`, `@quenty/soundplayer@7.13.0`, `@quenty/statestack@14.13.0`, `@quenty/symbol@3.3.0`, `@quenty/tie@10.14.0`, `@quenty/uiobjectutils@6.11.0`
+  - feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Nov 04 2024)
 
 #### 🐛 Bug Fix
