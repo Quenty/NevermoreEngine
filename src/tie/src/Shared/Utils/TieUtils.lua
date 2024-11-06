@@ -2,6 +2,10 @@
 	@class TieUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local Symbol = require("Symbol")
+
 local TieUtils = {}
 
 --[=[
@@ -16,7 +20,8 @@ function TieUtils.encode(...)
 	for i=1, results.n do
 		if type(results[i]) == "table"
 			or type(results[i])  == "function"
-			or typeof(results[i]) == "userdata" then -- newproxy() symbols
+			or typeof(results[i]) == "userdata" -- newproxy() symbols
+			or Symbol.isSymbol(results[i]) then
 
 			local saved = results[i]
 			results[i] = function()
