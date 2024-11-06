@@ -1,28 +1,30 @@
-# v13.12.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableSubscriptionTable:Fail(key) ([@Quenty](https://github.com/Quenty))
-- feat: Optimize memory and perf with combineLatestDefer ([@Quenty](https://github.com/Quenty))
-- feat: Add unfinished observable sorted list ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Make perf slightly better ([@Quenty](https://github.com/Quenty))
-- perf: Check canFire() and cache result ([@Quenty](https://github.com/Quenty))
-- fix: Better stack traces ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.11.1...@quenty/rx@13.12.0) (2024-11-06)
+
+
+### Bug Fixes
+
+* Better stack traces ([247ce9b](https://github.com/Quenty/NevermoreEngine/commit/247ce9bd97753dec8c8fd6674f93cba2c7deca05))
+
+
+### Features
+
+* Add ObservableSubscriptionTable:Fail(key) ([0bb3fae](https://github.com/Quenty/NevermoreEngine/commit/0bb3faeaff104fe924122a7274a47539cd88350a))
+* Add unfinished observable sorted list ([c7e9817](https://github.com/Quenty/NevermoreEngine/commit/c7e9817f07c9431e5f7cdf1fa2e700d3b3277f60))
+* Optimize memory and perf with combineLatestDefer ([3bed556](https://github.com/Quenty/NevermoreEngine/commit/3bed55667c3c795402260575f57132404b906112))
+
+
+### Performance Improvements
+
+* Check canFire() and cache result ([34fc3d9](https://github.com/Quenty/NevermoreEngine/commit/34fc3d98ca9d1dbece1d1f82f40519e986cdd5fb))
+
+
+
+
 
 ## [13.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.11.0...@quenty/rx@13.11.1) (2024-11-04)
 

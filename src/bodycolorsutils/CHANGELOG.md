@@ -1,23 +1,18 @@
-# v7.12.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: BodyColor observation is done correctly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.11.1...@quenty/bodycolorsutils@7.12.0) (2024-11-06)
+
+
+### Bug Fixes
+
+* BodyColor observation is done correctly ([b1c74cf](https://github.com/Quenty/NevermoreEngine/commit/b1c74cf3e5ae33733fca3cf29806713b70094036))
+
+
+
+
 
 ## [7.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.11.0...@quenty/bodycolorsutils@7.11.1) (2024-11-04)
 

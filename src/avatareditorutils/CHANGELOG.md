@@ -1,20 +1,18 @@
-# v7.13.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-- feat: Promise avatar rules properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.12.1...@quenty/avatareditorutils@7.13.0) (2024-11-06)
+
+
+### Features
+
+* Promise avatar rules properly ([66a3833](https://github.com/Quenty/NevermoreEngine/commit/66a38333ffcf2af788ae7356b8e1fb4169114556))
+
+
+
+
 
 ## [7.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.12.0...@quenty/avatareditorutils@7.12.1) (2024-11-04)
 

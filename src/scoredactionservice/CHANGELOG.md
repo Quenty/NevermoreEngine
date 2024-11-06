@@ -1,23 +1,18 @@
-# v16.16.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Don't check if we're cleaned up ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [16.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.15.1...@quenty/scoredactionservice@16.16.0) (2024-11-06)
+
+
+### Bug Fixes
+
+* Don't check if we're cleaned up ([49aa695](https://github.com/Quenty/NevermoreEngine/commit/49aa695fba74b91225109eb2dbe0f14407facbdd))
+
+
+
+
 
 ## [16.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.15.0...@quenty/scoredactionservice@16.15.1) (2024-11-04)
 

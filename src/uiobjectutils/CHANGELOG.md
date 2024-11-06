@@ -1,24 +1,23 @@
-# v6.11.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: clip state computes zero for unparented items ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.10.1...@quenty/uiobjectutils@6.11.0) (2024-11-06)
+
+
+### Bug Fixes
+
+* clip state computes zero for unparented items ([8d355c1](https://github.com/Quenty/NevermoreEngine/commit/8d355c18fc228290ae2587d62586c0a9fb2f1c78))
+
+
+### Features
+
+* Add RxClippedRectUtils.observeClippedRect(gui) ([26d5933](https://github.com/Quenty/NevermoreEngine/commit/26d593345b0f8f9af90042da826a7cc656c67713))
+
+
+
+
 
 ## [6.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.10.0...@quenty/uiobjectutils@6.10.1) (2024-11-04)
 

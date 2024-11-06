@@ -1,20 +1,18 @@
-# v14.13.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-- feat: Add StateStack:PushBrio ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.12.1...@quenty/statestack@14.13.0) (2024-11-06)
+
+
+### Features
+
+* Add StateStack:PushBrio ([afec365](https://github.com/Quenty/NevermoreEngine/commit/afec365f8437db31579088461d0026a788a8bf5f))
+
+
+
+
 
 ## [14.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.12.0...@quenty/statestack@14.12.1) (2024-11-04)
 

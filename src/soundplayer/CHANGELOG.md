@@ -1,20 +1,18 @@
-# v7.13.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-- feat: Use Rx.combineLatestDefer ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.12.1...@quenty/soundplayer@7.13.0) (2024-11-06)
+
+
+### Features
+
+* Use Rx.combineLatestDefer ([3ca0d3f](https://github.com/Quenty/NevermoreEngine/commit/3ca0d3f50347ed52cd3b6f6afe4ee5ddebf3b441))
+
+
+
+
 
 ## [7.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.12.0...@quenty/soundplayer@7.12.1) (2024-11-04)
 

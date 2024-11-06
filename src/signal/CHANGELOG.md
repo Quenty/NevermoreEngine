@@ -1,25 +1,18 @@
-# v7.9.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Update docs ([@Quenty](https://github.com/Quenty))
-- perf: Better perf check on category ([@Quenty](https://github.com/Quenty))
-- refactor: Event handling is reusable for classes besides Signal ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.8.1...@quenty/signal@7.9.0) (2024-11-06)
+
+
+### Performance Improvements
+
+* Better perf check on category ([594d5bb](https://github.com/Quenty/NevermoreEngine/commit/594d5bb8f56817b501f7c47053615d6cc3f8e313))
+
+
+
+
 
 ## [7.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.8.0...@quenty/signal@7.8.1) (2024-11-04)
 

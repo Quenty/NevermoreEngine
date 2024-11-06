@@ -1,20 +1,18 @@
-# v10.14.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-- feat: Specifically check for symbols ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.13.1...@quenty/tie@10.14.0) (2024-11-06)
+
+
+### Features
+
+* Specifically check for symbols ([374df56](https://github.com/Quenty/NevermoreEngine/commit/374df56f1692ff707d9f25b85f92a37c972dd089))
+
+
+
+
 
 ## [10.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.13.0...@quenty/tie@10.13.1) (2024-11-04)
 

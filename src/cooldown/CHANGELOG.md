@@ -1,20 +1,18 @@
-# v11.14.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-- feat: Optimize memory and perf with combineLatestDefer ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.13.1...@quenty/cooldown@11.14.0) (2024-11-06)
+
+
+### Features
+
+* Optimize memory and perf with combineLatestDefer ([3bed556](https://github.com/Quenty/NevermoreEngine/commit/3bed55667c3c795402260575f57132404b906112))
+
+
+
+
 
 ## [11.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.13.0...@quenty/cooldown@11.13.1) (2024-11-04)
 

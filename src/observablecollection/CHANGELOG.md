@@ -1,31 +1,34 @@
-# v12.12.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-- feat: More stuff broken, but it's getting there ([@Quenty](https://github.com/Quenty))
-- feat: Broken observable list ([@Quenty](https://github.com/Quenty))
-- feat: Add unfinished observable sorted list ([@Quenty](https://github.com/Quenty))
-- feat: Add __iter implementations ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Slightly cleaner code ([@Quenty](https://github.com/Quenty))
-- perf: Improve iteration perf ([@Quenty](https://github.com/Quenty))
-- fix: Fix some state issues and improve performance ([@Quenty](https://github.com/Quenty))
-- fix: Apparently working list ([@Quenty](https://github.com/Quenty))
-- perf: Use ObservableSubscriptionTable and stop debug validating integrity ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.11.1...@quenty/observablecollection@12.12.0) (2024-11-06)
+
+
+### Bug Fixes
+
+* Apparently working list ([e7a19a7](https://github.com/Quenty/NevermoreEngine/commit/e7a19a75cc06cd8df27768b89839a0b5c91d0c46))
+* Fix some state issues and improve performance ([69305a7](https://github.com/Quenty/NevermoreEngine/commit/69305a7732218a28c70d8e081238974b45da95e1))
+* Slightly cleaner code ([d0a9822](https://github.com/Quenty/NevermoreEngine/commit/d0a98220429dba24b67bbccd70fa9d90a11ac793))
+
+
+### Features
+
+* Add __iter implementations ([dd6db9a](https://github.com/Quenty/NevermoreEngine/commit/dd6db9a27c98afb4177ea950f1b3e2b22d4487d2))
+* Add unfinished observable sorted list ([c7e9817](https://github.com/Quenty/NevermoreEngine/commit/c7e9817f07c9431e5f7cdf1fa2e700d3b3277f60))
+* Broken observable list ([4f8a551](https://github.com/Quenty/NevermoreEngine/commit/4f8a551b5b1ca6ca5bc9fd9f471ab26aeefc28f9))
+* More stuff broken, but it's getting there ([d141e80](https://github.com/Quenty/NevermoreEngine/commit/d141e8007d789f47766b9ab98eebda864142a1ae))
+
+
+### Performance Improvements
+
+* Improve iteration perf ([40ebb7a](https://github.com/Quenty/NevermoreEngine/commit/40ebb7aeea5d3f6d5e292567e023638ff8f45864))
+* Use ObservableSubscriptionTable and stop debug validating integrity ([9d8e66b](https://github.com/Quenty/NevermoreEngine/commit/9d8e66b73b25f6ed087cbb38341bb9ea4a1162b4))
+
+
+
+
 
 ## [12.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.11.0...@quenty/observablecollection@12.11.1) (2024-11-04)
 

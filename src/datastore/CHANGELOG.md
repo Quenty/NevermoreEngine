@@ -1,23 +1,18 @@
-# v13.14.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix deletion checks (maybe not very well tested) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.13.2...@quenty/datastore@13.14.0) (2024-11-06)
+
+
+### Bug Fixes
+
+* Fix deletion checks (maybe not very well tested) ([71c6a99](https://github.com/Quenty/NevermoreEngine/commit/71c6a998001bd0296ce2a7e9bf9b05f304e91acc))
+
+
+
+
 
 ## [13.13.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.13.1...@quenty/datastore@13.13.2) (2024-11-04)
 

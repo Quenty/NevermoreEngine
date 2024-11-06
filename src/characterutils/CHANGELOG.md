@@ -1,23 +1,18 @@
-# v12.12.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Better stack traces ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.11.1...@quenty/characterutils@12.12.0) (2024-11-06)
+
+
+### Bug Fixes
+
+* Better stack traces ([247ce9b](https://github.com/Quenty/NevermoreEngine/commit/247ce9bd97753dec8c8fd6674f93cba2c7deca05))
+
+
+
+
 
 ## [12.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.11.0...@quenty/characterutils@12.11.1) (2024-11-04)
 

@@ -1,24 +1,19 @@
-# v14.12.0 (Wed Nov 06 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add RxClippedRectUtils.observeClippedRect(gui) [#513](https://github.com/Quenty/NevermoreEngine/pull/513) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Include dependency ([@Quenty](https://github.com/Quenty))
-- fix: Mouse scrolling scrolling check ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.11.1...@quenty/buttonhighlightmodel@14.12.0) (2024-11-06)
+
+
+### Bug Fixes
+
+* Include dependency ([2a0752d](https://github.com/Quenty/NevermoreEngine/commit/2a0752d3c9abb23d2c2fcefef1502bbb5906dc25))
+* Mouse scrolling scrolling check ([2742ac4](https://github.com/Quenty/NevermoreEngine/commit/2742ac4a10cf1e852d381231e72153c941e03f88))
+
+
+
+
 
 ## [14.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.11.0...@quenty/buttonhighlightmodel@14.11.1) (2024-11-04)
 
