@@ -77,7 +77,7 @@ function ObservableSortedList.new(isReversed, compare)
 	@prop ItemRemoved Signal<T, Symbol>
 	@within ObservableSortedList
 ]=]
-	self.ItemRemoved = Signal.new()
+	self.ItemRemoved = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when the order could have changed
@@ -497,6 +497,8 @@ function ObservableSortedList:_fireEvents()
 		self._countValue.Value = 0
 	end
 
+	if not self.Destroy then return end
+
 	-- TODO: Prevent Rx.of(itemAdded) stuff in our UI
 	for node in nodesAdded do
 		-- TODO: Prevent query slow here...?
@@ -504,11 +506,17 @@ function ObservableSortedList:_fireEvents()
 		self.ItemAdded:Fire(node.data, index, node)
 	end
 
+	if not self.Destroy then return end
+
 	for node in nodesRemoved do
 		self.ItemRemoved:Fire(node.data, node)
 	end
 
+	if not self.Destroy then return end
+
 	self.OrderChanged:Fire()
+
+	if not self.Destroy then return end
 
 	do
 		for index, node in self:_iterateNodesRange(lowestIndexChanged) do
@@ -521,6 +529,8 @@ function ObservableSortedList:_fireEvents()
 			self._indexObservers:Fire(negative, node)
 		end
 	end
+
+	if not self.Destroy then return end
 
 	if self._mainObservables:HasSubscriptions("list") then
 		-- TODO: Reuse list
