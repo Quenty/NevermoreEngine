@@ -29,16 +29,14 @@ function BoundChildCollection.new(binder, parent)
 	@prop ClassAdded Signal<T>
 	@within BoundChildCollection
 ]=]
-	self.ClassAdded = Signal.new() -- :Fire(class)
-	self._maid:GiveTask(self.ClassAdded)
+	self.ClassAdded = self._maid:Add(Signal.new()) -- :Fire(class)
 
 --[=[
 	Fires on class removal
 	@prop ClassRemoved Signal<T>
 	@within BoundChildCollection
 ]=]
-	self.ClassRemoved = Signal.new() -- :Fire(class)
-	self._maid:GiveTask(self.ClassRemoved)
+	self.ClassRemoved = self._maid:Add(Signal.new()) -- :Fire(class)
 
 	self._classes = {} -- [class] = true
 	self._size = 0

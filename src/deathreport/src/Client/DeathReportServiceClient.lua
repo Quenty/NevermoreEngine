@@ -28,20 +28,17 @@ DeathReportServiceClient.ServiceName = "DeathReportServiceClient"
 	@param serviceBag ServiceBag
 ]=]
 function DeathReportServiceClient:Init(serviceBag)
-	assert(not self.HumanoidDied, "Already initialized")
-
+	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	-- Internal
 	self._serviceBag:GetService(require("DeathReportBindersClient"))
 
-	self.NewDeathReport = Signal.new()
-	self._maid:GiveTask(self.NewDeathReport)
+	-- State
+	self.NewDeathReport = self._maid:Add(Signal.new())
 
-	self._reportProcessor = DeathReportProcessor.new()
-	self._maid:GiveTask(self._reportProcessor)
-
+	self._reportProcessor = self._maid:Add(DeathReportProcessor.new())
 	self._lastDeathReports = {}
 
 	-- Setup remote Event

@@ -26,10 +26,8 @@ function ActionManager.new()
 	self._maid = Maid.new()
 	self._actions = {}
 
-	self.ActiveAction = ValueObject.new()
-	self._maid:GiveTask(self.ActiveAction)
-
-	self.ActionAdded = Signal.new() -- :Fire(action)
+	self.ActiveAction = self._maid:Add(ValueObject.new())
+	self.ActionAdded = self._maid:Add(Signal.new()) -- :Fire(action)
 
 	-- Stop actions while tool is in play
 	self._maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(_)

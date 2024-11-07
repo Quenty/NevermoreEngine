@@ -32,11 +32,8 @@ function BaseAction.new(actionData)
 	self._contextActionKey = string.format("%s_ContextAction", tostring(self._name))
 	self._activateData = nil -- Data to be fired with the Activated event
 
-	self.Activated = Signal.new() -- :Fire(actionMaid, ... (activateData))
-	self._maid:GiveTask(self.Activated)
-
-	self.Deactivated = Signal.new() -- :Fire()
-	self._maid:GiveTask(self.Deactivated)
+	self.Activated = self._maid:Add(Signal.new()) -- :Fire(actionMaid, ... (activateData))
+	self.Deactivated = self._maid:Add(Signal.new()) -- :Fire()
 
 	self.IsActivatedValue = Instance.new("BoolValue")
 	self.IsActivatedValue.Value = false
