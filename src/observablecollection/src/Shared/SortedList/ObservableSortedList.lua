@@ -296,7 +296,7 @@ function ObservableSortedList:ObserveAtIndex(indexToObserve)
 
 	return self._indexObservers:Observe(indexToObserve)
 		:Pipe({
-			Rx.start(function()
+			Rx.map(function()
 				local node = self:_findNodeAtIndex(indexToObserve)
 				if node then
 					return node.data, node
