@@ -48,6 +48,16 @@ function MetricUtils.studsPerSecondToKph(studsPerSecond)
 end
 
 --[=[
+	Convert from studs per a second to meters per a second
+
+	@param studsPerSecond number
+	@return number -- kph
+]=]
+function MetricUtils.studsPerSecondToMetersPerSecond(studsPerSecond)
+	return studsPerSecond/STUDS_PER_METER
+end
+
+--[=[
 	Convert from studs per a second (Roblox in-game units) to mph
 	@param studsPerSecond number
 	@return number -- mph
