@@ -525,8 +525,8 @@ function ObservableSortedList:_fireEvents()
 			-- TODO: Avoid looping over nodes if we don't need to (track observations in node itself?)
 			local negative = ListIndexUtils.toNegativeIndex(self._root.descendantCount, index)
 			self._nodeIndexObservables:Fire(node, index)
-			self._indexObservers:Fire(index, node)
-			self._indexObservers:Fire(negative, node)
+			self._indexObservers:Fire(index, node.data, node)
+			self._indexObservers:Fire(negative, node.data, node)
 		end
 	end
 
