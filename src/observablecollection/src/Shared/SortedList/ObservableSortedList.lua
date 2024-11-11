@@ -20,6 +20,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
 local DuckTypeUtils = require("DuckTypeUtils")
+local ListIndexUtils = require("ListIndexUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
@@ -27,9 +28,8 @@ local Rx = require("Rx")
 local Signal = require("Signal")
 local SortedNode = require("SortedNode")
 local SortedNodeValue = require("SortedNodeValue")
-local ValueObject = require("ValueObject")
 local SortFunctionUtils = require("SortFunctionUtils")
-local ListIndexUtils = require("ListIndexUtils")
+local ValueObject = require("ValueObject")
 
 local ObservableSortedList = {}
 ObservableSortedList.ClassName = "ObservableSortedList"
@@ -116,7 +116,11 @@ end
 	@return Observable<{ T }>
 ]=]
 function ObservableSortedList:Observe()
-	return self._mainObservables:Observe("list")
+	return self._mainObservables:Observe("list"):Pipe({
+		Rx.start(function()
+			return self:GetList()
+		end)
+	})
 end
 
 --[=[
