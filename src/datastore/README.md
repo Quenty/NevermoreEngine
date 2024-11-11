@@ -18,6 +18,13 @@ This system is a reliable datastore system designed with promises and asyncronio
 ## Executive overiew
 This datastore prevents data loss by being explicit about what we're writing to, and only modifying the data that exists there instead of modifying the whole structure.
 
+## Comparison to other solutions
+
+* Not specifically locked to players
+* Native substore support for decoupled code
+* Very performant and battle tested
+* Native Rx and Promise implementation
+
 ## How syncing works
 Sometimes datastores (like a global game data store) need to be synced live instead of upon server or player start. This is if we expect multiple servers to write to the same datastore at once we can use thie sync method to 
 
