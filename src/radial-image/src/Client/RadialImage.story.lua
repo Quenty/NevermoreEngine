@@ -24,7 +24,7 @@ return function(target)
 		-- radialImage:SetPercent((os.clock()/5) % 1)
 
 		local scale = (1 + math.sin((os.clock()/5)*math.pi*2))/2
-		radialImage.Gui.Size = UDim2.fromOffset(scale*90, scale*90)
+		radialImage.Gui.Size = UDim2.fromOffset(math.round(scale*90), math.round(scale*90))
 	end))
 
 	radialImage.Gui.Parent = target
