@@ -33,6 +33,7 @@
     "@quenty/datastore": "file:../datastore",
     "@quenty/ducktype": "file:../ducktype",
     "@quenty/enumutils": "file:../enumutils",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/jsonutils": "file:../jsonutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
