@@ -1,3 +1,16 @@
+# (Tue Nov 12 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/actionmanager@13.13.0`, `@quenty/binder@14.14.0`, `@quenty/boundlinkutils@14.14.0`, `@quenty/datastore@13.15.0`, `@quenty/deathreport@10.15.0`, `@quenty/ik@15.17.0`, `@quenty/inputkeymaputils@14.16.0`, `@quenty/metricutils@2.4.0`, `@quenty/observablecollection@12.13.0`, `@quenty/radial-image@9.13.0`, `@quenty/tie@10.15.0`
+  - feat: Sorted list improvements [#518](https://github.com/Quenty/NevermoreEngine/pull/518) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Nov 06 2024)
 
 #### 🚀 Enhancement
