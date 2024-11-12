@@ -1448,14 +1448,12 @@ function Rx.combineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
 	return Observable.new(function(sub)
-		local pending = 0
 		local unset = 0
 		local latest = {}
 
 		-- Instead of caching this, use extra compute here
 		for key, value in pairs(observables) do
 			if Observable.isObservable(value) then
-				pending += 1
 				unset += 1
 				latest[key] = UNSET_VALUE
 			else
@@ -1463,12 +1461,13 @@ function Rx.combineLatest(observables)
 			end
 		end
 
-		if pending == 0 then
+		if unset == 0 then
 			sub:Fire(latest)
 			sub:Complete()
 			return
 		end
 
+		local pending = unset
 		local maid = Maid.new()
 
 		local function failOnFirst(...)
