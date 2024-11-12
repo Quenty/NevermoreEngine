@@ -93,8 +93,7 @@ function InputKeyMapListUtils.observeActiveInputModeType(inputKeyMapList, servic
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local selector = InputKeyMapListUtils.getNewInputModeTypeSelector(inputKeyMapList, serviceBag)
-		maid:GiveTask(selector)
+		local selector = maid:Add(InputKeyMapListUtils.getNewInputModeTypeSelector(inputKeyMapList, serviceBag))
 
 		maid:GiveTask(selector.Changed:Connect(function()
 			sub:Fire(selector.Value)

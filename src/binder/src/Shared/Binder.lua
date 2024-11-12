@@ -345,8 +345,8 @@ function Binder:GetClassAddedSignal()
 		return self._classAddedSignal
 	end
 
-	self._classAddedSignal = Signal.new() -- :fire(class, inst)
-	self._maid:GiveTask(self._classAddedSignal)
+	self._classAddedSignal = self._maid:Add(Signal.new()) -- :fire(class, inst)
+
 	return self._classAddedSignal
 end
 
@@ -360,8 +360,7 @@ function Binder:GetClassRemovingSignal()
 		return self._classRemovingSignal
 	end
 
-	self._classRemovingSignal = Signal.new() -- :fire(class, inst)
-	self._maid:GiveTask(self._classRemovingSignal)
+	self._classRemovingSignal = self._maid:Add(Signal.new()) -- :fire(class, inst)
 
 	return self._classRemovingSignal
 end
@@ -376,8 +375,7 @@ function Binder:GetClassRemovedSignal()
 		return self._classRemovedSignal
 	end
 
-	self._classRemovedSignal = Signal.new() -- :fire(class, inst)
-	self._maid:GiveTask(self._classRemovedSignal)
+	self._classRemovedSignal = self._maid:Add(Signal.new()) -- :fire(class, inst)
 
 	return self._classRemovedSignal
 end

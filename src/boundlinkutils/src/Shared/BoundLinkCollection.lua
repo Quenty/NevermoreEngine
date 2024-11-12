@@ -22,8 +22,8 @@ function BoundLinkCollection.new(binder, linkName, parent)
 	self._linkName = linkName or error("No linkName")
 	self._binder = binder or error("No binder")
 
-	self.ClassAdded = Signal.new() -- :Fire(class)
-	self.ClassRemoved = Signal.new() -- :Fire(class)
+	self.ClassAdded = self._maid:Add(Signal.new()) -- :Fire(class)
+	self.ClassRemoved = self._maid:Add(Signal.new()) -- :Fire(class)
 
 	self._classes = {} -- [class] = true
 	self._canidates = {} -- [inst] = { [objValue] = true }
