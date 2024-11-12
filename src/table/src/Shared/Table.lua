@@ -340,6 +340,17 @@ function Table.readonly(target)
 end
 
 --[=[
+	Sets a metatable on a table such that it errors when
+	indexing a nil value
+
+	@param target table -- Table to error on indexing
+	@return table -- The same table, with the target set to error on nil
+]=]
+function Table.errorOnNilIndex(target)
+	return setmetatable(target, READ_ONLY_METATABLE)
+end
+
+--[=[
 	Recursively sets the table as ReadOnly
 
 	@param target table -- Table to error on indexing
