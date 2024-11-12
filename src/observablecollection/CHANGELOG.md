@@ -1,24 +1,19 @@
-# v12.13.0 (Tue Nov 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Sorted list improvements [#518](https://github.com/Quenty/NevermoreEngine/pull/518) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix index observers firing ([@Quenty](https://github.com/Quenty))
-- fix: Apply improvements to ObservableSortedList while it's cleaning up ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.12.0...@quenty/observablecollection@12.13.0) (2024-11-12)
+
+
+### Bug Fixes
+
+* Apply improvements to ObservableSortedList while it's cleaning up ([ce7650a](https://github.com/Quenty/NevermoreEngine/commit/ce7650ada50f420d506210d8902fb927c35bde7c))
+* Fix index observers firing ([9bea5b6](https://github.com/Quenty/NevermoreEngine/commit/9bea5b69067b3be1db8a91135250c660e2588668))
+
+
+
+
 
 # [12.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.11.1...@quenty/observablecollection@12.12.0) (2024-11-06)
 

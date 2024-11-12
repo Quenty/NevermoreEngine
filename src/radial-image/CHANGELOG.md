@@ -1,23 +1,18 @@
-# v9.13.0 (Tue Nov 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Sorted list improvements [#518](https://github.com/Quenty/NevermoreEngine/pull/518) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Round radial image scale because of roblox int truncating ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.12.0...@quenty/radial-image@9.13.0) (2024-11-12)
+
+
+### Bug Fixes
+
+* Round radial image scale because of roblox int truncating ([d1dc66d](https://github.com/Quenty/NevermoreEngine/commit/d1dc66d2f95e5bb1cd0e253a3bd2867e07be7d57))
+
+
+
+
 
 # [9.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.11.1...@quenty/radial-image@9.12.0) (2024-11-06)
 

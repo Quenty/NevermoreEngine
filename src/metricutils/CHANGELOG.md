@@ -1,20 +1,18 @@
-# v2.4.0 (Tue Nov 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Sorted list improvements [#518](https://github.com/Quenty/NevermoreEngine/pull/518) ([@Quenty](https://github.com/Quenty))
-- feat: Add MetricUtils.studsPerSecondToMetersPerSecond(studsPerSecond) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/metricutils@2.3.0...@quenty/metricutils@2.4.0) (2024-11-12)
+
+
+### Features
+
+* Add MetricUtils.studsPerSecondToMetersPerSecond(studsPerSecond) ([7e2165f](https://github.com/Quenty/NevermoreEngine/commit/7e2165fa6c028d8cea2f0c59d65f330b23ab1e2c))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/metricutils@2.2.0...@quenty/metricutils@2.3.0) (2024-05-09)
 

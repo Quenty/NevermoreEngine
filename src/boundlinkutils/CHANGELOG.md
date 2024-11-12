@@ -1,23 +1,15 @@
-# v14.14.0 (Tue Nov 12 2024)
-
-#### 🚀 Enhancement
-
-- feat: Sorted list improvements [#518](https://github.com/Quenty/NevermoreEngine/pull/518) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Use maid:Add() in more places ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundlinkutils@14.13.0...@quenty/boundlinkutils@14.14.0) (2024-11-12)
+
+**Note:** Version bump only for package @quenty/boundlinkutils
+
+
+
+
 
 # [14.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundlinkutils@14.12.1...@quenty/boundlinkutils@14.13.0) (2024-11-06)
 
