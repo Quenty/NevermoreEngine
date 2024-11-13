@@ -1,3 +1,16 @@
+# (Wed Nov 13 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/observablecollection@12.14.0`, `@quenty/rx@13.13.0`, `@quenty/settings@11.17.0`, `@quenty/table@3.7.0`, `@quenty/templateprovider@11.12.0`
+  - fix: Fix :Observe() method in ObservableSortedList [#519](https://github.com/Quenty/NevermoreEngine/pull/519) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Nov 12 2024)
 
 #### 🚀 Enhancement

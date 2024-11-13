@@ -1,3 +1,16 @@
+# v3.7.0 (Wed Nov 13 2024)
+
+#### 🚀 Enhancement
+
+- fix: Fix :Observe() method in ObservableSortedList [#519](https://github.com/Quenty/NevermoreEngine/pull/519) ([@Quenty](https://github.com/Quenty))
+- feat: Add Table.errorOnNilIndex(target) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
