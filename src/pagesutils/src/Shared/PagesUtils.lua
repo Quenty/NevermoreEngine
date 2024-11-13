@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
+local PagesProxy = require("PagesProxy")
 
 local PagesUtils = {}
 
@@ -16,7 +17,7 @@ local PagesUtils = {}
 	@return { any }
 ]=]
 function PagesUtils.promiseAdvanceToNextPage(pages)
-	assert(typeof(pages) == "Instance" and pages:IsA("Pages"),"Bad pages")
+	assert(typeof(pages) == "Instance" and pages:IsA("Pages") or PagesProxy.isPagesProxy(pages),"Bad pages")
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
