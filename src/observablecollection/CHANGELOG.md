@@ -1,23 +1,18 @@
-# v12.14.0 (Wed Nov 13 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix :Observe() method in ObservableSortedList [#519](https://github.com/Quenty/NevermoreEngine/pull/519) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix :Observe() method in ObservableSortedList ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.13.0...@quenty/observablecollection@12.14.0) (2024-11-13)
+
+
+### Bug Fixes
+
+* Fix :Observe() method in ObservableSortedList ([be780db](https://github.com/Quenty/NevermoreEngine/commit/be780db4695e9eee73aeef0600f6d2ebb14bc923))
+
+
+
+
 
 # [12.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.12.0...@quenty/observablecollection@12.13.0) (2024-11-12)
 

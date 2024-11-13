@@ -1,23 +1,18 @@
-# v11.12.0 (Wed Nov 13 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix :Observe() method in ObservableSortedList [#519](https://github.com/Quenty/NevermoreEngine/pull/519) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix imports on template provider ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.11.0...@quenty/templateprovider@11.12.0) (2024-11-13)
+
+
+### Bug Fixes
+
+* Fix imports on template provider ([cd4d0d8](https://github.com/Quenty/NevermoreEngine/commit/cd4d0d82a87e31683ac8f4948962e2735ce28972))
+
+
+
+
 
 # [11.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.10.0...@quenty/templateprovider@11.11.0) (2024-11-12)
 
