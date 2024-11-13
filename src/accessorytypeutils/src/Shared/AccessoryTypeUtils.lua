@@ -4,6 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local EnumUtils = require("EnumUtils")
+
 local AvatarEditorService = game:GetService("AvatarEditorService")
 
 local AccessoryTypeUtils = {}
@@ -40,34 +42,22 @@ end
 	@param assetTypeId number
 	@return AssetType | nl
 ]=]
-function AccessoryTypeUtils.convertAssetTypeIdToAssetType(assetTypeId): AssetType
+function AccessoryTypeUtils.convertAssetTypeIdToAssetType(assetTypeId: number): AssetType?
 	assert(type(assetTypeId) == "number", "Bad assetTypeId")
 
-	for _, enumItem in pairs(Enum.AssetType:GetEnumItems()) do
-		if enumItem.Value == assetTypeId then
-			return enumItem
-		end
-	end
-
-	return nil
+	return EnumUtils.toEnum(Enum.AssetType, assetTypeId)
 end
 
 --[=[
 	Converts an enum value (retrieved from MarketplaceService) into a proper enum if possible
 
-	@param assetTypeId number
+	@param avatarAssetTypeId number
 	@return AvatarAssetType | nil
 ]=]
-function AccessoryTypeUtils.convertAssetTypeIdToAvatarAssetType(assetTypeId): AvatarAssetType
-	assert(type(assetTypeId) == "number", "Bad assetTypeId")
+function AccessoryTypeUtils.convertAssetTypeIdToAvatarAssetType(avatarAssetTypeId: number): AvatarAssetType?
+	assert(type(avatarAssetTypeId) == "number", "Bad avatarAssetTypeId")
 
-	for _, enumItem in pairs(Enum.AvatarAssetType:GetEnumItems()) do
-		if enumItem.Value == assetTypeId then
-			return enumItem
-		end
-	end
-
-	return nil
+	return EnumUtils.toEnum(Enum.AvatarAssetType, avatarAssetTypeId)
 end
 
 return AccessoryTypeUtils
