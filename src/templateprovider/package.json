@@ -37,7 +37,8 @@
     "@quenty/promise": "file:../promise",
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/rx": "file:../rx",
-    "@quenty/string": "file:../string"
+    "@quenty/string": "file:../string",
+    "@quenty/table": "file:../table"
   },
   "publishConfig": {
     "access": "public"
