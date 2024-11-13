@@ -101,7 +101,10 @@ function PlayerProductManagerBase.new(player, serviceBag)
 	end)
 
 	subscriptionOwnership:SetQueryOwnershipCallback(function(subscriptionId)
-		return MarketplaceUtils.promisePlayerOwnsBundle(self._player, subscriptionId)
+		return MarketplaceUtils.promiseUserSubscriptionStatus(self._player, subscriptionId)
+			:Then(function(status)
+				return status.IsSubscribed == true
+			end)
 	end)
 
 	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)

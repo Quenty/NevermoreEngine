@@ -193,7 +193,7 @@ function PlayerAssetOwnershipTracker:PromiseOwnsAsset(idOrKey)
 		end
 	end
 
-local id = self._configPicker:ToAssetId(self._assetType, idOrKey)
+	local id = self._configPicker:ToAssetId(self._assetType, idOrKey)
 	if id then
 		if self._ownedAssetIdSet:Contains(id) then
 			return Promise.resolved(true)
@@ -283,11 +283,8 @@ function PlayerAssetOwnershipTracker:_cacheWellKnownAssets()
 			return
 		end
 
-		local gameConfigMaid = brio:ToMaid()
-		local gameConfigAsset = brio:GetValue()
-
-		local wellKnownHandler = WellKnownAssetOwnershipHandler.new(self._player, gameConfigAsset)
-		gameConfigMaid:GiveTask(wellKnownHandler)
+		local gameConfigMaid, gameConfigAsset = brio:ToMaidAndValue()
+		local wellKnownHandler = gameConfigMaid:Add(WellKnownAssetOwnershipHandler.new(self._player, gameConfigAsset))
 
 		gameConfigMaid:GiveTask(Rx.combineLatest({
 			ownershipCallback = self._ownershipCallback:Observe();
