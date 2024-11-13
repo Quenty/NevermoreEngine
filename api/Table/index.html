@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v2.3.1">
 <title data-rh="true">Table | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/Table"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="Table | Nevermore"><meta data-rh="true" name="description" content="Provide a variety of utility table operations"><meta data-rh="true" property="og:description" content="Provide a variety of utility table operations"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Table"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Table" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Table" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.064ade8b.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.f2771fe8.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.9d0d0b44.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.ac4436f8.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -145,7 +145,16 @@
   Sets a metatable on a table such that it errors when
   indexing a nil value
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="deepReadonly"><code style="text-decoration:none">deepReadonly</code><a href="#deepReadonly" class="hash-link" aria-label="Direct link to deepReadonly" title="Direct link to deepReadonly">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/table/src/Shared/Table.lua#L348"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Table<!-- -->.</code><code class="green_DgR4">deepReadonly</code><code>(</code><div class="inset_uKQm"><div><code>target<!-- -->: </code><code class="blue_P4bS">table</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="errorOnNilIndex"><code style="text-decoration:none">errorOnNilIndex</code><a href="#errorOnNilIndex" class="hash-link" aria-label="Direct link to errorOnNilIndex" title="Direct link to errorOnNilIndex">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/table/src/Shared/Table.lua#L349"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Table<!-- -->.</code><code class="green_DgR4">errorOnNilIndex</code><code>(</code><div class="inset_uKQm"><div><code>target<!-- -->: </code><code class="blue_P4bS">table</code><span class="inlineDescription_G7Er">-- <span>
+<p>Table to error on indexing</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS">table</code><span class="inlineDescription_G7Er">-- <span>
+<p>The same table, with the target set to error on nil</p>
+</span></span></div><div>
+<p>
+  Sets a metatable on a table such that it errors when
+  indexing a nil value
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="deepReadonly"><code style="text-decoration:none">deepReadonly</code><a href="#deepReadonly" class="hash-link" aria-label="Direct link to deepReadonly" title="Direct link to deepReadonly">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/table/src/Shared/Table.lua#L359"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Table<!-- -->.</code><code class="green_DgR4">deepReadonly</code><code>(</code><div class="inset_uKQm"><div><code>target<!-- -->: </code><code class="blue_P4bS">table</code><span class="inlineDescription_G7Er">-- <span>
 <p>Table to error on indexing</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">table</code><span class="inlineDescription_G7Er">-- <span>
 <p>The same table</p>
@@ -636,6 +645,28 @@
             }
         },
         {
+            &quot;name&quot;: &quot;errorOnNilIndex&quot;,
+            &quot;desc&quot;: &quot;Sets a metatable on a table such that it errors when\nindexing a nil value&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;target&quot;,
+                    &quot;desc&quot;: &quot;Table to error on indexing&quot;,
+                    &quot;lua_type&quot;: &quot;table&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;The same table, with the target set to error on nil&quot;,
+                    &quot;lua_type&quot;: &quot;table&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 349,
+                &quot;path&quot;: &quot;src/table/src/Shared/Table.lua&quot;
+            }
+        },
+        {
             &quot;name&quot;: &quot;deepReadonly&quot;,
             &quot;desc&quot;: &quot;Recursively sets the table as ReadOnly&quot;,
             &quot;params&quot;: [
@@ -653,7 +684,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 348,
+                &quot;line&quot;: 359,
                 &quot;path&quot;: &quot;src/table/src/Shared/Table.lua&quot;
             }
         }
@@ -666,8 +697,8 @@
         &quot;line&quot;: 5,
         &quot;path&quot;: &quot;src/table/src/Shared/Table.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#append" class="table-of-contents__link toc-highlight">.append</a></li><li><a href="#contains" class="table-of-contents__link toc-highlight">.contains</a></li><li><a href="#count" class="table-of-contents__link toc-highlight">.count</a></li><li><a href="#deepCopy" class="table-of-contents__link toc-highlight">.deepCopy</a></li><li><a href="#deepEquivalent" class="table-of-contents__link toc-highlight">.deepEquivalent</a></li><li><a href="#deepOverwrite" class="table-of-contents__link toc-highlight">.deepOverwrite</a></li><li><a href="#deepReadonly" class="table-of-contents__link toc-highlight">.deepReadonly</a></li><li><a href="#getIndex" class="table-of-contents__link toc-highlight">.getIndex</a></li><li><a href="#keys" class="table-of-contents__link toc-highlight">.keys</a></li><li><a href="#merge" class="table-of-contents__link toc-highlight">.merge</a></li><li><a href="#mergeLists" class="table-of-contents__link toc-highlight">.mergeLists</a></li><li><a href="#overwrite" class="table-of-contents__link toc-highlight">.overwrite</a></li><li><a href="#readonly" class="table-of-contents__link toc-highlight">.readonly</a></li><li><a href="#reverse" class="table-of-contents__link toc-highlight">.reverse</a></li><li><a href="#stringify" class="table-of-contents__link toc-highlight">.stringify</a></li><li><a href="#swapKeyValue" class="table-of-contents__link toc-highlight">.swapKeyValue</a></li><li><a href="#Table.copy" class="table-of-contents__link toc-highlight">.Table.copy</a></li><li><a href="#take" class="table-of-contents__link toc-highlight">.take</a></li><li><a href="#toList" class="table-of-contents__link toc-highlight">.toList</a></li><li><a href="#values" class="table-of-contents__link toc-highlight">.values</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.064ade8b.js"></script>
-<script src="/NevermoreEngine/assets/js/main.f2771fe8.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#append" class="table-of-contents__link toc-highlight">.append</a></li><li><a href="#contains" class="table-of-contents__link toc-highlight">.contains</a></li><li><a href="#count" class="table-of-contents__link toc-highlight">.count</a></li><li><a href="#deepCopy" class="table-of-contents__link toc-highlight">.deepCopy</a></li><li><a href="#deepEquivalent" class="table-of-contents__link toc-highlight">.deepEquivalent</a></li><li><a href="#deepOverwrite" class="table-of-contents__link toc-highlight">.deepOverwrite</a></li><li><a href="#deepReadonly" class="table-of-contents__link toc-highlight">.deepReadonly</a></li><li><a href="#errorOnNilIndex" class="table-of-contents__link toc-highlight">.errorOnNilIndex</a></li><li><a href="#getIndex" class="table-of-contents__link toc-highlight">.getIndex</a></li><li><a href="#keys" class="table-of-contents__link toc-highlight">.keys</a></li><li><a href="#merge" class="table-of-contents__link toc-highlight">.merge</a></li><li><a href="#mergeLists" class="table-of-contents__link toc-highlight">.mergeLists</a></li><li><a href="#overwrite" class="table-of-contents__link toc-highlight">.overwrite</a></li><li><a href="#readonly" class="table-of-contents__link toc-highlight">.readonly</a></li><li><a href="#reverse" class="table-of-contents__link toc-highlight">.reverse</a></li><li><a href="#stringify" class="table-of-contents__link toc-highlight">.stringify</a></li><li><a href="#swapKeyValue" class="table-of-contents__link toc-highlight">.swapKeyValue</a></li><li><a href="#Table.copy" class="table-of-contents__link toc-highlight">.Table.copy</a></li><li><a href="#take" class="table-of-contents__link toc-highlight">.take</a></li><li><a href="#toList" class="table-of-contents__link toc-highlight">.toList</a></li><li><a href="#values" class="table-of-contents__link toc-highlight">.values</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.9d0d0b44.js"></script>
+<script src="/NevermoreEngine/assets/js/main.ac4436f8.js"></script>
 </body>
 </html>
