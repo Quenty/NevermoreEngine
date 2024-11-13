@@ -1,12 +1,12 @@
 {
-  "name": "@quenty/userserviceutils",
-  "version": "9.14.0",
-  "description": "Utilities involving UserService in Roblox",
+  "name": "@quenty/aggregator",
+  "version": "1.0.0",
+  "description": "Aggregates async promise requests",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "Vector"
+    "aggregator"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/userserviceutils/"
+    "directory": "src/aggregator/"
   },
   "funding": {
     "type": "patreon",
@@ -25,14 +25,11 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/aggregator": "file:../aggregator",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
+    "@quenty/lrucache": "file:../lrucache",
     "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/rx": "file:../rx"
   },
   "publishConfig": {
     "access": "public"
