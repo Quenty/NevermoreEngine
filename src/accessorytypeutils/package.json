@@ -25,6 +25,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/enumutils": "file:../enumutils",
     "@quenty/loader": "file:../loader"
   },
   "publishConfig": {

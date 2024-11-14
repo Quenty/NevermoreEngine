@@ -8,11 +8,16 @@ local require = require(script.Parent.loader).load(script)
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 
+local AvatarEditorInventoryServiceClient = require("AvatarEditorInventoryServiceClient")
 local Binder = require("Binder")
+local CatalogSearchServiceCache = require("CatalogSearchServiceCache")
+local EnumUtils = require("EnumUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local MarketplaceUtils = require("MarketplaceUtils")
 local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Remoting = require("Remoting")
+local Promise = require("Promise")
 
 local PlayerProductManagerClient = setmetatable({}, PlayerProductManagerBase)
 PlayerProductManagerClient.ClassName = "PlayerProductManagerClient"
@@ -20,6 +25,9 @@ PlayerProductManagerClient.__index = PlayerProductManagerClient
 
 function PlayerProductManagerClient.new(obj, serviceBag)
 	local self = setmetatable(PlayerProductManagerBase.new(obj, serviceBag), PlayerProductManagerClient)
+
+	self._avatarEditorInventoryServiceClient = self._serviceBag:GetService(AvatarEditorInventoryServiceClient)
+	self._catalogSearchServiceCache = self._serviceBag:GetService(CatalogSearchServiceCache)
 
 	if self._obj == Players.LocalPlayer then
 		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager", Remoting.Realms.CLIENT))
@@ -40,7 +48,6 @@ function PlayerProductManagerClient.new(obj, serviceBag)
 	return self
 end
 
-
 --[=[
 	Gets the current player
 	@return Player
@@ -51,6 +58,11 @@ end
 
 function PlayerProductManagerClient:_setupAssetTracker()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)
+	local assetOwnership = assert(tracker:GetOwnershipTracker(), "Missing ownershipTracker on client")
+
+	assetOwnership:SetQueryOwnershipCallback(function(assetId)
+		return self:_promiseBulkOwnsAssetQuery(assetId)
+	end)
 
 	self._maid:GiveTask(MarketplaceService.PromptPurchaseFinished:Connect(function(player, assetId, isPurchased)
 		if player == self._obj then
@@ -59,7 +71,6 @@ function PlayerProductManagerClient:_setupAssetTracker()
 			self._remoting.AssetPromptPurchaseFinished:FireServer(assetId, isPurchased)
 		end
 	end))
-
 end
 
 function PlayerProductManagerClient:_setupMembershipTracker()
@@ -180,6 +191,12 @@ end
 function PlayerProductManagerClient:_setupBundleTracker()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE)
 
+	local bundleOwnership = assert(tracker:GetOwnershipTracker(), "Missing ownershipTracker on client")
+
+	bundleOwnership:SetQueryOwnershipCallback(function(assetId)
+		return self:_promiseBulkOwnsBundleQuery(assetId, Enum.AvatarItemType.Bundle)
+	end)
+
 	self._maid:GiveTask(MarketplaceService.PromptBundlePurchaseFinished:Connect(function(player, bundleId, isPurchased)
 		if player == self._obj then
 			tracker:HandlePromptClosedEvent(bundleId)
@@ -188,6 +205,34 @@ function PlayerProductManagerClient:_setupBundleTracker()
 			self._remoting.PromptBundlePurchaseFinished:FireServer(bundleId, isPurchased)
 		end
 	end))
+end
+
+function PlayerProductManagerClient:_promiseBulkOwnsAssetQuery(assetId)
+	if self._avatarEditorInventoryServiceClient:IsInventoryAccessAllowed() then
+		-- When scrolling through a ton of entries in the avatar editor we want to query
+		-- this is typically faster. We really hope we aren't the Roblox account.
+		return self._catalogSearchServiceCache:PromiseItemDetails(assetId, Enum.AvatarItemType.Asset)
+			:Then(function(itemDetails)
+				-- https://devforum.roblox.com/t/avatareditorservicegetitemdetails-returns-ownership-where-as-avatareditorservicegetbatchitemdetails-does-not/3257431
+
+				local assetType = EnumUtils.toEnum(Enum.AvatarAssetType, itemDetails.AssetType)
+				if not assetType then
+					-- TODO: Fallback to standard query?
+					return Promise.rejected("Failed to get assetType")
+				end
+
+				return self._avatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(assetType)
+					:Then(function(inventory)
+						return inventory:IsAssetIdInInventory(assetId)
+					end)
+			end)
+	end
+
+	return MarketplaceUtils.promisePlayerOwnsAsset(self._player, assetId)
+end
+
+function PlayerProductManagerClient:_promiseBulkOwnsBundleQuery(bundleId)
+	return MarketplaceUtils.promisePlayerOwnsBundle(self._player, bundleId)
 end
 
 return Binder.new("PlayerProductManager", PlayerProductManagerClient)

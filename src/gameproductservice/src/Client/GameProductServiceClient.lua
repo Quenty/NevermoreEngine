@@ -34,8 +34,9 @@ function GameProductServiceClient:Init(serviceBag)
 	self._maid = Maid.new()
 
 	-- External
-	self._serviceBag:GetService(require("GameConfigServiceClient"))
+	self._serviceBag:GetService(require("AvatarEditorInventoryServiceClient"))
 	self._serviceBag:GetService(require("CmdrServiceClient"))
+	self._serviceBag:GetService(require("GameConfigServiceClient"))
 
 	-- Internal
 	self._gameProductDataService = self._serviceBag:GetService(require("GameProductDataService"))
