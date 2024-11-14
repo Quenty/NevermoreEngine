@@ -42,6 +42,7 @@
     "@quenty/playerutils": "file:../playerutils",
     "@quenty/preferredparentutils": "file:../preferredparentutils",
     "@quenty/promise": "file:../promise",
+    "@quenty/remoting": "file:../remoting",
     "@quenty/richtext": "file:../richtext",
     "@quenty/rx": "file:../rx",
     "@quenty/rxbinderutils": "file:../rxbinderutils",
