@@ -38,7 +38,10 @@ function ChatProviderServiceClient:Start()
 
 		local metadata = textChatMessage.Metadata
 		if metadata then
-			local isValidColor = Color3.fromHex(metadata)
+			local isValidColor = pcall(function()
+				return Color3.fromHex(metadata)
+			end)
+
 			if isValidColor then
 				local overrideProperties = Instance.new("TextChatMessageProperties")
 				overrideProperties.Text = `<font color="#{metadata}">{textChatMessage.Text}</font>`
