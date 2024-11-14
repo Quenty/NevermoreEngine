@@ -19,8 +19,6 @@ function ChatProviderServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._systemMessageColors = {}
-
 	-- State
 	self.MessageIncoming = self._maid:Add(Signal.new())
 
@@ -40,10 +38,10 @@ function ChatProviderServiceClient:Start()
 
 		local metadata = textChatMessage.Metadata
 		if metadata then
-			local systemColorProperties = self._systemMessageColors[metadata]
-			if systemColorProperties then
+			local isValidColor = Color3.fromHex(metadata)
+			if isValidColor then
 				local overrideProperties = Instance.new("TextChatMessageProperties")
-				overrideProperties.Text = string.format(systemColorProperties.Text, textChatMessage.Text)
+				overrideProperties.Text = `<font color="#{metadata}">{textChatMessage.Text}</font>`
 
 				return overrideProperties
 			end
@@ -66,24 +64,10 @@ function ChatProviderServiceClient:Start()
 	end
 end
 
-function ChatProviderServiceClient:SendSystemMessage(channel, message, color)
-	if not message then
-		return
-	end
-
+function ChatProviderServiceClient:SendSystemMessage(channel: TextChannel, message: string, color: Color3?)
 	assert(typeof(channel) == "Instance" and channel.ClassName == "TextChannel", "[ChatProviderServiceClient.SendSystemMessage] - Bad channel")
+	assert(typeof(message) == "string", "[ChatProviderServiceClient.SendSystemMessage] - Bad message")
 	assert(typeof(color) == "Color3" or color == nil, "[ChatProviderServiceClient.SendSystemMessage] - Bad color")
-
-	if color then
-		local hex = color:ToHex()
-
-		if not self._systemMessageColors[hex] then
-			local overrideProperties = Instance.new("TextChatMessageProperties")
-			overrideProperties.Text = `<font color="#{hex}">%s</font>`
-
-			self._systemMessageColors[hex] = overrideProperties
-		end
-	end
 
 	channel:DisplaySystemMessage(message, color and color:ToHex())
 end
