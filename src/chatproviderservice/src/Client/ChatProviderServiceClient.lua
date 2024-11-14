@@ -4,8 +4,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TextChatService = game:GetService("TextChatService")
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
 
 local Maid = require("Maid")
 local Signal = require("Signal")
@@ -38,15 +39,22 @@ function ChatProviderServiceClient:Start()
 
 		local metadata = textChatMessage.Metadata
 		if metadata then
-			local isValidColor = pcall(function()
-				return Color3.fromHex(metadata)
+			local success, decodedMessageData = pcall(function()
+				return HttpService:JSONDecode(metadata)
 			end)
 
-			if isValidColor then
-				local overrideProperties = Instance.new("TextChatMessageProperties")
-				overrideProperties.Text = `<font color="#{metadata}">{textChatMessage.Text}</font>`
+			if success and decodedMessageData then
+				local color = decodedMessageData.Color or "#ffffff"
+				local isValidHex = pcall(function()
+					return Color3.fromHex(color)
+				end)
 
-				return overrideProperties
+				if isValidHex then
+					local overrideProperties = Instance.new("TextChatMessageProperties")
+					overrideProperties.Text = `<font color="#{color}">{textChatMessage.Text}</font>`
+
+					return overrideProperties
+				end
 			end
 		end
 
@@ -69,16 +77,30 @@ end
 
 --[=[
 	Sends a system message to the provided TextChannel.
-	@param channel TextChannel
-	@param message string
-	@param color Color3?
+	@param encodedMessageData string
+	@param channel TextChannel?
 ]=]
-function ChatProviderServiceClient:SendSystemMessage(channel: TextChannel, message: string, color: Color3?)
-	assert(typeof(channel) == "Instance" and channel.ClassName == "TextChannel", "[ChatProviderServiceClient.SendSystemMessage] - Bad channel")
+function ChatProviderServiceClient:SendSystemMessage(message: string, encodedMessageData: string?, channel: TextChannel?)
 	assert(typeof(message) == "string", "[ChatProviderServiceClient.SendSystemMessage] - Bad message")
-	assert(typeof(color) == "Color3" or color == nil, "[ChatProviderServiceClient.SendSystemMessage] - Bad color")
 
-	channel:DisplaySystemMessage(message, color and color:ToHex())
+	if not channel then
+		local channels = TextChatService:FindFirstChild("TextChannels")
+		if not channels then
+			return
+		end
+
+		local general = channels:FindFirstChild("RBXGeneral")
+		if general then
+			channel = general
+		end
+	end
+
+	if not channel then
+		warn("[ChatProviderServiceClient.SendSystemMessage] - Failed to get default channel")
+		return
+	end
+
+	channel:DisplaySystemMessage(message, encodedMessageData)
 end
 
 function ChatProviderServiceClient:_renderTags(textSource)
