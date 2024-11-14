@@ -13,7 +13,7 @@
 
 Generalized game configuration system
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/GameConfig">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/GameConfigService">View docs →</a></div>
 
 ## Installation
 ```
