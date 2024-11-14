@@ -67,6 +67,12 @@ function ChatProviderServiceClient:Start()
 	end
 end
 
+--[=[
+	Sends a system message to the provided TextChannel.
+	@param channel TextChannel
+	@param message string
+	@param color Color3?
+]=]
 function ChatProviderServiceClient:SendSystemMessage(channel: TextChannel, message: string, color: Color3?)
 	assert(typeof(channel) == "Instance" and channel.ClassName == "TextChannel", "[ChatProviderServiceClient.SendSystemMessage] - Bad channel")
 	assert(typeof(message) == "string", "[ChatProviderServiceClient.SendSystemMessage] - Bad message")
