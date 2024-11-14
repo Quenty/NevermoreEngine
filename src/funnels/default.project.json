@@ -1,0 +1,7 @@
+{
+  "name": "funnels",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$path": "src"
+  }
+}
