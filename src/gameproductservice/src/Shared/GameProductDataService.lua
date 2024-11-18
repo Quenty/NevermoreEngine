@@ -188,11 +188,15 @@ function GameProductDataService:ObservePlayerOwnership(player, assetType, idOrKe
 
 	-- TODO: Maybe make this more light weight and cache
 	return self:_observePlayerProductManagerBrio(player):Pipe({
-		RxBrioUtils.switchMapBrio(function(playerProductManager)
-			local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
-			return ownershipTracker:ObserveOwnsAsset(idOrKey)
+		RxBrioUtils.flattenToValueAndNil;
+		Rx.switchMap(function(playerProductManager)
+			if playerProductManager then
+				local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
+				return ownershipTracker:ObserveOwnsAsset(idOrKey)
+			else
+				return Rx.EMPTY
+			end
 		end);
-		RxStateStackUtils.topOfStack(false);
 	})
 end
 
@@ -210,11 +214,16 @@ function GameProductDataService:ObservePlayerAssetPurchased(player, assetType, i
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self:_observePlayerProductManagerBrio(player):Pipe({
+		RxBrioUtils.flattenToValueAndNil;
 		RxBrioUtils.switchMapBrio(function(playerProductManager)
-			local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
-			return ownershipTracker:ObserveAssetPurchased(idOrKey)
+			if playerProductManager then
+				local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
+				return ownershipTracker:ObserveAssetPurchased(idOrKey)
+			else
+				return Rx.EMPTY
+			end
 		end);
-		Rx.map(function(_brio)
+		Rx.map(function()
 			return true
 		end)
 	})
