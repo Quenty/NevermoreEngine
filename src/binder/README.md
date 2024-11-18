@@ -19,3 +19,9 @@ Binders bind a class to Roblox Instance
 ```
 npm install @quenty/binder --save
 ```
+
+## Articles and more
+
+* [5 powerful programming patterns](https://www.youtube.com/watch?v=MOjiKS6F59s&t=1896s)
+* [OzzyPig's Binder Pattern Post](https://ozzypig.com/2021/11/15/binder-pattern)
+
