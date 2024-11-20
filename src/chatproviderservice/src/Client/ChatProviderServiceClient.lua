@@ -4,12 +4,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TextChatService = game:GetService("TextChatService")
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
 
 local Maid = require("Maid")
 local Signal = require("Signal")
 local String = require("String")
+local TextChannelUtils = require("TextChannelUtils")
 
 local ChatProviderServiceClient = {}
 ChatProviderServiceClient.ServiceName = "ChatProviderServiceClient"
@@ -36,6 +38,27 @@ function ChatProviderServiceClient:Start()
 	TextChatService.OnIncomingMessage = function(textChatMessage)
 		self.MessageIncoming:Fire(textChatMessage)
 
+		local metadata = textChatMessage.Metadata
+		if metadata then
+			local success, decodedMessageData = pcall(function()
+				return HttpService:JSONDecode(metadata)
+			end)
+
+			if success and decodedMessageData then
+				local color = decodedMessageData.Color or "#ffffff"
+				local isValidHex = pcall(function()
+					return Color3.fromHex(color)
+				end)
+
+				if isValidHex then
+					local overrideProperties = Instance.new("TextChatMessageProperties")
+					overrideProperties.Text = `<font color="#{color}">{textChatMessage.Text}</font>`
+
+					return overrideProperties
+				end
+			end
+		end
+
 		local textSource =  textChatMessage.TextSource
 		if not textSource then
 			return
@@ -51,6 +74,26 @@ function ChatProviderServiceClient:Start()
 			return properties
 		end
 	end
+end
+
+--[=[
+	Sends a system message to the provided TextChannel.
+	@param encodedMessageData string
+	@param channel TextChannel?
+]=]
+function ChatProviderServiceClient:SendSystemMessage(message: string, encodedMessageData: string?, channel: TextChannel?)
+	assert(typeof(message) == "string", "[ChatProviderServiceClient.SendSystemMessage] - Bad message")
+
+	if not channel then
+		channel = TextChannelUtils.getDefaultTextChannel()
+	end
+
+	if not channel then
+		warn("[ChatProviderServiceClient.SendSystemMessage] - Failed to get default channel")
+		return
+	end
+
+	channel:DisplaySystemMessage(message, encodedMessageData)
 end
 
 function ChatProviderServiceClient:_renderTags(textSource)
