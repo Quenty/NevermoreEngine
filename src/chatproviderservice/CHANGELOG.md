@@ -1,28 +1,26 @@
-# v9.19.0 (Wed Nov 20 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add way to send system messages to ChatProviderService [#520](https://github.com/Quenty/NevermoreEngine/pull/520) ([@unrooot](https://github.com/unrooot))
-- feat: Add TextChannelUtils ([@unrooot](https://github.com/unrooot))
-- feat: Add way to send system messages ([@unrooot](https://github.com/unrooot))
-
-#### 🐛 Bug Fix
-
-- fix: Take encoded message data as parameter + make channel optional ([@unrooot](https://github.com/unrooot))
-- docs: Add docs for method ([@unrooot](https://github.com/unrooot))
-- fix: pcall metadata in case it isn't a hex color ([@unrooot](https://github.com/unrooot))
-- fix: Create properties from metadata instead of caching ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.18.0...@quenty/chatproviderservice@9.19.0) (2024-11-20)
+
+
+### Bug Fixes
+
+* Create properties from metadata instead of caching ([f23602e](https://github.com/Quenty/NevermoreEngine/commit/f23602e73a41ce4135ca18bc4ab7f01e935b2cab))
+* pcall metadata in case it isn't a hex color ([0c6df93](https://github.com/Quenty/NevermoreEngine/commit/0c6df93f4e611dcdcf8c1fde454ee4bf7fa43ef0))
+* Take encoded message data as parameter + make channel optional ([20071a8](https://github.com/Quenty/NevermoreEngine/commit/20071a874fd7dbe733fdc116789fa8993ef0a405))
+
+
+### Features
+
+* Add TextChannelUtils ([49fdd74](https://github.com/Quenty/NevermoreEngine/commit/49fdd7495ee83b23aa8e042f7055d080e50f9687))
+* Add way to send system messages ([4db9577](https://github.com/Quenty/NevermoreEngine/commit/4db95775860f06b6e4cd9793c6a0e6457a27a0e1))
+
+
+
+
 
 # [9.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.17.0...@quenty/chatproviderservice@9.18.0) (2024-11-13)
 
