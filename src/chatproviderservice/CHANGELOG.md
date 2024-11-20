@@ -1,3 +1,24 @@
+# v9.19.0 (Wed Nov 20 2024)
+
+#### 🚀 Enhancement
+
+- feat: Add way to send system messages to ChatProviderService [#520](https://github.com/Quenty/NevermoreEngine/pull/520) ([@unrooot](https://github.com/unrooot))
+- feat: Add TextChannelUtils ([@unrooot](https://github.com/unrooot))
+- feat: Add way to send system messages ([@unrooot](https://github.com/unrooot))
+
+#### 🐛 Bug Fix
+
+- fix: Take encoded message data as parameter + make channel optional ([@unrooot](https://github.com/unrooot))
+- docs: Add docs for method ([@unrooot](https://github.com/unrooot))
+- fix: pcall metadata in case it isn't a hex color ([@unrooot](https://github.com/unrooot))
+- fix: Create properties from metadata instead of caching ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# (Wed Nov 20 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/chatproviderservice@9.19.0`
+  - feat: Add way to send system messages to ChatProviderService [#520](https://github.com/Quenty/NevermoreEngine/pull/520) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Wed Nov 13 2024)
 
 #### 🚀 Enhancement
