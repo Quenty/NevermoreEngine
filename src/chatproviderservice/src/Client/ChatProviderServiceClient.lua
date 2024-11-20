@@ -11,6 +11,7 @@ local TextChatService = game:GetService("TextChatService")
 local Maid = require("Maid")
 local Signal = require("Signal")
 local String = require("String")
+local TextChannelUtils = require("TextChannelUtils")
 
 local ChatProviderServiceClient = {}
 ChatProviderServiceClient.ServiceName = "ChatProviderServiceClient"
@@ -84,15 +85,7 @@ function ChatProviderServiceClient:SendSystemMessage(message: string, encodedMes
 	assert(typeof(message) == "string", "[ChatProviderServiceClient.SendSystemMessage] - Bad message")
 
 	if not channel then
-		local channels = TextChatService:FindFirstChild("TextChannels")
-		if not channels then
-			return
-		end
-
-		local general = channels:FindFirstChild("RBXGeneral")
-		if general then
-			channel = general
-		end
+		channel = TextChannelUtils.getDefaultTextChannel()
 	end
 
 	if not channel then
