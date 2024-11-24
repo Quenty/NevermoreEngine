@@ -407,15 +407,14 @@ end
 
 	@deprecated 3.6.0 -- This method does not wrap the resulting value in a Brio, which can sometimes lead to leaks.
 	@param project (value: TBrio) -> TProject
-	@param resultSelector ((initial TBrio, value: TProject) -> TResult)?
 	@return (source: Observable<Brio<TBrio>> -> Observable<TResult>)
 ]=]
-function RxBrioUtils.flatMap(project, resultSelector)
+function RxBrioUtils.flatMap(project)
 	assert(type(project) == "function", "Bad project")
 
 	warn("[RxBrioUtils.flatMap] - Deprecated since 3.6.0. Use RxBrioUtils.flatMapBrio")
 
-	return Rx.flatMap(RxBrioUtils.mapBrio(project), resultSelector)
+	return Rx.flatMap(RxBrioUtils.mapBrio(project))
 end
 
 --[=[

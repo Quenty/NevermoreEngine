@@ -224,7 +224,6 @@ function Subscription:Destroy()
 	end
 
 	self:_doCleanup()
-
 end
 
 --[=[

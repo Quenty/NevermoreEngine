@@ -22,6 +22,9 @@ local CancelToken = require("CancelToken")
 local MaidTaskUtils = require("MaidTaskUtils")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
+local function identity(...)
+	return ...
+end
 
 --[=[
 	An empty observable that completes immediately
@@ -901,72 +904,7 @@ end
 	@return (source: Observable<Observable<T>>) -> Observable<T>
 ]=]
 function Rx.mergeAll()
-	return function(source)
-		assert(Observable.isObservable(source), "Bad observable")
-
-		return Observable.new(function(sub)
-			local topMaid = Maid.new()
-
-			local pendingCount = 0
-			local topComplete = false
-
-			topMaid:GiveTask(source:Subscribe(
-				function(observable)
-					assert(Observable.isObservable(observable), "Not an observable")
-
-					pendingCount = pendingCount + 1
-
-					local innerSub = nil
-					innerSub = observable:Subscribe(
-						function(...)
-							-- Merge each inner observable
-							sub:Fire(...)
-						end,
-						function(...)
-							-- Emit failure automatically
-							sub:Fail(...)
-							topMaid:DoCleaning()
-
-							if innerSub then
-								topMaid[innerSub] = nil
-							end
-						end,
-						function()
-							pendingCount = pendingCount - 1
-							if pendingCount == 0 and topComplete then
-								sub:Complete()
-								topMaid:DoCleaning()
-							end
-
-							if innerSub then
-								topMaid[innerSub] = nil
-							end
-						end)
-
-					-- Make sure we only do this if we aren't already cleaned up here
-					if innerSub:IsPending() then
-						if sub:IsPending() then
-							topMaid[innerSub] = innerSub
-						else
-							innerSub:Destroy()
-						end
-					end
-				end,
-				function(...)
-					sub:Fail(...) -- Also reflect failures up to the top!
-					topMaid:DoCleaning()
-				end,
-				function()
-					topComplete = true
-					if pendingCount == 0 then
-						sub:Complete()
-						topMaid:DoCleaning()
-					end
-				end))
-
-			return topMaid
-		end)
-	end
+	return Rx.flatMap(identity)
 end
 
 --[=[
@@ -981,77 +919,7 @@ end
 	@return (source: Observable<Observable<T>>) -> Observable<T>
 ]=]
 function Rx.switchAll()
-	return function(source)
-		assert(Observable.isObservable(source), "Bad observable")
-
-		return Observable.new(function(sub)
-			local outerMaid = Maid.new()
-			local topComplete = false
-			local insideComplete = false
-			local currentInside = nil
-
-			outerMaid:GiveTask(function()
-				-- Ensure inner subscription is disconnected first. This prevents
-				-- the inner sub from firing while the outer is subscribed,
-				-- throwing a warning.
-				outerMaid._innerSub = nil
-				outerMaid._outerSuber = nil
-			end)
-
-			outerMaid._outerSuber = source:Subscribe(
-				function(observable)
-					assert(Observable.isObservable(observable), "Bad observable returned from subscription in switchAll()")
-
-					insideComplete = false
-					currentInside = observable
-					outerMaid._innerSub = nil
-
-					local subscription = observable:Subscribe(
-						function(...)
-							if currentInside == observable then
-								sub:Fire(...)
-							else
-								warn(string.format("[Rx.switchAll] - Observable is still firing despite disconnect (%q)", tostring(observable._source)))
-							end
-						end, -- Merge each inner observable
-						function(...)
-							if currentInside == observable then
-								currentInside = nil
-								sub:Fail(...)
-							end
-						end, -- Emit failure automatically
-						function()
-							if currentInside == observable then
-								insideComplete = true
-								if insideComplete and topComplete then
-									sub:Complete()
-									outerMaid:DoCleaning() -- Paranoid ensure cleanup.
-								end
-							end
-						end)
-
-					if currentInside == observable then
-						outerMaid._innerSub = subscription
-					else
-						-- We cleaned up while connecting
-						subscription:Destroy()
-					end
-				end,
-				function(...)
-					sub:Fail(...) -- Also reflect failures up to the top!
-					outerMaid:DoCleaning()
-				end,
-				function()
-					topComplete = true
-					if insideComplete and topComplete then
-						sub:Complete()
-						outerMaid:DoCleaning() -- Paranoid ensure cleanup
-					end
-				end)
-
-			return outerMaid
-		end)
-	end
+	return Rx.switchMap(identity)
 end
 
 --[=[
@@ -1060,77 +928,107 @@ end
 	This takes a stream of observables
 
 	@param project (value: T) -> Observable<U>
-	@param resultSelector ((initialValue: T, outputValue: U) -> U)?
 	@return (source: Observable<T>) -> Observable<U>
 ]=]
-function Rx.flatMap(project, resultSelector)
+function Rx.flatMap(project)
 	assert(type(project) == "function", "Bad project")
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			local maid = Maid.new()
-
+			local isComplete = false
 			local pendingCount = 0
-			local topComplete = false
+			local subscriptions = {}
 
-			maid:GiveTask(source:Subscribe(
-				function(...)
-					local outerValue = ...
+			local function checkComplete()
+				if isComplete and pendingCount == 0 then
+					sub:Complete()
+				end
+			end
 
-					local observable = project(...)
-					assert(Observable.isObservable(observable), "Bad observable from project")
+			local function onNextObservable(...)
+				local observable = project(...)
+				assert(Observable.isObservable(observable), "Bad observable returned from subscription project call")
 
-					pendingCount = pendingCount + 1
+				if not sub:IsPending() then
+					-- Projecting last subscription cancelled us
+					return
+				end
 
-					local innerMaid = Maid.new()
+				local innerCompleteOrFail = false
+				local subscription
 
-					local subscription = innerMaid:Add(observable:Subscribe(
-						function(...)
-							-- Merge each inner observable
-							if resultSelector then
-								sub:Fire(resultSelector(outerValue, ...))
-							else
-								sub:Fire(...)
-							end
-						end,
-						function(...)
-							sub:Fail(...)
-						end, -- Emit failure automatically
-						function()
-							innerMaid:DoCleaning()
-							pendingCount = pendingCount - 1
-							if pendingCount == 0 and topComplete then
-								sub:Complete()
-								maid:DoCleaning()
-							end
-						end))
-
-					if subscription:IsPending() then
-						local key = maid:GiveTask(innerMaid)
-
-						-- Cleanup
-						innerMaid:GiveTask(function()
-							maid[key] = nil
-						end)
-					else
-						subscription:Destroy()
+				local function onNext(...)
+					if innerCompleteOrFail or pendingCount == 0 then
+						return
 					end
-				end,
+
+					sub:Fire(...)
+				end
+
+				local function onFail(...)
+					if innerCompleteOrFail or pendingCount == 0 then
+						return
+					end
+
+					if subscription then
+						-- Trust subscription to clean itself up in this scenario
+						subscriptions[subscription] = nil
+						subscription = nil
+					end
+
+					pendingCount = 0
+					sub:Fail(...)
+				end
+
+				local function onComplete()
+					if innerCompleteOrFail or pendingCount == 0 then
+						return
+					end
+
+					innerCompleteOrFail = true
+					pendingCount -= 1
+
+					if subscription then
+						-- Trust subscription to clean itself up in this scenario
+						subscriptions[subscription] = nil
+						subscription = nil
+					end
+
+					checkComplete()
+				end
+
+				pendingCount += 1
+				subscription = observable:Subscribe(onNext, onFail, onComplete)
+
+				if innerCompleteOrFail or not sub:IsPending() then
+					-- Subscribing cancelled ourselves in some way
+					subscription:Destroy()
+					return
+				end
+
+				subscriptions[subscription] = true
+			end
+
+			local outerSubscription = source:Subscribe(onNextObservable,
 				function(...)
-					sub:Fail(...) -- Also reflect failures up to the top!
-					maid:DoCleaning()
+					sub:Fail(...)
 				end,
 				function()
-					topComplete = true
-					if pendingCount == 0 then
-						sub:Complete()
-						maid:DoCleaning()
-					end
-				end))
+					isComplete = true
+					checkComplete()
+				end)
 
-			return maid
+			return function()
+				pendingCount = 0
+
+				for subscription, _ in pairs(subscriptions) do
+					subscription:Destroy()
+				end
+
+				outerSubscription:Destroy()
+			end
 		end)
 	end
 end
@@ -1192,10 +1090,110 @@ end
 	@return Observable
 ]=]
 function Rx.switchMap(project)
-	return Rx.pipe({
-		Rx.map(project);
-		Rx.switchAll();
-	})
+	assert(type(project) == "function", "Bad project")
+
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local isComplete = false
+			local insideComplete = false
+			local insideSubscription = nil
+			local outerIndex = 0
+
+			local function checkComplete()
+				if isComplete and insideComplete then
+					outerIndex = nil
+					sub:Complete()
+				end
+			end
+
+			local function onNextObservable(...)
+				insideComplete = false
+
+				local observable = project(...)
+				assert(Observable.isObservable(observable), "Bad observable returned from subscription project call")
+
+				-- Handle cancellation when external callers do weird state stuff
+				if not outerIndex then
+					return
+				end
+
+				local index = outerIndex + 1
+				outerIndex = index
+
+				-- Cancel previous subscription
+				if insideSubscription then
+					insideSubscription:Destroy()
+					insideSubscription = nil
+				end
+
+				if not sub:IsPending() or index ~= outerIndex then
+					-- Cancelling last subscription cancelled us
+					return
+				end
+
+				local function onNext(...)
+					if index ~= outerIndex then
+						return
+					end
+
+					sub:Fire(...)
+				end
+
+				local function onFail(...)
+					if index ~= outerIndex then
+						return
+					end
+
+					insideSubscription = nil -- trust subscription to clean itself up
+					outerIndex = nil
+					sub:Fail(...)
+				end
+
+				local function onComplete()
+					if index ~= outerIndex then
+						return
+					end
+
+					insideSubscription = nil -- trust subscription to clean itself up
+					insideComplete = true
+					checkComplete()
+				end
+
+				local subscription = observable:Subscribe(onNext, onFail, onComplete)
+
+				if not sub:IsPending() or index ~= outerIndex then
+					-- Subscribing cancelled ourselves
+					subscription:Destroy()
+					return
+				end
+
+				insideSubscription = subscription
+			end
+
+			local outerSubscription = source:Subscribe(onNextObservable,
+				function(...)
+					outerIndex = nil
+					sub:Fail(...)
+				end,
+				function()
+					isComplete = true
+					checkComplete()
+				end)
+
+			return function()
+				outerIndex = nil
+
+				if insideSubscription then
+					insideSubscription:Destroy()
+					insideSubscription = nil
+				end
+
+				outerSubscription:Destroy()
+			end
+		end)
+	end
 end
 
 function Rx.takeUntil(notifier)
@@ -2167,9 +2165,7 @@ function Rx.mergeScan(accumulator, seed)
 
 	return Rx.pipe({
 		Rx.scan(accumulator, seed),
-		Rx.flatMap(function(x)
-			return x
-		end)
+		Rx.mergeAll();
 	})
 end
 
