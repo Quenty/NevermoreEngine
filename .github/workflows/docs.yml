@@ -2,17 +2,21 @@ name: publish-docs
 on:
   push:
     branches:
-    - main
+      - main
   workflow_dispatch:
 jobs:
   build:
-    name: Build and deploy docs
+    name: Build and Deploy the Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout the Repository
+        uses: actions/checkout@v4.1.1
         with:
-          node-version: "18"
+          fetch-depth: 0
+      - name: Set Up Node.JS
+        uses: actions/setup-node@v4.0.0
+        with:
+          node-version: 20
       - run: npm i -g moonwave@latest
       - name: Publish
         run: |
