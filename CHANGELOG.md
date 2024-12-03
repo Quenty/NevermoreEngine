@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/observablecollection@12.16.0`
+  - feat: ObservableMapList:ObserveListsBrio() [#521](https://github.com/Quenty/NevermoreEngine/pull/521) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
+# (Tue Dec 03 2024)
+
+#### 🚀 Enhancement
+
 - `@quenty/accessorytypeutils@1.5.0`, `@quenty/adorneeboundingbox@8.15.0`, `@quenty/adorneeutils@3.3.0`, `@quenty/aggregator@1.1.0`, `@quenty/avatareditorutils@7.15.0`, `@quenty/binder@14.16.0`, `@quenty/boundingboxutils@4.3.0`, `@quenty/brio@14.14.0`, `@quenty/buttonhighlightmodel@14.14.0`, `@quenty/convexhull@4.8.0`, `@quenty/enumutils@3.4.0`, `@quenty/firstpersoncharactertransparency@14.15.0`, `@quenty/funnels@1.1.0`, `@quenty/gameconfig@12.19.0`, `@quenty/gameproductservice@14.19.0`, `@quenty/observablecollection@12.15.0`, `@quenty/pagesutils@5.9.0`, `@quenty/playerutils@8.14.0`, `@quenty/receiptprocessing@7.15.0`, `@quenty/remoting@12.15.0`, `@quenty/rx@13.14.0`, `@quenty/symbol@3.4.0`, `@quenty/ugcsanitize@1.1.0`, `@quenty/userserviceutils@9.15.0`, `@quenty/valueobject@13.14.0`
   - Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
 

@@ -1,3 +1,15 @@
+# v12.16.0 (Tue Dec 03 2024)
+
+#### 🚀 Enhancement
+
+- feat: ObservableMapList:ObserveListsBrio() [#521](https://github.com/Quenty/NevermoreEngine/pull/521) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
