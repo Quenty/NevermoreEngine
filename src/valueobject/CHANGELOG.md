@@ -1,3 +1,16 @@
+# v13.14.0 (Tue Dec 03 2024)
+
+#### 🚀 Enhancement
+
+- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
+- feat: Add :SetValue() behavior to cleanup past mounted sub and return a function to unset the value ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

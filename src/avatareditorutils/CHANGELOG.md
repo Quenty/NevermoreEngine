@@ -1,3 +1,21 @@
+# v7.15.0 (Tue Dec 03 2024)
+
+#### 🚀 Enhancement
+
+- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
+- feat: PlayerProductManagerClient queries inventory when inventory is available ([@Quenty](https://github.com/Quenty))
+- feat: Break up logic into inventory and catalog to allow centralized querying ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Reject promises when failing to succeed prompt ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

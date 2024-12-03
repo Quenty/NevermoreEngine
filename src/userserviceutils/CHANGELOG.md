@@ -1,3 +1,20 @@
+# v9.15.0 (Tue Dec 03 2024)
+
+#### 🚀 Enhancement
+
+- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix username query ([@Quenty](https://github.com/Quenty))
+- refactor: Move aggregation logic into shared module ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

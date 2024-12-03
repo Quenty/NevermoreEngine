@@ -1,3 +1,20 @@
+# v12.15.0 (Tue Dec 03 2024)
+
+#### 🚀 Enhancement
+
+- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
+- feat: Return a cleanup method, even when amount is 0 ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: ObservableSortedList fires removed indexes (note: Doesn't handle negatives right now) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

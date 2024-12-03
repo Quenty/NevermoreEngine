@@ -1,3 +1,24 @@
+# v14.19.0 (Tue Dec 03 2024)
+
+#### 🚀 Enhancement
+
+- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
+- feat: Remove ownership tracking mess with well-known assets and attributes and just use raw state ([@Quenty](https://github.com/Quenty))
+- feat: PlayerProductManagerClient queries inventory when inventory is available ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix missing services ([@Quenty](https://github.com/Quenty))
+- style: Remove unused imports ([@Quenty](https://github.com/Quenty))
+- docs: Update docsfor the PlayerAssetMarketTracker ([@Quenty](https://github.com/Quenty))
+- fix: Subscription status is reported properly ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
