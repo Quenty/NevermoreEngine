@@ -42,7 +42,7 @@ end
 function UserInfoService:ObserveUserInfo(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return self._aggregator:ObserveDisplayName(userId)
+	return self._aggregator:ObserveUserInfo(userId)
 end
 
 --[=[
@@ -55,6 +55,18 @@ function UserInfoService:PromiseDisplayName(userId)
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:PromiseDisplayName(userId)
+end
+
+--[=[
+	Promises the Username for the userId
+
+	@param userId number
+	@return Promise<string>
+]=]
+function UserInfoService:PromiseUsername(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return self._aggregator:PromiseUsername(userId)
 end
 
 --[=[

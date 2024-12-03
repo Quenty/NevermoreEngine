@@ -456,7 +456,11 @@ function AvatarEditorUtils.promptAllowInventoryReadAccess()
 	end)
 
 	maid:GiveTask(AvatarEditorService.PromptAllowInventoryReadAccessCompleted:Connect(function(avatarPromptResult)
-		promise:Resolve(avatarPromptResult)
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			promise:Resolve(avatarPromptResult)
+		else
+			promise:Reject(avatarPromptResult)
+		end
 	end))
 
 	local ok, err = pcall(function()
@@ -493,8 +497,12 @@ function AvatarEditorUtils.promptCreateOutfit(outfit: HumanoidDescription, rigTy
 		maid:DoCleaning()
 	end)
 
-	maid:GiveTask(AvatarEditorService.PromptCreateOutfitCompleted:Connect(function(avatarPromptResult)
-		promise:Resolve(avatarPromptResult)
+	maid:GiveTask(AvatarEditorService.PromptCreateOutfitCompleted:Connect(function(avatarPromptResult, failureType)
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			promise:Resolve(avatarPromptResult)
+		else
+			promise:Reject(avatarPromptResult, failureType)
+		end
 	end))
 
 	local ok, err = pcall(function()
@@ -526,7 +534,11 @@ function AvatarEditorUtils.promptDeleteOutfit(outfitId: number)
 	end)
 
 	maid:GiveTask(AvatarEditorService.PromptDeleteOutfitCompleted:Connect(function(avatarPromptResult)
-		promise:Resolve(avatarPromptResult)
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			promise:Resolve(avatarPromptResult)
+		else
+			promise:Reject(avatarPromptResult)
+		end
 	end))
 
 	local ok, err = pcall(function()
@@ -558,7 +570,11 @@ function AvatarEditorUtils.promptRenameOutfit(outfitId: number)
 	end)
 
 	maid:GiveTask(AvatarEditorService.PromptRenameOutfitCompleted:Connect(function(avatarPromptResult)
-		promise:Resolve(avatarPromptResult)
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			promise:Resolve(avatarPromptResult)
+		else
+			promise:Reject(avatarPromptResult)
+		end
 	end))
 
 	local ok, err = pcall(function()
@@ -590,7 +606,11 @@ function AvatarEditorUtils.promptSaveAvatar(humanoidDescription: HumanoidDescrip
 	end)
 
 	maid:GiveTask(AvatarEditorService.PromptSaveAvatarCompleted:Connect(function(avatarPromptResult)
-		promise:Resolve(avatarPromptResult)
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			promise:Resolve(avatarPromptResult)
+		else
+			promise:Reject(avatarPromptResult)
+		end
 	end))
 
 	local ok, err = pcall(function()
@@ -626,7 +646,11 @@ function AvatarEditorUtils.promptSetFavorite(itemId: number, itemType: AvatarIte
 	end)
 
 	maid:GiveTask(AvatarEditorService.PromptSetFavoriteCompleted:Connect(function(avatarPromptResult)
-		promise:Resolve(avatarPromptResult)
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			promise:Resolve(avatarPromptResult)
+		else
+			promise:Reject(avatarPromptResult)
+		end
 	end))
 
 	local ok, err = pcall(function()
@@ -662,7 +686,11 @@ function AvatarEditorUtils.promptUpdateOutfit(outfitId: number, updatedOutfit: H
 	end)
 
 	maid:GiveTask(AvatarEditorService.PromptUpdateOutfitCompleted:Connect(function(avatarPromptResult)
-		promise:Resolve(avatarPromptResult)
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			promise:Resolve(avatarPromptResult)
+		else
+			promise:Reject(avatarPromptResult)
+		end
 	end))
 
 	local ok, err = pcall(function()

@@ -19,6 +19,9 @@ PlayerAssetMarketTracker.ClassName = "PlayerAssetMarketTracker"
 PlayerAssetMarketTracker.__index = PlayerAssetMarketTracker
 
 --[=[
+	Constructs a new market tracker. Generally you should not need to use
+	this directly.
+
 	@param assetType GameConfigAssetTypes
 	@param convertIds function
 	@param observeIdsBrio function
@@ -73,6 +76,11 @@ function PlayerAssetMarketTracker.new(assetType, convertIds, observeIdsBrio)
 	return self
 end
 
+--[=[
+	Observes the number of prompts open
+
+	@return Observable<number>
+]=]
 function PlayerAssetMarketTracker:ObservePromptOpenCount()
 	return self._promptsOpenCount:Observe()
 end
@@ -118,6 +126,11 @@ function PlayerAssetMarketTracker:ObserveAssetPurchased(idOrKey)
 	end)
 end
 
+--[=[
+	Gets the ownership tracker assigned to this tracker
+
+	@return GetOwnershipTracker
+]=]
 function PlayerAssetMarketTracker:GetOwnershipTracker()
 	return self._ownershipTracker
 end
@@ -208,6 +221,11 @@ function PlayerAssetMarketTracker:SetOwnershipTracker(ownershipTracker)
 	self._ownershipTracker = ownershipTracker
 end
 
+--[=[
+	Gets the current asset type
+
+	@return GameConfigAssetTypes
+]=]
 function PlayerAssetMarketTracker:GetAssetType()
 	return self._assetType
 end
@@ -262,6 +280,11 @@ function PlayerAssetMarketTracker:HandlePurchaseEvent(id, isPurchased)
 	purchasePromise:Resolve(isPurchased)
 end
 
+--[=[
+	Handles the prompt closed
+
+	@param id number
+]=]
 function PlayerAssetMarketTracker:HandlePromptClosedEvent(id)
 	assert(type(id) == "number", "Bad id")
 

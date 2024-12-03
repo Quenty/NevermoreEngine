@@ -1,0 +1,12 @@
+{
+  "name": "FunnelsTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "funnels": {
+        "$path": ".."
+      }
+    }
+  }
+}

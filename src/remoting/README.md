@@ -13,7 +13,7 @@
 
 Provides global remoting functionality for Roblox (GetRemoteEvent/GetRemoteFunction). This is extremely light-weight, but makes programming with global remotes a lot easier.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/GetRemoteEvent">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Remoting">View docs →</a></div>
 
 ## Installation
 ```

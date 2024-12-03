@@ -298,17 +298,14 @@ end
 function ObservableSortedList:ObserveAtIndex(indexToObserve)
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
 
-	return self._indexObservers:Observe(indexToObserve)
-		:Pipe({
-			Rx.start(function()
-				local node = self:_findNodeAtIndex(indexToObserve)
-				if node then
-					return node.data, node
-				else
-					return nil
-				end
-			end);
-		})
+	return self._indexObservers:Observe(indexToObserve, function(sub)
+		local node = self:_findNodeAtIndex(indexToObserve)
+		if node then
+			sub:Fire(node.data, node)
+		else
+			sub:Fire(nil, nil)
+		end
+	end)
 end
 
 --[=[
@@ -321,16 +318,12 @@ end
 function ObservableSortedList:ObserveIndexByKey(node)
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
-	return self._nodeIndexObservables:Observe(node):Pipe({
-		Rx.startFrom(function()
-			local currentIndex = self:_findNodeIndex(node)
-			if currentIndex then
-				return { currentIndex }
-			else
-				return {}
-			end
-		end);
-	})
+	return self._nodeIndexObservables:Observe(node, function(sub)
+		local currentIndex = self:_findNodeIndex(node)
+		if currentIndex then
+			sub:Fire(currentIndex)
+		end
+	end)
 end
 
 --[=[
@@ -494,12 +487,11 @@ function ObservableSortedList:_fireEvents()
 	local nodesRemoved = self._nodesRemoved
 	self._nodesRemoved = {}
 
+	local lastCount = self._countValue.Value
+	local newCount = if self._root then self._root.descendantCount else 0
+
 	-- Fire count changed first
-	if self._root then
-		self._countValue.Value = self._root.descendantCount
-	else
-		self._countValue.Value = 0
-	end
+	self._countValue.Value = newCount
 
 	if not self.Destroy then return end
 
@@ -532,6 +524,12 @@ function ObservableSortedList:_fireEvents()
 			self._indexObservers:Fire(index, node.data, node)
 			self._indexObservers:Fire(negative, node.data, node)
 		end
+
+		for index=newCount+1, lastCount do
+			self._indexObservers:Fire(index, nil, nil)
+		end
+
+		-- TODO: Fire negatives beyond range
 	end
 
 	if not self.Destroy then return end

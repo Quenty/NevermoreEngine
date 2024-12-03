@@ -35,7 +35,8 @@
     "@quenty/r15utils": "file:../r15utils",
     "@quenty/rx": "file:../rx",
     "@quenty/statestack": "file:../statestack",
-    "@quenty/transparencyservice": "file:../transparencyservice"
+    "@quenty/transparencyservice": "file:../transparencyservice",
+    "@quenty/ugcsanitize": "file:../ugcsanitize"
   },
   "publishConfig": {
     "access": "public"

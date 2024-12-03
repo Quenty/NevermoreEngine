@@ -66,19 +66,9 @@ function EnumUtils.toEnum(enumType, value)
 			return nil
 		end
 	elseif type(value) == "number" then
-		-- There has to be a better way, right?
-		for _, item in pairs(enumType:GetEnumItems()) do
-			if item.Value == value then
-				return item
-			end
-		end
-
-		return nil
+		return enumType:FromValue(value)
 	elseif type(value) == "string" then
-		local result = nil
-		pcall(function()
-			result = enumType[value]
-		end)
+		local result = enumType:FromName(value)
 		if result then
 			return result
 		end
@@ -118,7 +108,7 @@ function EnumUtils.decodeFromString(value)
 	if enumType and enumName then
 		local enumValue
 		local ok, err = pcall(function()
-			enumValue = Enum[enumType][enumName]
+			enumValue = Enum[enumType]:FromName(enumName)
 		end)
 		if not ok then
 			warn(err, string.format("[EnumUtils.decodeFromString] - Failed to decode %q into an enum value due to %q", value, tostring(err)))

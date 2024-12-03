@@ -271,18 +271,10 @@ end
 ]=]
 function ObservableCountingMap:Set(key, amount)
 	local current = self:Get(key)
-	if current == amount then
-		return
-	end
-
 	if current < amount then
 		self:Add(-(amount - current))
-		return
-	elseif current == amount then
-		return
-	else
+	elseif current > amount then
 		self:Add(current - amount)
-		return
 	end
 end
 
@@ -298,7 +290,9 @@ function ObservableCountingMap:Add(key, amount)
 	amount = amount or 1
 
 	if amount == 0 then
-		return
+		return function()
+
+		end
 	end
 
 	local oldValue = self._map[key]

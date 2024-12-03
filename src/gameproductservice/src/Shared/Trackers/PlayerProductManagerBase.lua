@@ -93,15 +93,20 @@ function PlayerProductManagerBase.new(player, serviceBag)
 
 	-- Configure assets too
 	assetOwnership:SetQueryOwnershipCallback(function(assetId)
+		-- NOTE: client overrides these to bulk operations
 		return MarketplaceUtils.promisePlayerOwnsAsset(self._player, assetId)
 	end)
 
 	bundleOwnership:SetQueryOwnershipCallback(function(bundleId)
+		-- NOTE: client overrides these to bulk operations
 		return MarketplaceUtils.promisePlayerOwnsBundle(self._player, bundleId)
 	end)
 
 	subscriptionOwnership:SetQueryOwnershipCallback(function(subscriptionId)
-		return MarketplaceUtils.promisePlayerOwnsBundle(self._player, subscriptionId)
+		return MarketplaceUtils.promiseUserSubscriptionStatus(self._player, subscriptionId)
+			:Then(function(status)
+				return status.IsSubscribed == true
+			end)
 	end)
 
 	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)

@@ -26,6 +26,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise"
   },

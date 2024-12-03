@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@quenty/attributeutils": "file:../attributeutils",
+    "@quenty/avatareditorutils": "file:../avatareditorutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",

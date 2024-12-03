@@ -13,7 +13,7 @@
 
 Allows transparency to manually be controlled for a character in first-person mode
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/DisableHatParticles">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ShowBody">View docs →</a></div>
 
 ## Installation
 ```

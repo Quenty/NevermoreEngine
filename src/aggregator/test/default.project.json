@@ -1,0 +1,12 @@
+{
+  "name": "AggregatorTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "aggregator": {
+        "$path": ".."
+      }
+    }
+  }
+}

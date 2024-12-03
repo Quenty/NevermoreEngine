@@ -31,6 +31,7 @@ function GameProductService:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("GameConfigService"))
+	self._serviceBag:GetService(require("CatalogSearchServiceCache"))
 	self._serviceBag:GetService(require("ReceiptProcessingService"))
 	self._serviceBag:GetService(require("CmdrService"))
 

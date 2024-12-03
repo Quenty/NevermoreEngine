@@ -29,6 +29,7 @@ ValueObject.ClassName = "ValueObject"
 function ValueObject.new(baseValue, checkType)
 	local self = setmetatable({
 		_value = baseValue;
+		_default = baseValue;
 		_checkType = checkType;
 	}, ValueObject)
 
@@ -111,7 +112,7 @@ function ValueObject:Mount(value)
 		self:_cleanupLastMountedSub()
 
 		local sub = observable:Subscribe(function(...)
-			self:SetValue(...)
+			ValueObject._applyValue(self, ...)
 		end)
 
 		rawset(self, "_lastMountedSub", sub)
@@ -124,7 +125,7 @@ function ValueObject:Mount(value)
 	else
 		self:_cleanupLastMountedSub()
 
-		self:SetValue(value)
+		ValueObject._applyValue(self, value)
 
 		return EMPTY_FUNCTION
 	end
@@ -234,8 +235,21 @@ end
 
 	@param value T
 	@param ... any -- Additional args. Can be used to pass event changing state args with value
+	@return () -> () -- Cleanup
 ]=]
 function ValueObject:SetValue(value, ...)
+	self:_cleanupLastMountedSub()
+
+	ValueObject._applyValue(self, value, ...)
+
+	return function()
+		if rawget(self, "_value") == value then
+			ValueObject._applyValue(self, rawget(self, "_default"))
+		end
+	end
+end
+
+function ValueObject:_applyValue(value, ...)
 	local previous = rawget(self, "_value")
 	local checkType = rawget(self, "_checkType")
 
@@ -298,7 +312,7 @@ end
 function ValueObject:__newindex(index, value)
 	if index == "Value" then
 		-- Avoid deoptimization
-		ValueObject.SetValue(self, value)
+		ValueObject._applyValue(self, value)
 	elseif index == "LastEventContext" or ValueObject[index] then
 		error(string.format("%q cannot be set in ValueObject", tostring(index)))
 	else

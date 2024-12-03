@@ -14,7 +14,7 @@
 
 Centralize receipt processing within games since this is a constrained resource.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ReceiptProcessingUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ReceiptProcessingService">View docs →</a></div>
 
 ## Installation
 

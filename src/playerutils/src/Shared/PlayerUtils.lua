@@ -42,12 +42,41 @@ end
 	@param displayName string
 	@return string -- Formatted name
 ]=]
-function PlayerUtils.formatDisplayName(name, displayName)
+function PlayerUtils.formatDisplayName(name: string, displayName: string): string
 	if string.lower(name) == string.lower(displayName) then
 		return displayName
 	else
 		return string.format("%s (@%s)", displayName, name)
 	end
+end
+
+--[=[
+	Formats the display name from the user info
+	@param userInfo UserInfo
+	@return string
+]=]
+function PlayerUtils.formatDisplayNameFromUserInfo(userInfo): string
+	assert(type(userInfo) == "table", "Bad userInfo")
+	assert(type(userInfo.Username) == "string", "Bad userInfo.Username")
+	assert(type(userInfo.DisplayName) == "string", "Bad userInfo.DisplayName")
+
+	local result = PlayerUtils.formatDisplayName(userInfo.Username, userInfo.DisplayName)
+
+	if userInfo.HasVerifiedBadge then
+		return PlayerUtils.addVerifiedBadgeToName(result)
+	end
+
+	return result
+end
+
+--[=[
+	Adds verified badges to the name
+
+	@param name string
+	@return string
+]=]
+function PlayerUtils.addVerifiedBadgeToName(name: string): string
+	return string.format("%s %s", name, utf8.char(0xE000))
 end
 
 local NAME_COLORS = {

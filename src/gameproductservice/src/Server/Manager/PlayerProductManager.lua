@@ -103,7 +103,6 @@ end
 
 function PlayerProductManager:_setupPassTracker()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
-	tracker:GetOwnershipTracker():SetWriteAttributesEnabled(true)
 
 	self._maid:GiveTask(self._remoting.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
 		assert(player == self._obj, "Bad player")
@@ -132,7 +131,6 @@ function PlayerProductManager:_setupSubscriptionTracker()
 	self._remoting.UserSubscriptionStatusChanged:DeclareEvent()
 
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.SUBSCRIPTION)
-	tracker:GetOwnershipTracker():SetWriteAttributesEnabled(true)
 
 	self._maid:GiveTask(self._remoting.PromptSubscriptionPurchaseFinished:Connect(function(player, subscriptionId)
 		assert(player == self._obj, "Bad player")

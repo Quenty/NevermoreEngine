@@ -6,12 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Aggregator = require("Aggregator")
 local BaseObject = require("BaseObject")
-local Promise = require("Promise")
-local UserServiceUtils = require("UserServiceUtils")
 local Rx = require("Rx")
-
-local MAX_USER_IDS_PER_REQUEST = 200
+local UserServiceUtils = require("UserServiceUtils")
 
 local UserInfoAggregator = setmetatable({}, BaseObject)
 UserInfoAggregator.ClassName = "UserInfoAggregator"
@@ -20,11 +18,9 @@ UserInfoAggregator.__index = UserInfoAggregator
 function UserInfoAggregator.new()
 	local self = setmetatable(BaseObject.new(), UserInfoAggregator)
 
-	-- TODO: LRU cache this? Limit to 1k or something?
-	self._promises = {}
-
-	self._unsentCount = 0
-	self._unsentPromises = {}
+	self._aggregator = self._maid:Add(Aggregator.new("UserServiceUtils.promiseUserInfosByUserIds", function(userIdList)
+		return UserServiceUtils.promiseUserInfosByUserIds(userIdList)
+	end))
 
 	return self
 end
@@ -39,19 +35,7 @@ end
 function UserInfoAggregator:PromiseUserInfo(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	if self._promises[userId] then
-		return self._promises[userId]
-	end
-
-	local promise = Promise.new()
-
-	self._unsentPromises[userId] = promise
-	self._unsentCount = self._unsentCount + 1
-	self._promises[userId] = promise
-
-	self:_queueAggregatedPromises()
-
-	return promise
+	return self._aggregator:Promise(userId)
 end
 
 --[=[
@@ -63,24 +47,24 @@ end
 function UserInfoAggregator:PromiseDisplayName(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return self:PromiseUserInfo(userId)
+	return self._aggregator:Promise(userId)
 		:Then(function(userInfo)
 			return userInfo.DisplayName
 		end)
 end
 
 --[=[
-	Promises the user display name for the userId
+	Promises the Username for the userId
 
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserInfoAggregator:PromiseDisplayName(userId)
+function UserInfoAggregator:PromiseUsername(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return self:PromiseUserInfo(userId)
+	return self._aggregator:Promise(userId)
 		:Then(function(userInfo)
-			return userInfo.DisplayName
+			return userInfo.Username
 		end)
 end
 
@@ -93,7 +77,7 @@ end
 function UserInfoAggregator:PromiseHasVerifiedBadge(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return self:PromiseUserInfo(userId)
+	return self._aggregator:Promise(userId)
 		:Then(function(userInfo)
 			return userInfo.HasVerifiedBadge
 		end)
@@ -108,7 +92,7 @@ end
 function UserInfoAggregator:ObserveUserInfo(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return Rx.fromPromise(self:PromiseUserInfo(userId))
+	return self._aggregator:Observe(userId)
 end
 
 --[=[
@@ -120,78 +104,43 @@ end
 function UserInfoAggregator:ObserveDisplayName(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return self:ObserveUserInfo():Pipe({
+	return self._aggregator:Observe(userId):Pipe({
 		Rx.map(function(userInfo)
 			return userInfo.DisplayName
 		end)
 	})
 end
 
-function UserInfoAggregator:_sendAggregatedPromises(promiseMap)
-	assert(promiseMap, "No promiseMap")
+--[=[
+	Observes the Username for the userId
 
-	local userIds = {}
-	local unresolvedMap = {}
-	for userId, promise in pairs(promiseMap) do
-		table.insert(userIds, userId)
-		unresolvedMap[userId] = promise
-	end
+	@param userId number
+	@return Observable<string>
+]=]
+function UserInfoAggregator:ObserveUsername(userId)
+	assert(type(userId) == "number", "Bad userId")
 
-	if #userIds == 0 then
-		return
-	end
-
-	assert(#userIds <= MAX_USER_IDS_PER_REQUEST, "Too many userIds sent")
-
-	self._maid:GivePromise(UserServiceUtils.promiseUserInfosByUserIds(userIds))
-		:Then(function(result)
-			assert(type(result) == "table", "Bad result")
-
-			for _, data in pairs(result) do
-				assert(type(data.Id) == "number", "Bad result[?].Id")
-
-				if unresolvedMap[data.Id] then
-					unresolvedMap[data.Id]:Resolve(data)
-					unresolvedMap[data.Id] = nil
-				end
-			end
-
-			-- Reject other ones
-			for userId, promise in pairs(unresolvedMap) do
-				promise:Reject(string.format("Failed to get result for userId %d", userId))
-			end
-		end, function(...)
-			for _, item in pairs(unresolvedMap) do
-				item:Reject(...)
-			end
+	return self._aggregator:Observe(userId):Pipe({
+		Rx.map(function(userInfo)
+			return userInfo.Username
 		end)
+	})
 end
 
-function UserInfoAggregator:_resetQueue()
-	local promiseMap = self._unsentPromises
+--[=[
+	Observes the user display name for the userId
 
-	self._maid._queue = nil
-	self._unsentCount = 0
-	self._unsentPromises = {}
+	@param userId number
+	@return Observable<boolean>
+]=]
+function UserInfoAggregator:ObserveHasVerifiedBadge(userId)
+	assert(type(userId) == "number", "Bad userId")
 
-	return promiseMap
-end
-
-function UserInfoAggregator:_queueAggregatedPromises()
-	if self._unsentCount >= MAX_USER_IDS_PER_REQUEST then
-		self:_sendAggregatedPromises(self:_resetQueue())
-		return
-	end
-
-	if self._maid._queue then
-		return
-	end
-
-	self._maid._queue = task.delay(0.1, function()
-		task.spawn(function()
-			self:_sendAggregatedPromises(self:_resetQueue())
+	return self._aggregator:Observe(userId):Pipe({
+		Rx.map(function(userInfo)
+			return userInfo.HasVerifiedBadge
 		end)
-	end)
+	})
 end
 
 return UserInfoAggregator

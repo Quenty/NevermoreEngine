@@ -19,7 +19,7 @@ function AdorneeUtils.getCenter(adornee)
 	if adornee:IsA("BasePart") then
 		return adornee.Position
 	elseif adornee:IsA("Model") then
-		return adornee:GetBoundingBox().p
+		return adornee:GetBoundingBox().Position
 	elseif adornee:IsA("Attachment") then
 		return adornee.WorldPosition
 	elseif adornee:IsA("Humanoid") then

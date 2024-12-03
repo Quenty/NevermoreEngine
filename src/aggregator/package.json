@@ -1,0 +1,39 @@
+{
+  "name": "@quenty/aggregator",
+  "version": "1.0.0",
+  "description": "Aggregates async promise requests",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "aggregator"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/aggregator/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/loader": "file:../loader",
+    "@quenty/lrucache": "file:../lrucache",
+    "@quenty/promise": "file:../promise",
+    "@quenty/queue": "file:../queue",
+    "@quenty/rx": "file:../rx",
+    "@quenty/tuple": "file:../tuple"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
