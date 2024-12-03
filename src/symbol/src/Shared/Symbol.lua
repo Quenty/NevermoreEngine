@@ -34,6 +34,7 @@ end
 --[=[
 	Returns true if a symbol
 
+	@param value boolean
 	@return boolean
 ]=]
 function Symbol.isSymbol(value)

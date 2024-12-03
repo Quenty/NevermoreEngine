@@ -38,7 +38,7 @@ end
 --[=[
 	Observes the aggregated data
 
-	@param id number
+	@param ... any
 	@return Observable<T>
 ]=]
 function RateAggregator:Promise(...)
