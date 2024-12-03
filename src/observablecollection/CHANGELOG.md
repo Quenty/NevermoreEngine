@@ -1,19 +1,15 @@
-# v12.16.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- feat: ObservableMapList:ObserveListsBrio() [#521](https://github.com/Quenty/NevermoreEngine/pull/521) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.15.0...@quenty/observablecollection@12.16.0) (2024-12-03)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
 
 # [12.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.14.0...@quenty/observablecollection@12.15.0) (2024-12-03)
 
