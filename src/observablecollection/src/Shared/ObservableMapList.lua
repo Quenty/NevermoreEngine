@@ -337,6 +337,15 @@ function ObservableMapList:ObserveListBrio(key)
 end
 
 --[=[
+	Observes all observable lists in the map.
+
+	@return Observable<Brio<ObservableList<TValue>>>
+]=]
+function ObservableMapList:ObserveListsBrio()
+	return self._observableMapOfLists:ObserveValuesBrio()
+end
+
+--[=[
 	Observes the number of entries for the given key
 
 	@param key TKey
