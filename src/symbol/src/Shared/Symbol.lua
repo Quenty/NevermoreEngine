@@ -7,8 +7,6 @@
 ]=]
 
 local Symbol = {}
-Symbol.ClassName = "Symbol"
-Symbol.__index = Symbol
 
 --[=[
 	Creates a Symbol with the given name.
@@ -22,17 +20,24 @@ Symbol.__index = Symbol
 function Symbol.named(name)
 	assert(type(name) == "string", "Symbols must be created using a string name!")
 
-	return table.freeze(setmetatable({
-		_symbolName = name;
-	}, Symbol))
+	local self = newproxy(true)
+
+	local wrappedName = string.format("Symbol(%s)", name)
+
+	getmetatable(self).__tostring = function()
+		return wrappedName
+	end
+
+	return self
 end
 
+--[=[
+	Returns true if a symbol
+
+	@return boolean
+]=]
 function Symbol.isSymbol(value)
-	return type(value) == "table" and getmetatable(value) == Symbol
+	return typeof(value) == "userdata"
 end
 
-function Symbol:__tostring()
-	return string.format("Symbol(%s)", self._symbolName)
-end
-
-return table.freeze(Symbol)
+return Symbol
