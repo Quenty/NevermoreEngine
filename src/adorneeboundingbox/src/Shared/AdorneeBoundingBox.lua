@@ -51,6 +51,31 @@ function AdorneeBoundingBox:SetAdornee(adornee)
 	end
 end
 
+function AdorneeBoundingBox:ObserveBoundingBox()
+	return Rx.combineLatest({
+		CFrame = self:ObserveCFrame();
+		Size = self:ObserveSize();
+	}):Pipe({
+		Rx.where(function(state)
+			return state.CFrame and state.Size
+		end);
+	})
+end
+
+function AdorneeBoundingBox:GetBoundingBox()
+	local cframe = self._bbCFrame.Value
+	local size = self._bbSize.Value
+
+	if cframe and size then
+		return {
+			CFrame = cframe;
+			Size = size;
+		}
+	else
+		return nil
+	end
+end
+
 --[=[
 	Observes the cframe of the adornee
 	@return Observable<Vector3>
