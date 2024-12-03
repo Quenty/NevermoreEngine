@@ -57,6 +57,27 @@ function ObservableSet.new()
 end
 
 --[=[
+	Constructs an ObservableSet populated via an observable of Brios
+	@param observable Observable<Brio<T>>
+	@return ObservableSet<T>
+]=]
+function ObservableSet.fromObservableBrio(observable)
+	local set = ObservableSet.new()
+
+	set._maid:GiveTask(observable:Subscribe(function(value)
+		assert(Brio.isBrio(value), "Observable must emit brio")
+
+		if value:IsDead() then
+			return
+		end
+
+		value:ToMaid():GiveTask(set:Add(value:GetValue()))
+	end))
+
+	return set
+end
+
+--[=[
 	Returns whether the value is an observable set
 	@param value any
 	@return boolean
