@@ -1,23 +1,18 @@
-# v14.14.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.13.0...@quenty/buttonhighlightmodel@14.14.0) (2024-12-03)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([2eafecc](https://github.com/Quenty/NevermoreEngine/commit/2eafeccab277e4462235568a31873d743767ad07))
+
+
+
+
 
 # [14.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.12.0...@quenty/buttonhighlightmodel@14.13.0) (2024-11-13)
 

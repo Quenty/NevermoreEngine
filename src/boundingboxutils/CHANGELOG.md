@@ -1,23 +1,18 @@
-# v4.3.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Use modern Roblox APIs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.2.0...@quenty/boundingboxutils@4.3.0) (2024-12-03)
+
+
+### Bug Fixes
+
+* Use modern Roblox APIs ([b4b9047](https://github.com/Quenty/NevermoreEngine/commit/b4b90471fbb678c6fb84664dbfc32cb9bfc56c2c))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.1.0...@quenty/boundingboxutils@4.2.0) (2024-05-09)
 

@@ -1,24 +1,18 @@
-# v12.19.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing services ([@Quenty](https://github.com/Quenty))
-- docs: Update docs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.18.0...@quenty/gameconfig@12.19.0) (2024-12-03)
+
+
+### Bug Fixes
+
+* Fix missing services ([92ea9de](https://github.com/Quenty/NevermoreEngine/commit/92ea9dea686cba1a9757f32648a930840efad2e7))
+
+
+
+
 
 # [12.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.17.0...@quenty/gameconfig@12.18.0) (2024-11-13)
 

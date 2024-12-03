@@ -1,20 +1,18 @@
-# v8.15.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-- feat: Add BoundingBox API calls ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.14.0...@quenty/adorneeboundingbox@8.15.0) (2024-12-03)
+
+
+### Features
+
+* Add BoundingBox API calls ([e6b0838](https://github.com/Quenty/NevermoreEngine/commit/e6b0838eefee355da68cf0a0ef19388ab60ead38))
+
+
+
+
 
 # [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.13.0...@quenty/adorneeboundingbox@8.14.0) (2024-11-13)
 

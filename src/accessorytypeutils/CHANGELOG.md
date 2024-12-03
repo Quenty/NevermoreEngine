@@ -1,21 +1,19 @@
-# v1.5.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-- feat: PlayerProductManagerClient queries inventory when inventory is available ([@Quenty](https://github.com/Quenty))
-- feat: Use EnumUtils here ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/accessorytypeutils@1.4.1...@quenty/accessorytypeutils@1.5.0) (2024-12-03)
+
+
+### Features
+
+* PlayerProductManagerClient queries inventory when inventory is available ([d159eea](https://github.com/Quenty/NevermoreEngine/commit/d159eeade8701bcbcd87e97126df3c3dfb155b8c))
+* Use EnumUtils here ([0232f25](https://github.com/Quenty/NevermoreEngine/commit/0232f25f0bdcd57801e053abd3766a0dc32eeb9a))
+
+
+
+
 
 ## [1.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/accessorytypeutils@1.4.0...@quenty/accessorytypeutils@1.4.1) (2024-11-04)
 

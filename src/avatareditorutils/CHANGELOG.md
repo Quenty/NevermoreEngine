@@ -1,25 +1,24 @@
-# v7.15.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-- feat: PlayerProductManagerClient queries inventory when inventory is available ([@Quenty](https://github.com/Quenty))
-- feat: Break up logic into inventory and catalog to allow centralized querying ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Reject promises when failing to succeed prompt ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.14.0...@quenty/avatareditorutils@7.15.0) (2024-12-03)
+
+
+### Bug Fixes
+
+* Reject promises when failing to succeed prompt ([8995ffc](https://github.com/Quenty/NevermoreEngine/commit/8995ffc94abe3e6e34f6a924f275177e7a22b641))
+
+
+### Features
+
+* Break up logic into inventory and catalog to allow centralized querying ([939f8b1](https://github.com/Quenty/NevermoreEngine/commit/939f8b10398b9955129195b71e95f12bb29bd219))
+* PlayerProductManagerClient queries inventory when inventory is available ([d159eea](https://github.com/Quenty/NevermoreEngine/commit/d159eeade8701bcbcd87e97126df3c3dfb155b8c))
+
+
+
+
 
 # [7.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.13.0...@quenty/avatareditorutils@7.14.0) (2024-11-13)
 

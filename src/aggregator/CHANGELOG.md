@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2024-12-03)
+
+
+### Features
+
+* Add RateAggregator ([bc4fb74](https://github.com/Quenty/NevermoreEngine/commit/bc4fb74a9901882843ea4a4a63531b47bf7e6c35))
+
+
+
+
+
 # v1.1.0 (Tue Dec 03 2024)
 
 #### 🚀 Enhancement

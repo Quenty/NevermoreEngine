@@ -1,28 +1,25 @@
-# v14.19.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-- feat: Remove ownership tracking mess with well-known assets and attributes and just use raw state ([@Quenty](https://github.com/Quenty))
-- feat: PlayerProductManagerClient queries inventory when inventory is available ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing services ([@Quenty](https://github.com/Quenty))
-- style: Remove unused imports ([@Quenty](https://github.com/Quenty))
-- docs: Update docsfor the PlayerAssetMarketTracker ([@Quenty](https://github.com/Quenty))
-- fix: Subscription status is reported properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.18.0...@quenty/gameproductservice@14.19.0) (2024-12-03)
+
+
+### Bug Fixes
+
+* Fix missing services ([92ea9de](https://github.com/Quenty/NevermoreEngine/commit/92ea9dea686cba1a9757f32648a930840efad2e7))
+* Subscription status is reported properly ([9883437](https://github.com/Quenty/NevermoreEngine/commit/98834378f2379503c7a7c69858b7dbfa2ff546aa))
+
+
+### Features
+
+* PlayerProductManagerClient queries inventory when inventory is available ([d159eea](https://github.com/Quenty/NevermoreEngine/commit/d159eeade8701bcbcd87e97126df3c3dfb155b8c))
+* Remove ownership tracking mess with well-known assets and attributes and just use raw state ([5147d50](https://github.com/Quenty/NevermoreEngine/commit/5147d5083c7c0b945dbf8f41e74805905d5e0271))
+
+
+
+
 
 # [14.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.17.0...@quenty/gameproductservice@14.18.0) (2024-11-13)
 

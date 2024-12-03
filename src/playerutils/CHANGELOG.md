@@ -1,20 +1,18 @@
-# v8.14.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-- feat: Add PlayerUtils.formatDisplayName(name) and other useful methods ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.13.0...@quenty/playerutils@8.14.0) (2024-12-03)
+
+
+### Features
+
+* Add PlayerUtils.formatDisplayName(name) and other useful methods ([61c9b97](https://github.com/Quenty/NevermoreEngine/commit/61c9b9782dc62f37b3bfc81febea3dbec406f157))
+
+
+
+
 
 # [8.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.12.0...@quenty/playerutils@8.13.0) (2024-11-13)
 

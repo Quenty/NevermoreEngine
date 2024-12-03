@@ -1,24 +1,18 @@
-# v3.4.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix missing docs ([@Quenty](https://github.com/Quenty))
-- fix: Symbols should be newproxy() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/symbol@3.3.0...@quenty/symbol@3.4.0) (2024-12-03)
+
+
+### Bug Fixes
+
+* Symbols should be newproxy() ([afb4337](https://github.com/Quenty/NevermoreEngine/commit/afb43373b3376a5e5c608eff0ea0a889240081a8))
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/symbol@3.2.0...@quenty/symbol@3.3.0) (2024-11-06)
 

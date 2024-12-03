@@ -1,20 +1,18 @@
-# v5.9.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-- feat: Add PagesProxy to allow caching of pages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.8.0...@quenty/pagesutils@5.9.0) (2024-12-03)
+
+
+### Features
+
+* Add PagesProxy to allow caching of pages ([8afb7cc](https://github.com/Quenty/NevermoreEngine/commit/8afb7cc1d160025f53041c6fa5c987078712fa5f))
+
+
+
+
 
 # [5.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.7.1...@quenty/pagesutils@5.8.0) (2024-11-06)
 

@@ -1,23 +1,15 @@
-# v12.15.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Update docs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.14.0...@quenty/remoting@12.15.0) (2024-12-03)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
 
 # [12.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.13.0...@quenty/remoting@12.14.0) (2024-11-13)
 

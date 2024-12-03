@@ -1,23 +1,15 @@
-# v14.16.0 (Tue Dec 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/sorted list improvements [#522](https://github.com/Quenty/NevermoreEngine/pull/522) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Add articles to binder README.md ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.15.0...@quenty/binder@14.16.0) (2024-12-03)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
 
 # [14.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.14.0...@quenty/binder@14.15.0) (2024-11-13)
 
