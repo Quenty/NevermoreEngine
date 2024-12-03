@@ -54,17 +54,17 @@ function UserInfoAggregator:PromiseDisplayName(userId)
 end
 
 --[=[
-	Promises the user display name for the userId
+	Promises the Username for the userId
 
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserInfoAggregator:PromiseDisplayName(userId)
+function UserInfoAggregator:PromiseUsername(userId)
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Promise(userId)
 		:Then(function(userInfo)
-			return userInfo.DisplayName
+			return userInfo.Username
 		end)
 end
 
@@ -107,6 +107,22 @@ function UserInfoAggregator:ObserveDisplayName(userId)
 	return self._aggregator:Observe(userId):Pipe({
 		Rx.map(function(userInfo)
 			return userInfo.DisplayName
+		end)
+	})
+end
+
+--[=[
+	Observes the Username for the userId
+
+	@param userId number
+	@return Observable<string>
+]=]
+function UserInfoAggregator:ObserveUsername(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return self._aggregator:Observe(userId):Pipe({
+		Rx.map(function(userInfo)
+			return userInfo.Username
 		end)
 	})
 end
