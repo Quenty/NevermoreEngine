@@ -29,6 +29,7 @@ function GameConfigService:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("CmdrService"))
+	self._serviceBag:GetService(require("MarketplaceServiceCache"))
 
 	-- Internal
 	self._serviceBag:GetService(require("GameConfigCommandService"))
