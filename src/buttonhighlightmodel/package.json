@@ -29,6 +29,7 @@
     "@quenty/acceltween": "file:../acceltween",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/blend": "file:../blend",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/rectutils": "file:../rectutils",
