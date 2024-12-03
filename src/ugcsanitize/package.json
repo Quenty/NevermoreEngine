@@ -1,13 +1,12 @@
 {
-  "name": "@quenty/firstpersoncharactertransparency",
-  "version": "14.14.0",
-  "description": "Allows transparency to manually be controlled for a character in first-person mode",
+  "name": "@quenty/ugcsanitize",
+  "version": "1.0.0",
+  "description": "Sanitizes UGC hats and other items",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "Transparency",
-    "Character"
+    "ugcsanitize"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -15,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/firstpersoncharactertransparency/"
+    "directory": "src/ugcsanitize/"
   },
   "funding": {
     "type": "patreon",
@@ -27,16 +26,10 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
-    "@quenty/brio": "file:../brio",
-    "@quenty/humanoidtracker": "file:../humanoidtracker",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/r15utils": "file:../r15utils",
-    "@quenty/rx": "file:../rx",
-    "@quenty/statestack": "file:../statestack",
-    "@quenty/transparencyservice": "file:../transparencyservice",
-    "@quenty/ugcsanitize": "file:../ugcsanitize"
+    "@quenty/string": "file:../string"
   },
   "publishConfig": {
     "access": "public"

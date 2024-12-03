@@ -1,4 +1,5 @@
-## FirstPersonCharacterTransparency
+## UGCSanitize
+
 <div align="center">
   <a href="http://quenty.github.io/NevermoreEngine/">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
@@ -11,11 +12,12 @@
   </a>
 </div>
 
-Allows transparency to manually be controlled for a character in first-person mode
+Sanitizes UGC hats and other items
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ShowBody">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/UGCSanitizeUtils">View docs →</a></div>
 
 ## Installation
+
 ```
-npm install @quenty/firstpersoncharactertransparency --save
+npm install @quenty/ugcsanitize --save
 ```
