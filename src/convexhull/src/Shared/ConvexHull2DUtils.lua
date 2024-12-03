@@ -47,8 +47,8 @@ end
 	Computes line intersection between vectors
 ]=]
 function ConvexHull2DUtils.lineIntersect(a: Vector2, b: Vector2, c: Vector2, d: Vector2): Vector2 | nil
-	local r = (b - a)
-	local s = (d - c)
+	local r = b - a
+	local s = d - c
 	local dot = r.x * s.y - r.y * s.x
 	local u = ((c.x - a.x) * r.y - (c.y - a.y) * r.x) / dot
 	local t = ((c.x - a.x) * s.y - (c.y - a.y) * s.x) / dot
@@ -88,6 +88,7 @@ function ConvexHull2DUtils.raycast(from: Vector2, to: Vector2, hull: { Vector2 }
 	if not closest then
 		return nil, nil, nil
 	end
+
 	return closest.point, closest.startPoint, closest.finishPoint
 end
 

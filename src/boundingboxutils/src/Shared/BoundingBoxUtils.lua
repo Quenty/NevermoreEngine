@@ -29,7 +29,7 @@ end
 	@return Vector3 -- Center of bounding box
 ]=]
 function BoundingBoxUtils.clampPointToBoundingBox(cframe, size, point)
-	local transform = cframe:pointToObjectSpace(point) -- transform into local space
+	local transform = cframe:PointToObjectSpace(point) -- transform into local space
 	local halfSize = size * 0.5
 	return cframe * Vector3.new( -- Clamp & transform into world space
 		math.clamp(transform.x, -halfSize.x, halfSize.x),
@@ -47,7 +47,7 @@ end
 	@return Vector3
 ]=]
 function BoundingBoxUtils.pushPointToLieOnBoundingBox(cframe, size, point)
-	local transform = cframe:pointToObjectSpace(point) -- transform into local space
+	local transform = cframe:PointToObjectSpace(point) -- transform into local space
 	local halfSize = size * 0.5
 	local x = transform.x < 0 and -halfSize.x or halfSize.x
 	local y = transform.y < 0 and -halfSize.y or halfSize.y
@@ -109,18 +109,18 @@ end
 	@return Vector3 -- size
 	@return Vector3 -- position
 ]=]
-function BoundingBoxUtils.getBoundingBox(data, relativeTo)
+function BoundingBoxUtils.getBoundingBox(data, relativeTo: CFrame?)
 	relativeTo = relativeTo or CFrame.new()
 
 	local minx, miny, minz = math.huge, math.huge, math.huge
 	local maxx, maxy, maxz = -math.huge, -math.huge, -math.huge
 
 	for _, obj in pairs(data) do
-		local cf = relativeTo:toObjectSpace(obj.CFrame)
+		local cframe = relativeTo:toObjectSpace(obj.CFrame)
 		local size = obj.Size
 		local sx, sy, sz = size.X, size.Y, size.Z
 
-		local x, y, z, R00, R01, R02, R10, R11, R12, R20, R21, R22 = cf:components()
+		local x, y, z, R00, R01, R02, R10, R11, R12, R20, R21, R22 = cframe:GetComponents()
 
 		-- https://zeuxcg.org/2010/10/17/aabb-from-obb-with-component-wise-abs/
 		local wsx = 0.5 * (math.abs(R00) * sx + math.abs(R01) * sy + math.abs(R02) * sz)
@@ -162,7 +162,7 @@ end
 	@return boolean
 ]=]
 function BoundingBoxUtils.inBoundingBox(cframe: CFrame, size: Vector3, testPosition: Vector3): boolean
-	local relative = cframe:pointToObjectSpace(testPosition)
+	local relative = cframe:PointToObjectSpace(testPosition)
 	local hsx, hsy, hsz = size.X/2, size.Y/2, size.Z/2
 
 	local rx, ry, rz = relative.x, relative.y, relative.z
@@ -183,7 +183,7 @@ end
 	@return boolean
 ]=]
 function BoundingBoxUtils.inCylinderBoundingBox(cframe, size, testPosition)
-	local relative = cframe:pointToObjectSpace(testPosition)
+	local relative = cframe:PointToObjectSpace(testPosition)
 	local half_height = size.x/2
 	local radius = math.min(size.y, size.z)/2
 
@@ -202,7 +202,7 @@ end
 	@return boolean
 ]=]
 function BoundingBoxUtils.inBallBoundingBox(cframe, size, testPosition)
-	local relative = cframe:pointToObjectSpace(testPosition)
+	local relative = cframe:PointToObjectSpace(testPosition)
 	local radius = math.min(size.x, size.y, size.z)/2
 
 	local rx, ry, rz = relative.x, relative.y, relative.z

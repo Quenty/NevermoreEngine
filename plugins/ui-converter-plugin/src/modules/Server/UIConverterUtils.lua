@@ -119,7 +119,7 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 						roundY,
 						roundZ)
 			else
-				return string.format("CFrame.new(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", applyToTuple(roundNumber, value:components()))
+				return string.format("CFrame.new(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", applyToTuple(roundNumber, value:GetComponents()))
 			end
 		end
 	elseif valueType == "Rect" then
