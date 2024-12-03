@@ -15,6 +15,14 @@ local Aggregator = setmetatable({}, BaseObject)
 Aggregator.ClassName = "Aggregator"
 Aggregator.__index = Aggregator
 
+--[=[
+	Creates a new aggregator that aggregates promised results together
+
+	@param debugName string
+	@param promiseBulkQuery ({ number }) -> Promise<T>
+
+	@return Aggregator<T>
+]=]
 function Aggregator.new(debugName, promiseBulkQuery)
 	assert(type(debugName) == "string", "Bad debugName")
 
@@ -33,6 +41,10 @@ function Aggregator.new(debugName, promiseBulkQuery)
 	return self
 end
 
+--[=[
+	@param id number
+	@return Promise<T>
+]=]
 function Aggregator:Promise(id)
 	assert(type(id) == "number", "Bad id")
 
@@ -53,10 +65,10 @@ function Aggregator:Promise(id)
 end
 
 --[=[
-	Observes the user display name for the id
+	Observes the aggregated data
 
 	@param id number
-	@return Observable<UserInfo>
+	@return Observable<T>
 ]=]
 function Aggregator:Observe(id)
 	assert(type(id) == "number", "Bad id")

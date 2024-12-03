@@ -29,7 +29,9 @@
     "@quenty/loader": "file:../loader",
     "@quenty/lrucache": "file:../lrucache",
     "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx"
+    "@quenty/queue": "file:../queue",
+    "@quenty/rx": "file:../rx",
+    "@quenty/tuple": "file:../tuple"
   },
   "publishConfig": {
     "access": "public"
