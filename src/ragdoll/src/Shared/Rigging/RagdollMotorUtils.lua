@@ -199,12 +199,12 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 			weld.C0 = innerState.C0 * innerState.Transform
 		end))
 
-		if weld:IsA("Motor6D") then
+		-- if weld:IsA("Motor6D") then
 			-- Suppress animations on any weld connection
-			weldMaid:GiveTask(RunService.Stepped:Connect(function()
-				weld.Transform = CFrame.new()
-			end))
-		end
+			-- weldMaid:GiveTask(RunService.Stepped:Connect(function()
+			-- 	weld.Transform = CFrame.new()
+			-- end))
+		-- end
 
 		weldMaid:GiveTask(RxInstanceUtils.observeProperty(motor, "C1"):Subscribe(function(c1)
 			weld.C1 = c1
@@ -231,13 +231,13 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 		end))
 
 	-- Lerp smoothly to 0 to avoid jarring camera.
-	maid:GiveTask(RunService.Stepped:Connect(function()
-		local target = QFrame.toCFrame(lastTransformSpring.p)
-		if target then
-			transformValue.Value = target
-			motor.Transform = target
-		end
-	end))
+	-- maid:GiveTask(RunService.Stepped:Connect(function()
+	-- 	local target = QFrame.toCFrame(lastTransformSpring.p)
+	-- 	if target then
+	-- 		transformValue.Value = target
+	-- 		motor.Transform = target
+	-- 	end
+	-- end))
 
 	motor.Enabled = false
 
