@@ -4,5 +4,5 @@ name: lint-external-prs
 on: [pull_request_target]
 jobs:
   lint:
-    if: "github.event.pull_request.head.repo.fork"
+    if: github.event.pull_request.head.repo.fork == true
     uses: ./.github/workflows/lint.yml

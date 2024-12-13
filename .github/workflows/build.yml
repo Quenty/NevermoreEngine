@@ -7,20 +7,20 @@ jobs:
   release:
     needs: lint
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+    if: github.event_name == 'push' && !contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci') && startsWith(github.ref, 'refs/tags/')
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout the Repository
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
 
-      - name: Setup node
-        uses: actions/setup-node@v2
+      - name: Set Up Node.JS
+        uses: actions/setup-node@v4.0.0
         env:
           NPM_TOKEN: '' # https://github.com/JS-DevTools/npm-publish/issues/15
         with:
           cache-dependency-path: package.json # we don't have a package-lock.json so we'll use this instead...
-          node-version: "18"
+          node-version: 20
 
       - name: Run `npm install --no-package-lock` on cli-output-helpers
         run: npm install --no-package-lock
@@ -46,7 +46,7 @@ jobs:
         run: npm run build
         working-directory: tools/nevermore-cli
 
-      - name: Run npm install
+      - name: Run NPM Install
         run: npm install --no-save
 
       - name: Create Release
@@ -55,7 +55,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx auto shipit
 
-      - name: Upload lerna logs
+      - name: Upload Lerna Logs
         if: failure()
         uses: actions/upload-artifact@v3
         with:
