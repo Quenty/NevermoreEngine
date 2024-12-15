@@ -1,20 +1,18 @@
-# v10.18.0 (Sun Dec 15 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
-- feat: Allow observation of grades from palette ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.17.0...@quenty/colorpalette@10.18.0) (2024-12-15)
+
+
+### Features
+
+* Allow observation of grades from palette ([d30ecab](https://github.com/Quenty/NevermoreEngine/commit/d30ecab8ec6d5710a002f677293a8a9f7562065d))
+
+
+
+
 
 # [10.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.16.0...@quenty/colorpalette@10.17.0) (2024-12-03)
 

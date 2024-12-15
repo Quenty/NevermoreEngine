@@ -1,20 +1,18 @@
-# v10.17.0 (Sun Dec 15 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
-- feat: Add RigBuilderUtils.findAnimateScript(rig: Model) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.16.0...@quenty/rigbuilderutils@10.17.0) (2024-12-15)
+
+
+### Features
+
+* Add RigBuilderUtils.findAnimateScript(rig: Model) ([8e4a44e](https://github.com/Quenty/NevermoreEngine/commit/8e4a44ed1408c68e0ef3eedfa5973557a43d65f7))
+
+
+
+
 
 # [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.15.0...@quenty/rigbuilderutils@10.16.0) (2024-12-03)
 

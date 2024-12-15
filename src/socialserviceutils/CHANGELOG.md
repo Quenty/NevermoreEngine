@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/socialserviceutils@10.8.0...@quenty/socialserviceutils@10.9.0) (2024-12-15)
+
+**Note:** Version bump only for package @quenty/socialserviceutils
+
+
+
+
+
 # [10.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/socialserviceutils@10.7.1...@quenty/socialserviceutils@10.8.0) (2024-11-06)
 
 **Note:** Version bump only for package @quenty/socialserviceutils

@@ -1,20 +1,18 @@
-# v13.15.0 (Sun Dec 15 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
-- feat: Add fail and complete state to Rx ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.14.0...@quenty/rx@13.15.0) (2024-12-15)
+
+
+### Features
+
+* Add fail and complete state to Rx ([4bb843b](https://github.com/Quenty/NevermoreEngine/commit/4bb843bfb89c18579a80ba2f11b1d48faa86b48f))
+
+
+
+
 
 # [13.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.13.0...@quenty/rx@13.14.0) (2024-12-03)
 

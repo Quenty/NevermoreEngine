@@ -1,20 +1,18 @@
-# v1.2.0 (Sun Dec 15 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
-- feat: Add rate aggregation and batching ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.1.0...@quenty/aggregator@1.2.0) (2024-12-15)
+
+
+### Features
+
+* Add rate aggregation and batching ([8b3b2a6](https://github.com/Quenty/NevermoreEngine/commit/8b3b2a62d5f272980a404b72e2c0d36eae04dfec))
+
+
+
+
 
 # 1.1.0 (2024-12-03)
 

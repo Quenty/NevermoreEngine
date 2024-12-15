@@ -1,20 +1,18 @@
-# v10.9.0 (Sun Dec 15 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
-- feat: Add retry mechanism to UserInfoAggregator ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.8.0...@quenty/promise@10.9.0) (2024-12-15)
+
+
+### Features
+
+* Add retry mechanism to UserInfoAggregator ([7ff28b9](https://github.com/Quenty/NevermoreEngine/commit/7ff28b98173b376389496d6d895ba564edf4b337))
+
+
+
+
 
 # [10.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.7.1...@quenty/promise@10.8.0) (2024-11-06)
 

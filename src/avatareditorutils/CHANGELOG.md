@@ -1,23 +1,18 @@
-# v7.17.0 (Sun Dec 15 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Limit batch request size ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.16.0...@quenty/avatareditorutils@7.17.0) (2024-12-15)
+
+
+### Bug Fixes
+
+* Limit batch request size ([0a48559](https://github.com/Quenty/NevermoreEngine/commit/0a485593478e3a4696d1433219233323cb30fbeb))
+
+
+
+
 
 # [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.15.0...@quenty/avatareditorutils@7.16.0) (2024-12-03)
 

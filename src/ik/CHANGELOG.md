@@ -1,23 +1,18 @@
-# v15.20.0 (Sun Dec 15 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: cleanup IK service properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.19.0...@quenty/ik@15.20.0) (2024-12-15)
+
+
+### Bug Fixes
+
+* cleanup IK service properly ([09f4cf9](https://github.com/Quenty/NevermoreEngine/commit/09f4cf909d8e3b903a21f897359f04a48abc5100))
+
+
+
+
 
 # [15.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.18.0...@quenty/ik@15.19.0) (2024-12-03)
 

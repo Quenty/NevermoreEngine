@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@10.8.0...@quenty/badgeutils@10.9.0) (2024-12-15)
+
+**Note:** Version bump only for package @quenty/badgeutils
+
+
+
+
+
 # [10.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@10.7.1...@quenty/badgeutils@10.8.0) (2024-11-06)
 
 **Note:** Version bump only for package @quenty/badgeutils

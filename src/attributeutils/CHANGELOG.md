@@ -1,20 +1,18 @@
-# v14.15.0 (Sun Dec 15 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
-- feat: Add JSONAttributeValue and EncodedAttributeValue ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.14.0...@quenty/attributeutils@14.15.0) (2024-12-15)
+
+
+### Features
+
+* Add JSONAttributeValue and EncodedAttributeValue ([fbb09eb](https://github.com/Quenty/NevermoreEngine/commit/fbb09ebcbec2e22580918727e5157f0789fafa17))
+
+
+
+
 
 # [14.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.13.0...@quenty/attributeutils@14.14.0) (2024-12-03)
 
