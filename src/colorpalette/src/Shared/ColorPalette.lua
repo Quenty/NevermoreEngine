@@ -270,14 +270,10 @@ function ColorPalette:ObserveModifiedGrade(gradeName, amount, multiplier)
 end
 
 function ColorPalette:ObserveGrade(name)
-	assert(type(name) == "string", "Bad name")
-
 	return self._gradePalette:ObserveGrade(name)
 end
 
 function ColorPalette:ObserveVividness(name)
-	assert(type(name) == "string", "Bad name")
-
 	return self._gradePalette:ObserveVividness(name)
 end
 
