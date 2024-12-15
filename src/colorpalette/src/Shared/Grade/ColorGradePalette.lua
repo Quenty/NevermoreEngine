@@ -95,14 +95,7 @@ function ColorGradePalette:Add(gradeName, colorGrade, vividness)
 end
 
 function ColorGradePalette:ObserveGrade(gradeName)
-	assert(type(gradeName) == "string", "Bad gradeName")
-
-	if not self._grades[gradeName] then
-		error(string.format("No grade for gradeName %q defined", gradeName))
-		return
-	end
-
-	return self._grades[gradeName], self._vividness[gradeName]
+	return self:_observeGradeFromName(gradeName)
 end
 
 function ColorGradePalette:ObserveVividness(gradeName)

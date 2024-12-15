@@ -29,9 +29,12 @@ function CatalogSearchServiceCache:Init(serviceBag)
 	self._assetAggregator = self._maid:Add(Aggregator.new("AvatarEditorUtils.promiseBatchItemDetails", function(itemIds)
 		return AvatarEditorUtils.promiseBatchItemDetails(itemIds, Enum.AvatarItemType.Asset)
 	end))
+	self._assetAggregator:SetMaxBatchSize(100)
+
 	self._bundleAggregator = self._maid:Add(Aggregator.new("AvatarEditorUtils.promiseBatchItemDetails", function(itemIds)
 		return AvatarEditorUtils.promiseBatchItemDetails(itemIds, Enum.AvatarItemType.Bundle)
 	end))
+	self._bundleAggregator:SetMaxBatchSize(100)
 end
 
 function CatalogSearchServiceCache:PromiseAvatarRules()

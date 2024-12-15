@@ -85,8 +85,9 @@ end
 
 --[=[
 	Fails the subscription, preventing anything else from emitting.
+	@param ... any
 ]=]
-function Subscription:Fail()
+function Subscription:Fail(...)
 	if self._state ~= SubscriptionStateTypes.PENDING then
 		return
 	end
@@ -94,7 +95,7 @@ function Subscription:Fail()
 	self._state = SubscriptionStateTypes.FAILED
 
 	if self._failCallback then
-		self._failCallback()
+		self._failCallback(...)
 	end
 
 	self:_doCleanup()
@@ -157,15 +158,17 @@ end
 --[=[
 	Completes the subscription, preventing anything else from being
 	emitted.
+
+	@param ... any
 ]=]
-function Subscription:Complete()
+function Subscription:Complete(...)
 	if self._state ~= SubscriptionStateTypes.PENDING then
 		return
 	end
 
 	self._state = SubscriptionStateTypes.COMPLETE
 	if self._completeCallback then
-		self._completeCallback()
+		self._completeCallback(...)
 	end
 
 	self:_doCleanup()

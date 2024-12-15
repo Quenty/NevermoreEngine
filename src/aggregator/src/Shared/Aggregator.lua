@@ -23,22 +23,32 @@ Aggregator.__index = Aggregator
 
 	@return Aggregator<T>
 ]=]
-function Aggregator.new(debugName, promiseBulkQuery)
+function Aggregator.new(debugName: string, promiseBulkQuery)
 	assert(type(debugName) == "string", "Bad debugName")
 
 	local self = setmetatable(BaseObject.new(), Aggregator)
 
 	self._debugName = debugName
-	self._promiseBulkQuery = assert(promiseBulkQuery, "No promiseBulkQuery")
+	self._promiseBatchQuery = assert(promiseBulkQuery, "No promiseBulkQuery")
 
-	-- TODO: LRU cache this? Limit to 1k or something?
 	self._promisesLruCache = LRUCache.new(2000)
 
-	self._maxPerRequest = 200
+	self._maxBatchSize = 200
 	self._unsentCount = 0
 	self._unsentPromises = {}
 
 	return self
+end
+
+--[=[
+	Sets the max batch size
+	@param maxBatchSize number
+]=]
+function Aggregator:SetMaxBatchSize(maxBatchSize: number)
+	assert(type(maxBatchSize) == "number", "Bad maxBatchSize")
+	assert(self._unsentCount == 0, "Cannot set while unsent values exist")
+
+	self._maxBatchSize = maxBatchSize
 end
 
 --[=[
@@ -59,7 +69,7 @@ function Aggregator:Promise(id)
 	self._unsentCount = self._unsentCount + 1
 	self._promisesLruCache:set(id, promise)
 
-	self:_queueAggregatedPromises()
+	self:_queueBatchRequests()
 
 	return promise
 end
@@ -76,7 +86,7 @@ function Aggregator:Observe(id)
 	return Rx.fromPromise(self:Promise(id))
 end
 
-function Aggregator:_sendAggregatedPromises(promiseMap)
+function Aggregator:_sendBatchedPromises(promiseMap)
 	assert(promiseMap, "No promiseMap")
 
 	local idList = {}
@@ -90,9 +100,9 @@ function Aggregator:_sendAggregatedPromises(promiseMap)
 		return
 	end
 
-	assert(#idList <= self._maxPerRequest, "Too many idList sent")
+	assert(#idList <= self._maxBatchSize, "Too many idList sent")
 
-	self._maid:GivePromise(self._promiseBulkQuery(idList))
+	self._maid:GivePromise(self._promiseBatchQuery(idList))
 		:Then(function(result)
 			assert(type(result) == "table", "Bad result")
 
@@ -107,11 +117,13 @@ function Aggregator:_sendAggregatedPromises(promiseMap)
 
 			-- Reject other ones
 			for id, promise in pairs(unresolvedMap) do
-				promise:Reject(string.format("Aggregated %s failed to get result for id %d", self._debugName, id))
+				promise:Reject(string.format("[Aggregator] %s failed to get result for id %d", self._debugName, id))
 			end
-		end, function(...)
+		end, function(err, ...)
+			local text = string.format("[Aggregator] %s failed to get bulk result - %q", self._debugName, tostring(err))
+
 			for _, item in pairs(unresolvedMap) do
-				item:Reject(...)
+				item:Reject(text, ...)
 			end
 		end)
 end
@@ -126,9 +138,9 @@ function Aggregator:_resetQueue()
 	return promiseMap
 end
 
-function Aggregator:_queueAggregatedPromises()
-	if self._unsentCount >= self._maxPerRequest then
-		self:_sendAggregatedPromises(self:_resetQueue())
+function Aggregator:_queueBatchRequests()
+	if self._unsentCount >= self._maxBatchSize then
+		self:_sendBatchedPromises(self:_resetQueue())
 		return
 	end
 
@@ -138,7 +150,7 @@ function Aggregator:_queueAggregatedPromises()
 
 	self._maid._queue = task.delay(0.1, function()
 		task.spawn(function()
-			self:_sendAggregatedPromises(self:_resetQueue())
+			self:_sendBatchedPromises(self:_resetQueue())
 		end)
 	end)
 end

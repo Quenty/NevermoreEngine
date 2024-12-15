@@ -35,6 +35,10 @@ function RateAggregator.new(promiseQuery)
 	return self
 end
 
+function RateAggregator:SetMaxRequestsPerSecond(maxRequestPerSecond)
+	self._maxRequestsPerSecond = maxRequestPerSecond
+end
+
 --[=[
 	Observes the aggregated data
 

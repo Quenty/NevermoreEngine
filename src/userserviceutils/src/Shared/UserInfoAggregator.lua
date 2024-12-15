@@ -10,6 +10,7 @@ local Aggregator = require("Aggregator")
 local BaseObject = require("BaseObject")
 local Rx = require("Rx")
 local UserServiceUtils = require("UserServiceUtils")
+local PromiseRetryUtils = require("PromiseRetryUtils")
 
 local UserInfoAggregator = setmetatable({}, BaseObject)
 UserInfoAggregator.ClassName = "UserInfoAggregator"
@@ -19,7 +20,13 @@ function UserInfoAggregator.new()
 	local self = setmetatable(BaseObject.new(), UserInfoAggregator)
 
 	self._aggregator = self._maid:Add(Aggregator.new("UserServiceUtils.promiseUserInfosByUserIds", function(userIdList)
-		return UserServiceUtils.promiseUserInfosByUserIds(userIdList)
+		return PromiseRetryUtils.retry(function()
+			return UserServiceUtils.promiseUserInfosByUserIds(userIdList)
+		end, {
+			initialWaitTime = 10;
+			maxAttempts = 10;
+			printWarning = true;
+		})
 	end))
 
 	return self
