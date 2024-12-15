@@ -45,7 +45,6 @@ IKService.ServiceName = "IKService"
 function IKService:Init(serviceBag)
 	assert(not self._maid, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-
 	self._maid = Maid.new()
 
 	-- External
@@ -180,6 +179,10 @@ function IKService:_updateStepped()
 		debug.profileend()
 	end
 	debug.profileend()
+end
+
+function IKService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return IKService
