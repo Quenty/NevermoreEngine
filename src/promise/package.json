@@ -27,7 +27,8 @@
   "dependencies": {
     "@quenty/deferred": "file:../deferred",
     "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/maid": "file:../maid",
+    "@quenty/math": "file:../math"
   },
   "publishConfig": {
     "access": "public"
