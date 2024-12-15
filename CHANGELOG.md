@@ -1,3 +1,16 @@
+# (Sun Dec 15 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/aggregator@1.2.0`, `@quenty/attributeutils@14.15.0`, `@quenty/avatareditorutils@7.17.0`, `@quenty/colorpalette@10.18.0`, `@quenty/ik@15.20.0`, `@quenty/promise@10.9.0`, `@quenty/rigbuilderutils@10.17.0`, `@quenty/rx@13.15.0`, `@quenty/userserviceutils@9.16.0`
+  - users/quenty/updates [#524](https://github.com/Quenty/NevermoreEngine/pull/524) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Dec 03 2024)
 
 #### 🚀 Enhancement
