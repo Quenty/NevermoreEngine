@@ -242,34 +242,28 @@ function Rx.fromPromise(promise)
 	assert(Promise.isPromise(promise), "Bad promise")
 
 	return Observable.new(function(sub)
-		if promise:IsFulfilled() then
-			sub:Fire(promise:Wait())
-			sub:Complete()
-			return nil
+		-- Save a task.spawn call
+		if not promise:IsPending() then
+			local results = table.pack(promise:GetResults())
+
+			if results[1] then
+				sub:Fire(table.unpack(results, 2, results.n))
+				sub:Complete()
+			else
+				sub:Fail(table.unpack(results, 2, results.n))
+			end
 		end
 
-		local maid = Maid.new()
+		return task.spawn(function()
+			local results = table.pack(promise:Yield())
 
-		local pending = true
-		maid:GiveTask(function()
-			pending = false
+			if results[1] then
+				sub:Fire(table.unpack(results, 2, results.n))
+				sub:Complete()
+			else
+				sub:Fail(table.unpack(results, 2, results.n))
+			end
 		end)
-
-		promise:Then(
-			function(...)
-				if pending then
-					sub:Fire(...)
-					sub:Complete()
-				end
-			end,
-			function(...)
-				if pending then
-					sub:Fail(...)
-					sub:Complete()
-				end
-			end)
-
-		return maid
 	end)
 end
 
