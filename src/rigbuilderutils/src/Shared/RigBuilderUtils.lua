@@ -44,12 +44,26 @@ end
 	@param rig Model
 ]=]
 function RigBuilderUtils.disableAnimateScript(rig: Model)
-	local animate = rig:FindFirstChild("Animate")
-	if animate and (animate:IsA("LocalScript") or animate:IsA("Script")) then
+	local animate = RigBuilderUtils.findAnimateScript(rig)
+	if animate then
 		animate.Enabled = false
 	end
 end
 
+--[=[
+	Finds the animate script in the rig
+
+	@param rig Model
+	@return LocalScript?
+]=]
+function RigBuilderUtils.findAnimateScript(rig: Model)
+	local animate = rig:FindFirstChild("Animate")
+	if animate and (animate:IsA("LocalScript") or animate:IsA("Script")) then
+		return animate
+	end
+
+	return nil
+end
 
 function RigBuilderUtils.createR6BaseRig()
 	local character = Instance.new("Model")
