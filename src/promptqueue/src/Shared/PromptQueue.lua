@@ -166,6 +166,24 @@ function PromptQueue:HideCurrent(doNotAnimate)
 	end
 end
 
+--[=[
+	Returns whether or not the PromptQueue is currently showing its contents.
+	
+	@return boolean
+]=]
+function PromptQueue:IsShowing()
+	return self._isShowing.Value
+end
+
+--[=[
+	Observes the current state of the PromptQueue, emitting true when showing and false if not.
+
+	@return Observable<boolean>
+]=]
+function PromptQueue:ObserveIsShowing()
+	return self._isShowing:Observe()
+end
+
 function PromptQueue:_startQueueProcessing()
 	if self._maid._processing then
 		return
