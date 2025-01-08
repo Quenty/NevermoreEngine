@@ -1,20 +1,18 @@
-# v8.8.0 (Wed Jan 08 2025)
-
-#### 🚀 Enhancement
-
-- feat: Add NumberSequenceUtils.scaleTransparency(sequence, scale) [#526](https://github.com/Quenty/NevermoreEngine/pull/526) ([@Quenty](https://github.com/Quenty))
-- feat: Add NumberSequenceUtils.scaleTransparency(sequence, scale) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@8.7.1...@quenty/numbersequenceutils@8.8.0) (2025-01-08)
+
+
+### Features
+
+* Add NumberSequenceUtils.scaleTransparency(sequence, scale) ([6659d0b](https://github.com/Quenty/NevermoreEngine/commit/6659d0bb8210616563f25bd20b084c0a4bb7fe36))
+
+
+
+
 
 ## [8.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@8.7.0...@quenty/numbersequenceutils@8.7.1) (2024-11-04)
 
