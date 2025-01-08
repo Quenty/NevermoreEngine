@@ -1,3 +1,19 @@
+# (Wed Jan 08 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/numbersequenceutils@8.8.0`, `@quenty/nevermore-cli@4.5.0`
+  - feat: Add NumberSequenceUtils.scaleTransparency(sequence, scale) [#526](https://github.com/Quenty/NevermoreEngine/pull/526) ([@Quenty](https://github.com/Quenty))
+- `@quenty/promptqueue@1.15.0`
+  - feat: PromptQueue:IsShowing() and PromptQueue:ObserveIsShowing() [#525](https://github.com/Quenty/NevermoreEngine/pull/525) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # (Sun Dec 15 2024)
 
 #### 🚀 Enhancement

@@ -1,3 +1,16 @@
+# v8.8.0 (Wed Jan 08 2025)
+
+#### 🚀 Enhancement
+
+- feat: Add NumberSequenceUtils.scaleTransparency(sequence, scale) [#526](https://github.com/Quenty/NevermoreEngine/pull/526) ([@Quenty](https://github.com/Quenty))
+- feat: Add NumberSequenceUtils.scaleTransparency(sequence, scale) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

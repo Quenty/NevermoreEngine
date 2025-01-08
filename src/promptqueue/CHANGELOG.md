@@ -1,3 +1,17 @@
+# v1.15.0 (Wed Jan 08 2025)
+
+#### 🚀 Enhancement
+
+- feat: Add NumberSequenceUtils.scaleTransparency(sequence, scale) [#526](https://github.com/Quenty/NevermoreEngine/pull/526) ([@Quenty](https://github.com/Quenty))
+- feat: PromptQueue:IsShowing() and PromptQueue:ObserveIsShowing() [#525](https://github.com/Quenty/NevermoreEngine/pull/525) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
