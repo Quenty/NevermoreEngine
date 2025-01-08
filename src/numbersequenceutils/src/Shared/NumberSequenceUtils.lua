@@ -125,6 +125,27 @@ function NumberSequenceUtils.scale(sequence, scale)
 end
 
 --[=[
+	Scale the transparency
+
+	@param sequence NumberSequence
+	@param scale number
+	@return NumberSequence
+]=]
+function NumberSequenceUtils.scaleTransparency(sequence, scale)
+	local waypoints = {}
+
+	local keypoints = sequence.Keypoints
+	for _, keypoint in pairs(keypoints) do
+		table.insert(waypoints, NumberSequenceKeypoint.new(
+			keypoint.Time,
+			Math.map(keypoint.Value, 0, 1, scale, 1),
+			keypoint.Envelope*scale))
+	end
+
+	return NumberSequence.new(waypoints)
+end
+
+--[=[
 	Generates a number sequence with stripes, which can be used in a variety of ways.
 
 	@param stripes number
