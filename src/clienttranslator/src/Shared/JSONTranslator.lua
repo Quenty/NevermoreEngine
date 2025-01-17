@@ -26,6 +26,7 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local TranslationKeyUtils = require("TranslationKeyUtils")
 local TranslatorService = require("TranslatorService")
 local ValueObject = require("ValueObject")
+local NumberLocalizationUtils = require("NumberLocalizationUtils")
 
 local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
@@ -108,6 +109,35 @@ function JSONTranslator:Init(serviceBag)
 		self._sourceTranslator.Value = self._localizationTable:GetTranslator(localeId)
 	end))
 end
+
+function JSONTranslator:ObserveNumber(number)
+	return Rx.combineLatest({
+		localeId = self:ObserveLocaleId();
+		number = number;
+	}):Pipe({
+		Rx.map(function(state)
+			return NumberLocalizationUtils.localize(state.number, state.localeId)
+		end)
+	})
+end
+
+function JSONTranslator:ObserveAbbreviatedNumber(number, roundingBehaviourType, numSignificantDigits)
+	return Rx.combineLatest({
+		localeId = self:ObserveLocaleId();
+		roundingBehaviourType = roundingBehaviourType;
+		numSignificantDigits = numSignificantDigits;
+		number = number;
+	}):Pipe({
+		Rx.map(function(state)
+			return NumberLocalizationUtils.abbreviate(
+				state.number,
+				state.localeId,
+				state.roundingBehaviourType,
+				state.numSignificantDigits)
+		end)
+	})
+end
+
 
 --[=[
 	Observes the translated value
