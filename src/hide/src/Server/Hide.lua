@@ -34,6 +34,8 @@ function Hide.new(adornee)
 				self:_setupPart(item)
 			end
 		end
+	elseif self._obj:IsA("GuiObject") then
+		self._obj.BackgroundTransparency = 1
 	else
 		error("[Hide] - Bad object type for hide")
 	end
