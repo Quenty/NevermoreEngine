@@ -27,6 +27,7 @@
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/string": "file:../string",
     "@quenty/uiobjectutils": "file:../uiobjectutils",
