@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local EnabledMixin = {}
 
@@ -17,12 +17,14 @@ function EnabledMixin:Add(class)
 	assert(not class.SetEnabled, "class.SetEnabled already defined")
 	assert(not class.IsEnabled, "class.IsEnabled already defined")
 	assert(not class.InitEnabledMixin, "class.InitEnabledMixin already defined")
+	assert(not class.ObserveIsEnabled, "class.ObserveIsEnabled already defined")
 
 	-- Inject methods
 	class.IsEnabled = self.IsEnabled
 	class.Enable = self.Enable
 	class.Disable = self.Disable
 	class.SetEnabled = self.SetEnabled
+	class.ObserveIsEnabled = self.ObserveIsEnabled
 	class.InitEnabledMixin = self.InitEnabledMixin
 end
 
@@ -33,13 +35,17 @@ function EnabledMixin:InitEnabledMixin(maid)
 
 	self._enabledMaidReference = maid
 
-	self._enabled = false
-	self.EnabledChanged = Signal.new() -- :Fire(isEnabled, doNotAnimate, enabledMaid)
-	self._enabledMaidReference:GiveTask(self.EnabledChanged)
+	self._enabledState = maid:Add(ValueObject.new(false, "boolean"))
+
+	self.EnabledChanged = maid:Add(Signal.new()) -- :Fire(isEnabled, doNotAnimate)
+
+	self._maid:GiveTask(self._enabledState.Changed:Connect(function(isEnabled, _, doNotAnimate)
+		self.EnabledChanged:Fire(isEnabled, doNotAnimate)
+	end))
 end
 
 function EnabledMixin:IsEnabled()
-	return self._enabled
+	return self._enabledState.Value
 end
 
 function EnabledMixin:Enable(doNotAnimate)
@@ -50,17 +56,14 @@ function EnabledMixin:Disable(doNotAnimate)
 	self:SetEnabled(false, doNotAnimate)
 end
 
+function EnabledMixin:ObserveIsEnabled()
+	return self._enabledState:Observe()
+end
+
 function EnabledMixin:SetEnabled(isEnabled, doNotAnimate)
 	assert(type(isEnabled) == "boolean", "Bad isEnabled")
 
-	if self._enabled ~= isEnabled then
-		self._enabled = isEnabled
-
-		local enabledMaid = Maid.new()
-		self._enabledMaidReference._enabledMaid = enabledMaid
-
-		self.EnabledChanged:Fire(isEnabled, doNotAnimate, enabledMaid)
-	end
+	self._enabledState:SetValue(isEnabled, doNotAnimate)
 end
 
 return EnabledMixin
