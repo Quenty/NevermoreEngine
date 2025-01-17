@@ -15,6 +15,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local Signal = require("Signal")
 local Maid = require("Maid")
 local EnabledMixin = require("EnabledMixin")
+local ValueObject = require("ValueObject")
 
 local BaseAction = {}
 BaseAction.__index = BaseAction
@@ -35,9 +36,7 @@ function BaseAction.new(actionData)
 	self.Activated = self._maid:Add(Signal.new()) -- :Fire(actionMaid, ... (activateData))
 	self.Deactivated = self._maid:Add(Signal.new()) -- :Fire()
 
-	self.IsActivatedValue = Instance.new("BoolValue")
-	self.IsActivatedValue.Value = false
-	self._maid:GiveTask(self.IsActivatedValue)
+	self.IsActivatedValue = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self:InitEnabledMixin()
 
@@ -101,12 +100,6 @@ function BaseAction:_updateShortcuts()
 	if self:IsEnabled() then
 		ContextActionService:BindAction(self._contextActionKey, function(_, userInputState, _)
 			if userInputState == Enum.UserInputState.Begin then
-				if self._actionData.CanActivateShortcutCallback then
-					if not self._actionData.CanActivateShortcutCallback() then
-						return
-					end
-				end
-
 				self:ToggleActivate()
 			end
 		end, false, unpack(shortcuts))
