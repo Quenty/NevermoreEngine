@@ -235,6 +235,10 @@ function CameraControls:_mouseTranslationToAngle(translationVector)
 	return Vector2.new(xTheta, yTheta)
 end
 
+function CameraControls:SetVelocityStrength(strength)
+	self._strength = strength
+end
+
 function CameraControls:_getVelocityTracker(strength, startVelocity)
 	strength = strength or 1
 
