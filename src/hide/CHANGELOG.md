@@ -1,20 +1,18 @@
-# v11.19.0 (Sun Jan 19 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
-- feat: Support gui objects ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.18.0...@quenty/hide@11.19.0) (2025-01-19)
+
+
+### Features
+
+* Support gui objects ([91a6fab](https://github.com/Quenty/NevermoreEngine/commit/91a6fabd2b436ce60af1c4ad2d8ca6acd8a36d78))
+
+
+
+
 
 # [11.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.17.0...@quenty/hide@11.18.0) (2024-12-15)
 

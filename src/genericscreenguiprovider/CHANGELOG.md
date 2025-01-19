@@ -1,20 +1,18 @@
-# v13.18.0 (Sun Jan 19 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
-- feat: Allow order t obe set ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.17.0...@quenty/genericscreenguiprovider@13.18.0) (2025-01-19)
+
+
+### Features
+
+* Allow order t obe set ([7edc784](https://github.com/Quenty/NevermoreEngine/commit/7edc784fa0983895fc9260adaf73a8e5012144fa))
+
+
+
+
 
 # [13.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.16.0...@quenty/genericscreenguiprovider@13.17.0) (2024-12-15)
 

@@ -1,20 +1,18 @@
-# v14.17.0 (Sun Jan 19 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
-- feat: Public rounding behavior ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.16.0...@quenty/clienttranslator@14.17.0) (2025-01-19)
+
+
+### Features
+
+* Public rounding behavior ([eafe408](https://github.com/Quenty/NevermoreEngine/commit/eafe408fca485f15f1957fa67c5e1fc6dbd00fc7))
+
+
+
+
 
 # [14.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.15.0...@quenty/clienttranslator@14.16.0) (2024-12-15)
 

@@ -1,20 +1,18 @@
-# v13.17.0 (Sun Jan 19 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
-- feat: Use ValueObject activation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.16.0...@quenty/actionmanager@13.17.0) (2025-01-19)
+
+
+### Features
+
+* Use ValueObject activation ([65d09e1](https://github.com/Quenty/NevermoreEngine/commit/65d09e10d2b3519746fd1bcd592425cd985dbaf6))
+
+
+
+
 
 # [13.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.15.0...@quenty/actionmanager@13.16.0) (2024-12-15)
 

@@ -1,20 +1,18 @@
-# v14.18.0 (Sun Jan 19 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
-- feat: Allow setting velocity strength ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.17.0...@quenty/camera@14.18.0) (2025-01-19)
+
+
+### Features
+
+* Allow setting velocity strength ([dca25af](https://github.com/Quenty/NevermoreEngine/commit/dca25af9bf997406cc17c705772b421c8dc70a1a))
+
+
+
+
 
 # [14.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.16.0...@quenty/camera@14.17.0) (2024-12-15)
 

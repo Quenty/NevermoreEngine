@@ -1,20 +1,18 @@
-# v11.10.0 (Sun Jan 19 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
-- feat: Add Rx support to EnabledMixin ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.9.0...@quenty/enabledmixin@11.10.0) (2025-01-19)
+
+
+### Features
+
+* Add Rx support to EnabledMixin ([29b2fc6](https://github.com/Quenty/NevermoreEngine/commit/29b2fc6629b0c3d0dbca812961686cb99568e3b4))
+
+
+
+
 
 # [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.8.1...@quenty/enabledmixin@11.9.0) (2024-11-06)
 

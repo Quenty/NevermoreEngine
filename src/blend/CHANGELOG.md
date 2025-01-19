@@ -1,20 +1,18 @@
-# v12.16.0 (Sun Jan 19 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
-- feat: Can cancel observable ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.15.0...@quenty/blend@12.16.0) (2025-01-19)
+
+
+### Features
+
+* Can cancel observable ([95d66c8](https://github.com/Quenty/NevermoreEngine/commit/95d66c824f08372796129caf7672d5f6f5cd2139))
+
+
+
+
 
 # [12.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.14.0...@quenty/blend@12.15.0) (2024-12-15)
 
