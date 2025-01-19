@@ -1,3 +1,16 @@
+# v14.18.0 (Sun Jan 19 2025)
+
+#### 🚀 Enhancement
+
+- Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
+- feat: Allow setting velocity strength ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

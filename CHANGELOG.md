@@ -1,3 +1,16 @@
+# (Sun Jan 19 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/actionmanager@13.17.0`, `@quenty/blend@12.16.0`, `@quenty/camera@14.18.0`, `@quenty/clienttranslator@14.17.0`, `@quenty/enabledmixin@11.10.0`, `@quenty/funnels@1.3.0`, `@quenty/genericscreenguiprovider@13.18.0`, `@quenty/hide@11.19.0`
+  - Users/quenty/wfyb [#527](https://github.com/Quenty/NevermoreEngine/pull/527) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jan 08 2025)
 
 #### 🚀 Enhancement
