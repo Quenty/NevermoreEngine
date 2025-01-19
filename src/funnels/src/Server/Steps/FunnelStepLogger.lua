@@ -55,6 +55,10 @@ function FunnelStepLogger:LogStep(stepNumber, stepName)
 	self._stepTracker:LogStep(stepNumber, stepName)
 end
 
+function FunnelStepLogger:IsStepComplete(stepNumber)
+	return self._stepTracker:IsStepComplete(stepNumber)
+end
+
 function FunnelStepLogger:_sendStep(stepNumber, stepName)
 	AnalyticsService:LogFunnelStepEvent(self._player, self._funnelName, self._funnelSessionId, stepNumber, stepName)
 

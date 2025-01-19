@@ -268,12 +268,16 @@ function SpringObject:SetTarget(target, doNotAnimate)
 	if not observable then
 		self._maid._targetSub = nil
 		self:_applyTarget(target, doNotAnimate)
-		return
+		return function()
+
+		end
 	end
 
+	local sub
+	self._maid._targetSub = nil
 	if doNotAnimate then
 		local isFirst = true
-		self._maid._targetSub = observable:Subscribe(function(unconverted)
+		sub = observable:Subscribe(function(unconverted)
 			local converted = SpringUtils.toLinearIfNeeded(unconverted)
 			assert(converted, "Not a valid converted target")
 
@@ -282,9 +286,17 @@ function SpringObject:SetTarget(target, doNotAnimate)
 			self:_applyTarget(unconverted, wasFirst)
 		end)
 	else
-		self._maid._targetSub = observable:Subscribe(function(unconverted)
+		sub = observable:Subscribe(function(unconverted)
 			self:_applyTarget(unconverted, doNotAnimate)
 		end)
+	end
+
+	self._maid._targetSub = sub
+
+	return function()
+		if self._maid._targetSub == sub then
+			self._maid._targetSub = nil
+		end
 	end
 end
 

@@ -38,6 +38,12 @@ function FunnelStepTracker:LogStep(stepNumber, stepName)
 	self.StepLogged:Fire(stepNumber, stepName)
 end
 
+function FunnelStepTracker:IsStepComplete(stepNumber)
+	assert(type(stepNumber) == "number", "Bad stepNumber")
+
+	return self._stepsLogged[stepNumber] ~= nil
+end
+
 function FunnelStepTracker:GetLoggedSteps()
 	return table.clone(self._stepsLogged)
 end

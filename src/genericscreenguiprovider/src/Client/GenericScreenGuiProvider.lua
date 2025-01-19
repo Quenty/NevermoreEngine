@@ -32,6 +32,7 @@ local Maid = require("Maid")
 local ScreenGuiService = require("ScreenGuiService")
 local ServiceBag = require("ServiceBag")
 local String = require("String")
+local ValueObject = require("ValueObject")
 
 local GenericScreenGuiProvider = {}
 GenericScreenGuiProvider.ClassName = "GenericScreenGuiProvider"
@@ -46,7 +47,7 @@ function GenericScreenGuiProvider.new(orders)
 	assert(type(orders) == "table", "Bad orders")
 
 	local self = setmetatable({
-		_order = orders;
+		_defaultOrders = orders;
 	}, GenericScreenGuiProvider)
 
 	return self
@@ -57,6 +58,11 @@ function GenericScreenGuiProvider:Init(serviceBag)
 	self._maid = Maid.new()
 
 	self._screenGuiService = self._serviceBag:GetService(ScreenGuiService)
+
+	self._orderValues = {}
+	for key, value in self._defaultOrders do
+		self._orderValues[key] = self._maid:Add(ValueObject.new(value, "number"))
+	end
 end
 
 function GenericScreenGuiProvider:Start()
@@ -107,10 +113,17 @@ function GenericScreenGuiProvider:ObserveScreenGui(orderName)
 		Name = String.toCamelCase(orderName);
 		ResetOnSpawn = false;
 		AutoLocalize = false;
-		DisplayOrder = self:GetDisplayOrder(orderName);
+		DisplayOrder = self:ObserveDisplayOrder(orderName);
 		Parent = self:_getScreenGuiService():ObservePlayerGui();
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
 	}
+end
+
+function GenericScreenGuiProvider:SetDisplayOrder(orderName, order)
+	assert(type(orderName) == "string", "Bad orderName")
+	self:_assertOrderExists(orderName)
+
+	return self._orderValues[orderName]:Mount(order)
 end
 
 --[=[
@@ -120,6 +133,7 @@ end
 ]=]
 function GenericScreenGuiProvider:Get(orderName)
 	assert(type(orderName) == "string", "Bad orderName")
+	self:_assertOrderExists(orderName)
 
 	if not RunService:IsRunning() then
 		local frame = Instance.new("Frame")
@@ -152,9 +166,29 @@ end
 ]=]
 function GenericScreenGuiProvider:GetDisplayOrder(orderName)
 	assert(type(orderName) == "string", "Bad orderName")
-	assert(self._order[orderName], string.format("No DisplayOrder with orderName '%s'", tostring(orderName)))
+	self:_assertOrderExists(orderName)
 
-	return self._order[orderName]
+	return self._orderValues[orderName].Value
+end
+
+--[=[
+	Retrieve the display order for a given order.
+	@param orderName string -- Order name of display order
+	@return Observable<number>
+]=]
+function GenericScreenGuiProvider:ObserveDisplayOrder(orderName)
+	assert(type(orderName) == "string", "Bad orderName")
+	self:_assertOrderExists(orderName)
+
+	return self._orderValues[orderName]:Observe()
+end
+
+function GenericScreenGuiProvider:_assertOrderExists(orderName)
+	assert(type(orderName) == "string", "Bad orderName")
+
+	if not self._defaultOrders[orderName] then
+		error(string.format("No DisplayOrder with orderName '%s'", tostring(orderName)))
+	end
 end
 
 function GenericScreenGuiProvider:_getScreenGuiService()
