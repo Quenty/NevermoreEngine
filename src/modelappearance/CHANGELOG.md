@@ -1,19 +1,18 @@
-# v10.7.2 (Mon Jan 20 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Support part operations in ModelAppearance API [#528](https://github.com/Quenty/NevermoreEngine/pull/528) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modelappearance@10.7.1...@quenty/modelappearance@10.7.2) (2025-01-20)
+
+
+### Bug Fixes
+
+* Support part operations in ModelAppearance API ([#528](https://github.com/Quenty/NevermoreEngine/issues/528)) ([125d008](https://github.com/Quenty/NevermoreEngine/commit/125d008d4d3c4ec4933d5963f23211ecf975b5a7))
+
+
+
+
 
 ## [10.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modelappearance@10.7.0...@quenty/modelappearance@10.7.1) (2024-11-04)
 
