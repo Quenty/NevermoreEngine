@@ -32,6 +32,10 @@ function ModelAppearance.new(model)
 			if part:IsA("Seat") or part:IsA("VehicleSeat") then
 				self._seats[part] = part
 			end
+
+			if part:IsA("PartOperation") then
+				self._parts[part].UsePartColor = part.UsePartColor
+			end
 		elseif part:IsA("ClickDetector") or part:IsA("BodyMover") then
 			table.insert(self._interactions, part)
 		end
@@ -102,6 +106,10 @@ function ModelAppearance:SetColor(color)
 	self._color = color
 	for part, _ in pairs(self._parts) do
 		part.Color = color
+
+		if part:IsA("PartOperation") then
+			part.UsePartColor = true
+		end
 	end
 end
 
@@ -113,6 +121,10 @@ function ModelAppearance:ResetColor()
 	self._color = nil
 	for part, properties in pairs(self._parts) do
 		part.Color = properties.Color
+
+		if part:IsA("PartOperation") then
+			part.UsePartColor = properties.UsePartColor
+		end
 	end
 end
 
