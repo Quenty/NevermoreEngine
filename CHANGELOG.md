@@ -1,3 +1,16 @@
+# (Mon Jan 20 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/modelappearance@10.7.2`
+  - fix: Support part operations in ModelAppearance API [#528](https://github.com/Quenty/NevermoreEngine/pull/528) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jan 19 2025)
 
 #### 🚀 Enhancement
