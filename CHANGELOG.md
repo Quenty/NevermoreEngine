@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/camera@14.18.1`
+  - fix: Apply strength to camera controls [#530](https://github.com/Quenty/NevermoreEngine/pull/530) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Tue Jan 21 2025)
+
+#### 🐛 Bug Fix
+
 - `@quenty/scoredactionservice@16.22.1`
   - fix: Set the first valid preferred action from the list [#529](https://github.com/Quenty/NevermoreEngine/pull/529) ([@unrooot](https://github.com/unrooot))
 

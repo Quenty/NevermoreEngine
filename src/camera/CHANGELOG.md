@@ -1,3 +1,16 @@
+# v14.18.1 (Tue Jan 21 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Apply strength to camera controls [#530](https://github.com/Quenty/NevermoreEngine/pull/530) ([@unrooot](https://github.com/unrooot))
+- fix: Apply strength to camera controls ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
