@@ -1,3 +1,16 @@
+# (Tue Jan 21 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/scoredactionservice@16.22.1`
+  - fix: Set the first valid preferred action from the list [#529](https://github.com/Quenty/NevermoreEngine/pull/529) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Mon Jan 20 2025)
 
 #### 🐛 Bug Fix

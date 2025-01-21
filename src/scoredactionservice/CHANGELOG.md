@@ -1,3 +1,16 @@
+# v16.22.1 (Tue Jan 21 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Set the first valid preferred action from the list [#529](https://github.com/Quenty/NevermoreEngine/pull/529) ([@unrooot](https://github.com/unrooot))
+- fix: Set the first valid preferred action from the list ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
