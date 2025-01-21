@@ -175,7 +175,7 @@ function CameraControls:BeginDrag(beginInputObject)
 	end))
 
 	if self._rotatedCamera.ClassName == "SmoothRotatedCamera" then
-		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.zero)
+		self._rotVelocityTracker = self:_getVelocityTracker(self._strength or 0.05, Vector2.zero)
 	end
 
 	self._maid._dragMaid = maid
