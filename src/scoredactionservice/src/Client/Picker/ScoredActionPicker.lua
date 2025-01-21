@@ -54,7 +54,13 @@ function ScoredActionPicker:Update()
 		warn(string.format("[ScoredActionPicker.Update] - Action list has size of %d/%d", #actionList, MAX_ACTION_LIST_SIZE_BEFORE_WARN))
 	end
 
-	self._currentPreferred.Value = self:_tryGetValidPreferredAction(actionList[1])
+	for _, action in actionList do
+		local preferredAction = self:_tryGetValidPreferredAction(action)
+		if preferredAction then
+			self._currentPreferred.Value = preferredAction
+			break
+		end
+	end
 end
 
 function ScoredActionPicker:_tryGetValidPreferredAction(action)
