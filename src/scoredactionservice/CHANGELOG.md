@@ -1,20 +1,18 @@
-# v16.22.1 (Tue Jan 21 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Set the first valid preferred action from the list [#529](https://github.com/Quenty/NevermoreEngine/pull/529) ([@unrooot](https://github.com/unrooot))
-- fix: Set the first valid preferred action from the list ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [16.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.22.0...@quenty/scoredactionservice@16.22.1) (2025-01-21)
+
+
+### Bug Fixes
+
+* Set the first valid preferred action from the list ([b027236](https://github.com/Quenty/NevermoreEngine/commit/b02723631e11668876cc3135b411165236b717eb))
+
+
+
+
 
 # [16.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.21.0...@quenty/scoredactionservice@16.22.0) (2025-01-19)
 
