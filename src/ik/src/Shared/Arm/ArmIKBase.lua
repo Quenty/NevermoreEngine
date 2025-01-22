@@ -50,8 +50,7 @@ function ArmIKBase.new(humanoid, armName, serviceBag)
 		error(string.format("[ArmIKBase] - Bad armName %q", tostring(armName)))
 	end
 
-	self._gripping = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._gripping)
+	self._gripping = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self._maid:GiveTask(self:_observeCharacterBrio():Subscribe(function(brio)
 		if brio:IsDead() then

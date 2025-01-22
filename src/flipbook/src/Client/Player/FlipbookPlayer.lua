@@ -29,17 +29,13 @@ function FlipbookPlayer.new(imageLabel)
 
 	assert(typeof(self._obj) == "Instance" and (self._obj:IsA("ImageLabel") or self._obj:IsA("ImageButton")), "Bad imageLabel")
 
-	self._isPlaying = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isPlaying)
+	self._isPlaying = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self._isBoomarang = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isBoomarang)
+	self._isBoomarang = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self._playData = ValueObject.new(nil)
-	self._maid:GiveTask(self._playData)
+	self._playData = self._maid:Add(ValueObject.new(nil))
 
-	self._flipbook = ValueObject.new(nil)
-	self._maid:GiveTask(self._flipbook)
+	self._flipbook = self._maid:Add(ValueObject.new(nil))
 
 	self._originalImage = self._obj.Image
 	self._originalRectOffset = self._obj.ImageRectOffset

@@ -36,8 +36,7 @@ function InputKeyMap.new(inputModeType, inputTypes)
 
 	self._defaultInputTypes = inputTypes or {}
 
-	self._inputType = ValueObject.new(self._defaultInputTypes)
-	self._maid:GiveTask(self._inputType)
+	self._inputType = self._maid:Add(ValueObject.new(self._defaultInputTypes))
 
 	return self
 end

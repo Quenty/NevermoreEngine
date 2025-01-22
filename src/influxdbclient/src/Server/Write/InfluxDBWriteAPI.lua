@@ -27,8 +27,7 @@ function InfluxDBWriteAPI.new(org, bucket, precision)
 	assert(type(bucket) == "string", "Bad bucket")
 	assert(type(precision) == "string" or precision == nil, "Bad precision")
 
-	self._clientConfig = ValueObject.new(nil)
-	self._maid:GiveTask(self._clientConfig)
+	self._clientConfig = self._maid:Add(ValueObject.new(nil))
 
 	self._printDebugWriteEnabled = false
 	self._org = org
@@ -38,8 +37,7 @@ function InfluxDBWriteAPI.new(org, bucket, precision)
 	self._pointSettings = InfluxDBPointSettings.new()
 	self._writeOptions = InfluxDBWriteOptionUtils.getDefaultOptions()
 
-	self.RequestFinished = Signal.new()
-	self._maid:GiveTask(self.RequestFinished)
+	self.RequestFinished = self._maid:Add(Signal.new())
 
 	self.Destroying = Signal.new()
 	self._maid:GiveTask(function()

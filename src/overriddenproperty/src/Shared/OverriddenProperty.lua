@@ -35,8 +35,7 @@ function OverriddenProperty.new(robloxInstance, propertyName, replicateRate, rep
 		assert(type(replicateRate) == "number", "Bad replicateRate")
 		assert(type(replicateCallback) == "function", "Bad replicateCallback")
 
-		self._throttledExecuteReplicate = ThrottledFunction.new(replicateRate, replicateCallback)
-		self._maid:GiveTask(self._throttledExecuteReplicate)
+		self._throttledExecuteReplicate = self._maid:Add(ThrottledFunction.new(replicateRate, replicateCallback))
 	end
 
 	self:_updateListenBinding()

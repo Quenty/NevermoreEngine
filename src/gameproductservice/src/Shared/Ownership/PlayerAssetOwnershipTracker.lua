@@ -130,7 +130,7 @@ function PlayerAssetOwnershipTracker:PromiseOwnsAsset(idOrKey)
 			return Promise.resolved(true)
 		end
 	else
-		warn(string.format("[PlayerAssetOwnershipTracker.PromiseOwnsAsset] - Nothing with key %q", tostring(idOrKey)))
+		return Promise.rejected(string.format("[PlayerAssetOwnershipTracker.PromiseOwnsAsset] - Nothing with key %q", tostring(idOrKey)))
 	end
 
 	-- Check actual callback querying Roblox

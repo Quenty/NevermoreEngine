@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 local AccelTween = require("AccelTween")
 local BaseObject = require("BaseObject")
 local CameraGamepadInputUtils = require("CameraGamepadInputUtils")
+local ValueObject = require("ValueObject")
 
 local GamepadRotateModel = setmetatable({}, BaseObject)
 GamepadRotateModel.__index = GamepadRotateModel
@@ -24,9 +25,7 @@ function GamepadRotateModel.new()
 	self._rampVelocityX = AccelTween.new(25)
 	self._rampVelocityY = AccelTween.new(25)
 
-	self.IsRotating = Instance.new("BoolValue")
-	self.IsRotating.Value = false
-	self._maid:GiveTask(self.IsRotating)
+	self.IsRotating = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	return self
 end

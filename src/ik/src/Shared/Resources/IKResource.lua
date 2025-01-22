@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local ValueObject = require("ValueObject")
 
 local IKResource = setmetatable({}, BaseObject)
 IKResource.ClassName = "IKResource"
@@ -24,9 +25,7 @@ function IKResource.new(data)
 		[data.name] = self;
 	}
 
-	self._ready = Instance.new("BoolValue")
-	self._ready.Value = false
-	self._maid:GiveTask(self._ready)
+	self._ready = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self.ReadyChanged = self._ready.Changed
 

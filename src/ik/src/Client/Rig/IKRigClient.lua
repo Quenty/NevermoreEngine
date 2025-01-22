@@ -92,8 +92,7 @@ function IKRigClient:_handleRemoteEventClient(newTarget)
 end
 
 function IKRigClient:_setupLocalPlayer(remoteEvent)
-	self._localPlayerAimer = IKRigAimerLocalPlayer.new(self._serviceBag, self, remoteEvent)
-	self._maid:GiveTask(self._localPlayerAimer)
+	self._localPlayerAimer = self._maid:Add(IKRigAimerLocalPlayer.new(self._serviceBag, self, remoteEvent))
 end
 
 return Binder.new("IKRig", IKRigClient)

@@ -36,8 +36,7 @@ function RagdollHumanoidOnFallClient.new(humanoid, serviceBag)
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player == Players.LocalPlayer then
-		self._ragdollLogic = BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder)
-		self._maid:GiveTask(self._ragdollLogic)
+		self._ragdollLogic = self._maid:Add(BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder))
 
 		self._maid:GiveTask(self._ragdollLogic.ShouldRagdoll.Changed:Connect(function()
 			self:_update()

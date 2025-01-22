@@ -26,8 +26,7 @@ function ColorSwatch.new(color, vividness)
 	self._color = ValueObject.new(Color3.new(0, 0, 0))
 	self._maid:GiveTask(self._color)
 
-	self._vividness = ValueObject.new(nil)
-	self._maid:GiveTask(self._vividness)
+	self._vividness = self._maid:Add(ValueObject.new(nil))
 
 	self:SetBaseColor(color)
 	self:SetVividness(vividness)

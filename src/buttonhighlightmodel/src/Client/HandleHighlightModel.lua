@@ -10,6 +10,7 @@ local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local Blend = require("Blend")
 local Rx = require("Rx")
+local ValueObject = require("ValueObject")
 
 local HandleHighlightModel = setmetatable({}, BaseObject)
 HandleHighlightModel.ClassName = "HandleHighlightModel"
@@ -18,17 +19,11 @@ HandleHighlightModel.__index = HandleHighlightModel
 function HandleHighlightModel.new()
 	local self = setmetatable(BaseObject.new(), HandleHighlightModel)
 
-	self.IsMouseOver = Instance.new("BoolValue")
-	self.IsMouseOver.Value = false
-	self._maid:GiveTask(self.IsMouseOver)
+	self.IsMouseOver = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self.IsMouseDown = Instance.new("BoolValue")
-	self.IsMouseDown.Value = false
-	self._maid:GiveTask(self.IsMouseDown)
+	self.IsMouseDown = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self.IsHighlighted = Instance.new("BoolValue")
-	self.IsHighlighted.Value = false
-	self._maid:GiveTask(self.IsHighlighted)
+	self.IsHighlighted = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self._maid:GiveTask(self.IsMouseDown.Changed:Connect(function()
 		self:_updateHighlighted()

@@ -22,6 +22,7 @@ function ChatProviderCommandService:Init(serviceBag)
 
 	-- External
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
+	self._permissionService = self._serviceBag:GetService(require("PermissionService"))
 
 	-- Internal
 	self._chatProviderService = self._serviceBag:GetService(require("ChatProviderService"))

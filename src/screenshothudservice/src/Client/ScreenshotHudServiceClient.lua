@@ -19,8 +19,7 @@ function ScreenshotHudServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._screenshotHudState = StateStack.new(nil)
-	self._maid:GiveTask(self._screenshotHudState)
+	self._screenshotHudState = self._maid:Add(StateStack.new(nil))
 
 	self._maid:GiveTask(RxBrioUtils.flatCombineLatest({
 		model = self._screenshotHudState:Observe();

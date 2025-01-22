@@ -14,6 +14,7 @@ local HttpService = game:GetService("HttpService")
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local cancellableDelay = require("cancellableDelay")
+local ValueObject = require("ValueObject")
 
 local GuiVisibleManager = setmetatable({}, BaseObject)
 GuiVisibleManager.ClassName = "GuiVisibleManager"
@@ -34,9 +35,7 @@ function GuiVisibleManager.new(promiseNewPane, maxHideTime)
 
 	self._nextDoNotAnimate = false
 
-	self._paneVisible = Instance.new("BoolValue")
-	self._paneVisible.Value = false
-	self._maid:GiveTask(self._paneVisible)
+	self._paneVisible = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self._showHandles = {}
 
