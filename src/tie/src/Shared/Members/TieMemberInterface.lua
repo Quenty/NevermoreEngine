@@ -50,7 +50,9 @@ function TieMemberInterface:GetImplParent()
 			return nil
 		end
 	elseif self._adornee then
-		return self._tieDefinition:GetImplementationParents(self._adornee, self._interfaceTieRealm)
+		-- TODO: What if there's nothing here?
+		-- What if there's more than one?
+		return self._tieDefinition:GetImplementationParents(self._adornee, self._interfaceTieRealm)[1]
 	else
 		error("Must have self._implParent or self._adornee")
 	end
