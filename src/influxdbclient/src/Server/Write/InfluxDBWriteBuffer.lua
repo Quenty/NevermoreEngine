@@ -22,8 +22,7 @@ function InfluxDBWriteBuffer.new(writeOptions, promiseHandleFlush)
 	self._bytes = 0
 	self._length = 0
 
-	self._requestQueueNext = Signal.new()
-	self._maid:GiveTask(self._requestQueueNext)
+	self._requestQueueNext = self._maid:Add(Signal.new())
 
 
 	return self

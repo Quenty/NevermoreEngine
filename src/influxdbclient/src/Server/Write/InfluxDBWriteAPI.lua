@@ -37,8 +37,7 @@ function InfluxDBWriteAPI.new(org, bucket, precision)
 	self._pointSettings = InfluxDBPointSettings.new()
 	self._writeOptions = InfluxDBWriteOptionUtils.getDefaultOptions()
 
-	self.RequestFinished = Signal.new()
-	self._maid:GiveTask(self.RequestFinished)
+	self.RequestFinished = self._maid:Add(Signal.new())
 
 	self.Destroying = Signal.new()
 	self._maid:GiveTask(function()

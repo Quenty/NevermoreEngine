@@ -39,8 +39,7 @@ function ScreenshotHudModel.new()
 
 	self._keepOpen = self._maid:Add(ValueObject.new(true, "boolean"))
 
-	self.CloseRequested = Signal.new()
-	self._maid:GiveTask(self.CloseRequested)
+	self.CloseRequested = self._maid:Add(Signal.new())
 
 	return self
 end
