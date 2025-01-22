@@ -28,7 +28,8 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/cancellabledelay": "file:../cancellabledelay",
     "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/maid": "file:../maid",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

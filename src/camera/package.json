@@ -37,6 +37,7 @@
     "@quenty/qframe": "file:../qframe",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/spring": "file:../spring",
+    "@quenty/valueobject": "file:../valueobject",
     "@quenty/vector3utils": "file:../vector3utils"
   },
   "devDependencies": {
