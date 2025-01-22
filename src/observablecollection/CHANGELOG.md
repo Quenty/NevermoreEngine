@@ -1,20 +1,18 @@
-# v12.18.1 (Wed Jan 22 2025)
-
-#### 🐛 Bug Fix
-
-- Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
-- fix: Avoid firing events when we add and remove immediately within the same frame ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.18.0...@quenty/observablecollection@12.18.1) (2025-01-22)
+
+
+### Bug Fixes
+
+* Avoid firing events when we add and remove immediately within the same frame ([760eab8](https://github.com/Quenty/NevermoreEngine/commit/760eab89580cb2ebf422457778c424fd3ab28f00))
+
+
+
+
 
 # [12.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.17.0...@quenty/observablecollection@12.18.0) (2025-01-19)
 

@@ -1,20 +1,18 @@
-# v10.18.1 (Wed Jan 22 2025)
-
-#### 🐛 Bug Fix
-
-- Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
-- fix: Fix retrieval of tie implementation parent ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.18.0...@quenty/tie@10.18.1) (2025-01-22)
+
+
+### Bug Fixes
+
+* Fix retrieval of tie implementation parent ([fe57f31](https://github.com/Quenty/NevermoreEngine/commit/fe57f31301e4cb8b335d583ddf3fe54b77a03658))
+
+
+
+
 
 # [10.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.17.0...@quenty/tie@10.18.0) (2024-12-15)
 

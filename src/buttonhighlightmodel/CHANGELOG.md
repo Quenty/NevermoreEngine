@@ -1,20 +1,15 @@
-# v14.16.1 (Wed Jan 22 2025)
-
-#### 🐛 Bug Fix
-
-- Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
-- refactor: Bulk refactor Instance.new("BoolValue") to self._maid:Add(ValueObject.new(false, "boolean")) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.16.0...@quenty/buttonhighlightmodel@14.16.1) (2025-01-22)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
 
 # [14.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.15.0...@quenty/buttonhighlightmodel@14.16.0) (2025-01-19)
 

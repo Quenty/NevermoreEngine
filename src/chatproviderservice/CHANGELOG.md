@@ -1,21 +1,18 @@
-# v9.23.1 (Wed Jan 22 2025)
-
-#### 🐛 Bug Fix
-
-- Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
-- refactor: Replace :GiveTask() with :Add() API calls using regex ([@Quenty](https://github.com/Quenty))
-- fix: Fix ChatProviderCommandService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [9.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.23.0...@quenty/chatproviderservice@9.23.1) (2025-01-22)
+
+
+### Bug Fixes
+
+* Fix ChatProviderCommandService ([ffbde7d](https://github.com/Quenty/NevermoreEngine/commit/ffbde7d3aaabe22578c47aad3baa058007e19bf1))
+
+
+
+
 
 # [9.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.22.0...@quenty/chatproviderservice@9.23.0) (2025-01-19)
 

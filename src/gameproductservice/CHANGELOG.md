@@ -1,20 +1,18 @@
-# v14.22.1 (Wed Jan 22 2025)
-
-#### 🐛 Bug Fix
-
-- Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
-- fix: Handle ownership as a rejection during error ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.22.0...@quenty/gameproductservice@14.22.1) (2025-01-22)
+
+
+### Bug Fixes
+
+* Handle ownership as a rejection during error ([1e40ece](https://github.com/Quenty/NevermoreEngine/commit/1e40ece4797249923b3c01694f1fa9227aec5d38))
+
+
+
+
 
 # [14.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.21.0...@quenty/gameproductservice@14.22.0) (2025-01-19)
 

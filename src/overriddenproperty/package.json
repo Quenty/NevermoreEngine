@@ -1,6 +1,6 @@
 {
   "name": "@quenty/overriddenproperty",
-  "version": "10.8.1",
+  "version": "10.8.2",
   "description": "Sets properties on the client and then replicates them to the server",
   "keywords": [
     "Roblox",
