@@ -415,7 +415,12 @@ function ObservableSortedList:_assignSortValue(node, value)
 
 	if value == nil then
 		if self._root and self._root:ContainsNode(node) then
-			self._nodesRemoved[node] = true
+			if self._nodesAdded[node] then
+				self._nodesAdded[node] = nil
+			else
+				self._nodesRemoved[node] = true
+			end
+
 			self:_applyLowestIndexChanged(node:GetIndex())
 			self:_removeNode(node)
 			node.value = nil
