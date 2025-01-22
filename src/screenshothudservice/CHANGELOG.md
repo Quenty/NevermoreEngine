@@ -1,3 +1,17 @@
+# v7.16.1 (Wed Jan 22 2025)
+
+#### 🐛 Bug Fix
+
+- Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
+- refactor: Replace Signal :GiveTask() with :Add() API calls using regex ([@Quenty](https://github.com/Quenty))
+- refactor: Replace :GiveTask() with :Add() API calls using regex ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

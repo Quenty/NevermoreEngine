@@ -1,3 +1,16 @@
+# v12.18.1 (Wed Jan 22 2025)
+
+#### 🐛 Bug Fix
+
+- Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
+- fix: Avoid firing events when we add and remove immediately within the same frame ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

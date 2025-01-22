@@ -1,3 +1,16 @@
+# (Wed Jan 22 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonhighlightmodel@14.16.1`, `@quenty/camera@14.18.2`, `@quenty/chatproviderservice@9.23.1`, `@quenty/colorpalette@10.19.1`, `@quenty/flipbook@9.15.1`, `@quenty/gameproductservice@14.22.1`, `@quenty/guivisiblemanager@12.7.2`, `@quenty/idleservice@13.20.2`, `@quenty/ik@15.21.2`, `@quenty/influxdbclient@7.17.1`, `@quenty/inputkeymaputils@14.21.1`, `@quenty/observablecollection@12.18.1`, `@quenty/overriddenproperty@10.8.2`, `@quenty/playerhumanoidbinder@14.17.1`, `@quenty/playerinputmode@9.17.1`, `@quenty/racketingropeconstraint@12.18.1`, `@quenty/ragdoll@15.20.2`, `@quenty/screenshothudservice@7.16.1`, `@quenty/softshutdown@9.20.1`, `@quenty/tie@10.18.1`
+  - Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jan 21 2025)
 
 #### 🐛 Bug Fix

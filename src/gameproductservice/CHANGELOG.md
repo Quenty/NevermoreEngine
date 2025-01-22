@@ -1,3 +1,16 @@
+# v14.22.1 (Wed Jan 22 2025)
+
+#### 🐛 Bug Fix
+
+- Bulk refactors and small bug fixes [#531](https://github.com/Quenty/NevermoreEngine/pull/531) ([@Quenty](https://github.com/Quenty))
+- fix: Handle ownership as a rejection during error ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
