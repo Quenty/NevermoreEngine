@@ -27,8 +27,7 @@ function InfluxDBWriteAPI.new(org, bucket, precision)
 	assert(type(bucket) == "string", "Bad bucket")
 	assert(type(precision) == "string" or precision == nil, "Bad precision")
 
-	self._clientConfig = ValueObject.new(nil)
-	self._maid:GiveTask(self._clientConfig)
+	self._clientConfig = self._maid:Add(ValueObject.new(nil))
 
 	self._printDebugWriteEnabled = false
 	self._org = org

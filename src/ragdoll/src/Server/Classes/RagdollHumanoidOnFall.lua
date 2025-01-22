@@ -64,8 +64,7 @@ function RagdollHumanoidOnFall:_getOrCreateRagdollLogic()
 		return self._ragdollLogic
 	end
 
-	self._ragdollLogic = BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder)
-	self._maid:GiveTask(self._ragdollLogic)
+	self._ragdollLogic = self._maid:Add(BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder))
 
 	return self._ragdollLogic
 end

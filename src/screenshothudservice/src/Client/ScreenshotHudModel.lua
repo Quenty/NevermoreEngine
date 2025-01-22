@@ -15,8 +15,7 @@ ScreenshotHudModel.__index = ScreenshotHudModel
 function ScreenshotHudModel.new()
 	local self = setmetatable(BaseObject.new(), ScreenshotHudModel)
 
-	self._cameraButtonIcon = ValueObject.new("", "string")
-	self._maid:GiveTask(self._cameraButtonIcon)
+	self._cameraButtonIcon = self._maid:Add(ValueObject.new("", "string"))
 
 	self._cameraButtonPosition = ValueObject.new(UDim2.new(0, 0, 0, 0))
 	self._maid:GiveTask(self._cameraButtonPosition)
@@ -24,29 +23,21 @@ function ScreenshotHudModel.new()
 	self._closeButtonPosition = ValueObject.new(UDim2.new(0, 0, 0, 0))
 	self._maid:GiveTask(self._closeButtonPosition)
 
-	self._closeWhenScreenshotTaken = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._closeWhenScreenshotTaken)
+	self._closeWhenScreenshotTaken = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self._experienceNameOverlayEnabled = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._experienceNameOverlayEnabled)
+	self._experienceNameOverlayEnabled = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self._overlayFont = ValueObject.new(Enum.Font.SourceSans)
-	self._maid:GiveTask(self._overlayFont)
+	self._overlayFont = self._maid:Add(ValueObject.new(Enum.Font.SourceSans))
 
-	self._usernameOverlayEnabled = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._usernameOverlayEnabled)
+	self._usernameOverlayEnabled = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self._visible = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._visible)
+	self._visible = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self._cameraButtonVisible = ValueObject.new(true, "boolean")
-	self._maid:GiveTask(self._cameraButtonVisible)
+	self._cameraButtonVisible = self._maid:Add(ValueObject.new(true, "boolean"))
 
-	self._closeButtonVisible = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._closeButtonVisible)
+	self._closeButtonVisible = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self._keepOpen = ValueObject.new(true, "boolean")
-	self._maid:GiveTask(self._keepOpen)
+	self._keepOpen = self._maid:Add(ValueObject.new(true, "boolean"))
 
 	self.CloseRequested = Signal.new()
 	self._maid:GiveTask(self.CloseRequested)

@@ -28,8 +28,7 @@ function SoftShutdownUI.new()
 	self._subtitle.Value = ""
 	self._maid:GiveTask(self._subtitle)
 
-	self._percentVisible = SpringObject.new(0, 40)
-	self._maid:GiveTask(self._percentVisible)
+	self._percentVisible = self._maid:Add(SpringObject.new(0, 40))
 
 	self._maid:GiveTask(self.VisibleChanged:Connect(function(isVisible, doNotAnimate)
 		self._percentVisible.t = isVisible and 1 or 0

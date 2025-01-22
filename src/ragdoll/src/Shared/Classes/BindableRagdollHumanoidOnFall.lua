@@ -28,11 +28,9 @@ function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 
 	self._ragdollBinder = assert(ragdollBinder, "Bad ragdollBinder")
 
-	self.ShouldRagdoll = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self.ShouldRagdoll)
+	self.ShouldRagdoll = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self._isFalling = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isFalling)
+	self._isFalling = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	-- Setup Ragdoll
 	self:_initLastVelocityRecords()

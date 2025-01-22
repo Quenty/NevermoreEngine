@@ -44,8 +44,7 @@ function PlayerHumanoidBinder:Init(serviceBag, ...)
 	self._humanoidTrackerService = self._serviceBag:GetService(HumanoidTrackerService)
 
 	if not self._shouldTag then
-		self._shouldTag = ValueObject.new(true, "boolean")
-		self._maid:GiveTask(self._shouldTag)
+		self._shouldTag = self._maid:Add(ValueObject.new(true, "boolean"))
 	end
 end
 

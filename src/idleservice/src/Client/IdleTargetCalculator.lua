@@ -19,8 +19,7 @@ IdleTargetCalculator.__index = IdleTargetCalculator
 function IdleTargetCalculator.new()
 	local self = setmetatable(BaseObject.new(), IdleTargetCalculator)
 
-	self._disableContextUI = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._disableContextUI)
+	self._disableContextUI = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self.Changed = self._disableContextUI.Changed
 

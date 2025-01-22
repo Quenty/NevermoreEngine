@@ -18,8 +18,7 @@ HasChatTagsBase.__index = HasChatTagsBase
 function HasChatTagsBase.new(player)
 	local self = setmetatable(BaseObject.new(player), HasChatTagsBase)
 
-	self._lastChatTags = ValueObject.new(nil)
-	self._maid:GiveTask(self._lastChatTags)
+	self._lastChatTags = self._maid:Add(ValueObject.new(nil))
 
 	self._maid:GiveTask(task.defer(function()
 		self._maid:GiveTask(self:_observeTagDataListBrio():Subscribe(function(brio)

@@ -32,12 +32,11 @@ function PlayerInputModeServiceClient:Init(serviceBag)
 end
 
 function PlayerInputModeServiceClient:Start()
-	self._selector = InputModeTypeSelector.new(self._serviceBag, {
+	self._selector = self._maid:Add(InputModeTypeSelector.new(self._serviceBag, {
 		InputModeTypes.Gamepads,
 		InputModeTypes.Keyboard,
 		InputModeTypes.Touch
-	})
-	self._maid:GiveTask(self._selector)
+	}))
 
 	self:_promiseRemoteEvent():Then(function(remoteEvent)
 		self._maid:GiveTask(RxBrioUtils.flatCombineLatest({

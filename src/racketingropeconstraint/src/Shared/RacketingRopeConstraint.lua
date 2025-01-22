@@ -30,8 +30,7 @@ function RacketingRopeConstraint.new(ropeConstraint, serviceBag)
 	self._smallestDistance = START_DISTANCE
 	self._targetDistance = 0.5
 
-	self._isConstrained = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isConstrained)
+	self._isConstrained = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self._maid:GiveTask(self._obj:GetPropertyChangedSignal("Enabled"):Connect(function()
 		self:_handleActiveChanged()
@@ -46,8 +45,7 @@ function RacketingRopeConstraint.new(ropeConstraint, serviceBag)
 	self:_handleActiveChanged()
 
 	if not RunService:IsServer() then
-		self._overriddenLength = OverriddenProperty.new(self._obj, "Length")
-		self._maid:GiveTask(self._overriddenLength)
+		self._overriddenLength = self._maid:Add(OverriddenProperty.new(self._obj, "Length"))
 	end
 
 	self._maid:GiveTask(RacketingRopeConstraintInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm()))
