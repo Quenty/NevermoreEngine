@@ -1,0 +1,36 @@
+{
+  "name": "@quenty/toolutils",
+  "version": "1.0.0",
+  "description": "Utility methods for tools",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "toolutils"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/toolutils/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

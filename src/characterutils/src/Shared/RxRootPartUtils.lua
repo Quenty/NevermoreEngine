@@ -29,9 +29,7 @@ end
 	@return Brio<BasePart>
 ]=]
 function RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(humanoid)
-	return RxInstanceUtils.observePropertyBrio(humanoid, "Parent", function(character)
-		return character ~= nil
-	end):Pipe({
+	return RxInstanceUtils.observeParentBrio(humanoid):Pipe({
 		RxBrioUtils.switchMapBrio(function(character)
 			return RxRootPartUtils.observeHumanoidRootPartBrio(character)
 		end)
