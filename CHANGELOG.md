@@ -1,3 +1,16 @@
+# (Fri Jan 24 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/characterutils@12.16.0`, `@quenty/toolutils@1.1.0`
+  - Add ToolUtils package [#532](https://github.com/Quenty/NevermoreEngine/pull/532) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jan 22 2025)
 
 #### 🐛 Bug Fix

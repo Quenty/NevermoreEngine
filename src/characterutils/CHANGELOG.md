@@ -1,3 +1,19 @@
+# v12.16.0 (Fri Jan 24 2025)
+
+#### 🚀 Enhancement
+
+- Add ToolUtils package [#532](https://github.com/Quenty/NevermoreEngine/pull/532) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- refactor: Use RxInstanceUtils.observeParentBrio(humanoid) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
