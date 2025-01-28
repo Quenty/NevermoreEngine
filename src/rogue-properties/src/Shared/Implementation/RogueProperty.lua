@@ -234,6 +234,12 @@ function RogueProperty:Observe()
 	})
 end
 
+function RogueProperty:ObserveBrio(predicate)
+	return self:Observe():Pipe({
+		RxBrioUtils.switchToBrio(predicate)
+	})
+end
+
 function RogueProperty:CreateMultiplier(amount, source)
 	assert(type(amount) == "number", "Bad amount")
 
