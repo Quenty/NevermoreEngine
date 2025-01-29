@@ -29,9 +29,9 @@ function ViewportControls.new(viewport, viewportModel)
 	self._enabled = self._maid:Add(ValueObject.new(true, "boolean"))
 
 	self._maid:GiveTask(self._obj.InputBegan:Connect(function(inputObject)
-		if inputObject.UserInputType == Enum.UserInputType.MouseButton1
+		if (inputObject.UserInputType == Enum.UserInputType.MouseButton1
 			or inputObject.UserInputType == Enum.UserInputType.MouseButton2
-			or inputObject.UserInputType == Enum.UserInputType.Touch
+			or inputObject.UserInputType == Enum.UserInputType.Touch)
 			and self._enabled.Value then
 			self:_startDrag(inputObject)
 		end
