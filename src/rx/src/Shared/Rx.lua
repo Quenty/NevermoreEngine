@@ -645,11 +645,11 @@ function Rx.reduce(reducer, seed)
 				end,
 				function(...)
 					sub:Fail(...)
-				end),
+				end,
 				function()
 					-- On complete emit the result.
 					sub:Fire(current)
-				end)
+				end))
 
 			return maid
 		end)
@@ -750,13 +750,13 @@ function Rx.endWith(values)
 						sub:Fire(item)
 					end
 					sub:Fail(...)
-				end),
+				end,
 				function()
 					for _, item in pairs(values) do
 						sub:Fire(item)
 					end
 					sub:Complete()
-				end)
+				end))
 
 			return maid
 		end)
@@ -1330,7 +1330,7 @@ function Rx.combineLatestAll()
 				end,
 				function(...)
 					sub:Fail(...)
-				end),
+				end,
 				function()
 					if not alive then
 						return
@@ -1338,7 +1338,7 @@ function Rx.combineLatestAll()
 
 					maid:GiveTask(Rx.combineLatest(observables))
 						:Subscribe(sub:GetFireFailComplete())
-				end)
+				end))
 
 			return maid
 		end)
