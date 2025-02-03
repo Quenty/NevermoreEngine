@@ -55,6 +55,27 @@ end
 	Observes a rig motor as a brio
 	@param character Model
 	@param partName string
+	@param weldName string
+	@return Observable<Brio<Motor6D>>
+]=]
+function RxR15Utils.observeRigWeldBrio(character, partName, weldName)
+	assert(typeof(character) == "Instance", "Bad character")
+	assert(type(partName) == "string", "Bad partName")
+	assert(type(weldName) == "string", "Bad weldName")
+
+	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", partName)
+		:Pipe({
+			RxBrioUtils.switchMapBrio(function(part)
+				return RxInstanceUtils.observeLastNamedChildBrio(part, "Weld", weldName)
+			end);
+			RxBrioUtils.onlyLastBrioSurvives();
+		})
+end
+
+--[=[
+	Observes a rig motor as a brio
+	@param character Model
+	@param partName string
 	@return Observable<Brio<BasePart>>
 ]=]
 function RxR15Utils.observeCharacterPartBrio(character, partName)
