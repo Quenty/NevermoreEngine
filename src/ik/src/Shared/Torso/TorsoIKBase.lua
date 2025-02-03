@@ -129,7 +129,7 @@ function TorsoIKBase:Update()
 	self:UpdateTransformOnly()
 end
 
-function TorsoIKBase:GetTarget()
+function TorsoIKBase:GetAimPosition()
 	return self._target -- May return nil
 end
 

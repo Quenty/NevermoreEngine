@@ -6,13 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Players = game:GetService("Players")
-
-local IKRigBase = require("IKRigBase")
-local IKConstants = require("IKConstants")
-local CharacterUtils = require("CharacterUtils")
-local Motor6DStackHumanoid = require("Motor6DStackHumanoid")
 local Binder = require("Binder")
+local IKRigBase = require("IKRigBase")
+local IKRigInterface = require("IKRigInterface")
+local Motor6DStackHumanoid = require("Motor6DStackHumanoid")
+local Remoting = require("Remoting")
 
 local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
@@ -23,19 +21,11 @@ function IKRig.new(humanoid, serviceBag)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._remoteEvent = Instance.new("RemoteEvent")
-	self._remoteEvent.Name = IKConstants.REMOTE_EVENT_NAME
-	self._remoteEvent.Archivable = false
-	self._remoteEvent.Parent = self._obj
-	self._maid:GiveTask(self._remoteEvent)
-
-	self._maid:GiveTask(self._remoteEvent.OnServerEvent:Connect(function(...)
-		self:_onServerEvent(...)
-	end))
-
 	Motor6DStackHumanoid:Tag(self._obj)
 
-	self._target = nil
+	self:_setupRemoting()
+
+	self._maid:Add(IKRigInterface.Server:Implement(self._obj, self))
 
 	return self
 end
@@ -45,8 +35,8 @@ end
 
 	@return Vector3?
 ]=]
-function IKRig:GetTarget()
-	return self._target
+function IKRig:GetAimPosition()
+	return self._aimPosition
 end
 
 --[=[
@@ -54,21 +44,25 @@ end
 
 	@param target Vector3?
 ]=]
-function IKRig:SetRigTarget(target)
+function IKRig:SetAimPosition(target)
 	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 
-	self._target = target
-
-	local torso = self:GetTorso()
-	if torso then
-		torso:Point(self._target)
-	end
-
-	self._remoteEvent:FireAllClients(target)
+	self:_applyAimPosition(target)
+	self._remoting.SetAimPosition:FireAllClients(target)
 end
 
-function IKRig:_onServerEvent(player, target)
-	assert(player == CharacterUtils.getPlayerFromCharacter(self._obj), "Bad player")
+function IKRig:_setupRemoting()
+	self._remoting = self._maid:Add(Remoting.Server.new(self._obj, "IKRig"))
+
+	self._maid:GiveTask(self._remoting.SetAimPosition:Connect(function(player, target)
+		assert(player == self:GetPlayer(), "Bad player")
+
+		self:_applyAimPosition(target)
+		self._remoting.SetAimPosition:FireAllClientsExcept(player, target)
+	end))
+end
+
+function IKRig:_applyAimPosition(target)
 	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 
 	-- Guard against NaN
@@ -76,18 +70,11 @@ function IKRig:_onServerEvent(player, target)
 		return
 	end
 
-	self._target = target
+	self._aimPosition = target
 
 	local torso = self:GetTorso()
 	if torso then
-		torso:Point(self._target)
-	end
-
-	-- Do replication
-	for _, other in pairs(Players:GetPlayers()) do
-		if other ~= player then
-			self._remoteEvent:FireClient(other, target) -- target may nil
-		end
+		torso:Point(self._aimPosition)
 	end
 end
 

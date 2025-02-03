@@ -46,17 +46,6 @@ function IKRigAimerLocalPlayer.new(serviceBag, ikRig)
 end
 
 --[=[
-	Sets the remote event for replication
-
-	@param remoteEvent RemoteEvent
-]=]
-function IKRigAimerLocalPlayer:SetRemoteEvent(remoteEvent)
-	assert(not self._remoteEvent, "Already have remoteEvent")
-
-	self._remoteEvent = assert(remoteEvent, "No remoteEvent")
-end
-
---[=[
 	Sets whether the local player should look around automatically.
 	@param lookAround boolean
 ]=]
@@ -178,9 +167,9 @@ function IKRigAimerLocalPlayer:UpdateStepped()
 	end
 
 	-- Filter replicate
-	if self._remoteEvent and (os.clock() - self._lastReplication) > self._replicationRate then
+	if (os.clock() - self._lastReplication) > self._replicationRate then
 		self._lastReplication = os.clock()
-		self._remoteEvent:FireServer(aimPosition)
+		self._ikRig:FireSetAimPosition(aimPosition)
 	end
 end
 
