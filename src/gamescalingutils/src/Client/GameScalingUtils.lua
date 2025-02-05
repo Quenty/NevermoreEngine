@@ -85,6 +85,26 @@ function GameScalingUtils.renderUIScale(props)
 end
 
 --[=[
+	Mount version of renderUIScale.
+	Garbage is given to the passed maid.
+	With no parent instance, defaults to parenting to the passed screen.
+
+	@param maid Maid
+	@param screen ScreenGui
+	@param parent Instance?
+]=]
+function GameScalingUtils.mountUIScale(maid, screenGui: ScreenGui, parent: Instance?)
+	local scale = Instance.new("UIScale")
+	scale.Archivable = false
+	scale.Name = "UIScale (GameScaling)"
+	maid:GiveTask(GameScalingUtils.observeUIScale(screenGui):Subscribe(function(scaleFac: number)
+		scale.Scale = scaleFac
+	end))
+	scale.Parent = parent or screenGui
+	maid:GiveTask(scale)
+end
+
+--[=[
 	Blend equivalent of rendering the dialog padding
 
 	@param props { Parent: Instance?, ScreenGui: ScreenGui }
@@ -100,6 +120,29 @@ function GameScalingUtils.renderDialogPadding(props)
 		PaddingLeft = GameScalingUtils.observeDialogPadding(props.ScreenGui);
 		PaddingRight = GameScalingUtils.observeDialogPadding(props.ScreenGui);
 	}
+end
+
+--[=[
+	Mount version of renderDialogPadding.
+	Garbage is given to the passed maid.
+	With no parent instance, defaults to parenting to the passed screen.
+
+	@param maid Maid
+	@param screen ScreenGui
+	@param parent Instance?
+]=]
+function GameScalingUtils.mountDialogPadding(maid, screenGui: ScreenGui, parent: Instance?)
+	local padding = Instance.new("UIPadding")
+	padding.Archivable = false
+	padding.Name = "DialogPadding (GameScaling)"
+	maid:GiveTask(GameScalingUtils.observeDialogPadding(screenGui):Subscribe(function(px: number)
+		padding.PaddingTop = px
+		padding.PaddingBottom = px
+		padding.PaddingLeft = px
+		padding.PaddingRight = px
+	end))
+	padding.Parent = parent or screenGui
+	maid:GiveTask(padding)
 end
 
 --[=[
