@@ -116,15 +116,21 @@ end
 
 function ObservableMap:_observeKeyValueChanged(packValue)
 	return Observable.new(function(sub)
-		local maid = Maid.new()
+		local brios = {}
 
 		local function handleValue(key, value)
 			if value ~= nil then
 				local brio = packValue(key, value)
-				maid[key] = brio
+				if brios[key] then
+					brios[key]:Destroy()
+				end
+				brios[key] = brio
 				sub:Fire(brio)
 			else
-				maid[key] = nil
+				if brios[key] then
+					brios[key]:Destroy()
+					brios[key] = nil
+				end
 			end
 		end
 
@@ -138,7 +144,9 @@ function ObservableMap:_observeKeyValueChanged(packValue)
 			self._maid[sub] = nil
 			conn:Disconnect()
 			sub:Complete()
-			maid:Destroy()
+			for _, v in brios do
+				v:Destroy()
+			end
 		end
 		self._maid[sub] = cleanup
 		return cleanup
