@@ -1,3 +1,26 @@
+# (Tue Feb 18 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Tanay Maganti ([@darealzz](https://github.com/darealzz)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/basicpane@13.16.0`, `@quenty/camera@14.19.0`, `@quenty/coreguienabler@12.17.0`, `@quenty/ik@15.23.0`, `@quenty/loader@10.8.0`, `@quenty/r15utils@13.16.0`, `@quenty/racketingropeconstraint@12.19.0`, `@quenty/rogue-properties@11.21.0`, `@quenty/teamutils@10.16.0`, `@quenty/templateprovider@11.17.0`
+  - Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/rx@13.16.0`
+  - fix: Typo causing some operators to not emit on source completion [#537](https://github.com/Quenty/NevermoreEngine/pull/537) ([@darealzz](https://github.com/darealzz))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Tanay Maganti ([@darealzz](https://github.com/darealzz))
+
+---
+
 # (Fri Jan 24 2025)
 
 #### 🚀 Enhancement

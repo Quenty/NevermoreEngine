@@ -1,3 +1,19 @@
+# v13.16.0 (Tue Feb 18 2025)
+
+#### 🚀 Enhancement
+
+- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- refactor: Add RxR15Utils.observeRigWeldBrio(character, partName, weldName) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

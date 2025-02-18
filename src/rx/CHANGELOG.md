@@ -1,3 +1,19 @@
+# v13.16.0 (Tue Feb 18 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Tanay Maganti ([@darealzz](https://github.com/darealzz)), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: Typo causing some operators to not emit on source completion [#537](https://github.com/Quenty/NevermoreEngine/pull/537) ([@darealzz](https://github.com/darealzz))
+
+#### Authors: 1
+
+- Tanay Maganti ([@darealzz](https://github.com/darealzz))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
