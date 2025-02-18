@@ -36,6 +36,7 @@
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/promise": "file:../promise",
     "@quenty/promisemaid": "file:../promisemaid",
+    "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table"
