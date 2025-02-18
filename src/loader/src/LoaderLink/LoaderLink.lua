@@ -23,8 +23,8 @@ local function waitForValue(objectValue)
 end
 
 local loader = waitForValue(script:WaitForChild("LoaderLink"))
-if not loader:IsDescendantOf(game) then
-	error("[LoaderLink] - Cannot load loader that is unparented from game")
+if not (loader:IsDescendantOf(game) or loader:FindFirstAncestorWhichIsA("Plugin")) then
+	error("[LoaderLink] - Cannot load loader that is unparented from game or plugin")
 end
 
 return require(loader)
