@@ -21,6 +21,7 @@ local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
+local StarterPlayer = game:GetService("StarterPlayer")
 
 local CharacterUtils = require("CharacterUtils")
 local Maid = require("Maid")
@@ -85,6 +86,10 @@ function CoreGuiEnabler.new()
 
 	self:AddState("ModalEnabled", function(isEnabled)
 		UserInputService.ModalEnabled = not isEnabled
+	end)
+
+	self:AddState("EnableMouseLockOption", function(isEnabled)
+		StarterPlayer.EnableMouseLockOption = isEnabled
 	end)
 
 	self:AddState("MouseIconEnabled", function(isEnabled)
