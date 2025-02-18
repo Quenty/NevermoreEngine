@@ -1,23 +1,18 @@
-# v13.16.0 (Tue Feb 18 2025)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Tanay Maganti ([@darealzz](https://github.com/darealzz)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Typo causing some operators to not emit on source completion [#537](https://github.com/Quenty/NevermoreEngine/pull/537) ([@darealzz](https://github.com/darealzz))
-
-#### Authors: 1
-
-- Tanay Maganti ([@darealzz](https://github.com/darealzz))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.15.0...@quenty/rx@13.16.0) (2025-02-18)
+
+
+### Bug Fixes
+
+* Typo typo causing some operators to not emit on source completion ([#537](https://github.com/Quenty/NevermoreEngine/issues/537)) ([bdff54c](https://github.com/Quenty/NevermoreEngine/commit/bdff54c926234e44d01af54f773239c0647bb303))
+
+
+
+
 
 # [13.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.14.0...@quenty/rx@13.15.0) (2024-12-15)
 

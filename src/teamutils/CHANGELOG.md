@@ -1,20 +1,18 @@
-# v10.16.0 (Tue Feb 18 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxTeamUtils.observePlayerTeam(player) and RxTeamUtils.observePlayerTeamColor(player) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.15.0...@quenty/teamutils@10.16.0) (2025-02-18)
+
+
+### Features
+
+* Add RxTeamUtils.observePlayerTeam(player) and RxTeamUtils.observePlayerTeamColor(player) ([046d6cd](https://github.com/Quenty/NevermoreEngine/commit/046d6cd192234c7165a1b4820aa68efad484ce4c))
+
+
+
+
 
 # [10.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.14.0...@quenty/teamutils@10.15.0) (2024-12-15)
 

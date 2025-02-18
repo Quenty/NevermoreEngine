@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.18.2...@quenty/hintscoringutils@14.19.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
 ## [14.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.18.1...@quenty/hintscoringutils@14.18.2) (2025-01-22)
 
 **Note:** Version bump only for package @quenty/hintscoringutils

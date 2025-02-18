@@ -1,20 +1,18 @@
-# v12.17.0 (Tue Feb 18 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
-- feat: Add EnableMouseLockOption to CoreGuiEnabler ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.16.0...@quenty/coreguienabler@12.17.0) (2025-02-18)
+
+
+### Features
+
+* Add EnableMouseLockOption to CoreGuiEnabler ([970a8da](https://github.com/Quenty/NevermoreEngine/commit/970a8dae16e83dd52e4d0c60b049873b1966b7b5))
+
+
+
+
 
 # [12.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.15.0...@quenty/coreguienabler@12.16.0) (2025-01-24)
 

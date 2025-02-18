@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@7.7.1...@quenty/colorsequenceutils@7.8.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/colorsequenceutils
+
+
+
+
+
 ## [7.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@7.7.0...@quenty/colorsequenceutils@7.7.1) (2024-11-04)
 
 **Note:** Version bump only for package @quenty/colorsequenceutils

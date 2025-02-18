@@ -1,23 +1,18 @@
-# v10.8.0 (Tue Feb 18 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Support loading in plugins ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.7.1...@quenty/loader@10.8.0) (2025-02-18)
+
+
+### Bug Fixes
+
+* Support loading in plugins ([d7799a4](https://github.com/Quenty/NevermoreEngine/commit/d7799a445662245f9bb75c977e3307996bca2577))
+
+
+
+
 
 ## [10.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.7.0...@quenty/loader@10.7.1) (2024-11-04)
 

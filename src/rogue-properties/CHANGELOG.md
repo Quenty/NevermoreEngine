@@ -1,23 +1,18 @@
-# v11.21.0 (Tue Feb 18 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Can ObserveBrio on a RogueProperty ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.20.1...@quenty/rogue-properties@11.21.0) (2025-02-18)
+
+
+### Bug Fixes
+
+* Can ObserveBrio on a RogueProperty ([7c14d7b](https://github.com/Quenty/NevermoreEngine/commit/7c14d7bbba83537575a236d5894464c81ccd0845))
+
+
+
+
 
 ## [11.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.20.0...@quenty/rogue-properties@11.20.1) (2025-01-22)
 

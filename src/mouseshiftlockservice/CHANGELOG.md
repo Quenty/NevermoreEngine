@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@11.9.0...@quenty/mouseshiftlockservice@11.10.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/mouseshiftlockservice
+
+
+
+
+
 # [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@11.8.0...@quenty/mouseshiftlockservice@11.9.0) (2024-12-15)
 
 **Note:** Version bump only for package @quenty/mouseshiftlockservice

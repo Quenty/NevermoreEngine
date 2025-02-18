@@ -1,23 +1,15 @@
-# v15.23.0 (Tue Feb 18 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Use AimPosition as a consistent API across all of the IK system ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.22.0...@quenty/ik@15.23.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
 
 # [15.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.21.2...@quenty/ik@15.22.0) (2025-01-24)
 

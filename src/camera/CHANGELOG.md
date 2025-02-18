@@ -1,20 +1,18 @@
-# v14.19.0 (Tue Feb 18 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
-- feat: Add FirstPerson detection to the DefaultCamera in the camera stack, to query Roblox state ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.18.2...@quenty/camera@14.19.0) (2025-02-18)
+
+
+### Features
+
+* Add FirstPerson detection to the DefaultCamera in the camera stack, to query Roblox state ([aff423f](https://github.com/Quenty/NevermoreEngine/commit/aff423f15f83ff0243b2b5ad9783c56b53f87e93))
+
+
+
+
 
 ## [14.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.18.1...@quenty/camera@14.18.2) (2025-01-22)
 

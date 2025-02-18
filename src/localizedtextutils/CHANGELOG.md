@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.15.0...@quenty/localizedtextutils@12.16.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
 # [12.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.14.0...@quenty/localizedtextutils@12.15.0) (2024-12-15)
 
 **Note:** Version bump only for package @quenty/localizedtextutils

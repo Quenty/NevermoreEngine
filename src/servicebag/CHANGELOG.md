@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.10.0...@quenty/servicebag@11.11.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
 # [11.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.9.1...@quenty/servicebag@11.10.0) (2024-11-06)
 
 **Note:** Version bump only for package @quenty/servicebag

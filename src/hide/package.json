@@ -1,6 +1,6 @@
 {
   "name": "@quenty/hide",
-  "version": "11.19.0",
+  "version": "11.20.0",
   "description": "Utility system that leverages the binder system to hide authored objects. Centralized here for cross-system communication.",
   "keywords": [
     "Roblox",

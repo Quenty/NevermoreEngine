@@ -1,23 +1,18 @@
-# v11.17.0 (Tue Feb 18 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing remoting package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.16.1...@quenty/templateprovider@11.17.0) (2025-02-18)
+
+
+### Bug Fixes
+
+* Fix missing remoting package ([ca40c8d](https://github.com/Quenty/NevermoreEngine/commit/ca40c8dd415c2d47340296a88eaad5d2807df327))
+
+
+
+
 
 ## [11.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.16.0...@quenty/templateprovider@11.16.1) (2025-01-22)
 

@@ -1,23 +1,18 @@
-# v12.19.0 (Tue Feb 18 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Rx works without promise ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.18.1...@quenty/racketingropeconstraint@12.19.0) (2025-02-18)
+
+
+### Bug Fixes
+
+* Rx works without promise ([267f976](https://github.com/Quenty/NevermoreEngine/commit/267f976d3be3e5fa407416d96d16d3afc021e25d))
+
+
+
+
 
 ## [12.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.18.0...@quenty/racketingropeconstraint@12.18.1) (2025-01-22)
 
