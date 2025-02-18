@@ -52,6 +52,9 @@ function IKServiceClient:Init(serviceBag)
 	self._serviceBag:GetService(require("Motor6DServiceClient"))
 
 	-- Internal
+	self._serviceBag:GetService(require("IKDataService"))
+
+	-- Binders
 	self._ikRigBinderClient = self._serviceBag:GetService(require("IKRigClient"))
 	self._serviceBag:GetService(require("IKRightGrip"))
 	self._serviceBag:GetService(require("IKLeftGrip"))

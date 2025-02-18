@@ -52,6 +52,9 @@ function IKService:Init(serviceBag)
 	self._serviceBag:GetService(require("TieRealmService"))
 	self._humanoidTrackerService = self._serviceBag:GetService(require("HumanoidTrackerService"))
 
+	-- Internal
+	self._serviceBag:GetService(require("IKDataService"))
+
 	-- Binders
 	self._ikRigBinder = self._serviceBag:GetService(require("IKRig"))
 	self._serviceBag:GetService(require("IKRightGrip"))
@@ -135,7 +138,7 @@ function IKService:UpdateServerRigTarget(humanoid, target)
 		return
 	end
 
-	serverRig:SetRigTarget(target)
+	serverRig:SetAimPosition(target)
 end
 
 function IKService:_handlePlayerRemoving(player)

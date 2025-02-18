@@ -6,13 +6,21 @@
 local TeamUtils = {}
 
 function TeamUtils.areTeamMates(playerA, playerB)
-	if playerA.Neutral or playerB.Neutral then
+	local teamA = TeamUtils.getTeam(playerA)
+	local teamB = TeamUtils.getTeam(playerB)
+	if not teamA or not teamB then
 		return false
 	end
-	if not playerA.Team or not playerB.Team then
-		return false
+
+	return teamA == teamB
+end
+
+function TeamUtils.getTeam(player)
+	if player.Neutral then
+		return nil
 	end
-	return playerA.Team == playerB.Team
+
+	return player.Team
 end
 
 return TeamUtils

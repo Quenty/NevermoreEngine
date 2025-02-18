@@ -17,6 +17,7 @@ local SummedCamera = require("SummedCamera")
 local Maid = require("Maid")
 local CFrameUtils = require("CFrameUtils")
 local CameraFrame = require("CameraFrame")
+local ValueObject = require("ValueObject")
 
 local EPSILON = 0.001
 
@@ -34,6 +35,8 @@ function DefaultCamera.new()
 	self._key = HttpService:GenerateGUID(false)
 	self._maid = Maid.new()
 	self._cameraState = CameraState.new(Workspace.CurrentCamera)
+
+	self._isFirstPerson = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	return self
 end
@@ -93,6 +96,32 @@ function DefaultCamera:SetLastSetCameraFrame(cameraFrame)
 end
 
 --[=[
+	Gets whether the Roblox camera is in first person
+]=]
+function DefaultCamera:IsFirstPerson(): boolean
+	return self._isFirstPerson.Value
+end
+
+--[=[
+	Gets whether the Roblox camera is in first person
+
+	@return Observable<boolean>
+]=]
+function DefaultCamera:ObserveIsFirstPerson()
+	return self._isFirstPerson:Observe()
+end
+
+--[=[
+	Gets whether the Roblox camera is in first person
+
+	@param predicate ((inFirstPerson: boolean) -> boolean)?
+	@return Observable<Brio<boolean>>
+]=]
+function DefaultCamera:ObserveIsFirstPersonBrio(predicate)
+	return self._isFirstPerson:Observe(predicate)
+end
+
+--[=[
 	Binds the camera to RunService RenderStepped event.
 
 	:::tip
@@ -125,11 +154,18 @@ function DefaultCamera:BindToRenderStep()
 	end)
 
 	RunService:BindToRenderStep("DefaultCamera_PostUpdate" .. self._key, Enum.RenderPriority.Camera.Value+2, function()
+		local camera = Workspace.CurrentCamera
+
+		-- Based upon Roblox's camera scripts
+		local distance = (camera.CFrame.Position - camera.Focus.Position).magnitude
+		self._isFirstPerson.Value = distance <= 0.75
+
 		-- Capture
-		self._cameraState = CameraState.new(Workspace.CurrentCamera)
+		self._cameraState = CameraState.new(camera)
 	end)
 
 	maid:GiveTask(function()
+		self._isFirstPerson.Value = false
 		RunService:UnbindFromRenderStep("DefaultCamera_Preupdate" .. self._key)
 		RunService:UnbindFromRenderStep("DefaultCamera_PostUpdate" .. self._key)
 	end)

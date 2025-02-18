@@ -96,7 +96,7 @@ end
 --[=[
 	Returns an observable that observes visibility
 
-	@return Observable<boolean>
+	@return Observable<boolean, boolean?>
 ]=]
 function BasicPane:ObserveVisible()
 	return self._visible:Observe()

@@ -12,8 +12,37 @@ local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
 local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
+local Rx = require("Rx")
 
 local RxTeamUtils = {}
+
+function RxTeamUtils.observePlayerTeam(player)
+	return Rx.combineLatest({
+		team = RxInstanceUtils.observeProperty(player, "Team");
+		neutral = RxInstanceUtils.observeProperty(player, "Neutral")
+	}):Pipe({
+		Rx.map(function(state)
+			if state.neutral then
+				return nil
+			end
+
+			return state.team
+		end)
+	})
+end
+
+function RxTeamUtils.observePlayerTeamColor(player)
+	return RxTeamUtils.observePlayerTeam(player):Pipe({
+		Rx.switchMap(function(team)
+			if team then
+				return RxInstanceUtils.observeProperty(team, "TeamColor")
+			else
+				return Rx.of(nil)
+			end
+		end)
+	})
+end
 
 --[=[
 	Observes all players on a taem.
