@@ -225,7 +225,7 @@ function RoguePropertyTable:__newindex(index, value)
 end
 
 function RoguePropertyTable:__index(index)
-	assert(type(index) == "string", "Bad index")
+	assert(type(index) == "string" or type(index) == "number", "Bad index")
 
 	if RoguePropertyTable[index] then
 		return RoguePropertyTable[index]
