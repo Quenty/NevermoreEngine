@@ -1704,6 +1704,34 @@ function Rx.skip(toSkip)
 end
 
 --[=[
+        https://rxjs.dev/api/operators/debounceTime
+
+        @param seconds number
+        @return (source: Observable<T>) -> Observable<T>
+]=]
+function Rx.debounceTime(seconds)
+    assert(type(seconds) == "number", "Bad seconds")
+
+    return function(source)
+            assert(Observable.isObservable(source), "Bad observable")
+
+            return Observable.new(function(sub)
+                    local maid = Maid.new()
+
+                    maid:GiveTask(source:Subscribe(function(...)
+                        local args = table.pack(...)
+                        maid._delay = task.delay(seconds, function()
+                            maid._delay = nil
+                            sub:Fire(table.unpack(args, 1, args.n))
+                        end)
+                    end))
+
+                    return maid
+            end)
+    end
+end
+
+--[=[
 	Defers the subscription and creation of the observable until the
 	actual subscription of the observable.
 
