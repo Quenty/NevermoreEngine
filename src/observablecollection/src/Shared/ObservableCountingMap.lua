@@ -255,6 +255,8 @@ function ObservableCountingMap:GetTotalKeyCount()
 	return self._totalKeyCountValue.Value
 end
 
+ObservableCountingMap.__len = ObservableCountingMap.GetTotalKeyCount
+
 --[=[
 	Observes the count of the keys in the map
 	@return Observable<number>

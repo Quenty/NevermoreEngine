@@ -96,6 +96,8 @@ function FilteredObservableListView:GetCount()
 	return self._scoredList:GetCount()
 end
 
+FilteredObservableListView.__len = FilteredObservableListView.GetCount
+
 --[=[
 	Observes the count of the list
 	@return Observable<number>
