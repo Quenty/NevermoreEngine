@@ -1,20 +1,15 @@
-# v12.19.1 (Sun Mar 09 2025)
-
-#### 🐛 Bug Fix
-
-- Add __len metamethod to ObservableCollections [#538](https://github.com/Quenty/NevermoreEngine/pull/538) ([@InvisibleWater](https://github.com/InvisibleWater))
-- Added __len metamethod for ObservableCollections ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.19.0...@quenty/observablecollection@12.19.1) (2025-03-09)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
 
 # [12.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.18.1...@quenty/observablecollection@12.19.0) (2025-02-18)
 
