@@ -146,6 +146,8 @@ function ObservableMapList:GetListCount()
 	return self._observableMapOfLists:GetCount()
 end
 
+ObservableMapList.__len = ObservableMapList.GetListCount
+
 --[=[
 	Observes how many lists exist
 

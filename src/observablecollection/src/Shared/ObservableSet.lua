@@ -173,6 +173,8 @@ function ObservableSet:GetCount()
 	return self._countValue.Value or 0
 end
 
+ObservableSet.__len = ObservableSet.GetCount
+
 --[=[
 	Observes the count of the set
 	@return Observable<number>

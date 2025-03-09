@@ -150,6 +150,8 @@ function ObservableMapSet:GetSetCount()
 	return self._observableMapOfSets:GetCount()
 end
 
+ObservableMapSet.__len = ObservableMapSet.GetSetCount
+
 --[=[
 	Observes how many sets exist
 	@return Observable<number>

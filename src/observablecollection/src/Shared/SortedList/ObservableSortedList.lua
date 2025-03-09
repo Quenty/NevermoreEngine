@@ -346,6 +346,8 @@ function ObservableSortedList:GetCount()
 	return self._countValue.Value or 0
 end
 
+ObservableSortedList.__len = ObservableSortedList.GetCount
+
 --[=[
 	Gets a list of all entries.
 	@return { T }

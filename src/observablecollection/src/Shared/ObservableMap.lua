@@ -175,6 +175,8 @@ function ObservableMap:GetCount()
 	return self._countValue.Value or 0
 end
 
+ObservableMap.__len = ObservableMap.GetCount
+
 --[=[
 	Observes the count of the set
 

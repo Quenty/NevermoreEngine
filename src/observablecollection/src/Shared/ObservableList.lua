@@ -263,6 +263,8 @@ function ObservableList:GetCount()
 	return self._countValue.Value or 0
 end
 
+ObservableList.__len = ObservableList.GetCount
+
 --[=[
 	Observes the count of the list
 	@return Observable<number>
