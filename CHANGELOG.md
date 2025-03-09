@@ -1,3 +1,16 @@
+# (Sun Mar 09 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/observablecollection@12.19.1`
+  - Add __len metamethod to ObservableCollections [#538](https://github.com/Quenty/NevermoreEngine/pull/538) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # (Tue Feb 18 2025)
 
 :tada: This release contains work from a new contributor! :tada:
