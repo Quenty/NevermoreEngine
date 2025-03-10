@@ -931,7 +931,7 @@ function Blend._observeChildren(value, parent)
 
 					if doCleanup then
 						if cleanup then
-							MaidTaskUtils.doCleanup(cleanup)
+							MaidTaskUtils.doTask(cleanup)
 						end
 					else
 						maid._current = cleanup
