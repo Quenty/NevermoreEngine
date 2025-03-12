@@ -1,19 +1,18 @@
-# v11.21.2 (Wed Mar 12 2025)
-
-#### 🐛 Bug Fix
-
-- fix: correct type assertion for index in RoguePropertyTable __index function [#539](https://github.com/Quenty/NevermoreEngine/pull/539) ([@darealzz](https://github.com/darealzz))
-
-#### Authors: 1
-
-- Tanay Maganti ([@darealzz](https://github.com/darealzz))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.21.1...@quenty/rogue-properties@11.21.2) (2025-03-12)
+
+
+### Bug Fixes
+
+* correct type assertion for index in __index function ([#539](https://github.com/Quenty/NevermoreEngine/issues/539)) ([7420942](https://github.com/Quenty/NevermoreEngine/commit/74209423be9746b6e44c049bcf8c7bdf08aae1b3))
+
+
+
+
 
 ## [11.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.21.0...@quenty/rogue-properties@11.21.1) (2025-03-09)
 
