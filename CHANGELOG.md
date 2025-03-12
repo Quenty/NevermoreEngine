@@ -1,5 +1,22 @@
 # (Wed Mar 12 2025)
 
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@Daimywil](https://github.com/Daimywil), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/viewport@11.20.1`
+  - fix: Incorrect if statement in ViewportControls [#535](https://github.com/Quenty/NevermoreEngine/pull/535) ([@Daimywil](https://github.com/Daimywil))
+
+#### Authors: 1
+
+- [@Daimywil](https://github.com/Daimywil)
+
+---
+
+# (Wed Mar 12 2025)
+
 #### 🐛 Bug Fix
 
 - `@quenty/rogue-properties@11.21.2`

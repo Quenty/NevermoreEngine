@@ -1,3 +1,19 @@
+# v11.20.1 (Wed Mar 12 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@Daimywil](https://github.com/Daimywil), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: Incorrect if statement in ViewportControls [#535](https://github.com/Quenty/NevermoreEngine/pull/535) ([@Daimywil](https://github.com/Daimywil))
+
+#### Authors: 1
+
+- [@Daimywil](https://github.com/Daimywil)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
