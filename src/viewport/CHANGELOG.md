@@ -1,23 +1,18 @@
-# v11.20.1 (Wed Mar 12 2025)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, null[@Daimywil](https://github.com/Daimywil), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Incorrect if statement in ViewportControls [#535](https://github.com/Quenty/NevermoreEngine/pull/535) ([@Daimywil](https://github.com/Daimywil))
-
-#### Authors: 1
-
-- [@Daimywil](https://github.com/Daimywil)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.20.0...@quenty/viewport@11.20.1) (2025-03-12)
+
+
+### Bug Fixes
+
+* Fix viewport if statement ([#535](https://github.com/Quenty/NevermoreEngine/issues/535)) ([626ae11](https://github.com/Quenty/NevermoreEngine/commit/626ae113523dc711702403e48906441fe4224353))
+
+
+
+
 
 # [11.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.19.2...@quenty/viewport@11.20.0) (2025-02-18)
 
