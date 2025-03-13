@@ -1,3 +1,16 @@
+# (Thu Mar 13 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/observablecollection@12.19.2`, `@quenty/nevermore-cli@4.5.1`
+  - ci: Fix moonwave extractor and documentation building [#540](https://github.com/Quenty/NevermoreEngine/pull/540) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Mar 12 2025)
 
 :tada: This release contains work from a new contributor! :tada:
