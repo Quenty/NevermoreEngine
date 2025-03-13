@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[90815],{19462:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DataStoreSnapshotUtils","desc":"","source":{"line":4,"path":"src/datastore/src/Server/Modules/DataStoreSnapshotUtils.lua"}}')}}]);

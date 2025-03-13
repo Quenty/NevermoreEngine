@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[57663],{49633:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RogueModifierInterface","desc":"","source":{"line":4,"path":"src/rogue-properties/src/Shared/Modifiers/RogueModifierInterface.lua"}}')}}]);

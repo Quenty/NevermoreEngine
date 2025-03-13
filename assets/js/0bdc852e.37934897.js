@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[27360],{91548:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BoundParentTracker","desc":"Tracks a parent bound to a specific binder","source":{"line":5,"path":"src/binder/src/Shared/Trackers/BoundParentTracker.lua"}}')}}]);

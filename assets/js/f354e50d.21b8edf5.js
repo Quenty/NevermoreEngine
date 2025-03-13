@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[20503],{15743:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SoundGroupService","desc":"","source":{"line":4,"path":"src/soundgroups/src/Server/SoundGroupService.lua"}}')}}]);

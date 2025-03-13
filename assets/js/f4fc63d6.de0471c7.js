@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[18331],{77308:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GameConfigCommandService","desc":"Handles cmdr integration","source":{"line":5,"path":"src/gameconfig/src/Server/Cmdr/GameConfigCommandService.lua"}}')}}]);

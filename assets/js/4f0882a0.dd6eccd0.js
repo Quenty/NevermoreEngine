@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[7085],{60700:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GameConfigAsset","desc":"","source":{"line":4,"path":"src/gameconfig/src/Server/Config/Asset/GameConfigAsset.lua"}}')}}]);

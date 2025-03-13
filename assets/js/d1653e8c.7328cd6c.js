@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[74770],{88049:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"UIRotationUtils","desc":"","source":{"line":4,"path":"src/uiobjectutils/src/Client/UIRotationUtils.lua"}}')}}]);

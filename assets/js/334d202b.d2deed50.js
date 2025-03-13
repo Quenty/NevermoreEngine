@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[63307],{23259:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GameConfigClient","desc":"See [GameConfigBase] for API and [GameConfigService] for usage.","realm":["Client"],"source":{"line":6,"path":"src/gameconfig/src/Client/Config/Config/GameConfigClient.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[87627],{60085:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RagdollHumanoidOnFallConstants","desc":"Constants for [RagdollHumanoidOnFall].","source":{"line":5,"path":"src/ragdoll/src/Shared/Classes/RagdollHumanoidOnFallConstants.lua"}}')}}]);

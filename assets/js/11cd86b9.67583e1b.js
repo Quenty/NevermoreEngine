@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[5065],{28882:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ChatProviderServiceClient","desc":"","source":{"line":4,"path":"src/chatproviderservice/src/Client/ChatProviderServiceClient.lua"}}')}}]);

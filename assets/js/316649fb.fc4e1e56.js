@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[95411],{13289:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RbxThumbnailTypes","desc":"Canonical RbxThumbnailTypes","source":{"line":5,"path":"src/rbxthumb/src/Shared/RbxThumbnailTypes.lua"}}')}}]);

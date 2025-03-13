@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[96058],{369:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".disableParticleEmittersAndFadeOutYielding","id":"disableParticleEmittersAndFadeOutYielding","level":3},{"value":".new","id":"new","level":3}]')}}]);

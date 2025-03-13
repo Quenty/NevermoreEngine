@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[92515],{27e3:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".getRotationInXZPlane","id":"getRotationInXZPlane","level":3}]')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[95781],{72414:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SortedNodeValue","desc":"Simplifies comparison logic","source":{"line":6,"path":"src/observablecollection/src/Shared/SortedList/SortedNodeValue.lua"}}')}}]);

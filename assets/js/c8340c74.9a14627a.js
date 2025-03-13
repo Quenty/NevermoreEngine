@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[90273],{74819:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"OpenableInterface","desc":"","source":{"line":4,"path":"src/tie/test/modules/Server/OpenableInterface.lua"}}')}}]);

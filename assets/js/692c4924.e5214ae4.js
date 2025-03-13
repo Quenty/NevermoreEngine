@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[99615],{39463:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BodyColorsDataConstants","desc":"","source":{"line":4,"path":"src/bodycolorsutils/src/Shared/BodyColorsDataConstants.lua"}}')}}]);

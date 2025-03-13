@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[97126],{1298:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PropertyValue","desc":"Proxies a property in Roblox","source":{"line":6,"path":"src/propertyvalue/src/Shared/PropertyValue.lua"}}')}}]);

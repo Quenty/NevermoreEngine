@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[47014],{68626:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SnackbarService","desc":"Server-side snackbar service. See [SnackbarServiceClient] for more details.","realm":["Server"],"source":{"line":7,"path":"src/snackbar/src/Server/SnackbarService.lua"}}')}}]);

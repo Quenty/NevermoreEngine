@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[75264],{27722:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".getJumpButtonPositionAndSize","id":"getJumpButtonPositionAndSize","level":3}]')}}]);

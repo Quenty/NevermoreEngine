@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[50357],{82844:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".solveOrderedRealLinear","id":"solveOrderedRealLinear","level":3},{"value":".solveOrderedRealQuadratic","id":"solveOrderedRealQuadratic","level":3}]')}}]);

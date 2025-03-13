@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[88240],{84601:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"loader","desc":"Primary loader which handles bootstrapping different scenarios quickly","source":{"line":6,"path":"src/loader/src/init.lua"}}')}}]);

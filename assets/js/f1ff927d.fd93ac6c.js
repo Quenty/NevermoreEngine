@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[75672],{81558:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"InputModeServiceClient","desc":"Centralized","source":{"line":5,"path":"src/inputmode/src/Client/InputModeServiceClient.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[13795],{13577:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PagesDatabase","desc":"","source":{"line":4,"path":"src/pagesutils/src/Shared/Proxy/PagesDatabase.lua"}}')}}]);

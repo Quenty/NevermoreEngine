@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[26401],{62812:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RotatingCharacterBuilder","desc":"","source":{"line":4,"path":"src/rotatinglabel/src/Client/RotatingCharacterBuilder.lua"}}')}}]);

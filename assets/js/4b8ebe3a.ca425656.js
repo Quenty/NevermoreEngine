@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[65507],{68696:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".getSizeForLabel","id":"getSizeForLabel","level":3},{"value":".observeSizeForLabelProps","id":"observeSizeForLabelProps","level":3},{"value":".promiseTextBounds","id":"promiseTextBounds","level":3}]')}}]);

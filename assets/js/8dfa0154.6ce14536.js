@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[40754],{95790:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"promiseBoundLinkedClass","desc":"Promise that returns an objectValue\'s value that has a bound\\nvalue to it.","source":{"line":7,"path":"src/boundlinkutils/src/Shared/promiseBoundLinkedClass.lua"}}')}}]);

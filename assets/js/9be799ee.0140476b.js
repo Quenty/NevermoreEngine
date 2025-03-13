@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[13070],{63646:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".getDaysMonthTable","id":"getDaysMonthTable","level":3},{"value":".getOrdinalOfNumber","id":"getOrdinalOfNumber","level":3}]')}}]);

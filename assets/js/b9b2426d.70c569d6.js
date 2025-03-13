@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[93744],{8640:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HasChatTagsClient","desc":"","source":{"line":4,"path":"src/chatproviderservice/src/Client/Binders/HasChatTagsClient.lua"}}')}}]);
