@@ -14,7 +14,7 @@ local SeatUtils = {}
 	@param seats { Seat }
 	@return { Player }
 ]=]
-function SeatUtils.getPlayerOccupants(seats)
+function SeatUtils.getPlayerOccupants(seats: { Seat | VehicleSeat }): { Player }
 	local players = {}
 
 	for _, seat in pairs(seats) do

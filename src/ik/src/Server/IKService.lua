@@ -24,7 +24,7 @@ local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
 
-local SERVER_UPDATE_RATE = 1/10
+local SERVER_UPDATE_RATE = 1 / 10
 
 local IKService = {}
 IKService.ServiceName = "IKService"
@@ -89,7 +89,9 @@ end
 	@param humanoid Humanoid
 	@return IKRig?
 ]=]
-function IKService:GetRig(humanoid)
+function IKService:GetRig(humanoid: Humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
 	return self._ikRigBinder:Bind(humanoid)
 end
 
@@ -98,8 +100,8 @@ end
 	@param humanoid Humanoid
 	@return Promise<IKRig>
 ]=]
-function IKService:PromiseRig(humanoid)
-	assert(typeof(humanoid) == "Instance", "Bad humanoid")
+function IKService:PromiseRig(humanoid: Humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	self._ikRigBinder:Bind(humanoid)
 	return self._ikRigBinder:Promise(humanoid)
@@ -109,7 +111,7 @@ end
 	Unbinds the rig from the humanoid.
 	@param humanoid Humanoid
 ]=]
-function IKService:RemoveRig(humanoid)
+function IKService:RemoveRig(humanoid: Humanoid)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	self._ikRigBinder:Unbind(humanoid)
@@ -128,7 +130,7 @@ end
 	@param humanoid Humanoid
 	@param target Vector3?
 ]=]
-function IKService:UpdateServerRigTarget(humanoid, target)
+function IKService:UpdateServerRigTarget(humanoid: Humanoid, target)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(target) == "Vector3", "Bad target")
 
@@ -141,11 +143,11 @@ function IKService:UpdateServerRigTarget(humanoid, target)
 	serverRig:SetAimPosition(target)
 end
 
-function IKService:_handlePlayerRemoving(player)
+function IKService:_handlePlayerRemoving(player: Player)
 	self._maid[player] = nil
 end
 
-function IKService:_handlePlayer(player)
+function IKService:_handlePlayer(player: Player)
 	local maid = Maid.new()
 
 	local humanoidTracker = self._humanoidTrackerService:GetHumanoidTracker(player)

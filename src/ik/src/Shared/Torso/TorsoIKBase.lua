@@ -16,7 +16,7 @@ local TorsoIKBase = setmetatable({}, BaseObject)
 TorsoIKBase.__index = TorsoIKBase
 TorsoIKBase.ClassName = "TorsoIKBase"
 
-function TorsoIKBase.new(humanoid)
+function TorsoIKBase.new(humanoid: Humanoid)
 	local self = setmetatable(BaseObject.new(), TorsoIKBase)
 
 	self._humanoid = humanoid or error("No humanoid")
@@ -24,38 +24,38 @@ function TorsoIKBase.new(humanoid)
 	self.Pointed = self._maid:Add(Signal.new()) -- :Fire(position | nil)
 
 	self._resources = IKResource.new(IKResourceUtils.createResource({
-		name = "Character";
-		robloxName = self._humanoid.Parent.Name;
+		name = "Character",
+		robloxName = self._humanoid.Parent.Name,
 		children = {
 			IKResourceUtils.createResource({
-				name = "RootPart";
-				robloxName = "HumanoidRootPart";
-			});
+				name = "RootPart",
+				robloxName = "HumanoidRootPart",
+			}),
 			IKResourceUtils.createResource({
-				name = "LowerTorso";
-				robloxName = "LowerTorso";
-			});
+				name = "LowerTorso",
+				robloxName = "LowerTorso",
+			}),
 			IKResourceUtils.createResource({
-				name = "UpperTorso";
-				robloxName = "UpperTorso";
+				name = "UpperTorso",
+				robloxName = "UpperTorso",
 				children = {
 					IKResourceUtils.createResource({
-						name = "Waist";
-						robloxName = "Waist";
-					});
-				};
-			});
+						name = "Waist",
+						robloxName = "Waist",
+					}),
+				},
+			}),
 			IKResourceUtils.createResource({
-				name = "Head";
-				robloxName = "Head";
+				name = "Head",
+				robloxName = "Head",
 				children = {
 					IKResourceUtils.createResource({
-						name = "Neck";
-						robloxName = "Neck";
-					});
-				};
-			});
-		}
+						name = "Neck",
+						robloxName = "Neck",
+					}),
+				},
+			}),
+		},
 	}))
 	self._maid:GiveTask(self._resources)
 	self._resources:SetInstance(self._humanoid.Parent or error("No humanoid.Parent"))
@@ -121,10 +121,8 @@ function TorsoIKBase:_recordLastValidTransforms()
 end
 
 function TorsoIKBase:Update()
-	self._relWaistTransform = CFrame.Angles(0, self._waistY.p, 0)
-		* CFrame.Angles(self._waistZ.p, 0, 0)
-	self._relNeckTransform = CFrame.Angles(0, self._headY.p, 0)
-		* CFrame.Angles(self._headZ.p, 0, 0)
+	self._relWaistTransform = CFrame.Angles(0, self._waistY.p, 0) * CFrame.Angles(self._waistZ.p, 0, 0)
+	self._relNeckTransform = CFrame.Angles(0, self._headY.p, 0) * CFrame.Angles(self._headZ.p, 0, 0)
 
 	self:UpdateTransformOnly()
 end

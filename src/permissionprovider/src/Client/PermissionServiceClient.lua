@@ -28,7 +28,8 @@ function PermissionServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "no serviceBag")
 	self._maid = Maid.new()
 
-	self._providerPromise = Promise.resolved(PermissionProviderClient.new(PermissionProviderConstants.DEFAULT_REMOTE_FUNCTION_NAME))
+	self._providerPromise =
+		Promise.resolved(PermissionProviderClient.new(PermissionProviderConstants.DEFAULT_REMOTE_FUNCTION_NAME))
 end
 
 --[=[
@@ -37,13 +38,12 @@ end
 	@param player Player | nil
 	@return Promise<boolean>
 ]=]
-function PermissionServiceClient:PromiseIsAdmin(player)
+function PermissionServiceClient:PromiseIsAdmin(player: Player?)
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
-	return self:PromisePermissionProvider()
-		:Then(function(permissionProvider)
-			return permissionProvider:PromiseIsAdmin(player)
-		end)
+	return self:PromisePermissionProvider():Then(function(permissionProvider)
+		return permissionProvider:PromiseIsAdmin(player)
+	end)
 end
 
 --[=[

@@ -44,16 +44,16 @@ function ChatProviderService:Init(serviceBag)
 	-- note: normally we don't expose default API surfaces like this with defaults, however, because this only affects developers and this
 	-- tends to significantly improve feedback we're leaving this default configuration in place.
 	self:SetDeveloperTag(ChatTagDataUtils.createChatTagData({
-		TagText = "(dev)";
-		LocalizedText = LocalizedTextUtils.create("chatTags.dev");
-		TagPriority = 15;
-		TagColor = Color3.fromRGB(245, 163, 27);
+		TagText = "(dev)",
+		LocalizedText = LocalizedTextUtils.create("chatTags.dev"),
+		TagPriority = 15,
+		TagColor = Color3.fromRGB(245, 163, 27),
 	}))
 	self:SetAdminTag(ChatTagDataUtils.createChatTagData({
-		TagText = "(mod)";
-		LocalizedText = LocalizedTextUtils.create("chatTags.mod");
-		TagPriority = 10;
-		TagColor = Color3.fromRGB(78, 205, 196);
+		TagText = "(mod)",
+		LocalizedText = LocalizedTextUtils.create("chatTags.mod"),
+		TagPriority = 10,
+		TagColor = Color3.fromRGB(78, 205, 196),
 	}))
 end
 
@@ -103,9 +103,9 @@ function ChatProviderService:SetAdminTag(chatTagData)
 							else
 								return Rx.EMPTY
 							end
-						end)
+						end),
 					})
-			end)
+			end),
 		})
 
 		self._maid._admin = self:_addObservablePlayerTag(observeBrio, chatTagData)
@@ -131,10 +131,9 @@ function ChatProviderService:_addObservablePlayerTag(observePlayersBrio, chatTag
 		local maid = brio:ToMaid()
 		local player = brio:GetValue()
 
-		maid:GivePromise(self:PromiseAddChatTag(player, chatTagData))
-			:Then(function(chatTag)
-				maid:GiveTask(chatTag)
-			end)
+		maid:GivePromise(self:PromiseAddChatTag(player, chatTagData)):Then(function(chatTag)
+			maid:GiveTask(chatTag)
+		end)
 	end))
 
 	return topMaid
@@ -153,10 +152,9 @@ function ChatProviderService:PromiseAddChatTag(player, chatTagData)
 
 	local hasChatTagBinder = self._serviceBag:GetService(require("HasChatTags"))
 
-	return hasChatTagBinder:Promise(player)
-		:Then(function(hasChatTag)
-			return hasChatTag:AddChatTag(chatTagData)
-		end)
+	return hasChatTagBinder:Promise(player):Then(function(hasChatTag)
+		return hasChatTag:AddChatTag(chatTagData)
+	end)
 end
 
 --[=[
@@ -164,7 +162,7 @@ end
 
 	@param player Player
 ]=]
-function ChatProviderService:ClearChatTags(player)
+function ChatProviderService:ClearChatTags(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	local hasChatTagBinder = self._serviceBag:GetService(require("HasChatTags"))
@@ -185,16 +183,15 @@ function ChatProviderService:PromiseSetSpeakerTags(speakerName, chatTagDataList)
 	assert(type(speakerName) == "string", "Bad speakerName")
 	assert(ChatTagDataUtils.isChatTagDataList(chatTagDataList))
 
-	return self:_promiseSpeaker(speakerName)
-		:Then(function(speaker)
-			if not speaker then
-				return nil
-			end
+	return self:_promiseSpeaker(speakerName):Then(function(speaker)
+		if not speaker then
+			return nil
+		end
 
-			speaker:SetExtraData("Tags", chatTagDataList)
-		end, function(err)
-			warn("[ChatProviderService.PromiseSetTags] - No speaker found", err)
-		end)
+		speaker:SetExtraData("Tags", chatTagDataList)
+	end, function(err)
+		warn("[ChatProviderService.PromiseSetTags] - No speaker found", err)
+	end)
 end
 
 function ChatProviderService:_getChatServiceAsync()
@@ -229,7 +226,6 @@ function ChatProviderService:_promiseChatService()
 
 	return Promise.resolved(self._chatServicePromise)
 end
-
 
 function ChatProviderService:_promiseSpeaker(speakerName)
 	assert(type(speakerName) == "string", "Bad speakerName")

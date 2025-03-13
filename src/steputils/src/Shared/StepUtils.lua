@@ -106,7 +106,7 @@ function StepUtils.bindToSignal(signal, update)
 		end
 
 		-- Usually contains just the self arg!
-		local args = {...}
+		local args = { ... }
 
 		-- Bind to render stepped
 		conn = signal:Connect(function()
@@ -127,7 +127,7 @@ end
 	@param func function -- Function to call
 	@return function -- Call this function to cancel call
 ]=]
-function StepUtils.onceAtRenderPriority(priority, func)
+function StepUtils.onceAtRenderPriority(priority: number, func)
 	assert(type(priority) == "number", "Bad priority")
 	assert(type(func) == "function", "Bad func")
 

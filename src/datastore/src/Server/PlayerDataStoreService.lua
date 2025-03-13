@@ -79,11 +79,10 @@ end
 	@param player Player
 	@return Promise<DataStore>
 ]=]
-function PlayerDataStoreService:PromiseDataStore(player)
-	return self:PromiseManager()
-		:Then(function(manager)
-			return manager:GetDataStore(player)
-		end)
+function PlayerDataStoreService:PromiseDataStore(player: Player)
+	return self:PromiseManager():Then(function(manager)
+		return manager:GetDataStore(player)
+	end)
 end
 
 --[=[
@@ -92,10 +91,9 @@ end
 	@return Promise
 ]=]
 function PlayerDataStoreService:PromiseAddRemovingCallback(callback)
-	return self:PromiseManager()
-		:Then(function(manager)
-			manager:AddRemovingCallback(callback)
-		end)
+	return self:PromiseManager():Then(function(manager)
+		manager:AddRemovingCallback(callback)
+	end)
 end
 
 --[=[
@@ -112,12 +110,9 @@ function PlayerDataStoreService:PromiseManager()
 			return DataStorePromises.promiseDataStore(self._dataStoreName, self._dataStoreScope)
 		end)
 		:Then(function(dataStore)
-			local manager = self._maid:Add(PlayerDataStoreManager.new(
-				dataStore,
-				function(player)
-					return tostring(player.UserId)
-				end,
-				true))
+			local manager = self._maid:Add(PlayerDataStoreManager.new(dataStore, function(player)
+				return tostring(player.UserId)
+			end, true))
 
 			-- A lot safer if we're hot reloading or need to monitor bind to close calls
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()

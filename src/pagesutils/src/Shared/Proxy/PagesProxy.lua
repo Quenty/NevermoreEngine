@@ -30,7 +30,7 @@ function PagesProxy.new(database)
 	return self
 end
 
-function PagesProxy.isPagesProxy(value)
+function PagesProxy.isPagesProxy(value): boolean
 	return DuckTypeUtils.isImplementation(PagesProxy, value)
 end
 

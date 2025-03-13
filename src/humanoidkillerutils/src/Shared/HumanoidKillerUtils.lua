@@ -19,7 +19,7 @@ local TAG_LIFETIME = 1
 	Removes all killer tags
 	@param humanoid Humanoid
 ]=]
-function HumanoidKillerUtils.untagKiller(humanoid)
+function HumanoidKillerUtils.untagKiller(humanoid: Humanoid)
 	for _, item in pairs(humanoid:GetChildren()) do
 		if item:IsA("ObjectValue") and item.Name == TAG_NAME then
 			item:Destroy()
@@ -37,7 +37,7 @@ end
 	@param humanoid Humanoid
 	@param attacker Player
 ]=]
-function HumanoidKillerUtils.tagKiller(humanoid, attacker)
+function HumanoidKillerUtils.tagKiller(humanoid: Humanoid, attacker: Player)
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 	assert(typeof(attacker) == "Instance", "Bad attacker")
 
@@ -59,7 +59,7 @@ end
 	@param humanoid Humanoid
 	@return Humanoid?
 ]=]
-function HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid)
+function HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid: Humanoid): Humanoid?
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
 	local creator = humanoid:FindFirstChild(TAG_NAME)
@@ -98,7 +98,7 @@ end
 	@param humanoid Humanoid
 	@return Player?
 ]=]
-function HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid)
+function HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid: Humanoid): Player?
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
 	local creator = humanoid:FindFirstChild(TAG_NAME)

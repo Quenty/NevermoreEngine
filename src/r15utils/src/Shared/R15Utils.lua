@@ -1,9 +1,12 @@
 --[=[
-	Utility methods for R15 Characters
+	Utility methods for R15 Characters. R15 is a specific Roblox character specification.
+
 	@class R15Utils
 ]=]
 
 local R15Utils = {}
+
+export type R15Side = "Left" | "Right"
 
 --[=[
 	Searches the rig for an attachment
@@ -12,8 +15,8 @@ local R15Utils = {}
 	@param attachmentName string
 	@return Attachment?
 ]=]
-function R15Utils.searchForRigAttachment(character, partName, attachmentName)
-	local part = character:FindFirstChild(partName)
+function R15Utils.searchForRigAttachment(character: Model, partName: string, attachmentName: string): Attachment?
+	local part = R15Utils.getBodyPart(character, partName)
 	if not part then
 		return nil
 	end
@@ -28,12 +31,12 @@ end
 	@param motorName string
 	@return Motor6D?
 ]=]
-function R15Utils.getRigMotor(character, partName, motorName)
+function R15Utils.getRigMotor(character: Model, partName: string, motorName: string): Motor6D?
 	assert(typeof(character) == "Instance", "Bad character")
 	assert(type(partName) == "string", "Bad partName")
 	assert(type(motorName) == "string", "Bad motorName")
 
-	local basePart = character:FindFirstChild(partName)
+	local basePart = R15Utils.getBodyPart(character, partName)
 	if not basePart then
 		return nil
 	end
@@ -46,14 +49,13 @@ function R15Utils.getRigMotor(character, partName, motorName)
 	return motor
 end
 
-
 --[=[
 	Retrieves the upper torso
 	@param character Model
 	@return BasePart?
 ]=]
-function R15Utils.getUpperTorso(character)
-	return character:FindFirstChild("UpperTorso")
+function R15Utils.getUpperTorso(character: Model): BasePart?
+	return R15Utils.getBodyPart(character, "UpperTorso")
 end
 
 --[=[
@@ -61,8 +63,21 @@ end
 	@param character Model
 	@return BasePart?
 ]=]
-function R15Utils.getLowerTorso(character)
-	return character:FindFirstChild("LowerTorso")
+function R15Utils.getLowerTorso(character: Model): BasePart?
+	return R15Utils.getBodyPart(character, "LowerTorso")
+end
+
+function R15Utils.getBodyPart(character: Model, partName: string): BasePart?
+	local found = character:FindFirstChild(partName)
+	if found == nil then
+		return nil
+	end
+
+	if not found:IsA("BasePart") then
+		return nil
+	end
+
+	return found
 end
 
 --[=[
@@ -70,7 +85,7 @@ end
 	@param character Model
 	@return Motor6D?
 ]=]
-function R15Utils.getWaistJoint(character)
+function R15Utils.getWaistJoint(character: Model): Motor6D?
 	local upperTorso = R15Utils.getUpperTorso(character)
 	if not upperTorso then
 		return nil
@@ -84,7 +99,7 @@ end
 	@param character Model
 	@return Motor6D?
 ]=]
-function R15Utils.getNeckJoint(character)
+function R15Utils.getNeckJoint(character: Model)
 	local head = character:FindFirstChild("Head")
 	if not head then
 		return nil
@@ -99,7 +114,7 @@ end
 	@param side "Left" | "Right"
 	@return Attachment?
 ]=]
-function R15Utils.getHand(character, side)
+function R15Utils.getHand(character: Model, side: R15Side)
 	return character:FindFirstChild(R15Utils.getHandName(side))
 end
 
@@ -109,7 +124,7 @@ end
 	@param side "Left" | "Right"
 	@return Motor6D?
 ]=]
-function R15Utils.getGripWeld(character, side)
+function R15Utils.getGripWeld(character: Model, side: R15Side): Motor6D?
 	local rightHand = R15Utils.getHand(character, side)
 	if rightHand then
 		return rightHand:FindFirstChild(R15Utils.getGripWeldName(side))
@@ -123,7 +138,7 @@ end
 	@param side "Left" | "Right"
 	@return "LeftGrip" | "RightGrip"
 ]=]
-function R15Utils.getGripWeldName(side)
+function R15Utils.getGripWeldName(side: R15Side)
 	if side == "Left" then
 		return "LeftGrip"
 	elseif side == "Right" then
@@ -153,7 +168,7 @@ end
 	@param side "Left" | "Right"
 	@return "LeftGripAttachment" | "RightGripAttachment"
 ]=]
-function R15Utils.getGripAttachmentName(side)
+function R15Utils.getGripAttachmentName(side: R15Side): "LeftGripAttachment" | "RightGripAttachment"
 	if side == "Left" then
 		return "LeftGripAttachment"
 	elseif side == "Right" then
@@ -169,8 +184,8 @@ end
 	@param side "Left" | "Right"
 	@return Attachment?
 ]=]
-function R15Utils.getShoulderRigAttachment(character, side)
-	if side == "Left"  then
+function R15Utils.getShoulderRigAttachment(character: Model, side: R15Side): Attachment?
+	if side == "Left" then
 		return R15Utils.searchForRigAttachment(character, "UpperTorso", "LeftShoulderRigAttachment")
 	elseif side == "Right" then
 		return R15Utils.searchForRigAttachment(character, "UpperTorso", "RightShoulderRigAttachment")
@@ -185,8 +200,8 @@ end
 	@param side "Left" | "Right"
 	@return Attachment?
 ]=]
-function R15Utils.getGripAttachment(character, side)
-	if side == "Left"  then
+function R15Utils.getGripAttachment(character: Model, side: R15Side): Attachment?
+	if side == "Left" then
 		return R15Utils.searchForRigAttachment(character, "LeftHand", "LeftGripAttachment")
 	elseif side == "Right" then
 		return R15Utils.searchForRigAttachment(character, "RightHand", "RightGripAttachment")
@@ -200,13 +215,13 @@ end
 	@param humanoid Humanoid
 	@return number?
 ]=]
-function R15Utils.getExpectedRootPartYOffset(humanoid)
+function R15Utils.getExpectedRootPartYOffset(humanoid: Humanoid): number?
 	local rootPart = humanoid.RootPart
 	if not rootPart then
 		return nil
 	end
 
-	return humanoid.HipHeight + rootPart.Size.Y/2
+	return humanoid.HipHeight + rootPart.Size.Y / 2
 end
 
 --[=[
@@ -217,7 +232,7 @@ end
 	@param rigAttachment1 string
 	@return number?
 ]=]
-function R15Utils.getRigLength(character, partName, rigAttachment0, rigAttachment1)
+function R15Utils.getRigLength(character: Model, partName: string, rigAttachment0: string, rigAttachment1: string)
 	local attachment0 = R15Utils.searchForRigAttachment(character, partName, rigAttachment0)
 	if not attachment0 then
 		return nil
@@ -236,7 +251,7 @@ end
 	@param lengths { number? }
 	@return number?
 ]=]
-function R15Utils.addLengthsOrNil(lengths)
+function R15Utils.addLengthsOrNil(lengths: { number? }): number?
 	local total = 0
 	for _, length in pairs(lengths) do
 		if not length then
@@ -255,11 +270,16 @@ end
 	@param side "Left" | "Right"
 	@return number?
 ]=]
-function R15Utils.getUpperArmRigLength(character, side)
+function R15Utils.getUpperArmRigLength(character: Model, side: R15Side)
 	if side == "Left" then
 		return R15Utils.getRigLength(character, "LeftUpperArm", "LeftShoulderRigAttachment", "LeftElbowRigAttachment")
 	elseif side == "Right" then
-		return R15Utils.getRigLength(character, "RightUpperArm", "RightShoulderRigAttachment", "RightElbowRigAttachment")
+		return R15Utils.getRigLength(
+			character,
+			"RightUpperArm",
+			"RightShoulderRigAttachment",
+			"RightElbowRigAttachment"
+		)
 	else
 		error("Bad side")
 	end
@@ -271,7 +291,7 @@ end
 	@param side "Left" | "Right"
 	@return number?
 ]=]
-function R15Utils.getLowerArmRigLength(character, side)
+function R15Utils.getLowerArmRigLength(character: Model, side: R15Side): number?
 	if side == "Left" then
 		return R15Utils.getRigLength(character, "LeftLowerArm", "LeftElbowRigAttachment", "LeftWristRigAttachment")
 	elseif side == "Right" then
@@ -287,7 +307,7 @@ end
 	@param side "Left" | "Right"
 	@return number?
 ]=]
-function R15Utils.getWristToGripLength(character, side)
+function R15Utils.getWristToGripLength(character: Model, side: R15Side): number?
 	if side == "Left" then
 		return R15Utils.getRigLength(character, "LeftHand", "LeftWristRigAttachment", "LeftGripAttachment")
 	elseif side == "Right" then
@@ -297,7 +317,13 @@ function R15Utils.getWristToGripLength(character, side)
 	end
 end
 
-function R15Utils.getHumanoidScaleProperty(humanoid, scaleValueName)
+--[=[
+	Retrieves the humanoid scale property
+	@param humanoid Humanoid
+	@param scaleValueName string
+	@return number?
+]=]
+function R15Utils.getHumanoidScaleProperty(humanoid: Humanoid, scaleValueName: string): number?
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	local scaleValue = humanoid:FindFirstChild(scaleValueName)
@@ -314,11 +340,11 @@ end
 	@param side "Left" | "Right"
 	@return number?
 ]=]
-function R15Utils.getArmRigToGripLength(character, side)
+function R15Utils.getArmRigToGripLength(character: Model, side: R15Side)
 	return R15Utils.addLengthsOrNil({
 		R15Utils.getUpperArmRigLength(character, side),
 		R15Utils.getLowerArmRigLength(character, side),
-		R15Utils.getWristToGripLength(character, side)
+		R15Utils.getWristToGripLength(character, side),
 	})
 end
 

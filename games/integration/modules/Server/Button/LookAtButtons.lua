@@ -11,7 +11,7 @@ local LookAtButtons = setmetatable({}, BaseObject)
 LookAtButtons.ClassName = "LookAtButtons"
 LookAtButtons.__index = LookAtButtons
 
-function LookAtButtons.new(humanoid)
+function LookAtButtons.new(humanoid: Humanoid)
 	local self = setmetatable(BaseObject.new(humanoid), LookAtButtons)
 
 	return self

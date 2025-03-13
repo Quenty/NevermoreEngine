@@ -20,7 +20,7 @@ local MessagingServiceUtils = {}
 	@param message any
 	@return Promise
 ]=]
-function MessagingServiceUtils.promisePublish(topic, message)
+function MessagingServiceUtils.promisePublish(topic: string, message)
 	assert(type(topic) == "string", "Bad topic")
 
 	return Promise.spawn(function(resolve, reject)
@@ -47,7 +47,7 @@ end
 	@param callback callback
 	@return Promise<RBXScriptConnection>
 ]=]
-function MessagingServiceUtils.promiseSubscribe(topic, callback)
+function MessagingServiceUtils.promiseSubscribe(topic: string, callback)
 	assert(type(topic) == "string", "Bad topic")
 	assert(type(callback) == "function", "Bad callback")
 

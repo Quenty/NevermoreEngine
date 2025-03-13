@@ -16,19 +16,22 @@ local ModelTransparencyEffect = setmetatable({}, BaseObject)
 ModelTransparencyEffect.ClassName = "ModelTransparencyEffect"
 ModelTransparencyEffect.__index = ModelTransparencyEffect
 
+export type TransparencyMode = "SetTransparency" | "SetLocalTransparencyModifier"
 --[=[
 	@param serviceBag ServiceBag
 	@param adornee Instance
 	@param transparencyServiceMethodName "SetTransparency" | "SetLocalTransparencyModifier" | nil
 	@return ModelTransparencyEffect
 ]=]
-function ModelTransparencyEffect.new(serviceBag, adornee, transparencyServiceMethodName)
+function ModelTransparencyEffect.new(serviceBag, adornee: Instance, transparencyServiceMethodName: TransparencyMode?)
 	local self = setmetatable(BaseObject.new(adornee), ModelTransparencyEffect)
 
 	assert(serviceBag, "Bad serviceBag")
 	assert(adornee, "Bad adornee")
-	assert(type(transparencyServiceMethodName) == "string" or transparencyServiceMethodName == nil,
-			"Bad transparencyServiceMethodName")
+	assert(
+		type(transparencyServiceMethodName) == "string" or transparencyServiceMethodName == nil,
+		"Bad transparencyServiceMethodName"
+	)
 
 	self._transparencyService = serviceBag:GetService(TransparencyService)
 
@@ -44,16 +47,16 @@ end
 	Sets the acceleration
 	@param acceleration number
 ]=]
-function ModelTransparencyEffect:SetAcceleration(acceleration)
+function ModelTransparencyEffect:SetAcceleration(acceleration: number)
 	self._transparency.a = acceleration
 end
 
 --[=[
 	Sets the transparency
 	@param transparency number
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
-function ModelTransparencyEffect:SetTransparency(transparency, doNotAnimate)
+function ModelTransparencyEffect:SetTransparency(transparency: number, doNotAnimate: boolean?)
 	if self._transparency.t == transparency then
 		return
 	end
@@ -70,7 +73,7 @@ end
 	Returns true if animation is done
 	@return boolean
 ]=]
-function ModelTransparencyEffect:IsDoneAnimating()
+function ModelTransparencyEffect:IsDoneAnimating(): boolean
 	return self._transparency.rtime == 0
 end
 
@@ -91,7 +94,6 @@ function ModelTransparencyEffect:FinishTransparencyAnimation(callback)
 	end
 end
 
-
 function ModelTransparencyEffect:_update()
 	if self._transparencyService:IsDead() then
 		return
@@ -100,7 +102,12 @@ function ModelTransparencyEffect:_update()
 	local transparency = self._transparency.p
 
 	for part, _ in pairs(self:_getParts()) do
-		self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, part, transparency)
+		self._transparencyService[self._transparencyServiceMethodName](
+			self._transparencyService,
+			self,
+			part,
+			transparency
+		)
 	end
 
 	return self._transparency.rtime > 0

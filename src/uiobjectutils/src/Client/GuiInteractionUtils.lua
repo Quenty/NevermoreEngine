@@ -16,21 +16,19 @@ local GuiInteractionUtils = {}
 	@param gui GuiObject
 	@return Observable<boolean>
 ]=]
-function GuiInteractionUtils.observeInteractionEnabled(gui)
+function GuiInteractionUtils.observeInteractionEnabled(gui: GuiObject)
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad gui")
 
 	return Rx.combineLatest({
-		visible = RxInstanceUtils.observeProperty(gui, "Visible");
-		guiState = RxInstanceUtils.observeProperty(gui, "GuiState");
-		dataModel = RxInstanceUtils.observeFirstAncestorBrio(gui, "DataModel");
+		visible = RxInstanceUtils.observeProperty(gui, "Visible"),
+		guiState = RxInstanceUtils.observeProperty(gui, "GuiState"),
+		dataModel = RxInstanceUtils.observeFirstAncestorBrio(gui, "DataModel"),
 	}):Pipe({
 		Rx.map(function(state)
-			return state.visible
-				and state.guiState ~= Enum.GuiState.NonInteractable
-				and state.dataModel
-				and true or false
-		end);
-		Rx.distinct();
+			return state.visible and state.guiState ~= Enum.GuiState.NonInteractable and state.dataModel and true
+				or false
+		end),
+		Rx.distinct(),
 	})
 end
 
@@ -41,15 +39,14 @@ end
 	@param gui GuiObject
 	@return Observable<Brio>
 ]=]
-function GuiInteractionUtils.observeInteractionEnabledBrio(gui)
+function GuiInteractionUtils.observeInteractionEnabledBrio(gui: GuiObject)
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad gui")
 
 	return GuiInteractionUtils.observeInteractionEnabled(gui):Pipe({
 		RxBrioUtils.switchToBrio(function(canInteract)
 			return canInteract
-		end)
+		end),
 	})
 end
-
 
 return GuiInteractionUtils

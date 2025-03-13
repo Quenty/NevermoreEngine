@@ -102,7 +102,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function PermissionService:PromiseIsAdmin(player)
+function PermissionService:PromiseIsAdmin(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)
@@ -113,7 +113,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function PermissionService:PromiseIsCreator(player)
+function PermissionService:PromiseIsCreator(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
@@ -125,14 +125,13 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function PermissionService:PromiseIsPermissionLevel(player, permissionLevel)
+function PermissionService:PromiseIsPermissionLevel(player: Player, permissionLevel)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
-	return self:PromisePermissionProvider()
-		:Then(function(permissionProvider)
-			return permissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
-		end)
+	return self:PromisePermissionProvider():Then(function(permissionProvider)
+		return permissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
+	end)
 end
 
 --[=[
@@ -146,17 +145,16 @@ function PermissionService:ObservePermissionedPlayersBrio(permissionLevel)
 
 	return RxPlayerUtils.observePlayersBrio():Pipe({
 		RxBrioUtils.flatMapBrio(function(player)
-			return Rx.fromPromise(self:PromiseIsPermissionLevel(player, permissionLevel))
-				:Pipe({
-					Rx.switchMap(function(hasPermission)
-						if hasPermission then
-							return Rx.of(player)
-						else
-							return Rx.EMPTY
-						end
-					end)
-				})
-		end);
+			return Rx.fromPromise(self:PromiseIsPermissionLevel(player, permissionLevel)):Pipe({
+				Rx.switchMap(function(hasPermission)
+					if hasPermission then
+						return Rx.of(player)
+					else
+						return Rx.EMPTY
+					end
+				end),
+			})
+		end),
 	})
 end
 

@@ -39,28 +39,30 @@ end
 	Starts the service. Should be done via [ServiceBag]
 ]=]
 function GameProductDataService:Start()
-	self._maid:GiveTask(PlayerProductManagerInterface:ObserveAllTaggedBrio("PlayerProductManager", self._tieRealmService:GetTieRealm()):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	self._maid:GiveTask(
+		PlayerProductManagerInterface:ObserveAllTaggedBrio("PlayerProductManager", self._tieRealmService:GetTieRealm())
+			:Subscribe(function(brio)
+				if brio:IsDead() then
+					return
+				end
 
-		local maid, playerProductManager = brio:ToMaidAndValue()
+				local maid, playerProductManager = brio:ToMaidAndValue()
 
-		local function exportSignal(signal, assetType)
-			maid:GiveTask(playerProductManager:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
-				signal:Fire(playerProductManager:GetPlayer(), ...)
-			end))
-		end
+				local function exportSignal(signal, assetType)
+					maid:GiveTask(playerProductManager:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
+						signal:Fire(playerProductManager:GetPlayer(), ...)
+					end))
+				end
 
-		exportSignal(self.GamePassPurchased, GameConfigAssetTypes.PASS)
-		exportSignal(self.ProductPurchased, GameConfigAssetTypes.PRODUCT)
-		exportSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
-		exportSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
-		exportSignal(self.SubscriptionPurchased, GameConfigAssetTypes.SUBSCRIPTION)
-		exportSignal(self.MembershipPurchased, GameConfigAssetTypes.MEMBERSHIP)
-	end))
+				exportSignal(self.GamePassPurchased, GameConfigAssetTypes.PASS)
+				exportSignal(self.ProductPurchased, GameConfigAssetTypes.PRODUCT)
+				exportSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
+				exportSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
+				exportSignal(self.SubscriptionPurchased, GameConfigAssetTypes.SUBSCRIPTION)
+				exportSignal(self.MembershipPurchased, GameConfigAssetTypes.MEMBERSHIP)
+			end)
+	)
 end
-
 
 --[=[
 	Returns true if item has been purchased this session
@@ -70,7 +72,7 @@ end
 	@param idOrKey string | number
 	@return boolean
 ]=]
-function GameProductDataService:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
+function GameProductDataService:HasPlayerPurchasedThisSession(player: Player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -93,16 +95,15 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductDataService:PromisePromptPurchase(player, assetType, idOrKey)
+function GameProductDataService:PromisePromptPurchase(player: Player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self:_promisePlayerProductManager(player)
-		:Then(function(playerProductManager)
-			local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
-			return assetTracker:PromisePromptPurchase(idOrKey)
-		end)
+	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
+		local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
+		return assetTracker:PromisePromptPurchase(idOrKey)
+	end)
 end
 
 --[=[
@@ -113,16 +114,15 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductDataService:PromisePlayerOwnership(player, assetType, idOrKey)
+function GameProductDataService:PromisePlayerOwnership(player: Player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self:_promisePlayerProductManager(player)
-		:Then(function(playerProductManager)
-			local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
-			return ownershipTracker:PromiseOwnsAsset(idOrKey)
-		end)
+	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
+		local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
+		return ownershipTracker:PromiseOwnsAsset(idOrKey)
+	end)
 end
 
 --[=[
@@ -132,14 +132,13 @@ end
 	@param assetType GameConfigAssetType
 	@return Promise<boolean>
 ]=]
-function GameProductDataService:PromiseIsOwnable(player, assetType)
+function GameProductDataService:PromiseIsOwnable(player: Player, assetType)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
-	return self:_promisePlayerProductManager(player)
-		:Then(function(playerProductManager)
-			return playerProductManager:IsOwnable(assetType)
-		end)
+	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
+		return playerProductManager:IsOwnable(assetType)
+	end)
 end
 
 --[=[
@@ -148,13 +147,12 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function GameProductDataService:PromisePlayerIsPromptOpen(player)
+function GameProductDataService:PromisePlayerIsPromptOpen(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return self:_promisePlayerProductManager(player)
-		:Then(function(playerProductManager)
-			return playerProductManager:IsPromptOpen()
-		end)
+	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
+		return playerProductManager:IsPromptOpen()
+	end)
 end
 
 --[=[
@@ -166,10 +164,9 @@ end
 function GameProductDataService:PromisePlayerPromptClosed(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return self:_promisePlayerProductManager(player)
-		:Then(function(playerProductManager)
-			return playerProductManager:PromisePlayerPromptClosed()
-		end)
+	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
+		return playerProductManager:PromisePlayerPromptClosed()
+	end)
 end
 
 --[=[
@@ -187,7 +184,7 @@ function GameProductDataService:ObservePlayerOwnership(player, assetType, idOrKe
 
 	-- TODO: Maybe make this more light weight and cache
 	return self:_observePlayerProductManagerBrio(player):Pipe({
-		RxBrioUtils.flattenToValueAndNil;
+		RxBrioUtils.flattenToValueAndNil,
 		Rx.switchMap(function(playerProductManager)
 			if playerProductManager then
 				local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
@@ -195,7 +192,7 @@ function GameProductDataService:ObservePlayerOwnership(player, assetType, idOrKe
 			else
 				return Rx.EMPTY
 			end
-		end);
+		end),
 	})
 end
 
@@ -207,13 +204,13 @@ end
 	@param idOrKey string | number
 	@return Observable<>
 ]=]
-function GameProductDataService:ObservePlayerAssetPurchased(player, assetType, idOrKey)
+function GameProductDataService:ObservePlayerAssetPurchased(player: Player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self:_observePlayerProductManagerBrio(player):Pipe({
-		RxBrioUtils.flattenToValueAndNil;
+		RxBrioUtils.flattenToValueAndNil,
 		RxBrioUtils.switchMapBrio(function(playerProductManager)
 			if playerProductManager then
 				local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
@@ -221,10 +218,10 @@ function GameProductDataService:ObservePlayerAssetPurchased(player, assetType, i
 			else
 				return Rx.EMPTY
 			end
-		end);
+		end),
 		Rx.map(function()
 			return true
-		end)
+		end),
 	})
 end
 
@@ -239,27 +236,29 @@ function GameProductDataService:ObserveAssetPurchased(assetType, idOrKey)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return PlayerProductManagerInterface:ObserveAllTaggedBrio("PlayerProductManager", self._tieRealmService:GetTieRealm()):Pipe({
-		RxBrioUtils.flatMapBrio(function(playerProductManager)
-			local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
-			return assetTracker:ObserveAssetPurchased(idOrKey):Pipe({
-				Rx.map(function()
-					return playerProductManager:GetPlayer()
-				end);
-			})
-		end);
-		Rx.map(function(brio)
-			-- I THINK THIS LEAKS
-			if brio:IsDead() then
-				return nil
-			end
+	return PlayerProductManagerInterface
+		:ObserveAllTaggedBrio("PlayerProductManager", self._tieRealmService:GetTieRealm())
+		:Pipe({
+			RxBrioUtils.flatMapBrio(function(playerProductManager)
+				local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
+				return assetTracker:ObserveAssetPurchased(idOrKey):Pipe({
+					Rx.map(function()
+						return playerProductManager:GetPlayer()
+					end),
+				})
+			end),
+			Rx.map(function(brio)
+				-- I THINK THIS LEAKS
+				if brio:IsDead() then
+					return nil
+				end
 
-			return brio:GetValue()
-		end);
-		Rx.where(function(value)
-			return value ~= nil
-		end);
-	})
+				return brio:GetValue()
+			end),
+			Rx.where(function(value)
+				return value ~= nil
+			end),
+		})
 end
 
 --[=[
@@ -272,50 +271,48 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductDataService:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
+function GameProductDataService:PromisePlayerOwnershipOrPrompt(player: Player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self:_promisePlayerProductManager(player)
-		:Then(function(playerProductManager)
-			local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
+	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
+		local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
 
-			if playerProductManager:IsOwnable(assetType) then
-				-- Retrieve ownership
-				local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
-				return ownershipTracker:PromiseOwnsAsset(idOrKey)
-					:Then(function(ownsAsset)
-						if ownsAsset then
-							return true
-						else
-							return assetTracker:PromisePromptPurchase(idOrKey)
-						end
-					end)
-			else
-				-- Assume this is a single session purchase
-				if assetTracker:HasPurchasedThisSession(idOrKey) then
-					return Promise.resolved(true)
+		if playerProductManager:IsOwnable(assetType) then
+			-- Retrieve ownership
+			local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
+			return ownershipTracker:PromiseOwnsAsset(idOrKey):Then(function(ownsAsset)
+				if ownsAsset then
+					return true
+				else
+					return assetTracker:PromisePromptPurchase(idOrKey)
 				end
-
-				return assetTracker:PromisePromptPurchase(idOrKey)
+			end)
+		else
+			-- Assume this is a single session purchase
+			if assetTracker:HasPurchasedThisSession(idOrKey) then
+				return Promise.resolved(true)
 			end
-		end)
+
+			return assetTracker:PromisePromptPurchase(idOrKey)
+		end
+	end)
 end
 
-function GameProductDataService:_observePlayerProductManagerBrio(player)
+function GameProductDataService:_observePlayerProductManagerBrio(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerProductManagerInterface:ObserveBrio(player, self._tieRealmService:GetTieRealm())
 end
 
-function GameProductDataService:_promisePlayerProductManager(player)
+function GameProductDataService:_promisePlayerProductManager(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerProductManagerInterface:Promise(player, self._tieRealmService:GetTieRealm())
 end
 
-function GameProductDataService:_getPlayerProductManager(player)
+function GameProductDataService:_getPlayerProductManager(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerProductManagerInterface:Find(player, self._tieRealmService:GetTieRealm())

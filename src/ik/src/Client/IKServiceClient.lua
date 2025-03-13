@@ -76,7 +76,7 @@ end
 	@param humanoid Humanoid
 	@return IKRigClient?
 ]=]
-function IKServiceClient:GetRig(humanoid)
+function IKServiceClient:GetRig(humanoid: Humanoid)
 	assert(self._serviceBag, "Not initialized")
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
@@ -88,7 +88,7 @@ end
 	@param humanoid Humanoid
 	@return Promise<IKRigClient>
 ]=]
-function IKServiceClient:PromiseRig(humanoid)
+function IKServiceClient:PromiseRig(humanoid: Humanoid)
 	assert(self._serviceBag, "Not initialized")
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
@@ -111,9 +111,9 @@ end
 	```
 
 	@param position Vector3? -- May be nil to set no position
-	@param optionalPriority number
+	@param priority number?
 ]=]
-function IKServiceClient:SetAimPosition(position, optionalPriority)
+function IKServiceClient:SetAimPosition(position: Vector3, priority: number?)
 	assert(self._serviceBag, "Not initialized")
 
 	if position ~= position then
@@ -126,7 +126,7 @@ function IKServiceClient:SetAimPosition(position, optionalPriority)
 		return
 	end
 
-	aimer:SetAimPosition(position, optionalPriority)
+	aimer:SetAimPosition(position, priority)
 end
 
 --[=[

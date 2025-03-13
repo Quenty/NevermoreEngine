@@ -26,7 +26,12 @@ local WeldConstraintUtils = {}
 	@param parent Instance? -- Optional
 	@return Weld | WeldConstraint
 ]=]
-function WeldConstraintUtils.namedBetween(name, part0, part1, parent)
+function WeldConstraintUtils.namedBetween(
+	name: string,
+	part0: BasePart,
+	part1: BasePart,
+	parent: Instance
+): Weld | WeldConstraint
 	assert(type(name) == "string", "Bad name")
 	assert(typeof(part0) == "Instance", "Bad part0")
 	assert(typeof(part1) == "Instance", "Bad part1")
@@ -65,7 +70,12 @@ end
 	@param parent Instance? -- Optional
 	@return WeldConstraint
 ]=]
-function WeldConstraintUtils.namedBetweenForceWeldConstraint(name, part0, part1, parent)
+function WeldConstraintUtils.namedBetweenForceWeldConstraint(
+	name: string,
+	part0: BasePart,
+	part1: BasePart,
+	parent: Instance?
+): WeldConstraint
 	assert(type(name) == "string", "Bad name")
 	assert(typeof(part0) == "Instance", "Bad part0")
 	assert(typeof(part1) == "Instance", "Bad part1")
@@ -80,6 +90,5 @@ function WeldConstraintUtils.namedBetweenForceWeldConstraint(name, part0, part1,
 
 	return weldConstraint
 end
-
 
 return WeldConstraintUtils

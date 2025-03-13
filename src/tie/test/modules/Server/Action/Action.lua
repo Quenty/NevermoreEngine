@@ -1,6 +1,6 @@
---[=[
+--[[
 	@class Action
-]=]
+]]
 
 local require = require(script.Parent.loader).load(script)
 

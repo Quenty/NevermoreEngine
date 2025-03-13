@@ -27,7 +27,7 @@ local RxSelectionUtils = {}
 	@param className string
 	@return Observable<Instance?>
 ]=]
-function RxSelectionUtils.observeFirstSelectionWhichIsA(className)
+function RxSelectionUtils.observeFirstSelectionWhichIsA(className: string)
 	assert(type(className) == "string", "Bad className")
 
 	return RxSelectionUtils.observeFirstSelection(function(inst)
@@ -51,7 +51,7 @@ end
 	@param className string
 	@return Observable<Brio<Instance>>
 ]=]
-function RxSelectionUtils.observeFirstSelectionWhichIsABrio(className)
+function RxSelectionUtils.observeFirstSelectionWhichIsABrio(className: string)
 	assert(type(className) == "string", "Bad className")
 
 	return RxSelectionUtils.observeFirstSelectionBrio(function(inst)
@@ -79,10 +79,9 @@ function RxSelectionUtils.observeAdorneesBrio()
 	return RxSelectionUtils.observeSelectionItemsBrio():Pipe({
 		RxBrioUtils.where(function(inst)
 			return inst:IsA("BasePart") or inst:IsA("Model")
-		end)
+		end),
 	})
 end
-
 
 --[=[
 	Observes first selection which meets condition
@@ -141,14 +140,13 @@ function RxSelectionUtils.observeFirstSelectionBrio(where)
 	assert(type(where) == "function", "Bad where")
 
 	return RxSelectionUtils.observeFirstSelection(where):Pipe({
-		RxBrioUtils.toBrio();
-		RxBrioUtils.onlyLastBrioSurvives();
+		RxBrioUtils.toBrio(),
+		RxBrioUtils.onlyLastBrioSurvives(),
 		RxBrioUtils.where(function(value)
 			return value ~= nil
-		end)
+		end),
 	})
 end
-
 
 --[=[
 	Observes the current selection table.

@@ -24,7 +24,7 @@ local MAX_YIELD_TIME = 60
 	@param humanoid Humanoid
 	@return Promise<BasePart>
 ]=]
-function RootPartUtils.promiseRootPart(humanoid)
+function RootPartUtils.promiseRootPart(humanoid: Humanoid)
 	if humanoid.RootPart then
 		return Promise.resolved(humanoid.RootPart)
 	end

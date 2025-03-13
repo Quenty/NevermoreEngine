@@ -15,7 +15,7 @@ local RxRootPartUtils = {}
 	@param character Model
 	@return Brio<BasePart>
 ]=]
-function RxRootPartUtils.observeHumanoidRootPartBrio(character)
+function RxRootPartUtils.observeHumanoidRootPartBrio(character: Model)
 	-- let's make a reasonable assumption here about name not changing
 	return RxInstanceUtils.observeChildrenBrio(character, function(part)
 		return part:IsA("BasePart") and part.Name == "HumanoidRootPart"
@@ -28,11 +28,11 @@ end
 	@param humanoid Humanoid
 	@return Brio<BasePart>
 ]=]
-function RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(humanoid)
+function RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(humanoid: Humanoid)
 	return RxInstanceUtils.observeParentBrio(humanoid):Pipe({
 		RxBrioUtils.switchMapBrio(function(character)
 			return RxRootPartUtils.observeHumanoidRootPartBrio(character)
-		end)
+		end),
 	})
 end
 

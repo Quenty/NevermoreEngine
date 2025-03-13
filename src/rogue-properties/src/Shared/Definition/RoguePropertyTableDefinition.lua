@@ -35,7 +35,7 @@ function RoguePropertyTableDefinition.new(tableName, defaultValueTable)
 	return self
 end
 
-function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value)
+function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value): boolean
 	return DuckTypeUtils.isImplementation(RoguePropertyTableDefinition, value)
 end
 
@@ -72,22 +72,34 @@ function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable)
 
 	if next(defaultArrayData) ~= nil then
 		-- Enforce array data types for sanity
-		local requiredPropertyDefinitionTemplate, message = RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(defaultArrayData, self)
+		local requiredPropertyDefinitionTemplate, message =
+			RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(defaultArrayData, self)
 
 		if requiredPropertyDefinitionTemplate then
-			self._arrayDefinitionHelper = RoguePropertyDefinitionArrayHelper.new(self, defaultArrayData, requiredPropertyDefinitionTemplate)
+			self._arrayDefinitionHelper =
+				RoguePropertyDefinitionArrayHelper.new(self, defaultArrayData, requiredPropertyDefinitionTemplate)
 		else
-			error(string.format("[RoguePropertyTableDefinition] - Could not create infer array type definition. Error: %s", message))
+			error(
+				string.format(
+					"[RoguePropertyTableDefinition] - Could not create infer array type definition. Error: %s",
+					message
+				)
+			)
 		end
 	end
 end
 
-
-function RoguePropertyTableDefinition:CanAssign(mainValue, strict)
+function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): boolean
 	assert(type(strict) == "boolean", "Bad strict")
 
 	if type(mainValue) ~= "table" then
-		return false, string.format("got %q, expected %q when assigning to %q", self._valueType, typeof(mainValue), self:GetFullName())
+		return false,
+			string.format(
+				"got %q, expected %q when assigning to %q",
+				self._valueType,
+				typeof(mainValue),
+				self:GetFullName()
+			)
 	end
 
 	local remainingKeys
@@ -107,7 +119,13 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict)
 					if message then
 						return false, message
 					else
-						return false, string.format("Bad index %q of %q due to %s", tostring(key), self:GetFullName(), tostring(message))
+						return false,
+							string.format(
+								"Bad index %q of %q due to %s",
+								tostring(key),
+								self:GetFullName(),
+								tostring(message)
+							)
 					end
 				end
 			else
@@ -120,7 +138,13 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict)
 					if message then
 						return false, message
 					else
-						return false, string.format("Bad index %q of %q due to %s", tostring(key), self:GetFullName(), tostring(message))
+						return false,
+							string.format(
+								"Bad index %q of %q due to %s",
+								tostring(key),
+								self:GetFullName(),
+								tostring(message)
+							)
 					end
 				end
 			else
@@ -131,7 +155,13 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict)
 
 	-- We missed some keys
 	if next(remainingKeys) ~= nil then
-		return false, string.format("Had %d unassigned keys %q while assigning to %q", #remainingKeys, table.concat(remainingKeys, ", "), self:GetFullName())
+		return false,
+			string.format(
+				"Had %d unassigned keys %q while assigning to %q",
+				#remainingKeys,
+				table.concat(remainingKeys, ", "),
+				self:GetFullName()
+			)
 	end
 
 	return true
@@ -196,7 +226,7 @@ RoguePropertyTableDefinition.GetPropertyTable = RoguePropertyTableDefinition.Get
 	@param canInitialize boolean
 	@return Observable<Brio<Folder>>
 ]=]
-function RoguePropertyTableDefinition:ObserveContainerBrio(adornee, canInitialize)
+function RoguePropertyTableDefinition:ObserveContainerBrio(adornee: Instance, canInitialize)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
@@ -205,12 +235,11 @@ function RoguePropertyTableDefinition:ObserveContainerBrio(adornee, canInitializ
 
 	local parentDefinition = self:GetParentPropertyDefinition()
 	if parentDefinition then
-		return parentDefinition:ObserveContainerBrio(adornee, canInitialize)
-			:Pipe({
-				RxBrioUtils.switchMapBrio(function(parent)
-					return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self:GetName())
-				end)
-			})
+		return parentDefinition:ObserveContainerBrio(adornee, canInitialize):Pipe({
+			RxBrioUtils.switchMapBrio(function(parent)
+				return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self:GetName())
+			end),
+		})
 	else
 		return RxInstanceUtils.observeLastNamedChildBrio(adornee, "Folder", self:GetName())
 	end
@@ -222,7 +251,7 @@ end
 	@param canInitialize boolean
 	@return Folder?
 ]=]
-function RoguePropertyTableDefinition:GetContainer(adornee, canInitialize)
+function RoguePropertyTableDefinition:GetContainer(adornee: Instance, canInitialize): Folder?
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 

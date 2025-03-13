@@ -11,7 +11,7 @@ local MeshUtils = {}
 	@param part BasePart
 	@return Mesh?
 ]=]
-function MeshUtils.getOrCreateMesh(part)
+function MeshUtils.getOrCreateMesh(part: BasePart): Instance?
 	local dataModelMesh = part:FindFirstChildWhichIsA("DataModelMesh")
 	if dataModelMesh then
 		return dataModelMesh

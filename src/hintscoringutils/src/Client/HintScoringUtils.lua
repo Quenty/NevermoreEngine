@@ -40,7 +40,7 @@ local HintScoringUtils = {}
 	@return Vector3? -- Position
 	@return Vector3? -- LookVector
 ]=]
-function HintScoringUtils.getHumanoidPositionDirection(humanoid)
+function HintScoringUtils.getHumanoidPositionDirection(humanoid: Humanoid)
 	local rootPart = humanoid.RootPart
 	if not rootPart then
 		return nil, nil
@@ -75,7 +75,7 @@ function HintScoringUtils.getAdorneeInRegionSet(position, radius, ignoreList, ge
 end
 
 if DEBUG_ENABLED then
---[=[
+	--[=[
 	Draws the score in debug mode
 	@param adornee Instance
 	@param score number
@@ -107,7 +107,7 @@ function HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, c
 		return nil
 	end
 
-	local ray = Ray.new(humanoidCenter, offset.unit*(offset.magnitude + extraDistance))
+	local ray = Ray.new(humanoidCenter, offset.unit * (offset.magnitude + extraDistance))
 	local hitData = raycaster:FindPartOnRay(ray)
 
 	if DEBUG_ENABLED then
@@ -151,7 +151,7 @@ end
 	@return Vector3? -- clamped point
 	@return Vector3? -- center of bounding box
 ]=]
-function HintScoringUtils.clampToBoundingBox(adornee, humanoidCenter)
+function HintScoringUtils.clampToBoundingBox(adornee: Instance, humanoidCenter: Vector3)
 	if adornee:IsA("Attachment") then
 		return adornee.WorldPosition, adornee.WorldPosition
 	end
@@ -186,7 +186,8 @@ function HintScoringUtils.scoreAdornee(
 	maxTriggerRadius,
 	maxViewAngle,
 	maxTriggerAngle,
-	isLineOfSightRequired)
+	isLineOfSightRequired
+)
 	assert(maxTriggerAngle, "Bad maxTriggerAngle")
 
 	-- local center = AdorneeUtils.getCenter(adornee)
@@ -206,13 +207,12 @@ function HintScoringUtils.scoreAdornee(
 
 	local extraDistance = 10
 
-	local closestPoint = HintScoringUtils.raycastToAdornee(
-		raycaster, humanoidCenter, adornee, boundingBoxPoint, extraDistance)
+	local closestPoint =
+		HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, boundingBoxPoint, extraDistance)
 
 	-- Round objects be sad
 	if not closestPoint then
-		closestPoint = HintScoringUtils.raycastToAdornee(
-			raycaster, humanoidCenter, adornee, center, 4)
+		closestPoint = HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, center, 4)
 	end
 
 	if not closestPoint then
@@ -228,7 +228,7 @@ function HintScoringUtils.scoreAdornee(
 	-- 	closestPoint = (closestPoint + boundingBoxPoint)/2 -- Weight this!
 	-- end
 
-	closestPoint = (boundingBoxPoint + center + closestPoint)/3
+	closestPoint = (boundingBoxPoint + center + closestPoint) / 3
 
 	if DEBUG_ENABLED then
 		debugMaid:GiveTask(Draw.point(closestPoint))
@@ -253,7 +253,7 @@ function HintScoringUtils.scoreAdornee(
 		return false
 	end
 
-	return (distScore + angleScore)/2
+	return (distScore + angleScore) / 2
 end
 
 --[=[
@@ -276,7 +276,7 @@ function HintScoringUtils.scoreDist(distance, maxViewDistance, maxTriggerRadius)
 	end
 
 	local inverseDistProportion = Math.map(distance, 0, maxTriggerRadius, 1, 0)
-	return inverseDistProportion*inverseDistProportion
+	return inverseDistProportion * inverseDistProportion
 end
 
 --[=[

@@ -57,7 +57,7 @@ end
 	@param option T
 	@return number | nil
 ]=]
-function WeightedRandomChooser:GetWeight(option)
+function WeightedRandomChooser:GetWeight(option): number?
 	return self._optionToWeight[option]
 end
 
@@ -67,14 +67,14 @@ end
 	@param option T
 	@return number | nil
 ]=]
-function WeightedRandomChooser:GetProbability(option)
+function WeightedRandomChooser:GetProbability(option): number?
 	local weight = self._optionToWeight[option]
 	if weight then
 		return nil
 	end
 
 	local cache = self:_getOrCreateDataCache()
-	return weight/cache.total
+	return weight / cache.total
 end
 
 --[=[
@@ -83,7 +83,7 @@ end
 	@param random Random
 	@return T
 ]=]
-function WeightedRandomChooser:Choose(random)
+function WeightedRandomChooser:Choose(random: Random?)
 	local data = self:_getOrCreateDataCache()
 
 	local randomNum
@@ -96,11 +96,11 @@ function WeightedRandomChooser:Choose(random)
 	local totalSum = 0
 
 	-- TODO: Binary search
-	for i=1, #data.options do
+	for i = 1, #data.options do
 		totalSum = totalSum + data.weights[i]
 
 		-- TODO: cache threshold?
-		local threshold = totalSum/data.total
+		local threshold = totalSum / data.total
 		if randomNum <= threshold then
 			return data.options[i]
 		end
@@ -126,9 +126,9 @@ function WeightedRandomChooser:_getOrCreateDataCache()
 	end
 
 	self._cache = {
-		options = options;
-		weights = weights;
-		total = total;
+		options = options,
+		weights = weights,
+		total = total,
 	}
 	return self._cache
 end

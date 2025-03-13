@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Class of functions that can be used to minimize entrance velocity of a projectile.
 	@class MinEntranceVelocityUtils
@@ -13,19 +14,19 @@ local SQRT_2 = math.sqrt(2)
 	@param origin Vector3
 	@param target Vector3
 	@param accel Vector3
-	@return number
+	@return Vector3
 ]=]
-function MinEntranceVelocityUtils.minimizeEntranceVelocity(origin, target, accel)
+function MinEntranceVelocityUtils.minimizeEntranceVelocity(origin: Vector3, target: Vector3, accel: Vector3): Vector3
 	local offset = target - origin
-	local accelDist = accel.magnitude
-	local offsetDist = offset.magnitude
+	local accelDist = accel.Magnitude
+	local offsetDist = offset.Magnitude
 
 	local lowerTerm = math.sqrt(2 * accelDist * offsetDist)
 	if lowerTerm == 0 then
 		return Vector3.zero
 	end
 
-	return (accelDist*offset - accel*offsetDist) / lowerTerm
+	return (accelDist * offset - accel * offsetDist) / lowerTerm
 end
 
 --[=[
@@ -41,9 +42,14 @@ end
 	@param accel Vector3
 	@return Vector3
 ]=]
-function MinEntranceVelocityUtils.computeEntranceVelocity(velocity, origin, target, accel)
+function MinEntranceVelocityUtils.computeEntranceVelocity(
+	velocity: Vector3,
+	origin: Vector3,
+	target: Vector3,
+	accel: Vector3
+): Vector3
 	local entranceTime = MinEntranceVelocityUtils.computeEntranceTime(velocity, origin, target, accel)
-	return accel*entranceTime + velocity
+	return accel * entranceTime + velocity
 end
 
 --[=[
@@ -59,7 +65,12 @@ end
 	@param accel Vector3
 	@return number
 ]=]
-function MinEntranceVelocityUtils.computeEntranceTime(velocity, origin, target, accel)
+function MinEntranceVelocityUtils.computeEntranceTime(
+	velocity: Vector3,
+	origin: Vector3,
+	target: Vector3,
+	accel: Vector3
+): number
 	local offset = target - origin
 	local aa = accel:Dot(accel)
 	local av = accel:Dot(velocity)
@@ -67,12 +78,12 @@ function MinEntranceVelocityUtils.computeEntranceTime(velocity, origin, target, 
 	local vo = velocity:Dot(offset)
 	local oo = offset:Dot(offset)
 
-	local lowerTerm = aa*vv - av*av
+	local lowerTerm = aa * vv - av * av
 	if lowerTerm == 0 then
 		return 0 -- We're already there
 	end
 
-	return SQRT_2*((vv*oo - vo*vo)/lowerTerm)^0.25
+	return SQRT_2 * ((vv * oo - vo * vo) / lowerTerm) ^ 0.25
 end
 
 return MinEntranceVelocityUtils

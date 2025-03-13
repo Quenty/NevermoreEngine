@@ -1,6 +1,6 @@
---[=[
+--[[
 	@class Window
-]=]
+]]
 
 local require = require(script.Parent.loader).load(script)
 

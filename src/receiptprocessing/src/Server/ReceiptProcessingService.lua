@@ -57,7 +57,7 @@ end
 	@param player Player
 	@return Observable<ReceiptInfo>
 ]=]
-function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player)
+function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:ObserveReceiptProcessedForUserId(player.UserId)
@@ -68,7 +68,7 @@ end
 	@param userId number
 	@return Observable<ReceiptInfo>
 ]=]
-function ReceiptProcessingService:ObserveReceiptProcessedForUserId(userId)
+function ReceiptProcessingService:ObserveReceiptProcessedForUserId(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._receiptProcessedForUserId:Observe(userId)
@@ -87,10 +87,10 @@ function ReceiptProcessingService:RegisterReceiptProcessor(processor, priority)
 	priority = priority or 0
 
 	local data = {
-		traceback = debug.traceback();
-		priority = priority;
-		timestamp = os.clock();
-		processor = processor;
+		traceback = debug.traceback(),
+		priority = priority,
+		timestamp = os.clock(),
+		processor = processor,
 	}
 
 	table.insert(self._processors, data)
@@ -114,7 +114,9 @@ end
 
 function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo)
 	if not self._processors then
-		warn("[ReceiptProcessingService._handleProcessReceiptAsync] - We're leaking memory. Receipt processing service is already cleaned up.")
+		warn(
+			"[ReceiptProcessingService._handleProcessReceiptAsync] - We're leaking memory. Receipt processing service is already cleaned up."
+		)
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 
@@ -128,7 +130,13 @@ function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo)
 		if Promise.isPromise(result) then
 			local ok, promiseResult = result:Yield()
 			if not ok then
-				warn(string.format("[ReceiptProcessingService._handleProcessReceiptAsync] - Promise failed with %q.\n%s", tostring(promiseResult), data.traceback))
+				warn(
+					string.format(
+						"[ReceiptProcessingService._handleProcessReceiptAsync] - Promise failed with %q.\n%s",
+						tostring(promiseResult),
+						data.traceback
+					)
+				)
 				continue
 			end
 
@@ -141,7 +149,13 @@ function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo)
 		elseif result == nil then
 			continue
 		else
-			warn(string.format("[ReceiptProcessingService._handleProcessReceiptAsync] - Got unexpected result of type %q from receiptInfo.\n%s", typeof(result), data.traceback))
+			warn(
+				string.format(
+					"[ReceiptProcessingService._handleProcessReceiptAsync] - Got unexpected result of type %q from receiptInfo.\n%s",
+					typeof(result),
+					data.traceback
+				)
+			)
 		end
 	end
 

@@ -71,9 +71,9 @@ TieDefinition.ClassName = "TieDefinition"
 TieDefinition.__index = TieDefinition
 
 TieDefinition.Types = Table.readonly({
-	METHOD = Symbol.named("method");
-	SIGNAL = Symbol.named("signal");
-	PROPERTY = Symbol.named("property"); -- will default to nil
+	METHOD = Symbol.named("method"),
+	SIGNAL = Symbol.named("signal"),
+	PROPERTY = Symbol.named("property"), -- will default to nil
 })
 
 TieDefinition.Realms = TieRealms
@@ -89,7 +89,7 @@ function TieDefinition.new(definitionName, members)
 	local self = setmetatable({}, TieDefinition)
 
 	self._definitionName = assert(definitionName, "No definitionName")
-	self._validContainerNameSetWeakCache = setmetatable({}, {__mode = "kv"})
+	self._validContainerNameSetWeakCache = setmetatable({}, { __mode = "kv" })
 	self._memberMap = {}
 	self._defaultTieRealm = TieRealms.SHARED
 
@@ -97,15 +97,15 @@ function TieDefinition.new(definitionName, members)
 	self:_addMembers(members, TieRealms.SHARED)
 
 	self.Server = setmetatable({
-		_defaultTieRealm = TieRealms.SERVER
+		_defaultTieRealm = TieRealms.SERVER,
 	}, {
-		__index = self;
+		__index = self,
 	})
 
 	self.Client = setmetatable({
-		_defaultTieRealm = TieRealms.CLIENT
+		_defaultTieRealm = TieRealms.CLIENT,
 	}, {
-		__index = self;
+		__index = self,
 	})
 
 	return self
@@ -114,12 +114,16 @@ end
 function TieDefinition:_addMembers(members, realm)
 	for memberName, memberTypeOrDefaultValue in pairs(members) do
 		if TieRealmUtils.isTieRealm(memberName) then
-
 			self:_addMembers(memberTypeOrDefaultValue, memberName)
 		elseif type(memberName) == "string" then
 			self:_addMember(memberName, memberTypeOrDefaultValue, realm)
 		else
-			error(string.format("[TieDefinition] - Bad memberName %q, expected either string or TieRealm.", tostring(memberName)))
+			error(
+				string.format(
+					"[TieDefinition] - Bad memberName %q, expected either string or TieRealm.",
+					tostring(memberName)
+				)
+			)
 		end
 	end
 end
@@ -168,20 +172,19 @@ function TieDefinition:GetNewImplClass(tieRealm)
 end
 
 local IMPL_CLIENT_SET = table.freeze({
-	["Configuration"] = true;
+	["Configuration"] = true,
 })
 
 local IMPL_SERVER_SET = table.freeze({
-	["Camera"] = true;
+	["Camera"] = true,
 })
 
 local IMPL_SHARED_SET = table.freeze({
-	["Camera"] = true;
-	["Configuration"] = true;
+	["Camera"] = true,
+	["Configuration"] = true,
 })
 
 function TieDefinition:GetImplClassSet(tieRealm)
-
 	if tieRealm == TieRealms.CLIENT then
 		-- Shared implements both...
 		return IMPL_CLIENT_SET
@@ -229,7 +232,7 @@ function TieDefinition:ObserveChildrenBrio(adornee: Instance, tieRealm)
 	return RxInstanceUtils.observeChildrenBrio(adornee):Pipe({
 		RxBrioUtils.flatMapBrio(function(child)
 			return self:ObserveBrio(child, tieRealm)
-		end)
+		end),
 	})
 end
 
@@ -240,7 +243,7 @@ end
 	@param tieRealm TieRealm?
 	@return Promise<TieInterface>
 ]=]
-function TieDefinition:Promise(adornee, tieRealm)
+function TieDefinition:Promise(adornee: Instance, tieRealm)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(TieRealmUtils.isTieRealm(tieRealm) or tieRealm == nil, "Bad tieRealm")
 
@@ -249,7 +252,7 @@ function TieDefinition:Promise(adornee, tieRealm)
 	return Rx.toPromise(self:Observe(adornee, tieRealm):Pipe({
 		Rx.where(function(value)
 			return value ~= nil
-		end)
+		end),
 	}))
 end
 
@@ -304,7 +307,7 @@ function TieDefinition:ObserveAllTaggedBrio(tagName, tieRealm)
 	return RxCollectionServiceUtils.observeTaggedBrio(tagName):Pipe({
 		RxBrioUtils.flatMapBrio(function(instance)
 			return self:ObserveBrio(instance, tieRealm)
-		end)
+		end),
 	})
 end
 
@@ -369,15 +372,14 @@ function TieDefinition:ObserveIsImplemented(adornee: Instance, tieRealm): boolea
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(TieRealmUtils.isTieRealm(tieRealm) or tieRealm == nil, "Bad tieRealm")
 
-	return self:ObserveLastImplementationBrio(adornee, tieRealm)
-		:Pipe({
-			RxBrioUtils.map(function(result)
-				return result and true or false
-			end);
-			RxBrioUtils.emitOnDeath(false);
-			Rx.defaultsTo(false);
-			Rx.distinct();
-		})
+	return self:ObserveLastImplementationBrio(adornee, tieRealm):Pipe({
+		RxBrioUtils.map(function(result)
+			return result and true or false
+		end),
+		RxBrioUtils.emitOnDeath(false),
+		Rx.defaultsTo(false),
+		Rx.distinct(),
+	})
 end
 
 --[=[
@@ -392,15 +394,14 @@ function TieDefinition:ObserveIsImplementation(implParent: Instance, tieRealm)
 
 	tieRealm = tieRealm or self._defaultTieRealm
 
-	return self:_observeImplementation(implParent, tieRealm)
-		:Pipe({
-			RxBrioUtils.map(function(result)
-				return result and true or false
-			end);
-			RxBrioUtils.emitOnDeath(false);
-			Rx.defaultsTo(false);
-			Rx.distinct();
-		})
+	return self:_observeImplementation(implParent, tieRealm):Pipe({
+		RxBrioUtils.map(function(result)
+			return result and true or false
+		end),
+		RxBrioUtils.emitOnDeath(false),
+		Rx.defaultsTo(false),
+		Rx.distinct(),
+	})
 end
 
 --[=[
@@ -422,13 +423,13 @@ function TieDefinition:ObserveIsImplementedOn(implParent: Instance, adornee: Ins
 	end):Pipe({
 		RxBrioUtils.switchMapBrio(function()
 			return self:_observeImplementation(implParent, tieRealm)
-		end);
+		end),
 		RxBrioUtils.map(function(result)
 			return result and true or false
-		end);
-		RxBrioUtils.emitOnDeath(false);
-		Rx.defaultsTo(false);
-		Rx.distinct();
+		end),
+		RxBrioUtils.emitOnDeath(false),
+		Rx.defaultsTo(false),
+		Rx.distinct(),
 	})
 end
 
@@ -445,13 +446,12 @@ function TieDefinition:ObserveBrio(adornee: Instance, tieRealm)
 
 	tieRealm = tieRealm or self._defaultTieRealm
 
-	return self:ObserveValidContainerChildrenBrio(adornee, tieRealm)
-		:Pipe({
-			RxBrioUtils.switchMapBrio(function(implParent)
-				return self:_observeImplementation(implParent, tieRealm)
-			end);
-			RxBrioUtils.onlyLastBrioSurvives();
-		})
+	return self:ObserveValidContainerChildrenBrio(adornee, tieRealm):Pipe({
+		RxBrioUtils.switchMapBrio(function(implParent)
+			return self:_observeImplementation(implParent, tieRealm)
+		end),
+		RxBrioUtils.onlyLastBrioSurvives(),
+	})
 end
 
 --[=[
@@ -466,7 +466,7 @@ function TieDefinition:Observe(adornee: Instance, tieRealm)
 	assert(TieRealmUtils.isTieRealm(tieRealm) or tieRealm == nil, "Bad tieRealm")
 
 	return self:ObserveBrio(adornee, tieRealm):Pipe({
-		RxStateStackUtils.topOfStack();
+		RxStateStackUtils.topOfStack(),
 	})
 end
 
@@ -485,12 +485,11 @@ function TieDefinition:ObserveImplementationsBrio(adornee: Instance, tieRealm)
 
 	tieRealm = tieRealm or self._defaultTieRealm
 
-	return self:ObserveValidContainerChildrenBrio(adornee, tieRealm)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(implParent)
-				return self:_observeImplementation(implParent, tieRealm)
-			end)
-		})
+	return self:ObserveValidContainerChildrenBrio(adornee, tieRealm):Pipe({
+		RxBrioUtils.flatMapBrio(function(implParent)
+			return self:_observeImplementation(implParent, tieRealm)
+		end),
+	})
 end
 
 function TieDefinition:ObserveValidContainerChildrenBrio(adornee, tieRealm)
@@ -639,23 +638,23 @@ function TieDefinition:GetValidContainerNameSet(tieRealm)
 	if tieRealm == TieRealms.CLIENT then
 		-- Shared implements both...
 		self._validContainerNameSetWeakCache[tieRealm] = table.freeze({
-			[self._definitionName .. "Client"] = true;
-			[self._definitionName .. "Shared"] = true;
+			[self._definitionName .. "Client"] = true,
+			[self._definitionName .. "Shared"] = true,
 		})
 		return self._validContainerNameSetWeakCache[tieRealm]
 	elseif tieRealm == TieRealms.SERVER then
 		self._validContainerNameSetWeakCache[tieRealm] = table.freeze({
-			[self._definitionName] = true;
-			[self._definitionName .. "Shared"] = true;
+			[self._definitionName] = true,
+			[self._definitionName .. "Shared"] = true,
 		})
 		return self._validContainerNameSetWeakCache[tieRealm]
 	elseif tieRealm == TieRealms.SHARED then
 		-- Technically on the implementation shared is very strict,
 		-- but we allow any calls here for discovery
 		self._validContainerNameSetWeakCache[tieRealm] = table.freeze({
-			[self._definitionName] = true;
-			[self._definitionName .. "Client"] = true;
-			[self._definitionName .. "Shared"] = true;
+			[self._definitionName] = true,
+			[self._definitionName .. "Client"] = true,
+			[self._definitionName .. "Shared"] = true,
 		})
 		return self._validContainerNameSetWeakCache[tieRealm]
 	else

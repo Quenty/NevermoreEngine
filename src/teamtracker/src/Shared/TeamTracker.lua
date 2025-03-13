@@ -12,10 +12,10 @@ local TeamTracker = {}
 TeamTracker.ClassName = "TeamTracker"
 TeamTracker.__index = TeamTracker
 
-function TeamTracker.new(player)
+function TeamTracker.new(player: Player)
 	local self = setmetatable({}, TeamTracker)
 
-	self._player = player or error("No player")
+	self._player = assert(player, "No player")
 
 	self._maid = Maid.new()
 
@@ -37,7 +37,7 @@ function TeamTracker.new(player)
 	return self
 end
 
-function TeamTracker:GetPlayer()
+function TeamTracker:GetPlayer(): Player
 	return self._player
 end
 

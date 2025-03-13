@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities involving Vector3 objects in Roblox.
 	@class Vector3Utils
@@ -16,7 +17,7 @@ local Vector3Utils = {}
 	@return Vector3
 ]=]
 function Vector3Utils.fromVector2XY(vector2: Vector2): Vector3
-	return Vector3.new(vector2.x, vector2.y, 0)
+	return Vector3.new(vector2.X, vector2.Y, 0)
 end
 
 --[=[
@@ -26,7 +27,7 @@ end
 	@return Vector3
 ]=]
 function Vector3Utils.fromVector2XZ(vector2: Vector2): Vector3
-	return Vector3.new(vector2.x, 0, vector2.y)
+	return Vector3.new(vector2.X, 0, vector2.Y)
 end
 
 --[=[
@@ -36,8 +37,8 @@ end
 	@param b Vector3
 	@return number?
 ]=]
-function Vector3Utils.getAngleRad(a: Vector3, b: Vector3): number
-	if a.magnitude == 0 then
+function Vector3Utils.getAngleRad(a: Vector3, b: Vector3): number?
+	if a.Magnitude == 0 then
 		return nil
 	end
 
@@ -52,7 +53,7 @@ end
 	@return Vector3
 ]=]
 function Vector3Utils.reflect(vector: Vector3, unitNormal: Vector3): Vector3
-	return vector - 2*(unitNormal*vector:Dot(unitNormal))
+	return vector - 2 * (unitNormal * vector:Dot(unitNormal))
 end
 
 --[=[
@@ -63,9 +64,9 @@ end
 	@return number
 ]=]
 function Vector3Utils.angleBetweenVectors(a: Vector3, b: Vector3): number
-	local u = b.magnitude*a
-	local v = a.magnitude*b
-	return 2*math.atan2((v - u).magnitude, (u + v).magnitude)
+	local u = b.Magnitude * a
+	local v = a.Magnitude * b
+	return 2 * math.atan2((v - u).Magnitude, (u + v).Magnitude)
 end
 
 --[=[
@@ -76,12 +77,12 @@ end
 	@param t number -- Amount to slerp. 0 is start, 1 is finish. beyond that is extended as expected.
 	@return Vector3
 ]=]
-function Vector3Utils.slerp(start: Vector3, finish: Vector3, t: number)
+function Vector3Utils.slerp(start: Vector3, finish: Vector3, t: number): Vector3
 	local dot = math.clamp(start:Dot(finish), -1, 1)
 
-	local theta = math.acos(dot)*t
-	local relVec = (finish - start*dot).unit
-	return ((start*math.cos(theta)) + (relVec*math.sin(theta)))
+	local theta = math.acos(dot) * t
+	local relVec = (finish - start * dot).Unit
+	return ((start * math.cos(theta)) + (relVec * math.sin(theta)))
 end
 
 --[=[
@@ -94,11 +95,11 @@ end
 ]=]
 function Vector3Utils.constrainToCone(direction: Vector3, coneDirection: Vector3, coneAngleRad: number): Vector3
 	local angle = Vector3Utils.angleBetweenVectors(direction, coneDirection)
-	local coneHalfAngle = 0.5*coneAngleRad
+	local coneHalfAngle = 0.5 * coneAngleRad
 
 	if angle > coneHalfAngle then
 		local proportion = coneHalfAngle / angle
-		return Vector3Utils.slerp(coneDirection.unit, direction.unit, proportion) * direction.magnitude
+		return Vector3Utils.slerp(coneDirection.Unit, direction.Unit, proportion) * direction.Magnitude
 	end
 
 	return direction
@@ -116,8 +117,8 @@ end
 	@param amount number
 	@return Vector3
 ]=]
-function Vector3Utils.round(vector3: Vector3, amount: number): number
-	return Vector3.new(Math.round(vector3.x, amount), Math.round(vector3.y, amount), Math.round(vector3.z, amount))
+function Vector3Utils.round(vector3: Vector3, amount: number): Vector3
+	return Vector3.new(Math.round(vector3.X, amount), Math.round(vector3.Y, amount), Math.round(vector3.Z, amount))
 end
 
 --[=[
@@ -128,12 +129,10 @@ end
 	@param epsilon number
 	@return boolean
 ]=]
-function Vector3Utils.areClose(a, b, epsilon)
+function Vector3Utils.areClose(a: Vector3, b: Vector3, epsilon: number): boolean
 	assert(type(epsilon) == "number", "Bad epsilon")
 
-	return math.abs(a.x - b.x) <= epsilon
-		and math.abs(a.y - b.y) <= epsilon
-		and math.abs(a.z - b.z) <= epsilon
+	return math.abs(a.X - b.X) <= epsilon and math.abs(a.Y - b.Y) <= epsilon and math.abs(a.Z - b.Z) <= epsilon
 end
 
 return Vector3Utils

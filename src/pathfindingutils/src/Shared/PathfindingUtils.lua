@@ -19,7 +19,7 @@ local PathfindingUtils = {}
 	@param finish Vector3
 	@return Promise<Path>
 ]=]
-function PathfindingUtils.promiseComputeAsync(path, start, finish)
+function PathfindingUtils.promiseComputeAsync(path: Path, start: Vector3, finish: Vector3)
 	assert(path, "Bad path")
 	assert(start, "Bad start")
 	assert(finish, "Bad finish")
@@ -43,7 +43,7 @@ end
 	@param startIndex number
 	@return Promise<number>
 ]=]
-function PathfindingUtils.promiseCheckOcclusion(path, startIndex)
+function PathfindingUtils.promiseCheckOcclusion(path: Path, startIndex: number)
 	return Promise.spawn(function(resolve, _)
 		resolve(path:CheckOcclusionAsync(startIndex))
 	end)
@@ -56,7 +56,7 @@ end
 	@param path Path
 	@return MaidTask
 ]=]
-function PathfindingUtils.visualizePath(path)
+function PathfindingUtils.visualizePath(path: Path)
 	local maid = Maid.new()
 
 	local parent = Instance.new("Folder")
@@ -66,7 +66,6 @@ function PathfindingUtils.visualizePath(path)
 	local lastWaypoint
 
 	for index, waypoint in pairs(path:GetWaypoints()) do
-
 		if waypoint.Action == Enum.PathWaypointAction.Walk then
 			local point = maid:Add(Draw.point(waypoint.Position, Color3.new(0.5, 1, 0.5), parent))
 			point.Name = string.format("%03d_WalkPoint", index)

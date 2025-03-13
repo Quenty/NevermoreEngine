@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility function to get rotation in the XZ plane.
 	@class getRotationInXZPlane
@@ -15,13 +16,14 @@
 	@return CFrame -- The CFrame in the XZ plane
 	@within getRotationInXZPlane
 ]=]
-local function getRotationInXZPlane(cframe)
-	local _,_,_,
-	      _,_,zx,
-	      _,_,_,
-	      _,_,zz = cframe:GetComponents()
+local function getRotationInXZPlane(cframe: CFrame): CFrame
+	-- stylua: ignore
+	local _, _, _,
+	      _, _, zx,
+	      _, _, _,
+	      _, _, zz = cframe:GetComponents()
 
-	local back = Vector3.new(zx, 0, zz).unit
+	local back = Vector3.new(zx, 0, zz).Unit
 	if back ~= back then
 		return cframe -- we're looking straight down
 	end
@@ -29,6 +31,7 @@ local function getRotationInXZPlane(cframe)
 	local top = Vector3.new(0, 1, 0)
 	local right = top:Cross(back)
 
+	-- stylua: ignore
 	return CFrame.new(
 		cframe.X, cframe.Y, cframe.Z,
 		right.X, top.X, back.X,

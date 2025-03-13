@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving sets, which are tables with the key as an index, and the value as a
 	truthy value.
@@ -14,10 +15,10 @@ local Set = {}
 ]=]
 function Set.union(set, otherSet)
 	local newSet = {}
-	for key, _ in pairs(set) do
+	for key, _ in set do
 		newSet[key] = true
 	end
-	for key, _ in pairs(otherSet) do
+	for key, _ in otherSet do
 		newSet[key] = true
 	end
 	return newSet
@@ -30,7 +31,7 @@ end
 	@return table
 ]=]
 function Set.unionUpdate(set, otherSet)
-	for key, _ in pairs(otherSet) do
+	for key, _ in otherSet do
 		set[key] = true
 	end
 end
@@ -43,7 +44,7 @@ end
 ]=]
 function Set.intersection(set, otherSet)
 	local newSet = {}
-	for key, _ in pairs(set) do
+	for key, _ in set do
 		if otherSet[key] ~= nil then
 			newSet[key] = true
 		end
@@ -58,7 +59,7 @@ end
 ]=]
 function Set.copy(set)
 	local newSet = {}
-	for key, _ in pairs(set) do
+	for key, _ in set do
 		newSet[key] = true
 	end
 	return newSet
@@ -71,7 +72,7 @@ end
 ]=]
 function Set.fromKeys(tab)
 	local newSet = {}
-	for key, _ in pairs(tab) do
+	for key, _ in tab do
 		newSet[key] = true
 	end
 	return newSet
@@ -85,7 +86,7 @@ end
 function Set.fromTableValue(tab)
 	local set = {}
 
-	for _, value in pairs(tab) do
+	for _, value in tab do
 		set[value] = true
 	end
 
@@ -109,7 +110,7 @@ Set.fromList = Set.fromTableValue
 function Set.toList(set)
 	local list = {}
 
-	for value, _ in pairs(set) do
+	for value, _ in set do
 		table.insert(list, value)
 	end
 
@@ -123,7 +124,7 @@ end
 	@return table
 ]=]
 function Set.differenceUpdate(set, otherSet)
-	for value, _ in pairs(otherSet) do
+	for value, _ in otherSet do
 		set[value] = nil
 	end
 end
@@ -136,14 +137,13 @@ end
 ]=]
 function Set.difference(set, otherSet)
 	local newSet = {}
-	for key, _ in pairs(set) do
+	for key, _ in set do
 		newSet[key] = true
 	end
-	for key, _ in pairs(otherSet) do
+	for key, _ in otherSet do
 		newSet[key] = nil
 	end
 	return newSet
 end
-
 
 return Set
