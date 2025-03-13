@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class CircleUtils
 ]=]
@@ -13,7 +14,7 @@ local CircleUtils = {}
 	@param circumference number
 	@return number
 ]=]
-function CircleUtils.updatePositionToSmallestDistOnCircle(position, target, circumference)
+function CircleUtils.updatePositionToSmallestDistOnCircle(position: number, target: number, circumference: number): number
 	assert(target >= 0 and target <= circumference, "Target must be between 0 and circumference")
 
 	if math.abs(position - target) <= circumference/2 then

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities involving an "Adornee" effectively, any Roblox instance. This is an extremely
 	useful library to use as it lets you abstract applying effects to any Roblox instance
@@ -54,7 +55,7 @@ end
 	@return CFrame? -- Center of the bounding box
 	@return Vector3? -- Size of the bounding box
 ]=]
-function AdorneeUtils.getBoundingBox(adornee: Instance): (CFrame, Vector3)
+function AdorneeUtils.getBoundingBox(adornee: Instance): (CFrame?, Vector3?)
 	if adornee:IsA("Model") then
 		return adornee:GetBoundingBox()
 	elseif adornee:IsA("Attachment") then
@@ -97,15 +98,15 @@ function AdorneeUtils.getParts(adornee: Instance): { BasePart }
 		table.insert(parts, adornee)
 	end
 
-	local searchParent
+	local searchParent: Instance?
 	if adornee:IsA("Humanoid") then
 		searchParent = adornee.Parent
 	else
 		searchParent = adornee
 	end
 
-	if searchParent then
-		for _, part in pairs(searchParent:GetDescendants()) do
+	if searchParent ~= nil then
+		for _, part in searchParent:GetDescendants() do
 			if part:IsA("BasePart") then
 				table.insert(parts, part)
 			end
@@ -183,7 +184,7 @@ function AdorneeUtils.getPartVelocity(adornee: Instance): Vector3?
 		return nil
 	end
 
-	return part.Velocity
+	return part.AssemblyLinearVelocity
 end
 
 --[=[
@@ -197,10 +198,11 @@ function AdorneeUtils.getPart(adornee: Instance): BasePart?
 	if adornee:IsA("BasePart") then
 		return adornee
 	elseif adornee:IsA("Model") then
-		if adornee.PrimaryPart then
+		if adornee.PrimaryPart ~= nil then
 			return adornee.PrimaryPart
 		else
-			return adornee:FindFirstChildWhichIsA("BasePart")
+			local basePart: BasePart? = adornee:FindFirstChildWhichIsA("BasePart")
+			return basePart
 		end
 	elseif adornee:IsA("Attachment") then
 		return adornee:FindFirstAncestorWhichIsA("BasePart")
@@ -237,7 +239,8 @@ function AdorneeUtils.getRenderAdornee(adornee: Instance): Instance?
 	elseif adornee:IsA("Humanoid") then
 		return adornee.Parent
 	elseif adornee:IsA("Accessory") or adornee:IsA("Clothing") then
-		return adornee:FindFirstChildWhichIsA("BasePart")
+		local basePart = adornee:FindFirstChildWhichIsA("BasePart")
+		return basePart
 	elseif adornee:IsA("Tool") then
 		local handle = adornee:FindFirstChild("Handle")
 		if handle and handle:IsA("BasePart") then

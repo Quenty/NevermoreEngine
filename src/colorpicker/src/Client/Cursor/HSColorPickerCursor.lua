@@ -88,7 +88,7 @@ end
 
 	@param transparency number
 ]=]
-function HSColorPickerCursor:SetTransparency(transparency)
+function HSColorPickerCursor:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
@@ -98,7 +98,7 @@ function HSColorPickerCursor:_render()
 	return Blend.New "Frame" {
 		Name = "HSColorPickerCursor";
 		Size = Blend.Computed(self._height, function(height)
-			return UDim2.fromScale(height, height);
+			return UDim2.fromScale(height, height)
 		end);
 		BackgroundTransparency = 1;
 		AnchorPoint = Vector2.new(0.5, 0.5);
@@ -143,7 +143,7 @@ function HSColorPickerCursor:_render()
 				CornerRadius = UDim.new(1, 0);
 			};
 		};
-	};
+	}
 end
 
 

@@ -1,6 +1,6 @@
+--!strict
 --[=[
 	@class SnackbarOptionUtils
-
 ]=]
 
 local require = require(script.Parent.loader).load(script)
@@ -9,7 +9,14 @@ local t = require("t")
 
 local SnackbarOptionUtils = {}
 
-function SnackbarOptionUtils.createSnackbarOptions(options)
+export type SnackbarOptions = {
+	CallToAction: string | {
+		Text: string,
+		OnClick: ((any) -> any) | nil,
+	} | nil,
+}
+
+function SnackbarOptionUtils.createSnackbarOptions(options: SnackbarOptions): SnackbarOptions
 	assert(SnackbarOptionUtils.isSnackbarOptions(options))
 
 	return options

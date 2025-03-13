@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	Legacy code written by AxisAngles to simulate particles with Guis
 
@@ -13,6 +14,7 @@ local RunService = game:GetService("RunService")
 
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local ParticleEngineConstants = require("ParticleEngineConstants")
+local _ServiceBag = require("ServiceBag")
 
 local ParticleEngineClient = {}
 ParticleEngineClient.ServiceName = "ParticleEngineClient"
@@ -23,7 +25,7 @@ ParticleEngineClient._maxParticles = 400
 -- Speed of wind to simulate
 ParticleEngineClient._windSpeed = 10
 
-local function newFrame(name)
+local function newFrame(name: string): Frame
 	local frame = Instance.new("Frame")
 	frame.BorderSizePixel = 0
 	frame.Name = name
@@ -31,10 +33,11 @@ local function newFrame(name)
 	return frame
 end
 
-function ParticleEngineClient:Init(serviceBag)
+function ParticleEngineClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._screen = nil :: ScreenGui?
 
-	PromiseGetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME):Then(function(remoteEvent)
+	PromiseGetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME):Then(function(remoteEvent: RemoteEvent)
 		self._remoteEvent = remoteEvent
 
 		self._remoteEvent.OnClientEvent:Connect(function(...)
@@ -46,10 +49,10 @@ function ParticleEngineClient:Init(serviceBag)
 
 	self._lastUpdateTime = tick()
 	self._particleCount = 0
-	self._particles = {}
-	self._particleFrames = {}
+	self._particles = {} :: { Particle }
+	self._particleFrames = {} :: { Frame }
 
-	for i=1, self._maxParticles do
+	for i = 1, self._maxParticles do
 		self._particleFrames[i] = newFrame("_particle")
 	end
 
@@ -60,15 +63,15 @@ function ParticleEngineClient:Init(serviceBag)
 	end)
 end
 
-function ParticleEngineClient:SetScreenGui(screenGui)
+function ParticleEngineClient:SetScreenGui(screenGui: ScreenGui)
 	self._screen = screenGui
 end
 
 -- Removes a particle
-function ParticleEngineClient:Remove(p)
+function ParticleEngineClient:Remove(p: Particle)
 	if self._particles[p] then
 		self._particles[p] = nil
-		self._particleCount = self._particleCount - 1
+		self._particleCount -= 1
 	end
 end
 
@@ -93,17 +96,34 @@ end
 	Function = function(Table ParticleProperties, Number dt, Number t)
 }
 --]]
-function ParticleEngineClient:Add(p)
+export type Particle = {
+	Position: Vector3,
+	Global: boolean,
+	Velocity: Vector3,
+	Gravity: Vector3,
+	WindResistance: number,
+	LifeTime: number,
+	Size: Vector2,
+	Bloom: Vector2,
+	Transparency: number,
+	Color: Color3,
+	Occlusion: boolean?,
+	RemoveOnCollision: ((BasePart, Vector3) -> boolean)?,
+	Function: ((Particle, number, number) -> ())?,
+	_lastScreenPosition: Vector2?,
+}
+
+function ParticleEngineClient:Add(p: Particle)
 	if self._particles[p] then
 		return
 	end
 
 	p.Position = p.Position or Vector3.zero
 	p.Velocity = p.Velocity or Vector3.zero
-	p.Size = p.Size or Vector2.new(0.2,0.2)
+	p.Size = p.Size or Vector2.new(0.2, 0.2)
 	p.Bloom = p.Bloom or Vector2.zero
 	p.Gravity = p.Gravity or Vector3.zero
-	p.Color = p.Color or Color3.new(1,1,1)
+	p.Color = p.Color or Color3.new(1, 1, 1)
 	p.Transparency = p.Transparency or 0.5
 
 	if p.Global then
@@ -123,7 +143,7 @@ function ParticleEngineClient:Add(p)
 		p.RemoveOnCollision = removeOnCollision
 	end
 
-	p.LifeTime = p.LifeTime and p.LifeTime+tick()
+	p.LifeTime = p.LifeTime and p.LifeTime + tick()
 
 	if self._particleCount > self._maxParticles then
 		self._particles[next(self._particles)] = nil
@@ -135,33 +155,33 @@ function ParticleEngineClient:Add(p)
 end
 
 -- @param p Position
-local function particleWind(t, p)
-	local xy,yz,zx=p.x+p.y,p.y+p.z,p.z+p.x
+local function particleWind(t: number, p: Vector3): Vector3
+	local xy: number, yz: number, zx: number = p.X + p.Y, p.Y + p.Z, p.Z + p.X
 	return Vector3.new(
-		(math.sin(yz+t*2)+math.sin(yz+t))/2+math.sin((yz+t)/10)/2,
-		(math.sin(zx+t*2)+math.sin(zx+t))/2+math.sin((zx+t)/10)/2,
-		(math.sin(xy+t*2)+math.sin(xy+t))/2+math.sin((xy+t)/10)/2
+		(math.sin(yz + t * 2) + math.sin(yz + t)) / 2 + math.sin((yz + t) / 10) / 2,
+		(math.sin(zx + t * 2) + math.sin(zx + t)) / 2 + math.sin((zx + t) / 10) / 2,
+		(math.sin(xy + t * 2) + math.sin(xy + t)) / 2 + math.sin((xy + t) / 10) / 2
 	)
 end
 
 -- @param p ParticleProperties
 -- @param dt ChangeInTime
-function ParticleEngineClient:_updatePosVel(p, dt, t)
-	p.Position = p.Position + p.Velocity*dt
+function ParticleEngineClient:_updatePosVel(p: Particle, dt: number, t: number)
+	p.Position = p.Position + p.Velocity * dt
 
 	local wind
 	if p.WindResistance then
-		wind = (particleWind(t, p.Position)*self._windSpeed - p.Velocity)*p.WindResistance
+		wind = (particleWind(t, p.Position) * self._windSpeed - p.Velocity) * p.WindResistance
 	else
 		wind = Vector3.zero
 	end
 
-	p.Velocity = p.Velocity + (p.Gravity + wind)*dt
+	p.Velocity = p.Velocity + (p.Gravity + wind) * dt
 end
 
 -- Handles both priority and regular particles
 -- @return boolean alive, true if still fine
-function ParticleEngineClient:_updateParticle(particle, t, dt)
+function ParticleEngineClient:_updateParticle(particle: Particle, t: number, dt: number)
 	if particle.LifeTime - t <= 0 then
 		return false
 	end
@@ -181,7 +201,7 @@ function ParticleEngineClient:_updateParticle(particle, t, dt)
 	local displacement = particle.Position - lastPos
 	local distance = displacement.Magnitude
 	if distance > 999 then
-		displacement = displacement * (999/distance)
+		displacement = displacement * (999 / distance)
 	end
 
 	local ray = Ray.new(lastPos, displacement)
@@ -225,10 +245,10 @@ function ParticleEngineClient:_update()
 end
 
 function ParticleEngineClient:_updateRender()
-	local camera = Workspace.CurrentCamera
+	local camera: Camera = Workspace.CurrentCamera
 	self:_updateScreenInfo(camera)
 
-	local cameraInverse = camera.CFrame:inverse()
+	local cameraInverse = camera.CFrame:Inverse()
 	local cameraPosition = camera.CFrame.Position
 
 	local frameIndex, frame = next(self._particleFrames)
@@ -248,39 +268,40 @@ end
 
 -- @param f frame
 -- @param cameraInverse The inverse camera cframe
-function ParticleEngineClient:_particleRender(cameraPosition, cameraInverse, frame, particle)
-	local rp = cameraInverse*particle.Position
-	local lsp = particle._lastScreenPosition
+function ParticleEngineClient:_particleRender(cameraPosition: Vector3, cameraInverse: CFrame, frame: Frame, particle: Particle)
+	local rp: Vector3 = cameraInverse * particle.Position
+	local lsp: Vector2? = particle._lastScreenPosition
 
-	if not (rp.z < -1 and lsp) then
-		if rp.z > 0 then
+	if not (rp.Z < -1 and lsp) then
+		if rp.Z > 0 then
 			particle._lastScreenPosition = nil
 		else
-			local sp = rp/rp.z
+			local sp = rp / rp.Z
 			particle._lastScreenPosition = Vector2.new(
-				(0.5-sp.x/self._planeSizeX)*self._screenSizeX,
-				(0.5+sp.y/self._planeSizeY)*self._screenSizeY)
+				(0.5 - sp.X / self._planeSizeX) * self._screenSizeX,
+				(0.5 + sp.Y / self._planeSizeY) * self._screenSizeY
+			)
 		end
 
 		return false
 	end
 
-	local sp = rp/rp.z
-	local b = particle.Bloom
-	local bgt = particle.Transparency
-	local px = (0.5-sp.x/self._planeSizeX)*self._screenSizeX
-	local py = (0.5+sp.y/self._planeSizeY)*self._screenSizeY
-	local preSizeY = -particle.Size.y/rp.z*self._screenSizeY/self._planeSizeY
-	local sx = -particle.Size.x/rp.z*self._screenSizeY/self._planeSizeY + b.x
-	local rppx,rppy = px-lsp.x,py-lsp.y
-	local sy = preSizeY+math.sqrt(rppx*rppx+rppy*rppy) + b.y
+	local sp = rp / rp.Z
+	local b: Vector2 = particle.Bloom
+	local bgt: number = particle.Transparency
+	local px: number = (0.5 - sp.X / self._planeSizeX) * self._screenSizeX
+	local py: number = (0.5 + sp.Y / self._planeSizeY) * self._screenSizeY
+	local preSizeY = -particle.Size.Y / rp.z * self._screenSizeY / self._planeSizeY
+	local sx: number = -particle.Size.X / rp.z * self._screenSizeY / self._planeSizeY + b.X
+	local rppx, rppy = px - lsp.x, py - lsp.y
+	local sy = preSizeY + math.sqrt(rppx * rppx + rppy * rppy) + b.y
 	particle._lastScreenPosition = Vector2.new(px, py)
 
 	if particle.Occlusion then
-		local vec = particle.Position-cameraPosition
+		local vec = particle.Position - cameraPosition
 		local mag = vec.Magnitude
 		if mag > 999 then
-			vec = vec * (999/mag)
+			vec = vec * (999 / mag)
 		end
 
 		if Workspace:FindPartOnRay(Ray.new(cameraPosition, vec), self._player.Character, true) then
@@ -288,7 +309,7 @@ function ParticleEngineClient:_particleRender(cameraPosition, cameraInverse, fra
 		end
 	end
 
-	frame.Position = UDim2.new(0, (px+lsp.x-sx)/2, 0, (py+lsp.y-sy)/2)
+	frame.Position = UDim2.new(0, (px + lsp.X - sx) / 2, 0, (py + lsp.Y - sy) / 2)
 	frame.Size = UDim2.new(0, sx, 0,sy)
 	frame.Rotation = 90+math.atan2(rppy,rppx)*57.295779513082
 	frame.BackgroundColor3 = particle.Color
@@ -297,7 +318,7 @@ function ParticleEngineClient:_particleRender(cameraPosition, cameraInverse, fra
 	return true
 end
 
-function ParticleEngineClient:_updateScreenInfo(camera)
+function ParticleEngineClient:_updateScreenInfo(camera: Camera)
 	self._screenSizeX = self._screen.AbsoluteSize.x
 	self._screenSizeY = self._screen.AbsoluteSize.y
 	self._planeSizeY = 2*math.tan(camera.FieldOfView*0.0087266462599716)

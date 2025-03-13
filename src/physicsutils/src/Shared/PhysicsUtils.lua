@@ -68,11 +68,11 @@ end
 ]=]
 function PhysicsUtils.getCenterOfMass(parts: { BasePart }): (Vector3, number)
 	local mass = 0
-	local weightedSum = Vector3.zero
+	local weightedSum: Vector3 = Vector3.zero
 
 	for _, part in parts do
 		mass = mass + part:GetMass()
-		weightedSum = weightedSum + part:GetMass() * part.Position
+		weightedSum += part:GetMass() * part.Position
 	end
 
 	return weightedSum / mass, mass

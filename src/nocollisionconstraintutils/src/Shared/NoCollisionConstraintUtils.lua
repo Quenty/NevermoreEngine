@@ -45,7 +45,7 @@ function NoCollisionConstraintUtils.tempNoCollision(parts0: { BasePart }, parts1
 
 	local maid = Maid.new()
 
-	for _, item in pairs(NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, parent or true)) do
+	for _, item in NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, parent or true) do
 		maid:GiveTask(item)
 	end
 
@@ -76,14 +76,14 @@ function NoCollisionConstraintUtils.createBetweenPartsLists(
 	end
 
 	if type(parent) == "boolean" then
-		for _, part0 in pairs(parts0) do
-			for _, part1 in pairs(parts1) do
+		for _, part0 in parts0 do
+			for _, part1 in parts1 do
 				table.insert(collisionConstraints, NoCollisionConstraintUtils.create(part0, part1, part0))
 			end
 		end
 	else
-		for _, part0 in pairs(parts0) do
-			for _, part1 in pairs(parts1) do
+		for _, part0 in parts0 do
+			for _, part1 in parts1 do
 				table.insert(collisionConstraints, NoCollisionConstraintUtils.create(part0, part1, parent))
 			end
 		end

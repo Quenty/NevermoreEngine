@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Holds binders for Ragdolls on the client. Be sure to initialize on the server. See [RagdollBindersClient] for details.
 	Be sure to use a [ServiceBag] to initialize this service.

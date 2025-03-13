@@ -28,7 +28,7 @@ local BadgeUtils = {}
 	@param badgeId number
 	@return Promise
 ]=]
-function BadgeUtils.promiseAwardBadge(player, badgeId)
+function BadgeUtils.promiseAwardBadge(player: Player, badgeId: number)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(badgeId) == "number", "Bad badgeId")
 
@@ -51,7 +51,7 @@ end
 	@param badgeId number
 	@return Promise<BadgeInfoDictionary>
 ]=]
-function BadgeUtils.promiseBadgeInfo(badgeId)
+function BadgeUtils.promiseBadgeInfo(badgeId: number)
 	assert(type(badgeId) == "number", "Bad badgeId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -78,7 +78,7 @@ end
 	@param badgeId number
 	@return Promise<BadgeInfoDictionary>
 ]=]
-function BadgeUtils.promiseUserHasBadge(userId, badgeId)
+function BadgeUtils.promiseUserHasBadge(userId: number, badgeId: number)
 	assert(type(userId) == "number", "Bad userId")
 	assert(type(badgeId) == "number", "Bad badgeId")
 

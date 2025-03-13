@@ -263,7 +263,7 @@ function TiePropertyInterface:__newindex(index, value)
 
 		local valueBase = self:_findValueBase()
 		if type(valueBase) == "table" or (typeof(valueBase) == "Instance" and valueBase.ClassName == className) then
-			valueBase.Value = value
+			(valueBase :: any).Value = value
 		elseif AttributeUtils.isValidAttributeType(typeof(value)) and value ~= nil then
 			local implParent = self:GetImplParent()
 			if implParent then

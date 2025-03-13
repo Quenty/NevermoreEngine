@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	3D convex hull computation using gift wrappling algorithm
 
@@ -13,15 +14,17 @@ local Draw = require("Draw")
 
 local ConvexHull3DUtils = {}
 
+type Edge = { number }
+
 --[=[
 	Computes the convex hull for a given set of points
 
 	https://en.wikipedia.org/wiki/Gift_wrapping_algorithm
 
-	@param points Vector3
+	@param points { Vector3 }
 	@return { Vector3 }
 ]=]
-function ConvexHull3DUtils.convexHull(points)
+function ConvexHull3DUtils.convexHull(points: { Vector3 }): { Vector3 }
 	assert(type(points) == "table", "Bad points")
 
 	if #points <= 3 then
@@ -39,7 +42,7 @@ function ConvexHull3DUtils.convexHull(points)
 
 	local visited = {} -- Set to keep track of visited edges
 
-	local agenda = Queue.new() -- Queue to process edgeSet
+	local agenda: Queue.Queue<Edge> = Queue.new() -- Queue to process edgeSet
 	agenda:PushRight({ leftMost, secondPoint })
 
 	while not agenda:IsEmpty() do
@@ -59,20 +62,20 @@ function ConvexHull3DUtils.convexHull(points)
 	end
 
 	local vertices = {}
-	for index, _ in pairs(meshIndexSet) do
+	for index, _ in meshIndexSet do
 		table.insert(vertices, points[index])
 	end
 
 	return vertices
 end
 
-function ConvexHull3DUtils._pickMostConvex(points, edge)
+function ConvexHull3DUtils._pickMostConvex(points: { Vector3 }, edge: Edge): number
 	local bestIndex = 0
 	local bestAngle = -math.huge
-	local diffEdge = (points[edge[2]] - points[edge[1]]).unit
+	local diffEdge = (points[edge[2]] - points[edge[1]]).Unit
 
-	for index, point in pairs(points) do
-		local diff = (points[edge[2]] - point).unit
+	for index, point in points do
+		local diff = (points[edge[2]] - point).Unit
 		local angle = math.acos(diff:Dot(diffEdge))
 
 		if angle > bestAngle and angle < math.pi then
@@ -84,26 +87,26 @@ function ConvexHull3DUtils._pickMostConvex(points, edge)
 	return bestIndex
 end
 
-function ConvexHull3DUtils._pickLeftMost(points)
+function ConvexHull3DUtils._pickLeftMost(points: { Vector3 }): number
 	local leftmostIndex = 1
 	local leftMostX = math.huge
-	for index, point in pairs(points) do
-		if point.x < leftMostX then
+	for index, point in points do
+		if point.X < leftMostX then
 			leftmostIndex = index
-			leftMostX = point.x
+			leftMostX = point.X
 		end
 	end
 
 	return leftmostIndex
 end
 
-function ConvexHull3DUtils._pickSecondPoint(points, leftMost)
+function ConvexHull3DUtils._pickSecondPoint(points: { Vector3 }, leftMost: number): number
 	local v0 = Vector3.new(1, 0, 0)
 	local bestAngle = -math.huge
 	local bestIndex = 1
 
-	for index, point in pairs(points) do
-		local diff = (point - points[leftMost]).unit
+	for index, point in points do
+		local diff = (point - points[leftMost]).Unit
 		local angle = math.acos(diff:Dot(v0))
 
 		if angle > bestAngle and angle < math.pi then
@@ -115,16 +118,16 @@ function ConvexHull3DUtils._pickSecondPoint(points, leftMost)
 	return bestIndex
 end
 
-function ConvexHull3DUtils._edgeKey(edge)
+function ConvexHull3DUtils._edgeKey(edge: Edge): string
 	return edge[1] .. "-" .. edge[2]
 end
 
-function ConvexHull3DUtils.drawVertices(points, color)
+function ConvexHull3DUtils.drawVertices(points: { Vector3 }, color: Color3?): Folder
 	local folder = Instance.new("Folder")
 	folder.Name = "ConvexHullPoints"
 	folder.Archivable = false
 
-	for _, point in pairs(points) do
+	for _, point in points do
 		Draw.point(point, color, folder)
 	end
 

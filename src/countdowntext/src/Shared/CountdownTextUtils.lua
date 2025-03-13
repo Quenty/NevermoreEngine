@@ -1,4 +1,7 @@
+--!strict
 --[=[
+	Utility functions to format countdowns in-game
+
 	@class CountdownTextUtils
 ]=]
 
@@ -11,7 +14,7 @@ local CountdownTextUtils = {}
 	@param whenAtZeroText string?
 	@return string
 ]=]
-function CountdownTextUtils.formatCountdown(seconds, whenAtZeroText)
+function CountdownTextUtils.formatCountdown(seconds: number, whenAtZeroText: string?): string
 	assert(type(seconds) == "number", "Bad seconds")
 	assert(type(whenAtZeroText) == "string" or whenAtZeroText == nil, "Bad whenAtZeroText")
 

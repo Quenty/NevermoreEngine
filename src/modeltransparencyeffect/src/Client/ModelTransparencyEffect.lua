@@ -132,7 +132,7 @@ function ModelTransparencyEffect:_setupParts()
 		self._parts[self._obj] = true
 	end
 
-	for _, part in pairs(self._obj:GetDescendants()) do
+	for _, part in self._obj:GetDescendants() do
 		if part:IsA("BasePart") or part:IsA("Decal") then
 			self._parts[part] = true
 		end
@@ -161,7 +161,7 @@ function ModelTransparencyEffect:_setupParts()
 			return
 		end
 
-		for part, _ in pairs(self._parts) do
+		for part, _ in self._parts do
 			self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, part, nil)
 		end
 	end)

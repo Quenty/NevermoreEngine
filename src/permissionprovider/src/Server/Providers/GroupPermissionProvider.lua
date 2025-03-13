@@ -62,7 +62,7 @@ function GroupPermissionProvider:Start()
 		self:_handlePlayer(player)
 	end))
 
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		self:_handlePlayer(player)
 	end
 
@@ -76,7 +76,7 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function GroupPermissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
+function GroupPermissionProvider:PromiseIsPermissionLevel(player: Player, permissionLevel)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
@@ -89,7 +89,7 @@ function GroupPermissionProvider:PromiseIsPermissionLevel(player, permissionLeve
 	end
 end
 
-function GroupPermissionProvider:_promiseIsCreator(player)
+function GroupPermissionProvider:_promiseIsCreator(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(player:IsDescendantOf(game), "Bad player")
 
@@ -97,13 +97,12 @@ function GroupPermissionProvider:_promiseIsCreator(player)
 		return Promise.resolved(true)
 	end
 
-	return self:_promiseRankInGroup(player)
-		:Then(function(rank)
-			return rank >= self._config.minCreatorRequiredRank
-		end)
+	return self:_promiseRankInGroup(player):Then(function(rank)
+		return rank >= self._config.minCreatorRequiredRank
+	end)
 end
 
-function GroupPermissionProvider:_promiseIsAdmin(player)
+function GroupPermissionProvider:_promiseIsAdmin(player: Player)
 	assert(player:IsDescendantOf(game))
 
 	-- really not saving much time.
@@ -115,29 +114,26 @@ function GroupPermissionProvider:_promiseIsAdmin(player)
 		return Promise.resolved(true)
 	end
 
-	return self:_promiseRankInGroup(player)
-		:Then(function(rank)
-			return rank >= self._config.minAdminRequiredRank
-		end)
+	return self:_promiseRankInGroup(player):Then(function(rank)
+		return rank >= self._config.minAdminRequiredRank
+	end)
 end
 
-
-function GroupPermissionProvider:_handlePlayer(player)
+function GroupPermissionProvider:_handlePlayer(player: Player)
 	assert(player, "Bad player")
 
-	self:_promiseRankInGroup(player)
-		:Then(function(rank)
-			if rank >= self._config.minAdminRequiredRank then
-				self._adminsCache[player.UserId] = true
-			end
+	self:_promiseRankInGroup(player):Then(function(rank)
+		if rank >= self._config.minAdminRequiredRank then
+			self._adminsCache[player.UserId] = true
+		end
 
-			if rank >= self._config.minCreatorRequiredRank then
-				self._creatorCache[player.UserId] = true
-			end
-		end)
+		if rank >= self._config.minCreatorRequiredRank then
+			self._creatorCache[player.UserId] = true
+		end
+	end)
 end
 
-function GroupPermissionProvider:_promiseRankInGroup(player)
+function GroupPermissionProvider:_promiseRankInGroup(player: Player)
 	assert(typeof(player) == "Instance", "Bad player")
 
 	if self._promiseRankPromisesCache[player.UserId] then

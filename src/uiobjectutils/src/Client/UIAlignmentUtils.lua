@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods for working with horizontal and vertical alignment
 	@class UIAlignmentUtils
@@ -5,37 +6,37 @@
 
 local UIAlignmentUtils = {}
 
-local HORIZONTAL_ALIGNMENT = {
+local HORIZONTAL_ALIGNMENT: { [Enum.HorizontalAlignment]: number } = {
 	[Enum.HorizontalAlignment.Left] = 0,
 	[Enum.HorizontalAlignment.Center] = 0.5,
 	[Enum.HorizontalAlignment.Right] = 1,
 }
 
-local HORIZONTAL_BIAS = {
+local HORIZONTAL_BIAS: { [Enum.HorizontalAlignment]: number } = {
 	[Enum.HorizontalAlignment.Left] = -1,
 	[Enum.HorizontalAlignment.Center] = 0,
 	[Enum.HorizontalAlignment.Right] = 1,
 }
 
-local VERTICAL_ALIGNMENT = {
+local VERTICAL_ALIGNMENT: { [Enum.VerticalAlignment]: number } = {
 	[Enum.VerticalAlignment.Top] = 0,
 	[Enum.VerticalAlignment.Center] = 0.5,
 	[Enum.VerticalAlignment.Bottom] = 1,
 }
 
-local VERTICAL_BIAS = {
+local VERTICAL_BIAS: { [Enum.VerticalAlignment]: number } = {
 	[Enum.VerticalAlignment.Top] = -1,
 	[Enum.VerticalAlignment.Center] = 0,
 	[Enum.VerticalAlignment.Bottom] = 1,
 }
 
-local VERTICAL_TO_HORIZONTAL = {
+local VERTICAL_TO_HORIZONTAL: { [Enum.VerticalAlignment]: Enum.HorizontalAlignment } = {
 	[Enum.VerticalAlignment.Top] = Enum.HorizontalAlignment.Left,
 	[Enum.VerticalAlignment.Center] = Enum.HorizontalAlignment.Center,
 	[Enum.VerticalAlignment.Bottom] = Enum.HorizontalAlignment.Right,
 }
 
-local HORIZONTAL_TO_VERTICAL = {
+local HORIZONTAL_TO_VERTICAL: { [Enum.HorizontalAlignment]: Enum.VerticalAlignment } = {
 	[Enum.HorizontalAlignment.Left] = Enum.VerticalAlignment.Top,
 	[Enum.HorizontalAlignment.Center] = Enum.VerticalAlignment.Center,
 	[Enum.HorizontalAlignment.Right] = Enum.VerticalAlignment.Bottom,
@@ -50,10 +51,10 @@ local HORIZONTAL_TO_VERTICAL = {
 function UIAlignmentUtils.toNumber(alignment: Enum.HorizontalAlignment | Enum.VerticalAlignment): number
 	assert(alignment, "Bad alignment")
 
-	if HORIZONTAL_ALIGNMENT[alignment] then
-		return HORIZONTAL_ALIGNMENT[alignment]
-	elseif VERTICAL_ALIGNMENT[alignment] then
-		return VERTICAL_ALIGNMENT[alignment]
+	if HORIZONTAL_ALIGNMENT[alignment :: any] then
+		return HORIZONTAL_ALIGNMENT[alignment :: any]
+	elseif VERTICAL_ALIGNMENT[alignment :: any] then
+		return VERTICAL_ALIGNMENT[alignment :: any]
 	else
 		error(string.format("[UIAlignmentUtils.toNumber] - Bad alignment %q", tostring(alignment)))
 	end
@@ -112,10 +113,10 @@ end
 function UIAlignmentUtils.toBias(alignment: Enum.HorizontalAlignment | Enum.VerticalAlignment): number
 	assert(alignment, "Bad alignment")
 
-	if HORIZONTAL_BIAS[alignment] then
-		return HORIZONTAL_BIAS[alignment]
-	elseif VERTICAL_BIAS[alignment] then
-		return VERTICAL_BIAS[alignment]
+	if HORIZONTAL_BIAS[alignment :: any] then
+		return HORIZONTAL_BIAS[alignment :: any]
+	elseif VERTICAL_BIAS[alignment :: any] then
+		return VERTICAL_BIAS[alignment :: any]
 	else
 		error(string.format("[UIAlignmentUtils.toBias] - Bad alignment %q", tostring(alignment)))
 	end

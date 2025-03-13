@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Scale ratios for the UI on different devices
 	@class GameScalingUtils
@@ -10,8 +11,14 @@ local GuiService = game:GetService("GuiService")
 local Blend = require("Blend")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local _Observable = require("Observable")
 
 local GameScalingUtils = {}
+
+export type Props = {
+	Parent: Instance?,
+	ScreenGui: ScreenGui,
+}
 
 --[=[
 	Given an screenAbsoluteSize, get a good UI scale to use for fixed offset
@@ -20,10 +27,10 @@ local GameScalingUtils = {}
 	@param screenAbsoluteSize Vector2
 	@return number
 ]=]
-function GameScalingUtils.getUIScale(screenAbsoluteSize)
+function GameScalingUtils.getUIScale(screenAbsoluteSize: Vector2): number
 	assert(typeof(screenAbsoluteSize) == "Vector2", "Bad screenAbsoluteSize")
-	local smallestAxis = math.min(screenAbsoluteSize.x, screenAbsoluteSize.y)
-	local height = screenAbsoluteSize.y
+	local smallestAxis = math.min(screenAbsoluteSize.X, screenAbsoluteSize.Y)
+	local height = screenAbsoluteSize.Y
 
 	if GuiService:IsTenFootInterface() then
 		return 2
@@ -45,11 +52,13 @@ end
 	@param screenGui ScreenGui
 	@return Observable<number>
 ]=]
-function GameScalingUtils.observeUIScale(screenGui)
-	return Blend.Spring(RxInstanceUtils.observeProperty(screenGui, "AbsoluteSize")
-		:Pipe({
-			Rx.map(GameScalingUtils.getUIScale)
-		}), 30)
+function GameScalingUtils.observeUIScale(screenGui: ScreenGui): _Observable.Observable<number>
+	return Blend.Spring(
+		RxInstanceUtils.observeProperty(screenGui, "AbsoluteSize"):Pipe({
+			Rx.map(GameScalingUtils.getUIScale) :: any,
+		}),
+		30
+	)
 end
 
 --[=[
@@ -57,16 +66,16 @@ end
 	@param child Instance
 	@return Observable<number>
 ]=]
-function GameScalingUtils.observeUIScaleForChild(child)
+function GameScalingUtils.observeUIScaleForChild(child: Instance): _Observable.Observable<number>
 	return RxInstanceUtils.observeFirstAncestor(child, "ScreenGui"):Pipe({
-		Rx.switchMap(function(screenGui)
+		Rx.switchMap(function(screenGui: ScreenGui?): any
 			if screenGui then
 				return GameScalingUtils.observeUIScale(screenGui)
 			else
 				return Rx.EMPTY
 			end
-		end)
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -75,47 +84,49 @@ end
 	@param props { Parent: Instance?, ScreenGui: ScreenGui }
 	@return Observable<number>
 ]=]
-function GameScalingUtils.renderUIScale(props)
+function GameScalingUtils.renderUIScale(props: Props): _Observable.Observable<number>
 	assert(props.ScreenGui, "No screenGui")
 
-	return Blend.New "UIScale" {
-		Parent = props.Parent;
-		Scale = GameScalingUtils.observeUIScale(props.ScreenGui)
-	}
+	return Blend.New("UIScale")({
+		Parent = props.Parent,
+		Scale = GameScalingUtils.observeUIScale(props.ScreenGui),
+	})
 end
 
 --[=[
 	Blend equivalent of rendering the dialog padding
 
 	@param props { Parent: Instance?, ScreenGui: ScreenGui }
-	@return Observable<number>
+	@return Observable<UIPadding>
 ]=]
-function GameScalingUtils.renderDialogPadding(props)
+function GameScalingUtils.renderDialogPadding(props: Props): _Observable.Observable<UIPadding>
 	assert(props.ScreenGui, "No screenGui")
 
-	return Blend.New "UIPadding" {
-		Parent = props.Parent;
-		PaddingTop = GameScalingUtils.observeDialogPadding(props.ScreenGui);
-		PaddingBottom = GameScalingUtils.observeDialogPadding(props.ScreenGui);
-		PaddingLeft = GameScalingUtils.observeDialogPadding(props.ScreenGui);
-		PaddingRight = GameScalingUtils.observeDialogPadding(props.ScreenGui);
-	}
+	return Blend.New("UIPadding")({
+		Parent = props.Parent,
+		PaddingTop = GameScalingUtils.observeDialogPadding(props.ScreenGui),
+		PaddingBottom = GameScalingUtils.observeDialogPadding(props.ScreenGui),
+		PaddingLeft = GameScalingUtils.observeDialogPadding(props.ScreenGui),
+		PaddingRight = GameScalingUtils.observeDialogPadding(props.ScreenGui),
+	})
 end
 
 --[=[
 	Observes a smoothed out UI scale for a given screenGui
 	@param screenGui ScreenGui
-	@return Observable<number>
+	@return Observable<UDim>
 ]=]
-function GameScalingUtils.observeDialogPadding(screenGui)
-	return Blend.Spring(RxInstanceUtils.observeProperty(screenGui, "AbsoluteSize")
-		:Pipe({
-			Rx.map(GameScalingUtils.getDialogPadding)
-		}), 30):Pipe({
-			Rx.map(function(padding)
-				return UDim.new(0, padding)
-			end);
-		})
+function GameScalingUtils.observeDialogPadding(screenGui: ScreenGui): _Observable.Observable<UDim>
+	return Blend.Spring(
+		RxInstanceUtils.observeProperty(screenGui, "AbsoluteSize"):Pipe({
+			Rx.map(GameScalingUtils.getDialogPadding) :: any,
+		}),
+		30
+	):Pipe({
+		Rx.map(function(padding)
+			return UDim.new(0, padding)
+		end),
+	})
 end
 
 --[=[
@@ -123,9 +134,9 @@ end
 	@param screenAbsoluteSize Vector2
 	@return number
 ]=]
-function GameScalingUtils.getDialogPadding(screenAbsoluteSize)
+function GameScalingUtils.getDialogPadding(screenAbsoluteSize: Vector2): number
 	assert(typeof(screenAbsoluteSize) == "Vector2", "Bad screenAbsoluteSize")
-	local smallestAxis = math.min(screenAbsoluteSize.x, screenAbsoluteSize.y)
+	local smallestAxis = math.min(screenAbsoluteSize.X, screenAbsoluteSize.Y)
 
 	if smallestAxis <= 300 then
 		return 5

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class AdorneeBoundingBox
 ]=]
@@ -5,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local AdorneeModelBoundingBox = require("AdorneeModelBoundingBox")
+local AdorneePartBoundingBox = require("AdorneePartBoundingBox")
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local Rx = require("Rx")
@@ -12,14 +14,16 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxPartBoundingBoxUtils = require("RxPartBoundingBoxUtils")
 local ValueObject = require("ValueObject")
-local AdorneePartBoundingBox = require("AdorneePartBoundingBox")
+local _Observable = require("Observable")
 
 local AdorneeBoundingBox = setmetatable({}, BaseObject)
 AdorneeBoundingBox.ClassName = "AdorneeBoundingBox"
 AdorneeBoundingBox.__index = AdorneeBoundingBox
 
-function AdorneeBoundingBox.new(initialAdornee)
-	local self = setmetatable(BaseObject.new(), AdorneeBoundingBox)
+export type AdorneeBoundingBox = typeof(setmetatable({}, AdorneeBoundingBox))
+
+function AdorneeBoundingBox.new(initialAdornee: Instance): AdorneeBoundingBox
+	local self = setmetatable(BaseObject.new() :: any, AdorneeBoundingBox)
 
 	self._adornee = self._maid:Add(ValueObject.new(initialAdornee))
 	self._bbCFrame = self._maid:Add(ValueObject.new(nil))
@@ -41,7 +45,7 @@ function AdorneeBoundingBox.new(initialAdornee)
 	return self
 end
 
-function AdorneeBoundingBox:SetAdornee(adornee)
+function AdorneeBoundingBox:SetAdornee(adornee: Instance?): () -> ()
 	assert(typeof(adornee) == "Instance" or adornee == nil, "Bad adornee")
 
 	self._adornee.Value = adornee
@@ -53,18 +57,31 @@ function AdorneeBoundingBox:SetAdornee(adornee)
 	end
 end
 
-function AdorneeBoundingBox:ObserveBoundingBox()
+export type BoundingBoxData = {
+	CFrame: CFrame,
+	Size: Vector3,
+}
+
+--[=[
+	Observes the bounding box of the adornee
+	@return Observable<BoundingBoxData>
+]=]
+function AdorneeBoundingBox:ObserveBoundingBox(): _Observable.Observable<BoundingBoxData>
 	return Rx.combineLatest({
 		CFrame = self:ObserveCFrame(),
 		Size = self:ObserveSize(),
 	}):Pipe({
-		Rx.where(function(state)
+		Rx.where(function(state: any)
 			return state.CFrame and state.Size
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
-function AdorneeBoundingBox:GetBoundingBox()
+--[=[
+	Gets the bounding box of the adornee
+	@return BoundingBoxData?
+]=]
+function AdorneeBoundingBox:GetBoundingBox(): BoundingBoxData?
 	local cframe = self._bbCFrame.Value
 	local size = self._bbSize.Value
 
@@ -82,7 +99,7 @@ end
 	Observes the cframe of the adornee
 	@return Observable<Vector3>
 ]=]
-function AdorneeBoundingBox:ObserveCFrame()
+function AdorneeBoundingBox:ObserveCFrame(): _Observable.Observable<CFrame>
 	return self._bbCFrame:Observe()
 end
 
@@ -90,7 +107,7 @@ end
 	Gets the CFrame of the adornee
 	@return Vector3
 ]=]
-function AdorneeBoundingBox:GetCFrame()
+function AdorneeBoundingBox:GetCFrame(): CFrame?
 	return self._bbCFrame.Value
 end
 
@@ -98,7 +115,7 @@ end
 	Observes the size of the adornee
 	@return Observable<Vector3>
 ]=]
-function AdorneeBoundingBox:ObserveSize()
+function AdorneeBoundingBox:ObserveSize(): _Observable.Observable<Vector3>
 	return self._bbSize:Observe()
 end
 
@@ -106,11 +123,11 @@ end
 	Gets the size of the adornee
 	@return Vector3
 ]=]
-function AdorneeBoundingBox:GetSize()
+function AdorneeBoundingBox:GetSize(): Vector3
 	return self._bbSize.Value
 end
 
-function AdorneeBoundingBox:_setup(maid, adornee)
+function AdorneeBoundingBox:_setup(maid: Maid.Maid, adornee: Instance)
 	if adornee:IsA("BasePart") then
 		maid:GiveTask(self:_setupPart(adornee))
 	elseif adornee:IsA("Model") then
@@ -133,7 +150,7 @@ function AdorneeBoundingBox:_setup(maid, adornee)
 	end
 end
 
-function AdorneeBoundingBox:_setupTool(tool)
+function AdorneeBoundingBox:_setupTool(tool: Tool): Maid.Maid
 	assert(typeof(tool) == "Instance" and tool:IsA("Tool"), "Bad tool")
 
 	local topMaid = Maid.new()
@@ -153,7 +170,7 @@ function AdorneeBoundingBox:_setupTool(tool)
 	return topMaid
 end
 
-function AdorneeBoundingBox:_setupModel(model)
+function AdorneeBoundingBox:_setupModel(model: Model): Maid.Maid
 	assert(typeof(model) == "Instance" and model:IsA("Model"), "Bad model")
 
 	local topMaid = Maid.new()
@@ -169,20 +186,19 @@ function AdorneeBoundingBox:_setupModel(model)
 	return topMaid
 end
 
-function AdorneeBoundingBox:_setupHumanoid(humanoid: Humanoid)
+function AdorneeBoundingBox:_setupHumanoid(humanoid: Humanoid): Maid.Maid
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	local topMaid = Maid.new()
 
-	topMaid:GiveTask(RxInstanceUtils.observePropertyBrio(humanoid, "Parent", function(parent)
-		return parent ~= nil and parent:IsA("Model")
+	topMaid:GiveTask(RxInstanceUtils.observePropertyBrio(humanoid, "Parent", function(parent: Instance)
+		return parent:IsA("Model")
 	end):Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end
 
-		local maid = brio:ToMaid()
-		local model = brio:GetValue()
+		local maid, model = brio:ToMaidAndValue()
 
 		maid:GiveTask(self:_setupModel(model))
 	end))
@@ -190,7 +206,7 @@ function AdorneeBoundingBox:_setupHumanoid(humanoid: Humanoid)
 	return topMaid
 end
 
-function AdorneeBoundingBox:_setupAttachment(attachment)
+function AdorneeBoundingBox:_setupAttachment(attachment: Attachment): Maid.Maid
 	assert(typeof(attachment) == "Instance" and attachment:IsA("Attachment"), "Bad attachment")
 
 	local maid = Maid.new()
@@ -207,9 +223,9 @@ function AdorneeBoundingBox:_setupAttachment(attachment)
 						partCFrame = RxPartBoundingBoxUtils.observePartCFrame(parent),
 						attachmentCFrame = RxInstanceUtils.observeProperty(attachment, "CFrame"),
 					}):Pipe({
-						Rx.map(function(state)
+						Rx.map(function(state: any)
 							return state.partCFrame * state.attachmentCFrame
-						end),
+						end) :: any,
 					})
 				else
 					return Rx.of(nil)
@@ -224,7 +240,7 @@ function AdorneeBoundingBox:_setupAttachment(attachment)
 	return maid
 end
 
-function AdorneeBoundingBox:_setupPart(part)
+function AdorneeBoundingBox:_setupPart(part: BasePart): Maid.Maid
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local maid = Maid.new()

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities for observing the local player's friends.
 
@@ -24,7 +25,7 @@ local RxFriendUtils = {}
 	@param player Player?
 	@return Observable<Brio<Player>>
 ]=]
-function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?)
+function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observable.Observable<Brio.Brio<Player>>
 	player = player or Players.LocalPlayer
 
 	assert(typeof(player) == "Instance", "Bad player")
@@ -37,7 +38,7 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?)
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local function handleFriendState(otherPlayer: Player, isFriendsWith)
+		local function handleFriendState(otherPlayer: Player, isFriendsWith: boolean)
 			if otherPlayer == Players.LocalPlayer then
 				return
 			end
@@ -105,7 +106,7 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxFriendUtils

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	A list that can be observed for blend and other components
 	@class ObservableList
@@ -15,16 +16,53 @@ local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
 local ListIndexUtils = require("ListIndexUtils")
+local _SortFunctionUtils = require("SortFunctionUtils")
 
 local ObservableList = {}
 ObservableList.ClassName = "ObservableList"
 ObservableList.__index = ObservableList
 
+export type ObservableList<T> = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_keyList: { Symbol.Symbol },
+		_contents: { [Symbol.Symbol]: T },
+		_indexes: { [Symbol.Symbol]: number },
+		_indexObservers: ObservableSubscriptionTable.ObservableSubscriptionTable<T?>,
+		_keyIndexObservables: ObservableSubscriptionTable.ObservableSubscriptionTable<number?>,
+		_countValue: ValueObject.ValueObject<number>,
+
+		--[=[
+			Fires when an item is added
+			@readonly
+			@prop ItemAdded Signal<T, number, Symbol>
+			@within ObservableList
+		]=]
+		ItemAdded: Signal.Signal<T, number, Symbol.Symbol>,
+
+		--[=[
+			Fires when an item is removed.
+			@readonly
+			@prop ItemRemoved Signal<T, Symbol>
+			@within ObservableList
+		]=]
+		ItemRemoved: Signal.Signal<T, Symbol.Symbol>,
+
+		--[=[
+			Fires when the count changes.
+			@prop CountChanged Signal.Signal<number>,
+			@within ObservableList
+		]=]
+		CountChanged: Signal.Signal<number>,
+	},
+	ObservableList
+))
+
 --[=[
 	Constructs a new ObservableList
 	@return ObservableList<T>
 ]=]
-function ObservableList.new()
+function ObservableList.new<T>(): ObservableList<T>
 	local self = setmetatable({}, ObservableList)
 
 	self._maid = Maid.new()
@@ -37,30 +75,11 @@ function ObservableList.new()
 	self._keyIndexObservables = self._maid:Add(ObservableSubscriptionTable.new())
 	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
---[=[
-	Fires when an item is added
-	@readonly
-	@prop ItemAdded Signal<T, number, Symbol>
-	@within ObservableList
-]=]
 	self.ItemAdded = self._maid:Add(Signal.new())
-
---[=[
-	Fires when an item is removed.
-	@readonly
-	@prop ItemRemoved Signal<T, Symbol>
-	@within ObservableList
-]=]
 	self.ItemRemoved = self._maid:Add(Signal.new())
-
---[=[
-	Fires when the count changes.
-	@prop CountChanged RBXScriptSignal
-	@within ObservableList
-]=]
 	self.CountChanged = self._countValue.Changed
 
-	return self
+	return self :: any
 end
 
 --[=[
@@ -68,7 +87,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function ObservableList.isObservableList(value)
+function ObservableList.isObservableList(value: any): boolean
 	return DuckTypeUtils.isImplementation(ObservableList, value)
 end
 
@@ -77,7 +96,7 @@ end
 
 	@return Observable<{ T }>
 ]=]
-function ObservableList:Observe()
+function ObservableList.Observe<T>(self: ObservableList<T>): Observable.Observable<{ T }>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -96,7 +115,7 @@ function ObservableList:Observe()
 		maid:GiveTask(self.ItemRemoved:Connect(queueFire))
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -104,7 +123,7 @@ end
 
 	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
 ]=]
-function ObservableList:__iter()
+function ObservableList.__iter<T>(self: ObservableList<T>): _SortFunctionUtils.WrappedIterator<number, T>
 	return coroutine.wrap(function()
 		for index, value in self._keyList do
 			coroutine.yield(index, self._contents[value])
@@ -116,11 +135,11 @@ end
 	Observes all items in the list
 	@return Observable<Brio<T>>
 ]=]
-function ObservableList:ObserveItemsBrio()
+function ObservableList.ObserveItemsBrio<T>(self: ObservableList<T>): Observable.Observable<Brio.Brio<T>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local function handleItem(item, _index, includeKey)
+		local function handleItem(item: T, _index, includeKey)
 			local brio = Brio.new(item, includeKey)
 			maid[includeKey] = brio
 			sub:Fire(brio)
@@ -131,18 +150,18 @@ function ObservableList:ObserveItemsBrio()
 			maid[includeKey] = nil
 		end))
 
-		for index, key in pairs(self._keyList) do
+		for index, key in self._keyList do
 			handleItem(self._contents[key], index, key)
 		end
 
-		self._maid[sub] = maid
+		self._maid[sub :: any] = maid
 		maid:GiveTask(function()
-			self._maid[sub] = nil
+			self._maid[sub :: any] = nil
 			sub:Complete()
 		end)
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -150,14 +169,14 @@ end
 	index is removed.
 
 	@param indexToObserve number
-	@return Observable<number>
+	@return Observable<number?>
 ]=]
-function ObservableList:ObserveIndex(indexToObserve)
+function ObservableList.ObserveIndex<T>(self: ObservableList<T>, indexToObserve: number): Observable.Observable<number?>
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
 
 	local key = self._keyList[indexToObserve]
 	if not key then
-		error(string.format("No entry at index %q, cannot observe changes", indexToObserve))
+		error(string.format("No entry at index %d, cannot observe changes", indexToObserve))
 	end
 
 	return self:ObserveIndexByKey(key)
@@ -175,7 +194,7 @@ end
 	@param indexToObserve number
 	@return Observable<T?>
 ]=]
-function ObservableList:ObserveAtIndex(indexToObserve)
+function ObservableList.ObserveAtIndex<T>(self: ObservableList<T>, indexToObserve: number): Observable.Observable<T?>
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
 
 	return self._indexObservers:Observe(indexToObserve, function(sub)
@@ -190,13 +209,16 @@ end
 	@param indexToObserve number
 	@return Observable<Brio<T>>
 ]=]
-function ObservableList:ObserveAtIndexBrio(indexToObserve)
+function ObservableList.ObserveAtIndexBrio<T>(
+	self: ObservableList<T>,
+	indexToObserve: number
+): Observable.Observable<Brio.Brio<T>>
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
 
 	return self:ObserveAtIndex(indexToObserve):Pipe({
-		RxBrioUtils.toBrio();
-		RxBrioUtils.onlyLastBrioSurvives();
-	})
+		RxBrioUtils.toBrio(),
+		RxBrioUtils.onlyLastBrioSurvives(),
+	}) :: any
 end
 
 --[=[
@@ -205,8 +227,8 @@ end
 	@param value T
 	@return boolean
 ]=]
-function ObservableList:RemoveFirst(value)
-	for key, item in pairs(self._contents) do
+function ObservableList.RemoveFirst<T>(self: ObservableList<T>, value: T): boolean
+	for key, item in self._contents do
 		if item == value then
 			self:RemoveByKey(key)
 			return true
@@ -217,11 +239,11 @@ function ObservableList:RemoveFirst(value)
 end
 
 --[=[
-	Returns an IntValue that represents the CountValue
+	Returns an ValueObject that represents the CountValue
 
-	@return IntValue
+	@return ValueObject<number>
 ]=]
-function ObservableList:GetCountValue()
+function ObservableList.GetCountValue<T>(self: ObservableList<T>): ValueObject.ValueObject<number>
 	return self._countValue
 end
 
@@ -230,23 +252,23 @@ end
 	key is removed.
 
 	@param key Symbol
-	@return Observable<number>
+	@return Observable<number?>
 ]=]
-function ObservableList:ObserveIndexByKey(key)
+function ObservableList.ObserveIndexByKey<T>(self: ObservableList<T>, key: Symbol.Symbol): Observable.Observable<number?>
 	assert(Symbol.isSymbol(key), "Bad key")
 
 	return self._keyIndexObservables:Observe(key, function(sub)
 		sub:Fire(self:GetIndexByKey(key))
-	end)
+	end) :: any
 end
 
 --[=[
 	Gets the current index from the key
 
 	@param key Symbol
-	@return number
+	@return number?
 ]=]
-function ObservableList:GetIndexByKey(key)
+function ObservableList.GetIndexByKey<T>(self: ObservableList<T>, key: Symbol.Symbol): number?
 	local currentIndex = self._indexes[key]
 	if currentIndex then
 		return currentIndex
@@ -259,7 +281,7 @@ end
 	Gets the count of items in the list
 	@return number
 ]=]
-function ObservableList:GetCount()
+function ObservableList.GetCount<T>(self: ObservableList<T>): number
 	return self._countValue.Value or 0
 end
 
@@ -269,7 +291,7 @@ ObservableList.__len = ObservableList.GetCount
 	Observes the count of the list
 	@return Observable<number>
 ]=]
-function ObservableList:ObserveCount()
+function ObservableList.ObserveCount<T>(self: ObservableList<T>): Observable.Observable<number>
 	return self._countValue:Observe()
 end
 
@@ -278,7 +300,7 @@ end
 	@param item T
 	@return callback -- Call to remove
 ]=]
-function ObservableList:Add(item)
+function ObservableList.Add<T>(self: ObservableList<T>, item: T): () -> ()
 	return self:InsertAt(item, #self._keyList + 1)
 end
 
@@ -287,7 +309,7 @@ end
 	@param index number
 	@return T?
 ]=]
-function ObservableList:Get(index)
+function ObservableList.Get<T>(self: ObservableList<T>, index: number): T?
 	assert(type(index) == "number", "Bad index")
 
 	index = ListIndexUtils.toPositiveIndex(#self._keyList, index)
@@ -306,7 +328,7 @@ end
 	@param index number?
 	@return callback -- Call to remove
 ]=]
-function ObservableList:InsertAt(item, index)
+function ObservableList.InsertAt<T>(self: ObservableList<T>, item: T, index: number?): () -> ()
 	assert(item ~= nil, "Bad item")
 	assert(type(index) == "number", "Bad index")
 
@@ -320,14 +342,14 @@ function ObservableList:InsertAt(item, index)
 	local changed = {}
 
 	local n = #self._keyList
-	for i=n, index, -1 do
+	for i = n, index, -1 do
 		local nextKey = self._keyList[i]
 		self._indexes[nextKey] = i + 1
 		self._keyList[i + 1] = nextKey
 
 		table.insert(changed, {
-			key = nextKey;
-			newIndex = i + 1;
+			key = nextKey,
+			newIndex = i + 1,
 		})
 	end
 
@@ -340,13 +362,12 @@ function ObservableList:InsertAt(item, index)
 	-- Fire off add
 	self.ItemAdded:Fire(item, index, key)
 
-
 	-- Fire off the index change on the value
 	self._keyIndexObservables:Fire(key, index)
 	self._indexObservers:Fire(index, item)
 	self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), item)
 
-	for _, data in pairs(changed) do
+	for _, data in changed do
 		if self._indexes[data.key] == data.newIndex then
 			self._indexObservers:Fire(data.newIndex, self._contents[data.key])
 			self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), self._contents[data.key])
@@ -366,7 +387,7 @@ end
 	@param index number
 	@return T
 ]=]
-function ObservableList:RemoveAt(index)
+function ObservableList.RemoveAt<T>(self: ObservableList<T>, index: number): T?
 	assert(type(index) == "number", "Bad index")
 
 	local key = self._keyList[index]
@@ -382,7 +403,7 @@ end
 	@param key Symbol
 	@return T
 ]=]
-function ObservableList:RemoveByKey(key)
+function ObservableList.RemoveByKey<T>(self: ObservableList<T>, key): T?
 	assert(key ~= nil, "Bad key")
 
 	local index = self._indexes[key]
@@ -402,14 +423,14 @@ function ObservableList:RemoveByKey(key)
 
 	-- shift everything down
 	local n = #self._keyList
-	for i=index, n - 1 do
-		local nextKey = self._keyList[i+1]
+	for i = index, n - 1 do
+		local nextKey = self._keyList[i + 1]
 		self._indexes[nextKey] = i
 		self._keyList[i] = nextKey
 
 		table.insert(changed, {
-			key = nextKey;
-			newIndex = i;
+			key = nextKey,
+			newIndex = i,
 		})
 	end
 	self._keyList[n] = nil
@@ -431,7 +452,7 @@ function ObservableList:RemoveByKey(key)
 	end
 
 	-- Fire off index change on each key list (if the data isn't stale)
-	for _, data in pairs(changed) do
+	for _, data in changed do
 		if self._indexes[data.key] == data.newIndex then
 			self._indexObservers:Fire(data.newIndex, self._contents[data.key])
 			self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), self._contents[data.key])
@@ -446,9 +467,9 @@ end
 	Gets a list of all entries.
 	@return { T }
 ]=]
-function ObservableList:GetList()
+function ObservableList.GetList<T>(self: ObservableList<T>): { T }
 	local list = table.create(#self._keyList)
-	for index, key in pairs(self._keyList) do
+	for index, key in self._keyList do
 		list[index] = self._contents[key]
 	end
 	return list
@@ -457,9 +478,9 @@ end
 --[=[
 	Cleans up the ObservableList and sets the metatable to nil.
 ]=]
-function ObservableList:Destroy()
+function ObservableList.Destroy<T>(self: ObservableList<T>)
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return ObservableList

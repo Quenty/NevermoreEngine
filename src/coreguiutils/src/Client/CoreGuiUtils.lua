@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions to work with the CoreGui
 	@class CoreGuiUtils
@@ -20,31 +21,33 @@ local CoreGuiUtils = {}
 	@param ... any -- parameters to set core with
 	@return Promise<()>
 ]=]
-function CoreGuiUtils.promiseRetrySetCore(tries, initialWaitTime, ...)
+function CoreGuiUtils.promiseRetrySetCore(tries: number, initialWaitTime: number, ...): Promise.Promise<()>
 	assert(type(tries) == "number", "Bad tries")
 	assert(type(initialWaitTime) == "number", "Bad initialWaitTime")
 
-	local args = {...}
+	local args = { ... }
 	local n = select("#", ...)
 
 	return Promise.spawn(function(resolve, reject)
 		local waitTime = initialWaitTime
 
 		local ok, err
-		for _=1, tries do
+		for _ = 1, tries do
 			ok, err = CoreGuiUtils.tryToSetCore(unpack(args, 1, n))
 			if ok then
 				return resolve()
 			else
 				task.wait(waitTime)
 				-- Exponential backoff
-				waitTime = waitTime*2
+				waitTime = waitTime * 2
 			end
 		end
 
 		if not ok then
 			return reject(err)
 		end
+
+		return
 	end)
 end
 
@@ -55,7 +58,7 @@ end
 	@return boolean -- false if failed
 	@return string? -- error, if there was one
 ]=]
-function CoreGuiUtils.tryToSetCore(...)
+function CoreGuiUtils.tryToSetCore(...): (boolean, string?)
 	local args = {...}
 	local n = select("#", ...)
 

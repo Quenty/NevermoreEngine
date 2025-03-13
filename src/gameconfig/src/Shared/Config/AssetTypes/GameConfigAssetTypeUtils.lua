@@ -19,7 +19,7 @@ local pluralMap = {
 	[GameConfigAssetTypes.MEMBERSHIP] = "memberships";
 }
 
-for _, item in pairs(GameConfigAssetTypes) do
+for _, item in GameConfigAssetTypes do
 	assert(pluralMap[item], "Missing plural")
 end
 

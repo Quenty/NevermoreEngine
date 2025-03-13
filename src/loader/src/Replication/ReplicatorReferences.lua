@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Handles mapping of references to the new value.
 
@@ -8,7 +9,17 @@ local ReplicatorReferences = {}
 ReplicatorReferences.ClassName = "ReplicatorReferences"
 ReplicatorReferences.__index = ReplicatorReferences
 
-function ReplicatorReferences.new()
+export type ListenerCallback = (Instance?) -> ()
+
+export type ReplicatorReferences = typeof(setmetatable(
+	{} :: {
+		_lookup: { [Instance]: Instance },
+		_listeners: { [Instance]: { ListenerCallback } },
+	},
+	ReplicatorReferences
+))
+
+function ReplicatorReferences.new(): ReplicatorReferences
 	local self = setmetatable({}, ReplicatorReferences)
 
 	self._lookup = {}
@@ -23,12 +34,11 @@ end
 	@param replicatorReferences any?
 	@return boolean
 ]=]
-function ReplicatorReferences.isReplicatorReferences(replicatorReferences)
-	return type(replicatorReferences) == "table" and
-		getmetatable(replicatorReferences) == ReplicatorReferences
+function ReplicatorReferences.isReplicatorReferences(replicatorReferences: any): boolean
+	return type(replicatorReferences) == "table" and getmetatable(replicatorReferences :: any) == ReplicatorReferences
 end
 
-function ReplicatorReferences:SetReference(orig, replicated)
+function ReplicatorReferences.SetReference(self: ReplicatorReferences, orig: Instance, replicated: Instance)
 	assert(typeof(orig) == "Instance", "Bad orig")
 	assert(typeof(replicated) == "Instance", "Bad replicated")
 
@@ -38,7 +48,7 @@ function ReplicatorReferences:SetReference(orig, replicated)
 	end
 end
 
-function ReplicatorReferences:UnsetReference(orig, replicated)
+function ReplicatorReferences.UnsetReference(self: ReplicatorReferences, orig: Instance, replicated: Instance)
 	assert(typeof(orig) == "Instance", "Bad orig")
 	assert(typeof(replicated) == "Instance", "Bad replicated")
 
@@ -48,11 +58,11 @@ function ReplicatorReferences:UnsetReference(orig, replicated)
 	end
 end
 
-function ReplicatorReferences:GetReference(orig)
+function ReplicatorReferences.GetReference(self: ReplicatorReferences, orig: Instance): Instance?
 	return self._lookup[orig]
 end
 
-function ReplicatorReferences:_fireSubs(orig, newValue)
+function ReplicatorReferences._fireSubs(self: ReplicatorReferences, orig: Instance, newValue: Instance?)
 	assert(typeof(orig) == "Instance", "Bad orig")
 
 	local listeners = self._listeners[orig]
@@ -60,7 +70,7 @@ function ReplicatorReferences:_fireSubs(orig, newValue)
 		return
 	end
 
-	for _, callback in pairs(listeners) do
+	for _, callback in listeners do
 		task.spawn(callback, newValue)
 	end
 end
@@ -71,9 +81,9 @@ end
 
 	@param orig Instance
 	@param callback function
-	@return function -- Call to disconnect
+	@return () -> () -- Call to disconnect
 ]=]
-function ReplicatorReferences:ObserveReferenceChanged(orig, callback)
+function ReplicatorReferences.ObserveReferenceChanged(self: ReplicatorReferences, orig: Instance, callback: ListenerCallback): () -> ()
 	assert(typeof(orig) == "Instance", "Bad orig")
 	assert(type(callback) == "function", "Bad callback")
 
@@ -81,7 +91,7 @@ function ReplicatorReferences:ObserveReferenceChanged(orig, callback)
 	do
 		local listeners = self._listeners[orig]
 		if not listeners then
-			listeners = {}
+			listeners = {} :: { ListenerCallback }
 			self._listeners[orig] = listeners
 		end
 

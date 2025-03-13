@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utils that work with Roblox Value objects (and also ValueObject)
 	@class ValueObjectUtils
@@ -18,7 +19,7 @@ local ValueObjectUtils = {}
 	@param to ValueObject<T>
 	@return MaidTask
 ]=]
-function ValueObjectUtils.syncValue(from, to)
+function ValueObjectUtils.syncValue<T>(from: ValueObject.ValueObject<T>, to: ValueObject.ValueObject<T>): Maid.Maid
 	local maid = Maid.new()
 	to.Value = from.Value
 
@@ -31,10 +32,12 @@ end
 
 --[=[
 	Observes the current value of the ValueObject
+
+	@deprecated 13.18.0
 	@param valueObject ValueObject<T>
 	@return Observable<T>
 ]=]
-function ValueObjectUtils.observeValue(valueObject)
+function ValueObjectUtils.observeValue<T>(valueObject: ValueObject.ValueObject<T>): Observable.Observable<T>
 	assert(ValueObject.isValueObject(valueObject), "Bad valueObject")
 
 	return valueObject:Observe()
@@ -45,7 +48,7 @@ end
 	@param valueObject ValueObject<T>
 	@return Observable<Brio<T>>
 ]=]
-function ValueObjectUtils.observeValueBrio(valueObject)
+function ValueObjectUtils.observeValueBrio<T>(valueObject: ValueObject.ValueObject<T>): Observable.Observable<Brio.Brio<T>>
 	assert(valueObject, "Bad valueObject")
 
 	return Observable.new(function(sub)
@@ -62,8 +65,7 @@ function ValueObjectUtils.observeValueBrio(valueObject)
 		refire()
 
 		return maid
-	end)
+	end) :: any
 end
-
 
 return ValueObjectUtils

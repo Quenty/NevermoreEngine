@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving [ReplicationType]
 	@class ReplicationTypeUtils
@@ -14,14 +15,17 @@ local ReplicationTypeUtils = {}
 	@param replicationType any
 	@return boolean
 ]=]
-function ReplicationTypeUtils.isReplicationType(replicationType)
+function ReplicationTypeUtils.isReplicationType(replicationType: any): boolean
 	return replicationType == ReplicationType.SHARED
 		or replicationType == ReplicationType.CLIENT
 		or replicationType == ReplicationType.SERVER
 		or replicationType == ReplicationType.PLUGIN
 end
 
-function ReplicationTypeUtils.getFolderReplicationType(folderName, ancestorReplicationType)
+function ReplicationTypeUtils.getFolderReplicationType(
+	folderName: string,
+	ancestorReplicationType: ReplicationType.ReplicationType
+): ReplicationType.ReplicationType
 	assert(type(folderName) == "string", "Bad folderName")
 	assert(type(ancestorReplicationType) == "string", "Bad ancestorReplicationType")
 
@@ -36,7 +40,7 @@ function ReplicationTypeUtils.getFolderReplicationType(folderName, ancestorRepli
 	end
 end
 
-function ReplicationTypeUtils.inferReplicationType()
+function ReplicationTypeUtils.inferReplicationType(): ReplicationType.ReplicationType
 	if (not RunService:IsRunning()) and RunService:IsStudio() then
 		return ReplicationType.PLUGIN
 	elseif RunService:IsServer() then
@@ -48,7 +52,7 @@ function ReplicationTypeUtils.inferReplicationType()
 	end
 end
 
-function ReplicationTypeUtils.isAllowed(replicationType, requestedReplicationType)
+function ReplicationTypeUtils.isAllowed(replicationType: ReplicationType.ReplicationType, requestedReplicationType: ReplicationType.ReplicationType): boolean
 	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
 	assert(ReplicationTypeUtils.isReplicationType(requestedReplicationType), "Bad requestedReplicationType")
 

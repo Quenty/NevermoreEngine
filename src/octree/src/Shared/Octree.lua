@@ -87,10 +87,10 @@ end
 function Octree:GetAllNodes()
 	local options = {}
 
-	for _, regionList in pairs(self._regionHashMap) do
-		for _, region in pairs(regionList) do
-			for node, _ in pairs(region.nodes) do
-				options[#options+1] = node
+	for _, regionList in self._regionHashMap do
+		for _, region in regionList do
+			for node, _ in region.nodes do
+				options[#options + 1] = node
 			end
 		end
 	end
@@ -116,7 +116,7 @@ end
 	@param object T
 	@return OctreeNode<T>
 ]=]
-function Octree:CreateNode(position, object)
+function Octree:CreateNode(position: Vector3, object: any)
 	assert(typeof(position) == "Vector3", "Bad position value")
 	assert(object, "Bad object value")
 
@@ -144,11 +144,11 @@ end
 	@return { T } -- Objects found
 	@return { number } -- Distances squared
 ]=]
-function Octree:RadiusSearch(position, radius)
+function Octree:RadiusSearch(position: Vector3, radius: number)
 	assert(typeof(position) == "Vector3", "Bad position")
 	assert(type(radius) == "number", "Bad radius")
 
-	local px, py, pz = position.x, position.y, position.z
+	local px, py, pz = position.X, position.Y, position.Z
 	return self:_radiusSearch(px, py, pz, radius)
 end
 
@@ -164,18 +164,18 @@ end
 	@return { any } -- Objects found
 	@return { number } -- Distances squared
 ]=]
-function Octree:KNearestNeighborsSearch(position, k, radius)
+function Octree:KNearestNeighborsSearch(position: Vector3, k: number, radius: number)
 	assert(typeof(position) == "Vector3", "Bad position")
 	assert(type(radius) == "number", "Bad radius")
 
-	local px, py, pz = position.x, position.y, position.z
+	local px, py, pz = position.X, position.Y, position.Z
 	local objects, nodeDistances2 = self:_radiusSearch(px, py, pz, radius)
 
 	local sortable = {}
-	for index, dist2 in pairs(nodeDistances2) do
+	for index, dist2 in nodeDistances2 do
 		table.insert(sortable, {
-			dist2 = dist2;
-			index = index;
+			dist2 = dist2,
+			index = index,
 		})
 	end
 
@@ -203,28 +203,36 @@ end
 	@param pz number
 	@return OctreeSubregion
 ]=]
-function Octree:GetOrCreateLowestSubRegion(px, py, pz)
+function Octree:GetOrCreateLowestSubRegion(px: number, py: number, pz: number)
 	local region = self:_getOrCreateRegion(px, py, pz)
 	return OctreeRegionUtils.getOrCreateSubRegionAtDepth(region, px, py, pz, self._maxDepth)
 end
 
-function Octree:_radiusSearch(px, py, pz, radius)
+function Octree:_radiusSearch(px: number, py: number, pz: number, radius: number)
 	local objectsFound = {}
 	local nodeDistances2 = {}
 
 	local diameter = self._maxRegionSize[1]
 	local searchRadiusSquared = OctreeRegionUtils.getSearchRadiusSquared(radius, diameter, EPSILON)
 
-	for _, regionList in pairs(self._regionHashMap) do
-		for _, region in pairs(regionList) do
+	for _, regionList in self._regionHashMap do
+		for _, region in regionList do
 			local rpos = region.position
 			local rpx, rpy, rpz = rpos[1], rpos[2], rpos[3]
 			local ox, oy, oz = px - rpx, py - rpy, pz - rpz
-			local dist2 = ox*ox + oy*oy + oz*oz
+			local dist2 = ox * ox + oy * oy + oz * oz
 
 			if dist2 <= searchRadiusSquared then
 				OctreeRegionUtils.getNeighborsWithinRadius(
-					region, radius, px, py, pz, objectsFound, nodeDistances2, self._maxDepth)
+					region,
+					radius,
+					px,
+					py,
+					pz,
+					objectsFound,
+					nodeDistances2,
+					self._maxDepth
+				)
 			end
 		end
 	end
@@ -232,11 +240,11 @@ function Octree:_radiusSearch(px, py, pz, radius)
 	return objectsFound, nodeDistances2
 end
 
-function Octree:_getRegion(px, py, pz)
+function Octree:_getRegion(px: number, py: number, pz: number)
 	return OctreeRegionUtils.findRegion(self._regionHashMap, self._maxRegionSize, px, py, pz)
 end
 
-function Octree:_getOrCreateRegion(px, py, pz)
+function Octree:_getOrCreateRegion(px: number, py: number, pz: number)
 	return OctreeRegionUtils.getOrCreateRegion(self._regionHashMap, self._maxRegionSize, px, py, pz)
 end
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	A 'Symbol' is an opaque marker type.
 
@@ -8,6 +9,8 @@
 
 local Symbol = {}
 
+export type Symbol = typeof(newproxy(true))
+
 --[=[
 	Creates a Symbol with the given name.
 
@@ -17,7 +20,7 @@ local Symbol = {}
 	@param name string
 	@return Symbol
 ]=]
-function Symbol.named(name)
+function Symbol.named(name: string): Symbol
 	assert(type(name) == "string", "Symbols must be created using a string name!")
 
 	local self = newproxy(true)
@@ -37,7 +40,7 @@ end
 	@param value boolean
 	@return boolean
 ]=]
-function Symbol.isSymbol(value)
+function Symbol.isSymbol(value: any): boolean
 	return typeof(value) == "userdata"
 end
 

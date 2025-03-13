@@ -145,6 +145,7 @@ lib.BezierAngularV = BezierAngularV
 
 --Regular tweening
 local TweenData={}
+-- stylua: ignore
 local Tweens=setmetatable({},{
 	__index=function(_,i)
 		local data=TweenData[i]
@@ -158,6 +159,8 @@ local Tweens=setmetatable({},{
 				return data.x0
 			end
 		end
+
+		return nil
 	end,
 	__newindex=function(_,i,v)
 		local data=TweenData[i]
@@ -188,12 +191,15 @@ local Tweens=setmetatable({},{
 		else
 			print("A value named "..tostring(i).." has not yet been created.")
 		end
+
+		return nil
 	end,
 })
 lib.Tweens = Tweens
 
 --Quaternion tweening
-local QuaternionTweenData={}
+local QuaternionTweenData = {}
+-- stylua: ignore
 local QuaternionTweens=setmetatable({},{
 	__index=function(_,i)
 		local data=QuaternionTweenData[i]
@@ -207,6 +213,8 @@ local QuaternionTweens=setmetatable({},{
 				return data.q0
 			end
 		end
+
+		return nil
 	end,
 	__newindex=function(_,i,v)
 		local data=QuaternionTweenData[i]
@@ -247,7 +255,8 @@ local QuaternionTweens=setmetatable({},{
 lib.QuaternionTweens = QuaternionTweens
 
 --CFrame tweening
-local CFrameTweenData={}
+local CFrameTweenData = {}
+-- stylua: ignore
 local CFrameTweens=setmetatable({},{
 	__index=function(_,i)
 		local data=CFrameTweenData[i]
@@ -263,6 +272,8 @@ local CFrameTweens=setmetatable({},{
 				return data.c0
 			end
 		end
+
+		return nil
 	end,
 	__newindex=function(_,i,v)
 		local data=CFrameTweenData[i]
@@ -304,6 +315,8 @@ local CFrameTweens=setmetatable({},{
 		else
 			print("A value named "..tostring(i).." has not yet been created.")
 		end
+
+		return nil
 	end,
 })
 lib.CFrameTweens = CFrameTweens

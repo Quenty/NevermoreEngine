@@ -48,7 +48,7 @@ function RagdollableBase:ObserveIsRagdolled()
 	error("Not implemented")
 end
 
-function RagdollableBase:IsRagdolled()
+function RagdollableBase:IsRagdolled(): boolean
 	return self._obj:HasTag("Ragdoll")
 end
 

@@ -12,6 +12,7 @@ local Players = game:GetService("Players")
 
 local Maid = require("Maid")
 local SettingsCmdrUtils = require("SettingsCmdrUtils")
+local _ServiceBag = require("ServiceBag")
 
 local SettingsServiceClient = {}
 
@@ -20,7 +21,7 @@ local SettingsServiceClient = {}
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingsServiceClient:Init(serviceBag)
+function SettingsServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -81,7 +82,7 @@ end
 	@param player Player
 	@return Observable<PlayerSettingsClient | nil>
 ]=]
-function SettingsServiceClient:ObservePlayerSettings(player)
+function SettingsServiceClient:ObservePlayerSettings(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._settingsDataService:ObservePlayerSettings(player)
@@ -93,7 +94,7 @@ end
 	@param player Player
 	@return Observable<Brio<PlayerSettingsClient>>
 ]=]
-function SettingsServiceClient:ObservePlayerSettingsBrio(player)
+function SettingsServiceClient:ObservePlayerSettingsBrio(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._settingsDataService:ObservePlayerSettingsBrio(player)
@@ -105,7 +106,7 @@ end
 	@param player Player
 	@return PlayerSettingsClient | nil
 ]=]
-function SettingsServiceClient:GetPlayerSettings(player)
+function SettingsServiceClient:GetPlayerSettings(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._settingsDataService:GetPlayerSettings(player)
@@ -118,7 +119,7 @@ end
 	@param cancelToken CancellationToken
 	@return Promise<PlayerSettingsClient>
 ]=]
-function SettingsServiceClient:PromisePlayerSettings(player, cancelToken)
+function SettingsServiceClient:PromisePlayerSettings(player: Player, cancelToken)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._settingsDataService:PromisePlayerSettings(player, cancelToken)

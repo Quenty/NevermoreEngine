@@ -13,7 +13,7 @@ local TieMemberDefinition = {}
 TieMemberDefinition.ClassName = "TieMemberDefinition"
 TieMemberDefinition.__index = TieMemberDefinition
 
-function TieMemberDefinition.new(tieDefinition, memberName, memberTieRealm)
+function TieMemberDefinition.new(tieDefinition, memberName: string, memberTieRealm)
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
 	local self = setmetatable({}, TieMemberDefinition)
@@ -33,11 +33,11 @@ function TieMemberDefinition:GetInterface()
 	error("Not implemented")
 end
 
-function TieMemberDefinition:GetFriendlyName()
+function TieMemberDefinition:GetFriendlyName(): string
 	return string.format("%s.%s", self._tieDefinition:GetName(), self._memberName)
 end
 
-function TieMemberDefinition:IsRequiredForInterface(currentRealm)
+function TieMemberDefinition:IsRequiredForInterface(currentRealm): boolean
 	assert(TieRealmUtils.isTieRealm(currentRealm), "Bad currentRealm")
 
 	if self._memberTieRealm == TieRealms.SHARED then
@@ -50,7 +50,7 @@ function TieMemberDefinition:IsRequiredForInterface(currentRealm)
 	end
 end
 
-function TieMemberDefinition:IsAllowedOnInterface(currentRealm)
+function TieMemberDefinition:IsAllowedOnInterface(currentRealm): boolean
 	assert(TieRealmUtils.isTieRealm(currentRealm), "Bad currentRealm")
 
 	if self._memberTieRealm == TieRealms.SHARED then
@@ -63,7 +63,7 @@ function TieMemberDefinition:IsAllowedOnInterface(currentRealm)
 	end
 end
 
-function TieMemberDefinition:IsRequiredForImplementation(currentRealm)
+function TieMemberDefinition:IsRequiredForImplementation(currentRealm): boolean
 	assert(TieRealmUtils.isTieRealm(currentRealm), "Bad currentRealm")
 
 	if currentRealm == TieRealms.SHARED then
@@ -76,7 +76,7 @@ function TieMemberDefinition:IsRequiredForImplementation(currentRealm)
 	end
 end
 
-function TieMemberDefinition:IsAllowedForImplementation(currentRealm)
+function TieMemberDefinition:IsAllowedForImplementation(currentRealm): boolean
 	assert(TieRealmUtils.isTieRealm(currentRealm), "Bad currentRealm")
 
 	if self._memberTieRealm == TieRealms.SHARED then
@@ -97,7 +97,7 @@ function TieMemberDefinition:GetTieDefinition()
 	return self._tieDefinition
 end
 
-function TieMemberDefinition:GetMemberName()
+function TieMemberDefinition:GetMemberName(): string
 	return self._memberName
 end
 

@@ -13,7 +13,7 @@ local Promise = require("Promise")
 
 local TURN_TIME = 8
 
-local function spinUpGameCopy(prefix)
+local function spinUpGameCopy(prefix: string)
 	assert(type(prefix) == "string", "Bad prefix")
 
 	local serviceBag = require("ServiceBag").new()

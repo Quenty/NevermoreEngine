@@ -98,7 +98,7 @@ end
 	Sets the image to use for this radial image
 	@param image string
 ]=]
-function RadialImage:SetImage(image)
+function RadialImage:SetImage(image: string)
 	assert(type(image) == "string", "Bad image")
 
 	self._image.Value = image
@@ -108,7 +108,7 @@ end
 	Sets the percent we're at
 	@param percent number
 ]=]
-function RadialImage:SetPercent(percent)
+function RadialImage:SetPercent(percent: number)
 	assert(type(percent) == "number", "Bad percent")
 
 	self._percent.Value = percent
@@ -118,7 +118,7 @@ end
 	Sets the total transparency of the radial image
 	@param transparency number
 ]=]
-function RadialImage:SetTransparency(transparency)
+function RadialImage:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
@@ -128,7 +128,7 @@ end
 	Sets the enabled transparency for the radial image
 	@param transparency number
 ]=]
-function RadialImage:SetEnabledTransparency(transparency)
+function RadialImage:SetEnabledTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._enabledTransparency.Value = transparency
@@ -138,7 +138,7 @@ end
 	Sets the disabled transparency
 	@param transparency number
 ]=]
-function RadialImage:SetDisabledTransparency(transparency)
+function RadialImage:SetDisabledTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._disabledTransparency.Value = transparency
@@ -183,9 +183,9 @@ function RadialImage:_render()
 				-- this is an issue because clips descendants tends towards floor
 				-- pixel clipping.
 				if size.x % 2 ~= 0 then
-					return UDim2.new(0.5, 1, 1, 0);
+					return UDim2.new(0.5, 1, 1, 0)
 				else
-					return UDim2.new(0.5, 0, 1, 0);
+					return UDim2.new(0.5, 0, 1, 0)
 				end
 			end);
 			Position = UDim2.new(0, 0, 0, 0);
@@ -208,7 +208,7 @@ function RadialImage:_render()
 								NumberSequenceKeypoint.new(0.5, disabled);
 								NumberSequenceKeypoint.new(0.5001, enabled);
 								NumberSequenceKeypoint.new(1, enabled);
-							});
+							})
 						end);
 					Color = Blend.Computed(
 						self._enabledColor,
@@ -219,7 +219,7 @@ function RadialImage:_render()
 								ColorSequenceKeypoint.new(0.5, disabled);
 								ColorSequenceKeypoint.new(0.5001, enabled);
 								ColorSequenceKeypoint.new(1, enabled);
-							});
+							})
 						end);
 					Rotation = Blend.Computed(self._percent, function(percent)
 						local mapped = math.clamp(Math.map(percent, 0.5, 1, 0, 1), 0, 1)
@@ -254,7 +254,7 @@ function RadialImage:_render()
 								NumberSequenceKeypoint.new(0.5, disabled);
 								NumberSequenceKeypoint.new(0.5001, enabled);
 								NumberSequenceKeypoint.new(1, enabled);
-							});
+							})
 						end);
 					Color = Blend.Computed(
 						self._enabledColor,
@@ -265,7 +265,7 @@ function RadialImage:_render()
 								ColorSequenceKeypoint.new(0.5, disabled);
 								ColorSequenceKeypoint.new(0.5001, enabled);
 								ColorSequenceKeypoint.new(1, enabled);
-							});
+							})
 						end);
 					Rotation = Blend.Computed(self._percent, function(percent)
 						local mapped = math.clamp(Math.map(percent, 0, 0.5, 0, 1), 0, 1)
@@ -274,7 +274,7 @@ function RadialImage:_render()
 				};
 			};
 		};
-	};
+	}
 end
 
 return RadialImage

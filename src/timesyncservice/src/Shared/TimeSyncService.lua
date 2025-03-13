@@ -55,7 +55,7 @@ end
 
 	@return boolean
 ]=]
-function TimeSyncService:IsSynced()
+function TimeSyncService:IsSynced(): boolean
 	if not RunService:IsRunning() then
 		return true
 	end

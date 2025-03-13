@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods to query policies for players from [PolicyService].
 
@@ -12,13 +13,23 @@ local Promise = require("Promise")
 
 local PolicyServiceUtils = {}
 
+export type PolicyInfo = {
+	AreAdsAllowed: boolean,
+	ArePaidRandomItemsRestricted: boolean,
+	AllowedExternalLinkReferences: { string },
+	IsContentSharingAllowed: boolean,
+	IsEligibleToPurchaseSubscription: boolean,
+	IsPaidItemTradingAllowed: boolean,
+	IsSubjectToChinaPolicies: boolean,
+}
+
 --[=[
 	Promises policy info for players.
 
 	@param player Player
-	@return table
+	@return Promise<PolicyInfo>
 ]=]
-function PolicyServiceUtils.promisePolicyInfoForPlayer(player)
+function PolicyServiceUtils.promisePolicyInfoForPlayer(player: Player): Promise.Promise<PolicyInfo>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return Promise.spawn(function(resolve, reject)
@@ -44,7 +55,7 @@ end
 	@param policyInfo PolicyInfo
 	@return boolean
 ]=]
-function PolicyServiceUtils.canReferenceTwitter(policyInfo)
+function PolicyServiceUtils.canReferenceTwitter(policyInfo: PolicyInfo): boolean
 	assert(type(policyInfo) == "table", "Bad policyInfo")
 
 	return PolicyServiceUtils.canReferenceSocialMedia(policyInfo, "Twitch")
@@ -56,12 +67,11 @@ end
 	@param policyInfo PolicyInfo
 	@return boolean
 ]=]
-function PolicyServiceUtils.canReferenceTwitch(policyInfo)
+function PolicyServiceUtils.canReferenceTwitch(policyInfo: PolicyInfo): boolean
 	assert(type(policyInfo) == "table", "Bad policyInfo")
 
 	return PolicyServiceUtils.canReferenceSocialMedia(policyInfo, "Twitch")
 end
-
 
 --[=[
 	Returns true if you can reference Discord
@@ -69,7 +79,7 @@ end
 	@param policyInfo PolicyInfo
 	@return boolean
 ]=]
-function PolicyServiceUtils.canReferenceDiscord(policyInfo)
+function PolicyServiceUtils.canReferenceDiscord(policyInfo: PolicyInfo): boolean
 	assert(type(policyInfo) == "table", "Bad policyInfo")
 
 	return PolicyServiceUtils.canReferenceSocialMedia(policyInfo, "Discord")
@@ -81,7 +91,7 @@ end
 	@param policyInfo PolicyInfo
 	@return boolean
 ]=]
-function PolicyServiceUtils.canReferenceFacebook(policyInfo)
+function PolicyServiceUtils.canReferenceFacebook(policyInfo: PolicyInfo): boolean
 	assert(type(policyInfo) == "table", "Bad policyInfo")
 
 	return PolicyServiceUtils.canReferenceSocialMedia(policyInfo, "Facebook")
@@ -93,7 +103,7 @@ end
 	@param policyInfo PolicyInfo
 	@return boolean
 ]=]
-function PolicyServiceUtils.canReferenceYouTube(policyInfo)
+function PolicyServiceUtils.canReferenceYouTube(policyInfo: PolicyInfo): boolean
 	assert(type(policyInfo) == "table", "Bad policyInfo")
 
 	return PolicyServiceUtils.canReferenceSocialMedia(policyInfo, "YouTube")
@@ -106,7 +116,7 @@ end
 	@param socialInfoName string
 	@return boolean
 ]=]
-function PolicyServiceUtils.canReferenceSocialMedia(policyInfo, socialInfoName)
+function PolicyServiceUtils.canReferenceSocialMedia(policyInfo: PolicyInfo, socialInfoName: string): boolean
 	assert(type(policyInfo) == "table", "Bad policyInfo")
 	assert(type(socialInfoName) == "string", "Bad socialInfoName")
 
@@ -115,7 +125,7 @@ function PolicyServiceUtils.canReferenceSocialMedia(policyInfo, socialInfoName)
 		return false
 	end
 
-	for _, item in pairs(policyInfo.AllowedExternalLinkReferences) do
+	for _, item in policyInfo.AllowedExternalLinkReferences do
 		if item == socialInfoName then
 			return true
 		end

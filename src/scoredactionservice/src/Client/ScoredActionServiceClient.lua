@@ -16,6 +16,7 @@ local InputListScoreHelper = require("InputListScoreHelper")
 local Observable = require("Observable")
 local InputKeyMapList = require("InputKeyMapList")
 local ValueObject = require("ValueObject")
+local _ServiceBag = require("ServiceBag")
 
 local ScoredActionServiceClient = {}
 ScoredActionServiceClient.ServiceName = "ScoredActionServiceClient"
@@ -24,7 +25,7 @@ ScoredActionServiceClient.ServiceName = "ScoredActionServiceClient"
 	Initializes the ScoredActionServiceClient. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function ScoredActionServiceClient:Init(serviceBag)
+function ScoredActionServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialize")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")

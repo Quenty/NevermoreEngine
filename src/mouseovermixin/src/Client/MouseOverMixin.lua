@@ -19,7 +19,7 @@ function MouseOverMixin:Add(class)
 	class._getMouseOverTweenProperties = self._getMouseOverTweenProperties
 end
 
-function MouseOverMixin:GetMouseOverBoolValue(gui)
+function MouseOverMixin:GetMouseOverBoolValue(gui: GuiObject)
 	local maid = Maid.new()
 
 	local mouseOver = Instance.new("BoolValue")
@@ -58,20 +58,20 @@ function MouseOverMixin:GetMouseOverBoolValue(gui)
 	return maid, mouseOver
 end
 
-function MouseOverMixin:_getMouseOverTweenProperties(gui)
+function MouseOverMixin:_getMouseOverTweenProperties(gui: GuiObject)
 	if gui:IsA("ImageButton") then
 		return {
-			ImageColor3 = ButtonUtils.getMouseOverColor(gui.ImageColor3);
-			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3);
+			ImageColor3 = ButtonUtils.getMouseOverColor(gui.ImageColor3),
+			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3),
 		}
 	else
 		return {
-			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3);
+			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3),
 		}
 	end
 end
 
-function MouseOverMixin:AddMouseOverEffect(gui, tweenProperties)
+function MouseOverMixin:AddMouseOverEffect(gui: GuiObject, tweenProperties)
 	tweenProperties = tweenProperties or ButtonUtils._getMouseOverTweenProperties(gui)
 
 	if gui:IsA("GuiButton") then
@@ -80,12 +80,12 @@ function MouseOverMixin:AddMouseOverEffect(gui, tweenProperties)
 
 	local maid, boolValue = ButtonUtils.getMouseOverBoolValue(gui)
 	local original = {}
-	for property, _ in pairs(tweenProperties) do
+	for property, _ in tweenProperties do
 		original[property] = gui[property]
 	end
 
 	local function update()
-		for property, Value in pairs(boolValue.Value and tweenProperties or original) do
+		for property, Value in boolValue.Value and tweenProperties or original do
 			gui[property] = Value
 		end
 	end

@@ -47,7 +47,7 @@ function LookAtButtonsClient:_setupLocal()
 		self:_stopTrackingPhysicalButton(physicalButton)
 	end))
 
-	for _, physicalButton in pairs(self._gameBindersClient.PhysicalButton:GetAll()) do
+	for _, physicalButton in self._gameBindersClient.PhysicalButton:GetAll() do
 		self:_trackPhysicalButton(physicalButton)
 	end
 

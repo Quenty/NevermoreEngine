@@ -14,7 +14,7 @@
 
 Utility methods for accessory types
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/AccessoryTypeUtilsUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/AccessoryTypeUtils">View docs →</a></div>
 
 ## Installation
 

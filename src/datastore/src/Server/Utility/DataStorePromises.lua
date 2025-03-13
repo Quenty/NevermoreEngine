@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods to interactive with Roblox datastores.
 	@server
@@ -21,7 +22,7 @@ local DataStorePromises = {}
 	@param scope string
 	@return Promise<DataStore>
 ]=]
-function DataStorePromises.promiseDataStore(name, scope)
+function DataStorePromises.promiseDataStore(name: string, scope: string): Promise.Promise<DataStore>
 	assert(type(name) == "string", "Bad name")
 	assert(type(scope) == "string", "Bad scope")
 
@@ -44,7 +45,7 @@ end
 	@param scope string
 	@return Promise<OrderedDataStore>
 ]=]
-function DataStorePromises.promiseOrderedDataStore(name, scope)
+function DataStorePromises.promiseOrderedDataStore(name: string, scope: string): Promise.Promise<OrderedDataStore>
 	assert(type(name) == "string", "Bad name")
 	assert(type(scope) == "string", "Bad scope")
 
@@ -66,7 +67,7 @@ end
 	@param key string
 	@return Promise<T>
 ]=]
-function DataStorePromises.getAsync(robloxDataStore, key)
+function DataStorePromises.getAsync<T>(robloxDataStore: DataStore, key: string): Promise.Promise<T>
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 
@@ -88,10 +89,14 @@ end
 	@param robloxDataStore DataStore
 	@param key string
 	@param updateFunc (T) -> T?
-	@return Promise<boolean>
+	@return Promise<T>
 ]=]
 
-function DataStorePromises.updateAsync(robloxDataStore, key, updateFunc)
+function DataStorePromises.updateAsync<T>(
+	robloxDataStore: DataStore,
+	key: string,
+	updateFunc: (T) -> T?
+): Promise.Promise<(T, DataStoreKeyInfo)>
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 	assert(type(updateFunc) == "function", "Bad updateFunc")
@@ -119,7 +124,12 @@ end
 	@param userIds { number } -- Associated userIds
 	@return Promise<boolean>
 ]=]
-function DataStorePromises.setAsync(robloxDataStore, key, value, userIds)
+function DataStorePromises.setAsync(
+	robloxDataStore: DataStore,
+	key,
+	value: string,
+	userIds: { number }?
+): Promise.Promise<boolean>
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 	assert(type(userIds) == "table" or userIds == nil, "Bad userIds")
@@ -142,7 +152,11 @@ end
 	@param delta number
 	@return Promise<boolean>
 ]=]
-function DataStorePromises.promiseIncrementAsync(robloxDataStore, key, delta)
+function DataStorePromises.promiseIncrementAsync(
+	robloxDataStore: DataStore,
+	key: string,
+	delta: number
+): Promise.Promise<boolean>
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 	assert(type(delta) == "number" or delta == nil, "Bad delta")
@@ -164,7 +178,7 @@ end
 	@param key string
 	@return Promise<boolean>
 ]=]
-function DataStorePromises.removeAsync(robloxDataStore, key)
+function DataStorePromises.removeAsync(robloxDataStore: DataStore, key: string): Promise.Promise<boolean>
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 
@@ -191,7 +205,13 @@ end
 	@param maxValue number?
 	@return Promise<DataStorePages>
 ]=]
-function DataStorePromises.promiseSortedPagesAsync(orderedDataStore, ascending, pagesize, minValue, maxValue)
+function DataStorePromises.promiseSortedPagesAsync(
+	orderedDataStore: OrderedDataStore,
+	ascending: boolean,
+	pagesize: number,
+	minValue: number?,
+	maxValue: number?
+): Promise.Promise<DataStorePages>
 	assert(typeof(orderedDataStore) == "Instance" and orderedDataStore:IsA("OrderedDataStore"), "Bad orderedDataStore")
 	assert(type(ascending) == "boolean", "Bad ascending")
 	assert(type(pagesize) == "number", "Bad entries")
@@ -211,7 +231,6 @@ function DataStorePromises.promiseSortedPagesAsync(orderedDataStore, ascending, 
 		return resolve(result)
 	end)
 end
-
 
 --[=[
 	@interface OrderedDataStoreEntry
@@ -253,19 +272,20 @@ end
 	@param maxValue number?
 	@return Promise<OrderedDataStoreEntry>
 ]=]
-function DataStorePromises.promiseOrderedEntries(orderedDataStore, ascending, pagesize, entries, minValue, maxValue)
+function DataStorePromises.promiseOrderedEntries(orderedDataStore: OrderedDataStore, ascending: boolean, pagesize: number, entries: number, minValue: number?, maxValue: number?): Promise.Promise<OrderedDataStoreEntry>
 	assert(typeof(orderedDataStore) == "Instance" and orderedDataStore:IsA("OrderedDataStore"), "Bad orderedDataStore")
 	assert(type(ascending) == "boolean", "Bad ascending")
 	assert(type(entries) == "number", "Bad entries")
 
+	-- stylua: ignore
 	return DataStorePromises.promiseSortedPagesAsync(orderedDataStore, ascending, pagesize, minValue, maxValue)
-		:Then(function(dataStorePages)
+		:Then(function(dataStorePages: DataStorePages)
 			return Promise.spawn(function(resolve, reject)
 				local resultList = {}
 
-				local pageData = dataStorePages:GetCurrentPage()
+				local pageData: any? = dataStorePages:GetCurrentPage()
 				while pageData do
-					for _, data in pairs(pageData) do
+					for _, data in pageData do
 						if #resultList < entries then
 							table.insert(resultList, data)
 						else

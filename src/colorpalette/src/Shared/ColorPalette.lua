@@ -134,7 +134,7 @@ function ColorPalette:ObserveColor(color, grade, vividness)
 	end
 end
 
-function ColorPalette:SetDefaultSurfaceName(surfaceName)
+function ColorPalette:SetDefaultSurfaceName(surfaceName: string)
 	assert(type(surfaceName) == "string", "Bad surfaceName")
 
 	self._gradePalette:SetDefaultSurfaceName(surfaceName)
@@ -178,7 +178,7 @@ function ColorPalette:_toGradeObservable(grade, fallbackColorSource)
 			Rx.map(function(value)
 				local luvColor = LuvColor3Utils.fromColor3(value)
 				return luvColor[3]
-			end)
+			end),
 		})
 	else
 		error("Bad fallbackColorSource argument")
@@ -235,7 +235,7 @@ function ColorPalette:_toVividness(vividness, grade, name)
 	end
 end
 
-function ColorPalette:GetColorValue(colorName)
+function ColorPalette:GetColorValue(colorName: string)
 	assert(type(colorName) == "string", "Bad colorName")
 
 	local colorValue = self._colorValues[colorName]
@@ -264,7 +264,6 @@ function ColorPalette:GetVividnessValue(gradeName)
 	return vividnessValue
 end
 
-
 function ColorPalette:ObserveModifiedGrade(gradeName, amount, multiplier)
 	return self._gradePalette:ObserveModified(gradeName, amount, multiplier)
 end
@@ -277,7 +276,7 @@ function ColorPalette:ObserveVividness(name)
 	return self._gradePalette:ObserveVividness(name)
 end
 
-function ColorPalette:GetSwatch(swatchName)
+function ColorPalette:GetSwatch(swatchName: string)
 	assert(type(swatchName) == "string", "Bad swatchName")
 
 	local swatch = self._swatchMap:Get(swatchName)

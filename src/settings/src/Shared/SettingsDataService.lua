@@ -15,6 +15,7 @@ local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local _ServiceBag = require("ServiceBag")
 
 local SettingsDataService = {}
 
@@ -23,7 +24,7 @@ local SettingsDataService = {}
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingsDataService:Init(serviceBag)
+function SettingsDataService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

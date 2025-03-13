@@ -48,7 +48,7 @@ return function(target)
 		local results = {}
 		local inOrder = true
 		local lastValue = nil
-		for _, item in pairs(observableSortedList:GetList()) do
+		for _, item in observableSortedList:GetList() do
 			if lastValue then
 				if item.scoreValue.Value < lastValue then
 					inOrder = false

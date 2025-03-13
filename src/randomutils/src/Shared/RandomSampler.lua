@@ -21,6 +21,7 @@ function RandomSampler.new(samples)
 
 	self._optionsList = {}
 	self._shuffledAvailableList = {}
+	self._lastSelection = nil
 
 	if samples then
 		self:SetSamples(samples)
@@ -34,7 +35,7 @@ end
 
 	@param samples { T } -- The list of samples to sample from
 ]=]
-function RandomSampler:SetSamples(samples)
+function RandomSampler:SetSamples<T>(samples: { T })
 	assert(type(samples) == "table", "Bad samples")
 
 	if self._optionsList ~= samples then

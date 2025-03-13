@@ -54,7 +54,7 @@ end
 	@param isSustained boolean
 	@param doNotAnimate boolean? -- True if animation should be skipped
 ]=]
-function SustainModel:SetIsSustained(isSustained, doNotAnimate)
+function SustainModel:SetIsSustained(isSustained, doNotAnimate: boolean?)
 	assert(type(isSustained) == "boolean", "Bad isSustained")
 
 	if self._isSustained ~= isSustained then
@@ -68,7 +68,7 @@ end
 
 	@param doNotAnimate boolean? -- True if animation should be skipped
 ]=]
-function SustainModel:Sustain(doNotAnimate)
+function SustainModel:Sustain(doNotAnimate: boolean?)
 	self:SetIsSustained(true, doNotAnimate)
 end
 
@@ -77,7 +77,7 @@ end
 
 	@param doNotAnimate boolean? -- True if animation should be skipped
 ]=]
-function SustainModel:Stop(doNotAnimate)
+function SustainModel:Stop(doNotAnimate: boolean?)
 	self:SetIsSustained(false, doNotAnimate)
 end
 
@@ -89,7 +89,7 @@ end
 	@param doNotAnimate boolean? -- True if animation should be skipped
 	@return Promise
 ]=]
-function SustainModel:PromiseSustain(doNotAnimate)
+function SustainModel:PromiseSustain(doNotAnimate: boolean?)
 	self:Sustain(doNotAnimate)
 
 	return self:_promiseSustained()
@@ -118,7 +118,7 @@ function SustainModel:_promiseSustained()
 	return promise
 end
 
-function SustainModel:_executeSustain(doNotAnimate)
+function SustainModel:_executeSustain(doNotAnimate: boolean?)
 	local maid = Maid.new()
 
 	local promise = Promise.new()

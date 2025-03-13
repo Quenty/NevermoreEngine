@@ -42,7 +42,7 @@ function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
 			RxBrioUtils.flatMapBrio(function(_, linkValue)
 				return binder:ObserveBrio(linkValue)
 			end);
-		});
+		})
 end
 
 --[=[
@@ -188,7 +188,7 @@ function RxBinderUtils.observeBoundClassesBrio(binders, instance)
 
 	local observables = {}
 
-	for _, binder in pairs(binders) do
+	for _, binder in binders do
 		table.insert(observables, RxBinderUtils.observeBoundClassBrio(binder, instance))
 	end
 

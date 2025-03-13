@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Service bags handle recursive initialization of services, and the
 	retrieval of services from a given source. This allows the composition
@@ -32,12 +33,13 @@ local require = require(script.Parent.loader).load(script)
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
 local ServiceInitLogger = require("ServiceInitLogger")
+local _Maid = require("Maid")
 
 --[=[
 	@interface Service
-	.Init: function?
-	.Start: function?
-	.Destroy: function?
+	.Init: (serviceBag: ServiceBag) -> ()?
+	.Start: () -> ()?
+	.Destroy: () -> ()?
 	@within ServiceBag
 ]=]
 
@@ -50,31 +52,50 @@ local ServiceBag = setmetatable({}, BaseObject)
 ServiceBag.ClassName = "ServiceBag"
 ServiceBag.__index = ServiceBag
 
+export type ServiceBag = typeof(setmetatable(
+	{} :: {
+		_maid: _Maid.Maid,
+		_services: { [any]: any },
+		_parentProvider: ServiceBag?,
+		_serviceTypesToInitializeSet: { [any]: true }?,
+		_initializedServiceTypeSet: { [any]: true },
+		_serviceTypesToStartSet: { [any]: true }?,
+
+		_initRunAllowed: boolean,
+		_destructing: boolean,
+		_serviceInitLogger: ServiceInitLogger.ServiceInitLogger,
+		_serviceStartLogger: ServiceInitLogger.ServiceInitLogger,
+
+		_destroyingSignal: Signal.Signal<()>,
+	},
+	{ __index = ServiceBag }
+))
+
 --[=[
 	Constructs a new ServiceBag
 
 	@param parentProvider ServiceBag? -- Optional parent provider to find services in
 	@return ServiceBag
 ]=]
-function ServiceBag.new(parentProvider)
-	local self = setmetatable(BaseObject.new(), ServiceBag)
+function ServiceBag.new(parentProvider: ServiceBag?): ServiceBag
+	local self = setmetatable(BaseObject.new() :: any, ServiceBag)
 
 	self._services = {}
 	self._parentProvider = parentProvider
 
 	self._serviceTypesToInitializeSet = {}
 	self._initializedServiceTypeSet = {}
+	self._serviceTypesToStartSet = {}
+
 	self._initRunAllowed = false
 	self._destructing = false
 
 	self._serviceInitLogger = ServiceInitLogger.new("initialized")
 	self._serviceStartLogger = ServiceInitLogger.new("started")
 
-	self._serviceTypesToStart = {}
-
 	self._destroyingSignal = Signal.new()
 
-	return self
+	return self :: any
 end
 
 --[=[
@@ -87,7 +108,7 @@ function ServiceBag.isServiceBag(value: any): boolean
 	return type(value) == "table" and value.ClassName == "ServiceBag"
 end
 
-function ServiceBag:PrintInitialization()
+function ServiceBag.PrintInitialization(self: ServiceBag)
 	self._serviceInitLogger:Print()
 	self._serviceStartLogger:Print()
 end
@@ -99,9 +120,9 @@ end
 	@param serviceType ServiceType
 	@return any
 ]=]
-function ServiceBag:GetService(serviceType)
+function ServiceBag.GetService<T>(self: ServiceBag, serviceType: T): T
 	if typeof(serviceType) == "Instance" then
-		serviceType = require(serviceType)
+		serviceType = (require :: any)(serviceType)
 	end
 
 	if type(serviceType) ~= "table" then
@@ -135,9 +156,9 @@ end
 	@param serviceType ServiceType
 	@return boolean
 ]=]
-function ServiceBag:HasService(serviceType)
+function ServiceBag.HasService<T>(self: ServiceBag, serviceType: T): boolean
 	if typeof(serviceType) == "Instance" then
-		serviceType = require(serviceType)
+		serviceType = (require :: any)(serviceType)
 	end
 
 	if self._services[serviceType] then
@@ -151,7 +172,7 @@ end
 	Initializes the service bag and ensures recursive initialization
 	can occur
 ]=]
-function ServiceBag:Init()
+function ServiceBag.Init(self: ServiceBag)
 	assert(not self._initRunAllowed, "Already initializing")
 	assert(self._serviceTypesToInitializeSet, "Already initialized")
 	self._initRunAllowed = true
@@ -169,14 +190,14 @@ end
 --[=[
 	Starts the service bag and all services
 ]=]
-function ServiceBag:Start()
-	assert(self._serviceTypesToStart, "Already started")
+function ServiceBag.Start(self: ServiceBag)
+	assert(self._serviceTypesToStartSet, "Already started")
 	assert(not self._serviceTypesToInitializeSet, "Not initialized yet. Call serviceBag:Init() first.")
 
 	self._initRunAllowed = false
 
-	while next(self._serviceTypesToStart) do
-		local serviceType = table.remove(self._serviceTypesToStart)
+	while next(self._serviceTypesToStartSet) do
+		local serviceType = table.remove(self._serviceTypesToStartSet)
 		local service = assert(self._services[serviceType], "No service")
 		local serviceName = self:_getServiceName(serviceType)
 
@@ -199,10 +220,10 @@ function ServiceBag:Start()
 		end
 	end
 
-	self._serviceTypesToStart = nil
+	self._serviceTypesToStartSet = nil
 end
 
-function ServiceBag:_getServiceName(serviceType): string
+function ServiceBag._getServiceName(_self: ServiceBag, serviceType): string
 	local serviceName
 	pcall(function()
 		serviceName = serviceType.ServiceName
@@ -218,8 +239,8 @@ end
 	Returns whether the service bag has fully started or not.
 	@return boolean
 ]=]
-function ServiceBag:IsStarted(): boolean
-	return self._serviceTypesToStart == nil
+function ServiceBag.IsStarted(self: ServiceBag): boolean
+	return self._serviceTypesToStartSet == nil
 end
 
 --[=[
@@ -228,14 +249,14 @@ end
 
 	@return ServiceBag
 ]=]
-function ServiceBag:CreateScope()
-	local provider = ServiceBag.new(self)
+function ServiceBag.CreateScope(self: ServiceBag): ServiceBag
+	local provider: ServiceBag = ServiceBag.new(self)
 
 	self:_addServiceType(provider)
 
 	-- Remove from parent provider
-	self._maid[provider] = provider._destroyingSignal:Connect(function()
-		self._maid[provider] = nil
+	self._maid[provider :: any] = provider._destroyingSignal:Connect(function()
+		self._maid[provider :: any] = nil
 		self._services[provider] = nil
 	end)
 
@@ -243,7 +264,7 @@ function ServiceBag:CreateScope()
 end
 
 -- Adds a service to this provider only
-function ServiceBag:_addServiceType(serviceType)
+function ServiceBag._addServiceType<T>(self: ServiceBag, serviceType: T)
 	if self._destructing then
 		local serviceName = self:_getServiceName(serviceType)
 		error(string.format("Cannot query service %q after ServiceBag is cleaned up", serviceName))
@@ -269,7 +290,7 @@ function ServiceBag:_addServiceType(serviceType)
 	self:_ensureInitialization(serviceType)
 end
 
-function ServiceBag:_ensureInitialization(serviceType)
+function ServiceBag._ensureInitialization<T>(self: ServiceBag, serviceType: T)
 	if self._initializedServiceTypeSet[serviceType] then
 		return
 	end
@@ -295,7 +316,9 @@ function ServiceBag:_ensureInitialization(serviceType)
 	end
 end
 
-function ServiceBag:_initService(serviceType)
+function ServiceBag._initService(self: ServiceBag, serviceType)
+	assert(self._serviceTypesToStartSet, "ServiceBag cannot start")
+
 	local service = assert(self._services[serviceType], "No service")
 	local serviceName = self:_getServiceName(serviceType)
 
@@ -318,14 +341,14 @@ function ServiceBag:_initService(serviceType)
 		end
 	end
 
-	table.insert(self._serviceTypesToStart, serviceType)
+	table.insert(self._serviceTypesToStartSet, serviceType)
 end
 
 --[=[
 	Cleans up the service bag and all services that have been
 	initialized in the service bag.
 ]=]
-function ServiceBag:Destroy()
+function ServiceBag.Destroy(self: ServiceBag)
 	if self._destructing then
 		return
 	end
@@ -339,10 +362,10 @@ function ServiceBag:Destroy()
 
 	self:_destructServices()
 
-	super.Destroy(self)
+	super.Destroy(self :: any)
 end
 
-function ServiceBag:_destructServices()
+function ServiceBag._destructServices(self: ServiceBag)
 	local services = self._services
 	local serviceType, service = next(services)
 	while service ~= nil do

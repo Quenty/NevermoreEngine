@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	An input key map list provides a mapping of input modes to input keys.
 	One of these should generally exist per an action with unique bindings.
@@ -53,13 +54,34 @@ local ObservableCountingMap = require("ObservableCountingMap")
 local ObservableMap = require("ObservableMap")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
-local SlottedTouchButtonUtils = require("SlottedTouchButtonUtils")
+local SlottedTouchButtonUtils = (require :: any)("SlottedTouchButtonUtils")
 local StateStack = require("StateStack")
 local String = require("String")
+local _Observable = require("Observable")
+local _Brio = require("Brio")
+local _Set = require("Set")
 
 local InputKeyMapList = setmetatable({}, BaseObject)
 InputKeyMapList.ClassName = "InputKeyMapList"
 InputKeyMapList.__index = InputKeyMapList
+
+export type InputKeyMapList = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_inputKeyMapListName: string,
+		_inputModeTypeToInputKeyMap: any, -- ObservableMap.ObservableMap<InputModeType.InputModeType, InputKeyMap.InputKeyMap>,
+		_inputTypesForBinding: any, -- ObservableCountingMap.ObservableCountingMap<InputTypeUtils.InputType>,
+		_isTapInWorld: StateStack.StateStack<boolean>,
+		_isRobloxTouchButton: StateStack.StateStack<boolean>,
+		_options: InputKeyMapListOptions,
+	},
+	{ __index = InputKeyMapList }
+))
+
+export type InputKeyMapListOptions = {
+	bindingName: string,
+	rebindable: boolean,
+}
 
 --[=[
 	Constructs a new InputKeyMapList
@@ -69,16 +91,19 @@ InputKeyMapList.__index = InputKeyMapList
 	@param options { bindingName: string, rebindable: boolean } -- configuration options
 	@return InputKeyMapList
 ]=]
-function InputKeyMapList.new(inputMapName, inputKeyMapList, options)
-	local self = setmetatable(BaseObject.new(), InputKeyMapList)
+function InputKeyMapList.new(
+	inputMapName: string,
+	inputKeyMapList: { InputKeyMap.InputKeyMap },
+	options: InputKeyMapListOptions
+): InputKeyMapList
+	local self = setmetatable(BaseObject.new() :: any, InputKeyMapList)
 
 	self._inputKeyMapListName = assert(inputMapName, "No inputMapName")
 	self._options = assert(options, "No options")
 
-	self._inputModeTypeToInputKeyMap = ObservableMap.new()
-	self._maid:GiveTask(self._inputModeTypeToInputKeyMap)
+	self._inputModeTypeToInputKeyMap = self._maid:Add(ObservableMap.new())
 
-	for _, inputKeyMap in pairs(inputKeyMapList) do
+	for _, inputKeyMap in inputKeyMapList do
 		self:Add(inputKeyMap)
 	end
 
@@ -93,26 +118,29 @@ end
 	```
 
 	@param inputKeys { any }
-	@param options { bindingName: string, rebindable: boolean } | nil -- Optional configuration options
+	@param options { bindingName: string, rebindable: boolean }? -- Optional configuration options
 	@return InputKeyMapList
 ]=]
-function InputKeyMapList.fromInputKeys(inputKeys, options)
+function InputKeyMapList.fromInputKeys(
+	inputKeys: { InputModeType.InputModeKey },
+	options: InputKeyMapListOptions?
+): InputKeyMapList
 	assert(type(inputKeys) == "table", "Bad inputKeys")
 
-	local self = InputKeyMapList.new("generated", {}, options or {
-		rebindable = false;
-		bindingName = "generated";
+	local self: InputKeyMapList = InputKeyMapList.new("generated", {}, options or {
+		rebindable = false,
+		bindingName = "generated",
 	})
 
 	local INPUT_TYPES = {
-		InputModeTypes.KeyboardAndMouse;
-		InputModeTypes.Gamepads;
-		InputModeTypes.Touch;
+		InputModeTypes.KeyboardAndMouse,
+		InputModeTypes.Gamepads,
+		InputModeTypes.Touch,
 	}
 
-	for _, inputModeType in pairs(INPUT_TYPES) do
+	for _, inputModeType in INPUT_TYPES do
 		local inputTypes = {}
-		for _, item in pairs(inputKeys) do
+		for _, item in inputKeys do
 			if inputModeType:IsValid(item) then
 				table.insert(inputTypes, item)
 			end
@@ -131,7 +159,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function InputKeyMapList.isInputKeyMapList(value)
+function InputKeyMapList.isInputKeyMapList(value: any): boolean
 	return DuckTypeUtils.isImplementation(InputKeyMapList, value)
 end
 
@@ -139,7 +167,7 @@ end
 	Returns user bindable time
 	@return boolean
 ]=]
-function InputKeyMapList:IsUserRebindable()
+function InputKeyMapList.IsUserRebindable(self: InputKeyMapList): boolean
 	return self._options.rebindable == true
 end
 
@@ -147,11 +175,11 @@ end
 	Gets the english name
 	@return string
 ]=]
-function InputKeyMapList:GetBindingName()
+function InputKeyMapList.GetBindingName(self: InputKeyMapList): string
 	return self._options.bindingName
 end
 
-function InputKeyMapList:GetBindingTranslationKey()
+function InputKeyMapList.GetBindingTranslationKey(self: InputKeyMapList): string
 	return "keybinds." .. String.toCamelCase(self._inputKeyMapListName)
 end
 
@@ -159,10 +187,10 @@ end
 	Adds an input key map into the actual list
 	@param inputKeyMap InputKeyMap
 ]=]
-function InputKeyMapList:Add(inputKeyMap)
+function InputKeyMapList.Add(self: InputKeyMapList, inputKeyMap: InputKeyMap.InputKeyMap): ()
 	assert(inputKeyMap, "Bad inputKeyMap")
 
-	self._maid[inputKeyMap:GetInputModeType()] = inputKeyMap
+	self._maid[inputKeyMap:GetInputModeType() :: any] = inputKeyMap
 	self._inputModeTypeToInputKeyMap:Set(inputKeyMap:GetInputModeType(), inputKeyMap)
 end
 
@@ -170,17 +198,21 @@ end
 	Gets the list name and returns it. Used by an input key map provider
 	@return string
 ]=]
-function InputKeyMapList:GetListName()
+function InputKeyMapList.GetListName(self: InputKeyMapList): string
 	return self._inputKeyMapListName
 end
 
-function InputKeyMapList:SetInputTypesList(inputModeType, inputTypes)
+function InputKeyMapList.SetInputTypesList(
+	self: InputKeyMapList,
+	inputModeType: InputModeType.InputModeType,
+	inputTypes
+): ()
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 	assert(type(inputTypes) == "table" or inputTypes == nil, "Bad inputTypes")
 
 	if inputTypes == nil then
 		self._inputModeTypeToInputKeyMap:Remove(inputModeType)
-		self._maid[inputModeType] = nil
+		self._maid[inputModeType :: any] = nil
 	else
 		local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
 		if not inputKeyMap then
@@ -191,13 +223,17 @@ function InputKeyMapList:SetInputTypesList(inputModeType, inputTypes)
 	end
 end
 
-function InputKeyMapList:SetDefaultInputTypesList(inputModeType, inputTypes)
+function InputKeyMapList.SetDefaultInputTypesList(
+	self: InputKeyMapList,
+	inputModeType: InputModeType.InputModeType,
+	inputTypes
+): ()
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 	assert(type(inputTypes) == "table" or inputTypes == nil, "Bad inputTypes")
 
 	if inputTypes == nil then
 		self._inputModeTypeToInputKeyMap:Remove(inputModeType)
-		self._maid[inputModeType] = nil
+		self._maid[inputModeType :: any] = nil
 	else
 		local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
 		if not inputKeyMap then
@@ -208,8 +244,17 @@ function InputKeyMapList:SetDefaultInputTypesList(inputModeType, inputTypes)
 	end
 end
 
-function InputKeyMapList:GetInputTypesList(inputModeType)
-	local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
+--[=[
+	Gets the input types list for this input key map
+
+	@param inputModeType InputModeType
+	@return { InputType }
+]=]
+function InputKeyMapList.GetInputTypesList(
+	self: InputKeyMapList,
+	inputModeType: InputModeType.InputModeType
+): { InputTypeUtils.InputType }
+	local inputKeyMap: InputKeyMap.InputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
 	if inputKeyMap then
 		return inputKeyMap:GetInputTypesList()
 	else
@@ -217,7 +262,25 @@ function InputKeyMapList:GetInputTypesList(inputModeType)
 	end
 end
 
-function InputKeyMapList:GetDefaultInputTypesList(inputModeType)
+--[=[
+	Gets the input key maps list
+
+	@return { InputKeyMap }
+]=]
+function InputKeyMapList:GetInputKeyMaps(): { InputKeyMap.InputKeyMap }
+	return self._inputModeTypeToInputKeyMap:GetValueList()
+end
+
+--[=[
+	Gets the default input types list for this input key map
+
+	@param inputModeType InputModeType
+	@return { InputType }
+]=]
+function InputKeyMapList.GetDefaultInputTypesList(
+	self: InputKeyMapList,
+	inputModeType: InputModeType.InputModeType
+): { InputTypeUtils.InputType }
 	local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
 	if inputKeyMap then
 		return inputKeyMap:GetDefaultInputTypesList()
@@ -230,15 +293,17 @@ end
 	Observes a brio with the first value as the InputModeType and the second value as the KeyMapList
 	@return Observable<Brio<InputModeType, InputKeyMap>>
 ]=]
-function InputKeyMapList:ObservePairsBrio()
+function InputKeyMapList.ObservePairsBrio(self: InputKeyMapList): _Observable.Observable<
+	_Brio.Brio<InputModeType.InputModeType, InputKeyMap.InputKeyMap>
+>
 	return self._inputModeTypeToInputKeyMap:ObservePairsBrio()
 end
 
 --[=[
 	Restores the default value for all lists
 ]=]
-function InputKeyMapList:RestoreDefault()
-	for _, item in pairs(self._inputModeTypeToInputKeyMap:GetValueList()) do
+function InputKeyMapList.RestoreDefault(self: InputKeyMapList): ()
+	for _, item in self._inputModeTypeToInputKeyMap:GetValueList() do
 		item:RestoreDefault()
 	end
 end
@@ -248,7 +313,7 @@ end
 
 	@param inputModeType InputModeType
 ]=]
-function InputKeyMapList:RemoveInputModeType(inputModeType)
+function InputKeyMapList.RemoveInputModeType(self: InputKeyMapList, inputModeType: InputModeType.InputModeType): ()
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	self:SetInputTypesList(inputModeType, nil)
@@ -257,14 +322,18 @@ end
 --[=[
 	@return Observable<Brio<InputKeyMap>>
 ]=]
-function InputKeyMapList:ObserveInputKeyMapsBrio()
+function InputKeyMapList.ObserveInputKeyMapsBrio(
+	self: InputKeyMapList
+): _Observable.Observable<_Brio.Brio<InputKeyMap.InputKeyMap>>
 	return self._inputModeTypeToInputKeyMap:ObserveValuesBrio()
 end
 
 --[=[
 	@return Observable<Brio<InputModeType>>
 ]=]
-function InputKeyMapList:ObserveInputModesTypesBrio()
+function InputKeyMapList.ObserveInputModesTypesBrio(
+	self: InputKeyMapList
+): _Observable.Observable<_Brio.Brio<InputModeType.InputModeType>>
 	return self._inputModeTypeToInputKeyMap:ObserveKeysBrio()
 end
 
@@ -272,9 +341,12 @@ end
 	Observes the input types for the active input map
 
 	@param inputModeType InputModeType
-	@return Observable<InputKeyMap>
+	@return Observable<InputKeyMap?>
 ]=]
-function InputKeyMapList:ObserveInputKeyMapForInputMode(inputModeType)
+function InputKeyMapList.ObserveInputKeyMapForInputMode(
+	self: InputKeyMapList,
+	inputModeType: InputModeType.InputModeType
+): _Observable.Observable<InputKeyMap.InputKeyMap?>
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	return self._inputModeTypeToInputKeyMap:ObserveValueForKey(inputModeType)
@@ -285,7 +357,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function InputKeyMapList:ObserveIsTapInWorld()
+function InputKeyMapList.ObserveIsTapInWorld(self: InputKeyMapList): _Observable.Observable<boolean>
 	self:_ensureInit()
 
 	return self._isTapInWorld:Observe()
@@ -296,7 +368,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function InputKeyMapList:ObserveIsRobloxTouchButton()
+function InputKeyMapList.ObserveIsRobloxTouchButton(self: InputKeyMapList)
 	self:_ensureInit()
 
 	return self._isRobloxTouchButton:Observe()
@@ -307,7 +379,7 @@ end
 
 	@return boolean
 ]=]
-function InputKeyMapList:IsRobloxTouchButton()
+function InputKeyMapList.IsRobloxTouchButton(self: InputKeyMapList): boolean
 	self:_ensureInit()
 
 	return self._isRobloxTouchButton:GetState()
@@ -318,7 +390,7 @@ end
 
 	@return boolean
 ]=]
-function InputKeyMapList:IsTouchTapInWorld()
+function InputKeyMapList.IsTouchTapInWorld(self: InputKeyMapList): boolean
 	self:_ensureInit()
 
 	return self._isTapInWorld:GetState()
@@ -329,10 +401,23 @@ end
 
 	@return Observable<{UserInputType | KeyCode}>
 ]=]
-function InputKeyMapList:ObserveInputEnumsList()
+function InputKeyMapList.ObserveInputEnumsList(
+	self: InputKeyMapList
+): _Observable.Observable<{ InputTypeUtils.InputType }>
 	self:_ensureInit()
 
 	return self._inputTypesForBinding:ObserveKeysList()
+end
+
+--[=[
+	Gets the input enums list, which can be used for bindings.
+
+	@return {UserInputType | KeyCode}
+]=]
+function InputKeyMapList.GetInputEnumsList(self: InputKeyMapList): { InputTypeUtils.InputType }
+	self:_ensureInit()
+
+	return self._inputTypesForBinding:GetKeyList()
 end
 
 --[=[
@@ -340,7 +425,9 @@ end
 
 	@return Observable<{[UserInputType | KeyCode]: true }>
 ]=]
-function InputKeyMapList:ObserveInputEnumsSet()
+function InputKeyMapList.ObserveInputEnumsSet(
+	self: InputKeyMapList
+): _Observable.Observable<_Set.Set<InputTypeUtils.InputType>>
 	self:_ensureInit()
 
 	return self._inputTypesForBinding:ObserveKeysSet()
@@ -351,15 +438,16 @@ end
 
 	@return Observable<SlottedTouchButton>
 ]=]
-function InputKeyMapList:ObserveSlottedTouchButtonDataBrio()
+function InputKeyMapList.ObserveSlottedTouchButtonDataBrio(self: InputKeyMapList)
 	return self._inputModeTypeToInputKeyMap:ObservePairsBrio():Pipe({
 		RxBrioUtils.flatMapBrio(function(inputModeType, inputKeyMap)
 			return inputKeyMap:ObserveInputTypesList():Pipe({
-				Rx.switchMap(function(inputTypesList)
+				Rx.switchMap(function(inputTypesList: { InputTypeUtils.InputType }): any
 					local valid = {}
-					for _, inputType in pairs(inputTypesList) do
+					for _, inputType in inputTypesList do
 						if SlottedTouchButtonUtils.isSlottedTouchButton(inputType) then
-							local data = SlottedTouchButtonUtils.createTouchButtonData(inputType.slotId, inputModeType)
+							local data =
+								SlottedTouchButtonUtils.createTouchButtonData((inputType :: any).slotId, inputModeType)
 							table.insert(valid, Brio.new(data))
 						end
 					end
@@ -369,48 +457,50 @@ function InputKeyMapList:ObserveSlottedTouchButtonDataBrio()
 					else
 						return Rx.of(unpack(valid))
 					end
-				end)
+				end),
 			})
-		end);
+		end),
 	})
 end
 
-function InputKeyMapList:GetModifierChords(_inputEnumType)
+function InputKeyMapList.GetModifierChords(_self: InputKeyMapList, _inputEnumType)
 	-- TODO: Provide way to query modifer chords
 	return {}
 end
 
-function InputKeyMapList:_ensureInit()
+function InputKeyMapList._ensureInit(self: InputKeyMapList)
 	if self._inputTypesForBinding then
 		return self._inputTypesForBinding
 	end
 
-	self._inputTypesForBinding = self._maid:Add(ObservableCountingMap.new())
+	local countingMap: ObservableCountingMap.ObservableCountingMap<InputTypeUtils.InputType> =
+		self._maid:Add(ObservableCountingMap.new()) :: any
+	self._inputTypesForBinding = countingMap
 	self._isTapInWorld = self._maid:Add(StateStack.new(false, "boolean"))
 	self._isRobloxTouchButton = self._maid:Add(StateStack.new(false, "boolean"))
 
 	-- Listen
-	self._maid:GiveTask(self._inputModeTypeToInputKeyMap:ObserveValuesBrio():Subscribe(function(brio)
+	self._maid:GiveTask(self._inputModeTypeToInputKeyMap:ObserveValuesBrio():Subscribe(function(brio: Brio.Brio<InputKeyMap.InputKeyMap>)
 		if brio:IsDead() then
 			return
 		end
 
 		local inputKeyMapMaid = brio:ToMaid()
-		local inputKeyMap = brio:GetValue()
+		local inputKeyMap: InputKeyMap.InputKeyMap = brio:GetValue()
 
 		inputKeyMapMaid:GiveTask(inputKeyMap:ObserveInputTypesList():Subscribe(function(inputTypes)
 			local maid = Maid.new()
 
-			for _, inputType in pairs(inputTypes) do
+			for _, inputType in inputTypes do
 				-- only emit enum items
 				if typeof(inputType) == "EnumItem" then
-					maid:GiveTask(self._inputTypesForBinding:Add(inputType))
+					maid:GiveTask(countingMap:Add(inputType :: any))
 				elseif InputTypeUtils.isTapInWorld(inputType) then
 					maid:GiveTask(self._isTapInWorld:PushState(true))
 				elseif InputTypeUtils.isRobloxTouchButton(inputType) then
 					maid:GiveTask(self._isRobloxTouchButton:PushState(true))
 				elseif InputChordUtils.isModifierInputChord(inputType) then
-					maid:GiveTask(self._inputTypesForBinding:Add(inputType.keyCode))
+					maid:GiveTask(countingMap:Add((inputType :: any).keyCode))
 				end
 			end
 

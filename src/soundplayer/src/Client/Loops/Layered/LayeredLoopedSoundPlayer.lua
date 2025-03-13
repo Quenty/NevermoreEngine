@@ -158,8 +158,8 @@ function LayeredLoopedSoundPlayer:_getOrCreateLayer(layerId)
 	return layer
 end
 
-function LayeredLoopedSoundPlayer:StopLayer(layerId)
-	assert(type(layerId) == "string", 'Bad layerId')
+function LayeredLoopedSoundPlayer:StopLayer(layerId: string)
+	assert(type(layerId) == "string", "Bad layerId")
 
 	self._layerMaid[layerId] = nil
 end

@@ -75,7 +75,7 @@ end
 function PlayerSettings:_setSettingsMap(settingsMap)
 	assert(type(settingsMap) == "table", "Bad settingsMap")
 
-	for settingName, value in pairs(settingsMap) do
+	for settingName, value in settingsMap do
 		assert(type(settingName) == "string", "Bad key")
 
 		-- Avoid even letting these be set.

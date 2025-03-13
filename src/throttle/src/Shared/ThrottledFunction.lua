@@ -3,11 +3,17 @@
 	@class ThrottledFunction
 ]=]
 
+export type ThrottleConfig = {
+	leading: boolean?,
+	trailing: boolean?,
+	leadingFirstTimeOnly: boolean?,
+}
+
 local ThrottledFunction = {}
 ThrottledFunction.ClassName = "ThrottledFunction"
 ThrottledFunction.__index = ThrottledFunction
 
-function ThrottledFunction.new(timeoutInSeconds, func, config)
+function ThrottledFunction.new(timeoutInSeconds: number, func, config: ThrottleConfig)
 	local self = setmetatable({}, ThrottledFunction)
 
 	self._nextCallTimeStamp = 0
@@ -24,7 +30,7 @@ function ThrottledFunction.new(timeoutInSeconds, func, config)
 	return self
 end
 
-function ThrottledFunction:Call(...)
+function ThrottledFunction:Call<T...>(...: T...)
 	if self._trailingValue then
 		-- Update the next value to be dispatched
 		self._trailingValue = table.pack(...)
@@ -72,14 +78,14 @@ function ThrottledFunction:_dispatch()
 	end
 end
 
-function ThrottledFunction:_configureOrError(throttleConfig)
+function ThrottledFunction:_configureOrError(throttleConfig: ThrottleConfig)
 	if throttleConfig == nil then
 		return
 	end
 
 	assert(type(throttleConfig) == "table", "Bad throttleConfig")
 
-	for key, value in pairs(throttleConfig) do
+	for key, value in throttleConfig do
 		assert(type(value) == "boolean", "Bad throttleConfig entry")
 
 		if key == "leading" then

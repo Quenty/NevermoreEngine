@@ -23,6 +23,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local SERVER_UPDATE_RATE = 1 / 10
 
@@ -42,7 +43,7 @@ IKService.ServiceName = "IKService"
 
 	@param serviceBag ServiceBag
 ]=]
-function IKService:Init(serviceBag)
+function IKService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._maid, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -75,7 +76,7 @@ function IKService:Start()
 		self:_handlePlayerRemoving(player)
 	end))
 
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		self:_handlePlayer(player)
 	end
 
@@ -171,7 +172,7 @@ end
 function IKService:_updateStepped()
 	debug.profilebegin("IKUpdateServer")
 
-	for _, rig in pairs(self._ikRigBinder:GetAll()) do
+	for _, rig in self._ikRigBinder:GetAll() do
 		debug.profilebegin("RigUpdateServer")
 
 		local lastUpdateTime = rig:GetLastUpdateTime()

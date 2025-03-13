@@ -13,7 +13,7 @@ local TieSignalDefinition = setmetatable({}, TieMemberDefinition)
 TieSignalDefinition.ClassName = "TieSignalDefinition"
 TieSignalDefinition.__index = TieSignalDefinition
 
-function TieSignalDefinition.new(tieDefinition, signalName, memberTieRealm)
+function TieSignalDefinition.new(tieDefinition, signalName: string, memberTieRealm)
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
 	local self = setmetatable(TieMemberDefinition.new(tieDefinition, signalName, memberTieRealm), TieSignalDefinition)

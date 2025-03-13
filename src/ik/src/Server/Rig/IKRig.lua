@@ -16,7 +16,7 @@ local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
 IKRig.__index = IKRig
 
-function IKRig.new(humanoid, serviceBag)
+function IKRig.new(humanoid: Humanoid, serviceBag)
 	local self = setmetatable(IKRigBase.new(humanoid, serviceBag), IKRig)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -44,7 +44,7 @@ end
 
 	@param target Vector3?
 ]=]
-function IKRig:SetAimPosition(target)
+function IKRig:SetAimPosition(target: Vector3?)
 	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 
 	self:_applyAimPosition(target)
@@ -62,7 +62,7 @@ function IKRig:_setupRemoting()
 	end))
 end
 
-function IKRig:_applyAimPosition(target)
+function IKRig:_applyAimPosition(target: Vector3?)
 	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 
 	-- Guard against NaN

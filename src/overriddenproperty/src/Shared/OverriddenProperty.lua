@@ -21,7 +21,12 @@ OverriddenProperty.__index = OverriddenProperty
 	@param replicateCallback (T)?
 	@return OverriddenProperty
 ]=]
-function OverriddenProperty.new(robloxInstance, propertyName, replicateRate, replicateCallback)
+function OverriddenProperty.new(
+	robloxInstance: Instance,
+	propertyName: string,
+	replicateRate: number?,
+	replicateCallback: (any) -> ()
+)
 	local self = setmetatable(BaseObject.new(robloxInstance), OverriddenProperty)
 
 	assert(typeof(robloxInstance) == "Instance", "Bad robloxInstance")
@@ -64,7 +69,7 @@ function OverriddenProperty:Get()
 	return self._value
 end
 
-function OverriddenProperty:_executeSet(doReplicate)
+function OverriddenProperty:_executeSet(doReplicate: boolean)
 	self:_pushDisconnectChange()
 	self._obj[self._propertyName] = self._value
 

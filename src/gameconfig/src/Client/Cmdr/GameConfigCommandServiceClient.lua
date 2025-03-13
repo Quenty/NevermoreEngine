@@ -8,11 +8,12 @@ local GameConfigCmdrUtils = require("GameConfigCmdrUtils")
 local Maid = require("Maid")
 local RxStateStackUtils = require("RxStateStackUtils")
 local Rx = require("Rx")
+local _ServiceBag = require("ServiceBag")
 
 local GameConfigCommandServiceClient = {}
 GameConfigCommandServiceClient.ServiceName = "GameConfigCommandServiceClient"
 
-function GameConfigCommandServiceClient:Init(serviceBag)
+function GameConfigCommandServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

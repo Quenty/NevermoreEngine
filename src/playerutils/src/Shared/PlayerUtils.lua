@@ -86,15 +86,15 @@ function PlayerUtils.addVerifiedBadgeToName(name: string): string
 	return string.format("%s %s", name, utf8.char(0xE000))
 end
 
-local NAME_COLORS = {
-	BrickColor.new("Bright red").Color,
-	BrickColor.new("Bright blue").Color,
-	BrickColor.new("Earth green").Color,
-	BrickColor.new("Bright violet").Color,
-	BrickColor.new("Bright orange").Color,
-	BrickColor.new("Bright yellow").Color,
-	BrickColor.new("Light reddish violet").Color,
-	BrickColor.new("Brick yellow").Color,
+local NAME_COLORS: { Color3 } = {
+	(BrickColor :: any).new("Bright red").Color,
+	(BrickColor :: any).new("Bright blue").Color,
+	(BrickColor :: any).new("Earth green").Color,
+	(BrickColor :: any).new("Bright violet").Color,
+	(BrickColor :: any).new("Bright orange").Color,
+	(BrickColor :: any).new("Bright yellow").Color,
+	(BrickColor :: any).new("Light reddish violet").Color,
+	(BrickColor :: any).new("Brick yellow").Color,
 }
 
 local function hashName(playerName: string): number
@@ -129,7 +129,7 @@ end
 	@param player Player
 	@return Promise<Model>
 ]=]
-function PlayerUtils.promiseLoadCharacter(player: Player)
+function PlayerUtils.promiseLoadCharacter(player: Player): Promise.Promise<Model>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return Promise.spawn(function(resolve, reject)
@@ -154,7 +154,7 @@ end
 function PlayerUtils.promiseLoadCharacterWithHumanoidDescription(
 	player: Player,
 	humanoidDescription: HumanoidDescription
-)
+): Promise.Promise<Model>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(
 		typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"),

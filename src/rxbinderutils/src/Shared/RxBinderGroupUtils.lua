@@ -27,7 +27,7 @@ function RxBinderGroupUtils.observeBinders(binderGroup)
 			sub:Fire(binder)
 		end))
 
-		for _, binder in pairs(binderGroup:GetBinders()) do
+		for _, binder in binderGroup:GetBinders() do
 			sub:Fire(binder)
 		end
 

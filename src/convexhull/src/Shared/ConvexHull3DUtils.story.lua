@@ -41,7 +41,7 @@ local function drawBlockCast(cframe, size, direction)
 	box2.Parent = folder
 
 	local points = {}
-	for _, corner in pairs(CORNERS) do
+	for _, corner in CORNERS do
 		local beginPoint = beginCFrame:PointToWorldSpace(corner * size)
 		local finishPoint = finishCFrame:PointToWorldSpace(corner * size)
 

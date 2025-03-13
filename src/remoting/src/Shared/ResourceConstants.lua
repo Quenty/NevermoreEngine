@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Holds constants for resource retrieval.
 	@class ResourceConstants

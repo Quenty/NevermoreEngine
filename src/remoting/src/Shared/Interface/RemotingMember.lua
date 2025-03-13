@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helper class for the [Remoting] object which allows more natural syntax
 	to be used against the remoting API surface.
@@ -13,6 +14,8 @@ local RemotingMember = {}
 RemotingMember.ClassName = "RemotingMember"
 RemotingMember.__index = RemotingMember
 
+export type RemotingMember = typeof(setmetatable({}, RemotingMember))
+
 --[=[
 	Constructs a new RemotingMember
 
@@ -21,7 +24,7 @@ RemotingMember.__index = RemotingMember
 	@param remotingRealm RemotingRealms
 	@return RemotingMember
 ]=]
-function RemotingMember.new(remoting, memberName, remotingRealm)
+function RemotingMember.new(remoting, memberName: string, remotingRealm: RemotingRealms.RemotingRealm): RemotingMember
 	local self = setmetatable({}, RemotingMember)
 
 	self._remoting = assert(remoting, "No remoting")
@@ -40,7 +43,7 @@ end
 	@param callback function
 	@return MaidTask
 ]=]
-function RemotingMember:Bind(callback)
+function RemotingMember:Bind(callback: (...any) -> ...any)
 	assert(type(callback) == "function", "Bad callback")
 
 	return self._remoting:Bind(self._memberName, callback)
@@ -57,7 +60,7 @@ end
 	@param callback function
 	@return MaidTask
 ]=]
-function RemotingMember:Connect(callback)
+function RemotingMember:Connect(callback: (...any) -> ())
 	assert(type(callback) == "function", "Bad callback")
 
 	return self._remoting:Connect(self._memberName, callback)
@@ -125,7 +128,6 @@ function RemotingMember:PromiseFireServer(...)
 	return self._remoting:PromiseFireServer(self._memberName, ...)
 end
 
-
 --[=[
 	Invokes the client from the server.
 
@@ -136,7 +138,7 @@ end
 	@param ... any
 	@return Promise<any>
 ]=]
-function RemotingMember:PromiseInvokeClient(player, ...)
+function RemotingMember:PromiseInvokeClient(player: Player, ...)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self._remotingRealm == RemotingRealms.SERVER, "PromiseInvokeClient must be called on client")
 
@@ -182,8 +184,11 @@ end
 	@param excludePlayer Player | nil
 	@param ... any
 ]=]
-function RemotingMember:FireAllClientsExcept(excludePlayer, ...)
-	assert(typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil, "Bad excludePlayer")
+function RemotingMember:FireAllClientsExcept(excludePlayer: Player, ...)
+	assert(
+		typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil,
+		"Bad excludePlayer"
+	)
 	assert(self._remotingRealm == RemotingRealms.SERVER, "FireAllClientsExcept must be called on server")
 
 	self._remoting:FireAllClientsExcept(self._memberName, excludePlayer, ...)
@@ -198,7 +203,7 @@ end
 	@param player Instance
 	@param ... any
 ]=]
-function RemotingMember:FireClient(player, ...)
+function RemotingMember:FireClient(player: Player, ...)
 	assert(self._remotingRealm == RemotingRealms.SERVER, "FireClient must be called on client")
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 

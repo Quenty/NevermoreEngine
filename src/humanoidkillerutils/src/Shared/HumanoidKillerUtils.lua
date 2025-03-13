@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Tags and retrieves killer. This is the old API surface to register KOs
 	in Roblox, and many legacy systems still use the creator tag. The contract
@@ -20,7 +21,7 @@ local TAG_LIFETIME = 1
 	@param humanoid Humanoid
 ]=]
 function HumanoidKillerUtils.untagKiller(humanoid: Humanoid)
-	for _, item in pairs(humanoid:GetChildren()) do
+	for _, item in humanoid:GetChildren() do
 		if item:IsA("ObjectValue") and item.Name == TAG_NAME then
 			item:Destroy()
 		end

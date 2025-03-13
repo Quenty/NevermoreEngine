@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions wrapping SocialService with promises
 	@class SocialServiceUtils
@@ -17,7 +18,7 @@ local SocialServiceUtils = {}
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function SocialServiceUtils.promiseCanSendGameInvite(player: Player)
+function SocialServiceUtils.promiseCanSendGameInvite(player: Player): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return Promise.spawn(function(resolve, reject)
@@ -40,7 +41,7 @@ end
 	@param options ExperienceInviteOptions?
 	@return Promise
 ]=]
-function SocialServiceUtils.promisePromptGameInvite(player: Player, options: ExperienceInviteOptions?)
+function SocialServiceUtils.promisePromptGameInvite(player: Player, options: ExperienceInviteOptions?): Promise.Promise<()>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(not options or (typeof(options) == "Instance" and options:IsA("ExperienceInviteOptions")), "Bad options")
 
@@ -48,7 +49,7 @@ function SocialServiceUtils.promisePromptGameInvite(player: Player, options: Exp
 
 	return Promise.spawn(function(resolve, reject)
 		maid:GiveTask(SocialService.GameInvitePromptClosed:Connect(function(closingPlayer)
-			if closingPlayer == player then
+			if (closingPlayer :: any) == player then
 				resolve(player)
 			end
 		end))
@@ -61,6 +62,7 @@ function SocialServiceUtils.promisePromptGameInvite(player: Player, options: Exp
 		end
 
 		-- TODO: Maybe timeout here?
+		return
 	end):Tap(function()
 		maid:DoCleaning()
 	end, function()

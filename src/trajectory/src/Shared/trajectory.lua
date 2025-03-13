@@ -48,7 +48,7 @@ local function trajectory(
 			local v0 = Vector3.new(v0x, ty > g * tx2 / (2 * v2) and v0y or -v0y, v0z)
 			local v1 = Vector3.new(v1x, v1y, v1z)
 
-			return v0, v1
+			return v0, v1, nil
 		else
 			return nil, nil, Vector3.new(rx, (tx2 ^ 0.5), rz).Unit * initialVelocity
 		end

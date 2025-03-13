@@ -64,7 +64,7 @@ end
 	@param data any
 	@return boolean
 ]=]
-function AdorneeDataEntry.isAdorneeDataEntry(data)
+function AdorneeDataEntry.isAdorneeDataEntry(data: any): boolean
 	return DuckTypeUtils.isImplementation(AdorneeDataEntry, data)
 end
 
@@ -74,7 +74,7 @@ end
 	@param adornee Instance
 	@return ValueObject<T>
 ]=]
-function AdorneeDataEntry:Create(adornee)
+function AdorneeDataEntry:Create(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return self._createValueObject(adornee)
@@ -86,7 +86,7 @@ end
 	@param adornee Instance
 	@return Observable<T>
 ]=]
-function AdorneeDataEntry:Observe(adornee)
+function AdorneeDataEntry:Observe(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local valueObject = self:Create(adornee)

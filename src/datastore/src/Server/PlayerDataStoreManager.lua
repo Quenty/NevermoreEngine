@@ -17,7 +17,7 @@
 
 	local topMaid = Maid.new()
 
-	local function handlePlayer(player)
+	local function handlePlayer(player: Player)
 		local maid = Maid.new()
 
 		local playerMoneyValue = Instance.new("IntValue")
@@ -39,7 +39,7 @@
 	Players.PlayerRemoving:Connect(function(player)
 		topMaid[player] = nil
 	end)
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		task.spawn(handlePlayer, player)
 	end
 	```
@@ -72,7 +72,7 @@ PlayerDataStoreManager.__index = PlayerDataStoreManager
 	@param skipBindingToClose boolean?
 	@return PlayerDataStoreManager
 ]=]
-function PlayerDataStoreManager.new(robloxDataStore, keyGenerator, skipBindingToClose)
+function PlayerDataStoreManager.new(robloxDataStore: DataStore, keyGenerator, skipBindingToClose)
 	local self = setmetatable(BaseObject.new(), PlayerDataStoreManager)
 
 	assert(type(skipBindingToClose) == "boolean" or skipBindingToClose == nil, "Bad skipBindingToClose")
@@ -131,7 +131,7 @@ end
 
 	@param player Player
 ]=]
-function PlayerDataStoreManager:RemovePlayerDataStore(player)
+function PlayerDataStoreManager:RemovePlayerDataStore(player: Player)
 	self:_removePlayerDataStore(player)
 end
 
@@ -139,7 +139,7 @@ end
 	@param player Player
 	@return DataStore
 ]=]
-function PlayerDataStoreManager:GetDataStore(player)
+function PlayerDataStoreManager:GetDataStore(player: Player)
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(player:IsA("Player"), "Bad player")
 
@@ -161,13 +161,13 @@ end
 	@return Promise
 ]=]
 function PlayerDataStoreManager:PromiseAllSaves()
-	for player, _ in pairs(self._datastores) do
+	for player, _ in self._datastores do
 		self:_removePlayerDataStore(player)
 	end
 	return self._maid:GivePromise(PromiseUtils.all(self._pendingSaves:GetAll()))
 end
 
-function PlayerDataStoreManager:_createDataStore(player)
+function PlayerDataStoreManager:_createDataStore(player: Player)
 	assert(not self._datastores[player], "Bad player")
 
 	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(player))
@@ -182,7 +182,7 @@ function PlayerDataStoreManager:_createDataStore(player)
 	return datastore
 end
 
-function PlayerDataStoreManager:_removePlayerDataStore(player)
+function PlayerDataStoreManager:_removePlayerDataStore(player: Player)
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(player:IsA("Player"), "Bad player")
 
@@ -194,7 +194,7 @@ function PlayerDataStoreManager:_removePlayerDataStore(player)
 	self._removing[player] = true
 
 	local removingPromises = {}
-	for _, func in pairs(self._removingCallbacks) do
+	for _, func in self._removingCallbacks do
 		local result = func(player)
 		if Promise.isPromise(result) then
 			table.insert(removingPromises, result)
@@ -215,7 +215,7 @@ function PlayerDataStoreManager:_removePlayerDataStore(player)
 	self._maid._savingConns[player] = nil
 end
 
-function PlayerDataStoreManager:_getKey(player)
+function PlayerDataStoreManager:_getKey(player: Player)
 	return self._keyGenerator(player)
 end
 

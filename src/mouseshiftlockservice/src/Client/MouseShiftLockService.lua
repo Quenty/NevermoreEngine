@@ -72,7 +72,7 @@ function MouseShiftLockService:_buildPromiseReady()
 			return reject(err)
 		end
 
-		resolve()
+		return resolve()
 	end)
 end
 

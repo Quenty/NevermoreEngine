@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class ConvexHull2DUtils
 ]=]
@@ -11,7 +12,7 @@ local ConvexHull2DUtils = {}
 ]=]
 function ConvexHull2DUtils.convexHull(points: { Vector2 }): { Vector2 }
 	table.sort(points, function(a, b)
-		return a.x < b.x
+		return a.X < b.X
 	end)
 
 	local pointOnHull = points[1]
@@ -22,7 +23,7 @@ function ConvexHull2DUtils.convexHull(points: { Vector2 }): { Vector2 }
 
 		local endpoint = points[1]
 
-		for i=1, #points do
+		for i = 1, #points do
 			local point = points[i]
 
 			-- endpoint == pointOnHull is a rare case and can happen only when j == 1 and a better endpoint has not yet been set for the loop
@@ -40,7 +41,7 @@ end
 	Retrns whether these 3 points are in a clockwise turn
 ]=]
 function ConvexHull2DUtils.isClockWiseTurn(p1: Vector2, p2: Vector2, p3: Vector2): boolean
-	return (p3.y - p1.y)*(p2.x - p1.x) < (p2.y - p1.y)*(p3.x - p1.x)
+	return (p3.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (p3.X - p1.X)
 end
 
 --[=[
@@ -49,9 +50,9 @@ end
 function ConvexHull2DUtils.lineIntersect(a: Vector2, b: Vector2, c: Vector2, d: Vector2): Vector2 | nil
 	local r = b - a
 	local s = d - c
-	local dot = r.x * s.y - r.y * s.x
-	local u = ((c.x - a.x) * r.y - (c.y - a.y) * r.x) / dot
-	local t = ((c.x - a.x) * s.y - (c.y - a.y) * s.x) / dot
+	local dot = r.X * s.Y - r.Y * s.X
+	local u = ((c.X - a.X) * r.Y - (c.Y - a.Y) * r.X) / dot
+	local t = ((c.X - a.X) * s.Y - (c.Y - a.Y) * s.X) / dot
 	return (0 <= u and u <= 1 and 0 <= t and t <= 1) and a + t * r or nil
 end
 
@@ -64,21 +65,21 @@ function ConvexHull2DUtils.raycast(from: Vector2, to: Vector2, hull: { Vector2 }
 
 	for i = 1, n do
 		local current = hull[i]
-		local after = hull[i%n + 1]
+		local after = hull[i % n + 1]
 		local point = ConvexHull2DUtils.lineIntersect(current, after, from, to)
 		if point then
 			table.insert(candidates, {
-				point = point;
-				startPoint = current;
-				finishPoint = after;
+				point = point,
+				startPoint = current,
+				finishPoint = after,
 			})
 		end
 	end
 
 	local closest
 	local closestDist = math.huge
-	for _, data in pairs(candidates) do
-		local dist = (data.point - from).magnitude
+	for _, data in candidates do
+		local dist = (data.point - from).Magnitude
 		if dist < closestDist then
 			closest = data
 			closestDist = dist

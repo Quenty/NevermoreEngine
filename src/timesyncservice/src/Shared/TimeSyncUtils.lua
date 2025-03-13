@@ -16,7 +16,7 @@ local TimeSyncUtils = {}
 	@param clock MasterClock | SlaveClock
 	@return Promise<MasterClock | SlaveClock>
 ]=]
-function TimeSyncUtils.promiseClockSynced(clock)
+function TimeSyncUtils.promiseClockSynced(clock: any): Promise.Promise<any>
 	if clock:IsSynced() then
 		return Promise.resolved(clock)
 	end

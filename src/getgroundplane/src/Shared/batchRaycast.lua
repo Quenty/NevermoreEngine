@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Batch raycast utility function
 	@private
@@ -5,10 +6,11 @@
 ]=]
 
 local function batchRaycast(
-	originList, directionList,
-	ignoreListWorkingEnvironment,
-	ignoreFunc, keepIgnoreListChanges
-)
+	originList: {Vector3}, directionList: { Vector3 },
+	ignoreListWorkingEnvironment: { Instance },
+	ignoreFunc: (Instance) -> boolean, keepIgnoreListChanges: boolean
+): { RaycastResult }
+
 	local resultList = {}
 	local initialIgnoreListLength = #ignoreListWorkingEnvironment
 
@@ -19,7 +21,7 @@ local function batchRaycast(
 	for i in next, originList do
 		local origin = originList[i]
 		local direction = directionList[i]
-		local target--we'll use these later maybe
+		local target --we'll use these later maybe
 		local offset
 		while true do
 			local result = workspace:Raycast(origin, direction, params)
@@ -29,7 +31,7 @@ local function batchRaycast(
 
 				if not target then--initialize these
 					target = origin + direction
-					offset = 1e-3/direction.magnitude*direction
+					offset = 1e-3 / direction.Magnitude * direction
 				end
 
 				origin = result.Position - offset

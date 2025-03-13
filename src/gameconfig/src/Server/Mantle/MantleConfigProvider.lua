@@ -11,6 +11,7 @@ local GameConfigService = require("GameConfigService")
 local GameConfigUtils = require("GameConfigUtils")
 local String = require("String")
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local MantleConfigProvider = {}
 MantleConfigProvider.ClassName = "MantleConfigProvider"
@@ -24,13 +25,13 @@ function MantleConfigProvider.new(container)
 	return self
 end
 
-function MantleConfigProvider:Init(serviceBag)
+function MantleConfigProvider:Init(serviceBag: _ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigService = self._serviceBag:GetService(GameConfigService)
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)
 	self._maid = Maid.new()
 
-	for _, item in pairs(self._container:GetChildren()) do
+	for _, item in self._container:GetChildren() do
 		if item:IsA("ModuleScript") then
 			self:_loadConfig(item)
 		end
@@ -97,7 +98,7 @@ function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 		asset.Parent = GameConfigUtils.getOrCreateAssetFolder(gameConfig, assetType)
 	end
 
-	for key, value in pairs(mantleConfigData) do
+	for key, value in mantleConfigData do
 		if type(value) == "table" then
 			addAsset("badge", GameConfigAssetTypes.BADGE, key, value)
 			addAsset("pass", GameConfigAssetTypes.PASS, key, value)

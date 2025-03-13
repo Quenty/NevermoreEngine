@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RxInputObjectUtils
 ]=]
@@ -12,7 +13,13 @@ local InputObjectUtils = require("InputObjectUtils")
 
 local RxInputObjectUtils = {}
 
-function RxInputObjectUtils.observeInputObjectEnded(initialInputObject)
+--[=[
+	Observes the input object ended event. This will fire immediately if the input object is already ended.
+
+	@param initialInputObject InputObject
+	@return Observable<()>
+]=]
+function RxInputObjectUtils.observeInputObjectEnded(initialInputObject: InputObject): Observable.Observable<()>
 	assert(initialInputObject, "Bad initialInputObject")
 
 	return Observable.new(function(sub)

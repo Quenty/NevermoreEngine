@@ -73,7 +73,7 @@ function ImpulseCamera:_getSpring(speed, damper)
 	speed = speed or self._defaultSpring.Speed
 	damper = damper or self._defaultSpring.Damper
 
-	for _, spring in pairs(self._springs) do
+	for _, spring in self._springs do
 		if math.abs(spring.Speed - speed) <= EPSILON and math.abs(spring.Damper - damper) <= EPSILON then
 			return spring
 		end

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helps with color grades, which is the concept where the darkness of the color
 	goes from 0 to 100, with a grade of 100 being white, and a grade of 0 being
@@ -22,9 +23,9 @@ local ColorGradeUtils = {}
 
 	@param grade number
 	@param difference number
-	@return Color3
+	@return number
 ]=]
-function ColorGradeUtils.addGrade(grade, difference)
+function ColorGradeUtils.addGrade(grade: number, difference: number): number
 	local finalGrade = grade + difference
 
 	if finalGrade > 100 or finalGrade < 0 then
@@ -42,7 +43,7 @@ function ColorGradeUtils.addGrade(grade, difference)
 	return finalGrade
 end
 
-function ColorGradeUtils.addGradeToColor(color, difference)
+function ColorGradeUtils.addGradeToColor(color: Color3, difference: number): Color3
 	local grade = ColorGradeUtils.getGrade(color)
 	return ColorGradeUtils.getGradedColor(color, ColorGradeUtils.addGrade(grade, difference))
 end
@@ -56,7 +57,7 @@ end
 	@param amount number -- Between 0 and 100
 	@return Color3
 ]=]
-function ColorGradeUtils.ensureGradeContrast(color, backing, amount)
+function ColorGradeUtils.ensureGradeContrast(color: Color3, backing: Color3, amount: number): Color3
 	local l, u, v = unpack(LuvColor3Utils.fromColor3(color))
 	local _, _, bv = unpack(LuvColor3Utils.fromColor3(backing))
 
@@ -71,7 +72,7 @@ function ColorGradeUtils.ensureGradeContrast(color, backing, amount)
 	end
 
 	local direction = math.sign(rel) > 0 and 1 or -1
-	local newRel = direction*amount
+	local newRel = direction * amount
 
 	local newGrade = math.clamp(backingGrade + newRel, 0, 100)
 	local otherNewGrade = math.clamp(backingGrade - newRel, 0, 100)
@@ -84,10 +85,10 @@ function ColorGradeUtils.ensureGradeContrast(color, backing, amount)
 	end
 
 	-- The further away from the original color the more we reduce vividness
-	local proportion = math.min(amount, math.abs(finalGrade - grade))/amount
-	u = math.clamp((1 - 0.5*proportion)*u, 0, 100)
+	local proportion = math.min(amount, math.abs(finalGrade - grade)) / amount
+	u = math.clamp((1 - 0.5 * proportion) * u, 0, 100)
 
-	return LuvColor3Utils.toColor3({l, u, 100 - finalGrade})
+	return LuvColor3Utils.toColor3({ l, u, 100 - finalGrade })
 end
 
 --[=[
@@ -96,7 +97,7 @@ end
 	@param color Color3
 	@return number
 ]=]
-function ColorGradeUtils.getGrade(color)
+function ColorGradeUtils.getGrade(color: Color3): number
 	assert(typeof(color) == "Color3", "Bad color")
 	local _, _, v = unpack(LuvColor3Utils.fromColor3(color))
 
@@ -108,10 +109,10 @@ end
 
 	@param baseColor Color3
 	@param colorGrade number -- 0 to 100
-	@param vividness number | nil
+	@param vividness number?
 	@return Color3
 ]=]
-function ColorGradeUtils.getGradedColor(baseColor, colorGrade, vividness)
+function ColorGradeUtils.getGradedColor(baseColor: Color3, colorGrade: number, vividness: number?): Color3
 	assert(typeof(baseColor) == "Color3", "Bad baseColor")
 	assert(type(vividness) == "number" or vividness == nil, "Bad vividness")
 	assert(type(colorGrade) == "number", "Bad colorGrade")

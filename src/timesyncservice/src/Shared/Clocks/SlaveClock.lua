@@ -20,7 +20,7 @@ SlaveClock._offset = -1 -- Set uncalculated values to -1
 	@param remoteFunction RemoteFunction
 	@return SlaveClock
 ]=]
-function SlaveClock.new(remoteEvent, remoteFunction)
+function SlaveClock.new(remoteEvent: RemoteEvent, remoteFunction: RemoteFunction)
 	local self = setmetatable(BaseObject.new(), SlaveClock)
 
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
@@ -69,7 +69,7 @@ end
 	Returns the sycncronized time
 	@return number
 ]=]
-function SlaveClock:GetTime()
+function SlaveClock:GetTime(): number
 	if not self:IsSynced() then
 		error("[SlaveClock.GetTime] - Slave clock is not yet synced")
 	end
@@ -81,7 +81,7 @@ end
 	Returns true if the manager has synced with the server
 	@return boolean
 ]=]
-function SlaveClock:IsSynced()
+function SlaveClock:IsSynced(): boolean
 	return self._offset ~= -1
 end
 
@@ -94,7 +94,7 @@ end
 	Returns estimated ping in seconds
 	@return number
 ]=]
-function SlaveClock:GetPing()
+function SlaveClock:GetPing(): number
 	return self._ping.Value
 end
 

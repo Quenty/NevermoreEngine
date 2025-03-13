@@ -38,7 +38,7 @@ function ApplyTagToTaggedChildren.new(parent, tag, requiredTag)
 	self._tagged = {}
 
 	self._maid:GiveTask(function()
-		for tagged, _ in pairs(self._tagged) do
+		for tagged, _ in self._tagged do
 			CollectionService:RemoveTag(tagged, self._tag)
 		end
 	end)
@@ -66,7 +66,7 @@ function ApplyTagToTaggedChildren:_setup()
 			self:_removeTagIfTagged(...)
 		end))
 
-	for _, child in pairs(self._parent:GetChildren()) do
+	for _, child in self._parent:GetChildren() do
 		self:_handleChildAdded(child)
 	end
 end

@@ -11,7 +11,7 @@ local DeathTrackedHumanoid = setmetatable({}, BaseObject)
 DeathTrackedHumanoid.ClassName = "DeathTrackedHumanoid"
 DeathTrackedHumanoid.__index = DeathTrackedHumanoid
 
-function DeathTrackedHumanoid.new(humanoid, serviceBag)
+function DeathTrackedHumanoid.new(humanoid: Humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), DeathTrackedHumanoid)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

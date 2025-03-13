@@ -55,7 +55,7 @@ end
 	@param text string
 	@return Promise<string>
 ]=]
-function TextFilterServiceClient:PromisePreviewNonChatStringForBroadcast(text)
+function TextFilterServiceClient:PromisePreviewNonChatStringForBroadcast(text: string)
 	assert(type(text) == "string", "Bad text")
 
 	return self:_promiseInvokeRemoteFunction(

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	An observable map that counts up/down and removes when the count is zero.
 	@class ObservableCountingMap
@@ -12,17 +13,59 @@ local Brio = require("Brio")
 local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local _Set = require("Set")
 
 local ObservableCountingMap = {}
 ObservableCountingMap.ClassName = "ObservableCountingMap"
 ObservableCountingMap.__index = ObservableCountingMap
 
+export type ObservableCountingMap<T> = typeof(setmetatable(
+	{} :: {
+		--[=[
+			Fires when an key is added
+			@readonly
+			@prop KeyAdded Signal<T>
+			@within ObservableCountingMap
+		]=]
+		KeyAdded: Signal.Signal<T>,
+
+		--[=[
+			Fires when an key is removed.
+			@readonly
+			@prop KeyRemoved Signal<T>
+			@within ObservableCountingMap
+		]=]
+		KeyRemoved: Signal.Signal<T>,
+
+		--[=[
+			Fires when an item count changes
+			@readonly
+			@prop KeyChanged Signal<T, number>
+			@within ObservableCountingMap
+		]=]
+		KeyChanged: Signal.Signal<T, number>,
+
+		--[=[
+			Fires when the total count changes.
+			@prop CountChanged Signal<number>
+			@within ObservableCountingMap
+		]=]
+		TotalKeyCountChanged: Signal.Signal<number>,
+
+		_maid: Maid.Maid,
+		_map: { [T]: number },
+		_keySubTable: any, -- ObservableSubscriptionTable.ObservableSubscriptionTable<number>,
+		_totalKeyCountValue: ValueObject.ValueObject<number>,
+	},
+	ObservableCountingMap
+))
+
 --[=[
 	Constructs a new ObservableCountingMap
 	@return ObservableCountingMap<T>
 ]=]
-function ObservableCountingMap.new()
-	local self = setmetatable({}, ObservableCountingMap)
+function ObservableCountingMap.new<T>(): ObservableCountingMap<T>
+	local self: any = setmetatable({}, ObservableCountingMap)
 
 	self._maid = Maid.new()
 	self._map = {}
@@ -30,35 +73,9 @@ function ObservableCountingMap.new()
 	self._totalKeyCountValue = self._maid:Add(ValueObject.new(0, "number"))
 	self._keySubTable = self._maid:Add(ObservableSubscriptionTable.new())
 
---[=[
-	Fires when an key is added
-	@readonly
-	@prop KeyAdded Signal<T>
-	@within ObservableCountingMap
-]=]
 	self.KeyAdded = self._maid:Add(Signal.new())
-
---[=[
-	Fires when an key is removed.
-	@readonly
-	@prop KeyRemoved Signal<T>
-	@within ObservableCountingMap
-]=]
 	self.KeyRemoved = self._maid:Add(Signal.new())
-
---[=[
-	Fires when an item count changes
-	@readonly
-	@prop KeyChanged Signal<T>
-	@within ObservableCountingMap
-]=]
 	self.KeyChanged = self._maid:Add(Signal.new())
-
---[=[
-	Fires when the total count changes.
-	@prop CountChanged RBXScriptSignal
-	@within ObservableCountingMap
-]=]
 	self.TotalKeyCountChanged = self._totalKeyCountValue.Changed
 
 	return self
@@ -69,7 +86,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function ObservableCountingMap.isObservableMap(value)
+function ObservableCountingMap.isObservableMap(value: any): boolean
 	return DuckTypeUtils.isImplementation(ObservableCountingMap, value)
 end
 
@@ -78,7 +95,7 @@ end
 
 	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
 ]=]
-function ObservableCountingMap:__iter()
+function ObservableCountingMap.__iter<T>(self: ObservableCountingMap<T>)
 	return pairs(self._map)
 end
 
@@ -86,11 +103,11 @@ end
 	Observes the current set of active keys
 	@return Observable<{ T }>
 ]=]
-function ObservableCountingMap:ObserveKeysList()
+function ObservableCountingMap.ObserveKeysList<T>(self: ObservableCountingMap<T>): Observable.Observable<{ T }>
 	return self:_observeDerivedDataStructureFromKeys(function()
 		local list = table.create(self._totalKeyCountValue.Value)
 
-		for key, _ in pairs(self._map) do
+		for key, _ in self._map do
 			table.insert(list, key)
 		end
 
@@ -102,11 +119,11 @@ end
 	Observes the current set of active keys
 	@return Observable<{ [T]: true }>
 ]=]
-function ObservableCountingMap:ObserveKeysSet()
+function ObservableCountingMap.ObserveKeysSet<T>(self: ObservableCountingMap<T>): Observable.Observable<_Set.Set<T>>
 	return self:_observeDerivedDataStructureFromKeys(function()
 		local set = {}
 
-		for key, _ in pairs(self._map) do
+		for key, _ in self._map do
 			set[key] = true
 		end
 
@@ -114,7 +131,10 @@ function ObservableCountingMap:ObserveKeysSet()
 	end)
 end
 
-function ObservableCountingMap:_observeDerivedDataStructureFromKeys(gatherValues)
+function ObservableCountingMap._observeDerivedDataStructureFromKeys<T>(
+	self: ObservableCountingMap<T>,
+	gatherValues
+): Observable.Observable<any>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -127,9 +147,9 @@ function ObservableCountingMap:_observeDerivedDataStructureFromKeys(gatherValues
 
 		emit()
 
-		self._maid[sub] = maid
+		self._maid[sub :: any] = maid
 		maid:GiveTask(function()
-			self._maid[sub] = nil
+			self._maid[sub :: any] = nil
 			sub:Complete()
 		end)
 
@@ -141,44 +161,46 @@ end
 	Observes all keys in the map
 	@return Observable<Brio<(T, number)>>
 ]=]
-function ObservableCountingMap:ObservePairsBrio()
+function ObservableCountingMap.ObservePairsBrio<T>(
+	self: ObservableCountingMap<T>
+): Observable.Observable<Brio.Brio<(T, number)>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
+		local keyMaid: any = maid:Add(Maid.new())
 
-		local function handleValue(key, value)
+		local function handleValue(key: T, value: number)
 			if value ~= 0 then
 				local brio = Brio.new(key, value)
-				maid[key] = brio
+				keyMaid[key] = brio
 				sub:Fire(brio)
 			else
-				maid[key] = nil
+				keyMaid[key] = nil
 			end
 		end
 
-		for key, value in pairs(self._map) do
+		for key, value in self._map do
 			handleValue(key, value)
 		end
 
 		maid:GiveTask(self.KeyChanged:Connect(handleValue))
 
-		self._maid[sub] = maid
+		self._maid[sub :: any] = maid
 		maid:GiveTask(function()
-			self._maid[sub] = nil
+			self._maid[sub :: any] = nil
 			sub:Complete()
 		end)
 
 		return maid
-
-	end)
+	end) :: any
 end
 
 --[=[
 	Observes the value for the given key.
 
 	@param key TKey
-	@return Observable<TValue?>
+	@return Observable<number>
 ]=]
-function ObservableCountingMap:ObserveAtKey(key)
+function ObservableCountingMap.ObserveAtKey<T>(self: ObservableCountingMap<T>, key: T): Observable.Observable<number>
 	assert(key ~= nil, "Bad key")
 
 	return self._keySubTable:Observe(key, function(sub)
@@ -190,12 +212,12 @@ end
 	Observes all keys in the map
 	@return Observable<Brio<T>>
 ]=]
-function ObservableCountingMap:ObserveKeysBrio()
+function ObservableCountingMap.ObserveKeysBrio<T>(self: ObservableCountingMap<T>): Observable.Observable<Brio.Brio<T>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
-		local keyMaid = maid:Add(Maid.new())
+		local keyMaid: any = maid:Add(Maid.new())
 
-		local function handleItem(key)
+		local function handleItem(key: T)
 			-- Happens upon key added re-entrance
 			if keyMaid[key] then
 				return
@@ -211,18 +233,18 @@ function ObservableCountingMap:ObserveKeysBrio()
 			keyMaid[key] = nil
 		end))
 
-		for key, _ in pairs(self._map) do
+		for key, _ in self._map do
 			handleItem(key)
 		end
 
-		self._maid[sub] = maid
+		self._maid[sub :: any] = maid
 		maid:GiveTask(function()
-			self._maid[sub] = nil
+			self._maid[sub :: any] = nil
 			sub:Complete()
 		end)
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -230,7 +252,7 @@ end
 	@param key T
 	@return boolean
 ]=]
-function ObservableCountingMap:Contains(key)
+function ObservableCountingMap.Contains<T>(self: ObservableCountingMap<T>, key: T): boolean
 	assert(key ~= nil, "Bad key")
 
 	return self._map[key] ~= nil
@@ -241,7 +263,7 @@ end
 	@param key T
 	@return number
 ]=]
-function ObservableCountingMap:Get(key)
+function ObservableCountingMap.Get<T>(self: ObservableCountingMap<T>, key: T): number
 	assert(key ~= nil, "Bad key")
 
 	return self._map[key] or 0
@@ -251,7 +273,7 @@ end
 	Gets the count of keys in the map
 	@return number
 ]=]
-function ObservableCountingMap:GetTotalKeyCount()
+function ObservableCountingMap.GetTotalKeyCount<T>(self: ObservableCountingMap<T>): number
 	return self._totalKeyCountValue.Value
 end
 
@@ -261,7 +283,7 @@ ObservableCountingMap.__len = ObservableCountingMap.GetTotalKeyCount
 	Observes the count of the keys in the map
 	@return Observable<number>
 ]=]
-function ObservableCountingMap:ObserveTotalKeyCount()
+function ObservableCountingMap.ObserveTotalKeyCount<T>(self: ObservableCountingMap<T>): Observable.Observable<number>
 	return self._totalKeyCountValue:Observe()
 end
 
@@ -271,12 +293,14 @@ end
 	@param amount number?
 	@return callback
 ]=]
-function ObservableCountingMap:Set(key, amount)
+function ObservableCountingMap.Set<T>(self: ObservableCountingMap<T>, key: T, amount: number): () -> ()
 	local current = self:Get(key)
 	if current < amount then
-		self:Add(-(amount - current))
+		return self:Add(key, -(amount - current))
 	elseif current > amount then
-		self:Add(current - amount)
+		return self:Add(key, current - amount)
+	else
+		return function() end
 	end
 end
 
@@ -286,21 +310,19 @@ end
 	@param amount number?
 	@return callback
 ]=]
-function ObservableCountingMap:Add(key, amount)
+function ObservableCountingMap.Add<T>(self: ObservableCountingMap<T>, key: T, amount: number?): () -> ()
 	assert(key ~= nil, "Bad key")
 	assert(type(amount) == "number" or amount == nil, "Bad amount")
-	amount = amount or 1
 
-	if amount == 0 then
-		return function()
-
-		end
+	local change: number = amount or 1
+	if change == 0 then
+		return function() end
 	end
 
 	local oldValue = self._map[key]
 
 	if oldValue then
-		local newValue = oldValue + amount
+		local newValue = oldValue + change
 		if newValue == 0 then
 			-- Remove item
 			self._map[key] = nil
@@ -324,7 +346,7 @@ function ObservableCountingMap:Add(key, amount)
 		end
 	else
 		-- Add item
-		self._map[key] = amount
+		self._map[key] = change
 
 		-- Fire events
 		self._totalKeyCountValue.Value = self._totalKeyCountValue.Value + 1
@@ -334,8 +356,8 @@ function ObservableCountingMap:Add(key, amount)
 		end
 
 		if self.Destroy then
-			self.KeyChanged:Fire(key, amount)
-			self._keySubTable:Fire(key, amount)
+			self.KeyChanged:Fire(key, change)
+			self._keySubTable:Fire(key, change)
 		end
 	end
 
@@ -343,7 +365,7 @@ function ObservableCountingMap:Add(key, amount)
 	return function()
 		if self.Destroy and not removed then
 			removed = true
-			self:Add(key, -amount)
+			self:Add(key, -change)
 		end
 	end
 end
@@ -354,19 +376,18 @@ end
 	@param amount number?
 	@return callback
 ]=]
-function ObservableCountingMap:Remove(key, amount)
+function ObservableCountingMap.Remove<T>(self: ObservableCountingMap<T>, key: T, amount: number?): () -> ()
 	assert(key ~= nil, "Bad key")
 	assert(type(amount) == "number" or amount == nil, "Bad amount")
-	amount = amount or 1
 
-	self:Add(key, -amount)
+	return self:Add(key, -(amount or 1))
 end
 
 --[=[
 	Gets the first key
 	@return T
 ]=]
-function ObservableCountingMap:GetFirstKey()
+function ObservableCountingMap.GetFirstKey<T>(self: ObservableCountingMap<T>): T?
 	local value = next(self._map)
 	return value
 end
@@ -375,9 +396,9 @@ end
 	Gets a list of all keys.
 	@return { T }
 ]=]
-function ObservableCountingMap:GetKeyList()
+function ObservableCountingMap.GetKeyList<T>(self: ObservableCountingMap<T>): { T }
 	local list = table.create(self._totalKeyCountValue.Value)
-	for key, _ in pairs(self._map) do
+	for key, _ in self._map do
 		table.insert(list, key)
 	end
 	return list
@@ -386,9 +407,9 @@ end
 --[=[
 	Cleans up the ObservableCountingMap and sets the metatable to nil.
 ]=]
-function ObservableCountingMap:Destroy()
+function ObservableCountingMap.Destroy<T>(self: ObservableCountingMap<T>): ()
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return ObservableCountingMap

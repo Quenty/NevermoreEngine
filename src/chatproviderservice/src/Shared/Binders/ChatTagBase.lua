@@ -14,7 +14,7 @@ local ChatTagBase = setmetatable({}, BaseObject)
 ChatTagBase.ClassName = "ChatTagBase"
 ChatTagBase.__index = ChatTagBase
 
-function ChatTagBase.new(obj)
+function ChatTagBase.new(obj: Folder)
 	local self = setmetatable(BaseObject.new(obj), ChatTagBase)
 
 	self._chatTagText = AttributeValue.new(self._obj, ChatTagConstants.TAG_TEXT_ATTRIBUTE, "")
@@ -38,7 +38,7 @@ function ChatTagBase:ObserveChatTagData()
 					return LocalizedTextUtils.fromJSON(text)
 				else
 					return nil
-				end;
+				end
 			end);
 		});
 		TagColor = self._chatTagColor:Observe();

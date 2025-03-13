@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities for observing characters and their humanoids.
 	@class RxCharacterUtils
@@ -22,7 +23,7 @@ local RxCharacterUtils = {}
 	@param player Player
 	@return Observable<Brio<Model>>
 ]=]
-function RxCharacterUtils.observeLastCharacterBrio(player: Player)
+function RxCharacterUtils.observeLastCharacterBrio(player: Player): Observable.Observable<Brio.Brio<Model>>
 	-- This assumes a player's 'Character' field is set to nil when
 	-- their character is destroyed, or when they leave the game.
 	return RxInstanceUtils.observePropertyBrio(player, "Character", function(character)
@@ -36,7 +37,7 @@ end
 	@param player Player
 	@return Observable<Model>
 ]=]
-function RxCharacterUtils.observeCharacter(player: Player)
+function RxCharacterUtils.observeCharacter(player: Player): Observable.Observable<Model>
 	return RxInstanceUtils.observeProperty(player, "Character")
 end
 
@@ -46,7 +47,7 @@ end
 	@param player Player
 	@return Observable<Brio<Model>>
 ]=]
-function RxCharacterUtils.observeCharacterBrio(player: Player)
+function RxCharacterUtils.observeCharacterBrio(player: Player): Observable.Observable<Brio.Brio<Model>>
 	return RxInstanceUtils.observePropertyBrio(player, "Character", function(character)
 		return character ~= nil
 	end)
@@ -58,28 +59,28 @@ end
 	@param instance Instance
 	@return Observable<boolean>
 ]=]
-function RxCharacterUtils.observeIsOfLocalCharacter(instance: Instance)
+function RxCharacterUtils.observeIsOfLocalCharacter(instance: Instance): Observable.Observable<boolean>
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local localPlayer = Players.LocalPlayer
 	if not localPlayer then
 		warn("[RxCharacterUtils] - No localPlayer")
-		return Rx.EMPTY
+		return Rx.EMPTY :: any
 	end
 
 	return Rx.combineLatest({
 		character = RxCharacterUtils.observeLocalPlayerCharacter(),
 		_ancestry = RxInstanceUtils.observeAncestry(instance),
 	}):Pipe({
-		Rx.map(function(state)
+		Rx.map(function(state: any)
 			if state.character then
 				return instance == state.character or instance:IsDescendantOf(state.character)
 			else
 				return false
 			end
-		end),
-		Rx.distinct(),
-	})
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
 end
 
 --[=[
@@ -88,12 +89,12 @@ end
 	@param instance Instance
 	@return Observable<Brio<boolean>>
 ]=]
-function RxCharacterUtils.observeIsOfLocalCharacterBrio(instance: Instance)
+function RxCharacterUtils.observeIsOfLocalCharacterBrio(instance: Instance): Observable.Observable<Brio.Brio<boolean>>
 	return RxCharacterUtils.observeIsOfLocalCharacter(instance):Pipe({
 		RxBrioUtils.switchToBrio(function(value)
 			return value
 		end),
-	})
+	}) :: any
 end
 
 --[=[
@@ -101,17 +102,17 @@ end
 
 	@return Observable<Model>
 ]=]
-function RxCharacterUtils.observeLocalPlayerCharacter()
+function RxCharacterUtils.observeLocalPlayerCharacter(): Observable.Observable<Model>
 	return RxInstanceUtils.observeProperty(Players, "LocalPlayer"):Pipe({
-		Rx.switchMap(function(player)
+		Rx.switchMap(function(player: Player?): any
 			if player then
 				return RxCharacterUtils.observeCharacter(player)
 			else
 				return Rx.of(nil)
 			end
-		end),
-		Rx.distinct(),
-	})
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
 end
 
 --[=[
@@ -119,12 +120,12 @@ end
 	@param player Player
 	@return Observable<Brio<Humanoid>>
 ]=]
-function RxCharacterUtils.observeLastHumanoidBrio(player: Player)
+function RxCharacterUtils.observeLastHumanoidBrio(player: Player): Observable.Observable<Brio.Brio<Humanoid>>
 	return RxCharacterUtils.observeLastCharacterBrio(player):Pipe({
-		RxBrioUtils.switchMapBrio(function(character)
+		RxBrioUtils.switchMapBrio(function(character: Model)
 			return RxInstanceUtils.observeLastNamedChildBrio(character, "Humanoid", "Humanoid")
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[[
@@ -134,7 +135,7 @@ end
 	@param humanoid Humanoid
 	@return Observable<Brio<Humanoid>>
 ]]
-local function observeHumanoidLifetimeAsBrio(humanoid: Humanoid)
+local function observeHumanoidLifetimeAsBrio(humanoid: Humanoid): Observable.Observable<Brio.Brio<Humanoid>>
 	return Observable.new(function(sub)
 		local function onDeath()
 			sub:Complete()
@@ -154,7 +155,7 @@ local function observeHumanoidLifetimeAsBrio(humanoid: Humanoid)
 			onDeath()
 			return nil
 		end
-	end)
+	end) :: any
 end
 
 --[=[
@@ -181,12 +182,12 @@ end
 	@param player Player
 	@return Observable<Brio<Humanoid>>
 ]=]
-function RxCharacterUtils.observeLastAliveHumanoidBrio(player: Player)
+function RxCharacterUtils.observeLastAliveHumanoidBrio(player: Player): Observable.Observable<Brio.Brio<Humanoid>>
 	return RxCharacterUtils.observeLastHumanoidBrio(player):Pipe({
 		RxBrioUtils.switchMapBrio(function(humanoid)
 			return observeHumanoidLifetimeAsBrio(humanoid)
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 return RxCharacterUtils

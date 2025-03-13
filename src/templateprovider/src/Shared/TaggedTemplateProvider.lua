@@ -11,7 +11,7 @@ local RxCollectionServiceUtils = require("RxCollectionServiceUtils")
 
 local TaggedTemplateProvider = {}
 
-function TaggedTemplateProvider.new(providerName, tagName)
+function TaggedTemplateProvider.new(providerName: string, tagName: string)
 	assert(type(providerName) == "string", "bad providerName")
 	assert(type(tagName) == "string", "Bad tagName")
 

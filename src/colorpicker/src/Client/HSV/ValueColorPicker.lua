@@ -107,7 +107,7 @@ end
 
 	@param height number
 ]=]
-function ValueColorPicker:SetSize(height)
+function ValueColorPicker:SetSize(height: number)
 	assert(type(height) == "number", "Bad height")
 
 	self:_updateSize(height)
@@ -173,7 +173,7 @@ function ValueColorPicker:GetMeasureValue()
 	return self._sizeValue
 end
 
-function ValueColorPicker:SetTransparency(transparency)
+function ValueColorPicker:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
@@ -264,7 +264,7 @@ function ValueColorPicker:_render()
 
 			self._triangle.Gui;
 		}
-	};
+	}
 end
 
 return ValueColorPicker

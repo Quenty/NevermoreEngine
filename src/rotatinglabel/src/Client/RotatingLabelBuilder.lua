@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	Builds a new RotatingLabel. See RotatingLabel for more details.
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helpful functions involving Roblox groups.
 	@class GroupUtils
@@ -18,7 +19,7 @@ local GroupUtils = {}
 	@param groupId number
 	@return Promise<number> -- Generally from 0 to 255
 ]=]
-function GroupUtils.promiseRankInGroup(player, groupId)
+function GroupUtils.promiseRankInGroup(player: Player, groupId: number): Promise.Promise<number>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(groupId) == "number", "Bad groupId")
 
@@ -47,7 +48,7 @@ end
 	@param groupId number
 	@return Promise<string>
 ]=]
-function GroupUtils.promiseRoleInGroup(player, groupId)
+function GroupUtils.promiseRoleInGroup(player: Player, groupId: number): Promise.Promise<string>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(groupId) == "number", "Bad groupId")
 
@@ -69,13 +70,30 @@ function GroupUtils.promiseRoleInGroup(player, groupId)
 	end)
 end
 
+export type GroupRoleInfo = {
+	Name: string,
+	Rank: number,
+}
+
+export type GroupInfo = {
+	Name: string,
+	Id: number,
+	Owner: {
+		Name: string,
+		Id: number,
+	},
+	EmblemUrl: string,
+	Description: string,
+	Roles: { GroupRoleInfo },
+}
+
 --[=[
 	Retrieves groupInfo about a group.
 
 	@param groupId number
 	@return Promise<table>
 ]=]
-function GroupUtils.promiseGroupInfo(groupId)
+function GroupUtils.promiseGroupInfo(groupId: number): Promise.Promise<GroupInfo>
 	assert(groupId, "Bad groupId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -103,7 +121,7 @@ end
 	@param rankId number
 	@return Promise<table>
 ]=]
-function GroupUtils.promiseGroupRoleInfo(groupId, rankId)
+function GroupUtils.promiseGroupRoleInfo(groupId: number, rankId: number): Promise.Promise<GroupRoleInfo>
 	assert(groupId, "Bad groupId")
 	assert(rankId, "Bad rankId")
 
@@ -113,7 +131,7 @@ function GroupUtils.promiseGroupRoleInfo(groupId, rankId)
 				return Promise.rejected("No Roles table")
 			end
 
-			for _, rankInfo in pairs(groupInfo.Roles) do
+			for _, rankInfo in groupInfo.Roles do
 				if rankInfo.Rank == rankId then
 					return rankInfo
 				end

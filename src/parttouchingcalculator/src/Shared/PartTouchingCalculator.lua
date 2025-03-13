@@ -29,7 +29,7 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
 	assert(parts, "Must have parts")
 
 	local humanoidParts = {}
-	for _, item in pairs(humanoid.Parent:GetDescendants()) do
+	for _, item in humanoid.Parent:GetDescendants() do
 		if item:IsA("BasePart") then
 			table.insert(humanoidParts, item)
 		end
@@ -44,13 +44,13 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
 
 	local previousProperties = {}
 	local toSet = {
-		CanCollide = true;
-		Anchored = false;
+		CanCollide = true,
+		Anchored = false,
 	}
 	local partSet = {}
-	for _, part in pairs(parts) do
+	for _, part in parts do
 		previousProperties[part] = {}
-		for name, value in pairs(toSet) do
+		for name, value in toSet do
 			previousProperties[part][name] = part[name]
 			part[name] = value
 		end
@@ -62,15 +62,15 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
 
 	local returnValue = false
 
-	for _, part in pairs(touching) do
+	for _, part in touching do
 		if partSet[part] then
 			returnValue = true
 			break
 		end
 	end
 
-	for part, properties in pairs(previousProperties) do
-		for name, value in pairs(properties) do
+	for part, properties in previousProperties do
+		for name, value in properties do
 			part[name] = value
 		end
 	end
@@ -110,14 +110,14 @@ end
 function PartTouchingCalculator:GetTouchingHull(parts, padding)
 	local hitParts = {}
 
-	for _, part in pairs(parts) do
-		for _, TouchingPart in pairs(self:GetTouching(part, padding)) do
+	for _, part in parts do
+		for _, TouchingPart in self:GetTouching(part, padding) do
 			hitParts[TouchingPart] = true
 		end
 	end
 
 	local touching = {}
-	for part, _ in pairs(hitParts) do
+	for part, _ in hitParts do
 		table.insert(touching, part)
 	end
 
@@ -142,7 +142,7 @@ function PartTouchingCalculator:GetTouching(basePart, padding)
 		part = basePart:Clone()
 
 		-- Remove all tags
-		for _, tag in pairs(CollectionService:GetTags(part)) do
+		for _, tag in CollectionService:GetTags(part) do
 			CollectionService:RemoveTag(part, tag)
 		end
 
@@ -166,16 +166,16 @@ end
 function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
 	local touchingHumanoids = {}
 
-	for _, part in pairs(touchingList) do
+	for _, part in touchingList do
 		local humanoid = part.Parent:FindFirstChildOfClass("Humanoid")
 		if humanoid then
 			if not touchingHumanoids[humanoid] then
 				local player = CharacterUtils.getPlayerFromCharacter(humanoid)
 				touchingHumanoids[humanoid] = {
-					Humanoid = humanoid;
-					Character = player and player.Character; -- May be nil
-					Player = player; -- May be nil
-					Touching = { part };
+					Humanoid = humanoid,
+					Character = player and player.Character, -- May be nil
+					Player = player, -- May be nil
+					Touching = { part },
 				}
 			else
 				table.insert(touchingHumanoids[humanoid].Touching, part)
@@ -184,7 +184,7 @@ function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
 	end
 
 	local list = {}
-	for _, data in pairs(touchingHumanoids) do
+	for _, data in touchingHumanoids do
 		table.insert(list, data)
 	end
 

@@ -40,7 +40,7 @@ end
 
 	@param acceleration number
 ]=]
-function GamepadRotateModel:SetAcceleration(acceleration)
+function GamepadRotateModel:SetAcceleration(acceleration: number)
 	assert(type(acceleration) == "number", "Bad acceleration")
 
 	self._rampVelocityX.a = acceleration

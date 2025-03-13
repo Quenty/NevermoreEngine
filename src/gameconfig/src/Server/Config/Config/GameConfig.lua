@@ -15,7 +15,7 @@ local GameConfig = setmetatable({}, GameConfigBase)
 GameConfig.ClassName = "GameConfig"
 GameConfig.__index = GameConfig
 
-function GameConfig.new(obj, serviceBag)
+function GameConfig.new(obj: Instance, serviceBag)
 	local self = setmetatable(GameConfigBase.new(obj), GameConfig)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

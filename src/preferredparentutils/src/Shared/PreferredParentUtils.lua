@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Handles logic for creating a "preferred" parent container or erroring if
 	it already exists.
@@ -14,12 +15,12 @@ local PreferredParentUtils = {}
 	@param forceCreate boolean
 	@return () -> Instance
 ]=]
-function PreferredParentUtils.createPreferredParentRetriever(parent, name, forceCreate)
+function PreferredParentUtils.createPreferredParentRetriever(parent: Instance, name: string, forceCreate: boolean)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(name) == "string", "Bad name")
 
-	local cache
-	return function()
+	local cache: Instance?
+	return function(): Instance?
 		-- Ensure that we don't try to search for duplicates EVERY time.
 		if cache and cache.Parent == parent then
 			return cache
@@ -36,17 +37,17 @@ end
 	@param forceCreate boolean
 	@return Instance
 ]=]
-function PreferredParentUtils.getPreferredParent(parent, name, forceCreate)
+function PreferredParentUtils.getPreferredParent(parent: Instance, name: string, forceCreate: boolean): Instance?
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(name) == "string", "Bad name")
 
 	local found
-	for _, item in pairs(parent:GetChildren()) do
+	for _, item in parent:GetChildren() do
 		if item.Name == name then
 			if not found then
 				found = item
 			else
-				error(string.format("[PreferredParentUtils.getPreferredParent] - Duplicate of %q", tostring(item:GetFullName())))
+				error(string.format("[PreferredParentUtils.getPreferredParent] - Duplicate of %q", item:GetFullName()))
 			end
 		end
 	end

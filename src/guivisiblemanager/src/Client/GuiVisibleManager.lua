@@ -27,7 +27,7 @@ GuiVisibleManager.__index = GuiVisibleManager
 	@param maxHideTime number? -- Optional hide time
 	@return GuiVisibleManager
 ]=]
-function GuiVisibleManager.new(promiseNewPane, maxHideTime)
+function GuiVisibleManager.new(promiseNewPane, maxHideTime: number?)
 	local self = setmetatable(BaseObject.new(), GuiVisibleManager)
 
 	self._maxHideTime = maxHideTime or 1
@@ -53,7 +53,7 @@ end
 
 	@return boolean
 ]=]
-function GuiVisibleManager:IsVisible()
+function GuiVisibleManager:IsVisible(): boolean
 	return self._paneVisible.Value
 end
 
@@ -63,7 +63,7 @@ end
 
 	@param boolValue BoolValue
 ]=]
-function GuiVisibleManager:BindToBoolValue(boolValue)
+function GuiVisibleManager:BindToBoolValue(boolValue: BoolValue)
 	assert(boolValue, "Must have boolValue")
 	assert(not self._boundBoolValue, "Already bound")
 
@@ -86,10 +86,10 @@ end
 	Creates a handle that will force the gui to be rendered. Clean up the task
 	to stop the showing.
 
-	@param doNotAnimate boolean | nil
+	@param doNotAnimate boolean?
 	@return MaidTask
 ]=]
-function GuiVisibleManager:CreateShowHandle(doNotAnimate)
+function GuiVisibleManager:CreateShowHandle(doNotAnimate: boolean?)
 	assert(self._showHandles, "Not initialized yet")
 
 	local key = HttpService:GenerateGUID(false)
@@ -107,11 +107,11 @@ function GuiVisibleManager:CreateShowHandle(doNotAnimate)
 				self._showHandles[key] = nil
 				self:_updatePaneVisible()
 			end
-		end
-	};
+		end,
+	}
 end
 
-function GuiVisibleManager:_updatePaneVisible(doNotAnimate)
+function GuiVisibleManager:_updatePaneVisible(doNotAnimate: boolean?)
 	local nextValue = next(self._showHandles) ~= nil
 	if nextValue ~= self._paneVisible.Value then
 		self._nextDoNotAnimate = doNotAnimate

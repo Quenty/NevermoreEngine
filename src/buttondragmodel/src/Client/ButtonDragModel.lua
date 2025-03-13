@@ -12,6 +12,8 @@ local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local InputObjectUtils = require("InputObjectUtils")
 local ValueObject = require("ValueObject")
+local _Observable = require("Observable")
+local _Brio = require("Brio")
 
 local ButtonDragModel = setmetatable({}, BaseObject)
 ButtonDragModel.ClassName = "ButtonDragModel"
@@ -23,7 +25,7 @@ ButtonDragModel.__index = ButtonDragModel
 	@param initialButton GuiButton? -- Optional
 	@return ButtonDragModel
 ]=]
-function ButtonDragModel.new(initialButton)
+function ButtonDragModel.new(initialButton: GuiButton?)
 	local self = setmetatable(BaseObject.new(), ButtonDragModel)
 
 	self._isMouseDown = self._maid:Add(ValueObject.new(false, "boolean"))
@@ -48,16 +50,18 @@ function ButtonDragModel.new(initialButton)
 		self:SetButton(initialButton)
 	end
 
-	self._maid:GiveTask(self._button:ObserveBrio(function(button)
-		return button ~= nil
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	self._maid:GiveTask(self._button
+		:ObserveBrio(function(button)
+			return button ~= nil
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-		local maid, button = brio:ToMaidAndValue()
-		self:_setupDragging(maid, button)
-	end))
+			local maid, button = brio:ToMaidAndValue()
+			self:_setupDragging(maid, button)
+		end))
 
 	return self
 end
@@ -67,7 +71,7 @@ end
 
 	@return boolean
 ]=]
-function ButtonDragModel:IsPressed()
+function ButtonDragModel:IsPressed(): boolean
 	return self._isPressed.Value
 end
 
@@ -76,30 +80,30 @@ end
 
 	@return Observable<boolean>
 ]=]
-function ButtonDragModel:ObserveIsPressed()
+function ButtonDragModel:ObserveIsPressed(): _Observable.Observable<boolean>
 	return self._isPressed:Observe()
 end
 
 --[=[
 	@return Observable<Brio<true>>
 ]=]
-function ButtonDragModel:ObserveIsPressedBrio()
+function ButtonDragModel:ObserveIsPressedBrio(): _Observable.Observable<_Brio.Brio<boolean>>
 	return self._isPressed:ObserveBrio(function(value)
 		return value
 	end)
 end
 
 --[=[
-	@return Observable<Vector2 | nil>
+	@return Observable<Vector2?>
 ]=]
-function ButtonDragModel:ObserveDragDelta()
+function ButtonDragModel:ObserveDragDelta(): _Observable.Observable<Vector2?>
 	return self._dragDelta:Observe()
 end
 
 --[=[
-	@return Vector2 | nil
+	@return Vector2?
 ]=]
-function ButtonDragModel:GetDragDelta()
+function ButtonDragModel:GetDragDelta(): Vector2?
 	return self._dragDelta.Value
 end
 
@@ -108,9 +112,9 @@ end
 
 	This is reletive to the GUI, so top left is 0, 0
 
-	@return Vector2 | nil
+	@return Vector2?
 ]=]
-function ButtonDragModel:GetDragPosition()
+function ButtonDragModel:GetDragPosition(): Vector2?
 	return self._dragPosition.Value
 end
 
@@ -119,9 +123,9 @@ end
 
 	This is reletive to the GUI, so top left is 0, 0
 
-	@return Observable<Vector2 | nil>
+	@return Observable<Vector2?>
 ]=]
-function ButtonDragModel:ObserveDragPosition()
+function ButtonDragModel:ObserveDragPosition(): _Observable.Observable<Vector2?>
 	return self._dragPosition:Observe()
 end
 
@@ -129,7 +133,7 @@ end
 	Sets whether to clamp the results within the button bounds
 	@param clampWithinButton boolean
 ]=]
-function ButtonDragModel:SetClampWithinButton(clampWithinButton)
+function ButtonDragModel:SetClampWithinButton(clampWithinButton: boolean)
 	self._clampWithinButton.Value = clampWithinButton
 end
 
@@ -139,7 +143,7 @@ end
 	@param button GuiButton
 	@return () -> () -- Cleanup function
 ]=]
-function ButtonDragModel:SetButton(button)
+function ButtonDragModel:SetButton(button: GuiButton): () -> ()
 	assert(typeof(button) == "Instance" or button == nil, "Bad button")
 
 	self._button.Value = button
@@ -151,7 +155,7 @@ function ButtonDragModel:SetButton(button)
 	end
 end
 
-function ButtonDragModel:_setupDragging(maid, button)
+function ButtonDragModel:_setupDragging(maid: Maid.Maid, button: GuiButton)
 	maid:GiveTask(self._clampWithinButton.Changed:Connect(function()
 		self:_updateCurrentPosition()
 	end))
@@ -200,12 +204,12 @@ function ButtonDragModel:_setupDragging(maid, button)
 	end))
 end
 
-function ButtonDragModel:_updateMouseTracking(button)
+function ButtonDragModel:_updateMouseTracking(button: GuiButton)
 	local maid = Maid.new()
 
-	local lastMousePosition = nil
+	local lastMousePosition: Vector3? = nil
 
-	local function setMousePosition(inputObject)
+	local function setMousePosition(inputObject: InputObject)
 		local previous = lastMousePosition
 		local current = inputObject.Position
 
@@ -256,7 +260,7 @@ function ButtonDragModel:_updateMouseTracking(button)
 	return maid
 end
 
-function ButtonDragModel:_trackTouch(buttonMaid, button, inputObject)
+function ButtonDragModel:_trackTouch(buttonMaid: Maid.Maid, button: GuiButton, inputObject: InputObject)
 	buttonMaid[inputObject] = nil
 
 	if inputObject.UserInputState == Enum.UserInputState.End then
@@ -292,22 +296,22 @@ function ButtonDragModel:_trackTouch(buttonMaid, button, inputObject)
 	maid[inputObject] = maid
 end
 
-function ButtonDragModel:_stopTouchTrack(buttonMaid, inputObject)
+function ButtonDragModel:_stopTouchTrack(buttonMaid: Maid.Maid, inputObject: InputObject)
 	-- Clears the input tracking as we slide off the button
 	buttonMaid[inputObject] = nil
 end
 
-function ButtonDragModel:_toButtonSpace(button, position)
+function ButtonDragModel:_toButtonSpace(button: GuiButton, position: Vector2): Vector2
 	local pos = button.AbsolutePosition
 	local size = button.AbsoluteSize
 
-	return (Vector2.new(position.x, position.y) - pos)/size
+	return (Vector2.new(position.X, position.Y) - pos) / size
 end
 
 function ButtonDragModel:_updateCurrentPosition()
 	local current = Vector2.zero
 	local count = 0
-	for _, item in pairs(self._activePositions) do
+	for _, item in self._activePositions do
 		current = current + item
 		count = count + 1
 	end
@@ -317,9 +321,9 @@ function ButtonDragModel:_updateCurrentPosition()
 		return
 	end
 
-	current = current/count
-	local x = current.x
-	local y = current.y
+	current = current / count
+	local x = current.X
+	local y = current.Y
 
 	if self._clampWithinButton.Value then
 		x = math.clamp(x, 0, 1)
@@ -334,9 +338,9 @@ function ButtonDragModel:_updateCurrentPosition()
 	end
 end
 
-function ButtonDragModel:_incrementDragDelta(delta)
-	local current = self._dragDelta.Value or Vector2.zero
-	self._dragDelta.Value = current + Vector2.new(delta.x, delta.y)
+function ButtonDragModel:_incrementDragDelta(delta: Vector3)
+	local current: Vector2 = self._dragDelta.Value or Vector2.zero
+	self._dragDelta.Value = current + Vector2.new(delta.X, delta.Y)
 end
 
 return ButtonDragModel

@@ -11,7 +11,7 @@ local ChatTagClient = setmetatable({}, ChatTagBase)
 ChatTagClient.ClassName = "ChatTagClient"
 ChatTagClient.__index = ChatTagClient
 
-function ChatTagClient.new(folder, serviceBag)
+function ChatTagClient.new(folder: Folder, serviceBag)
 	local self = setmetatable(ChatTagBase.new(folder), ChatTagClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

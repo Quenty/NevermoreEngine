@@ -6,17 +6,18 @@ local require = require(script.Parent.loader).load(script)
 
 local SecretsCmdrTypeUtils = require("SecretsCmdrTypeUtils")
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local SecretsCommandService = {}
 SecretsCommandService.ServiceName = "SecretsCommandService"
 
-function SecretsCommandService:Init(serviceBag)
+function SecretsCommandService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
-	self._secretsService = self._serviceBag:GetService(require("SecretsService"))
+	self._secretsService = self._serviceBag:GetService((require :: any)("SecretsService"))
 end
 
 function SecretsCommandService:Start()
@@ -123,14 +124,14 @@ function SecretsCommandService:_registerCommands()
 
 		local maxKeyLength = 6
 		local maxValueLength = 5
-		for key, value in pairs(secrets) do
+		for key, value in secrets do
 			maxKeyLength = math.max(maxKeyLength, #key)
 			maxValueLength = math.max(maxValueLength, #value)
 		end
 
 		local output = string.format("\n%-" .. maxKeyLength .. "s %-" .. maxValueLength .. "s", "Secret", "Value")
 		output = output .. string.format("\n%s %s", string.rep("-", maxKeyLength), string.rep("-", maxValueLength))
-		for key, value in pairs(secrets) do
+		for key, value in secrets do
 			output = output .. string.format("\n%-" .. maxKeyLength .. "s %-" .. maxValueLength .. "s", key, value)
 		end
 		output = output .. string.format("\n%s %s", string.rep("-", maxKeyLength), string.rep("-", maxValueLength))

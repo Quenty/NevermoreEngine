@@ -206,7 +206,7 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 				aliveBrios = BrioUtils.aliveOnly(aliveBrios)
 				local values = {}
 				if selectFromBrio then
-					for _, brio in pairs(aliveBrios) do
+					for _, brio in aliveBrios do
 						-- Hope for no side effects
 						local value = selectFromBrio(brio:GetValue())
 						assert(value ~= nil, "Bad value")
@@ -214,7 +214,7 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 						table.insert(values, value)
 					end
 				else
-					for _, brio in pairs(aliveBrios) do
+					for _, brio in aliveBrios do
 						local value = brio:GetValue()
 						assert(value ~= nil, "Bad value")
 
@@ -489,7 +489,7 @@ function RxBrioUtils.flatCombineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
 	local newObservables = {}
-	for key, observable in pairs(observables) do
+	for key, observable in observables do
 		if Observable.isObservable(observable) then
 			newObservables[key] = RxBrioUtils.flattenToValueAndNil(observable)
 		else
@@ -576,11 +576,11 @@ function RxBrioUtils.map(project)
 				table.insert(brios, (...))
 				args = (...):GetPackedValues()
 			else
-				args = {[1] = ...}
+				args = { [1] = ... }
 			end
 		else
 			args = {}
-			for index, item in pairs({...}) do
+			for index, item in { ... } do
 				if Brio.isBrio(item) then
 					table.insert(brios, item)
 					args[index] = item:GetValue() -- we lose data here, but I think this is fine
@@ -593,7 +593,7 @@ function RxBrioUtils.map(project)
 
 		local results = table.pack(project(table.unpack(args, 1, args.n)))
 		local transformedResults = {}
-		for i=1, results.n do
+		for i = 1, results.n do
 			local item = results[i]
 			if Brio.isBrio(item) then
 				table.insert(brios, item) -- add all subsequent brios into this table...
@@ -614,7 +614,7 @@ function RxBrioUtils._mapResult(brio)
 			return BrioUtils.withOtherValues(brio)
 		elseif n == 1 then
 			if Brio.isBrio(...) then
-				return BrioUtils.first({brio, (...)}, (...):GetValue())
+				return BrioUtils.first({ brio, (...) }, (...):GetValue())
 			else
 				return BrioUtils.withOtherValues(brio, ...)
 			end
@@ -622,7 +622,7 @@ function RxBrioUtils._mapResult(brio)
 			local brios = { brio }
 			local args = {}
 
-			for index, item in pairs({...}) do
+			for index, item in {...} do
 				if Brio.isBrio(item) then
 					table.insert(brios, item)
 					args[index] = item:GetValue() -- we lose data here, but I think this is fine
@@ -677,25 +677,29 @@ function RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
 			if brio:IsDead() then
 				sub:Fire(emitOnDeathValue)
 				sub:Complete()
-			else
-				sub:Fire(brio:GetValue())
 
-				-- Firing killed the subscription
-				if not sub:IsPending() then
-					return
-				end
-
-				-- Firing this event actually killed the brio
-				if brio:IsDead() then
-					sub:Fire(emitOnDeathValue)
-					sub:Complete()
-				else
-					return brio:GetDiedSignal():Connect(function()
-						sub:Fire(emitOnDeathValue)
-						sub:Complete()
-					end)
-				end
+				return nil
 			end
+
+			sub:Fire(brio:GetValue())
+
+			-- Firing killed the subscription
+			if not sub:IsPending() then
+				return nil
+			end
+
+			-- Firing this event actually killed the brio
+			if brio:IsDead() then
+				sub:Fire(emitOnDeathValue)
+				sub:Complete()
+
+				return nil
+			end
+
+			return brio:GetDiedSignal():Connect(function()
+				sub:Fire(emitOnDeathValue)
+				sub:Complete()
+			end)
 		end)
 	end
 end
@@ -722,7 +726,7 @@ end
 function RxBrioUtils.emitOnDeath(emitOnDeathValue)
 	return Rx.switchMap(function(brio)
 		return RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
-	end);
+	end)
 end
 
 --[=[

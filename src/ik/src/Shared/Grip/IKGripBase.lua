@@ -15,7 +15,7 @@ local IKGripBase = setmetatable({}, BaseObject)
 IKGripBase.ClassName = "IKGripBase"
 IKGripBase.__index = IKGripBase
 
-function IKGripBase.new(objectValue, serviceBag)
+function IKGripBase.new(objectValue: ObjectValue, serviceBag)
 	local self = setmetatable(BaseObject.new(objectValue), IKGripBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -27,11 +27,11 @@ function IKGripBase.new(objectValue, serviceBag)
 	return self
 end
 
-function IKGripBase:GetPriority()
+function IKGripBase:GetPriority(): number
 	return 1
 end
 
-function IKGripBase:GetAttachment()
+function IKGripBase:GetAttachment(): Attachment?
 	return self._obj.Parent
 end
 
@@ -42,9 +42,9 @@ function IKGripBase:PromiseIKRig()
 
 	local ikService
 	if RunService:IsServer() then
-		ikService = self._serviceBag:GetService(require("IKService"))
+		ikService = self._serviceBag:GetService((require :: any)("IKService"))
 	else
-		ikService = self._serviceBag:GetService(require("IKServiceClient"))
+		ikService = self._serviceBag:GetService((require :: any)("IKServiceClient"))
 	end
 
 	local promise = promisePropertyValue(self._obj, "Value")

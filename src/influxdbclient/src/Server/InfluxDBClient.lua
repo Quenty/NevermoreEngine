@@ -81,8 +81,8 @@ function InfluxDBClient:PromiseFlushAll()
 	end
 
 	local promises = {}
-	for _, bucketList in pairs(self._writeApis) do
-		for _, writeAPI in pairs(bucketList) do
+	for _, bucketList in self._writeApis do
+		for _, writeAPI in bucketList do
 			table.insert(promises, writeAPI:PromiseFlush())
 		end
 	end

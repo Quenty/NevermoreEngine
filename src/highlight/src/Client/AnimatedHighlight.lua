@@ -51,7 +51,13 @@ function AnimatedHighlight.new()
 	return self
 end
 
-function AnimatedHighlight.isAnimatedHighlight(value)
+--[=[
+	Returns true if it's an animated highlight
+
+	@param value any
+	@return boolean
+]=]
+function AnimatedHighlight.isAnimatedHighlight(value: any): boolean
 	return DuckTypeUtils.isImplementation(AnimatedHighlight, value)
 end
 
@@ -93,27 +99,27 @@ function AnimatedHighlight:SetPropertiesFrom(sourceHighlight)
 	transferSpringValue(self._percentVisible, sourceHighlight._percentVisible)
 end
 
-function AnimatedHighlight:SetTransparencySpeed(speed)
+function AnimatedHighlight:SetTransparencySpeed(speed: number)
 	assert(type(speed) == "number", "Bad speed")
 
 	self._fillTransparencySpring.Speed = speed
 	self._outlineTransparencySpring.Speed = speed
 end
 
-function AnimatedHighlight:SetColorSpeed(speed)
+function AnimatedHighlight:SetColorSpeed(speed: number)
 	assert(type(speed) == "number", "Bad speed")
 
 	self._fillColorSpring.Speed = speed
 	self._outlineColorSpring.Speed = speed
 end
 
-function AnimatedHighlight:SetSpeed(speed)
+function AnimatedHighlight:SetSpeed(speed: number)
 	assert(type(speed) == "number", "Bad speed")
 
 	self._percentVisible.Speed = speed
 end
 
-function AnimatedHighlight:Finish(doNotAnimate, callback)
+function AnimatedHighlight:Finish(doNotAnimate: boolean?, callback)
 	if self._percentVisible.p == 0 and self._percentVisible.v == 0 then
 		callback()
 		return
@@ -150,9 +156,9 @@ end
 	Sets the fill color
 
 	@param color Color3
-	@param doNotAnimate boolean | nil
+	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlight:SetFillColor(color, doNotAnimate)
+function AnimatedHighlight:SetFillColor(color: Color3, doNotAnimate: boolean?)
 	assert(typeof(color) == "Color3", "Bad color")
 
 	self._fillColorSpring:SetTarget(color, doNotAnimate)
@@ -162,21 +168,28 @@ end
 	Sets the outline color
 
 	@param color Color3
-	@param doNotAnimate boolean | nil
+	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlight:SetOutlineColor(color, doNotAnimate)
+function AnimatedHighlight:SetOutlineColor(color: Color3, doNotAnimate: boolean?)
 	assert(typeof(color) == "Color3", "Bad color")
 
 	self._outlineColorSpring:SetTarget(color, doNotAnimate)
 end
 
-function AnimatedHighlight:SetAdornee(adornee)
+--[=[
+	Sets the adornee
+]=]
+function AnimatedHighlight:SetAdornee(adornee: Instance?)
 	assert(typeof(adornee) == "Instance" or adornee == nil, "Bad adornee")
 
 	self._adornee.Value = adornee
 end
 
-function AnimatedHighlight:GetAdornee()
+--[=[
+	Gets the adornee
+	@return Instance?
+]=]
+function AnimatedHighlight:GetAdornee(): Instance?
 	return self._adornee.Value
 end
 
@@ -184,9 +197,9 @@ end
 	Sets the outlineTransparency
 
 	@param outlineTransparency number
-	@param doNotAnimate boolean | nil
+	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlight:SetOutlineTransparency(outlineTransparency, doNotAnimate)
+function AnimatedHighlight:SetOutlineTransparency(outlineTransparency: number, doNotAnimate: boolean?)
 	assert(type(outlineTransparency) == "number", "Bad outlineTransparency")
 
 	self._outlineTransparencySpring.Target = outlineTransparency
@@ -200,9 +213,9 @@ end
 	Sets the fillTransparency
 
 	@param fillTransparency number
-	@param doNotAnimate boolean | nil
+	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlight:SetFillTransparency(fillTransparency, doNotAnimate)
+function AnimatedHighlight:SetFillTransparency(fillTransparency: number, doNotAnimate: boolean?)
 	assert(type(fillTransparency) == "number", "Bad fillTransparency")
 
 	self._fillTransparencySpring.Target = fillTransparency
@@ -223,13 +236,13 @@ function AnimatedHighlight:_render()
 			self._fillTransparencySpring:ObserveRenderStepped(),
 			self._percentVisible:ObserveRenderStepped(),
 			function(transparency, visible)
-				return Math.map(visible, 0, 1, 1, transparency);
+				return Math.map(visible, 0, 1, 1, transparency)
 			end);
 		OutlineTransparency = Blend.Computed(
 			self._outlineTransparencySpring:ObserveRenderStepped(),
 			self._percentVisible:ObserveRenderStepped(),
 			function(transparency, visible)
-				return Math.map(visible, 0, 1, 1, transparency);
+				return Math.map(visible, 0, 1, 1, transparency)
 			end);
 		Adornee = self._adornee;
 		Parent = self._adornee;

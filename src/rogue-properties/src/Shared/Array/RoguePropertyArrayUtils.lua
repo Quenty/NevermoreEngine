@@ -10,11 +10,11 @@ local DefaultValueUtils = require("DefaultValueUtils")
 
 local RoguePropertyArrayUtils = {}
 
-function RoguePropertyArrayUtils.getNameFromIndex(index)
+function RoguePropertyArrayUtils.getNameFromIndex(index: number): string
 	return RoguePropertyArrayConstants.ARRAY_ENTRY_PERFIX .. tostring(index)
 end
 
-function RoguePropertyArrayUtils.getIndexFromName(name)
+function RoguePropertyArrayUtils.getIndexFromName(name: string): number?
 	return tonumber(String.removePrefix(name, RoguePropertyArrayConstants.ARRAY_ENTRY_PERFIX))
 end
 
@@ -26,7 +26,7 @@ function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(array
 		return nil, "Missing array data"
 	end
 
-	for index, item in pairs(arrayData) do
+	for index, item in arrayData do
 		if typeof(item) ~= expectedType then
 			expectedType = nil
 			-- TODO: Maybe union?
@@ -38,7 +38,7 @@ function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(array
 end
 
 function RoguePropertyArrayUtils.createRequiredTableDefinition(arrayData, parentPropertyTableDefinition)
-	local RoguePropertyTableDefinition = require("RoguePropertyTableDefinition")
+	local RoguePropertyTableDefinition = (require :: any)("RoguePropertyTableDefinition")
 
 	local entry = arrayData[1]
 	if type(entry) ~= "table" then
@@ -51,7 +51,7 @@ function RoguePropertyArrayUtils.createRequiredTableDefinition(arrayData, parent
 	propertyDefinition:SetParentPropertyTableDefinition(parentPropertyTableDefinition)
 	propertyDefinition:SetDefaultValue(DefaultValueUtils.toDefaultValue(entry))
 
-	for _, item in pairs(arrayData) do
+	for _, item in arrayData do
 		local canAssign, message = propertyDefinition:CanAssign(item, true)
 		if not canAssign then
 			return nil, string.format("Cannot assign due to %q", message)
@@ -61,8 +61,11 @@ function RoguePropertyArrayUtils.createRequiredTableDefinition(arrayData, parent
 	return propertyDefinition
 end
 
-function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromType(expectedType, parentPropertyTableDefinition)
-	local RoguePropertyDefinition = require("RoguePropertyDefinition")
+function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromType(
+	expectedType: string,
+	parentPropertyTableDefinition
+)
+	local RoguePropertyDefinition = (require :: any)("RoguePropertyDefinition")
 
 	local default = DefaultValueUtils.getDefaultValueForType(expectedType)
 	if default == nil then
@@ -77,13 +80,13 @@ function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromType(expect
 	return propertyDefinition
 end
 
-function RoguePropertyArrayUtils.createDefinitionsFromContainer(container, parentPropertyTableDefinition)
-	local RoguePropertyTableDefinition = require("RoguePropertyTableDefinition")
-	local RoguePropertyDefinition = require("RoguePropertyDefinition")
+function RoguePropertyArrayUtils.createDefinitionsFromContainer(container: Instance, parentPropertyTableDefinition)
+	local RoguePropertyTableDefinition = (require :: any)("RoguePropertyTableDefinition")
+	local RoguePropertyDefinition = (require :: any)("RoguePropertyDefinition")
 
 	local value = {}
 
-	for _, item in pairs(container:GetChildren()) do
+	for _, item in container:GetChildren() do
 		local index = RoguePropertyArrayUtils.getIndexFromName(item.Name)
 		if not index then
 			continue
@@ -108,10 +111,10 @@ function RoguePropertyArrayUtils.createDefinitionsFromContainer(container, paren
 	return value
 end
 
-function RoguePropertyArrayUtils.getDefaultValueMapFromContainer(container)
+function RoguePropertyArrayUtils.getDefaultValueMapFromContainer(container: Instance)
 	local value = {}
 
-	for _, item in pairs(container:GetChildren()) do
+	for _, item in container:GetChildren() do
 		local index = RoguePropertyArrayUtils.getIndexFromName(item.Name)
 		if index then
 			if item:IsA("Folder") then
@@ -132,11 +135,11 @@ function RoguePropertyArrayUtils.getDefaultValueMapFromContainer(container)
 end
 
 function RoguePropertyArrayUtils.createDefinitionsFromArrayData(arrayData, propertyTableDefinition)
-	local RoguePropertyTableDefinition = require("RoguePropertyTableDefinition")
-	local RoguePropertyDefinition = require("RoguePropertyDefinition")
+	local RoguePropertyTableDefinition = (require :: any)("RoguePropertyTableDefinition")
+	local RoguePropertyDefinition = (require :: any)("RoguePropertyDefinition")
 
 	local definitions = {}
-	for index, defaultValue in pairs(arrayData) do
+	for index, defaultValue in arrayData do
 		local name = RoguePropertyArrayUtils.getNameFromIndex(index)
 
 		if type(defaultValue) == "table" then

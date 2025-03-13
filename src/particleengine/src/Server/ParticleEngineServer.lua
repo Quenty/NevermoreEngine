@@ -28,7 +28,7 @@ end
 function ParticleEngineServer:_replicate(player, particle)
 	particle.Global = nil
 
-	for _, otherPlayer in pairs(Players:GetPlayers()) do
+	for _, otherPlayer in Players:GetPlayers() do
 		if otherPlayer ~= player then
 			self._remoteEvent:FireClient(otherPlayer, particle)
 		end
@@ -44,7 +44,7 @@ function ParticleEngineServer:ParticleNew(p)
 	p.Size = p.Size or Vector2.new(0.2,0.2)
 	p.Bloom = p.Bloom or Vector2.new(0,0)
 	p.Gravity = p.Gravity or Vector3.zero
-	p.LifeTime = p.LifeTime;
+	p.LifeTime = p.LifeTime
 	p.Color = p.Color or Color3.new(1,1,1)
 	p.Transparency = p.Transparency or 0.5
 

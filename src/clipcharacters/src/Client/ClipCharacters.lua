@@ -66,13 +66,13 @@ function ClipCharacters:_setupCharacter(maid, character)
 
 	-- Cleanup
 	maid:GiveTask(function()
-		for descendant, _ in pairs(originalTable) do
+		for descendant, _ in originalTable do
 			self:_onDescendantRemoving(originalTable, descendant)
 		end
 	end)
 
 	-- Initialize
-	for _, descendant in pairs(character:GetDescendants()) do
+	for _, descendant in character:GetDescendants() do
 		self:_onDescendantAdded(originalTable, descendant)
 	end
 end

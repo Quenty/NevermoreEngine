@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Handles selecting the right locale/translator for Studio, and Roblox games.
 
@@ -10,17 +11,33 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalizationService = game:GetService("LocalizationService")
 
-local RxInstanceUtils = require("RxInstanceUtils")
-local Rx = require("Rx")
 local LocalizationServiceUtils = require("LocalizationServiceUtils")
-local ValueObject = require("ValueObject")
 local Maid = require("Maid")
 local Promise = require("Promise")
+local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
+local ValueObject = require("ValueObject")
+local _Observable = require("Observable")
+local _ServiceBag = require("ServiceBag")
 
 local TranslatorService = {}
 TranslatorService.ServiceName = "TranslatorService"
 
-function TranslatorService:Init(serviceBag)
+export type TranslatorService = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_serviceBag: _ServiceBag.ServiceBag,
+		_translator: ValueObject.ValueObject<Translator>,
+		_localizationTable: LocalizationTable?,
+		_pendingTranslatorPromise: Promise.Promise<Translator>?,
+		_localeIdValue: ValueObject.ValueObject<string>?,
+		_loadedPlayerObservable: _Observable.Observable<Player>?,
+		_loadedPlayer: Player?,
+	},
+	{ __index = TranslatorService }
+))
+
+function TranslatorService.Init(self: TranslatorService, serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -29,7 +46,7 @@ function TranslatorService:Init(serviceBag)
 	self._translator:Mount(self:_observeTranslatorImpl())
 end
 
-function TranslatorService:GetLocalizationTable()
+function TranslatorService.GetLocalizationTable(self: TranslatorService): LocalizationTable
 	if self._localizationTable then
 		return self._localizationTable
 	end
@@ -47,7 +64,7 @@ function TranslatorService:GetLocalizationTable()
 	return localizationTable
 end
 
-function TranslatorService:_getLocalizationTableName()
+function TranslatorService._getLocalizationTableName(_self: TranslatorService): string
 	if RunService:IsServer() then
 		return "GeneratedJSONTable_Server"
 	else
@@ -60,7 +77,7 @@ end
 
 	@return Observable<Translator>
 ]=]
-function TranslatorService:ObserveTranslator()
+function TranslatorService.ObserveTranslator(self: TranslatorService): _Observable.Observable<Translator>
 	return self._translator:Observe()
 end
 
@@ -69,7 +86,7 @@ end
 
 	@return Observable<Translator>
 ]=]
-function TranslatorService:PromiseTranslator()
+function TranslatorService.PromiseTranslator(self: TranslatorService): Promise.Promise<Translator>
 	local found = self._translator.Value
 	if found then
 		return Promise.resolved(found)
@@ -95,7 +112,7 @@ function TranslatorService:PromiseTranslator()
 		end
 	end)
 
-	maid:GiveTask(self._translator:Observe():Subscribe(function(translator)
+	maid:GiveTask(self._translator:Observe():Subscribe(function(translator: Translator)
 		if translator then
 			promise:Resolve(translator)
 		end
@@ -109,7 +126,7 @@ end
 
 	@return Translator?
 ]=]
-function TranslatorService:GetTranslator()
+function TranslatorService.GetTranslator(self: TranslatorService): Translator?
 	return self._translator.Value
 end
 
@@ -118,34 +135,34 @@ end
 
 	@return Observable<string>
 ]=]
-function TranslatorService:ObserveLocaleId()
+function TranslatorService.ObserveLocaleId(self: TranslatorService): _Observable.Observable<string>
 	if self._localeIdValue then
 		return self._localeIdValue:Observe()
 	end
 
-	self._localeIdValue = self._maid:Add(ValueObject.new("en-us", "string"))
+	local valueObject = self._maid:Add(ValueObject.new("en-us", "string"))
 
-	self._localeIdValue:Mount(self._translator:Observe():Pipe({
-		Rx.switchMap(function(translator)
+	valueObject:Mount(self._translator:Observe():Pipe({
+		Rx.switchMap(function(translator: Translator): any
 			if translator then
 				return RxInstanceUtils.observeProperty(translator, "LocaleId")
 			else
 				-- Fallback
 				return self:_observeLoadedPlayer():Pipe({
-					Rx.switchMap(function(player)
+					Rx.switchMap(function(player: Player)
 						if player then
 							return RxInstanceUtils.observeProperty(player, "LocaleId")
 						else
 							return RxInstanceUtils.observeProperty(LocalizationService, "RobloxLocaleId")
 						end
-					end)
+					end) :: any,
 				})
 			end
-		end);
-		Rx.distinct();
+		end) :: any,
+		Rx.distinct(),
 	}))
-
-	return self._localeIdValue:Observe()
+	self._localeIdValue = valueObject
+	return valueObject:Observe()
 end
 
 --[=[
@@ -153,7 +170,7 @@ end
 
 	@return string
 ]=]
-function TranslatorService:GetLocaleId()
+function TranslatorService.GetLocaleId(self: TranslatorService): string
 	local found = self._translator.Value
 	if found then
 		return found.LocaleId
@@ -168,52 +185,53 @@ function TranslatorService:GetLocaleId()
 	end
 end
 
-function TranslatorService:_observeTranslatorImpl()
+function TranslatorService._observeTranslatorImpl(self: TranslatorService): _Observable.Observable<Translator>
 	return self:_observeLoadedPlayer():Pipe({
-		Rx.switchMap(function(loadedPlayer)
+		Rx.switchMap(function(loadedPlayer: Player): any
 			if loadedPlayer then
 				return Rx.fromPromise(LocalizationServiceUtils.promisePlayerTranslator(loadedPlayer))
 			end
 
 			return RxInstanceUtils.observeProperty(LocalizationService, "RobloxLocaleId"):Pipe({
-				Rx.switchMap(function(localeId)
+				Rx.switchMap(function(localeId: string): any
 					-- This can actually take a while (20-30 seconds)
 					return Rx.fromPromise(LocalizationServiceUtils.promiseTranslatorForLocale(localeId))
-				end)
+				end) :: any,
 			})
-		end);
-	})
+		end) :: any,
+	}) :: any
 end
 
-function TranslatorService:_observeLoadedPlayer()
+function TranslatorService._observeLoadedPlayer(self: TranslatorService): _Observable.Observable<Player>
 	if self._loadedPlayerObservable then
 		return self._loadedPlayerObservable
 	end
 
-	self._loadedPlayerObservable = RxInstanceUtils.observeProperty(Players, "LocalPlayer"):Pipe({
-		Rx.switchMap(function(player)
+	local observable: any = RxInstanceUtils.observeProperty(Players, "LocalPlayer"):Pipe({
+		Rx.switchMap(function(player: Player): any
 			if not player then
 				return Rx.of(nil)
 			end
 
 			return RxInstanceUtils.observeProperty(player, "LocaleId"):Pipe({
-				Rx.map(function(localeId)
+				Rx.map(function(localeId): Player?
 					if localeId == "" then
 						return nil
 					else
 						return player
 					end
-				end);
+				end) :: any,
 			})
-		end);
-		Rx.distinct();
-		Rx.cache();
+		end) :: any,
+		Rx.distinct() :: any,
+		Rx.cache() :: any,
 	})
+	self._loadedPlayerObservable = observable
 
-	return self._loadedPlayerObservable
+	return observable
 end
 
-function TranslatorService:Destroy()
+function TranslatorService.Destroy(self: TranslatorService)
 	self._maid:DoCleaning()
 end
 

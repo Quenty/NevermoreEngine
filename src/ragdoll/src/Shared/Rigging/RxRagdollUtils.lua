@@ -181,7 +181,7 @@ function RxRagdollUtils.runLocal(humanoid: Humanoid)
 					:Then(function(velocityReadings)
 						debug.profilebegin("initragdoll")
 
-						maid:GiveTask(RxRagdollUtils.suppressRootPartCollision(character, rigType))
+					maid:GiveTask(RxRagdollUtils.suppressRootPartCollision(character))
 						maid:GiveTask(RxRagdollUtils.enforceHeadCollision(character))
 						maid:GiveTask(RxRagdollUtils.enforceHumanoidStateMachineOff(character, humanoid))
 

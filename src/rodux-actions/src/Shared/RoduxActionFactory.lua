@@ -35,8 +35,8 @@ function RoduxActionFactory:__call(...)
 	return self:Create(...)
 end
 
-function RoduxActionFactory:CreateDispatcher(dispatch)
-	assert(type(dispatch) == "function", "Bad dispatch function")
+function RoduxActionFactory:CreateDispatcher(dispatch: () -> ())
+	assert(type(dispatch) == "function", "Bad dispatch")
 
 	return function(...)
 		return dispatch(self:Create(...))
@@ -71,11 +71,11 @@ function RoduxActionFactory:Validate(action)
 	return self._validator(action)
 end
 
-function RoduxActionFactory:Is(action)
+function RoduxActionFactory:Is(action): boolean
 	return action.type == self._actionName
 end
 
-function RoduxActionFactory:IsApplicable(action)
+function RoduxActionFactory:IsApplicable(action): boolean
 	if self:Is(action) then
 		assert(self:Validate(action))
 		return true

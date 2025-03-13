@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Handles interpolation of depth of field, which is tricky due to how Roblox implemented the shader
 	and how it interacts with other depth of field effects.
@@ -22,12 +23,25 @@ local SpringTransitionModel = require("SpringTransitionModel")
 local TransitionModel = require("TransitionModel")
 local ValueObject = require("ValueObject")
 local RxAttributeUtils = require("RxAttributeUtils")
+local _Brio = require("Brio")
 
 local DepthOfFieldEffect = setmetatable({}, TransitionModel)
 DepthOfFieldEffect.ClassName = "DepthOfFieldEffect"
 DepthOfFieldEffect.__index = DepthOfFieldEffect
 
-function DepthOfFieldEffect.new()
+export type DepthOfFieldEffect = typeof(setmetatable(
+	{} :: {
+		_depthOfField: Instance,
+		_focusDistanceSpring: SpringObject.SpringObject<number>,
+		_inFocusRadiusSpring: SpringObject.SpringObject<number>,
+		_nearIntensitySpring: SpringObject.SpringObject<number>,
+		_farIntensitySpring: SpringObject.SpringObject<number>,
+		_percentVisibleModel: SpringTransitionModel.SpringTransitionModel<number>,
+	},
+	DepthOfFieldEffect
+))
+
+function DepthOfFieldEffect.new(): DepthOfFieldEffect
 	local self = setmetatable(TransitionModel.new(), DepthOfFieldEffect)
 
 	self._focusDistanceSpring = self._maid:Add(SpringObject.new(40, 30))
@@ -58,7 +72,7 @@ function DepthOfFieldEffect.new()
 	return self
 end
 
-function DepthOfFieldEffect:SetShowSpeed(speed)
+function DepthOfFieldEffect:SetShowSpeed(speed: number)
 	self._percentVisibleModel:SetSpeed(speed)
 end
 
@@ -67,7 +81,7 @@ end
 	@param focusDistanceTarget number
 	@param doNotAnimate boolean
 ]=]
-function DepthOfFieldEffect:SetFocusDistanceTarget(focusDistanceTarget, doNotAnimate)
+function DepthOfFieldEffect:SetFocusDistanceTarget(focusDistanceTarget: number, doNotAnimate: boolean?)
 	assert(type(focusDistanceTarget) == "number", "Bad focusDistanceTarget")
 
 	self._focusDistanceSpring:SetTarget(focusDistanceTarget, doNotAnimate)
@@ -78,7 +92,7 @@ end
 	@param inFocusRadiusTarget number
 	@param doNotAnimate boolean
 ]=]
-function DepthOfFieldEffect:SetInFocusRadiusTarget(inFocusRadiusTarget, doNotAnimate)
+function DepthOfFieldEffect:SetInFocusRadiusTarget(inFocusRadiusTarget: number, doNotAnimate: boolean?)
 	assert(type(inFocusRadiusTarget) == "number", "Bad inFocusRadiusTarget")
 
 	self._inFocusRadiusSpring:SetTarget(inFocusRadiusTarget, doNotAnimate)
@@ -89,7 +103,7 @@ end
 	@param nearIntensityTarget number
 	@param doNotAnimate boolean
 ]=]
-function DepthOfFieldEffect:SetNearIntensityTarget(nearIntensityTarget, doNotAnimate)
+function DepthOfFieldEffect:SetNearIntensityTarget(nearIntensityTarget: number, doNotAnimate: boolean?)
 	assert(type(nearIntensityTarget) == "number", "Bad nearIntensityTarget")
 
 	self._nearIntensitySpring:SetTarget(nearIntensityTarget, doNotAnimate)
@@ -100,7 +114,7 @@ end
 	@param farIntensityTarget number
 	@param doNotAnimate boolean
 ]=]
-function DepthOfFieldEffect:SetFarIntensityTarget(farIntensityTarget, doNotAnimate)
+function DepthOfFieldEffect:SetFarIntensityTarget(farIntensityTarget: number, doNotAnimate: boolean?)
 	assert(type(farIntensityTarget) == "number", "Bad farIntensityTarget")
 
 	self._farIntensitySpring:SetTarget(farIntensityTarget, doNotAnimate)
@@ -110,7 +124,7 @@ end
 	Retrieves the distance target
 	@return number
 ]=]
-function DepthOfFieldEffect:GetFocusDistanceTarget()
+function DepthOfFieldEffect:GetFocusDistanceTarget(): number
 	return self._focusDistanceSpring.Target
 end
 
@@ -118,7 +132,7 @@ end
 	Retrieves the radius target
 	@return number
 ]=]
-function DepthOfFieldEffect:GetInFocusRadiusTarget()
+function DepthOfFieldEffect:GetInFocusRadiusTarget(): number
 	return self._inFocusRadiusSpring.Target
 end
 
@@ -126,7 +140,7 @@ end
 	Retrieve the near intensity target
 	@return number
 ]=]
-function DepthOfFieldEffect:GetNearIntensityTarget()
+function DepthOfFieldEffect:GetNearIntensityTarget(): number
 	return self._nearIntensitySpring.Target
 end
 
@@ -134,7 +148,7 @@ end
 	Retrieve the far intensity target
 	@return number
 ]=]
-function DepthOfFieldEffect:GetFarIntensityTarget()
+function DepthOfFieldEffect:GetFarIntensityTarget(): number
 	return self._farIntensitySpring.Target
 end
 
@@ -143,11 +157,11 @@ function DepthOfFieldEffect:_render()
 	-- state towards zero. The only issue is `InFocusRadius` must be rendered at target of 500 to fade "out" the effect
 	-- if other
 
-	return Blend.New "DepthOfFieldEffect" {
-		Name = "DepthOfField";
+	return Blend.New("DepthOfFieldEffect")({
+		Name = "DepthOfField",
 		Enabled = Blend.Computed(self._percentVisibleModel, function(visible)
 			return visible > 0
-		end);
+		end),
 		FocusDistance = Blend.Computed(
 			self._percentVisibleModel,
 			self._focusDistanceSpring,
@@ -161,7 +175,8 @@ function DepthOfFieldEffect:_render()
 				end
 
 				return Math.map(percentVisible, 0, 1, externalFocusDistance, focusDistance)
-			end);
+			end
+		),
 		InFocusRadius = Blend.Computed(
 			self._percentVisibleModel,
 			self._inFocusRadiusSpring,
@@ -179,31 +194,76 @@ function DepthOfFieldEffect:_render()
 				end
 
 				return Math.map(percentVisible, 0, 1, externalInFocusRadius, inFocusRadius)
-			end);
-		NearIntensity = Blend.Computed(self._percentVisibleModel, self._nearIntensitySpring, function(percentVisible, intensity)
-			return Math.map(percentVisible, 0, 1, 0, intensity)
-		end);
-		FarIntensity = Blend.Computed(self._percentVisibleModel, self._farIntensitySpring, function(percentVisible, intensity)
-			return Math.map(percentVisible, 0, 1, 0, intensity)
-		end);
+			end
+		),
+		NearIntensity = Blend.Computed(
+			self._percentVisibleModel,
+			self._nearIntensitySpring,
+			function(percentVisible, intensity)
+				return Math.map(percentVisible, 0, 1, 0, intensity)
+			end
+		),
+		FarIntensity = Blend.Computed(
+			self._percentVisibleModel,
+			self._farIntensitySpring,
+			function(percentVisible, intensity)
+				return Math.map(percentVisible, 0, 1, 0, intensity)
+			end
+		),
 		[Blend.Instance] = function(gui)
 			self._depthOfField = gui
 
 			-- Setup attributes so multiple tweening depth off fields with this system isn't sad
-			self._maid:GiveTask(Blend.Computed(self._percentVisibleModel, self._inFocusRadiusSpring, function(percentVisible, inFocusRadius)
-				return Math.map(percentVisible, 0, 1, 0, inFocusRadius)
-			end):Subscribe(function(targetDepthOfFieldRadius)
-				self._depthOfField:SetAttribute("DepthOfFieldEffect_TargetInFocusRadius", targetDepthOfFieldRadius)
-			end))
+			self._maid:GiveTask(
+				Blend.Computed(
+					self._percentVisibleModel,
+					self._inFocusRadiusSpring,
+					function(percentVisible, inFocusRadius)
+						return Math.map(percentVisible, 0, 1, 0, inFocusRadius)
+					end
+				)
+					:Subscribe(function(targetDepthOfFieldRadius)
+						self._depthOfField:SetAttribute(
+							"DepthOfFieldEffect_TargetInFocusRadius",
+							targetDepthOfFieldRadius
+						)
+					end)
+			)
 
-			self._maid:GiveTask(Blend.Computed(self._percentVisibleModel, self._focusDistanceSpring, function(percentVisible, focusDistance)
-				return Math.map(percentVisible, 0, 1, 0, focusDistance)
-			end):Subscribe(function(targetDepthOfFieldRadius)
-				self._depthOfField:SetAttribute("DepthOfFieldEffect_TargetFocusDistance", targetDepthOfFieldRadius)
-			end))
-		end;
-	}
+			self._maid:GiveTask(
+				Blend.Computed(
+					self._percentVisibleModel,
+					self._focusDistanceSpring,
+					function(percentVisible, focusDistance)
+						return Math.map(percentVisible, 0, 1, 0, focusDistance)
+					end
+				)
+					:Subscribe(function(targetDepthOfFieldRadius)
+						self._depthOfField:SetAttribute(
+							"DepthOfFieldEffect_TargetFocusDistance",
+							targetDepthOfFieldRadius
+						)
+					end)
+			)
+		end,
+	})
 end
+
+type OutputState = {
+	enabled: boolean?,
+	inFocusRadius: number?,
+	focusDistance: number?,
+	externalCount: number?,
+}
+
+type DepthOfFieldState = {
+	inFocusRadius: number,
+	focusDistance: number,
+	targetInFocusRadius: number,
+	targetFocusDistance: number,
+	enabled: boolean,
+	depthOfField: DepthOfFieldEffect?,
+}
 
 function DepthOfFieldEffect:_observeRenderedDepthOfFieldState()
 	if self._observeOtherStates then
@@ -213,25 +273,25 @@ function DepthOfFieldEffect:_observeRenderedDepthOfFieldState()
 	self._observeOtherStates = Observable.new(function(sub)
 		local topMaid = Maid.new()
 
-		local result = topMaid:Add(ValueObject.new(nil))
+		local result: ValueObject.ValueObject<OutputState?> = topMaid:Add(ValueObject.new(nil))
 
-		local latestStates = {}
+		local latestStates: { [Maid.Maid]: DepthOfFieldState } = {}
 
 		local function update()
 			local output = {
-				inFocusRadius = 0;
-				focusDistance = 0;
-				externalCount = 0;
+				inFocusRadius = 0,
+				focusDistance = 0,
+				externalCount = 0,
 			}
 
-			for _, state in pairs(latestStates) do
+			for _, state in latestStates do
 				if state.depthOfField == self._depthOfField then
 					continue
 				end
 
 				if state.enabled then
 					output.externalCount += 1
-					local inFocusRadius
+					local inFocusRadius: number
 					if state.targetInFocusRadius then
 						inFocusRadius = state.targetInFocusRadius
 					else
@@ -264,16 +324,22 @@ function DepthOfFieldEffect:_observeRenderedDepthOfFieldState()
 
 			local maid, depthOfField = brio:ToMaidAndValue()
 			maid:GiveTask(Rx.combineLatest({
-				depthOfField = depthOfField;
+				depthOfField = depthOfField,
 
-				inFocusRadius = RxInstanceUtils.observeProperty(depthOfField, "InFocusRadius");
-				targetInFocusRadius = RxAttributeUtils.observeAttribute(depthOfField, "DepthOfFieldEffect_TargetInFocusRadius");
+				inFocusRadius = RxInstanceUtils.observeProperty(depthOfField, "InFocusRadius"),
+				targetInFocusRadius = RxAttributeUtils.observeAttribute(
+					depthOfField,
+					"DepthOfFieldEffect_TargetInFocusRadius"
+				),
 
-				focusDistance = RxInstanceUtils.observeProperty(depthOfField, "FocusDistance");
-				targetFocusDistance = RxAttributeUtils.observeAttribute(depthOfField, "DepthOfFieldEffect_TargetFocusDistance");
+				focusDistance = RxInstanceUtils.observeProperty(depthOfField, "FocusDistance"),
+				targetFocusDistance = RxAttributeUtils.observeAttribute(
+					depthOfField,
+					"DepthOfFieldEffect_TargetFocusDistance"
+				),
 
-				enabled = RxInstanceUtils.observeProperty(depthOfField, "Enabled");
-			}):Subscribe(function(state)
+				enabled = RxInstanceUtils.observeProperty(depthOfField, "Enabled"),
+			}):Subscribe(function(state: any)
 				if state.depthOfField == self._depthOfField then
 					latestStates[maid] = nil
 				else
@@ -292,23 +358,23 @@ function DepthOfFieldEffect:_observeRenderedDepthOfFieldState()
 
 		return topMaid
 	end):Pipe({
-		Rx.cache()
+		Rx.cache() :: any,
 	})
 
 	return self._observeOtherStates
 end
 
-function DepthOfFieldEffect:_observeAllDepthOfFieldBrio()
+function DepthOfFieldEffect:_observeAllDepthOfFieldBrio(): Observable.Observable<_Brio.Brio<DepthOfFieldEffect>>
 	return Rx.merge({
-		RxInstanceUtils.observeChildrenOfClassBrio(Lighting, "DepthOfFieldEffect");
+		RxInstanceUtils.observeChildrenOfClassBrio(Lighting, "DepthOfFieldEffect") :: any,
 		RxInstanceUtils.observePropertyBrio(Workspace, "CurrentCamera", function(camera)
 			return camera ~= nil
 		end):Pipe({
 			RxBrioUtils.flatMapBrio(function(currentCamera)
 				return RxInstanceUtils.observeChildrenOfClassBrio(currentCamera, "DepthOfFieldEffect")
-			end)
-		})
-	})
+			end),
+		}) :: any,
+	}) :: any
 end
 
 return DepthOfFieldEffect

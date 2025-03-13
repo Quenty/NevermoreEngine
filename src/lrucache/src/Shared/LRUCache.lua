@@ -28,7 +28,7 @@ SOFTWARE.
 local LRUCache = {}
 LRUCache.ClassName = "LRUCache"
 
-function LRUCache.new(maxSize, maxBytes)
+function LRUCache.new(maxSize: number, maxBytes: number?)
     assert(maxSize >= 1, "maxSize must be >= 1")
     assert(not maxBytes or maxBytes >= 1, "maxBytes must be >= 1")
 

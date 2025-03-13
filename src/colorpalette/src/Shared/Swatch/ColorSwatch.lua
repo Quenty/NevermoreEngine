@@ -36,7 +36,7 @@ function ColorSwatch.new(color, vividness)
 	return self
 end
 
-function ColorSwatch:GetGraded(colorGrade)
+function ColorSwatch:GetGraded(colorGrade: number)
 	assert(type(colorGrade) == "number", "Bad colorGrade")
 
 	return ColorGradeUtils.getGradedColor(self._color.Value, colorGrade, self._vividness.Value)

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class GuiInteractionUtils
 ]=]
@@ -7,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local RxInstanceUtils = require("RxInstanceUtils")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local _Observable = require("Observable")
+local _Brio = require("Brio")
 
 local GuiInteractionUtils = {}
 
@@ -16,7 +19,7 @@ local GuiInteractionUtils = {}
 	@param gui GuiObject
 	@return Observable<boolean>
 ]=]
-function GuiInteractionUtils.observeInteractionEnabled(gui: GuiObject)
+function GuiInteractionUtils.observeInteractionEnabled(gui: GuiObject): _Observable.Observable<boolean>
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad gui")
 
 	return Rx.combineLatest({
@@ -27,9 +30,9 @@ function GuiInteractionUtils.observeInteractionEnabled(gui: GuiObject)
 		Rx.map(function(state)
 			return state.visible and state.guiState ~= Enum.GuiState.NonInteractable and state.dataModel and true
 				or false
-		end),
-		Rx.distinct(),
-	})
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
 end
 
 --[=[
@@ -37,16 +40,16 @@ end
 	interaction.
 
 	@param gui GuiObject
-	@return Observable<Brio>
+	@return Observable<Brio<true>>
 ]=]
-function GuiInteractionUtils.observeInteractionEnabledBrio(gui: GuiObject)
+function GuiInteractionUtils.observeInteractionEnabledBrio(gui: GuiObject): _Observable.Observable<_Brio.Brio<true>>
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad gui")
 
 	return GuiInteractionUtils.observeInteractionEnabled(gui):Pipe({
 		RxBrioUtils.switchToBrio(function(canInteract)
 			return canInteract
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 return GuiInteractionUtils

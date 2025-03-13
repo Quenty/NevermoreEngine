@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	A version of task.delay that can be cancelled. Soon to be useless.
 	@class cancellableDelay
@@ -11,20 +12,20 @@
 	@return function? -- Can be used to cancel
 	@within cancellableDelay
 ]=]
-local function cancellableDelay(timeoutInSeconds, func, ...)
+local function cancellableDelay<T...>(timeoutInSeconds: number, func: (T...) -> ...any, ...: T...): (() -> ())
 	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
 	assert(type(func) == "function", "Bad func")
 
-	local args = table.pack(...)
+	local args: any? = table.pack(...)
 
-	local running
+	local running: thread?
 	task.spawn(function()
 		running = coroutine.running()
 		task.wait(timeoutInSeconds)
 		local localArgs = args
 		running = nil
 		args = nil
-		func(table.unpack(localArgs, 1, localArgs.n))
+		func(table.unpack(localArgs :: any, 1, localArgs.n))
 	end)
 
 	return function()

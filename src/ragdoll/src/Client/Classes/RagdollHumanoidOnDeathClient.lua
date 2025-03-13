@@ -76,7 +76,7 @@ end
 function RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(character, duration)
 	local descendants = character:GetDescendants()
 	local transparencies = {}
-	for _, instance in pairs(descendants) do
+	for _, instance in descendants do
 		if instance:IsA("BasePart") or instance:IsA("Decal") then
 			transparencies[instance] = instance.Transparency
 		elseif instance:IsA("ParticleEmitter") then
@@ -90,7 +90,7 @@ function RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(
 		local dt = RunService.Heartbeat:Wait()
 		t = t + dt
 		local alpha = math.min(t / duration, 1)
-		for part, initialTransparency in pairs(transparencies) do
+		for part, initialTransparency in transparencies do
 			part.Transparency = (1 - alpha) * initialTransparency + alpha
 		end
 	end

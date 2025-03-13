@@ -1,0 +1,12 @@
+{
+  "name": "LipsumTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "lipsum": {
+        "$path": ".."
+      }
+    }
+  }
+}

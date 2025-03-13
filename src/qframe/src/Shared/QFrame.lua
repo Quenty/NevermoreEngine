@@ -156,7 +156,7 @@ end
 	@param b number
 	@return QFrame
 ]=]
-function QFrame.__pow(a: QFrame, b: QFrame): QF
+function QFrame.__pow(a: QFrame, b: number): QFrame
 	assert(QFrame.isQFrame(a) and type(b) == "number", "Bad a or b")
 
 	-- Center of mass agnostic power formula
@@ -209,7 +209,7 @@ end
 	@param b QFrame | number
 	@return QFrame
 ]=]
-function QFrame.__mul(a, b)
+function QFrame.__mul(a, b): QFrame
 	if type(a) == "number" and QFrame.isQFrame(b) then
 		return QFrame.new(a * b.x, a * b.y, a * b.z, a * b.W, a * b.X, a * b.Y, a * b.Z)
 	elseif QFrame.isQFrame(a) and type(b) == "number" then

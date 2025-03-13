@@ -1,4 +1,7 @@
+--!strict
 --[=[
+	Utility methods to help with loader functionality.
+
 	@private
 	@class Utils
 ]=]
@@ -10,23 +13,23 @@ local function errorOnIndex(_, index)
 end
 
 local READ_ONLY_METATABLE = {
-	__index = errorOnIndex;
-	__newindex = errorOnIndex;
+	__index = errorOnIndex,
+	__newindex = errorOnIndex,
 }
 
-function Utils.readonly(_table)
-	return setmetatable(_table, READ_ONLY_METATABLE)
+function Utils.readonly<T>(_table: T): T
+	return setmetatable(_table :: any, READ_ONLY_METATABLE)
 end
 
-function Utils.count(_table)
+function Utils.count(_table): number
 	local count = 0
-	for _, _ in pairs(_table) do
+	for _, _ in _table do
 		count = count + 1
 	end
 	return count
 end
 
-function Utils.getOrCreateValue(parent, instanceType, name, defaultValue)
+function Utils.getOrCreateValue(parent: Instance, instanceType: string, name: string, defaultValue: any)
 	assert(typeof(parent) == "Instance", "Bad argument 'parent'")
 	assert(type(instanceType) == "string", "Bad argument 'instanceType'")
 	assert(type(name) == "string", "Bad argument 'name'")
@@ -34,12 +37,20 @@ function Utils.getOrCreateValue(parent, instanceType, name, defaultValue)
 	local foundChild = parent:FindFirstChild(name)
 	if foundChild then
 		if not foundChild:IsA(instanceType) then
-			warn(string.format("[Utils.getOrCreateValue] - Value of type %q of name %q is of type %q in %s instead", instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
+			warn(
+				string.format(
+					"[Utils.getOrCreateValue] - Value of type %q of name %q is of type %q in %s instead",
+					instanceType,
+					name,
+					foundChild.ClassName,
+					foundChild:GetFullName()
+				)
+			)
 		end
 
 		return foundChild
 	else
-		local newChild = Instance.new(instanceType)
+		local newChild: any = Instance.new(instanceType)
 		newChild.Name = name
 		newChild.Value = defaultValue
 		newChild.Parent = parent
@@ -48,7 +59,7 @@ function Utils.getOrCreateValue(parent, instanceType, name, defaultValue)
 	end
 end
 
-function Utils.getValue(parent, instanceType, name, default)
+function Utils.getValue(parent: Instance, instanceType: string, name: string, default: any)
 	assert(typeof(parent) == "Instance", "Bad argument 'parent'")
 	assert(type(instanceType) == "string", "Bad argument 'instanceType'")
 	assert(type(name) == "string", "Bad argument 'name'")
@@ -56,9 +67,17 @@ function Utils.getValue(parent, instanceType, name, default)
 	local foundChild = parent:FindFirstChild(name)
 	if foundChild then
 		if foundChild:IsA(instanceType) then
-			return foundChild.Value
+			return (foundChild :: any).Value
 		else
-			warn(string.format("[Utils.getValue] - Value of type %q of name %q is of type %q in %s instead", instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
+			warn(
+				string.format(
+					"[Utils.getValue] - Value of type %q of name %q is of type %q in %s instead",
+					instanceType,
+					name,
+					foundChild.ClassName,
+					foundChild:GetFullName()
+				)
+			)
 			return nil
 		end
 	else
@@ -66,7 +85,7 @@ function Utils.getValue(parent, instanceType, name, default)
 	end
 end
 
-function Utils.setValue(parent, instanceType, name, value)
+function Utils.setValue(parent: Instance, instanceType: string, name: string, value: any)
 	assert(typeof(parent) == "Instance", "Bad argument 'parent'")
 	assert(type(instanceType) == "string", "Bad argument 'instanceType'")
 	assert(type(name) == "string", "Bad argument 'name'")
@@ -74,12 +93,20 @@ function Utils.setValue(parent, instanceType, name, value)
 	local foundChild = parent:FindFirstChild(name)
 	if foundChild then
 		if not foundChild:IsA(instanceType) then
-			warn(string.format("[Utils.setValue] - Value of type %q of name %q is of type %q in %s instead", instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
+			warn(
+				string.format(
+					"[Utils.setValue] - Value of type %q of name %q is of type %q in %s instead",
+					instanceType,
+					name,
+					foundChild.ClassName,
+					foundChild:GetFullName()
+				)
+			)
 		end
 
-		foundChild.Value = value
+		(foundChild :: any).Value = value
 	else
-		local newChild = Instance.new(instanceType)
+		local newChild: any = Instance.new(instanceType)
 		newChild.Name = name
 		newChild.Value = value
 		newChild.Parent = parent
@@ -87,7 +114,7 @@ function Utils.setValue(parent, instanceType, name, value)
 end
 
 
-function Utils.getOrCreateFolder(parent, folderName)
+function Utils.getOrCreateFolder(parent: Instance, folderName: string): Instance
 	local found = parent:FindFirstChild(folderName)
 	if found then
 		return found

@@ -10,11 +10,12 @@ local TeleportService = game:GetService("TeleportService")
 local GameConfigCmdrUtils = require("GameConfigCmdrUtils")
 local BadgeUtils = require("BadgeUtils")
 local PlayerUtils = require("PlayerUtils")
+local _ServiceBag = require("ServiceBag")
 
 local GameConfigCommandService = {}
 GameConfigCommandService.ServiceName = "GameConfigCommandService"
 
-function GameConfigCommandService:Init(serviceBag)
+function GameConfigCommandService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -54,8 +55,8 @@ function GameConfigCommandService:_registerCommands()
 	}, function(_context, players, badgeIds)
 		local givenTo = {}
 
-		for _, player in pairs(players) do
-			for _, badgeId in pairs(badgeIds) do
+		for _, player in players do
+			for _, badgeId in badgeIds do
 				BadgeUtils.promiseAwardBadge(player, badgeId)
 				table.insert(givenTo, string.format("%s badge %d", PlayerUtils.formatName(player), badgeId))
 			end
@@ -96,7 +97,7 @@ function GameConfigCommandService:_registerCommands()
 		context:Reply("Commencing teleport...")
 
 		if jobId then
-			for _, player in pairs(players) do
+			for _, player in players do
 				TeleportService:TeleportToPlaceInstance(placeId, jobId, player)
 			end
 		else

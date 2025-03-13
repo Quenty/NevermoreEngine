@@ -19,7 +19,7 @@ MasterClock.ClassName = "MasterClock"
 	@param remoteFunction RemoteFunction
 	@return MasterClock
 ]=]
-function MasterClock.new(remoteEvent, remoteFunction)
+function MasterClock.new(remoteEvent: RemoteEvent, remoteFunction: RemoteFunction)
 	local self = setmetatable(BaseObject.new(), MasterClock)
 
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
@@ -29,7 +29,7 @@ function MasterClock.new(remoteEvent, remoteFunction)
 		return self:_handleDelayRequest(timeThree)
 	end
 	self._maid:GiveTask(self._remoteEvent.OnServerEvent:Connect(function(player)
-		 self._remoteEvent:FireClient(player, self:GetTime())
+		self._remoteEvent:FireClient(player, self:GetTime())
 	end))
 
 	local alive = true
@@ -73,7 +73,7 @@ end
 	Returns true if the manager has synced with the server
 	@return boolean
 ]=]
-function MasterClock:IsSynced()
+function MasterClock:IsSynced(): boolean
 	return true
 end
 
@@ -81,7 +81,7 @@ end
 	Returns estimated ping in seconds
 	@return number
 ]=]
-function MasterClock:GetPing()
+function MasterClock:GetPing(): number
 	return self._offset
 end
 
@@ -89,7 +89,7 @@ end
 	Returns the sycncronized time
 	@return number
 ]=]
-function MasterClock:GetTime()
+function MasterClock:GetTime(): number
 	return tick()
 end
 
@@ -99,7 +99,7 @@ function MasterClock:_forceSync()
 	self._remoteEvent:FireAllClients(timeOne)
 end
 
-function MasterClock:_handleDelayRequest(timeThree)
+function MasterClock:_handleDelayRequest(timeThree: number)
 	-- Client sends back message to get the SM_Difference.
 	-- returns slaveMasterDifference
 	local timeFour = self:GetTime()

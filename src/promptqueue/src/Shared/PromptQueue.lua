@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Queue system for prompts and other UI
 
@@ -12,17 +13,35 @@ local Promise = require("Promise")
 local TransitionModel = require("TransitionModel")
 local ValueObject = require("ValueObject")
 local Signal = require("Signal")
+local _Observable = require("Observable")
 
 local PromptQueue = setmetatable({}, BaseObject)
 PromptQueue.ClassName = "PromptQueue"
 PromptQueue.__index = PromptQueue
 
+type PromptEntry = {
+	promise: Promise.Promise<()>,
+	execute: () -> (),
+	cancel: (doNotAnimate: boolean?) -> (),
+}
+
+export type PromptQueue = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_isShowing: ValueObject.ValueObject<boolean>,
+		_clearRequested: Signal.Signal<(boolean?)>,
+		_queue: { PromptEntry },
+		_currentProcessingEntry: PromptEntry?,
+	},
+	{ __index = PromptQueue }
+))
+
 --[=[
 	Constructs a new prompt queue
 	@return PromptQueue
 ]=]
-function PromptQueue.new()
-	local self = setmetatable(BaseObject.new(), PromptQueue)
+function PromptQueue.new(): PromptQueue
+	local self = setmetatable(BaseObject.new() :: any, PromptQueue)
 
 	self._isShowing = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._clearRequested = self._maid:Add(Signal.new())
@@ -30,7 +49,7 @@ function PromptQueue.new()
 	self._queue = {}
 	self._currentProcessingEntry = nil
 
-	return self
+	return self :: any
 end
 
 --[=[
@@ -38,24 +57,27 @@ end
 
 	@param transitionModel TransitionModel
 ]=]
-function PromptQueue:Queue(transitionModel)
+function PromptQueue.Queue(self: PromptQueue, transitionModel: TransitionModel.TransitionModel): Promise.Promise<()>
 	assert(TransitionModel.isTransitionModel(transitionModel), "Bad transitionModel")
 
 	local maid = Maid.new()
 	local promise = maid:Add(Promise.new())
 
-	local isCancelling = false
+	local isCancelling: boolean = false
 
-	local entry = {
-		promise = promise;
+	local entry: PromptEntry = {
+		promise = promise,
 		execute = function()
 			assert(promise:IsPending(), "Not pending")
 
+			-- stylua: ignore
 			maid:GivePromise(transitionModel:PromiseShow())
 				:Then(function()
 					if transitionModel.PromiseSustain then
 						return maid:GivePromise(transitionModel:PromiseSustain())
 					end
+
+					return nil
 				end)
 				:Then(function()
 					return maid:GivePromise(transitionModel:PromiseHide())
@@ -75,7 +97,7 @@ function PromptQueue:Queue(transitionModel)
 					warn(string.format("[PromptQueue] - Failed to execute due to %q", tostring(... or nil)))
 					return  Promise.rejected(...)
 				end)
-		end;
+		end,
 		cancel = function(doNotAnimate)
 			assert(promise:IsPending(), "Not pending")
 			if isCancelling then
@@ -97,18 +119,17 @@ function PromptQueue:Queue(transitionModel)
 
 					return Promise.rejected(...)
 				end)
-		end;
+		end,
 	}
 
 	table.insert(self._queue, entry)
 
-
-	maid:GiveTask(self._clearRequested:Connect(function(doNotAnimate)
+	maid:GiveTask(self._clearRequested:Connect(function(doNotAnimate: boolean?)
 		entry.cancel(doNotAnimate)
 	end))
 
 	promise:Finally(function()
-		self._maid[maid] = nil
+		self._maid[maid :: any] = nil
 	end)
 	maid:GiveTask(function()
 		if self._currentProcessingEntry == entry then
@@ -120,10 +141,10 @@ function PromptQueue:Queue(transitionModel)
 			table.remove(self._queue, index)
 		end
 
-		self._maid[maid] = nil
+		self._maid[maid :: any] = nil
 	end)
 
-	self._maid[maid] = maid
+	self._maid[maid :: any] = maid
 
 	self:_startQueueProcessing()
 
@@ -135,7 +156,7 @@ end
 
 	@return boolean
 ]=]
-function PromptQueue:HasItems()
+function PromptQueue.HasItems(self: PromptQueue): boolean
 	return #self._queue > 0
 end
 
@@ -144,7 +165,7 @@ end
 
 	@param doNotAnimate boolean?
 ]=]
-function PromptQueue:Clear(doNotAnimate)
+function PromptQueue.Clear(self: PromptQueue, doNotAnimate: boolean?)
 	self._clearRequested:Fire(doNotAnimate)
 end
 
@@ -154,13 +175,13 @@ end
 	@param doNotAnimate boolean?
 	@return Promise
 ]=]
-function PromptQueue:HideCurrent(doNotAnimate)
+function PromptQueue.HideCurrent(self: PromptQueue, doNotAnimate: boolean?)
 	if self._currentProcessingEntry then
 		local promise = self._currentProcessingEntry.promise
 
 		self._currentProcessingEntry.cancel(doNotAnimate)
 
-	 	return promise
+		return promise
 	else
 		return Promise.resolved()
 	end
@@ -168,10 +189,10 @@ end
 
 --[=[
 	Returns whether or not the PromptQueue is currently showing its contents.
-	
+
 	@return boolean
 ]=]
-function PromptQueue:IsShowing()
+function PromptQueue.IsShowing(self: PromptQueue): boolean
 	return self._isShowing.Value
 end
 
@@ -180,11 +201,11 @@ end
 
 	@return Observable<boolean>
 ]=]
-function PromptQueue:ObserveIsShowing()
+function PromptQueue.ObserveIsShowing(self: PromptQueue): _Observable.Observable<boolean>
 	return self._isShowing:Observe()
 end
 
-function PromptQueue:_startQueueProcessing()
+function PromptQueue._startQueueProcessing(self: PromptQueue)
 	if self._maid._processing then
 		return
 	end

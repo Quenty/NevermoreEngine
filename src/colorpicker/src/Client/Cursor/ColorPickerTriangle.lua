@@ -46,7 +46,7 @@ function ColorPickerTriangle:SetColor(color)
 	self._color.Value = color
 end
 
-function ColorPickerTriangle:SetTransparency(transparency)
+function ColorPickerTriangle:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency

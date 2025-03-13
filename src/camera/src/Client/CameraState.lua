@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Data container for the state of a camera.
 	@class CameraState
@@ -12,24 +13,42 @@ local DuckTypeUtils = require("DuckTypeUtils")
 local CameraState = {}
 CameraState.ClassName = "CameraState"
 
+export type CameraState = typeof(setmetatable(
+	{} :: {
+		CameraFrame: CameraFrame.CameraFrame,
+		CameraFrameDerivative: CameraFrame.CameraFrame,
+		CFrame: CFrame,
+		Position: Vector3,
+		Velocity: Vector3,
+		FieldOfView: number,
+	},
+	{ __index = CameraState }
+))
+
 --[=[
 	Constructs a new CameraState
-	@param cameraFrame CameraFrame | Camera
+	@param cameraFrame (CameraFrame | Camera)?
 	@param cameraFrameDerivative CameraFrame?
 	@return CameraState
 ]=]
-function CameraState.new(cameraFrame, cameraFrameDerivative)
-	local self = setmetatable({}, CameraState)
+function CameraState.new(
+	cameraFrame: (CameraFrame.CameraFrame | Camera)?,
+	cameraFrameDerivative: CameraFrame.CameraFrame?
+): CameraState
+	local self = setmetatable({} :: any, CameraState)
 
 	if typeof(cameraFrame) == "Instance" then
 		assert(cameraFrame:IsA("Camera"))
 
-		cameraFrame = CameraFrame.new(QFrame.fromCFrameClosestTo(cameraFrame.CFrame, QFrame.new()), cameraFrame.FieldOfView)
+		cameraFrame =
+			CameraFrame.new(QFrame.fromCFrameClosestTo(cameraFrame.CFrame, QFrame.new()), cameraFrame.FieldOfView)
 	end
 
 	assert(CameraFrame.isCameraFrame(cameraFrame) or type(cameraFrame) == "nil", "Bad cameraFrame")
-	assert(CameraFrame.isCameraFrame(cameraFrameDerivative) or type(cameraFrameDerivative) == "nil",
-		"Bad cameraFrameDerivative")
+	assert(
+		CameraFrame.isCameraFrame(cameraFrameDerivative) or type(cameraFrameDerivative) == "nil",
+		"Bad cameraFrameDerivative"
+	)
 
 	self.CameraFrame = cameraFrame or CameraFrame.new()
 	self.CameraFrameDerivative = cameraFrameDerivative or CameraFrame.new()
@@ -42,7 +61,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function CameraState.isCameraState(value)
+function CameraState.isCameraState(value: any): boolean
 	return DuckTypeUtils.isImplementation(CameraState, value)
 end
 
@@ -88,7 +107,7 @@ end
 	Set another camera state. Typically used to set Workspace.CurrentCamera's state to match this camera's state
 	@param camera Camera -- A CameraState to set, also accepts a Roblox Camera
 ]=]
-function CameraState:Set(camera)
+function CameraState:Set(camera: Camera)
 	camera.FieldOfView = self.FieldOfView
 	camera.CFrame = self.CFrame
 end

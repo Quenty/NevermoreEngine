@@ -15,18 +15,44 @@ local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local _GameConfigAssetBase = require("GameConfigAssetBase")
+local _Observable = require("Observable")
+local _Brio = require("Brio")
 
 local GameConfigBase = setmetatable({}, BaseObject)
 GameConfigBase.ClassName = "GameConfigBase"
 GameConfigBase.__index = GameConfigBase
+
+type GameConfigAssetType = GameConfigAssetTypes.GameConfigAssetType
+type ObservableMapSet<K, V> = ObservableMapSet.ObservableMapSet<K, V>
+type GameConfigAssetBase = _GameConfigAssetBase.GameConfigAssetBase
+
+export type GameConfigBase = typeof(setmetatable(
+	{} :: {
+		_obj: Folder,
+		_setupObservation: boolean,
+		_gameConfigBindersServer: any,
+		_gameId: AttributeValue.AttributeValue<number>,
+		_assetTypeToAssetConfig: any,
+		_assetTypeToAssetKeyMappings: {
+			[GameConfigAssetType]: any,
+		},
+		_assetTypeToAssetIdMappings: {
+			[GameConfigAssetType]: any,
+		},
+		_assetKeyToAssetConfig: any,
+		_assetIdToAssetConfig: any,
+	},
+	{ __index = GameConfigBase}
+))
 
 --[=[
 	Constructs a new game config.
 	@param folder
 	@return GameConfigBase
 ]=]
-function GameConfigBase.new(folder: Instance)
-	local self = setmetatable(BaseObject.new(folder), GameConfigBase)
+function GameConfigBase.new(folder: Folder): GameConfigBase
+	local self = setmetatable(BaseObject.new(folder) :: any, GameConfigBase)
 
 	self._gameId = AttributeValue.new(self._obj, GameConfigConstants.GAME_ID_ATTRIBUTE, game.GameId)
 
@@ -39,25 +65,28 @@ function GameConfigBase.new(folder: Instance)
 	self._assetTypeToAssetIdMappings = {}
 
 	-- Setup assetType mappings to key mapping observations
-	for _, assetType in pairs(GameConfigAssetTypes) do
+	for _, assetType in GameConfigAssetTypes do
 		self._assetTypeToAssetKeyMappings[assetType] = ObservableMapSet.new()
 		self._maid:GiveTask(self._assetTypeToAssetKeyMappings[assetType])
 
 		self._assetTypeToAssetIdMappings[assetType] = ObservableMapSet.new()
 		self._maid:GiveTask(self._assetTypeToAssetIdMappings[assetType])
 
-		self._maid:GiveTask(self._assetTypeToAssetConfig:ObserveItemsForKeyBrio(assetType)
-			:Subscribe(function(brio)
-				if brio:IsDead() then
-					return
-				end
+		self._maid:GiveTask(self._assetTypeToAssetConfig:ObserveItemsForKeyBrio(assetType):Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-				local gameAssetConfig = brio:GetValue()
-				local maid = brio:ToMaid()
+			local gameAssetConfig = brio:GetValue()
+			local maid = brio:ToMaid()
 
-				maid:GiveTask(self._assetTypeToAssetKeyMappings[assetType]:Push(gameAssetConfig:ObserveAssetKey(), gameAssetConfig))
-				maid:GiveTask(self._assetTypeToAssetIdMappings[assetType]:Push(gameAssetConfig:ObserveAssetId(), gameAssetConfig))
-			end))
+			maid:GiveTask(
+				self._assetTypeToAssetKeyMappings[assetType]:Push(gameAssetConfig:ObserveAssetKey(), gameAssetConfig)
+			)
+			maid:GiveTask(
+				self._assetTypeToAssetIdMappings[assetType]:Push(gameAssetConfig:ObserveAssetId(), gameAssetConfig)
+			)
+		end))
 	end
 
 	return self
@@ -67,7 +96,7 @@ end
 	Gets the current folder
 	@return Instance
 ]=]
-function GameConfigBase:GetFolder()
+function GameConfigBase.GetFolder(self: GameConfigBase): Folder
 	return self._obj
 end
 
@@ -75,7 +104,7 @@ end
 	Returns an array of all the assets of that type underneath this config
 	@return { GameConfigAssetBase }
 ]=]
-function GameConfigBase:GetAssetsOfType(assetType: string)
+function GameConfigBase.GetAssetsOfType(self: GameConfigBase, assetType: GameConfigAssetType): { GameConfigAssetBase }
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	return self._assetTypeToAssetConfig:GetListForKey(assetType)
@@ -87,7 +116,7 @@ end
 	@param assetKey
 	@return { GameConfigAssetBase }
 ]=]
-function GameConfigBase:GetAssetsOfTypeAndKey(assetType: string, assetKey: string)
+function GameConfigBase.GetAssetsOfTypeAndKey(self: GameConfigBase, assetType: GameConfigAssetType, assetKey: string)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 
@@ -100,7 +129,7 @@ end
 	@param assetId
 	@return { GameConfigAssetBase }
 ]=]
-function GameConfigBase:GetAssetsOfTypeAndId(assetType: string, assetId: number)
+function GameConfigBase.GetAssetsOfTypeAndId(self: GameConfigBase, assetType: GameConfigAssetType, assetId: number)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
@@ -113,7 +142,11 @@ end
 	@param assetKey
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigBase:ObserveAssetByTypeAndKeyBrio(assetType: string, assetKey: string)
+function GameConfigBase.ObserveAssetByTypeAndKeyBrio(
+	self: GameConfigBase,
+	assetType: GameConfigAssetType,
+	assetKey: string
+): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 
@@ -126,7 +159,11 @@ end
 	@param assetId
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigBase:ObserveAssetByTypeAndIdBrio(assetType: string, assetId: number)
+function GameConfigBase.ObserveAssetByTypeAndIdBrio(
+	self: GameConfigBase,
+	assetType: GameConfigAssetType,
+	assetId: number
+): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
@@ -138,7 +175,10 @@ end
 	@param assetId
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigBase:ObserveAssetByIdBrio(assetId: number)
+function GameConfigBase.ObserveAssetByIdBrio(
+	self: GameConfigBase,
+	assetId: number
+): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
 	assert(type(assetId) == "number", "Bad assetId")
 
 	return self._assetIdToAssetConfig:ObserveItemsForKeyBrio(assetId)
@@ -149,7 +189,10 @@ end
 	@param assetKey
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigBase:ObserveAssetByKeyBrio(assetKey: string)
+function GameConfigBase.ObserveAssetByKeyBrio(
+	self: GameConfigBase,
+	assetKey: string
+): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
 	assert(type(assetKey) == "string", "Bad assetKey")
 
 	return self._assetKeyToAssetConfig:ObserveItemsForKeyBrio(assetKey)
@@ -160,7 +203,10 @@ end
 	@param assetType
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigBase:ObserveAssetByTypeBrio(assetType: string)
+function GameConfigBase.ObserveAssetByTypeBrio(
+	self: GameConfigBase,
+	assetType: GameConfigAssetType
+): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	return self._assetTypeToAssetConfig:ObserveItemsForKeyBrio(assetType)
@@ -169,7 +215,7 @@ end
 --[=[
 	Initializes the observation. Should be called by the class inheriting this object.
 ]=]
-function GameConfigBase:InitObservation()
+function GameConfigBase.InitObservation(self: GameConfigBase)
 	if self._setupObservation then
 		return
 	end
@@ -177,12 +223,15 @@ function GameConfigBase:InitObservation()
 	self._setupObservation = true
 
 	local observables = {}
-	for _, assetType in pairs(GameConfigAssetTypes) do
-		table.insert(observables, self:_observeAssetFolderBrio(assetType):Pipe({
-			RxBrioUtils.switchMapBrio(function(folder)
-				return RxBinderUtils.observeBoundChildClassBrio(self:GetGameConfigAssetBinder(), folder)
-			end);
-		}))
+	for _, assetType in GameConfigAssetTypes do
+		table.insert(
+			observables,
+			self:_observeAssetFolderBrio(assetType):Pipe({
+				RxBrioUtils.switchMapBrio(function(folder)
+					return RxBinderUtils.observeBoundChildClassBrio(self:GetGameConfigAssetBinder(), folder)
+				end),
+			})
+		)
 	end
 
 	-- hook up mapping
@@ -200,7 +249,7 @@ function GameConfigBase:InitObservation()
 	end))
 end
 
-function GameConfigBase:_observeAssetFolderBrio(assetType)
+function GameConfigBase._observeAssetFolderBrio(self: GameConfigBase, assetType: GameConfigAssetType)
 	return GameConfigUtils.observeAssetFolderBrio(self._obj, assetType)
 end
 
@@ -208,7 +257,7 @@ end
 	Returns the game id for this profile.
 	@return Observable<number>
 ]=]
-function GameConfigBase:ObserveGameId()
+function GameConfigBase.ObserveGameId(self: GameConfigBase): _Observable.Observable<number>
 	return self._gameId:Observe()
 end
 
@@ -216,7 +265,7 @@ end
 	Returns the game id
 	@return number
 ]=]
-function GameConfigBase:GetGameId()
+function GameConfigBase.GetGameId(self: GameConfigBase): number?
 	return self._gameId.Value
 end
 
@@ -224,7 +273,7 @@ end
 	Returns this configuration's name
 	@return string
 ]=]
-function GameConfigBase:GetConfigName()
+function GameConfigBase.GetConfigName(self: GameConfigBase): string
 	return self._obj.Name
 end
 
@@ -232,11 +281,11 @@ end
 	Observes this configs name
 	@return Observable<string>
 ]=]
-function GameConfigBase:ObserveConfigName()
+function GameConfigBase.ObserveConfigName(self: GameConfigBase): _Observable.Observable<string>
 	return RxInstanceUtils.observeProperty(self._obj, "Name")
 end
 
-function GameConfigBase:GetGameConfigAssetBinder()
+function GameConfigBase.GetGameConfigAssetBinder(_self: GameConfigBase)
 	error("Not implemented")
 end
 

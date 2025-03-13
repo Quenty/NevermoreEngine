@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class PromiseInstanceUtils
 ]=]
@@ -15,7 +16,7 @@ local PromiseInstanceUtils = {}
 	@param instance Instance
 	@return Promise
 ]=]
-function PromiseInstanceUtils.promiseRemoved(instance)
+function PromiseInstanceUtils.promiseRemoved(instance: Instance): Promise.Promise<()>
 	assert(instance:IsDescendantOf(game))
 
 	local maid = Maid.new()

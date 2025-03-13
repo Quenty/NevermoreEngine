@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Tracks a player's character's humanoid
 	@class HumanoidTracker
@@ -14,6 +15,17 @@ local BaseObject = require("BaseObject")
 local HumanoidTracker = setmetatable({}, BaseObject)
 HumanoidTracker.ClassName = "HumanoidTracker"
 HumanoidTracker.__index = HumanoidTracker
+
+export type HumanoidTracker = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_player: Player,
+		HumanoidDied: Signal.Signal<Humanoid?>,
+		AliveHumanoid: ValueObject.ValueObject<Humanoid?>,
+		Humanoid: ValueObject.ValueObject<Humanoid?>,
+	},
+	{ __index = HumanoidTracker }
+))
 
 --[=[
 	Current humanoid
@@ -42,8 +54,8 @@ HumanoidTracker.__index = HumanoidTracker
 	@param player Player
 	@return HumanoidTracker
 ]=]
-function HumanoidTracker.new(player)
-	local self = setmetatable(BaseObject.new(), HumanoidTracker)
+function HumanoidTracker.new(player: Player): HumanoidTracker
+	local self = setmetatable(BaseObject.new() :: any, HumanoidTracker)
 
 	self._player = player or error("No player")
 
@@ -85,13 +97,13 @@ end
 
 	@return Promise<Humanoid>
 ]=]
-function HumanoidTracker:PromiseNextHumanoid()
+function HumanoidTracker.PromiseNextHumanoid(self: HumanoidTracker): Promise.Promise<Humanoid>
 	if self.Humanoid.Value then
 		return Promise.resolved(self.Humanoid.Value)
 	end
 
 	if self._maid._nextHumanoidPromise then
-		return self._maid._nextHumanoidPromise
+		return self._maid._nextHumanoidPromise :: Promise.Promise<Humanoid>
 	end
 
 	local promise = Promise.new()
@@ -111,7 +123,7 @@ function HumanoidTracker:PromiseNextHumanoid()
 	return promise
 end
 
-function HumanoidTracker:_onCharacterChanged()
+function HumanoidTracker._onCharacterChanged(self: HumanoidTracker)
 	local maid = Maid.new()
 	self._maid._characterMaid = maid
 
@@ -130,7 +142,7 @@ function HumanoidTracker:_onCharacterChanged()
 	self.Humanoid.Value = nil
 
 	-- Listen for changes
-	maid._childAdded = character.ChildAdded:Connect(function(child)
+	maid._childAdded = character.ChildAdded:Connect(function(child: Instance)
 		if child:IsA("Humanoid") then
 			maid._childAdded = nil
 			self.Humanoid.Value = child -- TODO: Track if this humanoid goes away
@@ -138,7 +150,7 @@ function HumanoidTracker:_onCharacterChanged()
 	end)
 end
 
-function HumanoidTracker:_handleHumanoidChanged(newHumanoid, _, maid)
+function HumanoidTracker._handleHumanoidChanged(self: HumanoidTracker, newHumanoid: Humanoid, _, maid: Maid.Maid)
 	if not newHumanoid then
 		self.AliveHumanoid.Value = nil
 		return

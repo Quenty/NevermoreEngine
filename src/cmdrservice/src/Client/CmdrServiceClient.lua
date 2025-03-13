@@ -17,6 +17,7 @@ local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local String = require("String")
+local _ServiceBag = require("ServiceBag")
 
 local CmdrServiceClient = {}
 CmdrServiceClient.ServiceName = "CmdrServiceClient"
@@ -25,7 +26,7 @@ CmdrServiceClient.ServiceName = "CmdrServiceClient"
 	Starts the cmdr service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function CmdrServiceClient:Init(serviceBag)
+function CmdrServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

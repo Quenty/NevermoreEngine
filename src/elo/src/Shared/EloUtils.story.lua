@@ -21,7 +21,7 @@ local function TextLabel(props)
 		TextSize = props.TextSize or 20;
 		Text = props.Text;
 		RichText = props.RichText;
-	};
+	}
 end
 
 local function MatchResultCard(props)
@@ -294,7 +294,7 @@ return function(target)
 				};
 			}
 
-			for _, matchResultType in pairs(matchResultTypes) do
+			for _, matchResultType in matchResultTypes do
 				if type(matchResultType) == "string" then
 					table.insert(groupOptions, TextLabel({
 						TextColor3 = Color3.new(1, 1, 1);

@@ -38,7 +38,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function UndoStackEntry.isUndoStackEntry(value)
+function UndoStackEntry.isUndoStackEntry(value: any): boolean
 	return DuckTypeUtils.isImplementation(UndoStackEntry, value)
 end
 

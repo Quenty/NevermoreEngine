@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Observable rx library for Roblox by Quenty. This provides a variety of
 	composition classes to be used, and is the primary entry point for an
@@ -12,14 +13,20 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CancelToken = require("CancelToken")
 local Maid = require("Maid")
+local MaidTaskUtils = require("MaidTaskUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Symbol = require("Symbol")
 local ThrottledFunction = require("ThrottledFunction")
+local _Subscription = require("Subscription")
 local cancellableDelay = require("cancellableDelay")
-local CancelToken = require("CancelToken")
-local MaidTaskUtils = require("MaidTaskUtils")
+local _Signal = require("Signal")
+
+export type Map<Key, Value> = { [Key]: Value }
+export type Set<T> = { [T]: true }
+export type Predicate<T...> = (T...) -> boolean
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 local function identity(...)
@@ -42,8 +49,11 @@ end
 local Rx = {
 	EMPTY = Observable.new(function(sub)
 		sub:Complete()
+		return
 	end),
-	NEVER = Observable.new(function(_) end),
+	NEVER = Observable.new(function(_)
+		return
+	end),
 }
 
 --[=[
@@ -55,7 +65,7 @@ local Rx = {
 ]=]
 function Rx.pipe(transformers)
 	assert(type(transformers) == "table", "Bad transformers")
-	for index, transformer in pairs(transformers) do
+	for index, transformer in transformers do
 		if type(transformer) ~= "function" then
 			error(
 				string.format(
@@ -71,7 +81,7 @@ function Rx.pipe(transformers)
 		assert(source, "Bad source")
 
 		local current = source
-		for key, transformer in pairs(transformers) do
+		for key, transformer in transformers do
 			current = transformer(current)
 
 			if not (type(current) == "table" and current.ClassName == "Observable") then
@@ -102,7 +112,7 @@ end
 	@param ... any -- Arguments to emit
 	@return Observable
 ]=]
-function Rx.of(...)
+function Rx.of<T...>(...: T...): Observable.Observable<T...>
 	local args = table.pack(...)
 
 	return Observable.new(function(sub)
@@ -111,6 +121,7 @@ function Rx.of(...)
 		end
 
 		sub:Complete()
+		return
 	end)
 end
 
@@ -125,6 +136,7 @@ function Rx.failed(...)
 
 	return Observable.new(function(sub)
 		sub:Fail(table.unpack(args, 1, args.n))
+		return
 	end)
 end
 
@@ -194,11 +206,11 @@ end
 	@param observables { Observable }
 	@return Observable
 ]=]
-function Rx.merge(observables)
+function Rx.merge<T...>(observables: { Observable.Observable<T...> }): Observable.Observable<T...>
 	assert(type(observables) == "table", "Bad observables")
 
 	local totalCount = 0
-	for _, item in pairs(observables) do
+	for _, item in observables do
 		assert(Observable.isObservable(item), "Not an observable")
 		totalCount = totalCount + 1
 	end
@@ -207,7 +219,7 @@ function Rx.merge(observables)
 		local maid = Maid.new()
 		local pendingCount = totalCount
 
-		for _, observable in pairs(observables) do
+		for _, observable: any in observables do
 			maid:GiveTask(observable:Subscribe(function(...)
 				sub:Fire(...)
 			end, function(...)
@@ -233,10 +245,10 @@ end
 	@param event Signal<T>
 	@return Observable<T>
 ]=]
-function Rx.fromSignal(event)
+function Rx.fromSignal<T...>(event: _Signal.Signal<T...> | RBXScriptSignal): Observable.Observable<T...>
 	return Observable.new(function(sub)
 		-- This stream never completes or fails!
-		return event:Connect(function(...)
+		return (event :: any):Connect(function(...)
 			sub:Fire(...)
 		end)
 	end)
@@ -249,7 +261,7 @@ end
 	@param promise Promise<T>
 	@return Observable<T>
 ]=]
-function Rx.fromPromise(promise)
+function Rx.fromPromise<T...>(promise: Promise.Promise<T...>): Observable.Observable<T...>
 	assert(Promise.isPromise(promise), "Bad promise")
 
 	return Observable.new(function(sub)
@@ -328,7 +340,7 @@ end
 	@param callback function
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.start(callback)
+function Rx.start<T...>(callback: () -> T...): Observable.Transformer<T..., T...>
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
@@ -348,10 +360,10 @@ end
 
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.share()
-	return function(source)
+function Rx.share<T...>(): Observable.Transformer<T..., T...>
+	return function(source): Observable.Observable<T...>
 		local shareMaid = Maid.new()
-		local subs = {}
+		local subs: { _Subscription.Subscription<T...> } = {}
 
 		local lastFail = UNSET_VALUE
 		local lastComplete = UNSET_VALUE
@@ -362,17 +374,17 @@ function Rx.share()
 				lastComplete = UNSET_VALUE
 
 				shareMaid._currentSub = source:Subscribe(function(...)
-					for _, sub in pairs(subs) do
+					for _, sub: any in subs do
 						sub:Fire(...)
 					end
 				end, function(...)
 					lastFail = table.pack(...)
-					for _, sub in pairs(subs) do
+					for _, sub: any in subs do
 						sub:Fail(...)
 					end
 				end, function(...)
 					lastComplete = table.pack(...)
-					for _, sub in pairs(subs) do
+					for _, sub: any in subs do
 						sub:Complete(...)
 					end
 				end)
@@ -412,7 +424,7 @@ function Rx.share()
 					end
 				end
 			end
-		end)
+		end) :: any
 	end
 end
 
@@ -423,27 +435,32 @@ end
 	@param windowTimeSeconds number? -- Time
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.shareReplay(bufferSize: number?, windowTimeSeconds: number?)
+function Rx.shareReplay<T...>(bufferSize: number?, windowTimeSeconds: number?): Observable.Transformer<T..., T...>
 	assert(type(bufferSize) == "number" or bufferSize == nil, "Bad bufferSize")
 	assert(type(windowTimeSeconds) == "number" or windowTimeSeconds == nil, "Bad windowTimeSeconds")
 
-	bufferSize = bufferSize or math.huge
-	windowTimeSeconds = windowTimeSeconds or math.huge
+	local maxBufferSize = bufferSize or math.huge
+	local windowTime = windowTimeSeconds or math.huge
 
 	return function(source)
 		local shareMaid = Maid.new()
-		local subs = {}
+		local subs: { _Subscription.Subscription<T...> } = {}
 
-		local buffer = {}
+		type Event = {
+			n: number,
+			timestamp: number,
+		}
+
+		local buffer: { Event } = {}
 		local lastFail = UNSET_VALUE
 		local lastComplete = UNSET_VALUE
 
-		local function getEventsCopy()
+		local function getEventsCopy(): { Event }
 			local now = os.clock()
 			local events = {}
 
-			for _, event in pairs(buffer) do
-				if (now - event.timestamp) <= windowTimeSeconds then
+			for _, event in buffer do
+				if (now - event.timestamp) <= windowTime then
 					table.insert(events, event)
 				end
 			end
@@ -460,17 +477,17 @@ function Rx.shareReplay(bufferSize: number?, windowTimeSeconds: number?)
 				shareMaid._currentSub = source:Subscribe(function(...)
 					-- TODO: also prune events by timestamp
 
-					if #buffer + 1 > bufferSize then
+					if #buffer + 1 > maxBufferSize then
 						table.remove(buffer, 1) -- O(n), not great.
 					end
 
 					-- Queue before we start
-					local event = table.pack(...)
+					local event: any = table.pack(...)
 					event.timestamp = os.clock()
 					table.insert(buffer, event)
 
 					-- Copy subs so removal doesn't affect replay
-					for _, sub in pairs(table.clone(subs)) do
+					for _, sub: any in table.clone(subs) do
 						if sub:IsPending() then
 							sub:Fire(table.unpack(event, 1, event.n))
 						end
@@ -479,7 +496,7 @@ function Rx.shareReplay(bufferSize: number?, windowTimeSeconds: number?)
 					lastFail = table.pack(...)
 
 					-- Copy subs so removal doesn't affect replay
-					for _, sub in pairs(table.clone(subs)) do
+					for _, sub: any in table.clone(subs) do
 						if sub:IsPending() then
 							sub:Fail(...)
 						end
@@ -488,7 +505,7 @@ function Rx.shareReplay(bufferSize: number?, windowTimeSeconds: number?)
 					lastComplete = table.pack(...)
 
 					-- Copy subs so removal doesn't affect replay
-					for _, sub in pairs(table.clone(subs)) do
+					for _, sub: any in table.clone(subs) do
 						if sub:IsPending() then
 							sub:Complete(...)
 						end
@@ -521,7 +538,7 @@ function Rx.shareReplay(bufferSize: number?, windowTimeSeconds: number?)
 			table.insert(subs, sub)
 
 			-- Firing could lead to re-entrance. Lets just use the buffer as-is.
-			for _, item in pairs(getEventsCopy()) do
+			for _, item in getEventsCopy() do
 				sub:Fire(table.unpack(item, 1, item.n))
 			end
 
@@ -537,7 +554,7 @@ function Rx.shareReplay(bufferSize: number?, windowTimeSeconds: number?)
 					end
 				end
 			end
-		end)
+		end) :: Observable.Observable<T...>
 	end
 end
 
@@ -546,7 +563,7 @@ end
 
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.cache()
+function Rx.cache<T...>(): Observable.Transformer<T..., T...>
 	return Rx.shareReplay(1)
 end
 
@@ -556,19 +573,19 @@ end
 	@param callback () -> { T }
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.startFrom(callback)
+function Rx.startFrom<T, U>(callback: () -> { U }): Observable.Transformer<(T), (U | T)>
 	assert(type(callback) == "function", "Bad callback")
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			for _, value in pairs(callback()) do
+			for _, value in callback() do
 				sub:Fire(value)
 			end
 
 			return source:Subscribe(sub:GetFireFailComplete())
-		end)
+		end) :: any
 	end
 end
 
@@ -579,19 +596,19 @@ end
 	@param values { T }
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.startWith(values)
+function Rx.startWith<T, U>(values: { U }): Observable.Transformer<(T), (T | U)>
 	assert(type(values) == "table", "Bad values")
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			for _, item in pairs(values) do
+			for _, item in values do
 				sub:Fire(item)
 			end
 
 			return source:Subscribe(sub:GetFireFailComplete())
-		end)
+		end) :: any
 	end
 end
 
@@ -604,24 +621,24 @@ end
 
 	https://reactivex.io/documentation/operators/scan.html
 
-	@param accumulator function
-	@param seed any | nil
+	@param accumulator (T, U...) -> T
+	@param seed T?
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.scan(accumulator, seed)
+function Rx.scan<T, U...>(accumulator: (T?, U...) -> T, seed: T?): Observable.Transformer<(U...), (T)>
 	assert(type(accumulator) == "function", "Bad accumulator")
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			local current = seed
+			local current: T? = seed
 
 			return source:Subscribe(function(...)
 				current = accumulator(current, ...)
 				sub:Fire(current)
 			end, sub:GetFailComplete())
-		end)
+		end) :: any
 	end
 end
 
@@ -747,12 +764,12 @@ function Rx.endWith(values)
 			maid:GiveTask(source:Subscribe(function(...)
 				sub:Fire(...)
 			end, function(...)
-				for _, item in pairs(values) do
+				for _, item in values do
 					sub:Fire(item)
 				end
 				sub:Fail(...)
 			end, function()
-				for _, item in pairs(values) do
+				for _, item in values do
 					sub:Fire(item)
 				end
 				sub:Complete()
@@ -778,10 +795,10 @@ end
 	@param predicate (value: T) -> boolean
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.where(predicate)
+function Rx.where<T...>(predicate: Predicate<T...>): Observable.Transformer<T..., T...>
 	assert(type(predicate) == "function", "Bad predicate callback")
 
-	return function(source)
+	return function(source: Observable.Observable<T...>): Observable.Observable<T...>
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
@@ -806,7 +823,7 @@ end
 	```
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.distinct()
+function Rx.distinct<T...>(): Observable.Transformer<T..., T...>
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
@@ -822,7 +839,7 @@ function Rx.distinct()
 				last = value
 				sub:Fire(last)
 			end, sub:GetFailComplete())
-		end)
+		end) :: Observable.Observable<T...>
 	end
 end
 
@@ -860,7 +877,7 @@ end
 	@param project (T) -> U
 	@return (source: Observable<T>) -> Observable<U>
 ]=]
-function Rx.map(project)
+function Rx.map<T..., U...>(project: (T...) -> U...): Observable.Transformer<T..., U...>
 	assert(type(project) == "function", "Bad project callback")
 
 	return function(source)
@@ -870,7 +887,7 @@ function Rx.map(project)
 			return source:Subscribe(function(...)
 				sub:Fire(project(...))
 			end, sub:GetFailComplete())
-		end)
+		end) :: Observable.Observable<U...>
 	end
 end
 
@@ -891,7 +908,7 @@ end
 
 	@return (source: Observable<Observable<T>>) -> Observable<T>
 ]=]
-function Rx.mergeAll()
+function Rx.mergeAll<T...>(): Observable.Transformer<Observable.Observable<T...>, T...>
 	return Rx.flatMap(identity)
 end
 
@@ -906,7 +923,7 @@ end
 
 	@return (source: Observable<Observable<T>>) -> Observable<T>
 ]=]
-function Rx.switchAll()
+function Rx.switchAll<T...>(): Observable.Transformer<Observable.Observable<T...>, T...>
 	return Rx.switchMap(identity)
 end
 
@@ -918,16 +935,16 @@ end
 	@param project (value: T) -> Observable<U>
 	@return (source: Observable<T>) -> Observable<U>
 ]=]
-function Rx.flatMap(project)
+function Rx.flatMap<T..., U...>(project: (T...) -> Observable.Observable<U...>): Observable.Transformer<(T...), (U...)>
 	assert(type(project) == "function", "Bad project")
 
-	return function(source)
+	return function(source: Observable.Observable<T...>): Observable.Observable<U...>
 		assert(Observable.isObservable(source), "Bad observable")
 
-		return Observable.new(function(sub)
-			local isComplete = false
-			local pendingCount = 0
-			local subscriptions = {}
+		return Observable.new(function(sub: _Subscription.Subscription<U...>)
+			local isComplete: boolean = false
+			local pendingCount: number = 0
+			local subscriptions: Set<_Subscription.Subscription<U...>> = {}
 
 			local function checkComplete()
 				if isComplete and pendingCount == 0 then
@@ -935,8 +952,8 @@ function Rx.flatMap(project)
 				end
 			end
 
-			local function onNextObservable(...)
-				local observable = project(...)
+			local function onNextObservable(...: T...)
+				local observable: Observable.Observable<U...> = project(...)
 				assert(Observable.isObservable(observable), "Bad observable returned from subscription project call")
 
 				if not sub:IsPending() then
@@ -945,9 +962,9 @@ function Rx.flatMap(project)
 				end
 
 				local innerCompleteOrFail = false
-				local subscription
+				local subscription: _Subscription.Subscription<U...>? = nil
 
-				local function onNext(...)
+				local function onNext(...: U...)
 					if innerCompleteOrFail or pendingCount == 0 then
 						return
 					end
@@ -988,15 +1005,16 @@ function Rx.flatMap(project)
 				end
 
 				pendingCount += 1
-				subscription = observable:Subscribe(onNext, onFail, onComplete)
+				local newSub = observable:Subscribe(onNext, onFail, onComplete)
+				subscription = newSub
 
 				if innerCompleteOrFail or not sub:IsPending() then
 					-- Subscribing cancelled ourselves in some way
-					subscription:Destroy()
+					newSub:Destroy()
 					return
 				end
 
-				subscriptions[subscription] = true
+				subscriptions[newSub] = true
 			end
 
 			local outerSubscription = source:Subscribe(onNextObservable, function(...)
@@ -1009,13 +1027,13 @@ function Rx.flatMap(project)
 			return function()
 				pendingCount = 0
 
-				for subscription, _ in pairs(subscriptions) do
+				for subscription: any in subscriptions do
 					subscription:Destroy()
 				end
 
 				outerSubscription:Destroy()
 			end
-		end)
+		end) :: any
 	end
 end
 
@@ -1075,17 +1093,17 @@ end
 	@param project function
 	@return Observable
 ]=]
-function Rx.switchMap(project)
+function Rx.switchMap<T..., U...>(project: (T...) -> Observable.Observable<U...>): Observable.Transformer<(T...), (U...)>
 	assert(type(project) == "function", "Bad project")
 
-	return function(source)
+	return function(source: Observable.Observable<T...>)
 		assert(Observable.isObservable(source), "Bad observable")
 
-		return Observable.new(function(sub)
-			local isComplete = false
-			local insideComplete = false
-			local insideSubscription = nil
-			local outerIndex = 0
+		return Observable.new(function(sub: _Subscription.Subscription<U...>)
+			local isComplete: boolean = false
+			local insideComplete: boolean = false
+			local insideSubscription: _Subscription.Subscription<T...>? = nil
+			local outerIndex: number? = 0
 
 			local function checkComplete()
 				if isComplete and insideComplete then
@@ -1097,7 +1115,7 @@ function Rx.switchMap(project)
 			local function onNextObservable(...)
 				insideComplete = false
 
-				local observable = project(...)
+				local observable: Observable.Observable<U...> = project(...)
 				assert(Observable.isObservable(observable), "Bad observable returned from subscription project call")
 
 				-- Handle cancellation when external callers do weird state stuff
@@ -1119,7 +1137,7 @@ function Rx.switchMap(project)
 					return
 				end
 
-				local function onNext(...)
+				local function onNext(...: U...)
 					if index ~= outerIndex then
 						return
 					end
@@ -1155,7 +1173,7 @@ function Rx.switchMap(project)
 					return
 				end
 
-				insideSubscription = subscription
+				insideSubscription = subscription :: any
 			end
 
 			local outerSubscription = source:Subscribe(onNextObservable, function(...)
@@ -1176,7 +1194,7 @@ function Rx.switchMap(project)
 
 				outerSubscription:Destroy()
 			end
-		end)
+		end) :: Observable.Observable<U...>
 	end
 end
 
@@ -1226,13 +1244,14 @@ end
 	@param ... any
 	@return Observable
 ]=]
-function Rx.packed(...)
+function Rx.packed<T...>(...: T...): Observable.Observable<T...>
 	local args = table.pack(...)
 
 	return Observable.new(function(sub)
 		sub:Fire(unpack(args, 1, args.n))
 		sub:Complete()
-	end)
+		return
+	end) :: any
 end
 
 --[=[
@@ -1419,20 +1438,20 @@ end
 	@param observables { [TKey]: Observable<TEmitted> | TEmitted }
 	@return Observable<{ [TKey]: TEmitted }>
 ]=]
-function Rx.combineLatest(observables)
+function Rx.combineLatest<K, V>(observables: Map<K, Observable.Observable<V> | V>): Observable.Observable<Map<K, V>>
 	assert(type(observables) == "table", "Bad observables")
 
 	return Observable.new(function(sub)
 		local unset = 0
-		local latest = {}
+		local latest: Map<K, V> = {}
 
 		-- Instead of caching this, use extra compute here
-		for key, value in pairs(observables) do
+		for key, value in observables do
 			if Observable.isObservable(value) then
 				unset += 1
 				latest[key] = UNSET_VALUE
 			else
-				latest[key] = value
+				latest[key] = value :: V
 			end
 		end
 
@@ -1447,19 +1466,19 @@ function Rx.combineLatest(observables)
 
 		local function failOnFirst(...)
 			pending -= 1
-			latest = nil
+			latest = nil :: any
 			sub:Fail(...)
 		end
 
 		local function completeOnAllPendingDone()
 			pending -= 1
 			if pending == 0 then
-				latest = nil
+				latest = nil :: any
 				sub:Complete()
 			end
 		end
 
-		for key, observer in pairs(observables) do
+		for key, observer: any in observables do
 			if not Observable.isObservable(observer) then
 				continue
 			end
@@ -1478,7 +1497,7 @@ function Rx.combineLatest(observables)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -1495,10 +1514,10 @@ function Rx.combineLatestDefer(observables)
 	return Observable.new(function(sub)
 		local pending = 0
 		local unset = 0
-		local latest = {}
+		local latest: any = {}
 
 		-- Instead of caching this, use extra compute here
-		for key, value in pairs(observables) do
+		for key, value in observables do
 			if Observable.isObservable(value) then
 				pending += 1
 				unset += 1
@@ -1530,14 +1549,14 @@ function Rx.combineLatestDefer(observables)
 			end
 		end
 
-		local queueThread = nil
+		local queueThread: thread? = nil
 		maid:GiveTask(function()
 			if queueThread then
 				MaidTaskUtils.doTask(queueThread)
 			end
 		end)
 
-		for key, observer in pairs(observables) do
+		for key, observer in observables do
 			if not Observable.isObservable(observer) then
 				continue
 			end
@@ -1614,7 +1633,7 @@ end
 	@param number number
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.take(number: number)
+function Rx.take<T...>(number: number): Observable.Transformer<T..., T...>
 	assert(type(number) == "number", "Bad number")
 	assert(number > 0, "Bad number")
 
@@ -1643,7 +1662,7 @@ function Rx.take(number: number)
 			end, sub:GetFailComplete())
 
 			return maid
-		end)
+		end) :: Observable.Observable<T...>
 	end
 end
 
@@ -1654,7 +1673,7 @@ end
 	@param toSkip number
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.skip(toSkip: number)
+function Rx.skip<T...>(toSkip: number): Observable.Transformer<T..., T...>
 	assert(type(toSkip) == "number", "Bad toSkip")
 	assert(toSkip > 0, "Bad toSkip")
 
@@ -1675,7 +1694,7 @@ function Rx.skip(toSkip: number)
 			end, sub:GetFailComplete()))
 
 			return maid
-		end)
+		end) :: Observable.Observable<T...>
 	end
 end
 
@@ -1689,7 +1708,7 @@ end
 	@param observableFactory () -> Observable<T>
 	@return Observable<T>
 ]=]
-function Rx.defer(observableFactory)
+function Rx.defer<T>(observableFactory: () -> Observable.Observable<T>): Observable.Observable<T>
 	return Observable.new(function(sub)
 		local observable
 		local ok, err = pcall(function()
@@ -1707,7 +1726,7 @@ function Rx.defer(observableFactory)
 		end
 
 		return observable:Subscribe(sub:GetFireFailComplete())
-	end)
+	end) :: any
 end
 
 --[=[
@@ -1716,13 +1735,13 @@ end
 	@param seconds number
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.delay(seconds: number)
+function Rx.delay<T...>(seconds: number): Observable.Transformer<T..., T...>
 	assert(type(seconds) == "number", "Bad seconds")
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
-		return Observable.new(function(sub)
+		return Observable.new(function(sub: _Subscription.Subscription<T...>)
 			local maid = Maid.new()
 
 			maid:GiveTask(source:Subscribe(function(...)
@@ -1735,7 +1754,7 @@ function Rx.delay(seconds: number)
 			end, sub:GetFailComplete()))
 
 			return maid
-		end)
+		end) :: Observable.Observable<T...>
 	end
 end
 
@@ -1811,7 +1830,7 @@ end
 function Rx.withLatestFrom(inputObservables)
 	assert(inputObservables, "Bad inputObservables")
 
-	for _, observable in pairs(inputObservables) do
+	for _, observable in inputObservables do
 		assert(Observable.isObservable(observable), "Bad observable")
 	end
 
@@ -1823,7 +1842,7 @@ function Rx.withLatestFrom(inputObservables)
 
 			local latest = {}
 
-			for key, observable in pairs(inputObservables) do
+			for key, observable in inputObservables do
 				latest[key] = UNSET_VALUE
 
 				maid:GiveTask(observable:Subscribe(function(value)
@@ -1832,7 +1851,7 @@ function Rx.withLatestFrom(inputObservables)
 			end
 
 			maid:GiveTask(source:Subscribe(function(value)
-				for _, item in pairs(latest) do
+				for _, item in latest do
 					if item == UNSET_VALUE then
 						return
 					end
@@ -1859,7 +1878,7 @@ end
 	@param throttleConfig { leading = true; trailing = true; }
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.throttleTime(duration: number, throttleConfig)
+function Rx.throttleTime(duration: number, throttleConfig: ThrottledFunction.ThrottleConfig)
 	assert(type(duration) == "number", "Bad duration")
 	assert(type(throttleConfig) == "table" or throttleConfig == nil, "Bad throttleConfig")
 
@@ -1920,8 +1939,8 @@ function Rx.throttleDefer()
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			local lastResult = nil
-			local currentQueue = nil
+			local lastResult: any = nil
+			local currentQueue: thread? = nil
 
 			local sourceSub = source:Subscribe(function(...)
 				if lastResult then
@@ -1972,7 +1991,7 @@ function Rx.throttle(durationSelector)
 		return Observable.new(function(sub)
 			local topMaid = Maid.new()
 
-			local lastResult
+			local lastResult: any
 
 			topMaid:GiveTask(source:Subscribe(function(...)
 				if not lastResult then
@@ -2115,7 +2134,7 @@ function Rx.switchScan(accumulator, seed)
 	assert(type(accumulator) == "function", "Bad accumulator")
 
 	return Rx.pipe({
-		Rx.scan(accumulator, seed),
+		Rx.scan(accumulator, seed) :: any,
 		Rx.switchAll(),
 	})
 end
@@ -2134,7 +2153,7 @@ function Rx.mergeScan(accumulator, seed)
 	assert(type(accumulator) == "function", "Bad accumulator")
 
 	return Rx.pipe({
-		Rx.scan(accumulator, seed),
+		Rx.scan(accumulator, seed) :: any,
 		Rx.mergeAll(),
 	})
 end

@@ -7,6 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RxInstanceUtils = require("RxInstanceUtils")
+local _Observable = require("Observable")
 
 local PropertyValue = {}
 PropertyValue.ClassName = "PropertyValue"
@@ -28,7 +29,7 @@ function PropertyValue:ObserveBrio(condition)
 	return RxInstanceUtils.observePropertyBrio(self._obj, self._propertyName, condition)
 end
 
-function PropertyValue:Observe()
+function PropertyValue:Observe(): _Observable.Observable<unknown>
 	return RxInstanceUtils.observeProperty(self._obj, self._propertyName)
 end
 

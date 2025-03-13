@@ -21,7 +21,7 @@ HumanoidSpeed.__index = HumanoidSpeed
 	@param serviceBag ServiceBag
 	@return HumanoidSpeed
 ]=]
-function HumanoidSpeed.new(humanoid, serviceBag)
+function HumanoidSpeed.new(humanoid: Humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), HumanoidSpeed)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -43,7 +43,7 @@ end
 	@param multiplier number
 	@return function -- Cleanup function
 ]=]
-function HumanoidSpeed:ApplySpeedMultiplier(multiplier)
+function HumanoidSpeed:ApplySpeedMultiplier(multiplier: number)
 	assert(type(multiplier) == "number", "Bad multiplier")
 	assert(multiplier >= 0, "Bad multiplier")
 
@@ -55,7 +55,7 @@ end
 	@param amount number
 	@return function -- Cleanup function
 ]=]
-function HumanoidSpeed:ApplySpeedAdditive(amount)
+function HumanoidSpeed:ApplySpeedAdditive(amount: number)
 	assert(type(amount) == "number", "Bad amount")
 
 	return self._properties.WalkSpeed:CreateAdditive(amount)

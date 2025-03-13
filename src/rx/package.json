@@ -36,7 +36,8 @@
     "@quenty/signal": "file:../signal",
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table",
-    "@quenty/throttle": "file:../throttle"
+    "@quenty/throttle": "file:../throttle",
+    "@quenty/typeutils": "file:../typeutils"
   },
   "publishConfig": {
     "access": "public"

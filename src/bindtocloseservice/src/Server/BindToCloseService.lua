@@ -13,11 +13,12 @@ local PromiseUtils = require("PromiseUtils")
 local Symbol = require("Symbol")
 local Promise = require("Promise")
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local BindToCloseService = {}
 BindToCloseService.ServiceName = "BindToCloseService"
 
-function BindToCloseService:Init(serviceBag)
+function BindToCloseService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -47,7 +48,7 @@ end
 function BindToCloseService:_promiseClose()
 	local promises = {}
 
-	for _, caller in pairs(self._subscriptions) do
+	for _, caller in self._subscriptions do
 		local promise = caller()
 		if Promise.isPromise(promise) then
 			table.insert(promises, promise)
@@ -65,7 +66,7 @@ end
 	@param saveCallback function
 	@return function -- Call to unregister callback
 ]=]
-function BindToCloseService:RegisterPromiseOnCloseCallback(saveCallback)
+function BindToCloseService:RegisterPromiseOnCloseCallback(saveCallback: () -> ())
 	assert(type(saveCallback) == "function", "Bad saveCallback")
 
 	local id = Symbol.named("savingCallbackId")

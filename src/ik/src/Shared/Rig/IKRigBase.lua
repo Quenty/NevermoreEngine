@@ -46,13 +46,13 @@ function IKRigBase:Update()
 	self._lastUpdateTime = tick()
 	self.Updating:Fire()
 
-	for _, item in pairs(self._ikTargets) do
+	for _, item in self._ikTargets do
 		item:Update()
 	end
 end
 
 function IKRigBase:UpdateTransformOnly()
-	for _, item in pairs(self._ikTargets) do
+	for _, item in self._ikTargets do
 		item:UpdateTransformOnly()
 	end
 end

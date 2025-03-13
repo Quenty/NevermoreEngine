@@ -12,7 +12,7 @@ local DisableHatParticles = setmetatable({}, BaseObject)
 DisableHatParticles.ClassName = "DisableHatParticles"
 DisableHatParticles.__index = DisableHatParticles
 
-function DisableHatParticles.new(character)
+function DisableHatParticles.new(character: Model)
 	local self = setmetatable(BaseObject.new(character), DisableHatParticles)
 
 	self._maid:GiveTask(RxInstanceUtils.observeChildrenOfClassBrio(self._obj, "Accessory"):Subscribe(function(brio)
@@ -27,7 +27,7 @@ function DisableHatParticles.new(character)
 	return self
 end
 
-function DisableHatParticles:_handleAccessory(maid, accessory)
+function DisableHatParticles:_handleAccessory(maid, accessory: Accessory)
 	maid:GiveTask(accessory.DescendantAdded:Connect(function(descendant)
 		self:_handleAccessoryDescendant(maid, descendant)
 	end))
@@ -35,16 +35,18 @@ function DisableHatParticles:_handleAccessory(maid, accessory)
 		maid[descendant] = nil
 	end))
 
-	for _, descendant in pairs(accessory:GetDescendants()) do
+	for _, descendant in accessory:GetDescendants() do
 		self:_handleAccessoryDescendant(maid, descendant)
 	end
 end
 
 function DisableHatParticles:_handleAccessoryDescendant(maid, descendant)
-	if descendant:IsA("Fire")
+	if
+		descendant:IsA("Fire")
 		or descendant:IsA("Sparkles")
 		or descendant:IsA("Smoke")
-		or descendant:IsA("ParticleEmitter") then
+		or descendant:IsA("ParticleEmitter")
+	then
 		if descendant.Enabled then
 			maid[descendant] = function()
 				descendant.Enabled = true

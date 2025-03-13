@@ -184,7 +184,7 @@ function PlayerSettingsClient:SetValue(settingName, value)
 	self._toReplicate[settingName] = PlayerSettingsUtils.encodeForNetwork(value)
 
 	if self._toReplicateCallbacks[settingName] then
-		for callback, _ in pairs(self._toReplicateCallbacks[settingName]) do
+		for callback, _ in self._toReplicateCallbacks[settingName] do
 			task.spawn(callback)
 		end
 	end

@@ -2,25 +2,26 @@
 	@class InfluxDBPointSettings
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local InfluxDBPointSettings = {}
 InfluxDBPointSettings.ClassName = "InfluxDBPointSettings"
 InfluxDBPointSettings.__index = InfluxDBPointSettings
+
+export type InfluxDBTags = { [string]: string }
+export type ConvertTime = (number) -> number
 
 function InfluxDBPointSettings.new()
 	local self = setmetatable({}, InfluxDBPointSettings)
 
 	self._defaultTags = {}
-	self._convertTime = nil
+	self._convertTime = nil :: ConvertTime?
 
 	return self
 end
 
-function InfluxDBPointSettings:SetDefaultTags(tags)
+function InfluxDBPointSettings:SetDefaultTags(tags: InfluxDBTags)
 	assert(type(tags) == "table", "Bad tags")
 
-	for key, value in pairs(tags) do
+	for key, value in tags do
 		assert(type(value) == "string", "Bad value")
 		assert(type(key) == "string", "Bad key")
 	end
@@ -28,18 +29,17 @@ function InfluxDBPointSettings:SetDefaultTags(tags)
 	self._defaultTags = tags
 end
 
-
-function InfluxDBPointSettings:GetDefaultTags()
+function InfluxDBPointSettings:GetDefaultTags(): InfluxDBTags
 	return self._defaultTags
 end
 
-function InfluxDBPointSettings:SetConvertTime(convertTime)
-	assert(type(convertTime) == "function", "Bad convertTime")
+function InfluxDBPointSettings:SetConvertTime(convertTime: ConvertTime?)
+	assert(type(convertTime) == "function" or convertTime == nil, "Bad convertTime")
 
 	self._convertTime = convertTime
 end
 
-function InfluxDBPointSettings:GetConvertTime()
+function InfluxDBPointSettings:GetConvertTime(): ConvertTime?
 	return self._convertTime
 end
 

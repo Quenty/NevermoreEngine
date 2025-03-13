@@ -9,17 +9,29 @@ local require = require(script.Parent.loader).load(script)
 local MarketplaceService = game:GetService("MarketplaceService")
 local RunService = game:GetService("RunService")
 
-local Promise = require("Promise")
 local EnumUtils = require("EnumUtils")
-local Signal = require("Signal")
 local Maid = require("Maid")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local Promise = require("Promise")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
+local _ServiceBag = require("ServiceBag")
+local _Observable = require("Observable")
+
+export type ReceiptInfo = {
+	PurchaseId: number,
+	PlayerId: number,
+	ProductId: number,
+	PlaceIdWherePurchased: number,
+	CurrencySpent: number,
+	CurrencyType: Enum.CurrencyType,
+	ProductPurchaseChannel: Enum.ProductPurchaseChannel,
+}
 
 local ReceiptProcessingService = {}
 ReceiptProcessingService.ServiceName = "ReceiptProcessingService"
 
-function ReceiptProcessingService:Init(serviceBag)
+function ReceiptProcessingService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -45,7 +57,7 @@ end
 	Sets the default purchase decision in case you want more control
 	@param productPurchaseDecision ProductPurchaseDecision
 ]=]
-function ReceiptProcessingService:SetDefaultPurchaseDecision(productPurchaseDecision)
+function ReceiptProcessingService:SetDefaultPurchaseDecision(productPurchaseDecision: Enum.ProductPurchaseDecision)
 	assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad productPurchaseDecision")
 
 	self._defaultDecision.Value = productPurchaseDecision
@@ -57,7 +69,7 @@ end
 	@param player Player
 	@return Observable<ReceiptInfo>
 ]=]
-function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player: Player)
+function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player: Player): _Observable.Observable<ReceiptInfo>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:ObserveReceiptProcessedForUserId(player.UserId)
@@ -68,20 +80,24 @@ end
 	@param userId number
 	@return Observable<ReceiptInfo>
 ]=]
-function ReceiptProcessingService:ObserveReceiptProcessedForUserId(userId: number)
+function ReceiptProcessingService:ObserveReceiptProcessedForUserId(userId: number): _Observable.Observable<ReceiptInfo>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._receiptProcessedForUserId:Observe(userId)
 end
+
+export type ReceiptProcessor = (
+	receiptInfo: ReceiptInfo
+) -> Enum.ProductPurchaseDecision? | Promise.Promise<Enum.ProductPurchaseDecision?>
 
 --[=[
 	Registers a new receipt processor. This works exactly like a normal receipt processor except it will also
 	take a Promise as a result (of which an error).
 
 	@param processor (receiptInfo) -> ProductPurchaseDecision | Promise<ProductPurchaseDecision> | nil
-	@param priority number
+	@param priority number?
 ]=]
-function ReceiptProcessingService:RegisterReceiptProcessor(processor, priority)
+function ReceiptProcessingService:RegisterReceiptProcessor(processor: ReceiptProcessor, priority: number?): () -> ()
 	assert(self._processors, "Not initialized")
 	assert(type(processor) == "function", "Bad processor")
 	priority = priority or 0
@@ -107,12 +123,12 @@ function ReceiptProcessingService:RegisterReceiptProcessor(processor, priority)
 	return function()
 		local index = table.find(self._handles, data)
 		if index then
-			table.remove(self._handles, data)
+			table.remove(self._handles, index)
 		end
 	end
 end
 
-function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo)
+function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo: ReceiptInfo): Enum.ProductPurchaseDecision
 	if not self._processors then
 		warn(
 			"[ReceiptProcessingService._handleProcessReceiptAsync] - We're leaking memory. Receipt processing service is already cleaned up."
@@ -123,7 +139,7 @@ function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo)
 	self.ReceiptCreated:Fire(receiptInfo)
 
 	-- Chain of command this thing
-	for _, data in pairs(self._processors) do
+	for _, data in self._processors do
 		local result = data.processor(receiptInfo)
 
 		-- Unpack pro
@@ -164,7 +180,7 @@ function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo)
 	return self._defaultDecision.Value
 end
 
-function ReceiptProcessingService:_fireProcessed(receiptInfo, productPurchaseDecision)
+function ReceiptProcessingService:_fireProcessed(receiptInfo: ReceiptInfo, productPurchaseDecision: Enum.ProductPurchaseDecision)
 	assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad productPurchaseDecision")
 
 	self.ReceiptProcessed:Fire(receiptInfo, productPurchaseDecision)

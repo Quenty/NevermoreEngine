@@ -51,7 +51,7 @@ end
 	@param ... any
 	@return any
 ]=]
-function TieUtils.invokeEncodedBindableFunction(bindableFunction, ...)
+function TieUtils.invokeEncodedBindableFunction(bindableFunction: BindableFunction, ...)
 	assert(typeof(bindableFunction) == "Instance" and bindableFunction:IsA("BindableFunction"), "Bad bindableFunction")
 
 	return TieUtils.decode(bindableFunction:Invoke(TieUtils.encode(...)))

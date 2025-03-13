@@ -50,44 +50,47 @@ function UIConverter:PromiseProperties(instance, overrideMap)
 
 					local hasProperties = {}
 
-					for _, property in pairs(properties) do
-						hasProperties[property:GetName()] = true
+			for _, property in properties do
+				hasProperties[property:GetName()] = true
 
-						self._maid:GivePromise(self:PromiseDefaultValue(class, property, overrideMap))
-							:Then(function(defaultValue)
-								local currentValue = instance[property:GetName()]
-								if currentValue ~= defaultValue then
-									map[property:GetName()] = currentValue
-								end
-							end)
-					end
-
-					-- Make sure we also include these properties for authoring
-					local neverSkip = UIConverterNeverSkipProps[class:GetClassName()]
-					if neverSkip then
-						for propertyName, _ in pairs(neverSkip) do
-							map[propertyName] = instance[propertyName]
+				self._maid
+					:GivePromise(self:PromiseDefaultValue(class, property, overrideMap))
+					:Then(function(defaultValue)
+						local currentValue = instance[property:GetName()]
+						if currentValue ~= defaultValue then
+							map[property:GetName()] = currentValue
 						end
+					end)
+			end
+
+			-- Make sure we also include these properties for authoring
+			local neverSkip = UIConverterNeverSkipProps[class:GetClassName()]
+			if neverSkip then
+				for propertyName, _ in neverSkip do
+					map[propertyName] = instance[propertyName]
+				end
+			end
+
+			return PromiseUtils.all(promises):Then(function()
+				-- Specifically handle edge-case with border size pixel defaults in the assumption of superfluous
+				-- border properties
+				-- TODO: Could group this all under a "PropertyObscuresOtherPropertyUnderCondition" scenario
+				-- TODO: also need to remove in case of UICorner or other scenarios
+				if hasProperties["BackgroundTransparency"] and instance.BackgroundTransparency >= 1 then
+					if hasProperties["BorderSizePixel"] and instance.BorderSizePixel == 1 then
+						map.BorderSizePixel = nil
 					end
 
-					return PromiseUtils.all(promises)
-						:Then(function()
-							-- Specifically handle edge-case with border size pixel defaults in the assumption of superfluous
-							-- border properties
-							-- TODO: Could group this all under a "PropertyObscuresOtherPropertyUnderCondition" scenario
-							-- TODO: also need to remove in case of UICorner or other scenarios
-							if hasProperties["BackgroundTransparency"] and instance.BackgroundTransparency >= 1 then
-								if hasProperties["BorderSizePixel"] and instance.BorderSizePixel == 1 then
-									map.BorderSizePixel = nil
-								end
+					if
+						hasProperties["BorderColor3"]
+						and Color3Utils.areEqual(instance.BorderColor3, Color3.fromRGB(27, 42, 53))
+					then
+						map.BorderColor3 = nil
+					end
+				end
 
-								if hasProperties["BorderColor3"] and Color3Utils.areEqual(instance.BorderColor3, Color3.fromRGB(27, 42, 53)) then
-									map.BorderColor3 = nil
-								end
-							end
-
-							return map
-						end)
+				return map
+			end)
 				end)
 
 		end)
@@ -96,13 +99,12 @@ end
 function UIConverter:PromiseCanClone(instance)
 	assert(typeof(instance) == "Instance", "Bad instance")
 
-	return self._apiDump:PromiseClass(instance.ClassName)
-		:Then(function(class)
-			return not class:IsNotCreatable()
-		end)
+	return self._apiDump:PromiseClass(instance.ClassName):Then(function(class)
+		return not class:IsNotCreatable()
+	end)
 end
 
-function UIConverter:PromisePropertiesForClass(className)
+function UIConverter:PromisePropertiesForClass(className: string)
 	assert(type(className) == "string", "Bad className")
 
 	if self._propertyPromisesForClass[className] then
@@ -111,11 +113,11 @@ function UIConverter:PromisePropertiesForClass(className)
 
 	self._propertyPromisesForClass[className] = self._maid:GivePromise(self._apiDump:PromiseClass(className))
 		:Then(function(class)
-			return class:PromiseProperties()
+		return class:PromiseProperties()
 		end)
 		:Then(function(allProperties)
-			local valid = {}
-			for _, property in pairs(allProperties) do
+		local valid = {}
+			for _, property in allProperties do
 				if not (property:IsHidden()
 						or property:IsReadOnly()
 						or property:IsNotScriptable()

@@ -20,7 +20,7 @@ RagdollCameraShake.__index = RagdollCameraShake
 	@param serviceBag ServiceBag
 	@return RagdollCameraShake
 ]=]
-function RagdollCameraShake.new(humanoid, serviceBag)
+function RagdollCameraShake.new(humanoid: Humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollCameraShake)
 
 	self._serviceBag = assert(serviceBag, "Bad serviceBag")

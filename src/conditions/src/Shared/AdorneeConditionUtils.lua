@@ -90,11 +90,15 @@ end
 	@param cancelToken CancelToken?
 	@return Promise<boolean>
 ]=]
-function AdorneeConditionUtils.promiseQueryConditionsMet(conditionObj: BindableFunction, adornee: Instance, cancelToken)
+function AdorneeConditionUtils.promiseQueryConditionsMet(
+	conditionObj: BindableFunction,
+	adornee: Instance,
+	cancelToken: any?
+)
 	assert(typeof(conditionObj) == "Instance" and conditionObj:IsA("BindableFunction"), "Bad condition")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return Rx.toPromise(AdorneeConditionUtils.observeConditionsMet(conditionObj, adornee, cancelToken))
+	return Rx.toPromise(AdorneeConditionUtils.observeConditionsMet(conditionObj, adornee), cancelToken)
 end
 
 --[=[
@@ -143,13 +147,15 @@ function AdorneeConditionUtils.createRequiredProperty(propertyName: string, requ
 		return RxInstanceUtils.observeProperty(adornee, propertyName):Pipe({
 			Rx.map(function(value)
 				return value == requiredValue
-			end);
+			end),
 		})
 	end)
-	condition.Name = string.format("RequiredProperty%s_%s_%s",
+	condition.Name = string.format(
+		"RequiredProperty%s_%s_%s",
 		AdorneeConditionUtils.getConditionNamePostfix(),
 		tostring(propertyName),
-		tostring(requiredValue))
+		tostring(requiredValue)
+	)
 
 	return condition
 end
@@ -167,14 +173,16 @@ function AdorneeConditionUtils.createRequiredAttribute(attributeName: string, at
 		return RxAttributeUtils.observeAttribute(adornee, attributeName):Pipe({
 			Rx.map(function(value)
 				return value == attributeValue
-			end);
+			end),
 		})
 	end)
 
-	condition.Name = string.format("RequiredAttribute%s_%s_%s",
+	condition.Name = string.format(
+		"RequiredAttribute%s_%s_%s",
 		AdorneeConditionUtils.getConditionNamePostfix(),
 		tostring(attributeName),
-		tostring(attributeValue))
+		tostring(attributeValue)
+	)
 	return condition
 end
 
@@ -190,9 +198,11 @@ function AdorneeConditionUtils.createRequiredTieInterface(tieInterfaceDefinition
 		return tieInterfaceDefinition:ObserveIsImplemented(adornee)
 	end)
 
-	condition.Name = string.format("RequiredInterface%s_%s",
+	condition.Name = string.format(
+		"RequiredInterface%s_%s",
 		AdorneeConditionUtils.getConditionNamePostfix(),
-		tieInterfaceDefinition:GetName())
+		tieInterfaceDefinition:GetName()
+	)
 
 	return condition
 end
@@ -207,10 +217,9 @@ function AdorneeConditionUtils.createOrConditionGroup(): BindableFunction
 	container = AdorneeConditionUtils.create(function(adornee: Instance)
 		assert(container, "Should not be invoking this on construction before container is assigned")
 
-		return AdorneeConditionUtils._observeConditionObservablesBrio(container, adornee)
-			:Pipe({
-				AdorneeConditionUtils._mapToOr(AdorneeConditionUtils.observeValueWhenEmpty(container))
-			})
+		return AdorneeConditionUtils._observeConditionObservablesBrio(container, adornee):Pipe({
+			AdorneeConditionUtils._mapToOr(AdorneeConditionUtils.observeValueWhenEmpty(container)),
+		})
 	end)
 
 	container.Name = string.format("OrConditionGroup%s", AdorneeConditionUtils.getConditionNamePostfix())
@@ -229,10 +238,9 @@ function AdorneeConditionUtils.createAndConditionGroup(): BindableFunction
 	container = AdorneeConditionUtils.create(function(adornee: Instance)
 		assert(container, "Should not be invoking this on construction before container is assigned")
 
-		return AdorneeConditionUtils._observeConditionObservablesBrio(container, adornee)
-			:Pipe({
-				AdorneeConditionUtils._mapToAnd(AdorneeConditionUtils.observeValueWhenEmpty(container))
-			})
+		return AdorneeConditionUtils._observeConditionObservablesBrio(container, adornee):Pipe({
+			AdorneeConditionUtils._mapToAnd(AdorneeConditionUtils.observeValueWhenEmpty(container)),
+		})
 	end)
 
 	container.Name = string.format("AndConditionGroup%s", AdorneeConditionUtils.getConditionNamePostfix())
@@ -302,7 +310,11 @@ end
 function AdorneeConditionUtils.observeValueWhenEmpty(container: BindableFunction)
 	assert(typeof(container) == "Instance", "Bad container")
 
-	return RxAttributeUtils.observeAttribute(container, VALUE_WHEN_EMPTY_ATTRIBUTE, DEFAULT_VALUE_WHEN_EMPTY_WHEN_UNDEFINED)
+	return RxAttributeUtils.observeAttribute(
+		container,
+		VALUE_WHEN_EMPTY_ATTRIBUTE,
+		DEFAULT_VALUE_WHEN_EMPTY_WHEN_UNDEFINED
+	)
 end
 
 --[[
@@ -345,28 +357,30 @@ function AdorneeConditionUtils._mapToAnd(observeValueWhenEmpty)
 			topMaid:GiveTask(isDisabled.Changed:Connect(update))
 			update()
 
-			topMaid:GiveTask(source:Subscribe(function(observableBrio)
-				if observableBrio:IsDead() then
-					return
-				end
-
-				local observable = observableBrio:GetValue()
-				local observableMaid = observableBrio:ToMaid()
-
-				activeSourceCount.Value = activeSourceCount.Value + 1
-				observableMaid:GiveTask(function()
-					activeSourceCount.Value = activeSourceCount.Value - 1
-				end)
-
-				observableMaid:GiveTask(observable:Subscribe(function(state)
-					if state then
-						observableMaid._state = nil
-					else
-						observableMaid._state = isDisabled:PushState(true)
+			topMaid:GiveTask(
+				source:Subscribe(function(observableBrio)
+					if observableBrio:IsDead() then
+						return
 					end
-				end))
 
-			end), sub:GetFailComplete())
+					local observable = observableBrio:GetValue()
+					local observableMaid = observableBrio:ToMaid()
+
+					activeSourceCount.Value = activeSourceCount.Value + 1
+					observableMaid:GiveTask(function()
+						activeSourceCount.Value = activeSourceCount.Value - 1
+					end)
+
+					observableMaid:GiveTask(observable:Subscribe(function(state)
+						if state then
+							observableMaid._state = nil
+						else
+							observableMaid._state = isDisabled:PushState(true)
+						end
+					end))
+				end),
+				sub:GetFailComplete()
+			)
 
 			topMaid:GiveTask(totalState.Changed:Connect(function()
 				sub:Fire(totalState.Value)
@@ -418,28 +432,30 @@ function AdorneeConditionUtils._mapToOr(observeValueWhenEmpty)
 			topMaid:GiveTask(isEnabled.Changed:Connect(update))
 			update()
 
-			topMaid:GiveTask(source:Subscribe(function(observableBrio)
-				if observableBrio:IsDead() then
-					return
-				end
-
-				local observable = observableBrio:GetValue()
-				local observableMaid = observableBrio:ToMaid()
-
-				activeSourceCount.Value = activeSourceCount.Value + 1
-				observableMaid:GiveTask(function()
-					activeSourceCount.Value = activeSourceCount.Value - 1
-				end)
-
-				observableMaid:GiveTask(observable:Subscribe(function(state)
-					if state then
-						observableMaid._state = isEnabled:PushState(true)
-					else
-						observableMaid._state = nil
+			topMaid:GiveTask(
+				source:Subscribe(function(observableBrio)
+					if observableBrio:IsDead() then
+						return
 					end
-				end))
 
-			end), sub:GetFailComplete())
+					local observable = observableBrio:GetValue()
+					local observableMaid = observableBrio:ToMaid()
+
+					activeSourceCount.Value = activeSourceCount.Value + 1
+					observableMaid:GiveTask(function()
+						activeSourceCount.Value = activeSourceCount.Value - 1
+					end)
+
+					observableMaid:GiveTask(observable:Subscribe(function(state)
+						if state then
+							observableMaid._state = isEnabled:PushState(true)
+						else
+							observableMaid._state = nil
+						end
+					end))
+				end),
+				sub:GetFailComplete()
+			)
 
 			topMaid:GiveTask(totalState.Changed:Connect(function()
 				sub:Fire(totalState.Value)
@@ -462,12 +478,11 @@ function AdorneeConditionUtils._observeConditionObservablesBrio(parent: Instance
 
 	return RxInstanceUtils.observeChildrenBrio(parent, function(child)
 		return child:IsA("BindableFunction") and CollectionService:HasTag(child, AdorneeConditionUtils.getRequiredTag())
-	end)
-		:Pipe({
-			RxBrioUtils.map(function(conditionObj)
-				return AdorneeConditionUtils._getObservableFromConditionObj(conditionObj, adornee)
-			end);
-		});
+	end):Pipe({
+		RxBrioUtils.map(function(conditionObj)
+			return AdorneeConditionUtils._getObservableFromConditionObj(conditionObj, adornee)
+		end),
+	})
 end
 
 --[[

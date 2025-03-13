@@ -9,6 +9,7 @@ local RunService = game:GetService("RunService")
 
 local RandomUtils = require("RandomUtils")
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local UPDATE_PERIOD_SEC = 5
 local SPAWN_AFTER_GAME_START = 1
@@ -19,7 +20,7 @@ local TOTAL_BUDGET_BEFORE_WARN = 0.1
 local SpawnService = {}
 SpawnService.ServiceName = "SpawnService"
 
-function SpawnService:Init(serviceBag)
+function SpawnService:Init(serviceBag: _ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -50,14 +51,14 @@ end
 function SpawnService:Regenerate()
 	local startTime = os.clock()
 
-	for _, binder in pairs(self._spawnBinderGroupsServer.Spawners:GetBinders()) do
-		for _, spawner in pairs(binder:GetAll()) do
+	for _, binder in self._spawnBinderGroupsServer.Spawners:GetBinders() do
+		for _, spawner in binder:GetAll() do
 			spawner:Regenerate()
 		end
 	end
 
 	if (os.clock() - startTime) >= 0.05 then
-		warn(string.format("SpawnService regenerate time: %0.4f ms", (os.clock() - startTime)*1000))
+		warn(string.format("SpawnService regenerate time: %0.4f ms", (os.clock() - startTime) * 1000))
 	end
 end
 
@@ -67,11 +68,11 @@ function SpawnService:Update()
 	local startTime = os.clock()
 	local spawnerCount = 0
 
-	for _, binder in pairs(self._spawnBinderGroupsServer.Spawners:GetBinders()) do
+	for _, binder in self._spawnBinderGroupsServer.Spawners:GetBinders() do
 		local classStartTime = os.clock()
 		local classes = RandomUtils.shuffledCopy(binder:GetAll())
 
-		for _, spawner in pairs(classes) do
+		for _, spawner in classes do
 			spawnerCount = spawnerCount + 1
 			spawner:SpawnUpdate(false)
 

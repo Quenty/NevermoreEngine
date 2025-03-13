@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	The lua implementation of the fzy string matching algorithm. This algorithm
 	is optimized for matching stuff on the terminal, but should serve well as a
@@ -69,6 +70,18 @@ local Fzy = {}
 	.maxMatchLength number
 	@within Fzy
 ]=]
+export type FzyConfig = {
+	caseSensitive: boolean,
+	gapLeadingScore: number,
+	gapTrailingScore: number,
+	gapInnerScore: number,
+	consecutiveMatchScore: number,
+	slashMatchScore: number,
+	wordMatchScore: number,
+	capitalMatchScore: number,
+	dotMatchScore: number,
+	maxMatchLength: number,
+}
 
 --[=[
 	Creates a new configuration for Fzy.
@@ -76,7 +89,7 @@ local Fzy = {}
 	@param config table
 	@return FzyConfig
 ]=]
-function Fzy.createConfig(config)
+function Fzy.createConfig(config: any): FzyConfig
 	assert(type(config) == "table" or config == nil, "Bad config")
 
 	config = config or {}
@@ -107,7 +120,7 @@ end
 	@param config any
 	@return boolean
 ]=]
-function Fzy.isFzyConfig(config)
+function Fzy.isFzyConfig(config: any): boolean
 	return type(config) == "table"
 		and type(config.gapLeadingScore) == "number"
 		and type(config.gapTrailingScore) == "number"
@@ -131,13 +144,13 @@ end
 	@param haystack string
 	@return boolean
 ]=]
-function Fzy.hasMatch(config, needle: string, haystack: string)
+function Fzy.hasMatch(config: FzyConfig, needle: string, haystack: string): boolean
 	if not config.caseSensitive then
 		needle = string.lower(needle)
 		haystack = string.lower(haystack)
 	end
 
-	local j = 1
+	local j: number? = 1
 	for i = 1, string.len(needle) do
 		j = string.find(haystack, string.sub(needle, i, i), j, true)
 		if not j then
@@ -150,15 +163,15 @@ function Fzy.hasMatch(config, needle: string, haystack: string)
 	return true
 end
 
-local function is_lower(c)
-	return string.match(c, "%l")
+local function is_lower(c: string): boolean
+	return string.match(c, "%l") ~= nil
 end
 
-local function is_upper(c)
-	return string.match(c, "%u")
+local function is_upper(c: string): boolean
+	return string.match(c, "%u") ~= nil
 end
 
-local function precomputeBonus(config, haystack: string)
+local function precomputeBonus(config: FzyConfig, haystack: string)
 	local matchBonus = {}
 
 	local last_char = "/"
@@ -182,7 +195,7 @@ local function precomputeBonus(config, haystack: string)
 	return matchBonus
 end
 
-local function compute(config, needle: string, haystack: string, D, M)
+local function compute(config: FzyConfig, needle: string, haystack: string, D: { { number } }, M)
 	-- Note that the match bonuses must be computed before the arguments are
 	-- converted to lowercase, since there are bonuses for camelCase.
 
@@ -240,7 +253,7 @@ end
 	@param haystack string
 	@return boolean
 ]=]
-function Fzy.isPerfectMatch(config, needle, haystack)
+function Fzy.isPerfectMatch(config: FzyConfig, needle: string, haystack: string): boolean
 	if config.caseSensitive then
 		return needle == haystack
 	else
@@ -256,7 +269,7 @@ end
 	@param haystack string
 	@return number -- higher scores indicate better matches. See also [Fzy.getMinScore] and [Fzy.getMaxScore].
 ]=]
-function Fzy.score(config, needle: string, haystack: string): number
+function Fzy.score(config: FzyConfig, needle: string, haystack: string): number
 	local n = string.len(needle)
 	local m = string.len(haystack)
 
@@ -272,7 +285,6 @@ function Fzy.score(config, needle: string, haystack: string): number
 	end
 end
 
-
 --[=[
 	Compute the locations where fzy matches a string.
 
@@ -285,7 +297,7 @@ end
 	@return { int } -- indices, where `indices[n]` is the location of the `n`th character of `needle` in `haystack`.
 	@return number -- the same matching score returned by `score`
 ]=]
-function Fzy.positions(config, needle: string, haystack: string)
+function Fzy.positions(config: FzyConfig, needle: string, haystack: string): ({ number }, number)
 	local n = string.len(needle)
 	local m = string.len(haystack)
 
@@ -334,13 +346,13 @@ end
 	@param haystacks { string }
 	@return {{idx, positions, score}, ...}
 ]=]
-function Fzy.filter(config, needle: string, haystacks: { string })
-	local result = {}
+function Fzy.filter(config: FzyConfig, needle: string, haystacks: { string }): { any }
+	local result: { any } = {}
 
 	for i, line in ipairs(haystacks) do
 		if Fzy.hasMatch(config, needle, line) then
 			local p, s = Fzy.positions(config, needle, line)
-			table.insert(result, {i, p, s})
+			table.insert(result, { i, p, s } :: { any })
 		end
 	end
 
@@ -378,7 +390,7 @@ end
 	@param config FzyConfig
 	@return number
 ]=]
-function Fzy.getMaxLength(config): number
+function Fzy.getMaxLength(config: FzyConfig): number
 	assert(Fzy.isFzyConfig(config), "Bad config")
 
 	return config.maxMatchLength
@@ -393,7 +405,7 @@ end
 	@param config FzyConfig
 	@return number
 ]=]
-function Fzy.getScoreFloor(config): number
+function Fzy.getScoreFloor(config: FzyConfig): number
 	assert(Fzy.isFzyConfig(config), "Bad config")
 
 	return config.maxMatchLength * config.gapInnerScore
@@ -408,7 +420,7 @@ end
 	@param config FzyConfig
 	@return number
 ]=]
-function Fzy.getScoreCeiling(config): number
+function Fzy.getScoreCeiling(config: FzyConfig): number
 	assert(Fzy.isFzyConfig(config), "Bad config")
 
 	return config.maxMatchLength * config.consecutiveMatchScore

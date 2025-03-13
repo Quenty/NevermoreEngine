@@ -28,7 +28,7 @@ function MarkdownParser:ParseList(oldLines)
 	local lines = {}
 	local currentList
 
-	for _, line in pairs(oldLines) do
+	for _, line in oldLines do
 		local space, bullet, text
 
 		if type(line) == "string" then
@@ -74,7 +74,7 @@ end
 function MarkdownParser:ParseHeaders(oldLines)
 	local lines = {}
 
-	for _, line in pairs(oldLines) do
+	for _, line in oldLines do
 		local poundSymbols, text
 
 		if type(line) == "string" then
@@ -84,9 +84,9 @@ function MarkdownParser:ParseHeaders(oldLines)
 		local level = poundSymbols and #poundSymbols
 		if text and level and level >= 1 and level <= 5 then
 			table.insert(lines, {
-				Type = "Header";
-				Level = level;
-				Text = text;
+				Type = "Header",
+				Level = level,
+				Text = text,
 			})
 		else
 			table.insert(lines, line)
@@ -100,7 +100,7 @@ function MarkdownParser:ParseParagraphs(oldLines)
 	local lines = {}
 
 	local currentParagraph
-	for _, line in pairs(oldLines) do
+	for _, line in oldLines do
 		if type(line) == "table" then
 			table.insert(lines, line)
 		else

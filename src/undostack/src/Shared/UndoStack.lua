@@ -16,7 +16,7 @@ local UndoStack = setmetatable({}, BaseObject)
 UndoStack.ClassName = "UndoStack"
 UndoStack.__index = UndoStack
 
-function UndoStack.new(maxSize)
+function UndoStack.new(maxSize: number?)
 	local self = setmetatable(BaseObject.new(), UndoStack)
 
 	assert(type(maxSize) == "number" or maxSize == nil, "Bad maxSize")
@@ -47,7 +47,7 @@ end
 	Returns true if an action is executing
 	@return boolean
 ]=]
-function UndoStack:IsActionExecuting()
+function UndoStack:IsActionExecuting(): boolean
 	return self._isActionExecuting.Value
 end
 

@@ -55,7 +55,7 @@ end
 	@param id number
 	@return Promise<T>
 ]=]
-function Aggregator:Promise(id)
+function Aggregator:Promise(id: number)
 	assert(type(id) == "number", "Bad id")
 
 	local found = self._promisesLruCache:get(id)
@@ -80,7 +80,7 @@ end
 	@param id number
 	@return Observable<T>
 ]=]
-function Aggregator:Observe(id)
+function Aggregator:Observe(id: number)
 	assert(type(id) == "number", "Bad id")
 
 	return Rx.fromPromise(self:Promise(id))
@@ -91,7 +91,7 @@ function Aggregator:_sendBatchedPromises(promiseMap)
 
 	local idList = {}
 	local unresolvedMap = {}
-	for id, promise in pairs(promiseMap) do
+	for id, promise in promiseMap do
 		table.insert(idList, id)
 		unresolvedMap[id] = promise
 	end
@@ -104,25 +104,25 @@ function Aggregator:_sendBatchedPromises(promiseMap)
 
 	self._maid:GivePromise(self._promiseBatchQuery(idList))
 		:Then(function(result)
-			assert(type(result) == "table", "Bad result")
+		assert(type(result) == "table", "Bad result")
 
-			for _, data in pairs(result) do
-				assert(type(data.Id) == "number", "Bad result[?].Id")
+		for _, data in result do
+			assert(type(data.Id) == "number", "Bad result[?].Id")
 
-				if unresolvedMap[data.Id] then
-					unresolvedMap[data.Id]:Resolve(data)
-					unresolvedMap[data.Id] = nil
-				end
+			if unresolvedMap[data.Id] then
+				unresolvedMap[data.Id]:Resolve(data)
+				unresolvedMap[data.Id] = nil
 			end
+		end
 
-			-- Reject other ones
-			for id, promise in pairs(unresolvedMap) do
-				promise:Reject(string.format("[Aggregator] %s failed to get result for id %d", self._debugName, id))
-			end
+		-- Reject other ones
+		for id, promise in unresolvedMap do
+			promise:Reject(string.format("[Aggregator] %s failed to get result for id %d", self._debugName, id))
+		end
 		end, function(err, ...)
-			local text = string.format("[Aggregator] %s failed to get bulk result - %q", self._debugName, tostring(err))
+		local text = string.format("[Aggregator] %s failed to get bulk result - %q", self._debugName, tostring(err))
 
-			for _, item in pairs(unresolvedMap) do
+			for _, item in unresolvedMap do
 				item:Reject(text, ...)
 			end
 		end)

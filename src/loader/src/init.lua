@@ -119,7 +119,7 @@ function Loader:__call(request)
 	end
 end
 
-function Loader:_findDependency(request)
+function Loader:_findDependency(request: string)
 	assert(type(request) == "string", "Bad request")
 
 	local packageTracker = GLOBAL_PACKAGE_TRACKER:FindPackageTracker(self._packages)

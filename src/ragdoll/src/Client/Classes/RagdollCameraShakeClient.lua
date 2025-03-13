@@ -25,7 +25,7 @@ local RagdollCameraShakeClient = setmetatable({}, BaseObject)
 RagdollCameraShakeClient.ClassName = "RagdollCameraShakeClient"
 RagdollCameraShakeClient.__index = RagdollCameraShakeClient
 
-function RagdollCameraShakeClient.new(humanoid, serviceBag)
+function RagdollCameraShakeClient.new(humanoid: Humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollCameraShakeClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

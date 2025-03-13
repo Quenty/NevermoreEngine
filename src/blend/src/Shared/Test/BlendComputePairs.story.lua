@@ -23,7 +23,7 @@ return function(target)
 				Size = UDim2.new(0, 100, 0, 20);
 				[Blend.OnEvent "Activated"] = function()
 					local newState = {}
-					for _, item in pairs(state.Value) do
+					for _, item in state.Value do
 						table.insert(newState, item)
 					end
 					table.insert(newState, string.char(string.byte("a") + #newState))

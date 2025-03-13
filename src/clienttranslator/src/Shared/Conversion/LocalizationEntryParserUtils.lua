@@ -21,7 +21,7 @@ function LocalizationEntryParserUtils.decodeFromInstance(tableName, sourceLocale
 	local lookupTable = {}
 	local baseKey = ""
 
-	for _, descendant in pairs(folder:GetDescendants()) do
+	for _, descendant in folder:GetDescendants() do
 		if descendant:IsA("StringValue") then
 			local localeId = LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)
 			local decodedTable = HttpService:JSONDecode(descendant.Value)
@@ -36,7 +36,7 @@ function LocalizationEntryParserUtils.decodeFromInstance(tableName, sourceLocale
 	end
 
 	local results = {}
-	for _, item in pairs(lookupTable) do
+	for _, item in lookupTable do
 		table.insert(results, item)
 	end
 	return results
@@ -50,10 +50,17 @@ function LocalizationEntryParserUtils.decodeFromTable(tableName, localeId, dataT
 	local lookupTable = {}
 
 	local baseKey = ""
-	LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, localeId, localeId, baseKey, dataTable, tableName)
+	LocalizationEntryParserUtils._parseTableToResultsList(
+		lookupTable,
+		localeId,
+		localeId,
+		baseKey,
+		dataTable,
+		tableName
+	)
 
 	local results = {}
-	for _, item in pairs(lookupTable) do
+	for _, item in lookupTable do
 		table.insert(results, item)
 	end
 	return results
@@ -75,7 +82,7 @@ function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sour
 	assert(type(dataTable) == "table", "Bad dataTable")
 	assert(type(tableName) == "string", "Bad tableName")
 
-	for index, text in pairs(dataTable) do
+	for index, text in dataTable do
 		local key = baseKey .. index
 		if type(text) == "table" then
 			LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, key .. ".", text, tableName)
@@ -92,9 +99,9 @@ function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sour
 					Values = {
 						[localeId] = text;
 					};
-				};
+				}
 
-				lookupTable[key] = found;
+				lookupTable[key] = found
 			end
 
 			-- Ensure assignment

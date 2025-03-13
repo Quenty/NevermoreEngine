@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities for observing players
 	@class RxPlayerUtils
@@ -11,21 +12,23 @@ local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local RxInstanceUtils = require("RxInstanceUtils")
+local _Rx = require("Rx")
+local _Observable = require("Observable")
 
 local RxPlayerUtils = {}
 
 --[=[
 	Observe players for the lifetime they exist
-	@param predicate (Player) -> boolean
+	@param predicate ((Player) -> boolean)?
 	@return Observable<Brio<Player>>
 ]=]
-function RxPlayerUtils.observePlayersBrio(predicate)
+function RxPlayerUtils.observePlayersBrio(predicate: _Rx.Predicate<Player>?): _Observable.Observable<Brio.Brio<Player>>
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate!")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local function handlePlayer(player)
+		local function handlePlayer(player: Player)
 			if predicate == nil or predicate(player) then
 				local brio = Brio.new(player)
 				maid[player] = brio
@@ -47,7 +50,7 @@ function RxPlayerUtils.observePlayersBrio(predicate)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -55,7 +58,7 @@ end
 
 	@return Observable<Brio<Player>>
 ]=]
-function RxPlayerUtils.observeLocalPlayerBrio()
+function RxPlayerUtils.observeLocalPlayerBrio(): _Observable.Observable<Brio.Brio<Player>>
 	return RxInstanceUtils.observePropertyBrio(Players, "LocalPlayer", function(value)
 		return value ~= nil
 	end)
@@ -63,16 +66,16 @@ end
 
 --[=[
 	Observe players as they're added, and as they are.
-	@param predicate (Player) -> boolean
+	@param predicate ((Player) -> boolean)?
 	@return Observable<Player>
 ]=]
-function RxPlayerUtils.observePlayers(predicate)
+function RxPlayerUtils.observePlayers(predicate: _Rx.Predicate<Player>?): _Observable.Observable<Player>
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local function handlePlayer(player)
+		local function handlePlayer(player: Player)
 			if predicate == nil or predicate(player) then
 				sub:Fire(player)
 			end
@@ -87,16 +90,16 @@ function RxPlayerUtils.observePlayers(predicate)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
 	Observes the first time the character appearance is loaded
 
 	@param player Player
-	@return Observable<void>
+	@return Observable<()>
 ]=]
-function RxPlayerUtils.observeFirstAppearanceLoaded(player)
+function RxPlayerUtils.observeFirstAppearanceLoaded(player: Player): _Observable.Observable<()>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	return Observable.new(function(sub)

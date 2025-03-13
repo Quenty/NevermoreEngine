@@ -17,7 +17,7 @@ local VoiceChatUtils = {}
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function VoiceChatUtils.promiseIsVoiceEnabledForPlayer(player: Player)
+function VoiceChatUtils.promiseIsVoiceEnabledForPlayer(player: Player): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return VoiceChatUtils.promiseIsVoiceEnabledForUserId(player.UserId)
@@ -29,7 +29,7 @@ end
 	@param userId number
 	@return Promise<boolean>
 ]=]
-function VoiceChatUtils.promiseIsVoiceEnabledForUserId(userId: number)
+function VoiceChatUtils.promiseIsVoiceEnabledForUserId(userId: number): Promise.Promise<boolean>
 	assert(type(userId) == "number", "Bad userId")
 
 	return Promise.spawn(function(resolve, reject)

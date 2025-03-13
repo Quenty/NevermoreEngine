@@ -8,10 +8,11 @@ local Set = require("Set")
 local ValueObject = require("ValueObject")
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local _ScoredAction = require("ScoredAction")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
 
-local ScoredActionPicker = setmetatable({},BaseObject)
+local ScoredActionPicker = setmetatable({}, BaseObject)
 ScoredActionPicker.ClassName = "ScoredActionPicker"
 ScoredActionPicker.__index = ScoredActionPicker
 
@@ -51,7 +52,13 @@ function ScoredActionPicker:Update()
 	end)
 
 	if #actionList > MAX_ACTION_LIST_SIZE_BEFORE_WARN then
-		warn(string.format("[ScoredActionPicker.Update] - Action list has size of %d/%d", #actionList, MAX_ACTION_LIST_SIZE_BEFORE_WARN))
+		warn(
+			string.format(
+				"[ScoredActionPicker.Update] - Action list has size of %d/%d",
+				#actionList,
+				MAX_ACTION_LIST_SIZE_BEFORE_WARN
+			)
+		)
 	end
 
 	for _, action in actionList do
@@ -63,7 +70,7 @@ function ScoredActionPicker:Update()
 	end
 end
 
-function ScoredActionPicker:_tryGetValidPreferredAction(action)
+function ScoredActionPicker:_tryGetValidPreferredAction(action: _ScoredAction.ScoredAction)
 	if not action then
 		return nil
 	end
@@ -80,14 +87,14 @@ function ScoredActionPicker:_tryGetValidPreferredAction(action)
 	return action
 end
 
-function ScoredActionPicker:AddAction(action)
+function ScoredActionPicker:AddAction(action: _ScoredAction.ScoredAction)
 	assert(type(action) == "table", "Bad action")
 
 	self._actionSet[action] = true
 	self:Update()
 end
 
-function ScoredActionPicker:RemoveAction(action)
+function ScoredActionPicker:RemoveAction(action: _ScoredAction.ScoredAction)
 	assert(type(action) == "table", "Bad action")
 
 	if self._currentPreferred.Value == action then

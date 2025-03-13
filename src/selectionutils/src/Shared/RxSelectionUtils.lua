@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RxSelectionUtils
 ]=]
@@ -27,7 +28,7 @@ local RxSelectionUtils = {}
 	@param className string
 	@return Observable<Instance?>
 ]=]
-function RxSelectionUtils.observeFirstSelectionWhichIsA(className: string)
+function RxSelectionUtils.observeFirstSelectionWhichIsA(className: string): Observable.Observable<Instance?>
 	assert(type(className) == "string", "Bad className")
 
 	return RxSelectionUtils.observeFirstSelection(function(inst)
@@ -51,12 +52,14 @@ end
 	@param className string
 	@return Observable<Brio<Instance>>
 ]=]
-function RxSelectionUtils.observeFirstSelectionWhichIsABrio(className: string)
+function RxSelectionUtils.observeFirstSelectionWhichIsABrio(
+	className: string
+): Observable.Observable<Brio.Brio<Instance>>
 	assert(type(className) == "string", "Bad className")
 
 	return RxSelectionUtils.observeFirstSelectionBrio(function(inst)
 		return inst:IsA(className)
-	end)
+	end) :: any
 end
 
 --[=[
@@ -64,7 +67,7 @@ end
 
 	@return Observable<Instance?>
 ]=]
-function RxSelectionUtils.observeFirstAdornee()
+function RxSelectionUtils.observeFirstAdornee(): Observable.Observable<Instance?>
 	return RxSelectionUtils.observeFirstSelection(function(inst)
 		return inst:IsA("BasePart") or inst:IsA("Model")
 	end)
@@ -75,12 +78,12 @@ end
 
 	@return Observable<Brio<Instance>>
 ]=]
-function RxSelectionUtils.observeAdorneesBrio()
+function RxSelectionUtils.observeAdorneesBrio(): Observable.Observable<Brio.Brio<Instance>>
 	return RxSelectionUtils.observeSelectionItemsBrio():Pipe({
 		RxBrioUtils.where(function(inst)
 			return inst:IsA("BasePart") or inst:IsA("Model")
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -107,7 +110,7 @@ function RxSelectionUtils.observeFirstSelection(where)
 		maid:GiveTask(current)
 
 		local function handleSelectionChanged()
-			for _, item in pairs(Selection:Get()) do
+			for _, item in Selection:Get() do
 				if where(item) then
 					current.Value = item
 					return
@@ -186,12 +189,12 @@ function RxSelectionUtils.observeSelectionItemsBrio()
 			lastSet = currentSet
 
 			-- Remove first
-			for toRemove, _ in pairs(toRemoveSet) do
+			for toRemove, _ in toRemoveSet do
 				maid[toRemove] = nil
 			end
 
 			-- Then add
-			for toAdd, _ in pairs(toAddSet) do
+			for toAdd, _ in toAddSet do
 				local brio = Brio.new(toAdd)
 				maid[toAdd] = brio
 

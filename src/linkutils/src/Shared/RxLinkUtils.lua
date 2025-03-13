@@ -14,21 +14,20 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local RxLinkUtils = {}
 
 -- Emits valid links in format Brio.new(link, linkValue)
-function RxLinkUtils.observeValidLinksBrio(linkName, parent)
+function RxLinkUtils.observeValidLinksBrio(linkName: string, parent: Instance)
 	assert(type(linkName) == "string", "linkName should be 'string'")
 	assert(typeof(parent) == "Instance", "parent should be 'Instance'")
 
-	return RxInstanceUtils.observeChildrenBrio(parent)
-		:Pipe({
-			Rx.flatMap(function(brio)
-				local instance = brio:GetValue()
-				if not instance:IsA("ObjectValue") then
-					return Rx.EMPTY
-				end
+	return RxInstanceUtils.observeChildrenBrio(parent):Pipe({
+		Rx.flatMap(function(brio)
+			local instance: Instance = brio:GetValue()
+			if not instance:IsA("ObjectValue") then
+				return Rx.EMPTY
+			end
 
-				return RxBrioUtils.completeOnDeath(brio, RxLinkUtils.observeValidityBrio(linkName, instance))
-			end);
-		})
+			return RxBrioUtils.completeOnDeath(brio, RxLinkUtils.observeValidityBrio(linkName, instance))
+		end),
+	})
 end
 
 --[=[
@@ -38,23 +37,22 @@ end
 	@param parent Instance
 	@return Brio<Instance>
 ]=]
-function RxLinkUtils.observeLinkValueBrio(linkName, parent)
+function RxLinkUtils.observeLinkValueBrio(linkName: string, parent: Instance)
 	assert(type(linkName) == "string", "linkName should be 'string'")
 	assert(typeof(parent) == "Instance", "parent should be 'Instance'")
 
-	return RxInstanceUtils.observeChildrenOfNameBrio(parent, "ObjectValue", linkName)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(instance)
-				return RxInstanceUtils.observePropertyBrio(instance, "Value", function(value)
-					return value ~= nil
-				end)
+	return RxInstanceUtils.observeChildrenOfNameBrio(parent, "ObjectValue", linkName):Pipe({
+		RxBrioUtils.flatMapBrio(function(instance)
+			return RxInstanceUtils.observePropertyBrio(instance, "Value", function(value: Instance?)
+				return value ~= nil
 			end)
-		})
+		end),
+	})
 end
 
 -- Fires off everytime the link is reconfigured into a valid link
 -- Fires with link, linkValue
-function RxLinkUtils.observeValidityBrio(linkName, link)
+function RxLinkUtils.observeValidityBrio(linkName: string, link: Instance)
 	assert(typeof(link) == "Instance" and link:IsA("ObjectValue"), "Bad link")
 	assert(type(linkName) == "string", "Bad linkName")
 
@@ -72,15 +70,12 @@ function RxLinkUtils.observeValidityBrio(linkName, link)
 			sub:Fire(newValid)
 		end
 
-		maid:GiveTask(link:GetPropertyChangedSignal("Value")
-			:Connect(updateValidity))
-		maid:GiveTask(link:GetPropertyChangedSignal("Name")
-			:Connect(updateValidity))
+		maid:GiveTask(link:GetPropertyChangedSignal("Value"):Connect(updateValidity))
+		maid:GiveTask(link:GetPropertyChangedSignal("Name"):Connect(updateValidity))
 		updateValidity()
 
 		return maid
 	end)
 end
-
 
 return RxLinkUtils

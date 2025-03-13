@@ -6,22 +6,23 @@
 local require = require(script.Parent.loader).load(script)
 
 local DuckTypeUtils = require("DuckTypeUtils")
+local RoguePropertyArrayUtils = (require :: any)("RoguePropertyArrayUtils")
+local RoguePropertyCacheService = require("RoguePropertyCacheService")
 local RoguePropertyDefinition = require("RoguePropertyDefinition")
 local RoguePropertyDefinitionArrayHelper = require("RoguePropertyDefinitionArrayHelper")
+local RoguePropertyService = require("RoguePropertyService")
 local RoguePropertyTable = require("RoguePropertyTable")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
-local RoguePropertyService = require("RoguePropertyService")
-local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
 local Set = require("Set")
-local RoguePropertyCacheService = require("RoguePropertyCacheService")
+local _Table = require("Table")
 
 local RoguePropertyTableDefinition = {} -- Inherits from RoguePropertyDefinition
 RoguePropertyTableDefinition.ClassName = "RoguePropertyTableDefinition"
 RoguePropertyTableDefinition.__index = RoguePropertyTableDefinition
 
-function RoguePropertyTableDefinition.new(tableName, defaultValueTable)
+function RoguePropertyTableDefinition.new(tableName: string?, defaultValueTable: _Table.Map<string, any>?)
 	local self = setmetatable(RoguePropertyDefinition.new(), RoguePropertyTableDefinition)
 
 	if tableName then
@@ -39,7 +40,7 @@ function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value): boo
 	return DuckTypeUtils.isImplementation(RoguePropertyTableDefinition, value)
 end
 
-function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable)
+function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable: _Table.Map<string, any>?)
 	assert(type(defaultValueTable) == "table", "Bad defaultValueTable")
 
 	RoguePropertyDefinition.SetDefaultValue(self, defaultValueTable)
@@ -48,7 +49,7 @@ function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable)
 
 	local defaultArrayData = {}
 
-	for key, defaultValue in pairs(defaultValueTable) do
+	for key, defaultValue in defaultValueTable do
 		if type(key) == "number" then
 			table.insert(defaultArrayData, defaultValue)
 		else
@@ -89,7 +90,7 @@ function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable)
 	end
 end
 
-function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): boolean
+function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): (boolean, string?)
 	assert(type(strict) == "boolean", "Bad strict")
 
 	if type(mainValue) ~= "table" then
@@ -102,14 +103,14 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): boo
 			)
 	end
 
-	local remainingKeys
+	local remainingKeys: Set.Set<string>
 	if strict then
 		remainingKeys = Set.fromKeys(self._definitionMap)
 	else
 		remainingKeys = {}
 	end
 
-	for key, value in pairs(mainValue) do
+	for key, value in mainValue do
 		remainingKeys[key] = nil
 
 		if type(key) == "number" then
@@ -158,13 +159,13 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): boo
 		return false,
 			string.format(
 				"Had %d unassigned keys %q while assigning to %q",
-				#remainingKeys,
-				table.concat(remainingKeys, ", "),
+				Set.count(remainingKeys),
+				table.concat(Set.toList(remainingKeys), ", "),
 				self:GetFullName()
 			)
 	end
 
-	return true
+	return true, nil
 end
 
 function RoguePropertyTableDefinition:GetDefinitionArrayHelper()
@@ -195,7 +196,7 @@ end
 	@param adornee Instance
 	@return RoguePropertyTable
 ]=]
-function RoguePropertyTableDefinition:Get(serviceBag, adornee)
+function RoguePropertyTableDefinition:Get(serviceBag, adornee: Instance)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
@@ -288,7 +289,7 @@ function RoguePropertyTableDefinition:GetOrCreateInstance(parent)
 	return folder
 end
 
-function RoguePropertyTableDefinition:__index(index)
+function RoguePropertyTableDefinition:__index(index: string)
 	assert(type(index) == "string", "Bad index")
 
 	if index == "_definitionMap" or index == "_arrayDefinitionHelper" or index == "_parentPropertyTableDefinition" then
@@ -318,6 +319,8 @@ function RoguePropertyTableDefinition:__index(index)
 		else
 			error(string.format("Bad definition %q - Not an array", tostring(index)))
 		end
+	else
+		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 

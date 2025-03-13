@@ -47,13 +47,13 @@ local MIN_SCORE = Fzy.getMinScore()
 local MAX_SCORE = Fzy.getMaxScore()
 
 local function compareTables(a, b)
-	for key, value in pairs(a) do
+	for key, value in a do
 		if b[key] ~= value then
 			return false
 		end
 	end
 
-	for key, value in pairs(b) do
+	for key, value in b do
 		if a[key] ~= value then
 			return false
 		end

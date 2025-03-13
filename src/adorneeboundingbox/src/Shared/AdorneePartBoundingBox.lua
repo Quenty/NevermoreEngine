@@ -9,12 +9,13 @@ local RunService = game:GetService("RunService")
 local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
 local RxInstanceUtils = require("RxInstanceUtils")
+local _Observable = require("Observable")
 
 local AdorneePartBoundingBox = setmetatable({}, BaseObject)
 AdorneePartBoundingBox.ClassName = "AdorneePartBoundingBox"
 AdorneePartBoundingBox.__index = AdorneePartBoundingBox
 
-function AdorneePartBoundingBox.new(part)
+function AdorneePartBoundingBox.new(part: BasePart)
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local self = setmetatable(BaseObject.new(part), AdorneePartBoundingBox)
@@ -55,11 +56,11 @@ function AdorneePartBoundingBox:_setupUnanchoredLoop(maid)
 	end))
 end
 
-function AdorneePartBoundingBox:ObserveCFrame()
+function AdorneePartBoundingBox:ObserveCFrame(): _Observable.Observable<CFrame>
 	return self._bbCFrame:Observe()
 end
 
-function AdorneePartBoundingBox:ObserveSize()
+function AdorneePartBoundingBox:ObserveSize(): _Observable.Observable<Vector3>
 	return self._bbSize:Observe()
 end
 

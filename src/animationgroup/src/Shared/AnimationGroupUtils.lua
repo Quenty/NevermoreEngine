@@ -37,13 +37,17 @@ function AnimationGroupUtils.createdWeightedTracks(animatorOrHumanoid, weightedA
 
 	local tracks = {}
 
-	for _, weightedAnimation in pairs(weightedAnimationList) do
+	for _, weightedAnimation in weightedAnimationList do
 		assert(weightedAnimation.animationId, "Bad weightedAnimation.animationId")
 		assert(weightedAnimation.weight, "Bad weightedAnimation.weight")
 
-		table.insert(tracks, AnimationGroupUtils.createdWeightedTrack(
-			AnimationTrackUtils.loadAnimationFromId(animatorOrHumanoid, weightedAnimation.animationId),
-			weightedAnimation.weight))
+		table.insert(
+			tracks,
+			AnimationGroupUtils.createdWeightedTrack(
+				AnimationTrackUtils.loadAnimationFromId(animatorOrHumanoid, weightedAnimation.animationId),
+				weightedAnimation.weight
+			)
+		)
 	end
 
 	return tracks
@@ -61,8 +65,8 @@ function AnimationGroupUtils.createdWeightedAnimation(animationId, weight)
 	assert(type(weight) == "number", "Bad weight")
 
 	return {
-		animationId = animationId;
-		weight = weight;
+		animationId = animationId,
+		weight = weight,
 	}
 end
 
@@ -78,8 +82,8 @@ function AnimationGroupUtils.createdWeightedTrack(track, weight)
 	assert(type(weight) == "number", "Bad weight")
 
 	return {
-		track = track;
-		weight = weight;
+		track = track,
+		weight = weight,
 	}
 end
 
@@ -98,7 +102,7 @@ function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks)
 	end
 
 	local totalWeight = 0
-	for _, animationData in pairs(weightedTracks) do
+	for _, animationData in weightedTracks do
 		totalWeight = totalWeight + animationData.weight
 	end
 
@@ -107,7 +111,7 @@ function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks)
 	local selection = math.random()
 
 	local total = 0
-	for _, option in pairs(weightedTracks) do
+	for _, option in weightedTracks do
 		local threshold = total + option.weight/totalWeight
 		total = total + threshold
 

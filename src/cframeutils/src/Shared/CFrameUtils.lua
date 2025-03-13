@@ -101,7 +101,7 @@ function CFrameUtils.redirectLocalAxis(cframe: CFrame, localAxis: Vector3, world
 	local R = CFrame.new(0, 0, 0, c.X, c.Y, c.Z, d + m)
 
 	if R == R then
-		return cframe * R
+		return cframe * (R :: any)
 	else
 		return cframe
 	end
@@ -122,18 +122,18 @@ function CFrameUtils.axisAngleToCFrame(axisAngle: Vector3, position: Vector3?): 
 
 	if cframe ~= cframe then
 		-- warn("[AxisAngleUtils.toCFrame] - cframe is NAN")
-		if position then
+		if position ~= nil then
 			return CFrame.new(position)
 		else
 			return CFrame.new()
 		end
 	end
 
-	if position then
-		cframe = cframe + position
+	if position ~= nil then
+		cframe += position
 	end
 
-	return cframe
+	return cframe :: CFrame
 end
 
 --[=[

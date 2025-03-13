@@ -86,7 +86,7 @@ end
 	@param className string
 	@return Promise<boolean>
 ]=]
-function RobloxApiClass:PromiseIsA(className)
+function RobloxApiClass:PromiseIsA(className: string)
 	if self:GetClassName() == className then
 		return Promise.resolved(true)
 	end
@@ -103,7 +103,7 @@ end
 ]=]
 function RobloxApiClass:PromiseIsDescendantOf(className)
 	return self:PromiseAllSuperClasses():Then(function(classes)
-		for _, class in pairs(classes) do
+		for _, class in classes do
 			if class:GetClassName() == className then
 				return true
 			end
@@ -125,15 +125,14 @@ function RobloxApiClass:PromiseAllSuperClasses()
 	local list = {}
 
 	local function chain(current)
-		return current:PromiseSuperClass()
-			:Then(function(superclass)
-				if superclass then
-					table.insert(list, superclass)
-					return chain(superclass)
-				else
-					return list
-				end
-			end)
+		return current:PromiseSuperClass():Then(function(superclass)
+			if superclass then
+				table.insert(list, superclass)
+				return chain(superclass)
+			else
+				return list
+			end
+		end)
 	end
 
 	self._allSuperClassesPromise = chain(self)
@@ -157,7 +156,7 @@ end
 	Returns whether the class has a super class
 	@return boolean
 ]=]
-function RobloxApiClass:HasSuperClass()
+function RobloxApiClass:HasSuperClass(): boolean
 	return self:GetSuperClassName() ~= nil
 end
 
@@ -174,16 +173,15 @@ end
 	@return Promise<{ RobloxApiMember }>
 ]=]
 function RobloxApiClass:PromiseProperties()
-	return self:PromiseMembers()
-		:Then(function(members)
-			local result = {}
-			for _, member in pairs(members) do
-				if member:IsProperty() then
-					table.insert(result, member)
-				end
+	return self:PromiseMembers():Then(function(members)
+		local result = {}
+		for _, member in members do
+			if member:IsProperty() then
+				table.insert(result, member)
 			end
-			return result
-		end)
+		end
+		return result
+	end)
 end
 
 --[=[
@@ -191,16 +189,15 @@ end
 	@return Promise<{ RobloxApiMember }>
 ]=]
 function RobloxApiClass:PromiseEvents()
-	return self:PromiseMembers()
-		:Then(function(members)
-			local result = {}
-			for _, member in pairs(members) do
-				if member:IsEvent() then
-					table.insert(result, member)
-				end
+	return self:PromiseMembers():Then(function(members)
+		local result = {}
+		for _, member in members do
+			if member:IsEvent() then
+				table.insert(result, member)
 			end
-			return result
-		end)
+		end
+		return result
+	end)
 end
 
 --[=[
@@ -208,23 +205,22 @@ end
 	@return Promise<{ RobloxApiMember }>
 ]=]
 function RobloxApiClass:PromiseFunctions()
-	return self:PromiseMembers()
-		:Then(function(members)
-			local result = {}
-			for _, member in pairs(members) do
-				if member:IsFunction() then
-					table.insert(result, member)
-				end
+	return self:PromiseMembers():Then(function(members)
+		local result = {}
+		for _, member in members do
+			if member:IsFunction() then
+				table.insert(result, member)
 			end
-			return result
-		end)
+		end
+		return result
+	end)
 end
 
 --[=[
 	Retrieves whether the class is a service
 	@return boolean
 ]=]
-function RobloxApiClass:IsService()
+function RobloxApiClass:IsService(): boolean
 	return self:HasTag("Service")
 end
 
@@ -232,7 +228,7 @@ end
 	Retrieves whether the class is not creatable
 	@return boolean
 ]=]
-function RobloxApiClass:IsNotCreatable()
+function RobloxApiClass:IsNotCreatable(): boolean
 	return self:HasTag("NotCreatable")
 end
 
@@ -240,7 +236,7 @@ end
 	Retrieves whether the class is not replicated
 	@return boolean
 ]=]
-function RobloxApiClass:IsNotReplicated()
+function RobloxApiClass:IsNotReplicated(): boolean
 	return self:HasTag("NotReplicated")
 end
 
@@ -249,14 +245,14 @@ end
 	@param tagName string
 	@return boolean
 ]=]
-function RobloxApiClass:HasTag(tagName)
+function RobloxApiClass:HasTag(tagName: string): boolean
 	if self._tagCache then
 		return self._tagCache[tagName] == true
 	end
 
 	self._tagCache = {}
 	if type(self._data.Tags) == "table" then
-		for _, tag in pairs(self._data.Tags) do
+		for _, tag in self._data.Tags do
 			self._tagCache[tag] = true
 		end
 	end

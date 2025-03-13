@@ -4,7 +4,6 @@
 	@class RoguePropertyCache
 ]=]
 
-local require = require(script.Parent.loader).load(script)
 
 local RoguePropertyCache = {}
 RoguePropertyCache.ClassName = "RoguePropertyCache"

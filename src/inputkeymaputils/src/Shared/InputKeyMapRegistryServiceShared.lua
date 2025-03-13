@@ -14,11 +14,12 @@ local Maid = require("Maid")
 local ObservableList = require("ObservableList")
 local RxBrioUtils = require("RxBrioUtils")
 local Rx = require("Rx")
+local _ServiceBag = require("ServiceBag")
 
 local InputKeyMapRegistryServiceShared = {}
 InputKeyMapRegistryServiceShared.ServiceName = "InputKeyMapRegistryServiceShared"
 
-function InputKeyMapRegistryServiceShared:Init(serviceBag)
+function InputKeyMapRegistryServiceShared:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -67,11 +68,11 @@ function InputKeyMapRegistryServiceShared:ObserveInputKeyMapListsBrio()
 	return self:ObserveProvidersBrio():Pipe({
 		RxBrioUtils.flatMapBrio(function(provider)
 			return provider:ObserveInputKeyMapListsBrio()
-		end)
+		end),
 	})
 end
 
-function InputKeyMapRegistryServiceShared:GetProvider(providerName)
+function InputKeyMapRegistryServiceShared:GetProvider(providerName: string)
 	assert(type(providerName) == "string", "Bad providerName")
 
 	return self._providerLookupByName[providerName]
@@ -82,8 +83,8 @@ function InputKeyMapRegistryServiceShared:ObserveInputKeyMapList(providerName, i
 	assert(inputKeyMapListName, "Bad inputKeyMapListName")
 
 	return Rx.combineLatest({
-		providerName = providerName;
-		inputKeyMapListName = inputKeyMapListName;
+		providerName = providerName,
+		inputKeyMapListName = inputKeyMapListName,
 	}):Pipe({
 		Rx.map(function(state)
 			if not (type(state.inputKeyMapListName) == "string" and type(state.providerName) == "string") then
@@ -95,16 +96,20 @@ function InputKeyMapRegistryServiceShared:ObserveInputKeyMapList(providerName, i
 				return found
 			end
 
-			warn(string.format("[TriggerModel.ObserveInputKeyMapList] - Bad inputKey name %q %q\n%s",
-				tostring(state.providerName),
-				tostring(state.inputKeyMapListName)))
+			warn(
+				string.format(
+					"[InputKeyMapRegistryServiceShared.ObserveInputKeyMapList] - Bad inputKey name %q\n%s",
+					tostring(state.providerName),
+					tostring(state.inputKeyMapListName)
+				)
+			)
 
 			return nil
-		end);
+		end),
 	})
 end
 
-function InputKeyMapRegistryServiceShared:FindInputKeyMapList(providerName, inputKeyMapListName)
+function InputKeyMapRegistryServiceShared:FindInputKeyMapList(providerName: string, inputKeyMapListName)
 	assert(type(providerName) == "string", "Bad providerName")
 	assert(type(inputKeyMapListName) == "string", "Bad inputKeyMapListName")
 
@@ -114,7 +119,7 @@ function InputKeyMapRegistryServiceShared:FindInputKeyMapList(providerName, inpu
 
 	assert(self._providersList, "Not initialized")
 
-	for _, provider in pairs(self._providerLookupByName) do
+	for _, provider in self._providerLookupByName do
 		if provider:GetProviderName() == providerName then
 			local found = provider:FindInputKeyMapList(inputKeyMapListName)
 			if found then

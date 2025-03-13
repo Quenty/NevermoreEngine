@@ -20,8 +20,8 @@ local NUMBERS = {
 local KEYCODES_TO_NUMBER = {}
 local ALL_KEYCODES = {}
 
-for number, keyCodes in pairs(NUMBERS) do
-	for _, keyCode in pairs(keyCodes) do
+for number, keyCodes in NUMBERS do
+	for _, keyCode in keyCodes do
 		KEYCODES_TO_NUMBER[keyCode] = number
 		table.insert(ALL_KEYCODES, keyCode)
 	end
@@ -34,7 +34,7 @@ local NumberToInputKeyUtils = {}
 	@param number number
 	@return { Enum.KeyCode }
 ]=]
-function NumberToInputKeyUtils.getInputsForNumber(number: number): Enum.KeyCode?
+function NumberToInputKeyUtils.getInputsForNumber(number: number): { Enum.KeyCode }?
 	assert(type(number) == "number", "Bad number")
 
 	return NUMBERS[number]

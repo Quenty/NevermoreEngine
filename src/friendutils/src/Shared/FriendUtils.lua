@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.
 	@class FriendUtils
@@ -19,6 +20,12 @@ local FriendUtils = {}
 	.IsOnline bool -- If the friend is currently online
 	@within FriendUtils
 ]=]
+export type FriendData = {
+	Id: number,
+	Username: string,
+	DisplayName: string,
+	IsOnline: boolean,
+}
 
 --[=[
 	Returns the current studio users friends
@@ -31,9 +38,8 @@ local FriendUtils = {}
 	```
 	@return Promise<{ FriendData }>
 ]=]
-function FriendUtils.promiseAllStudioFriends()
-	return FriendUtils.promiseCurrentStudioUserId()
-		:Then(FriendUtils.promiseAllFriends)
+function FriendUtils.promiseAllStudioFriends(): Promise.Promise<{ FriendData }>
+	return FriendUtils.promiseCurrentStudioUserId():Then(FriendUtils.promiseAllFriends)
 end
 
 --[=[
@@ -41,9 +47,9 @@ end
 	@param friends { FriendData }
 	@return { FriendData }
 ]=]
-function FriendUtils.onlineFriends(friends)
+function FriendUtils.onlineFriends(friends: { FriendData }): { FriendData }
 	local onlineFriends = {}
-	for _, friend in pairs(friends) do
+	for _, friend in friends do
 		if friend.IsOnline then
 			table.insert(onlineFriends, friend)
 		end
@@ -56,14 +62,14 @@ end
 	@param friends { FriendData }
 	@return { FriendData }
 ]=]
-function FriendUtils.friendsNotInGame(friends)
+function FriendUtils.friendsNotInGame(friends: { FriendData }): { FriendData }
 	local userIdsInGame = {}
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		userIdsInGame[player.UserId] = true
 	end
 
 	local onlineFriends = {}
-	for _, friend in pairs(friends) do
+	for _, friend in friends do
 		if not userIdsInGame[friend.Id] then
 			table.insert(onlineFriends, friend)
 		end
@@ -77,26 +83,25 @@ end
 	@param limitMaxFriends number? -- Optional max friends
 	@return Promise<{ FriendData }>
 ]=]
-function FriendUtils.promiseAllFriends(userId, limitMaxFriends)
+function FriendUtils.promiseAllFriends(userId: number, limitMaxFriends: number?): Promise.Promise<{ FriendData }>
 	assert(userId, "Bad userId")
 
-	return FriendUtils.promiseFriendPages(userId)
-		:Then(function(pages)
-			return Promise.spawn(function(resolve, _)
-				local users = {}
+	return FriendUtils.promiseFriendPages(userId):Then(function(pages)
+		return Promise.spawn(function(resolve, _)
+			local users = {}
 
-				for userData in FriendUtils.iterateFriendsYielding(pages) do
-					table.insert(users, userData)
+			for userData in FriendUtils.iterateFriendsYielding(pages) do
+				table.insert(users, userData)
 
-					-- Exit quickly!
-					if limitMaxFriends and #users >= limitMaxFriends then
-						return resolve(users)
-					end
+				-- Exit quickly!
+				if limitMaxFriends and #users >= limitMaxFriends then
+					return resolve(users)
 				end
+			end
 
-				return resolve(users)
-			end)
+			return resolve(users)
 		end)
+	end)
 end
 
 --[=[
@@ -104,7 +109,7 @@ end
 	@param userId number
 	@return Promise<FriendPages>
 ]=]
-function FriendUtils.promiseFriendPages(userId)
+function FriendUtils.promiseFriendPages(userId: number): Promise.Promise<FriendPages>
 	assert(type(userId) == "number", "Bad userId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -127,12 +132,12 @@ end
 	@param pages FriendPages
 	@return () => FrienData? -- Iterator
 ]=]
-function FriendUtils.iterateFriendsYielding(pages)
+function FriendUtils.iterateFriendsYielding(pages: FriendPages): () -> FriendData?
 	assert(pages, "Bad pages")
 
 	return coroutine.wrap(function()
 		while true do
-			for _, userData in pairs(pages:GetCurrentPage()) do
+			for _, userData in pages:GetCurrentPage() do
 				assert(type(userData.Id) == "number", "Bad userData.Id")
 				assert(type(userData.Username) == "string", "Bad userData.Username")
 				assert(type(userData.IsOnline) == "boolean", "Bad userData.IsOnline")
@@ -157,7 +162,7 @@ end
 
 	@return Promise<number>
 ]=]
-function FriendUtils.promiseStudioServiceUserId()
+function FriendUtils.promiseStudioServiceUserId(): Promise.Promise<number>
 	return Promise.new(function(resolve, reject)
 		local userId
 		local ok, err = pcall(function()
@@ -180,7 +185,7 @@ end
 	Gets the current studio user's user id.
 	@return Promise<number>
 ]=]
-function FriendUtils.promiseCurrentStudioUserId()
+function FriendUtils.promiseCurrentStudioUserId(): Promise.Promise<number>
 	return FriendUtils.promiseStudioServiceUserId()
 		:Catch(function(...)
 			warn(...)

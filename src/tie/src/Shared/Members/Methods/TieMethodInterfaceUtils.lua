@@ -6,10 +6,11 @@ local require = require(script.Parent.loader).load(script)
 
 local TieUtils = require("TieUtils")
 local TieRealmUtils = require("TieRealmUtils")
+local _TieRealms = require("TieRealms")
 
 local TieMethodInterfaceUtils = {}
 
-function TieMethodInterfaceUtils.get(aliasSelf, tieMethodDefinition, implParent, adornee, interfaceTieRealm)
+function TieMethodInterfaceUtils.get(aliasSelf, tieMethodDefinition, implParent, adornee: Instance?, interfaceTieRealm: _TieRealms.TieRealm)
 	assert(TieRealmUtils.isTieRealm(interfaceTieRealm), "Bad interfaceTieRealm")
 
 	local tieDefinition = tieMethodDefinition:GetTieDefinition()
@@ -33,7 +34,7 @@ function TieMethodInterfaceUtils.get(aliasSelf, tieMethodDefinition, implParent,
 			-- Search the adornee (rip this is SO slow)
 
 			local validContainerNameSet = tieDefinition:GetValidContainerNameSet(interfaceTieRealm)
-			for containerName, _ in pairs(validContainerNameSet) do
+			for containerName, _ in validContainerNameSet do
 				local found = adornee:FindFirstChild(containerName)
 				if found then
 					local bindableFunction = found:FindFirstChild(tieMethodDefinition:GetMemberName())
@@ -52,7 +53,7 @@ function TieMethodInterfaceUtils.get(aliasSelf, tieMethodDefinition, implParent,
 		end
 
 		return TieUtils.decode(bindableFunction:Invoke(TieUtils.encode(...)))
-	end;
+	end
 end
 
 return TieMethodInterfaceUtils

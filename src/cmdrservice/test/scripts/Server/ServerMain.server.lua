@@ -25,7 +25,7 @@ serviceBag:GetService(require("CmdrService")):RegisterCommand({
 		},
 	};
 }, function(_context, players)
-	for _, player in pairs(players) do
+	for _, player in players do
 		local humanoid = player.Character and player.Character:FindFirstChildWhichIsA("Humanoid")
 		local humanoidRootPart = humanoid and humanoid.RootPart
 		if humanoidRootPart then

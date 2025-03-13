@@ -4,8 +4,7 @@
 
 local TiePropertyImplementationUtils = {}
 
-function TiePropertyImplementationUtils.changeToClassIfNeeded(memberDefinition, folder, className)
-
+function TiePropertyImplementationUtils.changeToClassIfNeeded(memberDefinition, folder: Folder, className: string)
 	local memberName = memberDefinition:GetMemberName()
 	folder:SetAttribute(memberName, nil)
 

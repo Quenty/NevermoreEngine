@@ -39,7 +39,7 @@ end
 	@param userId number
 	@return Promise<UserInfo>
 ]=]
-function UserInfoAggregator:PromiseUserInfo(userId)
+function UserInfoAggregator:PromiseUserInfo(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Promise(userId)
@@ -51,13 +51,12 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserInfoAggregator:PromiseDisplayName(userId)
+function UserInfoAggregator:PromiseDisplayName(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
-	return self._aggregator:Promise(userId)
-		:Then(function(userInfo)
-			return userInfo.DisplayName
-		end)
+	return self._aggregator:Promise(userId):Then(function(userInfo)
+		return userInfo.DisplayName
+	end)
 end
 
 --[=[
@@ -66,13 +65,12 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserInfoAggregator:PromiseUsername(userId)
+function UserInfoAggregator:PromiseUsername(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
-	return self._aggregator:Promise(userId)
-		:Then(function(userInfo)
-			return userInfo.Username
-		end)
+	return self._aggregator:Promise(userId):Then(function(userInfo)
+		return userInfo.Username
+	end)
 end
 
 --[=[
@@ -81,13 +79,12 @@ end
 	@param userId number
 	@return Promise<boolean>
 ]=]
-function UserInfoAggregator:PromiseHasVerifiedBadge(userId)
+function UserInfoAggregator:PromiseHasVerifiedBadge(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
-	return self._aggregator:Promise(userId)
-		:Then(function(userInfo)
-			return userInfo.HasVerifiedBadge
-		end)
+	return self._aggregator:Promise(userId):Then(function(userInfo)
+		return userInfo.HasVerifiedBadge
+	end)
 end
 
 --[=[
@@ -96,7 +93,7 @@ end
 	@param userId number
 	@return Observable<UserInfo>
 ]=]
-function UserInfoAggregator:ObserveUserInfo(userId)
+function UserInfoAggregator:ObserveUserInfo(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Observe(userId)
@@ -108,13 +105,13 @@ end
 	@param userId number
 	@return Observable<string>
 ]=]
-function UserInfoAggregator:ObserveDisplayName(userId)
+function UserInfoAggregator:ObserveDisplayName(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Observe(userId):Pipe({
 		Rx.map(function(userInfo)
 			return userInfo.DisplayName
-		end)
+		end),
 	})
 end
 
@@ -124,13 +121,13 @@ end
 	@param userId number
 	@return Observable<string>
 ]=]
-function UserInfoAggregator:ObserveUsername(userId)
+function UserInfoAggregator:ObserveUsername(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Observe(userId):Pipe({
 		Rx.map(function(userInfo)
 			return userInfo.Username
-		end)
+		end),
 	})
 end
 
@@ -140,7 +137,7 @@ end
 	@param userId number
 	@return Observable<boolean>
 ]=]
-function UserInfoAggregator:ObserveHasVerifiedBadge(userId)
+function UserInfoAggregator:ObserveHasVerifiedBadge(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Observe(userId):Pipe({

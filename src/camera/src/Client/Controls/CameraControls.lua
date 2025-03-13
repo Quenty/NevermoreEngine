@@ -70,17 +70,17 @@ end
 	Sets the gamepad rotation acceleration
 	@param acceleration number
 ]=]
-function CameraControls:SetGamepadRotationAcceleration(acceleration)
+function CameraControls:SetGamepadRotationAcceleration(acceleration: number)
 	assert(type(acceleration) == "number", "Bad acceleration")
 
 	self._gamepadRotateModel:SetAcceleration(acceleration)
 end
 
-function CameraControls:GetKey()
+function CameraControls:GetKey(): string
 	return self._key
 end
 
-function CameraControls:IsEnabled()
+function CameraControls:IsEnabled(): boolean
 	return self._enabled
 end
 

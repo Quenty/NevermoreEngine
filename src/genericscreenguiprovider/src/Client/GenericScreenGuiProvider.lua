@@ -33,6 +33,7 @@ local ScreenGuiService = require("ScreenGuiService")
 local ServiceBag = require("ServiceBag")
 local String = require("String")
 local ValueObject = require("ValueObject")
+local _Observable = require("Observable")
 
 local GenericScreenGuiProvider = {}
 GenericScreenGuiProvider.ClassName = "GenericScreenGuiProvider"
@@ -43,17 +44,17 @@ GenericScreenGuiProvider.ServiceName = "GenericScreenGuiProvider"
 	@param orders { [string]: number }
 	@return GenericScreenGuiProvider
 ]=]
-function GenericScreenGuiProvider.new(orders)
+function GenericScreenGuiProvider.new(orders: { [string]: number })
 	assert(type(orders) == "table", "Bad orders")
 
 	local self = setmetatable({
-		_defaultOrders = orders;
+		_defaultOrders = orders,
 	}, GenericScreenGuiProvider)
 
 	return self
 end
 
-function GenericScreenGuiProvider:Init(serviceBag)
+function GenericScreenGuiProvider:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -65,16 +66,12 @@ function GenericScreenGuiProvider:Init(serviceBag)
 	end
 end
 
-function GenericScreenGuiProvider:Start()
-
-end
+function GenericScreenGuiProvider:Start() end
 
 function GenericScreenGuiProvider:__index(index)
 	if GenericScreenGuiProvider[index] then
 		return GenericScreenGuiProvider[index]
-	elseif index == "_screenGuiService"
-		or index == "_serviceBag"
-		or index == "_maid" then
+	elseif index == "_screenGuiService" or index == "_serviceBag" or index == "_maid" then
 		return rawget(self, index)
 	else
 		error(string.format("Bad index %q", tostring(index)), 2)
@@ -82,9 +79,7 @@ function GenericScreenGuiProvider:__index(index)
 end
 
 function GenericScreenGuiProvider:__newindex(index, value)
-	if index == "_screenGuiService"
-		or index == "_serviceBag"
-		or index == "_maid" then
+	if index == "_screenGuiService" or index == "_serviceBag" or index == "_maid" then
 		rawset(self, index, value)
 	else
 		error(string.format("Bad index %q", tostring(index)), 2)
@@ -96,27 +91,27 @@ end
 	@param orderName string
 	@return Observable<Instance>
 ]=]
-function GenericScreenGuiProvider:ObserveScreenGui(orderName)
+function GenericScreenGuiProvider:ObserveScreenGui(orderName: string): _Observable.Observable<Instance>
 	assert(type(orderName) == "string", "Bad orderName")
 
 	if not RunService:IsRunning() then
-		return Blend.New "Frame" {
-			Name = String.toCamelCase(orderName);
-			Archivable = false;
-			Size = UDim2.fromScale(1, 1);
-			BackgroundTransparency = 1;
-			Parent = self:_getScreenGuiService():ObservePlayerGui();
-		}
+		return Blend.New("Frame")({
+			Name = String.toCamelCase(orderName),
+			Archivable = false,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			Parent = self:_getScreenGuiService():ObservePlayerGui(),
+		})
 	end
 
-	return Blend.New "ScreenGui" {
-		Name = String.toCamelCase(orderName);
-		ResetOnSpawn = false;
-		AutoLocalize = false;
-		DisplayOrder = self:ObserveDisplayOrder(orderName);
-		Parent = self:_getScreenGuiService():ObservePlayerGui();
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-	}
+	return Blend.New("ScreenGui")({
+		Name = String.toCamelCase(orderName),
+		ResetOnSpawn = false,
+		AutoLocalize = false,
+		DisplayOrder = self:ObserveDisplayOrder(orderName),
+		Parent = self:_getScreenGuiService():ObservePlayerGui(),
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	})
 end
 
 function GenericScreenGuiProvider:SetDisplayOrder(orderName, order)
@@ -131,7 +126,7 @@ end
 	@param orderName string -- Order name of display order
 	@return ScreenGui
 ]=]
-function GenericScreenGuiProvider:Get(orderName)
+function GenericScreenGuiProvider:Get(orderName: string): ScreenGui
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 
@@ -164,7 +159,7 @@ end
 	@param orderName string -- Order name of display order
 	@return number
 ]=]
-function GenericScreenGuiProvider:GetDisplayOrder(orderName)
+function GenericScreenGuiProvider:GetDisplayOrder(orderName: string): number
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 
@@ -176,14 +171,14 @@ end
 	@param orderName string -- Order name of display order
 	@return Observable<number>
 ]=]
-function GenericScreenGuiProvider:ObserveDisplayOrder(orderName)
+function GenericScreenGuiProvider:ObserveDisplayOrder(orderName: string): _Observable.Observable<number>
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 
 	return self._orderValues[orderName]:Observe()
 end
 
-function GenericScreenGuiProvider:_assertOrderExists(orderName)
+function GenericScreenGuiProvider:_assertOrderExists(orderName: string): ()
 	assert(type(orderName) == "string", "Bad orderName")
 
 	if not self._defaultOrders[orderName] then

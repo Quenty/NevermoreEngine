@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions for use with collection service tags
 	@class CollectionServiceUtils
@@ -13,7 +14,7 @@ local CollectionServiceUtils = {}
 	@param child Instance
 	@return Instance?
 ]=]
-function CollectionServiceUtils.findFirstAncestor(tagName, child)
+function CollectionServiceUtils.findFirstAncestor(tagName: string, child: Instance): Instance?
 	assert(type(tagName) == "string", "Bad tagName")
 	assert(typeof(child) == "Instance", "Bad child")
 
@@ -34,7 +35,7 @@ end
 	@param child Instance
 	@return Instance?
 ]=]
-function CollectionServiceUtils.findInstanceOrFirstAncestor(tagName, child)
+function CollectionServiceUtils.findInstanceOrFirstAncestor(tagName: string, child: Instance): Instance?
 	assert(type(tagName) == "string", "Bad tagName")
 	assert(typeof(child) == "Instance", "Bad child")
 
@@ -49,10 +50,10 @@ end
 	Removes all tags from an instance.
 	@param instance Instance
 ]=]
-function CollectionServiceUtils.removeAllTags(instance)
+function CollectionServiceUtils.removeAllTags(instance: Instance)
 	assert(typeof(instance) == "Instance", "Bad instance")
 
-	for _, tag in pairs(CollectionService:GetTags(instance)) do
+	for _, tag in CollectionService:GetTags(instance) do
 		CollectionService:RemoveTag(instance, tag)
 	end
 end

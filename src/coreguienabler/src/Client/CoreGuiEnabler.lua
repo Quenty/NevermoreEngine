@@ -58,13 +58,13 @@ function CoreGuiEnabler.new()
 	-- Specifically handle this so we interface properly
 	self:AddState(Enum.CoreGuiType.All, function(isEnabled)
 		if isEnabled then
-			for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+			for _, coreGuiType in Enum.CoreGuiType:GetEnumItems() do
 				if coreGuiType ~= Enum.CoreGuiType.All then
 					self:Enable(ALL_TOKEN, coreGuiType)
 				end
 			end
 		else
-			for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+			for _, coreGuiType in Enum.CoreGuiType:GetEnumItems() do
 				if coreGuiType ~= Enum.CoreGuiType.All then
 					self:Disable(ALL_TOKEN, coreGuiType)
 				end
@@ -72,7 +72,7 @@ function CoreGuiEnabler.new()
 		end
 	end)
 
-	for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+	for _, coreGuiType in Enum.CoreGuiType:GetEnumItems() do
 		if not self._states[coreGuiType] then
 			self:AddState(coreGuiType, function(isEnabled)
 				StarterGui:SetCoreGuiEnabled(coreGuiType, isEnabled)
@@ -116,7 +116,7 @@ end
 	@param coreGuiState string | CoreGuiType
 	@return boolean
 ]=]
-function CoreGuiEnabler:IsEnabled(coreGuiState)
+function CoreGuiEnabler:IsEnabled(coreGuiState): boolean
 	local data = self._states[coreGuiState]
 	if not data then
 		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))

@@ -11,11 +11,12 @@ local ChatTagDataUtils = require("ChatTagDataUtils")
 local PlayerUtils = require("PlayerUtils")
 local Set = require("Set")
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local ChatProviderCommandService = {}
 ChatProviderCommandService.ServiceName = "ChatProviderCommandService"
 
-function ChatProviderCommandService:Init(serviceBag)
+function ChatProviderCommandService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -25,7 +26,7 @@ function ChatProviderCommandService:Init(serviceBag)
 	self._permissionService = self._serviceBag:GetService(require("PermissionService"))
 
 	-- Internal
-	self._chatProviderService = self._serviceBag:GetService(require("ChatProviderService"))
+	self._chatProviderService = self._serviceBag:GetService((require :: any)("ChatProviderService"))
 	self._chatTagBinder = self._serviceBag:GetService(require("ChatTag"))
 	self._hasChatTagsBinder = self._serviceBag:GetService(require("HasChatTags"))
 end

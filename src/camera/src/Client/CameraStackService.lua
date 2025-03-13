@@ -26,7 +26,7 @@ CameraStackService.ServiceName = "CameraStackService"
 	Initializes a new camera stack. Should be done via the ServiceBag.
 	@param serviceBag ServiceBag
 ]=]
-function CameraStackService:Init(serviceBag)
+function CameraStackService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(ServiceBag.isServiceBag(serviceBag), "Not a valid service bag")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

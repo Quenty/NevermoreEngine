@@ -25,7 +25,7 @@ function TransparencyService:Init()
 	}
 end
 
-function TransparencyService:IsDead()
+function TransparencyService:IsDead(): boolean
 	return self._properties == nil
 end
 
@@ -33,8 +33,8 @@ end
 	Uninitializes the transparency service, restoring transparency to original values.
 ]=]
 function TransparencyService:Destroy()
-	for propertyName, storage in pairs(self._properties) do
-		for part, data in pairs(storage) do
+	for propertyName, storage in self._properties do
+		for part, data in storage do
 			part[propertyName] = data.original
 		end
 	end
@@ -49,7 +49,7 @@ end
 	@param part Instance
 	@param transparency number
 ]=]
-function TransparencyService:SetTransparency(key, part, transparency)
+function TransparencyService:SetTransparency(key, part: Instance, transparency: number)
 	assert(self._properties, "Not initialized")
 
 	self:_set(key, part, "Transparency", transparency)
@@ -68,7 +68,7 @@ function TransparencyService:SetLocalTransparencyModifier(key, part, transparenc
 	self:_set(key, part, "LocalTransparencyModifier", transparency)
 end
 
-function TransparencyService:_set(key, part, property, newValue)
+function TransparencyService:_set(key, part: Instance, property, newValue: number?)
 	assert(type(key) == "table", "Key must be a table")
 	assert(typeof(part) == "Instance", "Part must be instance")
 
@@ -95,7 +95,7 @@ function TransparencyService:_set(key, part, property, newValue)
 
 	local valueToSet = nil
 	local count = 0
-	for _, value in pairs(partData.values) do
+	for _, value in partData.values do
 		count = count + 1
 		if not valueToSet or value > valueToSet then
 			valueToSet = value

@@ -17,7 +17,7 @@ local TieSignalInterface = setmetatable({}, TieMemberInterface)
 TieSignalInterface.ClassName = "TieSignalInterface"
 TieSignalInterface.__index = TieSignalInterface
 
-function TieSignalInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm)
+function TieSignalInterface.new(implParent: Instance, adornee: Instance, memberDefinition, interfaceTieRealm)
 	assert(TieRealmUtils.isTieRealm(interfaceTieRealm), "Bad interfaceTieRealm")
 
 	local self = setmetatable(TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm), TieSignalInterface)
@@ -45,7 +45,7 @@ end
 	@param callback (T...) -> ()
 	@return TieSignalConnection
 ]=]
-function TieSignalInterface:Connect(callback)
+function TieSignalInterface:Connect(callback: (...any) -> ())
 	assert(type(callback) == "function", "Bad callback")
 
 	return TieSignalConnection.new(self, callback)

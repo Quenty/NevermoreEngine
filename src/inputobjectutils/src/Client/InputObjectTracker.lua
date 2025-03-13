@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Tracks an input object, whether it's a mouse or a touch button for position
 	or mouse down.
@@ -38,39 +39,40 @@ local InputObjectUtils = require("InputObjectUtils")
 local InputObjectRayUtils = require("InputObjectRayUtils")
 local RxInputObjectUtils = require("RxInputObjectUtils")
 local RxSignal = require("RxSignal")
+local _Maid = require("Maid")
+local _Observable = require("Observable")
 
 local InputObjectTracker = setmetatable({}, BaseObject)
 InputObjectTracker.ClassName = "InputObjectTracker"
 InputObjectTracker.__index = InputObjectTracker
 
-function InputObjectTracker.new(initialInputObject)
+export type InputObjectTracker = typeof(setmetatable(
+	{} :: {
+		_maid: _Maid.Maid,
+		_initialPosition: Vector2,
+		_initialInputObject: InputObject,
+		_lastMousePosition: Vector2,
+		_isMouse: boolean,
+		_camera: Camera?,
+
+		InputEnded: RxSignal.RxSignal<()>,
+	},
+	{ __index = InputObjectTracker }
+))
+
+local function toVector2(vector3: Vector3): Vector2
+	return Vector2.new(vector3.X, vector3.Y)
+end
+
+function InputObjectTracker.new(initialInputObject: InputObject): InputObjectTracker
 	assert(typeof(initialInputObject) == "Instance" and initialInputObject:IsA("InputObject"), "Bad initialInputObject")
 
-	local self = setmetatable(BaseObject.new(), InputObjectTracker)
+	local self: InputObjectTracker = setmetatable(BaseObject.new() :: any, InputObjectTracker)
 
 	self._initialInputObject = assert(initialInputObject, "No initialInputObject")
 
 	if InputObjectUtils.isMouseUserInputType(self._initialInputObject.UserInputType) then
-		self._lastMousePosition = self._initialInputObject.Position
-		self._isMouse = true
-
-		self._maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject)
-			if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
-				self._lastMousePosition = inputObject.Position
-			end
-		end))
-
-		self._maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
-			if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
-				self._lastMousePosition = inputObject.Position
-			end
-		end))
-
-		self._maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject)
-			if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
-				self._lastMousePosition = inputObject.Position
-			end
-		end))
+		self:_setupMouse()
 	end
 
 	self._initialPosition = self:GetPosition()
@@ -80,12 +82,34 @@ function InputObjectTracker.new(initialInputObject)
 	return self
 end
 
+function InputObjectTracker._setupMouse(self: InputObjectTracker): ()
+	self._lastMousePosition = toVector2(self._initialInputObject.Position)
+	self._isMouse = true
+
+	self._maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject)
+		if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
+			self._lastMousePosition = toVector2(inputObject.Position)
+		end
+	end))
+
+	self._maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
+		if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
+			self._lastMousePosition = toVector2(inputObject.Position)
+		end
+	end))
+
+	self._maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject)
+		if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
+			self._lastMousePosition = toVector2(inputObject.Position)
+		end
+	end))
+end
 --[=[
 	Observes when the input is ended
 
 	@return Observable
 ]=]
-function InputObjectTracker:ObserveInputEnded()
+function InputObjectTracker.ObserveInputEnded(self: InputObjectTracker): _Observable.Observable<()>
 	return RxInputObjectUtils.observeInputObjectEnded(self._initialInputObject)
 end
 
@@ -94,7 +118,7 @@ end
 
 	@return Vector2
 ]=]
-function InputObjectTracker:GetInitialPosition()
+function InputObjectTracker.GetInitialPosition(self: InputObjectTracker): Vector2
 	return self._initialPosition
 end
 
@@ -103,28 +127,37 @@ end
 
 	@return Observable<Vector2>
 ]=]
-function InputObjectTracker:GetPosition()
+function InputObjectTracker.GetPosition(self: InputObjectTracker): Vector2
 	if self._isMouse then
 		return self._lastMousePosition
 	else
 		local position = self._initialInputObject.Position
-		return Vector2.new(position.x, position.y)
+		return Vector2.new(position.X, position.Y)
 	end
 end
 
 --[=[
 	Observes the input object ray
 
-	@param distance number? -- Optional number, defaults to 1000
-	@return Observable<Vector2>
+	@param rayDistance number? -- Optional number, defaults to 1000
+	@return Ray
 ]=]
-function InputObjectTracker:GetRay(distance)
-	distance = distance or 1000
+function InputObjectTracker.GetRay(self: InputObjectTracker, rayDistance: number?): Ray
+	local distance = rayDistance or 1000
 
 	if self._isMouse then
-		return InputObjectRayUtils.cameraRayFromScreenPosition(self._lastMousePosition, distance, self._camera or Workspace.CurrentCamera)
+		return InputObjectRayUtils.cameraRayFromScreenPosition(
+			self._lastMousePosition,
+			distance,
+			self._camera or Workspace.CurrentCamera
+		)
 	else
-		return InputObjectRayUtils.cameraRayFromInputObject(self._initialInputObject, distance, Vector2.zero, self._camera or Workspace.CurrentCamera)
+		return InputObjectRayUtils.cameraRayFromInputObject(
+			self._initialInputObject,
+			distance,
+			Vector2.zero,
+			self._camera or Workspace.CurrentCamera
+		)
 	end
 end
 
@@ -133,7 +166,7 @@ end
 
 	@param camera Camera
 ]=]
-function InputObjectTracker:SetCamera(camera)
+function InputObjectTracker.SetCamera(self: InputObjectTracker, camera: Camera): ()
 	assert(typeof(camera) == "Instance", "Bad camera")
 
 	self._camera = camera

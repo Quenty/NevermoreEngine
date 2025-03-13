@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions for filtering text wrapping [TextService] and legacy [Chat] API surfaces.
 
@@ -10,6 +11,7 @@ local TextService = game:GetService("TextService")
 local Chat = game:GetService("Chat")
 
 local Promise = require("Promise")
+local TypeUtils = require("TypeUtils")
 
 local TextFilterUtils = {}
 
@@ -34,7 +36,7 @@ function TextFilterUtils.promiseNonChatStringForBroadcast(
 	text: string,
 	fromUserId: number,
 	textFilterContext: Enum.TextFilterContext
-)
+): Promise.Promise<string>
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 	assert(typeof(textFilterContext) == "EnumItem", "Bad textFilterContext")
@@ -112,13 +114,13 @@ end
 	@param text string
 	@param fromUserId number
 	@param textFilterContext TextFilterContext
-	@return Promise<string>
+	@return (string?, string?)
 ]=]
 function TextFilterUtils.getNonChatStringForBroadcastAsync(
 	text: string,
 	fromUserId: number,
 	textFilterContext: Enum.TextFilterContext
-)
+): (string?, string?)
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 	assert(typeof(textFilterContext) == "EnumItem", "Bad textFilterContext")
@@ -134,7 +136,7 @@ function TextFilterUtils.getNonChatStringForBroadcastAsync(
 	end)
 
 	if not ok then
-		return false, err
+		return nil, err
 	end
 
 	return resultText
@@ -147,14 +149,14 @@ end
 	@param fromUserId number
 	@param toUserId number
 	@param textFilterContext TextFilterContext
-	@return Promise<string>
+	@return (string?, string?)
 ]=]
 function TextFilterUtils.getNonChatStringForUserAsync(
 	text: string,
 	fromUserId: number,
 	toUserId: number,
 	textFilterContext: Enum.TextFilterContext
-)
+): (string?, string?)
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 	assert(type(toUserId) == "number", "Bad toUserId")
@@ -171,17 +173,17 @@ function TextFilterUtils.getNonChatStringForUserAsync(
 	end)
 
 	if not ok then
-		return false, err
+		return nil, err
 	end
 
 	return textResult
 end
 
-function TextFilterUtils._promiseTextResult(getResult, ...)
-	local args = { ... }
+function TextFilterUtils._promiseTextResult<T...>(getResult: (T...) -> (string?, string?), ...: T...): Promise.Promise<string>
+	local args = table.pack(...)
 
 	local promise = Promise.spawn(function(resolve, reject)
-		local text, err = getResult(unpack(args))
+		local text, err = getResult(TypeUtils.anyValue(table.unpack(args, 1, args.n)))
 		if not text then
 			return reject(err or "Pcall failed")
 		end

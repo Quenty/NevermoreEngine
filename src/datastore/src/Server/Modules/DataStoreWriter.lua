@@ -24,7 +24,7 @@ DataStoreWriter.__index = DataStoreWriter
 	@param debugName string
 	@return DataStoreWriter
 ]=]
-function DataStoreWriter.new(debugName)
+function DataStoreWriter.new(debugName: string)
 	local self = setmetatable({}, DataStoreWriter)
 
 	self._debugName = assert(debugName, "No debugName")
@@ -66,7 +66,10 @@ function DataStoreWriter:GetSubWritersMap()
 end
 
 function DataStoreWriter:SetFullBaseDataSnapshot(fullBaseDataSnapshot)
-	assert(type(fullBaseDataSnapshot) ~= "table" or table.isfrozen(fullBaseDataSnapshot), "fullBaseDataSnapshot should be frozen")
+	assert(
+		type(fullBaseDataSnapshot) ~= "table" or table.isfrozen(fullBaseDataSnapshot),
+		"fullBaseDataSnapshot should be frozen"
+	)
 	assert(not Symbol.isSymbol(fullBaseDataSnapshot), "fullBaseDataSnapshot should not be symbol")
 
 	if fullBaseDataSnapshot == DataStoreDeleteToken then
@@ -81,7 +84,7 @@ end
 	@param name string
 	@param writer DataStoreWriter
 ]=]
-function DataStoreWriter:AddSubWriter(name, writer)
+function DataStoreWriter:AddSubWriter(name: string, writer)
 	assert(type(name) == "string", "Bad name")
 	assert(not self._writers[name], "Writer already exists for name")
 	assert(writer, "Bad writer")
@@ -95,7 +98,7 @@ end
 	@param name string
 	@return DataStoreWriter
 ]=]
-function DataStoreWriter:GetWriter(name)
+function DataStoreWriter:GetWriter(name: string)
 	assert(type(name) == "string", "Bad name")
 
 	return self._writers[name]
@@ -124,7 +127,7 @@ function DataStoreWriter:ComputeDiffSnapshot(incoming)
 		end
 
 		local diffSnapshot = {}
-		for key, _ in pairs(keys) do
+		for key, _ in keys do
 			if self._writers[key] then
 				diffSnapshot[key] = self._writers[key]:ComputeDiffSnapshot(incoming[key])
 			else
@@ -172,7 +175,7 @@ function DataStoreWriter:_computeTableDiff(original, incoming)
 	local keys = Set.union(Set.fromKeys(original), Set.fromKeys(incoming))
 
 	local diffSnapshot = {}
-	for key, _ in pairs(keys) do
+	for key, _ in keys do
 		diffSnapshot[key] = self:_computeValueDiff(original[key], incoming[key])
 	end
 
@@ -224,7 +227,7 @@ function DataStoreWriter:_writeMergeWriters(original)
 		end
 
 		-- Write our writers first...
-		for key, writer in pairs(self._writers) do
+		for key, writer in self._writers do
 			local result = writer:WriteMerge(copy[key])
 			if result == DataStoreDeleteToken then
 				copy[key] = nil
@@ -235,15 +238,26 @@ function DataStoreWriter:_writeMergeWriters(original)
 	end
 
 	-- Write our save data next
-	if not Symbol.isSymbol(self._saveDataSnapshot) and type(self._saveDataSnapshot) == "table" and next(self._saveDataSnapshot) ~= nil then
+	if
+		not Symbol.isSymbol(self._saveDataSnapshot)
+		and type(self._saveDataSnapshot) == "table"
+		and next(self._saveDataSnapshot) ~= nil
+	then
 		-- Original was not a table. We need to swap to one.
 		if type(copy) ~= "table" then
 			copy = {}
 		end
 
-		for key, value in pairs(self._saveDataSnapshot) do
+		for key, value in self._saveDataSnapshot do
 			if self._writers[key] then
-				warn(string.format("[DataStoreWriter._writeMergeWriters] - Overwriting key %q already saved as rawData with a writer with %q (was %q)", key, tostring(value), tostring(copy[key])))
+				warn(
+					string.format(
+						"[DataStoreWriter._writeMergeWriters] - Overwriting key %q already saved as rawData with a writer with %q (was %q)",
+						key,
+						tostring(value),
+						tostring(copy[key])
+					)
+				)
 			end
 
 			if value == DataStoreDeleteToken then
@@ -276,7 +290,11 @@ function DataStoreWriter:WriteMerge(original)
 
 	if self._saveDataSnapshot == DataStoreDeleteToken then
 		return DataStoreDeleteToken
-	elseif self._saveDataSnapshot == UNSET_TOKEN or self._saveDataSnapshot == nil or type(self._saveDataSnapshot) == "table" then
+	elseif
+		self._saveDataSnapshot == UNSET_TOKEN
+		or self._saveDataSnapshot == nil
+		or type(self._saveDataSnapshot) == "table"
+	then
 		return self:_writeMergeWriters(original)
 	else
 		-- Save data must be a boolean or something
@@ -284,7 +302,7 @@ function DataStoreWriter:WriteMerge(original)
 	end
 end
 
-function DataStoreWriter:IsCompleteWipe()
+function DataStoreWriter:IsCompleteWipe(): boolean
 	if self._saveDataSnapshot == UNSET_TOKEN then
 		return false
 	end

@@ -27,7 +27,7 @@ function TiePropertyDefinition:GetDefaultValue()
 	return self._defaultValue
 end
 
-function TiePropertyDefinition:IsRequiredForImplementation(currentRealm)
+function TiePropertyDefinition:IsRequiredForImplementation(currentRealm): boolean
 	-- Override
 	if getmetatable(TiePropertyDefinition).IsRequiredForImplementation(self, currentRealm) then
 		if self:GetDefaultValue() ~= nil then

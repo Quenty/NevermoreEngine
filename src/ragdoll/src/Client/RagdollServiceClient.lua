@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 local AttributeValue = require("AttributeValue")
 
 local Players = game:GetService("Players")
+local _ServiceBag = require("ServiceBag")
 
 local RagdollServiceClient = {}
 RagdollServiceClient.ServiceName = "RagdollServiceClient"
@@ -18,7 +19,7 @@ RagdollServiceClient.ServiceName = "RagdollServiceClient"
 	Initializes the ragdoll service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function RagdollServiceClient:Init(serviceBag)
+function RagdollServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -27,12 +28,12 @@ function RagdollServiceClient:Init(serviceBag)
 	self._serviceBag:GetService(require("CameraStackService"))
 
 	-- Internal
-	self._serviceBag:GetService(require("RagdollClient"))
-	self._serviceBag:GetService(require("RagdollableClient"))
-	self._serviceBag:GetService(require("RagdollHumanoidOnDeathClient"))
-	self._serviceBag:GetService(require("RagdollHumanoidOnFallClient"))
-	self._serviceBag:GetService(require("RagdollCameraShakeClient"))
-	self._serviceBag:GetService(require("RagdollBindersClient"))
+	self._serviceBag:GetService((require :: any)("RagdollClient"))
+	self._serviceBag:GetService((require :: any)("RagdollableClient"))
+	self._serviceBag:GetService((require :: any)("RagdollHumanoidOnDeathClient"))
+	self._serviceBag:GetService((require :: any)("RagdollHumanoidOnFallClient"))
+	self._serviceBag:GetService((require :: any)("RagdollCameraShakeClient"))
+	self._serviceBag:GetService((require :: any)("RagdollBindersClient"))
 
 	self._screenShakeEnabled = AttributeValue.new(Players.LocalPlayer, "RagdollScreenShakeEnabled", true)
 end
@@ -41,7 +42,7 @@ end
 	Sets screen shake enabled for the local player
 	@param value boolelan
 ]=]
-function RagdollServiceClient:SetScreenShakeEnabled(value)
+function RagdollServiceClient:SetScreenShakeEnabled(value: boolean)
 	assert(type(value) == "boolean", "Bad value")
 
 	self._screenShakeEnabled.Value = value

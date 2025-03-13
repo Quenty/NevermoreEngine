@@ -44,12 +44,12 @@ end
 
 	@param binders { Binder<T> }
 ]=]
-function BinderGroup:AddList(binders)
+function BinderGroup:AddList(binders: { any })
 	assert(type(binders) == "table", "Bad binders")
 
 	-- Assume to be using osyris's typechecking library,
 	-- we have an optional constructor to validate binder classes.
-	for _, binder in pairs(binders) do
+	for _, binder in binders do
 		self:Add(binder)
 	end
 end

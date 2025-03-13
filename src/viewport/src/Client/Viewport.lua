@@ -103,7 +103,7 @@ function Viewport.blend(props)
 	end)
 end
 
-function Viewport:ObserveTransparency()
+function Viewport:ObserveTransparency(): Observable.Observable<number>
 	return self._transparency:Observe()
 end
 
@@ -112,7 +112,7 @@ end
 
 	@param enabled boolean
 ]=]
-function Viewport:SetControlsEnabled(enabled)
+function Viewport:SetControlsEnabled(enabled: boolean)
 	assert(type(enabled) == "boolean", "Bad enabled")
 
 	self._controlsEnabled.Value = enabled
@@ -123,7 +123,7 @@ end
 
 	@param transparency number
 ]=]
-function Viewport:SetTransparency(transparency)
+function Viewport:SetTransparency(transparency: number)
 	return self._transparency:Mount(transparency or 0)
 end
 
@@ -132,7 +132,7 @@ end
 
 	@param fieldOfView number
 ]=]
-function Viewport:SetFieldOfView(fieldOfView)
+function Viewport:SetFieldOfView(fieldOfView: number)
 	return self._fieldOfView:Mount(fieldOfView or 20)
 end
 
@@ -148,7 +148,7 @@ end
 
 	@param instance Instance?
 ]=]
-function Viewport:SetInstance(instance)
+function Viewport:SetInstance(instance: Instance?): () -> ()
 	self._current:Mount(instance)
 
 	return function()
@@ -166,10 +166,11 @@ function Viewport:NotifyInstanceSizeChanged()
 	self._notifyInstanceSizeChanged:Fire()
 end
 
-function Viewport:SetYaw(yaw, doNotAnimate)
+function Viewport:SetYaw(yaw: number, doNotAnimate: boolean?)
 	yaw = yaw % TAU
 
-	self._rotationYawSpring.Position = CircleUtils.updatePositionToSmallestDistOnCircle(self._rotationYawSpring.Position, yaw, TAU)
+	self._rotationYawSpring.Position =
+		CircleUtils.updatePositionToSmallestDistOnCircle(self._rotationYawSpring.Position, yaw, TAU)
 	self._rotationYawSpring.Target = yaw
 
 	if doNotAnimate then
@@ -177,16 +178,16 @@ function Viewport:SetYaw(yaw, doNotAnimate)
 	end
 end
 
-function Viewport:SetPitch(pitch, doNotAnimate)
+function Viewport:SetPitch(pitch: number, doNotAnimate: boolean?)
 	self._rotationPitchSpring.Target = math.clamp(pitch, MIN_PITCH, MAX_PITCH)
 	if doNotAnimate then
 		self._rotationPitchSpring.Position = self._rotationPitchSpring.Target
 	end
 end
 
-function Viewport:RotateBy(deltaV2, doNotAnimate)
-	self:SetYaw(self._rotationYawSpring.Value + deltaV2.x, doNotAnimate)
-	self:SetPitch(self._rotationPitchSpring.Value + deltaV2.y, doNotAnimate)
+function Viewport:RotateBy(deltaV2: Vector2, doNotAnimate: boolean?)
+	self:SetYaw(self._rotationYawSpring.Value + deltaV2.X, doNotAnimate)
+	self:SetPitch(self._rotationPitchSpring.Value + deltaV2.Y, doNotAnimate)
 end
 
 --[=[
@@ -214,30 +215,32 @@ function Viewport:Render(props)
 	local currentCamera = ValueObject.new()
 	self._maid:GiveTask(currentCamera)
 
-	local lightDirectionCFrame = (CFrame.Angles(0, math.rad(180), 0)
-			* CFrame.Angles(math.rad(-45), 0, 0))
+	local lightDirectionCFrame = (CFrame.Angles(0, math.rad(180), 0) * CFrame.Angles(math.rad(-45), 0, 0))
 	local brightness = 1.25
 	local ambientBrightness = 0.75
 
-	return Blend.New "ViewportFrame" {
-		Parent = props.Parent;
-		Size = props.Size or UDim2.new(1, 0, 1, 0);
-		AnchorPoint = props.AnchorPoint;
-		Position = props.Position;
-		ImageColor3 = props.ImageColor3;
-		LayoutOrder = props.LayoutOrder;
-		BackgroundTransparency = 1;
-		BackgroundColor3 = props.BackgroundColor3;
-		CurrentCamera = currentCamera;
+	return Blend.New("ViewportFrame")({
+		Parent = props.Parent,
+		Size = props.Size or UDim2.new(1, 0, 1, 0),
+		AnchorPoint = props.AnchorPoint,
+		Position = props.Position,
+		ImageColor3 = props.ImageColor3,
+		LayoutOrder = props.LayoutOrder,
+		BackgroundTransparency = 1,
+		BackgroundColor3 = props.BackgroundColor3,
+		CurrentCamera = currentCamera,
 		-- selene:allow(roblox_incorrect_color3_new_bounds)
-		LightColor = props.LightColor or Color3.new(brightness, brightness, brightness + 0.15);
-		LightDirection = props.LightDirection or lightDirectionCFrame:vectorToWorldSpace(Vector3.new(0, 0, -1));
-		Ambient = props.Ambient or Color3.new(ambientBrightness, ambientBrightness, ambientBrightness + 0.15);
-		ImageTransparency = Blend.Computed(props.Transparency or 0, self._transparency,
+		LightColor = props.LightColor or Color3.new(brightness, brightness, brightness + 0.15),
+		LightDirection = props.LightDirection or lightDirectionCFrame:vectorToWorldSpace(Vector3.new(0, 0, -1)),
+		Ambient = props.Ambient or Color3.new(ambientBrightness, ambientBrightness, ambientBrightness + 0.15),
+		ImageTransparency = Blend.Computed(
+			props.Transparency or 0,
+			self._transparency,
 			function(propTransparency, selfTransparency)
 				return Math.map(propTransparency, 0, 1, selfTransparency, 1)
-			end);
-		[Blend.OnChange "AbsoluteSize"] = self._absoluteSize;
+			end
+		),
+		[Blend.OnChange("AbsoluteSize")] = self._absoluteSize,
 		[Blend.Attached(function(viewport)
 			local controlsMaid = Maid.new()
 
@@ -249,7 +252,7 @@ function Viewport:Render(props)
 			end))
 
 			return controlsMaid
-		end)] = true;
+		end)] = true,
 		[Blend.Attached(function(viewport)
 			-- custom parenting scheme to ensure we don't call destroy on children
 			local maid = Maid.new()
@@ -274,16 +277,16 @@ function Viewport:Render(props)
 			end)
 
 			return maid
-		end)] = true;
+		end)] = true,
 		[Blend.Children] = {
-			props[Blend.Children];
+			props[Blend.Children],
 
-			self._current;
+			self._current,
 
-			Blend.New "Camera" {
-				[Blend.Instance] = currentCamera;
-				Name = "CurrentCamera";
-				FieldOfView = self._fieldOfView;
+			Blend.New("Camera")({
+				[Blend.Instance] = currentCamera,
+				Name = "CurrentCamera",
+				FieldOfView = self._fieldOfView,
 				CFrame = Blend.Computed(
 					self._current,
 					self._absoluteSize,
@@ -291,25 +294,29 @@ function Viewport:Render(props)
 					self._rotationYawSpring:ObserveRenderStepped(),
 					self._rotationPitchSpring:ObserveRenderStepped(),
 					Rx.fromSignal(self._notifyInstanceSizeChanged):Pipe({
-						Rx.defaultsToNil;
+						Rx.defaultsToNil,
 					}),
 					function(inst, absSize, fov, rotationYaw, rotationPitch)
 						if typeof(inst) ~= "Instance" then
 							return CFrame.new()
 						end
 
-						local aspectRatio = absSize.x/absSize.y
+						local aspectRatio = absSize.x / absSize.y
 						local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(inst)
 						if not bbCFrame then
 							return CFrame.new()
 						end
 
 						local fit = CameraUtils.fitBoundingBoxToCamera(bbSize, fov, aspectRatio)
-						return CFrame.new(bbCFrame.Position) * CFrame.Angles(0, rotationYaw, 0) * CFrame.Angles(rotationPitch, 0, 0) * CFrame.new(0, 0, fit)
-					end);
-			}
-		}
-	};
+						return CFrame.new(bbCFrame.Position)
+							* CFrame.Angles(0, rotationYaw, 0)
+							* CFrame.Angles(rotationPitch, 0, 0)
+							* CFrame.new(0, 0, fit)
+					end
+				),
+			}),
+		},
+	})
 end
 
 return Viewport

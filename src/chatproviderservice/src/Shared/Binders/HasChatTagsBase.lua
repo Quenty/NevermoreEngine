@@ -15,7 +15,7 @@ local HasChatTagsBase = setmetatable({}, BaseObject)
 HasChatTagsBase.ClassName = "HasChatTagsBase"
 HasChatTagsBase.__index = HasChatTagsBase
 
-function HasChatTagsBase.new(player)
+function HasChatTagsBase.new(player: Player)
 	local self = setmetatable(BaseObject.new(player), HasChatTagsBase)
 
 	self._lastChatTags = self._maid:Add(ValueObject.new(nil))
@@ -65,7 +65,7 @@ function HasChatTagsBase:_observeTagDataListBrio()
 
 	return RxInstanceUtils.observeLastNamedChildBrio(self._obj, "Folder", HasChatTagsConstants.TAG_CONTAINER_NAME):Pipe({
 		RxBrioUtils.switchMapBrio(function(child)
-			return RxBinderUtils.observeChildrenBrio(chatTagBinder, child);
+			return RxBinderUtils.observeChildrenBrio(chatTagBinder, child)
 		end);
 		RxBrioUtils.flatMapBrio(function(chatTag)
 			return chatTag:ObserveChatTagData():Pipe({

@@ -11,7 +11,7 @@ local ChatTag = setmetatable({}, ChatTagBase)
 ChatTag.ClassName = "ChatTag"
 ChatTag.__index = ChatTag
 
-function ChatTag.new(folder, serviceBag)
+function ChatTag.new(folder: Folder, serviceBag)
 	local self = setmetatable(ChatTagBase.new(folder), ChatTag)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -22,7 +22,7 @@ function ChatTag.new(folder, serviceBag)
 	return self
 end
 
-function ChatTag:_getPlayer()
+function ChatTag:_getPlayer(): Player
 	return self._obj:FindFirstAncestorWhichIsA("Player")
 end
 

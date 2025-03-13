@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	This class is linking to the Nevermore loader.
 
@@ -13,7 +14,7 @@
 	@class LoaderLink
 ]=]
 
-local function waitForValue(objectValue)
+local function waitForValue(objectValue: ObjectValue): Instance
 	local value = objectValue.Value
 	if value then
 		return value

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods to work with Roblox humanoids.
 
@@ -13,7 +14,7 @@ local HumanoidUtils = {}
 	@return Humanoid?
 ]=]
 function HumanoidUtils.getHumanoid(descendant: Instance): Humanoid?
-	local character = descendant
+	local character: Instance? = descendant
 	while character do
 		local humanoid = character:FindFirstChildOfClass("Humanoid")
 		if humanoid then
@@ -32,14 +33,14 @@ end
 	@param humanoid Humanoid
 ]=]
 function HumanoidUtils.forceUnseatHumanoid(humanoid: Humanoid)
-	local seatPart = humanoid.SeatPart
+	local seatPart: (Seat | VehicleSeat)? = humanoid.SeatPart
 	if seatPart ~= nil then
 		local weld = seatPart:FindFirstChild("SeatWeld")
 		if weld then
 			weld:Destroy()
 		end
 
-		seatPart:Sit(nil)
+		(seatPart :: any):Sit(nil)
 	end
 
 	humanoid.Sit = false
