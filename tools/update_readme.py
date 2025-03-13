@@ -77,6 +77,10 @@ def get_package_data_list(root):
       columns = [linked_name, description, install_command, f"[docs]({docs_link})", f"[source]({github_link})", f"[changelog]({changelog_link})", f"[npm]({npm_link})"]
       package_data_list.append(columns)
 
+  def get_name(entry):
+    return entry[0].lower()
+  package_data_list.sort(key=get_name)
+
   return package_data_list
 
 def update_readme(root, output):
