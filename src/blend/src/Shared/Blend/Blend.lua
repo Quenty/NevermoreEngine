@@ -637,6 +637,54 @@ function Blend._observeTags(tags)
 end
 
 --[=[
+	Allows you to add Attributes to a Blend object.
+
+	```lua
+	Blend.New "Part" {
+		[Blend.Attribute "DamageAmount"] = 50;
+	};
+	```
+
+	You can also pass Observables in similarly to other Blend API
+
+	```lua
+	Blend.New "ScreenGui" {
+		[Blend.Attribute "CurrentTime"] = Rx.fromSignal(RunService.Heartbeat):Pipe({
+			Rx.map(function()
+				return os.time()
+			end)
+		});
+	};
+	```
+
+	@param attributeName string
+	@return Observable
+]=]
+function Blend.Attribute(attributeName)
+	assert(typeof(attributeName) == "string", "Bad attributeName")
+
+	return function(parent, initialValue)
+		assert(typeof(parent) == "Instance", "Bad parent")
+
+		local observe = Blend._observeAttribute(initialValue)
+
+		return observe:Pipe({
+			Rx.tap(function(newValue)
+				parent:SetAttribute(attributeName, newValue)
+			end)
+		})
+	end
+end
+
+function Blend._observeAttribute(attributeValue)
+	if (Observable.isObservable(attributeValue)) then
+		return attributeValue
+	else
+		return Rx.of(attributeValue)
+	end
+end
+
+--[=[
 	Mounts Blend objects into an existing instance.
 
 	:::tip
