@@ -2,11 +2,11 @@
 	@class ObservableSortedList.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Maid = require("Maid")
 local ObservableSortedList = require("ObservableSortedList")
-local ObservableSortedListOld = require("ObservableSortedListOld")
 
 return function(_target)
 	local maid = Maid.new()
@@ -17,22 +17,20 @@ return function(_target)
 		end
 
 		local startTime = os.clock()
-		for i=1, n do
+		for i = 1, n do
 			add(getElement(i))
 		end
 
-		print(string.format("%25s %0.2f ms", label .. " construction", (os.clock() - startTime)*1000))
+		print(string.format("%25s %0.2f ms", label .. " construction", (os.clock() - startTime) * 1000))
 	end
-
 
 	local function cleanup(label, sortedList)
 		local startTime = os.clock()
 
 		sortedList:Destroy()
 
-		print(string.format("%25s %0.2f ms", label .. " destruction", (os.clock() - startTime)*1000))
+		print(string.format("%25s %0.2f ms", label .. " destruction", (os.clock() - startTime) * 1000))
 	end
-
 
 	local function getRandomElement()
 		return math.random()
@@ -48,17 +46,12 @@ return function(_target)
 
 	local function runTest(label, n, getElement)
 		local observableSortedList = maid:Add(ObservableSortedList.new())
-		local observableSortedListOld = maid:Add(ObservableSortedListOld.new())
 
 		print(string.format("%25s n = %d", label, n))
 		print(string.format("%25s %8s", string.rep("-", 25), string.rep("-", 10)))
 
-		test(n, "prev impl", observableSortedListOld, getElement)
-		cleanup("prev impl", observableSortedListOld)
-
 		test(n, "new impl", observableSortedList, getElement)
 		cleanup("new impl", observableSortedList)
-
 
 		print("\n")
 	end
