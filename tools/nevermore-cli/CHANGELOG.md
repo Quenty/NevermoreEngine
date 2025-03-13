@@ -1,19 +1,15 @@
-# v4.5.1 (Thu Mar 13 2025)
-
-#### 🐛 Bug Fix
-
-- ci: Fix moonwave extractor and documentation building [#540](https://github.com/Quenty/NevermoreEngine/pull/540) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.5.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.5.0...@quenty/nevermore-cli@4.5.1) (2025-03-13)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
 
 # [4.5.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.4.1...@quenty/nevermore-cli@4.5.0) (2025-01-08)
 

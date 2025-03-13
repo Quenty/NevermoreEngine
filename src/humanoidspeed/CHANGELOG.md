@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.22.2...@quenty/humanoidspeed@12.22.3) (2025-03-13)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
 ## [12.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.22.1...@quenty/humanoidspeed@12.22.2) (2025-03-12)
 
 **Note:** Version bump only for package @quenty/humanoidspeed
