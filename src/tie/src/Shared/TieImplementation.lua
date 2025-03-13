@@ -23,7 +23,7 @@ TieImplementation.__index = TieImplementation
 	@param tieDefinition TieDefinition
 	@param adornee Instance
 	@param implementer table
-	@param tieRealm TieRealm
+	@param implementationTieRealm TieRealm
 ]=]
 function TieImplementation.new(tieDefinition, adornee: Instance, implementer, implementationTieRealm)
 	assert(TieRealmUtils.isTieRealm(implementationTieRealm), "Bad implementationTieRealm")

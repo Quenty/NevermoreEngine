@@ -20,7 +20,7 @@ local RxTeleportUtils = {}
 	@param player Player
 	@return Observable<Brio<number>>
 ]=]
-function RxTeleportUtils.observeTeleportBrio(player)
+function RxTeleportUtils.observeTeleportBrio(player: Player)
 	assert(typeof(player) == "Instance", "Bad player")
 
 	return Observable.new(function(sub)
@@ -30,15 +30,22 @@ function RxTeleportUtils.observeTeleportBrio(player)
 		maid:GiveTask(teleportPlaceId)
 
 		maid:GiveTask(player.OnTeleport:Connect(function(teleportState, placeId)
-			if teleportState == Enum.TeleportState.RequestedFromServer
-			or teleportState == Enum.TeleportState.Started
-			or teleportState == Enum.TeleportState.WaitingForServer
-			or teleportState == Enum.TeleportState.InProgress then
+			if
+				teleportState == Enum.TeleportState.RequestedFromServer
+				or teleportState == Enum.TeleportState.Started
+				or teleportState == Enum.TeleportState.WaitingForServer
+				or teleportState == Enum.TeleportState.InProgress
+			then
 				teleportPlaceId.Value = placeId
 			elseif teleportState == Enum.TeleportState.Failed then
 				teleportPlaceId.Value = nil
 			else
-				warn(string.format("[RxTeleportUtils.observeTeleportBrio] - Unknown teleport state %s", tostring(teleportState)))
+				warn(
+					string.format(
+						"[RxTeleportUtils.observeTeleportBrio] - Unknown teleport state %s",
+						tostring(teleportState)
+					)
+				)
 			end
 		end))
 

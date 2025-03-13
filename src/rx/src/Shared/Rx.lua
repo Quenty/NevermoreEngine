@@ -42,10 +42,8 @@ end
 local Rx = {
 	EMPTY = Observable.new(function(sub)
 		sub:Complete()
-	end);
-	NEVER = Observable.new(function(_)
-
-	end);
+	end),
+	NEVER = Observable.new(function(_) end),
 }
 
 --[=[
@@ -59,7 +57,13 @@ function Rx.pipe(transformers)
 	assert(type(transformers) == "table", "Bad transformers")
 	for index, transformer in pairs(transformers) do
 		if type(transformer) ~= "function" then
-			error(string.format("[Rx.pipe] Bad pipe value of type %q at index %q, expected function", type(transformer), tostring(index)))
+			error(
+				string.format(
+					"[Rx.pipe] Bad pipe value of type %q at index %q, expected function",
+					type(transformer),
+					tostring(index)
+				)
+			)
 		end
 	end
 
@@ -71,7 +75,14 @@ function Rx.pipe(transformers)
 			current = transformer(current)
 
 			if not (type(current) == "table" and current.ClassName == "Observable") then
-				error(string.format("[Rx.pipe] - Failed to transform %q in pipe, made %q (%s)", tostring(key), tostring(current), tostring(type(current) == "table" and current.ClassName or "")))
+				error(
+					string.format(
+						"[Rx.pipe] - Failed to transform %q in pipe, made %q (%s)",
+						tostring(key),
+						tostring(current),
+						tostring(type(current) == "table" and current.ClassName or "")
+					)
+				)
 			end
 		end
 
@@ -95,7 +106,7 @@ function Rx.of(...)
 	local args = table.pack(...)
 
 	return Observable.new(function(sub)
-		for i=1, args.n do
+		for i = 1, args.n do
 			sub:Fire(args[i])
 		end
 
@@ -287,27 +298,24 @@ function Rx.tap(onFire, onError, onComplete)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			return source:Subscribe(
-				function(...)
-					if onFire then
-						onFire(...)
-					end
-					if sub:IsPending() then
-						sub:Fire(...)
-					end
-				end,
-				function(...)
-					if onError then
-						onError(...)
-					end
-					sub:Fail(...)
-				end,
-				function(...)
-					if onComplete then
-						onComplete(...)
-					end
-					sub:Complete(...)
-				end)
+			return source:Subscribe(function(...)
+				if onFire then
+					onFire(...)
+				end
+				if sub:IsPending() then
+					sub:Fire(...)
+				end
+			end, function(...)
+				if onError then
+					onError(...)
+				end
+				sub:Fail(...)
+			end, function(...)
+				if onComplete then
+					onComplete(...)
+				end
+				sub:Complete(...)
+			end)
 		end)
 	end
 end
@@ -411,11 +419,11 @@ end
 --[=[
 	Same as [Rx.share] except it also replays the value
 
-	@param bufferSize number -- Number of entries to cache
-	@param windowTimeSeconds number -- Time
+	@param bufferSize number? -- Number of entries to cache
+	@param windowTimeSeconds number? -- Time
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.shareReplay(bufferSize, windowTimeSeconds)
+function Rx.shareReplay(bufferSize: number?, windowTimeSeconds: number?)
 	assert(type(bufferSize) == "number" or bufferSize == nil, "Bad bufferSize")
 	assert(type(windowTimeSeconds) == "number" or windowTimeSeconds == nil, "Bad windowTimeSeconds")
 
@@ -550,6 +558,7 @@ end
 ]=]
 function Rx.startFrom(callback)
 	assert(type(callback) == "function", "Bad callback")
+
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
@@ -639,17 +648,14 @@ function Rx.reduce(reducer, seed)
 			local maid = Maid.new()
 			local current = seed
 
-			maid:GiveTask(source:Subscribe(
-				function(...)
-					current = reducer(current, ...)
-				end,
-				function(...)
-					sub:Fail(...)
-				end,
-				function()
-					-- On complete emit the result.
-					sub:Fire(current)
-				end))
+			maid:GiveTask(source:Subscribe(function(...)
+				current = reducer(current, ...)
+			end, function(...)
+				sub:Fail(...)
+			end, function()
+				-- On complete emit the result.
+				sub:Fire(current)
+			end))
 
 			return maid
 		end)
@@ -679,25 +685,22 @@ function Rx.defaultsTo(value)
 
 			local fired = false
 
-			maid:GiveTask(source:Subscribe(
-				function(...)
+			maid:GiveTask(source:Subscribe(function(...)
+				fired = true
+				sub:Fire(...)
+			end, function(...)
+				if not fired then
 					fired = true
-					sub:Fire(...)
-				end,
-				function(...)
-					if not fired then
-						fired = true
-						sub:Fire(value)
-					end
-					sub:Fail(...)
-				end,
-				function(...)
-					if not fired then
-						fired = true
-						sub:Fire(value)
-					end
-					sub:Complete(...)
-				end))
+					sub:Fire(value)
+				end
+				sub:Fail(...)
+			end, function(...)
+				if not fired then
+					fired = true
+					sub:Fire(value)
+				end
+				sub:Complete(...)
+			end))
 
 			if not fired then
 				fired = true
@@ -741,22 +744,19 @@ function Rx.endWith(values)
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			maid:GiveTask(source:Subscribe(
-				function(...)
-					sub:Fire(...)
-				end,
-				function(...)
-					for _, item in pairs(values) do
-						sub:Fire(item)
-					end
-					sub:Fail(...)
-				end,
-				function()
-					for _, item in pairs(values) do
-						sub:Fire(item)
-					end
-					sub:Complete()
-				end))
+			maid:GiveTask(source:Subscribe(function(...)
+				sub:Fire(...)
+			end, function(...)
+				for _, item in pairs(values) do
+					sub:Fire(item)
+				end
+				sub:Fail(...)
+			end, function()
+				for _, item in pairs(values) do
+					sub:Fire(item)
+				end
+				sub:Complete()
+			end))
 
 			return maid
 		end)
@@ -785,14 +785,11 @@ function Rx.where(predicate)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			return source:Subscribe(
-				function(...)
-					if predicate(...) then
-						sub:Fire(...)
-					end
-				end,
-				sub:GetFailComplete()
-			)
+			return source:Subscribe(function(...)
+				if predicate(...) then
+					sub:Fire(...)
+				end
+			end, sub:GetFailComplete())
 		end)
 	end
 end
@@ -816,18 +813,15 @@ function Rx.distinct()
 		return Observable.new(function(sub)
 			local last = UNSET_VALUE
 
-			return source:Subscribe(
-				function(value)
-					-- TODO: Support tuples
-					if last == value then
-						return
-					end
+			return source:Subscribe(function(value)
+				-- TODO: Support tuples
+				if last == value then
+					return
+				end
 
-					last = value
-					sub:Fire(last)
-				end,
-				sub:GetFailComplete()
-			)
+				last = value
+				sub:Fire(last)
+			end, sub:GetFailComplete())
 		end)
 	end
 end
@@ -1005,14 +999,12 @@ function Rx.flatMap(project)
 				subscriptions[subscription] = true
 			end
 
-			local outerSubscription = source:Subscribe(onNextObservable,
-				function(...)
-					sub:Fail(...)
-				end,
-				function()
-					isComplete = true
-					checkComplete()
-				end)
+			local outerSubscription = source:Subscribe(onNextObservable, function(...)
+				sub:Fail(...)
+			end, function()
+				isComplete = true
+				checkComplete()
+			end)
 
 			return function()
 				pendingCount = 0
@@ -1166,15 +1158,13 @@ function Rx.switchMap(project)
 				insideSubscription = subscription
 			end
 
-			local outerSubscription = source:Subscribe(onNextObservable,
-				function(...)
-					outerIndex = nil
-					sub:Fail(...)
-				end,
-				function()
-					isComplete = true
-					checkComplete()
-				end)
+			local outerSubscription = source:Subscribe(onNextObservable, function(...)
+				outerIndex = nil
+				sub:Fail(...)
+			end, function()
+				isComplete = true
+				checkComplete()
+			end)
 
 			return function()
 				outerIndex = nil
@@ -1322,23 +1312,19 @@ function Rx.combineLatestAll()
 				alive = false
 			end)
 
-			maid:GiveTask(source:Subscribe(
-				function(value)
-					assert(Observable.isObservable(value))
+			maid:GiveTask(source:Subscribe(function(value)
+				assert(Observable.isObservable(value))
 
-					table.insert(observables, value)
-				end,
-				function(...)
-					sub:Fail(...)
-				end,
-				function()
-					if not alive then
-						return
-					end
+				table.insert(observables, value)
+			end, function(...)
+				sub:Fail(...)
+			end, function()
+				if not alive then
+					return
+				end
 
-					maid:GiveTask(Rx.combineLatest(observables))
-						:Subscribe(sub:GetFireFailComplete())
-				end))
+				maid:GiveTask(Rx.combineLatest(observables)):Subscribe(sub:GetFireFailComplete())
+			end))
 
 			return maid
 		end)
@@ -1383,27 +1369,24 @@ function Rx.catchError(callback)
 				alive = false
 			end)
 
-			maid:GiveTask(source:Subscribe(
-				function(...)
-					sub:Fire(...)
-				end,
-				function(...)
-					if not alive then
-						-- if we failed because maid was cancelled, then we'll get called here?
-						-- I think.
-						return
-					end
+			maid:GiveTask(source:Subscribe(function(...)
+				sub:Fire(...)
+			end, function(...)
+				if not alive then
+					-- if we failed because maid was cancelled, then we'll get called here?
+					-- I think.
+					return
+				end
 
-					-- at this point, we can only have one error, so we need to subscribe to the result
-					-- and continue the observiable
-					local observable = callback(...)
-					assert(Observable.isObservable(observable), "Bad observable")
+				-- at this point, we can only have one error, so we need to subscribe to the result
+				-- and continue the observiable
+				local observable = callback(...)
+				assert(Observable.isObservable(observable), "Bad observable")
 
-					maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
-				end,
-				function()
-					sub:Complete()
-				end));
+				maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
+			end, function()
+				sub:Complete()
+			end))
 
 			return maid
 		end)
@@ -1481,20 +1464,17 @@ function Rx.combineLatest(observables)
 				continue
 			end
 
-			maid:GiveTask(observer:Subscribe(
-				function(value)
-					if latest[key] == UNSET_VALUE then
-						unset -= 1
-					end
+			maid:GiveTask(observer:Subscribe(function(value)
+				if latest[key] == UNSET_VALUE then
+					unset -= 1
+				end
 
-					latest[key] = value
+				latest[key] = value
 
-					if unset == 0 then
-						sub:Fire(table.freeze(table.clone(latest)))
-					end
-				end,
-				failOnFirst,
-				completeOnAllPendingDone))
+				if unset == 0 then
+					sub:Fire(table.freeze(table.clone(latest)))
+				end
+			end, failOnFirst, completeOnAllPendingDone))
 		end
 
 		return maid
@@ -1562,29 +1542,25 @@ function Rx.combineLatestDefer(observables)
 				continue
 			end
 
-			maid:GiveTask(observer:Subscribe(
-				function(value)
-					if latest[key] == UNSET_VALUE then
-						unset -= 1
-					end
+			maid:GiveTask(observer:Subscribe(function(value)
+				if latest[key] == UNSET_VALUE then
+					unset -= 1
+				end
 
-					latest[key] = value
+				latest[key] = value
 
-					if unset == 0 and not queueThread then
-						queueThread = task.defer(function()
-							queueThread = nil
-							sub:Fire(table.freeze(table.clone(latest)))
-						end)
-					end
-				end,
-				failOnFirst,
-				completeOnAllPendingDone))
+				if unset == 0 and not queueThread then
+					queueThread = task.defer(function()
+						queueThread = nil
+						sub:Fire(table.freeze(table.clone(latest)))
+					end)
+				end
+			end, failOnFirst, completeOnAllPendingDone))
 		end
 
 		return maid
 	end)
 end
-
 
 --[=[
 	http://reactivex.io/documentation/operators/using.html
@@ -1638,7 +1614,7 @@ end
 	@param number number
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.take(number)
+function Rx.take(number: number)
 	assert(type(number) == "number", "Bad number")
 	assert(number > 0, "Bad number")
 
@@ -1678,7 +1654,7 @@ end
 	@param toSkip number
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.skip(toSkip)
+function Rx.skip(toSkip: number)
 	assert(type(toSkip) == "number", "Bad toSkip")
 	assert(toSkip > 0, "Bad toSkip")
 
@@ -1740,7 +1716,7 @@ end
 	@param seconds number
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.delay(seconds)
+function Rx.delay(seconds: number)
 	assert(type(seconds) == "number", "Bad seconds")
 
 	return function(source)
@@ -1769,7 +1745,7 @@ end
 	@param seconds number
 	@return Observable<()>
 ]=]
-function Rx.delayed(seconds)
+function Rx.delayed(seconds: number)
 	assert(type(seconds) == "number", "Bad seconds")
 
 	return Observable.new(function(sub)
@@ -1786,7 +1762,7 @@ end
 	@param seconds number
 	@return (source: Observable<number>) -> Observable<number>
 ]=]
-function Rx.timer(initialDelaySeconds, seconds)
+function Rx.timer(initialDelaySeconds: number, seconds: number)
 	assert(type(initialDelaySeconds) == "number" or initialDelaySeconds == nil, "Bad initialDelaySeconds")
 	assert(type(seconds) == "number", "Bad seconds")
 
@@ -1817,7 +1793,7 @@ end
 	@param seconds number
 	@return (source: Observable<number>) -> Observable<number>
 ]=]
-function Rx.interval(seconds)
+function Rx.interval(seconds: number)
 	assert(type(seconds) == "number", "Bad seconds")
 
 	return Rx.timer(0, seconds)
@@ -1862,7 +1838,7 @@ function Rx.withLatestFrom(inputObservables)
 					end
 				end
 
-				sub:Fire({value, unpack(latest)})
+				sub:Fire({ value, unpack(latest) })
 			end, sub:GetFailComplete()))
 
 			return maid
@@ -1883,7 +1859,7 @@ end
 	@param throttleConfig { leading = true; trailing = true; }
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.throttleTime(duration, throttleConfig)
+function Rx.throttleTime(duration: number, throttleConfig)
 	assert(type(duration) == "number", "Bad duration")
 	assert(type(throttleConfig) == "table" or throttleConfig == nil, "Bad throttleConfig")
 
@@ -1926,7 +1902,7 @@ function Rx.onlyAfterDefer()
 				end
 			end, sub:GetFailComplete())
 		end)
-	end;
+	end
 end
 
 --[=[
@@ -2140,7 +2116,7 @@ function Rx.switchScan(accumulator, seed)
 
 	return Rx.pipe({
 		Rx.scan(accumulator, seed),
-		Rx.switchAll()
+		Rx.switchAll(),
 	})
 end
 
@@ -2159,7 +2135,7 @@ function Rx.mergeScan(accumulator, seed)
 
 	return Rx.pipe({
 		Rx.scan(accumulator, seed),
-		Rx.mergeAll();
+		Rx.mergeAll(),
 	})
 end
 

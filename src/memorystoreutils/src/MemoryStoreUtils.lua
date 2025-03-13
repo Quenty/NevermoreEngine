@@ -21,7 +21,7 @@ local DEBUG_QUEUE = false
 	@param priority number?
 	@return Promise
 ]=]
-function MemoryStoreUtils.promiseAdd(queue, value, expirationSeconds, priority)
+function MemoryStoreUtils.promiseAdd(queue: MemoryStoreQueue, value: any, expirationSeconds: number, priority: number?)
 	assert(typeof(queue) == "Instance" and queue:IsA("MemoryStoreQueue"), "Bad queue")
 	assert(type(expirationSeconds) == "number", "Bad expirationSeconds")
 	assert(type(priority) == "number" or priority == nil, "Bad priority")
@@ -53,7 +53,12 @@ end
 	@param waitTimeout number
 	@return Promise<(any?, string?)>
 ]=]
-function MemoryStoreUtils.promiseRead(queue, count, allOrNothing, waitTimeout)
+function MemoryStoreUtils.promiseRead(
+	queue: MemoryStoreQueue,
+	count: number,
+	allOrNothing: boolean,
+	waitTimeout: number
+)
 	assert(typeof(queue) == "Instance" and queue:IsA("MemoryStoreQueue"), "Bad queue")
 	assert(type(count) == "number", "Bad count")
 	assert(type(allOrNothing) == "boolean", "Bad allOrNothing")
@@ -68,7 +73,6 @@ function MemoryStoreUtils.promiseRead(queue, count, allOrNothing, waitTimeout)
 		local ok, err = pcall(function()
 			values, removeId = queue:ReadAsync(count, allOrNothing, waitTimeout)
 		end)
-
 
 		if not ok then
 			if DEBUG_QUEUE then
@@ -93,7 +97,7 @@ end
 	@param id string
 	@return Promise
 ]=]
-function MemoryStoreUtils.promiseRemove(queue, id)
+function MemoryStoreUtils.promiseRemove(queue: MemoryStoreQueue, id: string)
 	assert(typeof(queue) == "Instance" and queue:IsA("MemoryStoreQueue"), "Bad queue")
 	assert(type(id) == "string", "Bad id")
 

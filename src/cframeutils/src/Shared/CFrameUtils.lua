@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Useful utility functions involving CFrame values.
 	@class CFrameUtils
@@ -28,38 +29,44 @@ function CFrameUtils.lookAt(position: Vector3, target: Vector3, upVector: Vector
 	return CFrame.fromMatrix(position, rightVector, upVector2):Orthonormalize()
 end
 
-function CFrameUtils.cframeFromTo(a, b)
+--[=[
+	Constructs a CFrame from a to b
+
+	@param a Vector3
+	@param b Vector3
+	@return CFrame
+]=]
+function CFrameUtils.cframeFromTo(a: Vector3, b: Vector3): CFrame
 	local dr = a:Dot(b)
 	local di = a:Cross(b)
 
-	local d = math.sqrt(dr*dr + di:Dot(di))
+	local d = math.sqrt(dr * dr + di:Dot(di))
 	if d < 1e-6 then
 		return CFrame.identity
 	end
 
-	if dr < 0 and -di.magnitude/dr < 1e-6 then
+	if dr < 0 and -di.Magnitude / dr < 1e-6 then
 		-- this is a degenerate case where a ~ -b
 		-- so we must arbitrate a perpendicular axis to a and b to disambiguate.
 		local r = b - a
-		local r2 = r*r
-		local min = math.min(r2.x, r2.y, r2.z)
-		if min == r2.x and min == r2.y then
-
-			return CFrame.new(0, 0, 0, 0, 0, r.z, 0)
-		elseif min == r2.y and min == r2.z then
-			return CFrame.new(0, 0, 0, 0, r.x, 0, 0)
-		elseif min == r2.x and min == r2.z then
-			return CFrame.new(0, 0, 0, r.y, 0, 0, 0)
-		elseif min == r2.x then
-			return CFrame.new(0, 0, 0, 0, -r.z, r.y, 0)
-		elseif min == r2.y then
-			return CFrame.new(0, 0, 0, r.z, 0, -r.x, 0)
-		else --if min == r2.z then
-			return CFrame.new(0, 0, 0, -r.y, r.x, 0, 0)
+		local r2 = r * r
+		local min = math.min(r2.X, r2.Y, r2.Z)
+		if min == r2.X and min == r2.Y then
+			return CFrame.new(0, 0, 0, 0, 0, r.Z, 0)
+		elseif min == r2.Y and min == r2.Z then
+			return CFrame.new(0, 0, 0, 0, r.X, 0, 0)
+		elseif min == r2.X and min == r2.Z then
+			return CFrame.new(0, 0, 0, r.Y, 0, 0, 0)
+		elseif min == r2.X then
+			return CFrame.new(0, 0, 0, 0, -r.Z, r.Y, 0)
+		elseif min == r2.Y then
+			return CFrame.new(0, 0, 0, r.Z, 0, -r.X, 0)
+		else --if min == r2.Z then
+			return CFrame.new(0, 0, 0, -r.Y, r.X, 0, 0)
 		end
 	end
 
-	return CFrame.new(0, 0, 0, di.x, di.y, di.z, dr + d)
+	return CFrame.new(0, 0, 0, di.X, di.Y, di.Z, dr + d)
 end
 
 --[=[
@@ -88,13 +95,13 @@ end
 ]=]
 function CFrameUtils.redirectLocalAxis(cframe: CFrame, localAxis: Vector3, worldGoal: Vector3): CFrame
 	local localGoal = cframe:VectorToObjectSpace(worldGoal)
-	local m = localAxis.magnitude*localGoal.magnitude
+	local m = localAxis.Magnitude * localGoal.Magnitude
 	local d = localAxis:Dot(localGoal)
 	local c = localAxis:Cross(localGoal)
-	local R = CFrame.new(0, 0, 0, c.x, c.y, c.z, d + m)
+	local R = CFrame.new(0, 0, 0, c.X, c.Y, c.Z, d + m)
 
 	if R == R then
-		return cframe*R
+		return cframe * R
 	else
 		return cframe
 	end
@@ -109,8 +116,8 @@ end
 	@param position Vector3 | nil
 	@return CFrame
 ]=]
-function CFrameUtils.axisAngleToCFrame(axisAngle, position)
-	local angle = axisAngle.magnitude
+function CFrameUtils.axisAngleToCFrame(axisAngle: Vector3, position: Vector3?): CFrame
+	local angle = axisAngle.Magnitude
 	local cframe = CFrame.fromAxisAngle(axisAngle, angle)
 
 	if cframe ~= cframe then
@@ -150,7 +157,7 @@ end
 ]=]
 function CFrameUtils.fromUpRight(position: Vector3, upVector: Vector3, rightVector: Vector3): CFrame | nil
 	local forwardVector = rightVector:Cross(upVector)
-	if forwardVector.magnitude == 0 then
+	if forwardVector.Magnitude == 0 then
 		return nil
 	end
 
@@ -172,12 +179,12 @@ function CFrameUtils.scalePosition(cframe: CFrame, scale: number): CFrame
 		return cframe
 	else
 		local position = cframe.Position
-		return cframe - position + position*scale
+		return cframe - position + position * scale
 	end
 end
 
 local function reflect(vector: Vector3, unitNormal: Vector3): Vector3
-	return vector - 2*(unitNormal*vector:Dot(unitNormal))
+	return vector - 2 * (unitNormal * vector:Dot(unitNormal))
 end
 
 --[=[
@@ -194,9 +201,9 @@ function CFrameUtils.mirror(cframe: CFrame, point, normal): CFrame
 
 	local position = point + reflect(cframe.Position - point, normal)
 
-	local xVector = reflect(cframe.XVector)
-	local yVector = reflect(cframe.YVector)
-	local zVector = reflect(cframe.ZVector)
+	local xVector = reflect(cframe.XVector, normal)
+	local yVector = reflect(cframe.YVector, normal)
+	local zVector = reflect(cframe.ZVector, normal)
 
 	return CFrame.fromMatrix(position, xVector, yVector, zVector):Orthonormalize()
 end
@@ -209,11 +216,11 @@ end
 	@param epsilon number
 	@return boolean
 ]=]
-function CFrameUtils.areClose(a, b, epsilon)
+function CFrameUtils.areClose(a: CFrame, b: CFrame, epsilon: number): boolean
 	assert(type(epsilon) == "number", "Bad epsilon")
 
-	local apx, apy, apz, axx, ayx, azx, axy, ayy, azy, axz, ayz, azz = a:components()
-	local bpx, bpy, bpz, bxx, byx, bzx, bxy, byy, bzy, bxz, byz, bzz = b:components()
+	local apx, apy, apz, axx, ayx, azx, axy, ayy, azy, axz, ayz, azz = a:GetComponents()
+	local bpx, bpy, bpz, bxx, byx, bzx, bxy, byy, bzy, bxz, byz, bzz = b:GetComponents()
 
 	return math.abs(bpx - apx) <= epsilon
 		and math.abs(bpy - apy) <= epsilon

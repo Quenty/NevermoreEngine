@@ -30,7 +30,11 @@ local TextFilterUtils = {}
 	@param textFilterContext TextFilterContext
 	@return Promise<string>
 ]=]
-function TextFilterUtils.promiseNonChatStringForBroadcast(text, fromUserId, textFilterContext)
+function TextFilterUtils.promiseNonChatStringForBroadcast(
+	text: string,
+	fromUserId: number,
+	textFilterContext: Enum.TextFilterContext
+)
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 	assert(typeof(textFilterContext) == "EnumItem", "Bad textFilterContext")
@@ -39,7 +43,8 @@ function TextFilterUtils.promiseNonChatStringForBroadcast(text, fromUserId, text
 		TextFilterUtils.getNonChatStringForBroadcastAsync,
 		text,
 		fromUserId,
-		textFilterContext)
+		textFilterContext
+	)
 end
 
 --[=[
@@ -51,7 +56,7 @@ end
 	@param text string
 	@return Promise<string>
 ]=]
-function TextFilterUtils.promiseLegacyChatFilter(playerFrom, text)
+function TextFilterUtils.promiseLegacyChatFilter(playerFrom: Player, text: string)
 	assert(typeof(playerFrom) == "Instance" and playerFrom:IsA("Player"), "Bad playerFrom")
 	assert(type(text) == "string", "Bad text")
 
@@ -81,7 +86,12 @@ end
 	@param textFilterContext TextFilterContext
 	@return Promise<string>
 ]=]
-function TextFilterUtils.promiseNonChatStringForUserAsync(text, fromUserId, toUserId, textFilterContext)
+function TextFilterUtils.promiseNonChatStringForUserAsync(
+	text: string,
+	fromUserId: number,
+	toUserId: number,
+	textFilterContext: Enum.TextFilterContext
+)
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 	assert(type(toUserId) == "number", "Bad toUserId")
@@ -92,7 +102,8 @@ function TextFilterUtils.promiseNonChatStringForUserAsync(text, fromUserId, toUs
 		text,
 		fromUserId,
 		toUserId,
-		textFilterContext)
+		textFilterContext
+	)
 end
 
 --[=[
@@ -103,7 +114,11 @@ end
 	@param textFilterContext TextFilterContext
 	@return Promise<string>
 ]=]
-function TextFilterUtils.getNonChatStringForBroadcastAsync(text, fromUserId, textFilterContext)
+function TextFilterUtils.getNonChatStringForBroadcastAsync(
+	text: string,
+	fromUserId: number,
+	textFilterContext: Enum.TextFilterContext
+)
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 	assert(typeof(textFilterContext) == "EnumItem", "Bad textFilterContext")
@@ -134,7 +149,12 @@ end
 	@param textFilterContext TextFilterContext
 	@return Promise<string>
 ]=]
-function TextFilterUtils.getNonChatStringForUserAsync(text, fromUserId, toUserId, textFilterContext)
+function TextFilterUtils.getNonChatStringForUserAsync(
+	text: string,
+	fromUserId: number,
+	toUserId: number,
+	textFilterContext: Enum.TextFilterContext
+)
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 	assert(type(toUserId) == "number", "Bad toUserId")
@@ -158,7 +178,7 @@ function TextFilterUtils.getNonChatStringForUserAsync(text, fromUserId, toUserId
 end
 
 function TextFilterUtils._promiseTextResult(getResult, ...)
-	local args = {...}
+	local args = { ... }
 
 	local promise = Promise.spawn(function(resolve, reject)
 		local text, err = getResult(unpack(args))
@@ -170,7 +190,7 @@ function TextFilterUtils._promiseTextResult(getResult, ...)
 			return reject("Bad text result")
 		end
 
-		resolve(text)
+		return resolve(text)
 	end)
 
 	return promise
@@ -187,10 +207,10 @@ function TextFilterUtils.hasNonFilteredText(text: string): boolean
 end
 
 local WHITESPACE = {
-	["\r"] = true;
-	["\n"] = true;
-	[" "] = true;
-	["\t"] = true;
+	["\r"] = true,
+	["\n"] = true,
+	[" "] = true,
+	["\t"] = true,
 }
 
 --[=[
@@ -199,14 +219,14 @@ local WHITESPACE = {
 	@param text string
 	@return number
 ]=]
-function TextFilterUtils.getProportionFiltered(text: string)
+function TextFilterUtils.getProportionFiltered(text: string): number
 	local filteredChars, unfilteredChars = TextFilterUtils.countFilteredCharacters(text)
 	local total = unfilteredChars + filteredChars
 	if total == 0 then
 		return 0
 	end
 
-	return filteredChars/total
+	return filteredChars / total
 end
 
 --[=[
@@ -217,11 +237,11 @@ end
 	@return number -- Unfiltered characters
 	@return number -- White space characters
 ]=]
-function TextFilterUtils.countFilteredCharacters(text: string)
+function TextFilterUtils.countFilteredCharacters(text: string): (number, number, number)
 	local filteredChars = 0
 	local unfilteredChars = 0
 	local whitespaceCharacters = 0
-	for i=1, #text do
+	for i = 1, #text do
 		local textChar = string.sub(text, i, i)
 		if textChar == "#" then
 			filteredChars = filteredChars + 1
@@ -235,15 +255,14 @@ function TextFilterUtils.countFilteredCharacters(text: string)
 	return filteredChars, unfilteredChars, whitespaceCharacters
 end
 
-
 --[=[
 	Adds in new lines and whitespace to the text
 
 	@param text string
 	@param filteredText string
-	@return number
+	@return string
 ]=]
-function TextFilterUtils.addBackInNewLinesAndWhitespace(text, filteredText)
+function TextFilterUtils.addBackInNewLinesAndWhitespace(text: string, filteredText: string): string
 	assert(type(text) == "string", "Bad text")
 	assert(type(filteredText) == "string", "Bad filteredText")
 
@@ -295,6 +314,5 @@ function TextFilterUtils.addBackInNewLinesAndWhitespace(text, filteredText)
 
 	return newString
 end
-
 
 return TextFilterUtils

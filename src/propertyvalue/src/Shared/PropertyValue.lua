@@ -8,12 +8,11 @@ local require = require(script.Parent.loader).load(script)
 
 local RxInstanceUtils = require("RxInstanceUtils")
 
-
 local PropertyValue = {}
 PropertyValue.ClassName = "PropertyValue"
 PropertyValue.__index = PropertyValue
 
-function PropertyValue.new(instance, propertyName)
+function PropertyValue.new(instance: Instance, propertyName: string)
 	assert(typeof(instance) == "Instance", "Bad argument 'instance'")
 	assert(type(propertyName) == "string", "Bad argument 'propertyName'")
 
@@ -52,6 +51,5 @@ function PropertyValue:__newindex(index, value)
 		error(string.format("%q is not a member of PropertyValue", tostring(index)))
 	end
 end
-
 
 return PropertyValue

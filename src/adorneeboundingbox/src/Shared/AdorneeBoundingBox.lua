@@ -25,16 +25,18 @@ function AdorneeBoundingBox.new(initialAdornee)
 	self._bbCFrame = self._maid:Add(ValueObject.new(nil))
 	self._bbSize = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
 
-	self._maid:GiveTask(self._adornee:ObserveBrio(function(adornee)
-		return adornee ~= nil
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	self._maid:GiveTask(self._adornee
+		:ObserveBrio(function(adornee)
+			return adornee ~= nil
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-		local maid, adornee = brio:ToMaidAndValue()
-		self:_setup(maid, adornee)
-	end))
+			local maid, adornee = brio:ToMaidAndValue()
+			self:_setup(maid, adornee)
+		end))
 
 	return self
 end
@@ -53,12 +55,12 @@ end
 
 function AdorneeBoundingBox:ObserveBoundingBox()
 	return Rx.combineLatest({
-		CFrame = self:ObserveCFrame();
-		Size = self:ObserveSize();
+		CFrame = self:ObserveCFrame(),
+		Size = self:ObserveSize(),
 	}):Pipe({
 		Rx.where(function(state)
 			return state.CFrame and state.Size
-		end);
+		end),
 	})
 end
 
@@ -68,8 +70,8 @@ function AdorneeBoundingBox:GetBoundingBox()
 
 	if cframe and size then
 		return {
-			CFrame = cframe;
-			Size = size;
+			CFrame = cframe,
+			Size = size,
 		}
 	else
 		return nil
@@ -167,8 +169,8 @@ function AdorneeBoundingBox:_setupModel(model)
 	return topMaid
 end
 
-function AdorneeBoundingBox:_setupHumanoid(humanoid)
-	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Attachment"), "Bad humanoid")
+function AdorneeBoundingBox:_setupHumanoid(humanoid: Humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	local topMaid = Maid.new()
 
@@ -197,25 +199,27 @@ function AdorneeBoundingBox:_setupAttachment(attachment)
 
 	maid:GiveTask(RxInstanceUtils.observePropertyBrio(attachment, "Parent", function(parent)
 		return parent ~= nil
-	end):Pipe({
-		RxBrioUtils.switchMapBrio(function(parent)
-			if parent:IsA("BasePart") then
-				return Rx.combineLatest({
-					partCFrame = RxPartBoundingBoxUtils.observePartCFrame(parent);
-					attachmentCFrame = RxInstanceUtils.observeProperty(attachment, "CFrame");
-				}):Pipe({
-					Rx.map(function(state)
-						return state.partCFrame * state.attachmentCFrame
-					end)
-				})
-			else
-				return Rx.of(nil)
-			end
-		end);
-		RxBrioUtils.flattenToValueAndNil;
-	}):Subscribe(function(cframe)
-		self._bbCFrame.Value = cframe
-	end))
+	end)
+		:Pipe({
+			RxBrioUtils.switchMapBrio(function(parent)
+				if parent:IsA("BasePart") then
+					return Rx.combineLatest({
+						partCFrame = RxPartBoundingBoxUtils.observePartCFrame(parent),
+						attachmentCFrame = RxInstanceUtils.observeProperty(attachment, "CFrame"),
+					}):Pipe({
+						Rx.map(function(state)
+							return state.partCFrame * state.attachmentCFrame
+						end),
+					})
+				else
+					return Rx.of(nil)
+				end
+			end),
+			RxBrioUtils.flattenToValueAndNil,
+		})
+		:Subscribe(function(cframe)
+			self._bbCFrame.Value = cframe
+		end))
 
 	return maid
 end

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides ways to convert studs to metric and back.
 	@class MetricUtils
@@ -15,9 +16,9 @@ local KPH_TO_MPH = 0.621371192
 	@param studs number
 	@return number -- seconds
 ]=]
-function MetricUtils.getSoundDelaySeconds(studs)
+function MetricUtils.getSoundDelaySeconds(studs: number): number
 	local meters = MetricUtils.studsToMeters(studs)
-	return meters/SPEED_OF_SOUND_IN_METERS_PER_SECOND
+	return meters / SPEED_OF_SOUND_IN_METERS_PER_SECOND
 end
 
 --[=[
@@ -25,8 +26,8 @@ end
 	@param studs number
 	@return number -- kilometers
 ]=]
-function MetricUtils.studsToKilometers(studs)
-	return studs/STUDS_PER_METER/1000
+function MetricUtils.studsToKilometers(studs: number): number
+	return studs / STUDS_PER_METER / 1000
 end
 
 --[=[
@@ -34,8 +35,8 @@ end
 	@param studs number
 	@return number -- meters
 ]=]
-function MetricUtils.studsToMeters(studs)
-	return studs/STUDS_PER_METER
+function MetricUtils.studsToMeters(studs: number): number
+	return studs / STUDS_PER_METER
 end
 
 --[=[
@@ -43,8 +44,8 @@ end
 	@param studsPerSecond number
 	@return number -- kph
 ]=]
-function MetricUtils.studsPerSecondToKph(studsPerSecond)
-	return studsPerSecond/STUDS_PER_METER/1000*SECONDS_PER_HOUR
+function MetricUtils.studsPerSecondToKph(studsPerSecond: number): number
+	return studsPerSecond / STUDS_PER_METER / 1000 * SECONDS_PER_HOUR
 end
 
 --[=[
@@ -53,8 +54,8 @@ end
 	@param studsPerSecond number
 	@return number -- kph
 ]=]
-function MetricUtils.studsPerSecondToMetersPerSecond(studsPerSecond)
-	return studsPerSecond/STUDS_PER_METER
+function MetricUtils.studsPerSecondToMetersPerSecond(studsPerSecond: number): number
+	return studsPerSecond / STUDS_PER_METER
 end
 
 --[=[
@@ -62,8 +63,8 @@ end
 	@param studsPerSecond number
 	@return number -- mph
 ]=]
-function MetricUtils.studsPerSecondToMph(studsPerSecond)
-	return studsPerSecond/STUDS_PER_METER/1000*SECONDS_PER_HOUR*KPH_TO_MPH
+function MetricUtils.studsPerSecondToMph(studsPerSecond: number): number
+	return studsPerSecond / STUDS_PER_METER / 1000 * SECONDS_PER_HOUR * KPH_TO_MPH
 end
 
 --[=[
@@ -71,8 +72,8 @@ end
 	@param kph number
 	@return number -- studs per a second
 ]=]
-function MetricUtils.kphToStudsPerSecond(kph)
-	return kph*STUDS_PER_METER*1000/SECONDS_PER_HOUR
+function MetricUtils.kphToStudsPerSecond(kph: number): number
+	return kph * STUDS_PER_METER * 1000 / SECONDS_PER_HOUR
 end
 
 --[=[
@@ -80,8 +81,8 @@ end
 	@param mph number
 	@return number  -- studs per a second
 ]=]
-function MetricUtils.mphToStudsPerSecond(mph)
-	return mph*STUDS_PER_METER*1000/SECONDS_PER_HOUR/KPH_TO_MPH
+function MetricUtils.mphToStudsPerSecond(mph: number): number
+	return mph * STUDS_PER_METER * 1000 / SECONDS_PER_HOUR / KPH_TO_MPH
 end
 
 return MetricUtils

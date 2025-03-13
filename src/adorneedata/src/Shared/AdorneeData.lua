@@ -194,7 +194,7 @@ end
 	@param adornee Instance
 	@return Observable<TStrict>
 ]=]
-function AdorneeData:Observe(adornee)
+function AdorneeData:Observe(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return self:Create(adornee):Observe(adornee)
@@ -206,7 +206,7 @@ end
 	@param adornee Instance
 	@return AdorneeDataValue
 ]=]
-function AdorneeData:Create(adornee)
+function AdorneeData:Create(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local attributeTableValue = AdorneeDataValue.new(adornee, self._fullPrototype)
@@ -220,7 +220,7 @@ end
 	@param adornee Instance
 	@return TStrict
 ]=]
-function AdorneeData:Get(adornee)
+function AdorneeData:Get(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local data = {}
@@ -240,14 +240,13 @@ function AdorneeData:Get(adornee)
 	return self:CreateStrictData(data)
 end
 
-
 --[=[
 	Sets the attributes for the adornee
 
 	@param adornee Instance
 	@param data T
 ]=]
-function AdorneeData:Set(adornee, data)
+function AdorneeData:Set(adornee: Instance, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
 
@@ -262,7 +261,7 @@ end
 
 	@param adornee Instance
 ]=]
-function AdorneeData:Unset(adornee)
+function AdorneeData:Unset(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	for key, _ in pairs(self._attributePrototype) do
@@ -278,7 +277,7 @@ end
 	@param adornee Instance
 	@param data TStrict
 ]=]
-function AdorneeData:SetStrict(adornee, data)
+function AdorneeData:SetStrict(adornee: Instance, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsStrictData(data))
 
@@ -298,7 +297,7 @@ end
 	@param adornee Instance
 	@param data T | nil
 ]=]
-function AdorneeData:InitAttributes(adornee, data)
+function AdorneeData:InitAttributes(adornee: Instance, data)
 	data = data or {}
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
