@@ -6,8 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local DataStoreService = game:GetService("DataStoreService")
+
+local Promise = require("Promise")
+local PagesUtils = require("PagesUtils")
+local Table = require("Table")
 
 local DataStorePromises = {}
 
@@ -209,12 +212,33 @@ function DataStorePromises.promiseSortedPagesAsync(orderedDataStore, ascending, 
 	end)
 end
 
+
 --[=[
 	@interface OrderedDataStoreEntry
 	.key any
 	.value any
 	@within DataStorePromises
 ]=]
+export type OrderedDataStoreEntry = {
+	key: string,
+	value: any,
+}
+
+local function toMap(data: { OrderedDataStoreEntry })
+	local keys = {}
+	for _, item in data do
+		keys[item.key] = item.value
+	end
+	return keys
+end
+
+local function areEquivalentPageData(data: { OrderedDataStoreEntry }, otherData: { OrderedDataStoreEntry }): boolean
+	local map = toMap(data)
+	local otherMap = toMap(otherData)
+
+	return Table.deepEquivalent(map, otherMap)
+end
+
 
 --[=[
 	Returns a DataStorePages object. The sort order is determined by ascending,
@@ -237,37 +261,41 @@ function DataStorePromises.promiseOrderedEntries(orderedDataStore, ascending, pa
 	return DataStorePromises.promiseSortedPagesAsync(orderedDataStore, ascending, pagesize, minValue, maxValue)
 		:Then(function(dataStorePages)
 			return Promise.spawn(function(resolve, reject)
-				local results = {}
-				local index = 0
+				local resultList = {}
 
-				while index < entries do
-					local initialIndex = index
-
-					for _, dataStoreEntry in pairs(dataStorePages:GetCurrentPage()) do
-						table.insert(results, dataStoreEntry)
-						index = index + 1
-						if index >= entries then
+				local pageData = dataStorePages:GetCurrentPage()
+				while pageData do
+					for _, data in pairs(pageData) do
+						if #resultList < entries then
+							table.insert(resultList, data)
+						else
 							break
 						end
 					end
 
-					-- Increment to next page if we need to/can
-					if initialIndex == index then
-						break -- no change
-					elseif dataStorePages.IsFinished then
-						break -- nothing more to pull
-					elseif index < entries then
-						-- try to pull
-						local ok, err = pcall(function()
-							dataStorePages:AdvanceToNextPageAsync()
-						end)
+					local lastPageData = pageData
+					pageData = nil
+
+					if #resultList >= entries then
+						break
+					end
+
+					if not dataStorePages.IsFinished then
+						local ok, err = PagesUtils.promiseAdvanceToNextPage(dataStorePages):Yield()
 						if not ok then
-							return reject(err)
+							return reject(string.format("Failed to advance to next page due to %s", tostring(err)))
 						end
+
+						pageData = err
+					end
+
+					-- https://devforum.roblox.com/t/ordereddatastore-pages-object-is-never-isfinished-resulting-in-finite-loops-when-n-0/3558372
+					if pageData and areEquivalentPageData(lastPageData, pageData) then
+						break
 					end
 				end
 
-				return resolve(results)
+				return resolve(resultList)
 			end)
 		end)
 end
