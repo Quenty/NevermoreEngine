@@ -1,3 +1,15 @@
+# v13.19.1 (Thu Mar 20 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Work around Roblox bug with OrderedDataStore never finishing [#543](https://github.com/Quenty/NevermoreEngine/pull/543) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
