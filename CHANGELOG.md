@@ -1,3 +1,17 @@
+# (Fri Mar 21 2025)
+
+#### 🐛 Bug Fix
+
+- docs: Update readme.md, and ensure stability by sorting by name [#541](https://github.com/Quenty/NevermoreEngine/pull/541) ([@Quenty](https://github.com/Quenty))
+- `@quenty/adorneeboundingbox@8.19.3`, `@quenty/adorneedata@7.17.1`, `@quenty/adorneeutils@3.3.1`, `@quenty/cframeutils@5.5.1`, `@quenty/characterutils@12.17.1`, `@quenty/chatproviderservice@9.24.4`, `@quenty/color3utils@11.17.1`, `@quenty/datastore@13.19.2`, `@quenty/deathreport@10.20.1`, `@quenty/draw@7.8.1`, `@quenty/ducktype@5.8.1`, `@quenty/friendutils@12.16.1`, `@quenty/gameproductservice@14.23.3`, `@quenty/hintscoringutils@14.19.1`, `@quenty/humanoidkillerutils@2.3.1`, `@quenty/humanoidspeed@12.22.4`, `@quenty/humanoidtracker@13.16.1`, `@quenty/humanoidutils@2.2.1`, `@quenty/ik@15.23.1`, `@quenty/instanceutils@13.16.1`, `@quenty/math@2.7.1`, `@quenty/memorystoreutils@6.10.1`, `@quenty/meshutils@2.3.1`, `@quenty/messagingserviceutils@7.10.1`, `@quenty/metricutils@2.4.1`, `@quenty/modeltransparencyeffect@11.8.1`, `@quenty/networkownerservice@5.2.1`, `@quenty/networkownerutils@3.2.1`, `@quenty/nocollisionconstraintutils@10.8.1`, `@quenty/numberrangeutils@3.1.1`, `@quenty/numbersequenceutils@8.9.1`, `@quenty/numbertoinputkeyutils@2.3.1`, `@quenty/pagesutils@5.11.1`, `@quenty/particles@5.9.1`, `@quenty/pathfindingutils@10.10.1`, `@quenty/permissionprovider@14.18.1`, `@quenty/physicsutils@8.16.1`, `@quenty/playerthumbnailutils@10.10.1`, `@quenty/playerutils@8.16.1`, `@quenty/polynomialutils@2.2.1`, `@quenty/probability@2.3.1`, `@quenty/propertyvalue@7.16.1`, `@quenty/qframe@10.10.1`, `@quenty/r15utils@13.16.1`, `@quenty/ragdoll@15.22.1`, `@quenty/randomutils@6.9.1`, `@quenty/receiptprocessing@7.17.1`, `@quenty/rogue-properties@11.21.4`, `@quenty/rx@13.16.1`, `@quenty/seatutils@7.18.1`, `@quenty/selectionutils@8.16.1`, `@quenty/servicebag@11.11.1`, `@quenty/settings@11.22.4`, `@quenty/socialserviceutils@10.10.1`, `@quenty/steputils@3.5.3`, `@quenty/streamingutils@10.10.1`, `@quenty/string@3.3.1`, `@quenty/table@3.7.1`, `@quenty/teamtracker@13.16.1`, `@quenty/teleportserviceutils@9.16.1`, `@quenty/terrainutils@10.9.1`, `@quenty/textboxutils@7.16.1`, `@quenty/textfilterutils@10.10.1`, `@quenty/tie@10.19.1`, `@quenty/toolutils@1.2.1`, `@quenty/touchingpartutils@2.2.1`, `@quenty/trajectory@2.7.1`, `@quenty/ugcsanitize@1.3.1`, `@quenty/uiobjectutils@6.15.1`, `@quenty/utf8@2.3.1`, `@quenty/vector3int16utils@2.2.1`, `@quenty/vector3utils@10.8.1`, `@quenty/voicechat@5.10.1`, `@quenty/weldconstraintutils@3.1.1`, `@quenty/nevermore-cli@4.5.2`
+  - docs: Add docs and types to a lot of files [#542](https://github.com/Quenty/NevermoreEngine/pull/542) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Mar 20 2025)
 
 #### 🐛 Bug Fix

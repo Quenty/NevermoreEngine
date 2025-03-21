@@ -1,3 +1,16 @@
+# v15.22.1 (Fri Mar 21 2025)
+
+#### 🐛 Bug Fix
+
+- docs: Add docs and types to a lot of files [#542](https://github.com/Quenty/NevermoreEngine/pull/542) ([@Quenty](https://github.com/Quenty))
+- docs: Update documentation with missing types and documentation ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
