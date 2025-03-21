@@ -1,20 +1,18 @@
-# v15.22.2 (Fri Mar 21 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix ragdolls showing issues on other people's characters [#523](https://github.com/Quenty/NevermoreEngine/pull/523) ([@imagerymartin](https://github.com/imagerymartin) [@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Martin ([@imagerymartin](https://github.com/imagerymartin))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [15.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.22.1...@quenty/ragdoll@15.22.2) (2025-03-21)
+
+
+### Bug Fixes
+
+* Fix ragdolls showing issues on other people's characters ([#523](https://github.com/Quenty/NevermoreEngine/issues/523)) ([df18a8c](https://github.com/Quenty/NevermoreEngine/commit/df18a8cc97b0845f5dd620b66345badcbb0a6596))
+
+
+
+
 
 ## [15.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.22.0...@quenty/ragdoll@15.22.1) (2025-03-21)
 
