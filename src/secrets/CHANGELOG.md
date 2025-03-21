@@ -1,19 +1,15 @@
-# v7.22.4 (Fri Mar 21 2025)
-
-#### 🐛 Bug Fix
-
-- docs: Add docs and types to a lot of files [#542](https://github.com/Quenty/NevermoreEngine/pull/542) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.22.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.22.3...@quenty/secrets@7.22.4) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
 
 ## [7.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.22.2...@quenty/secrets@7.22.3) (2025-03-20)
 

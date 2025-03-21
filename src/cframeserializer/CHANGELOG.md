@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@4.7.0...@quenty/cframeserializer@4.7.1) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/cframeserializer
+
+
+
+
+
 # [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@4.6.1...@quenty/cframeserializer@4.7.0) (2025-02-18)
 
 **Note:** Version bump only for package @quenty/cframeserializer

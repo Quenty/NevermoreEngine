@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.21.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.21.2...@quenty/cmdrservice@13.21.3) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
 ## [13.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.21.1...@quenty/cmdrservice@13.21.2) (2025-03-13)
 
 **Note:** Version bump only for package @quenty/cmdrservice

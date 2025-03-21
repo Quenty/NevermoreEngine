@@ -1,20 +1,15 @@
-# v3.5.3 (Fri Mar 21 2025)
-
-#### 🐛 Bug Fix
-
-- docs: Add docs and types to a lot of files [#542](https://github.com/Quenty/NevermoreEngine/pull/542) ([@Quenty](https://github.com/Quenty))
-- docs: Update documentation with missing types and documentation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.5.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.5.2...@quenty/steputils@3.5.3) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/steputils
+
+
+
+
 
 ## [3.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.5.1...@quenty/steputils@3.5.2) (2024-10-09)
 

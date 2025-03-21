@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.16.0...@quenty/animations@8.16.1) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
 # [8.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.15.0...@quenty/animations@8.16.0) (2025-02-18)
 
 **Note:** Version bump only for package @quenty/animations
