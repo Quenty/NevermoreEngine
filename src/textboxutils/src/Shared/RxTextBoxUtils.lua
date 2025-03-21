@@ -15,7 +15,7 @@ local RxTextBoxUtils = {}
 	@param textBox TextBox
 	@return Observable<boolean>
 ]=]
-function RxTextBoxUtils.observeIsFocused(textBox)
+function RxTextBoxUtils.observeIsFocused(textBox: TextBox)
 	assert(typeof(textBox) == "Instance" and textBox:IsA("TextBox"), "Bad textBox")
 
 	return Observable.new(function(sub)

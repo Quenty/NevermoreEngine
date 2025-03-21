@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions for UI padding
 	@class UIPaddingUtils
@@ -5,7 +6,10 @@
 
 local UIPaddingUtils = {}
 
-function UIPaddingUtils.fromUDim(udim)
+--[=[
+	Constructs a new UIPadding from a UDim
+]=]
+function UIPaddingUtils.fromUDim(udim: UDim): UIPadding
 	local uiPadding = Instance.new("UIPadding")
 	uiPadding.PaddingBottom = udim
 	uiPadding.PaddingTop = udim
@@ -15,22 +19,29 @@ function UIPaddingUtils.fromUDim(udim)
 	return uiPadding
 end
 
-function UIPaddingUtils.getTotalPadding(uiPadding)
-	return UDim2.new(uiPadding.PaddingLeft + uiPadding.PaddingRight,
-		uiPadding.PaddingBottom + uiPadding.PaddingTop)
+--[=[
+	Compute the total padding for the UIPadding
+]=]
+function UIPaddingUtils.getTotalPadding(uiPadding: UIPadding): UDim2
+	return UDim2.new(uiPadding.PaddingLeft + uiPadding.PaddingRight, uiPadding.PaddingBottom + uiPadding.PaddingTop)
 end
 
-function UIPaddingUtils.getTotalAbsolutePadding(uiPadding, absoluteSize)
+--[=[
+	Computes the total absolute padding for a UIPadding
+]=]
+function UIPaddingUtils.getTotalAbsolutePadding(uiPadding: UIPadding, absoluteSize: Vector2): Vector2
 	local padding = UIPaddingUtils.getTotalPadding(uiPadding)
 	return Vector2.new(
-		padding.X.Offset + padding.X.Scale*absoluteSize.x,
-		padding.Y.Offset + padding.Y.Scale*absoluteSize.Y
+		padding.X.Offset + padding.X.Scale * absoluteSize.X,
+		padding.Y.Offset + padding.Y.Scale * absoluteSize.Y
 	)
 end
 
-function UIPaddingUtils.getHorizontalPadding(uiPadding)
+--[=[
+	Compute the horizontal Padding
+]=]
+function UIPaddingUtils.getHorizontalPadding(uiPadding: UIPadding): UDim
 	return uiPadding.PaddingLeft + uiPadding.PaddingRight
 end
-
 
 return UIPaddingUtils

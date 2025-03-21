@@ -1,4 +1,7 @@
 --[=[
+	Standard playback of particles using `EmitDelay` and `EmitCount` attributes that
+	most standard particle editors emit.
+
 	@class ParticleEmitterUtils
 ]=]
 
@@ -9,7 +12,10 @@ local Maid = require("Maid")
 
 local ParticleEmitterUtils = {}
 
-function ParticleEmitterUtils.scaleSize(adornee, scale)
+--[=[
+	Scales the size of the particle emitter to a specified size
+]=]
+function ParticleEmitterUtils.scaleSize(adornee: Instance, scale: number)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	for _, particleEmitter in pairs(ParticleEmitterUtils.getParticleEmitters(adornee)) do
@@ -17,7 +23,13 @@ function ParticleEmitterUtils.scaleSize(adornee, scale)
 	end
 end
 
-function ParticleEmitterUtils.playFromTemplate(template, attachment)
+--[=[
+	Playes a particle emitter from a template in the parent
+
+	@param template Instance
+	@return Maid
+]=]
+function ParticleEmitterUtils.playFromTemplate(template: Instance, attachment: Attachment)
 	local maid = Maid.new()
 
 	for _, emitter in pairs(template:GetChildren()) do
@@ -38,10 +50,12 @@ function ParticleEmitterUtils.playFromTemplate(template, attachment)
 	end
 
 	return maid
-
 end
 
-function ParticleEmitterUtils.getParticleEmitters(adornee)
+--[=[
+	Retrieves particle emitters for the given adornee
+]=]
+function ParticleEmitterUtils.getParticleEmitters(adornee: Instance): { ParticleEmitter }
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local emitters = {}

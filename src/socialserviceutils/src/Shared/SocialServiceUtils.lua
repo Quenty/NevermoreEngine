@@ -17,7 +17,7 @@ local SocialServiceUtils = {}
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function SocialServiceUtils.promiseCanSendGameInvite(player)
+function SocialServiceUtils.promiseCanSendGameInvite(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return Promise.spawn(function(resolve, reject)
@@ -61,8 +61,7 @@ function SocialServiceUtils.promisePromptGameInvite(player: Player, options: Exp
 		end
 
 		-- TODO: Maybe timeout here?
-	end)
-	:Tap(function()
+	end):Tap(function()
 		maid:DoCleaning()
 	end, function()
 		maid:DoCleaning()

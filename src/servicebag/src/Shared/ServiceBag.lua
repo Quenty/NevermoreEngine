@@ -83,9 +83,8 @@ end
 	@param value ServiceBag?
 	@return boolean
 ]=]
-function ServiceBag.isServiceBag(value)
-	return type(value) == "table"
-		and value.ClassName == "ServiceBag"
+function ServiceBag.isServiceBag(value: any): boolean
+	return type(value) == "table" and value.ClassName == "ServiceBag"
 end
 
 function ServiceBag:PrintInitialization()
@@ -106,7 +105,13 @@ function ServiceBag:GetService(serviceType)
 	end
 
 	if type(serviceType) ~= "table" then
-		error(string.format("Bad serviceType definition of type %s of type %s", tostring(serviceType), typeof(serviceType)))
+		error(
+			string.format(
+				"Bad serviceType definition of type %s of type %s",
+				tostring(serviceType),
+				typeof(serviceType)
+			)
+		)
 	end
 
 	local service = self._services[serviceType]
@@ -197,7 +202,7 @@ function ServiceBag:Start()
 	self._serviceTypesToStart = nil
 end
 
-function ServiceBag:_getServiceName(serviceType)
+function ServiceBag:_getServiceName(serviceType): string
 	local serviceName
 	pcall(function()
 		serviceName = serviceType.ServiceName
@@ -213,7 +218,7 @@ end
 	Returns whether the service bag has fully started or not.
 	@return boolean
 ]=]
-function ServiceBag:IsStarted()
+function ServiceBag:IsStarted(): boolean
 	return self._serviceTypesToStart == nil
 end
 
@@ -246,7 +251,8 @@ function ServiceBag:_addServiceType(serviceType)
 	end
 
 	if self:IsStarted() then
-		local hint = "HINT: Be sure to call serviceBag:GetService(require(\"MyService\")) either before calling serviceBag:Init() or during serviceBag:Init() (within another service:Init)"
+		local hint =
+			'HINT: Be sure to call serviceBag:GetService(require("MyService")) either before calling serviceBag:Init() or during serviceBag:Init() (within another service:Init)'
 		error(string.format("Already started, cannot add %q. \n%s", self:_getServiceName(serviceType), hint))
 		return
 	end

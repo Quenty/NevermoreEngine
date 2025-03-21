@@ -1,4 +1,6 @@
 --[=[
+	Provides commands involving player settings
+
 	@class SettingsCmdrService
 ]=]
 
@@ -30,22 +32,22 @@ function SettingsCmdrService:_setupCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "restore-setting";
-		Aliases = { };
-		Description = "Restores the player setting to default.";
-		Group = "Settings";
+		Name = "restore-setting",
+		Aliases = {},
+		Description = "Restores the player setting to default.",
+		Group = "Settings",
 		Args = {
 			{
-				Name = "Players";
-				Type = "players";
-				Description = "Players to restore the default settings to.";
+				Name = "Players",
+				Type = "players",
+				Description = "Players to restore the default settings to.",
 			},
 			{
-				Name = "Settings";
-				Type = "settingDefinitions";
-				Description = "Settings to restore.";
-			}
-		};
+				Name = "Settings",
+				Type = "settingDefinitions",
+				Description = "Settings to restore.",
+			},
+		},
 	}, function(_context, players, settingsDefinitions)
 		local givenTo = {}
 
@@ -64,6 +66,5 @@ end
 function SettingsCmdrService:Destroy()
 	self._maid:DoCleaning()
 end
-
 
 return SettingsCmdrService

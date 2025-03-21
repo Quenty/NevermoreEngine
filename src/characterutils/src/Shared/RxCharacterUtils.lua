@@ -36,17 +36,29 @@ end
 	@param player Player
 	@return Observable<Model>
 ]=]
-function RxCharacterUtils.observeCharacter(player)
+function RxCharacterUtils.observeCharacter(player: Player)
 	return RxInstanceUtils.observeProperty(player, "Character")
 end
 
-function RxCharacterUtils.observeCharacterBrio(player)
+--[=[
+	Observes a player's character property as a brio
+
+	@param player Player
+	@return Observable<Brio<Model>>
+]=]
+function RxCharacterUtils.observeCharacterBrio(player: Player)
 	return RxInstanceUtils.observePropertyBrio(player, "Character", function(character)
 		return character ~= nil
 	end)
 end
 
-function RxCharacterUtils.observeIsOfLocalCharacter(instance)
+--[=[
+	Observes whether the instance is part of the local player's character
+
+	@param instance Instance
+	@return Observable<boolean>
+]=]
+function RxCharacterUtils.observeIsOfLocalCharacter(instance: Instance)
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local localPlayer = Players.LocalPlayer
@@ -56,8 +68,8 @@ function RxCharacterUtils.observeIsOfLocalCharacter(instance)
 	end
 
 	return Rx.combineLatest({
-		character = RxCharacterUtils.observeLocalPlayerCharacter();
-		_ancestry = RxInstanceUtils.observeAncestry(instance)
+		character = RxCharacterUtils.observeLocalPlayerCharacter(),
+		_ancestry = RxInstanceUtils.observeAncestry(instance),
 	}):Pipe({
 		Rx.map(function(state)
 			if state.character then
@@ -65,19 +77,30 @@ function RxCharacterUtils.observeIsOfLocalCharacter(instance)
 			else
 				return false
 			end
-		end);
-		Rx.distinct();
+		end),
+		Rx.distinct(),
 	})
 end
 
-function RxCharacterUtils.observeIsOfLocalCharacterBrio(instance)
+--[=[
+	Observes whether the instance is part of the local player's character as a brio
+
+	@param instance Instance
+	@return Observable<Brio<boolean>>
+]=]
+function RxCharacterUtils.observeIsOfLocalCharacterBrio(instance: Instance)
 	return RxCharacterUtils.observeIsOfLocalCharacter(instance):Pipe({
 		RxBrioUtils.switchToBrio(function(value)
 			return value
-		end)
+		end),
 	})
 end
 
+--[=[
+	Observes the local player's character
+
+	@return Observable<Model>
+]=]
 function RxCharacterUtils.observeLocalPlayerCharacter()
 	return RxInstanceUtils.observeProperty(Players, "LocalPlayer"):Pipe({
 		Rx.switchMap(function(player)
@@ -86,8 +109,8 @@ function RxCharacterUtils.observeLocalPlayerCharacter()
 			else
 				return Rx.of(nil)
 			end
-		end);
-		Rx.distinct();
+		end),
+		Rx.distinct(),
 	})
 end
 
@@ -100,7 +123,7 @@ function RxCharacterUtils.observeLastHumanoidBrio(player: Player)
 	return RxCharacterUtils.observeLastCharacterBrio(player):Pipe({
 		RxBrioUtils.switchMapBrio(function(character)
 			return RxInstanceUtils.observeLastNamedChildBrio(character, "Humanoid", "Humanoid")
-		end);
+		end),
 	})
 end
 
@@ -129,6 +152,7 @@ local function observeHumanoidLifetimeAsBrio(humanoid: Humanoid)
 			return maid
 		else
 			onDeath()
+			return nil
 		end
 	end)
 end
@@ -161,7 +185,7 @@ function RxCharacterUtils.observeLastAliveHumanoidBrio(player: Player)
 	return RxCharacterUtils.observeLastHumanoidBrio(player):Pipe({
 		RxBrioUtils.switchMapBrio(function(humanoid)
 			return observeHumanoidLifetimeAsBrio(humanoid)
-		end);
+		end),
 	})
 end
 

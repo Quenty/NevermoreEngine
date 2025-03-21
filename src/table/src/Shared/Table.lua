@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provide a variety of utility table operations
 	@class Table
@@ -13,8 +14,8 @@ local Table = {}
 	@return table -- parameter table
 ]=]
 function Table.append(target, source)
-	for _, value in pairs(source) do
-		target[#target+1] = value
+	for _, value in source do
+		target[#target + 1] = value
 	end
 
 	return target
@@ -29,7 +30,7 @@ end
 ]=]
 function Table.merge(orig, new)
 	local result = table.clone(orig)
-	for key, val in pairs(new) do
+	for key, val in new do
 		result[key] = val
 	end
 	return result
@@ -43,7 +44,7 @@ end
 ]=]
 function Table.reverse(orig)
 	local new = {}
-	for i=#orig, 1, -1 do
+	for i = #orig, 1, -1 do
 		table.insert(new, orig[i])
 	end
 	return new
@@ -57,7 +58,7 @@ end
 ]=]
 function Table.values(source)
 	local new = {}
-	for _, val in pairs(source) do
+	for _, val in source do
 		table.insert(new, val)
 	end
 	return new
@@ -71,7 +72,7 @@ end
 ]=]
 function Table.keys(source)
 	local new = {}
-	for key, _ in pairs(source) do
+	for key, _ in source do
 		table.insert(new, key)
 	end
 	return new
@@ -86,10 +87,10 @@ end
 ]=]
 function Table.mergeLists(orig, new)
 	local _table = {}
-	for _, val in pairs(orig) do
+	for _, val in orig do
 		table.insert(_table, val)
 	end
-	for _, val in pairs(new) do
+	for _, val in new do
 		table.insert(_table, val)
 	end
 	return _table
@@ -103,7 +104,7 @@ end
 ]=]
 function Table.swapKeyValue(orig)
 	local tab = {}
-	for key, val in pairs(orig) do
+	for key, val in orig do
 		tab[val] = key
 	end
 	return tab
@@ -117,7 +118,7 @@ end
 ]=]
 function Table.toList(_table)
 	local list = {}
-	for _, item in pairs(_table) do
+	for _, item in _table do
 		table.insert(list, item)
 	end
 	return list
@@ -132,7 +133,7 @@ end
 ]=]
 function Table.count(_table)
 	local count = 0
-	for _, _ in pairs(_table) do
+	for _, _ in _table do
 		count = count + 1
 	end
 	return count
@@ -164,7 +165,7 @@ function Table.deepCopy(target, _context)
 	if type(target) == "table" then
 		local new = {}
 		_context[target] = new
-		for index, value in pairs(target) do
+		for index, value in target do
 			new[Table.deepCopy(index, _context)] = Table.deepCopy(value, _context)
 		end
 		return setmetatable(new, Table.deepCopy(getmetatable(target), _context))
@@ -180,7 +181,7 @@ end
 	@return table -- target
 ]=]
 function Table.deepOverwrite(target, source)
-	for index, value in pairs(source) do
+	for index, value in source do
 		if type(target[index]) == "table" and type(value) == "table" then
 			target[index] = Table.deepOverwrite(target[index], value)
 		else
@@ -200,7 +201,7 @@ end
 function Table.getIndex(haystack, needle)
 	assert(needle ~= nil, "Needle cannot be nil")
 
-	for index, item in pairs(haystack) do
+	for index, item in haystack do
 		if needle == item then
 			return index
 		end
@@ -219,7 +220,7 @@ end
 function Table.stringify(_table, indent, output)
 	output = output or tostring(_table)
 	indent = indent or 0
-	for key, value in pairs(_table) do
+	for key, value in _table do
 		local formattedText = "\n" .. string.rep("  ", indent) .. tostring(key) .. ": "
 		if type(value) == "table" then
 			output = output .. formattedText
@@ -239,7 +240,7 @@ end
 	@return boolean -- `true` if within, `false` otherwise
 ]=]
 function Table.contains(_table, value)
-	for _, item in pairs(_table) do
+	for _, item in _table do
 		if item == value then
 			return true
 		end
@@ -256,7 +257,7 @@ end
 	@return table -- target
 ]=]
 function Table.overwrite(target, source)
-	for index, item in pairs(source) do
+	for index, item in source do
 		target[index] = item
 	end
 
@@ -280,13 +281,13 @@ function Table.deepEquivalent(target, source)
 	end
 
 	if type(target) == "table" then
-		for key, value in pairs(target) do
+		for key, value in target do
 			if not Table.deepEquivalent(value, source[key]) then
 				return false
 			end
 		end
 
-		for key, value in pairs(source) do
+		for key, value in source do
 			if not Table.deepEquivalent(value, target[key]) then
 				return false
 			end
@@ -312,7 +313,7 @@ function Table.take(source, count)
 	local n = math.min(#source, count)
 	local newTable = table.create(n)
 
-	for i=1, n do
+	for i = 1, n do
 		newTable[i] = source[i]
 	end
 
@@ -324,8 +325,8 @@ local function errorOnIndex(_, index)
 end
 
 local READ_ONLY_METATABLE = {
-	__index = errorOnIndex;
-	__newindex = errorOnIndex;
+	__index = errorOnIndex,
+	__newindex = errorOnIndex,
 }
 
 --[=[
@@ -357,7 +358,7 @@ end
 	@return table -- The same table
 ]=]
 function Table.deepReadonly(target)
-	for _, item in pairs(target) do
+	for _, item in target do
 		if type(item) == "table" then
 			Table.deepReadonly(item)
 		end

@@ -1,4 +1,7 @@
+--!strict
 --[=[
+	Utility logic involving scrolling direction
+
 	@class ScrollingDirectionUtils
 ]=]
 
@@ -8,13 +11,19 @@ local EnumUtils = require("EnumUtils")
 
 local ScrollingDirectionUtils = {}
 
-function ScrollingDirectionUtils.canScrollHorizontal(scrollingDirection)
+--[=[
+	Determines if the scrolling direction can scroll horizontally
+]=]
+function ScrollingDirectionUtils.canScrollHorizontal(scrollingDirection: Enum.ScrollingDirection): boolean
 	assert(EnumUtils.isOfType(Enum.ScrollingDirection, scrollingDirection))
 
 	return scrollingDirection == Enum.ScrollingDirection.X or scrollingDirection == Enum.ScrollingDirection.XY
 end
 
-function ScrollingDirectionUtils.canScrollVertical(scrollingDirection)
+--[=[
+	Determines if the scrolling direction can scroll vertically
+]=]
+function ScrollingDirectionUtils.canScrollVertical(scrollingDirection: Enum.ScrollingDirection): boolean
 	assert(EnumUtils.isOfType(Enum.ScrollingDirection, scrollingDirection))
 
 	return scrollingDirection == Enum.ScrollingDirection.Y or scrollingDirection == Enum.ScrollingDirection.XY

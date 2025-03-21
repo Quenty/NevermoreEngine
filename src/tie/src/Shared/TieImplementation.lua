@@ -17,7 +17,15 @@ local TieImplementation = setmetatable({}, BaseObject)
 TieImplementation.ClassName = "TieImplementation"
 TieImplementation.__index = TieImplementation
 
-function TieImplementation.new(tieDefinition, adornee, implementer, implementationTieRealm)
+--[=[
+	Constructs a new implementation. Use [TieDefinition.Implement] instead of using this directly.
+
+	@param tieDefinition TieDefinition
+	@param adornee Instance
+	@param implementer table
+	@param implementationTieRealm TieRealm
+]=]
+function TieImplementation.new(tieDefinition, adornee: Instance, implementer, implementationTieRealm)
 	assert(TieRealmUtils.isTieRealm(implementationTieRealm), "Bad implementationTieRealm")
 
 	local self = setmetatable(BaseObject.new(), TieImplementation)
@@ -53,14 +61,15 @@ function TieImplementation:__index(index)
 		return TieImplementation[index]
 	end
 
-	if index == "_implParent"
+	if
+		index == "_implParent"
 		or index == "_adornee"
 		or index == "_tieDefinition"
 		or index == "_memberImplementations"
 		or index == "_implementationTieRealm"
 		or index == "_memberMap"
-		or index == "_actualSelf" then
-
+		or index == "_actualSelf"
+	then
 		return rawget(self, index)
 	end
 
@@ -72,7 +81,13 @@ function TieImplementation:__index(index)
 		if memberDefinition:IsAllowedForImplementation(self._implementationTieRealm) then
 			return memberDefinition:GetInterface(self._implParent, self, implementationTieRealm)
 		else
-			error(string.format("[TieImplementation] - %q is not available on %s", memberDefinition:GetFriendlyName(), self._implementationTieRealm))
+			error(
+				string.format(
+					"[TieImplementation] - %q is not available on %s",
+					memberDefinition:GetFriendlyName(),
+					self._implementationTieRealm
+				)
+			)
 		end
 	else
 		error(string.format("Bad index %q for TieImplementation", tostring(index)))
@@ -80,14 +95,15 @@ function TieImplementation:__index(index)
 end
 
 function TieImplementation:__newindex(index, value)
-	if index == "_implParent"
+	if
+		index == "_implParent"
 		or index == "_adornee"
 		or index == "_tieDefinition"
 		or index == "_memberImplementations"
 		or index == "_implementationTieRealm"
 		or index == "_memberMap"
-		or index == "_actualSelf" then
-
+		or index == "_actualSelf"
+	then
 		rawset(self, index, value)
 	elseif self._memberImplementations[index] then
 		self._memberImplementations[index]:SetImplementation(value, self._actualSelf)
@@ -119,7 +135,9 @@ function TieImplementation:_buildMemberImplementations(implementer)
 			end
 		end
 
-		local memberImplementation = self._maid:Add(memberDefinition:Implement(self._implParent, found, self._actualSelf, self._implementationTieRealm))
+		local memberImplementation = self._maid:Add(
+			memberDefinition:Implement(self._implParent, found, self._actualSelf, self._implementationTieRealm)
+		)
 		self._memberImplementations[memberDefinition:GetMemberName()] = memberImplementation
 	end
 
@@ -127,18 +145,22 @@ function TieImplementation:_buildMemberImplementations(implementer)
 end
 
 function TieImplementation:_getErrorMessageForNotAllowedMember(memberDefinition)
-	local errorMessage = string.format("[TieImplementation] - Member implements %s only member %s (we are a %s implementation)",
+	local errorMessage = string.format(
+		"[TieImplementation] - Member implements %s only member %s (we are a %s implementation)",
 		memberDefinition:GetMemberTieRealm(),
 		memberDefinition:GetFriendlyName(),
-		self._implementationTieRealm)
+		self._implementationTieRealm
+	)
 
 	if self._implementationTieRealm == TieRealms.SHARED then
 		if memberDefinition:GetMemberTieRealm() ~= TieRealms.SHARED then
-			errorMessage = string.format("%s\n\tHINT: This is declared as a %s implementation. %s is only allowed on %s.",
+			errorMessage = string.format(
+				"%s\n\tHINT: This is declared as a %s implementation. %s is only allowed on %s.",
 				errorMessage,
 				self._implementationTieRealm,
 				memberDefinition:GetFriendlyName(),
-				memberDefinition:GetMemberTieRealm())
+				memberDefinition:GetMemberTieRealm()
+			)
 		end
 	end
 
@@ -146,18 +168,22 @@ function TieImplementation:_getErrorMessageForNotAllowedMember(memberDefinition)
 end
 
 function TieImplementation:_getErrorMessageRequiredMember(memberDefinition)
-	local errorMessage = string.format("[TieImplementation] - Missing %s member %s (we are a %s implementation)",
+	local errorMessage = string.format(
+		"[TieImplementation] - Missing %s member %s (we are a %s implementation)",
 		memberDefinition:GetMemberTieRealm(),
 		memberDefinition:GetFriendlyName(),
-		self._implementationTieRealm)
+		self._implementationTieRealm
+	)
 
 	if self._implementationTieRealm == TieRealms.SHARED then
 		if memberDefinition:GetMemberTieRealm() ~= TieRealms.SHARED then
-			errorMessage = string.format("%s\n\tHINT: This is declared as a %s implementation. Shared implements require both client and server components. You could also specify the implementation realm by writing %sInterface.%s:Implement(...)",
+			errorMessage = string.format(
+				"%s\n\tHINT: This is declared as a %s implementation. Shared implements require both client and server components. You could also specify the implementation realm by writing %sInterface.%s:Implement(...)",
 				errorMessage,
 				self._implementationTieRealm,
 				self._tieDefinition:GetName(),
-				String.uppercaseFirstLetter(memberDefinition:GetMemberTieRealm()))
+				String.uppercaseFirstLetter(memberDefinition:GetMemberTieRealm())
+			)
 		end
 	end
 

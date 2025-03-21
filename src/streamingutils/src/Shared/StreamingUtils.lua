@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides utilities for working with Roblox's streaming system
 	@class StreamingUtils
@@ -34,7 +35,7 @@ local StreamingUtils = {}
 	@param timeOut number? -- Optional
 	@return Promise
 ]=]
-function StreamingUtils.promiseStreamAround(player, position, timeOut)
+function StreamingUtils.promiseStreamAround(player: Player, position: Vector3, timeOut: number?)
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(typeof(position) == "Vector3", "Bad position")
 	assert(type(timeOut) == "number" or timeOut == nil, "Bad timeOut")
@@ -45,7 +46,6 @@ function StreamingUtils.promiseStreamAround(player, position, timeOut)
 	end
 
 	return Promise.spawn(function(resolve, reject)
-
 		local ok, err = pcall(function()
 			player:RequestStreamAroundAsync(position, timeOut)
 		end)

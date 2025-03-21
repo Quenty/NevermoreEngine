@@ -17,15 +17,15 @@ function IKDataService:Init(serviceBag)
 	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
 end
 
-function IKDataService:PromiseRig(humanoid)
+function IKDataService:PromiseRig(humanoid: Humanoid)
 	return IKRigInterface:Promise(humanoid, self._tieRealmService:GetTieRealm())
 end
 
-function IKDataService:ObserveRig(humanoid)
+function IKDataService:ObserveRig(humanoid: Humanoid)
 	return IKRigInterface:Observe(humanoid, self._tieRealmService:GetTieRealm())
 end
 
-function IKDataService:ObserveRigBrio(humanoid)
+function IKDataService:ObserveRigBrio(humanoid: Humanoid)
 	return IKRigInterface:ObserveBrio(humanoid, self._tieRealmService:GetTieRealm())
 end
 

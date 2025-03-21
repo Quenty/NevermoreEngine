@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class UIRotationUtils
 ]=]
@@ -6,13 +7,19 @@ local require = require(script.Parent.loader).load(script)
 
 local UIRotationUtils = {}
 
-function UIRotationUtils.toUnitCircle(rotationDegrees)
+--[=[
+	Converts a rotation to the unit circle
+]=]
+function UIRotationUtils.toUnitCircle(rotationDegrees: number): number
 	assert(type(rotationDegrees) == "number", "Bad rotationDegrees")
 
 	return -rotationDegrees + 90
 end
 
-function UIRotationUtils.toUnitCircleDirection(rotationDegrees)
+--[=[
+	Converts a rotation to the unit circle direction
+]=]
+function UIRotationUtils.toUnitCircleDirection(rotationDegrees: number): Vector2
 	assert(type(rotationDegrees) == "number", "Bad rotationDegrees")
 
 	local angle = math.rad(UIRotationUtils.toUnitCircle(rotationDegrees))
@@ -23,11 +30,13 @@ function UIRotationUtils.toUnitCircleDirection(rotationDegrees)
 	return Vector2.new(x, y)
 end
 
-function UIRotationUtils.toGuiDirection(unitCircleDirection)
+--[=[
+	Converts a rotation to the gui rotation vector
+]=]
+function UIRotationUtils.toGuiDirection(unitCircleDirection: Vector2): Vector2
 	assert(typeof(unitCircleDirection) == "Vector2", "Bad rotationAnchorPoint")
 
-	return unitCircleDirection*Vector2.new(1, -1)
+	return unitCircleDirection * Vector2.new(1, -1)
 end
-
 
 return UIRotationUtils

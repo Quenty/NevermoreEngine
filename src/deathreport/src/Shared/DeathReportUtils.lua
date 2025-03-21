@@ -18,14 +18,14 @@ local DeathReportUtils = {}
 	@param weaponData WeaponData
 	@return DeathReport
 ]=]
-function DeathReportUtils.fromDeceasedHumanoid(humanoid, weaponData)
+function DeathReportUtils.fromDeceasedHumanoid(humanoid: Humanoid, weaponData)
 	assert(DeathReportUtils.isWeaponData(weaponData) or weaponData == nil, "Bad weaponData")
 
 	local killerHumanoid = HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid)
 	return DeathReportUtils.create(humanoid.Parent, killerHumanoid, weaponData)
 end
 
-function DeathReportUtils.create(adornee, killerAdornee, weaponData)
+function DeathReportUtils.create(adornee: Instance, killerAdornee, weaponData)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local humanoid
@@ -36,14 +36,14 @@ function DeathReportUtils.create(adornee, killerAdornee, weaponData)
 	end
 
 	return {
-		type = "deathReport";
-		adornee = adornee;
-		humanoid = humanoid;
-		player = CharacterUtils.getPlayerFromCharacter(adornee);
-		killerAdornee = killerAdornee;
-		killerHumanoid = killerAdornee and killerAdornee:IsA("Humanoid") and killerAdornee or nil;
-		killerPlayer = killerAdornee and CharacterUtils.getPlayerFromCharacter(killerAdornee) or nil;
-		weaponData = weaponData or DeathReportUtils.createWeaponData(nil);
+		type = "deathReport",
+		adornee = adornee,
+		humanoid = humanoid,
+		player = CharacterUtils.getPlayerFromCharacter(adornee),
+		killerAdornee = killerAdornee,
+		killerHumanoid = killerAdornee and killerAdornee:IsA("Humanoid") and killerAdornee or nil,
+		killerPlayer = killerAdornee and CharacterUtils.getPlayerFromCharacter(killerAdornee) or nil,
+		weaponData = weaponData or DeathReportUtils.createWeaponData(nil),
 	}
 end
 
@@ -54,8 +54,7 @@ end
 	@return boolean
 ]=]
 function DeathReportUtils.isDeathReport(deathReport)
-	return type(deathReport) == "table"
-		and deathReport.type == "deathReport"
+	return type(deathReport) == "table" and deathReport.type == "deathReport"
 end
 
 --[=[
@@ -64,8 +63,9 @@ end
 	@param weaponData any
 	@return boolean
 ]=]
-function DeathReportUtils.isWeaponData(weaponData)
-	return type(weaponData) == "table" and (typeof(weaponData.weaponInstance) == "Instance" or weaponData.weaponInstance == nil)
+function DeathReportUtils.isWeaponData(weaponData): boolean
+	return type(weaponData) == "table"
+		and (typeof(weaponData.weaponInstance) == "Instance" or weaponData.weaponInstance == nil)
 end
 
 --[=[
@@ -78,7 +78,7 @@ function DeathReportUtils.createWeaponData(weaponInstance)
 	assert(typeof(weaponInstance) == "Instance" or weaponInstance == nil, "Bad weaponInstance")
 
 	return {
-		weaponInstance = weaponInstance;
+		weaponInstance = weaponInstance,
 	}
 end
 

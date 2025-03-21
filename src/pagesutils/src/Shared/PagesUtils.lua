@@ -16,8 +16,8 @@ local PagesUtils = {}
 	@param pages Pages
 	@return { any }
 ]=]
-function PagesUtils.promiseAdvanceToNextPage(pages)
-	assert(typeof(pages) == "Instance" and pages:IsA("Pages") or PagesProxy.isPagesProxy(pages),"Bad pages")
+function PagesUtils.promiseAdvanceToNextPage(pages: Pages)
+	assert(typeof(pages) == "Instance" and pages:IsA("Pages") or PagesProxy.isPagesProxy(pages), "Bad pages")
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()

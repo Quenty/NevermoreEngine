@@ -2,4 +2,4 @@
 # For more information, see https://github.com/LPGhatguy/aftman
 [tools]
 rojo = "quenty/rojo@7.4.3-quenty-npm-canary.2"
-selene = "Kampfkarren/selene@0.27.1"
+selene = "Kampfkarren/selene@0.28.0"

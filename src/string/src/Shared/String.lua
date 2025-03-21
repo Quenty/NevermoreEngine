@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	This module provides utility functions for strings
 	@class String
@@ -13,13 +14,13 @@ local String = {}
 	@return string
 ]=]
 function String.trim(str: string, pattern: string?): string
-	if not pattern then
-		return str:match("^%s*(.-)%s*$")
+	if pattern == nil then
+		return string.match(str, "^%s*(.-)%s*$") :: string
 	else
 		-- When we find the first non space character defined by ^%s
 		-- we yank out anything in between that and the end of the string
 		-- Everything else is replaced with %1 which is essentially nothing
-		return str:match("^"..pattern.."*(.-)"..pattern.."*$")
+		return string.match(str, "^" .. pattern .. "*(.-)" .. pattern .. "*$")
 	end
 end
 
@@ -76,8 +77,8 @@ end
 	@return string
 ]=]
 function String.trimFront(str: string, pattern: string?): string
-	pattern = pattern or "%s";
-	return (string.gsub(str, "^"..pattern.."*(.-)"..pattern.."*", "%1"))
+	local strPattern = pattern or "%s"
+	return (string.gsub(str, "^" .. strPattern .. "*(.-)" .. strPattern .. "*", "%1"))
 end
 
 --[=[
@@ -125,13 +126,14 @@ end
 ]=]
 function String.elipseLimit(str: string, characterLimit: number): string
 	if #str > characterLimit then
-		str = string.sub(str, 1, characterLimit-3).."..."
+		str = string.sub(str, 1, characterLimit - 3) .. "..."
 	end
 	return str
 end
 
 --[=[
 	Removes a prefix from a string if it exists
+
 	@param str string
 	@param prefix string
 	@return string
@@ -146,13 +148,14 @@ end
 
 --[=[
 	Removes a postfix from a string if it exists
+
 	@param str string
 	@param postfix string
 	@return string
 ]=]
 function String.removePostfix(str: string, postfix: string): string
 	if string.sub(str, -#postfix) == postfix then
-		return string.sub(str, 1, -#(postfix) - 1)
+		return string.sub(str, 1, -#postfix - 1)
 	else
 		return str
 	end
@@ -160,6 +163,7 @@ end
 
 --[=[
 	Returns if a string ends with a postfix
+
 	@param str string
 	@param postfix string
 	@return boolean
@@ -170,6 +174,7 @@ end
 
 --[=[
 	Returns if a string starts with a postfix
+
 	@param str string
 	@param prefix string
 	@return boolean
@@ -180,23 +185,29 @@ end
 
 --[=[
 	Adds commas to a number. Not culture aware.
+
+	See [NumberLocalizationUtils.abbreviate] for a culture aware version.
+
 	@param number string | number
 	@param seperator string?
 	@return string
 ]=]
 function String.addCommas(number: string | number, seperator: string): string
+	local strNumber
 	if type(number) == "number" then
-		number = tostring(number)
+		strNumber = tostring(number)
+	else
+		strNumber = number
 	end
 	seperator = seperator or ","
 
 	local index = -1
 
 	while index ~= 0 do
-		number, index = string.gsub(number, "^(-?%d+)(%d%d%d)", "%1" .. seperator .. "%2")
+		strNumber, index = string.gsub(strNumber, "^(-?%d+)(%d%d%d)", "%1" .. seperator .. "%2")
 	end
 
-	return number
+	return strNumber
 end
 
 return String
