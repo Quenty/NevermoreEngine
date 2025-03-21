@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[99930],{34722:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SettingsCmdrService","desc":"","source":{"line":4,"path":"src/settings/src/Server/Cmdr/SettingsCmdrService.lua"}}')}}]);

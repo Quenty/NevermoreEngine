@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[16328],{41428:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SettingsService","desc":"","source":{"line":4,"path":"src/settings/src/Server/SettingsService.lua"}}')}}]);

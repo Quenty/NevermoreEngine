@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[99930],{34722:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SettingsCmdrService","desc":"Provides commands involving player settings","source":{"line":6,"path":"src/settings/src/Server/Cmdr/SettingsCmdrService.lua"}}')}}]);
