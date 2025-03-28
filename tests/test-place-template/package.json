@@ -1,0 +1,21 @@
+{
+  "name": "unittest",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@quenty/binder": "^14.18.1",
+    "@quenty/clienttranslator": "^14.18.1",
+    "@quenty/cmdrservice": "^13.21.3",
+    "@quenty/loader": "^10.8.0",
+    "@quenty/servicebag": "^11.11.1"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
