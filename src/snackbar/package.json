@@ -29,7 +29,7 @@
     "@quenty/basicpane": "file:../basicpane",
     "@quenty/blend": "file:../blend",
     "@quenty/buttondragmodel": "file:../buttondragmodel",
-    "@quenty/buttonhighlightmodel": "file:../ButtonHighlightModel",
+    "@quenty/buttonhighlightmodel": "file:../buttonhighlightmodel",
     "@quenty/ducktype": "file:../ducktype",
     "@quenty/genericscreenguiprovider": "file:../genericscreenguiprovider",
     "@quenty/inputobjectutils": "file:../inputobjectutils",
