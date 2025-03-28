@@ -2,10 +2,10 @@ name: run-tests
 on: [pull_request]
 jobs:
   run-tests:
+    # TODO: add condition to only run on our PRs, similar to lint and lint-external-prs workflows
     # if: "github.event.pull_request.head.repo.fork"
     runs-on: ubuntu-latest
     steps:
-      # setup environment
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -13,43 +13,10 @@ jobs:
 
       - name: Setup node
         uses: actions/setup-node@v2
-        # env:
-        #   NPM_TOKEN: '' # https://github.com/JS-DevTools/npm-publish/issues/15
         with:
-          cache-dependency-path: package.json # we don't have a package-lock.json so we'll use this instead...
+          cache-dependency-path: package.json
           node-version: "18"
 
-      - name: Get changed packages
-        id: changed-packages
-        run: |
-          # get all changed files since last commit
-          CHANGED_FILES=$(git diff --name-only HEAD^1 || git status --porcelain | awk '{print $2}')
-
-          # if empty, try getting staged changes
-          if [ -z "$CHANGED_FILES" ]; then
-            CHANGED_FILES=$(git diff --staged --name-only)
-          fi
-
-          # if still empty, get all tracked files that changed
-          if [ -z "$CHANGED_FILES" ]; then
-            CHANGED_FILES=$(git status -s | awk '{print $2}')
-          fi
-
-          # generate relative paths to modified packages
-          PACKAGES=$(echo "$CHANGED_FILES" | while read file; do
-            dirname "$file" | sed -E 's/src\/([^/]+).*/\1/'
-          done | sort | uniq | while read dir; do
-            if [ -f "src/$dir/package.json" ]; then
-              echo "../../src/$dir"
-            fi
-          done | tr '\n' ' ')
-
-          echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
-          echo "Detected changed packages: $PACKAGES"
-
-      # TODO: remove me on prod, this is only needed because my docker
-      # container doesn't include gh, a dependency for the aftman action
-      # https://github.com/cli/cli/blob/trunk/docs/install_linux.md
       - name: Add GitHub CLI repository
         run: |
           (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
@@ -58,12 +25,8 @@ jobs:
           && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
           && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
           && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-
-      # TODO: remove on prod
-      - name: Install GitHub CLI
-        run: |
-          sudo apt update
-          sudo apt install gh -y
+          && sudo apt update \
+          && sudo apt install gh -y
 
       - name: Setup npm for GitHub Packages
         run: |
@@ -71,35 +34,35 @@ jobs:
           echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
           echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
           echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # generate new place file
+      - name: Install package dependencies
+        run: |
+          echo "Installing package dependencies..."
+          npx lerna exec -- npm install --no-audit
+
+      - name: Get changed packages
+        id: changed-packages
+        run: |
+          PACKAGES=$(npx lerna ls --since main --json | jq -r '.[].location' | tr '\n' ' ')
+
+          echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
+          echo "Detected changed packages: $PACKAGES"
+
       - name: Setup test place project
         run: |
-          echo "Generating project files for test place..."
-          mkdir -p tests/bin
+          echo "Setting up test place project from template..."
+          cp -r tests/test-place-template tests/bin
           cd tests/bin
-          npx @quenty/nevermore-cli init unit-test
+          npm i
 
-          # TODO: remove on prod
-          echo "[DEV] Installing Jest"
-          # npm i ../../src/jest
+          echo "Installing Jest"
           npm i https://github.com/quentystudios/jest-lua.git
-
-          rm default.project.json
-          cp ../unit-test.project.json ./default.project.json
-          cp ../jest.config.lua ./jest.config.lua
 
           echo "Installing packages: $PACKAGES"
           npm install $PACKAGES
-
-      # - name: Install package dependencies
-      #   run: |
-      #     echo "Installing package dependencies..."
-      #     npx lerna exec -- npm install --no-audit
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
