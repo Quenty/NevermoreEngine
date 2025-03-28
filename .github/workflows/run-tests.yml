@@ -46,7 +46,7 @@ jobs:
       - name: Get changed packages
         id: changed-packages
         run: |
-          PACKAGES=$(npx lerna ls --since main --json | jq -r '.[].location' | tr '\n' ' ')
+          PACKAGES=$(npx lerna ls --since origin/main --json | jq -r '.[].location' | tr '\n' ' ')
 
           echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
           echo "Detected changed packages: $PACKAGES"
