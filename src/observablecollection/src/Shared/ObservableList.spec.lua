@@ -4,127 +4,130 @@
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
+local Jest = require("Jest")
 local ObservableList = require("ObservableList")
 
-return function()
-	describe("ObservableList.new()", function()
-		local observableList = ObservableList.new()
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
 
-		it("should return nil for unset values", function()
-			expect(observableList:Get(1)).to.equal(nil)
-		end)
+describe("ObservableList.new()", function()
+	local observableList = ObservableList.new()
 
-		it("should allow inserting an value", function()
-			expect(observableList:GetCount()).to.equal(0)
-
-			observableList:Add("a")
-
-			expect(observableList:Get(1)).to.equal("a")
-			expect(observableList:GetCount()).to.equal(1)
-		end)
-
-		it("should allow negative queries", function()
-			expect(observableList:Get(-1)).to.equal("a")
-			expect(observableList:Get(-2)).to.equal(nil)
-		end)
-
-		it("should allow false as a value", function()
-			expect(observableList:Get(2)).to.equal(nil)
-			observableList:Add(false)
-			expect(observableList:Get(2)).to.equal(false)
-		end)
-
-		it("should allow negative queries after false", function()
-			expect(observableList:Get(1)).to.equal("a")
-			expect(observableList:Get(2)).to.equal(false)
-
-			expect(observableList:Get(-1)).to.equal(false)
-			expect(observableList:Get(-2)).to.equal("a")
-		end)
-
-		it("should fire off events for a specific key", function()
-			local seen = {}
-			local sub = observableList:ObserveIndex(1):Subscribe(function(value)
-				table.insert(seen, value)
-			end)
-			observableList:InsertAt("c", 1)
-
-			sub:Destroy()
-
-			expect(#seen).to.equal(2)
-			expect(seen[1]).to.equal(1)
-			expect(seen[2]).to.equal(2)
-		end)
-
-		it("should fire off events for all keys", function()
-			local seen = {}
-			local sub = observableList:ObserveItemsBrio():Subscribe(function(value)
-				table.insert(seen, value)
-			end)
-			observableList:Add("a")
-
-			expect(#seen).to.equal(4)
-			expect(seen[4]:GetValue()).to.equal("a")
-			expect(seen[4]:IsDead()).to.equal(false)
-
-			sub:Destroy()
-
-			expect(#seen).to.equal(4)
-			expect(seen[4]:IsDead()).to.equal(true)
-		end)
-
-		it("it should be able to observe a specific key", function()
-			local seen = {}
-			local sub = observableList:ObserveAtIndex(1):Subscribe(function(value)
-				table.insert(seen, value)
-			end)
-
-			local originalList = observableList:GetList()
-			expect(originalList[1]).to.equal("c")
-
-			observableList:InsertAt("dragon", 1)
-
-			sub:Destroy()
-
-			expect(#seen).to.equal(2)
-			expect(seen[1]).to.equal("c")
-			expect(seen[2]).to.equal("dragon")
-		end)
-
-		it("it should be able to observe a specific negative key", function()
-			local seen = {}
-			local sub = observableList:ObserveAtIndex(-1):Subscribe(function(value)
-				table.insert(seen, value)
-			end)
-
-			local originalList = observableList:GetList()
-			expect(originalList[#originalList]).to.equal("a")
-
-			observableList:Add("fire")
-
-			sub:Destroy()
-
-			expect(#seen).to.equal(2)
-			expect(seen[1]).to.equal("a")
-			expect(seen[2]).to.equal("fire")
-		end)
-
-		it("should fire off events on removal", function()
-			local seen = {}
-			local sub = observableList:ObserveIndex(2):Subscribe(function(value)
-				table.insert(seen, value)
-			end)
-			observableList:RemoveAt(1)
-
-			sub:Destroy()
-
-			expect(#seen).to.equal(2)
-			expect(seen[1]).to.equal(2)
-			expect(seen[2]).to.equal(1)
-		end)
-
-		it("should clean up", function()
-			observableList:Destroy()
-		end)
+	it("should return nil for unset values", function()
+		expect(observableList:Get(1)).toEqual(nil)
 	end)
-end
+
+	it("should allow inserting an value", function()
+		expect(observableList:GetCount()).toEqual(0)
+
+		observableList:Add("a")
+
+		expect(observableList:Get(1)).toEqual("a")
+		expect(observableList:GetCount()).toEqual(1)
+	end)
+
+	it("should allow negative queries", function()
+		expect(observableList:Get(-1)).toEqual("a")
+		expect(observableList:Get(-2)).toEqual(nil)
+	end)
+
+	it("should allow false as a value", function()
+		expect(observableList:Get(2)).toEqual(nil)
+		observableList:Add(false)
+		expect(observableList:Get(2)).toEqual(false)
+	end)
+
+	it("should allow negative queries after false", function()
+		expect(observableList:Get(1)).toEqual("a")
+		expect(observableList:Get(2)).toEqual(false)
+
+		expect(observableList:Get(-1)).toEqual(false)
+		expect(observableList:Get(-2)).toEqual("a")
+	end)
+
+	it("should fire off events for a specific key", function()
+		local seen = {}
+		local sub = observableList:ObserveIndex(1):Subscribe(function(value)
+			table.insert(seen, value)
+		end)
+		observableList:InsertAt("c", 1)
+
+		sub:Destroy()
+
+		expect(#seen).toEqual(2)
+		expect(seen[1]).toEqual(1)
+		expect(seen[2]).toEqual(2)
+	end)
+
+	it("should fire off events for all keys", function()
+		local seen = {}
+		local sub = observableList:ObserveItemsBrio():Subscribe(function(value)
+			table.insert(seen, value)
+		end)
+		observableList:Add("a")
+
+		expect(#seen).toEqual(4)
+		expect(seen[4]:GetValue()).toEqual("a")
+		expect(seen[4]:IsDead()).toEqual(false)
+
+		sub:Destroy()
+
+		expect(#seen).toEqual(4)
+		expect(seen[4]:IsDead()).toEqual(true)
+	end)
+
+	it("it should be able to observe a specific key", function()
+		local seen = {}
+		local sub = observableList:ObserveAtIndex(1):Subscribe(function(value)
+			table.insert(seen, value)
+		end)
+
+		local originalList = observableList:GetList()
+		expect(originalList[1]).toEqual("c")
+
+		observableList:InsertAt("dragon", 1)
+
+		sub:Destroy()
+
+		expect(#seen).toEqual(2)
+		expect(seen[1]).toEqual("c")
+		expect(seen[2]).toEqual("dragon")
+	end)
+
+	it("it should be able to observe a specific negative key", function()
+		local seen = {}
+		local sub = observableList:ObserveAtIndex(-1):Subscribe(function(value)
+			table.insert(seen, value)
+		end)
+
+		local originalList = observableList:GetList()
+		expect(originalList[#originalList]).toEqual("a")
+
+		observableList:Add("fire")
+
+		sub:Destroy()
+
+		expect(#seen).toEqual(2)
+		expect(seen[1]).toEqual("a")
+		expect(seen[2]).toEqual("fire")
+	end)
+
+	it("should fire off events on removal", function()
+		local seen = {}
+		local sub = observableList:ObserveIndex(2):Subscribe(function(value)
+			table.insert(seen, value)
+		end)
+		observableList:RemoveAt(1)
+
+		sub:Destroy()
+
+		expect(#seen).toEqual(2)
+		expect(seen[1]).toEqual(2)
+		expect(seen[2]).toEqual(1)
+	end)
+
+	it("should clean up", function()
+		observableList:Destroy()
+	end)
+end)
