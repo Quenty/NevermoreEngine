@@ -1,9 +1,7 @@
 name: run-tests
-on: [pull_request]
+on: [push]
 jobs:
   run-tests:
-    # TODO: add condition to only run on our PRs, similar to lint and lint-external-prs workflows
-    # if: "github.event.pull_request.head.repo.fork"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
