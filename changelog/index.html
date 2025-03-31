@@ -4,12 +4,27 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.7.0">
 <title data-rh="true">(Fri Mar 21 2025) | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/changelog"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="(Fri Mar 21 2025) | Nevermore"><meta data-rh="true" name="description" content="🐛 Bug Fix"><meta data-rh="true" property="og:description" content="🐛 Bug Fix"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/changelog"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/changelog" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/changelog" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.5bcef375.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.8efa17d3.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.950d333c.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.d3dacaa2.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.72d64b0e.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();null!==e?t(e):window.matchMedia("(prefers-color-scheme: dark)").matches?t("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,t("light"))}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/NevermoreEngine/"><b class="navbar__title text--truncate">Nevermore</b></a><a class="navbar__item navbar__link" href="/NevermoreEngine/docs/intro">Docs</a><a class="navbar__item navbar__link" href="/NevermoreEngine/api/">API</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/NevermoreEngine/changelog">Changelog</a></div><div class="navbar__items navbar__items--right"><a href="https://discord.gg/mhtGUS8" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><a href="https://github.com/Quenty/NevermoreEngine" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div class="navbar__search"><span aria-label="expand searchbar" role="button" class="search-icon" tabindex="0"></span><input id="search_input_react" type="search" placeholder="Loading..." aria-label="Search" class="navbar__search-input search-bar" disabled=""></div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0"><main class="container container--fluid margin-vert--lg"><div class="row mdxPageWrapper_j9I6"><div class="col col--8"><article><header><h1>(Fri Mar 21 2025)</h1></header>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix">🐛 Bug Fix<a href="#-bug-fix" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<ul>
+<li><code>@quenty/ragdoll@15.22.2</code>
+<ul>
+<li>fix: Fix ragdolls showing issues on other people&#x27;s characters <a href="https://github.com/Quenty/NevermoreEngine/pull/523" target="_blank" rel="noopener noreferrer">#523</a> (<a href="https://github.com/imagerymartin" target="_blank" rel="noopener noreferrer">@imagerymartin</a> <a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
+</ul>
+</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2">Authors: 2<a href="#authors-2" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<ul>
+<li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
+<li>Martin (<a href="https://github.com/imagerymartin" target="_blank" rel="noopener noreferrer">@imagerymartin</a>)</li>
+</ul>
+<hr>
+<h1>(Fri Mar 21 2025)</h1>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-1">🐛 Bug Fix<a href="#-bug-fix-1" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>docs: Update readme.md, and ensure stability by sorting by name <a href="https://github.com/Quenty/NevermoreEngine/pull/541" target="_blank" rel="noopener noreferrer">#541</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li><code>@quenty/adorneeboundingbox@8.19.3</code>, <code>@quenty/adorneedata@7.17.1</code>, <code>@quenty/adorneeutils@3.3.1</code>, <code>@quenty/cframeutils@5.5.1</code>, <code>@quenty/characterutils@12.17.1</code>, <code>@quenty/chatproviderservice@9.24.4</code>, <code>@quenty/color3utils@11.17.1</code>, <code>@quenty/datastore@13.19.2</code>, <code>@quenty/deathreport@10.20.1</code>, <code>@quenty/draw@7.8.1</code>, <code>@quenty/ducktype@5.8.1</code>, <code>@quenty/friendutils@12.16.1</code>, <code>@quenty/gameproductservice@14.23.3</code>, <code>@quenty/hintscoringutils@14.19.1</code>, <code>@quenty/humanoidkillerutils@2.3.1</code>, <code>@quenty/humanoidspeed@12.22.4</code>, <code>@quenty/humanoidtracker@13.16.1</code>, <code>@quenty/humanoidutils@2.2.1</code>, <code>@quenty/ik@15.23.1</code>, <code>@quenty/instanceutils@13.16.1</code>, <code>@quenty/math@2.7.1</code>, <code>@quenty/memorystoreutils@6.10.1</code>, <code>@quenty/meshutils@2.3.1</code>, <code>@quenty/messagingserviceutils@7.10.1</code>, <code>@quenty/metricutils@2.4.1</code>, <code>@quenty/modeltransparencyeffect@11.8.1</code>, <code>@quenty/networkownerservice@5.2.1</code>, <code>@quenty/networkownerutils@3.2.1</code>, <code>@quenty/nocollisionconstraintutils@10.8.1</code>, <code>@quenty/numberrangeutils@3.1.1</code>, <code>@quenty/numbersequenceutils@8.9.1</code>, <code>@quenty/numbertoinputkeyutils@2.3.1</code>, <code>@quenty/pagesutils@5.11.1</code>, <code>@quenty/particles@5.9.1</code>, <code>@quenty/pathfindingutils@10.10.1</code>, <code>@quenty/permissionprovider@14.18.1</code>, <code>@quenty/physicsutils@8.16.1</code>, <code>@quenty/playerthumbnailutils@10.10.1</code>, <code>@quenty/playerutils@8.16.1</code>, <code>@quenty/polynomialutils@2.2.1</code>, <code>@quenty/probability@2.3.1</code>, <code>@quenty/propertyvalue@7.16.1</code>, <code>@quenty/qframe@10.10.1</code>, <code>@quenty/r15utils@13.16.1</code>, <code>@quenty/ragdoll@15.22.1</code>, <code>@quenty/randomutils@6.9.1</code>, <code>@quenty/receiptprocessing@7.17.1</code>, <code>@quenty/rogue-properties@11.21.4</code>, <code>@quenty/rx@13.16.1</code>, <code>@quenty/seatutils@7.18.1</code>, <code>@quenty/selectionutils@8.16.1</code>, <code>@quenty/servicebag@11.11.1</code>, <code>@quenty/settings@11.22.4</code>, <code>@quenty/socialserviceutils@10.10.1</code>, <code>@quenty/steputils@3.5.3</code>, <code>@quenty/streamingutils@10.10.1</code>, <code>@quenty/string@3.3.1</code>, <code>@quenty/table@3.7.1</code>, <code>@quenty/teamtracker@13.16.1</code>, <code>@quenty/teleportserviceutils@9.16.1</code>, <code>@quenty/terrainutils@10.9.1</code>, <code>@quenty/textboxutils@7.16.1</code>, <code>@quenty/textfilterutils@10.10.1</code>, <code>@quenty/tie@10.19.1</code>, <code>@quenty/toolutils@1.2.1</code>, <code>@quenty/touchingpartutils@2.2.1</code>, <code>@quenty/trajectory@2.7.1</code>, <code>@quenty/ugcsanitize@1.3.1</code>, <code>@quenty/uiobjectutils@6.15.1</code>, <code>@quenty/utf8@2.3.1</code>, <code>@quenty/vector3int16utils@2.2.1</code>, <code>@quenty/vector3utils@10.8.1</code>, <code>@quenty/voicechat@5.10.1</code>, <code>@quenty/weldconstraintutils@3.1.1</code>, <code>@quenty/nevermore-cli@4.5.2</code>
@@ -24,7 +39,7 @@
 </ul>
 <hr>
 <h1>(Thu Mar 20 2025)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-1">🐛 Bug Fix<a href="#-bug-fix-1" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-2">🐛 Bug Fix<a href="#-bug-fix-2" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/datastore@13.19.1</code>
 <ul>
@@ -38,7 +53,7 @@
 </ul>
 <hr>
 <h1>(Thu Mar 13 2025)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-2">🐛 Bug Fix<a href="#-bug-fix-2" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-3">🐛 Bug Fix<a href="#-bug-fix-3" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/observablecollection@12.19.2</code>, <code>@quenty/nevermore-cli@4.5.1</code>
 <ul>
@@ -54,7 +69,7 @@
 <h1>(Wed Mar 12 2025)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, null<a href="https://github.com/Daimywil" target="_blank" rel="noopener noreferrer">@Daimywil</a>, for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-3">🐛 Bug Fix<a href="#-bug-fix-3" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-4">🐛 Bug Fix<a href="#-bug-fix-4" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/viewport@11.20.1</code>
 <ul>
@@ -68,7 +83,7 @@
 </ul>
 <hr>
 <h1>(Wed Mar 12 2025)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-4">🐛 Bug Fix<a href="#-bug-fix-4" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-5">🐛 Bug Fix<a href="#-bug-fix-5" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/rogue-properties@11.21.2</code>
 <ul>
@@ -82,7 +97,7 @@
 </ul>
 <hr>
 <h1>(Sun Mar 09 2025)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-5">🐛 Bug Fix<a href="#-bug-fix-5" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-6">🐛 Bug Fix<a href="#-bug-fix-6" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/observablecollection@12.19.1</code>
 <ul>
@@ -106,7 +121,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-6">🐛 Bug Fix<a href="#-bug-fix-6" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-7">🐛 Bug Fix<a href="#-bug-fix-7" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/rx@13.16.0</code>
 <ul>
@@ -114,7 +129,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2">Authors: 2<a href="#authors-2" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-1">Authors: 2<a href="#authors-2-1" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Tanay Maganti (<a href="https://github.com/darealzz" target="_blank" rel="noopener noreferrer">@darealzz</a>)</li>
@@ -135,7 +150,7 @@
 </ul>
 <hr>
 <h1>(Wed Jan 22 2025)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-7">🐛 Bug Fix<a href="#-bug-fix-7" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-8">🐛 Bug Fix<a href="#-bug-fix-8" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/buttonhighlightmodel@14.16.1</code>, <code>@quenty/camera@14.18.2</code>, <code>@quenty/chatproviderservice@9.23.1</code>, <code>@quenty/colorpalette@10.19.1</code>, <code>@quenty/flipbook@9.15.1</code>, <code>@quenty/gameproductservice@14.22.1</code>, <code>@quenty/guivisiblemanager@12.7.2</code>, <code>@quenty/idleservice@13.20.2</code>, <code>@quenty/ik@15.21.2</code>, <code>@quenty/influxdbclient@7.17.1</code>, <code>@quenty/inputkeymaputils@14.21.1</code>, <code>@quenty/observablecollection@12.18.1</code>, <code>@quenty/overriddenproperty@10.8.2</code>, <code>@quenty/playerhumanoidbinder@14.17.1</code>, <code>@quenty/playerinputmode@9.17.1</code>, <code>@quenty/racketingropeconstraint@12.18.1</code>, <code>@quenty/ragdoll@15.20.2</code>, <code>@quenty/screenshothudservice@7.16.1</code>, <code>@quenty/softshutdown@9.20.1</code>, <code>@quenty/tie@10.18.1</code>
 <ul>
@@ -149,7 +164,7 @@
 </ul>
 <hr>
 <h1>(Tue Jan 21 2025)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-8">🐛 Bug Fix<a href="#-bug-fix-8" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-9">🐛 Bug Fix<a href="#-bug-fix-9" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/camera@14.18.1</code>
 <ul>
@@ -163,7 +178,7 @@
 </ul>
 <hr>
 <h1>(Tue Jan 21 2025)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-9">🐛 Bug Fix<a href="#-bug-fix-9" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-10">🐛 Bug Fix<a href="#-bug-fix-10" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/scoredactionservice@16.22.1</code>
 <ul>
@@ -177,7 +192,7 @@
 </ul>
 <hr>
 <h1>(Mon Jan 20 2025)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-10">🐛 Bug Fix<a href="#-bug-fix-10" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-11">🐛 Bug Fix<a href="#-bug-fix-11" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/modelappearance@10.7.2</code>
 <ul>
@@ -218,7 +233,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-1">Authors: 2<a href="#authors-2-1" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-2">Authors: 2<a href="#authors-2-2" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
@@ -323,7 +338,7 @@
 </ul>
 <hr>
 <h1>(Mon Nov 04 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-11">🐛 Bug Fix<a href="#-bug-fix-11" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-12">🐛 Bug Fix<a href="#-bug-fix-12" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/cmdrservice@13.13.2</code>, <code>@quenty/loader@10.7.1</code>, <code>@quenty/quaternion@2.5.1</code>, <code>@quenty/servicebag@11.9.1</code>, <code>@quenty/signal@7.8.1</code>
 <ul>
@@ -337,7 +352,7 @@
 </ul>
 <hr>
 <h1>(Mon Nov 04 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-12">🐛 Bug Fix<a href="#-bug-fix-12" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-13">🐛 Bug Fix<a href="#-bug-fix-13" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/actionmanager@13.11.1</code>, <code>@quenty/adorneedata@7.12.1</code>, <code>@quenty/datastore@13.13.1</code>, <code>@quenty/settings@11.14.1</code>, <code>@quenty/templateprovider@11.9.1</code>
 <ul>
@@ -365,7 +380,7 @@
 </ul>
 <hr>
 <h1>(Sat Nov 02 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-13">🐛 Bug Fix<a href="#-bug-fix-13" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-14">🐛 Bug Fix<a href="#-bug-fix-14" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/tie@10.12.1</code>
 <ul>
@@ -387,7 +402,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-14">🐛 Bug Fix<a href="#-bug-fix-14" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-15">🐛 Bug Fix<a href="#-bug-fix-15" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>docs: Update docs for latest loader &amp; improve sections <a href="https://github.com/Quenty/NevermoreEngine/pull/510" target="_blank" rel="noopener noreferrer">#510</a> (<a href="https://github.com/unrooot" target="_blank" rel="noopener noreferrer">@unrooot</a>)</li>
 <li><code>@quenty/valueobject@13.10.0</code>
@@ -396,14 +411,14 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-2">Authors: 2<a href="#authors-2-2" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-3">Authors: 2<a href="#authors-2-3" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/unrooot" target="_blank" rel="noopener noreferrer">@unrooot</a></li>
 <li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
 </ul>
 <hr>
 <h1>(Wed Oct 09 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-15">🐛 Bug Fix<a href="#-bug-fix-15" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-16">🐛 Bug Fix<a href="#-bug-fix-16" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>docs: add links in design.md <a href="https://github.com/Quenty/NevermoreEngine/pull/504" target="_blank" rel="noopener noreferrer">#504</a> (<a href="https://github.com/anscg" target="_blank" rel="noopener noreferrer">@anscg</a>)</li>
 <li><code>@quenty/qgui@2.3.1</code>, <code>@quenty/ragdoll@15.12.1</code>, <code>@quenty/steputils@3.5.2</code>
@@ -412,7 +427,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-3">Authors: 2<a href="#authors-2-3" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-4">Authors: 2<a href="#authors-2-4" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>Anson Chung (<a href="https://github.com/anscg" target="_blank" rel="noopener noreferrer">@anscg</a>)</li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -433,7 +448,7 @@
 </ul>
 <hr>
 <h1>(Fri Oct 04 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-16">🐛 Bug Fix<a href="#-bug-fix-16" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-17">🐛 Bug Fix<a href="#-bug-fix-17" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/settings@11.11.2</code>
 <ul>
@@ -447,7 +462,7 @@
 </ul>
 <hr>
 <h1>(Fri Oct 04 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-17">🐛 Bug Fix<a href="#-bug-fix-17" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-18">🐛 Bug Fix<a href="#-bug-fix-18" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/steputils@3.5.1</code>
 <ul>
@@ -477,7 +492,7 @@
 <h1>(Wed Sep 25 2024)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, Loek Gerrits (<a href="https://github.com/LDGerrits" target="_blank" rel="noopener noreferrer">@LDGerrits</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-18">🐛 Bug Fix<a href="#-bug-fix-18" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-19">🐛 Bug Fix<a href="#-bug-fix-19" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/snackbar@11.9.1</code>
 <ul>
@@ -513,7 +528,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-19">🐛 Bug Fix<a href="#-bug-fix-19" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-20">🐛 Bug Fix<a href="#-bug-fix-20" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/actionmanager@13.6.0</code>, <code>@quenty/adorneevalue@10.6.0</code>, <code>@quenty/animationgroup@10.5.0</code>, <code>@quenty/binder@14.7.0</code>, <code>@quenty/blend@12.6.0</code>, <code>@quenty/boundlinkutils@14.7.0</code>, <code>@quenty/brio@14.6.0</code>, <code>@quenty/camera@14.8.0</code>, <code>@quenty/clienttranslator@14.7.0</code>, <code>@quenty/cmdrservice@13.8.0</code>, <code>@quenty/colorpalette@10.7.0</code>, <code>@quenty/conditions@10.8.0</code>, <code>@quenty/datastore@13.8.0</code>, <code>@quenty/ellipticcurvecryptography@1.5.0</code>, <code>@quenty/enumutils@3.3.0</code>, <code>@quenty/fzy@5.5.0</code>, <code>@quenty/gameconfig@12.10.0</code>, <code>@quenty/gameproductservice@14.10.0</code>, <code>@quenty/gameversionutils@3.4.0</code>, <code>@quenty/generatewithmixin@11.5.0</code>, <code>@quenty/genericscreenguiprovider@13.8.0</code>, <code>@quenty/hintscoringutils@14.8.0</code>, <code>@quenty/httppromise@10.5.0</code>, <code>@quenty/humanoiddescriptionutils@10.5.0</code>, <code>@quenty/ik@15.10.0</code>, <code>@quenty/inputkeymaputils@14.9.0</code>, <code>@quenty/inputmode@13.7.0</code>, <code>@quenty/kinematics@2.3.0</code>, <code>@quenty/linkutils@13.6.0</code>, <code>@quenty/lipsum@14.6.0</code>, <code>@quenty/loader@10.5.0</code>, <code>@quenty/markdownrender@2.3.0</code>, <code>@quenty/memorystoreutils@6.5.0</code>, <code>@quenty/meshutils@2.3.0</code>, <code>@quenty/messagingserviceutils@7.5.0</code>, <code>@quenty/motor6d@7.8.0</code>, <code>@quenty/observablecollection@12.6.0</code>, <code>@quenty/permissionprovider@14.8.0</code>, <code>@quenty/playerinputmode@9.8.0</code>, <code>@quenty/playerutils@8.6.0</code>, <code>@quenty/preferredparentutils@4.3.0</code>, <code>@quenty/pseudolocalize@3.4.0</code>, <code>@quenty/quaternion@2.5.0</code>, <code>@quenty/ragdoll@15.9.0</code>, <code>@quenty/raycaster@3.4.0</code>, <code>@quenty/rbxasset@5.5.0</code>, <code>@quenty/resetservice@11.8.0</code>, <code>@quenty/roblox-api-dump@8.5.0</code>, <code>@quenty/rodux-actions@9.5.0</code>, <code>@quenty/rogue-properties@11.8.0</code>, <code>@quenty/rotatinglabel@11.5.0</code>, <code>@quenty/rx@13.6.0</code>, <code>@quenty/safedestroy@1.4.0</code>, <code>@quenty/scrollingframe@12.5.0</code>, <code>@quenty/settings-inputkeymap@10.11.0</code>, <code>@quenty/settings@11.9.0</code>, <code>@quenty/signal@7.5.0</code>, <code>@quenty/sounds@10.5.0</code>, <code>@quenty/steputils@3.5.0</code>, <code>@quenty/string@3.3.0</code>, <code>@quenty/templateprovider@11.5.0</code>, <code>@quenty/textfilterservice@13.7.0</code>, <code>@quenty/throttle@10.6.0</code>, <code>@quenty/tie@10.8.0</code>, <code>@quenty/time@2.4.0</code>, <code>@quenty/transparencyservice@11.5.0</code>, <code>@quenty/utf8@2.3.0</code>, <code>@quenty/valuebaseutils@13.6.0</code>
 <ul>
@@ -521,14 +536,14 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-4">Authors: 2<a href="#authors-2-4" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-5">Authors: 2<a href="#authors-2-5" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/unrooot" target="_blank" rel="noopener noreferrer">@unrooot</a></li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 </ul>
 <hr>
 <h1>(Sun Sep 22 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-20">🐛 Bug Fix<a href="#-bug-fix-20" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-21">🐛 Bug Fix<a href="#-bug-fix-21" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/animations@8.5.1</code>, <code>@quenty/blend@12.5.2</code>, <code>@quenty/radial-image@9.5.2</code>, <code>@quenty/rogue-properties@11.7.2</code>, <code>@quenty/spring@10.4.1</code>
 <ul>
@@ -542,7 +557,7 @@
 </ul>
 <hr>
 <h1>(Fri Sep 20 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-21">🐛 Bug Fix<a href="#-bug-fix-21" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-22">🐛 Bug Fix<a href="#-bug-fix-22" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/blend@12.5.1</code>, <code>@quenty/servicebag@11.5.1</code>, <code>@quenty/uiobjectutils@6.4.1</code>, <code>@quenty/nevermore-cli@4.4.1</code>
 <ul>
@@ -584,7 +599,7 @@
 </ul>
 <hr>
 <h1>(Mon Sep 02 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-22">🐛 Bug Fix<a href="#-bug-fix-22" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-23">🐛 Bug Fix<a href="#-bug-fix-23" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/nevermore-cli@4.3.2</code>
 <ul>
@@ -598,7 +613,7 @@
 </ul>
 <hr>
 <h1>(Tue Aug 27 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-23">🐛 Bug Fix<a href="#-bug-fix-23" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-24">🐛 Bug Fix<a href="#-bug-fix-24" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/ragdoll@15.7.1</code>
 <ul>
@@ -614,7 +629,7 @@
 <h1>(Sat Aug 24 2024)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, David Regla (<a href="https://github.com/dreglad" target="_blank" rel="noopener noreferrer">@dreglad</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-24">🐛 Bug Fix<a href="#-bug-fix-24" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-25">🐛 Bug Fix<a href="#-bug-fix-25" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/nevermore-cli@4.3.1</code>
 <ul>
@@ -636,7 +651,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-5">Authors: 2<a href="#authors-2-5" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-6">Authors: 2<a href="#authors-2-6" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/unrooot" target="_blank" rel="noopener noreferrer">@unrooot</a></li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -657,7 +672,7 @@
 </ul>
 <hr>
 <h1>(Fri Aug 09 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-25">🐛 Bug Fix<a href="#-bug-fix-25" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-26">🐛 Bug Fix<a href="#-bug-fix-26" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/roblox-api-dump@8.3.1</code>
 <ul>
@@ -685,7 +700,7 @@
 </ul>
 <hr>
 <h1>(Tue Jul 16 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-26">🐛 Bug Fix<a href="#-bug-fix-26" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-27">🐛 Bug Fix<a href="#-bug-fix-27" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/observablecollection@12.3.1</code>
 <ul>
@@ -701,7 +716,7 @@
 <h1>(Tue Jul 16 2024)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, Ayo (<a href="https://github.com/GoodGithubAccount" target="_blank" rel="noopener noreferrer">@GoodGithubAccount</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-27">🐛 Bug Fix<a href="#-bug-fix-27" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-28">🐛 Bug Fix<a href="#-bug-fix-28" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>Docs: Update installation docs to include info on new loader <a href="https://github.com/Quenty/NevermoreEngine/pull/476" target="_blank" rel="noopener noreferrer">#476</a> (<a href="https://github.com/GoodGithubAccount" target="_blank" rel="noopener noreferrer">@GoodGithubAccount</a>)</li>
 <li><code>@quenty/camera@14.5.1</code>
@@ -710,7 +725,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-6">Authors: 2<a href="#authors-2-6" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-7">Authors: 2<a href="#authors-2-7" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/OttoHatt" target="_blank" rel="noopener noreferrer">@OttoHatt</a></li>
 <li>Ayo (<a href="https://github.com/GoodGithubAccount" target="_blank" rel="noopener noreferrer">@GoodGithubAccount</a>)</li>
@@ -745,7 +760,7 @@
 </ul>
 <hr>
 <h1>(Fri May 17 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-28">🐛 Bug Fix<a href="#-bug-fix-28" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-29">🐛 Bug Fix<a href="#-bug-fix-29" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/inputkeymaputils@14.6.1</code>
 <ul>
@@ -773,7 +788,7 @@
 </ul>
 <hr>
 <h1>(Tue May 14 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-29">🐛 Bug Fix<a href="#-bug-fix-29" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-30">🐛 Bug Fix<a href="#-bug-fix-30" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/buttondragmodel@1.1.1</code>, <code>@quenty/clipcharacters@12.4.1</code>, <code>@quenty/colorpicker@10.4.1</code>, <code>@quenty/equippedtracker@13.3.1</code>, <code>@quenty/particleengine@13.4.1</code>, <code>@quenty/snackbar@11.4.1</code>
 <ul>
@@ -815,7 +830,7 @@
 </ul>
 <hr>
 <h1>(Sat May 04 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-30">🐛 Bug Fix<a href="#-bug-fix-30" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-31">🐛 Bug Fix<a href="#-bug-fix-31" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/buttonhighlightmodel@14.2.1</code>
 <ul>
@@ -857,7 +872,7 @@
 </ul>
 <hr>
 <h1>(Sun Apr 28 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-31">🐛 Bug Fix<a href="#-bug-fix-31" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-32">🐛 Bug Fix<a href="#-bug-fix-32" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/randomutils@6.2.1</code>
 <ul>
@@ -885,7 +900,7 @@
 </ul>
 <hr>
 <h1>(Tue Apr 23 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-32">🐛 Bug Fix<a href="#-bug-fix-32" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-33">🐛 Bug Fix<a href="#-bug-fix-33" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/spring@10.1.1</code>
 <ul>
@@ -899,7 +914,7 @@
 </ul>
 <hr>
 <h1>(Wed Mar 27 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-33">🐛 Bug Fix<a href="#-bug-fix-33" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-34">🐛 Bug Fix<a href="#-bug-fix-34" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/nevermore-cli@4.0.2</code>
 <ul>
@@ -941,7 +956,7 @@
 </ul>
 <hr>
 <h1>(Sat Mar 09 2024)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-34">🐛 Bug Fix<a href="#-bug-fix-34" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-35">🐛 Bug Fix<a href="#-bug-fix-35" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/nevermore-cli@4.0.1</code>
 <ul>
@@ -1009,7 +1024,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-35">🐛 Bug Fix<a href="#-bug-fix-35" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-36">🐛 Bug Fix<a href="#-bug-fix-36" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>docs: Update readme.md <a href="https://github.com/Quenty/NevermoreEngine/pull/448" target="_blank" rel="noopener noreferrer">#448</a> (<a href="https://github.com/ExercitusMortem" target="_blank" rel="noopener noreferrer">@ExercitusMortem</a>)</li>
 <li><code>@quenty/humanoidspeed@12.0.0</code>, <code>@quenty/rogue-humanoid@10.0.0</code>, <code>@quenty/rogue-properties@11.0.0</code>
@@ -1096,7 +1111,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-36">🐛 Bug Fix<a href="#-bug-fix-36" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-37">🐛 Bug Fix<a href="#-bug-fix-37" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>docs: Update readme.md <a href="https://github.com/Quenty/NevermoreEngine/pull/448" target="_blank" rel="noopener noreferrer">#448</a> (<a href="https://github.com/ExercitusMortem" target="_blank" rel="noopener noreferrer">@ExercitusMortem</a>)</li>
 <li><code>@quenty/loader@11.0.0</code>
@@ -1171,7 +1186,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-37">🐛 Bug Fix<a href="#-bug-fix-37" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-38">🐛 Bug Fix<a href="#-bug-fix-38" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/loader@11.0.0</code>
 <ul>
@@ -1204,7 +1219,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-7">Authors: 2<a href="#authors-2-7" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-8">Authors: 2<a href="#authors-2-8" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
@@ -1239,7 +1254,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-38">🐛 Bug Fix<a href="#-bug-fix-38" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-39">🐛 Bug Fix<a href="#-bug-fix-39" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/loader@10.0.0</code>
 <ul>
@@ -1272,7 +1287,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-8">Authors: 2<a href="#authors-2-8" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-9">Authors: 2<a href="#authors-2-9" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
@@ -1307,7 +1322,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-39">🐛 Bug Fix<a href="#-bug-fix-39" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-40">🐛 Bug Fix<a href="#-bug-fix-40" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/marketplaceutils@10.0.0</code>, <code>@quenty/observablecollection@11.0.0</code>, <code>@quenty/sprites@12.0.0</code>
 <ul>
@@ -1335,7 +1350,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-9">Authors: 2<a href="#authors-2-9" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-10">Authors: 2<a href="#authors-2-10" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
@@ -1370,62 +1385,9 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-40">🐛 Bug Fix<a href="#-bug-fix-40" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
-<ul>
-<li><code>@quenty/rx@12.0.0</code>
-<ul>
-<li>fix: Replace Subscription<!-- -->:Error<!-- -->() call in Rx.tap with Subscription<!-- -->:Fail<!-- -->() <a href="https://github.com/Quenty/NevermoreEngine/pull/440" target="_blank" rel="noopener noreferrer">#440</a> (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
-</ul>
-</li>
-<li><code>@quenty/signal@6.0.0</code>
-<ul>
-<li>refactor: Update SignalUtils.lua to use <!-- -->:Once<!-- -->() <a href="https://github.com/Quenty/NevermoreEngine/pull/427" target="_blank" rel="noopener noreferrer">#427</a> (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
-</ul>
-</li>
-<li><code>@quenty/singleton@5.0.0</code>
-<ul>
-<li>fix: Singleton uses rawget/rawset to query stuff <a href="https://github.com/Quenty/NevermoreEngine/pull/435" target="_blank" rel="noopener noreferrer">#435</a> (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
-</ul>
-</li>
-<li><code>@quenty/countdowntext@3.0.0</code>, <code>@quenty/loader@9.0.0</code>, <code>@quenty/queue@3.0.0</code>
-<ul>
-<li>ci: Upgrade to latest auto-it and lerna <a href="https://github.com/Quenty/NevermoreEngine/pull/438" target="_blank" rel="noopener noreferrer">#438</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
-</ul>
-</li>
-</ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-10">Authors: 2<a href="#authors-2-10" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
-<ul>
-<li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
-<li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
-</ul>
-<hr>
-<h1>(Tue Feb 13 2024)</h1>
-<p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
-<p>Thank you, Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-breaking-change-6">💥 Breaking Change<a href="#-breaking-change-6" class="hash-link" aria-label="Direct link to 💥 Breaking Change" title="Direct link to 💥 Breaking Change">​</a></h4>
-<ul>
-<li><code>@quenty/adorneedata@5.0.0</code>, <code>@quenty/basicpane@11.0.0</code>, <code>@quenty/blend@10.0.0</code>, <code>@quenty/buttonhighlightmodel@12.0.0</code>, <code>@quenty/camera@13.0.0</code>, <code>@quenty/canceltoken@10.0.0</code>, <code>@quenty/cooldown@9.0.0</code>, <code>@quenty/datastore@11.0.0</code>, <code>@quenty/depthoffield@9.0.0</code>, <code>@quenty/ducktype@4.0.0</code>, <code>@quenty/flipbook@6.0.0</code>, <code>@quenty/highlight@7.0.0</code>, <code>@quenty/humanoidtracker@11.0.0</code>, <code>@quenty/ik@13.0.0</code>, <code>@quenty/influxdbclient@5.0.0</code>, <code>@quenty/inputkeymaputils@11.0.0</code>, <code>@quenty/inputmode@11.0.0</code>, <code>@quenty/loader@9.0.0</code>, <code>@quenty/localizedtextutils@10.0.0</code>, <code>@quenty/maid@4.0.0</code>, <code>@quenty/observablecollection@9.0.0</code>, <code>@quenty/physicsutils@6.0.0</code>, <code>@quenty/playerutils@6.0.0</code>, <code>@quenty/promise@9.0.0</code>, <code>@quenty/ragdoll@13.0.0</code>, <code>@quenty/resetservice@9.0.0</code>, <code>@quenty/rx@11.0.0</code>, <code>@quenty/spring@9.0.0</code>, <code>@quenty/symbol@4.0.0</code>, <code>@quenty/timesyncservice@11.0.0</code>, <code>@quenty/uiobjectutils@5.0.0</code>, <code>@quenty/undostack@5.0.0</code>, <code>@quenty/valueobject@11.0.0</code>, <code>@quenty/weldconstraintutils@4.0.0</code>, <code>@quenty/nevermore-cli@4.0.0</code>
-<ul>
-<li>feat: New loader (breaking changes), fixing loader issues <a href="https://github.com/Quenty/NevermoreEngine/pull/439" target="_blank" rel="noopener noreferrer">#439</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
-</ul>
-</li>
-<li><code>@quenty/adorneedata@5.0.0</code>, <code>@quenty/deathreport@8.0.0</code>
-<ul>
-<li>users/quenty/adorneedata <a href="https://github.com/Quenty/NevermoreEngine/pull/437" target="_blank" rel="noopener noreferrer">#437</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
-</ul>
-</li>
-</ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-enhancement-39">🚀 Enhancement<a href="#-enhancement-39" class="hash-link" aria-label="Direct link to 🚀 Enhancement" title="Direct link to 🚀 Enhancement">​</a></h4>
-<ul>
-<li><code>@quenty/adorneeboundingbox@5.0.0</code>, <code>@quenty/adorneedata@5.0.0</code>, <code>@quenty/attributeutils@12.0.0</code>, <code>@quenty/blend@10.0.0</code>, <code>@quenty/convexhull@3.0.0</code>, <code>@quenty/depthoffield@9.0.0</code>, <code>@quenty/draw@6.0.0</code>, <code>@quenty/genericscreenguiprovider@11.0.0</code>, <code>@quenty/humanoidtracker@11.0.0</code>, <code>@quenty/idleservice@11.0.0</code>, <code>@quenty/ik@13.0.0</code>, <code>@quenty/loader@9.0.0</code>, <code>@quenty/observablecollection@9.0.0</code>, <code>@quenty/playerhumanoidbinder@12.0.0</code>, <code>@quenty/propertyvalue@5.0.0</code>, <code>@quenty/queue@3.0.0</code>, <code>@quenty/rogue-properties@8.0.0</code>, <code>@quenty/rx@11.0.0</code>, <code>@quenty/softshutdown@7.0.0</code>, <code>@quenty/tie@8.0.0</code>, <code>@quenty/timedtween@5.0.0</code>, <code>@quenty/timesyncservice@11.0.0</code>, <code>@quenty/vector3utils@9.0.0</code>
-<ul>
-<li>users/quenty/draw <a href="https://github.com/Quenty/NevermoreEngine/pull/436" target="_blank" rel="noopener noreferrer">#436</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
-</ul>
-</li>
-</ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-41">🐛 Bug Fix<a href="#-bug-fix-41" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
-<li><code>@quenty/rx@11.0.0</code>
+<li><code>@quenty/rx@12.0.0</code>
 <ul>
 <li>fix: Replace Subscription<!-- -->:Error<!-- -->() call in Rx.tap with Subscription<!-- -->:Fail<!-- -->() <a href="https://github.com/Quenty/NevermoreEngine/pull/440" target="_blank" rel="noopener noreferrer">#440</a> (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
 </ul>
@@ -1455,6 +1417,59 @@
 <h1>(Tue Feb 13 2024)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>), for all your work!</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-breaking-change-6">💥 Breaking Change<a href="#-breaking-change-6" class="hash-link" aria-label="Direct link to 💥 Breaking Change" title="Direct link to 💥 Breaking Change">​</a></h4>
+<ul>
+<li><code>@quenty/adorneedata@5.0.0</code>, <code>@quenty/basicpane@11.0.0</code>, <code>@quenty/blend@10.0.0</code>, <code>@quenty/buttonhighlightmodel@12.0.0</code>, <code>@quenty/camera@13.0.0</code>, <code>@quenty/canceltoken@10.0.0</code>, <code>@quenty/cooldown@9.0.0</code>, <code>@quenty/datastore@11.0.0</code>, <code>@quenty/depthoffield@9.0.0</code>, <code>@quenty/ducktype@4.0.0</code>, <code>@quenty/flipbook@6.0.0</code>, <code>@quenty/highlight@7.0.0</code>, <code>@quenty/humanoidtracker@11.0.0</code>, <code>@quenty/ik@13.0.0</code>, <code>@quenty/influxdbclient@5.0.0</code>, <code>@quenty/inputkeymaputils@11.0.0</code>, <code>@quenty/inputmode@11.0.0</code>, <code>@quenty/loader@9.0.0</code>, <code>@quenty/localizedtextutils@10.0.0</code>, <code>@quenty/maid@4.0.0</code>, <code>@quenty/observablecollection@9.0.0</code>, <code>@quenty/physicsutils@6.0.0</code>, <code>@quenty/playerutils@6.0.0</code>, <code>@quenty/promise@9.0.0</code>, <code>@quenty/ragdoll@13.0.0</code>, <code>@quenty/resetservice@9.0.0</code>, <code>@quenty/rx@11.0.0</code>, <code>@quenty/spring@9.0.0</code>, <code>@quenty/symbol@4.0.0</code>, <code>@quenty/timesyncservice@11.0.0</code>, <code>@quenty/uiobjectutils@5.0.0</code>, <code>@quenty/undostack@5.0.0</code>, <code>@quenty/valueobject@11.0.0</code>, <code>@quenty/weldconstraintutils@4.0.0</code>, <code>@quenty/nevermore-cli@4.0.0</code>
+<ul>
+<li>feat: New loader (breaking changes), fixing loader issues <a href="https://github.com/Quenty/NevermoreEngine/pull/439" target="_blank" rel="noopener noreferrer">#439</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
+</ul>
+</li>
+<li><code>@quenty/adorneedata@5.0.0</code>, <code>@quenty/deathreport@8.0.0</code>
+<ul>
+<li>users/quenty/adorneedata <a href="https://github.com/Quenty/NevermoreEngine/pull/437" target="_blank" rel="noopener noreferrer">#437</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
+</ul>
+</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-enhancement-39">🚀 Enhancement<a href="#-enhancement-39" class="hash-link" aria-label="Direct link to 🚀 Enhancement" title="Direct link to 🚀 Enhancement">​</a></h4>
+<ul>
+<li><code>@quenty/adorneeboundingbox@5.0.0</code>, <code>@quenty/adorneedata@5.0.0</code>, <code>@quenty/attributeutils@12.0.0</code>, <code>@quenty/blend@10.0.0</code>, <code>@quenty/convexhull@3.0.0</code>, <code>@quenty/depthoffield@9.0.0</code>, <code>@quenty/draw@6.0.0</code>, <code>@quenty/genericscreenguiprovider@11.0.0</code>, <code>@quenty/humanoidtracker@11.0.0</code>, <code>@quenty/idleservice@11.0.0</code>, <code>@quenty/ik@13.0.0</code>, <code>@quenty/loader@9.0.0</code>, <code>@quenty/observablecollection@9.0.0</code>, <code>@quenty/playerhumanoidbinder@12.0.0</code>, <code>@quenty/propertyvalue@5.0.0</code>, <code>@quenty/queue@3.0.0</code>, <code>@quenty/rogue-properties@8.0.0</code>, <code>@quenty/rx@11.0.0</code>, <code>@quenty/softshutdown@7.0.0</code>, <code>@quenty/tie@8.0.0</code>, <code>@quenty/timedtween@5.0.0</code>, <code>@quenty/timesyncservice@11.0.0</code>, <code>@quenty/vector3utils@9.0.0</code>
+<ul>
+<li>users/quenty/draw <a href="https://github.com/Quenty/NevermoreEngine/pull/436" target="_blank" rel="noopener noreferrer">#436</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
+</ul>
+</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-42">🐛 Bug Fix<a href="#-bug-fix-42" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<ul>
+<li><code>@quenty/rx@11.0.0</code>
+<ul>
+<li>fix: Replace Subscription<!-- -->:Error<!-- -->() call in Rx.tap with Subscription<!-- -->:Fail<!-- -->() <a href="https://github.com/Quenty/NevermoreEngine/pull/440" target="_blank" rel="noopener noreferrer">#440</a> (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
+</ul>
+</li>
+<li><code>@quenty/signal@6.0.0</code>
+<ul>
+<li>refactor: Update SignalUtils.lua to use <!-- -->:Once<!-- -->() <a href="https://github.com/Quenty/NevermoreEngine/pull/427" target="_blank" rel="noopener noreferrer">#427</a> (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
+</ul>
+</li>
+<li><code>@quenty/singleton@5.0.0</code>
+<ul>
+<li>fix: Singleton uses rawget/rawset to query stuff <a href="https://github.com/Quenty/NevermoreEngine/pull/435" target="_blank" rel="noopener noreferrer">#435</a> (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
+</ul>
+</li>
+<li><code>@quenty/countdowntext@3.0.0</code>, <code>@quenty/loader@9.0.0</code>, <code>@quenty/queue@3.0.0</code>
+<ul>
+<li>ci: Upgrade to latest auto-it and lerna <a href="https://github.com/Quenty/NevermoreEngine/pull/438" target="_blank" rel="noopener noreferrer">#438</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
+</ul>
+</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-12">Authors: 2<a href="#authors-2-12" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<ul>
+<li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
+<li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
+</ul>
+<hr>
+<h1>(Tue Feb 13 2024)</h1>
+<p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
+<p>Thank you, Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>), for all your work!</p>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="-breaking-change-7">💥 Breaking Change<a href="#-breaking-change-7" class="hash-link" aria-label="Direct link to 💥 Breaking Change" title="Direct link to 💥 Breaking Change">​</a></h4>
 <ul>
 <li><code>@quenty/adorneedata@4.0.0</code>, <code>@quenty/basicpane@10.0.0</code>, <code>@quenty/blend@9.0.0</code>, <code>@quenty/buttonhighlightmodel@11.0.0</code>, <code>@quenty/camera@12.0.0</code>, <code>@quenty/canceltoken@9.0.0</code>, <code>@quenty/cooldown@8.0.0</code>, <code>@quenty/datastore@10.0.0</code>, <code>@quenty/depthoffield@8.0.0</code>, <code>@quenty/ducktype@3.0.0</code>, <code>@quenty/flipbook@5.0.0</code>, <code>@quenty/highlight@6.0.0</code>, <code>@quenty/humanoidtracker@10.0.0</code>, <code>@quenty/ik@12.0.0</code>, <code>@quenty/influxdbclient@4.0.0</code>, <code>@quenty/inputkeymaputils@10.0.0</code>, <code>@quenty/inputmode@10.0.0</code>, <code>@quenty/loader@8.0.0</code>, <code>@quenty/localizedtextutils@9.0.0</code>, <code>@quenty/maid@3.0.0</code>, <code>@quenty/observablecollection@8.0.0</code>, <code>@quenty/physicsutils@5.0.0</code>, <code>@quenty/playerutils@5.0.0</code>, <code>@quenty/promise@8.0.0</code>, <code>@quenty/ragdoll@12.0.0</code>, <code>@quenty/resetservice@8.0.0</code>, <code>@quenty/rx@10.0.0</code>, <code>@quenty/spring@8.0.0</code>, <code>@quenty/symbol@3.0.0</code>, <code>@quenty/timesyncservice@10.0.0</code>, <code>@quenty/uiobjectutils@4.0.0</code>, <code>@quenty/undostack@4.0.0</code>, <code>@quenty/valueobject@10.0.0</code>, <code>@quenty/weldconstraintutils@3.0.0</code>, <code>@quenty/nevermore-cli@3.0.0</code>
@@ -1476,7 +1491,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-42">🐛 Bug Fix<a href="#-bug-fix-42" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-43">🐛 Bug Fix<a href="#-bug-fix-43" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/signal@5.0.0</code>
 <ul>
@@ -1494,7 +1509,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-12">Authors: 2<a href="#authors-2-12" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-13">Authors: 2<a href="#authors-2-13" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
@@ -1519,7 +1534,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-43">🐛 Bug Fix<a href="#-bug-fix-43" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-44">🐛 Bug Fix<a href="#-bug-fix-44" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/signal@4.0.0</code>
 <ul>
@@ -1537,7 +1552,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-13">Authors: 2<a href="#authors-2-13" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-14">Authors: 2<a href="#authors-2-14" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
@@ -1562,7 +1577,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-44">🐛 Bug Fix<a href="#-bug-fix-44" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-45">🐛 Bug Fix<a href="#-bug-fix-45" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/singleton@3.0.0</code>
 <ul>
@@ -1575,7 +1590,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-14">Authors: 2<a href="#authors-2-14" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-15">Authors: 2<a href="#authors-2-15" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>)</li>
@@ -1598,7 +1613,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-45">🐛 Bug Fix<a href="#-bug-fix-45" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-46">🐛 Bug Fix<a href="#-bug-fix-46" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/countdowntext@2.0.0</code>, <code>@quenty/loader@8.0.0</code>, <code>@quenty/queue@3.0.0</code>
 <ul>
@@ -1620,7 +1635,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-46">🐛 Bug Fix<a href="#-bug-fix-46" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-47">🐛 Bug Fix<a href="#-bug-fix-47" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/countdowntext@1.3.0</code>, <code>@quenty/loader@7.3.0</code>, <code>@quenty/queue@2.2.0</code>
 <ul>
@@ -1676,7 +1691,7 @@
 </ul>
 <hr>
 <h1>(Sat Oct 28 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-47">🐛 Bug Fix<a href="#-bug-fix-47" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-48">🐛 Bug Fix<a href="#-bug-fix-48" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/rx@8.1.1</code>
 <ul>
@@ -1720,7 +1735,7 @@
 <h1>(Tue Oct 17 2023)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, Matthew Miller (<a href="https://github.com/InvisibleWater" target="_blank" rel="noopener noreferrer">@InvisibleWater</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-48">🐛 Bug Fix<a href="#-bug-fix-48" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-49">🐛 Bug Fix<a href="#-bug-fix-49" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/observablecollection@6.1.1</code>
 <ul>
@@ -1748,7 +1763,7 @@
 </ul>
 <hr>
 <h1>(Fri Oct 13 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-49">🐛 Bug Fix<a href="#-bug-fix-49" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-50">🐛 Bug Fix<a href="#-bug-fix-50" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/depthoffield@6.0.1</code>
 <ul>
@@ -1762,7 +1777,7 @@
 </ul>
 <hr>
 <h1>(Fri Oct 13 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-50">🐛 Bug Fix<a href="#-bug-fix-50" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-51">🐛 Bug Fix<a href="#-bug-fix-51" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/datastore@8.0.1</code>
 <ul>
@@ -1790,7 +1805,7 @@
 </ul>
 <hr>
 <h1>(Wed Oct 11 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-51">🐛 Bug Fix<a href="#-bug-fix-51" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-52">🐛 Bug Fix<a href="#-bug-fix-52" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/remoting@7.0.1</code>
 <ul>
@@ -1832,7 +1847,7 @@
 </ul>
 <hr>
 <h1>(Thu Sep 21 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-52">🐛 Bug Fix<a href="#-bug-fix-52" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-53">🐛 Bug Fix<a href="#-bug-fix-53" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/datastore@7.26.1</code>
 <ul>
@@ -1874,7 +1889,7 @@
 </ul>
 <hr>
 <h1>(Tue Sep 19 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-53">🐛 Bug Fix<a href="#-bug-fix-53" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-54">🐛 Bug Fix<a href="#-bug-fix-54" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/datastore@7.25.2</code>
 <ul>
@@ -1890,7 +1905,7 @@
 <h1>(Thu Sep 07 2023)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, Gael (<a href="https://github.com/TheGreatSageEqualToHeaven" target="_blank" rel="noopener noreferrer">@TheGreatSageEqualToHeaven</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-54">🐛 Bug Fix<a href="#-bug-fix-54" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-55">🐛 Bug Fix<a href="#-bug-fix-55" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/datastore@7.25.1</code>
 <ul>
@@ -1899,7 +1914,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-15">Authors: 2<a href="#authors-2-15" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-16">Authors: 2<a href="#authors-2-16" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>Gael (<a href="https://github.com/TheGreatSageEqualToHeaven" target="_blank" rel="noopener noreferrer">@TheGreatSageEqualToHeaven</a>)</li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -1935,7 +1950,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-55">🐛 Bug Fix<a href="#-bug-fix-55" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-56">🐛 Bug Fix<a href="#-bug-fix-56" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/datastore@7.24.0</code>
 <ul>
@@ -1943,7 +1958,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-16">Authors: 2<a href="#authors-2-16" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-17">Authors: 2<a href="#authors-2-17" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>Max Bacon (<a href="https://github.com/max-bacon" target="_blank" rel="noopener noreferrer">@max-bacon</a>)</li>
@@ -2006,7 +2021,7 @@
 </ul>
 <hr>
 <h1>(Sun Jul 23 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-56">🐛 Bug Fix<a href="#-bug-fix-56" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-57">🐛 Bug Fix<a href="#-bug-fix-57" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/nevermore-cli@1.8.1</code>
 <ul>
@@ -2034,7 +2049,7 @@
 </ul>
 <hr>
 <h1>(Tue Jul 18 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-57">🐛 Bug Fix<a href="#-bug-fix-57" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-58">🐛 Bug Fix<a href="#-bug-fix-58" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/remoting@6.8.1</code>
 <ul>
@@ -2090,7 +2105,7 @@
 </ul>
 <hr>
 <h1>(Tue Jul 11 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-58">🐛 Bug Fix<a href="#-bug-fix-58" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-59">🐛 Bug Fix<a href="#-bug-fix-59" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/blend@6.21.1</code>
 <ul>
@@ -2104,7 +2119,7 @@
 </ul>
 <hr>
 <h1>(Tue Jul 11 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-59">🐛 Bug Fix<a href="#-bug-fix-59" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-60">🐛 Bug Fix<a href="#-bug-fix-60" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/remoting@6.7.1</code>
 <ul>
@@ -2118,7 +2133,7 @@
 </ul>
 <hr>
 <h1>(Tue Jul 11 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-60">🐛 Bug Fix<a href="#-bug-fix-60" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-61">🐛 Bug Fix<a href="#-bug-fix-61" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/observablecollection@5.19.1</code>
 <ul>
@@ -2146,7 +2161,7 @@
 </ul>
 <hr>
 <h1>(Mon Jul 10 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-61">🐛 Bug Fix<a href="#-bug-fix-61" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-62">🐛 Bug Fix<a href="#-bug-fix-62" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/cmdrservice@7.17.2</code>
 <ul>
@@ -2160,7 +2175,7 @@
 </ul>
 <hr>
 <h1>(Mon Jul 03 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-62">🐛 Bug Fix<a href="#-bug-fix-62" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-63">🐛 Bug Fix<a href="#-bug-fix-63" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/observablecollection@5.18.1</code>, <code>@quenty/remoting@6.6.1</code>, <code>@quenty/rogue-properties@4.22.2</code>
 <ul>
@@ -2176,7 +2191,7 @@
 <h1>(Tue Jun 27 2023)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, Madison (<a href="https://github.com/Phalanxia" target="_blank" rel="noopener noreferrer">@Phalanxia</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-63">🐛 Bug Fix<a href="#-bug-fix-63" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-64">🐛 Bug Fix<a href="#-bug-fix-64" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/octree@6.4.1</code>
 <ul>
@@ -2192,7 +2207,7 @@
 <h1>(Sat Jun 24 2023)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, Deleted user (<a href="https://github.com/ghost" target="_blank" rel="noopener noreferrer">@ghost</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-64">🐛 Bug Fix<a href="#-bug-fix-64" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-65">🐛 Bug Fix<a href="#-bug-fix-65" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/binder@8.19.1</code>
 <ul>
@@ -2227,7 +2242,7 @@
 </ul>
 <hr>
 <h1>(Fri Jun 23 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-65">🐛 Bug Fix<a href="#-bug-fix-65" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-66">🐛 Bug Fix<a href="#-bug-fix-66" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/binder@8.18.1</code>
 <ul>
@@ -2241,7 +2256,7 @@
 </ul>
 <hr>
 <h1>(Tue Jun 20 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-66">🐛 Bug Fix<a href="#-bug-fix-66" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-67">🐛 Bug Fix<a href="#-bug-fix-67" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/ragdoll@9.27.1</code>
 <ul>
@@ -2311,7 +2326,7 @@
 </ul>
 <hr>
 <h1>(Wed May 31 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-67">🐛 Bug Fix<a href="#-bug-fix-67" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-68">🐛 Bug Fix<a href="#-bug-fix-68" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>docs: Update README.md with latest packages <a href="https://github.com/Quenty/NevermoreEngine/pull/365" target="_blank" rel="noopener noreferrer">#365</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li><code>@quenty/resetservice@5.7.1</code>
@@ -2382,7 +2397,7 @@
 </ul>
 <hr>
 <h1>(Mon Apr 24 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-68">🐛 Bug Fix<a href="#-bug-fix-68" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-69">🐛 Bug Fix<a href="#-bug-fix-69" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/gameproductservice@7.3.1</code>
 <ul>
@@ -2438,7 +2453,7 @@
 </ul>
 <hr>
 <h1>(Thu Apr 13 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-69">🐛 Bug Fix<a href="#-bug-fix-69" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-70">🐛 Bug Fix<a href="#-bug-fix-70" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/gameproductservice@7.1.1</code>
 <ul>
@@ -2466,7 +2481,7 @@
 </ul>
 <hr>
 <h1>(Sat Apr 08 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-70">🐛 Bug Fix<a href="#-bug-fix-70" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-71">🐛 Bug Fix<a href="#-bug-fix-71" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/gameproductservice@7.0.2</code>
 <ul>
@@ -2494,7 +2509,7 @@
 </ul>
 <hr>
 <h1>(Fri Apr 07 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-71">🐛 Bug Fix<a href="#-bug-fix-71" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-72">🐛 Bug Fix<a href="#-bug-fix-72" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/loader@6.2.1</code>
 <ul>
@@ -2592,7 +2607,7 @@
 </ul>
 <hr>
 <h1>(Tue Mar 28 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-72">🐛 Bug Fix<a href="#-bug-fix-72" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-73">🐛 Bug Fix<a href="#-bug-fix-73" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/clienttranslator@8.14.1</code>
 <ul>
@@ -2620,7 +2635,7 @@
 </ul>
 <hr>
 <h1>(Wed Mar 08 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-73">🐛 Bug Fix<a href="#-bug-fix-73" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-74">🐛 Bug Fix<a href="#-bug-fix-74" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/clienttranslator@8.13.1</code>, <code>@quenty/softshutdown@3.18.2</code>
 <ul>
@@ -2634,7 +2649,7 @@
 </ul>
 <hr>
 <h1>(Mon Mar 06 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-74">🐛 Bug Fix<a href="#-bug-fix-74" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-75">🐛 Bug Fix<a href="#-bug-fix-75" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/flipbook@2.0.3</code>, <code>@quenty/qgui@2.2.1</code>, <code>@quenty/screenshothudservice@1.2.1</code>, <code>@quenty/tie@4.10.1</code>, <code>@quenty/viewport@5.15.1</code>
 <ul>
@@ -2648,7 +2663,7 @@
 </ul>
 <hr>
 <h1>(Mon Mar 06 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-75">🐛 Bug Fix<a href="#-bug-fix-75" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-76">🐛 Bug Fix<a href="#-bug-fix-76" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/flipbook@2.0.2</code>
 <ul>
@@ -2662,7 +2677,7 @@
 </ul>
 <hr>
 <h1>(Mon Mar 06 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-76">🐛 Bug Fix<a href="#-bug-fix-76" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-77">🐛 Bug Fix<a href="#-bug-fix-77" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/coreguienabler@6.4.1</code>, <code>@quenty/flipbook@2.0.1</code>
 <ul>
@@ -2704,7 +2719,7 @@
 </ul>
 <hr>
 <h1>(Sun Mar 05 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-77">🐛 Bug Fix<a href="#-bug-fix-77" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-78">🐛 Bug Fix<a href="#-bug-fix-78" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/nevermore-cli@1.5.1</code>, <code>@quenty/nevermore-template-helpers@1.2.1</code>
 <ul>
@@ -2712,7 +2727,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-1-131">Authors: 1<a href="#authors-1-131" class="hash-link" aria-label="Direct link to Authors: 1" title="Direct link to Authors: 1">  ​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-1-131">Authors: 1<a href="#authors-1-131" class="hash-link" aria-label="Direct link to Authors: 1" title="Direct link to Authors: 1">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 </ul>
@@ -2824,7 +2839,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-78">🐛 Bug Fix<a href="#-bug-fix-78" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-79">🐛 Bug Fix<a href="#-bug-fix-79" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/cancellabledelay@3.4.0</code>, <code>@quenty/experiencecalculator@2.3.0</code>, <code>@quenty/firstpersoncharactertransparency@8.6.0</code>, <code>@quenty/inputmode@7.9.0</code>, <code>@quenty/loader@6.1.0</code>, <code>@quenty/motor6d@1.11.0</code>, <code>@quenty/qgui@2.2.0</code>, <code>@quenty/rodux-actions@5.2.0</code>, <code>@quenty/rodux-undo@4.1.0</code>, <code>@quenty/selectionutils@2.5.0</code>, <code>@quenty/string@3.1.0</code>, <code>@quenty/symbol@2.2.0</code>, <code>@quenty/table@3.2.0</code>, <code>@quenty/tie@4.8.0</code>, <code>@quenty/uiobjectutils@3.2.0</code>, <code>@quenty/undostack@1.6.0</code>, <code>@quenty/viewport@5.12.0</code>
 <ul>
@@ -2832,7 +2847,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-17">Authors: 2<a href="#authors-2-17" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-18">Authors: 2<a href="#authors-2-18" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>Antcar (<a href="https://github.com/antcar0929" target="_blank" rel="noopener noreferrer">@antcar0929</a>)</li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -2849,7 +2864,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-79">🐛 Bug Fix<a href="#-bug-fix-79" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-80">🐛 Bug Fix<a href="#-bug-fix-80" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/resetservice@5.2.0</code>
 <ul>
@@ -2857,7 +2872,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-18">Authors: 2<a href="#authors-2-18" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-19">Authors: 2<a href="#authors-2-19" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>Bark_ing (<a href="https://github.com/bark-ing" target="_blank" rel="noopener noreferrer">@bark-ing</a>)</li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -2878,7 +2893,7 @@
 </ul>
 <hr>
 <h1>(Tue Jan 03 2023)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-80">🐛 Bug Fix<a href="#-bug-fix-80" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-81">🐛 Bug Fix<a href="#-bug-fix-81" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/conditions@4.5.1</code>, <code>@quenty/datastore@7.4.1</code>, <code>@quenty/playerhumanoidbinder@8.5.1</code>
 <ul>
@@ -2920,7 +2935,7 @@
 </ul>
 <hr>
 <h1>(Tue Dec 27 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-81">🐛 Bug Fix<a href="#-bug-fix-81" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-82">🐛 Bug Fix<a href="#-bug-fix-82" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/rx@7.2.1</code>
 <ul>
@@ -2964,7 +2979,7 @@
 <h1>(Tue Dec 06 2022)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, null<a href="https://github.com/systematicequation" target="_blank" rel="noopener noreferrer">@systematicequation</a>, for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-82">🐛 Bug Fix<a href="#-bug-fix-82" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-83">🐛 Bug Fix<a href="#-bug-fix-83" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/ragdoll@9.7.1</code>
 <ul>
@@ -2992,7 +3007,7 @@
 </ul>
 <hr>
 <h1>(Mon Nov 28 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-83">🐛 Bug Fix<a href="#-bug-fix-83" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-84">🐛 Bug Fix<a href="#-bug-fix-84" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/attributeutils@8.1.2</code>
 <ul>
@@ -3058,7 +3073,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-84">🐛 Bug Fix<a href="#-bug-fix-84" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-85">🐛 Bug Fix<a href="#-bug-fix-85" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/colorpalette@4.4.0</code>, <code>@quenty/colorpicker@4.4.0</code>, <code>@quenty/softshutdown@3.6.0</code>, <code>@quenty/viewport@5.5.0</code>
 <ul>
@@ -3066,14 +3081,14 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-19">Authors: 2<a href="#authors-2-19" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-20">Authors: 2<a href="#authors-2-20" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>Antcar (<a href="https://github.com/antcar0929" target="_blank" rel="noopener noreferrer">@antcar0929</a>)</li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 </ul>
 <hr>
 <h1>(Fri Nov 04 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-85">🐛 Bug Fix<a href="#-bug-fix-85" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-86">🐛 Bug Fix<a href="#-bug-fix-86" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/blend@6.3.1</code>, <code>@quenty/loader@6.0.1</code>
 <ul>
@@ -3131,7 +3146,7 @@
 <h1>(Fri Oct 28 2022)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, Brandon Wilcox (<a href="https://github.com/MrAsynchronous" target="_blank" rel="noopener noreferrer">@MrAsynchronous</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-86">🐛 Bug Fix<a href="#-bug-fix-86" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-87">🐛 Bug Fix<a href="#-bug-fix-87" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/colorpalette@4.2.1</code>
 <ul>
@@ -3153,7 +3168,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-20">Authors: 2<a href="#authors-2-20" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-21">Authors: 2<a href="#authors-2-21" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/OttoHatt" target="_blank" rel="noopener noreferrer">@OttoHatt</a></li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -3177,7 +3192,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-21">Authors: 2<a href="#authors-2-21" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-22">Authors: 2<a href="#authors-2-22" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>Brandon Wilcox (<a href="https://github.com/brandon-wilcox-supersocial" target="_blank" rel="noopener noreferrer">@brandon-wilcox-supersocial</a>)</li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -3202,7 +3217,7 @@
 </ul>
 <hr>
 <h1>(Sun Oct 16 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-87">🐛 Bug Fix<a href="#-bug-fix-87" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-88">🐛 Bug Fix<a href="#-bug-fix-88" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/acceltween@2.2.1</code>, <code>@quenty/animationgroup@6.0.1</code>, <code>@quenty/animationtrackutils@2.1.1</code>, <code>@quenty/camera@9.1.1</code>, <code>@quenty/inputkeymaputils@7.1.1</code>, <code>@quenty/mouseshiftlockservice@7.0.1</code>, <code>@quenty/ragdoll@9.1.1</code>, <code>@quenty/viewport@5.1.1</code>
 <ul>
@@ -3261,7 +3276,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-88">🐛 Bug Fix<a href="#-bug-fix-88" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-89">🐛 Bug Fix<a href="#-bug-fix-89" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>ci: Allow CI to run on external PRs <a href="https://github.com/Quenty/NevermoreEngine/pull/289" target="_blank" rel="noopener noreferrer">#289</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li><code>@quenty/rx@7.1.0</code>
@@ -3306,7 +3321,7 @@
 </ul>
 <hr>
 <h1>(Tue Aug 16 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-89">🐛 Bug Fix<a href="#-bug-fix-89" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-90">🐛 Bug Fix<a href="#-bug-fix-90" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/adorneevalue@3.0.1</code>, <code>@quenty/basicpane@6.0.1</code>, <code>@quenty/bezierutils@2.1.1</code>, <code>@quenty/binarysearch@2.1.1</code>, <code>@quenty/datastore@6.0.1</code>, <code>@quenty/depthoffield@4.0.1</code>, <code>@quenty/humanoidanimatorutils@2.1.1</code>, <code>@quenty/humanoidmovedirectionutils@5.0.1</code>, <code>@quenty/inputkeymaputils@6.0.1</code>, <code>@quenty/lipsum@7.0.1</code>, <code>@quenty/loader@5.0.1</code>, <code>@quenty/markdownrender@2.1.1</code>, <code>@quenty/observablecollection@4.0.1</code>, <code>@quenty/r15utils@6.0.1</code>, <code>@quenty/radial-image@2.0.1</code>, <code>@quenty/ragdoll@8.0.1</code>, <code>@quenty/rx@6.0.1</code>, <code>@quenty/rxbinderutils@7.0.1</code>, <code>@quenty/servicebag@5.1.1</code>, <code>@quenty/settings@3.0.1</code>, <code>@quenty/sunpositionutils@2.2.1</code>, <code>@quenty/textfilterservice@6.0.1</code>
 <ul>
@@ -3328,7 +3343,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-90">🐛 Bug Fix<a href="#-bug-fix-90" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-91">🐛 Bug Fix<a href="#-bug-fix-91" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>fix: Add metapackage default.project.json <a href="https://github.com/Quenty/NevermoreEngine/pull/280" target="_blank" rel="noopener noreferrer">#280</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 </ul>
@@ -3338,7 +3353,7 @@
 </ul>
 <hr>
 <h1>(Thu Aug 11 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-91">🐛 Bug Fix<a href="#-bug-fix-91" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-92">🐛 Bug Fix<a href="#-bug-fix-92" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/friendutils@5.1.1</code>
 <ul>
@@ -3352,14 +3367,14 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-22">Authors: 2<a href="#authors-2-22" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-23">Authors: 2<a href="#authors-2-23" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/OttoHatt" target="_blank" rel="noopener noreferrer">@OttoHatt</a></li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 </ul>
 <hr>
 <h1>(Mon Aug 01 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-92">🐛 Bug Fix<a href="#-bug-fix-92" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-93">🐛 Bug Fix<a href="#-bug-fix-93" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>docs: Try to get moonwave to generate again <a href="https://github.com/Quenty/NevermoreEngine/pull/277" target="_blank" rel="noopener noreferrer">#277</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li><code>@quenty/draw@4.1.1</code>
@@ -3368,7 +3383,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-23">Authors: 2<a href="#authors-2-23" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-24">Authors: 2<a href="#authors-2-24" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/OttoHatt" target="_blank" rel="noopener noreferrer">@OttoHatt</a></li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -3390,7 +3405,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-93">🐛 Bug Fix<a href="#-bug-fix-93" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-94">🐛 Bug Fix<a href="#-bug-fix-94" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/promise@5.1.0</code>
 <ul>
@@ -3398,14 +3413,14 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-24">Authors: 2<a href="#authors-2-24" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-25">Authors: 2<a href="#authors-2-25" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>OptimisticSide (<a href="https://github.com/optimisticside" target="_blank" rel="noopener noreferrer">@optimisticside</a>)</li>
 </ul>
 <hr>
 <h1>(Tue Jul 19 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-94">🐛 Bug Fix<a href="#-bug-fix-94" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-95">🐛 Bug Fix<a href="#-bug-fix-95" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/blend@4.2.1</code>
 <ul>
@@ -3443,7 +3458,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-95">🐛 Bug Fix<a href="#-bug-fix-95" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-96">🐛 Bug Fix<a href="#-bug-fix-96" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/characterutils@5.1.0</code>, <code>@quenty/cmdrservice@5.2.0</code>, <code>@quenty/softshutdown@1.2.0</code>
 <ul>
@@ -3451,7 +3466,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-25">Authors: 2<a href="#authors-2-25" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-26">Authors: 2<a href="#authors-2-26" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/OttoHatt" target="_blank" rel="noopener noreferrer">@OttoHatt</a></li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -3480,11 +3495,11 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-96">🐛 Bug Fix<a href="#-bug-fix-96" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-97">🐛 Bug Fix<a href="#-bug-fix-97" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>Bump license/copyright date <a href="https://github.com/Quenty/NevermoreEngine/pull/258" target="_blank" rel="noopener noreferrer">#258</a> (<a href="https://github.com/insyri" target="_blank" rel="noopener noreferrer">@insyri</a>)</li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-26">Authors: 2<a href="#authors-2-26" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-27">Authors: 2<a href="#authors-2-27" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li>insyri (<a href="https://github.com/insyri" target="_blank" rel="noopener noreferrer">@insyri</a>)</li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -3519,7 +3534,7 @@
 </ul>
 <hr>
 <h1>(Sun Mar 20 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-97">🐛 Bug Fix<a href="#-bug-fix-97" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-98">🐛 Bug Fix<a href="#-bug-fix-98" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/octree@4.0.1</code>
 <ul>
@@ -3599,7 +3614,7 @@
 <h1>(Sun Jan 16 2022)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, null<a href="https://github.com/Yuuwa0519" target="_blank" rel="noopener noreferrer">@Yuuwa0519</a>, for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-98">🐛 Bug Fix<a href="#-bug-fix-98" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-99">🐛 Bug Fix<a href="#-bug-fix-99" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/draw@2.2.2</code>
 <ul>
@@ -3612,7 +3627,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-27">Authors: 2<a href="#authors-2-27" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-28">Authors: 2<a href="#authors-2-28" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/Yuuwa0519" target="_blank" rel="noopener noreferrer">@Yuuwa0519</a></li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -3647,7 +3662,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-99">🐛 Bug Fix<a href="#-bug-fix-99" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-100">🐛 Bug Fix<a href="#-bug-fix-100" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/permissionprovider@4.6.0</code>
 <ul>
@@ -3696,7 +3711,7 @@
 </ul>
 <hr>
 <h1>(Thu Jan 06 2022)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-100">🐛 Bug Fix<a href="#-bug-fix-100" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-101">🐛 Bug Fix<a href="#-bug-fix-101" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/ragdoll@5.1.2</code>
 <ul>
@@ -3712,7 +3727,7 @@
 <h1>(Thu Jan 06 2022)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, aku (<a href="https://github.com/aku-e" target="_blank" rel="noopener noreferrer">@aku-e</a>), for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-101">🐛 Bug Fix<a href="#-bug-fix-101" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-102">🐛 Bug Fix<a href="#-bug-fix-102" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/spring@3.1.1</code>
 <ul>
@@ -3786,7 +3801,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-102">🐛 Bug Fix<a href="#-bug-fix-102" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-103">🐛 Bug Fix<a href="#-bug-fix-103" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/blend@2.1.0</code>
 <ul>
@@ -3845,7 +3860,7 @@
 </ul>
 <hr>
 <h1>(Thu Dec 30 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-103">🐛 Bug Fix<a href="#-bug-fix-103" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-104">🐛 Bug Fix<a href="#-bug-fix-104" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/signal@2.0.2</code>
 <ul>
@@ -3859,7 +3874,7 @@
 </ul>
 <hr>
 <h1>(Thu Dec 30 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-104">🐛 Bug Fix<a href="#-bug-fix-104" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-105">🐛 Bug Fix<a href="#-bug-fix-105" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/acceltween@2.0.1</code>, <code>@quenty/actionmanager@3.5.1</code>, <code>@quenty/adorneeutils@2.1.1</code>, <code>@quenty/animationgroup@3.2.1</code>, <code>@quenty/animationprovider@3.5.1</code>, <code>@quenty/animationtrackutils@2.0.1</code>, <code>@quenty/applytagtotaggedchildren@3.2.1</code>, <code>@quenty/attributeutils@4.0.1</code>, <code>@quenty/axisangleutils@2.0.1</code>, <code>@quenty/badgeutils@3.3.1</code>, <code>@quenty/baseobject@3.2.1</code>, <code>@quenty/basicpane@3.2.1</code>, <code>@quenty/bezierutils@2.0.1</code>, <code>@quenty/binarysearch@2.0.1</code>, <code>@quenty/binder@4.5.1</code>, <code>@quenty/blend@2.0.1</code>, <code>@quenty/boundingboxutils@2.0.1</code>, <code>@quenty/boundlinkutils@4.5.1</code>, <code>@quenty/brio@3.5.1</code>, <code>@quenty/buttonhighlightmodel@3.3.1</code>, <code>@quenty/buttonutils@2.0.1</code>, <code>@quenty/camera@5.0.1</code>, <code>@quenty/camerastoryutils@3.3.1</code>, <code>@quenty/cancellabledelay@2.1.1</code>, <code>@quenty/canceltoken@3.3.1</code>, <code>@quenty/cframeserializer@2.0.1</code>, <code>@quenty/cframeutils@2.0.1</code>, <code>@quenty/characterparticleplayer@2.0.1</code>, <code>@quenty/characterutils@3.3.1</code>, <code>@quenty/clienttranslator@4.4.1</code>, <code>@quenty/clipcharacters@3.3.1</code>, <code>@quenty/cmdrservice@3.6.1</code>, <code>@quenty/collectionserviceutils@2.0.1</code>, <code>@quenty/color3serializationutils@2.0.1</code>, <code>@quenty/color3utils@2.0.1</code>, <code>@quenty/colorsequenceutils@2.0.1</code>, <code>@quenty/contentproviderutils@3.3.1</code>, <code>@quenty/cooldown@1.5.1</code>, <code>@quenty/coreguienabler@3.3.1</code>, <code>@quenty/coreguiutils@3.3.1</code>, <code>@quenty/cubicspline@3.2.1</code>, <code>@quenty/datastore@3.3.1</code>, <code>@quenty/debounce@2.0.1</code>, <code>@quenty/deferred@2.0.2</code>, <code>@quenty/depthoffield@1.5.1</code>, <code>@quenty/draw@2.2.1</code>, <code>@quenty/enabledmixin@3.2.1</code>, <code>@quenty/equippedtracker@3.5.1</code>, <code>@quenty/experiencecalculator@2.0.1</code>, <code>@quenty/fakeskybox@3.2.1</code>, <code>@quenty/firstpersoncharactertransparency@3.2.1</code>, <code>@quenty/friendutils@3.3.1</code>, <code>@quenty/functionutils@2.0.1</code>, <code>@quenty/gamescalingutils@3.0.1</code>, <code>@quenty/gameversionutils@2.0.1</code>, <code>@quenty/generatewithmixin@3.4.1</code>, <code>@quenty/genericscreenguiprovider@3.4.1</code>, <code>@quenty/geometryutils@2.1.1</code>, <code>@quenty/getgroundplane@3.1.2</code>, <code>@quenty/getmechanismparts@2.0.1</code>, <code>@quenty/getpercentexposedutils@3.2.1</code>, <code>@quenty/grouputils@3.4.1</code>, <code>@quenty/guitriangle@2.0.1</code>, <code>@quenty/guivisiblemanager@4.0.1</code>, <code>@quenty/hapticfeedbackutils@2.1.1</code>, <code>@quenty/hide@1.5.1</code>, <code>@quenty/hintscoringutils@5.0.1</code>, <code>@quenty/httppromise@3.3.1</code>, <code>@quenty/humanoidanimatorutils@2.0.1</code>, <code>@quenty/humanoiddescriptionutils@3.3.1</code>, <code>@quenty/humanoidkillerutils@2.0.1</code>, <code>@quenty/humanoidmovedirectionutils@3.2.1</code>, <code>@quenty/humanoidspeed@1.5.1</code>, <code>@quenty/humanoidteleportutils@3.2.1</code>, <code>@quenty/humanoidtracker@3.5.1</code>, <code>@quenty/humanoidutils@2.0.1</code>, <code>@quenty/idleservice@2.0.1</code>, <code>@quenty/ik@5.0.1</code>, <code>@quenty/inputkeymaputils@3.5.1</code>, <code>@quenty/inputmode@3.5.1</code>, <code>@quenty/inputobjectutils@2.0.2</code>, <code>@quenty/insertserviceutils@3.3.1</code>, <code>@quenty/instanceutils@3.5.1</code>, <code>@quenty/isamixin@2.0.1</code>, <code>@quenty/jsonutils@3.3.1</code>, <code>@quenty/jumpbuttonutils@2.0.1</code>, <code>@quenty/linearsystemssolver@2.0.1</code>, <code>@quenty/linkutils@3.5.1</code>, <code>@quenty/lipsum@4.0.1</code>, <code>@quenty/loader@3.1.2</code>, <code>@quenty/localizedtextutils@2.0.1</code>, <code>@quenty/maid@2.0.2</code>, <code>@quenty/markdownrender@2.0.1</code>, <code>@quenty/marketplaceutils@3.3.1</code>, <code>@quenty/math@2.0.1</code>, <code>@quenty/meshutils@2.0.1</code>, <code>@quenty/metricutils@2.0.1</code>, <code>@quenty/modelappearance@3.2.1</code>, <code>@quenty/modeltransparencyeffect@3.2.1</code>, <code>@quenty/mouseovermixin@3.2.1</code>, <code>@quenty/mouseshiftlockservice@3.3.1</code>, <code>@quenty/multipleclickutils@3.2.1</code>, <code>@quenty/networkownerservice@3.0.2</code>, <code>@quenty/networkownerutils@2.0.1</code>, <code>@quenty/networkropeutils@3.2.1</code>, <code>@quenty/nocollisionconstraintutils@3.2.1</code>, <code>@quenty/numberrangeutils@2.0.1</code>, <code>@quenty/numbersequenceutils@2.0.1</code>, <code>@quenty/numbertoinputkeyutils@2.0.1</code>, <code>@quenty/octree@3.3.1</code>, <code>@quenty/optional@4.2.1</code>, <code>@quenty/overriddenproperty@3.2.1</code>, <code>@quenty/particleengine@3.3.1</code>, <code>@quenty/parttouchingcalculator@4.5.1</code>, <code>@quenty/pathfindingutils@3.4.1</code>, <code>@quenty/permissionprovider@4.4.1</code>, <code>@quenty/physicsutils@2.0.1</code>, <code>@quenty/pillbacking@3.2.1</code>, <code>@quenty/playerbinder@4.5.1</code>, <code>@quenty/playerhumanoidbinder@4.5.1</code>, <code>@quenty/playersservicepromises@3.3.1</code>, <code>@quenty/playerthumbnailutils@3.4.1</code>, <code>@quenty/polynomialutils@2.0.1</code>, <code>@quenty/preferredparentutils@2.0.1</code>, <code>@quenty/probability@2.0.1</code>, <code>@quenty/promise@3.3.1</code>, <code>@quenty/pseudolocalize@2.0.1</code>, <code>@quenty/qframe@3.3.1</code>, <code>@quenty/qgui@2.0.1</code>, <code>@quenty/quaternion@2.1.1</code>, <code>@quenty/r15utils@3.5.1</code>, <code>@quenty/racketingropeconstraint@3.3.1</code>, <code>@quenty/ragdoll@5.0.1</code>, <code>@quenty/randomutils@2.1.1</code>, <code>@quenty/raycaster@2.1.1</code>, <code>@quenty/region3int16utils@3.2.1</code>, <code>@quenty/region3utils@3.2.1</code>, <code>@quenty/remotefunctionutils@3.3.1</code>, <code>@quenty/remoting@3.3.1</code>, <code>@quenty/resetservice@1.3.1</code>, <code>@quenty/rigbuilderutils@3.3.1</code>, <code>@quenty/rodux-actions@1.2.1</code>, <code>@quenty/rodux-undo@1.2.1</code>, <code>@quenty/rotatinglabel@4.0.1</code>, <code>@quenty/roundedbackingbuilder@2.0.1</code>, <code>@quenty/rx@3.5.1</code>, <code>@quenty/rxbinderutils@4.6.1</code>, <code>@quenty/safedestroy@1.1.1</code>, <code>@quenty/scoredactionservice@4.6.1</code>, <code>@quenty/scrollingframe@4.0.1</code>, <code>@quenty/selectionimageutils@4.1.2</code>, <code>@quenty/servicebag@3.2.2</code>, <code>@quenty/setmechanismcframe@3.2.1</code>, <code>@quenty/signal@2.0.1</code>, <code>@quenty/snackbar@3.3.1</code>, <code>@quenty/socialserviceutils@3.3.1</code>, <code>@quenty/sounds@3.5.1</code>, <code>@quenty/spring@3.0.1</code>, <code>@quenty/sprites@3.4.1</code>, <code>@quenty/statestack@3.2.1</code>, <code>@quenty/steputils@3.0.1</code>, <code>@quenty/streamingutils@3.3.1</code>, <code>@quenty/string@2.2.1</code>, <code>@quenty/sunpositionutils@2.1.1</code>, <code>@quenty/symbol@2.0.1</code>, <code>@quenty/table@2.1.1</code>, <code>@quenty/teamtracker@3.5.1</code>, <code>@quenty/teamutils@2.0.1</code>, <code>@quenty/templateprovider@3.5.1</code>, <code>@quenty/terrainutils@3.2.1</code>, <code>@quenty/textfilterservice@3.3.1</code>, <code>@quenty/textfilterutils@3.3.1</code>, <code>@quenty/textserviceutils@3.0.1</code>, <code>@quenty/throttle@3.2.1</code>, <code>@quenty/time@2.0.1</code>, <code>@quenty/timesyncservice@3.3.1</code>, <code>@quenty/touchingpartutils@2.0.1</code>, <code>@quenty/trajectory@2.0.1</code>, <code>@quenty/transparencyservice@3.2.1</code>, <code>@quenty/uiobjectutils@2.0.1</code>, <code>@quenty/ultrawidecontainerutils@2.0.1</code>, <code>@quenty/utf8@2.0.1</code>, <code>@quenty/valuebaseutils@3.5.1</code>, <code>@quenty/valueobject@3.5.1</code>, <code>@quenty/vector3int16utils@2.0.1</code>, <code>@quenty/vector3utils@3.2.1</code>, <code>@quenty/weldconstraintutils@2.0.1</code>
 <ul>
@@ -3969,7 +3984,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-105">🐛 Bug Fix<a href="#-bug-fix-105" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-106">🐛 Bug Fix<a href="#-bug-fix-106" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>chore: Add sample integration game <a href="https://github.com/Quenty/NevermoreEngine/pull/235" target="_blank" rel="noopener noreferrer">#235</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>chore: Update copyright date <a href="https://github.com/Quenty/NevermoreEngine/pull/235" target="_blank" rel="noopener noreferrer">#235</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -4034,7 +4049,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-106">🐛 Bug Fix<a href="#-bug-fix-106" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-107">🐛 Bug Fix<a href="#-bug-fix-107" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/rx@3.4.0</code>
 <ul>
@@ -4086,7 +4101,7 @@
 </ul>
 <hr>
 <h1>(Sat Dec 04 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-107">🐛 Bug Fix<a href="#-bug-fix-107" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-108">🐛 Bug Fix<a href="#-bug-fix-108" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/servicebag@3.2.1</code>
 <ul>
@@ -4131,7 +4146,7 @@
 <h1>(Mon Nov 22 2021)</h1>
 <p>🎉<!-- --> This release contains work from a new contributor! <!-- -->🎉</p>
 <p>Thank you, null<a href="https://github.com/Boegie19" target="_blank" rel="noopener noreferrer">@Boegie19</a>, for all your work!</p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-108">🐛 Bug Fix<a href="#-bug-fix-108" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-109">🐛 Bug Fix<a href="#-bug-fix-109" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>ci: update to mesh syncing verson of rojo <a href="https://github.com/Quenty/NevermoreEngine/pull/226" target="_blank" rel="noopener noreferrer">#226</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li><code>@quenty/remotefunctionutils@3.2.1</code>
@@ -4140,7 +4155,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-28">Authors: 2<a href="#authors-2-28" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="authors-2-29">Authors: 2<a href="#authors-2-29" class="hash-link" aria-label="Direct link to Authors: 2" title="Direct link to Authors: 2">​</a></h4>
 <ul>
 <li><a href="https://github.com/Boegie19" target="_blank" rel="noopener noreferrer">@Boegie19</a></li>
 <li>James Onnen (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -4160,7 +4175,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-109">🐛 Bug Fix<a href="#-bug-fix-109" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-110">🐛 Bug Fix<a href="#-bug-fix-110" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/actionmanager@3.3.0</code>, <code>@quenty/animationgroup@3.2.0</code>, <code>@quenty/animationprovider@3.4.0</code>, <code>@quenty/applytagtotaggedchildren@3.2.0</code>, <code>@quenty/attributeutils@3.4.0</code>, <code>@quenty/badgeutils@3.2.0</code>, <code>@quenty/baseobject@3.2.0</code>, <code>@quenty/basicpane@3.2.0</code>, <code>@quenty/binder@4.3.0</code>, <code>@quenty/boundlinkutils@4.3.0</code>, <code>@quenty/brio@3.3.0</code>, <code>@quenty/buttonhighlightmodel@3.2.0</code>, <code>@quenty/camera@4.3.0</code>, <code>@quenty/camerastoryutils@3.2.0</code>, <code>@quenty/canceltoken@3.2.0</code>, <code>@quenty/characterutils@3.2.0</code>, <code>@quenty/clienttranslator@4.2.0</code>, <code>@quenty/clipcharacters@3.2.0</code>, <code>@quenty/cmdrservice@3.2.0</code>, <code>@quenty/contentproviderutils@3.2.0</code>, <code>@quenty/cooldown@1.3.0</code>, <code>@quenty/coreguienabler@3.2.0</code>, <code>@quenty/coreguiutils@3.2.0</code>, <code>@quenty/cubicspline@3.2.0</code>, <code>@quenty/datastore@3.2.0</code>, <code>@quenty/depthoffield@1.3.0</code>, <code>@quenty/enabledmixin@3.2.0</code>, <code>@quenty/equippedtracker@3.3.0</code>, <code>@quenty/fakeskybox@3.2.0</code>, <code>@quenty/firstpersoncharactertransparency@3.2.0</code>, <code>@quenty/friendutils@3.2.0</code>, <code>@quenty/generatewithmixin@3.4.0</code>, <code>@quenty/genericscreenguiprovider@3.4.0</code>, <code>@quenty/getpercentexposedutils@3.2.0</code>, <code>@quenty/grouputils@3.2.0</code>, <code>@quenty/guivisiblemanager@3.2.0</code>, <code>@quenty/hide@1.3.0</code>, <code>@quenty/hintscoringutils@4.3.0</code>, <code>@quenty/httppromise@3.2.0</code>, <code>@quenty/humanoiddescriptionutils@3.2.0</code>, <code>@quenty/humanoidmovedirectionutils@3.2.0</code>, <code>@quenty/humanoidspeed@1.3.0</code>, <code>@quenty/humanoidteleportutils@3.2.0</code>, <code>@quenty/humanoidtracker@3.3.0</code>, <code>@quenty/idleservice@1.4.0</code>, <code>@quenty/ik@4.4.0</code>, <code>@quenty/inputkeymaputils@3.3.0</code>, <code>@quenty/inputmode@3.3.0</code>, <code>@quenty/insertserviceutils@3.2.0</code>, <code>@quenty/instanceutils@3.3.0</code>, <code>@quenty/jsonutils@3.2.0</code>, <code>@quenty/linkutils@3.3.0</code>, <code>@quenty/lipsum@3.4.0</code>, <code>@quenty/marketplaceutils@3.2.0</code>, <code>@quenty/modelappearance@3.2.0</code>, <code>@quenty/modeltransparencyeffect@3.2.0</code>, <code>@quenty/mouseovermixin@3.2.0</code>, <code>@quenty/mouseshiftlockservice@3.2.0</code>, <code>@quenty/multipleclickutils@3.2.0</code>, <code>@quenty/networkropeutils@3.2.0</code>, <code>@quenty/nocollisionconstraintutils@3.2.0</code>, <code>@quenty/octree@3.3.0</code>, <code>@quenty/optional@4.2.0</code>, <code>@quenty/overriddenproperty@3.2.0</code>, <code>@quenty/particleengine@3.2.0</code>, <code>@quenty/parttouchingcalculator@4.3.0</code>, <code>@quenty/pathfindingutils@3.3.0</code>, <code>@quenty/permissionprovider@4.2.0</code>, <code>@quenty/pillbacking@3.2.0</code>, <code>@quenty/playerbinder@4.3.0</code>, <code>@quenty/playerhumanoidbinder@4.3.0</code>, <code>@quenty/playersservicepromises@3.2.0</code>, <code>@quenty/playerthumbnailutils@3.2.0</code>, <code>@quenty/promise@3.2.0</code>, <code>@quenty/qframe@3.2.0</code>, <code>@quenty/quaternion@2.1.0</code>, <code>@quenty/r15utils@3.3.0</code>, <code>@quenty/racketingropeconstraint@3.2.0</code>, <code>@quenty/ragdoll@4.4.0</code>, <code>@quenty/region3int16utils@3.2.0</code>, <code>@quenty/region3utils@3.2.0</code>, <code>@quenty/remotefunctionutils@3.2.0</code>, <code>@quenty/remoting@3.2.0</code>, <code>@quenty/resetservice@1.2.0</code>, <code>@quenty/rigbuilderutils@3.2.0</code>, <code>@quenty/rodux-actions@1.2.0</code>, <code>@quenty/rodux-undo@1.2.0</code>, <code>@quenty/rotatinglabel@3.3.0</code>, <code>@quenty/rx@3.3.0</code>, <code>@quenty/rxbinderutils@4.4.0</code>, <code>@quenty/scoredactionservice@4.4.0</code>, <code>@quenty/scrollingframe@3.3.0</code>, <code>@quenty/servicebag@3.2.0</code>, <code>@quenty/setmechanismcframe@3.2.0</code>, <code>@quenty/snackbar@3.2.0</code>, <code>@quenty/socialserviceutils@3.2.0</code>, <code>@quenty/sounds@3.3.0</code>, <code>@quenty/sprites@3.4.0</code>, <code>@quenty/statestack@3.2.0</code>, <code>@quenty/streamingutils@3.2.0</code>, <code>@quenty/teamtracker@3.3.0</code>, <code>@quenty/templateprovider@3.4.0</code>, <code>@quenty/terrainutils@3.2.0</code>, <code>@quenty/textfilterservice@3.2.0</code>, <code>@quenty/textfilterutils@3.2.0</code>, <code>@quenty/throttle@3.2.0</code>, <code>@quenty/timesyncservice@3.2.0</code>, <code>@quenty/transparencyservice@3.2.0</code>, <code>@quenty/valuebaseutils@3.3.0</code>, <code>@quenty/valueobject@3.3.0</code>, <code>@quenty/vector3utils@3.2.0</code>
 <ul>
@@ -4193,7 +4208,7 @@
 </ul>
 <hr>
 <h1>(Wed Nov 10 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-110">🐛 Bug Fix<a href="#-bug-fix-110" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-111">🐛 Bug Fix<a href="#-bug-fix-111" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/servicebag@3.1.3</code>
 <ul>
@@ -4231,7 +4246,7 @@
 </ul>
 <hr>
 <h1>(Sat Oct 30 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-111">🐛 Bug Fix<a href="#-bug-fix-111" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-112">🐛 Bug Fix<a href="#-bug-fix-112" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/loader@3.1.1</code>, <code>@quenty/networkownerservice@3.0.1</code>, <code>@quenty/playersservicepromises@3.1.2</code>, <code>@quenty/templateprovider@3.2.2</code>
 <ul>
@@ -4245,7 +4260,7 @@
 </ul>
 <hr>
 <h1>(Wed Oct 13 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-112">🐛 Bug Fix<a href="#-bug-fix-112" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-113">🐛 Bug Fix<a href="#-bug-fix-113" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/inputobjectutils@2.0.1</code>
 <ul>
@@ -4264,7 +4279,7 @@
 </ul>
 <hr>
 <h1>(Wed Oct 06 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-113">🐛 Bug Fix<a href="#-bug-fix-113" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-114">🐛 Bug Fix<a href="#-bug-fix-114" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/servicebag@3.1.1</code>
 <ul>
@@ -4283,7 +4298,7 @@
 </ul>
 <hr>
 <h1>(Sun Oct 03 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-114">🐛 Bug Fix<a href="#-bug-fix-114" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-115">🐛 Bug Fix<a href="#-bug-fix-115" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>fix: Upgrade foreman.toml and luacheck point (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li><code>@quenty/scoredactionservice@4.2.1</code>
@@ -4366,7 +4381,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-115">🐛 Bug Fix<a href="#-bug-fix-115" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-116">🐛 Bug Fix<a href="#-bug-fix-116" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>chore: Remove heatbeatWait module since it&#x27;s deprecated by the task.wait method. <a href="https://github.com/Quenty/NevermoreEngine/pull/216" target="_blank" rel="noopener noreferrer">#216</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>fix: Upgrade luacheck to version-f5b685d4be894c8f <a href="https://github.com/Quenty/NevermoreEngine/pull/216" target="_blank" rel="noopener noreferrer">#216</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -4392,7 +4407,7 @@
 </ul>
 <hr>
 <h1>(Wed Sep 22 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-116">🐛 Bug Fix<a href="#-bug-fix-116" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-117">🐛 Bug Fix<a href="#-bug-fix-117" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/ik@4.1.1</code>
 <ul>
@@ -4419,7 +4434,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-117">🐛 Bug Fix<a href="#-bug-fix-117" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-118">🐛 Bug Fix<a href="#-bug-fix-118" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/camera@4.1.0</code>
 <ul>
@@ -4479,7 +4494,7 @@
 </ul>
 <hr>
 <h1>(Sat Sep 18 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-118">🐛 Bug Fix<a href="#-bug-fix-118" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-119">🐛 Bug Fix<a href="#-bug-fix-119" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/loader@3.0.1</code>
 <ul>
@@ -4521,7 +4536,7 @@
 </ul>
 <hr>
 <h1>(Sat Sep 11 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-119">🐛 Bug Fix<a href="#-bug-fix-119" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-120">🐛 Bug Fix<a href="#-bug-fix-120" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/sounds@3.0.1</code>
 <ul>
@@ -4581,7 +4596,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-120">🐛 Bug Fix<a href="#-bug-fix-120" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-121">🐛 Bug Fix<a href="#-bug-fix-121" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>chore: Remove dead code <a href="https://github.com/Quenty/NevermoreEngine/pull/211" target="_blank" rel="noopener noreferrer">#211</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li><code>@quenty/loader@3.0.0</code>
@@ -4668,7 +4683,7 @@
 </ul>
 <hr>
 <h1>(Fri Aug 06 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-121">🐛 Bug Fix<a href="#-bug-fix-121" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-122">🐛 Bug Fix<a href="#-bug-fix-122" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/clienttranslator@2.0.1</code>
 <ul>
@@ -4682,7 +4697,7 @@
 </ul>
 <hr>
 <h1>(Fri Aug 06 2021)</h1>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-122">🐛 Bug Fix<a href="#-bug-fix-122" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-123">🐛 Bug Fix<a href="#-bug-fix-123" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li><code>@quenty/camera@2.0.1</code>, <code>@quenty/cmdrservice@1.0.1</code>, <code>@quenty/ik@2.0.1</code>, <code>@quenty/permissionprovider@2.0.1</code>
 <ul>
@@ -4763,7 +4778,7 @@
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-123">🐛 Bug Fix<a href="#-bug-fix-123" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-124">🐛 Bug Fix<a href="#-bug-fix-124" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>chore: Add funding links <a href="https://github.com/Quenty/NevermoreEngine/pull/200" target="_blank" rel="noopener noreferrer">#200</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>docs: Update readme clarifying state of repository <a href="https://github.com/Quenty/NevermoreEngine/pull/199" target="_blank" rel="noopener noreferrer">#199</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
@@ -4807,7 +4822,7 @@
 <ul>
 <li>feat: Change how QFrame calculates multiplication and power <a href="https://github.com/Quenty/NevermoreEngine/pull/199" target="_blank" rel="noopener noreferrer">#199</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 </ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-124">🐛 Bug Fix<a href="#-bug-fix-124" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="-bug-fix-125">🐛 Bug Fix<a href="#-bug-fix-125" class="hash-link" aria-label="Direct link to 🐛 Bug Fix" title="Direct link to 🐛 Bug Fix">​</a></h4>
 <ul>
 <li>docs: Update readme clarifying state of repository <a href="https://github.com/Quenty/NevermoreEngine/pull/199" target="_blank" rel="noopener noreferrer">#199</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
 <li>docs: Remove Changelog from README.md in favor of CHANGELOG.md which will be generated <a href="https://github.com/Quenty/NevermoreEngine/pull/199" target="_blank" rel="noopener noreferrer">#199</a> (<a href="https://github.com/Quenty" target="_blank" rel="noopener noreferrer">@Quenty</a>)</li>
