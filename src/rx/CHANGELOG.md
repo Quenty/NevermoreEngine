@@ -1,23 +1,18 @@
-# v13.16.2 (Mon Mar 31 2025)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, null[@mrkboy10](https://github.com/mrkboy10), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Correct misplaced parenthesis in Rx combineLatestAll function [#546](https://github.com/Quenty/NevermoreEngine/pull/546) ([@mrkboy10](https://github.com/mrkboy10))
-
-#### Authors: 1
-
-- [@mrkboy10](https://github.com/mrkboy10)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.16.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.16.1...@quenty/rx@13.16.2) (2025-03-31)
+
+
+### Bug Fixes
+
+* Correct misplaced parenthesis in Rx combineLatestAll function ([#546](https://github.com/Quenty/NevermoreEngine/issues/546)) ([ba90772](https://github.com/Quenty/NevermoreEngine/commit/ba907720e0ada2e1019e634e9d200c932fb638ce))
+
+
+
+
 
 ## [13.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.16.0...@quenty/rx@13.16.1) (2025-03-21)
 

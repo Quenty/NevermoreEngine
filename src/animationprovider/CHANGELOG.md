@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.17.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.17.3...@quenty/animationprovider@11.17.4) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
 ## [11.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.17.2...@quenty/animationprovider@11.17.3) (2025-03-21)
 
 **Note:** Version bump only for package @quenty/animationprovider

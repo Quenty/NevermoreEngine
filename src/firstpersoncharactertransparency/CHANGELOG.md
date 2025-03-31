@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.17.1...@quenty/firstpersoncharactertransparency@14.17.2) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
 ## [14.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.17.0...@quenty/firstpersoncharactertransparency@14.17.1) (2025-03-21)
 
 **Note:** Version bump only for package @quenty/firstpersoncharactertransparency

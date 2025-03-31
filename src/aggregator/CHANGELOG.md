@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.3.1...@quenty/aggregator@1.3.2) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+
+
+
+
 ## [1.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.3.0...@quenty/aggregator@1.3.1) (2025-03-21)
 
 **Note:** Version bump only for package @quenty/aggregator

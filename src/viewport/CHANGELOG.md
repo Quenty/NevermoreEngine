@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.20.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.20.2...@quenty/viewport@11.20.3) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
 ## [11.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.20.1...@quenty/viewport@11.20.2) (2025-03-21)
 
 **Note:** Version bump only for package @quenty/viewport
