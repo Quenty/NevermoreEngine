@@ -1,3 +1,19 @@
+# v13.16.2 (Mon Mar 31 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@mrkboy10](https://github.com/mrkboy10), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: Correct misplaced parenthesis in Rx combineLatestAll function [#546](https://github.com/Quenty/NevermoreEngine/pull/546) ([@mrkboy10](https://github.com/mrkboy10))
+
+#### Authors: 1
+
+- [@mrkboy10](https://github.com/mrkboy10)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
