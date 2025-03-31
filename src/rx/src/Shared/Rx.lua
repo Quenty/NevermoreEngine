@@ -1323,7 +1323,7 @@ function Rx.combineLatestAll()
 					return
 				end
 
-				maid:GiveTask(Rx.combineLatest(observables)):Subscribe(sub:GetFireFailComplete())
+				maid:GiveTask(Rx.combineLatest(observables):Subscribe(sub:GetFireFailComplete()))
 			end))
 
 			return maid
