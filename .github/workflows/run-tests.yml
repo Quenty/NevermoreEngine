@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -15,16 +15,10 @@ jobs:
           cache-dependency-path: package.json
           node-version: "18"
 
-      - name: Add GitHub CLI repository
+      - name: Install GitHub CLI
         run: |
-          (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
-          && sudo mkdir -p -m 755 /etc/apt/keyrings \
-          && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-          && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-          && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-          && sudo apt update \
-          && sudo apt install gh -y
+          sudo apt update
+          sudo apt install gh -y
 
       - name: Setup npm for GitHub Packages
         run: |
@@ -40,6 +34,8 @@ jobs:
         run: |
           echo "Installing package dependencies..."
           npx lerna exec -- npm install --no-audit
+          PACKAGES=$(npx lerna ls --since origin/main --json | jq -r '.[] | select(.name != "@quenty/nevermore-cli") | .location' | tr '\n' ' ')
+          echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
 
       - name: Setup test place project
         run: |
@@ -48,7 +44,7 @@ jobs:
           cd tests/bin
 
           echo "Installing changed packages..."
-          npm i $(npx lerna ls --since origin/main --json | jq -r '.[].location' | tr '\n' ' ')
+          npm i ${{ env.PACKAGES }}
 
           echo "Installing Jest"
           npm i https://github.com/quentystudios/jest-lua.git
