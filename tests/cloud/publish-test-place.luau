@@ -133,16 +133,15 @@ local function runLuauTask(universeId: number, placeId: number, placeVersion: nu
 	local testsSuccessful, taskLogs = getTaskLogs(cloudTask.path)
 
 	print(taskLogs)
-	print(cloudTask)
 
 	if cloudTask.state == "COMPLETE" then
-		print("Luau task completed successfully")
 		if testsSuccessful then
 			print("Tests passed!")
 		else
 			error("Tests failed! See output above for more information.")
 		end
 	else
+		print(cloudTask)
 		error("Luau task failed")
 	end
 end
