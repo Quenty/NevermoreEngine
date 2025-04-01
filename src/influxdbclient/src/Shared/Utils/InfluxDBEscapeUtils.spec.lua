@@ -13,11 +13,13 @@ local it = Jest.Globals.it
 
 describe("InfluxDBEscapeUtils.measurement", function()
 	it("should pass through fine", function()
-		expect(InfluxDBEscapeUtils.measurement("hi")).toBe("hi")
+		local measurement = InfluxDBEscapeUtils.measurement("hi")
+		expect(measurement).toBe("hi")
 	end)
 
 	it("should escape tabs", function()
-		expect(InfluxDBEscapeUtils.measurement("\thi")).toBe("\\thi")
+		local measurement = InfluxDBEscapeUtils.measurement("\thi")
+		expect(measurement).toBe("\\thi")
 	end)
 end)
 
@@ -33,22 +35,27 @@ end)
 
 describe("InfluxDBEscapeUtils.tag", function()
 	it("should pass through fine", function()
-		expect(InfluxDBEscapeUtils.tag("hi")).toBe("hi")
+		local tag = InfluxDBEscapeUtils.tag("hi")
+		expect(tag).toBe("hi")
 	end)
 
 	it("should escape tabs", function()
-		expect(InfluxDBEscapeUtils.tag("\thi")).toBe("\\thi")
+		local tag = InfluxDBEscapeUtils.tag("\thi")
+		expect(tag).toBe("\\thi")
 	end)
 
 	it("should escape =", function()
-		expect(InfluxDBEscapeUtils.tag("=hi")).toBe("\\=hi")
+		local tag = InfluxDBEscapeUtils.tag("=hi")
+		expect(tag).toBe("\\=hi")
 	end)
 
 	it("should escape = and \\", function()
-		expect(InfluxDBEscapeUtils.tag("\\=hi")).toBe("\\\\\\=hi")
+		local tag = InfluxDBEscapeUtils.tag("\\=hi")
+		expect(tag).toBe("\\\\\\=hi")
 	end)
 
 	it("should escape \\n", function()
-		expect(InfluxDBEscapeUtils.tag("\nhi")).toBe("\\nhi")
+		local tag = InfluxDBEscapeUtils.tag("\nhi")
+		expect(tag).toBe("\\nhi")
 	end)
 end)
