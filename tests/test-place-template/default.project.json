@@ -16,6 +16,11 @@
           "$path": "jest.config.lua"
         }
       }
+    },
+    "TextChatService": {
+      "$properties": {
+        "ChatVersion": "TextChatService"
+      }
     }
   }
 }
