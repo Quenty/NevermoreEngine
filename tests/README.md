@@ -61,9 +61,9 @@ GITHUB_TOKEN=
 NPM_TOKEN=
 ```
 
-You will also need to update the target universe and place ids in `tests/publish-test-place.luau`. The default is a place managed by Studio Koi Koi.
+You will also need to update the target universe and place ids in `tests/cloud/publish-test-place.luau`. The default is a place managed by Studio Koi Koi.
 
-Finally, execute the workflow from the root of the repository with: `act -W .github/workflows/run-tests.yml --secret-file .env`
+Finally, execute the workflow from the root of the repository with: `act -W .github/workflows/run-tests.yml --secret-file .env --reuse`
 
 ### Locally with run-in-roblox
 Alternatively, if you don't have access to open cloud, you can build the test place and use `run-in-roblox` to run the tests locally.
@@ -73,6 +73,5 @@ cp -r tests/test-place-template tests/bin && cd tests/bin
 npm i $(npx lerna ls --since origin/main --json | jq -r '.[].location' | tr '\n' ' ')
 npm i https://github.com/quentystudios/jest-lua.git
 npx lerna exec -- npm install --no-audit
-rojo build default.project.json -o testPlace.rbxl
-run-in-roblox --place testPlace.rbxl --script ../run-tests.luau
+rojo build default.project.json -o testPlace.rbxl && run-in-roblox --place testPlace.rbxl --script ../cloud/run-tests.luau
 ```

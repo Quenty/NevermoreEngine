@@ -60,7 +60,7 @@ jobs:
         run: rojo build default.project.json -o testBuild.rbxl
         working-directory: tests/bin
 
-      - name: Publish test place to Roblox
+      - name: Publish test place to Roblox and run tests
         run: lune run cloud/publish-test-place.luau bin/testBuild.rbxl cloud/run-tests.luau
         working-directory: tests
         env:
