@@ -7,11 +7,11 @@ local it = Jest.Globals.it
 local expect = Jest.Globals.expect
 
 it("returns a randomly generated username", function()
-	expect(LipsumUtils.username()).any("string")
+	expect(LipsumUtils.username()).toEqual(expect.any("string"))
 end)
 
 it("returns a randomly generated word", function()
-	expect(LipsumUtils.word()).any("string")
+	expect(LipsumUtils.word()).toEqual(expect.any("string"))
 end)
 
 it("returns a fixed number of words", function()

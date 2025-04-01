@@ -5,6 +5,7 @@
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
+local EloMatchResult = require("EloMatchResult")
 local EloUtils = require("EloUtils")
 local Jest = require("Jest")
 
@@ -28,11 +29,11 @@ describe("EloUtils.getNewElo", function()
 			playerRating,
 			opponentRating,
 			{
-				EloUtils.MatchResult.PLAYER_ONE_WIN;
+				EloMatchResult.PLAYER_ONE_WIN;
 			})
 
-		expect(newPlayerWinRating > playerRating).to.equal(true)
-		expect(newOpponentWinRating < opponentRating).to.equal(true)
+		expect(newPlayerWinRating > playerRating).toBe(true)
+		expect(newOpponentWinRating < opponentRating).toBe(true)
 	end)
 
 	it("should change on a loss", function()
@@ -41,11 +42,11 @@ describe("EloUtils.getNewElo", function()
 			playerRating,
 			opponentRating,
 			{
-				EloUtils.MatchResult.PLAYER_TWO_WIN;
+				EloMatchResult.PLAYER_TWO_WIN;
 			})
 
-		expect(newPlayerLossRating < playerRating).to.equal(true)
-		expect(newOpponentLossRating > opponentRating).to.equal(true)
+		expect(newPlayerLossRating < playerRating).toBe(true)
+		expect(newOpponentLossRating > opponentRating).toBe(true)
 	end)
 
 	it("should change on a draw", function()
@@ -54,11 +55,11 @@ describe("EloUtils.getNewElo", function()
 			playerRating,
 			opponentRating,
 			{
-				EloUtils.MatchResult.DRAW;
+				EloMatchResult.DRAW;
 			})
 
-		expect(newPlayerDrawRating > playerRating).to.equal(true)
-		expect(newOpponentDrawRating < opponentRating).to.equal(true)
+		expect(newPlayerDrawRating > playerRating).toBe(true)
+		expect(newOpponentDrawRating < opponentRating).toBe(true)
 	end)
 
 	it("should change more on an unexpected win then a loss", function()
@@ -66,14 +67,14 @@ describe("EloUtils.getNewElo", function()
 		local drawChange = math.abs(playerRating - newPlayerDrawRating)
 		local lossChange = math.abs(playerRating - newPlayerLossRating)
 
-		expect(winChange > lossChange).to.equal(true)
-		expect(winChange > drawChange ).to.equal(true)
-		expect(drawChange > lossChange).to.equal(true)
+		expect(winChange > lossChange).toBe(true)
+		expect(winChange > drawChange ).toBe(true)
+		expect(drawChange > lossChange).toBe(true)
 	end)
 
 	it("should compute percentile as 0.5", function()
 		local percentile = EloUtils.getPercentile(config, 1400)
 
-		expect(percentile).to.equal(0.5)
+		expect(percentile).toBe(0.5)
 	end)
 end)

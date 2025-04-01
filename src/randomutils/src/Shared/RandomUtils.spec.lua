@@ -10,7 +10,7 @@ it("returns one option from the list", function()
 	local options = { "apples", "oranges", "bananas" }
 	local choice = RandomUtils.choice(options)
 
-	expect(choice).anything()
+	expect(choice).never.toBeNil()
 end)
 
 it("returns a shuffled copy of the table", function()
@@ -25,18 +25,18 @@ it("shuffles the table", function()
 	local options = { "apples", "oranges", "bananas" }
 	RandomUtils.shuffle(options)
 
-	expect(options).anything()
+	expect(options).never.toBeNil()
 end)
 
 it("computes the gaussian random function", function()
 	local random = Random.new()
-	local computed = RandomUtils.gaussian(random)
+	local computed = RandomUtils.gaussianRandom(random)
 
-	expect(computed).any("number")
+	expect(computed).toEqual(expect.any("number"))
 end)
 
 it("returns a random unit Vector3", function()
 	local randomUnitVector = RandomUtils.randomUnitVector3(Random.new())
 
-	expect(randomUnitVector).any("Vector3")
+	expect(randomUnitVector).toEqual(expect.any("Vector3"))
 end)

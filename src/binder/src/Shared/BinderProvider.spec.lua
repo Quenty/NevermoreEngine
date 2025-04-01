@@ -26,7 +26,7 @@ describe("BinderProvider.new()", function()
 			end))
 		end)
 
-		expect(provider).to.be.a("table")
+		expect(provider).toEqual(expect.any("table"))
 	end)
 
 	it("should initialize", function()
@@ -36,8 +36,10 @@ describe("BinderProvider.new()", function()
 	end)
 
 	it("should contain the binder", function()
-		expect(provider.Test).to.be.a("table")
+		expect(provider.Test).toEqual(expect.any("table"))
 	end)
 
-	provider:Destroy()
+	if provider then
+		provider:Destroy()
+	end
 end)

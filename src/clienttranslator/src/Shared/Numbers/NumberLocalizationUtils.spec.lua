@@ -10,7 +10,7 @@ local it = Jest.Globals.it
 
 local function checkLocale(locale, responseMapping)
 	for input, output in pairs(responseMapping) do
-		expect(NumberLocalizationUtils.localize(input, locale)).to.equal(output)
+		expect(NumberLocalizationUtils.localize(input, locale)).toBe(output)
 	end
 end
 
@@ -36,21 +36,21 @@ describe("NumberLocalizationUtils.localize", function()
 	-- 	local logs = Logging.capture(function()
 	-- 		checkValid_en_zh("bad_locale")
 	-- 	end)
-	-- 	expect(string.match(logs.warnings[1], "^Warning: Locale not found:") ~= nil).to.equal(true)
+	-- 	expect(string.match(logs.warnings[1], "^Warning: Locale not found:") ~= nil).toBe(true)
 	-- end)
 
 	-- it("should default to en-us when locale is nil", function()
 	-- 	local logs = Logging.capture(function()
 	-- 		checkValid_en_zh(nil)
 	-- 	end)
-	-- 	expect(string.match(logs.warnings[1], "^Warning: Locale not found:") ~= nil).to.equal(true)
+	-- 	expect(string.match(logs.warnings[1], "^Warning: Locale not found:") ~= nil).toBe(true)
 	-- end)
 
 	-- it("should default to en-us when locale is empty", function()
 	-- 	local logs = Logging.capture(function()
 	-- 		checkValid_en_zh("")
 	-- 	end)
-	-- 	expect(string.match(logs.warnings[1], "^Warning: Locale not found:") ~= nil).to.equal(true)
+	-- 	expect(string.match(logs.warnings[1], "^Warning: Locale not found:") ~= nil).toBe(true)
 	-- end)
 
 	it("should localize correctly. (en-us)", function()
@@ -106,7 +106,7 @@ describe("NumberLocalizationUtils.abbreviate", function()
 		}
 
 		for input, output in pairs(roundToZeroMap) do
-			expect(NumberLocalizationUtils.abbreviate(input, "en-us", RoundingBehaviourTypes.TRUNCATE)).to.equal(output)
+			expect(NumberLocalizationUtils.abbreviate(input, "en-us", RoundingBehaviourTypes.TRUNCATE)).toBe(output)
 		end
 	end)
 end)

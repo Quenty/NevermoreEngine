@@ -67,8 +67,9 @@ describe("ObservableList.new()", function()
 		end)
 		observableList:Add("a")
 
+		local value = seen[4]:GetValue()
 		expect(#seen).toEqual(4)
-		expect(seen[4]:GetValue()).toEqual("a")
+		expect(value).toEqual("a")
 		expect(seen[4]:IsDead()).toEqual(false)
 
 		sub:Destroy()
