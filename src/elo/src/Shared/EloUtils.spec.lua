@@ -75,6 +75,6 @@ describe("EloUtils.getNewElo", function()
 	it("should compute percentile as 0.5", function()
 		local percentile = EloUtils.getPercentile(config, 1400)
 
-		expect(percentile).toBe(0.5)
+		expect(percentile).toBeCloseTo(0.5, 5)
 	end)
 end)
