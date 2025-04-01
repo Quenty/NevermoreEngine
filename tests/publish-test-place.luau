@@ -110,7 +110,19 @@ local function getTaskLogs(taskPath: string)
 		error(`Get task logs failed: {response.body}`)
 	end
 
-	return table.concat(net.jsonDecode(response.body).luauExecutionSessionTaskLogs[1].messages, "\n")
+	local testsSuccessful = true
+	for _, message in net.jsonDecode(response.body).luauExecutionSessionTaskLogs[1].messages do
+		local cleanMessage = message:gsub("\27%[[%d;]*%a", "")
+		local failedSuites = string.match(cleanMessage, "Test Suites:%s*(%d+)%s+failed")
+		local failedTests = string.match(cleanMessage, "Tests:%s*(%d+)%s+failed")
+
+		if (failedSuites and tonumber(failedSuites) > 0) or (failedTests and tonumber(failedTests) > 0) then
+			testsSuccessful = false
+			break
+		end
+	end
+
+	return testsSuccessful, table.concat(net.jsonDecode(response.body).luauExecutionSessionTaskLogs[1].messages, "\n")
 end
 
 local function runLuauTask(universeId: number, placeId: number, placeVersion: number, scriptContents: string)
@@ -118,13 +130,18 @@ local function runLuauTask(universeId: number, placeId: number, placeVersion: nu
 
 	local cloudTask = createTask(universeId, placeId, placeVersion, scriptContents)
 	cloudTask = pollForTaskCompletion(cloudTask.path)
-	local logs = getTaskLogs(cloudTask.path)
+	local testsSuccessful, taskLogs = getTaskLogs(cloudTask.path)
 
-	print(logs)
+	print(taskLogs)
 	print(cloudTask)
 
 	if cloudTask.state == "COMPLETE" then
 		print("Luau task completed successfully")
+		if testsSuccessful then
+			print("Tests passed!")
+		else
+			error("Tests failed! See output above for more information.")
+		end
 	else
 		error("Luau task failed")
 	end
