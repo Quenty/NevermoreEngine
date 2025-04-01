@@ -9,24 +9,11 @@
       },
       "UnitTest": {
         "$className": "Folder",
-        "game": {
-          "$path": "src/modules"
-        },
         "node_modules": {
           "$path": "node_modules"
         },
         "jest.config": {
           "$path": "jest.config.lua"
-        }
-      },
-      "UnitTestScripts": {
-        "$path": "src/scripts/Server"
-      }
-    },
-    "StarterPlayer": {
-      "StarterPlayerScripts": {
-        "UnitTestScripts": {
-          "$path": "src/scripts/Client"
         }
       }
     }

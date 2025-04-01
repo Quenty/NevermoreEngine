@@ -7,15 +7,12 @@
     "Nevermore",
     "Lua"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
-    "@quenty/binder": "^14.18.1",
-    "@quenty/clienttranslator": "^14.18.1",
-    "@quenty/cmdrservice": "^13.21.3",
-    "@quenty/loader": "^10.8.0",
-    "@quenty/servicebag": "^11.11.1"
+    "@quenty/loader": "../../src/loader",
+    "@quenty/servicebag": "../../src/servicebag"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }
