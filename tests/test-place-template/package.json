@@ -1,0 +1,18 @@
+{
+  "name": "unittest",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@quenty/loader": "../../src/loader",
+    "@quenty/servicebag": "../../src/servicebag"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

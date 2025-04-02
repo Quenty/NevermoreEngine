@@ -1,0 +1,26 @@
+{
+  "name": "UnitTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
+      "UnitTest": {
+        "$className": "Folder",
+        "node_modules": {
+          "$path": "node_modules"
+        },
+        "jest.config": {
+          "$path": "jest.config.lua"
+        }
+      }
+    },
+    "TextChatService": {
+      "$properties": {
+        "ChatVersion": "TextChatService"
+      }
+    }
+  }
+}
