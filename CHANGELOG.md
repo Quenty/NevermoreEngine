@@ -1,3 +1,17 @@
+# (Wed Apr 02 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.19.0`, `@quenty/brio@14.17.0`, `@quenty/clienttranslator@14.19.0`, `@quenty/ellipticcurvecryptography@1.6.0`, `@quenty/elo@7.19.0`, `@quenty/experiencecalculator@2.5.0`, `@quenty/fzy@5.9.0`, `@quenty/influxdbclient@7.19.0`, `@quenty/instanceutils@13.17.0`, `@quenty/lipsum@14.18.0`, `@quenty/observablecollection@12.20.0`, `@quenty/randomutils@6.10.0`, `@quenty/rx@13.17.0`, `@quenty/snackbar@11.21.0`, `@quenty/nevermore-cli@4.6.0`
+  - ci: Create workflow to execute Jest unit tests with Roblox open cloud [#544](https://github.com/Quenty/NevermoreEngine/pull/544) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Mar 31 2025)
 
 :tada: This release contains work from a new contributor! :tada:

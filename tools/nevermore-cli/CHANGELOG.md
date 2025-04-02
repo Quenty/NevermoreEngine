@@ -1,3 +1,17 @@
+# v4.6.0 (Wed Apr 02 2025)
+
+#### 🚀 Enhancement
+
+- ci: Create workflow to execute Jest unit tests with Roblox open cloud [#544](https://github.com/Quenty/NevermoreEngine/pull/544) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
+- feat: Nevermore-cli command to install packages from npm ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
