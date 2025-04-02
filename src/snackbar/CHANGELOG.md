@@ -1,24 +1,18 @@
-# v11.21.0 (Wed Apr 02 2025)
-
-#### 🚀 Enhancement
-
-- ci: Create workflow to execute Jest unit tests with Roblox open cloud [#544](https://github.com/Quenty/NevermoreEngine/pull/544) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix package name ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.20.2...@quenty/snackbar@11.21.0) (2025-04-02)
+
+
+### Bug Fixes
+
+* Fix package name ([b53eeb9](https://github.com/Quenty/NevermoreEngine/commit/b53eeb991e5463a2f7030fcb92c597eb192686d8))
+
+
+
+
 
 ## [11.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.20.1...@quenty/snackbar@11.20.2) (2025-03-31)
 

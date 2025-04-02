@@ -1,26 +1,19 @@
-# v14.19.0 (Wed Apr 02 2025)
-
-#### 🚀 Enhancement
-
-- ci: Create workflow to execute Jest unit tests with Roblox open cloud [#544](https://github.com/Quenty/NevermoreEngine/pull/544) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix broken tests ([@unrooot](https://github.com/unrooot))
-- fix: Fix existing tests ([@unrooot](https://github.com/unrooot))
-- ci: Convert testEZ format to Jest ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.18.2...@quenty/clienttranslator@14.19.0) (2025-04-02)
+
+
+### Bug Fixes
+
+* Fix broken tests ([96485ff](https://github.com/Quenty/NevermoreEngine/commit/96485ff69dbba007d13ea4b5fe82f67244fda14c))
+* Fix existing tests ([655787c](https://github.com/Quenty/NevermoreEngine/commit/655787ced1139136e12f81800e229aa076731561))
+
+
+
+
 
 ## [14.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.18.1...@quenty/clienttranslator@14.18.2) (2025-03-31)
 

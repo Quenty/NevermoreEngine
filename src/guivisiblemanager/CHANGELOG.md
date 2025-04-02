@@ -1,20 +1,15 @@
-# v12.9.0 (Wed Apr 02 2025)
-
-#### 🚀 Enhancement
-
-- ci: Create workflow to execute Jest unit tests with Roblox open cloud [#544](https://github.com/Quenty/NevermoreEngine/pull/544) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.8.2...@quenty/guivisiblemanager@12.9.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
 
 ## [12.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.8.1...@quenty/guivisiblemanager@12.8.2) (2025-03-31)
 

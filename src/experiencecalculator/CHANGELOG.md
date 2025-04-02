@@ -1,25 +1,18 @@
-# v2.5.0 (Wed Apr 02 2025)
-
-#### 🚀 Enhancement
-
-- ci: Create workflow to execute Jest unit tests with Roblox open cloud [#544](https://github.com/Quenty/NevermoreEngine/pull/544) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix existing tests ([@unrooot](https://github.com/unrooot))
-- ci: Convert testEZ format to Jest ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.4.0...@quenty/experiencecalculator@2.5.0) (2025-04-02)
+
+
+### Bug Fixes
+
+* Fix existing tests ([655787c](https://github.com/Quenty/NevermoreEngine/commit/655787ced1139136e12f81800e229aa076731561))
+
+
+
+
 
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.3.0...@quenty/experiencecalculator@2.4.0) (2024-05-09)
 

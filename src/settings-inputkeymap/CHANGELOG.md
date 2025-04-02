@@ -1,20 +1,15 @@
-# v10.25.0 (Wed Apr 02 2025)
-
-#### 🚀 Enhancement
-
-- ci: Create workflow to execute Jest unit tests with Roblox open cloud [#544](https://github.com/Quenty/NevermoreEngine/pull/544) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- [@unrooot](https://github.com/unrooot)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.24.5...@quenty/settings-inputkeymap@10.25.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+
+
+
 
 ## [10.24.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.24.4...@quenty/settings-inputkeymap@10.24.5) (2025-03-31)
 
