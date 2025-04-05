@@ -10,6 +10,9 @@
     <a href="https://github.com/Quenty/NevermoreEngine/actions">
       <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
     </a>
+    <a href="https://github.com/Quenty/NevermoreEngine/actions">
+      <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/run-tests.yml/badge.svg" alt="Tests status" />
+    </a>
   </p>
   <p>ModuleScript loader with reusable and easy unified server-client modules for faster game development on Roblox.</p>
   <a href="https://quenty.github.io/NevermoreEngine/">View docs →</a>
