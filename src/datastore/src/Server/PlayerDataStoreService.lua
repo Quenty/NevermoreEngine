@@ -11,6 +11,7 @@ local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local DataStorePromises = require("DataStorePromises")
 local Promise = require("Promise")
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local PlayerDataStoreService = {}
 PlayerDataStoreService.ServiceName = "PlayerDataStoreService"
@@ -19,7 +20,7 @@ PlayerDataStoreService.ServiceName = "PlayerDataStoreService"
 	Initializes the PlayerDataStoreService. Should be done via [ServiceBag.Init].
 	@param serviceBag ServiceBag
 ]=]
-function PlayerDataStoreService:Init(serviceBag)
+function PlayerDataStoreService:Init(serviceBag: _ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -49,7 +50,7 @@ end
 
 	@param dataStoreName string
 ]=]
-function PlayerDataStoreService:SetDataStoreName(dataStoreName)
+function PlayerDataStoreService:SetDataStoreName(dataStoreName: string)
 	assert(type(dataStoreName) == "string", "Bad dataStoreName")
 	assert(self._promiseStarted, "Not initialized")
 	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
@@ -66,7 +67,7 @@ end
 
 	@param dataStoreScope string
 ]=]
-function PlayerDataStoreService:SetDataStoreScope(dataStoreScope)
+function PlayerDataStoreService:SetDataStoreScope(dataStoreScope: string)
 	assert(type(dataStoreScope) == "string", "Bad dataStoreScope")
 	assert(self._promiseStarted, "Not initialized")
 	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")

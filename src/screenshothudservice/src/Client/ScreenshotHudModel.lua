@@ -103,12 +103,11 @@ end
 
 	@param visible boolean
 ]=]
-function ScreenshotHudModel:SetVisible(visible)
+function ScreenshotHudModel:SetVisible(visible: boolean)
 	assert(type(visible) == "boolean", "Bad visible")
 
 	self._visible.Value = visible
 end
-
 
 --[=[
 	Sets the close button's position
@@ -167,7 +166,7 @@ end
 --[=[
 	Sets the camera button's icon.
 
-	@param icon string | nil
+	@param icon string?
 ]=]
 function ScreenshotHudModel:SetCameraButtonIcon(icon)
 	assert(type(icon) == "string" or icon == nil, "Bad icon")
@@ -189,7 +188,7 @@ end
 
 	@param closeWhenScreenshotTaken boolean
 ]=]
-function ScreenshotHudModel:SetCloseWhenScreenshotTaken(closeWhenScreenshotTaken)
+function ScreenshotHudModel:SetCloseWhenScreenshotTaken(closeWhenScreenshotTaken: boolean)
 	assert(type(closeWhenScreenshotTaken) == "boolean", "Bad closeWhenScreenshotTaken")
 
 	self._closeWhenScreenshotTaken.Value = closeWhenScreenshotTaken
@@ -215,7 +214,7 @@ end
 	Sets whether to experience name overlay should be enabled
 	@param experienceNameOverlayEnabled boolean
 ]=]
-function ScreenshotHudModel:SetExperienceNameOverlayEnabled(experienceNameOverlayEnabled)
+function ScreenshotHudModel:SetExperienceNameOverlayEnabled(experienceNameOverlayEnabled: boolean)
 	assert(type(experienceNameOverlayEnabled) == "boolean", "Bad experienceNameOverlayEnabled")
 
 	self._experienceNameOverlayEnabled.Value = experienceNameOverlayEnabled
@@ -233,7 +232,7 @@ end
 	Sets whether to username overlay should be enabled
 	@param usernameOverlayEnabled boolean
 ]=]
-function ScreenshotHudModel:SetUsernameOverlayEnabled(usernameOverlayEnabled)
+function ScreenshotHudModel:SetUsernameOverlayEnabled(usernameOverlayEnabled: boolean)
 	assert(type(usernameOverlayEnabled) == "boolean", "Bad usernameOverlayEnabled")
 
 	self._usernameOverlayEnabled.Value = usernameOverlayEnabled

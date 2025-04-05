@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Trace input mode state and trigger changes correctly. See [InputModeSelector] for details
 	on how to select between these. See [InputModeTypeTypes] for predefined modes.
@@ -9,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local DuckTypeUtils = require("DuckTypeUtils")
+local _InputModeType = require("InputModeType")
 
 --[=[
 	Fires off when the mode is enabled
@@ -26,13 +28,22 @@ local InputMode = {}
 InputMode.__index = InputMode
 InputMode.ClassName = "InputMode"
 
+export type InputMode = typeof(setmetatable(
+	{} :: {
+		_inputModeType: _InputModeType.InputModeType,
+		_lastEnabled: number,
+		Enabled: Signal.Signal<()>,
+	},
+	InputMode
+))
+
 --[=[
 	Constructs a new InputMode. This inherits data from the name.
 
 	@param inputModeType InputModeType
 	@return InputMode
 ]=]
-function InputMode.new(inputModeType)
+function InputMode.new(inputModeType: _InputModeType.InputModeType): InputMode
 	local self = setmetatable({}, InputMode)
 
 	self._inputModeType = assert(inputModeType, "Bad inputModeType")
@@ -50,7 +61,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function InputMode.isInputMode(value)
+function InputMode.isInputMode(value: any): boolean
 	return DuckTypeUtils.isImplementation(InputMode, value)
 end
 
@@ -58,7 +69,7 @@ end
 	Checks the last point this input mode was used.
 	@return number
 ]=]
-function InputMode:GetLastEnabledTime()
+function InputMode.GetLastEnabledTime(self: InputMode): number
 	return self._lastEnabled
 end
 
@@ -66,7 +77,7 @@ end
 	Returns all keys defining the input mode.
 	@return { UserInputType | KeyCode | string }
 ]=]
-function InputMode:GetKeys()
+function InputMode.GetKeys(self: InputMode): { Enum.UserInputType | Enum.KeyCode | string }
 	return self._inputModeType:GetKeys()
 end
 
@@ -75,7 +86,7 @@ end
 	@param inputType { UserInputType | KeyCode | string }
 	@return boolean
 ]=]
-function InputMode:IsValid(inputType)
+function InputMode.IsValid(self: InputMode, inputType: _InputModeType.InputModeKey): boolean
 	assert(inputType, "Must send in inputType")
 
 	return self._inputModeType:IsValid(inputType)
@@ -84,7 +95,7 @@ end
 --[=[
 	Enables the mode
 ]=]
-function InputMode:Enable()
+function InputMode.Enable(self: InputMode)
 	self._lastEnabled = os.clock()
 	self.Enabled:Fire()
 end
@@ -93,10 +104,8 @@ end
 	Evaluates the input object, and if it's valid, enables the mode
 	@param inputObject InputObject
 ]=]
-function InputMode:Evaluate(inputObject)
-	if self._inputModeType:IsValid(inputObject.UserInputType)
-		or self._inputModeType:IsValid(inputObject.KeyCode) then
-
+function InputMode.Evaluate(self: InputMode, inputObject: InputObject)
+	if self._inputModeType:IsValid(inputObject.UserInputType) or self._inputModeType:IsValid(inputObject.KeyCode) then
 		self:Enable()
 	end
 end
@@ -104,7 +113,7 @@ end
 --[=[
 	Cleans up the input mode
 ]=]
-function InputMode:Destroy()
+function InputMode.Destroy(self: InputMode)
 	self.Enabled:Destroy()
 end
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities involving pathfinding in Roblox
 	@class PathfindingUtils
@@ -19,7 +20,7 @@ local PathfindingUtils = {}
 	@param finish Vector3
 	@return Promise<Path>
 ]=]
-function PathfindingUtils.promiseComputeAsync(path: Path, start: Vector3, finish: Vector3)
+function PathfindingUtils.promiseComputeAsync(path: Path, start: Vector3, finish: Vector3): Promise.Promise<Path>
 	assert(path, "Bad path")
 	assert(start, "Bad start")
 	assert(finish, "Bad finish")
@@ -43,7 +44,7 @@ end
 	@param startIndex number
 	@return Promise<number>
 ]=]
-function PathfindingUtils.promiseCheckOcclusion(path: Path, startIndex: number)
+function PathfindingUtils.promiseCheckOcclusion(path: Path, startIndex: number): Promise.Promise<number>
 	return Promise.spawn(function(resolve, _)
 		resolve(path:CheckOcclusionAsync(startIndex))
 	end)
@@ -56,7 +57,7 @@ end
 	@param path Path
 	@return MaidTask
 ]=]
-function PathfindingUtils.visualizePath(path: Path)
+function PathfindingUtils.visualizePath(path: Path): Maid.Maid
 	local maid = Maid.new()
 
 	local parent = Instance.new("Folder")

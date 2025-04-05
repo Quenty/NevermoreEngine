@@ -20,10 +20,27 @@
 local require = require(script.Parent.loader).load(script)
 
 local RxAttributeUtils = require("RxAttributeUtils")
+local _Observable = require("Observable")
+local _Brio = require("Brio")
+local _Rx = require("Rx")
 
 local AttributeValue = {}
 AttributeValue.ClassName = "AttributeValue"
 AttributeValue.__index = AttributeValue
+
+export type AttributeValue<T> = typeof(setmetatable(
+	{} :: {
+		_object: Instance,
+		_attributeName: string,
+		_defaultValue: T?,
+
+		-- Public
+		Value: T?,
+		AttributeName: string,
+		Changed: RBXScriptSignal<(T)>,
+	},
+	AttributeValue
+))
 
 --[=[
 	Constructs a new AttributeValue. If a defaultValue that is not nil
@@ -34,21 +51,21 @@ AttributeValue.__index = AttributeValue
 	@param defaultValue T?
 	@return AttributeValue<T>
 ]=]
-function AttributeValue.new(object, attributeName, defaultValue)
+function AttributeValue.new<T>(object: Instance, attributeName: string, defaultValue: any?): AttributeValue<T>
 	assert(typeof(object) == "Instance", "Bad object")
 	assert(type(attributeName) == "string", "Bad attributeName")
 
 	local self = {
-		_object = object;
-		_attributeName = attributeName;
-		_defaultValue = defaultValue;
+		_object = object,
+		_attributeName = attributeName,
+		_defaultValue = defaultValue,
 	}
 
 	if defaultValue ~= nil and self._object:GetAttribute(self._attributeName) == nil then
 		self._object:SetAttribute(rawget(self, "_attributeName"), defaultValue)
 	end
 
-	return setmetatable(self, AttributeValue)
+	return setmetatable(self, AttributeValue) :: any
 end
 
 --[=[
@@ -57,7 +74,10 @@ end
 	@param condition function | nil
 	@return Observable<Brio<any>>
 ]=]
-function AttributeValue:ObserveBrio(condition)
+function AttributeValue.ObserveBrio<T>(
+	self: AttributeValue<T>,
+	condition: _Rx.Predicate<T>?
+): _Observable.Observable<_Brio.Brio<any>>
 	return RxAttributeUtils.observeAttributeBrio(self._object, self._attributeName, condition)
 end
 
@@ -65,8 +85,8 @@ end
 	Observes an attribute on an instance.
 	@return Observable<any>
 ]=]
-function AttributeValue:Observe()
-	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self, "_defaultValue"))
+function AttributeValue.Observe<T>(self: AttributeValue<T>): _Observable.Observable<T?>
+	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self :: any, "_defaultValue"))
 end
 
 --[=[
@@ -82,12 +102,12 @@ end
 	@prop Changed Signal<()>
 	@within AttributeValue
 ]=]
-function AttributeValue:__index(index)
+function AttributeValue.__index<T>(self: AttributeValue<T>, index)
 	if AttributeValue[index] then
 		return AttributeValue[index]
 	elseif index == "Value" then
-		local result = self._object:GetAttribute(rawget(self, "_attributeName"))
-		local default = rawget(self, "_defaultValue")
+		local result = self._object:GetAttribute(rawget(self :: any, "_attributeName"))
+		local default = rawget(self :: any, "_defaultValue")
 		if result == nil then
 			return default
 		else
@@ -96,15 +116,17 @@ function AttributeValue:__index(index)
 	elseif index == "Changed" then
 		return self._object:GetAttributeChangedSignal(self._attributeName)
 	elseif index == "AttributeName" then
-		return rawget(self, "_attributeName")
+		return rawget(self :: any, "_attributeName")
 	else
 		error(string.format("%q is not a member of AttributeValue", tostring(index)))
 	end
 end
 
-function AttributeValue:__newindex(index, value)
+function AttributeValue.__newindex<T>(self: AttributeValue<T>, index, value)
 	if index == "Value" then
-		self._object:SetAttribute(rawget(self, "_attributeName"), value)
+		self._object:SetAttribute(rawget(self :: any, "_attributeName"), value)
+	elseif index == "AttributeName" then
+		error("Cannot set AttributeName")
 	else
 		error(string.format("%q is not a member of AttributeValue", tostring(index)))
 	end

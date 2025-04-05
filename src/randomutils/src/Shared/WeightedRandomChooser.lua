@@ -28,7 +28,7 @@ end
 	removes the option.
 
 	@param option T
-	@param weight number | nil
+	@param weight number?
 ]=]
 function WeightedRandomChooser:SetWeight(option, weight)
 	assert(option ~= nil, "Bad option")
@@ -55,7 +55,7 @@ end
 	Gets the weight for the option
 
 	@param option T
-	@return number | nil
+	@return number?
 ]=]
 function WeightedRandomChooser:GetWeight(option): number?
 	return self._optionToWeight[option]
@@ -65,7 +65,7 @@ end
 	Gets the percent probability from 0 to 1
 
 	@param option T
-	@return number | nil
+	@return number?
 ]=]
 function WeightedRandomChooser:GetProbability(option): number?
 	local weight = self._optionToWeight[option]
@@ -119,7 +119,7 @@ function WeightedRandomChooser:_getOrCreateDataCache()
 	local weights = {}
 
 	local total = 0
-	for index, key in pairs(options) do
+	for index, key in options do
 		local weight = self._optionToWeight[key]
 		total = total + weight
 		weights[index] = weight

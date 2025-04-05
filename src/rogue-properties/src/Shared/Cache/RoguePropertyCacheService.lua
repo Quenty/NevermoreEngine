@@ -5,16 +5,16 @@
 	@class RoguePropertyCacheService
 ]=]
 
+local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
-local require = require(script.Parent.loader).load(script)
-
 local RoguePropertyCache = require("RoguePropertyCache")
+local _ServiceBag = require("ServiceBag")
 
 local RoguePropertyCacheService = {}
 RoguePropertyCacheService.ServiceName = "RoguePropertyCacheService"
 
-function RoguePropertyCacheService:Init(serviceBag)
+function RoguePropertyCacheService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

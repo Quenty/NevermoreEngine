@@ -13,7 +13,7 @@ local HideUtils = {}
 	@param inst Instance
 	@return boolean
 ]=]
-function HideUtils.isHidden(inst)
+function HideUtils.isHidden(inst: Instance): boolean
 	return CollectionService:HasTag(inst, "Hide")
 end
 

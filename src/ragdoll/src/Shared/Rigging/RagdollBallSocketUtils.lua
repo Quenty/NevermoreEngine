@@ -196,7 +196,7 @@ function RagdollBallSocketUtils.ensureBallSockets(character, rigType)
 
 	local topMaid = Maid.new()
 
-	for _, data in pairs(RagdollBallSocketUtils.getRigData(rigType)) do
+	for _, data in RagdollBallSocketUtils.getRigData(rigType) do
 		local part0Name = assert(data.part0Name, "No part0Name")
 		local part1Name = assert(data.part1Name, "No part1Name")
 		local motorName = assert(data.motorName, "No motorName")
@@ -262,7 +262,7 @@ function RagdollBallSocketUtils.ensureBallSockets(character, rigType)
 				mass = RxPhysicsUtils.observePartMass(motorState.part1);
 			}):Subscribe(function(state)
 				local gravityScale = state.gravity / state.referenceGravity
-				local referenceMass = state.referenceMass;
+				local referenceMass = state.referenceMass
 				local massScale = referenceMass and (state.mass / referenceMass) or 1
 				ballSocket.MaxFrictionTorque = state.frictionTorque * massScale * gravityScale
 			end))

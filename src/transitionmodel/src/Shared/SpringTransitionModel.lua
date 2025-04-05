@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class SpringTransitionModel
 ]=]
@@ -10,10 +11,29 @@ local SpringObject = require("SpringObject")
 local Promise = require("Promise")
 local Maid = require("Maid")
 local SpringUtils = require("SpringUtils")
+local _Observable = require("Observable")
+local _Signal = require("Signal")
 
 local SpringTransitionModel = setmetatable({}, BasicPane)
 SpringTransitionModel.ClassName = "SpringTransitionModel"
 SpringTransitionModel.__index = SpringTransitionModel
+
+export type SpringTransitionModel<T> = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_showTarget: any,
+		_hideTarget: any,
+		_springObject: any,
+		_transitionModel: TransitionModel.TransitionModel,
+
+		-- From BasicPane
+		IsVisible: (self: SpringTransitionModel<T>) -> boolean,
+		SetVisible: (self: SpringTransitionModel<T>, isVisible: boolean, doNotAnimate: boolean?) -> (),
+		VisibleChanged: _Signal.Signal<boolean, boolean>,
+		Destroy: (self: SpringTransitionModel<T>) -> (),
+	},
+	SpringTransitionModel
+))
 
 --[=[
 	A transition model that has a spring underlying it. Very useful
@@ -23,8 +43,8 @@ SpringTransitionModel.__index = SpringTransitionModel
 	@param hideTarget T? -- Defaults to 0*showTarget
 	@return SpringTransitionModel<T>
 ]=]
-function SpringTransitionModel.new(showTarget, hideTarget)
-	local self = setmetatable(BasicPane.new(), SpringTransitionModel)
+function SpringTransitionModel.new<T>(showTarget: T?, hideTarget: T?): SpringTransitionModel<T>
+	local self = setmetatable(BasicPane.new() :: any, SpringTransitionModel)
 
 	self._showTarget = showTarget or 1
 	self._hideTarget = hideTarget
@@ -51,7 +71,7 @@ end
 	@param showTarget T?
 	@param doNotAnimate boolean?
 ]=]
-function SpringTransitionModel:SetShowTarget(showTarget, doNotAnimate)
+function SpringTransitionModel.SetShowTarget<T>(self: SpringTransitionModel<T>, showTarget: T?, doNotAnimate: boolean?)
 	self._showTarget = SpringUtils.toLinearIfNeeded(showTarget or 1)
 
 	if self:IsVisible() then
@@ -67,7 +87,7 @@ end
 	@param hideTarget T?
 	@param doNotAnimate boolean?
 ]=]
-function SpringTransitionModel:SetHideTarget(hideTarget, doNotAnimate)
+function SpringTransitionModel.SetHideTarget<T>(self: SpringTransitionModel<T>, hideTarget: T?, doNotAnimate: boolean?)
 	self._hideTarget = hideTarget
 
 	if self:IsVisible() then
@@ -81,7 +101,7 @@ end
 	Returns true if showing is complete
 	@return boolean
 ]=]
-function SpringTransitionModel:IsShowingComplete()
+function SpringTransitionModel.IsShowingComplete<T>(self: SpringTransitionModel<T>): boolean
 	return self._transitionModel:IsShowingComplete()
 end
 
@@ -89,7 +109,7 @@ end
 	Returns true if hiding is complete
 	@return boolean
 ]=]
-function SpringTransitionModel:IsHidingComplete()
+function SpringTransitionModel.IsHidingComplete<T>(self: SpringTransitionModel<T>): boolean
 	return self._transitionModel:IsHidingComplete()
 end
 
@@ -97,7 +117,7 @@ end
 	Observe is showing is complete
 	@return Observable<boolean>
 ]=]
-function SpringTransitionModel:ObserveIsShowingComplete()
+function SpringTransitionModel.ObserveIsShowingComplete<T>(self: SpringTransitionModel<T>): _Observable.Observable<boolean>
 	return self._transitionModel:ObserveIsShowingComplete()
 end
 
@@ -105,7 +125,7 @@ end
 	Observe is hiding is complete
 	@return Observable<boolean>
 ]=]
-function SpringTransitionModel:ObserveIsHidingComplete()
+function SpringTransitionModel.ObserveIsHidingComplete<T>(self: SpringTransitionModel<T>): _Observable.Observable<boolean>
 	return self._transitionModel:ObserveIsHidingComplete()
 end
 
@@ -115,7 +135,7 @@ end
 	@param pane BasicPane
 	@return function -- Cleanup function
 ]=]
-function SpringTransitionModel:BindToPaneVisbility(pane)
+function SpringTransitionModel.BindToPaneVisbility<T>(self: SpringTransitionModel<T>, pane: BasicPane.BasicPane): () -> ()
 	local maid = Maid.new()
 
 	maid:GiveTask(pane.VisibleChanged:Connect(function(isVisible, doNotAnimate)
@@ -145,7 +165,7 @@ end
 
 	@return T
 ]=]
-function SpringTransitionModel:GetVelocity()
+function SpringTransitionModel.GetVelocity<T>(self: SpringTransitionModel<T>)
 	return self._springObject.Velocity
 end
 
@@ -155,7 +175,7 @@ end
 
 	@param epsilon number
 ]=]
-function SpringTransitionModel:SetEpsilon(epsilon)
+function SpringTransitionModel.SetEpsilon<T>(self: SpringTransitionModel<T>, epsilon: number)
 	assert(type(epsilon) == "number", "Bad epsilon")
 
 	self._springObject.Epsilon = epsilon
@@ -166,7 +186,7 @@ end
 
 	@param speed number
 ]=]
-function SpringTransitionModel:SetSpeed(speed)
+function SpringTransitionModel.SetSpeed<T>(self: SpringTransitionModel<T>, speed: number | _Observable.Observable<T>)
 	assert(type(speed) == "number", "Bad speed")
 
 	self._springObject.Speed = speed
@@ -177,7 +197,7 @@ end
 
 	@param damper number
 ]=]
-function SpringTransitionModel:SetDamper(damper)
+function SpringTransitionModel.SetDamper<T>(self: SpringTransitionModel<T>, damper: number | _Observable.Observable<T>)
 	assert(type(damper) == "number", "Bad damper")
 
 	self._springObject.Damper = damper
@@ -187,7 +207,7 @@ end
 	Observes the spring animating
 	@return Observable<T>
 ]=]
-function SpringTransitionModel:ObserveRenderStepped()
+function SpringTransitionModel.ObserveRenderStepped<T>(self: SpringTransitionModel<T>): _Observable.Observable<T>
 	return self._springObject:ObserveRenderStepped()
 end
 
@@ -196,7 +216,7 @@ end
 
 	@return Observable<T>
 ]=]
-function SpringTransitionModel:Observe()
+function SpringTransitionModel.Observe<T>(self: SpringTransitionModel<T>): _Observable.Observable<T>
 	return self._springObject:Observe()
 end
 
@@ -206,7 +226,7 @@ end
 	@param doNotAnimate boolean
 	@return Promise
 ]=]
-function SpringTransitionModel:PromiseShow(doNotAnimate)
+function SpringTransitionModel.PromiseShow<T>(self: SpringTransitionModel<T>, doNotAnimate: boolean?): Promise.Promise<()>
 	return self._transitionModel:PromiseShow(doNotAnimate)
 end
 
@@ -216,7 +236,7 @@ end
 	@param doNotAnimate boolean
 	@return Promise
 ]=]
-function SpringTransitionModel:PromiseHide(doNotAnimate)
+function SpringTransitionModel.PromiseHide<T>(self: SpringTransitionModel<T>, doNotAnimate: boolean?): Promise.Promise<()>
 	return self._transitionModel:PromiseHide(doNotAnimate)
 end
 
@@ -226,11 +246,18 @@ end
 	@param doNotAnimate boolean
 	@return Promise
 ]=]
-function SpringTransitionModel:PromiseToggle(doNotAnimate)
+function SpringTransitionModel.PromiseToggle<T>(
+	self: SpringTransitionModel<T>,
+	doNotAnimate: boolean?
+): Promise.Promise<()>
 	return self._transitionModel:PromiseToggle(doNotAnimate)
 end
 
-function SpringTransitionModel:_promiseShow(maid, doNotAnimate)
+function SpringTransitionModel._promiseShow<T>(
+	self: SpringTransitionModel<T>,
+	maid: Maid.Maid,
+	doNotAnimate: boolean?
+): Promise.Promise<()>
 	self._springObject:SetTarget(self._showTarget, doNotAnimate)
 
 	if doNotAnimate then
@@ -240,7 +267,11 @@ function SpringTransitionModel:_promiseShow(maid, doNotAnimate)
 	end
 end
 
-function SpringTransitionModel:_promiseHide(maid, doNotAnimate)
+function SpringTransitionModel._promiseHide<T>(
+	self: SpringTransitionModel<T>,
+	maid: Maid.Maid,
+	doNotAnimate: boolean?
+): Promise.Promise<()>
 	self._springObject:SetTarget(self:_computeHideTarget(), doNotAnimate)
 
 	if doNotAnimate then
@@ -250,11 +281,11 @@ function SpringTransitionModel:_promiseHide(maid, doNotAnimate)
 	end
 end
 
-function SpringTransitionModel:_computeHideTarget()
+function SpringTransitionModel._computeHideTarget<T>(self: SpringTransitionModel<T>): any
 	if self._hideTarget then
 		return SpringUtils.toLinearIfNeeded(self._hideTarget)
 	else
-		return 0*SpringUtils.toLinearIfNeeded(self._showTarget)
+		return 0 * SpringUtils.toLinearIfNeeded(self._showTarget) :: any
 	end
 end
 

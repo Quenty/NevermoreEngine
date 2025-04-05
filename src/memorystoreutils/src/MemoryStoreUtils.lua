@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Wraps MemoryService APIs
 	@class MemoryStoreUtils
@@ -21,7 +22,12 @@ local DEBUG_QUEUE = false
 	@param priority number?
 	@return Promise
 ]=]
-function MemoryStoreUtils.promiseAdd(queue: MemoryStoreQueue, value: any, expirationSeconds: number, priority: number?)
+function MemoryStoreUtils.promiseAdd(
+	queue: MemoryStoreQueue,
+	value: any,
+	expirationSeconds: number,
+	priority: number?
+): Promise.Promise<()>
 	assert(typeof(queue) == "Instance" and queue:IsA("MemoryStoreQueue"), "Bad queue")
 	assert(type(expirationSeconds) == "number", "Bad expirationSeconds")
 	assert(type(priority) == "number" or priority == nil, "Bad priority")
@@ -58,7 +64,7 @@ function MemoryStoreUtils.promiseRead(
 	count: number,
 	allOrNothing: boolean,
 	waitTimeout: number
-)
+): Promise.Promise<(any?, string?)>
 	assert(typeof(queue) == "Instance" and queue:IsA("MemoryStoreQueue"), "Bad queue")
 	assert(type(count) == "number", "Bad count")
 	assert(type(allOrNothing) == "boolean", "Bad allOrNothing")
@@ -97,7 +103,7 @@ end
 	@param id string
 	@return Promise
 ]=]
-function MemoryStoreUtils.promiseRemove(queue: MemoryStoreQueue, id: string)
+function MemoryStoreUtils.promiseRemove(queue: MemoryStoreQueue, id: string): Promise.Promise<()>
 	assert(typeof(queue) == "Instance" and queue:IsA("MemoryStoreQueue"), "Bad queue")
 	assert(type(id) == "string", "Bad id")
 

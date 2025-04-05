@@ -24,14 +24,12 @@ bridge:RegisterSettingDefinition(volumeDefinition)
 local rumbleDefinition = SettingDefinition.new("Rumble", true)
 bridge:RegisterSettingDefinition(rumbleDefinition)
 
-
-local function handlePlayer(player)
+local function handlePlayer(player: Player)
 	local volume = volumeDefinition:GetSettingProperty(serviceBag, player)
 
-	volume:PromiseValue()
-		:Then(function(value)
-			print(value)
-		end)
+	volume:PromiseValue():Then(function(value)
+		print(value)
+	end)
 
 	-- volume:PromiseSetValue(0.5)
 	-- 	:Then(function()
@@ -40,7 +38,7 @@ local function handlePlayer(player)
 end
 
 game.Players.PlayerAdded:Connect(handlePlayer)
-for _, player in pairs(game.Players:GetPlayers()) do
+for _, player in game.Players:GetPlayers() do
 	handlePlayer(player)
 end
 

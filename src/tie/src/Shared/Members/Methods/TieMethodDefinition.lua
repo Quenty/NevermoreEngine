@@ -8,12 +8,13 @@ local TieMethodImplementation = require("TieMethodImplementation")
 local TieMethodInterfaceUtils = require("TieMethodInterfaceUtils")
 local TieMemberDefinition = require("TieMemberDefinition")
 local TieRealmUtils = require("TieRealmUtils")
+local _TieRealms = require("TieRealms")
 
 local TieMethodDefinition = setmetatable({}, TieMemberDefinition)
 TieMethodDefinition.ClassName = "TieMethodDefinition"
 TieMethodDefinition.__index = TieMethodDefinition
 
-function TieMethodDefinition.new(tieDefinition, methodName, memberTieRealm)
+function TieMethodDefinition.new(tieDefinition, methodName, memberTieRealm: _TieRealms.TieRealm)
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
 	local self = setmetatable(TieMemberDefinition.new(tieDefinition, methodName, memberTieRealm), TieMethodDefinition)
@@ -21,7 +22,7 @@ function TieMethodDefinition.new(tieDefinition, methodName, memberTieRealm)
 	return self
 end
 
-function TieMethodDefinition:GetFriendlyName()
+function TieMethodDefinition:GetFriendlyName(): string
 	return string.format("%s:%s()", self._tieDefinition:GetName(), self._memberName)
 end
 

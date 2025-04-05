@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class PreviewFinder
 ]=]
@@ -24,7 +25,7 @@ PreviewFinder.ClassName = "PreviewFinder"
 PreviewFinder.__index = PreviewFinder
 
 function PreviewFinder.new(serviceBag)
-	local self = setmetatable(BaseObject.new(), PreviewFinder)
+	local self = setmetatable(BaseObject.new() :: any, PreviewFinder)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self:_setup()
@@ -53,7 +54,7 @@ function PreviewFinder:_setupParent(parent)
 		self:_handleChildRemoving(child)
 	end))
 
-	for _, child in pairs(parent:GetDescendants()) do
+	for _, child in parent:GetDescendants() do
 		self:_handleChild(child)
 	end
 
@@ -61,8 +62,7 @@ function PreviewFinder:_setupParent(parent)
 end
 
 function PreviewFinder:_observeAll(child)
-	return RxInstanceUtils.observeDescendants(service)
-
+	return RxInstanceUtils.observeDescendants(child)
 end
 
 function PreviewFinder:_handleChildRemoving()

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class LoaderLinkUtils
 	@private
@@ -7,7 +8,7 @@ local LoaderLink = script.Parent.LoaderLink
 
 local LoaderLinkUtils = {}
 
-function LoaderLinkUtils.create(loader, linkName)
+function LoaderLinkUtils.create(loader: Instance, linkName: string): ModuleScript
 	assert(typeof(loader) == "Instance", "Bad loader")
 	assert(type(linkName) == "string", "Bad linkName")
 

@@ -44,7 +44,7 @@ end
 	@return string
 ]=]
 function String.uppercaseFirstLetter(str: string): string
-	return string.gsub(str, "^%a", string.upper)
+	return (string.gsub(str, "^%a", string.upper))
 end
 
 --[=[

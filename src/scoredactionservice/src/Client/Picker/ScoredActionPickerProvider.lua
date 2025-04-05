@@ -58,7 +58,7 @@ end
 
 function ScoredActionPickerProvider:Update()
 	local indexToRemove = {}
-	for key, picker in pairs(self._scoredActionPickers) do
+	for key, picker in self._scoredActionPickers do
 		picker:Update()
 
 		if not picker:HasActions() then
@@ -66,7 +66,7 @@ function ScoredActionPickerProvider:Update()
 		end
 	end
 
-	for _, key in pairs(indexToRemove) do
+	for _, key in indexToRemove do
 		self._scoredActionPickers[key] = nil
 		self._maid[key] = nil
 	end

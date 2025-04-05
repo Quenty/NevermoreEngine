@@ -18,7 +18,7 @@ HideClient.__index = HideClient
 	@param _adornee Instance
 	@return HideClient
 ]=]
-function HideClient.new(_adornee)
+function HideClient.new(_adornee: Instance)
 	return setmetatable({}, HideClient)
 end
 

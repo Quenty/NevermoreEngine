@@ -22,6 +22,12 @@ local GROWTH_VALUE_NAMES = {
 	"BodyWidthScale";
 }
 
+type ScaleState = {
+	scale: number,
+	maxSize: number,
+	minSize: number,
+}
+
 local RogueHumanoidBase = setmetatable({}, BaseObject)
 RogueHumanoidBase.ClassName = "RogueHumanoidBase"
 RogueHumanoidBase.__index = RogueHumanoidBase
@@ -33,9 +39,9 @@ function RogueHumanoidBase.new(humanoid, serviceBag)
 
 	self._properties = RogueHumanoidProperties:GetPropertyTable(self._serviceBag, self._obj)
 	self._scaleState = self._maid:Add(ValueObject.fromObservable(Rx.combineLatest({
-		scale = self._properties.Scale:Observe();
-		maxSize = self._properties.ScaleMax:Observe();
-		minSize = self._properties.ScaleMin:Observe();
+		scale = self._properties.Scale:Observe(),
+		maxSize = self._properties.ScaleMax:Observe(),
+		minSize = self._properties.ScaleMin:Observe(),
 	})))
 
 	if CharacterUtils.getPlayerFromCharacter(self._obj) == Players.LocalPlayer then
@@ -79,13 +85,16 @@ function RogueHumanoidBase.new(humanoid, serviceBag)
 end
 
 function RogueHumanoidBase:_setupScaling()
-	self._maid:GiveTask(self._scaleState:Observe():Pipe({
-		Rx.where(function(state)
-			return state ~= nil
-		end);
-	}):Subscribe(function(state)
-		self:_updateScale(state)
-	end))
+	self._maid:GiveTask(self._scaleState
+		:Observe()
+		:Pipe({
+			Rx.where(function(state)
+				return state ~= nil
+			end),
+		})
+		:Subscribe(function(state)
+			self:_updateScale(state)
+		end))
 
 	self._maid:GiveTask(self._obj.ChildAdded:Connect(function(child)
 		if GROWTH_VALUE_NAMES[child.Name] and child:IsA("NumberValue") then
@@ -130,8 +139,8 @@ function RogueHumanoidBase:_setupIgnoreCFrameChangesOnScaleChange()
 	end))
 end
 
-function RogueHumanoidBase:_updateScale(state)
-	for _, name in pairs(GROWTH_VALUE_NAMES) do
+function RogueHumanoidBase:_updateScale(state: ScaleState)
+	for _, name in GROWTH_VALUE_NAMES do
 		local numberValue = self._obj:FindFirstChild(name)
 		if not (numberValue and numberValue:IsA("NumberValue")) then
 			continue
@@ -141,7 +150,7 @@ function RogueHumanoidBase:_updateScale(state)
 	end
 end
 
-function RogueHumanoidBase:_updateScaleValue(numberValue, state)
+function RogueHumanoidBase:_updateScaleValue(numberValue: NumberValue, state: ScaleState)
 	assert(typeof(numberValue) == "Instance", "Bad numberValue")
 	assert(numberValue:IsA("NumberValue"), "Bad numberValue")
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions to wrap invoking a remote function with a promise
 	@class RemoteFunctionUtils
@@ -15,7 +16,7 @@ local RemoteFunctionUtils = {}
 	@param ... any
 	@return Promise<T>
 ]=]
-function RemoteFunctionUtils.promiseInvokeServer(remoteFunction, ...)
+function RemoteFunctionUtils.promiseInvokeServer(remoteFunction: RemoteFunction, ...): Promise.Promise<any>
 	assert(typeof(remoteFunction) == "Instance" and remoteFunction:IsA("RemoteFunction"), "Bad remoteFunction")
 
 	local args = table.pack(...)
@@ -45,7 +46,11 @@ end
 	@param ... any
 	@return Promise<T>
 ]=]
-function RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...)
+function RemoteFunctionUtils.promiseInvokeClient(
+	remoteFunction: RemoteFunction,
+	player: Player,
+	...
+): Promise.Promise<any>
 	assert(typeof(remoteFunction) == "Instance" and remoteFunction:IsA("RemoteFunction"), "Bad remoteFunction")
 
 	local args = table.pack(...)
@@ -74,7 +79,10 @@ end
 	@param ... any
 	@return Promise<T>
 ]=]
-function RemoteFunctionUtils.promiseInvokeBindableFunction(bindableFunction, ...)
+function RemoteFunctionUtils.promiseInvokeBindableFunction(
+	bindableFunction: BindableFunction,
+	...
+): Promise.Promise<any>
 	assert(typeof(bindableFunction) == "Instance" and bindableFunction:IsA("BindableFunction"), "Bad bindableFunction")
 
 	local args = table.pack(...)
@@ -104,7 +112,7 @@ end
 	@param ... any
 	@return Promise<T>
 ]=]
-function RemoteFunctionUtils.fromPromiseYieldResult(ok, ...)
+function RemoteFunctionUtils.fromPromiseYieldResult(ok: boolean, ...): Promise.Promise<any>
 	if ok then
 		return ...
 	else

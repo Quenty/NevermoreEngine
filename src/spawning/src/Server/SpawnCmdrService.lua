@@ -4,14 +4,16 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local _ServiceBag = require("ServiceBag")
+
 local SpawnCmdrService = {}
 SpawnCmdrService.ServiceName = "SpawnCmdrService"
 
-function SpawnCmdrService:Init(serviceBag)
+function SpawnCmdrService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._spawnService = self._serviceBag:GetService(require("SpawnService"))
+	self._spawnService = self._serviceBag:GetService((require :: any)("SpawnService"))
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
 
 	self._cmdrService:RegisterCommand({

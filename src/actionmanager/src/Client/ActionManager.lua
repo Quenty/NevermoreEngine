@@ -78,7 +78,7 @@ end
 function ActionManager:GetActions()
 	local list = {}
 
-	for _, action in pairs(self._actions) do
+	for _, action in self._actions do
 		table.insert(list, action)
 	end
 

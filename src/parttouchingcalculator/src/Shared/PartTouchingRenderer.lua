@@ -20,7 +20,7 @@ function PartTouchingRenderer.new()
 end
 
 function PartTouchingRenderer:RenderTouchingProps(touchingPartList)
-	for _, part in pairs(touchingPartList) do
+	for _, part in touchingPartList do
 		local selectionBox = Instance.new("SelectionBox")
 		selectionBox.Name = "TouchingWarning"
 		selectionBox.LineThickness = 0.05

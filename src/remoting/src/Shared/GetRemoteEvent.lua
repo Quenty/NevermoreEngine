@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides getting named global [RemoteEvent] resources.
 	@class GetRemoteEvent
@@ -45,7 +46,7 @@ local RunService = game:GetService("RunService")
 local ResourceConstants = require("ResourceConstants")
 
 if not RunService:IsRunning() then
-	return function(name)
+	return function(name: string): RemoteEvent
 		local event = Instance.new("RemoteEvent")
 		event.Archivable = false
 		event.Name = "Mock" .. name
@@ -53,33 +54,45 @@ if not RunService:IsRunning() then
 		return event
 	end
 elseif RunService:IsServer() then
-	return function(name)
-		assert(type(name) == "string", "Bad name")
-
+	local function getOrCreateStorage(): Instance
 		local storage = ReplicatedStorage:FindFirstChild(ResourceConstants.REMOTE_EVENT_STORAGE_NAME)
-		if not storage then
-			storage = Instance.new("Folder")
-			storage.Name = ResourceConstants.REMOTE_EVENT_STORAGE_NAME
-			storage.Archivable = false
-			storage.Parent = ReplicatedStorage
+		if storage then
+			return storage
 		end
 
+		local created = Instance.new("Folder")
+		created.Name = ResourceConstants.REMOTE_EVENT_STORAGE_NAME
+		created.Archivable = false
+		created.Parent = ReplicatedStorage
+		return created
+	end
+
+	return function(name: string): RemoteEvent
+		assert(type(name) == "string", "Bad name")
+
+		local storage = getOrCreateStorage()
+
 		local event = storage:FindFirstChild(name)
-		if event then
+		if event and event:IsA("RemoteEvent") then
 			return event
 		end
 
-		event = Instance.new("RemoteEvent")
-		event.Name = name
-		event.Archivable = false
-		event.Parent = storage
+		local created = Instance.new("RemoteEvent")
+		created.Name = name
+		created.Archivable = false
+		created.Parent = storage
 
-		return event
+		return created
 	end
 else -- RunService:IsClient()
-	return function(name)
+	return function(name: string): RemoteEvent
 		assert(type(name) == "string", "Bad name")
 
-		return ReplicatedStorage:WaitForChild(ResourceConstants.REMOTE_EVENT_STORAGE_NAME):WaitForChild(name)
+		local found = ReplicatedStorage:WaitForChild(ResourceConstants.REMOTE_EVENT_STORAGE_NAME):WaitForChild(name)
+		if found and found:IsA("RemoteEvent") then
+			return found
+		end
+
+		error("Could not find remote event " .. name)
 	end
 end

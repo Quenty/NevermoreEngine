@@ -21,15 +21,15 @@ end
 function BinderTouchingCalculator:GetTouchingClass(binder, touchingList, ignoreObject)
 	local touching = {}
 
-	for _, part in pairs(touchingList) do
+	for _, part in touchingList do
 		local object = BinderUtils.findFirstAncestor(binder, part)
 		if object then
 			if not touching[object] then
 				touching[object] = {
-					Object = object;
+					Object = object,
 					Touching = {
-						part
-					};
+						part,
+					},
 				}
 			else
 				table.insert(touching[object].Touching, part)
@@ -42,7 +42,7 @@ function BinderTouchingCalculator:GetTouchingClass(binder, touchingList, ignoreO
 	end
 
 	local list = {}
-	for _, data in pairs(touching) do
+	for _, data in touching do
 		table.insert(list, data)
 	end
 

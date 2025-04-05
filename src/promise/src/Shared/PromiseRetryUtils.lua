@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class PromiseRetryUtils
 ]=]
@@ -9,7 +10,21 @@ local Math = require("Math")
 
 local PromiseRetryUtils = {}
 
-function PromiseRetryUtils.retry(callback, options)
+export type RetryOptions = {
+	initialWaitTime: number,
+	maxAttempts: number,
+	printWarning: boolean,
+}
+
+--[=[
+	Returns a promise that will retry the given callback until it succeeds or the max attempts
+	is reached.
+
+	@param callback function -- Callback that returns a promise
+	@param options RetryOptions -- Options for retrying
+	@return Promise<T>
+]=]
+function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, options: RetryOptions): Promise.Promise<T...>
 	assert(type(options.initialWaitTime) == "number", "Bad initialWaitTime")
 	assert(type(options.maxAttempts) == "number", "Bad maxAttempts")
 	assert(type(options.printWarning) == "boolean", "Bad printWarning")
@@ -39,7 +54,11 @@ function PromiseRetryUtils.retry(callback, options)
 		end
 
 		isLoopResolved = true
-		local errorMessage = string.format("Attempted request %d times before failing with error", tostring(lastResults[2]))
+		local errorMessage = string.format(
+			"Attempted request %d times before failing with error %s",
+			options.maxAttempts,
+			tostring(lastResults[2])
+		)
 		promise:Reject(errorMessage, table.unpack(lastResults, 3, lastResults.n))
 	end)
 

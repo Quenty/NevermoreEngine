@@ -130,7 +130,7 @@ function PlayerProductManagerClient:_connectBulkPurchaseMarketplace()
 
 		-- Update ownership information
 		if status == Enum.MarketplaceBulkPurchasePromptStatus.Completed then
-			for _, item in pairs(results.Items) do
+			for _, item in results.Items do
 				local tracker
 				if item.type == Enum.MarketplaceProductType.AvatarAsset then
 					tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)

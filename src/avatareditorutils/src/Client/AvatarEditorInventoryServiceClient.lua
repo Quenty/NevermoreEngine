@@ -14,11 +14,12 @@ local MemorizeUtils = require("MemorizeUtils")
 local Promise = require("Promise")
 local ValueObject = require("ValueObject")
 local PagesProxy = require("PagesProxy")
+local _ServiceBag = require("ServiceBag")
 
 local AvatarEditorInventoryServiceClient = {}
 AvatarEditorInventoryServiceClient.ServiceName = "AvatarEditorInventoryServiceClient"
 
-function AvatarEditorInventoryServiceClient:Init(serviceBag)
+function AvatarEditorInventoryServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

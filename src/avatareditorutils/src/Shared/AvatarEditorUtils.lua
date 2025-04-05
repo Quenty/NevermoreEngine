@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides utilities to query the AvatarEditorService with a promise wrapper.
 
@@ -26,6 +27,12 @@ local AvatarEditorUtils = {}
 	.Type string
 	@within AvatarEditorUtils
 ]=]
+export type AvatarItemBundledItemDetails = {
+	Owned: boolean,
+	Id: number,
+	Name: string,
+	Type: string,
+}
 
 --[=[
 	Holds premium pricing detail
@@ -35,6 +42,10 @@ local AvatarEditorUtils = {}
 	.PremiumPriceInRobux number
 	@within AvatarEditorUtils
 ]=]
+export type PremiumPricingItemDetails = {
+	PremiumDiscountPercentage: number,
+	PremiumPriceInRobux: number,
+}
 
 --[=[
 	A table with a variety of information about avatar items and details.
@@ -68,6 +79,33 @@ local AvatarEditorUtils = {}
 	.FavoriteCount number
 	@within AvatarEditorUtils
 ]=]
+export type AvatarItemDetails = {
+	IsForRent: boolean,
+	ExpectedSellerId: number,
+	Owned: boolean,
+	IsPurchasable: boolean,
+	Id: number,
+	ItemType: "Asset" | "Bundle" | string,
+	AssetType: "Image" | string,
+	BundleType: "BodyParts" | string,
+	Name: string,
+	Description: string,
+	ProductId: number,
+	Genres: { string },
+	BundledItems: { AvatarItemBundledItemDetails },
+	ItemStatus: { string },
+	ItemRestrictions: "ThirteenPlus",
+	CreatorType: "User" | string,
+	CreatorTargetId: number,
+	CreatorName: string,
+	Price: number,
+	PremiumPricing: PremiumPricingItemDetails,
+	LowestPrice: number,
+	PriceStatus: string,
+	UnitsAvailableForConsumption: number,
+	PurchaseCount: number,
+	FavoriteCount: number,
+}
 
 --[=[
 	This function returns the item details for the given item.
@@ -78,12 +116,15 @@ local AvatarEditorUtils = {}
 	@param itemId number
 	@return Promise<AvatarItemDetails>
 ]=]
-function AvatarEditorUtils.promiseItemDetails(itemId: number, itemType: AvatarItemType)
+function AvatarEditorUtils.promiseItemDetails(
+	itemId: number,
+	itemType: Enum.AvatarItemType
+): Promise.Promise<AvatarItemDetails>
 	assert(type(itemId) == "number", "Bad itemId")
 	assert(EnumUtils.isOfType(Enum.AvatarItemType, itemType), "Bad itemType")
 
 	return Promise.spawn(function(resolve, reject)
-		local itemDetails
+		local itemDetails: AvatarItemDetails
 		local ok, err = pcall(function()
 			itemDetails = AvatarEditorService:GetItemDetails(itemId, itemType)
 		end)
@@ -108,12 +149,15 @@ end
 	@param itemType AvatarItemType
 	@return Promise<{ { AvatarItemDetails } >
 ]=]
-function AvatarEditorUtils.promiseBatchItemDetails(itemIds: { number }, itemType: AvatarItemType)
+function AvatarEditorUtils.promiseBatchItemDetails(
+	itemIds: { number },
+	itemType: Enum.AvatarItemType
+): Promise.Promise<{ AvatarItemDetails }>
 	assert(type(itemIds) == "table", "Bad itemIds")
 	assert(EnumUtils.isOfType(Enum.AvatarItemType, itemType), "Bad itemType")
 
 	return Promise.spawn(function(resolve, reject)
-		local batchItemDetailsList
+		local batchItemDetailsList: { AvatarItemDetails }
 		local ok, err = pcall(function()
 			batchItemDetailsList = AvatarEditorService:GetBatchItemDetails(itemIds, itemType)
 		end)
@@ -140,8 +184,11 @@ end
 	@param humanoidDescription HumanoidDescription
 	@return Promise<HumanoidDescription?>
 ]=]
-function AvatarEditorUtils.promiseCheckApplyDefaultClothing(humanoidDescription: HumanoidDescription)
-	assert(typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"), "Bad humanoidDescription")
+function AvatarEditorUtils.promiseCheckApplyDefaultClothing(humanoidDescription: HumanoidDescription): Promise.Promise<HumanoidDescription?>
+	assert(
+		typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"),
+		"Bad humanoidDescription"
+	)
 
 	return Promise.spawn(function(resolve, reject)
 		local newDescriptionOrNil
@@ -150,7 +197,9 @@ function AvatarEditorUtils.promiseCheckApplyDefaultClothing(humanoidDescription:
 		end)
 
 		if not ok then
-			return reject(err or "[AvatarEditorUtils.promiseCheckApplyDefaultClothing] - Failed to CheckApplyDefaultClothing")
+			return reject(
+				err or "[AvatarEditorUtils.promiseCheckApplyDefaultClothing] - Failed to CheckApplyDefaultClothing"
+			)
 		end
 
 		if newDescriptionOrNil == nil then
@@ -172,7 +221,10 @@ end
 	@return Promise<HumanoidDescription>
 ]=]
 function AvatarEditorUtils.promiseConformToAvatarRules(humanoidDescription: HumanoidDescription)
-	assert(typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"), "Bad humanoidDescription")
+	assert(
+		typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"),
+		"Bad humanoidDescription"
+	)
 
 	return Promise.spawn(function(resolve, reject)
 		local newDescription
@@ -181,7 +233,9 @@ function AvatarEditorUtils.promiseConformToAvatarRules(humanoidDescription: Huma
 		end)
 
 		if not ok then
-			return reject(err or "[AvatarEditorUtils.promiseConformToAvatarRules] - Failed to CheckApplyDefaultClothing")
+			return reject(
+				err or "[AvatarEditorUtils.promiseConformToAvatarRules] - Failed to CheckApplyDefaultClothing"
+			)
 		end
 
 		if not (typeof(newDescription) == "Instance" and newDescription:IsA("HumanoidDescription")) then
@@ -201,6 +255,11 @@ end
 	.Name string
 	@within AvatarEditorUtils
 ]=]
+export type AvatarRulesWearableAssetType = {
+	MaxNumber: number,
+	Id: number,
+	Name: string,
+}
 
 --[=[
 	https://create.roblox.com/docs/reference/engine/classes/AvatarEditorService#GetAvatarRules
@@ -211,6 +270,11 @@ end
 	.Name string
 	@within AvatarEditorUtils
 ]=]
+export type AvatarRulesBodyColor = {
+	BrickColorId: number,
+	NexColor: string,
+	Name: string,
+}
 
 --[=[
 	@interface AvatarRuleDefaultClothingAssetLists
@@ -218,6 +282,10 @@ end
 	.DefaultPantAssetIds { number }
 	@within AvatarEditorUtils
 ]=]
+export type AvatarRuleDefaultClothingAssetLists = {
+	DefaultShirtAssetIds: { number },
+	DefaultPantAssetIds: { number },
+}
 
 --[=[
 	https://create.roblox.com/docs/reference/engine/classes/AvatarEditorService#GetAvatarRules
@@ -235,6 +303,18 @@ end
 	.EmotesEnabledForUser boolean
 	@within AvatarEditorUtils
 ]=]
+export type AvatarRules = {
+	PlayerAvatarTypes: "R6" | "R15" | string,
+	Scales: { [string]: number },
+	WearableAssetTypes: { AvatarRulesWearableAssetType },
+	BodyColorsPalette: { AvatarRulesBodyColor },
+	BasicBodyColorsPalette: { AvatarRulesBodyColor },
+	MinimumDeltaEBodyColorDifference: number,
+	ProportionsAndBodyTypeEnabledForUser: boolean,
+	DefaultClothingAssetLists: AvatarRuleDefaultClothingAssetLists,
+	BundlesEnabledForUser: boolean,
+	EmotesEnabledForUser: boolean,
+}
 
 --[=[
 	Returns the platform Avatar rules for things such as scaling, default shirts and pants, number of wearable assets.
@@ -245,7 +325,7 @@ end
 ]=]
 function AvatarEditorUtils.promiseAvatarRules()
 	return Promise.spawn(function(resolve, reject)
-		local avatarRulesTable
+		local avatarRulesTable: AvatarRules
 		local ok, err = pcall(function()
 			avatarRulesTable = AvatarEditorService:GetAvatarRules()
 		end)
@@ -269,12 +349,12 @@ end
 	@param itemType AvatarItemType
 	@return Promise<boolean>
 ]=]
-function AvatarEditorUtils.promiseIsFavorited(itemId: number, itemType: AvatarItemType)
+function AvatarEditorUtils.promiseIsFavorited(itemId: number, itemType: Enum.AvatarItemType)
 	assert(type(itemId) == "number", "Bad itemId")
 	assert(EnumUtils.isOfType(Enum.AvatarItemType, itemType), "Bad itemType")
 
 	return Promise.spawn(function(resolve, reject)
-		local isFavorited
+		local isFavorited: boolean
 		local ok, err = pcall(function()
 			isFavorited = AvatarEditorService:GetFavorite(itemId, itemType)
 		end)
@@ -301,7 +381,7 @@ function AvatarEditorUtils.promiseSearchCatalog(catalogSearchParams: CatalogSear
 	assert(typeof(catalogSearchParams) == "CatalogSearchParams", "Bad catalogSearchParams")
 
 	return Promise.spawn(function(resolve, reject)
-		local catalogPages
+		local catalogPages: CatalogPages
 		local ok, err = pcall(function()
 			catalogPages = AvatarEditorService:SearchCatalog(catalogSearchParams)
 		end)
@@ -324,7 +404,7 @@ end
 	@param assetTypes { AvatarAssetType }
 	@return Promise<InventoryPages>
 ]=]
-function AvatarEditorUtils.promiseInventoryPages(assetTypes: { AvatarAssetType })
+function AvatarEditorUtils.promiseInventoryPages(assetTypes: { Enum.AvatarAssetType })
 	assert(type(assetTypes) == "table", "Bad assetTypes")
 
 	return Promise.spawn(function(resolve, reject)
@@ -355,12 +435,12 @@ end
 	@param outfitType OutfitType
 	@return Promise<OutfitPages>
 ]=]
-function AvatarEditorUtils.promiseOutfitPages(outfitSource: OutfitSource, outfitType: OutfitType)
+function AvatarEditorUtils.promiseOutfitPages(outfitSource: Enum.OutfitSource, outfitType: Enum.OutfitType)
 	assert(EnumUtils.isOfType(Enum.OutfitSource, outfitSource), "Bad outfitSource")
 	assert(EnumUtils.isOfType(Enum.OutfitType, outfitType), "Bad outfitType")
 
 	return Promise.spawn(function(resolve, reject)
-		local outfitPages
+		local outfitPages: OutfitPages
 		local ok, err = pcall(function()
 			outfitPages = AvatarEditorService:GetOutfits(outfitSource, outfitSource, outfitType)
 		end)
@@ -391,14 +471,14 @@ end
 	@param contextAssetId number? -- Optional. if not provided just gives recommendations in general
 	@return Promise<{ number }>
 ]=]
-function AvatarEditorUtils.promiseRecommendedAssets(assetType: AvatarAssetType, contextAssetId: number)
+function AvatarEditorUtils.promiseRecommendedAssets(assetType: Enum.AvatarAssetType, contextAssetId: number?)
 	assert(EnumUtils.isOfType(Enum.AvatarAssetType, assetType), "Bad assetType")
 	assert(type(contextAssetId) == "number" or contextAssetId == nil, "Bad contextAssetId")
 
 	contextAssetId = contextAssetId or 0
 
 	return Promise.spawn(function(resolve, reject)
-		local result
+		local result: { number }
 		local ok, err = pcall(function()
 			result = AvatarEditorService:GetRecommendedAssets(assetType, contextAssetId)
 		end)
@@ -421,7 +501,7 @@ function AvatarEditorUtils.promiseRecommendedBundles(bundleId: number)
 	assert(type(bundleId) == "number", "Bad bundleId")
 
 	return Promise.spawn(function(resolve, reject)
-		local recommendedBundleIds
+		local recommendedBundleIds: { number }
 		local ok, err = pcall(function()
 			recommendedBundleIds = AvatarEditorService:GetRecommendedBundles(bundleId)
 		end)
@@ -485,7 +565,7 @@ end
 	@param rigType HumanoidRigType
 	@return Promise<AvatarPromptResult>
 ]=]
-function AvatarEditorUtils.promptCreateOutfit(outfit: HumanoidDescription, rigType: HumanoidRigType)
+function AvatarEditorUtils.promptCreateOutfit(outfit: HumanoidDescription, rigType: Enum.HumanoidRigType)
 	assert(typeof(outfit) == "Instance" and outfit:IsA("HumanoidDescription"), "Bad outfit")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
@@ -533,13 +613,15 @@ function AvatarEditorUtils.promptDeleteOutfit(outfitId: number)
 		maid:DoCleaning()
 	end)
 
-	maid:GiveTask(AvatarEditorService.PromptDeleteOutfitCompleted:Connect(function(avatarPromptResult)
-		if avatarPromptResult == Enum.AvatarPromptResult.Success then
-			promise:Resolve(avatarPromptResult)
-		else
-			promise:Reject(avatarPromptResult)
-		end
-	end))
+	maid:GiveTask(
+		AvatarEditorService.PromptDeleteOutfitCompleted:Connect(function(avatarPromptResult: Enum.AvatarPromptResult)
+			if avatarPromptResult == Enum.AvatarPromptResult.Success then
+				promise:Resolve(avatarPromptResult)
+			else
+				promise:Reject(avatarPromptResult)
+			end
+		end)
+	)
 
 	local ok, err = pcall(function()
 		AvatarEditorService:PromptDeleteOutfit(outfitId)
@@ -569,13 +651,15 @@ function AvatarEditorUtils.promptRenameOutfit(outfitId: number)
 		maid:DoCleaning()
 	end)
 
-	maid:GiveTask(AvatarEditorService.PromptRenameOutfitCompleted:Connect(function(avatarPromptResult)
-		if avatarPromptResult == Enum.AvatarPromptResult.Success then
-			promise:Resolve(avatarPromptResult)
-		else
-			promise:Reject(avatarPromptResult)
-		end
-	end))
+	maid:GiveTask(
+		AvatarEditorService.PromptRenameOutfitCompleted:Connect(function(avatarPromptResult: Enum.AvatarPromptResult)
+			if avatarPromptResult == Enum.AvatarPromptResult.Success then
+				promise:Resolve(avatarPromptResult)
+			else
+				promise:Reject(avatarPromptResult)
+			end
+		end)
+	)
 
 	local ok, err = pcall(function()
 		AvatarEditorService:PromptRenameOutfit(outfitId)
@@ -593,8 +677,11 @@ end
 	@param rigType HumanoidRigType
 	@return Promise<AvatarPromptResult>
 ]=]
-function AvatarEditorUtils.promptSaveAvatar(humanoidDescription: HumanoidDescription, rigType: HumanoidRigType)
-	assert(typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"), "Bad humanoidDescription")
+function AvatarEditorUtils.promptSaveAvatar(humanoidDescription: HumanoidDescription, rigType: Enum.HumanoidRigType)
+	assert(
+		typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"),
+		"Bad humanoidDescription"
+	)
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
 	local maid = Maid.new()
@@ -605,13 +692,15 @@ function AvatarEditorUtils.promptSaveAvatar(humanoidDescription: HumanoidDescrip
 		maid:DoCleaning()
 	end)
 
-	maid:GiveTask(AvatarEditorService.PromptSaveAvatarCompleted:Connect(function(avatarPromptResult)
-		if avatarPromptResult == Enum.AvatarPromptResult.Success then
-			promise:Resolve(avatarPromptResult)
-		else
-			promise:Reject(avatarPromptResult)
-		end
-	end))
+	maid:GiveTask(
+		AvatarEditorService.PromptSaveAvatarCompleted:Connect(function(avatarPromptResult: Enum.AvatarPromptResult)
+			if avatarPromptResult == Enum.AvatarPromptResult.Success then
+				promise:Resolve(avatarPromptResult)
+			else
+				promise:Reject(avatarPromptResult)
+			end
+		end)
+	)
 
 	local ok, err = pcall(function()
 		AvatarEditorService:PromptSaveAvatar(humanoidDescription, rigType)
@@ -628,11 +717,11 @@ end
 	This function prompts the Players.LocalPlayer to favorite or unfavorite the given asset or bundle.
 
 	@param itemId number
-	@param itemType AvatarItemType
+	@param itemType Enum.AvatarItemType
 	@param shouldFavorite boolean
 	@return Promise<AvatarPromptResult>
 ]=]
-function AvatarEditorUtils.promptSetFavorite(itemId: number, itemType: AvatarItemType, shouldFavorite: boolean)
+function AvatarEditorUtils.promptSetFavorite(itemId: number, itemType: Enum.AvatarItemType, shouldFavorite: boolean)
 	assert(type(itemId) == "number", "Bad itemId")
 	assert(EnumUtils.isOfType(Enum.AvatarItemType, itemType), "Bad itemType")
 	assert(type(shouldFavorite) == "boolean", "Bad shouldFavorite")
@@ -645,13 +734,15 @@ function AvatarEditorUtils.promptSetFavorite(itemId: number, itemType: AvatarIte
 		maid:DoCleaning()
 	end)
 
-	maid:GiveTask(AvatarEditorService.PromptSetFavoriteCompleted:Connect(function(avatarPromptResult)
-		if avatarPromptResult == Enum.AvatarPromptResult.Success then
-			promise:Resolve(avatarPromptResult)
-		else
-			promise:Reject(avatarPromptResult)
-		end
-	end))
+	maid:GiveTask(
+		AvatarEditorService.PromptSetFavoriteCompleted:Connect(function(avatarPromptResult: Enum.AvatarPromptResult)
+			if avatarPromptResult == Enum.AvatarPromptResult.Success then
+				promise:Resolve(avatarPromptResult)
+			else
+				promise:Reject(avatarPromptResult)
+			end
+		end)
+	)
 
 	local ok, err = pcall(function()
 		AvatarEditorService:PromptSetFavorite(itemId, itemType, shouldFavorite)
@@ -672,7 +763,7 @@ end
 	@param rigType HumanoidRigType
 	@return Promise<AvatarPromptResult>
 ]=]
-function AvatarEditorUtils.promptUpdateOutfit(outfitId: number, updatedOutfit: HumanoidDescription, rigType: HumanoidRigType)
+function AvatarEditorUtils.promptUpdateOutfit(outfitId: number, updatedOutfit: HumanoidDescription, rigType: Enum.HumanoidRigType)
 	assert(type(outfitId) == "number", "Bad outfitId")
 	assert(typeof(updatedOutfit) == "Instance" and updatedOutfit:IsA("HumanoidDescription"), "Bad updatedOutfit")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
@@ -685,7 +776,7 @@ function AvatarEditorUtils.promptUpdateOutfit(outfitId: number, updatedOutfit: H
 		maid:DoCleaning()
 	end)
 
-	maid:GiveTask(AvatarEditorService.PromptUpdateOutfitCompleted:Connect(function(avatarPromptResult)
+	maid:GiveTask(AvatarEditorService.PromptUpdateOutfitCompleted:Connect(function(avatarPromptResult: Enum.AvatarPromptResult)
 		if avatarPromptResult == Enum.AvatarPromptResult.Success then
 			promise:Resolve(avatarPromptResult)
 		else

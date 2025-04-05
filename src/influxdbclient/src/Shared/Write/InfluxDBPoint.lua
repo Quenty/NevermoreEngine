@@ -13,7 +13,9 @@ local InfluxDBPoint = {}
 InfluxDBPoint.ClassName = "InfluxDBPoint"
 InfluxDBPoint.__index = InfluxDBPoint
 
-function InfluxDBPoint.new(measurementName)
+export type InfluxDBPoint = typeof(setmetatable({}, InfluxDBPoint))
+
+function InfluxDBPoint.new(measurementName: string?): InfluxDBPoint
 	local self = setmetatable({}, InfluxDBPoint)
 
 	assert(type(measurementName) == "string" or measurementName == nil, "Bad measurementName")
@@ -36,7 +38,7 @@ function InfluxDBPoint.fromTableData(data)
 	if data.tags then
 		assert(type(data.tags) == "table", "Bad data.tags")
 
-		for tagKey, tagValue in pairs(data.tags) do
+		for tagKey, tagValue in data.tags do
 			assert(type(tagKey) == "string", "Bad tagKey")
 			assert(type(tagValue) == "string", "Bad tagValue")
 		end
@@ -46,7 +48,7 @@ function InfluxDBPoint.fromTableData(data)
 	if data.fields then
 		assert(type(data.fields) == "table", "Bad data.fields")
 
-		for fieldKey, fieldValue in pairs(data.fields) do
+		for fieldKey, fieldValue in data.fields do
 			assert(type(fieldKey) == "string", "Bad fieldKey")
 			assert(type(fieldValue) == "string", "Bad fieldValue")
 
@@ -59,12 +61,11 @@ function InfluxDBPoint.fromTableData(data)
 	return copy
 end
 
-function InfluxDBPoint.isInfluxDBPoint(point)
-	return type(point) == "table"
-		and getmetatable(point) == InfluxDBPoint
+function InfluxDBPoint.isInfluxDBPoint(point: any): boolean
+	return type(point) == "table" and getmetatable(point) == InfluxDBPoint
 end
 
-function InfluxDBPoint:SetMeasurementName(name)
+function InfluxDBPoint:SetMeasurementName(name: string)
 	assert(type(name) == "string" or name == nil, "Bad name")
 
 	self._measurementName = name
@@ -76,10 +77,10 @@ end
 
 function InfluxDBPoint:ToTableData()
 	return {
-		measurementName = self._measurementName;
-		timestamp = self._timestamp;
-		tags = table.clone(self._tags);
-		fields = table.clone(self._fields);
+		measurementName = self._measurementName,
+		timestamp = self._timestamp,
+		tags = table.clone(self._tags),
+		fields = table.clone(self._fields),
 	}
 end
 
@@ -88,7 +89,7 @@ end
 
 	@param timestamp DateTime | nil
 ]=]
-function InfluxDBPoint:SetTimestamp(timestamp)
+function InfluxDBPoint:SetTimestamp(timestamp: DateTime?)
 	assert(typeof(timestamp) == "DateTime" or timestamp == nil, "Bad timestamp")
 
 	self._timestamp = timestamp
@@ -100,7 +101,7 @@ end
 	@param tagKey string
 	@param tagValue string
 ]=]
-function InfluxDBPoint:AddTag(tagKey, tagValue)
+function InfluxDBPoint:AddTag(tagKey: string, tagValue: string)
 	assert(type(tagKey) == "string", "Bad tagKey")
 	assert(type(tagValue) == "string", "Bad tagValue")
 
@@ -113,18 +114,16 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddIntField(fieldName, value)
+function InfluxDBPoint:AddIntField(fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
-	if Math.isNaN(value)
-		or value <= -9223372036854776e3
-		or value >= 9223372036854776e3 then
-		error(string.format("invalid integer value for field '%s': %s", fieldName, value))
+	if Math.isNaN(value) or value <= -9223372036854776e3 or value >= 9223372036854776e3 then
+		error(string.format("invalid integer value for field '%s': %d", fieldName, value))
 	end
 
 	if not Math.isFinite(value) then
-		error(string.format("invalid integer value for field '%s': %s", fieldName, value))
+		error(string.format("invalid integer value for field '%s': %d", fieldName, value))
 	end
 
 	self._fields[fieldName] = string.format("%di", value)
@@ -136,18 +135,16 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddUintField(fieldName, value)
+function InfluxDBPoint:AddUintField(fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
-	if Math.isNaN(value)
-		or value < 0
-		or value >= 9007199254740991 then
-		error(string.format("invalid uint value for field '%s': %s", fieldName, value))
+	if Math.isNaN(value) or value < 0 or value >= 9007199254740991 then
+		error(string.format("invalid uint value for field '%s': %d", fieldName, value))
 	end
 
 	if not Math.isFinite(value) then
-		error(string.format("invalid uint value for field '%s': %s", fieldName, value))
+		error(string.format("invalid uint value for field '%s': %d", fieldName, value))
 	end
 
 	-- TODO: Support larger uint sizes
@@ -160,12 +157,12 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddFloatField(fieldName, value)
+function InfluxDBPoint:AddFloatField(fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
 	if not Math.isFinite(value) then
-		error(string.format("invalid float value for field '%s': %s", fieldName, value))
+		error(string.format("invalid float value for field '%s': %d", fieldName, value))
 	end
 
 	self._fields[fieldName] = tostring(value)
@@ -206,7 +203,7 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 	table.sort(fieldKeys)
 
 	local fields = {}
-	for _, key in pairs(fieldKeys) do
+	for _, key in fieldKeys do
 		local value = self._fields[key]
 		table.insert(fields, InfluxDBEscapeUtils.tag(key) .. "=" .. value)
 	end
@@ -222,14 +219,14 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 	local defaultTags = pointSettings:GetDefaultTags()
 	if next(defaultTags) or next(self._tags) then
 		local tagKeysSet = table.clone(self._tags)
-		for key, value in pairs(defaultTags) do
+		for key, value in defaultTags do
 			tagKeysSet[key] = value
 		end
 		local tagKeys = Set.toList(tagKeysSet)
 		table.sort(tagKeys)
 
 		tags = {}
-		for _, key in pairs(tagKeys) do
+		for _, key in tagKeys do
 			local value = self._tags[key] or defaultTags[key]
 			table.insert(tags, InfluxDBEscapeUtils.tag(key) .. "=" .. InfluxDBEscapeUtils.tag(value))
 		end

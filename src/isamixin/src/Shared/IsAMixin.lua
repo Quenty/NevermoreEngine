@@ -25,7 +25,7 @@ end
 	@param className string
 	@return boolean
 ]=]
-function IsAMixin:IsA(className)
+function IsAMixin:IsA(className: string): boolean
 	assert(type(className) == "string", "className must be a string")
 
 	local currentMetatable = getmetatable(self)

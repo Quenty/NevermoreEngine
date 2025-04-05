@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Executes code at a specific point in render step priority queue
 	@class onRenderStepFrame
@@ -14,7 +15,7 @@ local HttpService = game:GetService("HttpService")
 	@within onRenderStepFrame
 ]=]
 
-return function(priority, callback)
+return function(priority: number, callback: () -> ()): () -> ()
 	assert(type(priority) == "number", "Bad priority")
 	assert(type(callback) == "function", "Bad callback")
 

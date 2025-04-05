@@ -10,11 +10,12 @@ local SecretsCmdrTypeUtils = require("SecretsCmdrTypeUtils")
 local SecretsServiceConstants = require("SecretsServiceConstants")
 local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local Promise = require("Promise")
+local _ServiceBag = require("ServiceBag")
 
 local SecretsServiceClient = {}
 SecretsServiceClient.ServiceName = "SecretsServiceClient"
 
-function SecretsServiceClient:Init(serviceBag)
+function SecretsServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

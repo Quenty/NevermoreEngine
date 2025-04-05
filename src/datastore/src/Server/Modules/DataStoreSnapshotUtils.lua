@@ -8,7 +8,7 @@ local Symbol = require("Symbol")
 
 local DataStoreSnapshotUtils = {}
 
-function DataStoreSnapshotUtils.isEmptySnapshot(snapshot)
+function DataStoreSnapshotUtils.isEmptySnapshot(snapshot: any): boolean
 	return not Symbol.isSymbol(snapshot) and type(snapshot) == "table" and next(snapshot) == nil
 end
 

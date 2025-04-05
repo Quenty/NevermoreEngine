@@ -11,6 +11,7 @@ local AdorneeUtils = require("AdorneeUtils")
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local ValueObject = require("ValueObject")
+local _Observable = require("Observable")
 
 local AdorneeValue = setmetatable({}, BaseObject)
 AdorneeValue.ClassName = "AdorneeValue"
@@ -27,8 +28,6 @@ function AdorneeValue.new()
 	self._adornee = ValueObject.new()
 	self._maid:GiveTask(self._adornee)
 
-
-
 	return self
 end
 
@@ -37,7 +36,7 @@ end
 
 	@return Instance | CFrame | Vector3 | nil
 ]=]
-function AdorneeValue:GetAdornee()
+function AdorneeValue:GetAdornee(): (Instance | CFrame | Vector3)?
 	return self._adornee.Value
 end
 
@@ -46,7 +45,7 @@ end
 
 	@return Observable<Instance | CFrame | Vector3 | nil>
 ]=]
-function AdorneeValue:Observe()
+function AdorneeValue:Observe(): _Observable.Observable<(Instance | CFrame | Vector3)?>
 	return self._adornee:Observe()
 end
 
@@ -79,10 +78,10 @@ end
 
 function AdorneeValue:__newindex(index, value)
 	if index == "Value" then
-		assert(typeof(value) == "Instance"
-		or typeof(value) == "Vector3"
-		or typeof(value) == "CFrame"
-		or value == nil, "Bad value")
+		assert(
+			typeof(value) == "Instance" or typeof(value) == "Vector3" or typeof(value) == "CFrame" or value == nil,
+			"Bad value"
+		)
 
 		self._adornee.Value = value
 	elseif index == "_adornee" or index == "_maid" then
@@ -102,7 +101,7 @@ end
 	@return Observable<CFrame | nil>
 ]=]
 function AdorneeValue:ObserveBottomCFrame()
-	return Blend.Computed(self._adornee, function(adornee)
+	return Blend.Computed(self._adornee, function(adornee: Instance): CFrame?
 		if typeof(adornee) == "CFrame" then
 			return adornee
 		elseif typeof(adornee) == "Vector3" then
@@ -110,11 +109,11 @@ function AdorneeValue:ObserveBottomCFrame()
 		elseif typeof(adornee) == "Instance" then
 			-- TODO: Nearest bounding box stuff.
 			local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(adornee)
-			if not bbCFrame then
+			if not bbCFrame or not bbSize then
 				return nil
 			end
 
-			return bbCFrame * CFrame.new(0, -bbSize.y/2, 0)
+			return bbCFrame * CFrame.new(0, -bbSize.Y / 2, 0)
 		elseif adornee then
 			warn("Bad adornee")
 			return nil
@@ -140,7 +139,7 @@ end
 
 	@return Vector3 | nil
 ]=]
-function AdorneeValue:GetCenterPosition()
+function AdorneeValue:GetCenterPosition(): Vector3?
 	local adornee = self._adornee.Value
 
 	if typeof(adornee) == "CFrame" then
@@ -174,7 +173,7 @@ end
 
 	@return number?
 ]=]
-function AdorneeValue:GetRadius()
+function AdorneeValue:GetRadius(): number?
 	local adornee = self._adornee.Value
 
 	if typeof(adornee) == "CFrame" then
@@ -184,11 +183,11 @@ function AdorneeValue:GetRadius()
 	elseif typeof(adornee) == "Instance" then
 		-- TODO: Nearest bounding box stuff.
 		local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(adornee)
-		if not bbCFrame then
+		if not bbCFrame or not bbSize then
 			return nil
 		end
 
-		return bbSize.magnitude/2
+		return bbSize.Magnitude / 2
 	elseif adornee then
 		warn("Bad adornee")
 		return nil
@@ -212,9 +211,10 @@ function AdorneeValue:ObservePositionTowards(observeTargetPosition, observeRadiu
 		observeTargetPosition,
 		self:ObserveCenterPosition(),
 		observeRadius or self:ObserveRadius(),
-		function(target, radius, center)
+		function(target: Vector3, radius: number, center: Vector3)
 			return self:_getPositionTowards(target, radius, center)
-		end)
+		end
+	)
 end
 
 --[=[
@@ -226,7 +226,7 @@ end
 	@param center Vector3
 	@return Vector3
 ]=]
-function AdorneeValue:GetPositionTowards(target, radius, center)
+function AdorneeValue:GetPositionTowards(target: Vector3, radius: number, center: Vector3): Vector3?
 	assert(typeof(target) == "Vector3", "Bad target")
 
 	center = center or self:GetCenterPosition()
@@ -235,13 +235,13 @@ function AdorneeValue:GetPositionTowards(target, radius, center)
 	return self:_getPositionTowards(target, radius, center)
 end
 
-function AdorneeValue:_getPositionTowards(target, radius, center)
+function AdorneeValue:_getPositionTowards(target: Vector3, radius: number, center: Vector3): Vector3?
 	if not (radius and target and center) then
 		return nil
 	end
 
 	local offset = target - center
-	if offset.magnitude == 0 then
+	if offset.Magnitude == 0 then
 		return nil
 	end
 
@@ -255,7 +255,7 @@ end
 	@return Observable<Instance?>
 ]=]
 function AdorneeValue:ObserveAttachmentParent()
-	return Blend.Computed(self._adornee, function(adornee)
+	return Blend.Computed(self._adornee, function(adornee): Instance?
 		if typeof(adornee) == "Instance" then
 			-- TODO: Nearest bounding box stuff.
 			local part = AdorneeUtils.getPart(adornee)
@@ -286,7 +286,7 @@ end
 function AdorneeValue:RenderPositionAttachment(props)
 	props = props or {}
 
-	local observeWorldPosition = props.WorldPosition or self:ObserveCenterPosition();
+	local observeWorldPosition = props.WorldPosition or self:ObserveCenterPosition()
 	local observeParentPart = self:ObserveAttachmentParent()
 
 	local observeCFrame = Blend.Computed(observeParentPart, observeWorldPosition, function(parentPart, position)
@@ -295,7 +295,7 @@ function AdorneeValue:RenderPositionAttachment(props)
 		else
 			return CFrame.new(0, 0, 0)
 		end
-	end);
+	end)
 
 	return Blend.New "Attachment" {
 		Name = props.Name or "AdorneeValueAttachment";

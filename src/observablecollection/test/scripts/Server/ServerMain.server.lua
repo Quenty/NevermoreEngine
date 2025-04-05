@@ -26,7 +26,7 @@ observableSortedList:ObserveItemsBrio():Subscribe(function(brio)
 	local maid = brio:ToMaid()
 
 	local currentTween
-	local function setCFrame(cframe, doNotAnimate)
+	local function setCFrame(cframe: CFrame, doNotAnimate: boolean?)
 		if currentTween then
 			currentTween:Cancel()
 			currentTween = nil

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RxSignal
 ]=]
@@ -6,10 +7,18 @@ local require = require(script.Parent.loader).load(script)
 
 local Rx = require("Rx")
 local Observable = require("Observable")
+local _Subscription = require("Subscription")
 
 local RxSignal = {}
 RxSignal.ClassName = "RxSignal"
 RxSignal.__index = RxSignal
+
+export type RxSignal<T...> = typeof(setmetatable(
+	{} :: {
+		_observable: Observable.Observable<T...> | () -> Observable.Observable<T...>,
+	},
+	RxSignal
+))
 
 --[=[
 	Converts an observable to the Signal interface
@@ -17,7 +26,7 @@ RxSignal.__index = RxSignal
 	@param observable Observable<T> | () -> Observable<T>
 	@return RxSignal<T>
 ]=]
-function RxSignal.new(observable)
+function RxSignal.new<T...>(observable: Observable.Observable<T...> | () -> Observable.Observable<T...>): RxSignal<T...>
 	assert(observable, "No observable")
 
 	local self = setmetatable({}, RxSignal)
@@ -27,13 +36,42 @@ function RxSignal.new(observable)
 	return self
 end
 
-function RxSignal:Connect(callback)
+--[=[
+	Connects to the signal and returns a subscription
+]=]
+function RxSignal.Connect<T...>(self: RxSignal<T...>, callback: (T...) -> ()): _Subscription.Subscription<T...>
 	return self:_getObservable():Subscribe(callback)
 end
 
-function RxSignal:_getObservable()
+--[=[
+	Waits for the signal to fire and returns the values
+]=]
+function RxSignal.Wait<T...>(self: RxSignal<T...>): T...
+	local waitingCoroutine = coroutine.running()
+
+	local subscription: _Subscription.Subscription<T...>
+	subscription = self:Connect(function(...)
+		subscription:Disconnect()
+		task.spawn(waitingCoroutine, ...)
+	end)
+
+	return coroutine.yield()
+end
+
+--[=[
+	Connects once to the signal and returns a subscription
+]=]
+function RxSignal.Once<T...>(self: RxSignal<T...>, callback: (T...) -> ()): _Subscription.Subscription<T...>
+	return self:_getObservable()
+		:Pipe({
+			Rx.take(1) :: any,
+		})
+		:Subscribe(callback)
+end
+
+function RxSignal._getObservable<T...>(self: RxSignal<T...>): Observable.Observable<T...>
 	if Observable.isObservable(self._observable) then
-		return self._observable
+		return self._observable :: Observable.Observable<T...>
 	end
 
 	if type(self._observable) == "function" then
@@ -45,12 +83,6 @@ function RxSignal:_getObservable()
 	else
 		error("Could not convert self._observable to observable")
 	end
-end
-
-function RxSignal:Once(callback)
-	return self:_getObservable():Pipe({
-		Rx.take(1);
-	}):Subscribe(callback)
 end
 
 return RxSignal

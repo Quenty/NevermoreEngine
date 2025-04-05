@@ -62,7 +62,7 @@ function RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(character,
 
 	local topMaid = Maid.new()
 
-	for _, data in pairs(RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType)) do
+	for _, data in RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType) do
 		local partName, attachmentName, cframe, baseAttachmentName = unpack(data)
 
 		if baseAttachmentName then

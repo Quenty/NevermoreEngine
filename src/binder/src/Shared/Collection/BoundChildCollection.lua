@@ -18,7 +18,7 @@ BoundChildCollection.__index = BoundChildCollection
 	@param parent Instance
 	@return BoundChildCollection<T>
 ]=]
-function BoundChildCollection.new(binder, parent)
+function BoundChildCollection.new(binder, parent: Instance)
 	local self = setmetatable(BaseObject.new(), BoundChildCollection)
 
 	self._binder = binder or error("No binder")
@@ -89,7 +89,7 @@ end
 ]=]
 function BoundChildCollection:GetClasses()
 	local list = {}
-	for class, _ in pairs(self._classes) do
+	for class, _ in self._classes do
 		table.insert(list, class)
 	end
 	return list
@@ -104,7 +104,7 @@ function BoundChildCollection:_startTracking()
 		self:_removeChild(child)
 	end))
 
-	for _, child in pairs(self._parent:GetChildren()) do
+	for _, child in self._parent:GetChildren() do
 		-- Specifically do not fire on init because nothing is listening
 		self:_addChild(child, true)
 	end

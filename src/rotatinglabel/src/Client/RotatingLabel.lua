@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	A text label with most general properties of a textlabel, except when text is set,
 	it rotates uniformly like an old clock, animating in a satisfying way
@@ -54,22 +55,22 @@ function RotatingLabel.new()
 
 						newLabel.Gui.Position = self:_getLabelPosition(index)
 
-						for _, propertyName in pairs({"Transparency", "Damper", "Speed"}) do
-							if newLabel[propertyName] ~= self[propertyName] then
-								newLabel[propertyName] = self[propertyName]
-							end
+					for _, propertyName in { "Transparency", "Damper", "Speed" } do
+						if newLabel[propertyName] ~= self[propertyName] then
+							newLabel[propertyName] = self[propertyName]
 						end
+					end
 
-						rawset(labels, index, newLabel)
-						return newLabel
+					rawset(labels, index, newLabel)
+					return newLabel
 					end
 				end
 			else
-				return rawget(labels, labelsIndex)
+			return rawget(labels, labelsIndex)
 				-- error(index .. " is not a valid member")
 			end
-		end;
-	});
+		end,
+	})
 
 	self._bindKey = "RotatingLabel" .. tostring(self)
 
@@ -78,9 +79,9 @@ end
 
 function RotatingLabel:_getLabelPosition(index)
 	if self.TextXAlignment == "Left" then
-		return UDim2.new((index-1)*self.Width, 0, 0, 0)
+		return UDim2.new((index - 1) * self.Width, 0, 0, 0)
 	else
-		return UDim2.new(-self.TotalWidth + (index-1)*self.Width, 0, 0, 0)
+		return UDim2.new(-self.TotalWidth + (index - 1) * self.Width, 0, 0, 0)
 	end
 end
 
@@ -153,8 +154,8 @@ function RotatingLabel:__newindex(topindex, value)
 
 			local labels = {}
 
-			for index, label in pairs(self._labels) do
-				local NewIndex = index+Delta
+			for index, label in self._labels do
+				local NewIndex = index + Delta
 				labels[NewIndex] = label
 
 				-- Clean up
@@ -165,13 +166,13 @@ function RotatingLabel:__newindex(topindex, value)
 				self._labels[index] = nil
 			end
 
-			for index, label in pairs(labels) do
+			for index, label in labels do
 				self._labels[index] = label
 			end
 		else
 			-- Clean up past characters
 
-			for index = #value+1, #self.Text do
+			for index = #value + 1, #self.Text do
 				if self._labels[index] then
 					self._labels[index].TargetCharacter = " "
 				end
@@ -184,7 +185,7 @@ function RotatingLabel:__newindex(topindex, value)
 			self._labels:Get(index).TargetCharacter = string.sub(self.Text, index, index)
 		end
 
-		for index, label in pairs(self._labels) do
+		for index, label in self._labels do
 			label.Gui.Position = self:_getLabelPosition(index)
 		end
 
@@ -192,16 +193,16 @@ function RotatingLabel:__newindex(topindex, value)
 	elseif topindex == "Width" then
 		self._width = value
 
-		for index, label in pairs(self._labels) do
+		for index, label in self._labels do
 			label.Gui.Position = self:_getLabelPosition(index)
 		end
 	elseif topindex == "Transparency" or topindex == "Damper" or topindex == "Speed" then
 		self["_" .. string.lower(topindex)] = value
-		for _, label in pairs(self._labels) do
+		for _, label in self._labels do
 			label[topindex] = value
 		end
 	elseif topindex == "TextXAlignment" then
-		assert(value == "Left" or value == "Right", "value must be \"Left\" or \"Right\"")
+		assert(value == "Left" or value == "Right", 'value must be "Left" or "Right"')
 
 		if value == "Left" then
 			self._container.Position = UDim2.new(0, 0, 0, 0)
@@ -210,7 +211,7 @@ function RotatingLabel:__newindex(topindex, value)
 		end
 
 		self._textXAlignment = value
-		for index, label in pairs(self._labels) do
+		for index, label in self._labels do
 			label.Gui.Position = self:_getLabelPosition(index)
 		end
 	else
@@ -222,7 +223,7 @@ end
 function RotatingLabel:UpdateRender()
 	local isDone = true
 
-	for index, label in pairs(self._labels) do
+	for index, label in self._labels do
 		if label:UpdateRender() then
 			if label.TargetCharacter == " " then
 				self._labels:Remove(index)
@@ -259,7 +260,7 @@ function RotatingLabel:Destroy()
 	self:_stopUpdate()
 	self._bindKey = nil
 
-	for index, _ in pairs(self._labels) do
+	for index, _ in self._labels do
 		self._labels:Remove(index)
 	end
 	self._labels = nil

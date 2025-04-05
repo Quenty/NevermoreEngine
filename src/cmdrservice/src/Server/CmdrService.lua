@@ -15,17 +15,18 @@ local CmdrTemplateProviderServer = require("CmdrTemplateProviderServer")
 local Promise = require("Promise")
 local Maid = require("Maid")
 local PermissionService = require("PermissionService")
+local _ServiceBag = require("ServiceBag")
 
 local CmdrService = {}
 CmdrService.ServiceName = "CmdrService"
 
-local GLOBAL_REGISTRY = setmetatable({}, {__mode = "kv"})
+local GLOBAL_REGISTRY = setmetatable({}, { __mode = "kv" })
 
 --[=[
 	Initializes the CmdrService. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function CmdrService:Init(serviceBag)
+function CmdrService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -152,15 +153,13 @@ function CmdrService:RegisterCommand(commandData, execute)
 	end)
 end
 
-
-
 --[=[
 	Private function used by the execution template to retrieve the execution function.
 	@param cmdrCommandId string
 	@param ... any
 	@private
 ]=]
-function CmdrService:__executeCommand(cmdrCommandId, ...)
+function CmdrService:__executeCommand(cmdrCommandId: string, ...)
 	assert(type(cmdrCommandId) == "string", "Bad cmdrCommandId")
 	assert(self._promiseCmdr, "CmdrService is not initialized yet")
 
@@ -179,7 +178,7 @@ end
 	@return CmdrService
 	@private
 ]=]
-function CmdrService:__getServiceFromId(cmdrServiceId)
+function CmdrService:__getServiceFromId(cmdrServiceId: string)
 	assert(type(cmdrServiceId) == "string", "Bad cmdrServiceId")
 
 	return GLOBAL_REGISTRY[cmdrServiceId]

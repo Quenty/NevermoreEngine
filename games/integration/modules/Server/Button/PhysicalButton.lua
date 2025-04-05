@@ -32,7 +32,7 @@ function PhysicalButton.new(obj, serviceBag)
 	return self
 end
 
-function PhysicalButton:_handleRemoteEvent(player)
+function PhysicalButton:_handleRemoteEvent(player: Player)
 	local humanoid = CharacterUtils.getAlivePlayerHumanoid(player)
 	if not humanoid then
 		return

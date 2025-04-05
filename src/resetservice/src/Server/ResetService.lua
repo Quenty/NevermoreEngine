@@ -41,7 +41,7 @@ end
 	@param promiseReset function -- Reset provider
 	@return MaidTask
 ]=]
-function ResetService:PushResetProvider(promiseReset)
+function ResetService:PushResetProvider(promiseReset: () -> ())
 	assert(type(promiseReset) == "function", "Bad promiseReset")
 
 	return self._resetProviderStack:PushState(promiseReset)

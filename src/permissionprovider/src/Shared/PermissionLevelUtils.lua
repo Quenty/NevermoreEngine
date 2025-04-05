@@ -9,7 +9,7 @@ local PermissionLevel = require("PermissionLevel")
 local PermissionLevelUtils = {}
 
 local ALLOWED = {}
-for _, item in pairs(PermissionLevel) do
+for _, item in PermissionLevel do
 	ALLOWED[item] = true
 end
 

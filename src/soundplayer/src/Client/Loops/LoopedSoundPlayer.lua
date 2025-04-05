@@ -25,7 +25,7 @@ local LoopedSoundPlayer = setmetatable({}, SpringTransitionModel)
 LoopedSoundPlayer.ClassName = "LoopedSoundPlayer"
 LoopedSoundPlayer.__index = LoopedSoundPlayer
 
-function LoopedSoundPlayer.new(soundId, soundParent)
+function LoopedSoundPlayer.new(soundId, soundParent: Instance?)
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 
 	local self = setmetatable(SpringTransitionModel.new(), LoopedSoundPlayer)
@@ -60,25 +60,25 @@ function LoopedSoundPlayer.new(soundId, soundParent)
 	return self
 end
 
-function LoopedSoundPlayer:SetCrossFadeTime(crossFadeTime)
+function LoopedSoundPlayer:SetCrossFadeTime(crossFadeTime: number)
 	return self._crossFadeTime:Mount(crossFadeTime)
 end
 
-function LoopedSoundPlayer:SetVolumeMultiplier(volume)
+function LoopedSoundPlayer:SetVolumeMultiplier(volume: number)
 	self._volumeMultiplier.Value = volume
 end
 
-function LoopedSoundPlayer:SetSoundGroup(soundGroup)
+function LoopedSoundPlayer:SetSoundGroup(soundGroup: SoundGroup?)
 	return self._soundGroup:Mount(soundGroup)
 end
 
-function LoopedSoundPlayer:SetBPM(bpm)
+function LoopedSoundPlayer:SetBPM(bpm: number?)
 	assert(type(bpm) == "number" or bpm == nil, "Bad bpm")
 
 	self._bpm.Value = bpm
 end
 
-function LoopedSoundPlayer:SetSoundParent(parent)
+function LoopedSoundPlayer:SetSoundParent(parent: Instance?)
 	self._soundParent.Value = parent
 end
 
@@ -96,24 +96,25 @@ function LoopedSoundPlayer:Swap(soundId, loopSchedule)
 	self._maid._swappingTo = maid
 end
 
-function LoopedSoundPlayer:SetDoSyncSoundPlayback(doSyncSoundPlayback)
+function LoopedSoundPlayer:SetDoSyncSoundPlayback(doSyncSoundPlayback: boolean)
 	self._doSyncSoundPlayback.Value = doSyncSoundPlayback
 end
 
 function LoopedSoundPlayer:_setupRender()
-	self._maid:GiveTask(self._currentSoundId:ObserveBrio(function(value)
-		return value ~= nil
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	self._maid:GiveTask(self._currentSoundId
+		:ObserveBrio(function(value)
+			return value ~= nil
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
+			local maid = brio:ToMaid()
+			local soundId = brio:GetValue()
 
-		local maid = brio:ToMaid()
-		local soundId = brio:GetValue()
-
-		maid:GiveTask(self:_renderSoundPlayer(soundId))
-	end))
+			maid:GiveTask(self:_renderSoundPlayer(soundId))
+		end))
 end
 
 function LoopedSoundPlayer:_renderSoundPlayer(soundId)
@@ -128,18 +129,18 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 	end))
 
 	renderMaid:GiveTask(Rx.combineLatest({
-		bpm = self._bpm:Observe();
-		isLoaded = Rx.fromPromise(SoundPromiseUtils.promiseLoaded(soundPlayer.Sound));
-		doSyncSoundPlayback = self._doSyncSoundPlayback:Observe();
-		timeLength = RxInstanceUtils.observeProperty(soundPlayer.Sound, "TimeLength");
+		bpm = self._bpm:Observe(),
+		isLoaded = Rx.fromPromise(SoundPromiseUtils.promiseLoaded(soundPlayer.Sound)),
+		doSyncSoundPlayback = self._doSyncSoundPlayback:Observe(),
+		timeLength = RxInstanceUtils.observeProperty(soundPlayer.Sound, "TimeLength"),
 	}):Subscribe(function(state)
 		local syncMaid = Maid.new()
 
 		if state.doSyncSoundPlayback then
 			if state.bpm then
-				local bps = state.bpm/60
-				local beatTime = 1/bps
-				local truncatedTimeLength = math.floor(state.timeLength/beatTime) * beatTime
+				local bps = state.bpm / 60
+				local beatTime = 1 / bps
+				local truncatedTimeLength = math.floor(state.timeLength / beatTime) * beatTime
 				local currentTimePosition = soundPlayer.Sound.TimePosition
 				local clockDistanceIntoBeat = os.clock() % beatTime
 				local soundDistanceIntoBeat = currentTimePosition % beatTime
@@ -168,7 +169,7 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 	end))
 
 	maid:GiveTask(Rx.combineLatestDefer({
-		loopSchedule = self._currentLoopSchedule:Observe();
+		loopSchedule = self._currentLoopSchedule:Observe(),
 	}):Subscribe(function(state)
 		local scheduleMaid = Maid.new()
 
@@ -194,10 +195,10 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 	end))
 
 	maid:GiveTask(Rx.combineLatest({
-		visible = self:ObserveRenderStepped();
-		multiplier = self._volumeMultiplier:Observe();
+		visible = self:ObserveRenderStepped(),
+		multiplier = self._volumeMultiplier:Observe(),
 	}):Subscribe(function(state)
-		soundPlayer:SetVolumeMultiplier(state.multiplier*state.visible)
+		soundPlayer:SetVolumeMultiplier(state.multiplier * state.visible)
 	end))
 
 	maid:GiveTask(self:ObserveVisible():Subscribe(function(isVisible, doNotAnimate)
@@ -211,10 +212,6 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 	end)
 
 	return maid
-end
-
-function LoopedSoundPlayer:SetVolumeMultiplier(volume)
-	self._volumeMultiplier.Value = volume
 end
 
 function LoopedSoundPlayer:_setupLoopScheduling(soundPlayer, loopSchedule)
@@ -331,16 +328,16 @@ function LoopedSoundPlayer:_scheduleFirstPlay(loopSchedule, callback)
 				end
 
 				return self:_observeActiveSoundFinishLoop(waitTime)
-			end);
-		});
+			end),
+		})
 	end
 
 	if loopSchedule.initialDelay then
 		observable = observable:Pipe({
 			Rx.switchMap(function()
 				return Rx.delayed(SoundLoopScheduleUtils.getWaitTimeSeconds(loopSchedule.initialDelay))
-			end);
-		});
+			end),
+		})
 	end
 
 	-- Immediate

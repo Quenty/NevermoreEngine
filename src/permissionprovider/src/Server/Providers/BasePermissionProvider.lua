@@ -49,7 +49,7 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
+function BasePermissionProvider:PromiseIsPermissionLevel(player: Player, permissionLevel)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
@@ -62,7 +62,7 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider:IsPermissionLevel(player, permissionLevel)
+function BasePermissionProvider:IsPermissionLevel(player: Player, permissionLevel): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
@@ -85,7 +85,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider:PromiseIsCreator(player)
+function BasePermissionProvider:PromiseIsCreator(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
@@ -96,7 +96,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider:PromiseIsAdmin(player)
+function BasePermissionProvider:PromiseIsAdmin(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)
@@ -112,7 +112,7 @@ end
 	@param player Player
 	@return boolean
 ]=]
-function BasePermissionProvider:IsCreator(player)
+function BasePermissionProvider:IsCreator(player: Player): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:IsCreator(player, PermissionLevel.CREATOR)
@@ -128,7 +128,7 @@ end
 	@param player Player
 	@return boolean
 ]=]
-function BasePermissionProvider:IsAdmin(player)
+function BasePermissionProvider:IsAdmin(player: Player): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:IsPermissionLevel(player, PermissionLevel.ADMIN)

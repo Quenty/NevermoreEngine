@@ -10,6 +10,7 @@ local BaseObject = require("BaseObject")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
 local ObservableSet = require("ObservableSet")
+local _Observable = require("Observable")
 
 local FontPalette = setmetatable({}, BaseObject)
 FontPalette.ClassName = "FontPalette"
@@ -39,7 +40,7 @@ end
 
 	@return { string }
 ]=]
-function FontPalette:GetFontNames()
+function FontPalette:GetFontNames(): { string }
 	return self._fontKeys:GetList()
 end
 
@@ -57,7 +58,7 @@ function FontPalette:ObserveFontNames()
 				warn("[FontPalette.ObserveFontNames] - Calling when FontPalette is already dead")
 				return {}
 			end
-		end)
+		end),
 	})
 end
 
@@ -77,7 +78,7 @@ end
 	@param fontName string
 	@return Enum.Font
 ]=]
-function FontPalette:GetFont(fontName)
+function FontPalette:GetFont(fontName: string): Enum.Font
 	assert(type(fontName) == "string", "Bad fontName")
 
 	return self:GetFontValue(fontName).Value
@@ -89,7 +90,7 @@ end
 	@param fontName string
 	@return Observe<Enum.Font>
 ]=]
-function FontPalette:ObserveFont(fontName)
+function FontPalette:ObserveFont(fontName: string): _Observable.Observable<Enum.Font>
 	assert(type(fontName) == "string", "Bad fontName")
 
 	return self:GetFontValue(fontName):Observe()
@@ -99,11 +100,15 @@ end
 	Observes the curent font face defined for the font name
 
 	@param fontName string
-	@param weight FontWeight | Observable<FontWeight> | nil
-	@param style FontStyle | Observable<FontStyle> | nil
+	@param weight (FontWeight | Observable<FontWeight>)?
+	@param style (FontStyle | Observable<FontStyle>)?
 	@return Observable<Font>
 ]=]
-function FontPalette:ObserveFontFace(fontName, weight, style)
+function FontPalette:ObserveFontFace(
+	fontName: string,
+	weight: (Enum.FontWeight | _Observable.Observable<Enum.FontWeight>)?,
+	style: (Enum.FontStyle | _Observable.Observable<Enum.FontWeight>)?
+)
 	assert(type(fontName) == "string", "Bad fontName")
 
 	if weight == nil and style == nil then
@@ -111,13 +116,13 @@ function FontPalette:ObserveFontFace(fontName, weight, style)
 	end
 
 	return Rx.combineLatest({
-		font = self:GetFontFaceValue(fontName):Observe();
-		weight = weight;
-		style = style;
+		font = self:GetFontFaceValue(fontName):Observe(),
+		weight = weight,
+		style = style,
 	}):Pipe({
 		Rx.map(function(state)
 			return Font.new(state.font.Family, state.weight or state.font.Weight, state.style or state.font.Style)
-		end);
+		end),
 	})
 end
 
@@ -125,9 +130,9 @@ end
 	Gets a font value object for a given font.
 
 	@param fontName string
-	@return ValueObject<Enum.Font>
+	@return ValueObject<Font>
 ]=]
-function FontPalette:GetFontFaceValue(fontName)
+function FontPalette:GetFontFaceValue(fontName: string): Font
 	assert(type(fontName) == "string", "Bad fontName")
 
 	local fontValue = self._fontFaces[fontName]
@@ -142,9 +147,9 @@ end
 	Gets a font value object for a given font.
 
 	@param fontName string
-	@return ValueObject<Enum.Font>
+	@return ValueObject<Font>
 ]=]
-function FontPalette:GetFontValue(fontName)
+function FontPalette:GetFontValue(fontName: string): ValueObject.ValueObject<Enum.Font>
 	assert(type(fontName) == "string", "Bad fontName")
 
 	local fontValue = self._fonts[fontName]
@@ -159,7 +164,7 @@ end
 	Gets the default font map
 	@return { string: Font }
 ]=]
-function FontPalette:GetDefaultFontMap()
+function FontPalette:GetDefaultFontMap(): { string: Font }
 	return self._defaultFontMap
 end
 
@@ -170,13 +175,13 @@ end
 	@param defaultFont Enum.Font | Font
 	@return ValueObject<Enum.Font | Font>
 ]=]
-function FontPalette:DefineFont(fontName, defaultFont)
+function FontPalette:DefineFont(fontName: string, defaultFont: Enum.Font | Font): ValueObject.ValueObject<Enum.Font | Font>?
 	assert(type(fontName) == "string", "Bad fontName")
 	assert(typeof(defaultFont) == "EnumItem" or typeof(defaultFont) == "Font", "Bad defaultFont")
 
 	if self._fonts[fontName] then
 		warn(string.format("Already defined defaultFont of name %q", fontName))
-		return
+		return nil
 	end
 
 	local defaultFontEnum
@@ -216,7 +221,7 @@ function FontPalette:DefineFont(fontName, defaultFont)
 	return fontValue
 end
 
-function FontPalette:_tryToGetFontFace(fontFace)
+function FontPalette:_tryToGetFontFace(fontFace: Font)
 	local assetName = string.gmatch(fontFace.Family, "rbxasset://fonts/families/([%w]+).json$")()
 
 	local fontEnum

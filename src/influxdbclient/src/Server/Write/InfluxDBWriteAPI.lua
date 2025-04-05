@@ -20,7 +20,7 @@ local InfluxDBWriteAPI = setmetatable({}, BaseObject)
 InfluxDBWriteAPI.ClassName = "InfluxDBWriteAPI"
 InfluxDBWriteAPI.__index = InfluxDBWriteAPI
 
-function InfluxDBWriteAPI.new(org, bucket, precision)
+function InfluxDBWriteAPI.new(org: string, bucket: string, precision: string?)
 	local self = setmetatable(BaseObject.new(), InfluxDBWriteAPI)
 
 	assert(type(org) == "string", "Bad org")
@@ -53,13 +53,13 @@ function InfluxDBWriteAPI.new(org, bucket, precision)
 	return self
 end
 
-function InfluxDBWriteAPI:SetPrintDebugWriteEnabled(printDebugEnabled)
+function InfluxDBWriteAPI:SetPrintDebugWriteEnabled(printDebugEnabled: boolean)
 	assert(type(printDebugEnabled) == "boolean", "Bad printDebugEnabled")
 
 	self._printDebugWriteEnabled = printDebugEnabled
 end
 
-function InfluxDBWriteAPI:SetClientConfig(clientConfig)
+function InfluxDBWriteAPI:SetClientConfig(clientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig)
 	assert(InfluxDBClientConfigUtils.isClientConfig(clientConfig), "Bad clientConfig")
 
 	self._clientConfig.Value = InfluxDBClientConfigUtils.createClientConfig(clientConfig)
@@ -73,7 +73,7 @@ function InfluxDBWriteAPI:SetConvertTime(convertTime)
 	self._pointSettings:SetConvertTime(convertTime)
 end
 
-function InfluxDBWriteAPI:QueuePoint(point)
+function InfluxDBWriteAPI:QueuePoint(point: InfluxDBPoint.InfluxDBPoint)
 	assert(InfluxDBPoint.isInfluxDBPoint(point), "Bad point")
 
 	local line = point:ToLineProtocol(self._pointSettings)
@@ -86,10 +86,10 @@ function InfluxDBWriteAPI:QueuePoint(point)
 	end
 end
 
-function InfluxDBWriteAPI:QueuePoints(points)
+function InfluxDBWriteAPI:QueuePoints(points: { InfluxDBPoint.InfluxDBPoint })
 	assert(type(points) == "table", "Bad points")
 
-	for _, point in pairs(points) do
+	for _, point in points do
 		assert(InfluxDBPoint.isInfluxDBPoint(point), "Bad point")
 
 		local line = point:ToLineProtocol(self._pointSettings)
@@ -103,7 +103,7 @@ function InfluxDBWriteAPI:QueuePoints(points)
 	end
 end
 
-function InfluxDBWriteAPI:_promiseSendBatch(toSend)
+function InfluxDBWriteAPI:_promiseSendBatch(toSend: { InfluxDBPoint.InfluxDBPoint }): Promise.Promise<()>
 	assert(type(toSend) == "table", "Bad toSend")
 
 	local clientConfig = self._clientConfig.Value
@@ -123,22 +123,23 @@ function InfluxDBWriteAPI:_promiseSendBatch(toSend)
 
 	local body = table.concat(toSend, "\n")
 	local request = {
-		Method = "POST";
+		Method = "POST",
 		Headers = {
-			["Content-Type"] = "application/json";
-			["Accept"] = "application/json";
-			["Authorization"] = authHeader;
-		};
-		Compress = Enum.HttpCompression.Gzip;
-		Url = self:_getWriteUrl();
-		Body = body;
+			["Content-Type"] = "application/json",
+			["Accept"] = "application/json",
+			["Authorization"] = authHeader,
+		},
+		Compress = Enum.HttpCompression.Gzip,
+		Url = self:_getWriteUrl(),
+		Body = body,
 	}
 
 	if self._printDebugWriteEnabled then
 		print(string.format("[InfluxDBWriteAPI._promiseSendBatch] - Sending data %s", body))
 	end
 
-	return self._maid:GivePromise(HttpPromise.request(request))
+	return self._maid
+		:GivePromise(HttpPromise.request(request))
 		:Then(function(result)
 			if result.Success then
 				if self.Destroy then
@@ -159,32 +160,40 @@ function InfluxDBWriteAPI:_promiseSendBatch(toSend)
 				local errorBody = InfluxDBErrorUtils.tryParseErrorBody(err.Body)
 
 				if errorBody then
-					local message = string.format("[InfluxDBWriteAPI:QueuePoint] - %d: %s - %s",
+					local message = string.format(
+						"[InfluxDBWriteAPI:QueuePoint] - %d: %s - %s",
 						err.StatusCode,
 						errorBody.code,
-						errorBody.message)
+						errorBody.message
+					)
 					warn(message)
 
 					return Promise.rejected(errorBody)
 				end
 
-				warn(string.format("[InfluxDBWriteAPI:QueuePoint] - %d: %s - %s",
-					err.StatusCode,
-					err.StatusMessage,
-					tostring(err.Body)))
+				warn(
+					string.format(
+						"[InfluxDBWriteAPI:QueuePoint] - %d: %s - %s",
+						err.StatusCode,
+						err.StatusMessage,
+						tostring(err.Body)
+					)
+				)
 
-				return Promise.rejected(string.format("[InfluxDBWriteAPI:QueuePoint] - %d: %s", err.StatusCode, err.StatusMessage))
+				return Promise.rejected(
+					string.format("[InfluxDBWriteAPI:QueuePoint] - %d: %s", err.StatusCode, err.StatusMessage)
+				)
 			else
 				return Promise.rejected(err or "Request got cancelled")
 			end
 		end)
 end
 
-function InfluxDBWriteAPI:PromiseFlush()
+function InfluxDBWriteAPI:PromiseFlush(): Promise.Promise<()>
 	return self._writeBuffer:PromiseFlush()
 end
 
-function InfluxDBWriteAPI:_getWriteUrl()
+function InfluxDBWriteAPI:_getWriteUrl(): string
 	local config = self._clientConfig.Value
 	local url = config.url
 

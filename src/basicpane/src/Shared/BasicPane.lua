@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Base UI object with visibility and a maid. BasicPane provides three points of utility.
 
@@ -21,14 +22,27 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Maid = require("Maid")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
+local _Brio = require("Brio")
+local _Observable = require("Observable")
+local _Rx = require("Rx")
 
 local BasicPane = {}
 BasicPane.ClassName = "BasicPane"
 BasicPane.__index = BasicPane
+
+export type BasicPane = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_visible: ValueObject.ValueObject<boolean>,
+		Gui: GuiBase?,
+		VisibleChanged: Signal.Signal<(boolean, boolean)>,
+	},
+	BasicPane
+))
 
 --[=[
 	Constructs a new BasicPane with the .Gui property set.
@@ -36,7 +50,7 @@ BasicPane.__index = BasicPane
 	@param gui GuiBase? -- Optional Gui object
 	@return BasicPane
 ]=]
-function BasicPane.new(gui)
+function BasicPane.new(gui: GuiBase?): BasicPane
 	local self = setmetatable({}, BasicPane)
 
 	self._maid = Maid.new()
@@ -69,7 +83,7 @@ function BasicPane.new(gui)
 		self.Gui = self._maid:Add(gui)
 	end
 
-	return self
+	return self :: any
 end
 
 --[=[
@@ -77,7 +91,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function BasicPane.isBasicPane(value)
+function BasicPane.isBasicPane(value: any): boolean
 	return DuckTypeUtils.isImplementation(BasicPane, value)
 end
 
@@ -87,7 +101,7 @@ end
 	@param isVisible boolean -- Whether or not the pane should be visible
 	@param doNotAnimate boolean? -- True if this visiblity should not animate
 ]=]
-function BasicPane:SetVisible(isVisible, doNotAnimate)
+function BasicPane.SetVisible(self: BasicPane, isVisible: boolean, doNotAnimate: boolean?)
 	assert(type(isVisible) == "boolean", "Bad isVisible")
 
 	self._visible:SetValue(isVisible, doNotAnimate)
@@ -98,7 +112,7 @@ end
 
 	@return Observable<boolean, boolean?>
 ]=]
-function BasicPane:ObserveVisible()
+function BasicPane.ObserveVisible(self: BasicPane): _Observable.Observable<boolean, boolean?>
 	return self._visible:Observe()
 end
 
@@ -108,7 +122,10 @@ end
 	@param predicate function | nil -- Optional predicate. If not includeded returns the value.
 	@return Observable<Brio<boolean>>
 ]=]
-function BasicPane:ObserveVisibleBrio(predicate)
+function BasicPane.ObserveVisibleBrio(
+	self: BasicPane,
+	predicate: _Rx.Predicate<boolean>?
+): _Observable.Observable<_Brio.Brio<boolean>?>
 	return self._visible:ObserveBrio(predicate or function(isVisible)
 		return isVisible
 	end)
@@ -118,7 +135,7 @@ end
 	Shows the pane
 	@param doNotAnimate boolean? -- True if this visiblity should not animate
 ]=]
-function BasicPane:Show(doNotAnimate)
+function BasicPane.Show(self: BasicPane, doNotAnimate: boolean?)
 	self:SetVisible(true, doNotAnimate)
 end
 
@@ -126,7 +143,7 @@ end
 	Hides the pane
 	@param doNotAnimate boolean? -- True if this visiblity should not animate
 ]=]
-function BasicPane:Hide(doNotAnimate)
+function BasicPane.Hide(self: BasicPane, doNotAnimate: boolean?)
 	self:SetVisible(false, doNotAnimate)
 end
 
@@ -134,7 +151,7 @@ end
 	Toggles the pane
 	@param doNotAnimate boolean? -- True if this visiblity should not animate
 ]=]
-function BasicPane:Toggle(doNotAnimate)
+function BasicPane.Toggle(self: BasicPane, doNotAnimate: boolean?)
 	self:SetVisible(not self._visible.Value, doNotAnimate)
 end
 
@@ -142,7 +159,7 @@ end
 	Returns if the pane is visible
 	@return boolean
 ]=]
-function BasicPane:IsVisible()
+function BasicPane.IsVisible(self: BasicPane): boolean
 	return self._visible.Value
 end
 
@@ -150,10 +167,10 @@ end
 	Cleans up the BasicPane, invoking Maid:DoCleaning() on the BasicPane and
 	setting the metatable to nil.
 ]=]
-function BasicPane:Destroy()
-	self._maid:DoCleaning()
-	self._maid = nil
-	setmetatable(self, nil)
+function BasicPane.Destroy(self: BasicPane)
+	(self :: any)._maid:DoCleaning();
+	(self :: any)._maid = nil
+	setmetatable(self :: any, nil)
 end
 
 return BasicPane

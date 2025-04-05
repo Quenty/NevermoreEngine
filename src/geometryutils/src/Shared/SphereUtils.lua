@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving spheres
 	@class SphereUtils
@@ -15,9 +16,9 @@ local SphereUtils = {}
 	@return boolean
 ]=]
 function SphereUtils.intersectsRay(
-	sphereCenter, sphereRadius,
-	rayOrigin, rayDirection
-)
+	sphereCenter: Vector3, sphereRadius: number,
+	rayOrigin: Vector3, rayDirection: Vector3
+): boolean
 	local relOrigin = rayOrigin - sphereCenter
 	local rr = relOrigin:Dot(relOrigin)
 	local dr = rayDirection:Dot(relOrigin)

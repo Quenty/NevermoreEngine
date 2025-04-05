@@ -45,7 +45,7 @@ return function(target)
 		RigBuilderUtils.promisePlayerRig(676056)
 	}
 
-	for index, rig in pairs(rigs) do
+	for index, rig in rigs do
 		local offset = ((index - 0.5)/#rigs - 0.5)*#rigs*4
 		if Promise.isPromise(rig) then
 			maid:GivePromise(rig):Then(function(actualRig)

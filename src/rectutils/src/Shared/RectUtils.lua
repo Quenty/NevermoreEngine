@@ -1,10 +1,9 @@
+--!strict
 --[=[
 	Utility method to work with the Roblox Rect data object.
 
 	@class RectUtils
 ]=]
-
-local require = require(script.Parent.loader).load(script)
 
 local RectUtils = {}
 
@@ -14,7 +13,7 @@ local RectUtils = {}
 	@param position Vector2
 	@return boolean
 ]=]
-function RectUtils.contains(rect: Rect, position: Vector2)
+function RectUtils.contains(rect: Rect, position: Vector2): boolean
 	local relativePosition = position - rect.Min
 
 	return relativePosition.X >= 0

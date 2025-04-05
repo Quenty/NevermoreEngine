@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides getting named global [RemoteFunction] resources.
 
@@ -48,7 +49,7 @@ local RunService = game:GetService("RunService")
 local ResourceConstants = require("ResourceConstants")
 
 if not RunService:IsRunning() then
-	return function(name)
+	return function(name: string): RemoteFunction
 		local func = Instance.new("RemoteFunction")
 		func.Name = "Mock" .. name
 		func.Archivable = false
@@ -56,33 +57,45 @@ if not RunService:IsRunning() then
 		return func
 	end
 elseif RunService:IsServer() then
-	return function(name)
-		assert(type(name) == "string", "Bad name")
-
+	local function getOrCreateStorage(): Instance
 		local storage = ReplicatedStorage:FindFirstChild(ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME)
-		if not storage then
-			storage = Instance.new("Folder")
-			storage.Name = ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME
-			storage.Archivable = false
-			storage.Parent = ReplicatedStorage
+		if storage then
+			return storage
 		end
 
+		local created = Instance.new("Folder")
+		created.Name = ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME
+		created.Archivable = false
+		created.Parent = ReplicatedStorage
+
+		return created
+	end
+
+	return function(name: string): RemoteFunction
+		assert(type(name) == "string", "Bad name")
+
+		local storage = getOrCreateStorage()
 		local func = storage:FindFirstChild(name)
-		if func then
+		if func and func:IsA("RemoteFunction") then
 			return func
 		end
 
-		func = Instance.new("RemoteFunction")
-		func.Name = name
-		func.Archivable = false
-		func.Parent = storage
+		local created = Instance.new("RemoteFunction")
+		created.Name = name
+		created.Archivable = false
+		created.Parent = storage
 
-		return func
+		return created
 	end
 else -- RunService:IsClient()
-	return function(name)
+	return function(name: string): RemoteFunction
 		assert(type(name) == "string", "Bad name")
 
-		return ReplicatedStorage:WaitForChild(ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME):WaitForChild(name)
+		local found = ReplicatedStorage:WaitForChild(ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME):WaitForChild(name)
+		if found and found:IsA("RemoteFunction") then
+			return found
+		end
+
+		error("Could not find remote function " .. name)
 	end
 end

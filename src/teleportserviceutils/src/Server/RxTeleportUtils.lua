@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helps observe teleports.
 
@@ -20,14 +21,12 @@ local RxTeleportUtils = {}
 	@param player Player
 	@return Observable<Brio<number>>
 ]=]
-function RxTeleportUtils.observeTeleportBrio(player: Player)
+function RxTeleportUtils.observeTeleportBrio(player: Player): Observable.Observable<Brio.Brio<number>>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
-
-		local teleportPlaceId = ValueObject.new(nil)
-		maid:GiveTask(teleportPlaceId)
+		local teleportPlaceId: ValueObject.ValueObject<number?> = maid:Add(ValueObject.new(nil))
 
 		maid:GiveTask(player.OnTeleport:Connect(function(teleportState, placeId)
 			if
@@ -61,7 +60,7 @@ function RxTeleportUtils.observeTeleportBrio(player: Player)
 		end))
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxTeleportUtils

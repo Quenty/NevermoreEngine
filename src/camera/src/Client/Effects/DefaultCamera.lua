@@ -18,6 +18,8 @@ local Maid = require("Maid")
 local CFrameUtils = require("CFrameUtils")
 local CameraFrame = require("CameraFrame")
 local ValueObject = require("ValueObject")
+local _Rx = require("Rx")
+local _Observable = require("Observable")
 
 local EPSILON = 0.001
 
@@ -73,7 +75,7 @@ DefaultCamera.OverrideCameraState = DefaultCamera.SetRobloxCameraState
 
 	@param cframe CFrame
 ]=]
-function DefaultCamera:SetRobloxCFrame(cframe)
+function DefaultCamera:SetRobloxCFrame(cframe: CFrame)
 	self._cameraState.CFrame = cframe
 end
 
@@ -91,7 +93,7 @@ end
 
 	@param cameraFrame CameraState | nil
 ]=]
-function DefaultCamera:SetLastSetCameraFrame(cameraFrame)
+function DefaultCamera:SetLastSetCameraFrame(cameraFrame: CameraFrame.CameraFrame)
 	self._lastCameraFrame = CameraFrame.new(cameraFrame.QFrame, cameraFrame.FieldOfView)
 end
 
@@ -107,7 +109,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function DefaultCamera:ObserveIsFirstPerson()
+function DefaultCamera:ObserveIsFirstPerson(): _Observable.Observable<boolean>
 	return self._isFirstPerson:Observe()
 end
 
@@ -117,7 +119,7 @@ end
 	@param predicate ((inFirstPerson: boolean) -> boolean)?
 	@return Observable<Brio<boolean>>
 ]=]
-function DefaultCamera:ObserveIsFirstPersonBrio(predicate)
+function DefaultCamera:ObserveIsFirstPersonBrio(predicate: _Rx.Predicate<boolean>?)
 	return self._isFirstPerson:Observe(predicate)
 end
 

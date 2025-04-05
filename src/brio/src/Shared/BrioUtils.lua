@@ -50,7 +50,7 @@ end
 ]=]
 function BrioUtils.aliveOnly(brios)
 	local alive = {}
-	for _, brio in pairs(brios) do
+	for _, brio in brios do
 		if not brio:IsDead() then
 			table.insert(alive, brio)
 		end
@@ -65,7 +65,7 @@ end
 	@return Brio<T>
 ]=]
 function BrioUtils.firstAlive(brios)
-	for _, brio in pairs(brios) do
+	for _, brio in brios do
 		if not brio:IsDead() then
 			return brio
 		end
@@ -84,7 +84,7 @@ function BrioUtils.flatten(brioTable)
 	local newValue = {}
 	local brios = {}
 
-	for key, brio in pairs(brioTable) do
+	for key, brio in brioTable do
 		if Brio.isBrio(brio) then
 			if brio:IsDead() then
 				return Brio.DEAD
@@ -109,7 +109,7 @@ end
 	@return Brio<U>
 ]=]
 function BrioUtils.first(brios, ...)
-	for _, brio in pairs(brios) do
+	for _, brio in brios do
 		if Brio.isBrio(brio) then
 			if brio:IsDead() then
 				return Brio.DEAD
@@ -120,7 +120,7 @@ function BrioUtils.first(brios, ...)
 	local maid = Maid.new()
 	local topBrio = Brio.new(...)
 
-	for _, brio in pairs(brios) do
+	for _, brio in brios do
 		if Brio.isBrio(brio) then
 			maid:GiveTask(brio:GetDiedSignal():Connect(function()
 				topBrio:Kill()

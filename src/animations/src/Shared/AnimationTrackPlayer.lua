@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Plays a single track, allowing for the animation to be controlled easier.
 
@@ -21,11 +22,11 @@ AnimationTrackPlayer.__index = AnimationTrackPlayer
 	all data is found.
 
 	@param animationTarget Instance | Observable<Instance>
-	@param animationId string | number | nil
+	@param animationId string | number?
 	@return AnimationTrackPlayer
 ]=]
 function AnimationTrackPlayer.new(animationTarget, animationId)
-	local self = setmetatable(BaseObject.new(), AnimationTrackPlayer)
+	local self = setmetatable(BaseObject.new() :: any, AnimationTrackPlayer)
 
 	self._animationTarget = self._maid:Add(ValueObject.new(nil))
 	self._trackId = self._maid:Add(ValueObject.new(nil))
@@ -111,7 +112,7 @@ end
 	@param weight number
 	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:SetWeightTargetIfNotSet(weight, fadeTime)
+function AnimationTrackPlayer:SetWeightTargetIfNotSet(weight: number, fadeTime: number)
 	self._maid._adjustWeight = self:_onEachTrack(function(_maid, track)
 		if track.WeightTarget ~= weight then
 			track:AdjustWeight(weight, fadeTime)
@@ -126,7 +127,7 @@ end
 	@param weight number
 	@param speed number
 ]=]
-function AnimationTrackPlayer:Play(fadeTime, weight, speed)
+function AnimationTrackPlayer:Play(fadeTime: number, weight: number, speed: number)
 	if weight then
 		self._maid._adjustWeight = nil
 	end
@@ -146,7 +147,7 @@ end
 
 	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:Stop(fadeTime)
+function AnimationTrackPlayer:Stop(fadeTime: number)
 	self._maid._play = nil
 	self._maid._stop = self:_onEachTrack(function(_maid, track)
 		track:Stop(fadeTime)
@@ -159,7 +160,7 @@ end
 	@param weight number
 	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:AdjustWeight(weight, fadeTime)
+function AnimationTrackPlayer:AdjustWeight(weight: number, fadeTime: number)
 	self._maid._adjustWeight = self:_onEachTrack(function(_maid, track)
 		track:AdjustWeight(weight, fadeTime)
 	end)
@@ -171,7 +172,7 @@ end
 	@param speed number
 	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:AdjustSpeed(speed, fadeTime)
+function AnimationTrackPlayer:AdjustSpeed(speed: number, fadeTime: number)
 	self._maid._adjustSpeed = self:_onEachTrack(function(_maid, track)
 		track:AdjustSpeed(speed, fadeTime)
 	end)
@@ -182,7 +183,7 @@ end
 
 	@return boolean
 ]=]
-function AnimationTrackPlayer:IsPlaying()
+function AnimationTrackPlayer:IsPlaying(): boolean
 	local track = self._currentTrack.Value
 	if track then
 		return track.IsPlaying

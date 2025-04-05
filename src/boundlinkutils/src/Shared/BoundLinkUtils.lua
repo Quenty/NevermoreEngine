@@ -49,7 +49,7 @@ function BoundLinkUtils.getLinkClasses(binder, linkName, from)
 	assert(typeof(from) == "Instance", "Bad from")
 
 	local classes = {}
-	for _, value in pairs(LinkUtils.getAllLinkValues(linkName, from)) do
+	for _, value in LinkUtils.getAllLinkValues(linkName, from) do
 		local class = binder:Get(value)
 		if class then
 			table.insert(classes, class)
@@ -78,8 +78,8 @@ function BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
 	local tags = BinderUtils.mapBinderListToTable(binders)
 	local classes = {}
 
-	for _, instance in pairs(LinkUtils.getAllLinkValues(linkName, from)) do
-		for _, tag in pairs(CollectionService:GetTags(instance)) do
+	for _, instance in LinkUtils.getAllLinkValues(linkName, from) do
+		for _, tag in CollectionService:GetTags(instance) do
 			local binder = tags[tag]
 			if binder then
 				local obj = binder:Get(instance)
@@ -133,7 +133,13 @@ function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, metho
 		end
 
 		if called[class] then
-			warn(string.format("[BoundLinkUtils.callMethodOnLinkedClasses] - Double-linked class %q for method %q", tag, methodName))
+			warn(
+				string.format(
+					"[BoundLinkUtils.callMethodOnLinkedClasses] - Double-linked class %q for method %q",
+					tag,
+					methodName
+				)
+			)
 			return
 		end
 
@@ -141,8 +147,8 @@ function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, metho
 		class[methodName](class, unpack(args))
 	end
 
-	for _, value in pairs(LinkUtils.getAllLinkValues(linkName, from)) do
-		for _, tag in pairs(CollectionService:GetTags(value)) do
+	for _, value in LinkUtils.getAllLinkValues(linkName, from) do
+		for _, tag in CollectionService:GetTags(value) do
 			callForTag(value, tag)
 		end
 	end

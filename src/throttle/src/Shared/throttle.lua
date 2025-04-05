@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Debounce a existing function by timeout
 
@@ -7,6 +8,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local ThrottledFunction = require("ThrottledFunction")
+local TypeUtils = require("TypeUtils")
+
+export type ThrottleConfig = ThrottledFunction.ThrottleConfig
 
 --[=[
 	Provides a debounce function call on an operation.
@@ -18,14 +22,14 @@ local ThrottledFunction = require("ThrottledFunction")
 	@param throttleConfig? { leading = true; trailing = true; }
 	@return function
 ]=]
-local function throttle(timeoutInSeconds, func, throttleConfig)
+local function throttle<T...>(timeoutInSeconds: number, func: (T...) -> ...any, throttleConfig: ThrottledFunction.ThrottleConfig): (T...) -> ()
 	assert(type(timeoutInSeconds) == "number", "timeoutInSeconds is not a number")
 	assert(type(func) == "function", "func is not a function")
 
 	local throttled = ThrottledFunction.new(timeoutInSeconds, func, throttleConfig)
 
-	return function(...)
-		throttled:Call(...)
+	return function(...: T...)
+		throttled:Call(TypeUtils.anyValue(...))
 	end
 end
 

@@ -49,7 +49,7 @@ end
 ]=]
 function MarkdownRender:Render(data)
 	local height = 0
-	for index, item in pairs(data) do
+	for index, item in data do
 		local gui
 		if type(item) == "string" then
 			gui = self:_renderParagraph(item)

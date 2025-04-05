@@ -23,6 +23,7 @@ local UTF8 = require("UTF8")
 local ValueObject = require("ValueObject")
 local SpringObject = require("SpringObject")
 local Table = require("Table")
+local _Promise = require("Promise")
 
 local SHADOW_RADIUS = 2
 local CORNER_RADIUS = 2
@@ -37,16 +38,18 @@ local PADDING_X = 24
 local DEFAULT_TEXT_COLOR = Color3.fromRGB(78, 205, 196)
 
 local SnackbarDragDirections = Table.readonly({
-	HORIZONTAL = "horizontal";
-	VERTICAL = "vertical";
-	NONE = "none";
+	HORIZONTAL = "horizontal",
+	VERTICAL = "vertical",
+	NONE = "none",
 })
 
 local Snackbar = setmetatable({}, TransitionModel)
 Snackbar.ClassName = "Snackbar"
 Snackbar.__index = Snackbar
 
-function Snackbar.new(text, options)
+export type Snackbar = typeof(setmetatable({} :: {}, Snackbar)) & TransitionModel.TransitionModel
+
+function Snackbar.new(text: string, options: SnackbarOptionUtils.SnackbarOptions?): Snackbar
 	assert(SnackbarOptionUtils.isSnackbarOptions(options) or options == nil, "Bad options")
 	options = options or SnackbarOptionUtils.createSnackbarOptions({})
 
@@ -91,11 +94,11 @@ function Snackbar.new(text, options)
 	return self
 end
 
-function Snackbar.isSnackbar(value)
+function Snackbar.isSnackbar(value: any): boolean
 	return DuckTypeUtils.isImplementation(Snackbar, value)
 end
 
-function Snackbar:PromiseSustain()
+function Snackbar:PromiseSustain(): _Promise.Promise<()>
 	local promise = PromiseUtils.delayed(DURATION)
 
 	PromiseMaidUtils.whilePromise(promise, function(maid)

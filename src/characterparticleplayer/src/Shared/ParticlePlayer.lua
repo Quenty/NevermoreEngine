@@ -35,7 +35,7 @@ end
 function ParticlePlayer:_playDescendantsOnce(parent)
 	local longestLife = 0
 
-	for _, item in pairs(parent:GetDescendants()) do
+	for _, item in parent:GetDescendants() do
 		if item:IsA("ParticleEmitter") then
 			item:Emit(item.Rate)
 			longestLife = math.max(longestLife, item.Lifetime.Max)
@@ -59,7 +59,7 @@ function ParticlePlayer:_playHumanoidEffect(humanoid, effectTemplate)
 		return false
 	end
 
-	for _, child in pairs(core:GetChildren()) do
+	for _, child in core:GetChildren() do
 		if child:IsA("Attachment") then
 			child.Parent = rootPart
 
@@ -69,7 +69,7 @@ function ParticlePlayer:_playHumanoidEffect(humanoid, effectTemplate)
 	end
 
 	-- Add non-core items to
-	for _, part in pairs(effect:GetChildren()) do
+	for _, part in effect:GetChildren() do
 		if part ~= core then
 			local relative = core.CFrame:toObjectSpace(part.CFrame)
 			part.CFrame = rootPart.CFrame:toWorldSpace(relative)

@@ -157,7 +157,7 @@ local function makeSection(keycodes, theme, platform, parent)
 	uiGridLayout.CellSize = UDim2.new(0, 100, 0, 130)
 	uiGridLayout.Parent = container
 
-	for _, item in pairs(keycodes) do
+	for _, item in keycodes do
 		createInputKey(item, theme, platform, container)
 	end
 

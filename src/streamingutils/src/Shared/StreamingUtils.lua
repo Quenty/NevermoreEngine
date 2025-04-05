@@ -35,7 +35,7 @@ local StreamingUtils = {}
 	@param timeOut number? -- Optional
 	@return Promise
 ]=]
-function StreamingUtils.promiseStreamAround(player: Player, position: Vector3, timeOut: number?)
+function StreamingUtils.promiseStreamAround(player: Player, position: Vector3, timeOut: number?): Promise.Promise<()>
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(typeof(position) == "Vector3", "Bad position")
 	assert(type(timeOut) == "number" or timeOut == nil, "Bad timeOut")

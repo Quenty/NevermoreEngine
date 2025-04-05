@@ -8,13 +8,13 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function checkLocale(locale, responseMapping)
-	for input, output in pairs(responseMapping) do
+local function checkLocale(locale: string, responseMapping)
+	for input, output in responseMapping do
 		expect(NumberLocalizationUtils.localize(input, locale)).toBe(output)
 	end
 end
 
-local function checkValid_en_zh(locale)
+local function checkValid_en_zh(locale: string)
 	checkLocale(locale, {
 		[0] = "0",
 		[1] = "1",
@@ -105,7 +105,7 @@ describe("NumberLocalizationUtils.abbreviate", function()
 			[-1499.99] = "-1.4K",
 		}
 
-		for input, output in pairs(roundToZeroMap) do
+		for input, output in roundToZeroMap do
 			expect(NumberLocalizationUtils.abbreviate(input, "en-us", RoundingBehaviourTypes.TRUNCATE)).toBe(output)
 		end
 	end)

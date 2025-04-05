@@ -1,3 +1,4 @@
+--!strict
 --[[
 Lua implementation of HSLuv and HPLuv color spaces
 Homepage: https://www.hsluv.org/
@@ -24,18 +25,25 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 local LuvUtils = {}
 
+export type Tuple = { number }
+
 local hexChars = "0123456789abcdef"
 
-local function distance_line_from_origin(line)
-	return math.abs(line.intercept) / math.sqrt((line.slope*line.slope) + 1)
+export type Line = {
+	slope: number,
+	intercept: number,
+}
+
+local function distance_line_from_origin(line: Line): number
+	return math.abs(line.intercept) / math.sqrt((line.slope * line.slope) + 1)
 end
 
-local function length_of_ray_until_intersect(theta, line)
+local function length_of_ray_until_intersect(theta: number, line: Line): number
 	return line.intercept / (math.sin(theta) - line.slope * math.cos(theta))
 end
 
-function LuvUtils.get_bounds(l)
-	local result = {}
+function LuvUtils.get_bounds(l: number): { Line }
+	local result: { Line } = {}
 	local sub2
 	local sub1 = ((l + 16) ^ 3) / 1560896
 	if sub1 > LuvUtils.epsilon then
@@ -55,14 +63,14 @@ function LuvUtils.get_bounds(l)
 			local bottom = (632260 * m3 - 126452 * m2) * sub2 + 126452 * t
 			table.insert(result, {
 				slope = top1 / bottom,
-				intercept = top2 / bottom
+				intercept = top2 / bottom,
 			})
 		end
 	end
 	return result
 end
 
-function LuvUtils.max_safe_chroma_for_l(l)
+function LuvUtils.max_safe_chroma_for_l(l: number): number
 	local bounds = LuvUtils.get_bounds(l)
 	local min = 1.7976931348623157e+308
 
@@ -75,7 +83,7 @@ function LuvUtils.max_safe_chroma_for_l(l)
 	return min
 end
 
-function LuvUtils.max_safe_chroma_for_lh(l, h)
+function LuvUtils.max_safe_chroma_for_lh(l, h: number): number
 	local hrad = h / 360 * math.pi * 2
 	local bounds = LuvUtils.get_bounds(l)
 	local min = 1.7976931348623157e+308
@@ -90,7 +98,7 @@ function LuvUtils.max_safe_chroma_for_lh(l, h)
 	return min
 end
 
-function LuvUtils.dot_product(a, b)
+function LuvUtils.dot_product(a: Tuple, b: Tuple): number
 	local sum = 0
 	for i = 1, 3 do
 		sum = sum + a[i] * b[i]
@@ -98,7 +106,7 @@ function LuvUtils.dot_product(a, b)
 	return sum
 end
 
-function LuvUtils.from_linear(c)
+function LuvUtils.from_linear(c: number): number
 	if c <= 0.0031308 then
 		return 12.92 * c
 	else
@@ -106,7 +114,7 @@ function LuvUtils.from_linear(c)
 	end
 end
 
-function LuvUtils.to_linear(c)
+function LuvUtils.to_linear(c: number): number
 	if c > 0.04045 then
 		return ((c + 0.055) / 1.055) ^ 2.4
 	else
@@ -114,28 +122,28 @@ function LuvUtils.to_linear(c)
 	end
 end
 
-function LuvUtils.xyz_to_rgb(tuple)
+function LuvUtils.xyz_to_rgb(tuple: Tuple): Tuple
 	return {
 		LuvUtils.from_linear(LuvUtils.dot_product(LuvUtils.m[1], tuple)),
 		LuvUtils.from_linear(LuvUtils.dot_product(LuvUtils.m[2], tuple)),
-		LuvUtils.from_linear(LuvUtils.dot_product(LuvUtils.m[3], tuple))
+		LuvUtils.from_linear(LuvUtils.dot_product(LuvUtils.m[3], tuple)),
 	}
 end
 
-function LuvUtils.rgb_to_xyz(tuple)
+function LuvUtils.rgb_to_xyz(tuple: Tuple): Tuple
 	local rgbl = {
 		LuvUtils.to_linear(tuple[1]),
 		LuvUtils.to_linear(tuple[2]),
-		LuvUtils.to_linear(tuple[3])
+		LuvUtils.to_linear(tuple[3]),
 	}
 	return {
 		LuvUtils.dot_product(LuvUtils.minv[1], rgbl),
 		LuvUtils.dot_product(LuvUtils.minv[2], rgbl),
-		LuvUtils.dot_product(LuvUtils.minv[3], rgbl)
+		LuvUtils.dot_product(LuvUtils.minv[3], rgbl),
 	}
 end
 
-function LuvUtils.y_to_l(Y)
+function LuvUtils.y_to_l(Y: number): number
 	if Y <= LuvUtils.epsilon then
 		return Y / LuvUtils.refY * LuvUtils.kappa
 	else
@@ -143,7 +151,7 @@ function LuvUtils.y_to_l(Y)
 	end
 end
 
-function LuvUtils.l_to_y(L)
+function LuvUtils.l_to_y(L: number): number
 	if L <= 8 then
 		return LuvUtils.refY * L / LuvUtils.kappa
 	else
@@ -151,7 +159,7 @@ function LuvUtils.l_to_y(L)
 	end
 end
 
-function LuvUtils.xyz_to_luv(tuple)
+function LuvUtils.xyz_to_luv(tuple: Tuple): Tuple
 	local X = tuple[1]
 	local Y = tuple[2]
 	local divider = X + 15 * Y + 3 * tuple[3]
@@ -171,7 +179,7 @@ function LuvUtils.xyz_to_luv(tuple)
 	return { L, 13 * L * (varU - LuvUtils.refU), 13 * L * (varV - LuvUtils.refV) }
 end
 
-function LuvUtils.luv_to_xyz(tuple)
+function LuvUtils.luv_to_xyz(tuple: Tuple): Tuple
 	local L = tuple[1]
 	local U = tuple[2]
 	local V = tuple[3]
@@ -181,11 +189,11 @@ function LuvUtils.luv_to_xyz(tuple)
 	local varU = U / (13 * L) + LuvUtils.refU
 	local varV = V / (13 * L) + LuvUtils.refV
 	local Y = LuvUtils.l_to_y(L)
-	local X = 0 - (9 * Y * varU) / ((((varU - 4) * varV) - varU * varV))
+	local X = 0 - (9 * Y * varU) / (((varU - 4) * varV) - varU * varV)
 	return { X, Y, (9 * Y - 15 * varV * Y - varV * X) / (3 * varV) }
 end
 
-function LuvUtils.luv_to_lch(tuple)
+function LuvUtils.luv_to_lch(tuple: Tuple): Tuple
 	local L = tuple[1]
 	local U = tuple[2]
 	local V = tuple[3]
@@ -202,14 +210,14 @@ function LuvUtils.luv_to_lch(tuple)
 	return { L, C, H }
 end
 
-function LuvUtils.lch_to_luv(tuple)
+function LuvUtils.lch_to_luv(tuple: Tuple): Tuple
 	local L = tuple[1]
 	local C = tuple[2]
 	local Hrad = tuple[3] / 360.0 * 2 * math.pi
 	return { L, math.cos(Hrad) * C, math.sin(Hrad) * C }
 end
 
-function LuvUtils.hsluv_to_lch(tuple)
+function LuvUtils.hsluv_to_lch(tuple: Tuple): Tuple
 	local H = tuple[1]
 	local S = tuple[2]
 	local L = tuple[3]
@@ -222,7 +230,7 @@ function LuvUtils.hsluv_to_lch(tuple)
 	return { L, LuvUtils.max_safe_chroma_for_lh(L, H) / 100 * S, H }
 end
 
-function LuvUtils.lch_to_hsluv(tuple)
+function LuvUtils.lch_to_hsluv(tuple: Tuple): Tuple
 	local L = tuple[1]
 	local C = tuple[2]
 	local H = tuple[3]
@@ -237,7 +245,7 @@ function LuvUtils.lch_to_hsluv(tuple)
 	return { H, C / max_chroma * 100, L }
 end
 
-function LuvUtils.hpluv_to_lch(tuple)
+function LuvUtils.hpluv_to_lch(tuple: Tuple): Tuple
 	local H = tuple[1]
 	local S = tuple[2]
 	local L = tuple[3]
@@ -250,7 +258,7 @@ function LuvUtils.hpluv_to_lch(tuple)
 	return { L, LuvUtils.max_safe_chroma_for_l(L) / 100 * S, H }
 end
 
-function LuvUtils.lch_to_hpluv(tuple)
+function LuvUtils.lch_to_hpluv(tuple: Tuple): Tuple
 	local L = tuple[1]
 	local C = tuple[2]
 	local H = tuple[3]
@@ -263,69 +271,69 @@ function LuvUtils.lch_to_hpluv(tuple)
 	return { H, C / LuvUtils.max_safe_chroma_for_l(L) * 100, L }
 end
 
-function LuvUtils.rgb_to_hex(tuple)
-	local h = "#"
+function LuvUtils.rgb_to_hex(tuple: Tuple): string
+	local h: string = "#"
 	for i = 1, 3 do
 		local c = math.floor(tuple[i] * 255 + 0.5)
 		local digit2 = math.fmod(c, 16)
 		local x = (c - digit2) / 16
 		local digit1 = math.floor(x)
-		h = h .. string.sub(hexChars, digit1 + 1, digit1 + 1)
-		h = h .. string.sub(hexChars, digit2 + 1, digit2 + 1)
+		h ..= string.sub(hexChars, digit1 + 1, digit1 + 1)
+		h ..= string.sub(hexChars, digit2 + 1, digit2 + 1)
 	end
 	return h
 end
 
-function LuvUtils.hex_to_rgb(hex)
+function LuvUtils.hex_to_rgb(hex: string): Tuple
 	hex = string.lower(hex)
-	local ret = {}
+	local ret: Tuple = {}
 	for i = 0, 2 do
 		local char1 = string.sub(hex, i * 2 + 2, i * 2 + 2)
 		local char2 = string.sub(hex, i * 2 + 3, i * 2 + 3)
-		local digit1 = string.find(hexChars, char1) - 1
-		local digit2 = string.find(hexChars, char2) - 1
+		local digit1 = (string.find(hexChars, char1) :: number) - 1
+		local digit2 = (string.find(hexChars, char2) :: number) - 1
 		ret[i + 1] = (digit1 * 16 + digit2) / 255.0
 	end
 	return ret
 end
 
-function LuvUtils.lch_to_rgb(tuple)
+function LuvUtils.lch_to_rgb(tuple: Tuple): Tuple
 	return LuvUtils.xyz_to_rgb(LuvUtils.luv_to_xyz(LuvUtils.lch_to_luv(tuple)))
 end
 
-function LuvUtils.rgb_to_lch(tuple)
+function LuvUtils.rgb_to_lch(tuple: Tuple): Tuple
 	return LuvUtils.luv_to_lch(LuvUtils.xyz_to_luv(LuvUtils.rgb_to_xyz(tuple)))
 end
 
-function LuvUtils.hsluv_to_rgb(tuple)
+function LuvUtils.hsluv_to_rgb(tuple: Tuple): Tuple
 	return LuvUtils.lch_to_rgb(LuvUtils.hsluv_to_lch(tuple))
 end
 
-function LuvUtils.rgb_to_hsluv(tuple)
+function LuvUtils.rgb_to_hsluv(tuple: Tuple): Tuple
 	return LuvUtils.lch_to_hsluv(LuvUtils.rgb_to_lch(tuple))
 end
 
-function LuvUtils.hpluv_to_rgb(tuple)
+function LuvUtils.hpluv_to_rgb(tuple: Tuple): Tuple
 	return LuvUtils.lch_to_rgb(LuvUtils.hpluv_to_lch(tuple))
 end
 
-function LuvUtils.rgb_to_hpluv(tuple)
+function LuvUtils.rgb_to_hpluv(tuple: Tuple): Tuple
 	return LuvUtils.lch_to_hpluv(LuvUtils.rgb_to_lch(tuple))
 end
 
-function LuvUtils.hsluv_to_hex(tuple)
+function LuvUtils.hsluv_to_hex(tuple: Tuple): string
 	return LuvUtils.rgb_to_hex(LuvUtils.hsluv_to_rgb(tuple))
 end
 
-function LuvUtils.hpluv_to_hex(tuple)
+function LuvUtils.hpluv_to_hex(tuple: Tuple): string
 	return LuvUtils.rgb_to_hex(LuvUtils.hpluv_to_rgb(tuple))
 end
 
-function LuvUtils.hex_to_hsluv(s)
+function LuvUtils.hex_to_hsluv(s: string): Tuple
 	return LuvUtils.rgb_to_hsluv(LuvUtils.hex_to_rgb(s))
 end
 
-function LuvUtils.hex_to_hpluv(s)
+function LuvUtils.hex_to_hpluv(s: string): Tuple
 	return LuvUtils.rgb_to_hpluv(LuvUtils.hex_to_rgb(s))
 end
 

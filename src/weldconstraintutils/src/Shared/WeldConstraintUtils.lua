@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions to create WeldConstraint objects in Roblox.
 	@class WeldConstraintUtils

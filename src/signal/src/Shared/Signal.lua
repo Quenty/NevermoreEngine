@@ -1,4 +1,7 @@
+--!strict
 --[=[
+	Batched Yield-Safe Signal Implementation
+
 	Lua-side duplication of the [API of events on Roblox objects](https://create.roblox.com/docs/reference/engine/datatypes/RBXScriptSignal).
 
 	Signals are needed for to ensure that for local events objects are passed by
@@ -27,158 +30,244 @@
 	fired through the BindableEvent.
 	:::
 
-	@class Signal
+	This is a Signal class which has effectively identical behavior to a
+	normal RBXScriptSignal, with the only difference being a couple extra
+	stack frames at the bottom of the stack trace when an error is thrown
+	This implementation caches runner coroutines, so the ability to yield in
+	the signal handlers comes at minimal extra cost over a naive signal
+	implementation that either always or never spawns a thread.
+
+	Author notes:
+	stravant - July 31st, 2021 - Created the file.
+	Quenty - Auguest 21st, 2023 - Modified to fit Nevermore contract, with Moonwave docs
+
+	@class GoodSignal
 ]=]
 
-local USE_GOOD_SIGNAL_ONLY = true
+local require = require(script.Parent.loader).load(script)
 
-if USE_GOOD_SIGNAL_ONLY then
-	local require = require(script.Parent.loader).load(script)
+local EventHandlerUtils = require("EventHandlerUtils")
 
-	return require("GoodSignal")
+-- Connection class
+local Connection = {}
+Connection.ClassName = "Connection"
+Connection.__index = Connection
+
+export type SignalHandler<T...> = (T...) -> ()
+
+export type Connection<T...> = typeof(setmetatable(
+	{} :: {
+		_memoryCategory: string,
+		_signal: Signal<T...>?,
+		_fn: SignalHandler<T...>?,
+	},
+	Connection
+))
+
+function Connection.new<T...>(signal: Signal<T...>, fn: SignalHandler<T...>): Connection<T...>
+	return setmetatable({
+		-- selene: allow(incorrect_standard_library_use)
+		_memoryCategory = debug.getmemorycategory(),
+		_signal = signal,
+		_fn = fn,
+	}, Connection) :: any
 end
 
-local HttpService = game:GetService("HttpService")
-
-local ENABLE_TRACEBACK = false
-
-local Signal = {}
-Signal.__index = Signal
-Signal.ClassName = "Signal"
-
---[=[
-	Returns whether a class is a signal
-	@param value any
-	@return boolean
-]=]
-function Signal.isSignal(value)
-	return type(value) == "table"
-		and getmetatable(value) == Signal
+function Connection.IsConnected<T...>(self: Connection<T...>): boolean
+	return rawget(self :: any, "_signal") ~= nil
 end
 
---[=[
-	Constructs a new signal.
-	@return Signal<T>
-]=]
-function Signal.new()
-	local self = setmetatable({}, Signal)
-
-	self._bindableEvent = Instance.new("BindableEvent")
-	self._argMap = {}
-	self._source = ENABLE_TRACEBACK and debug.traceback() or ""
-
-	-- Events in Roblox execute in reverse order as they are stored in a linked list and
-	-- new connections are added at the head. This event will be at the tail of the list to
-	-- clean up memory.
-	self._bindableEvent.Event:Connect(function(key)
-		self._argMap[key] = nil
-
-		-- We've been destroyed here and there's nothing left in flight.
-		-- Let's remove the argmap too.
-		-- This code may be slower than leaving this table allocated.
-		if (not self._bindableEvent) and (not next(self._argMap)) then
-			self._argMap = nil
-		end
-	end)
-
-	return self
-end
-
---[=[
-	Fire the event with the given arguments. All handlers will be invoked. Handlers follow
-	@param ... T -- Variable arguments to pass to handler
-]=]
-function Signal:Fire(...)
-	if not self._bindableEvent then
-		warn(string.format("Signal is already destroyed. %s", self._source))
+function Connection.Disconnect<T...>(self: Connection<T...>)
+	local signal = rawget(self :: any, "_signal")
+	if not signal then
 		return
 	end
 
-	local args = table.pack(...)
+	-- Unhook the node. Originally the good signal would not clear this signal and
+	-- rely upon GC. However, this means that connections would keep themselves and other
+	-- disconnected nodes in the chain alive, keeping the function closure alive, and in return
+	-- keeping the signal alive. This means a `Maid` could keep full object trees alive if a
+	-- connection was made to them.
 
-	-- TODO: Replace with a less memory/computationally expensive key generation scheme
-	local key = HttpService:GenerateGUID(false)
-	self._argMap[key] = args
+	local ourNext = rawget(self :: any, "_next")
 
-	-- Queues each handler onto the queue.
-	self._bindableEvent:Fire(key)
+	if signal._handlerListHead == self then
+		signal._handlerListHead = ourNext or false
+	else
+		local prev = signal._handlerListHead
+		while prev and rawget(prev, "_next") ~= self do
+			prev = rawget(prev, "_next")
+		end
+		if prev then
+			rawset(prev, "_next", ourNext)
+		end
+	end
+
+	-- Clear all member variables that aren't _next so keeping a connection
+	-- indexed allows for GC of other components
+	table.clear(self :: any)
+end
+
+Connection.Destroy = Connection.Disconnect
+
+-- Make signal strict
+setmetatable(Connection, {
+	__index = function(_, key)
+		error(string.format("Attempt to get Connection::%s (not a valid member)", tostring(key)), 2)
+	end,
+	__newindex = function(_, key, _)
+		error(string.format("Attempt to set Connection::%s (not a valid member)", tostring(key)), 2)
+	end,
+})
+
+-- Signal class
+local Signal = {}
+Signal.ClassName = "Signal"
+Signal.__index = Signal
+
+export type Signal<T...> = typeof(setmetatable(
+	{} :: {
+		_handlerListHead: Connection<T...> | false,
+	},
+	Signal
+))
+
+--[=[
+	Constructs a new signal.
+	@return Signal<T...>
+]=]
+function Signal.new<T...>(): Signal<T...>
+	return setmetatable({
+		_handlerListHead = false,
+	}, Signal) :: any
+end
+
+--[=[
+	Returns whether a class is a signal
+
+	@param value any
+	@return boolean
+]=]
+function Signal.isSignal(value: any): boolean
+	return type(value) == "table" and getmetatable(value) == Signal
 end
 
 --[=[
 	Connect a new handler to the event. Returns a connection object that can be disconnected.
-	@param handler (... T) -> () -- Function handler called when `:Fire(...)` is called
+
+	@param fn (... T) -> () -- Function handler called when `:Fire(...)` is called
 	@return RBXScriptConnection
 ]=]
-function Signal:Connect(handler)
-	if not (type(handler) == "function") then
-		error(string.format("connect(%s)", typeof(handler)), 2)
+function Signal.Connect<T...>(self: Signal<T...>, fn: SignalHandler<T...>): Connection<T...>
+	local connection = Connection.new(self, fn)
+	if self._handlerListHead then
+		rawset(connection :: any, "_next", self._handlerListHead)
+		self._handlerListHead = connection
+	else
+		self._handlerListHead = connection
 	end
-
-	return self._bindableEvent.Event:Connect(function(key)
-		-- note we could queue multiple events here, but we'll do this just as Roblox events expect
-		-- to behave.
-
-		local args = self._argMap[key]
-		if args then
-			handler(table.unpack(args, 1, args.n))
-		else
-			error("Missing arg data, probably due to reentrance.")
-		end
-	end)
+	return connection
 end
 
 --[=[
-	Connect a new, one-time handler to the event. Returns a connection object that can be disconnected.
-	@param handler (... T) -> () -- One-time function handler called when `:Fire(...)` is called
-	@return RBXScriptConnection
-]=]
-function Signal:Once(handler)
-	if not (type(handler) == "function") then
-		error(string.format("once(%s)", typeof(handler)), 2)
-	end
+	Disconnects all connected events to the signal.
 
-	return self._bindableEvent.Event:Once(function(key)
-		local args = self._argMap[key]
-		if args then
-			handler(table.unpack(args, 1, args.n))
-		else
-			error("Missing arg data, probably due to reentrance.")
+	:::info
+	Disconnect all handlers. Since we use a linked list it suffices to clear the
+	reference to the head handler.
+	:::
+]=]
+function Signal.DisconnectAll<T...>(self: Signal<T...>): ()
+	self._handlerListHead = false
+end
+
+--[=[
+	Fire the event with the given arguments. All handlers will be invoked. Handlers follow
+
+	::: info
+	Signal:Fire(...) is implemented by running the handler functions on the
+	coRunnerThread, and any time the resulting thread yielded without returning
+	to us, that means that it yielded to the Roblox scheduler and has been taken
+	over by Roblox scheduling, meaning we have to make a new coroutine runner.
+	:::
+
+	@param ... T -- Variable arguments to pass to handler
+]=]
+function Signal.Fire<T...>(self: Signal<T...>, ...: T...): ()
+	local connection: any = self._handlerListHead
+	while connection do
+		-- capture our next node, which could after this be cleared or disconnected.
+		-- any connections occuring during fire will be added to the _handerListHead and not be fired
+		-- in this round. Any disconnections in the chain will still work here.
+		local nextNode = rawget(connection, "_next")
+
+		if rawget(connection, "_signal") ~= nil then -- isConnected
+			EventHandlerUtils.fire(connection._memoryCategory, connection._fn, ...)
 		end
-	end)
+
+		connection = nextNode
+	end
 end
 
 --[=[
 	Wait for fire to be called, and return the arguments it was given.
+
+	::: info
+	Signal:Wait() is implemented in terms of a temporary connection using
+	a Signal:Connect() which disconnects itself.
+	:::
+
 	@yields
 	@return T
 ]=]
-function Signal:Wait()
-	local key = self._bindableEvent.Event:Wait()
-	local args = self._argMap[key]
-	if args then
-		return table.unpack(args, 1, args.n)
-	else
-		error("Missing arg data, probably due to reentrance.")
-		return nil
-	end
+function Signal.Wait<T...>(self: Signal<T...>): T...
+	local waitingCoroutine = coroutine.running()
+
+	local connection: Connection<T...>
+	connection = (self :: any):Connect(function(...)
+		connection:Disconnect()
+		task.spawn(waitingCoroutine, ...)
+	end)
+
+	return coroutine.yield()
 end
 
 --[=[
-	Disconnects all connected events to the signal. Voids the signal as unusable.
-	Sets the metatable to nil.
+	Connect a new, one-time handler to the event. Returns a connection object that can be disconnected.
+
+	::: info
+	-- Implement Signal:Once() in terms of a connection which disconnects
+	-- itself before running the handler.
+	:::
+
+	@param fn (... T) -> () -- One-time function handler called when `:Fire(...)` is called
+	@return RBXScriptConnection
 ]=]
-function Signal:Destroy()
-	if self._bindableEvent then
-		-- This should disconnect all events, but in-flight events should still be
-		-- executed.
-
-		self._bindableEvent:Destroy()
-		self._bindableEvent = nil
-	end
-
-	-- Do not remove the argmap. It will be cleaned up by the cleanup connection.
-
-	setmetatable(self, nil)
+function Signal.Once<T...>(self: Signal<T...>, fn: SignalHandler<T...>): Connection<T...>
+	local connection: Connection<T...>
+	connection = (self :: any):Connect(function(...)
+		connection:Disconnect()
+		fn(...)
+	end)
+	return connection
 end
+
+--[=[
+	Alias for [DisconnectAll]
+
+	@function Destroy
+	@within Signal
+]=]
+Signal.Destroy = Signal.DisconnectAll
+
+-- Make signal strict
+setmetatable(Signal, {
+	__index = function(_, key)
+		error(string.format("Attempt to get Signal::%s (not a valid member)", tostring(key)), 2)
+	end,
+	__newindex = function(_, key, _)
+		error(string.format("Attempt to set Signal::%s (not a valid member)", tostring(key)), 2)
+	end,
+})
 
 return Signal

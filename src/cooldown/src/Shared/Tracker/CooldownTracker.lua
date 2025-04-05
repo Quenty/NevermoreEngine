@@ -65,7 +65,7 @@ function CooldownTracker:GetCooldownTrackerModel()
 	return self._cooldownTrackModel
 end
 
-function CooldownTracker:IsCoolingDown()
+function CooldownTracker:IsCoolingDown(): boolean
 	return self._cooldownTrackModel:IsCoolingDown()
 end
 

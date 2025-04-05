@@ -1,0 +1,12 @@
+{
+  "name": "TypeUtilsTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "typeutils": {
+        "$path": ".."
+      }
+    }
+  }
+}

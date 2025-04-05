@@ -7,12 +7,15 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Promise = require("Promise")
 local Signal = require("Signal")
+local _InfluxDBWriteOptionUtils = require("InfluxDBWriteOptionUtils")
 
 local InfluxDBWriteBuffer = setmetatable({}, BaseObject)
 InfluxDBWriteBuffer.ClassName = "InfluxDBWriteBuffer"
 InfluxDBWriteBuffer.__index = InfluxDBWriteBuffer
 
-function InfluxDBWriteBuffer.new(writeOptions, promiseHandleFlush)
+export type InfluxDBWriteBuffer = typeof(setmetatable({}, InfluxDBWriteBuffer))
+
+function InfluxDBWriteBuffer.new(writeOptions: _InfluxDBWriteOptionUtils.InfluxDBWriteOptions, promiseHandleFlush)
 	local self = setmetatable(BaseObject.new(), InfluxDBWriteBuffer)
 
 	self._writeOptions = assert(writeOptions, "Bad writeOptions")
@@ -24,11 +27,10 @@ function InfluxDBWriteBuffer.new(writeOptions, promiseHandleFlush)
 
 	self._requestQueueNext = self._maid:Add(Signal.new())
 
-
 	return self
 end
 
-function InfluxDBWriteBuffer:Add(entry)
+function InfluxDBWriteBuffer:Add(entry: string)
 	assert(type(entry) == "string", "Bad entry")
 
 

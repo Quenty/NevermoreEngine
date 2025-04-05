@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	This is like a [Spring], but it can be observed, and emits events. It handles [Observable]s and
 
@@ -6,7 +7,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService= game:GetService("RunService")
+local RunService = game:GetService("RunService")
 
 local Blend = require("Blend")
 local DuckTypeUtils = require("DuckTypeUtils")
@@ -22,6 +23,53 @@ local SpringObject = {}
 SpringObject.ClassName = "SpringObject"
 SpringObject.__index = SpringObject
 
+export type SpringObject<T> = typeof(setmetatable(
+	{} :: {
+		-- Public
+		Changed: Signal.Signal<()>,
+		Observe: (self: SpringObject<T>) -> Observable.Observable<T>,
+		ObserveRenderStepped: (self: SpringObject<T>) -> Observable.Observable<T>,
+		ObserveTarget: (self: SpringObject<T>) -> Observable.Observable<T>,
+		ObserveVelocityOnRenderStepped: (self: SpringObject<T>) -> Observable.Observable<T>,
+		PromiseFinished: (self: SpringObject<T>, signal: RBXScriptSignal?) -> Promise.Promise<boolean>,
+		ObserveVelocityOnSignal: (self: SpringObject<T>, signal: RBXScriptSignal) -> Observable.Observable<T>,
+		ObserveOnSignal: (self: SpringObject<T>, signal: RBXScriptSignal) -> Observable.Observable<T>,
+		IsAnimating: (self: SpringObject<T>) -> boolean,
+		Impulse: (self: SpringObject<T>, velocity: T) -> (),
+		SetTarget: (self: SpringObject<T>, target: T, doNotAnimate: boolean?) -> () -> (),
+		SetVelocity: (self: SpringObject<T>, velocity: T) -> (),
+		SetPosition: (self: SpringObject<T>, position: T) -> (),
+		SetDamper: (self: SpringObject<T>, damper: number | Observable.Observable<number>) -> (),
+		SetSpeed: (self: SpringObject<T>, speed: number | Observable.Observable<number>) -> (),
+		SetClock: (self: SpringObject<T>, clock: Spring.SpringClock) -> (),
+		SetEpsilon: (self: SpringObject<T>, epsilon: number) -> (),
+		TimeSkip: (self: SpringObject<T>, delta: number) -> (),
+		Destroy: (self: SpringObject<T>) -> (),
+
+		-- Properties
+		Value: T,
+		Position: T,
+		p: T,
+		Velocity: T,
+		v: T,
+		Target: T,
+		t: T,
+		Damper: number,
+		d: number,
+		Speed: number,
+		s: number,
+		Clock: Spring.SpringClock,
+		Epsilon: number,
+
+		-- Members
+		_maid: Maid.Maid,
+		_epsilon: number,
+		_currentSpring: Spring.Spring<T>,
+		_initInfo: { Clock: () -> number, Damper: number, Speed: number },
+	},
+	SpringObject
+))
+
 --[=[
 	Constructs a new SpringObject.
 
@@ -36,14 +84,14 @@ SpringObject.__index = SpringObject
 	@param damper number | Observable<number> | NumberValue | any
 	@return Spring<T>
 ]=]
-function SpringObject.new(target, speed, damper)
+function SpringObject.new<T>(target: T, speed, damper): SpringObject<T>
 	local self = setmetatable({
-		_maid = Maid.new();
-		_epsilon = 1e-6;
-		Changed = Signal.new();
+		_maid = Maid.new(),
+		_epsilon = 1e-6,
+		Changed = Signal.new(),
 	}, SpringObject)
 
---[=[
+	--[=[
 	Event fires when the spring value changes
 	@prop Changed Signal<()> -- Fires whenever the spring initially changes state
 	@within SpringObject
@@ -65,7 +113,7 @@ function SpringObject.new(target, speed, damper)
 		self.Damper = damper
 	end
 
-	return self
+	return self :: any
 end
 
 --[=[
@@ -73,7 +121,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function SpringObject.isSpringObject(value)
+function SpringObject.isSpringObject(value: any): boolean
 	return DuckTypeUtils.isImplementation(SpringObject, value)
 end
 
@@ -186,7 +234,7 @@ function SpringObject:ObserveVelocityOnSignal(signal)
 			if animating then
 				sub:Fire(SpringUtils.fromLinearIfNeeded(currentSpring.Velocity))
 			else
-				sub:Fire(SpringUtils.fromLinearIfNeeded(0*currentSpring.Velocity))
+				sub:Fire(SpringUtils.fromLinearIfNeeded(0 * currentSpring.Velocity))
 			end
 
 			return animating
@@ -232,7 +280,7 @@ end
 	Returns true when we're animating
 	@return boolean -- True if animating
 ]=]
-function SpringObject:IsAnimating()
+function SpringObject:IsAnimating(): boolean
 	local currentSpring = rawget(self, "_currentSpring")
 	if not currentSpring then
 		return false
@@ -261,16 +309,14 @@ end
 	@param target T -- The target to set
 	@param doNotAnimate boolean? -- Whether or not to animate
 ]=]
-function SpringObject:SetTarget(target, doNotAnimate)
+function SpringObject:SetTarget<T>(target: T, doNotAnimate: boolean?)
 	assert(target ~= nil, "Bad target")
 
 	local observable = Blend.toPropertyObservable(target)
 	if not observable then
 		self._maid._targetSub = nil
 		self:_applyTarget(target, doNotAnimate)
-		return function()
-
-		end
+		return function() end
 	end
 
 	local sub
@@ -300,7 +346,7 @@ function SpringObject:SetTarget(target, doNotAnimate)
 	end
 end
 
-function SpringObject:_applyTarget(unconverted, doNotAnimate)
+function SpringObject:_applyTarget(unconverted, doNotAnimate: boolean?)
 	local converted = SpringUtils.toLinearIfNeeded(unconverted)
 	self:_getSpringForType(converted):SetTarget(converted, doNotAnimate)
 	self.Changed:Fire()
@@ -328,7 +374,7 @@ end
 function SpringObject:_applyVelocity(unconverted)
 	local converted = SpringUtils.toLinearIfNeeded(unconverted)
 
-	self:_getSpringForType(0*converted).Velocity = converted
+	self:_getSpringForType(0 * (converted :: any)).Velocity = converted
 	self.Changed:Fire()
 end
 
@@ -377,8 +423,8 @@ function SpringObject:SetDamper(damper)
 	end
 end
 
-function SpringObject:_applyDamper(unconverted)
-	assert(type(unconverted) == "number", "Bad damper")
+function SpringObject:_applyDamper(unconverted: number)
+	assert(type(unconverted) == "number", "Bad unconverted")
 
 	local currentSpring = rawget(self, "_currentSpring")
 	if currentSpring then
@@ -410,8 +456,8 @@ function SpringObject:SetSpeed(speed)
 	end
 end
 
-function SpringObject:_applySpeed(unconverted)
-	assert(type(unconverted) == "number", "Bad damper")
+function SpringObject:_applySpeed(unconverted: number)
+	assert(type(unconverted) == "number", "Bad unconverted")
 
 	local currentSpring = rawget(self, "_currentSpring")
 	if currentSpring then
@@ -428,7 +474,7 @@ end
 
 	@param clock () -> (number)
 ]=]
-function SpringObject:SetClock(clock)
+function SpringObject:SetClock(clock: Spring.SpringClock)
 	assert(type(clock) == "function", "Bad clock clock")
 
 	local currentSpring = rawget(self, "_currentSpring")
@@ -446,7 +492,7 @@ end
 
 	@param epsilon number
 ]=]
-function SpringObject:SetEpsilon(epsilon)
+function SpringObject:SetEpsilon(epsilon: number)
 	assert(type(epsilon) == "number", "Bad epsilon")
 
 	rawset(self, "_epsilon", epsilon)
@@ -459,7 +505,7 @@ end
 	@param delta number -- Time to skip forwards
 	@return ()
 ]=]
-function SpringObject:TimeSkip(delta)
+function SpringObject:TimeSkip(delta: number)
 	assert(type(delta) == "number", "Bad delta")
 
 	local currentSpring = rawget(self, "_currentSpring")
@@ -471,7 +517,7 @@ function SpringObject:TimeSkip(delta)
 	self.Changed:Fire()
 end
 
-function SpringObject:__index(index)
+(SpringObject :: any).__index = function(self, index)
 	local currentSpring = rawget(self, "_currentSpring")
 
 	if SpringObject[index] then
@@ -498,19 +544,19 @@ function SpringObject:__index(index)
 		if currentSpring then
 			return currentSpring.Damper
 		else
-			return self:_getInitInfo().Damper
+			return (self :: any):_getInitInfo().Damper
 		end
 	elseif index == "Speed" or index == "s" then
 		if currentSpring then
 			return currentSpring.Speed
 		else
-			return self:_getInitInfo().Speed
+			return (self :: any):_getInitInfo().Speed
 		end
 	elseif index == "Clock" then
 		if currentSpring then
 			return currentSpring.Clock
 		else
-			return self:_getInitInfo().Clock
+			return (self :: any):_getInitInfo().Clock
 		end
 	elseif index == "Epsilon" then
 		return self._epsilon

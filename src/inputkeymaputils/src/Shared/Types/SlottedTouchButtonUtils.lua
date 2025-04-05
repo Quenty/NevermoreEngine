@@ -1,10 +1,14 @@
+--!strict
 --[=[
 	@class SlottedTouchButtonUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local InputModeType = require("InputModeType")
+local _InputModeType = require("InputModeType")
+local _InputKeyMapList = require("InputKeyMapList")
+local _InputKeyMap = require("InputKeyMap")
+local _InputTypeUtils = require("InputTypeUtils")
 
 local SlottedTouchButtonUtils = {}
 
@@ -15,17 +19,10 @@ local SlottedTouchButtonUtils = {}
 	.inputModeType InputModeType
 	@within SlottedTouchButtonUtils
 ]=]
-
-
---[=[
-	A touch button that goes into a specific slot. This ensures
-	consistent slot positions.
-
-	@interface SlottedTouchButton
-	.type "SlottedTouchButton"
-	.slotId string
-	@within SlottedTouchButtonUtils
-]=]
+export type SlottedTouchButtonData = {
+	slotId: string,
+	inputModeType: _InputModeType.InputModeType,
+}
 
 --[=[
 	Touch buttons should always show up in the same position
@@ -35,20 +32,23 @@ local SlottedTouchButtonUtils = {}
 	@param slotId string
 	@return SlottedTouchButton
 ]=]
-function SlottedTouchButtonUtils.createSlottedTouchButton(slotId)
-	assert(slotId == "primary1"
-		or slotId == "primary2"
-		or slotId == "primary3"
-		or slotId == "primary4"
-		or slotId == "primary5"
-		or slotId == "inner1"
-		or slotId == "inner2"
-		or slotId == "jumpbutton"
-		or slotId == "touchpad1", "Bad slotId")
+function SlottedTouchButtonUtils.createSlottedTouchButton(slotId: string): _InputTypeUtils.SlottedTouchButton
+	assert(
+		slotId == "primary1"
+			or slotId == "primary2"
+			or slotId == "primary3"
+			or slotId == "primary4"
+			or slotId == "primary5"
+			or slotId == "inner1"
+			or slotId == "inner2"
+			or slotId == "jumpbutton"
+			or slotId == "touchpad1",
+		"Bad slotId"
+	)
 
 	return {
-		type = "SlottedTouchButton";
-		slotId = slotId;
+		type = "SlottedTouchButton",
+		slotId = slotId,
 	}
 end
 
@@ -58,7 +58,7 @@ end
 	@param inputType any
 	@return boolean
 ]=]
-function SlottedTouchButtonUtils.isSlottedTouchButton(inputType)
+function SlottedTouchButtonUtils.isSlottedTouchButton(inputType: any): boolean
 	return type(inputType) == "table" and inputType.type == "SlottedTouchButton"
 end
 
@@ -69,10 +69,13 @@ end
 	@param inputModeType InputModeType
 	@return SlottedTouchButtonData
 ]=]
-function SlottedTouchButtonUtils.createTouchButtonData(slotId, inputModeType)
+function SlottedTouchButtonUtils.createTouchButtonData(
+	slotId: string,
+	inputModeType: _InputModeType.InputModeType
+): SlottedTouchButtonData
 	return {
-		slotId = slotId;
-		inputModeType = inputModeType;
+		slotId = slotId,
+		inputModeType = inputModeType,
 	}
 end
 
@@ -82,17 +85,20 @@ end
 	@param inputKeyMapList InputKeyMapList
 	@return { SlottedTouchButtonData }
 ]=]
-function SlottedTouchButtonUtils.getSlottedTouchButtonData(inputKeyMapList)
-	local slottedTouchButtons = {}
+function SlottedTouchButtonUtils.getSlottedTouchButtonData(inputKeyMapList: _InputKeyMapList.InputKeyMapList): { SlottedTouchButtonData }
+	local slottedTouchButtons: { SlottedTouchButtonData } = {}
 
-	for _, inputKeyMap in pairs(inputKeyMapList) do
-		assert(InputModeType.isInputModeType(inputKeyMap.inputModeType), "Bad inputKeyMap.inputModeType")
-		assert(inputKeyMap.inputTypes, "Bad inputKeyMap.inputTypes")
-
-		for _, touchButtonData in pairs(inputKeyMap.inputTypes) do
+	for _, inputKeyMap: any in inputKeyMapList:GetInputKeyMaps() do
+		for _, touchButtonData in inputKeyMap:GetInputTypesList() do
 			if SlottedTouchButtonUtils.isSlottedTouchButton(touchButtonData) then
-				table.insert(slottedTouchButtons, SlottedTouchButtonUtils.createTouchButtonData(
-					touchButtonData.slotId, inputKeyMap.inputModeType))
+				local slottedButtonData: _InputTypeUtils.SlottedTouchButton = touchButtonData :: any
+				table.insert(
+					slottedTouchButtons,
+					SlottedTouchButtonUtils.createTouchButtonData(
+						slottedButtonData.slotId,
+						inputKeyMap:GetInputModeType()
+					)
+				)
 			end
 		end
 	end

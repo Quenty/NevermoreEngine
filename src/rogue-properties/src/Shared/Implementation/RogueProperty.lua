@@ -35,7 +35,7 @@ function RogueProperty.new(adornee, serviceBag, definition)
 	return setmetatable(self, RogueProperty)
 end
 
-function RogueProperty:SetCanInitialize(canInitialize)
+function RogueProperty:SetCanInitialize(canInitialize: boolean)
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
 	if rawget(self, "_canInitialize") ~= canInitialize then
@@ -154,7 +154,7 @@ function RogueProperty:GetValue()
 
 	local current = self:_decodeValue(propObj.Value)
 
-	for _, rogueModifier in pairs(self:GetRogueModifiers()) do
+	for _, rogueModifier in self:GetRogueModifiers() do
 		current = rogueModifier:GetModifiedVersion(current)
 	end
 
@@ -174,7 +174,7 @@ function RogueProperty:GetRogueModifiers()
 	local found = RogueModifierInterface:GetChildren(propObj)
 
 	local orders = {}
-	for _, item in pairs(found) do
+	for _, item in found do
 		orders[item] = item.Order.Value
 	end
 	table.sort(found, function(a, b)
@@ -190,23 +190,25 @@ function RogueProperty:_observeModifierSortedList()
 
 		local sortedList = topMaid:Add(ObservableSortedList.new())
 
-		topMaid:GiveTask(self:_observeBaseValueBrio():Pipe({
-			RxBrioUtils.flatMapBrio(function(baseValue)
-				return RogueModifierInterface:ObserveChildrenBrio(baseValue)
-			end);
-		}):Subscribe(function(brio)
-			if brio:IsDead() then
-				return
-			end
-			local maid, rogueModifier = brio:ToMaidAndValue()
-			maid:GiveTask(sortedList:Add(rogueModifier, rogueModifier.Order:Observe()))
-		end))
+		topMaid:GiveTask(self:_observeBaseValueBrio()
+			:Pipe({
+				RxBrioUtils.flatMapBrio(function(baseValue)
+					return RogueModifierInterface:ObserveChildrenBrio(baseValue)
+				end),
+			})
+			:Subscribe(function(brio)
+				if brio:IsDead() then
+					return
+				end
+				local maid, rogueModifier = brio:ToMaidAndValue()
+				maid:GiveTask(sortedList:Add(rogueModifier, rogueModifier.Order:Observe()))
+			end))
 
 		sub:Fire(sortedList)
 
 		return topMaid
 	end):Pipe({
-		Rx.cache();
+		Rx.cache(),
 	})
 end
 
@@ -214,19 +216,19 @@ function RogueProperty:Observe()
 	local observeInitialValue = self:_observeBaseValueBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(baseValue)
 			return RxInstanceUtils.observeProperty(baseValue, "Value")
-		end);
-		RxBrioUtils.emitOnDeath(self._definition:GetDefaultValue());
-		Rx.defaultsTo(self._definition:GetDefaultValue());
-		Rx.distinct();
+		end),
+		RxBrioUtils.emitOnDeath(self._definition:GetDefaultValue()),
+		Rx.defaultsTo(self._definition:GetDefaultValue()),
+		Rx.distinct(),
 	})
 
 	return self:_observeModifierSortedList():Pipe({
 		Rx.switchMap(function(sortedList)
-			return sortedList:Observe()
+		return sortedList:Observe()
 		end);
 		Rx.switchMap(function(rogueModifierList)
-			local current = observeInitialValue
-			for _, rogueModifier in pairs(rogueModifierList) do
+		local current = observeInitialValue
+			for _, rogueModifier in rogueModifierList do
 				current = rogueModifier:ObserveModifiedVersion(current)
 			end
 			return current
@@ -269,7 +271,7 @@ function RogueProperty:CreateMultiplier(amount, source)
 	return multiplier
 end
 
-function RogueProperty:CreateAdditive(amount, source)
+function RogueProperty:CreateAdditive(amount: number, source)
 	assert(type(amount) == "number", "Bad amount")
 
 	local baseValue = self:GetBaseValueObject()

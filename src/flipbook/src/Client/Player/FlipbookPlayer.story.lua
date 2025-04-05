@@ -9,7 +9,7 @@ local FlipbookPlayer = require("FlipbookPlayer")
 local Maid = require("Maid")
 local UICornerUtils = require("UICornerUtils")
 
-local function makeLabel(maid, flipbook, target, isBoomarang)
+local function makeLabel(maid: Maid.Maid, flipbook: Flipbook.Flipbook, target: Instance, isBoomarang: boolean)
 	local size = flipbook:GetImageRectSize()
 
 	local imageLabel = Instance.new("ImageLabel")
@@ -65,7 +65,7 @@ local function makeButton(maid, flipbook, target, isBoomarang)
 	return imageButton
 end
 
-return function(target)
+return function(target: Instance)
 	local maid = Maid.new()
 
 	local container = Instance.new("Frame")

@@ -8,11 +8,12 @@ local PhysicsService = game:GetService("PhysicsService")
 
 local Maid = require("Maid")
 local ClipCharactersServiceConstants = require("ClipCharactersServiceConstants")
+local _ServiceBag = require("ServiceBag")
 
 local ClipCharactersService = {}
 ClipCharactersService.ServiceName = "ClipCharactersService"
 
-function ClipCharactersService:Init(serviceBag)
+function ClipCharactersService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

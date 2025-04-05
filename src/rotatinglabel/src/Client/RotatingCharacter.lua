@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	Character that rotates for animations
 	@class RotatingCharacter
@@ -16,12 +17,12 @@ RotatingCharacter._transparency = 0
 -- The key to use (ASCII) that acts as a space. So we get animations that move to this as a hidden value.
 local SPACE_CODE = 96
 local SPRING_VALUES = {
-	Target = true;
-	Velocity = true;
-	Speed = true;
-	Position = true;
-	Value = true;
-	Damper = true;
+	Target = true,
+	Velocity = true,
+	Speed = true,
+	Position = true,
+	Value = true,
+	Damper = true,
 }
 
 function RotatingCharacter.new(Gui)
@@ -42,13 +43,13 @@ function RotatingCharacter.new(Gui)
 	self.TransparencyList = setmetatable({}, {
 		__newindex = function(transparencyList, index, value)
 			rawset(transparencyList, index, {
-				Gui = value;
+				Gui = value,
 				Default = {
-					TextTransparency = value.TextTransparency;
-					TextStrokeTransparency = value.TextStrokeTransparency;
-				};
+					TextTransparency = value.TextTransparency,
+					TextStrokeTransparency = value.TextStrokeTransparency,
+				},
 			})
-		end;
+		end,
 	})
 	self.TransparencyList[1] = self._label
 	self.TransparencyList[2] = self._labelTwo
@@ -63,7 +64,7 @@ function RotatingCharacter:__index(index)
 	elseif index == "IsDoneAnimating" then
 		return not SpringUtils.animating(self._spring)
 	elseif index == "NextCharacter" then
-		return self:_intToChar(self.Value+1) -- For rendering purposes.
+		return self:_intToChar(self.Value + 1) -- For rendering purposes.
 	elseif index == "Position" then
 		local _, position = SpringUtils.animating(self._spring)
 		return position
@@ -77,13 +78,13 @@ function RotatingCharacter:__index(index)
 		local default = (self.Position % 1)
 
 		-- Adjust transparency upwards based upon velocity
-		default = Math.map(default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
+		default = Math.map(default, 0, 1, math.clamp(math.abs(self.Velocity * 2 / self.Speed), 0, 0.25), 1)
 
 		local transparency = self.Transparency
 
 		return {
-			[self._label] = Math.map(default, 0, 1, transparency, 1);
-			[self._labelTwo] = Math.map(default, 1, 0, transparency, 1);
+			[self._label] = Math.map(default, 0, 1, transparency, 1),
+			[self._labelTwo] = Math.map(default, 1, 0, transparency, 1),
 		}
 	else
 		return RotatingCharacter[index]
@@ -108,9 +109,9 @@ function RotatingCharacter:__newindex(index, value)
 
 		local transparencyMap = self.TransparencyMap
 
-		for _, data in pairs(self.TransparencyList) do
-			local transparency = transparencyMap[data.Gui] or error("Gui not in transparency map");
-			for property, propValue in pairs(data.Default) do
+		for _, data in self.TransparencyList do
+			local transparency = transparencyMap[data.Gui] or error("Gui not in transparency map")
+			for property, propValue in data.Default do
 				data.Gui[property] = Math.map(transparency, 0, 1, propValue, 1)
 			end
 		end

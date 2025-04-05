@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Handles shared observable subscription tables for the client and server
 
@@ -11,31 +12,33 @@ local Players = game:GetService("Players")
 local BaseObject = require("BaseObject")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local DeathReportUtils = require("DeathReportUtils")
+local _Observable = require("Observable")
 
 local DeathReportProcessor = setmetatable({}, BaseObject)
 DeathReportProcessor.ClassName = "DeathReportProcessor"
 DeathReportProcessor.__index = DeathReportProcessor
 
-function DeathReportProcessor.new()
-	local self = setmetatable(BaseObject.new(), DeathReportProcessor)
+export type DeathReportProcessor = typeof(setmetatable(
+	{} :: {
+		_playerKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
+		_playerDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
+		_humanoidKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
+		_humanoidDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
+		_characterKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
+		_characterDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
+	},
+	{ __index = DeathReportProcessor }
+))
 
-	self._playerKillerSubTable = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._playerKillerSubTable)
+function DeathReportProcessor.new(): DeathReportProcessor
+	local self = setmetatable(BaseObject.new() :: any, DeathReportProcessor)
 
-	self._playerDeathSubTable = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._playerDeathSubTable)
-
-	self._humanoidKillerSubTable = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._humanoidKillerSubTable)
-
-	self._humanoidDeathSubTable = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._humanoidDeathSubTable)
-
-	self._characterKillerSubTable = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._characterKillerSubTable)
-
-	self._characterDeathSubTable = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._characterDeathSubTable)
+	self._playerKillerSubTable = self._maid:Add(ObservableSubscriptionTable.new())
+	self._playerDeathSubTable = self._maid:Add(ObservableSubscriptionTable.new())
+	self._humanoidKillerSubTable = self._maid:Add(ObservableSubscriptionTable.new())
+	self._humanoidDeathSubTable = self._maid:Add(ObservableSubscriptionTable.new())
+	self._characterKillerSubTable = self._maid:Add(ObservableSubscriptionTable.new())
+	self._characterDeathSubTable = self._maid:Add(ObservableSubscriptionTable.new())
 
 	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
 		self._playerKillerSubTable:Complete(player)
@@ -51,7 +54,10 @@ end
 	@param player Player
 	@return Observable<DeathReport>
 ]=]
-function DeathReportProcessor:ObservePlayerKillerReports(player)
+function DeathReportProcessor.ObservePlayerKillerReports(
+	self: DeathReportProcessor,
+	player: Player
+): _Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._playerKillerSubTable:Observe(player)
@@ -63,7 +69,10 @@ end
 	@param player Player
 	@return Observable<DeathReport>
 ]=]
-function DeathReportProcessor:ObservePlayerDeathReports(player)
+function DeathReportProcessor.ObservePlayerDeathReports(
+	self: DeathReportProcessor,
+	player: Player
+): _Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._playerDeathSubTable:Observe(player)
@@ -75,7 +84,10 @@ end
 	@param humanoid Humanoid
 	@return Observable<DeathReport>
 ]=]
-function DeathReportProcessor:ObserveHumanoidDeathReports(humanoid)
+function DeathReportProcessor.ObserveHumanoidDeathReports(
+	self: DeathReportProcessor,
+	humanoid: Humanoid
+): _Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._humanoidDeathSubTable:Observe(humanoid)
@@ -87,7 +99,10 @@ end
 	@param humanoid Humanoid
 	@return Observable<DeathReport>
 ]=]
-function DeathReportProcessor:ObserveHumanoidKillerReports(humanoid)
+function DeathReportProcessor.ObserveHumanoidKillerReports(
+	self: DeathReportProcessor,
+	humanoid: Humanoid
+): _Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._humanoidKillerSubTable:Observe(humanoid)
@@ -99,7 +114,10 @@ end
 	@param character Model
 	@return Observable<DeathReport>
 ]=]
-function DeathReportProcessor:ObserveCharacterKillerReports(character)
+function DeathReportProcessor.ObserveCharacterKillerReports(
+	self: DeathReportProcessor,
+	character: Model
+): _Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	return self._characterKillerSubTable:Observe(character)
@@ -111,7 +129,10 @@ end
 	@param character Model
 	@return Observable<DeathReport>
 ]=]
-function DeathReportProcessor:ObserveCharacterDeathReports(character)
+function DeathReportProcessor.ObserveCharacterDeathReports(
+	self: DeathReportProcessor,
+	character: Model
+): _Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	return self._characterDeathSubTable:Observe(character)
@@ -123,7 +144,7 @@ end
 
 	@param deathReport DeathReport
 ]=]
-function DeathReportProcessor:HandleDeathReport(deathReport)
+function DeathReportProcessor.HandleDeathReport(self: DeathReportProcessor,deathReport: DeathReportUtils.DeathReport)
 	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathreport")
 
 	if deathReport.killerPlayer then

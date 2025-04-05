@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Tween that is a specific time, useful for countdowns and other things
 
@@ -15,10 +16,39 @@ local StepUtils = require("StepUtils")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Promise = require("Promise")
+local _Signal = require("Signal")
 
 local TimedTween = setmetatable({}, BasicPane)
 TimedTween.ClassName = "TimedTween"
 TimedTween.__index = TimedTween
+
+type TimedTweenState = {
+	p0: number,
+	p1: number,
+	t0: number,
+	t1: number,
+}
+
+type ComputedState = {
+	p: number,
+	v: number,
+	rtime: number,
+}
+
+export type TimedTween = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_state: ValueObject.ValueObject<TimedTweenState>,
+		_transitionTime: ValueObject.ValueObject<number>,
+
+		-- From BasicPane
+		IsVisible: (self: TimedTween) -> boolean,
+		SetVisible: (self: TimedTween, isVisible: boolean, doNotAnimate: boolean?) -> (),
+		VisibleChanged: _Signal.Signal<boolean, boolean>,
+		Destroy: (self: TimedTween) -> (),
+	},
+	{ __index = TimedTween }
+))
 
 --[=[
 	Timed transition module
@@ -26,15 +56,15 @@ TimedTween.__index = TimedTween
 	@param transitionTime number? -- Optional
 	@return TimedTween
 ]=]
-function TimedTween.new(transitionTime)
-	local self = setmetatable(BasicPane.new(), TimedTween)
+function TimedTween.new(transitionTime: number?): TimedTween
+	local self: TimedTween = setmetatable(BasicPane.new() :: any, TimedTween)
 
 	self._transitionTime = self._maid:Add(ValueObject.new(0.15, "number"))
 	self._state = self._maid:Add(ValueObject.new({
-		p0 = 0;
-		p1 = 0;
-		t0 = 0;
-		t1 = 0;
+		p0 = 0,
+		p1 = 0,
+		t0 = 0,
+		t1 = 0,
 	}))
 
 	if transitionTime then
@@ -59,7 +89,7 @@ end
 	@param transitionTime number | Observable<number>
 	@return MaidTask
 ]=]
-function TimedTween:SetTransitionTime(transitionTime)
+function TimedTween.SetTransitionTime(self: TimedTween, transitionTime: number | Observable.Observable<number>)
 	return self._transitionTime:Mount(transitionTime)
 end
 
@@ -68,7 +98,7 @@ end
 
 	@return number
 ]=]
-function TimedTween:GetTransitionTime()
+function TimedTween.GetTransitionTime(self: TimedTween): number
 	return self._transitionTime.Value
 end
 
@@ -77,7 +107,7 @@ end
 
 	@return Observable<number>
 ]=]
-function TimedTween:ObserveTransitionTime()
+function TimedTween.ObserveTransitionTime(self: TimedTween): Observable.Observable<number>
 	return self._transitionTime:Observe()
 end
 
@@ -86,7 +116,7 @@ end
 
 	@return Observable<number>
 ]=]
-function TimedTween:ObserveRenderStepped()
+function TimedTween.ObserveRenderStepped(self: TimedTween): Observable.Observable<number>
 	return self:ObserveOnSignal(RunService.RenderStepped)
 end
 
@@ -96,7 +126,7 @@ end
 	@param signal Signal
 	@return Observable<number>
 ]=]
-function TimedTween:ObserveOnSignal(signal)
+function TimedTween.ObserveOnSignal(self: TimedTween, signal: RBXScriptSignal): Observable.Observable<number>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -111,7 +141,7 @@ function TimedTween:ObserveOnSignal(signal)
 		startAnimate()
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -119,7 +149,7 @@ end
 
 	@return Observable<number>
 ]=]
-function TimedTween:Observe()
+function TimedTween.Observe(self: TimedTween): Observable.Observable<number>
 	return self:ObserveOnSignal(RunService.RenderStepped)
 end
 
@@ -128,9 +158,9 @@ end
 
 	@return Promise
 ]=]
-function TimedTween:PromiseFinished()
+function TimedTween.PromiseFinished(self: TimedTween): Promise.Promise<()>
 	local initState = self:_computeState(os.clock())
-	if initState.rtime <=  0 then
+	if initState.rtime <= 0 then
 		return Promise.resolved()
 	end
 
@@ -150,45 +180,45 @@ function TimedTween:PromiseFinished()
 		end)
 	end))
 
-	self._maid[promise] = maid
+	self._maid[promise :: any] = maid
 
 	promise:Finally(function()
-		self._maid[promise] = nil
+		self._maid[promise :: any] = nil
 	end)
 
 	maid:GiveTask(function()
-		self._maid[promise] = nil
+		self._maid[promise :: any] = nil
 	end)
 	return promise
 end
 
-function TimedTween:_updateState(doNotAnimate)
+function TimedTween._updateState(self: TimedTween, doNotAnimate: boolean?): ()
 	local transitionTime = self._transitionTime.Value
-	local target = self:IsVisible() and 1 or 0;
+	local target = self:IsVisible() and 1 or 0
 
 	local now = os.clock()
-	local computed = self:_computeState(now)
+	local computed: ComputedState = self:_computeState(now)
 	local p0 = computed.p
 
 	local remainingDist = target - p0
 	if doNotAnimate then
 		self._state.Value = {
-			p0 = target;
-			p1 = target;
-			t0 = now;
-			t1 = now;
+			p0 = target,
+			p1 = target,
+			t0 = now,
+			t1 = now,
 		}
 	else
 		self._state.Value = {
-			p0 = p0;
-			p1 = target;
-			t0 = now;
-			t1 = now + Math.map(math.abs(remainingDist), 0, 1, 0, transitionTime);
+			p0 = p0,
+			p1 = target,
+			t0 = now,
+			t1 = now + Math.map(math.abs(remainingDist), 0, 1, 0, transitionTime),
 		}
 	end
 end
 
-function TimedTween:_computeState(now)
+function TimedTween._computeState(self: TimedTween, now: number): ComputedState
 	local state = self._state.Value
 	local p
 

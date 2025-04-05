@@ -4,3 +4,4 @@
 rojo = "quenty/rojo@7.4.3-quenty-npm-canary.2"
 selene = "Kampfkarren/selene@0.28.0"
 moonwave-extractor = "UpliftGames/moonwave@1.3.0"
+luau-lsp = "Quenty/luau-lsp@1.42.0-quenty.1"

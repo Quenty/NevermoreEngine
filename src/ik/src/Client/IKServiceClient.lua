@@ -18,6 +18,7 @@ local Players = game:GetService("Players")
 
 local IKRigUtils = require("IKRigUtils")
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local IKServiceClient = {}
 IKServiceClient.ServiceName = "IKServiceClient"
@@ -38,7 +39,7 @@ IKServiceClient.ServiceName = "IKServiceClient"
 
 	@param serviceBag ServiceBag
 ]=]
-function IKServiceClient:Init(serviceBag)
+function IKServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -185,7 +186,7 @@ function IKServiceClient:_updateStepped()
 
 	local camPosition = Workspace.CurrentCamera.CFrame.p
 
-	for _, rig in pairs(self._ikRigBinderClient:GetAll()) do
+	for _, rig in self._ikRigBinderClient:GetAll() do
 		debug.profilebegin("RigUpdate")
 
 		local position = rig:GetPositionOrNil()

@@ -47,7 +47,7 @@ function SoundEffectsList:ObserveHasEffects()
 	return self._hasEffects:Observe()
 end
 
-function SoundEffectsList:IsActive()
+function SoundEffectsList:IsActive(): boolean
 	return self._isActive.Value
 end
 
@@ -58,7 +58,7 @@ end
 	@param effect (instance) -> MaidTask
 	@return () -> () -- Cleanup call
 ]=]
-function SoundEffectsList:PushEffect(effect)
+function SoundEffectsList:PushEffect(effect: () -> ())
 	assert(type(effect) == "function", "Bad effect")
 
 	return self._effectList:Add(effect)

@@ -32,7 +32,7 @@
 
 	local topMaid = Maid.new()
 
-	local function handlePlayer(player)
+	local function handlePlayer(player: Player)
 		local maid = Maid.new()
 
 		local playerMoneyValue = Instance.new("IntValue")
@@ -54,7 +54,7 @@
 	Players.PlayerRemoving:Connect(function(player)
 		topMaid[player] = nil
 	end)
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		task.spawn(handlePlayer, player)
 	end
 	```
@@ -85,6 +85,8 @@ local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
 DataStore.__index = DataStore
 
+export type DataStore = typeof(setmetatable({}, { __index = DataStore }))
+
 --[=[
 	Constructs a new DataStore. See [DataStoreStage] for more API.
 
@@ -96,7 +98,7 @@ DataStore.__index = DataStore
 	@param key string
 	@return DataStore
 ]=]
-function DataStore.new(robloxDataStore, key)
+function DataStore.new(robloxDataStore, key: string)
 	local self = setmetatable(DataStoreStage.new(key), DataStore)
 
 	self._key = key or error("No key")
@@ -114,7 +116,7 @@ function DataStore.new(robloxDataStore, key)
 		error("[DataStore] - Key cannot be an empty string")
 	end
 
---[=[
+	--[=[
 	Prop that fires when saving. Promise will resolve once saving is complete.
 	@prop Saving Signal<Promise>
 	@within DataStore
@@ -131,7 +133,7 @@ end
 
 	@param debugWriting boolean
 ]=]
-function DataStore:SetDoDebugWriting(debugWriting)
+function DataStore:SetDoDebugWriting(debugWriting: boolean)
 	assert(type(debugWriting) == "boolean", "Bad debugWriting")
 
 	self._debugWriting = debugWriting
@@ -141,7 +143,7 @@ end
 	Returns the full path for the datastore
 	@return string
 ]=]
-function DataStore:GetFullPath()
+function DataStore:GetFullPath(): string
 	return string.format("RobloxDataStore@%s", self._key)
 end
 
@@ -149,9 +151,9 @@ end
 	How frequent the data store will autosave (or sync) to the cloud. If set to nil then the datastore
 	will not do any syncing.
 
-	@param autoSaveTimeSeconds number | nil
+	@param autoSaveTimeSeconds number?
 ]=]
-function DataStore:SetAutoSaveTimeSeconds(autoSaveTimeSeconds)
+function DataStore:SetAutoSaveTimeSeconds(autoSaveTimeSeconds: number?)
 	assert(type(autoSaveTimeSeconds) == "number" or autoSaveTimeSeconds == nil, "Bad autoSaveTimeSeconds")
 
 	self._autoSaveTimeSeconds.Value = autoSaveTimeSeconds
@@ -162,7 +164,7 @@ end
 
 	@param syncEnabled boolean
 ]=]
-function DataStore:SetSyncOnSave(syncEnabled)
+function DataStore:SetSyncOnSave(syncEnabled: boolean)
 	assert(type(syncEnabled) == "boolean", "Bad syncEnabled")
 
 	self._syncOnSave.Value = syncEnabled
@@ -172,7 +174,7 @@ end
 	Returns whether the datastore failed.
 	@return boolean
 ]=]
-function DataStore:DidLoadFail()
+function DataStore:DidLoadFail(): boolean
 	if not self._firstLoadPromise then
 		return false
 	end
@@ -189,7 +191,7 @@ end
 
 	@return Promise<boolean>
 ]=]
-function DataStore:PromiseLoadSuccessful()
+function DataStore:PromiseLoadSuccessful(): Promise.Promise<boolean>
 	return self._maid:GivePromise(self:PromiseViewUpToDate()):Then(function()
 		return true
 	end, function()
@@ -201,7 +203,7 @@ end
 	Saves all stored data.
 	@return Promise
 ]=]
-function DataStore:Save()
+function DataStore:Save(): Promise.Promise<()>
 	return self:_syncData(false)
 end
 
@@ -211,16 +213,16 @@ end
 
 	@return Promise
 ]=]
-function DataStore:Sync()
+function DataStore:Sync(): Promise.Promise<()>
 	return self:_syncData(true)
 end
 
 --[=[
 	Sets the user id list associated with this datastore. Can be useful for GDPR compliance.
 
-	@param userIdList { number } | nil
+	@param userIdList { number }?
 ]=]
-function DataStore:SetUserIdList(userIdList)
+function DataStore:SetUserIdList(userIdList: { number }?)
 	assert(type(userIdList) == "table" or userIdList == nil, "Bad userIdList")
 	assert(not Symbol.isSymbol(userIdList), "Should not be symbol")
 
@@ -230,9 +232,9 @@ end
 --[=[
 	Returns a list of user ids or nil
 
-	@return { number } | nil
+	@return { number }?
 ]=]
-function DataStore:GetUserIdList()
+function DataStore:GetUserIdList(): { number }?
 	return self._userIdList
 end
 
@@ -241,7 +243,7 @@ end
 
 	@return Promise
 ]=]
-function DataStore:PromiseViewUpToDate()
+function DataStore:PromiseViewUpToDate(): Promise.Promise<()>
 	if self._firstLoadPromise then
 		return self._firstLoadPromise
 	end
@@ -259,10 +261,10 @@ function DataStore:_setupAutoSaving()
 	local startTime = os.clock()
 
 	self._maid:GiveTask(Rx.combineLatest({
-		autoSaveTimeSeconds = self._autoSaveTimeSeconds:Observe();
-		jitterProportion = self._jitterProportion:Observe();
-		syncOnSave = self._syncOnSave:Observe();
-		loadedOk = self._loadedOk:Observe();
+		autoSaveTimeSeconds = self._autoSaveTimeSeconds:Observe(),
+		jitterProportion = self._jitterProportion:Observe(),
+		syncOnSave = self._syncOnSave:Observe(),
+		loadedOk = self._loadedOk:Observe(),
 	}):Subscribe(function(state)
 		if state.autoSaveTimeSeconds and state.loadedOk then
 			local maid = Maid.new()
@@ -275,7 +277,11 @@ function DataStore:_setupAutoSaving()
 				while true do
 					local jitterBase = math.random()
 					local timeElapsed = os.clock() - startTime
-					local totalWaitTime = Math.jitter(state.autoSaveTimeSeconds, state.jitterProportion*state.autoSaveTimeSeconds, jitterBase)
+					local totalWaitTime = Math.jitter(
+						state.autoSaveTimeSeconds,
+						state.jitterProportion * state.autoSaveTimeSeconds,
+						jitterBase
+					)
 					local timeRemaining = totalWaitTime - timeElapsed
 
 					if timeRemaining > 0 then
@@ -301,7 +307,7 @@ function DataStore:_setupAutoSaving()
 	end))
 end
 
-function DataStore:_syncData(doMergeNewData)
+function DataStore:_syncData(doMergeNewData: boolean)
 	if self:DidLoadFail() then
 		warn("[DataStore] - Not syncing, failed to load")
 		return Promise.rejected("Load not successful, not syncing")
@@ -354,6 +360,8 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 				-- Do syncing after
 				return self:_promiseGetAsyncNoCache()
 			end
+
+			return nil
 		end))
 	else
 		if self._debugWriting then

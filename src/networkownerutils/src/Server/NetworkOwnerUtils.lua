@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides utility functions to make it easy to work with network owners. This wraps this API
 	because the API surface is actually quite bad.
@@ -35,7 +36,7 @@ end
 	@param part BasePart
 	@return Player?
 ]=]
-function NetworkOwnerUtils.getNetworkOwnerPlayer(part: BasePart)
+function NetworkOwnerUtils.getNetworkOwnerPlayer(part: BasePart): Player?
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part)
@@ -54,7 +55,7 @@ end
 	@param player Player? -- nil for server
 	@return boolean
 ]=]
-function NetworkOwnerUtils.isNetworkOwner(part: BasePart, player: Player)
+function NetworkOwnerUtils.isNetworkOwner(part: BasePart, player: Player): boolean
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
@@ -73,7 +74,7 @@ end
 	@param part BasePart
 	@return boolean
 ]=]
-function NetworkOwnerUtils.isServerNetworkOwner(part: BasePart)
+function NetworkOwnerUtils.isServerNetworkOwner(part: BasePart): boolean
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part)
@@ -89,7 +90,7 @@ end
 	@return boolean -- true if retrieved fine, false otherwise
 	@return Player? -- player that is owner.
 ]=]
-function NetworkOwnerUtils.tryToGetNetworkOwner(part: BasePart)
+function NetworkOwnerUtils.tryToGetNetworkOwner(part: BasePart): (boolean, Player?)
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local finished = false

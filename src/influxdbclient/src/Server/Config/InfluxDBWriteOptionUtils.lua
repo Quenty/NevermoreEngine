@@ -6,13 +6,19 @@ local require = require(script.Parent.loader).load(script)
 
 local Table = require("Table")
 
+export type InfluxDBWriteOptions = {
+	batchSize: number,
+	maxBatchBytes: number,
+	flushIntervalSeconds: number,
+}
+
 local InfluxDBWriteOptionUtils = {}
 
-function InfluxDBWriteOptionUtils.getDefaultOptions()
+function InfluxDBWriteOptionUtils.getDefaultOptions(): InfluxDBWriteOptions
 	return InfluxDBWriteOptionUtils.createWriteOptions({
-		batchSize = 1000;
-		maxBatchBytes = 50_000_000; -- default max batch size in the cloud
-		flushIntervalSeconds = 60;
+		batchSize = 1000,
+		maxBatchBytes = 50_000_000, -- default max batch size in the cloud
+		flushIntervalSeconds = 60,
 		-- maxRetries = 5;
 		-- maxRetryTimeSeconds = 180;
 		-- maxBufferLines = 32_000;
@@ -24,13 +30,13 @@ function InfluxDBWriteOptionUtils.getDefaultOptions()
 	})
 end
 
-function InfluxDBWriteOptionUtils.createWriteOptions(options)
+function InfluxDBWriteOptionUtils.createWriteOptions(options: InfluxDBWriteOptions): InfluxDBWriteOptions
 	assert(InfluxDBWriteOptionUtils.isWriteOptions(options), "Bad options")
 
 	return Table.readonly(options)
 end
 
-function InfluxDBWriteOptionUtils.isWriteOptions(options)
+function InfluxDBWriteOptionUtils.isWriteOptions(options: any): boolean
 	return type(options) == "table"
 		and type(options.batchSize) == "number"
 		and type(options.maxBatchBytes) == "number"

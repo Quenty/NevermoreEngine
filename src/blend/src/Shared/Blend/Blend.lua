@@ -56,7 +56,7 @@ function Blend.New(className: string)
 			local instance = Instance.new(className)
 
 			if BlendDefaultProps[className] then
-				for key, value in pairs(BlendDefaultProps[className]) do
+				for key, value in BlendDefaultProps[className] do
 					instance[key] = value
 				end
 			end
@@ -77,10 +77,10 @@ end
 	Creates a new Blend State which is actually just a ValueObject underneath.
 
 	@param defaultValue T
-	@param checkType string | nil
+	@param checkType string?
 	@return ValueObject<T>
 ]=]
-function Blend.State(defaultValue, checkType)
+function Blend.State<T>(defaultValue: T, checkType: ValueObject.ValueObjectTypeArg?): ValueObject.ValueObject<T>
 	return ValueObject.new(defaultValue, checkType)
 end
 
@@ -93,10 +93,10 @@ end
 	@param observable Observable<T>
 	@return Observable<T>
 ]=]
-function Blend.Throttled(observable)
+function Blend.Throttled<T>(observable: Observable.Observable<T>): Observable.Observable<T>
 	return observable:Pipe({
-		Rx.throttleDefer();
-	})
+		Rx.throttleDefer(),
+	}) :: any
 end
 
 --[=[
@@ -108,27 +108,27 @@ end
 	@param observable Observable<T>
 	@return Observable<T>
 ]=]
-function Blend.Shared(observable)
+function Blend.Shared<T>(observable: Observable.Observable<T>): Observable.Observable<T>
 	return observable:Pipe({
-		Rx.cache();
-	})
+		Rx.cache() :: any,
+	}) :: any
 end
 
 function Blend.Dynamic(...)
-	return Blend.Computed(...)
-		:Pipe({
-			-- This switch map is relatively expensive, so we don't do this for defaul computed
-			-- and instead force the user to switch to another promise
-			Rx.switchMap(function(promise, ...)
-				if Promise.isPromise(promise) then
-					return Rx.fromPromise(promise)
-				elseif Observable.isObservable(promise) then
-					return promise
-				else
-					return Rx.of(promise, ...)
-				end
-			end)
-		})
+	-- stylua: ignore
+	return Blend.Computed(...):Pipe({
+		-- This switch map is relatively expensive, so we don't do this for defaul computed
+		-- and instead force the user to switch to another promise
+		Rx.switchMap(function(promise, ...)
+			if Promise.isPromise(promise) then
+				return Rx.fromPromise(promise) :: any
+			elseif Observable.isObservable(promise) then
+				return promise
+			else
+				return Rx.of(promise, ...)
+			end
+		end) :: any,
+	})
 end
 
 --[=[
@@ -174,7 +174,7 @@ function Blend.Computed(...)
 	else
 		local args = table.create(n - 1)
 
-		for i=1, n - 1 do
+		for i = 1, n - 1 do
 			local found = select(i, ...)
 			local observable = Blend.toPropertyObservable(found)
 			if observable then
@@ -184,12 +184,11 @@ function Blend.Computed(...)
 			end
 		end
 
-		return Rx.combineLatest(args)
-			:Pipe({
-				Rx.map(function(result)
-					return compute(unpack(result, 1, n - 1))
-				end);
-			})
+		return Rx.combineLatest(args):Pipe({
+			Rx.map(function(result)
+				return compute(unpack(result, 1, n - 1))
+			end),
+		})
 	end
 end
 
@@ -209,10 +208,10 @@ end
 	@param propertyName string
 	@return (instance: Instance) -> Observable
 ]=]
-function Blend.OnChange(propertyName)
+function Blend.OnChange(propertyName: string): (instance: Instance) -> Observable.Observable<any>
 	assert(type(propertyName) == "string", "Bad propertyName")
 
-	return function(instance)
+	return function(instance: Instance)
 		return RxInstanceUtils.observeProperty(instance, propertyName)
 	end
 end
@@ -235,7 +234,7 @@ end
 	@param eventName string
 	@return (instance: Instance) -> Observable
 ]=]
-function Blend.OnEvent(eventName)
+function Blend.OnEvent(eventName: string)
 	assert(type(eventName) == "string", "Bad eventName")
 
 	return function(instance)
@@ -281,7 +280,7 @@ function Blend.Attached(constructor)
 
 			return cleanup
 		end)
-	end;
+	end
 end
 
 --[=[
@@ -300,37 +299,40 @@ function Blend.ComputedPairs(source, compute)
 		local maidForKeys = Maid.new()
 		topMaid:GiveTask(maidForKeys)
 
-		topMaid:GiveTask(sourceObservable:Subscribe(function(newValue)
-			-- It's gotta be a table
-			assert(type(newValue) == "table", "Bad value emitted from source")
+		topMaid:GiveTask(
+			sourceObservable:Subscribe(function(newValue)
+				-- It's gotta be a table
+				assert(type(newValue) == "table", "Bad value emitted from source")
 
-			local excluded = {}
-			for key, _ in pairs(cache) do
-				excluded[key] = true
-			end
-
-			for key, value in pairs(newValue) do
-				excluded[key] = nil
-
-				if cache[key] ~= value then
-					local innerMaid = Maid.new()
-					local result = compute(key, value, innerMaid)
-
-					local brio = Brio.new(result)
-					innerMaid:GiveTask(brio)
-
-					sub:Fire(brio)
-
-					maidForKeys[key] = innerMaid
-					cache[key] = value
+				local excluded = {}
+				for key, _ in cache do
+					excluded[key] = true
 				end
-			end
 
-			for key, _ in pairs(excluded) do
-				maidForKeys[key] = nil
-				cache[key] = nil
-			end
-		end), sub:GetFailComplete())
+				for key, value in newValue do
+					excluded[key] = nil
+
+					if cache[key] ~= value then
+						local innerMaid = Maid.new()
+						local result = compute(key, value, innerMaid)
+
+						local brio = Brio.new(result)
+						innerMaid:GiveTask(brio)
+
+						sub:Fire(brio)
+
+						maidForKeys[key] = innerMaid
+						cache[key] = value
+					end
+				end
+
+				for key, _ in excluded do
+					maidForKeys[key] = nil
+					cache[key] = nil
+				end
+			end),
+			sub:GetFailComplete()
+		)
 
 		return topMaid
 	end)
@@ -410,7 +412,7 @@ end
 ]=]
 function Blend.Spring(source, speed, damper)
 	if not SpringObject then
-		SpringObject = require("SpringObject")
+		SpringObject = (require :: any)("SpringObject")
 	end
 
 	return Observable.new(function(sub)
@@ -495,7 +497,7 @@ function Blend.toEventHandler(value)
 		-- IntValue, ObjectValue, et cetera
 		if ValueBaseUtils.isValueBase(value) then
 			return function(result)
-				value.Value = result
+				(value :: any).Value = result
 			end
 		end
 	elseif type(value) == "table" then
@@ -572,7 +574,7 @@ end
 	@param value any
 	@return Observable
 ]=]
-function Blend.Children(parent, value)
+function Blend.Children(parent: Instance, value)
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	local observe = Blend._observeChildren(value, parent)
@@ -601,10 +603,10 @@ end
 	@param value any
 	@return Observable
 ]=]
-function Blend.Tags(parent, value)
+function Blend.Tags(parent: Instance, value)
 	assert(typeof(parent) == "Instance", "Bad parent")
 
-	local observe = Blend._observeTags(value, parent)
+	local observe = Blend._observeTags(value)
 
 	if observe then
 		return observe:Pipe({
@@ -614,13 +616,12 @@ function Blend.Tags(parent, value)
 				else
 					error("Bad tag")
 				end
-			end);
+			end),
 		})
 	else
 		return Rx.EMPTY
 	end
 end
-
 
 function Blend._observeTags(tags)
 	if type(tags) == "string" then
@@ -672,7 +673,7 @@ end
 	@param className string
 	@return function
 ]=]
-function Blend.Find(className)
+function Blend.Find(className: string)
 	assert(type(className) == "string", "Bad className")
 
 	return function(props)
@@ -705,17 +706,17 @@ function Blend.Find(className)
 				return propertyObservable:Pipe({
 					RxBrioUtils.switchToBrio(function(parent)
 						return parent ~= nil
-					end);
+					end),
 					RxBrioUtils.switchMapBrio(function(parent)
 						assert(typeof(parent) == "Instance", "Bad parent retrieved during find spec")
 
 						return RxInstanceUtils.observeChildrenOfNameBrio(parent, className, props.Name)
-					end);
-					Rx.flatMap(handleChildBrio);
+					end),
+					Rx.flatMap(handleChildBrio),
 				})
 			else
 				return RxInstanceUtils.observeChildrenOfNameBrio(props.Parent, className, props.Name):Pipe({
-					Rx.flatMap(handleChildBrio);
+					Rx.flatMap(handleChildBrio),
 				})
 			end
 		end
@@ -725,7 +726,7 @@ function Blend.Find(className)
 			-- TODO: Swap based upon name
 			-- TODO: Avoid assigning name
 			return RxInstanceUtils.observeChildrenOfNameBrio(parent, className, props.Name):Pipe({
-				Blend._mountToFinding(props);
+				Blend._mountToFinding(props),
 			})
 		end
 	end
@@ -749,7 +750,7 @@ function Blend._mountToFinding(props)
 
 		-- Avoid emitting anything else so we don't get cleaned up
 		return Rx.EMPTY
-	end);
+	end)
 end
 
 --[=[
@@ -802,7 +803,7 @@ end
 	@param parent Instance
 	@return Observable<Instance>
 ]=]
-function Blend.Instance(parent)
+function Blend.Instance(parent: Instance): Observable.Observable<Instance>
 	return Observable.new(function(sub)
 		sub:Fire(parent)
 	end)
@@ -865,9 +866,9 @@ function Blend.Single(observable)
 	end)
 end
 
-function Blend._safeCleanupInstance(result)
+function Blend._safeCleanupInstance(result: Instance)
 	-- Unparent all children incase we want to resurrect them
-	for _, child in pairs(result:GetChildren()) do
+	for _, child in result:GetChildren() do
 		child.Parent = nil
 	end
 	result:Destroy()
@@ -1048,7 +1049,7 @@ function Blend._observeChildren(value, parent)
 
 	if type(value) == "table" and not getmetatable(value) then
 		local observables = {}
-		for key, item in pairs(value) do
+		for key, item in value do
 			local observe = Blend._observeChildren(item, parent)
 			if observe then
 				table.insert(observables, observe)
@@ -1101,7 +1102,7 @@ end
 	@param props table
 	@return Maid
 ]=]
-function Blend.mount(instance, props)
+function Blend.mount(instance: Instance, props)
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local maid = Maid.new()
@@ -1110,7 +1111,7 @@ function Blend.mount(instance, props)
 	local dependentObservables = {}
 	local children = {}
 
-	for key, value in pairs(props) do
+	for key, value in props do
 		if type(key) == "string" then
 			if key == "Parent" then
 				parent = value
@@ -1153,7 +1154,7 @@ function Blend.mount(instance, props)
 	end
 
 	-- Subscribe dependentObservables (which includes adding children)
-	for _, event in pairs(dependentObservables) do
+	for _, event in dependentObservables do
 		maid:GiveTask(event[1]:Subscribe(Blend.toEventHandler(event[2])))
 	end
 

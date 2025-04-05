@@ -159,35 +159,35 @@ function ArmIKBase:_observeStateBrio()
 		RxBrioUtils.switchMapBrio(function(character)
 			local observeUpperTorsoBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", "UpperTorso"):Pipe({
 				Rx.shareReplay(1);
-			});
+			})
 			local observeUpperArmBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "UpperArm"):Pipe({
 				Rx.shareReplay(1);
-			});
+			})
 			local observeLowerArmBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "LowerArm"):Pipe({
 				Rx.shareReplay(1);
-			});
+			})
 			local observeHandBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "Hand"):Pipe({
 				Rx.shareReplay(1);
-			});
+			})
 
 			local observeShoulderBrio = observeUpperArmBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(upperArm)
 					return RxInstanceUtils.observeLastNamedChildBrio(upperArm, "Motor6D", self._armName .. "Shoulder")
 				end);
 				Rx.shareReplay(1);
-			});
+			})
 			local observeElbowBrio = observeLowerArmBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(lowerArm)
 					return RxInstanceUtils.observeLastNamedChildBrio(lowerArm, "Motor6D", self._armName .. "Elbow")
 				end);
 				Rx.shareReplay(1);
-			});
+			})
 			local observeWristBrio = observeHandBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(hand)
 					return RxInstanceUtils.observeLastNamedChildBrio(hand, "Motor6D", self._armName .. "Wrist")
 				end);
 				Rx.shareReplay(1);
-			});
+			})
 
 			return RxBrioUtils.flatCombineLatest({
 				UpperTorso = observeUpperTorsoBrio;
@@ -201,19 +201,19 @@ function ArmIKBase:_observeStateBrio()
 
 				ShoulderMotor6DStack = observeShoulderBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm());
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
 					end);
 					Rx.defaultsToNil;
 				});
 				ElbowMotor6DStack = observeElbowBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm());
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
 					end);
 					Rx.defaultsToNil;
 				});
 				WristMotor6DStack = observeWristBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm());
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
 					end);
 					Rx.defaultsToNil;
 				});
@@ -287,7 +287,7 @@ function ArmIKBase:Grip(attachment, priority)
 end
 
 function ArmIKBase:_stopGrip(grip)
-	for index, value in pairs(self._grips) do
+	for index, value in self._grips do
 		if value == grip then
 			table.remove(self._grips, index)
 			break

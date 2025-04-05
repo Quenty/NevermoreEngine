@@ -52,7 +52,7 @@ end
 	Sets whether tagging should be enabled
 	@param shouldTag boolean
 ]=]
-function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag)
+function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag: boolean)
 	assert(type(shouldTag) == "boolean", "Bad shouldTag")
 	assert(self._shouldTag, "Missing self._shouldTag")
 
@@ -102,7 +102,7 @@ function PlayerHumanoidBinder:_bindTagging(doUnbinding)
 			playerMaid[player] = nil
 		end))
 
-		for _, player in pairs(Players:GetPlayers()) do
+		for _, player in Players:GetPlayers() do
 			self:_handlePlayerAdded(playerMaid, player)
 		end
 
@@ -111,7 +111,7 @@ function PlayerHumanoidBinder:_bindTagging(doUnbinding)
 		self._maid._tagging = nil
 
 		if doUnbinding then
-			for _, player in pairs(Players:GetPlayers()) do
+			for _, player in Players:GetPlayers() do
 				local character = player.Character
 				local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
 				if humanoid then

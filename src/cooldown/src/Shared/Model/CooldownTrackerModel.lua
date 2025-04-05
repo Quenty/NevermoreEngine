@@ -35,11 +35,11 @@ function CooldownTrackerModel.new()
 	return self
 end
 
-function CooldownTrackerModel.isCooldownTrackerModel(value)
+function CooldownTrackerModel.isCooldownTrackerModel(value: any): boolean
 	return DuckTypeUtils.isImplementation(CooldownTrackerModel, value)
 end
 
-function CooldownTrackerModel:IsCoolingDown()
+function CooldownTrackerModel:IsCoolingDown(): boolean
 	return self._currentCooldownModel.Value ~= nil
 end
 

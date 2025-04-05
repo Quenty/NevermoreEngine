@@ -57,7 +57,7 @@ function PlayerAssetOwnershipTracker:SetQueryOwnershipCallback(promiseOwnsAsset)
 	self._ownershipCallback.Value = promiseOwnsAsset
 end
 
-function PlayerAssetOwnershipTracker:_promiseQueryAssetId(assetId)
+function PlayerAssetOwnershipTracker:_promiseQueryAssetId(assetId: number)
 	assert(type(assetId) == "number", "Bad assetId")
 
 	local promiseOwnershipCallback = self._ownershipCallback.Value

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Reimplementation of Player:GetUserThumbnailAsync but as a promise with
 	retry logic.
@@ -32,7 +33,7 @@ function PlayerThumbnailUtils.promiseUserThumbnail(
 	userId: number,
 	thumbnailType: Enum.ThumbnailType?,
 	thumbnailSize: Enum.ThumbnailSize?
-)
+): Promise.Promise<string>
 	assert(type(userId) == "number", "Bad userId")
 	thumbnailType = thumbnailType or Enum.ThumbnailType.HeadShot
 	thumbnailSize = thumbnailSize or Enum.ThumbnailSize.Size100x100
@@ -73,7 +74,7 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function PlayerThumbnailUtils.promiseUserName(userId: number)
+function PlayerThumbnailUtils.promiseUserName(userId: number): Promise.Promise<string>
 	assert(type(userId) == "number", "Bad userId")
 
 	local promise

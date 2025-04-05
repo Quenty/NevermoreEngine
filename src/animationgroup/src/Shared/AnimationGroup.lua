@@ -52,13 +52,13 @@ end
 
 --[=[
 	@param weightedTracks { WeightedTrack }
-	@param transitionTime number | nil
+	@param transitionTime number?
 ]=]
 function AnimationGroup:SetWeightedTracks(weightedTracks, transitionTime)
 	assert(type(weightedTracks) == "table", "Bad weightedTracks")
 	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
 
-	for _, animation in pairs(weightedTracks) do
+	for _, animation in weightedTracks do
 		assert(animation.track, "Bad animation.track")
 		assert(animation.weight, "Bad animation.weight")
 	end

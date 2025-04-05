@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Rx extension for seats specifically
 	@class RxSeatUtils
@@ -9,6 +10,8 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxStateStackUtils = require("RxStateStackUtils")
 local Rx = require("Rx")
+local _Observable = require("Observable")
+local _Brio = require("Brio")
 
 local RxSeatUtils = {}
 
@@ -18,7 +21,7 @@ local RxSeatUtils = {}
 	@param seat Seat | VehicleSeat
 	@return Observable<Brio<Humanoid>>
 ]=]
-function RxSeatUtils.observeOccupantBrio(seat: Seat | VehicleSeat)
+function RxSeatUtils.observeOccupantBrio(seat: Seat | VehicleSeat): _Observable.Observable<_Brio.Brio<Humanoid>>
 	return RxInstanceUtils.observeChildrenOfNameBrio(seat, "Weld", "SeatWeld"):Pipe({
 		RxBrioUtils.flatMapBrio(function(weld)
 			return RxBrioUtils.flatCombineLatest({
@@ -40,7 +43,7 @@ function RxSeatUtils.observeOccupantBrio(seat: Seat | VehicleSeat)
 					end),
 				}),
 			})
-		end),
+		end) :: any,
 
 		-- Reduce state to humanoid
 		RxBrioUtils.where(function(state)
@@ -50,23 +53,23 @@ function RxSeatUtils.observeOccupantBrio(seat: Seat | VehicleSeat)
 		RxBrioUtils.map(function(state)
 			return state.humanoid
 		end),
-	})
+	}) :: any
 end
 
 --[=[
 	Defines occupant as the humanoid attached to the seat.
 
 	@param seat Seat | VehicleSeat
-	@return Observable<Humanoid | nil>
+	@return Observable<Humanoid?>
 ]=]
-function RxSeatUtils.observeOccupant(seat: Seat | VehicleSeat)
+function RxSeatUtils.observeOccupant(seat: Seat | VehicleSeat): _Observable.Observable<Humanoid?>
 	assert(typeof(seat) == "Instance", "Bad seat")
 
 	return RxSeatUtils.observeOccupantBrio(seat):Pipe({
 		-- Switch to top
-		RxStateStackUtils.topOfStack(),
-		Rx.distinct(),
-	})
+		RxStateStackUtils.topOfStack() :: any,
+		Rx.distinct() :: any,
+	}) :: any
 end
 
 return RxSeatUtils

@@ -19,7 +19,7 @@ local Color3Utils = {}
 function Color3Utils.getRelativeLuminance(color: Color3): number
 	local components = { color.R, color.G, color.B }
 	local vals = {}
-	for i, val in pairs(components) do
+	for i, val in components do
 		if val <= 0.03928 then
 			vals[i] = val / 12.92
 		else

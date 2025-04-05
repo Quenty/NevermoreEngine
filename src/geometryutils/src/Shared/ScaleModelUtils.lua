@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods to scale a model
 	@class ScaleModelUtils
@@ -6,8 +7,8 @@
 local ScaleModelUtils = {}
 
 local CLASS_NAME_TO_MIN_SIZE = {
-	["TrussPart"] = Vector3.new(2, 2, 2);
-	["UnionOperation"]  = Vector3.zero;
+	["TrussPart"] = Vector3.new(2, 2, 2),
+	["UnionOperation"] = Vector3.zero,
 }
 
 local MIN_PART_SIZE = Vector3.new(0.05, 0.05, 0.05)
@@ -17,7 +18,7 @@ local MIN_PART_SIZE = Vector3.new(0.05, 0.05, 0.05)
 	@param part BasePart
 	@param scale number
 ]=]
-function ScaleModelUtils.scalePartSize(part, scale)
+function ScaleModelUtils.scalePartSize(part: BasePart, scale: Vector3 | number)
 	local partSize = part.Size
 
 	local mesh = part:FindFirstChildWhichIsA("DataModelMesh")
@@ -33,14 +34,12 @@ function ScaleModelUtils.scalePartSize(part, scale)
 
 	local minSize = CLASS_NAME_TO_MIN_SIZE[part.ClassName] or MIN_PART_SIZE
 
-	if newPartSize.X < minSize.X
-		or newPartSize.Y < minSize.Y
-		or newPartSize.Z < minSize.Z then
-
+	if newPartSize.X < minSize.X or newPartSize.Y < minSize.Y or newPartSize.Z < minSize.Z then
 		newPartSize = Vector3.new(
 			math.max(newPartSize.X, minSize.X),
 			math.max(newPartSize.Y, minSize.Y),
-			math.max(newPartSize.Z, minSize.Z))
+			math.max(newPartSize.Z, minSize.Z)
+		)
 
 		-- We need a mesh for scaling (hopefully)
 		mesh = ScaleModelUtils.createMeshFromPart(part)
@@ -49,7 +48,7 @@ function ScaleModelUtils.scalePartSize(part, scale)
 	part.Size = newPartSize
 
 	if mesh then
-		mesh.Scale = newRenderSize/newPartSize
+		mesh.Scale = newRenderSize / newPartSize
 		mesh.Offset = mesh.Offset * scale
 	end
 end
@@ -61,7 +60,7 @@ end
 	@param scale number
 	@param centroid Vector3
 ]=]
-function ScaleModelUtils.scalePart(part, scale, centroid)
+function ScaleModelUtils.scalePart(part: BasePart, scale: Vector3 | number, centroid: Vector3)
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local partPosition = part.Position
@@ -80,8 +79,8 @@ end
 	@param scale number -- The scale to scale by
 	@param centroid Vector3 -- the center to scale by
 ]=]
-function ScaleModelUtils.scale(parts, scale, centroid)
-	for _, part in pairs(parts) do
+function ScaleModelUtils.scale(parts: { BasePart }, scale: number, centroid: Vector3)
+	for _, part in parts do
 		ScaleModelUtils.scalePart(part, scale, centroid)
 	end
 end
@@ -92,7 +91,7 @@ end
 	@param part BasePart
 	@return Mesh?
 ]=]
-function ScaleModelUtils.createMeshFromPart(part)
+function ScaleModelUtils.createMeshFromPart(part: BasePart): FileMesh?
 	if part:IsA("WedgePart") then
 		local mesh = Instance.new("SpecialMesh")
 		mesh.MeshType = Enum.MeshType.Wedge

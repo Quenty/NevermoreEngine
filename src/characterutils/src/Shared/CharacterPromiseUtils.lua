@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility for Roblox character objects that involve promises.
 	@class CharacterPromiseUtils
@@ -16,7 +17,7 @@ local CharacterPromiseUtils = {}
 	@param player Player
 	@return Promise<Model>
 ]=]
-function CharacterPromiseUtils.promiseCharacter(player)
+function CharacterPromiseUtils.promiseCharacter(player: Player): Promise.Promise<Model>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	local promise = Promise.new()

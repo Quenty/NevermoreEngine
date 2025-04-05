@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving the root part
 	@class RootPartUtils
@@ -24,7 +25,7 @@ local MAX_YIELD_TIME = 60
 	@param humanoid Humanoid
 	@return Promise<BasePart>
 ]=]
-function RootPartUtils.promiseRootPart(humanoid: Humanoid)
+function RootPartUtils.promiseRootPart(humanoid: Humanoid): Promise.Promise<BasePart>
 	if humanoid.RootPart then
 		return Promise.resolved(humanoid.RootPart)
 	end

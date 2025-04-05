@@ -16,20 +16,21 @@ local SoftShutdownTranslator = require("SoftShutdownTranslator")
 local SoftShutdownUI = require("SoftShutdownUI")
 local ValueObject = require("ValueObject")
 local CoreGuiEnabler = require("CoreGuiEnabler")
+local _ServiceBag = require("ServiceBag")
 
 local SoftShutdownServiceClient = {}
 SoftShutdownServiceClient.ServiceName = "SoftShutdownServiceClient"
 
 local DISABLE_CORE_GUI_TYPES = {
-	Enum.CoreGuiType.PlayerList;
-	Enum.CoreGuiType.Health;
-	Enum.CoreGuiType.Backpack;
-	Enum.CoreGuiType.Chat;
-	Enum.CoreGuiType.EmotesMenu;
-	Enum.CoreGuiType.All;
+	Enum.CoreGuiType.PlayerList,
+	Enum.CoreGuiType.Health,
+	Enum.CoreGuiType.Backpack,
+	Enum.CoreGuiType.Chat,
+	Enum.CoreGuiType.EmotesMenu,
+	Enum.CoreGuiType.All,
 }
 
-function SoftShutdownServiceClient:Init(serviceBag)
+function SoftShutdownServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -47,7 +48,7 @@ function SoftShutdownServiceClient:Init(serviceBag)
 			self._localTeleportDataSaysIsLobby.Value = true
 		end
 		if self:_queryIsArrivingAfterShutdown() then
-			self._isArrivingAfterShutdown.Value = true;
+			self._isArrivingAfterShutdown.Value = true
 		end
 	end)
 
@@ -167,7 +168,7 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 		end
 	end
 
-	for _, child in pairs(playerGui:GetChildren()) do
+	for _, child in playerGui:GetChildren() do
 		handleChild(child)
 	end
 
@@ -180,12 +181,12 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 	end))
 
 	maid:GiveTask(function()
-		for screenGui, _ in pairs(enabledScreenGuis) do
+		for screenGui, _ in enabledScreenGuis do
 			screenGui.Enabled = true
 		end
 	end)
 
-	for _, coreGuiType in pairs(DISABLE_CORE_GUI_TYPES) do
+	for _, coreGuiType in DISABLE_CORE_GUI_TYPES do
 		maid:GiveTask(CoreGuiEnabler:PushDisable(coreGuiType))
 	end
 end

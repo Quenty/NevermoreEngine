@@ -11,10 +11,12 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local StateStack = require("StateStack")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local _ServiceBag = require("ServiceBag")
+
 local ScreenshotHudServiceClient = {}
 ScreenshotHudServiceClient.ServiceName = "ScreenshotHudServiceClient"
 
-function ScreenshotHudServiceClient:Init(serviceBag)
+function ScreenshotHudServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -22,8 +24,8 @@ function ScreenshotHudServiceClient:Init(serviceBag)
 	self._screenshotHudState = self._maid:Add(StateStack.new(nil))
 
 	self._maid:GiveTask(RxBrioUtils.flatCombineLatest({
-		model = self._screenshotHudState:Observe();
-		screenshotHUD = self:_observeScreenshotHudBrio();
+		model = self._screenshotHudState:Observe(),
+		screenshotHUD = self:_observeScreenshotHudBrio(),
 	}):Subscribe(function(state)
 		self._maid._current = nil
 		local maid = Maid.new()
@@ -53,7 +55,7 @@ function ScreenshotHudServiceClient:PushModel(screenshotHudModel)
 	end
 end
 
-function ScreenshotHudServiceClient:_bindModelToHUD(maid, model, screenshotHUD)
+function ScreenshotHudServiceClient:_bindModelToHUD(maid: Maid.Maid, model, screenshotHUD)
 	maid:GiveTask(Rx.combineLatest({
 		visible = model:ObserveCloseButtonVisible();
 		position = model:ObserveCloseButtonPosition();

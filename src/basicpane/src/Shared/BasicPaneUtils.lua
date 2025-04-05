@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class BasicPaneUtils
 ]=]
@@ -9,6 +10,7 @@ local Maid = require("Maid")
 local Rx = require("Rx")
 local BasicPane = require("BasicPane")
 local Brio = require("Brio")
+local _Subscription = require("Subscription")
 
 local BasicPaneUtils = {}
 
@@ -24,11 +26,13 @@ local BasicPaneUtils = {}
 	@param basicPane BasicPane
 	@return Observable<boolean>
 ]=]
-function BasicPaneUtils.observeVisible(basicPane)
+function BasicPaneUtils.observeVisible(basicPane: BasicPane.BasicPane): Observable.Observable<boolean>
 	assert(BasicPane.isBasicPane(basicPane), "Bad BasicPane")
 
 	return basicPane:ObserveVisible()
 end
+
+export type CreateBasicPane = (maid: Maid.Maid) -> BasicPane.BasicPane
 
 --[=[
 	Shows the basic pane only when the emitting observable is visible. This
@@ -55,14 +59,13 @@ end
 	@param createBasicPane (maid: Maid) -> BasicPane
 	@return (source: Observable<boolean>) -> Observable<Brio<GuiBase>>
 ]=]
-function BasicPaneUtils.whenVisibleBrio(createBasicPane)
-	return function(source)
-		return Observable.new(function(sub)
+function BasicPaneUtils.whenVisibleBrio(createBasicPane: CreateBasicPane) --: Observable.Transformer<(boolean), (Brio.Brio<GuiBase>)>
+	return function(source: Observable.Observable<boolean>): Observable.Observable<Brio.Brio<GuiBase>>
+		return Observable.new(function(sub: _Subscription.Subscription<Brio.Brio<GuiBase>>)
 			local maid = Maid.new()
+			local currentPane: BasicPane.BasicPane? = nil
 
-			local currentPane = nil
-
-			local function ensurePane()
+			local function ensurePane(): BasicPane.BasicPane
 				if currentPane then
 					return currentPane
 				end
@@ -73,7 +76,7 @@ function BasicPaneUtils.whenVisibleBrio(createBasicPane)
 				assert(BasicPane.isBasicPane(basicPane), "Bad BasicPane")
 				paneMaid:GiveTask(basicPane)
 
-				local brio = Brio.new(basicPane.Gui)
+				local brio: Brio.Brio<GuiBase> = Brio.new(basicPane.Gui) :: any
 				paneMaid:GiveTask(brio)
 
 				do
@@ -89,10 +92,10 @@ function BasicPaneUtils.whenVisibleBrio(createBasicPane)
 				maid._currentPaneMaid = paneMaid
 				sub:Fire(brio)
 
-				return currentPane
+				return currentPane :: any
 			end
 
-			maid:GiveTask(source:Subscribe(function(isVisible)
+			maid:GiveTask(source:Subscribe(function(isVisible: boolean)
 				if isVisible then
 					maid._hideTask = nil
 					ensurePane():Show()
@@ -108,7 +111,7 @@ function BasicPaneUtils.whenVisibleBrio(createBasicPane)
 			end))
 
 			return maid
-		end)
+		end) :: any
 	end
 end
 
@@ -118,15 +121,15 @@ end
 	@param basicPane BasicPane
 	@return Observable<number>
 ]=]
-function BasicPaneUtils.observePercentVisible(basicPane)
+function BasicPaneUtils.observePercentVisible(basicPane: BasicPane.BasicPane): Observable.Observable<number>
 	assert(BasicPane.isBasicPane(basicPane), "Bad BasicPane")
 
 	return BasicPaneUtils.observeVisible(basicPane):Pipe({
-		Rx.map(function(visible)
+		Rx.map(function(visible: boolean): number
 			return visible and 1 or 0
-		end);
-		Rx.startWith({0}); -- Ensure fade in every time.
-	})
+		end) :: any,
+		Rx.startWith({ 0 }) :: any, -- Ensure fade in every time.
+	}) :: any
 end
 
 --[=[
@@ -148,12 +151,12 @@ end)
 	@param basicPane BasicPane
 	@return Observable<boolean>
 ]=]
-function BasicPaneUtils.observeShow(basicPane)
+function BasicPaneUtils.observeShow(basicPane: BasicPane.BasicPane): Observable.Observable<boolean>
 	return BasicPaneUtils.observeVisible(basicPane):Pipe({
 		Rx.where(function(isVisible)
 			return isVisible
-		end)
-	})
+		end) :: any,
+	}) :: any
 end
 
 return BasicPaneUtils

@@ -40,14 +40,14 @@ local HintScoringUtils = {}
 	@return Vector3? -- Position
 	@return Vector3? -- LookVector
 ]=]
-function HintScoringUtils.getHumanoidPositionDirection(humanoid: Humanoid)
+function HintScoringUtils.getHumanoidPositionDirection(humanoid: Humanoid): (Vector3?, Vector3?)
 	local rootPart = humanoid.RootPart
 	if not rootPart then
 		return nil, nil
 	end
 
 	local rootCFrame = rootPart.CFrame
-	return rootCFrame.Position, rootCFrame.lookVector
+	return rootCFrame.Position, rootCFrame.LookVector
 end
 
 --[=[
@@ -58,13 +58,13 @@ end
 	@param getAdorneeFunction (Instance) -> Instance?
 	@return { [Instance]: true }
 ]=]
-function HintScoringUtils.getAdorneeInRegionSet(position, radius, ignoreList, getAdorneeFunction)
+function HintScoringUtils.getAdorneeInRegionSet(position: Vector3, radius: number, ignoreList, getAdorneeFunction)
 	assert(type(getAdorneeFunction) == "function", "Bad getAdorneeFunction")
 
 	local region3 = Region3Utils.fromRadius(position, radius)
 	local adorneesSet = {}
 
-	for _, part in pairs(Workspace:FindPartsInRegion3WithIgnoreList(region3, ignoreList, MAX_PARTS_IN_REGION3)) do
+	for _, part in Workspace:FindPartsInRegion3WithIgnoreList(region3, ignoreList, MAX_PARTS_IN_REGION3) do
 		local adornee = getAdorneeFunction(part)
 		if adornee then
 			adorneesSet[adornee] = true
@@ -80,10 +80,13 @@ if DEBUG_ENABLED then
 	@param adornee Instance
 	@param score number
 ]=]
-	function HintScoringUtils.debugScore(adornee, score)
+	function HintScoringUtils.debugScore(adornee: Instance, score)
 		assert(adornee, "Bad adornee")
 
-		debugMaid:GiveTask(Draw.text(AdorneeUtils.getCenter(adornee), string.format("%0.6f", score)))
+		local position = AdorneeUtils.getCenter(adornee)
+		if position then
+			debugMaid:GiveTask(Draw.text(position, string.format("%0.6f", score)))
+		end
 	end
 else
 	function HintScoringUtils.debugScore(_, _)
@@ -101,13 +104,19 @@ end
 	@param extraDistance number
 	@return Vector3 -- Hit position
 ]=]
-function HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, closestBoundingBoxPoint, extraDistance)
+function HintScoringUtils.raycastToAdornee(
+	raycaster,
+	humanoidCenter: Vector3,
+	adornee: Instance,
+	closestBoundingBoxPoint: Vector3,
+	extraDistance: number
+)
 	local offset = closestBoundingBoxPoint - humanoidCenter
-	if offset.magnitude == 0 then
+	if offset.Magnitude == 0 then
 		return nil
 	end
 
-	local ray = Ray.new(humanoidCenter, offset.unit * (offset.magnitude + extraDistance))
+	local ray = Ray.new(humanoidCenter, offset.Unit * (offset.Magnitude + extraDistance))
 	local hitData = raycaster:FindPartOnRay(ray)
 
 	if DEBUG_ENABLED then
@@ -117,7 +126,7 @@ function HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, c
 
 	if adornee:IsA("Attachment") then
 		if hitData then
-			if (hitData.Position - closestBoundingBoxPoint).magnitude > MAX_DIST_FOR_ATTACHMENTS then
+			if (hitData.Position - closestBoundingBoxPoint).Magnitude > MAX_DIST_FOR_ATTACHMENTS then
 				return nil
 			else
 				return closestBoundingBoxPoint
@@ -151,13 +160,13 @@ end
 	@return Vector3? -- clamped point
 	@return Vector3? -- center of bounding box
 ]=]
-function HintScoringUtils.clampToBoundingBox(adornee: Instance, humanoidCenter: Vector3)
+function HintScoringUtils.clampToBoundingBox(adornee: Instance, humanoidCenter: Vector3): (Vector3?, Vector3?)
 	if adornee:IsA("Attachment") then
 		return adornee.WorldPosition, adornee.WorldPosition
 	end
 
 	local cframe, size = AdorneeUtils.getBoundingBox(adornee)
-	if not cframe then
+	if not cframe or not size then
 		return nil, nil
 	end
 
@@ -178,31 +187,34 @@ end
 	@return boolean | number -- [0, 1]
 ]=]
 function HintScoringUtils.scoreAdornee(
-	adornee,
+	adornee: Instance,
 	raycaster,
-	humanoidCenter,
-	humanoidLookVector,
-	maxViewRadius,
-	maxTriggerRadius,
-	maxViewAngle,
-	maxTriggerAngle,
-	isLineOfSightRequired
-)
+	humanoidCenter: Vector3,
+	humanoidLookVector: Vector3,
+	maxViewRadius: number,
+	maxTriggerRadius: number,
+	maxViewAngle: number,
+	maxTriggerAngle: number,
+	isLineOfSightRequired: boolean
+): number?
 	assert(maxTriggerAngle, "Bad maxTriggerAngle")
 
 	-- local center = AdorneeUtils.getCenter(adornee)
 	-- if not center then
-	-- 	return false
+	-- 	return nil
 	-- end
 
 	local boundingBoxPoint, center = HintScoringUtils.clampToBoundingBox(adornee, humanoidCenter)
-	if not boundingBoxPoint then
-		return false
+	if boundingBoxPoint == nil then
+		return nil
+	end
+	if center == nil then
+		return nil
 	end
 
 	local isOnScreen = CameraUtils.isOnScreen(Workspace.CurrentCamera, boundingBoxPoint)
 	if not isOnScreen then
-		return false
+		return nil
 	end
 
 	local extraDistance = 10
@@ -211,13 +223,13 @@ function HintScoringUtils.scoreAdornee(
 		HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, boundingBoxPoint, extraDistance)
 
 	-- Round objects be sad
-	if not closestPoint then
+	if closestPoint == nil then
 		closestPoint = HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, center, 4)
 	end
 
-	if not closestPoint then
+	if closestPoint == nil then
 		if isLineOfSightRequired then
-			return false
+			return nil
 		else
 			-- just pretend like we're here, and all good
 			closestPoint = boundingBoxPoint
@@ -240,17 +252,17 @@ function HintScoringUtils.scoreAdornee(
 	local flatOffset = angleOffset * Vector3.new(1, 0, 1)
 	local angle = Vector3Utils.angleBetweenVectors(flatOffset.Unit, humanoidLookVector * Vector3.new(1, 0, 1))
 	if not angle then
-		return false
+		return nil
 	end
 
-	local distScore = HintScoringUtils.scoreDist(flatHumanoidOffset.magnitude, maxViewRadius, maxTriggerRadius)
+	local distScore = HintScoringUtils.scoreDist(flatHumanoidOffset.Magnitude, maxViewRadius, maxTriggerRadius)
 	if not distScore then
-		return false
+		return nil
 	end
 
 	local angleScore = HintScoringUtils.scoreAngle(angle, maxViewAngle, maxTriggerAngle)
 	if not angleScore then
-		return false
+		return nil
 	end
 
 	return (distScore + angleScore) / 2
@@ -264,11 +276,11 @@ end
 	@param maxTriggerRadius number
 	@return number -- [0, 1]
 ]=]
-function HintScoringUtils.scoreDist(distance, maxViewDistance, maxTriggerRadius)
+function HintScoringUtils.scoreDist(distance: number, maxViewDistance: number, maxTriggerRadius: number): number?
 	assert(maxViewDistance >= maxTriggerRadius, "maxViewDistance < maxTriggerRadius")
 
 	if distance > maxViewDistance then
-		return false
+		return nil
 	end
 
 	if distance > maxTriggerRadius then
@@ -287,11 +299,11 @@ end
 	@param maxTriggerAngle number
 	@return number -- [0, 1]
 ]=]
-function HintScoringUtils.scoreAngle(angle, maxViewAngle, maxTriggerAngle)
+function HintScoringUtils.scoreAngle(angle: number, maxViewAngle: number, maxTriggerAngle: number): number?
 	assert(maxViewAngle >= maxTriggerAngle, "maxViewDistance < maxTriggerRadius")
 
 	if angle > maxViewAngle then
-		return false
+		return nil
 	end
 	if angle > maxTriggerAngle then
 		return -math.huge

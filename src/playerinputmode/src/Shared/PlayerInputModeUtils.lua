@@ -1,42 +1,98 @@
 --[=[
+	Utility methods to track public player input mode
+
 	@class PlayerInputModeUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
-local RxAttributeUtils = require("RxAttributeUtils")
-local PlayerInputModeTypes = require("PlayerInputModeTypes")
 local AttributeUtils = require("AttributeUtils")
+local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
+local PlayerInputModeTypes = require("PlayerInputModeTypes")
+local Rx = require("Rx")
+local RxAttributeUtils = require("RxAttributeUtils")
 
 local PlayerInputModeUtils = {}
 
-function PlayerInputModeUtils.getPlayerInputModeType(player)
+export type PlayerInputModeType = "Gamepad" | "Keyboard" | "Touch"
+
+--[=[
+	Returns the player input mode type for a player.
+
+	@param player Player
+	@return PlayerInputModeType?
+]=]
+function PlayerInputModeUtils.getPlayerInputModeType(player: Player): PlayerInputModeType?
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return player:GetAttribute(PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE)
+	local result = player:GetAttribute(PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE)
+	if PlayerInputModeUtils.isInputModeType(result) then
+		return result
+	else
+		return nil
+	end
 end
 
-function PlayerInputModeUtils.observePlayerInputModeType(player)
+--[=[
+	Observes the player input mode type for a player.
+
+	@param player Player
+	@return Observable<PlayerInputModeType?>
+]=]
+function PlayerInputModeUtils.observePlayerInputModeType(player: Player): PlayerInputModeType?
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return RxAttributeUtils.observeAttribute(player, PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE)
+	return RxAttributeUtils.observeAttribute(player, PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE):Pipe({
+		Rx.map(function(value)
+			if PlayerInputModeUtils.isInputModeType(value) then
+				return value
+			else
+				return nil
+			end
+		end),
+	})
 end
 
-function PlayerInputModeUtils.promisePlayerInputMode(player, cancelToken)
+--[=[
+	Observes the player input mode type for a player.
+
+	@param player Player
+	@param cancelToken CancelToken?
+	@return Promise<string?>
+]=]
+function PlayerInputModeUtils.promisePlayerInputMode(player: Player, cancelToken)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return AttributeUtils.promiseAttribute(player, PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE, PlayerInputModeUtils.isInputModeType, cancelToken)
+	return AttributeUtils.promiseAttribute(
+		player,
+		PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE,
+		PlayerInputModeUtils.isInputModeType,
+		cancelToken
+	)
 end
 
-function PlayerInputModeUtils.isInputModeType(playerInputModeType)
-	return typeof(playerInputModeType) == "string" and (
-		playerInputModeType == PlayerInputModeTypes.GAMEPAD
-		or playerInputModeType == PlayerInputModeTypes.KEYBOARD
-		or playerInputModeType == PlayerInputModeTypes.TOUCH)
+--[=[
+	Checks if the input mode type is valid.
+
+	@param playerInputModeType any
+	@return boolean
+]=]
+function PlayerInputModeUtils.isInputModeType(playerInputModeType: any): boolean
+	return typeof(playerInputModeType) == "string"
+		and (
+			playerInputModeType == PlayerInputModeTypes.GAMEPAD
+			or playerInputModeType == PlayerInputModeTypes.KEYBOARD
+			or playerInputModeType == PlayerInputModeTypes.TOUCH
+		)
 end
 
-function PlayerInputModeUtils.setPlayerInputModeType(player, playerInputModeType)
+--[=[
+	Sets the player input mode type for a player.
+
+	@param player Player
+	@param playerInputModeType string
+]=]
+function PlayerInputModeUtils.setPlayerInputModeType(player: Player, playerInputModeType: PlayerInputModeType)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PlayerInputModeUtils.isInputModeType(playerInputModeType), "Bad playerInputModeType")
 

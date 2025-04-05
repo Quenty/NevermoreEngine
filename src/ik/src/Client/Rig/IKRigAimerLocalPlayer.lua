@@ -49,7 +49,7 @@ end
 	Sets whether the local player should look around automatically.
 	@param lookAround boolean
 ]=]
-function IKRigAimerLocalPlayer:SetLookAround(lookAround)
+function IKRigAimerLocalPlayer:SetLookAround(lookAround: boolean)
 	assert(type(lookAround) == "boolean", "Bad lookAround")
 
 	self._lookAround = lookAround
@@ -71,13 +71,13 @@ function IKRigAimerLocalPlayer:SetAimPosition(position, optionalPriority)
 	end
 
 	self._aimData = {
-		priority = optionalPriority;
-		position = position; -- May be nil
-		timeStamp = os.clock();
+		priority = optionalPriority,
+		position = position, -- May be nil
+		timeStamp = os.clock(),
 	}
 end
 
-function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate)
+function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate: number)
 	assert(type(replicateRate) == "number", "Bad replicateRate")
 
 	local data = {
@@ -102,7 +102,7 @@ end
 
 function IKRigAimerLocalPlayer:_updateReplicationRate()
 	local best = nil
-	for _, rateData in pairs(self._replicationRates) do
+	for _, rateData in self._replicationRates do
 		local rate = rateData.replicateRate
 		if not best or rate < best then
 			best = rate

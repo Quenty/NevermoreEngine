@@ -26,7 +26,8 @@
   ],
   "dependencies": {
     "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/promise": "file:../promise",
+    "@quenty/typeutils": "file:../typeutils"
   },
   "publishConfig": {
     "access": "public"

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	General character utility code.
 	@class CharacterUtils
@@ -71,7 +72,7 @@ end
 	```lua
 	local Players = game:GetService("Players")
 
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		CharacterUtils.unequipTools(player)
 	end
 	```
@@ -108,7 +109,8 @@ end
 ]=]
 function CharacterUtils.getPlayerFromCharacter(descendant: Instance): Player?
 	local character = descendant
-	local player = Players:GetPlayerFromCharacter(character)
+	-- TODO: Only use models
+	local player = Players:GetPlayerFromCharacter(character :: any)
 
 	while not player do
 		if character.Parent then

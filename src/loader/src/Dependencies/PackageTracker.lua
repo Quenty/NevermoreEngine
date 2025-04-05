@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	For each package, track subdependent packages and packages
 
@@ -14,7 +15,29 @@ local PackageTracker = {}
 PackageTracker.ClassName = "PackageTracker"
 PackageTracker.__index = PackageTracker
 
-function PackageTracker.new(packageTrackerProvider, packageRoot)
+export type ModuleScriptInfo = {
+	moduleScript: ModuleScript,
+	replicationType: ReplicationType.ReplicationType,
+}
+
+export type PackageTrackerProvider = {
+	FindPackageTracker: (self: PackageTrackerProvider, instance: Instance) -> PackageTracker?,
+	AddPackageRoot: (self: PackageTrackerProvider, instance: Instance) -> PackageTracker,
+}
+
+export type PackageTracker = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_packageTrackerProvider: PackageTrackerProvider,
+		_packageRoot: Instance,
+		_subpackagesMap: { [string]: Instance },
+		_subpackagesTrackerList: { PackageTracker },
+		_packageModuleScriptMap: { [string]: ModuleScriptInfo },
+	},
+	PackageTracker
+))
+
+function PackageTracker.new(packageTrackerProvider: PackageTrackerProvider, packageRoot: Instance): PackageTracker
 	assert(packageTrackerProvider, "No packageTrackerProvider")
 	assert(typeof(packageRoot) == "Instance", "Bad packageRoot")
 
@@ -24,23 +47,33 @@ function PackageTracker.new(packageTrackerProvider, packageRoot)
 	self._packageTrackerProvider = assert(packageTrackerProvider, "No packageTrackerProvider")
 	self._packageRoot = assert(packageRoot, "No packageRoot")
 
-	self._subpackagesMap = {}
-	self._subpackagesTrackerList = {}
-	self._packageModuleScriptMap = {}
+	self._subpackagesMap = {} :: { [string]: Instance }
+	self._subpackagesTrackerList = {} :: { PackageTracker }
+	self._packageModuleScriptMap = {} :: { [string]: ModuleScriptInfo }
 
 	return self
 end
 
-function PackageTracker:StartTracking()
+function PackageTracker.StartTracking(self: PackageTracker)
+	local moduleScript: ModuleScript? = nil
 	if self._packageRoot:IsA("ModuleScript") then
+		moduleScript = self._packageRoot
+	end
+
+	if moduleScript ~= nil then
 		-- Module script children don't get to be observed
-		self._maid:GiveTask(self:_trackModuleScript(self._packageRoot, ReplicationType.SHARED))
+		self._maid:GiveTask(self:_trackModuleScript(moduleScript, ReplicationType.SHARED))
 	else
-		self._maid:GiveTask(self:_trackChildren(self._packageRoot, ReplicationType.SHARED))
+		local root = self._packageRoot :: Instance
+		self._maid:GiveTask(self:_trackChildren(root, ReplicationType.SHARED))
 	end
 end
 
-function PackageTracker:ResolveDependency(request, replicationType)
+function PackageTracker.ResolveDependency(
+	self: PackageTracker,
+	request: string,
+	replicationType: ReplicationType.ReplicationType
+): ModuleScript?
 	local packageModuleScript = self:FindPackageModuleScript(request, replicationType)
 	if packageModuleScript then
 		return packageModuleScript
@@ -59,7 +92,11 @@ function PackageTracker:ResolveDependency(request, replicationType)
 	return nil
 end
 
-function PackageTracker:FindImplicitParentModuleScript(request, replicationType)
+function PackageTracker.FindImplicitParentModuleScript(
+	self: PackageTracker,
+	request: string,
+	replicationType: ReplicationType.ReplicationType
+): ModuleScript?
 	assert(type(request) == "string", "Bad request")
 	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
 
@@ -80,10 +117,14 @@ function PackageTracker:FindImplicitParentModuleScript(request, replicationType)
 		return subpackageModuleScript
 	end
 
-	return parentProvider:FindImplicitParentModuleScript(request, replicationType)
+	return parentProvider:FindImplicitParentModuleScript(request, replicationType) :: ModuleScript?
 end
 
-function PackageTracker:FindPackageModuleScript(moduleScriptName, replicationType)
+function PackageTracker.FindPackageModuleScript(
+	self: PackageTracker,
+	moduleScriptName: string,
+	replicationType: ReplicationType.ReplicationType
+): ModuleScript?
 	assert(type(moduleScriptName) == "string", "Bad moduleScriptName")
 	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
 
@@ -100,11 +141,15 @@ function PackageTracker:FindPackageModuleScript(moduleScriptName, replicationTyp
 	end
 end
 
-function PackageTracker:FindSubpackageModuleScript(moduleScriptName, replicationType)
+function PackageTracker.FindSubpackageModuleScript(
+	self: PackageTracker,
+	moduleScriptName: string,
+	replicationType: ReplicationType.ReplicationType
+): ModuleScript?
 	assert(type(moduleScriptName) == "string", "Bad moduleScriptName")
 	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
 
-	for _, packageTracker in pairs(self._subpackagesTrackerList) do
+	for _, packageTracker in self._subpackagesTrackerList do
 		local found = packageTracker._packageModuleScriptMap[moduleScriptName]
 		if found then
 			if ReplicationTypeUtils.isAllowed(found.replicationType, replicationType) then
@@ -118,16 +163,22 @@ function PackageTracker:FindSubpackageModuleScript(moduleScriptName, replication
 	return nil
 end
 
-function PackageTracker:_trackChildrenAndReplicationType(parent, ancestorReplicationType)
+function PackageTracker._trackChildrenAndReplicationType(
+	self: PackageTracker,
+	parent: Instance,
+	ancestorReplicationType: ReplicationType.ReplicationType
+)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(ReplicationTypeUtils.isReplicationType(ancestorReplicationType), "Bad ancestorReplicationType")
 
 	local maid = Maid.new()
 
-	local lastReplicationType = ReplicationTypeUtils.getFolderReplicationType(parent.Name, ancestorReplicationType)
+	local lastReplicationType: ReplicationType.ReplicationType =
+		ReplicationTypeUtils.getFolderReplicationType(parent.Name, ancestorReplicationType)
 
 	maid:GiveTask(parent:GetPropertyChangedSignal("Name"):Connect(function()
-		local newReplicationType = ReplicationTypeUtils.getFolderReplicationType(parent.Name, ancestorReplicationType)
+		local newReplicationType: ReplicationType.ReplicationType =
+			ReplicationTypeUtils.getFolderReplicationType(parent.Name, ancestorReplicationType)
 		if newReplicationType ~= lastReplicationType then
 			maid._current = self:_trackChildren(parent, newReplicationType)
 			lastReplicationType = newReplicationType
@@ -139,7 +190,11 @@ function PackageTracker:_trackChildrenAndReplicationType(parent, ancestorReplica
 	return maid
 end
 
-function PackageTracker:_trackChildren(parent, ancestorReplicationType)
+function PackageTracker._trackChildren(
+	self: PackageTracker,
+	parent: Instance,
+	ancestorReplicationType: ReplicationType.ReplicationType
+): Maid.Maid
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(ReplicationTypeUtils.isReplicationType(ancestorReplicationType), "Bad ancestorReplicationType")
 
@@ -149,16 +204,21 @@ function PackageTracker:_trackChildren(parent, ancestorReplicationType)
 		self:_handleChildAdded(maid, child, ancestorReplicationType)
 	end))
 	maid:GiveTask(parent.ChildRemoved:Connect(function(child)
-		self:_handleChildRemoved(maid, child, ancestorReplicationType)
+		self:_handleChildRemoved(maid, child)
 	end))
-	for _, child in pairs(parent:GetChildren()) do
+	for _, child in parent:GetChildren() do
 		self:_handleChildAdded(maid, child, ancestorReplicationType)
 	end
 
 	return maid
 end
 
-function PackageTracker:_handleChildAdded(parentMaid, child, ancestorReplicationType)
+function PackageTracker._handleChildAdded(
+	self: PackageTracker,
+	parentMaid: Maid.Maid,
+	child: Instance,
+	ancestorReplicationType: ReplicationType.ReplicationType
+)
 	assert(Maid.isMaid(parentMaid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(ReplicationTypeUtils.isReplicationType(ancestorReplicationType), "Bad ancestorReplicationType")
@@ -170,15 +230,18 @@ function PackageTracker:_handleChildAdded(parentMaid, child, ancestorReplication
 	end
 end
 
-function PackageTracker:_handleChildRemoved(parentMaid, child)
+function PackageTracker._handleChildRemoved(_self: PackageTracker, parentMaid: Maid.Maid, child: Instance)
 	assert(Maid.isMaid(parentMaid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 
 	parentMaid[child] = nil
 end
 
-
-function PackageTracker:_trackFolder(child, ancestorReplicationType)
+function PackageTracker._trackFolder(
+	self: PackageTracker,
+	child: Instance,
+	ancestorReplicationType: ReplicationType.ReplicationType
+)
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(ReplicationTypeUtils.isReplicationType(ancestorReplicationType), "Bad ancestorReplicationType")
 
@@ -201,11 +264,13 @@ function PackageTracker:_trackFolder(child, ancestorReplicationType)
 	return maid
 end
 
-
-function PackageTracker:_trackModuleScript(child, ancestorReplicationType)
+function PackageTracker._trackModuleScript(
+	self: PackageTracker,
+	child: ModuleScript,
+	ancestorReplicationType: ReplicationType.ReplicationType
+): Maid.Maid
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(ReplicationTypeUtils.isReplicationType(ancestorReplicationType), "Bad ancestorReplicationType")
-
 
 	local maid = Maid.new()
 
@@ -225,7 +290,12 @@ function PackageTracker:_trackModuleScript(child, ancestorReplicationType)
 	return maid
 end
 
-function PackageTracker:_storeModuleScript(moduleScriptName, child, ancestorReplicationType)
+function PackageTracker._storeModuleScript(
+	self: PackageTracker,
+	moduleScriptName: string,
+	child: ModuleScript,
+	ancestorReplicationType: ReplicationType.ReplicationType
+): () -> ()
 	assert(type(moduleScriptName) == "string", "Bad moduleScriptName")
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(ReplicationTypeUtils.isReplicationType(ancestorReplicationType), "Bad ancestorReplicationType")
@@ -234,9 +304,9 @@ function PackageTracker:_storeModuleScript(moduleScriptName, child, ancestorRepl
 		warn(string.format("[PackageTracker] - Overwriting moduleScript with name %q", moduleScriptName))
 	end
 
-	local data = {
-		moduleScript = child;
-		replicationType = ancestorReplicationType;
+	local data: ModuleScriptInfo = {
+		moduleScript = child,
+		replicationType = ancestorReplicationType,
 	}
 	self._packageModuleScriptMap[moduleScriptName] = data
 
@@ -247,7 +317,7 @@ function PackageTracker:_storeModuleScript(moduleScriptName, child, ancestorRepl
 	end
 end
 
-function PackageTracker:_trackMainNodeModuleFolder(parent)
+function PackageTracker._trackMainNodeModuleFolder(self: PackageTracker, parent: Instance): Maid.Maid
 	local maid = Maid.new()
 
 	maid:GiveTask(parent.ChildAdded:Connect(function(child)
@@ -256,15 +326,14 @@ function PackageTracker:_trackMainNodeModuleFolder(parent)
 	maid:GiveTask(parent.ChildRemoved:Connect(function(child)
 		self:_handleNodeModulesChildRemoved(maid, child)
 	end))
-	for _, child in pairs(parent:GetChildren()) do
+	for _, child in parent:GetChildren() do
 		self:_handleNodeModulesChildAdded(maid, child)
 	end
 
 	return maid
 end
 
-
-function PackageTracker:_handleNodeModulesChildAdded(parentMaid, child)
+function PackageTracker._handleNodeModulesChildAdded(self: PackageTracker, parentMaid: Maid.Maid, child: Instance)
 	assert(Maid.isMaid(parentMaid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 
@@ -278,19 +347,19 @@ function PackageTracker:_handleNodeModulesChildAdded(parentMaid, child)
 	end
 end
 
-function PackageTracker:_handleNodeModulesChildRemoved(parentMaid, child)
+function PackageTracker._handleNodeModulesChildRemoved(_self: PackageTracker, parentMaid: Maid.Maid, child: Instance)
 	assert(Maid.isMaid(parentMaid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 
 	parentMaid[child] = nil
 end
 
-function PackageTracker:_trackNodeModulesChildFolder(child)
+function PackageTracker._trackNodeModulesChildFolder(self: PackageTracker, child: Instance): Maid.Maid
 	assert(typeof(child) == "Instance", "Bad child")
 
 	local maid = Maid.new()
 
-	local function update()
+	local function update(): Maid.MaidTask
 		local childName = child.Name
 
 		-- like @quenty
@@ -310,7 +379,7 @@ function PackageTracker:_trackNodeModulesChildFolder(child)
 	return maid
 end
 
-function PackageTracker:_trackNodeModulesObjectValue(objectValue)
+function PackageTracker._trackNodeModulesObjectValue(self: PackageTracker, objectValue: ObjectValue): Maid.Maid
 	assert(typeof(objectValue) == "Instance", "Bad objectValue")
 
 	local maid = Maid.new()
@@ -327,7 +396,7 @@ function PackageTracker:_trackNodeModulesObjectValue(objectValue)
 	return maid
 end
 
-function PackageTracker:_trackScopedChildFolder(scopeName, parent)
+function PackageTracker._trackScopedChildFolder(self: PackageTracker, scopeName: string, parent: Instance): Maid.Maid
 	assert(type(scopeName) == "string", "Bad scopeName")
 	assert(typeof(parent) == "Instance", "Bad parent")
 
@@ -339,14 +408,19 @@ function PackageTracker:_trackScopedChildFolder(scopeName, parent)
 	maid:GiveTask(parent.ChildRemoved:Connect(function(child)
 		self:_handleScopedModulesChildRemoved(maid, child)
 	end))
-	for _, child in pairs(parent:GetChildren()) do
+	for _, child in parent:GetChildren() do
 		self:_handleScopedModulesChildAdded(scopeName, maid, child)
 	end
 
 	return maid
 end
 
-function PackageTracker:_handleScopedModulesChildAdded(scopeName, parentMaid, child)
+function PackageTracker._handleScopedModulesChildAdded(
+	self: PackageTracker,
+	scopeName: string,
+	parentMaid: Maid.Maid,
+	child: Instance
+)
 	assert(type(scopeName) == "string", "Bad scopeName")
 	assert(Maid.isMaid(parentMaid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
@@ -358,7 +432,11 @@ function PackageTracker:_handleScopedModulesChildAdded(scopeName, parentMaid, ch
 	end
 end
 
-function PackageTracker:_trackScopedNodeModulesObjectValue(scopeName, objectValue)
+function PackageTracker._trackScopedNodeModulesObjectValue(
+	self: PackageTracker,
+	scopeName: string,
+	objectValue: ObjectValue
+)
 	assert(type(scopeName) == "string", "Bad scopeName")
 	assert(typeof(objectValue) == "Instance", "Bad objectValue")
 
@@ -376,14 +454,14 @@ function PackageTracker:_trackScopedNodeModulesObjectValue(scopeName, objectValu
 	return maid
 end
 
-function PackageTracker:_handleScopedModulesChildRemoved(parentMaid, child)
+function PackageTracker._handleScopedModulesChildRemoved(_self: PackageTracker, parentMaid: Maid.Maid, child: Instance)
 	assert(Maid.isMaid(parentMaid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 
 	parentMaid[child] = nil
 end
 
-function PackageTracker:_trackAddScopedPackage(scopeName, child)
+function PackageTracker._trackAddScopedPackage(self: PackageTracker, scopeName: string, child: Instance)
 	assert(type(scopeName) == "string", "Bad scopeName")
 	assert(typeof(child) == "Instance", "Bad child")
 
@@ -398,7 +476,7 @@ function PackageTracker:_trackAddScopedPackage(scopeName, child)
 	return maid
 end
 
-function PackageTracker:_trackAddPackage(child)
+function PackageTracker._trackAddPackage(self: PackageTracker, child: Instance)
 	assert(typeof(child) == "Instance", "Bad child")
 
 	local maid = Maid.new()
@@ -412,7 +490,11 @@ function PackageTracker:_trackAddPackage(child)
 	return maid
 end
 
-function PackageTracker:_tryStorePackage(fullPackageName, packageInst)
+function PackageTracker._tryStorePackage(
+	self: PackageTracker,
+	fullPackageName: string,
+	packageInst: Instance?
+): (() -> ())?
 	assert(type(fullPackageName) == "string", "Bad fullPackageName")
 
 	if not packageInst then
@@ -436,7 +518,7 @@ function PackageTracker:_tryStorePackage(fullPackageName, packageInst)
 	end
 end
 
-function PackageTracker:Destroy()
+function PackageTracker.Destroy(self: PackageTracker)
 	self._maid:DoCleaning()
 end
 

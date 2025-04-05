@@ -17,7 +17,8 @@ local TieRealmUtils = {}
 	@param tieRealm any
 	@return boolean
 ]=]
-function TieRealmUtils.isTieRealm(tieRealm)
+function TieRealmUtils.isTieRealm(tieRealm: any): boolean
+	-- stylua: ignore
 	return tieRealm == TieRealms.CLIENT
 		or tieRealm == TieRealms.SERVER
 		or tieRealm == TieRealms.SHARED
@@ -28,7 +29,7 @@ end
 
 	@return TieRealm
 ]=]
-function TieRealmUtils.inferTieRealm()
+function TieRealmUtils.inferTieRealm(): "server" | "client"
 	if RunService:IsServer() then
 		return TieRealms.SERVER
 	elseif RunService:IsClient() then

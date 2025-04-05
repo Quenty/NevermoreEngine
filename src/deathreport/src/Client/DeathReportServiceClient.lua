@@ -14,6 +14,7 @@ local DeathReportServiceConstants = require("DeathReportServiceConstants")
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local DeathReportProcessor = require("DeathReportProcessor")
 local DeathReportUtils = require("DeathReportUtils")
+local _ServiceBag = require("ServiceBag")
 
 -- Note: don't make this too big without upgrading the way we handle the queue
 local MAX_DEATH_REPORTS = 5
@@ -27,7 +28,7 @@ DeathReportServiceClient.ServiceName = "DeathReportServiceClient"
 
 	@param serviceBag ServiceBag
 ]=]
-function DeathReportServiceClient:Init(serviceBag)
+function DeathReportServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

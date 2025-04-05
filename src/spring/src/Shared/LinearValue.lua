@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	Represents a value that can operate in linear space
 
@@ -12,6 +13,14 @@ local LinearValue = {}
 LinearValue.ClassName = "LinearValue"
 LinearValue.__index = LinearValue
 
+export type LinearValue<T> = typeof(setmetatable(
+	{} :: {
+		_constructor: (...number) -> T,
+		_values: { number },
+	},
+	LinearValue
+))
+
 --[=[
 	Constructs a new LinearValue object.
 
@@ -19,10 +28,10 @@ LinearValue.__index = LinearValue
 	@param values ({ number })
 	@return LinearValue<T>
 ]=]
-function LinearValue.new(constructor, values)
+function LinearValue.new<T>(constructor: (...number) -> T, values: { number }): LinearValue<T>
 	return setmetatable({
-		_constructor = constructor;
-		_values = values;
+		_constructor = constructor,
+		_values = values,
 	}, LinearValue)
 end
 
@@ -32,26 +41,30 @@ end
 	@param value any -- A value to check
 	@return boolean -- True if a linear value, false otherwise
 ]=]
-function LinearValue.isLinear(value)
+function LinearValue.isLinear(value: any): boolean
 	return DuckTypeUtils.isImplementation(LinearValue, value)
 end
 
-local function convertUDim2(scaleX, offsetX, scaleY, offsetY)
+local function convertUDim2(scaleX: number, offsetX: number, scaleY: number, offsetY: number): UDim2
 	-- Roblox UDim2.new(0, 9.999, 0, 9.999) rounds to UDim2.new(0, 9, 0, 9) which means small floating point
 	-- errors can cause shaking UI.
 
 	return UDim2.new(scaleX, math.round(offsetX), scaleY, math.round(offsetY))
 end
 
-local function convertUDim(scale, offset)
+local function convertUDim(scale: number, offset: number): UDim
 	-- Roblox UDim.new(0, 9.999) rounds to UDim.new(0, 9) which means small floating point
 	-- errors can cause shaking UI.
 
 	return UDim.new(scale, math.round(offset))
 end
 
-local function convertBoolean(value)
+local function convertBoolean(value: number): boolean
 	return value ~= 0
+end
+
+local function convertColor3(r: number, g: number, b: number): Color3
+	return Color3.new(r, g, b)
 end
 
 --[=[
@@ -61,13 +74,16 @@ end
 	@param value T
 	@return LinearValue<T> | T
 ]=]
-function LinearValue.toLinearIfNeeded(value)
+function LinearValue.toLinearIfNeeded<T>(value: any): LinearValue<any>
 	if typeof(value) == "Color3" then
-		return LinearValue.new(Color3.new, {value.r, value.g, value.b})
+		return LinearValue.new(convertColor3, { value.R, value.G, value.B })
 	elseif typeof(value) == "UDim2" then
-		return LinearValue.new(convertUDim2, {value.X.Scale, math.round(value.X.Offset), value.Y.Scale, math.round(value.Y.Offset)})
+		return LinearValue.new(
+			convertUDim2,
+			{ value.X.Scale, math.round(value.X.Offset), value.Y.Scale, math.round(value.Y.Offset) }
+		)
 	elseif typeof(value) == "UDim" then
-		return LinearValue.new(convertUDim, {value.Scale, math.round(value.Offset)})
+		return LinearValue.new(convertUDim, { value.Scale, math.round(value.Offset) })
 	elseif type(value) == "boolean" then
 		return LinearValue.new(convertBoolean, { value and 1 or 0 })
 	else
@@ -81,7 +97,7 @@ end
 	@param value LinearValue<T> | any
 	@return T | any
 ]=]
-function LinearValue.fromLinearIfNeeded(value)
+function LinearValue.fromLinearIfNeeded<T>(value: LinearValue<T> | any): any
 	if LinearValue.isLinear(value) then
 		return value:ToBaseValue()
 	else
@@ -94,24 +110,24 @@ end
 
 	@return T
 ]=]
-function LinearValue:ToBaseValue()
+function LinearValue:ToBaseValue<T>(): T
 	return self._constructor(unpack(self._values))
 end
 
-local function operation(func)
-	return function(a, b)
+local function operation(func: (number, number) -> number)
+	return function(a: LinearValue<any>, b: LinearValue<any>)
 		if LinearValue.isLinear(a) and LinearValue.isLinear(b) then
 			assert(a._constructor == b._constructor, "a is not the same type of linearValue as b")
 
 			local values = {}
-			for i=1, #a._values do
+			for i = 1, #a._values do
 				values[i] = func(a._values[i], b._values[i])
 			end
 			return LinearValue.new(a._constructor, values)
 		elseif LinearValue.isLinear(a) then
 			if type(b) == "number" then
 				local values = {}
-				for i=1, #a._values do
+				for i = 1, #a._values do
 					values[i] = func(a._values[i], b)
 				end
 				return LinearValue.new(a._constructor, values)
@@ -121,7 +137,7 @@ local function operation(func)
 		elseif LinearValue.isLinear(b) then
 			if type(a) == "number" then
 				local values = {}
-				for i=1, #b._values do
+				for i = 1, #b._values do
 					values[i] = func(a, b._values[i])
 				end
 				return LinearValue.new(b._constructor, values)
@@ -139,11 +155,11 @@ end
 
 	@return number -- The magnitude of the linear value.
 ]=]
-function LinearValue:GetMagnitude()
-	local dot = 0
-	for i=1, #self._values do
-		local value = self._values[i]
-		dot = dot + value*value
+function LinearValue:GetMagnitude(): number
+	local dot: number = 0
+	for i = 1, #self._values do
+		local value: number = self._values[i]
+		dot = dot + value * value
 	end
 	return math.sqrt(dot)
 end
@@ -155,10 +171,10 @@ end
 	@readonly
 	@within LinearValue
 ]=]
-function LinearValue:__index(key)
+function LinearValue.__index<T>(self: LinearValue<T>, key: string): any
 	if LinearValue[key] then
 		return LinearValue[key]
-	elseif key == "magnitude" then
+	elseif key == "magnitude" or key == "Magnitude" then
 		return self:GetMagnitude()
 	else
 		return nil
@@ -181,7 +197,7 @@ LinearValue.__div = operation(function(a, b)
 	return a / b
 end)
 
-function LinearValue:__eq(a, b)
+function LinearValue:__eq<T>(a: LinearValue<T>, b: LinearValue<T>): boolean
 	if LinearValue.isLinear(a) and LinearValue.isLinear(b) then
 		if #a._values ~= #b._values then
 			return false

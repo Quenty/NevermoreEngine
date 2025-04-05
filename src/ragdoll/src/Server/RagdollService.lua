@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Initializes ragdoll related binders
 
@@ -7,6 +8,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local _ServiceBag = require("ServiceBag")
+
 local RagdollService = {}
 RagdollService.ServiceName = "RagdollService"
 
@@ -14,7 +17,7 @@ RagdollService.ServiceName = "RagdollService"
 	Initializes the ragdoll service on the server. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function RagdollService:Init(serviceBag)
+function RagdollService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -25,17 +28,17 @@ function RagdollService:Init(serviceBag)
 	self._serviceBag:GetService(require("RagdollBindersServer"))
 
 	-- Binders
-	self._serviceBag:GetService(require("Ragdoll"))
-	self._serviceBag:GetService(require("Ragdollable"))
-	self._serviceBag:GetService(require("RagdollHumanoidOnDeath"))
-	self._serviceBag:GetService(require("RagdollHumanoidOnFall"))
-	self._serviceBag:GetService(require("UnragdollAutomatically"))
-	self._serviceBag:GetService(require("RagdollCameraShake"))
+	self._serviceBag:GetService((require :: any)("Ragdoll"))
+	self._serviceBag:GetService((require :: any)("Ragdollable"))
+	self._serviceBag:GetService((require :: any)("RagdollHumanoidOnDeath"))
+	self._serviceBag:GetService((require :: any)("RagdollHumanoidOnFall"))
+	self._serviceBag:GetService((require :: any)("UnragdollAutomatically"))
+	self._serviceBag:GetService((require :: any)("RagdollCameraShake"))
 
 	-- Configure
-	self._serviceBag:GetService(require("RagdollHumanoidOnDeath")):SetAutomaticTagging(false)
-	self._serviceBag:GetService(require("RagdollHumanoidOnFall")):SetAutomaticTagging(false)
-	self._serviceBag:GetService(require("UnragdollAutomatically")):SetAutomaticTagging(false)
+	self._serviceBag:GetService((require :: any)("RagdollHumanoidOnDeath")):SetAutomaticTagging(false)
+	self._serviceBag:GetService((require :: any)("RagdollHumanoidOnFall")):SetAutomaticTagging(false)
+	self._serviceBag:GetService((require :: any)("UnragdollAutomatically")):SetAutomaticTagging(false)
 end
 
 --[=[

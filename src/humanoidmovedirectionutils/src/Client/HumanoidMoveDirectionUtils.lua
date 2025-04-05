@@ -43,7 +43,7 @@ function HumanoidMoveDirectionUtils.getRelativeMoveDirection(cameraCFrame, human
 
 	-- Compensate for lack of camera movement in left/right arrow keys
 	local direction = ZERO_VECTOR
-	for keycode, add in pairs(DIRECTION_INPUT_MAPS) do
+	for keycode, add in DIRECTION_INPUT_MAPS do
 		if UserInputService:IsKeyDown(keycode) then
 			direction = direction + add
 		end

@@ -22,11 +22,11 @@ function AvatarEditorInventory.new()
 	return self
 end
 
-function AvatarEditorInventory:PromiseProcessPages(inventoryPages)
+function AvatarEditorInventory:PromiseProcessPages(inventoryPages: Pages)
 	return Promise.spawn(function(resolve, reject)
 		local pageData = inventoryPages:GetCurrentPage()
 		while pageData do
-			for _, data in pairs(pageData) do
+			for _, data in pageData do
 				self._assetIdToAsset:Set(data.AssetId, data)
 			end
 
@@ -42,15 +42,15 @@ function AvatarEditorInventory:PromiseProcessPages(inventoryPages)
 			end
 		end
 
-		resolve()
+		return resolve()
 	end)
 end
 
-function AvatarEditorInventory:IsAssetIdInInventory(assetId)
+function AvatarEditorInventory:IsAssetIdInInventory(assetId: number): boolean
 	return self._assetIdToAsset:Get(assetId) ~= nil
 end
 
-function AvatarEditorInventory:ObserveAssetIdInInventory(assetId)
+function AvatarEditorInventory:ObserveAssetIdInInventory(assetId: number)
 	assert(type(assetId) == "number", "Bad assetId")
 
 	return self._assetIdToAsset:ObserveAtKey(assetId):Pipe({

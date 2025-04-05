@@ -32,7 +32,7 @@ function RoguePropertyDefinition:SetDefaultValue(defaultValue)
 	self._encodedDefaultValue = RoguePropertyUtils.encodeProperty(self, self._defaultValue)
 end
 
-function RoguePropertyDefinition.isRoguePropertyDefinition(value)
+function RoguePropertyDefinition.isRoguePropertyDefinition(value: any): boolean
 	return DuckTypeUtils.isImplementation(RoguePropertyDefinition, value)
 end
 
@@ -84,7 +84,7 @@ function RoguePropertyDefinition:CanAssign(value, _strict)
 	end
 end
 
-function RoguePropertyDefinition:SetName(name)
+function RoguePropertyDefinition:SetName(name: string)
 	assert(type(name) == "string", "Bad name")
 
 	self._name = name

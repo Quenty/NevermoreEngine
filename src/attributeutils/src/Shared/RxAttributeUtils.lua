@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving attributes.
 	@class RxAttributeUtils
@@ -9,6 +10,7 @@ local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Symbol = require("Symbol")
+local _Rx = require("Rx")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -21,7 +23,11 @@ local RxAttributeUtils = {}
 	@param defaultValue any?
 	@return Observable<any>
 ]=]
-function RxAttributeUtils.observeAttribute(instance, attributeName, defaultValue)
+function RxAttributeUtils.observeAttribute<T>(
+	instance: Instance,
+	attributeName: string,
+	defaultValue: T?
+): Observable.Observable<T>
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
 
@@ -39,7 +45,7 @@ function RxAttributeUtils.observeAttribute(instance, attributeName, defaultValue
 		handleAttributeChanged()
 
 		return connection
-	end)
+	end) :: any
 end
 
 --[=[
@@ -47,15 +53,15 @@ end
 	@param instance Instance
 	@return Observable<Brio<string>>
 ]=]
-function RxAttributeUtils.observeAttributeKeysBrio(instance)
+function RxAttributeUtils.observeAttributeKeysBrio(instance: Instance): Observable.Observable<Brio.Brio<string>>
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local attributeNameToBrio = {}
+		local attributeNameToBrio: { [string]: any } = {}
 
-		local function handleAttributeChanged(attributeName, attributeValue)
+		local function handleAttributeChanged(attributeName: string, attributeValue: any)
 			if attributeValue == nil then
 				local brio = attributeNameToBrio[attributeName]
 				if brio then
@@ -64,7 +70,7 @@ function RxAttributeUtils.observeAttributeKeysBrio(instance)
 				end
 			else
 				if not attributeNameToBrio[attributeName] then
-					local brio = Brio.new(attributeName)
+					local brio: any = Brio.new(attributeName)
 					attributeNameToBrio[attributeName] = brio
 					maid[brio] = brio
 					sub:Fire(brio)
@@ -86,7 +92,7 @@ function RxAttributeUtils.observeAttributeKeysBrio(instance)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -95,7 +101,7 @@ end
 	@param instance Instance
 	@return Observable<string>
 ]=]
-function RxAttributeUtils.observeAttributeKeys(instance)
+function RxAttributeUtils.observeAttributeKeys(instance: Instance): Observable.Observable<string>
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return Observable.new(function(sub)
@@ -114,7 +120,7 @@ function RxAttributeUtils.observeAttributeKeys(instance)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -124,7 +130,7 @@ end
 	@param condition function | nil
 	@return Observable<Brio<any>>
 ]=]
-function RxAttributeUtils.observeAttributeBrio(instance, attributeName, condition)
+function RxAttributeUtils.observeAttributeBrio<T>(instance: Instance, attributeName: string, condition: _Rx.Predicate<T>?): Observable.Observable<Brio.Brio<T>>
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
 
@@ -141,7 +147,7 @@ function RxAttributeUtils.observeAttributeBrio(instance, attributeName, conditio
 			if lastValue ~= attributeValue then
 				lastValue = attributeValue
 
-				if not condition or condition(attributeValue) then
+				if not condition or condition(attributeValue :: T) then
 					local brio = Brio.new(attributeValue)
 					maid._lastBrio = brio
 
@@ -159,7 +165,7 @@ function RxAttributeUtils.observeAttributeBrio(instance, attributeName, conditio
 		handleAttributeChanged()
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxAttributeUtils

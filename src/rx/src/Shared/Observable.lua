@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Observables are like an [signal](/api/Signal), except they do not execute code
 	until the observable is subscribed to. This follows the standard
@@ -59,6 +60,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Subscription = require("Subscription")
 local DuckTypeUtils = require("DuckTypeUtils")
+local _MaidTaskUtils = require("MaidTaskUtils")
 
 local ENABLE_STACK_TRACING = false
 
@@ -66,12 +68,24 @@ local Observable = {}
 Observable.ClassName = "Observable"
 Observable.__index = Observable
 
+export type OnSubscribe<T...> = (subscription: Subscription.Subscription<T...>) -> _MaidTaskUtils.MaidTask?
+
+export type Transformer<T..., U...> = (observable: Observable<T...>) -> Observable<U...>
+
+export type Observable<T...> = typeof(setmetatable(
+	{} :: {
+		_source: string?,
+		_onSubscribe: OnSubscribe<T...>,
+	},
+	Observable
+))
+
 --[=[
 	Returns whether or not a value is an observable.
 	@param item any
 	@return boolean
 ]=]
-function Observable.isObservable(item)
+function Observable.isObservable(item: any): boolean
 	return DuckTypeUtils.isImplementation(Observable, item)
 end
 
@@ -83,7 +97,7 @@ end
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			for _, item in pairs(parent:GetChildren()) do
+			for _, item in parent:GetChildren() do
 				sub:Fire(item)
 			end
 			maid:GiveTask(parent.ChildAdded:Connect(function(child)
@@ -103,12 +117,12 @@ end
 	@param onSubscribe (subscription: Subscription<T>) -> MaidTask
 	@return Observable<T>
 ]=]
-function Observable.new(onSubscribe)
+function Observable.new<T...>(onSubscribe: OnSubscribe<T...>): Observable<T...>
 	assert(type(onSubscribe) == "function", "Bad onSubscribe")
 
 	return setmetatable({
-		_source = if ENABLE_STACK_TRACING then debug.traceback("Observable.new()", 2) else nil;
-		_onSubscribe = onSubscribe;
+		_source = if ENABLE_STACK_TRACING then debug.traceback("Observable.new()", 2) else nil,
+		_onSubscribe = onSubscribe,
 	}, Observable)
 end
 
@@ -132,11 +146,11 @@ end
 	@param transformers { (observable: Observable<T>) -> Observable<T> }
 	@return Observable<T>
 ]=]
-function Observable:Pipe(transformers)
+function Observable.Pipe<T...>(self: Observable<T...>, transformers: { Transformer<T..., ...any> }): Observable<...any>
 	assert(type(transformers) == "table", "Bad transformers")
 
-	local current = self
-	for _, transformer in pairs(transformers) do
+	local current: any = self
+	for _, transformer in transformers do
 		assert(type(transformer) == "function", "Bad transformer")
 		current = transformer(current)
 		assert(Observable.isObservable(current), "Transformer must return an observable")
@@ -154,12 +168,17 @@ end
 	@param completeCallback function?
 	@return MaidTask
 ]=]
-function Observable:Subscribe(fireCallback, failCallback, completeCallback)
+function Observable.Subscribe<T...>(
+	self: Observable<T...>,
+	fireCallback: Subscription.FireCallback<T...>?,
+	failCallback: Subscription.FailCallback?,
+	completeCallback: Subscription.CompleteCallback?
+): Subscription.Subscription<T...>
 	local sub = Subscription.new(fireCallback, failCallback, completeCallback, self._source)
 
 	sub:_assignCleanup(self._onSubscribe(sub))
 
-	return sub
+	return sub :: any
 end
 
 return Observable

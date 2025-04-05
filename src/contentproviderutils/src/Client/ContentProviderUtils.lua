@@ -20,7 +20,7 @@ local ContentProviderUtils = {}
 	@param contentIdList { Instance | string }
 	@return Promise
 ]=]
-function ContentProviderUtils.promisePreload(contentIdList)
+function ContentProviderUtils.promisePreload(contentIdList: { Instance | string })
 	assert(type(contentIdList) == "table", "Bad contentIdList")
 
 	return Promise.spawn(function(resolve, reject)
@@ -32,7 +32,7 @@ function ContentProviderUtils.promisePreload(contentIdList)
 			return reject(err)
 		end
 
-		resolve()
+		return resolve()
 	end)
 end
 

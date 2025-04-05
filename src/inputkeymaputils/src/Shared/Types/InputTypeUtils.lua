@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class InputTypeUtils
 ]=]
@@ -6,7 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
 
-local SlottedTouchButtonUtils = require("SlottedTouchButtonUtils")
+local SlottedTouchButtonUtils = (require :: any)("SlottedTouchButtonUtils")
 local Set = require("Set")
 
 local InputTypeUtils = {}
@@ -16,15 +17,36 @@ local InputTypeUtils = {}
 	@type InputType KeyCode | UserInputType | SlottedTouchButton | "TouchButton" | "Tap" | "Drag" | any
 	@within InputTypeUtils
 ]=]
+export type InputType = Enum.UserInputType | Enum.KeyCode | string | SlottedTouchButton | "TouchButton" | "Tap" | "Drag"
 
-function InputTypeUtils.isKnownInputType(inputType)
+--[=[
+	A touch button that goes into a specific slot. This ensures
+	consistent slot positions.
+
+	@interface SlottedTouchButton
+	.type "SlottedTouchButton"
+	.slotId string
+	@within InputTypeUtils
+]=]
+export type SlottedTouchButton = {
+	type: "SlottedTouchButton",
+	slotId: string,
+}
+
+--[=[
+	Returns true if the input type is a known input type
+	@param inputType any
+	@return boolean
+]=]
+function InputTypeUtils.isKnownInputType(inputType: any): boolean
 	return InputTypeUtils.isTapInWorld(inputType)
 		or InputTypeUtils.isRobloxTouchButton(inputType)
 		or InputTypeUtils.isDrag(inputType)
 		or SlottedTouchButtonUtils.isSlottedTouchButton(inputType)
-		or (typeof(inputType) == "EnumItem" and (
-			tostring(inputType.EnumType) == "UserInputType"
-			or tostring(inputType.EnumType) == "KeyCode"))
+		or (
+			typeof(inputType) == "EnumItem"
+			and (tostring(inputType.EnumType) == "UserInputType" or tostring(inputType.EnumType) == "KeyCode")
+		)
 end
 
 --[=[
@@ -32,17 +54,16 @@ end
 	@param inputKey any
 	@return boolean
 ]=]
-function InputTypeUtils.isTapInWorld(inputKey)
+function InputTypeUtils.isTapInWorld(inputKey: InputType): boolean
 	return inputKey == "Tap"
 end
-
 
 --[=[
 	Returns true if the input type is specifying a drag
 	@param inputKey any
 	@return boolean
 ]=]
-function InputTypeUtils.isDrag(inputKey)
+function InputTypeUtils.isDrag(inputKey: InputType): boolean
 	return inputKey == "Drag"
 end
 
@@ -51,7 +72,7 @@ end
 	@param inputKey any
 	@return boolean
 ]=]
-function InputTypeUtils.isRobloxTouchButton(inputKey)
+function InputTypeUtils.isRobloxTouchButton(inputKey: InputType): boolean
 	return inputKey == "TouchButton"
 end
 
@@ -59,7 +80,7 @@ end
 	Specifies a tap in the world
 	@return "Tap"
 ]=]
-function InputTypeUtils.createTapInWorld()
+function InputTypeUtils.createTapInWorld(): "Tap"
 	return "Tap"
 end
 
@@ -67,7 +88,7 @@ end
 	Specifies a roblox touch button
 	@return "Tap"
 ]=]
-function InputTypeUtils.createRobloxTouchButton()
+function InputTypeUtils.createRobloxTouchButton(): "TouchButton"
 	return "TouchButton"
 end
 
@@ -79,9 +100,9 @@ end
 	@param inputType InputType
 	@return any
 ]=]
-function InputTypeUtils.getUniqueKeyForInputType(inputType)
+function InputTypeUtils.getUniqueKeyForInputType(inputType: InputType): any
 	if SlottedTouchButtonUtils.isSlottedTouchButton(inputType) then
-		return inputType.slotId
+		return (inputType :: any).slotId
 	else
 		return inputType
 	end
@@ -89,7 +110,7 @@ end
 
 local function convertValuesToJSONIfNeeded(list)
 	local result = {}
-	for key, value in pairs(list) do
+	for key, value in list do
 		if type(value) == "table" then
 			result[key] = HttpService:JSONEncode(value)
 		else
@@ -106,7 +127,7 @@ end
 	@param b { InputType }
 	@return boolean
 ]=]
-function InputTypeUtils.areInputTypesListsEquivalent(a, b)
+function InputTypeUtils.areInputTypesListsEquivalent(a: { InputType }, b: { InputType }): boolean
 	-- allocate, hehe
 	local setA = Set.fromTableValue(convertValuesToJSONIfNeeded(a))
 	local setB = Set.fromTableValue(convertValuesToJSONIfNeeded(b))

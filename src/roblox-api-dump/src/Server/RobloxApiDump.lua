@@ -17,12 +17,14 @@ local RobloxApiDump = setmetatable({}, BaseObject)
 RobloxApiDump.ClassName = "RobloxApiDump"
 RobloxApiDump.__index = RobloxApiDump
 
+export type RobloxApiDump = typeof(setmetatable({}, { __index = RobloxApiDump }))
+
 --[=[
 	Constructs a new RobloxApiDump which will cache all results for its lifetime.
 	@return RobloxApiDump
 ]=]
-function RobloxApiDump.new()
-	local self = setmetatable(BaseObject.new(), RobloxApiDump)
+function RobloxApiDump.new(): RobloxApiDump
+	local self = setmetatable(BaseObject.new() :: any, RobloxApiDump)
 
 	self._classMemberPromises = {}
 	self._ancestorListPromise = {}
@@ -36,17 +38,16 @@ end
 	@param className string
 	@return RobloxApiClass
 ]=]
-function RobloxApiDump:PromiseClass(className)
+function RobloxApiDump:PromiseClass(className: string)
 	assert(type(className) == "string", "Bad className")
 
 	if self._classPromises[className] then
 		return self._classPromises[className]
 	end
 
-	self._classPromises[className] = self:_promiseRawClassData(className)
-		:Then(function(classData)
-			return RobloxApiClass.new(self, classData)
-		end)
+	self._classPromises[className] = self:_promiseRawClassData(className):Then(function(classData)
+		return RobloxApiClass.new(self, classData)
+	end)
 
 	return self._classPromises[className]
 end
@@ -56,78 +57,74 @@ end
 	@param className string
 	@return { RobloxApiMember }
 ]=]
-function RobloxApiDump:PromiseMembers(className)
+function RobloxApiDump:PromiseMembers(className: string)
 	assert(type(className) == "string", "Bad className")
 
 	if self._classMemberPromises[className] then
 		return self._classMemberPromises[className]
 	end
 
-
-	self._classMemberPromises[className] = self:_promiseClassDataAndAncestorList(className)
-		:Then(function(list)
-			local members = {}
-			for _, entry in pairs(list) do
-				if entry.Members then
-					for _, member in pairs(entry.Members) do
-						table.insert(members, RobloxApiMember.new(member))
-					end
+	self._classMemberPromises[className] = self:_promiseClassDataAndAncestorList(className):Then(function(list)
+		local members = {}
+		for _, entry in list do
+			if entry.Members then
+				for _, member in entry.Members do
+					table.insert(members, RobloxApiMember.new(member))
 				end
 			end
+		end
 
-			return members
-		end)
+		return members
+	end)
 
 	return self._classMemberPromises[className]
 end
 
-function RobloxApiDump:_promiseClassDataAndAncestorList(className)
+function RobloxApiDump:_promiseClassDataAndAncestorList(className: string)
 	assert(type(className) == "string", "Bad className")
 
 	if self._ancestorListPromise[className] then
 		return self._ancestorListPromise[className]
 	end
 
-	self._ancestorListPromise[className] = self:_promiseClassMap()
-		:Then(function(classMap)
-			local current = classMap[className]
-			if not current then
-				return Promise.rejected(string.format("Could not find data for %q", className))
-			end
+	self._ancestorListPromise[className] = self:_promiseClassMap():Then(function(classMap)
+		local current = classMap[className]
+		if not current then
+			return Promise.rejected(string.format("Could not find data for %q", className))
+		end
 
-			local dataList = {}
-			while current do
-				table.insert(dataList, current)
+		local dataList = {}
+		while current do
+			table.insert(dataList, current)
 
-				local superclass = current.Superclass
-				if superclass and superclass ~= RobloxApiDumpConstants.ROOT_CLASS_NAME then
-					current = classMap[superclass]
-					if not current then
-						return Promise.rejected(string.format("Could not find data for super class %q", superclass))
-					end
-				else
-					current = nil
+			local superclass = current.Superclass
+			if superclass and superclass ~= RobloxApiDumpConstants.ROOT_CLASS_NAME then
+				current = classMap[superclass]
+				if not current then
+					return Promise.rejected(string.format("Could not find data for super class %q", superclass))
 				end
+			else
+				current = nil
 			end
+		end
 
-			return dataList
-		end)
+		return dataList
+	end)
 
 	return self._ancestorListPromise[className]
 end
 
-function RobloxApiDump:_promiseRawClassData(className)
+function RobloxApiDump:_promiseRawClassData(className: string)
 	assert(type(className) == "string", "Bad className")
 
-	return self:_promiseClassMap()
-		:Then(function(classMap)
-			local data = classMap[className]
-			if data then
-				return data
-			else
-				return Promise.rejected(string.format("Could not find data for %q", className))
-			end
-		end)
+	return self:_promiseClassMap():Then(function(classMap)
+		local data = classMap[className]
+		if data then
+			return data
+		else
+			return Promise.rejected(string.format("Could not find data for %q", className))
+		end
+	end)
 end
 
 function RobloxApiDump:_promiseClassMap()
@@ -139,7 +136,7 @@ function RobloxApiDump:_promiseClassMap()
 		assert(dump.Version == 1, "Only able to parse version 1 of the dump")
 
 		local classMap = {}
-		for _, entry in pairs(dump.Classes) do
+		for _, entry in dump.Classes do
 			assert(type(entry) == "table", "Bad entry")
 			assert(type(entry.Name) == "string", "Bad entry.Name")
 

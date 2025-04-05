@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions for constructing rays from input objects
 	@class InputObjectRayUtils
@@ -17,12 +18,22 @@ local InputObjectRayUtils = {}
 	@param camera Camera? -- Optional
 	@return Ray
 ]=]
-function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance, offset, camera)
+function InputObjectRayUtils.cameraRayFromInputObject(
+	inputObject: InputObject,
+	distance: number,
+	offset: (Vector3 | Vector2)?,
+	camera: Camera?
+): Ray
 	assert(inputObject, "Bad inputObject")
-	offset = offset or Vector3.zero
+
+	local rayOffset = offset or Vector3.zero
 
 	local position = inputObject.Position
-	return InputObjectRayUtils.cameraRayFromScreenPosition(Vector2.new(position.x + offset.x, position.y + offset.y), distance, camera)
+	return InputObjectRayUtils.cameraRayFromScreenPosition(
+		Vector2.new(position.X + rayOffset.X, position.Y + rayOffset.Y),
+		distance,
+		camera
+	)
 end
 
 --[=[
@@ -33,14 +44,21 @@ end
 	@param camera Camera? -- Optional
 	@return Ray
 ]=]
-function InputObjectRayUtils.cameraRayFromMouse(mouse, distance, offset, camera)
+function InputObjectRayUtils.cameraRayFromMouse(
+	mouse: Mouse,
+	distance: number,
+	offset: (Vector3 | Vector2)?,
+	camera: Camera?
+): Ray
 	assert(mouse, "Bad mouse")
-	offset = offset or Vector3.zero
+
+	local rayOffset = offset or Vector3.zero
 
 	return InputObjectRayUtils.cameraRayFromScreenPosition(
-		Vector2.new(mouse.x + offset.x, mouse.y + offset.y),
+		Vector2.new(mouse.X + rayOffset.X, mouse.Y + rayOffset.Y),
 		distance,
-		camera)
+		camera
+	)
 end
 
 --[=[
@@ -50,14 +68,20 @@ end
 	@param camera Camera? -- Optional
 	@return Ray
 ]=]
-function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(inputObject, distance, offset, camera)
+function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(
+	inputObject: InputObject,
+	distance: number?,
+	offset: Vector3 | Vector2,
+	camera: Camera?
+): Ray
 	assert(inputObject, "Bad inputObject")
 
 	local position = inputObject.Position
 	return InputObjectRayUtils.cameraRayFromScreenPosition(
-		Vector2.new(position.x + offset.x, position.y + offset.y),
+		Vector2.new(position.X + offset.X, position.Y + offset.Y),
 		distance,
-		camera)
+		camera
+	)
 end
 
 --[=[
@@ -66,11 +90,15 @@ end
 	@param camera Camera? -- Optional
 	@return Ray
 ]=]
-function InputObjectRayUtils.cameraRayFromScreenPosition(position, distance, camera)
+function InputObjectRayUtils.cameraRayFromScreenPosition(
+	position: Vector3 | Vector2,
+	distance: number?,
+	camera: Camera?
+): Ray
 	distance = distance or DEFAULT_RAY_DISTANCE
-	camera = camera or Workspace.CurrentCamera
+	local currentCamera = camera or Workspace.CurrentCamera
 
-	local baseRay = camera:ScreenPointToRay(position.X, position.Y)
+	local baseRay = currentCamera:ScreenPointToRay(position.X, position.Y)
 	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
 end
 
@@ -80,11 +108,15 @@ end
 	@param camera Camera? -- Optional
 	@return Ray
 ]=]
-function InputObjectRayUtils.cameraRayFromViewportPosition(position, distance, camera)
+function InputObjectRayUtils.cameraRayFromViewportPosition(
+	position: Vector3 | Vector2,
+	distance: number?,
+	camera: Camera?
+): Ray
 	distance = distance or DEFAULT_RAY_DISTANCE
-	camera = camera or Workspace.CurrentCamera
+	local currentCamera = camera or Workspace.CurrentCamera
 
-	local baseRay = camera:ViewportPointToRay(position.X, position.Y)
+	local baseRay = currentCamera:ViewportPointToRay(position.X, position.Y)
 	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
 end
 
@@ -95,8 +127,8 @@ end
 	@param radius number
 	@return { Ray }
 ]=]
-function InputObjectRayUtils.generateCircleRays(ray, count, radius)
-	local rays = { }
+function InputObjectRayUtils.generateCircleRays(ray: Ray, count: number, radius: number): { Ray }
+	local rays = {}
 
 	local origin = ray.Origin
 	local direction = ray.Direction
@@ -104,8 +136,8 @@ function InputObjectRayUtils.generateCircleRays(ray, count, radius)
 	local cframePointing = CFrame.new(origin, origin + direction)
 
 	for i=1, count do
-		local angle = math.pi*2*(i-1)/count
-		local offset = cframePointing:vectorToWorldSpace(Vector3.new(
+		local angle = math.pi * 2 * (i - 1) / count
+		local offset = cframePointing:VectorToWorldSpace(Vector3.new(
 			math.cos(angle)*radius,
 			math.sin(angle)*radius,
 			0))

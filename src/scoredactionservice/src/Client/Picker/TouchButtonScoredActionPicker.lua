@@ -20,7 +20,7 @@ function TouchButtonScoredActionPicker.new()
 end
 
 function TouchButtonScoredActionPicker:Update()
-	for action, _ in pairs(self._actionSet) do
+	for action, _ in self._actionSet do
 		if not action.Destroy then
 			warn("[ScoredActionPicker] - Action is destroyed. Should have been removed.")
 			self._maid[action] = nil

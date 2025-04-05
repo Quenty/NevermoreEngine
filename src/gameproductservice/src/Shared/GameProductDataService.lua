@@ -13,11 +13,12 @@ local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local Signal = require("Signal")
 local TieRealmService = require("TieRealmService")
+local _ServiceBag = require("ServiceBag")
 
 local GameProductDataService = {}
 GameProductDataService.ServiceName = "GameProductDataService"
 
-function GameProductDataService:Init(serviceBag)
+function GameProductDataService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -232,7 +233,7 @@ end
 	@param idOrKey string | number
 	@return Observable<Player>
 ]=]
-function GameProductDataService:ObserveAssetPurchased(assetType, idOrKey)
+function GameProductDataService:ObserveAssetPurchased(assetType: GameConfigAssetTypes.GameConfigAssetType, idOrKey: string | number)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 

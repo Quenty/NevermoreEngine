@@ -29,7 +29,7 @@ function Hide.new(adornee)
 	if self._obj:IsA("BasePart") then
 		self:_setupPart(self._obj)
 	elseif self._obj:IsA("Model") then
-		for _, item in pairs(self._obj:GetChildren()) do
+		for _, item in self._obj:GetChildren() do
 			if item:IsA("BasePart") then
 				self:_setupPart(item)
 			end

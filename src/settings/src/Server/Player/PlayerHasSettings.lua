@@ -16,7 +16,7 @@ local PlayerHasSettings = setmetatable({}, BaseObject)
 PlayerHasSettings.ClassName = "PlayerHasSettings"
 PlayerHasSettings.__index = PlayerHasSettings
 
-function PlayerHasSettings.new(player, serviceBag)
+function PlayerHasSettings.new(player: Player, serviceBag)
 	local self = setmetatable(BaseObject.new(player), PlayerHasSettings)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -40,7 +40,7 @@ function PlayerHasSettings:_promiseLoadSettings()
 
 			return dataStore:Load("settings", {})
 				:Then(function(settings)
-					for settingName, value in pairs(settings) do
+					for settingName, value in settings do
 						local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 						self._settings:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(value))
 					end

@@ -35,7 +35,7 @@ function RxUIConverterUtils.observeAnyChangedBelowInst(inst)
 		end))
 
 		handleDescendant(inst)
-		for _, descendant in pairs(inst:GetDescendants()) do
+		for _, descendant in inst:GetDescendants() do
 			handleDescendant(descendant)
 		end
 

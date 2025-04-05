@@ -26,7 +26,7 @@ CameraStateTweener.__index = CameraStateTweener
 	@param speed number? -- Speed that the camera tweener tweens at. Defaults to 20
 	@return CameraStateTweener
 ]=]
-function CameraStateTweener.new(serviceBagOrCameraStack, cameraEffect, speed)
+function CameraStateTweener.new(serviceBagOrCameraStack, cameraEffect, speed: number?)
 	local self = setmetatable(BaseObject.new(), CameraStateTweener)
 
 	assert(cameraEffect, "No cameraEffect")
@@ -65,7 +65,7 @@ end
 	Returns percent visible, from 0 to 1.
 	@return number
 ]=]
-function CameraStateTweener:GetPercentVisible()
+function CameraStateTweener:GetPercentVisible(): number
 	return self._fadeBetween.Value
 end
 
@@ -73,7 +73,7 @@ end
 	Shows the camera to fade in.
 	@param doNotAnimate? boolean -- Optional, defaults to animating
 ]=]
-function CameraStateTweener:Show(doNotAnimate)
+function CameraStateTweener:Show(doNotAnimate: boolean?)
 	self:SetTarget(1, doNotAnimate)
 end
 
@@ -81,7 +81,7 @@ end
 	Hides the camera to fade in.
 	@param doNotAnimate? boolean -- Optional, defaults to animating
 ]=]
-function CameraStateTweener:Hide(doNotAnimate)
+function CameraStateTweener:Hide(doNotAnimate: boolean?)
 	self:SetTarget(0, doNotAnimate)
 end
 
@@ -89,7 +89,7 @@ end
 	Returns true if we're done hiding
 	@return boolean
 ]=]
-function CameraStateTweener:IsFinishedHiding()
+function CameraStateTweener:IsFinishedHiding(): boolean
 	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 0
 end
 
@@ -97,7 +97,7 @@ end
 	Returns true if we're done showing
 	@return boolean
 ]=]
-function CameraStateTweener:IsFinishedShowing()
+function CameraStateTweener:IsFinishedShowing(): boolean
 	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 1
 end
 
@@ -107,7 +107,7 @@ end
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 	@param callback function
 ]=]
-function CameraStateTweener:Finish(doNotAnimate, callback)
+function CameraStateTweener:Finish(doNotAnimate: boolean?, callback: () -> ())
 	assert(type(callback) == "function", "Bad callback")
 
 	self:Hide(doNotAnimate)
@@ -146,7 +146,7 @@ end
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 	@return CameraStateTweener -- self
 ]=]
-function CameraStateTweener:SetTarget(target, doNotAnimate)
+function CameraStateTweener:SetTarget(target: number, doNotAnimate: boolean?)
 	self._fadeBetween.Target = target or error("No target")
 	if doNotAnimate then
 		self._fadeBetween.Value = self._fadeBetween.Target
@@ -160,7 +160,7 @@ end
 	@param speed number
 	@return CameraStateTweener -- self
 ]=]
-function CameraStateTweener:SetSpeed(speed)
+function CameraStateTweener:SetSpeed(speed: number)
 	assert(type(speed) == "number", "Bad speed")
 
 	self._fadeBetween.Speed = speed
@@ -173,7 +173,7 @@ end
 	@param isVisible boolean
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 ]=]
-function CameraStateTweener:SetVisible(isVisible, doNotAnimate)
+function CameraStateTweener:SetVisible(isVisible: number, doNotAnimate: boolean?)
 	if isVisible then
 		self:Show(doNotAnimate)
 	else

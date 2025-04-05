@@ -34,7 +34,7 @@ end
 function InputKeyMapSettingUtils.encodeInputTypeList(list)
 	local newList = {}
 
-	for _, inputType in pairs(list) do
+	for _, inputType in list do
 		if typeof(inputType) == "EnumItem" then
 			table.insert(newList, EnumUtils.encodeAsString(inputType))
 		elseif InputTypeUtils.isKnownInputType(inputType) then
@@ -71,7 +71,7 @@ function InputKeyMapSettingUtils.decodeInputTypeList(encoded)
 
 	local decodedList = {}
 
-	for _, inputType in pairs(result) do
+	for _, inputType in result do
 		if EnumUtils.isEncodedEnum(inputType) then
 			table.insert(decodedList, EnumUtils.decodeFromString(inputType))
 		elseif InputTypeUtils.isKnownInputType(inputType) then

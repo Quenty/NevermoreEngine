@@ -7,18 +7,19 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local SettingsService = {}
 SettingsService.ServiceName = "SettingsService"
 
-function SettingsService:Init(serviceBag)
+function SettingsService:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	-- External
 	self._serviceBag:GetService(require("PlayerDataStoreService"))
-	self._serviceBag:GetService(require("SettingsCmdrService"))
+	self._serviceBag:GetService((require :: any)("SettingsCmdrService"))
 
 	-- Internal
 	self._settingsDataService = self._serviceBag:GetService(require("SettingsDataService"))

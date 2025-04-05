@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	debounce a existing function by timeout
 	@class debounce
@@ -12,7 +13,7 @@
 	@function debounce
 	@within debounce
 ]=]
-local function debounce(timeoutInSeconds, func)
+local function debounce<T..., U...>(timeoutInSeconds: number, func: (T...) -> (U...)): (T...) -> ()
 	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
 	assert(type(func) == "function", "Bad func")
 
@@ -21,11 +22,11 @@ local function debounce(timeoutInSeconds, func)
 		key = key + 1
 		local localKey = key
 		local n = select("#", ...)
-		local args = {...}
+		local args = { ... }
 
 		task.delay(timeoutInSeconds, function()
 			if key == localKey then
-				func(unpack(args, 1, n))
+				func((unpack :: any)(args, 1, n))
 			end
 		end)
 	end

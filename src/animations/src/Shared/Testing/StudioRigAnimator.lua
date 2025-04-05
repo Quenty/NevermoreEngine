@@ -26,7 +26,7 @@ StudioRigAnimator.__index = StudioRigAnimator
 	@param animatorOrHumanoid Animator | Humanoid
 	@return StudioRigAnimator
 ]=]
-function StudioRigAnimator.new(animatorOrHumanoid)
+function StudioRigAnimator.new(animatorOrHumanoid: Animator | Humanoid)
 	local self = setmetatable(BaseObject.new(animatorOrHumanoid), StudioRigAnimator)
 
 	if RunService:IsStudio() and not RunService:IsRunning() then
@@ -38,6 +38,10 @@ end
 
 function StudioRigAnimator:_setupStudio()
 	self._animator = AnimationUtils.getOrCreateAnimator(self._obj)
+	if not self._animator then
+		return
+	end
+
 	self._lastTime = os.clock()
 
 	self._maid:GiveTask(RunService.RenderStepped:Connect(function()

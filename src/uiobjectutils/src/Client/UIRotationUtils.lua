@@ -3,8 +3,6 @@
 	@class UIRotationUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local UIRotationUtils = {}
 
 --[=[

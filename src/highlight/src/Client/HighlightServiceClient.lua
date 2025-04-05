@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AnimatedHighlightGroup = require("AnimatedHighlightGroup")
 local Maid = require("Maid")
+local _ServiceBag = require("ServiceBag")
 
 local HighlightServiceClient = {}
 HighlightServiceClient.ServiceName = "HighlightServiceClient"
@@ -17,7 +18,7 @@ HighlightServiceClient.ServiceName = "HighlightServiceClient"
 
 	@param serviceBag ServiceBag
 ]=]
-function HighlightServiceClient:Init(serviceBag)
+function HighlightServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -39,7 +40,7 @@ end
 	Highlights an instance at the given priority
 
 	@param adornee Instance
-	@param observeScore Observable<number> | number | nil
+	@param observeScore Observable<number> | number?
 	@return AnimatedHighlightModel
 ]=]
 function HighlightServiceClient:Highlight(adornee, observeScore)

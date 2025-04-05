@@ -1,13 +1,16 @@
+--!strict
 --[=[
 	@class ListIndexUtils
 ]=]
-
-local require = require(script.Parent.loader).load(script)
 
 local ListIndexUtils = {}
 
 --[=[
 	Converts a negative index to a positive one for the list indexing
+
+	@param listLength number
+	@param index number
+	@return number
 ]=]
 function ListIndexUtils.toPositiveIndex(listLength: number, index: number): number
 	assert(type(listLength) == "number", "Bad listLength")
@@ -24,6 +27,10 @@ end
 
 --[=[
 	Converts a positive index to a negative one for list indexing
+
+	@param listLength number
+	@param index number
+	@return number
 ]=]
 function ListIndexUtils.toNegativeIndex(listLength: number, index: number): number
 	assert(type(listLength) == "number", "Bad listLength")

@@ -115,7 +115,7 @@ do
 	end
 end
 
-for _, action in pairs(ActionInterface:GetImplementations(adornee)) do
+for _, action in ActionInterface:GetImplementations(adornee) do
 	-- action.Activated:Connect(function()
 	-- 	print("Action activation!")
 	-- end)

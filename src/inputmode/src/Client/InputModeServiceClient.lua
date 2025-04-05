@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Centralized
 	@class InputModeServiceClient
@@ -14,13 +15,25 @@ local Maid = require("Maid")
 local InputModeProcessor = require("InputModeProcessor")
 local InputModeTypes = require("InputModeTypes")
 local InputMode = require("InputMode")
+local _ServiceBag = require("ServiceBag")
 
 local THUMBSTICK_DEADZONE = 0.14
 
 local InputModeServiceClient = {}
 InputModeServiceClient.ServiceName = "InputModeServiceClient"
 
-function InputModeServiceClient:Init(serviceBag)
+export type InputModeServiceClient = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_inputModes: { [InputModeType.InputModeType]: InputMode.InputMode },
+		_inputModeProcessor: InputModeProcessor.InputModeProcessor,
+		_lastMousePosition: Vector3?,
+		_serviceBag: _ServiceBag.ServiceBag,
+	},
+	{ __index = InputModeServiceClient }
+))
+
+function InputModeServiceClient.Init(self: InputModeServiceClient, serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -31,22 +44,25 @@ function InputModeServiceClient:Init(serviceBag)
 
 	-- order semi-matters. general should come first, to non-specific. that way, specific stuff has
 	-- priority over non-specific input modes.
-	self:GetInputMode(InputModeTypes.KeyboardAndMouse);
-	self:GetInputMode(InputModeTypes.Gamepads);
-	self:GetInputMode(InputModeTypes.Keyboard);
-	self:GetInputMode(InputModeTypes.Touch);
-	self:GetInputMode(InputModeTypes.Mouse);
-	self:GetInputMode(InputModeTypes.ArrowKeys);
-	self:GetInputMode(InputModeTypes.Keypad);
-	self:GetInputMode(InputModeTypes.WASD);
-	self:GetInputMode(InputModeTypes.DPad);
+	self:GetInputMode(InputModeTypes.KeyboardAndMouse)
+	self:GetInputMode(InputModeTypes.Gamepads)
+	self:GetInputMode(InputModeTypes.Keyboard)
+	self:GetInputMode(InputModeTypes.Touch)
+	self:GetInputMode(InputModeTypes.Mouse)
+	self:GetInputMode(InputModeTypes.ArrowKeys)
+	self:GetInputMode(InputModeTypes.Keypad)
+	self:GetInputMode(InputModeTypes.WASD)
+	self:GetInputMode(InputModeTypes.DPad)
 	-- Don't add InputModeTypes.Thumbsticks, we handle it seperately
 
 	self:_triggerEnabled()
 	self:_bindProcessor()
 end
 
-function InputModeServiceClient:GetInputMode(inputModeType)
+function InputModeServiceClient.GetInputMode(
+	self: InputModeServiceClient,
+	inputModeType: InputModeType.InputModeType
+): InputMode.InputMode
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	if not RunService:IsRunning() then
@@ -80,7 +96,7 @@ function InputModeServiceClient:GetInputMode(inputModeType)
 	return inputMode
 end
 
-function InputModeServiceClient:_triggerEnabled()
+function InputModeServiceClient._triggerEnabled(self: InputModeServiceClient)
 	if UserInputService.MouseEnabled then
 		self:GetInputMode(InputModeTypes.Mouse):Enable()
 	end
@@ -93,25 +109,25 @@ function InputModeServiceClient:_triggerEnabled()
 	if UserInputService.KeyboardEnabled and UserInputService.MouseEnabled then
 		self:GetInputMode(InputModeTypes.KeyboardAndMouse):Enable()
 	end
-	if UserInputService.GamepadEnabled
+	if
+		UserInputService.GamepadEnabled
 		or #UserInputService:GetConnectedGamepads() > 0
-		or GuiService:IsTenFootInterface() then
+		or GuiService:IsTenFootInterface()
+	then
 		self:GetInputMode(InputModeTypes.Gamepads):Enable()
 	end
 end
 
-function InputModeServiceClient:_bindProcessor()
-	self._maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject)
+function InputModeServiceClient._bindProcessor(self: InputModeServiceClient)
+	self._maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject: InputObject)
 		self._inputModeProcessor:Evaluate(inputObject)
 	end))
-	self._maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject)
+	self._maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject: InputObject)
 		self._inputModeProcessor:Evaluate(inputObject)
 	end))
-	self._maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
-		if inputObject.KeyCode == Enum.KeyCode.Thumbstick1
-			or inputObject.KeyCode == Enum.KeyCode.Thumbstick2 then
-
-			if inputObject.Position.magnitude > THUMBSTICK_DEADZONE then
+	self._maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject: InputObject)
+		if inputObject.KeyCode == Enum.KeyCode.Thumbstick1 or inputObject.KeyCode == Enum.KeyCode.Thumbstick2 then
+			if inputObject.Position.Magnitude > THUMBSTICK_DEADZONE then
 				self._inputModeProcessor:Evaluate(inputObject)
 				self:GetInputMode(InputModeTypes.Thumbsticks):Enable()
 			end
@@ -134,13 +150,16 @@ function InputModeServiceClient:_bindProcessor()
 	end))
 end
 
-function InputModeServiceClient:_shouldProcessMouseMovement(inputObject)
+function InputModeServiceClient._shouldProcessMouseMovement(
+	self: InputModeServiceClient,
+	inputObject: InputObject
+): boolean
 	-- Prevent mouse movement from flickering
 	local position = inputObject.Position
-	local lastMousePosition = self._lastMousePosition
+	local lastMousePosition: Vector3? = self._lastMousePosition
 	self._lastMousePosition = position
 
-	if inputObject.Delta.magnitude > 0 then
+	if inputObject.Delta.Magnitude > 0 then
 		return true
 	end
 
@@ -148,14 +167,14 @@ function InputModeServiceClient:_shouldProcessMouseMovement(inputObject)
 		return true
 	end
 
-	if (lastMousePosition - position).magnitude > 0 then
+	if (lastMousePosition - position).Magnitude > 0 then
 		return true
 	end
 
 	return false
 end
 
-function InputModeServiceClient:Destroy()
+function InputModeServiceClient.Destroy(self: InputModeServiceClient)
 	self._maid:DoCleaning()
 end
 

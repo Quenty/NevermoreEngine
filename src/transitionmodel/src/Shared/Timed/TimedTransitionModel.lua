@@ -21,7 +21,7 @@ TimedTransitionModel.__index = TimedTransitionModel
 	@param transitionTime number? -- Optional
 	@return TimedTransitionModel<T>
 ]=]
-function TimedTransitionModel.new(transitionTime)
+function TimedTransitionModel.new(transitionTime: number?)
 	local self = setmetatable(BasicPane.new(), TimedTransitionModel)
 
 	self._transitionModel = self._maid:Add(TransitionModel.new())
@@ -40,7 +40,7 @@ function TimedTransitionModel.new(transitionTime)
 	return self
 end
 
-function TimedTransitionModel:SetTransitionTime(transitionTime)
+function TimedTransitionModel:SetTransitionTime(transitionTime: number)
 	self._timedTween:SetTransitionTime(transitionTime)
 end
 
@@ -48,7 +48,7 @@ end
 	Returns true if showing is complete
 	@return boolean
 ]=]
-function TimedTransitionModel:IsShowingComplete()
+function TimedTransitionModel:IsShowingComplete(): boolean
 	return self._transitionModel:IsShowingComplete()
 end
 
@@ -56,7 +56,7 @@ end
 	Returns true if hiding is complete
 	@return boolean
 ]=]
-function TimedTransitionModel:IsHidingComplete()
+function TimedTransitionModel:IsHidingComplete(): boolean
 	return self._transitionModel:IsHidingComplete()
 end
 
@@ -127,20 +127,20 @@ end
 --[=[
 	Shows the model and promises when the showing is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
-function TimedTransitionModel:PromiseShow(doNotAnimate)
+function TimedTransitionModel:PromiseShow(doNotAnimate: boolean?)
 	return self._transitionModel:PromiseShow(doNotAnimate)
 end
 
 --[=[
 	Hides the model and promises when the showing is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
-function TimedTransitionModel:PromiseHide(doNotAnimate)
+function TimedTransitionModel:PromiseHide(doNotAnimate: boolean?)
 	return self._transitionModel:PromiseHide(doNotAnimate)
 end
 
@@ -150,11 +150,11 @@ end
 	@param doNotAnimate boolean
 	@return Promise
 ]=]
-function TimedTransitionModel:PromiseToggle(doNotAnimate)
+function TimedTransitionModel:PromiseToggle(doNotAnimate: boolean?)
 	return self._transitionModel:PromiseToggle(doNotAnimate)
 end
 
-function TimedTransitionModel:_promiseShow(maid, doNotAnimate)
+function TimedTransitionModel:_promiseShow(maid, doNotAnimate: boolean?)
 	self._timedTween:Show(doNotAnimate)
 
 	if doNotAnimate then
@@ -164,7 +164,7 @@ function TimedTransitionModel:_promiseShow(maid, doNotAnimate)
 	end
 end
 
-function TimedTransitionModel:_promiseHide(maid, doNotAnimate)
+function TimedTransitionModel:_promiseHide(maid, doNotAnimate: boolean?)
 	self._timedTween:Hide(doNotAnimate)
 
 	if doNotAnimate then

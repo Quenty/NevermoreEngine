@@ -30,7 +30,7 @@ function IKResource.new(data)
 	self.ReadyChanged = self._ready.Changed
 
 	if self._data.children then
-		for _, childData in pairs(self._data.children) do
+		for _, childData in self._data.children do
 			self:_addResource(IKResource.new(childData))
 		end
 	end
@@ -42,11 +42,11 @@ function IKResource:GetData()
 	return self._data
 end
 
-function IKResource:IsReady()
+function IKResource:IsReady(): boolean
 	return self._ready.Value
 end
 
-function IKResource:Get(descendantName)
+function IKResource:Get(descendantName: string)
 	local resource = self._descendantLookupMap[descendantName]
 	if not resource then
 		error(string.format("[IKResource.Get] - Resource %q does not exist", tostring(descendantName)))
@@ -60,7 +60,7 @@ function IKResource:Get(descendantName)
 	return result
 end
 
-function IKResource:GetInstance()
+function IKResource:GetInstance(): Instance?
 	if self._data.isLink then
 		if self._instance then
 			return self._instance.Value
@@ -72,7 +72,7 @@ function IKResource:GetInstance()
 	return self._instance
 end
 
-function IKResource:SetInstance(instance)
+function IKResource:SetInstance(instance: Instance?)
 	if self._instance == instance then
 		return
 	end
@@ -107,7 +107,7 @@ function IKResource:GetLookupTable()
 end
 
 function IKResource:_startListening(maid, instance)
-	for _, child in pairs(instance:GetChildren()) do
+	for _, child in instance:GetChildren() do
 		self:_handleChildAdded(child)
 	end
 
@@ -165,7 +165,7 @@ function IKResource:_handleChildRemoved(child)
 end
 
 function IKResource:_clearChildren()
-	for _, child in pairs(self._childResourceMap) do
+	for _, child in self._childResourceMap do
 		child:SetInstance(nil)
 	end
 end
@@ -185,7 +185,7 @@ function IKResource:_calculateIsReady()
 		end
 	end
 
-	for _, child in pairs(self._childResourceMap) do
+	for _, child in self._childResourceMap do
 		if not child:IsReady() then
 			return false
 		end

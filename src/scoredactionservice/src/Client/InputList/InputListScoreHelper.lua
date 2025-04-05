@@ -57,7 +57,7 @@ function InputListScoreHelper:_updateInputTypeSet(inputTypeList)
 	local remaining = Set.copy(self._currentTypes)
 
 	-- Register inputTypes
-	for _, inputType in pairs(inputTypeList) do
+	for _, inputType in inputTypeList do
 		if not self._currentTypes[inputType] then
 			self._currentTypes[inputType] = true
 
@@ -72,7 +72,7 @@ function InputListScoreHelper:_updateInputTypeSet(inputTypeList)
 	end
 
 	-- Unregister old types
-	for inputType, _ in pairs(remaining) do
+	for inputType, _ in remaining do
 		self:_unregisterAction(inputType)
 	end
 end

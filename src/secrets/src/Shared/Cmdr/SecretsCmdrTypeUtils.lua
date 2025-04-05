@@ -2,8 +2,6 @@
 	@class SecretsCmdrTypeUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local SecretsCmdrTypeUtils = {}
 
 function SecretsCmdrTypeUtils.registerSecretKeyTypes(cmdr, secretsService)
@@ -19,7 +17,7 @@ end
 function SecretsCmdrTypeUtils.makeSecretKeyType(cmdr, secretsService, isRequired)
 	return {
 		Transform = function(text)
-			local secretNames = secretsService:PromiseSecretKeyNamesList():Wait();
+		local secretNames = secretsService:PromiseSecretKeyNamesList():Wait()
 			local list
 			if not isRequired then
 				list = table.clone(secretNames)

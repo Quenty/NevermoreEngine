@@ -18,11 +18,12 @@ local PlayerInputModeUtils = require("PlayerInputModeUtils")
 local PlayerInputModeTypes = require("PlayerInputModeTypes")
 local RxPlayerUtils = require("RxPlayerUtils")
 local RxBrioUtils = require("RxBrioUtils")
+local _ServiceBag = require("ServiceBag")
 
 local PlayerInputModeServiceClient = {}
 PlayerInputModeServiceClient.ServiceName = "PlayerInputModeServiceClient"
 
-function PlayerInputModeServiceClient:Init(serviceBag)
+function PlayerInputModeServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -70,7 +71,7 @@ end
 	@param player Player
 	@return Observable<PlayerInputModeType>
 ]=]
-function PlayerInputModeServiceClient:ObservePlayerInputType(player)
+function PlayerInputModeServiceClient:ObservePlayerInputType(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerInputModeUtils.observePlayerInputModeType(player)
@@ -82,7 +83,7 @@ end
 	@param player Player
 	@return PlayerInputModeType
 ]=]
-function PlayerInputModeServiceClient:GetPlayerInputModeType(player)
+function PlayerInputModeServiceClient:GetPlayerInputModeType(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerInputModeUtils.getPlayerInputModeType(player)

@@ -1,28 +1,32 @@
+--!strict
 --[=[
 	Utility functions for querying text channels.
 	@class TextChannelUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local TextChatService = game:GetService("TextChatService")
 
 local TextChannelUtils = {}
 
-function TextChannelUtils.getDefaultTextChannel()
+function TextChannelUtils.getDefaultTextChannel(): TextChannel?
 	return TextChannelUtils.getTextChannel("RBXGeneral")
 end
 
-function TextChannelUtils.getTextChannel(channelName: string)
+function TextChannelUtils.getTextChannel(channelName: string): TextChannel?
 	local channels = TextChannelUtils.getTextChannels()
-	if not channels then
-		return
+	if channels == nil then
+		return nil
 	end
 
-	return channels:FindFirstChild(channelName)
+	local found = channels:FindFirstChild(channelName)
+	if found == nil or not found:IsA("TextChannel") then
+		return nil
+	end
+
+	return found
 end
 
-function TextChannelUtils.getTextChannels()
+function TextChannelUtils.getTextChannels(): Instance?
 	return TextChatService:FindFirstChild("TextChannels")
 end
 

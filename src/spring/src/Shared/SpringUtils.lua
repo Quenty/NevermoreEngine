@@ -1,14 +1,17 @@
+--!strict
 --[=[
 	Utility functions that are related to the Spring object
 	@class SpringUtils
 ]=]
 
-local EPSILON = 1e-6
-
 local require = require(script.Parent.loader).load(script)
+
 local LinearValue = require("LinearValue")
+local _Spring = require("Spring")
 
 local SpringUtils = {}
+
+local EPSILON = 1e-6
 
 --[=[
 	Utility function that returns whether or not a spring is animating based upon
@@ -19,21 +22,21 @@ local SpringUtils = {}
 	@param epsilon number? -- Optional epsilon
 	@return boolean, T
 ]=]
-function SpringUtils.animating(spring, epsilon)
-	epsilon = epsilon or EPSILON
+function SpringUtils.animating<T>(spring: _Spring.Spring<T>, epsilon: number?): (boolean, T)
+	local thisEpsilon = epsilon or EPSILON
 
 	local position = spring.Position
 	local target = spring.Target
 
 	local animating
 	if type(target) == "number" then
-		animating = math.abs(spring.Position - spring.Target) > epsilon
-			or math.abs(spring.Velocity) > epsilon
+		animating = math.abs((spring :: any).Position - (spring :: any).Target) > thisEpsilon
+			or math.abs((spring :: any).Velocity) > thisEpsilon
 	else
 		local rbxtype = typeof(target)
 		if rbxtype == "Vector3" or rbxtype == "Vector2" or LinearValue.isLinear(target) then
-			animating = (spring.Position - spring.Target).magnitude > epsilon
-				or spring.Velocity.magnitude > epsilon
+			animating = ((spring :: any).Position - (spring :: any).Target).magnitude > thisEpsilon
+				or (spring :: any).Velocity.magnitude > thisEpsilon
 		else
 			error("Unknown type")
 		end
@@ -42,7 +45,7 @@ function SpringUtils.animating(spring, epsilon)
 	if animating then
 		return true, position
 	else
-		-- We need to return the target so we use the actual target value (i.e. pretend like the spring is asleep)
+		-- We need to return the target so we use the actual target value (i.e. pretend like the (spring :: any) is asleep)
 		return false, target
 	end
 end
@@ -55,12 +58,12 @@ end
 	@param speed number
 	@return T
 ]=]
-function SpringUtils.getVelocityAdjustment(velocity, dampen, speed)
+function SpringUtils.getVelocityAdjustment<T>(velocity: T, dampen: number, speed: number): T
 	assert(velocity, "Bad velocity")
 	assert(dampen, "Bad dampen")
 	assert(speed, "Bad speed")
 
-	return velocity*(2*dampen/speed)
+	return (velocity :: any) * (2 * dampen / speed)
 end
 
 --[=[
@@ -70,7 +73,7 @@ end
 	@param value T
 	@return LinearValue<T> | T
 ]=]
-function SpringUtils.toLinearIfNeeded(value)
+function SpringUtils.toLinearIfNeeded<T>(value: T): LinearValue.LinearValue<T> | T
 	return LinearValue.toLinearIfNeeded(value)
 end
 
@@ -80,7 +83,7 @@ end
 	@param value LinearValue<T> | any
 	@return T | any
 ]=]
-function SpringUtils.fromLinearIfNeeded(value)
+function SpringUtils.fromLinearIfNeeded<T>(value: LinearValue.LinearValue<T> | T): T
 	return LinearValue.fromLinearIfNeeded(value)
 end
 

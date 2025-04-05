@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	To work like value objects in Roblox and track a single item,
 	with `.Changed` events
@@ -14,23 +15,55 @@ local Observable = require("Observable")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Signal = require("Signal")
 local ValueBaseUtils = require("ValueBaseUtils")
+local _Subscription = require("Subscription")
+local _Rx = require("Rx")
 
 local EMPTY_FUNCTION = function() end
 
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"
 
+export type TypeChecker = (value: any) -> (boolean, string?)
+
+export type ValueObjectTypeArg = string | TypeChecker
+
+export type ValueObject<T> = typeof(setmetatable(
+	{} :: {
+		--[=[
+			The value of the ValueObject
+			@prop Value T
+			@within ValueObject
+		]=]
+		Value: T,
+
+		--[=[
+			Event fires when the value's object value change
+			@prop Changed Signal<T> -- fires with oldValue, newValue, ...
+			@within ValueObject
+		]=]
+		Changed: Signal.Signal<(T, T, ...any)>,
+		LastEventContext: { any },
+
+		_checkType: ValueObjectTypeArg?,
+		_value: T,
+		_default: T?,
+		_lastEventContext: { any }?,
+		_lastMountedSub: _Subscription.Subscription<(T, ...any)>?,
+	},
+	ValueObject
+))
+
 --[=[
 	Constructs a new value object
 	@param baseValue T
-	@param checkType string | nil | (value: T) -> (boolean, string)
+	@param checkType string? | (value: T) -> (boolean, string?)
 	@return ValueObject
 ]=]
-function ValueObject.new(baseValue, checkType)
+function ValueObject.new<T>(baseValue: T?, checkType: ValueObjectTypeArg?): ValueObject<T>
 	local self = setmetatable({
-		_value = baseValue;
-		_default = baseValue;
-		_checkType = checkType;
+		_value = baseValue,
+		_default = baseValue,
+		_checkType = checkType,
 	}, ValueObject)
 
 	if type(checkType) == "string" then
@@ -41,22 +74,16 @@ function ValueObject.new(baseValue, checkType)
 		assert(checkType(baseValue))
 	end
 
-	return self
+	return self :: any
 end
-
---[=[
-	Event fires when the value's object value change
-	@prop Changed Signal<T> -- fires with oldValue, newValue, ...
-	@within ValueObject
-]=]
 
 --[=[
 	Returns the current check type, if any
 
-	@return string | nil | (value: T) -> (boolean, string)
+	@return string? | (value: T) -> (boolean, string)
 ]=]
-function ValueObject:GetCheckType()
-	return rawget(self, "_checkType")
+function ValueObject.GetCheckType<T>(self: ValueObject<T>): ValueObjectTypeArg?
+	return rawget(self :: any, "_checkType")
 end
 
 --[=[
@@ -64,7 +91,7 @@ end
 	@param observable Observable<T>
 	@return ValueObject<T>
 ]=]
-function ValueObject.fromObservable(observable)
+function ValueObject.fromObservable<T>(observable: Observable.Observable<T>): ValueObject<T>
 	local result = ValueObject.new()
 
 	result:Mount(observable)
@@ -77,11 +104,11 @@ end
 	@param value any
 	@return boolean
 ]=]
-function ValueObject.isValueObject(value)
+function ValueObject.isValueObject(value: any): boolean
 	return DuckTypeUtils.isImplementation(ValueObject, value)
 end
 
-function ValueObject:_toMountableObservable(value)
+function ValueObject._toMountableObservable<T>(_self: ValueObject<T>, value: T | Observable.Observable<T> | ValueBase)
 	if Observable.isObservable(value) then
 		return value
 	elseif typeof(value) == "Instance" then
@@ -91,9 +118,9 @@ function ValueObject:_toMountableObservable(value)
 		end
 	elseif type(value) == "table" then
 		if ValueObject.isValueObject(value) then
-			return value:Observe()
-		-- elseif Promise.isPromise(value) then
-		-- 	return Rx.fromPromise(value)
+			return (value :: any):Observe()
+			-- elseif Promise.isPromise(value) then
+			-- 	return Rx.fromPromise(value)
 		end
 	end
 
@@ -106,7 +133,7 @@ end
 	@param value Observable | T
 	@return MaidTask
 ]=]
-function ValueObject:Mount(value)
+function ValueObject.Mount<T>(self: ValueObject<T>, value: Observable.Observable<T> | T | ValueBase): () -> ()
 	local observable = self:_toMountableObservable(value)
 	if observable then
 		self:_cleanupLastMountedSub()
@@ -115,36 +142,36 @@ function ValueObject:Mount(value)
 			ValueObject._applyValue(self, ...)
 		end)
 
-		rawset(self, "_lastMountedSub", sub)
+		rawset(self :: any, "_lastMountedSub", sub)
 
 		return function()
-			if rawget(self, "_lastMountedSub") == sub then
+			if rawget(self :: any, "_lastMountedSub") == sub then
 				self:_cleanupLastMountedSub()
 			end
 		end
 	else
 		self:_cleanupLastMountedSub()
 
-		ValueObject._applyValue(self, value)
+		ValueObject._applyValue(self, value :: T)
 
 		return EMPTY_FUNCTION
 	end
 end
 
-function ValueObject:_cleanupLastMountedSub()
-	local lastSub = rawget(self, "_lastMountedSub")
+function ValueObject._cleanupLastMountedSub<T>(self: ValueObject<T>)
+	local lastSub = rawget(self :: any, "_lastMountedSub")
 	if lastSub then
-		rawset(self, "_lastMountedSub", nil)
+		rawset(self :: any, "_lastMountedSub", nil)
 		MaidTaskUtils.doTask(lastSub)
 	end
 end
 
 --[=[
 	Observes the current value of the ValueObject
-	@return Observable<T>
+	@return Observable<T?>
 ]=]
-function ValueObject:Observe()
-	local found = rawget(self, "_observable")
+function ValueObject.Observe<T>(self: ValueObject<T>): Observable.Observable<T?>
+	local found = rawget(self :: any, "_observable")
 	if found then
 		return found
 	end
@@ -161,8 +188,8 @@ function ValueObject:Observe()
 			sub:Fire(newValue, ...)
 		end)
 
-		local args = rawget(self, "_lastEventContext")
-		local value = rawget(self, "_value")
+		local args = rawget(self :: any, "_lastEventContext")
+		local value = rawget(self :: any, "_value")
 		if args then
 			sub:Fire(value, table.unpack(args, 1, args.n))
 		else
@@ -173,7 +200,7 @@ function ValueObject:Observe()
 	end)
 
 	-- We use a lot of these so let's cache the result which reduces the number of tables we have here
-	rawset(self, "_observable", created)
+	rawset(self :: any, "_observable", created)
 	return created
 end
 
@@ -183,7 +210,10 @@ end
 	@param condition function | nil -- optional
 	@return Observable<Brio<T>>
 ]=]
-function ValueObject:ObserveBrio(condition)
+function ValueObject.ObserveBrio<T>(
+	self: ValueObject<T>,
+	condition: _Rx.Predicate<T>?
+): Observable.Observable<Brio.Brio<T>>
 	assert(type(condition) == "function" or condition == nil, "Bad condition")
 
 	return Observable.new(function(sub)
@@ -196,7 +226,7 @@ function ValueObject:ObserveBrio(condition)
 
 		local maid = Maid.new()
 
-		local function handleNewValue(newValue, ...)
+		local function handleNewValue(newValue: T, ...)
 			if not condition or condition(newValue) then
 				local brio = Brio.new(newValue, ...)
 				maid._current = brio
@@ -206,11 +236,11 @@ function ValueObject:ObserveBrio(condition)
 			end
 		end
 
-		maid:GiveTask(self.Changed:Connect(function(newValue, _, ...)
+		maid:GiveTask(self.Changed:Connect(function(newValue, _previous, ...)
 			handleNewValue(newValue, ...)
 		end))
 
-		local args = rawget(self, "_lastEventContext")
+		local args = rawget(self :: any, "_lastEventContext")
 		if args then
 			handleNewValue(self.Value, table.unpack(args, 1, args.n))
 		else
@@ -218,7 +248,7 @@ function ValueObject:ObserveBrio(condition)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -237,21 +267,21 @@ end
 	@param ... any -- Additional args. Can be used to pass event changing state args with value
 	@return () -> () -- Cleanup
 ]=]
-function ValueObject:SetValue(value, ...)
+function ValueObject.SetValue<T>(self: ValueObject<T>, value: T, ...)
 	self:_cleanupLastMountedSub()
 
 	ValueObject._applyValue(self, value, ...)
 
 	return function()
-		if rawget(self, "_value") == value then
-			ValueObject._applyValue(self, rawget(self, "_default"))
+		if rawget(self :: any, "_value") == value then
+			ValueObject._applyValue(self, rawget(self :: any, "_default"))
 		end
 	end
 end
 
-function ValueObject:_applyValue(value, ...)
-	local previous = rawget(self, "_value")
-	local checkType = rawget(self, "_checkType")
+function ValueObject._applyValue<T>(self: ValueObject<T>, value: T, ...)
+	local previous = rawget(self :: any, "_value")
+	local checkType = rawget(self :: any, "_checkType")
 
 	if type(checkType) == "string" then
 		if typeof(value) ~= checkType then
@@ -263,40 +293,35 @@ function ValueObject:_applyValue(value, ...)
 
 	if previous ~= value then
 		if select("#", ...) > 0 then
-			rawset(self, "_lastEventContext", table.pack(...))
+			rawset(self :: any, "_lastEventContext", table.pack(...))
 		else
-			rawset(self, "_lastEventContext", nil)
+			rawset(self :: any, "_lastEventContext", nil)
 		end
 
-		rawset(self, "_value", value)
-		local changed = rawget(self, "Changed")
+		rawset(self :: any, "_value", value)
+		local changed = rawget(self :: any, "Changed")
 		if changed then
 			changed:Fire(value, previous, ...)
 		end
 	end
 end
 
---[=[
-	The value of the ValueObject
-	@prop Value T
-	@within ValueObject
-]=]
 function ValueObject:__index(index)
 	if ValueObject[index] then
 		return ValueObject[index]
 	elseif index == "Value" then
-		return self._value
+		return rawget(self :: any, "_value")
 	elseif index == "Changed" then
 		-- Defer construction of Changed event until something needs it, since a lot
 		-- of times we don't need it
 
 		local signal = Signal.new() -- :Fire(newValue, oldValue, ...)
 
-		rawset(self, "Changed", signal)
+		rawset(self :: any, "Changed", signal)
 
 		return signal
 	elseif index == "LastEventContext" then
-		local args = rawget(self, "_lastEventContext")
+		local args = rawget(self :: any, "_lastEventContext")
 		if args then
 			return table.unpack(args, 1, args.n)
 		else
@@ -325,18 +350,18 @@ end
 
 	Does not fire the event since 3.5.0
 ]=]
-function ValueObject:Destroy()
-	rawset(self, "_value", nil)
+function ValueObject.Destroy<T>(self: ValueObject<T>)
+	rawset(self :: any, "_value", nil)
 
 	self:_cleanupLastMountedSub()
 
 	-- Avoid using a maid here because we make a LOT of ValueObjects
-	local changed = rawget(self, "Changed")
+	local changed = rawget(self :: any, "Changed")
 	if changed then
 		changed:Destroy()
 	end
 
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return ValueObject

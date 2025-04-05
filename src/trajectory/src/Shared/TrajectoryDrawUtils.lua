@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class TrajectoryDrawUtils
 ]=]
@@ -15,7 +16,7 @@ local TrajectoryDrawUtils = {}
 --[=[
 	Draws a trajectory out for debugging purposes
 ]=]
-function TrajectoryDrawUtils.draw(velocity: Vector3, origin: Vector3, target: Vector3, accel: Vector3)
+function TrajectoryDrawUtils.draw(velocity: Vector3, origin: Vector3, target: Vector3, accel: Vector3): ()
 	Draw.point(origin, ORIGIN_COLOR)
 	Draw.point(target, FINISH_COLOR)
 

@@ -12,7 +12,7 @@ local RoguePropertyTable = {} -- inherits from RogueProperty
 RoguePropertyTable.ClassName = "RoguePropertyTable"
 RoguePropertyTable.__index = RoguePropertyTable
 
-function RoguePropertyTable.new(adornee, serviceBag, roguePropertyTableDefinition)
+function RoguePropertyTable.new(adornee: Instance, serviceBag, roguePropertyTableDefinition)
 	local self = setmetatable(RogueProperty.new(adornee, serviceBag, roguePropertyTableDefinition), RoguePropertyTable)
 
 	rawset(self, "_properties", {})
@@ -25,12 +25,12 @@ function RoguePropertyTable.new(adornee, serviceBag, roguePropertyTableDefinitio
 	return self
 end
 
-function RoguePropertyTable:SetCanInitialize(canInitialize)
+function RoguePropertyTable:SetCanInitialize(canInitialize: boolean)
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
 	RogueProperty.SetCanInitialize(self, canInitialize)
 
-	for _, property in pairs(self:GetRogueProperties()) do
+	for _, property in self:GetRogueProperties() do
 		property:SetCanInitialize(canInitialize)
 	end
 
@@ -44,7 +44,7 @@ function RoguePropertyTable:ObserveContainerBrio()
 	return self._definition:ObserveContainerBrio(self._adornee, self:CanInitialize())
 end
 
-function RoguePropertyTable:GetContainer()
+function RoguePropertyTable:GetContainer(): Instance
 	local cached = rawget(self, "_containerCache")
 	if cached and cached:IsDescendantOf(self._adornee) then
 		return cached
@@ -60,7 +60,7 @@ function RoguePropertyTable:SetBaseValue(newBaseValue)
 
 	local arrayData = {}
 
-	for propertyName, value in pairs(newBaseValue) do
+	for propertyName, value in newBaseValue do
 		if type(propertyName) == "string" then
 			local rogueProperty = self:GetRogueProperty(propertyName)
 			if not rogueProperty then
@@ -88,7 +88,7 @@ function RoguePropertyTable:SetValue(newValue)
 
 	local arrayData = {}
 
-	for propertyName, value in pairs(newValue) do
+	for propertyName, value in newValue do
 		if type(propertyName) == "string" then
 			local rogueProperty = self:GetRogueProperty(propertyName)
 			if not rogueProperty then
@@ -185,7 +185,7 @@ function RoguePropertyTable:_observeDictionary()
 	return Rx.combineLatest(toObserve)
 end
 
-function RoguePropertyTable:GetRogueProperty(name)
+function RoguePropertyTable:GetRogueProperty(name: string)
 	assert(type(name) == "string", "Bad name")
 
 	-- Caching these things doesn't do a whole lot, but saves on table allocation.

@@ -1,22 +1,21 @@
+--!strict
 --[=[
 	Utility methods to fire an event in a free thread, reusing threads
 
 	@class EventHandlerUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local EventHandlerUtils = {}
 
 -- The currently idle thread to run the next handler on
-local freeThreads = setmetatable({}, {__mode = "kv"})
+local freeThreads = setmetatable({} :: { [string]: thread }, { __mode = "kv" })
 
 -- Function which acquires the currently idle handler runner thread, runs the
 -- function fn on it, and then releases the thread, returning it to being the
 -- currently idle one.
 -- If there was a currently idle runner thread already, that's okay, that old
 -- one will just get thrown and eventually GCed.
-function EventHandlerUtils._fireEvent(memoryCategory, fn, ...)
+function EventHandlerUtils._fireEvent<T...>(memoryCategory: string, fn: (T...) -> (), ...: T...): ()
 	local acquiredRunnerThread = freeThreads[memoryCategory]
 	freeThreads[memoryCategory] = nil
 	fn(...)
@@ -27,7 +26,7 @@ end
 -- Coroutine runner that we create coroutines of. The coroutine can be
 -- repeatedly resumed with functions to run followed by the argument to run
 -- them with.
-function EventHandlerUtils._initializeThread(memoryCategory)
+function EventHandlerUtils._initializeThread(memoryCategory: string): ()
 	if memoryCategory == "" then
 		debug.setmemorycategory("signal_unknown")
 	else
@@ -46,12 +45,8 @@ end
 
 --[=[
 	Safely fires an event in the given memory category we're in
-
-	@param memoryCategory string
-	@param callback any
-	@param ... any
 ]=]
-function EventHandlerUtils.fire(memoryCategory, callback, ...)
+function EventHandlerUtils.fire<T...>(memoryCategory: string, callback: (T...) -> (), ...: T...): ()
 	assert(type(memoryCategory) == "string", "Bad memoryCategory")
 	assert(type(callback) == "function", "Bad callback")
 

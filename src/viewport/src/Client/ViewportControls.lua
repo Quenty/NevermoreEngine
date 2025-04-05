@@ -22,17 +22,20 @@ ViewportControls.__index = ViewportControls
     @param viewportModel Viewport
     @return BaseObject
 ]=]
-function ViewportControls.new(viewport, viewportModel)
+function ViewportControls.new(viewport: ViewportFrame, viewportModel)
 	local self = setmetatable(BaseObject.new(viewport), ViewportControls)
 
 	self._viewportModel = assert(viewportModel, "No rotationYaw")
 	self._enabled = self._maid:Add(ValueObject.new(true, "boolean"))
 
 	self._maid:GiveTask(self._obj.InputBegan:Connect(function(inputObject)
-		if (inputObject.UserInputType == Enum.UserInputType.MouseButton1
-			or inputObject.UserInputType == Enum.UserInputType.MouseButton2
-			or inputObject.UserInputType == Enum.UserInputType.Touch)
-			and self._enabled.Value then
+		if
+			(
+				inputObject.UserInputType == Enum.UserInputType.MouseButton1
+				or inputObject.UserInputType == Enum.UserInputType.MouseButton2
+				or inputObject.UserInputType == Enum.UserInputType.Touch
+			) and self._enabled.Value
+		then
 			self:_startDrag(inputObject)
 		end
 	end))
@@ -45,13 +48,13 @@ end
 
 	@param enabled boolean
 ]=]
-function ViewportControls:SetEnabled(enabled)
+function ViewportControls:SetEnabled(enabled: boolean)
 	assert(type(enabled) == "boolean", "Bad enabled")
 
 	self._enabled.Value = enabled
 end
 
-function ViewportControls:_startDrag(startInputObject)
+function ViewportControls:_startDrag(startInputObject: InputObject)
 	if self._maid._dragging then
 		return
 	end

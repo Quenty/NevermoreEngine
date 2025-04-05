@@ -42,11 +42,11 @@ end
 	@param randomValue number?
 	@return number
 ]=]
-function Math.jitter(average: number, spread: number, randomValue)
-	randomValue = randomValue or math.random()
-	spread = spread or 0.5 * average
+function Math.jitter(average: number, spread: number?, randomValue: number?): number
+	local randomInput = randomValue or math.random()
+	local thisSpread = spread or 0.5 * average
 
-	return average - 0.5 * spread + randomValue * spread
+	return average - 0.5 * thisSpread + randomInput * thisSpread
 end
 
 --[=[

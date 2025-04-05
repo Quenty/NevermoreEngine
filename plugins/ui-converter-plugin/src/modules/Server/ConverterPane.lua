@@ -54,7 +54,7 @@ function ConverterPane.new()
 	return self
 end
 
-function ConverterPane:SetupSettings(plugin)
+function ConverterPane:SetupSettings(plugin: Plugin)
 	task.spawn(function()
 		local hPosition = plugin:GetSetting("hDividerPosition")
 		if type(hPosition) == "number" then
@@ -75,13 +75,13 @@ function ConverterPane:SetupSettings(plugin)
 	end)
 end
 
-function ConverterPane:SetSelected(selectionList)
+function ConverterPane:SetSelected(selectionList: { Instance })
 	assert(type(selectionList) == "table", "Bad selectionList")
 
 	self._selectedList.Value = selectionList
 end
 
-function ConverterPane:_preview(code, library, className)
+function ConverterPane:_preview(code: string, library, className: string)
 	local result, loadstrErr
 	local ok, err = pcall(function()
 		local newCode
@@ -123,7 +123,6 @@ function ConverterPane:_preview(code, library, className)
 		return self:_showPreviewText(string.format("Cannot preview %q", className))
 	end
 
-
 	if not Observable.isObservable(observable) then
 		if self:_allObservables(observable) then
 			return Observable.new(function(sub)
@@ -132,7 +131,7 @@ function ConverterPane:_preview(code, library, className)
 				local parent = Instance.new("Folder")
 				parent.Name = "ObservableGroupedRender"
 
-				for _, observe in pairs(observable) do
+				for _, observe in observable do
 					maid:GiveTask(observe:Subscribe(function(inst)
 						inst.Parent = parent
 					end))
@@ -152,7 +151,7 @@ end
 
 function ConverterPane:_allObservables(observableList)
 	if type(observableList) == "table" then
-		for _, item in pairs(observableList) do
+		for _, item in observableList do
 			if not Observable.isObservable(item) then
 				return false
 			end
@@ -162,75 +161,75 @@ function ConverterPane:_allObservables(observableList)
 	return true
 end
 
-function ConverterPane:_sanitize(instance)
-	local function sanitize(inst)
+function ConverterPane:_sanitize(instance: Instance)
+	local function sanitize(inst: Instance)
 		if inst:IsA("Script") or inst:IsA("LocalScript") then
-			inst.Disabled = true
+			(inst :: any).Disabled = true
 			CollectionServiceUtils.removeAllTags(instance)
 		end
 	end
 
-	for _, item in pairs(instance:GetDescendants()) do
+	for _, item in instance:GetDescendants() do
 		sanitize(item)
 	end
 	sanitize(instance)
 end
 
-function ConverterPane:_setupPreview(maid, library, className)
-	maid:GiveTask(self._code:Observe()
-		:Pipe({
-			Rx.throttleTime(0.2);
-		})
-		:Subscribe(function(code)
-			maid._codeMaid = nil
+function ConverterPane:_setupPreview(maid: Maid.Maid, library, className: string)
+	-- stylua: ignore
+	maid:GiveTask(self._code:Observe():Pipe({
+		Rx.throttleTime(0.2),
+	}):Subscribe(function(code)
+		maid._codeMaid = nil
 
-			local codeMaid = Maid.new()
+		local codeMaid = Maid.new()
 
-			if type(code) ~= "string" or #code == 0 then
-				return self:_showPreviewText(string.format("Cannot preview %q", className))
+		if type(code) ~= "string" or #code == 0 then
+			return self:_showPreviewText(string.format("Cannot preview %q", className))
+		end
+
+		local alive = true
+		codeMaid:GiveTask(function()
+			alive = false
+		end)
+
+		task.spawn(function()
+			local observable = self:_preview(code, library, className)
+			if not alive then
+				return
 			end
 
-			local alive = true
+			local sub = observable:Subscribe(function(inst)
+			if not alive then
+				warn("Not alive. Should not be emitting.")
+				return
+			end
+
+				if typeof(inst) ~= "Instance" then
+				self._renderPreview.Value =
+					self:_showPreviewText(string.format("Did not got instance back for %s", className))
+					return
+				end
+
+				self:_sanitize(inst)
+				self._renderPreview.Value = inst
+			end)
+
+			if not alive then
+				sub:Destroy()
+				return
+			end
+
 			codeMaid:GiveTask(function()
-				alive = false
-			end)
-
-			task.spawn(function()
-				local observable = self:_preview(code, library, className)
-				if not alive then
-					return
-				end
-
-				local sub = observable:Subscribe(function(inst)
-					if not alive then
-						warn("Not alive. Should not be emitting.")
-						return
-					end
-
-					if typeof(inst) ~= "Instance" then
-						self._renderPreview.Value = self:_showPreviewText(string.format("Did not got instance back for", className))
-						return
-					end
-
-					self:_sanitize(inst)
-					self._renderPreview.Value = inst
-				end)
-
-				if not alive then
+				task.spawn(function()
 					sub:Destroy()
-					return
-				end
-
-				codeMaid:GiveTask(function()
-					task.spawn(function()
-						sub:Destroy()
-					end)
 				end)
 			end)
+		end)
 
-
-			maid._codeMaid = codeMaid
-		end))
+		maid._codeMaid = codeMaid
+		return
+	end))
 end
 
 function ConverterPane:_renderFromInstance(state)
@@ -257,17 +256,30 @@ function ConverterPane:_renderFromInstance(state)
 			local genMaid = Maid.new()
 
 			local codePromises = {}
-			genMaid:GivePromise(UIConverterUtils.promiseCreateLookupMap(state.library, self._converter, state.selectedList))
+			genMaid
+				:GivePromise(
+					UIConverterUtils.promiseCreateLookupMap(state.library, self._converter, state.selectedList)
+				)
 				:Then(function(refLookupMap)
-					for _, item in pairs(state.selectedList) do
-						table.insert(codePromises, genMaid:GivePromise(
-							UIConverterUtils.promiseToLibraryInstance(state.library, self._converter, item, refLookupMap)))
+					for _, item in state.selectedList do
+						table.insert(
+							codePromises,
+							genMaid:GivePromise(
+								UIConverterUtils.promiseToLibraryInstance(
+									state.library,
+									self._converter,
+									item,
+									refLookupMap
+								)
+							)
+						)
 					end
 
-					genMaid:GivePromise(PromiseUtils.all(codePromises))
+					genMaid
+						:GivePromise(PromiseUtils.all(codePromises))
 						:Then(function(...)
 							local results = {}
-							for _, item in pairs({...}) do
+							for _, item in { ... } do
 								if item then
 									table.insert(results, item)
 								end
@@ -289,16 +301,16 @@ function ConverterPane:_renderFromInstance(state)
 							ensureRenderPreview()
 						end)
 						:Catch(function(err)
-							self._code.Value = UIConverterUtils.toLuaComment("error while converting: " .. tostring(err))
+							self._code.Value =
+								UIConverterUtils.toLuaComment("error while converting: " .. tostring(err))
 						end)
-
 				end)
 
-
 			local clonePromises = {}
-			for _, item in pairs(state.selectedList) do
-				table.insert(clonePromises, genMaid:GivePromise(self._converter:PromiseCanClone(item))
-					:Then(function(canClone)
+			for _, item in state.selectedList do
+				table.insert(
+					clonePromises,
+					genMaid:GivePromise(self._converter:PromiseCanClone(item)):Then(function(canClone)
 						if canClone then
 							local copy = item:Clone()
 							if copy then
@@ -310,26 +322,30 @@ function ConverterPane:_renderFromInstance(state)
 						else
 							return nil
 						end
-					end))
+					end)
+				)
 			end
 
-			genMaid:GivePromise(PromiseUtils.all(clonePromises))
+			genMaid
+				:GivePromise(PromiseUtils.all(clonePromises))
 				:Then(function(...)
 					local results = {}
-					for _, item in pairs({...}) do
+					for _, item in { ... } do
 						if item then
 							table.insert(results, item)
 						end
 					end
 
 					if #results == 0 then
-						return self:_showPreviewText(string.format("Cannot preview %q", state.selectedList[1].ClassName))
+						return self:_showPreviewText(
+							string.format("Cannot preview %q", state.selectedList[1].ClassName)
+						)
 					elseif #results == 1 then
 						return results[1]
 					else
 						local folder = Instance.new("Folder")
 						folder.Name = "PreviewGrouping"
-						for _, item in pairs(results) do
+						for _, item in results do
 							item.Parent = folder
 						end
 						return folder
@@ -346,13 +362,13 @@ function ConverterPane:_renderFromInstance(state)
 		end
 
 		local observables = {}
-		for _, item in pairs(state.selectedList) do
+		for _, item in state.selectedList do
 			table.insert(observables, RxUIConverterUtils.observeAnyChangedBelowInst(item))
 		end
 
 		maid:GiveTask(Rx.merge(observables)
 			:Pipe({
-				Rx.throttleTime(0.2);
+				Rx.throttleTime(0.2),
 			})
 			:Subscribe(function()
 				generate()
@@ -368,46 +384,46 @@ function ConverterPane:_renderFromInstance(state)
 	self._maid._convertingMaid = maid
 end
 
-function ConverterPane:_showPreviewText(text)
-	local observable = Blend.New "Frame" {
-		Name = self._previewTextName;
-		Size = UDim2.new(1, 0, 1, 0);
-		BackgroundColor3 = Color3.fromRGB(46, 46, 46);
+function ConverterPane:_showPreviewText(text: string)
+	local observable = Blend.New("Frame")({
+		Name = self._previewTextName,
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundColor3 = Color3.fromRGB(46, 46, 46),
 		[Blend.Children] = {
-			Blend.New "TextLabel" {
-				Text = text or "Select an object";
-				Font = Enum.Font.Arial;
-				TextColor3 = Color3.fromRGB(170, 170, 170);
-				TextWrapped = true;
-				Size = UDim2.new(1, 0, 1, 0);
-				TextSize = 12;
-				BackgroundTransparency = 1;
-			};
-			Blend.New "UIPadding" {
-				PaddingLeft = UDim.new(0, 5);
-				PaddingRight = UDim.new(0, 5);
-				PaddingTop = UDim.new(0, 5);
-				PaddingBottom = UDim.new(0, 5);
-			};
-		};
-	}
+			Blend.New("TextLabel")({
+				Text = text or "Select an object",
+				Font = Enum.Font.Arial,
+				TextColor3 = Color3.fromRGB(170, 170, 170),
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 1, 0),
+				TextSize = 12,
+				BackgroundTransparency = 1,
+			}),
+			Blend.New("UIPadding")({
+				PaddingLeft = UDim.new(0, 5),
+				PaddingRight = UDim.new(0, 5),
+				PaddingTop = UDim.new(0, 5),
+				PaddingBottom = UDim.new(0, 5),
+			}),
+		},
+	})
 
 	observable._isPreviewText = true
 	return observable
 end
 
-function ConverterPane:_isRenderableInViewport(inst)
-	local function isRenderable(item)
+function ConverterPane:_isRenderableInViewport(inst: Instance): boolean
+	local function isRenderable(item): boolean
 		return item:IsA("Model") or item:IsA("BasePart") or item:IsA("Accessory")
 	end
 
-	local function isRenderableCheck(item)
+	local function isRenderableCheck(item: Instance): boolean
 		if isRenderable(item) then
 			return true
 		end
 
 		if item:IsA("Folder") then
-			for _, child in pairs(item:GetChildren()) do
+			for _, child in item:GetChildren() do
 				if isRenderable(child) then
 					return true
 				end
@@ -418,11 +434,13 @@ function ConverterPane:_isRenderableInViewport(inst)
 	end
 
 	if type(inst) == "table" then
-		for _, item in pairs(inst) do
+		for _, item in inst do
 			if isRenderableCheck(item) then
 				return true
 			end
 		end
+
+		return false
 	elseif typeof(inst) == "Instance" then
 		return isRenderableCheck(inst)
 	else
@@ -432,74 +450,74 @@ end
 
 function ConverterPane:_renderPreviewPane(previewValue)
 	local function transparentBacking(children)
-		return Blend.New "ImageLabel" {
-			Image = "rbxassetid://8541111131";
-			ScaleType = Enum.ScaleType.Tile;
-			TileSize = UDim2.fromOffset(100, 100);
-			Name = "InstanceRenderPreview";
-			Size = UDim2.new(1, 0, 1, 0);
-			Position = UDim2.new(0.5, 0, 1, 0);
-			AnchorPoint = Vector2.new(0.5, 1);
-			BackgroundColor3 = Color3.fromRGB(255, 255, 255);
-			ZIndex = -1;
+		return Blend.New("ImageLabel")({
+			Image = "rbxassetid://8541111131",
+			ScaleType = Enum.ScaleType.Tile,
+			TileSize = UDim2.fromOffset(100, 100),
+			Name = "InstanceRenderPreview",
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = UDim2.new(0.5, 0, 1, 0),
+			AnchorPoint = Vector2.new(0.5, 1),
+			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+			ZIndex = -1,
 
-			[Blend.Children] = children;
-		}
+			[Blend.Children] = children,
+		})
 	end
 
 	local function paddedContainer(child)
 		return {
-			Blend.New "Frame" {
-				Size = UDim2.new(1, 0, 1, 0);
-				BackgroundTransparency = 1;
+			Blend.New("Frame")({
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = 1,
 				[Blend.Children] = {
-					Blend.New "Frame" {
-						Name = "IsolatedContainer";
-						Size = UDim2.new(1, 0, 1, 0);
-						BackgroundColor3 = Color3.new(1, 1, 1);
-						BackgroundTransparency = 1;
-						[Blend.Children] = child;
-					};
+					Blend.New("Frame")({
+						Name = "IsolatedContainer",
+						Size = UDim2.new(1, 0, 1, 0),
+						BackgroundColor3 = Color3.new(1, 1, 1),
+						BackgroundTransparency = 1,
+						[Blend.Children] = child,
+					}),
 
-					Blend.New "UIPadding" {
-						PaddingLeft = UDim.new(0, 30);
-						PaddingRight = UDim.new(0, 30);
-						PaddingTop = UDim.new(0, 30);
-						PaddingBottom = UDim.new(0, 30);
-					};
-				};
-			};
+					Blend.New("UIPadding")({
+						PaddingLeft = UDim.new(0, 30),
+						PaddingRight = UDim.new(0, 30),
+						PaddingTop = UDim.new(0, 30),
+						PaddingBottom = UDim.new(0, 30),
+					}),
+				},
+			}),
 		}
 	end
 
 	local function previewTexture(texture)
-		return Blend.New "Frame" {
-			Size = UDim2.new(1, 0, 1, 0);
-			BackgroundTransparency = 1;
-			AnchorPoint = Vector2.new(0.5, 0.5);
-			Position = UDim2.new(0.5, 0, 0.5, 0);
+		return Blend.New("Frame")({
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
 			[Blend.Children] = {
-				Blend.New "UIAspectRatioConstraint" {
-					AspectRatio = 1;
-				};
-				Blend.New "ImageLabel" {
-					Size = UDim2.new(1, 0, 1, 0);
-					BackgroundTransparency = 1;
-					Image = texture;
-				};
-				transparentBacking();
-			}
-		}
+				Blend.New("UIAspectRatioConstraint")({
+					AspectRatio = 1,
+				}),
+				Blend.New("ImageLabel")({
+					Size = UDim2.new(1, 0, 1, 0),
+					BackgroundTransparency = 1,
+					Image = texture,
+				}),
+				transparentBacking(),
+			},
+		})
 	end
 
 	local function previewUIComponent(inst)
-		return Blend.New "Frame" {
-			BackgroundColor3 = Color3.new(1, 1, 1);
-			AnchorPoint = Vector2.new(0.5, 0.5);
-			Position = UDim2.new(0.5, 0, 0.5, 0);
-			Size = UDim2.new(1, 0, 1, 0);
-			[Blend.Children] = inst;
-		}
+		return Blend.New("Frame")({
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.new(1, 0, 1, 0),
+			[Blend.Children] = inst,
+		})
 	end
 
 	return Blend.Single(Blend.Dynamic(previewValue, function(inst)
@@ -507,14 +525,14 @@ function ConverterPane:_renderPreviewPane(previewValue)
 			if inst.Name == self._previewTextName then
 				return inst
 			elseif inst:IsA("LuaSourceContainer") then
-				return self:_previewCode(inst.Source)
+				return self:_previewCode((inst :: any).Source)
 			elseif self:_isRenderableInViewport(inst) then
 				if inst:IsA("Folder") then
 					-- So we can generate a bounding box on this item.
 					local model = Instance.new("Model")
 					model.Name = inst.Name
 
-					for _, child in pairs(inst:GetChildren()) do
+					for _, child in inst:GetChildren() do
 						child.Parent = model
 					end
 					inst = model
@@ -537,7 +555,7 @@ function ConverterPane:_renderPreviewPane(previewValue)
 		end
 
 		return paddedContainer(transparentBacking(inst))
-	end));
+	end))
 end
 
 function ConverterPane:_previewCode(codeValue)
@@ -620,7 +638,7 @@ function ConverterPane:Render(props)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 			self._draggingState.Value = false
 		end
-	end;
+	end
 
 	local DIVIDER_WIDTH = 4 -- should be divisible by 2
 	local HEADER_HEIGHT = 24
@@ -634,7 +652,7 @@ function ConverterPane:Render(props)
 			Font = Enum.Font.Arial;
 			TextSize = 12;
 			BackgroundColor3 = Color3.fromRGB(53, 53, 53);
-		};
+		}
 	end
 
 	local function content(child)
@@ -671,7 +689,7 @@ function ConverterPane:Render(props)
 				Name = "LeftPreviewFrame";
 				Position = UDim2.new(0, 0, 0, 0);
 				Size = Blend.Computed(self._hDividerPosition, function(hPosition)
-					return UDim2.new(hPosition, -DIVIDER_WIDTH/2, 1, 0);
+					return UDim2.new(hPosition, -DIVIDER_WIDTH/2, 1, 0)
 				end);
 
 				-- BackgroundColor3 = Color3.fromRGB(37, 37, 37);
@@ -696,7 +714,7 @@ function ConverterPane:Render(props)
 
 				[Blend.OnEvent "InputEnded"] = function(inputObject)
 					if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-						self._draggingState.Value = false;
+						self._draggingState.Value = false
 					else
 						handleInputEnd(inputObject)
 					end
@@ -719,7 +737,7 @@ function ConverterPane:Render(props)
 				Position = UDim2.new(1, 0, 0, 0);
 				AnchorPoint = Vector2.new(1, 0);
 				Size = Blend.Computed(self._vDividerPosition, self._hDividerPosition, function(vPosition, hPosition)
-					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, vPosition, 0);
+					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, vPosition, 0)
 				end);
 				BackgroundTransparency = 1;
 
@@ -735,11 +753,11 @@ function ConverterPane:Render(props)
 			Blend.New "TextButton" {
 				AutoButtonColor = true;
 				Position = Blend.Computed(self._vDividerPosition, function(vPosition)
-					return UDim2.new(1, 0, vPosition, 0);
+					return UDim2.new(1, 0, vPosition, 0)
 				end);
 				AnchorPoint = Vector2.new(1, 0.5);
 				Size = Blend.Computed(self._hDividerPosition, function(hPosition)
-					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, 0, DIVIDER_WIDTH);
+					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, 0, DIVIDER_WIDTH)
 				end);
 				BackgroundColor3 = Color3.fromRGB(60, 60, 60);
 
@@ -754,7 +772,7 @@ function ConverterPane:Render(props)
 			Blend.New "TextButton" {
 				AutoButtonColor = true;
 				Position = Blend.Computed(self._hDividerPosition, function(hPosition)
-					return UDim2.new(hPosition, 0, 0, 0);
+					return UDim2.new(hPosition, 0, 0, 0)
 				end);
 				AnchorPoint = Vector2.new(0.5, 0);
 				Size = UDim2.new(0, DIVIDER_WIDTH, 1, 0);
@@ -774,7 +792,7 @@ function ConverterPane:Render(props)
 				Position = UDim2.new(1, 0, 1, 0);
 				AnchorPoint = Vector2.new(1, 1);
 				Size = Blend.Computed(self._vDividerPosition, self._hDividerPosition, function(vPosition, hPosition)
-					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, 1 - vPosition, -DIVIDER_WIDTH/2);
+					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, 1 - vPosition, -DIVIDER_WIDTH/2)
 				end);
 				BackgroundTransparency = 1;
 

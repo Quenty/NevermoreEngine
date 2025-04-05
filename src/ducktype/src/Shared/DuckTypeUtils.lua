@@ -1,10 +1,9 @@
+--!strict
 --[=[
 	Utility method to check interface is equivalent for two implementations
 
 	@class DuckTypeUtils
 ]=]
-
-local require = require(script.Parent.loader).load(script)
 
 local DuckTypeUtils = {}
 
@@ -34,7 +33,7 @@ function DuckTypeUtils._checkInterface(template: any, target: any): boolean
 		return false
 	end
 
-	for key, value in pairs(template) do
+	for key, value in template do
 		if type(value) == "function" and type(target[key]) ~= "function" then
 			return false
 		end

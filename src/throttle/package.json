@@ -26,7 +26,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "file:../loader",
+    "@quenty/typeutils": "file:../typeutils"
   },
   "devDependencies": {
     "@quenty/loader": "file:../loader"

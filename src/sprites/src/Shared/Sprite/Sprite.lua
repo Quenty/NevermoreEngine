@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	A single image on a spritesheet.
 	@class Sprite
@@ -6,6 +7,16 @@
 local Sprite = {}
 Sprite.ClassName = "Sprite"
 Sprite.__index = Sprite
+
+export type Sprite = typeof(setmetatable(
+	{} :: {
+		Texture: string,
+		Size: Vector2,
+		Position: Vector2,
+		Name: string,
+	},
+	Sprite
+))
 
 --[=[
 	Data used to construct a sprite.
@@ -16,13 +27,19 @@ Sprite.__index = Sprite
 	.Name string
 	@within Sprite
 ]=]
+export type SpriteData = {
+	Texture: string,
+	Size: Vector2,
+	Position: Vector2,
+	Name: string,
+}
 
 --[=[
 	Constructs a new sprite
 	@param data SpriteData
 	@return Sprite
 ]=]
-function Sprite.new(data)
+function Sprite.new(data: SpriteData): Sprite
 	assert(data.Texture, "Bad data")
 	assert(data.Size, "Bad data")
 	assert(data.Position, "Bad data")
@@ -38,12 +55,11 @@ end
 	@param gui ImageLabel | ImageButton
 	@return Instance
 ]=]
-function Sprite:Style(gui)
-	assert(typeof(gui) == "Instance" and (gui:IsA("ImageLabel") or gui:IsA("ImageButton")), "Bad gui")
-
-	gui.Image = self.Texture
-	gui.ImageRectOffset = self.Position
-	gui.ImageRectSize = self.Size
+function Sprite:Style(gui: ImageLabel | ImageButton)
+	assert(typeof(gui) == "Instance" and (gui:IsA("ImageLabel") or gui:IsA("ImageButton")), "Bad gui");
+	(gui :: ImageLabel).Image = self.Texture;
+	(gui :: ImageLabel).ImageRectOffset = self.Position;
+	(gui :: ImageLabel).ImageRectSize = self.Size
 
 	return gui
 end
@@ -53,10 +69,10 @@ end
 	@param instanceType "ImageLabel" | "ImageButton"
 	@return ImageLabel | ImageButton
 ]=]
-function Sprite:Get(instanceType)
+function Sprite:Get(instanceType: "ImageLabel" | "ImageButton"): ImageLabel | ImageButton
 	assert(type(instanceType) == "string", "Bad instanceType")
 
-	local gui = Instance.new(instanceType)
+	local gui: any = Instance.new(instanceType)
 	gui.Size = UDim2.new(0, self.Size.X, 0, self.Size.Y)
 	gui.Name = self.Name
 	gui.BackgroundTransparency = 1

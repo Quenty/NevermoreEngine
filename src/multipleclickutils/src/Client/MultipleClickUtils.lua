@@ -21,10 +21,10 @@ local VALID_TYPES = {
 
 --[=[
 	Observes a double click on the Gui
-	@param gui GuiBase
+	@param gui GuiObject
 	@return Observable<InputObject>
 ]=]
-function MultipleClickUtils.observeDoubleClick(gui)
+function MultipleClickUtils.observeDoubleClick(gui: GuiObject)
 	return MultipleClickUtils.observeMultipleClicks(gui, 2)
 end
 
@@ -32,31 +32,30 @@ end
 	Returns a signal that fires when the player clicks or taps on a Gui twice.
 
 	@param maid Maid
-	@param gui GuiBase
+	@param gui GuiObject
 	@return Signal<InputObject>
 ]=]
-function MultipleClickUtils.getDoubleClickSignal(maid, gui)
-	return MultipleClickUtils.getDoubleClickSignal(maid, gui, 2)
+function MultipleClickUtils.getDoubleClickSignal(maid, gui: GuiObject)
+	return MultipleClickUtils.getMultipleClickSignal(maid, gui, 2)
 end
 
 --[=[
 	Observes multiple clicks click on the Gui
 
-	@param gui GuiBase
+	@param gui GuiObject
 	@param requiredCount number
 	@return Observable<InputObject>
 ]=]
-function MultipleClickUtils.observeMultipleClicks(gui, requiredCount)
+function MultipleClickUtils.observeMultipleClicks(gui: GuiObject, requiredCount: number)
 	assert(typeof(gui) == "Instance", "Bad gui")
 	assert(type(requiredCount) == "number", "Bad requiredCount")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		maid:GiveTask(MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
-			:Connect(function(...)
-				sub:Fire(...)
-			end))
+		maid:GiveTask(MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount):Connect(function(...)
+			sub:Fire(...)
+		end))
 
 		return maid
 	end)
@@ -74,12 +73,12 @@ end
 	```
 
 	@param requiredCount number
-	@return (gui: GuiBase) -> Observable<InputObject>
+	@return (gui: GuiObject) -> Observable<InputObject>
 ]=]
-function MultipleClickUtils.onMultipleClicks(requiredCount)
+function MultipleClickUtils.onMultipleClicks(requiredCount: number)
 	assert(type(requiredCount) == "number", "Bad requiredCount")
 
-	return function(gui)
+	return function(gui: GuiObject)
 		return MultipleClickUtils.observeMultipleClicks(gui, requiredCount)
 	end
 end
@@ -89,11 +88,11 @@ end
 	of times.
 
 	@param maid Maid
-	@param gui GuiBase
+	@param gui GuiObject
 	@param requiredCount number
 	@return Signal<InputObject>
 ]=]
-function MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
+function MultipleClickUtils.getMultipleClickSignal(maid, gui: GuiObject, requiredCount: number)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(gui) == "Instance", "Bad gui")
 	assert(type(requiredCount) == "number", "Bad requiredCount")

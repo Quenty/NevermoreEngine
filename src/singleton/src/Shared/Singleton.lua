@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	This class converts a class into a singleton
 	@class Singleton
@@ -5,11 +6,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local _ServiceBag = require("ServiceBag")
+
 local Singleton = {}
 Singleton.ClassName = "Singleton"
 Singleton.__index = Singleton
 
-function Singleton.new(serviceName, constructor)
+function Singleton.new(serviceName: string, constructor)
 	assert(type(serviceName) == "string", "Bad serviceName")
 	assert(type(constructor) == "function", "Bad constructor")
 
@@ -21,7 +24,7 @@ function Singleton.new(serviceName, constructor)
 	return self
 end
 
-function Singleton:Init(serviceBag)
+function Singleton:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(self ~= Singleton, "Cannot initialize Singleton template directly")
 
 	local object = self._constructor(serviceBag)

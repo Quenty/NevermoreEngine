@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Tracks a player's current team, since the Team property is unreliable
 	@class TeamTracker
@@ -12,16 +13,23 @@ local TeamTracker = {}
 TeamTracker.ClassName = "TeamTracker"
 TeamTracker.__index = TeamTracker
 
-function TeamTracker.new(player: Player)
+export type TeamTracker = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_player: Player,
+
+		CurrentTeam: ValueObject.ValueObject<Team?>,
+	},
+	{ __index = TeamTracker }
+))
+
+function TeamTracker.new(player: Player): TeamTracker
 	local self = setmetatable({}, TeamTracker)
 
 	self._player = assert(player, "No player")
-
 	self._maid = Maid.new()
 
-	self.CurrentTeam = ValueObject.new() -- Holds a Roblox team
-	self.CurrentTeam.Value = nil
-	self._maid:GiveTask(self.CurrentTeam)
+	self.CurrentTeam = self._maid:Add(ValueObject.new(nil)) -- Holds a Roblox team
 
 	self._maid:GiveTask(self._player:GetPropertyChangedSignal("TeamColor"):Connect(function()
 		self:_updateCurrentTeam()
@@ -37,11 +45,11 @@ function TeamTracker.new(player: Player)
 	return self
 end
 
-function TeamTracker:GetPlayer(): Player
+function TeamTracker.GetPlayer(self: TeamTracker): Player
 	return self._player
 end
 
-function TeamTracker:_updateCurrentTeam()
+function TeamTracker._updateCurrentTeam(self: TeamTracker)
 	if self._player.Neutral then
 		self.CurrentTeam.Value = nil
 		return
@@ -50,9 +58,9 @@ function TeamTracker:_updateCurrentTeam()
 	self.CurrentTeam.Value = self._player.Team
 end
 
-function TeamTracker:Destroy()
+function TeamTracker.Destroy(self: TeamTracker)
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return TeamTracker

@@ -5,7 +5,7 @@ jobs:
     uses: ./.github/workflows/lint.yml
 
   release:
-    needs: lint
+    needs: [lint]
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
     steps:
@@ -38,6 +38,16 @@ jobs:
         run: npm run build
         working-directory: tools/nevermore-template-helpers
 
+      - name: Setup npm for GitHub Packages
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Run `npm install --no-package-lock` on nevermore-cli
         run: npm install --no-package-lock
         working-directory: tools/nevermore-cli
@@ -48,6 +58,9 @@ jobs:
 
       - name: Run npm install
         run: npm install --no-save
+
+      - name: Git reset .npmrc
+        run: git checkout .npmrc
 
       - name: Create Release
         env:

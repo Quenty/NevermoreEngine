@@ -11,10 +11,10 @@ local AnimationTrackUtils = {}
 	@param animationId string
 	@return Animation
 ]=]
-function AnimationTrackUtils.loadAnimationFromId(animatorOrHumanoid, animationId)
+function AnimationTrackUtils.loadAnimationFromId(animatorOrHumanoid: Humanoid | Animator, animationId: string): AnimationTrack
 	local animation = Instance.new("Animation")
 	animation.AnimationId = animationId
-	return animatorOrHumanoid:LoadAnimation(animation)
+	return (animatorOrHumanoid :: any):LoadAnimation(animation)
 end
 
 --[=[
@@ -24,7 +24,7 @@ end
 	@param fadeTime number
 	@return Animation
 ]=]
-function AnimationTrackUtils.setWeightTargetIfNotSet(track, weight, fadeTime)
+function AnimationTrackUtils.setWeightTargetIfNotSet(track: AnimationTrack, weight: number, fadeTime: number)
 	assert(typeof(track) == "Instance", "Bad track")
 	assert(type(weight) == "number", "Bad weight")
 	assert(type(fadeTime) == "number", "Bad fadeTime")

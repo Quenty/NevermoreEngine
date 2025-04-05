@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helper methods for finding and retrieving the [PlayerGui] instance
 	@class PlayerGuiUtils

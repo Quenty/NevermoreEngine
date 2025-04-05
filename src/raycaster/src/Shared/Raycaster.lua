@@ -47,7 +47,7 @@ function Raycaster:Ignore(tableOrInstance)
 		return
 	elseif type(tableOrInstance) == "table" then
 		local ignoreList = self.IgnoreList
-		for _, item in pairs(tableOrInstance) do
+		for _, item in tableOrInstance do
 			table.insert(ignoreList, item)
 		end
 	else

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class FunnelStepTracker
 ]=]
@@ -6,28 +7,52 @@ local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
+local _Maid = require("Maid")
 
 local FunnelStepTracker = setmetatable({}, BaseObject)
 FunnelStepTracker.ClassName = "FunnelStepTracker"
 FunnelStepTracker.__index = FunnelStepTracker
 
-function FunnelStepTracker.new()
-	local self = setmetatable(BaseObject.new(), FunnelStepTracker)
+export type FunnelStepTracker = typeof(setmetatable(
+	{} :: {
+		_maid: _Maid.Maid,
+		_stepsLogged: { [number]: string },
+		StepLogged: Signal.Signal<number, string>,
+	},
+	{ __index = FunnelStepTracker }
+))
+
+--[=[
+	Constructs a new FunnelStepTracker
+
+	@return FunnelStepTracker
+]=]
+function FunnelStepTracker.new(): FunnelStepTracker
+	local self: FunnelStepTracker = setmetatable(BaseObject.new() :: any, FunnelStepTracker)
 
 	self._stepsLogged = {}
 
-	self.StepLogged = self._maid:Add(Signal.new())
+	self.StepLogged = self._maid:Add(Signal.new() :: any)
 
 	return self
 end
 
-function FunnelStepTracker:LogStep(stepNumber, stepName)
+--[=[
+	Logs a step
+]=]
+function FunnelStepTracker.LogStep(self: FunnelStepTracker, stepNumber: number, stepName: string): ()
 	assert(type(stepNumber) == "number", "Bad stepNumber")
 	assert(type(stepName) == "string", "Bad stepName")
 
 	if self._stepsLogged[stepNumber] then
 		if self._stepsLogged[stepNumber] ~= stepName then
-			error(string.format("[FunnelStepTracker.LogStep] - Trying to log step with 2 separate names, %q and %q", self._stepsLogged[stepNumber], stepNumber))
+			error(
+				string.format(
+					"[FunnelStepTracker.LogStep] - Trying to log step with 2 separate names, %q and %d",
+					self._stepsLogged[stepNumber],
+					stepNumber
+				)
+			)
 		end
 
 		return
@@ -38,17 +63,31 @@ function FunnelStepTracker:LogStep(stepNumber, stepName)
 	self.StepLogged:Fire(stepNumber, stepName)
 end
 
-function FunnelStepTracker:IsStepComplete(stepNumber)
+--[=[
+	Returns true if the step is complete
+
+	@param stepNumber number
+	@return string?
+]=]
+function FunnelStepTracker.IsStepComplete(self: FunnelStepTracker, stepNumber: number): boolean
 	assert(type(stepNumber) == "number", "Bad stepNumber")
 
 	return self._stepsLogged[stepNumber] ~= nil
 end
 
-function FunnelStepTracker:GetLoggedSteps()
+--[=[
+	Gets the logged steps
+
+	@return { [number]: string }
+]=]
+function FunnelStepTracker.GetLoggedSteps(self: FunnelStepTracker): { [number]: string }
 	return table.clone(self._stepsLogged)
 end
 
-function FunnelStepTracker:ClearLoggedSteps()
+--[=[
+	Clears all logged steps
+]=]
+function FunnelStepTracker.ClearLoggedSteps(self: FunnelStepTracker)
 	table.clear(self._stepsLogged)
 end
 

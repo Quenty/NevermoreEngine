@@ -71,8 +71,8 @@ end
 	@param groupName string
 	@return BinderGroup?
 ]=]
-function BinderGroupProvider:Get(groupName)
-	assert(type(groupName) == "string", "groupName must be a string")
+function BinderGroupProvider:Get(groupName: string)
+	assert(type(groupName) == "string", "Bad groupName")
 	return rawget(self, groupName)
 end
 

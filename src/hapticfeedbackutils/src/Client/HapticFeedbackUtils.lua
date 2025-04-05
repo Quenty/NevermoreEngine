@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving haptic feedback on gamepads.
 	@class HapticFeedbackUtils
@@ -14,7 +15,7 @@ local HapticFeedbackUtils = {}
 	@param length number
 	@param amplitude number
 ]=]
-function HapticFeedbackUtils.smallVibrate(userInputType, length, amplitude)
+function HapticFeedbackUtils.smallVibrate(userInputType: Enum.UserInputType, length: number, amplitude: number)
 	length = length or 0.1
 	amplitude = amplitude or 1
 
@@ -31,7 +32,7 @@ end
 	@param amplitude number
 	@return boolean
 ]=]
-function HapticFeedbackUtils.setSmallVibration(userInputType, amplitude)
+function HapticFeedbackUtils.setSmallVibration(userInputType: Enum.UserInputType, amplitude: number): boolean
 	assert(type(amplitude) == "number", "Bad amplitude")
 
 	return HapticFeedbackUtils.setVibrationMotor(userInputType, Enum.VibrationMotor.Small, amplitude)
@@ -43,7 +44,7 @@ end
 	@param amplitude number
 	@return boolean
 ]=]
-function HapticFeedbackUtils.setLargeVibration(userInputType, amplitude)
+function HapticFeedbackUtils.setLargeVibration(userInputType: Enum.UserInputType, amplitude: number): boolean
 	assert(type(amplitude) == "number", "Bad amplitude")
 
 	return HapticFeedbackUtils.setVibrationMotor(userInputType, Enum.VibrationMotor.Large, amplitude)
@@ -57,7 +58,7 @@ end
 	@param ... number -- vibrationValues
 	@return boolean
 ]=]
-function HapticFeedbackUtils.setVibrationMotor(userInputType, vibrationMotor, amplitude, ...)
+function HapticFeedbackUtils.setVibrationMotor(userInputType: Enum.UserInputType, vibrationMotor: Enum.VibrationMotor, amplitude: number, ...: number): boolean
 	assert(type(amplitude) == "number", "Bad amplitude")
 
 	if not HapticService:IsVibrationSupported(userInputType) then

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Authored by Egomoose, modified by Quenty
 
@@ -10,16 +11,16 @@ local SwingTwistUtils = {}
 	Decomposes a CFrame into a swing and a twist.
 	@param cf CFrame
 	@param direction Vector3
-	@return Vector3 -- swing
-	@return Vector3 -- twist
+	@return CFrame -- swing
+	@return CFrame -- twist
 ]=]
-function SwingTwistUtils.swingTwist(cf, direction)
+function SwingTwistUtils.swingTwist(cf: CFrame, direction: Vector3): (CFrame, CFrame)
 	local axis, theta = cf:ToAxisAngle()
 	-- convert to quaternion
-	local w, v = math.cos(theta/2),  math.sin(theta/2)*axis
+	local w, v = math.cos(theta / 2), math.sin(theta / 2) * axis
 
 	-- (v . d)*d, plug into CFrame quaternion constructor with w it will solve rest for us
-	local proj = v:Dot(direction)*direction
+	local proj = v:Dot(direction) * direction
 	local twist = CFrame.new(0, 0, 0, proj.X, proj.Y, proj.Z, w)
 
 	-- cf = swing * twist, thus...
@@ -33,7 +34,7 @@ end
 	@param direction Vector3
 	@return number
 ]=]
-function SwingTwistUtils.twistAngle(cf, direction)
+function SwingTwistUtils.twistAngle(cf: CFrame, direction: Vector3): number
 	local axis, theta = cf:ToAxisAngle()
 	local w, v = math.cos(theta/2),  math.sin(theta/2)*axis
 	local proj = v:Dot(direction)*direction

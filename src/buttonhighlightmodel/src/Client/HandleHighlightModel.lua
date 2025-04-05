@@ -40,7 +40,7 @@ end
 	Sets the handle for the highlight model.
 	@param handle
 ]=]
-function HandleHighlightModel:SetHandle(handle: Instance)
+function HandleHighlightModel:SetHandle(handle: HandleAdornment)
 	assert(typeof(handle) == "Instance" or handle == nil, "Bad handle")
 
 	local maid = Maid.new()

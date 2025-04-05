@@ -299,12 +299,12 @@ end
 	@param index number
 	@return ObservableList<TValue>
 ]=]
-function ObservableMapList:GetListOfValuesAtListIndex(index)
+function ObservableMapList:GetListOfValuesAtListIndex(index: number)
 	assert(type(index) == "number", "Bad index")
 
 	local list = table.create(self._observableMapOfLists:GetCount())
 
-	for _, observableList in pairs(self._observableMapOfLists:GetValueList()) do
+	for _, observableList in self._observableMapOfLists:GetValueList() do
 		local value = observableList:Get(index)
 		if value ~= nil then
 			table.insert(list, value)

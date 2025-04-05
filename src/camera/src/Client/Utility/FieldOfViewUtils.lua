@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving field of view.
 	@class FieldOfViewUtils
@@ -14,8 +15,8 @@ local FieldOfViewUtils = {}
 	@param fov number
 	@return number
 ]=]
-function FieldOfViewUtils.fovToHeight(fov)
-    return 2*math.tan(math.rad(fov)/2)
+function FieldOfViewUtils.fovToHeight(fov: number): number
+	return 2 * math.tan(math.rad(fov) / 2)
 end
 
 --[=[
@@ -23,8 +24,8 @@ end
 	@param height number
 	@return number
 ]=]
-function FieldOfViewUtils.heightToFov(height)
-    return 2*math.deg(math.atan(height/2))
+function FieldOfViewUtils.heightToFov(height: number): number
+	return 2 * math.deg(math.atan(height / 2))
 end
 
 --[=[
@@ -33,10 +34,10 @@ end
 	@param linearAt number
 	@return number
 ]=]
-function FieldOfViewUtils.safeLog(height, linearAt)
+function FieldOfViewUtils.safeLog(height: number, linearAt: number): number
 	if height < linearAt then
-		local slope = 1/linearAt
-		return slope*(height - linearAt) + math.log(linearAt)
+		local slope = 1 / linearAt
+		return slope * (height - linearAt) + math.log(linearAt)
 	else
 		return math.log(height)
 	end
@@ -49,11 +50,11 @@ end
 	@param linearAt number
 	@return number
 ]=]
-function FieldOfViewUtils.safeExp(logHeight, linearAt)
+function FieldOfViewUtils.safeExp(logHeight: number, linearAt: number): number
 	local transitionAt = math.log(linearAt)
 
 	if logHeight <= transitionAt then
-		return linearAt*(logHeight - transitionAt) + linearAt
+		return linearAt * (logHeight - transitionAt) + linearAt
 	else
 		return math.exp(logHeight)
 	end
@@ -66,7 +67,7 @@ end
 	@param percent number
 	@return number -- Fov in degrees
 ]=]
-function FieldOfViewUtils.lerpInHeightSpace(fov0, fov1, percent)
+function FieldOfViewUtils.lerpInHeightSpace(fov0: number, fov1: number, percent: number): number
 	local height0 = FieldOfViewUtils.fovToHeight(fov0)
 	local height1 = FieldOfViewUtils.fovToHeight(fov1)
 

@@ -15,12 +15,14 @@ local ScoredAction = setmetatable({}, BaseObject)
 ScoredAction.ClassName = "ScoredAction"
 ScoredAction.__index = ScoredAction
 
+export type ScoredAction = typeof(setmetatable({}, ScoredAction))
+
 --[=[
 	Constructs a new ScoredAction. Should not be called directly. See [ScoredActionServiceClient.GetScoredAction].
 
 	@return ScoredAction
 ]=]
-function ScoredAction.new()
+function ScoredAction.new(): ScoredAction
 	local self = setmetatable(BaseObject.new(), ScoredAction)
 
 	self._score = -math.huge
@@ -50,7 +52,7 @@ end
 	Returns whether the action is currently preferred
 	@return boolean
 ]=]
-function ScoredAction:IsPreferred()
+function ScoredAction:IsPreferred(): boolean
 	return self._preferredStack:GetState()
 end
 
@@ -70,7 +72,7 @@ end
 
 	@param score number
 ]=]
-function ScoredAction:SetScore(score)
+function ScoredAction:SetScore(score: number)
 	assert(type(score) == "number", "Bad score")
 
 	self._score = score
@@ -80,7 +82,7 @@ end
 	Retrieves the score
 	@return number
 ]=]
-function ScoredAction:GetScore()
+function ScoredAction:GetScore(): number
 	return self._score
 end
 

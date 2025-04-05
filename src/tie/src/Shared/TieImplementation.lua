@@ -25,7 +25,7 @@ TieImplementation.__index = TieImplementation
 	@param implementer table
 	@param implementationTieRealm TieRealm
 ]=]
-function TieImplementation.new(tieDefinition, adornee: Instance, implementer, implementationTieRealm)
+function TieImplementation.new(tieDefinition, adornee: Instance, implementer, implementationTieRealm: TieRealms.TieRealm)
 	assert(TieRealmUtils.isTieRealm(implementationTieRealm), "Bad implementationTieRealm")
 
 	local self = setmetatable(BaseObject.new(), TieImplementation)
@@ -115,7 +115,7 @@ function TieImplementation:__newindex(index, value)
 end
 
 function TieImplementation:_buildMemberImplementations(implementer)
-	for _, memberDefinition in pairs(self._memberMap) do
+	for _, memberDefinition in self._memberMap do
 		local memberName = memberDefinition:GetMemberName()
 		local found = nil
 

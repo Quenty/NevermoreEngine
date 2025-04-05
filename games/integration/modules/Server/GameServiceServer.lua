@@ -4,9 +4,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local _ServiceBag = require("ServiceBag")
+
 local GameServiceServer = {}
 
-function GameServiceServer:Init(serviceBag)
+function GameServiceServer:Init(serviceBag: _ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	-- External

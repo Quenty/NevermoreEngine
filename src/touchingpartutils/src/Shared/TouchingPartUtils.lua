@@ -13,6 +13,12 @@ local EMPTY_FUNCTION = function() end
 
 local TouchingPartUtils = {}
 
+--[=[
+	Gets all the touching parts to a base part
+
+	@param part BasePart
+	@return { BasePart }
+]=]
 function TouchingPartUtils.getAllTouchingParts(part: BasePart): { BasePart }
 	-- Use the connection hack to gather all touching parts!
 	local conn = part.Touched:Connect(EMPTY_FUNCTION)
@@ -24,6 +30,12 @@ function TouchingPartUtils.getAllTouchingParts(part: BasePart): { BasePart }
 	return parts
 end
 
+--[=[
+	Returns all parts that are touching the given part.
+	@param cframe CFrame
+	@param size Vector3
+	@return { BasePart }
+]=]
 function TouchingPartUtils.getBoundingBoxParts(cframe: CFrame, size: Vector3): { BasePart }
 	local dummyPart = Instance.new("Part")
 	dummyPart.Name = "CollisionDetectionDummYpart"

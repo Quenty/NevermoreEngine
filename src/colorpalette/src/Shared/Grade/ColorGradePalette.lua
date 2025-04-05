@@ -27,7 +27,7 @@ function ColorGradePalette.new()
 	return self
 end
 
-function ColorGradePalette:SetDefaultSurfaceName(gradeName)
+function ColorGradePalette:SetDefaultSurfaceName(gradeName: string)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	self._defaultSurfaceName.Value = gradeName
@@ -41,7 +41,7 @@ function ColorGradePalette:HasGrade(gradeName)
 	end
 end
 
-function ColorGradePalette:GetGrade(gradeName)
+function ColorGradePalette:GetGrade(gradeName: string)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	local observable = self._grades[gradeName]
@@ -64,7 +64,7 @@ function ColorGradePalette:GetGrade(gradeName)
 	return grade, self:GetVividness(gradeName)
 end
 
-function ColorGradePalette:GetVividness(gradeName)
+function ColorGradePalette:GetVividness(gradeName: string)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	local observable = self._vividness[gradeName]
@@ -98,7 +98,7 @@ function ColorGradePalette:ObserveGrade(gradeName)
 	return self:_observeGradeFromName(gradeName)
 end
 
-function ColorGradePalette:ObserveVividness(gradeName)
+function ColorGradePalette:ObserveVividness(gradeName: string)
 	assert(type(gradeName) == "string", "Bad gradeName")
 	assert(self._vividness[gradeName], "No vividness for gradeName")
 

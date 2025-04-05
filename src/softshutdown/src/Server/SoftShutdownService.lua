@@ -26,6 +26,7 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local SoftShutdownConstants = require("SoftShutdownConstants")
 local TeleportServiceUtils = require("TeleportServiceUtils")
+local _ServiceBag = require("ServiceBag")
 
 local SoftShutdownService = {}
 SoftShutdownService.ServiceName = "SoftShutdownService"
@@ -40,7 +41,7 @@ SoftShutdownService.ServiceName = "SoftShutdownService"
 
 	@param serviceBag ServiceBag
 ]=]
-function SoftShutdownService:Init(serviceBag)
+function SoftShutdownService:Init(serviceBag: _ServiceBag.ServiceBag)
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -60,7 +61,7 @@ function SoftShutdownService:Init(serviceBag)
 	end)
 end
 
-function SoftShutdownService:_isReservedServer()
+function SoftShutdownService:_isReservedServer(): boolean
 	return game.PrivateServerId ~= "" and game.PrivateServerOwnerId == 0
 end
 
@@ -134,7 +135,7 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 end
 
 function SoftShutdownService:_containsPending(promises)
-	for _, item in pairs(promises) do
+	for _, item in promises do
 		if item:IsPending() then
 			return true
 		end

@@ -16,13 +16,17 @@ local CancelToken = {}
 CancelToken.ClassName = "CancelToken"
 CancelToken.__index = CancelToken
 
+export type Executor = (cancel: () -> (), maid: any) -> ()
+
+export type CancelToken = typeof(setmetatable({} :: {}, CancelToken))
+
 --[=[
 	Constructs a new CancelToken
 
 	@param executor (cancel: () -> ()) -> ()
 	@return CancelToken
 ]=]
-function CancelToken.new(executor)
+function CancelToken.new(executor: Executor): CancelToken
 	local self = setmetatable({}, CancelToken)
 
 	assert(type(executor) == "function", "Bad executor")
@@ -54,7 +58,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function CancelToken.isCancelToken(value)
+function CancelToken.isCancelToken(value: any): boolean
 	return DuckTypeUtils.isImplementation(CancelToken, value)
 end
 
@@ -64,7 +68,7 @@ end
 	@param maid Maid
 	@return CancelToken
 ]=]
-function CancelToken.fromMaid(maid)
+function CancelToken.fromMaid(maid): CancelToken
 	local token = CancelToken.new(EMPTY_FUNCTION)
 
 	local taskId = maid:GiveTask(function()
@@ -84,7 +88,7 @@ end
 	@param seconds number
 	@return CancelToken
 ]=]
-function CancelToken.fromSeconds(seconds)
+function CancelToken.fromSeconds(seconds: number): CancelToken
 	assert(type(seconds) == "number", "Bad seconds")
 
 	return CancelToken.new(function(cancel, maid)
@@ -105,7 +109,7 @@ end
 	Returns true if cancelled
 	@return boolean
 ]=]
-function CancelToken:IsCancelled()
+function CancelToken:IsCancelled(): boolean
 	return self.PromiseCancelled:IsFulfilled()
 end
 

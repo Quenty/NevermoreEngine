@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Debug drawing library useful for debugging 3D abstractions. One of
 	the more useful utility libraries.
@@ -141,7 +142,7 @@ function Draw.spherecast(
 	folder.Archivable = false
 
 	Draw.ray(Ray.new(castOrigin, castDirection), color, folder, 2 * radius)
-	Draw.sphere(castOrigin + direction, radius, castColor, folder)
+	Draw.sphere(castOrigin + castDirection, radius, castColor, folder)
 
 	folder.Parent = parent
 
@@ -184,6 +185,12 @@ function Draw.blockcast(
 	return folder
 end
 
+type Edge = {
+	longest: Vector3,
+	other: Vector3,
+	origin: Vector3,
+}
+
 --[=[
 	Draws a triangle between 3 points
 
@@ -204,10 +211,10 @@ function Draw.triangle(
 	local a = assert(Draw._toVector3(pointA), "Bad a")
 	local b = assert(Draw._toVector3(pointB), "Bad b")
 	local c = assert(Draw._toVector3(pointC), "Bad c")
-	color = Draw._toColor3(color) or Draw._defaultColor
+	local triangleColor = Draw._toColor3(color) or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
 
-	local edges = {
+	local edges: { Edge } = {
 		{ longest = (c - a), other = (b - a), origin = a },
 		{ longest = (a - b), other = (c - b), origin = b },
 		{ longest = (b - c), other = (a - c), origin = c },
@@ -215,26 +222,26 @@ function Draw.triangle(
 
 	local edge = edges[1]
 	for i = 2, #edges do
-		if edges[i].longest.magnitude > edge.longest.magnitude then
+		if edges[i].longest.Magnitude > edge.longest.Magnitude then
 			edge = edges[i]
 		end
 	end
 
-	local theta = math.acos(edge.longest.unit:Dot(edge.other.unit))
-	local w1 = math.cos(theta) * edge.other.magnitude
-	local w2 = edge.longest.magnitude - w1
-	local h = math.sin(theta) * edge.other.magnitude
+	local theta = math.acos(edge.longest.Unit:Dot(edge.other.Unit))
+	local w1 = math.cos(theta) * edge.other.Magnitude
+	local w2 = edge.longest.Magnitude - w1
+	local h = math.sin(theta) * edge.other.Magnitude
 
 	local p1 = edge.origin + edge.other * 0.5
 	local p2 = edge.origin + edge.longest + (edge.other - edge.longest) * 0.5
 
-	local right = edge.longest:Cross(edge.other).unit
-	local up = right:Cross(edge.longest).unit
-	local back = edge.longest.unit
+	local right = edge.longest:Cross(edge.other).Unit
+	local up = right:Cross(edge.longest).Unit
+	local back = edge.longest.Unit
 
-	local cf1 = CFrame.new(p1.x, p1.y, p1.z, -right.x, up.x, back.x, -right.y, up.y, back.y, -right.z, up.z, back.z)
+	local cf1 = CFrame.new(p1.X, p1.Y, p1.Z, -right.X, up.X, back.X, -right.Y, up.Y, back.Y, -right.Z, up.Z, back.Z)
 
-	local cf2 = CFrame.new(p2.x, p2.y, p2.z, right.x, up.x, -back.x, right.y, up.y, -back.y, right.z, up.z, -back.z)
+	local cf2 = CFrame.new(p2.X, p2.Y, p2.Z, right.X, up.X, -back.X, right.Y, up.Y, -back.Y, right.Z, up.Z, -back.Z)
 
 	-- put it all together by creating the wedges
 	local triangle = Instance.new("Folder")
@@ -252,7 +259,7 @@ function Draw.triangle(
 	wedge1.CastShadow = false
 	wedge1.Size = Vector3.new(0.05, h, w1)
 	wedge1.CFrame = cf1
-	wedge1.Color = color
+	wedge1.Color = triangleColor
 
 	local mesh1 = Instance.new("SpecialMesh")
 	mesh1.MeshType = Enum.MeshType.Wedge
@@ -270,7 +277,7 @@ function Draw.triangle(
 	wedge2.CastShadow = false
 	wedge2.Size = Vector3.new(0.05, h, w2)
 	wedge2.CFrame = cf2
-	wedge2.Color = color
+	wedge2.Color = triangleColor
 
 	local mesh2 = Instance.new("SpecialMesh")
 	mesh2.MeshType = Enum.MeshType.Wedge
@@ -365,7 +372,7 @@ function Draw.ray(ray: Ray, color: Color3Like?, parent: Instance?, diameter: num
 	local mesh = Instance.new("SpecialMesh")
 	mesh.MeshType = Enum.MeshType.Cylinder
 	mesh.Name = "DrawRayMesh"
-	mesh.Scale = Vector3.new(distance / partSize.x, rayDiameter / partSize.y, rayDiameter / partSize.z)
+	mesh.Scale = Vector3.new(distance / partSize.X, rayDiameter / partSize.Y, rayDiameter / partSize.Z)
 	mesh.Parent = part
 
 	part.Parent = rayParent
@@ -416,7 +423,7 @@ function Draw.updateRay(rayPart: BasePart, ray: Ray, color: Color3?, diameter: n
 	local partSize = rayPart.Size
 	local mesh = rayPart:FindFirstChildWhichIsA("SpecialMesh")
 	if mesh then
-		mesh.Scale = Vector3.new(distance / partSize.x, rayDiameter / partSize.y, rayDiameter / partSize.z)
+		mesh.Scale = Vector3.new(distance / partSize.X, rayDiameter / partSize.Y, rayDiameter / partSize.Z)
 	end
 end
 
@@ -492,11 +499,11 @@ function Draw._textOnAdornee(adornee: Instance, text: string, color: Color3): Bi
 
 	local textSize = TextService:GetTextSize(textLabel.Text, textLabel.TextSize, textLabel.Font, Vector2.new(1024, 1e6))
 
-	local lines = textSize.y / textLabel.TextSize
+	local lines = textSize.Y / textLabel.TextSize
 
 	local paddingOffset = textLabel.TextSize * PADDING_PERCENT_OF_LINE_HEIGHT
-	local paddedHeight = textSize.y + 2 * paddingOffset
-	local paddedWidth = textSize.x + 2 * paddingOffset
+	local paddedHeight = textSize.Y + 2 * paddingOffset
+	local paddedWidth = textSize.X + 2 * paddingOffset
 	local aspectRatio = paddedWidth / paddedHeight
 
 	local uiAspectRatio = Instance.new("UIAspectRatioConstraint")
@@ -669,8 +676,8 @@ function Draw.part(template: BasePart, cframe: CFrameLike?, color: Color3Like?, 
 	local partColor = Draw._toColor3(color) or Draw._defaultColor
 
 	local part = template:Clone()
-	for _, child in pairs(part:GetChildren()) do
-		if child:IsA("Mesh") then
+	for _, child in part:GetChildren() do
+		if child:IsA("DataModelMesh") then
 			Draw._sanitize(child)
 			child:ClearAllChildren()
 		else
@@ -723,8 +730,8 @@ end
 	@return BasePart
 ]=]
 function Draw.box(cframe: CFrameLike, size: Vector3Like, color: Color3Like?): BasePart
-	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
-	size = assert(Draw._toVector3(size), "Bad size")
+	local boxCFrame = assert(Draw._toCFrame(cframe), "Bad cframe")
+	local boxSize = assert(Draw._toVector3(size), "Bad size")
 	local boxColor = Draw._toColor3(color) or Draw._defaultColor
 
 	local part = Instance.new("Part")
@@ -740,12 +747,12 @@ function Draw.box(cframe: CFrameLike, size: Vector3Like, color: Color3Like?): Ba
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.Transparency = 0.75
-	part.Size = size
-	part.CFrame = cframe
+	part.Size = boxSize
+	part.CFrame = boxCFrame
 
 	local boxHandleAdornment = Instance.new("BoxHandleAdornment")
 	boxHandleAdornment.Adornee = part
-	boxHandleAdornment.Size = size
+	boxHandleAdornment.Size = boxSize
 	boxHandleAdornment.Color3 = boxColor
 	boxHandleAdornment.AlwaysOnTop = true
 	boxHandleAdornment.Transparency = 0.75
@@ -793,7 +800,7 @@ function Draw.terrainCell(position: Vector3Like, color: Color3Like?): BasePart
 	local size = Vector3.new(4, 4, 4)
 
 	local solidCell = Terrain:WorldToCell(position)
-	local terrainPosition = Terrain:CellCenterToWorld(solidCell.x, solidCell.y, solidCell.z)
+	local terrainPosition = Terrain:CellCenterToWorld(solidCell.X, solidCell.Y, solidCell.Z)
 
 	local part = Draw.box(CFrame.new(terrainPosition), size, color)
 	part.Name = "DebugTerrainCell"
@@ -812,16 +819,16 @@ function Draw.screenPointLine(a: Vector2, b: Vector2, parent: Instance?, color: 
 
 	local frame = Instance.new("Frame")
 	frame.Name = "DebugScreenLine"
-	frame.Size = UDim2.fromScale(math.abs(offset.x), math.abs(offset.y))
+	frame.Size = UDim2.fromScale(math.abs(offset.X), math.abs(offset.Y))
 
 	frame.BackgroundTransparency = 1
-	frame.Position = UDim2.fromScale(pos.x, pos.y)
+	frame.Position = UDim2.fromScale(pos.X, pos.Y)
 	frame.AnchorPoint = Vector2.new(0.5, 0.5)
 	frame.BorderSizePixel = 0
 	frame.ZIndex = 10000
 	frame.Parent = parent
 
-	local length = offset.magnitude
+	local length = offset.Magnitude
 	if length == 0 then
 		return frame
 	end
@@ -829,7 +836,7 @@ function Draw.screenPointLine(a: Vector2, b: Vector2, parent: Instance?, color: 
 	local diameter = 3
 	local count = 25
 
-	local slope = offset.y / offset.x
+	local slope = offset.Y / offset.X
 	if slope > 0 then
 		for i = 0, count do
 			Draw.screenPoint(Vector2.new(i / count, i / count), frame, color, diameter)
@@ -847,12 +854,12 @@ end
 	Draws a screen point
 ]=]
 function Draw.screenPoint(position: Vector2, parent: Instance, color: Color3Like?, diameter: number?): Frame
-	color = Draw._toColor3(color)
+	local pointColor = Draw._toColor3(color) or Color3.new(0.658824, 0.501961, 0.501961)
 
 	local frame = Instance.new("Frame")
 	frame.Name = "DebugScreenPoint"
 	frame.Size = UDim2.new(0, diameter, 0, diameter)
-	frame.BackgroundColor3 = color or Color3.new(1, 0.1, 0.1)
+	frame.BackgroundColor3 = pointColor
 	frame.BackgroundTransparency = 0.5
 	frame.Position = UDim2.fromScale(position.X, position.Y)
 	frame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -917,11 +924,11 @@ function Draw.ring(position: Vector3Like, normal: Vector3Like, radius: number?, 
 
 	local ringCFrame = CFrame.new(ringPosition, ringPosition + ringNormal)
 
-	local points = {}
+	local points: { Vector3 } = {}
 	for angle = 0, 2 * math.pi, math.pi / 8 do
 		local x = math.cos(angle) * ringRadius
 		local y = math.sin(angle) * ringRadius
-		local vector = ringCFrame:pointToWorldSpace(Vector3.new(x, y, 0))
+		local vector = ringCFrame:PointToWorldSpace(Vector3.new(x, y, 0))
 		table.insert(points, vector)
 	end
 

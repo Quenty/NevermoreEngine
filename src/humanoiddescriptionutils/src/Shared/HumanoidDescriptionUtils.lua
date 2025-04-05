@@ -120,12 +120,17 @@ function HumanoidDescriptionUtils.getAssetIdsFromString(assetString)
 	end
 
 	local assetIds = {}
-	for _, assetIdStr in pairs(string.split(assetString, ",")) do
+	for _, assetIdStr in string.split(assetString, ",") do
 		local num = tonumber(assetIdStr)
 		if num then
 			table.insert(assetIds, num)
 		elseif assetIdStr ~= "" then
-			warn(string.format("[HumanoidDescriptionUtils/getAssetIdsFromString] - Failed to convert %q to assetId", assetIdStr))
+			warn(
+				string.format(
+					"[HumanoidDescriptionUtils/getAssetIdsFromString] - Failed to convert %q to assetId",
+					assetIdStr
+				)
+			)
 		end
 	end
 
@@ -139,7 +144,7 @@ end
 ]=]
 function HumanoidDescriptionUtils.getAssetPromisesFromString(assetString)
 	local promises = {}
-	for _, assetId in pairs(HumanoidDescriptionUtils.getAssetIdsFromString(assetString)) do
+	for _, assetId in HumanoidDescriptionUtils.getAssetIdsFromString(assetString) do
 		table.insert(promises, InsertServiceUtils.promiseAsset(assetId))
 	end
 	return promises

@@ -58,7 +58,7 @@ function ColorPickerCursorPreview:SetColor(color)
 	self._colorValue.Value = color
 end
 
-function ColorPickerCursorPreview:SetTransparency(transparency)
+function ColorPickerCursorPreview:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
@@ -81,7 +81,7 @@ function ColorPickerCursorPreview:_render()
 		Name = "Preview";
 		BackgroundTransparency = 1;
 		Size = Blend.Computed(self._heightAbs, function(heightAbs)
-			return UDim2.fromOffset(heightAbs, heightAbs);
+			return UDim2.fromOffset(heightAbs, heightAbs)
 		end);
 		AnchorPoint = Vector2.new(0.5, 0.5);
 		Position = Blend.Computed(self._position, self._offsetAbs, self._heightAbs, function(pos, offsetAbs, heightAbs)

@@ -20,7 +20,7 @@ function ModelAppearance.new(model)
 	self._interactions = {}
 	self._seats = {}
 
-	for _, part in pairs(model:GetDescendants()) do
+	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then
 			self._parts[part] = {
 				Transparency = part.Transparency;
@@ -46,18 +46,18 @@ end
 
 -- Destructive, cannot be reverted
 function ModelAppearance:DisableInteractions()
-	for _, item in pairs(self._interactions) do
+	for _, item in self._interactions do
 		item:Destroy()
 	end
 	self._interactions = {}
-	for seat, _ in pairs(self._seats) do
+	for seat, _ in self._seats do
 		seat.Disabled = true
 	end
 
 	self:SetCanCollide(false)
 end
 
-function ModelAppearance:SetCanCollide(canCollide)
+function ModelAppearance:SetCanCollide(canCollide: boolean)
 	assert(type(canCollide) == "boolean", "Bad canCollide")
 
 	if self._canCollide == canCollide then
@@ -65,7 +65,7 @@ function ModelAppearance:SetCanCollide(canCollide)
 	end
 
 	self._canCollide = canCollide
-	for part, properties in pairs(self._parts) do
+	for part, properties in self._parts do
 		part.CanCollide = properties.CanCollide and canCollide
 	end
 end
@@ -80,7 +80,7 @@ function ModelAppearance:SetTransparency(transparency)
 	end
 
 	self._transparency = transparency
-	for part, properties in pairs(self._parts) do
+	for part, properties in self._parts do
 		part.Transparency = Math.map(transparency, 0, 1, properties.Transparency, 1)
 	end
 end
@@ -91,7 +91,7 @@ function ModelAppearance:ResetTransparency()
 	end
 
 	self._transparency = nil
-	for part, properties in pairs(self._parts) do
+	for part, properties in self._parts do
 		part.Transparency = properties.Transparency
 	end
 end
@@ -104,7 +104,7 @@ function ModelAppearance:SetColor(color)
 	end
 
 	self._color = color
-	for part, _ in pairs(self._parts) do
+	for part, _ in self._parts do
 		part.Color = color
 
 		if part:IsA("PartOperation") then
@@ -119,7 +119,7 @@ function ModelAppearance:ResetColor()
 	end
 
 	self._color = nil
-	for part, properties in pairs(self._parts) do
+	for part, properties in self._parts do
 		part.Color = properties.Color
 
 		if part:IsA("PartOperation") then
@@ -134,7 +134,7 @@ function ModelAppearance:ResetMaterial()
 	end
 
 	self._material = nil
-	for part, properties in pairs(self._parts) do
+	for part, properties in self._parts do
 		part.Material = properties.Material
 	end
 end
@@ -145,7 +145,7 @@ function ModelAppearance:SetMaterial(material)
 	end
 
 	self._material = material
-	for part, _ in pairs(self._parts) do
+	for part, _ in self._parts do
 		part.Material = material
 	end
 end

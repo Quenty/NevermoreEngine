@@ -17,7 +17,7 @@ local TiePropertyImplementation = setmetatable({}, BaseObject)
 TiePropertyImplementation.ClassName = "TiePropertyImplementation"
 TiePropertyImplementation.__index = TiePropertyImplementation
 
-function TiePropertyImplementation.new(memberDefinition, folder, initialValue, _actualSelf)
+function TiePropertyImplementation.new(memberDefinition, folder: Folder, initialValue, _actualSelf)
 	local self = setmetatable(BaseObject.new(), TiePropertyImplementation)
 
 	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
@@ -100,7 +100,14 @@ function TiePropertyImplementation:_updateImplementation(maid, implementation)
 
 	local className = ValueBaseUtils.getClassNameFromType(typeof(implementation))
 	if not className then
-		error(string.format("[TiePropertyImplementation] - Bad implementation value type %q, cannot set %s", typeof(implementation), self._memberDefinition:GetMemberName()))
+		local memberName = self._memberDefinition:GetMemberName()
+		error(
+			string.format(
+				"[TiePropertyImplementation] - Bad implementation value type %q, cannot set %s",
+				typeof(implementation),
+				memberName
+			)
+		)
 	end
 
 	local copy = self:_changeToClassIfNeeded(className, implementation)

@@ -154,7 +154,7 @@ end
 
 	@param transparency number
 ]=]
-function HSColorPicker:SetTransparency(transparency)
+function HSColorPicker:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
@@ -165,7 +165,7 @@ end
 
 	@param height number
 ]=]
-function HSColorPicker:SetSize(height)
+function HSColorPicker:SetSize(height: number)
 	assert(type(height) == "number", "Bad height")
 
 	self._sizeValue.Value = Vector2.new(height, height)
@@ -200,7 +200,7 @@ function HSColorPicker:_render()
 
 		self._preview.Gui;
 		self._cursor.Gui;
-	};
+	}
 end
 
 return HSColorPicker
