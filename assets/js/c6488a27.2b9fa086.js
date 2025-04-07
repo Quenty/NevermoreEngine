@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[82508],{18292:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"promiseWait","desc":"Wraps the task.delay() API in a promise","source":{"line":6,"path":"src/promise/src/Shared/Utility/promiseWait.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[96325],{43657:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RxPartBoundingBoxUtils","desc":"","source":{"line":4,"path":"src/adorneeboundingbox/src/Shared/RxPartBoundingBoxUtils.lua"}}')}}]);

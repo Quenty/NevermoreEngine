@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[63195],{31816:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RoundingBehaviourTypes","desc":"","source":{"line":4,"path":"src/clienttranslator/src/Shared/Numbers/RoundingBehaviourTypes.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[39279],{57926:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"FunnelStepLogger","desc":"Server-side funnel logger","source":{"line":6,"path":"src/funnels/src/Server/Steps/FunnelStepLogger.lua"}}')}}]);

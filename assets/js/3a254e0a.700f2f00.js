@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[37588],{16905:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ServiceInitLogger","desc":"","source":{"line":4,"path":"src/servicebag/src/Shared/ServiceInitLogger.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[82333],{6960:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".SetAbsoluteSize","id":"SetAbsoluteSize","level":3},{"value":".SetScreenGui","id":"SetScreenGui","level":3}]')}}]);

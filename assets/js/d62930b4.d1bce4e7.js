@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[96405],{98205:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Singleton","desc":"This class converts a class into a singleton","source":{"line":5,"path":"src/singleton/src/Shared/Singleton.lua"}}')}}]);

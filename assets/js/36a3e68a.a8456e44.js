@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[77004],{68795:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TextChannelUtils","desc":"Utility functions for querying text channels.","source":{"line":5,"path":"src/chatproviderservice/src/Shared/TextChannelUtils.lua"}}')}}]);

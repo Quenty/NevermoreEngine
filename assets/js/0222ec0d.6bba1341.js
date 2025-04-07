@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[22801],{24439:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GameScalingHelper","desc":"","source":{"line":4,"path":"src/gamescalingutils/src/Client/GameScalingHelper.lua"}}')}}]);

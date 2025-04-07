@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[41496],{33487:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ParticleEngineClient","desc":"Legacy code written by AxisAngles to simulate particles with Guis","realm":["Client"],"source":{"line":8,"path":"src/particleengine/src/Client/ParticleEngineClient.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[6204],{20145:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ValueBaseValue","desc":"For when attributes don\'t work","source":{"line":6,"path":"src/valuebaseutils/src/Shared/ValueBaseValue.lua"}}')}}]);
