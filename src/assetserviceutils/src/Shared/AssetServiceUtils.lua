@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods involving the AssetService
 	@class AssetServiceUtils
@@ -15,9 +16,9 @@ local AssetServiceUtils = {}
 	Retrieves the assetIds for a package
 
 	@param packageAssetId number
-	@return Promise<table>
+	@return Promise<{ number }>
 ]=]
-function AssetServiceUtils.promiseAssetIdsForPackage(packageAssetId: number)
+function AssetServiceUtils.promiseAssetIdsForPackage(packageAssetId: number): Promise.Promise<{ number }>
 	assert(type(packageAssetId) == "number", "Bad packageAssetId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -43,7 +44,7 @@ end
 
 	@return Promise<Pages>
 ]=]
-function AssetServiceUtils.promiseGamePlaces()
+function AssetServiceUtils.promiseGamePlaces(): Promise.Promise<Pages>
 	return Promise.spawn(function(resolve, reject)
 		local pages
 		local ok, err = pcall(function()
@@ -102,7 +103,7 @@ export type BundleDetails = {
 	@param bundleId number
 	@return Promise<BundleDetails>
 ]=]
-function AssetServiceUtils.promiseBundleDetails(bundleId: number)
+function AssetServiceUtils.promiseBundleDetails(bundleId: number): Promise.Promise<BundleDetails>
 	assert(type(bundleId) == "number", "Bad bundleId")
 
 	return Promise.spawn(function(resolve, reject)

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.2.1...@quenty/nevermore-template-helpers@1.2.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/Nevermore/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
 ## [1.2.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.2.0...@quenty/nevermore-template-helpers@1.2.1) (2023-03-05)
 
 

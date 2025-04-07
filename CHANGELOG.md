@@ -16,7 +16,7 @@
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@mrkboy10](https://github.com/mrkboy10), for all your work!
+Thank you, [@mrkboy10](https://github.com/mrkboy10), for all your work!
 
 #### 🐛 Bug Fix
 
@@ -87,7 +87,7 @@ Thank you, null[@mrkboy10](https://github.com/mrkboy10), for all your work!
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@Daimywil](https://github.com/Daimywil), for all your work!
+Thank you, [@Daimywil](https://github.com/Daimywil), for all your work!
 
 #### 🐛 Bug Fix
 
@@ -2617,7 +2617,7 @@ Thank you, Bark_ing ([@bark-ing](https://github.com/bark-ing)), for all your wor
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@systematicequation](https://github.com/systematicequation), for all your work!
+Thank you, [@systematicequation](https://github.com/systematicequation), for all your work!
 
 #### 🐛 Bug Fix
 
@@ -3059,7 +3059,7 @@ Thank you, OptimisticSide ([@optimisticside](https://github.com/optimisticside))
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@OttoHatt](https://github.com/OttoHatt), for all your work!
+Thank you, [@OttoHatt](https://github.com/OttoHatt), for all your work!
 
 #### 🚀 Enhancement
 
@@ -3209,7 +3209,7 @@ Thank you, null[@OttoHatt](https://github.com/OttoHatt), for all your work!
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@Yuuwa0519](https://github.com/Yuuwa0519), for all your work!
+Thank you, [@Yuuwa0519](https://github.com/Yuuwa0519), for all your work!
 
 #### 🐛 Bug Fix
 
@@ -3553,7 +3553,7 @@ Thank you, aku ([@aku-e](https://github.com/aku-e)), for all your work!
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@Boegie19](https://github.com/Boegie19), for all your work!
+Thank you, [@Boegie19](https://github.com/Boegie19), for all your work!
 
 #### 🐛 Bug Fix
 

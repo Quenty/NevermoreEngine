@@ -1,6 +1,6 @@
 {
   "name": "@quenty/raycaster",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "Repeats raycasting attempts while ignoring items via a filter function",
   "keywords": [
     "Roblox",

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerinputmode",
-  "version": "9.19.0",
+  "version": "9.19.1",
   "description": "Service that takes active input modes from the player and exposes it to every other player via the server.",
   "keywords": [
     "Roblox",

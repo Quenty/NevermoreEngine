@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rodux-undo",
-  "version": "8.9.1",
+  "version": "8.9.2",
   "description": "Undo stack for rodux",
   "keywords": [
     "Roblox",

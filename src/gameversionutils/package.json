@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameversionutils",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "Utility functions to automatically detect the version a game is running at",
   "keywords": [
     "Roblox",
