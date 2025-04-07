@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidanimatorutils",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Utility functions to retrieve and manipulate the Animator object on Roblox from a humanoid.",
   "keywords": [
     "Roblox",

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/color3serializationutils",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Utility functions to help serialize Color3 values",
   "keywords": [
     "Roblox",

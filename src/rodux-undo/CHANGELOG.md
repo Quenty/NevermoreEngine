@@ -1,20 +1,18 @@
-# v8.9.3 (Mon Apr 07 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Bump package versions for republishing [#547](https://github.com/Quenty/NevermoreEngine/pull/547) ([@Quenty](https://github.com/Quenty))
-- fix: Bump package versions for republishing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-undo@8.9.1...@quenty/rodux-undo@8.9.3) (2025-04-07)
+
+
+### Bug Fixes
+
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
 
 ## [8.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-undo@8.9.1...@quenty/rodux-undo@8.9.2) (2025-04-07)
 

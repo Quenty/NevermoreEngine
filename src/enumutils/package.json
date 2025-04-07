@@ -1,6 +1,6 @@
 {
   "name": "@quenty/enumutils",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "description": "Helds encode Roblox enums into a string",
   "keywords": [
     "Roblox",

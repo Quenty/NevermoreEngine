@@ -1,6 +1,6 @@
 {
   "name": "@quenty/typeutils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Utility methods for manipulating Luau types",
   "keywords": [
     "Roblox",

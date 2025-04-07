@@ -1,6 +1,6 @@
 {
   "name": "@quenty/experiencecalculator",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "Calculate experience on an exponential curve and perform relevant calculations Uses formulas from stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp",
   "keywords": [
     "Roblox",

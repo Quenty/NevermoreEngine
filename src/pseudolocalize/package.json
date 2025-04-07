@@ -1,6 +1,6 @@
 {
   "name": "@quenty/pseudolocalize",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "description": "Pseudo localizes text. Useful for verifying translation without having actual translations available",
   "keywords": [
     "Roblox",
