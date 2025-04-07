@@ -16,6 +16,7 @@ copyright = "Copyright © 2014-2022 James Onnen. Made with Moonwave."
 
 [docusaurus]
 url = "https://quenty.github.io"
+onBrokenLinks = "warn"
 
 [home]
 enabled = true
