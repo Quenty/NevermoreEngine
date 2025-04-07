@@ -629,6 +629,8 @@ function Blend._observeTags(tags)
 	elseif type(tags) == "table" then
 		if Observable.isObservable(tags) then
 			return tags
+		elseif getmetatable(tags) == nil then
+			return Rx.of(unpack(tags))
 		else
 			error("Bad tags")
 		end
