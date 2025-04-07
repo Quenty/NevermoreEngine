@@ -5,10 +5,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local _InputModeType = require("InputModeType")
-local _InputKeyMapList = require("InputKeyMapList")
-local _InputKeyMap = require("InputKeyMap")
-local _InputTypeUtils = require("InputTypeUtils")
+-- local _InputModeType = require("InputModeType")
+-- local _InputKeyMapList = require("InputKeyMapList")
+-- local _InputKeyMap = require("InputKeyMap")
+-- local _InputTypeUtils = require("InputTypeUtils")
 
 local SlottedTouchButtonUtils = {}
 
