@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local DeathReportService = require("DeathReportService")
+local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 
 local DeathTrackedHumanoid = setmetatable({}, BaseObject)
 DeathTrackedHumanoid.ClassName = "DeathTrackedHumanoid"
@@ -36,4 +37,4 @@ function DeathTrackedHumanoid:_handleDeath()
 	end
 end
 
-return DeathTrackedHumanoid
+return PlayerHumanoidBinder.new("DeathTrackedHumanoid", DeathTrackedHumanoid)
