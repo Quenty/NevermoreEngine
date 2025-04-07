@@ -12,7 +12,7 @@ label = "Discord"
 position = "right"
 
 [footer]
-copyright = "Copyright © 2014-2022 James Onnen. Made with Moonwave."
+copyright = "Copyright © 2014-2025 James Onnen. Made with Moonwave."
 
 [docusaurus]
 url = "https://quenty.github.io"
