@@ -1,6 +1,6 @@
 {
   "name": "@quenty/touchingpartutils",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Utility to get touching parts on a Roblox part. This acts as a performance-friendly way to query Roblox's spatial tree.",
   "keywords": [
     "Roblox",

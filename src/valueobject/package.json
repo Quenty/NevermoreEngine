@@ -1,6 +1,6 @@
 {
   "name": "@quenty/valueobject",
-  "version": "13.17.0",
+  "version": "13.17.1",
   "description": "To work like value objects in Roblox and track a single item with .Changed events",
   "keywords": [
     "Roblox",

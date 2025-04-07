@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.0...@quenty/cli-output-helpers@1.2.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/Nevermore/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
 # [1.2.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.1.0...@quenty/cli-output-helpers@1.2.0) (2023-02-21)
 
 **Note:** Version bump only for package @quenty/cli-output-helpers
