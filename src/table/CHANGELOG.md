@@ -1,3 +1,18 @@
+# v3.7.3 (Mon Apr 07 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Bump package versions for republishing [#547](https://github.com/Quenty/NevermoreEngine/pull/547) ([@Quenty](https://github.com/Quenty))
+- fix: Bump package versions for republishing ([@Quenty](https://github.com/Quenty))
+- ci: Add luau-lsp type checking github action and integration [#545](https://github.com/Quenty/NevermoreEngine/pull/545) ([@Quenty](https://github.com/Quenty))
+- fix: Add types to packages ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
