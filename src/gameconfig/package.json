@@ -32,6 +32,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
+    "@quenty/canceltoken": "file:../canceltoken",
     "@quenty/clienttranslator": "file:../clienttranslator",
     "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/instanceutils": "file:../instanceutils",
