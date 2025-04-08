@@ -1,20 +1,18 @@
-# v4.7.0 (Tue Apr 08 2025)
-
-#### 🚀 Enhancement
-
-- feat: Nevermore test cli command [#551](https://github.com/Quenty/NevermoreEngine/pull/551) ([@unrooot](https://github.com/unrooot))
-- feat: Nevermore cli command to run tests locally ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.7.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.6.2...@quenty/nevermore-cli@4.7.0) (2025-04-08)
+
+
+### Features
+
+* Nevermore cli command to run tests locally ([cd874ac](https://github.com/Quenty/Nevermore/commit/cd874ac94cc825b84a38af35a7220a77def5c490))
+
+
+
+
 
 ## [4.6.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.6.0...@quenty/nevermore-cli@4.6.2) (2025-04-07)
 
