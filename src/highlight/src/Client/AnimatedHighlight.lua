@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@client
 	@class AnimatedHighlight
@@ -14,13 +15,32 @@ local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
 local Signal = require("Signal")
 local DuckTypeUtils = require("DuckTypeUtils")
+local _Observable = require("Observable")
 
 local AnimatedHighlight = setmetatable({}, BasicPane)
 AnimatedHighlight.ClassName = "AnimatedHighlight"
 AnimatedHighlight.__index = AnimatedHighlight
 
-function AnimatedHighlight.new()
-	local self = setmetatable(BasicPane.new(), AnimatedHighlight)
+export type AnimatedHighlight = typeof(setmetatable(
+	{} :: {
+		-- Public
+		Gui: Highlight,
+		Destroying: Signal.Signal<()>,
+
+		-- Private
+		_adornee: ValueObject.ValueObject<Instance?>,
+		_highlightDepthMode: ValueObject.ValueObject<Enum.HighlightDepthMode>,
+		_fillColorSpring: SpringObject.SpringObject<Color3>,
+		_outlineColorSpring: SpringObject.SpringObject<Color3>,
+		_fillTransparencySpring: SpringObject.SpringObject<number>,
+		_outlineTransparencySpring: SpringObject.SpringObject<number>,
+		_percentVisible: SpringObject.SpringObject<number>,
+	},
+	{} :: typeof({ __index = AnimatedHighlight })
+)) & BasicPane.BasicPane
+
+function AnimatedHighlight.new(): AnimatedHighlight
+	local self: AnimatedHighlight = setmetatable(BasicPane.new() :: any, AnimatedHighlight)
 
 	self._adornee = self._maid:Add(ValueObject.new(nil))
 	self._highlightDepthMode = self._maid:Add(ValueObject.new(Enum.HighlightDepthMode.AlwaysOnTop))
@@ -45,7 +65,7 @@ function AnimatedHighlight.new()
 	end)
 
 	self._maid:GiveTask(self:_render():Subscribe(function(highlight)
-		self.Gui = highlight
+		self.Gui = highlight :: any
 	end))
 
 	return self
@@ -69,13 +89,13 @@ end
 
 	@param depthMode Enum.HighlightDepthMode
 ]=]
-function AnimatedHighlight:SetHighlightDepthMode(depthMode)
+function AnimatedHighlight.SetHighlightDepthMode(self: AnimatedHighlight, depthMode: Enum.HighlightDepthMode)
 	assert(EnumUtils.isOfType(Enum.HighlightDepthMode, depthMode))
 
 	self._highlightDepthMode.Value = depthMode
 end
 
-function AnimatedHighlight:SetPropertiesFrom(sourceHighlight)
+function AnimatedHighlight.SetPropertiesFrom(self: AnimatedHighlight, sourceHighlight: AnimatedHighlight)
 	assert(AnimatedHighlight.isAnimatedHighlight(sourceHighlight), "Bad AnimatedHighlight")
 
 	self._highlightDepthMode.Value = sourceHighlight._highlightDepthMode.Value
@@ -99,27 +119,27 @@ function AnimatedHighlight:SetPropertiesFrom(sourceHighlight)
 	transferSpringValue(self._percentVisible, sourceHighlight._percentVisible)
 end
 
-function AnimatedHighlight:SetTransparencySpeed(speed: number)
+function AnimatedHighlight.SetTransparencySpeed(self: AnimatedHighlight, speed: number): ()
 	assert(type(speed) == "number", "Bad speed")
 
 	self._fillTransparencySpring.Speed = speed
 	self._outlineTransparencySpring.Speed = speed
 end
 
-function AnimatedHighlight:SetColorSpeed(speed: number)
+function AnimatedHighlight.SetColorSpeed(self: AnimatedHighlight, speed: number): ()
 	assert(type(speed) == "number", "Bad speed")
 
 	self._fillColorSpring.Speed = speed
 	self._outlineColorSpring.Speed = speed
 end
 
-function AnimatedHighlight:SetSpeed(speed: number)
+function AnimatedHighlight.SetSpeed(self: AnimatedHighlight, speed: number): ()
 	assert(type(speed) == "number", "Bad speed")
 
 	self._percentVisible.Speed = speed
 end
 
-function AnimatedHighlight:Finish(doNotAnimate: boolean?, callback)
+function AnimatedHighlight.Finish(self: AnimatedHighlight, doNotAnimate: boolean?, callback: () -> ())
 	if self._percentVisible.p == 0 and self._percentVisible.v == 0 then
 		callback()
 		return
@@ -158,7 +178,7 @@ end
 	@param color Color3
 	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlight:SetFillColor(color: Color3, doNotAnimate: boolean?)
+function AnimatedHighlight.SetFillColor(self: AnimatedHighlight, color: Color3, doNotAnimate: boolean?): ()
 	assert(typeof(color) == "Color3", "Bad color")
 
 	self._fillColorSpring:SetTarget(color, doNotAnimate)
@@ -170,7 +190,7 @@ end
 	@param color Color3
 	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlight:SetOutlineColor(color: Color3, doNotAnimate: boolean?)
+function AnimatedHighlight.SetOutlineColor(self: AnimatedHighlight, color: Color3, doNotAnimate: boolean?): ()
 	assert(typeof(color) == "Color3", "Bad color")
 
 	self._outlineColorSpring:SetTarget(color, doNotAnimate)
@@ -179,7 +199,7 @@ end
 --[=[
 	Sets the adornee
 ]=]
-function AnimatedHighlight:SetAdornee(adornee: Instance?)
+function AnimatedHighlight.SetAdornee(self: AnimatedHighlight, adornee: Instance?)
 	assert(typeof(adornee) == "Instance" or adornee == nil, "Bad adornee")
 
 	self._adornee.Value = adornee
@@ -189,7 +209,7 @@ end
 	Gets the adornee
 	@return Instance?
 ]=]
-function AnimatedHighlight:GetAdornee(): Instance?
+function AnimatedHighlight.GetAdornee(self: AnimatedHighlight): Instance?
 	return self._adornee.Value
 end
 
@@ -199,7 +219,11 @@ end
 	@param outlineTransparency number
 	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlight:SetOutlineTransparency(outlineTransparency: number, doNotAnimate: boolean?)
+function AnimatedHighlight.SetOutlineTransparency(
+	self: AnimatedHighlight,
+	outlineTransparency: number,
+	doNotAnimate: boolean?
+): ()
 	assert(type(outlineTransparency) == "number", "Bad outlineTransparency")
 
 	self._outlineTransparencySpring.Target = outlineTransparency
@@ -215,7 +239,11 @@ end
 	@param fillTransparency number
 	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlight:SetFillTransparency(fillTransparency: number, doNotAnimate: boolean?)
+function AnimatedHighlight.SetFillTransparency(
+	self: AnimatedHighlight,
+	fillTransparency: number,
+	doNotAnimate: boolean?
+): ()
 	assert(type(fillTransparency) == "number", "Bad fillTransparency")
 
 	self._fillTransparencySpring.Target = fillTransparency
@@ -225,28 +253,30 @@ function AnimatedHighlight:SetFillTransparency(fillTransparency: number, doNotAn
 	end
 end
 
-function AnimatedHighlight:_render()
-	return Blend.New "Highlight" {
-		Name = "AnimatedHighlight";
-		Archivable = false;
-		DepthMode = self._highlightDepthMode;
-		FillColor = self._fillColorSpring:ObserveRenderStepped();
-		OutlineColor = self._outlineColorSpring:ObserveRenderStepped();
+function AnimatedHighlight._render(self: AnimatedHighlight): _Observable.Observable<Highlight>
+	return Blend.New("Highlight")({
+		Name = "AnimatedHighlight",
+		Archivable = false,
+		DepthMode = self._highlightDepthMode,
+		FillColor = self._fillColorSpring:ObserveRenderStepped(),
+		OutlineColor = self._outlineColorSpring:ObserveRenderStepped(),
 		FillTransparency = Blend.Computed(
 			self._fillTransparencySpring:ObserveRenderStepped(),
 			self._percentVisible:ObserveRenderStepped(),
 			function(transparency, visible)
 				return Math.map(visible, 0, 1, 1, transparency)
-			end);
+			end
+		),
 		OutlineTransparency = Blend.Computed(
 			self._outlineTransparencySpring:ObserveRenderStepped(),
 			self._percentVisible:ObserveRenderStepped(),
 			function(transparency, visible)
 				return Math.map(visible, 0, 1, 1, transparency)
-			end);
-		Adornee = self._adornee;
-		Parent = self._adornee;
-	}
+			end
+		),
+		Adornee = self._adornee,
+		Parent = self._adornee,
+	}) :: any
 end
 
 return AnimatedHighlight

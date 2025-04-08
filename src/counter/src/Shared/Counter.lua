@@ -17,7 +17,6 @@ Counter.__index = Counter
 
 export type Counter = typeof(setmetatable(
 	{} :: {
-		_maid: Maid.Maid,
 		_count: ValueObject.ValueObject<number>,
 
 		--[=[
@@ -28,8 +27,8 @@ export type Counter = typeof(setmetatable(
 		]=]
 		Changed: _Signal.Signal<number>,
 	},
-	Counter
-))
+	{} :: typeof({ __index = Counter })
+)) & BaseObject.BaseObject
 
 --[=[
 	Creates a new counter
@@ -116,13 +115,13 @@ function Counter._addObservable(self: Counter, observeAmount: Observable.Observa
 		self._count.Value = self._count.Value - delta
 	end)
 
-	self._maid[maid :: any] = maid
+	self._maid[maid] = maid
 	maid:GiveTask(function()
-		self._maid[maid :: any] = nil
+		self._maid[maid] = nil
 	end)
 
 	return function()
-		self._maid[maid :: any] = nil
+		self._maid[maid] = nil
 	end
 end
 

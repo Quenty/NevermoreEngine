@@ -50,7 +50,7 @@ export type ValueObject<T> = typeof(setmetatable(
 		_lastEventContext: { any }?,
 		_lastMountedSub: _Subscription.Subscription<(T, ...any)>?,
 	},
-	ValueObject
+	{} :: typeof({ __index = ValueObject })
 ))
 
 --[=[
@@ -60,11 +60,14 @@ export type ValueObject<T> = typeof(setmetatable(
 	@return ValueObject
 ]=]
 function ValueObject.new<T>(baseValue: T?, checkType: ValueObjectTypeArg?): ValueObject<T>
-	local self = setmetatable({
-		_value = baseValue,
-		_default = baseValue,
-		_checkType = checkType,
-	}, ValueObject)
+	local self: ValueObject<T> = setmetatable(
+		{
+			_value = baseValue,
+			_default = baseValue,
+			_checkType = checkType,
+		} :: any,
+		ValueObject
+	)
 
 	if type(checkType) == "string" then
 		if typeof(baseValue) ~= checkType then
@@ -74,7 +77,7 @@ function ValueObject.new<T>(baseValue: T?, checkType: ValueObjectTypeArg?): Valu
 		assert(checkType(baseValue))
 	end
 
-	return self :: any
+	return self
 end
 
 --[=[
@@ -170,7 +173,7 @@ end
 	Observes the current value of the ValueObject
 	@return Observable<T?>
 ]=]
-function ValueObject.Observe<T>(self: ValueObject<T>): Observable.Observable<T?>
+function ValueObject.Observe<T>(self: ValueObject<T>): Observable.Observable<T>
 	local found = rawget(self :: any, "_observable")
 	if found then
 		return found
@@ -201,7 +204,7 @@ function ValueObject.Observe<T>(self: ValueObject<T>): Observable.Observable<T?>
 
 	-- We use a lot of these so let's cache the result which reduces the number of tables we have here
 	rawset(self :: any, "_observable", created)
-	return created
+	return created :: any
 end
 
 --[=[

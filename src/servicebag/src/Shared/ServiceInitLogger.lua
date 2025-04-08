@@ -24,12 +24,13 @@ export type ServiceInitLogger = typeof(setmetatable(
 		_initIndent: number,
 		_totalServices: number,
 	},
-	ServiceInitLogger
+	{} :: typeof({ __index = ServiceInitLogger })
 ))
 
 function ServiceInitLogger.new(action: string): ServiceInitLogger
-	assert(type(action) == "string", "Bad action")
 	local self = setmetatable({}, ServiceInitLogger)
+
+	assert(type(action) == "string", "Bad action")
 
 	self._action = action
 	self._rootNode = {

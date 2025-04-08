@@ -32,7 +32,7 @@ export type GameConfigAssetBase = typeof(setmetatable(
 		_descriptionTranslationKey: AttributeValue.AttributeValue<string>,
 		_configTranslator: _JSONTranslator.JSONTranslator,
 	},
-	{ __index = GameConfigAssetBase}
+	{} :: typeof({ __index = GameConfigAssetBase })
 ))
 
 --[=[

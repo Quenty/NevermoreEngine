@@ -18,7 +18,7 @@ export type LinearValue<T> = typeof(setmetatable(
 		_constructor: (...number) -> T,
 		_values: { number },
 	},
-	LinearValue
+	{} :: typeof({ __index = LinearValue })
 ))
 
 --[=[
@@ -110,7 +110,7 @@ end
 
 	@return T
 ]=]
-function LinearValue:ToBaseValue<T>(): T
+function LinearValue.ToBaseValue<T>(self: LinearValue<T>): T
 	return self._constructor(unpack(self._values))
 end
 
@@ -155,7 +155,7 @@ end
 
 	@return number -- The magnitude of the linear value.
 ]=]
-function LinearValue:GetMagnitude(): number
+function LinearValue.GetMagnitude(self: LinearValue<T>): number
 	local dot: number = 0
 	for i = 1, #self._values do
 		local value: number = self._values[i]

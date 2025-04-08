@@ -48,7 +48,7 @@ export type JSONTranslator = typeof(setmetatable(
 		_localTranslator: ValueObject.ValueObject<any>,
 		_sourceTranslator: ValueObject.ValueObject<any>,
 	},
-	JSONTranslator
+	{} :: typeof({ __index = JSONTranslator })
 ))
 
 --[=[

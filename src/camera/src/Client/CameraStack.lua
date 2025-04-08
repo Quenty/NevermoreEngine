@@ -17,12 +17,11 @@ CameraStack.__index = CameraStack
 
 export type CameraStack = typeof(setmetatable(
 	{} :: {
-		_maid: _Maid.Maid,
 		_stack: { any },
 		_disabledSet: { [string]: boolean },
 	},
-	{ __index = CameraStack }
-))
+	{} :: typeof({ __index = CameraStack })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new camera stack
@@ -30,7 +29,7 @@ export type CameraStack = typeof(setmetatable(
 	@return CameraStack
 ]=]
 function CameraStack.new(): CameraStack
-	local self = setmetatable(BaseObject.new(), CameraStack)
+	local self: CameraStack = setmetatable(BaseObject.new(), CameraStack)
 
 	self._stack = {}
 	self._disabledSet = {}

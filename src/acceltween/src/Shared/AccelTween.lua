@@ -103,10 +103,10 @@ function AccelTween:__index(index)
 	if AccelTween[index] then
 		return AccelTween[index]
 	elseif index == "p" then
-		local pos, _ = self:_getstate(os.clock())
+		local pos, _ = self:_getState(os.clock())
 		return pos
 	elseif index == "v" then
-		local _, vel = self:_getstate(os.clock())
+		local _, vel = self:_getState(os.clock())
 		return vel
 	elseif index == "a" then
 		return self._accel
@@ -122,21 +122,21 @@ end
 
 function AccelTween:__newindex(index, value)
 	if index == "p" then
-		self:_setstate(value, nil, nil, nil)
+		self:_setState(value, nil, nil, nil)
 	elseif index == "v" then
-		self:_setstate(nil, value, nil, nil)
+		self:_setState(nil, value, nil, nil)
 	elseif index == "a" then
-		self:_setstate(nil, nil, value, nil)
+		self:_setState(nil, nil, value, nil)
 	elseif index == "t" then
-		self:_setstate(nil, nil, nil, value)
+		self:_setState(nil, nil, nil, value)
 	elseif index == "pt" then
-		self:_setstate(value, 0, nil, value)
+		self:_setState(value, 0, nil, value)
 	else
 		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 
-function AccelTween:_getstate(time)
+function AccelTween:_getState(time)
 	if time < (self._t0 + self._t1) / 2 then
 		local t = time - self._t0
 		return self._y0 + t * t / 2 * self._a0, t * self._a0
@@ -148,9 +148,9 @@ function AccelTween:_getstate(time)
 	end
 end
 
-function AccelTween:_setstate(newpos, newvel, newaccel, newtarg)
+function AccelTween:_setState(newpos, newvel, newaccel, newtarg)
 	local time = os.clock()
-	local pos, vel = self:_getstate(time)
+	local pos, vel = self:_getState(time)
 	pos = newpos or pos
 	vel = newvel or vel
 	self._accel = newaccel or self._accel

@@ -19,6 +19,13 @@ local _ServiceBag = require("ServiceBag")
 
 local SettingsDataService = {}
 
+export type SettingsDataService = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+	},
+	{} :: typeof({ __index = SettingsDataService })
+))
+
 --[=[
 	Initializes the shared registry service. Should be done via [ServiceBag].
 

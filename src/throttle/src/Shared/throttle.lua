@@ -22,7 +22,7 @@ export type ThrottleConfig = ThrottledFunction.ThrottleConfig
 	@param throttleConfig? { leading = true; trailing = true; }
 	@return function
 ]=]
-local function throttle<T...>(timeoutInSeconds: number, func: (T...) -> ...any, throttleConfig: ThrottledFunction.ThrottleConfig): (T...) -> ()
+local function throttle<T...>(timeoutInSeconds: number, func: ThrottledFunction.Func<T...>, throttleConfig: ThrottledFunction.ThrottleConfig): (T...) -> ()
 	assert(type(timeoutInSeconds) == "number", "timeoutInSeconds is not a number")
 	assert(type(func) == "function", "func is not a function")
 

@@ -57,7 +57,7 @@ export type ObservableCountingMap<T> = typeof(setmetatable(
 		_keySubTable: any, -- ObservableSubscriptionTable.ObservableSubscriptionTable<number>,
 		_totalKeyCountValue: ValueObject.ValueObject<number>,
 	},
-	ObservableCountingMap
+	{} :: typeof({ __index = ObservableCountingMap })
 ))
 
 --[=[
@@ -147,9 +147,9 @@ function ObservableCountingMap._observeDerivedDataStructureFromKeys<T>(
 
 		emit()
 
-		self._maid[sub :: any] = maid
+		self._maid[sub] = maid
 		maid:GiveTask(function()
-			self._maid[sub :: any] = nil
+			self._maid[sub] = nil
 			sub:Complete()
 		end)
 
@@ -184,9 +184,9 @@ function ObservableCountingMap.ObservePairsBrio<T>(
 
 		maid:GiveTask(self.KeyChanged:Connect(handleValue))
 
-		self._maid[sub :: any] = maid
+		self._maid[sub] = maid
 		maid:GiveTask(function()
-			self._maid[sub :: any] = nil
+			self._maid[sub] = nil
 			sub:Complete()
 		end)
 
@@ -237,9 +237,9 @@ function ObservableCountingMap.ObserveKeysBrio<T>(self: ObservableCountingMap<T>
 			handleItem(key)
 		end
 
-		self._maid[sub :: any] = maid
+		self._maid[sub] = maid
 		maid:GiveTask(function()
-			self._maid[sub :: any] = nil
+			self._maid[sub] = nil
 			sub:Complete()
 		end)
 

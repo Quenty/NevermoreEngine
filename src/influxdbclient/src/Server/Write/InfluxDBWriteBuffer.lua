@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class InfluxDBWriteBuffer
 ]=]
@@ -13,10 +14,23 @@ local InfluxDBWriteBuffer = setmetatable({}, BaseObject)
 InfluxDBWriteBuffer.ClassName = "InfluxDBWriteBuffer"
 InfluxDBWriteBuffer.__index = InfluxDBWriteBuffer
 
-export type InfluxDBWriteBuffer = typeof(setmetatable({}, InfluxDBWriteBuffer))
+export type InfluxDBWriteBuffer = typeof(setmetatable(
+	{} :: {
+		_bytes: number,
+		_length: number,
+		_entries: { string },
+		_writeOptions: _InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+		_promiseHandleFlush: (entries: { string }) -> Promise.Promise<()>,
+		_requestQueueNext: Signal.Signal<()>,
+	},
+	{} :: typeof({ __index = InfluxDBWriteBuffer })
+)) & BaseObject.BaseObject
 
-function InfluxDBWriteBuffer.new(writeOptions: _InfluxDBWriteOptionUtils.InfluxDBWriteOptions, promiseHandleFlush)
-	local self = setmetatable(BaseObject.new(), InfluxDBWriteBuffer)
+function InfluxDBWriteBuffer.new(
+	writeOptions: _InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+	promiseHandleFlush
+): InfluxDBWriteBuffer
+	local self: InfluxDBWriteBuffer = setmetatable(BaseObject.new() :: any, InfluxDBWriteBuffer)
 
 	self._writeOptions = assert(writeOptions, "Bad writeOptions")
 	self._promiseHandleFlush = assert(promiseHandleFlush, "No promiseHandleFlush")
@@ -30,9 +44,8 @@ function InfluxDBWriteBuffer.new(writeOptions: _InfluxDBWriteOptionUtils.InfluxD
 	return self
 end
 
-function InfluxDBWriteBuffer:Add(entry: string)
+function InfluxDBWriteBuffer.Add(self: InfluxDBWriteBuffer, entry: string)
 	assert(type(entry) == "string", "Bad entry")
-
 
 	-- Already overflowing
 	if self._bytes + #entry + 1 >= self._writeOptions.maxBatchBytes then
@@ -44,16 +57,14 @@ function InfluxDBWriteBuffer:Add(entry: string)
 	self._bytes = self._bytes + #entry + 1
 	self._length = self._length + 1
 
-	if self._length >= self._writeOptions.batchSize
-		or self._bytes >= self._writeOptions.maxBatchBytes then
-
+	if self._length >= self._writeOptions.batchSize or self._bytes >= self._writeOptions.maxBatchBytes then
 		self:_promiseFlushAll()
 	else
 		self:_queueNextSend()
 	end
 end
 
-function InfluxDBWriteBuffer:_queueNextSend()
+function InfluxDBWriteBuffer._queueNextSend(self: InfluxDBWriteBuffer)
 	if self._maid._queuedSendTask then
 		return
 	end
@@ -67,7 +78,7 @@ function InfluxDBWriteBuffer:_queueNextSend()
 	end)
 end
 
-function InfluxDBWriteBuffer:_reset()
+function InfluxDBWriteBuffer._reset(self: InfluxDBWriteBuffer)
 	local entries = self._entries
 
 	self._bytes = 0
@@ -77,7 +88,7 @@ function InfluxDBWriteBuffer:_reset()
 	return entries
 end
 
-function InfluxDBWriteBuffer:_promiseFlushAll()
+function InfluxDBWriteBuffer._promiseFlushAll(self: InfluxDBWriteBuffer)
 	self._maid._queuedSendTask = nil
 
 	local entries = self:_reset()
@@ -88,7 +99,7 @@ function InfluxDBWriteBuffer:_promiseFlushAll()
 	end
 end
 
-function InfluxDBWriteBuffer:PromiseFlush()
+function InfluxDBWriteBuffer.PromiseFlush(self: InfluxDBWriteBuffer)
 	return self:_promiseFlushAll()
 end
 

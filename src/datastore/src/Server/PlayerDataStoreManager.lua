@@ -64,6 +64,19 @@ local PlayerDataStoreManager = setmetatable({}, BaseObject)
 PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"
 PlayerDataStoreManager.__index = PlayerDataStoreManager
 
+export type PlayerDataStoreManager = typeof(setmetatable(
+	{} :: {
+		_robloxDataStore: any,
+		_keyGenerator: (Player) -> string,
+		_datastores: { [Player]: DataStore },
+		_removing: { [Player]: boolean },
+		_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
+		_removingCallbacks: { (Player) -> any },
+		_disableSavingInStudio: boolean?,
+	},
+	{} :: typeof({ __index = PlayerDataStoreManager })
+)) & BaseObject.BaseObject
+
 --[=[
 	Constructs a new PlayerDataStoreManager.
 

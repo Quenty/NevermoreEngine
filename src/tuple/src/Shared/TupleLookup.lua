@@ -18,7 +18,7 @@ export type TupleLookup = typeof(setmetatable(
 		_tuples: { [Tuple.Tuple<...any>]: boolean },
 		_singleArgTuples: { [any]: Tuple.Tuple<...any> },
 	},
-	TupleLookup
+	{} :: typeof({ __index = TupleLookup })
 ))
 
 function TupleLookup.new(): TupleLookup

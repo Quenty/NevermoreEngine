@@ -12,13 +12,22 @@ local LocalizedTextUtils = require("LocalizedTextUtils")
 local PlayerBinder = require("PlayerBinder")
 local String = require("String")
 local BinderUtils = require("BinderUtils")
+local _ServiceBag = require("ServiceBag")
 
 local HasChatTags = setmetatable({}, HasChatTagsBase)
 HasChatTags.ClassName = "HasChatTags"
 HasChatTags.__index = HasChatTags
 
-function HasChatTags.new(player: Player, serviceBag)
-	local self = setmetatable(HasChatTagsBase.new(player), HasChatTags)
+export type HasChatTags = typeof(setmetatable(
+	{} :: {
+		_chatTagsContainer: Folder,
+		_chatTagBinder: any,
+	},
+	{} :: typeof({ __index = HasChatTags })
+)) & HasChatTagsBase.HasChatTagsBase
+
+function HasChatTags.new(player: Player, serviceBag: _ServiceBag.ServiceBag): HasChatTags
+	local self: HasChatTags = setmetatable(HasChatTagsBase.new(player) :: any, HasChatTags)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._chatProviderService = self._serviceBag:GetService((require :: any)("ChatProviderService"))

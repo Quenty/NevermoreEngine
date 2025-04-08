@@ -34,7 +34,7 @@ export type InputMode = typeof(setmetatable(
 		_lastEnabled: number,
 		Enabled: Signal.Signal<()>,
 	},
-	InputMode
+	{} :: typeof({ __index = InputMode })
 ))
 
 --[=[

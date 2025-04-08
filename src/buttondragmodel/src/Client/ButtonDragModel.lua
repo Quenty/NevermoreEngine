@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Computes the position of a user dragging a button around
 
@@ -14,10 +15,28 @@ local InputObjectUtils = require("InputObjectUtils")
 local ValueObject = require("ValueObject")
 local _Observable = require("Observable")
 local _Brio = require("Brio")
+local _Signal = require("Signal")
 
 local ButtonDragModel = setmetatable({}, BaseObject)
 ButtonDragModel.ClassName = "ButtonDragModel"
 ButtonDragModel.__index = ButtonDragModel
+
+export type ButtonDragModel = typeof(setmetatable(
+	{} :: {
+		_dragPosition: ValueObject.ValueObject<Vector2?>,
+		_dragDelta: ValueObject.ValueObject<Vector2?>,
+		_isMouseDown: ValueObject.ValueObject<boolean>,
+		_button: ValueObject.ValueObject<GuiButton?>,
+		_absoluteSize: ValueObject.ValueObject<Vector2>,
+		_isPressed: ValueObject.ValueObject<boolean>,
+		_clampWithinButton: ValueObject.ValueObject<boolean>,
+		_activePositions: { [InputObject | string]: Vector2? },
+
+		DragPositionChanged: _Signal.Signal<Vector2>,
+		IsDraggingChanged: _Signal.Signal<boolean>,
+	},
+	{} :: typeof({ __index = ButtonDragModel })
+)) & BaseObject.BaseObject
 
 --[=[
 	Construst a new drag model for the button
@@ -25,8 +44,8 @@ ButtonDragModel.__index = ButtonDragModel
 	@param initialButton GuiButton? -- Optional
 	@return ButtonDragModel
 ]=]
-function ButtonDragModel.new(initialButton: GuiButton?)
-	local self = setmetatable(BaseObject.new(), ButtonDragModel)
+function ButtonDragModel.new(initialButton: GuiButton?): ButtonDragModel
+	local self: ButtonDragModel = setmetatable(BaseObject.new() :: any, ButtonDragModel)
 
 	self._isMouseDown = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._dragPosition = self._maid:Add(ValueObject.new(nil))
@@ -44,14 +63,14 @@ function ButtonDragModel.new(initialButton: GuiButton?)
 	end))
 
 	self.DragPositionChanged = self._dragPosition.Changed
-	self.IsDraggingChanged = self._isPressed.Changed
+	self.IsDraggingChanged = self._isPressed.Changed :: any
 
 	if initialButton then
 		self:SetButton(initialButton)
 	end
 
 	self._maid:GiveTask(self._button
-		:ObserveBrio(function(button)
+		:ObserveBrio(function(button: GuiButton?)
 			return button ~= nil
 		end)
 		:Subscribe(function(brio)
@@ -59,7 +78,7 @@ function ButtonDragModel.new(initialButton: GuiButton?)
 				return
 			end
 
-			local maid, button = brio:ToMaidAndValue()
+			local maid, button: any = brio:ToMaidAndValue()
 			self:_setupDragging(maid, button)
 		end))
 
@@ -71,7 +90,7 @@ end
 
 	@return boolean
 ]=]
-function ButtonDragModel:IsPressed(): boolean
+function ButtonDragModel.IsPressed(self: ButtonDragModel): boolean
 	return self._isPressed.Value
 end
 
@@ -80,30 +99,30 @@ end
 
 	@return Observable<boolean>
 ]=]
-function ButtonDragModel:ObserveIsPressed(): _Observable.Observable<boolean>
+function ButtonDragModel.ObserveIsPressed(self: ButtonDragModel): _Observable.Observable<boolean>
 	return self._isPressed:Observe()
 end
 
 --[=[
 	@return Observable<Brio<true>>
 ]=]
-function ButtonDragModel:ObserveIsPressedBrio(): _Observable.Observable<_Brio.Brio<boolean>>
+function ButtonDragModel.ObserveIsPressedBrio(self: ButtonDragModel): _Observable.Observable<_Brio.Brio<boolean>>
 	return self._isPressed:ObserveBrio(function(value)
-		return value
-	end)
+		return value :: any
+	end) :: any
 end
 
 --[=[
 	@return Observable<Vector2?>
 ]=]
-function ButtonDragModel:ObserveDragDelta(): _Observable.Observable<Vector2?>
+function ButtonDragModel.ObserveDragDelta(self: ButtonDragModel): _Observable.Observable<Vector2?>
 	return self._dragDelta:Observe()
 end
 
 --[=[
 	@return Vector2?
 ]=]
-function ButtonDragModel:GetDragDelta(): Vector2?
+function ButtonDragModel.GetDragDelta(self: ButtonDragModel): Vector2?
 	return self._dragDelta.Value
 end
 
@@ -114,7 +133,7 @@ end
 
 	@return Vector2?
 ]=]
-function ButtonDragModel:GetDragPosition(): Vector2?
+function ButtonDragModel.GetDragPosition(self: ButtonDragModel): Vector2?
 	return self._dragPosition.Value
 end
 
@@ -125,7 +144,7 @@ end
 
 	@return Observable<Vector2?>
 ]=]
-function ButtonDragModel:ObserveDragPosition(): _Observable.Observable<Vector2?>
+function ButtonDragModel.ObserveDragPosition(self: ButtonDragModel): _Observable.Observable<Vector2?>
 	return self._dragPosition:Observe()
 end
 
@@ -133,7 +152,7 @@ end
 	Sets whether to clamp the results within the button bounds
 	@param clampWithinButton boolean
 ]=]
-function ButtonDragModel:SetClampWithinButton(clampWithinButton: boolean)
+function ButtonDragModel.SetClampWithinButton(self: ButtonDragModel, clampWithinButton: boolean)
 	self._clampWithinButton.Value = clampWithinButton
 end
 
@@ -143,7 +162,7 @@ end
 	@param button GuiButton
 	@return () -> () -- Cleanup function
 ]=]
-function ButtonDragModel:SetButton(button: GuiButton): () -> ()
+function ButtonDragModel.SetButton(self: ButtonDragModel, button: GuiButton): () -> ()
 	assert(typeof(button) == "Instance" or button == nil, "Bad button")
 
 	self._button.Value = button
@@ -155,7 +174,7 @@ function ButtonDragModel:SetButton(button: GuiButton): () -> ()
 	end
 end
 
-function ButtonDragModel:_setupDragging(maid: Maid.Maid, button: GuiButton)
+function ButtonDragModel._setupDragging(self: ButtonDragModel, maid: Maid.Maid, button: GuiButton)
 	maid:GiveTask(self._clampWithinButton.Changed:Connect(function()
 		self:_updateCurrentPosition()
 	end))
@@ -204,7 +223,7 @@ function ButtonDragModel:_setupDragging(maid: Maid.Maid, button: GuiButton)
 	end))
 end
 
-function ButtonDragModel:_updateMouseTracking(button: GuiButton)
+function ButtonDragModel._updateMouseTracking(self: ButtonDragModel, button: GuiButton)
 	local maid = Maid.new()
 
 	local lastMousePosition: Vector3? = nil
@@ -260,7 +279,12 @@ function ButtonDragModel:_updateMouseTracking(button: GuiButton)
 	return maid
 end
 
-function ButtonDragModel:_trackTouch(buttonMaid: Maid.Maid, button: GuiButton, inputObject: InputObject)
+function ButtonDragModel._trackTouch(
+	self: ButtonDragModel,
+	buttonMaid: Maid.Maid,
+	button: GuiButton,
+	inputObject: InputObject
+)
 	buttonMaid[inputObject] = nil
 
 	if inputObject.UserInputState == Enum.UserInputState.End then
@@ -296,23 +320,23 @@ function ButtonDragModel:_trackTouch(buttonMaid: Maid.Maid, button: GuiButton, i
 	maid[inputObject] = maid
 end
 
-function ButtonDragModel:_stopTouchTrack(buttonMaid: Maid.Maid, inputObject: InputObject)
+function ButtonDragModel._stopTouchTrack(_self: ButtonDragModel, buttonMaid: Maid.Maid, inputObject: InputObject)
 	-- Clears the input tracking as we slide off the button
 	buttonMaid[inputObject] = nil
 end
 
-function ButtonDragModel:_toButtonSpace(button: GuiButton, position: Vector2): Vector2
+function ButtonDragModel._toButtonSpace(_self: ButtonDragModel, button: GuiButton, position: Vector3): Vector2
 	local pos = button.AbsolutePosition
 	local size = button.AbsoluteSize
 
 	return (Vector2.new(position.X, position.Y) - pos) / size
 end
 
-function ButtonDragModel:_updateCurrentPosition()
-	local current = Vector2.zero
+function ButtonDragModel._updateCurrentPosition(self: ButtonDragModel): ()
+	local current: Vector2 = Vector2.zero
 	local count = 0
-	for _, item in self._activePositions do
-		current = current + item
+	for _, item: any in self._activePositions do
+		current += item
 		count = count + 1
 	end
 	if count == 0 then
@@ -338,7 +362,7 @@ function ButtonDragModel:_updateCurrentPosition()
 	end
 end
 
-function ButtonDragModel:_incrementDragDelta(delta: Vector3)
+function ButtonDragModel._incrementDragDelta(self: ButtonDragModel, delta: Vector3)
 	local current: Vector2 = self._dragDelta.Value or Vector2.zero
 	self._dragDelta.Value = current + Vector2.new(delta.X, delta.Y)
 end

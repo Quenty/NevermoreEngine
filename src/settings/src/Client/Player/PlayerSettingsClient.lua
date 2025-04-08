@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	A player's current settings. Handles replication back to the server
 	when a setting changes. See [PlayerSettingsBase].
@@ -22,12 +23,26 @@ local Remoting = require("Remoting")
 local Symbol = require("Symbol")
 local ThrottledFunction = require("ThrottledFunction")
 local ValueObject = require("ValueObject")
+local _ServiceBag = require("ServiceBag")
+local _Promise = require("Promise")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
 local PlayerSettingsClient = setmetatable({}, PlayerSettingsBase)
 PlayerSettingsClient.ClassName = "PlayerSettingsClient"
 PlayerSettingsClient.__index = PlayerSettingsClient
+
+export type PlayerSettingsClient = typeof(setmetatable(
+	{} :: {
+		_remoting: Remoting.Remoting,
+		_pendingReplicationDataInTransit: ValueObject.ValueObject<any>,
+		_toReplicate: { [any]: any? }?,
+		_toReplicateCallbacks: { [string]: { [any]: any } },
+		_currentReplicationRequest: _Promise.Promise<()>?,
+		_queueSendSettingsFunc: ThrottledFunction.ThrottledFunction<()>,
+	},
+	{} :: typeof({ __index = PlayerSettingsClient })
+)) & PlayerSettingsBase.PlayerSettingsBase
 
 --[=[
 	See [SettingsBindersClient] and [SettingsServiceClient] on how to properly use this class.
@@ -36,8 +51,9 @@ PlayerSettingsClient.__index = PlayerSettingsClient
 	@param serviceBag ServiceBag
 	@return PlayerSettingsClient
 ]=]
-function PlayerSettingsClient.new(folder, serviceBag)
-	local self = setmetatable(PlayerSettingsBase.new(folder, serviceBag), PlayerSettingsClient)
+function PlayerSettingsClient.new(folder: Folder, serviceBag: _ServiceBag.ServiceBag): PlayerSettingsClient
+	local self: PlayerSettingsClient =
+		setmetatable(PlayerSettingsBase.new(folder, serviceBag) :: any, PlayerSettingsClient)
 
 	if self:GetPlayer() == Players.LocalPlayer then
 		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.CLIENT))
@@ -69,7 +85,7 @@ end
 	@param defaultValue T
 	@return T
 ]=]
-function PlayerSettingsClient:GetValue(settingName, defaultValue)
+function PlayerSettingsClient.GetValue<T>(self: PlayerSettingsClient, settingName: string, defaultValue: T): T
 	assert(type(settingName) == "string", "Bad settingName")
 
 	if self._toReplicate and self._toReplicate[settingName] ~= nil then
@@ -91,7 +107,11 @@ end
 	@param defaultValue T
 	@return Observable<T>
 ]=]
-function PlayerSettingsClient:ObserveValue(settingName, defaultValue)
+function PlayerSettingsClient.ObserveValue<T>(
+	self: PlayerSettingsClient,
+	settingName: string,
+	defaultValue: T
+): Observable.Observable<T>
 	assert(type(settingName) == "string", "Bad settingName")
 
 	local baseObservable = getmetatable(PlayerSettingsClient).ObserveValue(self, settingName, defaultValue)
@@ -149,11 +169,12 @@ function PlayerSettingsClient:ObserveValue(settingName, defaultValue)
 		maid:GiveTask(baseObservable:Subscribe(function(newValue)
 			lastObservedValue = newValue
 			update()
-		end), sub:GetFailComplete())
+		end, sub:GetFailComplete()))
+
 		update()
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -162,7 +183,7 @@ end
 	@param settingName string
 	@param value T
 ]=]
-function PlayerSettingsClient:SetValue(settingName, value)
+function PlayerSettingsClient.SetValue<T>(self: PlayerSettingsClient, settingName: string, value: T): ()
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(self:GetPlayer() == Players.LocalPlayer, "Cannot set settings of another player")
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
@@ -176,12 +197,16 @@ function PlayerSettingsClient:SetValue(settingName, value)
 	end
 
 	local queueReplication = false
-	if not self._toReplicate then
-		self._toReplicate = {}
+	local toReplicate
+	if self._toReplicate then
+		toReplicate = self._toReplicate
+	else
+		toReplicate = {}
+		self._toReplicate = toReplicate
 		queueReplication = true
 	end
 
-	self._toReplicate[settingName] = PlayerSettingsUtils.encodeForNetwork(value)
+	toReplicate[settingName] = PlayerSettingsUtils.encodeForNetwork(value)
 
 	if self._toReplicateCallbacks[settingName] then
 		for callback, _ in self._toReplicateCallbacks[settingName] do
@@ -203,7 +228,7 @@ function PlayerSettingsClient:SetValue(settingName, value)
 	end
 end
 
-function PlayerSettingsClient:_sendSettings()
+function PlayerSettingsClient._sendSettings(self: PlayerSettingsClient)
 	if not self._toReplicate then
 		warn("Nothing to save, should not have called this method")
 		return
@@ -228,10 +253,10 @@ function PlayerSettingsClient:_sendSettings()
 	return promise
 end
 
-function PlayerSettingsClient:_promiseReplicateSettings(settingsMap)
+function PlayerSettingsClient._promiseReplicateSettings(self: PlayerSettingsClient, settingsMap)
 	assert(type(settingsMap) == "table", "Bad settingsMap")
 
 	return self._remoting.RequestUpdateSettings:PromiseInvokeServer(settingsMap)
 end
 
-return Binder.new("PlayerSettings", PlayerSettingsClient)
+return Binder.new("PlayerSettings", PlayerSettingsClient :: any) :: Binder.Binder<PlayerSettingsClient>

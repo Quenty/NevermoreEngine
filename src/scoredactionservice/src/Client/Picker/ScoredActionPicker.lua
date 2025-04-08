@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class ScoredActionPicker
 ]=]
@@ -16,8 +17,16 @@ local ScoredActionPicker = setmetatable({}, BaseObject)
 ScoredActionPicker.ClassName = "ScoredActionPicker"
 ScoredActionPicker.__index = ScoredActionPicker
 
+export type ScoredActionPicker = typeof(setmetatable(
+	{} :: {
+		_actionSet: { [_ScoredAction.ScoredAction]: boolean },
+		_currentPreferred: ValueObject.ValueObject<_ScoredAction.ScoredAction?>,
+	},
+	{} :: typeof({ __index = ScoredActionPicker })
+)) & BaseObject.BaseObject
+
 function ScoredActionPicker.new()
-	local self = setmetatable(BaseObject.new(), ScoredActionPicker)
+	local self: ScoredActionPicker = setmetatable(BaseObject.new() :: any, ScoredActionPicker)
 
 	self._actionSet = {}
 	self._currentPreferred = self._maid:Add(ValueObject.new())
@@ -35,13 +44,13 @@ function ScoredActionPicker.new()
 	return self
 end
 
-function ScoredActionPicker:Update()
+function ScoredActionPicker.Update(self: ScoredActionPicker): ()
 	if not next(self._actionSet) then
 		self._currentPreferred.Value = nil
 		return
 	end
 
-	local actionList = Set.toList(self._actionSet)
+	local actionList: { _ScoredAction.ScoredAction } = Set.toList(self._actionSet)
 	table.sort(actionList, function(a, b)
 		if a._score == b._score then
 			-- Older objects have preference in ties
@@ -61,7 +70,7 @@ function ScoredActionPicker:Update()
 		)
 	end
 
-	for _, action in actionList do
+	for _, action: any in actionList do
 		local preferredAction = self:_tryGetValidPreferredAction(action)
 		if preferredAction then
 			self._currentPreferred.Value = preferredAction
@@ -70,7 +79,10 @@ function ScoredActionPicker:Update()
 	end
 end
 
-function ScoredActionPicker:_tryGetValidPreferredAction(action: _ScoredAction.ScoredAction)
+function ScoredActionPicker._tryGetValidPreferredAction(
+	_self: ScoredActionPicker,
+	action: _ScoredAction.ScoredAction
+): _ScoredAction.ScoredAction?
 	if not action then
 		return nil
 	end
@@ -87,14 +99,14 @@ function ScoredActionPicker:_tryGetValidPreferredAction(action: _ScoredAction.Sc
 	return action
 end
 
-function ScoredActionPicker:AddAction(action: _ScoredAction.ScoredAction)
+function ScoredActionPicker.AddAction(self: ScoredActionPicker, action: _ScoredAction.ScoredAction): ()
 	assert(type(action) == "table", "Bad action")
 
 	self._actionSet[action] = true
 	self:Update()
 end
 
-function ScoredActionPicker:RemoveAction(action: _ScoredAction.ScoredAction)
+function ScoredActionPicker.RemoveAction(self: ScoredActionPicker, action: _ScoredAction.ScoredAction): ()
 	assert(type(action) == "table", "Bad action")
 
 	if self._currentPreferred.Value == action then
@@ -105,7 +117,7 @@ function ScoredActionPicker:RemoveAction(action: _ScoredAction.ScoredAction)
 	self:Update()
 end
 
-function ScoredActionPicker:HasActions()
+function ScoredActionPicker.HasActions(self: ScoredActionPicker): boolean
 	return next(self._actionSet) ~= nil
 end
 

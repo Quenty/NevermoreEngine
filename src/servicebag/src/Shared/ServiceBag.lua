@@ -54,7 +54,6 @@ ServiceBag.__index = ServiceBag
 
 export type ServiceBag = typeof(setmetatable(
 	{} :: {
-		_maid: _Maid.Maid,
 		_services: { [any]: any },
 		_parentProvider: ServiceBag?,
 		_serviceTypesToInitializeSet: { [any]: true }?,
@@ -68,8 +67,8 @@ export type ServiceBag = typeof(setmetatable(
 
 		_destroyingSignal: Signal.Signal<()>,
 	},
-	{ __index = ServiceBag }
-))
+	{} :: typeof({ __index = ServiceBag })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new ServiceBag
@@ -78,7 +77,7 @@ export type ServiceBag = typeof(setmetatable(
 	@return ServiceBag
 ]=]
 function ServiceBag.new(parentProvider: ServiceBag?): ServiceBag
-	local self = setmetatable(BaseObject.new() :: any, ServiceBag)
+	local self: ServiceBag = setmetatable(BaseObject.new() :: any, ServiceBag)
 
 	self._services = {}
 	self._parentProvider = parentProvider
@@ -95,7 +94,7 @@ function ServiceBag.new(parentProvider: ServiceBag?): ServiceBag
 
 	self._destroyingSignal = Signal.new()
 
-	return self :: any
+	return self
 end
 
 --[=[
@@ -255,8 +254,8 @@ function ServiceBag.CreateScope(self: ServiceBag): ServiceBag
 	self:_addServiceType(provider)
 
 	-- Remove from parent provider
-	self._maid[provider :: any] = provider._destroyingSignal:Connect(function()
-		self._maid[provider :: any] = nil
+	self._maid[provider] = provider._destroyingSignal:Connect(function()
+		self._maid[provider] = nil
 		self._services[provider] = nil
 	end)
 

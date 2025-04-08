@@ -26,7 +26,7 @@ export type Queue<T> = typeof(setmetatable(
 		_first: number,
 		_last: number,
 	},
-	{ __index = Queue }
+	{} :: typeof({ __index = Queue })
 ))
 
 --[=[

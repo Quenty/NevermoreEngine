@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Cancellation token
 	@class CancelToken
@@ -18,7 +19,14 @@ CancelToken.__index = CancelToken
 
 export type Executor = (cancel: () -> (), maid: any) -> ()
 
-export type CancelToken = typeof(setmetatable({} :: {}, CancelToken))
+export type CancelToken = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		Cancelled: Signal.Signal<()>,
+		PromiseCancelled: Promise.Promise<()>,
+	},
+	{} :: typeof({ __index = CancelToken })
+))
 
 --[=[
 	Constructs a new CancelToken
@@ -68,7 +76,7 @@ end
 	@param maid Maid
 	@return CancelToken
 ]=]
-function CancelToken.fromMaid(maid): CancelToken
+function CancelToken.fromMaid(maid: Maid.Maid): CancelToken
 	local token = CancelToken.new(EMPTY_FUNCTION)
 
 	local taskId = maid:GiveTask(function()
@@ -99,7 +107,7 @@ end
 --[=[
 	Errors if cancelled
 ]=]
-function CancelToken:ErrorIfCancelled()
+function CancelToken.ErrorIfCancelled(self: CancelToken): ()
 	if not self.PromiseCancelled:IsPending() then
 		error("[CancelToken.ErrorIfCancelled] - Cancelled")
 	end
@@ -109,11 +117,11 @@ end
 	Returns true if cancelled
 	@return boolean
 ]=]
-function CancelToken:IsCancelled(): boolean
+function CancelToken.IsCancelled(self: CancelToken): boolean
 	return self.PromiseCancelled:IsFulfilled()
 end
 
-function CancelToken:_cancel()
+function CancelToken._cancel(self: CancelToken): ()
 	self._maid:DoCleaning()
 end
 

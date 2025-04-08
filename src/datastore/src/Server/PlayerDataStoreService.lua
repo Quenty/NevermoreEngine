@@ -16,6 +16,17 @@ local _ServiceBag = require("ServiceBag")
 local PlayerDataStoreService = {}
 PlayerDataStoreService.ServiceName = "PlayerDataStoreService"
 
+export type PlayerDataStoreService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: _ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_dataStoreName: string,
+		_dataStoreScope: string,
+		_dataStoreManagerPromise: Promise.Promise<PlayerDataStoreManager.PlayerDataStoreManager>,
+	},
+	{} :: typeof({ __index = PlayerDataStoreService })
+))
+
 --[=[
 	Initializes the PlayerDataStoreService. Should be done via [ServiceBag.Init].
 	@param serviceBag ServiceBag

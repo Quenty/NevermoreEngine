@@ -164,7 +164,10 @@ end
 	@param cancelToken CancelToken?
 	@return Promise<T>
 ]=]
-function Rx.toPromise(observable, cancelToken)
+function Rx.toPromise<T...>(
+	observable: Observable.Observable<T...>,
+	cancelToken: CancelToken.CancelToken?
+): Promise.Promise<T...>
 	assert(Observable.isObservable(observable), "Bad observable")
 
 	local maid = Maid.new()
@@ -301,7 +304,11 @@ end
 	@param onComplete function?
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
-function Rx.tap(onFire, onError, onComplete)
+function Rx.tap<T...>(
+	onFire: _Subscription.FireCallback<T...>?,
+	onError: _Subscription.FailCallback?,
+	onComplete: _Subscription.CompleteCallback?
+): Observable.Transformer<T..., T...>
 	assert(type(onFire) == "function" or onFire == nil, "Bad onFire")
 	assert(type(onError) == "function" or onError == nil, "Bad onError")
 	assert(type(onComplete) == "function" or onComplete == nil, "Bad onComplete")
@@ -328,7 +335,7 @@ function Rx.tap(onFire, onError, onComplete)
 				end
 				sub:Complete(...)
 			end)
-		end)
+		end) :: any
 	end
 end
 
@@ -348,7 +355,7 @@ function Rx.start<T...>(callback: () -> T...): Observable.Transformer<T..., T...
 			sub:Fire(callback())
 
 			return source:Subscribe(sub:GetFireFailComplete())
-		end)
+		end) :: any
 	end
 end
 
@@ -361,7 +368,7 @@ end
 	@return (source: Observable) -> Observable
 ]=]
 function Rx.share<T...>(): Observable.Transformer<T..., T...>
-	return function(source): Observable.Observable<T...>
+	return function(source)
 		local shareMaid = Maid.new()
 		local subs: { _Subscription.Subscription<T...> } = {}
 
@@ -554,7 +561,7 @@ function Rx.shareReplay<T...>(bufferSize: number?, windowTimeSeconds: number?): 
 					end
 				end
 			end
-		end) :: Observable.Observable<T...>
+		end) :: any
 	end
 end
 
@@ -798,7 +805,7 @@ end
 function Rx.where<T...>(predicate: Predicate<T...>): Observable.Transformer<T..., T...>
 	assert(type(predicate) == "function", "Bad predicate callback")
 
-	return function(source: Observable.Observable<T...>): Observable.Observable<T...>
+	return function(source: Observable.Observable<T...>)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
@@ -807,7 +814,7 @@ function Rx.where<T...>(predicate: Predicate<T...>): Observable.Transformer<T...
 					sub:Fire(...)
 				end
 			end, sub:GetFailComplete())
-		end)
+		end) :: any
 	end
 end
 
@@ -839,7 +846,7 @@ function Rx.distinct<T...>(): Observable.Transformer<T..., T...>
 				last = value
 				sub:Fire(last)
 			end, sub:GetFailComplete())
-		end) :: Observable.Observable<T...>
+		end) :: any
 	end
 end
 
@@ -887,7 +894,7 @@ function Rx.map<T..., U...>(project: (T...) -> U...): Observable.Transformer<T..
 			return source:Subscribe(function(...)
 				sub:Fire(project(...))
 			end, sub:GetFailComplete())
-		end) :: Observable.Observable<U...>
+		end) :: any
 	end
 end
 
@@ -938,7 +945,7 @@ end
 function Rx.flatMap<T..., U...>(project: (T...) -> Observable.Observable<U...>): Observable.Transformer<(T...), (U...)>
 	assert(type(project) == "function", "Bad project")
 
-	return function(source: Observable.Observable<T...>): Observable.Observable<U...>
+	return function(source: Observable.Observable<T...>)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub: _Subscription.Subscription<U...>)
@@ -1194,7 +1201,7 @@ function Rx.switchMap<T..., U...>(project: (T...) -> Observable.Observable<U...>
 
 				outerSubscription:Destroy()
 			end
-		end) :: Observable.Observable<U...>
+		end) :: any
 	end
 end
 
@@ -1662,7 +1669,7 @@ function Rx.take<T...>(number: number): Observable.Transformer<T..., T...>
 			end, sub:GetFailComplete())
 
 			return maid
-		end) :: Observable.Observable<T...>
+		end) :: any
 	end
 end
 
@@ -1694,7 +1701,7 @@ function Rx.skip<T...>(toSkip: number): Observable.Transformer<T..., T...>
 			end, sub:GetFailComplete()))
 
 			return maid
-		end) :: Observable.Observable<T...>
+		end) :: any
 	end
 end
 
@@ -1754,7 +1761,7 @@ function Rx.delay<T...>(seconds: number): Observable.Transformer<T..., T...>
 			end, sub:GetFailComplete()))
 
 			return maid
-		end) :: Observable.Observable<T...>
+		end) :: any
 	end
 end
 
@@ -1934,7 +1941,7 @@ end
 
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.throttleDefer()
+function Rx.throttleDefer<T...>(): Observable.Transformer<T..., T...>
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
@@ -1970,7 +1977,7 @@ function Rx.throttleDefer()
 
 				sourceSub:Destroy()
 			end
-		end)
+		end) :: any
 	end
 end
 

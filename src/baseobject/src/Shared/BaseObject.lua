@@ -17,7 +17,7 @@ export type BaseObject = typeof(setmetatable(
 		_obj: Instance?,
 		_maid: Maid.Maid,
 	},
-	{ __index = BaseObject }
+	{} :: typeof({ __index = BaseObject })
 ))
 
 --[=[

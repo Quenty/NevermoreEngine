@@ -20,7 +20,7 @@ export type SortedNodeValue<T> = typeof(setmetatable(
 		_value: T,
 		_compare: CompareFunction<T>,
 	},
-	SortedNodeValue
+	{} :: typeof({ __index = SortedNodeValue })
 ))
 
 function SortedNodeValue.new<T>(value: T, compare: CompareFunction<T>): SortedNodeValue<T>

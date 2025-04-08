@@ -13,7 +13,7 @@ export type Tuple<T...> = typeof(setmetatable(
 	{} :: {
 		n: number,
 	},
-	Tuple
+	{} :: typeof({ __index = Tuple })
 ))
 
 --[=[

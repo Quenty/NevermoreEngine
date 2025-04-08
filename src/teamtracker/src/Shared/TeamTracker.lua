@@ -20,7 +20,7 @@ export type TeamTracker = typeof(setmetatable(
 
 		CurrentTeam: ValueObject.ValueObject<Team?>,
 	},
-	{ __index = TeamTracker }
+	{} :: typeof({ __index = TeamTracker })
 ))
 
 function TeamTracker.new(player: Player): TeamTracker

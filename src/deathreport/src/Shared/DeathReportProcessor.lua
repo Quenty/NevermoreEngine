@@ -27,8 +27,8 @@ export type DeathReportProcessor = typeof(setmetatable(
 		_characterKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
 		_characterDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
 	},
-	{ __index = DeathReportProcessor }
-))
+	{} :: typeof({ __index = DeathReportProcessor })
+)) & BaseObject.BaseObject
 
 function DeathReportProcessor.new(): DeathReportProcessor
 	local self = setmetatable(BaseObject.new() :: any, DeathReportProcessor)

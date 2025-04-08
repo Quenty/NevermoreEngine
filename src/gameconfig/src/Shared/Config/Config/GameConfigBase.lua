@@ -43,8 +43,8 @@ export type GameConfigBase = typeof(setmetatable(
 		_assetKeyToAssetConfig: any,
 		_assetIdToAssetConfig: any,
 	},
-	{ __index = GameConfigBase}
-))
+	{} :: typeof({ __index = GameConfigBase })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new game config.

@@ -35,24 +35,34 @@ local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxPlayerUtils = require("RxPlayerUtils")
 local PermissionLevelUtils = require("PermissionLevelUtils")
+local _ServiceBag = require("ServiceBag")
+local _Observable = require("Observable")
+local _Brio = require("Brio")
+local _BasePermissionProvider = require("BasePermissionProvider")
 
 local PermissionService = {}
 PermissionService.ServiceName = "PermissionService"
+
+export type PermissionService = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_promise: Promise.Promise<()>,
+		_provider: any,
+	},
+	{} :: typeof({ __index = PermissionService })
+))
 
 --[=[
 	Initializes the service. Should be done via [ServiceBag].
 	@param _serviceBag ServiceBag
 ]=]
-function PermissionService:Init(_serviceBag)
+function PermissionService:Init(_serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._promise, "Already initialized")
 	assert(not self._provider, "Already have provider")
 
 	self._provider = nil
-
 	self._maid = Maid.new()
-
-	self._promise = Promise.new()
-	self._maid:GiveTask(self._promise)
+	self._promise = self._maid:Add(Promise.new())
 end
 
 --[=[
@@ -61,7 +71,7 @@ end
 
 	@param config { type: string }
 ]=]
-function PermissionService:SetProviderFromConfig(config)
+function PermissionService:SetProviderFromConfig(config: PermissionProviderUtils.PermissionProviderConfig)
 	assert(self._promise, "Not initialized")
 	assert(not self._provider, "Already have provider set")
 
@@ -91,7 +101,7 @@ end
 	Returns the permission provider
 	@return Promise<BasePermissionProvider>
 ]=]
-function PermissionService:PromisePermissionProvider()
+function PermissionService:PromisePermissionProvider(): Promise.Promise<_BasePermissionProvider.BasePermissionProvider>
 	assert(self._promise, "Not initialized")
 
 	return self._promise
@@ -102,7 +112,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function PermissionService:PromiseIsAdmin(player: Player)
+function PermissionService:PromiseIsAdmin(player: Player): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)
@@ -113,7 +123,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function PermissionService:PromiseIsCreator(player: Player)
+function PermissionService:PromiseIsCreator(player: Player): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
@@ -125,7 +135,10 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function PermissionService:PromiseIsPermissionLevel(player: Player, permissionLevel)
+function PermissionService:PromiseIsPermissionLevel(
+	player: Player,
+	permissionLevel: PermissionLevel.PermissionLevel
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
@@ -140,7 +153,7 @@ end
 	@param permissionLevel PermissionLevel
 	@return Observable<Brio<Player>>
 ]=]
-function PermissionService:ObservePermissionedPlayersBrio(permissionLevel)
+function PermissionService:ObservePermissionedPlayersBrio(permissionLevel: PermissionLevel.PermissionLevel): _Observable.Observable<_Brio.Brio<Player>>
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
 	return RxPlayerUtils.observePlayersBrio():Pipe({

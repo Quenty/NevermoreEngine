@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Syncronizes time between the server and client. This creates a shared timestamp that can be used to reasonably time
 	events between the server and client.
@@ -21,18 +22,28 @@ local Rx = require("Rx")
 local SlaveClock = require("SlaveClock")
 local TimeSyncConstants = require("TimeSyncConstants")
 local TimeSyncUtils = require("TimeSyncUtils")
+local _Observable = require("Observable")
 
 local TimeSyncService = {}
 TimeSyncService.ServiceName = "TimeSyncService"
 
+export type SyncedClock = MasterClock.MasterClock | SlaveClock.SlaveClock
+
+export type TimeSyncService = typeof(setmetatable(
+	{} :: {
+		_clockPromise: Promise.Promise<SyncedClock>,
+		_maid: Maid.Maid,
+	},
+	{} :: typeof({ __index = TimeSyncService })
+))
+
 --[=[
 	Initializes the TimeSyncService
 ]=]
-function TimeSyncService:Init()
-	assert(not self._clockPromise, "TimeSyncService is already initialized!")
+function TimeSyncService.Init(self: TimeSyncService)
+	assert(not (self :: any)._clockPromise, "TimeSyncService is already initialized!")
 
 	self._maid = Maid.new()
-
 	self._clockPromise = self._maid:Add(Promise.new())
 
 	if not RunService:IsRunning() then
@@ -55,7 +66,7 @@ end
 
 	@return boolean
 ]=]
-function TimeSyncService:IsSynced(): boolean
+function TimeSyncService.IsSynced(self: TimeSyncService): boolean
 	if not RunService:IsRunning() then
 		return true
 	end
@@ -70,7 +81,7 @@ end
 	@yields
 	@return MasterClock | SlaveClock
 ]=]
-function TimeSyncService:WaitForSyncedClock()
+function TimeSyncService.WaitForSyncedClock(self: TimeSyncService): SyncedClock
 	if not RunService:IsRunning() then
 		return self:_buildMockClock()
 	end
@@ -84,7 +95,7 @@ end
 
 	@return MasterClock | SlaveClock | nil
 ]=]
-function TimeSyncService:GetSyncedClock()
+function TimeSyncService.GetSyncedClock(self: TimeSyncService): SyncedClock?
 	if not RunService:IsRunning() then
 		return self:_buildMockClock()
 	end
@@ -102,7 +113,7 @@ end
 
 	@return Promise<MasterClock | SlaveClock>
 ]=]
-function TimeSyncService:PromiseSyncedClock()
+function TimeSyncService.PromiseSyncedClock(self: TimeSyncService): Promise.Promise<SyncedClock>
 	if not RunService:IsRunning() then
 		return Promise.resolved(self:_buildMockClock())
 	end
@@ -111,11 +122,11 @@ function TimeSyncService:PromiseSyncedClock()
 	return Promise.resolved(self._clockPromise)
 end
 
-function TimeSyncService:ObserveSyncedClock()
-	return Rx.fromPromise(self:PromiseSyncedClock())
+function TimeSyncService.ObserveSyncedClock(self: TimeSyncService): _Observable.Observable<SyncedClock>
+	return Rx.fromPromise(self:PromiseSyncedClock()) :: any
 end
 
-function TimeSyncService:_buildMockClock()
+function TimeSyncService._buildMockClock(_self: TimeSyncService): any
 	local mock = {}
 
 	function mock.IsSynced(_self)
@@ -133,7 +144,7 @@ function TimeSyncService:_buildMockClock()
 	return mock
 end
 
-function TimeSyncService:_buildMasterClock()
+function TimeSyncService._buildMasterClock(self: TimeSyncService): MasterClock.MasterClock
 	local remoteEvent = GetRemoteEvent(TimeSyncConstants.REMOTE_EVENT_NAME)
 	local remoteFunction = GetRemoteFunction(TimeSyncConstants.REMOTE_FUNCTION_NAME)
 
@@ -142,21 +153,23 @@ function TimeSyncService:_buildMasterClock()
 	return clock
 end
 
-function TimeSyncService:_promiseSlaveClock()
-	return self._maid:GivePromise(PromiseUtils.all({
-		PromiseGetRemoteEvent(TimeSyncConstants.REMOTE_EVENT_NAME);
-		PromiseGetRemoteFunction(TimeSyncConstants.REMOTE_FUNCTION_NAME);
-	})):Then(function(remoteEvent, remoteFunction)
-		local clock = self._maid:Add(SlaveClock.new(remoteEvent, remoteFunction))
+function TimeSyncService._promiseSlaveClock(self: TimeSyncService): Promise.Promise<SlaveClock.SlaveClock>
+	return self._maid
+		:GivePromise(PromiseUtils.all({
+			PromiseGetRemoteEvent(TimeSyncConstants.REMOTE_EVENT_NAME),
+			PromiseGetRemoteFunction(TimeSyncConstants.REMOTE_FUNCTION_NAME),
+		}))
+		:Then(function(remoteEvent, remoteFunction)
+			local clock = self._maid:Add(SlaveClock.new(remoteEvent, remoteFunction))
 
-		return TimeSyncUtils.promiseClockSynced(clock)
-	end)
+			return TimeSyncUtils.promiseClockSynced(clock)
+		end)
 end
 
 --[=[
 	Cleans up the time syncronization service.
 ]=]
-function TimeSyncService:Destroy()
+function TimeSyncService.Destroy(self: TimeSyncService)
 	self._maid:DoCleaning()
 end
 

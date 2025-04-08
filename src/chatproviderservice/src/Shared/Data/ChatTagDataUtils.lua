@@ -11,6 +11,7 @@ local ChatTagDataUtils = {}
 export type ChatTagData = {
 	TagText: string,
 	TagPriority: number,
+	UserDisabled: boolean?,
 	TagLocalizedText: LocalizedTextUtils.LocalizedTextData?,
 	TagColor: Color3,
 }

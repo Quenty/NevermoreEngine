@@ -17,7 +17,7 @@ export type RxSignal<T...> = typeof(setmetatable(
 	{} :: {
 		_observable: Observable.Observable<T...> | () -> Observable.Observable<T...>,
 	},
-	RxSignal
+	{} :: typeof({ __index = RxSignal })
 ))
 
 --[=[

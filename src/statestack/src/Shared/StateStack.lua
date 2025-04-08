@@ -30,6 +30,7 @@ local _Brio = require("Brio")
 local _Signal = require("Signal")
 local _Observable = require("Observable")
 local _Maid = require("Maid")
+local _Rx = require("Rx")
 
 local StateStack = setmetatable({}, BaseObject)
 StateStack.ClassName = "StateStack"
@@ -37,14 +38,14 @@ StateStack.__index = StateStack
 
 export type StateStack<T> = typeof(setmetatable(
 	{} :: {
-		_maid: _Maid.Maid,
+		Changed: _Signal.Signal<T>,
+
 		_state: ValueObject.ValueObject<T>,
 		_defaultValue: T,
 		_stateStack: { { T } },
-		Changed: _Signal.Signal<T>,
 	},
-	{ __index = StateStack }
-))
+	{} :: typeof({ __index = StateStack })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new StateStack.
@@ -52,7 +53,7 @@ export type StateStack<T> = typeof(setmetatable(
 	@param checkType string?
 	@return StateStack
 ]=]
-function StateStack.new<T>(defaultValue: T, checkType): StateStack<T>
+function StateStack.new<T>(defaultValue: T, checkType: ValueObject.ValueObjectTypeArg?): StateStack<T>
 	local self = setmetatable(BaseObject.new() :: any, StateStack)
 
 	self._state = self._maid:Add(ValueObject.new(defaultValue, checkType))
@@ -98,8 +99,11 @@ end
 	@param predicate function
 	@return Observable<T>
 ]=]
-function StateStack.ObserveBrio<T>(self: StateStack<T>, predicate): _Observable.Observable<_Brio.Brio<T>>
-	return self._state:ObserveBrio(predicate)
+function StateStack.ObserveBrio<T>(
+	self: StateStack<T>,
+	predicate: _Rx.Predicate<T>?
+): _Observable.Observable<_Brio.Brio<T>>
+	return self._state:ObserveBrio(predicate) :: any
 end
 
 --[=[
@@ -107,7 +111,7 @@ end
 	@param state T
 	@return function -- Cleanup function to invoke
 ]=]
-function StateStack.PushState<T>(self: StateStack<T>, state: T): (() -> ())?
+function StateStack.PushState<T>(self: StateStack<T>, state: T): () -> ()
 	local data: { T } = { state }
 	table.insert(self._stateStack, data)
 	self:_updateState()

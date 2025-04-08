@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Captures a snapshot of data to write and then merges it with the original.
 	@server
@@ -18,14 +19,27 @@ local DataStoreWriter = {}
 DataStoreWriter.ClassName = "DataStoreWriter"
 DataStoreWriter.__index = DataStoreWriter
 
+export type DataStoreStageKey = string | number
+
+export type DataStoreWriter = typeof(setmetatable(
+	{} :: {
+		_debugName: string,
+		_saveDataSnapshot: any,
+		_fullBaseDataSnapshot: any,
+		_userIdList: { number } | nil,
+		_writers: { [DataStoreStageKey]: DataStoreWriter },
+	},
+	{} :: typeof({ __index = DataStoreWriter })
+))
+
 --[=[
 	Constructs a new DataStoreWriter. In general, you will not use this API directly.
 
 	@param debugName string
 	@return DataStoreWriter
 ]=]
-function DataStoreWriter.new(debugName: string)
-	local self = setmetatable({}, DataStoreWriter)
+function DataStoreWriter.new(debugName: string): DataStoreWriter
+	local self: DataStoreWriter = setmetatable({} :: any, DataStoreWriter)
 
 	self._debugName = assert(debugName, "No debugName")
 	self._saveDataSnapshot = UNSET_TOKEN
@@ -41,7 +55,7 @@ end
 	Sets the ray data to write
 	@param saveDataSnapshot table | any
 ]=]
-function DataStoreWriter:SetSaveDataSnapshot(saveDataSnapshot)
+function DataStoreWriter.SetSaveDataSnapshot(self: DataStoreWriter, saveDataSnapshot)
 	assert(type(saveDataSnapshot) ~= "table" or table.isfrozen(saveDataSnapshot), "saveDataSnapshot should be frozen")
 
 	if saveDataSnapshot == DataStoreDeleteToken then
@@ -53,7 +67,7 @@ function DataStoreWriter:SetSaveDataSnapshot(saveDataSnapshot)
 	end
 end
 
-function DataStoreWriter:GetDataToSave()
+function DataStoreWriter.GetDataToSave(self: DataStoreWriter): any
 	if self._saveDataSnapshot == UNSET_TOKEN then
 		return nil
 	end
@@ -61,11 +75,11 @@ function DataStoreWriter:GetDataToSave()
 	return self._saveDataSnapshot
 end
 
-function DataStoreWriter:GetSubWritersMap()
+function DataStoreWriter.GetSubWritersMap(self: DataStoreWriter): { [DataStoreStageKey]: DataStoreWriter }
 	return self._writers
 end
 
-function DataStoreWriter:SetFullBaseDataSnapshot(fullBaseDataSnapshot)
+function DataStoreWriter.SetFullBaseDataSnapshot(self: DataStoreWriter, fullBaseDataSnapshot)
 	assert(
 		type(fullBaseDataSnapshot) ~= "table" or table.isfrozen(fullBaseDataSnapshot),
 		"fullBaseDataSnapshot should be frozen"
@@ -81,11 +95,11 @@ end
 
 --[=[
 	Adds a recursive child writer to use at the key `name`
-	@param name string
+	@param name string | number
 	@param writer DataStoreWriter
 ]=]
-function DataStoreWriter:AddSubWriter(name: string, writer)
-	assert(type(name) == "string", "Bad name")
+function DataStoreWriter.AddSubWriter(self: DataStoreWriter, name: DataStoreStageKey, writer: DataStoreWriter)
+	assert(type(name) == "string" or type(name) == "number", "Bad name")
 	assert(not self._writers[name], "Writer already exists for name")
 	assert(writer, "Bad writer")
 
@@ -95,10 +109,10 @@ end
 --[=[
 	Gets a sub writer
 
-	@param name string
+	@param name string | number
 	@return DataStoreWriter
 ]=]
-function DataStoreWriter:GetWriter(name: string)
+function DataStoreWriter.GetWriter(self: DataStoreWriter, name: DataStoreStageKey): DataStoreWriter?
 	assert(type(name) == "string", "Bad name")
 
 	return self._writers[name]
@@ -111,7 +125,7 @@ end
 
 	@param incoming any
 ]=]
-function DataStoreWriter:ComputeDiffSnapshot(incoming)
+function DataStoreWriter.ComputeDiffSnapshot(self: DataStoreWriter, incoming)
 	assert(incoming ~= DataStoreDeleteToken, "Incoming value should not be DataStoreDeleteToken")
 	assert(not Symbol.isSymbol(incoming), "Incoming should not be symbol")
 
@@ -149,7 +163,7 @@ function DataStoreWriter:ComputeDiffSnapshot(incoming)
 	end
 end
 
-function DataStoreWriter:_computeValueDiff(original, incoming)
+function DataStoreWriter._computeValueDiff(self: DataStoreWriter, original, incoming)
 	assert(original ~= DataStoreDeleteToken, "original cannot be DataStoreDeleteToken")
 	assert(incoming ~= DataStoreDeleteToken, "incoming cannot be DataStoreDeleteToken")
 	assert(not Symbol.isSymbol(original), "original should not be symbol")
@@ -166,7 +180,7 @@ function DataStoreWriter:_computeValueDiff(original, incoming)
 	end
 end
 
-function DataStoreWriter:_computeTableDiff(original, incoming)
+function DataStoreWriter._computeTableDiff(self: DataStoreWriter, original, incoming)
 	assert(type(original) == "table", "Bad original")
 	assert(type(incoming) == "table", "Bad incoming")
 	assert(not Symbol.isSymbol(original), "original should not be symbol")
@@ -191,7 +205,7 @@ end
 
 	@param userIdList { number }
 ]=]
-function DataStoreWriter:SetUserIdList(userIdList)
+function DataStoreWriter.SetUserIdList(self: DataStoreWriter, userIdList: { number }?)
 	assert(type(userIdList) == "table" or userIdList == nil, "Bad userIdList")
 
 	self._userIdList = userIdList
@@ -202,7 +216,7 @@ end
 
 	@return userIdList { number }
 ]=]
-function DataStoreWriter:GetUserIdList()
+function DataStoreWriter.GetUserIdList(self: DataStoreWriter): { number }?
 	if self._userIdList == UNSET_TOKEN then
 		return nil
 	end
@@ -210,7 +224,7 @@ function DataStoreWriter:GetUserIdList()
 	return self._userIdList
 end
 
-function DataStoreWriter:_writeMergeWriters(original)
+function DataStoreWriter._writeMergeWriters(self: DataStoreWriter, original)
 	local copy
 	if Symbol.isSymbol(original) then
 		copy = original
@@ -285,7 +299,7 @@ end
 	@param original any
 	@return any -- The original value
 ]=]
-function DataStoreWriter:WriteMerge(original)
+function DataStoreWriter.WriteMerge(self: DataStoreWriter, original)
 	-- Prioritize save value first, followed by writers, followed by original value
 
 	if self._saveDataSnapshot == DataStoreDeleteToken then
@@ -302,7 +316,7 @@ function DataStoreWriter:WriteMerge(original)
 	end
 end
 
-function DataStoreWriter:IsCompleteWipe(): boolean
+function DataStoreWriter.IsCompleteWipe(self: DataStoreWriter): boolean
 	if self._saveDataSnapshot == UNSET_TOKEN then
 		return false
 	end

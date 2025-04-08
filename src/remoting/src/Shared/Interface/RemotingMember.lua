@@ -9,12 +9,21 @@
 local require = require(script.Parent.loader).load(script)
 
 local RemotingRealms = require("RemotingRealms")
+local _Maid = require("Maid")
+local _Promise = require("Promise")
 
 local RemotingMember = {}
 RemotingMember.ClassName = "RemotingMember"
 RemotingMember.__index = RemotingMember
 
-export type RemotingMember = typeof(setmetatable({}, RemotingMember))
+export type RemotingMember = typeof(setmetatable(
+	{} :: {
+		_remoting: any,
+		_memberName: string,
+		_remotingRealm: RemotingRealms.RemotingRealm,
+	},
+	{} :: typeof({ __index = RemotingMember })
+))
 
 --[=[
 	Constructs a new RemotingMember
@@ -24,8 +33,12 @@ export type RemotingMember = typeof(setmetatable({}, RemotingMember))
 	@param remotingRealm RemotingRealms
 	@return RemotingMember
 ]=]
-function RemotingMember.new(remoting, memberName: string, remotingRealm: RemotingRealms.RemotingRealm): RemotingMember
-	local self = setmetatable({}, RemotingMember)
+function RemotingMember.new(
+	remoting: any,
+	memberName: string,
+	remotingRealm: RemotingRealms.RemotingRealm
+): RemotingMember
+	local self: RemotingMember = setmetatable({} :: any, RemotingMember)
 
 	self._remoting = assert(remoting, "No remoting")
 	self._memberName = assert(memberName, "No memberName")
@@ -43,7 +56,7 @@ end
 	@param callback function
 	@return MaidTask
 ]=]
-function RemotingMember:Bind(callback: (...any) -> ...any)
+function RemotingMember.Bind(self: RemotingMember, callback: (...any) -> ...any): _Maid.Maid
 	assert(type(callback) == "function", "Bad callback")
 
 	return self._remoting:Bind(self._memberName, callback)
@@ -60,7 +73,7 @@ end
 	@param callback function
 	@return MaidTask
 ]=]
-function RemotingMember:Connect(callback: (...any) -> ())
+function RemotingMember.Connect(self: RemotingMember, callback: (...any) -> ())
 	assert(type(callback) == "function", "Bad callback")
 
 	return self._remoting:Connect(self._memberName, callback)
@@ -69,14 +82,14 @@ end
 --[=[
 	Forward declares an event on the remoting object
 ]=]
-function RemotingMember:DeclareEvent()
+function RemotingMember.DeclareEvent(self: RemotingMember): ()
 	return self._remoting:DeclareEvent(self._memberName)
 end
 
 --[=[
 	Forward declares a method on the remoting object
 ]=]
-function RemotingMember:DeclareMethod()
+function RemotingMember.DeclareMethod(self: RemotingMember): ()
 	return self._remoting:DeclareMethod(self._memberName)
 end
 
@@ -86,7 +99,7 @@ end
 	@client
 	@param ... any
 ]=]
-function RemotingMember:FireServer(...)
+function RemotingMember.FireServer(self: RemotingMember, ...)
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "FireServer must be called on client")
 	self._remoting:FireServer(self._memberName, ...)
 end
@@ -97,7 +110,7 @@ end
 	@client
 	@param ... any
 ]=]
-function RemotingMember:InvokeServer(...)
+function RemotingMember.InvokeServer(self: RemotingMember, ...): _Promise.Promise<...any>
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "InvokeServer must be called on client")
 
 	return self._remoting:InvokeServer(self._memberName, ...)
@@ -109,7 +122,7 @@ end
 	@client
 	@param ... any
 ]=]
-function RemotingMember:PromiseInvokeServer(...)
+function RemotingMember.PromiseInvokeServer(self: RemotingMember, ...): _Promise.Promise<...any>
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "PromiseInvokeServer must be called on client")
 
 	return self._remoting:PromiseInvokeServer(self._memberName, ...)
@@ -122,7 +135,7 @@ end
 	@param ... any
 	@return Promise
 ]=]
-function RemotingMember:PromiseFireServer(...)
+function RemotingMember.PromiseFireServer(self: RemotingMember, ...): _Promise.Promise<...any>
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "PromiseInvokeServer must be called on client")
 
 	return self._remoting:PromiseFireServer(self._memberName, ...)
@@ -138,7 +151,7 @@ end
 	@param ... any
 	@return Promise<any>
 ]=]
-function RemotingMember:PromiseInvokeClient(player: Player, ...)
+function RemotingMember.PromiseInvokeClient(self: RemotingMember, player: Player, ...): _Promise.Promise<...any>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self._remotingRealm == RemotingRealms.SERVER, "PromiseInvokeClient must be called on client")
 
@@ -155,7 +168,7 @@ end
 	@param ... any
 	@return ... any
 ]=]
-function RemotingMember:InvokeClient(player, ...)
+function RemotingMember.InvokeClient(self: RemotingMember, player: Player, ...): ...any
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self._remotingRealm == RemotingRealms.SERVER, "InvokeClient must be called on client")
 
@@ -170,7 +183,7 @@ end
 	@server
 	@param ... any
 ]=]
-function RemotingMember:FireAllClients(...)
+function RemotingMember.FireAllClients(self: RemotingMember, ...)
 	assert(self._remotingRealm == RemotingRealms.SERVER, "FireAllClients must be called on client")
 
 	self._remoting:FireAllClients(self._memberName, ...)
@@ -184,7 +197,7 @@ end
 	@param excludePlayer Player | nil
 	@param ... any
 ]=]
-function RemotingMember:FireAllClientsExcept(excludePlayer: Player, ...)
+function RemotingMember.FireAllClientsExcept(self: RemotingMember, excludePlayer: Player, ...)
 	assert(
 		typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil,
 		"Bad excludePlayer"
@@ -203,7 +216,7 @@ end
 	@param player Instance
 	@param ... any
 ]=]
-function RemotingMember:FireClient(player: Player, ...)
+function RemotingMember.FireClient(self: RemotingMember, player: Player, ...)
 	assert(self._remotingRealm == RemotingRealms.SERVER, "FireClient must be called on client")
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 

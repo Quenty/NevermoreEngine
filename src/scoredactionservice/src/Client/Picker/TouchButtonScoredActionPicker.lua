@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	We need to handle touch buttons separately because we may have as many of these as we want.
 	@class TouchButtonScoredActionPicker
@@ -11,15 +12,22 @@ local TouchButtonScoredActionPicker = setmetatable({}, BaseObject)
 TouchButtonScoredActionPicker.ClassName = "TouchButtonScoredActionPicker"
 TouchButtonScoredActionPicker.__index = TouchButtonScoredActionPicker
 
-function TouchButtonScoredActionPicker.new()
-	local self = setmetatable(BaseObject.new(), TouchButtonScoredActionPicker)
+export type TouchButtonScoredActionPicker = typeof(setmetatable(
+	{} :: {
+		_actionSet: { [any]: boolean },
+	},
+	{} :: typeof({ __index = TouchButtonScoredActionPicker })
+)) & BaseObject.BaseObject
+
+function TouchButtonScoredActionPicker.new(): TouchButtonScoredActionPicker
+	local self: TouchButtonScoredActionPicker = setmetatable(BaseObject.new() :: any, TouchButtonScoredActionPicker)
 
 	self._actionSet = {}
 
 	return self
 end
 
-function TouchButtonScoredActionPicker:Update()
+function TouchButtonScoredActionPicker.Update(self: TouchButtonScoredActionPicker): ()
 	for action, _ in self._actionSet do
 		if not action.Destroy then
 			warn("[ScoredActionPicker] - Action is destroyed. Should have been removed.")
@@ -36,7 +44,7 @@ function TouchButtonScoredActionPicker:Update()
 	end
 end
 
-function TouchButtonScoredActionPicker:AddAction(action)
+function TouchButtonScoredActionPicker.AddAction(self: TouchButtonScoredActionPicker, action)
 	if self._actionSet[action] then
 		return
 	end
@@ -49,12 +57,12 @@ function TouchButtonScoredActionPicker:AddAction(action)
 	end
 end
 
-function TouchButtonScoredActionPicker:RemoveAction(action)
+function TouchButtonScoredActionPicker.RemoveAction(self: TouchButtonScoredActionPicker, action)
 	self._actionSet[action] = nil
 	self._maid[action] = nil
 end
 
-function TouchButtonScoredActionPicker:HasActions()
+function TouchButtonScoredActionPicker.HasActions(self: TouchButtonScoredActionPicker)
 	return next(self._actionSet) ~= nil
 end
 

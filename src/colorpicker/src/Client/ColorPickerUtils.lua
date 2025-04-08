@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class ColorPickerUtils
 ]=]
@@ -8,7 +9,10 @@ local LuvColor3Utils = require("LuvColor3Utils")
 
 local ColorPickerUtils = {}
 
-function ColorPickerUtils.getOutlineWithContrast(color, backingColor)
+--[=[
+	Gets the outline with a guaranteed contrast
+]=]
+function ColorPickerUtils.getOutlineWithContrast(color: Color3, backingColor: Color3): Color3
 	assert(typeof(color) == "Color3", "Bad color")
 	assert(typeof(backingColor) == "Color3", "Bad backingColor")
 

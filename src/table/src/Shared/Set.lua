@@ -122,7 +122,7 @@ Set.fromList = Set.fromTableValue
 	@param set table
 	@return table
 ]=]
-function Set.toList<T>(set: Set<T>): Array<T>
+function Set.toList<T>(set: { [T]: any }): Array<T>
 	local list = {}
 
 	for value, _ in set do

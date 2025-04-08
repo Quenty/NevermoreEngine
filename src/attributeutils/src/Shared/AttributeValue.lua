@@ -32,14 +32,14 @@ export type AttributeValue<T> = typeof(setmetatable(
 	{} :: {
 		_object: Instance,
 		_attributeName: string,
-		_defaultValue: T?,
+		_defaultValue: T,
 
 		-- Public
-		Value: T?,
+		Value: T,
 		AttributeName: string,
 		Changed: RBXScriptSignal<(T)>,
 	},
-	AttributeValue
+	{} :: typeof({ __index = AttributeValue })
 ))
 
 --[=[
@@ -48,10 +48,10 @@ export type AttributeValue<T> = typeof(setmetatable(
 
 	@param object Instance
 	@param attributeName string
-	@param defaultValue T?
+	@param defaultValue T
 	@return AttributeValue<T>
 ]=]
-function AttributeValue.new<T>(object: Instance, attributeName: string, defaultValue: any?): AttributeValue<T>
+function AttributeValue.new<T>(object: Instance, attributeName: string, defaultValue: T): AttributeValue<T>
 	assert(typeof(object) == "Instance", "Bad object")
 	assert(type(attributeName) == "string", "Bad attributeName")
 
@@ -85,7 +85,7 @@ end
 	Observes an attribute on an instance.
 	@return Observable<any>
 ]=]
-function AttributeValue.Observe<T>(self: AttributeValue<T>): _Observable.Observable<T?>
+function AttributeValue.Observe<T>(self: AttributeValue<T>): _Observable.Observable<T>
 	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self :: any, "_defaultValue"))
 end
 

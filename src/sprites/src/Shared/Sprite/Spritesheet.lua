@@ -17,7 +17,7 @@ export type Spritesheet = typeof(setmetatable(
 		_texture: string,
 		_sprites: { [any]: Sprite.Sprite },
 	},
-	Spritesheet
+	{} :: typeof({ __index = Spritesheet })
 ))
 
 --[=[

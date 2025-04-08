@@ -48,7 +48,6 @@ InputObjectTracker.__index = InputObjectTracker
 
 export type InputObjectTracker = typeof(setmetatable(
 	{} :: {
-		_maid: _Maid.Maid,
 		_initialPosition: Vector2,
 		_initialInputObject: InputObject,
 		_lastMousePosition: Vector2,
@@ -57,8 +56,8 @@ export type InputObjectTracker = typeof(setmetatable(
 
 		InputEnded: RxSignal.RxSignal<()>,
 	},
-	{ __index = InputObjectTracker }
-))
+	{} :: typeof({ __index = InputObjectTracker })
+)) & BaseObject.BaseObject
 
 local function toVector2(vector3: Vector3): Vector2
 	return Vector2.new(vector3.X, vector3.Y)

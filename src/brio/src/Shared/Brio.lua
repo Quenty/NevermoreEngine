@@ -71,7 +71,7 @@ export type Brio<T...> = typeof(setmetatable(
 		n: number?,
 		_diedEvent: Signal.Signal<T...>,
 	},
-	Brio
+	{} :: typeof({ __index = Brio })
 ))
 
 --[=[

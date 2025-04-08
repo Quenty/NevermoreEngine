@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility helpers to work with settings.
 
@@ -18,7 +19,7 @@ local PlayerSettingsUtils = {}
 
 	@return Folder
 ]=]
-function PlayerSettingsUtils.create()
+function PlayerSettingsUtils.create(): Folder
 	local playerSettings = Instance.new("Folder")
 	playerSettings.Name = PlayerSettingsConstants.PLAYER_SETTINGS_NAME
 	playerSettings:AddTag("PlayerSettings")
@@ -32,7 +33,7 @@ end
 	@param settingName string
 	@return string
 ]=]
-function PlayerSettingsUtils.getAttributeName(settingName)
+function PlayerSettingsUtils.getAttributeName(settingName: string): string
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 
@@ -46,7 +47,7 @@ end
 	@param attributeName string
 	@return string
 ]=]
-function PlayerSettingsUtils.getSettingName(attributeName)
+function PlayerSettingsUtils.getSettingName(attributeName: string): string
 	assert(type(attributeName) == "string", "Bad attributeName")
 
 	return String.removePrefix(attributeName, PlayerSettingsConstants.SETTING_ATTRIBUTE_PREFIX)
@@ -58,7 +59,7 @@ end
 	@param attributeName string
 	@return string
 ]=]
-function PlayerSettingsUtils.isSettingAttribute(attributeName)
+function PlayerSettingsUtils.isSettingAttribute(attributeName: string): boolean
 	assert(type(attributeName) == "string", "Bad attributeName")
 
 	return String.startsWith(attributeName, PlayerSettingsConstants.SETTING_ATTRIBUTE_PREFIX)
@@ -70,7 +71,7 @@ end
 	@param settingValue any
 	@return any
 ]=]
-function PlayerSettingsUtils.encodeForNetwork(settingValue)
+function PlayerSettingsUtils.encodeForNetwork(settingValue: any): any
 	assert(settingValue ~= "<NIL_SETTING_VALUE>", "Cannot have setting as <NIL_SETTING_VALUE>")
 
 	if settingValue == nil then
@@ -88,7 +89,7 @@ end
 	@param settingValue any
 	@return any
 ]=]
-function PlayerSettingsUtils.decodeForNetwork(settingValue)
+function PlayerSettingsUtils.decodeForNetwork(settingValue: any): any
 	if settingValue == "<NIL_SETTING_VALUE>" then
 		return nil
 	elseif EnumUtils.isEncodedEnum(settingValue) then
@@ -104,7 +105,7 @@ end
 	@param settingValue any
 	@return any
 ]=]
-function PlayerSettingsUtils.decodeForAttribute(settingValue)
+function PlayerSettingsUtils.decodeForAttribute(settingValue: any): any
 	if EnumUtils.isEncodedEnum(settingValue) then
 		return EnumUtils.decodeFromString(settingValue)
 	else
@@ -118,7 +119,7 @@ end
 	@param settingValue any
 	@return any
 ]=]
-function PlayerSettingsUtils.encodeForAttribute(settingValue)
+function PlayerSettingsUtils.encodeForAttribute(settingValue: any): any
 	if typeof(settingValue) == "EnumItem" then
 		return EnumUtils.encodeAsString(settingValue)
 	else

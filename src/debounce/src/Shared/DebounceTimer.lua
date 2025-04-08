@@ -13,7 +13,7 @@ export type DebounceTimer = typeof(setmetatable(
 		_length: number,
 		_startTime: number?,
 	},
-	DebounceTimer
+	{} :: typeof({ __index = DebounceTimer })
 ))
 
 --[=[
@@ -21,7 +21,7 @@ export type DebounceTimer = typeof(setmetatable(
 	@return DebounceTimer
 ]=]
 function DebounceTimer.new(length: number): DebounceTimer
-	local self = setmetatable({}, DebounceTimer)
+	local self: DebounceTimer = setmetatable({} :: any, DebounceTimer)
 
 	self._length = length or error("No length")
 

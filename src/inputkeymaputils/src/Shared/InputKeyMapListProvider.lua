@@ -66,7 +66,7 @@ export type InputKeyMapListProvider = typeof(setmetatable(
 		_inputKeyMapLists: { [string]: _InputKeyMapList.InputKeyMapList },
 		_inputMapLists: any, -- ObservableList.ObservableList<_InputKeyMapList.InputKeyMapList>,
 	},
-	{ __index = InputKeyMapListProvider }
+	{} :: typeof({ __index = InputKeyMapListProvider })
 ))
 
 --[=[

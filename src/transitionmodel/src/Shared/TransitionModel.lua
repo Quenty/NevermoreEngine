@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	This model deduplicates and handles transitions for showing, hiding, and
 	toggling. Inherits from [BasicPane]. See for more API.
@@ -19,20 +20,17 @@ local TransitionModel = setmetatable({}, BasicPane)
 TransitionModel.ClassName = "TransitionModel"
 TransitionModel.__index = TransitionModel
 
+export type ShowHideCallback = (maid: Maid.Maid, doNotAnimate: boolean?) -> Promise.Promise<()>
+
 export type TransitionModel = typeof(setmetatable(
 	{} :: {
 		_isShowingComplete: ValueObject.ValueObject<boolean>,
 		_isHidingComplete: ValueObject.ValueObject<boolean>,
-
-		-- From BasicPane
-		_maid: Maid.Maid,
-		IsVisible: (self: TransitionModel) -> boolean,
-		SetVisible: (self: TransitionModel, isVisible: boolean, doNotAnimate: boolean?) -> (),
-		VisibleChanged: _Signal.Signal<boolean, boolean>,
-		Destroy: (self: TransitionModel) -> (),
+		_hideCallback: ShowHideCallback?,
+		_showCallback: ShowHideCallback?,
 	},
-	TransitionModel
-))
+	{} :: typeof({ __index = TransitionModel })
+)) & BasicPane.BasicPane
 
 --[=[
 	A transition model that takes a set amount of time to show
@@ -43,7 +41,7 @@ export type TransitionModel = typeof(setmetatable(
 	@return TransitionModel
 ]=]
 function TransitionModel.new(): TransitionModel
-	local self = setmetatable(BasicPane.new(), TransitionModel)
+	local self: TransitionModel = setmetatable(BasicPane.new() :: any, TransitionModel)
 
 	self._isShowingComplete = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._isHidingComplete = self._maid:Add(ValueObject.new(false, "boolean"))
@@ -78,7 +76,7 @@ end
 	@param doNotAnimate boolean
 	@return Promise
 ]=]
-function TransitionModel:PromiseShow(doNotAnimate: boolean?): Promise.Promise<()>
+function TransitionModel.PromiseShow(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
 	local promise = self:_promiseIsShown()
 
 	self:Show(doNotAnimate)
@@ -92,7 +90,7 @@ end
 	@param doNotAnimate boolean
 	@return Promise
 ]=]
-function TransitionModel:PromiseHide(doNotAnimate: boolean?): Promise.Promise<()>
+function TransitionModel.PromiseHide(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
 	local promise = self:_promiseIsHidden()
 
 	self:Hide(doNotAnimate)
@@ -106,7 +104,7 @@ end
 	@param doNotAnimate boolean
 	@return Promise
 ]=]
-function TransitionModel:PromiseToggle(doNotAnimate: boolean?): Promise.Promise<()>
+function TransitionModel.PromiseToggle(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
 	if self:IsVisible() then
 		return self:PromiseShow(doNotAnimate)
 	else
@@ -118,7 +116,7 @@ end
 	Returns true if showing is complete
 	@return boolean?
 ]=]
-function TransitionModel:IsShowingComplete(): boolean
+function TransitionModel.IsShowingComplete(self: TransitionModel): boolean
 	return self._isShowingComplete.Value
 end
 
@@ -126,7 +124,7 @@ end
 	Returns true if hiding is complete
 	@return boolean?
 ]=]
-function TransitionModel:IsHidingComplete(): boolean?
+function TransitionModel.IsHidingComplete(self: TransitionModel): boolean
 	return self._isHidingComplete.Value
 end
 
@@ -134,7 +132,7 @@ end
 	Observe is showing is complete
 	@return Observable<boolean>
 ]=]
-function TransitionModel:ObserveIsShowingComplete(): _Observable.Observable<boolean>
+function TransitionModel.ObserveIsShowingComplete(self: TransitionModel): _Observable.Observable<boolean>
 	return self._isShowingComplete:Observe()
 end
 
@@ -142,7 +140,7 @@ end
 	Observe is hiding is complete
 	@return Observable<boolean>
 ]=]
-function TransitionModel:ObserveIsHidingComplete(): _Observable.Observable<boolean>
+function TransitionModel.ObserveIsHidingComplete(self: TransitionModel): _Observable.Observable<boolean>
 	return self._isHidingComplete:Observe()
 end
 
@@ -152,7 +150,7 @@ end
 	@param pane BasicPane
 	@return function -- Cleanup function
 ]=]
-function TransitionModel:BindToPaneVisbility(pane: BasicPane.BasicPane): () -> ()
+function TransitionModel.BindToPaneVisbility(self: TransitionModel, pane: BasicPane.BasicPane): () -> ()
 	local maid = Maid.new()
 
 	maid:GiveTask(pane.VisibleChanged:Connect(function(isVisible, doNotAnimate)
@@ -178,7 +176,7 @@ end
 
 	@param showCallback function? -- Callback which should return a promise
 ]=]
-function TransitionModel:SetPromiseShow(showCallback)
+function TransitionModel.SetPromiseShow(self: TransitionModel, showCallback)
 	assert(type(showCallback) == "function" or showCallback == nil, "Bad showCallback")
 
 	self._showCallback = showCallback
@@ -189,13 +187,13 @@ end
 
 	@param hideCallback function? -- Callback which should return a promise
 ]=]
-function TransitionModel:SetPromiseHide(hideCallback)
+function TransitionModel.SetPromiseHide(self: TransitionModel, hideCallback)
 	assert(type(hideCallback) == "function" or hideCallback == nil, "Bad hideCallback")
 
 	self._hideCallback = hideCallback
 end
 
-function TransitionModel:_promiseIsShown(): Promise.Promise<()>
+function TransitionModel._promiseIsShown(self: TransitionModel): Promise.Promise<()>
 	if self._isShowingComplete.Value then
 		return Promise.resolved()
 	end
@@ -224,7 +222,7 @@ function TransitionModel:_promiseIsShown(): Promise.Promise<()>
 	return promise
 end
 
-function TransitionModel:_promiseIsHidden(): Promise.Promise<()>
+function TransitionModel._promiseIsHidden(self: TransitionModel): Promise.Promise<()>
 	if self._isHidingComplete.Value then
 		return Promise.resolved()
 	end
@@ -253,7 +251,7 @@ function TransitionModel:_promiseIsHidden(): Promise.Promise<()>
 	return promise
 end
 
-function TransitionModel:_executeShow(doNotAnimate: boolean?)
+function TransitionModel._executeShow(self: TransitionModel, doNotAnimate: boolean?)
 	self._maid._transition = nil
 
 	local maid = Maid.new()
@@ -291,7 +289,7 @@ function TransitionModel:_executeShow(doNotAnimate: boolean?)
 	end
 end
 
-function TransitionModel:_executeHide(doNotAnimate: boolean?)
+function TransitionModel._executeHide(self: TransitionModel, doNotAnimate: boolean?)
 	self._maid._transition = nil
 
 	local maid = Maid.new()

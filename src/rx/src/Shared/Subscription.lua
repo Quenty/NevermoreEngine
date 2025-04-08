@@ -42,7 +42,7 @@ export type Subscription<T...> = typeof(setmetatable(
 		_source: string?,
 		_observableSource: string?,
 	},
-	Subscription
+	{} :: typeof({ __index = Subscription })
 ))
 
 export type SubscriptionStateTypes = {

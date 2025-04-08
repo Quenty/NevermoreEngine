@@ -55,7 +55,7 @@ export type ObservableSortedList<T> = typeof(setmetatable(
 		OrderChanged: Signal.Signal<()>,
 		CountChanged: Signal.Signal<number>,
 	},
-	ObservableSortedList
+	{} :: typeof({ __index = ObservableSortedList })
 ))
 
 --[=[
@@ -190,7 +190,7 @@ end
 function ObservableSortedList._iterateNodesRange<T>(
 	self: ObservableSortedList<T>,
 	start: number,
-	finish: number
+	finish: number?
 ): SortFunctionUtils.WrappedIterator<number, SortedNode.SortedNode<T>>
 	if self._root then
 		return self._root:IterateNodesRange(start, finish)
@@ -366,7 +366,7 @@ end
 function ObservableSortedList.ObserveIndexByKey<T>(
 	self: ObservableSortedList<T>,
 	node: SortedNode.SortedNode<T>
-): Observable.Observable<number?>
+): Observable.Observable<number>
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
 	return self._nodeIndexObservables:Observe(node, function(sub)
@@ -443,7 +443,7 @@ function ObservableSortedList.Add<T>(
 			self:_assignSortValue(node, sortValue)
 		end))
 	elseif observeValue ~= nil then
-		self:_assignSortValue(node, observeValue)
+		self:_assignSortValue(node, observeValue :: number)
 	else
 		error("Bad observeValue")
 	end
@@ -661,7 +661,7 @@ end
 function ObservableSortedList.RemoveByKey<T>(self: ObservableSortedList<T>, node: SortedNode.SortedNode<T>)
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
-	self._maid[node :: any] = nil
+	self._maid[node] = nil
 end
 
 --[=[

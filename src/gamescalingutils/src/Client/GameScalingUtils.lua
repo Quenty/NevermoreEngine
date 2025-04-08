@@ -82,15 +82,15 @@ end
 	Blend equivalent of rendering a UI Scale
 
 	@param props { Parent: Instance?, ScreenGui: ScreenGui }
-	@return Observable<number>
+	@return Observable<UIScale>
 ]=]
-function GameScalingUtils.renderUIScale(props: Props): _Observable.Observable<number>
+function GameScalingUtils.renderUIScale(props: Props): _Observable.Observable<UIScale>
 	assert(props.ScreenGui, "No screenGui")
 
 	return Blend.New("UIScale")({
 		Parent = props.Parent,
 		Scale = GameScalingUtils.observeUIScale(props.ScreenGui),
-	})
+	}) :: any
 end
 
 --[=[
@@ -108,7 +108,7 @@ function GameScalingUtils.renderDialogPadding(props: Props): _Observable.Observa
 		PaddingBottom = GameScalingUtils.observeDialogPadding(props.ScreenGui),
 		PaddingLeft = GameScalingUtils.observeDialogPadding(props.ScreenGui),
 		PaddingRight = GameScalingUtils.observeDialogPadding(props.ScreenGui),
-	})
+	}) :: any
 end
 
 --[=[

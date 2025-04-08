@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helper functions for the TimeSyncService.
 	@class TimeSyncUtils

@@ -24,7 +24,7 @@ export type LoaderLinkCreator = typeof(setmetatable(
 		_provideLoader: BoolValue,
 		_lastProvidedLoader: Instance?,
 	},
-	LoaderLinkCreator
+	{} :: typeof({ __index = LoaderLinkCreator })
 ))
 
 function LoaderLinkCreator.new(
