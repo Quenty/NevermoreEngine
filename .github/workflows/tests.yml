@@ -61,7 +61,7 @@ jobs:
         working-directory: tests/bin
 
       - name: Publish test place to Roblox and run tests
-        run: lune run cloud/publish-test-place.luau bin/testBuild.rbxl cloud/run-tests.luau
+        run: lune run cloud/publish-test-place.luau bin/testBuild.rbxl bin/run-tests.luau
         working-directory: tests
         env:
           ROBLOX_UNIT_TEST_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
