@@ -1,3 +1,16 @@
+# v4.7.0 (Tue Apr 08 2025)
+
+#### 🚀 Enhancement
+
+- feat: Nevermore test cli command [#551](https://github.com/Quenty/NevermoreEngine/pull/551) ([@unrooot](https://github.com/unrooot))
+- feat: Nevermore cli command to run tests locally ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

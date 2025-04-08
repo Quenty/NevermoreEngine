@@ -1,3 +1,20 @@
+# (Tue Apr 08 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.7.0`
+  - feat: Nevermore test cli command [#551](https://github.com/Quenty/NevermoreEngine/pull/551) ([@unrooot](https://github.com/unrooot))
+
+#### 🐛 Bug Fix
+
+- ci: Rename workflow to be cleaner [#548](https://github.com/Quenty/NevermoreEngine/pull/548) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Mon Apr 07 2025)
 
 #### 🐛 Bug Fix
