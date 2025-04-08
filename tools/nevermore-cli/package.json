@@ -29,6 +29,7 @@
     "execa": "v5.1.1",
     "find-git-root": "^1.0.4",
     "inquirer": "^8.2.4",
+    "node-fetch": "^3.3.2",
     "read-package-json": "^6.0.0",
     "typescript-memoize": "^1.1.1",
     "yargs": "^17.0.13"
