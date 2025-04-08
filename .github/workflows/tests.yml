@@ -1,7 +1,7 @@
-name: run-tests
+name: tests
 on: [push]
 jobs:
-  run-tests:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
