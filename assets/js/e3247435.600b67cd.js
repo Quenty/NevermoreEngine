@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[47072],{27736:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PermissionLevelUtils","desc":"","source":{"line":4,"path":"src/permissionprovider/src/Shared/PermissionLevelUtils.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[68090],{73128:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TieRealmService","desc":"","source":{"line":5,"path":"src/tie/src/Shared/Services/TieRealmService.lua"}}')}}]);

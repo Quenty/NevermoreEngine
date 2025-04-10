@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[51248],{71872:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ThrottledFunction","desc":"Throttles execution of a functon. Does both leading, and following","source":{"line":6,"path":"src/throttle/src/Shared/ThrottledFunction.lua"}}')}}]);
