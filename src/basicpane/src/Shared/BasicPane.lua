@@ -38,20 +38,27 @@ export type BasicPane = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
 		_visible: ValueObject.ValueObject<boolean>,
-		Gui: GuiBase?,
+
+		--[=[
+			Gui object which can be reparented or whatever
+
+			@prop Gui Instance?
+			@within BasicPane
+		]=]
+		Gui: GuiObject?,
 		VisibleChanged: Signal.Signal<(boolean, boolean)>,
 	},
-	BasicPane
+	{} :: typeof({ __index = BasicPane })
 ))
 
 --[=[
 	Constructs a new BasicPane with the .Gui property set.
 
-	@param gui GuiBase? -- Optional Gui object
+	@param gui GuiObject? -- Optional Gui object
 	@return BasicPane
 ]=]
-function BasicPane.new(gui: GuiBase?): BasicPane
-	local self = setmetatable({}, BasicPane)
+function BasicPane.new(gui: GuiObject?): BasicPane
+	local self: BasicPane = setmetatable({} :: any, BasicPane)
 
 	self._maid = Maid.new()
 	self._visible = self._maid:Add(ValueObject.new(false, "boolean"))
@@ -67,23 +74,17 @@ function BasicPane.new(gui: GuiBase?): BasicPane
 		@prop VisibleChanged Signal<boolean, boolean>
 		@within BasicPane
 	]=]
-	self.VisibleChanged = self._maid:Add(Signal.new()) -- :Fire(isVisible, doNotAnimate)
+	self.VisibleChanged = self._maid:Add(Signal.new() :: any) -- :Fire(isVisible, doNotAnimate)
 
 	self._maid:GiveTask(self._visible.Changed:Connect(function(isVisible, _, doNotAnimate)
 		self.VisibleChanged:Fire(isVisible, doNotAnimate)
 	end))
 
 	if gui then
-		--[=[
-			Gui object which can be reparented or whatever
-
-			@prop Gui Instance?
-			@within BasicPane
-		]=]
 		self.Gui = self._maid:Add(gui)
 	end
 
-	return self :: any
+	return self
 end
 
 --[=[
@@ -128,7 +129,7 @@ function BasicPane.ObserveVisibleBrio(
 ): _Observable.Observable<_Brio.Brio<boolean>?>
 	return self._visible:ObserveBrio(predicate or function(isVisible)
 		return isVisible
-	end)
+	end) :: any
 end
 
 --[=[
@@ -168,9 +169,11 @@ end
 	setting the metatable to nil.
 ]=]
 function BasicPane.Destroy(self: BasicPane)
-	(self :: any)._maid:DoCleaning();
-	(self :: any)._maid = nil
-	setmetatable(self :: any, nil)
+	local private: any = self
+
+	private._maid:DoCleaning()
+	private._maid = nil
+	setmetatable(private, nil)
 end
 
 return BasicPane

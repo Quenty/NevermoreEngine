@@ -9,11 +9,13 @@ local t = require("t")
 
 local SnackbarOptionUtils = {}
 
+export type CallToActionOptions = {
+	Text: string,
+	OnClick: ((any) -> any) | nil,
+}
+
 export type SnackbarOptions = {
-	CallToAction: string | {
-		Text: string,
-		OnClick: ((any) -> any) | nil,
-	} | nil,
+	CallToAction: string | CallToActionOptions?,
 }
 
 function SnackbarOptionUtils.createSnackbarOptions(options: SnackbarOptions): SnackbarOptions

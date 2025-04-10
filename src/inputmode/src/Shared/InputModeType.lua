@@ -19,7 +19,7 @@ export type InputModeType = typeof(setmetatable(
 		_valid: { [any]: boolean },
 		Name: string,
 	},
-	InputModeType
+	{} :: typeof({ __index = InputModeType })
 ))
 
 export type InputModeKey = Enum.UserInputType | Enum.KeyCode | string

@@ -1,10 +1,10 @@
+--!strict
 --[=[
 	Key based CoreGuiEnabler, singleton
 	Use this class to load/unload CoreGuis / other GUIs, by disabling based upon keys
 	Keys are additive, so if you have more than 1 disabled, it's ok.
 
 	```lua
-
 	local CoreGuiEnabler = require("CoreGuiEnabler")
 
 	-- Disable the backpack for 5 seconds
@@ -35,13 +35,22 @@ local CoreGuiEnabler = {}
 CoreGuiEnabler.__index = CoreGuiEnabler
 CoreGuiEnabler.ClassName = "CoreGuiEnabler"
 
-function CoreGuiEnabler.new()
-	local self = setmetatable({}, CoreGuiEnabler)
+export type CoreGuiEnabler = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_states: { [any]: { lastState: boolean, onChangeCallback: (boolean) -> (), disabledBy: { [any]: any } } },
+		_stateSubs: ObservableSubscriptionTable.ObservableSubscriptionTable<boolean>,
+	},
+	{} :: typeof({ __index = CoreGuiEnabler })
+))
+
+function CoreGuiEnabler.new(): CoreGuiEnabler
+	local self: CoreGuiEnabler = setmetatable({} :: any, CoreGuiEnabler)
 
 	self._maid = Maid.new()
 	self._states = {}
 
-	self._stateSubs = self._maid:Add(ObservableSubscriptionTable.new())
+	self._stateSubs = self._maid:Add(ObservableSubscriptionTable.new() :: any)
 
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
@@ -136,12 +145,11 @@ function CoreGuiEnabler:ObserveIsEnabled(coreGuiState)
 		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))
 	end
 
-	return self._stateSubs:Observe(coreGuiState)
-		:Pipe({
-			Rx.startFrom(function()
-				return { self:IsEnabled(coreGuiState) }
-			end)
-		})
+	return self._stateSubs:Observe(coreGuiState):Pipe({
+		Rx.startFrom(function()
+			return { self:IsEnabled(coreGuiState) }
+		end),
+	})
 end
 
 --[=[
@@ -154,9 +162,9 @@ function CoreGuiEnabler:AddState(coreGuiState, onChangeCallback)
 	assert(self._states[coreGuiState] == nil, "state already exists")
 
 	self._states[coreGuiState] = {
-		lastState = true;
-		onChangeCallback = onChangeCallback;
-		disabledBy = {};
+		lastState = true,
+		onChangeCallback = onChangeCallback,
+		disabledBy = {},
 	}
 end
 

@@ -28,8 +28,8 @@ export type InputKeyMap = typeof(setmetatable(
 		_defaultInputTypes: { InputTypeUtils.InputType },
 		_inputTypeList: ValueObject.ValueObject<{ InputTypeUtils.InputType }>,
 	},
-	{ __index = InputKeyMap }
-))
+	{} :: typeof({ __index = InputKeyMap })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new InputKeyMap. Generally this would be sent immediately to an

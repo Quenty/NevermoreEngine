@@ -43,7 +43,7 @@ export type Flipbook = typeof(setmetatable(
 		_restFrame: number?,
 		_imageId: string,
 	},
-	Flipbook
+	{} :: typeof({ __index = Flipbook })
 ))
 
 --[=[

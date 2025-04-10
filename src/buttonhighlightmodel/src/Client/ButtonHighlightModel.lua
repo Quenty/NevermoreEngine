@@ -116,8 +116,8 @@ export type ButtonHighlightModel = typeof(setmetatable(
 		]=]
 		IsPressedChanged: _Signal.Signal<boolean>,
 	},
-	{ __index = ButtonHighlightModel }
-))
+	{} :: typeof({ __index = ButtonHighlightModel })
+)) & BaseObject.BaseObject
 
 --[=[
 	A model that dictates the current state of a button.
@@ -264,7 +264,7 @@ function ButtonHighlightModel.SetButton(self: ButtonHighlightModel, button: GuiO
 	self._maid._buttonMaid = maid
 
 	return function()
-		if self._maid._buttonMaid == maid then
+		if (self._maid._buttonMaid :: any) == maid then
 			self._maid._buttonMaid = nil
 		end
 	end
@@ -358,8 +358,8 @@ function ButtonHighlightModel.ObservePercentPressedTarget(self: ButtonHighlightM
 	return self._isPressed:Observe():Pipe({
 		Rx.map(function(value)
 			return value and 1 or 0
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -388,10 +388,10 @@ function ButtonHighlightModel.ObservePercentHighlightedTarget(
 	self: ButtonHighlightModel
 ): _Observable.Observable<number>
 	return self._isHighlighted:Observe():Pipe({
-		Rx.map(function(value)
+		Rx.map(function(value: boolean): number
 			return value and 1 or 0
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -482,8 +482,8 @@ function ButtonHighlightModel.ObservePercentChoosenTarget(self: ButtonHighlightM
 	return self._isChoosen:Observe():Pipe({
 		Rx.map(function(value)
 			return value and 1 or 0
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -496,11 +496,12 @@ function ButtonHighlightModel.ObservePercentChoosen(
 	self: ButtonHighlightModel,
 	acceleration: number?
 ): _Observable.Observable<number>
+	-- stylua: ignore
 	return Blend.AccelTween(
 		self._isChoosen:Observe():Pipe({
-			Rx.map(function(value)
+			Rx.map(function(value): number
 				return value and 1 or 0
-			end),
+			end) :: any,
 		}),
 		acceleration or 200
 	)

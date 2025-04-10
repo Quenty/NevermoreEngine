@@ -16,7 +16,7 @@ export type ReplicatorReferences = typeof(setmetatable(
 		_lookup: { [Instance]: Instance },
 		_listeners: { [Instance]: { ListenerCallback } },
 	},
-	ReplicatorReferences
+	{} :: typeof({ __index = ReplicatorReferences })
 ))
 
 function ReplicatorReferences.new(): ReplicatorReferences

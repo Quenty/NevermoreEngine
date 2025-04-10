@@ -22,7 +22,7 @@ export type CameraState = typeof(setmetatable(
 		Velocity: Vector3,
 		FieldOfView: number,
 	},
-	{ __index = CameraState }
+	{} :: typeof({ __index = CameraState })
 ))
 
 --[=[
@@ -35,7 +35,7 @@ function CameraState.new(
 	cameraFrame: (CameraFrame.CameraFrame | Camera)?,
 	cameraFrameDerivative: CameraFrame.CameraFrame?
 ): CameraState
-	local self = setmetatable({} :: any, CameraState)
+	local self: CameraState = setmetatable({} :: any, CameraState)
 
 	if typeof(cameraFrame) == "Instance" then
 		assert(cameraFrame:IsA("Camera"))

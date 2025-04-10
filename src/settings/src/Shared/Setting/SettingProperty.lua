@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class SettingProperty
 ]=]
@@ -7,10 +8,27 @@ local require = require(script.Parent.loader).load(script)
 local SettingsDataService = require("SettingsDataService")
 local Rx = require("Rx")
 local RxSignal = require("RxSignal")
+local _ServiceBag = require("ServiceBag")
+local _Promise = require("Promise")
+local _Observable = require("Observable")
 
 local SettingProperty = {}
 SettingProperty.ClassName = "SettingProperty"
 SettingProperty.__index = SettingProperty
+
+export type SettingProperty<T> = typeof(setmetatable(
+	{} :: {
+		Value: T,
+		Changed: any,
+		DefaultValue: T,
+
+		_serviceBag: any,
+		_bridge: SettingsDataService.SettingsDataService,
+		_player: Player,
+		_definition: any,
+	},
+	{} :: typeof({ __index = SettingProperty })
+))
 
 --[=[
 	Constructs a new SettingProperty.
@@ -20,8 +38,8 @@ SettingProperty.__index = SettingProperty
 	@param definition SettingDefinition
 	@return SettingProperty<T>
 ]=]
-function SettingProperty.new(serviceBag, player, definition)
-	local self = setmetatable({}, SettingProperty)
+function SettingProperty.new<T>(serviceBag: _ServiceBag.ServiceBag, player: Player, definition): SettingProperty<T>
+	local self: SettingProperty<T> = setmetatable({} :: any, SettingProperty)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._bridge = self._serviceBag:GetService(SettingsDataService)
@@ -40,28 +58,31 @@ end
 	Observes the value of the setting property
 	@return Observable<T>
 ]=]
-function SettingProperty:Observe()
+function SettingProperty.Observe<T>(self: SettingProperty<T>): _Observable.Observable<T>
 	return self:_observePlayerSettings():Pipe({
 		Rx.where(function(settings)
 			return settings ~= nil
-		end);
-		Rx.take(1);
+		end),
+		Rx.take(1),
 		Rx.switchMap(function()
 			-- Ensure we're loaded first and then register for real.
 			return self:_observePlayerSettings()
-		end);
-		Rx.switchMap(function(playerSettings)
+		end) :: any,
+		Rx.switchMap(function(playerSettings): any
 			if not playerSettings then
 				-- Don't emit until we have a value
 				return Rx.of(self._definition:GetDefaultValue())
 			else
-				return playerSettings:ObserveValue(self._definition:GetSettingName(), self._definition:GetDefaultValue())
+				return playerSettings:ObserveValue(
+					self._definition:GetSettingName(),
+					self._definition:GetDefaultValue()
+				)
 			end
-		end);
-	})
+		end) :: any,
+	}) :: any
 end
 
-function SettingProperty:__index(index)
+(SettingProperty :: any).__index = function(self, index): any
 	if index == "Value" then
 		local settings = self:_getPlayerSettings()
 		if settings then
@@ -71,20 +92,26 @@ function SettingProperty:__index(index)
 		end
 	elseif index == "Changed" then
 		return RxSignal.new(self:Observe():Pipe({
-					-- TODO: Handle scenario where we're loading and .Value changes because of what
-					-- we queried.
-					Rx.skip(1);
-				}))
+			-- TODO: Handle scenario where we're loading and .Value changes because of what
+			-- we queried.
+			Rx.skip(1),
+		}))
 	elseif index == "DefaultValue" then
 		return self._definition:GetDefaultValue()
 	elseif SettingProperty[index] then
 		return SettingProperty[index]
 	else
-		error(string.format("%q is not a member of SettingProperty %s", tostring(index), self._definition:GetSettingName()))
+		error(
+			string.format(
+				"%q is not a member of SettingProperty %s",
+				tostring(index),
+				self._definition:GetSettingName()
+			)
+		)
 	end
 end
 
-function SettingProperty:__newindex(index, value)
+function SettingProperty.__newindex<T>(self, index, value)
 	if index == "Value" then
 		self:SetValue(value)
 	elseif index == "DefaultValue" or index == "Changed" or SettingProperty[index] then
@@ -103,12 +130,14 @@ end
 
 	@param value T
 ]=]
-function SettingProperty:SetValue(value)
+function SettingProperty.SetValue<T>(self: SettingProperty<T>, value: T)
 	local settings = self:_getPlayerSettings()
 	if settings then
 		settings:SetValue(self._definition:GetSettingName(), value)
 	else
-		warn("[SettingProperty.SetValue] - Cannot set setting value. Use :PromiseSetValue() to ensure value is set after load.")
+		warn(
+			"[SettingProperty.SetValue] - Cannot set setting value. Use :PromiseSetValue() to ensure value is set after load."
+		)
 	end
 end
 
@@ -117,11 +146,10 @@ end
 
 	@return Promise<T>
 ]=]
-function SettingProperty:PromiseValue()
-	return self:_promisePlayerSettings()
-		:Then(function(playerSettings)
-			return playerSettings:GetValue(self._definition:GetSettingName(), self._definition:GetDefaultValue())
-		end)
+function SettingProperty.PromiseValue<T>(self: SettingProperty<T>): _Promise.Promise<T>
+	return self:_promisePlayerSettings():Then(function(playerSettings)
+		return playerSettings:GetValue(self._definition:GetSettingName(), self._definition:GetDefaultValue())
+	end)
 end
 
 --[=[
@@ -130,22 +158,23 @@ end
 	@param value T
 	@return Promise
 ]=]
-function SettingProperty:PromiseSetValue(value)
-	return self:_promisePlayerSettings()
-		:Then(function(playerSettings)
-			playerSettings:SetValue(self._definition:GetSettingName(), value)
-		end)
+function SettingProperty.PromiseSetValue<T>(self: SettingProperty<T>, value: T): _Promise.Promise<()>
+	return self:_promisePlayerSettings():Then(function(playerSettings)
+		playerSettings:SetValue(self._definition:GetSettingName(), value)
+	end)
 end
 
 --[=[
 	Restores the setting to the default value
 ]=]
-function SettingProperty:RestoreDefault()
+function SettingProperty.RestoreDefault<T>(self: SettingProperty<T>): ()
 	local settings = self:_getPlayerSettings()
 	if settings then
 		settings:RestoreDefault(self._definition:GetSettingName(), self._definition:GetDefaultValue())
 	else
-		warn("[SettingProperty.RestoreDefault] - Cannot set setting value. Use :PromiseRestoreDefault() to ensure value is set after load.")
+		warn(
+			"[SettingProperty.RestoreDefault] - Cannot set setting value. Use :PromiseRestoreDefault() to ensure value is set after load."
+		)
 	end
 end
 
@@ -156,23 +185,21 @@ end
 
 	@return Promise
 ]=]
-function SettingProperty:PromiseRestoreDefault()
-	return self:_promisePlayerSettings()
-		:Then(function(playerSettings)
-			playerSettings:RestoreDefault(self._definition:GetSettingName(), self._definition:GetDefaultValue())
-		end)
+function SettingProperty.PromiseRestoreDefault<T>(self: SettingProperty<T>): _Promise.Promise<()>
+	return self:_promisePlayerSettings():Then(function(playerSettings)
+		playerSettings:RestoreDefault(self._definition:GetSettingName(), self._definition:GetDefaultValue())
+	end)
 end
 
-
-function SettingProperty:_observePlayerSettings()
+function SettingProperty._observePlayerSettings<T>(self: SettingProperty<T>)
 	return self._bridge:ObservePlayerSettings(self._player)
 end
 
-function SettingProperty:_getPlayerSettings()
+function SettingProperty._getPlayerSettings<T>(self: SettingProperty<T>)
 	return self._bridge:GetPlayerSettings(self._player)
 end
 
-function SettingProperty:_promisePlayerSettings()
+function SettingProperty._promisePlayerSettings<T>(self: SettingProperty<T>)
 	return self._bridge:PromisePlayerSettings(self._player)
 end
 

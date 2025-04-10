@@ -28,7 +28,7 @@ export type ValueBaseValue = typeof(setmetatable(
 		Value: any?,
 		Changed: RxSignal.RxSignal<any>,
 	},
-	ValueBaseValue
+	{} :: typeof({ __index = ValueBaseValue })
 ))
 
 --[=[

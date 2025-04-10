@@ -61,7 +61,7 @@ export type Connection<T...> = typeof(setmetatable(
 		_signal: Signal<T...>?,
 		_fn: SignalHandler<T...>?,
 	},
-	Connection
+	{} :: typeof({ __index = Connection })
 ))
 
 function Connection.new<T...>(signal: Signal<T...>, fn: SignalHandler<T...>): Connection<T...>
@@ -129,7 +129,7 @@ export type Signal<T...> = typeof(setmetatable(
 	{} :: {
 		_handlerListHead: Connection<T...> | false,
 	},
-	Signal
+	{} :: typeof({ __index = Signal })
 ))
 
 --[=[

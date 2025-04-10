@@ -27,7 +27,7 @@ export type GameConfigService = typeof(setmetatable(
 		_configPicker: GameConfigPicker.GameConfigPicker,
 		_getPreferredParent: () -> Instance,
 	},
-	{ __index = GameConfigService }
+	{} :: typeof({ __index = GameConfigService })
 ))
 
 --[=[

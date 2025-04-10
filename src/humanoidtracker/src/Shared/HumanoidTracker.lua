@@ -18,32 +18,31 @@ HumanoidTracker.__index = HumanoidTracker
 
 export type HumanoidTracker = typeof(setmetatable(
 	{} :: {
-		_maid: Maid.Maid,
 		_player: Player,
+
+		--[=[
+			Fires when the humanoid dies
+			@prop HumanoidDied Signal<Humanoid>
+			@within HumanoidTracker
+		]=]
 		HumanoidDied: Signal.Signal<Humanoid?>,
+
+		--[=[
+			Current humanoid which is alive
+			@prop AliveHumanoid ValueObject<Humanoid>
+			@within HumanoidTracker
+		]=]
 		AliveHumanoid: ValueObject.ValueObject<Humanoid?>,
+
+		--[=[
+			Current humanoid
+			@prop Humanoid ValueObject<Humanoid>
+			@within HumanoidTracker
+		]=]
 		Humanoid: ValueObject.ValueObject<Humanoid?>,
 	},
 	{ __index = HumanoidTracker }
-))
-
---[=[
-	Current humanoid
-	@prop Humanoid ValueObject<Humanoid>
-	@within HumanoidTracker
-]=]
-
---[=[
-	Current humanoid which is alive
-	@prop AliveHumanoid ValueObject<Humanoid>
-	@within HumanoidTracker
-]=]
-
---[=[
-	Fires when the humanoid dies
-	@prop HumanoidDied Signal<Humanoid>
-	@within HumanoidTracker
-]=]
+)) & BaseObject.BaseObject
 
 --[=[
 	Tracks the player's current humanoid

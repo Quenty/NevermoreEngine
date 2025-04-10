@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class HandleHighlightModel
 ]=]
@@ -11,13 +12,23 @@ local Maid = require("Maid")
 local Blend = require("Blend")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
+local _Observable = require("Observable")
 
 local HandleHighlightModel = setmetatable({}, BaseObject)
 HandleHighlightModel.ClassName = "HandleHighlightModel"
 HandleHighlightModel.__index = HandleHighlightModel
 
-function HandleHighlightModel.new()
-	local self = setmetatable(BaseObject.new(), HandleHighlightModel)
+export type HandleHighlightModel = typeof(setmetatable(
+	{} :: {
+		IsMouseOver: ValueObject.ValueObject<boolean>,
+		IsMouseDown: ValueObject.ValueObject<boolean>,
+		IsHighlighted: ValueObject.ValueObject<boolean>,
+	},
+	{} :: typeof({ __index = HandleHighlightModel })
+)) & BaseObject.BaseObject
+
+function HandleHighlightModel.new(): HandleHighlightModel
+	local self: HandleHighlightModel = setmetatable(BaseObject.new() :: any, HandleHighlightModel)
 
 	self.IsMouseOver = self._maid:Add(ValueObject.new(false, "boolean"))
 
@@ -40,7 +51,7 @@ end
 	Sets the handle for the highlight model.
 	@param handle
 ]=]
-function HandleHighlightModel:SetHandle(handle: HandleAdornment)
+function HandleHighlightModel.SetHandle(self: HandleHighlightModel, handle: HandleAdornment)
 	assert(typeof(handle) == "Instance" or handle == nil, "Bad handle")
 
 	local maid = Maid.new()
@@ -69,25 +80,26 @@ function HandleHighlightModel:SetHandle(handle: HandleAdornment)
 	self._maid._buttonMaid = maid
 end
 
-
 --[=[
 	Observes how pressed down the button is
 	@return Observable<number>
 ]=]
-function HandleHighlightModel:ObservePercentPressed()
-	return Blend.AccelTween(Blend.toPropertyObservable(self.IsMouseDown)
-		:Pipe({
+function HandleHighlightModel.ObservePercentPressed(self: HandleHighlightModel): _Observable.Observable<number>
+	return Blend.AccelTween(
+		Blend.toPropertyObservable(self.IsMouseDown):Pipe({
 			Rx.map(function(value)
 				return value and 1 or 0
-			end);
-		}), 200)
+			end),
+		}),
+		200
+	)
 end
 
 --[=[
 	Observes how highlighted the button is
 	@return Observable<number>
 ]=]
-function HandleHighlightModel:ObservePercentHighlighted()
+function HandleHighlightModel.ObservePercentHighlighted(self: HandleHighlightModel): _Observable.Observable<number>
 	return Blend.AccelTween(self:ObservePercentHighlightedTarget(), 200)
 end
 
@@ -95,16 +107,17 @@ end
 	Observes target for how highlighted the button is
 	@return Observable<number>
 ]=]
-function HandleHighlightModel:ObservePercentHighlightedTarget()
-	return Blend.toPropertyObservable(self.IsHighlighted)
-		:Pipe({
-			Rx.map(function(value)
-				return value and 1 or 0
-			end);
-		})
+function HandleHighlightModel.ObservePercentHighlightedTarget(
+	self: HandleHighlightModel
+): _Observable.Observable<number>
+	return Blend.toPropertyObservable(self.IsHighlighted):Pipe({
+		Rx.map(function(value)
+			return value and 1 or 0
+		end),
+	})
 end
 
-function HandleHighlightModel:_updateHighlighted()
+function HandleHighlightModel._updateHighlighted(self: HandleHighlightModel): ()
 	self.IsHighlighted.Value = self.IsMouseOver.Value or self.IsMouseDown.Value
 end
 

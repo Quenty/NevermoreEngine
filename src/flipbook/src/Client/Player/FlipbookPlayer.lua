@@ -27,7 +27,6 @@ type PlayData = {
 
 export type FlipbookPlayer = typeof(setmetatable(
 	{} :: {
-		_obj: ImageLabel | ImageButton,
 		_maid: Maid.Maid,
 		_isPlaying: ValueObject.ValueObject<boolean>,
 		_isBoomarang: ValueObject.ValueObject<boolean>,
@@ -38,8 +37,8 @@ export type FlipbookPlayer = typeof(setmetatable(
 		_originalRectOffset: UDim2,
 		_originalRectSize: UDim2,
 	},
-	{ __index = FlipbookPlayer}
-))
+	{} :: typeof({ __index = FlipbookPlayer })
+)) & BaseObject.BaseObject
 
 type State = {
 	flipbook: Flipbook.Flipbook?,

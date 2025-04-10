@@ -18,14 +18,13 @@ GameScalingHelper.__index = GameScalingHelper
 
 export type GameScalingHelper = typeof(setmetatable(
 	{} :: {
-		_maid: _Maid.Maid,
 		_absoluteSize: ValueObject.ValueObject<Vector2>,
 		_isVertical: ValueObject.ValueObject<boolean>,
 		_isSmall: ValueObject.ValueObject<boolean>,
 		_screenGui: ScreenGui?,
 	},
-	{ __index = GameScalingHelper }
-))
+	{} :: typeof({ __index = GameScalingHelper })
+)) & BaseObject.BaseObject
 
 function GameScalingHelper.new(screenGui: ScreenGui): GameScalingHelper
 	local self = setmetatable(BaseObject.new() :: any, GameScalingHelper)

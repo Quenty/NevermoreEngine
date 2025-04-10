@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class ScoredActionPickerProvider
 ]=]
@@ -16,21 +17,33 @@ local ScoredActionPickerProvider = setmetatable({}, BaseObject)
 ScoredActionPickerProvider.ClassName = "ScoredActionPickerProvider"
 ScoredActionPickerProvider.__index = ScoredActionPickerProvider
 
-function ScoredActionPickerProvider.new()
-	local self = setmetatable(BaseObject.new(), ScoredActionPickerProvider)
+type ActionPicker = {
+	Update: (unknown) -> (),
+	HasActions: (unknown) -> boolean,
+}
+
+export type ScoredActionPickerProvider = typeof(setmetatable(
+	{} :: {
+		_scoredActionPickers: { [any]: ActionPicker },
+	},
+	{} :: typeof({ __index = ScoredActionPickerProvider })
+)) & BaseObject.BaseObject
+
+function ScoredActionPickerProvider.new(): ScoredActionPickerProvider
+	local self: ScoredActionPickerProvider = setmetatable(BaseObject.new() :: any, ScoredActionPickerProvider)
 
 	self._scoredActionPickers = {} -- [ key ] = picker
 
 	return self
 end
 
-function ScoredActionPickerProvider:FindPicker(inputType)
+function ScoredActionPickerProvider.FindPicker(self: ScoredActionPickerProvider, inputType): ActionPicker
 	local key = InputTypeUtils.getUniqueKeyForInputType(inputType)
 	return self._scoredActionPickers[key]
 end
 
 --inputType is most likely an enum, but could be a string!
-function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
+function ScoredActionPickerProvider.GetOrCreatePicker(self: ScoredActionPickerProvider, inputType): ActionPicker
 	assert(inputType, "Bad inputType")
 	local key = InputTypeUtils.getUniqueKeyForInputType(inputType)
 
@@ -38,11 +51,11 @@ function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
 		return self._scoredActionPickers[key]
 	end
 
-	local picker
+	local picker: ActionPicker
 	if inputType == "TouchButton" then
-		picker = TouchButtonScoredActionPicker.new()
+		picker = TouchButtonScoredActionPicker.new() :: any
 	else
-		picker = ScoredActionPicker.new()
+		picker = ScoredActionPicker.new() :: any
 	end
 
 	self._maid[key] = picker
@@ -50,13 +63,19 @@ function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
 
 	local amount = Table.count(self._scoredActionPickers)
 	if amount > MAX_ACTION_LIST_SIZE_BEFORE_WARN then
-		warn(string.format("[ScoredActionPickerProvider.GetPicker] - Pickers has size of %d/%d", amount, MAX_ACTION_LIST_SIZE_BEFORE_WARN))
+		warn(
+			string.format(
+				"[ScoredActionPickerProvider.GetPicker] - Pickers has size of %d/%d",
+				amount,
+				MAX_ACTION_LIST_SIZE_BEFORE_WARN
+			)
+		)
 	end
 
 	return picker
 end
 
-function ScoredActionPickerProvider:Update()
+function ScoredActionPickerProvider.Update(self: ScoredActionPickerProvider): ()
 	local indexToRemove = {}
 	for key, picker in self._scoredActionPickers do
 		picker:Update()

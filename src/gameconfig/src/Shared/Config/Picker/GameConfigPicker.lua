@@ -28,10 +28,9 @@ GameConfigPicker.__index = GameConfigPicker
 export type GameConfigPicker = typeof(setmetatable(
 	{} :: {
 		_serviceBag: _ServiceBag.ServiceBag,
-		_maid: _Maid.Maid,
 	},
-	{ __index = GameConfigPicker }
-))
+	{} :: typeof({ __index = GameConfigPicker })
+)) & BaseObject.BaseObject
 type GameConfigAssetType = _GameConfigAssetTypes.GameConfigAssetType
 type GameConfigAssetBase = _GameConfigAssetBase.GameConfigAssetBase
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class WeightedRandomChooser
 ]=]
@@ -10,13 +11,23 @@ local WeightedRandomChooser = {}
 WeightedRandomChooser.ClassName = "WeightedRandomChooser"
 WeightedRandomChooser.__index = WeightedRandomChooser
 
+type WeightedRandomChooserCache<T> = { options: { T }, weights: { number }, total: number }
+
+export type WeightedRandomChooser<T> = typeof(setmetatable(
+	{} :: {
+		_optionToWeight: { [T]: number },
+		_cache: WeightedRandomChooserCache<T>?,
+	},
+	{} :: typeof({ __index = WeightedRandomChooser })
+))
+
 --[=[
 	Creates a new weighted random chooser
 
 	@return WeightedRandomChooser<T>
 ]=]
-function WeightedRandomChooser.new()
-	local self = setmetatable({}, WeightedRandomChooser)
+function WeightedRandomChooser.new<T>(): WeightedRandomChooser<T>
+	local self: WeightedRandomChooser<T> = setmetatable({} :: any, WeightedRandomChooser)
 
 	self._optionToWeight = {}
 
@@ -28,9 +39,9 @@ end
 	removes the option.
 
 	@param option T
-	@param weight number?
+	@param weight number | nil
 ]=]
-function WeightedRandomChooser:SetWeight(option, weight)
+function WeightedRandomChooser.SetWeight<T>(self: WeightedRandomChooser<T>, option: T, weight: number | nil)
 	assert(option ~= nil, "Bad option")
 	assert(type(weight) == "number" or weight == nil, "Bad weight")
 
@@ -39,7 +50,7 @@ function WeightedRandomChooser:SetWeight(option, weight)
 	end
 
 	self._cache = nil
-	self._optionToWeight[option] = weight
+	self._optionToWeight[option] = weight :: any
 end
 
 --[=[
@@ -47,7 +58,7 @@ end
 
 	@param option T
 ]=]
-function WeightedRandomChooser:Remove(option)
+function WeightedRandomChooser.Remove<T>(self: WeightedRandomChooser<T>, option: T)
 	self:SetWeight(option, nil)
 end
 
@@ -57,7 +68,7 @@ end
 	@param option T
 	@return number?
 ]=]
-function WeightedRandomChooser:GetWeight(option): number?
+function WeightedRandomChooser.GetWeight<T>(self: WeightedRandomChooser<T>, option): number?
 	return self._optionToWeight[option]
 end
 
@@ -67,9 +78,9 @@ end
 	@param option T
 	@return number?
 ]=]
-function WeightedRandomChooser:GetProbability(option): number?
+function WeightedRandomChooser.GetProbability<T>(self: WeightedRandomChooser<T>, option): number?
 	local weight = self._optionToWeight[option]
-	if weight then
+	if not weight then
 		return nil
 	end
 
@@ -83,7 +94,7 @@ end
 	@param random Random
 	@return T
 ]=]
-function WeightedRandomChooser:Choose(random: Random?)
+function WeightedRandomChooser.Choose<T>(self: WeightedRandomChooser<T>, random: Random?)
 	local data = self:_getOrCreateDataCache()
 
 	local randomNum
@@ -110,7 +121,7 @@ function WeightedRandomChooser:Choose(random: Random?)
 	return data.options[#data.options]
 end
 
-function WeightedRandomChooser:_getOrCreateDataCache()
+function WeightedRandomChooser._getOrCreateDataCache<T>(self: WeightedRandomChooser<T>): WeightedRandomChooserCache<T>
 	if self._cache then
 		return self._cache
 	end
@@ -121,16 +132,17 @@ function WeightedRandomChooser:_getOrCreateDataCache()
 	local total = 0
 	for index, key in options do
 		local weight = self._optionToWeight[key]
-		total = total + weight
+		total += weight
 		weights[index] = weight
 	end
 
-	self._cache = {
+	local cache: WeightedRandomChooserCache<T> = {
 		options = options,
 		weights = weights,
 		total = total,
 	}
-	return self._cache
+	self._cache = cache
+	return cache
 end
 
 return WeightedRandomChooser

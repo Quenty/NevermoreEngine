@@ -2,7 +2,7 @@
 	A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
 	@deprecated 2.3.1
-	@class qGui
+	@class qGUI
 ]=]
 
 local RunService = game:GetService("RunService")
@@ -152,7 +152,7 @@ local function makePropertyTweener(setProperties)
 	--                      setup so {index = NewValue} that is, for example,
 	--                      {TextTransparency = 1}.
 	-- @param Duration The amount of time to spend transitioning.
-	return function(Gui, NewProperties, Duration)
+	return function(Gui: GuiBase, NewProperties, Duration: number)
 
 		if Duration <= 0 then
 			setProperties(Gui, 1, NewProperties, NewProperties)
@@ -222,164 +222,168 @@ qGUI.TweenColor3 = TweenColor3
 qGUI.StopColor3Tween = StopColor3Tween
 
 -- Makes a 'Textured' window...  9Scale thingy?
-function qGUI.AddTexturedWindowTemplate(Frame: Frame, Radius: number, Type: string)
-	Type = Type or "Frame"
+function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: string)
+	type = type or "Frame"
 
-	local TopLeft = Instance.new(Type)
-	TopLeft.Archivable = false
-	TopLeft.BackgroundColor3 = Frame.BackgroundColor3
-	TopLeft.BorderSizePixel = 0
-	TopLeft.Name = "TopLeft"
-	TopLeft.Position = UDim2.new(0, 0, 0, 0)
-	TopLeft.Size = UDim2.new(0, Radius, 0, Radius)
-	TopLeft.BackgroundTransparency = 1
-	TopLeft.ZIndex = Frame.ZIndex
-	TopLeft.Parent = Frame
+	local topLeft = Instance.new(type)
+	topLeft.Archivable = false
+	topLeft.BackgroundColor3 = frame.BackgroundColor3
+	topLeft.BorderSizePixel = 0
+	topLeft.Name = "TopLeft"
+	topLeft.Position = UDim2.new(0, 0, 0, 0)
+	topLeft.Size = UDim2.new(0, radius, 0, radius)
+	topLeft.BackgroundTransparency = 1
+	topLeft.ZIndex = frame.ZIndex
+	topLeft.Parent = frame
 
-	local BottomLeft = Instance.new(Type)
-	BottomLeft.Archivable = false
-	BottomLeft.BackgroundColor3 = Frame.BackgroundColor3
-	BottomLeft.BorderSizePixel = 0
-	BottomLeft.Name = "BottomLeft"
-	BottomLeft.Position = UDim2.new(0, 0, 1, -Radius)
-	BottomLeft.Size = UDim2.new(0, Radius, 0, Radius)
-	BottomLeft.BackgroundTransparency = 1
-	BottomLeft.ZIndex = Frame.ZIndex
-	BottomLeft.Parent = Frame
+	local bottomLeft = Instance.new(type)
+	bottomLeft.Archivable = false
+	bottomLeft.BackgroundColor3 = frame.BackgroundColor3
+	bottomLeft.BorderSizePixel = 0
+	bottomLeft.Name = "BottomLeft"
+	bottomLeft.Position = UDim2.new(0, 0, 1, -radius)
+	bottomLeft.Size = UDim2.new(0, radius, 0, radius)
+	bottomLeft.BackgroundTransparency = 1
+	bottomLeft.ZIndex = frame.ZIndex
+	bottomLeft.Parent = frame
 
-	local TopRight = Instance.new(Type)
-	TopRight.Archivable = false
-	TopRight.BackgroundColor3 = Frame.BackgroundColor3
-	TopRight.BorderSizePixel = 0
-	TopRight.Name = "TopRight"
-	TopRight.Position = UDim2.new(1, -Radius, 0, 0)
-	TopRight.Size = UDim2.new(0, Radius, 0, Radius)
-	TopRight.BackgroundTransparency = 1
-	TopRight.ZIndex = Frame.ZIndex
-	TopRight.Parent = Frame
+	local topRight = Instance.new(type)
+	topRight.Archivable = false
+	topRight.BackgroundColor3 = frame.BackgroundColor3
+	topRight.BorderSizePixel = 0
+	topRight.Name = "TopRight"
+	topRight.Position = UDim2.new(1, -radius, 0, 0)
+	topRight.Size = UDim2.new(0, radius, 0, radius)
+	topRight.BackgroundTransparency = 1
+	topRight.ZIndex = frame.ZIndex
+	topRight.Parent = frame
 
-	local BottomRight = Instance.new(Type)
-	BottomRight.Archivable = false
-	BottomRight.BackgroundColor3 = Frame.BackgroundColor3
-	BottomRight.BorderSizePixel = 0
-	BottomRight.Name = "BottomRight"
-	BottomRight.Position = UDim2.new(1, -Radius, 1, -Radius)
-	BottomRight.Size = UDim2.new(0, Radius, 0, Radius)
-	BottomRight.BackgroundTransparency = 1
-	BottomRight.ZIndex = Frame.ZIndex
-	BottomRight.Parent = Frame
+	local bottomRight = Instance.new(type)
+	bottomRight.Archivable = false
+	bottomRight.BackgroundColor3 = frame.BackgroundColor3
+	bottomRight.BorderSizePixel = 0
+	bottomRight.Name = "BottomRight"
+	bottomRight.Position = UDim2.new(1, -radius, 1, -radius)
+	bottomRight.Size = UDim2.new(0, radius, 0, radius)
+	bottomRight.BackgroundTransparency = 1
+	bottomRight.ZIndex = frame.ZIndex
+	bottomRight.Parent = frame
 
-	local Middle = Instance.new(Type)
-	Middle.Archivable = false
-	Middle.BackgroundColor3 = Frame.BackgroundColor3
-	Middle.BorderSizePixel = 0
-	Middle.Name = "Middle"
-	Middle.Position = UDim2.new(0, Radius, 0, 0)
-	Middle.Size = UDim2.new(1, -Radius * 2, 1, 0)
-	Middle.BackgroundTransparency = 1
-	Middle.ZIndex = Frame.ZIndex
-	Middle.Parent = Frame
+	local middle = Instance.new(type)
+	middle.Archivable = false
+	middle.BackgroundColor3 = frame.BackgroundColor3
+	middle.BorderSizePixel = 0
+	middle.Name = "Middle"
+	middle.Position = UDim2.new(0, radius, 0, 0)
+	middle.Size = UDim2.new(1, -radius * 2, 1, 0)
+	middle.BackgroundTransparency = 1
+	middle.ZIndex = frame.ZIndex
+	middle.Parent = frame
 
-	local MiddleLeft = Instance.new(Type)
-	MiddleLeft.Archivable = false
-	MiddleLeft.BackgroundColor3 = Frame.BackgroundColor3
-	MiddleLeft.BorderSizePixel = 0
-	MiddleLeft.Name = "MiddleLeft"
-	MiddleLeft.Position = UDim2.new(0, 0, 0, Radius)
-	MiddleLeft.Size = UDim2.new(0, Radius, 1, -Radius * 2)
-	MiddleLeft.BackgroundTransparency = 1
-	MiddleLeft.ZIndex = Frame.ZIndex
-	MiddleLeft.Parent = Frame
+	local middleLeft = Instance.new(type)
+	middleLeft.Archivable = false
+	middleLeft.BackgroundColor3 = frame.BackgroundColor3
+	middleLeft.BorderSizePixel = 0
+	middleLeft.Name = "MiddleLeft"
+	middleLeft.Position = UDim2.new(0, 0, 0, radius)
+	middleLeft.Size = UDim2.new(0, radius, 1, -radius * 2)
+	middleLeft.BackgroundTransparency = 1
+	middleLeft.ZIndex = frame.ZIndex
+	middleLeft.Parent = frame
 
-	local MiddleRight = Instance.new(Type)
-	MiddleRight.Archivable = false
-	MiddleRight.BackgroundColor3 = Frame.BackgroundColor3
-	MiddleRight.BorderSizePixel = 0
-	MiddleRight.Name = "MiddleRight"
-	MiddleRight.Position = UDim2.new(1, -Radius, 0, Radius)
-	MiddleRight.Size = UDim2.new(0, Radius, 1, -Radius * 2)
-	MiddleRight.BackgroundTransparency = 1
-	MiddleRight.ZIndex = Frame.ZIndex
-	MiddleRight.Parent = Frame
+	local middleRight = Instance.new(type)
+	middleRight.Archivable = false
+	middleRight.BackgroundColor3 = frame.BackgroundColor3
+	middleRight.BorderSizePixel = 0
+	middleRight.Name = "MiddleRight"
+	middleRight.Position = UDim2.new(1, -radius, 0, radius)
+	middleRight.Size = UDim2.new(0, radius, 1, -radius * 2)
+	middleRight.BackgroundTransparency = 1
+	middleRight.ZIndex = frame.ZIndex
+	middleRight.Parent = frame
 
-	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight
+	return topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight
 end
 
--- Makes a NinePatch in the frame, with the image.
--- @param Frame The frame to texturize
--- @param Radius the radius you want the image to be at
--- @param Type The type (Class) that the frame should be, either an ImageLabel or an ImageButton
--- @param Image The URL of the image in question
--- @param ImageSize The size of the image overall, suggested to be 99/divisible by 3. Vector2 value.
+--[=[
+	Makes a NinePatch in the frame, with the image.
+
+	@param frame Frame -- The frame to texturize
+	@param radius -- the radius you want the image to be at
+	@param type -- The type (Class) that the frame should be, either an ImageLabel or an ImageButton
+	@param image -- The URL of the image in question
+	@param imageSize -- The size of the image overall, suggested to be 99/divisible by 3. Vector2 value.
+	@param properties any
+]=]
 function qGUI.AddNinePatch(
-	Frame: Frame,
-	Image: string,
-	ImageSize: Vector2,
-	Radius: number,
-	Type: "ImageLabel" | "ImageButton",
-	Properties
+	frame: Frame,
+	image: string,
+	imageSize: Vector2,
+	radius: number,
+	type: "ImageLabel" | "ImageButton",
+	properties
 )
-	Properties = Properties or {}
-	Type = Type or "ImageLabel"
-	local TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight =
-		qGUI.AddTexturedWindowTemplate(Frame, Radius, Type)
+	properties = properties or {}
+	type = type or "ImageLabel"
+	local topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight =
+		qGUI.AddTexturedWindowTemplate(frame, radius, type)
 
-	Middle.Size = UDim2.new(1, -Radius * 2, 1, -Radius * 2) -- Fix middle...
-	Middle.Position = UDim2.new(0, Radius, 0, Radius)
+	middle.Size = UDim2.new(1, -radius * 2, 1, -radius * 2) -- Fix middle...
+	middle.Position = UDim2.new(0, radius, 0, radius)
 
-	local middleTop = Instance.new(Type)
+	local middleTop = Instance.new(type)
 	middleTop.Archivable = false
-	middleTop.BackgroundColor3 = Frame.BackgroundColor3
+	middleTop.BackgroundColor3 = frame.BackgroundColor3
 	middleTop.BorderSizePixel = 0
 	middleTop.Name = "MiddleTop"
-	middleTop.Position = UDim2.new(0, Radius, 0, 0)
-	middleTop.Size = UDim2.new(1, -Radius * 2, 0, Radius)
+	middleTop.Position = UDim2.new(0, radius, 0, 0)
+	middleTop.Size = UDim2.new(1, -radius * 2, 0, radius)
 	middleTop.BackgroundTransparency = 1
-	middleTop.ZIndex = Frame.ZIndex
-	middleTop.Parent = Frame
+	middleTop.ZIndex = frame.ZIndex
+	middleTop.Parent = frame
 
-	local MiddleBottom = Instance.new(Type)
-	MiddleBottom.Archivable = false
-	MiddleBottom.BackgroundColor3 = Frame.BackgroundColor3
-	MiddleBottom.BorderSizePixel = 0
-	MiddleBottom.Name = "MiddleBottom"
-	MiddleBottom.Position = UDim2.new(0, Radius, 1, -Radius)
-	MiddleBottom.Size = UDim2.new(1, -Radius * 2, 0, Radius)
-	MiddleBottom.BackgroundTransparency = 1
-	MiddleBottom.ZIndex = Frame.ZIndex
-	MiddleBottom.Parent = Frame
+	local middleBottom = Instance.new(type)
+	middleBottom.Archivable = false
+	middleBottom.BackgroundColor3 = frame.BackgroundColor3
+	middleBottom.BorderSizePixel = 0
+	middleBottom.Name = "MiddleBottom"
+	middleBottom.Position = UDim2.new(0, radius, 1, -radius)
+	middleBottom.Size = UDim2.new(1, -radius * 2, 0, radius)
+	middleBottom.BackgroundTransparency = 1
+	middleBottom.ZIndex = frame.ZIndex
+	middleBottom.Parent = frame
 
-	for _, Item in pairs({
-		TopLeft,
-		TopRight,
-		BottomLeft,
-		BottomRight,
-		Middle,
-		MiddleLeft,
-		MiddleRight,
+	for _, item in pairs({
+		topLeft,
+		topRight,
+		bottomLeft,
+		bottomRight,
+		middle,
+		middleLeft,
+		middleRight,
 		middleTop,
-		MiddleBottom,
+		middleBottom,
 	}) do
-		for Property, Value in Properties do
-			Item[Property] = Value
+		for Property, Value in properties do
+			item[Property] = Value
 		end
-		Item.Image = Image
-		Item.ImageRectSize = Vector2.new(ImageSize.X / 3, ImageSize.Y / 3)
+		item.Image = image
+		item.ImageRectSize = Vector2.new(imageSize.X / 3, imageSize.Y / 3)
 	end
 
-	TopRight.ImageRectOffset = Vector2.new(ImageSize.X * (2 / 3), 0)
-	MiddleRight.ImageRectOffset = Vector2.new(ImageSize.X * (2 / 3), ImageSize.Y / 3)
-	BottomRight.ImageRectOffset = Vector2.new(ImageSize.X * (2 / 3), ImageSize.Y * (2 / 3))
+	topRight.ImageRectOffset = Vector2.new(imageSize.X * (2 / 3), 0)
+	middleRight.ImageRectOffset = Vector2.new(imageSize.X * (2 / 3), imageSize.Y / 3)
+	bottomRight.ImageRectOffset = Vector2.new(imageSize.X * (2 / 3), imageSize.Y * (2 / 3))
 
 	--TopLeft.ImageRectOffset = Vector2.new(0, 0)
-	MiddleLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y / 3)
-	BottomLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y * (2 / 3))
+	middleLeft.ImageRectOffset = Vector2.new(0, imageSize.Y / 3)
+	bottomLeft.ImageRectOffset = Vector2.new(0, imageSize.Y * (2 / 3))
 
-	Middle.ImageRectOffset = Vector2.new(ImageSize.X / 3, ImageSize.Y / 3)
-	middleTop.ImageRectOffset = Vector2.new(ImageSize.Y / 3, 0)
-	MiddleBottom.ImageRectOffset = Vector2.new(ImageSize.Y / 3, ImageSize.Y * (2 / 3))
+	middle.ImageRectOffset = Vector2.new(imageSize.X / 3, imageSize.Y / 3)
+	middleTop.ImageRectOffset = Vector2.new(imageSize.Y / 3, 0)
+	middleBottom.ImageRectOffset = Vector2.new(imageSize.Y / 3, imageSize.Y * (2 / 3))
 
-	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, middleTop, MiddleBottom
+	return topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight, middleTop, middleBottom
 end
 
 function qGUI.BackWithRoundedRectangle(Frame: Frame, Radius: number, Color: Color3?)

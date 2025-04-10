@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Master clock on the server
 	@class MasterClock
@@ -7,10 +8,22 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Rx = require("Rx")
+local _Observable = require("Observable")
 
 local MasterClock = setmetatable({}, BaseObject)
 MasterClock.__index = MasterClock
 MasterClock.ClassName = "MasterClock"
+
+export type ClockFunction = () -> number
+
+export type MasterClock = typeof(setmetatable(
+	{} :: {
+		_remoteEvent: RemoteEvent,
+		_remoteFunction: RemoteFunction,
+		_clockFunction: ClockFunction,
+	},
+	{} :: typeof({ __index = MasterClock })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new MasterClock
@@ -19,8 +32,8 @@ MasterClock.ClassName = "MasterClock"
 	@param remoteFunction RemoteFunction
 	@return MasterClock
 ]=]
-function MasterClock.new(remoteEvent: RemoteEvent, remoteFunction: RemoteFunction)
-	local self = setmetatable(BaseObject.new(), MasterClock)
+function MasterClock.new(remoteEvent: RemoteEvent, remoteFunction: RemoteFunction): MasterClock
+	local self: MasterClock = setmetatable(BaseObject.new() :: any, MasterClock)
 
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._remoteFunction = remoteFunction or error("No remoteFunction")
@@ -56,7 +69,7 @@ end
 
 	@return function
 ]=]
-function MasterClock:GetClockFunction()
+function MasterClock.GetClockFunction(self: MasterClock): ClockFunction
 	return self._clockFunction
 end
 
@@ -65,15 +78,15 @@ end
 
 	@return Observable<number>
 ]=]
-function MasterClock:ObservePing()
-	return Rx.of(0)
+function MasterClock.ObservePing(_self: MasterClock): _Observable.Observable<number>
+	return Rx.of(0) :: any
 end
 
 --[=[
 	Returns true if the manager has synced with the server
 	@return boolean
 ]=]
-function MasterClock:IsSynced(): boolean
+function MasterClock.IsSynced(_self: MasterClock): boolean
 	return true
 end
 
@@ -81,25 +94,25 @@ end
 	Returns estimated ping in seconds
 	@return number
 ]=]
-function MasterClock:GetPing(): number
-	return self._offset
+function MasterClock.GetPing(_self: MasterClock): number
+	return 0
 end
 
 --[=[
 	Returns the sycncronized time
 	@return number
 ]=]
-function MasterClock:GetTime(): number
+function MasterClock.GetTime(_self: MasterClock): number
 	return tick()
 end
 
-function MasterClock:_forceSync()
+function MasterClock._forceSync(self: MasterClock): ()
 	-- start the sync process with all slave clocks.
 	local timeOne = self:GetTime()
 	self._remoteEvent:FireAllClients(timeOne)
 end
 
-function MasterClock:_handleDelayRequest(timeThree: number)
+function MasterClock._handleDelayRequest(self: MasterClock, timeThree: number): number
 	-- Client sends back message to get the SM_Difference.
 	-- returns slaveMasterDifference
 	local timeFour = self:GetTime()

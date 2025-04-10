@@ -19,16 +19,34 @@ local _ServiceBag = require("ServiceBag")
 local _Observable = require("Observable")
 local _GameConfigAssetTypes = require("GameConfigAssetTypes")
 local _Promise = require("Promise")
+local _Signal = require("Signal")
+local _GameProductDataService = require("GameProductDataService")
 
 local GameProductService = {}
 GameProductService.ServiceName = "GameProductService"
+
+export type GameProductService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: _ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_gameProductDataService: _GameProductDataService.GameProductDataService,
+
+		GamePassPurchased: _Signal.Signal<Player, number>,
+		ProductPurchased: _Signal.Signal<Player, number>,
+		AssetPurchased: _Signal.Signal<Player, number>,
+		BundlePurchased: _Signal.Signal<Player, number>,
+		MembershipPurchased: _Signal.Signal<Player, number>,
+		SubscriptionPurchased: _Signal.Signal<Player, number>,
+	},
+	{} :: typeof({ __index = GameProductService })
+))
 
 --[=[
 	Initializes the service. Should be done via [ServiceBag]
 	@param serviceBag ServiceBag
 ]=]
-function GameProductService:Init(serviceBag: _ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function GameProductService.Init(self: GameProductService, serviceBag: _ServiceBag.ServiceBag)
+	assert(not (self :: any)._serviceBag, "Already initialized")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -60,11 +78,17 @@ end
 	@param idOrKey string | number
 	@return Observable<>
 ]=]
-function GameProductService:ObservePlayerAssetPurchased(assetType: _GameConfigAssetTypes.GameConfigAssetType, idOrKey)
+function GameProductService.ObservePlayerAssetPurchased(
+	self: GameProductService,
+	player: Player,
+	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): _Observable.Observable<()>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._gameProductDataService:ObservePlayerAssetPurchased(assetType, idOrKey)
+	return self._gameProductDataService:ObservePlayerAssetPurchased(player, assetType, idOrKey)
 end
 
 --[=[
@@ -74,7 +98,8 @@ end
 	@param idOrKey string | number
 	@return Observable<Player>
 ]=]
-function GameProductService:ObserveAssetPurchased(
+function GameProductService.ObserveAssetPurchased(
+	self: GameProductService,
 	assetType: _GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey
 ): _Observable.Observable<Player>
@@ -92,7 +117,8 @@ end
 	@param idOrKey string | number
 	@return boolean
 ]=]
-function GameProductService:HasPlayerPurchasedThisSession(
+function GameProductService.HasPlayerPurchasedThisSession(
+	self: GameProductService,
 	player: Player,
 	assetType: _GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -110,7 +136,10 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function GameProductService:PromisePlayerIsPromptOpen(player: Player): _Promise.Promise<boolean>
+function GameProductService.PromisePlayerIsPromptOpen(
+	self: GameProductService,
+	player: Player
+): _Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self._serviceBag, "Not initialized")
 
@@ -123,7 +152,10 @@ end
 	@param player Player
 	@return Promise
 ]=]
-function GameProductService:PromisePlayerPromptClosed(player: Player): _Promise.Promise<boolean>
+function GameProductService.PromisePlayerPromptClosed(
+	self: GameProductService,
+	player: Player
+): _Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self._serviceBag, "Not initialized")
 
@@ -138,7 +170,8 @@ end
 	@param idOrKey string | number
 	@return boolean
 ]=]
-function GameProductService:PromisePlayerPromptPurchase(
+function GameProductService.PromisePlayerPromptPurchase(
+	self: GameProductService,
 	player: Player,
 	assetType: _GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -158,7 +191,8 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductService:PromisePlayerOwnership(
+function GameProductService.PromisePlayerOwnership(
+	self: GameProductService,
 	player: Player,
 	assetType: _GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -180,7 +214,8 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductService:PromisePlayerOwnershipOrPrompt(
+function GameProductService.PromisePlayerOwnershipOrPrompt(
+	self: GameProductService,
 	player: Player,
 	assetType: _GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -200,7 +235,8 @@ end
 	@param idOrKey string | number
 	@return Observable<boolean>
 ]=]
-function GameProductService:ObservePlayerOwnership(
+function GameProductService.ObservePlayerOwnership(
+	self: GameProductService,
 	player: Player,
 	assetType: _GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -215,7 +251,7 @@ end
 --[=[
 	Cleans up the game product service
 ]=]
-function GameProductService:Destroy()
+function GameProductService.Destroy(self: GameProductService)
 	self._maid:DoCleaning()
 end
 

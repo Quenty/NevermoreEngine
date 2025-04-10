@@ -37,7 +37,6 @@ type ComputedState = {
 
 export type TimedTween = typeof(setmetatable(
 	{} :: {
-		_maid: Maid.Maid,
 		_state: ValueObject.ValueObject<TimedTweenState>,
 		_transitionTime: ValueObject.ValueObject<number>,
 
@@ -47,8 +46,8 @@ export type TimedTween = typeof(setmetatable(
 		VisibleChanged: _Signal.Signal<boolean, boolean>,
 		Destroy: (self: TimedTween) -> (),
 	},
-	{ __index = TimedTween }
-))
+	{} :: typeof({ __index = TimedTween })
+)) & BasicPane.BasicPane
 
 --[=[
 	Timed transition module
@@ -180,14 +179,14 @@ function TimedTween.PromiseFinished(self: TimedTween): Promise.Promise<()>
 		end)
 	end))
 
-	self._maid[promise :: any] = maid
+	self._maid[promise] = maid
 
 	promise:Finally(function()
-		self._maid[promise :: any] = nil
+		self._maid[promise] = nil
 	end)
 
 	maid:GiveTask(function()
-		self._maid[promise :: any] = nil
+		self._maid[promise] = nil
 	end)
 	return promise
 end

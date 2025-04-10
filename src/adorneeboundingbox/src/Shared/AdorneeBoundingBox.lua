@@ -20,9 +20,16 @@ local AdorneeBoundingBox = setmetatable({}, BaseObject)
 AdorneeBoundingBox.ClassName = "AdorneeBoundingBox"
 AdorneeBoundingBox.__index = AdorneeBoundingBox
 
-export type AdorneeBoundingBox = typeof(setmetatable({}, AdorneeBoundingBox))
+export type AdorneeBoundingBox = typeof(setmetatable(
+	{} :: {
+		_adornee: ValueObject.ValueObject<Instance?>,
+		_bbCFrame: ValueObject.ValueObject<CFrame?>,
+		_bbSize: ValueObject.ValueObject<Vector3?>,
+	},
+	{} :: typeof({ __index = AdorneeBoundingBox })
+)) & BaseObject.BaseObject
 
-function AdorneeBoundingBox.new(initialAdornee: Instance): AdorneeBoundingBox
+function AdorneeBoundingBox.new(initialAdornee: Instance?): AdorneeBoundingBox
 	local self = setmetatable(BaseObject.new() :: any, AdorneeBoundingBox)
 
 	self._adornee = self._maid:Add(ValueObject.new(initialAdornee))
@@ -45,7 +52,7 @@ function AdorneeBoundingBox.new(initialAdornee: Instance): AdorneeBoundingBox
 	return self
 end
 
-function AdorneeBoundingBox:SetAdornee(adornee: Instance?): () -> ()
+function AdorneeBoundingBox.SetAdornee(self: AdorneeBoundingBox, adornee: Instance?): () -> ()
 	assert(typeof(adornee) == "Instance" or adornee == nil, "Bad adornee")
 
 	self._adornee.Value = adornee
@@ -66,7 +73,7 @@ export type BoundingBoxData = {
 	Observes the bounding box of the adornee
 	@return Observable<BoundingBoxData>
 ]=]
-function AdorneeBoundingBox:ObserveBoundingBox(): _Observable.Observable<BoundingBoxData>
+function AdorneeBoundingBox.ObserveBoundingBox(self: AdorneeBoundingBox): _Observable.Observable<BoundingBoxData>
 	return Rx.combineLatest({
 		CFrame = self:ObserveCFrame(),
 		Size = self:ObserveSize(),
@@ -81,7 +88,7 @@ end
 	Gets the bounding box of the adornee
 	@return BoundingBoxData?
 ]=]
-function AdorneeBoundingBox:GetBoundingBox(): BoundingBoxData?
+function AdorneeBoundingBox.GetBoundingBox(self: AdorneeBoundingBox): BoundingBoxData?
 	local cframe = self._bbCFrame.Value
 	local size = self._bbSize.Value
 
@@ -99,7 +106,7 @@ end
 	Observes the cframe of the adornee
 	@return Observable<Vector3>
 ]=]
-function AdorneeBoundingBox:ObserveCFrame(): _Observable.Observable<CFrame>
+function AdorneeBoundingBox.ObserveCFrame(self: AdorneeBoundingBox): _Observable.Observable<CFrame?>
 	return self._bbCFrame:Observe()
 end
 
@@ -107,7 +114,7 @@ end
 	Gets the CFrame of the adornee
 	@return Vector3
 ]=]
-function AdorneeBoundingBox:GetCFrame(): CFrame?
+function AdorneeBoundingBox.GetCFrame(self: AdorneeBoundingBox): CFrame?
 	return self._bbCFrame.Value
 end
 
@@ -115,7 +122,7 @@ end
 	Observes the size of the adornee
 	@return Observable<Vector3>
 ]=]
-function AdorneeBoundingBox:ObserveSize(): _Observable.Observable<Vector3>
+function AdorneeBoundingBox.ObserveSize(self: AdorneeBoundingBox): _Observable.Observable<Vector3?>
 	return self._bbSize:Observe()
 end
 
@@ -123,11 +130,11 @@ end
 	Gets the size of the adornee
 	@return Vector3
 ]=]
-function AdorneeBoundingBox:GetSize(): Vector3
+function AdorneeBoundingBox.GetSize(self: AdorneeBoundingBox): Vector3?
 	return self._bbSize.Value
 end
 
-function AdorneeBoundingBox:_setup(maid: Maid.Maid, adornee: Instance)
+function AdorneeBoundingBox._setup(self: AdorneeBoundingBox, maid: Maid.Maid, adornee: Instance)
 	if adornee:IsA("BasePart") then
 		maid:GiveTask(self:_setupPart(adornee))
 	elseif adornee:IsA("Model") then
@@ -150,7 +157,7 @@ function AdorneeBoundingBox:_setup(maid: Maid.Maid, adornee: Instance)
 	end
 end
 
-function AdorneeBoundingBox:_setupTool(tool: Tool): Maid.Maid
+function AdorneeBoundingBox._setupTool(self: AdorneeBoundingBox, tool: Tool): Maid.Maid
 	assert(typeof(tool) == "Instance" and tool:IsA("Tool"), "Bad tool")
 
 	local topMaid = Maid.new()
@@ -160,17 +167,16 @@ function AdorneeBoundingBox:_setupTool(tool: Tool): Maid.Maid
 			return
 		end
 
-		local maid = brio:ToMaid()
-		local handle = brio:GetValue()
+		local maid, handle = brio:ToMaidAndValue()
 
 		-- TODO: Something smarter? But we'll need to change the AdorneeUtils contract too
-		maid:GiveTask(self:_setupPart(handle))
+		maid:GiveTask(self:_setupPart(handle :: BasePart))
 	end))
 
 	return topMaid
 end
 
-function AdorneeBoundingBox:_setupModel(model: Model): Maid.Maid
+function AdorneeBoundingBox._setupModel(self: AdorneeBoundingBox, model: Model): Maid.Maid
 	assert(typeof(model) == "Instance" and model:IsA("Model"), "Bad model")
 
 	local topMaid = Maid.new()
@@ -186,7 +192,7 @@ function AdorneeBoundingBox:_setupModel(model: Model): Maid.Maid
 	return topMaid
 end
 
-function AdorneeBoundingBox:_setupHumanoid(humanoid: Humanoid): Maid.Maid
+function AdorneeBoundingBox._setupHumanoid(self: AdorneeBoundingBox, humanoid: Humanoid): Maid.Maid
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	local topMaid = Maid.new()
@@ -206,7 +212,7 @@ function AdorneeBoundingBox:_setupHumanoid(humanoid: Humanoid): Maid.Maid
 	return topMaid
 end
 
-function AdorneeBoundingBox:_setupAttachment(attachment: Attachment): Maid.Maid
+function AdorneeBoundingBox._setupAttachment(self: AdorneeBoundingBox, attachment: Attachment): Maid.Maid
 	assert(typeof(attachment) == "Instance" and attachment:IsA("Attachment"), "Bad attachment")
 
 	local maid = Maid.new()
@@ -217,7 +223,7 @@ function AdorneeBoundingBox:_setupAttachment(attachment: Attachment): Maid.Maid
 		return parent ~= nil
 	end)
 		:Pipe({
-			RxBrioUtils.switchMapBrio(function(parent)
+			RxBrioUtils.switchMapBrio(function(parent): any
 				if parent:IsA("BasePart") then
 					return Rx.combineLatest({
 						partCFrame = RxPartBoundingBoxUtils.observePartCFrame(parent),
@@ -240,7 +246,7 @@ function AdorneeBoundingBox:_setupAttachment(attachment: Attachment): Maid.Maid
 	return maid
 end
 
-function AdorneeBoundingBox:_setupPart(part: BasePart): Maid.Maid
+function AdorneeBoundingBox._setupPart(self: AdorneeBoundingBox, part: BasePart): Maid.Maid
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local maid = Maid.new()

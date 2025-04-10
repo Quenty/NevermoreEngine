@@ -13,7 +13,7 @@ local RxPartBoundingBoxUtils = {}
 function RxPartBoundingBoxUtils.observePartCFrame(part: BasePart): _Observable.Observable<CFrame>
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
-	return RxInstanceUtils.observeProperty(part, "CFrame") :: any
+	return RxInstanceUtils.observeProperty(part, "CFrame")
 end
 
 return RxPartBoundingBoxUtils

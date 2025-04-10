@@ -30,7 +30,7 @@ export type DeathReportService = typeof(setmetatable(
 		_reportProcessor: DeathReportProcessor.DeathReportProcessor,
 		_weaponDataRetrievers: { GetWeaponData },
 	},
-	{ __index = DeathReportService }
+	{} :: typeof({ __index = DeathReportService })
 ))
 
 export type GetWeaponData = (humanoid: Humanoid) -> DeathReportUtils.WeaponData?

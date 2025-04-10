@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class ChatTagBase
 ]=]
@@ -9,13 +10,30 @@ local BaseObject = require("BaseObject")
 local ChatTagConstants = require("ChatTagConstants")
 local LocalizedTextUtils = require("LocalizedTextUtils")
 local Rx = require("Rx")
+local _ChatTagDataUtils = require("ChatTagDataUtils")
+local _Observable = require("Observable")
 
 local ChatTagBase = setmetatable({}, BaseObject)
 ChatTagBase.ClassName = "ChatTagBase"
 ChatTagBase.__index = ChatTagBase
 
-function ChatTagBase.new(obj: Folder)
-	local self = setmetatable(BaseObject.new(obj), ChatTagBase)
+export type ChatTagBase = typeof(setmetatable(
+	{} :: {
+		_obj: Folder,
+		_chatTagText: AttributeValue.AttributeValue<string>,
+		_chatTagLocalizedTextData: AttributeValue.AttributeValue<LocalizedTextUtils.LocalizedTextData?>,
+		_chatTagColor: AttributeValue.AttributeValue<Color3>,
+		_chatTagPriority: AttributeValue.AttributeValue<number>,
+
+		-- Public
+		UserDisabled: AttributeValue.AttributeValue<boolean>,
+		ChatTagKey: AttributeValue.AttributeValue<boolean>,
+	},
+	{} :: typeof({ __index = ChatTagBase })
+)) & BaseObject.BaseObject
+
+function ChatTagBase.new(obj: Folder): ChatTagBase
+	local self: ChatTagBase = setmetatable(BaseObject.new(obj) :: any, ChatTagBase)
 
 	self._chatTagText = AttributeValue.new(self._obj, ChatTagConstants.TAG_TEXT_ATTRIBUTE, "")
 	self._chatTagLocalizedTextData = AttributeValue.new(self._obj, ChatTagConstants.TAG_LOCALIZED_TEXT_ATTRIBUTE, nil)
@@ -28,10 +46,10 @@ function ChatTagBase.new(obj: Folder)
 	return self
 end
 
-function ChatTagBase:ObserveChatTagData()
+function ChatTagBase.ObserveChatTagData(self: ChatTagBase): _Observable.Observable<_ChatTagDataUtils.ChatTagData>
 	return Rx.combineLatest({
-		UserDisabled = self.UserDisabled:Observe();
-		TagText = self._chatTagText:Observe();
+		UserDisabled = self.UserDisabled:Observe(),
+		TagText = self._chatTagText:Observe(),
 		TagLocalizedText = self._chatTagLocalizedTextData:Observe():Pipe({
 			Rx.map(function(text)
 				if type(text) == "string" then
@@ -39,11 +57,11 @@ function ChatTagBase:ObserveChatTagData()
 				else
 					return nil
 				end
-			end);
-		});
-		TagColor = self._chatTagColor:Observe();
-		TagPriority = self._chatTagPriority:Observe();
-	})
+			end) :: any,
+		}),
+		TagColor = self._chatTagColor:Observe(),
+		TagPriority = self._chatTagPriority:Observe(),
+	}) :: any
 end
 
 return ChatTagBase

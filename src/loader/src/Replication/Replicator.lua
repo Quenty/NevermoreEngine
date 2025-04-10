@@ -46,7 +46,7 @@ export type Replicator = typeof(setmetatable(
 		_hasReplicatedDescendants: BoolValue,
 		_replicationType: StringValue,
 	},
-	Replicator
+	{} :: typeof({ __index = Replicator })
 ))
 
 --[=[

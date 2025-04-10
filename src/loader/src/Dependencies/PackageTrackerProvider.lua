@@ -18,7 +18,7 @@ export type PackageTrackerProvider = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_trackCount: number,
 	},
-	PackageTrackerProvider
+	{} :: typeof({ __index = PackageTrackerProvider })
 ))
 
 function PackageTrackerProvider.new(): PackageTrackerProvider

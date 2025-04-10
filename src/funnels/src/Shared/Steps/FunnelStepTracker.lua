@@ -15,12 +15,11 @@ FunnelStepTracker.__index = FunnelStepTracker
 
 export type FunnelStepTracker = typeof(setmetatable(
 	{} :: {
-		_maid: _Maid.Maid,
 		_stepsLogged: { [number]: string },
 		StepLogged: Signal.Signal<number, string>,
 	},
-	{ __index = FunnelStepTracker }
-))
+	{} :: typeof({ __index = FunnelStepTracker })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new FunnelStepTracker

@@ -31,7 +31,7 @@ export type Promise<T...> = typeof(setmetatable(
 		_pendingExecuteList: { any }?,
 		_source: string,
 	},
-	Promise
+	{} :: typeof({ __index = Promise })
 ))
 
 --[=[
@@ -408,7 +408,7 @@ end
 	@param onRejected function -- Called if/when rejected with parameters
 	@return Promise<T...>
 ]=]
-function Promise.Then<T...>(self: Promise<T...>, onFulfilled, onRejected)
+function Promise.Then<T...>(self: Promise<T...>, onFulfilled: ((T...) -> any...)?, onRejected: ((...any) -> any...)?)
 	if type(onRejected) == "function" then
 		self._unconsumedException = false
 	end

@@ -27,7 +27,7 @@
 local Maid = {}
 Maid.ClassName = "Maid"
 
-export type MaidTask = (() -> ()) | Instance | thread | Maid | any
+export type MaidTask = (() -> ()) | Instance | thread | any | RBXScriptConnection | nil
 
 export type Maid = typeof(setmetatable(
 	{} :: {
@@ -37,9 +37,9 @@ export type Maid = typeof(setmetatable(
 		DoCleaning: (self: Maid) -> (),
 		Destroy: (self: Maid) -> (),
 		_tasks: { [any]: MaidTask },
-		[string | number | { [any]: any } | Instance]: MaidTask?,
+		[string | number | MaidTask]: any,
 	},
-	Maid
+	{} :: typeof({ __index = Maid })
 ))
 
 --[[
@@ -53,9 +53,12 @@ export type Maid = typeof(setmetatable(
 	@return Maid
 ]]
 function Maid.new(): Maid
-	return setmetatable({
-		_tasks = {},
-	}, Maid) :: Maid
+	return setmetatable(
+		{
+			_tasks = {},
+		} :: any,
+		Maid
+	) :: Maid
 end
 
 --[[
@@ -136,8 +139,9 @@ function Maid.__newindex(self: Maid, index: any, newTask: MaidTask)
 		if typeof(job) == "function" then
 			(job :: any)()
 		elseif typeof(job) == "table" then
-			if type(job.Destroy) == "function" then
-				job:Destroy()
+			local destructable: any = job
+			if type(destructable.Destroy) == "function" then
+				destructable:Destroy()
 			end
 		elseif typeof(job) == "Instance" then
 			job:Destroy()
@@ -172,7 +176,7 @@ function Maid.Add<T>(self: Maid, task: T): T
 		error("Task cannot be false or nil", 2)
 	end
 
-	self[#(self._tasks :: any) + 1] = task
+	self[#(self._tasks :: any) + 1] = task :: any
 
 	if type(task) == "table" and not task.Destroy then
 		warn("[Maid.Add] - Gave table task without .Destroy\n\n" .. debug.traceback())
@@ -196,7 +200,7 @@ function Maid.GiveTask(self: Maid, task: MaidTask): number
 	local taskId = #(self._tasks :: any) + 1
 	self[taskId] = task
 
-	if type(task) == "table" and not task.Destroy then
+	if type(task) == "table" and not (task :: any).Destroy then
 		warn("[Maid.GiveTask] - Gave table task without .Destroy\n\n" .. debug.traceback())
 	end
 
@@ -261,8 +265,8 @@ function Maid.DoCleaning(self: Maid)
 		tasks[index] = nil
 		if typeof(job) == "function" then
 			(job :: any)()
-		elseif typeof(job) == "table" and type(job.Destroy) == "function" then
-			job:Destroy()
+		elseif typeof(job) == "table" and type((job :: any).Destroy) == "function" then
+			(job :: any):Destroy()
 		elseif typeof(job) == "Instance" then
 			job:Destroy()
 		elseif typeof(job) == "thread" then

@@ -36,7 +36,7 @@ export type InputModeTypeSelector = typeof(setmetatable(
 		Value: InputModeType.InputModeType?,
 		Changed: _Signal.Signal<InputModeType.InputModeType, InputModeType.InputModeType>,
 	},
-	{ __index = InputModeTypeSelector }
+	{} :: typeof({ __index = InputModeTypeSelector })
 ))
 
 --[=[
@@ -208,7 +208,7 @@ function InputModeTypeSelector.Bind(
 	updateBindFunction: (InputModeType.InputModeType, Maid.Maid) -> ()
 ): InputModeTypeSelector
 	local maid = Maid.new()
-	self._maid[updateBindFunction :: any] = maid
+	self._maid[updateBindFunction] = maid
 
 	local function onChange(newMode, _)
 		maid._modeMaid = nil
@@ -239,7 +239,7 @@ function InputModeTypeSelector.RemoveInputModeType(
 )
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
-	if not self._maid[inputModeType :: any] then
+	if not self._maid[inputModeType] then
 		return
 	end
 
@@ -250,7 +250,7 @@ function InputModeTypeSelector.RemoveInputModeType(
 		warn("[InputModeTypeSelector] - Failed to find inputModeType")
 	end
 
-	self._maid[inputModeType :: any] = nil
+	self._maid[inputModeType] = nil
 
 	if self._activeModeType.Value == inputModeType then
 		self:_pickNewInputMode()
@@ -264,13 +264,13 @@ end
 function InputModeTypeSelector.AddInputModeType(self: InputModeTypeSelector, inputModeType: InputModeType.InputModeType)
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
-	if self._maid[inputModeType :: any] then
+	if self._maid[inputModeType] then
 		return
 	end
 
 	table.insert(self._inputModeTypeList, inputModeType)
 	local inputMode = self._inputModeServiceClient:GetInputMode(inputModeType)
-	self._maid[inputModeType :: any] = inputMode.Enabled:Connect(function()
+	self._maid[inputModeType] = inputMode.Enabled:Connect(function()
 		self._activeModeType.Value = inputModeType
 	end)
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class InfluxDBPoint
 ]=]
@@ -13,10 +14,25 @@ local InfluxDBPoint = {}
 InfluxDBPoint.ClassName = "InfluxDBPoint"
 InfluxDBPoint.__index = InfluxDBPoint
 
-export type InfluxDBPoint = typeof(setmetatable({}, InfluxDBPoint))
+export type InfluxDBPoint = typeof(setmetatable(
+	{} :: {
+		_measurementName: string?,
+		_timestamp: (DateTime | string | number)?,
+		_tags: { [string]: string },
+		_fields: { [string]: string },
+	},
+	{} :: typeof({ __index = InfluxDBPoint })
+))
+
+export type InfluxDBPointTableData = {
+	measurementName: string?,
+	timestamp: (DateTime | string | number)?,
+	tags: { [string]: string },
+	fields: { [string]: string },
+}
 
 function InfluxDBPoint.new(measurementName: string?): InfluxDBPoint
-	local self = setmetatable({}, InfluxDBPoint)
+	local self: InfluxDBPoint = setmetatable({} :: any, InfluxDBPoint)
 
 	assert(type(measurementName) == "string" or measurementName == nil, "Bad measurementName")
 
@@ -28,7 +44,7 @@ function InfluxDBPoint.new(measurementName: string?): InfluxDBPoint
 	return self
 end
 
-function InfluxDBPoint.fromTableData(data)
+function InfluxDBPoint.fromTableData(data: InfluxDBPointTableData)
 	assert(type(data) == "table", "Bad data")
 	assert(type(data.measurementName) == "string" or data.measurementName == nil, "Bad data.measurementName")
 
@@ -65,17 +81,17 @@ function InfluxDBPoint.isInfluxDBPoint(point: any): boolean
 	return type(point) == "table" and getmetatable(point) == InfluxDBPoint
 end
 
-function InfluxDBPoint:SetMeasurementName(name: string)
+function InfluxDBPoint.SetMeasurementName(self: InfluxDBPoint, name: string)
 	assert(type(name) == "string" or name == nil, "Bad name")
 
 	self._measurementName = name
 end
 
-function InfluxDBPoint:GetMeasurementName()
+function InfluxDBPoint.GetMeasurementName(self: InfluxDBPoint): string?
 	return self._measurementName
 end
 
-function InfluxDBPoint:ToTableData()
+function InfluxDBPoint.ToTableData(self: InfluxDBPoint): InfluxDBPointTableData
 	return {
 		measurementName = self._measurementName,
 		timestamp = self._timestamp,
@@ -89,7 +105,7 @@ end
 
 	@param timestamp DateTime | nil
 ]=]
-function InfluxDBPoint:SetTimestamp(timestamp: DateTime?)
+function InfluxDBPoint.SetTimestamp(self: InfluxDBPoint, timestamp: DateTime?)
 	assert(typeof(timestamp) == "DateTime" or timestamp == nil, "Bad timestamp")
 
 	self._timestamp = timestamp
@@ -101,7 +117,7 @@ end
 	@param tagKey string
 	@param tagValue string
 ]=]
-function InfluxDBPoint:AddTag(tagKey: string, tagValue: string)
+function InfluxDBPoint.AddTag(self: InfluxDBPoint, tagKey: string, tagValue: string)
 	assert(type(tagKey) == "string", "Bad tagKey")
 	assert(type(tagValue) == "string", "Bad tagValue")
 
@@ -114,7 +130,7 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddIntField(fieldName: string, value: number)
+function InfluxDBPoint.AddIntField(self: InfluxDBPoint, fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
@@ -135,7 +151,7 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddUintField(fieldName: string, value: number)
+function InfluxDBPoint.AddUintField(self: InfluxDBPoint, fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
@@ -157,7 +173,7 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddFloatField(fieldName: string, value: number)
+function InfluxDBPoint.AddFloatField(self: InfluxDBPoint, fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
@@ -174,7 +190,7 @@ end
 	@param fieldName string
 	@param value boolean
 ]=]
-function InfluxDBPoint:AddBooleanField(fieldName, value)
+function InfluxDBPoint.AddBooleanField(self: InfluxDBPoint, fieldName: string, value: boolean)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "boolean", "Bad value")
 
@@ -187,14 +203,14 @@ end
 	@param fieldName string
 	@param value string
 ]=]
-function InfluxDBPoint:AddStringField(fieldName, value)
+function InfluxDBPoint.AddStringField(self: InfluxDBPoint, fieldName: string, value: string)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "string", "Bad value")
 
 	self._fields[fieldName] = InfluxDBEscapeUtils.quoted(value)
 end
 
-function InfluxDBPoint:ToLineProtocol(pointSettings)
+function InfluxDBPoint.ToLineProtocol(self: InfluxDBPoint, pointSettings)
 	if not self._measurementName then
 		return nil
 	end
@@ -232,7 +248,7 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 		end
 	end
 
-	local timestamp = self._timestamp
+	local timestamp: any? = self._timestamp
 	local convertTime = pointSettings:GetConvertTime()
 	if convertTime then
 		timestamp = convertTime(timestamp)
@@ -247,10 +263,15 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 		tagsContent = ""
 	end
 
-	return InfluxDBEscapeUtils.measurement(self._measurementName) .. tagsContent .. " " .. table.concat(fields, ",") .. " " .. timestamp
+	return InfluxDBEscapeUtils.measurement(self._measurementName)
+		.. tagsContent
+		.. " "
+		.. table.concat(fields, ",")
+		.. " "
+		.. tostring(timestamp)
 end
 
-function InfluxDBPoint:_convertTimeToMillis(value)
+function InfluxDBPoint._convertTimeToMillis(_self: InfluxDBPoint, value: (string | DateTime | number)?): string?
 	if value == nil then
 	    return tostring(DateTime.now().UnixTimestampMillis)
 	elseif type(value) == "string" then

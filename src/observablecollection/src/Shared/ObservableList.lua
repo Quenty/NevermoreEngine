@@ -28,8 +28,8 @@ export type ObservableList<T> = typeof(setmetatable(
 		_keyList: { Symbol.Symbol },
 		_contents: { [Symbol.Symbol]: T },
 		_indexes: { [Symbol.Symbol]: number },
-		_indexObservers: ObservableSubscriptionTable.ObservableSubscriptionTable<T?>,
-		_keyIndexObservables: ObservableSubscriptionTable.ObservableSubscriptionTable<number?>,
+		_indexObservers: any; -- ObservableSubscriptionTable.ObservableSubscriptionTable<T?>,
+		_keyIndexObservables: any; -- ObservableSubscriptionTable.ObservableSubscriptionTable<number?>,
 		_countValue: ValueObject.ValueObject<number>,
 
 		--[=[
@@ -55,7 +55,7 @@ export type ObservableList<T> = typeof(setmetatable(
 		]=]
 		CountChanged: Signal.Signal<number>,
 	},
-	ObservableList
+	{} :: typeof({ __index = ObservableList })
 ))
 
 --[=[
@@ -63,7 +63,7 @@ export type ObservableList<T> = typeof(setmetatable(
 	@return ObservableList<T>
 ]=]
 function ObservableList.new<T>(): ObservableList<T>
-	local self = setmetatable({}, ObservableList)
+	local self: ObservableList<T> = setmetatable({} :: any, ObservableList)
 
 	self._maid = Maid.new()
 
@@ -75,11 +75,11 @@ function ObservableList.new<T>(): ObservableList<T>
 	self._keyIndexObservables = self._maid:Add(ObservableSubscriptionTable.new())
 	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
-	self.ItemAdded = self._maid:Add(Signal.new())
-	self.ItemRemoved = self._maid:Add(Signal.new())
-	self.CountChanged = self._countValue.Changed
+	self.ItemAdded = self._maid:Add(Signal.new() :: any)
+	self.ItemRemoved = self._maid:Add(Signal.new() :: any)
+	self.CountChanged = self._countValue.Changed :: any
 
-	return self :: any
+	return self
 end
 
 --[=[
@@ -154,9 +154,9 @@ function ObservableList.ObserveItemsBrio<T>(self: ObservableList<T>): Observable
 			handleItem(self._contents[key], index, key)
 		end
 
-		self._maid[sub :: any] = maid
+		self._maid[sub] = maid
 		maid:GiveTask(function()
-			self._maid[sub :: any] = nil
+			self._maid[sub] = nil
 			sub:Complete()
 		end)
 

@@ -20,20 +20,13 @@ SpringTransitionModel.__index = SpringTransitionModel
 
 export type SpringTransitionModel<T> = typeof(setmetatable(
 	{} :: {
-		_maid: Maid.Maid,
 		_showTarget: any,
 		_hideTarget: any,
 		_springObject: any,
 		_transitionModel: TransitionModel.TransitionModel,
-
-		-- From BasicPane
-		IsVisible: (self: SpringTransitionModel<T>) -> boolean,
-		SetVisible: (self: SpringTransitionModel<T>, isVisible: boolean, doNotAnimate: boolean?) -> (),
-		VisibleChanged: _Signal.Signal<boolean, boolean>,
-		Destroy: (self: SpringTransitionModel<T>) -> (),
 	},
-	SpringTransitionModel
-))
+	{} :: typeof({ __index = SpringTransitionModel })
+)) & BasicPane.BasicPane
 
 --[=[
 	A transition model that has a spring underlying it. Very useful
@@ -44,7 +37,7 @@ export type SpringTransitionModel<T> = typeof(setmetatable(
 	@return SpringTransitionModel<T>
 ]=]
 function SpringTransitionModel.new<T>(showTarget: T?, hideTarget: T?): SpringTransitionModel<T>
-	local self = setmetatable(BasicPane.new() :: any, SpringTransitionModel)
+	local self: SpringTransitionModel<T> = setmetatable(BasicPane.new() :: any, SpringTransitionModel)
 
 	self._showTarget = showTarget or 1
 	self._hideTarget = hideTarget

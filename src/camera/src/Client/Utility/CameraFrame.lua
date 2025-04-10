@@ -39,7 +39,7 @@ export type CameraFrame = typeof(setmetatable(
 		]=]
 		QFrame: QFrame.QFrame,
 	},
-	{ __index = CameraFrame }
+	{} :: typeof({ __index = CameraFrame })
 ))
 
 --[=[

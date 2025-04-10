@@ -30,7 +30,7 @@ export type InputModeServiceClient = typeof(setmetatable(
 		_lastMousePosition: Vector3?,
 		_serviceBag: _ServiceBag.ServiceBag,
 	},
-	{ __index = InputModeServiceClient }
+	{} :: typeof({ __index = InputModeServiceClient })
 ))
 
 function InputModeServiceClient.Init(self: InputModeServiceClient, serviceBag: _ServiceBag.ServiceBag)

@@ -18,11 +18,11 @@ export type ObservableSubscriptionTable<T...> = typeof(setmetatable(
 	{} :: {
 		_subMap: { [any]: { _Subscription.Subscription<T...> } },
 	},
-	ObservableSubscriptionTable
+	{} :: typeof({ __index = ObservableSubscriptionTable })
 ))
 
 function ObservableSubscriptionTable.new<T...>(): ObservableSubscriptionTable<T...>
-	local self = setmetatable({} :: any, ObservableSubscriptionTable)
+	local self: ObservableSubscriptionTable<T...> = setmetatable({} :: any, ObservableSubscriptionTable)
 
 	self._subMap = {} -- { TKey: Subscription<TEmit> }
 
@@ -66,7 +66,7 @@ end
 
 	@param key TKey
 ]=]
-function ObservableSubscriptionTable.Complete<T...>(self: ObservableSubscriptionTable<T...>, key: any)
+function ObservableSubscriptionTable.Complete<T...>(self: ObservableSubscriptionTable<T...>, key: any): ()
 	local subs = self._subMap[key]
 	if not subs then
 		return
@@ -87,7 +87,7 @@ end
 
 	@param key TKey
 ]=]
-function ObservableSubscriptionTable.Fail<T...>(self: ObservableSubscriptionTable<T...>, key: any)
+function ObservableSubscriptionTable.Fail<T...>(self: ObservableSubscriptionTable<T...>, key: any): ()
 	local subs = self._subMap[key]
 	if not subs then
 		return
@@ -157,7 +157,7 @@ end
 --[=[
 	Completes all subscriptions and removes them from the list.
 ]=]
-function ObservableSubscriptionTable.Destroy<T...>(self: ObservableSubscriptionTable<T...>)
+function ObservableSubscriptionTable.Destroy<T...>(self: ObservableSubscriptionTable<T...>): ()
 	while next(self._subMap) do
 		local key, list = next(self._subMap)
 		assert(key, "Key should not be nil")

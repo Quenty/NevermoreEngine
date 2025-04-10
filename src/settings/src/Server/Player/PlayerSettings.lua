@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class PlayerSettings
 ]=]
@@ -12,13 +13,23 @@ local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local Remoting = require("Remoting")
 local SettingsDataService = require("SettingsDataService")
+local _ServiceBag = require("ServiceBag")
 
 local PlayerSettings = setmetatable({}, PlayerSettingsBase)
 PlayerSettings.ClassName = "PlayerSettings"
 PlayerSettings.__index = PlayerSettings
 
-function PlayerSettings.new(obj, serviceBag)
-	local self = setmetatable(PlayerSettingsBase.new(obj, serviceBag), PlayerSettings)
+export type PlayerSettings = typeof(setmetatable(
+	{} :: {
+		_serviceBag: any,
+		_remoting: Remoting.Remoting,
+		_settingsDataService: SettingsDataService.SettingsDataService,
+	},
+	{} :: typeof({ __index = PlayerSettings })
+)) & PlayerSettingsBase.PlayerSettingsBase
+
+function PlayerSettings.new(folder: Folder, serviceBag: _ServiceBag.ServiceBag)
+	local self: PlayerSettings = setmetatable(PlayerSettingsBase.new(folder, serviceBag) :: any, PlayerSettings)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._settingsDataService = self._serviceBag:GetService(SettingsDataService)
@@ -39,7 +50,7 @@ function PlayerSettings.new(obj, serviceBag)
 	return self
 end
 
-function PlayerSettings:EnsureInitialized(settingName, defaultValue)
+function PlayerSettings.EnsureInitialized(self: PlayerSettings, settingName: string, defaultValue)
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 
@@ -62,7 +73,7 @@ function PlayerSettings:EnsureInitialized(settingName, defaultValue)
 	end
 end
 
-function PlayerSettings:_setupRemoting()
+function PlayerSettings._setupRemoting(self: PlayerSettings)
 	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.SERVER))
 
 	self._maid:Add(self._remoting.RequestUpdateSettings:Bind(function(player, settingsMap)
@@ -72,7 +83,7 @@ function PlayerSettings:_setupRemoting()
 	end))
 end
 
-function PlayerSettings:_setSettingsMap(settingsMap)
+function PlayerSettings._setSettingsMap(self: PlayerSettings, settingsMap)
 	assert(type(settingsMap) == "table", "Bad settingsMap")
 
 	for settingName, value in settingsMap do
@@ -87,14 +98,24 @@ function PlayerSettings:_setSettingsMap(settingsMap)
 		local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 
 		if self._obj:GetAttribute(attributeName) == nil then
-			warn(string.format("[PlayerSettings] - Cannot set setting %q on attribute that is not defined on the server.", attributeName))
+			warn(
+				string.format(
+					"[PlayerSettings] - Cannot set setting %q on attribute that is not defined on the server.",
+					attributeName
+				)
+			)
 			continue
 		end
 
 		-- Paranoid UTF8 check. Avoid letting this value be set.
 		if type(value) == "string" then
 			if not DataStoreStringUtils.isValidUTF8(value) then
-				warn(string.format("[PlayerSettings] - Bad UTF8 value setting value for %q. Skipping setting.", settingName))
+				warn(
+					string.format(
+						"[PlayerSettings] - Bad UTF8 value setting value for %q. Skipping setting.",
+						settingName
+					)
+				)
 				continue
 			end
 		end
@@ -105,7 +126,12 @@ function PlayerSettings:_setSettingsMap(settingsMap)
 		if type(encodedAttribute) == "string" then
 			-- Paranoid UTF8 check. Avoid letting this value be set.
 			if not DataStoreStringUtils.isValidUTF8(encodedAttribute) then
-				warn(string.format("[PlayerSettings] - Bad UTF8 encodedAttribute value for %q. Skipping setting.", settingName))
+				warn(
+					string.format(
+						"[PlayerSettings] - Bad UTF8 encodedAttribute value for %q. Skipping setting.",
+						settingName
+					)
+				)
 				continue
 			end
 
@@ -120,4 +146,4 @@ function PlayerSettings:_setSettingsMap(settingsMap)
 	end
 end
 
-return Binder.new("PlayerSettings", PlayerSettings)
+return Binder.new("PlayerSettings", PlayerSettings :: any) :: Binder.Binder<PlayerSettings>

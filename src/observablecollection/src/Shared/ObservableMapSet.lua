@@ -30,7 +30,7 @@ export type ObservableMapSet<TKey, TValue> = typeof(setmetatable(
 		SetRemoved: _Signal.Signal<TKey>,
 		CountChanged: _Signal.Signal<number>,
 	},
-	ObservableMapSet
+	{} :: typeof({ __index = ObservableMapSet })
 ))
 
 --[=[
@@ -105,9 +105,9 @@ function ObservableMapSet.Push<TKey, TValue>(
 	end
 
 	-- Ensure self-cleanup when map cleans up
-	self._maid[maid :: any] = maid
+	self._maid[maid] = maid
 	maid:GiveTask(function()
-		self._maid[maid :: any] = nil
+		self._maid[maid] = nil
 	end)
 
 	return maid
@@ -287,9 +287,9 @@ function ObservableMapSet.ObserveCountForKey<TKey, TValue>(
 	return self:ObserveSetBrio(key):Pipe({
 		RxBrioUtils.switchMapBrio(function(observableSet)
 			return observableSet:ObserveCount()
-		end),
-		RxBrioUtils.emitOnDeath(0),
-	}) :: any
+		end) :: any,
+		RxBrioUtils.emitOnDeath(0) :: any,
+	} :: any) :: any
 end
 
 function ObservableMapSet._addToSet<TKey, TValue>(self: ObservableMapSet<TKey, TValue>, key: TKey, entry: TValue): () -> ()
@@ -311,12 +311,12 @@ function ObservableMapSet._getOrCreateSet<TKey, TValue>(
 
 	maid:GiveTask(set.CountChanged:Connect(function(count)
 		if count <= 0 then
-			self._maid[set :: any] = nil
+			self._maid[set] = nil
 		end
 	end))
 
 	maid:GiveTask(self._observableMapOfSets:Set(key, set))
-	self._maid[set :: any] = maid
+	self._maid[set] = maid
 
 	return set
 end

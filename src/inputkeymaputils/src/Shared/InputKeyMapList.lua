@@ -67,7 +67,6 @@ InputKeyMapList.__index = InputKeyMapList
 
 export type InputKeyMapList = typeof(setmetatable(
 	{} :: {
-		_maid: Maid.Maid,
 		_inputKeyMapListName: string,
 		_inputModeTypeToInputKeyMap: any, -- ObservableMap.ObservableMap<InputModeType.InputModeType, InputKeyMap.InputKeyMap>,
 		_inputTypesForBinding: any, -- ObservableCountingMap.ObservableCountingMap<InputTypeUtils.InputType>,
@@ -75,8 +74,8 @@ export type InputKeyMapList = typeof(setmetatable(
 		_isRobloxTouchButton: StateStack.StateStack<boolean>,
 		_options: InputKeyMapListOptions,
 	},
-	{ __index = InputKeyMapList }
-))
+	{} :: typeof({ __index = InputKeyMapList })
+)) & BaseObject.BaseObject
 
 export type InputKeyMapListOptions = {
 	bindingName: string,
@@ -190,7 +189,7 @@ end
 function InputKeyMapList.Add(self: InputKeyMapList, inputKeyMap: InputKeyMap.InputKeyMap): ()
 	assert(inputKeyMap, "Bad inputKeyMap")
 
-	self._maid[inputKeyMap:GetInputModeType() :: any] = inputKeyMap
+	self._maid[inputKeyMap:GetInputModeType()] = inputKeyMap
 	self._inputModeTypeToInputKeyMap:Set(inputKeyMap:GetInputModeType(), inputKeyMap)
 end
 
@@ -212,7 +211,7 @@ function InputKeyMapList.SetInputTypesList(
 
 	if inputTypes == nil then
 		self._inputModeTypeToInputKeyMap:Remove(inputModeType)
-		self._maid[inputModeType :: any] = nil
+		self._maid[inputModeType] = nil
 	else
 		local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
 		if not inputKeyMap then
@@ -233,7 +232,7 @@ function InputKeyMapList.SetDefaultInputTypesList(
 
 	if inputTypes == nil then
 		self._inputModeTypeToInputKeyMap:Remove(inputModeType)
-		self._maid[inputModeType :: any] = nil
+		self._maid[inputModeType] = nil
 	else
 		local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
 		if not inputKeyMap then

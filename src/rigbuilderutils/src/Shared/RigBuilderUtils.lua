@@ -353,7 +353,7 @@ end
 --[=[
 	Creates an R15 rig from a package
 	@param packageAssetId number
-	@return Promise<Instance>
+	@return Promise<Model>
 ]=]
 function RigBuilderUtils.promiseR15PackageRig(packageAssetId: number): Promise.Promise<Model>
 	assert(type(packageAssetId) == "number", "Bad packageAssetId")
@@ -414,7 +414,7 @@ end
 
 --[=[
 	Creates a default R15 rig
-	@return Promise<Instance>
+	@return Promise<Model>
 ]=]
 function RigBuilderUtils.promiseR15Rig()
 	return InsertServiceUtils.promiseAsset(1664543044):Then(function(inserted)
@@ -444,7 +444,7 @@ end
 
 --[=[
 	Creates an R15 man rig
-	@return Promise<Instance>
+	@return Promise<Model>
 ]=]
 function RigBuilderUtils.promiseR15ManRig(): Promise.Promise<Model>
 	return RigBuilderUtils.promiseR15PackageRig(86500185)
@@ -452,7 +452,7 @@ end
 
 --[=[
 	Creates an R15 woman rig
-	@return Promise<Instance>
+	@return Promise<Model>
 ]=]
 function RigBuilderUtils.promiseR15WomanRig(): Promise.Promise<Model>
 	return RigBuilderUtils.promiseR15PackageRig(86499905)
@@ -460,7 +460,7 @@ end
 
 --[=[
 	Creates an R15 mesh rig
-	@return Promise<Instance>
+	@return Promise<Model>
 ]=]
 function RigBuilderUtils.promiseR15MeshRig(): Promise.Promise<Model>
 	return RigBuilderUtils.promiseR15PackageRig(27112438)
@@ -471,7 +471,7 @@ end
 	@param userId number
 	@param humanoidRigType HumanoidRigType | nil
 	@param assetTypeVerification AssetTypeVerification | nil
-	@return Promise<Instance>
+	@return Promise<Model>
 ]=]
 function RigBuilderUtils.promiseBasePlayerRig(
 	userId: number,
@@ -506,6 +506,13 @@ function RigBuilderUtils.promiseBasePlayerRig(
 	end)
 end
 
+--[=[
+	Promises humanoid model from description
+	@param description HumanoidDescription
+	@param rigType HumanoidRigType | nil
+	@param assetTypeVerification AssetTypeVerification | nil
+	@return Promise<Model>
+]=]
 function RigBuilderUtils.promiseHumanoidModelFromDescription(
 	description: HumanoidDescription,
 	rigType: Enum.HumanoidRigType?,
@@ -573,7 +580,7 @@ end
 --[=[
 	Creates an R15 rig dressed as a given player
 	@param userId number
-	@return Promise<Instance>
+	@return Promise<Model>
 ]=]
 function RigBuilderUtils.promisePlayerRig(userId: number): Promise.Promise<Model>
 	assert(type(userId) == "number", "Bad userId")

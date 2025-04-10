@@ -77,7 +77,7 @@ export type Observable<T...> = typeof(setmetatable(
 		_source: string?,
 		_onSubscribe: OnSubscribe<T...>,
 	},
-	Observable
+	{} :: typeof({ __index = Observable })
 ))
 
 --[=[

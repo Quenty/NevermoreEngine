@@ -16,7 +16,7 @@ export type PendingPromiseTracker<T...> = typeof(setmetatable(
 	{} :: {
 		_pendingPromises: { [_Promise.Promise<T...>]: true },
 	},
-	PendingPromiseTracker
+	{} :: typeof({ __index = PendingPromiseTracker })
 ))
 
 --[=[

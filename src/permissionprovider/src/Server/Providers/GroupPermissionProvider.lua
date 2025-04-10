@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides permissions from a group
 
@@ -15,17 +16,31 @@ local PermissionLevel = require("PermissionLevel")
 local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local Promise = require("Promise")
+local _PermissionProviderUtils = require("PermissionProviderUtils")
 
 local GroupPermissionProvider = setmetatable({}, BasePermissionProvider)
 GroupPermissionProvider.__index = GroupPermissionProvider
 GroupPermissionProvider.ClassName = "GroupPermissionProvider"
 
+export type GroupPermissionProvider = typeof(setmetatable(
+	{} :: {
+		_config: _PermissionProviderUtils.GroupRankConfig,
+		_groupId: number,
+		_minAdminRequiredRank: number,
+		_minCreatorRequiredRank: number,
+		_adminsCache: { [number]: true },
+		_creatorCache: { [number]: true },
+		_promiseRankPromisesCache: { [number]: Promise.Promise<number> },
+	},
+	{} :: typeof({ __index = GroupPermissionProvider })
+)) & BasePermissionProvider.BasePermissionProvider
+
 --[=[
 	@param config table
 	@return GroupPermissionProvider
 ]=]
-function GroupPermissionProvider.new(config)
-	local self = setmetatable(BasePermissionProvider.new(config), GroupPermissionProvider)
+function GroupPermissionProvider.new(config: _PermissionProviderUtils.GroupRankConfig): GroupPermissionProvider
+	local self = setmetatable(BasePermissionProvider.new(config) :: any, GroupPermissionProvider)
 
 	assert(self._config.type == PermissionProviderConstants.GROUP_RANK_CONFIG_TYPE, "Bad configType")
 
@@ -40,12 +55,12 @@ end
 --[=[
 	Starts the permission provider. Should be done via ServiceBag.
 ]=]
-function GroupPermissionProvider:Start()
+function GroupPermissionProvider.Start(self: GroupPermissionProvider)
 	assert(self._config, "Bad config")
 
 	getmetatable(GroupPermissionProvider).Start(self)
 
-	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player: Player)
 		local userId = player.UserId
 
 		self._adminsCache[userId] = nil
@@ -76,7 +91,11 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function GroupPermissionProvider:PromiseIsPermissionLevel(player: Player, permissionLevel)
+function GroupPermissionProvider.PromiseIsPermissionLevel(
+	self: GroupPermissionProvider,
+	player: Player,
+	permissionLevel: PermissionLevel.PermissionLevel
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
@@ -89,7 +108,10 @@ function GroupPermissionProvider:PromiseIsPermissionLevel(player: Player, permis
 	end
 end
 
-function GroupPermissionProvider:_promiseIsCreator(player: Player)
+function GroupPermissionProvider._promiseIsCreator(
+	self: GroupPermissionProvider,
+	player: Player
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(player:IsDescendantOf(game), "Bad player")
 
@@ -102,7 +124,10 @@ function GroupPermissionProvider:_promiseIsCreator(player: Player)
 	end)
 end
 
-function GroupPermissionProvider:_promiseIsAdmin(player: Player)
+function GroupPermissionProvider._promiseIsAdmin(
+	self: GroupPermissionProvider,
+	player: Player
+): Promise.Promise<boolean>
 	assert(player:IsDescendantOf(game))
 
 	-- really not saving much time.
@@ -119,7 +144,7 @@ function GroupPermissionProvider:_promiseIsAdmin(player: Player)
 	end)
 end
 
-function GroupPermissionProvider:_handlePlayer(player: Player)
+function GroupPermissionProvider._handlePlayer(self: GroupPermissionProvider, player: Player): ()
 	assert(player, "Bad player")
 
 	self:_promiseRankInGroup(player):Then(function(rank)
@@ -133,7 +158,7 @@ function GroupPermissionProvider:_handlePlayer(player: Player)
 	end)
 end
 
-function GroupPermissionProvider:_promiseRankInGroup(player: Player)
+function GroupPermissionProvider._promiseRankInGroup(self: GroupPermissionProvider, player: Player): Promise.Promise<number>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	if self._promiseRankPromisesCache[player.UserId] then

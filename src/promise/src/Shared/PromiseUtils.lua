@@ -27,7 +27,7 @@ function PromiseUtils.any<T...>(promises: { Promise.Promise<T...> }): Promise.Pr
 		returnPromise:Reject(...)
 	end
 
-	for _, promise in promises do
+	for _, promise: any in promises do
 		promise:Then(resolve, reject)
 	end
 
@@ -67,11 +67,11 @@ function PromiseUtils.all<T>(promises: { Promise.Promise<T> }): Promise.Promise<
 	end
 
 	local remainingCount = #promises
-	local returnPromise = Promise.new()
+	local returnPromise: Promise.Promise<T> = Promise.new()
 	local results = {}
 	local allFulfilled = true
 
-	local function syncronize(index, isFullfilled)
+	local function syncronize(index: number, isFullfilled: boolean)
 		return function(value)
 			allFulfilled = allFulfilled and isFullfilled
 			results[index] = value
@@ -83,7 +83,7 @@ function PromiseUtils.all<T>(promises: { Promise.Promise<T> }): Promise.Promise<
 		end
 	end
 
-	for index, promise in promises do
+	for index, promise: any in promises do
 		promise:Then(syncronize(index, true), syncronize(index, false))
 	end
 
@@ -103,8 +103,8 @@ function PromiseUtils.firstSuccessOrLastFailure<T...>(promises: { Promise.Promis
 		return promises[1]
 	end
 
-	local remainingCount = #promises
-	local returnPromise = Promise.new()
+	local remainingCount: number = #promises
+	local returnPromise: Promise.Promise<T...> = Promise.new()
 
 	local function syncronize(isFullfilled)
 		return function(...)
@@ -122,7 +122,7 @@ function PromiseUtils.firstSuccessOrLastFailure<T...>(promises: { Promise.Promis
 		end
 	end
 
-	for _, promise in promises do
+	for _, promise: any in promises do
 		promise:Then(syncronize(true), syncronize(false))
 	end
 

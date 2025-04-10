@@ -27,21 +27,20 @@ type PromptEntry = {
 
 export type PromptQueue = typeof(setmetatable(
 	{} :: {
-		_maid: Maid.Maid,
 		_isShowing: ValueObject.ValueObject<boolean>,
 		_clearRequested: Signal.Signal<(boolean?)>,
 		_queue: { PromptEntry },
 		_currentProcessingEntry: PromptEntry?,
 	},
-	{ __index = PromptQueue }
-))
+	{} :: typeof({ __index = PromptQueue })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new prompt queue
 	@return PromptQueue
 ]=]
 function PromptQueue.new(): PromptQueue
-	local self = setmetatable(BaseObject.new() :: any, PromptQueue)
+	local self: PromptQueue = setmetatable(BaseObject.new() :: any, PromptQueue)
 
 	self._isShowing = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._clearRequested = self._maid:Add(Signal.new())
@@ -49,7 +48,7 @@ function PromptQueue.new(): PromptQueue
 	self._queue = {}
 	self._currentProcessingEntry = nil
 
-	return self :: any
+	return self
 end
 
 --[=[
@@ -68,13 +67,13 @@ function PromptQueue.Queue(self: PromptQueue, transitionModel: TransitionModel.T
 	local entry: PromptEntry = {
 		promise = promise,
 		execute = function()
-			assert(promise:IsPending(), "Not pending")
+		assert(promise:IsPending(), "Not pending")
 
 			-- stylua: ignore
 			maid:GivePromise(transitionModel:PromiseShow())
 				:Then(function()
-					if transitionModel.PromiseSustain then
-						return maid:GivePromise(transitionModel:PromiseSustain())
+					if (transitionModel :: any).PromiseSustain then
+						return maid:GivePromise((transitionModel :: any):PromiseSustain())
 					end
 
 					return nil
@@ -129,7 +128,7 @@ function PromptQueue.Queue(self: PromptQueue, transitionModel: TransitionModel.T
 	end))
 
 	promise:Finally(function()
-		self._maid[maid :: any] = nil
+		self._maid[maid] = nil
 	end)
 	maid:GiveTask(function()
 		if self._currentProcessingEntry == entry then
@@ -141,10 +140,10 @@ function PromptQueue.Queue(self: PromptQueue, transitionModel: TransitionModel.T
 			table.remove(self._queue, index)
 		end
 
-		self._maid[maid :: any] = nil
+		self._maid[maid] = nil
 	end)
 
-	self._maid[maid :: any] = maid
+	self._maid[maid] = maid
 
 	self:_startQueueProcessing()
 

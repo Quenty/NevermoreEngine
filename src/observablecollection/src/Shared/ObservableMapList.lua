@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Holds a map of lists. This is good for list-based
 
@@ -12,42 +13,58 @@ local ObservableList = require("ObservableList")
 local ObservableMap = require("ObservableMap")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local _Signal = require("Signal")
+local _Brio = require("Brio")
 
 local ObservableMapList = {}
 ObservableMapList.ClassName = "ObservableMapList"
 ObservableMapList.__index = ObservableMapList
 
+type ObservableList<T> = any --ObservableList.ObservableList<T>
+
+export type ObservableMapList<TKey, TValue> = typeof(setmetatable(
+	{} :: {
+		_observableMapOfLists: any, --ObservableMap.ObservableMap<TKey, ObservableList<TValue>>,
+		_maid: Maid.Maid,
+
+		--[=[
+			Fires when an item is added
+			@readonly
+			@prop ListAdded Signal<TKey>
+			@within ObservableMapSet
+		]=]
+		ListAdded: _Signal.Signal<TKey, ObservableList<TValue>>,
+
+		--[=[
+			Fires when an item is removed
+			@readonly
+			@prop ListRemoved Signal<TKey>
+			@within ObservableMapSet
+		]=]
+		ListRemoved: _Signal.Signal<TKey>,
+
+		--[=[
+			Fires when the count changes.
+			@prop CountChanged RBXScriptSignal
+			@within ObservableMap
+		]=]
+		CountChanged: _Signal.Signal<number>,
+	},
+	{} :: typeof({ __index = ObservableMapList })
+))
+
 --[=[
 	Constructs a new ObservableMapList
 	@return ObservableMapList<TKey, TValue>
 ]=]
-function ObservableMapList.new()
-	local self = setmetatable({}, ObservableMapList)
+function ObservableMapList.new<TKey, TValue>(): ObservableMapList<TKey, TValue>
+	local self: ObservableMapList<TKey, TValue> = setmetatable({} :: any, ObservableMapList)
 
 	self._maid = Maid.new()
 	self._observableMapOfLists = self._maid:Add(ObservableMap.new())
 
---[=[
-	Fires when an item is added
-	@readonly
-	@prop ListAdded Signal<TKey>
-	@within ObservableMapSet
-]=]
 	self.ListAdded = assert(self._observableMapOfLists.KeyAdded, "Bad KeyAdded") -- :Fire(key, set)
-
---[=[
-	Fires when an item is removed
-	@readonly
-	@prop ListRemoved Signal<TKey>
-	@within ObservableMapSet
-]=]
 	self.ListRemoved = assert(self._observableMapOfLists.KeyRemoved, "Bad KeyRemoved") -- :Fire(key)
-
---[=[
-	Fires when the count changes.
-	@prop CountChanged RBXScriptSignal
-	@within ObservableMap
-]=]
 	self.CountChanged = assert(self._observableMapOfLists.CountChanged, "Bad CountChanged")
 
 	return self
@@ -65,7 +82,7 @@ end
 	@param observeKey Observable<TKey>
 	@return MaidTask -- Cleanup object that will remove the entry
 ]=]
-function ObservableMapList:Push(observeKey, entry)
+function ObservableMapList.Push<TKey, TValue>(self: ObservableMapList<TKey, TValue>, observeKey, entry: TValue): Maid.Maid
 	assert(observeKey ~= nil, "Bad observeKey")
 	assert(entry ~= nil, "Bad entry")
 
@@ -98,7 +115,7 @@ end
 	@param key TKey
 	@return TValue | nil
 ]=]
-function ObservableMapList:GetFirstItemForKey(key)
+function ObservableMapList.GetFirstItemForKey<TKey, TValue>(self: ObservableMapList<TKey, TValue>, key: TKey): TValue?
 	assert(key ~= nil, "Bad key")
 
 	local observableList = self:GetListForKey(key)
@@ -123,9 +140,13 @@ end
 
 	@param key TKey
 	@param index number
-	@return TValue | nil
+	@return TValue?
 ]=]
-function ObservableMapList:GetItemForKeyAtIndex(key, index)
+function ObservableMapList.GetItemForKeyAtIndex<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>,
+	key: TKey,
+	index: number
+): TValue?
 	assert(key ~= nil, "Bad key")
 	assert(type(index) == "number", "Bad index")
 
@@ -142,7 +163,7 @@ end
 
 	@return number
 ]=]
-function ObservableMapList:GetListCount()
+function ObservableMapList.GetListCount<TKey, TValue>(self: ObservableMapList<TKey, TValue>): number
 	return self._observableMapOfLists:GetCount()
 end
 
@@ -153,7 +174,7 @@ ObservableMapList.__len = ObservableMapList.GetListCount
 
 	@return Observable<number>
 ]=]
-function ObservableMapList:ObserveListCount()
+function ObservableMapList.ObserveListCount<TKey, TValue>(self: ObservableMapList<TKey, TValue>): Observable.Observable<number>
 	return self._observableMapOfLists:ObserveCount()
 end
 
@@ -162,9 +183,9 @@ end
 
 	@param key TKey
 	@param index number
-	@return Observable<TValue?>
+	@return TValue?
 ]=]
-function ObservableMapList:GetAtListIndex(key, index)
+function ObservableMapList.GetAtListIndex<TKey, TValue>(self: ObservableMapList<TKey, TValue>, key: TKey, index: number): TValue?
 	assert(key ~= nil, "Bad key")
 	assert(type(index) == "number", "Bad index")
 
@@ -183,19 +204,23 @@ end
 	@param index number
 	@return Observable<TValue?>
 ]=]
-function ObservableMapList:ObserveAtListIndex(key, index)
+function ObservableMapList.ObserveAtListIndex<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>,
+	key: TKey,
+	index: number
+): Observable.Observable<TValue?>
 	assert(key ~= nil, "Bad key")
 	assert(type(index) == "number", "Bad index")
 
 	return self._observableMapOfLists:ObserveAtKey(key):Pipe({
-		Rx.switchMap(function(list)
+		Rx.switchMap(function(list): any
 			if list then
 				return list:ObserveAtIndex(index)
 			else
 				return Rx.of(nil)
 			end
-		end);
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -203,7 +228,7 @@ end
 
 	@return { TKey }
 ]=]
-function ObservableMapList:GetKeyList()
+function ObservableMapList.GetKeyList<TKey, TValue>(self: ObservableMapList<TKey, TValue>): { TKey }
 	return self._observableMapOfLists:GetKeyList()
 end
 
@@ -211,7 +236,7 @@ end
 	Observes the list of all keys.
 	@return Observable<{ TKey }>
 ]=]
-function ObservableMapList:ObserveKeyList()
+function ObservableMapList.ObserveKeyList<TKey, TValue>(self: ObservableMapList<TKey, TValue>): Observable.Observable<{ TKey }>
 	return self._observableMapOfLists:ObserveKeyList()
 end
 
@@ -219,7 +244,9 @@ end
 	Observes all keys in the map
 	@return Observable<Brio<TKey>>
 ]=]
-function ObservableMapList:ObserveKeysBrio()
+function ObservableMapList.ObserveKeysBrio<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>
+): Observable.Observable<_Brio.Brio<TKey>>
 	return self._observableMapOfLists:ObserveKeysBrio()
 end
 
@@ -230,19 +257,23 @@ end
 	@param index number
 	@return Observable<Brio<TValue>>
 ]=]
-function ObservableMapList:ObserveAtListIndexBrio(key, index)
+function ObservableMapList.ObserveAtListIndexBrio<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>,
+	key: TKey,
+	index: number
+): Observable.Observable<_Brio.Brio<TValue>>
 	assert(key ~= nil, "Bad key")
 	assert(type(index) == "number", "Bad index")
 
 	return self._observableMapOfLists:ObserveAtKeyBrio(key):Pipe({
 		RxBrioUtils.switchMapBrio(function(list)
 			return list:ObserveAtIndexBrio(index)
-		end);
-		RxBrioUtils.toBrio();
+		end) :: any,
+		RxBrioUtils.toBrio() :: any,
 		RxBrioUtils.where(function(value)
 			return value ~= nil
-		end)
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -251,18 +282,21 @@ end
 	@param key TKey
 	@return Observable<Brio<TValue>>
 ]=]
-function ObservableMapList:ObserveItemsForKeyBrio(key)
+function ObservableMapList.ObserveItemsForKeyBrio<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>,
+	key: TKey
+): Observable.Observable<_Brio.Brio<TValue>>
 	assert(key ~= nil, "Bad key")
 
 	return self._observableMapOfLists:ObserveAtKeyBrio(key):Pipe({
-		RxBrioUtils.switchMapBrio(function(list)
+		RxBrioUtils.switchMapBrio(function(list): any
 			if list then
 				return list:ObserveItemsBrio()
 			else
 				return Rx.EMPTY
 			end
-		end);
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -271,7 +305,7 @@ end
 	@param key TKey
 	@return { TValue }
 ]=]
-function ObservableMapList:GetListFromKey(key)
+function ObservableMapList.GetListFromKey<TKey, TValue>(self: ObservableMapList<TKey, TValue>, key: TKey): { TValue }
 	assert(key ~= nil, "Bad key")
 
 	local observableList = self:GetListForKey(key)
@@ -287,7 +321,7 @@ end
 	@param key TKey
 	@return ObservableList<TValue>
 ]=]
-function ObservableMapList:GetListForKey(key)
+function ObservableMapList.GetListForKey<TKey, TValue>(self: ObservableMapList<TKey, TValue>, key: TKey): any
 	assert(key ~= nil, "Bad key")
 
 	return self._observableMapOfLists:Get(key)
@@ -297,9 +331,9 @@ end
 	Gets a list of all of the entries at the given index, if it exists
 
 	@param index number
-	@return ObservableList<TValue>
+	@return { TValue}
 ]=]
-function ObservableMapList:GetListOfValuesAtListIndex(index: number)
+function ObservableMapList.GetListOfValuesAtListIndex<TKey, TValue>(self: ObservableMapList<TKey, TValue>, index: number): { TValue }
 	assert(type(index) == "number", "Bad index")
 
 	local list = table.create(self._observableMapOfLists:GetCount())
@@ -320,7 +354,10 @@ end
 	@param key TKey
 	@return Observable<ObservableList<TValue>>
 ]=]
-function ObservableMapList:ObserveList(key)
+function ObservableMapList.ObserveList<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>,
+	key: TKey
+): Observable.Observable<ObservableList<TValue>>
 	assert(key ~= nil, "Bad key")
 
 	return self._observableMapOfLists:ObserveAtKey(key)
@@ -332,7 +369,10 @@ end
 	@param key TKey
 	@return Observable<Brio<ObservableList<TValue>>>
 ]=]
-function ObservableMapList:ObserveListBrio(key)
+function ObservableMapList.ObserveListBrio<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>,
+	key: TKey
+): Observable.Observable<_Brio.Brio<ObservableList<TValue>>>
 	assert(key ~= nil, "Bad key")
 
 	return self._observableMapOfLists:ObserveAtKeyBrio(key)
@@ -343,7 +383,9 @@ end
 
 	@return Observable<Brio<ObservableList<TValue>>>
 ]=]
-function ObservableMapList:ObserveListsBrio()
+function ObservableMapList.ObserveListsBrio<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>
+): Observable.Observable<_Brio.Brio<ObservableList<TValue>>>
 	return self._observableMapOfLists:ObserveValuesBrio()
 end
 
@@ -353,30 +395,33 @@ end
 	@param key TKey
 	@return Observable<number>
 ]=]
-function ObservableMapList:ObserveCountForKey(key)
+function ObservableMapList.ObserveCountForKey<TKey, TValue>(
+	self: ObservableMapList<TKey, TValue>,
+	key: TKey
+): Observable.Observable<number>
 	assert(key ~= nil, "Bad key")
 
 	return self:ObserveListBrio(key):Pipe({
 		RxBrioUtils.switchMapBrio(function(observableList)
 			return observableList:ObserveCount()
-		end);
-		RxBrioUtils.emitOnDeath(0);
-	})
+		end) :: any,
+		RxBrioUtils.emitOnDeath(0) :: any,
+	}) :: any
 end
 
-function ObservableMapList:_addToList(key, entry)
+function ObservableMapList._addToList<TKey, TValue>(self: ObservableMapList<TKey, TValue>, key: TKey, entry: TValue): () -> ()
 	local list = self:_getOrCreateList(key)
 	return list:Add(entry)
 end
 
-function ObservableMapList:_getOrCreateList(key)
+function ObservableMapList._getOrCreateList<TKey, TValue>(self: ObservableMapList<TKey, TValue>, key: TKey): ObservableList<TValue>
 	local existing = self._observableMapOfLists:Get(key)
 	if existing then
 		return existing
 	end
 
 	local maid = Maid.new()
-	local list = maid:Add(ObservableList.new(nil))
+	local list = maid:Add(ObservableList.new())
 
 	maid:GiveTask(list.CountChanged:Connect(function(count)
 		if count <= 0 then
@@ -393,9 +438,9 @@ end
 --[=[
 	Cleans up the ObservableMapList and sets the metatable to nil.
 ]=]
-function ObservableMapList:Destroy()
+function ObservableMapList.Destroy<TKey, TValue>(self: ObservableMapList<TKey, TValue>)
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 

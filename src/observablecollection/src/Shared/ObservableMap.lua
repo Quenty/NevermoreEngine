@@ -58,7 +58,7 @@ export type ObservableMap<TKey, TValue> = typeof(setmetatable(
 		]=]
 		CountChanged: Signal.Signal<number>,
 	},
-	ObservableMap
+	{} :: typeof({ __index = ObservableMap })
 ))
 
 --[=[
@@ -129,7 +129,7 @@ function ObservableMap.ObservePairsBrio<TKey, TValue>(
 ): Observable.Observable<Brio.Brio<(TKey, TValue)>>
 	return self:_observeKeyValueChanged(function(key: TKey, value: TValue)
 		return Brio.new(key, value)
-	end)
+	end) :: any
 end
 
 function ObservableMap._observeKeyValueChanged<TKey, TValue>(
@@ -156,12 +156,12 @@ function ObservableMap._observeKeyValueChanged<TKey, TValue>(
 		local conn = self.KeyValueChanged:Connect(handleValue)
 
 		local function cleanup()
-			self._maid[sub :: any] = nil
+			self._maid[sub] = nil
 			conn:Disconnect()
 			sub:Complete()
 			maid:Destroy()
 		end
-		self._maid[sub :: any] = cleanup
+		self._maid[sub] = cleanup
 		return cleanup
 	end) :: any
 end

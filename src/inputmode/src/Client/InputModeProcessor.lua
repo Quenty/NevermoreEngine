@@ -16,7 +16,7 @@ export type InputModeProcessor = typeof(setmetatable(
 	{} :: {
 		_inputModes: { _InputMode.InputMode },
 	},
-	InputModeProcessor
+	{} :: typeof({ __index = InputModeProcessor })
 ))
 
 --[=[

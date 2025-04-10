@@ -41,7 +41,7 @@ export type SortedNode<T> = typeof(setmetatable(
 		descendantCount: number,
 		data: T,
 	},
-	SortedNode
+	{} :: typeof({ __index = SortedNode })
 ))
 
 function SortedNode.new<T>(data: T): SortedNode<T>
@@ -113,7 +113,7 @@ end
 function SortedNode.IterateNodesRange<T>(
 	self: SortedNode<T>,
 	start: number,
-	finish: number
+	finish: number?
 ): _SortFunctionUtils.WrappedIterator<number, SortedNode<T>>
 	assert(type(start) == "number", "Bad start")
 	assert(type(finish) == "number" or finish == nil, "Bad finish")

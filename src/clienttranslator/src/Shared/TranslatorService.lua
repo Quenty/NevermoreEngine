@@ -34,7 +34,7 @@ export type TranslatorService = typeof(setmetatable(
 		_loadedPlayerObservable: _Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
 	},
-	{ __index = TranslatorService }
+	{} :: typeof({ __index = TranslatorService })
 ))
 
 function TranslatorService.Init(self: TranslatorService, serviceBag: _ServiceBag.ServiceBag)
@@ -159,8 +159,8 @@ function TranslatorService.ObserveLocaleId(self: TranslatorService): _Observable
 				})
 			end
 		end) :: any,
-		Rx.distinct(),
-	}))
+		Rx.distinct() :: any,
+	}) :: any)
 	self._localeIdValue = valueObject
 	return valueObject:Observe()
 end

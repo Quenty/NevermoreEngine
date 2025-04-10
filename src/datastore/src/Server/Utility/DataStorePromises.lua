@@ -15,6 +15,8 @@ local Table = require("Table")
 
 local DataStorePromises = {}
 
+export type RobloxDataStore = DataStore
+
 --[=[
 	Promises a Roblox datastore object with the name and scope. Generally only fails
 	when you haven't published the place.
@@ -95,7 +97,7 @@ end
 function DataStorePromises.updateAsync<T>(
 	robloxDataStore: DataStore,
 	key: string,
-	updateFunc: (T) -> T?
+	updateFunc: (T, DataStoreKeyInfo) -> T?
 ): Promise.Promise<(T, DataStoreKeyInfo)>
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")

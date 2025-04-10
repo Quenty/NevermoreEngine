@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helps plays back sounds in the Roblox engine.
 
@@ -64,8 +65,9 @@ function SoundUtils.createSoundFromId(id: string | number | SoundOptions): Sound
 	return sound
 end
 
-function SoundUtils.applyPropertiesFromId(sound: Sound, id: string | number | SoundOptions)
-	local soundId = SoundUtils.toRbxAssetId(id)
+function SoundUtils.applyPropertiesFromId(sound: Sound, id: string | number | SoundOptions): ()
+	local soundId = assert(SoundUtils.toRbxAssetId(id), "Unable to convert id to rbxassetid")
+
 	sound.Name = string.format("Sound_%s", soundId)
 	sound.SoundId = soundId
 	sound.RollOffMode = Enum.RollOffMode.InverseTapered
@@ -111,7 +113,7 @@ end
 
 	@param sound Sound
 ]=]
-function SoundUtils.removeAfterTimeLength(sound: Sound)
+function SoundUtils.removeAfterTimeLength(sound: Sound): ()
 	-- TODO: clean up on destroying
 	SoundPromiseUtils.promiseLoaded(sound):Then(function()
 		task.delay(sound.TimeLength + 0.05, function()
@@ -155,7 +157,7 @@ end
 	@return string?
 	@within SoundUtils
 ]=]
-function SoundUtils.toRbxAssetId(soundId: string | number | SoundOptions)
+function SoundUtils.toRbxAssetId(soundId: string | number | SoundOptions): string?
 	if type(soundId) == "table" then
 		return RbxAssetUtils.toRbxAssetId(soundId.SoundId)
 	else
@@ -183,8 +185,8 @@ end
 	@param parent Instance
 	@return Sound
 ]=]
-function SoundUtils.playTemplateInParent(templates, templateName: string, parent: Instance)
-	local sound = templates:Clone(templateName)
+function SoundUtils.playTemplateInParent(templates, templateName: string, parent: Instance): Sound
+	local sound: Sound = templates:Clone(templateName)
 	sound.Archivable = false
 	sound.Parent = parent
 

@@ -8,14 +8,14 @@
 	@type Destructable Instance | { Destroy: function }
 	@within MaidTaskUtils
 ]=]
-export type Destructable = Instance | any
+export type Destructable = any
 
 --[=[
 	An object that can be cleaned up
 	@type MaidTask function | thread | Destructable | RBXScriptConnection
 	@within MaidTaskUtils
 ]=]
-export type MaidTask = (() -> ()) | thread | Instance | Destructable | RBXScriptConnection
+export type MaidTask = (() -> ()) | Instance | thread | Destructable | RBXScriptConnection | nil
 
 local MaidTaskUtils = {}
 

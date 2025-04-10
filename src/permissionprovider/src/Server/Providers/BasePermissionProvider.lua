@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Basic interface for providing permissions.
 	@server
@@ -11,10 +12,21 @@ local GetRemoteFunction = require("GetRemoteFunction")
 local PermissionLevel = require("PermissionLevel")
 local PermissionLevelUtils = require("PermissionLevelUtils")
 local Table = require("Table")
+local _Promise = require("Promise")
+local _PermissionProviderUtils = require("PermissionProviderUtils")
 
 local BasePermissionProvider = setmetatable({}, BaseObject)
 BasePermissionProvider.ClassName = "BasePermissionProvider"
 BasePermissionProvider.__index = BasePermissionProvider
+
+export type BasePermissionProvider = typeof(setmetatable(
+	{} :: {
+		_config: { remoteFunctionName: string },
+		_remoteFunctionName: string,
+		_remoteFunction: RemoteFunction?,
+	},
+	{} :: typeof({ __index = BasePermissionProvider })
+)) & BaseObject.BaseObject
 
 --[=[
 	Initializes a new permission provider
@@ -22,10 +34,10 @@ BasePermissionProvider.__index = BasePermissionProvider
 	@param config { remoteFunctionName: string }
 	@return BasePermissionProvider
 ]=]
-function BasePermissionProvider.new(config)
-	local self = setmetatable(BaseObject.new(), BasePermissionProvider)
+function BasePermissionProvider.new(config: _PermissionProviderUtils.PermissionProviderConfig): BasePermissionProvider
+	local self: BasePermissionProvider = setmetatable(BaseObject.new() :: any, BasePermissionProvider)
 
-	self._config = Table.readonly(assert(config, "Bad config"))
+	self._config = Table.readonly(assert(config, "Bad config") :: any)
 	self._remoteFunctionName = assert(self._config.remoteFunctionName, "Bad config")
 
 	return self
@@ -34,13 +46,14 @@ end
 --[=[
 	Starts the permission provider. Should be done via ServiceBag.
 ]=]
-function BasePermissionProvider:Start()
-	assert(not self._remoteFunction, "No remoteFunction")
+function BasePermissionProvider.Start(self: BasePermissionProvider): ()
+	assert(not (self :: any)._remoteFunction, "No remoteFunction")
 
-	self._remoteFunction = GetRemoteFunction(self._remoteFunctionName)
-	self._remoteFunction.OnServerInvoke = function(...)
+	local remoteFunction = GetRemoteFunction(self._remoteFunctionName)
+	remoteFunction.OnServerInvoke = function(...)
 		return self:_onServerInvoke(...)
 	end
+	self._remoteFunction = remoteFunction
 end
 
 --[=[
@@ -49,7 +62,11 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider:PromiseIsPermissionLevel(player: Player, permissionLevel)
+function BasePermissionProvider.PromiseIsPermissionLevel(
+	_self: BasePermissionProvider,
+	player: Player,
+	permissionLevel: PermissionLevel.PermissionLevel
+): _Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
@@ -62,7 +79,11 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider:IsPermissionLevel(player: Player, permissionLevel): boolean
+function BasePermissionProvider.IsPermissionLevel(
+	self: BasePermissionProvider,
+	player: Player,
+	permissionLevel: PermissionLevel.PermissionLevel
+): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
@@ -85,7 +106,10 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider:PromiseIsCreator(player: Player)
+function BasePermissionProvider.PromiseIsCreator(
+	self: BasePermissionProvider,
+	player: Player
+): _Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
@@ -96,7 +120,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider:PromiseIsAdmin(player: Player)
+function BasePermissionProvider.PromiseIsAdmin(self: BasePermissionProvider, player: Player): _Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)
@@ -112,10 +136,10 @@ end
 	@param player Player
 	@return boolean
 ]=]
-function BasePermissionProvider:IsCreator(player: Player): boolean
+function BasePermissionProvider.IsCreator(self: BasePermissionProvider, player: Player): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return self:IsCreator(player, PermissionLevel.CREATOR)
+	return self:IsPermissionLevel(player, PermissionLevel.CREATOR)
 end
 
 --[=[
@@ -128,13 +152,13 @@ end
 	@param player Player
 	@return boolean
 ]=]
-function BasePermissionProvider:IsAdmin(player: Player): boolean
+function BasePermissionProvider.IsAdmin(self: BasePermissionProvider, player: Player): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:IsPermissionLevel(player, PermissionLevel.ADMIN)
 end
 
-function BasePermissionProvider:_onServerInvoke(player)
+function BasePermissionProvider._onServerInvoke(self: BasePermissionProvider, player: Player): boolean
 	local promise = self:PromiseIsAdmin(player)
 	local ok, result = promise:Yield()
 	if not ok then
@@ -144,6 +168,5 @@ function BasePermissionProvider:_onServerInvoke(player)
 
 	return result and true or false
 end
-
 
 return BasePermissionProvider

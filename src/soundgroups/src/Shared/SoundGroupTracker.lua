@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class SoundGroupTracker
 ]=]
@@ -9,7 +10,7 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local ObservableMapList = require("ObservableMapList")
 local Maid = require("Maid")
 local ObservableMap = require("ObservableMap")
-local SoundGroupPathUtils= require("SoundGroupPathUtils")
+local SoundGroupPathUtils = require("SoundGroupPathUtils")
 local Rx = require("Rx")
 local Observable = require("Observable")
 
@@ -17,8 +18,16 @@ local SoundGroupTracker = setmetatable({}, BaseObject)
 SoundGroupTracker.ClassName = "SoundGroupTracker"
 SoundGroupTracker.__index = SoundGroupTracker
 
-function SoundGroupTracker.new(root)
-	local self = setmetatable(BaseObject.new(), SoundGroupTracker)
+export type SoundGroupTracker = typeof(setmetatable(
+	{} :: {
+		_pathToSoundGroupList: ObservableMapList.ObservableMapList<string, SoundGroup>,
+		_soundGroupToPath: ObservableMap.ObservableMap<SoundGroup, string>,
+	},
+	{} :: typeof({ __index = SoundGroupTracker })
+)) & BaseObject.BaseObject
+
+function SoundGroupTracker.new(root): SoundGroupTracker
+	local self: SoundGroupTracker = setmetatable(BaseObject.new() :: any, SoundGroupTracker)
 
 	-- Handle edge case of multiple sound groups with the same name...
 	self._pathToSoundGroupList = self._maid:Add(ObservableMapList.new())
@@ -31,39 +40,39 @@ function SoundGroupTracker.new(root)
 	return self
 end
 
-function SoundGroupTracker:GetFirstSoundGroup(soundGroupPath)
+function SoundGroupTracker.GetFirstSoundGroup(self: SoundGroupTracker, soundGroupPath)
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 
 	return self._pathToSoundGroupList:GetAtListIndex(soundGroupPath, 1)
 end
 
-function SoundGroupTracker:ObserveSoundGroup(soundGroupPath)
+function SoundGroupTracker.ObserveSoundGroup(self: SoundGroupTracker, soundGroupPath)
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 
 	return self._pathToSoundGroupList:ObserveAtListIndex(soundGroupPath, 1)
 end
 
-function SoundGroupTracker:ObserveSoundGroupBrio(soundGroupPath)
+function SoundGroupTracker.ObserveSoundGroupBrio(self: SoundGroupTracker, soundGroupPath)
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 
 	return self._pathToSoundGroupList:ObserveAtListIndexBrio(soundGroupPath, 1)
 end
 
-function SoundGroupTracker:ObserveSoundGroupsBrio()
+function SoundGroupTracker.ObserveSoundGroupsBrio(self: SoundGroupTracker)
 	return self._soundGroupToPath:ObserveKeysBrio()
 end
 
-function SoundGroupTracker:Track(parent)
+function SoundGroupTracker.Track(self: SoundGroupTracker, parent)
 	return self:_track(nil, parent)
 end
 
-function SoundGroupTracker:ObserveSoundGroupPath(soundGroup)
+function SoundGroupTracker.ObserveSoundGroupPath(self: SoundGroupTracker, soundGroup)
 	assert(typeof(soundGroup) == "Instance" and soundGroup:IsA("SoundGroup"), "Bad soundGroup")
 
 	return self._soundGroupToPath:ObserveAtKey(soundGroup)
 end
 
-function SoundGroupTracker:_track(observeRootPath, parent)
+function SoundGroupTracker._track(self: SoundGroupTracker, observeRootPath, parent)
 	assert(Observable.isObservable(observeRootPath) or observeRootPath == nil, "Bad observeRootPath")
 	assert(typeof(parent) == "Instance", "Bad parent")
 
@@ -76,6 +85,7 @@ function SoundGroupTracker:_track(observeRootPath, parent)
 
 		local maid, soundGroup = brio:ToMaidAndValue()
 
+		-- stylua: ignore
 		local observePath = Rx.combineLatest({
 			rootPath = observeRootPath or nil;
 			name = RxInstanceUtils.observeProperty(soundGroup, "Name");
@@ -87,11 +97,11 @@ function SoundGroupTracker:_track(observeRootPath, parent)
 				else
 					return state.name
 				end
-			end)
+			end) :: any
 		})
 
 		maid:Add(observePath:Subscribe(function(path)
-			maid._currentPath = self._soundGroupToPath:Set(soundGroup, path)
+			maid._currentPath = self._soundGroupToPath:Set(soundGroup :: SoundGroup, path)
 		end))
 		maid:Add(self._pathToSoundGroupList:Push(observePath, soundGroup))
 

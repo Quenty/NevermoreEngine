@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides permissions from a single user creator
 
@@ -14,17 +15,27 @@ local PermissionProviderConstants = require("PermissionProviderConstants")
 local Promise = require("Promise")
 local PermissionLevel = require("PermissionLevel")
 local PermissionLevelUtils = require("PermissionLevelUtils")
+local _PermissionProviderUtils = require("PermissionProviderUtils")
 
 local CreatorPermissionProvider = setmetatable({}, BasePermissionProvider)
 CreatorPermissionProvider.ClassName = "CreatorPermissionProvider"
 CreatorPermissionProvider.__index = CreatorPermissionProvider
 
+export type CreatorPermissionProvider = typeof(setmetatable(
+	{} :: {
+		_config: _PermissionProviderUtils.SingleUserConfig,
+		_userId: number,
+	},
+	{} :: typeof({ __index = CreatorPermissionProvider })
+)) & BasePermissionProvider.BasePermissionProvider
+
 --[=[
 	@param config table
 	@return CreatorPermissionProvider
 ]=]
-function CreatorPermissionProvider.new(config)
-	local self = setmetatable(BasePermissionProvider.new(config), CreatorPermissionProvider)
+function CreatorPermissionProvider.new(config: _PermissionProviderUtils.SingleUserConfig): CreatorPermissionProvider
+	local self: CreatorPermissionProvider =
+		setmetatable(BasePermissionProvider.new(config) :: any, CreatorPermissionProvider)
 
 	assert(self._config.type == PermissionProviderConstants.SINGLE_USER_CONFIG_TYPE, "Bad configType")
 	self._userId = assert(self._config.userId, "No userId")
@@ -39,7 +50,7 @@ end
 	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function CreatorPermissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
+function CreatorPermissionProvider.PromiseIsPermissionLevel(self: CreatorPermissionProvider, player: Player, permissionLevel: PermissionLevel.PermissionLevel): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 

@@ -34,7 +34,7 @@ export type PackageTracker = typeof(setmetatable(
 		_subpackagesTrackerList: { PackageTracker },
 		_packageModuleScriptMap: { [string]: ModuleScriptInfo },
 	},
-	PackageTracker
+	{} :: typeof({ __index = PackageTracker })
 ))
 
 function PackageTracker.new(packageTrackerProvider: PackageTrackerProvider, packageRoot: Instance): PackageTracker

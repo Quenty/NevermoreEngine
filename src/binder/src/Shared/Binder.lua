@@ -74,7 +74,7 @@ export type Binder<T> = typeof(setmetatable(
 		_classRemovingSignal: Signal.Signal<T, Instance>?,
 		_classRemovedSignal: Signal.Signal<T, Instance>?,
 	},
-	Binder
+	{} :: typeof({ __index = Binder })
 ))
 
 --[=[
@@ -106,7 +106,7 @@ export type Binder<T> = typeof(setmetatable(
 function Binder.new<T>(tagName: string, constructor: BinderConstructor<T>, ...): Binder<T>
 	assert(type(tagName) == "string", "Bad tagName")
 
-	local self = setmetatable({}, Binder)
+	local self: Binder<T> = setmetatable({} :: any, Binder)
 
 	self._tagName = assert(tagName, "Bad argument 'tagName', expected string")
 	self._constructor = assert(constructor, "Bad argument 'constructor', expected table or function")
@@ -121,7 +121,7 @@ function Binder.new<T>(tagName: string, constructor: BinderConstructor<T>, ...):
 		self._args = { ... }
 	end
 
-	return self :: Binder<T>
+	return self
 end
 
 --[=[

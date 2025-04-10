@@ -7,39 +7,50 @@ local require = require(script.Parent.loader).load(script)
 local PlayerUtils = require("PlayerUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local _ServiceBag = require("ServiceBag")
+local _CmdrService = require("CmdrService")
+local _GameProductService = require("GameProductService")
 
 local GameProductCmdrService = {}
 GameProductCmdrService.ServiceName = "GameProductCmdrService"
 
-function GameProductCmdrService:Init(serviceBag: _ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type GameProductCmdrService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: _ServiceBag.ServiceBag,
+		_cmdrService: _CmdrService.CmdrService,
+		_gameProductService: _GameProductService.GameProductService,
+	},
+	{} :: typeof({ __index = GameProductCmdrService })
+))
+
+function GameProductCmdrService.Init(self: GameProductCmdrService, serviceBag: _ServiceBag.ServiceBag)
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
 	self._gameProductService = self._serviceBag:GetService(require("GameProductService"))
 end
 
-function GameProductCmdrService:Start()
+function GameProductCmdrService.Start(self: GameProductCmdrService)
 	self:_registerCommands()
 end
 
-function GameProductCmdrService:_registerCommands()
+function GameProductCmdrService._registerCommands(self: GameProductCmdrService)
 	self._cmdrService:RegisterCommand({
-		Name = "prompt-product";
-		Description = "Prompts the player to make a product purchase game-product-service.";
-		Group = "GameConfig";
+		Name = "prompt-product",
+		Description = "Prompts the player to make a product purchase game-product-service.",
+		Group = "GameConfig",
 		Args = {
 			{
-				Name = "Player";
-				Type = "players";
-				Description = "The player to prompt.";
+				Name = "Player",
+				Type = "players",
+				Description = "The player to prompt.",
 			},
 			{
-				Name = "Product";
-				Type = "productId";
-				Description = "The Product to prompt.";
+				Name = "Product",
+				Type = "productId",
+				Description = "The Product to prompt.",
 			},
-		};
+		},
 	}, function(_context, players, productId)
 		local givenTo = {}
 
@@ -145,36 +156,41 @@ function GameProductCmdrService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "prompt-bundle";
-		Description = "Prompts the player to make a bundle purchase.";
-		Group = "GameConfig";
+		Name = "prompt-bundle",
+		Description = "Prompts the player to make a bundle purchase.",
+		Group = "GameConfig",
 		Args = {
 			{
-				Name = "Player";
-				Type = "players";
-				Description = "The player to prompt.";
+				Name = "Player",
+				Type = "players",
+				Description = "The player to prompt.",
 			},
 			{
-				Name = "Bundle";
-				Type = "bundleId";
-				Description = "The asset to prompt.";
+				Name = "Bundle",
+				Type = "bundleId",
+				Description = "The asset to prompt.",
 			},
-		};
+		},
 	}, function(_context, players, bundleId)
 		local givenTo = {}
 
 		for _, player in players do
-			self._gameProductService:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.BUNDLE, bundleId)
+			self._gameProductService
+				:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.BUNDLE, bundleId)
 				:Then(function(isPurchased)
-					print(string.format("User %s bundle prompt done. isPurchased: %s",
-						PlayerUtils.formatName(player), tostring(isPurchased)))
+					print(
+						string.format(
+							"User %s bundle prompt done. isPurchased: %s",
+							PlayerUtils.formatName(player),
+							tostring(isPurchased)
+						)
+					)
 				end)
 			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), bundleId))
 		end
 
 		return string.format("Prompted: %s", table.concat(givenTo, ", "))
 	end)
-
 end
 
 return GameProductCmdrService

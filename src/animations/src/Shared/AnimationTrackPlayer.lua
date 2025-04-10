@@ -17,6 +17,20 @@ local AnimationTrackPlayer = setmetatable({}, BaseObject)
 AnimationTrackPlayer.ClassName = "AnimationTrackPlayer"
 AnimationTrackPlayer.__index = AnimationTrackPlayer
 
+export type AnimationTrackPlayer = typeof(setmetatable(
+	{} :: {
+		-- Public
+		KeyframeReached: Signal.Signal<()>,
+
+		-- Private
+		_animationTarget: ValueObject.ValueObject<Instance>,
+		_trackId: ValueObject.ValueObject<string | number>,
+		_currentTrack: ValueObject.ValueObject<AnimationTrack?>,
+		_animationPriority: ValueObject.ValueObject<number>,
+	},
+	{} :: typeof({ __index = AnimationTrackPlayer })
+)) & BaseObject.BaseObject
+
 --[=[
 	Plays an animation track in the target. Async loads the track when
 	all data is found.
@@ -25,8 +39,8 @@ AnimationTrackPlayer.__index = AnimationTrackPlayer
 	@param animationId string | number?
 	@return AnimationTrackPlayer
 ]=]
-function AnimationTrackPlayer.new(animationTarget, animationId)
-	local self = setmetatable(BaseObject.new() :: any, AnimationTrackPlayer)
+function AnimationTrackPlayer.new(animationTarget, animationId: string | number): AnimationTrackPlayer
+	local self: AnimationTrackPlayer = setmetatable(BaseObject.new() :: any, AnimationTrackPlayer)
 
 	self._animationTarget = self._maid:Add(ValueObject.new(nil))
 	self._trackId = self._maid:Add(ValueObject.new(nil))
@@ -50,33 +64,41 @@ end
 
 function AnimationTrackPlayer:_setupState()
 	self._maid:GiveTask(Rx.combineLatest({
-		animationTarget = self._animationTarget:Observe();
-		trackId = self._trackId:Observe();
-		animationPriority = self._animationPriority:Observe();
-	}):Pipe({
-		Rx.throttleDefer();
-	}):Subscribe(function(state)
-		if state.animationTarget and state.trackId then
-			self._currentTrack.Value = AnimationUtils.getOrCreateAnimationTrack(state.animationTarget, state.trackId, state.animationPriority)
-		else
-			self._currentTrack.Value = nil
-		end
-	end))
-
-	self._maid:GiveTask(self._currentTrack:ObserveBrio(function(track)
-		return track ~= nil
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
-
-		local maid = brio:ToMaid()
-		local track = brio:GetValue()
-
-		maid:GiveTask(track.KeyframeReached:Connect(function(...)
-			self.KeyframeReached:Fire(...)
+		animationTarget = self._animationTarget:Observe(),
+		trackId = self._trackId:Observe(),
+		animationPriority = self._animationPriority:Observe(),
+	})
+		:Pipe({
+			Rx.throttleDefer() :: any,
+		})
+		:Subscribe(function(state)
+			if state.animationTarget and state.trackId then
+				self._currentTrack.Value = AnimationUtils.getOrCreateAnimationTrack(
+					state.animationTarget,
+					state.trackId,
+					state.animationPriority
+				)
+			else
+				self._currentTrack.Value = nil
+			end
 		end))
-	end))
+
+	self._maid:GiveTask(self._currentTrack
+		:ObserveBrio(function(track)
+			return track ~= nil
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
+
+			local maid = brio:ToMaid()
+			local track = brio:GetValue()
+
+			maid:GiveTask(track.KeyframeReached:Connect(function(...)
+				self.KeyframeReached:Fire(...)
+			end))
+		end))
 end
 
 --[=[
@@ -84,7 +106,7 @@ end
 
 	@param animationId string | number
 ]=]
-function AnimationTrackPlayer:SetAnimationId(animationId)
+function AnimationTrackPlayer:SetAnimationId(animationId: string | number)
 	return self._trackId:Mount(animationId)
 end
 
@@ -93,7 +115,7 @@ end
 
 	@return string | number
 ]=]
-function AnimationTrackPlayer:GetAnimationId()
+function AnimationTrackPlayer:GetAnimationId(): string | number
 	return self._trackId.Value
 end
 

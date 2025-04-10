@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Represents a specific Roblox class.
 	@class RobloxApiClass
@@ -12,6 +13,16 @@ local RobloxApiClass = {}
 RobloxApiClass.ClassName = "RobloxApiClass"
 RobloxApiClass.__index = RobloxApiClass
 
+export type RobloxApiClass = typeof(setmetatable(
+	{} :: {
+		_robloxApiDump: any,
+		_data: any,
+		_allSuperClassesPromise: Promise.Promise<any>?,
+		_tagCache: { [string]: boolean }?,
+	},
+	{} :: typeof({ __index = RobloxApiClass })
+))
+
 --[=[
 	Constructs a new RobloxApiClass. See [RobloxApiDump.PromiseClass] to actually construct
 	this class.
@@ -19,8 +30,8 @@ RobloxApiClass.__index = RobloxApiClass
 	@param data table
 	@return RobloxApiClass
 ]=]
-function RobloxApiClass.new(robloxApiDump, data)
-	local self = setmetatable({}, RobloxApiClass)
+function RobloxApiClass.new(robloxApiDump, data): RobloxApiClass
+	local self: RobloxApiClass = setmetatable({} :: any, RobloxApiClass)
 
 	--[[
         {
@@ -47,7 +58,7 @@ end
 	Retrieves the raw class data
 	@return table
 ]=]
-function RobloxApiClass:GetRawData()
+function RobloxApiClass.GetRawData(self: RobloxApiClass): unknown
 	return self._data
 end
 
@@ -55,7 +66,7 @@ end
 	Gets the class name.
 	@return string
 ]=]
-function RobloxApiClass:GetClassName()
+function RobloxApiClass.GetClassName(self: RobloxApiClass): string
 	assert(type(self._data.Name) == "string", "Bad Name")
 	return self._data.Name
 end
@@ -64,7 +75,7 @@ end
 	Gets the class category.
 	@return string?
 ]=]
-function RobloxApiClass:GetMemberCategory()
+function RobloxApiClass.GetMemberCategory(self: RobloxApiClass): string?
 	return self._data.MemoryCategory -- might be nil, stuff like "Data" or ""
 end
 
@@ -72,7 +83,7 @@ end
 	Retrieves the super class, or rejects.
 	@return Promise<RobloxApiClass>
 ]=]
-function RobloxApiClass:PromiseSuperClass()
+function RobloxApiClass.PromiseSuperClass(self: RobloxApiClass): Promise.Promise<RobloxApiClass>
 	local superclass = self:GetSuperClassName()
 	if superclass then
 		return self._robloxApiDump:PromiseClass(superclass)
@@ -86,7 +97,7 @@ end
 	@param className string
 	@return Promise<boolean>
 ]=]
-function RobloxApiClass:PromiseIsA(className: string)
+function RobloxApiClass.PromiseIsA(self: RobloxApiClass, className: string): Promise.Promise<boolean>
 	if self:GetClassName() == className then
 		return Promise.resolved(true)
 	end
@@ -101,7 +112,7 @@ end
 	@param className string
 	@return Promise<boolean>
 ]=]
-function RobloxApiClass:PromiseIsDescendantOf(className)
+function RobloxApiClass.PromiseIsDescendantOf(self: RobloxApiClass, className: string)
 	return self:PromiseAllSuperClasses():Then(function(classes)
 		for _, class in classes do
 			if class:GetClassName() == className then
@@ -117,33 +128,34 @@ end
 	Returns a promise that resolves to all super classes.
 	@return Promise<{ RobloxApiClass }>
 ]=]
-function RobloxApiClass:PromiseAllSuperClasses()
+function RobloxApiClass.PromiseAllSuperClasses(self: RobloxApiClass): Promise.Promise<{ RobloxApiClass }>
 	if self._allSuperClassesPromise then
 		return self._allSuperClassesPromise
 	end
 
-	local list = {}
+	local list: { RobloxApiClass } = {}
 
-	local function chain(current)
+	local function chain(current: RobloxApiClass): Promise.Promise<{ RobloxApiClass }>
 		return current:PromiseSuperClass():Then(function(superclass)
 			if superclass then
 				table.insert(list, superclass)
 				return chain(superclass)
 			else
-				return list
+				return list :: any
 			end
 		end)
 	end
 
-	self._allSuperClassesPromise = chain(self)
-	return self._allSuperClassesPromise
+	local promise = chain(self)
+	self._allSuperClassesPromise = promise
+	return promise
 end
 
 --[=[
 	Returns the super class name
 	@return string?
 ]=]
-function RobloxApiClass:GetSuperClassName()
+function RobloxApiClass.GetSuperClassName(self: RobloxApiClass)
 	local data = self._data.Superclass
 	if data == RobloxApiDumpConstants.ROOT_CLASS_NAME then
 		return nil
@@ -156,7 +168,7 @@ end
 	Returns whether the class has a super class
 	@return boolean
 ]=]
-function RobloxApiClass:HasSuperClass(): boolean
+function RobloxApiClass.HasSuperClass(self: RobloxApiClass): boolean
 	return self:GetSuperClassName() ~= nil
 end
 
@@ -164,7 +176,7 @@ end
 	Retrieves all class members (events, properties, callbacks, functions).
 	@return Promise<{ RobloxApiMember }>
 ]=]
-function RobloxApiClass:PromiseMembers()
+function RobloxApiClass.PromiseMembers(self: RobloxApiClass)
 	return self._robloxApiDump:PromiseMembers(self:GetClassName())
 end
 
@@ -172,7 +184,7 @@ end
 	Gets all class properties.
 	@return Promise<{ RobloxApiMember }>
 ]=]
-function RobloxApiClass:PromiseProperties()
+function RobloxApiClass.PromiseProperties(self: RobloxApiClass)
 	return self:PromiseMembers():Then(function(members)
 		local result = {}
 		for _, member in members do
@@ -188,7 +200,7 @@ end
 	Gets all class events.
 	@return Promise<{ RobloxApiMember }>
 ]=]
-function RobloxApiClass:PromiseEvents()
+function RobloxApiClass.PromiseEvents(self: RobloxApiClass)
 	return self:PromiseMembers():Then(function(members)
 		local result = {}
 		for _, member in members do
@@ -204,7 +216,7 @@ end
 	Gets all class functions (i.e. methods).
 	@return Promise<{ RobloxApiMember }>
 ]=]
-function RobloxApiClass:PromiseFunctions()
+function RobloxApiClass.PromiseFunctions(self: RobloxApiClass)
 	return self:PromiseMembers():Then(function(members)
 		local result = {}
 		for _, member in members do
@@ -220,7 +232,7 @@ end
 	Retrieves whether the class is a service
 	@return boolean
 ]=]
-function RobloxApiClass:IsService(): boolean
+function RobloxApiClass.IsService(self: RobloxApiClass): boolean
 	return self:HasTag("Service")
 end
 
@@ -228,7 +240,7 @@ end
 	Retrieves whether the class is not creatable
 	@return boolean
 ]=]
-function RobloxApiClass:IsNotCreatable(): boolean
+function RobloxApiClass.IsNotCreatable(self: RobloxApiClass): boolean
 	return self:HasTag("NotCreatable")
 end
 
@@ -236,7 +248,7 @@ end
 	Retrieves whether the class is not replicated
 	@return boolean
 ]=]
-function RobloxApiClass:IsNotReplicated(): boolean
+function RobloxApiClass.IsNotReplicated(self: RobloxApiClass): boolean
 	return self:HasTag("NotReplicated")
 end
 
@@ -245,19 +257,21 @@ end
 	@param tagName string
 	@return boolean
 ]=]
-function RobloxApiClass:HasTag(tagName: string): boolean
+function RobloxApiClass.HasTag(self: RobloxApiClass, tagName: string): boolean
 	if self._tagCache then
 		return self._tagCache[tagName] == true
 	end
 
-	self._tagCache = {}
+	local cache = {}
+	self._tagCache = cache
+
 	if type(self._data.Tags) == "table" then
 		for _, tag in self._data.Tags do
-			self._tagCache[tag] = true
+			cache[tag] = true
 		end
 	end
 
-	return self._tagCache[tagName] == true
+	return cache[tagName] == true
 end
 
 return RobloxApiClass

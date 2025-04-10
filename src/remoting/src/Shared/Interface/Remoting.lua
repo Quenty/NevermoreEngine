@@ -111,7 +111,7 @@ export type Remoting = typeof(setmetatable(
 		-- Public remoting member export
 		[string]: RemotingMember.RemotingMember,
 	},
-	Remoting
+	{} :: typeof({ __index = Remoting })
 ))
 
 --[=[
@@ -127,7 +127,7 @@ function Remoting.new(instance: Instance, name: string, remotingRealm: RemotingR
 	assert(type(name) == "string", "Bad name")
 	assert(RemotingRealmUtils.isRemotingRealm(remotingRealm) or remotingRealm == nil, "Bad remotingRealm")
 
-	local self = setmetatable({}, Remoting)
+	local self: Remoting = setmetatable({} :: any, Remoting)
 
 	self._maid = Maid.new()
 
@@ -139,7 +139,7 @@ function Remoting.new(instance: Instance, name: string, remotingRealm: RemotingR
 	self._remoteFolderName = string.format("%sRemotes", self._name)
 	self._remoteObjects = {}
 
-	return self :: any
+	return self
 end
 
 (Remoting :: any).__index = function(self, index)
@@ -219,9 +219,9 @@ function Remoting.Connect(self: Remoting, memberName: string, callback: (...any)
 		error("[Remoting.Connect] - Unknown RunService state")
 	end
 
-	self._maid[connectMaid :: any] = connectMaid
+	self._maid[connectMaid] = connectMaid
 	connectMaid:GiveTask(function()
-		self._maid[connectMaid :: any] = nil
+		self._maid[connectMaid] = nil
 	end)
 
 	return connectMaid
@@ -234,7 +234,7 @@ end
 	@param memberName string
 	@param callback any
 ]=]
-function Remoting.Bind(self: Remoting, memberName: string, callback: (...any) -> ...any)
+function Remoting.Bind(self: Remoting, memberName: string, callback: (...any) -> ...any): Maid.Maid
 	assert(type(memberName) == "string", "Bad memberName")
 	assert(type(callback) == "function", "Bad callback")
 
@@ -273,8 +273,8 @@ function Remoting.Bind(self: Remoting, memberName: string, callback: (...any) ->
 
 						bindMaid._warning = nil
 
-				local maid, remoteFunction: any = brio:ToMaidAndValue()
-				remoteFunction.OnInvoke = self:_translateCallback(maid, memberName, callback)
+						local maid, remoteFunction: any = brio:ToMaidAndValue()
+						remoteFunction.OnInvoke = self:_translateCallback(maid, memberName, callback)
 					end)
 			)
 		else
@@ -295,9 +295,9 @@ function Remoting.Bind(self: Remoting, memberName: string, callback: (...any) ->
 		error("[Remoting.Bind] - Unknown RunService state")
 	end
 
-	self._maid[bindMaid :: any] = bindMaid
+	self._maid[bindMaid] = bindMaid
 	bindMaid:GiveTask(function()
-		self._maid[bindMaid :: any] = nil
+		self._maid[bindMaid] = nil
 	end)
 
 	return bindMaid
@@ -543,11 +543,11 @@ function Remoting.PromiseFireServer(self: Remoting, memberName: string, ...)
 	end
 
 	promise:Finally(function()
-		self._maid[fireMaid :: any] = nil
+		self._maid[fireMaid] = nil
 	end)
-	self._maid[fireMaid :: any] = fireMaid
+	self._maid[fireMaid] = fireMaid
 	fireMaid:GiveTask(function()
-		self._maid[fireMaid :: any] = nil
+		self._maid[fireMaid] = nil
 	end)
 
 	-- TODO: Warn if remote event doesn't exist
@@ -604,11 +604,11 @@ function Remoting.PromiseInvokeServer(self: Remoting, memberName: string, ...): 
 	end
 
 	promise:Finally(function()
-		self._maid[invokeMaid :: any] = nil
+		self._maid[invokeMaid] = nil
 	end)
-	self._maid[invokeMaid :: any] = invokeMaid
+	self._maid[invokeMaid] = invokeMaid
 	invokeMaid:GiveTask(function()
-		self._maid[invokeMaid :: any] = nil
+		self._maid[invokeMaid] = nil
 	end)
 
 	-- TODO: Warn if remote function doesn't exist
@@ -642,12 +642,12 @@ function Remoting.PromiseInvokeClient(self: Remoting, memberName: string, player
 	end
 
 	promise:Finally(function()
-		self._maid[invokeMaid :: any] = nil
+		self._maid[invokeMaid] = nil
 	end)
 
-	self._maid[invokeMaid :: any] = invokeMaid
+	self._maid[invokeMaid] = invokeMaid
 	invokeMaid:GiveTask(function()
-		self._maid[invokeMaid :: any] = nil
+		self._maid[invokeMaid] = nil
 	end)
 
 	return promise

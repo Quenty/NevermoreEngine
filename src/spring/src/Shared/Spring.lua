@@ -50,7 +50,7 @@ export type Spring<T> = typeof(setmetatable(
 		_clock: SpringClock,
 		_positionVelocity: (self: Spring<T>, now: number) -> (T, T),
 	},
-	Spring
+	{} :: typeof({ __index = Spring })
 ))
 
 --[=[
@@ -75,15 +75,18 @@ function Spring.new<T>(initial: T?, clock: SpringClock?): Spring<T>
 	local p0 = initial or 0
 	local springClock = clock or os.clock
 
-	return setmetatable({
-		_clock = springClock,
-		_time0 = springClock(),
-		_position0 = p0,
-		_velocity0 = 0 * (p0 :: any),
-		_target = p0,
-		_damper = 1,
-		_speed = 1,
-	}, Spring) :: any
+	return setmetatable(
+		{
+			_clock = springClock,
+			_time0 = springClock(),
+			_position0 = p0,
+			_velocity0 = 0 * (p0 :: any),
+			_target = p0,
+			_damper = 1,
+			_speed = 1,
+		} :: any,
+		Spring
+	) :: Spring<T>
 end
 
 --[=[
@@ -254,20 +257,20 @@ function Spring.__newindex<T>(self: Spring<T>, index, value)
 		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
-		self._damper = value
+		self._damper = value :: any
 		self._time0 = now
 	elseif index == "Speed" or index == "s" then
 		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
-		self._speed = value < 0 and 0 or value
+		self._speed = if (value :: any) < 0 then 0 else value :: any
 		self._time0 = now
 	elseif index == "Clock" then
 		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
-		self._clock = value
-		self._time0 = value()
+		self._clock = value :: any
+		self._time0 = (value :: any)()
 	else
 		error(string.format("%q is not a valid member of Spring", tostring(index)), 2)
 	end

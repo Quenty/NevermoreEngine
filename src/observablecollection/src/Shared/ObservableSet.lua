@@ -29,7 +29,7 @@ export type ObservableSet<T> = typeof(setmetatable(
 		ItemRemoved: Signal.Signal<T>,
 		CountChanged: Signal.Signal<number>,
 	},
-	ObservableSet
+	{} :: typeof({ __index = ObservableSet })
 ))
 
 --[=[
@@ -127,12 +127,12 @@ function ObservableSet.ObserveItemsBrio<T>(self: ObservableSet<T>): Observable.O
 			handleItem(item)
 		end
 
-		self._maid[sub :: any] = maid
+		self._maid[sub] = maid
 		maid:GiveTask(function()
 			for _, brio: any in brios do
 				brio:Destroy()
 			end
-			self._maid[sub :: any] = nil
+			self._maid[sub] = nil
 			sub:Complete()
 		end)
 
@@ -167,9 +167,9 @@ function ObservableSet.ObserveContains<T>(self: ObservableSet<T>, item: T): Obse
 			sub:Fire(doesContain)
 		end))
 
-		self._maid[sub :: any] = maid
+		self._maid[sub] = maid
 		maid:GiveTask(function()
-			self._maid[sub :: any] = nil
+			self._maid[sub] = nil
 			sub:Complete()
 		end)
 

@@ -25,6 +25,8 @@ local SpringObject
 
 local Blend = {}
 
+export type BlendProps = { [any]: any }
+
 --[=[
 	Creates a new function which will return an observable that, given the props
 	in question, will construct a new instance and assign all props. This is the
@@ -48,10 +50,10 @@ local Blend = {}
 	@param className string
 	@return (props: { [string]: any; }) -> Observable<Instance>
 ]=]
-function Blend.New(className: string)
+function Blend.New(className: string): (props: BlendProps) -> Observable.Observable<Instance>
 	assert(type(className) == "string", "Bad className")
 
-	return function(props)
+	return function(props: BlendProps)
 		return Observable.new(function(sub)
 			local instance = Instance.new(className)
 
@@ -267,7 +269,7 @@ end
 	@return (parent: Instance) -> Observable<T>
 ]=]
 function Blend.Attached(constructor)
-	return function(parent)
+	return function(parent: Instance)
 		return Observable.new(function(sub)
 			local resource = constructor(parent)
 
@@ -817,7 +819,7 @@ end
 	In general, cosntructing new instances like this is a bad idea, so it's recommended against it.
 	:::
 
-	```lua
+	```
 	local render = Blend.New "ScreenGui" {
 		Parent = game.Players.LocalPlayer.PlayerGui;
 		[Blend.Children] = {
@@ -1102,7 +1104,7 @@ end
 	@param props table
 	@return Maid
 ]=]
-function Blend.mount(instance: Instance, props)
+function Blend.mount(instance: Instance, props: BlendProps): Maid.Maid
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local maid = Maid.new()
@@ -1135,7 +1137,7 @@ function Blend.mount(instance: Instance, props)
 			local observable = Blend.toEventObservable(key(instance, value))
 
 			if Observable.isObservable(observable) then
-				table.insert(dependentObservables, {observable, value})
+				table.insert(dependentObservables, { observable, value })
 			else
 				warn(string.format("Unable to apply event listener %q", tostring(key)))
 			end
@@ -1147,7 +1149,6 @@ function Blend.mount(instance: Instance, props)
 			warn(string.format("Unable to apply property %q", tostring(key)))
 		end
 	end
-
 
 	if #children > 0 then
 		maid:GiveTask(Blend.Children(instance, children):Subscribe())
@@ -1171,6 +1172,5 @@ function Blend.mount(instance: Instance, props)
 
 	return maid
 end
-
 
 return Blend

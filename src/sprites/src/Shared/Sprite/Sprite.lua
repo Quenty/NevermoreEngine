@@ -4,20 +4,6 @@
 	@class Sprite
 ]=]
 
-local Sprite = {}
-Sprite.ClassName = "Sprite"
-Sprite.__index = Sprite
-
-export type Sprite = typeof(setmetatable(
-	{} :: {
-		Texture: string,
-		Size: Vector2,
-		Position: Vector2,
-		Name: string,
-	},
-	Sprite
-))
-
 --[=[
 	Data used to construct a sprite.
 	@interface SpriteData
@@ -33,6 +19,20 @@ export type SpriteData = {
 	Position: Vector2,
 	Name: string,
 }
+
+local Sprite = {}
+Sprite.ClassName = "Sprite"
+Sprite.__index = Sprite
+
+export type Sprite = typeof(setmetatable(
+	{} :: {
+		Texture: string,
+		Size: Vector2,
+		Position: Vector2,
+		Name: string,
+	},
+	{} :: typeof({ __index = Sprite })
+))
 
 --[=[
 	Constructs a new sprite
@@ -56,12 +56,14 @@ end
 	@return Instance
 ]=]
 function Sprite:Style(gui: ImageLabel | ImageButton)
-	assert(typeof(gui) == "Instance" and (gui:IsA("ImageLabel") or gui:IsA("ImageButton")), "Bad gui");
-	(gui :: ImageLabel).Image = self.Texture;
-	(gui :: ImageLabel).ImageRectOffset = self.Position;
-	(gui :: ImageLabel).ImageRectSize = self.Size
+	assert(typeof(gui) == "Instance" and (gui:IsA("ImageLabel") or gui:IsA("ImageButton")), "Bad gui")
 
-	return gui
+	local castGui: any = gui
+	castGui.Image = self.Texture
+	castGui.ImageRectOffset = self.Position
+	castGui.ImageRectSize = self.Size
+
+	return castGui
 end
 
 --[=[
