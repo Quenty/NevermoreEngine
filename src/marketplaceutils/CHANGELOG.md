@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.11.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.11.3...@quenty/marketplaceutils@11.11.4) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+
+
+
+
 ## [11.11.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.11.1...@quenty/marketplaceutils@11.11.3) (2025-04-07)
 
 

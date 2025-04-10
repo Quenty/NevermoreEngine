@@ -1,19 +1,15 @@
-# v13.17.3 (Thu Apr 10 2025)
-
-#### 🐛 Bug Fix
-
-- refactor: Fix OOP inheritance [#550](https://github.com/Quenty/NevermoreEngine/pull/550) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@13.17.2...@quenty/valuebaseutils@13.17.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/valuebaseutils
+
+
+
+
 
 ## [13.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@13.17.0...@quenty/valuebaseutils@13.17.2) (2025-04-07)
 

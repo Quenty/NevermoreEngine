@@ -1,19 +1,15 @@
-# v16.24.3 (Thu Apr 10 2025)
-
-#### 🐛 Bug Fix
-
-- refactor: Fix OOP inheritance [#550](https://github.com/Quenty/NevermoreEngine/pull/550) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [16.24.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.24.2...@quenty/scoredactionservice@16.24.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
 
 ## [16.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.24.0...@quenty/scoredactionservice@16.24.2) (2025-04-07)
 
