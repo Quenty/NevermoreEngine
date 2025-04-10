@@ -1,3 +1,18 @@
+# (Thu Apr 10 2025)
+
+#### 🐛 Bug Fix
+
+- ci: Shorten workflow name from run-tests to tests [#552](https://github.com/Quenty/NevermoreEngine/pull/552) ([@unrooot](https://github.com/unrooot))
+- `@quenty/acceltween@2.5.3`, `@quenty/adorneeboundingbox@8.20.3`, `@quenty/adorneevalue@10.18.3`, `@quenty/aggregator@1.4.3`, `@quenty/animations@8.17.3`, `@quenty/attributeutils@14.17.3`, `@quenty/baseobject@10.8.3`, `@quenty/basicpane@13.17.3`, `@quenty/binder@14.19.3`, `@quenty/blend@12.18.3`, `@quenty/brio@14.17.3`, `@quenty/buttondragmodel@1.15.3`, `@quenty/buttonhighlightmodel@14.18.3`, `@quenty/camera@14.20.3`, `@quenty/canceltoken@11.11.4`, `@quenty/chatproviderservice@9.25.3`, `@quenty/clienttranslator@14.19.3`, `@quenty/cmdrservice@13.22.3`, `@quenty/colorpicker@10.19.3`, `@quenty/coreguienabler@12.18.3`, `@quenty/counter@7.17.3`, `@quenty/datastore@13.20.3`, `@quenty/deathreport@10.21.3`, `@quenty/debounce@2.3.3`, `@quenty/depthoffield@11.19.3`, `@quenty/flipbook@9.17.3`, `@quenty/funnels@1.5.3`, `@quenty/gameconfig@12.24.3`, `@quenty/gameproductservice@14.24.3`, `@quenty/gamescalingutils@13.18.3`, `@quenty/highlight@10.21.3`, `@quenty/humanoidtracker@13.17.3`, `@quenty/ik@15.24.3`, `@quenty/influxdbclient@7.19.3`, `@quenty/inputkeymaputils@14.23.3`, `@quenty/inputmode@13.18.3`, `@quenty/inputobjectutils@4.18.3`, `@quenty/loader@10.8.3`, `@quenty/maid@3.4.3`, `@quenty/observablecollection@12.20.3`, `@quenty/permissionprovider@14.19.3`, `@quenty/promise@10.10.4`, `@quenty/promptqueue@1.18.3`, `@quenty/qgui@2.3.4`, `@quenty/queue@2.3.3`, `@quenty/ragdoll@15.23.3`, `@quenty/randomutils@6.10.3`, `@quenty/remoting@12.18.3`, `@quenty/rigbuilderutils@10.19.3`, `@quenty/roblox-api-dump@8.11.4`, `@quenty/rx@13.17.3`, `@quenty/rxsignal@7.17.3`, `@quenty/scoredactionservice@16.24.3`, `@quenty/screenshothudservice@7.18.3`, `@quenty/servicebag@11.11.4`, `@quenty/settings@11.23.3`, `@quenty/signal@7.10.3`, `@quenty/singleton@6.8.3`, `@quenty/snackbar@11.21.3`, `@quenty/soundgroup@1.20.3`, `@quenty/sounds@10.10.4`, `@quenty/spring@10.8.4`, `@quenty/sprites@13.16.3`, `@quenty/statestack@14.18.3`, `@quenty/table@3.7.4`, `@quenty/teamtracker@13.17.3`, `@quenty/templateprovider@11.18.3`, `@quenty/throttle@10.9.3`, `@quenty/tie@10.20.3`, `@quenty/timedtween@7.18.3`, `@quenty/timesyncservice@13.18.3`, `@quenty/transitionmodel@7.19.3`, `@quenty/tuple@1.5.3`, `@quenty/valuebaseutils@13.17.3`, `@quenty/valueobject@13.17.3`
+  - refactor: Fix OOP inheritance [#550](https://github.com/Quenty/NevermoreEngine/pull/550) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Apr 08 2025)
 
 #### 🚀 Enhancement
