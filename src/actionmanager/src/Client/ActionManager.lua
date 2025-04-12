@@ -2,7 +2,7 @@
 	Holds single toggleable actions (like a tool system).
 
 	:::info
-	This is legacy code and probably shoudl not be used in new games.
+	This is legacy code and probably should not be used in new games.
 	:::
 
 	@class ActionManager
