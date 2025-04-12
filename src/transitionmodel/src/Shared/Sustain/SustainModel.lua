@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Signal = require("Signal")
 
@@ -93,6 +94,29 @@ function SustainModel:PromiseSustain(doNotAnimate: boolean?)
 	self:Sustain(doNotAnimate)
 
 	return self:_promiseSustained()
+end
+
+--[=[
+	Observes the current state of the SustainModel.
+	Emits true when sustaining and false otherwise.
+	
+	@return Observable<boolean>
+]=]
+function SustainModel:Observe()
+	return Observable.new(function(sub)
+		if not self.Destroy then
+			warn("[SustainModel.Observe] - Connecting to dead SustainModel")
+			sub:Complete()
+		end
+
+		local connection = self.SustainChanged:Connect(function(isSustained)
+			sub:Fire(isSustained)
+		end)
+
+		sub:Fire(self._isSustained)
+
+		return connection
+	end)
 end
 
 function SustainModel:_promiseSustained()
