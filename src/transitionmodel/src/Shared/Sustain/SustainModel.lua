@@ -107,6 +107,7 @@ function SustainModel:Observe()
 		if not self.Destroy then
 			warn("[SustainModel.Observe] - Connecting to dead SustainModel")
 			sub:Complete()
+			return
 		end
 
 		local connection = self.SustainChanged:Connect(function(isSustained)
