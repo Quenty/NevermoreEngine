@@ -1,3 +1,19 @@
+# v13.19.4 (Wed Apr 16 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Amir ([@alliancecrusader](https://github.com/alliancecrusader)), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: Fix typo in ActionManager.lua [#553](https://github.com/Quenty/NevermoreEngine/pull/553) ([@alliancecrusader](https://github.com/alliancecrusader))
+
+#### Authors: 1
+
+- Amir ([@alliancecrusader](https://github.com/alliancecrusader))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
