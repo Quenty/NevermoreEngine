@@ -1,23 +1,15 @@
-# v13.19.4 (Wed Apr 16 2025)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Amir ([@alliancecrusader](https://github.com/alliancecrusader)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Fix typo in ActionManager.lua [#553](https://github.com/Quenty/NevermoreEngine/pull/553) ([@alliancecrusader](https://github.com/alliancecrusader))
-
-#### Authors: 1
-
-- Amir ([@alliancecrusader](https://github.com/alliancecrusader))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.19.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.19.3...@quenty/actionmanager@13.19.4) (2025-04-16)
+
+**Note:** Version bump only for package @quenty/actionmanager
+
+
+
+
 
 ## [13.19.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.19.2...@quenty/actionmanager@13.19.3) (2025-04-10)
 
