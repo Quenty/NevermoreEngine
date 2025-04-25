@@ -13,4 +13,4 @@
 
 Converts UI between Roblox instances and Blend.
 
-<div align="center"><a href="https://www.roblox.com/library/8542156346/Quentys-Blend-Fusion-UI-Converter-Beta">Install →</a></div>
+<div align="center"><a href="https://create.roblox.com/store/asset/138098421396202/Quentys-BlendFusion-UI-Converter-Beta">Install on Roblox Creator Store→</a></div>
