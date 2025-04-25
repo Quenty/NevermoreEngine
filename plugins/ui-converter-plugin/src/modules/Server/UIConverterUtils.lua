@@ -276,7 +276,7 @@ end
 function UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
 	local data = {}
 	for key, value in properties do
-		if key ~= "Parent" and typeof(value) == "Content" then
+		if key ~= "Parent" and typeof(value) ~= "Content" then
 			if typeof(value) == "Instance" then
 				data[key] = UIConverterUtils.getRefProperty(refLookupMap, value)
 			else
