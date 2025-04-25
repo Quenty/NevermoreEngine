@@ -25,6 +25,7 @@ function RxUIConverterUtils.observeAnyChangedBelowInst(inst)
 			end))
 
 			maid[descendant] = maid
+			topMaid[descendant] = maid
 		end
 
 		topMaid:GiveTask(inst.DescendantAdded:Connect(function(descendant)
