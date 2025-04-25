@@ -91,7 +91,7 @@ function UIConverterUtils.toLuaPropertyString(value: any, debugHint: string): st
 	if valueType == "string" then
 		local multiline = UIConverterUtils.toMultiLineEscape(value)
 		if multiline then
-			return multiline
+			return `"{multiline}"`
 		else
 			return string.format("%q", value)
 		end
@@ -243,6 +243,13 @@ function UIConverterUtils.toLuaPropertyString(value: any, debugHint: string): st
 				tostring(value.Style)
 			)
 		end
+	elseif valueType == "Content" then
+		-- TODO: Do we need to handle Enum.ContentSourceType.Object?
+		if value.SourceType == Enum.ContentSourceType.Uri then
+			return `Content.fromUri("{value.Uri or ""}")`
+		else
+			return ""
+		end
 	elseif valueType == "userdata" then
 		-- FontFace
 		warn(
@@ -269,7 +276,7 @@ end
 function UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
 	local data = {}
 	for key, value in properties do
-		if key ~= "Parent" then
+		if key ~= "Parent" and typeof(value) ~= "Content" then
 			if typeof(value) == "Instance" then
 				data[key] = UIConverterUtils.getRefProperty(refLookupMap, value)
 			else
@@ -313,7 +320,11 @@ function UIConverterUtils.propertiesTableToString(library, properties)
 
 	local data = {}
 	for _, key in keys do
-		table.insert(data, string.format("%s = %s;", key, properties[key]))
+		if key == "[Blend.Children]" then
+			table.insert(data, properties[key])
+		else
+			table.insert(data, string.format("%s = %s;", key, properties[key]))
+		end
 	end
 
 	return table.concat(data, "\n")
@@ -548,8 +559,15 @@ function UIConverterUtils.promiseToLibraryInstance(
 
 				if next(childrenPromises) then
 					return PromiseUtils.all(childrenPromises):Then(function(...)
+						local ignoreIndent = false
+						-- The [Blend.Children] syntax isn't required anymore,
+						-- we can just list the items
+						if library == "Blend" then
+							ignoreIndent = true
+						end
+
 						converted[UIConverterUtils.getChildrenKey(library)] =
-							UIConverterUtils.convertListOfItemsToTable({ ... })
+							UIConverterUtils.convertListOfItemsToTable({ ... }, ignoreIndent)
 						return converted
 					end)
 				end
@@ -589,7 +607,7 @@ function UIConverterUtils.getEntryListCode(library: UIConverterLibrary, refLooku
 	end
 end
 
-function UIConverterUtils.convertListOfItemsToTable(results: { string }): string
+function UIConverterUtils.convertListOfItemsToTable(results: { string }, ignoreIndent: boolean?): string
 	local strings = {}
 	for _, item in results do
 		if item then
@@ -597,7 +615,11 @@ function UIConverterUtils.convertListOfItemsToTable(results: { string }): string
 		end
 	end
 	local childrenText = table.concat(strings, "\n")
-	return string.format("{\n%s\n}", UIConverterUtils.indent(childrenText))
+	if not ignoreIndent then
+		return string.format("{\n%s\n}", UIConverterUtils.indent(childrenText))
+	else
+		return childrenText
+	end
 end
 
 return UIConverterUtils
