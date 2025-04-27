@@ -131,23 +131,27 @@ function Raycaster:__newindex(index, value)
 end
 
 function Raycaster:_tryCast(ray, ignoreList)
-	local part, position, normal, material = Workspace:FindPartOnRayWithIgnoreList(
-		ray, ignoreList, false, self._ignoreWater)
+	local raycastParams = RaycastParams.new()
+	raycastParams.IgnoreWater = self._ignoreWater
+	raycastParams.FilterDescendantsInstances = ignoreList
+	raycastResult.FilterType = Enum.RaycastFilterType.Blacklist
 
-	if not part then
+	local raycastResult = Workspace:Raycast(ray.Origin, ray.Direction, raycastParams)
+	if not raycastResult.Instance then
 		return true, nil
 	end
 
 	local data = {
-		Part = part;
-		Position = position;
-		Normal = normal;
-		Material = material;
+		Part = raycastResult.Instance;
+		Position = raycastResult.Position;
+		Normal = raycastResult.Normal;
+		Material = raycastResult.Material;
+		Distance = raycastResult.Distance;
 	}
 
 	local filter = self.Filter
 	if filter and filter(data) then
-		table.insert(ignoreList, part)
+		table.insert(ignoreList, raycastResult.Instance)
 		return false, nil
 	end
 
