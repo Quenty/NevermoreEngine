@@ -7,8 +7,6 @@ local require = require(script.Parent.loader).load(script)
 
 local _InputModeType = require("InputModeType")
 local _InputKeyMapList = require("InputKeyMapList")
-local _InputKeyMap = require("InputKeyMap")
-local _InputTypeUtils = require("InputTypeUtils")
 
 local SlottedTouchButtonUtils = {}
 
@@ -32,7 +30,7 @@ export type SlottedTouchButtonData = {
 	@param slotId string
 	@return SlottedTouchButton
 ]=]
-function SlottedTouchButtonUtils.createSlottedTouchButton(slotId: string): _InputTypeUtils.SlottedTouchButton
+function SlottedTouchButtonUtils.createSlottedTouchButton(slotId: string)
 	assert(
 		slotId == "primary1"
 			or slotId == "primary2"
@@ -85,13 +83,15 @@ end
 	@param inputKeyMapList InputKeyMapList
 	@return { SlottedTouchButtonData }
 ]=]
-function SlottedTouchButtonUtils.getSlottedTouchButtonData(inputKeyMapList: _InputKeyMapList.InputKeyMapList): { SlottedTouchButtonData }
+function SlottedTouchButtonUtils.getSlottedTouchButtonData(
+	inputKeyMapList: _InputKeyMapList.InputKeyMapList
+): { SlottedTouchButtonData }
 	local slottedTouchButtons: { SlottedTouchButtonData } = {}
 
 	for _, inputKeyMap: any in inputKeyMapList:GetInputKeyMaps() do
 		for _, touchButtonData in inputKeyMap:GetInputTypesList() do
 			if SlottedTouchButtonUtils.isSlottedTouchButton(touchButtonData) then
-				local slottedButtonData: _InputTypeUtils.SlottedTouchButton = touchButtonData :: any
+				local slottedButtonData = touchButtonData :: any
 				table.insert(
 					slottedTouchButtons,
 					SlottedTouchButtonUtils.createTouchButtonData(
