@@ -6,7 +6,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local _InputModeType = require("InputModeType")
-local _InputKeyMapList = require("InputKeyMapList")
 
 local SlottedTouchButtonUtils = {}
 
@@ -84,7 +83,7 @@ end
 	@return { SlottedTouchButtonData }
 ]=]
 function SlottedTouchButtonUtils.getSlottedTouchButtonData(
-	inputKeyMapList: _InputKeyMapList.InputKeyMapList
+	inputKeyMapList
 ): { SlottedTouchButtonData }
 	local slottedTouchButtons: { SlottedTouchButtonData } = {}
 
