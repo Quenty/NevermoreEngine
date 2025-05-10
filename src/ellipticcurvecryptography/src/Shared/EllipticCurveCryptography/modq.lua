@@ -2,10 +2,10 @@
 
 -- Arithmetic on the Finite Field of Integers modulo q
 -- Where q is the generator's subgroup order.
-local util = require(script.Parent.util)
-local sha256 = require(script.Parent.sha256)
-local random = require(script.Parent.random)
 local arith = require(script.Parent.arith)
+local random = require(script.Parent.random)
+local sha256 = require(script.Parent.sha256)
+local util = require(script.Parent.util)
 
 local isEqual = arith.isEqual
 local compare = arith.compare

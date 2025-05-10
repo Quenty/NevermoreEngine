@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cli-output-helpers",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Helpers to generate Nevermore package and game templates",
   "keywords": [
     "Roblox",

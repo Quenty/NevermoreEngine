@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides utility methods for MarketplaceService
 	@class MarketplaceUtils
@@ -20,6 +21,12 @@ local MarketplaceUtils = {}
 	.Id number -- (Use CreatorTargetId instead)
 	@within MarketplaceUtils
 ]=]
+export type CreatorProductInfo = {
+	CreatorType: string,
+	CreatorTargetId: number,
+	Name: string,
+	Id: number,
+}
 
 --[=[
 	Product info result for assets.
@@ -43,6 +50,25 @@ local MarketplaceUtils = {}
 	.IsPublicDomain boolean -- Describes whether the asset can be taken for free
 	@within MarketplaceUtils
 ]=]
+export type AssetProductInfo = {
+	Creator: CreatorProductInfo,
+	AssetId: number,
+	AssetTypeId: number,
+	IsForSale: boolean,
+	IsLimited: boolean,
+	IsLimitedUnique: boolean,
+	IsNew: boolean,
+	Remaining: number,
+	Sales: number,
+	Name: string,
+	Description: string?,
+	PriceInRobux: number,
+	Created: string,
+	Updated: string,
+	ContentRatingTypeId: number,
+	MinimumMembershipLevel: number,
+	IsPublicDomain: boolean,
+}
 
 --[=[
 	Product info result for gamepasses.
@@ -60,6 +86,19 @@ local MarketplaceUtils = {}
 	.IsPublicDomain boolean -- Describes whether the asset can be taken for free
 	@within MarketplaceUtils
 ]=]
+export type GamePassOrDeveloperProductInfo = {
+	Creator: CreatorProductInfo,
+	ProductId: number,
+	IconImageAssetId: number,
+	Name: string,
+	Description: string?,
+	PriceInRobux: number,
+	Created: string,
+	Updated: string,
+	ContentRatingTypeId: number,
+	MinimumMembershipLevel: number,
+	IsPublicDomain: boolean,
+}
 
 --[=[
 	Subscription Status
@@ -69,6 +108,10 @@ local MarketplaceUtils = {}
 	.IsRenewing boolean -- True if the user is set to renew this subscription after the current subscription period ends.
 	@within MarketplaceUtils
 ]=]
+export type UserSubscriptonStatus = {
+	IsSubscribed: boolean,
+	IsRenewing: boolean,
+}
 
 --[=[
 	Wraps [MarketplaceService.GetProductInfo] and retrieves information about
@@ -76,7 +119,10 @@ local MarketplaceUtils = {}
 	@param infoType InfoType | nil
 	@return Promise<AssetProductInfo | GamePassOrDeveloperProductInfo>
 ]=]
-function MarketplaceUtils.promiseProductInfo(assetId, infoType)
+function MarketplaceUtils.promiseProductInfo(
+	assetId: number,
+	infoType: Enum.InfoType
+): Promise.Promise<AssetProductInfo | GamePassOrDeveloperProductInfo>
 	assert(type(assetId) == "number", "Bad assetId")
 	assert(typeof(infoType) == "EnumItem" or infoType == nil, "Bad infoType")
 
@@ -103,7 +149,10 @@ end
 	@param subscriptionId string
 	@return UserSubscriptonStatus
 ]=]
-function MarketplaceUtils.promiseUserSubscriptionStatus(player, subscriptionId)
+function MarketplaceUtils.promiseUserSubscriptionStatus(
+	player: Player,
+	subscriptionId: string
+): Promise.Promise<UserSubscriptonStatus>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(subscriptionId) == "string", "Bad subscriptionId")
 
@@ -128,7 +177,7 @@ end
 	@param gamePassId number
 	@return Promise<boolean>
 ]=]
-function MarketplaceUtils.promiseUserOwnsGamePass(userId, gamePassId)
+function MarketplaceUtils.promiseUserOwnsGamePass(userId: number, gamePassId: number): Promise.Promise<boolean>
 	assert(typeof(userId) == "number", "Bad userId")
 	assert(type(gamePassId) == "number", "Bad gamePassId")
 
@@ -153,7 +202,7 @@ end
 	@param assetId number
 	@return Promise<boolean>
 ]=]
-function MarketplaceUtils.promisePlayerOwnsAsset(player, assetId)
+function MarketplaceUtils.promisePlayerOwnsAsset(player: Player, assetId: number): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(type(assetId) == "number", "Bad assetId")
 
@@ -178,7 +227,7 @@ end
 	@param bundleId number
 	@return Promise<boolean>
 ]=]
-function MarketplaceUtils.promisePlayerOwnsBundle(player, bundleId)
+function MarketplaceUtils.promisePlayerOwnsBundle(player: Player, bundleId: number): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(type(bundleId) == "number", "Bad bundleId")
 

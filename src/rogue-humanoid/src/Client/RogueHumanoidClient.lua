@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RogueHumanoidBase = require("RogueHumanoidBase")
 local Binder = require("Binder")
+local RogueHumanoidBase = require("RogueHumanoidBase")
 
 local RogueHumanoidClient = setmetatable({}, RogueHumanoidBase)
 RogueHumanoidClient.ClassName = "RogueHumanoidClient"

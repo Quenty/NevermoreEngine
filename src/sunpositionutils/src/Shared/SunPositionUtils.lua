@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility to position the sun and to retrieve sun information specific to Roblox.
 
@@ -19,9 +20,11 @@ local ZAXIS = Vector3.new(0, 0, 1)
 	@param direction Vector3
 	@return number
 ]=]
-function SunPositionUtils.getGeographicalLatitudeFromDirection(direction: Vector3)
-	local angle = math.atan2(direction.z, math.sqrt(direction.x^2 + direction.y^2))
-	return angle/(math.pi*2)*360+EARTH_TILT
+function SunPositionUtils.getGeographicalLatitudeFromDirection(direction: Vector3): number
+	local x = direction.X
+	local y = direction.Y
+	local angle = math.atan2(direction.Z, math.sqrt(x * x + y * y))
+	return angle / (math.pi * 2) * 360 + EARTH_TILT
 end
 
 SunPositionUtils.getGeographicalLatitudeFromMoonDirection = SunPositionUtils.getGeographicalLatitudeFromDirection
@@ -32,10 +35,10 @@ SunPositionUtils.getGeographicalLatitudeFromMoonDirection = SunPositionUtils.get
 	@param direction Vector3
 	@return number
 ]=]
-function SunPositionUtils.getClockTimeFromDirection(direction: Vector3)
-	local altitude = math.atan2(-direction.y, -direction.x)
+function SunPositionUtils.getClockTimeFromDirection(direction: Vector3): number
+	local altitude = math.atan2(-direction.Y, -direction.X)
 
-	return (altitude/(math.pi*2)*24-6) % 24
+	return (altitude / (math.pi * 2) * 24 - 6) % 24
 end
 
 --[=[
@@ -44,10 +47,10 @@ end
 	@param direction Vector3
 	@return number
 ]=]
-function SunPositionUtils.getClockTimeFromMoonDirection(direction: Vector3)
-	local altitude = math.atan2(direction.y, direction.x)
+function SunPositionUtils.getClockTimeFromMoonDirection(direction: Vector3): number
+	local altitude = math.atan2(direction.Y, direction.X)
 
-	return (altitude/(math.pi*2)*24-6) % 24
+	return (altitude / (math.pi * 2) * 24 - 6) % 24
 end
 
 --[=[
@@ -58,9 +61,9 @@ end
 	@param north Vector3?
 	@return number
 ]=]
-function SunPositionUtils.getDirection(azimuthRad: number, altitudeRad: number, north: Vector3)
-	local cframe = (CFrame.Angles(0, azimuthRad, 0) * CFrame.Angles(altitudeRad, 0, 0))
-	return cframe:vectorToWorldSpace(north or NORTH)
+function SunPositionUtils.getDirection(azimuthRad: number, altitudeRad: number, north: Vector3): Vector3
+	local cframe: CFrame = (CFrame.Angles(0, azimuthRad, 0) * CFrame.Angles(altitudeRad, 0, 0))
+	return cframe:VectorToWorldSpace(north or NORTH)
 end
 
 --[=[
@@ -71,8 +74,8 @@ end
 	@return Vector3 -- Sun position
 	@return Vector3 -- Moon position
 ]=]
-function SunPositionUtils.getSunPosition(clockTime: number, geoLatitude: number)
-	local seconds = clockTime*60*60
+function SunPositionUtils.getSunPosition(clockTime: number, geoLatitude: number): (Vector3, Vector3)
+	local seconds = clockTime * 60 * 60
 	local DAY = 24 * 60 * 60
 	local YEAR = 365.2564 * DAY
 	local HALFYEAR = 182.6282
@@ -90,7 +93,7 @@ function SunPositionUtils.getSunPosition(clockTime: number, geoLatitude: number)
 	local trueSunPosition = CFrame.fromAxisAngle(ZAXIS:Cross(sunPosition), sunOffset) * sunPosition
 	local trueMoonPosition = CFrame.fromAxisAngle(ZAXIS:Cross(moonPosition), sunOffset) * moonPosition
 
-	return trueSunPosition, trueMoonPosition*Vector3.new(1, -1, 1)
+	return trueSunPosition, trueMoonPosition * Vector3.new(1, -1, 1)
 end
 
 return SunPositionUtils

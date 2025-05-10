@@ -45,7 +45,6 @@ function RagdollHumanoidOnFall.new(humanoid, serviceBag)
 			self:_handleServerEvent(...)
 		end))
 	else
-
 		self._maid:GiveTask(self:_getOrCreateRagdollLogic().ShouldRagdoll.Changed:Connect(function()
 			self:_update()
 		end))

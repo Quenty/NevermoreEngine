@@ -36,7 +36,9 @@ local function makePrompt(assetType, idOrKey, cframe)
 	prompt.Parent = promptPart
 
 	prompt.Triggered:Connect(function(player)
-		serviceBag:GetService(require("GameProductService")):PromisePromptPurchase(player, assetType, idOrKey)
+		serviceBag
+			:GetService(require("GameProductService"))
+			:PromisePromptPurchase(player, assetType, idOrKey)
 			:Then(function(purchased)
 				print("purchased", idOrKey, purchased)
 			end)

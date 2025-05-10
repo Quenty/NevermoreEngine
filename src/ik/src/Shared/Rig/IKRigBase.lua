@@ -4,12 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local TorsoIKBase = require("TorsoIKBase")
-local Promise = require("Promise")
-local CharacterUtils = require("CharacterUtils")
-local Signal = require("Signal")
 local ArmIKBase = require("ArmIKBase")
+local BaseObject = require("BaseObject")
+local CharacterUtils = require("CharacterUtils")
+local Promise = require("Promise")
+local Signal = require("Signal")
+local TorsoIKBase = require("TorsoIKBase")
 
 local IKRigBase = setmetatable({}, BaseObject)
 IKRigBase.ClassName = "IKRigBase"
@@ -46,13 +46,13 @@ function IKRigBase:Update()
 	self._lastUpdateTime = tick()
 	self.Updating:Fire()
 
-	for _, item in pairs(self._ikTargets) do
+	for _, item in self._ikTargets do
 		item:Update()
 	end
 end
 
 function IKRigBase:UpdateTransformOnly()
-	for _, item in pairs(self._ikTargets) do
+	for _, item in self._ikTargets do
 		item:UpdateTransformOnly()
 	end
 end

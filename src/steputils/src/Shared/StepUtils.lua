@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions primarily used to bind animations into update loops of the Roblox engine.
 	@class StepUtils
@@ -35,14 +36,14 @@ local StepUtils = {}
 	@return (...) -> () -- Connect function
 	@return () -> () -- Disconnect function
 ]=]
-function StepUtils.bindToRenderStep(update)
+function StepUtils.bindToRenderStep(update: () -> boolean): () -> ()
 	return StepUtils.bindToSignal(RunService.RenderStepped, update)
 end
 
 --[=[
 	Yields until the frame deferral is done
 ]=]
-function StepUtils.deferWait()
+function StepUtils.deferWait(): ()
 	local current = coroutine.running()
 	task.defer(task.spawn, current)
 	coroutine.yield()
@@ -60,7 +61,7 @@ end
 	@return (...) -> () -- Connect function
 	@return () -> () -- Disconnect function
 ]=]
-function StepUtils.bindToStepped(update)
+function StepUtils.bindToStepped(update: () -> boolean): () -> ()
 	return StepUtils.bindToSignal(RunService.Stepped, update)
 end
 
@@ -73,7 +74,7 @@ end
 	@return (...) -> () -- Connect function
 	@return () -> () -- Disconnect function
 ]=]
-function StepUtils.bindToSignal(signal, update)
+function StepUtils.bindToSignal(signal: RBXScriptSignal, update: () -> boolean): (() -> (), () -> ())
 	if typeof(signal) ~= "RBXScriptSignal" then
 		error("signal must be of type RBXScriptSignal")
 	end
@@ -81,7 +82,7 @@ function StepUtils.bindToSignal(signal, update)
 		error(string.format("update must be of type function, got %q", type(update)))
 	end
 
-	local conn = nil
+	local conn: RBXScriptConnection? = nil
 	local function disconnect()
 		if conn then
 			conn:Disconnect()
@@ -106,7 +107,7 @@ function StepUtils.bindToSignal(signal, update)
 		end
 
 		-- Usually contains just the self arg!
-		local args = {...}
+		local args = { ... }
 
 		-- Bind to render stepped
 		conn = signal:Connect(function()
@@ -127,7 +128,7 @@ end
 	@param func function -- Function to call
 	@return function -- Call this function to cancel call
 ]=]
-function StepUtils.onceAtRenderPriority(priority, func)
+function StepUtils.onceAtRenderPriority(priority: number, func: () -> ()): () -> ()
 	assert(type(priority) == "number", "Bad priority")
 	assert(type(func) == "function", "Bad func")
 
@@ -163,7 +164,7 @@ end
 	@param func function -- Function to call
 	@return function -- Call this function to cancel call
 ]=]
-function StepUtils.onceAtStepped(func)
+function StepUtils.onceAtStepped(func: () -> ()): () -> ()
 	local conn = RunService.Stepped:Once(func)
 	return function()
 		conn:Disconnect()
@@ -181,7 +182,7 @@ end
 	@param func function -- Function to call
 	@return function -- Call this function to cancel call
 ]=]
-function StepUtils.onceAtRenderStepped(func)
+function StepUtils.onceAtRenderStepped(func: () -> ()): () -> ()
 	local conn = RunService.RenderStepped:Once(func)
 	return function()
 		conn:Disconnect()
@@ -196,10 +197,10 @@ end
 	@param func function -- Function to call
 	@return function -- Call this function to cancel call
 ]=]
-function StepUtils.onceAtEvent(event, func)
+function StepUtils.onceAtEvent(event: RBXScriptSignal, func: () -> ()): () -> ()
 	assert(type(func) == "function", "Bad func")
 
-	local conn
+	local conn: RBXScriptConnection?
 	local function cleanup()
 		if conn then
 			conn:Disconnect()

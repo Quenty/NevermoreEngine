@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Allow freedom of movement around a current place, much like the classic script works now.
 	Not intended to be use with the current character script. This is the rotation component.
@@ -8,12 +9,25 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
-local getRotationInXZPlane = require("getRotationInXZPlane")
 local SummedCamera = require("SummedCamera")
+local getRotationInXZPlane = require("getRotationInXZPlane")
 
 local RotatedCamera = {}
 RotatedCamera.ClassName = "RotatedCamera"
+
+export type RotatedCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		CFrame: CFrame,
+		AngleX: number,
+		AngleY: number,
+		MaxY: number,
+		MinY: number,
+	},
+	{} :: typeof({ __index = RotatedCamera })
+)) & CameraEffectUtils.CameraEffect
 
 -- Max/Min aim up and down
 RotatedCamera._maxY = math.rad(80)
@@ -25,8 +39,8 @@ RotatedCamera._angleY = 0
 	Constructs a new RotatedCamera
 	@return RotatedCamera
 ]=]
-function RotatedCamera.new()
-	local self = setmetatable({}, RotatedCamera)
+function RotatedCamera.new(): RotatedCamera
+	local self: RotatedCamera = setmetatable({} :: any, RotatedCamera)
 
 	return self
 end
@@ -38,17 +52,17 @@ end
 --[=[
 	@param xzrotvector Vector2 -- The delta rotation to apply
 ]=]
-function RotatedCamera:RotateXY(xzrotvector)
-	self.AngleX = self.AngleX + xzrotvector.x
-	self.AngleY = self.AngleY + xzrotvector.y
+function RotatedCamera:RotateXY(xzrotvector: Vector2)
+	self.AngleX = self.AngleX + xzrotvector.X
+	self.AngleY = self.AngleY + xzrotvector.Y
 end
 
 function RotatedCamera:__newindex(index, value)
 	if index == "CFrame" then
 		local zxrot = getRotationInXZPlane(value)
-		self.AngleXZ = math.atan2(zxrot.lookVector.x, zxrot.lookVector.z) + math.pi
+		self.AngleXZ = math.atan2(zxrot.LookVector.X, zxrot.LookVector.Z) + math.pi
 
-		local yrot = zxrot:toObjectSpace(value).lookVector.y
+		local yrot = zxrot:ToObjectSpace(value).LookVector.Y
 		self.AngleY = math.asin(yrot)
 	elseif index == "AngleY" then
 		self._angleY = math.clamp(value, self.MinY, self.MaxY)

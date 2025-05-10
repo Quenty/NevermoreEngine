@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Very inefficient search utility function to find dependencies
 	organized in node_modules structure.
@@ -20,18 +21,30 @@ local DependencyUtils = {}
 	@param requestedReplicationType ReplicationType
 	@return ModuleScript?
 ]=]
-function DependencyUtils.findDependency(requester, moduleName, requestedReplicationType)
+function DependencyUtils.findDependency(
+	requester,
+	moduleName: string,
+	requestedReplicationType: ReplicationType.ReplicationType
+): ModuleScript?
 	assert(typeof(requester) == "Instance", "Bad requester")
 	assert(type(moduleName) == "string", "Bad moduleName")
 	assert(ReplicationTypeUtils.isReplicationType(requestedReplicationType), "Bad requestedReplicationType")
 
 	for packageInst in DependencyUtils.iterPackages(requester) do
-		for module, replicationType in DependencyUtils.iterModules(packageInst, ReplicationType.SHARED) do
+		for module: ModuleScript, replicationType: ReplicationType.ReplicationType in
+			DependencyUtils.iterModules(packageInst, ReplicationType.SHARED)
+		do
 			if module.Name == moduleName then
 				if ReplicationTypeUtils.isAllowed(replicationType, requestedReplicationType) then
 					return module
 				else
-					error(string.format("[DependencyUtils] - %q is not allowed in %q", moduleName, requestedReplicationType))
+					error(
+						string.format(
+							"[DependencyUtils] - %q is not allowed in %q",
+							moduleName,
+							requestedReplicationType
+						)
+					)
 				end
 			end
 		end
@@ -40,20 +53,24 @@ function DependencyUtils.findDependency(requester, moduleName, requestedReplicat
 	return nil
 end
 
-function DependencyUtils.iterModules(packageInst, ancestorReplicationType)
+function DependencyUtils.iterModules(
+	packageInst: Instance,
+	ancestorReplicationType: ReplicationType.ReplicationType
+): () -> (ModuleScript, ReplicationType.ReplicationType)
 	assert(typeof(packageInst) == "Instance", "Bad packageInst")
 	assert(ReplicationTypeUtils.isReplicationType(ancestorReplicationType), "Bad ancestorReplicationType")
 
-	return coroutine.wrap(function()
+	return coroutine.wrap(function(): any
 		if packageInst:IsA("ModuleScript") then
 			coroutine.yield(packageInst, ancestorReplicationType)
 			return
 		end
 
 		-- Iterate over the package contents
-		for _, item in pairs(packageInst:GetChildren()) do
-			local itemName = item.Name
-			local itemReplicationType = ReplicationTypeUtils.getFolderReplicationType(itemName, ancestorReplicationType)
+		for _, item in packageInst:GetChildren() do
+			local itemName: string = item.Name
+			local itemReplicationType: ReplicationType.ReplicationType =
+				ReplicationTypeUtils.getFolderReplicationType(itemName, ancestorReplicationType)
 
 			if itemName ~= "node_modules" then
 				for result, resultReplicationType in DependencyUtils.iterModules(item, itemReplicationType) do
@@ -61,13 +78,15 @@ function DependencyUtils.iterModules(packageInst, ancestorReplicationType)
 				end
 			end
 		end
-	end)
+
+		return
+	end) :: any
 end
 
-function DependencyUtils.iterPackages(requester)
+function DependencyUtils.iterPackages(requester: Instance): () -> Instance
 	assert(typeof(requester) == "Instance", "Bad requester")
 
-	return coroutine.wrap(function()
+	return coroutine.wrap(function(): any
 		for nodeModules in DependencyUtils.iterNodeModulesUp(requester) do
 			coroutine.yield(nodeModules.Parent)
 
@@ -75,35 +94,39 @@ function DependencyUtils.iterPackages(requester)
 				coroutine.yield(packageInst)
 			end
 		end
+
+		return
 	end)
 end
 
-function DependencyUtils.iterNodeModulesUp(module)
+function DependencyUtils.iterNodeModulesUp(module: Instance): () -> Instance
 	assert(typeof(module) == "Instance", "Bad module")
 
-	return coroutine.wrap(function()
+	return coroutine.wrap(function(): any
 		local found = module:FindFirstChild("node_modules")
 		if found and found:IsA("Folder") then
 			coroutine.yield(found)
 		end
 
-		local current = module.Parent
+		local current: Instance? = module.Parent
 		while current do
 			found = current:FindFirstChild("node_modules")
 			if found and found:IsA("Folder") then
 				coroutine.yield(found)
 			end
-			current = current.Parent
+			current = current.Parent :: Instance?
 		end
+
+		return
 	end)
 end
 
-function DependencyUtils.iterPackagesInModuleModules(nodeModules)
-	return coroutine.wrap(function()
-		for _, item in pairs(nodeModules:GetChildren()) do
+function DependencyUtils.iterPackagesInModuleModules(nodeModules: Instance): () -> Instance
+	return coroutine.wrap(function(): any
+		for _, item in nodeModules:GetChildren() do
 			if item:IsA("Folder") then
 				if DependencyUtils.isPackageGroup(item.Name) then
-					for _, child in pairs(item:GetChildren()) do
+					for _, child in item:GetChildren() do
 						if child:IsA("ModuleScript") or child:IsA("Folder") then
 							coroutine.yield(child)
 						elseif child:IsA("ObjectValue") then
@@ -137,10 +160,12 @@ function DependencyUtils.iterPackagesInModuleModules(nodeModules)
 				end
 			end
 		end
+
+		return
 	end)
 end
 
-function DependencyUtils.isPackageGroup(itemName)
+function DependencyUtils.isPackageGroup(itemName: string): boolean
 	return string.sub(itemName, 1, 1) == "@"
 end
 

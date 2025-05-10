@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.19.3...@quenty/playerhumanoidbinder@14.20.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+### Features
+
+* Add even more types ([b31717d](https://github.com/Quenty/NevermoreEngine/commit/b31717d8c9f7620c457f5018a2affa760a65334a))
+
+
+
+
+
+## [14.19.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.19.2...@quenty/playerhumanoidbinder@14.19.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+## [14.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.19.0...@quenty/playerhumanoidbinder@14.19.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [14.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.19.0...@quenty/playerhumanoidbinder@14.19.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
+# [14.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.18.2...@quenty/playerhumanoidbinder@14.19.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+## [14.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.18.1...@quenty/playerhumanoidbinder@14.18.2) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+## [14.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.18.0...@quenty/playerhumanoidbinder@14.18.1) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+# [14.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.17.1...@quenty/playerhumanoidbinder@14.18.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
 ## [14.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.17.0...@quenty/playerhumanoidbinder@14.17.1) (2025-01-22)
 
 **Note:** Version bump only for package @quenty/playerhumanoidbinder

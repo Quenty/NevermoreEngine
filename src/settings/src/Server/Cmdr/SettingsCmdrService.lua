@@ -1,17 +1,20 @@
 --[=[
+	Provides commands involving player settings
+
 	@class SettingsCmdrService
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerUtils = require("PlayerUtils")
-local SettingsCmdrUtils = require("SettingsCmdrUtils")
 local Maid = require("Maid")
+local PlayerUtils = require("PlayerUtils")
+local ServiceBag = require("ServiceBag")
+local SettingsCmdrUtils = require("SettingsCmdrUtils")
 
 local SettingsCmdrService = {}
 SettingsCmdrService.ServiceName = "SettingsCmdrService"
 
-function SettingsCmdrService:Init(serviceBag)
+function SettingsCmdrService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -30,28 +33,28 @@ function SettingsCmdrService:_setupCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "restore-setting";
-		Aliases = { };
-		Description = "Restores the player setting to default.";
-		Group = "Settings";
+		Name = "restore-setting",
+		Aliases = {},
+		Description = "Restores the player setting to default.",
+		Group = "Settings",
 		Args = {
 			{
-				Name = "Players";
-				Type = "players";
-				Description = "Players to restore the default settings to.";
+				Name = "Players",
+				Type = "players",
+				Description = "Players to restore the default settings to.",
 			},
 			{
-				Name = "Settings";
-				Type = "settingDefinitions";
-				Description = "Settings to restore.";
-			}
-		};
+				Name = "Settings",
+				Type = "settingDefinitions",
+				Description = "Settings to restore.",
+			},
+		},
 	}, function(_context, players, settingsDefinitions)
 		local givenTo = {}
 
-		for _, player in pairs(players) do
+		for _, player in players do
 			local playerSettings = self._settingService:PromisePlayerSettings(player):Wait()
-			for _, settingDefinition in pairs(settingsDefinitions) do
+			for _, settingDefinition in settingsDefinitions do
 				playerSettings:RestoreDefault(settingDefinition:GetSettingName(), settingDefinition:GetDefaultValue())
 			end
 			table.insert(givenTo, PlayerUtils.formatName(player))
@@ -64,6 +67,5 @@ end
 function SettingsCmdrService:Destroy()
 	self._maid:DoCleaning()
 end
-
 
 return SettingsCmdrService

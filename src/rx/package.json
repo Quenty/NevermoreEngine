@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rx",
-  "version": "13.15.0",
+  "version": "13.18.0",
   "description": "Quenty's reactive library for Roblox",
   "keywords": [
     "Roblox",
@@ -36,7 +36,8 @@
     "@quenty/signal": "file:../signal",
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table",
-    "@quenty/throttle": "file:../throttle"
+    "@quenty/throttle": "file:../throttle",
+    "@quenty/typeutils": "file:../typeutils"
   },
   "publishConfig": {
     "access": "public"

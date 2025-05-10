@@ -5,11 +5,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Snackbar = require("Snackbar")
-local SnackbarScreenGuiProvider = require("SnackbarScreenGuiProvider")
 local Maid = require("Maid")
-local SnackbarOptionUtils = require("SnackbarOptionUtils")
 local PromptQueue = require("PromptQueue")
+local ServiceBag = require("ServiceBag")
+local Snackbar = require("Snackbar")
+local SnackbarOptionUtils = require("SnackbarOptionUtils")
+local SnackbarScreenGuiProvider = require("SnackbarScreenGuiProvider")
 
 local SnackbarServiceClient = {}
 SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
@@ -19,7 +20,7 @@ SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
 
 	@param serviceBag ServiceBag
 ]=]
-function SnackbarServiceClient:Init(serviceBag)
+function SnackbarServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -61,7 +62,10 @@ end
 	@param text string
 	@param options SnackbarOptions
 ]=]
-function SnackbarServiceClient:ShowSnackbar(text, options)
+function SnackbarServiceClient:ShowSnackbar(
+	text: string,
+	options: SnackbarOptionUtils.SnackbarOptions?
+): Snackbar.Snackbar
 	assert(type(text) == "string", "text must be a string")
 	assert(SnackbarOptionUtils.isSnackbarOptions(options) or options == nil, "Bad snackbarOptions")
 
@@ -70,10 +74,9 @@ function SnackbarServiceClient:ShowSnackbar(text, options)
 
 	self._queue:HideCurrent()
 
-	self._maid:GivePromise(self._queue:Queue(snackbar))
-		:Finally(function()
-			snackbar:Destroy()
-		end)
+	self._maid:GivePromise(self._queue:Queue(snackbar)):Finally(function()
+		snackbar:Destroy()
+	end)
 
 	return snackbar
 end
@@ -83,7 +86,7 @@ end
 
 	@param doNotAnimate boolean
 ]=]
-function SnackbarServiceClient:HideCurrent(doNotAnimate)
+function SnackbarServiceClient:HideCurrent(doNotAnimate: boolean?)
 	return self._queue:HideCurrent(doNotAnimate)
 end
 
@@ -92,7 +95,7 @@ end
 
 	@param doNotAnimate boolean
 ]=]
-function SnackbarServiceClient:ClearQueue(doNotAnimate)
+function SnackbarServiceClient:ClearQueue(doNotAnimate: boolean?)
 	self._queue:Clear(doNotAnimate)
 end
 

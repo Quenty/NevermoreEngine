@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Aggregates all requests into one big send request to deduplicate the request
 
@@ -7,13 +8,28 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local LRUCache = require("LRUCache")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
-local LRUCache = require("LRUCache")
 
 local Aggregator = setmetatable({}, BaseObject)
 Aggregator.ClassName = "Aggregator"
 Aggregator.__index = Aggregator
+
+export type PromiseBulkQuery<T> = ({ number }) -> Promise.Promise<T>
+
+export type Aggregator<T> = typeof(setmetatable(
+	{} :: {
+		_debugName: string,
+		_promiseBatchQuery: ({ number }) -> Promise.Promise<T>,
+		_promisesLruCache: any,
+		_maxBatchSize: number,
+		_unsentCount: number,
+		_unsentPromises: { [number]: Promise.Promise<T> },
+	},
+	{} :: typeof({ __index = Aggregator })
+)) & BaseObject.BaseObject
 
 --[=[
 	Creates a new aggregator that aggregates promised results together
@@ -23,10 +39,10 @@ Aggregator.__index = Aggregator
 
 	@return Aggregator<T>
 ]=]
-function Aggregator.new(debugName: string, promiseBulkQuery)
+function Aggregator.new<T>(debugName: string, promiseBulkQuery: PromiseBulkQuery<T>): Aggregator<T>
 	assert(type(debugName) == "string", "Bad debugName")
 
-	local self = setmetatable(BaseObject.new(), Aggregator)
+	local self: Aggregator<T> = setmetatable(BaseObject.new() :: any, Aggregator)
 
 	self._debugName = debugName
 	self._promiseBatchQuery = assert(promiseBulkQuery, "No promiseBulkQuery")
@@ -44,7 +60,7 @@ end
 	Sets the max batch size
 	@param maxBatchSize number
 ]=]
-function Aggregator:SetMaxBatchSize(maxBatchSize: number)
+function Aggregator.SetMaxBatchSize<T>(self: Aggregator<T>, maxBatchSize: number): ()
 	assert(type(maxBatchSize) == "number", "Bad maxBatchSize")
 	assert(self._unsentCount == 0, "Cannot set while unsent values exist")
 
@@ -55,7 +71,7 @@ end
 	@param id number
 	@return Promise<T>
 ]=]
-function Aggregator:Promise(id)
+function Aggregator.Promise<T>(self: Aggregator<T>, id: number): Promise.Promise<T>
 	assert(type(id) == "number", "Bad id")
 
 	local found = self._promisesLruCache:get(id)
@@ -80,18 +96,18 @@ end
 	@param id number
 	@return Observable<T>
 ]=]
-function Aggregator:Observe(id)
+function Aggregator.Observe<T>(self: Aggregator<T>, id: number): Observable.Observable<T>
 	assert(type(id) == "number", "Bad id")
 
-	return Rx.fromPromise(self:Promise(id))
+	return Rx.fromPromise(self:Promise(id)) :: any
 end
 
-function Aggregator:_sendBatchedPromises(promiseMap)
+function Aggregator._sendBatchedPromises<T>(self: Aggregator<T>, promiseMap)
 	assert(promiseMap, "No promiseMap")
 
 	local idList = {}
 	local unresolvedMap = {}
-	for id, promise in pairs(promiseMap) do
+	for id, promise in promiseMap do
 		table.insert(idList, id)
 		unresolvedMap[id] = promise
 	end
@@ -102,33 +118,32 @@ function Aggregator:_sendBatchedPromises(promiseMap)
 
 	assert(#idList <= self._maxBatchSize, "Too many idList sent")
 
-	self._maid:GivePromise(self._promiseBatchQuery(idList))
-		:Then(function(result)
-			assert(type(result) == "table", "Bad result")
+	self._maid:GivePromise(self._promiseBatchQuery(idList)):Then(function(result)
+		assert(type(result) == "table", "Bad result")
 
-			for _, data in pairs(result) do
-				assert(type(data.Id) == "number", "Bad result[?].Id")
+		for _, data in result do
+			assert(type(data.Id) == "number", "Bad result[?].Id")
 
-				if unresolvedMap[data.Id] then
-					unresolvedMap[data.Id]:Resolve(data)
-					unresolvedMap[data.Id] = nil
-				end
+			if unresolvedMap[data.Id] then
+				unresolvedMap[data.Id]:Resolve(data)
+				unresolvedMap[data.Id] = nil
 			end
+		end
 
-			-- Reject other ones
-			for id, promise in pairs(unresolvedMap) do
-				promise:Reject(string.format("[Aggregator] %s failed to get result for id %d", self._debugName, id))
-			end
-		end, function(err, ...)
-			local text = string.format("[Aggregator] %s failed to get bulk result - %q", self._debugName, tostring(err))
+		-- Reject other ones
+		for id, promise in unresolvedMap do
+			promise:Reject(string.format("[Aggregator] %s failed to get result for id %d", self._debugName, id))
+		end
+	end, function(err, ...)
+		local text = string.format("[Aggregator] %s failed to get bulk result - %q", self._debugName, tostring(err))
 
-			for _, item in pairs(unresolvedMap) do
-				item:Reject(text, ...)
-			end
-		end)
+		for _, item in unresolvedMap do
+			item:Reject(text, ...)
+		end
+	end)
 end
 
-function Aggregator:_resetQueue()
+function Aggregator._resetQueue<T>(self: Aggregator<T>)
 	local promiseMap = self._unsentPromises
 
 	self._maid._queue = nil
@@ -138,7 +153,7 @@ function Aggregator:_resetQueue()
 	return promiseMap
 end
 
-function Aggregator:_queueBatchRequests()
+function Aggregator._queueBatchRequests<T>(self: Aggregator<T>): ()
 	if self._unsentCount >= self._maxBatchSize then
 		self:_sendBatchedPromises(self:_resetQueue())
 		return

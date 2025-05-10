@@ -10,7 +10,7 @@ local RxR15Utils = require("RxR15Utils")
 
 local ArmIKUtils = {}
 
-function ArmIKUtils.ensureMotorAnimated(character, armName)
+function ArmIKUtils.ensureMotorAnimated(character: Model, armName)
 	local topMaid = Maid.new()
 
 	local function disable(brio)
@@ -27,9 +27,15 @@ function ArmIKUtils.ensureMotorAnimated(character, armName)
 		end)
 	end
 
-	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, armName .. "UpperArm", armName .. "Shoulder"):Subscribe(disable))
-	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, armName .. "LowerArm", armName .. "Elbow"):Subscribe(disable))
-	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, armName .. "Hand", armName .."Wrist"):Subscribe(disable))
+	topMaid:GiveTask(
+		RxR15Utils.observeRigMotorBrio(character, armName .. "UpperArm", armName .. "Shoulder"):Subscribe(disable)
+	)
+	topMaid:GiveTask(
+		RxR15Utils.observeRigMotorBrio(character, armName .. "LowerArm", armName .. "Elbow"):Subscribe(disable)
+	)
+	topMaid:GiveTask(
+		RxR15Utils.observeRigMotorBrio(character, armName .. "Hand", armName .. "Wrist"):Subscribe(disable)
+	)
 
 	return topMaid
 end

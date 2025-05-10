@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local CharacterUtils = require("CharacterUtils")
 local EnumUtils = require("EnumUtils")
@@ -24,106 +24,114 @@ local Spring = require("Spring")
 
 local RagdollMotorUtils = {}
 
-local R6_MOTORS = {
-	{
-		partName = "Torso";
-		motorName = "Root";
-		isRootJoint = true;
-	};
-	{
-		partName = "Torso";
-		motorName = "Neck";
-	};
-	{
-		partName = "Torso";
-		motorName = "Left Shoulder";
-	};
-	{
-		partName = "Torso";
-		motorName = "Right Shoulder";
-	};
-	{
-		partName = "Torso";
-		motorName = "Left Hip";
-	};
-	{
-		partName = "Torso";
-		motorName = "Right Hip";
-	};
+type MotorData = {
+	partName: string,
+	motorName: string,
+	isRootJoint: boolean?,
 }
 
-local R15_MOTORS = {
+type MotorDataList = { MotorData }
+
+local R6_MOTORS: MotorDataList = {
 	{
-		partName = "LowerTorso";
-		motorName = "Root";
-		isRootJoint = true;
-	};
+		partName = "Torso",
+		motorName = "Root",
+		isRootJoint = true,
+	},
 	{
-		partName = "UpperTorso";
-		motorName = "Waist";
-	};
+		partName = "Torso",
+		motorName = "Neck",
+	},
 	{
-		partName = "Head";
-		motorName = "Neck";
-	};
+		partName = "Torso",
+		motorName = "Left Shoulder",
+	},
 	{
-		partName = "LeftUpperArm";
-		motorName = "LeftShoulder";
-	};
+		partName = "Torso",
+		motorName = "Right Shoulder",
+	},
 	{
-		partName = "LeftLowerArm";
-		motorName = "LeftElbow";
-	};
+		partName = "Torso",
+		motorName = "Left Hip",
+	},
 	{
-		partName = "LeftHand";
-		motorName = "LeftWrist";
-	};
+		partName = "Torso",
+		motorName = "Right Hip",
+	},
+}
+
+local R15_MOTORS: MotorDataList = {
 	{
-		partName = "RightUpperArm";
-		motorName = "RightShoulder";
-	};
+		partName = "LowerTorso",
+		motorName = "Root",
+		isRootJoint = true,
+	},
 	{
-		partName = "RightLowerArm";
-		motorName = "RightElbow";
-	};
+		partName = "UpperTorso",
+		motorName = "Waist",
+	},
 	{
-		partName = "RightHand";
-		motorName = "RightWrist";
-	};
+		partName = "Head",
+		motorName = "Neck",
+	},
 	{
-		partName = "LeftUpperLeg";
-		motorName = "LeftHip";
-	};
+		partName = "LeftUpperArm",
+		motorName = "LeftShoulder",
+	},
 	{
-		partName = "LeftLowerLeg";
-		motorName = "LeftKnee";
-	};
+		partName = "LeftLowerArm",
+		motorName = "LeftElbow",
+	},
 	{
-		partName = "LeftFoot";
-		motorName = "LeftAnkle";
-	};
+		partName = "LeftHand",
+		motorName = "LeftWrist",
+	},
 	{
-		partName = "RightUpperLeg";
-		motorName = "RightHip";
-	};
+		partName = "RightUpperArm",
+		motorName = "RightShoulder",
+	},
 	{
-		partName = "RightLowerLeg";
-		motorName = "RightKnee";
-	};
+		partName = "RightLowerArm",
+		motorName = "RightElbow",
+	},
 	{
-		partName = "RightFoot";
-		motorName = "RightAnkle";
-	};
+		partName = "RightHand",
+		motorName = "RightWrist",
+	},
+	{
+		partName = "LeftUpperLeg",
+		motorName = "LeftHip",
+	},
+	{
+		partName = "LeftLowerLeg",
+		motorName = "LeftKnee",
+	},
+	{
+		partName = "LeftFoot",
+		motorName = "LeftAnkle",
+	},
+	{
+		partName = "RightUpperLeg",
+		motorName = "RightHip",
+	},
+	{
+		partName = "RightLowerLeg",
+		motorName = "RightKnee",
+	},
+	{
+		partName = "RightFoot",
+		motorName = "RightAnkle",
+	},
 }
 
 local ROOT_JOINT_CACHE = {}
 
-function RagdollMotorUtils.getFirstRootJointData(rigType)
+function RagdollMotorUtils.getFirstRootJointData(rigType: Enum.HumanoidRigType): MotorData
 	if ROOT_JOINT_CACHE[rigType] then
 		return ROOT_JOINT_CACHE[rigType]
 	end
 
-	for _, item in pairs(RagdollMotorUtils.getMotorData(rigType)) do
+	for _, item in RagdollMotorUtils.getMotorData(rigType) do
 		if item.isRootJoint then
 			ROOT_JOINT_CACHE[rigType] = item
 			return item
@@ -133,7 +141,7 @@ function RagdollMotorUtils.getFirstRootJointData(rigType)
 	error("Could not find root joint data")
 end
 
-function RagdollMotorUtils.getMotorData(rigType)
+function RagdollMotorUtils.getMotorData(rigType: Enum.HumanoidRigType): MotorDataList
 	if rigType == Enum.HumanoidRigType.R15 then
 		return R15_MOTORS
 	elseif rigType == Enum.HumanoidRigType.R6 then
@@ -143,11 +151,11 @@ function RagdollMotorUtils.getMotorData(rigType)
 	end
 end
 
-function RagdollMotorUtils.initMotorAttributes(character, rigType)
+function RagdollMotorUtils.initMotorAttributes(character, rigType: Enum.HumanoidRigType)
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
-	for _, data in pairs(RagdollMotorUtils.getMotorData(rigType)) do
+	for _, data in RagdollMotorUtils.getMotorData(rigType) do
 		local motor = R15Utils.getRigMotor(character, data.partName, data.motorName)
 		if motor then
 			RagdollMotorData:InitAttributes(motor)
@@ -155,7 +163,7 @@ function RagdollMotorUtils.initMotorAttributes(character, rigType)
 	end
 end
 
-function RagdollMotorUtils.setupAnimatedMotor(character, part)
+function RagdollMotorUtils.setupAnimatedMotor(character: Model, part: BasePart)
 	local maid = Maid.new()
 
 	-- make this stuff not physics collide with our own rig
@@ -165,7 +173,7 @@ function RagdollMotorUtils.setupAnimatedMotor(character, part)
 	return maid
 end
 
-function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
+function RagdollMotorUtils.setupRagdollRootPartMotor(motor: Motor6D, part0, part1)
 	local maid = Maid.new()
 
 	local ragdollMotorData = RagdollMotorData:Create(motor)
@@ -193,18 +201,18 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 
 		-- Inserted C1/C0 here
 		weldMaid:GiveTask(Rx.combineLatest({
-			C0 = RxInstanceUtils.observeProperty(motor, "C0");
-			Transform = RxInstanceUtils.observeProperty(transformValue, "Value");
+			C0 = RxInstanceUtils.observeProperty(motor, "C0"),
+			Transform = RxInstanceUtils.observeProperty(transformValue, "Value"),
 		}):Subscribe(function(innerState)
 			weld.C0 = innerState.C0 * innerState.Transform
 		end))
 
-		if weld:IsA("Motor6D") then
-			-- Suppress animations on any weld connection
-			weldMaid:GiveTask(RunService.Stepped:Connect(function()
-				weld.Transform = CFrame.new()
-			end))
-		end
+		-- if weld:IsA("Motor6D") then
+		-- 	-- Suppress animations on any weld connection
+		-- 	weldMaid:GiveTask(RunService.Stepped:Connect(function()
+		-- 		weld.Transform = CFrame.new()
+		-- 	end))
+		-- end
 
 		weldMaid:GiveTask(RxInstanceUtils.observeProperty(motor, "C1"):Subscribe(function(c1)
 			weld.C1 = c1
@@ -225,19 +233,18 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 		maid._weld = setupWeld("Weld")
 	end
 
-	maid:GiveTask(ragdollMotorData.RagdollSpringReturnSpeed:Observe()
-		:Subscribe(function(speed)
-			lastTransformSpring.s = speed
-		end))
+	maid:GiveTask(ragdollMotorData.RagdollSpringReturnSpeed:Observe():Subscribe(function(speed)
+		lastTransformSpring.s = speed
+	end))
 
 	-- Lerp smoothly to 0 to avoid jarring camera.
-	maid:GiveTask(RunService.Stepped:Connect(function()
-		local target = QFrame.toCFrame(lastTransformSpring.p)
-		if target then
-			transformValue.Value = target
-			motor.Transform = target
-		end
-	end))
+	-- maid:GiveTask(RunService.Stepped:Connect(function()
+	-- 	local target = QFrame.toCFrame(lastTransformSpring.p)
+	-- 	if target then
+	-- 		transformValue.Value = target
+	-- 		motor.Transform = target
+	-- 	end
+	-- end))
 
 	motor.Enabled = false
 
@@ -248,7 +255,7 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 	return maid
 end
 
-function RagdollMotorUtils.setupRagdollMotor(motor, part0, part1)
+function RagdollMotorUtils.setupRagdollMotor(motor: Motor6D, part0: BasePart, part1: BasePart)
 	local maid = Maid.new()
 
 	motor.Enabled = false
@@ -256,7 +263,7 @@ function RagdollMotorUtils.setupRagdollMotor(motor, part0, part1)
 		local implemention = Motor6DStackInterface:FindFirstImplementation(motor)
 		if implemention then
 			local ragdollMotorData = RagdollMotorData:Create(motor)
-			local initialTransform = (part0.CFrame * motor.C0):toObjectSpace(part1.CFrame * motor.C1)
+			local initialTransform = (part0.CFrame * motor.C0):ToObjectSpace(part1.CFrame * motor.C1)
 			local speed = ragdollMotorData.RagdollSpringReturnSpeed.Value
 
 			implemention:TransformFromCFrame(initialTransform, speed)
@@ -272,7 +279,7 @@ function RagdollMotorUtils.setupRagdollMotor(motor, part0, part1)
 	return maid
 end
 
-function RagdollMotorUtils.suppressJustRootPart(character, rigType)
+function RagdollMotorUtils.suppressJustRootPart(character: Model, rigType: Enum.HumanoidRigType)
 	local data = RagdollMotorUtils.getFirstRootJointData(rigType)
 
 	local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName):Pipe({
@@ -280,12 +287,12 @@ function RagdollMotorUtils.suppressJustRootPart(character, rigType)
 			local ragdollMotorData = RagdollMotorData:Create(motor)
 
 			return Rx.combineLatest({
-				motor = motor;
-				part0 = RxInstanceUtils.observeProperty(motor, "Part0");
-				part1 = RxInstanceUtils.observeProperty(motor, "Part1");
-				isAnimated = ragdollMotorData.IsMotorAnimated:Observe();
+				motor = motor,
+				part0 = RxInstanceUtils.observeProperty(motor, "Part0"),
+				part1 = RxInstanceUtils.observeProperty(motor, "Part1"),
+				isAnimated = ragdollMotorData.IsMotorAnimated:Observe(),
 			})
-		end);
+		end),
 	})
 
 	local topMaid = Maid.new()
@@ -312,24 +319,24 @@ function RagdollMotorUtils.suppressJustRootPart(character, rigType)
 	return topMaid
 end
 
-function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
+function RagdollMotorUtils.suppressMotors(character: Model, rigType: Enum.HumanoidRigType, velocityReadings)
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
 	local topMaid = Maid.new()
 
-	for _, data in pairs(RagdollMotorUtils.getMotorData(rigType)) do
+	for _, data in RagdollMotorUtils.getMotorData(rigType) do
 		local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName):Pipe({
 			RxBrioUtils.switchMapBrio(function(motor)
 				local ragdollMotorData = RagdollMotorData:Create(motor)
 
 				return RxBrioUtils.flatCombineLatest({
-					motor = motor;
-					part0 = RxInstanceUtils.observeProperty(motor, "Part0");
-					part1 = RxInstanceUtils.observeProperty(motor, "Part1");
-					isAnimated = ragdollMotorData.IsMotorAnimated:Observe();
+					motor = motor,
+					part0 = RxInstanceUtils.observeProperty(motor, "Part0"),
+					part1 = RxInstanceUtils.observeProperty(motor, "Part1"),
+					isAnimated = ragdollMotorData.IsMotorAnimated:Observe(),
 				})
-			end);
+			end),
 		})
 
 		topMaid:GiveTask(observable:Subscribe(function(brio)
@@ -348,7 +355,8 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 				motorMaid._current = RagdollMotorUtils.setupAnimatedMotor(character, state.part1)
 			else
 				if data.isRootJoint then
-					motorMaid._current = RagdollMotorUtils.setupRagdollRootPartMotor(state.motor, state.part0, state.part1)
+					motorMaid._current =
+						RagdollMotorUtils.setupRagdollRootPartMotor(state.motor, state.part0, state.part1)
 				else
 					motorMaid._current = RagdollMotorUtils.setupRagdollMotor(state.motor, state.part0, state.part1)
 				end
@@ -362,12 +370,12 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 						if passed <= 0.1 then
 							local rotVelocity = velocityReadings.rotation[data]
 							if rotVelocity then
-								state.part1.RotVelocity += rotVelocity
+								state.part1.AssemblyAngularVelocity += rotVelocity
 							end
 
 							local velocity = velocityReadings.linear[data]
 							if velocity then
-								state.part1.Velocity += velocity
+								state.part1.AssemblyLinearVelocity += velocity
 							end
 						end
 					end)
@@ -379,7 +387,7 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 	return topMaid
 end
 
-function RagdollMotorUtils.guessIfNetworkOwner(part)
+function RagdollMotorUtils.guessIfNetworkOwner(part: BasePart): boolean
 	local currentNetworkOwner
 	local expectedNetworkOwner = Players.LocalPlayer
 
@@ -398,29 +406,29 @@ function RagdollMotorUtils.guessIfNetworkOwner(part)
 	return CharacterUtils.getPlayerFromCharacter(part) == expectedNetworkOwner
 end
 
-function RagdollMotorUtils.promiseVelocityRecordings(character, rigType)
+function RagdollMotorUtils.promiseVelocityRecordings(character: Model, rigType: Enum.HumanoidRigType)
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
 	local parts = {}
 
 	local rootPart = character:FindFirstChild("HumanoidRootPart")
-	if not rootPart then
+	if rootPart == nil or not rootPart:IsA("BasePart") then
 		return Promise.rejected("No humanoid root part")
 	end
 
 	local initialRootPartCFrame = rootPart.CFrame
-	for _, data in pairs(RagdollMotorUtils.getMotorData(rigType)) do
+	for _, data in RagdollMotorUtils.getMotorData(rigType) do
 		local motor = R15Utils.getRigMotor(character, data.partName, data.motorName)
 		if motor then
 			local part0 = motor.Part0
 			local part1 = motor.Part1
 			if part0 and part1 then
 				parts[data] = {
-					motor = motor;
-					part0 = part0;
-					part1 = part1;
-					relCFrame = initialRootPartCFrame:toObjectSpace(part1.CFrame);
+					motor = motor,
+					part0 = part0,
+					part1 = part1,
+					relCFrame = initialRootPartCFrame:ToObjectSpace(part1.CFrame),
 				}
 			end
 		end
@@ -434,26 +442,26 @@ function RagdollMotorUtils.promiseVelocityRecordings(character, rigType)
 		local newRootPartCFrame = rootPart.CFrame
 
 		local result = {
-			readingTimePhysics = time();
-			linear = {};
-			rotation = {};
+			readingTimePhysics = time(),
+			linear = {},
+			rotation = {},
 		}
 
-		for data, info in pairs(parts) do
+		for data, info in parts do
 			local motor = R15Utils.getRigMotor(character, data.partName, data.motorName)
 
 			-- Validate all the same
-			if info.motor == motor and info.part0 == motor.Part0 and info.part1 == motor.Part1 then
-				local linear = newRootPartCFrame:pointToObjectSpace(info.part1.Position) - info.relCFrame.p
-				result.linear[data] = newRootPartCFrame:vectorToWorldSpace(linear/dt)
+			if motor ~= nil and info.motor == motor and info.part0 == motor.Part0 and info.part1 == motor.Part1 then
+				local linear = newRootPartCFrame:PointToObjectSpace(info.part1.Position) - info.relCFrame.Position
+				result.linear[data] = newRootPartCFrame:VectorToWorldSpace(linear / dt)
 
-				local change = info.relCFrame:toObjectSpace(newRootPartCFrame:toObjectSpace(info.part1.CFrame))
+				local change = info.relCFrame:ToObjectSpace(newRootPartCFrame:ToObjectSpace(info.part1.CFrame))
 
 				-- assume that we're XYZ ordered
 				local x, y, z = change:ToEulerAnglesXYZ()
 
-				local vector = newRootPartCFrame:vectorToWorldSpace(Vector3.new(x, y, z))
-				result.rotation[data] = vector/dt
+				local vector = newRootPartCFrame:VectorToWorldSpace(Vector3.new(x, y, z))
+				result.rotation[data] = vector / dt
 			end
 		end
 

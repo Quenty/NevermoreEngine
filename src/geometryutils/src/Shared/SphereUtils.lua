@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving spheres
 	@class SphereUtils
@@ -15,19 +16,21 @@ local SphereUtils = {}
 	@return boolean
 ]=]
 function SphereUtils.intersectsRay(
-	sphereCenter, sphereRadius,
-	rayOrigin, rayDirection
-)
+	sphereCenter: Vector3,
+	sphereRadius: number,
+	rayOrigin: Vector3,
+	rayDirection: Vector3
+): boolean
 	local relOrigin = rayOrigin - sphereCenter
 	local rr = relOrigin:Dot(relOrigin)
 	local dr = rayDirection:Dot(relOrigin)
 	local dd = rayDirection:Dot(rayDirection)
 
-	local passTime = -dr/dd
-	local passDist2 = rr - dr*dr/dd
+	local passTime = -dr / dd
+	local passDist2 = rr - dr * dr / dd
 
-	if passDist2 <= sphereRadius*sphereRadius then
-		local offset = math.sqrt((sphereRadius*sphereRadius - passDist2)/dd)
+	if passDist2 <= sphereRadius * sphereRadius then
+		local offset = math.sqrt((sphereRadius * sphereRadius - passDist2) / dd)
 		local t0 = passTime - offset
 		local t1 = passTime + offset
 

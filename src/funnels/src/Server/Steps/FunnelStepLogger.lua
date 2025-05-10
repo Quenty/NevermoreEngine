@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Server-side funnel logger
 
@@ -16,11 +17,22 @@ local FunnelStepLogger = setmetatable({}, BaseObject)
 FunnelStepLogger.ClassName = "FunnelStepLogger"
 FunnelStepLogger.__index = FunnelStepLogger
 
-function FunnelStepLogger.new(player, funnelName)
-	local self = setmetatable(BaseObject.new(), FunnelStepLogger)
+export type FunnelStepLogger = typeof(setmetatable(
+	{} :: {
+		_player: Player,
+		_stepTracker: FunnelStepTracker.FunnelStepTracker,
+		_funnelName: string,
+		_funnelSessionId: string,
+		_printDebugEnabled: boolean,
+	},
+	{} :: typeof({ __index = FunnelStepLogger })
+)) & BaseObject.BaseObject
+
+function FunnelStepLogger.new(player: Player, funnelName: string): FunnelStepLogger
+	local self: any = setmetatable(BaseObject.new() :: any, FunnelStepLogger)
 
 	self._player = assert(player, "No player")
-	self._stepTracker = self._maid:Add(FunnelStepTracker.new())
+	self._stepTracker = self._maid:Add(FunnelStepTracker.new() :: any)
 	self._funnelName = assert(funnelName, "Bad funnelName")
 	self._funnelSessionId = HttpService:GenerateGUID(false)
 	self._printDebugEnabled = false
@@ -29,7 +41,7 @@ function FunnelStepLogger.new(player, funnelName)
 	if next(steps) then
 		-- Give us time to print if we need
 		self._maid:GiveTask(task.defer(function()
-			for stepNumber, stepName in pairs(steps) do
+			for stepNumber, stepName in steps do
 				self:_sendStep(stepNumber, stepName)
 			end
 		end))
@@ -42,24 +54,24 @@ function FunnelStepLogger.new(player, funnelName)
 	return self
 end
 
-function FunnelStepLogger:SetPrintDebugEnabled(debugEnabled)
+function FunnelStepLogger.SetPrintDebugEnabled(self: FunnelStepLogger, debugEnabled: boolean)
 	assert(type(debugEnabled) == "boolean", "Bad debugEnabled")
 
 	self._printDebugEnabled = debugEnabled
 end
 
-function FunnelStepLogger:LogStep(stepNumber, stepName)
+function FunnelStepLogger.LogStep(self: FunnelStepLogger, stepNumber: number, stepName: string)
 	assert(type(stepNumber) == "number", "Bad stepNumber")
 	assert(type(stepName) == "string", "Bad stepName")
 
 	self._stepTracker:LogStep(stepNumber, stepName)
 end
 
-function FunnelStepLogger:IsStepComplete(stepNumber)
+function FunnelStepLogger.IsStepComplete(self: FunnelStepLogger, stepNumber: number): boolean
 	return self._stepTracker:IsStepComplete(stepNumber)
 end
 
-function FunnelStepLogger:_sendStep(stepNumber, stepName)
+function FunnelStepLogger._sendStep(self: FunnelStepLogger, stepNumber: number, stepName: string)
 	AnalyticsService:LogFunnelStepEvent(self._player, self._funnelName, self._funnelSessionId, stepNumber, stepName)
 
 	if self._printDebugEnabled then

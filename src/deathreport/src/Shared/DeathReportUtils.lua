@@ -18,14 +18,29 @@ local DeathReportUtils = {}
 	@param weaponData WeaponData
 	@return DeathReport
 ]=]
-function DeathReportUtils.fromDeceasedHumanoid(humanoid, weaponData)
+function DeathReportUtils.fromDeceasedHumanoid(humanoid: Humanoid, weaponData: WeaponData?)
 	assert(DeathReportUtils.isWeaponData(weaponData) or weaponData == nil, "Bad weaponData")
 
 	local killerHumanoid = HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid)
-	return DeathReportUtils.create(humanoid.Parent, killerHumanoid, weaponData)
+	local character = humanoid.Parent
+	return DeathReportUtils.create(character, killerHumanoid, weaponData)
 end
 
-function DeathReportUtils.create(adornee, killerAdornee, weaponData)
+export type WeaponData = {
+	weaponInstance: Instance?,
+}
+export type DeathReport = {
+	type: "deathReport",
+	adornee: Instance,
+	humanoid: Humanoid?,
+	player: Player?,
+	killerAdornee: Instance?,
+	killerHumanoid: Humanoid?,
+	killerPlayer: Player?,
+	weaponData: WeaponData,
+}
+
+function DeathReportUtils.create(adornee: Instance, killerAdornee: Instance?, weaponData: WeaponData?): DeathReport
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local humanoid
@@ -36,14 +51,14 @@ function DeathReportUtils.create(adornee, killerAdornee, weaponData)
 	end
 
 	return {
-		type = "deathReport";
-		adornee = adornee;
-		humanoid = humanoid;
-		player = CharacterUtils.getPlayerFromCharacter(adornee);
-		killerAdornee = killerAdornee;
-		killerHumanoid = killerAdornee and killerAdornee:IsA("Humanoid") and killerAdornee or nil;
-		killerPlayer = killerAdornee and CharacterUtils.getPlayerFromCharacter(killerAdornee) or nil;
-		weaponData = weaponData or DeathReportUtils.createWeaponData(nil);
+		type = "deathReport",
+		adornee = adornee,
+		humanoid = humanoid,
+		player = CharacterUtils.getPlayerFromCharacter(adornee),
+		killerAdornee = killerAdornee,
+		killerHumanoid = killerAdornee and killerAdornee:IsA("Humanoid") and killerAdornee or nil,
+		killerPlayer = killerAdornee and CharacterUtils.getPlayerFromCharacter(killerAdornee) or nil,
+		weaponData = weaponData or DeathReportUtils.createWeaponData(nil),
 	}
 end
 
@@ -53,9 +68,8 @@ end
 	@param deathReport any
 	@return boolean
 ]=]
-function DeathReportUtils.isDeathReport(deathReport)
-	return type(deathReport) == "table"
-		and deathReport.type == "deathReport"
+function DeathReportUtils.isDeathReport(deathReport: any): boolean
+	return type(deathReport) == "table" and deathReport.type == "deathReport"
 end
 
 --[=[
@@ -64,8 +78,9 @@ end
 	@param weaponData any
 	@return boolean
 ]=]
-function DeathReportUtils.isWeaponData(weaponData)
-	return type(weaponData) == "table" and (typeof(weaponData.weaponInstance) == "Instance" or weaponData.weaponInstance == nil)
+function DeathReportUtils.isWeaponData(weaponData): boolean
+	return type(weaponData) == "table"
+		and (typeof(weaponData.weaponInstance) == "Instance" or weaponData.weaponInstance == nil)
 end
 
 --[=[
@@ -74,11 +89,11 @@ end
 	@param weaponInstance Instance?
 	@return WeaponData
 ]=]
-function DeathReportUtils.createWeaponData(weaponInstance)
+function DeathReportUtils.createWeaponData(weaponInstance: Instance?): WeaponData
 	assert(typeof(weaponInstance) == "Instance" or weaponInstance == nil, "Bad weaponInstance")
 
 	return {
-		weaponInstance = weaponInstance;
+		weaponInstance = weaponInstance,
 	}
 end
 
@@ -88,7 +103,7 @@ end
 	@param deathReport DeathReport
 	@return string
 ]=]
-function DeathReportUtils.getDeadDisplayName(deathReport)
+function DeathReportUtils.getDeadDisplayName(deathReport: DeathReport): string?
 	if deathReport.player then
 		return deathReport.player.DisplayName
 	elseif deathReport.humanoid then
@@ -113,7 +128,7 @@ end
 	@param player Player
 	@return string
 ]=]
-function DeathReportUtils.involvesPlayer(deathReport, player)
+function DeathReportUtils.involvesPlayer(deathReport: DeathReport, player: Player): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return (deathReport.player == player) or (deathReport.killerPlayer == player)
@@ -125,7 +140,7 @@ end
 	@param deathReport DeathReport
 	@return string?
 ]=]
-function DeathReportUtils.getKillerDisplayName(deathReport)
+function DeathReportUtils.getKillerDisplayName(deathReport: DeathReport): string?
 	if deathReport.killerPlayer then
 		assert(deathReport.killerPlayer:IsA("Player"), "Bad player")
 		return deathReport.killerPlayer.DisplayName
@@ -148,7 +163,7 @@ end
 	@param deathReport DeathReport
 	@return Color3?
 ]=]
-function DeathReportUtils.getDeadColor(deathReport)
+function DeathReportUtils.getDeadColor(deathReport: DeathReport): Color3?
 	if deathReport.player then
 		local team = deathReport.player.Team
 		if team then
@@ -165,7 +180,7 @@ end
 	@param deathReport DeathReport
 	@return Color3?
 ]=]
-function DeathReportUtils.getKillerColor(deathReport)
+function DeathReportUtils.getKillerColor(deathReport: DeathReport): Color3?
 	if deathReport.killerPlayer then
 		local team = deathReport.killerPlayer.Team
 		if team then
@@ -180,7 +195,7 @@ end
 	Gets the default color of a death report to use.
 	@return Color3
 ]=]
-function DeathReportUtils.getDefaultColor()
+function DeathReportUtils.getDefaultColor(): Color3
 	return DEFAULT_COLOR
 end
 

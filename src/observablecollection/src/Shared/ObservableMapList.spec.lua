@@ -2,23 +2,27 @@
 	@class ObservableMapList.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
+local Jest = require("Jest")
 local ObservableMapList = require("ObservableMapList")
 
-return function()
-	describe("ObservableMapList.new()", function()
-		local observableMapList = ObservableMapList.new()
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
 
-		it("should return nil for unset values", function()
-			expect(observableMapList:GetAtListIndex("dragon", 1)).to.equal(nil)
-		end)
+describe("ObservableMapList.new()", function()
+	local observableMapList = ObservableMapList.new()
 
-		it("should allow additions", function()
-			observableMapList:Add("hello", "dragon")
-			expect(observableMapList:GetAtListIndex("dragon", 1)).to.equal("hello")
-			expect(observableMapList:GetAtListIndex("dragon", -1)).to.equal("hello")
-			expect(observableMapList:GetAtListIndex("fire", 1)).to.equal(nil)
-		end)
+	it("should return nil for unset values", function()
+		expect(observableMapList:GetAtListIndex("dragon", 1)).toEqual(nil)
 	end)
-end
+
+	it("should allow additions", function()
+		observableMapList:Push("hello", "dragon")
+		expect(observableMapList:GetAtListIndex("hello", 1)).toEqual("dragon")
+		expect(observableMapList:GetAtListIndex("hello", -1)).toEqual("dragon")
+		expect(observableMapList:GetAtListIndex("fire", 1)).toEqual(nil)
+	end)
+end)

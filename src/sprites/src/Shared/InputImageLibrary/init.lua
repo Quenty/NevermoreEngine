@@ -29,22 +29,22 @@ end
 
 	@return { string }
 ]=]
-function InputImageLibrary:GetPreloadAssetIds()
+function InputImageLibrary:GetPreloadAssetIds(): { string }
 	local assets = {}
-	for _, platformSheets in pairs(self._spritesheets) do
-		for _, sheet in pairs(platformSheets) do
+	for _, platformSheets in self._spritesheets do
+		for _, sheet in platformSheets do
 			table.insert(assets, sheet:GetPreloadAssetId())
 		end
 	end
 	return assets
 end
 
-function InputImageLibrary:_loadSpriteSheets(parentFolder)
+function InputImageLibrary:_loadSpriteSheets(parentFolder: Instance)
 	assert(typeof(parentFolder) == "Instance", "Bad parentFolder")
 
-	for _, platform in pairs(parentFolder:GetChildren()) do
+	for _, platform in parentFolder:GetChildren() do
 		self._spritesheets[platform.Name] = {}
-		for _, style in pairs(platform:GetChildren()) do
+		for _, style in platform:GetChildren() do
 			if style:IsA("ModuleScript") then
 				self._spritesheets[platform.Name][style.Name] = require(style).new()
 			end
@@ -56,11 +56,11 @@ end
 	Retrieves a sprite from the library
 
 	@param keyCode any -- The sprite keyCode to get
-	@param preferredStyle string -- The preferred style type to retrieve this in
-	@param preferredPlatform string -- The preferred platform to get the sprite for
+	@param preferredStyle string? -- The preferred style type to retrieve this in
+	@param preferredPlatform string? -- The preferred platform to get the sprite for
 	@return Sprite
 ]=]
-function InputImageLibrary:GetSprite(keyCode, preferredStyle, preferredPlatform)
+function InputImageLibrary:GetSprite(keyCode, preferredStyle: string?, preferredPlatform: string?)
 	assert(keyCode ~= nil, "Bad keyCode")
 	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
 	assert(type(preferredPlatform) == "string" or preferredPlatform == nil, "Bad preferredPlatform")
@@ -83,11 +83,11 @@ end
 
 	@param gui ImageLabel | ImageButton
 	@param keyCode any -- The sprite keyCode to get
-	@param preferredStyle string -- The preferred style type to retrieve this in
-	@param preferredPlatform string -- The preferred platform to get the sprite for
+	@param preferredStyle string? -- The preferred style type to retrieve this in
+	@param preferredPlatform string? -- The preferred platform to get the sprite for
 	@return Sprite
 ]=]
-function InputImageLibrary:StyleImage(gui, keyCode, preferredStyle, preferredPlatform)
+function InputImageLibrary:StyleImage(gui, keyCode, preferredStyle: string?, preferredPlatform: string?)
 	assert(typeof(gui) == "Instance" and (gui:IsA("ImageLabel") or gui:IsA("ImageButton")), "Bad gui")
 	assert(keyCode ~= nil, "Bad keyCode")
 	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
@@ -118,7 +118,7 @@ function InputImageLibrary:_getDefaultPreferredPlatform()
 	end
 end
 
-function InputImageLibrary:GetScaledImageLabel(keyCode, preferredStyle, preferredPlatform)
+function InputImageLibrary:GetScaledImageLabel(keyCode, preferredStyle: string?, preferredPlatform: string?)
 	assert(keyCode ~= nil, "Bad keyCode")
 	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
 	assert(type(preferredPlatform) == "string" or preferredPlatform == nil, "Bad preferredPlatform")
@@ -129,7 +129,7 @@ function InputImageLibrary:GetScaledImageLabel(keyCode, preferredStyle, preferre
 	end
 
 	local size = image.Size
-	local ratio = size.Y.Offset/size.X.Offset
+	local ratio = size.Y.Offset / size.X.Offset
 
 	local uiAspectRatio = Instance.new("UIAspectRatioConstraint")
 	uiAspectRatio.DominantAxis = Enum.DominantAxis.Height
@@ -141,7 +141,7 @@ function InputImageLibrary:GetScaledImageLabel(keyCode, preferredStyle, preferre
 	return image
 end
 
-function InputImageLibrary:PickSheet(keyCode, preferredStyle, preferredPlatform)
+function InputImageLibrary:PickSheet(keyCode, preferredStyle: string?, preferredPlatform: string?)
 	assert(keyCode ~= nil, "Bad keyCode")
 	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
 	assert(type(preferredPlatform) == "string" or preferredPlatform == nil, "Bad preferredPlatform")
@@ -153,11 +153,13 @@ function InputImageLibrary:PickSheet(keyCode, preferredStyle, preferredPlatform)
 		end
 
 		-- otherwise search (yes, we double hit a sheet)
-		for _, sheet in pairs(platformSheets) do
+		for _, sheet in platformSheets do
 			if sheet:HasSprite(keyCode) then
 				return sheet
 			end
 		end
+
+		return nil
 	end
 
 	preferredPlatform = preferredPlatform or self:_getDefaultPreferredPlatform()
@@ -171,7 +173,7 @@ function InputImageLibrary:PickSheet(keyCode, preferredStyle, preferredPlatform)
 	end
 
 	-- otherwise search (repeats preferred :/ )
-	for _, platformSheets in pairs(self._spritesheets) do
+	for _, platformSheets in self._spritesheets do
 		local foundSheet = findSheet(platformSheets)
 		if foundSheet then
 			return foundSheet
@@ -184,7 +186,6 @@ function InputImageLibrary:PickSheet(keyCode, preferredStyle, preferredPlatform)
 
 	return nil
 end
-
 
 function InputImageLibrary:_getImageInstance(instanceType, keyCode, preferredStyle, preferredPlatform)
 	assert(type(instanceType) == "string", "Bad instanceType")

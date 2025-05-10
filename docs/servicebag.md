@@ -187,7 +187,7 @@ something like this:
 ```lua
 local OtherService = require("OtherService")
 
-function ServiceName:Init(serviceBag)
+function ServiceName:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

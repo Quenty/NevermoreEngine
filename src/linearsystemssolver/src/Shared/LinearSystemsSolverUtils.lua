@@ -51,13 +51,13 @@ function LinearSystemsSolverUtils.solve(mutSystem, mutOutput)
 		local iRow = mutSystem[i]
 		for j = i + 1, n do
 			local jRow = mutSystem[j]
-			local ratio = jRow[i]/iRow[i]
+			local ratio = jRow[i] / iRow[i]
 			jRow[i] = 0
 
 			if ratio ~= 0 then -- optimization
-				mutOutput[j] = mutOutput[j] - ratio*mutOutput[i]
+				mutOutput[j] = mutOutput[j] - ratio * mutOutput[i]
 				for k = i + 1, n do
-					jRow[k] = jRow[k] - ratio*iRow[k]
+					jRow[k] = jRow[k] - ratio * iRow[k]
 				end
 			end
 		end
@@ -71,10 +71,10 @@ function LinearSystemsSolverUtils.solve(mutSystem, mutOutput)
 		local b = 0
 
 		for j = i + 1, n do
-			b = b + iRow[j]*solution[j]
+			b = b + iRow[j] * solution[j]
 		end
 
-		local x = (y - b)/m
+		local x = (y - b) / m
 		solution[i] = x == x and x or 0
 	end
 
@@ -85,10 +85,10 @@ end
 --picks a to be 0
 local function getValidRatio(num, den)
 	if den == 0 then
-		return 0*num
+		return 0 * num
 	end
 
-	return num/den
+	return num / den
 end
 
 --[=[
@@ -103,8 +103,8 @@ function LinearSystemsSolverUtils.solveTridiagonal(mutMainDiag, mutUpperDiag, mu
 
 	for i = 1, n - 1 do
 		local ratio = getValidRatio(mutLowerDiag[i], mutMainDiag[i])
-		mutMainDiag[i + 1] = mutMainDiag[i + 1] - ratio*mutUpperDiag[i]
-		mutOutput[i + 1] = mutOutput[i + 1] - ratio*mutOutput[i]
+		mutMainDiag[i + 1] = mutMainDiag[i + 1] - ratio * mutUpperDiag[i]
+		mutOutput[i + 1] = mutOutput[i + 1] - ratio * mutOutput[i]
 		mutLowerDiag[i] = 0 -- lol
 	end
 
@@ -112,7 +112,7 @@ function LinearSystemsSolverUtils.solveTridiagonal(mutMainDiag, mutUpperDiag, mu
 	solution[n] = getValidRatio(mutOutput[n], mutMainDiag[n])
 
 	for i = n - 1, 1, -1 do
-		solution[i] = getValidRatio(mutOutput[i] - mutUpperDiag[i]*solution[i + 1], mutMainDiag[i])
+		solution[i] = getValidRatio(mutOutput[i] - mutUpperDiag[i] * solution[i + 1], mutMainDiag[i])
 	end
 
 	return solution

@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Flipbook = require("Flipbook")
+local ServiceBag = require("ServiceBag")
 
 local FlipbookLibrary = {}
 FlipbookLibrary.__index = FlipbookLibrary
@@ -23,7 +24,7 @@ function FlipbookLibrary.new(serviceName, register)
 	return self
 end
 
-function FlipbookLibrary:Init(serviceBag)
+function FlipbookLibrary:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(self ~= FlipbookLibrary, "Should construct new FlipbookLibrary")
 	assert(not self._spritesheets, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -37,7 +38,7 @@ function FlipbookLibrary:GetPreloadAssetIds()
 	assert(self._spritesheets, "Not initialized")
 
 	local assets = {}
-	for _, sheet in pairs(self._spritesheets) do
+	for _, sheet in self._spritesheets do
 		table.insert(assets, sheet:GetPreloadAssetId())
 	end
 	return assets

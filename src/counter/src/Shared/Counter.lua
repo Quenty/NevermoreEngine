@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class Counter
 ]=]
@@ -7,19 +8,35 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local Counter = setmetatable({}, BaseObject)
 Counter.ClassName = "Counter"
 Counter.__index = Counter
 
+export type Counter = typeof(setmetatable(
+	{} :: {
+		_count: ValueObject.ValueObject<number>,
+
+		--[=[
+			Fires when the count changes
+			@readonly
+			@prop Changed Signal.Signal<number>
+			@within Counter
+		]=]
+		Changed: Signal.Signal<number>,
+	},
+	{} :: typeof({ __index = Counter })
+)) & BaseObject.BaseObject
+
 --[=[
 	Creates a new counter
 
 	@return Counter
 ]=]
-function Counter.new()
-	local self = setmetatable(BaseObject.new(), Counter)
+function Counter.new(): Counter
+	local self = setmetatable(BaseObject.new() :: any, Counter)
 
 	self._count = self._maid:Add(ValueObject.new(0, "number"))
 
@@ -28,13 +45,12 @@ function Counter.new()
 	return self
 end
 
-
 --[=[
 	Returns the current count
 
 	@return number
 ]=]
-function Counter:GetValue()
+function Counter.GetValue(self: Counter): number
 	return self._count.Value
 end
 
@@ -43,10 +59,9 @@ end
 
 	@return number
 ]=]
-function Counter:Observe()
+function Counter.Observe(self: Counter)
 	return self._count:Observe()
 end
-
 
 --[=[
 	Adds an amount to the counter.
@@ -54,7 +69,7 @@ end
 	@param amount number | Observable<number>
 	@return MaidTask
 ]=]
-function Counter:Add(amount)
+function Counter.Add(self: Counter, amount: number): () -> ()
 	if type(amount) == "number" then
 		self._count.Value = self._count.Value + amount
 
@@ -76,7 +91,7 @@ function Counter:Add(amount)
 	end
 end
 
-function Counter:_addObservable(observeAmount)
+function Counter._addObservable(self: Counter, observeAmount: Observable.Observable<number>): () -> ()
 	assert(Observable.isObservable(observeAmount), "Bad observeAmount")
 
 	local lastCount = 0

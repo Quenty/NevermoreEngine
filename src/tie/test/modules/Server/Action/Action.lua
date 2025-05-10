@@ -1,11 +1,11 @@
---[=[
+--[[
 	@class Action
-]=]
+]]
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
 local ActionInterface = require("ActionInterface")
+local BaseObject = require("BaseObject")
 local Signal = require("Signal")
 
 local Action = setmetatable({}, BaseObject)

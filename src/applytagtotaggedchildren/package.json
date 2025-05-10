@@ -1,6 +1,6 @@
 {
   "name": "@quenty/applytagtotaggedchildren",
-  "version": "10.7.1",
+  "version": "10.9.0",
   "description": "Class that while constructed apply a tag to any children of the parent it is given, assuming that class has the required tag. This lets you bridge tag systems since CollectionService is used as an interop model between many components in scripts.",
   "keywords": [
     "Roblox",

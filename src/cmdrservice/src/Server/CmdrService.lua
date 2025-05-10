@@ -12,21 +12,37 @@ local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
 local CmdrTemplateProviderServer = require("CmdrTemplateProviderServer")
-local Promise = require("Promise")
+local CmdrTypes = require("CmdrTypes")
 local Maid = require("Maid")
 local PermissionService = require("PermissionService")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local CmdrService = {}
 CmdrService.ServiceName = "CmdrService"
 
-local GLOBAL_REGISTRY = setmetatable({}, {__mode = "kv"})
+export type CmdrService = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_serviceBag: ServiceBag.ServiceBag,
+		_serviceId: string,
+		_promiseCmdr: Promise.Promise<any>,
+		_cmdrTemplateProviderServer: any,
+		_permissionService: PermissionService.PermissionService,
+		_definitionData: { [string]: CmdrTypes.CommandDefinition },
+		_executeData: { [string]: (context: CmdrTypes.CommandContext, ...any) -> string? },
+	},
+	{} :: typeof({ __index = CmdrService })
+))
+
+local GLOBAL_REGISTRY = setmetatable({}, { __mode = "kv" })
 
 --[=[
 	Initializes the CmdrService. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function CmdrService:Init(serviceBag)
-	assert(not self._serviceBag, "Already initialized")
+function CmdrService.Init(self: CmdrService, serviceBag: ServiceBag.ServiceBag)
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -53,7 +69,6 @@ function CmdrService:Init(serviceBag)
 		end
 		resolve(cmdr)
 	end))
-
 
 	self._definitionData = {}
 	self._executeData = {}
@@ -99,7 +114,7 @@ end
 	Returns cmdr
 	@return Promise<Cmdr>
 ]=]
-function CmdrService:PromiseCmdr()
+function CmdrService.PromiseCmdr(self: CmdrService)
 	assert(self._promiseCmdr, "Not initialized")
 
 	return self._promiseCmdr
@@ -110,8 +125,12 @@ end
 	@param commandData table
 	@param execute (context: table, ... T)
 ]=]
-function CmdrService:RegisterCommand(commandData, execute)
-	assert(self._promiseCmdr, "Not initialized")
+function CmdrService.RegisterCommand(
+	self: CmdrService,
+	commandData: CmdrTypes.CommandDefinition,
+	execute: (context: CmdrTypes.CommandContext, ...any) -> string?
+): ()
+	assert((self :: any)._promiseCmdr, "Not initialized")
 	assert(commandData, "No commandData")
 	assert(commandData.Name, "No commandData.Name")
 	assert(execute, "No execute")
@@ -152,15 +171,13 @@ function CmdrService:RegisterCommand(commandData, execute)
 	end)
 end
 
-
-
 --[=[
 	Private function used by the execution template to retrieve the execution function.
 	@param cmdrCommandId string
 	@param ... any
 	@private
 ]=]
-function CmdrService:__executeCommand(cmdrCommandId, ...)
+function CmdrService.__executeCommand(self: CmdrService, cmdrCommandId: string, ...): string?
 	assert(type(cmdrCommandId) == "string", "Bad cmdrCommandId")
 	assert(self._promiseCmdr, "CmdrService is not initialized yet")
 
@@ -179,13 +196,13 @@ end
 	@return CmdrService
 	@private
 ]=]
-function CmdrService:__getServiceFromId(cmdrServiceId)
+function CmdrService.__getServiceFromId(_self: CmdrService, cmdrServiceId: string)
 	assert(type(cmdrServiceId) == "string", "Bad cmdrServiceId")
 
 	return GLOBAL_REGISTRY[cmdrServiceId]
 end
 
-function CmdrService:Destroy()
+function CmdrService.Destroy(self: CmdrService)
 	self._maid:DoCleaning()
 end
 

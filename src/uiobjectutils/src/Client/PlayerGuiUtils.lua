@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helper methods for finding and retrieving the [PlayerGui] instance
 	@class PlayerGuiUtils
@@ -17,7 +18,7 @@ local PlayerGuiUtils = {}
 
 	@return PlayerGui
 ]=]
-function PlayerGuiUtils.getPlayerGui()
+function PlayerGuiUtils.getPlayerGui(): PlayerGui
 	local localPlayer = Players.LocalPlayer
 	if not localPlayer then
 		error("[PlayerGuiUtils.getPlayerGui] - No localPlayer")
@@ -36,7 +37,7 @@ end
 
 	@return PlayerGui | nil
 ]=]
-function PlayerGuiUtils.findPlayerGui()
+function PlayerGuiUtils.findPlayerGui(): PlayerGui?
 	local localPlayer = Players.LocalPlayer
 	if not localPlayer then
 		return nil
@@ -44,6 +45,5 @@ function PlayerGuiUtils.findPlayerGui()
 
 	return localPlayer:FindFirstChildOfClass("PlayerGui")
 end
-
 
 return PlayerGuiUtils

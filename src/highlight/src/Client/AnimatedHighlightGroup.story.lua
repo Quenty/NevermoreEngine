@@ -2,10 +2,11 @@
 	@class AnimatedHighlight.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Maid = require("Maid")
 local AnimatedHighlightGroup = require("AnimatedHighlightGroup")
+local Maid = require("Maid")
 local RxSelectionUtils = require("RxSelectionUtils")
 
 return function(_target)

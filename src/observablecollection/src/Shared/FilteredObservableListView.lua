@@ -53,17 +53,20 @@ function FilteredObservableListView.new(observableList, observeScoreCallback, co
 		local observeScore = self._observeScoreCallback(entry)
 		assert(Observable.isObservable(observeScore), "Bad observeScore")
 
-		maid._add = self._scoredList:Add(entry, Rx.combineLatest({
-			score = observeScore;
-			index = self._baseList:ObserveIndexByKey(key);
-		}):Pipe({
-			Rx.map(function(state)
-				if state.score == nil then
-					return nil
-				end
-				return state
-			end)
-		}))
+		maid._add = self._scoredList:Add(
+			entry,
+			Rx.combineLatest({
+				score = observeScore,
+				index = self._baseList:ObserveIndexByKey(key),
+			}):Pipe({
+				Rx.map(function(state)
+					if state.score == nil then
+						return nil
+					end
+					return state
+				end),
+			})
+		)
 	end))
 
 	return self
@@ -95,6 +98,8 @@ end
 function FilteredObservableListView:GetCount()
 	return self._scoredList:GetCount()
 end
+
+FilteredObservableListView.__len = FilteredObservableListView.GetCount
 
 --[=[
 	Observes the count of the list

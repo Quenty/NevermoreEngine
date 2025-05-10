@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods to work with Rich text
 
@@ -11,14 +12,15 @@ local RichTextUtils = {}
 	@param text string
 	@return string
 ]=]
-function RichTextUtils.sanitizeRichText(text)
+function RichTextUtils.sanitizeRichText(text: string): string
 	assert(type(text) == "string", "Bad text")
 
-	return text:gsub("&", "&amp;")
+	--stylua: ignore
+	return (text:gsub("&", "&amp;")
 		:gsub("<", "&lt;")
 		:gsub(">", "&gt;")
 		:gsub("\"", "&quot;")
-		:gsub("'", "&apos;")
+		:gsub("'", "&apos;"))
 end
 
 --[=[
@@ -26,15 +28,16 @@ end
 	@param text string
 	@return string
 ]=]
-function RichTextUtils.removeRichTextEncoding(text)
+function RichTextUtils.removeRichTextEncoding(text: string): string
 	assert(type(text) == "string", "Bad text")
 
-	return text:gsub("<[^>]+>", "")
+	--stylua: ignore
+	return (text:gsub("<[^>]+>", "")
 		:gsub("&lt;", "<")
 		:gsub("&gt;", ">")
 		:gsub("&quot;", "\"")
 		:gsub("&apos;", "'")
-		:gsub("&amp;", "&")
+		:gsub("&amp;", "&"))
 end
 
 return RichTextUtils

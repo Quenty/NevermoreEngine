@@ -1,3 +1,4 @@
+--strict
 --[=[
 	A list that can be observed for blend and other components and maintains sorting order.
 
@@ -26,14 +27,36 @@ local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Rx = require("Rx")
 local Signal = require("Signal")
+local SortFunctionUtils = require("SortFunctionUtils")
 local SortedNode = require("SortedNode")
 local SortedNodeValue = require("SortedNodeValue")
-local SortFunctionUtils = require("SortFunctionUtils")
 local ValueObject = require("ValueObject")
 
 local ObservableSortedList = {}
 ObservableSortedList.ClassName = "ObservableSortedList"
 ObservableSortedList.__index = ObservableSortedList
+
+export type CompareFunction<T> = (T, T) -> number
+
+export type ObservableSortedList<T> = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_root: SortedNode.SortedNode<T>?,
+		_nodesAdded: { [SortedNode.SortedNode<T>]: boolean },
+		_nodesRemoved: { [SortedNode.SortedNode<T>]: boolean },
+		_lowestIndexChanged: number?,
+		_compare: CompareFunction<T>,
+		_countValue: ValueObject.ValueObject<number>,
+		_indexObservers: any,
+		_nodeIndexObservables: any,
+		_mainObservables: any,
+		ItemAdded: Signal.Signal<T, number, SortedNode.SortedNode<T>>,
+		ItemRemoved: Signal.Signal<T, SortedNode.SortedNode<T>>,
+		OrderChanged: Signal.Signal<()>,
+		CountChanged: Signal.Signal<number>,
+	},
+	{} :: typeof({ __index = ObservableSortedList })
+))
 
 --[=[
 	Constructs a new ObservableSortedList
@@ -41,10 +64,10 @@ ObservableSortedList.__index = ObservableSortedList
 	@param compare function
 	@return ObservableSortedList<T>
 ]=]
-function ObservableSortedList.new(isReversed, compare)
+function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunction<T>?): ObservableSortedList<T>
 	assert(type(isReversed) == "boolean" or isReversed == nil, "Bad isReversed")
 
-	local self = setmetatable({}, ObservableSortedList)
+	local self = setmetatable({} :: any, ObservableSortedList)
 
 	self._maid = Maid.new()
 
@@ -61,7 +84,7 @@ function ObservableSortedList.new(isReversed, compare)
 
 	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
---[=[
+	--[=[
 	Fires when an item is added
 
 	@readonly
@@ -70,7 +93,7 @@ function ObservableSortedList.new(isReversed, compare)
 ]=]
 	self.ItemAdded = self._maid:Add(Signal.new())
 
---[=[
+	--[=[
 	Fires when an item is removed.
 
 	@readonly
@@ -79,7 +102,7 @@ function ObservableSortedList.new(isReversed, compare)
 ]=]
 	self.ItemRemoved = self._maid:Add(Signal.new())
 
---[=[
+	--[=[
 	Fires when the order could have changed
 
 	@readonly
@@ -88,8 +111,7 @@ function ObservableSortedList.new(isReversed, compare)
 ]=]
 	self.OrderChanged = self._maid:Add(Signal.new())
 
-
---[=[
+	--[=[
 	Fires when the count changes
 
 	@readonly
@@ -106,7 +128,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function ObservableSortedList.isObservableSortedList(value)
+function ObservableSortedList.isObservableSortedList(value: any): boolean
 	return DuckTypeUtils.isImplementation(ObservableSortedList, value)
 end
 
@@ -115,11 +137,11 @@ end
 
 	@return Observable<{ T }>
 ]=]
-function ObservableSortedList:Observe()
+function ObservableSortedList.Observe<T>(self: ObservableSortedList<T>): Observable.Observable<{ T }>
 	return self._mainObservables:Observe("list"):Pipe({
 		Rx.start(function()
 			return self:GetList()
-		end)
+		end),
 	})
 end
 
@@ -128,7 +150,7 @@ end
 
 	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
 ]=]
-function ObservableSortedList:__iter()
+function ObservableSortedList.__iter<T>(self: ObservableSortedList<T>): SortFunctionUtils.WrappedIterator<number, T>
 	if self._root then
 		return self._root:IterateData()
 	else
@@ -143,15 +165,21 @@ end
 	@param finish number
 	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
 ]=]
-function ObservableSortedList:IterateRange(start, finish)
+function ObservableSortedList.IterateRange<T>(
+	self: ObservableSortedList<T>,
+	start: number,
+	finish: number
+): SortFunctionUtils.WrappedIterator<number, T>
 	return coroutine.wrap(function()
-		for index, node in self:_iterateNodesRange(start, finish) do
+		for index: number, node in self:_iterateNodesRange(start, finish) do
 			coroutine.yield(index, node.data)
 		end
-	end)
+	end) :: any
 end
 
-function ObservableSortedList:_iterateNodes()
+function ObservableSortedList._iterateNodes<T>(
+	self: ObservableSortedList<T>
+): SortFunctionUtils.WrappedIterator<number, SortedNode.SortedNode<T>>
 	if self._root then
 		return self._root:IterateNodes()
 	else
@@ -159,7 +187,11 @@ function ObservableSortedList:_iterateNodes()
 	end
 end
 
-function ObservableSortedList:_iterateNodesRange(start, finish)
+function ObservableSortedList._iterateNodesRange<T>(
+	self: ObservableSortedList<T>,
+	start: number,
+	finish: number?
+): SortFunctionUtils.WrappedIterator<number, SortedNode.SortedNode<T>>
 	if self._root then
 		return self._root:IterateNodesRange(start, finish)
 	else
@@ -167,7 +199,7 @@ function ObservableSortedList:_iterateNodesRange(start, finish)
 	end
 end
 
-function ObservableSortedList:_containsNode(node)
+function ObservableSortedList._containsNode<T>(self: ObservableSortedList<T>, node: SortedNode.SortedNode<T>): boolean
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
 	if self._root then
@@ -177,7 +209,10 @@ function ObservableSortedList:_containsNode(node)
 	end
 end
 
-function ObservableSortedList:_findNodeForDataLinearSearchSlow(data)
+function ObservableSortedList._findNodeForDataLinearSearchSlow<T>(
+	self: ObservableSortedList<T>,
+	data: T
+): SortedNode.SortedNode<T>?
 	if self._root then
 		return self._root:FindFirstNodeForData(data)
 	else
@@ -185,7 +220,7 @@ function ObservableSortedList:_findNodeForDataLinearSearchSlow(data)
 	end
 end
 
-function ObservableSortedList:_findNodeAtIndex(index)
+function ObservableSortedList._findNodeAtIndex<T>(self: ObservableSortedList<T>, index: number): SortedNode.SortedNode<T>?
 	assert(type(index) == "number", "Bad index")
 
 	if self._root then
@@ -195,7 +230,7 @@ function ObservableSortedList:_findNodeAtIndex(index)
 	end
 end
 
-function ObservableSortedList:_findNodeIndex(node)
+function ObservableSortedList._findNodeIndex<T>(self: ObservableSortedList<T>, node: SortedNode.SortedNode<T>): number?
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
 	if self._root then
@@ -211,11 +246,11 @@ end
 	@param content T
 	@return Symbol
 ]=]
-function ObservableSortedList:FindFirstKey(content)
+function ObservableSortedList.FindFirstKey<T>(self: ObservableSortedList<T>, content: T): SortedNode.SortedNode<T>?
 	return self:_findNodeForDataLinearSearchSlow(content)
 end
 
-function ObservableSortedList:PrintDebug()
+function ObservableSortedList.PrintDebug<T>(self: ObservableSortedList<T>)
 	print(self._root)
 end
 
@@ -225,7 +260,7 @@ end
 	@param content T
 	@return boolean
 ]=]
-function ObservableSortedList:Contains(content)
+function ObservableSortedList.Contains<T>(self: ObservableSortedList<T>, content): boolean
 	assert(content ~= nil, "Bad content")
 
 	-- TODO: Speed up
@@ -236,14 +271,16 @@ end
 	Observes all items in the list
 	@return Observable<Brio<T, Symbol>>
 ]=]
-function ObservableSortedList:ObserveItemsBrio()
+function ObservableSortedList.ObserveItemsBrio<T>(
+	self: ObservableSortedList<T>
+): Observable.Observable<Brio.Brio<T, SortedNode.SortedNode<T>>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		-- TODO: Optimize this so we don't have to make so many brios and connect
 		-- to so many events
 
-		local function handleItem(data, _index, node)
+		local function handleItem(data: T, _index, node)
 			local brio = Brio.new(data, node)
 			maid[node] = brio
 			sub:Fire(brio)
@@ -267,7 +304,7 @@ function ObservableSortedList:ObserveItemsBrio()
 		end)
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -277,12 +314,20 @@ end
 	@param indexToObserve number
 	@return Observable<number>
 ]=]
-function ObservableSortedList:ObserveIndex(indexToObserve)
+function ObservableSortedList.ObserveIndex<T>(
+	self: ObservableSortedList<T>,
+	indexToObserve: number
+): Observable.Observable<number>
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
 
 	local node = self:_findNodeAtIndex(indexToObserve)
 	if not node then
-		error(string.format("[ObservableSortedList.ObserveIndex] - No entry at index %q, cannot observe changes", indexToObserve))
+		error(
+			string.format(
+				"[ObservableSortedList.ObserveIndex] - No entry at index %d, cannot observe changes",
+				indexToObserve
+			)
+		)
 	end
 
 	return self:ObserveIndexByKey(node)
@@ -295,7 +340,10 @@ end
 	@param indexToObserve number
 	@return Observable<(T, Key)>
 ]=]
-function ObservableSortedList:ObserveAtIndex(indexToObserve)
+function ObservableSortedList.ObserveAtIndex<T>(
+	self: ObservableSortedList<T>,
+	indexToObserve: number
+): Observable.Observable<T, SortedNode.SortedNode<T>>
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
 
 	return self._indexObservers:Observe(indexToObserve, function(sub)
@@ -305,7 +353,7 @@ function ObservableSortedList:ObserveAtIndex(indexToObserve)
 		else
 			sub:Fire(nil, nil)
 		end
-	end)
+	end) :: any
 end
 
 --[=[
@@ -315,7 +363,10 @@ end
 	@param node SortedNode
 	@return Observable<number>
 ]=]
-function ObservableSortedList:ObserveIndexByKey(node)
+function ObservableSortedList.ObserveIndexByKey<T>(
+	self: ObservableSortedList<T>,
+	node: SortedNode.SortedNode<T>
+): Observable.Observable<number>
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
 	return self._nodeIndexObservables:Observe(node, function(sub)
@@ -323,7 +374,7 @@ function ObservableSortedList:ObserveIndexByKey(node)
 		if currentIndex then
 			sub:Fire(currentIndex)
 		end
-	end)
+	end) :: any
 end
 
 --[=[
@@ -332,7 +383,7 @@ end
 	@param node SortedNode
 	@return number
 ]=]
-function ObservableSortedList:GetIndexByKey(node)
+function ObservableSortedList.GetIndexByKey<T>(self: ObservableSortedList<T>, node: SortedNode.SortedNode<T>): number?
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
 	return self:_findNodeIndex(node)
@@ -342,15 +393,17 @@ end
 	Gets the count of items in the list
 	@return number
 ]=]
-function ObservableSortedList:GetCount()
+function ObservableSortedList.GetCount<T>(self: ObservableSortedList<T>): number
 	return self._countValue.Value or 0
 end
+
+ObservableSortedList.__len = ObservableSortedList.GetCount
 
 --[=[
 	Gets a list of all entries.
 	@return { T }
 ]=]
-function ObservableSortedList:GetList()
+function ObservableSortedList.GetList<T>(self: ObservableSortedList<T>): { T }
 	local list = table.create(self._countValue.Value)
 	for index, data in self:__iter() do
 		list[index] = data
@@ -362,7 +415,7 @@ end
 	Observes the count of the list
 	@return Observable<number>
 ]=]
-function ObservableSortedList:ObserveCount()
+function ObservableSortedList.ObserveCount<T>(self: ObservableSortedList<T>): Observable.Observable<number>
 	return self._countValue:Observe()
 end
 
@@ -372,7 +425,11 @@ end
 	@param observeValue Observable<Comparable> | Comparable
 	@return callback -- Call to remove
 ]=]
-function ObservableSortedList:Add(data, observeValue)
+function ObservableSortedList.Add<T>(
+	self: ObservableSortedList<T>,
+	data: T,
+	observeValue: Observable.Observable<number> | number
+): () -> ()
 	assert(data ~= nil, "Bad data")
 	assert(Observable.isObservable(observeValue) or observeValue ~= nil, "Bad observeValue")
 
@@ -382,11 +439,11 @@ function ObservableSortedList:Add(data, observeValue)
 	local maid = Maid.new()
 
 	if Observable.isObservable(observeValue) then
-		maid:GiveTask(observeValue:Subscribe(function(sortValue)
+		maid:GiveTask((observeValue :: any):Subscribe(function(sortValue: number)
 			self:_assignSortValue(node, sortValue)
 		end))
 	elseif observeValue ~= nil then
-		self:_assignSortValue(node, observeValue)
+		self:_assignSortValue(node, observeValue :: number)
 	else
 		error("Bad observeValue")
 	end
@@ -404,9 +461,13 @@ function ObservableSortedList:Add(data, observeValue)
 	end
 end
 
-function ObservableSortedList:_assignSortValue(node, value)
+function ObservableSortedList._assignSortValue<T>(
+	self: ObservableSortedList<T>,
+	node: SortedNode.SortedNode<T>,
+	value: number?
+): ()
 	if SortedNodeValue.isSortedNodeValue(node.value) then
-		if node.value:GetValue() == value then
+		if (node.value :: any):GetValue() == value then
 			return
 		end
 	elseif node.value == value then
@@ -433,7 +494,7 @@ function ObservableSortedList:_assignSortValue(node, value)
 	end
 
 	if self._compare ~= nil then
-		value = SortedNodeValue.new(value, self._compare)
+		value = SortedNodeValue.new(value, self._compare) :: any
 	end
 
 	-- our value changing didn't change anything
@@ -458,7 +519,7 @@ function ObservableSortedList:_assignSortValue(node, value)
 	self:_queueFireEvents()
 end
 
-function ObservableSortedList:_applyLowestIndexChanged(index)
+function ObservableSortedList._applyLowestIndexChanged<T>(self: ObservableSortedList<T>, index: number)
 	if self._lowestIndexChanged == nil then
 		self._lowestIndexChanged = index
 		return
@@ -469,7 +530,7 @@ function ObservableSortedList:_applyLowestIndexChanged(index)
 	end
 end
 
-function ObservableSortedList:_queueFireEvents()
+function ObservableSortedList._queueFireEvents<T>(self: ObservableSortedList<T>)
 	if self._maid._fireEvents then
 		return
 	end
@@ -480,7 +541,7 @@ function ObservableSortedList:_queueFireEvents()
 	end)
 end
 
-function ObservableSortedList:_fireEvents()
+function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	-- print(self._root)
 
 	local lowestIndexChanged = self._lowestIndexChanged
@@ -498,7 +559,9 @@ function ObservableSortedList:_fireEvents()
 	-- Fire count changed first
 	self._countValue.Value = newCount
 
-	if not self.Destroy then return end
+	if not self.Destroy then
+		return
+	end
 
 	-- TODO: Prevent Rx.of(itemAdded) stuff in our UI
 	for node in nodesAdded do
@@ -507,37 +570,46 @@ function ObservableSortedList:_fireEvents()
 		self.ItemAdded:Fire(node.data, index, node)
 	end
 
-	if not self.Destroy then return end
+	if not self.Destroy then
+		return
+	end
 
 	for node in nodesRemoved do
 		self.ItemRemoved:Fire(node.data, node)
 	end
 
-	if not self.Destroy then return end
+	if not self.Destroy then
+		return
+	end
 
 	self.OrderChanged:Fire()
 
-	if not self.Destroy then return end
+	if not self.Destroy then
+		return
+	end
 
 	do
+		local descendantCount = self._root and self._root.descendantCount or 0
 		for index, node in self:_iterateNodesRange(lowestIndexChanged) do
 			-- TODO: Handle negative observations to avoid refiring upon insertion
 			-- TODO: Handle our state changing while we're firing
 			-- TODO: Avoid looping over nodes if we don't need to (track observations in node itself?)
-			local negative = ListIndexUtils.toNegativeIndex(self._root.descendantCount, index)
+			local negative = ListIndexUtils.toNegativeIndex(descendantCount, index)
 			self._nodeIndexObservables:Fire(node, index)
 			self._indexObservers:Fire(index, node.data, node)
 			self._indexObservers:Fire(negative, node.data, node)
 		end
 
-		for index=newCount+1, lastCount do
+		for index = newCount + 1, lastCount do
 			self._indexObservers:Fire(index, nil, nil)
 		end
 
 		-- TODO: Fire negatives beyond range
 	end
 
-	if not self.Destroy then return end
+	if not self.Destroy then
+		return
+	end
 
 	if self._mainObservables:HasSubscriptions("list") then
 		-- TODO: Reuse list
@@ -546,7 +618,7 @@ function ObservableSortedList:_fireEvents()
 	end
 end
 
-function ObservableSortedList:_insertNode(node)
+function ObservableSortedList._insertNode<T>(self: ObservableSortedList<T>, node: SortedNode.SortedNode<T>)
 	assert(SortedNode.isSortedNode(node), "Bad SortedNode")
 
 	if self._root == nil then
@@ -557,7 +629,7 @@ function ObservableSortedList:_insertNode(node)
 	end
 end
 
-function ObservableSortedList:_removeNode(nodeToRemove)
+function ObservableSortedList._removeNode<T>(self: ObservableSortedList<T>, nodeToRemove: SortedNode.SortedNode<T>)
 	assert(SortedNode.isSortedNode(nodeToRemove), "Bad SortedNode")
 
 	if self._root ~= nil then
@@ -570,7 +642,7 @@ end
 	@param index number
 	@return T?
 ]=]
-function ObservableSortedList:Get(index)
+function ObservableSortedList.Get<T>(self: ObservableSortedList<T>, index: number): T?
 	assert(type(index) == "number", "Bad index")
 
 	local node = self:_findNodeAtIndex(index)
@@ -586,7 +658,7 @@ end
 	@param node SortedNode
 	@return T
 ]=]
-function ObservableSortedList:RemoveByKey(node)
+function ObservableSortedList.RemoveByKey<T>(self: ObservableSortedList<T>, node: SortedNode.SortedNode<T>)
 	assert(SortedNode.isSortedNode(node), "Bad node")
 
 	self._maid[node] = nil
@@ -595,9 +667,9 @@ end
 --[=[
 	Cleans up the ObservableSortedList and sets the metatable to nil.
 ]=]
-function ObservableSortedList:Destroy()
+function ObservableSortedList.Destroy<T>(self: ObservableSortedList<T>)
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return ObservableSortedList

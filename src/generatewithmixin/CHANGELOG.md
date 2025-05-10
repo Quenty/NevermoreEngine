@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.8.4...@quenty/generatewithmixin@11.9.0) (2025-05-10)
+
+**Note:** Version bump only for package @quenty/generatewithmixin
+
+
+
+
+
+## [11.8.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.8.3...@quenty/generatewithmixin@11.8.4) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/generatewithmixin
+
+
+
+
+
+## [11.8.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.8.1...@quenty/generatewithmixin@11.8.3) (2025-04-07)
+
+
+### Bug Fixes
+
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [11.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.8.1...@quenty/generatewithmixin@11.8.2) (2025-04-07)
+
+**Note:** Version bump only for package @quenty/generatewithmixin
+
+
+
+
+
+## [11.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.8.0...@quenty/generatewithmixin@11.8.1) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/generatewithmixin
+
+
+
+
+
+# [11.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.7.1...@quenty/generatewithmixin@11.8.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/generatewithmixin
+
+
+
+
+
 ## [11.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.7.0...@quenty/generatewithmixin@11.7.1) (2024-11-04)
 
 **Note:** Version bump only for package @quenty/generatewithmixin

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Calculate experience on an exponential curve and perform relevant calculations.
 
@@ -17,18 +18,23 @@
 
 local ExperienceUtils = {}
 
+export type ExperienceConfig = {
+	factor: number,
+	maxLevel: number,
+}
+
 --[=[
 	Creates a new experience configuration to be used
 
 	@param options ExperienceConfig
 	@return ExperienceConfig
 ]=]
-function ExperienceUtils.createExperienceConfig(options)
+function ExperienceUtils.createExperienceConfig(options: ExperienceConfig): ExperienceConfig
 	assert(type(options) == "table", "Bad options")
 
 	return {
-		factor = options.factor or 200;
-		maxLevel = options.maxLevel or math.huge;
+		factor = options.factor or 200,
+		maxLevel = options.maxLevel or math.huge,
 	}
 end
 
@@ -38,9 +44,8 @@ end
 	@param value any
 	@return boolean
 ]=]
-function ExperienceUtils.isExperienceConfig(value)
-	return type(value) == "table"
-		and type(value.factor) == "number"
+function ExperienceUtils.isExperienceConfig(value: any): boolean
+	return type(value) == "table" and type(value.factor) == "number"
 end
 
 --[=[
@@ -50,15 +55,12 @@ end
 	@param totalExperience number
 	@return number -- Level
 ]=]
-function ExperienceUtils.getLevel(config, totalExperience)
+function ExperienceUtils.getLevel(config: ExperienceConfig, totalExperience: number): number
 	assert(ExperienceUtils.isExperienceConfig(config), "Bad experience config")
 	assert(type(totalExperience) == "number", "Bad totalExperience")
 
 	local factor = config.factor
-	local level = math.floor(
-		(factor
-			+ math.sqrt(factor*factor - 4*factor*(-totalExperience)))
-		/(2*factor))
+	local level = math.floor((factor + math.sqrt(factor * factor - 4 * factor * -totalExperience)) / (2 * factor))
 	if level >= config.maxLevel then
 		return config.maxLevel
 	else
@@ -75,11 +77,11 @@ end
 	@param level number
 	@return number -- Total experience required for a level
 ]=]
-function ExperienceUtils.experienceFromLevel(config, level)
+function ExperienceUtils.experienceFromLevel(config: ExperienceConfig, level: number): number
 	assert(ExperienceUtils.isExperienceConfig(config), "Bad experience config")
 	assert(type(level) == "number", "Bad level")
 
-	return config.factor*level*(level - 1)
+	return config.factor * level * (level - 1)
 end
 
 --[=[
@@ -89,7 +91,7 @@ end
 	@param totalExperience number
 	@return number
 ]=]
-function ExperienceUtils.levelExperienceEarned(config, totalExperience)
+function ExperienceUtils.levelExperienceEarned(config: ExperienceConfig, totalExperience: number): number
 	assert(ExperienceUtils.isExperienceConfig(config), "Bad experience config")
 	assert(type(totalExperience) == "number", "Bad totalExperience")
 
@@ -114,7 +116,7 @@ end
 	@param totalExperience number
 	@return number
 ]=]
-function ExperienceUtils.levelExperienceLeft(config, totalExperience)
+function ExperienceUtils.levelExperienceLeft(config: ExperienceConfig, totalExperience: number): number
 	assert(ExperienceUtils.isExperienceConfig(config), "Bad experience config")
 	assert(type(totalExperience) == "number", "Bad totalExperience")
 
@@ -139,7 +141,7 @@ end
 	@param totalExperience number -- Current experience of player
 	@return number -- Total required for next level
 ]=]
-function ExperienceUtils.levelExperienceRequired(config, totalExperience)
+function ExperienceUtils.levelExperienceRequired(config: ExperienceConfig, totalExperience: number): number
 	assert(ExperienceUtils.isExperienceConfig(config), "Bad experience config")
 	assert(type(totalExperience) == "number", "Bad totalExperience")
 
@@ -164,7 +166,7 @@ end
 	@param totalExperience number
 	@return number
 ]=]
-function ExperienceUtils.percentLevelComplete(config, totalExperience)
+function ExperienceUtils.percentLevelComplete(config: ExperienceConfig, totalExperience: number): number
 	assert(ExperienceUtils.isExperienceConfig(config), "Bad experience config")
 	assert(type(totalExperience) == "number", "Bad totalExperience")
 
@@ -179,7 +181,7 @@ function ExperienceUtils.percentLevelComplete(config, totalExperience)
 		return 0
 	end
 
-	return earned/required
+	return earned / required
 end
 
 return ExperienceUtils

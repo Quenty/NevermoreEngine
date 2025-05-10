@@ -8,15 +8,16 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local GetRemoteEvent  = require("GetRemoteEvent")
+local GetRemoteEvent = require("GetRemoteEvent")
 local Maid = require("Maid")
 local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
 local PlayerInputModeUtils = require("PlayerInputModeUtils")
+local ServiceBag = require("ServiceBag")
 
 local PlayerInputModeService = {}
 PlayerInputModeService.ServiceName = "PlayerInputModeService"
 
-function PlayerInputModeService:Init(serviceBag)
+function PlayerInputModeService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -37,7 +38,7 @@ end
 	@param player Player
 	@return PlayerInputModeType
 ]=]
-function PlayerInputModeService:GetPlayerInputModeType(player)
+function PlayerInputModeService:GetPlayerInputModeType(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerInputModeUtils.getPlayerInputModeType(player)
@@ -50,7 +51,7 @@ end
 	@param cancelToken CancelToken
 	@return Promise<PlayerInputModeType>
 ]=]
-function PlayerInputModeService:PromisePlayerInputMode(player, cancelToken)
+function PlayerInputModeService:PromisePlayerInputMode(player: Player, cancelToken)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerInputModeUtils.promisePlayerInputMode(player, cancelToken)
@@ -62,13 +63,13 @@ end
 	@param player Player
 	@return Observable<PlayerInputModeType>
 ]=]
-function PlayerInputModeService:ObservePlayerInputType(player)
+function PlayerInputModeService:ObservePlayerInputType(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerInputModeUtils.observePlayerInputModeType(player)
 end
 
-function PlayerInputModeService:_handleServerEvent(player, request, ...)
+function PlayerInputModeService:_handleServerEvent(player: Player, request, ...)
 	if request == PlayerInputModeServiceConstants.REQUEST_SET_INPUT_MODE then
 		self:_setPlayerInputModeType(player, ...)
 	else
@@ -76,11 +77,10 @@ function PlayerInputModeService:_handleServerEvent(player, request, ...)
 	end
 end
 
-function PlayerInputModeService:_setPlayerInputModeType(player, inputModeType)
+function PlayerInputModeService:_setPlayerInputModeType(player: Player, inputModeType)
 	assert(PlayerInputModeUtils.isInputModeType(inputModeType), "Bad inputModeType")
 
 	PlayerInputModeUtils.setPlayerInputModeType(player, inputModeType)
 end
-
 
 return PlayerInputModeService

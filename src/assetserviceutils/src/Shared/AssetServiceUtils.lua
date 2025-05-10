@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods involving the AssetService
 	@class AssetServiceUtils
@@ -15,9 +16,9 @@ local AssetServiceUtils = {}
 	Retrieves the assetIds for a package
 
 	@param packageAssetId number
-	@return Promise<table>
+	@return Promise<{ number }>
 ]=]
-function AssetServiceUtils.promiseAssetIdsForPackage(packageAssetId)
+function AssetServiceUtils.promiseAssetIdsForPackage(packageAssetId: number): Promise.Promise<{ number }>
 	assert(type(packageAssetId) == "number", "Bad packageAssetId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -34,16 +35,16 @@ function AssetServiceUtils.promiseAssetIdsForPackage(packageAssetId)
 			return reject("Result was not an table")
 		end
 
-		resolve(result)
+		return resolve(result)
 	end)
 end
 
 --[=[
 	Gets the places and their name for the current game.
 
-	@return Pages
+	@return Promise<Pages>
 ]=]
-function AssetServiceUtils.promiseGamePlaces()
+function AssetServiceUtils.promiseGamePlaces(): Promise.Promise<Pages>
 	return Promise.spawn(function(resolve, reject)
 		local pages
 		local ok, err = pcall(function()
@@ -58,7 +59,7 @@ function AssetServiceUtils.promiseGamePlaces()
 			return reject("pages was not an table")
 		end
 
-		resolve(pages)
+		return resolve(pages)
 	end)
 end
 
@@ -71,6 +72,11 @@ end
 	.Type string -- Item Type eg: "UserOutfit" or "Asset"
 	@within AssetServiceUtils
 ]=]
+export type BundleDetailsItem = {
+	Id: number,
+	Name: string,
+	Type: string,
+}
 
 --[=[
 	Details for the bundle
@@ -83,14 +89,21 @@ end
 	.Items { BundleDetailsItem } -- An array of ValueTable objects
 	@within AssetServiceUtils
 ]=]
+export type BundleDetails = {
+	Id: number,
+	Name: string,
+	Description: string,
+	BundleType: string,
+	Items: { BundleDetailsItem },
+}
 
 --[=[
 	Gets the bundle details
 
 	@param bundleId number
-	@return BundleDetails
+	@return Promise<BundleDetails>
 ]=]
-function AssetServiceUtils.promiseBundleDetails(bundleId)
+function AssetServiceUtils.promiseBundleDetails(bundleId: number): Promise.Promise<BundleDetails>
 	assert(type(bundleId) == "number", "Bad bundleId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -107,7 +120,7 @@ function AssetServiceUtils.promiseBundleDetails(bundleId)
 			return reject("Result was not an table")
 		end
 
-		resolve(result)
+		return resolve(result)
 	end)
 end
 

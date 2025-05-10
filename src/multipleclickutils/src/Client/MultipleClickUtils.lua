@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility library for detecting multiple clicks or taps. Not good UX, but good for opening up a debug
 	menus.
@@ -7,24 +8,24 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local Signal = require("Signal")
 
 local MultipleClickUtils = {}
 
 local TIME_TO_CLICK_AGAIN = 0.5 -- Based upon windows default
 local VALID_TYPES = {
-	[Enum.UserInputType.MouseButton1] = true;
-	[Enum.UserInputType.Touch] = true;
+	[Enum.UserInputType.MouseButton1] = true,
+	[Enum.UserInputType.Touch] = true,
 }
 
 --[=[
 	Observes a double click on the Gui
-	@param gui GuiBase
+	@param gui GuiObject
 	@return Observable<InputObject>
 ]=]
-function MultipleClickUtils.observeDoubleClick(gui)
+function MultipleClickUtils.observeDoubleClick(gui: GuiObject): Observable.Observable<InputObject>
 	return MultipleClickUtils.observeMultipleClicks(gui, 2)
 end
 
@@ -32,34 +33,36 @@ end
 	Returns a signal that fires when the player clicks or taps on a Gui twice.
 
 	@param maid Maid
-	@param gui GuiBase
+	@param gui GuiObject
 	@return Signal<InputObject>
 ]=]
-function MultipleClickUtils.getDoubleClickSignal(maid, gui)
-	return MultipleClickUtils.getDoubleClickSignal(maid, gui, 2)
+function MultipleClickUtils.getDoubleClickSignal(maid: Maid.Maid, gui: GuiObject): Signal.Signal<InputObject>
+	return MultipleClickUtils.getMultipleClickSignal(maid, gui, 2)
 end
 
 --[=[
 	Observes multiple clicks click on the Gui
 
-	@param gui GuiBase
+	@param gui GuiObject
 	@param requiredCount number
 	@return Observable<InputObject>
 ]=]
-function MultipleClickUtils.observeMultipleClicks(gui, requiredCount)
+function MultipleClickUtils.observeMultipleClicks(
+	gui: GuiObject,
+	requiredCount: number
+): Observable.Observable<InputObject>
 	assert(typeof(gui) == "Instance", "Bad gui")
 	assert(type(requiredCount) == "number", "Bad requiredCount")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		maid:GiveTask(MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
-			:Connect(function(...)
-				sub:Fire(...)
-			end))
+		maid:GiveTask(MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount):Connect(function(...)
+			sub:Fire(...)
+		end))
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -74,12 +77,14 @@ end
 	```
 
 	@param requiredCount number
-	@return (gui: GuiBase) -> Observable<InputObject>
+	@return (gui: GuiObject) -> Observable<InputObject>
 ]=]
-function MultipleClickUtils.onMultipleClicks(requiredCount)
+function MultipleClickUtils.onMultipleClicks(
+	requiredCount: number
+): (gui: GuiObject) -> Observable.Observable<InputObject>
 	assert(type(requiredCount) == "number", "Bad requiredCount")
 
-	return function(gui)
+	return function(gui: GuiObject)
 		return MultipleClickUtils.observeMultipleClicks(gui, requiredCount)
 	end
 end
@@ -89,31 +94,35 @@ end
 	of times.
 
 	@param maid Maid
-	@param gui GuiBase
+	@param gui GuiObject
 	@param requiredCount number
 	@return Signal<InputObject>
 ]=]
-function MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
+function MultipleClickUtils.getMultipleClickSignal(
+	maid,
+	gui: GuiObject,
+	requiredCount: number
+): Signal.Signal<InputObject>
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(gui) == "Instance", "Bad gui")
 	assert(type(requiredCount) == "number", "Bad requiredCount")
 
-	local signal = Signal.new()
-	maid:GiveTask(signal)
+	local signal: Signal.Signal<InputObject> = maid:Add(Signal.new() :: any)
 
-	local lastInputTime = 0
-	local lastInputObject = nil
-	local inputCount = 0
+	local lastInputTime: number = 0
+	local lastInputObject: InputObject? = nil
+	local inputCount: number = 0
 
 	maid:GiveTask(gui.InputBegan:Connect(function(inputObject)
 		if not VALID_TYPES[inputObject.UserInputType] then
 			return
 		end
 
-		if lastInputObject
+		if
+			lastInputObject
 			and inputObject.UserInputType == lastInputObject.UserInputType
-			and (tick() - lastInputTime) <= TIME_TO_CLICK_AGAIN then
-
+			and (os.clock() - lastInputTime) <= TIME_TO_CLICK_AGAIN
+		then
 			inputCount = inputCount + 1
 
 			if inputCount >= requiredCount then
@@ -124,7 +133,7 @@ function MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
 			end
 		else
 			inputCount = 1
-			lastInputTime = tick()
+			lastInputTime = os.clock()
 			lastInputObject = inputObject
 		end
 	end))

@@ -1,10 +1,10 @@
+--!strict
 --[=[
 	Key based CoreGuiEnabler, singleton
 	Use this class to load/unload CoreGuis / other GUIs, by disabling based upon keys
 	Keys are additive, so if you have more than 1 disabled, it's ok.
 
 	```lua
-
 	local CoreGuiEnabler = require("CoreGuiEnabler")
 
 	-- Disable the backpack for 5 seconds
@@ -17,9 +17,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
+local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
 
 local CharacterUtils = require("CharacterUtils")
@@ -34,13 +35,22 @@ local CoreGuiEnabler = {}
 CoreGuiEnabler.__index = CoreGuiEnabler
 CoreGuiEnabler.ClassName = "CoreGuiEnabler"
 
-function CoreGuiEnabler.new()
-	local self = setmetatable({}, CoreGuiEnabler)
+export type CoreGuiEnabler = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_states: { [any]: { lastState: boolean, onChangeCallback: (boolean) -> (), disabledBy: { [any]: any } } },
+		_stateSubs: ObservableSubscriptionTable.ObservableSubscriptionTable<boolean>,
+	},
+	{} :: typeof({ __index = CoreGuiEnabler })
+))
+
+function CoreGuiEnabler.new(): CoreGuiEnabler
+	local self: CoreGuiEnabler = setmetatable({} :: any, CoreGuiEnabler)
 
 	self._maid = Maid.new()
 	self._states = {}
 
-	self._stateSubs = self._maid:Add(ObservableSubscriptionTable.new())
+	self._stateSubs = self._maid:Add(ObservableSubscriptionTable.new() :: any)
 
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
@@ -57,13 +67,13 @@ function CoreGuiEnabler.new()
 	-- Specifically handle this so we interface properly
 	self:AddState(Enum.CoreGuiType.All, function(isEnabled)
 		if isEnabled then
-			for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+			for _, coreGuiType in Enum.CoreGuiType:GetEnumItems() do
 				if coreGuiType ~= Enum.CoreGuiType.All then
 					self:Enable(ALL_TOKEN, coreGuiType)
 				end
 			end
 		else
-			for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+			for _, coreGuiType in Enum.CoreGuiType:GetEnumItems() do
 				if coreGuiType ~= Enum.CoreGuiType.All then
 					self:Disable(ALL_TOKEN, coreGuiType)
 				end
@@ -71,7 +81,7 @@ function CoreGuiEnabler.new()
 		end
 	end)
 
-	for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+	for _, coreGuiType in Enum.CoreGuiType:GetEnumItems() do
 		if not self._states[coreGuiType] then
 			self:AddState(coreGuiType, function(isEnabled)
 				StarterGui:SetCoreGuiEnabled(coreGuiType, isEnabled)
@@ -85,6 +95,10 @@ function CoreGuiEnabler.new()
 
 	self:AddState("ModalEnabled", function(isEnabled)
 		UserInputService.ModalEnabled = not isEnabled
+	end)
+
+	self:AddState("EnableMouseLockOption", function(isEnabled)
+		StarterPlayer.EnableMouseLockOption = isEnabled
 	end)
 
 	self:AddState("MouseIconEnabled", function(isEnabled)
@@ -111,7 +125,7 @@ end
 	@param coreGuiState string | CoreGuiType
 	@return boolean
 ]=]
-function CoreGuiEnabler:IsEnabled(coreGuiState)
+function CoreGuiEnabler:IsEnabled(coreGuiState): boolean
 	local data = self._states[coreGuiState]
 	if not data then
 		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))
@@ -131,12 +145,11 @@ function CoreGuiEnabler:ObserveIsEnabled(coreGuiState)
 		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))
 	end
 
-	return self._stateSubs:Observe(coreGuiState)
-		:Pipe({
-			Rx.startFrom(function()
-				return { self:IsEnabled(coreGuiState) }
-			end)
-		})
+	return self._stateSubs:Observe(coreGuiState):Pipe({
+		Rx.startFrom(function()
+			return { self:IsEnabled(coreGuiState) }
+		end),
+	})
 end
 
 --[=[
@@ -149,9 +162,9 @@ function CoreGuiEnabler:AddState(coreGuiState, onChangeCallback)
 	assert(self._states[coreGuiState] == nil, "state already exists")
 
 	self._states[coreGuiState] = {
-		lastState = true;
-		onChangeCallback = onChangeCallback;
-		disabledBy = {};
+		lastState = true,
+		onChangeCallback = onChangeCallback,
+		disabledBy = {},
 	}
 end
 

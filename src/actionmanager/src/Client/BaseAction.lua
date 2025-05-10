@@ -12,9 +12,9 @@ local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
 
-local Signal = require("Signal")
-local Maid = require("Maid")
 local EnabledMixin = require("EnabledMixin")
+local Maid = require("Maid")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local BaseAction = {}
@@ -50,7 +50,6 @@ function BaseAction.new(actionData)
 	end))
 
 	self:_withActionData(actionData)
-
 
 	return self
 end
@@ -113,10 +112,10 @@ function BaseAction:GetData()
 end
 
 function BaseAction:ToggleActivate(...)
-	self._activateData = {...}
+	self._activateData = { ... }
 
 	if self:IsEnabled() then
-		self.IsActivatedValue.Value = not (self.IsActivatedValue.Value)
+		self.IsActivatedValue.Value = not self.IsActivatedValue.Value
 	else
 		warn("[BaseAction.ToggleActivate] - Not activating, not enabled")
 		self.IsActivatedValue.Value = false
@@ -132,7 +131,7 @@ function BaseAction:Deactivate()
 end
 
 function BaseAction:Activate(...)
-	self._activateData = {...}
+	self._activateData = { ... }
 
 	if self:IsEnabled() then
 		self.IsActivatedValue.Value = true

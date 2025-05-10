@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class SeatUtils
 ]=]
@@ -14,10 +15,10 @@ local SeatUtils = {}
 	@param seats { Seat }
 	@return { Player }
 ]=]
-function SeatUtils.getPlayerOccupants(seats)
+function SeatUtils.getPlayerOccupants(seats: { Seat | VehicleSeat }): { Player }
 	local players = {}
 
-	for _, seat in pairs(seats) do
+	for _, seat in seats do
 		local occupant = seat.Occupant
 		if occupant then
 			local player = CharacterUtils.getPlayerFromCharacter(occupant)

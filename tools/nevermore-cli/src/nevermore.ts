@@ -12,6 +12,8 @@ import { InitGameCommand } from './commands/init-game-command';
 import { InitPackageCommand } from './commands/init-package-command';
 import { InitPluginCommand } from './commands/init-plugin-command';
 import { PackCommand } from './commands/pack-command';
+import { InstallPackageCommand } from './commands/install-package-command';
+import { TestProjectCommand } from './commands/test-project-command';
 
 yargs(hideBin(process.argv))
   .scriptName('nevermore')
@@ -34,6 +36,8 @@ yargs(hideBin(process.argv))
   .command(new InitPackageCommand() as any)
   .command(new InitPluginCommand() as any)
   .command(new PackCommand() as any)
+  .command(new InstallPackageCommand() as any)
+  .command(new TestProjectCommand() as any)
   .recommendCommands()
   .demandCommand(
     1,

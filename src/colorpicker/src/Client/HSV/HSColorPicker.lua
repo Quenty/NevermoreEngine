@@ -154,7 +154,7 @@ end
 
 	@param transparency number
 ]=]
-function HSColorPicker:SetTransparency(transparency)
+function HSColorPicker:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
@@ -165,7 +165,7 @@ end
 
 	@param height number
 ]=]
-function HSColorPicker:SetSize(height)
+function HSColorPicker:SetSize(height: number)
 	assert(type(height) == "number", "Bad height")
 
 	self._sizeValue.Value = Vector2.new(height, height)
@@ -173,34 +173,34 @@ end
 
 function HSColorPicker:_render()
 	return Blend.New "ImageButton" {
-		Name = "HSColorPicker";
-		Size = UDim2.new(1, 0, 1, 0);
-		BackgroundTransparency = 1;
-		Active = true;
-		Image = "rbxassetid://9290917908";
-		ImageTransparency = self._transparency;
+		Name = "HSColorPicker",
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		Active = true,
+		Image = "rbxassetid://9290917908",
+		ImageTransparency = self._transparency,
 
 		[Blend.Instance] = function(inst)
 			self._dragModel:SetButton(inst)
-		end;
+		end,
 
 		Blend.New "UIAspectRatioConstraint" {
 			AspectRatio = Blend.Computed(self._sizeValue, function(size)
 				if size.x <= 0 or size.y <= 0 then
 					return 1
 				else
-					return size.x/size.y
+					return size.x / size.y
 				end
-			end);
-		};
+			end),
+		},
 
 		Blend.New "UICorner" {
-			CornerRadius = UDim.new(0, 4);
-		};
+			CornerRadius = UDim.new(0, 4),
+		},
 
-		self._preview.Gui;
-		self._cursor.Gui;
-	};
+		self._preview.Gui,
+		self._cursor.Gui,
+	}
 end
 
 return HSColorPicker

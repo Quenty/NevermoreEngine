@@ -5,11 +5,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local AttributeUtils = require("AttributeUtils")
-local GameConfigAssetConstants = require("GameConfigAssetConstants")
 local BadgeUtils = require("BadgeUtils")
+local GameConfigAssetConstants = require("GameConfigAssetConstants")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local MarketplaceServiceCache = require("MarketplaceServiceCache")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigAssetUtils = {}
 
@@ -21,7 +22,12 @@ local GameConfigAssetUtils = {}
 	@param assetId number
 	@return Instance
 ]=]
-function GameConfigAssetUtils.create(binder, assetType, assetKey, assetId)
+function GameConfigAssetUtils.create(
+	binder,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetKey: string,
+	assetId: number
+): Folder
 	local asset = Instance.new("Folder")
 	asset.Name = assetKey
 
@@ -41,7 +47,11 @@ end
 	@param assetId number
 	@return Promise<any>
 ]=]
-function GameConfigAssetUtils.promiseCloudDataForAssetType(serviceBag, assetType, assetId)
+function GameConfigAssetUtils.promiseCloudDataForAssetType(
+	serviceBag: ServiceBag.ServiceBag,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetId: number
+): Promise.Promise<any>
 	assert(type(assetType) == "string", "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
@@ -61,8 +71,10 @@ function GameConfigAssetUtils.promiseCloudDataForAssetType(serviceBag, assetType
 	elseif assetType == GameConfigAssetTypes.BUNDLE then
 		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.Bundle)
 	else
-		local errorMessage = string.format("[GameConfigAssetUtils.promiseCloudDataForAssetType] - Unknown GameConfigAssetType %q. Ignoring asset.",
-			tostring(assetType))
+		local errorMessage = string.format(
+			"[GameConfigAssetUtils.promiseCloudDataForAssetType] - Unknown GameConfigAssetType %q. Ignoring asset.",
+			tostring(assetType)
+		)
 
 		return Promise.rejected(errorMessage)
 	end

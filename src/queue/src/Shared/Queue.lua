@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Queue class with better performance characteristics than table.remove()
 
@@ -20,14 +21,22 @@ local Queue = {}
 Queue.ClassName = "Queue"
 Queue.__index = Queue
 
+export type Queue<T> = typeof(setmetatable(
+	{} :: {
+		_first: number,
+		_last: number,
+	},
+	{} :: typeof({ __index = Queue })
+))
+
 --[=[
 	Constructs a new queue
 	@return Queue<T>
 ]=]
-function Queue.new()
+function Queue.new<T>(): Queue<T>
 	return setmetatable({
-		_first = 0;
-		_last = -1;
+		_first = 0,
+		_last = -1,
 	}, Queue)
 end
 
@@ -36,7 +45,7 @@ end
 
 	@return number
 ]=]
-function Queue:__len()
+function Queue.__len<T>(self: Queue<T>): number
 	return self._last + 1 - self._first
 end
 
@@ -45,7 +54,7 @@ end
 
 	@return number
 ]=]
-function Queue:GetCount()
+function Queue.GetCount<T>(self: Queue<T>): number
 	return self._last + 1 - self._first
 end
 
@@ -53,7 +62,7 @@ end
 	Pushes an entry to the left of the queue
 	@param value T
 ]=]
-function Queue:PushLeft(value)
+function Queue.PushLeft<T>(self: Queue<T>, value: T)
 	self._first = self._first - 1
 	self[self._first] = value
 end
@@ -62,7 +71,7 @@ end
 	Pushes an entry to the right of the queue
 	@param value T
 ]=]
-function Queue:PushRight(value)
+function Queue.PushRight<T>(self: Queue<T>, value: T)
 	self._last = self._last + 1
 	self[self._last] = value
 end
@@ -71,7 +80,7 @@ end
 	Pops an entry from the left of the queue
 	@return T
 ]=]
-function Queue:PopLeft()
+function Queue.PopLeft<T>(self: Queue<T>): T
 	if self._first > self._last then
 		error("Queue is empty")
 	end
@@ -87,7 +96,7 @@ end
 	Pops an entry from the right of the queue
 	@return T
 ]=]
-function Queue:PopRight()
+function Queue.PopRight<T>(self: Queue<T>): T
 	if self._first > self._last then
 		error("Queue is empty")
 	end
@@ -103,7 +112,7 @@ end
 	Returns true if the queue is empty
 	@return boolean
 ]=]
-function Queue:IsEmpty()
+function Queue.IsEmpty<T>(self: Queue<T>): boolean
 	return self._first > self._last
 end
 

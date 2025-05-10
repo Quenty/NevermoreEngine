@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving badges on Roblox
 	@class BadgeUtils
@@ -19,6 +20,12 @@ local BadgeUtils = {}
 	.IsEnabled bool -- Indicates whether the badge is available to be awarded.
 	@within BadgeUtils
 ]=]
+export type BadgeInfoDictionary = {
+	Name: string,
+	Description: string,
+	IconImageId: number,
+	IsEnabled: boolean,
+}
 
 --[=[
 	Tries to reward a player to a badge inside of a promise.
@@ -28,7 +35,7 @@ local BadgeUtils = {}
 	@param badgeId number
 	@return Promise
 ]=]
-function BadgeUtils.promiseAwardBadge(player, badgeId)
+function BadgeUtils.promiseAwardBadge(player: Player, badgeId: number): Promise.Promise<()>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(badgeId) == "number", "Bad badgeId")
 
@@ -51,7 +58,7 @@ end
 	@param badgeId number
 	@return Promise<BadgeInfoDictionary>
 ]=]
-function BadgeUtils.promiseBadgeInfo(badgeId)
+function BadgeUtils.promiseBadgeInfo(badgeId: number): Promise.Promise<BadgeInfoDictionary>
 	assert(type(badgeId) == "number", "Bad badgeId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -76,9 +83,9 @@ end
 
 	@param userId number
 	@param badgeId number
-	@return Promise<BadgeInfoDictionary>
+	@return Promise<boolean>
 ]=]
-function BadgeUtils.promiseUserHasBadge(userId, badgeId)
+function BadgeUtils.promiseUserHasBadge(userId: number, badgeId: number): Promise.Promise<boolean>
 	assert(type(userId) == "number", "Bad userId")
 	assert(type(badgeId) == "number", "Bad badgeId")
 

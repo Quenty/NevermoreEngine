@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RemotingRealmUtils
 ]=]
@@ -10,11 +11,11 @@ local RemotingRealms = require("RemotingRealms")
 
 local RemotingRealmUtils = {}
 
-function RemotingRealmUtils.isRemotingRealm(realm)
+function RemotingRealmUtils.isRemotingRealm(realm: any): boolean
 	return realm == RemotingRealms.SERVER or realm == RemotingRealms.CLIENT
 end
 
-function RemotingRealmUtils.inferRemotingRealm()
+function RemotingRealmUtils.inferRemotingRealm(): RemotingRealms.RemotingRealm
 	if RunService:IsServer() then
 		return RemotingRealms.SERVER
 	elseif RunService:IsClient() then

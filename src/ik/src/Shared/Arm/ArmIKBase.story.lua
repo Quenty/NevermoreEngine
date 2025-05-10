@@ -2,14 +2,15 @@
 	@class ArmIKBase.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
+local ArmIKBase = require("ArmIKBase")
 local Maid = require("Maid")
 local RigBuilderUtils = require("RigBuilderUtils")
-local ArmIKBase = require("ArmIKBase")
 local ServiceBag = require("ServiceBag")
 
 return function(_target)
@@ -41,7 +42,6 @@ return function(_target)
 			armIKBase:Update()
 		end))
 	end)
-
 
 	return function()
 		maid:DoCleaning()

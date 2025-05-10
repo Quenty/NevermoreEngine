@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helps get the default or zero value for value types in Roblox
 	@class DefaultValueUtils
@@ -7,29 +8,32 @@ local DefaultValueUtils = {}
 
 -- selene: allow(incorrect_standard_library_use)
 local DEFAULT_VALUES = {
-	["boolean"] = false;
-	["BrickColor"] = BrickColor.new();
-	["CFrame"] = CFrame.new();
-	["Color3"] = Color3.new();
-	["ColorSequence"] = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)); ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0)); });
-	["ColorSequenceKeypoint"] = ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0));
-	["number"] = 0;
-	["PhysicalProperties"] = PhysicalProperties.new(Enum.Material.Plastic); -- Eww
-	["NumberRange"] = NumberRange.new(0);
-	["NumberSequence"] = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0); NumberSequenceKeypoint.new(1, 0); });
-	["NumberSequenceKeypoint"] = NumberSequenceKeypoint.new(0, 0);
-	["Ray"] = Ray.new();
-	["Rect"] = Rect.new();
-	["Region3"] = Region3.new();
-	["Region3int16"] = Region3int16.new();
-	["string"] = "";
-	["UDim"] = UDim.new();
-	["UDim2"] = UDim2.new();
-	["userdata"] = newproxy();
-	["Vector2"] = Vector2.zero;
-	["Vector2int16"] = Vector2int16.new();
-	["Vector3"] = Vector3.zero;
-	["Vector3int16"] = Vector3int16.new();
+	["boolean"] = false,
+	["BrickColor"] = (BrickColor :: any).new(),
+	["CFrame"] = CFrame.new(),
+	["Color3"] = Color3.new(),
+	["ColorSequence"] = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),
+		ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0)),
+	}),
+	["ColorSequenceKeypoint"] = ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),
+	["number"] = 0,
+	["PhysicalProperties"] = PhysicalProperties.new(Enum.Material.Plastic), -- Eww
+	["NumberRange"] = NumberRange.new(0),
+	["NumberSequence"] = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 0) }),
+	["NumberSequenceKeypoint"] = NumberSequenceKeypoint.new(0, 0),
+	["Ray"] = (Ray :: any).new(),
+	["Rect"] = Rect.new(),
+	["Region3"] = (Region3 :: any).new(),
+	["Region3int16"] = (Region3int16 :: any).new(),
+	["string"] = "",
+	["UDim"] = UDim.new(),
+	["UDim2"] = UDim2.new(),
+	["userdata"] = newproxy(),
+	["Vector2"] = Vector2.zero,
+	["Vector2int16"] = Vector2int16.new(),
+	["Vector3"] = Vector3.zero,
+	["Vector3int16"] = Vector3int16.new(),
 }
 
 --[=[
@@ -39,7 +43,7 @@ local DEFAULT_VALUES = {
 	@param typeOfName string
 	@return any
 ]=]
-function DefaultValueUtils.getDefaultValueForType(typeOfName)
+function DefaultValueUtils.getDefaultValueForType(typeOfName: string)
 	if DEFAULT_VALUES[typeOfName] ~= nil then
 		return DEFAULT_VALUES[typeOfName]
 	elseif typeOfName == "table" then
@@ -65,10 +69,10 @@ end
 	@param value T
 	@return T
 ]=]
-function DefaultValueUtils.toDefaultValue(value)
+function DefaultValueUtils.toDefaultValue(value: any): any
 	if type(value) == "table" then
 		local result = {}
-		for key, item in pairs(value) do
+		for key, item in value do
 			result[key] = DefaultValueUtils.toDefaultValue(item)
 		end
 		return result

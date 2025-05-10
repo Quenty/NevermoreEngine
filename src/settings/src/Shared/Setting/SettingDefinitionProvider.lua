@@ -27,6 +27,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
 local SettingDefinition = require("SettingDefinition")
 
 local SettingDefinitionProvider = {}
@@ -72,7 +73,7 @@ function SettingDefinitionProvider.new(settingDefinitions)
 	self._settingDefinitionList = {}
 	self._lookup = {}
 
-	for key, value in pairs(settingDefinitions) do
+	for key, value in settingDefinitions do
 		if type(key) == "number" then
 			assert(SettingDefinition.isSettingDefinition(key), "Bad settingDefinition")
 
@@ -104,7 +105,7 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingDefinitionProvider:Init(serviceBag)
+function SettingDefinitionProvider:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(serviceBag, "No serviceBag")
 	assert(not self._maid, "Already initialized")
 
@@ -114,7 +115,7 @@ function SettingDefinitionProvider:Init(serviceBag)
 	self._initializedDefinitionLookup = {}
 
 	-- Register our setting definitions
-	for _, settingDefinition in pairs(self._settingDefinitionList) do
+	for _, settingDefinition in self._settingDefinitionList do
 		local initialized = self._serviceBag:GetService(settingDefinition)
 		self._initializedDefinitionLookup[settingDefinition] = initialized
 
@@ -139,7 +140,7 @@ function SettingDefinitionProvider:GetSettingDefinitions()
 	if self._serviceBag then
 		local copy = table.clone(self._settingDefinitionList)
 
-		for key, settingDefinition in pairs(copy) do
+		for key, settingDefinition in copy do
 			copy[key] = assert(self._initializedDefinitionLookup[settingDefinition], "Missing settingDefinition")
 		end
 
@@ -175,12 +176,13 @@ function SettingDefinitionProvider:__index(index)
 		error("[SettingDefinitionProvider] - Cannot index provider with nil value")
 	elseif SettingDefinitionProvider[index] then
 		return SettingDefinitionProvider[index]
-	elseif index == "_lookup"
+	elseif
+		index == "_lookup"
 		or index == "_settingDefinitionList"
 		or index == "_maid"
 		or index == "_initializedDefinitionLookup"
-		or index == "_serviceBag" then
-
+		or index == "_serviceBag"
+	then
 		return rawget(self, index)
 	elseif type(index) == "string" then
 		local lookup = rawget(self, "_lookup")
@@ -205,7 +207,7 @@ end
 	@param settingName string
 	@return SettingDefinition
 ]=]
-function SettingDefinitionProvider:Get(settingName)
+function SettingDefinitionProvider:Get(settingName: string)
 	assert(type(settingName) == "string", "Bad settingName")
 
 	local found = self._lookup[settingName]

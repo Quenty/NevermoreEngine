@@ -1,9 +1,54 @@
-# Reusable workflow that lints the repository!
 name: lint
 on:
   workflow_call
 jobs:
-  lint:
+  luau-lsp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup npm for GitHub Packages
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Link and install packages
+        run: npm run build:link
+
+      - name: Generate Sourcemap
+        run: npm run build:sourcemap
+
+      - name: luau-lsp analyze
+        run: npm run lint:luau
+
+  stylua:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: stylua check
+        run: npm run lint:stylua
+
+  selene:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -21,6 +66,17 @@ jobs:
       - name: Run Selene
         run: selene src
 
+  moonwave:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run moonwave-extractor
-        if: success() || failure()
         run: moonwave-extractor extract src

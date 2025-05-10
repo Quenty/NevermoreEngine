@@ -46,21 +46,10 @@ function IKRigAimerLocalPlayer.new(serviceBag, ikRig)
 end
 
 --[=[
-	Sets the remote event for replication
-
-	@param remoteEvent RemoteEvent
-]=]
-function IKRigAimerLocalPlayer:SetRemoteEvent(remoteEvent)
-	assert(not self._remoteEvent, "Already have remoteEvent")
-
-	self._remoteEvent = assert(remoteEvent, "No remoteEvent")
-end
-
---[=[
 	Sets whether the local player should look around automatically.
 	@param lookAround boolean
 ]=]
-function IKRigAimerLocalPlayer:SetLookAround(lookAround)
+function IKRigAimerLocalPlayer:SetLookAround(lookAround: boolean)
 	assert(type(lookAround) == "boolean", "Bad lookAround")
 
 	self._lookAround = lookAround
@@ -82,17 +71,17 @@ function IKRigAimerLocalPlayer:SetAimPosition(position, optionalPriority)
 	end
 
 	self._aimData = {
-		priority = optionalPriority;
-		position = position; -- May be nil
-		timeStamp = os.clock();
+		priority = optionalPriority,
+		position = position, -- May be nil
+		timeStamp = os.clock(),
 	}
 end
 
-function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate)
+function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate: number)
 	assert(type(replicateRate) == "number", "Bad replicateRate")
 
 	local data = {
-		replicateRate = replicateRate;
+		replicateRate = replicateRate,
 	}
 
 	table.insert(self._replicationRates, data)
@@ -113,7 +102,7 @@ end
 
 function IKRigAimerLocalPlayer:_updateReplicationRate()
 	local best = nil
-	for _, rateData in pairs(self._replicationRates) do
+	for _, rateData in self._replicationRates do
 		local rate = rateData.replicateRate
 		if not best or rate < best then
 			best = rate
@@ -129,7 +118,7 @@ end
 ]=]
 function IKRigAimerLocalPlayer:GetAimPosition()
 	if self._aimData and (os.clock() - self._aimData.timeStamp) < MAX_AGE_FOR_AIM_DATA then
-			-- If we have aim data within the last 0.2 seconds start pointing at that
+		-- If we have aim data within the last 0.2 seconds start pointing at that
 		return self._aimData.position -- May be nil
 	end
 
@@ -178,9 +167,9 @@ function IKRigAimerLocalPlayer:UpdateStepped()
 	end
 
 	-- Filter replicate
-	if self._remoteEvent and (os.clock() - self._lastReplication) > self._replicationRate then
+	if (os.clock() - self._lastReplication) > self._replicationRate then
 		self._lastReplication = os.clock()
-		self._remoteEvent:FireServer(aimPosition)
+		self._ikRig:FireSetAimPosition(aimPosition)
 	end
 end
 

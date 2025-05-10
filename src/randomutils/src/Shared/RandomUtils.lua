@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving random variables. This is quite useful
 	for a variety of game mechanics.
@@ -34,7 +35,7 @@ local RandomUtils = {}
 	@param random Random? -- Optional
 	@return T?
 ]=]
-function RandomUtils.choice(list, random)
+function RandomUtils.choice<T>(list: { T }, random: Random?): T?
 	if #list == 0 then
 		return nil
 	elseif #list == 1 then
@@ -63,7 +64,7 @@ end
 	@param random Random? -- Optional random to use when shuffling
 	@return { T }
 ]=]
-function RandomUtils.shuffledCopy(list, random)
+function RandomUtils.shuffledCopy<T>(list: { T }, random: Random?): { T }
 	local copy = table.clone(list)
 
 	RandomUtils.shuffle(copy, random)
@@ -88,7 +89,7 @@ end
 	@param list {T}
 	@param random Random? -- Optional random to use when shuffling
 ]=]
-function RandomUtils.shuffle(list, random)
+function RandomUtils.shuffle<T>(list: { T }, random: Random?)
 	if random then
 		for i = #list, 2, -1 do
 			local j = random:NextInteger(1, i)
@@ -111,6 +112,10 @@ end
 	undefined behavior.
 	:::
 
+	:::tip
+	See [RandomSampler] for a stateful approach where we remove items from the bag.
+	:::
+
 	```lua
 	local weights = { 1, 3, 10 }
 	local options = { "a", "b", "c" }
@@ -123,14 +128,14 @@ end
 	@param random Random? -- Optional random
 	@return T? -- May return nil if the list is empty
 ]=]
-function RandomUtils.weightedChoice(list, weights, random)
+function RandomUtils.weightedChoice<T>(list: { T }, weights: { number }, random: Random): T?
 	if #list == 0 then
 		return nil
 	elseif #list == 1 then
 		return list[1]
 	else
 		local total = 0
-		for i=1, #list do
+		for i = 1, #list do
 			assert(type(weights[i]) == "number", "Bad weights")
 			total = total + weights[i]
 		end
@@ -144,12 +149,12 @@ function RandomUtils.weightedChoice(list, weights, random)
 
 		local totalSum = 0
 
-		for i=1, #list do
+		for i = 1, #list do
 			if weights[i] == 0 then
 				continue
 			end
 			totalSum = totalSum + weights[i]
-			local threshold = totalSum/total
+			local threshold = totalSum / total
 			if randomNum <= threshold then
 				return list[i]
 			end
@@ -167,28 +172,29 @@ end
 	@param random Random? -- Optional random to use
 	@return number
 ]=]
-function RandomUtils.gaussianRandom(random)
+function RandomUtils.gaussianRandom(random: Random?): number
 	local a, t
 	if random then
-		a = 2*math.pi*random:NextNumber()
+		a = 2 * math.pi * random:NextNumber()
 		t = random:NextNumber()
 	else
-		a = 2*math.pi*math.random()
+		a = 2 * math.pi * math.random()
 		t = math.random()
 	end
 
-	return math.sqrt(-2*math.log(1 - t))*math.cos(a)
+	return math.sqrt(-2 * math.log(1 - t)) * math.cos(a)
 end
 
 --[=[
 	@param random? Random? -- Optional random to use
 	@return Vector3
 ]=]
-function RandomUtils.randomUnitVector3(random)
+function RandomUtils.randomUnitVector3(random: Random?): Vector3
 	return Vector3.new(
 		RandomUtils.gaussianRandom(random),
 		RandomUtils.gaussianRandom(random),
-		RandomUtils.gaussianRandom(random))
+		RandomUtils.gaussianRandom(random)
+	)
 end
 
 return RandomUtils

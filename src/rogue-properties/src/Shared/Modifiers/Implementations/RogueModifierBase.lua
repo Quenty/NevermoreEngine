@@ -5,8 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local TieRealmService = require("TieRealmService")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
+local TieRealmService = require("TieRealmService")
 
 local RogueModifierBase = setmetatable({}, BaseObject)
 RogueModifierBase.ClassName = "RogueModifierBase"

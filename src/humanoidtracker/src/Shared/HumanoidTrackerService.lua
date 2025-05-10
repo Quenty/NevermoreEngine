@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Centralized humanoid tracking service.
 
@@ -8,8 +9,10 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local Brio = require("Brio")
 local HumanoidTracker = require("HumanoidTracker")
 local Maid = require("Maid")
+local Observable = require("Observable")
 
 local HumanoidTrackerService = {}
 HumanoidTrackerService.ServiceName = "HumanoidTrackerService"
@@ -31,7 +34,7 @@ end
 	@param player Player? -- If not set, uses local player
 	@return HumanoidTracker
 ]=]
-function HumanoidTrackerService:GetHumanoidTracker(player)
+function HumanoidTrackerService:GetHumanoidTracker(player: Player?): HumanoidTracker.HumanoidTracker?
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
 	player = player or Players.LocalPlayer
@@ -64,7 +67,7 @@ end
 	@param player Player? -- If not set, uses local player
 	@return Humanoid?
 ]=]
-function HumanoidTrackerService:GetHumanoid(player)
+function HumanoidTrackerService:GetHumanoid(player: Player?): Humanoid?
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
 	player = player or Players.LocalPlayer
@@ -75,9 +78,9 @@ end
 	Observe a player's humanoid
 
 	@param player Player? -- If not set, uses local player
-	@return Observable<Humanoid | nil>
+	@return Observable<Humanoid?>
 ]=]
-function HumanoidTrackerService:ObserveHumanoid(player)
+function HumanoidTrackerService:ObserveHumanoid(player: Player?): Observable.Observable<Humanoid?>
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
 	player = player or Players.LocalPlayer
@@ -91,7 +94,7 @@ end
 	@param player Player? -- If not set, uses local player
 	@return Observable<Brio<Humanoid>>
 ]=]
-function HumanoidTrackerService:ObserveHumanoidBrio(player)
+function HumanoidTrackerService:ObserveHumanoidBrio(player: Player?): Observable.Observable<Brio.Brio<Humanoid>>
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
 	player = player or Players.LocalPlayer
@@ -107,7 +110,7 @@ end
 	@param player Player? -- If not set, uses local player
 	@return Humanoid?
 ]=]
-function HumanoidTrackerService:GetAliveHumanoid(player)
+function HumanoidTrackerService:GetAliveHumanoid(player: Player?): Humanoid?
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
 	player = player or Players.LocalPlayer
@@ -118,9 +121,9 @@ end
 	Observe a player's alive humanoid
 
 	@param player Player? -- If not set, uses local player
-	@return Observable<Humanoid | nil>
+	@return Observable<Humanoid?>
 ]=]
-function HumanoidTrackerService:ObserveAliveHumanoid(player)
+function HumanoidTrackerService:ObserveAliveHumanoid(player: Player?): Observable.Observable<Humanoid?>
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
 	player = player or Players.LocalPlayer
@@ -134,7 +137,7 @@ end
 	@param player Player? -- If not set, uses local player
 	@return Observable<Brio<Humanoid>>
 ]=]
-function HumanoidTrackerService:ObserveAliveHumanoidBrio(player)
+function HumanoidTrackerService:ObserveAliveHumanoidBrio(player: Player?)
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
 	player = player or Players.LocalPlayer

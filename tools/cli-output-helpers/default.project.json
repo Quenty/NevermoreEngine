@@ -1,0 +1,7 @@
+{
+  "name": "cli-output-helpers",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$path": { "optional": "does_not_exist_to_stop_rojo_errors" }
+  }
+}

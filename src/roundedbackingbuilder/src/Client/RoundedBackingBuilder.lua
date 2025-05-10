@@ -21,7 +21,7 @@ function RoundedBackingBuilder.new(options)
 	local self = setmetatable({}, RoundedBackingBuilder)
 
 	self._options = options or {
-		sibling = true;
+		sibling = true,
 	}
 
 	return self

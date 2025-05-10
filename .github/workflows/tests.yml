@@ -1,0 +1,67 @@
+name: tests
+on: [push]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          cache-dependency-path: package.json
+          node-version: "18"
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update
+          sudo apt install gh -y
+
+      - name: Setup npm for GitHub Packages
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install package dependencies
+        run: |
+          echo "Installing package dependencies..."
+          npx lerna exec -- npm install --no-audit
+          PACKAGES=$(npx lerna ls --since origin/main --json | jq -r '.[] | select(.name != "@quenty/nevermore-cli") | .location' | tr '\n' ' ')
+          echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
+
+      - name: Setup test place project
+        run: |
+          echo "Setting up test place project from template..."
+          cp -r tests/test-place-template tests/bin
+          cd tests/bin
+
+          echo "Installing changed packages..."
+          npm i ${{ env.PACKAGES }}
+
+          echo "Installing Jest"
+          npm i https://github.com/quentystudios/jest-lua.git
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          path: tests/bin
+          version: 'v0.3.0'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate test place file
+        run: rojo build default.project.json -o testBuild.rbxl
+        working-directory: tests/bin
+
+      - name: Publish test place to Roblox and run tests
+        run: lune run cloud/publish-test-place.luau bin/testBuild.rbxl bin/run-tests.luau
+        working-directory: tests
+        env:
+          ROBLOX_UNIT_TEST_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}

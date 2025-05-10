@@ -14,12 +14,16 @@ serviceBag:Start()
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 
 local Players = game:GetService("Players")
-serviceBag:GetService(require("GameProductServiceClient")):ObservePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.PASS, 27825080)
+serviceBag
+	:GetService(require("GameProductServiceClient"))
+	:ObservePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.PASS, 27825080)
 	:Subscribe(function(owns)
 		print("owns", owns)
 	end)
 
-serviceBag:GetService(require("GameProductServiceClient")):ObservePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.ASSET, "FrogOnHead")
+serviceBag
+	:GetService(require("GameProductServiceClient"))
+	:ObservePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.ASSET, "FrogOnHead")
 	:Subscribe(function(owns)
 		print("owns frog on head", owns)
 	end)

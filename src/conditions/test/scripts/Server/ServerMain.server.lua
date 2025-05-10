@@ -7,8 +7,8 @@ local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.conditions)
 
 local AdorneeConditionUtils = require("AdorneeConditionUtils")
-local TieDefinition = require("TieDefinition")
 local AttributeValue = require("AttributeValue")
+local TieDefinition = require("TieDefinition")
 
 do
 	local conditionFolder = AdorneeConditionUtils.createConditionContainer()
@@ -45,12 +45,11 @@ do
 	door.Name = "Door"
 	door.Parent = workspace
 
-
 	local openableInterface = TieDefinition.new("Openable", {
-		IsOpen = TieDefinition.Types.PROPERTY;
+		IsOpen = TieDefinition.Types.PROPERTY,
 	})
 	openableInterface:Implement(door, {
-		IsOpen = AttributeValue.new(door, "IsOpen", false);
+		IsOpen = AttributeValue.new(door, "IsOpen", false),
 	})
 
 	local canOpenCondition = AdorneeConditionUtils.createConditionContainer()

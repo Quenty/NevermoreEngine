@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class TextFilterService
 ]=]
@@ -5,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local GetRemoteFunction = require("GetRemoteFunction")
+local Promise = require("Promise")
 local TextFilterServiceConstants = require("TextFilterServiceConstants")
 local TextFilterUtils = require("TextFilterUtils")
 
@@ -28,7 +30,7 @@ function TextFilterService:_handleServerInvoke(...)
 	return true, filteredName
 end
 
-function TextFilterService:_turnRequestToPromise(player, request, ...)
+function TextFilterService:_turnRequestToPromise(player: Player, request: string, ...)
 	assert(player, "Bad player")
 	assert(type(request) == "string", "Bad request")
 
@@ -43,16 +45,21 @@ function TextFilterService:_turnRequestToPromise(player, request, ...)
 	end
 end
 
-function TextFilterService:_promiseNonChatStringForUser(player, text, fromUserId)
+function TextFilterService:_promiseNonChatStringForUser(
+	player: Player,
+	text: string,
+	fromUserId: number
+): Promise.Promise<string>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 
 	return TextFilterUtils.promiseNonChatStringForUserAsync(
-			text,
-			fromUserId,
-			player.UserId,
-			Enum.TextFilterContext.PublicChat)
+		text,
+		fromUserId,
+		player.UserId,
+		Enum.TextFilterContext.PublicChat
+	)
 		:Catch(function(_)
 			-- Error occurs due to player having left the game, but we still need to display their text, so let's fallback
 			-- to this text
@@ -60,15 +67,16 @@ function TextFilterService:_promiseNonChatStringForUser(player, text, fromUserId
 		end)
 end
 
-function TextFilterService:_promiseNonChatStringForBroadcast(player, text, fromUserId)
+function TextFilterService:_promiseNonChatStringForBroadcast(
+	player: Player,
+	text: string,
+	fromUserId: number
+): Promise.Promise<string>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 
-	return TextFilterUtils.promiseNonChatStringForBroadcast(
-			text,
-			fromUserId,
-			Enum.TextFilterContext.PublicChat)
+	return TextFilterUtils.promiseNonChatStringForBroadcast(text, fromUserId, Enum.TextFilterContext.PublicChat)
 		:Catch(function(_)
 			-- Error occurs due to player having left the game, but we still need to display their text, so let's fallback
 			-- to this text
@@ -76,7 +84,10 @@ function TextFilterService:_promiseNonChatStringForBroadcast(player, text, fromU
 		end)
 end
 
-function TextFilterService:_promisePreviewNonChatStringForBroadcast(player, text)
+function TextFilterService:_promisePreviewNonChatStringForBroadcast(
+	player: Player,
+	text: string
+): Promise.Promise<string>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(text) == "string", "Bad text")
 

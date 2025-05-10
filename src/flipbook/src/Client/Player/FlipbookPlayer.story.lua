@@ -2,14 +2,15 @@
 	@class Flipbook.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Flipbook = require("Flipbook")
 local FlipbookPlayer = require("FlipbookPlayer")
 local Maid = require("Maid")
 local UICornerUtils = require("UICornerUtils")
 
-local function makeLabel(maid, flipbook, target, isBoomarang)
+local function makeLabel(maid: Maid.Maid, flipbook: Flipbook.Flipbook, target: Instance, isBoomarang: boolean)
 	local size = flipbook:GetImageRectSize()
 
 	local imageLabel = Instance.new("ImageLabel")
@@ -65,7 +66,7 @@ local function makeButton(maid, flipbook, target, isBoomarang)
 	return imageButton
 end
 
-return function(target)
+return function(target: Instance)
 	local maid = Maid.new()
 
 	local container = Instance.new("Frame")
@@ -83,94 +84,139 @@ return function(target)
 	uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	uiListLayout.Parent = container
 
-	makeLabel(maid, Flipbook.new({
-		image = "rbxassetid://5085366281";
-		rows = 6;
-		columns = 6;
-		frameCount = 34;
-		imageRectSize = Vector2.new(85.33333, 85.33333);
-		frameRate = 20;
-		restFrame = 1;
-	}), container, false)
+	makeLabel(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://5085366281",
+			rows = 6,
+			columns = 6,
+			frameCount = 34,
+			imageRectSize = Vector2.new(85.33333, 85.33333),
+			frameRate = 20,
+			restFrame = 1,
+		}),
+		container,
+		false
+	)
 
-	makeLabel(maid, Flipbook.new({
-		image = "rbxassetid://5085366281";
-		rows = 6;
-		columns = 6;
-		frameCount = 34;
-		imageRectSize = Vector2.new(85.33333, 85.33333);
-		frameRate = 20;
-		restFrame = 1;
-	}), container, true)
+	makeLabel(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://5085366281",
+			rows = 6,
+			columns = 6,
+			frameCount = 34,
+			imageRectSize = Vector2.new(85.33333, 85.33333),
+			frameRate = 20,
+			restFrame = 1,
+		}),
+		container,
+		true
+	)
 
-	makeLabel(maid, Flipbook.new({
-		image = "rbxassetid://8966463176";
-		rows = 6;
-		columns = 6;
-		imageRectSize = Vector2.new(170, 170);
-		frameRate = 50;
-		restFrame = 1;
-	}), container, false)
+	makeLabel(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://8966463176",
+			rows = 6,
+			columns = 6,
+			imageRectSize = Vector2.new(170, 170),
+			frameRate = 50,
+			restFrame = 1,
+		}),
+		container,
+		false
+	)
 
-	makeLabel(maid, Flipbook.new({
-		image = "rbxassetid://9234616869";
-		rows = 10;
-		columns = 10;
-		frameCount = 92;
-		imageRectSize = Vector2.new(102, 102);
-		frameRate = 50;
-		restFrame = 1;
-	}), container, false)
+	makeLabel(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://9234616869",
+			rows = 10,
+			columns = 10,
+			frameCount = 92,
+			imageRectSize = Vector2.new(102, 102),
+			frameRate = 50,
+			restFrame = 1,
+		}),
+		container,
+		false
+	)
 
-	makeButton(maid, Flipbook.new({
-		image = "rbxassetid://9234616869";
-		rows = 10;
-		columns = 10;
-		frameCount = 92;
-		imageRectSize = Vector2.new(102, 102);
-		frameRate = 60;
-		restFrame = 1;
-	}), container, false)
+	makeButton(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://9234616869",
+			rows = 10,
+			columns = 10,
+			frameCount = 92,
+			imageRectSize = Vector2.new(102, 102),
+			frameRate = 60,
+			restFrame = 1,
+		}),
+		container,
+		false
+	)
 
-	makeButton(maid, Flipbook.new({
-		image = "rbxassetid://5085366281";
-		rows = 6;
-		columns = 6;
-		frameCount = 34;
-		imageRectSize = Vector2.new(85.33333, 85.33333);
-		frameRate = 20;
-		restFrame = 1;
-	}), container, true)
+	makeButton(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://5085366281",
+			rows = 6,
+			columns = 6,
+			frameCount = 34,
+			imageRectSize = Vector2.new(85.33333, 85.33333),
+			frameRate = 20,
+			restFrame = 1,
+		}),
+		container,
+		true
+	)
 
-	makeLabel(maid, Flipbook.new({
-		image = "rbxassetid://9234616869";
-		rows = 10;
-		columns = 10;
-		frameCount = 92;
-		imageRectSize = Vector2.new(102, 102);
-		frameRate = 50;
-		restFrame = 1;
-	}), container, false)
+	makeLabel(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://9234616869",
+			rows = 10,
+			columns = 10,
+			frameCount = 92,
+			imageRectSize = Vector2.new(102, 102),
+			frameRate = 50,
+			restFrame = 1,
+		}),
+		container,
+		false
+	)
 
-	makeLabel(maid, Flipbook.new({
-		image = "rbxassetid://12273540121";
-		rows = 7;
-		columns = 7;
-		frameCount = 45;
-		imageRectSize = Vector2.new(146, 146);
-		frameRate = 30;
-		restFrame = 1;
-	}), container, false)
+	makeLabel(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://12273540121",
+			rows = 7,
+			columns = 7,
+			frameCount = 45,
+			imageRectSize = Vector2.new(146, 146),
+			frameRate = 30,
+			restFrame = 1,
+		}),
+		container,
+		false
+	)
 
-	makeLabel(maid, Flipbook.new({
-		image = "rbxassetid://9234650028";
-		columns = 9;
-		rows = 8;
-		frameCount = 66;
-		imageRectSize = Vector2.new(113, 113);
-		frameRate = 60;
-		restFrame = 1;
-	}), container, false)
+	makeLabel(
+		maid,
+		Flipbook.new({
+			image = "rbxassetid://9234650028",
+			columns = 9,
+			rows = 8,
+			frameCount = 66,
+			imageRectSize = Vector2.new(113, 113),
+			frameRate = 60,
+			restFrame = 1,
+		}),
+		container,
+		false
+	)
 
 	return function()
 		maid:DoCleaning()

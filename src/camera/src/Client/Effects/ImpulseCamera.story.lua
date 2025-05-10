@@ -2,15 +2,16 @@
 	@class ImpulseCamera.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
-local Maid = require("Maid")
 local CameraStack = require("CameraStack")
-local ImpulseCamera = require("ImpulseCamera")
 local DefaultCamera = require("DefaultCamera")
+local ImpulseCamera = require("ImpulseCamera")
+local Maid = require("Maid")
 
 return function(target)
 	local maid = Maid.new()
@@ -67,9 +68,8 @@ return function(target)
 		maid:GiveTask(button.Activated:Connect(impulse))
 	end
 
-
 	makeShaker("Shake", function()
-		impulseCamera:Impulse(Vector3.new(0, math.random() - 0.5, math.random() - 0.5)*50, 50, 0.2)
+		impulseCamera:Impulse(Vector3.new(0, math.random() - 0.5, math.random() - 0.5) * 50, 50, 0.2)
 	end)
 	makeShaker("SHAKE", function()
 		impulseCamera:ImpulseRandom(Vector3.new(0, 3, 0), 75, 0.1)

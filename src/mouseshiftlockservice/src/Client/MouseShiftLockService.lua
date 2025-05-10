@@ -14,8 +14,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
 local StarterPlayer = game:GetService("StarterPlayer")
+local UserInputService = game:GetService("UserInputService")
 
 local Promise = require("Promise")
 
@@ -72,7 +72,7 @@ function MouseShiftLockService:_buildPromiseReady()
 			return reject(err)
 		end
 
-		resolve()
+		return resolve()
 	end)
 end
 

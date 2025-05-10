@@ -3,6 +3,99 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.18.3...@quenty/templateprovider@11.19.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+
+
+
+## [11.18.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.18.2...@quenty/templateprovider@11.18.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+
+
+
+
+## [11.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.18.0...@quenty/templateprovider@11.18.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [11.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.18.0...@quenty/templateprovider@11.18.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
+# [11.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.17.4...@quenty/templateprovider@11.18.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+
+
+
+
+## [11.17.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.17.3...@quenty/templateprovider@11.17.4) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+
+
+
+
+## [11.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.17.2...@quenty/templateprovider@11.17.3) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+
+
+
+
+## [11.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.17.1...@quenty/templateprovider@11.17.2) (2025-03-13)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+
+
+
+
+## [11.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.17.0...@quenty/templateprovider@11.17.1) (2025-03-09)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+
+
+
+
+# [11.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.16.1...@quenty/templateprovider@11.17.0) (2025-02-18)
+
+
+### Bug Fixes
+
+* Fix missing remoting package ([ca40c8d](https://github.com/Quenty/NevermoreEngine/commit/ca40c8dd415c2d47340296a88eaad5d2807df327))
+
+
+
+
+
 ## [11.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.16.0...@quenty/templateprovider@11.16.1) (2025-01-22)
 
 **Note:** Version bump only for package @quenty/templateprovider

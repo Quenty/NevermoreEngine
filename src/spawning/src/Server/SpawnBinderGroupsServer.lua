@@ -8,7 +8,6 @@ local BinderGroup = require("BinderGroup")
 local t = require("t")
 
 return require("BinderGroupProvider").new(function(self, _serviceBag)
-
 	-- SpawnProvider
 	-- self:Add("SpawnProviders", BinderGroup.new(
 	-- 	{
@@ -19,12 +18,14 @@ return require("BinderGroupProvider").new(function(self, _serviceBag)
 	-- ))
 
 	-- Item / asset spawning
-	self:Add("Spawners", BinderGroup.new(
-		{
-		},
-		t.interface({
-			SpawnUpdate = t.callback;
-			Regenerate = t.callback;
-		})
-	))
+	self:Add(
+		"Spawners",
+		BinderGroup.new(
+			{},
+			t.interface({
+				SpawnUpdate = t.callback,
+				Regenerate = t.callback,
+			})
+		)
+	)
 end)

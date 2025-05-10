@@ -6,7 +6,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RagdollableBase = require("RagdollableBase")
 local Maid = require("Maid")
 local Motor6DStackHumanoid = require("Motor6DStackHumanoid")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
@@ -15,10 +14,11 @@ local RagdollAdditionalAttachmentUtils = require("RagdollAdditionalAttachmentUti
 local RagdollBallSocketUtils = require("RagdollBallSocketUtils")
 local RagdollCollisionUtils = require("RagdollCollisionUtils")
 local RagdollMotorUtils = require("RagdollMotorUtils")
-local RxBrioUtils = require("RxBrioUtils")
-local RxRagdollUtils = require("RxRagdollUtils")
+local RagdollableBase = require("RagdollableBase")
 local RagdollableInterface = require("RagdollableInterface")
 local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxRagdollUtils = require("RxRagdollUtils")
 
 local Ragdollable = setmetatable({}, RagdollableBase)
 Ragdollable.ClassName = "Ragdollable"
@@ -41,8 +41,8 @@ function Ragdollable.new(humanoid, serviceBag)
 	-- Ensure predefined physics rig immediatelly on the server.
 	-- We do this so during replication loop-back there's no chance of death.
 	self._maid:GiveTask(RxBrioUtils.flatCombineLatest({
-		character = RxRagdollUtils.observeCharacterBrio(self._obj);
-		rigType = RxRagdollUtils.observeRigType(self._obj);
+		character = RxRagdollUtils.observeCharacterBrio(self._obj),
+		rigType = RxRagdollUtils.observeRigType(self._obj),
 	}):Subscribe(function(state)
 		if state.character and state.rigType then
 			local maid = Maid.new()
@@ -74,7 +74,7 @@ function Ragdollable:ObserveIsRagdolled()
 	return self._ragdollBinder:Observe(self._obj):Pipe({
 		Rx.map(function(value)
 			return value and true or false
-		end)
+		end),
 	})
 end
 

@@ -8,9 +8,10 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local Binder = require("Binder")
-local Maid = require("Maid")
-local ValueObject = require("ValueObject")
 local HumanoidTrackerService = require("HumanoidTrackerService")
+local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
+local ValueObject = require("ValueObject")
 
 local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
@@ -36,7 +37,7 @@ end
 	@param serviceBag ServiceBag
 	@param ... any
 ]=]
-function PlayerHumanoidBinder:Init(serviceBag, ...)
+function PlayerHumanoidBinder:Init(serviceBag: ServiceBag.ServiceBag, ...)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	getmetatable(PlayerHumanoidBinder).Init(self, serviceBag, ...)
@@ -52,7 +53,7 @@ end
 	Sets whether tagging should be enabled
 	@param shouldTag boolean
 ]=]
-function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag)
+function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag: boolean)
 	assert(type(shouldTag) == "boolean", "Bad shouldTag")
 	assert(self._shouldTag, "Missing self._shouldTag")
 
@@ -102,7 +103,7 @@ function PlayerHumanoidBinder:_bindTagging(doUnbinding)
 			playerMaid[player] = nil
 		end))
 
-		for _, player in pairs(Players:GetPlayers()) do
+		for _, player in Players:GetPlayers() do
 			self:_handlePlayerAdded(playerMaid, player)
 		end
 
@@ -111,7 +112,7 @@ function PlayerHumanoidBinder:_bindTagging(doUnbinding)
 		self._maid._tagging = nil
 
 		if doUnbinding then
-			for _, player in pairs(Players:GetPlayers()) do
+			for _, player in Players:GetPlayers() do
 				local character = player.Character
 				local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
 				if humanoid then
@@ -134,6 +135,5 @@ function PlayerHumanoidBinder:_handlePlayerAdded(playerMaid, player)
 
 	playerMaid[player] = maid
 end
-
 
 return PlayerHumanoidBinder

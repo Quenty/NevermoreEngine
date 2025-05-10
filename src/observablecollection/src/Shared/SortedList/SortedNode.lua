@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Used by [ObservableSortedList] to maintain a red-black binary search tree.
 
@@ -6,34 +7,47 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ListIndexUtils = require("ListIndexUtils")
 local DuckTypeUtils = require("DuckTypeUtils")
+local ListIndexUtils = require("ListIndexUtils")
+local SortFunctionUtils = require("SortFunctionUtils")
+local SortedNodeValue = require("SortedNodeValue")
 local Table = require("Table")
 
 local DEBUG_ASSERTION_SLOW = false
 
+export type SortedNodeColor = "BLACK" | "RED"
+
+export type SortedNodeColorMap = {
+	BLACK: "BLACK",
+	RED: "RED",
+}
+
 local Color = Table.readonly({
-	BLACK = "BLACK";
-	RED = "RED";
-})
+	BLACK = "BLACK",
+	RED = "RED",
+} :: SortedNodeColorMap)
 
 local SortedNode = {}
 SortedNode.ClassName = "SortedNode"
 SortedNode.__index = SortedNode
 
-export type SortedNode<T> = typeof(setmetatable({
-	left = nil :: SortedNode<T>?,
-	right = nil :: SortedNode<T>?,
-	color = nil :: "B" | "R";
-	value = nil :: number,
-	descendantCount = nil :: number,
-	data = nil :: T
-}, SortedNode))
+export type SortedNode<T> = typeof(setmetatable(
+	{} :: {
+		left: SortedNode<T>?,
+		right: SortedNode<T>?,
+		parent: SortedNode<T>?,
+		color: SortedNodeColor,
+		value: number?, -- Actually SortedNodeValue too, but we treat as number
+		descendantCount: number,
+		data: T,
+	},
+	{} :: typeof({ __index = SortedNode })
+))
 
-function SortedNode.new(data): SortedNode<T>
+function SortedNode.new<T>(data: T): SortedNode<T>
 	assert(data ~= nil, "Bad data")
 
-	local self = setmetatable({}, SortedNode)
+	local self: SortedNode<T> = setmetatable({} :: any, SortedNode)
 
 	self.data = data
 	self.color = Color.RED
@@ -42,14 +56,14 @@ function SortedNode.new(data): SortedNode<T>
 	return self
 end
 
-function SortedNode.isSortedNode(value)
+function SortedNode.isSortedNode(value: any): boolean
 	return DuckTypeUtils.isImplementation(SortedNode, value)
 end
 
-function SortedNode:IterateNodes()
+function SortedNode.IterateNodes<T>(self: SortedNode<T>): SortFunctionUtils.WrappedIterator<number, SortedNode<T>>
 	return coroutine.wrap(function()
-		local stack = {}
-		local current = self
+		local stack: { SortedNode<T> } = {}
+		local current: any? = self
 		local index = 1
 
 		while current or #stack > 0 do
@@ -62,15 +76,15 @@ function SortedNode:IterateNodes()
 			current = table.remove(stack)
 			coroutine.yield(index, current)
 			index += 1
-			current = current.right
+			current = (current :: any).right
 		end
-	end)
+	end) :: any
 end
 
-function SortedNode:IterateData()
+function SortedNode.IterateData<T>(self: SortedNode<T>): SortFunctionUtils.WrappedIterator<number, T>
 	return coroutine.wrap(function()
-		local stack = {}
-		local current = self
+		local stack: { SortedNode<T> } = {}
+		local current: any = self
 		local index = 1
 
 		while current or #stack > 0 do
@@ -80,12 +94,12 @@ function SortedNode:IterateData()
 				current = current.left
 			end
 
-			current = table.remove(stack)
-			coroutine.yield(index, current.data)
+			local removed: SortedNode<T> = assert(table.remove(stack), "Must have entry")
+			coroutine.yield(index, removed.data)
 			index += 1
-			current = current.right
+			current = removed.right
 		end
-	end)
+	end) :: any
 end
 
 --[=[
@@ -96,7 +110,11 @@ end
 	@param finish number
 	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
 ]=]
-function SortedNode:IterateNodesRange(start, finish)
+function SortedNode.IterateNodesRange<T>(
+	self: SortedNode<T>,
+	start: number,
+	finish: number?
+): SortFunctionUtils.WrappedIterator<number, SortedNode<T>>
 	assert(type(start) == "number", "Bad start")
 	assert(type(finish) == "number" or finish == nil, "Bad finish")
 	assert(self.parent == nil, "Should only be called on root")
@@ -106,16 +124,16 @@ function SortedNode:IterateNodesRange(start, finish)
 	end
 
 	return coroutine.wrap(function()
-		local target = ListIndexUtils.toPositiveIndex(self.descendantCount, start)
-		local endTarget = ListIndexUtils.toPositiveIndex(self.descendantCount, finish or -1)
-		local current = self:FindNodeAtIndex(target)
+		local target: number = ListIndexUtils.toPositiveIndex(self.descendantCount, start)
+		local endTarget: number = ListIndexUtils.toPositiveIndex(self.descendantCount, finish or -1)
+		local current: any? = self:FindNodeAtIndex(target)
 
 		-- We're out of range
 		if not current then
 			return
 		end
 
-		local index = target
+		local index: number = target
 
 		while current do
 			coroutine.yield(index, current)
@@ -144,10 +162,12 @@ function SortedNode:IterateNodesRange(start, finish)
 
 			current = current.parent
 		end
-	end)
+
+		return
+	end) :: any
 end
 
-function SortedNode:FindNodeAtIndex(searchIndex)
+function SortedNode.FindNodeAtIndex<T>(self: SortedNode<T>, searchIndex: number): SortedNode<T>?
 	assert(type(searchIndex) == "number", "Bad searchIndex")
 	assert(self.parent == nil, "Should only be called on root")
 
@@ -156,7 +176,7 @@ function SortedNode:FindNodeAtIndex(searchIndex)
 		return nil
 	end
 
-	local current = self
+	local current: any = self
 	local index = 1
 	if self.left then
 		index += self.left.descendantCount
@@ -183,7 +203,7 @@ function SortedNode:FindNodeAtIndex(searchIndex)
 	return nil
 end
 
-function SortedNode:FindNodeIndex(node)
+function SortedNode.FindNodeIndex<T>(self: SortedNode<T>, node: SortedNode<T>): number?
 	assert(SortedNode.isSortedNode(node), "Bad node")
 	assert(self.parent == nil, "Should only be called on root")
 
@@ -195,7 +215,7 @@ function SortedNode:FindNodeIndex(node)
 	end
 end
 
-function SortedNode:GetIndex(): number
+function SortedNode.GetIndex<T>(self: SortedNode<T>): number
 	local index = 1
 
 	if self.left then
@@ -207,8 +227,8 @@ function SortedNode:GetIndex(): number
 		if current == current.parent.right then
 			index += 1
 
-			if current.parent.left then
-				index += current.parent.left.descendantCount
+			if (current :: any).parent.left then
+				index += (current :: any).parent.left.descendantCount
 			end
 		end
 
@@ -218,7 +238,7 @@ function SortedNode:GetIndex(): number
 	return index
 end
 
-function SortedNode:FindFirstNodeForData(data)
+function SortedNode.FindFirstNodeForData<T>(self: SortedNode<T>, data: T): SortedNode<T>?
 	-- TODO: This is a linear search, very bad
 
 	for _, current in self:IterateNodes() do
@@ -230,7 +250,7 @@ function SortedNode:FindFirstNodeForData(data)
 	return nil
 end
 
-function SortedNode:NeedsToMove(root, newValue)
+function SortedNode.NeedsToMove<T>(self: SortedNode<T>, root: SortedNode<T>?, newValue: number): boolean
 	assert(newValue ~= nil, "Bad newValue")
 
 	if self.parent ~= nil then
@@ -263,10 +283,10 @@ end
 --[=[
 	Returns true if the node is contained within the parent node
 ]=]
-function SortedNode:ContainsNode(node: SortedNode): boolean
+function SortedNode.ContainsNode<T>(self: SortedNode<T>, node: SortedNode<T>): boolean
 	assert(SortedNode.isSortedNode(node), "Bad SortedNode")
 
-	local current = node
+	local current: any = node
 	while current do
 		if current == self then
 			return true
@@ -278,11 +298,11 @@ function SortedNode:ContainsNode(node: SortedNode): boolean
 	return false
 end
 
-function SortedNode:MarkBlack()
+function SortedNode.MarkBlack<T>(self: SortedNode<T>)
 	self.color = Color.BLACK
 end
 
-function SortedNode:InsertNode(node): SortedNode<T>
+function SortedNode.InsertNode<T>(self: SortedNode<T>, node: SortedNode<T>): SortedNode<T>
 	assert(SortedNode.isSortedNode(node), "Bad SortedNode")
 	assert(self.parent == nil, "Should only be called on root")
 	assert(node.parent == nil, "Already parented")
@@ -294,8 +314,8 @@ function SortedNode:InsertNode(node): SortedNode<T>
 
 	node.color = Color.RED
 
-	local parent = nil
-	local current = root
+	local parent: SortedNode<T>? = nil
+	local current: any = root
 
 	while current ~= nil do
 		parent = current
@@ -329,7 +349,7 @@ function SortedNode:InsertNode(node): SortedNode<T>
 	return root
 end
 
-function SortedNode:_leftRotate(root, node): SortedNode<T>
+function SortedNode._leftRotate<T>(_self: SortedNode<T>, root, node): SortedNode<T>
 	assert(root, "No root")
 	assert(node, "No node")
 
@@ -352,7 +372,7 @@ function SortedNode:_leftRotate(root, node): SortedNode<T>
 	return root
 end
 
-function SortedNode:_rightRotate(root, node): SortedNode<T>
+function SortedNode._rightRotate<T>(_self: SortedNode<T>, root, node): SortedNode<T>
 	assert(root, "No root")
 	assert(node, "No node")
 
@@ -375,19 +395,19 @@ function SortedNode:_rightRotate(root, node): SortedNode<T>
 	return root
 end
 
-function SortedNode:_swapColors(other)
+function SortedNode._swapColors<T>(self: SortedNode<T>, other: SortedNode<T>)
 	self.color, other.color = other.color, self.color
 end
 
-function SortedNode:_fixDoubleRed(root, node): SortedNode
+function SortedNode._fixDoubleRed<T>(self: SortedNode<T>, root: SortedNode<T>, node: SortedNode<T>): SortedNode<T>
 	if node == root then
 		node.color = Color.BLACK
 		return root
 	end
 
-	local parent = node.parent
-	local grandparent = node.parent and node.parent.parent
-	local uncle = node:_uncle()
+	local parent: any = assert(node.parent, "Must have node parent")
+	local grandparent: any = node.parent and node.parent.parent
+	local uncle: any = node:_uncle()
 
 	if not grandparent then
 		return root
@@ -435,7 +455,7 @@ function SortedNode:_fixDoubleRed(root, node): SortedNode
 	return root
 end
 
-function SortedNode:_setLeft(node: SortedNode)
+function SortedNode._setLeft<T>(self: SortedNode<T>, node: SortedNode<T>?)
 	assert(node ~= self, "Cannot assign to self")
 
 	if self.left == node then
@@ -453,19 +473,18 @@ function SortedNode:_setLeft(node: SortedNode)
 		end
 
 		self.left = node
-		self.left.parent = self
+		node.parent = self
 	end
 
 	self:_updateAllParentDescendantCount()
 end
 
-function SortedNode:_setRight(node: SortedNode)
+function SortedNode._setRight<T>(self: SortedNode<T>, node: SortedNode<T>?)
 	assert(node ~= self, "Cannot assign to self")
 
 	if self.right == node then
 		return
 	end
-
 
 	if self.right then
 		self.right.parent = nil
@@ -478,14 +497,14 @@ function SortedNode:_setRight(node: SortedNode)
 		end
 
 		self.right = node
-		self.right.parent = self
+		node.parent = self
 	end
 
 	self:_updateAllParentDescendantCount()
 end
 
-function SortedNode:_updateAllParentDescendantCount()
-	local current = self
+function SortedNode._updateAllParentDescendantCount<T>(self: SortedNode<T>)
+	local current: any = self
 	while current do
 		local descendantCount = 1
 		local left = current.left
@@ -502,7 +521,7 @@ function SortedNode:_updateAllParentDescendantCount()
 	end
 end
 
-function SortedNode:RemoveNode(node: SortedNode): SortedNode
+function SortedNode.RemoveNode<T>(self: SortedNode<T>, node: SortedNode<T>): SortedNode<T>
 	assert(SortedNode.isSortedNode(node), "Bad SortedNode")
 	assert(self.parent == nil, "Should only be called on root")
 
@@ -534,7 +553,12 @@ function SortedNode:RemoveNode(node: SortedNode): SortedNode
 	return root
 end
 
-function SortedNode:_removeNodeHelper(root, node, depth)
+function SortedNode._removeNodeHelper<T>(
+	self: SortedNode<T>,
+	root: SortedNode<T>?,
+	node: SortedNode<T>?,
+	depth: number?
+): SortedNode<T>
 	assert(root, "Bad root")
 	assert(node, "Bad node")
 	depth = (depth or 0) + 1
@@ -572,7 +596,7 @@ function SortedNode:_removeNodeHelper(root, node, depth)
 			root = self:_swapNodes(root, node, replacement)
 			root = self:_removeNodeHelper(root, node, depth)
 		else
-			assert(node.parent, "Node must have parent")
+			assert(parent, "Node must have parent")
 
 			if node:_isOnLeft() then
 				parent:_setLeft(replacement)
@@ -609,7 +633,12 @@ function SortedNode:_removeNodeHelper(root, node, depth)
 	return root
 end
 
-function SortedNode:_swapNodes(root, node, replacement)
+function SortedNode._swapNodes<T>(
+	_self: SortedNode<T>,
+	root: SortedNode<T>,
+	node: SortedNode<T>,
+	replacement: SortedNode<T>
+): SortedNode<T>?
 	assert(root, "No root")
 	assert(node, "No node")
 	assert(replacement, "No replacement")
@@ -628,12 +657,12 @@ function SortedNode:_swapNodes(root, node, replacement)
 	local nodeLeft = node.left
 	local nodeRight = node.right
 	local nodeOnLeft = nodeParent and node:_isOnLeft()
-	local nodeColor = node.color
+	local nodeColor: SortedNodeColor = node.color
 	local replacementLeft = replacement.left
 	local replacementRight = replacement.right
 	local replacementParent = replacement.parent
 	local replacementOnLeft = replacement:_isOnLeft()
-	local replacementColor = replacement.color
+	local replacementColor: SortedNodeColor = replacement.color
 
 	if replacement.parent == node then
 		node:_unparent()
@@ -718,7 +747,7 @@ function SortedNode:_swapNodes(root, node, replacement)
 	return root
 end
 
-function SortedNode:_findReplacement(node)
+function SortedNode._findReplacement<T>(_self: SortedNode<T>, node: SortedNode<T>): SortedNode<T>?
 	if node.left and node.right then
 		return node.right:_successor()
 	end
@@ -734,7 +763,7 @@ function SortedNode:_findReplacement(node)
 	end
 end
 
-function SortedNode:_successor()
+function SortedNode._successor<T>(self: SortedNode<T>): SortedNode<T>
 	local node = self
 	while node.left ~= nil do
 		node = node.left
@@ -745,7 +774,7 @@ end
 --[[
 	https://www.geeksforgeeks.org/deletion-in-red-black-tree/?ref=oin_asr9
 ]]
-function SortedNode:_fixDoubleBlack(root, node)
+function SortedNode._fixDoubleBlack<T>(self: SortedNode<T>, root: SortedNode<T>, node: SortedNode<T>): SortedNode<T>
 	assert(root, "No root")
 	assert(node, "No node")
 
@@ -798,13 +827,13 @@ function SortedNode:_fixDoubleBlack(root, node)
 			else
 				if sibling:_isOnLeft() then
 					-- Left-right
-					sibling.right.color = parent.color
+					(sibling :: any).right.color = parent.color
 					parent.color = Color.BLACK -- This should be true, but the guide I'm following doesn't specify this?
 					root = self:_leftRotate(root, sibling)
 					root = self:_rightRotate(root, parent)
 				else
 					-- Right-right
-					sibling.right.color = sibling.color
+					(sibling :: any).right.color = sibling.color
 					sibling.color = parent.color
 					parent.color = Color.BLACK -- This should be true, but the guide I'm following doesn't specify this?
 					root = self:_leftRotate(root, parent)
@@ -826,19 +855,19 @@ function SortedNode:_fixDoubleBlack(root, node)
 	return root
 end
 
-function SortedNode:_isOnLeft()
+function SortedNode._isOnLeft<T>(self: SortedNode<T>): boolean
 	assert(self.parent, "Must have parent to invoke this method")
 
 	return self.parent.left == self
 end
 
-function SortedNode:_isOnRight()
+function SortedNode._isOnRight<T>(self: SortedNode<T>): boolean
 	assert(self.parent, "Must have parent to invoke this method")
 
 	return self.parent.right == self
 end
 
-function SortedNode:_hasRedChild()
+function SortedNode._hasRedChild<T>(self: SortedNode<T>): boolean
 	if self.left and self.left.color == Color.RED then
 		return true
 	end
@@ -850,20 +879,20 @@ function SortedNode:_hasRedChild()
 	return false
 end
 
-function SortedNode:_unparent()
-	if not self.parent then
+function SortedNode._unparent<T>(self: SortedNode<T>)
+	local parent = self.parent
+	if not parent then
 		return
-	elseif self.parent.left == self then
-		self.parent:_setLeft(nil)
-	elseif self.parent.right == self then
-		self.parent:_setRight(nil)
+	elseif parent.left == self then
+		parent:_setLeft(nil)
+	elseif parent.right == self then
+		parent:_setRight(nil)
 	else
 		error("Bad state")
 	end
 end
 
-
-function SortedNode:_uncle()
+function SortedNode._uncle<T>(self: SortedNode<T>): SortedNode<T>?
 	local grandparent = self:_grandparent()
 	if not grandparent then
 		return nil
@@ -878,12 +907,13 @@ function SortedNode:_uncle()
 	end
 end
 
-function SortedNode:_sibling()
-	if self.parent then
-		if self == self.parent.left then
-			return self.parent.right
-		elseif self == self.parent.right then
-			return self.parent.left
+function SortedNode._sibling<T>(self: SortedNode<T>): SortedNode<T>?
+	local parent = self.parent
+	if parent then
+		if self == parent.left then
+			return parent.right
+		elseif self == parent.right then
+			return parent.left
 		else
 			error("Bad state")
 		end
@@ -892,7 +922,7 @@ function SortedNode:_sibling()
 	end
 end
 
-function SortedNode:_grandparent()
+function SortedNode._grandparent<T>(self: SortedNode<T>)
 	if self.parent then
 		return self.parent.parent
 	else
@@ -900,20 +930,26 @@ function SortedNode:_grandparent()
 	end
 end
 
-function SortedNode:__tostring()
-	local result
+type SortedNodeTostringStackEntry<T> = {
+	node: SortedNode<T>?,
+	indent: string,
+	isLeft: boolean,
+}
+
+function SortedNode.__tostring<T>(self: SortedNode<T>): string
+	local result: string
 	if self.parent == nil then
 		result = "BinarySearchTree\n"
 	else
 		result = "SortedNode\n"
 	end
 
-	local stack = {} -- Stack to hold nodes and their details
+	local stack: { SortedNodeTostringStackEntry<T> } = {} -- Stack to hold nodes and their details
 	local seen = {}
 	table.insert(stack, { node = self, indent = "", isLeft = false })
 
 	while #stack > 0 do
-		local current = table.remove(stack) -- Pop from the stack
+		local current: SortedNodeTostringStackEntry<T> = assert(table.remove(stack), "Must have entry") -- Pop from the stack
 		local wasSeen
 
 		if current.node then
@@ -938,11 +974,13 @@ function SortedNode:__tostring()
 		end
 
 		if node then
-			local text = string.format("SortedNode { index=%d, value=%s, descendants=%d, color=%s }",
+			local text = string.format(
+				"SortedNode { index=%d, value=%s, descendants=%d, color=%s }",
 				node:GetIndex(),
 				tostring(node.value),
 				node.descendantCount,
-				node.color)
+				node.color
+			)
 
 			if wasSeen then
 				result = result .. "<LOOPED> "
@@ -964,7 +1002,7 @@ function SortedNode:__tostring()
 	return result
 end
 
-function SortedNode:_childCount()
+function SortedNode._childCount<T>(self: SortedNode<T>): number
 	if self.left == nil and self.right == nil then
 		return 0
 	elseif self.left and self.right then
@@ -974,7 +1012,7 @@ function SortedNode:_childCount()
 	end
 end
 
-function SortedNode:_debugGetRoot()
+function SortedNode._debugGetRoot<T>(self: SortedNode<T>): SortedNode<T>
 	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 
 	local seen = {}
@@ -992,7 +1030,7 @@ function SortedNode:_debugGetRoot()
 	return root
 end
 
-function SortedNode:_assertRedBlackIntegrity()
+function SortedNode._assertRedBlackIntegrity<T>(self: SortedNode<T>)
 	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 
 	-- https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
@@ -1000,37 +1038,67 @@ function SortedNode:_assertRedBlackIntegrity()
 		-- Check adjacency
 		if self.left then
 			if self.left.color == Color.RED then
-				error(string.format("A red node should not have a red child %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+				error(
+					string.format(
+						"A red node should not have a red child %s\n%s",
+						tostring(self:_debugGetRoot()),
+						tostring(self)
+					)
+				)
 			end
 		end
 
 		if self.right then
 			if self.right.color == Color.RED then
-				error(string.format("A red node should not have a red child %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+				error(
+					string.format(
+						"A red node should not have a red child %s\n%s",
+						tostring(self:_debugGetRoot()),
+						tostring(self)
+					)
+				)
 			end
 		end
 
 		if self.parent then
 			if self.parent.color == Color.RED then
-				error(string.format("A red node should not be have a red parent %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+				error(
+					string.format(
+						"A red node should not be have a red parent %s\n%s",
+						tostring(self:_debugGetRoot()),
+						tostring(self)
+					)
+				)
 			end
 		end
 	end
 
 	if self.left ~= nil and self.right == nil then
 		if self.left.color ~= Color.RED then
-			error(string.format("Any node with 1 child must be red %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+			error(
+				string.format(
+					"Any node with 1 child must be red %s\n%s",
+					tostring(self:_debugGetRoot()),
+					tostring(self)
+				)
+			)
 		end
 	end
 
 	if self.left == nil and self.right ~= nil then
 		if self.right.color ~= Color.RED then
-			error(string.format("Any node with 1 child must be red %s\n%s", tostring(self:_debugGetRoot()), tostring(self)))
+			error(
+				string.format(
+					"Any node with 1 child must be red %s\n%s",
+					tostring(self:_debugGetRoot()),
+					tostring(self)
+				)
+			)
 		end
 	end
 end
 
-function SortedNode:_assertRedBlackFullIntegritySlow()
+function SortedNode._assertRedBlackFullIntegritySlow<T>(self: SortedNode<T>)
 	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 
 	local root = self:_debugGetRoot()
@@ -1042,7 +1110,7 @@ function SortedNode:_assertRedBlackFullIntegritySlow()
 	local seen = {}
 
 	local maxDepth = nil
-	local function recurse(node, ancestorBlackCount)
+	local function recurse(node: SortedNode<T>, ancestorBlackCount: number)
 		if seen[node] then
 			error("Loop in nodes")
 		end
@@ -1059,7 +1127,13 @@ function SortedNode:_assertRedBlackFullIntegritySlow()
 			if maxDepth == nil then
 				maxDepth = ancestorBlackCount
 			elseif maxDepth ~= ancestorBlackCount then
-				error(string.format("Leaf nodes must all pass through the same amount (%d) of black nodes to root, but we are at %d", maxDepth, ancestorBlackCount))
+				error(
+					string.format(
+						"Leaf nodes must all pass through the same amount (%d) of black nodes to root, but we are at %d",
+						maxDepth,
+						ancestorBlackCount
+					)
+				)
 			end
 		end
 
@@ -1069,7 +1143,13 @@ function SortedNode:_assertRedBlackFullIntegritySlow()
 			if maxDepth == nil then
 				maxDepth = ancestorBlackCount
 			elseif maxDepth ~= ancestorBlackCount then
-				error(string.format("Leaf nodes must all pass through the same amount (%d) of black nodes to root but we are at %d", maxDepth, ancestorBlackCount))
+				error(
+					string.format(
+						"Leaf nodes must all pass through the same amount (%d) of black nodes to root but we are at %d",
+						maxDepth,
+						ancestorBlackCount
+					)
+				)
 			end
 		end
 	end
@@ -1078,7 +1158,7 @@ function SortedNode:_assertRedBlackFullIntegritySlow()
 	recurse(root, 0)
 end
 
-function SortedNode:_assertIntegrity()
+function SortedNode._assertIntegrity<T>(self: SortedNode<T>)
 	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 	assert(self.left ~= self, "Node cannot be parented to self")
 	assert(self.right ~= self, "Node cannot be parented to self")
@@ -1090,13 +1170,25 @@ function SortedNode:_assertIntegrity()
 
 		if parent.left == self then
 			if self.value > parent.value then
-				error(string.format("self.parent.left.value %0.2f >= parent.value %0.2f", self.value, parent.value))
+				error(
+					string.format(
+						"self.parent.left.value %s >= parent.value %s",
+						self:_valueToHumanReadable(),
+						parent:_valueToHumanReadable()
+					)
+				)
 			end
 		end
 
 		if parent.right == self then
 			if self.value < parent.value then
-				error(string.format("self.parent.right.value %0.2f <= parent.value %0.2f", self.value, parent.value))
+				error(
+					string.format(
+						"self.parent.right.value %s <= parent.value %s",
+						self:_valueToHumanReadable(),
+						parent:_valueToHumanReadable()
+					)
+				)
 			end
 		end
 	end
@@ -1107,7 +1199,13 @@ function SortedNode:_assertIntegrity()
 		assert(left.parent == self, "Left parent is not set to us")
 
 		if left.value > self.value then
-			error(string.format("left.value %0.2f > self.value %0.2f", left.value, self.value))
+			error(
+				string.format(
+					"left.value %s > self.value %s",
+					left:_valueToHumanReadable(),
+					self:_valueToHumanReadable()
+				)
+			)
 		end
 
 		descendantCount += left.descendantCount
@@ -1118,7 +1216,13 @@ function SortedNode:_assertIntegrity()
 		assert(right.parent == self, "Right parent is not set to us")
 
 		if right.value < self.value then
-			error(string.format("right.value %0.2f <= self.value %0.2f", right.value, self.value))
+			error(
+				string.format(
+					"right.value %s <= self.value %s",
+					right:_valueToHumanReadable(),
+					self:_valueToHumanReadable()
+				)
+			)
 		end
 
 		descendantCount += right.descendantCount
@@ -1129,7 +1233,18 @@ function SortedNode:_assertIntegrity()
 	end
 end
 
-function SortedNode:_assertFullIntegritySlow()
+function SortedNode._valueToHumanReadable<T>(self: SortedNode<T>): string
+	local value: any = self.value
+	if type(value) == "number" then
+		return string.format("%0.2f", value)
+	elseif SortedNodeValue.isSortedNodeValue(value) then
+		return tostring(value)
+	else
+		error(string.format("Bad value %s", tostring(value)))
+	end
+end
+
+function SortedNode._assertFullIntegritySlow<T>(self: SortedNode<T>)
 	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 
 	local root = self:_debugGetRoot()
@@ -1154,13 +1269,13 @@ function SortedNode:_assertFullIntegritySlow()
 	end
 end
 
-function SortedNode:_assertRootIntegrity()
+function SortedNode._assertRootIntegrity<T>(self: SortedNode<T>)
 	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 	assert(self.parent == nil, "Root should not have a parent")
 	assert(self.color == Color.BLACK, "Root should be black")
 end
 
-function SortedNode:_assertDescendantCount(expected)
+function SortedNode._assertDescendantCount<T>(self: SortedNode<T>, expected: number)
 	assert(DEBUG_ASSERTION_SLOW, "Must have debug enabled")
 
 	if self.descendantCount ~= expected then

@@ -4,9 +4,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
-local Binder = require("Binder")
 
 return BinderProvider.new(script.Name, function(self, serviceBag)
 	-- Tracking

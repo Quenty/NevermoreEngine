@@ -4,17 +4,18 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
-local SecretsServiceConstants = require("SecretsServiceConstants")
-local GetRemoteFunction = require("GetRemoteFunction")
-local Promise = require("Promise")
-local Observable = require("Observable")
 local EllipticCurveCryptography = require("EllipticCurveCryptography")
+local GetRemoteFunction = require("GetRemoteFunction")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Promise = require("Promise")
+local SecretsServiceConstants = require("SecretsServiceConstants")
+local ServiceBag = require("ServiceBag")
 
 local SecretsService = {}
 SecretsService.ServiceName = "SecretsService"
 
-function SecretsService:Init(serviceBag)
+function SecretsService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -39,7 +40,7 @@ end
 
 	@param seed number
 ]=]
-function SecretsService:SetPublicKeySeed(seed)
+function SecretsService:SetPublicKeySeed(seed: number): ()
 	assert(type(seed) == "number", "Bad seed")
 
 	local private, public = EllipticCurveCryptography.keypair(seed or EllipticCurveCryptography.random.random())
@@ -64,23 +65,22 @@ end
 	@param secretKey string
 	@return Promise<string>
 ]=]
-function SecretsService:PromiseSecret(secretKey)
+function SecretsService:PromiseSecret(secretKey: string): Promise.Promise<string>
 	assert(type(secretKey) == "string", "Bad secretKey")
 
 	return self:_promiseSubstore():Then(function(substore)
-		return self._maid:GivePromise(substore:Load(secretKey))
-			:Then(function(data)
-				if type(data) ~= "table" then
-					return Promise.resolved(nil)
+		return self._maid:GivePromise(substore:Load(secretKey)):Then(function(data)
+			if type(data) ~= "table" then
+				return Promise.resolved(nil)
+			else
+				local ok, value = self:_decrypt(data)
+				if ok then
+					return value
 				else
-					local ok, value = self:_decrypt(data)
-					if ok then
-						return value
-					else
-						return Promise.rejected(value or "Failed to decrypt result")
-					end
+					return Promise.rejected(value or "Failed to decrypt result")
 				end
-			end)
+			end
+		end)
 	end)
 end
 
@@ -89,23 +89,22 @@ end
 
 	@return @return Promise<{string}>
 ]=]
-function SecretsService:PromiseAllSecrets()
+function SecretsService:PromiseAllSecrets(): Promise.Promise<{ string }>
 	return self:_promiseSubstore():Then(function(substore)
-		return self._maid:GivePromise(substore:LoadAll())
-			:Then(function(secretsList)
-				local secretMap = {}
+		return self._maid:GivePromise(substore:LoadAll()):Then(function(secretsList)
+			local secretMap = {}
 
-				for key, secretData in pairs(secretsList) do
-					local ok, decrypted = self:_decrypt(secretData)
-					if ok then
-						secretMap[key] = decrypted
-					else
-						warn(string.format("[SecretsService] - Failed to decrypt %q", key))
-					end
+			for key, secretData in secretsList do
+				local ok, decrypted = self:_decrypt(secretData)
+				if ok then
+					secretMap[key] = decrypted
+				else
+					warn(string.format("[SecretsService] - Failed to decrypt %q", key))
 				end
+			end
 
-				return secretMap
-			end)
+			return secretMap
+		end)
 	end)
 end
 
@@ -115,26 +114,29 @@ end
 	@param secretKey string
 	@return Observable<string>
 ]=]
-function SecretsService:ObserveSecret(secretKey)
+function SecretsService:ObserveSecret(secretKey: string): Observable.Observable<string>
 	assert(type(secretKey) == "string", "Bad secretKey")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		maid:GivePromise(self:_promiseSubstore():Then(function(substore)
-			maid:GivePromise(substore:Observe(secretKey):Subscribe(function(data)
-				if type(data) ~= "table" then
-					sub:Fire(nil)
-				else
-					local ok, value = self:_decrypt(data)
-					if ok then
-						sub:Fire(value)
+			maid:GivePromise(
+				substore:Observe(secretKey):Subscribe(function(data)
+					if type(data) ~= "table" then
+						sub:Fire(nil)
 					else
-						-- TODO: Maybe brio instead?
-						sub:Fail(value or "Failed to decrypt result")
+						local ok, value = self:_decrypt(data)
+						if ok then
+							sub:Fire(value)
+						else
+							-- TODO: Maybe brio instead?
+							sub:Fail(value or "Failed to decrypt result")
+						end
 					end
-				end
-			end), sub:GetFailComplete())
+				end),
+				sub:GetFailComplete()
+			)
 		end, function(err)
 			sub:Fail(err or "Failed to get datastore")
 		end))
@@ -148,10 +150,10 @@ end
 
 	@param secretKey string
 ]=]
-function SecretsService:DeleteSecret(secretKey)
+function SecretsService:DeleteSecret(secretKey: string): Promise.Promise<()>
 	assert(type(secretKey) == "string", "Bad secretKey")
 
-	self:_promiseSubstore():Then(function(substore)
+	return self:_promiseSubstore():Then(function(substore)
 		substore:Delete(secretKey)
 	end)
 end
@@ -162,7 +164,7 @@ end
 	@param secretKey string
 	@param value string
 ]=]
-function SecretsService:StoreSecret(secretKey, value)
+function SecretsService:StoreSecret(secretKey: string, value: string): ()
 	assert(type(secretKey) == "string", "Bad secretKey")
 	assert(type(value) == "string", "Bad value")
 
@@ -174,8 +176,8 @@ function SecretsService:StoreSecret(secretKey, value)
 
 		-- TODO: Encode byte array in more efficient structure for JSON
 		local toStore = {
-			encrypted = setmetatable(table.clone(encrypted), nil); -- remove metatable
-			signature = setmetatable(table.clone(signature), nil); -- remove metatable
+			encrypted = setmetatable(table.clone(encrypted), nil), -- remove metatable
+			signature = setmetatable(table.clone(signature), nil), -- remove metatable
 		}
 
 		substore:Store(secretKey, toStore)
@@ -185,9 +187,9 @@ end
 --[=[
 	Clears all the secrets stored in the datastore
 
-	@return { string }
+	@return Promise<()>
 ]=]
-function SecretsService:ClearAllSecrets()
+function SecretsService:ClearAllSecrets(): Promise.Promise<()>
 	return self:_promiseSubstore():Then(function(substore)
 		return substore:Wipe()
 	end)
@@ -196,31 +198,39 @@ end
 --[=[
 	Gets a list of all available secret keys for the game
 
-	@return { string }
+	@return Promise<{ string }>
 ]=]
-function SecretsService:PromiseSecretKeyNamesList()
+function SecretsService:PromiseSecretKeyNamesList(): Promise.Promise<{ string }>
 	return self:_promiseSubstore():Then(function(substore)
 		return substore:PromiseKeyList()
 	end)
 end
 
-function SecretsService:_warnAboutNoPublicKeyStoredInSourceCode()
+function SecretsService:_warnAboutNoPublicKeyStoredInSourceCode(): ()
 	if self._warningRequired then
 		self._warningRequired = false
 		warn(self:_getInstructions())
 	end
 end
 
-function SecretsService:_getInstructions()
-	local instructions = "[SecretsService.StoreSecret] - Security - Current private key seed is GameId, which is guessable."
+function SecretsService:_getInstructions(): string
+	local instructions =
+		"[SecretsService.StoreSecret] - Security - Current private key seed is GameId, which is guessable."
 	instructions = instructions .. "\n\tTIP: This is only applicable if we're storing API keys for use in here."
-	instructions = instructions .. "\n\tTIP: If you set the private key seed in source code, attackers need source code AND datastore access"
-	instructions = instructions .. "\n\tTIP: Call `serviceBag:GetService(require(\"SecretsService\")):SetPublicKeySeed(UNIQUE_RANDOM_NUMBER_HERE)` to suppress this warning."
+	instructions = instructions
+		.. "\n\tTIP: If you set the private key seed in source code, attackers need source code AND datastore access"
+	instructions = instructions
+		.. '\n\tTIP: Call `serviceBag:GetService(require("SecretsService")):SetPublicKeySeed(UNIQUE_RANDOM_NUMBER_HERE)` to suppress this warning.'
 	instructions = instructions .. "\n\tTIP: This will invalidate previous secrets stored."
 	return instructions
 end
 
-function SecretsService:_decrypt(data)
+export type SecretsData = {
+	encrypted: { number },
+	signature: { number },
+}
+
+function SecretsService:_decrypt(data: SecretsData): (boolean?, string)
 	assert(type(data) == "table", "Bad data")
 	assert(data.encrypted ~= nil, "Bad data.encrypted")
 	assert(data.signature ~= nil, "Bad data.signature")
@@ -247,7 +257,8 @@ function SecretsService:_handleServerInvoke(player, request)
 end
 
 function SecretsService:_promiseHandleList(player)
-	return self._permissionsService:PromisePermissionProvider()
+	return self._permissionsService
+		:PromisePermissionProvider()
 		:Then(function(provider)
 			return provider:PromiseIsAdmin(player)
 		end)
@@ -265,7 +276,8 @@ function SecretsService:_promiseSubstore()
 		return self._substorePromise
 	end
 
-	self._substorePromise = self._maid:GivePromise(self._gameDataStoreService:PromiseDataStore())
+	self._substorePromise = self._maid
+		:GivePromise(self._gameDataStoreService:PromiseDataStore())
 		:Then(function(dataStore)
 			return dataStore:GetSubStore("secrets")
 		end)

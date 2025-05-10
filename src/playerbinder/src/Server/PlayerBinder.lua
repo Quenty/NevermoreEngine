@@ -36,7 +36,7 @@ function PlayerBinder:Start()
 	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
 		self:Tag(player)
 	end))
-	for _, item in pairs(Players:GetPlayers()) do
+	for _, item in Players:GetPlayers() do
 		self:Tag(item)
 	end
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RateAggregator
 ]=]
@@ -5,23 +6,44 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Queue = require("Queue")
-local Promise = require("Promise")
-local TupleLookup = require("TupleLookup")
 local LRUCache = require("LRUCache")
+local Promise = require("Promise")
+local Queue = require("Queue")
+local Tuple = require("Tuple")
+local TupleLookup = require("TupleLookup")
 
 local RateAggregator = setmetatable({}, BaseObject)
 RateAggregator.ClassName = "RateAggregator"
 RateAggregator.__index = RateAggregator
 
-function RateAggregator.new(promiseQuery)
-	local self = setmetatable(BaseObject.new(), RateAggregator)
+export type QueueEntry<TArgs..., T...> = {
+	promise: Promise.Promise<T...>,
+	tuple: Tuple.Tuple<TArgs...>,
+}
+
+export type RateAggregator<TArgs..., T...> = typeof(setmetatable(
+	{} :: {
+		_promiseQuery: (TArgs...) -> Promise.Promise<T...>,
+		_maxRequestsPerSecond: number,
+		_minWaitTime: number,
+		_bankedWaitTime: number,
+		_lastQueryTime: number,
+		_queueRunning: boolean,
+		_queue: Queue.Queue<QueueEntry<(TArgs...), (T...)>>,
+		_tupleLookup: TupleLookup.TupleLookup,
+		_promisesLruCache: any,
+	},
+	{} :: typeof({ __index = RateAggregator })
+)) & BaseObject.BaseObject
+
+function RateAggregator.new<TArgs..., T...>(promiseQuery: (TArgs...) -> Promise.Promise<T...>): RateAggregator<TArgs..., T...>
+	local self: RateAggregator<TArgs..., T...> = setmetatable(BaseObject.new() :: any, RateAggregator)
 
 	self._promiseQuery = promiseQuery
 
 	-- Configuration
 	self._maxRequestsPerSecond = 50
-	self._minWaitTime = 1/60
+	self._minWaitTime = 1 / 60
 
 	-- State tracking
 	self._bankedWaitTime = 0
@@ -35,7 +57,7 @@ function RateAggregator.new(promiseQuery)
 	return self
 end
 
-function RateAggregator:SetMaxRequestsPerSecond(maxRequestPerSecond)
+function RateAggregator.SetMaxRequestsPerSecond<TArgs..., T...>(self: RateAggregator<TArgs..., T...>, maxRequestPerSecond: number)
 	self._maxRequestsPerSecond = maxRequestPerSecond
 end
 
@@ -45,7 +67,7 @@ end
 	@param ... any
 	@return Observable<T>
 ]=]
-function RateAggregator:Promise(...)
+function RateAggregator.Promise<TArgs..., T...>(self: RateAggregator<TArgs..., T...>, ...: T...): Promise.Promise<T...>
 	local promise = self._maid:GivePromise(Promise.new())
 
 	local tuple = self._tupleLookup:ToTuple(...)
@@ -55,8 +77,8 @@ function RateAggregator:Promise(...)
 	end
 
 	self._queue:PushRight({
-		tuple = tuple;
-		promise = promise;
+		tuple = tuple,
+		promise = promise,
 	})
 
 	self._promisesLruCache:set(tuple, promise)
@@ -66,7 +88,7 @@ function RateAggregator:Promise(...)
 	return promise
 end
 
-function RateAggregator:_startQueue()
+function RateAggregator._startQueue<TArgs..., T...>(self: RateAggregator<TArgs..., T...>)
 	if self._queueRunning then
 		return
 	end
@@ -75,9 +97,9 @@ function RateAggregator:_startQueue()
 
 	self._maid._processing = task.spawn(function()
 		local timeSinceLastQuery = os.clock() - self._lastQueryTime
-		if timeSinceLastQuery < 1/self._maxRequestsPerSecond then
+		if timeSinceLastQuery < 1 / self._maxRequestsPerSecond then
 			-- eww
-			task.wait(1/self._maxRequestsPerSecond)
+			task.wait(1 / self._maxRequestsPerSecond)
 		end
 
 		while not self._queue:IsEmpty() do
@@ -88,7 +110,7 @@ function RateAggregator:_startQueue()
 				data.promise:Resolve(self._promiseQuery(data.tuple:Unpack()))
 			end)
 
-			local thisStepWaitTime = 1/self._maxRequestsPerSecond
+			local thisStepWaitTime = 1 / self._maxRequestsPerSecond
 			local requiredWaitTime = thisStepWaitTime - self._bankedWaitTime
 
 			if requiredWaitTime < self._minWaitTime then

@@ -1,11 +1,12 @@
+--!strict
 --[=[
 	@class MessagingServiceUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local MessagingService = game:GetService("MessagingService")
 local HttpService = game:GetService("HttpService")
+local MessagingService = game:GetService("MessagingService")
 
 local Promise = require("Promise")
 
@@ -20,7 +21,7 @@ local MessagingServiceUtils = {}
 	@param message any
 	@return Promise
 ]=]
-function MessagingServiceUtils.promisePublish(topic, message)
+function MessagingServiceUtils.promisePublish(topic: string, message: any?): Promise.Promise<()>
 	assert(type(topic) == "string", "Bad topic")
 
 	return Promise.spawn(function(resolve, reject)
@@ -47,7 +48,10 @@ end
 	@param callback callback
 	@return Promise<RBXScriptConnection>
 ]=]
-function MessagingServiceUtils.promiseSubscribe(topic, callback)
+function MessagingServiceUtils.promiseSubscribe(
+	topic: string,
+	callback: (...any) -> ...any
+): Promise.Promise<RBXScriptConnection>
 	assert(type(topic) == "string", "Bad topic")
 	assert(type(callback) == "function", "Bad callback")
 

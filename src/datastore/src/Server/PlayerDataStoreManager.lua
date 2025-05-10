@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	DataStore manager for player that automatically saves on player leave and game close.
 
@@ -17,7 +18,7 @@
 
 	local topMaid = Maid.new()
 
-	local function handlePlayer(player)
+	local function handlePlayer(player: Player)
 		local maid = Maid.new()
 
 		local playerMoneyValue = Instance.new("IntValue")
@@ -39,7 +40,7 @@
 	Players.PlayerRemoving:Connect(function(player)
 		topMaid[player] = nil
 	end)
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		task.spawn(handlePlayer, player)
 	end
 	```
@@ -55,14 +56,28 @@ local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local DataStore = require("DataStore")
-local PromiseUtils = require("PromiseUtils")
-local PendingPromiseTracker = require("PendingPromiseTracker")
 local Maid = require("Maid")
+local PendingPromiseTracker = require("PendingPromiseTracker")
 local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 
 local PlayerDataStoreManager = setmetatable({}, BaseObject)
 PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"
 PlayerDataStoreManager.__index = PlayerDataStoreManager
+
+export type KeyGenerator = (Player) -> string
+export type PlayerDataStoreManager = typeof(setmetatable(
+	{} :: {
+		_robloxDataStore: any,
+		_keyGenerator: KeyGenerator,
+		_datastores: { [Player]: DataStore.DataStore },
+		_removing: { [Player]: boolean },
+		_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
+		_removingCallbacks: { (Player) -> any },
+		_disableSavingInStudio: boolean?,
+	},
+	{} :: typeof({ __index = PlayerDataStoreManager })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new PlayerDataStoreManager.
@@ -72,8 +87,12 @@ PlayerDataStoreManager.__index = PlayerDataStoreManager
 	@param skipBindingToClose boolean?
 	@return PlayerDataStoreManager
 ]=]
-function PlayerDataStoreManager.new(robloxDataStore, keyGenerator, skipBindingToClose)
-	local self = setmetatable(BaseObject.new(), PlayerDataStoreManager)
+function PlayerDataStoreManager.new(
+	robloxDataStore: DataStore,
+	keyGenerator: KeyGenerator,
+	skipBindingToClose: boolean?
+): PlayerDataStoreManager
+	local self: PlayerDataStoreManager = setmetatable(BaseObject.new() :: any, PlayerDataStoreManager)
 
 	assert(type(skipBindingToClose) == "boolean" or skipBindingToClose == nil, "Bad skipBindingToClose")
 
@@ -111,7 +130,7 @@ end
 --[=[
 	For if you want to disable saving in studio for faster close time!
 ]=]
-function PlayerDataStoreManager:DisableSaveOnCloseStudio()
+function PlayerDataStoreManager.DisableSaveOnCloseStudio(self: PlayerDataStoreManager): ()
 	assert(RunService:IsStudio())
 
 	self._disableSavingInStudio = true
@@ -121,7 +140,7 @@ end
 	Adds a callback to be called before save on removal
 	@param callback function -- May return a promise
 ]=]
-function PlayerDataStoreManager:AddRemovingCallback(callback)
+function PlayerDataStoreManager.AddRemovingCallback(self: PlayerDataStoreManager, callback)
 	table.insert(self._removingCallbacks, callback)
 end
 
@@ -131,15 +150,21 @@ end
 
 	@param player Player
 ]=]
-function PlayerDataStoreManager:RemovePlayerDataStore(player)
+function PlayerDataStoreManager.RemovePlayerDataStore(self: PlayerDataStoreManager, player: Player): ()
 	self:_removePlayerDataStore(player)
 end
 
 --[=[
+	Gets the datastore for a player. If it does not exist, it will create one.
+
+	:::tip
+	Returns nil if the player is in the process of being removed.
+	:::
+
 	@param player Player
-	@return DataStore
+	@return DataStore?
 ]=]
-function PlayerDataStoreManager:GetDataStore(player)
+function PlayerDataStoreManager.GetDataStore(self: PlayerDataStoreManager, player: Player): DataStore.DataStore?
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(player:IsA("Player"), "Bad player")
 
@@ -160,14 +185,14 @@ end
 	resolves when all pending saves are saved.
 	@return Promise
 ]=]
-function PlayerDataStoreManager:PromiseAllSaves()
-	for player, _ in pairs(self._datastores) do
+function PlayerDataStoreManager.PromiseAllSaves(self: PlayerDataStoreManager): Promise.Promise<()>
+	for player, _ in self._datastores do
 		self:_removePlayerDataStore(player)
 	end
 	return self._maid:GivePromise(PromiseUtils.all(self._pendingSaves:GetAll()))
 end
 
-function PlayerDataStoreManager:_createDataStore(player)
+function PlayerDataStoreManager._createDataStore(self: PlayerDataStoreManager, player: Player): DataStore.DataStore
 	assert(not self._datastores[player], "Bad player")
 
 	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(player))
@@ -182,7 +207,7 @@ function PlayerDataStoreManager:_createDataStore(player)
 	return datastore
 end
 
-function PlayerDataStoreManager:_removePlayerDataStore(player)
+function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreManager, player: Player)
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(player:IsA("Player"), "Bad player")
 
@@ -194,7 +219,7 @@ function PlayerDataStoreManager:_removePlayerDataStore(player)
 	self._removing[player] = true
 
 	local removingPromises = {}
-	for _, func in pairs(self._removingCallbacks) do
+	for _, func in self._removingCallbacks do
 		local result = func(player)
 		if Promise.isPromise(result) then
 			table.insert(removingPromises, result)
@@ -215,7 +240,7 @@ function PlayerDataStoreManager:_removePlayerDataStore(player)
 	self._maid._savingConns[player] = nil
 end
 
-function PlayerDataStoreManager:_getKey(player)
+function PlayerDataStoreManager._getKey(self: PlayerDataStoreManager, player: Player)
 	return self._keyGenerator(player)
 end
 

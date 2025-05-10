@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/typeutils",
+  "version": "1.1.0",
+  "description": "Utility methods for manipulating Luau types",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "TypeUtils"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/typeutils/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

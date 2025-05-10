@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility function to create network ropes which hint to Roblox that two assemblies
 	should be considered to be owned by the same network owner.
@@ -23,7 +24,7 @@ local NetworkRopeUtils = {}
 	@param part1 BasePart
 	@return Maid
 ]=]
-function NetworkRopeUtils.hintSharedMechanism(part0, part1)
+function NetworkRopeUtils.hintSharedMechanism(part0: BasePart, part1: BasePart): Maid.Maid
 	assert(typeof(part0) == "Instance", "Bad part0")
 	assert(typeof(part1) == "Instance", "Bad part1")
 
@@ -61,11 +62,11 @@ end
 	Removes all network owner hints from a given part
 	@param part Part
 ]=]
-function NetworkRopeUtils.clearNetworkOwnerHints(part)
+function NetworkRopeUtils.clearNetworkOwnerHints(part: BasePart)
 	-- Preemptively clears the ownership of a part so we don't transfer ownership
 	-- accidently
 
-	for _, item in pairs(part:GetChildren()) do
+	for _, item in part:GetChildren() do
 		if CollectionService:HasTag(item, NETWORK_OWNER_ROPE_TAG) then
 			item:Destroy()
 		end

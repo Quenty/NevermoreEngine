@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AccelTween = require("AccelTween")
 local BaseObject = require("BaseObject")
+local ServiceBag = require("ServiceBag")
 local StepUtils = require("StepUtils")
 local TransparencyService = require("TransparencyService")
 
@@ -16,19 +17,37 @@ local ModelTransparencyEffect = setmetatable({}, BaseObject)
 ModelTransparencyEffect.ClassName = "ModelTransparencyEffect"
 ModelTransparencyEffect.__index = ModelTransparencyEffect
 
+export type TransparencyMode = "SetTransparency" | "SetLocalTransparencyModifier"
+
+export type ModelTransparencyEffect = typeof(setmetatable(
+	{} :: {
+		_transparency: AccelTween.AccelTween,
+		_transparencyService: TransparencyService.TransparencyService,
+		_transparencyServiceMethodName: TransparencyMode,
+		_parts: { [Instance]: boolean },
+	},
+	{} :: typeof({ __index = ModelTransparencyEffect })
+)) & BaseObject.BaseObject
+
 --[=[
 	@param serviceBag ServiceBag
 	@param adornee Instance
 	@param transparencyServiceMethodName "SetTransparency" | "SetLocalTransparencyModifier" | nil
 	@return ModelTransparencyEffect
 ]=]
-function ModelTransparencyEffect.new(serviceBag, adornee, transparencyServiceMethodName)
-	local self = setmetatable(BaseObject.new(adornee), ModelTransparencyEffect)
+function ModelTransparencyEffect.new(
+	serviceBag: ServiceBag.ServiceBag,
+	adornee: Instance,
+	transparencyServiceMethodName: TransparencyMode?
+): ModelTransparencyEffect
+	local self: ModelTransparencyEffect = setmetatable(BaseObject.new(adornee) :: any, ModelTransparencyEffect)
 
 	assert(serviceBag, "Bad serviceBag")
 	assert(adornee, "Bad adornee")
-	assert(type(transparencyServiceMethodName) == "string" or transparencyServiceMethodName == nil,
-			"Bad transparencyServiceMethodName")
+	assert(
+		type(transparencyServiceMethodName) == "string" or transparencyServiceMethodName == nil,
+		"Bad transparencyServiceMethodName"
+	)
 
 	self._transparencyService = serviceBag:GetService(TransparencyService)
 
@@ -44,16 +63,20 @@ end
 	Sets the acceleration
 	@param acceleration number
 ]=]
-function ModelTransparencyEffect:SetAcceleration(acceleration)
+function ModelTransparencyEffect.SetAcceleration(self: ModelTransparencyEffect, acceleration: number)
 	self._transparency.a = acceleration
 end
 
 --[=[
 	Sets the transparency
 	@param transparency number
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
-function ModelTransparencyEffect:SetTransparency(transparency, doNotAnimate)
+function ModelTransparencyEffect.SetTransparency(
+	self: ModelTransparencyEffect,
+	transparency: number,
+	doNotAnimate: boolean?
+)
 	if self._transparency.t == transparency then
 		return
 	end
@@ -70,7 +93,7 @@ end
 	Returns true if animation is done
 	@return boolean
 ]=]
-function ModelTransparencyEffect:IsDoneAnimating()
+function ModelTransparencyEffect.IsDoneAnimating(self: ModelTransparencyEffect): boolean
 	return self._transparency.rtime == 0
 end
 
@@ -79,7 +102,7 @@ end
 	finish the animation.
 	@param callback function
 ]=]
-function ModelTransparencyEffect:FinishTransparencyAnimation(callback)
+function ModelTransparencyEffect.FinishTransparencyAnimation(self: ModelTransparencyEffect, callback)
 	self:SetTransparency(0)
 
 	if self._transparency.rtime == 0 then
@@ -91,22 +114,26 @@ function ModelTransparencyEffect:FinishTransparencyAnimation(callback)
 	end
 end
 
-
-function ModelTransparencyEffect:_update()
+function ModelTransparencyEffect._update(self: ModelTransparencyEffect)
 	if self._transparencyService:IsDead() then
 		return
 	end
 
 	local transparency = self._transparency.p
 
-	for part, _ in pairs(self:_getParts()) do
-		self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, part, transparency)
+	for part in self:_getPartsSet() do
+		self._transparencyService[self._transparencyServiceMethodName](
+			self._transparencyService,
+			self,
+			part,
+			transparency
+		)
 	end
 
 	return self._transparency.rtime > 0
 end
 
-function ModelTransparencyEffect:_getParts()
+function ModelTransparencyEffect._getPartsSet(self: ModelTransparencyEffect)
 	if self._parts then
 		return self._parts
 	end
@@ -116,8 +143,8 @@ function ModelTransparencyEffect:_getParts()
 	return self._parts
 end
 
-function ModelTransparencyEffect:_setupParts()
-	assert(not self._parts, "Already initialized")
+function ModelTransparencyEffect._setupParts(self: ModelTransparencyEffect)
+	assert(not (self :: any)._parts, "Already initialized")
 
 	self._parts = {}
 
@@ -125,7 +152,7 @@ function ModelTransparencyEffect:_setupParts()
 		self._parts[self._obj] = true
 	end
 
-	for _, part in pairs(self._obj:GetDescendants()) do
+	for _, part in self._obj:GetDescendants() do
 		if part:IsA("BasePart") or part:IsA("Decal") then
 			self._parts[part] = true
 		end
@@ -154,7 +181,7 @@ function ModelTransparencyEffect:_setupParts()
 			return
 		end
 
-		for part, _ in pairs(self._parts) do
+		for part, _ in self._parts do
 			self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, part, nil)
 		end
 	end)

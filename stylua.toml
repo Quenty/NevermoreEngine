@@ -1,0 +1,5 @@
+syntax = "Luau"
+call_parentheses = "Input"
+
+[sort_requires]
+enabled = true

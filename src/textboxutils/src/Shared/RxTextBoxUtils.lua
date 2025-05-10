@@ -1,11 +1,12 @@
+--!strict
 --[=[
 	@class RxTextBoxUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Observable = require("Observable")
 local Maid = require("Maid")
+local Observable = require("Observable")
 
 local RxTextBoxUtils = {}
 
@@ -15,7 +16,7 @@ local RxTextBoxUtils = {}
 	@param textBox TextBox
 	@return Observable<boolean>
 ]=]
-function RxTextBoxUtils.observeIsFocused(textBox)
+function RxTextBoxUtils.observeIsFocused(textBox: TextBox): Observable.Observable<boolean>
 	assert(typeof(textBox) == "Instance" and textBox:IsA("TextBox"), "Bad textBox")
 
 	return Observable.new(function(sub)
@@ -32,7 +33,7 @@ function RxTextBoxUtils.observeIsFocused(textBox)
 		sub:Fire(textBox:IsFocused())
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxTextBoxUtils

@@ -2,7 +2,8 @@
 	@class InfluxDBClient.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local InfluxDBClient = require("InfluxDBClient")
 local InfluxDBClientConfigUtils = require("InfluxDBClientConfigUtils")
@@ -13,8 +14,8 @@ return function(_target)
 	local maid = Maid.new()
 
 	local config = InfluxDBClientConfigUtils.createClientConfig({
-		url = "https://ingest.robloxanalytics.com/";
-		token = "test-api-key";
+		url = "https://ingest.robloxanalytics.com/",
+		token = "test-api-key",
 	})
 
 	local influxDBClient = InfluxDBClient.new(config)
@@ -33,7 +34,7 @@ return function(_target)
 	point:AddTag("place_id", tostring(game.PlaceId))
 	point:AddStringField("username", "Quenty")
 	point:AddIntField("userid", 4397833)
-	point:AddFloatField("fps", 30 + math.random()*30)
+	point:AddFloatField("fps", 30 + math.random() * 30)
 	point:AddBooleanField("is_alive", true)
 	point:AddBooleanField("is_silent", false)
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving sounds and their state
 	@class SoundPromiseUtils
@@ -5,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
-local PromiseUtils = require("PromiseUtils")
-local PromiseMaidUtils = require("PromiseMaidUtils")
 local Maid = require("Maid")
+local Promise = require("Promise")
+local PromiseMaidUtils = require("PromiseMaidUtils")
+local PromiseUtils = require("PromiseUtils")
 
 local SoundPromiseUtils = {}
 
@@ -17,7 +18,7 @@ local SoundPromiseUtils = {}
 	@param sound Sound
 	@return Promise
 ]=]
-function SoundPromiseUtils.promiseLoaded(sound)
+function SoundPromiseUtils.promiseLoaded(sound: Sound): Promise.Promise<()>
 	if sound.IsLoaded then
 		return Promise.resolved()
 	end
@@ -44,13 +45,13 @@ function SoundPromiseUtils.promiseLoaded(sound)
 	return promise
 end
 
-function SoundPromiseUtils.promisePlayed(sound)
+function SoundPromiseUtils.promisePlayed(sound: Sound): Promise.Promise<()>
 	return SoundPromiseUtils.promiseLoaded(sound):Then(function()
 		return PromiseUtils.delayed(sound.TimeLength)
 	end)
 end
 
-function SoundPromiseUtils.promiseLooped(sound)
+function SoundPromiseUtils.promiseLooped(sound: Sound): Promise.Promise<()>
 	local promise = Promise.new()
 
 	PromiseMaidUtils.whilePromise(promise, function(maid)
@@ -66,9 +67,9 @@ end
 	@param sounds { Sound }
 	@return Promise
 ]=]
-function SoundPromiseUtils.promiseAllSoundsLoaded(sounds)
+function SoundPromiseUtils.promiseAllSoundsLoaded(sounds: { Sound }): Promise.Promise<()>
 	local promises = {}
-	for _, sound in pairs(sounds) do
+	for _, sound in sounds do
 		table.insert(promises, SoundPromiseUtils.promiseLoaded(sound))
 	end
 	return PromiseUtils.all(promises)

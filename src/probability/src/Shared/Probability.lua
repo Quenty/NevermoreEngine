@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Probability utility functions
 	@class Probability
@@ -9,7 +10,7 @@ local Probability = {}
 	Returns a boxMuller random distribution
 	@return number
 ]=]
-function Probability.boxMuller()
+function Probability.boxMuller(): number
 	return math.sqrt(-2 * math.log(math.random())) * math.cos(2 * math.pi * math.random()) / 2
 end
 
@@ -19,7 +20,7 @@ end
 	@param standardDeviation number
 	@return number
 ]=]
-function Probability.normal(mean, standardDeviation)
+function Probability.normal(mean: number, standardDeviation: number): number
 	return mean + Probability.boxMuller() * standardDeviation
 end
 
@@ -31,7 +32,7 @@ end
 	@param hardMax number
 	@return number
 ]=]
-function Probability.boundedNormal(mean, standardDeviation, hardMin, hardMax)
+function Probability.boundedNormal(mean: number, standardDeviation: number, hardMin: number, hardMax: number)
 	return math.clamp(Probability.normal(mean, standardDeviation), hardMin, hardMax)
 end
 
@@ -43,18 +44,16 @@ end
 	@param x number
 	@return number
 ]=]
-function Probability.erf(x)
+function Probability.erf(x: number): number
 	local t = 1 / (1 + 0.5 * math.abs(x))
-	local erf_approx = 1 - t * math.exp(-x * x - 1.26551223 +
-			t * (1.00002368 +
-			t * (0.37409196 +
-			t * (0.09678418 +
-			t * (-0.18628806 +
-			t * (0.27886807 +
-			t * (-1.13520398 +
-			t * (1.48851587 +
-			t * (-0.82215223 +
-			t * (0.17087277))))))))))
+	local erf_approx = 1
+		- t
+			* math.exp(
+				-x * x
+					- 1.26551223
+					+ t
+						* (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))
+			)
 	if x >= 0 then
 		return erf_approx
 	else
@@ -70,7 +69,7 @@ end
 	@param zScore number
 	@return number
 ]=]
-function Probability.cdf(zScore)
+function Probability.cdf(zScore: number): number
 	assert(type(zScore) == "number", "Bad zScore")
 
 	return 0.5 * (1 + Probability.erf(zScore / math.sqrt(2)))
@@ -82,7 +81,7 @@ end
 	@param x number
 	@return number
 ]=]
-function Probability.erfinv(x)
+function Probability.erfinv(x: number): number?
 	assert(type(x) == "number", "Bad x")
 
 	if x < -1 or x > 1 then
@@ -96,7 +95,7 @@ function Probability.erfinv(x)
 	local tolerance = 1e-15
 	local maxIterations = 1000
 
-	local function derivative(y)
+	local function derivative(y: number): number
 		return 2 * math.exp(-y * y) / math.sqrt(math.pi)
 	end
 
@@ -121,11 +120,16 @@ end
 	@param percentile number
 	@return number
 ]=]
-function Probability.percentileToZScore(percentile)
+function Probability.percentileToZScore(percentile: number): number?
 	assert(type(percentile) == "number" and percentile >= 0 and percentile <= 1, "Bad percentile")
 
 	-- Calculate z-score using inverse cumulative distribution function (norm.ppf)
-	local zScore = math.sqrt(2) * Probability.erfinv(2 * percentile - 1)
+	local erfinv = Probability.erfinv(2 * percentile - 1)
+	if erfinv == nil then
+		return nil
+	end
+
+	local zScore = math.sqrt(2) * erfinv
 
 	return zScore
 end

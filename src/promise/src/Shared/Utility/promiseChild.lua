@@ -17,14 +17,19 @@ local Promise = require("Promise")
 	@return Promise<Instance>
 	@within promiseChild
 ]=]
-return function(parent, name, timeOut)
+return function(parent: Instance, name: string, timeOut: number?): Promise.Promise<Instance>
 	local result = parent:FindFirstChild(name)
 	if result then
 		return Promise.resolved(result)
 	end
 
 	return Promise.spawn(function(resolve, reject)
-		local child = parent:WaitForChild(name, timeOut)
+		local child: Instance?
+		if timeOut then
+			child = parent:WaitForChild(name, timeOut)
+		else
+			child = parent:WaitForChild(name)
+		end
 
 		if child then
 			resolve(child)

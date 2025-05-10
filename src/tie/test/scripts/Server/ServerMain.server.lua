@@ -6,11 +6,11 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.tie)
 
-local Door = require("Door")
-local Window = require("Window")
-local OpenableInterface = require("OpenableInterface")
-local ActionInterface = require("ActionInterface")
 local Action = require("Action")
+local ActionInterface = require("ActionInterface")
+local Door = require("Door")
+local OpenableInterface = require("OpenableInterface")
+local Window = require("Window")
 
 local DO_DOOR_WINDOW_TEST = false
 
@@ -36,7 +36,6 @@ if DO_DOOR_WINDOW_TEST then
 		print("door:ObserveIsImplemented()", isImplemented)
 	end)
 
-
 	doorInterface:PromiseOpen():Then(function()
 		print("Opened")
 	end)
@@ -56,7 +55,6 @@ if DO_DOOR_WINDOW_TEST then
 		print("Closed promise resolved")
 	end)
 end
-
 
 local adornee = Instance.new("Folder")
 adornee.Name = "Adornee"
@@ -115,7 +113,7 @@ do
 	end
 end
 
-for _, action in pairs(ActionInterface:GetImplementations(adornee)) do
+for _, action in ActionInterface:GetImplementations(adornee) do
 	-- action.Activated:Connect(function()
 	-- 	print("Action activation!")
 	-- end)

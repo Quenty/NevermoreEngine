@@ -16,7 +16,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-
 local BaseObject = require("BaseObject")
 local Binder = require("Binder")
 

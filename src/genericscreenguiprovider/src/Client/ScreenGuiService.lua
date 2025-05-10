@@ -10,18 +10,21 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
-local ValueObject = require("ValueObject")
+local Observable = require("Observable")
 local PlayerGuiUtils = require("PlayerGuiUtils")
+local ServiceBag = require("ServiceBag")
+local ValueObject = require("ValueObject")
 
 local ScreenGuiService = {}
 ScreenGuiService.ServiceName = "ScreenGuiService"
+ScreenGuiService._hackPlayerGui = nil :: any?
 
 --[=[
 	Initializes the ScreenGuiService
 
 	@param serviceBag ServiceBag
 ]=]
-function ScreenGuiService:Init(serviceBag)
+function ScreenGuiService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -62,7 +65,7 @@ end
 
 	return Observable<ScreenGui?>
 ]=]
-function ScreenGuiService:ObservePlayerGui()
+function ScreenGuiService:ObservePlayerGui(): Observable.Observable<ScreenGui?>
 	self:_ensureInit()
 
 	return self._guiParent:Observe()

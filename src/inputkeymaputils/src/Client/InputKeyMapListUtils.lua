@@ -47,7 +47,7 @@ function InputKeyMapListUtils.observeActiveInputKeyMap(inputKeyMapList, serviceB
 			else
 				return Rx.of(nil)
 			end
-		end);
+		end),
 	})
 end
 
@@ -74,8 +74,8 @@ function InputKeyMapListUtils.observeActiveInputTypesList(inputKeyMapList, servi
 			else
 				return Rx.of(nil)
 			end
-		end);
-		Rx.distinct();
+		end),
+		Rx.distinct(),
 	})
 end
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Rotation model for gamepad controls that uses Roblox's curve smoothing and other components.
 
@@ -15,12 +16,22 @@ local GamepadRotateModel = setmetatable({}, BaseObject)
 GamepadRotateModel.__index = GamepadRotateModel
 GamepadRotateModel.ClassName = "GamepadRotateModel"
 
+export type GamepadRotateModel = typeof(setmetatable(
+	{} :: {
+		_lastInputObject: InputObject?,
+		_rampVelocityX: AccelTween.AccelTween,
+		_rampVelocityY: AccelTween.AccelTween,
+		IsRotating: ValueObject.ValueObject<boolean>,
+	},
+	{} :: typeof({ __index = GamepadRotateModel })
+)) & BaseObject.BaseObject
+
 --[=[
 	Constructs a new GamepadRotateModel.
 	@return GamepadRotateModel
 ]=]
-function GamepadRotateModel.new()
-	local self = setmetatable(BaseObject.new(), GamepadRotateModel)
+function GamepadRotateModel.new(): GamepadRotateModel
+	local self: GamepadRotateModel = setmetatable(BaseObject.new() :: any, GamepadRotateModel)
 
 	self._rampVelocityX = AccelTween.new(25)
 	self._rampVelocityY = AccelTween.new(25)
@@ -40,7 +51,7 @@ end
 
 	@param acceleration number
 ]=]
-function GamepadRotateModel:SetAcceleration(acceleration)
+function GamepadRotateModel.SetAcceleration(self: GamepadRotateModel, acceleration: number): ()
 	assert(type(acceleration) == "number", "Bad acceleration")
 
 	self._rampVelocityX.a = acceleration
@@ -51,7 +62,7 @@ end
 	Gets the delta for the thumbstick
 	@return Vector2
 ]=]
-function GamepadRotateModel:GetThumbstickDeltaAngle()
+function GamepadRotateModel.GetThumbstickDeltaAngle(self: GamepadRotateModel): Vector2
 	if not self._lastInputObject then
 		return Vector2.zero
 	end
@@ -62,7 +73,7 @@ end
 --[=[
 	Stops rotation
 ]=]
-function GamepadRotateModel:StopRotate()
+function GamepadRotateModel.StopRotate(self: GamepadRotateModel): ()
 	self._lastInputObject = nil
 	self._rampVelocityX.t = 0
 	self._rampVelocityX.p = self._rampVelocityX.t
@@ -79,16 +90,15 @@ end
 
 	@param inputObject InputObject
 ]=]
-function GamepadRotateModel:HandleThumbstickInput(inputObject)
+function GamepadRotateModel.HandleThumbstickInput(self: GamepadRotateModel, inputObject: InputObject): ()
 	if CameraGamepadInputUtils.outOfDeadZone(inputObject) then
 		self._lastInputObject = inputObject
 
-		local stickOffset = self._lastInputObject.Position
-		stickOffset = Vector2.new(-stickOffset.x, stickOffset.y)  -- Invert axis!
-
+		local stickOffset = Vector2.new(-inputObject.Position.X, inputObject.Position.Y) -- Invert axis!
 		local adjustedStickOffset = CameraGamepadInputUtils.gamepadLinearToCurve(stickOffset)
-		self._rampVelocityX.t = adjustedStickOffset.x
-		self._rampVelocityY.t = adjustedStickOffset.y
+
+		self._rampVelocityX.t = adjustedStickOffset.X
+		self._rampVelocityY.t = adjustedStickOffset.Y
 
 		self.IsRotating.Value = true
 	else

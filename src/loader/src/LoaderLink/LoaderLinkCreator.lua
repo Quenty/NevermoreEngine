@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Adds the loader instance so script.Parent.loader works.
 
@@ -6,14 +7,31 @@
 
 local loader = script.Parent.Parent
 local LoaderLinkUtils = require(loader.LoaderLink.LoaderLinkUtils)
-local ReplicatorReferences = require(loader.Replication.ReplicatorReferences)
 local Maid = require(loader.Maid)
+local ReplicatorReferences = require(loader.Replication.ReplicatorReferences)
 
 local LoaderLinkCreator = {}
 LoaderLinkCreator.ClassName = "LoaderLinkCreator"
 LoaderLinkCreator.__index = LoaderLinkCreator
 
-function LoaderLinkCreator.new(root, references, isRoot)
+export type LoaderLinkCreator = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_root: Instance,
+		_references: ReplicatorReferences.ReplicatorReferences?,
+		_hasLoaderCount: IntValue,
+		_childRequiresLoaderCount: IntValue,
+		_provideLoader: BoolValue,
+		_lastProvidedLoader: Instance?,
+	},
+	{} :: typeof({ __index = LoaderLinkCreator })
+))
+
+function LoaderLinkCreator.new(
+	root: Instance,
+	references: ReplicatorReferences.ReplicatorReferences?,
+	isRoot: boolean?
+): LoaderLinkCreator
 	assert(typeof(root) == "Instance", "Bad root")
 	assert(ReplicatorReferences.isReplicatorReferences(references) or references == nil, "Bad references")
 
@@ -36,10 +54,10 @@ function LoaderLinkCreator.new(root, references, isRoot)
 	self:_setupEventTracking()
 	self:_setupRendering()
 
-	return self
+	return self :: LoaderLinkCreator
 end
 
-function LoaderLinkCreator:_setupEventTracking()
+function LoaderLinkCreator._setupEventTracking(self: LoaderLinkCreator)
 	self._maid:GiveTask(self._root.ChildAdded:Connect(function(child)
 		self:_handleChildAdded(child)
 	end))
@@ -47,21 +65,21 @@ function LoaderLinkCreator:_setupEventTracking()
 		self:_handleChildRemoved(child)
 	end))
 
-	for _, child in pairs(self._root:GetChildren()) do
+	for _, child in self._root:GetChildren() do
 		self:_handleChildAdded(child)
 	end
 
 	-- Need to do this AFTER child added loop
 	if self._references then
-		self._maid:GiveTask(self._references:ObserveReferenceChanged(loader, function(replicatedLoader)
+		self._maid:GiveTask(self._references:ObserveReferenceChanged(loader, function(replicatedLoader: Instance?)
 			if replicatedLoader and replicatedLoader ~= loader then
-				self._maid._trackFakeLoader = self:_countLoaderReferences(replicatedLoader)
+				self._maid._trackFakeLoader = (self :: any):_countLoaderReferences(replicatedLoader)
 			else
 				self._maid._trackFakeLoader = nil
 			end
 		end))
 	else
-		self._maid:GiveTask(self:_countLoaderReferences(loader))
+		self._maid:GiveTask((self :: any):_countLoaderReferences(loader))
 	end
 
 	-- Update state
@@ -74,11 +92,11 @@ function LoaderLinkCreator:_setupEventTracking()
 	self:_updateProviderLoader()
 end
 
-function LoaderLinkCreator:_setupRendering()
+function LoaderLinkCreator._setupRendering(self: LoaderLinkCreator)
 	if self._references then
 		local function renderLoader()
 			if self._provideLoader.Value then
-				self._maid._loader = self:_renderLoaderWithReferences()
+				self._maid._loader = self:_renderLoaderWithReferences(self._references)
 			else
 				self._maid._loader = nil
 			end
@@ -101,15 +119,15 @@ function LoaderLinkCreator:_setupRendering()
 	end
 end
 
-function LoaderLinkCreator:_updateProviderLoader()
+function LoaderLinkCreator._updateProviderLoader(self: LoaderLinkCreator)
 	self._provideLoader.Value = (self._childRequiresLoaderCount.Value > 0) and self._hasLoaderCount.Value <= 0
 end
 
-function LoaderLinkCreator:_handleChildRemoved(child)
+function LoaderLinkCreator._handleChildRemoved(self: LoaderLinkCreator, child: Instance)
 	self._maid[child] = nil
 end
 
-function LoaderLinkCreator:_handleChildAdded(child)
+function LoaderLinkCreator._handleChildAdded(self: LoaderLinkCreator, child: Instance)
 	assert(typeof(child) == "Instance", "Bad child")
 
 	if child:IsA("ModuleScript") then
@@ -126,10 +144,13 @@ function LoaderLinkCreator:_handleChildAdded(child)
 	end
 end
 
-function LoaderLinkCreator:_renderLoaderWithReferences()
+function LoaderLinkCreator._renderLoaderWithReferences(
+	self: LoaderLinkCreator,
+	references: ReplicatorReferences.ReplicatorReferences
+): Maid.Maid
 	local maid = Maid.new()
 
-	maid:GiveTask(self._references:ObserveReferenceChanged(loader, function(value)
+	maid:GiveTask(references:ObserveReferenceChanged(loader, function(value: Instance?)
 		if value then
 			maid._current = self:_doLoaderRender(value)
 		else
@@ -140,17 +161,16 @@ function LoaderLinkCreator:_renderLoaderWithReferences()
 	return maid
 end
 
-function LoaderLinkCreator:_doLoaderRender(value)
+function LoaderLinkCreator._doLoaderRender(self: LoaderLinkCreator, value: Instance)
 	local loaderLink = LoaderLinkUtils.create(value, loader.Name)
 	self._lastProvidedLoader = loaderLink
 
 	loaderLink.Parent = self._root
 
-
 	return loaderLink
 end
 
-function LoaderLinkCreator:_incrementNeededLoader(amount)
+function LoaderLinkCreator._incrementNeededLoader(self: LoaderLinkCreator, amount: number): () -> ()
 	assert(type(amount) == "number", "Bad amount")
 
 	self._childRequiresLoaderCount.Value = self._childRequiresLoaderCount.Value + amount
@@ -159,7 +179,7 @@ function LoaderLinkCreator:_incrementNeededLoader(amount)
 	end
 end
 
-function LoaderLinkCreator:_addToHasLoaderCount(amount)
+function LoaderLinkCreator._addToHasLoaderCount(self: LoaderLinkCreator, amount: number): () -> ()
 	assert(type(amount) == "number", "Bad amount")
 
 	self._hasLoaderCount.Value = self._hasLoaderCount.Value + amount
@@ -168,7 +188,7 @@ function LoaderLinkCreator:_addToHasLoaderCount(amount)
 	end
 end
 
-function LoaderLinkCreator:_countLoaderReferences(robloxInst)
+function LoaderLinkCreator._countLoaderReferences(self: LoaderLinkCreator, robloxInst: Instance): Maid.Maid
 	assert(typeof(robloxInst) == "Instance", "Bad robloxInst")
 
 	local maid = Maid.new()
@@ -193,9 +213,9 @@ end
 	Cleans up the replicator disconnecting all events and cleaning up
 	created instances.
 ]=]
-function LoaderLinkCreator:Destroy()
+function LoaderLinkCreator.Destroy(self: LoaderLinkCreator)
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return LoaderLinkCreator

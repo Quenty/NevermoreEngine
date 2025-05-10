@@ -23,5 +23,4 @@ keyMapList:ObserveInputEnumsList():Subscribe(function(...)
 	end, false, ...)
 end)
 
-
 keyMapList:SetForInputMode(InputModeTypes.Keypad, { Enum.KeyCode.Space })

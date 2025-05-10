@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RxInputObjectUtils
 ]=]
@@ -6,13 +7,19 @@ local require = require(script.Parent.loader).load(script)
 
 local UserInputService = game:GetService("UserInputService")
 
+local InputObjectUtils = require("InputObjectUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
-local InputObjectUtils = require("InputObjectUtils")
 
 local RxInputObjectUtils = {}
 
-function RxInputObjectUtils.observeInputObjectEnded(initialInputObject)
+--[=[
+	Observes the input object ended event. This will fire immediately if the input object is already ended.
+
+	@param initialInputObject InputObject
+	@return Observable<()>
+]=]
+function RxInputObjectUtils.observeInputObjectEnded(initialInputObject: InputObject): Observable.Observable<()>
 	assert(initialInputObject, "Bad initialInputObject")
 
 	return Observable.new(function(sub)

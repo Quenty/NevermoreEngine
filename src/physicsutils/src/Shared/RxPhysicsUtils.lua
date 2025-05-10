@@ -1,15 +1,16 @@
+--!strict
 --[=[
 	@class RxPhysicsUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Observable = require("Observable")
 local Maid = require("Maid")
+local Observable = require("Observable")
 
 local RxPhysicsUtils = {}
 
-function RxPhysicsUtils.observePartMass(part)
+function RxPhysicsUtils.observePartMass(part: BasePart): Observable.Observable<number>
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	return Observable.new(function(sub)
@@ -38,7 +39,7 @@ function RxPhysicsUtils.observePartMass(part)
 		update()
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxPhysicsUtils

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility method to transfer camera info to and from the client.
 
@@ -5,6 +6,12 @@
 ]=]
 
 local CameraInfoUtils = {}
+
+export type CameraInfo = {
+	cframe: CFrame,
+	viewPortSize: Vector2,
+	fieldOfView: number,
+}
 
 --[=[
 	Creates a new camera info.
@@ -14,15 +21,15 @@ local CameraInfoUtils = {}
 	@param fieldOfView number
 	@return CameraInfo
 ]=]
-function CameraInfoUtils.createCameraInfo(cframe, viewPortSize, fieldOfView)
+function CameraInfoUtils.createCameraInfo(cframe: CFrame, viewPortSize: Vector2, fieldOfView: number): CameraInfo
 	assert(typeof(cframe) == "CFrame", "Bad cframe")
 	assert(typeof(viewPortSize) == "Vector2", "Bad viewPortSize")
 	assert(type(fieldOfView) == "number", "Bad fieldOfView")
 
 	return {
-		cframe = cframe;
-		viewPortSize = viewPortSize;
-		fieldOfView = fieldOfView;
+		cframe = cframe,
+		viewPortSize = viewPortSize,
+		fieldOfView = fieldOfView,
 	}
 end
 
@@ -32,10 +39,9 @@ end
 	@param camera Camera
 	@return CameraInfo
 ]=]
-function CameraInfoUtils.fromCamera(camera)
+function CameraInfoUtils.fromCamera(camera: Camera): CameraInfo
 	return CameraInfoUtils.createCameraInfo(camera.CFrame, camera.ViewportSize, camera.FieldOfView)
 end
-
 
 --[=[
 	Returns true if the value is a cameraInfo
@@ -43,12 +49,11 @@ end
 	@param cameraInfo any
 	@return boolean
 ]=]
-function CameraInfoUtils.isCameraInfo(cameraInfo)
+function CameraInfoUtils.isCameraInfo(cameraInfo: any): boolean
 	return type(cameraInfo) == "table"
 		and typeof(cameraInfo.cframe) == "CFrame"
-		and typeof(cameraInfo.viewPortSize) == "Vector2"
-		and type(cameraInfo.fieldOfView) == "number"
+		and typeof((cameraInfo :: any).viewPortSize) == "Vector2"
+		and type((cameraInfo :: any).fieldOfView) == "number"
 end
-
 
 return CameraInfoUtils

@@ -7,15 +7,16 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local BaseObject = require("BaseObject")
+local DeathReportBindersServer = require("DeathReportBindersServer")
 local Maid = require("Maid")
 local PlayerKillTrackerUtils = require("PlayerKillTrackerUtils")
-local DeathReportBindersServer = require("DeathReportBindersServer")
+local ServiceBag = require("ServiceBag")
 
 local PlayerKillTrackerAssigner = setmetatable({}, BaseObject)
 PlayerKillTrackerAssigner.ClassName = "PlayerKillTrackerAssigner"
 PlayerKillTrackerAssigner.__index = PlayerKillTrackerAssigner
 
-function PlayerKillTrackerAssigner.new(serviceBag)
+function PlayerKillTrackerAssigner.new(serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(), PlayerKillTrackerAssigner)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -30,14 +31,14 @@ function PlayerKillTrackerAssigner.new(serviceBag)
 		self:_handlePlayerRemoving(player)
 	end))
 
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		self:_handlePlayerAdded(player)
 	end
 
 	return self
 end
 
-function PlayerKillTrackerAssigner:GetPlayerKills(player)
+function PlayerKillTrackerAssigner:GetPlayerKills(player: Player)
 	local tracker = self:GetPlayerKillTracker(player)
 	if tracker then
 		return tracker:GetKills()
@@ -46,7 +47,7 @@ function PlayerKillTrackerAssigner:GetPlayerKills(player)
 	end
 end
 
-function PlayerKillTrackerAssigner:GetPlayerKillTracker(player)
+function PlayerKillTrackerAssigner:GetPlayerKillTracker(player: Player)
 	local trackerInstance = self._killTrackers[player]
 	if trackerInstance then
 		return self._deathReportBindersServer.PlayerKillTracker:Get(trackerInstance)
@@ -76,6 +77,5 @@ function PlayerKillTrackerAssigner:_handlePlayerAdded(player)
 
 	self._maid[player] = maid
 end
-
 
 return PlayerKillTrackerAssigner

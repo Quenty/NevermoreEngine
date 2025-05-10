@@ -1,9 +1,14 @@
+--!strict
 --[=[
 	Utility methods for the binder object.
 	@class BinderUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local CollectionService = game:GetService("CollectionService")
+
+local Binder = require("Binder")
 
 local BinderUtils = {}
 
@@ -15,7 +20,7 @@ local BinderUtils = {}
 	@param child Instance
 	@return T?
 ]=]
-function BinderUtils.findFirstAncestor(binder, child)
+function BinderUtils.findFirstAncestor<T>(binder: Binder.Binder<T>, child: Instance): T?
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(child) == "Instance", "Child parameter must be instance")
 
@@ -38,11 +43,11 @@ end
 	@param parent Instance
 	@return T?
 ]=]
-function BinderUtils.findFirstChild(binder, parent)
+function BinderUtils.findFirstChild<T>(binder: Binder.Binder<T>, parent: Instance): T?
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
-	for _, child in pairs(parent:GetChildren()) do
+	for _, child in parent:GetChildren() do
 		local class = binder:Get(child)
 		if class then
 			return class
@@ -59,12 +64,12 @@ end
 	@param parent Instance
 	@return {T}
 ]=]
-function BinderUtils.getChildren(binder, parent)
+function BinderUtils.getChildren<T>(binder: Binder.Binder<T>, parent: Instance): { T }
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
 	local objects = {}
-	for _, item in pairs(parent:GetChildren()) do
+	for _, item in parent:GetChildren() do
 		local obj = binder:Get(item)
 		if obj then
 			table.insert(objects, obj)
@@ -72,7 +77,6 @@ function BinderUtils.getChildren(binder, parent)
 	end
 	return objects
 end
-
 
 --[=[
 	Maps a list of binders into a look up table where the keys are
@@ -83,13 +87,14 @@ end
 	@param bindersList { Binder<any> }
 	@return { [string]: Binder<any> }
 ]=]
-function BinderUtils.mapBinderListToTable(bindersList)
+function BinderUtils.mapBinderListToTable<T>(bindersList: { Binder.Binder<T> }): { [string]: Binder.Binder<T> }
 	assert(type(bindersList) == "table", "bindersList must be a table of binders")
 
-	local tags = {}
-	for _, binder in pairs(bindersList) do
-		tags[binder:GetTag()] = binder
+	local tags: { [string]: Binder.Binder<T> } = {}
+	for _, binder in bindersList do
+		tags[(binder :: any):GetTag()] = binder :: any
 	end
+
 	return tags
 end
 
@@ -106,11 +111,11 @@ end
 	@param instanceList { Instance }
 	@return { T }
 ]=]
-function BinderUtils.getMappedFromList(tagsMap, instanceList)
+function BinderUtils.getMappedFromList<T>(tagsMap: { [string]: Binder.Binder<T> }, instanceList: { Instance }): { T }
 	local objects = {}
 
-	for _, instance in pairs(instanceList) do
-		for _, tag in pairs(CollectionService:GetTags(instance)) do
+	for _, instance in instanceList do
+		for _, tag in CollectionService:GetTags(instance) do
 			local binder = tagsMap[tag]
 			if binder then
 				local obj = binder:Get(instance)
@@ -131,7 +136,7 @@ end
 	@param parent Instance
 	@return { T }
 ]=]
-function BinderUtils.getChildrenOfBinders(bindersList, parent)
+function BinderUtils.getChildrenOfBinders<T>(bindersList: { Binder.Binder<T> }, parent: Instance): { T }
 	assert(type(bindersList) == "table", "bindersList must be a table of binders")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
@@ -147,10 +152,10 @@ end
 	@param parent Instance
 	@return {T}
 ]=]
-function BinderUtils.getLinkedChildren(binder, linkName, parent)
+function BinderUtils.getLinkedChildren<T>(binder: Binder.Binder<T>, linkName: string, parent: Instance): { T }
 	local seen = {}
 	local objects = {}
-	for _, item in pairs(parent:GetChildren()) do
+	for _, item in parent:GetChildren() do
 		if item.Name == linkName and item:IsA("ObjectValue") and item.Value then
 			local obj = binder:Get(item.Value)
 			if obj then
@@ -158,7 +163,12 @@ function BinderUtils.getLinkedChildren(binder, linkName, parent)
 					seen[obj] = true
 					table.insert(objects, obj)
 				else
-					warn(string.format("[BinderUtils.getLinkedChildren] - Double linked children at %q", item:GetFullName()))
+					warn(
+						string.format(
+							"[BinderUtils.getLinkedChildren] - Double linked children at %q",
+							item:GetFullName()
+						)
+					)
 				end
 			end
 		end
@@ -173,12 +183,12 @@ end
 	@param parent Instance
 	@return {T}
 ]=]
-function BinderUtils.getDescendants(binder, parent)
+function BinderUtils.getDescendants<T>(binder: Binder.Binder<T>, parent: Instance): { T }
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
 	local objects = {}
-	for _, item in pairs(parent:GetDescendants()) do
+	for _, item in parent:GetDescendants() do
 		local obj = binder:Get(item)
 		if obj then
 			table.insert(objects, obj)
@@ -186,6 +196,5 @@ function BinderUtils.getDescendants(binder, parent)
 	end
 	return objects
 end
-
 
 return BinderUtils

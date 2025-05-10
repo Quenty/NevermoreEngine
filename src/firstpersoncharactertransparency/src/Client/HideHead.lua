@@ -7,8 +7,8 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local TransparencyService = require("TransparencyService")
 local RxR15Utils = require("RxR15Utils")
+local TransparencyService = require("TransparencyService")
 
 local HideHead = setmetatable({}, BaseObject)
 HideHead.ClassName = "HideHead"
@@ -19,7 +19,6 @@ function HideHead.new(character, serviceBag)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._transparencyService = self._serviceBag:GetService(TransparencyService)
-
 
 	self._maid:GiveTask(self:_observeHeadAndFaceAccessoryPartsBrio():Subscribe(function(brio)
 		if brio:IsDead() then
@@ -66,14 +65,14 @@ function HideHead:_observeHeadAndFaceAccessoryPartsBrio()
 					or accessoryType == Enum.AccessoryType.Eyebrow
 					or accessoryType == Enum.AccessoryType.Eyelash
 			end):Pipe({
-				RxBrioUtils.onlyLastBrioSurvives();
+				RxBrioUtils.onlyLastBrioSurvives(),
 				RxBrioUtils.switchMapBrio(function()
 					return RxInstanceUtils.observeDescendantsBrio(accessory, function(child)
 						return child:IsA("BasePart")
 					end)
-				end);
+				end),
 			})
-		end)
+		end),
 	})
 end
 

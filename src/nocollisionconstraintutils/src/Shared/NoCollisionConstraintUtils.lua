@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions to create and manipulate [NoCollisionConstraint] objects between Roblox parts.
 
@@ -8,8 +9,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local getMechanismParts = require("getMechanismParts")
 local Maid = require("Maid")
+local getMechanismParts = require("getMechanismParts")
 
 local NoCollisionConstraintUtils = {}
 
@@ -21,7 +22,7 @@ local NoCollisionConstraintUtils = {}
 	@param parent Instance?
 	@return NoCollisionConstraint
 ]=]
-function NoCollisionConstraintUtils.create(part0, part1, parent)
+function NoCollisionConstraintUtils.create(part0: BasePart, part1: BasePart, parent: Instance?): NoCollisionConstraint
 	local noCollision = Instance.new("NoCollisionConstraint")
 	noCollision.Part0 = part0
 	noCollision.Part1 = part1
@@ -39,12 +40,12 @@ end
 	@param parent Instance | boolean | nil
 	@return Maid
 ]=]
-function NoCollisionConstraintUtils.tempNoCollision(parts0, parts1, parent)
+function NoCollisionConstraintUtils.tempNoCollision(parts0: { BasePart }, parts1: { BasePart }, parent: Instance?)
 	assert(typeof(parent) == "Instance" or type(parent) == "boolean" or type(parent) == "nil", "Bad parent")
 
 	local maid = Maid.new()
 
-	for _, item in pairs(NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, parent or true)) do
+	for _, item in NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, parent or true) do
 		maid:GiveTask(item)
 	end
 
@@ -59,7 +60,11 @@ end
 	@param parent Instance | boolean | nil
 	@return { NoCollisionConstraint }
 ]=]
-function NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, parent)
+function NoCollisionConstraintUtils.createBetweenPartsLists(
+	parts0: { BasePart },
+	parts1: { BasePart },
+	parent: Instance | boolean | nil
+): { NoCollisionConstraint }
 	assert(type(parts0) == "table", "Bad parts0")
 	assert(type(parts1) == "table", "Bad parts1")
 	assert(typeof(parent) == "Instance" or type(parent) == "boolean" or type(parent) == "nil", "Bad parent")
@@ -71,14 +76,14 @@ function NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, pare
 	end
 
 	if type(parent) == "boolean" then
-		for _, part0 in pairs(parts0) do
-			for _, part1 in pairs(parts1) do
+		for _, part0 in parts0 do
+			for _, part1 in parts1 do
 				table.insert(collisionConstraints, NoCollisionConstraintUtils.create(part0, part1, part0))
 			end
 		end
 	else
-		for _, part0 in pairs(parts0) do
-			for _, part1 in pairs(parts1) do
+		for _, part0 in parts0 do
+			for _, part1 in parts1 do
 				table.insert(collisionConstraints, NoCollisionConstraintUtils.create(part0, part1, parent))
 			end
 		end
@@ -95,8 +100,16 @@ end
 	@param parent Instance | boolean | nil
 	@return { NoCollisionConstraint }
 ]=]
-function NoCollisionConstraintUtils.createBetweenMechanisms(adornee0, adornee1, parent)
-	return NoCollisionConstraintUtils.createBetweenPartsLists(getMechanismParts(adornee0), getMechanismParts(adornee1), parent)
+function NoCollisionConstraintUtils.createBetweenMechanisms(
+	adornee0: BasePart,
+	adornee1: BasePart,
+	parent: Instance?
+): { NoCollisionConstraint }
+	return NoCollisionConstraintUtils.createBetweenPartsLists(
+		getMechanismParts(adornee0),
+		getMechanismParts(adornee1),
+		parent
+	)
 end
 
 return NoCollisionConstraintUtils

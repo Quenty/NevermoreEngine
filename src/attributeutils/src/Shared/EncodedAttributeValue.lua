@@ -6,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxAttributeUtils = require("RxAttributeUtils")
 local Rx = require("Rx")
+local RxAttributeUtils = require("RxAttributeUtils")
 local RxBrioUtils = require("RxBrioUtils")
 
 local EncodedAttributeValue = {}
@@ -25,17 +25,17 @@ EncodedAttributeValue.__index = EncodedAttributeValue
 	@param defaultValue T?
 	@return EncodedAttributeValue<T, TValue>
 ]=]
-function EncodedAttributeValue.new(object, attributeName, encode, decode, defaultValue)
+function EncodedAttributeValue.new(object: Instance, attributeName: string, encode, decode, defaultValue)
 	assert(typeof(object) == "Instance", "Bad object")
 	assert(type(attributeName) == "string", "Bad attributeName")
 	assert(type(decode) == "function", "Bad decode")
 	assert(type(encode) == "function", "Bad encode")
 
 	local self = {
-		_object = object;
-		_attributeName = attributeName;
-		_decode = decode;
-		_encode = encode;
+		_object = object,
+		_attributeName = attributeName,
+		_decode = decode,
+		_encode = encode,
 	}
 
 	if defaultValue ~= nil and self._object:GetAttribute(self._attributeName) == nil then
@@ -52,7 +52,7 @@ end
 ]=]
 function EncodedAttributeValue:ObserveBrio(condition)
 	return RxAttributeUtils.observeAttributeBrio(self._object, self._attributeName, condition):Pipe({
-		RxBrioUtils.map(rawget(self, "_decode"))
+		RxBrioUtils.map(rawget(self, "_decode")),
 	})
 end
 
@@ -62,7 +62,7 @@ end
 ]=]
 function EncodedAttributeValue:Observe()
 	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self, "_defaultValue")):Pipe({
-		Rx.map(rawget(self, "_decode"))
+		Rx.map(rawget(self, "_decode")),
 	})
 end
 

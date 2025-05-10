@@ -5,6 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Maid = require("Maid")
+local Observable = require("Observable")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
@@ -29,7 +31,7 @@ function EnabledMixin:Add(class)
 end
 
 -- Initialize EnabledMixin
-function EnabledMixin:InitEnabledMixin(maid)
+function EnabledMixin:InitEnabledMixin(maid: Maid.Maid?)
 	maid = maid or self._maid
 	assert(maid, "Must have maid")
 
@@ -44,23 +46,23 @@ function EnabledMixin:InitEnabledMixin(maid)
 	end))
 end
 
-function EnabledMixin:IsEnabled()
+function EnabledMixin:IsEnabled(): boolean
 	return self._enabledState.Value
 end
 
-function EnabledMixin:Enable(doNotAnimate)
+function EnabledMixin:Enable(doNotAnimate: boolean?)
 	self:SetEnabled(true, doNotAnimate)
 end
 
-function EnabledMixin:Disable(doNotAnimate)
+function EnabledMixin:Disable(doNotAnimate: boolean?)
 	self:SetEnabled(false, doNotAnimate)
 end
 
-function EnabledMixin:ObserveIsEnabled()
+function EnabledMixin:ObserveIsEnabled(): Observable.Observable<boolean>
 	return self._enabledState:Observe()
 end
 
-function EnabledMixin:SetEnabled(isEnabled, doNotAnimate)
+function EnabledMixin:SetEnabled(isEnabled: boolean, doNotAnimate: boolean?)
 	assert(type(isEnabled) == "boolean", "Bad isEnabled")
 
 	self._enabledState:SetValue(isEnabled, doNotAnimate)

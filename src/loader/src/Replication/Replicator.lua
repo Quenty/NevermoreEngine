@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Monitors dependencies primarily for replication. Handles the following scenarios.
 
@@ -29,12 +30,24 @@ local loader = script.Parent.Parent
 local Maid = require(loader.Maid)
 local ReplicationType = require(loader.Replication.ReplicationType)
 local ReplicationTypeUtils = require(loader.Replication.ReplicationTypeUtils)
-local ReplicatorUtils = require(loader.Replication.ReplicatorUtils)
 local ReplicatorReferences = require(loader.Replication.ReplicatorReferences)
 
 local Replicator = {}
 Replicator.ClassName = "Replicator"
 Replicator.__index = Replicator
+
+export type Replicator = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_replicationStarted: boolean,
+		_references: ReplicatorReferences.ReplicatorReferences,
+		_target: ObjectValue,
+		_replicatedDescendantCount: IntValue,
+		_hasReplicatedDescendants: BoolValue,
+		_replicationType: StringValue,
+	},
+	{} :: typeof({ __index = Replicator })
+))
 
 --[=[
 	Constructs a new Replicator which will do the syncing.
@@ -42,13 +55,14 @@ Replicator.__index = Replicator
 	@param references ReplicatorReferences
 	@return Replicator
 ]=]
-function Replicator.new(references)
+function Replicator.new(references: ReplicatorReferences.ReplicatorReferences): Replicator
 	local self = setmetatable({}, Replicator)
 
 	assert(ReplicatorReferences.isReplicatorReferences(references), "Bad references")
 
 	self._maid = Maid.new()
 	self._references = references
+	self._replicationStarted = false
 
 	self._target = self._maid:Add(Instance.new("ObjectValue"))
 	self._target.Value = nil
@@ -77,10 +91,12 @@ end
 
 	@param root Instance
 ]=]
-function Replicator:ReplicateFrom(root)
+function Replicator.ReplicateFrom(self: Replicator, root: Instance)
 	assert(typeof(root) == "Instance", "Bad root")
+	if self._replicationStarted then
+		(error :: any)("[Replicator] - Replication already started")
+	end
 
-	assert(not self._replicationStarted, "Already bound events")
 	self._replicationStarted = true
 
 	self._maid:GiveTask(root.ChildAdded:Connect(function(child)
@@ -89,7 +105,7 @@ function Replicator:ReplicateFrom(root)
 	self._maid:GiveTask(root.ChildRemoved:Connect(function(child)
 		self:_handleChildRemoved(child)
 	end))
-	for _, child in pairs(root:GetChildren()) do
+	for _, child in root:GetChildren() do
 		self:_handleChildAdded(child)
 	end
 end
@@ -100,15 +116,15 @@ end
 	@param replicator any?
 	@return boolean
 ]=]
-function Replicator.isReplicator(replicator)
-	return type(replicator) == "table" and getmetatable(replicator) == Replicator
+function Replicator.isReplicator(replicator: any): boolean
+	return type(replicator) == "table" and getmetatable(replicator :: any) == Replicator
 end
 
 --[=[
 	Returns the replicated descendant count value.
 	@return IntValue
 ]=]
-function Replicator:GetReplicatedDescendantCountValue()
+function Replicator.GetReplicatedDescendantCountValue(self: Replicator): IntValue
 	return self._replicatedDescendantCount
 end
 
@@ -117,7 +133,7 @@ end
 
 	@param replicationType ReplicationType
 ]=]
-function Replicator:SetReplicationType(replicationType)
+function Replicator.SetReplicationType(self: Replicator, replicationType: ReplicationType.ReplicationType)
 	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
 
 	self._replicationType.Value = replicationType
@@ -128,7 +144,7 @@ end
 
 	@param target Instance?
 ]=]
-function Replicator:SetTarget(target)
+function Replicator.SetTarget(self: Replicator, target: Instance?)
 	assert(typeof(target) == "Instance" or target == nil, "Bad target")
 
 	self._target.Value = target
@@ -139,7 +155,7 @@ end
 
 	@return Instance?
 ]=]
-function Replicator:GetTarget()
+function Replicator.GetTarget(self: Replicator): Instance?
 	return self._target.Value
 end
 
@@ -149,19 +165,19 @@ end
 
 	@return BoolValue
 ]=]
-function Replicator:GetHasReplicatedChildrenValue()
+function Replicator.GetHasReplicatedChildrenValue(self: Replicator): BoolValue
 	return self._hasReplicatedDescendants
 end
 
-function Replicator:GetReplicationTypeValue()
+function Replicator.GetReplicationTypeValue(self: Replicator): StringValue
 	return self._replicationType
 end
 
-function Replicator:_handleChildRemoved(child)
+function Replicator._handleChildRemoved(self: Replicator, child: Instance)
 	self._maid[child] = nil
 end
 
-function Replicator:_handleChildAdded(child)
+function Replicator._handleChildAdded(self: Replicator, child: Instance)
 	assert(typeof(child) == "Instance", "Bad child")
 
 	local maid = Maid.new()
@@ -181,7 +197,7 @@ function Replicator:_handleChildAdded(child)
 	self._maid[child] = maid
 end
 
-function Replicator:_renderChild(child)
+function Replicator._renderChild(self: Replicator, child: Instance)
 	local maid = Maid.new()
 
 	local replicator = Replicator.new(self._references)
@@ -195,10 +211,15 @@ function Replicator:_renderChild(child)
 	end
 
 	local replicationTypeValue = replicator:GetReplicationTypeValue()
-	maid._current = self:_replicateBasedUponMode(replicator, replicationTypeValue.Value, child)
+	maid._current =
+		self:_replicateBasedUponMode(replicator, replicationTypeValue.Value :: ReplicationType.ReplicationType, child)
 	maid:GiveTask(replicationTypeValue.Changed:Connect(function()
 		maid._current = nil
-		maid._current = self:_replicateBasedUponMode(replicator, replicationTypeValue.Value, child)
+		maid._current = self:_replicateBasedUponMode(
+			replicator,
+			replicationTypeValue.Value :: ReplicationType.ReplicationType,
+			child
+		)
 	end))
 
 	replicator:ReplicateFrom(child)
@@ -206,23 +227,26 @@ function Replicator:_renderChild(child)
 	return maid
 end
 
-
-function Replicator:_replicateBasedUponMode(replicator, replicationType, child)
+function Replicator._replicateBasedUponMode(
+	self: Replicator,
+	replicator: Replicator,
+	replicationType: ReplicationType.ReplicationType,
+	child: Instance
+)
 	assert(Replicator.isReplicator(replicator), "Bad replicator")
 	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
 	assert(typeof(child) == "Instance", "Bad child")
 
 	if replicationType == ReplicationType.SERVER then
 		return self:_doReplicationServer(replicator, child)
-	elseif replicationType == ReplicationType.SHARED
-		or replicationType == ReplicationType.CLIENT then
+	elseif replicationType == ReplicationType.SHARED or replicationType == ReplicationType.CLIENT then
 		return self:_doReplicationClient(replicator, child)
 	else
 		error("[Replicator] - Unknown replicationType")
 	end
 end
 
-function Replicator:_doReplicationServer(replicator, child)
+function Replicator._doReplicationServer(self: Replicator, replicator: Replicator, child: Instance)
 	local maid = Maid.new()
 
 	local hasReplicatedChildren = replicator:GetHasReplicatedChildrenValue()
@@ -240,7 +264,7 @@ function Replicator:_doReplicationServer(replicator, child)
 	end
 end
 
-function Replicator:_doServerClone(replicator, child)
+function Replicator._doServerClone(self: Replicator, replicator: Replicator, child: Instance): Maid.Maid
 	-- Always a folder to prevent information from leaking...
 	local maid = Maid.new()
 	local copy = maid:Add(Instance.new("Folder"))
@@ -255,7 +279,7 @@ function Replicator:_doServerClone(replicator, child)
 	return maid
 end
 
-function Replicator:_doReplicationClient(replicator, child)
+function Replicator._doReplicationClient(self: Replicator, replicator: Replicator, child: Instance): Maid.Maid
 	local maid = Maid.new()
 
 	if child:IsA("ModuleScript") then
@@ -278,7 +302,8 @@ function Replicator:_doReplicationClient(replicator, child)
 		self:_setupObjectValueReplication(maid, child, copy)
 		self:_doStandardReplication(maid, replicator, child, copy)
 	else
-		local copy = maid:Add(ReplicatorUtils.cloneWithoutChildren(child))
+		-- selene: allow(incorrect_standard_library_use)
+		local copy = maid:Add(Instance.fromExisting(child))
 
 		-- TODO: Maybe do better
 		self:_setupReplicatedDescendantCountAdd(maid, 1)
@@ -288,20 +313,27 @@ function Replicator:_doReplicationClient(replicator, child)
 	return maid
 end
 
-function Replicator:_doModuleScriptCloneClient(replicator, child)
+function Replicator._doModuleScriptCloneClient(self: Replicator, replicator: Replicator, child: Instance): Maid.Maid
 	assert(Replicator.isReplicator(replicator), "Bad replicator")
 	assert(typeof(child) == "Instance", "Bad child")
 
 	local maid = Maid.new()
 
-	local copy = maid:Add(ReplicatorUtils.cloneWithoutChildren(child))
+	-- selene: allow(incorrect_standard_library_use)
+	local copy = maid:Add(Instance.fromExisting(child))
 
 	self:_doStandardReplication(maid, replicator, child, copy)
 
 	return maid
 end
 
-function Replicator:_doStandardReplication(maid, replicator, child, copy)
+function Replicator._doStandardReplication(
+	self: Replicator,
+	maid: Maid.Maid,
+	replicator: Replicator,
+	child: Instance,
+	copy: Instance
+)
 	assert(Replicator.isReplicator(replicator), "Bad replicator")
 	assert(typeof(copy) == "Instance", "Bad copy")
 	assert(typeof(child) == "Instance", "Bad child")
@@ -316,15 +348,15 @@ function Replicator:_doStandardReplication(maid, replicator, child, copy)
 	self:_setupReplicatorTarget(maid, replicator, copy)
 end
 
-function Replicator:_setupReplicatedDescendantCountAdd(maid, amount)
+function Replicator._setupReplicatedDescendantCountAdd(self: Replicator, maid: Maid.Maid, amount: number)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(type(amount) == "number", "Bad amount")
 
 	-- Do this replication count here so when the source changes we don't
 	-- have any flickering.
-	self._replicatedDescendantCount.Value = self._replicatedDescendantCount.Value + amount
+	self._replicatedDescendantCount.Value += amount
 	maid:GiveTask(function()
-		self._replicatedDescendantCount.Value = self._replicatedDescendantCount.Value - amount
+		self._replicatedDescendantCount.Value -= amount
 	end)
 end
 
@@ -338,7 +370,7 @@ end
 	@param replicator Replicator
 	@param copy Instance
 ]]
-function Replicator:_setupReplicatorTarget(maid, replicator, copy)
+function Replicator._setupReplicatorTarget(_self: Replicator, maid: Maid.Maid, replicator: Replicator, copy: Instance)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(Replicator.isReplicator(replicator), "Bad replicator")
 	assert(typeof(copy) == "Instance", "Bad copy")
@@ -346,7 +378,11 @@ function Replicator:_setupReplicatorTarget(maid, replicator, copy)
 	replicator:SetTarget(copy)
 
 	maid:GiveTask(function()
-		if replicator.Destroy and replicator:GetTarget() == copy then
+		if not replicator.Destroy then
+			return
+		end
+
+		if (replicator :: any):GetTarget() == copy then
 			replicator:SetTarget(nil)
 		end
 	end)
@@ -361,25 +397,25 @@ end
 	@param maid Maid
 	@param replicator Replicator
 ]]
-function Replicator:_setupReplicatorDescendantCount(maid, replicator)
+function Replicator._setupReplicatorDescendantCount(self: Replicator, maid: Maid.Maid, replicator: Replicator)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(Replicator.isReplicator(replicator), "Bad replicator")
 
 	local replicatedChildrenCount = replicator:GetReplicatedDescendantCountValue()
 	local lastValue = replicatedChildrenCount.Value
-	self._replicatedDescendantCount.Value = self._replicatedDescendantCount.Value + lastValue
+	self._replicatedDescendantCount.Value += lastValue
 
 	maid:GiveTask(replicatedChildrenCount.Changed:Connect(function()
 		local value = replicatedChildrenCount.Value
 		local delta = value - lastValue
 		lastValue = value
-		self._replicatedDescendantCount.Value = self._replicatedDescendantCount.Value + delta
+		self._replicatedDescendantCount.Value += delta
 	end))
 
 	maid:GiveTask(function()
 		local value = lastValue
 		lastValue = 0
-		self._replicatedDescendantCount.Value = self._replicatedDescendantCount.Value - value
+		self._replicatedDescendantCount.Value -= value
 	end)
 end
 
@@ -390,7 +426,7 @@ end
 	@param child Instance
 	@param copy Instance
 ]]
-function Replicator:_setupReference(maid, child, copy)
+function Replicator._setupReference(self: Replicator, maid, child: Instance, copy: Instance)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(typeof(copy) == "Instance", "Bad copy")
@@ -410,7 +446,12 @@ end
 	@param replicator
 	@param child Instance
 ]]
-function Replicator:_setupReplicatorTypeFromFolderName(maid, replicator, child)
+function Replicator._setupReplicatorTypeFromFolderName(
+	self: Replicator,
+	maid: Maid.Maid,
+	replicator: Replicator,
+	child: Instance
+)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(Replicator.isReplicator(replicator), "Bad replicator")
 	assert(typeof(child) == "Instance", "Bad child")
@@ -424,7 +465,7 @@ function Replicator:_setupReplicatorTypeFromFolderName(maid, replicator, child)
 	replicator:SetReplicationType(self:_getFolderReplicationType(child.Name))
 end
 
-function Replicator:_setupReplicatorType(maid, replicator)
+function Replicator._setupReplicatorType(self: Replicator, maid, replicator)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(Replicator.isReplicator(replicator), "Bad replicator")
 
@@ -441,7 +482,7 @@ end
 	@param child Instance
 	@param copy Instance
 ]]
-function Replicator:_setupNameReplication(maid, child, copy)
+function Replicator._setupNameReplication(_self: Replicator, maid: Maid.Maid, child: Instance, copy: Instance)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(typeof(copy) == "Instance", "Bad copy")
@@ -458,7 +499,7 @@ end
 	@param maid Maid
 	@param copy Instance
 ]]
-function Replicator:_setupParentReplication(maid, copy)
+function Replicator._setupParentReplication(self: Replicator, maid: Maid.Maid, copy: Instance)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(copy) == "Instance", "Bad copy")
 
@@ -475,23 +516,23 @@ end
 	@param child Instance
 	@param copy Instance
 ]]
-function Replicator:_setupTagReplication(maid, child, copy)
+function Replicator._setupTagReplication(_self: Replicator, maid: Maid.Maid, child: Instance, copy: Instance)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(typeof(copy) == "Instance", "Bad copy")
 
-	for _, tag in pairs(child:GetTags()) do
+	for _, tag in child:GetTags() do
 		copy:AddTag(tag)
 	end
 
 	maid:GiveTask(child.Changed:Connect(function(property)
 		if property == "Tags" then
-			local ourTagSet = {}
-			for _, tag in pairs(copy:GetTags()) do
+			local ourTagSet: { [string]: true } = {}
+			for _, tag in copy:GetTags() do
 				ourTagSet[tag] = true
 			end
 
-			for _, tag in pairs(child:GetTags()) do
+			for _, tag in child:GetTags() do
 				if not ourTagSet[tag] then
 					copy:AddTag(tag)
 				end
@@ -499,7 +540,7 @@ function Replicator:_setupTagReplication(maid, child, copy)
 				ourTagSet[tag] = nil
 			end
 
-			for tag, _ in pairs(ourTagSet) do
+			for tag, _ in ourTagSet do
 				copy:RemoveTag(tag)
 			end
 		end
@@ -513,7 +554,7 @@ end
 	@param child Instance
 	@param copy Instance
 ]]
-function Replicator:_setupObjectValueReplication(maid, child, copy)
+function Replicator._setupObjectValueReplication(self: Replicator, maid: Maid.Maid, child: ObjectValue, copy: Instance)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(typeof(copy) == "Instance", "Bad copy")
@@ -526,27 +567,27 @@ function Replicator:_setupObjectValueReplication(maid, child, copy)
 	maid[symbol] = self:_doObjectValueReplication(child, copy)
 end
 
-function Replicator:_doObjectValueReplication(child, copy)
+function Replicator._doObjectValueReplication(self: Replicator, child: ValueBase, copy: Instance): Maid.Maid?
 	assert(typeof(child) == "Instance", "Bad child")
 	assert(typeof(copy) == "Instance", "Bad copy")
 
-	local childValue = child.Value
+	local childValue: Instance? = (child :: any).Value
 	if childValue then
 		local maid = Maid.new()
 
-		maid:GiveTask(self._references:ObserveReferenceChanged(childValue,
-			function(newValue)
-				if newValue then
-					copy.Value = newValue
-				else
-					-- Fall back to original value (pointing outside of tree)
-					newValue = childValue
-				end
-			end))
+		maid:GiveTask(self._references:ObserveReferenceChanged(childValue, function(newValue)
+			if newValue then
+				(copy :: any).Value = newValue
+			else
+				-- Fall back to original value (pointing outside of tree)
+				newValue = childValue
+			end
+		end))
 
 		return maid
 	else
-		copy.Value = nil
+		(copy :: any).Value = nil
+
 		return nil
 	end
 end
@@ -557,16 +598,17 @@ end
 
 	@param childName string
 ]]
-function Replicator:_getFolderReplicationType(childName)
+function Replicator._getFolderReplicationType(self: Replicator, childName: string): ReplicationType.ReplicationType
 	assert(type(childName) == "string", "Bad childName")
 
-	return ReplicationTypeUtils.getFolderReplicationType(
-		childName,
-		self._replicationType.Value)
+	local replicationType: ReplicationType.ReplicationType =
+		self._replicationType.Value :: ReplicationType.ReplicationType
+
+	return ReplicationTypeUtils.getFolderReplicationType(childName, replicationType)
 end
 
-function Replicator:_setupAttributeReplication(maid, child, copy)
-	for key, value in pairs(child:GetAttributes()) do
+function Replicator._setupAttributeReplication(_self: Replicator, maid: Maid.Maid, child: Instance, copy: Instance)
+	for key, value in child:GetAttributes() do
 		copy:SetAttribute(key, value)
 	end
 
@@ -579,9 +621,9 @@ end
 	Cleans up the replicator disconnecting all events and cleaning up
 	created instances.
 ]=]
-function Replicator:Destroy()
+function Replicator.Destroy(self: Replicator)
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return Replicator

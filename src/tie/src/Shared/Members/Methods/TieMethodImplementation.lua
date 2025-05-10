@@ -11,7 +11,7 @@ local TieMethodImplementation = setmetatable({}, BaseObject)
 TieMethodImplementation.ClassName = "TieMethodImplementation"
 TieMethodImplementation.__index = TieMethodImplementation
 
-function TieMethodImplementation.new(memberDefinition, parent, initialValue, actualSelf)
+function TieMethodImplementation.new(memberDefinition, parent: Instance, initialValue, actualSelf)
 	local self = setmetatable(BaseObject.new(), TieMethodImplementation)
 
 	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
@@ -43,6 +43,5 @@ function TieMethodImplementation:SetImplementation(implementation)
 		end
 	end
 end
-
 
 return TieMethodImplementation

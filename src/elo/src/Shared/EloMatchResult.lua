@@ -1,15 +1,14 @@
+--!strict
 --[=[
 	@class EloMatchResult
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 return table.freeze(setmetatable({
-	PLAYER_ONE_WIN = 1;
-	DRAW = 0.5;
-	PLAYER_TWO_WIN = 0;
+	PLAYER_ONE_WIN = 1,
+	DRAW = 0.5,
+	PLAYER_TWO_WIN = 0,
 }, {
 	__index = function()
 		error("Bad index onto EloMatchResult")
-	end;
+	end,
 }))

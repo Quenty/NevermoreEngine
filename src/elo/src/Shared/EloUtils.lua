@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities to compute elo scores for players
 	@class EloUtils
@@ -30,6 +31,8 @@ local Probability = require("Probability")
 
 local EloUtils = {}
 
+export type EloMatchResultList = { number }
+
 --[=[
 	@interface EloConfig
 	.factor number
@@ -39,21 +42,36 @@ local EloUtils = {}
 	.groupMultipleResultAsOne boolean
 	@within EloUtils
 ]=]
+export type EloConfig = {
+	factor: number,
+	kfactor: number | (rating: number) -> number,
+	initial: number,
+	ratingFloor: number,
+	groupMultipleResultAsOne: boolean,
+}
+
+export type PartialEloConfig = {
+	factor: number?,
+	kfactor: (number | (rating: number) -> number)?,
+	initial: number?,
+	ratingFloor: number?,
+	groupMultipleResultAsOne: boolean?,
+}
 
 --[=[
 	Creates a new elo config.
 	@param config table? -- Optional table with defaults
 	@return EloConfig
 ]=]
-function EloUtils.createConfig(config)
-	config = config or {}
+function EloUtils.createConfig(config: PartialEloConfig?): EloConfig
+	local partial: PartialEloConfig = config or {}
 
 	return {
-		factor = config.factor or 400;
-		kfactor = config.kfactor or EloUtils.standardKFactorFormula;
-		initial = config.initial or 1400;
-		ratingFloor = config.ratingFloor or 100;
-		groupMultipleResultAsOne = false;
+		factor = partial.factor or 400,
+		kfactor = partial.kfactor or EloUtils.standardKFactorFormula,
+		initial = partial.initial or 1400,
+		ratingFloor = partial.ratingFloor or 100,
+		groupMultipleResultAsOne = false,
 	}
 end
 
@@ -63,7 +81,7 @@ end
 	@param config any
 	@return boolean
 ]=]
-function EloUtils.isEloConfig(config)
+function EloUtils.isEloConfig(config: EloConfig): boolean
 	return type(config) == "table"
 		and type(config.factor) == "number"
 		and (type(config.kfactor) == "number" or type(config.kfactor) == "function")
@@ -78,10 +96,10 @@ end
 	@param eloConfig EloConfig
 	@return number
 ]=]
-function EloUtils.getStandardDeviation(eloConfig)
+function EloUtils.getStandardDeviation(eloConfig: EloConfig): number
 	assert(EloUtils.isEloConfig(eloConfig), "Bad eloConfig")
 
-	return 0.5*eloConfig.factor*math.sqrt(2)
+	return 0.5 * eloConfig.factor * math.sqrt(2)
 end
 
 --[=[
@@ -91,13 +109,13 @@ end
 	@param elo number
 	@return number
 ]=]
-function EloUtils.getPercentile(eloConfig, elo)
+function EloUtils.getPercentile(eloConfig: EloConfig, elo: number): number
 	assert(EloUtils.isEloConfig(eloConfig), "Bad eloConfig")
 
 	local standardDeviation = EloUtils.getStandardDeviation(eloConfig)
 	local mean = eloConfig.initial
 
-	local zScore = (elo - mean)/standardDeviation
+	local zScore = (elo - mean) / standardDeviation
 	return Probability.cdf(zScore)
 end
 
@@ -108,14 +126,18 @@ end
 	@param percentile number
 	@return number
 ]=]
-function EloUtils.percentileToElo(eloConfig, percentile)
+function EloUtils.percentileToElo(eloConfig: EloConfig, percentile: number): number?
 	assert(EloUtils.isEloConfig(eloConfig), "Bad eloConfig")
 
 	local standardDeviation = EloUtils.getStandardDeviation(eloConfig)
 	local mean = eloConfig.initial
 
 	local zScore = Probability.percentileToZScore(percentile)
-	return mean + zScore*standardDeviation
+	if zScore == nil then
+		return nil
+	end
+
+	return mean + zScore * standardDeviation
 end
 
 --[=[
@@ -128,14 +150,25 @@ end
 	@return number -- playerOneRating
 	@return number -- playerTwoRating
 ]=]
-function EloUtils.getNewElo(config, playerOneRating, playerTwoRating, eloMatchResultList)
+function EloUtils.getNewElo(
+	config: EloConfig,
+	playerOneRating: number,
+	playerTwoRating: number,
+	eloMatchResultList: EloMatchResultList
+): (number, number)
 	assert(EloUtils.isEloConfig(config), "Bad config")
 	assert(type(playerOneRating) == "number", "Bad playerOneRating")
 	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
 	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
-	local newPlayerOneRating = EloUtils.getNewPlayerOneScore(config, playerOneRating, playerTwoRating, eloMatchResultList)
-	local newPlayerTwoRating = EloUtils.getNewPlayerOneScore(config, playerTwoRating, playerOneRating, EloUtils.fromOpponentPerspective(eloMatchResultList))
+	local newPlayerOneRating =
+		EloUtils.getNewPlayerOneScore(config, playerOneRating, playerTwoRating, eloMatchResultList)
+	local newPlayerTwoRating = EloUtils.getNewPlayerOneScore(
+		config,
+		playerTwoRating,
+		playerOneRating,
+		EloUtils.fromOpponentPerspective(eloMatchResultList)
+	)
 	return newPlayerOneRating, newPlayerTwoRating
 end
 
@@ -149,13 +182,14 @@ end
 	@return number -- playerOneRating
 	@return number -- playerTwoRating
 ]=]
-function EloUtils.getEloChange(config, playerOneRating, playerTwoRating, eloMatchResultList)
+function EloUtils.getEloChange(config: EloConfig, playerOneRating: number, playerTwoRating: number, eloMatchResultList)
 	assert(EloUtils.isEloConfig(config), "Bad config")
 	assert(type(playerOneRating) == "number", "Bad playerOneRating")
 	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
 	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
-	local newPlayerOneRating, newPlayerTwoRating = EloUtils.getNewElo(config, playerOneRating, playerTwoRating, eloMatchResultList)
+	local newPlayerOneRating, newPlayerTwoRating =
+		EloUtils.getNewElo(config, playerOneRating, playerTwoRating, eloMatchResultList)
 	local playerOneChange = newPlayerOneRating - playerOneRating
 	local playerTwoChange = newPlayerTwoRating - playerTwoRating
 	return playerOneChange, playerTwoChange
@@ -169,13 +203,22 @@ end
 	@param playerTwoRating number
 	@param eloMatchResultList { EloMatchResult }
 ]=]
-function EloUtils.getNewPlayerOneScore(config, playerOneRating, playerTwoRating, eloMatchResultList)
+function EloUtils.getNewPlayerOneScore(
+	config: EloConfig,
+	playerOneRating: number,
+	playerTwoRating: number,
+	eloMatchResultList: EloMatchResultList
+)
 	assert(EloUtils.isEloConfig(config), "Bad config")
 	assert(type(playerOneRating) == "number", "Bad playerOneRating")
 	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
 	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
-	return math.max(config.ratingFloor, playerOneRating + EloUtils.getPlayerOneScoreAdjustment(config, playerOneRating, playerTwoRating, eloMatchResultList))
+	return math.max(
+		config.ratingFloor,
+		playerOneRating
+			+ EloUtils.getPlayerOneScoreAdjustment(config, playerOneRating, playerTwoRating, eloMatchResultList)
+	)
 end
 
 --[=[
@@ -190,7 +233,7 @@ end
 	@param playerTwoRating number
 	@return number
 ]=]
-function EloUtils.getPlayerOneExpected(config, playerOneRating, playerTwoRating)
+function EloUtils.getPlayerOneExpected(config: EloConfig, playerOneRating: number, playerTwoRating: number): number
 	assert(EloUtils.isEloConfig(config), "Bad config")
 	assert(type(playerOneRating) == "number", "Bad playerOneRating")
 	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
@@ -208,7 +251,12 @@ end
 	@param eloMatchResultList { EloMatchResult }
 	@return number
 ]=]
-function EloUtils.getPlayerOneScoreAdjustment(config, playerOneRating, playerTwoRating, eloMatchResultList)
+function EloUtils.getPlayerOneScoreAdjustment(
+	config: EloConfig,
+	playerOneRating: number,
+	playerTwoRating: number,
+	eloMatchResultList: EloMatchResultList
+): number
 	assert(EloUtils.isEloConfig(config), "Bad config")
 	assert(type(playerOneRating) == "number", "Bad playerOneRating")
 	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
@@ -229,15 +277,15 @@ function EloUtils.getPlayerOneScoreAdjustment(config, playerOneRating, playerTwo
 			multiplier = losses
 		end
 
-		adjustment = multiplier*(score - expected)
+		adjustment = multiplier * (score - expected)
 	else
-		for _, score in pairs(eloMatchResultList) do
+		for _, score in eloMatchResultList do
 			adjustment = adjustment + (score - expected)
 		end
 	end
 
 	local kfactor = EloUtils.extractKFactor(config, playerOneRating)
-	return kfactor*adjustment
+	return kfactor * adjustment
 end
 
 --[=[
@@ -246,12 +294,12 @@ end
 	@param eloMatchResultList { EloMatchResult }
 	@return { number }
 ]=]
-function EloUtils.fromOpponentPerspective(eloMatchResultList)
+function EloUtils.fromOpponentPerspective(eloMatchResultList: EloMatchResultList): EloMatchResultList
 	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
 	local newScores = {}
 
-	for index, score in pairs(eloMatchResultList) do
+	for index, score in eloMatchResultList do
 		newScores[index] = 1 - score
 	end
 
@@ -264,11 +312,11 @@ end
 	@param eloMatchResultList { EloMatchResult }
 	@return { number }
 ]=]
-function EloUtils.countPlayerOneWins(eloMatchResultList)
+function EloUtils.countPlayerOneWins(eloMatchResultList: EloMatchResultList): number
 	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
 	local count = 0
-	for _, score in pairs(eloMatchResultList) do
+	for _, score in eloMatchResultList do
 		if score == EloMatchResult.PLAYER_ONE_WIN then
 			count = count + 1
 		end
@@ -282,11 +330,11 @@ end
 	@param eloMatchResultList { EloMatchResult }
 	@return { number }
 ]=]
-function EloUtils.countPlayerTwoWins(eloMatchResultList)
+function EloUtils.countPlayerTwoWins(eloMatchResultList: EloMatchResultList): number
 	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
 	local count = 0
-	for _, score in pairs(eloMatchResultList) do
+	for _, score in eloMatchResultList do
 		if score == EloMatchResult.PLAYER_TWO_WIN then
 			count = count + 1
 		end
@@ -300,7 +348,7 @@ end
 	@param rating number
 	@return number
 ]=]
-function EloUtils.standardKFactorFormula(rating)
+function EloUtils.standardKFactorFormula(rating: number): number
 	if rating >= 2400 then
 		return 16
 	elseif rating >= 2100 then
@@ -317,7 +365,7 @@ end
 	@param rating number
 	@return number
 ]=]
-function EloUtils.extractKFactor(config, rating)
+function EloUtils.extractKFactor(config: EloConfig, rating: number): number
 	assert(EloUtils.isEloConfig(config), "Bad config")
 	assert(type(rating) == "number", "Bad rating")
 

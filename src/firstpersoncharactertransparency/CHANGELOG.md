@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.18.3...@quenty/firstpersoncharactertransparency@14.19.0) (2025-05-10)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.18.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.18.2...@quenty/firstpersoncharactertransparency@14.18.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.18.0...@quenty/firstpersoncharactertransparency@14.18.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [14.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.18.0...@quenty/firstpersoncharactertransparency@14.18.1) (2025-04-07)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [14.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.17.2...@quenty/firstpersoncharactertransparency@14.18.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.17.1...@quenty/firstpersoncharactertransparency@14.17.2) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.17.0...@quenty/firstpersoncharactertransparency@14.17.1) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [14.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.16.0...@quenty/firstpersoncharactertransparency@14.17.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
 # [14.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.15.0...@quenty/firstpersoncharactertransparency@14.16.0) (2024-12-15)
 
 **Note:** Version bump only for package @quenty/firstpersoncharactertransparency

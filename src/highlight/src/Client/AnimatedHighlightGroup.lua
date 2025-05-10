@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@client
 	@class AnimatedHighlightGroup
@@ -5,19 +6,27 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local AnimatedHighlightStack = require("AnimatedHighlightStack")
-local Maid = require("Maid")
-local EnumUtils = require("EnumUtils")
 local AnimatedHighlightModel = require("AnimatedHighlightModel")
+local AnimatedHighlightStack = require("AnimatedHighlightStack")
+local BaseObject = require("BaseObject")
+local EnumUtils = require("EnumUtils")
+local Maid = require("Maid")
 local Rx = require("Rx")
 
 local AnimatedHighlightGroup = setmetatable({}, BaseObject)
 AnimatedHighlightGroup.ClassName = "AnimatedHighlightGroup"
 AnimatedHighlightGroup.__index = AnimatedHighlightGroup
 
-function AnimatedHighlightGroup.new()
-	local self = setmetatable(BaseObject.new(), AnimatedHighlightGroup)
+export type AnimatedHighlightGroup = typeof(setmetatable(
+	{} :: {
+		_defaultValues: AnimatedHighlightModel.AnimatedHighlightModel,
+		_highlightStacks: { [Instance]: AnimatedHighlightStack.AnimatedHighlightStack },
+	},
+	{} :: typeof({ __index = AnimatedHighlightGroup })
+)) & BaseObject.BaseObject
+
+function AnimatedHighlightGroup.new(): AnimatedHighlightGroup
+	local self: AnimatedHighlightGroup = setmetatable(BaseObject.new() :: any, AnimatedHighlightGroup)
 
 	self._defaultValues = self._maid:Add(AnimatedHighlightModel.new())
 	self._defaultValues:SetHighlightDepthMode(Enum.HighlightDepthMode.AlwaysOnTop)
@@ -42,25 +51,25 @@ end
 
 	@param depthMode Enum.HighlightDepthMode
 ]=]
-function AnimatedHighlightGroup:SetDefaultHighlightDepthMode(depthMode)
+function AnimatedHighlightGroup:SetDefaultHighlightDepthMode(depthMode: Enum.HighlightDepthMode)
 	assert(EnumUtils.isOfType(Enum.HighlightDepthMode, depthMode))
 
 	self._defaultValues:SetHighlightDepthMode(depthMode)
 end
 
-function AnimatedHighlightGroup:SetDefaultFillTransparency(transparency)
+function AnimatedHighlightGroup:SetDefaultFillTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._defaultValues:SetFillTransparency(transparency)
 end
 
-function AnimatedHighlightGroup:SetDefaultOutlineTransparency(outlineTransparency)
+function AnimatedHighlightGroup:SetDefaultOutlineTransparency(outlineTransparency: number)
 	assert(type(outlineTransparency) == "number", "Bad outlineTransparency")
 
 	self._defaultValues:SetOutlineTransparency(outlineTransparency)
 end
 
-function AnimatedHighlightGroup:SetDefaultFillColor(color)
+function AnimatedHighlightGroup:SetDefaultFillColor(color: Color3)
 	assert(typeof(color) == "Color3", "Bad color")
 
 	self._defaultValues:SetFillColor(color)
@@ -70,19 +79,19 @@ function AnimatedHighlightGroup:GetDefaultFillColor()
 	return self._defaultValues:GetFillColor()
 end
 
-function AnimatedHighlightGroup:SetDefaultOutlineColor(color)
+function AnimatedHighlightGroup:SetDefaultOutlineColor(color: Color3)
 	assert(typeof(color) == "Color3", "Bad color")
 
 	self._defaultValues:SetOutlineColor(color)
 end
 
-function AnimatedHighlightGroup:SetDefaultTransparencySpeed(speed)
+function AnimatedHighlightGroup:SetDefaultTransparencySpeed(speed: number)
 	assert(type(speed) == "number", "Bad speed")
 
 	self._defaultValues:SetTransparencySpeed(speed)
 end
 
-function AnimatedHighlightGroup:SetDefaultSpeed(speed)
+function AnimatedHighlightGroup:SetDefaultSpeed(speed: number)
 	assert(type(speed) == "number", "Bad speed")
 
 	self._defaultValues:SetSpeed(speed)
@@ -99,7 +108,7 @@ end
 	@param observeScore number
 	@return AnimatedHighlightModel
 ]=]
-function AnimatedHighlightGroup:Highlight(adornee, observeScore)
+function AnimatedHighlightGroup:Highlight(adornee: Instance, observeScore)
 	observeScore = observeScore or Rx.of(0)
 
 	if type(observeScore) == "number" then
@@ -112,7 +121,7 @@ function AnimatedHighlightGroup:Highlight(adornee, observeScore)
 	return self:_getOrCreateHighlightStackHandle(adornee, observeScore)
 end
 
-function AnimatedHighlightGroup:_setDefaultValues(highlight, doNotAnimate)
+function AnimatedHighlightGroup:_setDefaultValues(highlight, doNotAnimate: boolean?)
 	highlight:SetHighlightDepthMode(self._defaultValues.HighlightDepthMode.Value)
 	highlight:SetTransparencySpeed(self._defaultValues.TransparencySpeed.Value)
 	highlight:SetSpeed(self._defaultValues.Speed.Value)

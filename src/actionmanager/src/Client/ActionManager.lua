@@ -2,7 +2,7 @@
 	Holds single toggleable actions (like a tool system).
 
 	:::info
-	This is legacy code and probably shoudl not be used in new games.
+	This is legacy code and probably should not be used in new games.
 	:::
 
 	@class ActionManager
@@ -12,11 +12,11 @@ local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
 
-local ValueObject = require("ValueObject")
-local Signal = require("Signal")
 local Maid = require("Maid")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
-local ActionManager = setmetatable({}, {})
+local ActionManager = {}
 ActionManager.__index = ActionManager
 ActionManager.ClassName = "ActionManager"
 
@@ -50,7 +50,12 @@ function ActionManager.new()
 
 		-- Immediately deactivate
 		if value and not value.IsActivatedValue.Value then
-			warn(string.format("[ActionManager.ActiveAction.Changed] - Immediate deactivation of %q", tostring(value:GetName())))
+			warn(
+				string.format(
+					"[ActionManager.ActiveAction.Changed] - Immediate deactivation of %q",
+					tostring(value:GetName())
+				)
+			)
 			self.ActiveAction.Value = nil
 		end
 	end))
@@ -78,7 +83,7 @@ end
 function ActionManager:GetActions()
 	local list = {}
 
-	for _, action in pairs(self._actions) do
+	for _, action in self._actions do
 		table.insert(list, action)
 	end
 

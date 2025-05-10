@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods for cameras. These are great for viewport frames.
 
@@ -28,8 +29,12 @@ local CameraUtils = {}
 	@param size Vector3
 	@return number
 ]=]
-function CameraUtils.getCubeoidDiameter(size)
-	return math.sqrt(size.x^2 + size.y^2 + size.z^2)
+function CameraUtils.getCubeoidDiameter(size: Vector3): number
+	local x = size.X
+	local y = size.Y
+	local z = size.Z
+
+	return math.sqrt(x * x + y * y + z * z)
 end
 
 --[=[
@@ -41,8 +46,8 @@ end
 	@param aspectRatio number -- Aspect ratio of the screen
 	@return number -- Distance to move the camera back from the bounding box
 ]=]
-function CameraUtils.fitBoundingBoxToCamera(size, fovDeg, aspectRatio)
-	local radius = CameraUtils.getCubeoidDiameter(size)/2
+function CameraUtils.fitBoundingBoxToCamera(size: Vector3, fovDeg: number, aspectRatio: number): number
+	local radius = CameraUtils.getCubeoidDiameter(size) / 2
 	return CameraUtils.fitSphereToCamera(radius, fovDeg, aspectRatio)
 end
 
@@ -55,7 +60,7 @@ end
 	@param aspectRatio number -- Aspect ratio of the screen
 	@return number -- Distance to move the camera back from the bounding box
 ]=]
-function CameraUtils.fitSphereToCamera(radius, fovDeg, aspectRatio)
+function CameraUtils.fitSphereToCamera(radius: number, fovDeg: number, aspectRatio: number): number
 	local halfFov = 0.5 * math.rad(fovDeg)
 	if aspectRatio < 1 then
 		halfFov = math.atan(aspectRatio * math.tan(halfFov))
@@ -71,7 +76,7 @@ end
 	@param position Vector3
 	@return boolean
 ]=]
-function CameraUtils.isOnScreen(camera, position)
+function CameraUtils.isOnScreen(camera: Camera, position: Vector3): boolean
 	local _, onScreen = camera:WorldToScreenPoint(position)
 	return onScreen
 end

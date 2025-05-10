@@ -4,11 +4,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TimedTransitionModel = require("TimedTransitionModel")
-local Rx = require("Rx")
-local SoundUtils = require("SoundUtils")
-local SoundPromiseUtils = require("SoundPromiseUtils")
 local Promise = require("Promise")
+local Rx = require("Rx")
+local SoundPromiseUtils = require("SoundPromiseUtils")
+local SoundUtils = require("SoundUtils")
+local TimedTransitionModel = require("TimedTransitionModel")
 local ValueObject = require("ValueObject")
 
 local SimpleLoopedSoundPlayer = setmetatable({}, TimedTransitionModel)
@@ -29,10 +29,10 @@ function SimpleLoopedSoundPlayer.new(soundId)
 	self._maxVolume = self.Sound.Volume
 
 	self._maid:GiveTask(Rx.combineLatest({
-		visible = self:ObserveRenderStepped();
-		multiplier = self._volumeMultiplier:Observe();
+		visible = self:ObserveRenderStepped(),
+		multiplier = self._volumeMultiplier:Observe(),
 	}):Subscribe(function(state)
-		self.Sound.Volume = state.visible*self._maxVolume*state.multiplier
+		self.Sound.Volume = state.visible * self._maxVolume * state.multiplier
 	end))
 
 	self._maid:GiveTask(self.VisibleChanged:Connect(function(isVisible)
@@ -62,6 +62,5 @@ end
 function SimpleLoopedSoundPlayer:PromiseLoopDone()
 	return SoundPromiseUtils.promiseLooped(self.Sound)
 end
-
 
 return SimpleLoopedSoundPlayer

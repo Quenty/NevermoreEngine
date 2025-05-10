@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class PermissionLevelUtils
 ]=]
@@ -9,12 +10,15 @@ local PermissionLevel = require("PermissionLevel")
 local PermissionLevelUtils = {}
 
 local ALLOWED = {}
-for _, item in pairs(PermissionLevel) do
+for _, item in PermissionLevel do
 	ALLOWED[item] = true
 end
 
-function PermissionLevelUtils.isPermissionLevel(permissionLevel)
-	return ALLOWED[permissionLevel]
+--[=[
+	Returns true if a permission level
+]=]
+function PermissionLevelUtils.isPermissionLevel(permissionLevel: any): boolean
+	return ALLOWED[permissionLevel] == true
 end
 
 return PermissionLevelUtils

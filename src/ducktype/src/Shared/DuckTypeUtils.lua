@@ -1,10 +1,9 @@
+--!strict
 --[=[
 	Utility method to check interface is equivalent for two implementations
 
 	@class DuckTypeUtils
 ]=]
-
-local require = require(script.Parent.loader).load(script)
 
 local DuckTypeUtils = {}
 
@@ -15,14 +14,14 @@ local DuckTypeUtils = {}
 	@param target any
 	@return boolean
 ]=]
-function DuckTypeUtils.isImplementation(template, target)
+function DuckTypeUtils.isImplementation(template: any, target: any): boolean
 	assert(type(template) == "table", "Bad template")
 
 	return type(target) == "table"
 		and (getmetatable(target) == template or DuckTypeUtils._checkInterface(template, target))
 end
 
-function DuckTypeUtils._checkInterface(template, target)
+function DuckTypeUtils._checkInterface(template: any, target: any): boolean
 	local targetMetatable = getmetatable(target)
 	local templateMetatable = getmetatable(template)
 	if targetMetatable and type(targetMetatable.__index) == "function" then
@@ -34,7 +33,7 @@ function DuckTypeUtils._checkInterface(template, target)
 		return false
 	end
 
-	for key, value in pairs(template) do
+	for key, value in template do
 		if type(value) == "function" and type(target[key]) ~= "function" then
 			return false
 		end

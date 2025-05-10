@@ -5,8 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local TieUtils = require("TieUtils")
 local Maid = require("Maid")
+local TieUtils = require("TieUtils")
 local Tuple = require("Tuple")
 
 local TieSignalImplementation = setmetatable({}, BaseObject)
@@ -39,7 +39,7 @@ function TieSignalImplementation:SetImplementation(signal)
 
 		maid:GiveTask(signal:Connect(function(...)
 			local args = Tuple.new(...)
-			for pendingArgs, _ in pairs(signalFiredArgs) do
+			for pendingArgs, _ in signalFiredArgs do
 				if pendingArgs == args then
 					-- Remove from queue
 					signalFiredArgs[pendingArgs] = nil
@@ -53,7 +53,7 @@ function TieSignalImplementation:SetImplementation(signal)
 
 		maid:GiveTask(self._bindableEvent.Event:Connect(function(...)
 			local args = Tuple.new(TieUtils.decode(...))
-			for pendingArgs, _ in pairs(bindableEventFiredArgs) do
+			for pendingArgs, _ in bindableEventFiredArgs do
 				if pendingArgs == args then
 					-- Remove from queue
 					bindableEventFiredArgs[pendingArgs] = nil

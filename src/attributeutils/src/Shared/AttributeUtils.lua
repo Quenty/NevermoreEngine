@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides utility functions to work with attributes in Roblox
 	@class AttributeUtils
@@ -7,9 +8,9 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local CancelToken = require("CancelToken")
 local Maid = require("Maid")
 local Promise = require("Promise")
-local CancelToken = require("CancelToken")
 
 local DEFAULT_PREDICATE = function(value)
 	return value ~= nil
@@ -17,26 +18,28 @@ end
 
 local AttributeUtils = {}
 
-local VALID_ATTRIBUTE_TYPES = {
-	["nil"] = true;
-	["string"] = true;
-	["boolean"] = true;
-	["number"] = true;
-	["UDim"] = true;
-	["UDim2"] = true;
-	["BrickColor"] = true;
-	["CFrame"] = true;
-	["Color3"] = true;
-	["Vector2"] = true;
-	["Vector3"] = true;
-	["NumberSequence"] = true;
-	["ColorSequence"] = true;
-	["IntValue"] = true;
-	["NumberRange"] = true;
-	["Rect"] = true;
-	["Font"] = true;
-	["EnumItem"] = true;
-}
+type ValidAttributeMap = { [string]: true }
+
+local VALID_ATTRIBUTE_TYPES: ValidAttributeMap = table.freeze({
+	["nil"] = true,
+	["string"] = true,
+	["boolean"] = true,
+	["number"] = true,
+	["UDim"] = true,
+	["UDim2"] = true,
+	["BrickColor"] = true,
+	["CFrame"] = true,
+	["Color3"] = true,
+	["Vector2"] = true,
+	["Vector3"] = true,
+	["NumberSequence"] = true,
+	["ColorSequence"] = true,
+	["IntValue"] = true,
+	["NumberRange"] = true,
+	["Rect"] = true,
+	["Font"] = true,
+	["EnumItem"] = true,
+} :: ValidAttributeMap)
 
 --[=[
 	Returns whether the attribute is a valid type or not for an attribute.
@@ -48,7 +51,7 @@ local VALID_ATTRIBUTE_TYPES = {
 	@param valueType string
 	@return boolean
 ]=]
-function AttributeUtils.isValidAttributeType(valueType)
+function AttributeUtils.isValidAttributeType(valueType: string): boolean
 	return VALID_ATTRIBUTE_TYPES[valueType] == true
 end
 
@@ -59,9 +62,14 @@ end
 	@param attributeName string
 	@param predicate function | nil
 	@param cancelToken CancelToken
-	@return Promise<any>
+	@return Promise<unknown>
 ]=]
-function AttributeUtils.promiseAttribute(instance, attributeName, predicate, cancelToken)
+function AttributeUtils.promiseAttribute(
+	instance: Instance,
+	attributeName: string,
+	predicate,
+	cancelToken: CancelToken.CancelToken?
+): Promise.Promise<unknown>
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
 	assert(CancelToken.isCancelToken(cancelToken) or cancelToken == nil, "Bad cancelToken")
@@ -99,7 +107,6 @@ function AttributeUtils.promiseAttribute(instance, attributeName, predicate, can
 	return promise
 end
 
-
 --[=[
 	Whenever the attribute is true, the binder will be bound, and when the
 	binder is bound, the attribute will be true.
@@ -109,7 +116,7 @@ end
 	@param binder Binder<T>
 	@return Maid
 ]=]
-function AttributeUtils.bindToBinder(instance, attributeName, binder)
+function AttributeUtils.bindToBinder(instance: Instance, attributeName: string, binder): Maid.Maid
 	assert(binder, "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
@@ -174,7 +181,7 @@ end
 	@param default any
 	@return any? -- The value of the attribute
 ]=]
-function AttributeUtils.initAttribute(instance, attributeName, default)
+function AttributeUtils.initAttribute(instance: Instance, attributeName: string, default: any): any
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(typeof(attributeName) == "string", "Bad attributeName")
 
@@ -194,7 +201,7 @@ end
 	@param default T?
 	@return T?
 ]=]
-function AttributeUtils.getAttribute(instance, attributeName, default)
+function AttributeUtils.getAttribute(instance: Instance, attributeName: string, default: any): any
 	local value = instance:GetAttribute(attributeName)
 	if value == nil then
 		return default
@@ -211,7 +218,7 @@ end
 function AttributeUtils.removeAllAttributes(instance: Instance)
 	assert(typeof(instance) == "Instance", "Bad instance")
 
-	for key, _ in pairs(instance:GetAttributes()) do
+	for key, _ in instance:GetAttributes() do
 		instance:SetAttribute(key, nil)
 	end
 end

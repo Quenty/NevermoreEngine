@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods for promise
 	@class PromiseUtils
@@ -6,6 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
+local Signal = require("Signal")
 
 local PromiseUtils = {}
 
@@ -14,7 +16,7 @@ local PromiseUtils = {}
 	@param promises { Promise<T> }
 	@return Promise<T> -- Promise that resolves with first result
 ]=]
-function PromiseUtils.any(promises)
+function PromiseUtils.any<T...>(promises: { Promise.Promise<T...> }): Promise.Promise<T...>
 	local returnPromise = Promise.new()
 
 	local function resolve(...)
@@ -25,7 +27,7 @@ function PromiseUtils.any(promises)
 		returnPromise:Reject(...)
 	end
 
-	for _, promise in pairs(promises) do
+	for _, promise: any in promises do
 		promise:Then(resolve, reject)
 	end
 
@@ -38,7 +40,7 @@ end
 	@param seconds number
 	@return Promise
 ]=]
-function PromiseUtils.delayed(seconds)
+function PromiseUtils.delayed(seconds: number): Promise.Promise<()>
 	assert(type(seconds) == "number", "Bad seconds")
 
 	return Promise.delay(seconds, function(resolve, _reject)
@@ -57,7 +59,7 @@ end
 	@param promises { Promise<T> }
 	@return Promise<T>
 ]=]
-function PromiseUtils.all(promises)
+function PromiseUtils.all<T>(promises: { Promise.Promise<T> }): Promise.Promise<T>
 	if #promises == 0 then
 		return Promise.resolved()
 	elseif #promises == 1 then
@@ -65,11 +67,11 @@ function PromiseUtils.all(promises)
 	end
 
 	local remainingCount = #promises
-	local returnPromise = Promise.new()
+	local returnPromise: Promise.Promise<T> = Promise.new()
 	local results = {}
 	local allFulfilled = true
 
-	local function syncronize(index, isFullfilled)
+	local function syncronize(index: number, isFullfilled: boolean)
 		return function(value)
 			allFulfilled = allFulfilled and isFullfilled
 			results[index] = value
@@ -81,22 +83,28 @@ function PromiseUtils.all(promises)
 		end
 	end
 
-	for index, promise in pairs(promises) do
+	for index, promise: any in promises do
 		promise:Then(syncronize(index, true), syncronize(index, false))
 	end
 
 	return returnPromise
 end
 
-function PromiseUtils.firstSuccessOrLastFailure(promises)
+--[=[
+	Keeps on trying promises until one of them succeeds, or reports
+	the last failure.
+
+	@param promises { Promise<T> }
+]=]
+function PromiseUtils.firstSuccessOrLastFailure<T...>(promises: { Promise.Promise<T...> }): Promise.Promise<T...>
 	if #promises == 0 then
 		return Promise.resolved()
 	elseif #promises == 1 then
 		return promises[1]
 	end
 
-	local remainingCount = #promises
-	local returnPromise = Promise.new()
+	local remainingCount: number = #promises
+	local returnPromise: Promise.Promise<T...> = Promise.new()
 
 	local function syncronize(isFullfilled)
 		return function(...)
@@ -109,10 +117,12 @@ function PromiseUtils.firstSuccessOrLastFailure(promises)
 			if remainingCount == 0 then
 				return returnPromise:Reject(...)
 			end
+
+			return
 		end
 	end
 
-	for _, promise in pairs(promises) do
+	for _, promise: any in promises do
 		promise:Then(syncronize(true), syncronize(false))
 	end
 
@@ -125,13 +135,13 @@ end
 	@param stateTable any
 	@return Promise<any>
 ]=]
-function PromiseUtils.combine(stateTable)
+function PromiseUtils.combine(stateTable: any): Promise.Promise<any>
 	assert(type(stateTable) == "table", "Bad stateTable")
 
 	local remainingCount = 0
 	local results = {}
 
-	for key, value in pairs(stateTable) do
+	for key, value in stateTable do
 		if Promise.isPromise(value) then
 			remainingCount = remainingCount + 1
 		else
@@ -159,7 +169,7 @@ function PromiseUtils.combine(stateTable)
 		end
 	end
 
-	for key, value in pairs(stateTable) do
+	for key, value in stateTable do
 		if Promise.isPromise(value) then
 			value:Then(syncronize(key, true), syncronize(key, false))
 		end
@@ -175,7 +185,7 @@ end
 	@param promise Promise<T>
 	@return Promise<T>
 ]=]
-function PromiseUtils.invert(promise)
+function PromiseUtils.invert<T...>(promise: Promise.Promise<T...>): Promise.Promise<T...>
 	if promise:IsPending() then
 		return promise:Then(function(...)
 			return Promise.rejected(...)
@@ -183,7 +193,7 @@ function PromiseUtils.invert(promise)
 			return Promise.resolved(...)
 		end)
 	else
-		local results = {promise:GetResults()}
+		local results = { promise:GetResults() }
 		if results[1] then
 			return Promise.rejected(unpack(results, 2))
 		else
@@ -198,12 +208,14 @@ end
 	@param signal Signal<T>
 	@return Promise<T>
 ]=]
-function PromiseUtils.fromSignal(signal)
+function PromiseUtils.fromSignal<T...>(signal: Signal.Signal<T...>): Promise.Promise<T...>
 	local promise = Promise.new()
-	local conn
+	local conn: Signal.Connection<T...>?
 
 	promise:Finally(function()
-		conn:Disconnect()
+		if conn then
+			conn:Disconnect()
+		end
 		conn = nil
 	end)
 
@@ -222,7 +234,7 @@ end
 	@param fromPromise Promise<T>
 	@return Promise<T>
 ]=]
-function PromiseUtils.timeout(timeoutTime, fromPromise)
+function PromiseUtils.timeout<T...>(timeoutTime: number, fromPromise: Promise.Promise<T...>): Promise.Promise<T...>
 	assert(type(timeoutTime) == "number", "Bad timeoutTime")
 	assert(fromPromise, "Bad fromPromise")
 

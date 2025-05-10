@@ -5,12 +5,12 @@
 
 return {
 	UIScale = {
-		Scale = true;
-	};
+		Scale = true,
+	},
 	UICorner = {
-		CornerRadius = true;
-	};
+		CornerRadius = true,
+	},
 	UIAspectRatioConstraint = {
-		AspectRatio = true;
-	};
+		AspectRatio = true,
+	},
 }

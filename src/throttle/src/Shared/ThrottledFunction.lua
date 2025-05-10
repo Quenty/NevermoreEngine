@@ -1,14 +1,40 @@
+--!strict
 --[=[
 	Throttles execution of a functon. Does both leading, and following
 	@class ThrottledFunction
 ]=]
 
+export type ThrottleConfig = {
+	leading: boolean?,
+	trailing: boolean?,
+	leadingFirstTimeOnly: boolean?,
+}
+
 local ThrottledFunction = {}
 ThrottledFunction.ClassName = "ThrottledFunction"
 ThrottledFunction.__index = ThrottledFunction
 
-function ThrottledFunction.new(timeoutInSeconds, func, config)
-	local self = setmetatable({}, ThrottledFunction)
+export type Func<T...> = (T...) -> ...any
+
+export type ThrottledFunction<T...> = typeof(setmetatable(
+	{} :: {
+		_nextCallTimeStamp: number,
+		_timeout: number,
+		_func: Func<T...>,
+		_trailingValue: any,
+		_callLeading: boolean,
+		_callTrailing: boolean,
+		_callLeadingFirstTime: boolean?,
+	},
+	{} :: typeof({ __index = ThrottledFunction })
+))
+
+function ThrottledFunction.new<T...>(
+	timeoutInSeconds: number,
+	func: Func<T...>,
+	config: ThrottleConfig
+): ThrottledFunction<T...>
+	local self: ThrottledFunction<T...> = setmetatable({} :: any, ThrottledFunction)
 
 	self._nextCallTimeStamp = 0
 	self._timeout = timeoutInSeconds or error("No timeoutInSeconds")
@@ -24,7 +50,7 @@ function ThrottledFunction.new(timeoutInSeconds, func, config)
 	return self
 end
 
-function ThrottledFunction:Call(...)
+function ThrottledFunction.Call<T...>(self: ThrottledFunction<T...>, ...: T...)
 	if self._trailingValue then
 		-- Update the next value to be dispatched
 		self._trailingValue = table.pack(...)
@@ -61,7 +87,7 @@ end
 
 ThrottledFunction.__call = ThrottledFunction.Call
 
-function ThrottledFunction:_dispatch()
+function ThrottledFunction._dispatch<T...>(self: ThrottledFunction<T...>)
 	self._nextCallTimeStamp = tick() + self._timeout
 
 	local trailingValue = self._trailingValue
@@ -72,14 +98,14 @@ function ThrottledFunction:_dispatch()
 	end
 end
 
-function ThrottledFunction:_configureOrError(throttleConfig)
+function ThrottledFunction._configureOrError<T...>(self: ThrottledFunction<T...>, throttleConfig: ThrottleConfig)
 	if throttleConfig == nil then
 		return
 	end
 
 	assert(type(throttleConfig) == "table", "Bad throttleConfig")
 
-	for key, value in pairs(throttleConfig) do
+	for key, value in throttleConfig do
 		assert(type(value) == "boolean", "Bad throttleConfig entry")
 
 		if key == "leading" then
@@ -96,10 +122,11 @@ function ThrottledFunction:_configureOrError(throttleConfig)
 	assert(self._callLeading or self._callTrailing, "Cannot configure both leading and trailing disabled")
 end
 
-function ThrottledFunction:Destroy()
-	self._trailingValue = nil
-	self._func = nil
-	setmetatable(self, nil)
+function ThrottledFunction.Destroy<T...>(self: ThrottledFunction<T...>)
+	local private: any = self
+	private._trailingValue = nil
+	private._func = nil
+	setmetatable(private, nil)
 end
 
 return ThrottledFunction

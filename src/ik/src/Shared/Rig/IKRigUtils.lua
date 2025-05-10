@@ -9,7 +9,7 @@ local Math = require("Math")
 
 local IKRigUtils = {}
 
-function IKRigUtils.getTimeBeforeNextUpdate(distance)
+function IKRigUtils.getTimeBeforeNextUpdate(distance: number): number
 	local updateRate
 	if distance < 128 then
 		updateRate = 0
@@ -21,7 +21,7 @@ function IKRigUtils.getTimeBeforeNextUpdate(distance)
 	return updateRate
 end
 
-function IKRigUtils.getPlayerIKRig(binder, player)
+function IKRigUtils.getPlayerIKRig(binder, player: Player)
 	assert(binder, "Bad binder")
 
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)

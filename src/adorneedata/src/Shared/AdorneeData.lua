@@ -89,7 +89,7 @@ AdorneeData.__index = AdorneeData
 	@param prototype any
 	@return AdorneeData<T>
 ]=]
-function AdorneeData.new(prototype)
+function AdorneeData.new(prototype: any)
 	local self = setmetatable({}, AdorneeData)
 
 	self._fullPrototype = assert(prototype, "Bad prototype")
@@ -97,7 +97,7 @@ function AdorneeData.new(prototype)
 	self._defaultValuesPrototype = {}
 	self._valueObjectPrototype = {}
 
-	for key, item in pairs(self._fullPrototype) do
+	for key, item in self._fullPrototype do
 		if AdorneeDataEntry.isAdorneeDataEntry(item) then
 			local default = item:GetDefaultValue()
 			self._defaultValuesPrototype[key] = default
@@ -128,6 +128,8 @@ function AdorneeData:__index(index)
 				return AttributeValue.new(adornee, index, found)
 			end, found)
 		end
+	else
+		error("Bad index")
 	end
 end
 
@@ -138,7 +140,7 @@ end
 	@return boolean
 	@return string -- Error message
 ]=]
-function AdorneeData:IsStrictData(data)
+function AdorneeData:IsStrictData(data): (boolean, string?)
 	return self:GetStrictTInterface()(data)
 end
 
@@ -166,7 +168,7 @@ function AdorneeData:CreateFullData(data)
 
 	local result = table.clone(self._defaultValuesPrototype)
 
-	for key, value in pairs(data) do
+	for key, value in data do
 		result[key] = value
 	end
 
@@ -194,7 +196,7 @@ end
 	@param adornee Instance
 	@return Observable<TStrict>
 ]=]
-function AdorneeData:Observe(adornee)
+function AdorneeData:Observe(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return self:Create(adornee):Observe(adornee)
@@ -206,7 +208,7 @@ end
 	@param adornee Instance
 	@return AdorneeDataValue
 ]=]
-function AdorneeData:Create(adornee)
+function AdorneeData:Create(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local attributeTableValue = AdorneeDataValue.new(adornee, self._fullPrototype)
@@ -220,11 +222,11 @@ end
 	@param adornee Instance
 	@return TStrict
 ]=]
-function AdorneeData:Get(adornee)
+function AdorneeData:Get(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local data = {}
-	for key, defaultValue in pairs(self._attributePrototype) do
+	for key, defaultValue in self._attributePrototype do
 		local result = adornee:GetAttribute(key)
 		if result == nil then
 			result = defaultValue
@@ -233,13 +235,12 @@ function AdorneeData:Get(adornee)
 	end
 
 	-- TODO: Avoid additional allocation
-	for key, value in pairs(self._valueObjectPrototype) do
+	for key, value in self._valueObjectPrototype do
 		data[key] = value:Create(adornee).Value
 	end
 
 	return self:CreateStrictData(data)
 end
-
 
 --[=[
 	Sets the attributes for the adornee
@@ -247,12 +248,12 @@ end
 	@param adornee Instance
 	@param data T
 ]=]
-function AdorneeData:Set(adornee, data)
+function AdorneeData:Set(adornee: Instance, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
 
 	local attributeTable = self:Create(adornee)
-	for key, value in pairs(data) do
+	for key, value in data do
 		attributeTable[key].Value = value
 	end
 end
@@ -262,10 +263,10 @@ end
 
 	@param adornee Instance
 ]=]
-function AdorneeData:Unset(adornee)
+function AdorneeData:Unset(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	for key, _ in pairs(self._attributePrototype) do
+	for key, _ in self._attributePrototype do
 		adornee:SetAttribute(key, nil)
 	end
 
@@ -278,16 +279,16 @@ end
 	@param adornee Instance
 	@param data TStrict
 ]=]
-function AdorneeData:SetStrict(adornee, data)
+function AdorneeData:SetStrict(adornee: Instance, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsStrictData(data))
 
-	for key, _ in pairs(self._attributePrototype) do
+	for key, _ in self._attributePrototype do
 		adornee:SetAttribute(key, data[key])
 	end
 
 	-- TODO: Avoid additional allocation
-	for key, value in pairs(self._valueObjectPrototype) do
+	for key, value in self._valueObjectPrototype do
 		value:Create(adornee).Value = data[key]
 	end
 end
@@ -296,14 +297,14 @@ end
 	Initializes the attributes for the adornee
 
 	@param adornee Instance
-	@param data T | nil
+	@param data T?
 ]=]
-function AdorneeData:InitAttributes(adornee, data)
+function AdorneeData:InitAttributes(adornee: Instance, data)
 	data = data or {}
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
 
-	for key, defaultValue in pairs(self._attributePrototype) do
+	for key, defaultValue in self._attributePrototype do
 		if adornee:GetAttribute(key) == nil then
 			if data[key] ~= nil then
 				adornee:SetAttribute(key, data[key])
@@ -314,7 +315,7 @@ function AdorneeData:InitAttributes(adornee, data)
 	end
 
 	-- TODO: Avoid additional allocation
-	for key, value in pairs(self._valueObjectPrototype) do
+	for key, value in self._valueObjectPrototype do
 		local valueObject = value:Create(adornee)
 		if valueObject == nil then
 			if data[key] ~= nil then
@@ -386,7 +387,7 @@ function AdorneeData:_getOrCreateTypeInterfaceList()
 
 	local interfaceList = {}
 
-	for key, value in pairs(self._fullPrototype) do
+	for key, value in self._fullPrototype do
 		if AdorneeDataEntry.isAdorneeDataEntry(value) then
 			interfaceList[key] = value:GetStrictInterface()
 		else

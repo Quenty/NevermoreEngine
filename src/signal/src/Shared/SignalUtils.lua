@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities involving signals
 	@class SignalUtils
@@ -8,14 +9,14 @@ local SignalUtils = {}
 --[=[
 	Executes on the next event connection.
 	@param event RBXScriptSignal
-	@param _function function
+	@param callback function
 	@return RBXScriptConnection
 ]=]
-function SignalUtils.onNext(event, _function)
+function SignalUtils.onNext(event: RBXScriptSignal, callback: () -> ())
 	assert(typeof(event) == "RBXScriptSignal", "Bad event")
-	assert(type(_function) == "function", "Bad _function")
+	assert(type(callback) == "function", "Bad callback")
 
-	return event:Once(_function)
+	return event:Once(callback)
 end
 
 return SignalUtils

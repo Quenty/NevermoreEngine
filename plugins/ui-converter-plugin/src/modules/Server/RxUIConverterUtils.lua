@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Observable = require("Observable")
 local Maid = require("Maid")
+local Observable = require("Observable")
 
 local RxUIConverterUtils = {}
 
@@ -25,6 +25,7 @@ function RxUIConverterUtils.observeAnyChangedBelowInst(inst)
 			end))
 
 			maid[descendant] = maid
+			topMaid[descendant] = maid
 		end
 
 		topMaid:GiveTask(inst.DescendantAdded:Connect(function(descendant)
@@ -35,7 +36,7 @@ function RxUIConverterUtils.observeAnyChangedBelowInst(inst)
 		end))
 
 		handleDescendant(inst)
-		for _, descendant in pairs(inst:GetDescendants()) do
+		for _, descendant in inst:GetDescendants() do
 			handleDescendant(descendant)
 		end
 

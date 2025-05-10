@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Debug drawing library useful for debugging 3D abstractions. One of
 	the more useful utility libraries.
@@ -21,10 +22,10 @@
 	@class Draw
 ]=]
 
-local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
+local Workspace = game:GetService("Workspace")
 
 local Terrain = Workspace.Terrain
 
@@ -37,7 +38,7 @@ Draw._defaultColor = ORIGINAL_DEFAULT_COLOR
 	Sets the Draw's drawing color.
 	@param color Color3 -- The color to set
 ]=]
-function Draw.setColor(color)
+function Draw.setColor(color: Color3)
 	Draw._defaultColor = color
 end
 
@@ -52,44 +53,57 @@ end
 	Sets the Draw library to use a random color.
 ]=]
 function Draw.setRandomColor()
-	Draw.setColor(Color3.fromHSV(math.random(), 0.5+0.5*math.random(), 1))
+	Draw.setColor(Color3.fromHSV(math.random(), 0.5 + 0.5 * math.random(), 1))
 end
 
 --[=[
 	Draws a line between two points
 
+	```lua
+	Draw.line(Vector3.new(0, 0, 0), Vector3.new(0, 10, 0))
+	```
+
 	@param start Vector3
 	@param finish Vector3
-	@param color Color3 -- Optional
+	@param color Color3? -- Optional
 	@param parent Instance? -- Optional
-	@param diameter number -- Optional
+	@param diameter numbe? -- Optional
 	@return Instance
 ]=]
-function Draw.line(start, finish, color, parent, diameter)
+function Draw.line(start: Vector3, finish: Vector3, color: Color3Like?, parent: Instance?, diameter: number?): BasePart
 	start = assert(Draw._toVector3(start), "Bad start")
 	finish = assert(Draw._toVector3(finish), "Bad finish")
-	color = Draw._toColor3(color)
+	color = Draw._toColor3(color) or Draw._defaultColor
 
 	return Draw.ray(Ray.new(start, finish - start), color, parent, diameter)
 end
 
 --[=[
-	Draws a line between directions
+	Draws a line in a direction
+
+	```lua
+	Draw.direction(Vector3.new(0, 0, 0), Vector3.new(0, 10, 0))
+	```
 
 	@param origin Vector3
 	@param direction Vector3
 	@param color Color3 -- Optional
 	@param parent Instance? -- Optional
-	@param meshDiameter number -- Optional
-	@param diameter number -- Optional
+	@param diameter number? -- Optional
 	@return Instance
 ]=]
-function Draw.direction(origin, direction, color, parent, meshDiameter, diameter)
+function Draw.direction(
+	origin: Vector3,
+	direction: Vector3,
+	color: Color3?,
+	parent: Instance?,
+	diameter: number?
+): BasePart
 	origin = assert(Draw._toVector3(origin), "Bad origin")
 	direction = assert(Draw._toVector3(direction), "Bad direction")
 	color = Draw._toColor3(color)
 
-	return Draw.ray(Ray.new(origin, direction), color, parent, meshDiameter, diameter)
+	return Draw.ray(Ray.new(origin, direction), color, parent, diameter)
 end
 
 --[=[
@@ -100,25 +114,35 @@ end
 	that initially intersect the shape. So this draw doesn't render that initial sphere.
 	:::
 
+	```lua
+	Draw.spherecast(Vector3.new(0, 0, 0), 10, Vector3.new(0, 10, 0))
+	```
+
 	@param origin Vector3
 	@param radius number
 	@param direction Vector3
-	@param color Color3
-	@param parent Parent
+	@param color Color3?:
+	@param parent Instance?
 ]=]
-function Draw.spherecast(origin, radius, direction, color, parent)
-	origin = assert(Draw._toVector3(origin), "Bad cframe")
+function Draw.spherecast(
+	origin: Vector3Like,
+	radius: number,
+	direction: Vector3Like,
+	color: Color3Like?,
+	parent: Instance?
+): Folder
 	assert(type(radius) == "number", "Bad radius")
-	direction = assert(Draw._toVector3(direction), "Bad direction")
-	color = Draw._toColor3(color)
+	local castOrigin = assert(Draw._toVector3(origin), "Bad cframe")
+	local castDirection = assert(Draw._toVector3(direction), "Bad direction")
+	local castColor = Draw._toColor3(color) or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
 
 	local folder = Instance.new("Folder")
 	folder.Name = "SphereCast"
 	folder.Archivable = false
 
-	Draw.ray(Ray.new(origin, direction), color, folder, 2*radius)
-	Draw.sphere(origin + direction, radius, color, folder)
+	Draw.ray(Ray.new(castOrigin, castDirection), color, folder, 2 * radius)
+	Draw.sphere(castOrigin + castDirection, radius, castColor, folder)
 
 	folder.Parent = parent
 
@@ -134,11 +158,17 @@ end
 	@param color Color3
 	@param parent Parent
 ]=]
-function Draw.blockcast(cframe, size, direction, color, parent)
-	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
-	size = assert(Draw._toVector3(size), "Bad size")
-	direction = assert(Draw._toVector3(direction), "Bad direction")
-	color = Draw._toColor3(color)
+function Draw.blockcast(
+	cframe: CFrameLike,
+	size: Vector3Like,
+	direction: Vector3Like,
+	color: Color3Like?,
+	parent: Instance?
+): Folder
+	local blockCFrame = assert(Draw._toCFrame(cframe), "Bad cframe")
+	local blockSize = assert(Draw._toVector3(size), "Bad size")
+	local blockDirection = assert(Draw._toVector3(direction), "Bad direction")
+	local blockColor = Draw._toColor3(color)
 	parent = parent or Draw.getDefaultParent()
 
 	local folder = Instance.new("Folder")
@@ -147,59 +177,71 @@ function Draw.blockcast(cframe, size, direction, color, parent)
 
 	-- Draw beginning and end for now...
 	-- TODO: Convex hull
-	Draw.box(cframe, size, color).Parent = folder
-	Draw.box(cframe + direction, size, color).Parent = folder
+	Draw.box(blockCFrame, blockSize, blockColor).Parent = folder
+	Draw.box(blockCFrame + blockDirection, blockSize, blockColor).Parent = folder
 
 	folder.Parent = parent
 
 	return folder
 end
 
-function Draw.triangle(a, b, c, color, parent)
-	a = assert(Draw._toVector3(a), "Bad a")
-	b = assert(Draw._toVector3(b), "Bad b")
-	c = assert(Draw._toVector3(c), "Bad c")
-	color = Draw._toColor3(color) or Draw._defaultColor
+type Edge = {
+	longest: Vector3,
+	other: Vector3,
+	origin: Vector3,
+}
+
+--[=[
+	Draws a triangle between 3 points
+
+	@param pointA Vector3
+	@param pointB Vector3
+	@param pointC Vector3
+	@param color Color3? -- Optional color3
+	@param parent Instance? -- Optional parent
+	@return Folder
+]=]
+function Draw.triangle(
+	pointA: Vector3Like,
+	pointB: Vector3Like,
+	pointC: Vector3Like,
+	color: Color3Like?,
+	parent: Instance?
+): Folder
+	local a = assert(Draw._toVector3(pointA), "Bad a")
+	local b = assert(Draw._toVector3(pointB), "Bad b")
+	local c = assert(Draw._toVector3(pointC), "Bad c")
+	local triangleColor = Draw._toColor3(color) or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
 
-	local edges = {
-		{longest = (c - a), other = (b - a), origin = a},
-		{longest = (a - b), other = (c - b), origin = b},
-		{longest = (b - c), other = (a - c), origin = c}
-	};
+	local edges: { Edge } = {
+		{ longest = (c - a), other = (b - a), origin = a },
+		{ longest = (a - b), other = (c - b), origin = b },
+		{ longest = (b - c), other = (a - c), origin = c },
+	}
 
 	local edge = edges[1]
 	for i = 2, #edges do
-		if edges[i].longest.magnitude > edge.longest.magnitude then
+		if edges[i].longest.Magnitude > edge.longest.Magnitude then
 			edge = edges[i]
 		end
 	end
 
-	local theta = math.acos(edge.longest.unit:Dot(edge.other.unit))
-	local w1 = math.cos(theta) * edge.other.magnitude
-	local w2 = edge.longest.magnitude - w1
-	local h = math.sin(theta) * edge.other.magnitude
+	local theta = math.acos(edge.longest.Unit:Dot(edge.other.Unit))
+	local w1 = math.cos(theta) * edge.other.Magnitude
+	local w2 = edge.longest.Magnitude - w1
+	local h = math.sin(theta) * edge.other.Magnitude
 
-	local p1 = edge.origin + edge.other * 0.5;
+	local p1 = edge.origin + edge.other * 0.5
 	local p2 = edge.origin + edge.longest + (edge.other - edge.longest) * 0.5
 
-	local right = edge.longest:Cross(edge.other).unit
-	local up = right:Cross(edge.longest).unit
-	local back = edge.longest.unit
+	local right = edge.longest:Cross(edge.other).Unit
+	local up = right:Cross(edge.longest).Unit
+	local back = edge.longest.Unit
 
-	local cf1 = CFrame.new(
-		p1.x, p1.y, p1.z,
-		-right.x, up.x, back.x,
-		-right.y, up.y, back.y,
-		-right.z, up.z, back.z
-	);
+	local cf1 = CFrame.new(p1.X, p1.Y, p1.Z, -right.X, up.X, back.X, -right.Y, up.Y, back.Y, -right.Z, up.Z, back.Z)
 
-	local cf2 = CFrame.new(
-		p2.x, p2.y, p2.z,
-		right.x, up.x, -back.x,
-		right.y, up.y, -back.y,
-		right.z, up.z, -back.z
-	);
+	local cf2 = CFrame.new(p2.X, p2.Y, p2.Z, right.X, up.X, -back.X, right.Y, up.Y, -back.Y, right.Z, up.Z, -back.Z)
 
 	-- put it all together by creating the wedges
 	local triangle = Instance.new("Folder")
@@ -217,7 +259,7 @@ function Draw.triangle(a, b, c, color, parent)
 	wedge1.CastShadow = false
 	wedge1.Size = Vector3.new(0.05, h, w1)
 	wedge1.CFrame = cf1
-	wedge1.Color = color
+	wedge1.Color = triangleColor
 
 	local mesh1 = Instance.new("SpecialMesh")
 	mesh1.MeshType = Enum.MeshType.Wedge
@@ -235,7 +277,7 @@ function Draw.triangle(a, b, c, color, parent)
 	wedge2.CastShadow = false
 	wedge2.Size = Vector3.new(0.05, h, w2)
 	wedge2.CFrame = cf2
-	wedge2.Color = color
+	wedge2.Color = triangleColor
 
 	local mesh2 = Instance.new("SpecialMesh")
 	mesh2.MeshType = Enum.MeshType.Wedge
@@ -259,12 +301,17 @@ end
 	@param direction Vector3
 	@param color Color3 -- Optional
 	@param parent Instance? -- Optional
-	@param meshDiameter number -- Optional
-	@param diameter number -- Optional
+	@param diameter number? -- Optional
 	@return Instance
 ]=]
-function Draw.raycast(origin, direction, color, parent, meshDiameter, diameter)
-	return Draw.direction(origin, direction, color, parent, meshDiameter, diameter)
+function Draw.raycast(
+	origin: Vector3,
+	direction: Vector3,
+	color: Color3?,
+	parent: Instance?,
+	diameter: number?
+): BasePart
+	return Draw.direction(origin, direction, color, parent, diameter)
 end
 
 --[=[
@@ -281,14 +328,14 @@ end
 	@param diameter number? -- Optional diameter
 	@return BasePart
 ]=]
-function Draw.ray(ray, color, parent, diameter)
+function Draw.ray(ray: Ray, color: Color3Like?, parent: Instance?, diameter: number?): BasePart
 	assert(typeof(ray) == "Ray", "Bad typeof(ray) for Ray")
 
-	color = Draw._toColor3(color) or Draw._defaultColor
-	parent = parent or Draw.getDefaultParent()
-	diameter = diameter or 0.2
+	local rayColor = Draw._toColor3(color) or Draw._defaultColor
+	local rayParent = parent or Draw.getDefaultParent()
+	local rayDiameter = diameter or 0.2
 
-	local rayCenter = ray.Origin + ray.Direction/2
+	local rayCenter = ray.Origin + ray.Direction / 2
 	local distance = ray.Direction.Magnitude
 
 	local part = Instance.new("Part")
@@ -299,11 +346,11 @@ function Draw.ray(ray, color, parent, diameter)
 	part.CanQuery = false
 	part.CanTouch = false
 	part.CastShadow = false
-	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(0, math.pi/2, 0)
-	part.Color = color
+	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(0, math.pi / 2, 0)
+	part.Color = rayColor
 	part.Name = "DebugRay"
 	part.Shape = Enum.PartType.Cylinder
-	part.Size = Vector3.new(distance, diameter, diameter)
+	part.Size = Vector3.new(distance, rayDiameter, rayDiameter)
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.Transparency = 0.5
 
@@ -311,12 +358,12 @@ function Draw.ray(ray, color, parent, diameter)
 	cylinderHandleAdornment.Name = "CylinderHandleAdornment"
 	cylinderHandleAdornment.Height = ray.Direction.Magnitude
 	cylinderHandleAdornment.InnerRadius = 0
-	cylinderHandleAdornment.Radius = diameter/4
+	cylinderHandleAdornment.Radius = rayDiameter / 4
 	cylinderHandleAdornment.ZIndex = 3
-	cylinderHandleAdornment.Color3 = color
+	cylinderHandleAdornment.Color3 = rayColor
 	cylinderHandleAdornment.AlwaysOnTop = true
 	cylinderHandleAdornment.Transparency = 0.25
-	cylinderHandleAdornment.CFrame = CFrame.Angles(0, math.pi/2, 0)
+	cylinderHandleAdornment.CFrame = CFrame.Angles(0, math.pi / 2, 0)
 	cylinderHandleAdornment.Adornee = part
 	cylinderHandleAdornment.Parent = part
 
@@ -325,10 +372,10 @@ function Draw.ray(ray, color, parent, diameter)
 	local mesh = Instance.new("SpecialMesh")
 	mesh.MeshType = Enum.MeshType.Cylinder
 	mesh.Name = "DrawRayMesh"
-	mesh.Scale = Vector3.new(distance/partSize.x, diameter/partSize.y, diameter/partSize.z)
+	mesh.Scale = Vector3.new(distance / partSize.X, rayDiameter / partSize.Y, rayDiameter / partSize.Z)
 	mesh.Parent = part
 
-	part.Parent = parent
+	part.Parent = rayParent
 
 	return part
 end
@@ -350,33 +397,33 @@ end
 
 	@param rayPart Instance -- Ray part
 	@param ray Ray -- New ray
-	@param color Color3 -- New color
-	@param diameter number -- Number
+	@param color Color3? -- New color
+	@param diameter number? -- Number
 ]=]
-function Draw.updateRay(rayPart, ray, color, diameter)
+function Draw.updateRay(rayPart: BasePart, ray: Ray, color: Color3?, diameter: number?)
 	assert(typeof(rayPart) == "Instance", "Bad rayPart")
 	assert(typeof(ray) == "Ray", "Bad typeof(ray) for Ray")
-	color = Draw._toColor3(color) or rayPart.Color
-	diameter = diameter or rayPart.Size.z
+	local rayColor = Draw._toColor3(color) or rayPart.Color
+	local rayDiameter = diameter or rayPart.Size.Z
 
-	local rayCenter = ray.Origin + ray.Direction/2
+	local rayCenter = ray.Origin + ray.Direction / 2
 	local distance = ray.Direction.Magnitude
 
-	rayPart.Color = color
+	rayPart.Color = rayColor
 	rayPart.Size = Vector3.new(distance, diameter, diameter)
-	rayPart.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(0, math.pi/2, 0)
+	rayPart.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(0, math.pi / 2, 0)
 
 	local cylinderHandleAdornment = rayPart:FindFirstChildWhichIsA("CylinderHandleAdornment")
 	if cylinderHandleAdornment then
 		cylinderHandleAdornment.Height = ray.Direction.Magnitude
-		cylinderHandleAdornment.Radius = diameter/4
-		cylinderHandleAdornment.Color3 = color
+		cylinderHandleAdornment.Radius = rayDiameter / 4
+		cylinderHandleAdornment.Color3 = rayColor
 	end
 
 	local partSize = rayPart.Size
 	local mesh = rayPart:FindFirstChildWhichIsA("SpecialMesh")
 	if mesh then
-		mesh.Scale = Vector3.new(distance/partSize.x, diameter/partSize.y, diameter/partSize.z)
+		mesh.Scale = Vector3.new(distance / partSize.X, rayDiameter / partSize.Y, rayDiameter / partSize.Z)
 	end
 end
 
@@ -393,8 +440,8 @@ end
 	@param color Color3? -- Optional color to render
 	@return Instance
 ]=]
-function Draw.text(adornee, text, color)
-	color = Draw._toColor3(color)
+function Draw.text(adornee: Instance | Vector3, text: string, color: Color3Like?): Instance
+	local textColor = Draw._toColor3(color) or Draw._defaultColor
 
 	if typeof(adornee) == "Vector3" then
 		local attachment = Instance.new("Attachment")
@@ -402,23 +449,23 @@ function Draw.text(adornee, text, color)
 		attachment.Parent = Terrain
 		attachment.Name = "DebugTextAttachment"
 
-		Draw._textOnAdornee(attachment, text, color)
+		Draw._textOnAdornee(attachment, text, textColor)
 
 		return attachment
 	elseif typeof(adornee) == "Instance" then
-		return Draw._textOnAdornee(adornee, text, color)
+		return Draw._textOnAdornee(adornee, text, textColor)
 	else
 		error("Bad adornee")
 	end
 end
 
-function Draw._textOnAdornee(adornee, text, color)
+function Draw._textOnAdornee(adornee: Instance, text: string, color: Color3): BillboardGui
 	local TEXT_HEIGHT_STUDS = 2
 	local PADDING_PERCENT_OF_LINE_HEIGHT = 0.5
 
 	local billboardGui = Instance.new("BillboardGui")
 	billboardGui.Name = "DebugBillboardGui"
-	billboardGui.SizeOffset =  Vector2.new(0, 0.5)
+	billboardGui.SizeOffset = Vector2.new(0, 0.5)
 	billboardGui.ExtentsOffset = Vector3.new(0, 1, 0)
 	billboardGui.AlwaysOnTop = true
 	billboardGui.Adornee = adornee
@@ -431,7 +478,7 @@ function Draw._textOnAdornee(adornee, text, color)
 	background.AnchorPoint = Vector2.new(0.5, 1)
 	background.BackgroundTransparency = 0.3
 	background.BorderSizePixel = 0
-	background.BackgroundColor3 = color or Draw._defaultColor
+	background.BackgroundColor3 = color
 	background.Parent = billboardGui
 
 	local textLabel = Instance.new("TextLabel")
@@ -450,37 +497,33 @@ function Draw._textOnAdornee(adornee, text, color)
 		textLabel.Font = Enum.Font.GothamMedium
 	end
 
-	local textSize = TextService:GetTextSize(
-		textLabel.Text,
-		textLabel.TextSize,
-		textLabel.Font,
-		Vector2.new(1024, 1e6))
+	local textSize = TextService:GetTextSize(textLabel.Text, textLabel.TextSize, textLabel.Font, Vector2.new(1024, 1e6))
 
-	local lines = textSize.y/textLabel.TextSize
+	local lines = textSize.Y / textLabel.TextSize
 
-	local paddingOffset = textLabel.TextSize*PADDING_PERCENT_OF_LINE_HEIGHT
-	local paddedHeight = textSize.y + 2*paddingOffset
-	local paddedWidth = textSize.x + 2*paddingOffset
-	local aspectRatio = paddedWidth/paddedHeight
+	local paddingOffset = textLabel.TextSize * PADDING_PERCENT_OF_LINE_HEIGHT
+	local paddedHeight = textSize.Y + 2 * paddingOffset
+	local paddedWidth = textSize.X + 2 * paddingOffset
+	local aspectRatio = paddedWidth / paddedHeight
 
 	local uiAspectRatio = Instance.new("UIAspectRatioConstraint")
 	uiAspectRatio.AspectRatio = aspectRatio
 	uiAspectRatio.Parent = background
 
 	local uiPadding = Instance.new("UIPadding")
-	uiPadding.PaddingBottom = UDim.new(paddingOffset/paddedHeight, 0)
-	uiPadding.PaddingTop = UDim.new(paddingOffset/paddedHeight, 0)
-	uiPadding.PaddingLeft = UDim.new(paddingOffset/paddedWidth, 0)
-	uiPadding.PaddingRight = UDim.new(paddingOffset/paddedWidth, 0)
+	uiPadding.PaddingBottom = UDim.new(paddingOffset / paddedHeight, 0)
+	uiPadding.PaddingTop = UDim.new(paddingOffset / paddedHeight, 0)
+	uiPadding.PaddingLeft = UDim.new(paddingOffset / paddedWidth, 0)
+	uiPadding.PaddingRight = UDim.new(paddingOffset / paddedWidth, 0)
 	uiPadding.Parent = background
 
 	local uiCorner = Instance.new("UICorner")
-	uiCorner.CornerRadius = UDim.new(paddingOffset/paddedHeight/2, 0)
+	uiCorner.CornerRadius = UDim.new(paddingOffset / paddedHeight / 2, 0)
 	uiCorner.Parent = background
 
-	local height = lines*TEXT_HEIGHT_STUDS * TEXT_HEIGHT_STUDS*PADDING_PERCENT_OF_LINE_HEIGHT
+	local height = lines * TEXT_HEIGHT_STUDS * TEXT_HEIGHT_STUDS * PADDING_PERCENT_OF_LINE_HEIGHT
 
-	billboardGui.Size = UDim2.new(height*aspectRatio, 0, height, 0)
+	billboardGui.Size = UDim2.new(height * aspectRatio, 0, height, 0)
 	billboardGui.Parent = adornee
 
 	return billboardGui
@@ -501,8 +544,8 @@ end
 	@param parent Instance? -- Optional parent
 	@return BasePart
 ]=]
-function Draw.sphere(position, radius, color, parent)
-	return Draw.point(position, color, parent, radius*2)
+function Draw.sphere(position: Vector3Like, radius: number, color: Color3?, parent: Instance)
+	return Draw.point(position, color, parent, radius * 2)
 end
 
 --[=[
@@ -518,12 +561,11 @@ end
 	@param diameter number? -- Optional diameter
 	@return BasePart
 ]=]
-function Draw.point(position, color, parent, diameter)
-	position = assert(Draw._toVector3(position), "Bad position")
-	color = Draw._toColor3(color) or Draw._defaultColor
-
-	parent = parent or Draw.getDefaultParent()
-	diameter = diameter or 1
+function Draw.point(position: Vector3Like, color: Color3Like?, parent: Instance?, diameter: number?): BasePart
+	local pointPosition = assert(Draw._toVector3(position), "Bad position")
+	local pointColor = Draw._toColor3(color) or Draw._defaultColor
+	local pointParent = parent or Draw.getDefaultParent()
+	local pointDiameter = diameter or 1
 
 	local part = Instance.new("Part")
 	part.Material = Enum.Material.ForceField
@@ -534,25 +576,25 @@ function Draw.point(position, color, parent, diameter)
 	part.CanQuery = false
 	part.CanTouch = false
 	part.CastShadow = false
-	part.CFrame = CFrame.new(position)
-	part.Color = color
+	part.CFrame = CFrame.new(pointPosition)
+	part.Color = pointColor
 	part.Name = "DebugPoint"
 	part.Shape = Enum.PartType.Ball
-	part.Size = Vector3.new(diameter, diameter, diameter)
+	part.Size = Vector3.new(pointDiameter, pointDiameter, pointDiameter)
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.Transparency = 0.5
 
 	local sphereHandle = Instance.new("SphereHandleAdornment")
 	sphereHandle.Archivable = false
 	sphereHandle.Transparency = 0.25
-	sphereHandle.Radius = diameter/4
-	sphereHandle.Color3 = color
+	sphereHandle.Radius = pointDiameter / 4
+	sphereHandle.Color3 = pointColor
 	sphereHandle.AlwaysOnTop = true
 	sphereHandle.Adornee = part
 	sphereHandle.ZIndex = 2
 	sphereHandle.Parent = part
 
-	part.Parent = parent
+	part.Parent = pointParent
 
 	return part
 end
@@ -570,7 +612,7 @@ end
 	@param parent Instance? -- Optional parent
 	@return BasePart
 ]=]
-function Draw.labelledPoint(position, label, color, parent)
+function Draw.labelledPoint(position: Vector3Like, label: string, color: Color3Like?, parent: Instance?): BasePart
 	position = assert(Draw._toVector3(position), "Bad position")
 	color = Draw._toColor3(color)
 
@@ -591,31 +633,22 @@ end
 	@param cframe CFrame
 	@return Model
 ]=]
-function Draw.cframe(cframe)
-	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
+function Draw.cframe(cframe: CFrameLike): Model
+	local drawCFrame = assert(Draw._toCFrame(cframe), "Bad cframe")
 
 	local model = Instance.new("Model")
 	model.Name = "DebugCFrame"
 
-	local position = cframe.Position
+	local position = drawCFrame.Position
 	Draw.point(position, nil, model, 0.1)
 
-	local xRay = Draw.ray(Ray.new(
-		position,
-		cframe.XVector
-	), Color3.new(0.75, 0.25, 0.25), model, 0.1)
+	local xRay = Draw.ray(Ray.new(position, drawCFrame.XVector), Color3.new(0.75, 0.25, 0.25), model, 0.1)
 	xRay.Name = "XVector"
 
-	local yRay = Draw.ray(Ray.new(
-		position,
-		cframe.YVector
-	), Color3.new(0.25, 0.75, 0.25), model, 0.1)
+	local yRay = Draw.ray(Ray.new(position, drawCFrame.YVector), Color3.new(0.25, 0.75, 0.25), model, 0.1)
 	yRay.Name = "YVector"
 
-	local zRay = Draw.ray(Ray.new(
-		position,
-		cframe.ZVector
-	), Color3.new(0.25, 0.25, 0.75), model, 0.1)
+	local zRay = Draw.ray(Ray.new(position, drawCFrame.ZVector), Color3.new(0.25, 0.25, 0.75), model, 0.1)
 	zRay.Name = "ZVector"
 
 	model.Parent = Draw.getDefaultParent()
@@ -633,17 +666,18 @@ end
 	@param template BasePart
 	@param cframe CFrame
 	@param color Color3?
-	@param transparency number
+	@param transparency number?
 	@return BasePart
 ]=]
-function Draw.part(template, cframe, color, transparency)
+function Draw.part(template: BasePart, cframe: CFrameLike?, color: Color3Like?, transparency: number?): BasePart
 	assert(typeof(template) == "Instance" and template:IsA("BasePart"), "Bad template")
-	cframe = Draw._toCFrame(cframe)
-	color = Draw._toColor3(color)
+
+	local partCFrame = Draw._toCFrame(cframe)
+	local partColor = Draw._toColor3(color) or Draw._defaultColor
 
 	local part = template:Clone()
-	for _, child in pairs(part:GetChildren()) do
-		if child:IsA("Mesh") then
+	for _, child in part:GetChildren() do
+		if child:IsA("DataModelMesh") then
 			Draw._sanitize(child)
 			child:ClearAllChildren()
 		else
@@ -651,7 +685,7 @@ function Draw.part(template, cframe, color, transparency)
 		end
 	end
 
-	part.Color = color or Draw._defaultColor
+	part.Color = partColor
 	part.Material = Enum.Material.ForceField
 	part.Transparency = transparency or 0.75
 	part.Name = "Debug" .. template.Name
@@ -662,8 +696,8 @@ function Draw.part(template, cframe, color, transparency)
 	part.CastShadow = false
 	part.Archivable = false
 
-	if cframe then
-		part.CFrame = cframe
+	if partCFrame then
+		part.CFrame = partCFrame
 	end
 
 	Draw._sanitize(part)
@@ -673,12 +707,12 @@ function Draw.part(template, cframe, color, transparency)
 	return part
 end
 
-function Draw._sanitize(inst)
-	for key, _ in pairs(inst:GetAttributes()) do
+function Draw._sanitize(inst: Instance)
+	for key, _ in inst:GetAttributes() do
 		inst:SetAttribute(key, nil)
 	end
 
-	for _, tag in pairs(CollectionService:GetTags(inst)) do
+	for _, tag in CollectionService:GetTags(inst) do
 		CollectionService:RemoveTag(inst, tag)
 	end
 end
@@ -692,21 +726,16 @@ end
 
 	@param cframe CFrame | Vector3 -- CFrame of the box
 	@param size Vector3 -- Size of the box
-	@param color Color3 -- Optional Color3
+	@param color Color3? -- Optional Color3
 	@return BasePart
 ]=]
-function Draw.box(cframe, size, color)
-	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
-	size = assert(Draw._toVector3(size), "Bad size")
-	color = Draw._toColor3(color)
-
-	assert(typeof(cframe) == "CFrame", "Bad cframe")
-	assert(typeof(size) == "Vector3", "Bad size")
-
-	color = color or Draw._defaultColor
+function Draw.box(cframe: CFrameLike, size: Vector3Like, color: Color3Like?): BasePart
+	local boxCFrame = assert(Draw._toCFrame(cframe), "Bad cframe")
+	local boxSize = assert(Draw._toVector3(size), "Bad size")
+	local boxColor = Draw._toColor3(color) or Draw._defaultColor
 
 	local part = Instance.new("Part")
-	part.Color = color
+	part.Color = boxColor
 	part.Material = Enum.Material.ForceField
 	part.Name = "DebugPart"
 	part.Anchored = true
@@ -718,13 +747,13 @@ function Draw.box(cframe, size, color)
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.Transparency = 0.75
-	part.Size = size
-	part.CFrame = cframe
+	part.Size = boxSize
+	part.CFrame = boxCFrame
 
 	local boxHandleAdornment = Instance.new("BoxHandleAdornment")
 	boxHandleAdornment.Adornee = part
-	boxHandleAdornment.Size = size
-	boxHandleAdornment.Color3 = color
+	boxHandleAdornment.Size = boxSize
+	boxHandleAdornment.Color3 = boxColor
 	boxHandleAdornment.AlwaysOnTop = true
 	boxHandleAdornment.Transparency = 0.75
 	boxHandleAdornment.ZIndex = 1
@@ -746,7 +775,7 @@ end
 	@param color Color3? -- Optional color3
 	@return BasePart
 ]=]
-function Draw.region3(region3, color)
+function Draw.region3(region3: Region3, color: Color3Like?): BasePart
 	color = Draw._toColor3(color)
 
 	return Draw.box(region3.CFrame, region3.Size, color)
@@ -764,14 +793,14 @@ end
 	@param color Color3? -- Optional color to render
 	@return BasePart
 ]=]
-function Draw.terrainCell(position, color)
+function Draw.terrainCell(position: Vector3Like, color: Color3Like?): BasePart
 	position = assert(Draw._toVector3(position), "Bad position")
 	color = Draw._toColor3(color)
 
 	local size = Vector3.new(4, 4, 4)
 
 	local solidCell = Terrain:WorldToCell(position)
-	local terrainPosition = Terrain:CellCenterToWorld(solidCell.x, solidCell.y, solidCell.z)
+	local terrainPosition = Terrain:CellCenterToWorld(solidCell.X, solidCell.Y, solidCell.Z)
 
 	local part = Draw.box(CFrame.new(terrainPosition), size, color)
 	part.Name = "DebugTerrainCell"
@@ -779,25 +808,27 @@ function Draw.terrainCell(position, color)
 	return part
 end
 
-function Draw.screenPointLine(a, b, parent, color)
-	color = Draw._toColor3(color)
+--[=[
+	Draws a screen point line
+]=]
+function Draw.screenPointLine(a: Vector2, b: Vector2, parent: Instance?, color: Color3Like): Frame
+	color = Draw._toColor3(color) or Draw._defaultColor
 
 	local offset = (b - a)
-	local pos = a + offset/2
-
+	local pos = a + offset / 2
 
 	local frame = Instance.new("Frame")
 	frame.Name = "DebugScreenLine"
-	frame.Size = UDim2.fromScale(math.abs(offset.x), math.abs(offset.y))
+	frame.Size = UDim2.fromScale(math.abs(offset.X), math.abs(offset.Y))
 
 	frame.BackgroundTransparency = 1
-	frame.Position = UDim2.fromScale(pos.x, pos.y)
+	frame.Position = UDim2.fromScale(pos.X, pos.Y)
 	frame.AnchorPoint = Vector2.new(0.5, 0.5)
 	frame.BorderSizePixel = 0
 	frame.ZIndex = 10000
 	frame.Parent = parent
 
-	local length = offset.magnitude
+	local length = offset.Magnitude
 	if length == 0 then
 		return frame
 	end
@@ -805,29 +836,32 @@ function Draw.screenPointLine(a, b, parent, color)
 	local diameter = 3
 	local count = 25
 
-	local slope = offset.y/offset.x
+	local slope = offset.Y / offset.X
 	if slope > 0 then
-		for i=0, count do
-			Draw.screenPoint(Vector2.new(i/count, i/count), frame, color, diameter)
+		for i = 0, count do
+			Draw.screenPoint(Vector2.new(i / count, i / count), frame, color, diameter)
 		end
 	else
-		for i=0, count do
-			Draw.screenPoint(Vector2.new(i/count, 1 - i/count), frame, color, diameter)
+		for i = 0, count do
+			Draw.screenPoint(Vector2.new(i / count, 1 - i / count), frame, color, diameter)
 		end
 	end
 
 	return frame
 end
 
-function Draw.screenPoint(position, parent, color, diameter)
-	color = Draw._toColor3(color)
+--[=[
+	Draws a screen point
+]=]
+function Draw.screenPoint(position: Vector2, parent: Instance, color: Color3Like?, diameter: number?): Frame
+	local pointColor = Draw._toColor3(color) or Color3.new(0.658824, 0.501961, 0.501961)
 
 	local frame = Instance.new("Frame")
 	frame.Name = "DebugScreenPoint"
 	frame.Size = UDim2.new(0, diameter, 0, diameter)
-	frame.BackgroundColor3 = color or Color3.new(1, 0.1, 0.1)
+	frame.BackgroundColor3 = pointColor
 	frame.BackgroundTransparency = 0.5
-	frame.Position = UDim2.fromScale(position.x, position.y)
+	frame.Position = UDim2.fromScale(position.X, position.Y)
 	frame.AnchorPoint = Vector2.new(0.5, 0.5)
 	frame.BorderSizePixel = 0
 	frame.ZIndex = 20000
@@ -854,12 +888,18 @@ end
 	@param meshDiameter number? -- Optional diameter
 	@return BasePart
 ]=]
-function Draw.vector(position, direction, color, parent, meshDiameter)
-	position = assert(Draw._toVector3(position), "Bad position")
-	direction = assert(Draw._toVector3(direction), "Bad direction")
-	color = Draw._toColor3(color)
+function Draw.vector(
+	position: Vector3Like,
+	direction: Vector3Like,
+	color: Color3?,
+	parent: Instance?,
+	meshDiameter: number?
+)
+	local vectorPosition = assert(Draw._toVector3(position), "Bad position")
+	local vectorDirection = assert(Draw._toVector3(direction), "Bad direction")
+	local vectorColor = Draw._toColor3(color)
 
-	return Draw.ray(Ray.new(position, direction), color, parent, meshDiameter)
+	return Draw.ray(Ray.new(vectorPosition, vectorDirection), vectorColor, parent, meshDiameter)
 end
 
 --[=[
@@ -869,35 +909,37 @@ end
 	Draw.ring(Vector3.new(0, 0, 0), Vector3.new(0, 1, 0), 10)
 	```
 
-	@param ringPos Vector3 -- Position of the center of the ring
-	@param ringNorm Vector3 -- Direction of the ring.
-	@param ringRadius number? -- Optional radius for the ring
+	@param position Vector3 -- Position of the center of the ring
+	@param normal Vector3 -- Direction of the ring.
+	@param radius number? -- Optional radius for the ring
 	@param color Color3? -- Optional color
 	@param parent Instance? -- Optional instance
 	@return BasePart
 ]=]
-function Draw.ring(ringPos, ringNorm, ringRadius, color, parent)
-	ringPos = assert(Draw._toVector3(ringPos), "Bad ringPos")
-	ringNorm = assert(Draw._toVector3(ringNorm), "Bad ringNorm")
+function Draw.ring(position: Vector3Like, normal: Vector3Like, radius: number?, color: Color3Like, parent: Instance?)
+	local ringPosition = assert(Draw._toVector3(position), "Bad ringPos")
+	local ringNormal = assert(Draw._toVector3(normal), "Bad ringNorm")
+	local ringRadius = radius or 1
+	local ringColor = Draw._toColor3(color) or Draw._defaultColor
 
-	local ringCFrame = CFrame.new(ringPos, ringPos + ringNorm)
+	local ringCFrame = CFrame.new(ringPosition, ringPosition + ringNormal)
 
-	local points = {}
-	for angle = 0, 2*math.pi, math.pi/8 do
-		local x = math.cos(angle)*ringRadius
-		local y = math.sin(angle)*ringRadius
-		local vector = ringCFrame:pointToWorldSpace(Vector3.new(x, y, 0))
+	local points: { Vector3 } = {}
+	for angle = 0, 2 * math.pi, math.pi / 8 do
+		local x = math.cos(angle) * ringRadius
+		local y = math.sin(angle) * ringRadius
+		local vector = ringCFrame:PointToWorldSpace(Vector3.new(x, y, 0))
 		table.insert(points, vector)
 	end
 
 	local folder = Instance.new("Folder")
 	folder.Name = "DebugRing"
 
-	for i=1, #points do
+	for i = 1, #points do
 		local pos = points[i]
-		local nextPos = points[(i%#points)+1]
-        local ray = Ray.new(pos, nextPos - pos)
-        Draw.ray(ray, color, folder)
+		local nextPos = points[(i % #points) + 1]
+		local ray = Ray.new(pos, nextPos - pos)
+		Draw.ray(ray, ringColor, folder)
 	end
 
 	folder.Parent = parent or Draw.getDefaultParent()
@@ -905,7 +947,9 @@ function Draw.ring(ringPos, ringNorm, ringRadius, color, parent)
 	return folder
 end
 
-function Draw._toVector3(position)
+export type Vector3Like = Vector3 | CFrame | Attachment | BasePart | Model | RaycastResult | PathWaypoint
+
+function Draw._toVector3(position: Vector3Like): Vector3?
 	if typeof(position) == "Vector3" then
 		return position
 	elseif typeof(position) == "CFrame" then
@@ -916,7 +960,7 @@ function Draw._toVector3(position)
 		elseif position:IsA("BasePart") then
 			return position.Position
 		elseif position:IsA("Model") then
-			return position:GetBoundingBox().p
+			return position:GetBoundingBox().Position
 		else
 			return nil
 		end
@@ -929,7 +973,9 @@ function Draw._toVector3(position)
 	end
 end
 
-function Draw._toColor3(color)
+export type Color3Like = Color3 | BrickColor | BasePart
+
+function Draw._toColor3(color: Color3Like?): Color3?
 	if typeof(color) == "Color3" then
 		return color
 	elseif typeof(color) == "BrickColor" then
@@ -945,7 +991,9 @@ function Draw._toColor3(color)
 	end
 end
 
-function Draw._toCFrame(cframe)
+export type CFrameLike = CFrame | Vector3 | Attachment | BasePart | Model | RaycastResult | PathWaypoint
+
+function Draw._toCFrame(cframe: CFrameLike?): CFrame?
 	if typeof(cframe) == "CFrame" then
 		return cframe
 	elseif typeof(cframe) == "Vector3" then
@@ -973,7 +1021,7 @@ end
 	Retrieves the default parent for the current execution context.
 	@return Instance
 ]=]
-function Draw.getDefaultParent()
+function Draw.getDefaultParent(): Instance?
 	if not RunService:IsRunning() then
 		return Workspace.CurrentCamera
 	end

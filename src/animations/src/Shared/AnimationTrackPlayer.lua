@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Plays a single track, allowing for the animation to be controlled easier.
 
@@ -6,26 +7,40 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
-local Rx = require("Rx")
 local AnimationUtils = require("AnimationUtils")
+local BaseObject = require("BaseObject")
+local Rx = require("Rx")
 local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local AnimationTrackPlayer = setmetatable({}, BaseObject)
 AnimationTrackPlayer.ClassName = "AnimationTrackPlayer"
 AnimationTrackPlayer.__index = AnimationTrackPlayer
+
+export type AnimationTrackPlayer = typeof(setmetatable(
+	{} :: {
+		-- Public
+		KeyframeReached: Signal.Signal<()>,
+
+		-- Private
+		_animationTarget: ValueObject.ValueObject<Instance>,
+		_trackId: ValueObject.ValueObject<string | number>,
+		_currentTrack: ValueObject.ValueObject<AnimationTrack?>,
+		_animationPriority: ValueObject.ValueObject<number>,
+	},
+	{} :: typeof({ __index = AnimationTrackPlayer })
+)) & BaseObject.BaseObject
 
 --[=[
 	Plays an animation track in the target. Async loads the track when
 	all data is found.
 
 	@param animationTarget Instance | Observable<Instance>
-	@param animationId string | number | nil
+	@param animationId string | number?
 	@return AnimationTrackPlayer
 ]=]
-function AnimationTrackPlayer.new(animationTarget, animationId)
-	local self = setmetatable(BaseObject.new(), AnimationTrackPlayer)
+function AnimationTrackPlayer.new(animationTarget, animationId: string | number): AnimationTrackPlayer
+	local self: AnimationTrackPlayer = setmetatable(BaseObject.new() :: any, AnimationTrackPlayer)
 
 	self._animationTarget = self._maid:Add(ValueObject.new(nil))
 	self._trackId = self._maid:Add(ValueObject.new(nil))
@@ -49,33 +64,41 @@ end
 
 function AnimationTrackPlayer:_setupState()
 	self._maid:GiveTask(Rx.combineLatest({
-		animationTarget = self._animationTarget:Observe();
-		trackId = self._trackId:Observe();
-		animationPriority = self._animationPriority:Observe();
-	}):Pipe({
-		Rx.throttleDefer();
-	}):Subscribe(function(state)
-		if state.animationTarget and state.trackId then
-			self._currentTrack.Value = AnimationUtils.getOrCreateAnimationTrack(state.animationTarget, state.trackId, state.animationPriority)
-		else
-			self._currentTrack.Value = nil
-		end
-	end))
-
-	self._maid:GiveTask(self._currentTrack:ObserveBrio(function(track)
-		return track ~= nil
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
-
-		local maid = brio:ToMaid()
-		local track = brio:GetValue()
-
-		maid:GiveTask(track.KeyframeReached:Connect(function(...)
-			self.KeyframeReached:Fire(...)
+		animationTarget = self._animationTarget:Observe(),
+		trackId = self._trackId:Observe(),
+		animationPriority = self._animationPriority:Observe(),
+	})
+		:Pipe({
+			Rx.throttleDefer() :: any,
+		})
+		:Subscribe(function(state)
+			if state.animationTarget and state.trackId then
+				self._currentTrack.Value = AnimationUtils.getOrCreateAnimationTrack(
+					state.animationTarget,
+					state.trackId,
+					state.animationPriority
+				)
+			else
+				self._currentTrack.Value = nil
+			end
 		end))
-	end))
+
+	self._maid:GiveTask(self._currentTrack
+		:ObserveBrio(function(track)
+			return track ~= nil
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
+
+			local maid = brio:ToMaid()
+			local track = brio:GetValue()
+
+			maid:GiveTask(track.KeyframeReached:Connect(function(...)
+				self.KeyframeReached:Fire(...)
+			end))
+		end))
 end
 
 --[=[
@@ -83,7 +106,7 @@ end
 
 	@param animationId string | number
 ]=]
-function AnimationTrackPlayer:SetAnimationId(animationId)
+function AnimationTrackPlayer:SetAnimationId(animationId: string | number)
 	return self._trackId:Mount(animationId)
 end
 
@@ -92,7 +115,7 @@ end
 
 	@return string | number
 ]=]
-function AnimationTrackPlayer:GetAnimationId()
+function AnimationTrackPlayer:GetAnimationId(): string | number
 	return self._trackId.Value
 end
 
@@ -111,7 +134,7 @@ end
 	@param weight number
 	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:SetWeightTargetIfNotSet(weight, fadeTime)
+function AnimationTrackPlayer:SetWeightTargetIfNotSet(weight: number, fadeTime: number)
 	self._maid._adjustWeight = self:_onEachTrack(function(_maid, track)
 		if track.WeightTarget ~= weight then
 			track:AdjustWeight(weight, fadeTime)
@@ -126,7 +149,7 @@ end
 	@param weight number
 	@param speed number
 ]=]
-function AnimationTrackPlayer:Play(fadeTime, weight, speed)
+function AnimationTrackPlayer:Play(fadeTime: number, weight: number, speed: number)
 	if weight then
 		self._maid._adjustWeight = nil
 	end
@@ -146,7 +169,7 @@ end
 
 	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:Stop(fadeTime)
+function AnimationTrackPlayer:Stop(fadeTime: number)
 	self._maid._play = nil
 	self._maid._stop = self:_onEachTrack(function(_maid, track)
 		track:Stop(fadeTime)
@@ -159,7 +182,7 @@ end
 	@param weight number
 	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:AdjustWeight(weight, fadeTime)
+function AnimationTrackPlayer:AdjustWeight(weight: number, fadeTime: number)
 	self._maid._adjustWeight = self:_onEachTrack(function(_maid, track)
 		track:AdjustWeight(weight, fadeTime)
 	end)
@@ -171,7 +194,7 @@ end
 	@param speed number
 	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:AdjustSpeed(speed, fadeTime)
+function AnimationTrackPlayer:AdjustSpeed(speed: number, fadeTime: number)
 	self._maid._adjustSpeed = self:_onEachTrack(function(_maid, track)
 		track:AdjustSpeed(speed, fadeTime)
 	end)
@@ -182,7 +205,7 @@ end
 
 	@return boolean
 ]=]
-function AnimationTrackPlayer:IsPlaying()
+function AnimationTrackPlayer:IsPlaying(): boolean
 	local track = self._currentTrack.Value
 	if track then
 		return track.IsPlaying
@@ -192,16 +215,18 @@ function AnimationTrackPlayer:IsPlaying()
 end
 
 function AnimationTrackPlayer:_onEachTrack(callback)
-	return self._currentTrack:ObserveBrio(function(track)
-		return track ~= nil
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	return self._currentTrack
+		:ObserveBrio(function(track)
+			return track ~= nil
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-		local track = brio:GetValue()
-		callback(brio:ToMaid(), track)
-	end)
+			local track = brio:GetValue()
+			callback(brio:ToMaid(), track)
+		end)
 end
 
 return AnimationTrackPlayer

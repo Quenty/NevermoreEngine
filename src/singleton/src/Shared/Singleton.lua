@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	This class converts a class into a singleton
 	@class Singleton
@@ -5,15 +6,26 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local ServiceBag = require("ServiceBag")
+
 local Singleton = {}
 Singleton.ClassName = "Singleton"
 Singleton.__index = Singleton
 
-function Singleton.new(serviceName, constructor)
+export type Constructor<T> = (serviceBag: ServiceBag.ServiceBag) -> T
+export type Singleton<T> = typeof(setmetatable(
+	{} :: {
+		ServiceName: string,
+		_constructor: Constructor<T>,
+	},
+	{} :: typeof({ __index = Singleton })
+))
+
+function Singleton.new<T>(serviceName: string, constructor: Constructor<T>): Singleton<T>
 	assert(type(serviceName) == "string", "Bad serviceName")
 	assert(type(constructor) == "function", "Bad constructor")
 
-	local self = setmetatable({}, Singleton)
+	local self: Singleton<T> = setmetatable({} :: any, Singleton)
 
 	self.ServiceName = assert(serviceName, "No serviceName")
 	self._constructor = assert(constructor, "No constructor")
@@ -21,8 +33,8 @@ function Singleton.new(serviceName, constructor)
 	return self
 end
 
-function Singleton:Init(serviceBag)
-	assert(self ~= Singleton, "Cannot initialize Singleton template directly")
+function Singleton.Init<T>(self: Singleton<T>, serviceBag: ServiceBag.ServiceBag)
+	assert((self :: any) ~= Singleton, "Cannot initialize Singleton template directly")
 
 	local object = self._constructor(serviceBag)
 	assert(type(object) == "table", "Bad object")
@@ -34,7 +46,7 @@ function Singleton:Init(serviceBag)
 	end
 
 	-- Override
-	setmetatable(self, { __index = object })
+	setmetatable(self :: any, { __index = object })
 end
 
 return Singleton

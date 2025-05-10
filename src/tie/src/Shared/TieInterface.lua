@@ -6,15 +6,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TieSignalInterface = require("TieSignalInterface")
-local TiePropertyInterface = require("TiePropertyInterface")
 local TieMethodInterfaceUtils = require("TieMethodInterfaceUtils")
+local TiePropertyInterface = require("TiePropertyInterface")
+local TieSignalInterface = require("TieSignalInterface")
 
 local TieInterface = {}
 TieInterface.ClassName = "TieInterface"
 TieInterface.__index = TieInterface
 
-function TieInterface.new(definition, implParent, adornee, interfaceTieRealm)
+function TieInterface.new(definition, implParent: Instance?, adornee: Instance?, interfaceTieRealm)
 	local self = setmetatable({}, TieInterface)
 
 	assert(implParent or adornee, "ImplParent or adornee required")
@@ -33,7 +33,7 @@ end
 
 	@return boolean
 ]=]
-function TieInterface:IsImplemented()
+function TieInterface:IsImplemented(): boolean
 	local implParent = rawget(self, "_implParent")
 	local adornee = rawget(self, "_adornee")
 	local definition = rawget(self, "_definition")
@@ -59,9 +59,9 @@ end
 --[=[
 	Gets the adornee the tie interface is on if it can be found.
 
-	@return Instance | nil
+	@return Instance?
 ]=]
-function TieInterface:GetTieAdornee()
+function TieInterface:GetTieAdornee(): Instance?
 	local adornee = rawget(self, "_adornee")
 	if adornee then
 		return adornee
@@ -117,7 +117,14 @@ function TieInterface:__index(index)
 				error(string.format("Unknown member definition %q", tostring(member.ClassName)))
 			end
 		else
-			error(string.format("[TieInterface] - %s is not allowed in realm '%s'. Specify realm to %s.", member:GetFriendlyName(), interfaceTieRealm, member:GetMemberTieRealm()))
+			error(
+				string.format(
+					"[TieInterface] - %s is not allowed in realm '%s'. Specify realm to %s.",
+					member:GetFriendlyName(),
+					interfaceTieRealm,
+					member:GetMemberTieRealm()
+				)
+			)
 		end
 	elseif TieInterface[index] then
 		return TieInterface[index]

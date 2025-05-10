@@ -14,15 +14,15 @@ local function insert(state, reduced)
 	local _end = math.min(#state.past, start + HISTORY_LIMIT)
 
 	local newPast = {}
-	for i=start, _end do
+	for i = start, _end do
 		newPast[#newPast + 1] = state.past[i]
 	end
 	newPast[#newPast + 1] = state.present
 
 	return {
-		past = newPast;
-		present = reduced;
-		future = {};
+		past = newPast,
+		present = reduced,
+		future = {},
 	}
 end
 
@@ -34,39 +34,39 @@ return function(reducer)
 			end
 
 			local newPast = {}
-			for i=1, #state.past - 1 do
+			for i = 1, #state.past - 1 do
 				newPast[#newPast + 1] = state.past[i]
 			end
 
 			return {
-				past = newPast;
-				present = state.past[#state.past];
-				future = Table.mergeLists(state.future, { state.present });
+				past = newPast,
+				present = state.past[#state.past],
+				future = Table.mergeLists(state.future, { state.present }),
 			}
-		end;
+		end,
 		redo = function(state, _action)
 			if #state.future == 0 then
 				return state
 			end
 
 			local newFuture = {}
-			for i=1, #state.future - 1 do
+			for i = 1, #state.future - 1 do
 				newFuture[#newFuture + 1] = state.future[i]
 			end
 
 			return {
-				past = Table.mergeLists(state.past, { state.present });
-				present = state.future[#state.future];
-				future = newFuture;
+				past = Table.mergeLists(state.past, { state.present }),
+				present = state.future[#state.future],
+				future = newFuture,
 			}
-		end;
+		end,
 	}
 
 	return function(state, action)
 		state = state or {
-			past = {};
-			present = reducer(nil, {});
-			future = {};
+			past = {},
+			present = reducer(nil, {}),
+			future = {},
 		}
 
 		if not action.type then
@@ -82,5 +82,5 @@ return function(reducer)
 
 			return insert(state, reduced)
 		end
-	end;
+	end
 end

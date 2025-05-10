@@ -12,8 +12,8 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local Maid = require("Maid")
-local ScrollModel = require("ScrollModel")
 local SCROLL_TYPE = require("SCROLL_TYPE")
+local ScrollModel = require("ScrollModel")
 local Table = require("Table")
 
 local ScrollingFrame = {}
@@ -33,7 +33,7 @@ function ScrollingFrame.new(gui)
 	self._maid = Maid.new()
 	self.Gui = gui or error("No Gui")
 	self._container = self.Gui.Parent or error("No container")
-	self._scrollType = SCROLL_TYPE.Vertical;
+	self._scrollType = SCROLL_TYPE.Vertical
 
 	self._scrollbars = {}
 	self._model = ScrollModel.new()
@@ -80,7 +80,7 @@ function ScrollingFrame:RemoveScrollbar(scrollbar)
 end
 
 -- Scrolls to the position in pixels offset
-function ScrollingFrame:ScrollTo(position, doNotAnimate)
+function ScrollingFrame:ScrollTo(position, doNotAnimate: boolean?)
 	self._model.Target = position
 	if doNotAnimate then
 		self._model.position = self._model.Target
@@ -89,12 +89,12 @@ function ScrollingFrame:ScrollTo(position, doNotAnimate)
 end
 
 -- Scrolls to the top
-function ScrollingFrame:ScrollToTop(doNotAnimate)
+function ScrollingFrame:ScrollToTop(doNotAnimate: boolean?)
 	self:ScrollTo(self._model.Min, doNotAnimate)
 end
 
 -- Scrolls to the bottom
-function ScrollingFrame:ScrollToBottom(doNotAnimate)
+function ScrollingFrame:ScrollToBottom(doNotAnimate: boolean?)
 	self:ScrollTo(self._model.Max, doNotAnimate)
 end
 
@@ -116,7 +116,7 @@ function ScrollingFrame:_updateRender()
 		error("[ScrollingFrame] - Bad ScrollType")
 	end
 
-	for _, scrollbar in pairs(self._scrollbars) do
+	for _, scrollbar in self._scrollbars do
 		if scrollbar.Destroy then
 			scrollbar:UpdateRender()
 		else
@@ -182,12 +182,12 @@ function ScrollingFrame:_getVelocityTracker(strength)
 	end
 end
 
-function ScrollingFrame:_getInputProcessor(inputBeganObject)
+function ScrollingFrame:_getInputProcessor(inputBeganObject: InputObject)
 	local startPos = self._model.Position
 	local updateVelocity = self:_getVelocityTracker()
 	local originalPos = inputBeganObject.Position
 
-	return function(inputObject)
+	return function(inputObject: InputObject)
 		local distance = (inputObject.Position - originalPos)[self._scrollType.Direction]
 		local pos = startPos - distance
 		self._model.Position = pos
@@ -199,8 +199,6 @@ function ScrollingFrame:_getInputProcessor(inputBeganObject)
 		return distance
 	end
 end
-
-
 
 -- Binds input to a specific GUI
 -- @return maid Maid -- To cleanup inputs
@@ -228,9 +226,10 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 		return
 	end
 
-	if inputBeganObject.UserInputType == Enum.UserInputType.MouseButton1
-		or inputBeganObject.UserInputType == Enum.UserInputType.Touch then
-
+	if
+		inputBeganObject.UserInputType == Enum.UserInputType.MouseButton1
+		or inputBeganObject.UserInputType == Enum.UserInputType.Touch
+	then
 		local maid = Maid.new()
 
 		local startTime = tick()
@@ -290,7 +289,8 @@ function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganOb
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 			local direction = self._scrollType.Direction
 			local offset = (inputObject.Position - startPosition)[direction]
-			local percent = offset / (scrollbarContainer.AbsoluteSize[direction] * (1 - self._model.ContentScrollPercentSize))
+			local percent = offset
+				/ (scrollbarContainer.AbsoluteSize[direction] * (1 - self._model.ContentScrollPercentSize))
 			self._model.ContentScrollPercent = startPercent + percent
 			self._model.TargetContentScrollPercent = self._model.ContentScrollPercent
 

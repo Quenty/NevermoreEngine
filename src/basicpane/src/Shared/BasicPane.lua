@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Base UI object with visibility and a maid. BasicPane provides three points of utility.
 
@@ -21,23 +22,43 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Maid = require("Maid")
+local Brio = require("Brio")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local BasicPane = {}
 BasicPane.ClassName = "BasicPane"
 BasicPane.__index = BasicPane
 
+export type BasicPane = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_visible: ValueObject.ValueObject<boolean>,
+
+		--[=[
+			Gui object which can be reparented or whatever
+
+			@prop Gui Instance?
+			@within BasicPane
+		]=]
+		Gui: GuiObject?,
+		VisibleChanged: Signal.Signal<(boolean, boolean)>,
+	},
+	{} :: typeof({ __index = BasicPane })
+))
+
 --[=[
 	Constructs a new BasicPane with the .Gui property set.
 
-	@param gui GuiBase? -- Optional Gui object
+	@param gui GuiObject? -- Optional Gui object
 	@return BasicPane
 ]=]
-function BasicPane.new(gui)
-	local self = setmetatable({}, BasicPane)
+function BasicPane.new(gui: GuiObject?): BasicPane
+	local self: BasicPane = setmetatable({} :: any, BasicPane)
 
 	self._maid = Maid.new()
 	self._visible = self._maid:Add(ValueObject.new(false, "boolean"))
@@ -53,19 +74,13 @@ function BasicPane.new(gui)
 		@prop VisibleChanged Signal<boolean, boolean>
 		@within BasicPane
 	]=]
-	self.VisibleChanged = self._maid:Add(Signal.new()) -- :Fire(isVisible, doNotAnimate)
+	self.VisibleChanged = self._maid:Add(Signal.new() :: any) -- :Fire(isVisible, doNotAnimate)
 
 	self._maid:GiveTask(self._visible.Changed:Connect(function(isVisible, _, doNotAnimate)
 		self.VisibleChanged:Fire(isVisible, doNotAnimate)
 	end))
 
 	if gui then
-		--[=[
-			Gui object which can be reparented or whatever
-
-			@prop Gui Instance?
-			@within BasicPane
-		]=]
 		self.Gui = self._maid:Add(gui)
 	end
 
@@ -77,7 +92,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function BasicPane.isBasicPane(value)
+function BasicPane.isBasicPane(value: any): boolean
 	return DuckTypeUtils.isImplementation(BasicPane, value)
 end
 
@@ -87,7 +102,7 @@ end
 	@param isVisible boolean -- Whether or not the pane should be visible
 	@param doNotAnimate boolean? -- True if this visiblity should not animate
 ]=]
-function BasicPane:SetVisible(isVisible, doNotAnimate)
+function BasicPane.SetVisible(self: BasicPane, isVisible: boolean, doNotAnimate: boolean?)
 	assert(type(isVisible) == "boolean", "Bad isVisible")
 
 	self._visible:SetValue(isVisible, doNotAnimate)
@@ -96,9 +111,9 @@ end
 --[=[
 	Returns an observable that observes visibility
 
-	@return Observable<boolean>
+	@return Observable<boolean, boolean?>
 ]=]
-function BasicPane:ObserveVisible()
+function BasicPane.ObserveVisible(self: BasicPane): Observable.Observable<boolean, boolean?>
 	return self._visible:Observe()
 end
 
@@ -108,17 +123,20 @@ end
 	@param predicate function | nil -- Optional predicate. If not includeded returns the value.
 	@return Observable<Brio<boolean>>
 ]=]
-function BasicPane:ObserveVisibleBrio(predicate)
+function BasicPane.ObserveVisibleBrio(
+	self: BasicPane,
+	predicate: Rx.Predicate<boolean>?
+): Observable.Observable<Brio.Brio<boolean>?>
 	return self._visible:ObserveBrio(predicate or function(isVisible)
 		return isVisible
-	end)
+	end) :: any
 end
 
 --[=[
 	Shows the pane
 	@param doNotAnimate boolean? -- True if this visiblity should not animate
 ]=]
-function BasicPane:Show(doNotAnimate)
+function BasicPane.Show(self: BasicPane, doNotAnimate: boolean?)
 	self:SetVisible(true, doNotAnimate)
 end
 
@@ -126,7 +144,7 @@ end
 	Hides the pane
 	@param doNotAnimate boolean? -- True if this visiblity should not animate
 ]=]
-function BasicPane:Hide(doNotAnimate)
+function BasicPane.Hide(self: BasicPane, doNotAnimate: boolean?)
 	self:SetVisible(false, doNotAnimate)
 end
 
@@ -134,7 +152,7 @@ end
 	Toggles the pane
 	@param doNotAnimate boolean? -- True if this visiblity should not animate
 ]=]
-function BasicPane:Toggle(doNotAnimate)
+function BasicPane.Toggle(self: BasicPane, doNotAnimate: boolean?)
 	self:SetVisible(not self._visible.Value, doNotAnimate)
 end
 
@@ -142,7 +160,7 @@ end
 	Returns if the pane is visible
 	@return boolean
 ]=]
-function BasicPane:IsVisible()
+function BasicPane.IsVisible(self: BasicPane): boolean
 	return self._visible.Value
 end
 
@@ -150,10 +168,12 @@ end
 	Cleans up the BasicPane, invoking Maid:DoCleaning() on the BasicPane and
 	setting the metatable to nil.
 ]=]
-function BasicPane:Destroy()
-	self._maid:DoCleaning()
-	self._maid = nil
-	setmetatable(self, nil)
+function BasicPane.Destroy(self: BasicPane)
+	local private: any = self
+
+	private._maid:DoCleaning()
+	private._maid = nil
+	setmetatable(private, nil)
 end
 
 return BasicPane

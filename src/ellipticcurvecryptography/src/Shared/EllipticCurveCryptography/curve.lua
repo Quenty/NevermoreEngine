@@ -31,10 +31,10 @@
 	@class curve
 ]=]
 
-local util = require(script.Parent.util)
 local arith = require(script.Parent.arith)
 local modp = require(script.Parent.modp)
 local modq = require(script.Parent.modq)
+local util = require(script.Parent.util)
 
 local isEqual = arith.isEqual
 local NAF = arith.NAF

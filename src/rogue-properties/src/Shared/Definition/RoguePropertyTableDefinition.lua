@@ -6,22 +6,23 @@
 local require = require(script.Parent.loader).load(script)
 
 local DuckTypeUtils = require("DuckTypeUtils")
+local RoguePropertyArrayUtils = (require :: any)("RoguePropertyArrayUtils")
+local RoguePropertyCacheService = require("RoguePropertyCacheService")
 local RoguePropertyDefinition = require("RoguePropertyDefinition")
 local RoguePropertyDefinitionArrayHelper = require("RoguePropertyDefinitionArrayHelper")
+local RoguePropertyService = require("RoguePropertyService")
 local RoguePropertyTable = require("RoguePropertyTable")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
-local RoguePropertyService = require("RoguePropertyService")
-local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
 local Set = require("Set")
-local RoguePropertyCacheService = require("RoguePropertyCacheService")
+local Table = require("Table")
 
 local RoguePropertyTableDefinition = {} -- Inherits from RoguePropertyDefinition
 RoguePropertyTableDefinition.ClassName = "RoguePropertyTableDefinition"
 RoguePropertyTableDefinition.__index = RoguePropertyTableDefinition
 
-function RoguePropertyTableDefinition.new(tableName, defaultValueTable)
+function RoguePropertyTableDefinition.new(tableName: string?, defaultValueTable: Table.Map<string, any>?)
 	local self = setmetatable(RoguePropertyDefinition.new(), RoguePropertyTableDefinition)
 
 	if tableName then
@@ -35,11 +36,11 @@ function RoguePropertyTableDefinition.new(tableName, defaultValueTable)
 	return self
 end
 
-function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value)
+function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value): boolean
 	return DuckTypeUtils.isImplementation(RoguePropertyTableDefinition, value)
 end
 
-function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable)
+function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable: Table.Map<string, any>?)
 	assert(type(defaultValueTable) == "table", "Bad defaultValueTable")
 
 	RoguePropertyDefinition.SetDefaultValue(self, defaultValueTable)
@@ -48,7 +49,7 @@ function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable)
 
 	local defaultArrayData = {}
 
-	for key, defaultValue in pairs(defaultValueTable) do
+	for key, defaultValue in defaultValueTable do
 		if type(key) == "number" then
 			table.insert(defaultArrayData, defaultValue)
 		else
@@ -72,32 +73,44 @@ function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable)
 
 	if next(defaultArrayData) ~= nil then
 		-- Enforce array data types for sanity
-		local requiredPropertyDefinitionTemplate, message = RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(defaultArrayData, self)
+		local requiredPropertyDefinitionTemplate, message =
+			RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(defaultArrayData, self)
 
 		if requiredPropertyDefinitionTemplate then
-			self._arrayDefinitionHelper = RoguePropertyDefinitionArrayHelper.new(self, defaultArrayData, requiredPropertyDefinitionTemplate)
+			self._arrayDefinitionHelper =
+				RoguePropertyDefinitionArrayHelper.new(self, defaultArrayData, requiredPropertyDefinitionTemplate)
 		else
-			error(string.format("[RoguePropertyTableDefinition] - Could not create infer array type definition. Error: %s", message))
+			error(
+				string.format(
+					"[RoguePropertyTableDefinition] - Could not create infer array type definition. Error: %s",
+					message
+				)
+			)
 		end
 	end
 end
 
-
-function RoguePropertyTableDefinition:CanAssign(mainValue, strict)
+function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): (boolean, string?)
 	assert(type(strict) == "boolean", "Bad strict")
 
 	if type(mainValue) ~= "table" then
-		return false, string.format("got %q, expected %q when assigning to %q", self._valueType, typeof(mainValue), self:GetFullName())
+		return false,
+			string.format(
+				"got %q, expected %q when assigning to %q",
+				self._valueType,
+				typeof(mainValue),
+				self:GetFullName()
+			)
 	end
 
-	local remainingKeys
+	local remainingKeys: Set.Set<string>
 	if strict then
 		remainingKeys = Set.fromKeys(self._definitionMap)
 	else
 		remainingKeys = {}
 	end
 
-	for key, value in pairs(mainValue) do
+	for key, value in mainValue do
 		remainingKeys[key] = nil
 
 		if type(key) == "number" then
@@ -107,7 +120,13 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict)
 					if message then
 						return false, message
 					else
-						return false, string.format("Bad index %q of %q due to %s", tostring(key), self:GetFullName(), tostring(message))
+						return false,
+							string.format(
+								"Bad index %q of %q due to %s",
+								tostring(key),
+								self:GetFullName(),
+								tostring(message)
+							)
 					end
 				end
 			else
@@ -120,7 +139,13 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict)
 					if message then
 						return false, message
 					else
-						return false, string.format("Bad index %q of %q due to %s", tostring(key), self:GetFullName(), tostring(message))
+						return false,
+							string.format(
+								"Bad index %q of %q due to %s",
+								tostring(key),
+								self:GetFullName(),
+								tostring(message)
+							)
 					end
 				end
 			else
@@ -131,10 +156,16 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict)
 
 	-- We missed some keys
 	if next(remainingKeys) ~= nil then
-		return false, string.format("Had %d unassigned keys %q while assigning to %q", #remainingKeys, table.concat(remainingKeys, ", "), self:GetFullName())
+		return false,
+			string.format(
+				"Had %d unassigned keys %q while assigning to %q",
+				Set.count(remainingKeys),
+				table.concat(Set.toList(remainingKeys), ", "),
+				self:GetFullName()
+			)
 	end
 
-	return true
+	return true, nil
 end
 
 function RoguePropertyTableDefinition:GetDefinitionArrayHelper()
@@ -165,7 +196,7 @@ end
 	@param adornee Instance
 	@return RoguePropertyTable
 ]=]
-function RoguePropertyTableDefinition:Get(serviceBag, adornee)
+function RoguePropertyTableDefinition:Get(serviceBag: ServiceBag.ServiceBag, adornee: Instance)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
@@ -196,7 +227,7 @@ RoguePropertyTableDefinition.GetPropertyTable = RoguePropertyTableDefinition.Get
 	@param canInitialize boolean
 	@return Observable<Brio<Folder>>
 ]=]
-function RoguePropertyTableDefinition:ObserveContainerBrio(adornee, canInitialize)
+function RoguePropertyTableDefinition:ObserveContainerBrio(adornee: Instance, canInitialize)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
@@ -205,12 +236,11 @@ function RoguePropertyTableDefinition:ObserveContainerBrio(adornee, canInitializ
 
 	local parentDefinition = self:GetParentPropertyDefinition()
 	if parentDefinition then
-		return parentDefinition:ObserveContainerBrio(adornee, canInitialize)
-			:Pipe({
-				RxBrioUtils.switchMapBrio(function(parent)
-					return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self:GetName())
-				end)
-			})
+		return parentDefinition:ObserveContainerBrio(adornee, canInitialize):Pipe({
+			RxBrioUtils.switchMapBrio(function(parent)
+				return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self:GetName())
+			end),
+		})
 	else
 		return RxInstanceUtils.observeLastNamedChildBrio(adornee, "Folder", self:GetName())
 	end
@@ -222,7 +252,7 @@ end
 	@param canInitialize boolean
 	@return Folder?
 ]=]
-function RoguePropertyTableDefinition:GetContainer(adornee, canInitialize)
+function RoguePropertyTableDefinition:GetContainer(adornee: Instance, canInitialize): Folder?
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
@@ -259,7 +289,7 @@ function RoguePropertyTableDefinition:GetOrCreateInstance(parent)
 	return folder
 end
 
-function RoguePropertyTableDefinition:__index(index)
+function RoguePropertyTableDefinition:__index(index: string)
 	assert(type(index) == "string", "Bad index")
 
 	if index == "_definitionMap" or index == "_arrayDefinitionHelper" or index == "_parentPropertyTableDefinition" then
@@ -289,6 +319,8 @@ function RoguePropertyTableDefinition:__index(index)
 		else
 			error(string.format("Bad definition %q - Not an array", tostring(index)))
 		end
+	else
+		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 

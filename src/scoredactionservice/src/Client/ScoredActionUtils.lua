@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class ScoredActionUtils
 ]=]
@@ -8,7 +9,7 @@ local Maid = require("Maid")
 
 local ScoredActionUtils = {}
 
-function ScoredActionUtils.connectToPreferred(scoredAction, callback)
+function ScoredActionUtils.connectToPreferred(scoredAction, callback: (Maid.Maid) -> ()): Maid.Maid
 	local topMaid = Maid.new()
 
 	local function onPreferredChanged()

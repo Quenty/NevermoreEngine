@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/jumpbuttonutils@2.2.0...@quenty/jumpbuttonutils@2.3.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+
+
+
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/jumpbuttonutils@2.1.0...@quenty/jumpbuttonutils@2.2.0) (2024-05-09)
 
 

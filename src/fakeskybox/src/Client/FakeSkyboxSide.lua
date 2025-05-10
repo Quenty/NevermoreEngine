@@ -58,10 +58,9 @@ function FakeSkyboxSide:UpdateSizing()
 	self.Part.Size = Vector3.new(self.PartSize, self.PartSize, self.PartWidth)
 
 	local Direction = Vector3.FromNormalId(self.Normal)
-	local Offset = Direction * self.PartWidth/2
+	local Offset = Direction * self.PartWidth / 2
 
-	self.Relative = CFrame.new(Direction*(self.PartSize/2) + Offset)
-		* CFrame.new(Vector3.zero, -Direction)
+	self.Relative = CFrame.new(Direction * (self.PartSize / 2) + Offset) * CFrame.new(Vector3.zero, -Direction)
 
 	if self.Normal == Enum.NormalId.Bottom then
 		-- Hack
