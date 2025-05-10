@@ -48,6 +48,9 @@ function DeathReportService.Init(self: DeathReportService, serviceBag: ServiceBa
 	-- Internal
 	self._serviceBag:GetService((require :: any)("DeathReportBindersServer"))
 
+	-- Binders
+	self._serviceBag:GetService(require("DeathTrackedHumanoid"))
+
 	-- Export
 	self.NewDeathReport = self._maid:Add(Signal.new()) :: any
 
@@ -195,6 +198,8 @@ end
 
 function DeathReportService.ReportDeathReport(self: DeathReportService, deathReport: DeathReportUtils.DeathReport)
 	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathReport")
+
+	print("new death report", deathReport)
 
 	-- Notify services
 	self.NewDeathReport:Fire(deathReport)
