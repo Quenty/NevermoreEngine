@@ -1,6 +1,5 @@
 name: lint
-on:
-  workflow_call
+on: [pull_request_target, workflow_call]
 jobs:
   luau-lsp:
     runs-on: ubuntu-latest
