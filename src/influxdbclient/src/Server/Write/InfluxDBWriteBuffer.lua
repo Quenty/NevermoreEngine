@@ -6,9 +6,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local InfluxDBWriteOptionUtils = require("InfluxDBWriteOptionUtils")
 local Promise = require("Promise")
 local Signal = require("Signal")
-local _InfluxDBWriteOptionUtils = require("InfluxDBWriteOptionUtils")
 
 local InfluxDBWriteBuffer = setmetatable({}, BaseObject)
 InfluxDBWriteBuffer.ClassName = "InfluxDBWriteBuffer"
@@ -19,7 +19,7 @@ export type InfluxDBWriteBuffer = typeof(setmetatable(
 		_bytes: number,
 		_length: number,
 		_entries: { string },
-		_writeOptions: _InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+		_writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
 		_promiseHandleFlush: (entries: { string }) -> Promise.Promise<()>,
 		_requestQueueNext: Signal.Signal<()>,
 	},
@@ -27,7 +27,7 @@ export type InfluxDBWriteBuffer = typeof(setmetatable(
 )) & BaseObject.BaseObject
 
 function InfluxDBWriteBuffer.new(
-	writeOptions: _InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+	writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
 	promiseHandleFlush
 ): InfluxDBWriteBuffer
 	local self: InfluxDBWriteBuffer = setmetatable(BaseObject.new() :: any, InfluxDBWriteBuffer)

@@ -21,8 +21,8 @@ local RemotingRealms = require("RemotingRealms")
 local RemotingRealmUtils = require("RemotingRealmUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
+local Observable = require("Observable")
+local Brio = require("Brio")
 
 local RAW_MEMBERS = {
 	_name = true,
@@ -83,15 +83,15 @@ export type Remoting = typeof(setmetatable(
 		_getMemberName: (self: Remoting, memberName: string, objectType: string) -> string,
 		_getDebugMemberName: (self: Remoting, memberName: string) -> string,
 		_ensureContainer: (self: Remoting) -> Folder,
-		_observeFolderBrio: (self: Remoting) -> _Observable.Observable<_Brio.Brio<Folder>>,
+		_observeFolderBrio: (self: Remoting) -> Observable.Observable<Brio.Brio<Folder>>,
 		_observeRemoteEventBrio: (
 			self: Remoting,
 			memberName: string
-		) -> _Observable.Observable<_Brio.Brio<RemoteEvent>>,
+		) -> Observable.Observable<Brio.Brio<RemoteEvent>>,
 		_observeRemoteFunctionBrio: (
 			self: Remoting,
 			memberName: string
-		) -> _Observable.Observable<_Brio.Brio<RemoteFunction>>,
+		) -> Observable.Observable<Brio.Brio<RemoteFunction>>,
 		_promiseContainer: (self: Remoting, maid: Maid.Maid) -> Promise.Promise<Folder>,
 		_promiseRemoteEvent: (self: Remoting, maid: Maid.Maid, memberName: string) -> Promise.Promise<RemoteEvent>,
 		_getOrCreateRemoteEvent: (self: Remoting, memberName: string) -> RemoteEvent | BindableEvent,
@@ -687,7 +687,7 @@ function Remoting._observeRemoteFunctionBrio(self: Remoting, memberName: string)
 			else
 				return RxInstanceUtils.observeLastNamedChildBrio(item, "RemoteFunction", remoteFunctionName)
 			end
-		end),
+		end) :: any,
 	})
 end
 
@@ -698,12 +698,12 @@ function Remoting._observeRemoteEventBrio(self: Remoting, memberName: string)
 
 	return self:_observeFolderBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(item)
-			if self._useDummyObject then
-				return RxInstanceUtils.observeLastNamedChildBrio(item, "BindableEvent", remoteFunctionName)
-			else
-				return RxInstanceUtils.observeLastNamedChildBrio(item, "RemoteEvent", remoteFunctionName)
-			end
-		end),
+		if self._useDummyObject then
+			return RxInstanceUtils.observeLastNamedChildBrio(item, "BindableEvent", remoteFunctionName)
+		else
+			return RxInstanceUtils.observeLastNamedChildBrio(item, "RemoteEvent", remoteFunctionName)
+		end
+		end) :: any,
 	})
 end
 
@@ -729,7 +729,7 @@ function Remoting._promiseRemoteFunction(
 	end)
 end
 
-function Remoting._observeFolderBrio(self: Remoting): _Observable.Observable<_Brio.Brio<Folder>>
+function Remoting._observeFolderBrio(self: Remoting): Observable.Observable<Brio.Brio<Folder>>
 	assert(self._instance, "Not initialized")
 
 	return RxInstanceUtils.observeLastNamedChildBrio(

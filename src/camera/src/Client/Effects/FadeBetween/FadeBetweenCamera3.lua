@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Add another layer of effects that can be faded in/out
 	@class FadeBetweenCamera3
@@ -13,21 +14,43 @@ local FieldOfViewUtils = require("FieldOfViewUtils")
 local CameraState = require("CameraState")
 local CameraFrame = require("CameraFrame")
 local CubicSplineUtils = require("CubicSplineUtils")
+local CameraEffectUtils = require("CameraEffectUtils")
 
 local FadeBetweenCamera3 = {}
 FadeBetweenCamera3.ClassName = "FadeBetweenCamera3"
+
+export type FadeBetweenCamera3 = typeof(setmetatable(
+	{} :: {
+		_spring: Spring.Spring<number>,
+		CameraA: CameraEffectUtils.CameraLike,
+		CameraB: CameraEffectUtils.CameraLike,
+		HasReachedTarget: boolean,
+		Damper: number,
+		Value: number,
+		Speed: number,
+		Velocity: number,
+		Target: number,
+	},
+	{} :: typeof({ __index = FadeBetweenCamera3 })
+)) & CameraEffectUtils.CameraEffect
 
 --[=[
 	@param cameraA CameraLike
 	@param cameraB CameraLike
 	@return FadeBetweenCamera3
 ]=]
-function FadeBetweenCamera3.new(cameraA, cameraB)
-	local self = setmetatable({
-		_spring = Spring.new(0);
-		CameraA = cameraA or error("No cameraA");
-		CameraB = cameraB or error("No cameraB");
-	}, FadeBetweenCamera3)
+function FadeBetweenCamera3.new(
+	cameraA: CameraEffectUtils.CameraLike,
+	cameraB: CameraEffectUtils.CameraLike
+): FadeBetweenCamera3
+	local self: FadeBetweenCamera3 = setmetatable(
+		{
+			_spring = Spring.new(0),
+			CameraA = cameraA or error("No cameraA"),
+			CameraB = cameraB or error("No cameraB"),
+		} :: any,
+		FadeBetweenCamera3
+	)
 
 	self.Damper = 1
 	self.Speed = 15
@@ -79,23 +102,36 @@ function FadeBetweenCamera3:__index(index)
 
 			local dist = (frameA.Position - frameB.Position).magnitude
 
-			local node0 = CubicSplineUtils.newSplineNode(0, frameA.Position,
-				stateA.CameraFrameDerivative.Position + frameA.CFrame.lookVector*dist*0.3)
-			local node1 = CubicSplineUtils.newSplineNode(1, frameB.Position,
-				stateB.CameraFrameDerivative.Position + frameB.CFrame.lookVector*dist*0.3)
+			local node0 = CubicSplineUtils.newSplineNode(
+				0,
+				frameA.Position,
+				stateA.CameraFrameDerivative.Position + frameA.CFrame.lookVector * dist * 0.3
+			)
+			local node1 = CubicSplineUtils.newSplineNode(
+				1,
+				frameB.Position,
+				stateB.CameraFrameDerivative.Position + frameB.CFrame.lookVector * dist * 0.3
+			)
 
 			-- We do the position this way because 0^-1 is undefined
 			--stateA.Position + (stateB.Position - stateA.Position)*t
 			local newNode = CubicSplineUtils.tweenSplineNodes(node0, node1, t)
-			local delta = (frameB*(frameA^-1))
+			local delta = (frameB * (frameA ^ -1))
 
 			local deltaQFrame = delta.QFrame
 			if deltaQFrame.W < 0 then
 				delta.QFrame = QFrame.new(
-					deltaQFrame.x, deltaQFrame.y, deltaQFrame.z, -deltaQFrame.W, -deltaQFrame.X, -deltaQFrame.Y, -deltaQFrame.Z)
+					deltaQFrame.x,
+					deltaQFrame.y,
+					deltaQFrame.z,
+					-deltaQFrame.W,
+					-deltaQFrame.X,
+					-deltaQFrame.Y,
+					-deltaQFrame.Z
+				)
 			end
 
-			local newState = delta^t*frameA
+			local newState = delta ^ t * frameA
 			newState.FieldOfView = FieldOfViewUtils.lerpInHeightSpace(frameA.FieldOfView, frameB.FieldOfView, t)
 			newState.Position = newNode.p
 
@@ -121,7 +157,7 @@ function FadeBetweenCamera3:__index(index)
 		if animating then
 			return self._spring.Velocity
 		else
-			return Vector3.zero
+			return 0
 		end
 	elseif index == "HasReachedTarget" then
 		local animating = SpringUtils.animating(self._spring)

@@ -45,26 +45,26 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local Maid = require("Maid")
+local InputKeyMapList = require("InputKeyMapList")
 local InputKeyMapRegistryServiceShared = require("InputKeyMapRegistryServiceShared")
+local Maid = require("Maid")
 local ObservableList = require("ObservableList")
-local _ServiceBag = require("ServiceBag")
-local _InputKeyMapList = require("InputKeyMapList")
+local ServiceBag = require("ServiceBag")
 
 local InputKeyMapListProvider = {}
 InputKeyMapListProvider.ClassName = "InputKeyMapListProvider"
 InputKeyMapListProvider.ServiceName = "InputKeyMapListProvider"
 InputKeyMapListProvider.__index = InputKeyMapListProvider
 
-export type CreateDefaultsCallback = (self: InputKeyMapListProvider, serviceBag: _ServiceBag.ServiceBag) -> ()
+export type CreateDefaultsCallback = (self: InputKeyMapListProvider, serviceBag: ServiceBag.ServiceBag) -> ()
 export type InputKeyMapListProvider = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		_providerName: string,
 		_createDefaults: CreateDefaultsCallback,
-		_inputKeyMapLists: { [string]: _InputKeyMapList.InputKeyMapList },
-		_inputMapLists: any, -- ObservableList.ObservableList<_InputKeyMapList.InputKeyMapList>,
+		_inputKeyMapLists: { [string]: InputKeyMapList.InputKeyMapList },
+		_inputMapLists: any, -- ObservableList.ObservableList<InputKeyMapList.InputKeyMapList>,
 	},
 	{} :: typeof({ __index = InputKeyMapListProvider })
 ))
@@ -91,7 +91,7 @@ function InputKeyMapListProvider.new(
 	return self
 end
 
-function InputKeyMapListProvider.Init(self: InputKeyMapListProvider, serviceBag: _ServiceBag.ServiceBag)
+function InputKeyMapListProvider.Init(self: InputKeyMapListProvider, serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -124,7 +124,7 @@ end
 function InputKeyMapListProvider.GetInputKeyMapList(
 	self: InputKeyMapListProvider,
 	keyMapListName: string
-): _InputKeyMapList.InputKeyMapList
+): InputKeyMapList.InputKeyMapList
 	local keyMapList = self:FindInputKeyMapList(keyMapListName)
 	if not keyMapList then
 		error(string.format("Bad keyMapListName %q", tostring(keyMapListName)))
@@ -141,7 +141,7 @@ end
 function InputKeyMapListProvider.FindInputKeyMapList(
 	self: InputKeyMapListProvider,
 	keyMapListName: string
-): _InputKeyMapList.InputKeyMapList?
+): InputKeyMapList.InputKeyMapList?
 	assert(type(keyMapListName) == "string", "Bad keyMapListName")
 
 	if RunService:IsRunning() and not self._inputKeyMapLists then

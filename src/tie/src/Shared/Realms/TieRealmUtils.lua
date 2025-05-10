@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods to oeprate around [TieRealms]
 
@@ -7,6 +8,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
+
 local TieRealms = require("TieRealms")
 
 local TieRealmUtils = {}

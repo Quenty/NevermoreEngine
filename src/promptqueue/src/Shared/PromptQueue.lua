@@ -13,7 +13,7 @@ local Promise = require("Promise")
 local TransitionModel = require("TransitionModel")
 local ValueObject = require("ValueObject")
 local Signal = require("Signal")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local PromptQueue = setmetatable({}, BaseObject)
 PromptQueue.ClassName = "PromptQueue"
@@ -67,7 +67,7 @@ function PromptQueue.Queue(self: PromptQueue, transitionModel: TransitionModel.T
 	local entry: PromptEntry = {
 		promise = promise,
 		execute = function()
-		assert(promise:IsPending(), "Not pending")
+			assert(promise:IsPending(), "Not pending")
 
 			-- stylua: ignore
 			maid:GivePromise(transitionModel:PromiseShow())
@@ -200,7 +200,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function PromptQueue.ObserveIsShowing(self: PromptQueue): _Observable.Observable<boolean>
+function PromptQueue.ObserveIsShowing(self: PromptQueue): Observable.Observable<boolean>
 	return self._isShowing:Observe()
 end
 

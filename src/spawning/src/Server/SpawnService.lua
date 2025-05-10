@@ -9,7 +9,7 @@ local RunService = game:GetService("RunService")
 
 local RandomUtils = require("RandomUtils")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local UPDATE_PERIOD_SEC = 5
 local SPAWN_AFTER_GAME_START = 1
@@ -20,7 +20,7 @@ local TOTAL_BUDGET_BEFORE_WARN = 0.1
 local SpawnService = {}
 SpawnService.ServiceName = "SpawnService"
 
-function SpawnService:Init(serviceBag: _ServiceBag.ServiceBag)
+function SpawnService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 

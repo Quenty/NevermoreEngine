@@ -28,7 +28,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local SettingDefinition = require("SettingDefinition")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local SettingDefinitionProvider = {}
 SettingDefinitionProvider.ClassName = "SettingDefinitionProvider"
@@ -105,7 +105,7 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingDefinitionProvider:Init(serviceBag: _ServiceBag.ServiceBag)
+function SettingDefinitionProvider:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(serviceBag, "No serviceBag")
 	assert(not self._maid, "Already initialized")
 

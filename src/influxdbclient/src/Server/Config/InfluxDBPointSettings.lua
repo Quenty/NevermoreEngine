@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class InfluxDBPointSettings
 ]=]
@@ -9,8 +10,16 @@ InfluxDBPointSettings.__index = InfluxDBPointSettings
 export type InfluxDBTags = { [string]: string }
 export type ConvertTime = (number) -> number
 
-function InfluxDBPointSettings.new()
-	local self = setmetatable({}, InfluxDBPointSettings)
+export type InfluxDBPointSettings = typeof(setmetatable(
+	{} :: {
+		_defaultTags: InfluxDBTags,
+		_convertTime: ConvertTime?,
+	},
+	{} :: typeof({ __index = InfluxDBPointSettings })
+))
+
+function InfluxDBPointSettings.new(): InfluxDBPointSettings
+	local self: InfluxDBPointSettings = setmetatable({} :: any, InfluxDBPointSettings)
 
 	self._defaultTags = {}
 	self._convertTime = nil :: ConvertTime?
@@ -18,7 +27,7 @@ function InfluxDBPointSettings.new()
 	return self
 end
 
-function InfluxDBPointSettings:SetDefaultTags(tags: InfluxDBTags)
+function InfluxDBPointSettings.SetDefaultTags(self: InfluxDBPointSettings, tags: InfluxDBTags): ()
 	assert(type(tags) == "table", "Bad tags")
 
 	for key, value in tags do
@@ -29,17 +38,17 @@ function InfluxDBPointSettings:SetDefaultTags(tags: InfluxDBTags)
 	self._defaultTags = tags
 end
 
-function InfluxDBPointSettings:GetDefaultTags(): InfluxDBTags
+function InfluxDBPointSettings.GetDefaultTags(self: InfluxDBPointSettings): InfluxDBTags
 	return self._defaultTags
 end
 
-function InfluxDBPointSettings:SetConvertTime(convertTime: ConvertTime?)
+function InfluxDBPointSettings.SetConvertTime(self: InfluxDBPointSettings, convertTime: ConvertTime?)
 	assert(type(convertTime) == "function" or convertTime == nil, "Bad convertTime")
 
 	self._convertTime = convertTime
 end
 
-function InfluxDBPointSettings:GetConvertTime(): ConvertTime?
+function InfluxDBPointSettings.GetConvertTime(self: InfluxDBPointSettings): ConvertTime?
 	return self._convertTime
 end
 

@@ -13,12 +13,12 @@ local LocalizationService = game:GetService("LocalizationService")
 
 local LocalizationServiceUtils = require("LocalizationServiceUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
-local _Observable = require("Observable")
-local _ServiceBag = require("ServiceBag")
 
 local TranslatorService = {}
 TranslatorService.ServiceName = "TranslatorService"
@@ -26,18 +26,18 @@ TranslatorService.ServiceName = "TranslatorService"
 export type TranslatorService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_translator: ValueObject.ValueObject<Translator>,
 		_localizationTable: LocalizationTable?,
 		_pendingTranslatorPromise: Promise.Promise<Translator>?,
 		_localeIdValue: ValueObject.ValueObject<string>?,
-		_loadedPlayerObservable: _Observable.Observable<Player>?,
+		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
 	},
 	{} :: typeof({ __index = TranslatorService })
 ))
 
-function TranslatorService.Init(self: TranslatorService, serviceBag: _ServiceBag.ServiceBag)
+function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -77,7 +77,7 @@ end
 
 	@return Observable<Translator>
 ]=]
-function TranslatorService.ObserveTranslator(self: TranslatorService): _Observable.Observable<Translator>
+function TranslatorService.ObserveTranslator(self: TranslatorService): Observable.Observable<Translator>
 	return self._translator:Observe()
 end
 
@@ -135,7 +135,7 @@ end
 
 	@return Observable<string>
 ]=]
-function TranslatorService.ObserveLocaleId(self: TranslatorService): _Observable.Observable<string>
+function TranslatorService.ObserveLocaleId(self: TranslatorService): Observable.Observable<string>
 	if self._localeIdValue then
 		return self._localeIdValue:Observe()
 	end
@@ -185,7 +185,7 @@ function TranslatorService.GetLocaleId(self: TranslatorService): string
 	end
 end
 
-function TranslatorService._observeTranslatorImpl(self: TranslatorService): _Observable.Observable<Translator>
+function TranslatorService._observeTranslatorImpl(self: TranslatorService): Observable.Observable<Translator>
 	return self:_observeLoadedPlayer():Pipe({
 		Rx.switchMap(function(loadedPlayer: Player): any
 			if loadedPlayer then
@@ -202,7 +202,7 @@ function TranslatorService._observeTranslatorImpl(self: TranslatorService): _Obs
 	}) :: any
 end
 
-function TranslatorService._observeLoadedPlayer(self: TranslatorService): _Observable.Observable<Player>
+function TranslatorService._observeLoadedPlayer(self: TranslatorService): Observable.Observable<Player>
 	if self._loadedPlayerObservable then
 		return self._loadedPlayerObservable
 	end

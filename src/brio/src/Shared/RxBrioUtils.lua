@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving brios and rx. Brios encapsulate the lifetime of resources,
 	which could be expired by the time a subscription occurs. These functions allow us to
@@ -17,12 +18,12 @@ local Rx = require("Rx")
 local RxBrioUtils = {}
 
 --[=[
-	Creates a new observable wrapping the brio
+	Creates a new observable wrapping the brio with the brio lasting for the lifetime of the observable
 
-	@param callback function
-	@return Observable<Brio>
+	@param callback ((Maid.Maid) -> T) | T
+	@return Observable<Brio<T>>
 ]=]
-function RxBrioUtils.ofBrio(callback)
+function RxBrioUtils.ofBrio<T>(callback: ((Maid.Maid) -> T) | T): Observable.Observable<Brio.Brio<T>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -35,7 +36,7 @@ function RxBrioUtils.ofBrio(callback)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -43,14 +44,14 @@ end
 
 	@return (source: Observable<Brio<T> | T>) -> Observable<Brio<T>>
 ]=]
-function RxBrioUtils.toBrio()
+function RxBrioUtils.toBrio<T>(): Observable.Transformer<(Brio.Brio<T> | T), (Brio.Brio<T>)>
 	return Rx.map(function(result)
 		if Brio.isBrio(result) then
 			return result
 		end
 
 		return Brio.new(result)
-	end)
+	end) :: any
 end
 
 --[=[
@@ -59,10 +60,10 @@ end
 	@param ... T
 	@return Observable<Brio<T>>
 ]=]
-function RxBrioUtils.of(...)
+function RxBrioUtils.of<T...>(...: T...): Observable.Observable<Brio.Brio<T...>>
 	return Rx.of(...):Pipe({
-		RxBrioUtils.toBrio()
-	})
+		RxBrioUtils.toBrio() :: any,
+	}) :: any
 end
 
 --[=[
@@ -72,7 +73,10 @@ end
 	@param observable Observable<T>
 	@return Observable<T>
 ]=]
-function RxBrioUtils.completeOnDeath(brio, observable)
+function RxBrioUtils.completeOnDeath<T...>(
+	brio: Brio.Brio<...any>,
+	observable: Observable.Observable<T...>
+): Observable.Observable<T...>
 	assert(Brio.isBrio(brio))
 	assert(Observable.isObservable(observable))
 
@@ -150,23 +154,20 @@ function RxBrioUtils.emitWhileAllDead(valueToEmitWhileAllDead)
 				updateBrios()
 			end
 
-			topMaid:GiveTask(source:Subscribe(
-				function(brio)
-					if not Brio.isBrio(brio) then
-						warn(string.format("[RxBrioUtils.emitWhileAllDead] - Not a brio, %q", tostring(brio)))
-						topMaid._lastBrio = nil
-						sub:Fail("Not a brio")
-						return
-					end
+			topMaid:GiveTask(source:Subscribe(function(brio)
+				if not Brio.isBrio(brio) then
+					warn(string.format("[RxBrioUtils.emitWhileAllDead] - Not a brio, %q", tostring(brio)))
+					topMaid._lastBrio = nil
+					sub:Fail("Not a brio")
+					return
+				end
 
-					handleNewBrio(brio)
-				end,
-				function(...)
-					sub:Fail(...)
-				end,
-				function(...)
-					sub:Complete(...)
-				end))
+				handleNewBrio(brio)
+			end, function(...)
+				sub:Fail(...)
+			end, function(...)
+				sub:Complete(...)
+			end))
 
 			-- Make sure we emit an empty list if we discover nothing
 			if not fired then
@@ -184,7 +185,7 @@ end
 	@param selectFromBrio ((value: T) -> U)?
 	@return (source: Observable<Brio<T>>) -> Observable<Brio{U}>
 ]=]
-function RxBrioUtils.reduceToAliveList(selectFromBrio)
+function RxBrioUtils.reduceToAliveList(selectFromBrio: any?)
 	assert(type(selectFromBrio) == "function" or selectFromBrio == nil, "Bad selectFromBrio")
 
 	return function(source)
@@ -195,7 +196,7 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 			topMaid:GiveTask(function()
 				subscribed = false
 			end)
-			local aliveBrios = {}
+			local aliveBrios: { Brio.Brio<any> } = {}
 			local fired = false
 
 			local function updateBrios()
@@ -206,7 +207,7 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 				aliveBrios = BrioUtils.aliveOnly(aliveBrios)
 				local values = {}
 				if selectFromBrio then
-					for _, brio in aliveBrios do
+					for _, brio: any in aliveBrios do
 						-- Hope for no side effects
 						local value = selectFromBrio(brio:GetValue())
 						assert(value ~= nil, "Bad value")
@@ -214,7 +215,7 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 						table.insert(values, value)
 					end
 				else
-					for _, brio in aliveBrios do
+					for _, brio: any in aliveBrios do
 						local value = brio:GetValue()
 						assert(value ~= nil, "Bad value")
 
@@ -250,23 +251,20 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 				updateBrios()
 			end
 
-			topMaid:GiveTask(source:Subscribe(
-				function(brio)
-					if not Brio.isBrio(brio) then
-						warn(string.format("[RxBrioUtils.mergeToAliveList] - Not a brio, %q", tostring(brio)))
-						topMaid._lastBrio = nil
-						sub:Fail("Not a brio")
-						return
-					end
+			topMaid:GiveTask(source:Subscribe(function(brio)
+				if not Brio.isBrio(brio) then
+					warn(string.format("[RxBrioUtils.mergeToAliveList] - Not a brio, %q", tostring(brio)))
+					topMaid._lastBrio = nil
+					sub:Fail("Not a brio")
+					return
+				end
 
-					handleNewBrio(brio)
-				end,
-				function(...)
-					sub:Fail(...)
-				end,
-				function(...)
-					sub:Complete(...)
-				end))
+				handleNewBrio(brio)
+			end, function(...)
+				sub:Fail(...)
+			end, function(...)
+				sub:Complete(...)
+			end))
 
 			-- Make sure we emit an empty list if we discover nothing
 			if not fired then
@@ -288,34 +286,31 @@ function RxBrioUtils.reemitLastBrioOnDeath()
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			maid:GiveTask(source:Subscribe(
-				function(brio)
-					maid._conn = nil
+			maid:GiveTask(source:Subscribe(function(brio)
+				maid._conn = nil
 
-					if not Brio.isBrio(brio) then
-						warn(string.format("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q", tostring(brio)))
-						sub:Fail("Not a brio")
-						return
-					end
+				if not Brio.isBrio(brio) then
+					warn(string.format("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q", tostring(brio)))
+					sub:Fail("Not a brio")
+					return
+				end
 
-					if brio:IsDead() then
-						sub:Fire(brio)
-						return
-					end
-
-					-- Setup conn!
-					maid._conn = brio:GetDiedSignal():Connect(function()
-						sub:Fire(brio)
-					end)
-
+				if brio:IsDead() then
 					sub:Fire(brio)
-				end,
-				function(...)
-					sub:Fail(...)
-				end,
-				function(...)
-					sub:Complete(...)
-				end))
+					return
+				end
+
+				-- Setup conn!
+				maid._conn = brio:GetDiedSignal():Connect(function()
+					sub:Fire(brio)
+				end)
+
+				sub:Fire(brio)
+			end, function(...)
+				sub:Fail(...)
+			end, function(...)
+				sub:Complete(...)
+			end))
 
 			return maid
 		end)
@@ -330,7 +325,7 @@ end
 	@param predicate (T) -> boolean
 	@return (source: Observable<Brio<T>>) -> Observable<Brio<T>>
 ]=]
-function RxBrioUtils.where(predicate)
+function RxBrioUtils.where<T>(predicate: Rx.Predicate<T>)
 	assert(type(predicate) == "function", "Bad predicate")
 	return function(source)
 		return Observable.new(function(sub)
@@ -376,11 +371,10 @@ function RxBrioUtils.combineLatest(observables)
 
 	warn("[RxBrioUtils.combineLatest] - Deprecated since 3.6.0. Use RxBrioUtils.flatCombineLatest")
 
-	return Rx.combineLatest(observables)
-		:Pipe({
-			Rx.map(BrioUtils.flatten);
-			RxBrioUtils.onlyLastBrioSurvives();
-		})
+	return Rx.combineLatest(observables):Pipe({
+		Rx.map(BrioUtils.flatten) :: any,
+		RxBrioUtils.onlyLastBrioSurvives() :: any,
+	})
 end
 
 --[=[
@@ -391,14 +385,13 @@ end
 	@param filter function | nil
 	@return Observable<Brio<{ [any]: T }>>
 ]=]
-function RxBrioUtils.flatCombineLatestBrio(observables, filter)
+function RxBrioUtils.flatCombineLatestBrio<T>(observables, filter: Rx.Predicate<T>?)
 	assert(type(observables) == "table", "Bad observables")
 
-	return RxBrioUtils.flatCombineLatest(observables)
-		:Pipe({
-			RxBrioUtils.switchToBrio();
-			filter and RxBrioUtils.where(filter) or nil
-		})
+	return RxBrioUtils.flatCombineLatest(observables):Pipe({
+		RxBrioUtils.switchToBrio() :: any,
+		filter and RxBrioUtils.where(filter) :: any or nil :: never,
+	})
 end
 
 --[=[
@@ -414,7 +407,7 @@ function RxBrioUtils.flatMap(project)
 
 	warn("[RxBrioUtils.flatMap] - Deprecated since 3.6.0. Use RxBrioUtils.flatMapBrio")
 
-	return Rx.flatMap(RxBrioUtils.mapBrio(project))
+	return Rx.flatMap(RxBrioUtils.mapBrio(project) :: any)
 end
 
 --[=[
@@ -430,7 +423,7 @@ end
 	@return (source: Observable<Brio<TBrio>> -> Observable<Brio<TResult>>)
 ]=]
 function RxBrioUtils.flatMapBrio(project)
-	return Rx.flatMap(RxBrioUtils.mapBrioBrio(project))
+	return Rx.flatMap(RxBrioUtils.mapBrioBrio(project) :: any)
 end
 
 --[=[
@@ -446,7 +439,7 @@ function RxBrioUtils.switchMap(project)
 
 	warn("[RxBrioUtils.switchMap] - Deprecated since 3.6.0. Use RxBrioUtils.switchMapBrio")
 
-	return Rx.switchMap(RxBrioUtils.mapBrio(project))
+	return Rx.switchMap(RxBrioUtils.mapBrio(project) :: any)
 end
 
 --[=[
@@ -464,7 +457,7 @@ end
 function RxBrioUtils.switchMapBrio(project)
 	assert(type(project) == "function", "Bad project")
 
-	return Rx.switchMap(RxBrioUtils.mapBrioBrio(project))
+	return Rx.switchMap(RxBrioUtils.mapBrioBrio(project) :: any)
 end
 
 --[=[
@@ -597,13 +590,13 @@ function RxBrioUtils.map(project)
 			local item = results[i]
 			if Brio.isBrio(item) then
 				table.insert(brios, item) -- add all subsequent brios into this table...
-				transformedResults[i] = item:GetValue()
+				transformedResults[i] = ((item :: any) :: Brio.Brio<unknown>):GetValue()
 			else
 				transformedResults[i] = item
 			end
 		end
 
-		return BrioUtils.first(brios, table.unpack(transformedResults, 1, transformedResults.n))
+		return BrioUtils.first(brios, table.unpack(transformedResults, 1, results.n))
 	end)
 end
 
@@ -622,7 +615,7 @@ function RxBrioUtils._mapResult(brio)
 			local brios = { brio }
 			local args = {}
 
-			for index, item in {...} do
+			for index, item in { ... } do
 				if Brio.isBrio(item) then
 					table.insert(brios, item)
 					args[index] = item:GetValue() -- we lose data here, but I think this is fine
@@ -658,8 +651,8 @@ function RxBrioUtils.mapBrioBrio(project)
 		assert(Observable.isObservable(observable), "Not an observable")
 
 		return RxBrioUtils.completeOnDeath(brio, observable):Pipe({
-			Rx.map(RxBrioUtils._mapResult(brio))
-		})
+			Rx.map(RxBrioUtils._mapResult(brio)) :: any,
+		}) :: any
 	end
 end
 
@@ -725,7 +718,7 @@ end
 ]=]
 function RxBrioUtils.emitOnDeath(emitOnDeathValue)
 	return Rx.switchMap(function(brio)
-		return RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
+		return RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue) :: any
 	end)
 end
 
@@ -777,7 +770,7 @@ end
 	@return (source: Observable<T | Brio<T>>) -> Observable<Brio<T>>
 	@within RxBrioUtils
 ]=]
-function RxBrioUtils.switchToBrio(predicate)
+function RxBrioUtils.switchToBrio<T>(predicate: Rx.Predicate<T>?)
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
 
 	return function(source)

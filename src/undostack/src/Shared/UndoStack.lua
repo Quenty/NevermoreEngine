@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class UndoStack
 ]=]
@@ -9,6 +10,7 @@ local Promise = require("Promise")
 local UndoStackEntry = require("UndoStackEntry")
 local ValueObject = require("ValueObject")
 local Maid = require("Maid")
+local Observable = require("Observable")
 
 local DEFAULT_MAX_SIZE = 25
 
@@ -16,8 +18,21 @@ local UndoStack = setmetatable({}, BaseObject)
 UndoStack.ClassName = "UndoStack"
 UndoStack.__index = UndoStack
 
-function UndoStack.new(maxSize: number?)
-	local self = setmetatable(BaseObject.new(), UndoStack)
+export type UndoStack = typeof(setmetatable(
+	{} :: {
+		_undoStack: { UndoStackEntry.UndoStackEntry },
+		_redoStack: { UndoStackEntry.UndoStackEntry },
+		_hasUndoEntries: ValueObject.ValueObject<boolean>,
+		_hasRedoEntries: ValueObject.ValueObject<boolean>,
+		_isActionExecuting: ValueObject.ValueObject<boolean>,
+		_maxSize: number,
+		_latestPromiseChain: Promise.Promise<()>?,
+	},
+	{} :: typeof({ __index = UndoStack })
+)) & BaseObject.BaseObject
+
+function UndoStack.new(maxSize: number?): UndoStack
+	local self: UndoStack = setmetatable(BaseObject.new() :: any, UndoStack)
 
 	assert(type(maxSize) == "number" or maxSize == nil, "Bad maxSize")
 
@@ -38,7 +53,7 @@ end
 	can't push an undo.
 	@return boolean
 ]=]
-function UndoStack:ClearRedoStack()
+function UndoStack.ClearRedoStack(self: UndoStack)
 	self._redoStack = {}
 	self:_updateHasRedoEntries()
 end
@@ -47,7 +62,7 @@ end
 	Returns true if an action is executing
 	@return boolean
 ]=]
-function UndoStack:IsActionExecuting(): boolean
+function UndoStack.IsActionExecuting(self: UndoStack): boolean
 	return self._isActionExecuting.Value
 end
 
@@ -55,7 +70,7 @@ end
 	Observes whether the stack has undo entries
 	@return Observable<boolean>
 ]=]
-function UndoStack:ObserveHasUndoEntries()
+function UndoStack.ObserveHasUndoEntries(self: UndoStack): Observable.Observable<boolean>
 	return self._hasUndoEntries:Observe()
 end
 
@@ -63,7 +78,7 @@ end
 	Observes whether the stack has redo entries
 	@return Observable<boolean>
 ]=]
-function UndoStack:ObserveHasRedoEntries()
+function UndoStack.ObserveHasRedoEntries(self: UndoStack): Observable.Observable<boolean>
 	return self._hasRedoEntries:Observe()
 end
 
@@ -71,7 +86,7 @@ end
 	Returns true if there are undo entries on the stack
 	@return boolean
 ]=]
-function UndoStack:HasUndoEntries()
+function UndoStack.HasUndoEntries(self: UndoStack): boolean
 	return self._hasUndoEntries.Value
 end
 
@@ -79,7 +94,7 @@ end
 	Returns true if there are redo entries on the stack
 	@return boolean
 ]=]
-function UndoStack:HasRedoEntries()
+function UndoStack.HasRedoEntries(self: UndoStack): boolean
 	return self._hasRedoEntries.Value
 end
 
@@ -101,7 +116,7 @@ end
 	@param undoStackEntry UndoStackEntry
 	@return function -- Callback that removes the action
 ]=]
-function UndoStack:Push(undoStackEntry)
+function UndoStack.Push(self: UndoStack, undoStackEntry: UndoStackEntry.UndoStackEntry): () -> ()
 	assert(UndoStackEntry.isUndoStackEntry(undoStackEntry), "Bad undoStackEntry")
 
 	if self._maid[undoStackEntry] then
@@ -142,7 +157,7 @@ end
 
 	@param undoStackEntry The undo stack entry to remove
 ]=]
-function UndoStack:Remove(undoStackEntry)
+function UndoStack.Remove(self: UndoStack, undoStackEntry: UndoStackEntry.UndoStackEntry): ()
 	assert(UndoStackEntry.isUndoStackEntry(undoStackEntry), "Bad undoStackEntry")
 
 	self._maid[undoStackEntry] = nil
@@ -171,7 +186,7 @@ end
 
 	@return Promise
 ]=]
-function UndoStack:PromiseUndo()
+function UndoStack.PromiseUndo(self: UndoStack): Promise.Promise<()>
 	return self:_promiseCurrent(function()
 		local undoStackEntry = table.remove(self._undoStack)
 		if not undoStackEntry then
@@ -182,15 +197,14 @@ function UndoStack:PromiseUndo()
 
 		return self:_executePromiseWithMaid(function(maid)
 			return undoStackEntry:PromiseUndo(maid)
-		end)
-			:Then(function()
-				if undoStackEntry:HasRedo() then
-					table.insert(self._redoStack, undoStackEntry)
-					self:_updateHasRedoEntries()
-				end
+		end):Then(function()
+			if undoStackEntry:HasRedo() then
+				table.insert(self._redoStack, undoStackEntry)
+				self:_updateHasRedoEntries()
+			end
 
-				return true
-			end)
+			return true
+		end)
 	end)
 end
 
@@ -199,7 +213,7 @@ end
 
 	@return Promise
 ]=]
-function UndoStack:PromiseRedo()
+function UndoStack.PromiseRedo(self: UndoStack): Promise.Promise<()>
 	return self:_promiseCurrent(function()
 		local undoStackEntry = table.remove(self._redoStack)
 		if not undoStackEntry then
@@ -210,25 +224,23 @@ function UndoStack:PromiseRedo()
 
 		return self:_executePromiseWithMaid(function(maid)
 			return undoStackEntry:PromiseRedo(maid)
-		end)
-			:Then(function()
-				if undoStackEntry:HasUndo() then
-					table.insert(self._undoStack, undoStackEntry)
-					self:_updateHasUndoEntries()
-				end
+		end):Then(function()
+			if undoStackEntry:HasUndo() then
+				table.insert(self._undoStack, undoStackEntry)
+				self:_updateHasUndoEntries()
+			end
 
-				return true
-			end)
+			return true
+		end)
 	end)
 end
 
-function UndoStack:_promiseCurrent(doNextPromise)
+function UndoStack._promiseCurrent(self: UndoStack, doNextPromise: () -> Promise.Promise<()>): Promise.Promise<()>
 	local promise
 	if self._latestPromiseChain then
-		promise = self._latestPromiseChain
-			:Finally(function()
-				return self._maid:GivePromise(doNextPromise())
-			end)
+		promise = self._latestPromiseChain:Finally(function()
+			return self._maid:GivePromise(doNextPromise())
+		end)
 	else
 		promise = self._maid:GivePromise(doNextPromise())
 	end
@@ -248,8 +260,8 @@ function UndoStack:_promiseCurrent(doNextPromise)
 	return promise
 end
 
-function UndoStack:_executePromiseWithMaid(callback)
-	local maid  = Maid.new()
+function UndoStack._executePromiseWithMaid(self: UndoStack, callback: (Maid.Maid) -> any): Promise.Promise<()>
+	local maid = Maid.new()
 
 	local promise = Promise.new()
 	maid:GiveTask(promise)
@@ -270,11 +282,11 @@ function UndoStack:_executePromiseWithMaid(callback)
 	return promise
 end
 
-function UndoStack:_updateHasUndoEntries()
+function UndoStack._updateHasUndoEntries(self: UndoStack)
 	self._hasUndoEntries.Value = #self._undoStack > 0
 end
 
-function UndoStack:_updateHasRedoEntries()
+function UndoStack._updateHasRedoEntries(self: UndoStack)
 	self._hasRedoEntries.Value = #self._redoStack > 0
 end
 

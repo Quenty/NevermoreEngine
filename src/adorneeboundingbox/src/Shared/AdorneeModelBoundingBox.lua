@@ -12,7 +12,7 @@ local ObservableSet = require("ObservableSet")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ValueObject = require("ValueObject")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local AdorneeModelBoundingBox = setmetatable({}, BaseObject)
 AdorneeModelBoundingBox.ClassName = "AdorneeModelBoundingBox"
@@ -123,11 +123,11 @@ function AdorneeModelBoundingBox:_observeBasisChanged()
 	})
 end
 
-function AdorneeModelBoundingBox:ObserveCFrame(): _Observable.Observable<CFrame>
+function AdorneeModelBoundingBox:ObserveCFrame(): Observable.Observable<CFrame>
 	return self._bbCFrame:Observe()
 end
 
-function AdorneeModelBoundingBox:ObserveSize(): _Observable.Observable<Vector3>
+function AdorneeModelBoundingBox:ObserveSize(): Observable.Observable<Vector3>
 	return self._bbSize:Observe()
 end
 

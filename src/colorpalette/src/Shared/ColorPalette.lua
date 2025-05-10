@@ -35,7 +35,7 @@ function ColorPalette.new()
 	return self
 end
 
-function ColorPalette:GetSwatchNames()
+function ColorPalette:GetSwatchNames(): { string }
 	return self._swatchMap:GetKeyList()
 end
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions affecting Brios.
 	@class BrioUtils
@@ -5,8 +6,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local Brio = require("Brio")
+local Maid = require("Maid")
+local Table = require("Table")
 
 local BrioUtils = {}
 
@@ -17,11 +19,11 @@ local BrioUtils = {}
 	@param brio Brio<T>
 	@return Brio<T>
 ]=]
-function BrioUtils.clone(brio)
+function BrioUtils.clone<T...>(brio: Brio.Brio<T...>): Brio.Brio<T...>
 	assert(brio, "Bad brio")
 
 	if brio:IsDead() then
-		return Brio.DEAD
+		return Brio.DEAD :: any
 	end
 
 	local newBrio = Brio.new(brio:GetValue())
@@ -48,9 +50,9 @@ end
 	@param brios {Brio<T>}
 	@return {Brio<T>}
 ]=]
-function BrioUtils.aliveOnly(brios)
-	local alive = {}
-	for _, brio in brios do
+function BrioUtils.aliveOnly<T...>(brios: { Brio.Brio<T...> }): { Brio.Brio<T...> }
+	local alive: { Brio.Brio<T...> } = {}
+	for _, brio: any in brios do
 		if not brio:IsDead() then
 			table.insert(alive, brio)
 		end
@@ -64,8 +66,8 @@ end
 	@param brios {Brio<T>}
 	@return Brio<T>
 ]=]
-function BrioUtils.firstAlive(brios)
-	for _, brio in brios do
+function BrioUtils.firstAlive<T...>(brios: { Brio.Brio<T...> }): Brio.Brio<T...>?
+	for _, brio: any in brios do
 		if not brio:IsDead() then
 			return brio
 		end
@@ -77,17 +79,17 @@ end
 	Given a list of brios of brios, flattens that list into a brio with
 	just one T value.
 
-	@param brioTable { any: Brio<Brio<T> | T>}
+	@param brioTable { any: Brio<T> | T }
 	@return Brio<{T}>
 ]=]
-function BrioUtils.flatten(brioTable)
+function BrioUtils.flatten<K, T>(brioTable: Table.Map<K, Brio.Brio<T> | T>): Brio.Brio<Table.Map<K, T>>
 	local newValue = {}
 	local brios = {}
 
-	for key, brio in brioTable do
+	for key, brio: any in brioTable do
 		if Brio.isBrio(brio) then
 			if brio:IsDead() then
-				return Brio.DEAD
+				return Brio.DEAD :: any
 			else
 				table.insert(brios, brio)
 				newValue[key] = brio:GetValue()
@@ -105,14 +107,14 @@ end
 	dies. The value of the Brio is the `...` value.
 
 	@param brios {Brio<T>}
-	@param ... U
+	@param ... U...
 	@return Brio<U>
 ]=]
-function BrioUtils.first(brios, ...)
-	for _, brio in brios do
+function BrioUtils.first<T..., U...>(brios: { Brio.Brio<T...> }, ...: U...): Brio.Brio<U...>
+	for _, brio: any in brios do
 		if Brio.isBrio(brio) then
 			if brio:IsDead() then
-				return Brio.DEAD
+				return Brio.DEAD :: any
 			end
 		end
 	end
@@ -120,7 +122,7 @@ function BrioUtils.first(brios, ...)
 	local maid = Maid.new()
 	local topBrio = Brio.new(...)
 
-	for _, brio in brios do
+	for _, brio: any in brios do
 		if Brio.isBrio(brio) then
 			maid:GiveTask(brio:GetDiedSignal():Connect(function()
 				topBrio:Kill()
@@ -144,11 +146,11 @@ end
 	@param ... U
 	@return Brio<U>
 ]=]
-function BrioUtils.withOtherValues(brio, ...)
+function BrioUtils.withOtherValues<T..., U...>(brio: Brio.Brio<T...>, ...: U...): Brio.Brio<U...>
 	assert(brio, "Bad brio")
 
 	if brio:IsDead() then
-		return Brio.DEAD
+		return Brio.DEAD :: any
 	end
 
 	local newBrio = Brio.new(...)
@@ -175,12 +177,12 @@ function BrioUtils.extend(brio, ...)
 
 	local values = brio:GetPackedValues()
 	local current = {}
-	for i=1, values.n do
+	for i = 1, values.n do
 		current[i] = values[i]
 	end
 	local otherValues = table.pack(...)
-	for i=1, otherValues.n do
-		current[values.n+i] = otherValues[i]
+	for i = 1, otherValues.n do
+		current[values.n + i] = otherValues[i]
 	end
 
 	local maid = Maid.new()
@@ -214,11 +216,11 @@ function BrioUtils.prepend(brio, ...)
 	local values = brio:GetPackedValues()
 	local current = {}
 	local otherValues = table.pack(...)
-	for i=1, otherValues.n do
+	for i = 1, otherValues.n do
 		current[i] = otherValues[i]
 	end
-	for i=1, values.n do
-		current[otherValues.n+i] = values[i]
+	for i = 1, values.n do
+		current[otherValues.n + i] = values[i]
 	end
 
 	local maid = Maid.new()
@@ -242,27 +244,27 @@ end
 	@param otherBrio Brio<{U}>
 	@return Brio<{T | U}>
 ]=]
-function BrioUtils.merge(brio, otherBrio)
+function BrioUtils.merge<T, U>(brio: Brio.Brio<T>, otherBrio: Brio.Brio<U>): Brio.Brio<T & U>
 	assert(Brio.isBrio(brio), "Not a brio")
 	assert(Brio.isBrio(otherBrio), "Not a brio")
 
 	if brio:IsDead() or otherBrio:IsDead() then
-		return Brio.DEAD
+		return Brio.DEAD :: any
 	end
 
 	local values = brio:GetPackedValues()
 	local current = {}
-	for i=1, values.n do
+	for i = 1, values.n do
 		current[i] = values[i]
 	end
 
 	local otherValues = otherBrio:GetPackedValues()
-	for i=1, otherValues.n do
-		current[values.n+i] = otherValues[i]
+	for i = 1, otherValues.n do
+		current[values.n + i] = otherValues[i]
 	end
 
 	local maid = Maid.new()
-	local newBrio = Brio.new(unpack(current, 1, values.n + otherValues.n))
+	local newBrio: Brio.Brio<T & U> = Brio.new(unpack(current, 1, values.n + otherValues.n)) :: any
 
 	maid:GiveTask(brio:GetDiedSignal():Connect(function()
 		newBrio:Kill()

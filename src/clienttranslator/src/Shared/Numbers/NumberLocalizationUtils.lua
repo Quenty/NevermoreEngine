@@ -227,7 +227,7 @@ local function addGroupDelimiters(numberStr, delimiter: string): string
 	return formatted
 end
 
-local function findDenominationEntry(localeInfo, number: number, roundingBehaviourType)
+local function findDenominationEntry(localeInfo, number: number, roundingBehaviourType: RoundingBehaviourTypes.RoundingBehaviourType)
 	local denominationEntry = localeInfo[1] -- Default to base denominations
 	local absOfNumber = math.abs(number)
 	for i = #localeInfo, 2, -1 do

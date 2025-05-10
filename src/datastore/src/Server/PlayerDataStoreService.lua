@@ -11,14 +11,14 @@ local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local DataStorePromises = require("DataStorePromises")
 local Promise = require("Promise")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local PlayerDataStoreService = {}
 PlayerDataStoreService.ServiceName = "PlayerDataStoreService"
 
 export type PlayerDataStoreService = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		_dataStoreName: string,
 		_dataStoreScope: string,
@@ -31,7 +31,7 @@ export type PlayerDataStoreService = typeof(setmetatable(
 	Initializes the PlayerDataStoreService. Should be done via [ServiceBag.Init].
 	@param serviceBag ServiceBag
 ]=]
-function PlayerDataStoreService:Init(serviceBag: _ServiceBag.ServiceBag)
+function PlayerDataStoreService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 

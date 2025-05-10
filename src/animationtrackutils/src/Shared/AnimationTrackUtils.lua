@@ -24,7 +24,7 @@ end
 	@param fadeTime number
 	@return Animation
 ]=]
-function AnimationTrackUtils.setWeightTargetIfNotSet(track: AnimationTrack, weight: number, fadeTime: number)
+function AnimationTrackUtils.setWeightTargetIfNotSet(track: AnimationTrack, weight: number, fadeTime: number): ()
 	assert(typeof(track) == "Instance", "Bad track")
 	assert(type(weight) == "number", "Bad weight")
 	assert(type(fadeTime) == "number", "Bad fadeTime")

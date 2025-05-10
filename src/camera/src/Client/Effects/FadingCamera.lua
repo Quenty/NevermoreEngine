@@ -7,15 +7,30 @@ local require = require(script.Parent.loader).load(script)
 
 local Spring = require("Spring")
 local SummedCamera = require("SummedCamera")
+local CameraState = require("CameraState")
+local CameraEffectUtils = require("CameraEffectUtils")
 
 local FadingCamera = {}
 FadingCamera.ClassName = "FadingCamera"
 
+export type FadingCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		Spring: Spring.Spring<number>,
+		Camera: CameraEffectUtils.CameraLike,
+		Damper: number,
+		Speed: number,
+		Target: number,
+		Value: number,
+	},
+	{} :: typeof({ __index = FadingCamera })
+)) & CameraEffectUtils.CameraEffect
+
 --[=[
 	@param camera CameraEffect
 ]=]
-function FadingCamera.new(camera)
-	local self = setmetatable({}, FadingCamera)
+function FadingCamera.new(camera: CameraEffectUtils.CameraLike): FadingCamera
+	local self: FadingCamera = setmetatable({} :: any, FadingCamera)
 
 	self.Spring = Spring.new(0)
 
@@ -33,7 +48,7 @@ end
 function FadingCamera:__newindex(index, value)
 	if index == "Damper" then
 		self.Spring.Damper = value
-	elseif index == "value" then
+	elseif index == "Value" then
 		self.Spring.Value = value
 	elseif index == "Speed" then
 		self.Spring.Speed = value
@@ -57,7 +72,7 @@ function FadingCamera:__index(index)
 		return (self.Camera.CameraState or self.Camera) * self.Spring.Value
 	elseif index == "Damper" then
 		return self.Spring.Damper
-	elseif index == "value" then
+	elseif index == "Value" then
 		return self.Spring.Value
 	elseif index == "Speed" then
 		return self.Spring.Speed

@@ -538,7 +538,7 @@ end
 	@param pz number
 	@return OctreeRegion<T>
 ]=]
-function OctreeRegionUtils.getOrCreateRegion<T>(regionHashMap: OctreeRegionHashMap<T>, maxRegionSize: OctreeVector3, px: number, py: never, pz: number): OctreeRegion<T>
+function OctreeRegionUtils.getOrCreateRegion<T>(regionHashMap: OctreeRegionHashMap<T>, maxRegionSize: OctreeVector3, px: number, py: number, pz: number): OctreeRegion<T>
 	local cx, cy, cz = OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
 	local hash = OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
 

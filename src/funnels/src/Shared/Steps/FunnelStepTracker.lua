@@ -7,7 +7,6 @@ local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
-local _Maid = require("Maid")
 
 local FunnelStepTracker = setmetatable({}, BaseObject)
 FunnelStepTracker.ClassName = "FunnelStepTracker"

@@ -6,12 +6,12 @@ local require = require(script.Parent.loader).load(script)
 
 local MemorizeUtils = require("MemorizeUtils")
 local MarketplaceUtils = require("MarketplaceUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local MarketplaceServiceCache = {}
 MarketplaceServiceCache.ServiceName = "MarketplaceServiceCache"
 
-function MarketplaceServiceCache:Init(serviceBag: _ServiceBag.ServiceBag)
+function MarketplaceServiceCache:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

@@ -14,12 +14,12 @@ local SoundEffectsRegistry = require("SoundEffectsRegistry")
 local SoundGroupPathUtils = require("SoundGroupPathUtils")
 local SoundGroupTracker = require("SoundGroupTracker")
 local WellKnownSoundGroups = require("WellKnownSoundGroups")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local SoundEffectService = {}
 SoundEffectService.ServiceName = "SoundEffectService"
 
-function SoundEffectService:Init(serviceBag: _ServiceBag.ServiceBag)
+function SoundEffectService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

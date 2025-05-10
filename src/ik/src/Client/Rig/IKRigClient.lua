@@ -12,12 +12,13 @@ local IKRigAimerLocalPlayer = require("IKRigAimerLocalPlayer")
 local IKRigBase = require("IKRigBase")
 local IKRigInterface = require("IKRigInterface")
 local Remoting = require("Remoting")
+local ServiceBag = require("ServiceBag")
 
 local IKRigClient = setmetatable({}, IKRigBase)
 IKRigClient.ClassName = "IKRigClient"
 IKRigClient.__index = IKRigClient
 
-function IKRigClient.new(humanoid: Humanoid, serviceBag)
+function IKRigClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(IKRigBase.new(humanoid, serviceBag), IKRigClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

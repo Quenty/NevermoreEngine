@@ -10,7 +10,7 @@ local BadgeUtils = require("BadgeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local MarketplaceServiceCache = require("MarketplaceServiceCache")
 local Promise = require("Promise")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigAssetUtils = {}
 
@@ -47,7 +47,7 @@ end
 	@param assetId number
 	@return Promise<any>
 ]=]
-function GameConfigAssetUtils.promiseCloudDataForAssetType(serviceBag: _ServiceBag.ServiceBag, assetType: GameConfigAssetTypes.GameConfigAssetType, assetId: number): Promise.Promise<any>
+function GameConfigAssetUtils.promiseCloudDataForAssetType(serviceBag: ServiceBag.ServiceBag, assetType: GameConfigAssetTypes.GameConfigAssetType, assetId: number): Promise.Promise<any>
 	assert(type(assetType) == "string", "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 

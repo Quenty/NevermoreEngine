@@ -5,12 +5,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local SoundGroupServiceClient = {}
 SoundGroupServiceClient.ServiceName = "SoundGroupServiceClient"
 
-function SoundGroupServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function SoundGroupServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helper methods for cooldown. See [RxCooldownUtils] for [Rx] utilities.
 	@class CooldownUtils
@@ -17,7 +18,7 @@ local CooldownUtils = {}
 	@param length number
 	@return Instance
 ]=]
-function CooldownUtils.create(parent, length)
+function CooldownUtils.create(parent: Instance, length: number): NumberValue
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(length) == "number", "Bad length")
 	assert(length > 0, "Bad length")
@@ -39,7 +40,7 @@ end
 	@param parent Instance
 	@return Cooldown? | CooldownClient?
 ]=]
-function CooldownUtils.findCooldown(cooldownBinder, parent)
+function CooldownUtils.findCooldown(cooldownBinder, parent: Instance)
 	assert(cooldownBinder, "Bad cooldownBinder")
 	assert(typeof(parent) == "Instance", "Bad parent")
 
@@ -52,7 +53,7 @@ end
 	@param cooldown Instance
 	@return Instance
 ]=]
-function CooldownUtils.clone(cooldown)
+function CooldownUtils.clone(cooldown: NumberValue): NumberValue
 	assert(typeof(cooldown) == "Instance", "Bad cooldown")
 
 	local copy = cooldown:Clone()

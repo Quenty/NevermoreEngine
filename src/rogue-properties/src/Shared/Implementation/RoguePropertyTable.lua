@@ -5,14 +5,15 @@
 local require = require(script.Parent.loader).load(script)
 
 local RogueProperty = require("RogueProperty")
-local Rx = require("Rx")
 local RoguePropertyArrayHelper = require("RoguePropertyArrayHelper")
+local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 
 local RoguePropertyTable = {} -- inherits from RogueProperty
 RoguePropertyTable.ClassName = "RoguePropertyTable"
 RoguePropertyTable.__index = RoguePropertyTable
 
-function RoguePropertyTable.new(adornee: Instance, serviceBag, roguePropertyTableDefinition)
+function RoguePropertyTable.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag, roguePropertyTableDefinition)
 	local self = setmetatable(RogueProperty.new(adornee, serviceBag, roguePropertyTableDefinition), RoguePropertyTable)
 
 	rawset(self, "_properties", {})

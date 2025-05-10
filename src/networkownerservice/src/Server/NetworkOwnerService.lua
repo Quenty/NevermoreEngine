@@ -57,9 +57,9 @@ end
 --[=[
 	Tries to set the network owner handle to the given player.
 	@param part BasePart
-	@param player Player
+	@param player Player?
 ]=]
-function NetworkOwnerService:AddSetNetworkOwnerHandle(part: BasePart, player: Player)
+function NetworkOwnerService:AddSetNetworkOwnerHandle(part: BasePart, player: Player?)
 	assert(self ~= NetworkOwnerService, "Make sure to retrieve NetworkOwnerService from a ServiceBag")
 	assert(self._partOwnerData, "Not initialized")
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")

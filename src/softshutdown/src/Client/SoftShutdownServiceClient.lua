@@ -16,7 +16,7 @@ local SoftShutdownTranslator = require("SoftShutdownTranslator")
 local SoftShutdownUI = require("SoftShutdownUI")
 local ValueObject = require("ValueObject")
 local CoreGuiEnabler = require("CoreGuiEnabler")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local SoftShutdownServiceClient = {}
 SoftShutdownServiceClient.ServiceName = "SoftShutdownServiceClient"
@@ -30,7 +30,7 @@ local DISABLE_CORE_GUI_TYPES = {
 	Enum.CoreGuiType.All,
 }
 
-function SoftShutdownServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function SoftShutdownServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

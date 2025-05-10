@@ -14,7 +14,7 @@ local RunService = game:GetService("RunService")
 
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local ParticleEngineConstants = require("ParticleEngineConstants")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local ParticleEngineClient = {}
 ParticleEngineClient.ServiceName = "ParticleEngineClient"
@@ -33,7 +33,7 @@ local function newFrame(name: string): Frame
 	return frame
 end
 
-function ParticleEngineClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function ParticleEngineClient:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._screen = nil :: ScreenGui?
 

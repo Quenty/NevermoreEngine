@@ -22,13 +22,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
 local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local _Brio = require("Brio")
-local _Observable = require("Observable")
-local _Rx = require("Rx")
 
 local BasicPane = {}
 BasicPane.ClassName = "BasicPane"
@@ -113,7 +113,7 @@ end
 
 	@return Observable<boolean, boolean?>
 ]=]
-function BasicPane.ObserveVisible(self: BasicPane): _Observable.Observable<boolean, boolean?>
+function BasicPane.ObserveVisible(self: BasicPane): Observable.Observable<boolean, boolean?>
 	return self._visible:Observe()
 end
 
@@ -125,8 +125,8 @@ end
 ]=]
 function BasicPane.ObserveVisibleBrio(
 	self: BasicPane,
-	predicate: _Rx.Predicate<boolean>?
-): _Observable.Observable<_Brio.Brio<boolean>?>
+	predicate: Rx.Predicate<boolean>?
+): Observable.Observable<Brio.Brio<boolean>?>
 	return self._visible:ObserveBrio(predicate or function(isVisible)
 		return isVisible
 	end) :: any

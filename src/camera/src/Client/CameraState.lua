@@ -69,15 +69,15 @@ end
 	@prop cframe CFrame
 	@within CameraState
 ]=]
-function CameraState:__index(index)
+function CameraState.__index(self: CameraState, index)
 	if index == "CFrame" then
 		return self.CameraFrame.CFrame
 	elseif index == "Position" then
 		return self.CameraFrame.Position
 	elseif index == "CameraFrame" then
-		return rawget(self, "CameraFrame")
+		return rawget(self :: any, "CameraFrame")
 	elseif index == "CameraFrameDerivative" then
-		return rawget(self, "CameraFrameDerivative")
+		return rawget(self :: any, "CameraFrameDerivative")
 	elseif index == "Velocity" then
 		return self.CameraFrameDerivative.Position
 	elseif index == "FieldOfView" then
@@ -87,7 +87,7 @@ function CameraState:__index(index)
 	end
 end
 
-function CameraState:__newindex(index, value)
+function CameraState.__newindex(self: CameraState, index, value)
 	if index == "CFrame" then
 		self.CameraFrame.CFrame = value
 	elseif index == "Position" then
@@ -97,7 +97,7 @@ function CameraState:__newindex(index, value)
 	elseif index == "FieldOfView" then
 		self.CameraFrame.FieldOfView = value
 	elseif index == "CameraFrame" or index == "CameraFrameDerivative" then
-		rawset(self, index, value)
+		rawset(self :: any, index, value)
 	else
 		error(string.format("'%s' is not a valid index of CameraState", tostring(index)))
 	end
@@ -107,7 +107,7 @@ end
 	Set another camera state. Typically used to set Workspace.CurrentCamera's state to match this camera's state
 	@param camera Camera -- A CameraState to set, also accepts a Roblox Camera
 ]=]
-function CameraState:Set(camera: Camera)
+function CameraState.Set(self: CameraState, camera: Camera)
 	camera.FieldOfView = self.FieldOfView
 	camera.CFrame = self.CFrame
 end

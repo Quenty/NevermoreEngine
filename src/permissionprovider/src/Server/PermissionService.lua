@@ -24,21 +24,21 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local BasePermissionProvider = require("BasePermissionProvider")
+local Brio = require("Brio")
 local CreatorPermissionProvider = require("CreatorPermissionProvider")
 local GroupPermissionProvider = require("GroupPermissionProvider")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local PermissionLevel = require("PermissionLevel")
+local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxPlayerUtils = require("RxPlayerUtils")
-local PermissionLevelUtils = require("PermissionLevelUtils")
-local _ServiceBag = require("ServiceBag")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
-local _BasePermissionProvider = require("BasePermissionProvider")
+local ServiceBag = require("ServiceBag")
 
 local PermissionService = {}
 PermissionService.ServiceName = "PermissionService"
@@ -56,7 +56,7 @@ export type PermissionService = typeof(setmetatable(
 	Initializes the service. Should be done via [ServiceBag].
 	@param _serviceBag ServiceBag
 ]=]
-function PermissionService:Init(_serviceBag: _ServiceBag.ServiceBag)
+function PermissionService:Init(_serviceBag: ServiceBag.ServiceBag)
 	assert(not self._promise, "Already initialized")
 	assert(not self._provider, "Already have provider")
 
@@ -101,7 +101,7 @@ end
 	Returns the permission provider
 	@return Promise<BasePermissionProvider>
 ]=]
-function PermissionService:PromisePermissionProvider(): Promise.Promise<_BasePermissionProvider.BasePermissionProvider>
+function PermissionService:PromisePermissionProvider(): Promise.Promise<BasePermissionProvider.BasePermissionProvider>
 	assert(self._promise, "Not initialized")
 
 	return self._promise
@@ -153,7 +153,7 @@ end
 	@param permissionLevel PermissionLevel
 	@return Observable<Brio<Player>>
 ]=]
-function PermissionService:ObservePermissionedPlayersBrio(permissionLevel: PermissionLevel.PermissionLevel): _Observable.Observable<_Brio.Brio<Player>>
+function PermissionService:ObservePermissionedPlayersBrio(permissionLevel: PermissionLevel.PermissionLevel): Observable.Observable<Brio.Brio<Player>>
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
 	return RxPlayerUtils.observePlayersBrio():Pipe({

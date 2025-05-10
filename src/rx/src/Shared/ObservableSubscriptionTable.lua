@@ -8,7 +8,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Observable = require("Observable")
-local _Subscription = require("Subscription")
+local Subscription = require("Subscription")
 
 local ObservableSubscriptionTable = {}
 ObservableSubscriptionTable.ClassName = "ObservableSubscriptionTable"
@@ -16,7 +16,7 @@ ObservableSubscriptionTable.__index = ObservableSubscriptionTable
 
 export type ObservableSubscriptionTable<T...> = typeof(setmetatable(
 	{} :: {
-		_subMap: { [any]: { _Subscription.Subscription<T...> } },
+		_subMap: { [any]: { Subscription.Subscription<T...> } },
 	},
 	{} :: typeof({ __index = ObservableSubscriptionTable })
 ))
@@ -103,7 +103,7 @@ function ObservableSubscriptionTable.Fail<T...>(self: ObservableSubscriptionTabl
 	end
 end
 
-export type RetrieveInitialValue<T...> = (sub: _Subscription.Subscription<T...>) -> ()
+export type RetrieveInitialValue<T...> = (sub: Subscription.Subscription<T...>) -> ()
 
 --[=[
 	Observes for the key

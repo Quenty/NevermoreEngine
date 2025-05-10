@@ -11,12 +11,12 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local StateStack = require("StateStack")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local ScreenshotHudServiceClient = {}
 ScreenshotHudServiceClient.ServiceName = "ScreenshotHudServiceClient"
 
-function ScreenshotHudServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function ScreenshotHudServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

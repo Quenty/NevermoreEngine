@@ -9,8 +9,8 @@ local require = require(script.Parent.loader).load(script)
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local Rx = require("Rx")
 local Symbol = require("Symbol")
-local _Rx = require("Rx")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -130,7 +130,7 @@ end
 	@param condition function | nil
 	@return Observable<Brio<any>>
 ]=]
-function RxAttributeUtils.observeAttributeBrio<T>(instance: Instance, attributeName: string, condition: _Rx.Predicate<T>?): Observable.Observable<Brio.Brio<T>>
+function RxAttributeUtils.observeAttributeBrio<T>(instance: Instance, attributeName: string, condition: Rx.Predicate<T>?): Observable.Observable<Brio.Brio<T>>
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
 

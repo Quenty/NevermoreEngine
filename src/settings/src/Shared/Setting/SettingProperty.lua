@@ -5,12 +5,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SettingsDataService = require("SettingsDataService")
+local Observable = require("Observable")
+local Promise = require("Promise")
 local Rx = require("Rx")
 local RxSignal = require("RxSignal")
-local _ServiceBag = require("ServiceBag")
-local _Promise = require("Promise")
-local _Observable = require("Observable")
+local ServiceBag = require("ServiceBag")
+local SettingsDataService = require("SettingsDataService")
 
 local SettingProperty = {}
 SettingProperty.ClassName = "SettingProperty"
@@ -22,7 +22,7 @@ export type SettingProperty<T> = typeof(setmetatable(
 		Changed: any,
 		DefaultValue: T,
 
-		_serviceBag: any,
+		_serviceBag: ServiceBag.ServiceBag,
 		_bridge: SettingsDataService.SettingsDataService,
 		_player: Player,
 		_definition: any,
@@ -38,11 +38,11 @@ export type SettingProperty<T> = typeof(setmetatable(
 	@param definition SettingDefinition
 	@return SettingProperty<T>
 ]=]
-function SettingProperty.new<T>(serviceBag: _ServiceBag.ServiceBag, player: Player, definition): SettingProperty<T>
+function SettingProperty.new<T>(serviceBag: ServiceBag.ServiceBag, player: Player, definition): SettingProperty<T>
 	local self: SettingProperty<T> = setmetatable({} :: any, SettingProperty)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._bridge = self._serviceBag:GetService(SettingsDataService)
+	self._bridge = self._serviceBag:GetService(SettingsDataService) :: any
 
 	self._player = assert(player, "No player")
 	self._definition = assert(definition, "No definition")
@@ -58,7 +58,7 @@ end
 	Observes the value of the setting property
 	@return Observable<T>
 ]=]
-function SettingProperty.Observe<T>(self: SettingProperty<T>): _Observable.Observable<T>
+function SettingProperty.Observe<T>(self: SettingProperty<T>): Observable.Observable<T>
 	return self:_observePlayerSettings():Pipe({
 		Rx.where(function(settings)
 			return settings ~= nil
@@ -146,7 +146,7 @@ end
 
 	@return Promise<T>
 ]=]
-function SettingProperty.PromiseValue<T>(self: SettingProperty<T>): _Promise.Promise<T>
+function SettingProperty.PromiseValue<T>(self: SettingProperty<T>): Promise.Promise<T>
 	return self:_promisePlayerSettings():Then(function(playerSettings)
 		return playerSettings:GetValue(self._definition:GetSettingName(), self._definition:GetDefaultValue())
 	end)
@@ -158,7 +158,7 @@ end
 	@param value T
 	@return Promise
 ]=]
-function SettingProperty.PromiseSetValue<T>(self: SettingProperty<T>, value: T): _Promise.Promise<()>
+function SettingProperty.PromiseSetValue<T>(self: SettingProperty<T>, value: T): Promise.Promise<()>
 	return self:_promisePlayerSettings():Then(function(playerSettings)
 		playerSettings:SetValue(self._definition:GetSettingName(), value)
 	end)
@@ -185,7 +185,7 @@ end
 
 	@return Promise
 ]=]
-function SettingProperty.PromiseRestoreDefault<T>(self: SettingProperty<T>): _Promise.Promise<()>
+function SettingProperty.PromiseRestoreDefault<T>(self: SettingProperty<T>): Promise.Promise<()>
 	return self:_promisePlayerSettings():Then(function(playerSettings)
 		playerSettings:RestoreDefault(self._definition:GetSettingName(), self._definition:GetDefaultValue())
 	end)

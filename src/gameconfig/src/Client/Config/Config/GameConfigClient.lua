@@ -9,7 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local GameConfigBase = require("GameConfigBase")
 local GameConfigBindersClient = require("GameConfigBindersClient")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigClient = setmetatable({}, GameConfigBase)
 GameConfigClient.ClassName = "GameConfigClient"
@@ -17,13 +17,13 @@ GameConfigClient.__index = GameConfigClient
 
 export type GameConfigClient = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_gameConfigBindersClient: any,
 	},
 	{} :: typeof({ __index = GameConfigClient })
 )) & GameConfigBase.GameConfigBase
 
-function GameConfigClient.new(folder: Folder, serviceBag: _ServiceBag.ServiceBag): GameConfigClient
+function GameConfigClient.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): GameConfigClient
 	local self = setmetatable(GameConfigBase.new(folder), GameConfigClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

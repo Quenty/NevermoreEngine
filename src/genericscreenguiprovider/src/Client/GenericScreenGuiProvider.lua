@@ -33,7 +33,7 @@ local ScreenGuiService = require("ScreenGuiService")
 local ServiceBag = require("ServiceBag")
 local String = require("String")
 local ValueObject = require("ValueObject")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local GenericScreenGuiProvider = {}
 GenericScreenGuiProvider.ClassName = "GenericScreenGuiProvider"
@@ -91,7 +91,7 @@ end
 	@param orderName string
 	@return Observable<Instance>
 ]=]
-function GenericScreenGuiProvider:ObserveScreenGui(orderName: string): _Observable.Observable<Instance>
+function GenericScreenGuiProvider:ObserveScreenGui(orderName: string): Observable.Observable<Instance>
 	assert(type(orderName) == "string", "Bad orderName")
 
 	if not RunService:IsRunning() then
@@ -171,7 +171,7 @@ end
 	@param orderName string -- Order name of display order
 	@return Observable<number>
 ]=]
-function GenericScreenGuiProvider:ObserveDisplayOrder(orderName: string): _Observable.Observable<number>
+function GenericScreenGuiProvider:ObserveDisplayOrder(orderName: string): Observable.Observable<number>
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 

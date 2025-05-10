@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxBrioUtils = require("RxBrioUtils")
+local Brio = require("Brio")
+local Observable = require("Observable")
 
 export type R15Side = "Left" | "Right"
 
@@ -28,7 +30,7 @@ function RxR15Utils.observeRigAttachmentBrio(character: Model, partName: string,
 	return RxR15Utils.observeCharacterPartBrio(character, partName):Pipe({
 		RxBrioUtils.switchMapBrio(function(part)
 			return RxInstanceUtils.observeLastNamedChildBrio(part, "Attachment", attachmentName)
-		end),
+		end) :: any,
 	})
 end
 
@@ -39,7 +41,11 @@ end
 	@param motorName string
 	@return Observable<Brio<Motor6D>>
 ]=]
-function RxR15Utils.observeRigMotorBrio(character: Model, partName: string, motorName: string)
+function RxR15Utils.observeRigMotorBrio(
+	character: Model,
+	partName: string,
+	motorName: string
+): Observable.Observable<Brio.Brio<Motor6D>>
 	assert(typeof(character) == "Instance", "Bad character")
 	assert(type(partName) == "string", "Bad partName")
 	assert(type(motorName) == "string", "Bad motorName")
@@ -47,9 +53,9 @@ function RxR15Utils.observeRigMotorBrio(character: Model, partName: string, moto
 	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", partName):Pipe({
 		RxBrioUtils.switchMapBrio(function(part)
 			return RxInstanceUtils.observeLastNamedChildBrio(part, "Motor6D", motorName)
-		end),
-		RxBrioUtils.onlyLastBrioSurvives(),
-	})
+		end) :: any,
+		RxBrioUtils.onlyLastBrioSurvives() :: any,
+	}) :: any
 end
 
 --[=[
@@ -67,9 +73,9 @@ function RxR15Utils.observeRigWeldBrio(character: Model, partName: string, weldN
 	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", partName):Pipe({
 		RxBrioUtils.switchMapBrio(function(part)
 			return RxInstanceUtils.observeLastNamedChildBrio(part, "Weld", weldName)
-		end),
-		RxBrioUtils.onlyLastBrioSurvives(),
-	})
+		end) :: any,
+		RxBrioUtils.onlyLastBrioSurvives() :: any,
+	}) :: any
 end
 
 --[=[
@@ -90,16 +96,19 @@ end
 	@param character Model
 	@return Observable<Brio<Humanoid>>
 ]=]
-function RxR15Utils.observeHumanoidBrio(character: Model)
+function RxR15Utils.observeHumanoidBrio(character: Model): Observable.Observable<Brio.Brio<Humanoid>>
 	assert(typeof(character) == "Instance", "Bad character")
 
-	return RxInstanceUtils.observeLastNamedChildBrio(character, "Humanoid", "Humanoid")
+	return RxInstanceUtils.observeLastNamedChildBrio(character, "Humanoid", "Humanoid") :: any
 end
 
-function RxR15Utils.observeHumanoidScaleValueObject(humanoid: Humanoid, scaleValueName: string)
+function RxR15Utils.observeHumanoidScaleValueObject(
+	humanoid: Humanoid,
+	scaleValueName: string
+): Observable.Observable<Brio.Brio<NumberValue>>
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
-	return RxInstanceUtils.observeLastNamedChildBrio(humanoid, "NumberValue", scaleValueName)
+	return RxInstanceUtils.observeLastNamedChildBrio(humanoid, "NumberValue", scaleValueName) :: any
 end
 
 function RxR15Utils.observeHumanoidScaleProperty(humanoid: Humanoid, scaleValueName: string)
@@ -108,12 +117,12 @@ function RxR15Utils.observeHumanoidScaleProperty(humanoid: Humanoid, scaleValueN
 	return RxR15Utils.observeHumanoidScaleValueObject(humanoid, scaleValueName):Pipe({
 		RxBrioUtils.switchMapBrio(function(scaleValue)
 			return RxInstanceUtils.observeProperty(scaleValue, "Value")
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 function RxR15Utils.observeShoulderRigAttachmentBrio(character: Model, side: R15Side)
-	if side == "Left"  then
+	if side == "Left" then
 		return RxR15Utils.observeRigAttachmentBrio(character, "UpperTorso", "LeftShoulderRigAttachment")
 	elseif side == "Right" then
 		return RxR15Utils.observeRigAttachmentBrio(character, "UpperTorso", "RightShoulderRigAttachment")

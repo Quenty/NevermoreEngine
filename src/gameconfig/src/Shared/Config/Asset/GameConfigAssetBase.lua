@@ -7,18 +7,18 @@ local require = require(script.Parent.loader).load(script)
 
 local AttributeValue = require("AttributeValue")
 local BaseObject = require("BaseObject")
+local CancelToken = require("CancelToken")
 local GameConfigAssetConstants = require("GameConfigAssetConstants")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetUtils = require("GameConfigAssetUtils")
 local GameConfigTranslator = require("GameConfigTranslator")
+local JSONTranslator = require("JSONTranslator")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxAttributeUtils = require("RxAttributeUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local _CancelToken = require("CancelToken")
-local _JSONTranslator = require("JSONTranslator")
-local _Observable = require("Observable")
-local _ServiceBag = require("ServiceBag")
-local _GameConfigAssetTypes = require("GameConfigAssetTypes")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigAssetBase = setmetatable({}, BaseObject)
 GameConfigAssetBase.ClassName = "GameConfigAssetBase"
@@ -27,10 +27,10 @@ GameConfigAssetBase.__index = GameConfigAssetBase
 export type GameConfigAssetBase = typeof(setmetatable(
 	{} :: {
 		_obj: Folder,
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_nameTranslationKey: AttributeValue.AttributeValue<string>,
 		_descriptionTranslationKey: AttributeValue.AttributeValue<string>,
-		_configTranslator: _JSONTranslator.JSONTranslator,
+		_configTranslator: JSONTranslator.JSONTranslator,
 	},
 	{} :: typeof({ __index = GameConfigAssetBase })
 ))
@@ -41,7 +41,7 @@ export type GameConfigAssetBase = typeof(setmetatable(
 	@param serviceBag ServiceBag
 	@return GameConfigAssetBase
 ]=]
-function GameConfigAssetBase.new(obj: Folder, serviceBag: _ServiceBag.ServiceBag): GameConfigAssetBase
+function GameConfigAssetBase.new(obj: Folder, serviceBag: ServiceBag.ServiceBag): GameConfigAssetBase
 	local self: GameConfigAssetBase = setmetatable(BaseObject.new(obj) :: any, GameConfigAssetBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -57,7 +57,7 @@ end
 	Observes the translated name
 	@return Observable<string>
 ]=]
-function GameConfigAssetBase:ObserveTranslatedName(): _Observable.Observable<string>
+function GameConfigAssetBase:ObserveTranslatedName(): Observable.Observable<string>
 	return self:ObserveNameTranslationKey():Pipe({
 		Rx.switchMap(function(key)
 			return self._configTranslator:ObserveFormatByKey(key)
@@ -69,7 +69,7 @@ end
 	Observes the translated description
 	@return Observable<string>
 ]=]
-function GameConfigAssetBase:ObserveTranslatedDescription(): _Observable.Observable<string>
+function GameConfigAssetBase:ObserveTranslatedDescription(): Observable.Observable<string>
 	return self:ObserveDescriptionTranslationKey():Pipe({
 		Rx.switchMap(function(key)
 			return self._configTranslator:ObserveFormatByKey(key)
@@ -112,7 +112,7 @@ end
 	Observes the assetId
 	@return Observable<number>
 ]=]
-function GameConfigAssetBase:ObserveAssetId(): _Observable.Observable<number>
+function GameConfigAssetBase:ObserveAssetId(): Observable.Observable<number>
 	return RxAttributeUtils.observeAttribute(self._obj, GameConfigAssetConstants.ASSET_ID_ATTRIBUTE, nil)
 end
 
@@ -128,7 +128,7 @@ end
 	Observes the asset type
 	@return Observable<string?>
 ]=]
-function GameConfigAssetBase:ObserveAssetType(): _Observable.Observable<string?>
+function GameConfigAssetBase:ObserveAssetType(): Observable.Observable<string?>
 	return RxAttributeUtils.observeAttribute(self._obj, GameConfigAssetConstants.ASSET_TYPE_ATTRIBUTE, nil)
 end
 
@@ -136,7 +136,7 @@ end
 	Observes the asset key
 	@return Observable<string>
 ]=]
-function GameConfigAssetBase:ObserveAssetKey(): _Observable.Observable<string>
+function GameConfigAssetBase:ObserveAssetKey(): Observable.Observable<string>
 	return RxInstanceUtils.observeProperty(self._obj, "Name")
 end
 
@@ -151,14 +151,14 @@ end
 export type GameConfigAssetState = {
 	assetId: number,
 	assetKey: string,
-	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 }
 
 --[=[
 	Observes the asset state
 	@return any
 ]=]
-function GameConfigAssetBase:ObserveState(): _Observable.Observable<GameConfigAssetState>
+function GameConfigAssetBase:ObserveState(): Observable.Observable<GameConfigAssetState>
 	return Rx.combineLatest({
 		assetId = self:ObserveAssetId(),
 		assetKey = self:ObserveAssetKey(),
@@ -171,7 +171,7 @@ end
 	@param cancelToken CancelToken
 	@return Promise<number?>
 ]=]
-function GameConfigAssetBase:PromiseCloudPriceInRobux(cancelToken: _CancelToken.CancelToken): Promise.Promise<number>
+function GameConfigAssetBase:PromiseCloudPriceInRobux(cancelToken: CancelToken.CancelToken): Promise.Promise<number>
 	return Rx.toPromise(self:ObserveCloudPriceInRobux(), cancelToken)
 end
 
@@ -180,7 +180,7 @@ end
 	@param cancelToken CancelToken
 	@return Promise<string?>
 ]=]
-function GameConfigAssetBase:PromiseCloudName(cancelToken: _CancelToken.CancelToken): Promise.Promise<string>
+function GameConfigAssetBase:PromiseCloudName(cancelToken: CancelToken.CancelToken): Promise.Promise<string>
 	return Rx.toPromise(self:ObserveCloudName(), cancelToken)
 end
 --[=[
@@ -188,7 +188,7 @@ end
 	@param _cancelToken CancelToken
 	@return Promise<Color3>
 ]=]
-function GameConfigAssetBase:PromiseColor(_cancelToken: _CancelToken.CancelToken): Promise.Promise<Color3>
+function GameConfigAssetBase:PromiseColor(_cancelToken: CancelToken.CancelToken): Promise.Promise<Color3>
 	return Promise.resolved(Color3.fromRGB(66, 158, 166))
 end
 
@@ -197,7 +197,7 @@ end
 	@param cancelToken CancelToken
 	@return Promise<string?>
 ]=]
-function GameConfigAssetBase:PromiseNameTranslationKey(cancelToken: _CancelToken.CancelToken): Promise.Promise<string>
+function GameConfigAssetBase:PromiseNameTranslationKey(cancelToken: CancelToken.CancelToken): Promise.Promise<string>
 	return Rx.toPromise(self:ObserveNameTranslationKey(), cancelToken)
 end
 
@@ -205,7 +205,7 @@ end
 	Observes the name translation key.
 	@return Observable<string?>
 ]=]
-function GameConfigAssetBase:ObserveNameTranslationKey(): _Observable.Observable<string?>
+function GameConfigAssetBase:ObserveNameTranslationKey(): Observable.Observable<string?>
 	return self._nameTranslationKey:Observe()
 end
 
@@ -213,7 +213,7 @@ end
 	Observes the description translation key.
 	@return Observable<string?>
 ]=]
-function GameConfigAssetBase:ObserveDescriptionTranslationKey(): _Observable.Observable<string?>
+function GameConfigAssetBase:ObserveDescriptionTranslationKey(): Observable.Observable<string?>
 	return self._descriptionTranslationKey:Observe()
 end
 
@@ -222,7 +222,7 @@ end
 	translation keys.
 	@return Observable<string?>
 ]=]
-function GameConfigAssetBase:ObserveCloudName(): _Observable.Observable<string?>
+function GameConfigAssetBase:ObserveCloudName(): Observable.Observable<string?>
 	return self:_observeCloudProperty({ "Name" }, "string")
 end
 
@@ -231,7 +231,7 @@ end
 	translation keys.
 	@return Observable<string?>
 ]=]
-function GameConfigAssetBase:ObserveCloudDescription(): _Observable.Observable<string?>
+function GameConfigAssetBase:ObserveCloudDescription(): Observable.Observable<string?>
 	return self:_observeCloudProperty({ "Description" }, "string")
 end
 
@@ -239,21 +239,21 @@ end
 	Observes the cost in Robux.
 	@return Observable<number?>
 ]=]
-function GameConfigAssetBase:ObserveCloudPriceInRobux(): _Observable.Observable<number?>
+function GameConfigAssetBase:ObserveCloudPriceInRobux(): Observable.Observable<number?>
 	return self:_observeCloudProperty({ "PriceInRobux" }, "number")
 end
 
 --[=[
 	@return Observable<number?>
 ]=]
-function GameConfigAssetBase:ObserveCloudIconImageAssetId(): _Observable.Observable<number?>
+function GameConfigAssetBase:ObserveCloudIconImageAssetId(): Observable.Observable<number?>
 	return self:_observeCloudProperty({ "IconImageAssetId", "IconImageId" }, "number")
 end
 
 function GameConfigAssetBase:_observeCloudProperty(
 	propertyNameList: { string },
 	expectedType: string
-): _Observable.Observable<any?>
+): Observable.Observable<any?>
 	assert(type(propertyNameList) == "table", "Bad propertyNameList")
 	assert(type(expectedType) == "string", "Bad expectedType")
 
@@ -275,7 +275,7 @@ function GameConfigAssetBase:_observeCloudProperty(
 	})
 end
 
-function GameConfigAssetBase:_observeCloudDataFromState(): _Observable.Observable<any?>
+function GameConfigAssetBase:_observeCloudDataFromState(): Observable.Observable<any?>
 	if self._cloudDataObservable then
 		return self._cloudDataObservable
 	end

@@ -22,12 +22,11 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local SettingsDataService = require("SettingsDataService")
-local SettingProperty = require("SettingProperty")
-local ServiceBag = require("ServiceBag")
 local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
+local SettingProperty = require("SettingProperty")
+local SettingsDataService = require("SettingsDataService")
 
 local SettingDefinition = {}
 SettingDefinition.ClassName = "SettingDefinition"
@@ -60,7 +59,7 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingDefinition:Init(serviceBag: _ServiceBag.ServiceBag)
+function SettingDefinition:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(serviceBag, "No serviceBag")
 	assert(not self._maid, "Already initialized")
 

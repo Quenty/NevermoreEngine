@@ -10,7 +10,7 @@ local SnackbarScreenGuiProvider = require("SnackbarScreenGuiProvider")
 local Maid = require("Maid")
 local SnackbarOptionUtils = require("SnackbarOptionUtils")
 local PromptQueue = require("PromptQueue")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local SnackbarServiceClient = {}
 SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
@@ -20,7 +20,7 @@ SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
 
 	@param serviceBag ServiceBag
 ]=]
-function SnackbarServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function SnackbarServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

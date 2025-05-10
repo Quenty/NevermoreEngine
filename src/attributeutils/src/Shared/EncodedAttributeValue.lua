@@ -6,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxAttributeUtils = require("RxAttributeUtils")
 local Rx = require("Rx")
+local RxAttributeUtils = require("RxAttributeUtils")
 local RxBrioUtils = require("RxBrioUtils")
 
 local EncodedAttributeValue = {}
@@ -25,7 +25,7 @@ EncodedAttributeValue.__index = EncodedAttributeValue
 	@param defaultValue T?
 	@return EncodedAttributeValue<T, TValue>
 ]=]
-function EncodedAttributeValue.new(object, attributeName, encode, decode, defaultValue)
+function EncodedAttributeValue.new(object: Instance, attributeName: string, encode, decode, defaultValue)
 	assert(typeof(object) == "Instance", "Bad object")
 	assert(type(attributeName) == "string", "Bad attributeName")
 	assert(type(decode) == "function", "Bad decode")

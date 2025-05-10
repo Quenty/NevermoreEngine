@@ -16,7 +16,7 @@ local ValueObject = require("ValueObject")
 local Signal = require("Signal")
 local Maid = require("Maid")
 
-local ActionManager = setmetatable({}, {})
+local ActionManager = {}
 ActionManager.__index = ActionManager
 ActionManager.ClassName = "ActionManager"
 

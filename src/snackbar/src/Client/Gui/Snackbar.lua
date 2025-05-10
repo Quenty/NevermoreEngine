@@ -24,8 +24,8 @@ local UTF8 = require("UTF8")
 local ValueObject = require("ValueObject")
 local SpringObject = require("SpringObject")
 local Table = require("Table")
-local _Promise = require("Promise")
-local _Observable = require("Observable")
+local Promise = require("Promise")
+local Observable = require("Observable")
 
 local SHADOW_RADIUS = 2
 local CORNER_RADIUS = 2
@@ -59,7 +59,7 @@ export type Snackbar = typeof(setmetatable(
 		_dragSpring: SpringObject.SpringObject<Vector2>,
 		_positionSpringModel: SpringTransitionModel.SpringTransitionModel<UDim2>,
 		_dragModel: ButtonDragModel.ButtonDragModel,
-		_computedTransparency: _Observable.Observable<number>,
+		_computedTransparency: Observable.Observable<number>,
 		_mainButton: GuiButton?,
 		_callToActionContainer: GuiObject?,
 		_textLabel: TextLabel?,
@@ -116,7 +116,7 @@ function Snackbar.isSnackbar(value: any): boolean
 	return DuckTypeUtils.isImplementation(Snackbar, value)
 end
 
-function Snackbar.PromiseSustain(self: Snackbar): _Promise.Promise<()>
+function Snackbar.PromiseSustain(self: Snackbar): Promise.Promise<()>
 	local promise = PromiseUtils.delayed(DURATION)
 
 	PromiseMaidUtils.whilePromise(promise, function(maid)

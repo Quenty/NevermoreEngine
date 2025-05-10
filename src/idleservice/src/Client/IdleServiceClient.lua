@@ -13,9 +13,9 @@ local VRService = game:GetService("VRService")
 local Maid = require("Maid")
 local RagdollClient = require("RagdollClient")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local StateStack = require("StateStack")
 local ValueObject = require("ValueObject")
-local _ServiceBag = require("ServiceBag")
 
 local IdleServiceClient = {}
 IdleServiceClient.ServiceName = "IdleServiceClient"
@@ -27,7 +27,7 @@ local MOVE_DISTANCE_REQUIRED = 2.5
 	Initializes the idle service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function IdleServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function IdleServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._maid, "Already initialized")
 
 	self._maid = Maid.new()

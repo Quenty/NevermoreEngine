@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Lags the camera smoothly behind the position maintaining other components
 	@class SmoothPositionCamera
@@ -5,17 +6,28 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local CameraState = require("CameraState")
-local SummedCamera = require("SummedCamera")
-local Spring = require("Spring")
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraFrame = require("CameraFrame")
+local CameraState = require("CameraState")
 local QFrame = require("QFrame")
+local Spring = require("Spring")
+local SummedCamera = require("SummedCamera")
 
 local SmoothPositionCamera = {}
 SmoothPositionCamera.ClassName = "SmoothPositionCamera"
 
-function SmoothPositionCamera.new(baseCamera)
-	local self = setmetatable({}, SmoothPositionCamera)
+export type SmoothPositionCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		Spring: Spring.Spring<Vector3>,
+		BaseCamera: CameraEffectUtils.CameraEffect,
+		Speed: number,
+	},
+	{} :: typeof({ __index = SmoothPositionCamera })
+)) & CameraEffectUtils.CameraEffect
+
+function SmoothPositionCamera.new(baseCamera): SmoothPositionCamera
+	local self: SmoothPositionCamera = setmetatable({} :: any, SmoothPositionCamera)
 
 	self.Spring = Spring.new(Vector3.zero)
 	self.BaseCamera = baseCamera or error("Must have BaseCamera")

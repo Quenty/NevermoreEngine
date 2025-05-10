@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions for links. Links are an [ObjectValue] pointing to something else!
 	@class LinkUtils
@@ -37,11 +38,11 @@ end
 	@param from Instance
 	@return { Instance }
 ]=]
-function LinkUtils.getAllLinkValues(linkName: string, from: Instance): { ObjectValue }
+function LinkUtils.getAllLinkValues(linkName: string, from: Instance): { Instance }
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad from")
 
-	local linkValues = {}
+	local linkValues: { Instance } = {}
 
 	for _, item in from:GetChildren() do
 		if item:IsA("ObjectValue") and item.Name == linkName then

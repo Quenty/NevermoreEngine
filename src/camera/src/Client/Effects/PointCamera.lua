@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Point a current element
 	@class PointCamera
@@ -7,9 +8,21 @@ local require = require(script.Parent.loader).load(script)
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
+local CameraEffectUtils = require("CameraEffectUtils")
 
 local PointCamera = {}
 PointCamera.ClassName = "PointCamera"
+
+export type PointCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		OriginCamera: CameraEffectUtils.CameraEffect,
+		FocusCamera: CameraEffectUtils.CameraEffect,
+		Origin: CameraState.CameraState,
+		Focus: CameraState.CameraState,
+	},
+	{} :: typeof({ __index = PointCamera })
+)) & CameraEffectUtils.CameraEffect
 
 --[=[
 	Initializes a new PointCamera
@@ -17,8 +30,11 @@ PointCamera.ClassName = "PointCamera"
 	@param originCamera Camera -- A camera to use
 	@param focusCamera Camera -- The Camera to look at.
 ]=]
-function PointCamera.new(originCamera, focusCamera)
-	local self = setmetatable({}, PointCamera)
+function PointCamera.new(
+	originCamera: CameraEffectUtils.CameraEffect,
+	focusCamera: CameraEffectUtils.CameraEffect
+): PointCamera
+	local self: PointCamera = setmetatable({} :: any, PointCamera)
 
 	self.OriginCamera = originCamera or error("Must have originCamera")
 	self.FocusCamera = focusCamera or error("Must have focusCamera")
@@ -26,11 +42,11 @@ function PointCamera.new(originCamera, focusCamera)
 	return self
 end
 
-function PointCamera:__add(other)
+function PointCamera.__add(self: PointCamera, other: CameraEffectUtils.CameraEffect): SummedCamera.SummedCamera
 	return SummedCamera.new(self, other)
 end
 
-function PointCamera:__newindex(index, value)
+function PointCamera.__newindex(self: PointCamera, index, value)
 	if index == "OriginCamera" or index == "FocusCamera" then
 		rawset(self, index, value)
 	else
@@ -38,7 +54,7 @@ function PointCamera:__newindex(index, value)
 	end
 end
 
-function PointCamera:__index(index)
+function PointCamera.__index(self: PointCamera, index)
 	if index == "CameraState" then
 		local origin, focus = self.Origin, self.Focus
 

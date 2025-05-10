@@ -9,8 +9,7 @@ local BaseObject = require("BaseObject")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ValueObject = require("ValueObject")
-local _Maid = require("Maid")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local GameScalingHelper = setmetatable({}, BaseObject)
 GameScalingHelper.ClassName = "GameScalingHelper"
@@ -71,11 +70,11 @@ function GameScalingHelper.new(screenGui: ScreenGui): GameScalingHelper
 	return self
 end
 
-function GameScalingHelper.ObserveIsSmall(self: GameScalingHelper): _Observable.Observable<boolean>
+function GameScalingHelper.ObserveIsSmall(self: GameScalingHelper): Observable.Observable<boolean>
 	return self._isSmall:Observe()
 end
 
-function GameScalingHelper.ObserveIsVertical(self: GameScalingHelper): _Observable.Observable<boolean>
+function GameScalingHelper.ObserveIsVertical(self: GameScalingHelper): Observable.Observable<boolean>
 	return self._isVertical:Observe()
 end
 
@@ -90,7 +89,7 @@ end
 ]=]
 function GameScalingHelper.SetAbsoluteSize(
 	self: GameScalingHelper,
-	absoluteSize: Vector2 | _Observable.Observable<Vector2>
+	absoluteSize: Vector2 | Observable.Observable<Vector2>
 ): () -> ()
 	return self._absoluteSize:Mount(absoluteSize)
 end

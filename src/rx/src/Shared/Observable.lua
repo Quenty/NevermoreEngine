@@ -60,7 +60,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Subscription = require("Subscription")
 local DuckTypeUtils = require("DuckTypeUtils")
-local _MaidTaskUtils = require("MaidTaskUtils")
+local MaidTaskUtils = require("MaidTaskUtils")
 
 local ENABLE_STACK_TRACING = false
 
@@ -68,7 +68,7 @@ local Observable = {}
 Observable.ClassName = "Observable"
 Observable.__index = Observable
 
-export type OnSubscribe<T...> = (subscription: Subscription.Subscription<T...>) -> _MaidTaskUtils.MaidTask?
+export type OnSubscribe<T...> = (subscription: Subscription.Subscription<T...>) -> MaidTaskUtils.MaidTask?
 
 export type Transformer<T..., U...> = (observable: Observable<T...>) -> Observable<U...>
 

@@ -22,8 +22,9 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
 local ValueObject = require("ValueObject")
 local TieRealmService = require("TieRealmService")
+local ServiceBag = require("ServiceBag")
 
-local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
+local CFA_90X = CFrame.Angles(math.pi / 2, 0, 0)
 local USE_OLD_IK_SYSTEM = (not LimbIKUtils) or false
 local USE_MOTOR_6D_RAW = false
 
@@ -31,7 +32,7 @@ local ArmIKBase = setmetatable({}, BaseObject)
 ArmIKBase.ClassName = "ArmIKBase"
 ArmIKBase.__index = ArmIKBase
 
-function ArmIKBase.new(humanoid, armName, serviceBag)
+function ArmIKBase.new(humanoid: Humanoid, armName, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(), ArmIKBase)
 
 	self._humanoid = humanoid or error("No humanoid")

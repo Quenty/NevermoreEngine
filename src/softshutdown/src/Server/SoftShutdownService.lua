@@ -26,7 +26,7 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local SoftShutdownConstants = require("SoftShutdownConstants")
 local TeleportServiceUtils = require("TeleportServiceUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local SoftShutdownService = {}
 SoftShutdownService.ServiceName = "SoftShutdownService"
@@ -41,7 +41,7 @@ SoftShutdownService.ServiceName = "SoftShutdownService"
 
 	@param serviceBag ServiceBag
 ]=]
-function SoftShutdownService:Init(serviceBag: _ServiceBag.ServiceBag)
+function SoftShutdownService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

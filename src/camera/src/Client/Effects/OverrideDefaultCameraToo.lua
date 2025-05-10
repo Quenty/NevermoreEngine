@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Allows you to override the default camera with this cameras
 	information. Useful for custom camera controls that the user
@@ -17,9 +18,21 @@ local require = require(script.Parent.loader).load(script)
 
 local SummedCamera = require("SummedCamera")
 local Vector3Utils = require("Vector3Utils")
+local CameraEffectUtils = require("CameraEffectUtils")
+local CameraState = require("CameraState")
 
 local OverrideDefaultCameraToo = {}
 OverrideDefaultCameraToo.ClassName = "OverrideDefaultCameraToo"
+
+export type OverrideDefaultCameraToo = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		BaseCamera: CameraEffectUtils.CameraEffect,
+		DefaultCamera: CameraEffectUtils.CameraEffect,
+		Predicate: ((CameraState.CameraState) -> boolean)?,
+	},
+	{} :: typeof({ __index = OverrideDefaultCameraToo })
+)) & CameraEffectUtils.CameraEffect
 
 --[=[
 	Initializes a new OverrideDefaultCameraToo
@@ -28,8 +41,8 @@ OverrideDefaultCameraToo.ClassName = "OverrideDefaultCameraToo"
 	@param defaultCamera DefaultCamera
 	@param predicate Filter on whether to override or not
 ]=]
-function OverrideDefaultCameraToo.new(baseCamera, defaultCamera, predicate)
-	local self = setmetatable({}, OverrideDefaultCameraToo)
+function OverrideDefaultCameraToo.new(baseCamera: CameraEffectUtils.CameraEffect, defaultCamera: CameraEffectUtils.CameraEffect, predicate): OverrideDefaultCameraToo
+	local self: OverrideDefaultCameraToo = setmetatable({} :: any, OverrideDefaultCameraToo)
 
 	self.BaseCamera = assert(baseCamera, "No baseCamera")
 	self.DefaultCamera = assert(defaultCamera, "No defaultCamera")

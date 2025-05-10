@@ -22,10 +22,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local AttributeValue = require("AttributeValue")
-local RxSignal = require("RxSignal")
-local Rx = require("Rx")
 local AdorneeDataEntry = require("AdorneeDataEntry")
+local AttributeValue = require("AttributeValue")
+local Rx = require("Rx")
+local RxSignal = require("RxSignal")
 
 local AdorneeDataValue = {}
 AdorneeDataValue.ClassName = "AdorneeDataValue"

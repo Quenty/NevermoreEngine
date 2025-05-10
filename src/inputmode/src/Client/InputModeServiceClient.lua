@@ -15,7 +15,7 @@ local Maid = require("Maid")
 local InputModeProcessor = require("InputModeProcessor")
 local InputModeTypes = require("InputModeTypes")
 local InputMode = require("InputMode")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local THUMBSTICK_DEADZONE = 0.14
 
@@ -28,12 +28,12 @@ export type InputModeServiceClient = typeof(setmetatable(
 		_inputModes: { [InputModeType.InputModeType]: InputMode.InputMode },
 		_inputModeProcessor: InputModeProcessor.InputModeProcessor,
 		_lastMousePosition: Vector3?,
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 	},
 	{} :: typeof({ __index = InputModeServiceClient })
 ))
 
-function InputModeServiceClient.Init(self: InputModeServiceClient, serviceBag: _ServiceBag.ServiceBag)
+function InputModeServiceClient.Init(self: InputModeServiceClient, serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

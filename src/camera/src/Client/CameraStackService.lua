@@ -11,22 +11,36 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraStack = require("CameraStack")
+local CameraState = require("CameraState")
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
-assert(RunService:IsClient(), "[CameraStackService] - Only require CameraStackService on client")
-
 local CameraStackService = {}
 CameraStackService.ServiceName = "CameraStackService"
 
+export type CameraStackService = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_cameraStack: CameraStack.CameraStack,
+		_rawDefaultCamera: DefaultCamera.DefaultCamera,
+		_impulseCamera: ImpulseCamera.ImpulseCamera,
+		_defaultCamera: CameraEffectUtils.CameraEffect,
+		_key: string,
+		_serviceBag: ServiceBag.ServiceBag,
+		_started: boolean,
+		_doNotUseDefaultCamera: boolean,
+	},
+	{} :: typeof({ __index = CameraStackService })
+))
 --[=[
 	Initializes a new camera stack. Should be done via the ServiceBag.
 	@param serviceBag ServiceBag
 ]=]
-function CameraStackService:Init(serviceBag: ServiceBag.ServiceBag)
+function CameraStackService.Init(self: CameraStackService, serviceBag: ServiceBag.ServiceBag)
 	assert(ServiceBag.isServiceBag(serviceBag), "Not a valid service bag")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -39,17 +53,17 @@ function CameraStackService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._rawDefaultCamera = self._maid:Add(DefaultCamera.new())
 
 	self._impulseCamera = ImpulseCamera.new()
-	self._defaultCamera = (self._rawDefaultCamera + self._impulseCamera):SetMode("Relative")
+	self._defaultCamera = ((self :: any)._rawDefaultCamera + (self :: any)._impulseCamera):SetMode("Relative")
 
 	-- Add camera to stack
 	self:Add(self._defaultCamera)
 end
 
-function CameraStackService:GetRenderPriority()
+function CameraStackService.GetRenderPriority(_self: CameraStackService): number
 	return Enum.RenderPriority.Camera.Value + 75
 end
 
-function CameraStackService:Start()
+function CameraStackService.Start(self: CameraStackService): ()
 	RunService:BindToRenderStep("CameraStackUpdateInternal" .. self._key, self:GetRenderPriority(), function()
 		debug.profilebegin("camerastackservice")
 
@@ -60,7 +74,6 @@ function CameraStackService:Start()
 		if state then
 			state:Set(Workspace.CurrentCamera)
 		end
-
 
 		debug.profileend()
 	end)
@@ -88,7 +101,7 @@ end
 	Prevents the default camera from being used
 	@param doNotUseDefaultCamera boolean
 ]=]
-function CameraStackService:SetDoNotUseDefaultCamera(doNotUseDefaultCamera)
+function CameraStackService.SetDoNotUseDefaultCamera(self: CameraStackService, doNotUseDefaultCamera: boolean): ()
 	assert(not self._started, "Already started")
 
 	self._doNotUseDefaultCamera = doNotUseDefaultCamera
@@ -98,8 +111,8 @@ end
 	Pushes a disable state onto the camera stack
 	@return function -- Function to cancel disable
 ]=]
-function CameraStackService:PushDisable()
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.PushDisable(self: CameraStackService): () -> ()
+	self:_ensureInitOrError()
 
 	return self._cameraStack:PushDisable()
 end
@@ -107,8 +120,8 @@ end
 --[=[
 	Outputs the camera stack. Intended for diagnostics.
 ]=]
-function CameraStackService:PrintCameraStack()
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.PrintCameraStack(self: CameraStackService): ()
+	self:_ensureInitOrError()
 
 	return self._cameraStack:PrintCameraStack()
 end
@@ -117,7 +130,7 @@ end
 	Returns the default camera
 	@return SummedCamera -- DefaultCamera + ImpulseCamera
 ]=]
-function CameraStackService:GetDefaultCamera()
+function CameraStackService.GetDefaultCamera(self: CameraStackService): CameraEffectUtils.CameraEffect
 	assert(self._defaultCamera, "Not initialized")
 
 	return self._defaultCamera
@@ -142,7 +155,7 @@ end
 
 	@return ImpulseCamera
 ]=]
-function CameraStackService:GetImpulseCamera()
+function CameraStackService.GetImpulseCamera(self: CameraStackService): ImpulseCamera.ImpulseCamera
 	assert(self._impulseCamera, "Not initialized")
 
 	return self._impulseCamera
@@ -152,7 +165,7 @@ end
 	Returns the default camera without any impulse cameras
 	@return DefaultCamera
 ]=]
-function CameraStackService:GetRawDefaultCamera()
+function CameraStackService.GetRawDefaultCamera(self: CameraStackService): DefaultCamera.DefaultCamera
 	assert(self._rawDefaultCamera, "Not initialized")
 
 	return self._rawDefaultCamera
@@ -162,8 +175,8 @@ end
 	Gets the camera current on the top of the stack
 	@return CameraEffect
 ]=]
-function CameraStackService:GetTopCamera()
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.GetTopCamera(self: CameraStackService): CameraEffectUtils.CameraLike
+	self:_ensureInitOrError()
 
 	return self._cameraStack:GetTopCamera()
 end
@@ -172,8 +185,8 @@ end
 	Retrieves the top state off the stack at this time
 	@return CameraState?
 ]=]
-function CameraStackService:GetTopState()
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.GetTopState(self: CameraStackService): CameraState.CameraState?
+	self:_ensureInitOrError()
 
 	return self._cameraStack:GetTopState()
 end
@@ -184,8 +197,8 @@ end
 	@return CustomCameraEffect -- Effect below
 	@return (CameraState) -> () -- Function to set the state
 ]=]
-function CameraStackService:GetNewStateBelow()
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.GetNewStateBelow(self: CameraStackService)
+	self:_ensureInitOrError()
 
 	return self._cameraStack:GetNewStateBelow()
 end
@@ -196,8 +209,8 @@ end
 	@return number? -- index
 
 ]=]
-function CameraStackService:GetIndex(state)
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.GetIndex(self: CameraStackService, state: CameraEffectUtils.CameraEffect): number?
+	self:_ensureInitOrError()
 
 	return self._cameraStack:GetIndex(state)
 end
@@ -211,10 +224,10 @@ end
 
 	@return { CameraState<T> }
 ]=]
-function CameraStackService:GetRawStack()
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.GetRawStack(self: CameraStackService): { CameraEffectUtils.CameraLike }
+	self:_ensureInitOrError()
 
-	return self._cameraStack:GetRawStack()
+	return self._cameraStack:GetStack()
 end
 
 --[=[
@@ -222,8 +235,8 @@ end
 
 	@return CameraStack
 ]=]
-function CameraStackService:GetCameraStack()
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.GetCameraStack(self: CameraStackService): CameraStack.CameraStack
+	self:_ensureInitOrError()
 
 	return self._cameraStack
 end
@@ -232,8 +245,8 @@ end
 	Removes the state from the stack
 	@param state CameraState
 ]=]
-function CameraStackService:Remove(state)
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.Remove(self: CameraStackService, state: CameraEffectUtils.CameraEffect)
+	self:_ensureInitOrError()
 
 	return self._cameraStack:Remove(state)
 end
@@ -241,14 +254,19 @@ end
 --[=[
 	Adds the state from the stack
 	@param state CameraState
+	@return () -> () -- Cleanup function
 ]=]
-function CameraStackService:Add(state)
-	assert(self._cameraStack, "Not initialized")
+function CameraStackService.Add(self: CameraStackService, state: CameraEffectUtils.CameraEffect): () -> ()
+	self:_ensureInitOrError()
 
 	return self._cameraStack:Add(state)
 end
 
-function CameraStackService:Destroy()
+function CameraStackService._ensureInitOrError(self: CameraStackService)
+	assert(self._cameraStack, "Not initialized. Initialize via ServiceBag")
+end
+
+function CameraStackService.Destroy(self: CameraStackService)
 	self._maid:DoCleaning()
 end
 

@@ -6,12 +6,24 @@
 local require = require(script.Parent.loader).load(script)
 
 local SummedCamera = require("SummedCamera")
+local CameraState = require("CameraState")
+local CameraEffectUtils = require("CameraEffectUtils")
+local FadingCamera = require("FadingCamera")
 
 local InverseFader = {}
 InverseFader.ClassName = "InverseFader"
 
-function InverseFader.new(camera, fader)
-	local self = setmetatable({}, InverseFader)
+export type InverseFader = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		_camera: CameraEffectUtils.CameraEffect,
+		_fader: FadingCamera.FadingCamera,
+	},
+	{} :: typeof({ __index = InverseFader })
+)) & CameraEffectUtils.CameraEffect
+
+function InverseFader.new(camera: CameraEffectUtils.CameraEffect, fader: FadingCamera.FadingCamera)
+	local self: InverseFader = setmetatable({} :: any, InverseFader)
 
 	self._camera = camera or error("No camera")
 	self._fader = fader or error("No fader")
@@ -19,13 +31,16 @@ function InverseFader.new(camera, fader)
 	return self
 end
 
-function InverseFader:__add(other)
+function InverseFader.__add(self: InverseFader, other)
 	return SummedCamera.new(self, other)
 end
 
-function InverseFader:__index(index)
+function InverseFader.__index(self: InverseFader, index)
 	if index == "CameraState" then
-		return (self._camera.CameraState or self._camera)*(1-self._fader.Value)
+		local cameraState: CameraState.CameraState = (self._camera.CameraState :: any) or (self._camera :: any)
+
+		-- TODO: I think this is actually wrong
+		return (cameraState :: any) * (1 - self._fader.Value)
 	else
 		return InverseFader[index]
 	end

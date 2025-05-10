@@ -7,12 +7,13 @@ local Selection = game:GetService("Selection")
 
 local require = require(script.Parent.loader).load(script)
 
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
-local ValueObject = require("ValueObject")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local Set = require("Set")
+local ValueObject = require("ValueObject")
 
 local RxSelectionUtils = {}
 
@@ -100,7 +101,7 @@ end
 	@param where callback
 	@return Observable<Instance?>
 ]=]
-function RxSelectionUtils.observeFirstSelection(where)
+function RxSelectionUtils.observeFirstSelection(where: Rx.Predicate<Instance>): Observable.Observable<Instance?>
 	assert(type(where) == "function", "Bad where")
 
 	return Observable.new(function(sub)
@@ -139,16 +140,18 @@ end
 	@param where callback
 	@return Observable<Brio<Instance>>
 ]=]
-function RxSelectionUtils.observeFirstSelectionBrio(where)
+function RxSelectionUtils.observeFirstSelectionBrio(
+	where: Rx.Predicate<Instance>
+): Observable.Observable<Brio.Brio<Instance>>
 	assert(type(where) == "function", "Bad where")
 
 	return RxSelectionUtils.observeFirstSelection(where):Pipe({
-		RxBrioUtils.toBrio(),
-		RxBrioUtils.onlyLastBrioSurvives(),
+		RxBrioUtils.toBrio() :: any,
+		RxBrioUtils.onlyLastBrioSurvives() :: any,
 		RxBrioUtils.where(function(value)
 			return value ~= nil
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -156,7 +159,7 @@ end
 
 	@return Observable<{ Instance }>
 ]=]
-function RxSelectionUtils.observeSelectionList()
+function RxSelectionUtils.observeSelectionList(): Observable.Observable<{ Instance }>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -168,7 +171,7 @@ function RxSelectionUtils.observeSelectionList()
 		sub:Fire(current)
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -176,7 +179,7 @@ end
 
 	@return Observable<Brio<Instance>>
 ]=]
-function RxSelectionUtils.observeSelectionItemsBrio()
+function RxSelectionUtils.observeSelectionItemsBrio(): Observable.Observable<Brio.Brio<Instance>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -208,7 +211,7 @@ function RxSelectionUtils.observeSelectionItemsBrio()
 		handleSelectionChanged()
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxSelectionUtils

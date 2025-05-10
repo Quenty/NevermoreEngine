@@ -11,7 +11,7 @@ local GameConfigService = require("GameConfigService")
 local GameConfigUtils = require("GameConfigUtils")
 local String = require("String")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local MantleConfigProvider = {}
 MantleConfigProvider.ClassName = "MantleConfigProvider"
@@ -25,7 +25,7 @@ function MantleConfigProvider.new(container)
 	return self
 end
 
-function MantleConfigProvider:Init(serviceBag: _ServiceBag.ServiceBag)
+function MantleConfigProvider:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigService = self._serviceBag:GetService(GameConfigService)
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions to deal with Roblox's mobile jump button and its position
 	@class JumpButtonUtils
@@ -11,8 +12,8 @@ local JumpButtonUtils = {}
 	@return Vector2 -- Position
 	@return number -- Width
 ]=]
-function JumpButtonUtils.getJumpButtonPositionAndSize(screenGuiAbsSize)
-	local minAxis = math.min(screenGuiAbsSize.x, screenGuiAbsSize.y)
+function JumpButtonUtils.getJumpButtonPositionAndSize(screenGuiAbsSize: Vector2): (UDim2, number)
+	local minAxis = math.min(screenGuiAbsSize.X, screenGuiAbsSize.Y)
 
 	-- This is Roblox's logic for the jump button
 	local position, width

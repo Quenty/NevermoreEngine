@@ -25,7 +25,7 @@ local TiePropertyInterface = setmetatable({}, TieMemberInterface)
 TiePropertyInterface.ClassName = "TiePropertyInterface"
 TiePropertyInterface.__index = TiePropertyInterface
 
-function TiePropertyInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm)
+function TiePropertyInterface.new(implParent, adornee: Instance, memberDefinition, interfaceTieRealm)
 	local self = setmetatable(TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm), TiePropertyInterface)
 
 	return self

@@ -9,12 +9,12 @@ local AvatarEditorUtils = require("AvatarEditorUtils")
 local Aggregator = require("Aggregator")
 local Maid = require("Maid")
 local PagesProxy = require("PagesProxy")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local CatalogSearchServiceCache = {}
 CatalogSearchServiceCache.ServiceName = "CatalogSearchServiceCache"
 
-function CatalogSearchServiceCache:Init(serviceBag: _ServiceBag.ServiceBag)
+function CatalogSearchServiceCache:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

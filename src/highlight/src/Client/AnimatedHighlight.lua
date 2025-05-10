@@ -15,7 +15,7 @@ local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
 local Signal = require("Signal")
 local DuckTypeUtils = require("DuckTypeUtils")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local AnimatedHighlight = setmetatable({}, BasicPane)
 AnimatedHighlight.ClassName = "AnimatedHighlight"
@@ -253,7 +253,7 @@ function AnimatedHighlight.SetFillTransparency(
 	end
 end
 
-function AnimatedHighlight._render(self: AnimatedHighlight): _Observable.Observable<Highlight>
+function AnimatedHighlight._render(self: AnimatedHighlight): Observable.Observable<Highlight>
 	return Blend.New("Highlight")({
 		Name = "AnimatedHighlight",
 		Archivable = false,

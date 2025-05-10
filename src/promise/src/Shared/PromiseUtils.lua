@@ -7,7 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
-local _Signal = require("Signal")
+local Signal = require("Signal")
 
 local PromiseUtils = {}
 
@@ -208,9 +208,9 @@ end
 	@param signal Signal<T>
 	@return Promise<T>
 ]=]
-function PromiseUtils.fromSignal<T...>(signal: _Signal.Signal<T...>): Promise.Promise<T...>
+function PromiseUtils.fromSignal<T...>(signal: Signal.Signal<T...>): Promise.Promise<T...>
 	local promise = Promise.new()
-	local conn: _Signal.Connection<T...>?
+	local conn: Signal.Connection<T...>?
 
 	promise:Finally(function()
 		if conn then

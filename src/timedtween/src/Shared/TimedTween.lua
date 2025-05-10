@@ -16,7 +16,7 @@ local StepUtils = require("StepUtils")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Promise = require("Promise")
-local _Signal = require("Signal")
+local Signal = require("Signal")
 
 local TimedTween = setmetatable({}, BasicPane)
 TimedTween.ClassName = "TimedTween"
@@ -43,7 +43,7 @@ export type TimedTween = typeof(setmetatable(
 		-- From BasicPane
 		IsVisible: (self: TimedTween) -> boolean,
 		SetVisible: (self: TimedTween, isVisible: boolean, doNotAnimate: boolean?) -> (),
-		VisibleChanged: _Signal.Signal<boolean, boolean>,
+		VisibleChanged: Signal.Signal<boolean, boolean>,
 		Destroy: (self: TimedTween) -> (),
 	},
 	{} :: typeof({ __index = TimedTween })

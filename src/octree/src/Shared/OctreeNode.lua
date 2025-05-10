@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Basic node interacting with the octree. See [Octree](/api/Octree) for usage.
 
@@ -21,6 +22,19 @@ local OctreeNode = {}
 OctreeNode.ClassName = "OctreeNode"
 OctreeNode.__index = OctreeNode
 
+export type OctreeNode<T> = typeof(setmetatable(
+	{} :: {
+		_octree: any,
+		_object: T,
+		_currentLowestRegion: any?,
+		_position: Vector3?,
+		_px: number?,
+		_py: number?,
+		_pz: number?,
+	},
+	{} :: typeof({ __index = OctreeNode })
+)) & OctreeRegionUtils.OctreeNode<T>
+
 --[=[
 	Creates a new for the given Octree with the object.
 
@@ -34,8 +48,8 @@ OctreeNode.__index = OctreeNode
 	@param object T
 	@return OctreeNode<T>
 ]=]
-function OctreeNode.new(octree, object)
-	local self = setmetatable({}, OctreeNode)
+function OctreeNode.new<T>(octree, object: T): OctreeNode<T>
+	local self: OctreeNode<T> = setmetatable({} :: any, OctreeNode)
 
 	self._octree = octree or error("No octree")
 	self._object = object or error("No object")
@@ -61,7 +75,7 @@ end
 	@return { T } -- Objects found, including self
 	@return { number } -- Distances squared
 ]=]
-function OctreeNode:KNearestNeighborsSearch(k, radius)
+function OctreeNode.KNearestNeighborsSearch<T>(self: OctreeNode<T>, k: number, radius: number)
 	return self._octree:KNearestNeighborsSearch(self._position, k, radius)
 end
 
@@ -76,7 +90,7 @@ end
 
 	@return T
 ]=]
-function OctreeNode:GetObject()
+function OctreeNode.GetObject<T>(self: OctreeNode<T>): T
 	return self._object
 end
 
@@ -87,16 +101,16 @@ end
 	@return { any } -- Objects found
 	@return { number } -- Distances squared
 ]=]
-function OctreeNode:RadiusSearch(radius)
+function OctreeNode.RadiusSearch<T>(self: OctreeNode<T>, radius: number): ({ T }, { number })
 	return self._octree:RadiusSearch(self._position, radius)
 end
 
 --[=[
 	Retrieves the position
 
-	@return Vector3
+	@return Vector3?
 ]=]
-function OctreeNode:GetPosition()
+function OctreeNode.GetPosition<T>(self: OctreeNode<T>): Vector3?
 	return self._position
 end
 
@@ -107,7 +121,7 @@ end
 	@return number -- py
 	@return number -- pz
 ]=]
-function OctreeNode:GetRawPosition()
+function OctreeNode.GetRawPosition<T>(self: OctreeNode<T>): (number?, number?, number?)
 	return self._px, self._py, self._pz
 end
 
@@ -125,12 +139,12 @@ end
 
 	@param position Vector3
 ]=]
-function OctreeNode:SetPosition(position)
+function OctreeNode.SetPosition<T>(self: OctreeNode<T>, position: Vector3)
 	if self._position == position then
 		return
 	end
 
-	local px, py, pz = position.x, position.y, position.z
+	local px, py, pz = position.X, position.Y, position.Z
 
 	self._px = px
 	self._py = py
@@ -162,7 +176,7 @@ end
 --[=[
 	Removes the OctreeNode from the octree
 ]=]
-function OctreeNode:Destroy()
+function OctreeNode.Destroy<T>(self: OctreeNode<T>)
 	if self._currentLowestRegion then
 		OctreeRegionUtils.removeNode(self._currentLowestRegion, self)
 	end

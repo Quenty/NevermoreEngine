@@ -58,7 +58,7 @@ end
 	@param text string
 	@return Promise<string>
 ]=]
-function TextFilterUtils.promiseLegacyChatFilter(playerFrom: Player, text: string)
+function TextFilterUtils.promiseLegacyChatFilter(playerFrom: Player, text: string): Promise.Promise<string>
 	assert(typeof(playerFrom) == "Instance" and playerFrom:IsA("Player"), "Bad playerFrom")
 	assert(type(text) == "string", "Bad text")
 
@@ -93,7 +93,7 @@ function TextFilterUtils.promiseNonChatStringForUserAsync(
 	fromUserId: number,
 	toUserId: number,
 	textFilterContext: Enum.TextFilterContext
-)
+): Promise.Promise<string>
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
 	assert(type(toUserId) == "number", "Bad toUserId")

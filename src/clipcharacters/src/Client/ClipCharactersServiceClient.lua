@@ -7,12 +7,12 @@ local require = require(script.Parent.loader).load(script)
 local ClipCharacters = require("ClipCharacters")
 local Maid = require("Maid")
 local StateStack = require("StateStack")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local ClipCharactersServiceClient = {}
 ClipCharactersServiceClient.ServiceName = "ClipCharactersServiceClient"
 
-function ClipCharactersServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function ClipCharactersServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

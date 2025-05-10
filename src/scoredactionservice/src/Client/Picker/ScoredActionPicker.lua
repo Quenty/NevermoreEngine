@@ -5,11 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Set = require("Set")
-local ValueObject = require("ValueObject")
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
-local _ScoredAction = require("ScoredAction")
+local ScoredAction = require("ScoredAction")
+local Set = require("Set")
+local ValueObject = require("ValueObject")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
 
@@ -19,8 +19,8 @@ ScoredActionPicker.__index = ScoredActionPicker
 
 export type ScoredActionPicker = typeof(setmetatable(
 	{} :: {
-		_actionSet: { [_ScoredAction.ScoredAction]: boolean },
-		_currentPreferred: ValueObject.ValueObject<_ScoredAction.ScoredAction?>,
+		_actionSet: { [ScoredAction.ScoredAction]: boolean },
+		_currentPreferred: ValueObject.ValueObject<ScoredAction.ScoredAction?>,
 	},
 	{} :: typeof({ __index = ScoredActionPicker })
 )) & BaseObject.BaseObject
@@ -50,7 +50,7 @@ function ScoredActionPicker.Update(self: ScoredActionPicker): ()
 		return
 	end
 
-	local actionList: { _ScoredAction.ScoredAction } = Set.toList(self._actionSet)
+	local actionList: { ScoredAction.ScoredAction } = Set.toList(self._actionSet)
 	table.sort(actionList, function(a, b)
 		if a._score == b._score then
 			-- Older objects have preference in ties
@@ -81,8 +81,8 @@ end
 
 function ScoredActionPicker._tryGetValidPreferredAction(
 	_self: ScoredActionPicker,
-	action: _ScoredAction.ScoredAction
-): _ScoredAction.ScoredAction?
+	action: ScoredAction.ScoredAction
+): ScoredAction.ScoredAction?
 	if not action then
 		return nil
 	end
@@ -99,14 +99,14 @@ function ScoredActionPicker._tryGetValidPreferredAction(
 	return action
 end
 
-function ScoredActionPicker.AddAction(self: ScoredActionPicker, action: _ScoredAction.ScoredAction): ()
+function ScoredActionPicker.AddAction(self: ScoredActionPicker, action: ScoredAction.ScoredAction): ()
 	assert(type(action) == "table", "Bad action")
 
 	self._actionSet[action] = true
 	self:Update()
 end
 
-function ScoredActionPicker.RemoveAction(self: ScoredActionPicker, action: _ScoredAction.ScoredAction): ()
+function ScoredActionPicker.RemoveAction(self: ScoredActionPicker, action: ScoredAction.ScoredAction): ()
 	assert(type(action) == "table", "Bad action")
 
 	if self._currentPreferred.Value == action then

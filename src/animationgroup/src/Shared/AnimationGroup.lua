@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	A group of weighted tracks that can be played back with weighted probability.
 	The closest example to this is the idle animation that looks around at a 1:10
@@ -16,12 +17,20 @@ local AnimationGroup = setmetatable({}, BaseObject)
 AnimationGroup.ClassName = "AnimationGroup"
 AnimationGroup.__index = AnimationGroup
 
+export type AnimationGroup = typeof(setmetatable(
+	{} :: {
+		_weightedTracks: { AnimationGroupUtils.WeightedTrack },
+		_currentTrack: AnimationTrack?,
+	},
+	{} :: typeof({ __index = AnimationGroup })
+)) & BaseObject.BaseObject
+
 --[=[
 	@param weightedTracks { WeightedTrack }
 	@return AnimationGroup
 ]=]
-function AnimationGroup.new(weightedTracks)
-	local self = setmetatable(BaseObject.new(), AnimationGroup)
+function AnimationGroup.new(weightedTracks: { AnimationGroupUtils.WeightedTrack }): AnimationGroup
+	local self: AnimationGroup = setmetatable(BaseObject.new() :: any, AnimationGroup)
 
 	self._weightedTracks = {}
 
@@ -40,7 +49,7 @@ end
 	Plays the animations
 	@param transitionTime number
 ]=]
-function AnimationGroup:Play(transitionTime)
+function AnimationGroup.Play(self: AnimationGroup, transitionTime: number?): ()
 	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
 
 	if self._currentTrack and self._currentTrack.IsPlaying then
@@ -54,7 +63,11 @@ end
 	@param weightedTracks { WeightedTrack }
 	@param transitionTime number?
 ]=]
-function AnimationGroup:SetWeightedTracks(weightedTracks, transitionTime)
+function AnimationGroup.SetWeightedTracks(
+	self: AnimationGroup,
+	weightedTracks: { AnimationGroupUtils.WeightedTrack },
+	transitionTime: number?
+)
 	assert(type(weightedTracks) == "table", "Bad weightedTracks")
 	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
 
@@ -71,9 +84,10 @@ end
 
 --[=[
 	Stops the animations
-	@param transitionTime number
+
+	@param transitionTime number?
 ]=]
-function AnimationGroup:Stop(transitionTime)
+function AnimationGroup.Stop(self: AnimationGroup, transitionTime: number?): ()
 	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
 
 	if self._currentTrack then
@@ -82,7 +96,7 @@ function AnimationGroup:Stop(transitionTime)
 	end
 end
 
-function AnimationGroup:_playNewTrack(transitionTime)
+function AnimationGroup._playNewTrack(self: AnimationGroup, transitionTime: number?)
 	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
 
 	local trackData = AnimationGroupUtils.selectFromWeightedTracks(self._weightedTracks)
@@ -90,9 +104,9 @@ function AnimationGroup:_playNewTrack(transitionTime)
 		return
 	end
 
-	local track = trackData.track or error("No track")
+	local track = assert(trackData.track, "No track")
 
-	if self._currentTrack == track and self._currentTrack.IsPlaying then
+	if self._currentTrack == track and self._currentTrack and self._currentTrack.IsPlaying then
 		return
 	end
 
@@ -110,7 +124,7 @@ function AnimationGroup:_playNewTrack(transitionTime)
 	self._maid._trackMaid = maid
 end
 
-function AnimationGroup:_handleKeyframeReached(keyframeName)
+function AnimationGroup._handleKeyframeReached(self: AnimationGroup, keyframeName: string)
 	if keyframeName == "End" then
 		self:_playNewTrack()
 	end

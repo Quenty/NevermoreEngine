@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Controls for [Viewport]
 	@class ViewportControls
@@ -16,14 +17,23 @@ local ViewportControls = setmetatable({}, BaseObject)
 ViewportControls.ClassName = "ViewportControls"
 ViewportControls.__index = ViewportControls
 
+export type ViewportControls = typeof(setmetatable(
+	{} :: {
+		_obj: ViewportFrame,
+		_viewportModel: any,
+		_enabled: ValueObject.ValueObject<boolean>,
+	},
+	{} :: typeof({ __index = ViewportControls })
+)) & BaseObject.BaseObject
+
 --[=[
     Create the controls for dragging.
     @param viewport Instance
     @param viewportModel Viewport
     @return BaseObject
 ]=]
-function ViewportControls.new(viewport: ViewportFrame, viewportModel)
-	local self = setmetatable(BaseObject.new(viewport), ViewportControls)
+function ViewportControls.new(viewport: ViewportFrame, viewportModel: any): ViewportControls
+	local self: ViewportControls = setmetatable(BaseObject.new(viewport) :: any, ViewportControls)
 
 	self._viewportModel = assert(viewportModel, "No rotationYaw")
 	self._enabled = self._maid:Add(ValueObject.new(true, "boolean"))
@@ -48,13 +58,13 @@ end
 
 	@param enabled boolean
 ]=]
-function ViewportControls:SetEnabled(enabled: boolean)
+function ViewportControls.SetEnabled(self: ViewportControls, enabled: boolean)
 	assert(type(enabled) == "boolean", "Bad enabled")
 
 	self._enabled.Value = enabled
 end
 
-function ViewportControls:_startDrag(startInputObject: InputObject)
+function ViewportControls._startDrag(self: ViewportControls, startInputObject: InputObject)
 	if self._maid._dragging then
 		return
 	end
@@ -71,13 +81,16 @@ function ViewportControls:_startDrag(startInputObject: InputObject)
 
 	local lastDelta
 	maid:GiveTask(self._obj.InputChanged:Connect(function(inputObject)
-		if InputObjectUtils.isSameInputObject(inputObject, startInputObject) or inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+		if
+			InputObjectUtils.isSameInputObject(inputObject, startInputObject)
+			or inputObject.UserInputType == Enum.UserInputType.MouseMovement
+		then
 			local position = inputObject.Position
 			local delta = lastPosition - position
 			lastPosition = position
 
 			local absSize = self._obj.AbsoluteSize
-			local deltaV2 = Vector2.new(delta.x, delta.y)/absSize * SENSITIVITY
+			local deltaV2 = Vector2.new(delta.X, delta.Y) / absSize * SENSITIVITY
 			lastDelta = deltaV2
 
 			self._viewportModel:RotateBy(deltaV2, true)
@@ -104,7 +117,7 @@ function ViewportControls:_startDrag(startInputObject: InputObject)
 	self._maid._dragging = maid
 end
 
-function ViewportControls:_stopDrag()
+function ViewportControls._stopDrag(self: ViewportControls)
 	self._maid._dragging = nil
 end
 

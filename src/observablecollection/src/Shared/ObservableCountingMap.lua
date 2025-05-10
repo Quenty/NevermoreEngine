@@ -13,7 +13,7 @@ local Brio = require("Brio")
 local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
-local _Set = require("Set")
+local Set = require("Set")
 
 local ObservableCountingMap = {}
 ObservableCountingMap.ClassName = "ObservableCountingMap"
@@ -119,7 +119,7 @@ end
 	Observes the current set of active keys
 	@return Observable<{ [T]: true }>
 ]=]
-function ObservableCountingMap.ObserveKeysSet<T>(self: ObservableCountingMap<T>): Observable.Observable<_Set.Set<T>>
+function ObservableCountingMap.ObserveKeysSet<T>(self: ObservableCountingMap<T>): Observable.Observable<Set.Set<T>>
 	return self:_observeDerivedDataStructureFromKeys(function()
 		local set = {}
 

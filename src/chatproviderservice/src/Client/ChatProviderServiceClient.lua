@@ -12,12 +12,12 @@ local Maid = require("Maid")
 local Signal = require("Signal")
 local String = require("String")
 local TextChannelUtils = require("TextChannelUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local ChatProviderServiceClient = {}
 ChatProviderServiceClient.ServiceName = "ChatProviderServiceClient"
 
-function ChatProviderServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function ChatProviderServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

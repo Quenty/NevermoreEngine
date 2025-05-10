@@ -8,10 +8,10 @@ local require = require(script.Parent.loader).load(script)
 local AttributeValue = require("AttributeValue")
 local BaseObject = require("BaseObject")
 local ChatTagConstants = require("ChatTagConstants")
+local ChatTagDataUtils = require("ChatTagDataUtils")
 local LocalizedTextUtils = require("LocalizedTextUtils")
+local Observable = require("Observable")
 local Rx = require("Rx")
-local _ChatTagDataUtils = require("ChatTagDataUtils")
-local _Observable = require("Observable")
 
 local ChatTagBase = setmetatable({}, BaseObject)
 ChatTagBase.ClassName = "ChatTagBase"
@@ -46,7 +46,7 @@ function ChatTagBase.new(obj: Folder): ChatTagBase
 	return self
 end
 
-function ChatTagBase.ObserveChatTagData(self: ChatTagBase): _Observable.Observable<_ChatTagDataUtils.ChatTagData>
+function ChatTagBase.ObserveChatTagData(self: ChatTagBase): Observable.Observable<ChatTagDataUtils.ChatTagData>
 	return Rx.combineLatest({
 		UserDisabled = self.UserDisabled:Observe(),
 		TagText = self._chatTagText:Observe(),

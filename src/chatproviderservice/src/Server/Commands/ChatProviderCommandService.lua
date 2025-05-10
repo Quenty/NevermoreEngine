@@ -11,12 +11,12 @@ local ChatTagDataUtils = require("ChatTagDataUtils")
 local PlayerUtils = require("PlayerUtils")
 local Set = require("Set")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local ChatProviderCommandService = {}
 ChatProviderCommandService.ServiceName = "ChatProviderCommandService"
 
-function ChatProviderCommandService:Init(serviceBag: _ServiceBag.ServiceBag)
+function ChatProviderCommandService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

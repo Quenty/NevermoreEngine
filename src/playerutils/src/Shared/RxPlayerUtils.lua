@@ -11,9 +11,8 @@ local Players = game:GetService("Players")
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
-local _Rx = require("Rx")
-local _Observable = require("Observable")
 
 local RxPlayerUtils = {}
 
@@ -22,7 +21,7 @@ local RxPlayerUtils = {}
 	@param predicate ((Player) -> boolean)?
 	@return Observable<Brio<Player>>
 ]=]
-function RxPlayerUtils.observePlayersBrio(predicate: _Rx.Predicate<Player>?): _Observable.Observable<Brio.Brio<Player>>
+function RxPlayerUtils.observePlayersBrio(predicate: Rx.Predicate<Player>?): Observable.Observable<Brio.Brio<Player>>
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate!")
 
 	return Observable.new(function(sub)
@@ -58,7 +57,7 @@ end
 
 	@return Observable<Brio<Player>>
 ]=]
-function RxPlayerUtils.observeLocalPlayerBrio(): _Observable.Observable<Brio.Brio<Player>>
+function RxPlayerUtils.observeLocalPlayerBrio(): Observable.Observable<Brio.Brio<Player>>
 	return RxInstanceUtils.observePropertyBrio(Players, "LocalPlayer", function(value)
 		return value ~= nil
 	end)
@@ -69,7 +68,7 @@ end
 	@param predicate ((Player) -> boolean)?
 	@return Observable<Player>
 ]=]
-function RxPlayerUtils.observePlayers(predicate: _Rx.Predicate<Player>?): _Observable.Observable<Player>
+function RxPlayerUtils.observePlayers(predicate: Rx.Predicate<Player>?): Observable.Observable<Player>
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
 
 	return Observable.new(function(sub)
@@ -99,7 +98,7 @@ end
 	@param player Player
 	@return Observable<()>
 ]=]
-function RxPlayerUtils.observeFirstAppearanceLoaded(player: Player): _Observable.Observable<()>
+function RxPlayerUtils.observeFirstAppearanceLoaded(player: Player): Observable.Observable<()>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	return Observable.new(function(sub)

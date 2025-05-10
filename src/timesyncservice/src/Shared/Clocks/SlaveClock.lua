@@ -8,20 +8,19 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
-local _Observable = require("Observable")
+local Observable = require("Observable")
+local BaseClock = require("BaseClock")
 
 local SlaveClock = setmetatable({}, BaseObject)
 SlaveClock.__index = SlaveClock
 SlaveClock.ClassName = "SlaveClock"
 SlaveClock._offset = -1 -- Set uncalculated values to -1
 
-export type ClockFunction = () -> number
-
 export type SlaveClock = typeof(setmetatable(
 	{} :: {
 		_remoteEvent: RemoteEvent,
 		_remoteFunction: RemoteFunction,
-		_clockFunction: ClockFunction,
+		_clockFunction: BaseClock.ClockFunction,
 		_ping: ValueObject.ValueObject<number>,
 		_offset: number,
 		_pneWayDelay: number,
@@ -30,7 +29,7 @@ export type SlaveClock = typeof(setmetatable(
 		SyncedEvent: RBXScriptSignal,
 	},
 	{} :: typeof({ __index = SlaveClock })
-)) & BaseObject.BaseObject
+)) & BaseObject.BaseObject & BaseClock.BaseClock
 
 --[=[
 	Constructs a new SlaveClock
@@ -67,11 +66,11 @@ end
 
 	@return function
 ]=]
-function SlaveClock.GetClockFunction(self: SlaveClock): ClockFunction
+function SlaveClock.GetClockFunction(self: SlaveClock): BaseClock.ClockFunction
 	return self._clockFunction
 end
 
-function SlaveClock.ObservePing(self: SlaveClock): _Observable.Observable<number>
+function SlaveClock.ObservePing(self: SlaveClock): Observable.Observable<number>
 	return self._ping:Observe()
 end
 

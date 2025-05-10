@@ -1,3 +1,4 @@
+--!strict
 --[[
 	@class LuvColor3Utils.story
 ]]
@@ -7,7 +8,7 @@ local require = require(game:GetService("ServerScriptService"):FindFirstChild("L
 local Maid = require("Maid")
 local LuvColor3Utils = require("LuvColor3Utils")
 
-return function(target)
+return function(target: Instance?)
 	local maid = Maid.new()
 
 	local start = Color3.fromRGB(184, 127, 100)

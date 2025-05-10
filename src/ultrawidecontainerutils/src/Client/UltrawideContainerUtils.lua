@@ -36,10 +36,14 @@ end
 --[=[
 	Scales the size constraint of the container to the given scale.
 ]=]
-function UltrawideContainerUtils.scaleSizeConstraint(container: Frame, uiSizeConstraint: UISizeConstraint, scale: number): ()
+function UltrawideContainerUtils.scaleSizeConstraint(
+	container: Frame,
+	uiSizeConstraint: UISizeConstraint,
+	scale: number
+): ()
 	if scale ~= 0 then
-		container.Size = UDim2.new(1/scale, 0, 1/scale, 0)
-		uiSizeConstraint.MaxSize = Vector2.new(1920/scale, 1080/scale)
+		container.Size = UDim2.new(1 / scale, 0, 1 / scale, 0)
+		uiSizeConstraint.MaxSize = Vector2.new(1920 / scale, 1080 / scale)
 	end
 end
 

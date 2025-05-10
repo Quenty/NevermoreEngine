@@ -22,7 +22,7 @@ function GripPointer.new(ikRig)
 	return self
 end
 
-function GripPointer:SetLeftGrip(leftGrip)
+function GripPointer:SetLeftGrip(leftGrip: Attachment)
 	self._leftGripAttachment = leftGrip
 
 	if not self._leftGripAttachment then
@@ -37,7 +37,7 @@ function GripPointer:SetLeftGrip(leftGrip)
 	self._maid._leftGripMaid = maid
 end
 
-function GripPointer:SetRightGrip(rightGrip)
+function GripPointer:SetRightGrip(rightGrip: Attachment)
 	self._rightGripAttachment = rightGrip
 
 	if not self._rightGripAttachment then

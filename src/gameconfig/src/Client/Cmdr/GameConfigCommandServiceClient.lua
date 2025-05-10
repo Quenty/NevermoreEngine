@@ -6,14 +6,14 @@ local require = require(script.Parent.loader).load(script)
 
 local GameConfigCmdrUtils = require("GameConfigCmdrUtils")
 local Maid = require("Maid")
-local RxStateStackUtils = require("RxStateStackUtils")
 local Rx = require("Rx")
-local _ServiceBag = require("ServiceBag")
+local RxStateStackUtils = require("RxStateStackUtils")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigCommandServiceClient = {}
 GameConfigCommandServiceClient.ServiceName = "GameConfigCommandServiceClient"
 
-function GameConfigCommandServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function GameConfigCommandServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

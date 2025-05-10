@@ -18,12 +18,13 @@ local ValueBaseUtils = require("ValueBaseUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSortedList = require("ObservableSortedList")
+local ServiceBag = require("ServiceBag")
 
 local RogueProperty = {}
 RogueProperty.ClassName = "RogueProperty"
 RogueProperty.__index = RogueProperty
 
-function RogueProperty.new(adornee, serviceBag, definition)
+function RogueProperty.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag, definition)
 	local self = {}
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

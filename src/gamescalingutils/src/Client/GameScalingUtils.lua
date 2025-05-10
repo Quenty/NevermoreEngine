@@ -11,7 +11,7 @@ local GuiService = game:GetService("GuiService")
 local Blend = require("Blend")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local GameScalingUtils = {}
 
@@ -52,7 +52,7 @@ end
 	@param screenGui ScreenGui
 	@return Observable<number>
 ]=]
-function GameScalingUtils.observeUIScale(screenGui: ScreenGui): _Observable.Observable<number>
+function GameScalingUtils.observeUIScale(screenGui: ScreenGui): Observable.Observable<number>
 	return Blend.Spring(
 		RxInstanceUtils.observeProperty(screenGui, "AbsoluteSize"):Pipe({
 			Rx.map(GameScalingUtils.getUIScale) :: any,
@@ -66,7 +66,7 @@ end
 	@param child Instance
 	@return Observable<number>
 ]=]
-function GameScalingUtils.observeUIScaleForChild(child: Instance): _Observable.Observable<number>
+function GameScalingUtils.observeUIScaleForChild(child: Instance): Observable.Observable<number>
 	return RxInstanceUtils.observeFirstAncestor(child, "ScreenGui"):Pipe({
 		Rx.switchMap(function(screenGui: ScreenGui?): any
 			if screenGui then
@@ -84,7 +84,7 @@ end
 	@param props { Parent: Instance?, ScreenGui: ScreenGui }
 	@return Observable<UIScale>
 ]=]
-function GameScalingUtils.renderUIScale(props: Props): _Observable.Observable<UIScale>
+function GameScalingUtils.renderUIScale(props: Props): Observable.Observable<UIScale>
 	assert(props.ScreenGui, "No screenGui")
 
 	return Blend.New("UIScale")({
@@ -99,7 +99,7 @@ end
 	@param props { Parent: Instance?, ScreenGui: ScreenGui }
 	@return Observable<UIPadding>
 ]=]
-function GameScalingUtils.renderDialogPadding(props: Props): _Observable.Observable<UIPadding>
+function GameScalingUtils.renderDialogPadding(props: Props): Observable.Observable<UIPadding>
 	assert(props.ScreenGui, "No screenGui")
 
 	return Blend.New("UIPadding")({
@@ -116,7 +116,7 @@ end
 	@param screenGui ScreenGui
 	@return Observable<UDim>
 ]=]
-function GameScalingUtils.observeDialogPadding(screenGui: ScreenGui): _Observable.Observable<UDim>
+function GameScalingUtils.observeDialogPadding(screenGui: ScreenGui): Observable.Observable<UDim>
 	return Blend.Spring(
 		RxInstanceUtils.observeProperty(screenGui, "AbsoluteSize"):Pipe({
 			Rx.map(GameScalingUtils.getDialogPadding) :: any,

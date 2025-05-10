@@ -11,7 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Signal = require("Signal")
 local StateStack = require("StateStack")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local ScoredAction = setmetatable({}, BaseObject)
 ScoredAction.ClassName = "ScoredAction"
@@ -72,7 +72,7 @@ end
 --[=[
 	@return Observable<boolean>
 ]=]
-function ScoredAction.ObservePreferred(self: ScoredAction): _Observable.Observable<boolean>
+function ScoredAction.ObservePreferred(self: ScoredAction): Observable.Observable<boolean>
 	return self._preferredStack:Observe()
 end
 

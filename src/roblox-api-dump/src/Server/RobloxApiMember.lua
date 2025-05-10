@@ -7,14 +7,22 @@ local RobloxApiMember = {}
 RobloxApiMember.ClassName = "RobloxApiMember"
 RobloxApiMember.__index = RobloxApiMember
 
+export type RobloxApiMember = typeof(setmetatable(
+	{} :: {
+		_data: {},
+		_tagCache: { [string]: boolean }?,
+	},
+	{} :: typeof({ __index = RobloxApiMember })
+))
+
 --[=[
 	Constructs a new RobloxApiMember wrapping the data given. See [RobloxApiDump.PromiseMembers] to actually
 	construct this class.
 	@param data table
 	@return RobloxApiMember
 ]=]
-function RobloxApiMember.new(data)
-	local self = setmetatable({}, RobloxApiMember)
+function RobloxApiMember.new(data): RobloxApiMember
+	local self: RobloxApiMember = setmetatable({} :: any, RobloxApiMember)
 
 	--[[
 	 {

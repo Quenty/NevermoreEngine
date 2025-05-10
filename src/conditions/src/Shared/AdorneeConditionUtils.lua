@@ -44,6 +44,7 @@ local require = require(script.Parent.loader).load(script)
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
+local AttributeUtils = require("AttributeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
@@ -52,7 +53,6 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local StateStack = require("StateStack")
 local TieUtils = require("TieUtils")
-local AttributeUtils = require("AttributeUtils")
 
 local VALUE_WHEN_EMPTY_ATTRIBUTE = "ValueWhenEmpty"
 local DEFAULT_VALUE_WHEN_EMPTY_WHEN_UNDEFINED = true

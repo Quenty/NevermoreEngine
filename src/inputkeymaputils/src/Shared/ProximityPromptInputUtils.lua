@@ -7,12 +7,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local InputKeyMapList = require("InputKeyMapList")
-local InputModeTypes = require("InputModeTypes")
 local InputKeyMap = require("InputKeyMap")
+local InputKeyMapList = require("InputKeyMapList")
 local InputModeType = require("InputModeType")
+local InputModeTypes = require("InputModeTypes")
+local InputTypeUtils = require("InputTypeUtils")
 local SlottedTouchButtonUtils = require("SlottedTouchButtonUtils")
-local _InputTypeUtils = require("InputTypeUtils")
 
 local ProximityPromptInputUtils = {}
 
@@ -71,7 +71,7 @@ function ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList: InputKe
 	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
-	local inputTypesForInputMode: { _InputTypeUtils.InputType } = inputKeyMapList:GetInputTypesList(inputModeType)
+	local inputTypesForInputMode: { InputTypeUtils.InputType } = inputKeyMapList:GetInputTypesList(inputModeType)
 	for _, entry in inputTypesForInputMode do
 		if typeof(entry) == "EnumItem" and entry.EnumType == Enum.KeyCode then
 			return entry :: any

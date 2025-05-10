@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Creates a ViewportFrame with size fitting and drag controls. This means that the
 	viewport will center the camera around the given instance, and allow the user
@@ -31,13 +32,27 @@ local ViewportControls = require("ViewportControls")
 local Signal = require("Signal")
 local Rx = require("Rx")
 
-local MAX_PITCH = math.pi/3
-local MIN_PITCH = -math.pi/3
-local TAU = math.pi*2
+local MAX_PITCH = math.pi / 3
+local MIN_PITCH = -math.pi / 3
+local TAU = math.pi * 2
 
 local Viewport = setmetatable({}, BasicPane)
 Viewport.ClassName = "Viewport"
 Viewport.__index = Viewport
+
+export type Viewport = typeof(setmetatable(
+	{} :: {
+		_current: ValueObject.ValueObject<Instance?>,
+		_transparency: ValueObject.ValueObject<number>,
+		_absoluteSize: ValueObject.ValueObject<Vector2>,
+		_fieldOfView: ValueObject.ValueObject<number>,
+		_controlsEnabled: ValueObject.ValueObject<boolean>,
+		_rotationYawSpring: SpringObject.SpringObject<number>,
+		_rotationPitchSpring: SpringObject.SpringObject<number>,
+		_notifyInstanceSizeChanged: Signal.Signal<()>,
+	},
+	{} :: typeof({ __index = Viewport })
+)) & BasicPane.BasicPane
 
 --[=[
 	Constructs a new viewport. Unlike a normal [BasicPane] this will not render anything
@@ -45,8 +60,8 @@ Viewport.__index = Viewport
 
 	@return Viewport
 ]=]
-function Viewport.new()
-	local self = setmetatable(BasicPane.new(), Viewport)
+function Viewport.new(): Viewport
+	local self: Viewport = setmetatable(BasicPane.new() :: any, Viewport)
 
 	self._current = self._maid:Add(ValueObject.new(nil))
 	self._transparency = self._maid:Add(ValueObject.new(0, "number"))
@@ -103,7 +118,7 @@ function Viewport.blend(props)
 	end)
 end
 
-function Viewport:ObserveTransparency(): Observable.Observable<number>
+function Viewport.ObserveTransparency(self: Viewport): Observable.Observable<number>
 	return self._transparency:Observe()
 end
 
@@ -112,7 +127,7 @@ end
 
 	@param enabled boolean
 ]=]
-function Viewport:SetControlsEnabled(enabled: boolean)
+function Viewport.SetControlsEnabled(self: Viewport, enabled: boolean)
 	assert(type(enabled) == "boolean", "Bad enabled")
 
 	self._controlsEnabled.Value = enabled
@@ -123,7 +138,7 @@ end
 
 	@param transparency number
 ]=]
-function Viewport:SetTransparency(transparency: number)
+function Viewport.SetTransparency(self: Viewport, transparency: number)
 	return self._transparency:Mount(transparency or 0)
 end
 
@@ -132,7 +147,7 @@ end
 
 	@param fieldOfView number
 ]=]
-function Viewport:SetFieldOfView(fieldOfView: number)
+function Viewport.SetFieldOfView(self: Viewport, fieldOfView: number)
 	return self._fieldOfView:Mount(fieldOfView or 20)
 end
 
@@ -148,7 +163,7 @@ end
 
 	@param instance Instance?
 ]=]
-function Viewport:SetInstance(instance: Instance?): () -> ()
+function Viewport.SetInstance(self: Viewport, instance: Instance?): () -> ()
 	self._current:Mount(instance)
 
 	return function()
@@ -162,11 +177,11 @@ end
 	Notifies the viewport of the instance size changing. We don't connect to
 	any events here because the instance can be anything.
 ]=]
-function Viewport:NotifyInstanceSizeChanged()
+function Viewport.NotifyInstanceSizeChanged(self: Viewport)
 	self._notifyInstanceSizeChanged:Fire()
 end
 
-function Viewport:SetYaw(yaw: number, doNotAnimate: boolean?)
+function Viewport.SetYaw(self: Viewport, yaw: number, doNotAnimate: boolean?)
 	yaw = yaw % TAU
 
 	self._rotationYawSpring.Position =
@@ -178,14 +193,14 @@ function Viewport:SetYaw(yaw: number, doNotAnimate: boolean?)
 	end
 end
 
-function Viewport:SetPitch(pitch: number, doNotAnimate: boolean?)
+function Viewport.SetPitch(self: Viewport, pitch: number, doNotAnimate: boolean?)
 	self._rotationPitchSpring.Target = math.clamp(pitch, MIN_PITCH, MAX_PITCH)
 	if doNotAnimate then
 		self._rotationPitchSpring.Position = self._rotationPitchSpring.Target
 	end
 end
 
-function Viewport:RotateBy(deltaV2: Vector2, doNotAnimate: boolean?)
+function Viewport.RotateBy(self: Viewport, deltaV2: Vector2, doNotAnimate: boolean?)
 	self:SetYaw(self._rotationYawSpring.Value + deltaV2.X, doNotAnimate)
 	self:SetPitch(self._rotationPitchSpring.Value + deltaV2.Y, doNotAnimate)
 end
@@ -211,7 +226,7 @@ end
 	@param props { any }
 	@return Observable<ViewportFrame>
 ]=]
-function Viewport:Render(props)
+function Viewport.Render(self: Viewport, props)
 	local currentCamera = ValueObject.new()
 	self._maid:GiveTask(currentCamera)
 
@@ -231,52 +246,52 @@ function Viewport:Render(props)
 		CurrentCamera = currentCamera,
 		-- selene:allow(roblox_incorrect_color3_new_bounds)
 		LightColor = props.LightColor or Color3.new(brightness, brightness, brightness + 0.15),
-		LightDirection = props.LightDirection or lightDirectionCFrame:vectorToWorldSpace(Vector3.new(0, 0, -1)),
+		LightDirection = props.LightDirection or lightDirectionCFrame:VectorToWorldSpace(Vector3.new(0, 0, -1)),
 		Ambient = props.Ambient or Color3.new(ambientBrightness, ambientBrightness, ambientBrightness + 0.15),
 		ImageTransparency = Blend.Computed(
 			props.Transparency or 0,
 			self._transparency,
 			function(propTransparency, selfTransparency)
-				return Math.map(propTransparency, 0, 1, selfTransparency, 1)
+		return Math.map(propTransparency, 0, 1, selfTransparency, 1)
 			end
 		),
 		[Blend.OnChange("AbsoluteSize")] = self._absoluteSize,
 		[Blend.Attached(function(viewport)
-			local controlsMaid = Maid.new()
+		local controlsMaid = Maid.new()
 
-			-- create viewport controls and obey enabled state
-			local viewportControls = ViewportControls.new(viewport, self)
-			controlsMaid:Add(viewportControls)
-			controlsMaid:Add(self._controlsEnabled:Observe():Subscribe(function(controlsEnabled)
-				viewportControls:SetEnabled(controlsEnabled)
-			end))
+		-- create viewport controls and obey enabled state
+		local viewportControls = ViewportControls.new(viewport, self)
+		controlsMaid:Add(viewportControls)
+		controlsMaid:Add(self._controlsEnabled:Observe():Subscribe(function(controlsEnabled)
+			viewportControls:SetEnabled(controlsEnabled)
+		end))
 
-			return controlsMaid
+		return controlsMaid
 		end)] = true,
 		[Blend.Attached(function(viewport)
-			-- custom parenting scheme to ensure we don't call destroy on children
-			local maid = Maid.new()
+		-- custom parenting scheme to ensure we don't call destroy on children
+		local maid = Maid.new()
 
-			local function update()
-				local value = self._current.Value
-				if value then
-					value.Parent = viewport
-				end
+		local function update()
+			local value = self._current.Value
+			if value then
+				value.Parent = viewport
 			end
+		end
 
-			maid:GiveTask(self._current.Changed:Connect(update))
-			update()
+		maid:GiveTask(self._current.Changed:Connect(update))
+		update()
 
-			maid:GiveTask(function()
-				local value = self._current.Value
+		maid:GiveTask(function()
+			local value = self._current.Value
 
-				-- Ensure we don't call :Destroy() on our preview instance.
-				if value then
-					value.Parent = nil
-				end
-			end)
+			-- Ensure we don't call :Destroy() on our preview instance.
+			if value then
+				value.Parent = nil
+			end
+		end)
 
-			return maid
+		return maid
 		end)] = true,
 		[Blend.Children] = {
 			props[Blend.Children],
@@ -294,16 +309,16 @@ function Viewport:Render(props)
 					self._rotationYawSpring:ObserveRenderStepped(),
 					self._rotationPitchSpring:ObserveRenderStepped(),
 					Rx.fromSignal(self._notifyInstanceSizeChanged):Pipe({
-						Rx.defaultsToNil,
+						Rx.defaultsToNil :: any,
 					}),
-					function(inst, absSize, fov, rotationYaw, rotationPitch)
-						if typeof(inst) ~= "Instance" then
-							return CFrame.new()
-						end
+					function(inst: Instance, absSize: Vector2, fov: number, rotationYaw: number, rotationPitch: number)
+		if typeof(inst) ~= "Instance" then
+			return CFrame.new()
+		end
 
-						local aspectRatio = absSize.x / absSize.y
-						local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(inst)
-						if not bbCFrame then
+		local aspectRatio = absSize.X / absSize.Y
+		local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(inst)
+						if not (bbCFrame and bbSize) then
 							return CFrame.new()
 						end
 

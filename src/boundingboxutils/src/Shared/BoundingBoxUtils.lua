@@ -72,7 +72,8 @@ end
 	@return Vector3? -- position
 ]=]
 function BoundingBoxUtils.getChildrenBoundingBox(parent: Instance, relativeTo: CFrame?): (Vector3?, Vector3?)
-	local parts = {}
+	local parts: { BasePart } = {}
+
 	for _, item in parent:GetDescendants() do
 		if item:IsA("BasePart") then
 			table.insert(parts, item)

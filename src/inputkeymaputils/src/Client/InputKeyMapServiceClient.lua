@@ -6,12 +6,12 @@ local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local PseudoLocalize = require("PseudoLocalize")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local InputKeyMapServiceClient = {}
 InputKeyMapServiceClient.ServiceName = "InputKeyMapServiceClient"
 
-function InputKeyMapServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function InputKeyMapServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

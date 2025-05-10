@@ -16,6 +16,7 @@ local AdorneeUtils = require("AdorneeUtils")
 local Maid = require("Maid")
 local IKServiceClient = require("IKServiceClient")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
+local ServiceBag = require("ServiceBag")
 
 local LOOK_NEAR_DISTANCE = 15
 
@@ -23,7 +24,7 @@ local LookAtButtonsClient = setmetatable({}, BaseObject)
 LookAtButtonsClient.ClassName = "LookAtButtonsClient"
 LookAtButtonsClient.__index = LookAtButtonsClient
 
-function LookAtButtonsClient.new(humanoid, serviceBag)
+function LookAtButtonsClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), LookAtButtonsClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

@@ -9,7 +9,7 @@ local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ValueObject = require("ValueObject")
-local _Signal = require("Signal")
+local Signal = require("Signal")
 
 local Counter = setmetatable({}, BaseObject)
 Counter.ClassName = "Counter"
@@ -25,7 +25,7 @@ export type Counter = typeof(setmetatable(
 			@prop Changed Signal.Signal<number>
 			@within Counter
 		]=]
-		Changed: _Signal.Signal<number>,
+		Changed: Signal.Signal<number>,
 	},
 	{} :: typeof({ __index = Counter })
 )) & BaseObject.BaseObject

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	[Observable] utilities for [Cooldown] class.
 	@class RxCooldownUtils
@@ -15,7 +16,7 @@ local RxCooldownUtils = {}
 	@param parent Instance
 	@return Observable<Brio<Cooldown | CooldownClient>>
 ]=]
-function RxCooldownUtils.observeCooldownBrio(cooldownBinder, parent)
+function RxCooldownUtils.observeCooldownBrio(cooldownBinder, parent: Instance)
 	return RxBinderUtils.observeBoundChildClassBrio(cooldownBinder, parent)
 end
 

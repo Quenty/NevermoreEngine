@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Like a rotated camera, except we end up pushing back to a default rotation.
 	This same behavior is seen in Roblox vehicle seats
@@ -11,6 +12,7 @@ local CameraState = require("CameraState")
 local getRotationInXZPlane = require("getRotationInXZPlane")
 local Math = require("Math")
 local SummedCamera = require("SummedCamera")
+local CameraEffectUtils = require("CameraEffectUtils")
 
 local PushCamera = {}
 PushCamera.ClassName = "PushCamera"
@@ -25,24 +27,43 @@ PushCamera.DefaultAngleXZ0 = 0
 PushCamera._lastUpdateTime = -1
 PushCamera.PushBackAfter = 0.5
 
+export type PushCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		AngleX: number,
+		AngleY: number,
+		AngleXZ: number,
+		LastUpdateTime: number,
+		MinX: number,
+		MinY: number,
+		MaxY: number,
+		Rotation: CFrame,
+		CFrame: CFrame,
+		PushBackDelta: number,
+		PercentFaded: number,
+		PercentFadedCurved: number,
+	},
+	{} :: typeof({ __index = PushCamera })
+)) & CameraEffectUtils.CameraEffect
+
 --[=[
 	Constructs a new PushCamera
 	@return PushCamera
 ]=]
-function PushCamera.new()
-	local self = setmetatable({}, PushCamera)
+function PushCamera.new(): PushCamera
+	local self: PushCamera = setmetatable({} :: any, PushCamera)
 
 	return self
 end
 
-function PushCamera:__add(other)
+function PushCamera.__add(self: PushCamera, other)
 	return SummedCamera.new(self, other)
 end
 
 --[=[
 	@param xzrotVector Vector2 -- The delta rotation to apply
 ]=]
-function PushCamera:RotateXY(xzrotVector)
+function PushCamera.RotateXY(self: PushCamera, xzrotVector)
 	self.AngleX = self.AngleX + xzrotVector.x
 	self.AngleY = self.AngleY + xzrotVector.y
 end
@@ -51,29 +72,29 @@ end
 	Prevents the rotation back. You need to call this
 	every frame you want to prevent rotation.
 ]=]
-function PushCamera:StopRotateBack()
+function PushCamera.StopRotateBack(self: PushCamera)
 	self.CFrame = self.CFrame
 end
 
 --[=[
 	Resets to default position automatically
 ]=]
-function PushCamera:Reset()
+function PushCamera.Reset(self: PushCamera)
 	self.LastUpdateTime = 0
 end
 
-function PushCamera:__newindex(index, value)
+function PushCamera.__newindex(self: PushCamera, index, value)
 	if index == "CFrame" then
 		local xzrot = getRotationInXZPlane(value)
-		self.AngleXZ = math.atan2(xzrot.lookVector.x, xzrot.lookVector.z) + math.pi
+		self.AngleXZ = math.atan2(xzrot.LookVector.X, xzrot.LookVector.Z) + math.pi
 
-		local yrot = xzrot:toObjectSpace(value).lookVector.y
+		local yrot = xzrot:ToObjectSpace(value).LookVector.Y
 		self.AngleY = math.asin(yrot)
 	elseif index == "DefaultCFrame" then
 		local xzrot = getRotationInXZPlane(value)
-		self.DefaultAngleXZ0 = math.atan2(xzrot.lookVector.x, xzrot.lookVector.z) + math.pi
+		self.DefaultAngleXZ0 = math.atan2(xzrot.LookVector.X, xzrot.LookVector.Z) + math.pi
 
-		local yrot = xzrot:toObjectSpace(value).lookVector.y
+		local yrot = xzrot:ToObjectSpace(value).LookVector.Y
 		self.AngleY = math.asin(yrot)
 	elseif index == "AngleY" then
 		self._angleY = math.clamp(value, self.MinY, self.MaxY)
@@ -103,7 +124,7 @@ end
 	@prop CameraState CameraState
 	@within PushCamera
 ]=]
-function PushCamera:__index(index)
+function PushCamera.__index(self: PushCamera, index)
 	if index == "CameraState" then
 		local state = CameraState.new()
 		state.CFrame = self.CFrame
@@ -111,7 +132,7 @@ function PushCamera:__index(index)
 	elseif index == "LastUpdateTime" then
 		return self._lastUpdateTime
 	elseif index == "LookVector" then
-		return self.Rotation.lookVector
+		return self.Rotation.LookVector
 	elseif index == "CFrame" then
 		return CFrame.Angles(0, self.AngleXZ, 0) * CFrame.Angles(self.AngleY, 0, 0)
 	elseif index == "AngleY" then

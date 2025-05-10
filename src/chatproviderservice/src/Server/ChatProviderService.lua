@@ -8,23 +8,23 @@ local require = require(script.Parent.loader).load(script)
 local ServerScriptService = game:GetService("ServerScriptService")
 local TextChatService = game:GetService("TextChatService")
 
+local Brio = require("Brio")
 local ChatTagDataUtils = require("ChatTagDataUtils")
 local LocalizedTextUtils = require("LocalizedTextUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local PermissionLevel = require("PermissionLevel")
 local PreferredParentUtils = require("PreferredParentUtils")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
-local _ServiceBag = require("ServiceBag")
 
 local ChatProviderService = {}
 ChatProviderService.ServiceName = "ChatProviderService"
 
-function ChatProviderService:Init(serviceBag: _ServiceBag.ServiceBag)
+function ChatProviderService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -118,7 +118,7 @@ function ChatProviderService:SetAdminTag(chatTagData: ChatTagDataUtils.ChatTagDa
 end
 
 function ChatProviderService:_addObservablePlayerTag(
-	observePlayersBrio: _Observable.Observable<_Brio.Brio<Player>>,
+	observePlayersBrio: Observable.Observable<Brio.Brio<Player>>,
 	chatTagData: ChatTagDataUtils.ChatTagData
 )
 	assert(ChatTagDataUtils.isChatTagData(chatTagData), "Bad chatTagData")

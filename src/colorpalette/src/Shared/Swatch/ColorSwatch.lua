@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides variants of a given color. In painting a swatch contains different shades of the same color.
 	The same idea is here, except we can provide many variants of a color, with different vividness and brightness
@@ -9,23 +10,31 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
 local Blend = require("Blend")
-local LuvColor3Utils = require("LuvColor3Utils")
 local ColorGradeUtils = require("ColorGradeUtils")
-local Rx = require("Rx")
+local LuvColor3Utils = require("LuvColor3Utils")
 local Observable = require("Observable")
+local Rx = require("Rx")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local ColorSwatch = setmetatable({}, BaseObject)
 ColorSwatch.ClassName = "ColorSwatch"
 ColorSwatch.__index = ColorSwatch
 
-function ColorSwatch.new(color, vividness)
-	local self = setmetatable(BaseObject.new(), ColorSwatch)
+export type ColorSwatch = typeof(setmetatable(
+	{} :: {
+		_color: ValueObject.ValueObject<Color3>,
+		_vividness: ValueObject.ValueObject<number>,
+		Changed: Signal.Signal<Color3, Color3>,
+	},
+	{} :: typeof({ __index = ColorSwatch })
+)) & BaseObject.BaseObject
 
-	self._color = ValueObject.new(Color3.new(0, 0, 0))
-	self._maid:GiveTask(self._color)
+function ColorSwatch.new(color: Color3, vividness: number?): ColorSwatch
+	local self: ColorSwatch = setmetatable(BaseObject.new() :: any, ColorSwatch)
 
+	self._color = self._maid:Add(ValueObject.new(Color3.new(0, 0, 0)))
 	self._vividness = self._maid:Add(ValueObject.new(nil))
 
 	self:SetBaseColor(color)
@@ -36,13 +45,16 @@ function ColorSwatch.new(color, vividness)
 	return self
 end
 
-function ColorSwatch:GetGraded(colorGrade: number)
+function ColorSwatch:GetGraded(colorGrade: number): Color3
 	assert(type(colorGrade) == "number", "Bad colorGrade")
 
 	return ColorGradeUtils.getGradedColor(self._color.Value, colorGrade, self._vividness.Value)
 end
 
-function ColorSwatch:ObserveGraded(colorGrade, vividness)
+function ColorSwatch:ObserveGraded(
+	colorGrade: number | Observable.Observable<number>,
+	vividness
+): Observable.Observable<Color3>
 	assert(type(colorGrade) == "number" or Observable.isObservable(colorGrade), "Bad colorGrade")
 
 	local observeColorGrade = Blend.toPropertyObservable(colorGrade) or Rx.of(colorGrade)
@@ -55,59 +67,58 @@ function ColorSwatch:ObserveGraded(colorGrade, vividness)
 	end
 
 	return Rx.combineLatest({
-		colorGrade = observeColorGrade;
-		vividness = observeVividness;
-		baseColor = self:ObserveBaseColor()
+		colorGrade = observeColorGrade,
+		vividness = observeVividness,
+		baseColor = self:ObserveBaseColor(),
 	}):Pipe({
 		Rx.map(function(state)
 			return ColorGradeUtils.getGradedColor(state.baseColor, state.colorGrade, state.vividness)
-		end);
-	})
+		end) :: any,
+	}) :: any
 end
 
-function ColorSwatch:ObserveBaseColor()
+function ColorSwatch:ObserveBaseColor(): Observable.Observable<Color3>
 	return self._color:Observe()
 end
 
-function ColorSwatch:ObserveVividness()
+function ColorSwatch:ObserveVividness(): Observable.Observable<number>
 	return self._vividness:Observe()
 end
 
-function ColorSwatch:GetBaseColor()
+function ColorSwatch:GetBaseColor(): Color3
 	return self._color.Value
 end
 
-function ColorSwatch:GetBaseGrade()
+function ColorSwatch:GetBaseGrade(): number
 	return 100 - LuvColor3Utils.fromColor3(self._color.Value)[3]
 end
 
-function ColorSwatch:ObserveBaseGrade()
+function ColorSwatch:ObserveBaseGrade(): Observable.Observable<number>
 	return self._color:Observe():Pipe({
 		Rx.map(function(color)
 			return 100 - LuvColor3Utils.fromColor3(color)[3]
-		end)
+		end),
 	})
 end
 
-function ColorSwatch:ObserveBaseGradeBetween(low, high)
+function ColorSwatch:ObserveBaseGradeBetween(low: number, high: number): Observable.Observable<number>
 	return self:ObserveBaseGrade():Pipe({
 		Rx.map(function(grade)
 			return math.clamp(grade, low, high)
-		end)
+		end),
 	})
 end
 
-function ColorSwatch:GetVividness()
+function ColorSwatch:GetVividness(): number
 	return self._vividness.Value
 end
 
-function ColorSwatch:SetVividness(vividness)
+function ColorSwatch:SetVividness(vividness: number | Observable.Observable<number> | nil)
 	if type(vividness) == "number" then
 		self._vividness.Value = vividness
 		self._maid._currentVividness = nil
 		return
 	end
-
 
 	local observable = Blend.toPropertyObservable(vividness)
 	if not observable then
@@ -124,7 +135,7 @@ function ColorSwatch:SetVividness(vividness)
 	end)
 end
 
-function ColorSwatch:SetBaseColor(color)
+function ColorSwatch:SetBaseColor(color: Color3 | Observable.Observable<Color3>)
 	if typeof(color) == "Color3" then
 		self._color.Value = color
 		self._maid._currentColor = nil

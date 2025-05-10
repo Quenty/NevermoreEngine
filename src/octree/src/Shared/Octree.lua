@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Octree implementation. An octree is a data structure that allows for quick spatial
 	data queries of static objects. For example, trees can be stored in an octree, and
@@ -51,13 +52,22 @@ local Octree = {}
 Octree.ClassName = "Octree"
 Octree.__index = Octree
 
+export type Octree<T> = typeof(setmetatable(
+	{} :: {
+		_maxRegionSize: { number },
+		_maxDepth: number,
+		_regionHashMap: { [number]: any },
+	},
+	{} :: typeof({ __index = Octree })
+))
+
 --[=[
 	Constructs a new Octree.
 
 	@return Octree<T>
 ]=]
-function Octree.new()
-	local self = setmetatable({}, Octree)
+function Octree.new<T>(): Octree<T>
+	local self: Octree<T> = setmetatable({} :: any, Octree)
 
 	self._maxRegionSize = { 512, 512, 512 } -- these should all be the same number
 	self._maxDepth = 4
@@ -84,7 +94,7 @@ end
 
 	@return { OctreeNode<T> }
 ]=]
-function Octree:GetAllNodes()
+function Octree.GetAllNodes<T>(self: Octree<T>): { OctreeNode.OctreeNode<T> }
 	local options = {}
 
 	for _, regionList in self._regionHashMap do
@@ -116,7 +126,7 @@ end
 	@param object T
 	@return OctreeNode<T>
 ]=]
-function Octree:CreateNode(position: Vector3, object: any)
+function Octree.CreateNode<T>(self: Octree<T>, position: Vector3, object: T): OctreeNode.OctreeNode<T>
 	assert(typeof(position) == "Vector3", "Bad position value")
 	assert(object, "Bad object value")
 
@@ -144,7 +154,7 @@ end
 	@return { T } -- Objects found
 	@return { number } -- Distances squared
 ]=]
-function Octree:RadiusSearch(position: Vector3, radius: number)
+function Octree.RadiusSearch<T>(self: Octree<T>, position: Vector3, radius: number): ({ T }, { number })
 	assert(typeof(position) == "Vector3", "Bad position")
 	assert(type(radius) == "number", "Bad radius")
 
@@ -164,7 +174,12 @@ end
 	@return { any } -- Objects found
 	@return { number } -- Distances squared
 ]=]
-function Octree:KNearestNeighborsSearch(position: Vector3, k: number, radius: number)
+function Octree.KNearestNeighborsSearch<T>(
+	self: Octree<T>,
+	position: Vector3,
+	k: number,
+	radius: number
+): ({ T }, { number })
 	assert(typeof(position) == "Vector3", "Bad position")
 	assert(type(radius) == "number", "Bad radius")
 
@@ -203,12 +218,17 @@ end
 	@param pz number
 	@return OctreeSubregion
 ]=]
-function Octree:GetOrCreateLowestSubRegion(px: number, py: number, pz: number)
+function Octree.GetOrCreateLowestSubRegion<T>(
+	self: Octree<T>,
+	px: number,
+	py: number,
+	pz: number
+): OctreeRegionUtils.OctreeRegion<T>
 	local region = self:_getOrCreateRegion(px, py, pz)
 	return OctreeRegionUtils.getOrCreateSubRegionAtDepth(region, px, py, pz, self._maxDepth)
 end
 
-function Octree:_radiusSearch(px: number, py: number, pz: number, radius: number)
+function Octree._radiusSearch<T>(self: Octree<T>, px: number, py: number, pz: number, radius: number): ({ T }, { number })
 	local objectsFound = {}
 	local nodeDistances2 = {}
 
@@ -240,11 +260,11 @@ function Octree:_radiusSearch(px: number, py: number, pz: number, radius: number
 	return objectsFound, nodeDistances2
 end
 
-function Octree:_getRegion(px: number, py: number, pz: number)
+function Octree._getRegion<T>(self: Octree<T>, px: number, py: number, pz: number): OctreeRegionUtils.OctreeRegion<T>?
 	return OctreeRegionUtils.findRegion(self._regionHashMap, self._maxRegionSize, px, py, pz)
 end
 
-function Octree:_getOrCreateRegion(px: number, py: number, pz: number)
+function Octree._getOrCreateRegion<T>(self: Octree<T>, px: number, py: number, pz: number): OctreeRegionUtils.OctreeRegion<T>
 	return OctreeRegionUtils.getOrCreateRegion(self._regionHashMap, self._maxRegionSize, px, py, pz)
 end
 

@@ -8,9 +8,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Maid = require("Maid")
+local Promise = require("Promise")
 local RemotingRealms = require("RemotingRealms")
-local _Maid = require("Maid")
-local _Promise = require("Promise")
 
 local RemotingMember = {}
 RemotingMember.ClassName = "RemotingMember"
@@ -56,7 +56,7 @@ end
 	@param callback function
 	@return MaidTask
 ]=]
-function RemotingMember.Bind(self: RemotingMember, callback: (...any) -> ...any): _Maid.Maid
+function RemotingMember.Bind(self: RemotingMember, callback: (...any) -> ...any): Maid.Maid
 	assert(type(callback) == "function", "Bad callback")
 
 	return self._remoting:Bind(self._memberName, callback)
@@ -110,7 +110,7 @@ end
 	@client
 	@param ... any
 ]=]
-function RemotingMember.InvokeServer(self: RemotingMember, ...): _Promise.Promise<...any>
+function RemotingMember.InvokeServer(self: RemotingMember, ...): Promise.Promise<...any>
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "InvokeServer must be called on client")
 
 	return self._remoting:InvokeServer(self._memberName, ...)
@@ -122,7 +122,7 @@ end
 	@client
 	@param ... any
 ]=]
-function RemotingMember.PromiseInvokeServer(self: RemotingMember, ...): _Promise.Promise<...any>
+function RemotingMember.PromiseInvokeServer(self: RemotingMember, ...): Promise.Promise<...any>
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "PromiseInvokeServer must be called on client")
 
 	return self._remoting:PromiseInvokeServer(self._memberName, ...)
@@ -135,7 +135,7 @@ end
 	@param ... any
 	@return Promise
 ]=]
-function RemotingMember.PromiseFireServer(self: RemotingMember, ...): _Promise.Promise<...any>
+function RemotingMember.PromiseFireServer(self: RemotingMember, ...): Promise.Promise<...any>
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "PromiseInvokeServer must be called on client")
 
 	return self._remoting:PromiseFireServer(self._memberName, ...)
@@ -151,7 +151,7 @@ end
 	@param ... any
 	@return Promise<any>
 ]=]
-function RemotingMember.PromiseInvokeClient(self: RemotingMember, player: Player, ...): _Promise.Promise<...any>
+function RemotingMember.PromiseInvokeClient(self: RemotingMember, player: Player, ...): Promise.Promise<...any>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self._remotingRealm == RemotingRealms.SERVER, "PromiseInvokeClient must be called on client")
 

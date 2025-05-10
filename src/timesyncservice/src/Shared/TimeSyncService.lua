@@ -10,10 +10,12 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local BaseClock = require("BaseClock")
 local GetRemoteEvent = require("GetRemoteEvent")
 local GetRemoteFunction = require("GetRemoteFunction")
 local Maid = require("Maid")
 local MasterClock = require("MasterClock")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local PromiseGetRemoteFunction = require("PromiseGetRemoteFunction")
@@ -22,12 +24,11 @@ local Rx = require("Rx")
 local SlaveClock = require("SlaveClock")
 local TimeSyncConstants = require("TimeSyncConstants")
 local TimeSyncUtils = require("TimeSyncUtils")
-local _Observable = require("Observable")
 
 local TimeSyncService = {}
 TimeSyncService.ServiceName = "TimeSyncService"
 
-export type SyncedClock = MasterClock.MasterClock | SlaveClock.SlaveClock
+export type SyncedClock = BaseClock.BaseClock
 
 export type TimeSyncService = typeof(setmetatable(
 	{} :: {
@@ -75,6 +76,32 @@ function TimeSyncService.IsSynced(self: TimeSyncService): boolean
 	return self._clockPromise:IsFulfilled()
 end
 
+local function buildMockClock(): SyncedClock
+	local mock = {}
+
+	function mock.IsSynced(_this: SyncedClock): boolean
+		return true
+	end
+
+	function mock.GetTime(_this: SyncedClock): number
+		return tick()
+	end
+
+	function mock.GetPing(_this: SyncedClock): number
+		return 0
+	end
+
+	function mock.GetClockFunction(_this: SyncedClock): BaseClock.ClockFunction
+		return tick
+	end
+
+	function mock.ObservePing(_this: SyncedClock): Observable.Observable<number>
+		return Rx.of(0) :: any
+	end
+
+	return mock
+end
+
 --[=[
 	Waits for the synced clock, or throws an error.
 
@@ -83,7 +110,7 @@ end
 ]=]
 function TimeSyncService.WaitForSyncedClock(self: TimeSyncService): SyncedClock
 	if not RunService:IsRunning() then
-		return self:_buildMockClock()
+		return buildMockClock()
 	end
 
 	assert(self._clockPromise, "TimeSyncService is not initialized")
@@ -97,7 +124,7 @@ end
 ]=]
 function TimeSyncService.GetSyncedClock(self: TimeSyncService): SyncedClock?
 	if not RunService:IsRunning() then
-		return self:_buildMockClock()
+		return buildMockClock()
 	end
 
 	assert(self._clockPromise, "TimeSyncService is not initialized")
@@ -115,34 +142,17 @@ end
 ]=]
 function TimeSyncService.PromiseSyncedClock(self: TimeSyncService): Promise.Promise<SyncedClock>
 	if not RunService:IsRunning() then
-		return Promise.resolved(self:_buildMockClock())
+		return Promise.resolved(buildMockClock())
 	end
 
 	assert(self._clockPromise, "TimeSyncService is not initialized")
 	return Promise.resolved(self._clockPromise)
 end
 
-function TimeSyncService.ObserveSyncedClock(self: TimeSyncService): _Observable.Observable<SyncedClock>
+function TimeSyncService.ObserveSyncedClock(self: TimeSyncService): Observable.Observable<SyncedClock>
 	return Rx.fromPromise(self:PromiseSyncedClock()) :: any
 end
 
-function TimeSyncService._buildMockClock(_self: TimeSyncService): any
-	local mock = {}
-
-	function mock.IsSynced(_self)
-		return true
-	end
-
-	function mock.GetTime(_self)
-		return tick()
-	end
-
-	function mock.GetPing(_self)
-		return 0
-	end
-
-	return mock
-end
 
 function TimeSyncService._buildMasterClock(self: TimeSyncService): MasterClock.MasterClock
 	local remoteEvent = GetRemoteEvent(TimeSyncConstants.REMOTE_EVENT_NAME)

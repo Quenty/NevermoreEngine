@@ -11,6 +11,7 @@ local PlayerDataStoreService = require("PlayerDataStoreService")
 local DataStoreStringUtils = require("DataStoreStringUtils")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local PlayerBinder = require("PlayerBinder")
+local ServiceBag = require("ServiceBag")
 
 local PlayerHasSettings = setmetatable({}, BaseObject)
 PlayerHasSettings.ClassName = "PlayerHasSettings"
@@ -18,7 +19,7 @@ PlayerHasSettings.__index = PlayerHasSettings
 
 export type PlayerHasSettings = typeof(setmetatable(
 	{} :: {
-		_serviceBag: any,
+		_serviceBag: ServiceBag.ServiceBag,
 		_playerSettingsBinder: PlayerSettings.PlayerSettings,
 		_playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService,
 	},

@@ -4,18 +4,18 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
-local SecretsServiceConstants = require("SecretsServiceConstants")
-local GetRemoteFunction = require("GetRemoteFunction")
-local Promise = require("Promise")
-local Observable = require("Observable")
 local EllipticCurveCryptography = require("EllipticCurveCryptography")
-local _ServiceBag = require("ServiceBag")
+local GetRemoteFunction = require("GetRemoteFunction")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Promise = require("Promise")
+local SecretsServiceConstants = require("SecretsServiceConstants")
+local ServiceBag = require("ServiceBag")
 
 local SecretsService = {}
 SecretsService.ServiceName = "SecretsService"
 
-function SecretsService:Init(serviceBag: _ServiceBag.ServiceBag)
+function SecretsService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -40,7 +40,7 @@ end
 
 	@param seed number
 ]=]
-function SecretsService:SetPublicKeySeed(seed: number)
+function SecretsService:SetPublicKeySeed(seed: number): ()
 	assert(type(seed) == "number", "Bad seed")
 
 	local private, public = EllipticCurveCryptography.keypair(seed or EllipticCurveCryptography.random.random())
@@ -65,7 +65,7 @@ end
 	@param secretKey string
 	@return Promise<string>
 ]=]
-function SecretsService:PromiseSecret(secretKey: string)
+function SecretsService:PromiseSecret(secretKey: string): Promise.Promise<string>
 	assert(type(secretKey) == "string", "Bad secretKey")
 
 	return self:_promiseSubstore():Then(function(substore)
@@ -164,7 +164,7 @@ end
 	@param secretKey string
 	@param value string
 ]=]
-function SecretsService:StoreSecret(secretKey: string, value: string)
+function SecretsService:StoreSecret(secretKey: string, value: string): ()
 	assert(type(secretKey) == "string", "Bad secretKey")
 	assert(type(value) == "string", "Bad value")
 
@@ -206,7 +206,7 @@ function SecretsService:PromiseSecretKeyNamesList(): Promise.Promise<{ string }>
 	end)
 end
 
-function SecretsService:_warnAboutNoPublicKeyStoredInSourceCode()
+function SecretsService:_warnAboutNoPublicKeyStoredInSourceCode(): ()
 	if self._warningRequired then
 		self._warningRequired = false
 		warn(self:_getInstructions())
@@ -257,7 +257,8 @@ function SecretsService:_handleServerInvoke(player, request)
 end
 
 function SecretsService:_promiseHandleList(player)
-	return self._permissionsService:PromisePermissionProvider()
+	return self._permissionsService
+		:PromisePermissionProvider()
 		:Then(function(provider)
 			return provider:PromiseIsAdmin(player)
 		end)
@@ -275,7 +276,8 @@ function SecretsService:_promiseSubstore()
 		return self._substorePromise
 	end
 
-	self._substorePromise = self._maid:GivePromise(self._gameDataStoreService:PromiseDataStore())
+	self._substorePromise = self._maid
+		:GivePromise(self._gameDataStoreService:PromiseDataStore())
 		:Then(function(dataStore)
 			return dataStore:GetSubStore("secrets")
 		end)

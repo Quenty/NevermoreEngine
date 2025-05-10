@@ -5,11 +5,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Rx = require("Rx")
 local Blend = require("Blend")
-local Observable = require("Observable")
-local ValueObject = require("ValueObject")
 local ColorGradeUtils = require("ColorGradeUtils")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local ValueObject = require("ValueObject")
 
 local ColorGradePalette = setmetatable({}, BaseObject)
 ColorGradePalette.ClassName = "ColorGradePalette"

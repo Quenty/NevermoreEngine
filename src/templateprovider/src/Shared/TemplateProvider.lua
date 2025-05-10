@@ -60,7 +60,7 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local String = require("String")
 local TemplateReplicationModes = require("TemplateReplicationModes")
 local TemplateReplicationModesUtils = require("TemplateReplicationModesUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local TOMBSTONE_ID_ATTRIBUTE = "UnreplicatedTemplateId"
 local TOMBSTONE_NAME_POSTFIX_UNLOADED = "_Unloaded"
@@ -79,7 +79,7 @@ export type TemplateDeclaration = Instance | Observable.Observable<Brio.Brio<Ins
 
 export type TemplateProvider = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_initialTemplates: TemplateDeclaration,
 		_maid: Maid.Maid,
 		_templateMapList: any, -- ObservableMapList.ObservableMapList<Instance>,
@@ -136,7 +136,7 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function TemplateProvider.Init(self: TemplateProvider, serviceBag: _ServiceBag.ServiceBag)
+function TemplateProvider.Init(self: TemplateProvider, serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

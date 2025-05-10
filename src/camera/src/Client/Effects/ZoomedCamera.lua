@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Allow freedom of movement around a current place, much like the classic script works now.
 	Not intended to be use with the current character script
@@ -19,6 +20,7 @@ local require = require(script.Parent.loader).load(script)
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
+local CameraEffectUtils = require("CameraEffectUtils")
 
 local ZoomedCamera = {}
 ZoomedCamera.ClassName = "ZoomedCamera"
@@ -26,17 +28,32 @@ ZoomedCamera._maxZoom = 100
 ZoomedCamera._minZoom = 0.5
 ZoomedCamera._zoom = 10
 
-function ZoomedCamera.new()
-	local self = setmetatable({}, ZoomedCamera)
+export type ZoomedCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		Zoom: number,
+		MaxZoom: number,
+		MinZoom: number,
+
+		-- Private
+		_zoom: number,
+		_maxZoom: number,
+		_minZoom: number,
+	},
+	{} :: typeof({ __index = ZoomedCamera })
+)) & CameraEffectUtils.CameraEffect
+
+function ZoomedCamera.new(): ZoomedCamera
+	local self: ZoomedCamera = setmetatable({} :: any, ZoomedCamera)
 
 	return self
 end
 
-function ZoomedCamera:__add(other)
+function ZoomedCamera.__add(self: ZoomedCamera, other: CameraEffectUtils.CameraEffect): SummedCamera.SummedCamera
 	return SummedCamera.new(self, other)
 end
 
-function ZoomedCamera:ZoomIn(value, min, max)
+function ZoomedCamera.ZoomIn(self: ZoomedCamera, value: number, min: number?, max: number?)
 	if min or max then
 		self.Zoom = self.Zoom - math.clamp(value, min or -math.huge, max or math.huge)
 	else
@@ -44,7 +61,7 @@ function ZoomedCamera:ZoomIn(value, min, max)
 	end
 end
 
-function ZoomedCamera:__newindex(index, value)
+function ZoomedCamera.__newindex(self: ZoomedCamera, index, value)
 	if index == "Zoom" or index == "TargetZoom" then
 		self._zoom = math.clamp(value, self.MinZoom, self.MaxZoom)
 	elseif index == "MaxZoom" then
@@ -62,7 +79,7 @@ function ZoomedCamera:__newindex(index, value)
 	end
 end
 
-function ZoomedCamera:__index(index)
+function ZoomedCamera.__index(self: ZoomedCamera, index)
 	if index == "CameraState" then
 		local state = CameraState.new()
 		state.Position = Vector3.new(0, 0, self.Zoom)

@@ -10,9 +10,9 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local BaseObject = require("BaseObject")
-local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local DeathReportUtils = require("DeathReportUtils")
-local _Observable = require("Observable")
+local Observable = require("Observable")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 
 local DeathReportProcessor = setmetatable({}, BaseObject)
 DeathReportProcessor.ClassName = "DeathReportProcessor"
@@ -57,7 +57,7 @@ end
 function DeathReportProcessor.ObservePlayerKillerReports(
 	self: DeathReportProcessor,
 	player: Player
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._playerKillerSubTable:Observe(player)
@@ -72,7 +72,7 @@ end
 function DeathReportProcessor.ObservePlayerDeathReports(
 	self: DeathReportProcessor,
 	player: Player
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._playerDeathSubTable:Observe(player)
@@ -87,7 +87,7 @@ end
 function DeathReportProcessor.ObserveHumanoidDeathReports(
 	self: DeathReportProcessor,
 	humanoid: Humanoid
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._humanoidDeathSubTable:Observe(humanoid)
@@ -102,7 +102,7 @@ end
 function DeathReportProcessor.ObserveHumanoidKillerReports(
 	self: DeathReportProcessor,
 	humanoid: Humanoid
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._humanoidKillerSubTable:Observe(humanoid)
@@ -117,7 +117,7 @@ end
 function DeathReportProcessor.ObserveCharacterKillerReports(
 	self: DeathReportProcessor,
 	character: Model
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	return self._characterKillerSubTable:Observe(character)
@@ -132,7 +132,7 @@ end
 function DeathReportProcessor.ObserveCharacterDeathReports(
 	self: DeathReportProcessor,
 	character: Model
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	return self._characterDeathSubTable:Observe(character)

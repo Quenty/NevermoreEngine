@@ -9,7 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local RxClippedRectUtils = {}
 
@@ -25,7 +25,7 @@ type State = {
 	@param gui Gui
 	@return Observable<Rect>
 ]=]
-function RxClippedRectUtils.observeClippedRect(gui: GuiObject): _Observable.Observable<Rect>
+function RxClippedRectUtils.observeClippedRect(gui: GuiObject): Observable.Observable<Rect>
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad GuiBase2d")
 
 	-- At least use our object's size here...
@@ -61,7 +61,7 @@ type ClippedRectState = {
 	@param gui Gui
 	@return Observable<Rect>
 ]=]
-function RxClippedRectUtils.observeClippedRectInScale(gui: GuiObject): _Observable.Observable<Rect>
+function RxClippedRectUtils.observeClippedRectInScale(gui: GuiObject): Observable.Observable<Rect>
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad GuiBase2d")
 
 	return Rx.combineLatest({
@@ -89,7 +89,7 @@ function RxClippedRectUtils.observeClippedRectInScale(gui: GuiObject): _Observab
 	}) :: any
 end
 
-function RxClippedRectUtils._observeClippedRectImpl(gui: GuiObject): _Observable.Observable<Rect>
+function RxClippedRectUtils._observeClippedRectImpl(gui: GuiObject): Observable.Observable<Rect>
 	if gui:IsA("GuiObject") then
 		return RxInstanceUtils.observeProperty(gui, "ClipsDescendants"):Pipe({
 			Rx.switchMap(function(clipDescendants)
@@ -153,7 +153,7 @@ function RxClippedRectUtils._computeClippedRect(state: State): Rect
 	return Rect.new(topLeftX, topLeftY, topLeftX + sizeX, topLeftY + sizeY)
 end
 
-function RxClippedRectUtils._observeParentClippedRect(gui: GuiBase2d): _Observable.Observable<Rect?>
+function RxClippedRectUtils._observeParentClippedRect(gui: GuiBase2d): Observable.Observable<Rect?>
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiBase2d"), "Bad GuiBase2d")
 
 	return RxInstanceUtils.observeFirstAncestor(gui, "GuiObject"):Pipe({

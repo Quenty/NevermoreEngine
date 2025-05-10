@@ -37,8 +37,8 @@ end
 	@param player Player
 	@return Observable<Model>
 ]=]
-function RxCharacterUtils.observeCharacter(player: Player): Observable.Observable<Model>
-	return RxInstanceUtils.observeProperty(player, "Character")
+function RxCharacterUtils.observeCharacter(player: Player): Observable.Observable<Model?>
+	return RxInstanceUtils.observeProperty(player, "Character") :: any
 end
 
 --[=[
@@ -92,8 +92,8 @@ end
 function RxCharacterUtils.observeIsOfLocalCharacterBrio(instance: Instance): Observable.Observable<Brio.Brio<boolean>>
 	return RxCharacterUtils.observeIsOfLocalCharacter(instance):Pipe({
 		RxBrioUtils.switchToBrio(function(value)
-			return value
-		end),
+		return value
+		end) :: any,
 	}) :: any
 end
 

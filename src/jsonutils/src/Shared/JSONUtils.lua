@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods for JSON
 	@class JSONUtils
@@ -58,7 +59,7 @@ end
 	@param str string
 	@return Promise<table>
 ]=]
-function JSONUtils.promiseJSONDecode(str: string)
+function JSONUtils.promiseJSONDecode(str: string): Promise.Promise<unknown>
 	if type(str) ~= "string" then
 		return Promise.rejected("Not a string")
 	end

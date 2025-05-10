@@ -62,9 +62,9 @@ end
 	@param attributeName string
 	@param predicate function | nil
 	@param cancelToken CancelToken
-	@return Promise<any>
+	@return Promise<unknown>
 ]=]
-function AttributeUtils.promiseAttribute(instance: Instance, attributeName: string, predicate, cancelToken)
+function AttributeUtils.promiseAttribute(instance: Instance, attributeName: string, predicate, cancelToken: CancelToken.CancelToken?): Promise.Promise<unknown>
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
 	assert(CancelToken.isCancelToken(cancelToken) or cancelToken == nil, "Bad cancelToken")

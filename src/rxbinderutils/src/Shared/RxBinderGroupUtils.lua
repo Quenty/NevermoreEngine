@@ -9,6 +9,7 @@ local RxBinderUtils = require("RxBinderUtils")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Rx = require("Rx")
+local BinderGroup = require("BinderGroup")
 
 local RxBinderGroupUtils = {}
 
@@ -17,7 +18,7 @@ local RxBinderGroupUtils = {}
 	@param binderGroup BinderGroup<T>
 	@return Observable<Binder<T>>
 ]=]
-function RxBinderGroupUtils.observeBinders(binderGroup)
+function RxBinderGroupUtils.observeBinders(binderGroup: BinderGroup.BinderGroup)
 	assert(type(binderGroup) == "table", "Bad binderGroup")
 
 	return Observable.new(function(sub)

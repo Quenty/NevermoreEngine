@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Realms sort of have to be a first class citizen...
 

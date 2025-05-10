@@ -7,16 +7,16 @@
 local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
+local DuckTypeUtils = require("DuckTypeUtils")
+local ListIndexUtils = require("ListIndexUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local RxBrioUtils = require("RxBrioUtils")
 local Signal = require("Signal")
+local SortFunctionUtils = require("SortFunctionUtils")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
-local DuckTypeUtils = require("DuckTypeUtils")
-local ListIndexUtils = require("ListIndexUtils")
-local _SortFunctionUtils = require("SortFunctionUtils")
 
 local ObservableList = {}
 ObservableList.ClassName = "ObservableList"
@@ -28,8 +28,8 @@ export type ObservableList<T> = typeof(setmetatable(
 		_keyList: { Symbol.Symbol },
 		_contents: { [Symbol.Symbol]: T },
 		_indexes: { [Symbol.Symbol]: number },
-		_indexObservers: any; -- ObservableSubscriptionTable.ObservableSubscriptionTable<T?>,
-		_keyIndexObservables: any; -- ObservableSubscriptionTable.ObservableSubscriptionTable<number?>,
+		_indexObservers: any, -- ObservableSubscriptionTable.ObservableSubscriptionTable<T?>,
+		_keyIndexObservables: any, -- ObservableSubscriptionTable.ObservableSubscriptionTable<number?>,
 		_countValue: ValueObject.ValueObject<number>,
 
 		--[=[
@@ -123,7 +123,7 @@ end
 
 	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
 ]=]
-function ObservableList.__iter<T>(self: ObservableList<T>): _SortFunctionUtils.WrappedIterator<number, T>
+function ObservableList.__iter<T>(self: ObservableList<T>): SortFunctionUtils.WrappedIterator<number, T>
 	return coroutine.wrap(function()
 		for index, value in self._keyList do
 			coroutine.yield(index, self._contents[value])
@@ -216,8 +216,8 @@ function ObservableList.ObserveAtIndexBrio<T>(
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
 
 	return self:ObserveAtIndex(indexToObserve):Pipe({
-		RxBrioUtils.toBrio(),
-		RxBrioUtils.onlyLastBrioSurvives(),
+		RxBrioUtils.toBrio() :: any,
+		RxBrioUtils.onlyLastBrioSurvives() :: any,
 	}) :: any
 end
 

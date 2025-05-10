@@ -137,7 +137,7 @@ function RxTeamUtils.observePlayersForTeamColorBrio(teamColor: BrickColor): Obse
 		-- with the same color so no great solution here.
 		RxBrioUtils.switchMapBrio(function(team)
 			return RxTeamUtils.observePlayersForTeamBrio(team)
-		end),
+		end) :: any,
 	}) :: any
 end
 

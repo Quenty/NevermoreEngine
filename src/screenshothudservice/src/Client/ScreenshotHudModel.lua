@@ -8,7 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
 local Signal = require("Signal")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local ScreenshotHudModel = setmetatable({}, BaseObject)
 ScreenshotHudModel.ClassName = "ScreenshotHudModel"
@@ -68,7 +68,7 @@ end
 	Observes close button visiblity
 	@return Observable<boolean>
 ]=]
-function ScreenshotHudModel.ObserveCloseButtonVisible(self: ScreenshotHudModel): _Observable.Observable<boolean>
+function ScreenshotHudModel.ObserveCloseButtonVisible(self: ScreenshotHudModel): Observable.Observable<boolean>
 	return self._closeButtonVisible:Observe()
 end
 
@@ -86,7 +86,7 @@ end
 	Observes camera button visiblity
 	@return Observable<boolean>
 ]=]
-function ScreenshotHudModel.ObserveCameraButtonVisible(self: ScreenshotHudModel): _Observable.Observable<boolean>
+function ScreenshotHudModel.ObserveCameraButtonVisible(self: ScreenshotHudModel): Observable.Observable<boolean>
 	return self._cameraButtonVisible:Observe()
 end
 
@@ -133,7 +133,7 @@ end
 	Observes the close button's position
 	@return Observable<UDim2>
 ]=]
-function ScreenshotHudModel.ObserveCloseButtonPosition(self: ScreenshotHudModel): _Observable.Observable<UDim2>
+function ScreenshotHudModel.ObserveCloseButtonPosition(self: ScreenshotHudModel): Observable.Observable<UDim2>
 	return self._closeButtonPosition:Observe()
 end
 
@@ -151,7 +151,7 @@ end
 	Observes the camera button's position
 	@return Observable<UDim2>
 ]=]
-function ScreenshotHudModel.ObserveCameraButtonPosition(self: ScreenshotHudModel): _Observable.Observable<UDim2>
+function ScreenshotHudModel.ObserveCameraButtonPosition(self: ScreenshotHudModel): Observable.Observable<UDim2>
 	return self._cameraButtonPosition:Observe()
 end
 
@@ -169,7 +169,7 @@ end
 	Observes the overlay font
 	@return Observable<Enum.Font>
 ]=]
-function ScreenshotHudModel.ObserveOverlayFont(self: ScreenshotHudModel): _Observable.Observable<Enum.Font>
+function ScreenshotHudModel.ObserveOverlayFont(self: ScreenshotHudModel): Observable.Observable<Enum.Font>
 	return self._overlayFont:Observe()
 end
 
@@ -189,7 +189,7 @@ end
 
 	@return Observable<string>
 ]=]
-function ScreenshotHudModel.ObserveCameraButtonIcon(self: ScreenshotHudModel): _Observable.Observable<string>
+function ScreenshotHudModel.ObserveCameraButtonIcon(self: ScreenshotHudModel): Observable.Observable<string>
 	return self._cameraButtonIcon:Observe()
 end
 
@@ -216,7 +216,7 @@ end
 	Observes whether a screenshot is taken
 	@return Observable<boolean>
 ]=]
-function ScreenshotHudModel.ObserveCloseWhenScreenshotTaken(self: ScreenshotHudModel): _Observable.Observable<boolean>
+function ScreenshotHudModel.ObserveCloseWhenScreenshotTaken(self: ScreenshotHudModel): Observable.Observable<boolean>
 	return self._closeWhenScreenshotTaken:Observe()
 end
 
@@ -239,7 +239,7 @@ end
 ]=]
 function ScreenshotHudModel.ObserveExperienceNameOverlayEnabled(
 	self: ScreenshotHudModel
-): _Observable.Observable<boolean>
+): Observable.Observable<boolean>
 	return self._experienceNameOverlayEnabled:Observe()
 end
 
@@ -257,7 +257,7 @@ end
 	Observes whether the username name overlay is enabled
 	@return Observable<boolean>
 ]=]
-function ScreenshotHudModel.ObserveUsernameOverlayEnabled(self: ScreenshotHudModel): _Observable.Observable<boolean>
+function ScreenshotHudModel.ObserveUsernameOverlayEnabled(self: ScreenshotHudModel): Observable.Observable<boolean>
 	return self._usernameOverlayEnabled:Observe()
 end
 
@@ -265,7 +265,7 @@ end
 	Observes whilet he model is visible
 	@return Observable<boolean>
 ]=]
-function ScreenshotHudModel.ObserveVisible(self: ScreenshotHudModel): _Observable.Observable<boolean>
+function ScreenshotHudModel.ObserveVisible(self: ScreenshotHudModel): Observable.Observable<boolean>
 	return self._visible:Observe()
 end
 

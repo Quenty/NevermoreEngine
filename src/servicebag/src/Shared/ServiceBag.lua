@@ -30,10 +30,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
 local BaseObject = require("BaseObject")
 local ServiceInitLogger = require("ServiceInitLogger")
-local _Maid = require("Maid")
+local Signal = require("Signal")
 
 --[=[
 	@interface Service

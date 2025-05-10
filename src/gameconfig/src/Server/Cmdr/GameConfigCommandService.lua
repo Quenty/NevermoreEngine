@@ -10,12 +10,12 @@ local TeleportService = game:GetService("TeleportService")
 local GameConfigCmdrUtils = require("GameConfigCmdrUtils")
 local BadgeUtils = require("BadgeUtils")
 local PlayerUtils = require("PlayerUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigCommandService = {}
 GameConfigCommandService.ServiceName = "GameConfigCommandService"
 
-function GameConfigCommandService:Init(serviceBag: _ServiceBag.ServiceBag)
+function GameConfigCommandService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

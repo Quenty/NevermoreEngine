@@ -12,7 +12,7 @@ local LocalizedTextUtils = require("LocalizedTextUtils")
 local PlayerBinder = require("PlayerBinder")
 local String = require("String")
 local BinderUtils = require("BinderUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local HasChatTags = setmetatable({}, HasChatTagsBase)
 HasChatTags.ClassName = "HasChatTags"
@@ -26,7 +26,7 @@ export type HasChatTags = typeof(setmetatable(
 	{} :: typeof({ __index = HasChatTags })
 )) & HasChatTagsBase.HasChatTagsBase
 
-function HasChatTags.new(player: Player, serviceBag: _ServiceBag.ServiceBag): HasChatTags
+function HasChatTags.new(player: Player, serviceBag: ServiceBag.ServiceBag): HasChatTags
 	local self: HasChatTags = setmetatable(HasChatTagsBase.new(player) :: any, HasChatTags)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

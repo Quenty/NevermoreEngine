@@ -35,6 +35,7 @@ export type SpringClock = () -> number
 export type Spring<T> = typeof(setmetatable(
 	{} :: {
 		Position: T,
+		Value: T,
 		Velocity: T,
 		Target: T,
 		Damper: number,

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Holds undo state
 	@class UndoStackEntry
@@ -15,13 +16,25 @@ local UndoStackEntry = setmetatable({}, BaseObject)
 UndoStackEntry.ClassName = "UndoStackEntry"
 UndoStackEntry.__index = UndoStackEntry
 
+export type ExecuteUndo = (Maid.Maid) -> Promise.Promise<()> | any
+export type ExecuteRedo = (Maid.Maid) -> Promise.Promise<()> | any
+
+export type UndoStackEntry = typeof(setmetatable(
+	{} :: {
+		Destroying: Signal.Signal<()>,
+		_promiseUndo: ExecuteUndo?,
+		_promiseRedo: ExecuteRedo?,
+	},
+	{} :: typeof({ __index = UndoStackEntry })
+)) & BaseObject.BaseObject
+
 --[=[
 	Constructs a new undo restack entry. See [UndoStack] for usage.
 
 	@return UndoStackEntry
 ]=]
-function UndoStackEntry.new()
-	local self = setmetatable(BaseObject.new(), UndoStackEntry)
+function UndoStackEntry.new(): UndoStackEntry
+	local self: UndoStackEntry = setmetatable(BaseObject.new() :: any, UndoStackEntry)
 
 	self.Destroying = Signal.new()
 	self._maid:GiveTask(function()
@@ -47,7 +60,7 @@ end
 
 	@param promiseUndo function | nil
 ]=]
-function UndoStackEntry:SetPromiseUndo(promiseUndo)
+function UndoStackEntry.SetPromiseUndo(self: UndoStackEntry, promiseUndo: ExecuteUndo)
 	assert(type(promiseUndo) == "function" or promiseUndo == nil, "Bad promiseUndo")
 
 	self._promiseUndo = promiseUndo
@@ -58,7 +71,7 @@ end
 
 	@param promiseRedo function | nil
 ]=]
-function UndoStackEntry:SetPromiseRedo(promiseRedo)
+function UndoStackEntry.SetPromiseRedo(self: UndoStackEntry, promiseRedo: ExecuteRedo)
 	assert(type(promiseRedo) == "function" or promiseRedo == nil, "Bad promiseRedo")
 
 	self._promiseRedo = promiseRedo
@@ -68,7 +81,7 @@ end
 	Returns true if this entry can be undone
 	@return boolean
 ]=]
-function UndoStackEntry:HasUndo()
+function UndoStackEntry.HasUndo(self: UndoStackEntry): boolean
 	return self._promiseUndo ~= nil
 end
 
@@ -76,7 +89,7 @@ end
 	Returns true if this entry can be redone
 	@return boolean
 ]=]
-function UndoStackEntry:HasRedo()
+function UndoStackEntry.HasRedo(self: UndoStackEntry): boolean
 	return self._promiseRedo ~= nil
 end
 
@@ -86,14 +99,15 @@ end
 	@param maid Maid
 	@return Promise
 ]=]
-function UndoStackEntry:PromiseUndo(maid)
+function UndoStackEntry.PromiseUndo(self: UndoStackEntry, maid: Maid.Maid): Promise.Promise<()>
 	assert(Maid.isMaid(maid), "Bad maid")
 
-	if not self._promiseUndo then
+	local promiseUndo = self._promiseUndo
+	if not promiseUndo then
 		return Promise.resolved()
 	end
 
-	local result = maid:GivePromise(self._promiseUndo(maid))
+	local result = maid:GivePromise(promiseUndo(maid))
 	if Promise.isPromise(result) then
 		return result
 	else
@@ -107,14 +121,15 @@ end
 	@param maid Maid
 	@return Promise
 ]=]
-function UndoStackEntry:PromiseRedo(maid)
+function UndoStackEntry.PromiseRedo(self: UndoStackEntry, maid: Maid.Maid): Promise.Promise<()>
 	assert(Maid.isMaid(maid), "Bad maid")
 
-	if not self._promiseUndo then
+	local promiseRedo = self._promiseRedo
+	if not promiseRedo then
 		return Promise.resolved()
 	end
 
-	local result = maid:GivePromise(self._promiseRedo(maid))
+	local result = maid:GivePromise(promiseRedo(maid))
 	if Promise.isPromise(result) then
 		return result
 	else

@@ -50,7 +50,7 @@ end
 	@param className string
 	@return RobloxApiClass
 ]=]
-function RobloxApiDump:PromiseClass(className: string)
+function RobloxApiDump:PromiseClass(className: string): Promise.Promise<RobloxApiClass.RobloxApiClass>
 	assert(type(className) == "string", "Bad className")
 
 	if self._classPromises[className] then
@@ -69,7 +69,7 @@ end
 	@param className string
 	@return { RobloxApiMember }
 ]=]
-function RobloxApiDump:PromiseMembers(className: string)
+function RobloxApiDump:PromiseMembers(className: string): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
 	assert(type(className) == "string", "Bad className")
 
 	if self._classMemberPromises[className] then

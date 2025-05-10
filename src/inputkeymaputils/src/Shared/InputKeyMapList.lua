@@ -50,16 +50,15 @@ local InputModeType = require("InputModeType")
 local InputModeTypes = require("InputModeTypes")
 local InputTypeUtils = require("InputTypeUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableCountingMap = require("ObservableCountingMap")
 local ObservableMap = require("ObservableMap")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local Set = require("Set")
 local SlottedTouchButtonUtils = (require :: any)("SlottedTouchButtonUtils")
 local StateStack = require("StateStack")
 local String = require("String")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
-local _Set = require("Set")
 
 local InputKeyMapList = setmetatable({}, BaseObject)
 InputKeyMapList.ClassName = "InputKeyMapList"
@@ -292,8 +291,8 @@ end
 	Observes a brio with the first value as the InputModeType and the second value as the KeyMapList
 	@return Observable<Brio<InputModeType, InputKeyMap>>
 ]=]
-function InputKeyMapList.ObservePairsBrio(self: InputKeyMapList): _Observable.Observable<
-	_Brio.Brio<InputModeType.InputModeType, InputKeyMap.InputKeyMap>
+function InputKeyMapList.ObservePairsBrio(self: InputKeyMapList): Observable.Observable<
+	Brio.Brio<InputModeType.InputModeType, InputKeyMap.InputKeyMap>
 >
 	return self._inputModeTypeToInputKeyMap:ObservePairsBrio()
 end
@@ -323,7 +322,7 @@ end
 ]=]
 function InputKeyMapList.ObserveInputKeyMapsBrio(
 	self: InputKeyMapList
-): _Observable.Observable<_Brio.Brio<InputKeyMap.InputKeyMap>>
+): Observable.Observable<Brio.Brio<InputKeyMap.InputKeyMap>>
 	return self._inputModeTypeToInputKeyMap:ObserveValuesBrio()
 end
 
@@ -332,7 +331,7 @@ end
 ]=]
 function InputKeyMapList.ObserveInputModesTypesBrio(
 	self: InputKeyMapList
-): _Observable.Observable<_Brio.Brio<InputModeType.InputModeType>>
+): Observable.Observable<Brio.Brio<InputModeType.InputModeType>>
 	return self._inputModeTypeToInputKeyMap:ObserveKeysBrio()
 end
 
@@ -345,7 +344,7 @@ end
 function InputKeyMapList.ObserveInputKeyMapForInputMode(
 	self: InputKeyMapList,
 	inputModeType: InputModeType.InputModeType
-): _Observable.Observable<InputKeyMap.InputKeyMap?>
+): Observable.Observable<InputKeyMap.InputKeyMap?>
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	return self._inputModeTypeToInputKeyMap:ObserveValueForKey(inputModeType)
@@ -356,7 +355,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function InputKeyMapList.ObserveIsTapInWorld(self: InputKeyMapList): _Observable.Observable<boolean>
+function InputKeyMapList.ObserveIsTapInWorld(self: InputKeyMapList): Observable.Observable<boolean>
 	self:_ensureInit()
 
 	return self._isTapInWorld:Observe()
@@ -402,7 +401,7 @@ end
 ]=]
 function InputKeyMapList.ObserveInputEnumsList(
 	self: InputKeyMapList
-): _Observable.Observable<{ InputTypeUtils.InputType }>
+): Observable.Observable<{ InputTypeUtils.InputType }>
 	self:_ensureInit()
 
 	return self._inputTypesForBinding:ObserveKeysList()
@@ -426,7 +425,7 @@ end
 ]=]
 function InputKeyMapList.ObserveInputEnumsSet(
 	self: InputKeyMapList
-): _Observable.Observable<_Set.Set<InputTypeUtils.InputType>>
+): Observable.Observable<Set.Set<InputTypeUtils.InputType>>
 	self:_ensureInit()
 
 	return self._inputTypesForBinding:ObserveKeysSet()

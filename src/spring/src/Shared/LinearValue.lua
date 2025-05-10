@@ -155,7 +155,7 @@ end
 
 	@return number -- The magnitude of the linear value.
 ]=]
-function LinearValue.GetMagnitude(self: LinearValue<T>): number
+function LinearValue.GetMagnitude<T>(self: LinearValue<T>): number
 	local dot: number = 0
 	for i = 1, #self._values do
 		local value: number = self._values[i]

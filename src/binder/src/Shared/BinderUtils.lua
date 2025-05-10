@@ -1,9 +1,14 @@
+--!strict
 --[=[
 	Utility methods for the binder object.
 	@class BinderUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local CollectionService = game:GetService("CollectionService")
+
+local Binder = require("Binder")
 
 local BinderUtils = {}
 
@@ -15,7 +20,7 @@ local BinderUtils = {}
 	@param child Instance
 	@return T?
 ]=]
-function BinderUtils.findFirstAncestor(binder, child)
+function BinderUtils.findFirstAncestor<T>(binder: Binder.Binder<T>, child: Instance): T?
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(child) == "Instance", "Child parameter must be instance")
 
@@ -38,7 +43,7 @@ end
 	@param parent Instance
 	@return T?
 ]=]
-function BinderUtils.findFirstChild(binder, parent)
+function BinderUtils.findFirstChild<T>(binder: Binder.Binder<T>, parent: Instance): T?
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
@@ -59,7 +64,7 @@ end
 	@param parent Instance
 	@return {T}
 ]=]
-function BinderUtils.getChildren(binder, parent)
+function BinderUtils.getChildren<T>(binder: Binder.Binder<T>, parent: Instance): { T }
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
@@ -82,13 +87,14 @@ end
 	@param bindersList { Binder<any> }
 	@return { [string]: Binder<any> }
 ]=]
-function BinderUtils.mapBinderListToTable(bindersList)
+function BinderUtils.mapBinderListToTable<T>(bindersList: { Binder.Binder<T> }): { [string]: Binder.Binder<T> }
 	assert(type(bindersList) == "table", "bindersList must be a table of binders")
 
-	local tags = {}
+	local tags: { [string]: Binder.Binder<T> } = {}
 	for _, binder in bindersList do
-		tags[binder:GetTag()] = binder
+		tags[(binder :: any):GetTag()] = binder :: any
 	end
+
 	return tags
 end
 
@@ -105,7 +111,7 @@ end
 	@param instanceList { Instance }
 	@return { T }
 ]=]
-function BinderUtils.getMappedFromList(tagsMap, instanceList)
+function BinderUtils.getMappedFromList<T>(tagsMap: { [string]: Binder.Binder<T> }, instanceList: { Instance }): { T }
 	local objects = {}
 
 	for _, instance in instanceList do
@@ -130,7 +136,7 @@ end
 	@param parent Instance
 	@return { T }
 ]=]
-function BinderUtils.getChildrenOfBinders(bindersList, parent)
+function BinderUtils.getChildrenOfBinders<T>(bindersList: { Binder.Binder<T> }, parent: Instance): { T }
 	assert(type(bindersList) == "table", "bindersList must be a table of binders")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
@@ -146,7 +152,7 @@ end
 	@param parent Instance
 	@return {T}
 ]=]
-function BinderUtils.getLinkedChildren(binder, linkName, parent)
+function BinderUtils.getLinkedChildren<T>(binder: Binder.Binder<T>, linkName: string, parent: Instance): { T }
 	local seen = {}
 	local objects = {}
 	for _, item in parent:GetChildren() do
@@ -177,7 +183,7 @@ end
 	@param parent Instance
 	@return {T}
 ]=]
-function BinderUtils.getDescendants(binder, parent)
+function BinderUtils.getDescendants<T>(binder: Binder.Binder<T>, parent: Instance): { T }
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 

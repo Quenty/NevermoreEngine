@@ -10,7 +10,7 @@ local Queue = require("Queue")
 local Promise = require("Promise")
 local TupleLookup = require("TupleLookup")
 local LRUCache = require("LRUCache")
-local _Tuple = require("Tuple")
+local Tuple = require("Tuple")
 
 local RateAggregator = setmetatable({}, BaseObject)
 RateAggregator.ClassName = "RateAggregator"
@@ -18,7 +18,7 @@ RateAggregator.__index = RateAggregator
 
 export type QueueEntry<TArgs..., T...> = {
 	promise: Promise.Promise<T...>,
-	tuple: _Tuple.Tuple<TArgs...>,
+	tuple: Tuple.Tuple<TArgs...>,
 }
 
 export type RateAggregator<TArgs..., T...> = typeof(setmetatable(

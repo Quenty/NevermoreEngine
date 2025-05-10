@@ -14,14 +14,14 @@ local GameConfigAssetUtils = require("GameConfigAssetUtils")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigServiceConstants = require("GameConfigServiceConstants")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigService = {}
 GameConfigService.ServiceName = "GameConfigService"
 
 export type GameConfigService = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		_binders: any, -- Binders
 		_configPicker: GameConfigPicker.GameConfigPicker,
@@ -34,7 +34,7 @@ export type GameConfigService = typeof(setmetatable(
 	Initializes the configuration service. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function GameConfigService:Init(serviceBag: _ServiceBag.ServiceBag)
+function GameConfigService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

@@ -11,6 +11,7 @@ local Binder = require("Binder")
 local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 local HumanoidTrackerService = require("HumanoidTrackerService")
+local ServiceBag = require("ServiceBag")
 
 local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
@@ -36,7 +37,7 @@ end
 	@param serviceBag ServiceBag
 	@param ... any
 ]=]
-function PlayerHumanoidBinder:Init(serviceBag, ...)
+function PlayerHumanoidBinder:Init(serviceBag: ServiceBag.ServiceBag, ...)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	getmetatable(PlayerHumanoidBinder).Init(self, serviceBag, ...)

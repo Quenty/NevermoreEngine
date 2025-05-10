@@ -14,8 +14,8 @@ local ObservableMap = require("ObservableMap")
 local SoundEffectsList = require("SoundEffectsList")
 local SoundGroupPathUtils = require("SoundGroupPathUtils")
 local ObservableSet = require("ObservableSet")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
+local Observable = require("Observable")
+local Brio = require("Brio")
 
 local SoundEffectsRegistry = setmetatable({}, BaseObject)
 SoundEffectsRegistry.ClassName = "SoundEffectsRegistry"
@@ -64,7 +64,7 @@ end
 
 function SoundEffectsRegistry.ObserveActiveEffectsPathBrios(
 	self: SoundEffectsRegistry
-): _Observable.Observable<_Brio.Brio<string>>
+): Observable.Observable<Brio.Brio<string>>
 	return self._activeEffectsPathSet:ObserveItemsBrio() :: any
 end
 

@@ -135,7 +135,7 @@ end
 	@param templateName string
 	@return Sound
 ]=]
-function SoundUtils.playTemplate(templates, templateName: string)
+function SoundUtils.playTemplate(templates, templateName: string): Sound
 	assert(type(templates) == "table", "Bad templates")
 	assert(type(templateName) == "string", "Bad templateName")
 

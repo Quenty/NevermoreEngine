@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class CooldownModel
 ]=]
@@ -14,8 +15,27 @@ local CooldownModel = setmetatable({}, BaseObject)
 CooldownModel.ClassName = "CooldownModel"
 CooldownModel.__index = CooldownModel
 
-function CooldownModel.new()
-	local self = setmetatable(BaseObject.new(), CooldownModel)
+export type Clock = () -> number
+
+export type CooldownModel = typeof(setmetatable(
+	{} :: {
+		_length: ValueObject.ValueObject<number>,
+		_startTime: ValueObject.ValueObject<number>,
+		_clock: ValueObject.ValueObject<Clock>,
+		_doneFired: boolean,
+		Done: Signal.Signal<()>,
+		_cleanup: any,
+	},
+	{} :: typeof({ __index = CooldownModel })
+)) & BaseObject.BaseObject
+
+--[=[
+	Creates a new cooldown model
+
+	@return CooldownModel
+]=]
+function CooldownModel.new(): CooldownModel
+	local self: CooldownModel = setmetatable(BaseObject.new() :: any, CooldownModel)
 
 	self._length = self._maid:Add(ValueObject.new(0, "number"))
 	self._startTime = self._maid:Add(ValueObject.new(os.clock(), "number"))
@@ -36,10 +56,10 @@ function CooldownModel.new()
 	end
 
 	self._maid:GiveTask(Rx.combineLatestDefer({
-		length = self._length:Observe();
-		clock = self._clock:Observe();
-		startTime = self._startTime:Observe();
-	}):Subscribe(function(state)
+		length = self._length:Observe(),
+		clock = self._clock:Observe(),
+		startTime = self._startTime:Observe(),
+	}):Subscribe(function(state: any)
 		local now = state.clock()
 		local waitTime = state.length + state.startTime - now
 
@@ -56,39 +76,56 @@ function CooldownModel.new()
 	return self
 end
 
-function CooldownModel.isCooldownModel(value)
+--[=[
+	Returns true if the value is a CooldownModel
+	@param value any
+	@return boolean
+]=]
+function CooldownModel.isCooldownModel(value: any): boolean
 	return DuckTypeUtils.isImplementation(CooldownModel, value)
 end
 
-function CooldownModel:SetClock(clock)
+--[=[
+	Sets the clock to use for the cooldown
+	@param clock Clock
+]=]
+function CooldownModel.SetClock(self: CooldownModel, clock: ValueObject.Mountable<Clock>): () -> ()
 	if self._doneFired then
 		warn("[CooldownModel] - Done already fired")
 	end
 
-	self._clock:Mount(clock)
+	return self._clock:Mount(clock)
 end
 
-function CooldownModel:SetStartTime(startTime)
+--[=[
+	Sets the start time for the cooldown
+	@param startTime number
+]=]
+function CooldownModel.SetStartTime(self: CooldownModel, startTime: ValueObject.Mountable<number>): () -> ()
 	if self._doneFired then
 		warn("[CooldownModel] - Done already fired")
 	end
 
-	self._startTime:Mount(startTime)
+	return self._startTime:Mount(startTime)
 end
 
-function CooldownModel:SetLength(length)
+--[=[
+	Sets the length of the cooldown
+	@param length number
+]=]
+function CooldownModel.SetLength(self: CooldownModel, length: ValueObject.Mountable<number>): () -> ()
 	if self._doneFired then
 		warn("[CooldownModel] - Done already fired")
 	end
 
-	self._length:Mount(length)
+	return self._length:Mount(length)
 end
 
 --[=[
 	Gets the syncronized time stamp the cooldown is starting at
 	@return number
 ]=]
-function CooldownModel:GetStartTime()
+function CooldownModel.GetStartTime(self: CooldownModel): number
 	return self._startTime.Value
 end
 
@@ -96,13 +133,17 @@ end
 	Gets the time remaining
 	@return number
 ]=]
-function CooldownModel:GetTimeRemaining()
+function CooldownModel.GetTimeRemaining(self: CooldownModel): number
 	local endTime = self:GetEndTime()
 
 	return math.max(0, endTime - self._clock.Value())
 end
 
-function CooldownModel:GetTimePassed()
+--[=[
+	Gets the time passed
+	@return number
+]=]
+function CooldownModel.GetTimePassed(self: CooldownModel): number
 	local startTime = self._startTime.Value
 	return self._clock.Value() - startTime
 end
@@ -111,13 +152,16 @@ end
 	Gets the syncronized time stamp the cooldown is ending at
 	@return number?
 ]=]
-function CooldownModel:GetEndTime()
+function CooldownModel.GetEndTime(self: CooldownModel)
 	return self._startTime.Value + self:GetLength()
 end
 
-function CooldownModel:GetLength()
+--[=[
+	Gets the length of the cooldown
+	@return number
+]=]
+function CooldownModel.GetLength(self: CooldownModel): number
 	return self._length.Value
 end
-
 
 return CooldownModel

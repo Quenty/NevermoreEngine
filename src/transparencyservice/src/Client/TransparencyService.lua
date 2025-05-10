@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Service that orchistrates transparency setting from multiple colliding sources
 	and handle the transparency appropriately. This means that 2 systems can work with
@@ -13,29 +14,42 @@ local Math = require("Math")
 local TransparencyService = {}
 TransparencyService.ServiceName = "TransparencyService"
 
+export type TransparencyType = "Transparency" | "LocalTransparencyModifier"
+
+export type TransparencyService = typeof(setmetatable(
+	{} :: {
+		_properties: {
+			[TransparencyType]: { [Instance]: { original: number, values: { [any]: number? } } },
+		}?,
+	},
+	{} :: typeof({ __index = TransparencyService })
+))
+
 --[=[
 	Initializes the transparency service
 ]=]
-function TransparencyService:Init()
+function TransparencyService.Init(self: TransparencyService)
 	assert(not self._properties, "Already initialized")
 
 	self._properties = {
-		Transparency = setmetatable({}, {__mode = "k"});
-		LocalTransparencyModifier = setmetatable({}, {__mode = "k"})
+		Transparency = setmetatable({}, { __mode = "k" }),
+		LocalTransparencyModifier = setmetatable({}, { __mode = "k" }),
 	}
 end
 
-function TransparencyService:IsDead(): boolean
+function TransparencyService.IsDead(self: TransparencyService): boolean
 	return self._properties == nil
 end
 
 --[=[
 	Uninitializes the transparency service, restoring transparency to original values.
 ]=]
-function TransparencyService:Destroy()
+function TransparencyService.Destroy(self: TransparencyService)
+	assert(self._properties, "Not initialized")
+
 	for propertyName, storage in self._properties do
 		for part, data in storage do
-			part[propertyName] = data.original
+			(part :: any)[propertyName] = data.original
 		end
 	end
 
@@ -49,7 +63,7 @@ end
 	@param part Instance
 	@param transparency number
 ]=]
-function TransparencyService:SetTransparency(key, part: Instance, transparency: number)
+function TransparencyService.SetTransparency(self: TransparencyService, key: any, part: Instance, transparency: number?)
 	assert(self._properties, "Not initialized")
 
 	self:_set(key, part, "Transparency", transparency)
@@ -62,15 +76,27 @@ end
 	@param part Instance
 	@param transparency number
 ]=]
-function TransparencyService:SetLocalTransparencyModifier(key, part, transparency)
+function TransparencyService.SetLocalTransparencyModifier(
+	self: TransparencyService,
+	key: any,
+	part: Instance,
+	transparency: number?
+)
 	assert(self._properties, "Not initialized")
 
 	self:_set(key, part, "LocalTransparencyModifier", transparency)
 end
 
-function TransparencyService:_set(key, part: Instance, property, newValue: number?)
+function TransparencyService._set(
+	self: TransparencyService,
+	key: any,
+	part: Instance,
+	property: TransparencyType,
+	newValue: number?
+)
 	assert(type(key) == "table", "Key must be a table")
 	assert(typeof(part) == "Instance", "Part must be instance")
+	assert(self._properties, "Not initialized")
 
 	if newValue == 0 then
 		newValue = nil
@@ -85,8 +111,8 @@ function TransparencyService:_set(key, part: Instance, property, newValue: numbe
 		end
 
 		storage[part] = {
-			values = {};
-			original = part[property];
+			values = {},
+			original = (part :: any)[property],
 		}
 		partData = storage[part]
 	end
@@ -103,27 +129,33 @@ function TransparencyService:_set(key, part: Instance, property, newValue: numbe
 	end
 
 	if count >= 5 then
-		warn(string.format("[TransparencyService] - Part %q has %d transparency instances set to it, memory leak possible", part:GetFullName(), count))
+		warn(
+			string.format(
+				"[TransparencyService] - Part %q has %d transparency instances set to it, memory leak possible",
+				part:GetFullName(),
+				count
+			)
+		)
 	end
 
 	if not valueToSet then
 		-- Reset
-		storage[part] = nil
-		part[property] = partData.original
+		storage[part] = nil;
+		(part :: any)[property] = partData.original
 		return
 	end
 
-	part[property] = Math.map(valueToSet, 0, 1, partData.original, 1)
+	(part :: any)[property] = Math.map(valueToSet, 0, 1, partData.original, 1)
 end
 
-function TransparencyService:ResetLocalTransparencyModifier(key, part)
+function TransparencyService.ResetLocalTransparencyModifier(self: TransparencyService, key: any, part: Instance)
 	assert(self._properties, "Not initialized")
 
 	self:SetLocalTransparencyModifier(key, part, nil)
 end
 
 
-function TransparencyService:ResetTransparency(key, part)
+function TransparencyService.ResetTransparency(self: TransparencyService, key: any, part: Instance): ()
 	assert(self._properties, "Not initialized")
 
 	self:SetTransparency(key, part, nil)

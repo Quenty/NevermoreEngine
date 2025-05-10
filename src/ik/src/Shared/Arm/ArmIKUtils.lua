@@ -10,7 +10,7 @@ local RxR15Utils = require("RxR15Utils")
 
 local ArmIKUtils = {}
 
-function ArmIKUtils.ensureMotorAnimated(character, armName)
+function ArmIKUtils.ensureMotorAnimated(character: Model, armName)
 	local topMaid = Maid.new()
 
 	local function disable(brio)

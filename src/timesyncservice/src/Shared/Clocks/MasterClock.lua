@@ -8,22 +8,21 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Rx = require("Rx")
-local _Observable = require("Observable")
+local Observable = require("Observable")
+local BaseClock = require("BaseClock")
 
 local MasterClock = setmetatable({}, BaseObject)
 MasterClock.__index = MasterClock
 MasterClock.ClassName = "MasterClock"
 
-export type ClockFunction = () -> number
-
 export type MasterClock = typeof(setmetatable(
 	{} :: {
 		_remoteEvent: RemoteEvent,
 		_remoteFunction: RemoteFunction,
-		_clockFunction: ClockFunction,
+		_clockFunction: BaseClock.ClockFunction,
 	},
 	{} :: typeof({ __index = MasterClock })
-)) & BaseObject.BaseObject
+)) & BaseObject.BaseObject & BaseClock.BaseClock
 
 --[=[
 	Constructs a new MasterClock
@@ -69,7 +68,7 @@ end
 
 	@return function
 ]=]
-function MasterClock.GetClockFunction(self: MasterClock): ClockFunction
+function MasterClock.GetClockFunction(self: MasterClock): BaseClock.ClockFunction
 	return self._clockFunction
 end
 
@@ -78,7 +77,7 @@ end
 
 	@return Observable<number>
 ]=]
-function MasterClock.ObservePing(_self: MasterClock): _Observable.Observable<number>
+function MasterClock.ObservePing(_self: MasterClock): Observable.Observable<number>
 	return Rx.of(0) :: any
 end
 

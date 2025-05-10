@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Add two cameras together
 	@class SummedCamera
@@ -8,9 +9,24 @@ local require = require(script.Parent.loader).load(script)
 local QFrame = require("QFrame")
 local CameraState = require("CameraState")
 local CameraFrame = require("CameraFrame")
+local CameraEffectUtils = require("CameraEffectUtils")
 
 local SummedCamera = {}
 SummedCamera.ClassName = "SummedCamera"
+
+export type SummedCameraMode = "World" | "Relative"
+
+export type SummedCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		CameraAState: CameraState.CameraState,
+		CameraBState: CameraState.CameraState,
+		_cameraA: CameraEffectUtils.CameraEffect,
+		_cameraB: CameraEffectUtils.CameraEffect,
+		_mode: SummedCameraMode,
+	},
+	{} :: typeof({ __index = SummedCamera })
+)) & CameraEffectUtils.CameraEffect
 
 --[=[
 	Construct a new summed camera
@@ -19,8 +35,11 @@ SummedCamera.ClassName = "SummedCamera"
 	@param cameraB CameraEffect -- A CameraState or another CameraEffect to be used
 	@return SummedCamera
 ]=]
-function SummedCamera.new(cameraA, cameraB)
-	local self = setmetatable({}, SummedCamera)
+function SummedCamera.new(
+	cameraA: CameraEffectUtils.CameraEffect,
+	cameraB: CameraEffectUtils.CameraEffect
+): SummedCamera
+	local self: SummedCamera = setmetatable({} :: any, SummedCamera)
 
 	self._mode = "World"
 	self._cameraA = cameraA or error("No cameraA")
@@ -36,32 +55,32 @@ end
 	@param mode "World" | "Relative" -- Mode to set
 	@return SummedCamera
 ]=]
-function SummedCamera:SetMode(mode)
+function SummedCamera.SetMode(self: SummedCamera, mode: SummedCameraMode): SummedCamera
 	assert(mode == "World" or mode == "Relative", "Bad mode")
 	self._mode = mode
 
 	return self
 end
 
-function SummedCamera:__addClass(other)
+function SummedCamera.__addClass(self: SummedCamera, other: CameraEffectUtils.CameraEffect)
 	return SummedCamera.new(self, other)
 end
 
-function SummedCamera:__add(other)
+function SummedCamera.__add(self: SummedCamera, other: CameraEffectUtils.CameraEffect)
 	return SummedCamera.new(self, other):SetMode(self._mode)
 end
 
-function SummedCamera:__sub(camera)
+function SummedCamera.__sub(self: SummedCamera, camera: CameraEffectUtils.CameraEffect): CameraEffectUtils.CameraEffect
 	if self._cameraA == camera then
 		return self._cameraA
 	elseif self._cameraB == camera then
 		return self._cameraB
 	else
-		error("Unable to subtract successfully");
+		error("Unable to subtract successfully")
 	end
 end
 
-function SummedCamera:__index(index)
+function SummedCamera.__index(self: SummedCamera, index)
 	if index == "CameraState" then
 		if self._mode == "World" then
 			-- TODO: fix this

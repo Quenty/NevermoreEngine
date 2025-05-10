@@ -14,7 +14,7 @@ local PseudoLocalize = require("PseudoLocalize")
 
 local LocalizationEntryParserUtils = {}
 
-function LocalizationEntryParserUtils.decodeFromInstance(tableName, sourceLocaleId, folder)
+function LocalizationEntryParserUtils.decodeFromInstance(tableName: string, sourceLocaleId: string, folder: Instance)
 	assert(type(tableName) == "string", "Bad tableName")
 	assert(typeof(folder) == "Instance", "Bad folder")
 
@@ -26,12 +26,26 @@ function LocalizationEntryParserUtils.decodeFromInstance(tableName, sourceLocale
 			local localeId = LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)
 			local decodedTable = HttpService:JSONDecode(descendant.Value)
 
-			LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, baseKey, decodedTable, tableName)
+			LocalizationEntryParserUtils._parseTableToResultsList(
+				lookupTable,
+				sourceLocaleId,
+				localeId,
+				baseKey,
+				decodedTable,
+				tableName
+			)
 		elseif descendant:IsA("ModuleScript") then
 			local localeId = LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)
 			local decodedTable = require(descendant)
 
-			LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, baseKey, decodedTable, tableName)
+			LocalizationEntryParserUtils._parseTableToResultsList(
+				lookupTable,
+				sourceLocaleId,
+				localeId,
+				baseKey,
+				decodedTable,
+				tableName
+			)
 		end
 	end
 
@@ -42,7 +56,7 @@ function LocalizationEntryParserUtils.decodeFromInstance(tableName, sourceLocale
 	return results
 end
 
-function LocalizationEntryParserUtils.decodeFromTable(tableName, localeId, dataTable)
+function LocalizationEntryParserUtils.decodeFromTable(tableName: string, localeId: string, dataTable)
 	assert(type(tableName) == "string", "Bad tableName")
 	assert(type(localeId) == "string", "Bad localeId")
 	assert(type(dataTable) == "table", "Bad dataTable")
@@ -66,15 +80,15 @@ function LocalizationEntryParserUtils.decodeFromTable(tableName, localeId, dataT
 	return results
 end
 
-function LocalizationEntryParserUtils._parseLocaleFromName(name)
+function LocalizationEntryParserUtils._parseLocaleFromName(name: string)
 	if string.sub(name, -5) == ".json" then
-		return string.sub(name, 1, #name-5)
+		return string.sub(name, 1, #name - 5)
 	else
 		return name
 	end
 end
 
-function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, baseKey, dataTable, tableName)
+function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId: string, localeId: string, baseKey: string, dataTable, tableName: string)
 	assert(type(lookupTable) == "table", "Bad lookupTable")
 	assert(type(sourceLocaleId) == "string", "Bad sourceLocaleId")
 	assert(type(localeId) == "string", "Bad localeId")

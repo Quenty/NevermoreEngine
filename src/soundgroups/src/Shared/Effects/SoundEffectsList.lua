@@ -14,8 +14,8 @@ local MaidTaskUtils = require("MaidTaskUtils")
 local ValueObject = require("ValueObject")
 local Counter = require("Counter")
 local Rx = require("Rx")
-local _Signal = require("Signal")
-local _Observable = require("Observable")
+local Signal = require("Signal")
+local Observable = require("Observable")
 
 local SoundEffectsList = setmetatable({}, BaseObject)
 SoundEffectsList.ClassName = "SoundEffectsList"
@@ -29,7 +29,7 @@ export type SoundEffectsList = typeof(setmetatable(
 		_appliedCount: Counter.Counter,
 		_isActive: ValueObject.ValueObject<boolean>,
 		_hasEffects: ValueObject.ValueObject<boolean>,
-		IsActiveChanged: _Signal.Signal<boolean>,
+		IsActiveChanged: Signal.Signal<boolean>,
 		HasEffects: () -> boolean,
 	},
 	{} :: typeof({ __index = SoundEffectsList })
@@ -72,7 +72,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function SoundEffectsList.ObserveHasEffects(self: SoundEffectsList): _Observable.Observable<boolean>
+function SoundEffectsList.ObserveHasEffects(self: SoundEffectsList): Observable.Observable<boolean>
 	return self._hasEffects:Observe()
 end
 

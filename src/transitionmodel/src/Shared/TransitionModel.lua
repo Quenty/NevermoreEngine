@@ -13,8 +13,7 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
-local _Signal = require("Signal")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local TransitionModel = setmetatable({}, BasicPane)
 TransitionModel.ClassName = "TransitionModel"
@@ -132,7 +131,7 @@ end
 	Observe is showing is complete
 	@return Observable<boolean>
 ]=]
-function TransitionModel.ObserveIsShowingComplete(self: TransitionModel): _Observable.Observable<boolean>
+function TransitionModel.ObserveIsShowingComplete(self: TransitionModel): Observable.Observable<boolean>
 	return self._isShowingComplete:Observe()
 end
 
@@ -140,7 +139,7 @@ end
 	Observe is hiding is complete
 	@return Observable<boolean>
 ]=]
-function TransitionModel.ObserveIsHidingComplete(self: TransitionModel): _Observable.Observable<boolean>
+function TransitionModel.ObserveIsHidingComplete(self: TransitionModel): Observable.Observable<boolean>
 	return self._isHidingComplete:Observe()
 end
 

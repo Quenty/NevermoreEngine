@@ -14,7 +14,7 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
-local _Observable = require("Observable")
+local Observable = require("Observable")
 
 local FlipbookPlayer = setmetatable({}, BaseObject)
 FlipbookPlayer.ClassName = "FlipbookPlayer"
@@ -187,7 +187,7 @@ end
 	Observes if the flipbook is playing
 	@return Observable<boolean>
 ]=]
-function FlipbookPlayer:ObserveIsPlaying(): _Observable.Observable<boolean>
+function FlipbookPlayer:ObserveIsPlaying(): Observable.Observable<boolean>
 	return self._isPlaying:Observe()
 end
 

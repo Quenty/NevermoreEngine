@@ -10,12 +10,13 @@ local RunService = game:GetService("RunService")
 local BaseObject = require("BaseObject")
 local promisePropertyValue = require("promisePropertyValue")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local IKGripBase = setmetatable({}, BaseObject)
 IKGripBase.ClassName = "IKGripBase"
 IKGripBase.__index = IKGripBase
 
-function IKGripBase.new(objectValue: ObjectValue, serviceBag)
+function IKGripBase.new(objectValue: ObjectValue, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(objectValue), IKGripBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

@@ -4,12 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigDataService = {}
 GameConfigDataService.ServiceName = "GameConfigDataService"
 
-function GameConfigDataService:Init(serviceBag: _ServiceBag.ServiceBag)
+function GameConfigDataService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

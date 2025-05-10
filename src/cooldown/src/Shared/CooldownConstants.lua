@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Holds constants for the cooldown.
 	@class CooldownConstants

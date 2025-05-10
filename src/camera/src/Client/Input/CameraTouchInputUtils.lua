@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods involving touch input and cameras.
 	@class CameraTouchInputUtils
@@ -23,9 +24,9 @@ local TOUCH_SENSITIVTY_ADJUST_MIN_Y = 0.5
 	@param currPitchAngle number
 	@param sensitivity Vector2
 	@param delta Vector2
-	Return Vector2
+	@return Vector2
 ]=]
-function CameraTouchInputUtils.adjustTouchSensitivity(currPitchAngle, sensitivity, delta)
+function CameraTouchInputUtils.adjustTouchSensitivity(currPitchAngle: number, sensitivity: Vector2, delta: Vector2): Vector2
 	local multiplierY = TOUCH_SENSITIVTY_ADJUST_MAX_Y
 	if currPitchAngle > TOUCH_ADJUST_AREA_UP and delta.Y < 0 then
 		local fractionAdjust = (currPitchAngle - TOUCH_ADJUST_AREA_UP)/(MAX_Y - TOUCH_ADJUST_AREA_UP)

@@ -526,7 +526,7 @@ end
 
 	@return Promise<AvatarPromptResult>
 ]=]
-function AvatarEditorUtils.promptAllowInventoryReadAccess()
+function AvatarEditorUtils.promptAllowInventoryReadAccess(): Promise.Promise<()>
 	local maid = Maid.new()
 
 	local promise = Promise.new()

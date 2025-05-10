@@ -15,7 +15,7 @@ local PermissionProviderConstants = require("PermissionProviderConstants")
 local Promise = require("Promise")
 local PermissionLevel = require("PermissionLevel")
 local PermissionLevelUtils = require("PermissionLevelUtils")
-local _PermissionProviderUtils = require("PermissionProviderUtils")
+local PermissionProviderUtils = require("PermissionProviderUtils")
 
 local CreatorPermissionProvider = setmetatable({}, BasePermissionProvider)
 CreatorPermissionProvider.ClassName = "CreatorPermissionProvider"
@@ -23,7 +23,7 @@ CreatorPermissionProvider.__index = CreatorPermissionProvider
 
 export type CreatorPermissionProvider = typeof(setmetatable(
 	{} :: {
-		_config: _PermissionProviderUtils.SingleUserConfig,
+		_config: PermissionProviderUtils.SingleUserConfig,
 		_userId: number,
 	},
 	{} :: typeof({ __index = CreatorPermissionProvider })
@@ -33,7 +33,7 @@ export type CreatorPermissionProvider = typeof(setmetatable(
 	@param config table
 	@return CreatorPermissionProvider
 ]=]
-function CreatorPermissionProvider.new(config: _PermissionProviderUtils.SingleUserConfig): CreatorPermissionProvider
+function CreatorPermissionProvider.new(config: PermissionProviderUtils.SingleUserConfig): CreatorPermissionProvider
 	local self: CreatorPermissionProvider =
 		setmetatable(BasePermissionProvider.new(config) :: any, CreatorPermissionProvider)
 

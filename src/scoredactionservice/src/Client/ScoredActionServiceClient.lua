@@ -10,22 +10,21 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local InputKeyMapList = require("InputKeyMapList")
+local InputListScoreHelper = require("InputListScoreHelper")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local ScoredAction = require("ScoredAction")
 local ScoredActionPickerProvider = require("ScoredActionPickerProvider")
-local Maid = require("Maid")
-local InputListScoreHelper = require("InputListScoreHelper")
-local Observable = require("Observable")
-local InputKeyMapList = require("InputKeyMapList")
+local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
-local _ServiceBag = require("ServiceBag")
-local _Observable = require("Observable")
 
 local ScoredActionServiceClient = {}
 ScoredActionServiceClient.ServiceName = "ScoredActionServiceClient"
 
 export type ScoredActionServiceClient = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_provider: ScoredActionPickerProvider.ScoredActionPickerProvider,
 		_maid: Maid.Maid,
 	},
@@ -36,7 +35,7 @@ export type ScoredActionServiceClient = typeof(setmetatable(
 	Initializes the ScoredActionServiceClient. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function ScoredActionServiceClient.Init(self: ScoredActionServiceClient, serviceBag: _ServiceBag.ServiceBag)
+function ScoredActionServiceClient.Init(self: ScoredActionServiceClient, serviceBag: ServiceBag.ServiceBag)
 	assert(not (self :: any)._serviceBag, "Already initialize")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -114,7 +113,7 @@ end
 function ScoredActionServiceClient.ObserveNewFromInputKeyMapList(
 	self: ScoredActionServiceClient,
 	scoreValue: ValueObject.ValueObject<number>
-): _Observable.Transformer<
+): Observable.Transformer<
 	(InputKeyMapList.InputKeyMapList),
 	(ScoredAction.ScoredAction)
 >

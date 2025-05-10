@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Interface between user input and camera controls
 	@class CameraControls
@@ -9,16 +10,19 @@ local ContextActionService = game:GetService("ContextActionService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
-local Maid = require("Maid")
 local GamepadRotateModel = require("GamepadRotateModel")
 local InputObjectUtils = require("InputObjectUtils")
+local Maid = require("Maid")
+local SmoothRotatedCamera = require("SmoothRotatedCamera")
+local SmoothZoomedCamera = require("SmoothZoomedCamera")
+local PushCamera = require("PushCamera")
 
 -- Stolen directly from ROBLOX's core scripts.
 -- Looks like a simple integrator.
 -- Called (zoom, zoomScale, 1) returns zoom
-local function rk4Integrator(position, velocity, t)
+local function rk4Integrator(position: number, velocity: number, t: number): (number, number)
 	local direction = velocity < 0 and -1 or 1
-	local function acceleration(p, _)
+	local function acceleration(p: number, _: number): number
 		local accel = direction * math.max(1, (p / 3.3) + 0.5)
 		return accel
 	end
@@ -44,11 +48,31 @@ end
 local CameraControls = {}
 CameraControls.__index = CameraControls
 CameraControls.ClassName = "CameraControls"
-CameraControls.MOUSE_SENSITIVITY = Vector2.new(math.pi*4, math.pi*1.9)
+CameraControls.MOUSE_SENSITIVITY = Vector2.new(math.pi * 4, math.pi * 1.9)
 CameraControls._dragBeginTypes = { Enum.UserInputType.MouseButton2, Enum.UserInputType.Touch }
 
-function CameraControls.new(zoomCamera, rotatedCamera)
-	local self = setmetatable({}, CameraControls)
+export type CameraControls = typeof(setmetatable(
+	{} :: {
+		_enabled: boolean,
+		_key: string,
+		_maid: Maid.Maid?,
+		_strength: number,
+		_zoomedCamera: SmoothZoomedCamera.SmoothZoomedCamera?,
+		_rotatedCamera: SmoothRotatedCamera.SmoothRotatedCamera?,
+		_gamepadRotateModel: GamepadRotateModel.GamepadRotateModel,
+		_rotVelocityTracker: any?,
+		_lastMousePosition: Vector3?,
+		_startZoomScale: number,
+		_dragMaid: Maid.Maid?,
+	},
+	{} :: typeof({ __index = CameraControls })
+))
+
+function CameraControls.new(
+	zoomedCamera: SmoothZoomedCamera.SmoothZoomedCamera?,
+	rotatedCamera: SmoothRotatedCamera.SmoothRotatedCamera?
+): CameraControls
+	local self: CameraControls = setmetatable({} :: any, CameraControls)
 
 	self._enabled = false
 	self._key = tostring(self) .. "CameraControls"
@@ -56,8 +80,8 @@ function CameraControls.new(zoomCamera, rotatedCamera)
 	-- Destroyed below
 	self._gamepadRotateModel = GamepadRotateModel.new()
 
-	if zoomCamera then
-		self:SetZoomedCamera(zoomCamera)
+	if zoomedCamera then
+		self:SetZoomedCamera(zoomedCamera)
 	end
 	if rotatedCamera then
 		self:SetRotatedCamera(rotatedCamera)
@@ -70,24 +94,24 @@ end
 	Sets the gamepad rotation acceleration
 	@param acceleration number
 ]=]
-function CameraControls:SetGamepadRotationAcceleration(acceleration: number)
+function CameraControls.SetGamepadRotationAcceleration(self: CameraControls, acceleration: number)
 	assert(type(acceleration) == "number", "Bad acceleration")
 
 	self._gamepadRotateModel:SetAcceleration(acceleration)
 end
 
-function CameraControls:GetKey(): string
+function CameraControls.GetKey(self: CameraControls): string
 	return self._key
 end
 
-function CameraControls:IsEnabled(): boolean
+function CameraControls.IsEnabled(self: CameraControls): boolean
 	return self._enabled
 end
 
 --[=[
 	Enables the control.
 ]=]
-function CameraControls:Enable()
+function CameraControls.Enable(self: CameraControls)
 	if self._enabled then
 		return
 	end
@@ -95,9 +119,10 @@ function CameraControls:Enable()
 	assert(not self._maid, "Maid already defined")
 	self._enabled = true
 
-	self._maid = Maid.new()
+	local maid = Maid.new()
+	self._maid = maid
 
-	self._maid:GiveTask(self._gamepadRotateModel.IsRotating.Changed:Connect(function()
+	maid:GiveTask(self._gamepadRotateModel.IsRotating.Changed:Connect(function()
 		if self._gamepadRotateModel.IsRotating.Value then
 			self:_handleGamepadRotateStart()
 		else
@@ -121,11 +146,11 @@ function CameraControls:Enable()
 		self:_handleThumbstickInput(inputObject)
 	end, false, Enum.KeyCode.Thumbstick2)
 
-	self._maid:GiveTask(UserInputService.TouchPinch:Connect(function(_, scale, velocity, userInputState)
+	maid:GiveTask(UserInputService.TouchPinch:Connect(function(_, scale, velocity, userInputState)
 		self:_handleTouchPinch(scale, velocity, userInputState)
 	end))
 
-	self._maid:GiveTask(function()
+	maid:GiveTask(function()
 		ContextActionService:UnbindAction(self._key)
 		ContextActionService:UnbindAction(self._key .. "Drag")
 		ContextActionService:UnbindAction(self._key .. "Rotate")
@@ -135,11 +160,12 @@ end
 --[=[
 	Disables the control.
 ]=]
-function CameraControls:Disable()
+function CameraControls.Disable(self: CameraControls)
 	if not self._enabled then
 		return
 	end
 
+	assert(self._maid, "Must be enabled")
 	self._enabled = false
 
 	self._maid:DoCleaning()
@@ -148,7 +174,9 @@ function CameraControls:Disable()
 	self._lastMousePosition = nil
 end
 
-function CameraControls:BeginDrag(beginInputObject)
+function CameraControls.BeginDrag(self: CameraControls, beginInputObject)
+	assert(self._maid, "Must be enabled")
+
 	if not self._rotatedCamera then
 		self._maid._dragMaid = nil
 		return
@@ -181,45 +209,58 @@ function CameraControls:BeginDrag(beginInputObject)
 	self._maid._dragMaid = maid
 end
 
-function CameraControls:SetZoomedCamera(zoomedCamera)
+function CameraControls.SetZoomedCamera(
+	self: CameraControls,
+	zoomedCamera: SmoothZoomedCamera.SmoothZoomedCamera
+): CameraControls
 	self._zoomedCamera = assert(zoomedCamera, "Bad zoomedCamera")
-	self._startZoomScale = self._zoomedCamera.Zoom
+	self._startZoomScale = zoomedCamera.Zoom
 
 	return self
 end
 
-function CameraControls:SetRotatedCamera(rotatedCamera)
+function CameraControls.SetRotatedCamera(
+	self: CameraControls,
+	rotatedCamera: SmoothRotatedCamera.SmoothRotatedCamera
+): CameraControls
 	self._rotatedCamera = assert(rotatedCamera, "Bad rotatedCamera")
 	return self
 end
 
 -- This code was the same algorithm used by Roblox. It makes it so you can zoom easier at further distances.
-function CameraControls:_handleMouseWheel(inputObject)
-	if self._zoomedCamera then
-		local delta = math.clamp(-inputObject.Position.Z, -1, 1)*1.4
-		local zoom = rk4Integrator(self._zoomedCamera.TargetZoom, delta, 1)
+function CameraControls._handleMouseWheel(self: CameraControls, inputObject: InputObject): ()
+	local zoomedCamera = self._zoomedCamera
+	if zoomedCamera then
+		local delta = math.clamp(-inputObject.Position.Z, -1, 1) * 1.4
+		local zoom = rk4Integrator(zoomedCamera.TargetZoom, delta, 1)
 
-		self._zoomedCamera.TargetZoom = zoom
+		zoomedCamera.TargetZoom = zoom
 	end
 
-	if self._rotatedCamera then
-		if self._rotatedCamera.ClassName == "PushCamera" then
-			self._rotatedCamera:StopRotateBack()
+	local rotatedCamera = self._rotatedCamera
+	if rotatedCamera then
+		if rotatedCamera.ClassName == "PushCamera" then
+			((rotatedCamera :: any) :: PushCamera.PushCamera):StopRotateBack()
 		end
 	end
 end
 
-function CameraControls:_handleTouchPinch(scale, velocity, userInputState)
+function CameraControls._handleTouchPinch(
+	self: CameraControls,
+	scale: number,
+	velocity: number,
+	userInputState: Enum.UserInputState
+)
 	if self._zoomedCamera then
 		if userInputState == Enum.UserInputState.Begin then
 			self._startZoomScale = self._zoomedCamera.Zoom
-			self._zoomedCamera.Zoom = self._startZoomScale*1/scale
+			self._zoomedCamera.Zoom = self._startZoomScale * 1 / scale
 		elseif userInputState == Enum.UserInputState.End then
-			self._zoomedCamera.Zoom = self._startZoomScale*1/scale
-			self._zoomedCamera.TargetZoom = self._zoomedCamera.Zoom + -velocity/5
+			self._zoomedCamera.Zoom = self._startZoomScale * 1 / scale
+			self._zoomedCamera.TargetZoom = self._zoomedCamera.Zoom + -velocity / 5
 		elseif userInputState == Enum.UserInputState.Change then
 			if self._startZoomScale then
-				self._zoomedCamera.TargetZoom = self._startZoomScale*1/scale
+				self._zoomedCamera.TargetZoom = self._startZoomScale * 1 / scale
 				self._zoomedCamera.Zoom = self._zoomedCamera.TargetZoom
 			else
 				warn("[CameraControls._handleTouchPinch] - No self._startZoomScale")
@@ -229,40 +270,40 @@ function CameraControls:_handleTouchPinch(scale, velocity, userInputState)
 end
 
 -- This is also a Roblox algorithm. Not sure why screen resolution is locked like it is.
-function CameraControls:_mouseTranslationToAngle(translationVector)
-	local xTheta = (translationVector.x / 1920)
-	local yTheta = (translationVector.y / 1200)
+function CameraControls._mouseTranslationToAngle(_self: CameraControls, translationVector: Vector3): Vector2
+	local xTheta = (translationVector.X / 1920)
+	local yTheta = (translationVector.Y / 1200)
 	return Vector2.new(xTheta, yTheta)
 end
 
-function CameraControls:SetVelocityStrength(strength)
+function CameraControls.SetVelocityStrength(self: CameraControls, strength: number): ()
 	self._strength = strength
 end
 
-function CameraControls:_getVelocityTracker(strength, startVelocity)
-	strength = strength or 1
+function CameraControls._getVelocityTracker(_self: CameraControls, initialStrength: number?, startVelocity: Vector2)
+	local strength = initialStrength or 1
 
-	local lastUpdate = tick()
-	local velocity = startVelocity
+	local lastUpdate = os.clock()
+	local velocity: Vector2 = startVelocity
 
 	return {
-		Update = function(_, delta)
-			local elapsed = tick() - lastUpdate
-			lastUpdate = tick()
-			velocity = velocity / (2^(elapsed/strength)) + (delta / (0.0001 + elapsed)) * strength
-		end;
+		Update = function(_this, delta: Vector2)
+			local elapsed = os.clock() - lastUpdate
+			lastUpdate = os.clock()
+			velocity = velocity / (2 ^ (elapsed / strength)) + (delta / (0.0001 + elapsed)) * strength
+		end,
 		GetVelocity = function(this)
-			this:Update(startVelocity*0)
+			this:Update(startVelocity * 0)
 			return velocity
-		end;
+		end,
 	}
 end
 
-function CameraControls:_handleMouseMovement(inputObject)
+function CameraControls._handleMouseMovement(self: CameraControls, inputObject: InputObject)
 	if self._lastMousePosition then
 		if self._rotatedCamera then
 			-- This calculation may seem weird, but either .Position updates (if it's locked), or .Delta updates (if it's not).
-			local delta
+			local delta: Vector3
 			if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
 				delta = -inputObject.Delta + self._lastMousePosition - inputObject.Position
 			else
@@ -281,11 +322,11 @@ function CameraControls:_handleMouseMovement(inputObject)
 	end
 end
 
-function CameraControls:_handleThumbstickInput(inputObject)
+function CameraControls._handleThumbstickInput(self: CameraControls, inputObject: InputObject)
 	self._gamepadRotateModel:HandleThumbstickInput(inputObject)
 end
 
-function CameraControls:_applyRotVelocityTracker(rotVelocityTracker)
+function CameraControls._applyRotVelocityTracker(self: CameraControls, rotVelocityTracker)
 	if self._rotatedCamera then
 		local position = self._rotatedCamera.AngleXZ
 		local velocity = rotVelocityTracker:GetVelocity().X
@@ -300,7 +341,9 @@ function CameraControls:_applyRotVelocityTracker(rotVelocityTracker)
 	end
 end
 
-function CameraControls:_endDrag()
+function CameraControls._endDrag(self: CameraControls): ()
+	assert(self._maid, "Must be enabled")
+
 	if self._rotVelocityTracker then
 		self:_applyRotVelocityTracker(self._rotVelocityTracker)
 		self._rotVelocityTracker = nil
@@ -312,7 +355,9 @@ function CameraControls:_endDrag()
 	self._maid._dragMaid = nil
 end
 
-function CameraControls:_handleGamepadRotateStop()
+function CameraControls._handleGamepadRotateStop(self: CameraControls): ()
+	assert(self._maid, "Must be enabled")
+
 	if self._rotVelocityTracker then
 		self:_applyRotVelocityTracker(self._rotVelocityTracker)
 		self._rotVelocityTracker = nil
@@ -321,7 +366,9 @@ function CameraControls:_handleGamepadRotateStop()
 	self._maid._dragMaid = nil
 end
 
-function CameraControls:_handleGamepadRotateStart()
+function CameraControls._handleGamepadRotateStart(self: CameraControls): ()
+	assert(self._maid, "Must be enabled")
+
 	if not self._rotatedCamera then
 		self._maid._dragMaid = nil
 		return
@@ -334,7 +381,7 @@ function CameraControls:_handleGamepadRotateStart()
 	end
 
 	maid:GiveTask(RunService.Stepped:Connect(function()
-		local deltaAngle = 0.1*self._gamepadRotateModel:GetThumbstickDeltaAngle()
+		local deltaAngle: Vector2 = 0.1 * self._gamepadRotateModel:GetThumbstickDeltaAngle()
 
 		if self._rotatedCamera then
 			self._rotatedCamera:RotateXY(deltaAngle)
@@ -348,10 +395,10 @@ function CameraControls:_handleGamepadRotateStart()
 	self._maid._dragMaid = maid
 end
 
-function CameraControls:Destroy()
+function CameraControls.Destroy(self: CameraControls)
 	self:Disable()
 	self._gamepadRotateModel:Destroy()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return CameraControls
