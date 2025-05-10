@@ -21,6 +21,8 @@
     "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore='**/node_modules/**' --ignore='**/*.story.lua' --ignore='**/*.client.lua' --ignore='**/*.server.lua' src",
     "lint:moonwave": "npx lerna exec --parallel -- moonwave-extractor extract src",
     "lint:selene": "npx lerna exec -- selene --config=../../selene.toml src",
+    "lint:stylua": "stylua --config-path=stylua.toml --check src games tests plugins",
+    "format": "stylua --config-path=stylua.toml src games tests plugins",
     "postinstall": "npm run build:link",
     "prelint:luau": "npm run build:sourcemap && node tools/scripts/download-roblox-types.js",
     "release": "auto shipit"
