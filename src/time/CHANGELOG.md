@@ -1,3 +1,16 @@
+# v2.4.3 (Sat May 10 2025)
+
+#### 🐛 Bug Fix
+
+- ci: Allow branches to be protected during deploy [#560](https://github.com/Quenty/NevermoreEngine/pull/560) ([@Quenty](https://github.com/Quenty))
+- docs: Add docs (really this is to just test the CI/CD release cycle) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

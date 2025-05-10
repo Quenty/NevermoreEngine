@@ -1,5 +1,18 @@
 # (Sat May 10 2025)
 
+#### 🐛 Bug Fix
+
+- `@quenty/time@2.4.3`
+  - ci: Allow branches to be protected during deploy [#560](https://github.com/Quenty/NevermoreEngine/pull/560) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat May 10 2025)
+
 :tada: This release contains work from a new contributor! :tada:
 
 Thank you, KreatorKols ([@KreatorKols](https://github.com/KreatorKols)), for all your work!
