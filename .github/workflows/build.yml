@@ -21,7 +21,7 @@ jobs:
           NPM_TOKEN: '' # https://github.com/JS-DevTools/npm-publish/issues/15
         with:
           cache-dependency-path: package.json # we don't have a package-lock.json so we'll use this instead...
-          node-version: "18"
+          node-version: '18'
 
       - name: Run `npm install --no-package-lock` on cli-output-helpers
         run: npm install --no-package-lock
