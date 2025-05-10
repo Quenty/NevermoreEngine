@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[59749],{96616:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PagesProxy","desc":"Proxy pages and cache the results to allow for reuse","source":{"line":6,"path":"src/pagesutils/src/Shared/Proxy/PagesProxy.lua"}}')}}]);

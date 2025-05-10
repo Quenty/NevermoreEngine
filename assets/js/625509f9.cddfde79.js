@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[90459],{71271:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CooldownServiceClient","desc":"","source":{"line":5,"path":"src/cooldown/src/Client/CooldownServiceClient.lua"}}')}}]);

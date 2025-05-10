@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[15404],{75597:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ColorPickerCursorPreview","desc":"Cursor preview for mobile input especially","source":{"line":5,"path":"src/colorpicker/src/Client/Cursor/ColorPickerCursorPreview.lua"}}')}}]);

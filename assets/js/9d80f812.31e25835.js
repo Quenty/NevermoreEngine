@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[30447],{65219:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ParticlePlayer","desc":"Plays particle effects for players","source":{"line":5,"path":"src/characterparticleplayer/src/Shared/ParticlePlayer.lua"}}')}}]);

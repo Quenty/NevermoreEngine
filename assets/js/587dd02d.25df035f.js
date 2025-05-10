@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[31443],{15591:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PermissionProviderConstants","desc":"Constants for the permission system","source":{"line":5,"path":"src/permissionprovider/src/Shared/PermissionProviderConstants.lua"}}')}}]);
