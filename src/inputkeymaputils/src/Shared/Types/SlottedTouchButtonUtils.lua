@@ -82,9 +82,7 @@ end
 	@param inputKeyMapList InputKeyMapList
 	@return { SlottedTouchButtonData }
 ]=]
-function SlottedTouchButtonUtils.getSlottedTouchButtonData(
-	inputKeyMapList: any
-): { SlottedTouchButtonData }
+function SlottedTouchButtonUtils.getSlottedTouchButtonData(inputKeyMapList: any): { SlottedTouchButtonData }
 	local slottedTouchButtons: { SlottedTouchButtonData } = {}
 
 	for _, inputKeyMap: any in inputKeyMapList:GetInputKeyMaps() do
