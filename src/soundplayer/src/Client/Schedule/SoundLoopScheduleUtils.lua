@@ -4,9 +4,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local t = require("t")
 local NumberRangeUtils = require("NumberRangeUtils")
 local Table = require("Table")
+local t = require("t")
 
 local SoundLoopScheduleUtils = {}
 

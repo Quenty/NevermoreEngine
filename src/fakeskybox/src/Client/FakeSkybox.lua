@@ -12,17 +12,18 @@ local FakeSkyboxSide = require("FakeSkyboxSide")
 local Maid = require("Maid")
 local Signal = require("Signal")
 
-local SKYBOX_PROPERTY_IMAGE_MAP = {} do
+local SKYBOX_PROPERTY_IMAGE_MAP = {}
+do
 	local properties = {
-		Top = "Up";
-		Bottom = "Dn";
+		Top = "Up",
+		Bottom = "Dn",
 
-		 -- Bind backwards
-		Right = "Lf";
-		Left = "Rt";
+		-- Bind backwards
+		Right = "Lf",
+		Left = "Rt",
 
-		Front = "Ft";
-		Back = "Bk";
+		Front = "Ft",
+		Back = "Bk",
 	}
 	for Surface, Direction in properties do
 		SKYBOX_PROPERTY_IMAGE_MAP[Enum.NormalId[Surface]] = "Skybox" .. Direction

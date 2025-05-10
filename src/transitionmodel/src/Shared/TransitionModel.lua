@@ -9,11 +9,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
-local Promise = require("Promise")
-local Maid = require("Maid")
-local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
 local Observable = require("Observable")
+local Promise = require("Promise")
+local ValueObject = require("ValueObject")
 
 local TransitionModel = setmetatable({}, BasicPane)
 TransitionModel.ClassName = "TransitionModel"
@@ -303,7 +303,12 @@ function TransitionModel._executeHide(self: TransitionModel, doNotAnimate: boole
 			promise:Resolve(result)
 		else
 			promise:Reject()
-			error(string.format("[TransitionModel] - Expected promise to be returned from hideCallback, got %q", tostring(result)))
+			error(
+				string.format(
+					"[TransitionModel] - Expected promise to be returned from hideCallback, got %q",
+					tostring(result)
+				)
+			)
 		end
 	else
 		-- Immediately resolve

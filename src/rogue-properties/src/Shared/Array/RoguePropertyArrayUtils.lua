@@ -4,9 +4,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local DefaultValueUtils = require("DefaultValueUtils")
 local RoguePropertyArrayConstants = require("RoguePropertyArrayConstants")
 local String = require("String")
-local DefaultValueUtils = require("DefaultValueUtils")
 
 local RoguePropertyArrayUtils = {}
 

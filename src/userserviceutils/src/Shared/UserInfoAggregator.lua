@@ -9,11 +9,11 @@ local require = require(script.Parent.loader).load(script)
 
 local Aggregator = require("Aggregator")
 local BaseObject = require("BaseObject")
+local Observable = require("Observable")
+local Promise = require("Promise")
+local PromiseRetryUtils = require("PromiseRetryUtils")
 local Rx = require("Rx")
 local UserServiceUtils = require("UserServiceUtils")
-local PromiseRetryUtils = require("PromiseRetryUtils")
-local Promise = require("Promise")
-local Observable = require("Observable")
 
 local UserInfoAggregator = setmetatable({}, BaseObject)
 UserInfoAggregator.ClassName = "UserInfoAggregator"
@@ -153,7 +153,7 @@ function UserInfoAggregator:ObserveHasVerifiedBadge(userId: number): Observable.
 	return self._aggregator:Observe(userId):Pipe({
 		Rx.map(function(userInfo)
 			return userInfo.HasVerifiedBadge
-		end)
+		end),
 	})
 end
 

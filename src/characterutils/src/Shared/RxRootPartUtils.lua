@@ -31,7 +31,9 @@ end
 	@param humanoid Humanoid
 	@return Observvable<Brio<BasePart>>
 ]=]
-function RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(humanoid: Humanoid): Observable.Observable<Brio.Brio<BasePart>>
+function RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(
+	humanoid: Humanoid
+): Observable.Observable<Brio.Brio<BasePart>>
 	return RxInstanceUtils.observeParentBrio(humanoid):Pipe({
 		RxBrioUtils.switchMapBrio(function(character: Model)
 			return RxRootPartUtils.observeHumanoidRootPartBrio(character)

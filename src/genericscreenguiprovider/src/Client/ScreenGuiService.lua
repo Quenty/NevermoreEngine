@@ -10,10 +10,10 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
-local ValueObject = require("ValueObject")
-local PlayerGuiUtils = require("PlayerGuiUtils")
 local Observable = require("Observable")
+local PlayerGuiUtils = require("PlayerGuiUtils")
 local ServiceBag = require("ServiceBag")
+local ValueObject = require("ValueObject")
 
 local ScreenGuiService = {}
 ScreenGuiService.ServiceName = "ScreenGuiService"

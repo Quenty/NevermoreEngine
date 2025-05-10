@@ -14,41 +14,41 @@ serviceBag:Start()
 local RoguePropertyTableDefinition = require("RoguePropertyTableDefinition")
 
 local propertyDefinition = RoguePropertyTableDefinition.new("CombatStats", {
-	Health = 100;
+	Health = 100,
 
 	Ultimate = {
-		AttackDamage = 30;
-		AbilityPower = 30;
+		AttackDamage = 30,
+		AbilityPower = 30,
 
 		Sequence = {
 			{
-				Name = "Ultimate 1";
-				AnimationId = "rbxassetid://1";
-			};
+				Name = "Ultimate 1",
+				AnimationId = "rbxassetid://1",
+			},
 			{
-				Name = "Ultimate 2";
-				AnimationId = "rbxassetid://2";
-			};
-		};
-	};
+				Name = "Ultimate 2",
+				AnimationId = "rbxassetid://2",
+			},
+		},
+	},
 
 	HeavyPunch = {
-		AttackDamage = 45;
-		AbilityPower = 100;
+		AttackDamage = 45,
+		AbilityPower = 100,
 
 		Sequence = {
 			{
-				Name = "HeavyPunch 1";
-				AnimationId = "rbxassetid://1";
-			};
+				Name = "HeavyPunch 1",
+				AnimationId = "rbxassetid://1",
+			},
 			{
-				Name = "HeavyPunch 2";
-				AnimationId = "rbxassetid://2";
-			};
-		};
-	};
+				Name = "HeavyPunch 2",
+				AnimationId = "rbxassetid://2",
+			},
+		},
+	},
 
-	ReticleHairRotationsDegree = { 0, 120, 240 };
+	ReticleHairRotationsDegree = { 0, 120, 240 },
 })
 
 local properties = propertyDefinition:GetPropertyTable(serviceBag, workspace)
@@ -70,24 +70,24 @@ properties.Changed:Connect(function()
 end)
 
 properties:SetBaseValue({
-	Health = 5;
+	Health = 5,
 
 	Ultimate = {
-		AttackDamage = 2;
-		AbilityPower = 2;
-	};
+		AttackDamage = 2,
+		AbilityPower = 2,
+	},
 
 	HeavyPunch = {
-		AttackDamage = 5;
-		AbilityPower = 9;
-	};
+		AttackDamage = 5,
+		AbilityPower = 9,
+	},
 
-	ReticleHairRotationsDegree = { 1, 25, 135, 325, 500 };
+	ReticleHairRotationsDegree = { 1, 25, 135, 325, 500 },
 })
 
 -- print("ReticleHairRotationsDegree", properties.ReticleHairRotationsDegree.Value)
 
-properties.ReticleHairRotationsDegree.Value = { 2, 5}
+properties.ReticleHairRotationsDegree.Value = { 2, 5 }
 
 -- print("ReticleHairRotationsDegree", properties.ReticleHairRotationsDegree.Value)
 
@@ -97,17 +97,16 @@ properties.Health.Value = 25
 
 properties.Ultimate.Sequence.Value = {
 	{
-		Name = "Another value 3";
-		AnimationId = "rbxassetid://3";
-	};
+		Name = "Another value 3",
+		AnimationId = "rbxassetid://3",
+	},
 }
 
 -- print("properties.Ultimate.Sequence", properties.Ultimate.Sequence.Value)
 
 properties.Value = {
-	Health = 25000;
-};
-
+	Health = 25000,
+}
 
 local multiplier = ultAttackDamage:CreateMultiplier(2, workspace)
 -- ultAttackDamage:CreateAdditive(100, workspace)

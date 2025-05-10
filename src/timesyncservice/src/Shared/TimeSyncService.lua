@@ -153,7 +153,6 @@ function TimeSyncService.ObserveSyncedClock(self: TimeSyncService): Observable.O
 	return Rx.fromPromise(self:PromiseSyncedClock()) :: any
 end
 
-
 function TimeSyncService._buildMasterClock(self: TimeSyncService): MasterClock.MasterClock
 	local remoteEvent = GetRemoteEvent(TimeSyncConstants.REMOTE_EVENT_NAME)
 	local remoteFunction = GetRemoteFunction(TimeSyncConstants.REMOTE_FUNCTION_NAME)

@@ -12,12 +12,12 @@ local RunService = game:GetService("RunService")
 
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local ServiceBag = require("ServiceBag")
-local Observable = require("Observable")
 
 export type ReceiptInfo = {
 	PurchaseId: number,
@@ -181,7 +181,10 @@ function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo: Receip
 	return self._defaultDecision.Value
 end
 
-function ReceiptProcessingService:_fireProcessed(receiptInfo: ReceiptInfo, productPurchaseDecision: Enum.ProductPurchaseDecision)
+function ReceiptProcessingService:_fireProcessed(
+	receiptInfo: ReceiptInfo,
+	productPurchaseDecision: Enum.ProductPurchaseDecision
+)
 	assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad productPurchaseDecision")
 
 	self.ReceiptProcessed:Fire(receiptInfo, productPurchaseDecision)

@@ -58,9 +58,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Subscription = require("Subscription")
 local DuckTypeUtils = require("DuckTypeUtils")
 local MaidTaskUtils = require("MaidTaskUtils")
+local Subscription = require("Subscription")
 
 local ENABLE_STACK_TRACING = false
 

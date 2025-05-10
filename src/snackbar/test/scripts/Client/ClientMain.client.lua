@@ -16,11 +16,11 @@ local LipsumUtils = require("LipsumUtils")
 local function showSnackbar()
 	snackbarServiceClient:ShowSnackbar(LipsumUtils.sentence(5), {
 		CallToAction = {
-			Text = LipsumUtils.word();
+			Text = LipsumUtils.word(),
 			OnClick = function()
 				print("Activated action")
-			end;
-		}
+			end,
+		},
 	})
 end
 

@@ -86,7 +86,13 @@ function ModuleProvider:_addToRegistery(moduleScript)
 	xpcall(function()
 		_module = require(moduleScript)
 	end, function(err)
-		error(string.format("[ModuleProvider._addToRegistery] - Failed to load %q due to %q", moduleScript:GetFullName(), tostring(err)))
+		error(
+			string.format(
+				"[ModuleProvider._addToRegistery] - Failed to load %q due to %q",
+				moduleScript:GetFullName(),
+				tostring(err)
+			)
+		)
 	end)
 
 	if self._checkModule then

@@ -9,11 +9,11 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local PromiseUtils = require("PromiseUtils")
-local Symbol = require("Symbol")
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 local ServiceBag = require("ServiceBag")
+local Symbol = require("Symbol")
 
 local BindToCloseService = {}
 BindToCloseService.ServiceName = "BindToCloseService"

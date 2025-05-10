@@ -2,7 +2,8 @@
 	@class InfluxDBEscapeUtils.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local InfluxDBEscapeUtils = require("InfluxDBEscapeUtils")
 local Jest = require("Jest")
@@ -25,11 +26,11 @@ end)
 
 describe("InfluxDBEscapeUtils.quoted", function()
 	it("should pass through fine", function()
-		expect(InfluxDBEscapeUtils.quoted("hi")).toBe("\"hi\"")
+		expect(InfluxDBEscapeUtils.quoted("hi")).toBe('"hi"')
 	end)
 
 	it("should escape quotes", function()
-		expect(InfluxDBEscapeUtils.quoted("\"hi")).toBe("\"\\\"hi\"")
+		expect(InfluxDBEscapeUtils.quoted('"hi')).toBe('"\\"hi"')
 	end)
 end)
 

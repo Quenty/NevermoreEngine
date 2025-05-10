@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
-local RxBrioUtils = require("RxBrioUtils")
 local Brio = require("Brio")
 local Observable = require("Observable")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 export type R15Side = "Left" | "Right"
 

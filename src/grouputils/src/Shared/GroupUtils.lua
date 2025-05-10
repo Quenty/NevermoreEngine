@@ -125,20 +125,19 @@ function GroupUtils.promiseGroupRoleInfo(groupId: number, rankId: number): Promi
 	assert(groupId, "Bad groupId")
 	assert(rankId, "Bad rankId")
 
-	return GroupUtils.promiseGroupInfo(groupId)
-		:Then(function(groupInfo)
-			if type(groupInfo.Roles) ~= "table" then
-				return Promise.rejected("No Roles table")
-			end
+	return GroupUtils.promiseGroupInfo(groupId):Then(function(groupInfo)
+		if type(groupInfo.Roles) ~= "table" then
+			return Promise.rejected("No Roles table")
+		end
 
-			for _, rankInfo in groupInfo.Roles do
-				if rankInfo.Rank == rankId then
-					return rankInfo
-				end
+		for _, rankInfo in groupInfo.Roles do
+			if rankInfo.Rank == rankId then
+				return rankInfo
 			end
+		end
 
-			return Promise.rejected("No rank with given id")
-		end)
+		return Promise.rejected("No rank with given id")
+	end)
 end
 
 return GroupUtils

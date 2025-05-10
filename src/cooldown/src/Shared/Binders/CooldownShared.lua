@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local CooldownBase = require("CooldownBase")
 local Binder = require("Binder")
+local CooldownBase = require("CooldownBase")
 local ServiceBag = require("ServiceBag")
 
 local CooldownShared = setmetatable({}, CooldownBase)

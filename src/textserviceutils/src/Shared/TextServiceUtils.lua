@@ -8,9 +8,9 @@ local require = require(script.Parent.loader).load(script)
 local TextService = game:GetService("TextService")
 
 local Blend = require("Blend")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
-local Observable = require("Observable")
 
 local TextServiceUtils = {}
 

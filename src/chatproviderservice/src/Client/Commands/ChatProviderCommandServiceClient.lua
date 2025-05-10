@@ -7,10 +7,10 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local ChatTagCmdrUtils = require("ChatTagCmdrUtils")
-local Set = require("Set")
 local Maid = require("Maid")
-local String = require("String")
 local ServiceBag = require("ServiceBag")
+local Set = require("Set")
+local String = require("String")
 
 local ChatProviderCommandServiceClient = {}
 ChatProviderCommandServiceClient.ServiceName = "ChatProviderCommandServiceClient"
@@ -39,7 +39,7 @@ function ChatProviderCommandServiceClient:_registerChatCommand(cmdr)
 			return
 		end
 
-		if String.startsWith(textChatMessage.Text, "/cmdr")  then
+		if String.startsWith(textChatMessage.Text, "/cmdr") then
 			cmdr:Show()
 		end
 	end))

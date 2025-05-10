@@ -4,12 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RogueProperty = require("RogueProperty")
-local ServiceBag = require("ServiceBag")
-local RoguePropertyUtils = require("RoguePropertyUtils")
 local DuckTypeUtils = require("DuckTypeUtils")
-local ValueBaseUtils = require("ValueBaseUtils")
+local RogueProperty = require("RogueProperty")
 local RoguePropertyCacheService = require("RoguePropertyCacheService")
+local RoguePropertyUtils = require("RoguePropertyUtils")
+local ServiceBag = require("ServiceBag")
+local ValueBaseUtils = require("ValueBaseUtils")
 
 local RoguePropertyDefinition = {}
 RoguePropertyDefinition.ClassName = "RoguePropertyDefinition"
@@ -158,6 +158,5 @@ function RoguePropertyDefinition:_computeStorageInstanceType()
 		error(string.format("Unknown valueType %q", tostring(self._valueType)))
 	end
 end
-
 
 return RoguePropertyDefinition

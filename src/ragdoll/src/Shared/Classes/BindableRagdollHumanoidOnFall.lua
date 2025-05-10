@@ -42,7 +42,7 @@ function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 	end)
 
 	task.spawn(function()
-		task.wait(math.random()*FRAME_TIME) -- Apply jitter
+		task.wait(math.random() * FRAME_TIME) -- Apply jitter
 		while alive do
 			self:_updateVelocity()
 			task.wait(FRAME_TIME)
@@ -152,11 +152,9 @@ function BindableRagdollHumanoidOnFall:_updateVelocity()
 	end
 
 	local currentState = self._obj:GetState()
-	if currentState == Enum.HumanoidStateType.Physics
-		or currentState == Enum.HumanoidStateType.Swimming then
+	if currentState == Enum.HumanoidStateType.Physics or currentState == Enum.HumanoidStateType.Swimming then
 		return
 	end
-
 
 	if (os.clock() - self._lastRagDollTime) <= RAGDOLL_DEBOUNCE_TIME then
 		return

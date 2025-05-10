@@ -7,9 +7,9 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
-local RxInstanceUtils = require("RxInstanceUtils")
 local Observable = require("Observable")
+local RxInstanceUtils = require("RxInstanceUtils")
+local ValueObject = require("ValueObject")
 
 local AdorneePartBoundingBox = setmetatable({}, BaseObject)
 AdorneePartBoundingBox.ClassName = "AdorneePartBoundingBox"

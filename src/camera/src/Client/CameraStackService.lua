@@ -7,9 +7,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local HttpService = game:GetService("HttpService")
 
 local CameraEffectUtils = require("CameraEffectUtils")
 local CameraStack = require("CameraStack")

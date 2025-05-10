@@ -25,7 +25,7 @@ function ColorPickerUtils.getOutlineWithContrast(color: Color3, backingColor: Co
 		v = math.clamp(v - 80, 0, 100)
 	end
 
-	return LuvColor3Utils.toColor3({l, u, v})
+	return LuvColor3Utils.toColor3({ l, u, v })
 end
 
 return ColorPickerUtils

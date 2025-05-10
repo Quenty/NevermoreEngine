@@ -7,17 +7,17 @@
 local InputObjectUtils = {}
 
 local MOUSE_USER_INPUT_TYPES = {
-	[Enum.UserInputType.MouseButton1] = true;
-	[Enum.UserInputType.MouseButton2] = true;
-	[Enum.UserInputType.MouseButton3] = true;
-	[Enum.UserInputType.MouseWheel] = true;
-	[Enum.UserInputType.MouseMovement] = true;
+	[Enum.UserInputType.MouseButton1] = true,
+	[Enum.UserInputType.MouseButton2] = true,
+	[Enum.UserInputType.MouseButton3] = true,
+	[Enum.UserInputType.MouseWheel] = true,
+	[Enum.UserInputType.MouseMovement] = true,
 }
 
 local MOUSE_BUTTON_USER_INPUT_TYPES = {
-	[Enum.UserInputType.MouseButton1] = true;
-	[Enum.UserInputType.MouseButton2] = true;
-	[Enum.UserInputType.MouseButton3] = true;
+	[Enum.UserInputType.MouseButton1] = true,
+	[Enum.UserInputType.MouseButton2] = true,
+	[Enum.UserInputType.MouseButton3] = true,
 }
 
 --[=[

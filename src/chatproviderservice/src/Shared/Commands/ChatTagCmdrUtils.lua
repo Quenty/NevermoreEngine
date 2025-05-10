@@ -11,7 +11,7 @@ function ChatTagCmdrUtils.registerChatTagKeys(cmdr, chatProviderService)
 			local chatTagKeyList = chatProviderService:GetChatTagKeyList()
 			local find = cmdr.Util.MakeFuzzyFinder(chatTagKeyList)
 			return find(text)
-		end;
+		end,
 		Validate = function(keys)
 			return #keys > 0, "No chat tag with that key could be found."
 		end,
@@ -20,7 +20,7 @@ function ChatTagCmdrUtils.registerChatTagKeys(cmdr, chatProviderService)
 		end,
 		Parse = function(keys)
 			return keys[1]
-		end;
+		end,
 	}
 
 	cmdr.Registry:RegisterType("chatTagKey", chatTagKey)

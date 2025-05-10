@@ -31,8 +31,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 
 local BaseObject = require("BaseObject")
 local InputObjectRayUtils = require("InputObjectRayUtils")

@@ -5,11 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
-local RxBrioUtils = require("RxBrioUtils")
-local Observable = require("Observable")
 local Brio = require("Brio")
+local Observable = require("Observable")
 local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxValueBaseUtils = {}
 
@@ -62,7 +62,6 @@ function RxValueBaseUtils.observe(
 		RxBrioUtils.emitOnDeath(defaultValue) :: any,
 	}) :: any
 end
-
 
 --[=[
 	Observables a given value object's value

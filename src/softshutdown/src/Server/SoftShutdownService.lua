@@ -24,9 +24,9 @@ local Workspace = game:GetService("Workspace")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 local SoftShutdownConstants = require("SoftShutdownConstants")
 local TeleportServiceUtils = require("TeleportServiceUtils")
-local ServiceBag = require("ServiceBag")
 
 local SoftShutdownService = {}
 SoftShutdownService.ServiceName = "SoftShutdownService"
@@ -84,7 +84,7 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 	local initialTeleportOptions = Instance.new("TeleportOptions")
 	initialTeleportOptions.ShouldReserveServer = true
 	initialTeleportOptions:SetTeleportData({
-		isSoftShutdownReserveServer = true;
+		isSoftShutdownReserveServer = true,
 	})
 
 	-- Collect any players remaining
@@ -96,9 +96,10 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 	return Promise.spawn(function(resolve, _reject)
 		-- Wait to let the teleport GUI be set
 		task.delay(1, resolve)
-	end):Then(function()
-		return TeleportServiceUtils.promiseTeleport(game.PlaceId, players, initialTeleportOptions)
 	end)
+		:Then(function()
+			return TeleportServiceUtils.promiseTeleport(game.PlaceId, players, initialTeleportOptions)
+		end)
 		:Then(function(teleportResult)
 			self._maid._playerAddedCollector = nil
 
@@ -107,18 +108,24 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 			newTeleportOptions.ServerInstanceId = teleportResult.PrivateServerId
 			newTeleportOptions.ReservedServerAccessCode = teleportResult.ReservedServerAccessCode
 			newTeleportOptions:SetTeleportData({
-				isSoftShutdownReserveServer = true;
+				isSoftShutdownReserveServer = true,
 			})
 
 			-- Teleport any players that joined during initial teleport
 			local promises = {}
 
 			if #remainingPlayers > 0 then
-				table.insert(promises, TeleportServiceUtils.promiseTeleport(game.PlaceId, remainingPlayers, newTeleportOptions))
+				table.insert(
+					promises,
+					TeleportServiceUtils.promiseTeleport(game.PlaceId, remainingPlayers, newTeleportOptions)
+				)
 			end
 
 			self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
-				table.insert(promises, TeleportServiceUtils.promiseTeleport(game.PlaceId, { player }, newTeleportOptions))
+				table.insert(
+					promises,
+					TeleportServiceUtils.promiseTeleport(game.PlaceId, { player }, newTeleportOptions)
+				)
 			end))
 
 			-- We hope this works!
@@ -159,22 +166,21 @@ function SoftShutdownService:_promiseRedirectAllPlayers()
 		self._maid:GiveTask(reject)
 
 		resolve(players)
+	end):Then(function(players)
+		local teleportOptions = Instance.new("TeleportOptions")
+		teleportOptions:SetTeleportData({
+			isSoftShutdownArrivingIntoUpdatedServer = true,
+		})
+
+		-- Teleport all remaining players
+		self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
+			task.wait(1) -- Let the teleport GUI be set
+			TeleportServiceUtils.promiseTeleport(game.PlaceId, { player }, teleportOptions)
+		end))
+
+		-- Try to keep players in the same group
+		return TeleportServiceUtils.promiseTeleport(game.PlaceId, players, teleportOptions)
 	end)
-		:Then(function(players)
-			local teleportOptions = Instance.new("TeleportOptions")
-			teleportOptions:SetTeleportData({
-				isSoftShutdownArrivingIntoUpdatedServer = true;
-			})
-
-			-- Teleport all remaining players
-			self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
-				task.wait(1) -- Let the teleport GUI be set
-				TeleportServiceUtils.promiseTeleport(game.PlaceId, { player }, teleportOptions)
-			end))
-
-			-- Try to keep players in the same group
-			return TeleportServiceUtils.promiseTeleport(game.PlaceId, players, teleportOptions)
-		end)
 end
 
 function SoftShutdownService:Destroy()

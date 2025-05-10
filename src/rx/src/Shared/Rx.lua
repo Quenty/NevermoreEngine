@@ -18,11 +18,11 @@ local Maid = require("Maid")
 local MaidTaskUtils = require("MaidTaskUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
+local Signal = require("Signal")
+local Subscription = require("Subscription")
 local Symbol = require("Symbol")
 local ThrottledFunction = require("ThrottledFunction")
-local Subscription = require("Subscription")
 local cancellableDelay = require("cancellableDelay")
-local Signal = require("Signal")
 
 export type Map<Key, Value> = { [Key]: Value }
 export type Set<T> = { [T]: true }

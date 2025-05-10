@@ -78,7 +78,7 @@ end
 function CameraInputUtils.getCappedAspectRatio(viewportSize: Vector2): number
 	local x = math.clamp(viewportSize.X, 0, 1920)
 	local y = math.clamp(viewportSize.Y, 0, 1080)
-	return x/y
+	return x / y
 end
 
 return CameraInputUtils

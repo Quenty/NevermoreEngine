@@ -6,11 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxBinderUtils = require("RxBinderUtils")
-local Observable = require("Observable")
-local Maid = require("Maid")
-local Rx = require("Rx")
 local BinderGroup = require("BinderGroup")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local RxBinderUtils = require("RxBinderUtils")
 
 local RxBinderGroupUtils = {}
 

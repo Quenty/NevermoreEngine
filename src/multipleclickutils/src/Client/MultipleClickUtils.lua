@@ -8,9 +8,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local Signal = require("Signal")
 
 local MultipleClickUtils = {}
 
@@ -98,7 +98,11 @@ end
 	@param requiredCount number
 	@return Signal<InputObject>
 ]=]
-function MultipleClickUtils.getMultipleClickSignal(maid, gui: GuiObject, requiredCount: number): Signal.Signal<InputObject>
+function MultipleClickUtils.getMultipleClickSignal(
+	maid,
+	gui: GuiObject,
+	requiredCount: number
+): Signal.Signal<InputObject>
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(gui) == "Instance", "Bad gui")
 	assert(type(requiredCount) == "number", "Bad requiredCount")
@@ -114,9 +118,11 @@ function MultipleClickUtils.getMultipleClickSignal(maid, gui: GuiObject, require
 			return
 		end
 
-		if lastInputObject
+		if
+			lastInputObject
 			and inputObject.UserInputType == lastInputObject.UserInputType
-			and (os.clock() - lastInputTime) <= TIME_TO_CLICK_AGAIN then
+			and (os.clock() - lastInputTime) <= TIME_TO_CLICK_AGAIN
+		then
 			inputCount = inputCount + 1
 
 			if inputCount >= requiredCount then

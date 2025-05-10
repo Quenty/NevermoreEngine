@@ -19,7 +19,12 @@ local PlaneUtils = {}
 	@return Vector3? -- Intersection point
 	@return number? -- Distance to intersection point
 ]=]
-function PlaneUtils.rayIntersection(origin: Vector3, normal: Vector3, rayOrigin: Vector3, unitRayDirection: Vector3): (Vector3?, number?)
+function PlaneUtils.rayIntersection(
+	origin: Vector3,
+	normal: Vector3,
+	rayOrigin: Vector3,
+	unitRayDirection: Vector3
+): (Vector3?, number?)
 	local rpoint = rayOrigin - origin
 	local dot = unitRayDirection:Dot(normal)
 	if dot == 0 then

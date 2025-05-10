@@ -478,33 +478,37 @@ function InputKeyMapList._ensureInit(self: InputKeyMapList)
 	self._isRobloxTouchButton = self._maid:Add(StateStack.new(false, "boolean"))
 
 	-- Listen
-	self._maid:GiveTask(self._inputModeTypeToInputKeyMap:ObserveValuesBrio():Subscribe(function(brio: Brio.Brio<InputKeyMap.InputKeyMap>)
-		if brio:IsDead() then
-			return
-		end
-
-		local inputKeyMapMaid = brio:ToMaid()
-		local inputKeyMap: InputKeyMap.InputKeyMap = brio:GetValue()
-
-		inputKeyMapMaid:GiveTask(inputKeyMap:ObserveInputTypesList():Subscribe(function(inputTypes)
-			local maid = Maid.new()
-
-			for _, inputType in inputTypes do
-				-- only emit enum items
-				if typeof(inputType) == "EnumItem" then
-					maid:GiveTask(countingMap:Add(inputType :: any))
-				elseif InputTypeUtils.isTapInWorld(inputType) then
-					maid:GiveTask(self._isTapInWorld:PushState(true))
-				elseif InputTypeUtils.isRobloxTouchButton(inputType) then
-					maid:GiveTask(self._isRobloxTouchButton:PushState(true))
-				elseif InputChordUtils.isModifierInputChord(inputType) then
-					maid:GiveTask(countingMap:Add((inputType :: any).keyCode))
+	self._maid:GiveTask(
+		self._inputModeTypeToInputKeyMap
+			:ObserveValuesBrio()
+			:Subscribe(function(brio: Brio.Brio<InputKeyMap.InputKeyMap>)
+				if brio:IsDead() then
+					return
 				end
-			end
 
-			inputKeyMapMaid._current = maid
-		end))
-	end))
+				local inputKeyMapMaid = brio:ToMaid()
+				local inputKeyMap: InputKeyMap.InputKeyMap = brio:GetValue()
+
+				inputKeyMapMaid:GiveTask(inputKeyMap:ObserveInputTypesList():Subscribe(function(inputTypes)
+					local maid = Maid.new()
+
+					for _, inputType in inputTypes do
+						-- only emit enum items
+						if typeof(inputType) == "EnumItem" then
+							maid:GiveTask(countingMap:Add(inputType :: any))
+						elseif InputTypeUtils.isTapInWorld(inputType) then
+							maid:GiveTask(self._isTapInWorld:PushState(true))
+						elseif InputTypeUtils.isRobloxTouchButton(inputType) then
+							maid:GiveTask(self._isRobloxTouchButton:PushState(true))
+						elseif InputChordUtils.isModifierInputChord(inputType) then
+							maid:GiveTask(countingMap:Add((inputType :: any).keyCode))
+						end
+					end
+
+					inputKeyMapMaid._current = maid
+				end))
+			end)
+	)
 
 	return self._inputTypesForBinding
 end

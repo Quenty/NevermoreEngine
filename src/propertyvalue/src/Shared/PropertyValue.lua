@@ -7,10 +7,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
-local Observable = require("Observable")
 local Brio = require("Brio")
+local Observable = require("Observable")
 local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local PropertyValue = {}
 PropertyValue.ClassName = "PropertyValue"

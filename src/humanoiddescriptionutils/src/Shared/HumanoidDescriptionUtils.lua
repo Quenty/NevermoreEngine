@@ -7,9 +7,9 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local Promise = require("Promise")
 local InsertServiceUtils = require("InsertServiceUtils")
 local PlayersServicePromises = require("PlayersServicePromises")
+local Promise = require("Promise")
 
 local HumanoidDescriptionUtils = {}
 
@@ -65,10 +65,9 @@ end
 	@return Promise
 ]=]
 function HumanoidDescriptionUtils.promiseApplyFromUserName(humanoid, userName)
-	return HumanoidDescriptionUtils.promiseFromUserName(userName)
-		:Then(function(description)
-			return HumanoidDescriptionUtils.promiseApplyDescription(humanoid, description)
-		end)
+	return HumanoidDescriptionUtils.promiseFromUserName(userName):Then(function(description)
+		return HumanoidDescriptionUtils.promiseApplyDescription(humanoid, description)
+	end)
 end
 
 --[=[
@@ -77,10 +76,9 @@ end
 	@return Promise<HumanoidDescription>
 ]=]
 function HumanoidDescriptionUtils.promiseFromUserName(userName)
-	return PlayersServicePromises.promiseUserIdFromName(userName)
-		:Then(function(userId)
-			return HumanoidDescriptionUtils.promiseFromUserId(userId)
-		end)
+	return PlayersServicePromises.promiseUserIdFromName(userName):Then(function(userId)
+		return HumanoidDescriptionUtils.promiseFromUserId(userId)
+	end)
 end
 
 --[=[

@@ -9,10 +9,10 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local Brio = require("Brio")
 local HumanoidTracker = require("HumanoidTracker")
 local Maid = require("Maid")
 local Observable = require("Observable")
-local Brio = require("Brio")
 
 local HumanoidTrackerService = {}
 HumanoidTrackerService.ServiceName = "HumanoidTrackerService"

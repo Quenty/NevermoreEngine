@@ -7,12 +7,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RagdollableBase = require("RagdollableBase")
-local RagdollClient = require("RagdollClient")
-local RxRagdollUtils = require("RxRagdollUtils")
 local Binder = require("Binder")
+local RagdollClient = require("RagdollClient")
+local RagdollableBase = require("RagdollableBase")
 local RagdollableInterface = require("RagdollableInterface")
 local Rx = require("Rx")
+local RxRagdollUtils = require("RxRagdollUtils")
 
 local RagdollableClient = setmetatable({}, RagdollableBase)
 RagdollableClient.ClassName = "RagdollableClient"
@@ -43,7 +43,7 @@ function RagdollableClient:ObserveIsRagdolled()
 	return self._ragdollBinder:Observe(self._obj):Pipe({
 		Rx.map(function(value)
 			return value and true or false
-		end)
+		end),
 	})
 end
 

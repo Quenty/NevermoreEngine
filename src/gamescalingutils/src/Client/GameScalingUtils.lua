@@ -9,9 +9,9 @@ local require = require(script.Parent.loader).load(script)
 local GuiService = game:GetService("GuiService")
 
 local Blend = require("Blend")
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
-local Observable = require("Observable")
 
 local GameScalingUtils = {}
 

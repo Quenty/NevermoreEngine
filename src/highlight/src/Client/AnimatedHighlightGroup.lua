@@ -6,11 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local AnimatedHighlightStack = require("AnimatedHighlightStack")
-local Maid = require("Maid")
-local EnumUtils = require("EnumUtils")
 local AnimatedHighlightModel = require("AnimatedHighlightModel")
+local AnimatedHighlightStack = require("AnimatedHighlightStack")
+local BaseObject = require("BaseObject")
+local EnumUtils = require("EnumUtils")
+local Maid = require("Maid")
 local Rx = require("Rx")
 
 local AnimatedHighlightGroup = setmetatable({}, BaseObject)

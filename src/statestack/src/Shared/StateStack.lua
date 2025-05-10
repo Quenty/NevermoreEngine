@@ -25,11 +25,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
 local Brio = require("Brio")
-local Signal = require("Signal")
 local Observable = require("Observable")
 local Rx = require("Rx")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local StateStack = setmetatable({}, BaseObject)
 StateStack.ClassName = "StateStack"

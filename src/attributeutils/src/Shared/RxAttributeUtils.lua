@@ -130,7 +130,11 @@ end
 	@param condition function | nil
 	@return Observable<Brio<any>>
 ]=]
-function RxAttributeUtils.observeAttributeBrio<T>(instance: Instance, attributeName: string, condition: Rx.Predicate<T>?): Observable.Observable<Brio.Brio<T>>
+function RxAttributeUtils.observeAttributeBrio<T>(
+	instance: Instance,
+	attributeName: string,
+	condition: Rx.Predicate<T>?
+): Observable.Observable<Brio.Brio<T>>
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
 

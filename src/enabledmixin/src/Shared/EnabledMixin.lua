@@ -5,10 +5,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Maid = require("Maid")
+local Observable = require("Observable")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local Observable = require("Observable")
-local Maid = require("Maid")
 
 local EnabledMixin = {}
 

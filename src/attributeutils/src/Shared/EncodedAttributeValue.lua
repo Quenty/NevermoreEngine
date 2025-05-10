@@ -32,10 +32,10 @@ function EncodedAttributeValue.new(object: Instance, attributeName: string, enco
 	assert(type(encode) == "function", "Bad encode")
 
 	local self = {
-		_object = object;
-		_attributeName = attributeName;
-		_decode = decode;
-		_encode = encode;
+		_object = object,
+		_attributeName = attributeName,
+		_decode = decode,
+		_encode = encode,
 	}
 
 	if defaultValue ~= nil and self._object:GetAttribute(self._attributeName) == nil then
@@ -52,7 +52,7 @@ end
 ]=]
 function EncodedAttributeValue:ObserveBrio(condition)
 	return RxAttributeUtils.observeAttributeBrio(self._object, self._attributeName, condition):Pipe({
-		RxBrioUtils.map(rawget(self, "_decode"))
+		RxBrioUtils.map(rawget(self, "_decode")),
 	})
 end
 
@@ -62,7 +62,7 @@ end
 ]=]
 function EncodedAttributeValue:Observe()
 	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self, "_defaultValue")):Pipe({
-		Rx.map(rawget(self, "_decode"))
+		Rx.map(rawget(self, "_decode")),
 	})
 end
 

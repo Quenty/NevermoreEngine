@@ -27,7 +27,7 @@ end
 	@param eloMatchResultList any
 	@return boolean
 ]=]
-function EloMatchResultUtils.isEloMatchResultList(eloMatchResultList: {number }): boolean
+function EloMatchResultUtils.isEloMatchResultList(eloMatchResultList: { number }): boolean
 	if type(eloMatchResultList) ~= "table" then
 		return false
 	end

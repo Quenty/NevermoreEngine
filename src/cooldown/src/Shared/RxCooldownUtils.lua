@@ -6,9 +6,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxBinderUtils = require("RxBinderUtils")
-local Observable = require("Observable")
 local Brio = require("Brio")
+local Observable = require("Observable")
+local RxBinderUtils = require("RxBinderUtils")
 
 local RxCooldownUtils = {}
 

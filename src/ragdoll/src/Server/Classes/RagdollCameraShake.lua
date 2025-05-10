@@ -7,8 +7,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Ragdoll = require("Ragdoll")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
+local Ragdoll = require("Ragdoll")
 
 local RagdollCameraShake = setmetatable({}, BaseObject)
 RagdollCameraShake.ClassName = "RagdollCameraShake"
@@ -25,7 +25,6 @@ function RagdollCameraShake.new(humanoid: Humanoid, serviceBag)
 
 	self._serviceBag = assert(serviceBag, "Bad serviceBag")
 	self._ragdollBinder = self._serviceBag:GetService(Ragdoll)
-
 
 	return self
 end

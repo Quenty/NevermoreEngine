@@ -17,11 +17,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
-local UserInputService = game:GetService("UserInputService")
 local StarterPlayer = game:GetService("StarterPlayer")
+local UserInputService = game:GetService("UserInputService")
 
 local CharacterUtils = require("CharacterUtils")
 local Maid = require("Maid")

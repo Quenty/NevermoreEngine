@@ -5,18 +5,18 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local Brio = require("Brio")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local TieRealmService = require("TieRealmService")
-local ServiceBag = require("ServiceBag")
-local Observable = require("Observable")
-local Brio = require("Brio")
 
 local GameProductDataService = {}
 GameProductDataService.ServiceName = "GameProductDataService"
@@ -267,12 +267,12 @@ function GameProductDataService.ObservePlayerAssetPurchased(
 	return self:_observePlayerProductManagerBrio(player):Pipe({
 		RxBrioUtils.flattenToValueAndNil :: any,
 		RxBrioUtils.switchMapBrio(function(playerProductManager): any
-		if playerProductManager then
-			local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
-			return ownershipTracker:ObserveAssetPurchased(idOrKey)
-		else
-			return Rx.EMPTY
-		end
+			if playerProductManager then
+				local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
+				return ownershipTracker:ObserveAssetPurchased(idOrKey)
+			else
+				return Rx.EMPTY
+			end
 		end) :: any,
 		Rx.map(function()
 			return true

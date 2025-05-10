@@ -6,8 +6,8 @@ local require = require(script.Parent.loader).load(script)
 
 local ClipCharacters = require("ClipCharacters")
 local Maid = require("Maid")
-local StateStack = require("StateStack")
 local ServiceBag = require("ServiceBag")
+local StateStack = require("StateStack")
 
 local ClipCharactersServiceClient = {}
 ClipCharactersServiceClient.ServiceName = "ClipCharactersServiceClient"
@@ -29,16 +29,18 @@ function ClipCharactersServiceClient:PushDisableCharacterCollisionsWithDefault()
 end
 
 function ClipCharactersServiceClient:Start()
-	self._maid:GiveTask(self._disableCollisions:ObserveBrio(function(value)
-		return value
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	self._maid:GiveTask(self._disableCollisions
+		:ObserveBrio(function(value)
+			return value
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-		local maid = brio:ToMaid()
-		maid:GiveTask(ClipCharacters.new())
-	end))
+			local maid = brio:ToMaid()
+			maid:GiveTask(ClipCharacters.new())
+		end))
 end
 
 function ClipCharactersServiceClient:Destroy()

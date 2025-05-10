@@ -8,13 +8,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Maid = require("Maid")
-local DeathReportServiceConstants = require("DeathReportServiceConstants")
-local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local DeathReportProcessor = require("DeathReportProcessor")
+local DeathReportServiceConstants = require("DeathReportServiceConstants")
 local DeathReportUtils = require("DeathReportUtils")
+local Maid = require("Maid")
+local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
 
 -- Note: don't make this too big without upgrading the way we handle the queue
 local MAX_DEATH_REPORTS = 5
@@ -43,12 +43,11 @@ function DeathReportServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	self._lastDeathReports = {}
 
 	-- Setup remote Event
-	self:_promiseRemoteEvent()
-		:Then(function(remoteEvent)
-			self._maid:GiveTask(remoteEvent.OnClientEvent:Connect(function(...)
-				self:_handleClientEvent(...)
-			end))
-		end)
+	self:_promiseRemoteEvent():Then(function(remoteEvent)
+		self._maid:GiveTask(remoteEvent.OnClientEvent:Connect(function(...)
+			self:_handleClientEvent(...)
+		end))
+	end)
 end
 
 --[=[

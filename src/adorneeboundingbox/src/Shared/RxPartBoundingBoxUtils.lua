@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
 local Observable = require("Observable")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxPartBoundingBoxUtils = {}
 

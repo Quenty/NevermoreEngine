@@ -10,11 +10,11 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableSet = require("ObservableSet")
 local Promise = require("Promise")
 local ValueObject = require("ValueObject")
-local Observable = require("Observable")
-local Maid = require("Maid")
 
 local PlayerAssetOwnershipTracker = setmetatable({}, BaseObject)
 PlayerAssetOwnershipTracker.ClassName = "PlayerAssetOwnershipTracker"
@@ -62,7 +62,12 @@ function PlayerAssetOwnershipTracker:_promiseQueryAssetId(assetId: number)
 
 	local promiseOwnershipCallback = self._ownershipCallback.Value
 	if not promiseOwnershipCallback then
-		return Promise.rejected(string.format("[PlayerAssetOwnershipTracker] - Cannot query ownership for assetType %q - No ownership callback set", tostring(self._assetType)))
+		return Promise.rejected(
+			string.format(
+				"[PlayerAssetOwnershipTracker] - Cannot query ownership for assetType %q - No ownership callback set",
+				tostring(self._assetType)
+			)
+		)
 	end
 
 	if self._assetOwnershipPromiseCache[assetId] ~= nil then
@@ -130,7 +135,9 @@ function PlayerAssetOwnershipTracker:PromiseOwnsAsset(idOrKey)
 			return Promise.resolved(true)
 		end
 	else
-		return Promise.rejected(string.format("[PlayerAssetOwnershipTracker.PromiseOwnsAsset] - Nothing with key %q", tostring(idOrKey)))
+		return Promise.rejected(
+			string.format("[PlayerAssetOwnershipTracker.PromiseOwnsAsset] - Nothing with key %q", tostring(idOrKey))
+		)
 	end
 
 	-- Check actual callback querying Roblox
@@ -164,38 +171,32 @@ function PlayerAssetOwnershipTracker:ObserveOwnsAsset(idOrKey)
 
 				-- Only fire once we find the asset
 				local maid, assetId = brio:ToMaidAndValue()
-				maid:GivePromise(self:_promiseQueryAssetId(assetId))
-					:Then(function()
-						maid:GiveTask(self._ownedAssetIdSet:ObserveContains(assetId):Subscribe(function(value)
-							sub:Fire(value)
-						end))
-					end)
+				maid:GivePromise(self:_promiseQueryAssetId(assetId)):Then(function()
+					maid:GiveTask(self._ownedAssetIdSet:ObserveContains(assetId):Subscribe(function(value)
+						sub:Fire(value)
+					end))
+				end)
 			end))
 
 			return topMaid
 		end)
-
-
 	elseif type(idOrKey) == "number" then
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			maid:GivePromise(self:_promiseQueryAssetId(idOrKey))
-				:Then(function()
-					-- Only fire once we find ownership status
+			maid:GivePromise(self:_promiseQueryAssetId(idOrKey)):Then(function()
+				-- Only fire once we find ownership status
 
-					maid:GiveTask(self._ownedAssetIdSet:ObserveContains(idOrKey):Subscribe(function(value)
-						sub:Fire(value)
-					end))
-				end)
+				maid:GiveTask(self._ownedAssetIdSet:ObserveContains(idOrKey):Subscribe(function(value)
+					sub:Fire(value)
+				end))
+			end)
 
 			return maid
 		end)
 	else
 		error("Bad idOrKey")
 	end
-
 end
-
 
 return PlayerAssetOwnershipTracker

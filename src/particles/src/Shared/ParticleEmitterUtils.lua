@@ -8,8 +8,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local NumberSequenceUtils = require("NumberSequenceUtils")
 local Maid = require("Maid")
+local NumberSequenceUtils = require("NumberSequenceUtils")
 
 local ParticleEmitterUtils = {}
 

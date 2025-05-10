@@ -27,8 +27,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
 
 local Brio = require("Brio")
 local CancelToken = require("CancelToken")

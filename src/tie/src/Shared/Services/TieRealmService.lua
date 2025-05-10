@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TieRealmUtils = require("TieRealmUtils")
 local ServiceBag = require("ServiceBag")
+local TieRealmUtils = require("TieRealmUtils")
 local TieRealms = require("TieRealms")
 
 local TieRealmService = {}

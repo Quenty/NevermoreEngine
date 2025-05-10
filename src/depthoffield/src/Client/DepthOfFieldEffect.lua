@@ -383,14 +383,16 @@ function DepthOfFieldEffect._observeRenderedDepthOfFieldState(
 	return self._observeOtherStates :: any
 end
 
-function DepthOfFieldEffect._observeAllDepthOfFieldBrio(_self: DepthOfFieldEffect): Observable.Observable<Brio.Brio<Instance>>
+function DepthOfFieldEffect._observeAllDepthOfFieldBrio(
+	_self: DepthOfFieldEffect
+): Observable.Observable<Brio.Brio<Instance>>
 	return Rx.merge({
 		RxInstanceUtils.observeChildrenOfClassBrio(Lighting, "DepthOfFieldEffect") :: any,
 		RxInstanceUtils.observePropertyBrio(Workspace, "CurrentCamera", function(camera)
-		return camera ~= nil
+			return camera ~= nil
 		end):Pipe({
 			RxBrioUtils.flatMapBrio(function(currentCamera)
-		return RxInstanceUtils.observeChildrenOfClassBrio(currentCamera, "DepthOfFieldEffect")
+				return RxInstanceUtils.observeChildrenOfClassBrio(currentCamera, "DepthOfFieldEffect")
 			end) :: any,
 		}) :: any,
 	}) :: any

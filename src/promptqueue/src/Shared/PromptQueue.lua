@@ -7,13 +7,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local BaseObject = require("BaseObject")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
+local Signal = require("Signal")
 local TransitionModel = require("TransitionModel")
 local ValueObject = require("ValueObject")
-local Signal = require("Signal")
-local Observable = require("Observable")
 
 local PromptQueue = setmetatable({}, BaseObject)
 PromptQueue.ClassName = "PromptQueue"

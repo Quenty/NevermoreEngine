@@ -8,12 +8,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerDataStoreManager = require("PlayerDataStoreManager")
-local DataStorePromises = require("DataStorePromises")
-local Promise = require("Promise")
-local Maid = require("Maid")
-local ServiceBag = require("ServiceBag")
 local DataStore = require("DataStore")
+local DataStorePromises = require("DataStorePromises")
+local Maid = require("Maid")
+local PlayerDataStoreManager = require("PlayerDataStoreManager")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local PlayerDataStoreService = {}
 PlayerDataStoreService.ServiceName = "PlayerDataStoreService"

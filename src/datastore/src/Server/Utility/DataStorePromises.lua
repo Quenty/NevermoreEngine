@@ -9,8 +9,8 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreService = game:GetService("DataStoreService")
 
-local Promise = require("Promise")
 local PagesUtils = require("PagesUtils")
+local Promise = require("Promise")
 local Table = require("Table")
 
 local DataStorePromises = {}
@@ -260,7 +260,6 @@ local function areEquivalentPageData(data: { OrderedDataStoreEntry }, otherData:
 	return Table.deepEquivalent(map, otherMap)
 end
 
-
 --[=[
 	Returns a DataStorePages object. The sort order is determined by ascending,
 	the length of each page by pageSize, and minValue/maxValue are
@@ -274,7 +273,14 @@ end
 	@param maxValue number?
 	@return Promise<OrderedDataStoreEntry>
 ]=]
-function DataStorePromises.promiseOrderedEntries(orderedDataStore: OrderedDataStore, ascending: boolean, pagesize: number, entries: number, minValue: number?, maxValue: number?): Promise.Promise<OrderedDataStoreEntry>
+function DataStorePromises.promiseOrderedEntries(
+	orderedDataStore: OrderedDataStore,
+	ascending: boolean,
+	pagesize: number,
+	entries: number,
+	minValue: number?,
+	maxValue: number?
+): Promise.Promise<OrderedDataStoreEntry>
 	assert(typeof(orderedDataStore) == "Instance" and orderedDataStore:IsA("OrderedDataStore"), "Bad orderedDataStore")
 	assert(type(ascending) == "boolean", "Bad ascending")
 	assert(type(entries) == "number", "Bad entries")

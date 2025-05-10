@@ -2,7 +2,8 @@
 	@class Draw.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
@@ -32,7 +33,7 @@ return function(_target)
 			local baseRay = camera:ViewportPointToRay(position.x, position.y, 0)
 			local ray = Ray.new(baseRay.Origin, baseRay.Direction.unit * 50)
 			local cframe = CFrame.new(ray.Origin, ray.Origin + ray.Direction.unit)
-				* CFrame.Angles(0, math.pi/4, math.pi/4)
+				* CFrame.Angles(0, math.pi / 4, math.pi / 4)
 			local size = Vector3.new(4, 4, 4)
 			local direction = ray.Direction
 

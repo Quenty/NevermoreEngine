@@ -8,12 +8,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local PlayerSettingsUtils = require("PlayerSettingsUtils")
-local RxAttributeUtils = require("RxAttributeUtils")
-local SettingDefinition = require("SettingDefinition")
-local Rx = require("Rx")
 local DataStoreStringUtils = require("DataStoreStringUtils")
+local PlayerSettingsUtils = require("PlayerSettingsUtils")
+local Rx = require("Rx")
+local RxAttributeUtils = require("RxAttributeUtils")
 local ServiceBag = require("ServiceBag")
+local SettingDefinition = require("SettingDefinition")
 
 local PlayerSettingsBase = setmetatable({}, BaseObject)
 PlayerSettingsBase.ClassName = "PlayerSettingsBase"

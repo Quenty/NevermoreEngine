@@ -6,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local Brio = require("Brio")
+local Maid = require("Maid")
 local Observable = require("Observable")
 local ValueObject = require("ValueObject")
 

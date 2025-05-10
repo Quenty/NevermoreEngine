@@ -12,9 +12,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local Players = game:GetService("Players")
 
 local IKRigUtils = require("IKRigUtils")
 local Maid = require("Maid")

@@ -34,7 +34,8 @@ THE SOFTWARE.
 
 local EPSILON = 0.000001
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Fzy = require("Fzy")
 local Jest = require("Jest")
@@ -63,10 +64,10 @@ local function compareTables(a, b)
 end
 
 local config = Fzy.createConfig({
-	caseSensitive = false;
+	caseSensitive = false,
 })
 local caseSensitiveConfig = Fzy.createConfig({
-	caseSensitive = true;
+	caseSensitive = true,
 })
 local MATCH_MAX_LENGTH = Fzy.getMaxLength(config)
 
@@ -187,25 +188,25 @@ end)
 
 describe("positioning", function()
 	it("favors consecutive positions", function()
-		expect(compareTables({1, 5, 6}, Fzy.positions(config, "amo", "app/models/foo"))).toBe(true)
+		expect(compareTables({ 1, 5, 6 }, Fzy.positions(config, "amo", "app/models/foo"))).toBe(true)
 	end)
 	it("favors word beginnings", function()
-		expect(compareTables({1, 5, 12, 13}, Fzy.positions(config, "amor", "app/models/order"))).toBe(true)
-		expect(compareTables({3, 4}, Fzy.positions(config, "aa", "baAa"))).toBe(true)
-		expect(compareTables({4}, Fzy.positions(config, "a", "ba.a"))).toBe(true)
+		expect(compareTables({ 1, 5, 12, 13 }, Fzy.positions(config, "amor", "app/models/order"))).toBe(true)
+		expect(compareTables({ 3, 4 }, Fzy.positions(config, "aa", "baAa"))).toBe(true)
+		expect(compareTables({ 4 }, Fzy.positions(config, "a", "ba.a"))).toBe(true)
 	end)
 	it("works when there are no bonuses", function()
-		expect(compareTables({2, 4}, Fzy.positions(config, "as", "tags"))).toBe(true)
-		expect(compareTables({3, 8}, Fzy.positions(config, "as", "examples.txt"))).toBe(true)
+		expect(compareTables({ 2, 4 }, Fzy.positions(config, "as", "tags"))).toBe(true)
+		expect(compareTables({ 3, 8 }, Fzy.positions(config, "as", "examples.txt"))).toBe(true)
 	end)
 	it("favors smaller groupings of positions", function()
-		expect(compareTables({3, 5, 7}, Fzy.positions(config, "abc", "a/a/b/c/c"))).toBe(true)
-		expect(compareTables({3, 5, 7}, Fzy.positions(config, "abc", "a\\a\\b\\c\\c"))).toBe(true)
-		expect(compareTables({4, 6, 8}, Fzy.positions(config, "abc", "*a*a*b*c*c"))).toBe(true)
-		expect(compareTables({3, 5}, Fzy.positions(config, "ab", "caacbbc"))).toBe(true)
+		expect(compareTables({ 3, 5, 7 }, Fzy.positions(config, "abc", "a/a/b/c/c"))).toBe(true)
+		expect(compareTables({ 3, 5, 7 }, Fzy.positions(config, "abc", "a\\a\\b\\c\\c"))).toBe(true)
+		expect(compareTables({ 4, 6, 8 }, Fzy.positions(config, "abc", "*a*a*b*c*c"))).toBe(true)
+		expect(compareTables({ 3, 5 }, Fzy.positions(config, "ab", "caacbbc"))).toBe(true)
 	end)
 	it("handles exact matches", function()
-		expect(compareTables({1, 2, 3}, Fzy.positions(config, "foo", "foo"))).toBe(true)
+		expect(compareTables({ 1, 2, 3 }, Fzy.positions(config, "foo", "foo"))).toBe(true)
 	end)
 	it("ignores empty requests", function()
 		expect(compareTables({}, Fzy.positions(config, "", ""))).toBe(true)
@@ -218,7 +219,7 @@ describe("positioning", function()
 		expect(Fzy.score(config, longstring, longstring)).toBe(MIN_SCORE)
 	end)
 	it("is case-sensitive when requested", function()
-		expect(compareTables({2, 5}, Fzy.positions(caseSensitiveConfig, "AB", "aAabBb", true))).toBe(true)
+		expect(compareTables({ 2, 5 }, Fzy.positions(caseSensitiveConfig, "AB", "aAabBb", true))).toBe(true)
 	end)
 	it("returns the same score as `score()`", function()
 		local _, s = Fzy.positions(config, "ab", "aaabbb")
@@ -232,7 +233,6 @@ end)
 
 describe("filtering", function()
 	it("repeats application of hasMatch and positions", function()
-
 		-- compare the result of `filter` with repeated calls to `positions`
 		local function check_filter(needle, haystacks, case)
 			local result = Fzy.filter(config, needle, haystacks, case)
@@ -250,10 +250,10 @@ describe("filtering", function()
 			expect(#result).toBe(r)
 		end
 
-		check_filter("a", {"a", "A", "aa", "b", ""})
-		check_filter("a", {"a", "A", "aa", "b", ""}, true)
-		check_filter("", {"a", "A", "aa", "b", ""})
-		check_filter("a", {"b"})
+		check_filter("a", { "a", "A", "aa", "b", "" })
+		check_filter("a", { "a", "A", "aa", "b", "" }, true)
+		check_filter("", { "a", "A", "aa", "b", "" })
+		check_filter("a", { "b" })
 		check_filter("a", {})
 	end)
 end)

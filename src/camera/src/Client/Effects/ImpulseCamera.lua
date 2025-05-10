@@ -8,11 +8,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
 local Spring = require("Spring")
 local SpringUtils = require("SpringUtils")
 local SummedCamera = require("SummedCamera")
-local CameraEffectUtils = require("CameraEffectUtils")
 
 local EPSILON = 1e-6
 

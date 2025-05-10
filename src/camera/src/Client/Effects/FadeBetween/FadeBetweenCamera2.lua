@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local CubicSplineUtils = require("CubicSplineUtils")
 local CameraState = require("CameraState")
+local CubicSplineUtils = require("CubicSplineUtils")
 
 local FadeBetweenCamera2 = {}
 FadeBetweenCamera2.ClassName = "FadeBetweenCamera2"
@@ -18,13 +18,13 @@ FadeBetweenCamera2.__index = FadeBetweenCamera2
 ]=]
 function FadeBetweenCamera2.new(cameraA, cameraB)
 	local self = setmetatable({
-		CameraA = cameraA or error("No cameraA");
-		CameraB = cameraB or error("No cameraB");
-		_state0 = cameraA.CameraState;
-		_time0 = os.clock();
-		_target = 0;
-		_position0 = 0;
-		_speed = 15;
+		CameraA = cameraA or error("No cameraA"),
+		CameraB = cameraB or error("No cameraB"),
+		_state0 = cameraA.CameraState,
+		_time0 = os.clock(),
+		_target = 0,
+		_position0 = 0,
+		_speed = 15,
 	}, FadeBetweenCamera2)
 
 	return self
@@ -138,9 +138,9 @@ function FadeBetweenCamera2:_computeDoneProportion(now)
 		return 1
 	end
 
-	local SPEED_CONSTANT = 0.5/15 -- 0.5 seconds is 15 speed in the other system
+	local SPEED_CONSTANT = 0.5 / 15 -- 0.5 seconds is 15 speed in the other system
 
-	return math.clamp(self._speed*(now - self._time0)*SPEED_CONSTANT/dist_to_travel, 0, 1)
+	return math.clamp(self._speed * (now - self._time0) * SPEED_CONSTANT / dist_to_travel, 0, 1)
 end
 
 return FadeBetweenCamera2

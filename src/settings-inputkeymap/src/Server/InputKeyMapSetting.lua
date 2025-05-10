@@ -6,8 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local InputKeyMapSettingUtils = require("InputKeyMapSettingUtils")
 local InputKeyMapSettingConstants = require("InputKeyMapSettingConstants")
+local InputKeyMapSettingUtils = require("InputKeyMapSettingUtils")
 local SettingDefinition = require("SettingDefinition")
 local SettingsDataService = require("SettingsDataService")
 

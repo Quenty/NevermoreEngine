@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local QFrame = require("QFrame")
-local CameraState = require("CameraState")
-local CameraFrame = require("CameraFrame")
 local CameraEffectUtils = require("CameraEffectUtils")
+local CameraFrame = require("CameraFrame")
+local CameraState = require("CameraState")
+local QFrame = require("QFrame")
 
 local SummedCamera = {}
 SummedCamera.ClassName = "SummedCamera"
@@ -90,15 +90,18 @@ function SummedCamera.__index(self: SummedCamera, index)
 			local a = self.CameraAState
 			local b = self.CameraBState
 
-			local newQFrame = QFrame.fromCFrameClosestTo(a.CFrame*b.CFrame, a.CameraFrame.QFrame)
+			local newQFrame = QFrame.fromCFrameClosestTo(a.CFrame * b.CFrame, a.CameraFrame.QFrame)
 			local cameraFrame = CameraFrame.new(newQFrame, a.FieldOfView + b.FieldOfView)
 
 			-- TODO: compute derivative velocity more correctly of this non-linear thing
 			local newQFrameVelocity = QFrame.fromCFrameClosestTo(
-				a.CameraFrameDerivative.CFrame*b.CameraFrameDerivative.CFrame,
-				a.CameraFrameDerivative.QFrame)
-			local cameraFrameVelocity = CameraFrame.new(newQFrameVelocity,
-				a.CameraFrameDerivative.FieldOfView + b.CameraFrameDerivative.FieldOfView)
+				a.CameraFrameDerivative.CFrame * b.CameraFrameDerivative.CFrame,
+				a.CameraFrameDerivative.QFrame
+			)
+			local cameraFrameVelocity = CameraFrame.new(
+				newQFrameVelocity,
+				a.CameraFrameDerivative.FieldOfView + b.CameraFrameDerivative.FieldOfView
+			)
 
 			local result = CameraState.new(cameraFrame, cameraFrameVelocity)
 			-- result.CFrame =

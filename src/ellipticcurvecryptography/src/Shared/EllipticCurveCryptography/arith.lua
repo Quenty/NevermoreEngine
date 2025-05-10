@@ -1,4 +1,3 @@
-
 -- Big integer arithmetic for 168-bit (and 336-bit) numbers
 -- Numbers are represented as little-endian tables of 24-bit integers
 local twoPower = require(script.Parent.twoPower)

@@ -17,11 +17,11 @@ function SpawnCmdrService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
 
 	self._cmdrService:RegisterCommand({
-		Name = "regen";
-		Aliases = {};
-		Description = "Forces all spawners to regenerate.";
-		Group = "Spawn";
-		Args = {};
+		Name = "regen",
+		Aliases = {},
+		Description = "Forces all spawners to regenerate.",
+		Group = "Spawn",
+		Args = {},
 	}, function(_context)
 		self._spawnService:Regenerate()
 

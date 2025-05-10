@@ -8,11 +8,11 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local InsertServiceUtils = require("InsertServiceUtils")
-local PromiseUtils = require("PromiseUtils")
 local AssetServiceUtils = require("AssetServiceUtils")
-local Promise = require("Promise")
 local HumanoidDescriptionUtils = require("HumanoidDescriptionUtils")
+local InsertServiceUtils = require("InsertServiceUtils")
+local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 
 local RigBuilderUtils = {}
 

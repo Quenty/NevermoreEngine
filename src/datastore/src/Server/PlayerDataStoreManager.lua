@@ -56,10 +56,10 @@ local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local DataStore = require("DataStore")
-local PromiseUtils = require("PromiseUtils")
-local PendingPromiseTracker = require("PendingPromiseTracker")
 local Maid = require("Maid")
+local PendingPromiseTracker = require("PendingPromiseTracker")
 local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 
 local PlayerDataStoreManager = setmetatable({}, BaseObject)
 PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"

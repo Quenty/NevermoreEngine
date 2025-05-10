@@ -62,5 +62,4 @@ function HasChatTagsClient:GetAsRichText(): string?
 	return output
 end
 
-
 return Binder.new("HasChatTags", HasChatTagsClient)

@@ -9,11 +9,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
-local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local ParticleEngineConstants = require("ParticleEngineConstants")
+local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local ServiceBag = require("ServiceBag")
 
 local ParticleEngineClient = {}
@@ -268,7 +268,12 @@ end
 
 -- @param f frame
 -- @param cameraInverse The inverse camera cframe
-function ParticleEngineClient:_particleRender(cameraPosition: Vector3, cameraInverse: CFrame, frame: Frame, particle: Particle)
+function ParticleEngineClient:_particleRender(
+	cameraPosition: Vector3,
+	cameraInverse: CFrame,
+	frame: Frame,
+	particle: Particle
+)
 	local rp: Vector3 = cameraInverse * particle.Position
 	local lsp: Vector2? = particle._lastScreenPosition
 
@@ -310,10 +315,10 @@ function ParticleEngineClient:_particleRender(cameraPosition: Vector3, cameraInv
 	end
 
 	frame.Position = UDim2.new(0, (px + lsp.X - sx) / 2, 0, (py + lsp.Y - sy) / 2)
-	frame.Size = UDim2.new(0, sx, 0,sy)
-	frame.Rotation = 90+math.atan2(rppy,rppx)*57.295779513082
+	frame.Size = UDim2.new(0, sx, 0, sy)
+	frame.Rotation = 90 + math.atan2(rppy, rppx) * 57.295779513082
 	frame.BackgroundColor3 = particle.Color
-	frame.BackgroundTransparency = bgt+(1-bgt)*(1 - preSizeY/sy)
+	frame.BackgroundTransparency = bgt + (1 - bgt) * (1 - preSizeY / sy)
 
 	return true
 end
@@ -321,8 +326,8 @@ end
 function ParticleEngineClient:_updateScreenInfo(camera: Camera)
 	self._screenSizeX = self._screen.AbsoluteSize.x
 	self._screenSizeY = self._screen.AbsoluteSize.y
-	self._planeSizeY = 2*math.tan(camera.FieldOfView*0.0087266462599716)
-	self._planeSizeX = self._planeSizeY*self._screenSizeX/self._screenSizeY
+	self._planeSizeY = 2 * math.tan(camera.FieldOfView * 0.0087266462599716)
+	self._planeSizeX = self._planeSizeY * self._screenSizeX / self._screenSizeY
 end
 
 return ParticleEngineClient

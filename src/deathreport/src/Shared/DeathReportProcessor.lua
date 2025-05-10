@@ -138,13 +138,12 @@ function DeathReportProcessor.ObserveCharacterDeathReports(
 	return self._characterDeathSubTable:Observe(character)
 end
 
-
 --[=[
 	Handles the death report
 
 	@param deathReport DeathReport
 ]=]
-function DeathReportProcessor.HandleDeathReport(self: DeathReportProcessor,deathReport: DeathReportUtils.DeathReport)
+function DeathReportProcessor.HandleDeathReport(self: DeathReportProcessor, deathReport: DeathReportUtils.DeathReport)
 	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathreport")
 
 	if deathReport.killerPlayer then

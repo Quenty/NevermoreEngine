@@ -48,9 +48,13 @@ function InputKeyMapServiceClient:_ensureLocalizationEntries()
 		local value = text
 
 		localizationTable:SetEntryValue(key, source, context, localeId, value)
-		localizationTable:SetEntryValue(key, source, context,
+		localizationTable:SetEntryValue(
+			key,
+			source,
+			context,
 			PseudoLocalize.getDefaultPseudoLocaleId(),
-			PseudoLocalize.pseudoLocalize(value))
+			PseudoLocalize.pseudoLocalize(value)
+		)
 	end))
 end
 

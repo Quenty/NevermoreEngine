@@ -11,10 +11,10 @@ local RunService = game:GetService("RunService")
 local BaseObject = require("BaseObject")
 local Flipbook = require("Flipbook")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
-local Observable = require("Observable")
 
 local FlipbookPlayer = setmetatable({}, BaseObject)
 FlipbookPlayer.ClassName = "FlipbookPlayer"

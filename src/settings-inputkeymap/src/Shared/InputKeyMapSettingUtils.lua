@@ -8,8 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local HttpService = game:GetService("HttpService")
 
 local EnumUtils = require("EnumUtils")
-local JSONUtils = require("JSONUtils")
 local InputTypeUtils = require("InputTypeUtils")
+local JSONUtils = require("JSONUtils")
 local String = require("String")
 
 local InputKeyMapSettingUtils = {}

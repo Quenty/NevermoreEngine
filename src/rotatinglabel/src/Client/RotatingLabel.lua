@@ -55,18 +55,18 @@ function RotatingLabel.new()
 
 						newLabel.Gui.Position = self:_getLabelPosition(index)
 
-					for _, propertyName in { "Transparency", "Damper", "Speed" } do
-						if newLabel[propertyName] ~= self[propertyName] then
-							newLabel[propertyName] = self[propertyName]
+						for _, propertyName in { "Transparency", "Damper", "Speed" } do
+							if newLabel[propertyName] ~= self[propertyName] then
+								newLabel[propertyName] = self[propertyName]
+							end
 						end
-					end
 
-					rawset(labels, index, newLabel)
-					return newLabel
+						rawset(labels, index, newLabel)
+						return newLabel
 					end
 				end
 			else
-			return rawget(labels, labelsIndex)
+				return rawget(labels, labelsIndex)
 				-- error(index .. " is not a valid member")
 			end
 		end,

@@ -33,8 +33,7 @@ function PreviewFinder.new(serviceBag)
 	return self
 end
 
-function PreviewFinder:Observe()
-end
+function PreviewFinder:Observe() end
 
 function PreviewFinder:_setup()
 	for _, serviceName in ipairs(USER_SERVICES) do
@@ -65,6 +64,5 @@ function PreviewFinder:_observeAll(child)
 	return RxInstanceUtils.observeDescendants(child)
 end
 
-function PreviewFinder:_handleChildRemoving()
-end
+function PreviewFinder:_handleChildRemoving() end
 return PreviewFinder

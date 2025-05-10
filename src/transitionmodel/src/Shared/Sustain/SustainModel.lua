@@ -140,7 +140,12 @@ function SustainModel._executeSustain(self: SustainModel, doNotAnimate: boolean?
 			promise:Resolve(result)
 		else
 			promise:Reject()
-			error(string.format("[SustainModel] - Expected promise to be returned from sustainCallback, got %q", tostring(result)))
+			error(
+				string.format(
+					"[SustainModel] - Expected promise to be returned from sustainCallback, got %q",
+					tostring(result)
+				)
+			)
 		end
 	end
 
@@ -150,6 +155,5 @@ function SustainModel._executeSustain(self: SustainModel, doNotAnimate: boolean?
 
 	self._maid._sustaining = maid
 end
-
 
 return SustainModel

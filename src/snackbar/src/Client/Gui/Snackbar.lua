@@ -15,17 +15,17 @@ local ButtonDragModel = require("ButtonDragModel")
 local ButtonHighlightModel = require("ButtonHighlightModel")
 local DuckTypeUtils = require("DuckTypeUtils")
 local Math = require("Math")
+local Observable = require("Observable")
+local Promise = require("Promise")
 local PromiseMaidUtils = require("PromiseMaidUtils")
 local PromiseUtils = require("PromiseUtils")
 local SnackbarOptionUtils = require("SnackbarOptionUtils")
+local SpringObject = require("SpringObject")
 local SpringTransitionModel = require("SpringTransitionModel")
+local Table = require("Table")
 local TransitionModel = require("TransitionModel")
 local UTF8 = require("UTF8")
 local ValueObject = require("ValueObject")
-local SpringObject = require("SpringObject")
-local Table = require("Table")
-local Promise = require("Promise")
-local Observable = require("Observable")
 
 local SHADOW_RADIUS = 2
 local CORNER_RADIUS = 2
@@ -359,26 +359,26 @@ function Snackbar._renderCallToAction(self: Snackbar, callToAction)
 	local buttonModel = self._maid:Add(ButtonHighlightModel.new())
 
 	return Blend.New "TextButton" {
-		Name = "CallToActionButton";
-		AnchorPoint = Vector2.new(1, 0.5);
-		LayoutOrder = 2;
-		BackgroundTransparency = 1;
-		Position = UDim2.new(1, 0, 0.5, 0);
-		AutomaticSize = Enum.AutomaticSize.X;
-		Size = UDim2.new(0, 0, 0, 18);
-		Text = UTF8.upper(callToActionText);
-		Font = Enum.Font.SourceSans;
-		TextSize = assert(self._textLabel, "Must have textLabel").TextSize;
-		TextXAlignment = Enum.TextXAlignment.Right;
+		Name = "CallToActionButton",
+		AnchorPoint = Vector2.new(1, 0.5),
+		LayoutOrder = 2,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(1, 0, 0.5, 0),
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.new(0, 0, 0, 18),
+		Text = UTF8.upper(callToActionText),
+		Font = Enum.Font.SourceSans,
+		TextSize = assert(self._textLabel, "Must have textLabel").TextSize,
+		TextXAlignment = Enum.TextXAlignment.Right,
 		TextColor3 = Blend.Computed(buttonModel:ObservePercentHighlighted(), function(percent)
 			local scale = Math.map(percent, 0, 1, 0, 0.2)
 			return DEFAULT_TEXT_COLOR:Lerp(Color3.new(0, 0, 0), scale)
-		end);
-		TextTransparency = self._computedTransparency;
+		end),
+		TextTransparency = self._computedTransparency,
 
 		[Blend.Instance] = function(gui)
 			buttonModel:SetButton(gui)
-		end;
+		end,
 
 		[Blend.OnEvent "Activated"] = function()
 			self:Hide()
@@ -386,7 +386,7 @@ function Snackbar._renderCallToAction(self: Snackbar, callToAction)
 			if onClick then
 				onClick()
 			end
-		end;
+		end,
 	}
 end
 

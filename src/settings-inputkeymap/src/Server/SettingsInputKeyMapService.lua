@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local InputKeyMapSetting = require("InputKeyMapSetting")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local SettingsInputKeyMapService = {}
@@ -19,7 +19,6 @@ function SettingsInputKeyMapService:Init(serviceBag: ServiceBag.ServiceBag)
 	-- External
 	self._serviceBag:GetService(require("SettingsService"))
 	self._inputKeyMapRegistry = self._serviceBag:GetService(require("InputKeyMapRegistryServiceShared"))
-
 end
 
 function SettingsInputKeyMapService:Start()

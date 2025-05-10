@@ -7,12 +7,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RobloxApiUtils = require("RobloxApiUtils")
-local Promise = require("Promise")
-local RobloxApiMember = require("RobloxApiMember")
-local RobloxApiClass = require("RobloxApiClass")
 local BaseObject = require("BaseObject")
+local Promise = require("Promise")
+local RobloxApiClass = require("RobloxApiClass")
 local RobloxApiDumpConstants = require("RobloxApiDumpConstants")
+local RobloxApiMember = require("RobloxApiMember")
+local RobloxApiUtils = require("RobloxApiUtils")
 
 local RobloxApiDump = setmetatable({}, BaseObject)
 RobloxApiDump.ClassName = "RobloxApiDump"

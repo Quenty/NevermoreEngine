@@ -10,18 +10,28 @@ local TieUtils = require("TieUtils")
 
 local TieMethodInterfaceUtils = {}
 
-function TieMethodInterfaceUtils.get(aliasSelf, tieMethodDefinition, implParent: Instance?, adornee: Instance?, interfaceTieRealm: TieRealms.TieRealm)
+function TieMethodInterfaceUtils.get(
+	aliasSelf,
+	tieMethodDefinition,
+	implParent: Instance?,
+	adornee: Instance?,
+	interfaceTieRealm: TieRealms.TieRealm
+)
 	assert(TieRealmUtils.isTieRealm(interfaceTieRealm), "Bad interfaceTieRealm")
 
 	local tieDefinition = tieMethodDefinition:GetTieDefinition()
 
 	return function(firstArg, ...)
 		if firstArg ~= aliasSelf then
-			error(string.format("Must call methods with self as first parameter (Hint use `%s:%s()` instead of `%s.%s()`)",
-				tieDefinition:GetName(),
-				tieMethodDefinition:GetMemberName(),
-				tieDefinition:GetName(),
-				tieMethodDefinition:GetMemberName()))
+			error(
+				string.format(
+					"Must call methods with self as first parameter (Hint use `%s:%s()` instead of `%s.%s()`)",
+					tieDefinition:GetName(),
+					tieMethodDefinition:GetMemberName(),
+					tieDefinition:GetName(),
+					tieMethodDefinition:GetMemberName()
+				)
+			)
 		end
 
 		if implParent and adornee then

@@ -6,14 +6,14 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Brio = require("Brio")
+local ChatTagDataUtils = require("ChatTagDataUtils")
+local HasChatTagsConstants = require("HasChatTagsConstants")
+local Observable = require("Observable")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ValueObject = require("ValueObject")
-local HasChatTagsConstants = require("HasChatTagsConstants")
-local ChatTagDataUtils = require("ChatTagDataUtils")
-local Observable = require("Observable")
-local Brio = require("Brio")
 
 local HasChatTagsBase = setmetatable({}, BaseObject)
 HasChatTagsBase.ClassName = "HasChatTagsBase"

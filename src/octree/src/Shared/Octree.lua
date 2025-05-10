@@ -43,8 +43,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local OctreeRegionUtils = require("OctreeRegionUtils")
 local OctreeNode = require("OctreeNode")
+local OctreeRegionUtils = require("OctreeRegionUtils")
 
 local EPSILON = 1e-9
 
@@ -264,7 +264,12 @@ function Octree._getRegion<T>(self: Octree<T>, px: number, py: number, pz: numbe
 	return OctreeRegionUtils.findRegion(self._regionHashMap, self._maxRegionSize, px, py, pz)
 end
 
-function Octree._getOrCreateRegion<T>(self: Octree<T>, px: number, py: number, pz: number): OctreeRegionUtils.OctreeRegion<T>
+function Octree._getOrCreateRegion<T>(
+	self: Octree<T>,
+	px: number,
+	py: number,
+	pz: number
+): OctreeRegionUtils.OctreeRegion<T>
 	return OctreeRegionUtils.getOrCreateRegion(self._regionHashMap, self._maxRegionSize, px, py, pz)
 end
 

@@ -9,10 +9,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local CameraState = require("CameraState")
-local getRotationInXZPlane = require("getRotationInXZPlane")
-local SummedCamera = require("SummedCamera")
 local CameraEffectUtils = require("CameraEffectUtils")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local getRotationInXZPlane = require("getRotationInXZPlane")
 
 local RotatedCamera = {}
 RotatedCamera.ClassName = "RotatedCamera"

@@ -85,22 +85,22 @@ function IdleServiceClient:ObserveHumanoidMoveFromCurrentPosition(minimumTimeVis
 	assert(type(minimumTimeVisible) == "number", "Bad minimumTimeVisible")
 
 	return Rx.of(true):Pipe({
-		Rx.delay(minimumTimeVisible);
+		Rx.delay(minimumTimeVisible),
 		Rx.flatMap(function()
 			return self._lastPosition:Observe()
-		end);
+		end),
 		Rx.where(function(value)
 			return value ~= nil
-		end);
-		Rx.first();
+		end),
+		Rx.first(),
 		Rx.flatMap(function(initialPosition)
 			return self._lastPosition:Observe():Pipe({
 				Rx.where(function(position)
 					return position == nil or (initialPosition - position).magnitude >= MOVE_DISTANCE_REQUIRED
-				end)
+				end),
 			})
-		end);
-		Rx.first();
+		end),
+		Rx.first(),
 	})
 end
 

@@ -7,17 +7,17 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
 local PermissionServiceClient = require("PermissionServiceClient")
 local Promise = require("Promise")
-local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
-local String = require("String")
 local ServiceBag = require("ServiceBag")
+local String = require("String")
+local promiseChild = require("promiseChild")
 
 local CmdrServiceClient = {}
 CmdrServiceClient.ServiceName = "CmdrServiceClient"
@@ -80,20 +80,20 @@ end
 function CmdrServiceClient:Start()
 	assert(self._serviceBag, "Not initialized")
 
-	self._maid:GivePromise(PromiseUtils.all({
-		self:PromiseCmdr(),
-		self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider())
-			:Then(function(provider)
+	self._maid
+		:GivePromise(PromiseUtils.all({
+			self:PromiseCmdr(),
+			self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider()):Then(function(provider)
 				return provider:PromiseIsAdmin()
-			end)
-	}))
-	:Then(function(cmdr, isAdmin)
-		if isAdmin then
-			self:_setBindings(cmdr)
-		else
-			cmdr:SetActivationKeys({})
-		end
-	end)
+			end),
+		}))
+		:Then(function(cmdr, isAdmin)
+			if isAdmin then
+				self:_setBindings(cmdr)
+			else
+				cmdr:SetActivationKeys({})
+			end
+		end)
 end
 
 function CmdrServiceClient:_setBindings(cmdr)
@@ -106,7 +106,6 @@ function CmdrServiceClient:_setBindings(cmdr)
 			cmdr:Show()
 		end
 	end))
-
 
 	-- Race condition
 	task.defer(function()
@@ -132,7 +131,8 @@ function CmdrServiceClient:PromiseCmdr()
 		timeout = 1e10
 	end
 
-	self._cmdrPromise = self._maid:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient", timeout))
+	self._cmdrPromise = self._maid
+		:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient", timeout))
 		:Then(function(cmdClient)
 			return Promise.spawn(function(resolve, _reject)
 				-- Requiring cmdr can yield

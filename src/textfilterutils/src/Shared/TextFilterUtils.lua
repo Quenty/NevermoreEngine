@@ -7,8 +7,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TextService = game:GetService("TextService")
 local Chat = game:GetService("Chat")
+local TextService = game:GetService("TextService")
 
 local Promise = require("Promise")
 local TypeUtils = require("TypeUtils")

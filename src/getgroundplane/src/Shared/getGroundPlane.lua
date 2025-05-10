@@ -94,8 +94,12 @@ local goldenAngle = (3 - 5 ^ 0.5) * math.pi
 	@within getGroundPlane
 ]=]
 local function getGroundPlane(
-	basis: CFrame, radius: number, length: number, sampleCount: number,
-	ignoreList: { Instance }, ignoreFunc: (Instance) -> boolean
+	basis: CFrame,
+	radius: number,
+	length: number,
+	sampleCount: number,
+	ignoreList: { Instance },
+	ignoreFunc: (Instance) -> boolean
 ): (Vector3?, Vector3?)
 	debug.profilebegin("createRayData")
 

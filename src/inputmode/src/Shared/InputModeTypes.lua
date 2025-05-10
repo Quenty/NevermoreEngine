@@ -6,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Table = require("Table")
 local InputModeType = require("InputModeType")
+local Table = require("Table")
 
 local InputModeTypes = {}
 

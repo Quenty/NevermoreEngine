@@ -7,13 +7,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
-local Blend = require("Blend")
 local BasicPaneUtils = require("BasicPaneUtils")
-local Math = require("Math")
+local Blend = require("Blend")
 local ColorPickerUtils = require("ColorPickerUtils")
 local LuvColor3Utils = require("LuvColor3Utils")
-local ValueObject = require("ValueObject")
+local Math = require("Math")
 local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local ColorPickerCursorPreview = setmetatable({}, BasicPane)
 ColorPickerCursorPreview.ClassName = "ColorPickerCursorPreview"

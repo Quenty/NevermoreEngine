@@ -6,15 +6,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
-local InputModeType = require("InputModeType")
-local Maid = require("Maid")
-local InputModeProcessor = require("InputModeProcessor")
-local InputModeTypes = require("InputModeTypes")
 local InputMode = require("InputMode")
+local InputModeProcessor = require("InputModeProcessor")
+local InputModeType = require("InputModeType")
+local InputModeTypes = require("InputModeTypes")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local THUMBSTICK_DEADZONE = 0.14

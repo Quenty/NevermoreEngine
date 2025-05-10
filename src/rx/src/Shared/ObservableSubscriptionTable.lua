@@ -172,5 +172,4 @@ function ObservableSubscriptionTable.Destroy<T...>(self: ObservableSubscriptionT
 	end
 end
 
-
 return ObservableSubscriptionTable

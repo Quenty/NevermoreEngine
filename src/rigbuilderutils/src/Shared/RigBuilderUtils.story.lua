@@ -2,14 +2,15 @@
 	@class RigBuilderUtils.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Workspace = game:GetService("Workspace")
 
-local Maid = require("Maid")
-local RigBuilderUtils = require("RigBuilderUtils")
 local CameraStoryUtils = require("CameraStoryUtils")
+local Maid = require("Maid")
 local Promise = require("Promise")
+local RigBuilderUtils = require("RigBuilderUtils")
 
 local function spawnRig(offset, maid, viewportFrame, rig)
 	maid:GiveTask(rig)
@@ -20,10 +21,9 @@ local function spawnRig(offset, maid, viewportFrame, rig)
 		rig.Parent = viewportFrame
 	end)
 
-	rig:SetPrimaryPartCFrame(Workspace.CurrentCamera.CFrame
-		* CFrame.new(0, 0, -15)
-		* CFrame.new(offset, 0, 0)
-		* CFrame.Angles(0, math.pi, 0))
+	rig:SetPrimaryPartCFrame(
+		Workspace.CurrentCamera.CFrame * CFrame.new(0, 0, -15) * CFrame.new(offset, 0, 0) * CFrame.Angles(0, math.pi, 0)
+	)
 end
 
 return function(target)
@@ -42,11 +42,11 @@ return function(target)
 		RigBuilderUtils.promiseR15Rig(),
 		RigBuilderUtils.promisePlayerRig(4397833),
 		RigBuilderUtils.promisePlayerRig(9360463),
-		RigBuilderUtils.promisePlayerRig(676056)
+		RigBuilderUtils.promisePlayerRig(676056),
 	}
 
 	for index, rig in rigs do
-		local offset = ((index - 0.5)/#rigs - 0.5)*#rigs*4
+		local offset = ((index - 0.5) / #rigs - 0.5) * #rigs * 4
 		if Promise.isPromise(rig) then
 			maid:GivePromise(rig):Then(function(actualRig)
 				spawnRig(offset, maid, viewportFrame, actualRig)

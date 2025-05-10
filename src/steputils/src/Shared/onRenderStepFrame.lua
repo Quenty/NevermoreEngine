@@ -4,8 +4,8 @@
 	@class onRenderStepFrame
 ]=]
 
-local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
 --[=[
 	Executes code at a specific point in render step priority queue.

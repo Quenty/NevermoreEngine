@@ -5,9 +5,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local InputKeyMapSettingConstants = require("InputKeyMapSettingConstants")
 local InputKeyMapSettingUtils = require("InputKeyMapSettingUtils")
 local SettingsServiceClient = require("SettingsServiceClient")
-local InputKeyMapSettingConstants = require("InputKeyMapSettingConstants")
 
 local InputKeyMapSettingClient = setmetatable({}, BaseObject)
 InputKeyMapSettingClient.ClassName = "InputKeyMapSettingClient"
@@ -47,10 +47,20 @@ function InputKeyMapSettingClient.new(serviceBag, inputKeyMapList)
 					if decoded then
 						inputKeyMap:SetInputTypesList(decoded)
 					else
-						warn(string.format("[InputKeyMapSettingClient] - Failed to decode setting value from %q", tostring(currentValue)))
+						warn(
+							string.format(
+								"[InputKeyMapSettingClient] - Failed to decode setting value from %q",
+								tostring(currentValue)
+							)
+						)
 					end
 				else
-					warn(string.format("[InputKeyMapSettingClient] - Failed to decode setting value from %q", tostring(currentValue)))
+					warn(
+						string.format(
+							"[InputKeyMapSettingClient] - Failed to decode setting value from %q",
+							tostring(currentValue)
+						)
+					)
 				end
 			end))
 

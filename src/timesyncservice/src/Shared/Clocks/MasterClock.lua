@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local Rx = require("Rx")
-local Observable = require("Observable")
 local BaseClock = require("BaseClock")
+local BaseObject = require("BaseObject")
+local Observable = require("Observable")
+local Rx = require("Rx")
 
 local MasterClock = setmetatable({}, BaseObject)
 MasterClock.__index = MasterClock

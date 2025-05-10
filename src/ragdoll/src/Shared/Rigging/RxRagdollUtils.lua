@@ -9,12 +9,12 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local CharacterUtils = require("CharacterUtils")
 local Maid = require("Maid")
+local RagdollMotorUtils = require("RagdollMotorUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
-local RagdollMotorUtils = require("RagdollMotorUtils")
-local CharacterUtils = require("CharacterUtils")
 
 local RxRagdollUtils = {}
 
@@ -181,7 +181,7 @@ function RxRagdollUtils.runLocal(humanoid: Humanoid)
 					:Then(function(velocityReadings)
 						debug.profilebegin("initragdoll")
 
-					maid:GiveTask(RxRagdollUtils.suppressRootPartCollision(character))
+						maid:GiveTask(RxRagdollUtils.suppressRootPartCollision(character))
 						maid:GiveTask(RxRagdollUtils.enforceHeadCollision(character))
 						maid:GiveTask(RxRagdollUtils.enforceHumanoidStateMachineOff(character, humanoid))
 

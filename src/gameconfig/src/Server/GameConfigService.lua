@@ -7,14 +7,14 @@ local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local GameConfigUtils = require("GameConfigUtils")
-local GameConfigPicker = require("GameConfigPicker")
-local Maid = require("Maid")
-local PreferredParentUtils = require("PreferredParentUtils")
-local GameConfigAssetUtils = require("GameConfigAssetUtils")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigAssetUtils = require("GameConfigAssetUtils")
+local GameConfigPicker = require("GameConfigPicker")
 local GameConfigServiceConstants = require("GameConfigServiceConstants")
+local GameConfigUtils = require("GameConfigUtils")
+local Maid = require("Maid")
+local PreferredParentUtils = require("PreferredParentUtils")
 local ServiceBag = require("ServiceBag")
 
 local GameConfigService = {}
@@ -137,7 +137,11 @@ end
 	@param assetKey string -- Key name to use for the bundle
 	@param assetId number -- Cloud id
 ]=]
-function GameConfigService:AddTypedAsset(assetType: GameConfigAssetTypes.GameConfigAssetType, assetKey: string, assetId: number)
+function GameConfigService:AddTypedAsset(
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetKey: string,
+	assetId: number
+)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 	assert(type(assetId) == "number", "Bad assetId")

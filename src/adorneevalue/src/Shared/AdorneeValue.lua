@@ -216,7 +216,11 @@ end
 	@param observeRadius Observable<number>
 	@return Observable
 ]=]
-function AdorneeValue.ObservePositionTowards(self: AdorneeValue, observeTargetPosition: Observable.Observable<Vector3>, observeRadius: Observable.Observable<number>)
+function AdorneeValue.ObservePositionTowards(
+	self: AdorneeValue,
+	observeTargetPosition: Observable.Observable<Vector3>,
+	observeRadius: Observable.Observable<number>
+)
 	-- TODO: Some sort of de-duplication/multicast.
 
 	return Blend.Computed(
@@ -315,10 +319,10 @@ function AdorneeValue.RenderPositionAttachment(self: AdorneeValue, props)
 	end)
 
 	return Blend.New "Attachment" {
-		Name = props.Name or "AdorneeValueAttachment";
-		Parent = observeParentPart;
-		CFrame = observeCFrame;
-		[Blend.Children] = props[Blend.Children];
+		Name = props.Name or "AdorneeValueAttachment",
+		Parent = observeParentPart,
+		CFrame = observeCFrame,
+		[Blend.Children] = props[Blend.Children],
 	}
 end
 

@@ -12,9 +12,9 @@ local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
 
-local ValueObject = require("ValueObject")
-local Signal = require("Signal")
 local Maid = require("Maid")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local ActionManager = {}
 ActionManager.__index = ActionManager
@@ -50,7 +50,12 @@ function ActionManager.new()
 
 		-- Immediately deactivate
 		if value and not value.IsActivatedValue.Value then
-			warn(string.format("[ActionManager.ActiveAction.Changed] - Immediate deactivation of %q", tostring(value:GetName())))
+			warn(
+				string.format(
+					"[ActionManager.ActiveAction.Changed] - Immediate deactivation of %q",
+					tostring(value:GetName())
+				)
+			)
 			self.ActiveAction.Value = nil
 		end
 	end))

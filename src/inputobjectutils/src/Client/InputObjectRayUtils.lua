@@ -135,12 +135,10 @@ function InputObjectRayUtils.generateCircleRays(ray: Ray, count: number, radius:
 
 	local cframePointing = CFrame.new(origin, origin + direction)
 
-	for i=1, count do
+	for i = 1, count do
 		local angle = math.pi * 2 * (i - 1) / count
-		local offset = cframePointing:VectorToWorldSpace(Vector3.new(
-			math.cos(angle)*radius,
-			math.sin(angle)*radius,
-			0))
+		local offset =
+			cframePointing:VectorToWorldSpace(Vector3.new(math.cos(angle) * radius, math.sin(angle) * radius, 0))
 		table.insert(rays, Ray.new(origin + offset, direction))
 	end
 

@@ -7,9 +7,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
-local Observable = require("Observable")
 
 local RxClippedRectUtils = {}
 

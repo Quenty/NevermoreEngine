@@ -11,11 +11,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 
-local SoundPromiseUtils = require("SoundPromiseUtils")
 local RbxAssetUtils = require("RbxAssetUtils")
+local SoundPromiseUtils = require("SoundPromiseUtils")
 
 export type SoundOptions = {
 	SoundId: number | string,

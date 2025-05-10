@@ -8,11 +8,11 @@ local require = require(script.Parent.loader).load(script)
 local UserInputService = game:GetService("UserInputService")
 
 local BaseObject = require("BaseObject")
-local Maid = require("Maid")
 local Blend = require("Blend")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
-local Observable = require("Observable")
 
 local HandleHighlightModel = setmetatable({}, BaseObject)
 HandleHighlightModel.ClassName = "HandleHighlightModel"
@@ -107,9 +107,7 @@ end
 	Observes target for how highlighted the button is
 	@return Observable<number>
 ]=]
-function HandleHighlightModel.ObservePercentHighlightedTarget(
-	self: HandleHighlightModel
-): Observable.Observable<number>
+function HandleHighlightModel.ObservePercentHighlightedTarget(self: HandleHighlightModel): Observable.Observable<number>
 	return Blend.toPropertyObservable(self.IsHighlighted):Pipe({
 		Rx.map(function(value)
 			return value and 1 or 0

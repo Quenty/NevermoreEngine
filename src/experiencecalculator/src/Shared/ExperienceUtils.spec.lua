@@ -2,7 +2,8 @@
 	@class ExperienceUtils.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local ExperienceUtils = require("ExperienceUtils")
 local Jest = require("Jest")
@@ -12,7 +13,7 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local config = ExperienceUtils.createExperienceConfig({
-	factor = 200;
+	factor = 200,
 })
 
 describe("ExperienceUtils.getLevel", function()

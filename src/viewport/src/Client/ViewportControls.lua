@@ -7,8 +7,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Maid = require("Maid")
 local InputObjectUtils = require("InputObjectUtils")
+local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 
 local SENSITIVITY = Vector2.new(8, 4)

@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
+local CameraState = require("CameraState")
 local Spring = require("Spring")
 local SummedCamera = require("SummedCamera")
-local CameraState = require("CameraState")
-local CameraEffectUtils = require("CameraEffectUtils")
 
 local FadingCamera = {}
 FadingCamera.ClassName = "FadingCamera"

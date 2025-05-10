@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local HttpPromise = require("HttpPromise")
 local InfluxDBClientConfigUtils = require("InfluxDBClientConfigUtils")
+local InfluxDBErrorUtils = require("InfluxDBErrorUtils")
 local InfluxDBPoint = require("InfluxDBPoint")
 local InfluxDBPointSettings = require("InfluxDBPointSettings")
 local InfluxDBWriteBuffer = require("InfluxDBWriteBuffer")
@@ -18,7 +19,6 @@ local InfluxDBWriteOptionUtils = require("InfluxDBWriteOptionUtils")
 local Promise = require("Promise")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local InfluxDBErrorUtils = require("InfluxDBErrorUtils")
 
 local InfluxDBWriteAPI = setmetatable({}, BaseObject)
 InfluxDBWriteAPI.ClassName = "InfluxDBWriteAPI"
@@ -254,11 +254,7 @@ function InfluxDBWriteAPI._getWriteUrl(self: InfluxDBWriteAPI): string
 	-- escape trailing slashes
 	url = string.match(url, "(.-)[\\/]*$") or ""
 
-	return string.format("%s/api/v2/write?org=%s&bucket=%s&precision=%s",
-		url,
-		self._org,
-		self._bucket,
-		self._precision)
+	return string.format("%s/api/v2/write?org=%s&bucket=%s&precision=%s", url, self._org, self._bucket, self._precision)
 end
 
 return InfluxDBWriteAPI

@@ -42,7 +42,6 @@ function SortFunctionUtils.default(a: any, b: any): number
 	end
 end
 
-function SortFunctionUtils.emptyIterator()
-end
+function SortFunctionUtils.emptyIterator() end
 
 return SortFunctionUtils

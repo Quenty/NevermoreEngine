@@ -5,13 +5,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local AttributeUtils = require("AttributeUtils")
-local GameConfigConstants = require("GameConfigConstants")
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
-local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local Binder = require("Binder")
-local RxInstanceUtils = require("RxInstanceUtils")
-local Observable = require("Observable")
 local Brio = require("Brio")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigConstants = require("GameConfigConstants")
+local Observable = require("Observable")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local GameConfigUtils = {}
 
@@ -52,7 +52,10 @@ function GameConfigUtils.getOrCreateAssetFolder(
 	return folder
 end
 
-function GameConfigUtils.observeAssetFolderBrio(config: Folder, assetType: GameConfigAssetTypes.GameConfigAssetType): Observable.Observable<Brio.Brio<Folder>>
+function GameConfigUtils.observeAssetFolderBrio(
+	config: Folder,
+	assetType: GameConfigAssetTypes.GameConfigAssetType
+): Observable.Observable<Brio.Brio<Folder>>
 	assert(typeof(config) == "Instance", "Bad config")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 

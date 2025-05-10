@@ -7,8 +7,8 @@ local loader = modules:FindFirstChild("LoaderUtils", true).Parent
 
 local require = require(loader).bootstrapPlugin(modules)
 
-local Maid = require("Maid")
 local ConverterPane = require("ConverterPane")
+local Maid = require("Maid")
 
 local function renderPane(plugin, target)
 	local maid = Maid.new()
@@ -25,7 +25,7 @@ local function renderPane(plugin, target)
 	pane:SetupSettings(plugin)
 
 	maid:GiveTask(pane:Render({
-		Parent = target;
+		Parent = target,
 	}):Subscribe())
 
 	return maid

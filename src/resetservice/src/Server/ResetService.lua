@@ -9,11 +9,11 @@ local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Remoting = require("Remoting")
 local Maid = require("Maid")
-local StateStack = require("StateStack")
 local PlayerUtils = require("PlayerUtils")
 local Promise = require("Promise")
+local Remoting = require("Remoting")
+local StateStack = require("StateStack")
 
 local ResetService = {}
 ResetService.ServiceName = "ResetService"

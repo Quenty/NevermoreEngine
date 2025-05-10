@@ -26,11 +26,11 @@ local CircleUtils = require("CircleUtils")
 local Maid = require("Maid")
 local Math = require("Math")
 local Observable = require("Observable")
+local Rx = require("Rx")
+local Signal = require("Signal")
 local SpringObject = require("SpringObject")
 local ValueObject = require("ValueObject")
 local ViewportControls = require("ViewportControls")
-local Signal = require("Signal")
-local Rx = require("Rx")
 
 local MAX_PITCH = math.pi / 3
 local MIN_PITCH = -math.pi / 3
@@ -252,46 +252,46 @@ function Viewport.Render(self: Viewport, props)
 			props.Transparency or 0,
 			self._transparency,
 			function(propTransparency, selfTransparency)
-		return Math.map(propTransparency, 0, 1, selfTransparency, 1)
+				return Math.map(propTransparency, 0, 1, selfTransparency, 1)
 			end
 		),
 		[Blend.OnChange("AbsoluteSize")] = self._absoluteSize,
 		[Blend.Attached(function(viewport)
-		local controlsMaid = Maid.new()
+			local controlsMaid = Maid.new()
 
-		-- create viewport controls and obey enabled state
-		local viewportControls = ViewportControls.new(viewport, self)
-		controlsMaid:Add(viewportControls)
-		controlsMaid:Add(self._controlsEnabled:Observe():Subscribe(function(controlsEnabled)
-			viewportControls:SetEnabled(controlsEnabled)
-		end))
+			-- create viewport controls and obey enabled state
+			local viewportControls = ViewportControls.new(viewport, self)
+			controlsMaid:Add(viewportControls)
+			controlsMaid:Add(self._controlsEnabled:Observe():Subscribe(function(controlsEnabled)
+				viewportControls:SetEnabled(controlsEnabled)
+			end))
 
-		return controlsMaid
+			return controlsMaid
 		end)] = true,
 		[Blend.Attached(function(viewport)
-		-- custom parenting scheme to ensure we don't call destroy on children
-		local maid = Maid.new()
+			-- custom parenting scheme to ensure we don't call destroy on children
+			local maid = Maid.new()
 
-		local function update()
-			local value = self._current.Value
-			if value then
-				value.Parent = viewport
+			local function update()
+				local value = self._current.Value
+				if value then
+					value.Parent = viewport
+				end
 			end
-		end
 
-		maid:GiveTask(self._current.Changed:Connect(update))
-		update()
+			maid:GiveTask(self._current.Changed:Connect(update))
+			update()
 
-		maid:GiveTask(function()
-			local value = self._current.Value
+			maid:GiveTask(function()
+				local value = self._current.Value
 
-			-- Ensure we don't call :Destroy() on our preview instance.
-			if value then
-				value.Parent = nil
-			end
-		end)
+				-- Ensure we don't call :Destroy() on our preview instance.
+				if value then
+					value.Parent = nil
+				end
+			end)
 
-		return maid
+			return maid
 		end)] = true,
 		[Blend.Children] = {
 			props[Blend.Children],
@@ -312,12 +312,12 @@ function Viewport.Render(self: Viewport, props)
 						Rx.defaultsToNil :: any,
 					}),
 					function(inst: Instance, absSize: Vector2, fov: number, rotationYaw: number, rotationPitch: number)
-		if typeof(inst) ~= "Instance" then
-			return CFrame.new()
-		end
+						if typeof(inst) ~= "Instance" then
+							return CFrame.new()
+						end
 
-		local aspectRatio = absSize.X / absSize.Y
-		local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(inst)
+						local aspectRatio = absSize.X / absSize.Y
+						local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(inst)
 						if not (bbCFrame and bbSize) then
 							return CFrame.new()
 						end

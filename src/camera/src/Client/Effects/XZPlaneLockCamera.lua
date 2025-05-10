@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
 local getRotationInXZPlane = require("getRotationInXZPlane")
-local CameraEffectUtils = require("CameraEffectUtils")
 
 local XZPlaneLockCamera = {}
 XZPlaneLockCamera.ClassName = "XZPlaneLockCamera"
@@ -30,7 +30,10 @@ function XZPlaneLockCamera.new(camera: CameraEffectUtils.CameraLike): XZPlaneLoc
 	return self
 end
 
-function XZPlaneLockCamera.__add(self: XZPlaneLockCamera, other: CameraEffectUtils.CameraEffect): SummedCamera.SummedCamera
+function XZPlaneLockCamera.__add(
+	self: XZPlaneLockCamera,
+	other: CameraEffectUtils.CameraEffect
+): SummedCamera.SummedCamera
 	return SummedCamera.new(self, other)
 end
 

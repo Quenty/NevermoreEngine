@@ -83,7 +83,11 @@ end
 	@param callback function
 	@return () -> () -- Call to disconnect
 ]=]
-function ReplicatorReferences.ObserveReferenceChanged(self: ReplicatorReferences, orig: Instance, callback: ListenerCallback): () -> ()
+function ReplicatorReferences.ObserveReferenceChanged(
+	self: ReplicatorReferences,
+	orig: Instance,
+	callback: ListenerCallback
+): () -> ()
 	assert(typeof(orig) == "Instance", "Bad orig")
 	assert(type(callback) == "function", "Bad callback")
 

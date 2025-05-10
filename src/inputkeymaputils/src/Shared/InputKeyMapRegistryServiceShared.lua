@@ -12,8 +12,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local ObservableList = require("ObservableList")
-local RxBrioUtils = require("RxBrioUtils")
 local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
 local ServiceBag = require("ServiceBag")
 
 local InputKeyMapRegistryServiceShared = {}
@@ -134,6 +134,5 @@ end
 function InputKeyMapRegistryServiceShared:Destroy()
 	self._maid:DoCleaning()
 end
-
 
 return InputKeyMapRegistryServiceShared

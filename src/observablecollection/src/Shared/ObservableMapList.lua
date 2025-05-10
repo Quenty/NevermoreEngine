@@ -7,6 +7,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableList = require("ObservableList")
@@ -14,7 +15,6 @@ local ObservableMap = require("ObservableMap")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local Signal = require("Signal")
-local Brio = require("Brio")
 
 local ObservableMapList = {}
 ObservableMapList.ClassName = "ObservableMapList"
@@ -442,6 +442,5 @@ function ObservableMapList.Destroy<TKey, TValue>(self: ObservableMapList<TKey, T
 	self._maid:DoCleaning()
 	setmetatable(self :: any, nil)
 end
-
 
 return ObservableMapList

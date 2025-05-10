@@ -11,9 +11,9 @@ local Players = game:GetService("Players")
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local Rx = require("Rx")
 
 local RxCharacterUtils = {}
 
@@ -92,7 +92,7 @@ end
 function RxCharacterUtils.observeIsOfLocalCharacterBrio(instance: Instance): Observable.Observable<Brio.Brio<boolean>>
 	return RxCharacterUtils.observeIsOfLocalCharacter(instance):Pipe({
 		RxBrioUtils.switchToBrio(function(value)
-		return value
+			return value
 		end) :: any,
 	}) :: any
 end

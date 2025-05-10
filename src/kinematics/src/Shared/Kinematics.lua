@@ -205,6 +205,8 @@ function Kinematics:_positionVelocity<T>(now: number): (T, T)
 	local a0: T = rawget(self, "_acceleration")
 	local v0: T = rawget(self, "_velocity0")
 	local p0: T = rawget(self, "_position0")
+
+	-- stylua: ignore
 	return p0 + v0*dt + 0.5*dt*dt*a0,
 	       v0 + a0*dt
 end

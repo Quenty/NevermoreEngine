@@ -88,7 +88,14 @@ function LocalizationEntryParserUtils._parseLocaleFromName(name: string)
 	end
 end
 
-function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId: string, localeId: string, baseKey: string, dataTable, tableName: string)
+function LocalizationEntryParserUtils._parseTableToResultsList(
+	lookupTable,
+	sourceLocaleId: string,
+	localeId: string,
+	baseKey: string,
+	dataTable,
+	tableName: string
+)
 	assert(type(lookupTable) == "table", "Bad lookupTable")
 	assert(type(sourceLocaleId) == "string", "Bad sourceLocaleId")
 	assert(type(localeId) == "string", "Bad localeId")
@@ -99,20 +106,27 @@ function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sour
 	for index, text in dataTable do
 		local key = baseKey .. index
 		if type(text) == "table" then
-			LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, key .. ".", text, tableName)
+			LocalizationEntryParserUtils._parseTableToResultsList(
+				lookupTable,
+				sourceLocaleId,
+				localeId,
+				key .. ".",
+				text,
+				tableName
+			)
 		elseif type(text) == "string" then
 			local found = lookupTable[key]
 			if found then
 				found.Values[localeId] = text
 			else
 				found = {
-					Example = text;
-					Key = key;
-					Context = string.format("[TEMP] - Generated from %s with key %s", tableName, key);
-					Source = text; -- Tempt!
+					Example = text,
+					Key = key,
+					Context = string.format("[TEMP] - Generated from %s with key %s", tableName, key),
+					Source = text, -- Tempt!
 					Values = {
-						[localeId] = text;
-					};
+						[localeId] = text,
+					},
 				}
 
 				lookupTable[key] = found

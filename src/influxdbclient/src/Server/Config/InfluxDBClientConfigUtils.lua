@@ -32,8 +32,8 @@ function InfluxDBClientConfigUtils.createClientConfig(config: InfluxDBClientConf
 	assert(InfluxDBClientConfigUtils.isClientConfig(config), "Bad config")
 
 	return {
-		url = config.url;
-		token = config.token;
+		url = config.url,
+		token = config.token,
 	}
 end
 

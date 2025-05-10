@@ -7,9 +7,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigBase = require("GameConfigBase")
 local GameConfigBindersServer = require("GameConfigBindersServer")
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigUtils = require("GameConfigUtils")
 local ServiceBag = require("ServiceBag")
 

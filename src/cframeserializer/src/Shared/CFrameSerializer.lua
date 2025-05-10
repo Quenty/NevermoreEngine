@@ -110,12 +110,12 @@ function CFrameSerializer.readRotationAzure(data: SerializedCFrame): CFrame
 	local roll = data[5] -- Buffer:ReadSigned(21)
 	local elevation = data[6] -- Buffer:ReadSigned(21)
 
-	azumith = math.pi * (azumith/PRECISION)
-	roll = math.pi * (roll/PRECISION)
-	elevation = (math.pi/2) * (elevation/PRECISION)
+	azumith = math.pi * (azumith / PRECISION)
+	roll = math.pi * (roll / PRECISION)
+	elevation = (math.pi / 2) * (elevation / PRECISION)
 
 	local cframe = CFrame.Angles(0, azumith, 0) * CFrame.Angles(elevation, 0, roll)
-	return cframe + Vector3.new(data[1]/MULTIPLIER, data[2]/MULTIPLIER, data[3]/MULTIPLIER) --, azumith, roll, elevation}
+	return cframe + Vector3.new(data[1] / MULTIPLIER, data[2] / MULTIPLIER, data[3] / MULTIPLIER) --, azumith, roll, elevation}
 end
 
 return CFrameSerializer

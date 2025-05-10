@@ -6,11 +6,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local UndoStackEntry = require("UndoStackEntry")
 local ValueObject = require("ValueObject")
-local Maid = require("Maid")
-local Observable = require("Observable")
 
 local DEFAULT_MAX_SIZE = 25
 

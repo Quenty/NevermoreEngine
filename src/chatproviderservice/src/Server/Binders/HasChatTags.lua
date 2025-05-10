@@ -4,15 +4,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local BinderUtils = require("BinderUtils")
 local ChatTagConstants = require("ChatTagConstants")
 local ChatTagDataUtils = require("ChatTagDataUtils")
 local HasChatTagsBase = require("HasChatTagsBase")
 local HasChatTagsConstants = require("HasChatTagsConstants")
 local LocalizedTextUtils = require("LocalizedTextUtils")
 local PlayerBinder = require("PlayerBinder")
-local String = require("String")
-local BinderUtils = require("BinderUtils")
 local ServiceBag = require("ServiceBag")
+local String = require("String")
 
 local HasChatTags = setmetatable({}, HasChatTagsBase)
 HasChatTags.ClassName = "HasChatTags"

@@ -6,11 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local Promise = require("Promise")
-local BaseObject = require("BaseObject")
 
 local HumanoidTracker = setmetatable({}, BaseObject)
 HumanoidTracker.ClassName = "HumanoidTracker"

@@ -8,8 +8,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 local AdorneeUtils = require("AdorneeUtils")
 local BoundingBoxUtils = require("BoundingBoxUtils")

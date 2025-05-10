@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local InputModeType = require("InputModeType")
 local InputKeyMapList = require("InputKeyMapList")
+local InputModeType = require("InputModeType")
 
 local SlottedTouchButtonUtils = {}
 

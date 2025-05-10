@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local IKGripBase = require("IKGripBase")
 local Binder = require("Binder")
+local IKGripBase = require("IKGripBase")
 local ServiceBag = require("ServiceBag")
 
 local IKRightGrip = setmetatable({}, IKGripBase)

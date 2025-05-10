@@ -59,7 +59,11 @@ end
 --[=[
 	Raycasts from `from` to `to` against the convex hull.
 ]=]
-function ConvexHull2DUtils.raycast(from: Vector2, to: Vector2, hull: { Vector2 }): (Vector2 | nil, Vector2 | nil, Vector2 | nil)
+function ConvexHull2DUtils.raycast(
+	from: Vector2,
+	to: Vector2,
+	hull: { Vector2 }
+): (Vector2 | nil, Vector2 | nil, Vector2 | nil)
 	local candidates = {}
 	local n = #hull
 

@@ -8,7 +8,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local GetRemoteEvent  = require("GetRemoteEvent")
+local GetRemoteEvent = require("GetRemoteEvent")
 local Maid = require("Maid")
 local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
 local PlayerInputModeUtils = require("PlayerInputModeUtils")
@@ -82,6 +82,5 @@ function PlayerInputModeService:_setPlayerInputModeType(player: Player, inputMod
 
 	PlayerInputModeUtils.setPlayerInputModeType(player, inputModeType)
 end
-
 
 return PlayerInputModeService

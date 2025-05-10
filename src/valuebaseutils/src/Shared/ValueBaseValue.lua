@@ -8,12 +8,12 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local Brio = require("Brio")
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxSignal = require("RxSignal")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
-local Observable = require("Observable")
-local Brio = require("Brio")
 
 local ValueBaseValue = {}
 ValueBaseValue.ClassName = "ValueBaseValue"

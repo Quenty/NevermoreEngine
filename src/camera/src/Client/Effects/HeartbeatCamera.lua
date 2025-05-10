@@ -11,10 +11,10 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local SummedCamera = require("SummedCamera")
-local Maid = require("Maid")
-local CameraState = require("CameraState")
 local CameraEffectUtils = require("CameraEffectUtils")
+local CameraState = require("CameraState")
+local Maid = require("Maid")
+local SummedCamera = require("SummedCamera")
 
 local HeartbeatCamera = {}
 HeartbeatCamera.ClassName = "HeartbeatCamera"

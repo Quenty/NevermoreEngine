@@ -197,5 +197,4 @@ function BinderUtils.getDescendants<T>(binder: Binder.Binder<T>, parent: Instanc
 	return objects
 end
 
-
 return BinderUtils

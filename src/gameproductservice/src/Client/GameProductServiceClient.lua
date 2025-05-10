@@ -15,13 +15,13 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
-local Promise = require("Promise")
-local Signal = require("Signal")
-local ServiceBag = require("ServiceBag")
 local Observable = require("Observable")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
 
 local GameProductServiceClient = {}
 GameProductServiceClient.ServiceName = "GameProductServiceClient"

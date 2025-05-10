@@ -184,7 +184,9 @@ end
 	@param humanoidDescription HumanoidDescription
 	@return Promise<HumanoidDescription?>
 ]=]
-function AvatarEditorUtils.promiseCheckApplyDefaultClothing(humanoidDescription: HumanoidDescription): Promise.Promise<HumanoidDescription?>
+function AvatarEditorUtils.promiseCheckApplyDefaultClothing(
+	humanoidDescription: HumanoidDescription
+): Promise.Promise<HumanoidDescription?>
 	assert(
 		typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"),
 		"Bad humanoidDescription"
@@ -763,7 +765,11 @@ end
 	@param rigType HumanoidRigType
 	@return Promise<AvatarPromptResult>
 ]=]
-function AvatarEditorUtils.promptUpdateOutfit(outfitId: number, updatedOutfit: HumanoidDescription, rigType: Enum.HumanoidRigType)
+function AvatarEditorUtils.promptUpdateOutfit(
+	outfitId: number,
+	updatedOutfit: HumanoidDescription,
+	rigType: Enum.HumanoidRigType
+)
 	assert(type(outfitId) == "number", "Bad outfitId")
 	assert(typeof(updatedOutfit) == "Instance" and updatedOutfit:IsA("HumanoidDescription"), "Bad updatedOutfit")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
@@ -776,13 +782,15 @@ function AvatarEditorUtils.promptUpdateOutfit(outfitId: number, updatedOutfit: H
 		maid:DoCleaning()
 	end)
 
-	maid:GiveTask(AvatarEditorService.PromptUpdateOutfitCompleted:Connect(function(avatarPromptResult: Enum.AvatarPromptResult)
-		if avatarPromptResult == Enum.AvatarPromptResult.Success then
-			promise:Resolve(avatarPromptResult)
-		else
-			promise:Reject(avatarPromptResult)
-		end
-	end))
+	maid:GiveTask(
+		AvatarEditorService.PromptUpdateOutfitCompleted:Connect(function(avatarPromptResult: Enum.AvatarPromptResult)
+			if avatarPromptResult == Enum.AvatarPromptResult.Success then
+				promise:Resolve(avatarPromptResult)
+			else
+				promise:Reject(avatarPromptResult)
+			end
+		end)
+	)
 
 	local ok, err = pcall(function()
 		AvatarEditorService:PromptUpdateOutfit(outfitId, updatedOutfit, rigType)

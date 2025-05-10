@@ -30,10 +30,10 @@ end
 function LuvVectorColor3Utils.toColor3(luvV3: Vector3): Color3
 	-- Transform out of this space
 	return Color3.new(unpack(LuvUtils.hsluv_to_rgb({
-		(luvV3.X - 0.5)*200,
-		(luvV3.Y - 0.5)*200,
-		(luvV3.Z - 0.5)*200})
-	))
+		(luvV3.X - 0.5) * 200,
+		(luvV3.Y - 0.5) * 200,
+		(luvV3.Z - 0.5) * 200,
+	})))
 end
 
 return LuvVectorColor3Utils

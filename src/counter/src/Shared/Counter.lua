@@ -8,8 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local Observable = require("Observable")
-local ValueObject = require("ValueObject")
 local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local Counter = setmetatable({}, BaseObject)
 Counter.ClassName = "Counter"

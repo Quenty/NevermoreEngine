@@ -501,13 +501,24 @@ function AdorneeConditionUtils._getObservableFromConditionObj(conditionObj: Inst
 
 	-- TODO: Allow yielding here
 	if coroutine.status(current) ~= "dead" then
-		warn(string.format("[AdorneeConditionUtils.observeAllowed] - Getting condition yielded from %q", conditionObj:GetFullName()))
+		warn(
+			string.format(
+				"[AdorneeConditionUtils.observeAllowed] - Getting condition yielded from %q",
+				conditionObj:GetFullName()
+			)
+		)
 		return Rx.EMPTY
 	end
 
 	-- TODO: Allow non-observables.
 	if not (observable and Observable.isObservable(observable)) then
-		warn(string.format("[AdorneeConditionUtils.observeAllowed] - Failed to get observable from %q. Got %q", conditionObj:GetFullName(), tostring(observable)))
+		warn(
+			string.format(
+				"[AdorneeConditionUtils.observeAllowed] - Failed to get observable from %q. Got %q",
+				conditionObj:GetFullName(),
+				tostring(observable)
+			)
+		)
 		return Rx.EMPTY
 	end
 

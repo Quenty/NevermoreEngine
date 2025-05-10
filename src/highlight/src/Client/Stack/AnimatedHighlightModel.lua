@@ -6,10 +6,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 local EnumUtils = require("EnumUtils")
 local Signal = require("Signal")
-local DuckTypeUtils = require("DuckTypeUtils")
+local ValueObject = require("ValueObject")
 
 local AnimatedHighlightModel = setmetatable({}, BaseObject)
 AnimatedHighlightModel.ClassName = "AnimatedHighlightModel"
@@ -179,6 +179,5 @@ function AnimatedHighlightModel:SetFillTransparency(fillTransparency: number?, d
 
 	self.FillTransparency:SetValue(fillTransparency, doNotAnimate)
 end
-
 
 return AnimatedHighlightModel

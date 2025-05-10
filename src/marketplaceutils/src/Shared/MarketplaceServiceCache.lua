@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local MemorizeUtils = require("MemorizeUtils")
 local MarketplaceUtils = require("MarketplaceUtils")
+local MemorizeUtils = require("MemorizeUtils")
 local ServiceBag = require("ServiceBag")
 
 local MarketplaceServiceCache = {}
@@ -32,7 +32,7 @@ function MarketplaceServiceCache:_ensureInit()
 	end
 
 	self._promiseProductInfo = MemorizeUtils.memoize(MarketplaceUtils.promiseProductInfo, {
-		maxSize = 2048;
+		maxSize = 2048,
 	})
 end
 

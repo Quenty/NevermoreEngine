@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerUtils = require("PlayerUtils")
-local SettingsCmdrUtils = require("SettingsCmdrUtils")
 local Maid = require("Maid")
+local PlayerUtils = require("PlayerUtils")
 local ServiceBag = require("ServiceBag")
+local SettingsCmdrUtils = require("SettingsCmdrUtils")
 
 local SettingsCmdrService = {}
 SettingsCmdrService.ServiceName = "SettingsCmdrService"

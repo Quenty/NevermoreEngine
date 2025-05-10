@@ -7,8 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local RandomUtils = require("RandomUtils")
 local Maid = require("Maid")
+local RandomUtils = require("RandomUtils")
 local ServiceBag = require("ServiceBag")
 
 local UPDATE_PERIOD_SEC = 5
@@ -78,7 +78,13 @@ function SpawnService:Update()
 
 			if (os.clock() - classStartTime) >= MAX_BUDGET_PER_CLASS then
 				if WARN_ON_CLASS_BUDGET_EXHAUST then
-					warn(string.format("[SpawnService.Update] - Class %q ran out of execution budget at %0.4f ms", binder:GetTag(), (os.clock() - classStartTime)*1000))
+					warn(
+						string.format(
+							"[SpawnService.Update] - Class %q ran out of execution budget at %0.4f ms",
+							binder:GetTag(),
+							(os.clock() - classStartTime) * 1000
+						)
+					)
 				end
 				break
 			end
@@ -87,7 +93,13 @@ function SpawnService:Update()
 
 	-- watch dog
 	if (os.clock() - startTime) >= TOTAL_BUDGET_BEFORE_WARN then
-		warn(string.format("[SpawnService.Update] - Update time: %0.4f ms for %d spawners", (os.clock() - startTime)*1000, spawnerCount))
+		warn(
+			string.format(
+				"[SpawnService.Update] - Update time: %0.4f ms for %d spawners",
+				(os.clock() - startTime) * 1000,
+				spawnerCount
+			)
+		)
 	end
 
 	debug.profileend()

@@ -6,9 +6,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Maid = require("Maid")
 local RxInstanceUtils = require("RxInstanceUtils")
 local String = require("String")
-local Maid = require("Maid")
 
 local DisableHatParticles = setmetatable({}, BaseObject)
 DisableHatParticles.ClassName = "DisableHatParticles"

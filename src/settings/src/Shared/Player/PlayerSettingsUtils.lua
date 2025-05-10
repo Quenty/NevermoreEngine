@@ -7,10 +7,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local DataStoreStringUtils = require("DataStoreStringUtils")
+local EnumUtils = require("EnumUtils")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local String = require("String")
-local EnumUtils = require("EnumUtils")
-local DataStoreStringUtils = require("DataStoreStringUtils")
 
 local PlayerSettingsUtils = {}
 

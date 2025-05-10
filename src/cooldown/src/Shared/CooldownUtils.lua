@@ -47,7 +47,6 @@ function CooldownUtils.findCooldown(cooldownBinder, parent: Instance)
 	return BinderUtils.findFirstChild(cooldownBinder, parent)
 end
 
-
 --[=[
 	Makes a copy of the cooldown
 	@param cooldown Instance

@@ -7,9 +7,9 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local BaseObject = require("BaseObject")
+local DeathReportBindersServer = require("DeathReportBindersServer")
 local Maid = require("Maid")
 local PlayerKillTrackerUtils = require("PlayerKillTrackerUtils")
-local DeathReportBindersServer = require("DeathReportBindersServer")
 local ServiceBag = require("ServiceBag")
 
 local PlayerKillTrackerAssigner = setmetatable({}, BaseObject)
@@ -77,6 +77,5 @@ function PlayerKillTrackerAssigner:_handlePlayerAdded(player)
 
 	self._maid[player] = maid
 end
-
 
 return PlayerKillTrackerAssigner

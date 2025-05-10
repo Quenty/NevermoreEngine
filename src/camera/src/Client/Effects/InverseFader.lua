@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SummedCamera = require("SummedCamera")
-local CameraState = require("CameraState")
 local CameraEffectUtils = require("CameraEffectUtils")
+local CameraState = require("CameraState")
 local FadingCamera = require("FadingCamera")
+local SummedCamera = require("SummedCamera")
 
 local InverseFader = {}
 InverseFader.ClassName = "InverseFader"

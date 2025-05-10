@@ -6,10 +6,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local InputTypeUtils = require("InputTypeUtils")
 local ScoredActionPicker = require("ScoredActionPicker")
 local Table = require("Table")
 local TouchButtonScoredActionPicker = require("TouchButtonScoredActionPicker")
-local InputTypeUtils = require("InputTypeUtils")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
 

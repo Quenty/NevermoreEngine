@@ -362,7 +362,7 @@ end
 	@return table -- The same table
 ]=]
 function Table.deepReadonly<T>(target: T): T
-	for _, item in (target :: any) do
+	for _, item in target :: any do
 		if type(item) == "table" then
 			Table.deepReadonly(item)
 		end

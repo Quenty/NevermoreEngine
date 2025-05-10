@@ -27,9 +27,9 @@ local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Rx = require("Rx")
 local Signal = require("Signal")
+local SortFunctionUtils = require("SortFunctionUtils")
 local SortedNode = require("SortedNode")
 local SortedNodeValue = require("SortedNodeValue")
-local SortFunctionUtils = require("SortFunctionUtils")
 local ValueObject = require("ValueObject")
 
 local ObservableSortedList = {}

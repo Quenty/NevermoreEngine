@@ -5,8 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local IKRigInterface = require("IKRigInterface")
-local TieRealmService = require("TieRealmService")
 local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
 
 local IKDataService = {}
 IKDataService.ServiceName = "IKDataService"

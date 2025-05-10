@@ -66,9 +66,8 @@ end
 function MemorizeUtils.createCacheConfig(cacheConfig: CacheConfig?): CacheConfig
 	assert(MemorizeUtils.isCacheConfig(cacheConfig) or cacheConfig == nil, "Bad cacheConfig")
 
-
 	return {
-		maxSize = if cacheConfig and cacheConfig.maxSize then cacheConfig.maxSize else 128;
+		maxSize = if cacheConfig and cacheConfig.maxSize then cacheConfig.maxSize else 128,
 	}
 end
 

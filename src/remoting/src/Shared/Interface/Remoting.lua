@@ -11,18 +11,18 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local Brio = require("Brio")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
-local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local RemotingMember = require("RemotingMember")
-local RemotingRealms = require("RemotingRealms")
 local RemotingRealmUtils = require("RemotingRealmUtils")
+local RemotingRealms = require("RemotingRealms")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local Observable = require("Observable")
-local Brio = require("Brio")
+local promiseChild = require("promiseChild")
 
 local RAW_MEMBERS = {
 	_name = true,
@@ -698,11 +698,11 @@ function Remoting._observeRemoteEventBrio(self: Remoting, memberName: string)
 
 	return self:_observeFolderBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(item)
-		if self._useDummyObject then
-			return RxInstanceUtils.observeLastNamedChildBrio(item, "BindableEvent", remoteFunctionName)
-		else
-			return RxInstanceUtils.observeLastNamedChildBrio(item, "RemoteEvent", remoteFunctionName)
-		end
+			if self._useDummyObject then
+				return RxInstanceUtils.observeLastNamedChildBrio(item, "BindableEvent", remoteFunctionName)
+			else
+				return RxInstanceUtils.observeLastNamedChildBrio(item, "RemoteEvent", remoteFunctionName)
+			end
 		end) :: any,
 	})
 end

@@ -9,9 +9,9 @@ local HttpService = game:GetService("HttpService")
 
 local BaseObject = require("BaseObject")
 local CameraEffectUtils = require("CameraEffectUtils")
+local CameraState = require("CameraState")
 local CustomCameraEffect = require("CustomCameraEffect")
 local DuckTypeUtils = require("DuckTypeUtils")
-local CameraState = require("CameraState")
 
 local CameraStack = setmetatable({}, BaseObject)
 CameraStack.ClassName = "CameraStack"

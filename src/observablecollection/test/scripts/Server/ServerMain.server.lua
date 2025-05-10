@@ -8,8 +8,8 @@ local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.observablecollection)
 
 local ObservableSortedList = require("ObservableSortedList")
-local RxInstanceUtils = require("RxInstanceUtils")
 local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local observableSortedList = ObservableSortedList.new()
 
@@ -37,7 +37,7 @@ observableSortedList:ObserveItemsBrio():Subscribe(function(brio)
 		else
 			local tweenInfo = TweenInfo.new(0.2)
 			local tween = TweenService:Create(part, tweenInfo, {
-				CFrame = cframe;
+				CFrame = cframe,
 			})
 			currentTween = tween
 			tween:Play()
@@ -51,24 +51,24 @@ observableSortedList:ObserveItemsBrio():Subscribe(function(brio)
 
 		if index then
 			part:SetAttribute("CurrentIndex", index)
-			setCFrame(CFrame.new(-5*index, 5, 0) * CFrame.Angles(0, math.pi/2, 0), first)
+			setCFrame(CFrame.new(-5 * index, 5, 0) * CFrame.Angles(0, math.pi / 2, 0), first)
 			first = false
 		else
 			part:SetAttribute("CurrentIndex", "nil")
-			setCFrame(CFrame.new(part.CFrame.x, 10, 0) * CFrame.Angles(0, math.pi/2, 0), first)
+			setCFrame(CFrame.new(part.CFrame.x, 10, 0) * CFrame.Angles(0, math.pi / 2, 0), first)
 			first = false
 		end
 	end))
 
 	maid:GiveTask(function()
 		part:SetAttribute("CurrentIndex", "nil")
-		setCFrame(CFrame.new(part.CFrame.x, 5, 5) * CFrame.Angles(0, math.pi/2, 0), first)
+		setCFrame(CFrame.new(part.CFrame.x, 5, 5) * CFrame.Angles(0, math.pi / 2, 0), first)
 		first = false
 	end)
 end)
 
 local parts = {}
-for i=9, 1, -1 do
+for i = 9, 1, -1 do
 	local part = Instance.new("Part")
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.BottomSurface = Enum.SurfaceType.Smooth
@@ -99,14 +99,16 @@ for i=9, 1, -1 do
 	parts[i] = part
 	part.Parent = workspace
 
-	observableSortedList:Add(part, RxInstanceUtils.observeProperty(part, "Name", nil):Pipe({
-		Rx.map(function(name)
-			return tonumber(name)
-		end)
-	}))
+	observableSortedList:Add(
+		part,
+		RxInstanceUtils.observeProperty(part, "Name", nil):Pipe({
+			Rx.map(function(name)
+				return tonumber(name)
+			end),
+		})
+	)
 end
 
 parts[5].Name = "25"
 parts[9].Name = "3.1"
 parts[2].Name = "remove"
-

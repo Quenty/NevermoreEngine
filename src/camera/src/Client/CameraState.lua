@@ -6,9 +6,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local QFrame = require("QFrame")
 local CameraFrame = require("CameraFrame")
 local DuckTypeUtils = require("DuckTypeUtils")
+local QFrame = require("QFrame")
 
 local CameraState = {}
 CameraState.ClassName = "CameraState"

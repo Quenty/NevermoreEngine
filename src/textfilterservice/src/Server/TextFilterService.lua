@@ -6,9 +6,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local GetRemoteFunction = require("GetRemoteFunction")
+local Promise = require("Promise")
 local TextFilterServiceConstants = require("TextFilterServiceConstants")
 local TextFilterUtils = require("TextFilterUtils")
-local Promise = require("Promise")
 
 local TextFilterService = {}
 TextFilterService.ServiceName = "TextFilterService"
@@ -84,7 +84,10 @@ function TextFilterService:_promiseNonChatStringForBroadcast(
 		end)
 end
 
-function TextFilterService:_promisePreviewNonChatStringForBroadcast(player: Player, text: string): Promise.Promise<string>
+function TextFilterService:_promisePreviewNonChatStringForBroadcast(
+	player: Player,
+	text: string
+): Promise.Promise<string>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(text) == "string", "Bad text")
 

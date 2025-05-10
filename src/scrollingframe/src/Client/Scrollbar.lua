@@ -62,7 +62,7 @@ end
 function Scrollbar:UpdateRender()
 	if self._model.TotalContentLength > self._model.ViewSize then
 		local percentSize = self._model.RenderedContentScrollPercentSize
-		local pos = (1-percentSize) * self._model.RenderedContentScrollPercent
+		local pos = (1 - percentSize) * self._model.RenderedContentScrollPercent
 
 		if self._scrollType == SCROLL_TYPE.Vertical then
 			self.Gui.Size = UDim2.new(self.Gui.Size.X, UDim.new(percentSize, 0))

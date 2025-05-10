@@ -27,8 +27,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
-local SettingDefinition = require("SettingDefinition")
 local ServiceBag = require("ServiceBag")
+local SettingDefinition = require("SettingDefinition")
 
 local SettingDefinitionProvider = {}
 SettingDefinitionProvider.ClassName = "SettingDefinitionProvider"
@@ -176,12 +176,13 @@ function SettingDefinitionProvider:__index(index)
 		error("[SettingDefinitionProvider] - Cannot index provider with nil value")
 	elseif SettingDefinitionProvider[index] then
 		return SettingDefinitionProvider[index]
-	elseif index == "_lookup"
+	elseif
+		index == "_lookup"
 		or index == "_settingDefinitionList"
 		or index == "_maid"
 		or index == "_initializedDefinitionLookup"
-		or index == "_serviceBag" then
-
+		or index == "_serviceBag"
+	then
 		return rawget(self, index)
 	elseif type(index) == "string" then
 		local lookup = rawget(self, "_lookup")

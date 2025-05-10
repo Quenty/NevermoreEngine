@@ -43,8 +43,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Brio = require("Brio")
 local DuckTypeUtils = require("DuckTypeUtils")
@@ -57,10 +57,10 @@ local PromiseMaidUtils = require("PromiseMaidUtils")
 local Remoting = require("Remoting")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 local String = require("String")
 local TemplateReplicationModes = require("TemplateReplicationModes")
 local TemplateReplicationModesUtils = require("TemplateReplicationModesUtils")
-local ServiceBag = require("ServiceBag")
 
 local TOMBSTONE_ID_ATTRIBUTE = "UnreplicatedTemplateId"
 local TOMBSTONE_NAME_POSTFIX_UNLOADED = "_Unloaded"
@@ -703,7 +703,6 @@ TemplateProvider.Clone = assert(TemplateProvider.CloneTemplate, "Missing method"
 TemplateProvider.PromiseClone = assert(TemplateProvider.PromiseCloneTemplate, "Missing method")
 TemplateProvider.GetAllTemplates = assert(TemplateProvider.GetTemplateList, "Missing method")
 TemplateProvider.GetAll = assert(TemplateProvider.GetTemplateList, "Missing method")
-
 
 --[=[
 	Cleans up the provider

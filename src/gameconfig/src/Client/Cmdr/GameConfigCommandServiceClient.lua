@@ -30,29 +30,31 @@ function GameConfigCommandServiceClient:_setupCommands()
 	local picker = self._gameConfigServiceClient:GetConfigPicker()
 	-- TODO: Determine production vs. staging and set cmdr annotation accordingly.
 
-
 	self._maid:GivePromise(self._cmdrService:PromiseCmdr()):Then(function(cmdr)
 		GameConfigCmdrUtils.registerAssetTypes(cmdr, picker)
 
 		local latestConfig = RxStateStackUtils.createStateStack(picker:ObserveActiveConfigsBrio())
 		self._maid:GiveTask(latestConfig)
 
-		self._maid:GiveTask(latestConfig:Observe():Pipe({
-			Rx.switchMap(function(config)
-				if config then
-					return config:ObserveConfigName()
+		self._maid:GiveTask(latestConfig
+			:Observe()
+			:Pipe({
+				Rx.switchMap(function(config)
+					if config then
+						return config:ObserveConfigName()
+					else
+						return Rx.of(nil)
+					end
+				end),
+			})
+			:Subscribe(function(name)
+				if name then
+					cmdr:SetPlaceName(name)
 				else
-					return Rx.of(nil)
+					-- Default value
+					cmdr:SetPlaceName("Cmdr")
 				end
-			end)
-		}):Subscribe(function(name)
-			if name then
-				cmdr:SetPlaceName(name)
-			else
-				-- Default value
-				cmdr:SetPlaceName("Cmdr")
-			end
-		end))
+			end))
 	end)
 end
 

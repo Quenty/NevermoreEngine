@@ -18,7 +18,7 @@ function RoguePropertyCacheService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._cache = setmetatable({}, {__mode = "k"})
+	self._cache = setmetatable({}, { __mode = "k" })
 end
 
 function RoguePropertyCacheService:GetCache(roguePropertyDefinition)

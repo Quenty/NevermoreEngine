@@ -6,16 +6,16 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
+local InputModeServiceClient = require("InputModeServiceClient")
+local InputModeType = require("InputModeType")
 local InputModeTypes = require("InputModeTypes")
 local Maid = require("Maid")
-local ValueObject = require("ValueObject")
-local InputModeServiceClient = require("InputModeServiceClient")
-local ServiceBag = require("ServiceBag")
-local Rx = require("Rx")
-local InputModeType = require("InputModeType")
 local Observable = require("Observable")
+local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
-local Brio = require("Brio")
+local ValueObject = require("ValueObject")
 
 local InputModeTypeSelector = {}
 InputModeTypeSelector.ClassName = "InputModeTypeSelector"

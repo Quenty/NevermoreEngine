@@ -5,12 +5,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Snackbar = require("Snackbar")
-local SnackbarScreenGuiProvider = require("SnackbarScreenGuiProvider")
 local Maid = require("Maid")
-local SnackbarOptionUtils = require("SnackbarOptionUtils")
 local PromptQueue = require("PromptQueue")
 local ServiceBag = require("ServiceBag")
+local Snackbar = require("Snackbar")
+local SnackbarOptionUtils = require("SnackbarOptionUtils")
+local SnackbarScreenGuiProvider = require("SnackbarScreenGuiProvider")
 
 local SnackbarServiceClient = {}
 SnackbarServiceClient.ServiceName = "SnackbarServiceClient"

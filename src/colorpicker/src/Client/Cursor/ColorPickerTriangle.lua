@@ -66,31 +66,30 @@ end
 
 function ColorPickerTriangle._render(self: ColorPickerTriangle)
 	return Blend.New "Frame" {
-		Name = "ColorPickerTriangle";
-		Size = UDim2.new(1, 0, 1, 0);
-		BackgroundTransparency = 1;
+		Name = "ColorPickerTriangle",
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
 
 		Blend.New "ImageLabel" {
-			BackgroundTransparency = 1;
-			Size = UDim2.new(1, 0, 1, 0);
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
 			ImageColor3 = Blend.Computed(self._color, self._backgroundColorHint, function(color, backingColor)
 				return ColorPickerUtils.getOutlineWithContrast(color, backingColor)
-			end);
-			ImageTransparency = self._transparency;
-			Image = "rbxassetid://9291514809";
-		};
+			end),
+			ImageTransparency = self._transparency,
+			Image = "rbxassetid://9291514809",
+		},
 
 		Blend.New "UIAspectRatioConstraint" {
 			AspectRatio = Blend.Computed(self._sizeValue, function(size)
 				if size.x <= 0 or size.y <= 0 then
 					return 1
 				else
-					return size.x/size.y
+					return size.x / size.y
 				end
-			end);
-		};
+			end),
+		},
 	}
 end
-
 
 return ColorPickerTriangle

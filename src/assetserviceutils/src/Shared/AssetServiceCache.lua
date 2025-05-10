@@ -7,10 +7,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local MemorizeUtils = require("MemorizeUtils")
 local AssetServiceUtils = require("AssetServiceUtils")
-local ServiceBag = require("ServiceBag")
+local MemorizeUtils = require("MemorizeUtils")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local AssetServiceCache = {}
 AssetServiceCache.ServiceName = "AssetServiceCache"

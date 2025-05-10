@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ServiceBag = require("ServiceBag")
 local GameConfigPicker = require("GameConfigPicker")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigDataService = {}
 GameConfigDataService.ServiceName = "GameConfigDataService"

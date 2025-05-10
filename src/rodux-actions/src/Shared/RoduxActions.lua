@@ -57,7 +57,7 @@ end
 
 function RoduxActions:Validate(action)
 	assert(type(action) == "table", "Bad action")
-	assert(type(action.type) == "string","Bad action")
+	assert(type(action.type) == "string", "Bad action")
 
 	local actionFactory = self:Get(action.type)
 	if not actionFactory then

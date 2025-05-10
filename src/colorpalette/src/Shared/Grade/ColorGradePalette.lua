@@ -116,18 +116,17 @@ end
 
 function ColorGradePalette:ObserveModified(gradeName, amount, multiplier)
 	return Rx.combineLatest({
-		grade = self:_observeGradeFromName(gradeName);
-		amount = self:_observeGradeFromName(amount);
-		multiplier = multiplier or 1;
+		grade = self:_observeGradeFromName(gradeName),
+		amount = self:_observeGradeFromName(amount),
+		multiplier = multiplier or 1,
 	}):Pipe({
 		Rx.map(function(state)
 			assert(type(state.grade) == "number", "Bad state.grade")
 			assert(type(state.amount) == "number", "Bad state.amount")
 			assert(type(state.multiplier) == "number", "Bad state.multiplier")
 
-
-			return state.grade + state.multiplier*state.amount
-		end);
+			return state.grade + state.multiplier * state.amount
+		end),
 	})
 end
 
@@ -141,9 +140,9 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 	end
 
 	return Rx.combineLatest({
-		grade = self:_observeGradeFromName(gradeName);
-		newSurfaceGrade = self:_observeGradeFromName(newSurfaceName);
-		baseSurfaceGrade = observeBaseSurfaceGrade;
+		grade = self:_observeGradeFromName(gradeName),
+		newSurfaceGrade = self:_observeGradeFromName(newSurfaceName),
+		baseSurfaceGrade = observeBaseSurfaceGrade,
 	}):Pipe({
 		Rx.map(function(state)
 			local difference = state.grade - state.baseSurfaceGrade
@@ -162,8 +161,9 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 			end
 
 			return finalGrade
-		end)
-	}), self._vividness[gradeName]
+		end),
+	}),
+		self._vividness[gradeName]
 end
 
 function ColorGradePalette:_observeGradeFromName(gradeName)
@@ -181,7 +181,7 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 				else
 					error("Bad grade value")
 				end
-			end)
+			end),
 		})
 	end
 
@@ -194,7 +194,7 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 	local colorOrObservable = Blend.toPropertyObservable(gradeName)
 	if colorOrObservable then
 		return colorOrObservable:Pipe({
-			Rx.map(ColorGradeUtils.getGrade)
+			Rx.map(ColorGradeUtils.getGrade),
 		})
 	end
 
@@ -209,7 +209,7 @@ function ColorGradePalette:ObserveDefaultSurfaceGrade()
 			else
 				return Rx.EMPTY
 			end
-		end)
+		end),
 	})
 end
 

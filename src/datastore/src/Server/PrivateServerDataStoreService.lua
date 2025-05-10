@@ -11,8 +11,8 @@ local require = require(script.Parent.loader).load(script)
 local DataStore = require("DataStore")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
-local ServiceBag = require("ServiceBag")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local PrivateServerDataStoreService = {}
 PrivateServerDataStoreService.ServiceName = "PrivateServerDataStoreService"

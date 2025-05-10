@@ -20,7 +20,7 @@ function Region3Utils.fromBox(cframe: CFrame, size: Vector3): Region3
 end
 
 function Region3Utils.fromRadius(position: Vector3, radius: number): Region3
-	local diameterPadded = 2*radius
+	local diameterPadded = 2 * radius
 	local size = Vector3.new(diameterPadded, diameterPadded, diameterPadded)
 	return Region3Utils.fromPositionSize(position, size)
 end

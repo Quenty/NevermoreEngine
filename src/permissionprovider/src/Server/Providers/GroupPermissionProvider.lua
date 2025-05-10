@@ -158,7 +158,10 @@ function GroupPermissionProvider._handlePlayer(self: GroupPermissionProvider, pl
 	end)
 end
 
-function GroupPermissionProvider._promiseRankInGroup(self: GroupPermissionProvider, player: Player): Promise.Promise<number>
+function GroupPermissionProvider._promiseRankInGroup(
+	self: GroupPermissionProvider,
+	player: Player
+): Promise.Promise<number>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	if self._promiseRankPromisesCache[player.UserId] then

@@ -1,6 +1,6 @@
 return {
 	testMatch = {
 		"**/*.spec",
-		"!**/@quentystudios/Jest/**"
-	}
+		"!**/@quentystudios/Jest/**",
+	},
 }

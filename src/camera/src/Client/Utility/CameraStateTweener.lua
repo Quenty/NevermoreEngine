@@ -9,12 +9,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local BaseObject = require("BaseObject")
+local CameraEffectUtils = require("CameraEffectUtils")
+local CameraStack = require("CameraStack")
 local CameraStackService = require("CameraStackService")
 local FadeBetweenCamera3 = require("FadeBetweenCamera3")
 local ServiceBag = require("ServiceBag")
-local BaseObject = require("BaseObject")
-local CameraStack = require("CameraStack")
-local CameraEffectUtils = require("CameraEffectUtils")
 
 local CameraStateTweener = setmetatable({}, BaseObject)
 CameraStateTweener.ClassName = "CameraStateTweener"

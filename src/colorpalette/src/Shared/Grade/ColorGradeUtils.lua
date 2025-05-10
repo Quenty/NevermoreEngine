@@ -126,12 +126,12 @@ function ColorGradeUtils.getGradedColor(baseColor: Color3, colorGrade: number, v
 		-- local towardsOffset = (colorGrade - v)/100
 		-- local scaleTowards = math.clamp(math.abs(towardsOffset), 0, 1)^vividness
 		-- u = math.clamp(Math.map(scaleTowards, 0, 1, u, 0), 0, 100)
-		u = math.clamp(vividness*u, 0, 100)
+		u = math.clamp(vividness * u, 0, 100)
 	end
 
 	v = 100 - colorGrade
 
-	return LuvColor3Utils.toColor3({l, u, v})
+	return LuvColor3Utils.toColor3({ l, u, v })
 end
 
 return ColorGradeUtils

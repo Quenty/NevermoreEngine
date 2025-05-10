@@ -2,7 +2,8 @@
 	Unit tests for RxBrioUtils.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Brio = require("Brio")
 local Jest = require("Jest")
@@ -32,9 +33,9 @@ describe("RxBrioUtils.combineLatest({ value = Observable(Brio(5)) })", function(
 	it("should execute immediately", function()
 		local observe = RxBrioUtils.combineLatest({
 			value = Observable.new(function(sub)
-				sub:Fire(Brio.new(5));
-			end);
-			otherValue = 25;
+				sub:Fire(Brio.new(5))
+			end),
+			otherValue = 25,
 		})
 		local brio
 
@@ -56,12 +57,12 @@ describe("RxBrioUtils.flatCombineLatest", function()
 	local brio = Brio.new(5)
 	local observe = RxBrioUtils.flatCombineLatest({
 		value = Observable.new(function(sub)
-			sub:Fire(brio);
+			sub:Fire(brio)
 			doFire = function(...)
 				sub:Fire(...)
 			end
-		end);
-		otherValue = 25;
+		end),
+		otherValue = 25,
 	})
 
 	local lastResult = nil

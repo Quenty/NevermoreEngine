@@ -43,19 +43,17 @@ function CameraInfoUtils.fromCamera(camera: Camera): CameraInfo
 	return CameraInfoUtils.createCameraInfo(camera.CFrame, camera.ViewportSize, camera.FieldOfView)
 end
 
-
 --[=[
 	Returns true if the value is a cameraInfo
 
 	@param cameraInfo any
 	@return boolean
 ]=]
-function CameraInfoUtils.isCameraInfo(cameraInfo: any):  boolean
+function CameraInfoUtils.isCameraInfo(cameraInfo: any): boolean
 	return type(cameraInfo) == "table"
 		and typeof(cameraInfo.cframe) == "CFrame"
 		and typeof((cameraInfo :: any).viewPortSize) == "Vector2"
 		and type((cameraInfo :: any).fieldOfView) == "number"
 end
-
 
 return CameraInfoUtils

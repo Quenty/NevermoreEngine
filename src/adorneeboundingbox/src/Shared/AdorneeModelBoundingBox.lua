@@ -8,11 +8,11 @@ local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableSet = require("ObservableSet")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ValueObject = require("ValueObject")
-local Observable = require("Observable")
 
 local AdorneeModelBoundingBox = setmetatable({}, BaseObject)
 AdorneeModelBoundingBox.ClassName = "AdorneeModelBoundingBox"

@@ -5,8 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
-local WellKnownSoundGroups = require("WellKnownSoundGroups")
 local ServiceBag = require("ServiceBag")
+local WellKnownSoundGroups = require("WellKnownSoundGroups")
 
 local SoundGroupService = {}
 SoundGroupService.ServiceName = "SoundGroupService"

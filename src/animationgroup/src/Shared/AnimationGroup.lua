@@ -9,8 +9,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
 local AnimationGroupUtils = require("AnimationGroupUtils")
+local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 
 local AnimationGroup = setmetatable({}, BaseObject)

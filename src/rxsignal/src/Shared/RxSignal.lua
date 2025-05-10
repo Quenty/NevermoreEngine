@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Rx = require("Rx")
 local Observable = require("Observable")
+local Rx = require("Rx")
 local Subscription = require("Subscription")
 
 local RxSignal = {}

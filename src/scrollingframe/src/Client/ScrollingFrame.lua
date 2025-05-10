@@ -12,8 +12,8 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local Maid = require("Maid")
-local ScrollModel = require("ScrollModel")
 local SCROLL_TYPE = require("SCROLL_TYPE")
+local ScrollModel = require("ScrollModel")
 local Table = require("Table")
 
 local ScrollingFrame = {}
@@ -200,8 +200,6 @@ function ScrollingFrame:_getInputProcessor(inputBeganObject: InputObject)
 	end
 end
 
-
-
 -- Binds input to a specific GUI
 -- @return maid Maid -- To cleanup inputs
 function ScrollingFrame:BindInput(gui, options)
@@ -228,9 +226,10 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 		return
 	end
 
-	if inputBeganObject.UserInputType == Enum.UserInputType.MouseButton1
-		or inputBeganObject.UserInputType == Enum.UserInputType.Touch then
-
+	if
+		inputBeganObject.UserInputType == Enum.UserInputType.MouseButton1
+		or inputBeganObject.UserInputType == Enum.UserInputType.Touch
+	then
 		local maid = Maid.new()
 
 		local startTime = tick()
@@ -290,7 +289,8 @@ function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganOb
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 			local direction = self._scrollType.Direction
 			local offset = (inputObject.Position - startPosition)[direction]
-			local percent = offset / (scrollbarContainer.AbsoluteSize[direction] * (1 - self._model.ContentScrollPercentSize))
+			local percent = offset
+				/ (scrollbarContainer.AbsoluteSize[direction] * (1 - self._model.ContentScrollPercentSize))
 			self._model.ContentScrollPercent = startPercent + percent
 			self._model.TargetContentScrollPercent = self._model.ContentScrollPercent
 

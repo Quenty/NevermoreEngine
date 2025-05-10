@@ -15,8 +15,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CoreGuiUtils = require("CoreGuiUtils")
 local Maid = require("Maid")
-local Remoting = require("Remoting")
 local Promise = require("Promise")
+local Remoting = require("Remoting")
 
 local RETRY_ATTEMPTS = 3
 local INITIAL_WAIT_TIME = 1

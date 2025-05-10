@@ -2,7 +2,8 @@
 	@class BinderProvider.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
@@ -22,7 +23,7 @@ describe("BinderProvider.new()", function()
 			assert(arg == 12345, "Bad arg")
 
 			self:Add(Binder.new("Test", function()
-				return { Destroy = function() end; }
+				return { Destroy = function() end }
 			end))
 		end)
 

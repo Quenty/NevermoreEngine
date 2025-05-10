@@ -27,17 +27,19 @@ function InputListScoreHelper.new(serviceBag, provider, scoredAction, inputKeyMa
 
 	self._currentTypes = {}
 
-	self._maid:GiveTask(InputKeyMapListUtils.observeActiveInputKeyMap(self._inputKeyMapList, self._serviceBag):Pipe({
-		Rx.switchMap(function(activeInputKeyMap)
-			if activeInputKeyMap then
-				return activeInputKeyMap:ObserveInputTypesList()
-			else
-				return Rx.of({})
-			end
-		end)
-	}):Subscribe(function(inputTypeList)
-		self:_updateInputTypeSet(inputTypeList)
-	end))
+	self._maid:GiveTask(InputKeyMapListUtils.observeActiveInputKeyMap(self._inputKeyMapList, self._serviceBag)
+		:Pipe({
+			Rx.switchMap(function(activeInputKeyMap)
+				if activeInputKeyMap then
+					return activeInputKeyMap:ObserveInputTypesList()
+				else
+					return Rx.of({})
+				end
+			end),
+		})
+		:Subscribe(function(inputTypeList)
+			self:_updateInputTypeSet(inputTypeList)
+		end))
 
 	self._maid:GiveTask(function()
 		local current, _ = next(self._currentTypes)

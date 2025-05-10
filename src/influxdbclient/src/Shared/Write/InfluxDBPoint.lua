@@ -5,11 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Math = require("Math")
 local InfluxDBEscapeUtils = require("InfluxDBEscapeUtils")
-local Table = require("Table")
-local Set = require("Set")
 local InfluxDBPointSettings = require("InfluxDBPointSettings")
+local Math = require("Math")
+local Set = require("Set")
+local Table = require("Table")
 
 local InfluxDBPoint = {}
 InfluxDBPoint.ClassName = "InfluxDBPoint"
@@ -251,7 +251,10 @@ end
 	@param pointSettings InfluxDBPointSettings
 	@return string?
 ]=]
-function InfluxDBPoint.ToLineProtocol(self: InfluxDBPoint, pointSettings: InfluxDBPointSettings.InfluxDBPointSettings): string?
+function InfluxDBPoint.ToLineProtocol(
+	self: InfluxDBPoint,
+	pointSettings: InfluxDBPointSettings.InfluxDBPointSettings
+): string?
 	if not self._measurementName then
 		return nil
 	end
@@ -314,7 +317,7 @@ end
 
 function InfluxDBPoint._convertTimeToMillis(_self: InfluxDBPoint, value: (string | DateTime | number)?): string?
 	if value == nil then
-	    return tostring(DateTime.now().UnixTimestampMillis)
+		return tostring(DateTime.now().UnixTimestampMillis)
 	elseif type(value) == "string" then
 		if #value > 0 then
 			return value

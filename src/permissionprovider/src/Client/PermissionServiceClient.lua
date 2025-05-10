@@ -11,10 +11,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PermissionProviderConstants = require("PermissionProviderConstants")
-local PermissionProviderClient = require("PermissionProviderClient")
-local Promise = require("Promise")
 local Maid = require("Maid")
+local PermissionProviderClient = require("PermissionProviderClient")
+local PermissionProviderConstants = require("PermissionProviderConstants")
+local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
 local PermissionServiceClient = {}

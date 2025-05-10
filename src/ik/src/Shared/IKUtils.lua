@@ -6,7 +6,11 @@
 
 local IKUtils = {}
 
-function IKUtils.getDampenedAngleClamp(maxAngle: number, dampenAreaAngle: number, dampenAreaFactor: number?): (number) -> number
+function IKUtils.getDampenedAngleClamp(
+	maxAngle: number,
+	dampenAreaAngle: number,
+	dampenAreaFactor: number?
+): (number) -> number
 	local areaFactor = dampenAreaFactor or dampenAreaAngle
 
 	return function(angle)
@@ -17,9 +21,9 @@ function IKUtils.getDampenedAngleClamp(maxAngle: number, dampenAreaAngle: number
 			-- dampenAreaFactor is the area that the bouncing happens
 			-- dampenAreaAngle is the amount of bounce that occurs
 			local timesOver = (math.abs(angle) - min) / areaFactor
-			local scale = (1 - 0.5^timesOver)
+			local scale = (1 - 0.5 ^ timesOver)
 
-			return math.sign(angle) * (min + (scale*dampenAreaAngle))
+			return math.sign(angle) * (min + (scale * dampenAreaAngle))
 		end
 	end
 end

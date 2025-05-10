@@ -17,7 +17,6 @@ serviceBag:GetService(screenShakeDefinition)
 serviceBag:Init()
 serviceBag:Start()
 
-
 local volumeDefinition = SettingDefinition.new("Volume", 1)
 bridge:RegisterSettingDefinition(volumeDefinition)
 
@@ -41,4 +40,3 @@ game.Players.PlayerAdded:Connect(handlePlayer)
 for _, player in game.Players:GetPlayers() do
 	handlePlayer(player)
 end
-

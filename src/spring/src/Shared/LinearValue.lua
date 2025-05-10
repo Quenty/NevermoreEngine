@@ -203,7 +203,7 @@ function LinearValue:__eq<T>(a: LinearValue<T>, b: LinearValue<T>): boolean
 			return false
 		end
 
-		for i=1, #a._values do
+		for i = 1, #a._values do
 			if a._values[i] ~= b._values[i] then
 				return false
 			end
@@ -214,6 +214,5 @@ function LinearValue:__eq<T>(a: LinearValue<T>, b: LinearValue<T>): boolean
 		return false
 	end
 end
-
 
 return LinearValue

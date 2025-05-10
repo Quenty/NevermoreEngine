@@ -7,11 +7,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Table = require("Table")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
-local Symbol = require("Symbol")
-local Set = require("Set")
 local DataStoreSnapshotUtils = require("DataStoreSnapshotUtils")
+local Set = require("Set")
+local Symbol = require("Symbol")
+local Table = require("Table")
 
 local UNSET_TOKEN = Symbol.named("unsetValue")
 

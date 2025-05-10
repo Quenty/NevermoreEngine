@@ -18,9 +18,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
-local CameraEffectUtils = require("CameraEffectUtils")
 
 local ZoomedCamera = {}
 ZoomedCamera.ClassName = "ZoomedCamera"

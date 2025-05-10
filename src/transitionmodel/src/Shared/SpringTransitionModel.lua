@@ -6,12 +6,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
-local TransitionModel = require("TransitionModel")
-local SpringObject = require("SpringObject")
-local Promise = require("Promise")
 local Maid = require("Maid")
-local SpringUtils = require("SpringUtils")
 local Observable = require("Observable")
+local Promise = require("Promise")
+local SpringObject = require("SpringObject")
+local SpringUtils = require("SpringUtils")
+local TransitionModel = require("TransitionModel")
 
 local SpringTransitionModel = setmetatable({}, BasicPane)
 SpringTransitionModel.ClassName = "SpringTransitionModel"

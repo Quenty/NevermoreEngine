@@ -174,6 +174,8 @@ function BoundingBoxUtils.inBoundingBox(cframe: CFrame, size: Vector3, testPosit
 	local hsx, hsy, hsz = size.X / 2, size.Y / 2, size.Z / 2
 
 	local rx, ry, rz = relative.X, relative.Y, relative.Z
+
+	-- stylua: ignore
 	return rx >= -hsx
 		and rx <= hsx
 		and ry >= -hsy
@@ -192,13 +194,12 @@ end
 ]=]
 function BoundingBoxUtils.inCylinderBoundingBox(cframe: CFrame, size: Vector3, testPosition: Vector3): boolean
 	local relative = cframe:PointToObjectSpace(testPosition)
-	local half_height = size.X/2
-	local radius = math.min(size.Y, size.Z)/2
+	local half_height = size.X / 2
+	local radius = math.min(size.Y, size.Z) / 2
 
 	local rx, ry, rz = relative.X, relative.Y, relative.Z
-	local dist = ry*ry + rz*rz
-	return math.abs(rx) <= half_height
-		and dist <= (radius*radius)
+	local dist = ry * ry + rz * rz
+	return math.abs(rx) <= half_height and dist <= (radius * radius)
 end
 
 --[=[
@@ -211,11 +212,11 @@ end
 ]=]
 function BoundingBoxUtils.inBallBoundingBox(cframe: CFrame, size: Vector3, testPosition: Vector3): boolean
 	local relative = cframe:PointToObjectSpace(testPosition)
-	local radius = math.min(size.X, size.Y, size.Z)/2
+	local radius = math.min(size.X, size.Y, size.Z) / 2
 
 	local rx, ry, rz = relative.X, relative.Y, relative.Z
-	local dist = rx*rx + ry*ry + rz*rz
-	return dist <= radius*radius
+	local dist = rx * rx + ry * ry + rz * rz
+	return dist <= radius * radius
 end
 
 return BoundingBoxUtils

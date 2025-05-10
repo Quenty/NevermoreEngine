@@ -6,14 +6,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
-local ValueObject = require("ValueObject")
-local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Set = require("Set")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local ObservableSet = {}
 ObservableSet.ClassName = "ObservableSet"
@@ -289,7 +289,6 @@ end
 function ObservableSet.GetRawSet<T>(self: ObservableSet<T>): Set.Set<T>
 	return self._set
 end
-
 
 --[=[
 	Cleans up the ObservableSet and sets the metatable to nil.

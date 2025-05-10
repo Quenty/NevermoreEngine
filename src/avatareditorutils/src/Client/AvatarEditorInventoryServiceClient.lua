@@ -11,10 +11,10 @@ local AvatarEditorUtils = require("AvatarEditorUtils")
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
 local MemorizeUtils = require("MemorizeUtils")
-local Promise = require("Promise")
-local ValueObject = require("ValueObject")
 local PagesProxy = require("PagesProxy")
+local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
+local ValueObject = require("ValueObject")
 
 local AvatarEditorInventoryServiceClient = {}
 AvatarEditorInventoryServiceClient.ServiceName = "AvatarEditorInventoryServiceClient"
@@ -34,11 +34,10 @@ function AvatarEditorInventoryServiceClient:Init(serviceBag: ServiceBag.ServiceB
 	end))
 
 	self._promiseInventoryPages = MemorizeUtils.memoize(function(avatarAssetTypes)
-		return AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes)
-			:Then(function(catalogPages)
-				-- Allow for replay
-				return PagesProxy.new(catalogPages)
-			end)
+		return AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes):Then(function(catalogPages)
+			-- Allow for replay
+			return PagesProxy.new(catalogPages)
+		end)
 	end)
 end
 

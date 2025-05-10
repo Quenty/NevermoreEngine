@@ -130,5 +130,4 @@ function PlayerCharacterBinder:_handlePlayerAdded(playerMaid, player)
 	playerMaid[player] = maid
 end
 
-
 return PlayerCharacterBinder

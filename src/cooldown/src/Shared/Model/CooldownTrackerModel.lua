@@ -8,11 +8,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
-local DuckTypeUtils = require("DuckTypeUtils")
-local CooldownModel = require("CooldownModel")
-local Observable = require("Observable")
 local Brio = require("Brio")
+local CooldownModel = require("CooldownModel")
+local DuckTypeUtils = require("DuckTypeUtils")
+local Observable = require("Observable")
+local ValueObject = require("ValueObject")
 
 local CooldownTrackerModel = setmetatable({}, BaseObject)
 CooldownTrackerModel.ClassName = "CooldownTrackerModel"
@@ -90,7 +90,10 @@ end
 	@param cooldownModel CooldownModel
 	@return function
 ]=]
-function CooldownTrackerModel.SetCooldownModel(self: CooldownTrackerModel, cooldownModel: ValueObject.Mountable<CooldownModel.CooldownModel?>): (() -> ())
+function CooldownTrackerModel.SetCooldownModel(
+	self: CooldownTrackerModel,
+	cooldownModel: ValueObject.Mountable<CooldownModel.CooldownModel?>
+): () -> ()
 	self._currentCooldownModel:Mount(cooldownModel)
 
 	return function()

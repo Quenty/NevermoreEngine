@@ -38,8 +38,6 @@ function CharacterPromiseUtils.promiseCharacter(player: Player): Promise.Promise
 	end)
 
 	return promise
-
 end
 
 return CharacterPromiseUtils
-

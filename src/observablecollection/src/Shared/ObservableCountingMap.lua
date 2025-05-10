@@ -6,14 +6,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
-local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Set = require("Set")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local ObservableCountingMap = {}
 ObservableCountingMap.ClassName = "ObservableCountingMap"

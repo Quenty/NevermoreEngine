@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
 local Promise = require("Promise")
 local Signal = require("Signal")
-local Maid = require("Maid")
-local DuckTypeUtils = require("DuckTypeUtils")
 
 local EMPTY_FUNCTION = function() end
 

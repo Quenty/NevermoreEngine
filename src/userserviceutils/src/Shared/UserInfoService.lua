@@ -81,11 +81,10 @@ end
 	@return Observable<string>
 ]=]
 function UserInfoService:ObserveDisplayName(userId: number): Observable.Observable<UserServiceUtils.UserInfo>
-    assert(type(userId) == "number", "Bad userId")
+	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:ObserveDisplayName(userId)
 end
-
 
 function UserInfoService:Destroy()
 	self._maid:DoCleaning()

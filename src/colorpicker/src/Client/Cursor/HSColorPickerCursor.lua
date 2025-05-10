@@ -10,8 +10,8 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local ColorPickerUtils = require("ColorPickerUtils")
-local ValueObject = require("ValueObject")
 local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local HSColorPickerCursor = setmetatable({}, BaseObject)
 HSColorPickerCursor.ClassName = "HSColorPickerCursor"
@@ -113,55 +113,57 @@ end
 
 function HSColorPickerCursor._render(self: HSColorPickerCursor)
 	return Blend.New "Frame" {
-		Name = "HSColorPickerCursor";
+		Name = "HSColorPickerCursor",
 		Size = Blend.Computed(self._height, function(height)
 			return UDim2.fromScale(height, height)
-		end);
-		BackgroundTransparency = 1;
-		AnchorPoint = Vector2.new(0.5, 0.5);
+		end),
+		BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = Blend.Computed(self._position, function(pos)
 			return UDim2.fromScale(pos.x, pos.y)
-		end);
+		end),
 
 		Blend.New "UIAspectRatioConstraint" {
-			AspectRatio = 1;
-		};
+			AspectRatio = 1,
+		},
 
 		Blend.New "Frame" {
-			AnchorPoint = Vector2.new(0.5, 0.5);
-			Position = UDim2.fromScale(0.5, 0.5);
-			Visible = self._horizontalHairVisible;
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Visible = self._horizontalHairVisible,
 			Size = Blend.Computed(self._crossHairWidthAbs, function(width)
 				return UDim2.new(1, 0, 0, width)
-			end);
+			end),
 			BackgroundColor3 = Blend.Computed(self._backgroundColorHint, function(backingColor)
 				return ColorPickerUtils.getOutlineWithContrast(Color3.new(0, 0, 0), backingColor)
-			end);
-			BackgroundTransparency = self._transparency;
+			end),
+			BackgroundTransparency = self._transparency,
 
 			Blend.New "UICorner" {
-				CornerRadius = UDim.new(1, 0);
-			};
-		};
+				CornerRadius = UDim.new(1, 0),
+			},
+		},
 
 		Blend.New "Frame" {
-			AnchorPoint = Vector2.new(0.5, 0.5);
-			Position = UDim2.fromScale(0.5, 0.5);
-			Visible = self._verticalHairVisible;
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Visible = self._verticalHairVisible,
 			Size = Blend.Computed(self._crossHairWidthAbs, function(width)
 				return UDim2.new(0, width, 1, 0)
-			end);
-			BackgroundColor3 = Blend.Spring(Blend.Computed(self._backgroundColorHint, function(backingColor)
-				return ColorPickerUtils.getOutlineWithContrast(Color3.new(0, 0, 0), backingColor)
-			end), 20);
-			BackgroundTransparency = self._transparency;
+			end),
+			BackgroundColor3 = Blend.Spring(
+				Blend.Computed(self._backgroundColorHint, function(backingColor)
+					return ColorPickerUtils.getOutlineWithContrast(Color3.new(0, 0, 0), backingColor)
+				end),
+				20
+			),
+			BackgroundTransparency = self._transparency,
 
 			Blend.New "UICorner" {
-				CornerRadius = UDim.new(1, 0);
-			};
-		};
+				CornerRadius = UDim.new(1, 0),
+			},
+		},
 	}
 end
-
 
 return HSColorPickerCursor

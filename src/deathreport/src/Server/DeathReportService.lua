@@ -9,14 +9,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local GetRemoteEvent = require("GetRemoteEvent")
+local DeathReportProcessor = require("DeathReportProcessor")
 local DeathReportServiceConstants = require("DeathReportServiceConstants")
 local DeathReportUtils = require("DeathReportUtils")
+local GetRemoteEvent = require("GetRemoteEvent")
 local Maid = require("Maid")
-local DeathReportProcessor = require("DeathReportProcessor")
-local ServiceBag = require("ServiceBag")
 local Observable = require("Observable")
+local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
 
 local DeathReportService = {}
 DeathReportService.ServiceName = "DeathReportService"

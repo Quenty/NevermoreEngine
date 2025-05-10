@@ -13,7 +13,7 @@
 	@function debounce
 	@within debounce
 ]=]
-local function debounce<T..., U...>(timeoutInSeconds: number, func: (T...) -> (U...)): (T...) -> ()
+local function debounce<T..., U...>(timeoutInSeconds: number, func: (T...) -> U...): (T...) -> ()
 	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
 	assert(type(func) == "function", "Bad func")
 

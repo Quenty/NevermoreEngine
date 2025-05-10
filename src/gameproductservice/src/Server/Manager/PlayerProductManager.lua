@@ -7,8 +7,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
 
 local EnumUtils = require("EnumUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
@@ -72,7 +72,6 @@ function PlayerProductManager:_setupAssetTracker()
 	end))
 end
 
-
 function PlayerProductManager:_setupProductTracker()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
 
@@ -90,15 +89,19 @@ function PlayerProductManager:_setupProductTracker()
 		end
 	end))
 
-	self._maid:GiveTask(self._receiptProcessingService:ObserveReceiptProcessedForPlayer(self._obj):Subscribe(function(receiptInfo, productPurchaseDecision)
-		assert(type(receiptInfo) == "table", "Bad receiptInfo")
-		assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad decision")
+	self._maid:GiveTask(
+		self._receiptProcessingService
+			:ObserveReceiptProcessedForPlayer(self._obj)
+			:Subscribe(function(receiptInfo, productPurchaseDecision)
+				assert(type(receiptInfo) == "table", "Bad receiptInfo")
+				assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad decision")
 
-		local productId = receiptInfo.ProductId
-		tracker:HandlePurchaseEvent(productId, true)
+				local productId = receiptInfo.ProductId
+				tracker:HandlePurchaseEvent(productId, true)
 
-		self._remoting.DeveloperProductPurchased:FireClient(self._obj, productId)
-	end))
+				self._remoting.DeveloperProductPurchased:FireClient(self._obj, productId)
+			end)
+	)
 end
 
 function PlayerProductManager:_setupPassTracker()
@@ -139,16 +142,18 @@ function PlayerProductManager:_setupSubscriptionTracker()
 	end))
 
 	-- In case this does anything
-	self._maid:GiveTask(MarketplaceService.PromptSubscriptionPurchaseFinished:Connect(function(player, subscriptionId, didTryPurchasing)
-		if player == self._obj then
-			tracker:HandlePromptClosedEvent(subscriptionId)
-			self._remoting.PromptSubscriptionPurchaseFinished:FireClient(player, subscriptionId, didTryPurchasing)
+	self._maid:GiveTask(
+		MarketplaceService.PromptSubscriptionPurchaseFinished:Connect(function(player, subscriptionId, didTryPurchasing)
+			if player == self._obj then
+				tracker:HandlePromptClosedEvent(subscriptionId)
+				self._remoting.PromptSubscriptionPurchaseFinished:FireClient(player, subscriptionId, didTryPurchasing)
 
-			if not didTryPurchasing then
-				tracker:HandlePurchaseEvent(subscriptionId, didTryPurchasing)
+				if not didTryPurchasing then
+					tracker:HandlePurchaseEvent(subscriptionId, didTryPurchasing)
+				end
 			end
-		end
-	end))
+		end)
+	)
 
 	self._maid:GiveTask(Players.UserSubscriptionStatusChanged:Connect(function(player, subscriptionId)
 		if player == self._obj then
@@ -177,6 +182,5 @@ function PlayerProductManager:_setupBundleTracker()
 		tracker:HandlePurchaseEvent(bundleId, isPurchased)
 	end))
 end
-
 
 return PlayerBinder.new("PlayerProductManager", PlayerProductManager)

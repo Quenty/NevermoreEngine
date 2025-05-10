@@ -40,20 +40,21 @@ end
 
 function GameConfigAssetClient:_setupEntrySet(observeTranslationKey, observeTranslationValue)
 	self._maid:GiveTask(Rx.combineLatestDefer({
-		assetKey = self:ObserveAssetKey();
-		translationKey = observeTranslationKey;
-		text = observeTranslationValue;
+		assetKey = self:ObserveAssetKey(),
+		translationKey = observeTranslationKey,
+		text = observeTranslationValue,
 	}):Subscribe(function(state)
-			if type(state.translationKey) == "string"
-				and type(state.text) == "string"
-				and #state.text > 0
-				and state.assetKey then
+		if
+			type(state.translationKey) == "string"
+			and type(state.text) == "string"
+			and #state.text > 0
+			and state.assetKey
+		then
+			local context = string.format("GameConfigAsset.%s", state.assetKey)
+			local localeId = "en"
 
-				local context = string.format("GameConfigAsset.%s", state.assetKey)
-				local localeId = "en"
-
-				self._configTranslator:SetEntryValue(state.translationKey, state.text, context, localeId, state.text)
-			end
+			self._configTranslator:SetEntryValue(state.translationKey, state.text, context, localeId, state.text)
+		end
 	end))
 end
 

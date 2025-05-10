@@ -41,11 +41,11 @@ function ParticleEngineServer:ParticleNew(p)
 
 	p.Position = p.Position or error("No Position")
 	p.Velocity = p.Velocity or Vector3.zero
-	p.Size = p.Size or Vector2.new(0.2,0.2)
-	p.Bloom = p.Bloom or Vector2.new(0,0)
+	p.Size = p.Size or Vector2.new(0.2, 0.2)
+	p.Bloom = p.Bloom or Vector2.new(0, 0)
 	p.Gravity = p.Gravity or Vector3.zero
 	p.LifeTime = p.LifeTime
-	p.Color = p.Color or Color3.new(1,1,1)
+	p.Color = p.Color or Color3.new(1, 1, 1)
 	p.Transparency = p.Transparency or 0.5
 
 	self._remoteEvent:FireAllClients(p)

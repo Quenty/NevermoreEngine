@@ -71,5 +71,4 @@ function PreferredParentUtils.getPreferredParent(parent: Instance, name: string,
 	return nil
 end
 
-
 return PreferredParentUtils

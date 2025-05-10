@@ -7,8 +7,8 @@
 
 local loader = script.Parent.Parent
 local LoaderLinkUtils = require(loader.LoaderLink.LoaderLinkUtils)
-local ReplicatorReferences = require(loader.Replication.ReplicatorReferences)
 local Maid = require(loader.Maid)
+local ReplicatorReferences = require(loader.Replication.ReplicatorReferences)
 
 local LoaderLinkCreator = {}
 LoaderLinkCreator.ClassName = "LoaderLinkCreator"

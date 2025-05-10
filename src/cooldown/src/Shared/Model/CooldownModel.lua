@@ -6,10 +6,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
-local Signal = require("Signal")
-local Rx = require("Rx")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Rx = require("Rx")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local CooldownModel = setmetatable({}, BaseObject)
 CooldownModel.ClassName = "CooldownModel"

@@ -52,7 +52,12 @@ local function ensureEntropyInit()
 	random.save()
 
 	-- TODO: Suppress this warning
-	warn(string.format("[EllipticCurveCryptography.random] - Generating entropy took %s ms", 1000*(os.clock() - startTime)))
+	warn(
+		string.format(
+			"[EllipticCurveCryptography.random] - Generating entropy took %s ms",
+			1000 * (os.clock() - startTime)
+		)
+	)
 end
 
 function random.save()

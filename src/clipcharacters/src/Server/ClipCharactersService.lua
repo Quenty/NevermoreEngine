@@ -6,8 +6,8 @@ local require = require(script.Parent.loader).load(script)
 
 local PhysicsService = game:GetService("PhysicsService")
 
-local Maid = require("Maid")
 local ClipCharactersServiceConstants = require("ClipCharactersServiceConstants")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local ClipCharactersService = {}

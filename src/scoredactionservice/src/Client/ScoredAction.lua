@@ -9,9 +9,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Observable = require("Observable")
 local Signal = require("Signal")
 local StateStack = require("StateStack")
-local Observable = require("Observable")
 
 local ScoredAction = setmetatable({}, BaseObject)
 ScoredAction.ClassName = "ScoredAction"

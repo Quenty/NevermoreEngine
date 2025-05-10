@@ -4,13 +4,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local TieUtils = require("TieUtils")
-local Maid = require("Maid")
-local ValueBaseUtils = require("ValueBaseUtils")
-local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
 local AttributeUtils = require("AttributeUtils")
 local AttributeValue = require("AttributeValue")
+local BaseObject = require("BaseObject")
+local Maid = require("Maid")
+local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
+local TieUtils = require("TieUtils")
+local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
 
 local TiePropertyImplementation = setmetatable({}, BaseObject)

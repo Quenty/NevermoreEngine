@@ -84,7 +84,10 @@ end
 	@param assetId number
 	@return Observable<AssetData>
 ]=]
-function AvatarEditorInventory.ObserveAssetIdInInventory(self: AvatarEditorInventory, assetId: number): Observable.Observable<AssetData>
+function AvatarEditorInventory.ObserveAssetIdInInventory(
+	self: AvatarEditorInventory,
+	assetId: number
+): Observable.Observable<AssetData>
 	assert(type(assetId) == "number", "Bad assetId")
 
 	return self._assetIdToAsset:ObserveAtKey(assetId):Pipe({

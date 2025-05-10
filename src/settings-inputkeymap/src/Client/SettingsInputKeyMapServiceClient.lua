@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local InputKeyMapSettingClient = require("InputKeyMapSettingClient")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local SettingsInputKeyMapServiceClient = {}

@@ -11,10 +11,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
 local InputModeType = require("InputModeType")
 local InputTypeUtils = require("InputTypeUtils")
 local Observable = require("Observable")
+local ValueObject = require("ValueObject")
 
 local InputKeyMap = setmetatable({}, BaseObject)
 InputKeyMap.ClassName = "InputKeyMap"

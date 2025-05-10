@@ -187,7 +187,6 @@ function InputImageLibrary:PickSheet(keyCode, preferredStyle: string?, preferred
 	return nil
 end
 
-
 function InputImageLibrary:_getImageInstance(instanceType, keyCode, preferredStyle, preferredPlatform)
 	assert(type(instanceType) == "string", "Bad instanceType")
 	assert(keyCode ~= nil, "Bad keyCode")

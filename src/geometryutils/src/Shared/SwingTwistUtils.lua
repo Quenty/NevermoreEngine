@@ -36,11 +36,11 @@ end
 ]=]
 function SwingTwistUtils.twistAngle(cf: CFrame, direction: Vector3): number
 	local axis, theta = cf:ToAxisAngle()
-	local w, v = math.cos(theta/2),  math.sin(theta/2)*axis
-	local proj = v:Dot(direction)*direction
+	local w, v = math.cos(theta / 2), math.sin(theta / 2) * axis
+	local proj = v:Dot(direction) * direction
 	local twist = CFrame.new(0, 0, 0, proj.X, proj.Y, proj.Z, w)
 	local _, nTheta = twist:ToAxisAngle()
-	return math.sign(v:Dot(direction))*nTheta
+	return math.sign(v:Dot(direction)) * nTheta
 end
 
 return SwingTwistUtils

@@ -48,9 +48,7 @@ end
 	@return boolean
 ]=]
 function InfluxDBErrorUtils.isInfluxDBError(data: any): boolean
-	return type(data) == "table"
-		and type(data.code) == "string"
-		and type(data.message) == "string"
+	return type(data) == "table" and type(data.code) == "string" and type(data.message) == "string"
 end
 
 return InfluxDBErrorUtils

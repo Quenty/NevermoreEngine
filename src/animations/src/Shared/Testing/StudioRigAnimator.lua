@@ -13,8 +13,8 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local BaseObject = require("BaseObject")
 local AnimationUtils = require("AnimationUtils")
+local BaseObject = require("BaseObject")
 
 local StudioRigAnimator = setmetatable({}, BaseObject)
 StudioRigAnimator.ClassName = "StudioRigAnimator"

@@ -100,7 +100,10 @@ end
 	@param keyframeName string
 	@return Promise
 ]=]
-function AnimationPromiseUtils.promiseKeyframeReached(animationTrack: AnimationTrack, keyframeName: string): Promise.Promise<()>
+function AnimationPromiseUtils.promiseKeyframeReached(
+	animationTrack: AnimationTrack,
+	keyframeName: string
+): Promise.Promise<()>
 	assert(typeof(animationTrack) == "Instance", "Bad animationTrack")
 	assert(type(keyframeName) == "string", "Bad endMarkerName")
 
@@ -126,6 +129,5 @@ function AnimationPromiseUtils.promiseKeyframeReached(animationTrack: AnimationT
 
 	return promise
 end
-
 
 return AnimationPromiseUtils

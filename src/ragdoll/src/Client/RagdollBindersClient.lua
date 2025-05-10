@@ -17,7 +17,7 @@ local require = require(script.Parent.loader).load(script)
 local BinderProvider = require("BinderProvider")
 
 return BinderProvider.new(script.Name, function(self, serviceBag)
---[=[
+	--[=[
 	Apply this binder to a humanoid to ragdoll it. Humanoid must already have [Ragdollable] defined.
 
 	```lua
@@ -33,21 +33,21 @@ return BinderProvider.new(script.Name, function(self, serviceBag)
 ]=]
 	self:Add(serviceBag:GetService(require("RagdollClient")))
 
---[=[
+	--[=[
 	Enables ragdolling on a humanoid.
 	@prop Ragdollable Binder<RagdollableClient>
 	@within RagdollBindersClient
 ]=]
 	self:Add(serviceBag:GetService(require("RagdollableClient")))
 
---[=[
+	--[=[
 	Automatically applies ragdoll upon humanoid death.
 	@prop RagdollaRagdollHumanoidOnDeathble Binder<RagdollHumanoidOnDeathClient>
 	@within RagdollBindersClient
 ]=]
 	self:Add(serviceBag:GetService(require("RagdollHumanoidOnDeathClient")))
 
---[=[
+	--[=[
 	Automatically applies ragdoll upon humanoid fall.
 	@prop RagdollHumanoidOnFall Binder<RagdollHumanoidOnFallClient>
 	@within RagdollBindersClient

@@ -7,8 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local TeleportService = game:GetService("TeleportService")
 
-local GameConfigCmdrUtils = require("GameConfigCmdrUtils")
 local BadgeUtils = require("BadgeUtils")
+local GameConfigCmdrUtils = require("GameConfigCmdrUtils")
 local PlayerUtils = require("PlayerUtils")
 local ServiceBag = require("ServiceBag")
 
@@ -36,22 +36,22 @@ function GameConfigCommandService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "give-badge";
-		Aliases = { "award-badge" };
-		Description = "Awards the player a badge.";
-		Group = "GameConfig";
+		Name = "give-badge",
+		Aliases = { "award-badge" },
+		Description = "Awards the player a badge.",
+		Group = "GameConfig",
 		Args = {
 			{
-				Name = "Targets";
-				Type = "players";
-				Description = "The player to award.";
+				Name = "Targets",
+				Type = "players",
+				Description = "The player to award.",
 			},
 			{
-				Name = "Badge";
-				Type = "badgeIds";
-				Description = "Badge to award.";
+				Name = "Badge",
+				Type = "badgeIds",
+				Description = "Badge to award.",
 			},
-		};
+		},
 	}, function(_context, players, badgeIds)
 		local givenTo = {}
 
@@ -66,27 +66,27 @@ function GameConfigCommandService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "goto-named-place";
-		Description = "Teleport to a Roblox place.";
-		Group = "GameConfig";
+		Name = "goto-named-place",
+		Description = "Teleport to a Roblox place.",
+		Group = "GameConfig",
 		Args = {
 			{
-				Type = "players";
-				Name = "Players";
-				Description = "The players you want to teleport";
+				Type = "players",
+				Name = "Players",
+				Description = "The players you want to teleport",
 			},
 			{
-				Type = "placeId";
-				Name = "Place";
-				Description = "The Place you want to teleport to";
+				Type = "placeId",
+				Name = "Place",
+				Description = "The Place you want to teleport to",
 			},
 			{
-				Type = "string";
-				Name = "JobId";
-				Description = "The specific JobId you want to teleport to";
-				Optional = true;
-			}
-		};
+				Type = "string",
+				Name = "JobId",
+				Description = "The specific JobId you want to teleport to",
+				Optional = true,
+			},
+		},
 	}, function(context, players, placeId, jobId)
 		if placeId <= 0 then
 			return "Invalid place ID"

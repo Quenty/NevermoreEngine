@@ -18,7 +18,7 @@ end
 function SecretsCmdrTypeUtils.makeSecretKeyType(cmdr, secretsService, isRequired)
 	return {
 		Transform = function(text)
-		local secretNames = secretsService:PromiseSecretKeyNamesList():Wait()
+			local secretNames = secretsService:PromiseSecretKeyNamesList():Wait()
 			local list
 			if not isRequired then
 				list = table.clone(secretNames)
@@ -29,7 +29,7 @@ function SecretsCmdrTypeUtils.makeSecretKeyType(cmdr, secretsService, isRequired
 
 			local find = cmdr.Util.MakeFuzzyFinder(list)
 			return find(text)
-		end;
+		end,
 		Validate = function(keys)
 			return #keys > 0, "No secret exists with key."
 		end,
@@ -38,7 +38,7 @@ function SecretsCmdrTypeUtils.makeSecretKeyType(cmdr, secretsService, isRequired
 		end,
 		Parse = function(keys)
 			return keys[1]
-		end;
+		end,
 	}
 end
 

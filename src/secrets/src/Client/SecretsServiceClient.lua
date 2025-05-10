@@ -5,11 +5,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
+local Promise = require("Promise")
 local PromiseGetRemoteFunction = require("PromiseGetRemoteFunction")
+local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local SecretsCmdrTypeUtils = require("SecretsCmdrTypeUtils")
 local SecretsServiceConstants = require("SecretsServiceConstants")
-local RemoteFunctionUtils = require("RemoteFunctionUtils")
-local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
 local SecretsServiceClient = {}

@@ -6,11 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
-local Maid = require("Maid")
 local BaseObject = require("BaseObject")
-local Signal = require("Signal")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
+local Promise = require("Promise")
+local Signal = require("Signal")
 
 local UndoStackEntry = setmetatable({}, BaseObject)
 UndoStackEntry.ClassName = "UndoStackEntry"

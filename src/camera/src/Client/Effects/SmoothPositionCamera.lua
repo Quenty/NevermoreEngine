@@ -62,12 +62,12 @@ function SmoothPositionCamera:__index(index)
 		local baseCameraFrame = baseCameraState.CameraFrame
 		local baseCameraFrameDerivative = baseCameraState.CameraFrameDerivative
 
-		local cameraFrame = CameraFrame.new(
-			QFrame.fromVector3(self.Position, baseCameraFrame.QFrame),
-			baseCameraFrame.FieldOfView)
+		local cameraFrame =
+			CameraFrame.new(QFrame.fromVector3(self.Position, baseCameraFrame.QFrame), baseCameraFrame.FieldOfView)
 		local cameraFrameDerivative = CameraFrame.new(
 			QFrame.fromVector3(self.Velocity, baseCameraFrameDerivative.QFrame),
-			baseCameraFrameDerivative.FieldOfView)
+			baseCameraFrameDerivative.FieldOfView
+		)
 
 		return CameraState.new(cameraFrame, cameraFrameDerivative)
 	elseif index == "Position" then

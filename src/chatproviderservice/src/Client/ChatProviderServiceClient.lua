@@ -9,10 +9,10 @@ local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
 
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local String = require("String")
 local TextChannelUtils = require("TextChannelUtils")
-local ServiceBag = require("ServiceBag")
 
 local ChatProviderServiceClient = {}
 ChatProviderServiceClient.ServiceName = "ChatProviderServiceClient"
@@ -60,7 +60,7 @@ function ChatProviderServiceClient:Start()
 			end
 		end
 
-		local textSource =  textChatMessage.TextSource
+		local textSource = textChatMessage.TextSource
 		if not textSource then
 			return
 		end
@@ -84,7 +84,11 @@ end
 	@param encodedMessageData string
 	@param channel TextChannel?
 ]=]
-function ChatProviderServiceClient:SendSystemMessage(message: string, encodedMessageData: string?, channel: TextChannel?)
+function ChatProviderServiceClient:SendSystemMessage(
+	message: string,
+	encodedMessageData: string?,
+	channel: TextChannel?
+)
 	assert(typeof(message) == "string", "[ChatProviderServiceClient.SendSystemMessage] - Bad message")
 
 	if not channel then

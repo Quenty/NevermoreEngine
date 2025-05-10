@@ -108,25 +108,27 @@ function ImageLabelLoaded:SetImageLabel(imageLabel: ImageLabel?)
 		end))
 
 		-- Setup preloading as necessary
-		maid:GiveTask(self._preloadImage:Observe():Pipe({
-			Rx.switchMap(function(preload)
-				if preload then
-					return Rx.combineLatest({
-						isLoaded = self._isLoaded:Observe();
-						image = RxInstanceUtils.observeProperty(self._imageLabel, "Image");
-					})
-				else
-					return Rx.EMPTY
-				end
-			end);
-		}):Subscribe(function(state)
-			if not state.isLoaded and state.image ~= "" then
-				maid:GivePromise(ContentProviderUtils.promisePreload({self._imageLabel}))
-					:Then(function()
+		maid:GiveTask(self._preloadImage
+			:Observe()
+			:Pipe({
+				Rx.switchMap(function(preload)
+					if preload then
+						return Rx.combineLatest({
+							isLoaded = self._isLoaded:Observe(),
+							image = RxInstanceUtils.observeProperty(self._imageLabel, "Image"),
+						})
+					else
+						return Rx.EMPTY
+					end
+				end),
+			})
+			:Subscribe(function(state)
+				if not state.isLoaded and state.image ~= "" then
+					maid:GivePromise(ContentProviderUtils.promisePreload({ self._imageLabel })):Then(function()
 						self._isLoaded.Value = true
 					end)
-			end
-		end))
+				end
+			end))
 	else
 		self._isLoaded.Value = false
 	end

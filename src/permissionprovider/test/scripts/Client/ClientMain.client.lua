@@ -9,7 +9,9 @@ serviceBag:GetService(require("PermissionServiceClient"))
 serviceBag:Init()
 serviceBag:Start()
 
-serviceBag:GetService(require("PermissionServiceClient")):PromisePermissionProvider()
+serviceBag
+	:GetService(require("PermissionServiceClient"))
+	:PromisePermissionProvider()
 	:Then(function(permissionProvider)
 		return permissionProvider:PromiseIsAdmin()
 	end)

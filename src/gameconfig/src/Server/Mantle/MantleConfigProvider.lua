@@ -9,9 +9,9 @@ local GameConfigAssetUtils = require("GameConfigAssetUtils")
 local GameConfigBindersServer = require("GameConfigBindersServer")
 local GameConfigService = require("GameConfigService")
 local GameConfigUtils = require("GameConfigUtils")
-local String = require("String")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
+local String = require("String")
 
 local MantleConfigProvider = {}
 MantleConfigProvider.ClassName = "MantleConfigProvider"
@@ -51,7 +51,6 @@ function MantleConfigProvider:_loadConfig(item)
 
 	assert(coroutine.status(current) == "dead", "Loading the mantle config yielded")
 end
-
 
 function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 	assert(type(mantleConfigData) == "table", "Bad mantleConfigData")
@@ -94,7 +93,8 @@ function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 			return
 		end
 
-		local asset = GameConfigAssetUtils.create(self._gameConfigBindersServer.GameConfigAsset, assetType, assetName, assetId)
+		local asset =
+			GameConfigAssetUtils.create(self._gameConfigBindersServer.GameConfigAsset, assetType, assetName, assetId)
 		asset.Parent = GameConfigUtils.getOrCreateAssetFolder(gameConfig, assetType)
 	end
 
@@ -116,6 +116,5 @@ end
 function MantleConfigProvider:Destroy()
 	self._maid:DoCleaning()
 end
-
 
 return MantleConfigProvider

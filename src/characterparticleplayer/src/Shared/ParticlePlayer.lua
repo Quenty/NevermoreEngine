@@ -5,8 +5,8 @@
 	@class ParticlePlayer
 ]=]
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Debris = game:GetService("Debris")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ParticlePlayer = {}
 ParticlePlayer.__index = ParticlePlayer

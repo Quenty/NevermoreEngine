@@ -8,9 +8,9 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
-local promisePropertyValue = require("promisePropertyValue")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
+local promisePropertyValue = require("promisePropertyValue")
 
 local IKGripBase = setmetatable({}, BaseObject)
 IKGripBase.ClassName = "IKGripBase"
@@ -51,15 +51,14 @@ function IKGripBase:PromiseIKRig()
 	local promise = promisePropertyValue(self._obj, "Value")
 	self._maid:GiveTask(promise)
 
-	self._ikRigPromise = promise
-		:Then(function(humanoid)
-			if not humanoid:IsA("Humanoid") then
-				warn("[IKGripBase.PromiseIKRig] - Humanoid in link is not a humanoid")
-				return Promise.rejected()
-			end
+	self._ikRigPromise = promise:Then(function(humanoid)
+		if not humanoid:IsA("Humanoid") then
+			warn("[IKGripBase.PromiseIKRig] - Humanoid in link is not a humanoid")
+			return Promise.rejected()
+		end
 
-			return self._maid:GivePromise(ikService:PromiseRig(humanoid))
-		end)
+		return self._maid:GivePromise(ikService:PromiseRig(humanoid))
+	end)
 
 	return self._ikRigPromise
 end

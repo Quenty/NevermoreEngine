@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SecretsCmdrTypeUtils = require("SecretsCmdrTypeUtils")
 local Maid = require("Maid")
+local SecretsCmdrTypeUtils = require("SecretsCmdrTypeUtils")
 local ServiceBag = require("ServiceBag")
 
 local SecretsCommandService = {}
@@ -30,11 +30,11 @@ function SecretsCommandService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "list-all-secret-keys";
-		Aliases = { };
-		Description = "Lists all secret keys available.";
-		Group = "Secrets";
-		Args = {};
+		Name = "list-all-secret-keys",
+		Aliases = {},
+		Description = "Lists all secret keys available.",
+		Group = "Secrets",
+		Args = {},
 	}, function(_context)
 		local secrets = self._secretsService:PromiseSecretKeyNamesList():Wait()
 
@@ -47,22 +47,22 @@ function SecretsCommandService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "store-secret";
-		Aliases = { };
-		Description = "Stores a secret key.";
-		Group = "Secrets";
+		Name = "store-secret",
+		Aliases = {},
+		Description = "Stores a secret key.",
+		Group = "Secrets",
 		Args = {
 			{
-				Name = "SecretKey";
-				Type = "secretKey";
-				Description = "The key of the secret to store.";
+				Name = "SecretKey",
+				Type = "secretKey",
+				Description = "The key of the secret to store.",
 			},
 			{
-				Name = "SecretValue";
-				Type = "string";
-				Description = "The value of the secret to store";
-			}
-		};
+				Name = "SecretValue",
+				Type = "string",
+				Description = "The value of the secret to store",
+			},
+		},
 	}, function(_context, secretKey, secretValue)
 		self._secretsService:StoreSecret(secretKey, secretValue)
 
@@ -70,17 +70,17 @@ function SecretsCommandService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "delete-secret";
-		Aliases = { };
-		Description = "Stores a secret by key.";
-		Group = "Secrets";
+		Name = "delete-secret",
+		Aliases = {},
+		Description = "Stores a secret by key.",
+		Group = "Secrets",
 		Args = {
 			{
-				Name = "SecretKey";
-				Type = "requiredSecretKey";
-				Description = "The key of the secret to store.";
-			}
-		};
+				Name = "SecretKey",
+				Type = "requiredSecretKey",
+				Description = "The key of the secret to store.",
+			},
+		},
 	}, function(_context, secretKey)
 		self._secretsService:DeleteSecret(secretKey)
 
@@ -88,17 +88,17 @@ function SecretsCommandService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "read-secret";
-		Aliases = { };
-		Description = "Reads a secret by key.";
-		Group = "Secrets";
+		Name = "read-secret",
+		Aliases = {},
+		Description = "Reads a secret by key.",
+		Group = "Secrets",
 		Args = {
 			{
-				Name = "SecretKey";
-				Type = "requiredSecretKey";
-				Description = "The key of the secret to read.";
-			}
-		};
+				Name = "SecretKey",
+				Type = "requiredSecretKey",
+				Description = "The key of the secret to read.",
+			},
+		},
 	}, function(_context, secretKey)
 		local secret = self._secretsService:PromiseSecret(secretKey):Wait()
 
@@ -110,11 +110,11 @@ function SecretsCommandService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "list-all-secrets";
-		Aliases = { };
-		Description = "Reads all secrets.";
-		Group = "Secrets";
-		Args = {};
+		Name = "list-all-secrets",
+		Aliases = {},
+		Description = "Reads all secrets.",
+		Group = "Secrets",
+		Args = {},
 	}, function(_context)
 		local secrets = self._secretsService:PromiseAllSecrets():Wait()
 
@@ -140,11 +140,11 @@ function SecretsCommandService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "clear-all-secrets";
-		Aliases = { };
-		Description = "Clears all secrets in the store.";
-		Group = "Secrets";
-		Args = {};
+		Name = "clear-all-secrets",
+		Aliases = {},
+		Description = "Clears all secrets in the store.",
+		Group = "Secrets",
+		Args = {},
 	}, function(_context)
 		self._secretsService:ClearAllSecrets()
 

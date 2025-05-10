@@ -5,9 +5,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local TieMemberDefinition = require("TieMemberDefinition")
+local TieRealmUtils = require("TieRealmUtils")
 local TieSignalImplementation = require("TieSignalImplementation")
 local TieSignalInterface = require("TieSignalInterface")
-local TieRealmUtils = require("TieRealmUtils")
 
 local TieSignalDefinition = setmetatable({}, TieMemberDefinition)
 TieSignalDefinition.ClassName = "TieSignalDefinition"

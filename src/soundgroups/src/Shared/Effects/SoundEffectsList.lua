@@ -8,14 +8,14 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ObservableList = require("ObservableList")
+local Counter = require("Counter")
 local Maid = require("Maid")
 local MaidTaskUtils = require("MaidTaskUtils")
-local ValueObject = require("ValueObject")
-local Counter = require("Counter")
+local Observable = require("Observable")
+local ObservableList = require("ObservableList")
 local Rx = require("Rx")
 local Signal = require("Signal")
-local Observable = require("Observable")
+local ValueObject = require("ValueObject")
 
 local SoundEffectsList = setmetatable({}, BaseObject)
 SoundEffectsList.ClassName = "SoundEffectsList"

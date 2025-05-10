@@ -6,11 +6,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
-local TransitionModel = require("TransitionModel")
-local TimedTween = require("TimedTween")
-local Promise = require("Promise")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local Promise = require("Promise")
+local TimedTween = require("TimedTween")
+local TransitionModel = require("TransitionModel")
 
 local TimedTransitionModel = setmetatable({}, BasicPane)
 TimedTransitionModel.ClassName = "TimedTransitionModel"
@@ -183,7 +183,11 @@ function TimedTransitionModel._promiseShow(
 	end
 end
 
-function TimedTransitionModel._promiseHide(self: TimedTransitionModel, maid: Maid.Maid, doNotAnimate: boolean?): Promise.Promise<()>
+function TimedTransitionModel._promiseHide(
+	self: TimedTransitionModel,
+	maid: Maid.Maid,
+	doNotAnimate: boolean?
+): Promise.Promise<()>
 	self._timedTween:Hide(doNotAnimate)
 
 	if doNotAnimate then
@@ -192,6 +196,5 @@ function TimedTransitionModel._promiseHide(self: TimedTransitionModel, maid: Mai
 		return maid:GivePromise(self._timedTween:PromiseFinished())
 	end
 end
-
 
 return TimedTransitionModel

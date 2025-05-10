@@ -7,9 +7,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local LocalizationService = game:GetService("LocalizationService")
 
 local LocalizationServiceUtils = require("LocalizationServiceUtils")
 local Maid = require("Maid")

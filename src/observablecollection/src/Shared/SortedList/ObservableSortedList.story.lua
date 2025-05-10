@@ -2,14 +2,15 @@
 	@class observableSortedList.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Maid = require("Maid")
-local ValueObject = require("ValueObject")
-local ObservableSortedList = require("ObservableSortedList")
 local Blend = require("Blend")
-local RxBrioUtils = require("RxBrioUtils")
+local Maid = require("Maid")
+local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local ValueObject = require("ValueObject")
 
 local ENTRIES = 10
 local CHANGE_TO_NEGATIVE_INDEX = false
@@ -22,22 +23,22 @@ return function(target)
 	local random = Random.new(35)
 
 	local values = {}
-	for i=1, ENTRIES do
+	for i = 1, ENTRIES do
 		local scoreValue = maid:Add(ValueObject.new(0 or random:NextNumber(), "number"))
 
 		local data = {
-			originalIndex = i;
-			scoreValue = scoreValue;
+			originalIndex = i,
+			scoreValue = scoreValue,
 		}
 
 		values[i] = data
 
-		maid:GiveTask(task.delay(i*0.05, function()
+		maid:GiveTask(task.delay(i * 0.05, function()
 			maid:Add(observableSortedList:Add(data, scoreValue:Observe()))
 		end))
 
 		if CHANGE_TO_NEGATIVE_INDEX then
-			maid:GiveTask(task.delay(ENTRIES*0.05 + random:NextNumber()*3, function()
+			maid:GiveTask(task.delay(ENTRIES * 0.05 + random:NextNumber() * 3, function()
 				-- print("change", scoreValue.Value, " to", -1)
 				scoreValue.Value = -i
 			end))
@@ -71,57 +72,60 @@ return function(target)
 
 	maid:GiveTask(Blend.mount(target, {
 		Blend.New "Frame" {
-			Size = UDim2.new(1, 0, 1, 0);
-			BackgroundTransparency = 1;
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
 
 			Blend.New "UIListLayout" {
-				Padding = UDim.new(0, 5);
-				HorizontalAlignment = Enum.HorizontalAlignment.Center;
-				VerticalAlignment = Enum.VerticalAlignment.Top;
-			};
+				Padding = UDim.new(0, 5),
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+			},
 
 			Blend.New "UIPadding" {
-				PaddingTop = UDim.new(0, 10);
-				PaddingBottom = UDim.new(0, 10);
-			};
+				PaddingTop = UDim.new(0, 10),
+				PaddingBottom = UDim.new(0, 10),
+			},
 
 			observableSortedList:ObserveItemsBrio():Pipe({
 				RxBrioUtils.flatMapBrio(function(data, itemKey)
 					local valid = ValueObject.new(false, "boolean")
 
 					return Blend.New "Frame" {
-						Size = UDim2.fromOffset(100, 30);
-						BackgroundColor3 = Blend.Spring(Blend.Computed(valid, function(isValid)
-							if isValid then
-								return Color3.new(1, 1, 1)
-							else
-								return Color3.new(1, 0.5, 0.5)
-							end
-						end), 5);
-						LayoutOrder = observableSortedList:ObserveIndexByKey(itemKey);
+						Size = UDim2.fromOffset(100, 30),
+						BackgroundColor3 = Blend.Spring(
+							Blend.Computed(valid, function(isValid)
+								if isValid then
+									return Color3.new(1, 1, 1)
+								else
+									return Color3.new(1, 0.5, 0.5)
+								end
+							end),
+							5
+						),
+						LayoutOrder = observableSortedList:ObserveIndexByKey(itemKey),
 
 						Blend.New "UICorner" {
-							CornerRadius = UDim.new(0, 5);
-						};
+							CornerRadius = UDim.new(0, 5),
+						},
 
 						Blend.New "TextLabel" {
-							Name = "Score";
+							Name = "Score",
 							Text = data.scoreValue:Observe():Pipe({
-								Rx.map(tostring)
-							});
-							Size = UDim2.fromScale(1, 1);
-							BackgroundTransparency = 1;
-							Position = UDim2.new(1, 10, 0.5, 0);
-							AnchorPoint = Vector2.new(0, 0.5);
-							TextColor3 = Color3.new(1, 1, 1);
-							TextXAlignment = Enum.TextXAlignment.Left;
-						};
+								Rx.map(tostring),
+							}),
+							Size = UDim2.fromScale(1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(1, 10, 0.5, 0),
+							AnchorPoint = Vector2.new(0, 0.5),
+							TextColor3 = Color3.new(1, 1, 1),
+							TextXAlignment = Enum.TextXAlignment.Left,
+						},
 
 						Blend.New "TextBox" {
-							Name = "SetScore";
-							Size = UDim2.fromScale(1, 1);
-							Text = tostring(data.scoreValue.Value);
-							BackgroundTransparency = 1;
+							Name = "SetScore",
+							Size = UDim2.fromScale(1, 1),
+							Text = tostring(data.scoreValue.Value),
+							BackgroundTransparency = 1,
 							[Blend.OnChange "Text"] = function(newValue)
 								if tonumber(newValue) then
 									data.scoreValue.Value = tonumber(newValue)
@@ -129,25 +133,24 @@ return function(target)
 								else
 									valid.Value = false
 								end
-							end;
-						};
+							end,
+						},
 
 						Blend.New "TextLabel" {
-							Name = "OriginalIndex";
-							Text = data.originalIndex;
-							Size = UDim2.fromScale(1, 1);
-							BackgroundTransparency = 1;
-							Position = UDim2.new(0, -10, 0.5, 0);
-							AnchorPoint = Vector2.new(1, 0.5);
-							TextColor3 = Color3.new(1, 1, 1);
-							TextXAlignment = Enum.TextXAlignment.Right;
-						};
+							Name = "OriginalIndex",
+							Text = data.originalIndex,
+							Size = UDim2.fromScale(1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(0, -10, 0.5, 0),
+							AnchorPoint = Vector2.new(1, 0.5),
+							TextColor3 = Color3.new(1, 1, 1),
+							TextXAlignment = Enum.TextXAlignment.Right,
+						},
 					}
-				end)
-			})
-		}
+				end),
+			}),
+		},
 	}))
-
 
 	return function()
 		maid:DoCleaning()

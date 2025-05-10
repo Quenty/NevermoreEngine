@@ -63,20 +63,19 @@ function TieMemberInterface:ObserveImplParentBrio()
 
 	if self._implParent and self._adornee then
 		return Rx.combineLatest({
-			Parent = RxInstanceUtils.observeProperty(self._implParent, "Parent");
-			Name = RxInstanceUtils.observeProperty(self._implParent, "Name");
-		})
-		:Pipe({
+			Parent = RxInstanceUtils.observeProperty(self._implParent, "Parent"),
+			Name = RxInstanceUtils.observeProperty(self._implParent, "Name"),
+		}):Pipe({
 			Rx.map(function(state)
 				if validContainerNameSet[state.Name] and state.Parent == self._adornee then
 					return self._implParent
 				else
 					return nil
 				end
-			end);
-			Rx.distinct();
-			RxBrioUtils.toBrio();
-			RxBrioUtils.onlyLastBrioSurvives();
+			end),
+			Rx.distinct(),
+			RxBrioUtils.toBrio(),
+			RxBrioUtils.onlyLastBrioSurvives(),
 		})
 	elseif self._implParent then
 		return RxInstanceUtils.observePropertyBrio(self._implParent, "Name", function(name)
@@ -84,7 +83,7 @@ function TieMemberInterface:ObserveImplParentBrio()
 		end):Pipe({
 			RxBrioUtils.map(function()
 				return self._implParent
-			end);
+			end),
 		})
 	elseif self._adornee then
 		return self._tieDefinition:ObserveValidContainerChildrenBrio(self._adornee, self._interfaceTieRealm)

@@ -6,15 +6,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Spring = require("Spring")
-local SummedCamera = require("SummedCamera")
-local SpringUtils = require("SpringUtils")
-local QFrame = require("QFrame")
-local FieldOfViewUtils = require("FieldOfViewUtils")
-local CameraState = require("CameraState")
-local CameraFrame = require("CameraFrame")
-local CubicSplineUtils = require("CubicSplineUtils")
 local CameraEffectUtils = require("CameraEffectUtils")
+local CameraFrame = require("CameraFrame")
+local CameraState = require("CameraState")
+local CubicSplineUtils = require("CubicSplineUtils")
+local FieldOfViewUtils = require("FieldOfViewUtils")
+local QFrame = require("QFrame")
+local Spring = require("Spring")
+local SpringUtils = require("SpringUtils")
+local SummedCamera = require("SummedCamera")
 
 local FadeBetweenCamera3 = {}
 FadeBetweenCamera3.ClassName = "FadeBetweenCamera3"

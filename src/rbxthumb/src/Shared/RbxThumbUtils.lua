@@ -247,5 +247,4 @@ function RbxThumbUtils.getOutfitThumbnailUrl(targetId: number, width: number?, h
 	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.OUTFIT, targetId, thumbnailWidth, thumbnailHeight)
 end
 
-
 return RbxThumbUtils

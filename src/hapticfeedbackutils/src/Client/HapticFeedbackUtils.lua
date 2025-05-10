@@ -58,7 +58,12 @@ end
 	@param ... number -- vibrationValues
 	@return boolean
 ]=]
-function HapticFeedbackUtils.setVibrationMotor(userInputType: Enum.UserInputType, vibrationMotor: Enum.VibrationMotor, amplitude: number, ...: number): boolean
+function HapticFeedbackUtils.setVibrationMotor(
+	userInputType: Enum.UserInputType,
+	vibrationMotor: Enum.VibrationMotor,
+	amplitude: number,
+	...: number
+): boolean
 	assert(type(amplitude) == "number", "Bad amplitude")
 
 	if not HapticService:IsVibrationSupported(userInputType) then

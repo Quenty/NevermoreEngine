@@ -6,12 +6,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local DuckTypeUtils = require("DuckTypeUtils")
-local t = require("t")
-local DefaultValueUtils = require("DefaultValueUtils")
 local AttributeValue = require("AttributeValue")
+local DefaultValueUtils = require("DefaultValueUtils")
+local DuckTypeUtils = require("DuckTypeUtils")
 local Observable = require("Observable")
 local ValueObject = require("ValueObject")
+local t = require("t")
 
 local AdorneeDataEntry = {}
 AdorneeDataEntry.ClassName = "AdorneeDataEntry"

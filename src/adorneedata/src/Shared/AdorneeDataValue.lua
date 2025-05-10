@@ -43,9 +43,9 @@ function AdorneeDataValue.new(adornee, prototype)
 	assert(type(prototype) == "table", "Bad prototype")
 
 	local self = {
-		_adornee = adornee;
-		_defaultValues = prototype;
-		_valueObjects = {};
+		_adornee = adornee,
+		_defaultValues = prototype,
+		_valueObjects = {},
 	}
 
 	for key, value in prototype do

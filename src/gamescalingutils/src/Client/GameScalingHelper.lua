@@ -6,10 +6,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ValueObject = require("ValueObject")
-local Observable = require("Observable")
 
 local GameScalingHelper = setmetatable({}, BaseObject)
 GameScalingHelper.ClassName = "GameScalingHelper"

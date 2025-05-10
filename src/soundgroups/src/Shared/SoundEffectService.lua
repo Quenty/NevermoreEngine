@@ -6,15 +6,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
 local SoundEffectsRegistry = require("SoundEffectsRegistry")
 local SoundGroupPathUtils = require("SoundGroupPathUtils")
 local SoundGroupTracker = require("SoundGroupTracker")
 local WellKnownSoundGroups = require("WellKnownSoundGroups")
-local ServiceBag = require("ServiceBag")
 
 local SoundEffectService = {}
 SoundEffectService.ServiceName = "SoundEffectService"
@@ -97,14 +97,13 @@ function SoundEffectService:_setupEffectApplication()
 		end
 
 		local maid, soundGroup = brio:ToMaidAndValue()
-		maid:GiveTask(self._tracker:ObserveSoundGroupPath(soundGroup)
-			:Subscribe(function(soundGroupPath)
-				if soundGroupPath then
-					maid._currentEffects = self._soundEffectsRegister:ApplyEffects(soundGroupPath, soundGroup)
-				else
-					maid._currentEffects = nil
-				end
-			end))
+		maid:GiveTask(self._tracker:ObserveSoundGroupPath(soundGroup):Subscribe(function(soundGroupPath)
+			if soundGroupPath then
+				maid._currentEffects = self._soundEffectsRegister:ApplyEffects(soundGroupPath, soundGroup)
+			else
+				maid._currentEffects = nil
+			end
+		end))
 	end))
 
 	-- Render sound groups
@@ -121,7 +120,6 @@ function SoundEffectService:_setupEffectApplication()
 		end)
 	end))
 end
-
 
 function SoundEffectService:Destroy()
 	self._maid:DoCleaning()

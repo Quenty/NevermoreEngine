@@ -2,13 +2,14 @@
 	@class ColorGradePalette.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Maid = require("Maid")
 local Blend = require("Blend")
 local ColorGradePalette = require("ColorGradePalette")
-local ColorSwatch = require("ColorSwatch")
 local ColorPickerStoryUtils = require("ColorPickerStoryUtils")
+local ColorSwatch = require("ColorSwatch")
+local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 
 return function(target)
@@ -59,161 +60,171 @@ return function(target)
 		local percentMouseOver = Blend.Spring(mouseOver, 60)
 
 		return Blend.New "Frame" {
-			BackgroundColor3 = surface:ObserveGraded(gradePalette:ObserveGrade("surface"));
-			Size = UDim2.new(0, 250, 0, 100);
+			BackgroundColor3 = surface:ObserveGraded(gradePalette:ObserveGrade("surface")),
+			Size = UDim2.new(0, 250, 0, 100),
 
 			[Blend.Children] = {
 				Blend.New "TextLabel" {
-					TextColor3 = text:ObserveGraded(gradePalette:ObserveGrade("text"));
-					Text = labelText;
-					Font = Enum.Font.FredokaOne;
-					Size = UDim2.new(1, 0, 1, 0);
-					BackgroundTransparency = 1;
-					TextScaled = true;
-					ZIndex = 2;
-				};
+					TextColor3 = text:ObserveGraded(gradePalette:ObserveGrade("text")),
+					Text = labelText,
+					Font = Enum.Font.FredokaOne,
+					Size = UDim2.new(1, 0, 1, 0),
+					BackgroundTransparency = 1,
+					TextScaled = true,
+					ZIndex = 2,
+				},
 
 				Blend.New "UIPadding" {
-					PaddingTop = UDim.new(0, 10);
-					PaddingBottom = UDim.new(0, 10);
-					PaddingLeft = UDim.new(0, 10);
-					PaddingRight = UDim.new(0, 10);
-				};
+					PaddingTop = UDim.new(0, 10),
+					PaddingBottom = UDim.new(0, 10),
+					PaddingLeft = UDim.new(0, 10),
+					PaddingRight = UDim.new(0, 10),
+				},
 
 				Blend.New "UIStroke" {
-					Color = surface:ObserveGraded(gradePalette:ObserveGrade("border"));
-					Thickness = 5;
-				};
+					Color = surface:ObserveGraded(gradePalette:ObserveGrade("border")),
+					Thickness = 5,
+				},
 
 				Blend.New "UICorner" {
-					CornerRadius = UDim.new(0, 10);
-				};
+					CornerRadius = UDim.new(0, 10),
+				},
 
 				Blend.New "Frame" {
-					Name = "Highlight";
-					Size = UDim2.new(0.8, 0, 0, 20);
-					Position = UDim2.fromScale(0.5, 0.75);
-					AnchorPoint = Vector2.new(0.5, 0.5);
-					BackgroundColor3 = accent:ObserveGraded(gradePalette:ObserveGrade("highlight"));
+					Name = "Highlight",
+					Size = UDim2.new(0.8, 0, 0, 20),
+					Position = UDim2.fromScale(0.5, 0.75),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					BackgroundColor3 = accent:ObserveGraded(gradePalette:ObserveGrade("highlight")),
 					[Blend.Children] = {
 						Blend.New "UICorner" {
-							CornerRadius = UDim.new(0, 10);
-						};
-					};
-				};
+							CornerRadius = UDim.new(0, 10),
+						},
+					},
+				},
 
 				Blend.New "Frame" {
-					Name ="Button";
-					Size = UDim2.new(0.5, 0, 0, 40);
-					AnchorPoint = Vector2.new(1, 1);
-					BackgroundColor3 = action:ObserveGraded(gradePalette:ObserveModified("action", "mouseOver", percentMouseOver));
-					Position = UDim2.new(1, 30, 1, 40);
-					ZIndex = 2;
+					Name = "Button",
+					Size = UDim2.new(0.5, 0, 0, 40),
+					AnchorPoint = Vector2.new(1, 1),
+					BackgroundColor3 = action:ObserveGraded(
+						gradePalette:ObserveModified("action", "mouseOver", percentMouseOver)
+					),
+					Position = UDim2.new(1, 30, 1, 40),
+					ZIndex = 2,
 
 					[Blend.OnEvent "MouseEnter"] = function()
 						mouseOver.Value = 1
-					end;
+					end,
 
 					[Blend.OnEvent "MouseLeave"] = function()
 						mouseOver.Value = 0
-					end;
+					end,
 
 					[Blend.Children] = {
 						Blend.New "UICorner" {
-							CornerRadius = UDim.new(0, 10);
-						};
+							CornerRadius = UDim.new(0, 10),
+						},
 
 						Blend.New "TextLabel" {
-							TextColor3 = action:ObserveGraded(gradePalette:ObserveModified(gradePalette:ObserveOn("text", "action"), "mouseOver", percentMouseOver));
-							Text = "Action";
-							TextScaled = true;
-							Font = Enum.Font.FredokaOne;
-							Size = UDim2.new(1, 0, 1, 0);
-							BackgroundTransparency = 1;
-							ZIndex = 2;
-						};
+							TextColor3 = action:ObserveGraded(
+								gradePalette:ObserveModified(
+									gradePalette:ObserveOn("text", "action"),
+									"mouseOver",
+									percentMouseOver
+								)
+							),
+							Text = "Action",
+							TextScaled = true,
+							Font = Enum.Font.FredokaOne,
+							Size = UDim2.new(1, 0, 1, 0),
+							BackgroundTransparency = 1,
+							ZIndex = 2,
+						},
 
 						[Blend.Children] = {
 							Blend.New "UIStroke" {
-								Color = action:ObserveGraded(gradePalette:ObserveModified(gradePalette:ObserveOn("border", "action"), "mouseOver", percentMouseOver));
-								Thickness = 5;
-							};
-						};
+								Color = action:ObserveGraded(
+									gradePalette:ObserveModified(
+										gradePalette:ObserveOn("border", "action"),
+										"mouseOver",
+										percentMouseOver
+									)
+								),
+								Thickness = 5,
+							},
+						},
 
 						Blend.New "Frame" {
-							Name = "Highlight";
-							Size = UDim2.new(0.9, 0, 0, 10);
-							Position = UDim2.fromScale(0.5, 0.75);
-							AnchorPoint = Vector2.new(0.5, 0.5);
-							BackgroundColor3 = accent:ObserveGraded(gradePalette:ObserveOn("highlight", "action"));
+							Name = "Highlight",
+							Size = UDim2.new(0.9, 0, 0, 10),
+							Position = UDim2.fromScale(0.5, 0.75),
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							BackgroundColor3 = accent:ObserveGraded(gradePalette:ObserveOn("highlight", "action")),
 							[Blend.Children] = {
 								Blend.New "UICorner" {
-									CornerRadius = UDim.new(0, 10);
-								};
-							};
-						};
-
+									CornerRadius = UDim.new(0, 10),
+								},
+							},
+						},
 
 						Blend.New "UIPadding" {
-							PaddingTop = UDim.new(0, 5);
-							PaddingBottom = UDim.new(0, 5);
-							PaddingLeft = UDim.new(0, 5);
-							PaddingRight = UDim.new(0, 5);
-						};
-					};
-				};
-			};
-		};
+							PaddingTop = UDim.new(0, 5),
+							PaddingBottom = UDim.new(0, 5),
+							PaddingLeft = UDim.new(0, 5),
+							PaddingRight = UDim.new(0, 5),
+						},
+					},
+				},
+			},
+		}
 	end
 
 	maid:GiveTask((Blend.New "ScrollingFrame" {
-		Size = UDim2.new(1, 0, 1, 0);
-		BackgroundColor3 = Color3.new(0, 0, 0);
-		AutomaticCanvasSize = Enum.AutomaticSize.Y;
-		CanvasSize = UDim2.new(1, 0, 0, 0);
-		Parent = target;
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundColor3 = Color3.new(0, 0, 0),
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		CanvasSize = UDim2.new(1, 0, 0, 0),
+		Parent = target,
 
 		[Blend.Children] = {
 			ColorPickerStoryUtils.create(maid, function(createPicker)
-				createPicker("Surface", surfaceColorValue);
-				createPicker("Text", textColorValue);
-				createPicker("Accent", accentColorValue);
-				createPicker("Action", actionColorValue);
-			end);
-
+				createPicker("Surface", surfaceColorValue)
+				createPicker("Text", textColorValue)
+				createPicker("Accent", accentColorValue)
+				createPicker("Action", actionColorValue)
+			end),
 
 			Blend.New "Frame" {
-				Size = UDim2.new(1, 0, 0, 0);
-				BackgroundTransparency = 1;
-				AutomaticSize = Enum.AutomaticSize.Y;
+				Size = UDim2.new(1, 0, 0, 0),
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
 
 				[Blend.Children] = {
-					sampleGui("Light", light);
-					sampleGui("Dark", dark);
+					sampleGui("Light", light),
+					sampleGui("Dark", dark),
 
 					Blend.New "UIListLayout" {
-						Padding = UDim.new(0, 50);
-						HorizontalAlignment = Enum.HorizontalAlignment.Center;
-						VerticalAlignment = Enum.VerticalAlignment.Top;
-						FillDirection = Enum.FillDirection.Vertical;
-					};
-				};
-			};
-
+						Padding = UDim.new(0, 50),
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Top,
+						FillDirection = Enum.FillDirection.Vertical,
+					},
+				},
+			},
 
 			Blend.New "UIListLayout" {
-				Padding = UDim.new(0, 20);
-				HorizontalAlignment = Enum.HorizontalAlignment.Center;
-				VerticalAlignment = Enum.VerticalAlignment.Top;
-				FillDirection = Enum.FillDirection.Vertical;
-			};
+				Padding = UDim.new(0, 20),
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+				FillDirection = Enum.FillDirection.Vertical,
+			},
 
 			Blend.New "UIPadding" {
-				PaddingTop = UDim.new(0, 10);
-			};
-		}
+				PaddingTop = UDim.new(0, 10),
+			},
+		},
 	}):Subscribe())
-
 
 	return function()
 		maid:DoCleaning()

@@ -13,9 +13,9 @@ local UserInputService = game:GetService("UserInputService")
 local GamepadRotateModel = require("GamepadRotateModel")
 local InputObjectUtils = require("InputObjectUtils")
 local Maid = require("Maid")
+local PushCamera = require("PushCamera")
 local SmoothRotatedCamera = require("SmoothRotatedCamera")
 local SmoothZoomedCamera = require("SmoothZoomedCamera")
-local PushCamera = require("PushCamera")
 
 -- Stolen directly from ROBLOX's core scripts.
 -- Looks like a simple integrator.

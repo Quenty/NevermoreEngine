@@ -5,11 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
+local Brio = require("Brio")
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
-local Observable = require("Observable")
-local Brio = require("Brio")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local GuiInteractionUtils = {}
 

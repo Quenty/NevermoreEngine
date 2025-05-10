@@ -10,9 +10,9 @@ local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
 
 local InsertServiceUtils = require("InsertServiceUtils")
-local Promise = require("Promise")
-local Math = require("Math")
 local Maid = require("Maid")
+local Math = require("Math")
+local Promise = require("Promise")
 
 local CameraStoryUtils = {}
 
@@ -117,7 +117,14 @@ end
 	@param toCFrame CFrame
 	@return (interpolate: function, color: Color3, label: string?, labelOffset: Vector2?) -> ()
 ]=]
-function CameraStoryUtils.getInterpolationFactory(maid: Maid.Maid, viewportFrame: ViewportFrame, low: number, high: number, period: number, toCFrame: CFrame)
+function CameraStoryUtils.getInterpolationFactory(
+	maid: Maid.Maid,
+	viewportFrame: ViewportFrame,
+	low: number,
+	high: number,
+	period: number,
+	toCFrame: CFrame
+)
 	assert(maid, "Bad maid")
 	assert(viewportFrame, "Bad viewportFrame")
 	assert(type(low) == "number", "Bad low")
@@ -132,10 +139,9 @@ function CameraStoryUtils.getInterpolationFactory(maid: Maid.Maid, viewportFrame
 		labelOffset = labelOffset or Vector2.zero
 
 		maid:GivePromise(CameraStoryUtils.promiseCrate(maid, viewportFrame, {
-			Color = color;
-			Transparency = 0.5
-		}))
-			:Then(function(crate)
+			Color = color,
+			Transparency = 0.5,
+		})):Then(function(crate)
 			local label
 			if labelText then
 				local h, s, _ = Color3.toHSV(color)
@@ -176,7 +182,7 @@ function CameraStoryUtils.getInterpolationFactory(maid: Maid.Maid, viewportFrame
 				end
 			end
 
-				maid:GiveTask(RunService.RenderStepped:Connect(function()
+			maid:GiveTask(RunService.RenderStepped:Connect(function()
 				local t = (os.clock() / period % 2 / period) * period
 				if t >= 1 then
 					t = 1 - (t % 1)
@@ -201,11 +207,11 @@ function CameraStoryUtils.getInterpolationFactory(maid: Maid.Maid, viewportFrame
 					end
 				end
 
-					for part, rel in relCFrame do
-						part.CFrame = cframe:toWorldSpace(rel)
-					end
-				end))
-			end)
+				for part, rel in relCFrame do
+					part.CFrame = cframe:toWorldSpace(rel)
+				end
+			end))
+		end)
 	end
 end
 

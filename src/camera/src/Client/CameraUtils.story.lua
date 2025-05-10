@@ -2,7 +2,8 @@
 	@class CameraUtils.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Maid = require("Maid")
 
@@ -25,7 +26,7 @@ return function(target: Instance)
 
 	local ball: Part = maid:Add(Instance.new("Part"))
 	ball.Color = Color3.new(1, 0.5, 0.5)
-	ball.Size = Vector3.new(2*radius, 2*radius, 2*radius)
+	ball.Size = Vector3.new(2 * radius, 2 * radius, 2 * radius)
 	ball.Shape = Enum.PartType.Ball
 	ball.CFrame = CFrame.new()
 	ball.Anchored = true
@@ -34,7 +35,7 @@ return function(target: Instance)
 	local function update()
 		local absSize = viewportFrame.AbsoluteSize
 		if absSize.x > 0 and absSize.y > 0 then
-			local aspectRatio = absSize.x/absSize.y
+			local aspectRatio = absSize.x / absSize.y
 			local dist = CameraUtils.fitSphereToCamera(radius, camera.FieldOfView, aspectRatio)
 			camera.CFrame = CFrame.new(0, 0, dist)
 		end

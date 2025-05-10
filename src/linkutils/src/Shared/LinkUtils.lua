@@ -6,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local promisePropertyValue = require("promisePropertyValue")
 local promiseChild = require("promiseChild")
+local promisePropertyValue = require("promisePropertyValue")
 
 local LinkUtils = {}
 

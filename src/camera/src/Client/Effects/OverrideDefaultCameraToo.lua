@@ -16,10 +16,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SummedCamera = require("SummedCamera")
-local Vector3Utils = require("Vector3Utils")
 local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local Vector3Utils = require("Vector3Utils")
 
 local OverrideDefaultCameraToo = {}
 OverrideDefaultCameraToo.ClassName = "OverrideDefaultCameraToo"
@@ -41,7 +41,11 @@ export type OverrideDefaultCameraToo = typeof(setmetatable(
 	@param defaultCamera DefaultCamera
 	@param predicate Filter on whether to override or not
 ]=]
-function OverrideDefaultCameraToo.new(baseCamera: CameraEffectUtils.CameraEffect, defaultCamera: CameraEffectUtils.CameraEffect, predicate): OverrideDefaultCameraToo
+function OverrideDefaultCameraToo.new(
+	baseCamera: CameraEffectUtils.CameraEffect,
+	defaultCamera: CameraEffectUtils.CameraEffect,
+	predicate
+): OverrideDefaultCameraToo
 	local self: OverrideDefaultCameraToo = setmetatable({} :: any, OverrideDefaultCameraToo)
 
 	self.BaseCamera = assert(baseCamera, "No baseCamera")
@@ -73,7 +77,12 @@ function OverrideDefaultCameraToo:__index(index)
 				warn("[OverrideDefaultCameraToo] - No predicate set")
 			end
 
-			local angle = math.abs(Vector3Utils.angleBetweenVectors(result.CFrame:VectorToWorldSpace(Vector3.new(0, 0, -1)), Vector3.new(0, 1, 0)))
+			local angle = math.abs(
+				Vector3Utils.angleBetweenVectors(
+					result.CFrame:VectorToWorldSpace(Vector3.new(0, 0, -1)),
+					Vector3.new(0, 1, 0)
+				)
+			)
 
 			-- If the camera is straight up and down then Roblox breaks
 			if angle >= math.rad(0.1) and angle <= math.rad(179.9) then

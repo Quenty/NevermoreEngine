@@ -140,7 +140,7 @@ function TransparencyService._set(
 
 	if not valueToSet then
 		-- Reset
-		storage[part] = nil;
+		storage[part] = nil
 		(part :: any)[property] = partData.original
 		return
 	end
@@ -153,7 +153,6 @@ function TransparencyService.ResetLocalTransparencyModifier(self: TransparencySe
 
 	self:SetLocalTransparencyModifier(key, part, nil)
 end
-
 
 function TransparencyService.ResetTransparency(self: TransparencyService, key: any, part: Instance): ()
 	assert(self._properties, "Not initialized")

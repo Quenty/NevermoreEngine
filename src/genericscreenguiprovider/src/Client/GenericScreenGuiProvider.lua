@@ -29,11 +29,11 @@ local RunService = game:GetService("RunService")
 
 local Blend = require("Blend")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ScreenGuiService = require("ScreenGuiService")
 local ServiceBag = require("ServiceBag")
 local String = require("String")
 local ValueObject = require("ValueObject")
-local Observable = require("Observable")
 
 local GenericScreenGuiProvider = {}
 GenericScreenGuiProvider.ClassName = "GenericScreenGuiProvider"

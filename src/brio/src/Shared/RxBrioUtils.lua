@@ -805,5 +805,4 @@ function RxBrioUtils.switchToBrio<T>(predicate: Rx.Predicate<T>?)
 	end
 end
 
-
 return RxBrioUtils
