@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Service which manages central access to datastore. This datastore will refresh pretty frequently and
 	can be used for configuration and other components, such as Twitter codes or global settings.
@@ -26,44 +27,43 @@ function GameDataStoreService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._maid = Maid.new()
 end
 
-function GameDataStoreService:PromiseDataStore()
+function GameDataStoreService:PromiseDataStore(): Promise.Promise<DataStore>
 	if self._dataStorePromise then
 		return self._dataStorePromise
 	end
 
-	self._dataStorePromise = self:_promiseRobloxDataStore()
-		:Then(function(robloxDataStore)
-			-- Live sync this stuff pretty frequently
-			local dataStore = DataStore.new(robloxDataStore, self:_getKey())
-			dataStore:SetSyncOnSave(true)
-			dataStore:SetAutoSaveTimeSeconds(5)
+	self._dataStorePromise = self:_promiseRobloxDataStore():Then(function(robloxDataStore)
+		-- Live sync this stuff pretty frequently
+		local dataStore: DataStore.DataStore = DataStore.new(robloxDataStore, self:_getKey())
+		dataStore:SetSyncOnSave(true)
+		dataStore:SetAutoSaveTimeSeconds(5)
 
-			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
-				return Promise.defer(function(resolve)
-					return resolve(dataStore:Save())
-				end)
-				:Finally(function()
-					dataStore:Destroy()
-				end)
-			end))
+		self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
+			return Promise.defer(function(resolve)
+				return resolve(dataStore:Save())
+			end):Finally(function()
+				dataStore:Destroy()
+			end)
+		end))
 
-			return dataStore
-		end)
+		return dataStore
+	end)
 
 	return self._dataStorePromise
 end
 
-function GameDataStoreService:_promiseRobloxDataStore()
+function GameDataStoreService:_promiseRobloxDataStore(): Promise.Promise<any>
 	if self._robloxDataStorePromise then
 		return self._robloxDataStorePromise
 	end
 
-	self._robloxDataStorePromise = self._maid:GivePromise(DataStorePromises.promiseDataStore("GameDataStore", "Version1"))
+	self._robloxDataStorePromise =
+		self._maid:GivePromise(DataStorePromises.promiseDataStore("GameDataStore", "Version1"))
 
 	return self._robloxDataStorePromise
 end
 
-function GameDataStoreService:_getKey()
+function GameDataStoreService:_getKey(): string
 	return "version1"
 end
 

@@ -1,3 +1,4 @@
+--!strict
 --[[
 	Provides translations for game configuration
 	@class GameConfigTranslator

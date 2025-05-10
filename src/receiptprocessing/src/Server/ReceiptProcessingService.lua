@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Centralize receipt processing within games since this is a constrained resource.
 

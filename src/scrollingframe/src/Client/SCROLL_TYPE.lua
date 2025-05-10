@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	ScrollType enum, determines scrolling behavior
 	@class ScrollType

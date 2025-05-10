@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Retrieves a remote event as a promise
 	@class PromiseGetRemoteEvent

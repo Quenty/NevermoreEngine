@@ -33,7 +33,7 @@ export type GameConfigAssetBase = typeof(setmetatable(
 		_configTranslator: JSONTranslator.JSONTranslator,
 	},
 	{} :: typeof({ __index = GameConfigAssetBase })
-))
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new GameConfigAssetBase. Should be done via binder. This is a base class.

@@ -64,7 +64,7 @@ export type ObservableSortedList<T> = typeof(setmetatable(
 	@param compare function
 	@return ObservableSortedList<T>
 ]=]
-function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunction<T>): ObservableSortedList<T>
+function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunction<T>?): ObservableSortedList<T>
 	assert(type(isReversed) == "boolean" or isReversed == nil, "Bad isReversed")
 
 	local self = setmetatable({} :: any, ObservableSortedList)

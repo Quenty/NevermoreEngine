@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Hack to maintain default camera control by binding before and after the camera update cycle
 	This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme.
@@ -56,7 +57,7 @@ function DefaultCamera.new(): DefaultCamera
 	return self
 end
 
-function DefaultCamera.__add(self: DefaultCamera, other: CameraEffectUtils.CameraLike)
+function DefaultCamera.__add(self: DefaultCamera, other: CameraEffectUtils.CameraEffect)
 	return SummedCamera.new(self, other)
 end
 

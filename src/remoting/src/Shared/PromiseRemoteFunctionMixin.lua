@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Intended for classes that extend BaseObject only
 	@class PromiseRemoteFunctionMixin

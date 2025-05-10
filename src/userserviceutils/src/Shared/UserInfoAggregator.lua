@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Aggregates all requests into one big send request to deduplicate the request
 
@@ -11,21 +12,30 @@ local BaseObject = require("BaseObject")
 local Rx = require("Rx")
 local UserServiceUtils = require("UserServiceUtils")
 local PromiseRetryUtils = require("PromiseRetryUtils")
+local Promise = require("Promise")
+local Observable = require("Observable")
 
 local UserInfoAggregator = setmetatable({}, BaseObject)
 UserInfoAggregator.ClassName = "UserInfoAggregator"
 UserInfoAggregator.__index = UserInfoAggregator
 
-function UserInfoAggregator.new()
-	local self = setmetatable(BaseObject.new(), UserInfoAggregator)
+export type UserInfoAggregator = typeof(setmetatable(
+	{} :: {
+		_aggregator: Aggregator.Aggregator<UserServiceUtils.UserInfo>,
+	},
+	{} :: typeof({ __index = UserInfoAggregator })
+)) & BaseObject.BaseObject
+
+function UserInfoAggregator.new(): UserInfoAggregator
+	local self: UserInfoAggregator = setmetatable(BaseObject.new() :: any, UserInfoAggregator)
 
 	self._aggregator = self._maid:Add(Aggregator.new("UserServiceUtils.promiseUserInfosByUserIds", function(userIdList)
 		return PromiseRetryUtils.retry(function()
 			return UserServiceUtils.promiseUserInfosByUserIds(userIdList)
 		end, {
-			initialWaitTime = 10;
-			maxAttempts = 10;
-			printWarning = true;
+			initialWaitTime = 10,
+			maxAttempts = 10,
+			printWarning = true,
 		})
 	end))
 
@@ -39,7 +49,7 @@ end
 	@param userId number
 	@return Promise<UserInfo>
 ]=]
-function UserInfoAggregator:PromiseUserInfo(userId: number)
+function UserInfoAggregator:PromiseUserInfo(userId: number): Promise.Promise<UserServiceUtils.UserInfo>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Promise(userId)
@@ -51,7 +61,7 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserInfoAggregator:PromiseDisplayName(userId: number)
+function UserInfoAggregator:PromiseDisplayName(userId: number): Promise.Promise<string>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Promise(userId):Then(function(userInfo)
@@ -65,7 +75,7 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserInfoAggregator:PromiseUsername(userId: number)
+function UserInfoAggregator:PromiseUsername(userId: number): Promise.Promise<string>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Promise(userId):Then(function(userInfo)
@@ -79,7 +89,7 @@ end
 	@param userId number
 	@return Promise<boolean>
 ]=]
-function UserInfoAggregator:PromiseHasVerifiedBadge(userId: number)
+function UserInfoAggregator:PromiseHasVerifiedBadge(userId: number): Promise.Promise<boolean>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Promise(userId):Then(function(userInfo)
@@ -93,7 +103,7 @@ end
 	@param userId number
 	@return Observable<UserInfo>
 ]=]
-function UserInfoAggregator:ObserveUserInfo(userId: number)
+function UserInfoAggregator:ObserveUserInfo(userId: number): Observable.Observable<UserServiceUtils.UserInfo>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Observe(userId)
@@ -105,7 +115,7 @@ end
 	@param userId number
 	@return Observable<string>
 ]=]
-function UserInfoAggregator:ObserveDisplayName(userId: number)
+function UserInfoAggregator:ObserveDisplayName(userId: number): Observable.Observable<string>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Observe(userId):Pipe({
@@ -121,7 +131,7 @@ end
 	@param userId number
 	@return Observable<string>
 ]=]
-function UserInfoAggregator:ObserveUsername(userId: number)
+function UserInfoAggregator:ObserveUsername(userId: number): Observable.Observable<string>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Observe(userId):Pipe({
@@ -137,7 +147,7 @@ end
 	@param userId number
 	@return Observable<boolean>
 ]=]
-function UserInfoAggregator:ObserveHasVerifiedBadge(userId: number)
+function UserInfoAggregator:ObserveHasVerifiedBadge(userId: number): Observable.Observable<boolean>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:Observe(userId):Pipe({

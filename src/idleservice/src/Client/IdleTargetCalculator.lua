@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Assets in calculating whether the player is idle while moving the camera around or
 	aiming a gun.
@@ -7,6 +8,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Observable = require("Observable")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local DIST_BEFORE_MOVEMENT = 0.15
@@ -16,26 +19,35 @@ local IdleTargetCalculator = setmetatable({}, BaseObject)
 IdleTargetCalculator.ClassName = "IdleTargetCalculator"
 IdleTargetCalculator.__index = IdleTargetCalculator
 
-function IdleTargetCalculator.new()
-	local self = setmetatable(BaseObject.new(), IdleTargetCalculator)
+export type IdleTargetCalculator = typeof(setmetatable(
+	{} :: {
+		_lastTargetPosition: Vector3?,
+		_lastMoveTime: number?,
+		_disableContextUI: ValueObject.ValueObject<boolean>,
+		Changed: Signal.Signal<()>,
+	},
+	{} :: typeof({ __index = IdleTargetCalculator })
+)) & BaseObject.BaseObject
+
+function IdleTargetCalculator.new(): IdleTargetCalculator
+	local self: IdleTargetCalculator = setmetatable(BaseObject.new() :: any, IdleTargetCalculator)
 
 	self._disableContextUI = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self.Changed = self._disableContextUI.Changed
+	self.Changed = self._disableContextUI.Changed :: any
 
 	return self
 end
 
-function IdleTargetCalculator:GetShouldDisableContextUI()
+function IdleTargetCalculator.GetShouldDisableContextUI(self: IdleTargetCalculator): boolean
 	return self._disableContextUI.Value
 end
 
-
-function IdleTargetCalculator:ObserveShouldDisableContextUI()
+function IdleTargetCalculator.ObserveShouldDisableContextUI(self: IdleTargetCalculator): Observable.Observable<boolean>
 	return self._disableContextUI:Observe()
 end
 
-function IdleTargetCalculator:SetTarget(targetPosition)
+function IdleTargetCalculator.SetTarget(self: IdleTargetCalculator, targetPosition: Vector3): ()
 	if not targetPosition then
 		self._disableContextUI.Value = false
 		return
@@ -43,7 +55,7 @@ function IdleTargetCalculator:SetTarget(targetPosition)
 
 	-- Show UI if no movement for a while
 	if self._lastTargetPosition then
-		local dist = (self._lastTargetPosition - targetPosition).magnitude
+		local dist = (self._lastTargetPosition - targetPosition).Magnitude
 		if dist >= DIST_BEFORE_MOVEMENT then
 			self._lastMoveTime = os.clock()
 			self._disableContextUI.Value = true

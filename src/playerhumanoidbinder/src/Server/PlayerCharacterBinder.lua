@@ -22,7 +22,7 @@ PlayerCharacterBinder.__index = PlayerCharacterBinder
 	@param ... any
 	@return PlayerCharacterBinder<T>
 ]=]
-function PlayerCharacterBinder.new(tag, class, ...)
+function PlayerCharacterBinder.new(tag: string, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerCharacterBinder)
 
 	return self

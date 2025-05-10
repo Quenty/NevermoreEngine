@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class GameConfigService
 ]=]
@@ -55,7 +56,7 @@ function GameConfigService:Init(serviceBag: ServiceBag.ServiceBag)
 
 	self._getPreferredParent = PreferredParentUtils.createPreferredParentRetriever(ReplicatedStorage, "GameConfigs")
 
-	self._serviceBag:GetService(require("GameConfigDataService")):SetConfigPicker(self._configPicker)
+	self._serviceBag:GetService(require("GameConfigDataService") :: any):SetConfigPicker(self._configPicker)
 end
 
 --[=[

@@ -31,7 +31,7 @@ export type ColorSwatch = typeof(setmetatable(
 	{} :: typeof({ __index = ColorSwatch })
 )) & BaseObject.BaseObject
 
-function ColorSwatch.new(color: Color3, vividness: number?): ColorSwatch
+function ColorSwatch.new(color: ValueObject.Mountable<Color3>, vividness: number?): ColorSwatch
 	local self: ColorSwatch = setmetatable(BaseObject.new() :: any, ColorSwatch)
 
 	self._color = self._maid:Add(ValueObject.new(Color3.new(0, 0, 0)))
@@ -135,7 +135,7 @@ function ColorSwatch:SetVividness(vividness: number | Observable.Observable<numb
 	end)
 end
 
-function ColorSwatch:SetBaseColor(color: Color3 | Observable.Observable<Color3>)
+function ColorSwatch:SetBaseColor(color: ValueObject.Mountable<Color3>)
 	if typeof(color) == "Color3" then
 		self._color.Value = color
 		self._maid._currentColor = nil

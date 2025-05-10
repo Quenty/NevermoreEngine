@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving badges on Roblox
 	@class BadgeUtils

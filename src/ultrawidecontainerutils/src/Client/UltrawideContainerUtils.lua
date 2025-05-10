@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Creates a 1920x1080 scaling container to handle ultrawide monitors and screens
 	in a reasonable way. This helps keep UI centered and available for ultrawide screens.

@@ -113,7 +113,7 @@ export type DataStore = typeof(setmetatable(
 	@param key string
 	@return DataStore
 ]=]
-function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: string)
+function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: string): DataStore
 	local self: DataStore = setmetatable(DataStoreStage.new(key) :: any, DataStore)
 
 	self._key = key or error("No key")

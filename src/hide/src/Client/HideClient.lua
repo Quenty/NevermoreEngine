@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	See [Binder] for usage.
 

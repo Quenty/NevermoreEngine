@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class GameConfigAsset
 ]=]
@@ -7,13 +8,23 @@ local require = require(script.Parent.loader).load(script)
 local GameConfigAssetBase = require("GameConfigAssetBase")
 local GameConfigTranslator = require("GameConfigTranslator")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
+local JSONTranslator = require("JSONTranslator")
 
 local GameConfigAsset = setmetatable({}, GameConfigAssetBase)
 GameConfigAsset.ClassName = "GameConfigAsset"
 GameConfigAsset.__index = GameConfigAsset
 
-function GameConfigAsset.new(obj, serviceBag)
-	local self = setmetatable(GameConfigAssetBase.new(obj, serviceBag), GameConfigAsset)
+export type GameConfigAsset = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_translator: JSONTranslator.JSONTranslator,
+	},
+	{} :: typeof({ __index = GameConfigAsset })
+)) & GameConfigAssetBase.GameConfigAssetBase
+
+function GameConfigAsset.new(obj: Folder, serviceBag: ServiceBag.ServiceBag): GameConfigAsset
+	local self: GameConfigAsset = setmetatable(GameConfigAssetBase.new(obj, serviceBag) :: any, GameConfigAsset)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._translator = self._serviceBag:GetService(GameConfigTranslator)

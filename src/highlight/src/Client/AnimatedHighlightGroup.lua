@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@client
 	@class AnimatedHighlightGroup
@@ -16,8 +17,16 @@ local AnimatedHighlightGroup = setmetatable({}, BaseObject)
 AnimatedHighlightGroup.ClassName = "AnimatedHighlightGroup"
 AnimatedHighlightGroup.__index = AnimatedHighlightGroup
 
-function AnimatedHighlightGroup.new()
-	local self = setmetatable(BaseObject.new(), AnimatedHighlightGroup)
+export type AnimatedHighlightGroup = typeof(setmetatable(
+	{} :: {
+		_defaultValues: AnimatedHighlightModel.AnimatedHighlightModel,
+		_highlightStacks: { [Instance]: AnimatedHighlightStack.AnimatedHighlightStack },
+	},
+	{} :: typeof({ __index = AnimatedHighlightGroup })
+)) & BaseObject.BaseObject
+
+function AnimatedHighlightGroup.new(): AnimatedHighlightGroup
+	local self: AnimatedHighlightGroup = setmetatable(BaseObject.new() :: any, AnimatedHighlightGroup)
 
 	self._defaultValues = self._maid:Add(AnimatedHighlightModel.new())
 	self._defaultValues:SetHighlightDepthMode(Enum.HighlightDepthMode.AlwaysOnTop)

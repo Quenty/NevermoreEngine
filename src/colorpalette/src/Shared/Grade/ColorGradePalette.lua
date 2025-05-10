@@ -15,8 +15,17 @@ local ColorGradePalette = setmetatable({}, BaseObject)
 ColorGradePalette.ClassName = "ColorGradePalette"
 ColorGradePalette.__index = ColorGradePalette
 
-function ColorGradePalette.new()
-	local self = setmetatable(BaseObject.new(), ColorGradePalette)
+export type ColorGradePalette = typeof(setmetatable(
+	{} :: {
+		_grades: { [string]: Observable.Observable<number> },
+		_vividness: { [string]: Observable.Observable<number> },
+		_defaultSurfaceName: ValueObject.ValueObject<string>,
+	},
+	{} :: typeof({ __index = ColorGradePalette })
+)) & BaseObject.BaseObject
+
+function ColorGradePalette.new(): ColorGradePalette
+	local self: ColorGradePalette = setmetatable(BaseObject.new() :: any, ColorGradePalette)
 
 	self._grades = {}
 	self._vividness = {}
@@ -33,7 +42,7 @@ function ColorGradePalette:SetDefaultSurfaceName(gradeName: string)
 	self._defaultSurfaceName.Value = gradeName
 end
 
-function ColorGradePalette:HasGrade(gradeName)
+function ColorGradePalette:HasGrade(gradeName: string): boolean
 	if self._grades[gradeName] then
 		return true
 	else
@@ -87,7 +96,7 @@ function ColorGradePalette:GetVividness(gradeName: string)
 	return vividness
 end
 
-function ColorGradePalette:Add(gradeName, colorGrade, vividness)
+function ColorGradePalette:Add(gradeName: string, colorGrade, vividness)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	self._grades[gradeName] = Blend.toPropertyObservable(colorGrade) or Rx.of(colorGrade)

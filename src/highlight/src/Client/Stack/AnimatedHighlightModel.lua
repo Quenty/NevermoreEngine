@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class AnimatedHighlightModel
 ]=]
@@ -14,6 +15,22 @@ local AnimatedHighlightModel = setmetatable({}, BaseObject)
 AnimatedHighlightModel.ClassName = "AnimatedHighlightModel"
 AnimatedHighlightModel.__index = AnimatedHighlightModel
 
+export type AnimatedHighlightModel = typeof(setmetatable(
+	{} :: {
+		HighlightDepthMode: ValueObject.ValueObject<Enum.HighlightDepthMode?>,
+		FillColor: ValueObject.ValueObject<Color3?>,
+		OutlineColor: ValueObject.ValueObject<Color3?>,
+		FillTransparency: ValueObject.ValueObject<number?>,
+		OutlineTransparency: ValueObject.ValueObject<number?>,
+		Speed: ValueObject.ValueObject<number?>,
+		ColorSpeed: ValueObject.ValueObject<number?>,
+		TransparencySpeed: ValueObject.ValueObject<number?>,
+		FillSpeed: ValueObject.ValueObject<number?>,
+		Destroying: Signal.Signal<()>,
+	},
+	{} :: typeof({ __index = AnimatedHighlightModel })
+)) & BaseObject.BaseObject
+
 --[=[
 	Constructs a new data model for an animated highlight. Probably retrieve via an
 	[AnimatedHighlightStack] or more likely an [AnimatedHighlightGroup] or even the
@@ -21,8 +38,8 @@ AnimatedHighlightModel.__index = AnimatedHighlightModel
 
 	@return AnimatedHighlightModel
 ]=]
-function AnimatedHighlightModel.new()
-	local self = setmetatable(BaseObject.new(), AnimatedHighlightModel)
+function AnimatedHighlightModel.new(): AnimatedHighlightModel
+	local self: AnimatedHighlightModel = setmetatable(BaseObject.new() :: any, AnimatedHighlightModel)
 
 	self.HighlightDepthMode = self._maid:Add(ValueObject.new(nil))
 	self.FillColor = self._maid:Add(ValueObject.new(nil))
@@ -54,10 +71,12 @@ function AnimatedHighlightModel.isAnimatedHighlightModel(value: any): boolean
 end
 
 --[=[
+	Sets the highlight depth mode
+
 	@param depthMode HighlightDepthMode
 ]=]
-function AnimatedHighlightModel:SetHighlightDepthMode(depthMode: Enum.HighlightDepthMode?)
-	assert(EnumUtils.isOfType(Enum.HighlightDepthMode, depthMode) or depthMode == nil, "Bad depthMode")
+function AnimatedHighlightModel:SetHighlightDepthMode(depthMode: Enum.HighlightDepthMode?): ()
+	assert(depthMode == nil or EnumUtils.isOfType(Enum.HighlightDepthMode, depthMode), "Bad depthMode")
 
 	self.HighlightDepthMode.Value = depthMode
 end
@@ -67,7 +86,7 @@ end
 
 	@param speed number?
 ]=]
-function AnimatedHighlightModel:SetTransparencySpeed(speed: number?)
+function AnimatedHighlightModel:SetTransparencySpeed(speed: number?): ()
 	assert(type(speed) == "number" or speed == nil, "Bad speed")
 
 	self.TransparencySpeed:SetValue(speed)
@@ -78,7 +97,7 @@ end
 
 	@param speed number?
 ]=]
-function AnimatedHighlightModel:SetColorSpeed(speed: number?)
+function AnimatedHighlightModel:SetColorSpeed(speed: number?): ()
 	assert(type(speed) == "number" or speed == nil, "Bad speed")
 
 	self.ColorSpeed:SetValue(speed)
@@ -89,7 +108,7 @@ end
 
 	@param speed number?
 ]=]
-function AnimatedHighlightModel:SetSpeed(speed: number?)
+function AnimatedHighlightModel:SetSpeed(speed: number?): ()
 	assert(type(speed) == "number" or speed == nil, "Bad speed")
 
 	self.Speed:SetValue(speed)
@@ -101,7 +120,7 @@ end
 	@param color Color3?
 	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlightModel:SetFillColor(color: Color3?, doNotAnimate: boolean?)
+function AnimatedHighlightModel:SetFillColor(color: Color3?, doNotAnimate: boolean?): ()
 	assert(typeof(color) == "Color3" or color == nil, "Bad color")
 
 	self.FillColor:SetValue(color, doNotAnimate)
@@ -122,7 +141,7 @@ end
 	@param color Color3?
 	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlightModel:SetOutlineColor(color: Color3?, doNotAnimate: boolean?)
+function AnimatedHighlightModel:SetOutlineColor(color: Color3?, doNotAnimate: boolean?): ()
 	assert(typeof(color) == "Color3" or color == nil, "Bad color")
 
 	self.OutlineColor:SetValue(color, doNotAnimate)
@@ -133,7 +152,7 @@ end
 
 	@return Color3?
 ]=]
-function AnimatedHighlightModel:GetOutlineColor()
+function AnimatedHighlightModel:GetOutlineColor(): Color3?
 	return self.OutlineColor.Value
 end
 
@@ -143,7 +162,7 @@ end
 	@param outlineTransparency number
 	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlightModel:SetOutlineTransparency(outlineTransparency: number?, doNotAnimate: boolean?)
+function AnimatedHighlightModel:SetOutlineTransparency(outlineTransparency: number?, doNotAnimate: boolean?): ()
 	assert(type(outlineTransparency) == "number" or outlineTransparency == nil, "Bad outlineTransparency")
 
 	self.OutlineTransparency:SetValue(outlineTransparency, doNotAnimate)
@@ -155,7 +174,7 @@ end
 	@param fillTransparency number
 	@param doNotAnimate boolean?
 ]=]
-function AnimatedHighlightModel:SetFillTransparency(fillTransparency: number?, doNotAnimate: boolean?)
+function AnimatedHighlightModel:SetFillTransparency(fillTransparency: number?, doNotAnimate: boolean?): ()
 	assert(type(fillTransparency) == "number" or fillTransparency == nil, "Bad fillTransparency")
 
 	self.FillTransparency:SetValue(fillTransparency, doNotAnimate)

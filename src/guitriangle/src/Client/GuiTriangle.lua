@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	2D Gui triangle rendering class.
 	See: http://wiki.roblox.com/index.php?title=2D_triangles
@@ -10,14 +11,25 @@ GuiTriangle.__index = GuiTriangle
 GuiTriangle.ClassName = "GuiTriangle"
 GuiTriangle.ExtraPixels = 2
 
+export type GuiTriangle = typeof(setmetatable(
+	{} :: {
+		_ta: ImageLabel,
+		_tb: ImageLabel,
+		_a: Vector2,
+		_b: Vector2,
+		_c: Vector2,
+	},
+	{} :: typeof({ __index = GuiTriangle })
+))
+
 --[=[
 	Constructs a new GuiTriangle
 
 	@param parent Instance?
 	@return GuiTriangle
 ]=]
-function GuiTriangle.new(parent: Instance?)
-	local self = setmetatable({}, GuiTriangle)
+function GuiTriangle.new(parent: Instance?): GuiTriangle
+	local self: GuiTriangle = setmetatable({} :: any, GuiTriangle)
 
 	self._a = Vector2.zero
 	self._b = Vector2.zero
@@ -37,7 +49,7 @@ end
 --[=[
 	@param parent Instance?
 ]=]
-function GuiTriangle:SetParent(parent: Instance?)
+function GuiTriangle.SetParent(self: GuiTriangle, parent: Instance?)
 	self._ta.Parent = parent
 	self._tb.Parent = parent
 end
@@ -45,7 +57,7 @@ end
 --[=[
 	Shows the triangle
 ]=]
-function GuiTriangle:Show()
+function GuiTriangle.Show(self: GuiTriangle)
 	self._ta.Visible = true
 	self._tb.Visible = true
 end
@@ -57,7 +69,7 @@ end
 	@param c Vector2
 	@return GuiTriangle -- self
 ]=]
-function GuiTriangle:Set(a: Vector2, b: Vector2, c: Vector2)
+function GuiTriangle.Set(self: GuiTriangle, a: Vector2, b: Vector2, c: Vector2)
 	self:SetA(a)
 	self:SetB(b)
 	self:SetC(c)
@@ -68,7 +80,7 @@ end
 --[=[
 	Hides the triangle
 ]=]
-function GuiTriangle:Hide()
+function GuiTriangle.Hide(self: GuiTriangle)
 	self._ta.Visible = false
 	self._tb.Visible = false
 end
@@ -88,7 +100,7 @@ end
 	@param a Vector2
 	@return GuiTriangle -- self
 ]=]
-function GuiTriangle:SetA(a: Vector2)
+function GuiTriangle.SetA(self: GuiTriangle, a: Vector2)
 	assert(typeof(a) == "Vector2", "Bad a")
 
 	self._a = a
@@ -100,7 +112,7 @@ end
 	@param b Vector2
 	@return GuiTriangle -- self
 ]=]
-function GuiTriangle:SetB(b: Vector2)
+function GuiTriangle.SetB(self: GuiTriangle, b: Vector2)
 	assert(typeof(b) == "Vector2", "Bad b")
 
 	self._b = b
@@ -112,7 +124,7 @@ end
 	@param c Vector2
 	@return GuiTriangle -- self
 ]=]
-function GuiTriangle:SetC(c: Vector2)
+function GuiTriangle.SetC(self: GuiTriangle, c: Vector2)
 	assert(typeof(c) == "Vector2", "Bad c")
 
 	self._c = c
@@ -131,7 +143,7 @@ type Edge = {
 --[=[
 	Updates the render of the triangle.
 ]=]
-function GuiTriangle:UpdateRender()
+function GuiTriangle.UpdateRender(self: GuiTriangle)
 	local a: Vector2, b: Vector2, c: Vector2 = self._a, self._b, self._c
 
 	local extra = self.ExtraPixels
@@ -184,14 +196,14 @@ end
 --[=[
 	Cleans up the triangle.
 ]=]
-function GuiTriangle:Destroy()
-	setmetatable(self, nil)
+function GuiTriangle.Destroy(self: GuiTriangle)
+	setmetatable(self :: any, nil)
 
-	self._ta:Destroy()
-	self._ta = nil
+	self._ta:Destroy();
+	(self :: any)._ta = nil
 
-	self._tb:Destroy()
-	self._tb = nil
+	self._tb:Destroy();
+	(self :: any)._tb = nil
 end
 
 return GuiTriangle

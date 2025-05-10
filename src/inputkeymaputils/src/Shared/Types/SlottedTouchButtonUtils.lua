@@ -30,7 +30,7 @@ export type SlottedTouchButtonData = {
 	@param slotId string
 	@return SlottedTouchButton
 ]=]
-function SlottedTouchButtonUtils.createSlottedTouchButton(slotId: string)
+function SlottedTouchButtonUtils.createSlottedTouchButton(slotId: string): any
 	assert(
 		slotId == "primary1"
 			or slotId == "primary2"

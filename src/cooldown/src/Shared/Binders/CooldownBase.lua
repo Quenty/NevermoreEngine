@@ -7,13 +7,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local TimeSyncService = require("TimeSyncService")
 local CooldownConstants = require("CooldownConstants")
 local CooldownModel = require("CooldownModel")
 local RxAttributeUtils = require("RxAttributeUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
+local TimeSyncService = require("TimeSyncService")
 
 local CooldownBase = setmetatable({}, BaseObject)
 CooldownBase.ClassName = "CooldownBase"

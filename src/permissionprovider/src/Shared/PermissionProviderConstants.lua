@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Constants for the permission system
 	@class PermissionProviderConstants

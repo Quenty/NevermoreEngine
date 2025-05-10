@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class ColorPalette
 ]=]
@@ -5,22 +6,39 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
-local ColorSwatch = require("ColorSwatch")
-local ColorGradePalette = require("ColorGradePalette")
-local Rx = require("Rx")
 local Blend = require("Blend")
-local Observable = require("Observable")
+local Brio = require("Brio")
+local ColorGradePalette = require("ColorGradePalette")
 local ColorGradeUtils = require("ColorGradeUtils")
+local ColorSwatch = require("ColorSwatch")
 local LuvColor3Utils = require("LuvColor3Utils")
+local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
+local Rx = require("Rx")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local ColorPalette = setmetatable({}, BaseObject)
 ColorPalette.ClassName = "ColorPalette"
 ColorPalette.__index = ColorPalette
 
-function ColorPalette.new()
-	local self = setmetatable(BaseObject.new(), ColorPalette)
+export type ColorPalette = typeof(setmetatable(
+	{} :: {
+		_swatches: { ColorSwatch.ColorSwatch },
+		_gradePalette: ColorGradePalette.ColorGradePalette,
+		_swatchMap: any,
+		_colorGradeMap: any,
+		_colorValues: { [string]: ValueObject.ValueObject<Color3> },
+		_vividnessValues: { [string]: ValueObject.ValueObject<number> },
+
+		ColorSwatchAdded: Signal.Signal<string>,
+		ColorGradeAdded: Signal.Signal<string>,
+	},
+	{} :: typeof({ __index = ColorPalette })
+)) & BaseObject.BaseObject
+
+function ColorPalette.new(): ColorPalette
+	local self: ColorPalette = setmetatable(BaseObject.new() :: any, ColorPalette)
 
 	self._gradePalette = self._maid:Add(ColorGradePalette.new())
 
@@ -30,78 +48,84 @@ function ColorPalette.new()
 	self._vividnessValues = {}
 
 	self.ColorSwatchAdded = assert(self._swatchMap.KeyAdded, "No KeyAdded") -- :Fire(name)
-	self.ColorGradeAdded = assert(self._colorGradeMap.KeyAdded, "No KeyAdded") -- :Fire(name) -- :Fire(name)
+	self.ColorGradeAdded = assert(self._colorGradeMap.KeyAdded, "No KeyAdded") -- :Fire(name)
 
 	return self
 end
 
-function ColorPalette:GetSwatchNames(): { string }
+function ColorPalette.GetSwatchNames(self: ColorPalette): { string }
 	return self._swatchMap:GetKeyList()
 end
 
-function ColorPalette:ObserveSwatchNames()
-	return Rx.fromSignal(self.ColorSwatchAdded):Pipe({
+function ColorPalette.ObserveSwatchNames(self: ColorPalette): Observable.Observable<{ string }>
+	return Rx.fromSignal(self.ColorSwatchAdded :: any):Pipe({
 		Rx.startFrom(function()
 			return self:GetSwatchNames()
-		end)
-	})
+		end) :: any,
+	}) :: any
 end
 
-function ColorPalette:ObserveSwatchNameList()
+function ColorPalette.ObserveSwatchNameList(self: ColorPalette): Observable.Observable<{ string }>
 	return self._swatchMap:ObserveKeyList()
 end
 
-function ColorPalette:ObserveSwatchNamesBrio()
+function ColorPalette.ObserveSwatchNamesBrio(self: ColorPalette)
 	return self._swatchMap:ObserveKeysBrio()
 end
 
-function ColorPalette:GetGradeNames()
+function ColorPalette.GetGradeNames(self: ColorPalette): { string }
 	return self._colorGradeMap:GetKeyList()
 end
 
-function ColorPalette:ObserveGradeNameList()
+function ColorPalette.ObserveGradeNameList(self: ColorPalette)
 	return self._colorGradeMap:ObserveKeyList()
 end
 
-function ColorPalette:ObserveGradeNames()
-	return Rx.fromSignal(self.ColorGradeAdded):Pipe({
+function ColorPalette.ObserveGradeNames(self: ColorPalette): Observable.Observable<{ string }>
+	return Rx.fromSignal(self.ColorGradeAdded :: any):Pipe({
 		Rx.startFrom(function()
 			return self:GetGradeNames()
-		end)
-	})
+		end) :: any,
+	}) :: any
 end
 
-function ColorPalette:ObserveGradeNamesBrio()
+function ColorPalette.ObserveGradeNamesBrio(self: ColorPalette): Observable.Observable<Brio.Brio<string>>
 	return self._colorGradeMap:ObserveKeysBrio()
 end
 
-function ColorPalette:GetColorValues()
+function ColorPalette.GetColorValues(self: ColorPalette)
 	return self._colorValues
 end
 
-function ColorPalette:GetColor(color, grade, vividness)
+function ColorPalette.GetColor(self: ColorPalette, color, grade, vividness)
 	if type(color) == "string" then
-		return self:GetColorSwatch(color):GetGraded(
-			self:_toGrade(grade, color),
-			self:_toVividness(vividness, grade, color))
+		return self:GetColorSwatch(color)
+			:GetGraded(self:_toGrade(grade, color), self:_toVividness(vividness, grade, color))
 	elseif typeof(color) == "Color3" then
-		return ColorGradeUtils.getGradedColor(color, self:_toGrade(grade, color), self:_toVividness(vividness, grade, color))
-	elseif typeof(color) == "Instance" and color:IsA("Color3Value") then
-		return ColorGradeUtils.getGradedColor(color.Value,
+		return ColorGradeUtils.getGradedColor(
+			color,
 			self:_toGrade(grade, color),
-			self:_toVividness(vividness, grade, color))
+			self:_toVividness(vividness, grade, color)
+		)
+	elseif typeof(color) == "Instance" and color:IsA("Color3Value") then
+		return ColorGradeUtils.getGradedColor(
+			color.Value,
+			self:_toGrade(grade, color),
+			self:_toVividness(vividness, grade, color)
+		)
 	else
 		error("Bad color")
 	end
 end
 
-function ColorPalette:ObserveColor(color, grade, vividness)
+function ColorPalette.ObserveColor(self: ColorPalette, color, grade, vividness): Observable.Observable<Color3>
 	-- assert(type(color) == "string", "Bad color")
 
 	if type(color) == "string" then
 		return self:GetColorSwatch(color):ObserveGraded(
 			self:_toGradeObservable(grade, color),
-			self:_toVividnessObservable(vividness, grade, color))
+			self:_toVividnessObservable(vividness, grade, color)
+		)
 	end
 
 	-- handle observable of color. this is for custom colors.
@@ -116,31 +140,31 @@ function ColorPalette:ObserveColor(color, grade, vividness)
 	if colorOrObservable then
 		if grade == nil and vividness == nil then
 			-- no modification needed
-			return colorOrObservable
+			return colorOrObservable :: any
 		end
 
 		-- TODO: Optimize this potentially
 		return Rx.combineLatest({
-			baseColor = colorOrObservable;
-			colorGrade = self:_toGradeObservable(grade, colorOrObservable);
-			vividness = self:_toVividnessObservable(vividness, grade, colorOrObservable);
+			baseColor = colorOrObservable,
+			colorGrade = self:_toGradeObservable(grade, colorOrObservable),
+			vividness = self:_toVividnessObservable(vividness, grade, colorOrObservable),
 		}):Pipe({
 			Rx.map(function(state)
 				return ColorGradeUtils.getGradedColor(state.baseColor, state.colorGrade, state.vividness)
-			end)
-		})
+			end) :: any,
+		}) :: any
 	else
 		error("Bad color")
 	end
 end
 
-function ColorPalette:SetDefaultSurfaceName(surfaceName: string)
+function ColorPalette.SetDefaultSurfaceName(self: ColorPalette, surfaceName: string)
 	assert(type(surfaceName) == "string", "Bad surfaceName")
 
 	self._gradePalette:SetDefaultSurfaceName(surfaceName)
 end
 
-function ColorPalette:GetColorSwatch(colorName)
+function ColorPalette.GetColorSwatch(self: ColorPalette, colorName: string)
 	local swatch = self._swatchMap:Get(colorName)
 	if not swatch then
 		error(string.format("No swatch with name %q", colorName))
@@ -149,11 +173,11 @@ function ColorPalette:GetColorSwatch(colorName)
 	return swatch
 end
 
-function ColorPalette:ObserveGradeOn(colorName, newSurfaceName, baseSurfaceName)
+function ColorPalette.ObserveGradeOn(self: ColorPalette, colorName: string, newSurfaceName, baseSurfaceName)
 	return self._gradePalette:ObserveOn(colorName, newSurfaceName, baseSurfaceName)
 end
 
-function ColorPalette:_toGradeObservable(grade, fallbackColorSource)
+function ColorPalette._toGradeObservable(self: ColorPalette, grade, fallbackColorSource)
 	if type(grade) == "string" then
 		return (self._gradePalette:ObserveGrade(grade))
 	elseif type(grade) == "number" then
@@ -185,7 +209,7 @@ function ColorPalette:_toGradeObservable(grade, fallbackColorSource)
 	end
 end
 
-function ColorPalette:_toVividnessObservable(vividness, grade, colorOrObservable)
+function ColorPalette._toVividnessObservable(self: ColorPalette, vividness, grade, colorOrObservable)
 	if type(vividness) == "string" then
 		return self._gradePalette:ObserveVividness(vividness)
 	elseif type(vividness) == "number" then
@@ -211,7 +235,7 @@ function ColorPalette:_toVividnessObservable(vividness, grade, colorOrObservable
 	end
 end
 
-function ColorPalette:_toGrade(grade, name)
+function ColorPalette._toGrade(self: ColorPalette, grade, name): number
 	if type(grade) == "string" then
 		return self._gradePalette:GetGrade(grade)
 	elseif type(grade) == "number" then
@@ -221,7 +245,7 @@ function ColorPalette:_toGrade(grade, name)
 	end
 end
 
-function ColorPalette:_toVividness(vividness, grade, name)
+function ColorPalette._toVividness(self: ColorPalette, vividness, grade, name): number
 	if type(vividness) == "string" then
 		return self._gradePalette:GetVividness(vividness)
 	elseif type(vividness) == "number" then
@@ -235,7 +259,7 @@ function ColorPalette:_toVividness(vividness, grade, name)
 	end
 end
 
-function ColorPalette:GetColorValue(colorName: string)
+function ColorPalette.GetColorValue(self: ColorPalette, colorName: string)
 	assert(type(colorName) == "string", "Bad colorName")
 
 	local colorValue = self._colorValues[colorName]
@@ -246,7 +270,7 @@ function ColorPalette:GetColorValue(colorName: string)
 	return colorValue
 end
 
-function ColorPalette:GetGradeValue(gradeName)
+function ColorPalette.GetGradeValue(self: ColorPalette, gradeName: string): ValueObject.ValueObject<number>
 	local gradeValue = self._colorGradeMap:Get(gradeName)
 	if not gradeValue then
 		error(string.format("No grade with name %q", gradeName))
@@ -255,7 +279,7 @@ function ColorPalette:GetGradeValue(gradeName)
 	return gradeValue
 end
 
-function ColorPalette:GetVividnessValue(gradeName)
+function ColorPalette.GetVividnessValue(self: ColorPalette, gradeName: string): ValueObject.ValueObject<number>
 	local vividnessValue = self._vividnessValues[gradeName]
 	if not vividnessValue then
 		error(string.format("No grade with name %q", gradeName))
@@ -264,19 +288,19 @@ function ColorPalette:GetVividnessValue(gradeName)
 	return vividnessValue
 end
 
-function ColorPalette:ObserveModifiedGrade(gradeName, amount, multiplier)
+function ColorPalette.ObserveModifiedGrade(self: ColorPalette, gradeName, amount, multiplier)
 	return self._gradePalette:ObserveModified(gradeName, amount, multiplier)
 end
 
-function ColorPalette:ObserveGrade(name)
+function ColorPalette.ObserveGrade(self: ColorPalette, name)
 	return self._gradePalette:ObserveGrade(name)
 end
 
-function ColorPalette:ObserveVividness(name)
+function ColorPalette.ObserveVividness(self: ColorPalette, name)
 	return self._gradePalette:ObserveVividness(name)
 end
 
-function ColorPalette:GetSwatch(swatchName: string)
+function ColorPalette.GetSwatch(self: ColorPalette, swatchName: string)
 	assert(type(swatchName) == "string", "Bad swatchName")
 
 	local swatch = self._swatchMap:Get(swatchName)
@@ -291,7 +315,7 @@ end
 	@param colorName string
 	@param color Observable<Color3> | Color3
 ]=]
-function ColorPalette:SetColor(colorName, color)
+function ColorPalette.SetColor(self: ColorPalette, colorName, color)
 	assert(type(colorName) == "string", "Bad colorName")
 
 	if not self._colorValues[colorName] then
@@ -301,7 +325,7 @@ function ColorPalette:SetColor(colorName, color)
 	return self._colorValues[colorName]:Mount(color)
 end
 
-function ColorPalette:SetVividness(gradeName, vividness)
+function ColorPalette.SetVividness(self: ColorPalette, gradeName, vividness)
 	assert(type(gradeName) == "string", "Bad colorName")
 
 	if not self._vividnessValues[gradeName] then
@@ -311,7 +335,7 @@ function ColorPalette:SetVividness(gradeName, vividness)
 	return self._vividnessValues[gradeName]:Mount(vividness)
 end
 
-function ColorPalette:SetColorGrade(gradeName, grade)
+function ColorPalette.SetColorGrade(self: ColorPalette, gradeName, grade)
 	assert(type(gradeName) == "string", "Bad colorName")
 	assert(grade, "Bad grade")
 
@@ -323,14 +347,13 @@ function ColorPalette:SetColorGrade(gradeName, grade)
 	return gradeValue:Mount(grade)
 end
 
-
-function ColorPalette:ObserveColorBaseGradeBetween(colorName, low, high)
+function ColorPalette.ObserveColorBaseGradeBetween(self: ColorPalette, colorName, low, high)
 	assert(type(colorName) == "string", "Bad colorName")
 
 	return self:GetSwatch(colorName):ObserveBaseGradeBetween(low, high)
 end
 
-function ColorPalette:DefineColorGrade(gradeName, gradeValue, vividnessValue)
+function ColorPalette.DefineColorGrade(self: ColorPalette, gradeName, gradeValue, vividnessValue)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	if self._colorGradeMap:Get(gradeName) then
@@ -352,7 +375,7 @@ function ColorPalette:DefineColorGrade(gradeName, gradeValue, vividnessValue)
 	return colorGrade
 end
 
-function ColorPalette:DefineColorSwatch(colorName, value)
+function ColorPalette.DefineColorSwatch(self: ColorPalette, colorName, value)
 	assert(type(colorName) == "string", "Bad colorName")
 
 	if self._swatchMap:Get(colorName) then
@@ -361,7 +384,7 @@ function ColorPalette:DefineColorSwatch(colorName, value)
 	end
 
 	local colorValue = self._maid:Add(ValueObject.new(value or Color3.new(0, 0, 0), "Color3"))
-	local colorSwatch = self._maid:Add(ColorSwatch.new(colorValue))
+	local colorSwatch = self._maid:Add(ColorSwatch.new(colorValue :: any))
 
 	self._colorValues[colorName] = colorValue
 

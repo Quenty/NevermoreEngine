@@ -7,6 +7,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local RxBinderUtils = require("RxBinderUtils")
+local Observable = require("Observable")
+local Brio = require("Brio")
 
 local RxCooldownUtils = {}
 
@@ -16,7 +18,7 @@ local RxCooldownUtils = {}
 	@param parent Instance
 	@return Observable<Brio<Cooldown | CooldownClient>>
 ]=]
-function RxCooldownUtils.observeCooldownBrio(cooldownBinder, parent: Instance)
+function RxCooldownUtils.observeCooldownBrio(cooldownBinder, parent: Instance): Observable.Observable<Brio.Brio<any>>
 	return RxBinderUtils.observeBoundChildClassBrio(cooldownBinder, parent)
 end
 

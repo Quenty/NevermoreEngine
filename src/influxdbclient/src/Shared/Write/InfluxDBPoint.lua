@@ -9,6 +9,7 @@ local Math = require("Math")
 local InfluxDBEscapeUtils = require("InfluxDBEscapeUtils")
 local Table = require("Table")
 local Set = require("Set")
+local InfluxDBPointSettings = require("InfluxDBPointSettings")
 
 local InfluxDBPoint = {}
 InfluxDBPoint.ClassName = "InfluxDBPoint"
@@ -31,6 +32,12 @@ export type InfluxDBPointTableData = {
 	fields: { [string]: string },
 }
 
+--[=[
+	Creates a new InfluxDB point
+
+	@param measurementName string?
+	@return InfluxDBPoint
+]=]
 function InfluxDBPoint.new(measurementName: string?): InfluxDBPoint
 	local self: InfluxDBPoint = setmetatable({} :: any, InfluxDBPoint)
 
@@ -44,7 +51,13 @@ function InfluxDBPoint.new(measurementName: string?): InfluxDBPoint
 	return self
 end
 
-function InfluxDBPoint.fromTableData(data: InfluxDBPointTableData)
+--[=[
+	Creates a new InfluxDB point from table data
+
+	@param data InfluxDBPointTableData
+	@return InfluxDBPoint
+]=]
+function InfluxDBPoint.fromTableData(data: InfluxDBPointTableData): InfluxDBPoint
 	assert(type(data) == "table", "Bad data")
 	assert(type(data.measurementName) == "string" or data.measurementName == nil, "Bad data.measurementName")
 
@@ -77,20 +90,42 @@ function InfluxDBPoint.fromTableData(data: InfluxDBPointTableData)
 	return copy
 end
 
+--[=[
+	Checks if the point is an InfluxDBPoint
+
+	@param point any
+	@return boolean
+]=]
 function InfluxDBPoint.isInfluxDBPoint(point: any): boolean
 	return type(point) == "table" and getmetatable(point) == InfluxDBPoint
 end
 
+--[=[
+	Sets the measurement name
+
+	@param name string?
+	@return boolean
+]=]
 function InfluxDBPoint.SetMeasurementName(self: InfluxDBPoint, name: string)
 	assert(type(name) == "string" or name == nil, "Bad name")
 
 	self._measurementName = name
 end
 
+--[=[
+	Gets the measurement name
+
+	@return string?
+]=]
 function InfluxDBPoint.GetMeasurementName(self: InfluxDBPoint): string?
 	return self._measurementName
 end
 
+--[=[
+	Converts the point into a table data format safe for serialization
+
+	@return InfluxDBPointTableData
+]=]
 function InfluxDBPoint.ToTableData(self: InfluxDBPoint): InfluxDBPointTableData
 	return {
 		measurementName = self._measurementName,
@@ -210,7 +245,13 @@ function InfluxDBPoint.AddStringField(self: InfluxDBPoint, fieldName: string, va
 	self._fields[fieldName] = InfluxDBEscapeUtils.quoted(value)
 end
 
-function InfluxDBPoint.ToLineProtocol(self: InfluxDBPoint, pointSettings)
+--[=[
+	Converts the point to line protocol format to send to InfluxDB for consumption
+
+	@param pointSettings InfluxDBPointSettings
+	@return string?
+]=]
+function InfluxDBPoint.ToLineProtocol(self: InfluxDBPoint, pointSettings: InfluxDBPointSettings.InfluxDBPointSettings): string?
 	if not self._measurementName then
 		return nil
 	end
@@ -248,9 +289,9 @@ function InfluxDBPoint.ToLineProtocol(self: InfluxDBPoint, pointSettings)
 		end
 	end
 
-	local timestamp: any? = self._timestamp
+	local timestamp = self._timestamp
 	local convertTime = pointSettings:GetConvertTime()
-	if convertTime then
+	if convertTime ~= nil then
 		timestamp = convertTime(timestamp)
 	else
 		timestamp = self:_convertTimeToMillis(timestamp)

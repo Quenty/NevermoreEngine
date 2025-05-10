@@ -67,7 +67,10 @@ end
 	@param inputModeType InputModeType
 	@return KeyCode?
 ]=]
-function ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList: InputKeyMapList.InputKeyMapList, inputModeType: InputModeType.InputModeType): Enum.KeyCode?
+function ProximityPromptInputUtils.getFirstInputKeyCode(
+	inputKeyMapList: InputKeyMapList.InputKeyMapList,
+	inputModeType: InputModeType.InputModeType
+): Enum.KeyCode?
 	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 

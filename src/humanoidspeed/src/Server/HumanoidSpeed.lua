@@ -8,12 +8,21 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local RogueHumanoidProperties = require("RogueHumanoidProperties")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
+local RogueHumanoidProperties = require("RogueHumanoidProperties")
+local ServiceBag = require("ServiceBag")
 
 local HumanoidSpeed = setmetatable({}, BaseObject)
 HumanoidSpeed.ClassName = "HumanoidSpeed"
 HumanoidSpeed.__index = HumanoidSpeed
+
+export type HumanoidSpeed = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_properties: any,
+	},
+	{} :: typeof({ __index = HumanoidSpeed })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new HumanoidSpeed
@@ -21,8 +30,8 @@ HumanoidSpeed.__index = HumanoidSpeed
 	@param serviceBag ServiceBag
 	@return HumanoidSpeed
 ]=]
-function HumanoidSpeed.new(humanoid: Humanoid, serviceBag)
-	local self = setmetatable(BaseObject.new(humanoid), HumanoidSpeed)
+function HumanoidSpeed.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): HumanoidSpeed
+	local self: HumanoidSpeed = setmetatable(BaseObject.new(humanoid) :: any, HumanoidSpeed)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._properties = RogueHumanoidProperties:GetPropertyTable(self._serviceBag, self._obj)

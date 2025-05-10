@@ -25,7 +25,7 @@ function ParticleEngineServer:Init()
 	end)
 end
 
-function ParticleEngineServer:_replicate(player, particle)
+function ParticleEngineServer:_replicate(player: Player, particle)
 	particle.Global = nil
 
 	for _, otherPlayer in Players:GetPlayers() do

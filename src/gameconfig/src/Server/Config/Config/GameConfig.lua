@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	See [GameConfigBase] for API and [GameConfigService] for usage.
 	@class GameConfig
@@ -30,7 +31,7 @@ function GameConfig.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): GameC
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)
 
-	for _, assetType in GameConfigAssetTypes do
+	for _, assetType: any in GameConfigAssetTypes do
 		GameConfigUtils.getOrCreateAssetFolder(self._obj, assetType)
 	end
 

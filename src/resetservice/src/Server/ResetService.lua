@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly
 	@server
@@ -47,7 +48,7 @@ function ResetService:PushResetProvider(promiseReset: () -> ())
 	return self._resetProviderStack:PushState(promiseReset)
 end
 
-function ResetService:PromiseResetCharacter(player)
+function ResetService:PromiseResetCharacter(player: Player): Promise.Promise<()>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	if not player:IsDescendantOf(game) then

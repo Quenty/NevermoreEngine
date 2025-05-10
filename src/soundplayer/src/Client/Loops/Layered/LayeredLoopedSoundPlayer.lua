@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Rx = require("Rx")
 local SoundUtils = require("SoundUtils")
 local SoundLoopScheduleUtils = require("SoundLoopScheduleUtils")
+local t = require("t")
 
 local LayeredLoopedSoundPlayer = setmetatable({}, SpringTransitionModel)
 LayeredLoopedSoundPlayer.ClassName = "LayeredLoopedSoundPlayer"
@@ -21,9 +22,9 @@ function LayeredLoopedSoundPlayer.new(soundParent)
 
 	self._layerMaid = self._maid:Add(Maid.new())
 
-	self._soundParent = self._maid:Add(ValueObject.new(nil))
-	self._soundGroup = self._maid:Add(ValueObject.new(nil))
-	self._bpm = self._maid:Add(ValueObject.new(nil))
+	self._soundParent = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance)))
+	self._soundGroup = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance)))
+	self._bpm = self._maid:Add(ValueObject.new(nil, t.optional(t.number)))
 	self._defaultCrossFadeTime = self._maid:Add(ValueObject.new(0.5, "number"))
 	self._volumeMultiplier = self._maid:Add(ValueObject.new(1, "number"))
 
@@ -36,31 +37,29 @@ function LayeredLoopedSoundPlayer.new(soundParent)
 	return self
 end
 
-function LayeredLoopedSoundPlayer:SetDefaultCrossFadeTime(crossFadeTime)
+function LayeredLoopedSoundPlayer:SetDefaultCrossFadeTime(crossFadeTime: ValueObject.Mountable<number>)
 	return self._defaultCrossFadeTime:Mount(crossFadeTime)
 end
 
-function LayeredLoopedSoundPlayer:SetVolumeMultiplier(volumeMultiplier)
-	self._volumeMultiplier.Value = volumeMultiplier
+function LayeredLoopedSoundPlayer:SetVolumeMultiplier(volumeMultiplier: ValueObject.Mountable<number>)
+	return self._volumeMultiplier:Mount(volumeMultiplier)
 end
 
-function LayeredLoopedSoundPlayer:SetBPM(bpm)
-	assert(type(bpm) == "number" or bpm == nil, "Bad bpm")
-
+function LayeredLoopedSoundPlayer:SetBPM(bpm: ValueObject.Mountable<number?>)
 	self._bpm.Value = bpm
 end
 
-function LayeredLoopedSoundPlayer:SetSoundParent(soundParent)
+function LayeredLoopedSoundPlayer:SetSoundParent(soundParent: Instance?)
 	assert(typeof(soundParent) == "Instance" or soundParent == nil, "Bad soundParent")
 
 	self._soundParent.Value = soundParent
 end
 
-function LayeredLoopedSoundPlayer:SetSoundGroup(soundGroup)
+function LayeredLoopedSoundPlayer:SetSoundGroup(soundGroup: SoundGroup?)
 	return self._soundGroup:Mount(soundGroup)
 end
 
-function LayeredLoopedSoundPlayer:Swap(layerId, soundId, scheduleOptions)
+function LayeredLoopedSoundPlayer:Swap(layerId: string, soundId, scheduleOptions)
 	assert(type(layerId) == "string", 'Bad layerId')
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")

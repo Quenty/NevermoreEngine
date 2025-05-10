@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Primarily used for authoring, this hides the tagged instance from render. Great for
 	making bounding boxes in studio that are then hidden upon runtime.
@@ -21,7 +22,7 @@ Hide.__index = Hide
 	@param adornee Instance
 	@return Hide
 ]=]
-function Hide.new(adornee)
+function Hide.new(adornee: Instance)
 	local self = setmetatable({}, Hide)
 
 	self._obj = assert(adornee, "No adornee")
@@ -43,7 +44,7 @@ function Hide.new(adornee)
 	return self
 end
 
-function Hide:_setupPart(part)
+function Hide:_setupPart(part: BasePart)
 	part.Locked = true
 	part.Transparency = 1
 end

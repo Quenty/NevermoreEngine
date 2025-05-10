@@ -5,8 +5,7 @@
     "out": true,
     "roblox.toml": true
   },
-  // "luau-lsp.server.path": "/Users/jonnen/.aftman/bin/luau-lsp",
-  "luau-lsp.server.path": "/Users/jonnen/git/games/luau-lsp/cmake-build-debug/luau-lsp",
+  "luau-lsp.server.path": "/Users/jonnen/.aftman/bin/luau-lsp",
   "luau-lsp.ignoreGlobs": ["**/node_modules/**"],
   "luau-lsp.fflags.enableNewSolver": false,
   "[lua]": {

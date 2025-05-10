@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Centralized group
 	@client

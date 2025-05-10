@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions that let you score a proximity prompt (i.e. a Hint)
 	based upon its relation to a character in 3D space.
@@ -16,6 +17,7 @@ local CameraUtils = require("CameraUtils")
 local Draw = require("Draw")
 local Maid = require("Maid")
 local Math = require("Math")
+local Raycaster = require("Raycaster")
 local Region3Utils = require("Region3Utils")
 local Vector3Utils = require("Vector3Utils")
 
@@ -105,12 +107,12 @@ end
 	@return Vector3 -- Hit position
 ]=]
 function HintScoringUtils.raycastToAdornee(
-	raycaster,
+	raycaster: Raycaster.Raycaster,
 	humanoidCenter: Vector3,
 	adornee: Instance,
 	closestBoundingBoxPoint: Vector3,
 	extraDistance: number
-)
+): Vector3?
 	local offset = closestBoundingBoxPoint - humanoidCenter
 	if offset.Magnitude == 0 then
 		return nil
@@ -219,7 +221,7 @@ function HintScoringUtils.scoreAdornee(
 
 	local extraDistance = 10
 
-	local closestPoint =
+	local closestPoint: Vector3? =
 		HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, boundingBoxPoint, extraDistance)
 
 	-- Round objects be sad
@@ -235,6 +237,8 @@ function HintScoringUtils.scoreAdornee(
 			closestPoint = boundingBoxPoint
 		end
 	end
+
+	assert(closestPoint, "Closest point should be set")
 
 	-- if (boundingBoxPoint - humanoidCenter).magnitude <= (closestPoint - humanoidCenter).magnitude then
 	-- 	closestPoint = (closestPoint + boundingBoxPoint)/2 -- Weight this!

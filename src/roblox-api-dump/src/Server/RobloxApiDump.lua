@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Entry point for the Roblox API dump, this class contains api surfaces to
 	query the actual API.
@@ -100,12 +101,12 @@ function RobloxApiDump:_promiseClassDataAndAncestorList(className: string)
 	end
 
 	self._ancestorListPromise[className] = self:_promiseClassMap():Then(function(classMap)
-		local current = classMap[className]
+		local current: any = classMap[className]
 		if not current then
 			return Promise.rejected(string.format("Could not find data for %q", className))
 		end
 
-		local dataList = {}
+		local dataList: any = {}
 		while current do
 			table.insert(dataList, current)
 

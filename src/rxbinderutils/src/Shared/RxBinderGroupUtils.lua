@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Rx utility methods involving [BinderGroup] API surface
 	@class RxBinderGroupUtils
@@ -34,7 +35,6 @@ function RxBinderGroupUtils.observeBinders(binderGroup: BinderGroup.BinderGroup)
 
 		return maid
 	end)
-
 end
 
 --[=[
@@ -45,10 +45,9 @@ end
 function RxBinderGroupUtils.observeAllClassesBrio(binderGroup)
 	assert(type(binderGroup) == "table", "Bad binderGroup")
 
-	return RxBinderGroupUtils.observeBinders(binderGroup)
-		:Pipe({
-			Rx.flatMap(RxBinderUtils.observeAllBrio)
-		})
+	return RxBinderGroupUtils.observeBinders(binderGroup):Pipe({
+		Rx.flatMap(RxBinderUtils.observeAllBrio) :: any,
+	}) :: any
 end
 
 return RxBinderGroupUtils

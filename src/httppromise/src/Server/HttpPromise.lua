@@ -36,7 +36,7 @@ local HttpPromise = {}
 export type HTTPRequest = {
 	Url: string,
 	Method: "POST" | "GET" | "PUT" | "DELETE",
-	Headers: { [string]: string }?,
+	Headers: { [string]: string | Secret }?,
 	Body: string?,
 	Compress: Enum.HttpCompression?,
 }

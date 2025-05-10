@@ -1,5 +1,7 @@
 --!strict
 --[=[
+	Holds settings for the InfluxDB point API
+
 	@class InfluxDBPointSettings
 ]=]
 
@@ -8,7 +10,7 @@ InfluxDBPointSettings.ClassName = "InfluxDBPointSettings"
 InfluxDBPointSettings.__index = InfluxDBPointSettings
 
 export type InfluxDBTags = { [string]: string }
-export type ConvertTime = (number) -> number
+export type ConvertTime = ((DateTime | number | string)?) -> number
 
 export type InfluxDBPointSettings = typeof(setmetatable(
 	{} :: {
@@ -18,6 +20,11 @@ export type InfluxDBPointSettings = typeof(setmetatable(
 	{} :: typeof({ __index = InfluxDBPointSettings })
 ))
 
+--[=[
+	Creates a new InfluxDB point settings
+
+	@return InfluxDBPointSettings
+]=]
 function InfluxDBPointSettings.new(): InfluxDBPointSettings
 	local self: InfluxDBPointSettings = setmetatable({} :: any, InfluxDBPointSettings)
 
@@ -27,6 +34,11 @@ function InfluxDBPointSettings.new(): InfluxDBPointSettings
 	return self
 end
 
+--[=[
+	Sets the default tags for the InfluxDB point settings
+
+	@param tags InfluxDBTags
+]=]
 function InfluxDBPointSettings.SetDefaultTags(self: InfluxDBPointSettings, tags: InfluxDBTags): ()
 	assert(type(tags) == "table", "Bad tags")
 
@@ -38,19 +50,33 @@ function InfluxDBPointSettings.SetDefaultTags(self: InfluxDBPointSettings, tags:
 	self._defaultTags = tags
 end
 
+--[=[
+	Gets the default tags for the InfluxDB point settings
+
+	@return InfluxDBTags
+]=]
 function InfluxDBPointSettings.GetDefaultTags(self: InfluxDBPointSettings): InfluxDBTags
 	return self._defaultTags
 end
 
+--[=[
+	Sets the conversion time function for the InfluxDB point settings
+
+	@param convertTime (number) -> number
+]=]
 function InfluxDBPointSettings.SetConvertTime(self: InfluxDBPointSettings, convertTime: ConvertTime?)
 	assert(type(convertTime) == "function" or convertTime == nil, "Bad convertTime")
 
 	self._convertTime = convertTime
 end
 
+--[=[
+	Gets the conversion time function for the InfluxDB point settings
+
+	@return (number) -> number
+]=]
 function InfluxDBPointSettings.GetConvertTime(self: InfluxDBPointSettings): ConvertTime?
 	return self._convertTime
 end
-
 
 return InfluxDBPointSettings

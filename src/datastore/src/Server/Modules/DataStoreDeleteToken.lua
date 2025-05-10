@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Token to use for deleting.
 	@server

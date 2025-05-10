@@ -24,6 +24,12 @@ end
 
 export type EscapeTable = { [string]: string }
 
+--[=[
+	Creates a new escaper function for the given table.
+
+	@param subTable EscapeTable
+	@return (string) -> string
+]=]
 function InfluxDBEscapeUtils.createEscaper(subTable: EscapeTable): (string) -> string
 	assert(type(subTable) == "table", "Bad subTable")
 
@@ -44,6 +50,12 @@ function InfluxDBEscapeUtils.createEscaper(subTable: EscapeTable): (string) -> s
 	end
 end
 
+--[=[
+	Creates a new escaper function for the given table, with quotes.
+
+	@param subTable EscapeTable
+	@return (string) -> string
+]=]
 function InfluxDBEscapeUtils.createQuotedEscaper(subTable: EscapeTable): (string) -> string
 	assert(type(subTable) == "table", "Bad subTable")
 

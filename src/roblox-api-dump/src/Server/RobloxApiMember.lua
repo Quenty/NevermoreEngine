@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Represents a specific member of a class. This could be a property or event, or method, or callback.
 	@class RobloxApiMember

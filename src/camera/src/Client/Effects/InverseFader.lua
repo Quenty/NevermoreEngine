@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Be the inverse of a fading camera (makes scaling in cameras easy).
 	@class InverseFader

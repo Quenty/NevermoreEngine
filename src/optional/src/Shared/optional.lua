@@ -1,3 +1,4 @@
+--!strict
 --[=[
 Sets up `require.optional("Name")`.
 
