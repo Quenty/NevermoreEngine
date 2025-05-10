@@ -1,22 +1,26 @@
 --[=[
 	Plays particle effects for players
+
+	@deprecated 2.2.2
 	@class ParticlePlayer
 ]=]
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Debris = game:GetService("Debris")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ParticlePlayer = {}
 ParticlePlayer.__index = ParticlePlayer
 ParticlePlayer.ClassName = "ParticlePlayer"
 
-function ParticlePlayer.new()
-	local self = setmetatable({}, ParticlePlayer)
+export type ParticlePlayer = typeof(setmetatable({} :: {}, {} :: typeof({ __index = ParticlePlayer })))
+
+function ParticlePlayer.new(): ParticlePlayer
+	local self: ParticlePlayer = setmetatable({} :: any, ParticlePlayer)
 
 	return self
 end
 
-function ParticlePlayer:PlayLevelUpEffect(humanoid)
+function ParticlePlayer:PlayLevelUpEffect(humanoid: Humanoid)
 	if not humanoid then
 		warn("[ParticlePlayer] - No humanoid")
 		return false
@@ -26,13 +30,13 @@ function ParticlePlayer:PlayLevelUpEffect(humanoid)
 	local animation = Instance.new("Animation")
 	animation.AnimationId = "rbxassetid://1097650171"
 
-	local track = humanoid:LoadAnimation(animation)
+	local track = (humanoid :: any):LoadAnimation(animation)
 	track:Play()
 
 	return self:_playHumanoidEffect(humanoid, ReplicatedStorage.Particles.LevelUpEffect)
 end
 
-function ParticlePlayer:_playDescendantsOnce(parent)
+function ParticlePlayer:_playDescendantsOnce(parent: Instance)
 	local longestLife = 0
 
 	for _, item in parent:GetDescendants() do
@@ -45,7 +49,7 @@ function ParticlePlayer:_playDescendantsOnce(parent)
 	return longestLife
 end
 
-function ParticlePlayer:_playHumanoidEffect(humanoid, effectTemplate)
+function ParticlePlayer:_playHumanoidEffect(humanoid: Humanoid, effectTemplate: Instance)
 	local rootPart = humanoid.RootPart
 	if not rootPart then
 		warn("[ParticlePlayer] - No root part")

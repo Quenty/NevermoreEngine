@@ -30,7 +30,8 @@
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
-    "@quenty/steputils": "file:../steputils"
+    "@quenty/steputils": "file:../steputils",
+    "@quenty/table": "file:../table"
   },
   "publishConfig": {
     "access": "public"

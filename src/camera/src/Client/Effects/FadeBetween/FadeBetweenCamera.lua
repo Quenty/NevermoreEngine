@@ -5,11 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Spring = require("Spring")
-local SummedCamera = require("SummedCamera")
-local SpringUtils = require("SpringUtils")
 local CameraState = require("CameraState")
 local CubicSplineUtils = require("CubicSplineUtils")
+local Spring = require("Spring")
+local SpringUtils = require("SpringUtils")
+local SummedCamera = require("SummedCamera")
 
 local FadeBetweenCamera = {}
 FadeBetweenCamera.ClassName = "FadeBetweenCamera"
@@ -21,9 +21,9 @@ FadeBetweenCamera.ClassName = "FadeBetweenCamera"
 ]=]
 function FadeBetweenCamera.new(cameraA, cameraB)
 	local self = setmetatable({
-		_spring = Spring.new(0);
-		CameraA = cameraA or error("No cameraA");
-		CameraB = cameraB or error("No cameraB");
+		_spring = Spring.new(0),
+		CameraA = cameraA or error("No cameraA"),
+		CameraB = cameraB or error("No cameraB"),
 	}, FadeBetweenCamera)
 
 	self.Damper = 1

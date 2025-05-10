@@ -18,11 +18,11 @@ local Maid = require("Maid")
 local MaidTaskUtils = require("MaidTaskUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
+local Signal = require("Signal")
+local Subscription = require("Subscription")
 local Symbol = require("Symbol")
 local ThrottledFunction = require("ThrottledFunction")
-local _Subscription = require("Subscription")
 local cancellableDelay = require("cancellableDelay")
-local _Signal = require("Signal")
 
 export type Map<Key, Value> = { [Key]: Value }
 export type Set<T> = { [T]: true }
@@ -248,7 +248,7 @@ end
 	@param event Signal<T>
 	@return Observable<T>
 ]=]
-function Rx.fromSignal<T...>(event: _Signal.Signal<T...> | RBXScriptSignal): Observable.Observable<T...>
+function Rx.fromSignal<T...>(event: Signal.Signal<T...> | RBXScriptSignal<T...>): Observable.Observable<T...>
 	return Observable.new(function(sub)
 		-- This stream never completes or fails!
 		return (event :: any):Connect(function(...)
@@ -305,9 +305,9 @@ end
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
 function Rx.tap<T...>(
-	onFire: _Subscription.FireCallback<T...>?,
-	onError: _Subscription.FailCallback?,
-	onComplete: _Subscription.CompleteCallback?
+	onFire: Subscription.FireCallback<T...>?,
+	onError: Subscription.FailCallback?,
+	onComplete: Subscription.CompleteCallback?
 ): Observable.Transformer<T..., T...>
 	assert(type(onFire) == "function" or onFire == nil, "Bad onFire")
 	assert(type(onError) == "function" or onError == nil, "Bad onError")
@@ -370,7 +370,7 @@ end
 function Rx.share<T...>(): Observable.Transformer<T..., T...>
 	return function(source)
 		local shareMaid = Maid.new()
-		local subs: { _Subscription.Subscription<T...> } = {}
+		local subs: { Subscription.Subscription<T...> } = {}
 
 		local lastFail = UNSET_VALUE
 		local lastComplete = UNSET_VALUE
@@ -451,7 +451,7 @@ function Rx.shareReplay<T...>(bufferSize: number?, windowTimeSeconds: number?): 
 
 	return function(source)
 		local shareMaid = Maid.new()
-		local subs: { _Subscription.Subscription<T...> } = {}
+		local subs: { Subscription.Subscription<T...> } = {}
 
 		type Event = {
 			n: number,
@@ -948,10 +948,10 @@ function Rx.flatMap<T..., U...>(project: (T...) -> Observable.Observable<U...>):
 	return function(source: Observable.Observable<T...>)
 		assert(Observable.isObservable(source), "Bad observable")
 
-		return Observable.new(function(sub: _Subscription.Subscription<U...>)
+		return Observable.new(function(sub: Subscription.Subscription<U...>)
 			local isComplete: boolean = false
 			local pendingCount: number = 0
-			local subscriptions: Set<_Subscription.Subscription<U...>> = {}
+			local subscriptions: Set<Subscription.Subscription<U...>> = {}
 
 			local function checkComplete()
 				if isComplete and pendingCount == 0 then
@@ -969,7 +969,7 @@ function Rx.flatMap<T..., U...>(project: (T...) -> Observable.Observable<U...>):
 				end
 
 				local innerCompleteOrFail = false
-				local subscription: _Subscription.Subscription<U...>? = nil
+				local subscription: Subscription.Subscription<U...>? = nil
 
 				local function onNext(...: U...)
 					if innerCompleteOrFail or pendingCount == 0 then
@@ -1106,10 +1106,10 @@ function Rx.switchMap<T..., U...>(project: (T...) -> Observable.Observable<U...>
 	return function(source: Observable.Observable<T...>)
 		assert(Observable.isObservable(source), "Bad observable")
 
-		return Observable.new(function(sub: _Subscription.Subscription<U...>)
+		return Observable.new(function(sub: Subscription.Subscription<U...>)
 			local isComplete: boolean = false
 			local insideComplete: boolean = false
-			local insideSubscription: _Subscription.Subscription<T...>? = nil
+			local insideSubscription: Subscription.Subscription<T...>? = nil
 			local outerIndex: number? = 0
 
 			local function checkComplete()
@@ -1748,7 +1748,7 @@ function Rx.delay<T...>(seconds: number): Observable.Transformer<T..., T...>
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
-		return Observable.new(function(sub: _Subscription.Subscription<T...>)
+		return Observable.new(function(sub: Subscription.Subscription<T...>)
 			local maid = Maid.new()
 
 			maid:GiveTask(source:Subscribe(function(...)

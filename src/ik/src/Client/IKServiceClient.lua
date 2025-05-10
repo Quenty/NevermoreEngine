@@ -12,13 +12,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local Players = game:GetService("Players")
 
 local IKRigUtils = require("IKRigUtils")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local IKServiceClient = {}
 IKServiceClient.ServiceName = "IKServiceClient"
@@ -39,7 +39,7 @@ IKServiceClient.ServiceName = "IKServiceClient"
 
 	@param serviceBag ServiceBag
 ]=]
-function IKServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function IKServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

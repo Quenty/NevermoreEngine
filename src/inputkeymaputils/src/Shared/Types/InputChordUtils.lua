@@ -38,9 +38,9 @@ function InputChordUtils.createModifierInputChord(modifiers, keyCode)
 	assert(EnumUtils.isOfType(Enum.KeyCode, keyCode), "Bad keyCode")
 
 	return {
-		type = "ModifierInputChord";
-		modifiers = modifiers;
-		keyCode = keyCode;
+		type = "ModifierInputChord",
+		modifiers = modifiers,
+		keyCode = keyCode,
 	}
 end
 

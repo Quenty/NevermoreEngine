@@ -6,11 +6,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Queue = require("Queue")
-local Promise = require("Promise")
-local TupleLookup = require("TupleLookup")
 local LRUCache = require("LRUCache")
-local _Tuple = require("Tuple")
+local Promise = require("Promise")
+local Queue = require("Queue")
+local Tuple = require("Tuple")
+local TupleLookup = require("TupleLookup")
 
 local RateAggregator = setmetatable({}, BaseObject)
 RateAggregator.ClassName = "RateAggregator"
@@ -18,7 +18,7 @@ RateAggregator.__index = RateAggregator
 
 export type QueueEntry<TArgs..., T...> = {
 	promise: Promise.Promise<T...>,
-	tuple: _Tuple.Tuple<TArgs...>,
+	tuple: Tuple.Tuple<TArgs...>,
 }
 
 export type RateAggregator<TArgs..., T...> = typeof(setmetatable(
@@ -97,9 +97,9 @@ function RateAggregator._startQueue<TArgs..., T...>(self: RateAggregator<TArgs..
 
 	self._maid._processing = task.spawn(function()
 		local timeSinceLastQuery = os.clock() - self._lastQueryTime
-		if timeSinceLastQuery < 1/self._maxRequestsPerSecond then
+		if timeSinceLastQuery < 1 / self._maxRequestsPerSecond then
 			-- eww
-			task.wait(1/self._maxRequestsPerSecond)
+			task.wait(1 / self._maxRequestsPerSecond)
 		end
 
 		while not self._queue:IsEmpty() do
@@ -110,7 +110,7 @@ function RateAggregator._startQueue<TArgs..., T...>(self: RateAggregator<TArgs..
 				data.promise:Resolve(self._promiseQuery(data.tuple:Unpack()))
 			end)
 
-			local thisStepWaitTime = 1/self._maxRequestsPerSecond
+			local thisStepWaitTime = 1 / self._maxRequestsPerSecond
 			local requiredWaitTime = thisStepWaitTime - self._bankedWaitTime
 
 			if requiredWaitTime < self._minWaitTime then

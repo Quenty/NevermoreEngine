@@ -90,7 +90,7 @@ end
 	@return number
 	@return number
 ]=]
-function BinarySearchUtils.spanSearchAnything(n: number, indexFunc: (number) -> (number), t: number): (number?, number?)
+function BinarySearchUtils.spanSearchAnything(n: number, indexFunc: (number) -> number, t: number): (number?, number?)
 	local l = 1
 	local h = n
 
@@ -105,8 +105,8 @@ function BinarySearchUtils.spanSearchAnything(n: number, indexFunc: (number) -> 
 	end
 
 	while 1 < h - l do
-		local m = (l + h)/2
-		m = m - m%1
+		local m = (l + h) / 2
+		m = m - m % 1
 
 		if t < indexFunc(m) then
 			h = m

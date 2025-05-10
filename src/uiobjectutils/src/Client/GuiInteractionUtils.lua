@@ -5,11 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
+local Brio = require("Brio")
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local GuiInteractionUtils = {}
 
@@ -19,7 +19,7 @@ local GuiInteractionUtils = {}
 	@param gui GuiObject
 	@return Observable<boolean>
 ]=]
-function GuiInteractionUtils.observeInteractionEnabled(gui: GuiObject): _Observable.Observable<boolean>
+function GuiInteractionUtils.observeInteractionEnabled(gui: GuiObject): Observable.Observable<boolean>
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad gui")
 
 	return Rx.combineLatest({
@@ -42,7 +42,7 @@ end
 	@param gui GuiObject
 	@return Observable<Brio<true>>
 ]=]
-function GuiInteractionUtils.observeInteractionEnabledBrio(gui: GuiObject): _Observable.Observable<_Brio.Brio<true>>
+function GuiInteractionUtils.observeInteractionEnabledBrio(gui: GuiObject): Observable.Observable<Brio.Brio<true>>
 	assert(typeof(gui) == "Instance" and gui:IsA("GuiObject"), "Bad gui")
 
 	return GuiInteractionUtils.observeInteractionEnabled(gui):Pipe({

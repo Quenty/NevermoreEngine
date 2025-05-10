@@ -19,10 +19,9 @@ function RoduxActionFactory.new(actionName, typeTable)
 	assert(type(actionName) == "string", "Action name must be string, and is required")
 
 	self._actionName = actionName
-	self._validator = t.strictInterface(
-		Table.merge({
-			type = t.literal(self._actionName),
-		}, typeTable))
+	self._validator = t.strictInterface(Table.merge({
+		type = t.literal(self._actionName),
+	}, typeTable))
 
 	return self
 end
@@ -49,13 +48,13 @@ function RoduxActionFactory:Create(action)
 		assert(type(action) == "table", "Action must be a table")
 
 		actionWithType = Table.merge(action, {
-			type = self._actionName;
+			type = self._actionName,
 		})
 	else
 		assert(action == nil, "Action must be nil or table")
 
 		actionWithType = {
-			type = self._actionName;
+			type = self._actionName,
 		}
 	end
 

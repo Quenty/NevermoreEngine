@@ -53,8 +53,7 @@ Signal.ClassName = "Signal"
 	@return boolean
 ]=]
 function Signal.isSignal(value)
-	return type(value) == "table"
-		and getmetatable(value) == Signal
+	return type(value) == "table" and getmetatable(value) == Signal
 end
 
 --[=[

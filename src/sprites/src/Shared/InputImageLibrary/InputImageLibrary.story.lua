@@ -2,92 +2,93 @@
 	@class InputImageLibrary.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local InputImageLibrary = require("InputImageLibrary")
 local Maid = require("Maid")
-local UIPaddingUtils = require("UIPaddingUtils")
-local UICornerUtils = require("UICornerUtils")
 local String = require("String")
+local UICornerUtils = require("UICornerUtils")
+local UIPaddingUtils = require("UIPaddingUtils")
 
 local CONSOLE = {
-	Enum.KeyCode.ButtonA;
-	Enum.KeyCode.ButtonB;
-	Enum.KeyCode.ButtonX;
-	Enum.KeyCode.ButtonY;
-	Enum.KeyCode.ButtonL1;
-	Enum.KeyCode.ButtonL2;
-	Enum.KeyCode.ButtonR1;
-	Enum.KeyCode.ButtonR2;
-	Enum.KeyCode.Menu;
-	Enum.KeyCode.ButtonSelect;
-	Enum.KeyCode.DPadLeft;
-	Enum.KeyCode.DPadRight;
-	Enum.KeyCode.DPadUp;
-	Enum.KeyCode.DPadDown;
-	Enum.KeyCode.Thumbstick1;
-	Enum.KeyCode.Thumbstick2;
-	"DPad";
+	Enum.KeyCode.ButtonA,
+	Enum.KeyCode.ButtonB,
+	Enum.KeyCode.ButtonX,
+	Enum.KeyCode.ButtonY,
+	Enum.KeyCode.ButtonL1,
+	Enum.KeyCode.ButtonL2,
+	Enum.KeyCode.ButtonR1,
+	Enum.KeyCode.ButtonR2,
+	Enum.KeyCode.Menu,
+	Enum.KeyCode.ButtonSelect,
+	Enum.KeyCode.DPadLeft,
+	Enum.KeyCode.DPadRight,
+	Enum.KeyCode.DPadUp,
+	Enum.KeyCode.DPadDown,
+	Enum.KeyCode.Thumbstick1,
+	Enum.KeyCode.Thumbstick2,
+	"DPad",
 }
 
 local KEYBOARD = {
-	Enum.KeyCode.Left;
-	Enum.KeyCode.Right;
-	Enum.KeyCode.Up;
-	Enum.KeyCode.Down;
-	Enum.KeyCode.Space;
-	Enum.KeyCode.Backspace;
-	Enum.KeyCode.LeftControl;
-	Enum.KeyCode.Tab;
-	Enum.KeyCode.Return;
-	Enum.KeyCode.Delete;
-	Enum.KeyCode.Backspace;
+	Enum.KeyCode.Left,
+	Enum.KeyCode.Right,
+	Enum.KeyCode.Up,
+	Enum.KeyCode.Down,
+	Enum.KeyCode.Space,
+	Enum.KeyCode.Backspace,
+	Enum.KeyCode.LeftControl,
+	Enum.KeyCode.Tab,
+	Enum.KeyCode.Return,
+	Enum.KeyCode.Delete,
+	Enum.KeyCode.Backspace,
 
-	Enum.KeyCode.A;
-	Enum.KeyCode.B;
-	Enum.KeyCode.C;
-	Enum.KeyCode.D;
-	Enum.KeyCode.E;
-	Enum.KeyCode.F;
-	Enum.KeyCode.G;
-	Enum.KeyCode.H;
-	Enum.KeyCode.I;
-	Enum.KeyCode.J;
-	Enum.KeyCode.K;
-	Enum.KeyCode.L;
-	Enum.KeyCode.M;
-	Enum.KeyCode.N;
-	Enum.KeyCode.O;
-	Enum.KeyCode.P;
-	Enum.KeyCode.Q;
-	Enum.KeyCode.R;
-	Enum.KeyCode.S;
-	Enum.KeyCode.T;
-	Enum.KeyCode.U;
-	Enum.KeyCode.V;
-	Enum.KeyCode.W;
-	Enum.KeyCode.X;
-	Enum.KeyCode.Y;
-	Enum.KeyCode.Z;
+	Enum.KeyCode.A,
+	Enum.KeyCode.B,
+	Enum.KeyCode.C,
+	Enum.KeyCode.D,
+	Enum.KeyCode.E,
+	Enum.KeyCode.F,
+	Enum.KeyCode.G,
+	Enum.KeyCode.H,
+	Enum.KeyCode.I,
+	Enum.KeyCode.J,
+	Enum.KeyCode.K,
+	Enum.KeyCode.L,
+	Enum.KeyCode.M,
+	Enum.KeyCode.N,
+	Enum.KeyCode.O,
+	Enum.KeyCode.P,
+	Enum.KeyCode.Q,
+	Enum.KeyCode.R,
+	Enum.KeyCode.S,
+	Enum.KeyCode.T,
+	Enum.KeyCode.U,
+	Enum.KeyCode.V,
+	Enum.KeyCode.W,
+	Enum.KeyCode.X,
+	Enum.KeyCode.Y,
+	Enum.KeyCode.Z,
 
-	Enum.KeyCode.Zero;
-	Enum.KeyCode.One;
-	Enum.KeyCode.Two;
-	Enum.KeyCode.Three;
-	Enum.KeyCode.Four;
-	Enum.KeyCode.Five;
-	Enum.KeyCode.Six;
-	Enum.KeyCode.Seven;
-	Enum.KeyCode.Eight;
-	Enum.KeyCode.Nine;
+	Enum.KeyCode.Zero,
+	Enum.KeyCode.One,
+	Enum.KeyCode.Two,
+	Enum.KeyCode.Three,
+	Enum.KeyCode.Four,
+	Enum.KeyCode.Five,
+	Enum.KeyCode.Six,
+	Enum.KeyCode.Seven,
+	Enum.KeyCode.Eight,
+	Enum.KeyCode.Nine,
 }
 
 local MOUSE = {
-	Enum.UserInputType.MouseButton1;
-	Enum.UserInputType.MouseButton3;
-	Enum.UserInputType.MouseWheel;
-	Enum.UserInputType.MouseButton2;
-	Enum.UserInputType.MouseMovement;
+	Enum.UserInputType.MouseButton1,
+	Enum.UserInputType.MouseButton3,
+	Enum.UserInputType.MouseWheel,
+	Enum.UserInputType.MouseButton2,
+	Enum.UserInputType.MouseMovement,
 }
 
 local function createInputKey(keyCode, theme, platform, parent)
@@ -101,7 +102,7 @@ local function createInputKey(keyCode, theme, platform, parent)
 	padding.Parent = container
 
 	local phaseTextLabel = Instance.new("TextLabel")
-	phaseTextLabel.Text =String.removePrefix(type(keyCode) == "string" and keyCode or keyCode.Name, "Mouse")
+	phaseTextLabel.Text = String.removePrefix(type(keyCode) == "string" and keyCode or keyCode.Name, "Mouse")
 	phaseTextLabel.TextSize = 20
 	phaseTextLabel.TextTruncate = Enum.TextTruncate.AtEnd
 	phaseTextLabel.Font = Enum.Font.Highway
@@ -212,7 +213,6 @@ return function(target)
 
 	add(makeTitle("Keyboard Light", scrollingFrame))
 	add(makeSection(KEYBOARD, "Light", nil, scrollingFrame))
-
 
 	return function()
 		maid:DoCleaning()

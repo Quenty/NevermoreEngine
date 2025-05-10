@@ -6,9 +6,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TieSignalInterface = require("TieSignalInterface")
-local TiePropertyInterface = require("TiePropertyInterface")
 local TieMethodInterfaceUtils = require("TieMethodInterfaceUtils")
+local TiePropertyInterface = require("TiePropertyInterface")
+local TieSignalInterface = require("TieSignalInterface")
 
 local TieInterface = {}
 TieInterface.ClassName = "TieInterface"
@@ -117,7 +117,14 @@ function TieInterface:__index(index)
 				error(string.format("Unknown member definition %q", tostring(member.ClassName)))
 			end
 		else
-			error(string.format("[TieInterface] - %s is not allowed in realm '%s'. Specify realm to %s.", member:GetFriendlyName(), interfaceTieRealm, member:GetMemberTieRealm()))
+			error(
+				string.format(
+					"[TieInterface] - %s is not allowed in realm '%s'. Specify realm to %s.",
+					member:GetFriendlyName(),
+					interfaceTieRealm,
+					member:GetMemberTieRealm()
+				)
+			)
 		end
 	elseif TieInterface[index] then
 		return TieInterface[index]

@@ -7,9 +7,9 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
+local Observable = require("Observable")
 local RxInstanceUtils = require("RxInstanceUtils")
-local _Observable = require("Observable")
+local ValueObject = require("ValueObject")
 
 local AdorneePartBoundingBox = setmetatable({}, BaseObject)
 AdorneePartBoundingBox.ClassName = "AdorneePartBoundingBox"
@@ -56,11 +56,11 @@ function AdorneePartBoundingBox:_setupUnanchoredLoop(maid)
 	end))
 end
 
-function AdorneePartBoundingBox:ObserveCFrame(): _Observable.Observable<CFrame>
+function AdorneePartBoundingBox:ObserveCFrame(): Observable.Observable<CFrame>
 	return self._bbCFrame:Observe()
 end
 
-function AdorneePartBoundingBox:ObserveSize(): _Observable.Observable<Vector3>
+function AdorneePartBoundingBox:ObserveSize(): Observable.Observable<Vector3>
 	return self._bbSize:Observe()
 end
 

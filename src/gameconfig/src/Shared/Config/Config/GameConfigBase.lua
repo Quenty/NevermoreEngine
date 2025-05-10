@@ -6,18 +6,18 @@ local require = require(script.Parent.loader).load(script)
 
 local AttributeValue = require("AttributeValue")
 local BaseObject = require("BaseObject")
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local Brio = require("Brio")
+local GameConfigAssetBase = require("GameConfigAssetBase")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigConstants = require("GameConfigConstants")
 local GameConfigUtils = require("GameConfigUtils")
+local Observable = require("Observable")
 local ObservableMapSet = require("ObservableMapSet")
 local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local _GameConfigAssetBase = require("GameConfigAssetBase")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
 
 local GameConfigBase = setmetatable({}, BaseObject)
 GameConfigBase.ClassName = "GameConfigBase"
@@ -25,7 +25,7 @@ GameConfigBase.__index = GameConfigBase
 
 type GameConfigAssetType = GameConfigAssetTypes.GameConfigAssetType
 type ObservableMapSet<K, V> = ObservableMapSet.ObservableMapSet<K, V>
-type GameConfigAssetBase = _GameConfigAssetBase.GameConfigAssetBase
+type GameConfigAssetBase = GameConfigAssetBase.GameConfigAssetBase
 
 export type GameConfigBase = typeof(setmetatable(
 	{} :: {
@@ -146,7 +146,7 @@ function GameConfigBase.ObserveAssetByTypeAndKeyBrio(
 	self: GameConfigBase,
 	assetType: GameConfigAssetType,
 	assetKey: string
-): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 
@@ -163,7 +163,7 @@ function GameConfigBase.ObserveAssetByTypeAndIdBrio(
 	self: GameConfigBase,
 	assetType: GameConfigAssetType,
 	assetId: number
-): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
@@ -178,7 +178,7 @@ end
 function GameConfigBase.ObserveAssetByIdBrio(
 	self: GameConfigBase,
 	assetId: number
-): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(type(assetId) == "number", "Bad assetId")
 
 	return self._assetIdToAssetConfig:ObserveItemsForKeyBrio(assetId)
@@ -192,7 +192,7 @@ end
 function GameConfigBase.ObserveAssetByKeyBrio(
 	self: GameConfigBase,
 	assetKey: string
-): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(type(assetKey) == "string", "Bad assetKey")
 
 	return self._assetKeyToAssetConfig:ObserveItemsForKeyBrio(assetKey)
@@ -206,7 +206,7 @@ end
 function GameConfigBase.ObserveAssetByTypeBrio(
 	self: GameConfigBase,
 	assetType: GameConfigAssetType
-): _Observable.Observable<_Brio.Brio<GameConfigAssetBase>>
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	return self._assetTypeToAssetConfig:ObserveItemsForKeyBrio(assetType)
@@ -257,7 +257,7 @@ end
 	Returns the game id for this profile.
 	@return Observable<number>
 ]=]
-function GameConfigBase.ObserveGameId(self: GameConfigBase): _Observable.Observable<number>
+function GameConfigBase.ObserveGameId(self: GameConfigBase): Observable.Observable<number>
 	return self._gameId:Observe()
 end
 
@@ -281,7 +281,7 @@ end
 	Observes this configs name
 	@return Observable<string>
 ]=]
-function GameConfigBase.ObserveConfigName(self: GameConfigBase): _Observable.Observable<string>
+function GameConfigBase.ObserveConfigName(self: GameConfigBase): Observable.Observable<string>
 	return RxInstanceUtils.observeProperty(self._obj, "Name")
 end
 

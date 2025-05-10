@@ -81,7 +81,7 @@ function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate: number)
 	assert(type(replicateRate) == "number", "Bad replicateRate")
 
 	local data = {
-		replicateRate = replicateRate;
+		replicateRate = replicateRate,
 	}
 
 	table.insert(self._replicationRates, data)
@@ -118,7 +118,7 @@ end
 ]=]
 function IKRigAimerLocalPlayer:GetAimPosition()
 	if self._aimData and (os.clock() - self._aimData.timeStamp) < MAX_AGE_FOR_AIM_DATA then
-			-- If we have aim data within the last 0.2 seconds start pointing at that
+		-- If we have aim data within the last 0.2 seconds start pointing at that
 		return self._aimData.position -- May be nil
 	end
 

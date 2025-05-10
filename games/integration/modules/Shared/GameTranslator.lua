@@ -8,5 +8,5 @@ return require("JSONTranslator").new("GameTranslator", "en", {
 	actions = {
 		ragdoll = "Ragdoll",
 		unragdoll = "Unragdoll",
-	}
+	},
 })

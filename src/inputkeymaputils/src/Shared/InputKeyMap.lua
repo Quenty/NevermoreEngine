@@ -11,10 +11,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
 local InputModeType = require("InputModeType")
 local InputTypeUtils = require("InputTypeUtils")
-local _Observable = require("Observable")
+local Observable = require("Observable")
+local ValueObject = require("ValueObject")
 
 local InputKeyMap = setmetatable({}, BaseObject)
 InputKeyMap.ClassName = "InputKeyMap"
@@ -113,7 +113,7 @@ end
 
 	@return Observable<{ InputType }>
 ]=]
-function InputKeyMap.ObserveInputTypesList(self: InputKeyMap): _Observable.Observable<{ InputType }>
+function InputKeyMap.ObserveInputTypesList(self: InputKeyMap): Observable.Observable<{ InputType }>
 	return self._inputTypeList:Observe()
 end
 

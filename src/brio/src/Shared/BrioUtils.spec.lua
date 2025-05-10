@@ -2,7 +2,8 @@
 	Unit tests for BrioUtils.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Brio = require("Brio")
 local BrioUtils = require("BrioUtils")
@@ -37,7 +38,7 @@ end)
 
 describe("BrioUtils.flatten with out a brio in it", function()
 	local brio = BrioUtils.flatten({
-		value = 5;
+		value = 5,
 	})
 
 	describe("should return a brio that", function()
@@ -62,7 +63,7 @@ end)
 
 describe("BrioUtils.flatten a dead brio in it", function()
 	local brio = BrioUtils.flatten({
-		value = Brio.DEAD;
+		value = Brio.DEAD,
 	})
 
 	describe("should return a brio that", function()

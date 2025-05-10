@@ -227,7 +227,11 @@ local function addGroupDelimiters(numberStr, delimiter: string): string
 	return formatted
 end
 
-local function findDenominationEntry(localeInfo, number: number, roundingBehaviourType)
+local function findDenominationEntry(
+	localeInfo,
+	number: number,
+	roundingBehaviourType: RoundingBehaviourTypes.RoundingBehaviourType
+)
 	local denominationEntry = localeInfo[1] -- Default to base denominations
 	local absOfNumber = math.abs(number)
 	for i = #localeInfo, 2, -1 do
@@ -283,7 +287,12 @@ end
 	@param numSignificantDigits number?
 	@return string
 ]=]
-function NumberLocalizationUtils.abbreviate(number: number, locale: string, roundingBehaviourType: RoundingBehaviourTypes.RoundingBehaviourType?, numSignificantDigits: number?): string
+function NumberLocalizationUtils.abbreviate(
+	number: number,
+	locale: string,
+	roundingBehaviourType: RoundingBehaviourTypes.RoundingBehaviourType?,
+	numSignificantDigits: number?
+): string
 	assert(type(number) == "number", "Bad number")
 	local roundingBehavior = roundingBehaviourType or RoundingBehaviourTypes.ROUND_TO_CLOSEST
 	local significantDigits = numSignificantDigits or 3

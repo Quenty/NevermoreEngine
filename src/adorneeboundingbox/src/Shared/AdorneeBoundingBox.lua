@@ -9,12 +9,12 @@ local AdorneeModelBoundingBox = require("AdorneeModelBoundingBox")
 local AdorneePartBoundingBox = require("AdorneePartBoundingBox")
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxPartBoundingBoxUtils = require("RxPartBoundingBoxUtils")
 local ValueObject = require("ValueObject")
-local _Observable = require("Observable")
 
 local AdorneeBoundingBox = setmetatable({}, BaseObject)
 AdorneeBoundingBox.ClassName = "AdorneeBoundingBox"
@@ -73,7 +73,7 @@ export type BoundingBoxData = {
 	Observes the bounding box of the adornee
 	@return Observable<BoundingBoxData>
 ]=]
-function AdorneeBoundingBox.ObserveBoundingBox(self: AdorneeBoundingBox): _Observable.Observable<BoundingBoxData>
+function AdorneeBoundingBox.ObserveBoundingBox(self: AdorneeBoundingBox): Observable.Observable<BoundingBoxData>
 	return Rx.combineLatest({
 		CFrame = self:ObserveCFrame(),
 		Size = self:ObserveSize(),
@@ -106,7 +106,7 @@ end
 	Observes the cframe of the adornee
 	@return Observable<Vector3>
 ]=]
-function AdorneeBoundingBox.ObserveCFrame(self: AdorneeBoundingBox): _Observable.Observable<CFrame?>
+function AdorneeBoundingBox.ObserveCFrame(self: AdorneeBoundingBox): Observable.Observable<CFrame?>
 	return self._bbCFrame:Observe()
 end
 
@@ -122,7 +122,7 @@ end
 	Observes the size of the adornee
 	@return Observable<Vector3>
 ]=]
-function AdorneeBoundingBox.ObserveSize(self: AdorneeBoundingBox): _Observable.Observable<Vector3?>
+function AdorneeBoundingBox.ObserveSize(self: AdorneeBoundingBox): Observable.Observable<Vector3?>
 	return self._bbSize:Observe()
 end
 
@@ -198,13 +198,14 @@ function AdorneeBoundingBox._setupHumanoid(self: AdorneeBoundingBox, humanoid: H
 	local topMaid = Maid.new()
 
 	topMaid:GiveTask(RxInstanceUtils.observePropertyBrio(humanoid, "Parent", function(parent: Instance)
-		return parent:IsA("Model")
+		return parent and parent:IsA("Model")
 	end):Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end
 
 		local maid, model = brio:ToMaidAndValue()
+		assert(typeof(model) == "Instance" and model:IsA("Model"), "Bad model")
 
 		maid:GiveTask(self:_setupModel(model))
 	end))
@@ -236,8 +237,8 @@ function AdorneeBoundingBox._setupAttachment(self: AdorneeBoundingBox, attachmen
 				else
 					return Rx.of(nil)
 				end
-			end),
-			RxBrioUtils.flattenToValueAndNil,
+			end) :: any,
+			RxBrioUtils.flattenToValueAndNil :: any,
 		})
 		:Subscribe(function(cframe)
 			self._bbCFrame.Value = cframe

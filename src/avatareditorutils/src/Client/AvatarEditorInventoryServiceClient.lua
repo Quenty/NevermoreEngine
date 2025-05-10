@@ -11,15 +11,15 @@ local AvatarEditorUtils = require("AvatarEditorUtils")
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
 local MemorizeUtils = require("MemorizeUtils")
-local Promise = require("Promise")
-local ValueObject = require("ValueObject")
 local PagesProxy = require("PagesProxy")
-local _ServiceBag = require("ServiceBag")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
+local ValueObject = require("ValueObject")
 
 local AvatarEditorInventoryServiceClient = {}
 AvatarEditorInventoryServiceClient.ServiceName = "AvatarEditorInventoryServiceClient"
 
-function AvatarEditorInventoryServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function AvatarEditorInventoryServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -34,15 +34,14 @@ function AvatarEditorInventoryServiceClient:Init(serviceBag: _ServiceBag.Service
 	end))
 
 	self._promiseInventoryPages = MemorizeUtils.memoize(function(avatarAssetTypes)
-		return AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes)
-			:Then(function(catalogPages)
-				-- Allow for replay
-				return PagesProxy.new(catalogPages)
-			end)
+		return AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes):Then(function(catalogPages)
+			-- Allow for replay
+			return PagesProxy.new(catalogPages)
+		end)
 	end)
 end
 
-function AvatarEditorInventoryServiceClient:PromiseInventoryPages(avatarAssetTypes)
+function AvatarEditorInventoryServiceClient:PromiseInventoryPages(avatarAssetTypes: Enum.AvatarAssetType)
 	return self:PromiseEnsureAccess()
 		:Then(function()
 			return self._promiseInventoryPages(avatarAssetTypes)
@@ -52,7 +51,7 @@ function AvatarEditorInventoryServiceClient:PromiseInventoryPages(avatarAssetTyp
 		end)
 end
 
-function AvatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(avatarAssetType)
+function AvatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(avatarAssetType: Enum.AvatarAssetType)
 	assert(EnumUtils.isOfType(Enum.AvatarAssetType, avatarAssetType), "Bad avatarAssetType")
 
 	if self._assetTypeToInventoryPromises[avatarAssetType] then
@@ -62,7 +61,7 @@ function AvatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(a
 	local inventory = self._maid:Add(AvatarEditorInventory.new())
 
 	self._assetTypeToInventoryPromises[avatarAssetType] = AvatarEditorUtils.promiseInventoryPages({
-		avatarAssetType
+		avatarAssetType,
 	})
 		:Then(function(inventoryPages)
 			return inventory:PromiseProcessPages(inventoryPages)
@@ -74,7 +73,7 @@ function AvatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(a
 	return self._assetTypeToInventoryPromises[avatarAssetType]
 end
 
-function AvatarEditorInventoryServiceClient:IsInventoryAccessAllowed()
+function AvatarEditorInventoryServiceClient:IsInventoryAccessAllowed(): boolean
 	return self._isAccessAllowed.Value
 end
 
@@ -82,7 +81,7 @@ function AvatarEditorInventoryServiceClient:ObserveIsInventoryAccessAllowed()
 	return self._isAccessAllowed:Observe()
 end
 
-function AvatarEditorInventoryServiceClient:PromiseEnsureAccess()
+function AvatarEditorInventoryServiceClient:PromiseEnsureAccess(): Promise.Promise<()>
 	if self._isAccessAllowed.Value then
 		return Promise.resolved()
 	end

@@ -7,10 +7,10 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local CooldownShared = require("CooldownShared")
-local ValueObject = require("ValueObject")
-local RxBinderUtils = require("RxBinderUtils")
 local CooldownTrackerModel = require("CooldownTrackerModel")
 local Maid = require("Maid")
+local RxBinderUtils = require("RxBinderUtils")
+local ValueObject = require("ValueObject")
 
 local CooldownTracker = setmetatable({}, BaseObject)
 CooldownTracker.ClassName = "CooldownTracker"
@@ -32,8 +32,8 @@ function CooldownTracker.new(serviceBag, parent)
 	end))
 
 	-- Handle not running
-	self._maid:GiveTask(RxBinderUtils.observeBoundChildClassBrio(self._cooldownBinder, self._obj)
-		:Subscribe(function(brio)
+	self._maid:GiveTask(
+		RxBinderUtils.observeBoundChildClassBrio(self._cooldownBinder, self._obj):Subscribe(function(brio)
 			if brio:IsDead() then
 				return
 			end
@@ -56,7 +56,8 @@ function CooldownTracker.new(serviceBag, parent)
 					self.CurrentCooldown.Value = nil
 				end
 			end)
-		end))
+		end)
+	)
 
 	return self
 end

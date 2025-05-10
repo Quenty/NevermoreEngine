@@ -5,14 +5,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local IKGripBase = require("IKGripBase")
 local Binder = require("Binder")
+local IKGripBase = require("IKGripBase")
+local ServiceBag = require("ServiceBag")
 
 local IKLeftGrip = setmetatable({}, IKGripBase)
 IKLeftGrip.ClassName = "IKLeftGrip"
 IKLeftGrip.__index = IKLeftGrip
 
-function IKLeftGrip.new(objectValue, serviceBag)
+function IKLeftGrip.new(objectValue, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(IKGripBase.new(objectValue, serviceBag), IKLeftGrip)
 
 	self:PromiseIKRig()

@@ -52,7 +52,10 @@ function ReplicationTypeUtils.inferReplicationType(): ReplicationType.Replicatio
 	end
 end
 
-function ReplicationTypeUtils.isAllowed(replicationType: ReplicationType.ReplicationType, requestedReplicationType: ReplicationType.ReplicationType): boolean
+function ReplicationTypeUtils.isAllowed(
+	replicationType: ReplicationType.ReplicationType,
+	requestedReplicationType: ReplicationType.ReplicationType
+): boolean
 	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
 	assert(ReplicationTypeUtils.isReplicationType(requestedReplicationType), "Bad requestedReplicationType")
 

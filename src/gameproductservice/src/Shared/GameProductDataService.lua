@@ -5,25 +5,25 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local Brio = require("Brio")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local TieRealmService = require("TieRealmService")
-local _ServiceBag = require("ServiceBag")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
 
 local GameProductDataService = {}
 GameProductDataService.ServiceName = "GameProductDataService"
 
 export type GameProductDataService = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_tieRealmService: TieRealmService.TieRealmService,
 		_maid: Maid.Maid,
 
@@ -37,7 +37,7 @@ export type GameProductDataService = typeof(setmetatable(
 	{} :: typeof({ __index = GameProductDataService })
 ))
 
-function GameProductDataService.Init(self: GameProductDataService, serviceBag: _ServiceBag.ServiceBag)
+function GameProductDataService.Init(self: GameProductDataService, serviceBag: ServiceBag.ServiceBag)
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -227,7 +227,7 @@ function GameProductDataService.ObservePlayerOwnership(
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
-): _Observable.Observable<boolean>
+): Observable.Observable<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -259,13 +259,13 @@ function GameProductDataService.ObservePlayerAssetPurchased(
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
-): _Observable.Observable<()>
+): Observable.Observable<()>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self:_observePlayerProductManagerBrio(player):Pipe({
-		RxBrioUtils.flattenToValueAndNil,
+		RxBrioUtils.flattenToValueAndNil :: any,
 		RxBrioUtils.switchMapBrio(function(playerProductManager): any
 			if playerProductManager then
 				local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
@@ -273,7 +273,7 @@ function GameProductDataService.ObservePlayerAssetPurchased(
 			else
 				return Rx.EMPTY
 			end
-		end),
+		end) :: any,
 		Rx.map(function()
 			return true
 		end) :: any,
@@ -367,7 +367,7 @@ end
 function GameProductDataService._observePlayerProductManagerBrio(
 	self: GameProductDataService,
 	player: Player
-): _Observable.Observable<_Brio.Brio<any>>
+): Observable.Observable<Brio.Brio<any>>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerProductManagerInterface:ObserveBrio(player, self._tieRealmService:GetTieRealm())

@@ -6,10 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
-local PromiseUtils = require("PromiseUtils")
-local PromiseMaidUtils = require("PromiseMaidUtils")
 local Maid = require("Maid")
+local Promise = require("Promise")
+local PromiseMaidUtils = require("PromiseMaidUtils")
+local PromiseUtils = require("PromiseUtils")
 
 local SoundPromiseUtils = {}
 

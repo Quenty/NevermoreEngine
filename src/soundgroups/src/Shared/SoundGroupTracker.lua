@@ -6,13 +6,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local RxInstanceUtils = require("RxInstanceUtils")
-local ObservableMapList = require("ObservableMapList")
 local Maid = require("Maid")
-local ObservableMap = require("ObservableMap")
-local SoundGroupPathUtils = require("SoundGroupPathUtils")
-local Rx = require("Rx")
 local Observable = require("Observable")
+local ObservableMap = require("ObservableMap")
+local ObservableMapList = require("ObservableMapList")
+local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
+local SoundGroupPathUtils = require("SoundGroupPathUtils")
 
 local SoundGroupTracker = setmetatable({}, BaseObject)
 SoundGroupTracker.ClassName = "SoundGroupTracker"

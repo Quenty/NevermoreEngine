@@ -181,7 +181,7 @@ function ExperienceUtils.percentLevelComplete(config: ExperienceConfig, totalExp
 		return 0
 	end
 
-	return earned/required
+	return earned / required
 end
 
 return ExperienceUtils

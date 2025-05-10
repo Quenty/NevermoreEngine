@@ -5,8 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local RxSignal = require("RxSignal")
 local Rx = require("Rx")
+local RxSignal = require("RxSignal")
 
 local RagdollableBase = setmetatable({}, BaseObject)
 RagdollableBase.ClassName = "RagdollableBase"

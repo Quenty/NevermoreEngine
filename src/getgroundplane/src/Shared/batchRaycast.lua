@@ -6,11 +6,12 @@
 ]=]
 
 local function batchRaycast(
-	originList: {Vector3}, directionList: { Vector3 },
+	originList: { Vector3 },
+	directionList: { Vector3 },
 	ignoreListWorkingEnvironment: { Instance },
-	ignoreFunc: (Instance) -> boolean, keepIgnoreListChanges: boolean
+	ignoreFunc: (Instance) -> boolean,
+	keepIgnoreListChanges: boolean
 ): { RaycastResult }
-
 	local resultList = {}
 	local initialIgnoreListLength = #ignoreListWorkingEnvironment
 
@@ -29,7 +30,7 @@ local function batchRaycast(
 				table.insert(ignoreListWorkingEnvironment, result.Instance)
 				params.FilterDescendantsInstances = ignoreListWorkingEnvironment
 
-				if not target then--initialize these
+				if not target then --initialize these
 					target = origin + direction
 					offset = 1e-3 / direction.Magnitude * direction
 				end
@@ -37,7 +38,7 @@ local function batchRaycast(
 				origin = result.Position - offset
 				direction = target - origin
 			else
-				resultList[i] = result--may be nil
+				resultList[i] = result --may be nil
 				break
 			end
 		end

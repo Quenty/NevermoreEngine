@@ -44,5 +44,4 @@ function TieMethodImplementation:SetImplementation(implementation)
 	end
 end
 
-
 return TieMethodImplementation

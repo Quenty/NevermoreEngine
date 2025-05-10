@@ -9,8 +9,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local getMechanismParts = require("getMechanismParts")
 local Maid = require("Maid")
+local getMechanismParts = require("getMechanismParts")
 
 local NoCollisionConstraintUtils = {}
 

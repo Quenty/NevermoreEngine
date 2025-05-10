@@ -11,12 +11,13 @@ local Color3Utils = require("Color3Utils")
 local HasChatTagsBase = require("HasChatTagsBase")
 local LocalizedTextUtils = require("LocalizedTextUtils")
 local RichTextUtils = require("RichTextUtils")
+local ServiceBag = require("ServiceBag")
 
 local HasChatTagsClient = setmetatable({}, HasChatTagsBase)
 HasChatTagsClient.ClassName = "HasChatTagsClient"
 HasChatTagsClient.__index = HasChatTagsClient
 
-function HasChatTagsClient.new(player: Player, serviceBag)
+function HasChatTagsClient.new(player: Player, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(HasChatTagsBase.new(player), HasChatTagsClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -60,6 +61,5 @@ function HasChatTagsClient:GetAsRichText(): string?
 
 	return output
 end
-
 
 return Binder.new("HasChatTags", HasChatTagsClient)

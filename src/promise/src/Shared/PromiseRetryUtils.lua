@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Math = require("Math")
+local Promise = require("Promise")
 
 local PromiseRetryUtils = {}
 
@@ -37,7 +37,7 @@ function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, op
 		local waitTime = options.initialWaitTime
 		local lastResults
 
-		for attemptNumber=1, options.maxAttempts do
+		for attemptNumber = 1, options.maxAttempts do
 			lastResults = table.pack(callback():Yield())
 
 			if lastResults[1] then
@@ -47,10 +47,17 @@ function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, op
 			end
 
 			if options.printWarning then
-				warn(string.format("[PromiseRetryUtils] - Retrying %d/%d due to failure %q", attemptNumber, options.maxAttempts, tostring(lastResults[2])))
+				warn(
+					string.format(
+						"[PromiseRetryUtils] - Retrying %d/%d due to failure %q",
+						attemptNumber,
+						options.maxAttempts,
+						tostring(lastResults[2])
+					)
+				)
 			end
 
-			task.wait(Math.jitter(waitTime * 2^attemptNumber))
+			task.wait(Math.jitter(waitTime * 2 ^ attemptNumber))
 		end
 
 		isLoopResolved = true
@@ -71,6 +78,5 @@ function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, op
 
 	return promise
 end
-
 
 return PromiseRetryUtils

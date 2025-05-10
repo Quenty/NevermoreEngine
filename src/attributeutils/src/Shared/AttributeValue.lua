@@ -19,10 +19,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
+local Observable = require("Observable")
+local Rx = require("Rx")
 local RxAttributeUtils = require("RxAttributeUtils")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
-local _Rx = require("Rx")
 
 local AttributeValue = {}
 AttributeValue.ClassName = "AttributeValue"
@@ -76,8 +76,8 @@ end
 ]=]
 function AttributeValue.ObserveBrio<T>(
 	self: AttributeValue<T>,
-	condition: _Rx.Predicate<T>?
-): _Observable.Observable<_Brio.Brio<any>>
+	condition: Rx.Predicate<T>?
+): Observable.Observable<Brio.Brio<any>>
 	return RxAttributeUtils.observeAttributeBrio(self._object, self._attributeName, condition)
 end
 
@@ -85,7 +85,7 @@ end
 	Observes an attribute on an instance.
 	@return Observable<any>
 ]=]
-function AttributeValue.Observe<T>(self: AttributeValue<T>): _Observable.Observable<T>
+function AttributeValue.Observe<T>(self: AttributeValue<T>): Observable.Observable<T>
 	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self :: any, "_defaultValue"))
 end
 

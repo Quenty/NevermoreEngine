@@ -17,25 +17,25 @@ local cos, sin = math.cos, math.sin
 local acos = math.acos
 
 local function TYPE(x)
-	local xMet=getmetatable(x)
-	if type(xMet)=="table" and xMet.__type~=nil then
+	local xMet = getmetatable(x)
+	if type(xMet) == "table" and xMet.__type ~= nil then
 		return xMet.__type
 	else
 		return type(x)
 	end
 end
 
-local Q={}
-local metatable={__type="quaternion"}
-local alt={"w","x","y","z"}
-function metatable.__index(q,i)
+local Q = {}
+local metatable = { __type = "quaternion" }
+local alt = { "w", "x", "y", "z" }
+function metatable.__index(q, i)
 	return q[alt[i]]
 end
 
-local function new(w,x,y,z)
-	return setmetatable({w=w or 1,x=x or 0,y=y or 0,z=z or 0},metatable)
+local function new(w, x, y, z)
+	return setmetatable({ w = w or 1, x = x or 0, y = y or 0, z = z or 0 }, metatable)
 end
-Q.new=new
+Q.new = new
 
 local function fromCFrame(cframe)
 	return new(Quaternion.QuaternionFromCFrame(cframe))
@@ -52,30 +52,30 @@ end
 Q.toCFrame = toCFrame
 
 local function inv(q)
-	local w,x,y,z=q.w,q.x,q.y,q.z
-	local m=w*w+x*x+y*y+z*z
-	if m>0 then
-		return new(w/m,-x/m,-y/m,-z/m)
+	local w, x, y, z = q.w, q.x, q.y, q.z
+	local m = w * w + x * x + y * y + z * z
+	if m > 0 then
+		return new(w / m, -x / m, -y / m, -z / m)
 	else
 		return new(0)
 	end
 end
-Q.inv=inv
+Q.inv = inv
 
 --Unary minus; -q
 local function unm(q)
-	return new(-q.w,-q.x,-q.y,-q.z)
+	return new(-q.w, -q.x, -q.y, -q.z)
 end
-metatable.__unm=unm
-Q.unm=unm
-local function add(q0,q1)
-	local t0,t1=TYPE(q0),TYPE(q1)
-	if t0=="quaternion" and t1=="quaternion" then
-		return new(q0.w+q1.w,q0.x+q1.x,q0.y+q1.y,q0.z+q1.z)
-	elseif t0=="quaternion" and t1=="number" then
-		return new(q0.w+q1,q0.x,q0.y,q0.z)
-	elseif t0=="number" and t1=="quaternion" then
-		return new(q0+q1.w,q1.x,q1.y,q1.z)
+metatable.__unm = unm
+Q.unm = unm
+local function add(q0, q1)
+	local t0, t1 = TYPE(q0), TYPE(q1)
+	if t0 == "quaternion" and t1 == "quaternion" then
+		return new(q0.w + q1.w, q0.x + q1.x, q0.y + q1.y, q0.z + q1.z)
+	elseif t0 == "quaternion" and t1 == "number" then
+		return new(q0.w + q1, q0.x, q0.y, q0.z)
+	elseif t0 == "number" and t1 == "quaternion" then
+		return new(q0 + q1.w, q1.x, q1.y, q1.z)
 	else
 		return nil
 	end
@@ -150,9 +150,9 @@ local function div(q0, q1)
 end
 metatable.__div = div
 Q.div = div
-local function pow(q0,q1)
+local function pow(q0, q1)
 	local t0, t1 = TYPE(q0), TYPE(q1)
-	if t0=="quaternion" and t1=="quaternion" then
+	if t0 == "quaternion" and t1 == "quaternion" then
 		local w0, x0, y0, z0 = q0.w, q0.x, q0.y, q0.z
 		local vv = x0 * x0 + y0 * y0 + z0 * z0
 		local mm = w0 * w0 + vv
@@ -181,7 +181,7 @@ local function pow(q0,q1)
 		else
 			return new(m)
 		end
-	elseif t0=="quaternion" and t1=="number" then
+	elseif t0 == "quaternion" and t1 == "number" then
 		local w, x, y, z = q0.w, q0.x, q0.y, q0.z
 		local vv = x * x + y * y + z * z
 		if vv > 0 then
@@ -199,7 +199,7 @@ local function pow(q0,q1)
 				return new(w ^ q1)
 			end
 		end
-	elseif t0=="number" and t1=="quaternion" then
+	elseif t0 == "number" and t1 == "quaternion" then
 		local w, x, y, z = q1.w, q1.x, q1.y, q1.z
 		if q0 > 0 then
 			local m = q0 ^ w
@@ -237,78 +237,78 @@ local function pow(q0,q1)
 		return nil
 	end
 end
-metatable.__pow=pow
-Q.pow=pow
+metatable.__pow = pow
+Q.pow = pow
 local function length(q)
-	local w,x,y,z=q.w,q.x,q.y,q.z
-	return (w*w+x*x+y*y+z*z)^0.5
+	local w, x, y, z = q.w, q.x, q.y, q.z
+	return (w * w + x * x + y * y + z * z) ^ 0.5
 end
-metatable.__len=length
-Q.length=length
-Q.magnitude=length
-local function Qtostring(q,precision)
-	precision=precision or 3
-	return string.sub(string.rep(string.format(", %."..precision.."f", q.w,q.x,q.y,q.z), 4), 3)
+metatable.__len = length
+Q.length = length
+Q.magnitude = length
+local function Qtostring(q, precision)
+	precision = precision or 3
+	return string.sub(string.rep(string.format(", %." .. precision .. "f", q.w, q.x, q.y, q.z), 4), 3)
 end
-metatable.__tostring=Qtostring
-Q.tostring=Qtostring
+metatable.__tostring = Qtostring
+Q.tostring = Qtostring
 
 local function Qlog(q)
-	local w,x,y,z=q.w,q.x,q.y,q.z
-	local vv=x*x+y*y+z*z
-	local mm=w*w+vv
-	if mm>0 then
-		if vv>0 then
-			local m=mm^0.5
-			local s=acos(w/m)/vv^0.5
-			return new(log(m),x*s,y*s,z*s)
+	local w, x, y, z = q.w, q.x, q.y, q.z
+	local vv = x * x + y * y + z * z
+	local mm = w * w + vv
+	if mm > 0 then
+		if vv > 0 then
+			local m = mm ^ 0.5
+			local s = acos(w / m) / vv ^ 0.5
+			return new(log(m), x * s, y * s, z * s)
 		else
-			return new(log(mm)/2)--lim v->0 x/v*acos(a/(a*a+v*v)^0.5)=0 when a is positive
+			return new(log(mm) / 2) --lim v->0 x/v*acos(a/(a*a+v*v)^0.5)=0 when a is positive
 		end
 	else
 		return new(-math.huge)
 	end
 end
-Q.log=Qlog
+Q.log = Qlog
 
 local function Qexp(q)
-	local m=exp(q.w)
-	local x,y,z=q.x,q.y,q.z
-	local vv=x*x+y*y+z*z
-	if vv>0 then
-		local v=vv^0.5
-		local s=m*sin(v)/v
-		return new(m*cos(v),x*s,y*s,z*s)
+	local m = exp(q.w)
+	local x, y, z = q.x, q.y, q.z
+	local vv = x * x + y * y + z * z
+	if vv > 0 then
+		local v = vv ^ 0.5
+		local s = m * sin(v) / v
+		return new(m * cos(v), x * s, y * s, z * s)
 	else
 		return new(m)
 	end
 end
-Q.exp=Qexp
+Q.exp = Qexp
 
 local function Qnormalize(q)
-	local w,x,y,z=q.w,q.x,q.y,q.z
-	local mm=w*w+x*x+y*y+z*z
-	if mm>0 then
-		local m=mm^0.5
-		return new(w/m,x/m,y/m,z/m)
+	local w, x, y, z = q.w, q.x, q.y, q.z
+	local mm = w * w + x * x + y * y + z * z
+	if mm > 0 then
+		local m = mm ^ 0.5
+		return new(w / m, x / m, y / m, z / m)
 	else
 		return new()
 	end
 end
-Q.normalize=Qnormalize
-Q.unit=Qnormalize
+Q.normalize = Qnormalize
+Q.unit = Qnormalize
 
 local function Qsqrt(q)
-	local w,x,y,z=q.w,q.x,q.y,q.z
-	local vv=x*x+y*y+z*z
-	if vv>0 then
-		local m=(w*w+vv)^0.5
-		local s=((m-w)/(2*vv))^0.5
-		return new(((m+w)/2)^0.5,x*s,y*s,z*s)
+	local w, x, y, z = q.w, q.x, q.y, q.z
+	local vv = x * x + y * y + z * z
+	if vv > 0 then
+		local m = (w * w + vv) ^ 0.5
+		local s = ((m - w) / (2 * vv)) ^ 0.5
+		return new(((m + w) / 2) ^ 0.5, x * s, y * s, z * s)
 	else
-		return new((w*w)^0.25)
+		return new((w * w) ^ 0.25)
 	end
 end
-Q.sqrt=Qsqrt
+Q.sqrt = Qsqrt
 
 return Q

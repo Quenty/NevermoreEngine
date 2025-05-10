@@ -7,14 +7,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
+local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local RxBrioUtils = require("RxBrioUtils")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local RxBrioUtils = require("RxBrioUtils")
-local DuckTypeUtils = require("DuckTypeUtils")
-local _SortFunctionUtils = require("SortFunctionUtils")
 
 local ObservableMap = {}
 ObservableMap.ClassName = "ObservableMap"
@@ -220,9 +219,9 @@ function ObservableMap.ObserveAtKeyBrio<TKey, TValue>(
 	assert(key ~= nil, "Bad key")
 
 	return self:ObserveAtKey(key):Pipe({
-		RxBrioUtils.switchToBrio(function(value)
+		RxBrioUtils.switchToBrio(function(value): boolean
 			return value ~= nil
-		end),
+		end) :: any,
 	}) :: any
 end
 

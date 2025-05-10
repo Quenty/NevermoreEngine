@@ -22,7 +22,7 @@ function IKResource.new(data)
 	self._instance = nil
 	self._childResourceMap = {} -- [robloxName] = { data = data; ikResource = ikResource }
 	self._descendantLookupMap = {
-		[data.name] = self;
+		[data.name] = self,
 	}
 
 	self._ready = self._maid:Add(ValueObject.new(false, "boolean"))

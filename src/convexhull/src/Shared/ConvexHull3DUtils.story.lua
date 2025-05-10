@@ -4,24 +4,25 @@
 	@class ConvexHull3DUtils.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 
+local ConvexHull3DUtils = require("ConvexHull3DUtils")
 local Draw = require("Draw")
 local Maid = require("Maid")
-local ConvexHull3DUtils = require("ConvexHull3DUtils")
 
 local CORNERS = {
-	Vector3.new( 0.5,  0.5, -0.5);
-	Vector3.new( 0.5,  0.5,  0.5);
-	Vector3.new( 0.5, -0.5, -0.5);
-	Vector3.new( 0.5, -0.5,  0.5);
-	Vector3.new(-0.5,  0.5, -0.5);
-	Vector3.new(-0.5,  0.5,  0.5);
-	Vector3.new(-0.5, -0.5, -0.5);
-	Vector3.new(-0.5, -0.5,  0.5);
+	Vector3.new(0.5, 0.5, -0.5),
+	Vector3.new(0.5, 0.5, 0.5),
+	Vector3.new(0.5, -0.5, -0.5),
+	Vector3.new(0.5, -0.5, 0.5),
+	Vector3.new(-0.5, 0.5, -0.5),
+	Vector3.new(-0.5, 0.5, 0.5),
+	Vector3.new(-0.5, -0.5, -0.5),
+	Vector3.new(-0.5, -0.5, 0.5),
 }
 
 local function drawBlockCast(cframe, size, direction)
@@ -32,11 +33,11 @@ local function drawBlockCast(cframe, size, direction)
 	local beginCFrame = cframe
 	local finishCFrame = (cframe + direction)
 
-	local box = Draw.box(cframe, size - Vector3.new(1, 1, 1)*0.1)
+	local box = Draw.box(cframe, size - Vector3.new(1, 1, 1) * 0.1)
 	box:FindFirstChildWhichIsA("BoxHandleAdornment"):Destroy()
 	box.Parent = folder
 
-	local box2 = Draw.box(cframe + direction, size - Vector3.new(1, 1, 1)*0.1)
+	local box2 = Draw.box(cframe + direction, size - Vector3.new(1, 1, 1) * 0.1)
 	box2:FindFirstChildWhichIsA("BoxHandleAdornment"):Destroy()
 	box2.Parent = folder
 
@@ -61,8 +62,7 @@ local function render(baseRay)
 	local maid = Maid.new()
 
 	local ray = Ray.new(baseRay.Origin, baseRay.Direction.unit * 8)
-	local cframe = CFrame.new(ray.Origin, ray.Origin + ray.Direction.unit)
-		* CFrame.Angles(0, math.pi/4, math.pi/4)
+	local cframe = CFrame.new(ray.Origin, ray.Origin + ray.Direction.unit) * CFrame.Angles(0, math.pi / 4, math.pi / 4)
 
 	local size = Vector3.new(4, 4, 4)
 	local direction = ray.Direction

@@ -26,7 +26,7 @@ function EquippedTracker.new(tool)
 
 	self._maid = Maid.new()
 
---[=[
+	--[=[
 	Tracks current equipped player who has an alive humanoid
 	@prop Player ValueObject<Player>
 	@within EquippedTracker

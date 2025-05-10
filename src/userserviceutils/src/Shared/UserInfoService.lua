@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Centralized provider for user info so we can coordinate web requests.
 
@@ -6,14 +7,17 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local UserInfoAggregator = require("UserInfoAggregator")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local Observable = require("Observable")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
+local UserInfoAggregator = require("UserInfoAggregator")
+local UserServiceUtils = require("UserServiceUtils")
 
 local UserInfoService = {}
 UserInfoService.ServiceName = "UserInfoService"
 
-function UserInfoService:Init(serviceBag: _ServiceBag.ServiceBag)
+function UserInfoService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -28,8 +32,8 @@ end
 	@param userId number
 	@return Promise<UserInfo>
 ]=]
-function UserInfoService:PromiseUserInfo(userId: number)
-    assert(type(userId) == "number", "Bad userId")
+function UserInfoService:PromiseUserInfo(userId: number): Promise.Promise<UserServiceUtils.UserInfo>
+	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:PromiseUserInfo(userId)
 end
@@ -40,8 +44,8 @@ end
 	@param userId number
 	@return Observable<UserInfo>
 ]=]
-function UserInfoService:ObserveUserInfo(userId: number)
-    assert(type(userId) == "number", "Bad userId")
+function UserInfoService:ObserveUserInfo(userId: number): Observable.Observable<UserServiceUtils.UserInfo>
+	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:ObserveUserInfo(userId)
 end
@@ -52,8 +56,8 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserInfoService:PromiseDisplayName(userId: number)
-    assert(type(userId) == "number", "Bad userId")
+function UserInfoService:PromiseDisplayName(userId: number): Promise.Promise<string>
+	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:PromiseDisplayName(userId)
 end
@@ -64,8 +68,8 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserInfoService:PromiseUsername(userId: number)
-    assert(type(userId) == "number", "Bad userId")
+function UserInfoService:PromiseUsername(userId: number): Promise.Promise<string>
+	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:PromiseUsername(userId)
 end
@@ -76,12 +80,11 @@ end
 	@param userId number
 	@return Observable<string>
 ]=]
-function UserInfoService:ObserveDisplayName(userId: number)
-    assert(type(userId) == "number", "Bad userId")
+function UserInfoService:ObserveDisplayName(userId: number): Observable.Observable<UserServiceUtils.UserInfo>
+	assert(type(userId) == "number", "Bad userId")
 
 	return self._aggregator:ObserveDisplayName(userId)
 end
-
 
 function UserInfoService:Destroy()
 	self._maid:DoCleaning()

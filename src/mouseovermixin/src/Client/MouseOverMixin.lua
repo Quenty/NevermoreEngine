@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local ButtonUtils = require("ButtonUtils")
+local Maid = require("Maid")
 
 local MouseOverMixin = {}
 

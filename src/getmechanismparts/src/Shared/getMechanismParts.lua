@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Gets the full mechanism from parts. See [NoCollisionConstraintUtils].
 	@class getMechanismParts
@@ -6,9 +7,9 @@
 local Workspace = game:GetService("Workspace")
 
 local IGNORE_CONSTRAINT_SET = {
-	["LineForce"] = true;
-	["VectorForce"] = true;
-	["Torque"] = true;
+	["LineForce"] = true,
+	["VectorForce"] = true,
+	["Torque"] = true,
 }
 
 --[=[
@@ -30,10 +31,10 @@ local IGNORE_CONSTRAINT_SET = {
 	@within getMechanismParts
 ]=]
 return function(originParts: Instance | { BasePart }): { BasePart }
-	local startingTable
+	local startingTable: { Instance }
 	if type(originParts) == "table" then
 		assert(#originParts > 0, "Bad originParts")
-		startingTable = originParts
+		startingTable = originParts :: { any }
 	elseif typeof(originParts) == "Instance" then
 		startingTable = { originParts }
 	else
@@ -42,7 +43,7 @@ return function(originParts: Instance | { BasePart }): { BasePart }
 
 	local result = {}
 	local checked = {
-		[Workspace.Terrain] = true;
+		[Workspace.Terrain] = true,
 	}
 
 	for _, item in startingTable do
@@ -89,8 +90,8 @@ return function(originParts: Instance | { BasePart }): { BasePart }
 					part1 = joint.Attachment1.Parent
 				end
 			else
-				part0 = joint.Part0
-				part1 = joint.Part1
+				part0 = (joint :: any).Part0
+				part1 = (joint :: any).Part1
 			end
 
 			if part0 and not checked[part0] then

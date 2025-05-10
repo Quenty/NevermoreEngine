@@ -32,7 +32,7 @@ function GetPercentExposedUtils.search(point: Vector3, radius: number, raycaster
 	local hits = {}
 	local totalHits = 0
 
-	for _=1, GetPercentExposedUtils.RAY_COUNT do
+	for _ = 1, GetPercentExposedUtils.RAY_COUNT do
 		local ray = Ray.new(point, RandomVector3Utils.getRandomUnitVector() * radius)
 		if raycaster then
 			local hitData = raycaster:FindPartOnRay(ray)

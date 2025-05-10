@@ -6,11 +6,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local AccelTween = require("AccelTween")
-local TorsoIKUtils = require("TorsoIKUtils")
-local Signal = require("Signal")
 local BaseObject = require("BaseObject")
 local IKResource = require("IKResource")
 local IKResourceUtils = require("IKResourceUtils")
+local Signal = require("Signal")
+local TorsoIKUtils = require("TorsoIKUtils")
 
 local TorsoIKBase = setmetatable({}, BaseObject)
 TorsoIKBase.__index = TorsoIKBase

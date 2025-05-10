@@ -2,11 +2,12 @@
 	@class SimpleLoopedSoundPlayer.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
+local Blend = require("Blend")
 local Maid = require("Maid")
 local SimpleLoopedSoundPlayer = require("SimpleLoopedSoundPlayer")
-local Blend = require("Blend")
 
 return function(target)
 	local maid = Maid.new()
@@ -20,42 +21,40 @@ return function(target)
 
 	local function button(props)
 		return Blend.New "TextButton" {
-			Text = props.Text;
-			AutoButtonColor = true;
-			Font = Enum.Font.FredokaOne;
-			Size = UDim2.new(0, 100, 0, 30);
+			Text = props.Text,
+			AutoButtonColor = true,
+			Font = Enum.Font.FredokaOne,
+			Size = UDim2.new(0, 100, 0, 30),
 
-			Blend.New "UICorner" {
-
-			};
+			Blend.New "UICorner" {},
 
 			[Blend.OnEvent "Activated"] = function()
-				props.OnActivated();
-			end;
-		};
+				props.OnActivated()
+			end,
+		}
 	end
 
 	maid:GiveTask(Blend.mount(target, {
 		Blend.New "Frame" {
-			Name = "ButtonContainer";
-			BackgroundTransparency = 1;
-			Position = UDim2.new(0.5, 0, 0, 5);
-			AnchorPoint = Vector2.new(0.5, 0);
-			Size = UDim2.new(1, 0, 0, 30);
+			Name = "ButtonContainer",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0.5, 0, 0, 5),
+			AnchorPoint = Vector2.new(0.5, 0),
+			Size = UDim2.new(1, 0, 0, 30),
 
 			Blend.New "UIListLayout" {
-				FillDirection = Enum.FillDirection.Horizontal;
-				Padding = UDim.new(0, 5);
-				HorizontalAlignment = Enum.HorizontalAlignment.Center;
-			};
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, 5),
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			},
 
 			button({
-				Text = "Toggle";
+				Text = "Toggle",
 				OnActivated = function()
 					simpleLoopedSoundPlayer:Toggle()
-				end;
-			});
-		}
+				end,
+			}),
+		},
 	}))
 
 	return function()

@@ -59,7 +59,7 @@ end
 	@return string? -- error, if there was one
 ]=]
 function CoreGuiUtils.tryToSetCore(...): (boolean, string?)
-	local args = {...}
+	local args = { ... }
 	local n = select("#", ...)
 
 	local ok, err = pcall(function()
@@ -71,6 +71,5 @@ function CoreGuiUtils.tryToSetCore(...): (boolean, string?)
 
 	return true
 end
-
 
 return CoreGuiUtils

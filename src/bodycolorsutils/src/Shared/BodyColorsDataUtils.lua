@@ -7,9 +7,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Color3Utils = require("Color3Utils")
-local Color3SerializationUtils = require("Color3SerializationUtils")
 local BodyColorsDataConstants = require("BodyColorsDataConstants")
+local Color3SerializationUtils = require("Color3SerializationUtils")
+local Color3Utils = require("Color3Utils")
 
 local BodyColorsDataUtils = {}
 
@@ -338,9 +338,15 @@ end
 	@param humanoidDescription HumanoidDescription
 	@return BodyColors
 ]=]
-function BodyColorsDataUtils.applyToHumanoidDescription(bodyColorsData: BodyColorsData, humanoidDescription: HumanoidDescription)
+function BodyColorsDataUtils.applyToHumanoidDescription(
+	bodyColorsData: BodyColorsData,
+	humanoidDescription: HumanoidDescription
+)
 	assert(BodyColorsDataUtils.isBodyColorsData(bodyColorsData), "Bad bodyColorsData")
-	assert(typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"), "Bad humanoidDescription")
+	assert(
+		typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"),
+		"Bad humanoidDescription"
+	)
 
 	if bodyColorsData.headColor then
 		humanoidDescription.HeadColor = bodyColorsData.headColor

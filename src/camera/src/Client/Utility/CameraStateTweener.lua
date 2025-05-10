@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Makes transitions between states easier. Uses the `CameraStackService` to tween in and
 	out a new camera state Call `:Show()` and `:Hide()` to do so, and make sure to
@@ -8,15 +9,26 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local BaseObject = require("BaseObject")
+local CameraEffectUtils = require("CameraEffectUtils")
+local CameraStack = require("CameraStack")
 local CameraStackService = require("CameraStackService")
 local FadeBetweenCamera3 = require("FadeBetweenCamera3")
 local ServiceBag = require("ServiceBag")
-local BaseObject = require("BaseObject")
-local CameraStack = require("CameraStack")
 
 local CameraStateTweener = setmetatable({}, BaseObject)
 CameraStateTweener.ClassName = "CameraStateTweener"
 CameraStateTweener.__index = CameraStateTweener
+
+export type CameraStateTweener = typeof(setmetatable(
+	{} :: {
+		_cameraStack: CameraStack.CameraStack,
+		_cameraEffect: any,
+		_cameraBelow: any,
+		_fadeBetween: FadeBetweenCamera3.FadeBetweenCamera3,
+	},
+	{} :: typeof({ __index = CameraStateTweener })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new camera state tweener
@@ -26,15 +38,19 @@ CameraStateTweener.__index = CameraStateTweener
 	@param speed number? -- Speed that the camera tweener tweens at. Defaults to 20
 	@return CameraStateTweener
 ]=]
-function CameraStateTweener.new(serviceBagOrCameraStack, cameraEffect, speed: number?)
-	local self = setmetatable(BaseObject.new(), CameraStateTweener)
+function CameraStateTweener.new(
+	serviceBagOrCameraStack: ServiceBag.ServiceBag | CameraStack.CameraStack,
+	cameraEffect,
+	speed: number?
+): CameraStateTweener
+	local self: CameraStateTweener = setmetatable(BaseObject.new() :: any, CameraStateTweener)
 
 	assert(cameraEffect, "No cameraEffect")
 
 	if ServiceBag.isServiceBag(serviceBagOrCameraStack) then
-		self._cameraStack = serviceBagOrCameraStack:GetService(CameraStackService):GetCameraStack()
+		self._cameraStack = (serviceBagOrCameraStack :: any):GetService(CameraStackService):GetCameraStack()
 	elseif CameraStack.isCameraStack(serviceBagOrCameraStack) then
-		self._cameraStack = serviceBagOrCameraStack
+		self._cameraStack = serviceBagOrCameraStack :: any
 	else
 		error("Bad serviceBagOrCameraStack")
 	end
@@ -65,7 +81,7 @@ end
 	Returns percent visible, from 0 to 1.
 	@return number
 ]=]
-function CameraStateTweener:GetPercentVisible(): number
+function CameraStateTweener.GetPercentVisible(self: CameraStateTweener): number
 	return self._fadeBetween.Value
 end
 
@@ -73,7 +89,7 @@ end
 	Shows the camera to fade in.
 	@param doNotAnimate? boolean -- Optional, defaults to animating
 ]=]
-function CameraStateTweener:Show(doNotAnimate: boolean?)
+function CameraStateTweener.Show(self: CameraStateTweener, doNotAnimate: boolean?)
 	self:SetTarget(1, doNotAnimate)
 end
 
@@ -81,7 +97,7 @@ end
 	Hides the camera to fade in.
 	@param doNotAnimate? boolean -- Optional, defaults to animating
 ]=]
-function CameraStateTweener:Hide(doNotAnimate: boolean?)
+function CameraStateTweener.Hide(self: CameraStateTweener, doNotAnimate: boolean?)
 	self:SetTarget(0, doNotAnimate)
 end
 
@@ -89,7 +105,7 @@ end
 	Returns true if we're done hiding
 	@return boolean
 ]=]
-function CameraStateTweener:IsFinishedHiding(): boolean
+function CameraStateTweener.IsFinishedHiding(self: CameraStateTweener): boolean
 	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 0
 end
 
@@ -97,7 +113,7 @@ end
 	Returns true if we're done showing
 	@return boolean
 ]=]
-function CameraStateTweener:IsFinishedShowing(): boolean
+function CameraStateTweener.IsFinishedShowing(self: CameraStateTweener): boolean
 	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 1
 end
 
@@ -107,7 +123,7 @@ end
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 	@param callback function
 ]=]
-function CameraStateTweener:Finish(doNotAnimate: boolean?, callback: () -> ())
+function CameraStateTweener.Finish(self: CameraStateTweener, doNotAnimate: boolean?, callback: () -> ())
 	assert(type(callback) == "function", "Bad callback")
 
 	self:Hide(doNotAnimate)
@@ -128,7 +144,7 @@ end
 	Gets the current effect we're tweening
 	@return CameraEffect
 ]=]
-function CameraStateTweener:GetCameraEffect()
+function CameraStateTweener.GetCameraEffect(self: CameraStateTweener): CameraEffectUtils.CameraEffect
 	return self._cameraEffect
 end
 
@@ -136,7 +152,7 @@ end
 	Gets the camera below this camera on the camera stack
 	@return CameraEffect
 ]=]
-function CameraStateTweener:GetCameraBelow()
+function CameraStateTweener.GetCameraBelow(self: CameraStateTweener): CameraEffectUtils.CameraEffect
 	return self._cameraBelow
 end
 
@@ -146,7 +162,11 @@ end
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 	@return CameraStateTweener -- self
 ]=]
-function CameraStateTweener:SetTarget(target: number, doNotAnimate: boolean?)
+function CameraStateTweener.SetTarget(
+	self: CameraStateTweener,
+	target: number,
+	doNotAnimate: boolean?
+): CameraStateTweener
 	self._fadeBetween.Target = target or error("No target")
 	if doNotAnimate then
 		self._fadeBetween.Value = self._fadeBetween.Target
@@ -160,7 +180,7 @@ end
 	@param speed number
 	@return CameraStateTweener -- self
 ]=]
-function CameraStateTweener:SetSpeed(speed: number)
+function CameraStateTweener.SetSpeed(self: CameraStateTweener, speed: number): CameraStateTweener
 	assert(type(speed) == "number", "Bad speed")
 
 	self._fadeBetween.Speed = speed
@@ -173,7 +193,7 @@ end
 	@param isVisible boolean
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 ]=]
-function CameraStateTweener:SetVisible(isVisible: number, doNotAnimate: boolean?)
+function CameraStateTweener.SetVisible(self: CameraStateTweener, isVisible: number, doNotAnimate: boolean?): ()
 	if isVisible then
 		self:Show(doNotAnimate)
 	else
@@ -185,7 +205,7 @@ end
 	Retrieves the fading camera being used to interpolate.
 	@return CameraEffect
 ]=]
-function CameraStateTweener:GetFader()
+function CameraStateTweener.GetFader(self: CameraStateTweener): CameraEffectUtils.CameraEffect
 	return self._fadeBetween
 end
 

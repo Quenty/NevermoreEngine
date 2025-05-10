@@ -6,16 +6,16 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
+local InputModeServiceClient = require("InputModeServiceClient")
+local InputModeType = require("InputModeType")
 local InputModeTypes = require("InputModeTypes")
 local Maid = require("Maid")
-local ValueObject = require("ValueObject")
-local InputModeServiceClient = require("InputModeServiceClient")
-local ServiceBag = require("ServiceBag")
+local Observable = require("Observable")
 local Rx = require("Rx")
-local InputModeType = require("InputModeType")
-local _Observable = require("Observable")
-local _Signal = require("Signal")
-local _Brio = require("Brio")
+local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local InputModeTypeSelector = {}
 InputModeTypeSelector.ClassName = "InputModeTypeSelector"
@@ -34,7 +34,7 @@ export type InputModeTypeSelector = typeof(setmetatable(
 		_inputModeServiceClient: InputModeServiceClient.InputModeServiceClient,
 
 		Value: InputModeType.InputModeType?,
-		Changed: _Signal.Signal<InputModeType.InputModeType, InputModeType.InputModeType>,
+		Changed: Signal.Signal<InputModeType.InputModeType, InputModeType.InputModeType>,
 	},
 	{} :: typeof({ __index = InputModeTypeSelector })
 ))
@@ -88,7 +88,7 @@ end
 ]=]
 function InputModeTypeSelector.fromObservableBrio(
 	serviceBag: ServiceBag.ServiceBag,
-	observeInputModesBrio: _Observable.Observable<_Brio.Brio<InputModeType.InputModeType>>
+	observeInputModesBrio: Observable.Observable<Brio.Brio<InputModeType.InputModeType>>
 ): InputModeTypeSelector
 	local selector = InputModeTypeSelector.new(serviceBag, {})
 
@@ -148,7 +148,7 @@ end
 function InputModeTypeSelector.ObserveIsActive(
 	self: InputModeTypeSelector,
 	inputModeType: InputModeType.InputModeType
-): _Observable.Observable<boolean>
+): Observable.Observable<boolean>
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	return self:ObserveActiveInputType():Pipe({

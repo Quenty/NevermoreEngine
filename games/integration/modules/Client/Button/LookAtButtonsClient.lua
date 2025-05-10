@@ -8,14 +8,15 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local AdorneeUtils = require("AdorneeUtils")
 local BaseObject = require("BaseObject")
 local CharacterUtils = require("CharacterUtils")
-local Octree = require("Octree")
 local GameBindersClient = require("GameBindersClient")
-local AdorneeUtils = require("AdorneeUtils")
-local Maid = require("Maid")
-local IKServiceClient = require("IKServiceClient")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
+local IKServiceClient = require("IKServiceClient")
+local Maid = require("Maid")
+local Octree = require("Octree")
+local ServiceBag = require("ServiceBag")
 
 local LOOK_NEAR_DISTANCE = 15
 
@@ -23,7 +24,7 @@ local LookAtButtonsClient = setmetatable({}, BaseObject)
 LookAtButtonsClient.ClassName = "LookAtButtonsClient"
 LookAtButtonsClient.__index = LookAtButtonsClient
 
-function LookAtButtonsClient.new(humanoid, serviceBag)
+function LookAtButtonsClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), LookAtButtonsClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -113,9 +114,6 @@ function LookAtButtonsClient:_stopTrackingPhysicalButton(class)
 	self._maid[class] = nil
 end
 
-
-function LookAtButtonsClient:_updateLocal()
-
-end
+function LookAtButtonsClient:_updateLocal() end
 
 return LookAtButtonsClient

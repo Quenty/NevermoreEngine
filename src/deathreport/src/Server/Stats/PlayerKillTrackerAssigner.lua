@@ -7,16 +7,16 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local BaseObject = require("BaseObject")
+local DeathReportBindersServer = require("DeathReportBindersServer")
 local Maid = require("Maid")
 local PlayerKillTrackerUtils = require("PlayerKillTrackerUtils")
-local DeathReportBindersServer = require("DeathReportBindersServer")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local PlayerKillTrackerAssigner = setmetatable({}, BaseObject)
 PlayerKillTrackerAssigner.ClassName = "PlayerKillTrackerAssigner"
 PlayerKillTrackerAssigner.__index = PlayerKillTrackerAssigner
 
-function PlayerKillTrackerAssigner.new(serviceBag: _ServiceBag.ServiceBag)
+function PlayerKillTrackerAssigner.new(serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(), PlayerKillTrackerAssigner)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -77,6 +77,5 @@ function PlayerKillTrackerAssigner:_handlePlayerAdded(player)
 
 	self._maid[player] = maid
 end
-
 
 return PlayerKillTrackerAssigner

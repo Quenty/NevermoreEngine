@@ -8,12 +8,12 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local Brio = require("Brio")
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxSignal = require("RxSignal")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
 
 local ValueBaseValue = {}
 ValueBaseValue.ClassName = "ValueBaseValue"
@@ -76,7 +76,7 @@ end
 function ValueBaseValue.ObserveBrio(
 	self: ValueBaseValue,
 	predicate: Rx.Predicate<any>?
-): _Observable.Observable<_Brio.Brio<any>>
+): Observable.Observable<Brio.Brio<any>>
 	return RxValueBaseUtils.observeBrio(self._parent, self._className, self._name, predicate)
 end
 
@@ -85,7 +85,7 @@ end
 
 	@return Observable<any>
 ]=]
-function ValueBaseValue.Observe(self: ValueBaseValue): _Observable.Observable<any>
+function ValueBaseValue.Observe(self: ValueBaseValue): Observable.Observable<any>
 	return RxValueBaseUtils.observe(self._parent, self._className, self._name, self._defaultValue)
 end
 

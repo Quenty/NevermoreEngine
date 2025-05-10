@@ -2,8 +2,8 @@
 	@class ServerMain
 ]]
 
-local ServerScriptService = game:GetService("ServerScriptService")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.ik)

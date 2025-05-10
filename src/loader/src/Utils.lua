@@ -113,7 +113,6 @@ function Utils.setValue(parent: Instance, instanceType: string, name: string, va
 	end
 end
 
-
 function Utils.getOrCreateFolder(parent: Instance, folderName: string): Instance
 	local found = parent:FindFirstChild(folderName)
 	if found then
@@ -125,6 +124,5 @@ function Utils.getOrCreateFolder(parent: Instance, folderName: string): Instance
 		return folder
 	end
 end
-
 
 return Utils

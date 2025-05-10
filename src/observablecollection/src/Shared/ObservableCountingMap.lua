@@ -6,14 +6,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
-local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
-local _Set = require("Set")
+local Set = require("Set")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local ObservableCountingMap = {}
 ObservableCountingMap.ClassName = "ObservableCountingMap"
@@ -119,7 +119,7 @@ end
 	Observes the current set of active keys
 	@return Observable<{ [T]: true }>
 ]=]
-function ObservableCountingMap.ObserveKeysSet<T>(self: ObservableCountingMap<T>): Observable.Observable<_Set.Set<T>>
+function ObservableCountingMap.ObserveKeysSet<T>(self: ObservableCountingMap<T>): Observable.Observable<Set.Set<T>>
 	return self:_observeDerivedDataStructureFromKeys(function()
 		local set = {}
 

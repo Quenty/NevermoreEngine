@@ -83,5 +83,4 @@ function HumanoidAnimatorUtils.isPlayingAnimationTrack(humanoid: Humanoid, track
 	return false
 end
 
-
 return HumanoidAnimatorUtils

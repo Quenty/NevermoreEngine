@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PromiseUtils = require("PromiseUtils")
 local Math = require("Math")
+local PromiseUtils = require("PromiseUtils")
 local String = require("String")
 
 export type UIConverterLibrary = "Blend" | "Fusion" | "FusionUnpacked" | "BlendUnpacked"
@@ -540,8 +540,8 @@ function UIConverterUtils.promiseToLibraryInstance(
 		:PromiseProperties(instance, UIConverterUtils.getOverrideMap(library))
 		:Then(function(properties)
 			if properties then
-			local converted = UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
-			local childrenPromises = {}
+				local converted = UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
+				local childrenPromises = {}
 
 				for _, child in UIConverterUtils.getSortedChildren(instance) do
 					table.insert(

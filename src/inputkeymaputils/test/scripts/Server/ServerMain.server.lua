@@ -10,4 +10,3 @@ local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("TestInputKeyMap"))
 serviceBag:Init()
 serviceBag:Start()
-

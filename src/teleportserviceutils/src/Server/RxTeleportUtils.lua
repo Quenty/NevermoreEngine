@@ -7,10 +7,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ValueObject = require("ValueObject")
-local Brio = require("Brio")
 
 local RxTeleportUtils = {}
 

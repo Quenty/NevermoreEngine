@@ -153,7 +153,6 @@ local function makePropertyTweener(setProperties)
 	--                      {TextTransparency = 1}.
 	-- @param Duration The amount of time to spend transitioning.
 	return function(Gui: GuiBase, NewProperties, Duration: number)
-
 		if Duration <= 0 then
 			setProperties(Gui, 1, NewProperties, NewProperties)
 		else

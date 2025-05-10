@@ -12,11 +12,11 @@ local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
 local CmdrTemplateProviderServer = require("CmdrTemplateProviderServer")
-local Promise = require("Promise")
+local CmdrTypes = require("CmdrTypes")
 local Maid = require("Maid")
 local PermissionService = require("PermissionService")
-local _ServiceBag = require("ServiceBag")
-local _CmdrTypes = require("CmdrTypes")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local CmdrService = {}
 CmdrService.ServiceName = "CmdrService"
@@ -24,13 +24,13 @@ CmdrService.ServiceName = "CmdrService"
 export type CmdrService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_serviceId: string,
 		_promiseCmdr: Promise.Promise<any>,
 		_cmdrTemplateProviderServer: any,
 		_permissionService: PermissionService.PermissionService,
-		_definitionData: { [string]: _CmdrTypes.CommandDefinition },
-		_executeData: { [string]: (context: _CmdrTypes.CommandContext, ...any) -> string? },
+		_definitionData: { [string]: CmdrTypes.CommandDefinition },
+		_executeData: { [string]: (context: CmdrTypes.CommandContext, ...any) -> string? },
 	},
 	{} :: typeof({ __index = CmdrService })
 ))
@@ -41,7 +41,7 @@ local GLOBAL_REGISTRY = setmetatable({}, { __mode = "kv" })
 	Initializes the CmdrService. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function CmdrService.Init(self: CmdrService, serviceBag: _ServiceBag.ServiceBag)
+function CmdrService.Init(self: CmdrService, serviceBag: ServiceBag.ServiceBag)
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -127,8 +127,8 @@ end
 ]=]
 function CmdrService.RegisterCommand(
 	self: CmdrService,
-	commandData: _CmdrTypes.CommandDefinition,
-	execute: (context: _CmdrTypes.CommandContext, ...any) -> string?
+	commandData: CmdrTypes.CommandDefinition,
+	execute: (context: CmdrTypes.CommandContext, ...any) -> string?
 ): ()
 	assert((self :: any)._promiseCmdr, "Not initialized")
 	assert(commandData, "No commandData")

@@ -6,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TemplateProvider = require("TemplateProvider")
 local RxCollectionServiceUtils = require("RxCollectionServiceUtils")
+local TemplateProvider = require("TemplateProvider")
 
 local TaggedTemplateProvider = {}
 

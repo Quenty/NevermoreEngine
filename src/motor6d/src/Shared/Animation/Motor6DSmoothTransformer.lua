@@ -4,9 +4,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Motor6DTransformer = require("Motor6DTransformer")
 local Spring = require("Spring")
 local SpringUtils = require("SpringUtils")
-local Motor6DTransformer = require("Motor6DTransformer")
 
 local Motor6DSmoothTransformer = setmetatable({}, Motor6DTransformer)
 Motor6DSmoothTransformer.ClassName = "Motor6DSmoothTransformer"

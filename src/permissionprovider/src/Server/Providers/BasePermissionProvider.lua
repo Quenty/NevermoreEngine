@@ -11,9 +11,9 @@ local BaseObject = require("BaseObject")
 local GetRemoteFunction = require("GetRemoteFunction")
 local PermissionLevel = require("PermissionLevel")
 local PermissionLevelUtils = require("PermissionLevelUtils")
+local PermissionProviderUtils = require("PermissionProviderUtils")
+local Promise = require("Promise")
 local Table = require("Table")
-local _Promise = require("Promise")
-local _PermissionProviderUtils = require("PermissionProviderUtils")
 
 local BasePermissionProvider = setmetatable({}, BaseObject)
 BasePermissionProvider.ClassName = "BasePermissionProvider"
@@ -34,7 +34,7 @@ export type BasePermissionProvider = typeof(setmetatable(
 	@param config { remoteFunctionName: string }
 	@return BasePermissionProvider
 ]=]
-function BasePermissionProvider.new(config: _PermissionProviderUtils.PermissionProviderConfig): BasePermissionProvider
+function BasePermissionProvider.new(config: PermissionProviderUtils.PermissionProviderConfig): BasePermissionProvider
 	local self: BasePermissionProvider = setmetatable(BaseObject.new() :: any, BasePermissionProvider)
 
 	self._config = Table.readonly(assert(config, "Bad config") :: any)
@@ -66,7 +66,7 @@ function BasePermissionProvider.PromiseIsPermissionLevel(
 	_self: BasePermissionProvider,
 	player: Player,
 	permissionLevel: PermissionLevel.PermissionLevel
-): _Promise.Promise<boolean>
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
@@ -106,10 +106,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider.PromiseIsCreator(
-	self: BasePermissionProvider,
-	player: Player
-): _Promise.Promise<boolean>
+function BasePermissionProvider.PromiseIsCreator(self: BasePermissionProvider, player: Player): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
@@ -120,7 +117,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function BasePermissionProvider.PromiseIsAdmin(self: BasePermissionProvider, player: Player): _Promise.Promise<boolean>
+function BasePermissionProvider.PromiseIsAdmin(self: BasePermissionProvider, player: Player): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)

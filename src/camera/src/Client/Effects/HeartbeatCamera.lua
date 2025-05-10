@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Update on heartbeat, must GC this camera state, unlike others. This
 	allows for camera effects to run on heartbeat and cache information once instead
@@ -10,17 +11,29 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local SummedCamera = require("SummedCamera")
+local CameraEffectUtils = require("CameraEffectUtils")
+local CameraState = require("CameraState")
 local Maid = require("Maid")
+local SummedCamera = require("SummedCamera")
 
 local HeartbeatCamera = {}
 HeartbeatCamera.ClassName = "HeartbeatCamera"
 HeartbeatCamera.ProfileName = "HeartbeatCamera"
 
-function HeartbeatCamera.new(camera)
-	local self = setmetatable({}, HeartbeatCamera)
+export type HeartbeatCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		_maid: Maid.Maid,
+		_camera: CameraEffectUtils.CameraEffect,
+		_currentStateCache: CameraState.CameraState,
+	},
+	{} :: typeof({ __index = HeartbeatCamera })
+)) & CameraEffectUtils.CameraEffect
 
-	self._camera = camera or error("No camera")
+function HeartbeatCamera.new(camera: CameraEffectUtils.CameraEffect): HeartbeatCamera
+	local self: HeartbeatCamera = setmetatable({} :: any, HeartbeatCamera)
+
+	self._camera = assert(camera, "No camera")
 	self._maid = Maid.new()
 
 	self._currentStateCache = self._camera.CameraState or error("Camera state returned null")
@@ -33,11 +46,11 @@ function HeartbeatCamera.new(camera)
 	return self
 end
 
-function HeartbeatCamera:__add(other)
+function HeartbeatCamera.__add(self: HeartbeatCamera, other: CameraEffectUtils.CameraEffect): SummedCamera.SummedCamera
 	return SummedCamera.new(self, other)
 end
 
-function HeartbeatCamera:ForceUpdateCache()
+function HeartbeatCamera.ForceUpdateCache(self: HeartbeatCamera): ()
 	self._currentStateCache = self._camera.CameraState
 end
 
@@ -47,7 +60,7 @@ end
 	@prop CameraState CameraState
 	@within HeartbeatCamera
 ]=]
-function HeartbeatCamera:__index(index)
+function HeartbeatCamera.__index(self: HeartbeatCamera, index)
 	if index == "CameraState" then
 		return self._currentStateCache
 	else
@@ -55,7 +68,7 @@ function HeartbeatCamera:__index(index)
 	end
 end
 
-function HeartbeatCamera:Destroy()
+function HeartbeatCamera.Destroy(self: HeartbeatCamera)
 	self._maid:DoCleaning()
 end
 

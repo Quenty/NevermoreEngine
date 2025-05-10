@@ -12,11 +12,11 @@ local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local MaidTaskUtils = require("MaidTaskUtils")
 local Observable = require("Observable")
+local Rx = require("Rx")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Signal = require("Signal")
+local Subscription = require("Subscription")
 local ValueBaseUtils = require("ValueBaseUtils")
-local _Subscription = require("Subscription")
-local _Rx = require("Rx")
 
 local EMPTY_FUNCTION = function() end
 
@@ -26,6 +26,8 @@ ValueObject.ClassName = "ValueObject"
 export type TypeChecker = (value: any) -> (boolean, string?)
 
 export type ValueObjectTypeArg = string | TypeChecker
+
+export type Mountable<T> = T | Observable.Observable<T> | ValueBase | ValueObject<T>
 
 export type ValueObject<T> = typeof(setmetatable(
 	{} :: {
@@ -48,7 +50,7 @@ export type ValueObject<T> = typeof(setmetatable(
 		_value: T,
 		_default: T?,
 		_lastEventContext: { any }?,
-		_lastMountedSub: _Subscription.Subscription<(T, ...any)>?,
+		_lastMountedSub: Subscription.Subscription<(T, ...any)>?,
 	},
 	{} :: typeof({ __index = ValueObject })
 ))
@@ -111,7 +113,7 @@ function ValueObject.isValueObject(value: any): boolean
 	return DuckTypeUtils.isImplementation(ValueObject, value)
 end
 
-function ValueObject._toMountableObservable<T>(_self: ValueObject<T>, value: T | Observable.Observable<T> | ValueBase)
+function ValueObject._toMountableObservable<T>(_self: ValueObject<T>, value: Mountable<T>)
 	if Observable.isObservable(value) then
 		return value
 	elseif typeof(value) == "Instance" then
@@ -136,7 +138,7 @@ end
 	@param value Observable | T
 	@return MaidTask
 ]=]
-function ValueObject.Mount<T>(self: ValueObject<T>, value: Observable.Observable<T> | T | ValueBase): () -> ()
+function ValueObject.Mount<T>(self: ValueObject<T>, value: Mountable<T>): () -> ()
 	local observable = self:_toMountableObservable(value)
 	if observable then
 		self:_cleanupLastMountedSub()
@@ -213,10 +215,7 @@ end
 	@param condition function | nil -- optional
 	@return Observable<Brio<T>>
 ]=]
-function ValueObject.ObserveBrio<T>(
-	self: ValueObject<T>,
-	condition: _Rx.Predicate<T>?
-): Observable.Observable<Brio.Brio<T>>
+function ValueObject.ObserveBrio<T>(self: ValueObject<T>, condition: Rx.Predicate<T>?): Observable.Observable<Brio.Brio<T>>
 	assert(type(condition) == "function" or condition == nil, "Bad condition")
 
 	return Observable.new(function(sub)

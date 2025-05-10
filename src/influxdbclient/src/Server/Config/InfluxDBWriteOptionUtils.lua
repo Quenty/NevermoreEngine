@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class InfluxDBWriteOptionUtils
 ]=]
@@ -41,14 +42,14 @@ function InfluxDBWriteOptionUtils.isWriteOptions(options: any): boolean
 		and type(options.batchSize) == "number"
 		and type(options.maxBatchBytes) == "number"
 		and type(options.flushIntervalSeconds) == "number"
-		-- and type(options.maxRetries) == "number"
-		-- and type(options.maxRetryTimeSeconds) == "number"
-		-- and type(options.maxBufferLines) == "number"
-		-- and type(options.retryJitterSeconds) == "number"
-		-- and type(options.minRetryDelaySeconds) == "number"
-		-- and type(options.maxRetryDelaySeconds) == "number"
-		-- and type(options.exponentialBase) == "number"
-		-- and type(options.randomRetry) == "boolean"
+	-- and type(options.maxRetries) == "number"
+	-- and type(options.maxRetryTimeSeconds) == "number"
+	-- and type(options.maxBufferLines) == "number"
+	-- and type(options.retryJitterSeconds) == "number"
+	-- and type(options.minRetryDelaySeconds) == "number"
+	-- and type(options.maxRetryDelaySeconds) == "number"
+	-- and type(options.exponentialBase) == "number"
+	-- and type(options.randomRetry) == "boolean"
 end
 
 return InfluxDBWriteOptionUtils

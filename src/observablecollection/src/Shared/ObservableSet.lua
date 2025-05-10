@@ -6,14 +6,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
-local ValueObject = require("ValueObject")
-local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local DuckTypeUtils = require("DuckTypeUtils")
-local _Set = require("Set")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local Set = require("Set")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local ObservableSet = {}
 ObservableSet.ClassName = "ObservableSet"
@@ -22,7 +22,7 @@ ObservableSet.__index = ObservableSet
 export type ObservableSet<T> = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
-		_set: _Set.Set<T>,
+		_set: Set.Set<T>,
 		_containsObservables: any,
 		_countValue: ValueObject.ValueObject<number>,
 		ItemAdded: Signal.Signal<T>,
@@ -85,7 +85,7 @@ end
 
 	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
 ]=]
-function ObservableSet.__iter<T>(self: ObservableSet<T>): typeof(pairs({} :: _Set.Set<T>))
+function ObservableSet.__iter<T>(self: ObservableSet<T>): typeof(pairs({} :: Set.Set<T>))
 	return pairs(self._set)
 end
 
@@ -100,7 +100,7 @@ function ObservableSet.ObserveItemsBrio<T>(self: ObservableSet<T>): Observable.O
 		end
 
 		local maid = Maid.new()
-		local brios: _Set.Map<T, Brio.Brio<T>> = {}
+		local brios: Set.Map<T, Brio.Brio<T>> = {}
 
 		local function handleItem(item: T)
 			if brios[item] then
@@ -278,7 +278,7 @@ end
 	Gets a copy of the set
 	@return { [T]: true }
 ]=]
-function ObservableSet.GetSetCopy<T>(self: ObservableSet<T>): _Set.Set<T>
+function ObservableSet.GetSetCopy<T>(self: ObservableSet<T>): Set.Set<T>
 	return table.clone(self._set)
 end
 
@@ -286,10 +286,9 @@ end
 	Gets the raw set. Do not modify this set.
 	@return { [T]: true }
 ]=]
-function ObservableSet.GetRawSet<T>(self: ObservableSet<T>): _Set.Set<T>
+function ObservableSet.GetRawSet<T>(self: ObservableSet<T>): Set.Set<T>
 	return self._set
 end
-
 
 --[=[
 	Cleans up the ObservableSet and sets the metatable to nil.

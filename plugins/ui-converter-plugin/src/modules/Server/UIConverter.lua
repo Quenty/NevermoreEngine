@@ -31,24 +31,22 @@ function UIConverter:PromiseProperties(instance, overrideMap)
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(overrideMap) == "table", "Bad overrideMap")
 
-	return self._apiDump:PromiseClass(instance.ClassName)
-		:Then(function(class)
-			if class:IsService() then
-				-- TODO: Mount here
-				return Promise.rejected(string.format("%q is a service and cannot be created", class:GetClassName()))
-			end
+	return self._apiDump:PromiseClass(instance.ClassName):Then(function(class)
+		if class:IsService() then
+			-- TODO: Mount here
+			return Promise.rejected(string.format("%q is a service and cannot be created", class:GetClassName()))
+		end
 
-			if class:IsNotCreatable() then
-				-- Just don't include this
-				return Promise.resolved(nil)
-			end
+		if class:IsNotCreatable() then
+			-- Just don't include this
+			return Promise.resolved(nil)
+		end
 
-			return self._maid:GivePromise(self:PromisePropertiesForClass(class:GetClassName()))
-				:Then(function(properties)
-					local map = {}
-					local promises = {}
+		return self._maid:GivePromise(self:PromisePropertiesForClass(class:GetClassName())):Then(function(properties)
+			local map = {}
+			local promises = {}
 
-					local hasProperties = {}
+			local hasProperties = {}
 
 			for _, property in properties do
 				hasProperties[property:GetName()] = true
@@ -91,9 +89,8 @@ function UIConverter:PromiseProperties(instance, overrideMap)
 
 				return map
 			end)
-				end)
-
 		end)
+	end)
 end
 
 function UIConverter:PromiseCanClone(instance)
@@ -111,14 +108,17 @@ function UIConverter:PromisePropertiesForClass(className: string)
 		return self._propertyPromisesForClass[className]
 	end
 
-	self._propertyPromisesForClass[className] = self._maid:GivePromise(self._apiDump:PromiseClass(className))
+	self._propertyPromisesForClass[className] = self._maid
+		:GivePromise(self._apiDump:PromiseClass(className))
 		:Then(function(class)
-		return class:PromiseProperties()
+			return class:PromiseProperties()
 		end)
 		:Then(function(allProperties)
-		local valid = {}
+			local valid = {}
 			for _, property in allProperties do
-				if not (property:IsHidden()
+				if
+					not (
+						property:IsHidden()
 						or property:IsReadOnly()
 						or property:IsNotScriptable()
 						or property:IsDeprecated()
@@ -127,9 +127,9 @@ function UIConverter:PromisePropertiesForClass(className: string)
 						or property:IsWriteLocalUserSecurity()
 						or property:IsReadLocalUserSecurity()
 						or property:IsWriteRobloxScriptSecurity()
-						or property:IsReadRobloxScriptSecurity())
-					then
-
+						or property:IsReadRobloxScriptSecurity()
+					)
+				then
 					table.insert(valid, property)
 				end
 			end
@@ -188,6 +188,5 @@ function UIConverter:PromiseDefaultValue(class, property, overrideMap)
 
 	return classCache[propertyName].default
 end
-
 
 return UIConverter

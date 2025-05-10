@@ -7,9 +7,9 @@ local require = require(script.Parent.loader).load(script)
 
 local GameConfigAssetBase = require("GameConfigAssetBase")
 local GameConfigTranslator = require("GameConfigTranslator")
+local JSONTranslator = require("JSONTranslator")
 local Rx = require("Rx")
-local _ServiceBag = require("ServiceBag")
-local _JSONTranslator = require("JSONTranslator")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigAssetClient = setmetatable({}, GameConfigAssetBase)
 GameConfigAssetClient.ClassName = "GameConfigAssetClient"
@@ -17,8 +17,8 @@ GameConfigAssetClient.__index = GameConfigAssetClient
 
 export type GameConfigAssetClient = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
-		_configTranslator: _JSONTranslator.JSONTranslator,
+		_serviceBag: ServiceBag.ServiceBag,
+		_configTranslator: JSONTranslator.JSONTranslator,
 	},
 	GameConfigAssetClient
 )) & GameConfigAssetBase.GameConfigAssetBase
@@ -29,7 +29,7 @@ export type GameConfigAssetClient = typeof(setmetatable(
 	@param serviceBag ServiceBag
 	@return GameConfigAssetClient
 ]=]
-function GameConfigAssetClient.new(folder: Folder, serviceBag: _ServiceBag.ServiceBag): GameConfigAssetClient
+function GameConfigAssetClient.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): GameConfigAssetClient
 	local self = setmetatable(GameConfigAssetBase.new(folder, serviceBag) :: any, GameConfigAssetClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -40,20 +40,21 @@ end
 
 function GameConfigAssetClient:_setupEntrySet(observeTranslationKey, observeTranslationValue)
 	self._maid:GiveTask(Rx.combineLatestDefer({
-		assetKey = self:ObserveAssetKey();
-		translationKey = observeTranslationKey;
-		text = observeTranslationValue;
+		assetKey = self:ObserveAssetKey(),
+		translationKey = observeTranslationKey,
+		text = observeTranslationValue,
 	}):Subscribe(function(state)
-			if type(state.translationKey) == "string"
-				and type(state.text) == "string"
-				and #state.text > 0
-				and state.assetKey then
+		if
+			type(state.translationKey) == "string"
+			and type(state.text) == "string"
+			and #state.text > 0
+			and state.assetKey
+		then
+			local context = string.format("GameConfigAsset.%s", state.assetKey)
+			local localeId = "en"
 
-				local context = string.format("GameConfigAsset.%s", state.assetKey)
-				local localeId = "en"
-
-				self._configTranslator:SetEntryValue(state.translationKey, state.text, context, localeId, state.text)
-			end
+			self._configTranslator:SetEntryValue(state.translationKey, state.text, context, localeId, state.text)
+		end
 	end))
 end
 

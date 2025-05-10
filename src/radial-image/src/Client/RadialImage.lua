@@ -6,9 +6,9 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
+local Maid = require("Maid")
 local Math = require("Math")
 local Observable = require("Observable")
-local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 
 local RadialImage = setmetatable({}, BaseObject)
@@ -166,17 +166,17 @@ end
 
 function RadialImage:_render()
 	return Blend.New "Frame" {
-		Name = "RadialImage";
-		Size = UDim2.new(1, 0, 1, 0);
-		BackgroundTransparency = 1;
-		[Blend.OnChange("AbsoluteSize")] = self._absoluteSize;
+		Name = "RadialImage",
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		[Blend.OnChange("AbsoluteSize")] = self._absoluteSize,
 
 		Blend.New "UIAspectRatioConstraint" {
-			AspectRatio = 1;
-		};
+			AspectRatio = 1,
+		},
 
 		Blend.New "Frame" {
-			Name = "LeftFrame";
+			Name = "LeftFrame",
 			Size = Blend.Computed(self._absoluteSize, function(size)
 				-- hack: ensures when we're 24.5 wide or something we don't end
 				-- up with a split in the middle.
@@ -187,16 +187,16 @@ function RadialImage:_render()
 				else
 					return UDim2.new(0.5, 0, 1, 0)
 				end
-			end);
-			Position = UDim2.new(0, 0, 0, 0);
-			BackgroundTransparency = 1;
-			ClipsDescendants = true;
+			end),
+			Position = UDim2.new(0, 0, 0, 0),
+			BackgroundTransparency = 1,
+			ClipsDescendants = true,
 
 			Blend.New "ImageLabel" {
-				Size = UDim2.new(2, 0, 1, 0);
-				BackgroundTransparency = 1;
-				ImageTransparency = self._transparency;
-				Image = self._image;
+				Size = UDim2.new(2, 0, 1, 0),
+				BackgroundTransparency = 1,
+				ImageTransparency = self._transparency,
+				Image = self._image,
 
 				Blend.New "UIGradient" {
 					Transparency = Blend.Computed(
@@ -204,45 +204,43 @@ function RadialImage:_render()
 						self._disabledTransparency,
 						function(enabled, disabled)
 							return NumberSequence.new({
-								NumberSequenceKeypoint.new(0, disabled);
-								NumberSequenceKeypoint.new(0.5, disabled);
-								NumberSequenceKeypoint.new(0.5001, enabled);
-								NumberSequenceKeypoint.new(1, enabled);
+								NumberSequenceKeypoint.new(0, disabled),
+								NumberSequenceKeypoint.new(0.5, disabled),
+								NumberSequenceKeypoint.new(0.5001, enabled),
+								NumberSequenceKeypoint.new(1, enabled),
 							})
-						end);
-					Color = Blend.Computed(
-						self._enabledColor,
-						self._disabledColor,
-						function(enabled, disabled)
-							return ColorSequence.new({
-								ColorSequenceKeypoint.new(0, disabled);
-								ColorSequenceKeypoint.new(0.5, disabled);
-								ColorSequenceKeypoint.new(0.5001, enabled);
-								ColorSequenceKeypoint.new(1, enabled);
-							})
-						end);
+						end
+					),
+					Color = Blend.Computed(self._enabledColor, self._disabledColor, function(enabled, disabled)
+						return ColorSequence.new({
+							ColorSequenceKeypoint.new(0, disabled),
+							ColorSequenceKeypoint.new(0.5, disabled),
+							ColorSequenceKeypoint.new(0.5001, enabled),
+							ColorSequenceKeypoint.new(1, enabled),
+						})
+					end),
 					Rotation = Blend.Computed(self._percent, function(percent)
 						local mapped = math.clamp(Math.map(percent, 0.5, 1, 0, 1), 0, 1)
-						return mapped*180
-					end);
-				};
-			};
-		};
+						return mapped * 180
+					end),
+				},
+			},
+		},
 
 		Blend.New "Frame" {
-			Name = "RightFrame";
-			Size = UDim2.new(0.5, 0, 1, 0);
-			Position = UDim2.new(0.5, 0, 0, 0);
-			BackgroundTransparency = 1;
-			ClipsDescendants = true;
+			Name = "RightFrame",
+			Size = UDim2.new(0.5, 0, 1, 0),
+			Position = UDim2.new(0.5, 0, 0, 0),
+			BackgroundTransparency = 1,
+			ClipsDescendants = true,
 
 			Blend.New "ImageLabel" {
-				Size = UDim2.new(2, 0, 1, 0);
-				AnchorPoint = Vector2.new(1, 0);
-				Position = UDim2.new(1, 0, 0, 0);
-				BackgroundTransparency = 1;
-				ImageTransparency = self._transparency;
-				Image = self._image;
+				Size = UDim2.new(2, 0, 1, 0),
+				AnchorPoint = Vector2.new(1, 0),
+				Position = UDim2.new(1, 0, 0, 0),
+				BackgroundTransparency = 1,
+				ImageTransparency = self._transparency,
+				Image = self._image,
 
 				Blend.New "UIGradient" {
 					Transparency = Blend.Computed(
@@ -250,30 +248,28 @@ function RadialImage:_render()
 						self._disabledTransparency,
 						function(enabled, disabled)
 							return NumberSequence.new({
-								NumberSequenceKeypoint.new(0, disabled);
-								NumberSequenceKeypoint.new(0.5, disabled);
-								NumberSequenceKeypoint.new(0.5001, enabled);
-								NumberSequenceKeypoint.new(1, enabled);
+								NumberSequenceKeypoint.new(0, disabled),
+								NumberSequenceKeypoint.new(0.5, disabled),
+								NumberSequenceKeypoint.new(0.5001, enabled),
+								NumberSequenceKeypoint.new(1, enabled),
 							})
-						end);
-					Color = Blend.Computed(
-						self._enabledColor,
-						self._disabledColor,
-						function(enabled, disabled)
-							return ColorSequence.new({
-								ColorSequenceKeypoint.new(0, disabled);
-								ColorSequenceKeypoint.new(0.5, disabled);
-								ColorSequenceKeypoint.new(0.5001, enabled);
-								ColorSequenceKeypoint.new(1, enabled);
-							})
-						end);
+						end
+					),
+					Color = Blend.Computed(self._enabledColor, self._disabledColor, function(enabled, disabled)
+						return ColorSequence.new({
+							ColorSequenceKeypoint.new(0, disabled),
+							ColorSequenceKeypoint.new(0.5, disabled),
+							ColorSequenceKeypoint.new(0.5001, enabled),
+							ColorSequenceKeypoint.new(1, enabled),
+						})
+					end),
 					Rotation = Blend.Computed(self._percent, function(percent)
 						local mapped = math.clamp(Math.map(percent, 0, 0.5, 0, 1), 0, 1)
-						return 180 + mapped*180
-					end);
-				};
-			};
-		};
+						return 180 + mapped * 180
+					end),
+				},
+			},
+		},
 	}
 end
 

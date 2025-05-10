@@ -20,10 +20,11 @@ local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
-local ValueObject = require("ValueObject")
+local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
+local ValueObject = require("ValueObject")
 
-local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
+local CFA_90X = CFrame.Angles(math.pi / 2, 0, 0)
 local USE_OLD_IK_SYSTEM = (not LimbIKUtils) or false
 local USE_MOTOR_6D_RAW = false
 
@@ -31,7 +32,7 @@ local ArmIKBase = setmetatable({}, BaseObject)
 ArmIKBase.ClassName = "ArmIKBase"
 ArmIKBase.__index = ArmIKBase
 
-function ArmIKBase.new(humanoid, armName, serviceBag)
+function ArmIKBase.new(humanoid: Humanoid, armName, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(), ArmIKBase)
 
 	self._humanoid = humanoid or error("No humanoid")
@@ -100,7 +101,7 @@ function ArmIKBase:_startUpdateLoop(character)
 	maid:GiveTask(self:_ensureAnimator(character, self._armName .. "LowerArm", self._armName .. "Elbow", function()
 		return self._elbowTransform
 	end))
-	maid:GiveTask(self:_ensureAnimator(character, self._armName .. "Hand", self._armName .."Wrist", function()
+	maid:GiveTask(self:_ensureAnimator(character, self._armName .. "Hand", self._armName .. "Wrist", function()
 		return self._wristTransform
 	end))
 
@@ -110,31 +111,33 @@ end
 function ArmIKBase:_ensureAnimator(character, partName, motorName, getTranform)
 	local topMaid = Maid.new()
 
-	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, partName, motorName):Pipe({
-		RxBrioUtils.switchMapBrio(function(motor)
-			return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
-		end);
-	}):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, partName, motorName)
+		:Pipe({
+			RxBrioUtils.switchMapBrio(function(motor)
+				return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
+			end),
+		})
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-		local maid, motor6DStack = brio:ToMaidAndValue()
+			local maid, motor6DStack = brio:ToMaidAndValue()
 
-		local transformer = Motor6DSmoothTransformer.new(getTranform)
-		transformer:SetTarget(1)
+			local transformer = Motor6DSmoothTransformer.new(getTranform)
+			transformer:SetTarget(1)
 
-		local cleanup = motor6DStack:Push(transformer)
+			local cleanup = motor6DStack:Push(transformer)
 
-		maid:GiveTask(function()
-			transformer:SetTarget(0)
+			maid:GiveTask(function()
+				transformer:SetTarget(0)
 
-			task.delay(2, function()
-				transformer:Destroy()
-				cleanup()
+				task.delay(2, function()
+					transformer:Destroy()
+					cleanup()
+				end)
 			end)
-		end)
-	end))
+		end))
 
 	return topMaid
 end
@@ -147,116 +150,155 @@ function ArmIKBase:_observeCharacterBrio()
 	self._characterObservable = RxInstanceUtils.observePropertyBrio(self._humanoid, "Parent", function(parent)
 		return parent ~= nil
 	end):Pipe({
-		Rx.shareReplay(1);
+		Rx.shareReplay(1),
 	})
 
 	return self._characterObservable
 end
 
-
 function ArmIKBase:_observeStateBrio()
 	return self:_observeCharacterBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(character)
-			local observeUpperTorsoBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", "UpperTorso"):Pipe({
-				Rx.shareReplay(1);
-			})
-			local observeUpperArmBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "UpperArm"):Pipe({
-				Rx.shareReplay(1);
-			})
-			local observeLowerArmBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "LowerArm"):Pipe({
-				Rx.shareReplay(1);
-			})
-			local observeHandBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "Hand"):Pipe({
-				Rx.shareReplay(1);
-			})
+			local observeUpperTorsoBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", "UpperTorso")
+				:Pipe({
+					Rx.shareReplay(1),
+				})
+			local observeUpperArmBrio =
+				RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "UpperArm"):Pipe({
+					Rx.shareReplay(1),
+				})
+			local observeLowerArmBrio =
+				RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "LowerArm"):Pipe({
+					Rx.shareReplay(1),
+				})
+			local observeHandBrio =
+				RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "Hand"):Pipe({
+					Rx.shareReplay(1),
+				})
 
 			local observeShoulderBrio = observeUpperArmBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(upperArm)
 					return RxInstanceUtils.observeLastNamedChildBrio(upperArm, "Motor6D", self._armName .. "Shoulder")
-				end);
-				Rx.shareReplay(1);
+				end),
+				Rx.shareReplay(1),
 			})
 			local observeElbowBrio = observeLowerArmBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(lowerArm)
 					return RxInstanceUtils.observeLastNamedChildBrio(lowerArm, "Motor6D", self._armName .. "Elbow")
-				end);
-				Rx.shareReplay(1);
+				end),
+				Rx.shareReplay(1),
 			})
 			local observeWristBrio = observeHandBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(hand)
 					return RxInstanceUtils.observeLastNamedChildBrio(hand, "Motor6D", self._armName .. "Wrist")
-				end);
-				Rx.shareReplay(1);
+				end),
+				Rx.shareReplay(1),
 			})
 
 			return RxBrioUtils.flatCombineLatest({
-				UpperTorso = observeUpperTorsoBrio;
-				UpperArm = observeUpperArmBrio;
-				LowerArm = observeLowerArmBrio;
-				Hand = observeHandBrio;
+				UpperTorso = observeUpperTorsoBrio,
+				UpperArm = observeUpperArmBrio,
+				LowerArm = observeLowerArmBrio,
+				Hand = observeHandBrio,
 
-				Shoulder = observeShoulderBrio;
-				Elbow = observeElbowBrio;
-				Wrist = observeWristBrio;
+				Shoulder = observeShoulderBrio,
+				Elbow = observeElbowBrio,
+				Wrist = observeWristBrio,
 
 				ShoulderMotor6DStack = observeShoulderBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
-					end);
-					Rx.defaultsToNil;
-				});
+						return Motor6DStackInterface:ObserveLastImplementationBrio(
+							motor,
+							self._tieRealmService:GetTieRealm()
+						)
+					end),
+					Rx.defaultsToNil,
+				}),
 				ElbowMotor6DStack = observeElbowBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
-					end);
-					Rx.defaultsToNil;
-				});
+						return Motor6DStackInterface:ObserveLastImplementationBrio(
+							motor,
+							self._tieRealmService:GetTieRealm()
+						)
+					end),
+					Rx.defaultsToNil,
+				}),
 				WristMotor6DStack = observeWristBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
-					end);
-					Rx.defaultsToNil;
-				});
+						return Motor6DStackInterface:ObserveLastImplementationBrio(
+							motor,
+							self._tieRealmService:GetTieRealm()
+						)
+					end),
+					Rx.defaultsToNil,
+				}),
 
 				UpperTorsoShoulderRigAttachment = observeUpperTorsoBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(upperTorso)
-						return RxInstanceUtils.observeLastNamedChildBrio(upperTorso, "Attachment", self._armName .. "ShoulderRigAttachment")
-					end)
-				});
+						return RxInstanceUtils.observeLastNamedChildBrio(
+							upperTorso,
+							"Attachment",
+							self._armName .. "ShoulderRigAttachment"
+						)
+					end),
+				}),
 				UpperArmShoulderRigAttachment = observeUpperArmBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(upperArm)
-						return RxInstanceUtils.observeLastNamedChildBrio(upperArm, "Attachment", self._armName .. "ShoulderRigAttachment")
-					end)
-				});
+						return RxInstanceUtils.observeLastNamedChildBrio(
+							upperArm,
+							"Attachment",
+							self._armName .. "ShoulderRigAttachment"
+						)
+					end),
+				}),
 				UpperArmElbowRigAttachment = observeUpperArmBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(upperArm)
-						return RxInstanceUtils.observeLastNamedChildBrio(upperArm, "Attachment", self._armName .. "ElbowRigAttachment")
-					end)
-				});
+						return RxInstanceUtils.observeLastNamedChildBrio(
+							upperArm,
+							"Attachment",
+							self._armName .. "ElbowRigAttachment"
+						)
+					end),
+				}),
 				LowerArmElbowRigAttachment = observeLowerArmBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(lowerArm)
-						return RxInstanceUtils.observeLastNamedChildBrio(lowerArm, "Attachment", self._armName .. "ElbowRigAttachment")
-					end)
-				});
+						return RxInstanceUtils.observeLastNamedChildBrio(
+							lowerArm,
+							"Attachment",
+							self._armName .. "ElbowRigAttachment"
+						)
+					end),
+				}),
 				LowerArmWristRigAttachment = observeLowerArmBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(lowerArm)
-						return RxInstanceUtils.observeLastNamedChildBrio(lowerArm, "Attachment", self._armName .. "WristRigAttachment")
-					end)
-				});
+						return RxInstanceUtils.observeLastNamedChildBrio(
+							lowerArm,
+							"Attachment",
+							self._armName .. "WristRigAttachment"
+						)
+					end),
+				}),
 				HandWristRigAttachment = observeHandBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(hand)
-						return RxInstanceUtils.observeLastNamedChildBrio(hand, "Attachment", self._armName .. "WristRigAttachment")
-					end)
-				});
+						return RxInstanceUtils.observeLastNamedChildBrio(
+							hand,
+							"Attachment",
+							self._armName .. "WristRigAttachment"
+						)
+					end),
+				}),
 				HandGripAttachment = observeHandBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(hand)
-						return RxInstanceUtils.observeLastNamedChildBrio(hand, "Attachment", self._armName .. "GripAttachment")
-					end)
-				});
+						return RxInstanceUtils.observeLastNamedChildBrio(
+							hand,
+							"Attachment",
+							self._armName .. "GripAttachment"
+						)
+					end),
+				}),
 			})
-		end);
-		Rx.throttleDefer();
-
+		end),
+		Rx.throttleDefer(),
 	})
 end
 
@@ -267,8 +309,8 @@ function ArmIKBase:Grip(attachment, priority)
 	priority = priority or IKAimPositionPriorites.DEFAULT
 
 	local gripData = {
-		attachment = attachment;
-		priority = priority;
+		attachment = attachment,
+		priority = priority,
 	}
 
 	local i = 1
@@ -347,7 +389,6 @@ else
 	end
 end
 
-
 if USE_OLD_IK_SYSTEM then
 	function ArmIKBase:Update()
 		if self:_oldUpdatePoint() then
@@ -412,13 +453,17 @@ function ArmIKBase:_newUpdate()
 	local handWristRigAttachment = self._lastState["HandWristRigAttachment"]
 	local handGripAttachment = self._lastState["HandGripAttachment"]
 
-	if not (upperTorsoShoulderRigAttachment
-		and upperArmShoulderRigAttachment
-		and upperArmElbowRigAttachment
-		and lowerArmElbowRigAttachment
-		and lowerArmWristRigAttachment
-		and handWristRigAttachment
-		and handGripAttachment) then
+	if
+		not (
+			upperTorsoShoulderRigAttachment
+			and upperArmShoulderRigAttachment
+			and upperArmElbowRigAttachment
+			and lowerArmElbowRigAttachment
+			and lowerArmWristRigAttachment
+			and handWristRigAttachment
+			and handGripAttachment
+		)
+	then
 		return false
 	end
 
@@ -432,7 +477,11 @@ function ArmIKBase:_newUpdate()
 
 	-- TODO: Allow configuration
 	local ELBOW_ANGLE = math.rad(20)
-	local shoulderQFrame, elbowQFrame, wristQFrame = LimbIKUtils.solveLimb(config, QFrame.fromCFrameClosestTo(relTargetCFrame, QFrame.new()), self._direction*ELBOW_ANGLE)
+	local shoulderQFrame, elbowQFrame, wristQFrame = LimbIKUtils.solveLimb(
+		config,
+		QFrame.fromCFrameClosestTo(relTargetCFrame, QFrame.new()),
+		self._direction * ELBOW_ANGLE
+	)
 
 	self._shoulderTransform = QFrame.toCFrame(shoulderQFrame)
 	self._elbowTransform = QFrame.toCFrame(elbowQFrame)
@@ -450,10 +499,7 @@ function ArmIKBase:_oldCalculatePoint(targetPositionWorld)
 	local elbow = self._lastState["Elbow"]
 	local wrist = self._lastState["Wrist"]
 	local gripAttachment = self._lastState["HandGripAttachment"]
-	if not (shoulder
-		and elbow
-		and wrist
-		and gripAttachment) then
+	if not (shoulder and elbow and wrist and gripAttachment) then
 		return false
 	end
 
@@ -489,8 +535,8 @@ function ArmIKBase:_oldCalculatePoint(targetPositionWorld)
 	end
 
 	elbowAngle = (elbowAngle - math.pi)
-	if elbowAngle > -math.pi/32 then -- Force a bit of bent elbow
-		elbowAngle = -math.pi/32
+	if elbowAngle > -math.pi / 32 then -- Force a bit of bent elbow
+		elbowAngle = -math.pi / 32
 	end
 
 	self._shoulderXAngle = -baseAngle
@@ -499,6 +545,5 @@ function ArmIKBase:_oldCalculatePoint(targetPositionWorld)
 
 	return true
 end
-
 
 return ArmIKBase

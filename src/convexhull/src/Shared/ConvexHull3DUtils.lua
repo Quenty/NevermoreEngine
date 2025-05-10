@@ -9,8 +9,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Queue = require("Queue")
 local Draw = require("Draw")
+local Queue = require("Queue")
 
 local ConvexHull3DUtils = {}
 

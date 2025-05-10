@@ -6,13 +6,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
 local BinderUtils = require("BinderUtils")
+local ValueObject = require("ValueObject")
 
 local BoundAncestorTracker = setmetatable({}, BaseObject)
 BoundAncestorTracker.ClassName = "BoundAncestorTracker"
 BoundAncestorTracker.__index = BoundAncestorTracker
-
 
 --[=[
 Constructs a new BoundAncestorTracker
@@ -27,7 +26,7 @@ function BoundAncestorTracker.new(binder, child)
 	self._child = child or error("No child")
 	self._binder = binder or error("No binder")
 
---[=[
+	--[=[
 	@prop Class ValueObject<T>
 	@readonly
 	@within BoundAncestorTracker

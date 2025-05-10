@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	General utility for raycasting
 	Author: Quenty, AxisAngle
@@ -8,6 +9,8 @@
 local Workspace = game:GetService("Workspace")
 
 local RaycastUtils = {}
+
+export type IgnoreFunction = (part: BasePart) -> boolean
 
 --[=[
 	What is the first exit along this line segment?
@@ -20,10 +23,10 @@ local RaycastUtils = {}
 	@param part BasePart
 	@return RaycastResult
 ]=]
-function RaycastUtils.raycastSingleExit(origin, direction, part)
+function RaycastUtils.raycastSingleExit(origin: Vector3, direction: Vector3, part: BasePart): RaycastResult?
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Include
-	params.FilterDescendantsInstances = {part}
+	params.FilterDescendantsInstances = { part }
 
 	local resultFinal = Workspace:Raycast(origin + direction, -direction, params)
 
@@ -36,7 +39,7 @@ end
 	@param part BasePart
 	@return boolean
 ]=]
-function RaycastUtils.ignoreCanCollideFalse(part)
+function RaycastUtils.ignoreCanCollideFalse(part: BasePart): boolean
 	return not part.CanCollide
 end
 
@@ -50,14 +53,16 @@ end
 	@param ignoreFunc callback
 	@param keepIgnoreListChanges boolean?
 	@param ignoreWater boolean?
-	@return RaycastResult
+	@return RaycastResult?
 ]=]
 function RaycastUtils.raycast(
-	origin, direction,
-	ignoreListWorkingEnvironment,
-	ignoreFunc, keepIgnoreListChanges,
-	ignoreWater
-)
+	origin: Vector3,
+	direction: Vector3,
+	ignoreListWorkingEnvironment: { Instance },
+	ignoreFunc: IgnoreFunction,
+	keepIgnoreListChanges: boolean?,
+	ignoreWater: boolean
+): RaycastResult?
 	local resultFinal
 	local initialIgnoreListLength = #ignoreListWorkingEnvironment
 

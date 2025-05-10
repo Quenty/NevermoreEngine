@@ -5,10 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
+local Brio = require("Brio")
+local Observable = require("Observable")
+local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxValueBaseUtils = {}
 
@@ -25,8 +26,8 @@ function RxValueBaseUtils.observeBrio(
 	parent: Instance,
 	className: string,
 	name: string,
-	predicate: ((any) -> boolean)?
-): _Observable.Observable<_Brio.Brio<any>>
+	predicate: Rx.Predicate<any>?
+): Observable.Observable<Brio.Brio<any>>
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(className) == "string", "Bad className")
 	assert(type(name) == "string", "Bad naem")
@@ -34,7 +35,7 @@ function RxValueBaseUtils.observeBrio(
 	return RxInstanceUtils.observeLastNamedChildBrio(parent, className, name):Pipe({
 		RxBrioUtils.switchMapBrio(RxValueBaseUtils.observeValue) :: any,
 		RxBrioUtils.onlyLastBrioSurvives() :: any,
-		if predicate then RxBrioUtils.where(predicate) else nil :: never,
+		if predicate then RxBrioUtils.where(predicate) :: any else nil :: never,
 	}) :: any
 end
 
@@ -52,7 +53,7 @@ function RxValueBaseUtils.observe(
 	className: string,
 	name: string,
 	defaultValue: any?
-): _Observable.Observable<any>
+): Observable.Observable<any>
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(className) == "string", "Bad className")
 	assert(type(name) == "string", "Bad name")
@@ -62,13 +63,12 @@ function RxValueBaseUtils.observe(
 	}) :: any
 end
 
-
 --[=[
 	Observables a given value object's value
 	@param valueObject Instance
 	@return Observable<T>
 ]=]
-function RxValueBaseUtils.observeValue(valueObject): _Observable.Observable<any>
+function RxValueBaseUtils.observeValue(valueObject: ValueBase): Observable.Observable<any>
 	assert(typeof(valueObject) == "Instance", "Bad valueObject")
 
 	return RxInstanceUtils.observeProperty(valueObject, "Value")

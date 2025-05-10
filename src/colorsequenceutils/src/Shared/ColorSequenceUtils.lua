@@ -54,7 +54,13 @@ end
 	@param percentOffset number
 	@return ColorSequence
 ]=]
-function ColorSequenceUtils.stripe(stripes: number, backgroundColor3: Color3, stripeColor3: Color3, percentStripeThickness: number, percentOffset: number): ColorSequence
+function ColorSequenceUtils.stripe(
+	stripes: number,
+	backgroundColor3: Color3,
+	stripeColor3: Color3,
+	percentStripeThickness: number,
+	percentOffset: number
+): ColorSequence
 	percentOffset = percentOffset or 0
 	percentStripeThickness = math.clamp(percentStripeThickness or 0.5, 0, 1)
 

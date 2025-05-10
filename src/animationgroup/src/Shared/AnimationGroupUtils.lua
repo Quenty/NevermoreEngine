@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	An animation group is a group of animations, such as the idle animations that Roblox plays.
 	This utility functions are intended to help recreate a custom animation playback system with
@@ -17,6 +18,10 @@ local AnimationGroupUtils = {}
 	.weight number
 	@within AnimationGroupUtils
 ]=]
+export type WeightedAnimation = {
+	animationId: string,
+	weight: number,
+}
 
 --[=[
 	@interface WeightedTrack
@@ -24,6 +29,10 @@ local AnimationGroupUtils = {}
 	.weight number
 	@within AnimationGroupUtils
 ]=]
+export type WeightedTrack = {
+	track: AnimationTrack,
+	weight: number,
+}
 
 --[=[
 	Creates a new weighted track list.
@@ -31,7 +40,10 @@ local AnimationGroupUtils = {}
 	@param weightedAnimationList { WeightedAnimation }
 	@return { WeightedTrack }
 ]=]
-function AnimationGroupUtils.createdWeightedTracks(animatorOrHumanoid, weightedAnimationList)
+function AnimationGroupUtils.createdWeightedTracks(
+	animatorOrHumanoid: Animator | Humanoid,
+	weightedAnimationList: { WeightedAnimation }
+): { WeightedTrack }
 	assert(animatorOrHumanoid, "Bad animatorOrHumanoid")
 	assert(weightedAnimationList, "Bad weightedAnimationList")
 
@@ -60,7 +72,7 @@ end
 	@param weight number
 	@return WeightedAnimation
 ]=]
-function AnimationGroupUtils.createdWeightedAnimation(animationId, weight)
+function AnimationGroupUtils.createdWeightedAnimation(animationId: string, weight: number): WeightedAnimation
 	assert(type(animationId) == "string", "Bad animationId")
 	assert(type(weight) == "number", "Bad weight")
 
@@ -73,11 +85,11 @@ end
 --[=[
 	Creates a new weighted track.
 
-	@param track Track
+	@param track AnimationTrack
 	@param weight number
 	@return WeightedTrack
 ]=]
-function AnimationGroupUtils.createdWeightedTrack(track, weight)
+function AnimationGroupUtils.createdWeightedTrack(track: AnimationTrack, weight: number): WeightedTrack
 	assert(typeof(track) == "Instance" and track:IsA("AnimationTrack"), "Bad track")
 	assert(type(weight) == "number", "Bad weight")
 
@@ -93,7 +105,7 @@ end
 	@param weightedTracks { WeightedTrack }
 	@return WeightedTrack?
 ]=]
-function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks)
+function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks: { WeightedTrack }): WeightedTrack?
 	assert(type(weightedTracks) == "table", "Bad weightedTracks")
 	assert(#weightedTracks > 0, "Bad weightedTracks")
 
@@ -112,7 +124,7 @@ function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks)
 
 	local total = 0
 	for _, option in weightedTracks do
-		local threshold = total + option.weight/totalWeight
+		local threshold = total + option.weight / totalWeight
 		total = total + threshold
 
 		if selection <= threshold then
@@ -120,7 +132,12 @@ function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks)
 		end
 	end
 
-	error(string.format("[AnimationGroupUtils.selectFromWeightedTracks] - Failed to find a selection with option at %d", selection))
+	error(
+		string.format(
+			"[AnimationGroupUtils.selectFromWeightedTracks] - Failed to find a selection with option at %d",
+			selection
+		)
+	)
 	return nil
 end
 

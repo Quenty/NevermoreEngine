@@ -4,12 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RogueModifierBase = require("RogueModifierBase")
 local Binder = require("Binder")
-local RxValueBaseUtils = require("RxValueBaseUtils")
+local RogueModifierBase = require("RogueModifierBase")
 local RogueModifierInterface = require("RogueModifierInterface")
+local RxValueBaseUtils = require("RxValueBaseUtils")
 
-local RogueSetter = setmetatable( {}, RogueModifierBase)
+local RogueSetter = setmetatable({}, RogueModifierBase)
 RogueSetter.ClassName = "RogueSetter"
 RogueSetter.__index = RogueSetter
 

@@ -450,7 +450,10 @@ end
 	@param className string
 	@return Observable<Instance>
 ]=]
-function RxInstanceUtils.observeDescendantsOfClassBrio(parent: Instance, className: string): Observable.Observable<Brio.Brio<Instance>>
+function RxInstanceUtils.observeDescendantsOfClassBrio(
+	parent: Instance,
+	className: string
+): Observable.Observable<Brio.Brio<Instance>>
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(className) == "string", "Bad className")
 

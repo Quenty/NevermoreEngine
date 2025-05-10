@@ -10,13 +10,13 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local BasicPane = require("BasicPane")
-local ValueObject = require("ValueObject")
-local Math = require("Math")
-local StepUtils = require("StepUtils")
-local Observable = require("Observable")
 local Maid = require("Maid")
+local Math = require("Math")
+local Observable = require("Observable")
 local Promise = require("Promise")
-local _Signal = require("Signal")
+local Signal = require("Signal")
+local StepUtils = require("StepUtils")
+local ValueObject = require("ValueObject")
 
 local TimedTween = setmetatable({}, BasicPane)
 TimedTween.ClassName = "TimedTween"
@@ -43,7 +43,7 @@ export type TimedTween = typeof(setmetatable(
 		-- From BasicPane
 		IsVisible: (self: TimedTween) -> boolean,
 		SetVisible: (self: TimedTween, isVisible: boolean, doNotAnimate: boolean?) -> (),
-		VisibleChanged: _Signal.Signal<boolean, boolean>,
+		VisibleChanged: Signal.Signal<boolean, boolean>,
 		Destroy: (self: TimedTween) -> (),
 	},
 	{} :: typeof({ __index = TimedTween })
@@ -228,21 +228,20 @@ function TimedTween._computeState(self: TimedTween, now: number): ComputedState
 		p = Math.map(math.clamp(now, state.t0, state.t1), state.t0, state.t1, state.p0, state.p1)
 	end
 
-	local rtime = math.abs(state.p1 - p)*duration
+	local rtime = math.abs(state.p1 - p) * duration
 
 	local v
 	if rtime > 0 and duration > 0 then
-		v = (state.p1 - state.p0)/duration
+		v = (state.p1 - state.p0) / duration
 	else
 		v = 0
 	end
 
 	return {
-		p = p;
-		v = v;
-		rtime = rtime;
+		p = p,
+		v = v,
+		rtime = rtime,
 	}
 end
-
 
 return TimedTween

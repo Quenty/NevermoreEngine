@@ -186,19 +186,18 @@ end
 	@return Promise<number>
 ]=]
 function FriendUtils.promiseCurrentStudioUserId(): Promise.Promise<number>
-	return FriendUtils.promiseStudioServiceUserId()
-		:Catch(function(...)
-			warn(...)
+	return FriendUtils.promiseStudioServiceUserId():Catch(function(...)
+		warn(...)
 
-			-- this is in team create!
-			local player = Players:FindFirstChildWhichIsA("Player")
-			if player then
-				return player.UserId
-			end
+		-- this is in team create!
+		local player = Players:FindFirstChildWhichIsA("Player")
+		if player then
+			return player.UserId
+		end
 
-			-- default to Quenty
-			return 4397833
-		end)
+		-- default to Quenty
+		return 4397833
+	end)
 end
 
 return FriendUtils

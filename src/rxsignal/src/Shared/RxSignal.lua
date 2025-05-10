@@ -5,9 +5,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Rx = require("Rx")
 local Observable = require("Observable")
-local _Subscription = require("Subscription")
+local Rx = require("Rx")
+local Subscription = require("Subscription")
 
 local RxSignal = {}
 RxSignal.ClassName = "RxSignal"
@@ -39,7 +39,7 @@ end
 --[=[
 	Connects to the signal and returns a subscription
 ]=]
-function RxSignal.Connect<T...>(self: RxSignal<T...>, callback: (T...) -> ()): _Subscription.Subscription<T...>
+function RxSignal.Connect<T...>(self: RxSignal<T...>, callback: (T...) -> ()): Subscription.Subscription<T...>
 	return self:_getObservable():Subscribe(callback)
 end
 
@@ -49,7 +49,7 @@ end
 function RxSignal.Wait<T...>(self: RxSignal<T...>): T...
 	local waitingCoroutine = coroutine.running()
 
-	local subscription: _Subscription.Subscription<T...>
+	local subscription: Subscription.Subscription<T...>
 	subscription = self:Connect(function(...)
 		subscription:Disconnect()
 		task.spawn(waitingCoroutine, ...)
@@ -61,7 +61,7 @@ end
 --[=[
 	Connects once to the signal and returns a subscription
 ]=]
-function RxSignal.Once<T...>(self: RxSignal<T...>, callback: (T...) -> ()): _Subscription.Subscription<T...>
+function RxSignal.Once<T...>(self: RxSignal<T...>, callback: (T...) -> ()): Subscription.Subscription<T...>
 	return self:_getObservable()
 		:Pipe({
 			Rx.take(1) :: any,

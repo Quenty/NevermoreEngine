@@ -40,13 +40,13 @@ local AccelTween = require("AccelTween")
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local RectUtils = require("RectUtils")
 local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
+local Signal = require("Signal")
 local StepUtils = require("StepUtils")
 local ValueObject = require("ValueObject")
-local RectUtils = require("RectUtils")
-local RxInstanceUtils = require("RxInstanceUtils")
-local _Observable = require("Observable")
-local _Signal = require("Signal")
 
 local ButtonHighlightModel = setmetatable({}, BaseObject)
 ButtonHighlightModel.ClassName = "ButtonHighlightModel"
@@ -86,35 +86,35 @@ export type ButtonHighlightModel = typeof(setmetatable(
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		InteractionEnabledChanged: _Signal.Signal<boolean>,
+		InteractionEnabledChanged: Signal.Signal<boolean>,
 
 		--[=[
 			@prop IsSelectedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsSelectedChanged: _Signal.Signal<boolean>,
+		IsSelectedChanged: Signal.Signal<boolean>,
 
 		--[=[
 			@prop IsMouseOrTouchOverChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsMouseOrTouchOverChanged: _Signal.Signal<boolean>,
+		IsMouseOrTouchOverChanged: Signal.Signal<boolean>,
 
 		--[=[
 			@prop IsHighlightedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsHighlightedChanged: _Signal.Signal<boolean>,
+		IsHighlightedChanged: Signal.Signal<boolean>,
 
 		--[=[
 			@prop IsPressedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsPressedChanged: _Signal.Signal<boolean>,
+		IsPressedChanged: Signal.Signal<boolean>,
 	},
 	{} :: typeof({ __index = ButtonHighlightModel })
 )) & BaseObject.BaseObject
@@ -281,7 +281,6 @@ function ButtonHighlightModel._trackIfButtonMovedOutFromMouse(
 		end
 	end))
 
-	-- stylua: ignore
 	maid:GiveTask(Rx.combineLatest({
 		mousePosition = self._lastMousePositionForScrollingCheck:Observe(),
 		absolutePosition = RxInstanceUtils.observeProperty(button, "AbsolutePosition"),
@@ -326,7 +325,7 @@ end
 	Observes if the button is pressed
 	@return Observable<boolean>
 ]=]
-function ButtonHighlightModel.ObserveIsPressed(self: ButtonHighlightModel): _Observable.Observable<boolean>
+function ButtonHighlightModel.ObserveIsPressed(self: ButtonHighlightModel): Observable.Observable<boolean>
 	return self._isPressed:Observe()
 end
 
@@ -339,7 +338,7 @@ end
 function ButtonHighlightModel.ObservePercentPressed(
 	self: ButtonHighlightModel,
 	acceleration: number?
-): _Observable.Observable<number>
+): Observable.Observable<number>
 	return Blend.AccelTween(
 		Blend.toPropertyObservable(self._isPressed):Pipe({
 			Rx.map(function(value)
@@ -354,7 +353,7 @@ end
 	Observes target for how pressed the button is
 	@return Observable<number>
 ]=]
-function ButtonHighlightModel.ObservePercentPressedTarget(self: ButtonHighlightModel): _Observable.Observable<number>
+function ButtonHighlightModel.ObservePercentPressedTarget(self: ButtonHighlightModel): Observable.Observable<number>
 	return self._isPressed:Observe():Pipe({
 		Rx.map(function(value)
 			return value and 1 or 0
@@ -376,7 +375,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function ButtonHighlightModel.ObserveIsHighlighted(self: ButtonHighlightModel): _Observable.Observable<boolean>
+function ButtonHighlightModel.ObserveIsHighlighted(self: ButtonHighlightModel): Observable.Observable<boolean>
 	return self._isHighlighted:Observe()
 end
 
@@ -384,9 +383,7 @@ end
 	Observes target for how highlighted the button is
 	@return Observable<number>
 ]=]
-function ButtonHighlightModel.ObservePercentHighlightedTarget(
-	self: ButtonHighlightModel
-): _Observable.Observable<number>
+function ButtonHighlightModel.ObservePercentHighlightedTarget(self: ButtonHighlightModel): Observable.Observable<number>
 	return self._isHighlighted:Observe():Pipe({
 		Rx.map(function(value: boolean): number
 			return value and 1 or 0
@@ -403,7 +400,7 @@ end
 function ButtonHighlightModel.ObservePercentHighlighted(
 	self: ButtonHighlightModel,
 	acceleration: number?
-): _Observable.Observable<boolean>
+): Observable.Observable<boolean>
 	return Blend.AccelTween(self:ObservePercentHighlightedTarget(), acceleration or 200)
 end
 
@@ -421,7 +418,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function ButtonHighlightModel.ObserveIsSelected(self: ButtonHighlightModel): _Observable.Observable<boolean>
+function ButtonHighlightModel.ObserveIsSelected(self: ButtonHighlightModel): Observable.Observable<boolean>
 	return self._isSelected:Observe()
 end
 
@@ -441,7 +438,7 @@ end
 
 	@return Observable<boolean>
 ]=]
-function ButtonHighlightModel.ObserveIsMouseOrTouchOver(self: ButtonHighlightModel): _Observable.Observable<boolean>
+function ButtonHighlightModel.ObserveIsMouseOrTouchOver(self: ButtonHighlightModel): Observable.Observable<boolean>
 	return self._isMouseOrTouchOver:Observe()
 end
 
@@ -470,7 +467,7 @@ end
 
 	@return boolean
 ]=]
-function ButtonHighlightModel.ObserveIsChoosen(self: ButtonHighlightModel): _Observable.Observable<boolean>
+function ButtonHighlightModel.ObserveIsChoosen(self: ButtonHighlightModel): Observable.Observable<boolean>
 	return self._isChoosen:Observe()
 end
 
@@ -478,7 +475,7 @@ end
 	Observes target for if the button is selected or not
 	@return Observable<number>
 ]=]
-function ButtonHighlightModel.ObservePercentChoosenTarget(self: ButtonHighlightModel): _Observable.Observable<number>
+function ButtonHighlightModel.ObservePercentChoosenTarget(self: ButtonHighlightModel): Observable.Observable<number>
 	return self._isChoosen:Observe():Pipe({
 		Rx.map(function(value)
 			return value and 1 or 0
@@ -495,7 +492,7 @@ end
 function ButtonHighlightModel.ObservePercentChoosen(
 	self: ButtonHighlightModel,
 	acceleration: number?
-): _Observable.Observable<number>
+): Observable.Observable<number>
 	-- stylua: ignore
 	return Blend.AccelTween(
 		self._isChoosen:Observe():Pipe({
@@ -527,7 +524,7 @@ end
 	Observes if interaction enabled
 	@return Observable<boolean>
 ]=]
-function ButtonHighlightModel.ObserveIsInteractionEnabled(self: ButtonHighlightModel): _Observable.Observable<boolean>
+function ButtonHighlightModel.ObserveIsInteractionEnabled(self: ButtonHighlightModel): Observable.Observable<boolean>
 	return self._interactionEnabled:Observe()
 end
 

@@ -8,9 +8,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
 local DuckTypeUtils = require("DuckTypeUtils")
-local _InputModeType = require("InputModeType")
+local InputModeType = require("InputModeType")
+local Signal = require("Signal")
 
 --[=[
 	Fires off when the mode is enabled
@@ -30,7 +30,7 @@ InputMode.ClassName = "InputMode"
 
 export type InputMode = typeof(setmetatable(
 	{} :: {
-		_inputModeType: _InputModeType.InputModeType,
+		_inputModeType: InputModeType.InputModeType,
 		_lastEnabled: number,
 		Enabled: Signal.Signal<()>,
 	},
@@ -43,7 +43,7 @@ export type InputMode = typeof(setmetatable(
 	@param inputModeType InputModeType
 	@return InputMode
 ]=]
-function InputMode.new(inputModeType: _InputModeType.InputModeType): InputMode
+function InputMode.new(inputModeType: InputModeType.InputModeType): InputMode
 	local self = setmetatable({}, InputMode)
 
 	self._inputModeType = assert(inputModeType, "Bad inputModeType")
@@ -86,7 +86,7 @@ end
 	@param inputType { UserInputType | KeyCode | string }
 	@return boolean
 ]=]
-function InputMode.IsValid(self: InputMode, inputType: _InputModeType.InputModeKey): boolean
+function InputMode.IsValid(self: InputMode, inputType: InputModeType.InputModeKey): boolean
 	assert(inputType, "Must send in inputType")
 
 	return self._inputModeType:IsValid(inputType)

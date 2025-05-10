@@ -39,7 +39,8 @@ function GenerateWithMixin._generateWith(class, resources)
 		local storeName = String.toPrivateCase(resourceName)
 
 		class[string.format("With%s", resourceName)] = function(self, resource)
-			self[storeName] = resource or error(string.format("Failed to set '%s', %s", resourceName, tostring(resource)))
+			self[storeName] = resource
+				or error(string.format("Failed to set '%s', %s", resourceName, tostring(resource)))
 			self[resourceName] = resource -- inject publically too, for now
 			return self
 		end

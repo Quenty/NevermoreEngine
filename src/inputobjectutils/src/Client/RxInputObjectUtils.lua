@@ -7,9 +7,9 @@ local require = require(script.Parent.loader).load(script)
 
 local UserInputService = game:GetService("UserInputService")
 
+local InputObjectUtils = require("InputObjectUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
-local InputObjectUtils = require("InputObjectUtils")
 
 local RxInputObjectUtils = {}
 

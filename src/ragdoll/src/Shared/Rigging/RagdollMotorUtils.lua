@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local CharacterUtils = require("CharacterUtils")
 local EnumUtils = require("EnumUtils")
@@ -461,7 +461,7 @@ function RagdollMotorUtils.promiseVelocityRecordings(character: Model, rigType: 
 				local x, y, z = change:ToEulerAnglesXYZ()
 
 				local vector = newRootPartCFrame:VectorToWorldSpace(Vector3.new(x, y, z))
-				result.rotation[data] = vector/dt
+				result.rotation[data] = vector / dt
 			end
 		end
 

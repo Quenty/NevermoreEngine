@@ -5,12 +5,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local PlayerSettingsUtils = require("PlayerSettingsUtils")
-local PlayerSettings = require("PlayerSettings")
-local PlayerDataStoreService = require("PlayerDataStoreService")
 local DataStoreStringUtils = require("DataStoreStringUtils")
-local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local PlayerBinder = require("PlayerBinder")
+local PlayerDataStoreService = require("PlayerDataStoreService")
+local PlayerSettings = require("PlayerSettings")
+local PlayerSettingsConstants = require("PlayerSettingsConstants")
+local PlayerSettingsUtils = require("PlayerSettingsUtils")
+local ServiceBag = require("ServiceBag")
 
 local PlayerHasSettings = setmetatable({}, BaseObject)
 PlayerHasSettings.ClassName = "PlayerHasSettings"
@@ -18,7 +19,7 @@ PlayerHasSettings.__index = PlayerHasSettings
 
 export type PlayerHasSettings = typeof(setmetatable(
 	{} :: {
-		_serviceBag: any,
+		_serviceBag: ServiceBag.ServiceBag,
 		_playerSettingsBinder: PlayerSettings.PlayerSettings,
 		_playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService,
 	},
@@ -40,24 +41,24 @@ end
 function PlayerHasSettings:_promiseLoadSettings()
 	self._settings = self._maid:Add(PlayerSettingsUtils.create())
 
-	self._maid:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj))
+	self._maid
+		:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj))
 		:Then(function(dataStore)
 			-- Ensure we've fully loaded before we parent.
 			-- This should ensure the cache is mostly instant.
 
 			local subStore = dataStore:GetSubStore("settings")
 
-			return dataStore:Load("settings", {})
-				:Then(function(settings)
-					for settingName, value in settings do
-						local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
-						self._settings:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(value))
-					end
+			return dataStore:Load("settings", {}):Then(function(settings)
+				for settingName, value in settings do
+					local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
+					self._settings:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(value))
+				end
 
-					self._maid:GiveTask(self._settings.AttributeChanged:Connect(function(attributeName)
-						self:_handleAttributeChanged(subStore, attributeName)
-					end))
-				end)
+				self._maid:GiveTask(self._settings.AttributeChanged:Connect(function(attributeName)
+					self:_handleAttributeChanged(subStore, attributeName)
+				end))
+			end)
 		end)
 		:Catch(function(err)
 			warn(string.format("[PlayerHasSettings] - Failed to load settings for player. %s", tostring(err)))
@@ -84,7 +85,9 @@ function PlayerHasSettings:_handleAttributeChanged(subStore, attributeName)
 
 	if type(newValue) == "string" then
 		if (#settingName + #newValue) > PlayerSettingsConstants.MAX_SETTINGS_LENGTH then
-			warn(string.format("[PlayerSettingsClient.SetValue] - Setting is too long for %q. Cannot save.", settingName))
+			warn(
+				string.format("[PlayerSettingsClient.SetValue] - Setting is too long for %q. Cannot save.", settingName)
+			)
 			return
 		end
 		-- TODO: JSON encode and check length for ther scenarios

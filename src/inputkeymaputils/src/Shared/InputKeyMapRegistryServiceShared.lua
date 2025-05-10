@@ -12,14 +12,14 @@ local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local ObservableList = require("ObservableList")
-local RxBrioUtils = require("RxBrioUtils")
 local Rx = require("Rx")
-local _ServiceBag = require("ServiceBag")
+local RxBrioUtils = require("RxBrioUtils")
+local ServiceBag = require("ServiceBag")
 
 local InputKeyMapRegistryServiceShared = {}
 InputKeyMapRegistryServiceShared.ServiceName = "InputKeyMapRegistryServiceShared"
 
-function InputKeyMapRegistryServiceShared:Init(serviceBag: _ServiceBag.ServiceBag)
+function InputKeyMapRegistryServiceShared:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -134,6 +134,5 @@ end
 function InputKeyMapRegistryServiceShared:Destroy()
 	self._maid:DoCleaning()
 end
-
 
 return InputKeyMapRegistryServiceShared

@@ -22,10 +22,10 @@
 	@class Draw
 ]=]
 
-local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
+local Workspace = game:GetService("Workspace")
 
 local Terrain = Workspace.Terrain
 

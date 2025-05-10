@@ -5,12 +5,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Observable = require("Observable")
-local Maid = require("Maid")
-local Rx = require("Rx")
 local BasicPane = require("BasicPane")
 local Brio = require("Brio")
-local _Subscription = require("Subscription")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local Subscription = require("Subscription")
 
 local BasicPaneUtils = {}
 
@@ -61,7 +61,7 @@ export type CreateBasicPane = (maid: Maid.Maid) -> BasicPane.BasicPane
 ]=]
 function BasicPaneUtils.whenVisibleBrio(createBasicPane: CreateBasicPane) --: Observable.Transformer<(boolean), (Brio.Brio<GuiBase>)>
 	return function(source: Observable.Observable<boolean>): Observable.Observable<Brio.Brio<GuiBase>>
-		return Observable.new(function(sub: _Subscription.Subscription<Brio.Brio<GuiBase>>)
+		return Observable.new(function(sub: Subscription.Subscription<Brio.Brio<GuiBase>>)
 			local maid = Maid.new()
 			local currentPane: BasicPane.BasicPane? = nil
 

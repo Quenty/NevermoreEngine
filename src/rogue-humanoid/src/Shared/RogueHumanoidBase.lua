@@ -16,10 +16,10 @@ local RxRootPartUtils = require("RxRootPartUtils")
 local ValueObject = require("ValueObject")
 
 local GROWTH_VALUE_NAMES = {
-	"HeadScale";
-	"BodyDepthScale";
-	"BodyHeightScale";
-	"BodyWidthScale";
+	"HeadScale",
+	"BodyDepthScale",
+	"BodyHeightScale",
+	"BodyWidthScale",
 }
 
 type ScaleState = {
@@ -162,11 +162,9 @@ function RogueHumanoidBase:_updateScaleValue(numberValue: NumberValue, state: Sc
 	local max = state.maxSize
 	local min = state.minSize
 
-	local multiplier = min
-		+ (math.exp(r*t)*(-min + max))/(math.exp(r*t)
-		+ (-i + max)/(i - min))
+	local multiplier = min + (math.exp(r * t) * (-min + max)) / (math.exp(r * t) + (-i + max) / (i - min))
 
-	numberValue.Value = initialValue*multiplier
+	numberValue.Value = initialValue * multiplier
 end
 
 return RogueHumanoidBase

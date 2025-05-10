@@ -16,13 +16,13 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
 local Set = require("Set")
-local _Table = require("Table")
+local Table = require("Table")
 
 local RoguePropertyTableDefinition = {} -- Inherits from RoguePropertyDefinition
 RoguePropertyTableDefinition.ClassName = "RoguePropertyTableDefinition"
 RoguePropertyTableDefinition.__index = RoguePropertyTableDefinition
 
-function RoguePropertyTableDefinition.new(tableName: string?, defaultValueTable: _Table.Map<string, any>?)
+function RoguePropertyTableDefinition.new(tableName: string?, defaultValueTable: Table.Map<string, any>?)
 	local self = setmetatable(RoguePropertyDefinition.new(), RoguePropertyTableDefinition)
 
 	if tableName then
@@ -40,7 +40,7 @@ function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value): boo
 	return DuckTypeUtils.isImplementation(RoguePropertyTableDefinition, value)
 end
 
-function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable: _Table.Map<string, any>?)
+function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable: Table.Map<string, any>?)
 	assert(type(defaultValueTable) == "table", "Bad defaultValueTable")
 
 	RoguePropertyDefinition.SetDefaultValue(self, defaultValueTable)
@@ -196,7 +196,7 @@ end
 	@param adornee Instance
 	@return RoguePropertyTable
 ]=]
-function RoguePropertyTableDefinition:Get(serviceBag, adornee: Instance)
+function RoguePropertyTableDefinition:Get(serviceBag: ServiceBag.ServiceBag, adornee: Instance)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 

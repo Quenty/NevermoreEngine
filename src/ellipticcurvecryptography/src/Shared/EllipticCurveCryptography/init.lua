@@ -32,18 +32,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]]
 
-local util = require(script.util)
-local sha256 = require(script.sha256)
 local chacha20 = require(script.chacha20)
-local random = require(script.random)
-local modq = require(script.modq)
 local curve = require(script.curve)
+local modq = require(script.modq)
+local random = require(script.random)
+local sha256 = require(script.sha256)
+local util = require(script.util)
 local EllipticCurveCryptography = {}
 
-EllipticCurveCryptography.chacha20 = chacha20;
-EllipticCurveCryptography.sha256 = sha256;
-EllipticCurveCryptography.random = random;
-EllipticCurveCryptography._byteMetatable = assert(util.byteTableMT, "No byteTable");
+EllipticCurveCryptography.chacha20 = chacha20
+EllipticCurveCryptography.sha256 = sha256
+EllipticCurveCryptography.random = random
+EllipticCurveCryptography._byteMetatable = assert(util.byteTableMT, "No byteTable")
 
 --[=[
 	Returns true if it's an ByteTable

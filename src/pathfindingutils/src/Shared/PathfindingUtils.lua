@@ -6,9 +6,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Draw = require("Draw")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local PathfindingUtils = {}
 

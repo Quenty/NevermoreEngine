@@ -9,9 +9,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local String = require("String")
 local TieRealmUtils = require("TieRealmUtils")
 local TieRealms = require("TieRealms")
-local String = require("String")
 
 local TieImplementation = setmetatable({}, BaseObject)
 TieImplementation.ClassName = "TieImplementation"
@@ -25,7 +25,12 @@ TieImplementation.__index = TieImplementation
 	@param implementer table
 	@param implementationTieRealm TieRealm
 ]=]
-function TieImplementation.new(tieDefinition, adornee: Instance, implementer, implementationTieRealm: TieRealms.TieRealm)
+function TieImplementation.new(
+	tieDefinition,
+	adornee: Instance,
+	implementer,
+	implementationTieRealm: TieRealms.TieRealm
+)
 	assert(TieRealmUtils.isTieRealm(implementationTieRealm), "Bad implementationTieRealm")
 
 	local self = setmetatable(BaseObject.new(), TieImplementation)

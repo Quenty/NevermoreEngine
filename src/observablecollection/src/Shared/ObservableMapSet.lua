@@ -8,15 +8,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
 local ObservableSet = require("ObservableSet")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
-local _Brio = require("Brio")
-local _Signal = require("Signal")
-local _Table = require("Table")
+local Signal = require("Signal")
+local Table = require("Table")
 
 local ObservableMapSet = {}
 ObservableMapSet.ClassName = "ObservableMapSet"
@@ -26,9 +26,9 @@ export type ObservableMapSet<TKey, TValue> = typeof(setmetatable(
 	{} :: {
 		_observableMapOfSets: any, -- ObservableMap.ObservableMap<TKey, ObservableSet.ObservableSet<TValue>>,
 		_maid: Maid.Maid,
-		SetAdded: _Signal.Signal<TKey>,
-		SetRemoved: _Signal.Signal<TKey>,
-		CountChanged: _Signal.Signal<number>,
+		SetAdded: Signal.Signal<TKey>,
+		SetRemoved: Signal.Signal<TKey>,
+		CountChanged: Signal.Signal<number>,
 	},
 	{} :: typeof({ __index = ObservableMapSet })
 ))
@@ -165,7 +165,7 @@ end
 	Observes all keys in the map
 	@return Observable<Brio<TKey>>
 ]=]
-function ObservableMapSet.ObserveKeysBrio<TKey, TValue>(self: ObservableMapSet<TKey, TValue>): Observable.Observable<_Brio.Brio<TKey>>
+function ObservableMapSet.ObserveKeysBrio<TKey, TValue>(self: ObservableMapSet<TKey, TValue>): Observable.Observable<Brio.Brio<TKey>>
 	return self._observableMapOfSets:ObserveKeysBrio()
 end
 
@@ -195,7 +195,7 @@ end
 function ObservableMapSet.ObserveItemsForKeyBrio<TKey, TValue>(
 	self: ObservableMapSet<TKey, TValue>,
 	key: TKey
-): Observable.Observable<_Brio.Brio<TValue>>
+): Observable.Observable<Brio.Brio<TValue>>
 	assert(key ~= nil, "Bad key")
 
 	return self._observableMapOfSets:ObserveAtKeyBrio(key):Pipe({
@@ -230,7 +230,7 @@ end
 	@param key TKey
 	@return { TValue }
 ]=]
-function ObservableMapSet.GetListForKey<TKey, TValue>(self: ObservableMapSet<TKey, TValue>, key: TKey): _Table.Array<TValue>
+function ObservableMapSet.GetListForKey<TKey, TValue>(self: ObservableMapSet<TKey, TValue>, key: TKey): Table.Array<TValue>
 	assert(key ~= nil, "Bad key")
 
 	local observableSet = self:GetObservableSetForKey(key)
@@ -265,7 +265,7 @@ function ObservableMapSet.ObserveSetBrio<TKey, TValue>(
 	self: ObservableMapSet<TKey, TValue>,
 	key: TKey
 ): Observable.Observable<
-	_Brio.Brio<ObservableSet.ObservableSet<TValue>>
+	Brio.Brio<ObservableSet.ObservableSet<TValue>>
 >
 	assert(key ~= nil, "Bad key")
 

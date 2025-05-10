@@ -6,7 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Flipbook = require("Flipbook")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local FlipbookLibrary = {}
 FlipbookLibrary.__index = FlipbookLibrary
@@ -24,7 +24,7 @@ function FlipbookLibrary.new(serviceName, register)
 	return self
 end
 
-function FlipbookLibrary:Init(serviceBag: _ServiceBag.ServiceBag)
+function FlipbookLibrary:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(self ~= FlipbookLibrary, "Should construct new FlipbookLibrary")
 	assert(not self._spritesheets, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")

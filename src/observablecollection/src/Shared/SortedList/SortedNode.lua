@@ -7,11 +7,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ListIndexUtils = require("ListIndexUtils")
 local DuckTypeUtils = require("DuckTypeUtils")
-local Table = require("Table")
+local ListIndexUtils = require("ListIndexUtils")
+local SortFunctionUtils = require("SortFunctionUtils")
 local SortedNodeValue = require("SortedNodeValue")
-local _SortFunctionUtils = require("SortFunctionUtils")
+local Table = require("Table")
 
 local DEBUG_ASSERTION_SLOW = false
 
@@ -60,7 +60,7 @@ function SortedNode.isSortedNode(value: any): boolean
 	return DuckTypeUtils.isImplementation(SortedNode, value)
 end
 
-function SortedNode.IterateNodes<T>(self: SortedNode<T>): _SortFunctionUtils.WrappedIterator<number, SortedNode<T>>
+function SortedNode.IterateNodes<T>(self: SortedNode<T>): SortFunctionUtils.WrappedIterator<number, SortedNode<T>>
 	return coroutine.wrap(function()
 		local stack: { SortedNode<T> } = {}
 		local current: any? = self
@@ -81,7 +81,7 @@ function SortedNode.IterateNodes<T>(self: SortedNode<T>): _SortFunctionUtils.Wra
 	end) :: any
 end
 
-function SortedNode.IterateData<T>(self: SortedNode<T>): _SortFunctionUtils.WrappedIterator<number, T>
+function SortedNode.IterateData<T>(self: SortedNode<T>): SortFunctionUtils.WrappedIterator<number, T>
 	return coroutine.wrap(function()
 		local stack: { SortedNode<T> } = {}
 		local current: any = self
@@ -114,7 +114,7 @@ function SortedNode.IterateNodesRange<T>(
 	self: SortedNode<T>,
 	start: number,
 	finish: number?
-): _SortFunctionUtils.WrappedIterator<number, SortedNode<T>>
+): SortFunctionUtils.WrappedIterator<number, SortedNode<T>>
 	assert(type(start) == "number", "Bad start")
 	assert(type(finish) == "number" or finish == nil, "Bad finish")
 	assert(self.parent == nil, "Should only be called on root")

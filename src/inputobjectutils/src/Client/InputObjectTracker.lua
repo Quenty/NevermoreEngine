@@ -31,16 +31,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 
 local BaseObject = require("BaseObject")
-local InputObjectUtils = require("InputObjectUtils")
 local InputObjectRayUtils = require("InputObjectRayUtils")
+local InputObjectUtils = require("InputObjectUtils")
+local Observable = require("Observable")
 local RxInputObjectUtils = require("RxInputObjectUtils")
 local RxSignal = require("RxSignal")
-local _Maid = require("Maid")
-local _Observable = require("Observable")
 
 local InputObjectTracker = setmetatable({}, BaseObject)
 InputObjectTracker.ClassName = "InputObjectTracker"
@@ -108,7 +107,7 @@ end
 
 	@return Observable
 ]=]
-function InputObjectTracker.ObserveInputEnded(self: InputObjectTracker): _Observable.Observable<()>
+function InputObjectTracker.ObserveInputEnded(self: InputObjectTracker): Observable.Observable<()>
 	return RxInputObjectUtils.observeInputObjectEnded(self._initialInputObject)
 end
 

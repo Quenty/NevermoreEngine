@@ -6,14 +6,14 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Brio = require("Brio")
+local ChatTagDataUtils = require("ChatTagDataUtils")
+local HasChatTagsConstants = require("HasChatTagsConstants")
+local Observable = require("Observable")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ValueObject = require("ValueObject")
-local HasChatTagsConstants = require("HasChatTagsConstants")
-local _ChatTagDataUtils = require("ChatTagDataUtils")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
 
 local HasChatTagsBase = setmetatable({}, BaseObject)
 HasChatTagsBase.ClassName = "HasChatTagsBase"
@@ -22,7 +22,7 @@ HasChatTagsBase.__index = HasChatTagsBase
 export type HasChatTagsBase = typeof(setmetatable(
 	{} :: {
 		_obj: Player,
-		_lastChatTags: ValueObject.ValueObject<{ _ChatTagDataUtils.ChatTagData }?>,
+		_lastChatTags: ValueObject.ValueObject<{ ChatTagDataUtils.ChatTagData }?>,
 	},
 	{} :: typeof({ __index = HasChatTagsBase })
 )) & BaseObject.BaseObject
@@ -60,13 +60,13 @@ function HasChatTagsBase.new(player: Player): HasChatTagsBase
 	return self
 end
 
-function HasChatTagsBase.GetLastChatTags(self: HasChatTagsBase): { _ChatTagDataUtils.ChatTagData }?
+function HasChatTagsBase.GetLastChatTags(self: HasChatTagsBase): { ChatTagDataUtils.ChatTagData }?
 	return self._lastChatTags.Value
 end
 
 function HasChatTagsBase.ObserveLastChatTags(
 	self: HasChatTagsBase
-): _Observable.Observable<{ _ChatTagDataUtils.ChatTagData }?>
+): Observable.Observable<{ ChatTagDataUtils.ChatTagData }?>
 	return self._lastChatTags:Observe()
 end
 
@@ -74,7 +74,9 @@ function HasChatTagsBase.GetChatTagBinder(_self: HasChatTagsBase)
 	error("Not implemented")
 end
 
-function HasChatTagsBase._observeTagDataListBrio(self: HasChatTagsBase): _Observable.Observable<_Brio.Brio<{ _ChatTagDataUtils.ChatTagData }>>
+function HasChatTagsBase._observeTagDataListBrio(
+	self: HasChatTagsBase
+): Observable.Observable<Brio.Brio<{ ChatTagDataUtils.ChatTagData }>>
 	local chatTagBinder = self:GetChatTagBinder()
 
 	return RxInstanceUtils.observeLastNamedChildBrio(
@@ -85,17 +87,17 @@ function HasChatTagsBase._observeTagDataListBrio(self: HasChatTagsBase): _Observ
 			:Pipe({
 				RxBrioUtils.switchMapBrio(function(child)
 					return RxBinderUtils.observeChildrenBrio(chatTagBinder, child)
-				end),
+				end) :: any,
 				RxBrioUtils.flatMapBrio(function(chatTag)
 					return chatTag:ObserveChatTagData():Pipe({
-						RxBrioUtils.toBrio(),
-						RxBrioUtils.onlyLastBrioSurvives(),
+						RxBrioUtils.toBrio() :: any,
+						RxBrioUtils.onlyLastBrioSurvives() :: any,
 					})
-				end),
+				end) :: any,
 				RxBrioUtils.where(function(chatTagData)
 					return not chatTagData.UserDisabled
-				end),
-				RxBrioUtils.reduceToAliveList(),
+				end) :: any,
+				RxBrioUtils.reduceToAliveList() :: any,
 			}) :: any
 end
 

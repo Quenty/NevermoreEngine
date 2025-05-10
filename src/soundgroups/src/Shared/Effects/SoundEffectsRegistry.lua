@@ -9,13 +9,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Brio = require("Brio")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
+local ObservableSet = require("ObservableSet")
 local SoundEffectsList = require("SoundEffectsList")
 local SoundGroupPathUtils = require("SoundGroupPathUtils")
-local ObservableSet = require("ObservableSet")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
 
 local SoundEffectsRegistry = setmetatable({}, BaseObject)
 SoundEffectsRegistry.ClassName = "SoundEffectsRegistry"
@@ -64,11 +64,14 @@ end
 
 function SoundEffectsRegistry.ObserveActiveEffectsPathBrios(
 	self: SoundEffectsRegistry
-): _Observable.Observable<_Brio.Brio<string>>
+): Observable.Observable<Brio.Brio<string>>
 	return self._activeEffectsPathSet:ObserveItemsBrio() :: any
 end
 
-function SoundEffectsRegistry._getOrCreateEffectList(self: SoundEffectsRegistry, soundGroupPath: string): SoundEffectsList.SoundEffectsList
+function SoundEffectsRegistry._getOrCreateEffectList(
+	self: SoundEffectsRegistry,
+	soundGroupPath: string
+): SoundEffectsList.SoundEffectsList
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 
 	local found = self._pathToEffectList:Get(soundGroupPath)

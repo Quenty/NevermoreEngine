@@ -7,8 +7,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
-local _Promise = require("Promise")
-local _CancelToken = require("CancelToken")
+local CancelToken = require("CancelToken")
+local Promise = require("Promise")
 
 --[=[
 	Returns a promise that resolves when the class is bound to the instance.
@@ -19,7 +19,7 @@ local _CancelToken = require("CancelToken")
 	@function promiseBoundClass
 	@within promiseBoundClass
 ]=]
-return function<T>(binder: Binder.Binder<T>, inst: Instance, cancelToken: _CancelToken.CancelToken?): _Promise.Promise<T>
+return function<T>(binder: Binder.Binder<T>, inst: Instance, cancelToken: CancelToken.CancelToken?): Promise.Promise<T>
 	assert(Binder.isBinder(binder), "'binder' must be table")
 	assert(typeof(inst) == "Instance", "'inst' must be instance")
 

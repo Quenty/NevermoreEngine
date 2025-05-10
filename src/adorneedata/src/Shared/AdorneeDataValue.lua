@@ -22,10 +22,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local AttributeValue = require("AttributeValue")
-local RxSignal = require("RxSignal")
-local Rx = require("Rx")
 local AdorneeDataEntry = require("AdorneeDataEntry")
+local AttributeValue = require("AttributeValue")
+local Rx = require("Rx")
+local RxSignal = require("RxSignal")
 
 local AdorneeDataValue = {}
 AdorneeDataValue.ClassName = "AdorneeDataValue"
@@ -43,9 +43,9 @@ function AdorneeDataValue.new(adornee, prototype)
 	assert(type(prototype) == "table", "Bad prototype")
 
 	local self = {
-		_adornee = adornee;
-		_defaultValues = prototype;
-		_valueObjects = {};
+		_adornee = adornee,
+		_defaultValues = prototype,
+		_valueObjects = {},
 	}
 
 	for key, value in prototype do

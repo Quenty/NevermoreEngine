@@ -12,8 +12,8 @@ local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local Remoting = require("Remoting")
+local ServiceBag = require("ServiceBag")
 local SettingsDataService = require("SettingsDataService")
-local _ServiceBag = require("ServiceBag")
 
 local PlayerSettings = setmetatable({}, PlayerSettingsBase)
 PlayerSettings.ClassName = "PlayerSettings"
@@ -21,18 +21,18 @@ PlayerSettings.__index = PlayerSettings
 
 export type PlayerSettings = typeof(setmetatable(
 	{} :: {
-		_serviceBag: any,
+		_serviceBag: ServiceBag.ServiceBag,
 		_remoting: Remoting.Remoting,
 		_settingsDataService: SettingsDataService.SettingsDataService,
 	},
 	{} :: typeof({ __index = PlayerSettings })
 )) & PlayerSettingsBase.PlayerSettingsBase
 
-function PlayerSettings.new(folder: Folder, serviceBag: _ServiceBag.ServiceBag)
+function PlayerSettings.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): PlayerSettings
 	local self: PlayerSettings = setmetatable(PlayerSettingsBase.new(folder, serviceBag) :: any, PlayerSettings)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._settingsDataService = self._serviceBag:GetService(SettingsDataService)
+	self._settingsDataService = self._serviceBag:GetService(SettingsDataService) :: any
 
 	self:_setupRemoting()
 

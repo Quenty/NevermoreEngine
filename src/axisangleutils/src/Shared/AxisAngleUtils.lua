@@ -40,15 +40,15 @@ end
     @return Vector3 -- position
 ]=]
 function AxisAngleUtils.fromCFrame(cframe: CFrame): (Vector3, Vector3)
-    local axis, angle = cframe:ToAxisAngle()
-    local axisAngle = angle*axis
+	local axis, angle = cframe:ToAxisAngle()
+	local axisAngle = angle * axis
 
-    if axisAngle ~= axisAngle then
-        -- warn("[AxisAngleUtils.fromCFrame] - axisAngle is NAN")
-        return Vector3.zero, cframe.Position
-    end
+	if axisAngle ~= axisAngle then
+		-- warn("[AxisAngleUtils.fromCFrame] - axisAngle is NAN")
+		return Vector3.zero, cframe.Position
+	end
 
-    return axisAngle, cframe.Position
+	return axisAngle, cframe.Position
 end
 
 return AxisAngleUtils

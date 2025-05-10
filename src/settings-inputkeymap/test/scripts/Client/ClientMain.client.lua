@@ -9,18 +9,18 @@ serviceBag:GetService(require("SettingsInputKeyMapServiceClient"))
 serviceBag:Init()
 serviceBag:Start()
 
+local InputKeyMap = require("InputKeyMap")
 local InputKeyMapList = require("InputKeyMapList")
 local InputModeTypes = require("InputModeTypes")
-local InputKeyMap = require("InputKeyMap")
 local SlottedTouchButtonUtils = require("SlottedTouchButtonUtils")
 
 local inputKeyMapList = InputKeyMapList.new("JUMP", {
-	InputKeyMap.new(InputModeTypes.KeyboardAndMouse, { Enum.KeyCode.Q });
-	InputKeyMap.new(InputModeTypes.Gamepads, { Enum.KeyCode.ButtonY });
-	InputKeyMap.new(InputModeTypes.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary3") });
+	InputKeyMap.new(InputModeTypes.KeyboardAndMouse, { Enum.KeyCode.Q }),
+	InputKeyMap.new(InputModeTypes.Gamepads, { Enum.KeyCode.ButtonY }),
+	InputKeyMap.new(InputModeTypes.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary3") }),
 }, {
-	bindingName = "Jump";
-	rebindable = true;
+	bindingName = "Jump",
+	rebindable = true,
 })
 
 serviceBag:GetService(require("SettingsInputKeyMapServiceClient")):AddInputKeyMapList(inputKeyMapList)

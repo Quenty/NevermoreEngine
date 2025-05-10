@@ -4,24 +4,34 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TieUtils = require("TieUtils")
 local TieRealmUtils = require("TieRealmUtils")
-local _TieRealms = require("TieRealms")
+local TieRealms = require("TieRealms")
+local TieUtils = require("TieUtils")
 
 local TieMethodInterfaceUtils = {}
 
-function TieMethodInterfaceUtils.get(aliasSelf, tieMethodDefinition, implParent, adornee: Instance?, interfaceTieRealm: _TieRealms.TieRealm)
+function TieMethodInterfaceUtils.get(
+	aliasSelf,
+	tieMethodDefinition,
+	implParent: Instance?,
+	adornee: Instance?,
+	interfaceTieRealm: TieRealms.TieRealm
+)
 	assert(TieRealmUtils.isTieRealm(interfaceTieRealm), "Bad interfaceTieRealm")
 
 	local tieDefinition = tieMethodDefinition:GetTieDefinition()
 
 	return function(firstArg, ...)
 		if firstArg ~= aliasSelf then
-			error(string.format("Must call methods with self as first parameter (Hint use `%s:%s()` instead of `%s.%s()`)",
-				tieDefinition:GetName(),
-				tieMethodDefinition:GetMemberName(),
-				tieDefinition:GetName(),
-				tieMethodDefinition:GetMemberName()))
+			error(
+				string.format(
+					"Must call methods with self as first parameter (Hint use `%s:%s()` instead of `%s.%s()`)",
+					tieDefinition:GetName(),
+					tieMethodDefinition:GetMemberName(),
+					tieDefinition:GetName(),
+					tieMethodDefinition:GetMemberName()
+				)
+			)
 		end
 
 		if implParent and adornee then
@@ -44,12 +54,24 @@ function TieMethodInterfaceUtils.get(aliasSelf, tieMethodDefinition, implParent,
 				end
 			end
 
-			error(string.format("No implemented for %s on %q", tieMethodDefinition:GetFriendlyName(), implParent:GetFullName()))
+			error(
+				string.format(
+					"No implemented for %s on %q",
+					tieMethodDefinition:GetFriendlyName(),
+					implParent and implParent:GetFullName() or "nil"
+				)
+			)
 		end
 
-		local bindableFunction = implParent:FindFirstChild(tieMethodDefinition:GetMemberName())
+		local bindableFunction = implParent and implParent:FindFirstChild(tieMethodDefinition:GetMemberName())
 		if not bindableFunction then
-			error(string.format("No implemented for %s on %q", tieMethodDefinition:GetFriendlyName(), implParent:GetFullName()))
+			error(
+				string.format(
+					"No implemented for %s on %q",
+					tieMethodDefinition:GetFriendlyName(),
+					implParent and implParent:GetFullName() or "nil"
+				)
+			)
 		end
 
 		return TieUtils.decode(bindableFunction:Invoke(TieUtils.encode(...)))

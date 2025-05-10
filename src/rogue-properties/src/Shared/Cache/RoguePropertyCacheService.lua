@@ -9,16 +9,16 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local RoguePropertyCache = require("RoguePropertyCache")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local RoguePropertyCacheService = {}
 RoguePropertyCacheService.ServiceName = "RoguePropertyCacheService"
 
-function RoguePropertyCacheService:Init(serviceBag: _ServiceBag.ServiceBag)
+function RoguePropertyCacheService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._cache = setmetatable({}, {__mode = "k"})
+	self._cache = setmetatable({}, { __mode = "k" })
 end
 
 function RoguePropertyCacheService:GetCache(roguePropertyDefinition)

@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local BinderProvider = {}
 BinderProvider.ClassName = "BinderProvider"
@@ -90,15 +90,14 @@ function BinderProvider:PromiseBinder(binderName)
 		end
 	end
 
-	return self._bindersAddedPromise
-		:Then(function()
-			local binder = self:Get(binderName)
-			if binder then
-				return binder
-			else
-				return Promise.rejected()
-			end
-		end)
+	return self._bindersAddedPromise:Then(function()
+		local binder = self:Get(binderName)
+		if binder then
+			return binder
+		else
+			return Promise.rejected()
+		end
+	end)
 end
 
 --[=[

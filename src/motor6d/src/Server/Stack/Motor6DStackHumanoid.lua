@@ -44,7 +44,7 @@ function Motor6DStackHumanoid:_observeMotorsBrio()
 			return RxInstanceUtils.observeDescendantsBrio(character, function(descendant)
 				return descendant:IsA("Motor6D")
 			end)
-		end);
+		end),
 	})
 end
 

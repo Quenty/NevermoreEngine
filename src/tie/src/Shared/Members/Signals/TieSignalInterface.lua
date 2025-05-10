@@ -6,12 +6,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TieMemberInterface = require("TieMemberInterface")
-local TieSignalConnection = require("TieSignalConnection")
-local TieUtils = require("TieUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local TieMemberInterface = require("TieMemberInterface")
 local TieRealmUtils = require("TieRealmUtils")
+local TieSignalConnection = require("TieSignalConnection")
+local TieUtils = require("TieUtils")
 
 local TieSignalInterface = setmetatable({}, TieMemberInterface)
 TieSignalInterface.ClassName = "TieSignalInterface"
@@ -20,7 +20,10 @@ TieSignalInterface.__index = TieSignalInterface
 function TieSignalInterface.new(implParent: Instance, adornee: Instance, memberDefinition, interfaceTieRealm)
 	assert(TieRealmUtils.isTieRealm(interfaceTieRealm), "Bad interfaceTieRealm")
 
-	local self = setmetatable(TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm), TieSignalInterface)
+	local self = setmetatable(
+		TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm),
+		TieSignalInterface
+	)
 
 	return self
 end
@@ -67,10 +70,9 @@ function TieSignalInterface:ObserveBindableEventBrio()
 	return self:ObserveImplParentBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(implParent)
 			return RxInstanceUtils.observeLastNamedChildBrio(implParent, "BindableEvent", name)
-		end);
-		RxBrioUtils.onlyLastBrioSurvives();
+		end),
+		RxBrioUtils.onlyLastBrioSurvives(),
 	})
-
 end
 
 function TieSignalInterface:_getBindableEvent()

@@ -5,10 +5,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local StateStack = require("StateStack")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local StateStack = require("StateStack")
 
 local RxStateStackUtils = {}
 

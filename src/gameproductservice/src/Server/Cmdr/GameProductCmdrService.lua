@@ -4,25 +4,25 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerUtils = require("PlayerUtils")
+local CmdrService = require("CmdrService")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
-local _ServiceBag = require("ServiceBag")
-local _CmdrService = require("CmdrService")
-local _GameProductService = require("GameProductService")
+local GameProductService = require("GameProductService")
+local PlayerUtils = require("PlayerUtils")
+local ServiceBag = require("ServiceBag")
 
 local GameProductCmdrService = {}
 GameProductCmdrService.ServiceName = "GameProductCmdrService"
 
 export type GameProductCmdrService = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
-		_cmdrService: _CmdrService.CmdrService,
-		_gameProductService: _GameProductService.GameProductService,
+		_serviceBag: ServiceBag.ServiceBag,
+		_cmdrService: CmdrService.CmdrService,
+		_gameProductService: GameProductService.GameProductService,
 	},
 	{} :: typeof({ __index = GameProductCmdrService })
 ))
 
-function GameProductCmdrService.Init(self: GameProductCmdrService, serviceBag: _ServiceBag.ServiceBag)
+function GameProductCmdrService.Init(self: GameProductCmdrService, serviceBag: ServiceBag.ServiceBag)
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

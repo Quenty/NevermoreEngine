@@ -5,10 +5,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
+local Brio = require("Brio")
+local Observable = require("Observable")
 local RxBrioUtils = require("RxBrioUtils")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxRootPartUtils = {}
 
@@ -18,7 +18,7 @@ local RxRootPartUtils = {}
 	@param character Model
 	@return Observable<Brio<BasePart>>
 ]=]
-function RxRootPartUtils.observeHumanoidRootPartBrio(character: Model): _Observable.Observable<_Brio.Brio<BasePart>>
+function RxRootPartUtils.observeHumanoidRootPartBrio(character: Model): Observable.Observable<Brio.Brio<BasePart>>
 	-- let's make a reasonable assumption here about name not changing
 	return RxInstanceUtils.observeChildrenBrio(character, function(part)
 		return part:IsA("BasePart") and part.Name == "HumanoidRootPart"
@@ -31,7 +31,9 @@ end
 	@param humanoid Humanoid
 	@return Observvable<Brio<BasePart>>
 ]=]
-function RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(humanoid: Humanoid): _Observable.Observable<_Brio.Brio<BasePart>>
+function RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(
+	humanoid: Humanoid
+): Observable.Observable<Brio.Brio<BasePart>>
 	return RxInstanceUtils.observeParentBrio(humanoid):Pipe({
 		RxBrioUtils.switchMapBrio(function(character: Model)
 			return RxRootPartUtils.observeHumanoidRootPartBrio(character)

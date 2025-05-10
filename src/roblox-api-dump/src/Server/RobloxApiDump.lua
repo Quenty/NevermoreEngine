@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Entry point for the Roblox API dump, this class contains api surfaces to
 	query the actual API.
@@ -6,12 +7,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RobloxApiUtils = require("RobloxApiUtils")
-local Promise = require("Promise")
-local RobloxApiMember = require("RobloxApiMember")
-local RobloxApiClass = require("RobloxApiClass")
 local BaseObject = require("BaseObject")
+local Promise = require("Promise")
+local RobloxApiClass = require("RobloxApiClass")
 local RobloxApiDumpConstants = require("RobloxApiDumpConstants")
+local RobloxApiMember = require("RobloxApiMember")
+local RobloxApiUtils = require("RobloxApiUtils")
 
 local RobloxApiDump = setmetatable({}, BaseObject)
 RobloxApiDump.ClassName = "RobloxApiDump"
@@ -50,7 +51,7 @@ end
 	@param className string
 	@return RobloxApiClass
 ]=]
-function RobloxApiDump:PromiseClass(className: string)
+function RobloxApiDump:PromiseClass(className: string): Promise.Promise<RobloxApiClass.RobloxApiClass>
 	assert(type(className) == "string", "Bad className")
 
 	if self._classPromises[className] then
@@ -69,7 +70,7 @@ end
 	@param className string
 	@return { RobloxApiMember }
 ]=]
-function RobloxApiDump:PromiseMembers(className: string)
+function RobloxApiDump:PromiseMembers(className: string): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
 	assert(type(className) == "string", "Bad className")
 
 	if self._classMemberPromises[className] then
@@ -100,12 +101,12 @@ function RobloxApiDump:_promiseClassDataAndAncestorList(className: string)
 	end
 
 	self._ancestorListPromise[className] = self:_promiseClassMap():Then(function(classMap)
-		local current = classMap[className]
+		local current: any = classMap[className]
 		if not current then
 			return Promise.rejected(string.format("Could not find data for %q", className))
 		end
 
-		local dataList = {}
+		local dataList: any = {}
 		while current do
 			table.insert(dataList, current)
 

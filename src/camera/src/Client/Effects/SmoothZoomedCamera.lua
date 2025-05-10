@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Allow freedom of movement around a current place, much like the classic script works now.
 	Not intended to be use with the current character script
@@ -8,9 +9,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
-local SummedCamera = require("SummedCamera")
 local Spring = require("Spring")
+local SummedCamera = require("SummedCamera")
 
 local SmoothZoomedCamera = {}
 SmoothZoomedCamera.ClassName = "SmoothZoomedCamera"
@@ -18,8 +20,25 @@ SmoothZoomedCamera._maxZoom = 100
 SmoothZoomedCamera._minZoom = 0.5
 SmoothZoomedCamera.BounceAtEnd = true
 
-function SmoothZoomedCamera.new()
-	local self = setmetatable({}, SmoothZoomedCamera)
+export type SmoothZoomedCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		Zoom: number,
+		Speed: number,
+		Range: number,
+		MaxZoom: number,
+		MinZoom: number,
+		Target: number,
+		Value: number,
+		Velocity: number,
+		TargetZoom: number,
+		Spring: Spring.Spring<number>,
+	},
+	{} :: typeof({ __index = SmoothZoomedCamera })
+)) & CameraEffectUtils.CameraEffect
+
+function SmoothZoomedCamera.new(): SmoothZoomedCamera
+	local self: SmoothZoomedCamera = setmetatable({} :: any, SmoothZoomedCamera)
 
 	self.Spring = Spring.new(0)
 	self.Speed = 15
@@ -27,11 +46,11 @@ function SmoothZoomedCamera.new()
 	return self
 end
 
-function SmoothZoomedCamera:__add(other)
+function SmoothZoomedCamera.__add(self: SmoothZoomedCamera, other)
 	return SummedCamera.new(self, other)
 end
 
-function SmoothZoomedCamera:ZoomIn(value, min, max)
+function SmoothZoomedCamera.ZoomIn(self: SmoothZoomedCamera, value: number, min: number?, max: number?)
 	if min or max then
 		self.Zoom = self.Zoom - math.clamp(value, min or -math.huge, max or math.huge)
 	else
@@ -39,11 +58,11 @@ function SmoothZoomedCamera:ZoomIn(value, min, max)
 	end
 end
 
-function SmoothZoomedCamera:Impulse(value)
+function SmoothZoomedCamera.Impulse(self: SmoothZoomedCamera, value)
 	self.Spring:Impulse(value)
 end
 
-function SmoothZoomedCamera:__newindex(index, value)
+function SmoothZoomedCamera.__newindex(self: SmoothZoomedCamera, index, value)
 	if index == "TargetZoom" or index == "Target" then
 		local target = math.clamp(value, self.MinZoom, self.MaxZoom)
 		self.Spring.Target = target
@@ -56,9 +75,9 @@ function SmoothZoomedCamera:__newindex(index, value)
 			end
 		end
 	elseif index == "TargetPercentZoom" then
-		self.Target = self.MinZoom + self.Range*value
+		self.Target = self.MinZoom + self.Range * value
 	elseif index == "PercentZoom" then
-		self.Zoom = self.MinZoom + self.Range*value
+		self.Zoom = self.MinZoom + self.Range * value
 	elseif index == "Damper" then
 		self.Spring.Damper = value
 	elseif index == "Value" or index == "Zoom" then
@@ -78,13 +97,13 @@ function SmoothZoomedCamera:__newindex(index, value)
 	end
 end
 
-function SmoothZoomedCamera:__index(index)
+function SmoothZoomedCamera.__index(self: SmoothZoomedCamera, index)
 	if index == "CameraState" then
 		local state = CameraState.new()
 		state.Position = Vector3.new(0, 0, self.Zoom)
 		return state
 	elseif index == "Zoom" or index == "value" then
-		return self.Spring.Value
+		return self.Spring.Position
 	elseif index == "TargetPercentZoom" then
 		return (self.Target - self.MinZoom) / self.Range
 	elseif index == "PercentZoom" then

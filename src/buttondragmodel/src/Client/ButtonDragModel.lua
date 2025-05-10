@@ -10,12 +10,12 @@ local require = require(script.Parent.loader).load(script)
 local UserInputService = game:GetService("UserInputService")
 
 local BaseObject = require("BaseObject")
-local Maid = require("Maid")
+local Brio = require("Brio")
 local InputObjectUtils = require("InputObjectUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
-local _Signal = require("Signal")
 
 local ButtonDragModel = setmetatable({}, BaseObject)
 ButtonDragModel.ClassName = "ButtonDragModel"
@@ -32,8 +32,8 @@ export type ButtonDragModel = typeof(setmetatable(
 		_clampWithinButton: ValueObject.ValueObject<boolean>,
 		_activePositions: { [InputObject | string]: Vector2? },
 
-		DragPositionChanged: _Signal.Signal<Vector2>,
-		IsDraggingChanged: _Signal.Signal<boolean>,
+		DragPositionChanged: Signal.Signal<Vector2>,
+		IsDraggingChanged: Signal.Signal<boolean>,
 	},
 	{} :: typeof({ __index = ButtonDragModel })
 )) & BaseObject.BaseObject
@@ -99,14 +99,14 @@ end
 
 	@return Observable<boolean>
 ]=]
-function ButtonDragModel.ObserveIsPressed(self: ButtonDragModel): _Observable.Observable<boolean>
+function ButtonDragModel.ObserveIsPressed(self: ButtonDragModel): Observable.Observable<boolean>
 	return self._isPressed:Observe()
 end
 
 --[=[
 	@return Observable<Brio<true>>
 ]=]
-function ButtonDragModel.ObserveIsPressedBrio(self: ButtonDragModel): _Observable.Observable<_Brio.Brio<boolean>>
+function ButtonDragModel.ObserveIsPressedBrio(self: ButtonDragModel): Observable.Observable<Brio.Brio<boolean>>
 	return self._isPressed:ObserveBrio(function(value)
 		return value :: any
 	end) :: any
@@ -115,7 +115,7 @@ end
 --[=[
 	@return Observable<Vector2?>
 ]=]
-function ButtonDragModel.ObserveDragDelta(self: ButtonDragModel): _Observable.Observable<Vector2?>
+function ButtonDragModel.ObserveDragDelta(self: ButtonDragModel): Observable.Observable<Vector2?>
 	return self._dragDelta:Observe()
 end
 
@@ -144,7 +144,7 @@ end
 
 	@return Observable<Vector2?>
 ]=]
-function ButtonDragModel.ObserveDragPosition(self: ButtonDragModel): _Observable.Observable<Vector2?>
+function ButtonDragModel.ObserveDragPosition(self: ButtonDragModel): Observable.Observable<Vector2?>
 	return self._dragPosition:Observe()
 end
 

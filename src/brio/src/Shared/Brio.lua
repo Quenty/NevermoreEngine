@@ -303,7 +303,7 @@ Brio.Kill = Brio.Destroy
 	@prop DEAD Brio
 	@within Brio
 ]=]
-Brio.DEAD = Brio.new()
+Brio.DEAD = Brio.new() :: Brio<...any>
 Brio.DEAD:Kill()
 
 return Brio

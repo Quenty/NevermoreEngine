@@ -27,16 +27,16 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
 
 local Brio = require("Brio")
+local CancelToken = require("CancelToken")
 local Maid = require("Maid")
 local MaidTaskUtils = require("MaidTaskUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Signal = require("Signal")
-local _CancelToken = require("CancelToken")
 
 local Binder = {}
 Binder.__index = Binder
@@ -602,7 +602,7 @@ end
 	@param cancelToken CancelToken?
 	@return Promise<T>
 ]=]
-function Binder.Promise<T>(self: Binder<T>, inst: Instance, cancelToken: _CancelToken.CancelToken?): Promise.Promise<T>
+function Binder.Promise<T>(self: Binder<T>, inst: Instance, cancelToken: CancelToken.CancelToken?): Promise.Promise<T>
 	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
 
 	local class = self:Get(inst)

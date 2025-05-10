@@ -113,7 +113,7 @@ export type DataStore = typeof(setmetatable(
 	@param key string
 	@return DataStore
 ]=]
-function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: string)
+function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: string): DataStore
 	local self: DataStore = setmetatable(DataStoreStage.new(key) :: any, DataStore)
 
 	self._key = key or error("No key")
@@ -455,9 +455,16 @@ function DataStore._doDataSync(self: DataStore, writer, doMergeNewData: boolean)
 end
 
 function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
-	return self._maid:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key))
+	return self._maid
+		:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key))
 		:Catch(function(err)
-			warn(string.format("DataStorePromises.getAsync(%q) -> warning - %s", tostring(self._key), tostring(err or "empty error")))
+			warn(
+				string.format(
+					"DataStorePromises.getAsync(%q) -> warning - %s",
+					tostring(self._key),
+					tostring(err or "empty error")
+				)
+			)
 			return Promise.rejected(err)
 		end)
 		:Then(function(data)
@@ -467,7 +474,14 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 			self:MergeDiffSnapshot(diffSnapshot)
 
 			if self._debugWriting then
-				print(string.format("DataStorePromises.getAsync(%q) -> Got ", tostring(self._key)), data, "with diff snapshot", diffSnapshot, "to view", self._viewSnapshot)
+				print(
+					string.format("DataStorePromises.getAsync(%q) -> Got ", tostring(self._key)),
+					data,
+					"with diff snapshot",
+					diffSnapshot,
+					"to view",
+					self._viewSnapshot
+				)
 				-- print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data)
 			end
 		end)

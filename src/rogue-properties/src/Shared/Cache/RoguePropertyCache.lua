@@ -4,7 +4,6 @@
 	@class RoguePropertyCache
 ]=]
 
-
 local RoguePropertyCache = {}
 RoguePropertyCache.ClassName = "RoguePropertyCache"
 RoguePropertyCache.__index = RoguePropertyCache

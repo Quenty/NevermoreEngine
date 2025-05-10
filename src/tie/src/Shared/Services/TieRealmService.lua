@@ -5,22 +5,22 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local ServiceBag = require("ServiceBag")
 local TieRealmUtils = require("TieRealmUtils")
-local _ServiceBag = require("ServiceBag")
-local _TieRealms = require("TieRealms")
+local TieRealms = require("TieRealms")
 
 local TieRealmService = {}
 TieRealmService.ServiceName = "TieRealmService"
 
 export type TieRealmService = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
-		_tieRealm: _TieRealms.TieRealm,
+		_serviceBag: ServiceBag.ServiceBag,
+		_tieRealm: TieRealms.TieRealm,
 	},
 	{} :: typeof({ __index = TieRealmService })
 ))
 
-function TieRealmService.Init(self: TieRealmService, serviceBag: _ServiceBag.ServiceBag)
+function TieRealmService.Init(self: TieRealmService, serviceBag: ServiceBag.ServiceBag)
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -32,7 +32,7 @@ end
 --[=[
 	Sets the tie realm for this service bag
 ]=]
-function TieRealmService.SetTieRealm(self: TieRealmService, tieRealm: _TieRealms.TieRealm)
+function TieRealmService.SetTieRealm(self: TieRealmService, tieRealm: TieRealms.TieRealm)
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 
 	self._tieRealm = tieRealm
@@ -41,7 +41,7 @@ end
 --[=[
 	Get the tie realm for this service bag
 ]=]
-function TieRealmService.GetTieRealm(self: TieRealmService): _TieRealms.TieRealm
+function TieRealmService.GetTieRealm(self: TieRealmService): TieRealms.TieRealm
 	return self._tieRealm
 end
 

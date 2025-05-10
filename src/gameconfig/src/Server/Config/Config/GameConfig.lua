@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	See [GameConfigBase] for API and [GameConfigService] for usage.
 	@class GameConfig
@@ -6,11 +7,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigBase = require("GameConfigBase")
 local GameConfigBindersServer = require("GameConfigBindersServer")
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigUtils = require("GameConfigUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local GameConfig = setmetatable({}, GameConfigBase)
 GameConfig.ClassName = "GameConfig"
@@ -18,19 +19,19 @@ GameConfig.__index = GameConfig
 
 export type GameConfig = typeof(setmetatable(
 	{} :: {
-		_serviceBag: any,
+		_serviceBag: ServiceBag.ServiceBag,
 		_gameConfigBindersServer: any,
 	},
 	{} :: typeof({ __index = GameConfig })
 )) & GameConfigBase.GameConfigBase
 
-function GameConfig.new(obj: Instance, serviceBag: _ServiceBag.ServiceBag): GameConfig
+function GameConfig.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): GameConfig
 	local self: GameConfig = setmetatable(GameConfigBase.new(obj) :: any, GameConfig)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)
 
-	for _, assetType in GameConfigAssetTypes do
+	for _, assetType: any in GameConfigAssetTypes do
 		GameConfigUtils.getOrCreateAssetFolder(self._obj, assetType)
 	end
 

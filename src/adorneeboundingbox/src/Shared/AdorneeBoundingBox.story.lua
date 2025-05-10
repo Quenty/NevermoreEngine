@@ -2,13 +2,14 @@
 	@class AdorneeBoundingBox.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Maid = require("Maid")
 local AdorneeBoundingBox = require("AdorneeBoundingBox")
-local RxSelectionUtils = require("RxSelectionUtils")
-local Rx = require("Rx")
 local Draw = require("Draw")
+local Maid = require("Maid")
+local Rx = require("Rx")
+local RxSelectionUtils = require("RxSelectionUtils")
 
 return function(_target)
 	local topMaid = Maid.new()
@@ -25,8 +26,8 @@ return function(_target)
 		maid:GiveTask(adorneeBoundingBox)
 
 		maid:GiveTask(Rx.combineLatest({
-			cframe = adorneeBoundingBox:ObserveCFrame();
-			size = adorneeBoundingBox:ObserveSize();
+			cframe = adorneeBoundingBox:ObserveCFrame(),
+			size = adorneeBoundingBox:ObserveSize(),
 		}):Subscribe(function(state)
 			if state.cframe and state.size then
 				if state.size == Vector3.zero then

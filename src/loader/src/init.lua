@@ -149,9 +149,23 @@ function Loader:_findDependency(request: string)
 	local foundBackup = DependencyUtils.findDependency(self._packages, request, self._replicationType)
 	if foundBackup then
 		if packageTracker then
-			warn(string.format("[Loader] - No package tracker for root %s (while loading %s)\n%s", self._packages:GetFullName(), request, debug.traceback()))
+			warn(
+				string.format(
+					"[Loader] - No package tracker for root %s (while loading %s)\n%s",
+					self._packages:GetFullName(),
+					request,
+					debug.traceback()
+				)
+			)
 		else
-			warn(string.format("[Loader] - Failed to find package %q in package tracker of root %s\n%s", request, self._packages:GetFullName(), debug.traceback()))
+			warn(
+				string.format(
+					"[Loader] - Failed to find package %q in package tracker of root %s\n%s",
+					request,
+					self._packages:GetFullName(),
+					debug.traceback()
+				)
+			)
 		end
 
 		-- Ensure hoarcekat story has a link to use
@@ -166,7 +180,12 @@ function Loader:_findDependency(request: string)
 	end
 
 	-- TODO: Track location and provider install command
-	error(string.format("[Loader] - %q is not available. Please make this module or install it to the package requiring it.", request))
+	error(
+		string.format(
+			"[Loader] - %q is not available. Please make this module or install it to the package requiring it.",
+			request
+		)
+	)
 	return nil
 end
 

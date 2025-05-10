@@ -5,13 +5,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local PlayerKillTrackerClient = setmetatable({}, BaseObject)
 PlayerKillTrackerClient.ClassName = "PlayerKillTrackerClient"
 PlayerKillTrackerClient.__index = PlayerKillTrackerClient
 
-function PlayerKillTrackerClient.new(tracker, serviceBag: _ServiceBag.ServiceBag)
+function PlayerKillTrackerClient.new(tracker, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(tracker), PlayerKillTrackerClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

@@ -6,13 +6,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local Singleton = {}
 Singleton.ClassName = "Singleton"
 Singleton.__index = Singleton
 
-export type Constructor<T> = (serviceBag: _ServiceBag.ServiceBag) -> T
+export type Constructor<T> = (serviceBag: ServiceBag.ServiceBag) -> T
 export type Singleton<T> = typeof(setmetatable(
 	{} :: {
 		ServiceName: string,
@@ -33,7 +33,7 @@ function Singleton.new<T>(serviceName: string, constructor: Constructor<T>): Sin
 	return self
 end
 
-function Singleton.Init<T>(self: Singleton<T>, serviceBag: _ServiceBag.ServiceBag)
+function Singleton.Init<T>(self: Singleton<T>, serviceBag: ServiceBag.ServiceBag)
 	assert((self :: any) ~= Singleton, "Cannot initialize Singleton template directly")
 
 	local object = self._constructor(serviceBag)

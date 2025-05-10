@@ -11,11 +11,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 
-local SoundPromiseUtils = require("SoundPromiseUtils")
 local RbxAssetUtils = require("RbxAssetUtils")
+local SoundPromiseUtils = require("SoundPromiseUtils")
 
 export type SoundOptions = {
 	SoundId: number | string,
@@ -135,7 +135,7 @@ end
 	@param templateName string
 	@return Sound
 ]=]
-function SoundUtils.playTemplate(templates, templateName: string)
+function SoundUtils.playTemplate(templates, templateName: string): Sound
 	assert(type(templates) == "table", "Bad templates")
 	assert(type(templateName) == "string", "Bad templateName")
 

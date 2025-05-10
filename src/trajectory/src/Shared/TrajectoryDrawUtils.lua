@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local MinEntranceVelocityUtils = require("MinEntranceVelocityUtils")
 local Draw = require("Draw")
+local MinEntranceVelocityUtils = require("MinEntranceVelocityUtils")
 
 local ORIGIN_COLOR = Color3.new(0, 1, 0)
 local FINISH_COLOR = Color3.new(1, 0, 0)

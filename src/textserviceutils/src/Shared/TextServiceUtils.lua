@@ -8,9 +8,9 @@ local require = require(script.Parent.loader).load(script)
 local TextService = game:GetService("TextService")
 
 local Blend = require("Blend")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
-local _Observable = require("Observable")
 
 local TextServiceUtils = {}
 
@@ -101,7 +101,7 @@ export type Props = {
 	@param props table
 	@return Observable<Vector2> -- The text bounds reported
 ]=]
-function TextServiceUtils.observeSizeForLabelProps(props: Props): _Observable.Observable<Vector2>
+function TextServiceUtils.observeSizeForLabelProps(props: Props): Observable.Observable<Vector2>
 	assert(props.Text, "Bad props.Text")
 	assert(props.TextSize, "Bad props.TextSize")
 

@@ -8,8 +8,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local CharacterUtils = require("CharacterUtils")
 local Binder = require("Binder")
+local CharacterUtils = require("CharacterUtils")
 
 local HumanoidSpeedClient = setmetatable({}, BaseObject)
 HumanoidSpeedClient.ClassName = "HumanoidSpeedClient"

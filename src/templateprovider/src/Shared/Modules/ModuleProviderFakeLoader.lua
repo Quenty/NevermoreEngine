@@ -12,5 +12,5 @@ local function load(script)
 end
 
 return {
-	load = load
+	load = load,
 }

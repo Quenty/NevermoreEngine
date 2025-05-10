@@ -11,9 +11,9 @@ local Workspace = game:GetService("Workspace")
 local AdorneeUtils = require("AdorneeUtils")
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
+local Observable = require("Observable")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local _Observable = require("Observable")
-local _Signal = require("Signal")
 
 local AdorneeValue = setmetatable({}, BaseObject)
 AdorneeValue.ClassName = "AdorneeValue"
@@ -25,7 +25,7 @@ export type AdorneeValue = typeof(setmetatable(
 	{} :: {
 		_adornee: ValueObject.ValueObject<AdorneeValueOption?>,
 		Value: AdorneeValueOption?,
-		Changed: _Signal.Signal<(AdorneeValueOption?, AdorneeValueOption?)>,
+		Changed: Signal.Signal<(AdorneeValueOption?, AdorneeValueOption?)>,
 	},
 	{} :: typeof({ __index = AdorneeValue })
 )) & BaseObject.BaseObject
@@ -57,7 +57,7 @@ end
 
 	@return Observable<Instance | CFrame | Vector3 | nil>
 ]=]
-function AdorneeValue.Observe(self: AdorneeValue): _Observable.Observable<(Instance | CFrame | Vector3)?>
+function AdorneeValue.Observe(self: AdorneeValue): Observable.Observable<(Instance | CFrame | Vector3)?>
 	return self._adornee:Observe()
 end
 
@@ -112,7 +112,7 @@ end
 
 	@return Observable<CFrame | nil>
 ]=]
-function AdorneeValue.ObserveBottomCFrame(self: AdorneeValue)
+function AdorneeValue.ObserveBottomCFrame(self: AdorneeValue): Observable.Observable<CFrame?>
 	return Blend.Computed(self._adornee, function(adornee: Instance): CFrame?
 		if typeof(adornee) == "CFrame" then
 			return adornee
@@ -140,7 +140,7 @@ end
 
 	@return Observable<Vector3 | nil>
 ]=]
-function AdorneeValue.ObserveCenterPosition(self: AdorneeValue): _Observable.Observable<Vector3?>
+function AdorneeValue.ObserveCenterPosition(self: AdorneeValue): Observable.Observable<Vector3?>
 	return Blend.Computed(self._adornee, function()
 		return self:GetCenterPosition()
 	end)
@@ -174,7 +174,7 @@ end
 
 	@return Observable<number?>
 ]=]
-function AdorneeValue.ObserveRadius(self: AdorneeValue)
+function AdorneeValue.ObserveRadius(self: AdorneeValue): Observable.Observable<number?>
 	return Blend.Computed(self._adornee, function()
 		return self:GetRadius()
 	end)
@@ -216,7 +216,11 @@ end
 	@param observeRadius Observable<number>
 	@return Observable
 ]=]
-function AdorneeValue.ObservePositionTowards(self: AdorneeValue, observeTargetPosition, observeRadius)
+function AdorneeValue.ObservePositionTowards(
+	self: AdorneeValue,
+	observeTargetPosition: Observable.Observable<Vector3>,
+	observeRadius: Observable.Observable<number>
+)
 	-- TODO: Some sort of de-duplication/multicast.
 
 	return Blend.Computed(
@@ -315,10 +319,10 @@ function AdorneeValue.RenderPositionAttachment(self: AdorneeValue, props)
 	end)
 
 	return Blend.New "Attachment" {
-		Name = props.Name or "AdorneeValueAttachment";
-		Parent = observeParentPart;
-		CFrame = observeCFrame;
-		[Blend.Children] = props[Blend.Children];
+		Name = props.Name or "AdorneeValueAttachment",
+		Parent = observeParentPart,
+		CFrame = observeCFrame,
+		[Blend.Children] = props[Blend.Children],
 	}
 end
 

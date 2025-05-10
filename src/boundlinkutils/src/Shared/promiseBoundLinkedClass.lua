@@ -7,8 +7,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 return function(binder, objValue)
 	if objValue.Value then

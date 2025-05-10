@@ -3,7 +3,8 @@
 	@class EloUtils.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local EloMatchResult = require("EloMatchResult")
 local EloUtils = require("EloUtils")
@@ -24,39 +25,27 @@ describe("EloUtils.getNewElo", function()
 	local newPlayerDrawRating, newOpponentDrawRating
 
 	it("should change on win", function()
-		newPlayerWinRating, newOpponentWinRating = EloUtils.getNewElo(
-			config,
-			playerRating,
-			opponentRating,
-			{
-				EloMatchResult.PLAYER_ONE_WIN;
-			})
+		newPlayerWinRating, newOpponentWinRating = EloUtils.getNewElo(config, playerRating, opponentRating, {
+			EloMatchResult.PLAYER_ONE_WIN,
+		})
 
 		expect(newPlayerWinRating > playerRating).toBe(true)
 		expect(newOpponentWinRating < opponentRating).toBe(true)
 	end)
 
 	it("should change on a loss", function()
-		newPlayerLossRating, newOpponentLossRating = EloUtils.getNewElo(
-			config,
-			playerRating,
-			opponentRating,
-			{
-				EloMatchResult.PLAYER_TWO_WIN;
-			})
+		newPlayerLossRating, newOpponentLossRating = EloUtils.getNewElo(config, playerRating, opponentRating, {
+			EloMatchResult.PLAYER_TWO_WIN,
+		})
 
 		expect(newPlayerLossRating < playerRating).toBe(true)
 		expect(newOpponentLossRating > opponentRating).toBe(true)
 	end)
 
 	it("should change on a draw", function()
-		newPlayerDrawRating, newOpponentDrawRating = EloUtils.getNewElo(
-			config,
-			playerRating,
-			opponentRating,
-			{
-				EloMatchResult.DRAW;
-			})
+		newPlayerDrawRating, newOpponentDrawRating = EloUtils.getNewElo(config, playerRating, opponentRating, {
+			EloMatchResult.DRAW,
+		})
 
 		expect(newPlayerDrawRating > playerRating).toBe(true)
 		expect(newOpponentDrawRating < opponentRating).toBe(true)
@@ -68,7 +57,7 @@ describe("EloUtils.getNewElo", function()
 		local lossChange = math.abs(playerRating - newPlayerLossRating)
 
 		expect(winChange > lossChange).toBe(true)
-		expect(winChange > drawChange ).toBe(true)
+		expect(winChange > drawChange).toBe(true)
 		expect(drawChange > lossChange).toBe(true)
 	end)
 

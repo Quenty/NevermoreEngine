@@ -2,7 +2,8 @@
 	@class RxInstanceUtils.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Jest = require("Jest")
 local RxInstanceUtils = require("RxInstanceUtils")

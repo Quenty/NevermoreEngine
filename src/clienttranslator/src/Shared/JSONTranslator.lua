@@ -21,16 +21,16 @@ local RunService = game:GetService("RunService")
 local Blend = require("Blend")
 local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
 local Maid = require("Maid")
+local NumberLocalizationUtils = require("NumberLocalizationUtils")
+local Observable = require("Observable")
+local Promise = require("Promise")
 local PseudoLocalize = require("PseudoLocalize")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 local TranslationKeyUtils = require("TranslationKeyUtils")
 local TranslatorService = require("TranslatorService")
 local ValueObject = require("ValueObject")
-local NumberLocalizationUtils = require("NumberLocalizationUtils")
-local _ServiceBag = require("ServiceBag")
-local _Observable = require("Observable")
-local _Promise = require("Promise")
 
 local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
@@ -40,7 +40,7 @@ JSONTranslator.__index = JSONTranslator
 export type JSONTranslator = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_translatorService: TranslatorService.TranslatorService,
 		_translatorName: string,
 		_entries: { [string]: any },
@@ -102,7 +102,7 @@ function JSONTranslator.new(translatorName: string, localeId: string, dataTable)
 	return self :: any
 end
 
-function JSONTranslator.Init(self: JSONTranslator, serviceBag: _ServiceBag.ServiceBag)
+function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._translatorService = self._serviceBag:GetService(TranslatorService) :: any
 
@@ -130,7 +130,7 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: _ServiceBag.Servi
 	)
 end
 
-function JSONTranslator.ObserveNumber(self: JSONTranslator, number: number): _Observable.Observable<string>
+function JSONTranslator.ObserveNumber(self: JSONTranslator, number: number): Observable.Observable<string>
 	return Rx.combineLatest({
 		localeId = self:ObserveLocaleId(),
 		number = number,
@@ -174,7 +174,7 @@ function JSONTranslator.ObserveFormatByKey(
 	self: JSONTranslator,
 	translationKey: string,
 	translationArgs
-): _Observable.Observable<string>
+): Observable.Observable<string>
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
@@ -252,7 +252,7 @@ end
 	Returns a promise that will resolve once the Roblox translator is loaded from the cloud.
 	@return Promise<Translator>
 ]=]
-function JSONTranslator.PromiseTranslator(self: JSONTranslator): _Promise.Promise<Translator>
+function JSONTranslator.PromiseTranslator(self: JSONTranslator): Promise.Promise<Translator>
 	return self._translatorService:PromiseTranslator()
 end
 
@@ -261,7 +261,7 @@ end
 
 	@return Observable<Translator>
 ]=]
-function JSONTranslator.ObserveTranslator(self: JSONTranslator): _Observable.Observable<Translator>
+function JSONTranslator.ObserveTranslator(self: JSONTranslator): Observable.Observable<Translator>
 	return self._translatorService:ObserveTranslator()
 end
 
@@ -270,7 +270,7 @@ end
 
 	@return Observable<string>
 ]=]
-function JSONTranslator.ObserveLocaleId(self: JSONTranslator): _Observable.Observable<string>
+function JSONTranslator.ObserveLocaleId(self: JSONTranslator): Observable.Observable<string>
 	return self._translatorService:ObserveLocaleId()
 end
 
@@ -325,7 +325,7 @@ function JSONTranslator.ObserveTranslation(
 	prefix: string,
 	text: string,
 	translationArgs
-): _Observable.Observable<string>
+): Observable.Observable<string>
 	assert(type(prefix) == "string", "Bad text")
 	assert(type(text) == "string", "Bad text")
 
@@ -374,7 +374,7 @@ end
 	Returns a promise that will resolve once the translator is loaded from the cloud.
 	@return Promise
 ]=]
-function JSONTranslator.PromiseLoaded(self: JSONTranslator): _Promise.Promise<()>
+function JSONTranslator.PromiseLoaded(self: JSONTranslator): Promise.Promise<()>
 	return self:PromiseTranslator()
 end
 
@@ -402,7 +402,7 @@ function JSONTranslator.FormatByKey(self: JSONTranslator, translationKey: string
 	return self:_doTranslation(translator, translationKey, args)
 end
 
-function JSONTranslator._observeArgs(_self: JSONTranslator, translationArgs): _Observable.Observable<any>
+function JSONTranslator._observeArgs(_self: JSONTranslator, translationArgs): Observable.Observable<any>
 	if translationArgs == nil then
 		return Rx.of(nil)
 	end

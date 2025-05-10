@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class GameConfigAssetTypeUtils
 ]=]
@@ -8,18 +9,18 @@ local GameConfigAssetTypes = require("GameConfigAssetTypes")
 
 local GameConfigAssetTypeUtils = {}
 
-local pluralMap = {
-	[GameConfigAssetTypes.BADGE] = "badges";
-	[GameConfigAssetTypes.PRODUCT] = "products";
-	[GameConfigAssetTypes.PASS] = "passes";
-	[GameConfigAssetTypes.PLACE] = "places";
-	[GameConfigAssetTypes.ASSET] = "assets";
-	[GameConfigAssetTypes.BUNDLE] = "bundles";
-	[GameConfigAssetTypes.SUBSCRIPTION] = "subscriptions";
-	[GameConfigAssetTypes.MEMBERSHIP] = "memberships";
+local pluralMap: { [GameConfigAssetTypes.GameConfigAssetType]: string } = {
+	[GameConfigAssetTypes.BADGE] = "badges",
+	[GameConfigAssetTypes.PRODUCT] = "products",
+	[GameConfigAssetTypes.PASS] = "passes",
+	[GameConfigAssetTypes.PLACE] = "places",
+	[GameConfigAssetTypes.ASSET] = "assets",
+	[GameConfigAssetTypes.BUNDLE] = "bundles",
+	[GameConfigAssetTypes.SUBSCRIPTION] = "subscriptions",
+	[GameConfigAssetTypes.MEMBERSHIP] = "memberships",
 }
 
-for _, item in GameConfigAssetTypes do
+for _, item: any in GameConfigAssetTypes do
 	assert(pluralMap[item], "Missing plural")
 end
 
@@ -29,8 +30,8 @@ end
 	@param assetType any
 	@return boolean
 ]=]
-function GameConfigAssetTypeUtils.isAssetType(assetType)
-	return type(assetType) == "string" and pluralMap[assetType] ~= nil
+function GameConfigAssetTypeUtils.isAssetType(assetType: any): boolean
+	return type(assetType) == "string" and pluralMap[assetType :: any] ~= nil
 end
 
 --[=[
@@ -39,7 +40,7 @@ end
 	@param assetType GameConfigAssetType
 	@return string
 ]=]
-function GameConfigAssetTypeUtils.getPlural(assetType)
+function GameConfigAssetTypeUtils.getPlural(assetType: GameConfigAssetTypes.GameConfigAssetType): string
 	return pluralMap[assetType] or error("Bad assetType")
 end
 

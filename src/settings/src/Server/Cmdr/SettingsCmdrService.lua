@@ -6,15 +6,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerUtils = require("PlayerUtils")
-local SettingsCmdrUtils = require("SettingsCmdrUtils")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local PlayerUtils = require("PlayerUtils")
+local ServiceBag = require("ServiceBag")
+local SettingsCmdrUtils = require("SettingsCmdrUtils")
 
 local SettingsCmdrService = {}
 SettingsCmdrService.ServiceName = "SettingsCmdrService"
 
-function SettingsCmdrService:Init(serviceBag: _ServiceBag.ServiceBag)
+function SettingsCmdrService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

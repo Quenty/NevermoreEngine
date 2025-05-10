@@ -1,34 +1,46 @@
 --!strict
 --[=[
+	Buffer for influx DB points.
+
+	@server
 	@class InfluxDBWriteBuffer
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local InfluxDBWriteOptionUtils = require("InfluxDBWriteOptionUtils")
 local Promise = require("Promise")
 local Signal = require("Signal")
-local _InfluxDBWriteOptionUtils = require("InfluxDBWriteOptionUtils")
 
 local InfluxDBWriteBuffer = setmetatable({}, BaseObject)
 InfluxDBWriteBuffer.ClassName = "InfluxDBWriteBuffer"
 InfluxDBWriteBuffer.__index = InfluxDBWriteBuffer
+
+export type PromiseHandleFlush = (entries: { string }) -> Promise.Promise<()>
 
 export type InfluxDBWriteBuffer = typeof(setmetatable(
 	{} :: {
 		_bytes: number,
 		_length: number,
 		_entries: { string },
-		_writeOptions: _InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
-		_promiseHandleFlush: (entries: { string }) -> Promise.Promise<()>,
+		_writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+		_promiseHandleFlush: PromiseHandleFlush,
 		_requestQueueNext: Signal.Signal<()>,
 	},
 	{} :: typeof({ __index = InfluxDBWriteBuffer })
 )) & BaseObject.BaseObject
 
+--[=[
+	Creates a new InfluxDB write buffer.
+
+	@param writeOptions InfluxDBWriteOptions
+	@param promiseHandleFlush (entries: { string }) -> Promise.Promise<()>
+	@return InfluxDBWriteBuffer
+]=]
 function InfluxDBWriteBuffer.new(
-	writeOptions: _InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
-	promiseHandleFlush
+	writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+	promiseHandleFlush: PromiseHandleFlush
 ): InfluxDBWriteBuffer
 	local self: InfluxDBWriteBuffer = setmetatable(BaseObject.new() :: any, InfluxDBWriteBuffer)
 
@@ -44,7 +56,12 @@ function InfluxDBWriteBuffer.new(
 	return self
 end
 
-function InfluxDBWriteBuffer.Add(self: InfluxDBWriteBuffer, entry: string)
+--[=[
+	Adds an entry to the buffer. If the buffer is full, it will flush
+
+	@param entry string
+]=]
+function InfluxDBWriteBuffer.Add(self: InfluxDBWriteBuffer, entry: string): ()
 	assert(type(entry) == "string", "Bad entry")
 
 	-- Already overflowing
@@ -64,7 +81,7 @@ function InfluxDBWriteBuffer.Add(self: InfluxDBWriteBuffer, entry: string)
 	end
 end
 
-function InfluxDBWriteBuffer._queueNextSend(self: InfluxDBWriteBuffer)
+function InfluxDBWriteBuffer._queueNextSend(self: InfluxDBWriteBuffer): ()
 	if self._maid._queuedSendTask then
 		return
 	end
@@ -78,7 +95,7 @@ function InfluxDBWriteBuffer._queueNextSend(self: InfluxDBWriteBuffer)
 	end)
 end
 
-function InfluxDBWriteBuffer._reset(self: InfluxDBWriteBuffer)
+function InfluxDBWriteBuffer._reset(self: InfluxDBWriteBuffer): { string }
 	local entries = self._entries
 
 	self._bytes = 0
@@ -88,7 +105,7 @@ function InfluxDBWriteBuffer._reset(self: InfluxDBWriteBuffer)
 	return entries
 end
 
-function InfluxDBWriteBuffer._promiseFlushAll(self: InfluxDBWriteBuffer)
+function InfluxDBWriteBuffer._promiseFlushAll(self: InfluxDBWriteBuffer): Promise.Promise<()>
 	self._maid._queuedSendTask = nil
 
 	local entries = self:_reset()
@@ -99,7 +116,12 @@ function InfluxDBWriteBuffer._promiseFlushAll(self: InfluxDBWriteBuffer)
 	end
 end
 
-function InfluxDBWriteBuffer.PromiseFlush(self: InfluxDBWriteBuffer)
+--[=[
+	Flushes all entries in the buffer. Returns a promise that resolves when the flush is complete.
+
+	@return Promise<()>
+]=]
+function InfluxDBWriteBuffer.PromiseFlush(self: InfluxDBWriteBuffer): Promise.Promise<()>
 	return self:_promiseFlushAll()
 end
 

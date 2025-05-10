@@ -11,12 +11,13 @@ local IKRigBase = require("IKRigBase")
 local IKRigInterface = require("IKRigInterface")
 local Motor6DStackHumanoid = require("Motor6DStackHumanoid")
 local Remoting = require("Remoting")
+local ServiceBag = require("ServiceBag")
 
 local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
 IKRig.__index = IKRig
 
-function IKRig.new(humanoid: Humanoid, serviceBag)
+function IKRig.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(IKRigBase.new(humanoid, serviceBag), IKRig)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -35,7 +36,7 @@ end
 
 	@return Vector3?
 ]=]
-function IKRig:GetAimPosition()
+function IKRig:GetAimPosition(): Vector3?
 	return self._aimPosition
 end
 

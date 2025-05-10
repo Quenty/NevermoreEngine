@@ -11,11 +11,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PermissionProviderConstants = require("PermissionProviderConstants")
-local PermissionProviderClient = require("PermissionProviderClient")
-local Promise = require("Promise")
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local PermissionProviderClient = require("PermissionProviderClient")
+local PermissionProviderConstants = require("PermissionProviderConstants")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local PermissionServiceClient = {}
 PermissionServiceClient.ServiceName = "PermissionServiceClient"
@@ -24,7 +24,7 @@ PermissionServiceClient.ServiceName = "PermissionServiceClient"
 	Initializes the permission service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function PermissionServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function PermissionServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "no serviceBag")
 	self._maid = Maid.new()

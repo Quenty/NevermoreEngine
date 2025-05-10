@@ -13,30 +13,30 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
-local _ServiceBag = require("ServiceBag")
-local _Observable = require("Observable")
-local _GameConfigAssetTypes = require("GameConfigAssetTypes")
-local _Promise = require("Promise")
-local _Signal = require("Signal")
-local _GameProductDataService = require("GameProductDataService")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameProductDataService = require("GameProductDataService")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
 
 local GameProductService = {}
 GameProductService.ServiceName = "GameProductService"
 
 export type GameProductService = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
-		_gameProductDataService: _GameProductDataService.GameProductDataService,
+		_gameProductDataService: GameProductDataService.GameProductDataService,
 
-		GamePassPurchased: _Signal.Signal<Player, number>,
-		ProductPurchased: _Signal.Signal<Player, number>,
-		AssetPurchased: _Signal.Signal<Player, number>,
-		BundlePurchased: _Signal.Signal<Player, number>,
-		MembershipPurchased: _Signal.Signal<Player, number>,
-		SubscriptionPurchased: _Signal.Signal<Player, number>,
+		GamePassPurchased: Signal.Signal<Player, number>,
+		ProductPurchased: Signal.Signal<Player, number>,
+		AssetPurchased: Signal.Signal<Player, number>,
+		BundlePurchased: Signal.Signal<Player, number>,
+		MembershipPurchased: Signal.Signal<Player, number>,
+		SubscriptionPurchased: Signal.Signal<Player, number>,
 	},
 	{} :: typeof({ __index = GameProductService })
 ))
@@ -45,7 +45,7 @@ export type GameProductService = typeof(setmetatable(
 	Initializes the service. Should be done via [ServiceBag]
 	@param serviceBag ServiceBag
 ]=]
-function GameProductService.Init(self: GameProductService, serviceBag: _ServiceBag.ServiceBag)
+function GameProductService.Init(self: GameProductService, serviceBag: ServiceBag.ServiceBag)
 	assert(not (self :: any)._serviceBag, "Already initialized")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -81,9 +81,9 @@ end
 function GameProductService.ObservePlayerAssetPurchased(
 	self: GameProductService,
 	player: Player,
-	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
-): _Observable.Observable<()>
+): Observable.Observable<()>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -100,9 +100,9 @@ end
 ]=]
 function GameProductService.ObserveAssetPurchased(
 	self: GameProductService,
-	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey
-): _Observable.Observable<Player>
+): Observable.Observable<Player>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -120,7 +120,7 @@ end
 function GameProductService.HasPlayerPurchasedThisSession(
 	self: GameProductService,
 	player: Player,
-	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
@@ -139,7 +139,7 @@ end
 function GameProductService.PromisePlayerIsPromptOpen(
 	self: GameProductService,
 	player: Player
-): _Promise.Promise<boolean>
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self._serviceBag, "Not initialized")
 
@@ -155,7 +155,7 @@ end
 function GameProductService.PromisePlayerPromptClosed(
 	self: GameProductService,
 	player: Player
-): _Promise.Promise<boolean>
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self._serviceBag, "Not initialized")
 
@@ -173,9 +173,9 @@ end
 function GameProductService.PromisePlayerPromptPurchase(
 	self: GameProductService,
 	player: Player,
-	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
-): _Promise.Promise<boolean>
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -194,9 +194,9 @@ end
 function GameProductService.PromisePlayerOwnership(
 	self: GameProductService,
 	player: Player,
-	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
-): _Promise.Promise<boolean>
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -217,9 +217,9 @@ end
 function GameProductService.PromisePlayerOwnershipOrPrompt(
 	self: GameProductService,
 	player: Player,
-	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
-): _Promise.Promise<boolean>
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -238,9 +238,9 @@ end
 function GameProductService.ObservePlayerOwnership(
 	self: GameProductService,
 	player: Player,
-	assetType: _GameConfigAssetTypes.GameConfigAssetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
-): _Observable.Observable<boolean>
+): Observable.Observable<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")

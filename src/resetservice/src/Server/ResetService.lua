@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly
 	@server
@@ -8,11 +9,11 @@ local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Remoting = require("Remoting")
 local Maid = require("Maid")
-local StateStack = require("StateStack")
 local PlayerUtils = require("PlayerUtils")
 local Promise = require("Promise")
+local Remoting = require("Remoting")
+local StateStack = require("StateStack")
 
 local ResetService = {}
 ResetService.ServiceName = "ResetService"
@@ -47,7 +48,7 @@ function ResetService:PushResetProvider(promiseReset: () -> ())
 	return self._resetProviderStack:PushState(promiseReset)
 end
 
-function ResetService:PromiseResetCharacter(player)
+function ResetService:PromiseResetCharacter(player: Player): Promise.Promise<()>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	if not player:IsDescendantOf(game) then

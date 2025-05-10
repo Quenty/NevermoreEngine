@@ -15,8 +15,8 @@ local GroupUtils = require("GroupUtils")
 local PermissionLevel = require("PermissionLevel")
 local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderConstants = require("PermissionProviderConstants")
+local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
-local _PermissionProviderUtils = require("PermissionProviderUtils")
 
 local GroupPermissionProvider = setmetatable({}, BasePermissionProvider)
 GroupPermissionProvider.__index = GroupPermissionProvider
@@ -24,7 +24,7 @@ GroupPermissionProvider.ClassName = "GroupPermissionProvider"
 
 export type GroupPermissionProvider = typeof(setmetatable(
 	{} :: {
-		_config: _PermissionProviderUtils.GroupRankConfig,
+		_config: PermissionProviderUtils.GroupRankConfig,
 		_groupId: number,
 		_minAdminRequiredRank: number,
 		_minCreatorRequiredRank: number,
@@ -39,7 +39,7 @@ export type GroupPermissionProvider = typeof(setmetatable(
 	@param config table
 	@return GroupPermissionProvider
 ]=]
-function GroupPermissionProvider.new(config: _PermissionProviderUtils.GroupRankConfig): GroupPermissionProvider
+function GroupPermissionProvider.new(config: PermissionProviderUtils.GroupRankConfig): GroupPermissionProvider
 	local self = setmetatable(BasePermissionProvider.new(config) :: any, GroupPermissionProvider)
 
 	assert(self._config.type == PermissionProviderConstants.GROUP_RANK_CONFIG_TYPE, "Bad configType")
@@ -158,7 +158,10 @@ function GroupPermissionProvider._handlePlayer(self: GroupPermissionProvider, pl
 	end)
 end
 
-function GroupPermissionProvider._promiseRankInGroup(self: GroupPermissionProvider, player: Player): Promise.Promise<number>
+function GroupPermissionProvider._promiseRankInGroup(
+	self: GroupPermissionProvider,
+	player: Player
+): Promise.Promise<number>
 	assert(typeof(player) == "Instance", "Bad player")
 
 	if self._promiseRankPromisesCache[player.UserId] then

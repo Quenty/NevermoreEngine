@@ -5,13 +5,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local IKRigInterface = require("IKRigInterface")
+local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
-local _ServiceBag = require("ServiceBag")
 
 local IKDataService = {}
 IKDataService.ServiceName = "IKDataService"
 
-function IKDataService:Init(serviceBag: _ServiceBag.ServiceBag)
+function IKDataService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

@@ -5,18 +5,27 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Rx = require("Rx")
 local Blend = require("Blend")
-local Observable = require("Observable")
-local ValueObject = require("ValueObject")
 local ColorGradeUtils = require("ColorGradeUtils")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local ValueObject = require("ValueObject")
 
 local ColorGradePalette = setmetatable({}, BaseObject)
 ColorGradePalette.ClassName = "ColorGradePalette"
 ColorGradePalette.__index = ColorGradePalette
 
-function ColorGradePalette.new()
-	local self = setmetatable(BaseObject.new(), ColorGradePalette)
+export type ColorGradePalette = typeof(setmetatable(
+	{} :: {
+		_grades: { [string]: Observable.Observable<number> },
+		_vividness: { [string]: Observable.Observable<number> },
+		_defaultSurfaceName: ValueObject.ValueObject<string>,
+	},
+	{} :: typeof({ __index = ColorGradePalette })
+)) & BaseObject.BaseObject
+
+function ColorGradePalette.new(): ColorGradePalette
+	local self: ColorGradePalette = setmetatable(BaseObject.new() :: any, ColorGradePalette)
 
 	self._grades = {}
 	self._vividness = {}
@@ -33,7 +42,7 @@ function ColorGradePalette:SetDefaultSurfaceName(gradeName: string)
 	self._defaultSurfaceName.Value = gradeName
 end
 
-function ColorGradePalette:HasGrade(gradeName)
+function ColorGradePalette:HasGrade(gradeName: string): boolean
 	if self._grades[gradeName] then
 		return true
 	else
@@ -87,7 +96,7 @@ function ColorGradePalette:GetVividness(gradeName: string)
 	return vividness
 end
 
-function ColorGradePalette:Add(gradeName, colorGrade, vividness)
+function ColorGradePalette:Add(gradeName: string, colorGrade, vividness)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	self._grades[gradeName] = Blend.toPropertyObservable(colorGrade) or Rx.of(colorGrade)
@@ -107,18 +116,17 @@ end
 
 function ColorGradePalette:ObserveModified(gradeName, amount, multiplier)
 	return Rx.combineLatest({
-		grade = self:_observeGradeFromName(gradeName);
-		amount = self:_observeGradeFromName(amount);
-		multiplier = multiplier or 1;
+		grade = self:_observeGradeFromName(gradeName),
+		amount = self:_observeGradeFromName(amount),
+		multiplier = multiplier or 1,
 	}):Pipe({
 		Rx.map(function(state)
 			assert(type(state.grade) == "number", "Bad state.grade")
 			assert(type(state.amount) == "number", "Bad state.amount")
 			assert(type(state.multiplier) == "number", "Bad state.multiplier")
 
-
-			return state.grade + state.multiplier*state.amount
-		end);
+			return state.grade + state.multiplier * state.amount
+		end),
 	})
 end
 
@@ -132,9 +140,9 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 	end
 
 	return Rx.combineLatest({
-		grade = self:_observeGradeFromName(gradeName);
-		newSurfaceGrade = self:_observeGradeFromName(newSurfaceName);
-		baseSurfaceGrade = observeBaseSurfaceGrade;
+		grade = self:_observeGradeFromName(gradeName),
+		newSurfaceGrade = self:_observeGradeFromName(newSurfaceName),
+		baseSurfaceGrade = observeBaseSurfaceGrade,
 	}):Pipe({
 		Rx.map(function(state)
 			local difference = state.grade - state.baseSurfaceGrade
@@ -153,8 +161,9 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 			end
 
 			return finalGrade
-		end)
-	}), self._vividness[gradeName]
+		end),
+	}),
+		self._vividness[gradeName]
 end
 
 function ColorGradePalette:_observeGradeFromName(gradeName)
@@ -172,7 +181,7 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 				else
 					error("Bad grade value")
 				end
-			end)
+			end),
 		})
 	end
 
@@ -185,7 +194,7 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 	local colorOrObservable = Blend.toPropertyObservable(gradeName)
 	if colorOrObservable then
 		return colorOrObservable:Pipe({
-			Rx.map(ColorGradeUtils.getGrade)
+			Rx.map(ColorGradeUtils.getGrade),
 		})
 	end
 
@@ -200,7 +209,7 @@ function ColorGradePalette:ObserveDefaultSurfaceGrade()
 			else
 				return Rx.EMPTY
 			end
-		end)
+		end),
 	})
 end
 

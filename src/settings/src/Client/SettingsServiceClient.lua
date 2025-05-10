@@ -11,20 +11,20 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local Brio = require("Brio")
+local CancelToken = require("CancelToken")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local PlayerSettingsClient = require("PlayerSettingsClient")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 local SettingsCmdrUtils = require("SettingsCmdrUtils")
-local _ServiceBag = require("ServiceBag")
-local _PlayerSettingsClient = require("PlayerSettingsClient")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
-local _CancelToken = require("CancelToken")
-local _Promise = require("Promise")
 
 local SettingsServiceClient = {}
 
 export type SettingsServiceClient = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		_settingsDataService: any,
 	},
@@ -36,7 +36,7 @@ export type SettingsServiceClient = typeof(setmetatable(
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingsServiceClient.Init(self: SettingsServiceClient, serviceBag: _ServiceBag.ServiceBag)
+function SettingsServiceClient.Init(self: SettingsServiceClient, serviceBag: ServiceBag.ServiceBag)
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -61,7 +61,7 @@ end
 ]=]
 function SettingsServiceClient.GetLocalPlayerSettings(
 	self: SettingsServiceClient
-): _PlayerSettingsClient.PlayerSettingsClient?
+): PlayerSettingsClient.PlayerSettingsClient?
 	return self:GetPlayerSettings(Players.LocalPlayer)
 end
 
@@ -70,8 +70,8 @@ end
 
 	@return Observable<Brio<PlayerSettingsClient>>
 ]=]
-function SettingsServiceClient.ObserveLocalPlayerSettingsBrio(self: SettingsServiceClient): _Observable.Observable<
-	_Brio.Brio<_PlayerSettingsClient.PlayerSettingsClient>
+function SettingsServiceClient.ObserveLocalPlayerSettingsBrio(self: SettingsServiceClient): Observable.Observable<
+	Brio.Brio<PlayerSettingsClient.PlayerSettingsClient>
 >
 	return self:ObservePlayerSettingsBrio(Players.LocalPlayer)
 end
@@ -81,8 +81,8 @@ end
 
 	@return Observable<PlayerSettingsClient | nil>
 ]=]
-function SettingsServiceClient.ObserveLocalPlayerSettings(self: SettingsServiceClient): _Observable.Observable<
-	_PlayerSettingsClient.PlayerSettingsClient
+function SettingsServiceClient.ObserveLocalPlayerSettings(self: SettingsServiceClient): Observable.Observable<
+	PlayerSettingsClient.PlayerSettingsClient
 >
 	return self:ObservePlayerSettings(Players.LocalPlayer)
 end
@@ -95,8 +95,8 @@ end
 ]=]
 function SettingsServiceClient.PromiseLocalPlayerSettings(
 	self: SettingsServiceClient,
-	cancelToken: _CancelToken.CancelToken
-): _Promise.Promise<_PlayerSettingsClient.PlayerSettingsClient>
+	cancelToken: CancelToken.CancelToken
+): Promise.Promise<PlayerSettingsClient.PlayerSettingsClient>
 	return self:PromisePlayerSettings(Players.LocalPlayer, cancelToken)
 end
 
@@ -109,7 +109,7 @@ end
 function SettingsServiceClient.ObservePlayerSettings(
 	self: SettingsServiceClient,
 	player: Player
-): _Observable.Observable<_PlayerSettingsClient.PlayerSettingsClient>
+): Observable.Observable<PlayerSettingsClient.PlayerSettingsClient>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._settingsDataService:ObservePlayerSettings(player)
@@ -124,8 +124,8 @@ end
 function SettingsServiceClient.ObservePlayerSettingsBrio(
 	self: SettingsServiceClient,
 	player: Player
-): _Observable.Observable<
-	_Brio.Brio<_PlayerSettingsClient.PlayerSettingsClient>
+): Observable.Observable<
+	Brio.Brio<PlayerSettingsClient.PlayerSettingsClient>
 >
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
@@ -141,7 +141,7 @@ end
 function SettingsServiceClient.GetPlayerSettings(
 	self: SettingsServiceClient,
 	player: Player
-): _PlayerSettingsClient.PlayerSettingsClient?
+): PlayerSettingsClient.PlayerSettingsClient?
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._settingsDataService:GetPlayerSettings(player)
@@ -157,8 +157,8 @@ end
 function SettingsServiceClient.PromisePlayerSettings(
 	self: SettingsServiceClient,
 	player: Player,
-	cancelToken: _CancelToken.CancelToken
-): _Promise.Promise<_PlayerSettingsClient.PlayerSettingsClient>
+	cancelToken: CancelToken.CancelToken
+): Promise.Promise<PlayerSettingsClient.PlayerSettingsClient>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._settingsDataService:PromisePlayerSettings(player, cancelToken)

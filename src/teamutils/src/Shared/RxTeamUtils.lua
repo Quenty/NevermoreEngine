@@ -6,15 +6,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Teams = game:GetService("Teams")
 local Players = game:GetService("Players")
+local Teams = game:GetService("Teams")
 
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local Rx = require("Rx")
 
 local RxTeamUtils = {}
 
@@ -137,7 +137,7 @@ function RxTeamUtils.observePlayersForTeamColorBrio(teamColor: BrickColor): Obse
 		-- with the same color so no great solution here.
 		RxBrioUtils.switchMapBrio(function(team)
 			return RxTeamUtils.observePlayersForTeamBrio(team)
-		end),
+		end) :: any,
 	}) :: any
 end
 

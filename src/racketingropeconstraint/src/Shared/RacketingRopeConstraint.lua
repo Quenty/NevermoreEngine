@@ -12,8 +12,8 @@ local Binder = require("Binder")
 local OverriddenProperty = require("OverriddenProperty")
 local Promise = require("Promise")
 local RacketingRopeConstraintInterface = require("RacketingRopeConstraintInterface")
-local ValueObject = require("ValueObject")
 local TieRealmService = require("TieRealmService")
+local ValueObject = require("ValueObject")
 
 local START_DISTANCE = 1000
 
@@ -48,7 +48,9 @@ function RacketingRopeConstraint.new(ropeConstraint, serviceBag)
 		self._overriddenLength = self._maid:Add(OverriddenProperty.new(self._obj, "Length"))
 	end
 
-	self._maid:GiveTask(RacketingRopeConstraintInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm()))
+	self._maid:GiveTask(
+		RacketingRopeConstraintInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm())
+	)
 
 	return self
 end

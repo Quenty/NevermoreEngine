@@ -2,7 +2,8 @@
 	@class ObservableSortedList.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Maid = require("Maid")
 local ObservableSortedList = require("ObservableSortedList")
@@ -27,8 +28,8 @@ return function(_target)
 		-- end
 
 		local random = Random.new()
-		for _i=1, 10 do
-			add(math.floor(100*random:NextNumber()))
+		for _i = 1, 10 do
+			add(math.floor(100 * random:NextNumber()))
 		end
 
 		for index, node in observableSortedList._root:IterateNodesRange(3, 7) do
@@ -45,19 +46,19 @@ return function(_target)
 		observableSortedList:Destroy()
 	end)
 
-		-- for i=1, 10 do
-		-- 	add(-i)
-		-- 	add(i)
-		-- end
+	-- for i=1, 10 do
+	-- 	add(-i)
+	-- 	add(i)
+	-- end
 
-		-- add(2)
-		-- add(1)
-		-- add(3)
-		-- add(4)
-		-- add(5)
-		-- add(0)
+	-- add(2)
+	-- add(1)
+	-- add(3)
+	-- add(4)
+	-- add(5)
+	-- add(0)
 
-		-- print(observableSortedList:GetList())
+	-- print(observableSortedList:GetList())
 
 	return function()
 		maid:DoCleaning()

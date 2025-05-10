@@ -2,8 +2,6 @@
     "recommendations": [
       "kampfkarren.selene-vscode",
       "johnnymorganz.luau-lsp",
-      "johnnymorganz.stylua",
-      "shardulm94.trailing-spaces",
-      "esbenp.prettier-vscode"
+      "johnnymorganz.stylua"
     ]
 }

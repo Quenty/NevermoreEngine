@@ -7,5 +7,5 @@ local require = require(script.Parent.loader).load(script)
 local GenericScreenGuiProvider = require("GenericScreenGuiProvider")
 
 return GenericScreenGuiProvider.new({
-	SNACKBAR = 0;
+	SNACKBAR = 0,
 })

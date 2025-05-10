@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions for hoacekat stories.
 	@class CameraStoryUtils
@@ -9,8 +10,9 @@ local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
 
 local InsertServiceUtils = require("InsertServiceUtils")
-local Promise = require("Promise")
+local Maid = require("Maid")
 local Math = require("Math")
+local Promise = require("Promise")
 
 local CameraStoryUtils = {}
 
@@ -20,7 +22,7 @@ local CameraStoryUtils = {}
 	@param topCamera Camera
 	@return Camera
 ]=]
-function CameraStoryUtils.reflectCamera(maid, topCamera: Camera)
+function CameraStoryUtils.reflectCamera(maid: Maid.Maid, topCamera: Camera): Camera
 	local camera = Instance.new("Camera")
 	camera.Name = "ReflectedCamera"
 	maid:GiveTask(camera)
@@ -43,7 +45,7 @@ end
 	@param target GuiBase
 	@return ViewportFrame
 ]=]
-function CameraStoryUtils.setupViewportFrame(maid, target: GuiBase)
+function CameraStoryUtils.setupViewportFrame(maid: Maid.Maid, target: GuiBase)
 	local viewportFrame = Instance.new("ViewportFrame")
 	viewportFrame.ZIndex = 0
 	viewportFrame.BorderSizePixel = 0
@@ -67,11 +69,15 @@ end
 	@param properties { [string}: any }
 	@return Promise<Instance>
 ]=]
-function CameraStoryUtils.promiseCrate(maid, viewportFrame, properties)
+function CameraStoryUtils.promiseCrate(
+	maid: Maid.Maid,
+	viewportFrame: ViewportFrame,
+	properties
+): Promise.Promise<Instance>
 	return maid:GivePromise(InsertServiceUtils.promiseAsset(182451181)):Then(function(model)
 		maid:GiveTask(model)
 
-		local crate = model:GetChildren()[1]
+		local crate = (model :: any):GetChildren()[1]
 		if not crate then
 			return Promise.rejected()
 		end
@@ -92,7 +98,7 @@ function CameraStoryUtils.promiseCrate(maid, viewportFrame, properties)
 			local camera = viewportFrame.CurrentCamera
 			if camera then
 				local cameraCFrame = camera.CFrame
-				local cframe = CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector * 25)
+				local cframe = CFrame.new(cameraCFrame.Position + cameraCFrame.LookVector * 25)
 				crate:SetPrimaryPartCFrame(cframe)
 			end
 		end
@@ -111,7 +117,14 @@ end
 	@param toCFrame CFrame
 	@return (interpolate: function, color: Color3, label: string?, labelOffset: Vector2?) -> ()
 ]=]
-function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high, period, toCFrame)
+function CameraStoryUtils.getInterpolationFactory(
+	maid: Maid.Maid,
+	viewportFrame: ViewportFrame,
+	low: number,
+	high: number,
+	period: number,
+	toCFrame: CFrame
+)
 	assert(maid, "Bad maid")
 	assert(viewportFrame, "Bad viewportFrame")
 	assert(type(low) == "number", "Bad low")
@@ -126,10 +139,9 @@ function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high
 		labelOffset = labelOffset or Vector2.zero
 
 		maid:GivePromise(CameraStoryUtils.promiseCrate(maid, viewportFrame, {
-			Color = color;
-			Transparency = 0.5
-		}))
-			:Then(function(crate)
+			Color = color,
+			Transparency = 0.5,
+		})):Then(function(crate)
 			local label
 			if labelText then
 				local h, s, _ = Color3.toHSV(color)
@@ -170,7 +182,7 @@ function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high
 				end
 			end
 
-				maid:GiveTask(RunService.RenderStepped:Connect(function()
+			maid:GiveTask(RunService.RenderStepped:Connect(function()
 				local t = (os.clock() / period % 2 / period) * period
 				if t >= 1 then
 					t = 1 - (t % 1)
@@ -185,21 +197,21 @@ function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high
 					local camera = viewportFrame.CurrentCamera
 					local pos = camera:WorldToViewportPoint(cframe.p)
 					local viewportSize = viewportFrame.AbsoluteSize
-					local aspectRatio = viewportSize.x / viewportSize.y
-					if pos.z > 0 then
+					local aspectRatio = viewportSize.X / viewportSize.Y
+					if pos.Z > 0 then
 						label.Position =
-							UDim2.new((pos.x - 0.5) / aspectRatio + 0.5, labelOffset.x, pos.y, 0 + labelOffset.y)
+							UDim2.new((pos.X - 0.5) / aspectRatio + 0.5, labelOffset.X, pos.Y, 0 + labelOffset.Y)
 						label.Visible = true
 					else
 						label.Visible = false
 					end
 				end
 
-					for part, rel in relCFrame do
-						part.CFrame = cframe:toWorldSpace(rel)
-					end
-				end))
-			end)
+				for part, rel in relCFrame do
+					part.CFrame = cframe:toWorldSpace(rel)
+				end
+			end))
+		end)
 	end
 end
 

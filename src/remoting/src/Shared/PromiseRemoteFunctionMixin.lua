@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Intended for classes that extend BaseObject only
 	@class PromiseRemoteFunctionMixin
@@ -54,6 +55,5 @@ end
 function PromiseRemoteFunctionMixin:PromiseRemoteFunction()
 	return self._maid:GivePromise(promiseChild(self._obj, self._remoteFunctionName))
 end
-
 
 return PromiseRemoteFunctionMixin

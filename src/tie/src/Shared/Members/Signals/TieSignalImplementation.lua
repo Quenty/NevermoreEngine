@@ -5,8 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local TieUtils = require("TieUtils")
 local Maid = require("Maid")
+local TieUtils = require("TieUtils")
 local Tuple = require("Tuple")
 
 local TieSignalImplementation = setmetatable({}, BaseObject)

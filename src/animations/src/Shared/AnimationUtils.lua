@@ -5,9 +5,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RbxAssetUtils = require("RbxAssetUtils")
-local HumanoidAnimatorUtils = require("HumanoidAnimatorUtils")
 local EnumUtils = require("EnumUtils")
+local HumanoidAnimatorUtils = require("HumanoidAnimatorUtils")
+local RbxAssetUtils = require("RbxAssetUtils")
 
 local AnimationUtils = {}
 
@@ -173,7 +173,9 @@ end
 --[=[
 	Finds an animator for the current instance
 ]=]
-function AnimationUtils.getOrCreateAnimator(target: Animator | Player | Model | AnimationController): Animator?
+function AnimationUtils.getOrCreateAnimator(
+	target: Animator | Player | Model | Humanoid | AnimationController
+): Animator?
 	assert(typeof(target) == "Instance", "Bad target")
 
 	if target:IsA("Animator") then

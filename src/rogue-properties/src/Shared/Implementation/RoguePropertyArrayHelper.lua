@@ -61,8 +61,10 @@ function RoguePropertyArrayHelper:GetArrayRogueProperties()
 
 	local adornee = self._roguePropertyTable:GetAdornee()
 
-
-	local definitions = RoguePropertyArrayUtils.createDefinitionsFromContainer(container, self._arrayDefinitionHelper:GetPropertyTableDefinition())
+	local definitions = RoguePropertyArrayUtils.createDefinitionsFromContainer(
+		container,
+		self._arrayDefinitionHelper:GetPropertyTableDefinition()
+	)
 	local rogueProperties = {}
 
 	for index, definition in definitions do

@@ -7,8 +7,8 @@ local HttpService = game:GetService("HttpService")
 
 local require = require(script.Parent.loader).load(script)
 
-local RxAttributeUtils = require("RxAttributeUtils")
 local Rx = require("Rx")
+local RxAttributeUtils = require("RxAttributeUtils")
 
 local LocalizedTextUtils = {}
 

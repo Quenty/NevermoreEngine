@@ -6,8 +6,8 @@
 ]=]
 
 local loader = script.Parent.Parent
-local Maid = require(loader.Maid)
 local DependencyUtils = require(loader.Dependencies.DependencyUtils)
+local Maid = require(loader.Maid)
 local ReplicationType = require(loader.Replication.ReplicationType)
 local ReplicationTypeUtils = require(loader.Replication.ReplicationTypeUtils)
 

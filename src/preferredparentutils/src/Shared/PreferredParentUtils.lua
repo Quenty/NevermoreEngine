@@ -10,12 +10,14 @@ local RunService = game:GetService("RunService")
 local PreferredParentUtils = {}
 
 --[=[
+	Creates a function that will return the preferred parent for a given name, with a cache.
+
 	@param parent Instance
 	@param name string
-	@param forceCreate boolean
+	@param forceCreate boolean?
 	@return () -> Instance
 ]=]
-function PreferredParentUtils.createPreferredParentRetriever(parent: Instance, name: string, forceCreate: boolean)
+function PreferredParentUtils.createPreferredParentRetriever(parent: Instance, name: string, forceCreate: boolean?)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(name) == "string", "Bad name")
 
@@ -32,12 +34,14 @@ function PreferredParentUtils.createPreferredParentRetriever(parent: Instance, n
 end
 
 --[=[
+	Gets the preferred parent for an instance
+
 	@param parent Instance
 	@param name string
-	@param forceCreate boolean
+	@param forceCreate boolean?
 	@return Instance
 ]=]
-function PreferredParentUtils.getPreferredParent(parent: Instance, name: string, forceCreate: boolean): Instance?
+function PreferredParentUtils.getPreferredParent(parent: Instance, name: string, forceCreate: boolean?): Instance?
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(name) == "string", "Bad name")
 
@@ -66,6 +70,5 @@ function PreferredParentUtils.getPreferredParent(parent: Instance, name: string,
 
 	return nil
 end
-
 
 return PreferredParentUtils

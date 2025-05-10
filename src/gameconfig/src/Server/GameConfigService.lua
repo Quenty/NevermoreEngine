@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class GameConfigService
 ]=]
@@ -6,22 +7,22 @@ local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local GameConfigUtils = require("GameConfigUtils")
-local GameConfigPicker = require("GameConfigPicker")
-local Maid = require("Maid")
-local PreferredParentUtils = require("PreferredParentUtils")
-local GameConfigAssetUtils = require("GameConfigAssetUtils")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigAssetUtils = require("GameConfigAssetUtils")
+local GameConfigPicker = require("GameConfigPicker")
 local GameConfigServiceConstants = require("GameConfigServiceConstants")
-local _ServiceBag = require("ServiceBag")
+local GameConfigUtils = require("GameConfigUtils")
+local Maid = require("Maid")
+local PreferredParentUtils = require("PreferredParentUtils")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigService = {}
 GameConfigService.ServiceName = "GameConfigService"
 
 export type GameConfigService = typeof(setmetatable(
 	{} :: {
-		_serviceBag: _ServiceBag.ServiceBag,
+		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		_binders: any, -- Binders
 		_configPicker: GameConfigPicker.GameConfigPicker,
@@ -34,7 +35,7 @@ export type GameConfigService = typeof(setmetatable(
 	Initializes the configuration service. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function GameConfigService:Init(serviceBag: _ServiceBag.ServiceBag)
+function GameConfigService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -55,7 +56,7 @@ function GameConfigService:Init(serviceBag: _ServiceBag.ServiceBag)
 
 	self._getPreferredParent = PreferredParentUtils.createPreferredParentRetriever(ReplicatedStorage, "GameConfigs")
 
-	self._serviceBag:GetService(require("GameConfigDataService")):SetConfigPicker(self._configPicker)
+	self._serviceBag:GetService(require("GameConfigDataService") :: any):SetConfigPicker(self._configPicker)
 end
 
 --[=[
@@ -136,7 +137,11 @@ end
 	@param assetKey string -- Key name to use for the bundle
 	@param assetId number -- Cloud id
 ]=]
-function GameConfigService:AddTypedAsset(assetType: GameConfigAssetTypes.GameConfigAssetType, assetKey: string, assetId: number)
+function GameConfigService:AddTypedAsset(
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetKey: string,
+	assetId: number
+)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 	assert(type(assetId) == "number", "Bad assetId")

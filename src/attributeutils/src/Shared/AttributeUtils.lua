@@ -8,9 +8,9 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local CancelToken = require("CancelToken")
 local Maid = require("Maid")
 local Promise = require("Promise")
-local CancelToken = require("CancelToken")
 
 local DEFAULT_PREDICATE = function(value)
 	return value ~= nil
@@ -62,9 +62,14 @@ end
 	@param attributeName string
 	@param predicate function | nil
 	@param cancelToken CancelToken
-	@return Promise<any>
+	@return Promise<unknown>
 ]=]
-function AttributeUtils.promiseAttribute(instance: Instance, attributeName: string, predicate, cancelToken)
+function AttributeUtils.promiseAttribute(
+	instance: Instance,
+	attributeName: string,
+	predicate,
+	cancelToken: CancelToken.CancelToken?
+): Promise.Promise<unknown>
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
 	assert(CancelToken.isCancelToken(cancelToken) or cancelToken == nil, "Bad cancelToken")

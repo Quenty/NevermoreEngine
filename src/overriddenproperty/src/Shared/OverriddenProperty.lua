@@ -117,10 +117,9 @@ function OverriddenProperty:_listenForChange()
 		return
 	end
 
-	self._maid._update = self._obj:GetPropertyChangedSignal(self._propertyName)
-		:Connect(function()
-			self:_executeSet(false)
-		end)
+	self._maid._update = self._obj:GetPropertyChangedSignal(self._propertyName):Connect(function()
+		self:_executeSet(false)
+	end)
 end
 
 return OverriddenProperty

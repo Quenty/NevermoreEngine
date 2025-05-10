@@ -9,8 +9,8 @@ local require = require(script.Parent.loader).load(script)
 
 local CollectionService = game:GetService("CollectionService")
 
-local LinkUtils = require("LinkUtils")
 local BinderUtils = require("BinderUtils")
+local LinkUtils = require("LinkUtils")
 
 local BoundLinkUtils = {}
 

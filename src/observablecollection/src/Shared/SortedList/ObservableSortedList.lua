@@ -27,9 +27,9 @@ local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Rx = require("Rx")
 local Signal = require("Signal")
+local SortFunctionUtils = require("SortFunctionUtils")
 local SortedNode = require("SortedNode")
 local SortedNodeValue = require("SortedNodeValue")
-local SortFunctionUtils = require("SortFunctionUtils")
 local ValueObject = require("ValueObject")
 
 local ObservableSortedList = {}
@@ -64,7 +64,7 @@ export type ObservableSortedList<T> = typeof(setmetatable(
 	@param compare function
 	@return ObservableSortedList<T>
 ]=]
-function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunction<T>): ObservableSortedList<T>
+function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunction<T>?): ObservableSortedList<T>
 	assert(type(isReversed) == "boolean" or isReversed == nil, "Bad isReversed")
 
 	local self = setmetatable({} :: any, ObservableSortedList)

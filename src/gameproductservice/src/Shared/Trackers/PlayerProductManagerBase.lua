@@ -9,8 +9,8 @@ local require = require(script.Parent.loader).load(script)
 local MarketplaceService = game:GetService("MarketplaceService")
 
 local BaseObject = require("BaseObject")
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigDataService = require("GameConfigDataService")
 local MarketplaceUtils = require("MarketplaceUtils")
 local PlayerAssetMarketTracker = require("PlayerAssetMarketTracker")
@@ -82,7 +82,12 @@ function PlayerProductManagerBase.new(player, serviceBag)
 		if membershipType == Enum.MembershipType.Premium then
 			MarketplaceService:PromptPremiumPurchase(self._player)
 		else
-			warn(string.format("[PlayerProductManagerBase] - Unsure how to prompt for membershipType %q", tostring(membershipType)))
+			warn(
+				string.format(
+					"[PlayerProductManagerBase] - Unsure how to prompt for membershipType %q",
+					tostring(membershipType)
+				)
+			)
 		end
 	end))
 
@@ -103,10 +108,9 @@ function PlayerProductManagerBase.new(player, serviceBag)
 	end)
 
 	subscriptionOwnership:SetQueryOwnershipCallback(function(subscriptionId)
-		return MarketplaceUtils.promiseUserSubscriptionStatus(self._player, subscriptionId)
-			:Then(function(status)
-				return status.IsSubscribed == true
-			end)
+		return MarketplaceUtils.promiseUserSubscriptionStatus(self._player, subscriptionId):Then(function(status)
+			return status.IsSubscribed == true
+		end)
 	end)
 
 	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)
@@ -193,12 +197,12 @@ function PlayerProductManagerBase:PromisePlayerPromptClosed()
 			end
 
 			return true
-		end);
+		end),
 		Rx.where(function(value)
 			return value
-		end);
-		Rx.distinct();
-		Rx.share();
+		end),
+		Rx.distinct(),
+		Rx.share(),
 	})
 
 	return Rx.toPromise(self._observeNextNoPromptOpen)
@@ -242,7 +246,8 @@ function PlayerProductManagerBase:_addOwnershipTracker(assetType)
 
 	local marketAssetTracker = self:GetAssetTrackerOrError(assetType)
 
-	local ownershipTracker = self._maid:Add(PlayerAssetOwnershipTracker.new(self._player, self._configPicker, assetType, marketAssetTracker))
+	local ownershipTracker =
+		self._maid:Add(PlayerAssetOwnershipTracker.new(self._player, self._configPicker, assetType, marketAssetTracker))
 	marketAssetTracker:SetOwnershipTracker(ownershipTracker)
 
 	self._ownershipTrackers[assetType] = ownershipTracker

@@ -7,11 +7,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
-local Rx = require("Rx")
 local AnimationUtils = require("AnimationUtils")
+local BaseObject = require("BaseObject")
+local Rx = require("Rx")
 local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local AnimationTrackPlayer = setmetatable({}, BaseObject)
 AnimationTrackPlayer.ClassName = "AnimationTrackPlayer"
@@ -215,16 +215,18 @@ function AnimationTrackPlayer:IsPlaying(): boolean
 end
 
 function AnimationTrackPlayer:_onEachTrack(callback)
-	return self._currentTrack:ObserveBrio(function(track)
-		return track ~= nil
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	return self._currentTrack
+		:ObserveBrio(function(track)
+			return track ~= nil
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-		local track = brio:GetValue()
-		callback(brio:ToMaid(), track)
-	end)
+			local track = brio:GetValue()
+			callback(brio:ToMaid(), track)
+		end)
 end
 
 return AnimationTrackPlayer

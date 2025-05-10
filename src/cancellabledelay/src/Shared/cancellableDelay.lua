@@ -12,7 +12,7 @@
 	@return function? -- Can be used to cancel
 	@within cancellableDelay
 ]=]
-local function cancellableDelay<T...>(timeoutInSeconds: number, func: (T...) -> ...any, ...: T...): (() -> ())
+local function cancellableDelay<T...>(timeoutInSeconds: number, func: (T...) -> ...any, ...: T...): () -> ()
 	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
 	assert(type(func) == "function", "Bad func")
 

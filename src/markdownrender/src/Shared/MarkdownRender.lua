@@ -65,11 +65,13 @@ function MarkdownRender:Render(data)
 				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
 				height = height + gui.Size.Y.Offset
 
-				local nextIsNestedList = (type(data[index+1]) == "table"
-					and data[index+1].Type == "List"
-					and data[index+1].Level ~= item.Level)
+				local nextIsNestedList = (
+					type(data[index + 1]) == "table"
+					and data[index + 1].Type == "List"
+					and data[index + 1].Level ~= item.Level
+				)
 
-				if index ~= #data  then
+				if index ~= #data then
 					if nextIsNestedList then
 						height = height + self.SpaceBetweenList
 					else
@@ -132,11 +134,11 @@ end
 
 -- Strip ending punctuation which screws with roblox's wordwrapping and .TextFits
 function MarkdownRender:_renderParagraphLabel(label, text)
-	local labelWidth = label.Size.X.Scale*self._width + label.Size.X.Offset
+	local labelWidth = label.Size.X.Scale * self._width + label.Size.X.Offset
 
 	local strippedText = string.gsub(text, "(%p+)$", "")
-	local textSize = TextService:GetTextSize(strippedText, label.TextSize, label.Font,
-		Vector2.new(labelWidth, label.TextSize*20))
+	local textSize =
+		TextService:GetTextSize(strippedText, label.TextSize, label.Font, Vector2.new(labelWidth, label.TextSize * 20))
 
 	label.Size = UDim2.new(label.Size.X, UDim.new(0, textSize.Y))
 	label.Text = text
@@ -179,7 +181,7 @@ function MarkdownRender:_renderList(listData)
 
 	local frame = self:_getFrame()
 	frame.Name = string.format("List_%d", listData.Level)
-	frame.Size = UDim2.new(1, -(listData.Level)*self.Indent, 0, 0)
+	frame.Size = UDim2.new(1, -listData.Level * self.Indent, 0, 0)
 	frame.Position = UDim2.new(0, -frame.Size.X.Offset, 0, 0)
 	frame.Parent = self._gui
 
@@ -191,7 +193,7 @@ function MarkdownRender:_renderList(listData)
 
 		local bullet = self:_getBullet(listData.Level)
 		bullet.AnchorPoint = Vector2.new(0.5, 0.5)
-		bullet.Position = UDim2.new(0, -self.Indent/2, 0, self.TextSize/2 + 1)
+		bullet.Position = UDim2.new(0, -self.Indent / 2, 0, self.TextSize / 2 + 1)
 		bullet.Parent = textLabel
 
 		height = height + textLabel.Size.Y.Offset
@@ -208,7 +210,7 @@ end
 function MarkdownRender:_renderHeader(headerData)
 	local label = self:_getTextLabel()
 	label.Name = "Header" .. headerData.Level
-	label.TextSize = self.TextSize + (self.MaxHeaderLevel-headerData.Level)
+	label.TextSize = self.TextSize + (self.MaxHeaderLevel - headerData.Level)
 	label.TextYAlignment = Enum.TextYAlignment.Center
 	label.Parent = self._gui
 	label.Font = Enum.Font.SourceSansSemibold

@@ -19,12 +19,12 @@ local PlayerSettingsBase = require("PlayerSettingsBase")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
+local Promise = require("Promise")
 local Remoting = require("Remoting")
+local ServiceBag = require("ServiceBag")
 local Symbol = require("Symbol")
 local ThrottledFunction = require("ThrottledFunction")
 local ValueObject = require("ValueObject")
-local _ServiceBag = require("ServiceBag")
-local _Promise = require("Promise")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -38,7 +38,7 @@ export type PlayerSettingsClient = typeof(setmetatable(
 		_pendingReplicationDataInTransit: ValueObject.ValueObject<any>,
 		_toReplicate: { [any]: any? }?,
 		_toReplicateCallbacks: { [string]: { [any]: any } },
-		_currentReplicationRequest: _Promise.Promise<()>?,
+		_currentReplicationRequest: Promise.Promise<()>?,
 		_queueSendSettingsFunc: ThrottledFunction.ThrottledFunction<()>,
 	},
 	{} :: typeof({ __index = PlayerSettingsClient })
@@ -51,7 +51,7 @@ export type PlayerSettingsClient = typeof(setmetatable(
 	@param serviceBag ServiceBag
 	@return PlayerSettingsClient
 ]=]
-function PlayerSettingsClient.new(folder: Folder, serviceBag: _ServiceBag.ServiceBag): PlayerSettingsClient
+function PlayerSettingsClient.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): PlayerSettingsClient
 	local self: PlayerSettingsClient =
 		setmetatable(PlayerSettingsBase.new(folder, serviceBag) :: any, PlayerSettingsClient)
 

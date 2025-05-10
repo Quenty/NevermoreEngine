@@ -10,12 +10,12 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local RoguePropertyService = {}
 RoguePropertyService.ServiceName = "RoguePropertyService"
 
-function RoguePropertyService:Init(serviceBag: _ServiceBag.ServiceBag)
+function RoguePropertyService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

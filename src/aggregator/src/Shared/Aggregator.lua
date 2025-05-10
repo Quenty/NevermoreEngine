@@ -8,9 +8,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local LRUCache = require("LRUCache")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
-local LRUCache = require("LRUCache")
 
 local Aggregator = setmetatable({}, BaseObject)
 Aggregator.ClassName = "Aggregator"
@@ -59,7 +60,7 @@ end
 	Sets the max batch size
 	@param maxBatchSize number
 ]=]
-function Aggregator.SetMaxBatchSize<T>(self: Aggregator<T>, maxBatchSize: number)
+function Aggregator.SetMaxBatchSize<T>(self: Aggregator<T>, maxBatchSize: number): ()
 	assert(type(maxBatchSize) == "number", "Bad maxBatchSize")
 	assert(self._unsentCount == 0, "Cannot set while unsent values exist")
 
@@ -70,7 +71,7 @@ end
 	@param id number
 	@return Promise<T>
 ]=]
-function Aggregator.Promise<T>(self: Aggregator<T>, id: number)
+function Aggregator.Promise<T>(self: Aggregator<T>, id: number): Promise.Promise<T>
 	assert(type(id) == "number", "Bad id")
 
 	local found = self._promisesLruCache:get(id)
@@ -95,10 +96,10 @@ end
 	@param id number
 	@return Observable<T>
 ]=]
-function Aggregator.Observe<T>(self: Aggregator<T>, id: number)
+function Aggregator.Observe<T>(self: Aggregator<T>, id: number): Observable.Observable<T>
 	assert(type(id) == "number", "Bad id")
 
-	return Rx.fromPromise(self:Promise(id))
+	return Rx.fromPromise(self:Promise(id)) :: any
 end
 
 function Aggregator._sendBatchedPromises<T>(self: Aggregator<T>, promiseMap)
@@ -152,7 +153,7 @@ function Aggregator._resetQueue<T>(self: Aggregator<T>)
 	return promiseMap
 end
 
-function Aggregator._queueBatchRequests<T>(self: Aggregator<T>)
+function Aggregator._queueBatchRequests<T>(self: Aggregator<T>): ()
 	if self._unsentCount >= self._maxBatchSize then
 		self:_sendBatchedPromises(self:_resetQueue())
 		return

@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PlaneUtils = require("PlaneUtils")
 local Draw = require("Draw")
+local PlaneUtils = require("PlaneUtils")
 
 local CameraPyramidUtils = {}
 
@@ -183,7 +183,12 @@ function CameraPyramidUtils._drawIntersection(
 	end
 end
 
-function CameraPyramidUtils._isInBounds(camCFrame: CFrame, intersection: Vector3?, halfFov: number, isVertical: boolean): boolean
+function CameraPyramidUtils._isInBounds(
+	camCFrame: CFrame,
+	intersection: Vector3?,
+	halfFov: number,
+	isVertical: boolean
+): boolean
 	if not intersection then
 		return false
 	end

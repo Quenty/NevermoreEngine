@@ -25,12 +25,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Brio = require("Brio")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local _Brio = require("Brio")
-local _Signal = require("Signal")
-local _Observable = require("Observable")
-local _Maid = require("Maid")
-local _Rx = require("Rx")
 
 local StateStack = setmetatable({}, BaseObject)
 StateStack.ClassName = "StateStack"
@@ -38,7 +37,7 @@ StateStack.__index = StateStack
 
 export type StateStack<T> = typeof(setmetatable(
 	{} :: {
-		Changed: _Signal.Signal<T>,
+		Changed: Signal.Signal<T>,
 
 		_state: ValueObject.ValueObject<T>,
 		_defaultValue: T,
@@ -90,7 +89,7 @@ end
 	Observes the current value of stack
 	@return Observable<T>
 ]=]
-function StateStack.Observe<T>(self: StateStack<T>): _Observable.Observable<T>
+function StateStack.Observe<T>(self: StateStack<T>): Observable.Observable<T>
 	return self._state:Observe()
 end
 
@@ -99,10 +98,7 @@ end
 	@param predicate function
 	@return Observable<T>
 ]=]
-function StateStack.ObserveBrio<T>(
-	self: StateStack<T>,
-	predicate: _Rx.Predicate<T>?
-): _Observable.Observable<_Brio.Brio<T>>
+function StateStack.ObserveBrio<T>(self: StateStack<T>, predicate: Rx.Predicate<T>?): Observable.Observable<Brio.Brio<T>>
 	return self._state:ObserveBrio(predicate) :: any
 end
 
@@ -129,7 +125,7 @@ end
 	@param brio Brio
 	@return function -- Cleanup function
 ]=]
-function StateStack.PushBrio<T>(self: StateStack<T>, brio: _Brio.Brio<T>): (() -> ())?
+function StateStack.PushBrio<T>(self: StateStack<T>, brio: Brio.Brio<T>): (() -> ())?
 	if brio:IsDead() then
 		return nil
 	end

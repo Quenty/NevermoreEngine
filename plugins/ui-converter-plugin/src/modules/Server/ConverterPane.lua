@@ -45,8 +45,8 @@ function ConverterPane.new()
 	self._libraryName = self._maid:Add(ValueObject.new("Blend"))
 
 	self._maid:GiveTask(Rx.combineLatest({
-		library = self._libraryName:Observe();
-		selectedList = self._selectedList:Observe();
+		library = self._libraryName:Observe(),
+		selectedList = self._selectedList:Observe(),
 	}):Subscribe(function(state)
 		self:_renderFromInstance(state)
 	end))
@@ -539,7 +539,7 @@ function ConverterPane:_renderPreviewPane(previewValue)
 				end
 
 				return transparentBacking(Viewport.blend({
-					Instance = inst;
+					Instance = inst,
 				}))
 			elseif inst:IsA("Decal") or inst:IsA("Texture") then
 				return paddedContainer(previewTexture(inst.Texture))
@@ -560,26 +560,26 @@ end
 
 function ConverterPane:_previewCode(codeValue)
 	return Blend.New "ScrollingFrame" {
-		AutomaticCanvasSize = Enum.AutomaticSize.XY;
-		CanvasSize = UDim2.new(0, 0, 0, 0);
-		ScrollingDirection = Enum.ScrollingDirection.Y;
-		Size = UDim2.new(1, 0, 1, 0);
-		Position = UDim2.new(0, 0, 1, 0);
-		AnchorPoint = Vector2.new(0, 1);
-		BackgroundColor3 = Color3.fromRGB(37, 37, 37);
+		AutomaticCanvasSize = Enum.AutomaticSize.XY,
+		CanvasSize = UDim2.new(0, 0, 0, 0),
+		ScrollingDirection = Enum.ScrollingDirection.Y,
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.new(0, 0, 1, 0),
+		AnchorPoint = Vector2.new(0, 1),
+		BackgroundColor3 = Color3.fromRGB(37, 37, 37),
 		[Blend.Children] = {
 			Blend.New "TextBox" {
-				Active = false;
-				Size = UDim2.new(1, 0, 0, 0);
-				AutomaticSize = Enum.AutomaticSize.Y;
-				TextXAlignment = Enum.TextXAlignment.Left;
-				TextYAlignment = Enum.TextYAlignment.Top;
-				Font = Enum.Font.Code;
-				MultiLine = true;
-				BackgroundTransparency = 1;
-				TextSize = 16;
-				TextEditable = false;
-				TextColor3 = Color3.new(1, 1, 1);
+				Active = false,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				Font = Enum.Font.Code,
+				MultiLine = true,
+				BackgroundTransparency = 1,
+				TextSize = 16,
+				TextEditable = false,
+				TextColor3 = Color3.new(1, 1, 1),
 
 				Text = Blend.Computed(codeValue, function(value)
 					if type(value) == "string" then
@@ -588,7 +588,7 @@ function ConverterPane:_previewCode(codeValue)
 					else
 						return value
 					end
-				end);
+				end),
 				-- [Blend.OnChange "Text"] = codeValue;
 
 				[function(textBox)
@@ -601,7 +601,7 @@ function ConverterPane:_previewCode(codeValue)
 
 						return maid
 					end)
-				end] = true;
+				end] = true,
 
 				[function(textBox)
 					return Observable.new(function(_sub)
@@ -620,16 +620,16 @@ function ConverterPane:_previewCode(codeValue)
 
 						return maid
 					end)
-				end] = true;
-			};
+				end] = true,
+			},
 
 			Blend.New "UIPadding" {
-				PaddingLeft = UDim.new(0, 10);
-				PaddingRight = UDim.new(0, 10);
-				PaddingTop = UDim.new(0, 10);
-				PaddingBottom = UDim.new(0, 10);
-			};
-		};
+				PaddingLeft = UDim.new(0, 10),
+				PaddingRight = UDim.new(0, 10),
+				PaddingTop = UDim.new(0, 10),
+				PaddingBottom = UDim.new(0, 10),
+			},
+		},
 	}
 end
 
@@ -644,25 +644,25 @@ function ConverterPane:Render(props)
 	local HEADER_HEIGHT = 24
 	local function header(text)
 		return Blend.New "TextLabel" {
-			Name = "Header";
-			TextColor3 = Color3.fromRGB(170, 170, 170);
-			TextTruncate = Enum.TextTruncate.AtEnd;
-			Text = text;
-			Size = UDim2.new(1, 0, 0, HEADER_HEIGHT);
-			Font = Enum.Font.Arial;
-			TextSize = 12;
-			BackgroundColor3 = Color3.fromRGB(53, 53, 53);
+			Name = "Header",
+			TextColor3 = Color3.fromRGB(170, 170, 170),
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			Text = text,
+			Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
+			Font = Enum.Font.Arial,
+			TextSize = 12,
+			BackgroundColor3 = Color3.fromRGB(53, 53, 53),
 		}
 	end
 
 	local function content(child)
 		return Blend.New "Frame" {
-			Name = "Content";
-			Size = UDim2.new(1, 0, 1, -HEADER_HEIGHT);
-			Position = UDim2.new(0.5, 0, 1, 0);
-			AnchorPoint = Vector2.new(0.5, 1);
-			BackgroundColor3 = Color3.fromRGB(46, 46, 46);
-			[Blend.Children] = child;
+			Name = "Content",
+			Size = UDim2.new(1, 0, 1, -HEADER_HEIGHT),
+			Position = UDim2.new(0.5, 0, 1, 0),
+			AnchorPoint = Vector2.new(0.5, 1),
+			BackgroundColor3 = Color3.fromRGB(46, 46, 46),
+			[Blend.Children] = child,
 		}
 	end
 
@@ -677,40 +677,40 @@ function ConverterPane:Render(props)
 	end)
 
 	return Blend.New "Frame" {
-		Parent = props.Parent;
-		Size = UDim2.new(1, 0, 1, 0);
-		BackgroundColor3 = Color3.fromRGB(100, 41, 41);
+		Parent = props.Parent,
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundColor3 = Color3.fromRGB(100, 41, 41),
 
-		[Blend.OnChange "AbsoluteSize" ] = self._absoluteSize;
-		[Blend.OnChange "AbsolutePosition" ] = self._absolutePosition;
+		[Blend.OnChange "AbsoluteSize"] = self._absoluteSize,
+		[Blend.OnChange "AbsolutePosition"] = self._absolutePosition,
 
 		[Blend.Children] = {
 			Blend.New "Frame" {
-				Name = "LeftPreviewFrame";
-				Position = UDim2.new(0, 0, 0, 0);
+				Name = "LeftPreviewFrame",
+				Position = UDim2.new(0, 0, 0, 0),
 				Size = Blend.Computed(self._hDividerPosition, function(hPosition)
-					return UDim2.new(hPosition, -DIVIDER_WIDTH/2, 1, 0)
-				end);
+					return UDim2.new(hPosition, -DIVIDER_WIDTH / 2, 1, 0)
+				end),
 
 				-- BackgroundColor3 = Color3.fromRGB(37, 37, 37);
-				BackgroundTransparency = 1;
+				BackgroundTransparency = 1,
 				[Blend.Children] = {
 					header(Blend.Computed(selectionName, function(name)
 						return string.format("Quenty's UI Converter - Selection %s", name)
-					end));
-					content(self:_renderPreviewPane(self._copyPreview));
-				}
-			};
+					end)),
+					content(self:_renderPreviewPane(self._copyPreview)),
+				},
+			},
 
 			Blend.New "Frame" {
-				Name = "DraggingCoverFrame";
+				Name = "DraggingCoverFrame",
 				Visible = Blend.Computed(self._draggingState, function(down)
 					return down and true or false
-				end);
-				Active = true;
-				Size = UDim2.new(1, 0, 1, 0);
-				BackgroundTransparency = 1;
-				ZIndex = 1e6;
+				end),
+				Active = true,
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = 1,
+				ZIndex = 1e6,
 
 				[Blend.OnEvent "InputEnded"] = function(inputObject)
 					if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
@@ -718,96 +718,100 @@ function ConverterPane:Render(props)
 					else
 						handleInputEnd(inputObject)
 					end
-				end;
+				end,
 				[Blend.OnEvent "InputChanged"] = function(inputObject)
 					if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 						if self._draggingState.Value == "vertical" then
 							self._vDividerPosition.Value = math.clamp(
-								(inputObject.Position.y - self._absolutePosition.Value.y)/self._absoluteSize.Value.y, 0.05, 0.95)
+								(inputObject.Position.y - self._absolutePosition.Value.y) / self._absoluteSize.Value.y,
+								0.05,
+								0.95
+							)
 						elseif self._draggingState.Value == "horizontal" then
 							self._hDividerPosition.Value = math.clamp(
-								(inputObject.Position.x - self._absolutePosition.Value.x)/self._absoluteSize.Value.x, 0.05, 0.95)
+								(inputObject.Position.x - self._absolutePosition.Value.x) / self._absoluteSize.Value.x,
+								0.05,
+								0.95
+							)
 						end
 					end
-				end;
-			};
+				end,
+			},
 
 			Blend.New "Frame" {
-				Name = "RenderedPreviewPane";
-				Position = UDim2.new(1, 0, 0, 0);
-				AnchorPoint = Vector2.new(1, 0);
+				Name = "RenderedPreviewPane",
+				Position = UDim2.new(1, 0, 0, 0),
+				AnchorPoint = Vector2.new(1, 0),
 				Size = Blend.Computed(self._vDividerPosition, self._hDividerPosition, function(vPosition, hPosition)
-					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, vPosition, 0)
-				end);
-				BackgroundTransparency = 1;
+					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH / 2, vPosition, 0)
+				end),
+				BackgroundTransparency = 1,
 
 				[Blend.Children] = {
 					header(Blend.Computed(self._libraryName, selectionName, function(libraryName, name)
 						return string.format("Quenty's UI Converter - %s Render %s", libraryName, name)
-					end));
+					end)),
 
-					content(self:_renderPreviewPane(self._renderPreview));
-				};
-			};
+					content(self:_renderPreviewPane(self._renderPreview)),
+				},
+			},
 
 			Blend.New "TextButton" {
-				AutoButtonColor = true;
+				AutoButtonColor = true,
 				Position = Blend.Computed(self._vDividerPosition, function(vPosition)
 					return UDim2.new(1, 0, vPosition, 0)
-				end);
-				AnchorPoint = Vector2.new(1, 0.5);
+				end),
+				AnchorPoint = Vector2.new(1, 0.5),
 				Size = Blend.Computed(self._hDividerPosition, function(hPosition)
-					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, 0, DIVIDER_WIDTH)
-				end);
-				BackgroundColor3 = Color3.fromRGB(60, 60, 60);
+					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH / 2, 0, DIVIDER_WIDTH)
+				end),
+				BackgroundColor3 = Color3.fromRGB(60, 60, 60),
 
-				[Blend.OnEvent "InputEnded"] = handleInputEnd;
+				[Blend.OnEvent "InputEnded"] = handleInputEnd,
 				[Blend.OnEvent "InputBegan"] = function(inputObject)
 					if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 						self._draggingState.Value = "vertical"
 					end
-				end;
-			};
+				end,
+			},
 
 			Blend.New "TextButton" {
-				AutoButtonColor = true;
+				AutoButtonColor = true,
 				Position = Blend.Computed(self._hDividerPosition, function(hPosition)
 					return UDim2.new(hPosition, 0, 0, 0)
-				end);
-				AnchorPoint = Vector2.new(0.5, 0);
-				Size = UDim2.new(0, DIVIDER_WIDTH, 1, 0);
-				BackgroundColor3 = Color3.fromRGB(60, 60, 60);
+				end),
+				AnchorPoint = Vector2.new(0.5, 0),
+				Size = UDim2.new(0, DIVIDER_WIDTH, 1, 0),
+				BackgroundColor3 = Color3.fromRGB(60, 60, 60),
 
-				[Blend.OnEvent "InputEnded"] = handleInputEnd;
+				[Blend.OnEvent "InputEnded"] = handleInputEnd,
 				[Blend.OnEvent "InputBegan"] = function(inputObject)
 					if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 						self._draggingState.Value = "horizontal"
 					end
-				end;
-			};
-
+				end,
+			},
 
 			Blend.New "Frame" {
-				Name = "CodePane";
-				Position = UDim2.new(1, 0, 1, 0);
-				AnchorPoint = Vector2.new(1, 1);
+				Name = "CodePane",
+				Position = UDim2.new(1, 0, 1, 0),
+				AnchorPoint = Vector2.new(1, 1),
 				Size = Blend.Computed(self._vDividerPosition, self._hDividerPosition, function(vPosition, hPosition)
-					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH/2, 1 - vPosition, -DIVIDER_WIDTH/2)
-				end);
-				BackgroundTransparency = 1;
+					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH / 2, 1 - vPosition, -DIVIDER_WIDTH / 2)
+				end),
+				BackgroundTransparency = 1,
 
-				[Blend.OnEvent "InputBegan"] = self._captureFocus;
+				[Blend.OnEvent "InputBegan"] = self._captureFocus,
 
 				[Blend.Children] = {
 					header(Blend.Computed(self._libraryName, selectionName, function(libraryName, name)
 						return string.format("Quenty's UI Converter - %s Code %s", libraryName, name)
-					end));
+					end)),
 
-					content(self:_previewCode(self._code));
-
-				};
-			};
-		};
+					content(self:_previewCode(self._code)),
+				},
+			},
+		},
 	}
 end
 

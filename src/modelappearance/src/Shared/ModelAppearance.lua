@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Allows the appearance of a model to be overridden. Most commonly used when
 	placing down an object in a building game.
@@ -13,8 +14,29 @@ local ModelAppearance = {}
 ModelAppearance.ClassName = "ModelAppearance"
 ModelAppearance.__index = ModelAppearance
 
-function ModelAppearance.new(model)
-	local self = setmetatable({}, ModelAppearance)
+export type ModelAppearance = typeof(setmetatable(
+	{} :: {
+		_parts: {
+			[BasePart]: {
+				Transparency: number,
+				Color: Color3,
+				Material: Enum.Material,
+				CanCollide: boolean,
+				UsePartColor: boolean?,
+			},
+		},
+		_interactions: { Instance },
+		_seats: { [Seat | VehicleSeat]: Instance },
+		_canCollide: boolean?,
+		_transparency: number?,
+		_color: Color3?,
+		_material: Enum.Material?,
+	},
+	{} :: typeof({ __index = ModelAppearance })
+))
+
+function ModelAppearance.new(model: Instance): ModelAppearance
+	local self: ModelAppearance = setmetatable({} :: any, ModelAppearance)
 
 	self._parts = {}
 	self._interactions = {}
@@ -23,10 +45,10 @@ function ModelAppearance.new(model)
 	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then
 			self._parts[part] = {
-				Transparency = part.Transparency;
-				Color = part.Color;
-				Material = part.Material;
-				CanCollide = part.CanCollide;
+				Transparency = part.Transparency,
+				Color = part.Color,
+				Material = part.Material,
+				CanCollide = part.CanCollide,
 			}
 
 			if part:IsA("Seat") or part:IsA("VehicleSeat") then
@@ -44,20 +66,29 @@ function ModelAppearance.new(model)
 	return self
 end
 
--- Destructive, cannot be reverted
-function ModelAppearance:DisableInteractions()
+--[=[
+	Disables all interactions with the model. This includes click detectors and seats
+
+	:::tip
+	Destructive, cannot be reverted
+	:::
+]=]
+function ModelAppearance.DisableInteractions(self: ModelAppearance)
 	for _, item in self._interactions do
 		item:Destroy()
 	end
 	self._interactions = {}
 	for seat, _ in self._seats do
-		seat.Disabled = true
+		(seat :: Seat).Disabled = true
 	end
 
 	self:SetCanCollide(false)
 end
 
-function ModelAppearance:SetCanCollide(canCollide: boolean)
+--[=[
+	Sets the models collision state
+]=]
+function ModelAppearance.SetCanCollide(self: ModelAppearance, canCollide: boolean)
 	assert(type(canCollide) == "boolean", "Bad canCollide")
 
 	if self._canCollide == canCollide then
@@ -70,11 +101,19 @@ function ModelAppearance:SetCanCollide(canCollide: boolean)
 	end
 end
 
-function ModelAppearance:ResetCanCollide()
+--[=[
+	Resets the can collide state to the original state
+]=]
+function ModelAppearance.ResetCanCollide(self: ModelAppearance)
 	self:SetCanCollide(true)
 end
 
-function ModelAppearance:SetTransparency(transparency)
+--[=[
+	Sets the transparency of the model
+
+	@param transparency number
+]=]
+function ModelAppearance.SetTransparency(self: ModelAppearance, transparency: number)
 	if self._transparency == transparency then
 		return
 	end
@@ -85,7 +124,10 @@ function ModelAppearance:SetTransparency(transparency)
 	end
 end
 
-function ModelAppearance:ResetTransparency()
+--[=[
+	Resets the transparency to the original state
+]=]
+function ModelAppearance.ResetTransparency(self: ModelAppearance)
 	if not self._transparency then
 		return
 	end
@@ -96,7 +138,12 @@ function ModelAppearance:ResetTransparency()
 	end
 end
 
-function ModelAppearance:SetColor(color)
+--[=[
+	Sets the color of the model
+
+	@param color Color3
+]=]
+function ModelAppearance.SetColor(self: ModelAppearance, color: Color3)
 	assert(typeof(color) == "Color3", "Bad color")
 
 	if self._color == color then
@@ -113,7 +160,10 @@ function ModelAppearance:SetColor(color)
 	end
 end
 
-function ModelAppearance:ResetColor()
+--[=[
+	Resets the color to the original state
+]=]
+function ModelAppearance.ResetColor(self: ModelAppearance)
 	if not self._color then
 		return
 	end
@@ -123,12 +173,15 @@ function ModelAppearance:ResetColor()
 		part.Color = properties.Color
 
 		if part:IsA("PartOperation") then
-			part.UsePartColor = properties.UsePartColor
+			part.UsePartColor = properties.UsePartColor :: boolean
 		end
 	end
 end
 
-function ModelAppearance:ResetMaterial()
+--[=[
+	Resets the material to the original state
+]=]
+function ModelAppearance.ResetMaterial(self: ModelAppearance): ()
 	if not self._material then
 		return
 	end
@@ -139,7 +192,12 @@ function ModelAppearance:ResetMaterial()
 	end
 end
 
-function ModelAppearance:SetMaterial(material)
+--[=[
+	Sets the material of the model
+
+	@param material Enum.Material
+]=]
+function ModelAppearance.SetMaterial(self: ModelAppearance, material: Enum.Material)
 	if self._material == material then
 		return
 	end

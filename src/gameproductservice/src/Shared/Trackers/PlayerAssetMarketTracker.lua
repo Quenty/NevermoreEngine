@@ -8,12 +8,12 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local _GameConfigAssetTypes = require("GameConfigAssetTypes")
 
 local PlayerAssetMarketTracker = setmetatable({}, BaseObject)
 PlayerAssetMarketTracker.ClassName = "PlayerAssetMarketTracker"
@@ -28,7 +28,7 @@ PlayerAssetMarketTracker.__index = PlayerAssetMarketTracker
 	@param observeIdsBrio function
 	@return PlayerAssetMarketTracker
 ]=]
-function PlayerAssetMarketTracker.new(assetType: _GameConfigAssetTypes.GameConfigAssetType, convertIds, observeIdsBrio)
+function PlayerAssetMarketTracker.new(assetType: GameConfigAssetTypes.GameConfigAssetType, convertIds, observeIdsBrio)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	local self = setmetatable(BaseObject.new(), PlayerAssetMarketTracker)
@@ -246,7 +246,7 @@ end
 
 	@return GameConfigAssetTypes
 ]=]
-function PlayerAssetMarketTracker:GetAssetType(): _GameConfigAssetTypes.GameConfigAssetType
+function PlayerAssetMarketTracker:GetAssetType(): GameConfigAssetTypes.GameConfigAssetType
 	return self._assetType
 end
 

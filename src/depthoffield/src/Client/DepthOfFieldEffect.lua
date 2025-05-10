@@ -12,18 +12,18 @@ local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
 
 local Blend = require("Blend")
+local Brio = require("Brio")
 local Maid = require("Maid")
 local Math = require("Math")
 local Observable = require("Observable")
 local Rx = require("Rx")
+local RxAttributeUtils = require("RxAttributeUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local SpringObject = require("SpringObject")
 local SpringTransitionModel = require("SpringTransitionModel")
 local TransitionModel = require("TransitionModel")
 local ValueObject = require("ValueObject")
-local RxAttributeUtils = require("RxAttributeUtils")
-local _Brio = require("Brio")
 
 local DepthOfFieldEffect = setmetatable({}, TransitionModel)
 DepthOfFieldEffect.ClassName = "DepthOfFieldEffect"
@@ -37,7 +37,7 @@ export type DepthOfFieldEffect = typeof(setmetatable(
 		_nearIntensitySpring: SpringObject.SpringObject<number>,
 		_farIntensitySpring: SpringObject.SpringObject<number>,
 		_percentVisibleModel: SpringTransitionModel.SpringTransitionModel<number>,
-		_observeOtherStates: Observable.Observable<_Brio.Brio<DepthOfFieldEffect>?>,
+		_observeOtherStates: Observable.Observable<Brio.Brio<DepthOfFieldEffect>?>,
 	},
 	{} :: typeof({ __index = DepthOfFieldEffect })
 )) & TransitionModel.TransitionModel
@@ -282,7 +282,9 @@ type DepthOfFieldState = {
 	depthOfField: Instance?,
 }
 
-function DepthOfFieldEffect._observeRenderedDepthOfFieldState(self: DepthOfFieldEffect)
+function DepthOfFieldEffect._observeRenderedDepthOfFieldState(
+	self: DepthOfFieldEffect
+): Observable.Observable<Brio.Brio<DepthOfFieldEffect>?>
 	if self._observeOtherStates then
 		return self._observeOtherStates
 	end
@@ -378,10 +380,12 @@ function DepthOfFieldEffect._observeRenderedDepthOfFieldState(self: DepthOfField
 		Rx.cache() :: any,
 	}) :: any
 
-	return self._observeOtherStates
+	return self._observeOtherStates :: any
 end
 
-function DepthOfFieldEffect._observeAllDepthOfFieldBrio(_self: DepthOfFieldEffect): Observable.Observable<_Brio.Brio<Instance>>
+function DepthOfFieldEffect._observeAllDepthOfFieldBrio(
+	_self: DepthOfFieldEffect
+): Observable.Observable<Brio.Brio<Instance>>
 	return Rx.merge({
 		RxInstanceUtils.observeChildrenOfClassBrio(Lighting, "DepthOfFieldEffect") :: any,
 		RxInstanceUtils.observePropertyBrio(Workspace, "CurrentCamera", function(camera)
@@ -389,7 +393,7 @@ function DepthOfFieldEffect._observeAllDepthOfFieldBrio(_self: DepthOfFieldEffec
 		end):Pipe({
 			RxBrioUtils.flatMapBrio(function(currentCamera)
 				return RxInstanceUtils.observeChildrenOfClassBrio(currentCamera, "DepthOfFieldEffect")
-			end),
+			end) :: any,
 		}) :: any,
 	}) :: any
 end

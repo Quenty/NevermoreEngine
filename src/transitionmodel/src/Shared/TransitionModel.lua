@@ -9,12 +9,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
-local Promise = require("Promise")
-local Maid = require("Maid")
-local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
-local _Signal = require("Signal")
-local _Observable = require("Observable")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Promise = require("Promise")
+local ValueObject = require("ValueObject")
 
 local TransitionModel = setmetatable({}, BasicPane)
 TransitionModel.ClassName = "TransitionModel"
@@ -132,7 +131,7 @@ end
 	Observe is showing is complete
 	@return Observable<boolean>
 ]=]
-function TransitionModel.ObserveIsShowingComplete(self: TransitionModel): _Observable.Observable<boolean>
+function TransitionModel.ObserveIsShowingComplete(self: TransitionModel): Observable.Observable<boolean>
 	return self._isShowingComplete:Observe()
 end
 
@@ -140,7 +139,7 @@ end
 	Observe is hiding is complete
 	@return Observable<boolean>
 ]=]
-function TransitionModel.ObserveIsHidingComplete(self: TransitionModel): _Observable.Observable<boolean>
+function TransitionModel.ObserveIsHidingComplete(self: TransitionModel): Observable.Observable<boolean>
 	return self._isHidingComplete:Observe()
 end
 
@@ -304,7 +303,12 @@ function TransitionModel._executeHide(self: TransitionModel, doNotAnimate: boole
 			promise:Resolve(result)
 		else
 			promise:Reject()
-			error(string.format("[TransitionModel] - Expected promise to be returned from hideCallback, got %q", tostring(result)))
+			error(
+				string.format(
+					"[TransitionModel] - Expected promise to be returned from hideCallback, got %q",
+					tostring(result)
+				)
+			)
 		end
 	else
 		-- Immediately resolve

@@ -7,7 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local LinearValue = require("LinearValue")
-local _Spring = require("Spring")
+local Spring = require("Spring")
 
 local SpringUtils = {}
 
@@ -22,7 +22,7 @@ local EPSILON = 1e-6
 	@param epsilon number? -- Optional epsilon
 	@return boolean, T
 ]=]
-function SpringUtils.animating<T>(spring: _Spring.Spring<T>, epsilon: number?): (boolean, T)
+function SpringUtils.animating<T>(spring: Spring.Spring<T>, epsilon: number?): (boolean, T)
 	local thisEpsilon = epsilon or EPSILON
 
 	local position = spring.Position

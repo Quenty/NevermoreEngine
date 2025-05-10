@@ -15,12 +15,13 @@ local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local SettingsDataService = {}
 
 export type SettingsDataService = typeof(setmetatable(
 	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 	},
 	{} :: typeof({ __index = SettingsDataService })
@@ -31,7 +32,7 @@ export type SettingsDataService = typeof(setmetatable(
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingsDataService:Init(serviceBag: _ServiceBag.ServiceBag)
+function SettingsDataService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()

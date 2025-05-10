@@ -108,7 +108,6 @@ function AnimationSlotPlayer.AdjustSpeed(self: AnimationSlotPlayer, id: string |
 
 	local topMaid = Maid.new()
 
-	-- stylua: ignore
 	topMaid:GiveTask(self._currentAnimationTrackData
 		:ObserveBrio(function(data: AnimationData)
 			return data and data.animationId == animationId
@@ -159,7 +158,6 @@ function AnimationSlotPlayer.AdjustWeight(self: AnimationSlotPlayer, id: string,
 
 	local topMaid = Maid.new()
 
-	-- stylua: ignore
 	topMaid:GiveTask(self._currentAnimationTrackData
 		:ObserveBrio(function(data)
 			return data and data.animationId == animationId

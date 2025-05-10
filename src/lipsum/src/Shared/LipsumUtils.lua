@@ -193,7 +193,7 @@ function LipsumUtils.document(numParagraphs: number?, createParagraph: GenerateC
 	end
 
 	local output = ""
-	for p=1, paragraphCount do
+	for p = 1, paragraphCount do
 		output ..= generateParagraph()
 		if p ~= paragraphCount then
 			output ..= "\n\n"

@@ -8,8 +8,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
-local StarterGui = game:GetService("StarterGui")
 local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 
 local Brio = require("Brio")
 local Maid = require("Maid")

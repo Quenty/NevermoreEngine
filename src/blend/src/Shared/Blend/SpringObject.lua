@@ -603,7 +603,6 @@ function SpringObject:_getSpringForType(converted)
 	local currentSpring = rawget(self, "_currentSpring")
 
 	if currentSpring == nil then
-
 		-- only happens on init
 		local newSpring = Spring.new(converted)
 
@@ -649,9 +648,9 @@ function SpringObject:_getInitInfo()
 	end
 
 	local value = {
-		Clock = os.clock;
-		Damper = 1;
-		Speed = 1;
+		Clock = os.clock,
+		Damper = 1,
+		Speed = 1,
 	}
 
 	rawset(self, "_initInfo", value)

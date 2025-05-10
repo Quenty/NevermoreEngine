@@ -1,4 +1,8 @@
+--!strict
 --[=[
+	InfluxDB API to write to the server.
+
+	@server
 	@class InfluxDBWriteAPI
 ]=]
 
@@ -7,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local HttpPromise = require("HttpPromise")
 local InfluxDBClientConfigUtils = require("InfluxDBClientConfigUtils")
+local InfluxDBErrorUtils = require("InfluxDBErrorUtils")
 local InfluxDBPoint = require("InfluxDBPoint")
 local InfluxDBPointSettings = require("InfluxDBPointSettings")
 local InfluxDBWriteBuffer = require("InfluxDBWriteBuffer")
@@ -14,14 +19,38 @@ local InfluxDBWriteOptionUtils = require("InfluxDBWriteOptionUtils")
 local Promise = require("Promise")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local InfluxDBErrorUtils = require("InfluxDBErrorUtils")
 
 local InfluxDBWriteAPI = setmetatable({}, BaseObject)
 InfluxDBWriteAPI.ClassName = "InfluxDBWriteAPI"
 InfluxDBWriteAPI.__index = InfluxDBWriteAPI
 
-function InfluxDBWriteAPI.new(org: string, bucket: string, precision: string?)
-	local self = setmetatable(BaseObject.new(), InfluxDBWriteAPI)
+export type InfluxDBWriteAPI = typeof(setmetatable(
+	{} :: {
+		RequestFinished: Signal.Signal<(any)>,
+		Destroying: Signal.Signal<()>,
+
+		_clientConfig: ValueObject.ValueObject<InfluxDBClientConfigUtils.InfluxDBClientConfig>,
+		_printDebugWriteEnabled: boolean,
+		_org: string,
+		_bucket: string,
+		_precision: string,
+		_pointSettings: InfluxDBPointSettings.InfluxDBPointSettings,
+		_writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+		_writeBuffer: InfluxDBWriteBuffer.InfluxDBWriteBuffer,
+	},
+	{} :: typeof({ __index = InfluxDBWriteAPI })
+)) & BaseObject.BaseObject
+
+--[=[
+	Creates a new InfluxDB write API. Retrieve this from the [InfluxDBClient].
+
+	@param org string
+	@param bucket string
+	@param precision string?
+	@return InfluxDBWriteAPI
+]=]
+function InfluxDBWriteAPI.new(org: string, bucket: string, precision: string?): InfluxDBWriteAPI
+	local self: InfluxDBWriteAPI = setmetatable(BaseObject.new() :: any, InfluxDBWriteAPI)
 
 	assert(type(org) == "string", "Bad org")
 	assert(type(bucket) == "string", "Bad bucket")
@@ -53,27 +82,45 @@ function InfluxDBWriteAPI.new(org: string, bucket: string, precision: string?)
 	return self
 end
 
-function InfluxDBWriteAPI:SetPrintDebugWriteEnabled(printDebugEnabled: boolean)
+function InfluxDBWriteAPI.SetPrintDebugWriteEnabled(self: InfluxDBWriteAPI, printDebugEnabled: boolean): ()
 	assert(type(printDebugEnabled) == "boolean", "Bad printDebugEnabled")
 
 	self._printDebugWriteEnabled = printDebugEnabled
 end
 
-function InfluxDBWriteAPI:SetClientConfig(clientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig)
+function InfluxDBWriteAPI.SetClientConfig(
+	self: InfluxDBWriteAPI,
+	clientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig
+): ()
 	assert(InfluxDBClientConfigUtils.isClientConfig(clientConfig), "Bad clientConfig")
 
 	self._clientConfig.Value = InfluxDBClientConfigUtils.createClientConfig(clientConfig)
 end
 
-function InfluxDBWriteAPI:SetDefaultTags(tags)
+--[=[
+	Sets the default tags to write with each point.
+
+	@param tags InfluxDBTags
+]=]
+function InfluxDBWriteAPI.SetDefaultTags(self: InfluxDBWriteAPI, tags: InfluxDBPointSettings.InfluxDBTags): ()
 	self._pointSettings:SetDefaultTags(tags)
 end
 
-function InfluxDBWriteAPI:SetConvertTime(convertTime)
+--[=[
+	Sets the conversion time
+
+	@param convertTime (number) -> number
+]=]
+function InfluxDBWriteAPI.SetConvertTime(self: InfluxDBWriteAPI, convertTime: InfluxDBPointSettings.ConvertTime?): ()
 	self._pointSettings:SetConvertTime(convertTime)
 end
 
-function InfluxDBWriteAPI:QueuePoint(point: InfluxDBPoint.InfluxDBPoint)
+--[=[
+	Queues a new influx DB point to send to the server.
+
+	@param point InfluxDBPoint
+]=]
+function InfluxDBWriteAPI.QueuePoint(self: InfluxDBWriteAPI, point: InfluxDBPoint.InfluxDBPoint): ()
 	assert(InfluxDBPoint.isInfluxDBPoint(point), "Bad point")
 
 	local line = point:ToLineProtocol(self._pointSettings)
@@ -82,11 +129,16 @@ function InfluxDBWriteAPI:QueuePoint(point: InfluxDBPoint.InfluxDBPoint)
 	end
 
 	if self._printDebugWriteEnabled then
-		print(string.format("[InfluxDBWriteAPI.QueuePoint] - Queueing '%s'", line))
+		print(string.format("[InfluxDBWriteAPI.QueuePoint] - Queueing '%s'", line or "nil"))
 	end
 end
 
-function InfluxDBWriteAPI:QueuePoints(points: { InfluxDBPoint.InfluxDBPoint })
+--[=[
+	Queues a new list of influx DB points to send to the server.
+
+	@param points { InfluxDBPoint }
+]=]
+function InfluxDBWriteAPI.QueuePoints(self: InfluxDBWriteAPI, points: { InfluxDBPoint.InfluxDBPoint }): ()
 	assert(type(points) == "table", "Bad points")
 
 	for _, point in points do
@@ -98,12 +150,12 @@ function InfluxDBWriteAPI:QueuePoints(points: { InfluxDBPoint.InfluxDBPoint })
 		end
 
 		if self._printDebugWriteEnabled then
-			print(string.format("[InfluxDBWriteAPI.QueuePoints] - Queueing '%s'", line))
+			print(string.format("[InfluxDBWriteAPI.QueuePoints] - Queueing '%s'", line or "nil"))
 		end
 	end
 end
 
-function InfluxDBWriteAPI:_promiseSendBatch(toSend: { InfluxDBPoint.InfluxDBPoint }): Promise.Promise<()>
+function InfluxDBWriteAPI._promiseSendBatch(self: InfluxDBWriteAPI, toSend: { string }): Promise.Promise<()>
 	assert(type(toSend) == "table", "Bad toSend")
 
 	local clientConfig = self._clientConfig.Value
@@ -122,13 +174,13 @@ function InfluxDBWriteAPI:_promiseSendBatch(toSend: { InfluxDBPoint.InfluxDBPoin
 	end
 
 	local body = table.concat(toSend, "\n")
-	local request = {
+	local request: HttpPromise.HTTPRequest = {
 		Method = "POST",
 		Headers = {
 			["Content-Type"] = "application/json",
 			["Accept"] = "application/json",
 			["Authorization"] = authHeader,
-		},
+		} :: any,
 		Compress = Enum.HttpCompression.Gzip,
 		Url = self:_getWriteUrl(),
 		Body = body,
@@ -189,24 +241,20 @@ function InfluxDBWriteAPI:_promiseSendBatch(toSend: { InfluxDBPoint.InfluxDBPoin
 		end)
 end
 
-function InfluxDBWriteAPI:PromiseFlush(): Promise.Promise<()>
+function InfluxDBWriteAPI.PromiseFlush(self: InfluxDBWriteAPI): Promise.Promise<()>
 	return self._writeBuffer:PromiseFlush()
 end
 
-function InfluxDBWriteAPI:_getWriteUrl(): string
+function InfluxDBWriteAPI._getWriteUrl(self: InfluxDBWriteAPI): string
 	local config = self._clientConfig.Value
-	local url = config.url
+	local url: string = config.url
 
 	assert(type(url) == "string", "Bad url")
 
 	-- escape trailing slashes
-	url = string.match(url, "(.-)[\\/]*$")
+	url = string.match(url, "(.-)[\\/]*$") or ""
 
-	return string.format("%s/api/v2/write?org=%s&bucket=%s&precision=%s",
-		url,
-		self._org,
-		self._bucket,
-		self._precision)
+	return string.format("%s/api/v2/write?org=%s&bucket=%s&precision=%s", url, self._org, self._bucket, self._precision)
 end
 
 return InfluxDBWriteAPI

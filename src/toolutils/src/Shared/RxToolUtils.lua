@@ -5,10 +5,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxInstanceUtils = require("RxInstanceUtils")
+local Brio = require("Brio")
+local Observable = require("Observable")
 local RxBrioUtils = require("RxBrioUtils")
-local _Observable = require("Observable")
-local _Brio = require("Brio")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxToolUtils = {}
 
@@ -18,7 +18,7 @@ local RxToolUtils = {}
 	@param tool Instance
 	@return Observable<Brio<Humanoid>>
 ]=]
-function RxToolUtils.observeEquippedHumanoidBrio(tool: Tool): _Observable.Observable<_Brio.Brio<Humanoid>>
+function RxToolUtils.observeEquippedHumanoidBrio(tool: Tool): Observable.Observable<Brio.Brio<Humanoid>>
 	assert(typeof(tool) == "Instance", "Bad tool")
 
 	return RxInstanceUtils.observePropertyBrio(tool, "Parent", function(parent)

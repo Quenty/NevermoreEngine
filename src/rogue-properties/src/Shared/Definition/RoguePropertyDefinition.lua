@@ -4,12 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RogueProperty = require("RogueProperty")
-local ServiceBag = require("ServiceBag")
-local RoguePropertyUtils = require("RoguePropertyUtils")
 local DuckTypeUtils = require("DuckTypeUtils")
-local ValueBaseUtils = require("ValueBaseUtils")
+local RogueProperty = require("RogueProperty")
 local RoguePropertyCacheService = require("RoguePropertyCacheService")
+local RoguePropertyUtils = require("RoguePropertyUtils")
+local ServiceBag = require("ServiceBag")
+local ValueBaseUtils = require("ValueBaseUtils")
 
 local RoguePropertyDefinition = {}
 RoguePropertyDefinition.ClassName = "RoguePropertyDefinition"
@@ -41,7 +41,7 @@ end
 	@param adornee Instance
 	@return RogueProperty
 ]=]
-function RoguePropertyDefinition:Get(serviceBag, adornee)
+function RoguePropertyDefinition:Get(serviceBag: ServiceBag.ServiceBag, adornee: Instance)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
@@ -58,14 +58,15 @@ function RoguePropertyDefinition:Get(serviceBag, adornee)
 	return rogueProperty
 end
 
-function RoguePropertyDefinition:GetOrCreateInstance(parent)
+function RoguePropertyDefinition:GetOrCreateInstance(parent: Instance)
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	return ValueBaseUtils.getOrCreateValue(
 		parent,
 		self:GetStorageInstanceType(),
 		self:GetName(),
-		self:GetEncodedDefaultValue())
+		self:GetEncodedDefaultValue()
+	)
 end
 
 function RoguePropertyDefinition:SetParentPropertyTableDefinition(parentPropertyTableDefinition)
@@ -76,15 +77,21 @@ function RoguePropertyDefinition:GetParentPropertyDefinition()
 	return self._parentPropertyTableDefinition
 end
 
-function RoguePropertyDefinition:CanAssign(value, _strict)
+function RoguePropertyDefinition:CanAssign(value, _strict): (boolean, string?)
 	if self._valueType == typeof(value) then
 		return true
 	else
-		return false, string.format("got %q, expected %q when assigning to %q", self._valueType, typeof(value), self:GetFullName())
+		return false,
+			string.format(
+				"got %q, expected %q when assigning to %q",
+				self._valueType,
+				typeof(value),
+				self:GetFullName()
+			)
 	end
 end
 
-function RoguePropertyDefinition:SetName(name: string)
+function RoguePropertyDefinition:SetName(name: string): ()
 	assert(type(name) == "string", "Bad name")
 
 	self._name = name
@@ -122,7 +129,7 @@ function RoguePropertyDefinition:GetValueType()
 	return self._valueType
 end
 
-function RoguePropertyDefinition:GetStorageInstanceType()
+function RoguePropertyDefinition:GetStorageInstanceType(): string
 	return self._storageType
 end
 
@@ -151,6 +158,5 @@ function RoguePropertyDefinition:_computeStorageInstanceType()
 		error(string.format("Unknown valueType %q", tostring(self._valueType)))
 	end
 end
-
 
 return RoguePropertyDefinition

@@ -2,7 +2,8 @@
 	@class Tuple.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Tuple = require("Tuple")
 
@@ -27,6 +28,5 @@ return function(_target: Frame)
 
 	assert(lookupTable[b] == false, "Lookup should not be equivalent")
 
-	return function()
-	end
+	return function() end
 end

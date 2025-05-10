@@ -75,7 +75,7 @@ end
 	@return Vector3 -- Moon position
 ]=]
 function SunPositionUtils.getSunPosition(clockTime: number, geoLatitude: number): (Vector3, Vector3)
-	local seconds = clockTime*60*60
+	local seconds = clockTime * 60 * 60
 	local DAY = 24 * 60 * 60
 	local YEAR = 365.2564 * DAY
 	local HALFYEAR = 182.6282
@@ -93,7 +93,7 @@ function SunPositionUtils.getSunPosition(clockTime: number, geoLatitude: number)
 	local trueSunPosition = CFrame.fromAxisAngle(ZAXIS:Cross(sunPosition), sunOffset) * sunPosition
 	local trueMoonPosition = CFrame.fromAxisAngle(ZAXIS:Cross(moonPosition), sunOffset) * moonPosition
 
-	return trueSunPosition, trueMoonPosition*Vector3.new(1, -1, 1)
+	return trueSunPosition, trueMoonPosition * Vector3.new(1, -1, 1)
 end
 
 return SunPositionUtils

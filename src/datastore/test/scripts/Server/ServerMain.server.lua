@@ -2,8 +2,8 @@
 	@class ServerMain
 ]]
 
-local ServerScriptService = game:GetService("ServerScriptService")
 local HttpService = game:GetService("HttpService")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.datastore)
@@ -48,7 +48,7 @@ local function spinUpGameCopy(prefix: string)
 			-- 	print(string.format("(%s) dataStore:Observe()", prefix), viewSnapshot)
 			-- end))
 
-			task.delay(4*TURN_TIME, function()
+			task.delay(4 * TURN_TIME, function()
 				warn("Blue server is restoring data")
 
 				substore:Store(guid, true)
@@ -71,8 +71,8 @@ local function spinUpGameCopy(prefix: string)
 					warn(string.format("%s server is adding substore data", prefix))
 
 					substore:Store(guid, {
-						playerCount = 5;
-						startTime = DateTime.now().UnixTimestamp
+						playerCount = 5,
+						startTime = DateTime.now().UnixTimestamp,
 					})
 					-- dataStore:Save()
 
@@ -109,7 +109,6 @@ local function spinUpGameCopy(prefix: string)
 			substore:Delete(guid)
 			return Promise.resolved()
 		end))
-
 	end)
 
 	return maid

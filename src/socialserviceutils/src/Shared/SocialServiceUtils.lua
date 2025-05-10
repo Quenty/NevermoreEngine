@@ -8,8 +8,8 @@ local require = require(script.Parent.loader).load(script)
 
 local SocialService = game:GetService("SocialService")
 
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local SocialServiceUtils = {}
 
@@ -41,7 +41,10 @@ end
 	@param options ExperienceInviteOptions?
 	@return Promise
 ]=]
-function SocialServiceUtils.promisePromptGameInvite(player: Player, options: ExperienceInviteOptions?): Promise.Promise<()>
+function SocialServiceUtils.promisePromptGameInvite(
+	player: Player,
+	options: ExperienceInviteOptions?
+): Promise.Promise<()>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(not options or (typeof(options) == "Instance" and options:IsA("ExperienceInviteOptions")), "Bad options")
 

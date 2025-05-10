@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ChatTagBase = require("ChatTagBase")
 local Binder = require("Binder")
+local ChatTagBase = require("ChatTagBase")
 
 local ChatTag = setmetatable({}, ChatTagBase)
 ChatTag.ClassName = "ChatTag"
@@ -37,17 +37,17 @@ function ChatTag:_loadData()
 		return
 	end
 
-	self._maid:GivePromise(self._playerDataStoreService:PromiseDataStore(player))
+	self._maid
+		:GivePromise(self._playerDataStoreService:PromiseDataStore(player))
 		:Then(function(dataStore)
 			return dataStore:GetSubStore("chatTags"):GetSubStore(tagKey)
 		end)
 		:Then(function(dataStore)
-			return dataStore:Load("UserDisabled", false)
-				:Then(function(userDisabled)
-					self.UserDisabled.Value = userDisabled
+			return dataStore:Load("UserDisabled", false):Then(function(userDisabled)
+				self.UserDisabled.Value = userDisabled
 
-					self._maid:GiveTask(dataStore:StoreOnValueChange("UserDisabled", self.UserDisabled))
-				end)
+				self._maid:GiveTask(dataStore:StoreOnValueChange("UserDisabled", self.UserDisabled))
+			end)
 		end)
 end
 

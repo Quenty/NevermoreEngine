@@ -6,13 +6,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
-local TransitionModel = require("TransitionModel")
-local SpringObject = require("SpringObject")
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local Promise = require("Promise")
+local SpringObject = require("SpringObject")
 local SpringUtils = require("SpringUtils")
-local _Observable = require("Observable")
-local _Signal = require("Signal")
+local TransitionModel = require("TransitionModel")
 
 local SpringTransitionModel = setmetatable({}, BasicPane)
 SpringTransitionModel.ClassName = "SpringTransitionModel"
@@ -110,7 +109,7 @@ end
 	Observe is showing is complete
 	@return Observable<boolean>
 ]=]
-function SpringTransitionModel.ObserveIsShowingComplete<T>(self: SpringTransitionModel<T>): _Observable.Observable<boolean>
+function SpringTransitionModel.ObserveIsShowingComplete<T>(self: SpringTransitionModel<T>): Observable.Observable<boolean>
 	return self._transitionModel:ObserveIsShowingComplete()
 end
 
@@ -118,7 +117,7 @@ end
 	Observe is hiding is complete
 	@return Observable<boolean>
 ]=]
-function SpringTransitionModel.ObserveIsHidingComplete<T>(self: SpringTransitionModel<T>): _Observable.Observable<boolean>
+function SpringTransitionModel.ObserveIsHidingComplete<T>(self: SpringTransitionModel<T>): Observable.Observable<boolean>
 	return self._transitionModel:ObserveIsHidingComplete()
 end
 
@@ -179,7 +178,7 @@ end
 
 	@param speed number
 ]=]
-function SpringTransitionModel.SetSpeed<T>(self: SpringTransitionModel<T>, speed: number | _Observable.Observable<T>)
+function SpringTransitionModel.SetSpeed<T>(self: SpringTransitionModel<T>, speed: number | Observable.Observable<T>)
 	assert(type(speed) == "number", "Bad speed")
 
 	self._springObject.Speed = speed
@@ -190,7 +189,7 @@ end
 
 	@param damper number
 ]=]
-function SpringTransitionModel.SetDamper<T>(self: SpringTransitionModel<T>, damper: number | _Observable.Observable<T>)
+function SpringTransitionModel.SetDamper<T>(self: SpringTransitionModel<T>, damper: number | Observable.Observable<T>)
 	assert(type(damper) == "number", "Bad damper")
 
 	self._springObject.Damper = damper
@@ -200,7 +199,7 @@ end
 	Observes the spring animating
 	@return Observable<T>
 ]=]
-function SpringTransitionModel.ObserveRenderStepped<T>(self: SpringTransitionModel<T>): _Observable.Observable<T>
+function SpringTransitionModel.ObserveRenderStepped<T>(self: SpringTransitionModel<T>): Observable.Observable<T>
 	return self._springObject:ObserveRenderStepped()
 end
 
@@ -209,7 +208,7 @@ end
 
 	@return Observable<T>
 ]=]
-function SpringTransitionModel.Observe<T>(self: SpringTransitionModel<T>): _Observable.Observable<T>
+function SpringTransitionModel.Observe<T>(self: SpringTransitionModel<T>): Observable.Observable<T>
 	return self._springObject:Observe()
 end
 

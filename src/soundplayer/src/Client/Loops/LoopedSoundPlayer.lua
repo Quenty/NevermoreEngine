@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class LoopedSoundPlayer
 ]=]
@@ -25,13 +26,31 @@ local LoopedSoundPlayer = setmetatable({}, SpringTransitionModel)
 LoopedSoundPlayer.ClassName = "LoopedSoundPlayer"
 LoopedSoundPlayer.__index = LoopedSoundPlayer
 
-function LoopedSoundPlayer.new(soundId, soundParent: Instance?)
-	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
+export type LoopedSoundPlayer = typeof(setmetatable(
+	{} :: {
+		_currentSoundLooped: Signal.Signal<()>,
+		_currentSoundLoopedAfterDelay: Signal.Signal<()>,
+		_bpm: ValueObject.ValueObject<number?>,
+		_soundParent: ValueObject.ValueObject<Instance?>,
+		_soundGroup: ValueObject.ValueObject<SoundGroup?>,
+		_crossFadeTime: ValueObject.ValueObject<number>,
+		_volumeMultiplier: ValueObject.ValueObject<number>,
+		_doSyncSoundPlayback: ValueObject.ValueObject<boolean>,
+		_currentActiveSound: ValueObject.ValueObject<Sound?>,
+		_currentSoundId: ValueObject.ValueObject<(string | number)?>,
+		_defaultScheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule,
+		_currentLoopSchedule: ValueObject.ValueObject<SoundLoopScheduleUtils.SoundLoopSchedule>,
+	},
+	{} :: typeof({ __index = LoopedSoundPlayer })
+)) & SpringTransitionModel.SpringTransitionModel<number>
 
-	local self = setmetatable(SpringTransitionModel.new(), LoopedSoundPlayer)
+function LoopedSoundPlayer.new(soundId: (string | number)?, soundParent: Instance?)
+	assert(soundId == nil or SoundUtils.isConvertableToRbxAsset(soundId), "Bad soundId")
 
-	self._currentSoundLooped = self._maid:Add(Signal.new())
-	self._currentSoundLoopedAfterDelay = self._maid:Add(Signal.new())
+	local self: LoopedSoundPlayer = setmetatable(SpringTransitionModel.new() :: any, LoopedSoundPlayer)
+
+	self._currentSoundLooped = self._maid:Add(Signal.new() :: any)
+	self._currentSoundLoopedAfterDelay = self._maid:Add(Signal.new() :: any)
 
 	self:SetSpeed(10)
 
@@ -60,29 +79,29 @@ function LoopedSoundPlayer.new(soundId, soundParent: Instance?)
 	return self
 end
 
-function LoopedSoundPlayer:SetCrossFadeTime(crossFadeTime: number)
+function LoopedSoundPlayer.SetCrossFadeTime(self: LoopedSoundPlayer, crossFadeTime: number)
 	return self._crossFadeTime:Mount(crossFadeTime)
 end
 
-function LoopedSoundPlayer:SetVolumeMultiplier(volume: number)
+function LoopedSoundPlayer.SetVolumeMultiplier(self: LoopedSoundPlayer, volume: number)
 	self._volumeMultiplier.Value = volume
 end
 
-function LoopedSoundPlayer:SetSoundGroup(soundGroup: SoundGroup?)
+function LoopedSoundPlayer.SetSoundGroup(self: LoopedSoundPlayer, soundGroup: SoundGroup?)
 	return self._soundGroup:Mount(soundGroup)
 end
 
-function LoopedSoundPlayer:SetBPM(bpm: number?)
+function LoopedSoundPlayer.SetBPM(self: LoopedSoundPlayer, bpm: number?)
 	assert(type(bpm) == "number" or bpm == nil, "Bad bpm")
 
 	self._bpm.Value = bpm
 end
 
-function LoopedSoundPlayer:SetSoundParent(parent: Instance?)
+function LoopedSoundPlayer.SetSoundParent(self: LoopedSoundPlayer, parent: Instance?)
 	self._soundParent.Value = parent
 end
 
-function LoopedSoundPlayer:Swap(soundId, loopSchedule)
+function LoopedSoundPlayer.Swap(self: LoopedSoundPlayer, soundId, loopSchedule)
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 	loopSchedule = self:_convertToLoopedSchedule(loopSchedule)
 
@@ -96,11 +115,11 @@ function LoopedSoundPlayer:Swap(soundId, loopSchedule)
 	self._maid._swappingTo = maid
 end
 
-function LoopedSoundPlayer:SetDoSyncSoundPlayback(doSyncSoundPlayback: boolean)
+function LoopedSoundPlayer.SetDoSyncSoundPlayback(self: LoopedSoundPlayer, doSyncSoundPlayback: boolean)
 	self._doSyncSoundPlayback.Value = doSyncSoundPlayback
 end
 
-function LoopedSoundPlayer:_setupRender()
+function LoopedSoundPlayer._setupRender(self: LoopedSoundPlayer)
 	self._maid:GiveTask(self._currentSoundId
 		:ObserveBrio(function(value)
 			return value ~= nil
@@ -117,7 +136,7 @@ function LoopedSoundPlayer:_setupRender()
 		end))
 end
 
-function LoopedSoundPlayer:_renderSoundPlayer(soundId)
+function LoopedSoundPlayer._renderSoundPlayer(self: LoopedSoundPlayer, soundId)
 	local maid = Maid.new()
 
 	local renderMaid = Maid.new()
@@ -133,7 +152,7 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 		isLoaded = Rx.fromPromise(SoundPromiseUtils.promiseLoaded(soundPlayer.Sound)),
 		doSyncSoundPlayback = self._doSyncSoundPlayback:Observe(),
 		timeLength = RxInstanceUtils.observeProperty(soundPlayer.Sound, "TimeLength"),
-	}):Subscribe(function(state)
+	}):Subscribe(function(state: any)
 		local syncMaid = Maid.new()
 
 		if state.doSyncSoundPlayback then
@@ -197,7 +216,7 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 	maid:GiveTask(Rx.combineLatest({
 		visible = self:ObserveRenderStepped(),
 		multiplier = self._volumeMultiplier:Observe(),
-	}):Subscribe(function(state)
+	}):Subscribe(function(state: any)
 		soundPlayer:SetVolumeMultiplier(state.multiplier * state.visible)
 	end))
 
@@ -214,7 +233,7 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 	return maid
 end
 
-function LoopedSoundPlayer:_setupLoopScheduling(soundPlayer, loopSchedule)
+function LoopedSoundPlayer._setupLoopScheduling(self: LoopedSoundPlayer, soundPlayer, loopSchedule)
 	local maid = Maid.new()
 
 	if loopSchedule.maxLoops then
@@ -249,7 +268,7 @@ function LoopedSoundPlayer:_setupLoopScheduling(soundPlayer, loopSchedule)
 	return maid
 end
 
-function LoopedSoundPlayer:SwapToSamples(soundIdList, loopSchedule)
+function LoopedSoundPlayer.SwapToSamples(self: LoopedSoundPlayer, soundIdList, loopSchedule)
 	assert(type(soundIdList) == "table", "Bad soundIdList")
 	loopSchedule = self:_convertToLoopedSchedule(loopSchedule)
 
@@ -268,7 +287,7 @@ function LoopedSoundPlayer:SwapToSamples(soundIdList, loopSchedule)
 	self._maid._swappingTo = loopMaid
 end
 
-function LoopedSoundPlayer:SwapToChoice(soundIdList, loopSchedule)
+function LoopedSoundPlayer.SwapToChoice(self: LoopedSoundPlayer, soundIdList, loopSchedule)
 	assert(type(soundIdList) == "table", "Bad soundIdList")
 	loopSchedule = self:_convertToLoopedSchedule(loopSchedule)
 
@@ -286,39 +305,39 @@ function LoopedSoundPlayer:SwapToChoice(soundIdList, loopSchedule)
 	self._maid._swappingTo = loopMaid
 end
 
-function LoopedSoundPlayer:PlayOnce(soundId, loopSchedule)
+function LoopedSoundPlayer.PlayOnce(self: LoopedSoundPlayer, soundId, loopSchedule)
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 	loopSchedule = self:_convertToLoopedSchedule(loopSchedule)
 
 	self:Swap(soundId, SoundLoopScheduleUtils.maxLoops(1, loopSchedule))
 end
 
-function LoopedSoundPlayer:SwapOnLoop(soundId, loopSchedule)
+function LoopedSoundPlayer.SwapOnLoop(self: LoopedSoundPlayer, soundId, loopSchedule)
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 	loopSchedule = self:_convertToLoopedSchedule(loopSchedule)
 
 	self:Swap(soundId, SoundLoopScheduleUtils.onNextLoop(loopSchedule))
 end
 
-function LoopedSoundPlayer:PlayOnceOnLoop(soundId, loopSchedule)
+function LoopedSoundPlayer.PlayOnceOnLoop(self: LoopedSoundPlayer, soundId, loopSchedule)
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 	loopSchedule = self:_convertToLoopedSchedule(loopSchedule)
 
 	self:PlayOnce(soundId, SoundLoopScheduleUtils.onNextLoop(loopSchedule))
 end
 
-function LoopedSoundPlayer:_convertToLoopedSchedule(loopSchedule)
+function LoopedSoundPlayer._convertToLoopedSchedule(self: LoopedSoundPlayer, loopSchedule)
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(loopSchedule) or loopSchedule == nil, "Bad loopSchedule")
 	return loopSchedule or self._defaultScheduleOptions
 end
 
-function LoopedSoundPlayer:_scheduleFirstPlay(loopSchedule, callback)
+function LoopedSoundPlayer._scheduleFirstPlay(self: LoopedSoundPlayer, loopSchedule, callback)
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(loopSchedule), "Bad loopSchedule")
 	assert(type(callback) == "function", "Bad callback")
 
 	local maid = Maid.new()
 
-	local observable = Rx.of(true)
+	local observable: any = Rx.of(true)
 	if loopSchedule.playOnNextLoop then
 		observable = observable:Pipe({
 			Rx.switchMap(function()
@@ -328,15 +347,15 @@ function LoopedSoundPlayer:_scheduleFirstPlay(loopSchedule, callback)
 				end
 
 				return self:_observeActiveSoundFinishLoop(waitTime)
-			end),
+			end) :: any,
 		})
 	end
 
 	if loopSchedule.initialDelay then
 		observable = observable:Pipe({
 			Rx.switchMap(function()
-				return Rx.delayed(SoundLoopScheduleUtils.getWaitTimeSeconds(loopSchedule.initialDelay))
-			end),
+				return Rx.delayed(SoundLoopScheduleUtils.getWaitTimeSeconds(loopSchedule.initialDelay)) :: any
+			end) :: any,
 		})
 	end
 
@@ -353,7 +372,7 @@ function LoopedSoundPlayer:_scheduleFirstPlay(loopSchedule, callback)
 	return maid
 end
 
-function LoopedSoundPlayer:StopAfterLoop()
+function LoopedSoundPlayer.StopAfterLoop(self: LoopedSoundPlayer)
 	local swapMaid = Maid.new()
 
 	swapMaid:GiveTask(self._currentSoundLooped:Connect(function()
@@ -365,22 +384,22 @@ function LoopedSoundPlayer:StopAfterLoop()
 	self._maid._swappingTo = swapMaid
 end
 
-function LoopedSoundPlayer:_observeActiveSoundFinishLoop(maxWaitTime)
+function LoopedSoundPlayer._observeActiveSoundFinishLoop(self: LoopedSoundPlayer, maxWaitTime)
 	local startTime = os.clock()
 
 	return self._currentActiveSound:Observe():Pipe({
-		Rx.throttleDefer();
-		Rx.switchMap(function(sound)
+		Rx.throttleDefer() :: any,
+		Rx.switchMap(function(sound): any
 			if not sound then
 				return Rx.of(true)
 			end
 
 			return Rx.combineLatest({
-				timeLength = RxInstanceUtils.observeProperty(sound, "TimeLength");
-				timePosition = RxInstanceUtils.observeProperty(sound, "TimePosition");
-				crossFadeTime = self._crossFadeTime:Observe();
+				timeLength = RxInstanceUtils.observeProperty(sound, "TimeLength"),
+				timePosition = RxInstanceUtils.observeProperty(sound, "TimePosition"),
+				crossFadeTime = self._crossFadeTime:Observe(),
 			}):Pipe({
-				Rx.switchMap(function(state)
+				Rx.switchMap(function(state: any): any
 					local timeElapsed = os.clock() - startTime
 					local timeRemaining
 					if maxWaitTime then
@@ -403,13 +422,13 @@ function LoopedSoundPlayer:_observeActiveSoundFinishLoop(maxWaitTime)
 					end
 
 					return Rx.delayed(waitTime)
-				end);
+				end) :: any,
 			})
-		end)
-	})
+		end) :: any,
+	}) :: any
 end
 
-function LoopedSoundPlayer:PromiseLoopDone()
+function LoopedSoundPlayer.PromiseLoopDone(self: LoopedSoundPlayer): Promise.Promise<()>
 	local promise = self._maid:GivePromise(Promise.new())
 
 	PromiseMaidUtils.whilePromise(promise, function(maid)
@@ -421,14 +440,13 @@ function LoopedSoundPlayer:PromiseLoopDone()
 	return promise
 end
 
-function LoopedSoundPlayer:PromiseSustain()
+function LoopedSoundPlayer.PromiseSustain(_self: LoopedSoundPlayer): Promise.Promise<()>
 	-- Never resolve (?)
 	return Promise.new()
 end
 
-
-function LoopedSoundPlayer:GetSound()
-	return self._sound
+function LoopedSoundPlayer.GetSound(self: LoopedSoundPlayer): Sound?
+	return self._currentActiveSound.Value
 end
 
 return LoopedSoundPlayer

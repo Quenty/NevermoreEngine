@@ -8,7 +8,13 @@
   "luau-lsp.server.path": "/Users/jonnen/.aftman/bin/luau-lsp",
   "luau-lsp.ignoreGlobs": ["**/node_modules/**"],
   "luau-lsp.fflags.enableNewSolver": false,
+  "stylua.styluaPath": "/Users/jonnen/.aftman/bin/stylua",
   "[lua]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[luau]": {
     "editor.defaultFormatter": "JohnnyMorganz.stylua",
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file"

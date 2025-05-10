@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PartTouchingCalculator = require("PartTouchingCalculator")
 local BinderUtils = require("BinderUtils")
+local PartTouchingCalculator = require("PartTouchingCalculator")
 
 local BinderTouchingCalculator = setmetatable({}, PartTouchingCalculator)
 BinderTouchingCalculator.ClassName = "BinderTouchingCalculator"

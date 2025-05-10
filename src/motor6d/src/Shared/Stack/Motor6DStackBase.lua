@@ -41,7 +41,6 @@ function Motor6DStackBase:TransformFromCFrame(physicsTransformCFrame, speed)
 	return transformer
 end
 
-
 function Motor6DStackBase:Push(transformer)
 	assert(transformer, "No transformer")
 

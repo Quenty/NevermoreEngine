@@ -2,7 +2,8 @@
 	@class QFrame.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local CameraStoryUtils = require("CameraStoryUtils")
 local CubicSplineUtils = require("CubicSplineUtils")
@@ -16,20 +17,19 @@ return function(target)
 
 	local cameraCFrame = workspace.CurrentCamera.CFrame
 	local a = QFrame.fromCFrameClosestTo(
-		CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25 - 20*cameraCFrame.RightVector),
-		QFrame.new())
+		CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector * 25 - 20 * cameraCFrame.RightVector),
+		QFrame.new()
+	)
 
 	local setup = CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, -1, 2, 8, function(qFrame)
 		return QFrame.toCFrame(qFrame)
 	end)
 
 	local function getFinish(t)
-		local root = CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25 + 20*cameraCFrame.RightVector)
-			* CFrame.Angles(math.pi/3, 2*math.pi/3, 0)
+		local root = CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector * 25 + 20 * cameraCFrame.RightVector)
+			* CFrame.Angles(math.pi / 3, 2 * math.pi / 3, 0)
 
-		return QFrame.fromCFrameClosestTo(
-			root * CFrame.Angles(0, math.pi*t/3, 0),
-			QFrame.new())
+		return QFrame.fromCFrameClosestTo(root * CFrame.Angles(0, math.pi * t / 3, 0), QFrame.new())
 	end
 
 	setup(function(t)
@@ -49,12 +49,12 @@ return function(target)
 	end, Color3.new(0.75, 0.75, 0.75), "CFrame:Lerp()")
 
 	local function slerp(q0, q1, t)
-		local delta = q1*(q0^-1)
+		local delta = q1 * (q0 ^ -1)
 		if delta.W < 0 then
 			delta = QFrame.new(delta.x, delta.y, delta.z, -delta.W, -delta.X, -delta.Y, -delta.Z)
 		end
 
-		return(delta^t)*q0
+		return (delta ^ t) * q0
 	end
 
 	setup(function(t)

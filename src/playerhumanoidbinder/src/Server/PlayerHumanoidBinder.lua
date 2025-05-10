@@ -8,9 +8,10 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local Binder = require("Binder")
-local Maid = require("Maid")
-local ValueObject = require("ValueObject")
 local HumanoidTrackerService = require("HumanoidTrackerService")
+local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
+local ValueObject = require("ValueObject")
 
 local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
@@ -36,7 +37,7 @@ end
 	@param serviceBag ServiceBag
 	@param ... any
 ]=]
-function PlayerHumanoidBinder:Init(serviceBag, ...)
+function PlayerHumanoidBinder:Init(serviceBag: ServiceBag.ServiceBag, ...)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	getmetatable(PlayerHumanoidBinder).Init(self, serviceBag, ...)
@@ -134,6 +135,5 @@ function PlayerHumanoidBinder:_handlePlayerAdded(playerMaid, player)
 
 	playerMaid[player] = maid
 end
-
 
 return PlayerHumanoidBinder

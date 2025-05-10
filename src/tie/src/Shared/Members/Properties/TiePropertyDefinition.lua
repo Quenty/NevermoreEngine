@@ -4,9 +4,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local TieMemberDefinition = require("TieMemberDefinition")
 local TiePropertyImplementation = require("TiePropertyImplementation")
 local TiePropertyInterface = require("TiePropertyInterface")
-local TieMemberDefinition = require("TieMemberDefinition")
 local TieRealmUtils = require("TieRealmUtils")
 
 local TiePropertyDefinition = setmetatable({}, TieMemberDefinition)
@@ -16,7 +16,8 @@ TiePropertyDefinition.__index = TiePropertyDefinition
 function TiePropertyDefinition.new(tieDefinition, propertyName: string, defaultValue: any, memberTieRealm)
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
-	local self = setmetatable(TieMemberDefinition.new(tieDefinition, propertyName, memberTieRealm), TiePropertyDefinition)
+	local self =
+		setmetatable(TieMemberDefinition.new(tieDefinition, propertyName, memberTieRealm), TiePropertyDefinition)
 
 	self._defaultValue = defaultValue
 
@@ -53,6 +54,5 @@ function TiePropertyDefinition:GetInterface(implParent: Instance, _actualSelf, t
 
 	return TiePropertyInterface.new(implParent, nil, self, tieRealm)
 end
-
 
 return TiePropertyDefinition

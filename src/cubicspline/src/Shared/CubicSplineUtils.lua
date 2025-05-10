@@ -8,9 +8,9 @@ local CubicSplineUtils = {}
 
 local require = require(script.Parent.loader).load(script)
 
-local LinearSystemsSolverUtils = require("LinearSystemsSolverUtils")
 local BinarySearchUtils = require("BinarySearchUtils")
 local CubicTweenUtils = require("CubicTweenUtils")
+local LinearSystemsSolverUtils = require("LinearSystemsSolverUtils")
 
 --[=[
 	A node that can be used as part of a cubic spline.

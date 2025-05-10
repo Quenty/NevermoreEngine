@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Centralize receipt processing within games since this is a constrained resource.
 
@@ -11,12 +12,12 @@ local RunService = game:GetService("RunService")
 
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
-local _ServiceBag = require("ServiceBag")
-local _Observable = require("Observable")
 
 export type ReceiptInfo = {
 	PurchaseId: number,
@@ -31,7 +32,7 @@ export type ReceiptInfo = {
 local ReceiptProcessingService = {}
 ReceiptProcessingService.ServiceName = "ReceiptProcessingService"
 
-function ReceiptProcessingService:Init(serviceBag: _ServiceBag.ServiceBag)
+function ReceiptProcessingService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -69,7 +70,7 @@ end
 	@param player Player
 	@return Observable<ReceiptInfo>
 ]=]
-function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player: Player): _Observable.Observable<ReceiptInfo>
+function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player: Player): Observable.Observable<ReceiptInfo>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:ObserveReceiptProcessedForUserId(player.UserId)
@@ -80,7 +81,7 @@ end
 	@param userId number
 	@return Observable<ReceiptInfo>
 ]=]
-function ReceiptProcessingService:ObserveReceiptProcessedForUserId(userId: number): _Observable.Observable<ReceiptInfo>
+function ReceiptProcessingService:ObserveReceiptProcessedForUserId(userId: number): Observable.Observable<ReceiptInfo>
 	assert(type(userId) == "number", "Bad userId")
 
 	return self._receiptProcessedForUserId:Observe(userId)
@@ -180,7 +181,10 @@ function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo: Receip
 	return self._defaultDecision.Value
 end
 
-function ReceiptProcessingService:_fireProcessed(receiptInfo: ReceiptInfo, productPurchaseDecision: Enum.ProductPurchaseDecision)
+function ReceiptProcessingService:_fireProcessed(
+	receiptInfo: ReceiptInfo,
+	productPurchaseDecision: Enum.ProductPurchaseDecision
+)
 	assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad productPurchaseDecision")
 
 	self.ReceiptProcessed:Fire(receiptInfo, productPurchaseDecision)

@@ -2,7 +2,8 @@
 	@class RadialImage.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local RunService = game:GetService("RunService")
 
@@ -23,8 +24,8 @@ return function(target)
 	maid:GiveTask(RunService.RenderStepped:Connect(function()
 		-- radialImage:SetPercent((os.clock()/5) % 1)
 
-		local scale = (1 + math.sin((os.clock()/5)*math.pi*2))/2
-		radialImage.Gui.Size = UDim2.fromOffset(math.round(scale*90), math.round(scale*90))
+		local scale = (1 + math.sin((os.clock() / 5) * math.pi * 2)) / 2
+		radialImage.Gui.Size = UDim2.fromOffset(math.round(scale * 90), math.round(scale * 90))
 	end))
 
 	radialImage.Gui.Parent = target

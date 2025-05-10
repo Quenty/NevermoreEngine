@@ -9,21 +9,21 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local GetRemoteEvent = require("GetRemoteEvent")
+local DeathReportProcessor = require("DeathReportProcessor")
 local DeathReportServiceConstants = require("DeathReportServiceConstants")
 local DeathReportUtils = require("DeathReportUtils")
+local GetRemoteEvent = require("GetRemoteEvent")
 local Maid = require("Maid")
-local DeathReportProcessor = require("DeathReportProcessor")
-local _ServiceBag = require("ServiceBag")
-local _Observable = require("Observable")
+local Observable = require("Observable")
+local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
 
 local DeathReportService = {}
 DeathReportService.ServiceName = "DeathReportService"
 
 export type DeathReportService = typeof(setmetatable(
 	{} :: {
-		_serviceBag: any,
+		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		NewDeathReport: Signal.Signal<DeathReportUtils.DeathReport>,
 		_remoteEvent: RemoteEvent,
@@ -40,8 +40,8 @@ export type GetWeaponData = (humanoid: Humanoid) -> DeathReportUtils.WeaponData?
 
 	@param serviceBag ServiceBag
 ]=]
-function DeathReportService.Init(self: DeathReportService, serviceBag: _ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function DeathReportService.Init(self: DeathReportService, serviceBag: ServiceBag.ServiceBag)
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -93,7 +93,7 @@ end
 function DeathReportService.ObservePlayerKillerReports(
 	self: DeathReportService,
 	player: Player
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._reportProcessor:ObservePlayerKillerReports(player)
@@ -108,7 +108,7 @@ end
 function DeathReportService.ObservePlayerDeathReports(
 	self: DeathReportService,
 	player: Player
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._reportProcessor:ObservePlayerDeathReports(player)
@@ -123,7 +123,7 @@ end
 function DeathReportService.ObserveHumanoidKillerReports(
 	self: DeathReportService,
 	humanoid: Humanoid
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._reportProcessor:ObserveHumanoidKillerReports(humanoid)
@@ -138,7 +138,7 @@ end
 function DeathReportService.ObserveHumanoidDeathReports(
 	self: DeathReportService,
 	humanoid: Humanoid
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._reportProcessor:ObserveHumanoidDeathReports(humanoid)
@@ -153,7 +153,7 @@ end
 function DeathReportService.ObserveCharacterKillerReports(
 	self: DeathReportService,
 	character: Model
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	return self._reportProcessor:ObserveCharacterKillerReports(character)
@@ -168,7 +168,7 @@ end
 function DeathReportService.ObserveCharacterDeathReports(
 	self: DeathReportService,
 	character: Model
-): _Observable.Observable<DeathReportUtils.DeathReport>
+): Observable.Observable<DeathReportUtils.DeathReport>
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	return self._reportProcessor:ObserveCharacterDeathReports(character)

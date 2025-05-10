@@ -4,6 +4,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Maid = require("Maid")
+local Observable = require("Observable")
+local ObservableSortedList = require("ObservableSortedList")
 local RogueAdditive = require("RogueAdditive")
 local RogueModifierInterface = require("RogueModifierInterface")
 local RogueMultiplier = require("RogueMultiplier")
@@ -14,16 +17,14 @@ local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxSignal = require("RxSignal")
+local ServiceBag = require("ServiceBag")
 local ValueBaseUtils = require("ValueBaseUtils")
-local Maid = require("Maid")
-local Observable = require("Observable")
-local ObservableSortedList = require("ObservableSortedList")
 
 local RogueProperty = {}
 RogueProperty.ClassName = "RogueProperty"
 RogueProperty.__index = RogueProperty
 
-function RogueProperty.new(adornee, serviceBag, definition)
+function RogueProperty.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag, definition)
 	local self = {}
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -93,17 +94,21 @@ end
 function RogueProperty:_observeBaseValueBrio()
 	local parentDefinition = self._definition:GetParentPropertyDefinition()
 	if parentDefinition then
-		return parentDefinition:ObserveContainerBrio(self._adornee, self:CanInitialize())
-			:Pipe({
-				RxBrioUtils.switchMapBrio(function(container)
-					return RxInstanceUtils.observeLastNamedChildBrio(
-						container,
-						self._definition:GetStorageInstanceType(),
-						self._definition:GetName())
-				end);
-			})
+		return parentDefinition:ObserveContainerBrio(self._adornee, self:CanInitialize()):Pipe({
+			RxBrioUtils.switchMapBrio(function(container)
+				return RxInstanceUtils.observeLastNamedChildBrio(
+					container,
+					self._definition:GetStorageInstanceType(),
+					self._definition:GetName()
+				)
+			end),
+		})
 	else
-		return RxInstanceUtils.observeLastNamedChildBrio(self._adornee, self._definition:GetStorageInstanceType(), self._definition:GetName())
+		return RxInstanceUtils.observeLastNamedChildBrio(
+			self._adornee,
+			self._definition:GetStorageInstanceType(),
+			self._definition:GetName()
+		)
 	end
 end
 
@@ -114,7 +119,13 @@ function RogueProperty:SetBaseValue(value)
 	if baseValue then
 		baseValue.Value = self:_encodeValue(value)
 	else
-		warn(string.format("[RogueProperty.SetBaseValue] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		warn(
+			string.format(
+				"[RogueProperty.SetBaseValue] - Failed to get the baseValue for %q on %q",
+				self._definition:GetFullName(),
+				self._adornee:GetFullName()
+			)
+		)
 	end
 end
 
@@ -123,14 +134,20 @@ function RogueProperty:SetValue(value)
 
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
-		warn(string.format("[RogueProperty.SetValue] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		warn(
+			string.format(
+				"[RogueProperty.SetValue] - Failed to get the baseValue for %q on %q",
+				self._definition:GetFullName(),
+				self._adornee:GetFullName()
+			)
+		)
 		return
 	end
 
 	local current = value
 
 	local modifiers = self:GetRogueModifiers()
-	for i=#modifiers, 1, -1 do
+	for i = #modifiers, 1, -1 do
 		current = modifiers[i]:GetInvertedVersion(current, value)
 	end
 
@@ -224,21 +241,21 @@ function RogueProperty:Observe()
 
 	return self:_observeModifierSortedList():Pipe({
 		Rx.switchMap(function(sortedList)
-		return sortedList:Observe()
-		end);
+			return sortedList:Observe()
+		end),
 		Rx.switchMap(function(rogueModifierList)
-		local current = observeInitialValue
+			local current = observeInitialValue
 			for _, rogueModifier in rogueModifierList do
 				current = rogueModifier:ObserveModifiedVersion(current)
 			end
 			return current
-		end);
+		end),
 	})
 end
 
 function RogueProperty:ObserveBrio(predicate)
 	return self:Observe():Pipe({
-		RxBrioUtils.switchToBrio(predicate)
+		RxBrioUtils.switchToBrio(predicate),
 	})
 end
 
@@ -247,7 +264,13 @@ function RogueProperty:CreateMultiplier(amount, source)
 
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
-		warn(string.format("[RogueProperty.CreateMultiplier] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		warn(
+			string.format(
+				"[RogueProperty.CreateMultiplier] - Failed to get the baseValue for %q on %q",
+				self._definition:GetFullName(),
+				self._adornee:GetFullName()
+			)
+		)
 	end
 
 	local className = ValueBaseUtils.getClassNameFromType(typeof(amount))
@@ -276,7 +299,13 @@ function RogueProperty:CreateAdditive(amount: number, source)
 
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
-		warn(string.format("[RogueProperty.CreateAdditive] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		warn(
+			string.format(
+				"[RogueProperty.CreateAdditive] - Failed to get the baseValue for %q on %q",
+				self._definition:GetFullName(),
+				self._adornee:GetFullName()
+			)
+		)
 		return nil
 	end
 
@@ -304,7 +333,13 @@ end
 function RogueProperty:GetNamedAdditive(name, source)
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
-		warn(string.format("[RogueProperty.GetNamedAdditive] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		warn(
+			string.format(
+				"[RogueProperty.GetNamedAdditive] - Failed to get the baseValue for %q on %q",
+				self._definition:GetFullName(),
+				self._adornee:GetFullName()
+			)
+		)
 		return nil
 	end
 
@@ -323,7 +358,13 @@ end
 function RogueProperty:CreateSetter(value, source)
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
-		warn(string.format("[RogueProperty.CreateSetter] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
+		warn(
+			string.format(
+				"[RogueProperty.CreateSetter] - Failed to get the baseValue for %q on %q",
+				self._definition:GetFullName(),
+				self._adornee:GetFullName()
+			)
+		)
 		return nil
 	end
 
@@ -382,7 +423,7 @@ end
 
 function RogueProperty:GetChangedEvent()
 	return RxSignal.new(self:Observe():Pipe({
-		Rx.skip(1)
+		Rx.skip(1),
 	}))
 end
 

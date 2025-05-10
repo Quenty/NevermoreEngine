@@ -7,10 +7,10 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
+local CFrameUtils = require("CFrameUtils")
+local Maid = require("Maid")
 local StepUtils = require("StepUtils")
 local Symbol = require("Symbol")
-local Maid = require("Maid")
-local CFrameUtils = require("CFrameUtils")
 
 local Motor6DAnimator = setmetatable({}, BaseObject)
 Motor6DAnimator.ClassName = "Motor6DAnimator"
@@ -121,7 +121,6 @@ function Motor6DAnimator:_updateStepped()
 		return true
 	end
 end
-
 
 function Motor6DAnimator:_resetTransform(unmodifiedTransform)
 	self._obj.Transform = unmodifiedTransform

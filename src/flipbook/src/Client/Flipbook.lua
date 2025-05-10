@@ -6,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Sprite = require("Sprite")
 local DuckTypeUtils = require("DuckTypeUtils")
+local Sprite = require("Sprite")
 
 --[=[
 	@interface FlipbookData

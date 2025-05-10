@@ -15,13 +15,13 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
-local _ServiceBag = require("ServiceBag")
-local _Observable = require("Observable")
 
 local GameProductServiceClient = {}
 GameProductServiceClient.ServiceName = "GameProductServiceClient"
@@ -30,7 +30,7 @@ GameProductServiceClient.ServiceName = "GameProductServiceClient"
 	Initializes the service. Should be done via [ServiceBag]
 	@param serviceBag ServiceBag
 ]=]
-function GameProductServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function GameProductServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -98,7 +98,7 @@ end
 function GameProductServiceClient:ObserveAssetPurchased(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
-): _Observable.Observable<boolean>
+): Observable.Observable<boolean>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -177,7 +177,7 @@ function GameProductServiceClient:ObservePlayerOwnership(
 	player: Player,
 	assetType,
 	idOrKey: string | number
-): _Observable.Observable<boolean>
+): Observable.Observable<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
