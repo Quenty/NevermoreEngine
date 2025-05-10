@@ -1,3 +1,29 @@
+# v14.24.0 (Sat May 10 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, KreatorKols ([@KreatorKols](https://github.com/KreatorKols)), for all your work!
+
+#### 🚀 Enhancement
+
+- fix: Add additional type checking improvements and format via stylua [#559](https://github.com/Quenty/NevermoreEngine/pull/559) ([@Quenty](https://github.com/Quenty))
+- feat: Add even more types ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Format documents automatically and format document ([@Quenty](https://github.com/Quenty))
+- fix: Fix recursive require ([@Quenty](https://github.com/Quenty))
+- style: Format all files using stylua ([@Quenty](https://github.com/Quenty))
+- fix: Additional type checking updates ([@Quenty](https://github.com/Quenty))
+- fix: slottedtouchbutton recursion [#557](https://github.com/Quenty/NevermoreEngine/pull/557) ([@KreatorKols](https://github.com/KreatorKols))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
