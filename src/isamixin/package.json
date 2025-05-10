@@ -1,6 +1,6 @@
 {
   "name": "@quenty/isamixin",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "Generic IsA interface for Lua classes.",
   "keywords": [
     "Roblox",

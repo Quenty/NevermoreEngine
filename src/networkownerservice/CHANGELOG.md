@@ -1,23 +1,18 @@
-# v5.3.0 (Sat May 10 2025)
-
-#### 🚀 Enhancement
-
-- fix: Add additional type checking improvements and format via stylua [#559](https://github.com/Quenty/NevermoreEngine/pull/559) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Additional type checking updates ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@5.2.3...@quenty/networkownerservice@5.3.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+
+
 
 ## [5.2.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@5.2.1...@quenty/networkownerservice@5.2.3) (2025-04-07)
 

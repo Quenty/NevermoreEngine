@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamtracker@13.17.3...@quenty/teamtracker@13.18.0) (2025-05-10)
+
+**Note:** Version bump only for package @quenty/teamtracker
+
+
+
+
+
 ## [13.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamtracker@13.17.2...@quenty/teamtracker@13.17.3) (2025-04-10)
 
 **Note:** Version bump only for package @quenty/teamtracker

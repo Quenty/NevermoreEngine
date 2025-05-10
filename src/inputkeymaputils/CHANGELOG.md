@@ -1,33 +1,25 @@
-# v14.24.0 (Sat May 10 2025)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, KreatorKols ([@KreatorKols](https://github.com/KreatorKols)), for all your work!
-
-#### 🚀 Enhancement
-
-- fix: Add additional type checking improvements and format via stylua [#559](https://github.com/Quenty/NevermoreEngine/pull/559) ([@Quenty](https://github.com/Quenty))
-- feat: Add even more types ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Format documents automatically and format document ([@Quenty](https://github.com/Quenty))
-- fix: Fix recursive require ([@Quenty](https://github.com/Quenty))
-- style: Format all files using stylua ([@Quenty](https://github.com/Quenty))
-- fix: Additional type checking updates ([@Quenty](https://github.com/Quenty))
-- fix: slottedtouchbutton recursion [#557](https://github.com/Quenty/NevermoreEngine/pull/557) ([@KreatorKols](https://github.com/KreatorKols))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.23.3...@quenty/inputkeymaputils@14.24.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+* Fix recursive require ([6288f3c](https://github.com/Quenty/NevermoreEngine/commit/6288f3cc60e3aa8efe83aa685c6490bc6c01ff84))
+* slottedtouchbutton recursion ([#557](https://github.com/Quenty/NevermoreEngine/issues/557)) ([c3e5c89](https://github.com/Quenty/NevermoreEngine/commit/c3e5c8977f9207f1b56489010ce12b204a28f4ae))
+
+
+### Features
+
+* Add even more types ([b31717d](https://github.com/Quenty/NevermoreEngine/commit/b31717d8c9f7620c457f5018a2affa760a65334a))
+
+
+
+
 
 ## [14.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.23.2...@quenty/inputkeymaputils@14.23.3) (2025-04-10)
 

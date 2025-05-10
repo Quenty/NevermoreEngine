@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ducktype@5.8.4...@quenty/ducktype@5.9.0) (2025-05-10)
+
+**Note:** Version bump only for package @quenty/ducktype
+
+
+
+
+
 ## [5.8.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ducktype@5.8.3...@quenty/ducktype@5.8.4) (2025-04-10)
 
 **Note:** Version bump only for package @quenty/ducktype

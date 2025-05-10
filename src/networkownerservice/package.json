@@ -1,6 +1,6 @@
 {
   "name": "@quenty/networkownerservice",
-  "version": "5.2.3",
+  "version": "5.3.0",
   "description": "NetworkOwnerService - Tracks a stack of owners so ownership isn't reverted or overwritten in delayed network owner set.",
   "keywords": [
     "Roblox",

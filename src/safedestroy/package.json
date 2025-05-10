@@ -1,6 +1,6 @@
 {
   "name": "@quenty/safedestroy",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "Fixes an issue where you can't destroy already destroyed objects",
   "keywords": [
     "Roblox",

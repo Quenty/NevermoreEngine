@@ -1,20 +1,18 @@
-# v3.5.0 (Sat May 10 2025)
-
-#### 🚀 Enhancement
-
-- fix: Add additional type checking improvements and format via stylua [#559](https://github.com/Quenty/NevermoreEngine/pull/559) ([@Quenty](https://github.com/Quenty))
-- feat: Add even more types ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/raycaster@3.4.2...@quenty/raycaster@3.5.0) (2025-05-10)
+
+
+### Features
+
+* Add even more types ([b31717d](https://github.com/Quenty/NevermoreEngine/commit/b31717d8c9f7620c457f5018a2affa760a65334a))
+
+
+
+
 
 ## [3.4.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/raycaster@3.4.0...@quenty/raycaster@3.4.2) (2025-04-07)
 

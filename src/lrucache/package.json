@@ -1,6 +1,6 @@
 {
   "name": "@quenty/lrucache",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "description": "LRUCache library",
   "keywords": [
     "Roblox",

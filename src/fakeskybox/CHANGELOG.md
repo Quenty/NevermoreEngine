@@ -1,23 +1,15 @@
-# v11.11.0 (Sat May 10 2025)
-
-#### 🚀 Enhancement
-
-- fix: Add additional type checking improvements and format via stylua [#559](https://github.com/Quenty/NevermoreEngine/pull/559) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Format all files using stylua ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.10.3...@quenty/fakeskybox@11.11.0) (2025-05-10)
+
+**Note:** Version bump only for package @quenty/fakeskybox
+
+
+
+
 
 ## [11.10.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.10.2...@quenty/fakeskybox@11.10.3) (2025-04-10)
 

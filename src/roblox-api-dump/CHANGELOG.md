@@ -1,25 +1,23 @@
-# v8.12.0 (Sat May 10 2025)
-
-#### 🚀 Enhancement
-
-- fix: Add additional type checking improvements and format via stylua [#559](https://github.com/Quenty/NevermoreEngine/pull/559) ([@Quenty](https://github.com/Quenty))
-- feat: Add even more types ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Format all files using stylua ([@Quenty](https://github.com/Quenty))
-- fix: Additional type checking updates ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.11.4...@quenty/roblox-api-dump@8.12.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+### Features
+
+* Add even more types ([b31717d](https://github.com/Quenty/NevermoreEngine/commit/b31717d8c9f7620c457f5018a2affa760a65334a))
+
+
+
+
 
 ## [8.11.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.11.3...@quenty/roblox-api-dump@8.11.4) (2025-04-10)
 

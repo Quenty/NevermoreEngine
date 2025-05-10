@@ -1,24 +1,18 @@
-# v12.10.0 (Sat May 10 2025)
-
-#### 🚀 Enhancement
-
-- fix: Add additional type checking improvements and format via stylua [#559](https://github.com/Quenty/NevermoreEngine/pull/559) ([@Quenty](https://github.com/Quenty))
-- feat: Add even more types ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Format all files using stylua ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.9.3...@quenty/guivisiblemanager@12.10.0) (2025-05-10)
+
+
+### Features
+
+* Add even more types ([b31717d](https://github.com/Quenty/NevermoreEngine/commit/b31717d8c9f7620c457f5018a2affa760a65334a))
+
+
+
+
 
 ## [12.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.9.2...@quenty/guivisiblemanager@12.9.3) (2025-04-10)
 
