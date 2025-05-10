@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          persist-credentials: false # https://stackoverflow.com/questions/74744498/github-pushing-to-protected-branches-with-fine-grained-token
 
       - name: Setup node
         uses: actions/setup-node@v2
@@ -64,7 +65,7 @@ jobs:
 
       - name: Create Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.NEVERMORE_CI_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx auto shipit
 
