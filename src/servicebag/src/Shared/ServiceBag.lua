@@ -106,6 +106,10 @@ function ServiceBag.isServiceBag(value: any): boolean
 	return type(value) == "table" and value.ClassName == "ServiceBag"
 end
 
+--[=[
+	Prints out initialization stack trace - helpful for debugging
+	and diagnostics.
+]=]
 function ServiceBag.PrintInitialization(self: ServiceBag)
 	self._serviceInitLogger:Print()
 	self._serviceStartLogger:Print()
@@ -213,7 +217,7 @@ function ServiceBag.Start(self: ServiceBag)
 
 			local isDead = coroutine.status(current) == "dead"
 			if not isDead then
-				error(string.format("Starting service %q yielded", serviceName))
+				error(debug.traceback(current, string.format("Starting service %q yielded", serviceName)))
 			end
 		end
 	end
@@ -335,7 +339,7 @@ function ServiceBag._initService(self: ServiceBag, serviceType)
 
 		local isDead = coroutine.status(current) == "dead"
 		if not isDead then
-			error(string.format("Initializing service %q yielded", serviceName))
+			error(debug.traceback(current, string.format("Initializing service %q yielded", serviceName)))
 		end
 	end
 
@@ -384,7 +388,7 @@ function ServiceBag._destructServices(self: ServiceBag)
 
 			local isDead = coroutine.status(current) == "dead"
 			if not isDead then
-				warn(string.format("Destroying service %q yielded", serviceName))
+				warn(debug.traceback(current, string.format("Destroying service %q yielded", serviceName)))
 			end
 		end
 
