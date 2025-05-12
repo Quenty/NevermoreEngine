@@ -1,19 +1,18 @@
-# v14.21.0 (Mon May 12 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix requires ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.20.0...@quenty/binder@14.21.0) (2025-05-12)
+
+
+### Bug Fixes
+
+* Fix requires ([ef3344b](https://github.com/Quenty/NevermoreEngine/commit/ef3344b098d70ed38f331492828274ee4c1b6b68))
+
+
+
+
 
 # [14.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.19.3...@quenty/binder@14.20.0) (2025-05-10)
 

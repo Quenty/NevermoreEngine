@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerbinder",
-  "version": "14.20.0",
+  "version": "14.21.0",
   "description": "Binds the given class to each player in the game",
   "keywords": [
     "Roblox",
