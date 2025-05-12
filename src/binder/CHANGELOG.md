@@ -1,3 +1,15 @@
+# v14.21.0 (Mon May 12 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Fix requires ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

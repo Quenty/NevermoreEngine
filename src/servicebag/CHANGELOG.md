@@ -1,3 +1,15 @@
+# v11.13.0 (Mon May 12 2025)
+
+#### 🚀 Enhancement
+
+- feat: Service bag prints out where the yielding happens ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

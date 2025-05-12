@@ -1,3 +1,23 @@
+# (Mon May 12 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/influxdbclient@7.21.0`
+  - docs: Fix doc links [#561](https://github.com/Quenty/NevermoreEngine/pull/561) ([@Quenty](https://github.com/Quenty))
+- `@quenty/servicebag@11.13.0`
+  - feat: Service bag prints out where the yielding happens ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/binder@14.21.0`
+  - fix: Fix requires ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat May 10 2025)
 
 #### 🐛 Bug Fix
