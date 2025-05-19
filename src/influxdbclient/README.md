@@ -14,7 +14,7 @@
 
 Provides a Roblox Lua InfluxDB client
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/InfluxDBClientUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/InfluxDBClient">View docs →</a></div>
 
 ## Installation
 

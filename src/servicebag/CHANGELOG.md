@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.12.0...@quenty/servicebag@11.13.0) (2025-05-12)
+
+
+### Features
+
+* Service bag prints out where the yielding happens ([9f37c25](https://github.com/Quenty/NevermoreEngine/commit/9f37c25a98dd5a1989541b6e644580346a7c15e0))
+
+
+
+
+
 # [11.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.11.4...@quenty/servicebag@11.12.0) (2025-05-10)
 
 
