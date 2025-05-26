@@ -43,8 +43,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Brio = require("Brio")
 local DuckTypeUtils = require("DuckTypeUtils")
@@ -57,6 +57,7 @@ local PromiseMaidUtils = require("PromiseMaidUtils")
 local Remoting = require("Remoting")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 local String = require("String")
 local TemplateReplicationModes = require("TemplateReplicationModes")
 local TemplateReplicationModesUtils = require("TemplateReplicationModesUtils")
@@ -71,25 +72,49 @@ TemplateProvider.ServiceName = "TemplateProvider"
 TemplateProvider.__index = TemplateProvider
 
 --[=[
-	@type Template Instance | Observable<Brio<Instance>> | table
+	@type TemplateDeclaration Instance | Observable<Brio<Instance>> | table
 	@within TemplateProvider
 ]=]
+export type TemplateDeclaration = Instance | Observable.Observable<Brio.Brio<Instance>> | { TemplateDeclaration }
+
+export type TemplateProvider = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_initialTemplates: TemplateDeclaration,
+		_maid: Maid.Maid,
+		_templateMapList: any, -- ObservableMapList.ObservableMapList<Instance>,
+		_unreplicatedTemplateMapList: any, -- ObservableMapList.ObservableMapList<Instance>,
+		_containerRootCountingMap: ObservableCountingMap.ObservableCountingMap<Instance>,
+		_remoting: Remoting.Remoting,
+		_tombstoneLookup: { [string]: Instance },
+		_pendingTemplatePromises: { [string]: Promise.Promise<Instance> },
+		_pendingTombstoneRequests: { [string]: Promise.Promise<Instance> },
+		_replicationMode: TemplateReplicationModes.TemplateReplicationMode,
+	},
+	{} :: typeof({ __index = TemplateProvider })
+))
 
 --[=[
 	Constructs a new [TemplateProvider].
 
 	@param providerName string
-	@param initialTemplates Template
+	@param initialTemplates TemplateDeclaration
 ]=]
-function TemplateProvider.new(providerName, initialTemplates)
+function TemplateProvider.new(providerName: string, initialTemplates: TemplateDeclaration): TemplateProvider
 	assert(type(providerName) == "string", "Bad providerName")
 	local self = setmetatable({}, TemplateProvider)
 
 	self.ServiceName = assert(providerName, "No providerName")
 	self._initialTemplates = initialTemplates
 
-	if not (self:_isValidTemplate(self._initialTemplates) or self._initialTemplates == nil) then
-		error(string.format("[TemplateProvider.%s] - Bad initialTemplates of type %s", self.ServiceName, typeof(initialTemplates)))
+	if not (self:_isValidTemplateDeclaration(self._initialTemplates) or self._initialTemplates == nil) then
+		error(
+			string.format(
+				"[TemplateProvider.%s] - Bad initialTemplates of type %s",
+				self.ServiceName,
+				typeof(initialTemplates)
+			)
+		)
 	end
 
 	return self
@@ -102,7 +127,7 @@ end
 	@return boolean
 ]=]
 
-function TemplateProvider.isTemplateProvider(value)
+function TemplateProvider.isTemplateProvider(value: any): boolean
 	return DuckTypeUtils.isImplementation(TemplateProvider, value)
 end
 
@@ -111,7 +136,7 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function TemplateProvider:Init(serviceBag)
+function TemplateProvider.Init(self: TemplateProvider, serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -128,7 +153,7 @@ function TemplateProvider:Init(serviceBag)
 	self:_setupTemplateCache()
 end
 
-function TemplateProvider:_setupTemplateCache()
+function TemplateProvider._setupTemplateCache(self: TemplateProvider)
 	if self._replicationMode == TemplateReplicationModes.SERVER then
 		self._tombstoneLookup = {}
 		self._remoting = self._maid:Add(Remoting.Server.new(ReplicatedStorage, self.ServiceName .. "TemplateProvider"))
@@ -179,14 +204,16 @@ function TemplateProvider:_setupTemplateCache()
 		end
 
 		local containerMaid, container = containerBrio:ToMaidAndValue()
-		self:_handleContainer(containerMaid,  container)
+		self:_handleContainer(containerMaid, container)
 	end))
 end
 
-function TemplateProvider:_handleContainer(containerMaid, container)
-	if self._replicationMode == TemplateReplicationModes.SERVER
+function TemplateProvider._handleContainer(self: TemplateProvider, containerMaid: Maid.Maid, container: Instance)
+	if
+		self._replicationMode == TemplateReplicationModes.SERVER
 		and not container:IsA("Camera")
-		and not container:FindFirstAncestorWhichIsA("Camera") then
+		and not container:FindFirstAncestorWhichIsA("Camera")
+	then
 		-- Prevent replication to client immediately
 
 		local camera = containerMaid:Add(Instance.new("Camera"))
@@ -206,7 +233,7 @@ function TemplateProvider:_handleContainer(containerMaid, container)
 
 		containerMaid:GiveTask(container.ChildAdded:Connect(handleChild))
 
-		for _, child in pairs(container:GetChildren()) do
+		for _, child in container:GetChildren() do
 			handleChild(child)
 		end
 
@@ -225,7 +252,12 @@ function TemplateProvider:_handleContainer(containerMaid, container)
 	end))
 end
 
-function TemplateProvider:_replicateTombstones(topMaid, unreplicatedParent, replicatedParent)
+function TemplateProvider._replicateTombstones(
+	self: TemplateProvider,
+	topMaid: Maid.Maid,
+	unreplicatedParent,
+	replicatedParent
+)
 	assert(self._replicationMode == TemplateReplicationModes.SERVER, "Only should be invoked on server")
 
 	-- Tombstone each child so the client knows what is replicated
@@ -265,25 +297,27 @@ end
 	@param templateName string
 	@return Observable<Instance>
 ]=]
-function TemplateProvider:ObserveTemplate(templateName)
-	assert(type(templateName) == "string", "templateName must be a string")
+function TemplateProvider.ObserveTemplate(self: TemplateProvider, templateName: string): Observable.Observable<Instance>
+	assert(type(templateName) == "string", "Bad templateName")
 
 	return self._templateMapList:ObserveList(templateName):Pipe({
 		Rx.switchMap(function(list)
 			if not list then
-				return Rx.of(nil);
+				return Rx.of(nil)
 			end
 
 			return list:ObserveAtIndex(-1)
-		end);
+		end),
 	})
 end
 
-function TemplateProvider:ObserveTemplateNamesBrio()
+function TemplateProvider.ObserveTemplateNamesBrio(self: TemplateProvider): Observable.Observable<Brio.Brio<string>>
 	return self._templateMapList:ObserveKeysBrio()
 end
 
-function TemplateProvider:ObserveUnreplicatedTemplateNamesBrio()
+function TemplateProvider.ObserveUnreplicatedTemplateNamesBrio(
+	self: TemplateProvider
+): Observable.Observable<Brio.Brio<string>>
 	return self._unreplicatedTemplateMapList:ObserveKeysBrio()
 end
 
@@ -293,8 +327,8 @@ end
 	@param templateName string
 	@return Instance?
 ]=]
-function TemplateProvider:GetTemplate(templateName)
-	assert(type(templateName) == "string", "templateName must be a string")
+function TemplateProvider.GetTemplate(self: TemplateProvider, templateName: string): Instance?
+	assert(type(templateName) == "string", "Bad templateName")
 
 	return self._templateMapList:GetItemForKeyAtIndex(templateName, -1)
 end
@@ -305,13 +339,12 @@ end
 	@param templateName string
 	@return Promise<Instance>
 ]=]
-function TemplateProvider:PromiseCloneTemplate(templateName)
-	assert(type(templateName) == "string", "templateName must be a string")
+function TemplateProvider.PromiseCloneTemplate(self: TemplateProvider, templateName: string): Promise.Promise<Instance>
+	assert(type(templateName) == "string", "Bad templateName")
 
-	return self:PromiseTemplate(templateName)
-		:Then(function(template)
-			return self:_cloneTemplate(template)
-		end)
+	return self:PromiseTemplate(templateName):Then(function(template)
+		return self:_cloneTemplate(template)
+	end)
 end
 
 --[=[
@@ -320,8 +353,8 @@ end
 	@param templateName string
 	@return Promise<Instance>
 ]=]
-function TemplateProvider:PromiseTemplate(templateName)
-	assert(type(templateName) == "string", "templateName must be a string")
+function TemplateProvider.PromiseTemplate(self: TemplateProvider, templateName: string): Promise.Promise<Instance>
+	assert(type(templateName) == "string", "Bad templateName")
 
 	local foundTemplate = self._templateMapList:GetItemForKeyAtIndex(templateName, -1)
 	if foundTemplate then
@@ -346,41 +379,68 @@ function TemplateProvider:PromiseTemplate(templateName)
 			-- There's a chance an external process will stream in our template
 
 			topMaid:GiveTask(task.delay(5, function()
-				warn(string.format("[TemplateProvider.%s.PromiseTemplate] - Missing template %q", self.ServiceName, templateName))
+				warn(
+					string.format(
+						"[TemplateProvider.%s.PromiseTemplate] - Missing template %q",
+						self.ServiceName,
+						templateName
+					)
+				)
 			end))
 		elseif self._replicationMode == TemplateReplicationModes.CLIENT then
 			-- Replicate from the unfound area
-			topMaid:GiveTask(self._unreplicatedTemplateMapList:ObserveAtListIndexBrio(templateName, -1):Subscribe(function(brio)
-				if brio:IsDead() then
-					return
-				end
+			topMaid:GiveTask(
+				self._unreplicatedTemplateMapList:ObserveAtListIndexBrio(templateName, -1):Subscribe(function(brio)
+					if brio:IsDead() then
+						return
+					end
 
-				local maid, templateTombstone = brio:ToMaidAndValue()
+					local maid, templateTombstone = brio:ToMaidAndValue()
 
-				local originalName = templateTombstone.Name
+					local originalName = templateTombstone.Name
 
-				maid:GivePromise(self:_promiseReplicateTemplateFromTombstone(templateTombstone))
-					:Then(function(template)
-						-- Cache the template here which then loads it into the known templates naturally
-						templateTombstone.Name = String.removePostfix(originalName, TOMBSTONE_NAME_POSTFIX_UNLOADED) .. TOMBSTONE_NAME_POSTFIX_LOADED
-						template.Parent = templateTombstone
+					maid:GivePromise(self:_promiseReplicateTemplateFromTombstone(templateTombstone))
+						:Then(function(template)
+							-- Cache the template here which then loads it into the known templates naturally
+							templateTombstone.Name = String.removePostfix(originalName, TOMBSTONE_NAME_POSTFIX_UNLOADED)
+								.. TOMBSTONE_NAME_POSTFIX_LOADED
+							template.Parent = templateTombstone
 
-						promiseTemplate:Resolve(template)
-					end)
-			end))
+							promiseTemplate:Resolve(template)
+						end)
+				end)
+			)
 
 			topMaid:GiveTask(task.delay(5, function()
 				if self._unreplicatedTemplateMapList:GetListForKey(templateName) then
-					warn(string.format("[TemplateProvider.%s.PromiseTemplate] - Failed to replicate template %q from server to client", self.ServiceName, templateName))
+					warn(
+						string.format(
+							"[TemplateProvider.%s.PromiseTemplate] - Failed to replicate template %q from server to client",
+							self.ServiceName,
+							templateName
+						)
+					)
 				else
-					warn(string.format("[TemplateProvider.%s.PromiseTemplate] - Template %q is not a known template", self.ServiceName, templateName))
+					warn(
+						string.format(
+							"[TemplateProvider.%s.PromiseTemplate] - Template %q is not a known template",
+							self.ServiceName,
+							templateName
+						)
+					)
 				end
 			end))
 		elseif self._replicationMode == TemplateReplicationModes.SHARED then
 			-- There's a chance an external process will stream in our template
 
 			topMaid:GiveTask(task.delay(5, function()
-				warn(string.format("[TemplateProvider.%s.PromiseTemplate] - Missing template %q", self.ServiceName, templateName))
+				warn(
+					string.format(
+						"[TemplateProvider.%s.PromiseTemplate] - Missing template %q",
+						self.ServiceName,
+						templateName
+					)
+				)
 			end))
 		else
 			error("Bad replicationMode")
@@ -398,7 +458,10 @@ function TemplateProvider:PromiseTemplate(templateName)
 	return promiseTemplate
 end
 
-function TemplateProvider:_promiseReplicateTemplateFromTombstone(templateTombstone)
+function TemplateProvider._promiseReplicateTemplateFromTombstone(
+	self: TemplateProvider,
+	templateTombstone: Instance
+): Promise.Promise<Instance>
 	assert(self._replicationMode == TemplateReplicationModes.CLIENT, "Bad replicationMode")
 	assert(typeof(templateTombstone) == "Instance", "Bad templateTombstone")
 
@@ -414,10 +477,12 @@ function TemplateProvider:_promiseReplicateTemplateFromTombstone(templateTombsto
 	local promiseTemplate = Promise.new()
 
 	PromiseMaidUtils.whilePromise(promiseTemplate, function(topMaid)
-		topMaid:GivePromise(self._remoting.ReplicateTemplate:PromiseInvokeServer(tombstoneId))
+		topMaid
+			:GivePromise(self._remoting.ReplicateTemplate:PromiseInvokeServer(tombstoneId))
 			:Then(function(tempTemplate)
 				if not tempTemplate then
-					return Promise.rejected("Failed to get any template")
+					Promise.rejected("Failed to get any template")
+					return
 				end
 
 				-- This tempTemplate will get destroyed by the server soon to free up server memory
@@ -450,20 +515,30 @@ end
 	@param templateName string
 	@return Instance?
 ]=]
-function TemplateProvider:CloneTemplate(templateName)
-	assert(type(templateName) == "string", "templateName must be a string")
+function TemplateProvider.CloneTemplate(self: TemplateProvider, templateName: string): Instance?
+	assert(type(templateName) == "string", "Bad templateName")
 
 	local template = self._templateMapList:GetItemForKeyAtIndex(templateName, -1)
 	if not template then
 		local unreplicated = self._unreplicatedTemplateMapList:GetListForKey(templateName)
 
 		if unreplicated then
-			error(string.format("[TemplateProvider.%s.CloneTemplate] - Template %q is not replicated. Use PromiseCloneTemplate instead", self.ServiceName, tostring(templateName)))
+			error(
+				string.format(
+					"[TemplateProvider.%s.CloneTemplate] - Template %q is not replicated. Use PromiseCloneTemplate instead",
+					self.ServiceName,
+					tostring(templateName)
+				)
+			)
 		else
-			error(string.format("[TemplateProvider.%s.CloneTemplate] - Cannot provide template %q", self.ServiceName, tostring(templateName)))
+			error(
+				string.format(
+					"[TemplateProvider.%s.CloneTemplate] - Cannot provide template %q",
+					self.ServiceName,
+					tostring(templateName)
+				)
+			)
 		end
-
-		return nil
 	end
 
 	return self:_cloneTemplate(template)
@@ -481,8 +556,8 @@ end
 	@param container Template
 	@return MaidTask
 ]=]
-function TemplateProvider:AddTemplates(container)
-	assert(self:_isValidTemplate(container), "Bad container")
+function TemplateProvider.AddTemplates(self: TemplateProvider, container: TemplateDeclaration): () -> ()
+	assert(self:_isValidTemplateDeclaration(container), "Bad container")
 
 	if typeof(container) == "Instance" then
 		-- Always add this instance as we explicitly asked for it to be added as a root. This could be a
@@ -502,14 +577,20 @@ function TemplateProvider:AddTemplates(container)
 	elseif type(container) == "table" then
 		local topMaid = Maid.new()
 
-		for _, value in pairs(container) do
+		for _, value in container :: any do
 			if typeof(value) == "Instance" then
 				-- Always add these as we explicitly ask for this to be a root too.
 				topMaid:GiveTask(self._containerRootCountingMap:Add(value))
 			elseif Observable.isObservable(value) then
 				self:_addObservableTemplates(topMaid, value)
 			else
-				error(string.format("[TemplateProvider.%s] - Bad value of type %q in container table", self.ServiceName, typeof(value)))
+				error(
+					string.format(
+						"[TemplateProvider.%s] - Bad value of type %q in container table",
+						self.ServiceName,
+						typeof(value)
+					)
+				)
 			end
 		end
 
@@ -518,13 +599,15 @@ function TemplateProvider:AddTemplates(container)
 			self._maid[topMaid] = nil
 		end)
 
-		return topMaid
+		return function()
+			self._maid[topMaid] = nil
+		end
 	else
 		error(string.format("[TemplateProvider.%s] - Bad container of type %s", self.ServiceName, typeof(container)))
 	end
 end
 
-function TemplateProvider:_addObservableTemplates(topMaid, observable)
+function TemplateProvider._addObservableTemplates(self: TemplateProvider, topMaid: Maid.Maid, observable)
 	topMaid:GiveTask(observable:Subscribe(function(result)
 		if Brio.isBrio(result) then
 			if result:IsDead() then
@@ -543,24 +626,27 @@ function TemplateProvider:_addObservableTemplates(topMaid, observable)
 	end))
 end
 
-function TemplateProvider:_addInstanceTemplate(topMaid, template)
+function TemplateProvider._addInstanceTemplate(self: TemplateProvider, topMaid: Maid.Maid, template: Instance)
 	if self:_shouldAddChildrenAsTemplates(template) then
 		topMaid:GiveTask(self._containerRootCountingMap:Add(template))
 	end
 
 	if template:GetAttribute(TOMBSTONE_ID_ATTRIBUTE) then
-		topMaid:GiveTask(self._unreplicatedTemplateMapList:Push(RxInstanceUtils.observeProperty(template, "Name"):Pipe({
-			Rx.map(function(name)
-				if String.endsWith(name, TOMBSTONE_NAME_POSTFIX_UNLOADED) then
-					return String.removePostfix(name, TOMBSTONE_NAME_POSTFIX_UNLOADED)
-				elseif String.endsWith(name, TOMBSTONE_NAME_POSTFIX_LOADED) then
-					return String.removePostfix(name, TOMBSTONE_NAME_POSTFIX_LOADED)
-				else
-					return name
-				end
-			end);
-			Rx.distinct();
-		}), template))
+		topMaid:GiveTask(self._unreplicatedTemplateMapList:Push(
+			RxInstanceUtils.observeProperty(template, "Name"):Pipe({
+				Rx.map(function(name)
+					if String.endsWith(name, TOMBSTONE_NAME_POSTFIX_UNLOADED) then
+						return String.removePostfix(name, TOMBSTONE_NAME_POSTFIX_UNLOADED)
+					elseif String.endsWith(name, TOMBSTONE_NAME_POSTFIX_LOADED) then
+						return String.removePostfix(name, TOMBSTONE_NAME_POSTFIX_LOADED)
+					else
+						return name
+					end
+				end),
+				Rx.distinct(),
+			}),
+			template
+		))
 	else
 		topMaid:GiveTask(self._templateMapList:Push(RxInstanceUtils.observeProperty(template, "Name"), template))
 	end
@@ -572,8 +658,8 @@ end
 	@param templateName string
 	@return boolean
 ]=]
-function TemplateProvider:IsTemplateAvailable(templateName)
-	assert(type(templateName) == "string", "templateName must be a string")
+function TemplateProvider.IsTemplateAvailable(self: TemplateProvider, templateName: string)
+	assert(type(templateName) == "string", "Bad templateName")
 
 	return self._templateMapList:GetItemForKeyAtIndex(templateName, -1) ~= nil
 end
@@ -583,7 +669,7 @@ end
 
 	@return { Instance }
 ]=]
-function TemplateProvider:GetTemplateList()
+function TemplateProvider.GetTemplateList(self: TemplateProvider): { Instance }
 	return self._templateMapList:GetListOfValuesAtListIndex(-1)
 end
 
@@ -592,8 +678,22 @@ end
 
 	@return { Instance }
 ]=]
-function TemplateProvider:GetContainerList()
-	return self._containerRootCountingMap:GetList()
+function TemplateProvider.GetContainerList(self: TemplateProvider): { Instance }
+	return self._containerRootCountingMap:GetKeyList()
+end
+
+function TemplateProvider._cloneTemplate(_self: TemplateProvider, template: Instance): Instance
+	local newItem = template:Clone()
+	newItem.Name = String.removePostfix(template.Name, "Template")
+	return newItem
+end
+
+function TemplateProvider._shouldAddChildrenAsTemplates(_self: TemplateProvider, container: Instance): boolean
+	return container:IsA("Folder")
+end
+
+function TemplateProvider._isValidTemplateDeclaration(_self: TemplateProvider, container: TemplateDeclaration): boolean
+	return typeof(container) == "Instance" or Observable.isObservable(container) or type(container) == "table"
 end
 
 -- Backwards compatibility
@@ -604,26 +704,10 @@ TemplateProvider.PromiseClone = assert(TemplateProvider.PromiseCloneTemplate, "M
 TemplateProvider.GetAllTemplates = assert(TemplateProvider.GetTemplateList, "Missing method")
 TemplateProvider.GetAll = assert(TemplateProvider.GetTemplateList, "Missing method")
 
-function TemplateProvider:_cloneTemplate(template)
-	local newItem = template:Clone()
-	newItem.Name = String.removePostfix(template.Name, "Template")
-	return newItem
-end
-
-function TemplateProvider:_shouldAddChildrenAsTemplates(container)
-	return container:IsA("Folder")
-end
-
-function TemplateProvider:_isValidTemplate(container)
-	return typeof(container) == "Instance"
-		or Observable.isObservable(container)
-		or type(container) == "table"
-end
-
 --[=[
 	Cleans up the provider
 ]=]
-function TemplateProvider:Destroy()
+function TemplateProvider.Destroy(self: TemplateProvider)
 	self._maid:DoCleaning()
 end
 

@@ -8,7 +8,6 @@ local require = require(script.Parent.loader).load(script)
 
 local AttributeValue = require("AttributeValue")
 local BaseObject = require("BaseObject")
-local cancellableDelay = require("cancellableDelay")
 local CharacterUtils = require("CharacterUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
@@ -20,6 +19,7 @@ local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local UnragdollAutomaticallyConstants = require("UnragdollAutomaticallyConstants")
+local cancellableDelay = require("cancellableDelay")
 
 local UnragdollAutomatically = setmetatable({}, BaseObject)
 UnragdollAutomatically.ClassName = "UnragdollAutomatically"
@@ -39,8 +39,10 @@ function UnragdollAutomatically.new(humanoid, serviceBag)
 	self._ragdollHumanoidOnFallBinder = self._serviceBag:GetService(RagdollHumanoidOnFall)
 	self._player = CharacterUtils.getPlayerFromCharacter(self._obj)
 
-	self._unragdollAutomatically = AttributeValue.new(self._obj, UnragdollAutomaticallyConstants.UNRAGDOLL_AUTOMATICALLY_ATTRIBUTE, true)
-	self._unragdollAutomaticTime = AttributeValue.new(self._obj, UnragdollAutomaticallyConstants.UNRAGDOLL_AUTOMATIC_TIME_ATTRIBUTE, 5)
+	self._unragdollAutomatically =
+		AttributeValue.new(self._obj, UnragdollAutomaticallyConstants.UNRAGDOLL_AUTOMATICALLY_ATTRIBUTE, true)
+	self._unragdollAutomaticTime =
+		AttributeValue.new(self._obj, UnragdollAutomaticallyConstants.UNRAGDOLL_AUTOMATIC_TIME_ATTRIBUTE, 5)
 
 	self._maid:GiveTask(self._ragdollBinder:ObserveInstance(self._obj, function()
 		self:_handleRagdollChanged(self._maid)
@@ -52,20 +54,22 @@ end
 
 function UnragdollAutomatically:_handleRagdollChanged(maid)
 	if self._ragdollBinder:Get(self._obj) then
-		maid._unragdoll = self:_observeCanUnragdollTimer():Pipe({
-			Rx.switchMap(function(state)
-				if state then
-					return self:_observeAlive()
-				else
-					return Rx.of(false);
+		maid._unragdoll = self:_observeCanUnragdollTimer()
+			:Pipe({
+				Rx.switchMap(function(state)
+					if state then
+						return self:_observeAlive()
+					else
+						return Rx.of(false)
+					end
+				end),
+				Rx.distinct(),
+			})
+			:Subscribe(function(canUnragdoll)
+				if canUnragdoll then
+					self._ragdollBinder:Unbind(self._obj)
 				end
-			end);
-			Rx.distinct();
-		}):Subscribe(function(canUnragdoll)
-			if canUnragdoll then
-				self._ragdollBinder:Unbind(self._obj)
-			end
-		end)
+			end)
 	else
 		maid._unragdoll = nil
 	end
@@ -75,8 +79,8 @@ function UnragdollAutomatically:_observeAlive()
 	return RxInstanceUtils.observeProperty(self._obj, "Health"):Pipe({
 		Rx.map(function(health)
 			return health > 0
-		end);
-		Rx.distinct();
+		end),
+		Rx.distinct(),
 	})
 end
 
@@ -91,21 +95,21 @@ function UnragdollAutomatically:_observeCanUnragdollTimer()
 
 		maid:GiveTask(RxBrioUtils.flatCombineLatest({
 			canUnragdoll = RxBrioUtils.flatCombineLatest({
-				enabled = self._unragdollAutomatically:Observe();
-				isFallingRagdoll = self:_observeIsFallingRagdoll();
+				enabled = self._unragdollAutomatically:Observe(),
+				isFallingRagdoll = self:_observeIsFallingRagdoll(),
 			}):Pipe({
 				Rx.map(function(state)
 					return state.enabled and not state.isFallingRagdoll
-				end);
-				Rx.distinct();
+				end),
+				Rx.distinct(),
 				Rx.tap(function(canUnragdoll)
 					-- Ensure we reset timer if we change state
 					if canUnragdoll then
 						startTime = os.clock()
 					end
-				end);
-			});
-			time = self._unragdollAutomaticTime:Observe();
+				end),
+			}),
+			time = self._unragdollAutomaticTime:Observe(),
 		}):Subscribe(function(state)
 			if state.canUnragdoll then
 				maid._deferred = nil
@@ -121,7 +125,6 @@ function UnragdollAutomatically:_observeCanUnragdollTimer()
 					end)
 				end
 			else
-
 				isReady.Value = false
 				maid._deferred = nil
 			end
@@ -137,14 +140,13 @@ function UnragdollAutomatically:_observeCanUnragdollTimer()
 end
 
 function UnragdollAutomatically:_observeIsFallingRagdoll()
-	return RxBinderUtils.observeBoundClassBrio(self._ragdollHumanoidOnFallBinder, self._obj)
-		:Pipe({
-			RxBrioUtils.switchMapBrio(function(ragdollHumanoidOnFall)
-				return ragdollHumanoidOnFall:ObserveIsFalling()
-			end);
-			RxBrioUtils.emitOnDeath(false);
-			Rx.distinct();
-		})
+	return RxBinderUtils.observeBoundClassBrio(self._ragdollHumanoidOnFallBinder, self._obj):Pipe({
+		RxBrioUtils.switchMapBrio(function(ragdollHumanoidOnFall)
+			return ragdollHumanoidOnFall:ObserveIsFalling()
+		end),
+		RxBrioUtils.emitOnDeath(false),
+		Rx.distinct(),
+	})
 end
 
 return PlayerHumanoidBinder.new("UnragdollAutomatically", UnragdollAutomatically)

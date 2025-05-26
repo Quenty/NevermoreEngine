@@ -5,16 +5,17 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
+local Promise = require("Promise")
 local PromiseGetRemoteFunction = require("PromiseGetRemoteFunction")
+local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local SecretsCmdrTypeUtils = require("SecretsCmdrTypeUtils")
 local SecretsServiceConstants = require("SecretsServiceConstants")
-local RemoteFunctionUtils = require("RemoteFunctionUtils")
-local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local SecretsServiceClient = {}
 SecretsServiceClient.ServiceName = "SecretsServiceClient"
 
-function SecretsServiceClient:Init(serviceBag)
+function SecretsServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -28,12 +29,15 @@ function SecretsServiceClient:Start()
 	self:_registerCmdrTypes()
 end
 
-function SecretsServiceClient:PromiseSecretKeyNamesList()
+function SecretsServiceClient:PromiseSecretKeyNamesList(): Promise.Promise<{ string }>
 	return self:_promiseRemoteFunction()
 		:Then(function(remoteFunction)
-			return self._maid:GivePromise(RemoteFunctionUtils.promiseInvokeServer(
-				remoteFunction,
-				SecretsServiceConstants.REQUEST_SECRET_KEY_NAMES_LIST))
+			return self._maid:GivePromise(
+				RemoteFunctionUtils.promiseInvokeServer(
+					remoteFunction,
+					SecretsServiceConstants.REQUEST_SECRET_KEY_NAMES_LIST
+				)
+			)
 		end)
 		:Then(function(ok, list)
 			if not ok then
@@ -55,7 +59,8 @@ function SecretsServiceClient:_promiseRemoteFunction()
 		return self._remoteFunctionPromise
 	end
 
-	self._remoteFunctionPromise = self._maid:GivePromise(PromiseGetRemoteFunction(SecretsServiceConstants.REMOTE_FUNCTION_NAME))
+	self._remoteFunctionPromise =
+		self._maid:GivePromise(PromiseGetRemoteFunction(SecretsServiceConstants.REMOTE_FUNCTION_NAME))
 	return self._remoteFunctionPromise
 end
 

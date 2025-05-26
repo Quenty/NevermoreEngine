@@ -10,9 +10,9 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local ButtonDragModel = require("ButtonDragModel")
-local ValueObject = require("ValueObject")
 local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
 local ColorPickerTriangle = require("ColorPickerTriangle")
+local ValueObject = require("ValueObject")
 
 local ValueColorPicker = setmetatable({}, BaseObject)
 ValueColorPicker.ClassName = "ValueColorPicker"
@@ -107,7 +107,7 @@ end
 
 	@param height number
 ]=]
-function ValueColorPicker:SetSize(height)
+function ValueColorPicker:SetSize(height: number)
 	assert(type(height) == "number", "Bad height")
 
 	self:_updateSize(height)
@@ -173,7 +173,7 @@ function ValueColorPicker:GetMeasureValue()
 	return self._sizeValue
 end
 
-function ValueColorPicker:SetTransparency(transparency)
+function ValueColorPicker:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
@@ -203,35 +203,35 @@ end
 
 function ValueColorPicker:_render()
 	return Blend.New "ImageButton" {
-		Name = "HSColorPicker";
-		Size = UDim2.new(1, 0, 1, 0);
-		BackgroundTransparency = 1;
-		Active = true;
+		Name = "HSColorPicker",
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		Active = true,
 
 		[Blend.Instance] = function(inst)
 			self._dragModel:SetButton(inst)
-		end;
+		end,
 
 		Blend.New "UIAspectRatioConstraint" {
 			AspectRatio = Blend.Computed(self._sizeValue, function(size)
 				if size.x <= 0 or size.y <= 0 then
 					return 1
 				else
-					return size.x/size.y
+					return size.x / size.y
 				end
-			end);
-		};
+			end),
+		},
 
 		Blend.New "Frame" {
-			BackgroundColor3 = Color3.new(1, 1, 1);
-			BackgroundTransparency = self._transparency;
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			BackgroundTransparency = self._transparency,
 			Size = Blend.Computed(self._leftWidth, self._sizeValue, function(width, sizeValue)
 				if sizeValue.x == 0 then
 					return UDim2.new(0, 0, 1, 0)
 				end
 
-				return UDim2.new(width/sizeValue.x, 0, 1, 0)
-			end);
+				return UDim2.new(width / sizeValue.x, 0, 1, 0)
+			end),
 
 			Blend.New "UIGradient" {
 				Color = Blend.Computed(self._hsvColorValue, function(color)
@@ -239,32 +239,32 @@ function ValueColorPicker:_render()
 					local start = Color3.fromHSV(h, s, 0)
 					local finish = Color3.fromHSV(h, s, 1)
 					return ColorSequence.new(start, finish)
-				end);
-				Rotation = -90;
-			};
+				end),
+				Rotation = -90,
+			},
 			Blend.New "UICorner" {
-				CornerRadius = UDim.new(0, 4);
-			};
+				CornerRadius = UDim.new(0, 4),
+			},
 
-			self._preview.Gui;
+			self._preview.Gui,
 			-- self._cursor.Gui;
-		};
+		},
 
 		Blend.New "Frame" {
-			BackgroundTransparency = 1;
-			Position = UDim2.fromScale(1, 0);
-			AnchorPoint = Vector2.new(1, 0);
+			BackgroundTransparency = 1,
+			Position = UDim2.fromScale(1, 0),
+			AnchorPoint = Vector2.new(1, 0),
 			Size = Blend.Computed(self._leftWidth, self._sizeValue, function(width, sizeValue)
 				if sizeValue.x == 0 then
 					return UDim2.new(0, 0, 1, 0)
 				end
 
-				return UDim2.new((sizeValue.x - width)/sizeValue.x, 0, 1, 0)
-			end);
+				return UDim2.new((sizeValue.x - width) / sizeValue.x, 0, 1, 0)
+			end),
 
-			self._triangle.Gui;
-		}
-	};
+			self._triangle.Gui,
+		},
+	}
 end
 
 return ValueColorPicker

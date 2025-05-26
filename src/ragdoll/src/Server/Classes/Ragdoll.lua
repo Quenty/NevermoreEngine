@@ -31,6 +31,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Binder = require("Binder")
+local ServiceBag = require("ServiceBag")
 
 local Ragdoll = setmetatable({}, BaseObject)
 Ragdoll.ClassName = "Ragdoll"
@@ -42,7 +43,7 @@ Ragdoll.__index = Ragdoll
 	@param _serviceBag ServiceBag
 	@return Ragdoll
 ]=]
-function Ragdoll.new(humanoid, _serviceBag)
+function Ragdoll.new(humanoid: Humanoid, _serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), Ragdoll)
 
 	return self

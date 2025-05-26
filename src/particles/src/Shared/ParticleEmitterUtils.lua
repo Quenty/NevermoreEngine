@@ -1,34 +1,51 @@
+--!strict
 --[=[
+	Standard playback of particles using `EmitDelay` and `EmitCount` attributes that
+	most standard particle editors emit.
+
 	@class ParticleEmitterUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local NumberSequenceUtils = require("NumberSequenceUtils")
 local Maid = require("Maid")
+local NumberSequenceUtils = require("NumberSequenceUtils")
 
 local ParticleEmitterUtils = {}
 
-function ParticleEmitterUtils.scaleSize(adornee, scale)
+--[=[
+	Scales the size of the particle emitter to a specified size
+]=]
+function ParticleEmitterUtils.scaleSize(adornee: Instance, scale: number): ()
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	for _, particleEmitter in pairs(ParticleEmitterUtils.getParticleEmitters(adornee)) do
+	for _, particleEmitter in ParticleEmitterUtils.getParticleEmitters(adornee) do
 		particleEmitter.Size = NumberSequenceUtils.scale(particleEmitter.Size, scale)
 	end
 end
 
-function ParticleEmitterUtils.playFromTemplate(template, attachment)
+--[=[
+	Playes a particle emitter from a template in the parent
+
+	@param template Instance
+	@return Maid
+]=]
+function ParticleEmitterUtils.playFromTemplate(template: Instance, attachment: Attachment): Maid.Maid
 	local maid = Maid.new()
 
-	for _, emitter in pairs(template:GetChildren()) do
+	for _, emitter in ParticleEmitterUtils.getParticleEmitters(template) do
 		local newEmitter = emitter:Clone()
 		newEmitter.Parent = attachment
 		maid:GiveTask(newEmitter)
 
 		local emitDelay = newEmitter:GetAttribute("EmitDelay")
-		local emitCount = newEmitter:GetAttribute("EmitCount")
+		local unparsedEmitCount = newEmitter:GetAttribute("EmitCount")
+		local emitCount: number?
+		if type(unparsedEmitCount) ~= "number" then
+			emitCount = nil
+		end
 
-		if emitDelay then
+		if type(emitDelay) == "number" then
 			maid:GiveTask(task.delay(emitDelay, function()
 				newEmitter:Emit(emitCount)
 			end))
@@ -38,19 +55,21 @@ function ParticleEmitterUtils.playFromTemplate(template, attachment)
 	end
 
 	return maid
-
 end
 
-function ParticleEmitterUtils.getParticleEmitters(adornee)
+--[=[
+	Retrieves particle emitters for the given adornee
+]=]
+function ParticleEmitterUtils.getParticleEmitters(adornee: Instance): { ParticleEmitter }
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	local emitters = {}
+	local emitters: { ParticleEmitter } = {}
 
 	if adornee:IsA("ParticleEmitter") then
 		table.insert(emitters, adornee)
 	end
 
-	for _, particleEmitter in pairs(adornee:GetDescendants()) do
+	for _, particleEmitter in adornee:GetDescendants() do
 		if particleEmitter:IsA("ParticleEmitter") then
 			table.insert(emitters, particleEmitter)
 		end

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class TransitionUtils
 ]=]
@@ -19,7 +20,7 @@ local TransitionUtils = {}
 	@param value any
 	@return boolean
 ]=]
-function TransitionUtils.isTransition(value)
+function TransitionUtils.isTransition(value: any): boolean
 	return BasicPane.isBasicPane(value)
 		and type(value.PromiseShow) == "function"
 		and type(value.PromiseHide) == "function"

@@ -70,7 +70,7 @@ function ScrollModel:__index(index)
 		return (self._viewSize / self.TotalContentLength)
 	elseif index == "RenderedContentScrollPercentSize" then
 		local Position = self.Position
-		return self.ContentScrollPercentSize * (1-self:GetScale(self:_getTimesOverBounds(Position)))
+		return self.ContentScrollPercentSize * (1 - self:GetScale(self:_getTimesOverBounds(Position)))
 	elseif index == "ContentScrollPercent" then
 		return (self.Position - self._min) / (self.TotalContentLength - self._viewSize)
 	elseif index == "RenderedContentScrollPercent" then
@@ -87,9 +87,9 @@ function ScrollModel:__index(index)
 		local timesOverBounds = self:_getTimesOverBounds(position)
 		local scale = self:GetScale(timesOverBounds)
 		if timesOverBounds > 0 then
-			return -self.ContentMax - scale*self.BackBounceRenderRange
+			return -self.ContentMax - scale * self.BackBounceRenderRange
 		elseif timesOverBounds < 0 then
-			return self.ContentMin + scale*self.BackBounceRenderRange
+			return self.ContentMin + scale * self.BackBounceRenderRange
 		else
 			return -position
 		end

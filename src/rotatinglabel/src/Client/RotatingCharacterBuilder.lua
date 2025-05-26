@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	@class RotatingCharacterBuilder
 ]=]
@@ -26,7 +27,7 @@ function RotatingCharacterBuilder:Generate(Parent)
 	local Template = self.TextLabelTemplate or error("Must set TextLabelTemplate")
 
 	local container = Instance.new("Frame")
-	container.Name = "RotatingCharacterContainer";
+	container.Name = "RotatingCharacterContainer"
 	container.ClipsDescendants = true
 	container.SizeConstraint = Enum.SizeConstraint.RelativeYY
 	container.Size = UDim2.new(1, 0, 1, 0)

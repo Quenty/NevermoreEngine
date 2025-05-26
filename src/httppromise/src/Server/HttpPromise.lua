@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides a wrapper around HttpService with a promise API
 
@@ -32,6 +33,22 @@ local DEBUG_RESPONSE = false
 
 local HttpPromise = {}
 
+export type HTTPRequest = {
+	Url: string,
+	Method: "POST" | "GET" | "PUT" | "DELETE",
+	Headers: { [string]: string | Secret }?,
+	Body: string?,
+	Compress: Enum.HttpCompression?,
+}
+
+export type HTTPResponse = {
+	Success: boolean,
+	StatusCode: number,
+	StatusMessage: string,
+	Headers: { [string]: string },
+	Body: string,
+}
+
 --[=[
 	Decodes JSON from the response
 
@@ -46,10 +63,10 @@ local HttpPromise = {}
 	})
 	```
 
-	@param request table
+	@param request HTTPRequest
 	@return Promise<table>
 ]=]
-function HttpPromise.request(request)
+function HttpPromise.request(request: HTTPRequest): Promise.Promise<()>
 	if DEBUG_REQUEST then
 		print("Sending request", HttpService:JSONEncode(request))
 	end
@@ -85,7 +102,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function HttpPromise.isHttpResponse(value)
+function HttpPromise.isHttpResponse(value: any): boolean
 	return type(value) == "table"
 		and type(value.Success) == "boolean"
 		and type(value.StatusCode) == "number"
@@ -100,7 +117,7 @@ end
 	@param value HttpResponse
 	@return string
 ]=]
-function HttpPromise.convertHttpResponseToString(value)
+function HttpPromise.convertHttpResponseToString(value: HTTPResponse): string
 	assert(HttpPromise.isHttpResponse(value), "Bad value")
 
 	return string.format("%d: %s - %s", value.StatusCode, value.StatusMessage, value.Body)
@@ -117,16 +134,18 @@ end
 	@param request table | string
 	@return Promise<table>
 ]=]
-function HttpPromise.json(request)
+function HttpPromise.json(request: HTTPRequest | string): Promise.Promise<any>
+	local finalRequest: HTTPRequest
 	if type(request) == "string" then
-		request = {
-			Method = "GET";
-			Url = request;
+		finalRequest = {
+			Method = "GET",
+			Url = request,
 		}
+	else
+		finalRequest = request
 	end
 
-	return HttpPromise.request(request)
-		:Then(HttpPromise.decodeJson)
+	return HttpPromise.request(finalRequest):Then(HttpPromise.decodeJson)
 end
 
 --[=[
@@ -140,7 +159,7 @@ end
 	@param ... any -- A list of requests to retrieve. Meant to be used
 ]=]
 function HttpPromise.logFailedRequests(...)
-	for _, item in pairs({...}) do
+	for _, item in { ... } do
 		if type(item) == "string" then
 			warn(item)
 		elseif type(item) == "table" and type(item.StatusCode) == "number" then
@@ -155,7 +174,7 @@ end
 	@param response { Body: string }
 	@return table
 ]=]
-function HttpPromise.decodeJson(response)
+function HttpPromise.decodeJson(response: HTTPResponse)
 	assert(response, "Bad response")
 
 	if type(response.Body) ~= "string" then

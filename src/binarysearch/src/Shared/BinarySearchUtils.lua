@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Binary search implementation for Roblox in pure Lua
 	@class BinarySearchUtils
@@ -15,10 +16,10 @@ local BinarySearchUtils = {}
 
 	@param list {T}
 	@param t number
-	@return number
-	@return number
+	@return number?
+	@return number?
 ]=]
-function BinarySearchUtils.spanSearch(list, t)
+function BinarySearchUtils.spanSearch(list: { number }, t: number): (number?, number?)
 	local l = 1
 	local h = #list
 
@@ -33,8 +34,8 @@ function BinarySearchUtils.spanSearch(list, t)
 	end
 
 	while 1 < h - l do
-		local m = (l + h)/2
-		m = m - m%1
+		local m = (l + h) / 2
+		m = m - m % 1
 
 		if t < list[m] then
 			h = m
@@ -51,10 +52,10 @@ end
 	@param list { TNode }
 	@param index string
 	@param t number
-	@return number
-	@return number
+	@return number?
+	@return number?
 ]=]
-function BinarySearchUtils.spanSearchNodes(list, index, t)
+function BinarySearchUtils.spanSearchNodes(list: { any }, index: string, t: number): (number?, number?)
 	local l = 1
 	local h = #list
 
@@ -69,8 +70,8 @@ function BinarySearchUtils.spanSearchNodes(list, index, t)
 	end
 
 	while 1 < h - l do
-		local m = (l + h)/2
-		m = m - m%1
+		local m = (l + h) / 2
+		m = m - m % 1
 
 		if t < list[m][index] then
 			h = m
@@ -89,7 +90,7 @@ end
 	@return number
 	@return number
 ]=]
-function BinarySearchUtils.spanSearchAnything(n, indexFunc, t)
+function BinarySearchUtils.spanSearchAnything(n: number, indexFunc: (number) -> number, t: number): (number?, number?)
 	local l = 1
 	local h = n
 
@@ -104,8 +105,8 @@ function BinarySearchUtils.spanSearchAnything(n, indexFunc, t)
 	end
 
 	while 1 < h - l do
-		local m = (l + h)/2
-		m = m - m%1
+		local m = (l + h) / 2
+		m = m - m % 1
 
 		if t < indexFunc(m) then
 			h = m

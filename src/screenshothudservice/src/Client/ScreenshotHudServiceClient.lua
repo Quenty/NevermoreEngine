@@ -7,14 +7,16 @@ local require = require(script.Parent.loader).load(script)
 local GuiService = game:GetService("GuiService")
 
 local Maid = require("Maid")
-local RxInstanceUtils = require("RxInstanceUtils")
-local StateStack = require("StateStack")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
+local StateStack = require("StateStack")
+
 local ScreenshotHudServiceClient = {}
 ScreenshotHudServiceClient.ServiceName = "ScreenshotHudServiceClient"
 
-function ScreenshotHudServiceClient:Init(serviceBag)
+function ScreenshotHudServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -22,8 +24,8 @@ function ScreenshotHudServiceClient:Init(serviceBag)
 	self._screenshotHudState = self._maid:Add(StateStack.new(nil))
 
 	self._maid:GiveTask(RxBrioUtils.flatCombineLatest({
-		model = self._screenshotHudState:Observe();
-		screenshotHUD = self:_observeScreenshotHudBrio();
+		model = self._screenshotHudState:Observe(),
+		screenshotHUD = self:_observeScreenshotHudBrio(),
 	}):Subscribe(function(state)
 		self._maid._current = nil
 		local maid = Maid.new()
@@ -53,10 +55,10 @@ function ScreenshotHudServiceClient:PushModel(screenshotHudModel)
 	end
 end
 
-function ScreenshotHudServiceClient:_bindModelToHUD(maid, model, screenshotHUD)
+function ScreenshotHudServiceClient:_bindModelToHUD(maid: Maid.Maid, model, screenshotHUD)
 	maid:GiveTask(Rx.combineLatest({
-		visible = model:ObserveCloseButtonVisible();
-		position = model:ObserveCloseButtonPosition();
+		visible = model:ObserveCloseButtonVisible(),
+		position = model:ObserveCloseButtonPosition(),
 	}):Subscribe(function(state)
 		if state.visible then
 			screenshotHUD.CloseButtonPosition = state.position
@@ -68,8 +70,8 @@ function ScreenshotHudServiceClient:_bindModelToHUD(maid, model, screenshotHUD)
 
 	-- I'm not sure why you would do this, but it's here
 	maid:GiveTask(Rx.combineLatest({
-		visible = model:ObserveCameraButtonVisible();
-		position = model:ObserveCameraButtonPosition();
+		visible = model:ObserveCameraButtonVisible(),
+		position = model:ObserveCameraButtonPosition(),
 	}):Subscribe(function(state)
 		if state.visible then
 			screenshotHUD.CameraButtonPosition = state.position

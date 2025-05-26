@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Mesh utility methods
 	@class MeshUtils
@@ -9,9 +10,9 @@ local MeshUtils = {}
 	Get or create a mesh object for a part
 
 	@param part BasePart
-	@return Mesh?
+	@return DataModelMesh?
 ]=]
-function MeshUtils.getOrCreateMesh(part)
+function MeshUtils.getOrCreateMesh(part: BasePart): DataModelMesh?
 	local dataModelMesh = part:FindFirstChildWhichIsA("DataModelMesh")
 	if dataModelMesh then
 		return dataModelMesh
@@ -29,7 +30,8 @@ function MeshUtils.getOrCreateMesh(part)
 			mesh.Parent = part
 			return mesh
 		elseif part.Shape == Enum.PartType.Block then
-			local mesh = Instance.new("BlockMesh")
+			local mesh = Instance.new("SpecialMesh")
+			mesh.MeshType = Enum.MeshType.Brick
 			mesh.Parent = part
 			return mesh
 		else
@@ -37,7 +39,8 @@ function MeshUtils.getOrCreateMesh(part)
 			return nil
 		end
 	elseif part:IsA("VehicleSeat") or part:IsA("Seat") then
-		local mesh = Instance.new("BlockMesh")
+		local mesh = Instance.new("SpecialMesh")
+		mesh.MeshType = Enum.MeshType.Brick
 		mesh.Parent = part
 		return mesh
 	elseif part:IsA("MeshPart") then

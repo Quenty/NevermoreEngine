@@ -12,19 +12,20 @@ local FakeSkyboxSide = require("FakeSkyboxSide")
 local Maid = require("Maid")
 local Signal = require("Signal")
 
-local SKYBOX_PROPERTY_IMAGE_MAP = {} do
+local SKYBOX_PROPERTY_IMAGE_MAP = {}
+do
 	local properties = {
-		Top = "Up";
-		Bottom = "Dn";
+		Top = "Up",
+		Bottom = "Dn",
 
-		 -- Bind backwards
-		Right = "Lf";
-		Left = "Rt";
+		-- Bind backwards
+		Right = "Lf",
+		Left = "Rt",
 
-		Front = "Ft";
-		Back = "Bk";
+		Front = "Ft",
+		Back = "Bk",
 	}
-	for Surface, Direction in pairs(properties) do
+	for Surface, Direction in properties do
 		SKYBOX_PROPERTY_IMAGE_MAP[Enum.NormalId[Surface]] = "Skybox" .. Direction
 	end
 end
@@ -49,7 +50,7 @@ function FakeSkybox.new(skybox)
 	self._maid:GiveTask(self._parentFolder)
 
 	self._sides = {}
-	for _, NormalId in pairs(Enum.NormalId:GetEnumItems()) do
+	for _, NormalId in Enum.NormalId:GetEnumItems() do
 		self._sides[NormalId] = FakeSkyboxSide.new(self._partSize, NormalId, self._parentFolder)
 		--self._maid[NormalId] = self._sides[NormalId]
 	end
@@ -77,7 +78,7 @@ end
 function FakeSkybox:SetPartSize(partSize)
 	self._partSize = partSize or error("No partSize")
 
-	for _, side in pairs(self._sides) do
+	for _, side in self._sides do
 		side:SetPartSize(self._partSize)
 	end
 
@@ -87,7 +88,7 @@ end
 --[=[
 	@param doNotAnimate boolean
 ]=]
-function FakeSkybox:Show(doNotAnimate)
+function FakeSkybox:Show(doNotAnimate: boolean?)
 	if self._visible then
 		return
 	end
@@ -104,7 +105,7 @@ end
 --[=[
 	@param doNotAnimate boolean
 ]=]
-function FakeSkybox:Hide(doNotAnimate)
+function FakeSkybox:Hide(doNotAnimate: boolean?)
 	if not self._visible then
 		return
 	end
@@ -125,7 +126,7 @@ end
 function FakeSkybox:SetSkybox(skybox)
 	self._skybox = skybox or error("No skybox")
 
-	for normal, side in pairs(self._sides) do
+	for normal, side in self._sides do
 		local propertyName = SKYBOX_PROPERTY_IMAGE_MAP[normal]
 		side:SetImage(skybox[propertyName])
 	end
@@ -137,7 +138,7 @@ end
 	Returns whether the skybox is visible.
 	@return boolean
 ]=]
-function FakeSkybox:IsVisible()
+function FakeSkybox:IsVisible(): boolean
 	return self._visible
 end
 
@@ -145,10 +146,10 @@ end
 	Updates the rendering
 	@param baseCFrame CFrame
 ]=]
-function FakeSkybox:UpdateRender(baseCFrame)
-	local transparency = 1-self._percentVisible.p
+function FakeSkybox:UpdateRender(baseCFrame: CFrame)
+	local transparency = 1 - self._percentVisible.p
 
-	for _, side in pairs(self._sides) do
+	for _, side in self._sides do
 		side:UpdateRender(baseCFrame)
 		side:SetTransparency(transparency)
 	end

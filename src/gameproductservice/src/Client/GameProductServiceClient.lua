@@ -15,10 +15,12 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 
 local GameProductServiceClient = {}
@@ -28,7 +30,7 @@ GameProductServiceClient.ServiceName = "GameProductServiceClient"
 	Initializes the service. Should be done via [ServiceBag]
 	@param serviceBag ServiceBag
 ]=]
-function GameProductServiceClient:Init(serviceBag)
+function GameProductServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -91,9 +93,12 @@ end
 
 	@param assetType GameConfigAssetType
 	@param idOrKey string | number
-	@return Observable<Player>
+	@return Observable<boolean>
 ]=]
-function GameProductServiceClient:ObserveAssetPurchased(assetType, idOrKey)
+function GameProductServiceClient:ObserveAssetPurchased(
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Observable.Observable<boolean>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -108,7 +113,11 @@ end
 	@param idOrKey string | number
 	@return boolean
 ]=]
-function GameProductServiceClient:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
+function GameProductServiceClient:HasPlayerPurchasedThisSession(
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -124,11 +133,14 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePromptPurchase(player, assetType, idOrKey)
+function GameProductServiceClient:PromisePromptPurchase(
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
-
 
 	return self._gameProductDataService:PromisePromptPurchase(player, assetType, idOrKey)
 end
@@ -141,7 +153,11 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerOwnership(player, assetType, idOrKey)
+function GameProductServiceClient:PromisePlayerOwnership(
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -157,7 +173,11 @@ end
 	@param idOrKey string | number
 	@return Observable<boolean>
 ]=]
-function GameProductServiceClient:ObservePlayerOwnership(player, assetType, idOrKey)
+function GameProductServiceClient:ObservePlayerOwnership(
+	player: Player,
+	assetType,
+	idOrKey: string | number
+): Observable.Observable<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -171,7 +191,7 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerIsPromptOpen(player)
+function GameProductServiceClient:PromisePlayerIsPromptOpen(player: Player): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self ~= GameProductServiceClient, "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
@@ -185,7 +205,7 @@ end
 	@param player Player
 	@return Promise
 ]=]
-function GameProductServiceClient:PromisePlayerPromptClosed(player)
+function GameProductServiceClient:PromisePlayerPromptClosed(player: Player): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self ~= GameProductServiceClient, "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
@@ -203,7 +223,11 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
+function GameProductServiceClient:PromisePlayerOwnershipOrPrompt(
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -218,7 +242,10 @@ end
 	@param productIdOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(gamePassIdOrKey, productIdOrKey)
+function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(
+	gamePassIdOrKey: string | number,
+	productIdOrKey: string | number
+): Promise.Promise<boolean>
 	assert(type(gamePassIdOrKey) == "number" or type(gamePassIdOrKey) == "string", "Bad gamePassIdOrKey")
 	assert(type(productIdOrKey) == "number" or type(productIdOrKey) == "string", "Bad productIdOrKey")
 

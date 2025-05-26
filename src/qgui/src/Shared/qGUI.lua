@@ -2,14 +2,14 @@
 	A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
 	@deprecated 2.3.1
-	@class qGui
+	@class qGUI
 ]=]
 
 local RunService = game:GetService("RunService")
 
 local qGUI = {}
 
-function qGUI.PointInBounds(frame, x, y)
+function qGUI.PointInBounds(frame: Frame, x: number, y: number): boolean
 	local position = frame.AbsolutePosition
 	local size = frame.AbsoluteSize
 
@@ -18,43 +18,39 @@ function qGUI.PointInBounds(frame, x, y)
 	local left = position.X
 	local right = position.X + size.X
 
-	return y > top
-		and y < bottom
-		and x > left
-		and x < right
+	return y > top and y < bottom and x > left and x < right
 end
 
-function qGUI.MouseOver(mouse, frame)
+function qGUI.MouseOver(mouse: Mouse, frame: Frame): boolean
 	return qGUI.PointInBounds(frame, mouse.X, mouse.Y)
 end
 
--- @param UpdateFunction()
+-- @param updateFunction()
 -- @return ShouldStop, if true, will stop updating
 -- @return StartUpdate()
-local function CreateYieldedUpdate(UpdateFunction)
-	local AnimationId = 0
-	local LastUpdatePoint = -1 -- If it's -1, no active thread.
+local function createYieldedUpdate(updateFunction: () -> ())
+	local animationId = 0
+	local lastUpdatePoint = -1 -- If it's -1, no active thread.
 
-	-- Increments the AnimationId and returns a new UpdateFunction
+	-- Increments the animationId and returns a new updateFunction
 	-- to be bound into RenderStep
-	local function GetNewUpdateFunction(RenderStepKey)
-
-		local LocalAnimationId = AnimationId + 1
-		AnimationId = LocalAnimationId
+	local function getNewUpdateFunction(renderStepKey: string)
+		local localAnimationId = animationId + 1
+		animationId = localAnimationId
 
 		-- Note that we're now updating.
-		LastUpdatePoint = tick()
+		lastUpdatePoint = tick()
 
-		-- Intended to be called each RenderStep. Will unbind itself if the UpdateFunction fails
+		-- Intended to be called each RenderStep. Will unbind itself if the updateFunction fails
 		-- or a new update function is generated
 		return function()
-			LastUpdatePoint = tick()
+			lastUpdatePoint = tick()
 
-			if UpdateFunction() or (AnimationId ~= LocalAnimationId) then
-				RunService:UnbindFromRenderStep(RenderStepKey)
+			if updateFunction() or (animationId ~= localAnimationId) then
+				RunService:UnbindFromRenderStep(renderStepKey)
 
-				if AnimationId == LocalAnimationId then
-					LastUpdatePoint = -1
+				if animationId == localAnimationId then
+					lastUpdatePoint = -1
 				end
 			end
 		end
@@ -63,40 +59,39 @@ local function CreateYieldedUpdate(UpdateFunction)
 	-- Calculates the time since the last update function was called
 	-- Used to determine if a new update function should be generated, since clients tend to
 	-- kill threads when local scripts are GCed
-	local function TimeSinceUpdate()
-
-		return tick() - LastUpdatePoint
+	local function timeSinceUpdate(): number
+		return tick() - lastUpdatePoint
 	end
 
-	local function ShouldStartUpdate()
-		return LastUpdatePoint == -1 -- In this case, we have no active threads
-			or TimeSinceUpdate() > 0.1 -- In this case, our presumed active thread is dead.
+	local function shouldStartUpdate(): boolean
+		return lastUpdatePoint == -1 -- In this case, we have no active threads
+			or timeSinceUpdate() > 0.1 -- In this case, our presumed active thread is dead.
 	end
 
 	-- Starts an update thread, potentialy removing the old one.
-	local function StartNewThread()
-		local RenderStepKey = "TweenTransparencyOnGuis" .. tostring(UpdateFunction) .. tick()
-		RunService:BindToRenderStep(RenderStepKey, 2000, GetNewUpdateFunction(RenderStepKey))
+	local function startNewThread()
+		local renderStepKey = "TweenTransparencyOnGuis" .. tostring(updateFunction) .. tick()
+		RunService:BindToRenderStep(renderStepKey, 2000, getNewUpdateFunction(renderStepKey))
 	end
 
 	-- Starts the tween
 	return function()
-		if ShouldStartUpdate() then
-			StartNewThread()
+		if shouldStartUpdate() then
+			startNewThread()
 		end
 	end
 end
 
 -- Creates a tweener that only runs when it's updating with a set properties system.
--- @param function `SetProperties`
-	-- SetProperties(Gui, Percent, StartProperties, NewProperties)
-		-- @param Gui The Gui to set properties on
-		-- @param Percent Number [0, 1] of properties to set
-		-- @param StartProperties The properties we started with
-		-- @param NewProperties The properties we ended with
+-- @param function `setProperties`
+-- setProperties(Gui, Percent, StartProperties, NewProperties)
+-- @param Gui The Gui to set properties on
+-- @param Percent Number [0, 1] of properties to set
+-- @param StartProperties The properties we started with
+-- @param NewProperties The properties we ended with
 -- @return
-local function MakePropertyTweener(SetProperties)
-	local GuiMap = {} -- [Gui] = TweenData
+local function makePropertyTweener(setProperties)
+	local guiMap: { [GuiBase]: any } = {} -- [Gui] = TweenData
 
 	local function GetTweenData(Gui, NewProperties, Duration)
 		-- Returns new tween data for the GUI in question
@@ -105,40 +100,45 @@ local function MakePropertyTweener(SetProperties)
 		local EndProperties = {}
 
 		-- Copy data into the table
-		for Index, Value in pairs(NewProperties) do
-			if Gui[Index] ~= Value then
-				StartProperties[Index] = Gui[Index]
-				EndProperties[Index] = Value
+		for index, Value in NewProperties do
+			if Gui[index] ~= Value then
+				StartProperties[index] = Gui[index]
+				EndProperties[index] = Value
 			end
 		end
 
 		return {
-			StartTime       = tick();
-			Duration        = Duration;
-			StartProperties = StartProperties;
-			NewProperties   = EndProperties;
+			StartTime = tick(),
+			Duration = Duration,
+			StartProperties = StartProperties,
+			NewProperties = EndProperties,
 		}
 	end
 
-	local StartRenderStepUpdater = CreateYieldedUpdate(function()
+	local StartRenderStepUpdater = createYieldedUpdate(function()
 		-- Update function that will be called each second
 
 		local tick = tick()
 		local ShouldStop = true
 
-		for Gui, TweenState in next, GuiMap do
+		for Gui, TweenState in next, guiMap do
 			if Gui:IsDescendantOf(game) then
 				local TimeElapsed = tick - TweenState.StartTime
 
 				if TimeElapsed > TweenState.Duration then -- Then we end it.
-					SetProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties)
-					GuiMap[Gui] = nil
+					setProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties)
+					guiMap[Gui] = nil
 				else
-					SetProperties(Gui, TimeElapsed/TweenState.Duration, TweenState.StartProperties, TweenState.NewProperties)
+					setProperties(
+						Gui,
+						TimeElapsed / TweenState.Duration,
+						TweenState.StartProperties,
+						TweenState.NewProperties
+					)
 					ShouldStop = false
 				end
 			else
-				GuiMap[Gui] = nil
+				guiMap[Gui] = nil
 			end
 		end
 
@@ -149,22 +149,21 @@ local function MakePropertyTweener(SetProperties)
 	-- @param Gui The GUI to tween the Transparency's upon
 	-- @param NewProperties The properties to be changed. It will take the current
 	--                      properties and tween to the new ones. This table should be
-	--                      setup so {Index = NewValue} that is, for example,
+	--                      setup so {index = NewValue} that is, for example,
 	--                      {TextTransparency = 1}.
 	-- @param Duration The amount of time to spend transitioning.
-	return function(Gui, NewProperties, Duration)
-
+	return function(Gui: GuiBase, NewProperties, Duration: number)
 		if Duration <= 0 then
-			SetProperties(Gui, 1, NewProperties, NewProperties)
+			setProperties(Gui, 1, NewProperties, NewProperties)
 		else
-			GuiMap[Gui] = GetTweenData(Gui, NewProperties, Duration)
+			guiMap[Gui] = GetTweenData(Gui, NewProperties, Duration)
 			StartRenderStepUpdater()
 		end
 
-	-- A tweening function to manually terminate tweening on a Gui element
-	-- @param Gui The GUI to stop tweening
+		-- A tweening function to manually terminate tweening on a Gui element
+		-- @param Gui The GUI to stop tweening
 	end, function(Gui)
-		GuiMap[Gui] = nil
+		guiMap[Gui] = nil
 	end
 end
 
@@ -173,46 +172,47 @@ end
 -- @param Gui The GUI to tween the Transparency's upon
 -- @param NewProperties The properties to be changed. It will take the current
 --                      properties and tween to the new ones. This table should be
---                      setup so {Index = NewValue} that is, for example,
+--                      setup so {index = NewValue} that is, for example,
 --                      {TextTransparency = 1}.
 -- @param Time The amount of time to spend transitioning.
-local TweenTransparency, StopTransparencyTween = MakePropertyTweener(
-	function(Gui, Percent, StartProperties, NewProperties)
-		for Index, EndValue in next, NewProperties do
-			local StartProperty = StartProperties[Index]
-			Gui[Index] = StartProperty + (EndValue - StartProperty) * Percent
+local TweenTransparency, StopTransparencyTween = makePropertyTweener(
+	function(Gui: any, percent: number, startProperties, newProperties)
+		for index, endValue in next, newProperties do
+			local StartProperty = startProperties[index]
+			Gui[index] = StartProperty + (endValue - StartProperty) * percent
 		end
-	end)
+	end
+)
 
 qGUI.TweenTransparency = TweenTransparency
 qGUI.StopTransparencyTween = StopTransparencyTween
-
 
 -- TweenColor3(Gui, NewProperties, Time)
 -- Tween's the Color3 values in a GUI,
 -- @param Gui The GUI to tween the Color3's upon
 -- @param NewProperties The properties to be changed. It will take the current
 --                      properties and tween to the new ones. This table should be
---                      setup so {Index = NewValue} that is, for example,
+--                      setup so {index = NewValue} that is, for example,
 --                      {BackgroundColor3 = Color3.new(1, 1, 1)}.
 -- @param Duration The amount of time to spend transitioning.
-local TweenColor3, StopColor3Tween do
-	local function LerpNumber(ValueOne, ValueTwo, Alpha)
-		return ValueOne + ((ValueTwo - ValueOne) * Alpha)
+local TweenColor3, StopColor3Tween
+do
+	local function LerpNumber(valueOne: number, valueTwo: number, alpha: number): number
+		return valueOne + ((valueTwo - valueOne) * alpha)
 	end
 
-	local function LerpColor3(ColorOne, ColorTwo, Alpha)
+	local function LerpColor3(colorOne: Color3, colorTwo: Color3, alpha: number)
 		return Color3.new(
-			LerpNumber(ColorOne.r, ColorTwo.r, Alpha),
-			LerpNumber(ColorOne.g, ColorTwo.g, Alpha),
-			LerpNumber(ColorOne.b, ColorTwo.b, Alpha)
+			LerpNumber(colorOne.R, colorTwo.R, alpha),
+			LerpNumber(colorOne.G, colorTwo.G, alpha),
+			LerpNumber(colorOne.B, colorTwo.B, alpha)
 		)
 	end
 
-	TweenColor3, StopColor3Tween = MakePropertyTweener(function(Gui, Percent, StartProperties, NewProperties)
-		for Index, EndValue in next, NewProperties do
-			local StartProperty = StartProperties[Index]
-			Gui[Index] = LerpColor3(StartProperty, EndValue, Percent)
+	TweenColor3, StopColor3Tween = makePropertyTweener(function(gui, percent, startProperties, newProperties)
+		for index, endValue in next, newProperties do
+			local StartProperty = startProperties[index]
+			gui[index] = LerpColor3(StartProperty, endValue, percent)
 		end
 	end)
 end
@@ -221,160 +221,176 @@ qGUI.TweenColor3 = TweenColor3
 qGUI.StopColor3Tween = StopColor3Tween
 
 -- Makes a 'Textured' window...  9Scale thingy?
-local function AddTexturedWindowTemplate(Frame, Radius, Type)
-	Type = Type or 'Frame'
+function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: string)
+	type = type or "Frame"
 
-	local TopLeft = Instance.new(Type)
-	TopLeft.Archivable = false
-	TopLeft.BackgroundColor3 = Frame.BackgroundColor3
-	TopLeft.BorderSizePixel = 0
-	TopLeft.Name = "TopLeft"
-	TopLeft.Position = UDim2.new(0, 0, 0, 0)
-	TopLeft.Size = UDim2.new(0, Radius, 0, Radius)
-	TopLeft.BackgroundTransparency = 1
-	TopLeft.ZIndex = Frame.ZIndex
-	TopLeft.Parent = Frame
+	local topLeft = Instance.new(type)
+	topLeft.Archivable = false
+	topLeft.BackgroundColor3 = frame.BackgroundColor3
+	topLeft.BorderSizePixel = 0
+	topLeft.Name = "TopLeft"
+	topLeft.Position = UDim2.new(0, 0, 0, 0)
+	topLeft.Size = UDim2.new(0, radius, 0, radius)
+	topLeft.BackgroundTransparency = 1
+	topLeft.ZIndex = frame.ZIndex
+	topLeft.Parent = frame
 
-	local BottomLeft = Instance.new(Type)
-	BottomLeft.Archivable = false
-	BottomLeft.BackgroundColor3 = Frame.BackgroundColor3
-	BottomLeft.BorderSizePixel = 0
-	BottomLeft.Name = "BottomLeft"
-	BottomLeft.Position = UDim2.new(0, 0, 1, -Radius)
-	BottomLeft.Size = UDim2.new(0, Radius, 0, Radius)
-	BottomLeft.BackgroundTransparency = 1
-	BottomLeft.ZIndex = Frame.ZIndex
-	BottomLeft.Parent = Frame
+	local bottomLeft = Instance.new(type)
+	bottomLeft.Archivable = false
+	bottomLeft.BackgroundColor3 = frame.BackgroundColor3
+	bottomLeft.BorderSizePixel = 0
+	bottomLeft.Name = "BottomLeft"
+	bottomLeft.Position = UDim2.new(0, 0, 1, -radius)
+	bottomLeft.Size = UDim2.new(0, radius, 0, radius)
+	bottomLeft.BackgroundTransparency = 1
+	bottomLeft.ZIndex = frame.ZIndex
+	bottomLeft.Parent = frame
 
-	local TopRight = Instance.new(Type)
-	TopRight.Archivable = false
-	TopRight.BackgroundColor3 = Frame.BackgroundColor3
-	TopRight.BorderSizePixel = 0
-	TopRight.Name = "TopRight"
-	TopRight.Position = UDim2.new(1, -Radius, 0, 0)
-	TopRight.Size = UDim2.new(0, Radius, 0, Radius)
-	TopRight.BackgroundTransparency = 1
-	TopRight.ZIndex = Frame.ZIndex
-	TopRight.Parent = Frame
+	local topRight = Instance.new(type)
+	topRight.Archivable = false
+	topRight.BackgroundColor3 = frame.BackgroundColor3
+	topRight.BorderSizePixel = 0
+	topRight.Name = "TopRight"
+	topRight.Position = UDim2.new(1, -radius, 0, 0)
+	topRight.Size = UDim2.new(0, radius, 0, radius)
+	topRight.BackgroundTransparency = 1
+	topRight.ZIndex = frame.ZIndex
+	topRight.Parent = frame
 
-	local BottomRight = Instance.new(Type)
-	BottomRight.Archivable = false
-	BottomRight.BackgroundColor3 = Frame.BackgroundColor3
-	BottomRight.BorderSizePixel = 0
-	BottomRight.Name = "BottomRight"
-	BottomRight.Position = UDim2.new(1, -Radius, 1, -Radius)
-	BottomRight.Size = UDim2.new(0, Radius, 0, Radius)
-	BottomRight.BackgroundTransparency = 1
-	BottomRight.ZIndex = Frame.ZIndex
-	BottomRight.Parent = Frame
+	local bottomRight = Instance.new(type)
+	bottomRight.Archivable = false
+	bottomRight.BackgroundColor3 = frame.BackgroundColor3
+	bottomRight.BorderSizePixel = 0
+	bottomRight.Name = "BottomRight"
+	bottomRight.Position = UDim2.new(1, -radius, 1, -radius)
+	bottomRight.Size = UDim2.new(0, radius, 0, radius)
+	bottomRight.BackgroundTransparency = 1
+	bottomRight.ZIndex = frame.ZIndex
+	bottomRight.Parent = frame
 
-	local Middle = Instance.new(Type)
-	Middle.Archivable = false
-	Middle.BackgroundColor3 = Frame.BackgroundColor3
-	Middle.BorderSizePixel = 0
-	Middle.Name = "Middle"
-	Middle.Position = UDim2.new(0, Radius, 0, 0)
-	Middle.Size = UDim2.new(1, -Radius*2, 1, 0)
-	Middle.BackgroundTransparency = 1
-	Middle.ZIndex = Frame.ZIndex
-	Middle.Parent = Frame
+	local middle = Instance.new(type)
+	middle.Archivable = false
+	middle.BackgroundColor3 = frame.BackgroundColor3
+	middle.BorderSizePixel = 0
+	middle.Name = "Middle"
+	middle.Position = UDim2.new(0, radius, 0, 0)
+	middle.Size = UDim2.new(1, -radius * 2, 1, 0)
+	middle.BackgroundTransparency = 1
+	middle.ZIndex = frame.ZIndex
+	middle.Parent = frame
 
-	local MiddleLeft = Instance.new(Type)
-	MiddleLeft.Archivable = false
-	MiddleLeft.BackgroundColor3 = Frame.BackgroundColor3
-	MiddleLeft.BorderSizePixel = 0
-	MiddleLeft.Name = "MiddleLeft"
-	MiddleLeft.Position = UDim2.new(0, 0, 0, Radius)
-	MiddleLeft.Size = UDim2.new(0, Radius, 1, -Radius*2)
-	MiddleLeft.BackgroundTransparency = 1
-	MiddleLeft.ZIndex = Frame.ZIndex
-	MiddleLeft.Parent = Frame
+	local middleLeft = Instance.new(type)
+	middleLeft.Archivable = false
+	middleLeft.BackgroundColor3 = frame.BackgroundColor3
+	middleLeft.BorderSizePixel = 0
+	middleLeft.Name = "MiddleLeft"
+	middleLeft.Position = UDim2.new(0, 0, 0, radius)
+	middleLeft.Size = UDim2.new(0, radius, 1, -radius * 2)
+	middleLeft.BackgroundTransparency = 1
+	middleLeft.ZIndex = frame.ZIndex
+	middleLeft.Parent = frame
 
-	local MiddleRight = Instance.new(Type)
-	MiddleRight.Archivable = false
-	MiddleRight.BackgroundColor3 = Frame.BackgroundColor3
-	MiddleRight.BorderSizePixel = 0
-	MiddleRight.Name = "MiddleRight"
-	MiddleRight.Position = UDim2.new(1, -Radius, 0, Radius)
-	MiddleRight.Size = UDim2.new(0, Radius, 1, -Radius*2)
-	MiddleRight.BackgroundTransparency = 1
-	MiddleRight.ZIndex = Frame.ZIndex
-	MiddleRight.Parent = Frame
+	local middleRight = Instance.new(type)
+	middleRight.Archivable = false
+	middleRight.BackgroundColor3 = frame.BackgroundColor3
+	middleRight.BorderSizePixel = 0
+	middleRight.Name = "MiddleRight"
+	middleRight.Position = UDim2.new(1, -radius, 0, radius)
+	middleRight.Size = UDim2.new(0, radius, 1, -radius * 2)
+	middleRight.BackgroundTransparency = 1
+	middleRight.ZIndex = frame.ZIndex
+	middleRight.Parent = frame
 
-	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight
+	return topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight
 end
-qGUI.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 
--- Makes a NinePatch in the frame, with the image.
--- @param Frame The frame to texturize
--- @param Radius the radius you want the image to be at
--- @param Type The type (Class) that the frame should be, either an ImageLabel or an ImageButton
--- @param Image The URL of the image in question
--- @param ImageSize The size of the image overall, suggested to be 99/divisible by 3. Vector2 value.
-local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
-	Properties = Properties or {}
-	Type = Type or "ImageLabel"
-	local TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight
-		= AddTexturedWindowTemplate(Frame, Radius, Type)
+--[=[
+	Makes a NinePatch in the frame, with the image.
 
-	Middle.Size = UDim2.new(1, -Radius*2, 1, -Radius*2) -- Fix middle...
-	Middle.Position = UDim2.new(0, Radius, 0, Radius)
+	@param frame Frame -- The frame to texturize
+	@param radius -- the radius you want the image to be at
+	@param type -- The type (Class) that the frame should be, either an ImageLabel or an ImageButton
+	@param image -- The URL of the image in question
+	@param imageSize -- The size of the image overall, suggested to be 99/divisible by 3. Vector2 value.
+	@param properties any
+]=]
+function qGUI.AddNinePatch(
+	frame: Frame,
+	image: string,
+	imageSize: Vector2,
+	radius: number,
+	type: "ImageLabel" | "ImageButton",
+	properties
+)
+	properties = properties or {}
+	type = type or "ImageLabel"
+	local topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight =
+		qGUI.AddTexturedWindowTemplate(frame, radius, type)
 
-	local MiddleTop = Instance.new(Type)
-	MiddleTop.Archivable = false
-	MiddleTop.BackgroundColor3 = Frame.BackgroundColor3
-	MiddleTop.BorderSizePixel = 0
-	MiddleTop.Name = "MiddleTop"
-	MiddleTop.Position = UDim2.new(0, Radius, 0, 0)
-	MiddleTop.Size = UDim2.new(1, -Radius*2, 0, Radius)
-	MiddleTop.BackgroundTransparency = 1
-	MiddleTop.ZIndex = Frame.ZIndex
-	MiddleTop.Parent = Frame
+	middle.Size = UDim2.new(1, -radius * 2, 1, -radius * 2) -- Fix middle...
+	middle.Position = UDim2.new(0, radius, 0, radius)
 
-	local MiddleBottom = Instance.new(Type)
-	MiddleBottom.Archivable = false
-	MiddleBottom.BackgroundColor3 = Frame.BackgroundColor3
-	MiddleBottom.BorderSizePixel = 0
-	MiddleBottom.Name = "MiddleBottom"
-	MiddleBottom.Position = UDim2.new(0, Radius, 1, -Radius)
-	MiddleBottom.Size = UDim2.new(1, -Radius*2, 0, Radius)
-	MiddleBottom.BackgroundTransparency = 1
-	MiddleBottom.ZIndex = Frame.ZIndex
-	MiddleBottom.Parent = Frame
+	local middleTop = Instance.new(type)
+	middleTop.Archivable = false
+	middleTop.BackgroundColor3 = frame.BackgroundColor3
+	middleTop.BorderSizePixel = 0
+	middleTop.Name = "MiddleTop"
+	middleTop.Position = UDim2.new(0, radius, 0, 0)
+	middleTop.Size = UDim2.new(1, -radius * 2, 0, radius)
+	middleTop.BackgroundTransparency = 1
+	middleTop.ZIndex = frame.ZIndex
+	middleTop.Parent = frame
 
-	for _, Item in pairs(
-		{TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom}
-	) do
-		for Property, Value in pairs(Properties) do
-			Item[Property] = Value
+	local middleBottom = Instance.new(type)
+	middleBottom.Archivable = false
+	middleBottom.BackgroundColor3 = frame.BackgroundColor3
+	middleBottom.BorderSizePixel = 0
+	middleBottom.Name = "MiddleBottom"
+	middleBottom.Position = UDim2.new(0, radius, 1, -radius)
+	middleBottom.Size = UDim2.new(1, -radius * 2, 0, radius)
+	middleBottom.BackgroundTransparency = 1
+	middleBottom.ZIndex = frame.ZIndex
+	middleBottom.Parent = frame
+
+	for _, item in pairs({
+		topLeft,
+		topRight,
+		bottomLeft,
+		bottomRight,
+		middle,
+		middleLeft,
+		middleRight,
+		middleTop,
+		middleBottom,
+	}) do
+		for Property, Value in properties do
+			item[Property] = Value
 		end
-		Item.Image = Image
-		Item.ImageRectSize = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
+		item.Image = image
+		item.ImageRectSize = Vector2.new(imageSize.X / 3, imageSize.Y / 3)
 	end
 
-	TopRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), 0)
-	MiddleRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), ImageSize.Y/3)
-	BottomRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), ImageSize.Y * (2/3))
+	topRight.ImageRectOffset = Vector2.new(imageSize.X * (2 / 3), 0)
+	middleRight.ImageRectOffset = Vector2.new(imageSize.X * (2 / 3), imageSize.Y / 3)
+	bottomRight.ImageRectOffset = Vector2.new(imageSize.X * (2 / 3), imageSize.Y * (2 / 3))
 
 	--TopLeft.ImageRectOffset = Vector2.new(0, 0)
-	MiddleLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y/3)
-	BottomLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y * (2/3))
+	middleLeft.ImageRectOffset = Vector2.new(0, imageSize.Y / 3)
+	bottomLeft.ImageRectOffset = Vector2.new(0, imageSize.Y * (2 / 3))
 
-	Middle.ImageRectOffset = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
-	MiddleTop.ImageRectOffset = Vector2.new(ImageSize.Y/3, 0)
-	MiddleBottom.ImageRectOffset = Vector2.new(ImageSize.Y/3, ImageSize.Y * (2/3))
+	middle.ImageRectOffset = Vector2.new(imageSize.X / 3, imageSize.Y / 3)
+	middleTop.ImageRectOffset = Vector2.new(imageSize.Y / 3, 0)
+	middleBottom.ImageRectOffset = Vector2.new(imageSize.Y / 3, imageSize.Y * (2 / 3))
 
-	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom
+	return topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight, middleTop, middleBottom
 end
-qGUI.AddNinePatch = AddNinePatch
 
-local function BackWithRoundedRectangle(Frame, Radius, Color)
-	Color = Color or Color3.new(1, 1, 1);
+function qGUI.BackWithRoundedRectangle(Frame: Frame, Radius: number, Color: Color3?)
+	Color = Color or Color3.new(1, 1, 1)
 
-	return AddNinePatch(Frame, "rbxassetid://176688412", Vector2.new(150, 150), Radius, "ImageLabel", {
-		ImageColor3 = Color;
+	return qGUI.AddNinePatch(Frame, "rbxassetid://176688412", Vector2.new(150, 150), Radius, "ImageLabel", {
+		ImageColor3 = Color,
 	})
 end
-qGUI.BackWithRoundedRectangle = BackWithRoundedRectangle
 
 return qGUI

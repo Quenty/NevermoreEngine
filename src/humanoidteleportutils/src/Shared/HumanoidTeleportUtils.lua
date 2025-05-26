@@ -32,13 +32,13 @@ function HumanoidTeleportUtils.identifySafePosition(position, raycaster)
 		end
 	end
 
-	for i=1, SEARCH_UP_TO, 2 do
+	for i = 1, SEARCH_UP_TO, 2 do
 		local origin = position + Vector3.new(0, i, 0)
 		local direction = Vector3.new(0, REQUIRED_SPACE, 0)
 		local hitData = raycaster:FindPartOnRay(Ray.new(origin, direction))
 
 		if not hitData then
-			local secondHit = raycaster:FindPartOnRay(Ray.new(origin+direction - Vector3.new(0, 1, 0), -direction))
+			local secondHit = raycaster:FindPartOnRay(Ray.new(origin + direction - Vector3.new(0, 1, 0), -direction))
 
 			-- try to identify flat surface
 			if secondHit then
@@ -94,13 +94,13 @@ function HumanoidTeleportUtils.teleportParts(humanoid, rootPart, parts, position
 	local newRootPartCFrame = rootPartCFrame - rootPartCFrame.Position + position + offset
 
 	local relCFrame = {}
-	for _, part in pairs(parts) do
+	for _, part in parts do
 		relCFrame[part] = rootPartCFrame:toObjectSpace(part.CFrame)
 	end
 
 	relCFrame[rootPart] = nil
 
-	for part, relative in pairs(relCFrame) do
+	for part, relative in relCFrame do
 		part.CFrame = newRootPartCFrame:toWorldSpace(relative)
 	end
 
@@ -133,7 +133,7 @@ end
 
 function HumanoidTeleportUtils.getRootPartOffset(humanoid, rootPart)
 	-- Calculate additional offset for teleportation
-	return Vector3.new(0, rootPart.Size.Y/2 + humanoid.HipHeight, 0)
+	return Vector3.new(0, rootPart.Size.Y / 2 + humanoid.HipHeight, 0)
 end
 
 return HumanoidTeleportUtils

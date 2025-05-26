@@ -2,13 +2,14 @@
 	@class DepthOfFieldEffect.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Workspace = game:GetService("Workspace")
 
-local Maid = require("Maid")
-local DepthOfFieldEffect = require("DepthOfFieldEffect")
 local Blend = require("Blend")
+local DepthOfFieldEffect = require("DepthOfFieldEffect")
+local Maid = require("Maid")
 
 return function(target)
 	local maid = Maid.new()
@@ -25,52 +26,51 @@ return function(target)
 	depthOfFieldEffect2.Gui.Parent = Workspace.CurrentCamera
 	-- depthOfFieldEffect2:Show()
 
-
 	maid:Add(Blend.mount(target, {
 		Blend.New "Frame" {
-			Size = UDim2.new(1, 0, 1, 0);
-			BackgroundTransparency = 1;
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
 
 			Blend.New "UIListLayout" {
-				Padding = UDim.new(0, 5);
-			};
+				Padding = UDim.new(0, 5),
+			},
 
 			Blend.New "TextButton" {
 				Text = Blend.Computed(depthOfFieldEffect:ObserveVisible(), function(visible)
 					return string.format("Toggle 1 (%s)", visible and "on" or "off")
-				end);
+				end),
 				BackgroundColor3 = Blend.Computed(depthOfFieldEffect:ObserveVisible(), function(visible)
 					return visible and Color3.new(0.5, 1, 0.5) or Color3.new(1, 0.5, 0.5)
-				end);
-				AutoButtonColor = true;
-				Size = UDim2.new(0, 100, 0, 30);
+				end),
+				AutoButtonColor = true,
+				Size = UDim2.new(0, 100, 0, 30),
 				[Blend.OnEvent "Activated"] = function()
 					depthOfFieldEffect:Toggle()
-				end;
+				end,
 
 				Blend.New "UICorner" {
-					CornerRadius = UDim.new(0, 5);
-				};
-			};
+					CornerRadius = UDim.new(0, 5),
+				},
+			},
 
 			Blend.New "TextButton" {
 				Text = Blend.Computed(depthOfFieldEffect2:ObserveVisible(), function(visible)
 					return string.format("Toggle 2 (%s)", visible and "on" or "off")
-				end);
+				end),
 				BackgroundColor3 = Blend.Computed(depthOfFieldEffect2:ObserveVisible(), function(visible)
 					return visible and Color3.new(0.5, 1, 0.5) or Color3.new(1, 0.5, 0.5)
-				end);
-				AutoButtonColor = true;
-				Size = UDim2.new(0, 100, 0, 30);
+				end),
+				AutoButtonColor = true,
+				Size = UDim2.new(0, 100, 0, 30),
 				[Blend.OnEvent "Activated"] = function()
 					depthOfFieldEffect2:Toggle()
-				end;
+				end,
 
 				Blend.New "UICorner" {
-					CornerRadius = UDim.new(0, 5);
-				};
-			};
-		};
+					CornerRadius = UDim.new(0, 5),
+				},
+			},
+		},
 	}))
 
 	return function()

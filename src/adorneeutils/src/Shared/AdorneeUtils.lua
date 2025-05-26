@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities involving an "Adornee" effectively, any Roblox instance. This is an extremely
 	useful library to use as it lets you abstract applying effects to any Roblox instance
@@ -13,7 +14,7 @@ local AdorneeUtils = {}
 	@param adornee Instance
 	@return Vector3?
 ]=]
-function AdorneeUtils.getCenter(adornee)
+function AdorneeUtils.getCenter(adornee: Instance): Vector3?
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
 	if adornee:IsA("BasePart") then
@@ -51,10 +52,10 @@ end
 --[=[
 	Gets the bounding box of the adornee
 	@param adornee Instance
-	@return CFrame?
-	@return Vector3?
+	@return CFrame? -- Center of the bounding box
+	@return Vector3? -- Size of the bounding box
 ]=]
-function AdorneeUtils.getBoundingBox(adornee)
+function AdorneeUtils.getBoundingBox(adornee: Instance): (CFrame?, Vector3?)
 	if adornee:IsA("Model") then
 		return adornee:GetBoundingBox()
 	elseif adornee:IsA("Attachment") then
@@ -70,8 +71,8 @@ end
 	@param part BasePart
 	@return boolean
 ]=]
-function AdorneeUtils.isPartOfAdornee(adornee, part)
-	assert(part:IsA("BasePart"))
+function AdorneeUtils.isPartOfAdornee(adornee: Instance, part: BasePart): boolean
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	if adornee:IsA("Humanoid") then
 		if not adornee.Parent then
@@ -89,7 +90,7 @@ end
 	@param adornee Instance
 	@return { BasePart }
 ]=]
-function AdorneeUtils.getParts(adornee)
+function AdorneeUtils.getParts(adornee: Instance): { BasePart }
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
 	local parts = {}
@@ -97,15 +98,15 @@ function AdorneeUtils.getParts(adornee)
 		table.insert(parts, adornee)
 	end
 
-	local searchParent
+	local searchParent: Instance?
 	if adornee:IsA("Humanoid") then
 		searchParent = adornee.Parent
 	else
 		searchParent = adornee
 	end
 
-	if searchParent then
-		for _, part in pairs(searchParent:GetDescendants()) do
+	if searchParent ~= nil then
+		for _, part in searchParent:GetDescendants() do
 			if part:IsA("BasePart") then
 				table.insert(parts, part)
 			end
@@ -120,12 +121,13 @@ end
 	@param adornee Instance
 	@return Vector3?
 ]=]
-function AdorneeUtils.getAlignedSize(adornee)
+function AdorneeUtils.getAlignedSize(adornee: Instance): Vector3?
 	if adornee:IsA("Model") then
 		return select(2, adornee:GetBoundingBox())
 	elseif adornee:IsA("Humanoid") then
-		if adornee.Parent then
-			return select(2, adornee.Parent:GetBoundingBox())
+		local character = adornee.Parent
+		if character and character:IsA("Model") then
+			return select(2, character:GetBoundingBox())
 		else
 			return nil
 		end
@@ -144,7 +146,7 @@ end
 	@param adornee Instance
 	@return CFrame
 ]=]
-function AdorneeUtils.getPartCFrame(adornee)
+function AdorneeUtils.getPartCFrame(adornee: Instance): CFrame?
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
 	local part = AdorneeUtils.getPart(adornee)
@@ -160,7 +162,7 @@ end
 	@param adornee Instance
 	@return Position
 ]=]
-function AdorneeUtils.getPartPosition(adornee)
+function AdorneeUtils.getPartPosition(adornee: Instance): Vector3?
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
 	local part = AdorneeUtils.getPart(adornee)
@@ -176,13 +178,13 @@ end
 	@param adornee Instance
 	@return Vector3
 ]=]
-function AdorneeUtils.getPartVelocity(adornee)
+function AdorneeUtils.getPartVelocity(adornee: Instance): Vector3?
 	local part = AdorneeUtils.getPart(adornee)
 	if not part then
 		return nil
 	end
 
-	return part.Velocity
+	return part.AssemblyLinearVelocity
 end
 
 --[=[
@@ -190,23 +192,24 @@ end
 	@param adornee Instance
 	@return BasePart
 ]=]
-function AdorneeUtils.getPart(adornee)
+function AdorneeUtils.getPart(adornee: Instance): BasePart?
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
 	if adornee:IsA("BasePart") then
 		return adornee
 	elseif adornee:IsA("Model") then
-		if adornee.PrimaryPart then
+		if adornee.PrimaryPart ~= nil then
 			return adornee.PrimaryPart
 		else
-			return adornee:FindFirstChildWhichIsA("BasePart")
+			local basePart: BasePart? = adornee:FindFirstChildWhichIsA("BasePart")
+			return basePart
 		end
 	elseif adornee:IsA("Attachment") then
-		return adornee.Parent
+		return adornee:FindFirstAncestorWhichIsA("BasePart")
 	elseif adornee:IsA("Humanoid") then
 		return adornee.RootPart
 	elseif adornee:IsA("Accessory") or adornee:IsA("Clothing") then
-		return adornee:FindFirstChildWhichIsA("BasePart")
+		return adornee:FindFirstChildWhichIsA("BasePart") :: BasePart
 	elseif adornee:IsA("Tool") then
 		local handle = adornee:FindFirstChild("Handle")
 		if handle and handle:IsA("BasePart") then
@@ -224,7 +227,7 @@ end
 	@param adornee Instance
 	@return Instance
 ]=]
-function AdorneeUtils.getRenderAdornee(adornee)
+function AdorneeUtils.getRenderAdornee(adornee: Instance): Instance?
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
 	if adornee:IsA("BasePart") then
@@ -236,7 +239,8 @@ function AdorneeUtils.getRenderAdornee(adornee)
 	elseif adornee:IsA("Humanoid") then
 		return adornee.Parent
 	elseif adornee:IsA("Accessory") or adornee:IsA("Clothing") then
-		return adornee:FindFirstChildWhichIsA("BasePart")
+		local basePart = adornee:FindFirstChildWhichIsA("BasePart")
+		return basePart
 	elseif adornee:IsA("Tool") then
 		local handle = adornee:FindFirstChild("Handle")
 		if handle and handle:IsA("BasePart") then

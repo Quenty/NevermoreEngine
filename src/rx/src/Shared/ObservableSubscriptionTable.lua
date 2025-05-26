@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	This allows the storage of subscriptions for keys, such that something
 	can subscribe onto a key, and events can be invoked onto keys.
@@ -7,13 +8,21 @@
 local require = require(script.Parent.loader).load(script)
 
 local Observable = require("Observable")
+local Subscription = require("Subscription")
 
 local ObservableSubscriptionTable = {}
 ObservableSubscriptionTable.ClassName = "ObservableSubscriptionTable"
 ObservableSubscriptionTable.__index = ObservableSubscriptionTable
 
-function ObservableSubscriptionTable.new()
-	local self = setmetatable({}, ObservableSubscriptionTable)
+export type ObservableSubscriptionTable<T...> = typeof(setmetatable(
+	{} :: {
+		_subMap: { [any]: { Subscription.Subscription<T...> } },
+	},
+	{} :: typeof({ __index = ObservableSubscriptionTable })
+))
+
+function ObservableSubscriptionTable.new<T...>(): ObservableSubscriptionTable<T...>
+	local self: ObservableSubscriptionTable<T...> = setmetatable({} :: any, ObservableSubscriptionTable)
 
 	self._subMap = {} -- { TKey: Subscription<TEmit> }
 
@@ -25,7 +34,7 @@ end
 	@param key TKey
 	@param ... TEmit
 ]=]
-function ObservableSubscriptionTable:Fire(key, ...)
+function ObservableSubscriptionTable.Fire<T...>(self: ObservableSubscriptionTable<T...>, key: any, ...)
 	assert(key ~= nil, "Bad key")
 
 	local subs = self._subMap[key]
@@ -34,7 +43,7 @@ function ObservableSubscriptionTable:Fire(key, ...)
 	end
 
 	-- Make a copy so we don't have to worry about our last changing
-	for _, sub in pairs(table.clone(subs)) do
+	for _, sub: any in table.clone(subs) do
 		if sub:IsPending() then
 			-- TODO: Use connection here
 			task.spawn(sub.Fire, sub, ...)
@@ -48,7 +57,7 @@ end
 	@param key TKey
 	@return boolean
 ]=]
-function ObservableSubscriptionTable:HasSubscriptions(key)
+function ObservableSubscriptionTable.HasSubscriptions<T...>(self: ObservableSubscriptionTable<T...>, key: any): boolean
 	return self._subMap[key] ~= nil
 end
 
@@ -57,7 +66,7 @@ end
 
 	@param key TKey
 ]=]
-function ObservableSubscriptionTable:Complete(key)
+function ObservableSubscriptionTable.Complete<T...>(self: ObservableSubscriptionTable<T...>, key: any): ()
 	local subs = self._subMap[key]
 	if not subs then
 		return
@@ -66,7 +75,7 @@ function ObservableSubscriptionTable:Complete(key)
 	local subsToComplete = table.clone(subs)
 	self._subMap[key] = nil
 
-	for _, sub in pairs(subsToComplete) do
+	for _, sub: any in subsToComplete do
 		if sub:IsPending() then
 			task.spawn(sub.Complete, sub)
 		end
@@ -78,7 +87,7 @@ end
 
 	@param key TKey
 ]=]
-function ObservableSubscriptionTable:Fail(key)
+function ObservableSubscriptionTable.Fail<T...>(self: ObservableSubscriptionTable<T...>, key: any): ()
 	local subs = self._subMap[key]
 	if not subs then
 		return
@@ -87,12 +96,14 @@ function ObservableSubscriptionTable:Fail(key)
 	local subsToFail = table.clone(subs)
 	self._subMap[key] = nil
 
-	for _, sub in pairs(subsToFail) do
+	for _, sub: any in subsToFail do
 		if sub:IsPending() then
 			task.spawn(sub.Fail, sub)
 		end
 	end
 end
+
+export type RetrieveInitialValue<T...> = (sub: Subscription.Subscription<T...>) -> ()
 
 --[=[
 	Observes for the key
@@ -100,7 +111,11 @@ end
 	@param retrieveInitialValue callback -- Optional
 	@return Observable<TEmit>
 ]=]
-function ObservableSubscriptionTable:Observe(key, retrieveInitialValue)
+function ObservableSubscriptionTable.Observe<T...>(
+	self: ObservableSubscriptionTable<T...>,
+	key: any,
+	retrieveInitialValue: RetrieveInitialValue<T...>?
+): Observable.Observable<T...>
 	assert(key ~= nil, "Bad key")
 
 	return Observable.new(function(sub)
@@ -142,18 +157,19 @@ end
 --[=[
 	Completes all subscriptions and removes them from the list.
 ]=]
-function ObservableSubscriptionTable:Destroy()
+function ObservableSubscriptionTable.Destroy<T...>(self: ObservableSubscriptionTable<T...>): ()
 	while next(self._subMap) do
 		local key, list = next(self._subMap)
+		assert(key, "Key should not be nil")
+
 		self._subMap[key] = nil
 
-		for _, sub in pairs(list) do
+		for _, sub: any in list do
 			if sub:IsPending() then
 				task.spawn(sub.Complete, sub)
 			end
 		end
 	end
 end
-
 
 return ObservableSubscriptionTable

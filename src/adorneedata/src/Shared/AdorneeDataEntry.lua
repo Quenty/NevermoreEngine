@@ -6,14 +6,27 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local DuckTypeUtils = require("DuckTypeUtils")
-local t = require("t")
-local DefaultValueUtils = require("DefaultValueUtils")
 local AttributeValue = require("AttributeValue")
+local DefaultValueUtils = require("DefaultValueUtils")
+local DuckTypeUtils = require("DuckTypeUtils")
+local Observable = require("Observable")
+local ValueObject = require("ValueObject")
+local t = require("t")
 
 local AdorneeDataEntry = {}
 AdorneeDataEntry.ClassName = "AdorneeDataEntry"
 AdorneeDataEntry.__index = AdorneeDataEntry
+
+type ValueInterface = (value: any) -> (boolean, string?)
+
+export type AdorneeDataEntry<T> = typeof(setmetatable(
+	{} :: {
+		_interface: ValueInterface,
+		_createValueObject: (adornee: Instance) -> ValueObject.ValueObject<T>,
+		_defaultValue: T?,
+	},
+	{} :: typeof({ __index = AdorneeDataEntry })
+))
 
 --[=[
 	Creates a new adornee data entry
@@ -23,7 +36,7 @@ AdorneeDataEntry.__index = AdorneeDataEntry
 	@param defaultValue T?
 	@return AdorneeDataEntry<T>
 ]=]
-function AdorneeDataEntry.new(interface, createValueObject, defaultValue)
+function AdorneeDataEntry.new<T>(interface: string | ValueInterface, createValueObject, defaultValue): AdorneeDataEntry<T>
 	assert(type(interface) == "string" or type(interface) == "function", "Bad interface")
 	assert(type(createValueObject) == "function", "Bad createValueObject")
 
@@ -50,7 +63,7 @@ function AdorneeDataEntry.new(interface, createValueObject, defaultValue)
 	return self
 end
 
-function AdorneeDataEntry.optionalAttribute(interface, name)
+function AdorneeDataEntry.optionalAttribute(interface, name: string)
 	assert(type(interface) == "string" or type(interface) == "function", "Bad interface")
 
 	return AdorneeDataEntry.new(t.optional(interface), function(instance)
@@ -64,7 +77,7 @@ end
 	@param data any
 	@return boolean
 ]=]
-function AdorneeDataEntry.isAdorneeDataEntry(data)
+function AdorneeDataEntry.isAdorneeDataEntry(data: any): boolean
 	return DuckTypeUtils.isImplementation(AdorneeDataEntry, data)
 end
 
@@ -74,7 +87,7 @@ end
 	@param adornee Instance
 	@return ValueObject<T>
 ]=]
-function AdorneeDataEntry:Create(adornee)
+function AdorneeDataEntry.Create<T>(self: AdorneeDataEntry<T>, adornee: Instance): ValueObject.ValueObject<T>
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return self._createValueObject(adornee)
@@ -86,7 +99,7 @@ end
 	@param adornee Instance
 	@return Observable<T>
 ]=]
-function AdorneeDataEntry:Observe(adornee)
+function AdorneeDataEntry.Observe<T>(self: AdorneeDataEntry<T>, adornee: Instance): Observable.Observable<T>
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local valueObject = self:Create(adornee)
@@ -99,7 +112,7 @@ end
 	@param adornee Instance
 	@return T
 ]=]
-function AdorneeDataEntry:Get(adornee)
+function AdorneeDataEntry.Get<T>(self: AdorneeDataEntry<T>, adornee: Instance): T
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local valueObject = self:Create(adornee)
@@ -113,7 +126,7 @@ end
 	@param adornee Instance
 	@param value T
 ]=]
-function AdorneeDataEntry:Set(adornee, value)
+function AdorneeDataEntry.Set<T>(self: AdorneeDataEntry<T>, adornee: Instance, value: T): ()
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self._interface(value))
 
@@ -126,16 +139,16 @@ end
 
 	@return T?
 ]=]
-function AdorneeDataEntry:GetDefaultValue()
+function AdorneeDataEntry.GetDefaultValue<T>(self: AdorneeDataEntry<T>): T?
 	return self._defaultValue
 end
 
 --[=[
 	Gets the estrict interface for the entry
 
-	@return (value: any) -> (boolean, string)
+	@return (value: any) -> (boolean, string?)
 ]=]
-function AdorneeDataEntry:GetStrictInterface()
+function AdorneeDataEntry.GetStrictInterface<T>(self: AdorneeDataEntry<T>): (any) -> (boolean, string?)
 	return self._interface
 end
 
@@ -143,9 +156,9 @@ end
 	Returns true if the item is valid.
 
 	@param value any
-	@return (boolean, string)
+	@return (boolean, string?)
 ]=]
-function AdorneeDataEntry:IsValid(value)
+function AdorneeDataEntry.IsValid<T>(self: AdorneeDataEntry<T>, value: any): (boolean, string?)
 	return self._interface(value)
 end
 

@@ -26,9 +26,9 @@ This datastore prevents data loss by being explicit about what we're writing to,
 * Native Rx and Promise implementation
 
 ## How syncing works
-Sometimes datastores (like a global game data store) need to be synced live instead of upon server or player start. This is if we expect multiple servers to write to the same datastore at once we can use thie sync method to 
+Sometimes datastores (like a global game data store) need to be synced live instead of upon server or player start. This is if we expect multiple servers to write to the same datastore at once we can use thie sync method to
 
-Syncing is like saving. However, instead of treating the current datastore as a session lock, we load in additional data from our "source-of-truth". From here, we merge that data into the datastore, which means both clearing any matching write tokens that our sync says is done. 
+Syncing is like saving. However, instead of treating the current datastore as a session lock, we load in additional data from our "source-of-truth". From here, we merge that data into the datastore, which means both clearing any matching write tokens that our sync says is done.
 
 This is best for a "shared" memory that can be temporarily not correct. Deleting with a sync is less effective.
 
@@ -394,7 +394,7 @@ end
 -- Do actual load
 
 Players.PlayerAdded:Connect(handlePlayerAdded)
-for _, player in pairs(Players:GetPlayers()) do
+for _, player in Players:GetPlayers() do
 	handlePlayerAdded(player)
 end
 ```

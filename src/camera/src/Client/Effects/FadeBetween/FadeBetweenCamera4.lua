@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local CubicSplineUtils = require("CubicSplineUtils")
 local CameraState = require("CameraState")
+local CubicSplineUtils = require("CubicSplineUtils")
 local Spring = require("Spring")
 local SpringUtils = require("SpringUtils")
 
@@ -20,11 +20,11 @@ FadeBetweenCamera4.__index = FadeBetweenCamera4
 ]=]
 function FadeBetweenCamera4.new(cameraA, cameraB)
 	local self = setmetatable({
-		CameraA = cameraA or error("No cameraA");
-		CameraB = cameraB or error("No cameraB");
-		_spring = Spring.new();
-		_position0 = 0;
-		_state0 = cameraA.CameraState;
+		CameraA = cameraA or error("No cameraA"),
+		CameraB = cameraB or error("No cameraB"),
+		_spring = Spring.new(),
+		_position0 = 0,
+		_state0 = cameraA.CameraState,
 	}, FadeBetweenCamera4)
 
 	self._spring.s = 15
@@ -122,11 +122,19 @@ function FadeBetweenCamera4:_computeCameraState(position)
 		local a = self:_computeTargetState(0)
 
 		node0 = CubicSplineUtils.newSplineNode(0, a.CameraFrame, a.CameraFrameDerivative)
-		node1 = CubicSplineUtils.newSplineNode(self._position0, self._state0.CameraFrame, self._state0.CameraFrameDerivative)
+		node1 = CubicSplineUtils.newSplineNode(
+			self._position0,
+			self._state0.CameraFrame,
+			self._state0.CameraFrameDerivative
+		)
 	else
 		local b = self:_computeTargetState(1)
 
-		node0 = CubicSplineUtils.newSplineNode(self._position0, self._state0.CameraFrame, self._state0.CameraFrameDerivative)
+		node0 = CubicSplineUtils.newSplineNode(
+			self._position0,
+			self._state0.CameraFrame,
+			self._state0.CameraFrameDerivative
+		)
 		node1 = CubicSplineUtils.newSplineNode(1, b.CameraFrame, b.CameraFrameDerivative)
 	end
 

@@ -4,21 +4,23 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PromiseUtils = require("PromiseUtils")
 local Math = require("Math")
+local PromiseUtils = require("PromiseUtils")
 local String = require("String")
+
+export type UIConverterLibrary = "Blend" | "Fusion" | "FusionUnpacked" | "BlendUnpacked"
 
 local UIConverterUtils = {}
 
 local function applyToTuple(func, ...)
 	local result = {}
-	for _, item in pairs({...}) do
+	for _, item in { ... } do
 		table.insert(result, func(item))
 	end
 	return unpack(result)
 end
 
-local function roundNumber(value)
+local function roundNumber(value: number): string
 	if value == math.huge then
 		return "math.huge"
 	elseif value == -math.huge then
@@ -31,8 +33,8 @@ local function roundNumber(value)
 	end
 end
 
-local function roundToPi(value)
-	local closeTo = Math.round(value/math.pi, 1e-6)
+local function roundToPi(value: number): string?
+	local closeTo = Math.round(value / math.pi, 1e-6)
 	if closeTo == 0 then
 		return "0"
 	elseif closeTo == -1 then
@@ -40,7 +42,7 @@ local function roundToPi(value)
 	elseif closeTo == 1 then
 		return "math.pi"
 	else
-		local fractionBottom = Math.round(math.pi/value, 1e-6)
+		local fractionBottom = Math.round(math.pi / value, 1e-6)
 		if math.floor(fractionBottom) == fractionBottom then
 			if fractionBottom < 0 then
 				return string.format("-math.pi/%d", math.abs(fractionBottom))
@@ -58,9 +60,9 @@ local function roundToPi(value)
 	end
 end
 
-function UIConverterUtils.toMultiLineEscape(text)
+function UIConverterUtils.toMultiLineEscape(text: string): string
 	if text:find("\n") then
-		for i=0, 250 do
+		for i = 0, 250 do
 			local equals = string.rep("=", i)
 			local sep = string.format("%%[%s%%[", equals)
 			local endSep = string.format("%%]%s%%]", equals)
@@ -69,11 +71,14 @@ function UIConverterUtils.toMultiLineEscape(text)
 				return string.format("%s%s%s", string.format("[%s[", equals), text, string.format("]%s]", equals))
 			end
 		end
+
 		return string.format("[[%s]]", text)
 	end
+
+	return text
 end
 
-function UIConverterUtils.toLuaComment(text)
+function UIConverterUtils.toLuaComment(text: string): string
 	if text:find("\n") then
 		return "--" .. UIConverterUtils.toMultiLineEscape("\n" .. text .. "\n")
 	else
@@ -81,12 +86,12 @@ function UIConverterUtils.toLuaComment(text)
 	end
 end
 
-function UIConverterUtils.toLuaPropertyString(value, debugHint)
+function UIConverterUtils.toLuaPropertyString(value: any, debugHint: string): string
 	local valueType = typeof(value)
 	if valueType == "string" then
 		local multiline = UIConverterUtils.toMultiLineEscape(value)
 		if multiline then
-			return multiline
+			return `"{multiline}"`
 		else
 			return string.format("%q", value)
 		end
@@ -95,7 +100,7 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 	elseif valueType == "boolean" then
 		return tostring(value)
 	elseif valueType == "Color3" then
-		return string.format("Color3.fromRGB(%d, %d, %d)", value.R*255, value.G*255, value.B*255)
+		return string.format("Color3.fromRGB(%d, %d, %d)", value.R * 255, value.G * 255, value.B * 255)
 	elseif valueType == "Vector2" then
 		return string.format("Vector2.new(%s, %s)", applyToTuple(roundNumber, value.x, value.y))
 	elseif valueType == "Vector3" then
@@ -111,32 +116,44 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 			local roundX, roundY, roundZ = roundToPi(x), roundToPi(y), roundToPi(z)
 
 			if roundX and roundY and roundZ then
-				return string.format("CFrame.new(%s, %s, %s) * CFrame.Angles(%s, %s, %s)",
-						roundNumber(value.x),
-						roundNumber(value.y),
-						roundNumber(value.z),
-						roundX,
-						roundY,
-						roundZ)
+				return string.format(
+					"CFrame.new(%s, %s, %s) * CFrame.Angles(%s, %s, %s)",
+					roundNumber(value.x),
+					roundNumber(value.y),
+					roundNumber(value.z),
+					roundX,
+					roundY,
+					roundZ
+				)
 			else
-				return string.format("CFrame.new(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", applyToTuple(roundNumber, value:GetComponents()))
+				return string.format(
+					"CFrame.new(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+					applyToTuple(roundNumber, value:GetComponents())
+				)
 			end
 		end
 	elseif valueType == "Rect" then
-		return string.format("Rect.new(%s, %s)",
+		return string.format(
+			"Rect.new(%s, %s)",
 			UIConverterUtils.toLuaPropertyString(value.Min, debugHint),
-			UIConverterUtils.toLuaPropertyString(value.Max, debugHint))
+			UIConverterUtils.toLuaPropertyString(value.Max, debugHint)
+		)
 	elseif valueType == "ColorSequence" then
 		local keypoints = value.Keypoints
 		if #keypoints == 1 then
-			return string.format("ColorSequence.new(%s)", UIConverterUtils.toLuaPropertyString(keypoints[1].Value, debugHint))
+			return string.format(
+				"ColorSequence.new(%s)",
+				UIConverterUtils.toLuaPropertyString(keypoints[1].Value, debugHint)
+			)
 		elseif #keypoints == 2 and keypoints[1].Time == 0 and keypoints[2].Time == 1 then
-			return string.format("ColorSequence.new(%s, %s)",
+			return string.format(
+				"ColorSequence.new(%s, %s)",
 				UIConverterUtils.toLuaPropertyString(value.Keypoints[1].Value, debugHint),
-				UIConverterUtils.toLuaPropertyString(value.Keypoints[2].Value, debugHint))
+				UIConverterUtils.toLuaPropertyString(value.Keypoints[2].Value, debugHint)
+			)
 		else
 			local strings = {}
-			for _, keypoint in pairs(keypoints) do
+			for _, keypoint in keypoints do
 				table.insert(strings, "\n\t" .. UIConverterUtils.toLuaPropertyString(keypoint, debugHint))
 			end
 			return string.format("ColorSequence.new({%s\n})", table.concat(strings, ","))
@@ -146,37 +163,47 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 		if #keypoints == 1 then
 			return string.format("NumberSequence.new(%s)", roundNumber(keypoints[1].Value))
 		elseif #keypoints == 2 and keypoints[1].Time == 0 and keypoints[2].Time == 1 then
-			return string.format("NumberSequence.new(%s, %s)",
+			return string.format(
+				"NumberSequence.new(%s, %s)",
 				roundNumber(keypoints[1].Value),
-				roundNumber(keypoints[2].Value))
+				roundNumber(keypoints[2].Value)
+			)
 		else
 			local strings = {}
-			for _, keypoint in pairs(keypoints) do
+			for _, keypoint in keypoints do
 				table.insert(strings, "\n\t" .. UIConverterUtils.toLuaPropertyString(keypoint, debugHint))
 			end
 			return string.format("NumberSequence.new({%s\n})", table.concat(strings, ","))
 		end
 	elseif valueType == "ColorSequenceKeypoint" then
-		return string.format("ColorSequenceKeypoint.new(%s, %s)",
+		return string.format(
+			"ColorSequenceKeypoint.new(%s, %s)",
 			roundNumber(value.Time),
-			UIConverterUtils.toLuaPropertyString(value.Value, debugHint))
+			UIConverterUtils.toLuaPropertyString(value.Value, debugHint)
+		)
 	elseif valueType == "NumberSequenceKeypoint" then
-		return string.format("NumberSequenceKeypoint.new(%s, %s)",
+		return string.format(
+			"NumberSequenceKeypoint.new(%s, %s)",
 			roundNumber(value.Time),
-			UIConverterUtils.toLuaPropertyString(value.Value, debugHint))
+			UIConverterUtils.toLuaPropertyString(value.Value, debugHint)
+		)
 	elseif valueType == "BrickColor" then
 		return string.format("BrickColor.new(%q)", value.Name)
 	elseif valueType == "UDim" then
 		return string.format("UDim.new(%s, %s)", roundNumber(value.Scale), roundNumber(value.Offset))
 	elseif valueType == "UDim2" then
-		if value.X.Scale == 0 and value.Y.Scale == 0 and
-			(value.X.Offset ~= 0 or value.Y.Offset ~= 0) then
+		if value.X.Scale == 0 and value.Y.Scale == 0 and (value.X.Offset ~= 0 or value.Y.Offset ~= 0) then
 			return string.format("UDim2.fromOffset(%s, %s)", roundNumber(value.X.Offset), roundNumber(value.Y.Offset))
-		elseif value.X.Offset == 0 and value.Y.Offset == 0
-			and (value.X.Scale ~= 0 or value.Y.Scale ~= 0) then
+		elseif value.X.Offset == 0 and value.Y.Offset == 0 and (value.X.Scale ~= 0 or value.Y.Scale ~= 0) then
 			return string.format("UDim2.fromScale(%s, %s)", roundNumber(value.X.Scale), roundNumber(value.Y.Scale))
 		else
-			return string.format("UDim2.new(%s, %s, %s, %s)", roundNumber(value.X.Scale), roundNumber(value.X.Offset), roundNumber(value.Y.Scale), roundNumber(value.Y.Offset))
+			return string.format(
+				"UDim2.new(%s, %s, %s, %s)",
+				roundNumber(value.X.Scale),
+				roundNumber(value.X.Offset),
+				roundNumber(value.Y.Scale),
+				roundNumber(value.Y.Offset)
+			)
 		end
 	elseif valueType == "NumberRange" then
 		if value.Min == value.Max then
@@ -188,21 +215,51 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 		return string.format("Enum.%s.%s", tostring(value.EnumType), value.Name)
 	elseif valueType == "PhysicalProperties" then
 		if value.FrictionWeight == 1 and value.ElasticityWeight == 1 then
-			return string.format("PhysicalProperties.new(%s, %s, %s)",
-				applyToTuple(roundNumber, value.Density, value.Friction, value.Elasticity))
+			return string.format(
+				"PhysicalProperties.new(%s, %s, %s)",
+				applyToTuple(roundNumber, value.Density, value.Friction, value.Elasticity)
+			)
 		else
-			return string.format("PhysicalProperties.new(%s, %s, %s, %s, %s)",
-				applyToTuple(roundNumber, value.Density, value.Friction, value.Elasticity, value.FrictionWeight, value.ElasticityWeight))
+			return string.format(
+				"PhysicalProperties.new(%s, %s, %s, %s, %s)",
+				applyToTuple(
+					roundNumber,
+					value.Density,
+					value.Friction,
+					value.Elasticity,
+					value.FrictionWeight,
+					value.ElasticityWeight
+				)
+			)
 		end
 	elseif valueType == "Font" then
 		if value.Weight == Enum.FontWeight.Regular and value.Style == Enum.FontStyle.Normal then
 			return string.format("Font.new(%q)", value.Family)
 		else
-			return string.format("Font.new(%q, %s, %s)", value.Family, tostring(value.Weight, value.Style))
+			return string.format(
+				"Font.new(%q, Enum.FontWeight.%s, Enum.FontStyle.%s)",
+				value.Family,
+				tostring(value.Weight),
+				tostring(value.Style)
+			)
+		end
+	elseif valueType == "Content" then
+		-- TODO: Do we need to handle Enum.ContentSourceType.Object?
+		if value.SourceType == Enum.ContentSourceType.Uri then
+			return `Content.fromUri("{value.Uri or ""}")`
+		else
+			return ""
 		end
 	elseif valueType == "userdata" then
 		-- FontFace
-		warn(string.format("Bad property type %s for %s - Cannot serialize.", valueType, debugHint and tostring(debugHint) or "?"))
+		warn(
+			string.format(
+				"Bad property type %s for %s - Cannot serialize.",
+				valueType,
+				debugHint and tostring(debugHint) or "?"
+			)
+		)
+		return "ERROR"
 	else
 		error(string.format("Unknown property type %s for %s", valueType, debugHint and tostring(debugHint) or "?"))
 	end
@@ -218,8 +275,8 @@ end
 
 function UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
 	local data = {}
-	for key, value in pairs(properties) do
-		if key ~= "Parent" then
+	for key, value in properties do
+		if key ~= "Parent" and typeof(value) ~= "Content" then
 			if typeof(value) == "Instance" then
 				data[key] = UIConverterUtils.getRefProperty(refLookupMap, value)
 			else
@@ -232,7 +289,7 @@ end
 
 function UIConverterUtils.propertiesTableToString(library, properties)
 	local keys = {}
-	for key, _ in pairs(properties) do
+	for key, _ in properties do
 		table.insert(keys, key)
 	end
 	table.sort(keys)
@@ -259,21 +316,25 @@ function UIConverterUtils.propertiesTableToString(library, properties)
 	ensureFirst("Position")
 	ensureFirst("AnchorPoint")
 	ensureFirst("Size")
-	ensureLast(UIConverterUtils.getChildrenKey(library));
+	ensureLast(UIConverterUtils.getChildrenKey(library))
 
 	local data = {}
-	for _, key in pairs(keys) do
-		table.insert(data, string.format("%s = %s;", key, properties[key]))
+	for _, key in keys do
+		if key == "[Blend.Children]" then
+			table.insert(data, properties[key])
+		else
+			table.insert(data, string.format("%s = %s;", key, properties[key]))
+		end
 	end
 
 	return table.concat(data, "\n")
 end
 
-function UIConverterUtils.indent(text)
+function UIConverterUtils.indent(text: string): string
 	local lines = string.split(text, "\n")
 	local noEscape = nil
 
-	for key, line in pairs(lines) do
+	for key, line in lines do
 		if noEscape then
 			local pattern = "]" .. noEscape .. "]"
 			if line:find(pattern) then
@@ -291,7 +352,7 @@ function UIConverterUtils.indent(text)
 	return table.concat(lines, "\n")
 end
 
-function UIConverterUtils.getChildrenKey(library)
+function UIConverterUtils.getChildrenKey(library: UIConverterLibrary): string
 	if library == "Blend" then
 		return "[Blend.Children]"
 	elseif library == "Fusion" then
@@ -303,7 +364,7 @@ function UIConverterUtils.getChildrenKey(library)
 	end
 end
 
-function UIConverterUtils.getLibraryNewClass(library, instance, propertiesString)
+function UIConverterUtils.getLibraryNewClass(library: UIConverterLibrary, instance: Instance, propertiesString)
 	if library == "Blend" then
 		return string.format("Blend.New %q {\n%s\n}", instance.ClassName, propertiesString)
 	elseif library == "Fusion" then
@@ -317,7 +378,7 @@ end
 
 local cachedFusionOverrideMap = nil
 
-function UIConverterUtils.getOverrideMap(library)
+function UIConverterUtils.getOverrideMap(library: UIConverterLibrary)
 	if library == "Blend" or library == "BlendUnpacked" then
 		return require("BlendDefaultProps")
 	elseif library == "Fusion" or library == "FusionUnpacked" then
@@ -343,18 +404,18 @@ function UIConverterUtils.getOverrideMap(library)
 	end
 end
 
-function UIConverterUtils.getSortedChildren(instance)
+function UIConverterUtils.getSortedChildren(instance: Instance)
 	local other = {}
 	local guiObjects = {}
 	local uiComponents = {}
 
-	for _, child in pairs(instance:GetChildren()) do
+	for _, child in instance:GetChildren() do
 		if child:IsA("UIComponent") then
 			table.insert(uiComponents, child)
 		elseif child:IsA("GuiObject") then
 			local index = 1
 			-- stable insertion sort
-			for i=1, #guiObjects do
+			for i = 1, #guiObjects do
 				if guiObjects[i].LayoutOrder <= child.LayoutOrder then
 					index = i + 1
 				end
@@ -367,13 +428,13 @@ function UIConverterUtils.getSortedChildren(instance)
 	end
 
 	local children = {}
-	for _, item in pairs(uiComponents) do
+	for _, item in uiComponents do
 		table.insert(children, item)
 	end
-	for _, item in pairs(guiObjects) do
+	for _, item in guiObjects do
 		table.insert(children, item)
 	end
-	for _, item in pairs(other) do
+	for _, item in other do
 		table.insert(children, item)
 	end
 
@@ -383,7 +444,7 @@ end
 --[[
 	Generates a lookup map that will be used to resolve instances.
 ]]
-function UIConverterUtils.promiseCreateLookupMap(library, uiConverter, instances)
+function UIConverterUtils.promiseCreateLookupMap(library: UIConverterLibrary, uiConverter, instances)
 	assert(type(library) == "string", "Bad library")
 	assert(type(uiConverter) == "table", "Bad uiConverter")
 	assert(instances, "No instances")
@@ -397,10 +458,11 @@ function UIConverterUtils.promiseCreateLookupMap(library, uiConverter, instances
 	local function handleInst(inst)
 		seen[inst] = true
 
-		table.insert(promises, uiConverter:PromiseProperties(inst, overrideMap)
-			:Then(function(properties)
+		table.insert(
+			promises,
+			uiConverter:PromiseProperties(inst, overrideMap):Then(function(properties)
 				if properties then
-					for key, value in pairs(properties) do
+					for key, value in properties do
 						if key ~= "Parent" then
 							if typeof(value) == "Instance" then
 								-- TODO: Smarter about this
@@ -409,52 +471,51 @@ function UIConverterUtils.promiseCreateLookupMap(library, uiConverter, instances
 						end
 					end
 				end
-			end))
+			end)
+		)
 	end
 
-	for _, item in pairs(instances) do
+	for _, item in instances do
 		handleInst(item)
-		for _, descendant in pairs(item:GetDescendants()) do
+		for _, descendant in item:GetDescendants() do
 			handleInst(descendant)
 		end
 	end
 
+	return PromiseUtils.all(promises):Then(function()
+		local lookupMap = {}
+		local usedNames = {}
 
-	return PromiseUtils.all(promises)
-		:Then(function()
-			local lookupMap = {}
-			local usedNames = {}
-
-			local function getName(suggestion)
-				local name = String.toLowerCamelCase(suggestion)
-				if not usedNames[name] then
-					return name
-				end
-
-				for i=1, 1000 do
-					local newName = name .. tostring(i)
-					if not usedNames[newName] then
-						return newName
-					end
-				end
-
-				error("Could not generate a name")
+		local function getName(suggestion)
+			local name = String.toLowerCamelCase(suggestion)
+			if not usedNames[name] then
+				return name
 			end
 
-			for item, _ in pairs(needed) do
-				if seen[item] then
-					-- TODO: Better algorithm
-					local name = getName(item.Name)
-					usedNames[name] = true
-					lookupMap[item] = name
+			for i = 1, 1000 do
+				local newName = name .. tostring(i)
+				if not usedNames[newName] then
+					return newName
 				end
 			end
 
-			return lookupMap
-		end)
+			error("Could not generate a name")
+		end
+
+		for item, _ in needed do
+			if seen[item] then
+				-- TODO: Better algorithm
+				local name = getName(item.Name)
+				usedNames[name] = true
+				lookupMap[item] = name
+			end
+		end
+
+		return lookupMap
+	end)
 end
 
-function UIConverterUtils.getLibraryRefEntryKey(library)
+function UIConverterUtils.getLibraryRefEntryKey(library: UIConverterLibrary)
 	if library == "Blend" then
 		return "[Blend.Instance]"
 	elseif library == "BlendUnpacked" then
@@ -464,20 +525,29 @@ function UIConverterUtils.getLibraryRefEntryKey(library)
 	end
 end
 
-function UIConverterUtils.promiseToLibraryInstance(library, uiConverter, instance, refLookupMap)
+function UIConverterUtils.promiseToLibraryInstance(
+	library: UIConverterLibrary,
+	uiConverter,
+	instance: Instance,
+	refLookupMap
+)
 	assert(type(library) == "string", "Bad library")
 	assert(type(uiConverter) == "table", "Bad uiConverter")
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(refLookupMap) == "table", "No refLookupMap")
 
-	return uiConverter:PromiseProperties(instance, UIConverterUtils.getOverrideMap(library))
+	return uiConverter
+		:PromiseProperties(instance, UIConverterUtils.getOverrideMap(library))
 		:Then(function(properties)
 			if properties then
 				local converted = UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
 				local childrenPromises = {}
 
-				for _, child in pairs(UIConverterUtils.getSortedChildren(instance)) do
-					table.insert(childrenPromises, UIConverterUtils.promiseToLibraryInstance(library, uiConverter, child, refLookupMap))
+				for _, child in UIConverterUtils.getSortedChildren(instance) do
+					table.insert(
+						childrenPromises,
+						UIConverterUtils.promiseToLibraryInstance(library, uiConverter, child, refLookupMap)
+					)
 				end
 
 				if refLookupMap[instance] then
@@ -488,13 +558,19 @@ function UIConverterUtils.promiseToLibraryInstance(library, uiConverter, instanc
 				end
 
 				if next(childrenPromises) then
-					return PromiseUtils.all(childrenPromises)
-						:Then(function(...)
-							converted[UIConverterUtils.getChildrenKey(library)] = UIConverterUtils.convertListOfItemsToTable({...})
-							return converted
-						end)
-				end
+					return PromiseUtils.all(childrenPromises):Then(function(...)
+						local ignoreIndent = false
+						-- The [Blend.Children] syntax isn't required anymore,
+						-- we can just list the items
+						if library == "Blend" then
+							ignoreIndent = true
+						end
 
+						converted[UIConverterUtils.getChildrenKey(library)] =
+							UIConverterUtils.convertListOfItemsToTable({ ... }, ignoreIndent)
+						return converted
+					end)
+				end
 
 				return converted
 			else
@@ -506,21 +582,22 @@ function UIConverterUtils.promiseToLibraryInstance(library, uiConverter, instanc
 				return UIConverterUtils.getLibraryNewClass(
 					library,
 					instance,
-					UIConverterUtils.indent(UIConverterUtils.propertiesTableToString(library, properties)))
+					UIConverterUtils.indent(UIConverterUtils.propertiesTableToString(library, properties))
+				)
 			else
 				return nil
 			end
 		end)
 end
 
-function UIConverterUtils.getEntryListCode(library, refLookupMap)
+function UIConverterUtils.getEntryListCode(library: UIConverterLibrary, refLookupMap)
 	if not next(refLookupMap) then
 		return ""
 	end
 
 	if library == "Blend" then
 		local items = {}
-		for _, value in pairs(refLookupMap) do
+		for _, value in refLookupMap do
 			table.insert(items, string.format("local %s = Blend.State()", value))
 		end
 
@@ -530,15 +607,19 @@ function UIConverterUtils.getEntryListCode(library, refLookupMap)
 	end
 end
 
-function UIConverterUtils.convertListOfItemsToTable(results)
+function UIConverterUtils.convertListOfItemsToTable(results: { string }, ignoreIndent: boolean?): string
 	local strings = {}
-	for _, item in pairs(results) do
+	for _, item in results do
 		if item then
 			table.insert(strings, item .. ";")
 		end
 	end
 	local childrenText = table.concat(strings, "\n")
-	return string.format("{\n%s\n}", UIConverterUtils.indent(childrenText))
+	if not ignoreIndent then
+		return string.format("{\n%s\n}", UIConverterUtils.indent(childrenText))
+	else
+		return childrenText
+	end
 end
 
 return UIConverterUtils

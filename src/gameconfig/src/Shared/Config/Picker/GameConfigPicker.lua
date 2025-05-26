@@ -6,16 +6,30 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local RxBinderUtils = require("RxBinderUtils")
-local ObservableMapSet = require("ObservableMapSet")
-local RxBrioUtils = require("RxBrioUtils")
+local Brio = require("Brio")
+local GameConfigAssetBase = require("GameConfigAssetBase")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
-local Promise = require("Promise")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetUtils = require("GameConfigAssetUtils")
+local Observable = require("Observable")
+local ObservableMapSet = require("ObservableMapSet")
+local Promise = require("Promise")
+local RxBinderUtils = require("RxBinderUtils")
+local RxBrioUtils = require("RxBrioUtils")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigPicker = setmetatable({}, BaseObject)
 GameConfigPicker.ClassName = "GameConfigPicker"
 GameConfigPicker.__index = GameConfigPicker
+
+export type GameConfigPicker = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+	},
+	{} :: typeof({ __index = GameConfigPicker })
+)) & BaseObject.BaseObject
+type GameConfigAssetType = GameConfigAssetTypes.GameConfigAssetType
+type GameConfigAssetBase = GameConfigAssetBase.GameConfigAssetBase
 
 --[=[
 	Constructs a new game config picker. Should be gotten by [GameConfigService].
@@ -25,7 +39,11 @@ GameConfigPicker.__index = GameConfigPicker
 	@param gameConfigAssetBinder Binder<GameConfigAsset>
 	@return GameConfigPicker
 ]=]
-function GameConfigPicker.new(serviceBag, gameConfigBinder, gameConfigAssetBinder)
+function GameConfigPicker.new(
+	serviceBag: ServiceBag.ServiceBag,
+	gameConfigBinder,
+	gameConfigAssetBinder
+): GameConfigPicker
 	local self = setmetatable(BaseObject.new(), GameConfigPicker)
 
 	self._gameConfigBinder = assert(gameConfigBinder, "No gameConfigBinder")
@@ -34,17 +52,16 @@ function GameConfigPicker.new(serviceBag, gameConfigBinder, gameConfigAssetBinde
 
 	self._gameIdToConfigSet = self._maid:Add(ObservableMapSet.new())
 
-	self._maid:GiveTask(RxBinderUtils.observeAllBrio(self._gameConfigBinder)
-		:Subscribe(function(brio)
-			if brio:IsDead() then
-				return
-			end
+	self._maid:GiveTask(RxBinderUtils.observeAllBrio(self._gameConfigBinder):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
 
-			local gameConfig = brio:GetValue()
-			local maid = brio:ToMaid()
+		local gameConfig = brio:GetValue()
+		local maid = brio:ToMaid()
 
-			maid:GiveTask(self._gameIdToConfigSet:Push(gameConfig:ObserveGameId(), gameConfig))
-		end))
+		maid:GiveTask(self._gameIdToConfigSet:Push(gameConfig:ObserveGameId(), gameConfig))
+	end))
 
 	return self
 end
@@ -54,21 +71,23 @@ end
 	@param assetType
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigPicker:ObserveActiveAssetOfTypeBrio(assetType: string)
+function GameConfigPicker.ObserveActiveAssetOfTypeBrio(
+	self: GameConfigPicker,
+	assetType: string
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
-	return self:ObserveActiveConfigsBrio(game.GameId)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(gameConfig)
-				return gameConfig:ObserveAssetByTypeBrio(assetType)
-			end);
-		})
+	return self:ObserveActiveConfigsBrio(game.GameId):Pipe({
+		RxBrioUtils.flatMapBrio(function(gameConfig)
+			return gameConfig:ObserveAssetByTypeBrio(assetType)
+		end),
+	})
 end
 
 --[=[
 	Observes all active assets of a type and key.
 
-	```lua
+	```
 	maid:GiveTask(picker:ObserveActiveAssetOfAssetTypeAndKeyBrio(GameConfigAssetType.BADGE, "myBadge")
 		:Pipe({
 			RxStateStackUtils.topOfStack();
@@ -81,15 +100,18 @@ end
 	@param assetKey
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigPicker:ObserveActiveAssetOfAssetTypeAndKeyBrio(assetType: string, assetKey: string)
+function GameConfigPicker.ObserveActiveAssetOfAssetTypeAndKeyBrio(
+	self: GameConfigPicker,
+	assetType: string,
+	assetKey: string
+)
 	assert(type(assetKey) == "string", "Bad assetKey")
 
-	return self:ObserveActiveConfigsBrio(game.GameId)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(gameConfig)
-				return gameConfig:ObserveAssetByTypeAndKeyBrio(assetType, assetKey)
-			end);
-		})
+	return self:ObserveActiveConfigsBrio(game.GameId):Pipe({
+		RxBrioUtils.flatMapBrio(function(gameConfig)
+			return gameConfig:ObserveAssetByTypeAndKeyBrio(assetType, assetKey)
+		end),
+	})
 end
 
 --[=[
@@ -99,15 +121,18 @@ end
 	@param assetId
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigPicker:ObserveActiveAssetOfAssetTypeAndIdBrio(assetType: string, assetId: number)
+function GameConfigPicker.ObserveActiveAssetOfAssetTypeAndIdBrio(
+	self: GameConfigPicker,
+	assetType: string,
+	assetId: number
+)
 	assert(type(assetId) == "number", "Bad assetId")
 
-	return self:ObserveActiveConfigsBrio(game.GameId)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(gameConfig)
-				return gameConfig:ObserveAssetByTypeAndIdBrio(assetType, assetId)
-			end);
-		})
+	return self:ObserveActiveConfigsBrio(game.GameId):Pipe({
+		RxBrioUtils.flatMapBrio(function(gameConfig)
+			return gameConfig:ObserveAssetByTypeAndIdBrio(assetType, assetId)
+		end),
+	})
 end
 
 --[=[
@@ -116,15 +141,17 @@ end
 	@param assetId
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigPicker:ObserveActiveAssetOfAssetIdBrio(assetId: number)
+function GameConfigPicker.ObserveActiveAssetOfAssetIdBrio(
+	self: GameConfigPicker,
+	assetId: number
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(type(assetId) == "number", "Bad assetId")
 
-	return self:ObserveActiveConfigsBrio(game.GameId)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(gameConfig)
-				return gameConfig:ObserveAssetByIdBrio(assetId)
-			end);
-		})
+	return self:ObserveActiveConfigsBrio(game.GameId):Pipe({
+		RxBrioUtils.flatMapBrio(function(gameConfig)
+			return gameConfig:ObserveAssetByIdBrio(assetId)
+		end),
+	})
 end
 
 --[=[
@@ -133,15 +160,17 @@ end
 	@param assetKey
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigPicker:ObserveActiveAssetOfKeyBrio(assetKey: string)
+function GameConfigPicker.ObserveActiveAssetOfKeyBrio(
+	self: GameConfigPicker,
+	assetKey: string
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(type(assetKey) == "string", "Bad assetKey")
 
-	return self:ObserveActiveConfigsBrio(game.GameId)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(gameConfig)
-				return gameConfig:ObserveAssetByKeyBrio(assetKey)
-			end);
-		})
+	return self:ObserveActiveConfigsBrio(game.GameId):Pipe({
+		RxBrioUtils.flatMapBrio(function(gameConfig)
+			return gameConfig:ObserveAssetByKeyBrio(assetKey)
+		end),
+	})
 end
 
 --[=[
@@ -149,7 +178,9 @@ end
 
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigPicker:ObserveActiveConfigsBrio()
+function GameConfigPicker.ObserveActiveConfigsBrio(
+	self: GameConfigPicker
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	return self:_observeConfigsForGameIdBrio(game.GameId)
 end
 
@@ -158,7 +189,7 @@ end
 
 	@return { GameConfigAssetBase }
 ]=]
-function GameConfigPicker:GetActiveConfigs()
+function GameConfigPicker.GetActiveConfigs(self: GameConfigPicker): { GameConfigAssetBase }
 	return self:_getConfigsForGameId(game.GameId)
 end
 
@@ -167,14 +198,18 @@ end
 
 	@param assetType
 	@param assetId
-	@return GameConfigAssetBase
+	@return GameConfigAssetBase?
 ]=]
-function GameConfigPicker:FindFirstActiveAssetOfId(assetType: string, assetId: number)
+function GameConfigPicker.FindFirstActiveAssetOfId(
+	self: GameConfigPicker,
+	assetType: string,
+	assetId: number
+): GameConfigAssetBase?
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
-	for _, gameConfig in pairs(self:GetActiveConfigs()) do
-		for _, gameConfigAsset in pairs(gameConfig:GetAssetsOfTypeAndId(assetType, assetId)) do
+	for _, gameConfig in self:GetActiveConfigs() do
+		for _, gameConfigAsset in gameConfig:GetAssetsOfTypeAndId(assetType, assetId) do
 			return gameConfigAsset
 		end
 	end
@@ -187,9 +222,13 @@ end
 
 	@param assetType string
 	@param assetIdOrKey string | number
-	@return GameConfigAssetBase
+	@return Promise<number>
 ]=]
-function GameConfigPicker:PromisePriceInRobux(assetType, assetIdOrKey)
+function GameConfigPicker.PromisePriceInRobux(
+	self: GameConfigPicker,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetIdOrKey
+): Promise.Promise<number>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetIdOrKey) == "number" or type(assetIdOrKey) == "string", "Bad assetIdOrKey")
 
@@ -225,14 +264,18 @@ end
 
 	@param assetType
 	@param assetKey
-	@return GameConfigAssetBase
+	@return GameConfigAssetBase?
 ]=]
-function GameConfigPicker:FindFirstActiveAssetOfKey(assetType: string, assetKey: string)
+function GameConfigPicker.FindFirstActiveAssetOfKey(
+	self: GameConfigPicker,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetKey: string
+): GameConfigAssetBase?
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 
-	for _, gameConfig in pairs(self:GetActiveConfigs()) do
-		for _, gameConfigAsset in pairs(gameConfig:GetAssetsOfTypeAndKey(assetType, assetKey)) do
+	for _, gameConfig in self:GetActiveConfigs() do
+		for _, gameConfigAsset in gameConfig:GetAssetsOfTypeAndKey(assetType, assetKey) do
 			return gameConfigAsset
 		end
 	end
@@ -246,23 +289,29 @@ end
 	@param assetType
 	@return { GameConfigAssetBase }
 ]=]
-function GameConfigPicker:GetAllActiveAssetsOfType(assetType: string)
+function GameConfigPicker.GetAllActiveAssetsOfType(
+	self: GameConfigPicker,
+	assetType: GameConfigAssetTypes.GameConfigAssetType
+)
 	local assetList = {}
-	for _, gameConfig in pairs(self:GetActiveConfigs()) do
-		for _, gameConfigAsset in pairs(gameConfig:GetAssetsOfType(assetType)) do
+	for _, gameConfig in self:GetActiveConfigs() do
+		for _, gameConfigAsset in gameConfig:GetAssetsOfType(assetType) do
 			table.insert(assetList, gameConfigAsset)
 		end
 	end
 	return assetList
 end
 
-function GameConfigPicker:_observeConfigsForGameIdBrio(gameId: number)
+function GameConfigPicker._observeConfigsForGameIdBrio(
+	self: GameConfigPicker,
+	gameId: number
+): Observable.Observable<Brio.Brio<GameConfigAssetBase>>
 	assert(type(gameId) == "number", "Bad gameId")
 
 	return self._gameIdToConfigSet:ObserveItemsForKeyBrio(gameId)
 end
 
-function GameConfigPicker:_getConfigsForGameId(gameId: number)
+function GameConfigPicker._getConfigsForGameId(self: GameConfigPicker, gameId: number)
 	assert(type(gameId) == "number", "Bad gameId")
 
 	return self._gameIdToConfigSet:GetListForKey(gameId)
@@ -273,9 +322,13 @@ end
 
 	@param assetType GameConfigAssetType
 	@param assetIdOrKey number | string
-	@return number | nil
+	@return number?
 ]=]
-function GameConfigPicker:ToAssetId(assetType, assetIdOrKey)
+function GameConfigPicker.ToAssetId(
+	self: GameConfigPicker,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetIdOrKey: string | number
+): number?
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetIdOrKey) == "number" or type(assetIdOrKey) == "string", "Bad assetIdOrKey")
 
@@ -298,7 +351,11 @@ end
 	@param assetIdOrKey number | string
 	@return Observable<Brio<number>>
 ]=]
-function GameConfigPicker:ObserveToAssetIdBrio(assetType, assetIdOrKey)
+function GameConfigPicker.ObserveToAssetIdBrio(
+	self: GameConfigPicker,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetIdOrKey: string | number
+): Observable.Observable<Brio.Brio<number>>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetIdOrKey) == "number" or type(assetIdOrKey) == "string", "Bad assetIdOrKey")
 
@@ -306,7 +363,7 @@ function GameConfigPicker:ObserveToAssetIdBrio(assetType, assetIdOrKey)
 		return self:ObserveActiveAssetOfAssetTypeAndKeyBrio(assetType, assetIdOrKey):Pipe({
 			RxBrioUtils.switchMapBrio(function(asset)
 				return asset:ObserveAssetId()
-			end);
+			end),
 		})
 	elseif type(assetIdOrKey) == "number" then
 		return RxBrioUtils.of(assetIdOrKey)
@@ -314,6 +371,5 @@ function GameConfigPicker:ObserveToAssetIdBrio(assetType, assetIdOrKey)
 		error("Bad idOrKey")
 	end
 end
-
 
 return GameConfigPicker

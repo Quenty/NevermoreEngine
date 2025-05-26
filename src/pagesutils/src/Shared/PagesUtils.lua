@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities to advance over the Roblox pagess API surface
 	@class PagesUtils
@@ -5,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local PagesProxy = require("PagesProxy")
+local Promise = require("Promise")
 
 local PagesUtils = {}
 
@@ -16,8 +17,8 @@ local PagesUtils = {}
 	@param pages Pages
 	@return { any }
 ]=]
-function PagesUtils.promiseAdvanceToNextPage(pages)
-	assert(typeof(pages) == "Instance" and pages:IsA("Pages") or PagesProxy.isPagesProxy(pages),"Bad pages")
+function PagesUtils.promiseAdvanceToNextPage(pages: Pages): Promise.Promise<({ any })>
+	assert(typeof(pages) == "Instance" and pages:IsA("Pages") or PagesProxy.isPagesProxy(pages), "Bad pages")
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()

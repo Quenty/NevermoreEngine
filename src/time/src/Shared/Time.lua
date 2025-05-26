@@ -11,11 +11,24 @@
 local Time = {}
 
 -- luacheck: push ignore 631
-local MONTH_NAMES        = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
-local MONTH_NAMES_SHORT  = {"Jan",     "Feb",      "Mar",   "Apr",   "May", "Jun",  "Jul",  "Aug",    "Sep",       "Oct",     "Nov",      "Dec"}
-local DAYS_IN_MONTH      = { 31,        28,         31,      30,      31,    30,     31,     31,       30,          31,       30,         31}
-local DAYS_OF_WEEK       = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
-local DAYS_OF_WEEK_SHORT = {"Sun",    "Mon",    "Tues",    "Weds",      "Thurs",    "Fri",    "Sat"}
+local MONTH_NAMES = {
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+}
+local MONTH_NAMES_SHORT = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
+local DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+local DAYS_OF_WEEK = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" }
+local DAYS_OF_WEEK_SHORT = { "Sun", "Mon", "Tues", "Weds", "Thurs", "Fri", "Sat" }
 -- luacheck: pop
 
 --[=[
@@ -23,7 +36,7 @@ local DAYS_OF_WEEK_SHORT = {"Sun",    "Mon",    "Tues",    "Weds",      "Thurs",
 	@param year number
 	@return { [number]: number }
 ]=]
-function Time.getDaysMonthTable(year)
+function Time.getDaysMonthTable(year: number): { [number]: number }
 	local copy = table.clone(DAYS_IN_MONTH)
 
 	if year % 4 == 0 and (year % 100 ~= 0 or year % 400 == 0) then
@@ -35,31 +48,66 @@ function Time.getDaysMonthTable(year)
 	return copy
 end
 
-function Time.getSecond(currentTime)
+--[=[
+	Returns the second of the given time.
+	@param currentTime number
+	@return number
+]=]
+function Time.getSecond(currentTime: number): number
 	return math.floor(currentTime % 60)
 end
 
-function Time.getMinute(currentTime)
-	return math.floor(currentTime/60 % 60)
+--[=[
+	Returns the minute of the given time.
+	@param currentTime number
+	@return number
+]=]
+function Time.getMinute(currentTime: number): number
+	return math.floor(currentTime / 60 % 60)
 end
 
-function Time.getHour(currentTime)
-	return math.floor(currentTime/3600 % 24)
+--[=[
+	Returns the hour of the given time in 24-hour format.
+	@param currentTime number
+	@return number
+]=]
+function Time.getHour(currentTime: number): number
+	return math.floor(currentTime / 3600 % 24)
 end
 
-function Time.getDay(currentTime)
-	return math.ceil(currentTime/60/60/24 % 365.25)
+--[=[
+	Returns the day of the year for the given time.
+	@param currentTime number
+	@return number
+]=]
+function Time.getDay(currentTime: number): number
+	return math.ceil(currentTime / 60 / 60 / 24 % 365.25)
 end
 
-function Time.getYear(currentTime)
-	return math.floor(currentTime/60/60/24/365.25 + 1970)
+--[=[
+	Returns the year for the given time.
+	@param currentTime number
+	@return number
+]=]
+function Time.getYear(currentTime: number): number
+	return math.floor(currentTime / 60 / 60 / 24 / 365.25 + 1970)
 end
 
-function Time.getYearShort(currentTime)
+--[=[
+	Returns the last two digits of the year for the given time.
+	@param currentTime number
+	@return number
+]=]
+function Time.getYearShort(currentTime: number): number
 	return Time.getYear(currentTime) % 100
 end
 
-function Time.getYearShortFormatted(currentTime)
+--[=[
+	Returns the last two digits of the year formatted as a string.
+	@param currentTime number
+	@return string
+]=]
+function Time.getYearShortFormatted(currentTime: number): string
 	local shortYear = Time.getYearShort(currentTime)
 	if shortYear < 10 then
 		shortYear = "0" .. shortYear
@@ -67,73 +115,122 @@ function Time.getYearShortFormatted(currentTime)
 	return shortYear
 end
 
-function Time.getMonth(currentTime)
+--[=[
+	Returns the month of the given time.
+	@param currentTime number
+	@return number?
+]=]
+function Time.getMonth(currentTime: number): number?
 	local year = Time.getYear(currentTime)
 	local day = Time.getDay(currentTime)
 
 	local daysInMonth = Time.getDaysMonthTable(year)
 
-	for i=1, #daysInMonth do
+	for i = 1, #daysInMonth do
 		if day > daysInMonth[i] then
 			day = day - daysInMonth[i]
 		else
 			return i
 		end
 	end
+
+	return nil
 end
 
-function Time.getFormattedMonth(currentTime)
+--[=[
+	Returns the month formatted as a two-digit string.
+	@param currentTime number
+	@return string
+]=]
+function Time.getFormattedMonth(currentTime: number): string
 	local month = Time.getMonth(currentTime)
 	if month < 10 then
-		month = "0"..month
+		month = "0" .. month
 	end
 
 	return month
 end
 
-function Time.getDayOfTheMonth(currentTime)
+--[=[
+	Returns the day of the month for the given time.
+	@param currentTime number
+	@return number?
+]=]
+function Time.getDayOfTheMonth(currentTime: number): number?
 	local year = Time.getYear(currentTime)
 	local day = Time.getDay(currentTime)
 
 	local daysInMonth = Time.getDaysMonthTable(year)
 
-	for i=1, #daysInMonth do
+	for i = 1, #daysInMonth do
 		if day > daysInMonth[i] then
 			day = day - daysInMonth[i]
 		else
 			return day
 		end
 	end
+
+	return nil
 end
 
-function Time.getFormattedDayOfTheMonth(currentTime)
+--[=[
+	Returns the day of the month formatted as a two-digit string.
+	@param currentTime number
+	@return string
+]=]
+function Time.getFormattedDayOfTheMonth(currentTime: number): string
 	local dayOfTheMonth = Time.getDayOfTheMonth(currentTime)
 
 	if dayOfTheMonth < 10 then
-		dayOfTheMonth = "0"..dayOfTheMonth
+		dayOfTheMonth = "0" .. dayOfTheMonth
 	end
 
 	return dayOfTheMonth
 end
 
-function Time.getMonthName(currentTime)
-	return MONTH_NAMES[Time.getMonth(currentTime)]
+--[=[
+	Returns the full name of the month for the given time.
+	@param currentTime number
+	@return string
+]=]
+function Time.getMonthName(currentTime: number): string
+	local month = Time.getMonth(currentTime)
+	if month == nil then
+		return "Unknown"
+	end
+
+	return MONTH_NAMES[month]
 end
 
-function Time.getMonthNameShort(currentTime)
-	return MONTH_NAMES_SHORT[Time.getMonth(currentTime)]
+--[=[
+	Returns the abbreviated name of the month for the given time.
+	@param currentTime number
+	@return string
+]=]
+function Time.getMonthNameShort(currentTime: number): string
+	local month = Time.getMonth(currentTime)
+	if month == nil then
+		return "???"
+	end
+
+	return MONTH_NAMES_SHORT[month]
 end
 
-function Time.getJulianDate(currentTime)
+--[=[
+	Calculates the Julian date for the given time.
+	@param currentTime number
+	@return number
+]=]
+function Time.getJulianDate(currentTime: number)
 	local month = Time.getMonth(currentTime)
 	local year = Time.getYear(currentTime)
 	local day = Time.getDay(currentTime)
 
-	local a = (14-month) / 12
+	local a = (14 - month) / 12
 	local y = year + 4800 - a
 	local m = month + 12 * a - 3
 
-	local julianDay = day + ((153 * m + 2) / 5) + 365 * y + (y/4) - (y/100) + (y/400) - 32045
+	local julianDay = day + ((153 * m + 2) / 5) + 365 * y + (y / 4) - (y / 100) + (y / 400) - 32045
 
 	--[[local julianDay = (day
 	+ ((153 * (month + 12 * ((14 - month) / 12 ) - 3) + 2) / 5)
@@ -146,23 +243,39 @@ function Time.getJulianDate(currentTime)
 	return julianDay
 end
 
-function Time.getDayOfTheWeek(currentTime)
+--[=[
+	Returns the day of the week as a number (0-6) for the given time.
+	@param currentTime number
+	@return number
+]=]
+function Time.getDayOfTheWeek(currentTime: number): number
 	return math.floor(Time.getJulianDate(currentTime)) % 7
 end
 
-function Time.getDayOfTheWeekName(currentTime)
+--[=[
+	Returns the full name of the day of the week for the given time.
+	@param currentTime number
+	@return string
+]=]
+function Time.getDayOfTheWeekName(currentTime: number): string
 	return DAYS_OF_WEEK[Time.getDayOfTheWeek(currentTime)]
 end
 
-function Time.getDayOfTheWeekNameShort(currentTime)
+--[=[
+	Returns the abbreviated name of the day of the week for the given time.
+	@param currentTime number
+	@return string
+]=]
+function Time.getDayOfTheWeekNameShort(currentTime: number): string
 	return DAYS_OF_WEEK_SHORT[Time.getDayOfTheWeek(currentTime)]
 end
 
 --[=[
+	Returns the ordinal suffix (e.g., "st", "nd", "rd", "th") for a given number.
 	@param number number
-	@return string (Like 1st, 2nd)
+	@return string
 ]=]
-function Time.getOrdinalOfNumber(number)
+function Time.getOrdinalOfNumber(number: number): string
 	local tenRemainder = number % 10
 	local hundredRemainder = number % 100
 
@@ -181,27 +294,52 @@ function Time.getOrdinalOfNumber(number)
 	end
 end
 
-function Time.getDayOfTheMonthOrdinal(currentTime)
-	return Time.getOrdinalOfNumber(Time.getDayOfTheMonth(currentTime))
+--[=[
+	Returns the ordinal suffix for the day of the month for the given time.
+	@param currentTime number
+	@return string?
+]=]
+function Time.getDayOfTheMonthOrdinal(currentTime: number): string?
+	local dayOfMonth = Time.getDayOfTheMonth(currentTime)
+	if dayOfMonth == nil then
+		return nil
+	end
+
+	return Time.getOrdinalOfNumber(dayOfMonth)
 end
 
-function Time.getFormattedSecond(currentTime)
+--[=[
+	Returns the second formatted as a two-digit string.
+	@param currentTime number
+	@return string
+]=]
+function Time.getFormattedSecond(currentTime: number): string
 	local currentSecond = Time.getSecond(currentTime)
 	if currentSecond < 10 then
-		currentSecond = "0"..currentSecond
+		currentSecond = "0" .. currentSecond
 	end
 	return currentSecond
 end
 
-function Time.getFormattedMinute(currentTime)
+--[=[
+	Returns the minute formatted as a two-digit string.
+	@param currentTime number
+	@return string
+]=]
+function Time.getFormattedMinute(currentTime: number): string
 	local currentMinute = Time.getMinute(currentTime)
 	if currentMinute < 10 then
-		currentMinute = "0".. currentMinute
+		currentMinute = "0" .. currentMinute
 	end
 	return currentMinute
 end
 
-function Time.getRegularHour(currentTime)
+--[=[
+	Returns the hour in 12-hour format.
+	@param currentTime number
+	@return number
+]=]
+function Time.getRegularHour(currentTime: number): number
 	local hour = Time.getHour(currentTime)
 	if hour > 12 then
 		hour = hour - 12
@@ -209,23 +347,38 @@ function Time.getRegularHour(currentTime)
 	return hour
 end
 
-function Time.getHourFormatted(currentTime)
+--[=[
+	Returns the hour formatted as a two-digit string in 24-hour format.
+	@param currentTime number
+	@return string
+]=]
+function Time.getHourFormatted(currentTime): string
 	local hour = Time.getHour(currentTime)
 	if hour < 10 then
-		hour = "0"..hour
+		hour = "0" .. hour
 	end
 	return hour
 end
 
-function Time.getRegularHourFormatted(currentTime)
+--[=[
+	Returns the hour formatted as a two-digit string in 12-hour format.
+	@param currentTime number
+	@return string
+]=]
+function Time.getRegularHourFormatted(currentTime: number): string
 	local hour = Time.getRegularHour(currentTime)
 	if hour < 10 then
-		hour = "0"..hour
+		hour = "0" .. hour
 	end
 	return hour
 end
 
-function Time.getamOrpm(currentTime)
+--[=[
+	Returns "am" or "pm" based on the given time.
+	@param currentTime number
+	@return "am" | "pm"
+]=]
+function Time.getamOrpm(currentTime: number): "am" | "pm"
 	local hour = Time.getHour(currentTime)
 
 	if hour > 12 then
@@ -235,7 +388,12 @@ function Time.getamOrpm(currentTime)
 	end
 end
 
-function Time.getAMorPM(currentTime)
+--[=[
+	Returns "AM" or "PM" based on the given time.
+	@param currentTime number
+	@return "AM" | "PM"
+]=]
+function Time.getAMorPM(currentTime: number): "AM" | "PM"
 	local hour = Time.getHour(currentTime)
 
 	if hour > 12 then
@@ -245,15 +403,25 @@ function Time.getAMorPM(currentTime)
 	end
 end
 
-function Time.getMilitaryHour(currentTime)
+--[=[
+	Reports the time in 24-hour format as a two-digit string.
+	@param currentTime number
+	@return string
+]=]
+function Time.getMilitaryHour(currentTime: number): string
 	local hour = Time.getHour(currentTime)
 	if hour < 10 then
-		return "0"..hour
+		return "0" .. hour
 	end
 	return hour
 end
 
-function Time.isLeapYear(currentTime)
+--[=[
+	Determines if the year of the given time is a leap year.
+	@param currentTime number
+	@return boolean
+]=]
+function Time.isLeapYear(currentTime: number): boolean
 	local year = Time.getYear(currentTime)
 	if year % 4 == 0 and (year % 100 ~= 0 or year % 400 == 0) then
 		return true
@@ -262,46 +430,51 @@ function Time.isLeapYear(currentTime)
 	end
 end
 
-function Time.getDaysInMonth(currentTime)
+--[=[
+	Returns the number of days in the month for the given time.
+	@param currentTime number
+	@return number
+]=]
+function Time.getDaysInMonth(currentTime: number): number
 	local month = Time.getMonth(currentTime)
 	local year = Time.getYear(currentTime)
 	return Time.getDaysMonthTable(year)[month]
 end
 
 local ISO_FORMAT_STRINGS = {
-	d = Time.getFormattedDayOfTheMonth;
-	D = Time.getDayOfTheWeekNameShort;
-	j = Time.getDayOfTheMonth;
-	l = Time.getDayOfTheWeekName;
-	N = Time.getDayOfTheWeek;
-	S = Time.getDayOfTheMonthOrdinal;
-	W = Time.getDayOfTheWeek;
-	Z = Time.getDay;
+	d = Time.getFormattedDayOfTheMonth,
+	D = Time.getDayOfTheWeekNameShort,
+	j = Time.getDayOfTheMonth,
+	l = Time.getDayOfTheWeekName,
+	N = Time.getDayOfTheWeek,
+	S = Time.getDayOfTheMonthOrdinal,
+	W = Time.getDayOfTheWeek,
+	Z = Time.getDay,
 
 	-- W
 
-	F = Time.getMonthName;
-	m = Time.getFormattedMonth;
-	M = Time.getMonthNameShort;
-	n = Time.getMonth;
-	t = Time.getDaysInMonth;
+	F = Time.getMonthName,
+	m = Time.getFormattedMonth,
+	M = Time.getMonthNameShort,
+	n = Time.getMonth,
+	t = Time.getDaysInMonth,
 
-	L = Time.isLeapYear;
-	o = Time.getYear;
-	Y = Time.getYear; -- Screw ISO-8610, it confuses me.
-	y = Time.getYearShortFormatted;
+	L = Time.isLeapYear,
+	o = Time.getYear,
+	Y = Time.getYear, -- Screw ISO-8610, it confuses me.
+	y = Time.getYearShortFormatted,
 
-	a = Time.getamOrpm;
-	A = Time.getAMorPM;
+	a = Time.getamOrpm,
+	A = Time.getAMorPM,
 	--B -- No one uses it
-	g = Time.getRegularHour;
-	G = Time.getHour;
-	h = Time.getRegularHourFormatted;
-	H = Time.getHourFormatted;
-	i = Time.getFormattedMinute;
-	s = Time.getFormattedSecond;
+	g = Time.getRegularHour,
+	G = Time.getHour,
+	h = Time.getRegularHourFormatted,
+	H = Time.getHourFormatted,
+	i = Time.getFormattedMinute,
+	s = Time.getFormattedSecond,
 
-	X = Time.getJulianDate; -- For testing purposes.
+	X = Time.getJulianDate, -- For testing purposes.
 
 	-- e -- No way to get Time Zones
 	-- I -- Daylight saving time should be added later.
@@ -312,31 +485,38 @@ local ISO_FORMAT_STRINGS = {
 
 	-- c -- ISO 8601
 	-- r -- No need for formatted dates
-	U = time;
+	U = time,
 }
 
-local matchString = "[" do
-	for i, _ in pairs(ISO_FORMAT_STRINGS) do
-		matchString = matchString .. i
+local matchString: string = "["
+do
+	for i, _ in ISO_FORMAT_STRINGS do
+		matchString ..= i
 	end
-	matchString = matchString .. "]"
+	matchString ..= "]"
 end
 
-function Time.getFormattedTime(format, currentTime)
+--[=[
+	Formats the given time based on the provided format string.
+	@param format string
+	@param currentTime number
+	@return string
+]=]
+function Time.getFormattedTime(format: string, currentTime: number)
 	currentTime = currentTime or tick()
 
 	local returnString = format
 	local formatsRequired = {}
 
 	for newFormat in string.gmatch(format, matchString) do
-		formatsRequired[#formatsRequired+1] = newFormat
+		formatsRequired[#formatsRequired + 1] = newFormat
 	end
 
-	for _, formatType in pairs(formatsRequired) do
+	for _, formatType in formatsRequired do
 		returnString = string.gsub(returnString, formatType, string.rep(formatType, 3))
 	end
 
-	for _, formatType in pairs(formatsRequired) do
+	for _, formatType in formatsRequired do
 		local replacement = ISO_FORMAT_STRINGS[formatType](currentTime)
 		returnString = string.gsub(returnString, string.rep(formatType, 3), replacement)
 	end

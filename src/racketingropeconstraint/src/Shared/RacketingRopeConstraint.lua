@@ -12,8 +12,8 @@ local Binder = require("Binder")
 local OverriddenProperty = require("OverriddenProperty")
 local Promise = require("Promise")
 local RacketingRopeConstraintInterface = require("RacketingRopeConstraintInterface")
-local ValueObject = require("ValueObject")
 local TieRealmService = require("TieRealmService")
+local ValueObject = require("ValueObject")
 
 local START_DISTANCE = 1000
 
@@ -48,7 +48,9 @@ function RacketingRopeConstraint.new(ropeConstraint, serviceBag)
 		self._overriddenLength = self._maid:Add(OverriddenProperty.new(self._obj, "Length"))
 	end
 
-	self._maid:GiveTask(RacketingRopeConstraintInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm()))
+	self._maid:GiveTask(
+		RacketingRopeConstraintInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm())
+	)
 
 	return self
 end
@@ -93,6 +95,7 @@ function RacketingRopeConstraint:_handleActiveChanged()
 
 		self:_update()
 	else
+		self._isConstrained.Value = false
 		self._maid._updateHeartbeat = nil
 		self._maid._pendingConstrainedPromise = nil
 		self._smallestDistance = START_DISTANCE
@@ -101,7 +104,7 @@ function RacketingRopeConstraint:_handleActiveChanged()
 end
 
 function RacketingRopeConstraint:_update()
-	assert(self:_isValid())
+	assert(self:_isValid(), "Not valid state")
 
 	local currentDistance = (self._obj.Attachment0.WorldPosition - self._obj.Attachment1.WorldPosition).magnitude
 	self._smallestDistance = math.clamp(currentDistance, self._targetDistance, self._smallestDistance)
@@ -110,15 +113,17 @@ function RacketingRopeConstraint:_update()
 
 	if self:_queryIsConstrained() then
 		self._maid._updateHeartbeat = nil
+		self._isConstrained.Value = true
 
 		if self._maid._pendingConstrainedPromise then
 			if self:_isValid() and self:_queryIsConstrained() then
-				self._isConstrained.Value = true
 				self._maid._pendingConstrainedPromise:Resolve()
 			end
 
 			self._maid._pendingConstrainedPromise = nil
 		end
+	else
+		self._isConstrained.Value = false
 	end
 end
 

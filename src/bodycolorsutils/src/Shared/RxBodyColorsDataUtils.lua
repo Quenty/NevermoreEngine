@@ -4,10 +4,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Rx = require("Rx")
 local BodyColorsDataConstants = require("BodyColorsDataConstants")
-local RxAttributeUtils = require("RxAttributeUtils")
 local BodyColorsDataUtils = require("BodyColorsDataUtils")
+local Rx = require("Rx")
+local RxAttributeUtils = require("RxAttributeUtils")
 
 local RxBodyColorsDataUtils = {}
 
@@ -22,7 +22,7 @@ function RxBodyColorsDataUtils.observeFromAttributes(instance)
 
 	local observables = {}
 
-	for key, attributeName in pairs(BodyColorsDataConstants.ATTRIBUTE_MAPPING) do
+	for key, attributeName in BodyColorsDataConstants.ATTRIBUTE_MAPPING do
 		observables[key] = RxAttributeUtils.observeAttribute(instance, attributeName)
 	end
 
@@ -30,19 +30,23 @@ function RxBodyColorsDataUtils.observeFromAttributes(instance)
 		Rx.map(function(latestValues)
 			local bodyColorsData = {}
 
-			for key, attributeName in pairs(BodyColorsDataConstants.ATTRIBUTE_MAPPING) do
+			for key, attributeName in BodyColorsDataConstants.ATTRIBUTE_MAPPING do
 				local value = latestValues[key]
 				if typeof(value) == "Color3" then
 					bodyColorsData[key] = value
 				else
-					warn(string.format("[RxBodyColorsDataUtils.observeFromAttributes] - Bad attribute %q of type %q",
-						attributeName,
-						typeof(value)))
+					warn(
+						string.format(
+							"[RxBodyColorsDataUtils.observeFromAttributes] - Bad attribute %q of type %q",
+							attributeName,
+							typeof(value)
+						)
+					)
 				end
 			end
 
 			return BodyColorsDataUtils.createBodyColorsData(bodyColorsData)
-		end);
+		end),
 	})
 end
 

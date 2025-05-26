@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	Promises, but without error handling as this screws with stack traces, using Roblox signals
 
@@ -12,11 +13,26 @@ local HttpService = game:GetService("HttpService")
 local ENABLE_TRACEBACK = false
 local _emptyRejectedPromise = nil
 local _emptyFulfilledPromise = nil
-local EMPTY_PACKED_TUPLE = table.freeze({ n = 0; })
+local EMPTY_PACKED_TUPLE = table.freeze({ n = 0 })
 
 local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
+
+export type Resolve<T...> = (T...) -> ()
+export type Reject = (...any) -> ()
+export type ResolveReject<T...> = (Resolve<T...>, Reject) -> ()
+
+export type Promise<T...> = typeof(setmetatable(
+	{} :: {
+		_fulfilled: any?,
+		_rejected: any?,
+		_unconsumedException: boolean,
+		_pendingExecuteList: { any }?,
+		_source: string,
+	},
+	{} :: typeof({ __index = Promise })
+))
 
 --[=[
 	Determines whether a value is a promise or not.
@@ -24,7 +40,7 @@ Promise.__index = Promise
 	@param value any
 	@return boolean
 ]=]
-function Promise.isPromise(value)
+function Promise.isPromise(value: any): boolean
 	return type(value) == "table" and value.ClassName == "Promise"
 end
 
@@ -37,13 +53,13 @@ end
 	::
 
 	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise.new(func)
+function Promise.new<T...>(func: ResolveReject<T...>?): Promise<T...>
 	local self = setmetatable({
-		_pendingExecuteList = {};
-		_unconsumedException = true;
-		_source = ENABLE_TRACEBACK and debug.traceback("Promise.new()", 2) or "";
+		_pendingExecuteList = {},
+		_unconsumedException = true,
+		_source = ENABLE_TRACEBACK and debug.traceback("Promise.new()", 2) or "",
 	}, Promise)
 
 	if type(func) == "function" then
@@ -57,9 +73,9 @@ end
 	Initializes a new promise with the given function in a spawn wrapper.
 
 	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise.spawn(func)
+function Promise.spawn<T...>(func: ResolveReject<T...>): Promise<T...>
 	local self = Promise.new()
 
 	task.spawn(func, self:_getResolveReject())
@@ -72,9 +88,9 @@ end
 
 	@param seconds number
 	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise.delay(seconds, func)
+function Promise.delay<T...>(seconds: number, func: ResolveReject<T...>): Promise<T...>
 	assert(type(seconds) == "number", "Bad seconds")
 	assert(type(func) == "function", "Bad func")
 
@@ -89,9 +105,9 @@ end
 	Initializes a new promise with the given function in a deferred wrapper.
 
 	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise.defer(func)
+function Promise.defer<T...>(func: ResolveReject<T...>): Promise<T...>
 	local self = Promise.new()
 
 	-- Just the function part of the resolve/reject protocol!
@@ -104,9 +120,9 @@ end
 	Returns a resolved promise with the following values
 
 	@param ... Values to resolve to
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise.resolved(...)
+function Promise.resolved<T...>(...: T...): Promise<T...>
 	local n = select("#", ...)
 	if n == 0 then
 		-- Reuse promise here to save on calls to Promise.resolved()
@@ -129,9 +145,9 @@ end
 	Returns a rejected promise with the following values
 
 	@param ... Values to reject to
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise.rejected(...)
+function Promise.rejected<T...>(...): Promise<()>
 	local n = select("#", ...)
 	if n == 0 then
 		-- Reuse promise here to save on calls to Promise.rejected()
@@ -148,7 +164,7 @@ end
 
 	@return bool -- True if pending, false otherwise
 ]=]
-function Promise:IsPending()
+function Promise.IsPending<T...>(self: Promise<T...>): boolean
 	return self._pendingExecuteList ~= nil
 end
 
@@ -157,7 +173,7 @@ end
 
 	@return bool -- True if fulfilled
 ]=]
-function Promise:IsFulfilled()
+function Promise.IsFulfilled<T...>(self: Promise<T...>): boolean
 	return self._fulfilled ~= nil
 end
 
@@ -166,7 +182,7 @@ end
 
 	@return bool -- True if rejected
 ]=]
-function Promise:IsRejected()
+function Promise.IsRejected<T...>(self: Promise<T...>): boolean
 	return self._rejected ~= nil
 end
 
@@ -177,11 +193,11 @@ end
 	@yields
 	@return T
 ]=]
-function Promise:Wait()
+function Promise.Wait<T...>(self: Promise<T...>): T...
 	if self._fulfilled then
 		return table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	elseif self._rejected then
-		return error(tostring(self._rejected[1]), 2)
+		error(tostring(self._rejected[1]), 2)
 	else
 		local waitingCoroutine = coroutine.running()
 
@@ -194,13 +210,14 @@ function Promise:Wait()
 		coroutine.yield()
 
 		if self._rejected then
-			return error(tostring(self._rejected[1]), 2)
-		else
+			error(tostring(self._rejected[1]), 2)
+		elseif self._fulfilled then
 			return table.unpack(self._fulfilled, 1, self._fulfilled.n)
+		else
+			error("Bad state")
 		end
 	end
 end
-
 
 --[=[
 	Yields until the promise is complete, then returns a boolean indicating
@@ -209,7 +226,7 @@ end
 	@yields
 	@return boolean, T
 ]=]
-function Promise:Yield()
+function Promise.Yield<T...>(self: Promise<T...>): (boolean, T...)
 	if self._fulfilled then
 		return true, table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	elseif self._rejected then
@@ -235,13 +252,12 @@ function Promise:Yield()
 	end
 end
 
-
 --[=[
 	Promise resolution procedure, resolves the given values
 
 	@param ... T
 ]=]
-function Promise:Resolve(...)
+function Promise:Resolve<T...>(...: T...)
 	if not self._pendingExecuteList then
 		return
 	end
@@ -253,7 +269,8 @@ function Promise:Resolve(...)
 		self:Reject("TypeError: Resolved to self")
 	elseif Promise.isPromise(...) then
 		if len > 1 then
-			local message = string.format("When resolving a promise, extra arguments are discarded! See:\n\n%s", self._source)
+			local message =
+				string.format("When resolving a promise, extra arguments are discarded! See:\n\n%s", self._source)
 			warn(message)
 		end
 
@@ -270,7 +287,6 @@ function Promise:Resolve(...)
 						self:_reject(table.pack(...))
 					end
 				end,
-				nil
 			}
 		elseif promise2._rejected then -- rejected
 			promise2._unconsumedException = false
@@ -282,7 +298,8 @@ function Promise:Resolve(...)
 		end
 	elseif type(...) == "function" then
 		if len > 1 then
-			local message = string.format("When resolving a function, extra arguments are discarded! See:\n\n%s", self._source)
+			local message =
+				string.format("When resolving a function, extra arguments are discarded! See:\n\n%s", self._source)
 			warn(message)
 		end
 
@@ -301,7 +318,7 @@ end
 	@param values { T } -- Params to fulfil with
 	@private
 ]]
-function Promise:_fulfill(values)
+function Promise._fulfill<T...>(self: Promise<T...>, values)
 	if not self._pendingExecuteList then
 		return
 	end
@@ -310,7 +327,7 @@ function Promise:_fulfill(values)
 
 	local list = self._pendingExecuteList
 	self._pendingExecuteList = nil
-	for _, data in pairs(list) do
+	for _, data in list do
 		self:_executeThen(unpack(data))
 	end
 end
@@ -319,11 +336,11 @@ end
 	Rejects the promise with the values given
 	@param ... T -- Params to reject with
 ]=]
-function Promise:Reject(...)
+function Promise.Reject<T...>(self: Promise<T...>, ...)
 	self:_reject(table.pack(...))
 end
 
-function Promise:_reject(values)
+function Promise._reject<T...>(self: Promise<T...>, values)
 	if not self._pendingExecuteList then
 		return
 	end
@@ -332,7 +349,7 @@ function Promise:_reject(values)
 
 	local list = self._pendingExecuteList
 	self._pendingExecuteList = nil
-	for _, data in pairs(list) do
+	for _, data in list do
 		self:_executeThen(unpack(data))
 	end
 
@@ -342,10 +359,12 @@ function Promise:_reject(values)
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
 			if self._unconsumedException then
-				local errOutput = self:_toHumanReadable(self._rejected[1])
+				local errOutput = self:_toHumanReadable(values[1])
 
 				if ENABLE_TRACEBACK then
-					warn(string.format("[Promise] - Uncaught exception in promise\n\n%q\n\n%s", errOutput, self._source))
+					warn(
+						string.format("[Promise] - Uncaught exception in promise\n\n%q\n\n%s", errOutput, self._source)
+					)
 				else
 					warn(string.format("[Promise] - Uncaught exception in promise: %q", errOutput))
 				end
@@ -354,7 +373,7 @@ function Promise:_reject(values)
 	end
 end
 
-function Promise:_toHumanReadable(data)
+function Promise._toHumanReadable<T...>(_self: Promise<T...>, data: any): string
 	if type(data) == "table" then
 		local errOutput
 		local ok = pcall(function()
@@ -387,9 +406,9 @@ end
 
 	@param onFulfilled function -- Called if/when fulfilled with parameters
 	@param onRejected function -- Called if/when rejected with parameters
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise:Then(onFulfilled, onRejected)
+function Promise.Then<T...>(self: Promise<T...>, onFulfilled: ((T...) -> any...)?, onRejected: ((...any) -> any...)?)
 	if type(onRejected) == "function" then
 		self._unconsumedException = false
 	end
@@ -411,9 +430,9 @@ end
 
 	@param onFulfilled function
 	@param onRejected function
-	@return Promise<T> -- Returns self
+	@return Promise<T...> -- Returns self
 ]=]
-function Promise:Tap(onFulfilled, onRejected)
+function Promise.Tap<T...>(self: Promise<T...>, onFulfilled, onRejected)
 	-- Run immediately like then, but we return something safer!
 	local result = self:Then(onFulfilled, onRejected)
 	if result == self then
@@ -443,9 +462,9 @@ end
 	Executes upon pending stop
 
 	@param func function
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise:Finally(func)
+function Promise.Finally<T...>(self: Promise<T...>, func)
 	return self:Then(func, func)
 end
 
@@ -453,17 +472,16 @@ end
 	Catch errors from the promise
 
 	@param onRejected function
-	@return Promise<T>
+	@return Promise<T...>
 ]=]
-function Promise:Catch(onRejected)
+function Promise.Catch<T...>(self: Promise<T...>, onRejected)
 	return self:Then(nil, onRejected)
 end
-
 
 --[=[
 	Rejects the current promise. Utility left for Maid task
 ]=]
-function Promise:Destroy()
+function Promise.Destroy<T...>(self: Promise<T...>)
 	self:_reject(EMPTY_PACKED_TUPLE)
 end
 
@@ -477,7 +495,7 @@ end
 	@return boolean -- true if resolved, false otherwise.
 	@return any
 ]=]
-function Promise:GetResults()
+function Promise.GetResults<T...>(self: Promise<T...>): (boolean, T...)
 	if self._rejected then
 		return false, table.unpack(self._rejected, 1, self._rejected.n)
 	elseif self._fulfilled then
@@ -487,7 +505,7 @@ function Promise:GetResults()
 	end
 end
 
-function Promise:_getResolveReject()
+function Promise._getResolveReject<T...>(self: Promise<T...>): (Resolve<T...>, Reject)
 	return function(...)
 		self:Resolve(...)
 	end, function(...)
@@ -500,10 +518,10 @@ end
 
 	@param onFulfilled function?
 	@param onRejected function?
-	@param promise2 Promise<T>? -- May be nil. If it is, then we have the option to return self
+	@param promise2 Promise<T...>? -- May be nil. If it is, then we have the option to return self
 	@return Promise
 ]=]
-function Promise:_executeThen(onFulfilled, onRejected, promise2)
+function Promise._executeThen<T...>(self: Promise<T...>, onFulfilled, onRejected, promise2)
 	if self._fulfilled then
 		if type(onFulfilled) == "function" then
 			-- If either onFulfilled or onRejected returns a value x, run

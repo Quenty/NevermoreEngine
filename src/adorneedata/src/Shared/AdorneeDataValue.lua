@@ -22,10 +22,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local AttributeValue = require("AttributeValue")
-local RxSignal = require("RxSignal")
-local Rx = require("Rx")
 local AdorneeDataEntry = require("AdorneeDataEntry")
+local AttributeValue = require("AttributeValue")
+local Rx = require("Rx")
+local RxSignal = require("RxSignal")
 
 local AdorneeDataValue = {}
 AdorneeDataValue.ClassName = "AdorneeDataValue"
@@ -43,12 +43,12 @@ function AdorneeDataValue.new(adornee, prototype)
 	assert(type(prototype) == "table", "Bad prototype")
 
 	local self = {
-		_adornee = adornee;
-		_defaultValues = prototype;
-		_valueObjects = {};
+		_adornee = adornee,
+		_defaultValues = prototype,
+		_valueObjects = {},
 	}
 
-	for key, value in pairs(prototype) do
+	for key, value in prototype do
 		if AdorneeDataEntry.isAdorneeDataEntry(value) then
 			self._valueObjects[key] = value:Create(adornee)
 		else
@@ -75,13 +75,13 @@ end
 function AdorneeDataValue:__index(index)
 	if index == "Value" then
 		local result = {}
-		for key, valueObject in pairs(self._valueObjects) do
+		for key, valueObject in self._valueObjects do
 			result[key] = valueObject.Value
 		end
 		return result
 	elseif index == "Changed" then
 		return RxSignal.new(self:Observe():Pipe({
-			Rx.skip(1);
+			Rx.skip(1),
 		}))
 	elseif AdorneeDataValue[index] then
 		return AdorneeDataValue[index]
@@ -110,7 +110,7 @@ function AdorneeDataValue:Observe()
 	local attributeValues = rawget(self, "_valueObjects")
 
 	local observables = {}
-	for key, valueObject in pairs(attributeValues) do
+	for key, valueObject in attributeValues do
 		observables[key] = valueObject:Observe()
 	end
 
@@ -124,7 +124,7 @@ function AdorneeDataValue:__newindex(index, newValue)
 		assert(type(newValue) == "table", "Bad newValue")
 		local attributeValues = rawget(self, "_valueObjects")
 
-		for key, value in pairs(newValue) do
+		for key, value in newValue do
 			if attributeValues[key] then
 				attributeValues[key].Value = value
 			else

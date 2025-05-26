@@ -3,6 +3,83 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.17.3...@quenty/teamutils@10.18.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+
+
+
+## [10.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.17.2...@quenty/teamutils@10.17.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+## [10.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.17.0...@quenty/teamutils@10.17.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [10.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.17.0...@quenty/teamutils@10.17.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
+# [10.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.16.2...@quenty/teamutils@10.17.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+## [10.16.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.16.1...@quenty/teamutils@10.16.2) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+## [10.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.16.0...@quenty/teamutils@10.16.1) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.15.0...@quenty/teamutils@10.16.0) (2025-02-18)
+
+
+### Features
+
+* Add RxTeamUtils.observePlayerTeam(player) and RxTeamUtils.observePlayerTeamColor(player) ([046d6cd](https://github.com/Quenty/NevermoreEngine/commit/046d6cd192234c7165a1b4820aa68efad484ce4c))
+
+
+
+
+
 # [10.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.14.0...@quenty/teamutils@10.15.0) (2024-12-15)
 
 **Note:** Version bump only for package @quenty/teamutils

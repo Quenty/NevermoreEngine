@@ -1,4 +1,8 @@
+--!strict
 --[=[
+	Client to write InfluxDB points to the server.
+
+	@server
 	@class InfluxDBClient
 ]=]
 
@@ -7,16 +11,32 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local InfluxDBClientConfigUtils = require("InfluxDBClientConfigUtils")
 local InfluxDBWriteAPI = require("InfluxDBWriteAPI")
-local ValueObject = require("ValueObject")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
+local ValueObject = require("ValueObject")
 
 local InfluxDBClient = setmetatable({}, BaseObject)
 InfluxDBClient.ClassName = "InfluxDBClient"
 InfluxDBClient.__index = InfluxDBClient
 
-function InfluxDBClient.new(clientConfig)
-	local self = setmetatable(BaseObject.new(), InfluxDBClient)
+export type InfluxDBClient = typeof(setmetatable(
+	{} :: {
+		_clientConfig: ValueObject.ValueObject<InfluxDBClientConfigUtils.InfluxDBClientConfig>,
+		_writeApis: { [string]: { [string]: InfluxDBWriteAPI.InfluxDBWriteAPI } },
+		_flushAllPromises: Promise.Promise<()>,
+	},
+	{} :: typeof({ __index = InfluxDBClient })
+)) & BaseObject.BaseObject
+
+--[=[
+	Creates a new InfluxDB client
+
+	@param clientConfig InfluxDBClientConfig?
+	@return InfluxDBClient
+]=]
+function InfluxDBClient.new(clientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig?): InfluxDBClient
+	local self: InfluxDBClient = setmetatable(BaseObject.new() :: any, InfluxDBClient)
 
 	self._clientConfig = self._maid:Add(ValueObject.new(nil))
 
@@ -29,13 +49,26 @@ function InfluxDBClient.new(clientConfig)
 	return self
 end
 
-function InfluxDBClient:SetClientConfig(clientConfig)
+--[=[
+	Sets the client config for this client
+
+	@param clientConfig InfluxDBClientConfig
+]=]
+function InfluxDBClient.SetClientConfig(
+	self: InfluxDBClient,
+	clientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig
+)
 	assert(InfluxDBClientConfigUtils.isClientConfig(clientConfig), "Bad clientConfig")
 
 	self._clientConfig.Value = InfluxDBClientConfigUtils.createClientConfig(clientConfig)
 end
 
-function InfluxDBClient:GetWriteAPI(org, bucket, precision)
+function InfluxDBClient.GetWriteAPI(
+	self: InfluxDBClient,
+	org: string,
+	bucket: string,
+	precision: string?
+): InfluxDBWriteAPI.InfluxDBWriteAPI
 	assert(self._clientConfig, "No self._clientConfig")
 	assert(type(org) == "string", "Bad org")
 	assert(type(bucket) == "string", "Bad bucket")
@@ -75,20 +108,25 @@ function InfluxDBClient:GetWriteAPI(org, bucket, precision)
 	return writeAPI
 end
 
-function InfluxDBClient:PromiseFlushAll()
+--[=[
+	Flushes all write APIs. Returns a promise that resolves when all write APIs are flushed for all buckets.
+
+	@return Promise<()>
+]=]
+function InfluxDBClient.PromiseFlushAll(self: InfluxDBClient): Promise.Promise<()>
 	if self._flushAllPromises and self._flushAllPromises:IsPending() then
 		return self._flushAllPromises
 	end
 
 	local promises = {}
-	for _, bucketList in pairs(self._writeApis) do
-		for _, writeAPI in pairs(bucketList) do
+	for _, bucketList in self._writeApis do
+		for _, writeAPI: any in bucketList do
 			table.insert(promises, writeAPI:PromiseFlush())
 		end
 	end
 
 	self._flushAllPromises = PromiseUtils.all(promises)
-	return self._flushAllPromises
+	return self._flushAllPromises :: any
 end
 
 return InfluxDBClient

@@ -22,11 +22,11 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local SettingsDataService = require("SettingsDataService")
-local SettingProperty = require("SettingProperty")
-local ServiceBag = require("ServiceBag")
 local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
+local SettingProperty = require("SettingProperty")
+local SettingsDataService = require("SettingsDataService")
 
 local SettingDefinition = {}
 SettingDefinition.ClassName = "SettingDefinition"
@@ -59,7 +59,7 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingDefinition:Init(serviceBag)
+function SettingDefinition:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(serviceBag, "No serviceBag")
 	assert(not self._maid, "Already initialized")
 
@@ -76,7 +76,7 @@ end
 	@param player Player
 	@return T
 ]=]
-function SettingDefinition:Get(player)
+function SettingDefinition:Get(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -89,7 +89,7 @@ end
 	@param player Player
 	@param value T
 ]=]
-function SettingDefinition:Set(player, value)
+function SettingDefinition:Set(player: Player, value)
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -102,7 +102,7 @@ end
 	@param player Player
 	@return Promise<T>
 ]=]
-function SettingDefinition:Promise(player)
+function SettingDefinition:Promise(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -116,7 +116,7 @@ end
 	@param value T
 	@return Promise<T>
 ]=]
-function SettingDefinition:PromiseSet(player, value)
+function SettingDefinition:PromiseSet(player: Player, value)
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -129,7 +129,7 @@ end
 	@param player Player
 	@return Promise<T>
 ]=]
-function SettingDefinition:Observe(player)
+function SettingDefinition:Observe(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -142,7 +142,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function SettingDefinition.isSettingDefinition(value)
+function SettingDefinition.isSettingDefinition(value: any): boolean
 	return DuckTypeUtils.isImplementation(SettingDefinition, value)
 end
 
@@ -153,7 +153,7 @@ end
 	@param player Player
 	@return SettingProperty<T>
 ]=]
-function SettingDefinition:GetSettingProperty(serviceBag, player)
+function SettingDefinition:GetSettingProperty(serviceBag, player: Player)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 
@@ -178,7 +178,7 @@ end
 	Retrieves the default name of the setting
 	@return string
 ]=]
-function SettingDefinition:GetSettingName()
+function SettingDefinition:GetSettingName(): string
 	return self._settingName
 end
 

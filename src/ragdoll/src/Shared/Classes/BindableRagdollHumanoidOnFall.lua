@@ -42,7 +42,7 @@ function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 	end)
 
 	task.spawn(function()
-		task.wait(math.random()*FRAME_TIME) -- Apply jitter
+		task.wait(math.random() * FRAME_TIME) -- Apply jitter
 		while alive do
 			self:_updateVelocity()
 			task.wait(FRAME_TIME)
@@ -73,7 +73,7 @@ end
 function BindableRagdollHumanoidOnFall:_getLargestSpeedInRecords()
 	local largestSpeed = -math.huge
 
-	for _, velocityRecord in pairs(self._lastVelocityRecords) do
+	for _, velocityRecord in self._lastVelocityRecords do
 		local speed = velocityRecord.magnitude
 		if speed > largestSpeed then
 			largestSpeed = speed
@@ -87,9 +87,7 @@ function BindableRagdollHumanoidOnFall:_ragdollFromFall()
 	self.ShouldRagdoll.Value = true
 
 	task.spawn(function()
-		while self.Destroy
-			and self:_getLargestSpeedInRecords() >= 3
-			and self.ShouldRagdoll.Value do
+		while self.Destroy and self:_getLargestSpeedInRecords() >= 3 and self.ShouldRagdoll.Value do
 			task.wait(0.05)
 		end
 
@@ -117,7 +115,7 @@ function BindableRagdollHumanoidOnFall:_updateVelocity()
 
 	local fellForAllFrames = true
 	local mostNegativeVelocityY = math.huge
-	for _, velocityRecord in pairs(self._lastVelocityRecords) do
+	for _, velocityRecord in self._lastVelocityRecords do
 		if velocityRecord.y >= -2 then
 			fellForAllFrames = false
 			break
@@ -154,11 +152,9 @@ function BindableRagdollHumanoidOnFall:_updateVelocity()
 	end
 
 	local currentState = self._obj:GetState()
-	if currentState == Enum.HumanoidStateType.Physics
-		or currentState == Enum.HumanoidStateType.Swimming then
+	if currentState == Enum.HumanoidStateType.Physics or currentState == Enum.HumanoidStateType.Swimming then
 		return
 	end
-
 
 	if (os.clock() - self._lastRagDollTime) <= RAGDOLL_DEBOUNCE_TIME then
 		return

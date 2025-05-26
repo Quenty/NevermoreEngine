@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions for Color sequences in Roblox.
 	@class ColorSequenceUtils
@@ -29,13 +30,13 @@ function ColorSequenceUtils.getColor(colorSequence: ColorSequence, t: number): C
 		return keypoints[1].Value
 	end
 
-	for i=2, #keypoints do
+	for i = 2, #keypoints do
 		local point = keypoints[i]
 		if point.Time < t then
 			continue
 		end
 
-		local prevPoint = keypoints[i-1]
+		local prevPoint = keypoints[i - 1]
 		local scale = math.clamp(Math.map(t, prevPoint.Time, point.Time, 0, 1), 0, 1)
 		return prevPoint.Value:Lerp(point.Value, scale)
 	end
@@ -53,7 +54,13 @@ end
 	@param percentOffset number
 	@return ColorSequence
 ]=]
-function ColorSequenceUtils.stripe(stripes, backgroundColor3, stripeColor3, percentStripeThickness, percentOffset)
+function ColorSequenceUtils.stripe(
+	stripes: number,
+	backgroundColor3: Color3,
+	stripeColor3: Color3,
+	percentStripeThickness: number,
+	percentOffset: number
+): ColorSequence
 	percentOffset = percentOffset or 0
 	percentStripeThickness = math.clamp(percentStripeThickness or 0.5, 0, 1)
 
@@ -63,16 +70,16 @@ function ColorSequenceUtils.stripe(stripes, backgroundColor3, stripeColor3, perc
 		return ColorSequence.new(stripeColor3)
 	end
 
-	local timeWidth = 1/stripes
-	local timeOffset = percentOffset*timeWidth
-	timeOffset = timeOffset + percentStripeThickness*timeWidth*0.5 -- We add thickness to center
+	local timeWidth = 1 / stripes
+	local timeOffset = percentOffset * timeWidth
+	timeOffset = timeOffset + percentStripeThickness * timeWidth * 0.5 -- We add thickness to center
 	timeOffset = timeOffset % timeWidth
 
 	-- Generate initialial points
-	local waypoints = {}
-	for i=0, stripes-1 do
-		local timestampStart = (i/stripes + timeOffset) % 1
-		local timeStampMiddle = (timestampStart + timeWidth*(1 - percentStripeThickness)) % 1
+	local waypoints: { ColorSequenceKeypoint } = {}
+	for i = 0, stripes - 1 do
+		local timestampStart = (i / stripes + timeOffset) % 1
+		local timeStampMiddle = (timestampStart + timeWidth * (1 - percentStripeThickness)) % 1
 
 		table.insert(waypoints, ColorSequenceKeypoint.new(timestampStart, backgroundColor3))
 		table.insert(waypoints, ColorSequenceKeypoint.new(timeStampMiddle, stripeColor3))
@@ -82,13 +89,13 @@ function ColorSequenceUtils.stripe(stripes, backgroundColor3, stripeColor3, perc
 		return a.Time < b.Time
 	end)
 
-	local fullWaypoints = {}
+	local fullWaypoints: { ColorSequenceKeypoint } = {}
 
 	-- Handle first!
 	table.insert(fullWaypoints, waypoints[1])
 
-	for i=2, #waypoints do
-		local previous = waypoints[i-1]
+	for i = 2, #waypoints do
+		local previous = waypoints[i - 1]
 		local current = waypoints[i]
 
 		if current.Time - EPSILON > previous.Time then
@@ -101,7 +108,7 @@ function ColorSequenceUtils.stripe(stripes, backgroundColor3, stripeColor3, perc
 	-- Add beginning
 	local first = fullWaypoints[1]
 	if first.Time >= EPSILON then
-		local color
+		local color: Color3
 		if first.Value == backgroundColor3 then
 			color = stripeColor3
 		elseif first.Value == stripeColor3 then

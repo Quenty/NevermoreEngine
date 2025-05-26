@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Rx utility methods involving [BinderGroup] API surface
 	@class RxBinderGroupUtils
@@ -5,10 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RxBinderUtils = require("RxBinderUtils")
-local Observable = require("Observable")
+local BinderGroup = require("BinderGroup")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Rx = require("Rx")
+local RxBinderUtils = require("RxBinderUtils")
 
 local RxBinderGroupUtils = {}
 
@@ -17,7 +19,7 @@ local RxBinderGroupUtils = {}
 	@param binderGroup BinderGroup<T>
 	@return Observable<Binder<T>>
 ]=]
-function RxBinderGroupUtils.observeBinders(binderGroup)
+function RxBinderGroupUtils.observeBinders(binderGroup: BinderGroup.BinderGroup)
 	assert(type(binderGroup) == "table", "Bad binderGroup")
 
 	return Observable.new(function(sub)
@@ -27,13 +29,12 @@ function RxBinderGroupUtils.observeBinders(binderGroup)
 			sub:Fire(binder)
 		end))
 
-		for _, binder in pairs(binderGroup:GetBinders()) do
+		for _, binder in binderGroup:GetBinders() do
 			sub:Fire(binder)
 		end
 
 		return maid
 	end)
-
 end
 
 --[=[
@@ -44,10 +45,9 @@ end
 function RxBinderGroupUtils.observeAllClassesBrio(binderGroup)
 	assert(type(binderGroup) == "table", "Bad binderGroup")
 
-	return RxBinderGroupUtils.observeBinders(binderGroup)
-		:Pipe({
-			Rx.flatMap(RxBinderUtils.observeAllBrio)
-		})
+	return RxBinderGroupUtils.observeBinders(binderGroup):Pipe({
+		Rx.flatMap(RxBinderUtils.observeAllBrio) :: any,
+	}) :: any
 end
 
 return RxBinderGroupUtils

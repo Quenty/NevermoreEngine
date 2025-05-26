@@ -4,12 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RogueModifierBase = require("RogueModifierBase")
-local RxInstanceUtils = require("RxInstanceUtils")
 local Binder = require("Binder")
-local Rx = require("Rx")
 local LinearValue = require("LinearValue")
+local RogueModifierBase = require("RogueModifierBase")
 local RogueModifierInterface = require("RogueModifierInterface")
+local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RogueAdditive = setmetatable({}, RogueModifierBase)
 RogueAdditive.ClassName = "RogueAdditive"
@@ -39,8 +39,8 @@ end
 
 function RogueAdditive:ObserveModifiedVersion(inputValue)
 	return Rx.combineLatest({
-		inputValue = inputValue;
-		additive = RxInstanceUtils.observeProperty(self._obj, "Value");
+		inputValue = inputValue,
+		additive = RxInstanceUtils.observeProperty(self._obj, "Value"),
 	}):Pipe({
 		Rx.map(function(state)
 			if state.inputValue and type(state.inputValue) == type(state.additive) then
@@ -51,8 +51,8 @@ function RogueAdditive:ObserveModifiedVersion(inputValue)
 			else
 				return state.inputValue
 			end
-		end);
-		Rx.distinct();
+		end),
+		Rx.distinct(),
 	})
 end
 

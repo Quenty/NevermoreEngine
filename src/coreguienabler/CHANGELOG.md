@@ -3,6 +3,80 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.18.3...@quenty/coreguienabler@12.19.0) (2025-05-10)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
+## [12.18.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.18.2...@quenty/coreguienabler@12.18.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
+## [12.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.18.0...@quenty/coreguienabler@12.18.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [12.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.18.0...@quenty/coreguienabler@12.18.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
+# [12.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.17.2...@quenty/coreguienabler@12.18.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
+## [12.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.17.1...@quenty/coreguienabler@12.17.2) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
+## [12.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.17.0...@quenty/coreguienabler@12.17.1) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
+# [12.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.16.0...@quenty/coreguienabler@12.17.0) (2025-02-18)
+
+
+### Features
+
+* Add EnableMouseLockOption to CoreGuiEnabler ([970a8da](https://github.com/Quenty/NevermoreEngine/commit/970a8dae16e83dd52e4d0c60b049873b1966b7b5))
+
+
+
+
+
 # [12.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.15.0...@quenty/coreguienabler@12.16.0) (2025-01-24)
 
 **Note:** Version bump only for package @quenty/coreguienabler

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Selects the most recent input mode and attempts to identify the best state from it.
 	@class InputModeTypeSelector
@@ -5,21 +6,38 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
+local InputModeServiceClient = require("InputModeServiceClient")
+local InputModeType = require("InputModeType")
 local InputModeTypes = require("InputModeTypes")
 local Maid = require("Maid")
-local ValueObject = require("ValueObject")
-local InputModeServiceClient = require("InputModeServiceClient")
-local ServiceBag = require("ServiceBag")
+local Observable = require("Observable")
 local Rx = require("Rx")
-local InputModeType = require("InputModeType")
+local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local InputModeTypeSelector = {}
 InputModeTypeSelector.ClassName = "InputModeTypeSelector"
 InputModeTypeSelector.DEFAULT_MODE_TYPES = {
 	InputModeTypes.Gamepads,
 	InputModeTypes.Keyboard,
-	InputModeTypes.Touch
-}
+	InputModeTypes.Touch,
+} :: { InputModeType.InputModeType }
+
+export type InputModeTypeSelector = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_inputModeTypeList: { InputModeType.InputModeType },
+		_activeModeType: ValueObject.ValueObject<InputModeType.InputModeType>,
+		_serviceBag: ServiceBag.ServiceBag,
+		_inputModeServiceClient: InputModeServiceClient.InputModeServiceClient,
+
+		Value: InputModeType.InputModeType?,
+		Changed: Signal.Signal<InputModeType.InputModeType, InputModeType.InputModeType>,
+	},
+	{} :: typeof({ __index = InputModeTypeSelector })
+))
 
 --[=[
 	Constructs a new InputModeTypeSelector
@@ -28,8 +46,11 @@ InputModeTypeSelector.DEFAULT_MODE_TYPES = {
 	@param inputModesTypes { InputModeType }
 	@return InputModeTypeSelector
 ]=]
-function InputModeTypeSelector.new(serviceBag, inputModesTypes)
-	local self = setmetatable({}, InputModeTypeSelector)
+function InputModeTypeSelector.new(
+	serviceBag: ServiceBag.ServiceBag,
+	inputModesTypes: { InputModeType.InputModeType }
+): InputModeTypeSelector
+	local self: any = setmetatable({}, InputModeTypeSelector)
 
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
@@ -44,14 +65,14 @@ function InputModeTypeSelector.new(serviceBag, inputModesTypes)
 
 	self._activeModeType = self._maid:Add(ValueObject.new())
 
---[=[
+	--[=[
 	Event that fires whenever the active mode changes.
 	@prop Changed Signal<InputModeType, InputModeType> -- newMode, oldMode
 	@within InputModeTypeSelector
 ]=]
 	self.Changed = self._activeModeType.Changed
 
-	for _, inputModeType in pairs(inputModesTypes or InputModeTypeSelector.DEFAULT_MODE_TYPES) do
+	for _, inputModeType in inputModesTypes or InputModeTypeSelector.DEFAULT_MODE_TYPES do
 		self:AddInputModeType(inputModeType)
 	end
 
@@ -65,7 +86,10 @@ end
 	@param observeInputModesBrio Observable<Brio<InputModeType>>
 	@return InputModeTypeSelector
 ]=]
-function InputModeTypeSelector.fromObservableBrio(serviceBag, observeInputModesBrio)
+function InputModeTypeSelector.fromObservableBrio(
+	serviceBag: ServiceBag.ServiceBag,
+	observeInputModesBrio: Observable.Observable<Brio.Brio<InputModeType.InputModeType>>
+): InputModeTypeSelector
 	local selector = InputModeTypeSelector.new(serviceBag, {})
 
 	selector._maid:GiveTask(observeInputModesBrio:Subscribe(function(brio)
@@ -91,16 +115,16 @@ end
 	Returns the current active mode
 	@return InputModeType
 ]=]
-function InputModeTypeSelector:GetActiveInputType()
-	return rawget(self, "_activeModeType").Value
+function InputModeTypeSelector.GetActiveInputType(self: InputModeTypeSelector)
+	return rawget(self :: any, "_activeModeType").Value
 end
 
 --[=[
 	Observes the current active mode
 	@return Observable<InputModeType>
 ]=]
-function InputModeTypeSelector:ObserveActiveInputType()
-	return rawget(self, "_activeModeType"):Observe()
+function InputModeTypeSelector.ObserveActiveInputType(self: InputModeTypeSelector)
+	return rawget(self :: any, "_activeModeType"):Observe()
 end
 
 --[=[
@@ -109,10 +133,10 @@ end
 	@param inputModeType InputModeType
 	@return boolean
 ]=]
-function InputModeTypeSelector:IsActive(inputModeType)
+function InputModeTypeSelector.IsActive(self: InputModeTypeSelector, inputModeType: InputModeType.InputModeType)
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
-	return rawget(self, "_activeModeType").Value == inputModeType
+	return rawget(self :: any, "_activeModeType").Value == inputModeType
 end
 
 --[=[
@@ -121,14 +145,17 @@ end
 	@param inputModeType InputModeType
 	@return Observable<boolean>
 ]=]
-function InputModeTypeSelector:ObserveIsActive(inputModeType)
+function InputModeTypeSelector.ObserveIsActive(
+	self: InputModeTypeSelector,
+	inputModeType: InputModeType.InputModeType
+): Observable.Observable<boolean>
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	return self:ObserveActiveInputType():Pipe({
-		Rx.map(function(inputType)
+		Rx.map(function(inputType: InputModeType.InputModeType)
 			return inputType == inputModeType
-		end);
-		Rx.distinct();
+		end) :: any,
+		Rx.distinct(),
 	})
 end
 
@@ -137,13 +164,13 @@ end
 	@prop Value InputModeType?
 	@within InputModeTypeSelector
 ]=]
-function InputModeTypeSelector:__index(index)
+function InputModeTypeSelector.__index(self: InputModeTypeSelector, index)
 	if index == "Value" then
-		return rawget(self, "_activeModeType").Value
+		return rawget(self :: any, "_activeModeType").Value
 	elseif InputModeTypeSelector[index] then
 		return InputModeTypeSelector[index]
 	else
-		local value = rawget(self, index)
+		local value = rawget(self :: any, index)
 		if value then
 			return value
 		else
@@ -176,7 +203,10 @@ end
 	@param updateBindFunction (newMode: InputModeType, modeMaid: Maid) -> ()
 	@return InputModeTypeSelector
 ]=]
-function InputModeTypeSelector:Bind(updateBindFunction)
+function InputModeTypeSelector.Bind(
+	self: InputModeTypeSelector,
+	updateBindFunction: (InputModeType.InputModeType, Maid.Maid) -> ()
+): InputModeTypeSelector
 	local maid = Maid.new()
 	self._maid[updateBindFunction] = maid
 
@@ -203,7 +233,10 @@ end
 	Removes the input mode
 	@param inputModeType InputModeType
 ]=]
-function InputModeTypeSelector:RemoveInputModeType(inputModeType)
+function InputModeTypeSelector.RemoveInputModeType(
+	self: InputModeTypeSelector,
+	inputModeType: InputModeType.InputModeType
+)
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	if not self._maid[inputModeType] then
@@ -228,7 +261,7 @@ end
 	Adds a new input mode
 	@param inputModeType InputModeType
 ]=]
-function InputModeTypeSelector:AddInputModeType(inputModeType)
+function InputModeTypeSelector.AddInputModeType(self: InputModeTypeSelector, inputModeType: InputModeType.InputModeType)
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	if self._maid[inputModeType] then
@@ -241,16 +274,19 @@ function InputModeTypeSelector:AddInputModeType(inputModeType)
 		self._activeModeType.Value = inputModeType
 	end)
 
-	if not self._activeModeType.Value
-		or inputMode:GetLastEnabledTime() > self._inputModeServiceClient:GetInputMode(self._activeModeType.Value):GetLastEnabledTime() then
+	if
+		not self._activeModeType.Value
+		or inputMode:GetLastEnabledTime()
+			> self._inputModeServiceClient:GetInputMode(self._activeModeType.Value):GetLastEnabledTime()
+	then
 		self._activeModeType.Value = inputModeType
 	end
 end
 
-function InputModeTypeSelector:_pickNewInputMode()
+function InputModeTypeSelector._pickNewInputMode(self: InputModeTypeSelector)
 	local bestEnabledTime = -math.huge
 	local bestModeType
-	for _, inputModeType in pairs(self._inputModeTypeList) do
+	for _, inputModeType in self._inputModeTypeList do
 		local enableTime = self._inputModeServiceClient:GetInputMode(inputModeType):GetLastEnabledTime()
 		if enableTime >= bestEnabledTime then
 			bestEnabledTime = enableTime
@@ -268,9 +304,9 @@ end
 	This should be called whenever the mode selector is done being used.
 	:::
 ]=]
-function InputModeTypeSelector:Destroy()
+function InputModeTypeSelector.Destroy(self: InputModeTypeSelector)
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return InputModeTypeSelector

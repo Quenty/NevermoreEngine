@@ -8,6 +8,7 @@ local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableSet = require("ObservableSet")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
@@ -17,7 +18,7 @@ local AdorneeModelBoundingBox = setmetatable({}, BaseObject)
 AdorneeModelBoundingBox.ClassName = "AdorneeModelBoundingBox"
 AdorneeModelBoundingBox.__index = AdorneeModelBoundingBox
 
-function AdorneeModelBoundingBox.new(model)
+function AdorneeModelBoundingBox.new(model: Model)
 	local self = setmetatable(BaseObject.new(model), AdorneeModelBoundingBox)
 
 	self._bbCFrame = self._maid:Add(ValueObject.new(nil))
@@ -41,33 +42,39 @@ function AdorneeModelBoundingBox.new(model)
 		self._isDirty.Value = true
 	end))
 
-	self._maid:GiveTask(self._isDirty:Observe():Pipe({
-		Rx.where(function(value)
-			return value
-		end);
-		Rx.throttleDefer();
-	}):Subscribe(function()
-		debug.profilebegin("modelboundingbox")
-		self._isDirty.Value = false
+	self._maid:GiveTask(self._isDirty
+		:Observe()
+		:Pipe({
+			Rx.where(function(value)
+				return value
+			end),
+			Rx.throttleDefer(),
+		})
+		:Subscribe(function()
+			debug.profilebegin("modelboundingbox")
+			self._isDirty.Value = false
 
-		local bbCFrame, bbSize = self._obj:GetBoundingBox()
-		self._bbSize.Value = bbSize
-		self._bbCFrame.Value = bbCFrame
-		debug.profileend()
-	end))
+			local bbCFrame, bbSize = self._obj:GetBoundingBox()
+			self._bbSize.Value = bbSize
+			self._bbCFrame.Value = bbCFrame
+			debug.profileend()
+		end))
 
-	self._maid:GiveTask(self._unanchoredPartsSet:ObserveCount():Pipe({
-		Rx.map(function(value)
-			return value > 0
-		end);
-		Rx.distinct();
-	}):Subscribe(function(hasUnanchoredParts)
-		if hasUnanchoredParts then
-			self._maid._current = self:_setupUnanchoredLoop()
-		else
-			self._maid._current = nil
-		end
-	end))
+	self._maid:GiveTask(self._unanchoredPartsSet
+		:ObserveCount()
+		:Pipe({
+			Rx.map(function(value)
+				return value > 0
+			end),
+			Rx.distinct(),
+		})
+		:Subscribe(function(hasUnanchoredParts)
+			if hasUnanchoredParts then
+				self._maid._current = self:_setupUnanchoredLoop()
+			else
+				self._maid._current = nil
+			end
+		end))
 
 	return self
 end
@@ -83,7 +90,7 @@ function AdorneeModelBoundingBox:_setupUnanchoredLoop()
 	return maid
 end
 
-function AdorneeModelBoundingBox:_handlePart(topMaid, part)
+function AdorneeModelBoundingBox:_handlePart(topMaid, part: BasePart)
 	topMaid:GiveTask(RxInstanceUtils.observePropertyBrio(part, "Anchored", function(isAnchored)
 		return not isAnchored
 	end):Subscribe(function(brio)
@@ -112,15 +119,15 @@ function AdorneeModelBoundingBox:_observeBasisChanged()
 			else
 				return RxInstanceUtils.observeProperty(self._obj, "WorldPivot")
 			end
-		end)
+		end),
 	})
 end
 
-function AdorneeModelBoundingBox:ObserveCFrame()
+function AdorneeModelBoundingBox:ObserveCFrame(): Observable.Observable<CFrame>
 	return self._bbCFrame:Observe()
 end
 
-function AdorneeModelBoundingBox:ObserveSize()
+function AdorneeModelBoundingBox:ObserveSize(): Observable.Observable<Vector3>
 	return self._bbSize:Observe()
 end
 

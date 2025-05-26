@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Groups binders together into a list, and allows binders to be dynamically
 	added or removed.
@@ -18,6 +19,17 @@ local BinderGroup = {}
 BinderGroup.ClassName = "BinderGroup"
 BinderGroup.__index = BinderGroup
 
+export type BinderConstructorValidator = (constructor: Binder.BinderConstructor<any>) -> boolean
+
+export type BinderGroup = typeof(setmetatable(
+	{} :: {
+		_binders: { Binder.Binder<any> },
+		_bindersByTag: { [string]: Binder.Binder<any> },
+		_validateConstructor: BinderConstructorValidator?,
+		BinderAdded: Signal.Signal<Binder.Binder<any>>,
+	},
+	{} :: typeof({ __index = BinderGroup })
+))
 --[=[
 	Constructs a new BinderGroup
 
@@ -25,14 +37,14 @@ BinderGroup.__index = BinderGroup
 	@param validateConstructor (constructor: any) -> boolean -- Validates a binder matches T
 	@return BinderGroup<T>
 ]=]
-function BinderGroup.new(binders, validateConstructor)
-	local self = setmetatable({}, BinderGroup)
+function BinderGroup.new(binders: { Binder.Binder<any> }, validateConstructor: BinderConstructorValidator?): BinderGroup
+	local self: BinderGroup = setmetatable({} :: any, BinderGroup)
 
 	self._binders = {}
 	self._bindersByTag = {}
 	self._validateConstructor = validateConstructor
 
-	self.BinderAdded = Signal.new()
+	self.BinderAdded = Signal.new() :: any
 
 	self:AddList(binders)
 
@@ -44,13 +56,13 @@ end
 
 	@param binders { Binder<T> }
 ]=]
-function BinderGroup:AddList(binders)
+function BinderGroup.AddList(self: BinderGroup, binders: { Binder.Binder<any> })
 	assert(type(binders) == "table", "Bad binders")
 
 	-- Assume to be using osyris's typechecking library,
 	-- we have an optional constructor to validate binder classes.
-	for _, binder in pairs(binders) do
-		self:Add(binder)
+	for _, binder in binders do
+		self:Add(binder :: any)
 	end
 end
 
@@ -59,7 +71,7 @@ end
 
 	@param binder Binder<T>
 ]=]
-function BinderGroup:Add(binder)
+function BinderGroup.Add(self: BinderGroup, binder: Binder.Binder<any>)
 	assert(Binder.isBinder(binder), "Binder is not a binder")
 
 	if self._validateConstructor then
@@ -84,9 +96,9 @@ end
 	Do not modify the list of binders returned here
 	:::
 
-	@return { T }
+	@return { Binder.Binder<any> }
 ]=]
-function BinderGroup:GetBinders()
+function BinderGroup.GetBinders(self: BinderGroup): { Binder.Binder<any> }
 	assert(self._binders, "No self._binders")
 
 	return self._binders

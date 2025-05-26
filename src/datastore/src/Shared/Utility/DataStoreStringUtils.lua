@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods to validate strings which can be used to attack datastores in a string saving attack otherwise.
 
@@ -12,7 +13,7 @@ local DataStoreStringUtils = {}
 	@param str string
 	@return boolean
 ]=]
-function DataStoreStringUtils.isValidUTF8(str)
+function DataStoreStringUtils.isValidUTF8(str: string): (boolean, string?)
 	if type(str) ~= "string" then
 		return false, "Not a string"
 	end

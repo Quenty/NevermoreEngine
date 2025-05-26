@@ -1,22 +1,32 @@
+--!strict
 --[=[
 	@class ScoredActionPicker
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Set = require("Set")
-local ValueObject = require("ValueObject")
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local ScoredAction = require("ScoredAction")
+local Set = require("Set")
+local ValueObject = require("ValueObject")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
 
-local ScoredActionPicker = setmetatable({},BaseObject)
+local ScoredActionPicker = setmetatable({}, BaseObject)
 ScoredActionPicker.ClassName = "ScoredActionPicker"
 ScoredActionPicker.__index = ScoredActionPicker
 
+export type ScoredActionPicker = typeof(setmetatable(
+	{} :: {
+		_actionSet: { [ScoredAction.ScoredAction]: boolean },
+		_currentPreferred: ValueObject.ValueObject<ScoredAction.ScoredAction?>,
+	},
+	{} :: typeof({ __index = ScoredActionPicker })
+)) & BaseObject.BaseObject
+
 function ScoredActionPicker.new()
-	local self = setmetatable(BaseObject.new(), ScoredActionPicker)
+	local self: ScoredActionPicker = setmetatable(BaseObject.new() :: any, ScoredActionPicker)
 
 	self._actionSet = {}
 	self._currentPreferred = self._maid:Add(ValueObject.new())
@@ -34,13 +44,13 @@ function ScoredActionPicker.new()
 	return self
 end
 
-function ScoredActionPicker:Update()
+function ScoredActionPicker.Update(self: ScoredActionPicker): ()
 	if not next(self._actionSet) then
 		self._currentPreferred.Value = nil
 		return
 	end
 
-	local actionList = Set.toList(self._actionSet)
+	local actionList: { ScoredAction.ScoredAction } = Set.toList(self._actionSet)
 	table.sort(actionList, function(a, b)
 		if a._score == b._score then
 			-- Older objects have preference in ties
@@ -51,10 +61,16 @@ function ScoredActionPicker:Update()
 	end)
 
 	if #actionList > MAX_ACTION_LIST_SIZE_BEFORE_WARN then
-		warn(string.format("[ScoredActionPicker.Update] - Action list has size of %d/%d", #actionList, MAX_ACTION_LIST_SIZE_BEFORE_WARN))
+		warn(
+			string.format(
+				"[ScoredActionPicker.Update] - Action list has size of %d/%d",
+				#actionList,
+				MAX_ACTION_LIST_SIZE_BEFORE_WARN
+			)
+		)
 	end
 
-	for _, action in actionList do
+	for _, action: any in actionList do
 		local preferredAction = self:_tryGetValidPreferredAction(action)
 		if preferredAction then
 			self._currentPreferred.Value = preferredAction
@@ -63,7 +79,10 @@ function ScoredActionPicker:Update()
 	end
 end
 
-function ScoredActionPicker:_tryGetValidPreferredAction(action)
+function ScoredActionPicker._tryGetValidPreferredAction(
+	_self: ScoredActionPicker,
+	action: ScoredAction.ScoredAction
+): ScoredAction.ScoredAction?
 	if not action then
 		return nil
 	end
@@ -80,14 +99,14 @@ function ScoredActionPicker:_tryGetValidPreferredAction(action)
 	return action
 end
 
-function ScoredActionPicker:AddAction(action)
+function ScoredActionPicker.AddAction(self: ScoredActionPicker, action: ScoredAction.ScoredAction): ()
 	assert(type(action) == "table", "Bad action")
 
 	self._actionSet[action] = true
 	self:Update()
 end
 
-function ScoredActionPicker:RemoveAction(action)
+function ScoredActionPicker.RemoveAction(self: ScoredActionPicker, action: ScoredAction.ScoredAction): ()
 	assert(type(action) == "table", "Bad action")
 
 	if self._currentPreferred.Value == action then
@@ -98,7 +117,7 @@ function ScoredActionPicker:RemoveAction(action)
 	self:Update()
 end
 
-function ScoredActionPicker:HasActions()
+function ScoredActionPicker.HasActions(self: ScoredActionPicker): boolean
 	return next(self._actionSet) ~= nil
 end
 

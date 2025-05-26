@@ -22,7 +22,7 @@ PlayerCharacterBinder.__index = PlayerCharacterBinder
 	@param ... any
 	@return PlayerCharacterBinder<T>
 ]=]
-function PlayerCharacterBinder.new(tag, class, ...)
+function PlayerCharacterBinder.new(tag: string, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerCharacterBinder)
 
 	return self
@@ -46,7 +46,7 @@ end
 	Sets whether tagging should be enabled
 	@param shouldTag boolean
 ]=]
-function PlayerCharacterBinder:SetAutomaticTagging(shouldTag)
+function PlayerCharacterBinder:SetAutomaticTagging(shouldTag: boolean)
 	assert(type(shouldTag) == "boolean", "Bad shouldTag")
 	assert(self._shouldTag, "Missing self._shouldTag")
 
@@ -97,7 +97,7 @@ function PlayerCharacterBinder:_bindTagging(doUnbinding)
 			playerMaid[player] = nil
 		end))
 
-		for _, player in pairs(Players:GetPlayers()) do
+		for _, player in Players:GetPlayers() do
 			self:_handlePlayerAdded(playerMaid, player)
 		end
 
@@ -106,7 +106,7 @@ function PlayerCharacterBinder:_bindTagging(doUnbinding)
 		self._maid._tagging = nil
 
 		if doUnbinding then
-			for _, player in pairs(Players:GetPlayers()) do
+			for _, player in Players:GetPlayers() do
 				local character = player.Character
 				if character then
 					self:Unbind(character)
@@ -129,6 +129,5 @@ function PlayerCharacterBinder:_handlePlayerAdded(playerMaid, player)
 
 	playerMaid[player] = maid
 end
-
 
 return PlayerCharacterBinder

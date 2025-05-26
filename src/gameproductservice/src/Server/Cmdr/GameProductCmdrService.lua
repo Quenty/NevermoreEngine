@@ -4,113 +4,149 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerUtils = require("PlayerUtils")
+local CmdrService = require("CmdrService")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameProductService = require("GameProductService")
+local PlayerUtils = require("PlayerUtils")
+local ServiceBag = require("ServiceBag")
 
 local GameProductCmdrService = {}
 GameProductCmdrService.ServiceName = "GameProductCmdrService"
 
-function GameProductCmdrService:Init(serviceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type GameProductCmdrService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_cmdrService: CmdrService.CmdrService,
+		_gameProductService: GameProductService.GameProductService,
+	},
+	{} :: typeof({ __index = GameProductCmdrService })
+))
+
+function GameProductCmdrService.Init(self: GameProductCmdrService, serviceBag: ServiceBag.ServiceBag)
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
 	self._gameProductService = self._serviceBag:GetService(require("GameProductService"))
 end
 
-function GameProductCmdrService:Start()
+function GameProductCmdrService.Start(self: GameProductCmdrService)
 	self:_registerCommands()
 end
 
-function GameProductCmdrService:_registerCommands()
+function GameProductCmdrService._registerCommands(self: GameProductCmdrService)
 	self._cmdrService:RegisterCommand({
-		Name = "prompt-product";
-		Description = "Prompts the player to make a product purchase game-product-service.";
-		Group = "GameConfig";
+		Name = "prompt-product",
+		Description = "Prompts the player to make a product purchase game-product-service.",
+		Group = "GameConfig",
 		Args = {
 			{
-				Name = "Player";
-				Type = "players";
-				Description = "The player to prompt.";
+				Name = "Player",
+				Type = "players",
+				Description = "The player to prompt.",
 			},
 			{
-				Name = "Product";
-				Type = "productId";
-				Description = "The Product to prompt.";
+				Name = "Product",
+				Type = "productId",
+				Description = "The Product to prompt.",
 			},
-		};
+		},
 	}, function(_context, players, productId)
 		local givenTo = {}
 
-		for _, player in pairs(players) do
-			self._gameProductService:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.PRODUCT, productId)
+		for _, player in players do
+			self._gameProductService
+				:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.PRODUCT, productId)
 				:Then(function(isPurchased)
-					print(string.format("User %s product purchase done. isPurchased: %s",
-						PlayerUtils.formatName(player), tostring(isPurchased)))
+					print(
+						string.format(
+							"User %s product purchase done. isPurchased: %s",
+							PlayerUtils.formatName(player),
+							tostring(isPurchased)
+						)
+					)
 				end)
 
-			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), productId))
+			table.insert(
+				givenTo,
+				string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), productId)
+			)
 		end
 
 		return string.format("Prompted: %s", table.concat(givenTo, ", "))
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "prompt-pass";
-		Description = "Prompts the player to make a gamepass purchase.";
-		Group = "GameConfig";
+		Name = "prompt-pass",
+		Description = "Prompts the player to make a gamepass purchase.",
+		Group = "GameConfig",
 		Args = {
 			{
-				Name = "Player";
-				Type = "players";
-				Description = "The player to prompt.";
+				Name = "Player",
+				Type = "players",
+				Description = "The player to prompt.",
 			},
 			{
-				Name = "GamePass";
-				Type = "passId";
-				Description = "The gamepass to prompt.";
+				Name = "GamePass",
+				Type = "passId",
+				Description = "The gamepass to prompt.",
 			},
-		};
+		},
 	}, function(_context, players, gamePassId)
 		local givenTo = {}
 
-		for _, player in pairs(players) do
-			self._gameProductService:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.PASS, gamePassId)
+		for _, player in players do
+			self._gameProductService
+				:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.PASS, gamePassId)
 				:Then(function(isPurchased)
-					print(string.format("User %s pass prompt done. isPurchased: %s",
-						PlayerUtils.formatName(player), tostring(isPurchased)))
+					print(
+						string.format(
+							"User %s pass prompt done. isPurchased: %s",
+							PlayerUtils.formatName(player),
+							tostring(isPurchased)
+						)
+					)
 				end)
 
-			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), gamePassId))
+			table.insert(
+				givenTo,
+				string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), gamePassId)
+			)
 		end
 
 		return string.format("Prompted: %s", table.concat(givenTo, ", "))
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "prompt-asset";
-		Description = "Prompts the player to make an asset purchase.";
-		Group = "GameConfig";
+		Name = "prompt-asset",
+		Description = "Prompts the player to make an asset purchase.",
+		Group = "GameConfig",
 		Args = {
 			{
-				Name = "Player";
-				Type = "players";
-				Description = "The player to prompt.";
+				Name = "Player",
+				Type = "players",
+				Description = "The player to prompt.",
 			},
 			{
-				Name = "Asset";
-				Type = "assetId";
-				Description = "The asset to prompt.";
+				Name = "Asset",
+				Type = "assetId",
+				Description = "The asset to prompt.",
 			},
-		};
+		},
 	}, function(_context, players, assetId)
 		local givenTo = {}
 
-		for _, player in pairs(players) do
-			self._gameProductService:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.ASSET, assetId)
+		for _, player in players do
+			self._gameProductService
+				:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.ASSET, assetId)
 				:Then(function(isPurchased)
-					print(string.format("User %s asset prompt done. isPurchased: %s",
-						PlayerUtils.formatName(player), tostring(isPurchased)))
+					print(
+						string.format(
+							"User %s asset prompt done. isPurchased: %s",
+							PlayerUtils.formatName(player),
+							tostring(isPurchased)
+						)
+					)
 				end)
 
 			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), assetId))
@@ -120,36 +156,41 @@ function GameProductCmdrService:_registerCommands()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "prompt-bundle";
-		Description = "Prompts the player to make a bundle purchase.";
-		Group = "GameConfig";
+		Name = "prompt-bundle",
+		Description = "Prompts the player to make a bundle purchase.",
+		Group = "GameConfig",
 		Args = {
 			{
-				Name = "Player";
-				Type = "players";
-				Description = "The player to prompt.";
+				Name = "Player",
+				Type = "players",
+				Description = "The player to prompt.",
 			},
 			{
-				Name = "Bundle";
-				Type = "bundleId";
-				Description = "The asset to prompt.";
+				Name = "Bundle",
+				Type = "bundleId",
+				Description = "The asset to prompt.",
 			},
-		};
+		},
 	}, function(_context, players, bundleId)
 		local givenTo = {}
 
-		for _, player in pairs(players) do
-			self._gameProductService:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.BUNDLE, bundleId)
+		for _, player in players do
+			self._gameProductService
+				:PromisePlayerPromptPurchase(player, GameConfigAssetTypes.BUNDLE, bundleId)
 				:Then(function(isPurchased)
-					print(string.format("User %s bundle prompt done. isPurchased: %s",
-						PlayerUtils.formatName(player), tostring(isPurchased)))
+					print(
+						string.format(
+							"User %s bundle prompt done. isPurchased: %s",
+							PlayerUtils.formatName(player),
+							tostring(isPurchased)
+						)
+					)
 				end)
 			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), bundleId))
 		end
 
 		return string.format("Prompted: %s", table.concat(givenTo, ", "))
 	end)
-
 end
 
 return GameProductCmdrService

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class AccessoryTypeUtils
 ]=]
@@ -10,7 +11,13 @@ local AvatarEditorService = game:GetService("AvatarEditorService")
 
 local AccessoryTypeUtils = {}
 
-function AccessoryTypeUtils.tryGetAccessoryType(avatarAssetType: AvatarAssetType): (AccessoryType?, string?)
+--[=[
+	Converts an enum value (retrieved from AvatarEditorService) into a proper enum if possible
+
+	@param avatarAssetType Enum.AvatarAssetType
+	@return Enum.AccessoryType?
+]=]
+function AccessoryTypeUtils.tryGetAccessoryType(avatarAssetType: Enum.AvatarAssetType): (Enum.AccessoryType?, string?)
 	if not avatarAssetType then
 		return nil, "No avatarAssetType"
 	end
@@ -26,8 +33,14 @@ function AccessoryTypeUtils.tryGetAccessoryType(avatarAssetType: AvatarAssetType
 	return accessoryType
 end
 
-function AccessoryTypeUtils.getAccessoryTypeFromName(accessoryType: string): AccessoryType
-	for _, enumItem in pairs(Enum.AccessoryType:GetEnumItems()) do
+--[=[
+	Converts a string into an enum value
+
+	@param accessoryType string
+	@return Enum.AccessoryType
+]=]
+function AccessoryTypeUtils.getAccessoryTypeFromName(accessoryType: string): Enum.AccessoryType
+	for _, enumItem in Enum.AccessoryType:GetEnumItems() do
 		if enumItem.Name == accessoryType then
 			return enumItem
 		end
@@ -40,24 +53,24 @@ end
 	Converts an enum value (retrieved from MarketplaceService) into a proper enum if possible
 
 	@param assetTypeId number
-	@return AssetType | nl
+	@return Enum.AssetType?
 ]=]
-function AccessoryTypeUtils.convertAssetTypeIdToAssetType(assetTypeId: number): AssetType?
+function AccessoryTypeUtils.convertAssetTypeIdToAssetType(assetTypeId: number): Enum.AssetType?
 	assert(type(assetTypeId) == "number", "Bad assetTypeId")
 
-	return EnumUtils.toEnum(Enum.AssetType, assetTypeId)
+	return EnumUtils.toEnum(Enum.AssetType, assetTypeId) :: any
 end
 
 --[=[
 	Converts an enum value (retrieved from MarketplaceService) into a proper enum if possible
 
 	@param avatarAssetTypeId number
-	@return AvatarAssetType | nil
+	@return Enum.AvatarAssetType?
 ]=]
-function AccessoryTypeUtils.convertAssetTypeIdToAvatarAssetType(avatarAssetTypeId: number): AvatarAssetType?
+function AccessoryTypeUtils.convertAssetTypeIdToAvatarAssetType(avatarAssetTypeId: number): Enum.AvatarAssetType?
 	assert(type(avatarAssetTypeId) == "number", "Bad avatarAssetTypeId")
 
-	return EnumUtils.toEnum(Enum.AvatarAssetType, avatarAssetTypeId)
+	return EnumUtils.toEnum(Enum.AvatarAssetType, avatarAssetTypeId) :: any
 end
 
 return AccessoryTypeUtils

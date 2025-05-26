@@ -1,11 +1,12 @@
+--!strict
 --[=[
 	@class PromiseInstanceUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local PromiseInstanceUtils = {}
 
@@ -15,7 +16,7 @@ local PromiseInstanceUtils = {}
 	@param instance Instance
 	@return Promise
 ]=]
-function PromiseInstanceUtils.promiseRemoved(instance)
+function PromiseInstanceUtils.promiseRemoved(instance: Instance): Promise.Promise<()>
 	assert(instance:IsDescendantOf(game))
 
 	local maid = Maid.new()

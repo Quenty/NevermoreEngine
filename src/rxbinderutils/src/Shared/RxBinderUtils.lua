@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods to observe bound objects on instances. This is what makes the Rx library with
 	binders really good.
@@ -32,17 +33,20 @@ local RxBinderUtils = {}
 	@param binder Binder<T>
 	@return Observable<Brio<T>>
 ]=]
-function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
+function RxBinderUtils.observeLinkedBoundClassBrio<T>(
+	linkName: string,
+	parent: Instance,
+	binder: Binder.Binder<T>
+): Observable.Observable<Brio.Brio<T>>
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(Binder.isBinder(binder), "Bad binder")
 
-	return RxLinkUtils.observeValidLinksBrio(linkName, parent)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(_, linkValue)
-				return binder:ObserveBrio(linkValue)
-			end);
-		});
+	return RxLinkUtils.observeValidLinksBrio(linkName, parent):Pipe({
+		RxBrioUtils.flatMapBrio(function(_, linkValue)
+			return binder:ObserveBrio(linkValue)
+		end),
+	})
 end
 
 --[=[
@@ -52,18 +56,19 @@ end
 	@param instance Instance
 	@return Observable<Brio<T>>
 ]=]
-function RxBinderUtils.observeChildrenBrio(binder, instance)
+function RxBinderUtils.observeChildrenBrio<T>(
+	binder: Binder.Binder<T>,
+	instance: Instance
+): Observable.Observable<Brio.Brio<T>>
 	assert(Binder.isBinder(binder), "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
-	return RxInstanceUtils.observeChildrenBrio(instance)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(child)
-				return binder:ObserveBrio(child)
-			end);
-		})
+	return RxInstanceUtils.observeChildrenBrio(instance):Pipe({
+		RxBrioUtils.flatMapBrio(function(child)
+			return binder:ObserveBrio(child)
+		end) :: any,
+	}) :: any
 end
-
 
 --[=[
 	Observes bound children classes.
@@ -76,7 +81,6 @@ end
 ]=]
 RxBinderUtils.observeBoundChildClassBrio = RxBinderUtils.observeChildrenBrio
 
-
 --[=[
 	Observes ainstance's parent class that is bound.
 
@@ -84,21 +88,23 @@ RxBinderUtils.observeBoundChildClassBrio = RxBinderUtils.observeChildrenBrio
 	@param instance Instance
 	@return Observable<Brio<T>>
 ]=]
-function RxBinderUtils.observeBoundParentClassBrio(binder, instance)
+function RxBinderUtils.observeBoundParentClassBrio<T>(
+	binder: Binder.Binder<T>,
+	instance: Instance
+): Observable.Observable<Brio.Brio<T>>
 	assert(Binder.isBinder(binder), "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
-	return RxInstanceUtils.observePropertyBrio(instance, "Parent")
-		:Pipe({
-			RxBrioUtils.switchMapBrio(function(child)
-				if child then
-					return RxBinderUtils.observeBoundClassBrio(binder, child)
-				else
-					return Rx.EMPTY
-				end
-			end);
-			RxBrioUtils.onlyLastBrioSurvives();
-		})
+	return RxInstanceUtils.observePropertyBrio(instance, "Parent"):Pipe({
+		RxBrioUtils.switchMapBrio(function(child: Instance)
+			if child then
+				return RxBinderUtils.observeBoundClassBrio(binder, child)
+			else
+				return Rx.EMPTY
+			end
+		end) :: any,
+		RxBrioUtils.onlyLastBrioSurvives() :: any,
+	}) :: any
 end
 
 --[=[
@@ -108,16 +114,15 @@ end
 	@param instance Instance
 	@return Observable<Brio<T>>
 ]=]
-function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
+function RxBinderUtils.observeBoundChildClassesBrio(binders, instance: Instance)
 	assert(type(binders) == "table", "Bad binders")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
-	return RxInstanceUtils.observeChildrenBrio(instance)
-		:Pipe({
-			RxBrioUtils.flatMapBrio(function(child)
-				return RxBinderUtils.observeBoundClassesBrio(binders, child)
-			end);
-		})
+	return RxInstanceUtils.observeChildrenBrio(instance):Pipe({
+		RxBrioUtils.flatMapBrio(function(child)
+			return RxBinderUtils.observeBoundClassesBrio(binders, child)
+		end) :: any,
+	})
 end
 
 --[=[
@@ -127,7 +132,7 @@ end
 	@param instance Instance
 	@return Observable<T?>
 ]=]
-function RxBinderUtils.observeBoundClass(binder, instance)
+function RxBinderUtils.observeBoundClass<T>(binder: Binder.Binder<T>, instance: Instance): Observable.Observable<T?>
 	assert(Binder.isBinder(binder), "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
@@ -150,7 +155,10 @@ end
 	@param instance Instance
 	@return Observable<Brio<T>>
 ]=]
-function RxBinderUtils.observeBoundClassBrio(binder, instance)
+function RxBinderUtils.observeBoundClassBrio<T>(
+	binder: Binder.Binder<T>,
+	instance: Instance
+): Observable.Observable<Brio.Brio<T>>
 	assert(Binder.isBinder(binder), "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
@@ -172,7 +180,7 @@ function RxBinderUtils.observeBoundClassBrio(binder, instance)
 		handleClassChanged(binder:Get(instance))
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -182,19 +190,19 @@ end
 	@param instance Instance
 	@return Observable<Brio<T>>
 ]=]
-function RxBinderUtils.observeBoundClassesBrio(binders, instance)
+function RxBinderUtils.observeBoundClassesBrio<T>(binders, instance: Instance): Observable.Observable<Brio.Brio<T>>
 	assert(type(binders) == "table", "Bad binders")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local observables = {}
 
-	for _, binder in pairs(binders) do
+	for _, binder in binders do
 		table.insert(observables, RxBinderUtils.observeBoundClassBrio(binder, instance))
 	end
 
 	return Rx.of(unpack(observables)):Pipe({
-		Rx.mergeAll();
-	})
+		Rx.mergeAll() :: any,
+	}) :: any
 end
 
 --[=[
@@ -203,7 +211,7 @@ end
 	@param binder Binder
 	@return Observable<Brio<T>>
 ]=]
-function RxBinderUtils.observeAllBrio(binder)
+function RxBinderUtils.observeAllBrio<T>(binder: Binder.Binder<T>): Observable.Observable<Brio.Brio<T>>
 	assert(Binder.isBinder(binder), "Bad binder")
 
 	return Observable.new(function(sub)
@@ -226,7 +234,7 @@ function RxBinderUtils.observeAllBrio(binder)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -235,7 +243,7 @@ end
 	@param binder Binder
 	@return Observable<Brio<{ T }>>
 ]=]
-function RxBinderUtils.observeAllArrayBrio(binder)
+function RxBinderUtils.observeAllArrayBrio<T>(binder: Binder.Binder<T>): Observable.Observable<Brio.Brio<{ T }>>
 	assert(Binder.isBinder(binder), "Bad binder")
 
 	return Observable.new(function(sub)
@@ -274,7 +282,7 @@ function RxBinderUtils.observeAllArrayBrio(binder)
 		emit()
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxBinderUtils

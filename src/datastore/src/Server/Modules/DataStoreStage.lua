@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides a data storage facility with an ability to get sub-stores. So you can write
 	directly to this store, overwriting all children, or you can have more partial control
@@ -20,13 +21,13 @@ local BaseObject = require("BaseObject")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStoreSnapshotUtils = require("DataStoreSnapshotUtils")
 local DataStoreWriter = require("DataStoreWriter")
-local GoodSignal = require("GoodSignal")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local Set = require("Set")
+local Signal = require("Signal")
 local Symbol = require("Symbol")
 local Table = require("Table")
 
@@ -35,6 +36,28 @@ local SLOW_INTEGRITY_CHECK_ENABLED = false
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
 DataStoreStage.__index = DataStoreStage
+
+export type DataStoreStageKey = string | number
+
+export type DataStoreCallback = () -> Promise.Promise<()>?
+
+export type DataStoreStage = typeof(setmetatable(
+	{} :: {
+		_loadName: DataStoreStageKey,
+		_loadParent: DataStoreStage?,
+		_saveDataSnapshot: any,
+		_fullPath: string?,
+		_baseDataSnapshot: any,
+		_viewSnapshot: any,
+		_stores: { [DataStoreStageKey]: DataStoreStage },
+		_savingCallbacks: { DataStoreCallback },
+		_keySubscriptions: ObservableSubscriptionTable.ObservableSubscriptionTable<any>,
+
+		Changed: Signal.Signal<any>,
+		DataStored: Signal.Signal<any>,
+	},
+	{} :: typeof({ __index = DataStoreStage })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new DataStoreStage to load from. Prefer to use DataStore because this doesn't
@@ -51,15 +74,15 @@ DataStoreStage.__index = DataStoreStage
 	@param loadParent DataStoreStage?
 	@return DataStoreStage
 ]=]
-function DataStoreStage.new(loadName, loadParent)
-	local self = setmetatable(BaseObject.new(), DataStoreStage)
+function DataStoreStage.new(loadName: DataStoreStageKey, loadParent: DataStoreStage?): DataStoreStage
+	local self: DataStoreStage = setmetatable(BaseObject.new() :: any, DataStoreStage)
 
 	-- LoadParent is optional, used for loading
 	self._loadName = loadName
 	self._loadParent = loadParent
 
-	self.Changed = self._maid:Add(GoodSignal.new()) -- :Fire(viewSnapshot)
-	self.DataStored = self._maid:Add(GoodSignal.new())
+	self.Changed = self._maid:Add(Signal.new()) -- :Fire(viewSnapshot)
+	self.DataStored = self._maid:Add(Signal.new())
 
 	-- Stores the actual data loaded and synced (but not pending written data)
 	self._saveDataSnapshot = nil
@@ -83,10 +106,10 @@ end
 	dataStore:Store("money", 25)
 	```
 
-	@param key string | number
+	@param key string
 	@param value any
 ]=]
-function DataStoreStage:Store(key, value)
+function DataStoreStage.Store(self: DataStoreStage, key: string, value: any)
 	assert(type(key) == "string", "Bad key")
 
 	if value == nil then
@@ -112,7 +135,7 @@ end
 	@param defaultValue T?
 	@return Promise<T>
 ]=]
-function DataStoreStage:Load(key, defaultValue)
+function DataStoreStage.Load<T>(self: DataStoreStage, key: DataStoreStageKey, defaultValue: T?): Promise.Promise<T>
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	return self:PromiseViewUpToDate():Then(function()
@@ -141,7 +164,7 @@ end
 	@param defaultValue any
 	@return Promise<any>
 ]=]
-function DataStoreStage:LoadAll(defaultValue)
+function DataStoreStage.LoadAll(self: DataStoreStage, defaultValue)
 	return self:PromiseViewUpToDate():Then(function()
 		if self._viewSnapshot == nil then
 			return defaultValue
@@ -165,7 +188,7 @@ end
 	@param key string | number
 	@return DataStoreStage
 ]=]
-function DataStoreStage:GetSubStore(key)
+function DataStoreStage.GetSubStore(self: DataStoreStage, key: DataStoreStageKey)
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if self._stores[key] then
@@ -220,7 +243,7 @@ end
 
 	@param key string | number
 ]=]
-function DataStoreStage:Delete(key)
+function DataStoreStage.Delete(self: DataStoreStage, key: string)
 	assert(type(key) == "string", "Bad key")
 
 	self:_storeAtKey(key, DataStoreDeleteToken)
@@ -229,7 +252,7 @@ end
 --[=[
 	Queues up a wipe of all values. This will completely set the data to nil.
 ]=]
-function DataStoreStage:Wipe()
+function DataStoreStage.Wipe(self: DataStoreStage)
 	self:Overwrite(DataStoreDeleteToken)
 end
 
@@ -238,35 +261,34 @@ end
 
 	If no key is passed than it will observe the whole view snapshot
 
-	@param key string | number | nil
+	@param key string | number?
 	@param defaultValue T?
 	@return Observable<T>
 ]=]
-function DataStoreStage:Observe(key, defaultValue)
+function DataStoreStage.Observe(self: DataStoreStage, key, defaultValue)
 	assert(type(key) == "string" or type(key) == "number" or key == nil, "Bad key")
 
 	if key == nil then
 		return Observable.new(function(sub)
 			local maid = Maid.new()
-			maid:GivePromise(self:LoadAll())
-				:Then(function()
-					-- Only connect once loaded
-					maid:GiveTask(self.Changed:Connect(function(viewSnapshot)
-						if viewSnapshot == nil then
-							sub:Fire(defaultValue)
-						else
-							sub:Fire(viewSnapshot)
-						end
-					end))
-
-					if self._viewSnapshot == nil then
+			maid:GivePromise(self:LoadAll()):Then(function()
+				-- Only connect once loaded
+				maid:GiveTask(self.Changed:Connect(function(viewSnapshot)
+					if viewSnapshot == nil then
 						sub:Fire(defaultValue)
 					else
-						sub:Fire(self._viewSnapshot)
+						sub:Fire(viewSnapshot)
 					end
-				end, function(...)
-					sub:Fail(...)
-				end)
+				end))
+
+				if self._viewSnapshot == nil then
+					sub:Fire(defaultValue)
+				else
+					sub:Fire(self._viewSnapshot)
+				end
+			end, function(...)
+				sub:Fail(...)
+			end)
 
 			return maid
 		end)
@@ -281,15 +303,14 @@ function DataStoreStage:Observe(key, defaultValue)
 			else
 				sub:Fire(value)
 			end
-		end), sub:GetFailComplete())
+		end, sub:GetFailComplete()))
 
 		-- Load initially
-		maid:GivePromise(self:Load(key, defaultValue))
-			:Then(function(value)
-				sub:Fire(value)
-			end, function(...)
-				sub:Fail(...)
-			end)
+		maid:GivePromise(self:Load(key, defaultValue)):Then(function(value)
+			sub:Fire(value)
+		end, function(...)
+			sub:Fail(...)
+		end)
 
 		return maid
 	end)
@@ -301,7 +322,7 @@ end
 	@param callback function -- May return a promise
 	@return function -- Call to remove
 ]=]
-function DataStoreStage:AddSavingCallback(callback)
+function DataStoreStage.AddSavingCallback(self: DataStoreStage, callback: DataStoreCallback?)
 	assert(type(callback) == "function", "Bad callback")
 
 	table.insert(self._savingCallbacks, callback)
@@ -317,7 +338,7 @@ end
 	Removes a saving callback from the data store stage
 	@param callback function
 ]=]
-function DataStoreStage:RemoveSavingCallback(callback)
+function DataStoreStage.RemoveSavingCallback(self: DataStoreStage, callback: DataStoreCallback?)
 	assert(type(callback) == "function", "Bad callback")
 
 	local index = table.find(self._savingCallbacks, callback)
@@ -331,7 +352,7 @@ end
 
 	@return Signal
 ]=]
-function DataStoreStage:GetTopLevelDataStoredSignal()
+function DataStoreStage.GetTopLevelDataStoredSignal(self: DataStoreStage)
 	return self.DataStored
 end
 
@@ -340,15 +361,17 @@ end
 
 	@return string
 ]=]
-function DataStoreStage:GetFullPath()
+function DataStoreStage.GetFullPath(self: DataStoreStage): string
 	if self._fullPath then
 		return self._fullPath
 	elseif self._loadParent then
-		self._fullPath = self._loadParent:GetFullPath() .. "." .. tostring(self._loadName)
-		return self._fullPath
+		local fullPath = self._loadParent:GetFullPath() .. "." .. tostring(self._loadName)
+		self._fullPath = fullPath
+		return fullPath
 	else
-		self._fullPath = tostring(self._loadName)
-		return self._fullPath
+		local fullPath = tostring(self._loadName)
+		self._fullPath = fullPath
+		return fullPath
 	end
 end
 
@@ -357,15 +380,14 @@ end
 
 	@return Promise<{ string }>
 ]=]
-function DataStoreStage:PromiseKeyList()
-	return self:PromiseKeySet()
-		:Then(function(keys)
-			local list = {}
-			for key, _ in pairs(keys) do
-				table.insert(list, key)
-			end
-			return list
-		end)
+function DataStoreStage.PromiseKeyList(self: DataStoreStage): Promise.Promise<{ string }>
+	return self:PromiseKeySet():Then(function(keys)
+		local list = {}
+		for key, _ in keys do
+			table.insert(list, key)
+		end
+		return list
+	end)
 end
 
 --[=[
@@ -373,7 +395,7 @@ end
 
 	@return Promise<{ [string]: true }>
 ]=]
-function DataStoreStage:PromiseKeySet()
+function DataStoreStage.PromiseKeySet(self: DataStoreStage): Promise.Promise<{ [string]: true }>
 	return self:PromiseViewUpToDate():Then(function()
 		if type(self._viewSnapshot) == "table" then
 			return Set.fromKeys(self._viewSnapshot)
@@ -393,7 +415,7 @@ end
 
 	@param diffSnapshot any
 ]=]
-function DataStoreStage:MergeDiffSnapshot(diffSnapshot)
+function DataStoreStage.MergeDiffSnapshot(self: DataStoreStage, diffSnapshot)
 	self:_checkIntegrity()
 
 	self._baseDataSnapshot = self:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(diffSnapshot)
@@ -410,7 +432,7 @@ end
 
 	@param parentWriter DataStoreWriter
 ]=]
-function DataStoreStage:MarkDataAsSaved(parentWriter)
+function DataStoreStage.MarkDataAsSaved(self: DataStoreStage, parentWriter: DataStoreWriter.DataStoreWriter)
 	-- Update all children first
 	for key, subwriter in pairs(parentWriter:GetSubWritersMap()) do
 		local store = self._stores[key]
@@ -437,11 +459,12 @@ function DataStoreStage:MarkDataAsSaved(parentWriter)
 				newBaseDataSnapshot = {}
 			end
 
-			for key, value in pairs(dataToSave) do
+			for key, value in dataToSave do
 				local ourSnapshotValue = self._saveDataSnapshot[key]
 				if Table.deepEquivalent(ourSnapshotValue, value) or ourSnapshotValue == nil then
 					-- This shouldn't fire any event because our save data is matching
-					newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
+					newBaseDataSnapshot[key] =
+						self:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
 					newSaveSnapshot[key] = nil
 				end
 			end
@@ -479,7 +502,7 @@ end
 
 	@return Promise
 ]=]
-function DataStoreStage:PromiseViewUpToDate()
+function DataStoreStage.PromiseViewUpToDate(self: DataStoreStage)
 	if not self._loadParent then
 		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
 	end
@@ -500,7 +523,7 @@ end
 
 	@param data any
 ]=]
-function DataStoreStage:Overwrite(data)
+function DataStoreStage.Overwrite(self: DataStoreStage, data)
 	-- Ensure that we at least start loading (and thus the autosave loop) for write
 	self:PromiseViewUpToDate()
 
@@ -512,12 +535,12 @@ function DataStoreStage:Overwrite(data)
 		local newSaveSnapshot = {}
 
 		local remaining = Set.fromKeys(self._stores)
-		for key, store in pairs(self._stores) do
+		for key, store: any in self._stores do
 			-- Update each store
 			store:Overwrite(data[key])
 		end
 
-		for key, value in pairs(data) do
+		for key, value in data do
 			remaining[key] = nil
 			if self._stores[key] then
 				self._stores[key]:Overwrite(value)
@@ -526,13 +549,13 @@ function DataStoreStage:Overwrite(data)
 			end
 		end
 
-		for key, _ in pairs(remaining) do
+		for key, _ in remaining do
 			self._stores[key]:Overwrite(DataStoreDeleteToken)
 		end
 
 		self._saveDataSnapshot = table.freeze(newSaveSnapshot)
 	else
-		for _, store in pairs(self._stores) do
+		for _, store: any in self._stores do
 			store:Overwrite(DataStoreDeleteToken)
 		end
 
@@ -553,13 +576,13 @@ end
 
 	@param data any
 ]=]
-function DataStoreStage:OverwriteMerge(data)
+function DataStoreStage.OverwriteMerge(self: DataStoreStage, data)
 	-- Ensure that we at least start loading (and thus the autosave loop) for write
 	self:PromiseViewUpToDate()
 
 	if type(data) == "table" and data ~= DataStoreDeleteToken then
 		-- Note we explicitly don't wipe values here! Need delete token if we want to delete!
-		for key, value in pairs(data) do
+		for key, value in data do
 			self:_storeAtKey(key, value)
 		end
 	else
@@ -575,7 +598,7 @@ end
 	@param valueObj Instance -- ValueBase object to store on
 	@return MaidTask -- Cleanup to remove this writer and free the key.
 ]=]
-function DataStoreStage:StoreOnValueChange(name, valueObj)
+function DataStoreStage.StoreOnValueChange(self: DataStoreStage, name: DataStoreStageKey, valueObj)
 	assert(type(name) == "string" or type(name) == "number", "Bad name")
 	assert(typeof(valueObj) == "Instance" or (type(valueObj) == "table" and valueObj.Changed), "Bad valueObj")
 
@@ -600,14 +623,14 @@ end
 
 	@return boolean
 ]=]
-function DataStoreStage:HasWritableData()
+function DataStoreStage.HasWritableData(self: DataStoreStage): boolean
 	if self._saveDataSnapshot ~= nil then
 		return true
 	end
 
-	for name, store in pairs(self._stores) do
+	for name, store: any in self._stores do
 		if not store.Destroy then
-			warn(string.format("[DataStoreStage] - Substore %q destroyed", name))
+			warn(string.format("[DataStoreStage] - Substore %q destroyed", tostring(name)))
 			continue
 		end
 
@@ -628,7 +651,7 @@ end
 
 	@return DataStoreWriter
 ]=]
-function DataStoreStage:GetNewWriter()
+function DataStoreStage.GetNewWriter(self: DataStoreStage): DataStoreWriter.DataStoreWriter
 	self:_checkIntegrity()
 
 	local writer = DataStoreWriter.new(self:GetFullPath())
@@ -639,9 +662,9 @@ function DataStoreStage:GetNewWriter()
 		writer:SetSaveDataSnapshot(self._saveDataSnapshot)
 	end
 
-	for key, store in pairs(self._stores) do
+	for key, store: any in self._stores do
 		if not store.Destroy then
-			warn(string.format("[DataStoreStage] - Substore %q destroyed", key))
+			warn(string.format("[DataStoreStage] - Substore %q destroyed", tostring(key)))
 			continue
 		end
 
@@ -664,17 +687,17 @@ end
 
 	@return Promise
 ]=]
-function DataStoreStage:PromiseInvokeSavingCallbacks()
-	local removingPromises = {}
+function DataStoreStage.PromiseInvokeSavingCallbacks(self: DataStoreStage)
+	local removingPromises: { Promise.Promise<()> } = {}
 
-	for _, func in pairs(self._savingCallbacks) do
+	for _, func in self._savingCallbacks do
 		local result = func()
 		if Promise.isPromise(result) then
-			table.insert(removingPromises, result)
+			table.insert(removingPromises, result :: any)
 		end
 	end
 
-	for _, substore in pairs(self._stores) do
+	for _, substore: any in self._stores do
 		local promise = substore:PromiseInvokeSavingCallbacks()
 		if promise then
 			table.insert(removingPromises, promise)
@@ -684,7 +707,7 @@ function DataStoreStage:PromiseInvokeSavingCallbacks()
 	return PromiseUtils.all(removingPromises)
 end
 
-function DataStoreStage:_createFullBaseDataSnapshot()
+function DataStoreStage._createFullBaseDataSnapshot(self: DataStoreStage)
 	if self._baseDataSnapshot == DataStoreDeleteToken then
 		error("BadDataSnapshot cannot be a delete token")
 	elseif type(self._baseDataSnapshot) == "table" or self._baseDataSnapshot == nil then
@@ -695,9 +718,9 @@ function DataStoreStage:_createFullBaseDataSnapshot()
 			newSnapshot = {}
 		end
 
-		for key, store in pairs(self._stores) do
+		for key, store: any in self._stores do
 			if not store.Destroy then
-				warn(string.format("[DataStoreStage] - Substore %q destroyed", key))
+				warn(string.format("[DataStoreStage] - Substore %q destroyed", tostring(key)))
 				continue
 			end
 
@@ -716,7 +739,7 @@ function DataStoreStage:_createFullBaseDataSnapshot()
 	end
 end
 
-function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(diffSnapshot)
+function DataStoreStage._updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(self: DataStoreStage, diffSnapshot)
 	if diffSnapshot == DataStoreDeleteToken then
 		return nil
 	elseif type(diffSnapshot) == "table" then
@@ -730,7 +753,7 @@ function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(
 		end
 
 		-- Merge all of our newly downloaded data here into our base layer.
-		for key, value in pairs(diffSnapshot) do
+		for key, value in diffSnapshot do
 			newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
 		end
 
@@ -742,7 +765,11 @@ function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(
 	end
 end
 
-function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
+function DataStoreStage._updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(
+	self: DataStoreStage,
+	key: DataStoreStageKey,
+	value
+)
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if self._stores[key] then
@@ -750,14 +777,18 @@ function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnap
 		return nil
 	elseif value == DataStoreDeleteToken then
 		return nil
-	elseif type(value) == "table" and type(self._baseDataSnapshot) == "table" and type(self._baseDataSnapshot[key]) == "table" then
+	elseif
+		type(value) == "table"
+		and type(self._baseDataSnapshot) == "table"
+		and type(self._baseDataSnapshot[key]) == "table"
+	then
 		return self:_recurseMergeTable(self._baseDataSnapshot[key], value)
 	else
 		return value
 	end
 end
 
-function DataStoreStage:_recurseMergeTable(original, incoming)
+function DataStoreStage._recurseMergeTable(self: DataStoreStage, original, incoming)
 	if incoming == DataStoreDeleteToken then
 		return nil
 	elseif type(incoming) == "table" and type(original) == "table" then
@@ -765,7 +796,7 @@ function DataStoreStage:_recurseMergeTable(original, incoming)
 		local newSnapshot = table.clone(original)
 
 		-- Overwerite with merged values...
-		for key, value in pairs(incoming) do
+		for key, value in incoming do
 			newSnapshot[key] = self:_recurseMergeTable(original[key], value)
 		end
 
@@ -775,7 +806,7 @@ function DataStoreStage:_recurseMergeTable(original, incoming)
 	end
 end
 
-function DataStoreStage:_updateViewSnapshot()
+function DataStoreStage._updateViewSnapshot(self: DataStoreStage)
 	self:_checkIntegrity()
 
 	local newViewSnapshot = self:_computeNewViewSnapshot()
@@ -788,11 +819,11 @@ function DataStoreStage:_updateViewSnapshot()
 		local changedKeys = self:_computeChangedKeys(previousViewSnapshot, newViewSnapshot)
 		if next(changedKeys) ~= nil then
 			if type(newViewSnapshot) == "table" then
-				for key, _ in pairs(changedKeys) do
+				for key, _ in changedKeys do
 					self._keySubscriptions:Fire(key, newViewSnapshot[key])
 				end
 			else
-				for key, _ in pairs(changedKeys) do
+				for key, _ in changedKeys do
 					self._keySubscriptions:Fire(key, nil)
 				end
 			end
@@ -804,13 +835,13 @@ function DataStoreStage:_updateViewSnapshot()
 	self:_checkIntegrity()
 end
 
-function DataStoreStage:_computeChangedKeys(previousViewSnapshot, newViewSnapshot)
+function DataStoreStage._computeChangedKeys(_self: DataStoreStage, previousViewSnapshot, newViewSnapshot)
 	-- Detect keys that changed
 	if type(previousViewSnapshot) == "table" and type(newViewSnapshot) == "table" then
 		local changedKeys = {}
 
 		local keys = Set.union(Set.fromKeys(previousViewSnapshot), Set.fromKeys(newViewSnapshot))
-		for key, _ in pairs(keys) do
+		for key, _ in keys do
 			if not Table.deepEquivalent(previousViewSnapshot[key], newViewSnapshot[key]) then
 				changedKeys[key] = true
 			end
@@ -828,7 +859,7 @@ function DataStoreStage:_computeChangedKeys(previousViewSnapshot, newViewSnapsho
 	end
 end
 
-function DataStoreStage:_updateViewSnapshotAtKey(key)
+function DataStoreStage._updateViewSnapshotAtKey(self: DataStoreStage, key)
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if type(self._viewSnapshot) ~= "table" then
@@ -852,7 +883,7 @@ function DataStoreStage:_updateViewSnapshotAtKey(key)
 	self:_checkIntegrity()
 end
 
-function DataStoreStage:_computeNewViewSnapshot()
+function DataStoreStage._computeNewViewSnapshot(self: DataStoreStage)
 	-- This prioritizes save data first, then stores, then base data
 
 	if self._saveDataSnapshot == DataStoreDeleteToken then
@@ -869,13 +900,13 @@ function DataStoreStage:_computeNewViewSnapshot()
 		end
 
 		-- Add in stores
-		for key, store in pairs(self._stores) do
+		for key, store in self._stores do
 			newView[key] = store._viewSnapshot
 		end
 
 		-- Then finally save data
 		if type(self._saveDataSnapshot) == "table" then
-			for key, value in pairs(self._saveDataSnapshot) do
+			for key, value in self._saveDataSnapshot do
 				if value == DataStoreDeleteToken then
 					newView[key] = nil
 				else
@@ -884,7 +915,10 @@ function DataStoreStage:_computeNewViewSnapshot()
 			end
 		end
 
-		if next(newView) == nil and not (type(self._baseDataSnapshot) == "table" or type(self._saveDataSnapshot) == "table") then
+		if
+			next(newView) == nil
+			and not (type(self._baseDataSnapshot) == "table" or type(self._saveDataSnapshot) == "table")
+		then
 			-- We have no reason to be a table, make sure we return nil
 			return nil
 		end
@@ -899,7 +933,7 @@ function DataStoreStage:_computeNewViewSnapshot()
 	end
 end
 
-function DataStoreStage:_computeViewValueForKey(key)
+function DataStoreStage._computeViewValueForKey(self: DataStoreStage, key)
 	-- This prioritizes save data first, then stores, then base data
 
 	if self._saveDataSnapshot == DataStoreDeleteToken then
@@ -939,7 +973,7 @@ function DataStoreStage:_computeViewValueForKey(key)
 end
 
 -- Stores the data for overwrite.
-function DataStoreStage:_storeAtKey(key, value)
+function DataStoreStage._storeAtKey(self: DataStoreStage, key, value)
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 	assert(value ~= nil, "Bad value")
 
@@ -979,7 +1013,7 @@ function DataStoreStage:_storeAtKey(key, value)
 	self:_checkIntegrity()
 end
 
-function DataStoreStage:_checkSnapshotIntegrity(label, result)
+function DataStoreStage._checkSnapshotIntegrity(_self: DataStoreStage, label, result)
 	assert(type(label) == "string", "Bad label")
 
 	if not SLOW_INTEGRITY_CHECK_ENABLED then
@@ -990,16 +1024,16 @@ function DataStoreStage:_checkSnapshotIntegrity(label, result)
 		error(string.format("%s should not be a DataStoreDeleteToken", label))
 	end
 
-	local function recurse(innerLabel, value)
+	local function recurse(innerLabel: string, value)
 		if type(value) ~= "table" then
 			return
 		end
 
-		for key, item in pairs(value) do
+		for key, item in value do
 			local keyLabel = innerLabel .. "." .. tostring(key)
 
 			if not (type(key) == "string" or type(key) == "number") then
-				 error(string.format("%s should be a number or string", keyLabel))
+				error(string.format("%s should be a number or string", keyLabel))
 			end
 
 			if item == DataStoreDeleteToken then
@@ -1015,7 +1049,7 @@ function DataStoreStage:_checkSnapshotIntegrity(label, result)
 	recurse(label, result)
 end
 
-function DataStoreStage:_checkIntegrity()
+function DataStoreStage._checkIntegrity(self: DataStoreStage)
 	if not SLOW_INTEGRITY_CHECK_ENABLED then
 		return
 	end
@@ -1037,13 +1071,13 @@ function DataStoreStage:_checkIntegrity()
 		self:_checkSnapshotIntegrity("self._viewSnapshot", self._viewSnapshot)
 	end
 
-	for key, _ in pairs(self._stores) do
+	for key, _ in self._stores do
 		if type(self._baseDataSnapshot) == "table" and self._baseDataSnapshot[key] ~= nil then
-			error(string.format("[DataStoreStage] - Duplicate baseData at key %q", key))
+			error(string.format("[DataStoreStage] - Duplicate baseData at key %q", tostring(key)))
 		end
 
 		if type(self._saveDataSnapshot) == "table" and self._saveDataSnapshot[key] ~= nil then
-			error(string.format("[DataStoreStage] - Duplicate saveData at key %q", key))
+			error(string.format("[DataStoreStage] - Duplicate saveData at key %q", tostring(key)))
 		end
 	end
 end

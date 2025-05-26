@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Centralized service using serviceBag. This will let other packages work with a single player datastore service.
 
@@ -7,19 +8,32 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerDataStoreManager = require("PlayerDataStoreManager")
+local DataStore = require("DataStore")
 local DataStorePromises = require("DataStorePromises")
-local Promise = require("Promise")
 local Maid = require("Maid")
+local PlayerDataStoreManager = require("PlayerDataStoreManager")
+local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 
 local PlayerDataStoreService = {}
 PlayerDataStoreService.ServiceName = "PlayerDataStoreService"
+
+export type PlayerDataStoreService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_dataStoreName: string,
+		_dataStoreScope: string,
+		_dataStoreManagerPromise: Promise.Promise<PlayerDataStoreManager.PlayerDataStoreManager>,
+	},
+	{} :: typeof({ __index = PlayerDataStoreService })
+))
 
 --[=[
 	Initializes the PlayerDataStoreService. Should be done via [ServiceBag.Init].
 	@param serviceBag ServiceBag
 ]=]
-function PlayerDataStoreService:Init(serviceBag)
+function PlayerDataStoreService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -49,7 +63,7 @@ end
 
 	@param dataStoreName string
 ]=]
-function PlayerDataStoreService:SetDataStoreName(dataStoreName)
+function PlayerDataStoreService:SetDataStoreName(dataStoreName: string): ()
 	assert(type(dataStoreName) == "string", "Bad dataStoreName")
 	assert(self._promiseStarted, "Not initialized")
 	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
@@ -66,7 +80,7 @@ end
 
 	@param dataStoreScope string
 ]=]
-function PlayerDataStoreService:SetDataStoreScope(dataStoreScope)
+function PlayerDataStoreService:SetDataStoreScope(dataStoreScope: string): ()
 	assert(type(dataStoreScope) == "string", "Bad dataStoreScope")
 	assert(self._promiseStarted, "Not initialized")
 	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
@@ -79,11 +93,10 @@ end
 	@param player Player
 	@return Promise<DataStore>
 ]=]
-function PlayerDataStoreService:PromiseDataStore(player)
-	return self:PromiseManager()
-		:Then(function(manager)
-			return manager:GetDataStore(player)
-		end)
+function PlayerDataStoreService:PromiseDataStore(player: Player): Promise.Promise<DataStore.DataStore>
+	return self:PromiseManager():Then(function(manager)
+		return manager:GetDataStore(player)
+	end)
 end
 
 --[=[
@@ -92,17 +105,16 @@ end
 	@return Promise
 ]=]
 function PlayerDataStoreService:PromiseAddRemovingCallback(callback)
-	return self:PromiseManager()
-		:Then(function(manager)
-			manager:AddRemovingCallback(callback)
-		end)
+	return self:PromiseManager():Then(function(manager)
+		manager:AddRemovingCallback(callback)
+	end)
 end
 
 --[=[
 	Retrieves the manager
-	@return PlayerDataStoreManager
+	@return Promise<PlayerDataStoreManager>
 ]=]
-function PlayerDataStoreService:PromiseManager()
+function PlayerDataStoreService:PromiseManager(): Promise.Promise<PlayerDataStoreManager.PlayerDataStoreManager>
 	if self._dataStoreManagerPromise then
 		return self._dataStoreManagerPromise
 	end
@@ -112,12 +124,9 @@ function PlayerDataStoreService:PromiseManager()
 			return DataStorePromises.promiseDataStore(self._dataStoreName, self._dataStoreScope)
 		end)
 		:Then(function(dataStore)
-			local manager = self._maid:Add(PlayerDataStoreManager.new(
-				dataStore,
-				function(player)
-					return tostring(player.UserId)
-				end,
-				true))
+			local manager = self._maid:Add(PlayerDataStoreManager.new(dataStore, function(player)
+				return tostring(player.UserId)
+			end, true))
 
 			-- A lot safer if we're hot reloading or need to monitor bind to close calls
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()

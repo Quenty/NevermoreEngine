@@ -2,11 +2,12 @@
 	@class LayeredLoopedSoundPlayer.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Maid = require("Maid")
-local LayeredLoopedSoundPlayer = require("LayeredLoopedSoundPlayer")
 local Blend = require("Blend")
+local LayeredLoopedSoundPlayer = require("LayeredLoopedSoundPlayer")
+local Maid = require("Maid")
 
 return function(target)
 	local maid = Maid.new()
@@ -19,23 +20,23 @@ return function(target)
 	local function initial()
 		layeredLoopedSoundPlayer:SwapToChoice("drums", {
 			{
-				SoundId = "rbxassetid://14478151709";
-				Volume = 0.1;
-			};
+				SoundId = "rbxassetid://14478151709",
+				Volume = 0.1,
+			},
 			{
-				SoundId = "rbxassetid://14478738244";
-				Volume = 0.1;
-			}
+				SoundId = "rbxassetid://14478738244",
+				Volume = 0.1,
+			},
 		})
 		layeredLoopedSoundPlayer:SwapToChoice("rifts", {
 			{
-				SoundId = "rbxassetid://14478152812";
-				Volume = 0.2;
-			};
+				SoundId = "rbxassetid://14478152812",
+				Volume = 0.2,
+			},
 			{
-				SoundId = "rbxassetid://14478729478";
-				Volume = 0.015;
-			};
+				SoundId = "rbxassetid://14478729478",
+				Volume = 0.015,
+			},
 		})
 	end
 	initial()
@@ -44,115 +45,110 @@ return function(target)
 
 	local function button(props)
 		return Blend.New "TextButton" {
-			Text = props.Text;
-			AutoButtonColor = true;
-			Font = Enum.Font.FredokaOne;
-			Size = UDim2.new(0, 100, 0, 30);
+			Text = props.Text,
+			AutoButtonColor = true,
+			Font = Enum.Font.FredokaOne,
+			Size = UDim2.new(0, 100, 0, 30),
 
-			Blend.New "UICorner" {
-
-			};
+			Blend.New "UICorner" {},
 
 			[Blend.OnEvent "Activated"] = function()
-				props.OnActivated();
-			end;
-		};
+				props.OnActivated()
+			end,
+		}
 	end
 
 	maid:GiveTask(Blend.mount(target, {
 		Blend.New "Frame" {
-			Name = "ButtonContainer";
-			BackgroundTransparency = 1;
-			Position = UDim2.new(0.5, 0, 0, 5);
-			AnchorPoint = Vector2.new(0.5, 0);
-			Size = UDim2.new(1, 0, 0, 30);
+			Name = "ButtonContainer",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0.5, 0, 0, 5),
+			AnchorPoint = Vector2.new(0.5, 0),
+			Size = UDim2.new(1, 0, 0, 30),
 
 			Blend.New "UIListLayout" {
-				FillDirection = Enum.FillDirection.Horizontal;
-				Padding = UDim.new(0, 5);
-				HorizontalAlignment = Enum.HorizontalAlignment.Center;
-			};
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, 5),
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			},
 
 			button({
-				Text = "Toggle";
+				Text = "Toggle",
 				OnActivated = function()
 					layeredLoopedSoundPlayer:Toggle()
-				end;
-			});
+				end,
+			}),
 
 			button({
-				Text = "Reset";
+				Text = "Reset",
 				OnActivated = function()
 					initial()
-				end;
-			});
+				end,
+			}),
 
 			button({
-				Text = "Combat equip";
+				Text = "Combat equip",
 				OnActivated = function()
 					layeredLoopedSoundPlayer:SwapToChoice("drums", {
-						"rbxassetid://14478154829";
-						"rbxassetid://14478714545";
-						"rbxassetid://14478772830";
-						"rbxassetid://14478897865";
+						"rbxassetid://14478154829",
+						"rbxassetid://14478714545",
+						"rbxassetid://14478772830",
+						"rbxassetid://14478897865",
 					})
 					layeredLoopedSoundPlayer:PlayOnceOnLoop("rifts", nil)
-				end;
-			});
+				end,
+			}),
 
 			button({
-				Text = "On target lock";
+				Text = "On target lock",
 				OnActivated = function()
 					layeredLoopedSoundPlayer:SwapToChoice("drums", {
 						{
-							SoundId = "rbxassetid://14478150956";
-							Volume = 0.1;
-						};
+							SoundId = "rbxassetid://14478150956",
+							Volume = 0.1,
+						},
 						{
-							SoundId = "rbxassetid://14478721669";
-							Volume = 0.2;
-						};
-						"rbxassetid://14478154829";
-						"rbxassetid://14478764914";
+							SoundId = "rbxassetid://14478721669",
+							Volume = 0.2,
+						},
+						"rbxassetid://14478154829",
+						"rbxassetid://14478764914",
 					})
 
 					layeredLoopedSoundPlayer:SwapToChoice("rifts", {
-						"rbxassetid://14478145963";
-						"rbxassetid://14478156714";
+						"rbxassetid://14478145963",
+						"rbxassetid://14478156714",
 						{
-							SoundId = "rbxassetid://14478777472";
-							Volume = 0.1;
-						};
+							SoundId = "rbxassetid://14478777472",
+							Volume = 0.1,
+						},
 						{
-							SoundId = "rbxassetid://14478793045";
-							Volume = 0.1;
-						};
+							SoundId = "rbxassetid://14478793045",
+							Volume = 0.1,
+						},
 					})
-				end;
-			});
+				end,
+			}),
 
 			button({
-				Text = "On low health";
+				Text = "On low health",
 				OnActivated = function()
 					layeredLoopedSoundPlayer:SwapToChoice("drums", {
-						"rbxassetid://14478746326";
-						"rbxassetid://14478767498";
-						"rbxassetid://14478797936"; -- record scratch
+						"rbxassetid://14478746326",
+						"rbxassetid://14478767498",
+						"rbxassetid://14478797936", -- record scratch
 					})
-
-				end;
-			});
-
+				end,
+			}),
 
 			button({
-				Text = "Target drop";
+				Text = "Target drop",
 				OnActivated = function()
 					layeredLoopedSoundPlayer:PlayOnceOnLoop("rifts", "rbxassetid://14478158396")
-				end;
-			});
-		}
+				end,
+			}),
+		},
 	}))
-
 
 	return function()
 		maid:DoCleaning()

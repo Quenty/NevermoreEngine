@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Add another layer of effects over any other camera by allowing an "impulse"
 	to be applied. Good for shockwaves, camera shake, and recoil.
@@ -7,6 +8,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
 local Spring = require("Spring")
 local SpringUtils = require("SpringUtils")
@@ -17,11 +19,26 @@ local EPSILON = 1e-6
 local ImpulseCamera = {}
 ImpulseCamera.ClassName = "ImpulseCamera"
 
-function ImpulseCamera.new()
-	local self = setmetatable({
-		_springs = {};
-		_defaultSpring = Spring.new(Vector3.zero);
-	}, ImpulseCamera)
+export type ImpulseCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		Damper: number,
+		Speed: number,
+		Spring: Spring.Spring<Vector3>,
+		_defaultSpring: Spring.Spring<Vector3>,
+		_springs: { Spring.Spring<Vector3> },
+	},
+	{} :: typeof({ __index = ImpulseCamera })
+)) & CameraEffectUtils.CameraEffect
+
+function ImpulseCamera.new(): ImpulseCamera
+	local self: ImpulseCamera = setmetatable(
+		{
+			_springs = {},
+			_defaultSpring = Spring.new(Vector3.zero),
+		} :: any,
+		ImpulseCamera
+	)
 
 	self._defaultSpring.Damper = 0.5
 	self._defaultSpring.Speed = 20
@@ -32,10 +49,10 @@ end
 --[=[
 	Applies an impulse to the camera, shaking it!
 	@param velocity Vector3
-	@param speed number -- Optional
-	@param damper number -- Optional
+	@param speed number? -- Optional
+	@param damper number? -- Optional
 ]=]
-function ImpulseCamera:Impulse(velocity, speed, damper)
+function ImpulseCamera.Impulse(self: ImpulseCamera, velocity: Vector3, speed: number?, damper: number?): ()
 	assert(typeof(velocity) == "Vector3", "Bad velocity")
 	assert(type(speed) == "number" or speed == nil, "Bad speed")
 	assert(type(damper) == "number" or damper == nil, "Bad damper")
@@ -48,32 +65,31 @@ end
 	Applies a random impulse
 
 	@param velocity Vector3
-	@param speed number -- Optional
-	@param damper number -- Optional
+	@param speed number? -- Optional
+	@param damper number? -- Optional
 ]=]
-function ImpulseCamera:ImpulseRandom(velocity, speed, damper)
+function ImpulseCamera.ImpulseRandom(self: ImpulseCamera, velocity: Vector3, speed: number?, damper: number?): ()
 	assert(typeof(velocity) == "Vector3", "Bad velocity")
 	assert(type(speed) == "number" or speed == nil, "Bad speed")
 	assert(type(damper) == "number" or damper == nil, "Bad damper")
 
-	local randomVector = Vector3.new(
-		2*(math.random() - 0.5),
-		2*(math.random() - 0.5),
-		2*(math.random() - 0.5)
-	)
+	local randomVector = Vector3.new(2 * (math.random() - 0.5), 2 * (math.random() - 0.5), 2 * (math.random() - 0.5))
 
-	return self:Impulse(velocity*randomVector, speed, damper)
+	return self:Impulse(velocity * randomVector, speed, damper)
 end
 
-function ImpulseCamera:_getSpring(speed, damper)
-	if (not speed) and (not damper) then
+function ImpulseCamera._getSpring(self: ImpulseCamera, speed: number?, damper: number?)
+	if (not speed) and not damper then
 		return self._defaultSpring
 	end
+
+	assert(speed ~= nil, "Type checker needs assert")
+	assert(damper ~= nil, "Type checker needs assert")
 
 	speed = speed or self._defaultSpring.Speed
 	damper = damper or self._defaultSpring.Damper
 
-	for _, spring in pairs(self._springs) do
+	for _, spring in self._springs do
 		if math.abs(spring.Speed - speed) <= EPSILON and math.abs(spring.Damper - damper) <= EPSILON then
 			return spring
 		end
@@ -92,10 +108,10 @@ function ImpulseCamera:_getSpring(speed, damper)
 	return newSpring
 end
 
-function ImpulseCamera:_aggregateSprings()
+function ImpulseCamera._aggregateSprings(self: ImpulseCamera): Vector3
 	local position = self._defaultSpring.Position
 
-	for i=#self._springs, 1, -1 do
+	for i = #self._springs, 1, -1 do
 		local spring = self._springs[i]
 		local animating, springPosition = SpringUtils.animating(spring, EPSILON)
 
@@ -108,11 +124,11 @@ function ImpulseCamera:_aggregateSprings()
 	return position
 end
 
-function ImpulseCamera:__add(other)
+function ImpulseCamera.__add(self: ImpulseCamera, other)
 	return SummedCamera.new(self, other)
 end
 
-function ImpulseCamera:__newindex(index, value)
+function ImpulseCamera.__newindex(self: ImpulseCamera, index, value)
 	if index == "Damper" then
 		assert(type(value) == "number", "Bad value")
 		self._defaultSpring.Damper = value
@@ -130,14 +146,14 @@ end
 	@prop CameraState CameraState
 	@within ImpulseCamera
 ]=]
-function ImpulseCamera:__index(index)
+function ImpulseCamera.__index(self: ImpulseCamera, index)
 	if index == "CameraState" then
 		local newState = CameraState.new()
 
 		local position = self:_aggregateSprings()
-		newState.CFrame = CFrame.Angles(0, position.y, 0)
-			* CFrame.Angles(position.x, 0, 0)
-			* CFrame.Angles(0, 0, position.z)
+		newState.CFrame = CFrame.Angles(0, position.Y, 0)
+			* CFrame.Angles(position.X, 0, 0)
+			* CFrame.Angles(0, 0, position.Z)
 
 		return newState
 	elseif index == "Damper" then

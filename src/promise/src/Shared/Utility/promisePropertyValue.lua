@@ -20,7 +20,7 @@ local Promise = require("Promise")
 	@return Promise<Instance>
 	@within promisePropertyValue
 ]=]
-return function(instance, propertyName)
+return function(instance: Instance, propertyName: string)
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(propertyName) == "string", "Bad propertyName")
 

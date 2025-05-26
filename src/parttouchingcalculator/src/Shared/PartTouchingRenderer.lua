@@ -20,7 +20,7 @@ function PartTouchingRenderer.new()
 end
 
 function PartTouchingRenderer:RenderTouchingProps(touchingPartList)
-	for _, part in pairs(touchingPartList) do
+	for _, part in touchingPartList do
 		local selectionBox = Instance.new("SelectionBox")
 		selectionBox.Name = "TouchingWarning"
 		selectionBox.LineThickness = 0.05
@@ -29,10 +29,9 @@ function PartTouchingRenderer:RenderTouchingProps(touchingPartList)
 		selectionBox.Adornee = part
 		selectionBox.Parent = part
 
-		qGUI.TweenTransparency(selectionBox, {Transparency = 1}, 0.5)
+		qGUI.TweenTransparency(selectionBox, { Transparency = 1 }, 0.5)
 		Debris:AddItem(selectionBox, 0.6)
 	end
 end
-
 
 return PartTouchingRenderer

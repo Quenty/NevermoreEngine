@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterparticleplayer@2.2.2...@quenty/characterparticleplayer@2.3.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+
+
+
+## [2.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterparticleplayer@2.2.0...@quenty/characterparticleplayer@2.2.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [2.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterparticleplayer@2.2.0...@quenty/characterparticleplayer@2.2.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterparticleplayer@2.1.0...@quenty/characterparticleplayer@2.2.0) (2024-05-09)
 
 

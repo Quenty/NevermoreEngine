@@ -14,7 +14,7 @@ local Motor6DStackHumanoid = setmetatable({}, BaseObject)
 Motor6DStackHumanoid.ClassName = "Motor6DStackHumanoid"
 Motor6DStackHumanoid.__index = Motor6DStackHumanoid
 
-function Motor6DStackHumanoid.new(humanoid, serviceBag)
+function Motor6DStackHumanoid.new(humanoid: Humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), Motor6DStackHumanoid)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -44,7 +44,7 @@ function Motor6DStackHumanoid:_observeMotorsBrio()
 			return RxInstanceUtils.observeDescendantsBrio(character, function(descendant)
 				return descendant:IsA("Motor6D")
 			end)
-		end);
+		end),
 	})
 end
 

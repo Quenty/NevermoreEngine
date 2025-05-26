@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Allows us to independently apply sound effects to both sound groups and to
 	individual sounds.
@@ -8,18 +9,28 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Brio = require("Brio")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
+local ObservableSet = require("ObservableSet")
 local SoundEffectsList = require("SoundEffectsList")
 local SoundGroupPathUtils = require("SoundGroupPathUtils")
-local ObservableSet = require("ObservableSet")
 
 local SoundEffectsRegistry = setmetatable({}, BaseObject)
 SoundEffectsRegistry.ClassName = "SoundEffectsRegistry"
 SoundEffectsRegistry.__index = SoundEffectsRegistry
 
-function SoundEffectsRegistry.new()
-	local self = setmetatable(BaseObject.new(), SoundEffectsRegistry)
+export type SoundEffectsRegistry = typeof(setmetatable(
+	{} :: {
+		_pathToEffectList: ObservableMap.ObservableMap<string, SoundEffectsList.SoundEffectsList>,
+		_activeEffectsPathSet: ObservableSet.ObservableSet<string>,
+	},
+	{} :: typeof({ __index = SoundEffectsRegistry })
+)) & BaseObject.BaseObject
+
+function SoundEffectsRegistry.new(): SoundEffectsRegistry
+	local self: SoundEffectsRegistry = setmetatable(BaseObject.new() :: any, SoundEffectsRegistry)
 
 	self._pathToEffectList = self._maid:Add(ObservableMap.new())
 	self._activeEffectsPathSet = self._maid:Add(ObservableSet.new())
@@ -27,7 +38,11 @@ function SoundEffectsRegistry.new()
 	return self
 end
 
-function SoundEffectsRegistry:PushEffect(soundGroupPath, effect)
+function SoundEffectsRegistry.PushEffect(
+	self: SoundEffectsRegistry,
+	soundGroupPath: string,
+	effect: SoundEffectsList.SoundEffectApplier
+): () -> ()
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 	assert(type(effect) == "function", "Bad effect")
 
@@ -35,7 +50,11 @@ function SoundEffectsRegistry:PushEffect(soundGroupPath, effect)
 	return effectsList:PushEffect(effect)
 end
 
-function SoundEffectsRegistry:ApplyEffects(soundGroupPath, instance)
+function SoundEffectsRegistry.ApplyEffects(
+	self: SoundEffectsRegistry,
+	soundGroupPath: string,
+	instance: SoundGroup | Sound
+): () -> ()
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 	assert(typeof(instance) == "Instance" and (instance:IsA("SoundGroup") or instance:IsA("Sound")), "Bad instance")
 
@@ -43,11 +62,16 @@ function SoundEffectsRegistry:ApplyEffects(soundGroupPath, instance)
 	return effectsList:ApplyEffects(instance)
 end
 
-function SoundEffectsRegistry:ObserveActiveEffectsPathBrios()
-	return self._activeEffectsPathSet:ObserveItemsBrio()
+function SoundEffectsRegistry.ObserveActiveEffectsPathBrios(
+	self: SoundEffectsRegistry
+): Observable.Observable<Brio.Brio<string>>
+	return self._activeEffectsPathSet:ObserveItemsBrio() :: any
 end
 
-function SoundEffectsRegistry:_getOrCreateEffectList(soundGroupPath)
+function SoundEffectsRegistry._getOrCreateEffectList(
+	self: SoundEffectsRegistry,
+	soundGroupPath: string
+): SoundEffectsList.SoundEffectsList
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 
 	local found = self._pathToEffectList:Get(soundGroupPath)

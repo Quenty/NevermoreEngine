@@ -10,8 +10,8 @@ local ValueBaseValue = require("ValueBaseValue")
 local t = require("t")
 
 return AdorneeData.new({
-	Order = 0;
+	Order = 0,
 	RoguePropertySourceLink = AdorneeDataEntry.new(t.optional(t.Instance), function(adornee)
 		return ValueBaseValue.new(adornee, "ObjectValue", "RoguePropertySourceLink", nil)
-	end);
+	end),
 })

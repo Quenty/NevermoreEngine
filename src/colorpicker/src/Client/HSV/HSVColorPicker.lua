@@ -85,7 +85,7 @@ end
 
 	@param height number
 ]=]
-function HSVColorPicker:SetSize(height)
+function HSVColorPicker:SetSize(height: number)
 	assert(type(height) == "number", "Bad height")
 
 	self._hueSaturationPicker:SetSize(height)
@@ -156,7 +156,7 @@ end
 
 	@param color Color3
 ]=]
-function HSVColorPicker:SetColor(color)
+function HSVColorPicker:SetColor(color: Color3)
 	local h, s, v = Color3.toHSV(color)
 	self._hsvColorValue.Value = Vector3.new(h, s, v)
 end
@@ -166,7 +166,7 @@ end
 
 	@return Color3
 ]=]
-function HSVColorPicker:GetColor()
+function HSVColorPicker:GetColor(): Color3
 	local current = self._hsvColorValue.Value
 	local h, s, v = current.x, current.y, current.z
 	return Color3.fromHSV(h, s, v)
@@ -174,13 +174,13 @@ end
 
 --[=[
 	A size value that defines the aspect ratio and size of this picker. See [SetSize]
-	@return Vector3
+	@return ValueObject<Vector2>
 ]=]
-function HSVColorPicker:GetSizeValue()
+function HSVColorPicker:GetSizeValue(): ValueObject.ValueObject<Vector2>
 	return self._sizeValue
 end
 
-function HSVColorPicker:GetMeasureValue()
+function HSVColorPicker:GetMeasureValue(): ValueObject.ValueObject<Vector2>
 	return self._sizeValue
 end
 
@@ -189,14 +189,14 @@ end
 
 	@param transparency number
 ]=]
-function HSVColorPicker:SetTransparency(transparency)
+function HSVColorPicker:SetTransparency(transparency: number)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
 end
 
 function HSVColorPicker:_updateSize()
-	local valueSize  = self._valuePicker:GetSizeValue().Value
+	local valueSize = self._valuePicker:GetSizeValue().Value
 	local hueSize = self._hueSaturationPicker:GetSizeValue().Value
 
 	local width = valueSize.x + hueSize.x + self._innerPadding.Value
@@ -207,54 +207,54 @@ end
 
 function HSVColorPicker:_render()
 	local function container(picker, props)
-		return Blend.New "Frame" {
-			AnchorPoint = props.AnchorPoint;
-			Position = props.Position;
-			BackgroundTransparency = 1;
-			Size = UDim2.new(1, 0, 1, 0);
+		return Blend.New("Frame")({
+			AnchorPoint = props.AnchorPoint,
+			Position = props.Position,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
 			ZIndex = Blend.Computed(picker:ObserveIsPressed(), function(isPressed)
 				return isPressed and 2 or 1
-			end);
+			end),
 
-			picker.Gui;
+			picker.Gui,
 
-			Blend.New "UIAspectRatioConstraint" {
+			Blend.New("UIAspectRatioConstraint")({
 				AspectRatio = Blend.Computed(picker:GetSizeValue(), function(size)
 					if size.x <= 0 or size.y <= 0 then
 						return 1
 					else
-						return size.x/size.y
+						return size.x / size.y
 					end
-				end);
-			};
-		};
+				end),
+			}),
+		})
 	end
 
-	return Blend.New "Frame" {
-		Name = "HSVColorPicker";
-		Size = UDim2.new(1, 0, 1, 0);
-		BackgroundTransparency = 1;
+	return Blend.New("Frame")({
+		Name = "HSVColorPicker",
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
 
-		Blend.New "UIAspectRatioConstraint" {
+		Blend.New("UIAspectRatioConstraint")({
 			AspectRatio = Blend.Computed(self._sizeValue, function(size)
 				if size.x <= 0 or size.y <= 0 then
 					return 1
 				else
-					return size.x/size.y
+					return size.x / size.y
 				end
-			end);
-		};
+			end),
+		}),
 
 		container(self._hueSaturationPicker, {
-			AnchorPoint = Vector2.zero;
-			Position = UDim2.fromScale(0, 0);
-		});
+			AnchorPoint = Vector2.zero,
+			Position = UDim2.fromScale(0, 0),
+		}),
 
 		container(self._valuePicker, {
-			AnchorPoint = Vector2.new(1, 0);
-			Position = UDim2.fromScale(1, 0);
-		});
-	};
+			AnchorPoint = Vector2.new(1, 0),
+			Position = UDim2.fromScale(1, 0),
+		}),
+	})
 end
 
 return HSVColorPicker

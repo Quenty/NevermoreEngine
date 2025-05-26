@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class PagesDatabase
 ]=]
@@ -10,8 +11,17 @@ local PagesDatabase = {}
 PagesDatabase.ClassName = "PagesDatabase"
 PagesDatabase.__index = PagesDatabase
 
-function PagesDatabase.new(pages)
-	local self = setmetatable({}, PagesDatabase)
+export type PagesDatabase = typeof(setmetatable(
+	{} :: {
+		_pages: Pages,
+		_lastIncrementedIndex: number,
+		_pageData: { [number]: { currentPage: any, isFinished: boolean } },
+	},
+	{} :: typeof({ __index = PagesDatabase })
+))
+
+function PagesDatabase.new(pages: Pages): PagesDatabase
+	local self: PagesDatabase = setmetatable({} :: any, PagesDatabase)
 
 	self._pages = assert(pages, "No pages")
 	self._lastIncrementedIndex = 1
@@ -22,11 +32,11 @@ function PagesDatabase.new(pages)
 	return self
 end
 
-function PagesDatabase.isPagesDatabase(value)
+function PagesDatabase.isPagesDatabase(value): boolean
 	return DuckTypeUtils.isImplementation(PagesDatabase, value)
 end
 
-function PagesDatabase:IncrementToPageIdAsync(pageId)
+function PagesDatabase.IncrementToPageIdAsync(self: PagesDatabase, pageId: number)
 	while self._lastIncrementedIndex < pageId do
 		self._lastIncrementedIndex += 1
 		self._pages:AdvanceToNextPageAsync()
@@ -34,28 +44,28 @@ function PagesDatabase:IncrementToPageIdAsync(pageId)
 	end
 end
 
-function PagesDatabase:GetPage(pageId)
+function PagesDatabase.GetPage(self: PagesDatabase, pageId: number)
 	assert(type(pageId) == "number", "Bad pageId")
 
 	return self:_getPageState(pageId).currentPage
 end
 
-function PagesDatabase:GetIsFinished(pageId)
+function PagesDatabase.GetIsFinished(self: PagesDatabase, pageId: number): boolean
 	assert(type(pageId) == "number", "Bad pageId")
 
 	return self:_getPageState(pageId).isFinished
 end
 
-function PagesDatabase:_getPageState(pageId)
+function PagesDatabase._getPageState(self: PagesDatabase, pageId: number)
 	assert(pageId > 0 and pageId <= self._lastIncrementedIndex, "pageId is out of bounds")
 
 	return assert(self._pageData[pageId], "Missing data")
 end
 
-function PagesDatabase:_storeState()
+function PagesDatabase._storeState(self: PagesDatabase)
 	self._pageData[self._lastIncrementedIndex] = {
-		currentPage = self._pages:GetCurrentPage();
-		isFinished = self._pages.IsFinished;
+		currentPage = self._pages:GetCurrentPage(),
+		isFinished = self._pages.IsFinished,
 	}
 end
 

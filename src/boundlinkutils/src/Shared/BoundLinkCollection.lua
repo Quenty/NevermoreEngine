@@ -44,7 +44,7 @@ end
 
 function BoundLinkCollection:GetClasses()
 	local list = {}
-	for class, _ in pairs(self._classes) do
+	for class, _ in self._classes do
 		table.insert(list, class)
 	end
 	return list
@@ -67,7 +67,7 @@ function BoundLinkCollection:TrackParent(parent)
 		self:_removeLink(child)
 	end))
 
-	for _, child in pairs(parent:GetChildren()) do
+	for _, child in parent:GetChildren() do
 		if child:IsA("ObjectValue") and child.Name == self._linkName then
 			self:_handleNewLink(child)
 		end

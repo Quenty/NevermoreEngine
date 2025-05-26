@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions involving planes!
 	@class PlaneUtils
@@ -16,13 +17,19 @@ local PlaneUtils = {}
 	@param rayOrigin Vector3
 	@param unitRayDirection Vector3
 	@return Vector3? -- Intersection point
+	@return number? -- Distance to intersection point
 ]=]
-function PlaneUtils.rayIntersection(origin, normal, rayOrigin, unitRayDirection)
+function PlaneUtils.rayIntersection(
+	origin: Vector3,
+	normal: Vector3,
+	rayOrigin: Vector3,
+	unitRayDirection: Vector3
+): (Vector3?, number?)
 	local rpoint = rayOrigin - origin
 	local dot = unitRayDirection:Dot(normal)
 	if dot == 0 then
 		-- Parallel
-		return nil
+		return nil, nil
 	end
 
 	local t = -rpoint:Dot(normal) / dot

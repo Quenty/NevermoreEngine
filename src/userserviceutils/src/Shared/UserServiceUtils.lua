@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Wraps [UserService] API calls with [Promise].
 
@@ -20,6 +21,12 @@ local UserServiceUtils = {}
 	.HasVerifiedBadge boolean -- The HasVerifiedBadge value associated with the user.
 	@within UserServiceUtils
 ]=]
+export type UserInfo = {
+	Id: number,
+	Username: string,
+	DisplayName: string,
+	HasVerifiedBadge: boolean,
+}
 
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync(userIds)
@@ -31,7 +38,7 @@ local UserServiceUtils = {}
 	@param userIds { number }
 	@return Promise<{ UserInfo }>
 ]=]
-function UserServiceUtils.promiseUserInfosByUserIds(userIds)
+function UserServiceUtils.promiseUserInfosByUserIds(userIds: { number }): Promise.Promise<{ UserInfo }>
 	assert(type(userIds) == "table", "Bad userIds")
 
 	return Promise.spawn(function(resolve, reject)
@@ -61,19 +68,18 @@ end
 	@param userId number
 	@return Promise<UserInfo>
 ]=]
-function UserServiceUtils.promiseUserInfo(userId)
+function UserServiceUtils.promiseUserInfo(userId: number): Promise.Promise<UserInfo>
 	assert(type(userId) == "number", "Bad userId")
 
-	return UserServiceUtils.promiseUserInfosByUserIds({ userId })
-		:Then(function(infos)
-			local userInfo = infos[1]
+	return UserServiceUtils.promiseUserInfosByUserIds({ userId }):Then(function(infos)
+		local userInfo = infos[1]
 
-			if not userInfo then
-				return Promise.rejected("Failed to retrieve data for userId")
-			end
+		if not userInfo then
+			return Promise.rejected("Failed to retrieve data for userId")
+		end
 
-			return userInfo
-		end)
+		return userInfo
+	end)
 end
 
 --[=[
@@ -86,13 +92,12 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserServiceUtils.promiseDisplayName(userId)
+function UserServiceUtils.promiseDisplayName(userId: number): Promise.Promise<string>
 	assert(type(userId) == "number", "Bad userId")
 
-	return UserServiceUtils.promiseUserInfo(userId)
-		:Then(function(userInfo)
-			return userInfo.DisplayName
-		end)
+	return UserServiceUtils.promiseUserInfo(userId):Then(function(userInfo)
+		return userInfo.DisplayName
+	end)
 end
 
 --[=[
@@ -105,13 +110,12 @@ end
 	@param userId number
 	@return Promise<string>
 ]=]
-function UserServiceUtils.promiseUserName(userId)
+function UserServiceUtils.promiseUserName(userId: number): Promise.Promise<string>
 	assert(type(userId) == "number", "Bad userId")
 
-	return UserServiceUtils.promiseUserInfo(userId)
-		:Then(function(userInfo)
-			return userInfo.Username
-		end)
+	return UserServiceUtils.promiseUserInfo(userId):Then(function(userInfo)
+		return userInfo.Username
+	end)
 end
 
 return UserServiceUtils

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helper class to transform a an adornee into relative positions/information
 	@class AdorneeValue
@@ -10,24 +11,34 @@ local Workspace = game:GetService("Workspace")
 local AdorneeUtils = require("AdorneeUtils")
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
+local Observable = require("Observable")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local AdorneeValue = setmetatable({}, BaseObject)
 AdorneeValue.ClassName = "AdorneeValue"
 AdorneeValue.__index = AdorneeValue
 
+export type AdorneeValueOption = Instance | CFrame | Vector3
+
+export type AdorneeValue = typeof(setmetatable(
+	{} :: {
+		_adornee: ValueObject.ValueObject<AdorneeValueOption?>,
+		Value: AdorneeValueOption?,
+		Changed: Signal.Signal<(AdorneeValueOption?, AdorneeValueOption?)>,
+	},
+	{} :: typeof({ __index = AdorneeValue })
+)) & BaseObject.BaseObject
+
 --[=[
 	Constructs a new AdorneeValue
 
 	@return AdorneeValue
 ]=]
-function AdorneeValue.new()
-	local self = setmetatable(BaseObject.new(), AdorneeValue)
+function AdorneeValue.new(): AdorneeValue
+	local self: AdorneeValue = setmetatable(BaseObject.new() :: any, AdorneeValue)
 
-	self._adornee = ValueObject.new()
-	self._maid:GiveTask(self._adornee)
-
-
+	self._adornee = self._maid:Add(ValueObject.new())
 
 	return self
 end
@@ -37,7 +48,7 @@ end
 
 	@return Instance | CFrame | Vector3 | nil
 ]=]
-function AdorneeValue:GetAdornee()
+function AdorneeValue.GetAdornee(self: AdorneeValue): (Instance | CFrame | Vector3)?
 	return self._adornee.Value
 end
 
@@ -46,7 +57,7 @@ end
 
 	@return Observable<Instance | CFrame | Vector3 | nil>
 ]=]
-function AdorneeValue:Observe()
+function AdorneeValue.Observe(self: AdorneeValue): Observable.Observable<(Instance | CFrame | Vector3)?>
 	return self._adornee:Observe()
 end
 
@@ -62,7 +73,7 @@ end
 	@prop Value Instance | CFrame | Vector3 | nil
 	@within AdorneeValue
 ]=]
-function AdorneeValue:__index(index)
+(AdorneeValue :: any).__index = function(self, index)
 	if index == "Value" then
 		return self._adornee.Value
 	elseif index == "Changed" then
@@ -77,12 +88,12 @@ function AdorneeValue:__index(index)
 	end
 end
 
-function AdorneeValue:__newindex(index, value)
+function AdorneeValue.__newindex(self, index, value)
 	if index == "Value" then
-		assert(typeof(value) == "Instance"
-		or typeof(value) == "Vector3"
-		or typeof(value) == "CFrame"
-		or value == nil, "Bad value")
+		assert(
+			typeof(value) == "Instance" or typeof(value) == "Vector3" or typeof(value) == "CFrame" or value == nil,
+			"Bad value"
+		)
 
 		self._adornee.Value = value
 	elseif index == "_adornee" or index == "_maid" then
@@ -101,8 +112,8 @@ end
 
 	@return Observable<CFrame | nil>
 ]=]
-function AdorneeValue:ObserveBottomCFrame()
-	return Blend.Computed(self._adornee, function(adornee)
+function AdorneeValue.ObserveBottomCFrame(self: AdorneeValue): Observable.Observable<CFrame?>
+	return Blend.Computed(self._adornee, function(adornee: Instance): CFrame?
 		if typeof(adornee) == "CFrame" then
 			return adornee
 		elseif typeof(adornee) == "Vector3" then
@@ -110,11 +121,11 @@ function AdorneeValue:ObserveBottomCFrame()
 		elseif typeof(adornee) == "Instance" then
 			-- TODO: Nearest bounding box stuff.
 			local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(adornee)
-			if not bbCFrame then
+			if not bbCFrame or not bbSize then
 				return nil
 			end
 
-			return bbCFrame * CFrame.new(0, -bbSize.y/2, 0)
+			return bbCFrame * CFrame.new(0, -bbSize.Y / 2, 0)
 		elseif adornee then
 			warn("Bad adornee")
 			return nil
@@ -129,7 +140,7 @@ end
 
 	@return Observable<Vector3 | nil>
 ]=]
-function AdorneeValue:ObserveCenterPosition()
+function AdorneeValue.ObserveCenterPosition(self: AdorneeValue): Observable.Observable<Vector3?>
 	return Blend.Computed(self._adornee, function()
 		return self:GetCenterPosition()
 	end)
@@ -140,7 +151,7 @@ end
 
 	@return Vector3 | nil
 ]=]
-function AdorneeValue:GetCenterPosition()
+function AdorneeValue.GetCenterPosition(self: AdorneeValue): Vector3?
 	local adornee = self._adornee.Value
 
 	if typeof(adornee) == "CFrame" then
@@ -163,7 +174,7 @@ end
 
 	@return Observable<number?>
 ]=]
-function AdorneeValue:ObserveRadius()
+function AdorneeValue.ObserveRadius(self: AdorneeValue): Observable.Observable<number?>
 	return Blend.Computed(self._adornee, function()
 		return self:GetRadius()
 	end)
@@ -174,7 +185,7 @@ end
 
 	@return number?
 ]=]
-function AdorneeValue:GetRadius()
+function AdorneeValue.GetRadius(self: AdorneeValue): number?
 	local adornee = self._adornee.Value
 
 	if typeof(adornee) == "CFrame" then
@@ -184,11 +195,11 @@ function AdorneeValue:GetRadius()
 	elseif typeof(adornee) == "Instance" then
 		-- TODO: Nearest bounding box stuff.
 		local bbCFrame, bbSize = AdorneeUtils.getBoundingBox(adornee)
-		if not bbCFrame then
+		if not bbCFrame or not bbSize then
 			return nil
 		end
 
-		return bbSize.magnitude/2
+		return bbSize.Magnitude / 2
 	elseif adornee then
 		warn("Bad adornee")
 		return nil
@@ -205,16 +216,21 @@ end
 	@param observeRadius Observable<number>
 	@return Observable
 ]=]
-function AdorneeValue:ObservePositionTowards(observeTargetPosition, observeRadius)
+function AdorneeValue.ObservePositionTowards(
+	self: AdorneeValue,
+	observeTargetPosition: Observable.Observable<Vector3>,
+	observeRadius: Observable.Observable<number>
+)
 	-- TODO: Some sort of de-duplication/multicast.
 
 	return Blend.Computed(
 		observeTargetPosition,
 		self:ObserveCenterPosition(),
 		observeRadius or self:ObserveRadius(),
-		function(target, radius, center)
+		function(target: Vector3, radius: number, center: Vector3)
 			return self:_getPositionTowards(target, radius, center)
-		end)
+		end
+	)
 end
 
 --[=[
@@ -226,26 +242,31 @@ end
 	@param center Vector3
 	@return Vector3
 ]=]
-function AdorneeValue:GetPositionTowards(target, radius, center)
+function AdorneeValue.GetPositionTowards(self: AdorneeValue, target: Vector3, radius: number, center: Vector3): Vector3?
 	assert(typeof(target) == "Vector3", "Bad target")
 
-	center = center or self:GetCenterPosition()
-	radius = radius or self:GetRadius()
+	center = center or assert(self:GetCenterPosition(), "Bad center")
+	radius = radius or assert(self:GetRadius(), "Bad radius")
 
 	return self:_getPositionTowards(target, radius, center)
 end
 
-function AdorneeValue:_getPositionTowards(target, radius, center)
+function AdorneeValue._getPositionTowards(
+	_self: AdorneeValue,
+	target: Vector3,
+	radius: number,
+	center: Vector3
+): Vector3?
 	if not (radius and target and center) then
 		return nil
 	end
 
 	local offset = target - center
-	if offset.magnitude == 0 then
+	if offset.Magnitude == 0 then
 		return nil
 	end
 
-	return center + offset.unit * radius
+	return center + offset.Unit * radius
 end
 
 --[=[
@@ -254,8 +275,8 @@ end
 
 	@return Observable<Instance?>
 ]=]
-function AdorneeValue:ObserveAttachmentParent()
-	return Blend.Computed(self._adornee, function(adornee)
+function AdorneeValue.ObserveAttachmentParent(self: AdorneeValue)
+	return Blend.Computed(self._adornee, function(adornee): Instance?
 		if typeof(adornee) == "Instance" then
 			-- TODO: Nearest bounding box stuff.
 			local part = AdorneeUtils.getPart(adornee)
@@ -283,10 +304,10 @@ end
 	@param props {} -- Takes [Blend.Children] as an option
 	@return Observable<Instance?>
 ]=]
-function AdorneeValue:RenderPositionAttachment(props)
+function AdorneeValue.RenderPositionAttachment(self: AdorneeValue, props)
 	props = props or {}
 
-	local observeWorldPosition = props.WorldPosition or self:ObserveCenterPosition();
+	local observeWorldPosition = props.WorldPosition or self:ObserveCenterPosition()
 	local observeParentPart = self:ObserveAttachmentParent()
 
 	local observeCFrame = Blend.Computed(observeParentPart, observeWorldPosition, function(parentPart, position)
@@ -295,13 +316,13 @@ function AdorneeValue:RenderPositionAttachment(props)
 		else
 			return CFrame.new(0, 0, 0)
 		end
-	end);
+	end)
 
 	return Blend.New "Attachment" {
-		Name = props.Name or "AdorneeValueAttachment";
-		Parent = observeParentPart;
-		CFrame = observeCFrame;
-		[Blend.Children] = props[Blend.Children];
+		Name = props.Name or "AdorneeValueAttachment",
+		Parent = observeParentPart,
+		CFrame = observeCFrame,
+		[Blend.Children] = props[Blend.Children],
 	}
 end
 

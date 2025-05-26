@@ -13,6 +13,7 @@ local VRService = game:GetService("VRService")
 local Maid = require("Maid")
 local RagdollClient = require("RagdollClient")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local StateStack = require("StateStack")
 local ValueObject = require("ValueObject")
 
@@ -26,7 +27,7 @@ local MOVE_DISTANCE_REQUIRED = 2.5
 	Initializes the idle service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function IdleServiceClient:Init(serviceBag)
+function IdleServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._maid, "Already initialized")
 
 	self._maid = Maid.new()
@@ -84,22 +85,22 @@ function IdleServiceClient:ObserveHumanoidMoveFromCurrentPosition(minimumTimeVis
 	assert(type(minimumTimeVisible) == "number", "Bad minimumTimeVisible")
 
 	return Rx.of(true):Pipe({
-		Rx.delay(minimumTimeVisible);
+		Rx.delay(minimumTimeVisible),
 		Rx.flatMap(function()
-			return self._lastPosition:Observe();
-		end);
+			return self._lastPosition:Observe()
+		end),
 		Rx.where(function(value)
 			return value ~= nil
-		end);
-		Rx.first();
+		end),
+		Rx.first(),
 		Rx.flatMap(function(initialPosition)
 			return self._lastPosition:Observe():Pipe({
 				Rx.where(function(position)
 					return position == nil or (initialPosition - position).magnitude >= MOVE_DISTANCE_REQUIRED
-				end)
+				end),
 			})
-		end);
-		Rx.first();
+		end),
+		Rx.first(),
 	})
 end
 
@@ -107,7 +108,7 @@ end
 	Returns whether the humanoid is idle.
 	@return boolean
 ]=]
-function IdleServiceClient:IsHumanoidIdle()
+function IdleServiceClient:IsHumanoidIdle(): boolean
 	return self._humanoidIdle.Value
 end
 
@@ -115,7 +116,7 @@ end
 	Returns whether the humanoid is idle.
 	@return boolean
 ]=]
-function IdleServiceClient:IsMoving()
+function IdleServiceClient:IsMoving(): boolean
 	return not self._humanoidIdle.Value
 end
 
@@ -166,7 +167,7 @@ function IdleServiceClient:PushDisable()
 	return self._disableStack:PushState(true)
 end
 
-function IdleServiceClient:_setEnabled(enabled)
+function IdleServiceClient:_setEnabled(enabled: boolean)
 	assert(type(enabled) == "boolean", "Bad enabled")
 	self._enabled.Value = enabled
 end

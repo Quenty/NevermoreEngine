@@ -6,10 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
 local SoundEffectsRegistry = require("SoundEffectsRegistry")
 local SoundGroupPathUtils = require("SoundGroupPathUtils")
 local SoundGroupTracker = require("SoundGroupTracker")
@@ -18,7 +19,7 @@ local WellKnownSoundGroups = require("WellKnownSoundGroups")
 local SoundEffectService = {}
 SoundEffectService.ServiceName = "SoundEffectService"
 
-function SoundEffectService:Init(serviceBag)
+function SoundEffectService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -36,14 +37,14 @@ end
 	@param sound Sound
 	@param soundGroupPath string? -- Optional
 ]=]
-function SoundEffectService:RegisterSFX(sound, soundGroupPath)
+function SoundEffectService:RegisterSFX(sound: Sound, soundGroupPath: string?)
 	assert(typeof(sound) == "Instance" and sound:IsA("Sound"), "Bad sound")
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath) or soundGroupPath == nil, "Bad soundGroupPath")
 
 	sound.SoundGroup = self:GetOrCreateSoundGroup(soundGroupPath or WellKnownSoundGroups.SFX)
 end
 
-function SoundEffectService:GetOrCreateSoundGroup(soundGroupPath)
+function SoundEffectService:GetOrCreateSoundGroup(soundGroupPath: string): SoundGroup
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 
 	local found = self:GetSoundGroup(soundGroupPath)
@@ -55,7 +56,7 @@ function SoundEffectService:GetOrCreateSoundGroup(soundGroupPath)
 	return SoundGroupPathUtils.findOrCreateSoundGroup(soundGroupPath)
 end
 
-function SoundEffectService:GetSoundGroup(soundGroupPath)
+function SoundEffectService:GetSoundGroup(soundGroupPath: string): SoundGroup
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 
 	if not self._tracker then
@@ -75,7 +76,7 @@ function SoundEffectService:GetSoundGroup(soundGroupPath)
 	return SoundGroupPathUtils.findOrCreateSoundGroup(soundGroupPath)
 end
 
-function SoundEffectService:PushEffect(soundGroupPath, effect)
+function SoundEffectService:PushEffect(soundGroupPath: string, effect)
 	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 	assert(type(effect) == "function", "Bad effect")
 
@@ -96,14 +97,13 @@ function SoundEffectService:_setupEffectApplication()
 		end
 
 		local maid, soundGroup = brio:ToMaidAndValue()
-		maid:GiveTask(self._tracker:ObserveSoundGroupPath(soundGroup)
-			:Subscribe(function(soundGroupPath)
-				if soundGroupPath then
-					maid._currentEffects = self._soundEffectsRegister:ApplyEffects(soundGroupPath, soundGroup)
-				else
-					maid._currentEffects = nil
-				end
-			end))
+		maid:GiveTask(self._tracker:ObserveSoundGroupPath(soundGroup):Subscribe(function(soundGroupPath)
+			if soundGroupPath then
+				maid._currentEffects = self._soundEffectsRegister:ApplyEffects(soundGroupPath, soundGroup)
+			else
+				maid._currentEffects = nil
+			end
+		end))
 	end))
 
 	-- Render sound groups
@@ -120,7 +120,6 @@ function SoundEffectService:_setupEffectApplication()
 		end)
 	end))
 end
-
 
 function SoundEffectService:Destroy()
 	self._maid:DoCleaning()

@@ -2,40 +2,45 @@
 	@class BinderProvider.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local BinderProvider = require("BinderProvider")
 local Binder = require("Binder")
+local BinderProvider = require("BinderProvider")
+local Jest = require("Jest")
 
-return function()
-	describe("BinderProvider.new()", function()
-		local provider
-		local initialized = false
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
 
-		it("should execute immediately", function()
-			provider = BinderProvider.new("BinderServiceName", function(self, arg)
-				initialized = true
-				assert(arg == 12345, "Bad arg")
+describe("BinderProvider.new()", function()
+	local provider
+	local initialized = false
 
-				self:Add(Binder.new("Test", function()
-					return { Destroy = function() end; }
-				end))
-			end)
+	it("should execute immediately", function()
+		provider = BinderProvider.new("BinderServiceName", function(self, arg)
+			initialized = true
+			assert(arg == 12345, "Bad arg")
 
-			expect(provider).to.be.a("table")
+			self:Add(Binder.new("Test", function()
+				return { Destroy = function() end }
+			end))
 		end)
 
-		it("should initialize", function()
-			expect(initialized).to.equal(false)
-			provider:Init(12345)
-			expect(initialized).to.equal(true)
-		end)
-
-		it("should contain the binder", function()
-			expect(provider.Test).to.be.a("table")
-		end)
-
-		provider:Destroy()
+		expect(provider).toEqual(expect.any("table"))
 	end)
 
-end
+	it("should initialize", function()
+		expect(initialized).toEqual(false)
+		provider:Init(12345)
+		expect(initialized).toEqual(true)
+	end)
+
+	it("should contain the binder", function()
+		expect(provider.Test).toEqual(expect.any("table"))
+	end)
+
+	if provider then
+		provider:Destroy()
+	end
+end)

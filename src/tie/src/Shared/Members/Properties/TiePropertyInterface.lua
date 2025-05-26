@@ -25,8 +25,11 @@ local TiePropertyInterface = setmetatable({}, TieMemberInterface)
 TiePropertyInterface.ClassName = "TiePropertyInterface"
 TiePropertyInterface.__index = TiePropertyInterface
 
-function TiePropertyInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm)
-	local self = setmetatable(TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm), TiePropertyInterface)
+function TiePropertyInterface.new(implParent, adornee: Instance, memberDefinition, interfaceTieRealm)
+	local self = setmetatable(
+		TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm),
+		TiePropertyInterface
+	)
 
 	return self
 end
@@ -40,7 +43,7 @@ function TiePropertyInterface:ObserveBrio(predicate)
 				-- TODO: Maybe don't assumet his exists and use a helper method instead.
 				return valueBase:ObserveBrio(predicate)
 			end
-		end);
+		end),
 	})
 end
 
@@ -77,8 +80,8 @@ function TiePropertyInterface:Observe()
 
 				return maid
 			end)
-		end);
-		Rx.distinct();
+		end),
+		Rx.distinct(),
 	})
 end
 
@@ -106,9 +109,13 @@ end
 function TiePropertyInterface:_getValueBaseOrError()
 	local valueBase = self:_findValueBase()
 	if not valueBase then
-		error(string.format("%s.%s is not implemented for %s",
-			self._memberDefinition:GetFriendlyName(),
-			self:_getFullName()))
+		error(
+			string.format(
+				"%s.%s is not implemented for %s",
+				self._memberDefinition:GetFriendlyName(),
+				self:_getFullName()
+			)
+		)
 	end
 	return valueBase
 end
@@ -125,13 +132,13 @@ end
 
 function TiePropertyInterface:_getChangedEvent()
 	return RxSignal.new(self:Observe():Pipe({
-		Rx.skip(1)
+		Rx.skip(1),
 	}))
 end
 
 local IMPLEMENTATION_TYPES = {
-	attribute = "attribute";
-	none = "none";
+	attribute = "attribute",
+	none = "none",
 }
 
 function TiePropertyInterface:_observeFromImplParent(implParent)
@@ -224,8 +231,8 @@ function TiePropertyInterface:_observeValueBaseBrio()
 	return self:ObserveImplParentBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(implParent)
 			return self:_observeFromImplParent(implParent)
-		end);
-		RxBrioUtils.onlyLastBrioSurvives();
+		end),
+		RxBrioUtils.onlyLastBrioSurvives(),
 	})
 end
 
@@ -245,7 +252,12 @@ function TiePropertyInterface:__index(index)
 		return valueBase.Value
 	elseif index == "Changed" then
 		return self:_getChangedEvent()
-	elseif index == "_adornee" or index == "_implParent" or index == "_memberDefinition" or index == "_tieDefinition" then
+	elseif
+		index == "_adornee"
+		or index == "_implParent"
+		or index == "_memberDefinition"
+		or index == "_tieDefinition"
+	then
 		return rawget(self, index)
 	else
 		error(string.format("Bad index %q for TiePropertyInterface", tostring(index)))
@@ -258,12 +270,17 @@ function TiePropertyInterface:__newindex(index, value)
 	elseif index == "Value" then
 		local className = ValueBaseUtils.getClassNameFromType(typeof(value))
 		if not className then
-			error(string.format("[TiePropertyImplementation] - Bad implementation value type %q, cannot set", typeof(value)))
+			error(
+				string.format(
+					"[TiePropertyImplementation] - Bad implementation value type %q, cannot set",
+					typeof(value)
+				)
+			)
 		end
 
 		local valueBase = self:_findValueBase()
 		if type(valueBase) == "table" or (typeof(valueBase) == "Instance" and valueBase.ClassName == className) then
-			valueBase.Value = value
+			(valueBase :: any).Value = value
 		elseif AttributeUtils.isValidAttributeType(typeof(value)) and value ~= nil then
 			local implParent = self:GetImplParent()
 			if implParent then
@@ -279,11 +296,17 @@ function TiePropertyInterface:__newindex(index, value)
 		else
 			local implParent = self:GetImplParent()
 			if implParent then
-				local copy = TiePropertyImplementationUtils.changeToClassIfNeeded(self._memberDefinition, implParent, className)
+				local copy =
+					TiePropertyImplementationUtils.changeToClassIfNeeded(self._memberDefinition, implParent, className)
 				copy.Value = value
 				copy.Parent = implParent
 			else
-				error(string.format("[TiePropertyImplementation] - No implParent for %q", self._memberDefinition:GetMemberName()))
+				error(
+					string.format(
+						"[TiePropertyImplementation] - No implParent for %q",
+						self._memberDefinition:GetMemberName()
+					)
+				)
 			end
 		end
 	elseif index == "Changed" then
@@ -292,6 +315,5 @@ function TiePropertyInterface:__newindex(index, value)
 		error(string.format("Bad index %q for TiePropertyInterface", tostring(index)))
 	end
 end
-
 
 return TiePropertyInterface

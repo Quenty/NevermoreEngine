@@ -58,21 +58,20 @@ function ShowBody:_observeNonHeadParts()
 	end)
 end
 
-
 function ShowBody:_observeNonHeadAndFaceAccessoryPartsBrio()
 	return self:_observeAccessoriesBrio():Pipe({
 		RxBrioUtils.flatMapBrio(function(accessory)
 			return RxInstanceUtils.observePropertyBrio(accessory, "AccessoryType", function(accessoryType)
 				return accessoryType ~= Enum.AccessoryType.Hat and accessoryType ~= Enum.AccessoryType.Face
 			end):Pipe({
-				RxBrioUtils.onlyLastBrioSurvives();
+				RxBrioUtils.onlyLastBrioSurvives(),
 				RxBrioUtils.switchMapBrio(function()
 					return RxInstanceUtils.observeDescendantsBrio(accessory, function(child)
 						return child:IsA("BasePart")
 					end)
-				end);
+				end),
 			})
-		end)
+		end),
 	})
 end
 

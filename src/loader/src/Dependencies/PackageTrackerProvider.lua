@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class PackageTrackerProvider
 ]=]
@@ -11,7 +12,16 @@ local PackageTrackerProvider = {}
 PackageTrackerProvider.ClassName = "PackageTrackerProvider"
 PackageTrackerProvider.__index = PackageTrackerProvider
 
-function PackageTrackerProvider.new()
+export type PackageTrackerProvider = typeof(setmetatable(
+	{} :: {
+		_packageTrackersRoots: { [Instance]: PackageTracker.PackageTracker },
+		_maid: Maid.Maid,
+		_trackCount: number,
+	},
+	{} :: typeof({ __index = PackageTrackerProvider })
+))
+
+function PackageTrackerProvider.new(): PackageTrackerProvider
 	local self = setmetatable({}, PackageTrackerProvider)
 
 	self._maid = Maid.new()
@@ -21,28 +31,37 @@ function PackageTrackerProvider.new()
 	return self
 end
 
-function PackageTrackerProvider:AddPackageRoot(instance)
+function PackageTrackerProvider.AddPackageRoot(
+	self: PackageTrackerProvider,
+	instance: Instance
+): PackageTracker.PackageTracker
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	if self._packageTrackersRoots[instance] then
 		return self._packageTrackersRoots[instance]
 	end
 
-	self._trackCount = self._trackCount + 1
+	self._trackCount += 1
 
 	local maid = Maid.new()
 
-	self._packageTrackersRoots[instance] = maid:Add(PackageTracker.new(self, instance))
+	local packageTracker = PackageTracker.new(self :: any, instance)
+	maid:GiveTask(packageTracker)
+
+	self._packageTrackersRoots[instance] = packageTracker
 	self._maid[instance] = maid
 
-	self._packageTrackersRoots[instance]:StartTracking()
+	packageTracker:StartTracking()
 
 	-- TODO: Provide cleanup mechanism
 
 	return self._packageTrackersRoots[instance]
 end
 
-function PackageTrackerProvider:FindPackageTracker(instance)
+function PackageTrackerProvider.FindPackageTracker(
+	self: PackageTrackerProvider,
+	instance: Instance
+): PackageTracker.PackageTracker?
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local current = instance
@@ -51,13 +70,13 @@ function PackageTrackerProvider:FindPackageTracker(instance)
 			return self._packageTrackersRoots[current]
 		end
 
-		current = current.Parent
+		current = current.Parent :: Instance
 	end
 
 	return nil
 end
 
-function PackageTrackerProvider:Destroy()
+function PackageTrackerProvider.Destroy(self: PackageTrackerProvider)
 	self._maid:DoCleaning()
 end
 

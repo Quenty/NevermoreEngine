@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Acts as a priority slot which can be overridden and play any animation in.
 	See Roblox's animation system for more information.
@@ -18,14 +19,26 @@ local AnimationSlotPlayer = setmetatable({}, BaseObject)
 AnimationSlotPlayer.ClassName = "AnimationSlotPlayer"
 AnimationSlotPlayer.__index = AnimationSlotPlayer
 
+export type AnimationSlotPlayer = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_animationTarget: ValueObject.ValueObject<Instance>,
+		_defaultFadeTime: ValueObject.ValueObject<number>,
+		_defaultAnimationPriority: ValueObject.ValueObject<Enum.AnimationPriority>,
+		_currentAnimationTrackData: ValueObject.ValueObject<any>,
+		_currentAnimationId: ValueObject.ValueObject<string>,
+	},
+	{} :: typeof({ __index = AnimationSlotPlayer })
+)) & BaseObject.BaseObject
+
 --[=[
 	Creates a new AnimationSlotPlayer with a target to play the animation on.
 
 	@param animationTarget Instance? | Observable<Instance>
 	@return AnimationSlotPlayer
 ]=]
-function AnimationSlotPlayer.new(animationTarget)
-	local self = setmetatable(BaseObject.new(), AnimationSlotPlayer)
+function AnimationSlotPlayer.new(animationTarget): AnimationSlotPlayer
+	local self: AnimationSlotPlayer = setmetatable(BaseObject.new() :: any, AnimationSlotPlayer)
 
 	self._animationTarget = self._maid:Add(ValueObject.new(nil))
 	self._defaultFadeTime = self._maid:Add(ValueObject.new(0.1, "number"))
@@ -45,7 +58,7 @@ end
 
 	@param defaultFadeTime number
 ]=]
-function AnimationSlotPlayer:SetDefaultFadeTime(defaultFadeTime)
+function AnimationSlotPlayer.SetDefaultFadeTime(self: AnimationSlotPlayer, defaultFadeTime: number)
 	self._defaultFadeTime.Value = defaultFadeTime
 end
 
@@ -54,8 +67,11 @@ end
 
 	@param defaultAnimationPriority number
 ]=]
-function AnimationSlotPlayer:SetDefaultAnimationPriority(defaultAnimationPriority)
-	assert(EnumUtils.isOfType(Enum.AnimationPriority, defaultAnimationPriority) or defaultAnimationPriority == nil, "Bad defaultAnimationPriority")
+function AnimationSlotPlayer.SetDefaultAnimationPriority(self: AnimationSlotPlayer, defaultAnimationPriority)
+	assert(
+		EnumUtils.isOfType(Enum.AnimationPriority, defaultAnimationPriority) or defaultAnimationPriority == nil,
+		"Bad defaultAnimationPriority"
+	)
 
 	self._defaultAnimationPriority.Value = defaultAnimationPriority
 end
@@ -65,9 +81,17 @@ end
 
 	@param animationTarget Instance | Observable<Instance>
 ]=]
-function AnimationSlotPlayer:SetAnimationTarget(animationTarget)
+function AnimationSlotPlayer.SetAnimationTarget(self: AnimationSlotPlayer, animationTarget)
 	self._animationTarget:Mount(animationTarget)
 end
+
+type AnimationData = {
+	animationId: string,
+	track: AnimationTrack,
+	originalSpeed: number?,
+	originalWeight: number?,
+	originalPriority: Enum.AnimationPriority?,
+}
 
 --[=[
 	Adjusts the speed of the animation playing in the slot
@@ -76,7 +100,7 @@ end
 	@param speed number
 	@return () -> () -- Callback to clean things up
 ]=]
-function AnimationSlotPlayer:AdjustSpeed(id, speed)
+function AnimationSlotPlayer.AdjustSpeed(self: AnimationSlotPlayer, id: string | number, speed: number)
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 	assert(type(speed) == "number", "Bad speed")
 
@@ -84,32 +108,34 @@ function AnimationSlotPlayer:AdjustSpeed(id, speed)
 
 	local topMaid = Maid.new()
 
-	topMaid:GiveTask(self._currentAnimationTrackData:ObserveBrio(function(data)
-		return data and data.animationId == animationId
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
-
-		local data = brio:GetValue()
-		local maid = brio:ToMaid()
-
-		data.track:AdjustSpeed(speed)
-
-		-- TODO: Use stack here?
-		-- TODO: Probably need rogue property mechanisms
-		maid:GiveTask(function()
-			if math.abs(data.track.Speed - speed) <= 1e-3 then
-				data.track:AdjustSpeed(data.originalSpeed)
-			end
+	topMaid:GiveTask(self._currentAnimationTrackData
+		:ObserveBrio(function(data: AnimationData)
+			return data and data.animationId == animationId
 		end)
-	end))
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
+
+			local data: AnimationData = brio:GetValue()
+			local maid = brio:ToMaid()
+
+			data.track:AdjustSpeed(speed)
+
+			-- TODO: Use stack here?
+			-- TODO: Probably need rogue property mechanisms
+			maid:GiveTask(function()
+				if math.abs(data.track.Speed - speed) <= 1e-3 then
+					data.track:AdjustSpeed(data.originalSpeed)
+				end
+			end)
+		end))
 
 	-- TODO: Probably per-a-track instead of global like this
 	self._maid._currentSpeedAdjustment = topMaid
 
 	return function()
-		if self._maid._currentSpeedAdjustment == topMaid then
+		if self._maid._currentSpeedAdjustment :: any == topMaid then
 			self._maid._currentSpeedAdjustment = nil
 		end
 	end
@@ -120,10 +146,10 @@ end
 
 	@param id string | number
 	@param weight number
-	@param fadeTime number
+	@param fadeTime number?
 	@return () -> () -- Callback to clean things up
 ]=]
-function AnimationSlotPlayer:AdjustWeight(id, weight, fadeTime)
+function AnimationSlotPlayer.AdjustWeight(self: AnimationSlotPlayer, id: string, weight: number, fadeTime: number?)
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 	assert(type(weight) == "number", "Bad weight")
 	assert(type(fadeTime) == "number" or fadeTime == nil, "Bad fadeTime")
@@ -132,32 +158,34 @@ function AnimationSlotPlayer:AdjustWeight(id, weight, fadeTime)
 
 	local topMaid = Maid.new()
 
-	topMaid:GiveTask(self._currentAnimationTrackData:ObserveBrio(function(data)
-		return data and data.animationId == animationId
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
-
-		local data = brio:GetValue()
-		local maid = brio:ToMaid()
-
-		data.track:AdjustWeight(weight, fadeTime)
-
-		-- TODO: Use stack here?
-		-- TODO: Probably need rogue property mechanisms
-		maid:GiveTask(function()
-			if math.abs(data.track.Speed - weight) <= 1e-3 then
-				data.track:AdjustWeight(data.originalWeight, fadeTime)
-			end
+	topMaid:GiveTask(self._currentAnimationTrackData
+		:ObserveBrio(function(data)
+			return data and data.animationId == animationId
 		end)
-	end))
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
+
+			local data: AnimationData = brio:GetValue()
+			local maid = brio:ToMaid()
+
+			data.track:AdjustWeight(weight, fadeTime)
+
+			-- TODO: Use stack here?
+			-- TODO: Probably need rogue property mechanisms
+			maid:GiveTask(function()
+				if math.abs(data.track.Speed - weight) <= 1e-3 then
+					data.track:AdjustWeight(data.originalWeight, fadeTime)
+				end
+			end)
+		end))
 
 	-- TODO: Probably per-a-track instead of global like this
 	self._maid._currentWeightAdjustment = topMaid
 
 	return function()
-		if self._maid._currentWeightAdjustment == topMaid then
+		if self._maid._currentWeightAdjustment :: any == topMaid then
 			self._maid._currentWeightAdjustment = nil
 		end
 	end
@@ -170,10 +198,17 @@ end
 	@param fadeTime number?
 	@param weight number?
 	@param speed number?
-	@param priority number?
+	@param priority Enum.AnimationPriority?
 	@return () -> () -- Callback to clean things up
 ]=]
-function AnimationSlotPlayer:Play(id, fadeTime, weight, speed, priority)
+function AnimationSlotPlayer.Play(
+	self: AnimationSlotPlayer,
+	id: string | number,
+	fadeTime: number?,
+	weight: number?,
+	speed: number?,
+	priority: Enum.AnimationPriority?
+): () -> ()
 	fadeTime = fadeTime or self._defaultFadeTime.Value
 	priority = priority or self._defaultAnimationPriority.Value
 	weight = weight or 1 -- We need to explicitly adjust the weight here
@@ -182,45 +217,47 @@ function AnimationSlotPlayer:Play(id, fadeTime, weight, speed, priority)
 
 	local animationId = RbxAssetUtils.toRbxAssetId(id)
 
-	topMaid:GiveTask(self._animationTarget:ObserveBrio(function(target)
-		return target ~= nil
-	end):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	topMaid:GiveTask(self._animationTarget
+		:ObserveBrio(function(target)
+			return target ~= nil
+		end)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-		local animationTarget = brio:GetValue()
-		local maid = brio:ToMaid()
+			local animationTarget: any = brio:GetValue()
+			local maid = brio:ToMaid()
 
-		local track = AnimationUtils.playAnimation(animationTarget, animationId, fadeTime, weight, speed, priority)
-		if track then
-			local data = {
-				animationId = animationId;
-				track = track;
-				originalSpeed = speed;
-				originalWeight = weight;
-				originalPriority = priority;
-			}
+			local track = AnimationUtils.playAnimation(animationTarget, animationId, fadeTime, weight, speed, priority)
+			if track then
+				local data = {
+					animationId = animationId,
+					track = track,
+					originalSpeed = speed,
+					originalWeight = weight,
+					originalPriority = priority,
+				}
 
-			self._currentAnimationTrackData.Value = data
-			maid:GiveTask(function()
-				if self._currentAnimationTrackData.Value == data then
-					self._currentAnimationTrackData.Value = nil
-				end
-			end)
+				self._currentAnimationTrackData.Value = data
+				maid:GiveTask(function()
+					if self._currentAnimationTrackData.Value == data then
+						self._currentAnimationTrackData.Value = nil
+					end
+				end)
 
-			maid:GiveTask(function()
-				track:AdjustWeight(0, fadeTime or self._defaultFadeTime.Value)
-			end)
-		else
-			warn("[AnimationSlotPlayer] - Failed to get animation to play")
-		end
-	end))
+				maid:GiveTask(function()
+					track:AdjustWeight(0, fadeTime or self._defaultFadeTime.Value)
+				end)
+			else
+				warn("[AnimationSlotPlayer] - Failed to get animation to play")
+			end
+		end))
 
 	self._maid._current = topMaid
 
 	return function()
-		if self._maid._current == topMaid then
+		if self._maid._current :: any == topMaid then
 			self._maid._current = nil
 		end
 	end
@@ -229,7 +266,7 @@ end
 --[=[
 	Stops the current animation playing
 ]=]
-function AnimationSlotPlayer:Stop()
+function AnimationSlotPlayer.Stop(self: AnimationSlotPlayer)
 	self._maid._current = nil
 end
 

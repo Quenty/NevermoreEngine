@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Brios wrap a value (or tuple of values) and are used to convey the lifetime of that
 	object. The brio is better than a maid, by providing the following constraints:
@@ -59,11 +60,19 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
-local GoodSignal = require("GoodSignal")
+local Signal = require("Signal")
 
 local Brio = {}
-Brio.ClassName = "Brio"
 Brio.__index = Brio
+Brio.ClassName = "Brio"
+
+export type Brio<T...> = typeof(setmetatable(
+	{} :: {
+		n: number?,
+		_diedEvent: Signal.Signal<T...>,
+	},
+	{} :: typeof({ __index = Brio })
+))
 
 --[=[
 	Returns whether a value is a Brio.
@@ -74,7 +83,7 @@ Brio.__index = Brio
 	@param value any
 	@return boolean
 ]=]
-function Brio.isBrio(value)
+function Brio.isBrio(value: any): boolean
 	return type(value) == "table" and value.ClassName == "Brio"
 end
 
@@ -89,8 +98,8 @@ end
 	@param ... any -- Brio values
 	@return Brio
 ]=]
-function Brio.new(...) -- Wrap
-	return setmetatable(table.pack(...), Brio)
+function Brio.new<T...>(...: T...): Brio<T...>
+	return setmetatable(table.pack(...) :: any, Brio)
 end
 
 --[=[
@@ -101,8 +110,8 @@ end
 	@param ... any -- Brio values
 	@return Brio
 ]=]
-function Brio.delayed(time, ...)
-	local brio = Brio.new(...)
+function Brio.delayed<T...>(time: number, ...: T...): Brio<T...>
+	local brio: Brio<T...> = Brio.new(...)
 	task.delay(time, function()
 		brio:Kill()
 	end)
@@ -129,7 +138,7 @@ end
 
 	@return Signal
 ]=]
-function Brio:GetDiedSignal()
+function Brio.GetDiedSignal<T...>(self: Brio<T...>): Signal.Signal<T...>
 	if self:IsDead() then
 		error("Brio is dead")
 	end
@@ -138,8 +147,9 @@ function Brio:GetDiedSignal()
 		return self._diedEvent
 	end
 
-	self._diedEvent = GoodSignal.new()
-	return self._diedEvent
+	local diedEvent = Signal.new()
+	self._diedEvent = diedEvent
+	return diedEvent
 end
 
 --[=[
@@ -156,7 +166,7 @@ end
 
 	@return boolean
 ]=]
-function Brio:IsDead()
+function Brio.IsDead<T...>(self: Brio<T...>): boolean
 	return self.n == nil
 end
 
@@ -167,7 +177,7 @@ end
 	brio.DEAD:ErrorIfDead() --> ERROR: [Brio.ErrorIfDead] - Brio is dead
 	```
 ]=]
-function Brio:ErrorIfDead()
+function Brio.ErrorIfDead<T...>(self: Brio<T...>)
 	if not self.n then
 		error("[Brio.ErrorIfDead] - Brio is dead")
 	end
@@ -192,7 +202,7 @@ end
 
 	@return Maid
 ]=]
-function Brio:ToMaid()
+function Brio.ToMaid<T...>(self: Brio<T...>): Maid.Maid
 	assert(self.n ~= nil, "Brio is dead")
 
 	local maid = Maid.new()
@@ -204,7 +214,7 @@ function Brio:ToMaid()
 	return maid
 end
 
-function Brio:ToMaidAndValue()
+function Brio.ToMaidAndValue<T...>(self: Brio<T...>): (any, T...)
 	return self:ToMaid(), self:GetValue()
 end
 
@@ -226,10 +236,10 @@ end
 
 	@return any
 ]=]
-function Brio:GetValue()
+function Brio.GetValue<T...>(self: Brio<T...>): T...
 	assert(self.n, "Brio is dead")
 
-	return unpack(self, 1, self.n)
+	return unpack(self :: any, 1, self.n)
 end
 
 --[=[
@@ -238,7 +248,7 @@ end
 	@since 3.6.0
 	@return { n: number, ... T }
 ]=]
-function Brio:GetPackedValues()
+function Brio.GetPackedValues<T...>(self: Brio<T...>)
 	assert(self.n, "Brio is dead")
 
 	return self
@@ -259,14 +269,14 @@ end
 	print(brio:GetValue()) --> ERROR: Brio is dead
 	```
 ]=]
-function Brio:Destroy()
+function Brio.Destroy<T...>(self: Brio<T...>)
 	if not self.n then
 		return
 	end
 
-	local diedEvent = self._diedEvent
+	local diedEvent: any = self._diedEvent
 
-	table.clear(self)
+	table.clear(self :: any)
 	table.freeze(self)
 
 	if diedEvent then
@@ -293,7 +303,7 @@ Brio.Kill = Brio.Destroy
 	@prop DEAD Brio
 	@within Brio
 ]=]
-Brio.DEAD = Brio.new()
+Brio.DEAD = Brio.new() :: Brio<...any>
 Brio.DEAD:Kill()
 
 return Brio

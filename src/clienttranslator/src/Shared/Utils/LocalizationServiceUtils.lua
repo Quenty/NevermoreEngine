@@ -39,7 +39,7 @@ function LocalizationServiceUtils.promiseTranslatorForLocale(localeId)
 	end)
 end
 
-function LocalizationServiceUtils.promisePlayerTranslator(player)
+function LocalizationServiceUtils.promisePlayerTranslator(player: Player)
 	local promiseTranslator = Promise.spawn(function(resolve, reject)
 		local translator = nil
 		local ok, err = pcall(function()

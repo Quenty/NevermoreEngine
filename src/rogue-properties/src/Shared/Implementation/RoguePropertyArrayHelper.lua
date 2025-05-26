@@ -22,13 +22,13 @@ function RoguePropertyArrayHelper.new(serviceBag, arrayDefinitionHelper, roguePr
 	return self
 end
 
-function RoguePropertyArrayHelper:SetCanInitialize(canInitialize)
+function RoguePropertyArrayHelper:SetCanInitialize(canInitialize: boolean)
 	if canInitialize then
 		self:GetArrayRogueProperties()
 	end
 end
 
-function RoguePropertyArrayHelper:GetArrayRogueProperty(index)
+function RoguePropertyArrayHelper:GetArrayRogueProperty(index: number)
 	assert(type(index) == "number", "Bad index")
 
 	-- TODO: Maybe return something general for that index
@@ -47,7 +47,7 @@ function RoguePropertyArrayHelper:GetArrayRogueProperties()
 		if not (container and container:GetAttribute("HasInitializedArrayComponent")) then
 			container:SetAttribute("HasInitializedArrayComponent", true)
 			local properties = self:_getDefaultRogueProperties()
-			for _, rogueProperty in pairs(properties) do
+			for _, rogueProperty in properties do
 				-- Force initialization once and only once...
 				rogueProperty:SetCanInitialize(true)
 				rogueProperty:SetCanInitialize(false)
@@ -61,11 +61,13 @@ function RoguePropertyArrayHelper:GetArrayRogueProperties()
 
 	local adornee = self._roguePropertyTable:GetAdornee()
 
-
-	local definitions = RoguePropertyArrayUtils.createDefinitionsFromContainer(container, self._arrayDefinitionHelper:GetPropertyTableDefinition())
+	local definitions = RoguePropertyArrayUtils.createDefinitionsFromContainer(
+		container,
+		self._arrayDefinitionHelper:GetPropertyTableDefinition()
+	)
 	local rogueProperties = {}
 
-	for index, definition in pairs(definitions) do
+	for index, definition in definitions do
 		local property = definition:Get(self._serviceBag, adornee)
 		property:SetCanInitialize(false) -- Explicitly not going to reinitialize
 		rogueProperties[index] = property
@@ -81,7 +83,7 @@ function RoguePropertyArrayHelper:_getDefaultRogueProperties()
 
 	local defaultRogueProperties = {}
 	local adornee = self._roguePropertyTable:GetAdornee()
-	for _, definition in pairs(self._arrayDefinitionHelper:GetDefaultDefinitions()) do
+	for _, definition in self._arrayDefinitionHelper:GetDefaultDefinitions() do
 		local property = definition:Get(self._serviceBag, adornee)
 		table.insert(defaultRogueProperties, property)
 	end
@@ -105,7 +107,7 @@ function RoguePropertyArrayHelper:SetArrayBaseData(arrayData)
 	local adornee = self._roguePropertyTable:GetAdornee()
 	local definitions = RoguePropertyArrayUtils.createDefinitionsFromArrayData(arrayData, parentPropertyTableDefinition)
 
-	for index, definition in pairs(definitions) do
+	for index, definition in definitions do
 		if available[index] and available[index]:GetDefinition():GetValueType() == definition:GetValueType() then
 			available[index]:SetBaseValue(definition:GetDefaultValue())
 		else
@@ -140,7 +142,7 @@ function RoguePropertyArrayHelper:SetArrayData(arrayData)
 	local adornee = self._roguePropertyTable:GetAdornee()
 	local definitions = RoguePropertyArrayUtils.createDefinitionsFromArrayData(arrayData, parentPropertyTableDefinition)
 
-	for index, definition in pairs(definitions) do
+	for index, definition in definitions do
 		if available[index] and available[index]:GetDefinition():GetValueType() == definition:GetValueType() then
 			available[index]:SetValue(definition:GetDefaultValue())
 		else
@@ -159,7 +161,7 @@ function RoguePropertyArrayHelper:SetArrayData(arrayData)
 end
 
 function RoguePropertyArrayHelper:_removeUnspecified(container, definitions)
-	for _, item in pairs(container:GetChildren()) do
+	for _, item in container:GetChildren() do
 		local index = RoguePropertyArrayUtils.getIndexFromName(item.Name)
 		if index then
 			if not definitions[index] then
@@ -168,7 +170,6 @@ function RoguePropertyArrayHelper:_removeUnspecified(container, definitions)
 		end
 	end
 end
-
 
 function RoguePropertyArrayHelper:GetArrayBaseValues()
 	local result = {}
@@ -192,7 +193,7 @@ function RoguePropertyArrayHelper:ObserveArrayValues()
 	-- TODO: Allow for observing
 	local observables = {}
 
-	for _, rogueProperty in pairs(self:GetArrayRogueProperties()) do
+	for _, rogueProperty in self:GetArrayRogueProperties() do
 		table.insert(observables, rogueProperty:Observe())
 	end
 

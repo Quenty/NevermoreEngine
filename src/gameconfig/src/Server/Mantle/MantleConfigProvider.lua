@@ -9,8 +9,9 @@ local GameConfigAssetUtils = require("GameConfigAssetUtils")
 local GameConfigBindersServer = require("GameConfigBindersServer")
 local GameConfigService = require("GameConfigService")
 local GameConfigUtils = require("GameConfigUtils")
-local String = require("String")
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
+local String = require("String")
 
 local MantleConfigProvider = {}
 MantleConfigProvider.ClassName = "MantleConfigProvider"
@@ -24,13 +25,13 @@ function MantleConfigProvider.new(container)
 	return self
 end
 
-function MantleConfigProvider:Init(serviceBag)
+function MantleConfigProvider:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigService = self._serviceBag:GetService(GameConfigService)
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)
 	self._maid = Maid.new()
 
-	for _, item in pairs(self._container:GetChildren()) do
+	for _, item in self._container:GetChildren() do
 		if item:IsA("ModuleScript") then
 			self:_loadConfig(item)
 		end
@@ -50,7 +51,6 @@ function MantleConfigProvider:_loadConfig(item)
 
 	assert(coroutine.status(current) == "dead", "Loading the mantle config yielded")
 end
-
 
 function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 	assert(type(mantleConfigData) == "table", "Bad mantleConfigData")
@@ -93,11 +93,12 @@ function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 			return
 		end
 
-		local asset = GameConfigAssetUtils.create(self._gameConfigBindersServer.GameConfigAsset, assetType, assetName, assetId)
+		local asset =
+			GameConfigAssetUtils.create(self._gameConfigBindersServer.GameConfigAsset, assetType, assetName, assetId)
 		asset.Parent = GameConfigUtils.getOrCreateAssetFolder(gameConfig, assetType)
 	end
 
-	for key, value in pairs(mantleConfigData) do
+	for key, value in mantleConfigData do
 		if type(value) == "table" then
 			addAsset("badge", GameConfigAssetTypes.BADGE, key, value)
 			addAsset("pass", GameConfigAssetTypes.PASS, key, value)
@@ -115,6 +116,5 @@ end
 function MantleConfigProvider:Destroy()
 	self._maid:DoCleaning()
 end
-
 
 return MantleConfigProvider

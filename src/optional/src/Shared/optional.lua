@@ -1,3 +1,4 @@
+--!strict
 --[=[
 Sets up `require.optional("Name")`.
 
@@ -21,12 +22,14 @@ local BasicPane = require.optional("BasicPane")
 	@return T?
 	@within optional
 ]=]
-return function(_require, _module)
+return function(_require, _module: string | number | Instance)
 	assert(_require, "Bad _require function")
-	assert(type(_module) == "string"
-		or type(_module) == "number"
-		or (typeof(_module) == "Instance" and _module:IsA("ModuleScript")),
-		"Bad module identifier")
+	assert(
+		type(_module) == "string"
+			or type(_module) == "number"
+			or (typeof(_module) == "Instance" and _module:IsA("ModuleScript")),
+		"Bad module identifier"
+	)
 
 	local result
 	local ok, _ = pcall(function()

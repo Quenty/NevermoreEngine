@@ -7,8 +7,8 @@ local require = require(script.Parent.loader).load(script)
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
 local RxBrioUtils = require("RxBrioUtils")
-local RxR15Utils = require("RxR15Utils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local RxR15Utils = require("RxR15Utils")
 
 local RagdollAdditionalAttachmentUtils = {}
 
@@ -23,27 +23,47 @@ local V3_LEFT = Vector3.new(-1, 0, 0)
 -- of non-ideal axis orientation, but it's not as noticable there since the limits for natural
 -- motion are tighter for those joints anyway.
 local R15_ADDITIONAL_ATTACHMENTS = {
-	{"UpperTorso", "RightShoulderRagdollAttachment", CFrame.fromMatrix(V3_ZERO, V3_RIGHT, V3_UP), "RightShoulderRigAttachment"},
-	{"RightUpperArm", "RightShoulderRagdollAttachment", CFrame.fromMatrix(V3_ZERO, V3_DOWN, V3_RIGHT), "RightShoulderRigAttachment"},
-	{"UpperTorso", "LeftShoulderRagdollAttachment", CFrame.fromMatrix(V3_ZERO, V3_LEFT, V3_UP), "LeftShoulderRigAttachment"},
-	{"LeftUpperArm", "LeftShoulderRagdollAttachment", CFrame.fromMatrix(V3_ZERO, V3_DOWN, V3_LEFT), "LeftShoulderRigAttachment"},
+	{
+		"UpperTorso",
+		"RightShoulderRagdollAttachment",
+		CFrame.fromMatrix(V3_ZERO, V3_RIGHT, V3_UP),
+		"RightShoulderRigAttachment",
+	},
+	{
+		"RightUpperArm",
+		"RightShoulderRagdollAttachment",
+		CFrame.fromMatrix(V3_ZERO, V3_DOWN, V3_RIGHT),
+		"RightShoulderRigAttachment",
+	},
+	{
+		"UpperTorso",
+		"LeftShoulderRagdollAttachment",
+		CFrame.fromMatrix(V3_ZERO, V3_LEFT, V3_UP),
+		"LeftShoulderRigAttachment",
+	},
+	{
+		"LeftUpperArm",
+		"LeftShoulderRagdollAttachment",
+		CFrame.fromMatrix(V3_ZERO, V3_DOWN, V3_LEFT),
+		"LeftShoulderRigAttachment",
+	},
 }
 
 local R6_ADDITIONAL_ATTACHMENTS = {
-	{"Head", "NeckAttachment", CFrame.new(0, -0.5, 0)},
-	{"Torso", "NeckAttachment", CFrame.new(0, 1, 0)},
+	{ "Head", "NeckAttachment", CFrame.new(0, -0.5, 0) },
+	{ "Torso", "NeckAttachment", CFrame.new(0, 1, 0) },
 
-	{"Torso", "RightShoulderRagdollAttachment", CFrame.fromMatrix(Vector3.new(1, 0.5, 0), V3_RIGHT, V3_UP)},
-	{"Right Arm", "RightShoulderRagdollAttachment", CFrame.fromMatrix(Vector3.new(-0.5, 0.5, 0), V3_DOWN, V3_RIGHT)},
+	{ "Torso", "RightShoulderRagdollAttachment", CFrame.fromMatrix(Vector3.new(1, 0.5, 0), V3_RIGHT, V3_UP) },
+	{ "Right Arm", "RightShoulderRagdollAttachment", CFrame.fromMatrix(Vector3.new(-0.5, 0.5, 0), V3_DOWN, V3_RIGHT) },
 
-	{"Torso", "LeftShoulderRagdollAttachment", CFrame.fromMatrix(Vector3.new(-1, 0.5, 0), V3_LEFT, V3_UP)},
-	{"Left Arm", "LeftShoulderRagdollAttachment", CFrame.fromMatrix(Vector3.new(0.5, 0.5, 0), V3_DOWN, V3_LEFT)},
+	{ "Torso", "LeftShoulderRagdollAttachment", CFrame.fromMatrix(Vector3.new(-1, 0.5, 0), V3_LEFT, V3_UP) },
+	{ "Left Arm", "LeftShoulderRagdollAttachment", CFrame.fromMatrix(Vector3.new(0.5, 0.5, 0), V3_DOWN, V3_LEFT) },
 
-	{"Torso", "RightHipAttachment", CFrame.new(0.5, -1, 0)},
-	{"Right Leg", "RightHipAttachment", CFrame.new(0, 1, 0)},
+	{ "Torso", "RightHipAttachment", CFrame.new(0.5, -1, 0) },
+	{ "Right Leg", "RightHipAttachment", CFrame.new(0, 1, 0) },
 
-	{"Torso", "LeftHipAttachment", CFrame.new(-0.5, -1, 0)},
-	{"Left Leg", "LeftHipAttachment", CFrame.new(0, 1, 0)},
+	{ "Torso", "LeftHipAttachment", CFrame.new(-0.5, -1, 0) },
+	{ "Left Leg", "LeftHipAttachment", CFrame.new(0, 1, 0) },
 }
 
 function RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType)
@@ -62,13 +82,13 @@ function RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(character,
 
 	local topMaid = Maid.new()
 
-	for _, data in pairs(RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType)) do
+	for _, data in RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType) do
 		local partName, attachmentName, cframe, baseAttachmentName = unpack(data)
 
 		if baseAttachmentName then
 			local observable = RxBrioUtils.flatCombineLatest({
-				part = RxR15Utils.observeCharacterPartBrio(character, partName);
-				baseAttachment = RxR15Utils.observeRigAttachmentBrio(character, partName, baseAttachmentName);
+				part = RxR15Utils.observeCharacterPartBrio(character, partName),
+				baseAttachment = RxR15Utils.observeRigAttachmentBrio(character, partName, baseAttachmentName),
 			})
 
 			topMaid:GiveTask(observable:Subscribe(function(state)
@@ -78,10 +98,12 @@ function RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(character,
 					local attachment = Instance.new("Attachment")
 					attachment.Name = attachmentName
 
-					maid:GiveTask(RxInstanceUtils.observeProperty(state.baseAttachment, "CFrame"):Subscribe(function(baseCFrame)
-						attachment.CFrame = baseCFrame * cframe
-						attachment.Parent = state.part -- event ordering...
-					end))
+					maid:GiveTask(
+						RxInstanceUtils.observeProperty(state.baseAttachment, "CFrame"):Subscribe(function(baseCFrame)
+							attachment.CFrame = baseCFrame * cframe
+							attachment.Parent = state.part -- event ordering...
+						end)
+					)
 
 					maid:GiveTask(attachment)
 

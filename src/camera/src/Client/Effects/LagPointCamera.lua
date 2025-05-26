@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Point a current element but lag behind for a smoother experience
 	@class LagPointCamera
@@ -5,14 +6,29 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
-local SummedCamera = require("SummedCamera")
 local Spring = require("Spring")
+local SummedCamera = require("SummedCamera")
 
 local LagPointCamera = {}
 LagPointCamera.ClassName = "LagPointCamera"
 LagPointCamera._FocusCamera = nil
 LagPointCamera._OriginCamera = nil
+
+export type LagPointCamera = typeof(setmetatable(
+	{} :: {
+		CameraState: CameraState.CameraState,
+		Origin: CameraState.CameraState,
+		FocusCamera: CameraEffectUtils.CameraEffect,
+		OriginCamera: CameraEffectUtils.CameraEffect,
+		FocusSpring: Spring.Spring<Vector3>,
+		LastFocusUpdate: number,
+		FocusPosition: Vector3,
+		Speed: number,
+	},
+	{} :: typeof({ __index = LagPointCamera })
+)) & CameraEffectUtils.CameraEffect
 
 --[=[
 	Camera that lags behind the actual camera.
@@ -21,8 +37,11 @@ LagPointCamera._OriginCamera = nil
 	@param focusCamera CameraEffect -- The Camera to look at.
 	@return LagPointCamera
 ]=]
-function LagPointCamera.new(originCamera, focusCamera)
-	local self = setmetatable({}, LagPointCamera)
+function LagPointCamera.new(
+	originCamera: CameraEffectUtils.CameraEffect,
+	focusCamera: CameraEffectUtils.CameraEffect
+): LagPointCamera
+	local self: LagPointCamera = setmetatable({} :: any, LagPointCamera)
 
 	self.FocusSpring = Spring.new(Vector3.zero)
 	self.OriginCamera = originCamera or error("Must have originCamera")
@@ -32,11 +51,11 @@ function LagPointCamera.new(originCamera, focusCamera)
 	return self
 end
 
-function LagPointCamera:__add(other)
+function LagPointCamera.__add(self: LagPointCamera, other)
 	return SummedCamera.new(self, other)
 end
 
-function LagPointCamera:__newindex(index, value)
+function LagPointCamera.__newindex(self: LagPointCamera, index, value)
 	if index == "FocusCamera" then
 		rawset(self, "_" .. index, value)
 		self.FocusSpring.Target = self.FocusCamera.CameraState.Position
@@ -49,11 +68,11 @@ function LagPointCamera:__newindex(index, value)
 	elseif index == "Speed" or index == "Damper" or index == "Velocity" then
 		self.FocusSpring[index] = value
 	else
-		error(index .. " is not a valid member of LagPointCamera")
+		error(tostring(index) .. " is not a valid member of LagPointCamera")
 	end
 end
 
-function LagPointCamera:__index(index)
+function LagPointCamera.__index(self: LagPointCamera, index): any
 	if index == "CameraState" then
 		local origin, focusPosition = self.Origin, self.FocusPosition
 

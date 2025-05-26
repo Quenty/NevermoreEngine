@@ -1,20 +1,45 @@
+--!strict
 --[=[
 	@class InfluxDBPoint
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Math = require("Math")
 local InfluxDBEscapeUtils = require("InfluxDBEscapeUtils")
-local Table = require("Table")
+local InfluxDBPointSettings = require("InfluxDBPointSettings")
+local Math = require("Math")
 local Set = require("Set")
+local Table = require("Table")
 
 local InfluxDBPoint = {}
 InfluxDBPoint.ClassName = "InfluxDBPoint"
 InfluxDBPoint.__index = InfluxDBPoint
 
-function InfluxDBPoint.new(measurementName)
-	local self = setmetatable({}, InfluxDBPoint)
+export type InfluxDBPoint = typeof(setmetatable(
+	{} :: {
+		_measurementName: string?,
+		_timestamp: (DateTime | string | number)?,
+		_tags: { [string]: string },
+		_fields: { [string]: string },
+	},
+	{} :: typeof({ __index = InfluxDBPoint })
+))
+
+export type InfluxDBPointTableData = {
+	measurementName: string?,
+	timestamp: (DateTime | string | number)?,
+	tags: { [string]: string },
+	fields: { [string]: string },
+}
+
+--[=[
+	Creates a new InfluxDB point
+
+	@param measurementName string?
+	@return InfluxDBPoint
+]=]
+function InfluxDBPoint.new(measurementName: string?): InfluxDBPoint
+	local self: InfluxDBPoint = setmetatable({} :: any, InfluxDBPoint)
 
 	assert(type(measurementName) == "string" or measurementName == nil, "Bad measurementName")
 
@@ -26,7 +51,13 @@ function InfluxDBPoint.new(measurementName)
 	return self
 end
 
-function InfluxDBPoint.fromTableData(data)
+--[=[
+	Creates a new InfluxDB point from table data
+
+	@param data InfluxDBPointTableData
+	@return InfluxDBPoint
+]=]
+function InfluxDBPoint.fromTableData(data: InfluxDBPointTableData): InfluxDBPoint
 	assert(type(data) == "table", "Bad data")
 	assert(type(data.measurementName) == "string" or data.measurementName == nil, "Bad data.measurementName")
 
@@ -36,7 +67,7 @@ function InfluxDBPoint.fromTableData(data)
 	if data.tags then
 		assert(type(data.tags) == "table", "Bad data.tags")
 
-		for tagKey, tagValue in pairs(data.tags) do
+		for tagKey, tagValue in data.tags do
 			assert(type(tagKey) == "string", "Bad tagKey")
 			assert(type(tagValue) == "string", "Bad tagValue")
 		end
@@ -46,7 +77,7 @@ function InfluxDBPoint.fromTableData(data)
 	if data.fields then
 		assert(type(data.fields) == "table", "Bad data.fields")
 
-		for fieldKey, fieldValue in pairs(data.fields) do
+		for fieldKey, fieldValue in data.fields do
 			assert(type(fieldKey) == "string", "Bad fieldKey")
 			assert(type(fieldValue) == "string", "Bad fieldValue")
 
@@ -59,27 +90,48 @@ function InfluxDBPoint.fromTableData(data)
 	return copy
 end
 
-function InfluxDBPoint.isInfluxDBPoint(point)
-	return type(point) == "table"
-		and getmetatable(point) == InfluxDBPoint
+--[=[
+	Checks if the point is an InfluxDBPoint
+
+	@param point any
+	@return boolean
+]=]
+function InfluxDBPoint.isInfluxDBPoint(point: any): boolean
+	return type(point) == "table" and getmetatable(point) == InfluxDBPoint
 end
 
-function InfluxDBPoint:SetMeasurementName(name)
+--[=[
+	Sets the measurement name
+
+	@param name string?
+	@return boolean
+]=]
+function InfluxDBPoint.SetMeasurementName(self: InfluxDBPoint, name: string)
 	assert(type(name) == "string" or name == nil, "Bad name")
 
 	self._measurementName = name
 end
 
-function InfluxDBPoint:GetMeasurementName()
+--[=[
+	Gets the measurement name
+
+	@return string?
+]=]
+function InfluxDBPoint.GetMeasurementName(self: InfluxDBPoint): string?
 	return self._measurementName
 end
 
-function InfluxDBPoint:ToTableData()
+--[=[
+	Converts the point into a table data format safe for serialization
+
+	@return InfluxDBPointTableData
+]=]
+function InfluxDBPoint.ToTableData(self: InfluxDBPoint): InfluxDBPointTableData
 	return {
-		measurementName = self._measurementName;
-		timestamp = self._timestamp;
-		tags = table.clone(self._tags);
-		fields = table.clone(self._fields);
+		measurementName = self._measurementName,
+		timestamp = self._timestamp,
+		tags = table.clone(self._tags),
+		fields = table.clone(self._fields),
 	}
 end
 
@@ -88,7 +140,7 @@ end
 
 	@param timestamp DateTime | nil
 ]=]
-function InfluxDBPoint:SetTimestamp(timestamp)
+function InfluxDBPoint.SetTimestamp(self: InfluxDBPoint, timestamp: DateTime?)
 	assert(typeof(timestamp) == "DateTime" or timestamp == nil, "Bad timestamp")
 
 	self._timestamp = timestamp
@@ -100,7 +152,7 @@ end
 	@param tagKey string
 	@param tagValue string
 ]=]
-function InfluxDBPoint:AddTag(tagKey, tagValue)
+function InfluxDBPoint.AddTag(self: InfluxDBPoint, tagKey: string, tagValue: string)
 	assert(type(tagKey) == "string", "Bad tagKey")
 	assert(type(tagValue) == "string", "Bad tagValue")
 
@@ -113,18 +165,16 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddIntField(fieldName, value)
+function InfluxDBPoint.AddIntField(self: InfluxDBPoint, fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
-	if Math.isNaN(value)
-		or value <= -9223372036854776e3
-		or value >= 9223372036854776e3 then
-		error(string.format("invalid integer value for field '%s': %s", fieldName, value))
+	if Math.isNaN(value) or value <= -9223372036854776e3 or value >= 9223372036854776e3 then
+		error(string.format("invalid integer value for field '%s': %d", fieldName, value))
 	end
 
 	if not Math.isFinite(value) then
-		error(string.format("invalid integer value for field '%s': %s", fieldName, value))
+		error(string.format("invalid integer value for field '%s': %d", fieldName, value))
 	end
 
 	self._fields[fieldName] = string.format("%di", value)
@@ -136,18 +186,16 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddUintField(fieldName, value)
+function InfluxDBPoint.AddUintField(self: InfluxDBPoint, fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
-	if Math.isNaN(value)
-		or value < 0
-		or value >= 9007199254740991 then
-		error(string.format("invalid uint value for field '%s': %s", fieldName, value))
+	if Math.isNaN(value) or value < 0 or value >= 9007199254740991 then
+		error(string.format("invalid uint value for field '%s': %d", fieldName, value))
 	end
 
 	if not Math.isFinite(value) then
-		error(string.format("invalid uint value for field '%s': %s", fieldName, value))
+		error(string.format("invalid uint value for field '%s': %d", fieldName, value))
 	end
 
 	-- TODO: Support larger uint sizes
@@ -160,12 +208,12 @@ end
 	@param fieldName string
 	@param value number
 ]=]
-function InfluxDBPoint:AddFloatField(fieldName, value)
+function InfluxDBPoint.AddFloatField(self: InfluxDBPoint, fieldName: string, value: number)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "number", "Bad value")
 
 	if not Math.isFinite(value) then
-		error(string.format("invalid float value for field '%s': %s", fieldName, value))
+		error(string.format("invalid float value for field '%s': %d", fieldName, value))
 	end
 
 	self._fields[fieldName] = tostring(value)
@@ -177,7 +225,7 @@ end
 	@param fieldName string
 	@param value boolean
 ]=]
-function InfluxDBPoint:AddBooleanField(fieldName, value)
+function InfluxDBPoint.AddBooleanField(self: InfluxDBPoint, fieldName: string, value: boolean)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "boolean", "Bad value")
 
@@ -190,14 +238,23 @@ end
 	@param fieldName string
 	@param value string
 ]=]
-function InfluxDBPoint:AddStringField(fieldName, value)
+function InfluxDBPoint.AddStringField(self: InfluxDBPoint, fieldName: string, value: string)
 	assert(type(fieldName) == "string", "Bad fieldName")
 	assert(type(value) == "string", "Bad value")
 
 	self._fields[fieldName] = InfluxDBEscapeUtils.quoted(value)
 end
 
-function InfluxDBPoint:ToLineProtocol(pointSettings)
+--[=[
+	Converts the point to line protocol format to send to InfluxDB for consumption
+
+	@param pointSettings InfluxDBPointSettings
+	@return string?
+]=]
+function InfluxDBPoint.ToLineProtocol(
+	self: InfluxDBPoint,
+	pointSettings: InfluxDBPointSettings.InfluxDBPointSettings
+): string?
 	if not self._measurementName then
 		return nil
 	end
@@ -206,7 +263,7 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 	table.sort(fieldKeys)
 
 	local fields = {}
-	for _, key in pairs(fieldKeys) do
+	for _, key in fieldKeys do
 		local value = self._fields[key]
 		table.insert(fields, InfluxDBEscapeUtils.tag(key) .. "=" .. value)
 	end
@@ -222,14 +279,14 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 	local defaultTags = pointSettings:GetDefaultTags()
 	if next(defaultTags) or next(self._tags) then
 		local tagKeysSet = table.clone(self._tags)
-		for key, value in pairs(defaultTags) do
+		for key, value in defaultTags do
 			tagKeysSet[key] = value
 		end
 		local tagKeys = Set.toList(tagKeysSet)
 		table.sort(tagKeys)
 
 		tags = {}
-		for _, key in pairs(tagKeys) do
+		for _, key in tagKeys do
 			local value = self._tags[key] or defaultTags[key]
 			table.insert(tags, InfluxDBEscapeUtils.tag(key) .. "=" .. InfluxDBEscapeUtils.tag(value))
 		end
@@ -237,7 +294,7 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 
 	local timestamp = self._timestamp
 	local convertTime = pointSettings:GetConvertTime()
-	if convertTime then
+	if convertTime ~= nil then
 		timestamp = convertTime(timestamp)
 	else
 		timestamp = self:_convertTimeToMillis(timestamp)
@@ -250,12 +307,17 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 		tagsContent = ""
 	end
 
-	return InfluxDBEscapeUtils.measurement(self._measurementName) .. tagsContent .. " " .. table.concat(fields, ",") .. " " .. timestamp
+	return InfluxDBEscapeUtils.measurement(self._measurementName)
+		.. tagsContent
+		.. " "
+		.. table.concat(fields, ",")
+		.. " "
+		.. tostring(timestamp)
 end
 
-function InfluxDBPoint:_convertTimeToMillis(value)
+function InfluxDBPoint._convertTimeToMillis(_self: InfluxDBPoint, value: (string | DateTime | number)?): string?
 	if value == nil then
-	    return tostring(DateTime.now().UnixTimestampMillis)
+		return tostring(DateTime.now().UnixTimestampMillis)
 	elseif type(value) == "string" then
 		if #value > 0 then
 			return value

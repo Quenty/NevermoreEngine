@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.9.3...@quenty/fzy@5.10.0) (2025-05-10)
+
+**Note:** Version bump only for package @quenty/fzy
+
+
+
+
+
+## [5.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.9.2...@quenty/fzy@5.9.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/fzy
+
+
+
+
+
+## [5.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.9.0...@quenty/fzy@5.9.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [5.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.9.0...@quenty/fzy@5.9.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
+# [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.8.0...@quenty/fzy@5.9.0) (2025-04-02)
+
+
+### Bug Fixes
+
+* Fix existing tests ([655787c](https://github.com/Quenty/NevermoreEngine/commit/655787ced1139136e12f81800e229aa076731561))
+
+
+
+
+
+# [5.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.7.1...@quenty/fzy@5.8.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/fzy
+
+
+
+
+
 ## [5.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.7.0...@quenty/fzy@5.7.1) (2024-11-04)
 
 **Note:** Version bump only for package @quenty/fzy

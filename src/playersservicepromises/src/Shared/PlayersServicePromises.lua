@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods for async methods in Players service
 	@class PlayersServicePromises
@@ -16,7 +17,7 @@ local PlayersServicePromises = {}
 	@param name string
 	@return Promise<UserId>
 ]=]
-function PlayersServicePromises.promiseUserIdFromName(name)
+function PlayersServicePromises.promiseUserIdFromName(name: string): Promise.Promise<number>
 	assert(type(name) == "string", "Bad name")
 
 	return Promise.spawn(function(resolve, reject)
@@ -33,7 +34,7 @@ function PlayersServicePromises.promiseUserIdFromName(name)
 			return reject("UserId returned was not a number")
 		end
 
-		resolve(userId)
+		return resolve(userId)
 	end)
 end
 

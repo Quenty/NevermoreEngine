@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility functions for manipulating terrain
 	@class TerrainUtils
@@ -18,9 +19,8 @@ local TerrainUtils = {}
 	@param resolution number
 	@return Region3
 ]=]
-function TerrainUtils.getTerrainRegion3(position, size, resolution)
-	return Region3Utils.fromPositionSize(position, size)
-		:ExpandToGrid(resolution)
+function TerrainUtils.getTerrainRegion3(position: Vector3, size: Vector3, resolution: number): Region3
+	return Region3Utils.fromPositionSize(position, size):ExpandToGrid(resolution)
 end
 
 --[=[
@@ -30,9 +30,9 @@ end
 	@param resolution number
 	@return Region3int16
 ]=]
-function TerrainUtils.getTerrainRegion3int16FromRegion3(region3, resolution)
-	local position = region3.CFrame.Position/resolution
-	local size = region3.Size/resolution
+function TerrainUtils.getTerrainRegion3int16FromRegion3(region3: Region3, resolution: number): Region3int16
+	local position = region3.CFrame.Position / resolution
+	local size = region3.Size / resolution
 
 	return Region3int16Utils.createRegion3int16FromPositionSize(position, size)
 end
@@ -42,9 +42,9 @@ end
 	@param region3 Region3
 	@return Vector3
 ]=]
-function TerrainUtils.getCorner(region3)
+function TerrainUtils.getCorner(region3: Region3): Vector3
 	local position = region3.CFrame.Position
-	local halfSize = region3.Size/2
+	local halfSize = region3.Size / 2
 
 	return position - halfSize
 end
@@ -55,9 +55,9 @@ end
 	@param resolution number
 	@return Vector3int16
 ]=]
-function TerrainUtils.getCornerint16(region3, resolution)
+function TerrainUtils.getCornerint16(region3: Region3, resolution: number): Vector3int16
 	local corner = TerrainUtils.getCorner(region3)
-	return Vector3int16Utils.fromVector3(corner/resolution)
+	return Vector3int16Utils.fromVector3(corner / resolution)
 end
 
 return TerrainUtils

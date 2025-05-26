@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Provides utility functions to make it easy to work with network owners. This wraps this API
 	because the API surface is actually quite bad.
@@ -11,11 +12,13 @@ local NetworkOwnerUtils = {}
 
 --[=[
 	Tries to set the network owner. Otherwise warns about failure.
+
 	@param part BasePart
-	@param player Player
+	@param player Player?
 ]=]
-function NetworkOwnerUtils.trySetNetworkOwner(part, player)
-	assert(part, "Bad part")
+function NetworkOwnerUtils.trySetNetworkOwner(part: BasePart, player: Player?): boolean
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
+
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerUtils.trySetNetworkOwner] - Cannot set network ownership", err)
@@ -33,8 +36,8 @@ end
 	@param part BasePart
 	@return Player?
 ]=]
-function NetworkOwnerUtils.getNetworkOwnerPlayer(part)
-	assert(part, "Bad part")
+function NetworkOwnerUtils.getNetworkOwnerPlayer(part: BasePart): Player?
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part)
 	if not ok then
@@ -52,11 +55,11 @@ end
 	@param player Player? -- nil for server
 	@return boolean
 ]=]
-function NetworkOwnerUtils.isNetworkOwner(part, player)
-	assert(part, "Bad part")
-	assert(player, "Bad player")
+function NetworkOwnerUtils.isNetworkOwner(part: BasePart, player: Player): boolean
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
-	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part, player)
+	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part)
 	if not ok then
 		return false
 	end
@@ -71,10 +74,10 @@ end
 	@param part BasePart
 	@return boolean
 ]=]
-function NetworkOwnerUtils.isServerNetworkOwner(part)
-	assert(part, "Bad part")
+function NetworkOwnerUtils.isServerNetworkOwner(part: BasePart): boolean
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
-	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part, part)
+	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part)
 	if not ok then
 		return false
 	end
@@ -87,8 +90,8 @@ end
 	@return boolean -- true if retrieved fine, false otherwise
 	@return Player? -- player that is owner.
 ]=]
-function NetworkOwnerUtils.tryToGetNetworkOwner(part)
-	assert(part, "Bad part")
+function NetworkOwnerUtils.tryToGetNetworkOwner(part: BasePart): (boolean, Player?)
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local finished = false
 	local networkOwner = nil
@@ -106,7 +109,5 @@ function NetworkOwnerUtils.tryToGetNetworkOwner(part)
 
 	return true, networkOwner
 end
-
-
 
 return NetworkOwnerUtils

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helper functions for maids and promises
 
@@ -13,11 +14,8 @@ local PromiseMaidUtils = {}
 
 --[=[
 	Calls the callback with a maid for the lifetime of the promise.
-
-	@param promise Promise
-	@param callback function
 ]=]
-function PromiseMaidUtils.whilePromise(promise, callback)
+function PromiseMaidUtils.whilePromise<T...>(promise: Promise.Promise<T...>, callback: (Maid.Maid) -> ()): Maid.Maid
 	assert(Promise.isPromise(promise), "Bad promise")
 	assert(type(callback) == "function", "Bad callback")
 

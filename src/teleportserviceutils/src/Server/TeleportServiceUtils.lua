@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class TeleportServiceUtils
 ]=]
@@ -15,7 +16,7 @@ local TeleportServiceUtils = {}
 	@param placeId number
 	@return Promise<string> -- Code
 ]=]
-function TeleportServiceUtils.promiseReserveServer(placeId)
+function TeleportServiceUtils.promiseReserveServer(placeId: number): Promise.Promise<string>
 	assert(type(placeId) == "number", "Bad placeId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -38,10 +39,17 @@ end
 	@param teleportOptions TeleportOptions
 	@return Promise<string> -- Code
 ]=]
-function TeleportServiceUtils.promiseTeleport(placeId, players, teleportOptions)
+function TeleportServiceUtils.promiseTeleport(
+	placeId: number,
+	players: { Player },
+	teleportOptions: TeleportOptions?
+): Promise.Promise<string>
 	assert(type(placeId) == "number", "Bad placeId")
 	assert(type(players) == "table", "Bad players")
-	assert(typeof(teleportOptions) == "Instance" and teleportOptions:IsA("TeleportOptions") or teleportOptions == nil, "Bad options")
+	assert(
+		typeof(teleportOptions) == "Instance" and teleportOptions:IsA("TeleportOptions") or teleportOptions == nil,
+		"Bad options"
+	)
 
 	return Promise.spawn(function(resolve, reject)
 		local teleportAsyncResult

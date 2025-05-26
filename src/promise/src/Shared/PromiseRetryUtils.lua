@@ -1,15 +1,30 @@
+--!strict
 --[=[
 	@class PromiseRetryUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Math = require("Math")
+local Promise = require("Promise")
 
 local PromiseRetryUtils = {}
 
-function PromiseRetryUtils.retry(callback, options)
+export type RetryOptions = {
+	initialWaitTime: number,
+	maxAttempts: number,
+	printWarning: boolean,
+}
+
+--[=[
+	Returns a promise that will retry the given callback until it succeeds or the max attempts
+	is reached.
+
+	@param callback function -- Callback that returns a promise
+	@param options RetryOptions -- Options for retrying
+	@return Promise<T>
+]=]
+function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, options: RetryOptions): Promise.Promise<T...>
 	assert(type(options.initialWaitTime) == "number", "Bad initialWaitTime")
 	assert(type(options.maxAttempts) == "number", "Bad maxAttempts")
 	assert(type(options.printWarning) == "boolean", "Bad printWarning")
@@ -22,7 +37,7 @@ function PromiseRetryUtils.retry(callback, options)
 		local waitTime = options.initialWaitTime
 		local lastResults
 
-		for attemptNumber=1, options.maxAttempts do
+		for attemptNumber = 1, options.maxAttempts do
 			lastResults = table.pack(callback():Yield())
 
 			if lastResults[1] then
@@ -32,14 +47,25 @@ function PromiseRetryUtils.retry(callback, options)
 			end
 
 			if options.printWarning then
-				warn(string.format("[PromiseRetryUtils] - Retrying %d/%d due to failure %q", attemptNumber, options.maxAttempts, tostring(lastResults[2])))
+				warn(
+					string.format(
+						"[PromiseRetryUtils] - Retrying %d/%d due to failure %q",
+						attemptNumber,
+						options.maxAttempts,
+						tostring(lastResults[2])
+					)
+				)
 			end
 
-			task.wait(Math.jitter(waitTime * 2^attemptNumber))
+			task.wait(Math.jitter(waitTime * 2 ^ attemptNumber))
 		end
 
 		isLoopResolved = true
-		local errorMessage = string.format("Attempted request %d times before failing with error", tostring(lastResults[2]))
+		local errorMessage = string.format(
+			"Attempted request %d times before failing with error %s",
+			options.maxAttempts,
+			tostring(lastResults[2])
+		)
 		promise:Reject(errorMessage, table.unpack(lastResults, 3, lastResults.n))
 	end)
 
@@ -52,6 +78,5 @@ function PromiseRetryUtils.retry(callback, options)
 
 	return promise
 end
-
 
 return PromiseRetryUtils

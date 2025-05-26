@@ -14,35 +14,49 @@ local PseudoLocalize = require("PseudoLocalize")
 
 local LocalizationEntryParserUtils = {}
 
-function LocalizationEntryParserUtils.decodeFromInstance(tableName, sourceLocaleId, folder)
+function LocalizationEntryParserUtils.decodeFromInstance(tableName: string, sourceLocaleId: string, folder: Instance)
 	assert(type(tableName) == "string", "Bad tableName")
 	assert(typeof(folder) == "Instance", "Bad folder")
 
 	local lookupTable = {}
 	local baseKey = ""
 
-	for _, descendant in pairs(folder:GetDescendants()) do
+	for _, descendant in folder:GetDescendants() do
 		if descendant:IsA("StringValue") then
 			local localeId = LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)
 			local decodedTable = HttpService:JSONDecode(descendant.Value)
 
-			LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, baseKey, decodedTable, tableName)
+			LocalizationEntryParserUtils._parseTableToResultsList(
+				lookupTable,
+				sourceLocaleId,
+				localeId,
+				baseKey,
+				decodedTable,
+				tableName
+			)
 		elseif descendant:IsA("ModuleScript") then
 			local localeId = LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)
 			local decodedTable = require(descendant)
 
-			LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, baseKey, decodedTable, tableName)
+			LocalizationEntryParserUtils._parseTableToResultsList(
+				lookupTable,
+				sourceLocaleId,
+				localeId,
+				baseKey,
+				decodedTable,
+				tableName
+			)
 		end
 	end
 
 	local results = {}
-	for _, item in pairs(lookupTable) do
+	for _, item in lookupTable do
 		table.insert(results, item)
 	end
 	return results
 end
 
-function LocalizationEntryParserUtils.decodeFromTable(tableName, localeId, dataTable)
+function LocalizationEntryParserUtils.decodeFromTable(tableName: string, localeId: string, dataTable)
 	assert(type(tableName) == "string", "Bad tableName")
 	assert(type(localeId) == "string", "Bad localeId")
 	assert(type(dataTable) == "table", "Bad dataTable")
@@ -50,24 +64,38 @@ function LocalizationEntryParserUtils.decodeFromTable(tableName, localeId, dataT
 	local lookupTable = {}
 
 	local baseKey = ""
-	LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, localeId, localeId, baseKey, dataTable, tableName)
+	LocalizationEntryParserUtils._parseTableToResultsList(
+		lookupTable,
+		localeId,
+		localeId,
+		baseKey,
+		dataTable,
+		tableName
+	)
 
 	local results = {}
-	for _, item in pairs(lookupTable) do
+	for _, item in lookupTable do
 		table.insert(results, item)
 	end
 	return results
 end
 
-function LocalizationEntryParserUtils._parseLocaleFromName(name)
+function LocalizationEntryParserUtils._parseLocaleFromName(name: string)
 	if string.sub(name, -5) == ".json" then
-		return string.sub(name, 1, #name-5)
+		return string.sub(name, 1, #name - 5)
 	else
 		return name
 	end
 end
 
-function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, baseKey, dataTable, tableName)
+function LocalizationEntryParserUtils._parseTableToResultsList(
+	lookupTable,
+	sourceLocaleId: string,
+	localeId: string,
+	baseKey: string,
+	dataTable,
+	tableName: string
+)
 	assert(type(lookupTable) == "table", "Bad lookupTable")
 	assert(type(sourceLocaleId) == "string", "Bad sourceLocaleId")
 	assert(type(localeId) == "string", "Bad localeId")
@@ -75,26 +103,33 @@ function LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sour
 	assert(type(dataTable) == "table", "Bad dataTable")
 	assert(type(tableName) == "string", "Bad tableName")
 
-	for index, text in pairs(dataTable) do
+	for index, text in dataTable do
 		local key = baseKey .. index
 		if type(text) == "table" then
-			LocalizationEntryParserUtils._parseTableToResultsList(lookupTable, sourceLocaleId, localeId, key .. ".", text, tableName)
+			LocalizationEntryParserUtils._parseTableToResultsList(
+				lookupTable,
+				sourceLocaleId,
+				localeId,
+				key .. ".",
+				text,
+				tableName
+			)
 		elseif type(text) == "string" then
 			local found = lookupTable[key]
 			if found then
 				found.Values[localeId] = text
 			else
 				found = {
-					Example = text;
-					Key = key;
-					Context = string.format("[TEMP] - Generated from %s with key %s", tableName, key);
-					Source = text; -- Tempt!
+					Example = text,
+					Key = key,
+					Context = string.format("[TEMP] - Generated from %s with key %s", tableName, key),
+					Source = text, -- Tempt!
 					Values = {
-						[localeId] = text;
-					};
-				};
+						[localeId] = text,
+					},
+				}
 
-				lookupTable[key] = found;
+				lookupTable[key] = found
 			end
 
 			-- Ensure assignment

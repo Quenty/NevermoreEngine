@@ -3,6 +3,118 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.23.0...@quenty/rogue-properties@11.24.0) (2025-05-12)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.22.3...@quenty/rogue-properties@11.23.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+
+
+
+## [11.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.22.2...@quenty/rogue-properties@11.22.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.22.0...@quenty/rogue-properties@11.22.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [11.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.22.0...@quenty/rogue-properties@11.22.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
+# [11.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.21.5...@quenty/rogue-properties@11.22.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.21.4...@quenty/rogue-properties@11.21.5) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.21.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.21.3...@quenty/rogue-properties@11.21.4) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.21.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.21.2...@quenty/rogue-properties@11.21.3) (2025-03-13)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.21.1...@quenty/rogue-properties@11.21.2) (2025-03-12)
+
+
+### Bug Fixes
+
+* correct type assertion for index in __index function ([#539](https://github.com/Quenty/NevermoreEngine/issues/539)) ([7420942](https://github.com/Quenty/NevermoreEngine/commit/74209423be9746b6e44c049bcf8c7bdf08aae1b3))
+
+
+
+
+
+## [11.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.21.0...@quenty/rogue-properties@11.21.1) (2025-03-09)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.20.1...@quenty/rogue-properties@11.21.0) (2025-02-18)
+
+
+### Bug Fixes
+
+* Can ObserveBrio on a RogueProperty ([7c14d7b](https://github.com/Quenty/NevermoreEngine/commit/7c14d7bbba83537575a236d5894464c81ccd0845))
+
+
+
+
+
 ## [11.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.20.0...@quenty/rogue-properties@11.20.1) (2025-01-22)
 
 **Note:** Version bump only for package @quenty/rogue-properties

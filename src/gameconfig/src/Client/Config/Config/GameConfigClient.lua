@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	See [GameConfigBase] for API and [GameConfigService] for usage.
 	@class GameConfigClient
@@ -8,12 +9,21 @@ local require = require(script.Parent.loader).load(script)
 
 local GameConfigBase = require("GameConfigBase")
 local GameConfigBindersClient = require("GameConfigBindersClient")
+local ServiceBag = require("ServiceBag")
 
 local GameConfigClient = setmetatable({}, GameConfigBase)
 GameConfigClient.ClassName = "GameConfigClient"
 GameConfigClient.__index = GameConfigClient
 
-function GameConfigClient.new(folder, serviceBag)
+export type GameConfigClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_gameConfigBindersClient: any,
+	},
+	{} :: typeof({ __index = GameConfigClient })
+)) & GameConfigBase.GameConfigBase
+
+function GameConfigClient.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): GameConfigClient
 	local self = setmetatable(GameConfigBase.new(folder), GameConfigClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -24,7 +34,7 @@ function GameConfigClient.new(folder, serviceBag)
 	return self
 end
 
-function GameConfigClient:GetGameConfigAssetBinder()
+function GameConfigClient.GetGameConfigAssetBinder(self: GameConfigClient)
 	return self._gameConfigBindersClient.GameConfigAsset
 end
 

@@ -7,37 +7,29 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local IKRigBase = require("IKRigBase")
-local IKConstants = require("IKConstants")
-local IKRigAimerLocalPlayer = require("IKRigAimerLocalPlayer")
 local Binder = require("Binder")
+local IKRigAimerLocalPlayer = require("IKRigAimerLocalPlayer")
+local IKRigBase = require("IKRigBase")
+local IKRigInterface = require("IKRigInterface")
+local Remoting = require("Remoting")
+local ServiceBag = require("ServiceBag")
 
 local IKRigClient = setmetatable({}, IKRigBase)
 IKRigClient.ClassName = "IKRigClient"
 IKRigClient.__index = IKRigClient
 
-require("PromiseRemoteEventMixin"):Add(IKRigClient, IKConstants.REMOTE_EVENT_NAME)
-
-function IKRigClient.new(humanoid, serviceBag)
+function IKRigClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(IKRigBase.new(humanoid, serviceBag), IKRigClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	self:_setupRemoting()
+
 	if self:GetPlayer() == Players.LocalPlayer then
-		self:_setupLocalPlayer(self._remoteEvent)
+		self:_setupLocalPlayer()
 	end
 
-	self:PromiseRemoteEvent():Then(function(remoteEvent)
-		self._remoteEvent = assert(remoteEvent, "No remoteEvent")
-
-		self._maid:GiveTask(self._remoteEvent.OnClientEvent:Connect(function(...)
-			self:_handleRemoteEventClient(...)
-		end))
-
-		if self._localPlayerAimer then
-			self._localPlayerAimer:SetRemoteEvent(self._remoteEvent)
-		end
-	end)
+	self._maid:Add(IKRigInterface.Client:Implement(self._obj, self))
 
 	return self
 end
@@ -47,7 +39,7 @@ end
 
 	@return Vector3?
 ]=]
-function IKRigClient:GetPositionOrNil()
+function IKRigClient:GetPositionOrNil(): Vector3?
 	local rootPart = self._obj.RootPart
 	if not rootPart then
 		return nil
@@ -70,7 +62,7 @@ end
 
 	@return Vector3?
 ]=]
-function IKRigClient:GetTarget()
+function IKRigClient:GetAimPosition(): Vector3?
 	if self._localPlayerAimer then
 		return self._localPlayerAimer:GetAimPosition()
 	end
@@ -78,8 +70,7 @@ function IKRigClient:GetTarget()
 	return self._target
 end
 
-
-function IKRigClient:_handleRemoteEventClient(newTarget)
+function IKRigClient:_setAimPosition(newTarget: Vector3?)
 	assert(typeof(newTarget) == "Vector3" or newTarget == nil, "Bad newTarget")
 
 	local torso = self:GetTorso()
@@ -91,8 +82,22 @@ function IKRigClient:_handleRemoteEventClient(newTarget)
 	self._target = newTarget
 end
 
-function IKRigClient:_setupLocalPlayer(remoteEvent)
-	self._localPlayerAimer = self._maid:Add(IKRigAimerLocalPlayer.new(self._serviceBag, self, remoteEvent))
+function IKRigClient:_setupRemoting()
+	self._remoting = self._maid:Add(Remoting.Client.new(self._obj, "IKRig"))
+
+	self._maid:GiveTask(self._remoting.SetAimPosition:Connect(function(...)
+		self:_setAimPosition(...)
+	end))
+end
+
+function IKRigClient:_setupLocalPlayer()
+	self._localPlayerAimer = self._maid:Add(IKRigAimerLocalPlayer.new(self._serviceBag, self))
+end
+
+function IKRigClient:FireSetAimPosition(newTarget: Vector3?)
+	assert(self:GetPlayer() == Players.LocalPlayer, "Canot only fire from client")
+
+	self._remoting.SetAimPosition:FireServer(newTarget)
 end
 
 return Binder.new("IKRig", IKRigClient)

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RandomSampler
 ]=]
@@ -10,11 +11,27 @@ local RandomSampler = {}
 RandomSampler.ClassName = "RandomSampler"
 RandomSampler.__index = RandomSampler
 
-function RandomSampler.new(samples)
-	local self = setmetatable({}, RandomSampler)
+export type RandomSampler<T> = typeof(setmetatable(
+	{} :: {
+		_optionsList: { T },
+		_shuffledAvailableList: { T },
+		_lastSelection: T?,
+	},
+	{} :: typeof({ __index = RandomSampler })
+))
+
+--[=[
+	Constructs a new RandomSampler
+
+	@param samples { T } -- The list of samples to sample from
+	@return RandomSampler<T>
+]=]
+function RandomSampler.new<T>(samples): RandomSampler<T>
+	local self: RandomSampler<T> = setmetatable({} :: any, RandomSampler)
 
 	self._optionsList = {}
 	self._shuffledAvailableList = {}
+	self._lastSelection = nil
 
 	if samples then
 		self:SetSamples(samples)
@@ -23,7 +40,12 @@ function RandomSampler.new(samples)
 	return self
 end
 
-function RandomSampler:SetSamples(samples)
+--[=[
+	Sets the samples to sample from
+
+	@param samples { T } -- The list of samples to sample from
+]=]
+function RandomSampler.SetSamples<T>(self: RandomSampler<T>, samples: { T })
 	assert(type(samples) == "table", "Bad samples")
 
 	if self._optionsList ~= samples then
@@ -34,18 +56,26 @@ function RandomSampler:SetSamples(samples)
 	end
 end
 
-function RandomSampler:Sample()
+--[=[
+	Samples from the list
+
+	@return T -- The sample
+]=]
+function RandomSampler.Sample<T>(self: RandomSampler<T>): T
 	if #self._shuffledAvailableList == 0 then
 		self:Refill()
 	end
 
-	local selection = table.remove(self._shuffledAvailableList)
+	local selection: T = table.remove(self._shuffledAvailableList) :: any
 	self._lastSelection = selection
 
 	return selection
 end
 
-function RandomSampler:Refill()
+--[=[
+	Refills the list
+]=]
+function RandomSampler.Refill<T>(self: RandomSampler<T>)
 	local newList = RandomUtils.shuffledCopy(self._optionsList)
 
 	if #newList > 1 then
@@ -57,6 +87,5 @@ function RandomSampler:Refill()
 
 	self._shuffledAvailableList = newList
 end
-
 
 return RandomSampler

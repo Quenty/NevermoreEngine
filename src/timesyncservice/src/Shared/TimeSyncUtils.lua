@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helper functions for the TimeSyncService.
 	@class TimeSyncUtils
@@ -5,8 +6,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local TimeSyncUtils = {}
 
@@ -16,7 +17,7 @@ local TimeSyncUtils = {}
 	@param clock MasterClock | SlaveClock
 	@return Promise<MasterClock | SlaveClock>
 ]=]
-function TimeSyncUtils.promiseClockSynced(clock)
+function TimeSyncUtils.promiseClockSynced(clock: any): Promise.Promise<any>
 	if clock:IsSynced() then
 		return Promise.resolved(clock)
 	end

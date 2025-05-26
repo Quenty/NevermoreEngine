@@ -2,32 +2,31 @@
 	@class CameraUtils.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Maid = require("Maid")
 
 local CameraUtils = require("CameraUtils")
 
-return function(target)
+return function(target: Instance)
 	local maid = Maid.new()
 
-	local viewportFrame = Instance.new("ViewportFrame")
+	local viewportFrame = maid:Add(Instance.new("ViewportFrame"))
 	viewportFrame.BorderSizePixel = 0
 	viewportFrame.BackgroundColor3 = Color3.new(0.7, 0.7, 0.7)
 	viewportFrame.Size = UDim2.new(1, 0, 1, 0)
-	maid:GiveTask(viewportFrame)
 
-	local camera = Instance.new("Camera")
+	local camera: Camera = maid:Add(Instance.new("Camera"))
 	camera.FieldOfViewMode = Enum.FieldOfViewMode.Diagonal
 	camera.FieldOfView = 70
 	viewportFrame.CurrentCamera = camera
-	maid:GiveTask(camera)
 
 	local radius = 5
 
-	local ball = Instance.new("Part")
+	local ball: Part = maid:Add(Instance.new("Part"))
 	ball.Color = Color3.new(1, 0.5, 0.5)
-	ball.Size = Vector3.new(2*radius, 2*radius, 2*radius)
+	ball.Size = Vector3.new(2 * radius, 2 * radius, 2 * radius)
 	ball.Shape = Enum.PartType.Ball
 	ball.CFrame = CFrame.new()
 	ball.Anchored = true
@@ -36,7 +35,7 @@ return function(target)
 	local function update()
 		local absSize = viewportFrame.AbsoluteSize
 		if absSize.x > 0 and absSize.y > 0 then
-			local aspectRatio = absSize.x/absSize.y
+			local aspectRatio = absSize.x / absSize.y
 			local dist = CameraUtils.fitSphereToCamera(radius, camera.FieldOfView, aspectRatio)
 			camera.CFrame = CFrame.new(0, 0, dist)
 		end

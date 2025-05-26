@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.8.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.7.0...@quenty/nevermore-cli@4.8.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/Nevermore/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+
+
+
+
+
+# [4.7.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.6.2...@quenty/nevermore-cli@4.7.0) (2025-04-08)
+
+
+### Features
+
+* Nevermore cli command to run tests locally ([cd874ac](https://github.com/Quenty/Nevermore/commit/cd874ac94cc825b84a38af35a7220a77def5c490))
+
+
+
+
+
+## [4.6.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.6.0...@quenty/nevermore-cli@4.6.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/Nevermore/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/Nevermore/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [4.6.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.6.0...@quenty/nevermore-cli@4.6.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/Nevermore/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
+# [4.6.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.5.2...@quenty/nevermore-cli@4.6.0) (2025-04-02)
+
+
+### Features
+
+* Nevermore-cli command to install packages from npm ([de8fcee](https://github.com/Quenty/Nevermore/commit/de8fcee995fcdae464964357b4c770c03f4c7e03))
+
+
+
+
+
+## [4.5.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.5.1...@quenty/nevermore-cli@4.5.2) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+## [4.5.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.5.0...@quenty/nevermore-cli@4.5.1) (2025-03-13)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
 # [4.5.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.4.1...@quenty/nevermore-cli@4.5.0) (2025-01-08)
 
 **Note:** Version bump only for package @quenty/nevermore-cli

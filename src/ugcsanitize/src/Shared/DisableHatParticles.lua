@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class DisableHatParticles
 ]=]
@@ -5,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Maid = require("Maid")
 local RxInstanceUtils = require("RxInstanceUtils")
 local String = require("String")
 
@@ -12,8 +14,21 @@ local DisableHatParticles = setmetatable({}, BaseObject)
 DisableHatParticles.ClassName = "DisableHatParticles"
 DisableHatParticles.__index = DisableHatParticles
 
-function DisableHatParticles.new(character)
-	local self = setmetatable(BaseObject.new(character), DisableHatParticles)
+export type DisableHatParticles = typeof(setmetatable(
+	{} :: {
+		_obj: Model,
+	},
+	{} :: typeof({ __index = DisableHatParticles })
+)) & BaseObject.BaseObject
+
+--[=[
+	Disables all particles and sounds in hats for the lifetime of the object
+
+	@param character Model -- The character to disable particles for
+	@return DisableHatParticles
+]=]
+function DisableHatParticles.new(character: Model): DisableHatParticles
+	local self: DisableHatParticles = setmetatable(BaseObject.new(character) :: any, DisableHatParticles)
 
 	self._maid:GiveTask(RxInstanceUtils.observeChildrenOfClassBrio(self._obj, "Accessory"):Subscribe(function(brio)
 		if brio:IsDead() then
@@ -21,13 +36,15 @@ function DisableHatParticles.new(character)
 		end
 
 		local maid, accessory = brio:ToMaidAndValue()
+		assert(accessory:IsA("Accessory"), "Expected accessory")
+
 		self:_handleAccessory(maid, accessory)
 	end))
 
 	return self
 end
 
-function DisableHatParticles:_handleAccessory(maid, accessory)
+function DisableHatParticles._handleAccessory(self: DisableHatParticles, maid: Maid.Maid, accessory: Accessory)
 	maid:GiveTask(accessory.DescendantAdded:Connect(function(descendant)
 		self:_handleAccessoryDescendant(maid, descendant)
 	end))
@@ -35,16 +52,18 @@ function DisableHatParticles:_handleAccessory(maid, accessory)
 		maid[descendant] = nil
 	end))
 
-	for _, descendant in pairs(accessory:GetDescendants()) do
+	for _, descendant in accessory:GetDescendants() do
 		self:_handleAccessoryDescendant(maid, descendant)
 	end
 end
 
-function DisableHatParticles:_handleAccessoryDescendant(maid, descendant)
-	if descendant:IsA("Fire")
+function DisableHatParticles._handleAccessoryDescendant(self: DisableHatParticles, maid: Maid.Maid, descendant: any)
+	if
+		descendant:IsA("Fire")
 		or descendant:IsA("Sparkles")
 		or descendant:IsA("Smoke")
-		or descendant:IsA("ParticleEmitter") then
+		or descendant:IsA("ParticleEmitter")
+	then
 		if descendant.Enabled then
 			maid[descendant] = function()
 				descendant.Enabled = true
@@ -73,7 +92,7 @@ function DisableHatParticles:_handleAccessoryDescendant(maid, descendant)
 	end
 end
 
-function DisableHatParticles:_isASoundScript(descendant)
+function DisableHatParticles._isASoundScript(_self: DisableHatParticles, descendant: Instance)
 	if not descendant:IsA("LocalScript") then
 		return false
 	end
@@ -93,7 +112,7 @@ function DisableHatParticles:_isASoundScript(descendant)
 	return false
 end
 
-function DisableHatParticles:_isSound(descendant)
+function DisableHatParticles._isSound(_self: DisableHatParticles, descendant: Instance): boolean
 	-- Sound group check is paranoid but likely to be valid as to identify hat-sounds
 	return descendant:IsA("Sound") and descendant.SoundGroup == nil
 end

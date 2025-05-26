@@ -1,4 +1,7 @@
+--!strict
 --[=[
+	Utility functions to format countdowns in-game
+
 	@class CountdownTextUtils
 ]=]
 
@@ -11,7 +14,7 @@ local CountdownTextUtils = {}
 	@param whenAtZeroText string?
 	@return string
 ]=]
-function CountdownTextUtils.formatCountdown(seconds, whenAtZeroText)
+function CountdownTextUtils.formatCountdown(seconds: number, whenAtZeroText: string?): string
 	assert(type(seconds) == "number", "Bad seconds")
 	assert(type(whenAtZeroText) == "string" or whenAtZeroText == nil, "Bad whenAtZeroText")
 
@@ -25,7 +28,7 @@ function CountdownTextUtils.formatCountdown(seconds, whenAtZeroText)
 	end
 
 	-- less than 1 hour
-	if seconds <= 60*60 then
+	if seconds <= 60 * 60 then
 		local hours = math.floor(seconds / 60)
 		return string.format("%0d:%02d", hours, seconds % 60)
 	end
@@ -35,27 +38,17 @@ function CountdownTextUtils.formatCountdown(seconds, whenAtZeroText)
 	local minutes = math.floor(seconds / 60) % 60
 
 	if days == 0 then
-		return string.format("%d:%02d:%02d",
-			hours,
-			minutes,
-			seconds % 60)
+		return string.format("%d:%02d:%02d", hours, minutes, seconds % 60)
 	elseif days == 1 then
 		-- People would be confused about "1 day 2:15:00"
 		-- So show 47:15:00
 		hours = math.floor(seconds / 60 / 60) % 48
 
-		return string.format("%d:%02d:%02d",
-			hours,
-			minutes,
-			seconds % 60)
+		return string.format("%d:%02d:%02d", hours, minutes, seconds % 60)
 	else
 		-- TODO: Localize this "days" part?
 
-		return string.format("%d days %d:%02d:%02d",
-			days,
-			hours,
-			minutes,
-			seconds % 60)
+		return string.format("%d days %d:%02d:%02d", days, hours, minutes, seconds % 60)
 	end
 end
 

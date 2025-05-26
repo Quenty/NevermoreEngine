@@ -12,4 +12,3 @@ serviceBag:GetService(require("DeathReportService"))
 
 serviceBag:Init()
 serviceBag:Start()
-

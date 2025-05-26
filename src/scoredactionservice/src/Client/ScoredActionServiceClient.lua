@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Scores actions and picks the highest rated one every frame.
 
@@ -9,23 +10,33 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local InputKeyMapList = require("InputKeyMapList")
+local InputListScoreHelper = require("InputListScoreHelper")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local ScoredAction = require("ScoredAction")
 local ScoredActionPickerProvider = require("ScoredActionPickerProvider")
-local Maid = require("Maid")
-local InputListScoreHelper = require("InputListScoreHelper")
-local Observable = require("Observable")
-local InputKeyMapList = require("InputKeyMapList")
+local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 
 local ScoredActionServiceClient = {}
 ScoredActionServiceClient.ServiceName = "ScoredActionServiceClient"
 
+export type ScoredActionServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_provider: ScoredActionPickerProvider.ScoredActionPickerProvider,
+		_maid: Maid.Maid,
+	},
+	{} :: typeof({ __index = ScoredActionServiceClient })
+))
+
 --[=[
 	Initializes the ScoredActionServiceClient. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function ScoredActionServiceClient:Init(serviceBag)
-	assert(not self._serviceBag, "Already initialize")
+function ScoredActionServiceClient.Init(self: ScoredActionServiceClient, serviceBag: ServiceBag.ServiceBag)
+	assert(not (self :: any)._serviceBag, "Already initialize")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -39,7 +50,7 @@ end
 --[=[
 	Starts the scored action service. Should be done via [ServiceBag].
 ]=]
-function ScoredActionServiceClient:Start()
+function ScoredActionServiceClient.Start(self: ScoredActionServiceClient)
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
 		-- TODO: Push to end of frame so we don't delay input by a frame?
 		self._provider:Update()
@@ -52,7 +63,10 @@ end
 	@param inputKeyMapList InputKeyMapList
 	@return ScoredAction
 ]=]
-function ScoredActionServiceClient:GetScoredAction(inputKeyMapList)
+function ScoredActionServiceClient.GetScoredAction(
+	self: ScoredActionServiceClient,
+	inputKeyMapList: InputKeyMapList.InputKeyMapList
+): ScoredAction.ScoredAction
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 
 	-- Mock for not running mode
@@ -93,10 +107,16 @@ end
 	This MUTATES state of the scored action service whenever an object is emitted.
 	:::
 
-	@param scoreValue NumberValue
+	@param scoreValue ValueObject<number>
 	@return (source: Observable<InputKeyMapList>) -> Observable<ScoredAction>
 ]=]
-function ScoredActionServiceClient:ObserveNewFromInputKeyMapList(scoreValue)
+function ScoredActionServiceClient.ObserveNewFromInputKeyMapList(
+	self: ScoredActionServiceClient,
+	scoreValue: ValueObject.ValueObject<number>
+): Observable.Transformer<
+	(InputKeyMapList.InputKeyMapList),
+	(ScoredAction.ScoredAction)
+>
 	assert(self._provider, "Not initialized")
 	assert(ValueObject.isValueObject(scoreValue), "Bad scoreValue")
 
@@ -130,11 +150,11 @@ function ScoredActionServiceClient:ObserveNewFromInputKeyMapList(scoreValue)
 			end, sub:GetFailComplete()))
 
 			return topMaid
-		end)
+		end) :: any
 	end
 end
 
-function ScoredActionServiceClient:Destroy()
+function ScoredActionServiceClient.Destroy(self: ScoredActionServiceClient)
 	self._maid:DoCleaning()
 end
 

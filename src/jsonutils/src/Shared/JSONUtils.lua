@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods for JSON
 	@class JSONUtils
@@ -18,7 +19,7 @@ local JSONUtils = {}
 	@return table? -- Result
 	@return string? -- Error
 ]=]
-function JSONUtils.jsonDecode(str)
+function JSONUtils.jsonDecode(str: string): (boolean, string?, string?)
 	if type(str) ~= "string" then
 		return false, nil, "Not a string"
 	end
@@ -31,7 +32,7 @@ function JSONUtils.jsonDecode(str)
 		return false, nil, err
 	end
 
-	return true, decoded
+	return true, decoded, nil
 end
 
 --[=[
@@ -41,7 +42,7 @@ end
 	@return table? -- Result
 	@return string? -- Error
 ]=]
-function JSONUtils.jsonEncode(value)
+function JSONUtils.jsonEncode(value: any): (boolean, string?, string?)
 	local encoded
 	local ok, err = pcall(function()
 		encoded = HttpService:JSONEncode(value)
@@ -50,7 +51,7 @@ function JSONUtils.jsonEncode(value)
 		return false, nil, err
 	end
 
-	return true, encoded
+	return true, encoded, nil
 end
 
 --[=[
@@ -58,7 +59,7 @@ end
 	@param str string
 	@return Promise<table>
 ]=]
-function JSONUtils.promiseJSONDecode(str)
+function JSONUtils.promiseJSONDecode(str: string): Promise.Promise<unknown>
 	if type(str) ~= "string" then
 		return Promise.rejected("Not a string")
 	end

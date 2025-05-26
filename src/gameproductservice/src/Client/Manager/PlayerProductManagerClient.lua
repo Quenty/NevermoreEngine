@@ -16,8 +16,8 @@ local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local MarketplaceUtils = require("MarketplaceUtils")
 local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
-local Remoting = require("Remoting")
 local Promise = require("Promise")
+local Remoting = require("Remoting")
 
 local PlayerProductManagerClient = setmetatable({}, PlayerProductManagerBase)
 PlayerProductManagerClient.ClassName = "PlayerProductManagerClient"
@@ -97,25 +97,29 @@ function PlayerProductManagerClient:_setupSubscriptionTracker()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.SUBSCRIPTION)
 
 	-- Main event
-	self._maid:GiveTask(MarketplaceService.PromptSubscriptionPurchaseFinished:Connect(function(player, subscriptionId, didTryPurchasing)
-		if player == self._obj then
-			self._remoting.PromptSubscriptionPurchaseFinished:FireServer(subscriptionId, didTryPurchasing)
+	self._maid:GiveTask(
+		MarketplaceService.PromptSubscriptionPurchaseFinished:Connect(function(player, subscriptionId, didTryPurchasing)
+			if player == self._obj then
+				self._remoting.PromptSubscriptionPurchaseFinished:FireServer(subscriptionId, didTryPurchasing)
+				tracker:HandlePromptClosedEvent(subscriptionId)
+
+				if not didTryPurchasing then
+					tracker:HandlePurchaseEvent(subscriptionId, didTryPurchasing)
+				end
+			end
+		end)
+	)
+
+	-- In case it comes from the server
+	self._maid:GiveTask(
+		self._remoting.PromptSubscriptionPurchaseFinished:Connect(function(subscriptionId, didTryPurchasing)
 			tracker:HandlePromptClosedEvent(subscriptionId)
 
 			if not didTryPurchasing then
 				tracker:HandlePurchaseEvent(subscriptionId, didTryPurchasing)
 			end
-		end
-	end))
-
-	-- In case it comes from the server
-	self._maid:GiveTask(self._remoting.PromptSubscriptionPurchaseFinished:Connect(function(subscriptionId, didTryPurchasing)
-		tracker:HandlePromptClosedEvent(subscriptionId)
-
-		if not didTryPurchasing then
-			tracker:HandlePurchaseEvent(subscriptionId, didTryPurchasing)
-		end
-	end))
+		end)
+	)
 
 	self._maid:GiveTask(self._remoting.UserSubscriptionStatusChanged:Connect(function(subscriptionId)
 		tracker:HandlePurchaseEvent(subscriptionId, true)
@@ -130,14 +134,19 @@ function PlayerProductManagerClient:_connectBulkPurchaseMarketplace()
 
 		-- Update ownership information
 		if status == Enum.MarketplaceBulkPurchasePromptStatus.Completed then
-			for _, item in pairs(results.Items) do
+			for _, item in results.Items do
 				local tracker
 				if item.type == Enum.MarketplaceProductType.AvatarAsset then
 					tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)
 				elseif item.type == Enum.MarketplaceProductType.AvatarBundle then
 					tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE)
 				else
-					warn(string.format("[PlayerProductManagerClient] - Unknown Enum.MarketplaceProductType %q", tostring(item.type)))
+					warn(
+						string.format(
+							"[PlayerProductManagerClient] - Unknown Enum.MarketplaceProductType %q",
+							tostring(item.type)
+						)
+					)
 					continue
 				end
 
@@ -154,18 +163,20 @@ end
 function PlayerProductManagerClient:_setupProductTracker()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
 
-	self._maid:GiveTask(MarketplaceService.PromptProductPurchaseFinished:Connect(function(userId, productId, isPurchased)
-		if self._obj.UserId == userId then
-			tracker:HandlePromptClosedEvent(productId)
+	self._maid:GiveTask(
+		MarketplaceService.PromptProductPurchaseFinished:Connect(function(userId, productId, isPurchased)
+			if self._obj.UserId == userId then
+				tracker:HandlePromptClosedEvent(productId)
 
-			-- We only read from the server purchase event
-			if not isPurchased then
-				tracker:HandlePurchaseEvent(productId, isPurchased)
+				-- We only read from the server purchase event
+				if not isPurchased then
+					tracker:HandlePurchaseEvent(productId, isPurchased)
+				end
+
+				self._remoting.PromptProductPurchaseFinished:FireServer(productId, isPurchased)
 			end
-
-			self._remoting.PromptProductPurchaseFinished:FireServer(productId, isPurchased)
-		end
-	end))
+		end)
+	)
 
 	self._maid:GiveTask(self._remoting.DeveloperProductPurchased:Connect(function(productId)
 		local assetTracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
@@ -176,16 +187,18 @@ end
 function PlayerProductManagerClient:_connectGamePassTracker()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
 
-	self._maid:GiveTask(MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
-		assert(type(isPurchased) == "boolean", "Bad isPurchased")
+	self._maid:GiveTask(
+		MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
+			assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
-		if player == self._obj then
-			tracker:HandlePromptClosedEvent(gamePassId)
-			tracker:HandlePurchaseEvent(gamePassId, isPurchased)
+			if player == self._obj then
+				tracker:HandlePromptClosedEvent(gamePassId)
+				tracker:HandlePurchaseEvent(gamePassId, isPurchased)
 
-			self._remoting.PromptGamePassPurchaseFinished:FireServer(gamePassId, isPurchased)
-		end
-	end))
+				self._remoting.PromptGamePassPurchaseFinished:FireServer(gamePassId, isPurchased)
+			end
+		end)
+	)
 end
 
 function PlayerProductManagerClient:_setupBundleTracker()
@@ -211,7 +224,8 @@ function PlayerProductManagerClient:_promiseBulkOwnsAssetQuery(assetId)
 	if self._avatarEditorInventoryServiceClient:IsInventoryAccessAllowed() then
 		-- When scrolling through a ton of entries in the avatar editor we want to query
 		-- this is typically faster. We really hope we aren't the Roblox account.
-		return self._catalogSearchServiceCache:PromiseItemDetails(assetId, Enum.AvatarItemType.Asset)
+		return self._catalogSearchServiceCache
+			:PromiseItemDetails(assetId, Enum.AvatarItemType.Asset)
 			:Then(function(itemDetails)
 				-- https://devforum.roblox.com/t/avatareditorservicegetitemdetails-returns-ownership-where-as-avatareditorservicegetbatchitemdetails-does-not/3257431
 
@@ -221,7 +235,8 @@ function PlayerProductManagerClient:_promiseBulkOwnsAssetQuery(assetId)
 					return Promise.rejected("Failed to get assetType")
 				end
 
-				return self._avatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(assetType)
+				return self._avatarEditorInventoryServiceClient
+					:PromiseInventoryForAvatarAssetType(assetType)
 					:Then(function(inventory)
 						return inventory:IsAssetIdInInventory(assetId)
 					end)

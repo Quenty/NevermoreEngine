@@ -1,3 +1,278 @@
+# (Mon May 12 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/influxdbclient@7.21.0`
+  - docs: Fix doc links [#561](https://github.com/Quenty/NevermoreEngine/pull/561) ([@Quenty](https://github.com/Quenty))
+- `@quenty/servicebag@11.13.0`
+  - feat: Service bag prints out where the yielding happens ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/binder@14.21.0`
+  - fix: Fix requires ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat May 10 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/time@2.4.3`
+  - ci: Allow branches to be protected during deploy [#560](https://github.com/Quenty/NevermoreEngine/pull/560) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat May 10 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, KreatorKols ([@KreatorKols](https://github.com/KreatorKols)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/accessorytypeutils@1.7.0`, `@quenty/actionmanager@13.20.0`, `@quenty/adorneeboundingbox@8.21.0`, `@quenty/adorneedata@7.19.0`, `@quenty/adorneevalue@10.19.0`, `@quenty/aggregator@1.5.0`, `@quenty/animationgroup@10.9.0`, `@quenty/animationprovider@11.19.0`, `@quenty/animations@8.18.0`, `@quenty/animationtrackutils@2.3.0`, `@quenty/applytagtotaggedchildren@10.9.0`, `@quenty/assetserviceutils@5.20.0`, `@quenty/attributeutils@14.18.0`, `@quenty/avatareditorutils@7.21.0`, `@quenty/axisangleutils@2.4.0`, `@quenty/badgeutils@10.11.0`, `@quenty/baseobject@10.9.0`, `@quenty/basicpane@13.18.0`, `@quenty/bezierutils@2.3.0`, `@quenty/binarysearch@2.3.0`, `@quenty/binder@14.20.0`, `@quenty/bindtocloseservice@8.18.0`, `@quenty/blend@12.19.0`, `@quenty/bodycolorsutils@7.19.0`, `@quenty/boundingboxutils@4.4.0`, `@quenty/boundlinkutils@14.20.0`, `@quenty/brio@14.18.0`, `@quenty/buttondragmodel@1.16.0`, `@quenty/buttonhighlightmodel@14.19.0`, `@quenty/buttonutils@2.3.0`, `@quenty/camera@14.21.0`, `@quenty/camerainfo@1.3.0`, `@quenty/camerastoryutils@10.11.0`, `@quenty/cancellabledelay@3.6.0`, `@quenty/canceltoken@11.12.0`, `@quenty/cframeserializer@4.8.0`, `@quenty/characterparticleplayer@2.3.0`, `@quenty/characterutils@12.19.0`, `@quenty/chatproviderservice@9.26.0`, `@quenty/clienttranslator@14.20.0`, `@quenty/clipcharacters@12.20.0`, `@quenty/cmdrservice@13.23.0`, `@quenty/collectionserviceutils@8.18.0`, `@quenty/color3serializationutils@2.3.0`, `@quenty/color3utils@11.19.0`, `@quenty/colorpalette@10.22.0`, `@quenty/colorpicker@10.20.0`, `@quenty/colorsequenceutils@7.9.0`, `@quenty/conditions@10.21.0`, `@quenty/contentproviderutils@12.18.0`, `@quenty/convexhull@4.10.0`, `@quenty/cooldown@11.21.0`, `@quenty/coreguienabler@12.19.0`, `@quenty/coreguiutils@10.11.0`, `@quenty/countdowntext@4.9.0`, `@quenty/counter@7.18.0`, `@quenty/cubicspline@10.9.0`, `@quenty/datastore@13.21.0`, `@quenty/deathreport@10.22.0`, `@quenty/debounce@2.4.0`, `@quenty/deferred@2.3.0`, `@quenty/depthoffield@11.20.0`, `@quenty/draw@7.9.0`, `@quenty/ellipticcurvecryptography@1.7.0`, `@quenty/elo@7.20.0`, `@quenty/enabledmixin@11.13.0`, `@quenty/equippedtracker@13.19.0`, `@quenty/experiencecalculator@2.6.0`, `@quenty/fakeskybox@11.11.0`, `@quenty/firstpersoncharactertransparency@14.19.0`, `@quenty/flipbook@9.18.0`, `@quenty/friendutils@12.18.0`, `@quenty/functionutils@2.3.0`, `@quenty/funnels@1.6.0`, `@quenty/fzy@5.10.0`, `@quenty/gameconfig@12.25.0`, `@quenty/gameproductservice@14.25.0`, `@quenty/gamescalingutils@13.19.0`, `@quenty/gameversionutils@3.5.0`, `@quenty/generatewithmixin@11.9.0`, `@quenty/genericscreenguiprovider@13.21.0`, `@quenty/geometryutils@6.9.0`, `@quenty/getgroundplane@10.9.0`, `@quenty/getmechanismparts@2.3.0`, `@quenty/getpercentexposedutils@10.9.0`, `@quenty/grouputils@10.11.0`, `@quenty/guitriangle@2.3.0`, `@quenty/guivisiblemanager@12.10.0`, `@quenty/hapticfeedbackutils@3.3.0`, `@quenty/hide@11.22.0`, `@quenty/highlight@10.22.0`, `@quenty/hintscoringutils@14.21.0`, `@quenty/httppromise@10.11.0`, `@quenty/humanoidanimatorutils@3.2.0`, `@quenty/humanoiddescriptionutils@10.11.0`, `@quenty/humanoidmovedirectionutils@10.9.0`, `@quenty/humanoidspeed@12.24.0`, `@quenty/humanoidteleportutils@10.9.0`, `@quenty/humanoidtracker@13.18.0`, `@quenty/idleservice@13.24.0`, `@quenty/ik@15.25.0`, `@quenty/influxdbclient@7.20.0`, `@quenty/inputkeymaputils@14.24.0`, `@quenty/inputmode@13.19.0`, `@quenty/inputobjectutils@4.19.0`, `@quenty/insertserviceutils@10.11.0`, `@quenty/instanceutils@13.18.0`, `@quenty/isamixin@2.3.0`, `@quenty/jsonutils@10.11.0`, `@quenty/jumpbuttonutils@2.3.0`, `@quenty/kinematics@2.4.0`, `@quenty/linearsystemssolver@2.3.0`, `@quenty/linkutils@13.18.0`, `@quenty/lipsum@14.19.0`, `@quenty/loader@10.9.0`, `@quenty/localizedtextutils@12.18.0`, `@quenty/lrucache@1.7.0`, `@quenty/maid@3.5.0`, `@quenty/markdownrender@2.4.0`, `@quenty/marketplaceutils@11.12.0`, `@quenty/memoize@1.7.0`, `@quenty/messagingserviceutils@7.11.0`, `@quenty/modelappearance@10.9.0`, `@quenty/modeltransparencyeffect@11.9.0`, `@quenty/motor6d@7.21.0`, `@quenty/mouseovermixin@10.9.0`, `@quenty/mouseshiftlockservice@11.11.0`, `@quenty/multipleclickutils@13.18.0`, `@quenty/networkownerservice@5.3.0`, `@quenty/networkropeutils@10.9.0`, `@quenty/nocollisionconstraintutils@10.9.0`, `@quenty/observablecollection@12.21.0`, `@quenty/octree@11.9.0`, `@quenty/optional@11.9.0`, `@quenty/overriddenproperty@10.10.0`, `@quenty/pagesutils@5.12.0`, `@quenty/particleengine@13.19.0`, `@quenty/particles@5.10.0`, `@quenty/parttouchingcalculator@14.21.0`, `@quenty/pathfindingutils@10.11.0`, `@quenty/performanceutils@4.9.0`, `@quenty/permissionprovider@14.20.0`, `@quenty/physicsutils@8.18.0`, `@quenty/pillbacking@10.10.0`, `@quenty/playerbinder@14.20.0`, `@quenty/playerhumanoidbinder@14.20.0`, `@quenty/playerinputmode@9.20.0`, `@quenty/playersservicepromises@10.11.0`, `@quenty/playerutils@8.18.0`, `@quenty/policyserviceutils@6.11.0`, `@quenty/preferredparentutils@4.4.0`, `@quenty/promise@10.11.0`, `@quenty/promisemaid@5.11.0`, `@quenty/promptqueue@1.19.0`, `@quenty/propertyvalue@7.18.0`, `@quenty/pseudolocalize@3.5.0`, `@quenty/qframe@10.11.0`, `@quenty/qgui@2.4.0`, `@quenty/quaternion@2.6.0`, `@quenty/queue@2.4.0`, `@quenty/r15utils@13.18.0`, `@quenty/racketingropeconstraint@12.21.0`, `@quenty/radial-image@9.20.0`, `@quenty/ragdoll@15.24.0`, `@quenty/randomutils@6.11.0`, `@quenty/raycaster@3.5.0`, `@quenty/rbxasset@5.9.0`, `@quenty/rbxthumb@5.10.0`, `@quenty/receiptprocessing@7.19.0`, `@quenty/rectutils@1.3.0`, `@quenty/region3int16utils@10.9.0`, `@quenty/region3utils@10.10.0`, `@quenty/remotefunctionutils@10.11.0`, `@quenty/remoting@12.19.0`, `@quenty/resetservice@11.20.0`, `@quenty/richtext@1.4.0`, `@quenty/rigbuilderutils@10.20.0`, `@quenty/roblox-api-dump@8.12.0`, `@quenty/rodux-actions@9.10.0`, `@quenty/rodux-undo@8.10.0`, `@quenty/rogue-humanoid@10.24.0`, `@quenty/rogue-properties@11.23.0`, `@quenty/rotatinglabel@11.9.0`, `@quenty/roundedbackingbuilder@2.3.0`, `@quenty/rx@13.18.0`, `@quenty/rxbinderutils@14.20.0`, `@quenty/rxsignal@7.18.0`, `@quenty/safedestroy@1.5.0`, `@quenty/scoredactionservice@16.25.0`, `@quenty/screenshothudservice@7.19.0`, `@quenty/scrollingframe@12.12.0`, `@quenty/seatutils@7.20.0`, `@quenty/secrets@7.24.0`, `@quenty/selectionimageutils@11.9.0`, `@quenty/selectionutils@8.18.0`, `@quenty/servicebag@11.12.0`, `@quenty/settings-inputkeymap@10.26.0`, `@quenty/settings@11.24.0`, `@quenty/signal@7.11.0`, `@quenty/singleton@6.9.0`, `@quenty/snackbar@11.22.0`, `@quenty/socialserviceutils@10.11.0`, `@quenty/softshutdown@9.24.0`, `@quenty/soundgroup@1.21.0`, `@quenty/soundplayer@7.20.0`, `@quenty/sounds@10.11.0`, `@quenty/spawning@10.23.0`, `@quenty/spring@10.9.0`, `@quenty/sprites@13.17.0`, `@quenty/statestack@14.19.0`, `@quenty/steputils@3.6.0`, `@quenty/sunpositionutils@2.4.0`, `@quenty/symbol@3.5.0`, `@quenty/table@3.8.0`, `@quenty/teamutils@10.18.0`, `@quenty/teleportserviceutils@9.18.0`, `@quenty/templateprovider@11.19.0`, `@quenty/textboxutils@7.18.0`, `@quenty/textfilterservice@13.19.0`, `@quenty/textfilterutils@10.11.0`, `@quenty/textserviceutils@13.19.0`, `@quenty/throttle@10.10.0`, `@quenty/tie@10.21.0`, `@quenty/timedtween@7.19.0`, `@quenty/timesyncservice@13.19.0`, `@quenty/toolutils@1.4.0`, `@quenty/trajectory@2.8.0`, `@quenty/transitionmodel@7.20.0`, `@quenty/transparencyservice@11.9.0`, `@quenty/tuple@1.6.0`, `@quenty/ugcsanitize@1.5.0`, `@quenty/uiobjectutils@6.17.0`, `@quenty/ultrawidecontainerutils@2.5.0`, `@quenty/undostack@7.18.0`, `@quenty/userserviceutils@9.19.0`, `@quenty/valuebaseutils@13.18.0`, `@quenty/valueobject@13.18.0`, `@quenty/viewport@11.22.0`, `@quenty/nevermore-cli@4.8.0`
+  - fix: Add additional type checking improvements and format via stylua [#559](https://github.com/Quenty/NevermoreEngine/pull/559) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Support Content type in Blend converter plugin [#555](https://github.com/Quenty/NevermoreEngine/pull/555) ([@unrooot](https://github.com/unrooot))
+- `@quenty/inputkeymaputils@14.24.0`
+  - fix: slottedtouchbutton recursion [#557](https://github.com/Quenty/NevermoreEngine/pull/557) ([@KreatorKols](https://github.com/KreatorKols))
+
+#### Authors: 3
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
+
+---
+
+# (Wed Apr 16 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Amir ([@alliancecrusader](https://github.com/alliancecrusader)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/actionmanager@13.19.4`
+  - fix: Fix typo in ActionManager.lua [#553](https://github.com/Quenty/NevermoreEngine/pull/553) ([@alliancecrusader](https://github.com/alliancecrusader))
+
+#### Authors: 1
+
+- Amir ([@alliancecrusader](https://github.com/alliancecrusader))
+
+---
+
+# (Thu Apr 10 2025)
+
+#### 🐛 Bug Fix
+
+- ci: Shorten workflow name from run-tests to tests [#552](https://github.com/Quenty/NevermoreEngine/pull/552) ([@unrooot](https://github.com/unrooot))
+- `@quenty/acceltween@2.5.3`, `@quenty/adorneeboundingbox@8.20.3`, `@quenty/adorneevalue@10.18.3`, `@quenty/aggregator@1.4.3`, `@quenty/animations@8.17.3`, `@quenty/attributeutils@14.17.3`, `@quenty/baseobject@10.8.3`, `@quenty/basicpane@13.17.3`, `@quenty/binder@14.19.3`, `@quenty/blend@12.18.3`, `@quenty/brio@14.17.3`, `@quenty/buttondragmodel@1.15.3`, `@quenty/buttonhighlightmodel@14.18.3`, `@quenty/camera@14.20.3`, `@quenty/canceltoken@11.11.4`, `@quenty/chatproviderservice@9.25.3`, `@quenty/clienttranslator@14.19.3`, `@quenty/cmdrservice@13.22.3`, `@quenty/colorpicker@10.19.3`, `@quenty/coreguienabler@12.18.3`, `@quenty/counter@7.17.3`, `@quenty/datastore@13.20.3`, `@quenty/deathreport@10.21.3`, `@quenty/debounce@2.3.3`, `@quenty/depthoffield@11.19.3`, `@quenty/flipbook@9.17.3`, `@quenty/funnels@1.5.3`, `@quenty/gameconfig@12.24.3`, `@quenty/gameproductservice@14.24.3`, `@quenty/gamescalingutils@13.18.3`, `@quenty/highlight@10.21.3`, `@quenty/humanoidtracker@13.17.3`, `@quenty/ik@15.24.3`, `@quenty/influxdbclient@7.19.3`, `@quenty/inputkeymaputils@14.23.3`, `@quenty/inputmode@13.18.3`, `@quenty/inputobjectutils@4.18.3`, `@quenty/loader@10.8.3`, `@quenty/maid@3.4.3`, `@quenty/observablecollection@12.20.3`, `@quenty/permissionprovider@14.19.3`, `@quenty/promise@10.10.4`, `@quenty/promptqueue@1.18.3`, `@quenty/qgui@2.3.4`, `@quenty/queue@2.3.3`, `@quenty/ragdoll@15.23.3`, `@quenty/randomutils@6.10.3`, `@quenty/remoting@12.18.3`, `@quenty/rigbuilderutils@10.19.3`, `@quenty/roblox-api-dump@8.11.4`, `@quenty/rx@13.17.3`, `@quenty/rxsignal@7.17.3`, `@quenty/scoredactionservice@16.24.3`, `@quenty/screenshothudservice@7.18.3`, `@quenty/servicebag@11.11.4`, `@quenty/settings@11.23.3`, `@quenty/signal@7.10.3`, `@quenty/singleton@6.8.3`, `@quenty/snackbar@11.21.3`, `@quenty/soundgroup@1.20.3`, `@quenty/sounds@10.10.4`, `@quenty/spring@10.8.4`, `@quenty/sprites@13.16.3`, `@quenty/statestack@14.18.3`, `@quenty/table@3.7.4`, `@quenty/teamtracker@13.17.3`, `@quenty/templateprovider@11.18.3`, `@quenty/throttle@10.9.3`, `@quenty/tie@10.20.3`, `@quenty/timedtween@7.18.3`, `@quenty/timesyncservice@13.18.3`, `@quenty/transitionmodel@7.19.3`, `@quenty/tuple@1.5.3`, `@quenty/valuebaseutils@13.17.3`, `@quenty/valueobject@13.17.3`
+  - refactor: Fix OOP inheritance [#550](https://github.com/Quenty/NevermoreEngine/pull/550) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Apr 08 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.7.0`
+  - feat: Nevermore test cli command [#551](https://github.com/Quenty/NevermoreEngine/pull/551) ([@unrooot](https://github.com/unrooot))
+
+#### 🐛 Bug Fix
+
+- ci: Rename workflow to be cleaner [#548](https://github.com/Quenty/NevermoreEngine/pull/548) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Mon Apr 07 2025)
+
+#### 🐛 Bug Fix
+
+- docs: Add badge for testing state ([@unrooot](https://github.com/unrooot))
+- `@quenty/acceltween@2.5.2`, `@quenty/accessorytypeutils@1.6.2`, `@quenty/actionmanager@13.19.2`, `@quenty/adorneeboundingbox@8.20.2`, `@quenty/adorneedata@7.18.2`, `@quenty/adorneeutils@3.3.3`, `@quenty/adorneevalue@10.18.2`, `@quenty/aggregator@1.4.2`, `@quenty/animationgroup@10.8.2`, `@quenty/animationprovider@11.18.2`, `@quenty/animations@8.17.2`, `@quenty/animationtrackutils@2.2.2`, `@quenty/applytagtotaggedchildren@10.8.2`, `@quenty/assetserviceutils@5.19.2`, `@quenty/attributeutils@14.17.2`, `@quenty/avatareditorutils@7.20.2`, `@quenty/axisangleutils@2.3.2`, `@quenty/badgeutils@10.10.3`, `@quenty/baseobject@10.8.2`, `@quenty/basicpane@13.17.2`, `@quenty/bezierutils@2.2.2`, `@quenty/binarysearch@2.2.2`, `@quenty/binder@14.19.2`, `@quenty/bindtocloseservice@8.17.2`, `@quenty/blend@12.18.2`, `@quenty/bodycolorsutils@7.18.2`, `@quenty/boundingboxutils@4.3.2`, `@quenty/boundlinkutils@14.19.2`, `@quenty/brio@14.17.2`, `@quenty/buttondragmodel@1.15.2`, `@quenty/buttonhighlightmodel@14.18.2`, `@quenty/buttonutils@2.2.2`, `@quenty/camera@14.20.2`, `@quenty/camerainfo@1.2.2`, `@quenty/camerastoryutils@10.10.3`, `@quenty/cancellabledelay@3.5.2`, `@quenty/canceltoken@11.11.3`, `@quenty/cframeserializer@4.7.3`, `@quenty/cframeutils@5.5.3`, `@quenty/characterparticleplayer@2.2.2`, `@quenty/characterutils@12.18.2`, `@quenty/chatproviderservice@9.25.2`, `@quenty/clienttranslator@14.19.2`, `@quenty/clipcharacters@12.19.2`, `@quenty/cmdrservice@13.22.2`, `@quenty/collectionserviceutils@8.17.2`, `@quenty/color3serializationutils@2.2.2`, `@quenty/color3utils@11.18.2`, `@quenty/colorpalette@10.21.2`, `@quenty/colorpicker@10.19.2`, `@quenty/colorsequenceutils@7.8.3`, `@quenty/conditions@10.20.2`, `@quenty/contentproviderutils@12.17.2`, `@quenty/convexhull@4.9.3`, `@quenty/cooldown@11.20.2`, `@quenty/coreguienabler@12.18.2`, `@quenty/coreguiutils@10.10.3`, `@quenty/countdowntext@4.8.2`, `@quenty/counter@7.17.2`, `@quenty/cubicspline@10.8.2`, `@quenty/datastore@13.20.2`, `@quenty/deathreport@10.21.2`, `@quenty/debounce@2.3.2`, `@quenty/defaultvalueutils@1.2.2`, `@quenty/deferred@2.2.2`, `@quenty/depthoffield@11.19.2`, `@quenty/draw@7.8.3`, `@quenty/ducktype@5.8.3`, `@quenty/ellipticcurvecryptography@1.6.2`, `@quenty/elo@7.19.2`, `@quenty/enabledmixin@11.12.2`, `@quenty/enumutils@3.4.2`, `@quenty/equippedtracker@13.18.2`, `@quenty/experiencecalculator@2.5.2`, `@quenty/fakeskybox@11.10.2`, `@quenty/firstpersoncharactertransparency@14.18.2`, `@quenty/flipbook@9.17.2`, `@quenty/friendutils@12.17.2`, `@quenty/functionutils@2.2.2`, `@quenty/funnels@1.5.2`, `@quenty/fzy@5.9.2`, `@quenty/gameconfig@12.24.2`, `@quenty/gameproductservice@14.24.2`, `@quenty/gamescalingutils@13.18.2`, `@quenty/gameversionutils@3.4.2`, `@quenty/generatewithmixin@11.8.3`, `@quenty/genericscreenguiprovider@13.20.2`, `@quenty/geometryutils@6.8.3`, `@quenty/getgroundplane@10.8.2`, `@quenty/getmechanismparts@2.2.2`, `@quenty/getpercentexposedutils@10.8.3`, `@quenty/grouputils@10.10.3`, `@quenty/guitriangle@2.2.2`, `@quenty/guivisiblemanager@12.9.2`, `@quenty/hapticfeedbackutils@3.2.2`, `@quenty/hide@11.21.2`, `@quenty/highlight@10.21.2`, `@quenty/hintscoringutils@14.20.2`, `@quenty/httppromise@10.10.3`, `@quenty/humanoidanimatorutils@3.1.2`, `@quenty/humanoiddescriptionutils@10.10.3`, `@quenty/humanoidkillerutils@2.3.3`, `@quenty/humanoidmovedirectionutils@10.8.3`, `@quenty/humanoidspeed@12.23.2`, `@quenty/humanoidteleportutils@10.8.2`, `@quenty/humanoidtracker@13.17.2`, `@quenty/humanoidutils@2.2.3`, `@quenty/idleservice@13.23.2`, `@quenty/ik@15.24.2`, `@quenty/influxdbclient@7.19.2`, `@quenty/inputkeymaputils@14.23.2`, `@quenty/inputmode@13.18.2`, `@quenty/inputobjectutils@4.18.2`, `@quenty/insertserviceutils@10.10.3`, `@quenty/instanceutils@13.17.2`, `@quenty/isamixin@2.2.2`, `@quenty/jsonutils@10.10.3`, `@quenty/kinematics@2.3.2`, `@quenty/linkutils@13.17.2`, `@quenty/lipsum@14.18.2`, `@quenty/loader@10.8.2`, `@quenty/localizedtextutils@12.17.2`, `@quenty/lrucache@1.6.2`, `@quenty/maid@3.4.2`, `@quenty/markdownrender@2.3.2`, `@quenty/marketplaceutils@11.11.3`, `@quenty/math@2.7.3`, `@quenty/memoize@1.6.2`, `@quenty/memorystoreutils@6.10.3`, `@quenty/meshutils@2.3.3`, `@quenty/messagingserviceutils@7.10.3`, `@quenty/modelappearance@10.8.3`, `@quenty/modeltransparencyeffect@11.8.3`, `@quenty/motor6d@7.20.2`, `@quenty/mouseovermixin@10.8.2`, `@quenty/mouseshiftlockservice@11.10.3`, `@quenty/multipleclickutils@13.17.2`, `@quenty/networkownerservice@5.2.3`, `@quenty/networkownerutils@3.2.3`, `@quenty/networkropeutils@10.8.2`, `@quenty/nocollisionconstraintutils@10.8.3`, `@quenty/numbersequenceutils@8.9.3`, `@quenty/numbertoinputkeyutils@2.3.3`, `@quenty/observablecollection@12.20.2`, `@quenty/octree@11.8.3`, `@quenty/optional@11.8.2`, `@quenty/overriddenproperty@10.9.2`, `@quenty/pagesutils@5.11.3`, `@quenty/particleengine@13.18.2`, `@quenty/particles@5.9.3`, `@quenty/parttouchingcalculator@14.20.2`, `@quenty/pathfindingutils@10.10.3`, `@quenty/performanceutils@4.8.3`, `@quenty/permissionprovider@14.19.2`, `@quenty/physicsutils@8.17.2`, `@quenty/pillbacking@10.9.3`, `@quenty/playerbinder@14.19.2`, `@quenty/playerhumanoidbinder@14.19.2`, `@quenty/playerinputmode@9.19.2`, `@quenty/playersservicepromises@10.10.3`, `@quenty/playerthumbnailutils@10.10.3`, `@quenty/playerutils@8.17.2`, `@quenty/policyserviceutils@6.10.3`, `@quenty/preferredparentutils@4.3.2`, `@quenty/promise@10.10.3`, `@quenty/promisemaid@5.10.3`, `@quenty/promptqueue@1.18.2`, `@quenty/propertyvalue@7.17.2`, `@quenty/pseudolocalize@3.4.2`, `@quenty/qframe@10.10.3`, `@quenty/qgui@2.3.3`, `@quenty/quaternion@2.5.3`, `@quenty/queue@2.3.2`, `@quenty/r15utils@13.17.2`, `@quenty/racketingropeconstraint@12.20.2`, `@quenty/radial-image@9.19.2`, `@quenty/ragdoll@15.23.2`, `@quenty/randomutils@6.10.2`, `@quenty/raycaster@3.4.2`, `@quenty/rbxasset@5.8.2`, `@quenty/rbxthumb@5.9.3`, `@quenty/receiptprocessing@7.18.2`, `@quenty/rectutils@1.2.2`, `@quenty/region3int16utils@10.8.3`, `@quenty/region3utils@10.9.2`, `@quenty/remotefunctionutils@10.10.3`, `@quenty/remoting@12.18.2`, `@quenty/resetservice@11.19.2`, `@quenty/richtext@1.3.2`, `@quenty/rigbuilderutils@10.19.2`, `@quenty/roblox-api-dump@8.11.3`, `@quenty/rodux-actions@9.9.3`, `@quenty/rodux-undo@8.9.3`, `@quenty/rogue-humanoid@10.23.2`, `@quenty/rogue-properties@11.22.2`, `@quenty/rotatinglabel@11.8.3`, `@quenty/rx@13.17.2`, `@quenty/rxbinderutils@14.19.2`, `@quenty/rxsignal@7.17.2`, `@quenty/safedestroy@1.4.2`, `@quenty/scoredactionservice@16.24.2`, `@quenty/screenshothudservice@7.18.2`, `@quenty/scrollingframe@12.11.3`, `@quenty/seatutils@7.19.2`, `@quenty/secrets@7.23.2`, `@quenty/selectionimageutils@11.8.2`, `@quenty/selectionutils@8.17.2`, `@quenty/servicebag@11.11.3`, `@quenty/setmechanismcframe@10.8.2`, `@quenty/settings-inputkeymap@10.25.2`, `@quenty/settings@11.23.2`, `@quenty/signal@7.10.2`, `@quenty/singleton@6.8.2`, `@quenty/snackbar@11.21.2`, `@quenty/socialserviceutils@10.10.3`, `@quenty/softshutdown@9.23.2`, `@quenty/soundgroup@1.20.2`, `@quenty/soundplayer@7.19.2`, `@quenty/sounds@10.10.3`, `@quenty/spawning@10.22.2`, `@quenty/spring@10.8.3`, `@quenty/sprites@13.16.2`, `@quenty/statestack@14.18.2`, `@quenty/steputils@3.5.5`, `@quenty/streamingutils@10.10.3`, `@quenty/string@3.3.3`, `@quenty/sunpositionutils@2.3.2`, `@quenty/symbol@3.4.2`, `@quenty/table@3.7.3`, `@quenty/teamtracker@13.17.2`, `@quenty/teamutils@10.17.2`, `@quenty/teleportserviceutils@9.17.2`, `@quenty/templateprovider@11.18.2`, `@quenty/terrainutils@10.9.3`, `@quenty/textboxutils@7.17.2`, `@quenty/textfilterservice@13.18.2`, `@quenty/textfilterutils@10.10.3`, `@quenty/textserviceutils@13.18.2`, `@quenty/throttle@10.9.2`, `@quenty/tie@10.20.2`, `@quenty/time@2.4.2`, `@quenty/timedtween@7.18.2`, `@quenty/timesyncservice@13.18.2`, `@quenty/toolutils@1.3.2`, `@quenty/touchingpartutils@2.2.3`, `@quenty/trajectory@2.7.3`, `@quenty/transitionmodel@7.19.2`, `@quenty/transparencyservice@11.8.3`, `@quenty/tuple@1.5.2`, `@quenty/typeutils@1.0.2`, `@quenty/ugcsanitize@1.4.2`, `@quenty/uiobjectutils@6.16.2`, `@quenty/ultrawidecontainerutils@2.4.2`, `@quenty/undostack@7.17.2`, `@quenty/userserviceutils@9.18.2`, `@quenty/utf8@2.3.3`, `@quenty/valuebaseutils@13.17.2`, `@quenty/valueobject@13.17.2`, `@quenty/vector3utils@10.8.3`, `@quenty/viewport@11.21.2`, `@quenty/voicechat@5.10.3`, `@quenty/weldconstraintutils@3.1.3`, `@quenty/cli-output-helpers@1.2.2`, `@quenty/nevermore-cli@4.6.2`, `@quenty/nevermore-template-helpers@1.2.3`
+  - fix: Bump package versions for republishing [#547](https://github.com/Quenty/NevermoreEngine/pull/547) ([@Quenty](https://github.com/Quenty))
+- `@quenty/acceltween@2.5.2`, `@quenty/accessorytypeutils@1.6.2`, `@quenty/actionmanager@13.19.2`, `@quenty/adorneeboundingbox@8.20.2`, `@quenty/adorneedata@7.18.2`, `@quenty/adorneeutils@3.3.3`, `@quenty/adorneevalue@10.18.2`, `@quenty/aggregator@1.4.2`, `@quenty/animationgroup@10.8.2`, `@quenty/animations@8.17.2`, `@quenty/animationtrackutils@2.2.2`, `@quenty/applytagtotaggedchildren@10.8.2`, `@quenty/assetserviceutils@5.19.2`, `@quenty/attributeutils@14.17.2`, `@quenty/avatareditorutils@7.20.2`, `@quenty/axisangleutils@2.3.2`, `@quenty/badgeutils@10.10.3`, `@quenty/baseobject@10.8.2`, `@quenty/basicpane@13.17.2`, `@quenty/bezierutils@2.2.2`, `@quenty/binarysearch@2.2.2`, `@quenty/binder@14.19.2`, `@quenty/bindtocloseservice@8.17.2`, `@quenty/blend@12.18.2`, `@quenty/bodycolorsutils@7.18.2`, `@quenty/boundingboxutils@4.3.2`, `@quenty/boundlinkutils@14.19.2`, `@quenty/brio@14.17.2`, `@quenty/buttondragmodel@1.15.2`, `@quenty/buttonhighlightmodel@14.18.2`, `@quenty/buttonutils@2.2.2`, `@quenty/camera@14.20.2`, `@quenty/camerainfo@1.2.2`, `@quenty/camerastoryutils@10.10.3`, `@quenty/cancellabledelay@3.5.2`, `@quenty/canceltoken@11.11.3`, `@quenty/cframeserializer@4.7.3`, `@quenty/cframeutils@5.5.3`, `@quenty/characterparticleplayer@2.2.2`, `@quenty/characterutils@12.18.2`, `@quenty/chatproviderservice@9.25.2`, `@quenty/clienttranslator@14.19.2`, `@quenty/clipcharacters@12.19.2`, `@quenty/cmdrservice@13.22.2`, `@quenty/collectionserviceutils@8.17.2`, `@quenty/color3serializationutils@2.2.2`, `@quenty/color3utils@11.18.2`, `@quenty/colorpalette@10.21.2`, `@quenty/colorpicker@10.19.2`, `@quenty/colorsequenceutils@7.8.3`, `@quenty/conditions@10.20.2`, `@quenty/contentproviderutils@12.17.2`, `@quenty/convexhull@4.9.3`, `@quenty/cooldown@11.20.2`, `@quenty/coreguienabler@12.18.2`, `@quenty/coreguiutils@10.10.3`, `@quenty/countdowntext@4.8.2`, `@quenty/counter@7.17.2`, `@quenty/cubicspline@10.8.2`, `@quenty/datastore@13.20.2`, `@quenty/deathreport@10.21.2`, `@quenty/debounce@2.3.2`, `@quenty/defaultvalueutils@1.2.2`, `@quenty/deferred@2.2.2`, `@quenty/depthoffield@11.19.2`, `@quenty/draw@7.8.3`, `@quenty/ducktype@5.8.3`, `@quenty/ellipticcurvecryptography@1.6.2`, `@quenty/elo@7.19.2`, `@quenty/enabledmixin@11.12.2`, `@quenty/enumutils@3.4.2`, `@quenty/experiencecalculator@2.5.2`, `@quenty/fakeskybox@11.10.2`, `@quenty/flipbook@9.17.2`, `@quenty/friendutils@12.17.2`, `@quenty/functionutils@2.2.2`, `@quenty/funnels@1.5.2`, `@quenty/fzy@5.9.2`, `@quenty/gameconfig@12.24.2`, `@quenty/gameproductservice@14.24.2`, `@quenty/gamescalingutils@13.18.2`, `@quenty/gameversionutils@3.4.2`, `@quenty/genericscreenguiprovider@13.20.2`, `@quenty/geometryutils@6.8.3`, `@quenty/getgroundplane@10.8.2`, `@quenty/getmechanismparts@2.2.2`, `@quenty/getpercentexposedutils@10.8.3`, `@quenty/grouputils@10.10.3`, `@quenty/guitriangle@2.2.2`, `@quenty/guivisiblemanager@12.9.2`, `@quenty/hapticfeedbackutils@3.2.2`, `@quenty/hide@11.21.2`, `@quenty/highlight@10.21.2`, `@quenty/hintscoringutils@14.20.2`, `@quenty/httppromise@10.10.3`, `@quenty/humanoidanimatorutils@3.1.2`, `@quenty/humanoiddescriptionutils@10.10.3`, `@quenty/humanoidkillerutils@2.3.3`, `@quenty/humanoidmovedirectionutils@10.8.3`, `@quenty/humanoidspeed@12.23.2`, `@quenty/humanoidteleportutils@10.8.2`, `@quenty/humanoidtracker@13.17.2`, `@quenty/humanoidutils@2.2.3`, `@quenty/idleservice@13.23.2`, `@quenty/ik@15.24.2`, `@quenty/influxdbclient@7.19.2`, `@quenty/inputkeymaputils@14.23.2`, `@quenty/inputmode@13.18.2`, `@quenty/inputobjectutils@4.18.2`, `@quenty/insertserviceutils@10.10.3`, `@quenty/instanceutils@13.17.2`, `@quenty/isamixin@2.2.2`, `@quenty/jsonutils@10.10.3`, `@quenty/kinematics@2.3.2`, `@quenty/linkutils@13.17.2`, `@quenty/lipsum@14.18.2`, `@quenty/loader@10.8.2`, `@quenty/localizedtextutils@12.17.2`, `@quenty/lrucache@1.6.2`, `@quenty/maid@3.4.2`, `@quenty/markdownrender@2.3.2`, `@quenty/marketplaceutils@11.11.3`, `@quenty/math@2.7.3`, `@quenty/memoize@1.6.2`, `@quenty/memorystoreutils@6.10.3`, `@quenty/meshutils@2.3.3`, `@quenty/messagingserviceutils@7.10.3`, `@quenty/modelappearance@10.8.3`, `@quenty/modeltransparencyeffect@11.8.3`, `@quenty/motor6d@7.20.2`, `@quenty/mouseovermixin@10.8.2`, `@quenty/mouseshiftlockservice@11.10.3`, `@quenty/multipleclickutils@13.17.2`, `@quenty/networkownerservice@5.2.3`, `@quenty/networkownerutils@3.2.3`, `@quenty/networkropeutils@10.8.2`, `@quenty/nocollisionconstraintutils@10.8.3`, `@quenty/numbersequenceutils@8.9.3`, `@quenty/numbertoinputkeyutils@2.3.3`, `@quenty/observablecollection@12.20.2`, `@quenty/octree@11.8.3`, `@quenty/optional@11.8.2`, `@quenty/overriddenproperty@10.9.2`, `@quenty/pagesutils@5.11.3`, `@quenty/particleengine@13.18.2`, `@quenty/particles@5.9.3`, `@quenty/parttouchingcalculator@14.20.2`, `@quenty/pathfindingutils@10.10.3`, `@quenty/performanceutils@4.8.3`, `@quenty/permissionprovider@14.19.2`, `@quenty/physicsutils@8.17.2`, `@quenty/pillbacking@10.9.3`, `@quenty/playerbinder@14.19.2`, `@quenty/playerhumanoidbinder@14.19.2`, `@quenty/playerinputmode@9.19.2`, `@quenty/playersservicepromises@10.10.3`, `@quenty/playerthumbnailutils@10.10.3`, `@quenty/playerutils@8.17.2`, `@quenty/policyserviceutils@6.10.3`, `@quenty/preferredparentutils@4.3.2`, `@quenty/promise@10.10.3`, `@quenty/promisemaid@5.10.3`, `@quenty/promptqueue@1.18.2`, `@quenty/propertyvalue@7.17.2`, `@quenty/pseudolocalize@3.4.2`, `@quenty/qframe@10.10.3`, `@quenty/qgui@2.3.3`, `@quenty/quaternion@2.5.3`, `@quenty/queue@2.3.2`, `@quenty/r15utils@13.17.2`, `@quenty/radial-image@9.19.2`, `@quenty/ragdoll@15.23.2`, `@quenty/randomutils@6.10.2`, `@quenty/raycaster@3.4.2`, `@quenty/rbxasset@5.8.2`, `@quenty/rbxthumb@5.9.3`, `@quenty/receiptprocessing@7.18.2`, `@quenty/rectutils@1.2.2`, `@quenty/region3int16utils@10.8.3`, `@quenty/region3utils@10.9.2`, `@quenty/remotefunctionutils@10.10.3`, `@quenty/remoting@12.18.2`, `@quenty/resetservice@11.19.2`, `@quenty/richtext@1.3.2`, `@quenty/rigbuilderutils@10.19.2`, `@quenty/roblox-api-dump@8.11.3`, `@quenty/rodux-actions@9.9.3`, `@quenty/rogue-humanoid@10.23.2`, `@quenty/rogue-properties@11.22.2`, `@quenty/rotatinglabel@11.8.3`, `@quenty/rx@13.17.2`, `@quenty/rxbinderutils@14.19.2`, `@quenty/rxsignal@7.17.2`, `@quenty/safedestroy@1.4.2`, `@quenty/scoredactionservice@16.24.2`, `@quenty/screenshothudservice@7.18.2`, `@quenty/scrollingframe@12.11.3`, `@quenty/seatutils@7.19.2`, `@quenty/secrets@7.23.2`, `@quenty/selectionimageutils@11.8.2`, `@quenty/selectionutils@8.17.2`, `@quenty/servicebag@11.11.3`, `@quenty/setmechanismcframe@10.8.2`, `@quenty/settings-inputkeymap@10.25.2`, `@quenty/settings@11.23.2`, `@quenty/signal@7.10.2`, `@quenty/singleton@6.8.2`, `@quenty/snackbar@11.21.2`, `@quenty/socialserviceutils@10.10.3`, `@quenty/softshutdown@9.23.2`, `@quenty/soundgroup@1.20.2`, `@quenty/soundplayer@7.19.2`, `@quenty/sounds@10.10.3`, `@quenty/spawning@10.22.2`, `@quenty/spring@10.8.3`, `@quenty/sprites@13.16.2`, `@quenty/statestack@14.18.2`, `@quenty/steputils@3.5.5`, `@quenty/streamingutils@10.10.3`, `@quenty/string@3.3.3`, `@quenty/sunpositionutils@2.3.2`, `@quenty/symbol@3.4.2`, `@quenty/table@3.7.3`, `@quenty/teamtracker@13.17.2`, `@quenty/teamutils@10.17.2`, `@quenty/teleportserviceutils@9.17.2`, `@quenty/templateprovider@11.18.2`, `@quenty/textboxutils@7.17.2`, `@quenty/textfilterservice@13.18.2`, `@quenty/textfilterutils@10.10.3`, `@quenty/textserviceutils@13.18.2`, `@quenty/throttle@10.9.2`, `@quenty/tie@10.20.2`, `@quenty/time@2.4.2`, `@quenty/timedtween@7.18.2`, `@quenty/timesyncservice@13.18.2`, `@quenty/toolutils@1.3.2`, `@quenty/touchingpartutils@2.2.3`, `@quenty/trajectory@2.7.3`, `@quenty/transitionmodel@7.19.2`, `@quenty/transparencyservice@11.8.3`, `@quenty/tuple@1.5.2`, `@quenty/typeutils@1.0.2`, `@quenty/ugcsanitize@1.4.2`, `@quenty/uiobjectutils@6.16.2`, `@quenty/ultrawidecontainerutils@2.4.2`, `@quenty/undostack@7.17.2`, `@quenty/userserviceutils@9.18.2`, `@quenty/utf8@2.3.3`, `@quenty/valuebaseutils@13.17.2`, `@quenty/valueobject@13.17.2`, `@quenty/viewport@11.21.2`, `@quenty/voicechat@5.10.3`, `@quenty/weldconstraintutils@3.1.3`, `@quenty/cli-output-helpers@1.2.2`, `@quenty/nevermore-cli@4.6.2`, `@quenty/nevermore-template-helpers@1.2.3`
+  - ci: Add luau-lsp type checking github action and integration [#545](https://github.com/Quenty/NevermoreEngine/pull/545) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Apr 02 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.19.0`, `@quenty/brio@14.17.0`, `@quenty/clienttranslator@14.19.0`, `@quenty/ellipticcurvecryptography@1.6.0`, `@quenty/elo@7.19.0`, `@quenty/experiencecalculator@2.5.0`, `@quenty/fzy@5.9.0`, `@quenty/influxdbclient@7.19.0`, `@quenty/instanceutils@13.17.0`, `@quenty/lipsum@14.18.0`, `@quenty/observablecollection@12.20.0`, `@quenty/randomutils@6.10.0`, `@quenty/rx@13.17.0`, `@quenty/snackbar@11.21.0`, `@quenty/nevermore-cli@4.6.0`
+  - ci: Create workflow to execute Jest unit tests with Roblox open cloud [#544](https://github.com/Quenty/NevermoreEngine/pull/544) ([@unrooot](https://github.com/unrooot) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@unrooot](https://github.com/unrooot)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Mar 31 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, [@mrkboy10](https://github.com/mrkboy10), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/rx@13.16.2`
+  - fix: Correct misplaced parenthesis in Rx combineLatestAll function [#546](https://github.com/Quenty/NevermoreEngine/pull/546) ([@mrkboy10](https://github.com/mrkboy10))
+
+#### Authors: 1
+
+- [@mrkboy10](https://github.com/mrkboy10)
+
+---
+
+# (Fri Mar 21 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/ragdoll@15.22.2`
+  - fix: Fix ragdolls showing issues on other people's characters [#523](https://github.com/Quenty/NevermoreEngine/pull/523) ([@imagerymartin](https://github.com/imagerymartin) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Martin ([@imagerymartin](https://github.com/imagerymartin))
+
+---
+
+# (Fri Mar 21 2025)
+
+#### 🐛 Bug Fix
+
+- docs: Update readme.md, and ensure stability by sorting by name [#541](https://github.com/Quenty/NevermoreEngine/pull/541) ([@Quenty](https://github.com/Quenty))
+- `@quenty/adorneeboundingbox@8.19.3`, `@quenty/adorneedata@7.17.1`, `@quenty/adorneeutils@3.3.1`, `@quenty/cframeutils@5.5.1`, `@quenty/characterutils@12.17.1`, `@quenty/chatproviderservice@9.24.4`, `@quenty/color3utils@11.17.1`, `@quenty/datastore@13.19.2`, `@quenty/deathreport@10.20.1`, `@quenty/draw@7.8.1`, `@quenty/ducktype@5.8.1`, `@quenty/friendutils@12.16.1`, `@quenty/gameproductservice@14.23.3`, `@quenty/hintscoringutils@14.19.1`, `@quenty/humanoidkillerutils@2.3.1`, `@quenty/humanoidspeed@12.22.4`, `@quenty/humanoidtracker@13.16.1`, `@quenty/humanoidutils@2.2.1`, `@quenty/ik@15.23.1`, `@quenty/instanceutils@13.16.1`, `@quenty/math@2.7.1`, `@quenty/memorystoreutils@6.10.1`, `@quenty/meshutils@2.3.1`, `@quenty/messagingserviceutils@7.10.1`, `@quenty/metricutils@2.4.1`, `@quenty/modeltransparencyeffect@11.8.1`, `@quenty/networkownerservice@5.2.1`, `@quenty/networkownerutils@3.2.1`, `@quenty/nocollisionconstraintutils@10.8.1`, `@quenty/numberrangeutils@3.1.1`, `@quenty/numbersequenceutils@8.9.1`, `@quenty/numbertoinputkeyutils@2.3.1`, `@quenty/pagesutils@5.11.1`, `@quenty/particles@5.9.1`, `@quenty/pathfindingutils@10.10.1`, `@quenty/permissionprovider@14.18.1`, `@quenty/physicsutils@8.16.1`, `@quenty/playerthumbnailutils@10.10.1`, `@quenty/playerutils@8.16.1`, `@quenty/polynomialutils@2.2.1`, `@quenty/probability@2.3.1`, `@quenty/propertyvalue@7.16.1`, `@quenty/qframe@10.10.1`, `@quenty/r15utils@13.16.1`, `@quenty/ragdoll@15.22.1`, `@quenty/randomutils@6.9.1`, `@quenty/receiptprocessing@7.17.1`, `@quenty/rogue-properties@11.21.4`, `@quenty/rx@13.16.1`, `@quenty/seatutils@7.18.1`, `@quenty/selectionutils@8.16.1`, `@quenty/servicebag@11.11.1`, `@quenty/settings@11.22.4`, `@quenty/socialserviceutils@10.10.1`, `@quenty/steputils@3.5.3`, `@quenty/streamingutils@10.10.1`, `@quenty/string@3.3.1`, `@quenty/table@3.7.1`, `@quenty/teamtracker@13.16.1`, `@quenty/teleportserviceutils@9.16.1`, `@quenty/terrainutils@10.9.1`, `@quenty/textboxutils@7.16.1`, `@quenty/textfilterutils@10.10.1`, `@quenty/tie@10.19.1`, `@quenty/toolutils@1.2.1`, `@quenty/touchingpartutils@2.2.1`, `@quenty/trajectory@2.7.1`, `@quenty/ugcsanitize@1.3.1`, `@quenty/uiobjectutils@6.15.1`, `@quenty/utf8@2.3.1`, `@quenty/vector3int16utils@2.2.1`, `@quenty/vector3utils@10.8.1`, `@quenty/voicechat@5.10.1`, `@quenty/weldconstraintutils@3.1.1`, `@quenty/nevermore-cli@4.5.2`
+  - docs: Add docs and types to a lot of files [#542](https://github.com/Quenty/NevermoreEngine/pull/542) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Mar 20 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@13.19.1`
+  - fix: Work around Roblox bug with OrderedDataStore never finishing [#543](https://github.com/Quenty/NevermoreEngine/pull/543) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Mar 13 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/observablecollection@12.19.2`, `@quenty/nevermore-cli@4.5.1`
+  - ci: Fix moonwave extractor and documentation building [#540](https://github.com/Quenty/NevermoreEngine/pull/540) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Mar 12 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, [@Daimywil](https://github.com/Daimywil), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/viewport@11.20.1`
+  - fix: Incorrect if statement in ViewportControls [#535](https://github.com/Quenty/NevermoreEngine/pull/535) ([@Daimywil](https://github.com/Daimywil))
+
+#### Authors: 1
+
+- [@Daimywil](https://github.com/Daimywil)
+
+---
+
+# (Wed Mar 12 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rogue-properties@11.21.2`
+  - fix: correct type assertion for index in RoguePropertyTable __index function [#539](https://github.com/Quenty/NevermoreEngine/pull/539) ([@darealzz](https://github.com/darealzz))
+
+#### Authors: 1
+
+- Tanay Maganti ([@darealzz](https://github.com/darealzz))
+
+---
+
+# (Sun Mar 09 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/observablecollection@12.19.1`
+  - Add __len metamethod to ObservableCollections [#538](https://github.com/Quenty/NevermoreEngine/pull/538) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
+# (Tue Feb 18 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Tanay Maganti ([@darealzz](https://github.com/darealzz)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/basicpane@13.16.0`, `@quenty/camera@14.19.0`, `@quenty/coreguienabler@12.17.0`, `@quenty/ik@15.23.0`, `@quenty/loader@10.8.0`, `@quenty/r15utils@13.16.0`, `@quenty/racketingropeconstraint@12.19.0`, `@quenty/rogue-properties@11.21.0`, `@quenty/teamutils@10.16.0`, `@quenty/templateprovider@11.17.0`
+  - Users/quenty/wfyb [#534](https://github.com/Quenty/NevermoreEngine/pull/534) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/rx@13.16.0`
+  - fix: Typo causing some operators to not emit on source completion [#537](https://github.com/Quenty/NevermoreEngine/pull/537) ([@darealzz](https://github.com/darealzz))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Tanay Maganti ([@darealzz](https://github.com/darealzz))
+
+---
+
 # (Fri Jan 24 2025)
 
 #### 🚀 Enhancement
@@ -2466,7 +2741,7 @@ Thank you, Bark_ing ([@bark-ing](https://github.com/bark-ing)), for all your wor
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@systematicequation](https://github.com/systematicequation), for all your work!
+Thank you, [@systematicequation](https://github.com/systematicequation), for all your work!
 
 #### 🐛 Bug Fix
 
@@ -2908,7 +3183,7 @@ Thank you, OptimisticSide ([@optimisticside](https://github.com/optimisticside))
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@OttoHatt](https://github.com/OttoHatt), for all your work!
+Thank you, [@OttoHatt](https://github.com/OttoHatt), for all your work!
 
 #### 🚀 Enhancement
 
@@ -3058,7 +3333,7 @@ Thank you, null[@OttoHatt](https://github.com/OttoHatt), for all your work!
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@Yuuwa0519](https://github.com/Yuuwa0519), for all your work!
+Thank you, [@Yuuwa0519](https://github.com/Yuuwa0519), for all your work!
 
 #### 🐛 Bug Fix
 
@@ -3402,7 +3677,7 @@ Thank you, aku ([@aku-e](https://github.com/aku-e)), for all your work!
 
 :tada: This release contains work from a new contributor! :tada:
 
-Thank you, null[@Boegie19](https://github.com/Boegie19), for all your work!
+Thank you, [@Boegie19](https://github.com/Boegie19), for all your work!
 
 #### 🐛 Bug Fix
 

@@ -15,15 +15,24 @@ local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 
 local SettingsDataService = {}
+
+export type SettingsDataService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+	},
+	{} :: typeof({ __index = SettingsDataService })
+))
 
 --[=[
 	Initializes the shared registry service. Should be done via [ServiceBag].
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingsDataService:Init(serviceBag)
+function SettingsDataService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -44,14 +53,14 @@ function SettingsDataService:_getPlayerSettingsCacheMap()
 	self._playerSettingsCacheMap = self._maid:Add(ObservableMap.new())
 	self._hydratedPlayersMaid = self._maid:Add(Maid.new())
 
-	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player: Player)
 		self._hydratedPlayersMaid[player] = nil
 	end))
 
 	return self._playerSettingsCacheMap
 end
 
-function SettingsDataService:_getPlayerSettingsMapForPlayer(player)
+function SettingsDataService:_getPlayerSettingsMapForPlayer(player: Player)
 	local playerSettingsCacheMap = self:_getPlayerSettingsCacheMap()
 
 	if self._hydratedPlayersMaid[player] then
@@ -65,28 +74,35 @@ function SettingsDataService:_getPlayerSettingsMapForPlayer(player)
 	return playerSettingsCacheMap
 end
 
-function SettingsDataService:_hydrateCacheForPlayer(player)
+function SettingsDataService:_hydrateCacheForPlayer(player: Player)
 	local playerMaid = Maid.new()
 
 	playerMaid:GiveTask(RxInstanceUtils.observeChildrenBrio(player, function(value)
 		-- We really only care about this, and we can assume we have the tag immediately
 		return value:HasTag("PlayerSettings")
-	end):Pipe({
-		RxBrioUtils.flatMapBrio(function(playerSettingsInstance)
-			return PlayerSettingsInterface:ObserveBrio(playerSettingsInstance, self._tieRealmService:GetTieRealm())
-		end)
-	}):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
+	end)
+		:Pipe({
+			RxBrioUtils.flatMapBrio(function(playerSettingsInstance)
+				return PlayerSettingsInterface:ObserveBrio(playerSettingsInstance, self._tieRealmService:GetTieRealm())
+			end),
+		})
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-		local maid, playerSettings = brio:ToMaidAndValue()
-		maid:GiveTask(self._playerSettingsCacheMap:Set(playerSettings:GetPlayer(), playerSettings))
-	end))
+			local maid, playerSettings = brio:ToMaidAndValue()
+			maid:GiveTask(self._playerSettingsCacheMap:Set(playerSettings:GetPlayer(), playerSettings))
+		end))
 
 	return playerMaid
 end
 
+--[=[
+	Gets the setting definitions
+
+	@return { SettingDefinition }
+]=]
 function SettingsDataService:GetSettingDefinitions()
 	return self._settingDefinitions:GetList()
 end
@@ -112,7 +128,6 @@ function SettingsDataService:ObserveRegisteredDefinitionsBrio()
 	return self._settingDefinitions:ObserveItemsBrio()
 end
 
-
 --[=[
 	Observes the player's settings
 
@@ -131,7 +146,7 @@ end
 	@param player Player
 	@return Observable<Brio<PlayerSettingsClient>>
 ]=]
-function SettingsDataService:ObservePlayerSettingsBrio(player)
+function SettingsDataService:ObservePlayerSettingsBrio(player: Player)
 	return self:_getPlayerSettingsMapForPlayer(player):ObserveAtKeyBrio(player, self._tieRealmService:GetTieRealm())
 end
 
@@ -142,14 +157,17 @@ end
 	@param cancelToken CancelToken
 	@return Promise<PlayerSettingsBase>
 ]=]
-function SettingsDataService:PromisePlayerSettings(player, cancelToken)
+function SettingsDataService:PromisePlayerSettings(player: Player, cancelToken)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return  Rx.toPromise(self:ObservePlayerSettings(player):Pipe({
-		Rx.where(function(playerSettings)
-			return playerSettings ~= nil
-		end)
-	}), cancelToken)
+	return Rx.toPromise(
+		self:ObservePlayerSettings(player):Pipe({
+			Rx.where(function(playerSettings)
+				return playerSettings ~= nil
+			end),
+		}),
+		cancelToken
+	)
 end
 
 --[=[
@@ -158,7 +176,7 @@ end
 	@param player Player
 	@return Promise<PlayerSettingsBase>
 ]=]
-function SettingsDataService:GetPlayerSettings(player)
+function SettingsDataService:GetPlayerSettings(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:_getPlayerSettingsMapForPlayer(player):Get(player)

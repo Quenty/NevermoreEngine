@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/preferredparentutils@4.3.2...@quenty/preferredparentutils@4.4.0) (2025-05-10)
+
+
+### Features
+
+* Add even more types ([b31717d](https://github.com/Quenty/NevermoreEngine/commit/b31717d8c9f7620c457f5018a2affa760a65334a))
+
+
+
+
+
+## [4.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/preferredparentutils@4.3.0...@quenty/preferredparentutils@4.3.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [4.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/preferredparentutils@4.3.0...@quenty/preferredparentutils@4.3.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
 # [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/preferredparentutils@4.2.0...@quenty/preferredparentutils@4.3.0) (2024-09-25)
 
 **Note:** Version bump only for package @quenty/preferredparentutils

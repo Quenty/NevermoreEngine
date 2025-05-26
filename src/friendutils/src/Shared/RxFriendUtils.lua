@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utilities for observing the local player's friends.
 
@@ -7,8 +8,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
-local StarterGui = game:GetService("StarterGui")
 local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 
 local Brio = require("Brio")
 local Maid = require("Maid")
@@ -21,10 +22,10 @@ local RxFriendUtils = {}
 	The lifetimes exist for the whole duration another player is a friend and in your server.
 	This means if a player is unfriended + friended multiple times per session, they will have emitted multiple friend lifetimes.
 
-	@param player Player | nil
+	@param player Player?
 	@return Observable<Brio<Player>>
 ]=]
-function RxFriendUtils.observeFriendsInServerAsBrios(player)
+function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observable.Observable<Brio.Brio<Player>>
 	player = player or Players.LocalPlayer
 
 	assert(typeof(player) == "Instance", "Bad player")
@@ -37,7 +38,7 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player)
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local function handleFriendState(otherPlayer: Player, isFriendsWith)
+		local function handleFriendState(otherPlayer: Player, isFriendsWith: boolean)
 			if otherPlayer == Players.LocalPlayer then
 				return
 			end
@@ -61,8 +62,12 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player)
 					return player:IsFriendsWith(otherPlayer.UserId)
 				end)
 				if not ok then
-					warn(string.format("[RxFriendUtils.observeFriendsInServerAsBrios] Couldn't get friendship status with %q!",
-						otherPlayer.Name))
+					warn(
+						string.format(
+							"[RxFriendUtils.observeFriendsInServerAsBrios] Couldn't get friendship status with %q!",
+							otherPlayer.Name
+						)
+					)
 
 					-- If the call failed, then 'isFriendsWith' will be nil.
 					-- We'll assume that this player isn't a friend on failure.
@@ -101,7 +106,7 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player)
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxFriendUtils

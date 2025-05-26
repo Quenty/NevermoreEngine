@@ -2,13 +2,14 @@
 	@class LoopedSoundPlayer.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Maid = require("Maid")
-local LoopedSoundPlayer = require("LoopedSoundPlayer")
-local RandomUtils = require("RandomUtils")
 local Blend = require("Blend")
+local LoopedSoundPlayer = require("LoopedSoundPlayer")
 local LoopedSoundScheduleUtils = require("LoopedSoundScheduleUtils")
+local Maid = require("Maid")
+local RandomUtils = require("RandomUtils")
 
 return function(target)
 	local maid = Maid.new()
@@ -22,7 +23,7 @@ return function(target)
 	loopedSoundPlayer:SetSoundParent(target)
 
 	local OPTIONS = {
-		"rbxassetid://14477453689";
+		"rbxassetid://14477453689",
 	}
 
 	maid:GiveTask(task.spawn(function()
@@ -36,86 +37,87 @@ return function(target)
 
 	local function button(props)
 		return Blend.New "TextButton" {
-			Text = props.Text;
-			AutoButtonColor = true;
-			Font = Enum.Font.FredokaOne;
-			Size = UDim2.new(0, 100, 0, 30);
+			Text = props.Text,
+			AutoButtonColor = true,
+			Font = Enum.Font.FredokaOne,
+			Size = UDim2.new(0, 100, 0, 30),
 
-			Blend.New "UICorner" {
-
-			};
+			Blend.New "UICorner" {},
 
 			[Blend.OnEvent "Activated"] = function()
-				props.OnActivated();
-			end;
-		};
+				props.OnActivated()
+			end,
+		}
 	end
 
 	maid:GiveTask(Blend.mount(target, {
 		Blend.New "Frame" {
-			Name = "ButtonContainer";
-			BackgroundTransparency = 1;
-			Position = UDim2.new(0.5, 0, 0, 5);
-			AnchorPoint = Vector2.new(0.5, 0);
-			Size = UDim2.new(1, 0, 0, 30);
+			Name = "ButtonContainer",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0.5, 0, 0, 5),
+			AnchorPoint = Vector2.new(0.5, 0),
+			Size = UDim2.new(1, 0, 0, 30),
 
 			Blend.New "UIListLayout" {
-				FillDirection = Enum.FillDirection.Horizontal;
-				Padding = UDim.new(0, 5);
-				HorizontalAlignment = Enum.HorizontalAlignment.Center;
-			};
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, 5),
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			},
 
 			button({
-				Text = "Toggle";
+				Text = "Toggle",
 				OnActivated = function()
 					loopedSoundPlayer:Toggle()
-				end;
-			});
+				end,
+			}),
 
 			button({
-				Text = "Reset";
+				Text = "Reset",
 				OnActivated = function()
 					loopedSoundPlayer:Swap(ORIGINAL)
-				end;
-			});
+				end,
+			}),
 
 			button({
-				Text = "Swap sample";
+				Text = "Swap sample",
 				OnActivated = function()
 					loopedSoundPlayer:SwapToSamples({
-						"rbxassetid://14478670277";
-						"rbxassetid://14478671494";
-						"rbxassetid://14478672676";
+						"rbxassetid://14478670277",
+						"rbxassetid://14478671494",
+						"rbxassetid://14478672676",
 					})
-				end;
-			});
+				end,
+			}),
 
 			button({
-				Text = "Play once";
+				Text = "Play once",
 				OnActivated = function()
 					loopedSoundPlayer:PlayOnce("rbxassetid://14478764914")
-				end;
-			});
+				end,
+			}),
 
 			button({
-				Text = "Play delayed loop";
+				Text = "Play delayed loop",
 				OnActivated = function()
-					loopedSoundPlayer:Swap({
-						SoundId ="rbxassetid://6052547865";
-						Volume = 3;
-					}, LoopedSoundScheduleUtils.schedule({
-						loopDelay = NumberRange.new(0.25, 1);
-					}))
-				end;
-			});
+					loopedSoundPlayer:Swap(
+						{
+							SoundId = "rbxassetid://6052547865",
+							Volume = 3,
+						},
+						LoopedSoundScheduleUtils.schedule({
+							loopDelay = NumberRange.new(0.25, 1),
+						})
+					)
+				end,
+			}),
 
 			button({
-				Text = "Swap on loop";
+				Text = "Swap on loop",
 				OnActivated = function()
 					loopedSoundPlayer:SwapOnLoop(RandomUtils.choice(OPTIONS))
-				end;
-			});
-		}
+				end,
+			}),
+		},
 	}))
 
 	return function()

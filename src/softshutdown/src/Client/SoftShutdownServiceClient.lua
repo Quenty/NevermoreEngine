@@ -4,32 +4,33 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Workspace = game:GetService("Workspace")
 local TeleportService = game:GetService("TeleportService")
+local Workspace = game:GetService("Workspace")
 
 local AttributeValue = require("AttributeValue")
+local CoreGuiEnabler = require("CoreGuiEnabler")
 local Maid = require("Maid")
 local PlayerGuiUtils = require("PlayerGuiUtils")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local SoftShutdownConstants = require("SoftShutdownConstants")
 local SoftShutdownTranslator = require("SoftShutdownTranslator")
 local SoftShutdownUI = require("SoftShutdownUI")
 local ValueObject = require("ValueObject")
-local CoreGuiEnabler = require("CoreGuiEnabler")
 
 local SoftShutdownServiceClient = {}
 SoftShutdownServiceClient.ServiceName = "SoftShutdownServiceClient"
 
 local DISABLE_CORE_GUI_TYPES = {
-	Enum.CoreGuiType.PlayerList;
-	Enum.CoreGuiType.Health;
-	Enum.CoreGuiType.Backpack;
-	Enum.CoreGuiType.Chat;
-	Enum.CoreGuiType.EmotesMenu;
-	Enum.CoreGuiType.All;
+	Enum.CoreGuiType.PlayerList,
+	Enum.CoreGuiType.Health,
+	Enum.CoreGuiType.Backpack,
+	Enum.CoreGuiType.Chat,
+	Enum.CoreGuiType.EmotesMenu,
+	Enum.CoreGuiType.All,
 }
 
-function SoftShutdownServiceClient:Init(serviceBag)
+function SoftShutdownServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -47,27 +48,29 @@ function SoftShutdownServiceClient:Init(serviceBag)
 			self._localTeleportDataSaysIsLobby.Value = true
 		end
 		if self:_queryIsArrivingAfterShutdown() then
-			self._isArrivingAfterShutdown.Value = true;
+			self._isArrivingAfterShutdown.Value = true
 		end
 	end)
 
 	self._maid:GiveTask(Rx.combineLatest({
-		isLobby = self._isLobby:Observe();
-		isShuttingDown = self._isUpdating:Observe();
-		localTeleportDataSaysIsLobby = self._localTeleportDataSaysIsLobby:Observe();
-		isArrivingAfterShutdown = self._isArrivingAfterShutdown:Observe();
+		isLobby = self._isLobby:Observe(),
+		isShuttingDown = self._isUpdating:Observe(),
+		localTeleportDataSaysIsLobby = self._localTeleportDataSaysIsLobby:Observe(),
+		isArrivingAfterShutdown = self._isArrivingAfterShutdown:Observe(),
 	}):Subscribe(function(state)
 		if state.isLobby or state.localTeleportDataSaysIsLobby then
 			self._maid._shutdownUI = nil
 			if not self._maid._lobbyUI then
 				local screenGui
-				self._maid._lobbyUI, screenGui = self:_showSoftShutdownUI("shutdown.lobby.title", "shutdown.lobby.subtitle", true)
+				self._maid._lobbyUI, screenGui =
+					self:_showSoftShutdownUI("shutdown.lobby.title", "shutdown.lobby.subtitle", true)
 
 				TeleportService:SetTeleportGui(screenGui)
 			end
 		elseif state.isShuttingDown then
 			local screenGui
-			self._maid._shutdownUI, screenGui = self:_showSoftShutdownUI("shutdown.restart.title", "shutdown.restart.subtitle")
+			self._maid._shutdownUI, screenGui =
+				self:_showSoftShutdownUI("shutdown.restart.title", "shutdown.restart.subtitle")
 
 			TeleportService:SetTeleportGui(screenGui)
 
@@ -167,7 +170,7 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 		end
 	end
 
-	for _, child in pairs(playerGui:GetChildren()) do
+	for _, child in playerGui:GetChildren() do
 		handleChild(child)
 	end
 
@@ -180,12 +183,12 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 	end))
 
 	maid:GiveTask(function()
-		for screenGui, _ in pairs(enabledScreenGuis) do
+		for screenGui, _ in enabledScreenGuis do
 			screenGui.Enabled = true
 		end
 	end)
 
-	for _, coreGuiType in pairs(DISABLE_CORE_GUI_TYPES) do
+	for _, coreGuiType in DISABLE_CORE_GUI_TYPES do
 		maid:GiveTask(CoreGuiEnabler:PushDisable(coreGuiType))
 	end
 end

@@ -1,4 +1,5 @@
---[=[
+--!strict
+--[[
 	Manages the cleaning of events and other things. Useful for
 	encapsulating state and make deconstructors easy.
 
@@ -18,29 +19,49 @@
 	maid:DoCleaning()
 	```
 
+	@ignore
 	@class Maid
-]=]
+]]
 -- luacheck: pop
 
 local Maid = {}
 Maid.ClassName = "Maid"
 
---[=[
+export type MaidTask = (() -> ()) | Instance | thread | any | RBXScriptConnection | nil
+
+export type Maid = typeof(setmetatable(
+	{} :: {
+		Add: <T>(self: Maid, task: T) -> T,
+		GiveTask: (self: Maid, task: MaidTask) -> number,
+		GivePromise: <T>(self: Maid, promise: T) -> T,
+		DoCleaning: (self: Maid) -> (),
+		Destroy: (self: Maid) -> (),
+		_tasks: { [any]: MaidTask },
+		[string | number | MaidTask]: any,
+	},
+	{} :: typeof({ __index = Maid })
+))
+
+--[[
 	Constructs a new Maid object
 
 	```lua
 	local maid = Maid.new()
 	```
 
+	@ignore
 	@return Maid
-]=]
-function Maid.new()
-	return setmetatable({
-		_tasks = {}
-	}, Maid)
+]]
+function Maid.new(): Maid
+	return setmetatable(
+		{
+			_tasks = {},
+		} :: any,
+		Maid
+	) :: Maid
 end
 
---[=[
+--[[
 	Returns true if the class is a maid, and false otherwise.
 
 	```lua
@@ -48,14 +69,15 @@ end
 	print(Maid.isMaid(nil)) --> false
 	```
 
+	@ignore
 	@param value any
 	@return boolean
-]=]
-function Maid.isMaid(value)
+]]
+function Maid.isMaid(value: any): boolean
 	return type(value) == "table" and value.ClassName == "Maid"
 end
 
---[=[
+--[[
 	Returns Maid[key] if not part of Maid metatable
 
 	```lua
@@ -67,10 +89,11 @@ end
 	print(maid._current) --> nil
 	```
 
+	@ignore
 	@param index any
 	@return MaidTask
-]=]
-function Maid:__index(index)
+]]
+function Maid.__index(self: Maid, index: any)
 	if Maid[index] then
 		return Maid[index]
 	else
@@ -78,7 +101,7 @@ function Maid:__index(index)
 	end
 end
 
---[=[
+--[[
 	Add a task to clean up. Tasks given to a maid will be cleaned when
 	maid[index] is set to a different value.
 
@@ -94,10 +117,11 @@ end
 	Maid[key] = nil                Removes a named task.
 	```
 
+	@ignore
 	@param index any
 	@param newTask MaidTask
-]=]
-function Maid:__newindex(index, newTask)
+]]
+function Maid.__newindex(self: Maid, index: any, newTask: MaidTask)
 	if Maid[index] ~= nil then
 		error(string.format("Cannot use '%s' as a Maid key", tostring(index)), 2)
 	end
@@ -112,16 +136,16 @@ function Maid:__newindex(index, newTask)
 	tasks[index] = newTask
 
 	if job then
-		local jobType = typeof(job)
-		if jobType == "function" then
-			job()
-		elseif jobType == "table" then
-			if type(job.Destroy) == "function" then
-				job:Destroy()
+		if typeof(job) == "function" then
+			(job :: any)()
+		elseif typeof(job) == "table" then
+			local destructable: any = job
+			if type(destructable.Destroy) == "function" then
+				destructable:Destroy()
 			end
-		elseif jobType == "Instance" then
+		elseif typeof(job) == "Instance" then
 			job:Destroy()
-		elseif jobType == "thread" then
+		elseif typeof(job) == "thread" then
 			local cancelled
 			if coroutine.running() ~= job then
 				cancelled = pcall(function()
@@ -134,60 +158,63 @@ function Maid:__newindex(index, newTask)
 					task.cancel(job)
 				end)
 			end
-		elseif jobType == "RBXScriptConnection" then
+		elseif typeof(job) == "RBXScriptConnection" then
 			job:Disconnect()
 		end
 	end
 end
 
---[=[
+--[[
 	Gives a task to the maid for cleanup and returns the resulting value
 
+	@ignore
 	@param task MaidTask -- An item to clean
 	@return MaidTask
-]=]
-function Maid:Add(task)
+]]
+function Maid.Add<T>(self: Maid, task: T): T
 	if not task then
 		error("Task cannot be false or nil", 2)
 	end
 
-	self[#self._tasks+1] = task
+	self[#(self._tasks :: any) + 1] = task :: any
 
-	if type(task) == "table" and (not task.Destroy) then
+	if type(task) == "table" and not task.Destroy then
 		warn("[Maid.Add] - Gave table task without .Destroy\n\n" .. debug.traceback())
 	end
 
 	return task
 end
 
---[=[
+--[[
 	Gives a task to the maid for cleanup, but uses an incremented number as a key.
 
+	@ignore
 	@param task MaidTask -- An item to clean
 	@return number -- taskId
-]=]
-function Maid:GiveTask(task)
+]]
+function Maid.GiveTask(self: Maid, task: MaidTask): number
 	if not task then
 		error("Task cannot be false or nil", 2)
 	end
 
-	local taskId = #self._tasks+1
+	local taskId = #(self._tasks :: any) + 1
 	self[taskId] = task
 
-	if type(task) == "table" and (not task.Destroy) then
+	if type(task) == "table" and not (task :: any).Destroy then
 		warn("[Maid.GiveTask] - Gave table task without .Destroy\n\n" .. debug.traceback())
 	end
 
 	return taskId
 end
 
---[=[
+--[[
 	Gives a promise to the maid for clean.
 
+	@ignore
 	@param promise Promise<T>
 	@return Promise<T>
-]=]
-function Maid:GivePromise(promise)
+]]
+function Maid.GivePromise(self: Maid, promise: any): any
 	if not promise:IsPending() then
 		return promise
 	end
@@ -203,7 +230,7 @@ function Maid:GivePromise(promise)
 	return newPromise
 end
 
---[=[
+--[[
 	Cleans up all tasks and removes them as entries from the Maid.
 
 	:::note
@@ -218,12 +245,14 @@ end
 	However, adding tasks while cleaning is not generally a good idea, as if you add a
 	function that adds itself, this will loop indefinitely.
 	:::
-]=]
-function Maid:DoCleaning()
+
+	@ignore
+]]
+function Maid.DoCleaning(self: Maid)
 	local tasks = self._tasks
 
 	-- Disconnect all events first as we know this is safe
-	for index, job in pairs(tasks) do
+	for index, job in tasks do
 		if typeof(job) == "RBXScriptConnection" then
 			tasks[index] = nil
 			job:Disconnect()
@@ -234,14 +263,13 @@ function Maid:DoCleaning()
 	local index, job = next(tasks)
 	while job ~= nil do
 		tasks[index] = nil
-		local jobType = typeof(job)
-		if jobType == "function" then
-			job()
-		elseif jobType == "table" and type(job.Destroy) == "function" then
+		if typeof(job) == "function" then
+			(job :: any)()
+		elseif typeof(job) == "table" and type((job :: any).Destroy) == "function" then
+			(job :: any):Destroy()
+		elseif typeof(job) == "Instance" then
 			job:Destroy()
-		elseif jobType == "Instance" then
-			job:Destroy()
-		elseif jobType == "thread" then
+		elseif typeof(job) == "thread" then
 			local cancelled
 			if coroutine.running() ~= job then
 				cancelled = pcall(function()
@@ -255,19 +283,20 @@ function Maid:DoCleaning()
 					task.cancel(toCancel)
 				end)
 			end
-		elseif jobType == "RBXScriptConnection" then
+		elseif typeof(job) == "RBXScriptConnection" then
 			job:Disconnect()
 		end
 		index, job = next(tasks)
 	end
 end
 
---[=[
+--[[
 	Alias for [Maid.DoCleaning()](/api/Maid#DoCleaning)
 
+	@ignore
 	@function Destroy
 	@within Maid
-]=]
+]]
 Maid.Destroy = Maid.DoCleaning
 
 return Maid

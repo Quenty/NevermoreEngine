@@ -1,23 +1,24 @@
+--!strict
 --[=[
 	@class RxStateStackUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local StateStack = require("StateStack")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local StateStack = require("StateStack")
 
 local RxStateStackUtils = {}
 
 --[=[
 	Converts the observable of Brios into a statestack.
 
-	@param defaultValue T | nil
+	@param defaultValue T?
 	@return (source: Observable<Brio<T>>) -> Observable<T?>
 ]=]
-function RxStateStackUtils.topOfStack(defaultValue)
+function RxStateStackUtils.topOfStack<T>(defaultValue: T?): Observable.Transformer<(Brio.Brio<T>), (T)>
 	return function(source)
 		return Observable.new(function(sub)
 			local maid = Maid.new()
@@ -42,8 +43,7 @@ function RxStateStackUtils.topOfStack(defaultValue)
 			update()
 
 			return maid
-		end)
-
+		end) :: any
 	end
 end
 
@@ -54,8 +54,8 @@ end
 	@param observable Observable<Brio<T>>
 	@return StateStack<T>
 ]=]
-function RxStateStackUtils.createStateStack(observable)
-	local stateStack = StateStack.new(nil)
+function RxStateStackUtils.createStateStack<T>(observable: Observable.Observable<Brio.Brio<T>>): StateStack.StateStack<T>
+	local stateStack: StateStack.StateStack<T> = StateStack.new(nil) :: any
 
 	stateStack._maid:GiveTask(observable:Subscribe(function(value)
 		assert(Brio.isBrio(value), "Observable must emit brio")

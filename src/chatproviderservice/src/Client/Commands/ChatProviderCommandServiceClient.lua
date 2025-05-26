@@ -7,20 +7,21 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local ChatTagCmdrUtils = require("ChatTagCmdrUtils")
-local Set = require("Set")
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
+local Set = require("Set")
 local String = require("String")
 
 local ChatProviderCommandServiceClient = {}
 ChatProviderCommandServiceClient.ServiceName = "ChatProviderCommandServiceClient"
 
-function ChatProviderCommandServiceClient:Init(serviceBag)
+function ChatProviderCommandServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	self._cmdrService = self._serviceBag:GetService(require("CmdrServiceClient"))
-	self._chatProviderServiceClient = self._serviceBag:GetService(require("ChatProviderServiceClient"))
+	self._chatProviderServiceClient = self._serviceBag:GetService((require :: any)("ChatProviderServiceClient"))
 	self._chatTagBinder = self._serviceBag:GetService(require("ChatTagClient"))
 end
 
@@ -38,7 +39,7 @@ function ChatProviderCommandServiceClient:_registerChatCommand(cmdr)
 			return
 		end
 
-		if String.startsWith(textChatMessage.Text, "/cmdr")  then
+		if String.startsWith(textChatMessage.Text, "/cmdr") then
 			cmdr:Show()
 		end
 	end))

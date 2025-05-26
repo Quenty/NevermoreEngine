@@ -7,8 +7,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Ragdoll = require("Ragdoll")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
+local Ragdoll = require("Ragdoll")
 
 local RagdollHumanoidOnDeath = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeath.ClassName = "RagdollHumanoidOnDeath"

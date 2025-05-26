@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	General character utility code.
 	@class CharacterUtils
@@ -12,7 +13,7 @@ local CharacterUtils = {}
 	@param player Player
 	@return Humanoid? -- Nil if not found
 ]=]
-function CharacterUtils.getPlayerHumanoid(player)
+function CharacterUtils.getPlayerHumanoid(player: Player): Humanoid?
 	local character = player.Character
 	if not character then
 		return nil
@@ -26,7 +27,7 @@ end
 	@param player Player
 	@return Humanoid? -- Nil if not found
 ]=]
-function CharacterUtils.getAlivePlayerHumanoid(player)
+function CharacterUtils.getAlivePlayerHumanoid(player: Player): Humanoid?
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
@@ -41,7 +42,7 @@ end
 	@param player Player
 	@return BasePart? -- Nil if not found
 ]=]
-function CharacterUtils.getAlivePlayerRootPart(player)
+function CharacterUtils.getAlivePlayerRootPart(player: Player): BasePart?
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
@@ -55,7 +56,7 @@ end
 	@param player Player
 	@return BasePart? -- Nil if not found
 ]=]
-function CharacterUtils.getPlayerRootPart(player)
+function CharacterUtils.getPlayerRootPart(player: Player): BasePart?
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid then
 		return nil
@@ -71,14 +72,14 @@ end
 	```lua
 	local Players = game:GetService("Players")
 
-	for _, player in pairs(Players:GetPlayers()) do
+	for _, player in Players:GetPlayers() do
 		CharacterUtils.unequipTools(player)
 	end
 	```
 
 	@param player Player
 ]=]
-function CharacterUtils.unequipTools(player)
+function CharacterUtils.unequipTools(player: Player)
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if humanoid then
 		humanoid:UnequipTools()
@@ -106,9 +107,10 @@ end
 	@param descendant Instance -- A child of the potential character.
 	@return Player? -- Nil if not found
 ]=]
-function CharacterUtils.getPlayerFromCharacter(descendant)
+function CharacterUtils.getPlayerFromCharacter(descendant: Instance): Player?
 	local character = descendant
-	local player = Players:GetPlayerFromCharacter(character)
+	-- TODO: Only use models
+	local player = Players:GetPlayerFromCharacter(character :: any)
 
 	while not player do
 		if character.Parent then

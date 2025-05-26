@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	A sustain model is much like a [TransitionModel] but is responsible for
 	sustaining some animation or state. Useful to represent the sustained state
@@ -17,14 +18,25 @@ local SustainModel = setmetatable({}, BaseObject)
 SustainModel.ClassName = "SustainModel"
 SustainModel.__index = SustainModel
 
-function SustainModel.new()
-	local self = setmetatable(BaseObject.new(), SustainModel)
+export type SustainCallback = (Maid.Maid, boolean?) -> Promise.Promise<()> | any
+
+export type SustainModel = typeof(setmetatable(
+	{} :: {
+		_isSustained: boolean,
+		_sustainCallback: SustainCallback?,
+		_maid: Maid.Maid,
+		SustainChanged: Signal.Signal<(boolean, boolean?)>,
+	},
+	{} :: typeof({ __index = SustainModel })
+)) & BaseObject.BaseObject
+
+function SustainModel.new(): SustainModel
+	local self: SustainModel = setmetatable(BaseObject.new() :: any, SustainModel)
 
 	self._isSustained = false
 	self._sustainCallback = nil
 
-	self.SustainChanged = Signal.new() -- :Fire(isSustained, doNotAnimate)
-	self._maid:GiveTask(self.SustainChanged)
+	self.SustainChanged = self._maid:Add(Signal.new() :: any) -- :Fire(isSustained, doNotAnimate)
 
 	self._maid:GiveTask(self.SustainChanged:Connect(function(isSustained, doNotAnimate)
 		if isSustained then
@@ -42,7 +54,7 @@ end
 
 	@param sustainCallback function? -- Callback which should return a promise
 ]=]
-function SustainModel:SetPromiseSustain(sustainCallback)
+function SustainModel.SetPromiseSustain(self: SustainModel, sustainCallback: SustainCallback?)
 	assert(type(sustainCallback) == "function" or sustainCallback == nil, "Bad sustainCallback")
 
 	self._sustainCallback = sustainCallback
@@ -54,7 +66,7 @@ end
 	@param isSustained boolean
 	@param doNotAnimate boolean? -- True if animation should be skipped
 ]=]
-function SustainModel:SetIsSustained(isSustained, doNotAnimate)
+function SustainModel.SetIsSustained(self: SustainModel, isSustained: boolean, doNotAnimate: boolean?)
 	assert(type(isSustained) == "boolean", "Bad isSustained")
 
 	if self._isSustained ~= isSustained then
@@ -68,7 +80,7 @@ end
 
 	@param doNotAnimate boolean? -- True if animation should be skipped
 ]=]
-function SustainModel:Sustain(doNotAnimate)
+function SustainModel.Sustain(self: SustainModel, doNotAnimate: boolean?)
 	self:SetIsSustained(true, doNotAnimate)
 end
 
@@ -77,7 +89,7 @@ end
 
 	@param doNotAnimate boolean? -- True if animation should be skipped
 ]=]
-function SustainModel:Stop(doNotAnimate)
+function SustainModel.Stop(self: SustainModel, doNotAnimate: boolean?)
 	self:SetIsSustained(false, doNotAnimate)
 end
 
@@ -89,13 +101,13 @@ end
 	@param doNotAnimate boolean? -- True if animation should be skipped
 	@return Promise
 ]=]
-function SustainModel:PromiseSustain(doNotAnimate)
+function SustainModel.PromiseSustain(self: SustainModel, doNotAnimate: boolean?): Promise.Promise<()>
 	self:Sustain(doNotAnimate)
 
 	return self:_promiseSustained()
 end
 
-function SustainModel:_promiseSustained()
+function SustainModel._promiseSustained(self: SustainModel): Promise.Promise<()>
 	if not self._isSustained then
 		return Promise.resolved()
 	end
@@ -118,11 +130,9 @@ function SustainModel:_promiseSustained()
 	return promise
 end
 
-function SustainModel:_executeSustain(doNotAnimate)
+function SustainModel._executeSustain(self: SustainModel, doNotAnimate: boolean?): ()
 	local maid = Maid.new()
-
-	local promise = Promise.new()
-	maid:GiveTask(promise)
+	local promise = maid:Add(Promise.new())
 
 	if self._sustainCallback then
 		local result = self._sustainCallback(maid, doNotAnimate)
@@ -130,7 +140,12 @@ function SustainModel:_executeSustain(doNotAnimate)
 			promise:Resolve(result)
 		else
 			promise:Reject()
-			error(string.format("[SustainModel] - Expected promise to be returned from sustainCallback, got %q", tostring(result)))
+			error(
+				string.format(
+					"[SustainModel] - Expected promise to be returned from sustainCallback, got %q",
+					tostring(result)
+				)
+			)
 		end
 	end
 
@@ -140,6 +155,5 @@ function SustainModel:_executeSustain(doNotAnimate)
 
 	self._maid._sustaining = maid
 end
-
 
 return SustainModel

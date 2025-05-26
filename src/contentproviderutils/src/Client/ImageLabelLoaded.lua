@@ -30,23 +30,23 @@ function ImageLabelLoaded.new()
 	return self
 end
 
-function ImageLabelLoaded:SetDefaultTimeout(defaultTimeout)
+function ImageLabelLoaded:SetDefaultTimeout(defaultTimeout: number?)
 	assert(type(defaultTimeout) == "number" or defaultTimeout == nil, "Bad defaultTimeout")
 
 	self._defaultTimeout = defaultTimeout
 end
 
-function ImageLabelLoaded:IsLoaded()
+function ImageLabelLoaded:IsLoaded(): boolean
 	return self._isLoaded.Value
 end
 
-function ImageLabelLoaded:SetPreloadImage(preloadImage)
+function ImageLabelLoaded:SetPreloadImage(preloadImage: boolean)
 	assert(type(preloadImage) == "boolean", "Bad preloadImage")
 
 	self._preloadImage.Value = preloadImage
 end
 
-function ImageLabelLoaded:PromiseLoaded(timeout)
+function ImageLabelLoaded:PromiseLoaded(timeout: number?)
 	assert(type(timeout) == "number" or timeout == nil, "Bad timeout")
 
 	local originalTimeout = timeout
@@ -90,7 +90,7 @@ function ImageLabelLoaded:PromiseLoaded(timeout)
 	return promise
 end
 
-function ImageLabelLoaded:SetImageLabel(imageLabel)
+function ImageLabelLoaded:SetImageLabel(imageLabel: ImageLabel?)
 	assert(typeof(imageLabel) == "Instance" and imageLabel:IsA("ImageLabel") or imageLabel == nil, "Bad imageLabel")
 	if self._imageLabel == imageLabel then
 		return
@@ -108,25 +108,27 @@ function ImageLabelLoaded:SetImageLabel(imageLabel)
 		end))
 
 		-- Setup preloading as necessary
-		maid:GiveTask(self._preloadImage:Observe():Pipe({
-			Rx.switchMap(function(preload)
-				if preload then
-					return Rx.combineLatest({
-						isLoaded = self._isLoaded:Observe();
-						image = RxInstanceUtils.observeProperty(self._imageLabel, "Image");
-					})
-				else
-					return Rx.EMPTY
-				end
-			end);
-		}):Subscribe(function(state)
-			if not state.isLoaded and state.image ~= "" then
-				maid:GivePromise(ContentProviderUtils.promisePreload({self._imageLabel}))
-					:Then(function()
+		maid:GiveTask(self._preloadImage
+			:Observe()
+			:Pipe({
+				Rx.switchMap(function(preload)
+					if preload then
+						return Rx.combineLatest({
+							isLoaded = self._isLoaded:Observe(),
+							image = RxInstanceUtils.observeProperty(self._imageLabel, "Image"),
+						})
+					else
+						return Rx.EMPTY
+					end
+				end),
+			})
+			:Subscribe(function(state)
+				if not state.isLoaded and state.image ~= "" then
+					maid:GivePromise(ContentProviderUtils.promisePreload({ self._imageLabel })):Then(function()
 						self._isLoaded.Value = true
 					end)
-			end
-		end))
+				end
+			end))
 	else
 		self._isLoaded.Value = false
 	end

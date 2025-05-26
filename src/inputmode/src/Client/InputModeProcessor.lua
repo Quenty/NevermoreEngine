@@ -4,22 +4,33 @@
 	@class InputModeProcessor
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local InputMode = require("InputMode")
+
 local InputModeProcessor = {}
 InputModeProcessor.__index = InputModeProcessor
 InputModeProcessor.ClassName = InputModeProcessor
+
+export type InputModeProcessor = typeof(setmetatable(
+	{} :: {
+		_inputModes: { InputMode.InputMode },
+	},
+	{} :: typeof({ __index = InputModeProcessor })
+))
 
 --[=[
 	Construtcs a new inputModeProcessor
 	@param inputModes { InputMode }?
 	@return InputModeProcessor
 ]=]
-function InputModeProcessor.new(inputModes)
+function InputModeProcessor.new(inputModes: { InputMode.InputMode }?): InputModeProcessor
 	local self = setmetatable({}, InputModeProcessor)
 
 	self._inputModes = {}
 
 	if inputModes then
-		for _, inputMode in pairs(inputModes) do
+		for _, inputMode in inputModes do
 			self:AddInputMode(inputMode)
 		end
 	end
@@ -27,7 +38,11 @@ function InputModeProcessor.new(inputModes)
 	return self
 end
 
-function InputModeProcessor:AddInputMode(inputMode)
+--[=[
+	Adds an input mode to the inputModeProcessor
+	@param inputMode InputMode
+]=]
+function InputModeProcessor.AddInputMode(self: InputModeProcessor, inputMode: InputMode.InputMode)
 	table.insert(self._inputModes, inputMode)
 end
 
@@ -35,7 +50,7 @@ end
 	Gets all input mode inputModes being used
 	@return { InputMode }
 ]=]
-function InputModeProcessor:GetStates()
+function InputModeProcessor.GetStates(self: InputModeProcessor): { InputMode.InputMode }
 	return self._inputModes
 end
 
@@ -43,8 +58,8 @@ end
 	Applies the inputObject as an evaluation for the inputm odes
 	@param inputObject InputObject
 ]=]
-function InputModeProcessor:Evaluate(inputObject)
-	for _, inputMode in pairs(self._inputModes) do
+function InputModeProcessor.Evaluate(self: InputModeProcessor, inputObject: InputObject)
+	for _, inputMode in self._inputModes do
 		inputMode:Evaluate(inputObject)
 	end
 end

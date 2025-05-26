@@ -4,20 +4,20 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local TieUtils = require("TieUtils")
-local Maid = require("Maid")
-local ValueBaseUtils = require("ValueBaseUtils")
-local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
 local AttributeUtils = require("AttributeUtils")
 local AttributeValue = require("AttributeValue")
+local BaseObject = require("BaseObject")
+local Maid = require("Maid")
+local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
+local TieUtils = require("TieUtils")
+local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
 
 local TiePropertyImplementation = setmetatable({}, BaseObject)
 TiePropertyImplementation.ClassName = "TiePropertyImplementation"
 TiePropertyImplementation.__index = TiePropertyImplementation
 
-function TiePropertyImplementation.new(memberDefinition, folder, initialValue, _actualSelf)
+function TiePropertyImplementation.new(memberDefinition, folder: Folder, initialValue, _actualSelf)
 	local self = setmetatable(BaseObject.new(), TiePropertyImplementation)
 
 	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
@@ -100,7 +100,14 @@ function TiePropertyImplementation:_updateImplementation(maid, implementation)
 
 	local className = ValueBaseUtils.getClassNameFromType(typeof(implementation))
 	if not className then
-		error(string.format("[TiePropertyImplementation] - Bad implementation value type %q, cannot set %s", typeof(implementation), self._memberDefinition:GetMemberName()))
+		local memberName = self._memberDefinition:GetMemberName()
+		error(
+			string.format(
+				"[TiePropertyImplementation] - Bad implementation value type %q, cannot set %s",
+				typeof(implementation),
+				memberName
+			)
+		)
 	end
 
 	local copy = self:_changeToClassIfNeeded(className, implementation)

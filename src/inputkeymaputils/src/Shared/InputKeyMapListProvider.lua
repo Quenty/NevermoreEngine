@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Centralizes input of keys. You can construct a new provider in a
 	package and key bindings can be recovered from it. This is designed
@@ -44,14 +45,29 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local Maid = require("Maid")
+local InputKeyMapList = require("InputKeyMapList")
 local InputKeyMapRegistryServiceShared = require("InputKeyMapRegistryServiceShared")
+local Maid = require("Maid")
 local ObservableList = require("ObservableList")
+local ServiceBag = require("ServiceBag")
 
 local InputKeyMapListProvider = {}
 InputKeyMapListProvider.ClassName = "InputKeyMapListProvider"
 InputKeyMapListProvider.ServiceName = "InputKeyMapListProvider"
 InputKeyMapListProvider.__index = InputKeyMapListProvider
+
+export type CreateDefaultsCallback = (self: InputKeyMapListProvider, serviceBag: ServiceBag.ServiceBag) -> ()
+export type InputKeyMapListProvider = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_providerName: string,
+		_createDefaults: CreateDefaultsCallback,
+		_inputKeyMapLists: { [string]: InputKeyMapList.InputKeyMapList },
+		_inputMapLists: any, -- ObservableList.ObservableList<InputKeyMapList.InputKeyMapList>,
+	},
+	{} :: typeof({ __index = InputKeyMapListProvider })
+))
 
 --[=[
 	Constructs a new InputKeyMapListProvider. The name will be used for retrieval,
@@ -62,8 +78,11 @@ InputKeyMapListProvider.__index = InputKeyMapListProvider
 	@param createDefaults callback -- Callback to construct the default items on init
 	@return InputKeyMapList
 ]=]
-function InputKeyMapListProvider.new(providerName, createDefaults)
-	local self = setmetatable({}, InputKeyMapListProvider)
+function InputKeyMapListProvider.new(
+	providerName: string,
+	createDefaults: CreateDefaultsCallback
+): InputKeyMapListProvider
+	local self = setmetatable({} :: any, InputKeyMapListProvider)
 
 	self._providerName = assert(providerName, "No providerName")
 	self.ServiceName = providerName
@@ -72,19 +91,18 @@ function InputKeyMapListProvider.new(providerName, createDefaults)
 	return self
 end
 
-function InputKeyMapListProvider:Init(serviceBag)
+function InputKeyMapListProvider.Init(self: InputKeyMapListProvider, serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
-
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	self:_ensureDefaultsInit()
 
 	-- Only register after initialization
-	self._maid:GiveTask(self._serviceBag:GetService(InputKeyMapRegistryServiceShared):RegisterProvider(self))
+	self._maid:GiveTask((self :: any)._serviceBag:GetService(InputKeyMapRegistryServiceShared):RegisterProvider(self))
 end
 
-function InputKeyMapListProvider:Start()
+function InputKeyMapListProvider.Start(_self: InputKeyMapListProvider)
 	-- empty function
 end
 
@@ -92,7 +110,7 @@ end
 	Gets this providers name
 	@return string
 ]=]
-function InputKeyMapListProvider:GetProviderName()
+function InputKeyMapListProvider.GetProviderName(self: InputKeyMapListProvider): string
 	return self._providerName
 end
 
@@ -103,7 +121,10 @@ end
 	@param keyMapListName string
 	@return InputKeyMapList
 ]=]
-function InputKeyMapListProvider:GetInputKeyMapList(keyMapListName)
+function InputKeyMapListProvider.GetInputKeyMapList(
+	self: InputKeyMapListProvider,
+	keyMapListName: string
+): InputKeyMapList.InputKeyMapList
 	local keyMapList = self:FindInputKeyMapList(keyMapListName)
 	if not keyMapList then
 		error(string.format("Bad keyMapListName %q", tostring(keyMapListName)))
@@ -117,7 +138,10 @@ end
 	@param keyMapListName string
 	@return InputKeyMapList
 ]=]
-function InputKeyMapListProvider:FindInputKeyMapList(keyMapListName)
+function InputKeyMapListProvider.FindInputKeyMapList(
+	self: InputKeyMapListProvider,
+	keyMapListName: string
+): InputKeyMapList.InputKeyMapList?
 	assert(type(keyMapListName) == "string", "Bad keyMapListName")
 
 	if RunService:IsRunning() and not self._inputKeyMapLists then
@@ -134,7 +158,7 @@ function InputKeyMapListProvider:FindInputKeyMapList(keyMapListName)
 	return self._inputKeyMapLists[keyMapListName]
 end
 
-function InputKeyMapListProvider:Add(inputKeyMapList)
+function InputKeyMapListProvider.Add(self: InputKeyMapListProvider, inputKeyMapList)
 	assert(inputKeyMapList, "Bad inputKeyMapList")
 	assert(self._maid, "Not initialized")
 
@@ -148,11 +172,11 @@ function InputKeyMapListProvider:Add(inputKeyMapList)
 	self._maid:GiveTask(self._inputMapLists:Add(inputKeyMapList))
 end
 
-function InputKeyMapListProvider:ObserveInputKeyMapListsBrio()
+function InputKeyMapListProvider.ObserveInputKeyMapListsBrio(self: InputKeyMapListProvider)
 	return self._inputMapLists:ObserveItemsBrio()
 end
 
-function InputKeyMapListProvider:_ensureDefaultsInit()
+function InputKeyMapListProvider._ensureDefaultsInit(self: InputKeyMapListProvider)
 	if not self._inputKeyMapLists then
 		self._inputMapLists = ObservableList.new()
 		self._maid:GiveTask(self._inputMapLists)
@@ -163,13 +187,12 @@ function InputKeyMapListProvider:_ensureDefaultsInit()
 	end
 end
 
-function InputKeyMapListProvider:Destroy()
+function InputKeyMapListProvider.Destroy(self: InputKeyMapListProvider)
 	if self._maid then
 		self._maid:DoCleaning()
-		self._maid = nil
 	end
 
-	self._inputKeyMapLists = nil
+	self._inputKeyMapLists = {}
 end
 
 return InputKeyMapListProvider

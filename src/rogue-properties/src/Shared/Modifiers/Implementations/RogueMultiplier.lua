@@ -4,12 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RogueModifierBase = require("RogueModifierBase")
 local Binder = require("Binder")
+local LinearValue = require("LinearValue")
+local RogueModifierBase = require("RogueModifierBase")
+local RogueModifierInterface = require("RogueModifierInterface")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
-local LinearValue = require("LinearValue")
-local RogueModifierInterface = require("RogueModifierInterface")
 
 local RogueMultiplier = setmetatable({}, RogueModifierBase)
 RogueMultiplier.ClassName = "RogueMultiplier"
@@ -39,8 +39,8 @@ end
 
 function RogueMultiplier:ObserveModifiedVersion(inputValue)
 	return Rx.combineLatest({
-		inputValue = inputValue;
-		multiplier = RxInstanceUtils.observeProperty(self._obj, "Value");
+		inputValue = inputValue,
+		multiplier = RxInstanceUtils.observeProperty(self._obj, "Value"),
 	}):Pipe({
 		Rx.map(function(state)
 			if state.inputValue and type(state.inputValue) == type(state.multiplier) then
@@ -51,8 +51,8 @@ function RogueMultiplier:ObserveModifiedVersion(inputValue)
 			else
 				return state.inputValue
 			end
-		end);
-		Rx.distinct();
+		end),
+		Rx.distinct(),
 	})
 end
 

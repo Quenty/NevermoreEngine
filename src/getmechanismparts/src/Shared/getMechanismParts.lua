@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Gets the full mechanism from parts. See [NoCollisionConstraintUtils].
 	@class getMechanismParts
@@ -6,9 +7,9 @@
 local Workspace = game:GetService("Workspace")
 
 local IGNORE_CONSTRAINT_SET = {
-	["LineForce"] = true;
-	["VectorForce"] = true;
-	["Torque"] = true;
+	["LineForce"] = true,
+	["VectorForce"] = true,
+	["Torque"] = true,
 }
 
 --[=[
@@ -25,15 +26,15 @@ local IGNORE_CONSTRAINT_SET = {
 	See: https://devforum.roblox.com/t/getting-all-parts-in-a-mechanism-one-part-in-each-assembly/101344/4
 
 	@function getMechanismParts
-	@param originParts { BasePart }
+	@param originParts Instance | { BasePart }
 	@return { BasePart }
 	@within getMechanismParts
 ]=]
-return function(originParts)
-	local startingTable
+return function(originParts: Instance | { BasePart }): { BasePart }
+	local startingTable: { Instance }
 	if type(originParts) == "table" then
 		assert(#originParts > 0, "Bad originParts")
-		startingTable = originParts
+		startingTable = originParts :: { any }
 	elseif typeof(originParts) == "Instance" then
 		startingTable = { originParts }
 	else
@@ -42,17 +43,17 @@ return function(originParts)
 
 	local result = {}
 	local checked = {
-		[Workspace.Terrain] = true;
+		[Workspace.Terrain] = true,
 	}
 
-	for _, item in pairs(startingTable) do
+	for _, item in startingTable do
 		if item:IsA("BasePart") then
 			if not checked[item] then
 				checked[item] = true
 				table.insert(result, item)
 			end
 		elseif item:IsA("Model") then
-			for _, child in pairs(item:GetDescendants()) do
+			for _, child in item:GetDescendants() do
 				if child:IsA("BasePart") then
 					if not checked[child] then
 						checked[child] = true
@@ -80,7 +81,7 @@ return function(originParts)
 	local index = 1
 	while result[index] do
 		local part = result[index]
-		for _, joint in pairs(part:GetJoints()) do
+		for _, joint in part:GetJoints() do
 			local part0
 			local part1
 			if joint:IsA("Constraint") then
@@ -89,8 +90,8 @@ return function(originParts)
 					part1 = joint.Attachment1.Parent
 				end
 			else
-				part0 = joint.Part0
-				part1 = joint.Part1
+				part0 = (joint :: any).Part0
+				part1 = (joint :: any).Part1
 			end
 
 			if part0 and not checked[part0] then
@@ -107,7 +108,7 @@ return function(originParts)
 		-- Validate assembly
 		if not connectionChecked[part] then
 			connectionChecked[part] = true
-			for _, connectedPart in pairs(part:GetConnectedParts(true)) do
+			for _, connectedPart in part:GetConnectedParts(true) do
 				if not checked[connectedPart] then
 					checked[connectedPart] = true
 					connectionChecked[connectedPart] = true

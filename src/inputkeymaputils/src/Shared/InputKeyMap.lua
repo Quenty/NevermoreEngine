@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	This represents a list of key bindings for a specific mode. While this is a useful object to query
 	for showing icons and input hints to the user, in general, it is recommended that binding occur
@@ -10,13 +11,25 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ValueObject = require("ValueObject")
 local InputModeType = require("InputModeType")
 local InputTypeUtils = require("InputTypeUtils")
+local Observable = require("Observable")
+local ValueObject = require("ValueObject")
 
 local InputKeyMap = setmetatable({}, BaseObject)
 InputKeyMap.ClassName = "InputKeyMap"
 InputKeyMap.__index = InputKeyMap
+
+type InputType = InputTypeUtils.InputType
+
+export type InputKeyMap = typeof(setmetatable(
+	{} :: {
+		_inputModeType: InputModeType.InputModeType,
+		_defaultInputTypes: { InputTypeUtils.InputType },
+		_inputTypeList: ValueObject.ValueObject<{ InputTypeUtils.InputType }>,
+	},
+	{} :: typeof({ __index = InputKeyMap })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new InputKeyMap. Generally this would be sent immediately to an
@@ -26,17 +39,17 @@ InputKeyMap.__index = InputKeyMap
 	@param inputTypes { InputType }
 	@return InputKeyMap
 ]=]
-function InputKeyMap.new(inputModeType, inputTypes)
+function InputKeyMap.new(inputModeType: InputModeType.InputModeType, inputTypes: { InputType }): InputKeyMap
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 	assert(type(inputTypes) == "table" or inputTypes == nil, "Bad inputTypes")
 
-	local self = setmetatable(BaseObject.new(), InputKeyMap)
+	local self = setmetatable(BaseObject.new() :: any, InputKeyMap)
 
 	self._inputModeType = assert(inputModeType, "No inputModeType")
 
 	self._defaultInputTypes = inputTypes or {}
 
-	self._inputType = self._maid:Add(ValueObject.new(self._defaultInputTypes))
+	self._inputTypeList = self._maid:Add(ValueObject.new(self._defaultInputTypes))
 
 	return self
 end
@@ -44,7 +57,7 @@ end
 --[=[
 	Gets the input mode for this keymap. This will not change.
 ]=]
-function InputKeyMap:GetInputModeType()
+function InputKeyMap.GetInputModeType(self: InputKeyMap): InputModeType.InputModeType
 	return self._inputModeType
 end
 
@@ -53,10 +66,10 @@ end
 
 	@param inputTypes { InputType }
 ]=]
-function InputKeyMap:SetInputTypesList(inputTypes)
+function InputKeyMap.SetInputTypesList(self: InputKeyMap, inputTypes: { InputType }): ()
 	assert(type(inputTypes) == "table", "Bad inputTypes")
 
-	self._inputType.Value = inputTypes
+	self._inputTypeList.Value = inputTypes
 end
 
 --[=[
@@ -68,12 +81,12 @@ end
 
 	@param inputTypes { InputType }
 ]=]
-function InputKeyMap:SetDefaultInputTypesList(inputTypes)
+function InputKeyMap.SetDefaultInputTypesList(self: InputKeyMap, inputTypes: { InputType }): ()
 	assert(type(inputTypes) == "table", "Bad inputTypes")
 	assert(type(self._defaultInputTypes) == "table", "bad self._defaultInputTypes")
 
-	if InputTypeUtils.areInputTypesListsEquivalent(self._inputType.Value, self._defaultInputTypes) then
-		self._inputType.Value = inputTypes
+	if InputTypeUtils.areInputTypesListsEquivalent(self._inputTypeList.Value, self._defaultInputTypes) then
+		self._inputTypeList.Value = inputTypes
 	end
 
 	self._defaultInputTypes = inputTypes
@@ -84,15 +97,15 @@ end
 
 	@return { InputType }
 ]=]
-function InputKeyMap:GetDefaultInputTypesList()
+function InputKeyMap.GetDefaultInputTypesList(self: InputKeyMap): { InputType }
 	return self._defaultInputTypes
 end
 
 --[=[
 	Resets the input type to the default input types.
 ]=]
-function InputKeyMap:RestoreDefault()
-	self._inputType.Value = self._defaultInputTypes
+function InputKeyMap.RestoreDefault(self: InputKeyMap): ()
+	self._inputTypeList.Value = self._defaultInputTypes
 end
 
 --[=[
@@ -100,8 +113,8 @@ end
 
 	@return Observable<{ InputType }>
 ]=]
-function InputKeyMap:ObserveInputTypesList()
-	return self._inputType:Observe()
+function InputKeyMap.ObserveInputTypesList(self: InputKeyMap): Observable.Observable<{ InputType }>
+	return self._inputTypeList:Observe()
 end
 
 --[=[
@@ -109,8 +122,8 @@ end
 
 	@return { InputType }
 ]=]
-function InputKeyMap:GetInputTypesList()
-	return self._inputType.Value
+function InputKeyMap.GetInputTypesList(self: InputKeyMap): { InputType }
+	return self._inputTypeList.Value
 end
 
 return InputKeyMap

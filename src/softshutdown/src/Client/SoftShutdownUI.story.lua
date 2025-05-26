@@ -2,12 +2,13 @@
 	@class SoftShutdownUI.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require =
+	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
 local SoftShutdownTranslator = require("SoftShutdownTranslator")
 local SoftShutdownUI = require("SoftShutdownUI")
-local ServiceBag = require("ServiceBag")
 
 return function(target)
 	local maid = Maid.new()

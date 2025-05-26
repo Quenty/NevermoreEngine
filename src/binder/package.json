@@ -1,6 +1,6 @@
 {
   "name": "@quenty/binder",
-  "version": "14.17.0",
+  "version": "14.21.0",
   "description": "Utility object to Bind a class to Roblox object, and associated helper methods",
   "keywords": [
     "Roblox",
@@ -27,6 +27,7 @@
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
+    "@quenty/canceltoken": "file:../canceltoken",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/linkutils": "file:../linkutils",
     "@quenty/loader": "file:../loader",

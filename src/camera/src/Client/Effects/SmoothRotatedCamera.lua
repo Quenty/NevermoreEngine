@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Allow freedom of movement around a current place, much like the classic script works now.
 	Not intended to be use with the current character script. This is the rotation component.
@@ -8,21 +9,48 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
-local getRotationInXZPlane = require("getRotationInXZPlane")
 local Spring = require("Spring")
 local SummedCamera = require("SummedCamera")
+local getRotationInXZPlane = require("getRotationInXZPlane")
 
 local SmoothRotatedCamera = {}
 SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
+
+export type SmoothRotatedCamera = typeof(setmetatable(
+	{} :: {
+		AngleX: number,
+		AngleXZ: number,
+		RenderAngleXZ: number,
+		AngleY: number,
+		CFrame: CFrame,
+		RenderAngleY: number,
+		CameraState: CameraState.CameraState,
+		MaxY: number,
+		MinY: number,
+		Rotation: CFrame,
+		Speed: number,
+		ZoomGiveY: number,
+		SpeedAngleX: number,
+		SpeedAngleY: number,
+		SpringX: Spring.Spring<number>,
+		SpringY: Spring.Spring<number>,
+		TargetAngleX: number,
+		TargetAngleXZ: number,
+		TargetAngleY: number,
+		TargetXZ: number,
+	},
+	{} :: typeof({ __index = SmoothRotatedCamera })
+)) & CameraEffectUtils.CameraEffect
 
 -- Max/Min aim up and down
 SmoothRotatedCamera._maxY = math.rad(80)
 SmoothRotatedCamera._minY = math.rad(-80)
 SmoothRotatedCamera._zoomGiveY = math.rad(5) -- Only on th
 
-function SmoothRotatedCamera.new()
-	local self = setmetatable({}, SmoothRotatedCamera)
+function SmoothRotatedCamera.new(): SmoothRotatedCamera
+	local self: SmoothRotatedCamera = setmetatable({} :: any, SmoothRotatedCamera)
 
 	self.SpringX = Spring.new(0)
 	self.SpringY = Spring.new(0)
@@ -31,37 +59,37 @@ function SmoothRotatedCamera.new()
 	return self
 end
 
-function SmoothRotatedCamera:__add(other)
+function SmoothRotatedCamera.__add(self: SmoothRotatedCamera, other)
 	return SummedCamera.new(self, other)
 end
 
 --[=[
 	@param xyRotateVector Vector2 -- The delta rotation to apply
 ]=]
-function SmoothRotatedCamera:RotateXY(xyRotateVector)
-	self.AngleX = self.AngleX + xyRotateVector.x
-	self.AngleY = self.AngleY + xyRotateVector.y
+function SmoothRotatedCamera.RotateXY(self: SmoothRotatedCamera, xyRotateVector: Vector2)
+	self.AngleX = self.AngleX + xyRotateVector.X
+	self.AngleY = self.AngleY + xyRotateVector.Y
 	self.TargetAngleX = self.AngleX
 	self.TargetAngleY = self.AngleY
 end
 
-function SmoothRotatedCamera:__newindex(index, value)
+function SmoothRotatedCamera.__newindex(self: SmoothRotatedCamera, index, value)
 	if index == "CFrame" then
 		local xzrot = getRotationInXZPlane(value)
-		self.AngleXZ = math.atan2(xzrot.lookVector.x, xzrot.lookVector.z) + math.pi
+		self.AngleXZ = math.atan2(xzrot.LookVector.X, xzrot.LookVector.Z) + math.pi
 
-		local yrot = xzrot:toObjectSpace(value).lookVector.y
+		local yrot = xzrot:ToObjectSpace(value).LookVector.Y
 		self.AngleY = math.asin(yrot)
 	elseif index == "TargetCFrame" then
 		local xzrot = getRotationInXZPlane(value)
-		self.TargetAngleXZ = math.atan2(xzrot.lookVector.x, xzrot.lookVector.z) + math.pi
+		self.TargetAngleXZ = math.atan2(xzrot.LookVector.X, xzrot.LookVector.Z) + math.pi
 
-		local yrot = xzrot:toObjectSpace(value).lookVector.y
+		local yrot = xzrot:ToObjectSpace(value).LookVector.Y
 		self.TargetAngleY = math.asin(yrot)
 	elseif index == "AngleY" then
-		self.SpringY.Value = value
+		self.SpringY.Position = value
 	elseif index == "AngleX" or index == "AngleXZ" then
-		self.SpringX.Value = value
+		self.SpringX.Position = value
 	elseif index == "TargetAngleY" then
 		self.SpringY.Target = value
 	elseif index == "TargetAngleX" or index == "TargetAngleXZ" then
@@ -84,15 +112,15 @@ function SmoothRotatedCamera:__newindex(index, value)
 	elseif SmoothRotatedCamera[index] ~= nil or index == "SpringX" or index == "SpringY" then
 		rawset(self, index, value)
 	else
-		error(index .. " is not a valid member or SmoothRotatedCamera")
+		error(tostring(index) .. " is not a valid member or SmoothRotatedCamera")
 	end
 end
 
-function SmoothRotatedCamera:SnapIntoBounds()
+function SmoothRotatedCamera.SnapIntoBounds(self: SmoothRotatedCamera)
 	self.TargetAngleY = math.clamp(self.TargetAngleY, self.MinY, self.MaxY)
 end
 
-function SmoothRotatedCamera:GetPastBounds(angle)
+function SmoothRotatedCamera.GetPastBounds(self: SmoothRotatedCamera, angle)
 	if angle < self.MinY then
 		return angle - self.MinY
 	elseif angle > self.MaxY then
@@ -102,13 +130,13 @@ function SmoothRotatedCamera:GetPastBounds(angle)
 	end
 end
 
-function SmoothRotatedCamera:__index(index)
+function SmoothRotatedCamera.__index(self: SmoothRotatedCamera, index)
 	if index == "CameraState" then
 		local state = CameraState.new()
 		state.CFrame = self.CFrame
 		return state
 	elseif index == "LookVector" then
-		return self.Rotation.lookVector
+		return self.Rotation.LookVector
 	elseif index == "CFrame" then
 		return CFrame.Angles(0, self.RenderAngleXZ, 0) * CFrame.Angles(self.RenderAngleY, 0, 0)
 	elseif index == "TargetCFrame" then
@@ -121,18 +149,18 @@ function SmoothRotatedCamera:__index(index)
 		local scale = (1 - 0.25 ^ math.abs(timesOverBounds))
 
 		if past < 0 then
-			return self.MinY - self.ZoomGiveY*scale
+			return self.MinY - self.ZoomGiveY * scale
 		elseif past > 0 then
-			return self.MaxY + self.ZoomGiveY*scale
+			return self.MaxY + self.ZoomGiveY * scale
 		else
 			return angle
 		end
 	elseif index == "RenderAngleX" or index == "RenderAngleXZ" then
 		return self.AngleX
 	elseif index == "AngleY" then
-		return self.SpringY.Value
+		return self.SpringY.Position
 	elseif index == "AngleX" or index == "AngleXZ" then
-		return self.SpringX.Value
+		return self.SpringX.Position
 	elseif index == "TargetAngleY" then
 		return self.SpringY.Target
 	elseif index == "TargetAngleX" or index == "TargetAngleXZ" then

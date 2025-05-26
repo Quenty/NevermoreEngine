@@ -1,3 +1,4 @@
+--!nocheck
 --[=[
 	Basic kinematics calculator that can be used like a spring. See [Spring] also.
 
@@ -6,6 +7,8 @@
 
 local Kinematics = {}
 Kinematics.ClassName = "Kinematics"
+
+export type Clock = () -> number
 
 --[=[
 	Constructs a new kinematics class.
@@ -24,15 +27,15 @@ Kinematics.ClassName = "Kinematics"
 	@param clock? () -> number -- The clock function is optional, and is used to update the kinematics class
 	@return Kinematics<T>
 ]=]
-function Kinematics.new(initial, clock)
+function Kinematics.new<T>(initial: T, clock: Clock?)
 	initial = initial or 0
 
 	local self = setmetatable({}, Kinematics)
 
 	rawset(self, "_clock", clock or os.clock)
 	rawset(self, "_position0", initial)
-	rawset(self, "_velocity0", 0*initial)
-	rawset(self, "_acceleration", 0*initial)
+	rawset(self, "_velocity0", 0 * initial)
+	rawset(self, "_acceleration", 0 * initial)
 	rawset(self, "_speed", 1)
 	rawset(self, "_time0", self._clock())
 
@@ -43,7 +46,7 @@ end
 	Impulses the current kinematics object, applying velocity to it.
 	@param velocity T
 ]=]
-function Kinematics:Impulse(velocity)
+function Kinematics:Impulse<T>(velocity: T)
 	self.Velocity = self.Velocity + velocity
 end
 
@@ -51,11 +54,11 @@ end
 	Skips forward in the set amount of time dictated by `delta`
 	@param delta number
 ]=]
-function Kinematics:TimeSkip(delta)
+function Kinematics:TimeSkip(delta: number)
 	assert(type(delta) == "number", "Bad delta")
 
 	local now = self._clock()
-	local position, velocity = self:_positionVelocity(now+delta)
+	local position, velocity = self:_positionVelocity(now + delta)
 	rawset(self, "_position0", position)
 	rawset(self, "_velocity0", velocity)
 	rawset(self, "_time0", now)
@@ -70,7 +73,7 @@ end
 	@param velocity0 T
 	@param acceleration T
 ]=]
-function Kinematics:SetData(startTime, position0, velocity0, acceleration)
+function Kinematics:SetData<T>(startTime: number, position0: T, velocity0: T, acceleration: T)
 	rawset(self, "_time0", startTime)
 	rawset(self, "_position0", position0)
 	rawset(self, "_velocity0", velocity0)
@@ -133,7 +136,7 @@ end
 	@within Kinematics
 ]=]
 
-function Kinematics:__index(index)
+function Kinematics:__index(index: string)
 	local now = self._clock()
 
 	if Kinematics[index] then
@@ -163,7 +166,7 @@ function Kinematics:__index(index)
 	end
 end
 
-function Kinematics:__newindex(index, value)
+function Kinematics:__newindex(index: string, value)
 	local now = self._clock()
 	if index == "Position" then
 		local _, velocity = self:_positionVelocity(now)
@@ -195,12 +198,15 @@ function Kinematics:__newindex(index, value)
 	rawset(self, "_time0", now)
 end
 
-function Kinematics:_positionVelocity(now)
-	local s = rawget(self, "_speed")
-	local dt = s*(now - rawget(self, "_time0"))
-	local a0 = rawget(self, "_acceleration")
-	local v0 = rawget(self, "_velocity0")
-	local p0 = rawget(self, "_position0")
+function Kinematics:_positionVelocity<T>(now: number): (T, T)
+	local s: number = rawget(self, "_speed")
+	local t0: number = rawget(self, "_time0")
+	local dt: number = s * (now - t0)
+	local a0: T = rawget(self, "_acceleration")
+	local v0: T = rawget(self, "_velocity0")
+	local p0: T = rawget(self, "_position0")
+
+	-- stylua: ignore
 	return p0 + v0*dt + 0.5*dt*dt*a0,
 	       v0 + a0*dt
 end

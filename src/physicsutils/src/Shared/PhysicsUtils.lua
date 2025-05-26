@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	General physics library for use on Roblox
 	@class PhysicsUtils
@@ -13,9 +14,9 @@ PhysicsUtils.WATER_DENSITY = 1 -- (mass/volume)
 	@param part BasePart
 	@return { BasePart }
 ]=]
-function PhysicsUtils.getConnectedParts(part)
-	local parts = part:GetConnectedParts(true)
-	parts[#parts+1] = part
+function PhysicsUtils.getConnectedParts(part: BasePart): { BasePart }
+	local parts: { BasePart } = part:GetConnectedParts(true) :: any
+	table.insert(parts, part)
 	return parts
 end
 
@@ -24,9 +25,9 @@ end
 	@param parts { BasePart }
 	@return number
 ]=]
-function PhysicsUtils.getMass(parts)
+function PhysicsUtils.getMass(parts: { BasePart }): number
 	local mass = 0
-	for _, part in pairs(parts) do
+	for _, part in parts do
 		mass = mass + part:GetMass()
 	end
 	return mass
@@ -39,19 +40,19 @@ end
 	@return number -- mass
 	@return number -- volume
 ]=]
-function PhysicsUtils.estimateBuoyancyContribution(parts)
+function PhysicsUtils.estimateBuoyancyContribution(parts: { BasePart }): (number, number, number)
 	local totalMass = 0
 	local totalVolumeApplicable = 0
 	local totalFloat = 0
 
-	for _, part in pairs(parts) do
+	for _, part in parts do
 		local mass = part:GetMass()
 		totalMass = totalMass + mass
 		totalFloat = totalFloat - mass * Workspace.Gravity
 
 		if part.CanCollide then
-			local volume = part.Size.X*part.Size.Y*part.Size.Z
-			totalFloat = totalFloat + volume*PhysicsUtils.WATER_DENSITY*Workspace.Gravity
+			local volume = part.Size.X * part.Size.Y * part.Size.Z
+			totalFloat = totalFloat + volume * PhysicsUtils.WATER_DENSITY * Workspace.Gravity
 			totalVolumeApplicable = totalVolumeApplicable + volume
 		end
 	end
@@ -65,16 +66,16 @@ end
 	@return Vector3 -- position
 	@return number -- mass
 ]=]
-function PhysicsUtils.getCenterOfMass(parts)
+function PhysicsUtils.getCenterOfMass(parts: { BasePart }): (Vector3, number)
 	local mass = 0
-	local weightedSum = Vector3.zero
+	local weightedSum: Vector3 = Vector3.zero
 
-	for _, part in pairs(parts) do
+	for _, part in parts do
 		mass = mass + part:GetMass()
-		weightedSum = weightedSum + part:GetMass() * part.Position
+		weightedSum += part:GetMass() * part.Position
 	end
 
-	return weightedSum/mass, mass
+	return weightedSum / mass, mass
 end
 
 --[=[
@@ -89,19 +90,19 @@ end
 	@param origin Vector3
 	@return number
 ]=]
-function PhysicsUtils.momentOfInertia(part, axis, origin)
+function PhysicsUtils.momentOfInertia(part: BasePart, axis: Vector3, origin: Vector3): number
 	local size = part.Size
 	local position = part.Position
 	local cframe = part.CFrame
 	local mass = part:GetMass()
 
-	local radius  = (position - origin):Cross(axis)
+	local radius = (position - origin):Cross(axis)
 	local r2 = radius:Dot(radius)
 	local ip = mass * r2 -- inertia based on position
-	local s2 = size*size
-	local sa = cframe:vectorToObjectSpace(axis)
-	local id = (Vector3.new(s2.y+s2.z, s2.z+s2.x, s2.x+s2.y)):Dot(sa*sa)*mass/12 -- Inertia based on direction
-	return ip+id
+	local s2 = size * size
+	local sa = cframe:VectorToObjectSpace(axis)
+	local id = (Vector3.new(s2.Y + s2.Z, s2.Z + s2.X, s2.X + s2.Y)):Dot(sa * sa) * mass / 12 -- Inertia based on direction
+	return ip + id
 end
 
 --[=[
@@ -111,10 +112,10 @@ end
 	@param origin The origin of the axis (should be center of mass of the parts)
 	@return number
 ]=]
-function PhysicsUtils.bodyMomentOfInertia(parts, axis, origin)
+function PhysicsUtils.bodyMomentOfInertia(parts: { BasePart }, axis: Vector3, origin: Vector3): number
 	local totalBodyInertia = 0
 
-	for _, part in pairs(parts) do
+	for _, part in parts do
 		totalBodyInertia = totalBodyInertia + PhysicsUtils.momentOfInertia(part, axis, origin)
 	end
 
@@ -138,7 +139,7 @@ end
 	@param force Vector3 -- the force vector to apply
 	@param forcePosition Vector3 -- The position that the force is to be applied from (World vector).
 ]=]
-function PhysicsUtils.applyForce(part, force, forcePosition)
+function PhysicsUtils.applyForce(part: BasePart, force: Vector3, forcePosition: Vector3)
 	local parts = PhysicsUtils.getConnectedParts(part)
 
 	forcePosition = forcePosition or part.Position
@@ -150,15 +151,15 @@ function PhysicsUtils.applyForce(part, force, forcePosition)
 	local momentOfInertia = PhysicsUtils.bodyMomentOfInertia(parts, torque, centerOfMass)
 	local rotAcceleration
 	if momentOfInertia ~= 0 then
-		rotAcceleration = torque/momentOfInertia
+		rotAcceleration = torque / momentOfInertia
 	else
 		rotAcceleration = Vector3.zero -- We cannot divide by 0
 	end
 
-	local acceleration = force/mass
+	local acceleration = force / mass
 
-	part.RotVelocity = part.RotVelocity + rotAcceleration
-	part.Velocity = part.Velocity + acceleration
+	part.AssemblyAngularVelocity = part.AssemblyAngularVelocity + rotAcceleration
+	part.AssemblyLinearVelocity = part.AssemblyLinearVelocity + acceleration
 end
 
 --[=[
@@ -169,7 +170,7 @@ end
 	@param emittingPart BasePart
 	@param acceleration Vector3
 ]=]
-function PhysicsUtils.acceleratePart(part, emittingPart, acceleration)
+function PhysicsUtils.acceleratePart(part: BasePart, emittingPart: BasePart, acceleration: Vector3)
 	local force = acceleration * part:GetMass()
 	local position = part.Position
 

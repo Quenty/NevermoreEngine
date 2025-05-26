@@ -39,7 +39,7 @@ function ModuleProvider:Init()
 	end
 
 	if self._initModule then
-		for moduleScript, _module in pairs(self._moduleScriptToModule) do
+		for moduleScript, _module in self._moduleScriptToModule do
 			self._initModule(_module, moduleScript)
 		end
 	end
@@ -61,7 +61,7 @@ function ModuleProvider:GetFromName(name)
 end
 
 function ModuleProvider:_processFolder(folder)
-	for _, moduleScript in pairs(folder:GetChildren()) do
+	for _, moduleScript in folder:GetChildren() do
 		if moduleScript:IsA("ModuleScript") then
 			self:_addToRegistery(moduleScript)
 		else
@@ -86,7 +86,13 @@ function ModuleProvider:_addToRegistery(moduleScript)
 	xpcall(function()
 		_module = require(moduleScript)
 	end, function(err)
-		error(string.format("[ModuleProvider._addToRegistery] - Failed to load %q due to %q", moduleScript:GetFullName(), tostring(err)))
+		error(
+			string.format(
+				"[ModuleProvider._addToRegistery] - Failed to load %q due to %q",
+				moduleScript:GetFullName(),
+				tostring(err)
+			)
+		)
 	end)
 
 	if self._checkModule then

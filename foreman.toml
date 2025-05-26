@@ -1,0 +1,4 @@
+[tools]
+rojo = { github = "quenty/rojo", version = "=7.4.3-quenty-npm-canary.2" }
+luau-lsp = { github = "quenty/luau-lsp", version = "=1.45.0-quenty" }
+stylua = { github = "johnnymorganz/stylua", version = "=2.1.0" }

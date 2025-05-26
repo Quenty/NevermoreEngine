@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class InsertServiceUtils
 ]=]
@@ -16,7 +17,7 @@ local InsertServiceUtils = {}
 	@param assetId number
 	@return Promise<Instance>
 ]=]
-function InsertServiceUtils.promiseAsset(assetId)
+function InsertServiceUtils.promiseAsset(assetId: number): Promise.Promise<Instance>
 	assert(type(assetId) == "number", "Bad assetId")
 
 	if assetId == 0 then
@@ -36,7 +37,7 @@ function InsertServiceUtils.promiseAsset(assetId)
 			return reject("Result was not an instance")
 		end
 
-		resolve(result)
+		return resolve(result)
 	end)
 end
 

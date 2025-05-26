@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Slave clock on the client
 	@class SlaveClock
@@ -5,13 +6,30 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local BaseClock = require("BaseClock")
 local BaseObject = require("BaseObject")
+local Observable = require("Observable")
 local ValueObject = require("ValueObject")
 
 local SlaveClock = setmetatable({}, BaseObject)
 SlaveClock.__index = SlaveClock
 SlaveClock.ClassName = "SlaveClock"
 SlaveClock._offset = -1 -- Set uncalculated values to -1
+
+export type SlaveClock = typeof(setmetatable(
+	{} :: {
+		_remoteEvent: RemoteEvent,
+		_remoteFunction: RemoteFunction,
+		_clockFunction: BaseClock.ClockFunction,
+		_ping: ValueObject.ValueObject<number>,
+		_offset: number,
+		_pneWayDelay: number,
+		_syncedBindable: BindableEvent,
+
+		SyncedEvent: RBXScriptSignal,
+	},
+	{} :: typeof({ __index = SlaveClock })
+)) & BaseObject.BaseObject & BaseClock.BaseClock
 
 --[=[
 	Constructs a new SlaveClock
@@ -20,8 +38,8 @@ SlaveClock._offset = -1 -- Set uncalculated values to -1
 	@param remoteFunction RemoteFunction
 	@return SlaveClock
 ]=]
-function SlaveClock.new(remoteEvent, remoteFunction)
-	local self = setmetatable(BaseObject.new(), SlaveClock)
+function SlaveClock.new(remoteEvent: RemoteEvent, remoteFunction: RemoteFunction): SlaveClock
+	local self: SlaveClock = setmetatable(BaseObject.new() :: any, SlaveClock)
 
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._remoteFunction = remoteFunction or error("No remoteFunction")
@@ -48,11 +66,11 @@ end
 
 	@return function
 ]=]
-function SlaveClock:GetClockFunction()
+function SlaveClock.GetClockFunction(self: SlaveClock): BaseClock.ClockFunction
 	return self._clockFunction
 end
 
-function SlaveClock:ObservePing()
+function SlaveClock.ObservePing(self: SlaveClock): Observable.Observable<number>
 	return self._ping:Observe()
 end
 
@@ -61,7 +79,7 @@ end
 	@param syncedTime number
 	@return number
 ]=]
-function SlaveClock:TickToSyncedTime(syncedTime)
+function SlaveClock.TickToSyncedTime(self: SlaveClock, syncedTime: number): number
 	return syncedTime - self._offset
 end
 
@@ -69,7 +87,7 @@ end
 	Returns the sycncronized time
 	@return number
 ]=]
-function SlaveClock:GetTime()
+function SlaveClock.GetTime(self: SlaveClock): number
 	if not self:IsSynced() then
 		error("[SlaveClock.GetTime] - Slave clock is not yet synced")
 	end
@@ -81,11 +99,11 @@ end
 	Returns true if the manager has synced with the server
 	@return boolean
 ]=]
-function SlaveClock:IsSynced()
+function SlaveClock.IsSynced(self: SlaveClock): boolean
 	return self._offset ~= -1
 end
 
-function SlaveClock:_getLocalTime()
+function SlaveClock._getLocalTime(_self: SlaveClock)
 	-- NOTE: Do not change this without changing :TickToSyncedTime
 	return tick()
 end
@@ -94,11 +112,11 @@ end
 	Returns estimated ping in seconds
 	@return number
 ]=]
-function SlaveClock:GetPing()
+function SlaveClock.GetPing(self: SlaveClock): number
 	return self._ping.Value
 end
 
-function SlaveClock:_handleSyncEventAsync(timeOne)
+function SlaveClock._handleSyncEventAsync(self: SlaveClock, timeOne: number)
 	local timeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately.
 	local masterSlaveDifference = timeTwo - timeOne -- We have Offst + MS Delay
 
@@ -126,8 +144,8 @@ function SlaveClock:_handleSyncEventAsync(timeOne)
 		one_way_delay = (MSDelay + SMDelay) / 2
 	]]
 
-	local offset = (masterSlaveDifference - slaveMasterDifference)/2
-	local oneWayDelay = (masterSlaveDifference + slaveMasterDifference)/2
+	local offset = (masterSlaveDifference - slaveMasterDifference) / 2
+	local oneWayDelay = (masterSlaveDifference + slaveMasterDifference) / 2
 
 	self._offset = offset -- Estimated difference between server/client
 	self._pneWayDelay = oneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
@@ -136,7 +154,7 @@ function SlaveClock:_handleSyncEventAsync(timeOne)
 	self._syncedBindable:Fire()
 end
 
-function SlaveClock:_sendDelayRequestAsync(timeThree)
+function SlaveClock._sendDelayRequestAsync(self: SlaveClock, timeThree)
 	return self._remoteFunction:InvokeServer(timeThree)
 end
 

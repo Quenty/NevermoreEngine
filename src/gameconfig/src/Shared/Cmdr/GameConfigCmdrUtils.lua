@@ -12,23 +12,24 @@ function GameConfigCmdrUtils.registerAssetTypes(cmdr, configPicker)
 	assert(cmdr, "Bad cmdr")
 	assert(configPicker, "Bad configPicker")
 
-	for _, assetType in pairs(GameConfigAssetTypes) do
+	for _, assetType in GameConfigAssetTypes do
 		GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType)
 	end
 end
 
-function GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType)
+function GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType: GameConfigAssetTypes.GameConfigAssetType)
 	assert(cmdr, "Bad cmdr")
 	assert(type(assetType) == "string", "Bad assetType")
 	assert(configPicker, "Bad configPicker")
 
+	--stylua: ignore
 	local assetIdDefinition = {
 		Transform = function(text)
 			local allAssets = configPicker:GetAllActiveAssetsOfType(assetType)
 			local assetKeys = {}
 
 			-- TODO: Translate too?
-			for _, assetConfig in pairs(allAssets) do
+			for _, assetConfig in allAssets do
 				table.insert(assetKeys, assetConfig:GetAssetKey())
 			end
 
@@ -47,7 +48,7 @@ function GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType)
 		end,
 		Autocomplete = function(keys)
 			local stringified = {}
-			for _, item in pairs(keys) do
+			for _, item in keys do
 				table.insert(stringified, tostring(item))
 			end
 			return stringified
@@ -62,6 +63,8 @@ function GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType)
 			if asset then
 				return asset:GetAssetId()
 			end
+
+			return nil
 		end;
 	}
 

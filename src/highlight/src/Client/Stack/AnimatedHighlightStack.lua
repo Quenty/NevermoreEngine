@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class AnimatedHighlightStack
 ]=]
@@ -7,19 +8,36 @@ local require = require(script.Parent.loader).load(script)
 local AnimatedHighlight = require("AnimatedHighlight")
 local AnimatedHighlightModel = require("AnimatedHighlightModel")
 local BaseObject = require("BaseObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
 local Signal = require("Signal")
-local ObservableSortedList = require("ObservableSortedList")
 local ValueObject = require("ValueObject")
-local DuckTypeUtils = require("DuckTypeUtils")
 
 local AnimatedHighlightStack = setmetatable({}, BaseObject)
 AnimatedHighlightStack.ClassName = "AnimatedHighlightStack"
 AnimatedHighlightStack.__index = AnimatedHighlightStack
 
-function AnimatedHighlightStack.new(adornee, defaultModelValues)
-	local self = setmetatable(BaseObject.new(), AnimatedHighlightStack)
+export type AnimatedHighlightStack = typeof(setmetatable(
+	{} :: {
+		_adornee: Instance,
+		_defaultModelValues: AnimatedHighlightModel.AnimatedHighlightModel,
+		_list: any,
+		_currentModel: AnimatedHighlightModel.AnimatedHighlightModel,
+		_highlight: AnimatedHighlight.AnimatedHighlight,
+		_hasEntries: ValueObject.ValueObject<boolean>,
+		maid: Maid.Maid,
+
+		Done: Signal.Signal<()>,
+		Destroying: Signal.Signal<()>,
+	},
+	{} :: typeof({ __index = AnimatedHighlightStack })
+)) & BaseObject.BaseObject
+
+function AnimatedHighlightStack.new(adornee: Instance, defaultModelValues): AnimatedHighlightStack
+	local self: AnimatedHighlightStack = setmetatable(BaseObject.new() :: any, AnimatedHighlightStack)
 
 	self._adornee = assert(adornee, "No adornee")
 
@@ -31,24 +49,27 @@ function AnimatedHighlightStack.new(adornee, defaultModelValues)
 
 	self.Done = self._maid:Add(Signal.new())
 
-	self._maid:GiveTask(self._list:ObserveCount():Pipe({
-		Rx.switchMap(function(count)
-			if count == 0 then
-				return Rx.of(nil)
+	self._maid:GiveTask(self._list
+		:ObserveCount()
+		:Pipe({
+			Rx.switchMap(function(count)
+				if count == 0 then
+					return Rx.of(nil) :: any
+				else
+					return self._list:ObserveAtIndex(count)
+				end
+			end) :: any,
+			Rx.distinct() :: any,
+		})
+		:Subscribe(function(currentModel)
+			if currentModel then
+				self._maid._current = self:_setupModel(currentModel)
+				self._hasEntries.Value = true
 			else
-				return self._list:ObserveAtIndex(count)
+				self._hasEntries.Value = false
+				self._maid._current = nil
 			end
-		end);
-		Rx.distinct()
-	}):Subscribe(function(currentModel)
-		if currentModel then
-			self._maid._current = self:_setupModel(currentModel)
-			self._hasEntries.Value = true
-		else
-			self._hasEntries.Value = false
-			self._maid._current = nil
-		end
-	end))
+		end))
 
 	self:_setupHighlight()
 
@@ -79,7 +100,7 @@ end
 	@param value any
 	@return boolean
 ]=]
-function AnimatedHighlightStack.isAnimatedHighlightStack(value)
+function AnimatedHighlightStack.isAnimatedHighlightStack(value: any): boolean
 	return DuckTypeUtils.isImplementation(AnimatedHighlightStack, value)
 end
 
@@ -88,7 +109,7 @@ end
 
 	@param source AnimatedHighlightStack
 ]=]
-function AnimatedHighlightStack:SetPropertiesFrom(source)
+function AnimatedHighlightStack:SetPropertiesFrom(source: AnimatedHighlightStack)
 	assert(AnimatedHighlightStack.isAnimatedHighlightStack(source), "Bad source")
 
 	self._highlight:SetPropertiesFrom(source._highlight)
@@ -97,7 +118,7 @@ end
 --[=[
 	@return Observable<boolean>
 ]=]
-function AnimatedHighlightStack:ObserveHasEntries()
+function AnimatedHighlightStack:ObserveHasEntries(): Observable.Observable<boolean>
 	return self._hasEntries:Observe()
 end
 
@@ -153,46 +174,58 @@ function AnimatedHighlightStack:_setupHighlight()
 	return maid
 end
 
-function AnimatedHighlightStack:_setupModel(model)
+function AnimatedHighlightStack:_setupModel(model: AnimatedHighlightModel.AnimatedHighlightModel)
 	local maid = Maid.new()
 
 	-- TODO: Default to default value instead
 	local function filterNil(observeDefaultValue, observable)
 		return observable:Pipe({
-			Rx.switchMap(function(value)
+			Rx.switchMap(function(value): any
 				if value ~= nil then
 					return Rx.of(value)
 				else
 					return observeDefaultValue
 				end
-			end);
+			end) :: any,
 			Rx.where(function(value)
 				return value ~= nil
-			end)
+			end) :: any,
 		})
 	end
 
-	maid:GiveTask(self._currentModel.HighlightDepthMode:Mount(filterNil(
-		self._defaultModelValues.HighlightDepthMode:Observe(),
-		model.HighlightDepthMode:Observe())))
-	maid:GiveTask(self._currentModel.FillColor:Mount(filterNil(
-		self._defaultModelValues.FillColor:Observe(),
-		model.FillColor:Observe())))
-	maid:GiveTask(self._currentModel.OutlineColor:Mount(filterNil(
-		self._defaultModelValues.OutlineColor:Observe(),
-		model.OutlineColor:Observe())))
-	maid:GiveTask(self._currentModel.FillTransparency:Mount(filterNil(
-		self._defaultModelValues.FillTransparency:Observe(),
-		model.FillTransparency:Observe())))
-	maid:GiveTask(self._currentModel.OutlineTransparency:Mount(filterNil(
-		self._defaultModelValues.OutlineTransparency:Observe(),
-		model.OutlineTransparency:Observe())))
-	maid:GiveTask(self._currentModel.Speed:Mount(filterNil(
-		self._defaultModelValues.Speed:Observe(),
-		model.Speed:Observe())))
-	maid:GiveTask(self._currentModel.TransparencySpeed:Mount(filterNil(
-		self._defaultModelValues.TransparencySpeed:Observe(),
-		model.TransparencySpeed:Observe())))
+	maid:GiveTask(
+		self._currentModel.HighlightDepthMode:Mount(
+			filterNil(self._defaultModelValues.HighlightDepthMode:Observe(), model.HighlightDepthMode:Observe())
+		)
+	)
+	maid:GiveTask(
+		self._currentModel.FillColor:Mount(
+			filterNil(self._defaultModelValues.FillColor:Observe(), model.FillColor:Observe())
+		)
+	)
+	maid:GiveTask(
+		self._currentModel.OutlineColor:Mount(
+			filterNil(self._defaultModelValues.OutlineColor:Observe(), model.OutlineColor:Observe())
+		)
+	)
+	maid:GiveTask(
+		self._currentModel.FillTransparency:Mount(
+			filterNil(self._defaultModelValues.FillTransparency:Observe(), model.FillTransparency:Observe())
+		)
+	)
+	maid:GiveTask(
+		self._currentModel.OutlineTransparency:Mount(
+			filterNil(self._defaultModelValues.OutlineTransparency:Observe(), model.OutlineTransparency:Observe())
+		)
+	)
+	maid:GiveTask(
+		self._currentModel.Speed:Mount(filterNil(self._defaultModelValues.Speed:Observe(), model.Speed:Observe()))
+	)
+	maid:GiveTask(
+		self._currentModel.TransparencySpeed:Mount(
+			filterNil(self._defaultModelValues.TransparencySpeed:Observe(), model.TransparencySpeed:Observe())
+		)
+	)
 
 	return maid
 end
@@ -203,7 +236,9 @@ end
 	@param observeScore Observable<number>
 	@return AnimatedHighlightModel
 ]=]
-function AnimatedHighlightStack:GetHandle(observeScore)
+function AnimatedHighlightStack:GetHandle(
+	observeScore: Observable.Observable<number>
+): AnimatedHighlightModel.AnimatedHighlightModel
 	assert(observeScore, "No observeScore")
 
 	local maid = Maid.new()

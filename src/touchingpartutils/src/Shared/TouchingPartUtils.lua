@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility to get touching parts on a Roblox part.
 	This acts as a performance-friendly way to query
@@ -12,10 +13,16 @@ local EMPTY_FUNCTION = function() end
 
 local TouchingPartUtils = {}
 
-function TouchingPartUtils.getAllTouchingParts(part)
+--[=[
+	Gets all the touching parts to a base part
+
+	@param part BasePart
+	@return { BasePart }
+]=]
+function TouchingPartUtils.getAllTouchingParts(part: BasePart): { BasePart }
 	-- Use the connection hack to gather all touching parts!
 	local conn = part.Touched:Connect(EMPTY_FUNCTION)
-	local parts = part:GetTouchingParts()
+	local parts: { BasePart } = part:GetTouchingParts() :: any
 
 	-- Disconnect connection before we continue
 	conn:Disconnect()
@@ -23,7 +30,13 @@ function TouchingPartUtils.getAllTouchingParts(part)
 	return parts
 end
 
-function TouchingPartUtils.getBoundingBoxParts(cframe, size)
+--[=[
+	Returns all parts that are touching the given part.
+	@param cframe CFrame
+	@param size Vector3
+	@return { BasePart }
+]=]
+function TouchingPartUtils.getBoundingBoxParts(cframe: CFrame, size: Vector3): { BasePart }
 	local dummyPart = Instance.new("Part")
 	dummyPart.Name = "CollisionDetectionDummYpart"
 	dummyPart.Size = size
@@ -33,7 +46,7 @@ function TouchingPartUtils.getBoundingBoxParts(cframe, size)
 	dummyPart.Parent = Workspace
 
 	local conn = dummyPart.Touched:Connect(EMPTY_FUNCTION)
-	local parts = dummyPart:GetTouchingParts()
+	local parts: { BasePart } = dummyPart:GetTouchingParts() :: any
 
 	conn:Disconnect()
 	dummyPart:Destroy()

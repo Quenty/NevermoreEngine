@@ -12,13 +12,27 @@ local require = require(script.Parent.loader).load(script)
 local HttpService = game:GetService("HttpService")
 
 local BaseObject = require("BaseObject")
+local BasicPane = require("BasicPane")
 local Maid = require("Maid")
-local cancellableDelay = require("cancellableDelay")
+local Promise = require("Promise")
 local ValueObject = require("ValueObject")
+local cancellableDelay = require("cancellableDelay")
 
 local GuiVisibleManager = setmetatable({}, BaseObject)
 GuiVisibleManager.ClassName = "GuiVisibleManager"
 GuiVisibleManager.__index = GuiVisibleManager
+
+export type ConstructPane = (maid: Maid.Maid) -> Promise.Promise<BasicPane.BasicPane>
+
+export type GuiVisibleManager = typeof(setmetatable(
+	{} :: {
+		_paneVisible: ValueObject.ValueObject<boolean>,
+		_promiseNewPane: ConstructPane,
+		_maxHideTime: number,
+		_nextDoNotAnimate: boolean?,
+	},
+	{} :: typeof({ __index = GuiVisibleManager })
+)) & BaseObject.BaseObject
 
 --[=[
 	Constructs a new GuiVisibleManager.
@@ -27,8 +41,8 @@ GuiVisibleManager.__index = GuiVisibleManager
 	@param maxHideTime number? -- Optional hide time
 	@return GuiVisibleManager
 ]=]
-function GuiVisibleManager.new(promiseNewPane, maxHideTime)
-	local self = setmetatable(BaseObject.new(), GuiVisibleManager)
+function GuiVisibleManager.new(promiseNewPane: ConstructPane, maxHideTime: number?): GuiVisibleManager
+	local self: GuiVisibleManager = setmetatable(BaseObject.new() :: any, GuiVisibleManager)
 
 	self._maxHideTime = maxHideTime or 1
 	self._promiseNewPane = promiseNewPane or error("No promiseNewPane")
@@ -53,7 +67,7 @@ end
 
 	@return boolean
 ]=]
-function GuiVisibleManager:IsVisible()
+function GuiVisibleManager.IsVisible(self: GuiVisibleManager): boolean
 	return self._paneVisible.Value
 end
 
@@ -63,7 +77,7 @@ end
 
 	@param boolValue BoolValue
 ]=]
-function GuiVisibleManager:BindToBoolValue(boolValue)
+function GuiVisibleManager.BindToBoolValue(self: GuiVisibleManager, boolValue: BoolValue)
 	assert(boolValue, "Must have boolValue")
 	assert(not self._boundBoolValue, "Already bound")
 
@@ -86,10 +100,10 @@ end
 	Creates a handle that will force the gui to be rendered. Clean up the task
 	to stop the showing.
 
-	@param doNotAnimate boolean | nil
+	@param doNotAnimate boolean?
 	@return MaidTask
 ]=]
-function GuiVisibleManager:CreateShowHandle(doNotAnimate)
+function GuiVisibleManager.CreateShowHandle(self: GuiVisibleManager, doNotAnimate: boolean?): Maid.MaidTask
 	assert(self._showHandles, "Not initialized yet")
 
 	local key = HttpService:GenerateGUID(false)
@@ -107,11 +121,11 @@ function GuiVisibleManager:CreateShowHandle(doNotAnimate)
 				self._showHandles[key] = nil
 				self:_updatePaneVisible()
 			end
-		end
-	};
+		end,
+	}
 end
 
-function GuiVisibleManager:_updatePaneVisible(doNotAnimate)
+function GuiVisibleManager._updatePaneVisible(self: GuiVisibleManager, doNotAnimate: boolean?): ()
 	local nextValue = next(self._showHandles) ~= nil
 	if nextValue ~= self._paneVisible.Value then
 		self._nextDoNotAnimate = doNotAnimate
@@ -119,7 +133,7 @@ function GuiVisibleManager:_updatePaneVisible(doNotAnimate)
 	end
 end
 
-function GuiVisibleManager:_onPaneVisibleChanged()
+function GuiVisibleManager._onPaneVisibleChanged(self: GuiVisibleManager): ()
 	if self._maid._paneMaid then
 		return
 	end
@@ -132,20 +146,19 @@ function GuiVisibleManager:_onPaneVisibleChanged()
 	local maid = Maid.new()
 	self._maid._paneMaid = maid
 
-	self._promiseNewPane(maid)
-		:Then(function(pane)
-			if self._maid._paneMaid == maid then
-				self:_handleNewPane(maid, pane)
-			else
-				warn("[GuiVisibleManager] - Pane is not needed, promise took too long")
-				pane:Destroy()
-			end
-		end)
+	self._promiseNewPane(maid):Then(function(pane)
+		if self._maid._paneMaid == maid then
+			self:_handleNewPane(maid, pane)
+		else
+			warn("[GuiVisibleManager] - Pane is not needed, promise took too long")
+			pane:Destroy()
+		end
+	end)
 end
 
-function GuiVisibleManager:_handleNewPane(maid, pane)
+function GuiVisibleManager._handleNewPane(self: GuiVisibleManager, maid: Maid.Maid, pane: BasicPane.BasicPane): ()
 	assert(pane.SetVisible, "No SetVisible on self, already destroyed")
-	assert(self._maid._paneMaid == maid, "Bad maid")
+	assert(self._maid._paneMaid :: any == maid, "Bad maid")
 
 	maid:GiveTask(pane)
 
@@ -161,7 +174,7 @@ function GuiVisibleManager:_handleNewPane(maid, pane)
 
 			-- cleanup after a given amount of time
 			maid._hideTask = cancellableDelay(self._maxHideTime, function()
-				if self._maid._paneMaid == maid then
+				if self._maid._paneMaid :: any == maid then
 					self._maid._paneMaid = nil
 				end
 			end)

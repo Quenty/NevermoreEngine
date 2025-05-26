@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local BinderProvider = {}
 BinderProvider.ClassName = "BinderProvider"
@@ -40,7 +40,7 @@ BinderProvider.__index = BinderProvider
 	@param initMethod (self, serviceBag: ServiceBag)
 	@return BinderProvider
 ]=]
-function BinderProvider.new(serviceName, initMethod)
+function BinderProvider.new(serviceName: string, initMethod)
 	local self = setmetatable({}, BinderProvider)
 
 	if type(serviceName) == "string" then
@@ -48,7 +48,9 @@ function BinderProvider.new(serviceName, initMethod)
 	else
 		-- Backwords compatibility (for now)
 		if type(serviceName) == "function" and initMethod == nil then
-			warn("[BinderProvider] - Missing serviceName for binder provider. Please pass in a service name as the first argument.")
+			warn(
+				"[BinderProvider] - Missing serviceName for binder provider. Please pass in a service name as the first argument."
+			)
 			initMethod = serviceName
 		else
 			error("Bad serviceName")
@@ -68,7 +70,7 @@ end
 	@param value any
 	@return boolean -- True if it is a binder provider
 ]=]
-function BinderProvider.isBinderProvider(value)
+function BinderProvider.isBinderProvider(value: any): boolean
 	return type(value) == "table" and value.ClassName == "BinderProvider"
 end
 
@@ -88,15 +90,14 @@ function BinderProvider:PromiseBinder(binderName)
 		end
 	end
 
-	return self._bindersAddedPromise
-		:Then(function()
-			local binder = self:Get(binderName)
-			if binder then
-				return binder
-			else
-				return Promise.rejected()
-			end
-		end)
+	return self._bindersAddedPromise:Then(function()
+		local binder = self:Get(binderName)
+		if binder then
+			return binder
+		else
+			return Promise.rejected()
+		end
+	end)
 end
 
 --[=[
@@ -118,7 +119,7 @@ function BinderProvider:Init(...)
 
 	self._initMethod(self, ...)
 
-	for _, binder in pairs(self._binders) do
+	for _, binder in self._binders do
 		binder:Init(...)
 	end
 
@@ -151,7 +152,7 @@ function BinderProvider:Start()
 	assert(not self._started, "Already started")
 
 	self._started = true
-	for _, binder in pairs(self._binders) do
+	for _, binder in self._binders do
 		binder:Start()
 	end
 
@@ -176,8 +177,8 @@ end
 	@param tagName string
 	@return Binder<T>?
 ]=]
-function BinderProvider:Get(tagName)
-	assert(type(tagName) == "string", "tagName must be a string")
+function BinderProvider:Get(tagName: string)
+	assert(type(tagName) == "string", "Bad tagName")
 	return rawget(self, tagName)
 end
 
@@ -199,7 +200,7 @@ end
 function BinderProvider:Destroy()
 	self._destroyed = true
 
-	for _, item in pairs(self._binders) do
+	for _, item in self._binders do
 		rawset(self, item:GetTag(), nil)
 	end
 

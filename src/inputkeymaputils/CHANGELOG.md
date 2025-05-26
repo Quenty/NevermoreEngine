@@ -3,6 +3,111 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.24.0...@quenty/inputkeymaputils@14.25.0) (2025-05-12)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [14.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.23.3...@quenty/inputkeymaputils@14.24.0) (2025-05-10)
+
+
+### Bug Fixes
+
+* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
+* Fix recursive require ([6288f3c](https://github.com/Quenty/NevermoreEngine/commit/6288f3cc60e3aa8efe83aa685c6490bc6c01ff84))
+* slottedtouchbutton recursion ([#557](https://github.com/Quenty/NevermoreEngine/issues/557)) ([c3e5c89](https://github.com/Quenty/NevermoreEngine/commit/c3e5c8977f9207f1b56489010ce12b204a28f4ae))
+
+
+### Features
+
+* Add even more types ([b31717d](https://github.com/Quenty/NevermoreEngine/commit/b31717d8c9f7620c457f5018a2affa760a65334a))
+
+
+
+
+
+## [14.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.23.2...@quenty/inputkeymaputils@14.23.3) (2025-04-10)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [14.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.23.0...@quenty/inputkeymaputils@14.23.2) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
+
+
+
+
+
+## [14.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.23.0...@quenty/inputkeymaputils@14.23.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+
+
+
+
+
+# [14.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.22.4...@quenty/inputkeymaputils@14.23.0) (2025-04-02)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [14.22.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.22.3...@quenty/inputkeymaputils@14.22.4) (2025-03-31)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [14.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.22.2...@quenty/inputkeymaputils@14.22.3) (2025-03-21)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [14.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.22.1...@quenty/inputkeymaputils@14.22.2) (2025-03-13)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [14.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.22.0...@quenty/inputkeymaputils@14.22.1) (2025-03-09)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [14.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.21.1...@quenty/inputkeymaputils@14.22.0) (2025-02-18)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
 ## [14.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.21.0...@quenty/inputkeymaputils@14.21.1) (2025-01-22)
 
 **Note:** Version bump only for package @quenty/inputkeymaputils

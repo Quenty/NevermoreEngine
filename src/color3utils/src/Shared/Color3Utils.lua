@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods for Roblox Color3 values
 	@class Color3Utils
@@ -15,14 +16,14 @@ local Color3Utils = {}
 	 @return number -- A scalar from 0 to 1 with 0 as the darkest dark, and 1 as the whitest white
 
 ]=]
-function Color3Utils.getRelativeLuminance(color)
-	local components = { color.r, color.g, color.b }
+function Color3Utils.getRelativeLuminance(color: Color3): number
+	local components = { color.R, color.G, color.B }
 	local vals = {}
-	for i, val in pairs(components) do
+	for i, val in components do
 		if val <= 0.03928 then
-			vals[i] = val/12.92
+			vals[i] = val / 12.92
 		else
-			vals[i] = ((val+0.055)/1.055) ^ 2.4
+			vals[i] = ((val + 0.055) / 1.055) ^ 2.4
 		end
 	end
 
@@ -38,7 +39,7 @@ end
 	@param color Color3 -- The Color3 to check
 	@return boolean -- True if the text should be black, false if it should be good
 ]=]
-function Color3Utils.textShouldBeBlack(color)
+function Color3Utils.textShouldBeBlack(color: Color3): boolean
 	return Color3Utils.getRelativeLuminance(color) > 0.179
 end
 
@@ -48,9 +49,9 @@ end
 	@param percent number -- Percent scaling
 	@return Color3
 ]=]
-function Color3Utils.scaleValue(color3, percent)
-	local h, s, v = Color3.toHSV(color3)
-	return Color3.fromHSV(h, s, percent*v)
+function Color3Utils.scaleValue(color3: Color3, percent: number): Color3
+	local h, s, v = color3:ToHSV()
+	return Color3.fromHSV(h, s, percent * v)
 end
 
 --[=[
@@ -59,8 +60,8 @@ end
 	@param value number
 	@return Color3
 ]=]
-function Color3Utils.setValue(color3, value)
-	local h, s, _ = Color3.toHSV(color3)
+function Color3Utils.setValue(color3: Color3, value: number): Color3
+	local h, s, _ = color3:ToHSV()
 	return Color3.fromHSV(h, s, value)
 end
 
@@ -70,8 +71,8 @@ end
 	@param hue number
 	@return Color3
 ]=]
-function Color3Utils.setHue(color3, hue)
-	local _, s, v = Color3.toHSV(color3)
+function Color3Utils.setHue(color3: Color3, hue: number): Color3
+	local _, s, v = color3:ToHSV()
 	return Color3.fromHSV(hue, s, v)
 end
 
@@ -81,9 +82,9 @@ end
 	@param percent number -- Percent scaling
 	@return Color3
 ]=]
-function Color3Utils.scaleSaturation(color3, percent)
-	local h, s, v = Color3.toHSV(color3)
-	return Color3.fromHSV(h, percent*s, v)
+function Color3Utils.scaleSaturation(color3: Color3, percent: number): Color3
+	local h, s, v = color3:ToHSV()
+	return Color3.fromHSV(h, percent * s, v)
 end
 
 --[=[
@@ -92,8 +93,8 @@ end
 	@param saturation number
 	@return Color3
 ]=]
-function Color3Utils.setSaturation(color3, saturation)
-	local h, _, v = Color3.toHSV(color3)
+function Color3Utils.setSaturation(color3: Color3, saturation: number): Color3
+	local h, _, v = color3:ToHSV()
 	return Color3.fromHSV(h, saturation, v)
 end
 
@@ -105,14 +106,12 @@ end
 	@param epsilon number? -- Optional
 	@return boolean
 ]=]
-function Color3Utils.areEqual(a, b, epsilon)
-	if not epsilon then
-		epsilon = 1e-6
-	end
+function Color3Utils.areEqual(a: Color3, b: Color3, epsilon: number?): boolean
+	local equalEpsilon = if epsilon then epsilon else 1e-6
 
-	return math.abs(a.r - b.r) <= epsilon
-		and math.abs(a.g - b.g) <= epsilon
-		and math.abs(a.b - b.b) <= epsilon
+	return math.abs(a.R - b.R) <= equalEpsilon
+		and math.abs(a.G - b.G) <= equalEpsilon
+		and math.abs(a.B - b.B) <= equalEpsilon
 end
 
 --[=[
@@ -122,10 +121,10 @@ end
 	@param color3 Color3
 	@return number
 ]=]
-function Color3Utils.toHexInteger(color3)
+function Color3Utils.toHexInteger(color3: Color3): number
 	assert(typeof(color3) == "Color3", "Bad color3")
 
-	return bit32.bor(bit32.lshift(color3.r*0xFF, 16), bit32.lshift(color3.g*0xFF, 8), color3.b*0xFF)
+	return bit32.bor(bit32.lshift(color3.R * 0xFF, 16), bit32.lshift(color3.G * 0xFF, 8), color3.B * 0xFF)
 end
 
 --[=[
@@ -139,7 +138,7 @@ end
 	@param color3 Color3
 	@return number
 ]=]
-function Color3Utils.toHexString(color3)
+function Color3Utils.toHexString(color3: Color3): string
 	assert(typeof(color3) == "Color3", "Bad color3")
 
 	return string.format("%06X", Color3Utils.toHexInteger(color3))
@@ -155,7 +154,7 @@ end
 	@param color3 Color3
 	@return number
 ]=]
-function Color3Utils.toWebHexString(color3)
+function Color3Utils.toWebHexString(color3: Color3): string
 	assert(typeof(color3) == "Color3", "Bad color3")
 
 	return string.format("#%06X", Color3Utils.toHexInteger(color3))

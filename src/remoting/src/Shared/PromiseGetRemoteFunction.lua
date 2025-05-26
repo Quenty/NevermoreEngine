@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Retrieves a remote function as a promise
 	@class PromiseGetRemoteFunction
