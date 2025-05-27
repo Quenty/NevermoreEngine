@@ -1,3 +1,16 @@
+# v4.8.1 (Tue May 27 2025)
+
+#### 🐛 Bug Fix
+
+- chore: Bump aftman versions [#563](https://github.com/Quenty/NevermoreEngine/pull/563) ([@unrooot](https://github.com/unrooot))
+- chore: Bump Rojo versions in aftman ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# (Tue May 27 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.8.1`
+  - chore: Bump aftman versions [#563](https://github.com/Quenty/NevermoreEngine/pull/563) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Mon May 12 2025)
 
 #### 🚀 Enhancement
