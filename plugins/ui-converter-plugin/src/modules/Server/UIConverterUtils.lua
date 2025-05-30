@@ -236,15 +236,9 @@ function UIConverterUtils.toLuaPropertyString(value: any, debugHint: string): st
 		if value.Weight == Enum.FontWeight.Regular and value.Style == Enum.FontStyle.Normal then
 			return string.format("Font.new(%q)", value.Family)
 		else
-			return string.format(
-				"Font.new(%q, Enum.FontWeight.%s, Enum.FontStyle.%s)",
-				value.Family,
-				tostring(value.Weight),
-				tostring(value.Style)
-			)
+			return string.format("Font.new(%q, %s, %s)", value.Family, tostring(value.Weight), tostring(value.Style))
 		end
 	elseif valueType == "Content" then
-		-- TODO: Do we need to handle Enum.ContentSourceType.Object?
 		if value.SourceType == Enum.ContentSourceType.Uri then
 			return `Content.fromUri("{value.Uri or ""}")`
 		else
