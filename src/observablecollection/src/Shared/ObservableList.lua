@@ -74,7 +74,7 @@ function ObservableList.new<T>(): ObservableList<T>
 
 	--[=[
 		Fires when the count changes.
-		@prop CountChanged Signal.Signal<number>,
+		@prop CountChanged Signal<number>
 		@within ObservableList
 	]=]
 	self.CountChanged = self._countValue.Changed :: any
@@ -133,9 +133,9 @@ end
 
 --[=[
 	Observes all items in the list
-	@return Observable<Brio<T>>
+	@return Observable<Brio<T, Symbol>>
 ]=]
-function ObservableList.ObserveItemsBrio<T>(self: ObservableList<T>): Observable.Observable<Brio.Brio<T>>
+function ObservableList.ObserveItemsBrio<T>(self: ObservableList<T>): Observable.Observable<Brio.Brio<T, Symbol>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
