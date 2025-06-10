@@ -135,7 +135,7 @@ end
 	Observes all items in the list
 	@return Observable<Brio<T, Symbol>>
 ]=]
-function ObservableList.ObserveItemsBrio<T>(self: ObservableList<T>): Observable.Observable<Brio.Brio<T, Symbol>>
+function ObservableList.ObserveItemsBrio<T>(self: ObservableList<T>): Observable.Observable<Brio.Brio<T, Symbol.Symbol>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
