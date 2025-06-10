@@ -32,27 +32,8 @@ export type ObservableList<T> = typeof(setmetatable(
 		_keyIndexObservables: any, -- ObservableSubscriptionTable.ObservableSubscriptionTable<number?>,
 		_countValue: ValueObject.ValueObject<number>,
 
-		--[=[
-			Fires when an item is added
-			@readonly
-			@prop ItemAdded Signal<T, number, Symbol>
-			@within ObservableList
-		]=]
 		ItemAdded: Signal.Signal<T, number, Symbol.Symbol>,
-
-		--[=[
-			Fires when an item is removed.
-			@readonly
-			@prop ItemRemoved Signal<T, Symbol>
-			@within ObservableList
-		]=]
 		ItemRemoved: Signal.Signal<T, Symbol.Symbol>,
-
-		--[=[
-			Fires when the count changes.
-			@prop CountChanged Signal.Signal<number>,
-			@within ObservableList
-		]=]
 		CountChanged: Signal.Signal<number>,
 	},
 	{} :: typeof({ __index = ObservableList })
@@ -75,8 +56,27 @@ function ObservableList.new<T>(): ObservableList<T>
 	self._keyIndexObservables = self._maid:Add(ObservableSubscriptionTable.new())
 	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
+	--[=[
+		Fires when an item is added
+		@readonly
+		@prop ItemAdded Signal<T, number, Symbol>
+		@within ObservableList
+	]=]
 	self.ItemAdded = self._maid:Add(Signal.new() :: any)
+
+	--[=[
+		Fires when an item is removed.
+		@readonly
+		@prop ItemRemoved Signal<T, Symbol>
+		@within ObservableList
+	]=]
 	self.ItemRemoved = self._maid:Add(Signal.new() :: any)
+
+	--[=[
+		Fires when the count changes.
+		@prop CountChanged Signal.Signal<number>,
+		@within ObservableList
+	]=]
 	self.CountChanged = self._countValue.Changed :: any
 
 	return self
