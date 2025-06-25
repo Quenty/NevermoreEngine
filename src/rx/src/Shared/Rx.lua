@@ -2171,7 +2171,7 @@ function Rx.mergeScan<T, U...>(accumulator: (T?, U...) -> Observable.Observable<
 
 	return function(source)
 		return Observable.new(function(sub)
-			local current = seed
+			local current: T? = seed
 
 			return Rx.flatMap(function(...)
 				return accumulator(current, ...)
