@@ -2137,13 +2137,23 @@ end
 	@param seed any | nil
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.switchScan(accumulator, seed)
+function Rx.switchScan<T, U...>(accumulator: (T?, U...) -> T, seed: T?): Observable.Transformer<(U...), (T)>
 	assert(type(accumulator) == "function", "Bad accumulator")
 
-	return Rx.pipe({
-		Rx.scan(accumulator, seed) :: any,
-		Rx.switchAll(),
-	})
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local current: T? = seed
+
+			return Rx.switchMap(function(...)
+				return accumulator(current, ...)
+			end)(source):Subscribe(function(innerValue)
+				current = innerValue
+				sub:Fire(innerValue)
+			end, sub:GetFailComplete())
+		end) :: any
+	end
 end
 
 --[=[
@@ -2156,13 +2166,21 @@ end
 	@param seed any | nil
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.mergeScan(accumulator, seed)
+function Rx.mergeScan<T, U...>(accumulator: (T?, U...) -> T, seed: T?): Observable.Transformer<(U...), (T)>
 	assert(type(accumulator) == "function", "Bad accumulator")
 
-	return Rx.pipe({
-		Rx.scan(accumulator, seed) :: any,
-		Rx.mergeAll(),
-	})
+	return function(source)
+		return Observable.new(function(sub)
+			local current = seed
+
+			return Rx.flatMap(function(...)
+				return accumulator(current, ...)
+			end)(source):Subscribe(function(innerValue)
+				current = innerValue
+				sub:Fire(innerValue)
+			end, sub:GetFailComplete())
+		end) :: any
+	end
 end
 
 return Rx
