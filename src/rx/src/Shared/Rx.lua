@@ -2137,7 +2137,7 @@ end
 	@param seed any | nil
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.switchScan<T, U...>(accumulator: (T?, U...) -> T, seed: T?): Observable.Transformer<(U...), (T)>
+function Rx.switchScan<T, U...>(accumulator: (T?, U...) -> Observable.Observable<T>, seed: T?): Observable.Transformer<(U...), (T)>
 	assert(type(accumulator) == "function", "Bad accumulator")
 
 	return function(source)
@@ -2166,7 +2166,7 @@ end
 	@param seed any | nil
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.mergeScan<T, U...>(accumulator: (T?, U...) -> T, seed: T?): Observable.Transformer<(U...), (T)>
+function Rx.mergeScan<T, U...>(accumulator: (T?, U...) -> Observable.Observable<T>, seed: T?): Observable.Transformer<(U...), (T)>
 	assert(type(accumulator) == "function", "Bad accumulator")
 
 	return function(source)
