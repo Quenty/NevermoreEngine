@@ -127,6 +127,7 @@ function UIConverter:PromisePropertiesForClass(className: string)
 						or property:IsWriteLocalUserSecurity()
 						or property:IsReadLocalUserSecurity()
 						or property:IsWriteRobloxScriptSecurity()
+						or property:IsWriteRobloxSecurity()
 						or property:IsReadRobloxScriptSecurity()
 					)
 				then
