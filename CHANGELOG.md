@@ -1,3 +1,17 @@
+# (Tue Jul 08 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Remove extra text from string [#564](https://github.com/Quenty/NevermoreEngine/pull/564) ([@unrooot](https://github.com/unrooot))
+- `@quenty/roblox-api-dump@8.12.1`
+  - fix: Fix UniqueId error in Blend converter plugin [#567](https://github.com/Quenty/NevermoreEngine/pull/567) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Tue May 27 2025)
 
 #### 🐛 Bug Fix

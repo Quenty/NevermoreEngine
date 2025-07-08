@@ -1,3 +1,17 @@
+# v8.12.1 (Tue Jul 08 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Fix UniqueId error in Blend converter plugin [#567](https://github.com/Quenty/NevermoreEngine/pull/567) ([@unrooot](https://github.com/unrooot))
+- chore: Fix lint ([@unrooot](https://github.com/unrooot))
+- fix: Check for write RobloxSecurity (UniqueId property) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
