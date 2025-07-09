@@ -29,6 +29,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
+    "@quenty/canceltoken": "file:../canceltoken",
     "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/datastore": "file:../datastore",
     "@quenty/ducktype": "file:../ducktype",
