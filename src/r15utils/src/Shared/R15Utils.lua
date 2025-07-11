@@ -108,7 +108,7 @@ end
 	Retrieves hand attachment
 	@param character Model
 	@param side "Left" | "Right"
-	@return Attachment?
+	@return BasePart?
 ]=]
 function R15Utils.getHand(character: Model, side: R15Side): BasePart?
 	local result = character:FindFirstChild(R15Utils.getHandName(side))
