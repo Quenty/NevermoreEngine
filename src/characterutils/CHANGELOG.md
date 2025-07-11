@@ -1,20 +1,18 @@
-# v12.20.0 (Fri Jul 11 2025)
-
-#### 🚀 Enhancement
-
-- Users/klga/fixes [#568](https://github.com/Quenty/NevermoreEngine/pull/568) ([@klga](https://github.com/klga))
-- feat(RootPartUtils): getRootPart function ([@klga](https://github.com/klga))
-
-#### Authors: 1
-
-- [@klga](https://github.com/klga)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.19.0...@quenty/characterutils@12.20.0) (2025-07-11)
+
+
+### Features
+
+* **RootPartUtils:** getRootPart function ([e07270c](https://github.com/Quenty/NevermoreEngine/commit/e07270c0b1e1b3ab67620fb6e2af72e03580dc2a))
+
+
+
+
 
 # [12.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.18.3...@quenty/characterutils@12.19.0) (2025-05-10)
 

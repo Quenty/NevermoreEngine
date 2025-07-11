@@ -1,23 +1,15 @@
-# v2.9.0 (Fri Jul 11 2025)
-
-#### 🚀 Enhancement
-
-- Users/klga/fixes [#568](https://github.com/Quenty/NevermoreEngine/pull/568) ([@klga](https://github.com/klga))
-
-#### 🐛 Bug Fix
-
-- chore(TrajectoryDrawUtils): add .draw maid ([@klga](https://github.com/klga))
-
-#### Authors: 1
-
-- [@klga](https://github.com/klga)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.8.0...@quenty/trajectory@2.9.0) (2025-07-11)
+
+**Note:** Version bump only for package @quenty/trajectory
+
+
+
+
 
 # [2.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.7.4...@quenty/trajectory@2.8.0) (2025-05-10)
 

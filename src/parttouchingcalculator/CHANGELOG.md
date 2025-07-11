@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/parttouchingcalculator@14.22.0...@quenty/parttouchingcalculator@14.23.0) (2025-07-11)
+
+**Note:** Version bump only for package @quenty/parttouchingcalculator
+
+
+
+
+
 # [14.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/parttouchingcalculator@14.21.0...@quenty/parttouchingcalculator@14.22.0) (2025-05-12)
 
 **Note:** Version bump only for package @quenty/parttouchingcalculator

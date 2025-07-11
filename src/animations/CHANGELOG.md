@@ -1,24 +1,18 @@
-# v8.19.0 (Fri Jul 11 2025)
-
-#### 🚀 Enhancement
-
-- Users/klga/fixes [#568](https://github.com/Quenty/NevermoreEngine/pull/568) ([@klga](https://github.com/klga))
-- feat(AnimationSlotPlayer): promise animation Stopped ([@klga](https://github.com/klga))
-
-#### 🐛 Bug Fix
-
-- chore(AnimationSlotPlayer): remove unused module ([@klga](https://github.com/klga))
-
-#### Authors: 1
-
-- [@klga](https://github.com/klga)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.18.0...@quenty/animations@8.19.0) (2025-07-11)
+
+
+### Features
+
+* **AnimationSlotPlayer:** promise animation Stopped ([674b3af](https://github.com/Quenty/NevermoreEngine/commit/674b3afe54848bddd18faebace0f075e1b541a12))
+
+
+
+
 
 # [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.17.3...@quenty/animations@8.18.0) (2025-05-10)
 
