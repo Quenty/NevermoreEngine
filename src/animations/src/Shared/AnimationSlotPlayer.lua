@@ -15,7 +15,6 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local PromiseMaidUtils = require("PromiseMaidUtils")
 local RbxAssetUtils = require("RbxAssetUtils")
-local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local AnimationSlotPlayer = setmetatable({}, BaseObject)
