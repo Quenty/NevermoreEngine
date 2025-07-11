@@ -1,3 +1,16 @@
+# (Fri Jul 11 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.19.0`, `@quenty/characterutils@12.20.0`, `@quenty/r15utils@13.19.0`, `@quenty/trajectory@2.9.0`, `@quenty/nevermore-template-helpers@1.3.0`
+  - Users/klga/fixes [#568](https://github.com/Quenty/NevermoreEngine/pull/568) ([@klga](https://github.com/klga))
+
+#### Authors: 1
+
+- [@klga](https://github.com/klga)
+
+---
+
 # (Tue Jul 08 2025)
 
 #### 🐛 Bug Fix

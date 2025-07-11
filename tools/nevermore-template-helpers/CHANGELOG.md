@@ -1,3 +1,23 @@
+# v1.3.0 (Fri Jul 11 2025)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@klga](https://github.com/klga), for all your work!
+
+#### 🚀 Enhancement
+
+- Users/klga/fixes [#568](https://github.com/Quenty/NevermoreEngine/pull/568) ([@klga](https://github.com/klga))
+
+#### 🐛 Bug Fix
+
+- chore: update versions ([@klga](https://github.com/klga))
+
+#### Authors: 1
+
+- [@klga](https://github.com/klga)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
