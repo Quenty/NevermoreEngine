@@ -70,4 +70,23 @@ function RootPartUtils.promiseRootPart(humanoid: Humanoid): Promise.Promise<Base
 	return promise
 end
 
+--[=[
+	Gets the root part of a character, if it exists
+	@param character Model
+	@return BasePart? -- Nil if not found
+]=]
+function RootPartUtils.getRootPart(character: Model): BasePart?
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then
+		return nil
+	end
+
+	local rootPart = humanoid.RootPart
+	if not rootPart then
+		return nil
+	end
+
+	return rootPart
+end
+
 return RootPartUtils
