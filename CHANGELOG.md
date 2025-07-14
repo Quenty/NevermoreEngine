@@ -1,3 +1,16 @@
+# (Mon Jul 14 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneedata@7.19.1`
+  - fix: Support optional interface as string [#569](https://github.com/Quenty/NevermoreEngine/pull/569) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Jul 11 2025)
 
 #### 🚀 Enhancement

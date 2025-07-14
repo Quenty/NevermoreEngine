@@ -1,3 +1,15 @@
+# v7.19.1 (Mon Jul 14 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Support optional interface as string [#569](https://github.com/Quenty/NevermoreEngine/pull/569) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
