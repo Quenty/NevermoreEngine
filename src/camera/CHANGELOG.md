@@ -1,19 +1,18 @@
-# v14.22.1 (Mon Jul 14 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix telemetry + other packages [#570](https://github.com/Quenty/NevermoreEngine/pull/570) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.22.0...@quenty/camera@14.22.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* Fix telemetry + other packages ([#570](https://github.com/Quenty/NevermoreEngine/issues/570)) ([2e2c6ee](https://github.com/Quenty/NevermoreEngine/commit/2e2c6ee7be5a9eb137e76b3788c8fd7ad39c4e41))
+
+
+
+
 
 # [14.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.21.0...@quenty/camera@14.22.0) (2025-05-12)
 
