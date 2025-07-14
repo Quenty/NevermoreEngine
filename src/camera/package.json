@@ -35,6 +35,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
     "@quenty/qframe": "file:../qframe",
+    "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/spring": "file:../spring",
     "@quenty/valueobject": "file:../valueobject",
