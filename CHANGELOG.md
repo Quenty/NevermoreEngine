@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/camera@14.22.1`, `@quenty/influxdbclient@7.21.1`, `@quenty/memoize@1.7.1`, `@quenty/r15utils@13.19.1`
+  - fix: Fix telemetry + other packages [#570](https://github.com/Quenty/NevermoreEngine/pull/570) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 14 2025)
+
+#### 🐛 Bug Fix
+
 - `@quenty/adorneedata@7.19.1`
   - fix: Support optional interface as string [#569](https://github.com/Quenty/NevermoreEngine/pull/569) ([@Quenty](https://github.com/Quenty))
 
