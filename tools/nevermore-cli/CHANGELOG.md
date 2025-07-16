@@ -1,3 +1,16 @@
+# v4.9.1 (Wed Jul 16 2025)
+
+#### 🐛 Bug Fix
+
+- chore(package-lock): update nevermore-template-helpers version [#571](https://github.com/Quenty/NevermoreEngine/pull/571) ([@klga](https://github.com/klga))
+- chore(package-lock): update nevermore-template-helpers version ([@klga](https://github.com/klga))
+
+#### Authors: 1
+
+- [@klga](https://github.com/klga)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
