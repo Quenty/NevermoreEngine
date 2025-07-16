@@ -1,20 +1,15 @@
-# v4.9.1 (Wed Jul 16 2025)
-
-#### 🐛 Bug Fix
-
-- chore(package-lock): update nevermore-template-helpers version [#571](https://github.com/Quenty/NevermoreEngine/pull/571) ([@klga](https://github.com/klga))
-- chore(package-lock): update nevermore-template-helpers version ([@klga](https://github.com/klga))
-
-#### Authors: 1
-
-- [@klga](https://github.com/klga)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.9.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.0...@quenty/nevermore-cli@4.9.1) (2025-07-16)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
 
 # [4.9.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.8.1...@quenty/nevermore-cli@4.9.0) (2025-07-11)
 
