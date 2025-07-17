@@ -1,3 +1,16 @@
+# (Thu Jul 17 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/settings@11.25.1`
+  - fix: Fix cancel token [#572](https://github.com/Quenty/NevermoreEngine/pull/572) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jul 16 2025)
 
 #### 🐛 Bug Fix

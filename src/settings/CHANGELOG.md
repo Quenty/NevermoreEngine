@@ -1,3 +1,15 @@
+# v11.25.1 (Thu Jul 17 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Fix cancel token [#572](https://github.com/Quenty/NevermoreEngine/pull/572) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
