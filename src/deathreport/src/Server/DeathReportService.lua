@@ -199,8 +199,6 @@ end
 function DeathReportService.ReportDeathReport(self: DeathReportService, deathReport: DeathReportUtils.DeathReport)
 	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathReport")
 
-	print("new death report", deathReport)
-
 	-- Notify services
 	self.NewDeathReport:Fire(deathReport)
 
