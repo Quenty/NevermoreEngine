@@ -4,7 +4,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local _ServiceBag = require("ServiceBag")
+local ServiceBag = require("ServiceBag")
 
 local {{gameNameProper}}ServiceClient = {}
 {{gameNameProper}}ServiceClient.ServiceName = "{{gameNameProper}}ServiceClient"
