@@ -4,10 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local _ServiceBag = require("ServiceBag")
+
 local {{gameNameProper}}ServiceClient = {}
 {{gameNameProper}}ServiceClient.ServiceName = "{{gameNameProper}}ServiceClient"
 
-function {{gameNameProper}}ServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
+function {{gameNameProper}}ServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
