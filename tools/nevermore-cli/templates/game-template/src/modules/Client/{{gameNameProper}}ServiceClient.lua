@@ -9,7 +9,7 @@ local ServiceBag = require("ServiceBag")
 local {{gameNameProper}}ServiceClient = {}
 {{gameNameProper}}ServiceClient.ServiceName = "{{gameNameProper}}ServiceClient"
 
-function {{gameNameProper}}ServiceClient:Init(serviceBag: _ServiceBag.ServiceBag)
+function {{gameNameProper}}ServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
