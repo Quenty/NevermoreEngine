@@ -39,7 +39,6 @@ end
 
 --[=[
 	Use spherical bounding box to calculate how far back to move a camera
-	See: https://community.khronos.org/t/zoom-to-fit-screen/59857/12
 
 	@param size Vector3 -- Size of the bounding box
 	@param fovDeg number -- Field of view in degrees (vertical)
@@ -54,6 +53,13 @@ end
 --[=[
 	Fits a sphere to the camera, computing how far back to zoom the camera from
 	the center of the sphere.
+	Camera (C), object center (B) and object edge (A) form a right angle triangle 
+	where AB is the radius and BC is the distance from the center to the camera
+	A
+	|  \
+	|    \
+	B-----C
+	Distance is given by equation tan(halfFov)=AB/BC => BC = AB/tan(halfFov)
 
 	@param radius number -- Radius of the sphere
 	@param fovDeg number -- Field of view in degrees (vertical)
@@ -66,7 +72,7 @@ function CameraUtils.fitSphereToCamera(radius: number, fovDeg: number, aspectRat
 		halfFov = math.atan(aspectRatio * math.tan(halfFov))
 	end
 
-	return radius / math.sin(halfFov)
+	return radius / math.tan(halfFov)
 end
 
 --[=[
