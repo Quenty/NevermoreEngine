@@ -403,7 +403,7 @@ end
 	end);
 
 	Blend.mount(frame, {
-		BackgroundTransparency = visibleSpring;
+		BackgroundTransparency = transparency;
 	})
 	```
 
