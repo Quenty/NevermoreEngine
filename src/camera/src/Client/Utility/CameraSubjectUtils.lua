@@ -2,8 +2,6 @@
 	@class CameraSubjectUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local CameraSubjectUtils = {}
 
 local HEAD_OFFSET = Vector3.new(0, 1.5, 0)
