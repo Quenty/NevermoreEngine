@@ -33,7 +33,7 @@ jobs:
       - name: Install package dependencies
         run: |
           echo "Installing package dependencies..."
-          npx lerna exec -- npm install --no-audit
+          npx lerna exec -- npm install --no-audit --no-fund
           PACKAGES=$(npx lerna ls --since origin/main --json | jq -r '.[] | select(.name != "@quenty/nevermore-cli") | .location' | tr '\n' ' ')
           echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
 
