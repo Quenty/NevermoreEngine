@@ -1,11 +1,11 @@
-name: lint
-on: [pull_request_target, workflow_call]
+name: linting
+on: [pull_request, workflow_call]
 jobs:
   luau-lsp:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2

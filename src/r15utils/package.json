@@ -1,6 +1,6 @@
 {
   "name": "@quenty/r15utils",
-  "version": "13.18.0",
+  "version": "13.19.1",
   "description": "Utility methods for R15 Characters",
   "keywords": [
     "Roblox",
@@ -27,7 +27,8 @@
   "dependencies": {
     "@quenty/brio": "file:../brio",
     "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx"
   },
   "publishConfig": {
     "access": "public"

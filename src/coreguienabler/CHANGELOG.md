@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.19.0...@quenty/coreguienabler@12.20.0) (2025-07-11)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
 # [12.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@12.18.3...@quenty/coreguienabler@12.19.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/coreguienabler
