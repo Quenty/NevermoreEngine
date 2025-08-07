@@ -1,23 +1,18 @@
-# v10.20.0 (Thu Aug 07 2025)
-
-#### 🚀 Enhancement
-
-- fix: Misc small fixes [#576](https://github.com/Quenty/NevermoreEngine/pull/576) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneevalue@10.19.0...@quenty/adorneevalue@10.20.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([b8a62b8](https://github.com/Quenty/NevermoreEngine/commit/b8a62b885ac9f43a8f942349918ff477f79f99a9))
+
+
+
+
 
 # [10.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneevalue@10.18.3...@quenty/adorneevalue@10.19.0) (2025-05-10)
 

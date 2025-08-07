@@ -1,23 +1,18 @@
-# v15.28.0 (Thu Aug 07 2025)
-
-#### 🚀 Enhancement
-
-- fix: Misc small fixes [#576](https://github.com/Quenty/NevermoreEngine/pull/576) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix errors on cleanup ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.27.2...@quenty/ik@15.28.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix errors on cleanup ([8fc6af1](https://github.com/Quenty/NevermoreEngine/commit/8fc6af1fedec7c9c8647f98d9317fac34bb4d895))
+
+
+
+
 
 ## [15.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.27.1...@quenty/ik@15.27.2) (2025-07-14)
 

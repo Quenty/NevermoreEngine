@@ -1,23 +1,18 @@
-# v12.27.0 (Thu Aug 07 2025)
-
-#### 🚀 Enhancement
-
-- fix: Misc small fixes [#576](https://github.com/Quenty/NevermoreEngine/pull/576) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix requires ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.26.1...@quenty/gameconfig@12.27.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix requires ([2763f4e](https://github.com/Quenty/NevermoreEngine/commit/2763f4e95d419d3e8701213feb6c851d6843a92d))
+
+
+
+
 
 ## [12.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.26.0...@quenty/gameconfig@12.26.1) (2025-07-14)
 

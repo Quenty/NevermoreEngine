@@ -1,25 +1,19 @@
-# v10.25.0 (Thu Aug 07 2025)
-
-#### 🚀 Enhancement
-
-- fix: Misc small fixes [#576](https://github.com/Quenty/NevermoreEngine/pull/576) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix cyclical dependencies ([@Quenty](https://github.com/Quenty))
-- fix: Fix death report stuff ([@Quenty](https://github.com/Quenty))
-- refactor: Binder changes ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.24.0...@quenty/deathreport@10.25.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix cyclical dependencies ([b9fbb05](https://github.com/Quenty/NevermoreEngine/commit/b9fbb051253e878b47f292f0462f1e8579115d1c))
+* Fix death report stuff ([4366b56](https://github.com/Quenty/NevermoreEngine/commit/4366b567867a14184b24d8cd7e8164f279eefb54))
+
+
+
+
 
 # [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.23.0...@quenty/deathreport@10.24.0) (2025-07-11)
 
