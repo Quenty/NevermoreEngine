@@ -1,16 +1,16 @@
 name: build
 on: [push]
 jobs:
-  build-lint:
-    uses: ./.github/workflows/lint.yml
+  build-linting:
+    uses: ./.github/workflows/linting.yml
 
   release:
-    needs: [build-lint]
+    needs: [build-linting]
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false # https://stackoverflow.com/questions/74744498/github-pushing-to-protected-branches-with-fine-grained-token
