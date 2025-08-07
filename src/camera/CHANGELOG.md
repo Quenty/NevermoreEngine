@@ -1,3 +1,23 @@
+# v14.23.0 (Thu Aug 07 2025)
+
+#### 🚀 Enhancement
+
+- fix: Misc small fixes [#576](https://github.com/Quenty/NevermoreEngine/pull/576) ([@Quenty](https://github.com/Quenty))
+- feat: Add CameraSubjectUtils ([@Quenty](https://github.com/Quenty))
+- feat: Add epsilon ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Remove require ([@Quenty](https://github.com/Quenty))
+- fix: Fix formatting ([@Quenty](https://github.com/Quenty))
+- fix: Setting RobloxCFrame also assigns the override CFrame ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
