@@ -30,6 +30,7 @@ export type FadeBetweenCamera3 = typeof(setmetatable(
 		Speed: number,
 		Velocity: number,
 		Target: number,
+		Epsilon: number?,
 	},
 	{} :: typeof({ __index = FadeBetweenCamera3 })
 )) & CameraEffectUtils.CameraEffect
@@ -73,7 +74,7 @@ function FadeBetweenCamera3:__newindex(index, value)
 		self._spring.Target = value
 	elseif index == "Velocity" then
 		self._spring.Velocity = value
-	elseif index == "CameraA" or index == "CameraB" then
+	elseif index == "CameraA" or index == "CameraB" or index == "Epsilon" then
 		rawset(self, index, value)
 	else
 		error(string.format("%q is not a valid member of FadeBetweenCamera3", tostring(index)))
@@ -88,7 +89,7 @@ end
 ]=]
 function FadeBetweenCamera3:__index(index)
 	if index == "CameraState" then
-		local _, t = SpringUtils.animating(self._spring)
+		local _, t = SpringUtils.animating(self._spring, rawget(self, "Epsilon"))
 		if t == 0 then
 			return self.CameraStateA
 		elseif t == 1 then
@@ -146,24 +147,26 @@ function FadeBetweenCamera3:__index(index)
 	elseif index == "Damper" then
 		return self._spring.Damper
 	elseif index == "Value" then
-		local _, t = SpringUtils.animating(self._spring)
+		local _, t = SpringUtils.animating(self._spring, rawget(self, "Epsilon"))
 		return t
 	elseif index == "Speed" then
 		return self._spring.Speed
 	elseif index == "Target" then
 		return self._spring.Target
 	elseif index == "Velocity" then
-		local animating = SpringUtils.animating(self._spring)
+		local animating = SpringUtils.animating(self._spring, rawget(self, "Epsilon"))
 		if animating then
 			return self._spring.Velocity
 		else
 			return 0
 		end
 	elseif index == "HasReachedTarget" then
-		local animating = SpringUtils.animating(self._spring)
+		local animating = SpringUtils.animating(self._spring, rawget(self, "Epsilon"))
 		return not animating
 	elseif index == "Spring" then
 		return self._spring
+	elseif index == "Epsilon" then
+		return rawget(self, "Epsilon")
 	elseif FadeBetweenCamera3[index] then
 		return FadeBetweenCamera3[index]
 	else

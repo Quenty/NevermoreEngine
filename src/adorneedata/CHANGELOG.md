@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.19.0...@quenty/adorneedata@7.19.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* Support optional interface as string ([#569](https://github.com/Quenty/NevermoreEngine/issues/569)) ([2fa5895](https://github.com/Quenty/NevermoreEngine/commit/2fa5895cd309b4e8ad43cc46f1dd0d11fedbf8f5))
+
+
+
+
+
 # [7.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.18.3...@quenty/adorneedata@7.19.0) (2025-05-10)
 
 
