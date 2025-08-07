@@ -1,3 +1,16 @@
+# (Thu Aug 07 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.9.2`
+  - fix: service bag reference in game template service client [#573](https://github.com/Quenty/NevermoreEngine/pull/573) ([@KreatorKols](https://github.com/KreatorKols))
+
+#### Authors: 1
+
+- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
+
+---
+
 # (Thu Jul 17 2025)
 
 #### 🐛 Bug Fix
