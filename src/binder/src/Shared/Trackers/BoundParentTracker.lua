@@ -29,6 +29,12 @@ function BoundParentTracker.new(binder, child)
 		end
 	end))
 
+	self._maid:GiveTask(self._binder:GetClassAddedSignal():Connect(function(_, instance)
+		if self._child.Parent == instance then
+			self:_update()
+		end
+	end))
+
 	-- Perform update
 	self._maid:GiveTask(self._child:GetPropertyChangedSignal("Parent"):Connect(function()
 		self:_update()
