@@ -14,18 +14,18 @@ local HUMANOID_ROOT_PART_SIZE = Vector3.new(2, 2, 1)
 --[=[
 	Follows the same logic as Roblox's default camera
 ]=]
-function CameraSubjectUtils.getRobloxCameraSubjectCFrame(cameraSubject: Instance): CFrame
+function CameraSubjectUtils.getRobloxCameraSubjectCFrame(cameraSubject: Instance): CFrame?
 	if cameraSubject:IsA("Humanoid") then
 		local humanoid = cameraSubject
 		local humanoidIsDead = humanoid:GetState() == Enum.HumanoidStateType.Dead
 
 		local cameraOffset = humanoid.CameraOffset
-		local bodyPartToFollow = humanoid.RootPart
+		local bodyPartToFollow: BasePart? = humanoid.RootPart
 
 		-- If the humanoid is dead, prefer their head part as a follow target, if it exists
 		if humanoidIsDead then
 			if humanoid.Parent and humanoid.Parent:IsA("Model") then
-				bodyPartToFollow = humanoid.Parent:FindFirstChild("Head") or bodyPartToFollow
+				bodyPartToFollow = (humanoid.Parent:FindFirstChild("Head") :: BasePart) or bodyPartToFollow
 			end
 		end
 
@@ -58,7 +58,7 @@ function CameraSubjectUtils.getRobloxCameraSubjectCFrame(cameraSubject: Instance
 	elseif cameraSubject:IsA("Model") then
 		-- Model subjects are expected to have a PrimaryPart to determine orientation
 		if cameraSubject.PrimaryPart then
-			return cameraSubject:GetPrimaryPartCFrame()
+			return (cameraSubject :: any):GetPrimaryPartCFrame()
 		else
 			return nil
 		end

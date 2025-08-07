@@ -6,7 +6,6 @@
   },
   "luau-lsp.ignoreGlobs": ["**/node_modules/**"],
   "luau-lsp.fflags.enableNewSolver": false,
-  "stylua.styluaPath": "/Users/jonnen/.aftman/bin/stylua",
   "[lua]": {
     "editor.defaultFormatter": "JohnnyMorganz.stylua",
     "editor.formatOnSave": true,
