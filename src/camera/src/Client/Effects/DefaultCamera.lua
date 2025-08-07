@@ -91,6 +91,10 @@ DefaultCamera.OverrideCameraState = DefaultCamera.SetRobloxCameraState
 ]=]
 function DefaultCamera.SetRobloxCFrame(self: DefaultCamera, cframe: CFrame)
 	self._cameraState.CFrame = cframe
+
+	if self._lastCameraFrame then
+		self._lastCameraFrame.CFrame = cframe
+	end
 end
 
 --[=[
