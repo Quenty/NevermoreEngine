@@ -1,6 +1,6 @@
 {
   "name": "@quenty/settings",
-  "version": "11.25.1",
+  "version": "11.26.0",
   "description": "Centralized player settings service",
   "keywords": [
     "Roblox",
@@ -41,6 +41,7 @@
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/playerbinder": "file:../playerbinder",
     "@quenty/playerutils": "file:../playerutils",
+    "@quenty/promise": "file:../promise",
     "@quenty/remotefunctionutils": "file:../remotefunctionutils",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",

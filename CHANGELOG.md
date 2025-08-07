@@ -1,3 +1,29 @@
+# (Thu Aug 07 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneevalue@10.20.0`, `@quenty/camera@14.23.0`, `@quenty/deathreport@10.25.0`, `@quenty/gameconfig@12.27.0`, `@quenty/ik@15.28.0`, `@quenty/settings@11.26.0`
+  - fix: Misc small fixes [#576](https://github.com/Quenty/NevermoreEngine/pull/576) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 07 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.9.2`
+  - fix: service bag reference in game template service client [#573](https://github.com/Quenty/NevermoreEngine/pull/573) ([@KreatorKols](https://github.com/KreatorKols))
+
+#### Authors: 1
+
+- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
+
+---
+
 # (Thu Jul 17 2025)
 
 #### 🐛 Bug Fix

@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.22.1...@quenty/camera@14.23.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix formatting ([41ceadb](https://github.com/Quenty/NevermoreEngine/commit/41ceadbc674b7860d8593019b5dc5d4cbe539deb))
+* Setting RobloxCFrame also assigns the override CFrame ([1014f69](https://github.com/Quenty/NevermoreEngine/commit/1014f69cce67eda8cde99f7cb7b4243a83ec9fba))
+
+
+### Features
+
+* Add CameraSubjectUtils ([5e32c47](https://github.com/Quenty/NevermoreEngine/commit/5e32c47a1cec33ca903c9f558463fffbc8f2daf4))
+* Add epsilon ([9f61ef3](https://github.com/Quenty/NevermoreEngine/commit/9f61ef3c7fdfc8b7ffc65c592873fd960a5ef126))
+
+
+
+
+
 ## [14.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.22.0...@quenty/camera@14.22.1) (2025-07-14)
 
 
