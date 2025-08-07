@@ -1,6 +1,6 @@
 {
   "name": "@quenty/memoize",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Memoization library",
   "keywords": [
     "Roblox",
@@ -27,7 +27,8 @@
   "dependencies": {
     "@quenty/loader": "file:../loader",
     "@quenty/lrucache": "file:../lrucache",
-    "@quenty/tuple": "file:../tuple"
+    "@quenty/tuple": "file:../tuple",
+    "@quenty/typeutils": "file:../typeutils"
   },
   "publishConfig": {
     "access": "public"

@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Draw = require("Draw")
+local Maid = require("Maid")
 local MinEntranceVelocityUtils = require("MinEntranceVelocityUtils")
 
 local ORIGIN_COLOR = Color3.new(0, 1, 0)
@@ -16,9 +17,11 @@ local TrajectoryDrawUtils = {}
 --[=[
 	Draws a trajectory out for debugging purposes
 ]=]
-function TrajectoryDrawUtils.draw(velocity: Vector3, origin: Vector3, target: Vector3, accel: Vector3): ()
-	Draw.point(origin, ORIGIN_COLOR)
-	Draw.point(target, FINISH_COLOR)
+function TrajectoryDrawUtils.draw(velocity: Vector3, origin: Vector3, target: Vector3, accel: Vector3): Maid.MaidTask
+	local maid = Maid.new()
+
+	maid:GiveTask(Draw.point(origin, ORIGIN_COLOR))
+	maid:GiveTask(Draw.point(target, FINISH_COLOR))
 
 	local entranceTime = MinEntranceVelocityUtils.computeEntranceTime(velocity, origin, target, accel)
 
@@ -30,8 +33,10 @@ function TrajectoryDrawUtils.draw(velocity: Vector3, origin: Vector3, target: Ve
 		local p1 = origin + velocity * t1 + 0.5 * accel * t1 * t1
 
 		local percent = t / entranceTime
-		Draw.line(p0, p1, ORIGIN_COLOR:Lerp(FINISH_COLOR, percent))
+		maid:GiveTask(Draw.line(p0, p1, ORIGIN_COLOR:Lerp(FINISH_COLOR, percent)))
 	end
+
+	return maid
 end
 
 return TrajectoryDrawUtils

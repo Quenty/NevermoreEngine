@@ -1,3 +1,121 @@
+# (Thu Aug 07 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneevalue@10.20.0`, `@quenty/camera@14.23.0`, `@quenty/deathreport@10.25.0`, `@quenty/gameconfig@12.27.0`, `@quenty/ik@15.28.0`, `@quenty/settings@11.26.0`
+  - fix: Misc small fixes [#576](https://github.com/Quenty/NevermoreEngine/pull/576) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 07 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.9.2`
+  - fix: service bag reference in game template service client [#573](https://github.com/Quenty/NevermoreEngine/pull/573) ([@KreatorKols](https://github.com/KreatorKols))
+
+#### Authors: 1
+
+- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
+
+---
+
+# (Thu Jul 17 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/settings@11.25.1`
+  - fix: Fix cancel token [#572](https://github.com/Quenty/NevermoreEngine/pull/572) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 16 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.9.1`
+  - chore(package-lock): update nevermore-template-helpers version [#571](https://github.com/Quenty/NevermoreEngine/pull/571) ([@klga](https://github.com/klga))
+
+#### Authors: 1
+
+- [@klga](https://github.com/klga)
+
+---
+
+# (Mon Jul 14 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/camera@14.22.1`, `@quenty/influxdbclient@7.21.1`, `@quenty/memoize@1.7.1`, `@quenty/r15utils@13.19.1`
+  - fix: Fix telemetry + other packages [#570](https://github.com/Quenty/NevermoreEngine/pull/570) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 14 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneedata@7.19.1`
+  - fix: Support optional interface as string [#569](https://github.com/Quenty/NevermoreEngine/pull/569) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 11 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.19.0`, `@quenty/characterutils@12.20.0`, `@quenty/r15utils@13.19.0`, `@quenty/trajectory@2.9.0`, `@quenty/nevermore-template-helpers@1.3.0`
+  - Users/klga/fixes [#568](https://github.com/Quenty/NevermoreEngine/pull/568) ([@klga](https://github.com/klga))
+
+#### Authors: 1
+
+- [@klga](https://github.com/klga)
+
+---
+
+# (Tue Jul 08 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Remove extra text from string [#564](https://github.com/Quenty/NevermoreEngine/pull/564) ([@unrooot](https://github.com/unrooot))
+- `@quenty/roblox-api-dump@8.12.1`
+  - fix: Fix UniqueId error in Blend converter plugin [#567](https://github.com/Quenty/NevermoreEngine/pull/567) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Tue May 27 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.8.1`
+  - chore: Bump aftman versions [#563](https://github.com/Quenty/NevermoreEngine/pull/563) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Mon May 12 2025)
 
 #### 🚀 Enhancement
