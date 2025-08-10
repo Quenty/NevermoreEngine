@@ -1,19 +1,24 @@
 interface Destroyable {
-    Destroy(): void;
+  Destroy(): void;
 }
-export type MaidTask = (() => any) | thread | RBXScriptConnection | Maid | Destroyable;
+export type MaidTask =
+  | (() => any)
+  | thread
+  | RBXScriptConnection
+  | Maid
+  | Destroyable;
 
-declare type Maid = {
-	[index in number | string]: MaidTask | undefined;
+type Maid = {
+  [index in number | string]: MaidTask | undefined;
 } & {
-	GiveTask(task: MaidTask): number;
-	DoCleaning(): void;
-	Destroy(): void;
+  GiveTask(task: MaidTask): number;
+  DoCleaning(): void;
+  Destroy(): void;
+};
+
+interface MaidConstructor {
+  readonly ClassName: 'Maid';
+  new (): Maid;
 }
 
-declare interface MaidConstructor {
-	readonly ClassName: "Maid";
-	new (): Maid;
-}
-
-export declare const Maid: MaidConstructor;
+export const Maid: MaidConstructor;

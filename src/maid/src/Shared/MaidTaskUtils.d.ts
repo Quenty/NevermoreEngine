@@ -1,5 +1,5 @@
-import { MaidTask } from "./Maid";
+import { MaidTask } from './Maid';
 
-export declare const isValidTask: (job: any) => boolean;
-export declare const doTask: (job: MaidTask) => void;
-export declare const delayed: (time: number, job: MaidTask) => (() => void)
+export const isValidTask: (job: any) => boolean;
+export const doTask: (job: MaidTask) => void;
+export const delayed: (time: number, job: MaidTask) => () => void;
