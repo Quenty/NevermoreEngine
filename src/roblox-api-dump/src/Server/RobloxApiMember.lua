@@ -162,6 +162,14 @@ function RobloxApiMember:IsWriteRobloxScriptSecurity(): boolean
 end
 
 --[=[
+	Returns whether this member has write RobloxSecurity
+	@return boolean
+]=]
+function RobloxApiMember:IsWriteRobloxSecurity(): boolean
+	return self:GetWriteSecurity() == "RobloxSecurity"
+end
+
+--[=[
 	Returns whether this can serialize save
 	@return boolean?
 ]=]

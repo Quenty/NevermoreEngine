@@ -63,8 +63,17 @@ function AdorneeDataEntry.new<T>(interface: string | ValueInterface, createValue
 	return self
 end
 
-function AdorneeDataEntry.optionalAttribute(interface, name: string)
+--[=[
+	Sets up an optional attribute which can be nil to begin with.
+
+	@return AdorneeDataEntry<T>
+]=]
+function AdorneeDataEntry.optionalAttribute<T>(interface: string | ValueInterface, name: string): AdorneeDataEntry<T>
 	assert(type(interface) == "string" or type(interface) == "function", "Bad interface")
+
+	if type(interface) == "string" then
+		interface = t.typeof(interface)
+	end
 
 	return AdorneeDataEntry.new(t.optional(interface), function(instance)
 		return AttributeValue.new(instance, name, nil)

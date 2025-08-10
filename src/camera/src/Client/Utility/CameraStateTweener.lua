@@ -156,6 +156,10 @@ function CameraStateTweener.GetCameraBelow(self: CameraStateTweener): CameraEffe
 	return self._cameraBelow
 end
 
+function CameraStateTweener:SetEpsilon(epsilon: number?)
+	self._fadeBetween.Epsilon = epsilon
+end
+
 --[=[
 	Sets the percent visible target
 	@param target number

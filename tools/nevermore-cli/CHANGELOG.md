@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.1...@quenty/nevermore-cli@4.9.2) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix ServiceBag reference in game template service client ([#573](https://github.com/Quenty/Nevermore/issues/573)) ([be3df7b](https://github.com/Quenty/Nevermore/commit/be3df7bef89d972f0ea70db5aa2651497874197d))
+
+
+
+
+
+## [4.9.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.0...@quenty/nevermore-cli@4.9.1) (2025-07-16)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+# [4.9.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.8.1...@quenty/nevermore-cli@4.9.0) (2025-07-11)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
 ## [4.8.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.8.0...@quenty/nevermore-cli@4.8.1) (2025-05-27)
 
 **Note:** Version bump only for package @quenty/nevermore-cli
