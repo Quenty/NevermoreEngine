@@ -1712,25 +1712,25 @@ end
         @return (source: Observable<T>) -> Observable<T>
 ]=]
 function Rx.debounceTime(seconds)
-    assert(type(seconds) == "number", "Bad seconds")
+	assert(type(seconds) == "number", "Bad seconds")
 
-    return function(source)
-            assert(Observable.isObservable(source), "Bad observable")
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
 
-            return Observable.new(function(sub)
-                    local maid = Maid.new()
+		return Observable.new(function(sub)
+			local maid = Maid.new()
 
-                    maid:GiveTask(source:Subscribe(function(...)
-                        local args = table.pack(...)
-                        maid._delay = task.delay(seconds, function()
-                            maid._delay = nil
-                            sub:Fire(table.unpack(args, 1, args.n))
-                        end)
-                    end))
+			maid:GiveTask(source:Subscribe(function(...)
+				local args = table.pack(...)
+				maid._delay = task.delay(seconds, function()
+					maid._delay = nil
+					sub:Fire(table.unpack(args, 1, args.n))
+				end)
+			end))
 
-                    return maid
-            end)
-    end
+			return maid
+		end)
+	end
 end
 
 --[=[
