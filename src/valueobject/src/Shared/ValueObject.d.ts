@@ -1,13 +1,15 @@
+import { Brio } from '../../../brio';
 import { MaidTask } from '../../../maid/src/Shared/Maid';
+import { Observable } from '../../../rx';
 
 type CheckType = string | ((value: any) => LuaTuple<[boolean, string?]>);
 
 interface ValueObject<T> {
   Value: T;
   GetCheckType: () => CheckType | undefined;
-  Mount: (value: T | Observable<T>) => MaidTask;
-  Observe: () => Observable<T>;
-  ObserveBrio: (condition?: (value: T) => boolean) => Observable<Brio<T>>;
+  Mount: (value: T | Observable<[T]>) => MaidTask;
+  Observe: () => Observable<[T]>;
+  ObserveBrio: (condition?: (value: T) => boolean) => Observable<[Brio<[T]>]>;
   SetValue: (value: T) => void;
   Destroy: () => void;
 }
@@ -16,7 +18,7 @@ interface ValueObjectConstructor {
   readonly ClassName: string;
   new <T>(value: T, checkType?: CheckType): ValueObject<T>;
 
-  fromObservable: <T>(observable: Observable<T>) => ValueObject<T>;
+  fromObservable: <T>(observable: Observable<[T]>) => ValueObject<T>;
   isValueObject: (value: any) => value is ValueObject<any>;
 }
 

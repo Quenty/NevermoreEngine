@@ -1,8 +1,8 @@
 import { Maid } from '../../../maid';
 
 type Promise<T extends unknown[] = unknown[]> = {
-  Then(
-    onFulfilled: (...values: T) => void,
+  Then<R extends unknown[] = unknown[]>(
+    onFulfilled: (...values: T) => Promise<R>,
     onRejected?: (error: unknown) => void
   ): Promise<T>;
   Catch(onRejected: (error: unknown) => void): Promise<T>;
