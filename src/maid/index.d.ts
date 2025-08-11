@@ -1,2 +1,2 @@
-export * from "./src/Shared/Maid";
-export * as MaidTaskUtils from "./src/Shared/MaidTaskUtils";
+export * from './src/Shared/Maid';
+export * from './src/Shared/MaidTaskUtils';
