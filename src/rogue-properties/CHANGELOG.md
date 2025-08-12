@@ -1,3 +1,16 @@
+# v11.24.2 (Tue Aug 12 2025)
+
+#### 🐛 Bug Fix
+
+- Users/quenty/fixes [#578](https://github.com/Quenty/NevermoreEngine/pull/578) ([@Quenty](https://github.com/Quenty))
+- fix: Index handling has better errors ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
