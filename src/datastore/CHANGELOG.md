@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.22.0...@quenty/datastore@13.22.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
 # [13.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.21.0...@quenty/datastore@13.22.0) (2025-05-12)
 
 **Note:** Version bump only for package @quenty/datastore

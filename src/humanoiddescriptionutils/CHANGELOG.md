@@ -1,21 +1,15 @@
-# v10.11.1 (Tue Aug 12 2025)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/fixes [#578](https://github.com/Quenty/NevermoreEngine/pull/578) ([@Quenty](https://github.com/Quenty))
-- style: Format ([@Quenty](https://github.com/Quenty))
-- types: Add better type annotations ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.11.0...@quenty/humanoiddescriptionutils@10.11.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+
+
+
 
 # [10.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.10.4...@quenty/humanoiddescriptionutils@10.11.0) (2025-05-10)
 

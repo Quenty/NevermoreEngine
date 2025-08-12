@@ -1,20 +1,18 @@
-# v8.19.1 (Tue Aug 12 2025)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/fixes [#578](https://github.com/Quenty/NevermoreEngine/pull/578) ([@Quenty](https://github.com/Quenty))
-- fix: Stop playback faster ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.19.0...@quenty/animations@8.19.1) (2025-08-12)
+
+
+### Bug Fixes
+
+* Stop playback faster ([7701ae1](https://github.com/Quenty/NevermoreEngine/commit/7701ae11254460a10af61b5cc970320fe087c5b4))
+
+
+
+
 
 # [8.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.18.0...@quenty/animations@8.19.0) (2025-07-11)
 

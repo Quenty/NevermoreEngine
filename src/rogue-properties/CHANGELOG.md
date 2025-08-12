@@ -1,20 +1,18 @@
-# v11.24.2 (Tue Aug 12 2025)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/fixes [#578](https://github.com/Quenty/NevermoreEngine/pull/578) ([@Quenty](https://github.com/Quenty))
-- fix: Index handling has better errors ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.24.1...@quenty/rogue-properties@11.24.2) (2025-08-12)
+
+
+### Bug Fixes
+
+* Index handling has better errors ([b092117](https://github.com/Quenty/NevermoreEngine/commit/b092117e032db8a6b0ed9b680507e80515bb8193))
+
+
+
+
 
 ## [11.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.24.0...@quenty/rogue-properties@11.24.1) (2025-07-14)
 

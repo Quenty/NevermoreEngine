@@ -1,6 +1,6 @@
 {
   "name": "@quenty/bindtocloseservice",
-  "version": "8.18.0",
+  "version": "8.18.1",
   "description": "Bind to game close API in a centralized location.",
   "keywords": [
     "Roblox",
