@@ -212,16 +212,16 @@ function RoguePropertyTable:__newindex(index, value)
 	elseif index == "Changed" then
 		error("Cannot set .Changed event")
 	elseif RoguePropertyTable[index] then
-		error(string.format("Cannot set %q", tostring(index)))
+		error(string.format("Cannot set %q on %s", tostring(index), self._definition:GetFullName()))
 	elseif type(index) == "string" then
 		local property = self:GetRogueProperty(index)
 		if not property then
-			error(string.format("Bad index %q", tostring(index)))
+			error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 		end
 
 		error(string.format("Use RoguePropertyTable.%s.Value to assign", index))
 	else
-		error(string.format("Bad index %q", tostring(index)))
+		error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 	end
 end
 
@@ -239,7 +239,7 @@ function RoguePropertyTable:__index(index)
 	elseif type(index) == "string" then
 		local property = self:GetRogueProperty(index)
 		if not property then
-			error(string.format("Bad index %q", tostring(index)))
+			error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 		end
 		return property
 	elseif type(index) == "number" then
@@ -250,13 +250,13 @@ function RoguePropertyTable:__index(index)
 			if result then
 				return result
 			else
-				error(string.format("Bad index %q", tostring(index)))
+				error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 			end
 		else
 			error(string.format("Bad index %q - We are not an array", tostring(index)))
 		end
 	else
-		error(string.format("Bad index %q", tostring(index)))
+		error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 	end
 end
 
