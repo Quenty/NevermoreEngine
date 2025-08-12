@@ -43,7 +43,11 @@ end
 	@param assetTypeVerification AssetTypeVerification
 	@return Promise
 ]=]
-function HumanoidDescriptionUtils.promiseApplyDescriptionReset(humanoid: Humanoid, description: HumanoidDescription, assetTypeVerification: Enum.AssetTypeVerification)
+function HumanoidDescriptionUtils.promiseApplyDescriptionReset(
+	humanoid: Humanoid,
+	description: HumanoidDescription,
+	assetTypeVerification: Enum.AssetTypeVerification
+)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(description) == "Instance" and description:IsA("HumanoidDescription"), "Bad description")
 
