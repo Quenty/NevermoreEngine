@@ -6,6 +6,8 @@ type CheckType = string | ((value: any) => LuaTuple<[boolean, string?]>);
 
 interface ValueObject<T> {
   Value: T;
+  Changed: Signal<[T]>;
+  readonly AttributeName: string;
   GetCheckType: () => CheckType | undefined;
   Mount: (value: T | Observable<[T]>) => MaidTask;
   Observe: () => Observable<[T]>;
