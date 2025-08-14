@@ -61,7 +61,7 @@ end
 	@param defaultFadeTime number
 ]=]
 function AnimationSlotPlayer.SetDefaultFadeTime(self: AnimationSlotPlayer, defaultFadeTime: number)
-	self._defaultFadeTime.Value = defaultFadeTime
+	return self._defaultFadeTime:Mount(defaultFadeTime)
 end
 
 --[=[
@@ -287,7 +287,12 @@ function AnimationSlotPlayer.Play(
 				end)
 
 				maid:GiveTask(function()
-					track:AdjustWeight(0, fadeTime or self._defaultFadeTime.Value)
+					local stopFadeTime = fadeTime or self._defaultFadeTime.Value
+					track:AdjustWeight(0, stopFadeTime)
+
+					if stopFadeTime == 0 then
+						track:Stop(stopFadeTime)
+					end
 				end)
 			else
 				warn("[AnimationSlotPlayer] - Failed to get animation to play")

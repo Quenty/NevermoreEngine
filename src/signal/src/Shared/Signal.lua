@@ -99,6 +99,7 @@ function Connection.Disconnect<T...>(self: Connection<T...>)
 			prev = rawget(prev, "_next")
 		end
 		if prev then
+			assert(rawget(prev, "_next") == self, "Bad state")
 			rawset(prev, "_next", ourNext)
 		end
 	end
@@ -169,6 +170,16 @@ function Signal.Connect<T...>(self: Signal<T...>, fn: SignalHandler<T...>): Conn
 	return connection
 end
 
+function Signal:GetConnectionCount()
+	local n = 0
+	local prev = self._handlerListHead
+	while prev do
+		n += 1
+		prev = rawget(prev, "_next")
+	end
+	return n
+end
+
 --[=[
 	Disconnects all connected events to the signal.
 
@@ -178,6 +189,12 @@ end
 	:::
 ]=]
 function Signal.DisconnectAll<T...>(self: Signal<T...>): ()
+	while self._handlerListHead do
+		local last = self._handlerListHead
+		last:Disconnect()
+		assert(self._handlerListHead ~= last, "self._handlerListHead should not be last")
+	end
+
 	self._handlerListHead = false
 end
 

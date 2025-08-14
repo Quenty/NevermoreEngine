@@ -1,3 +1,17 @@
+# (Tue Aug 12 2025)
+
+#### 🐛 Bug Fix
+
+- ci: Try to run tests on pull request [#577](https://github.com/Quenty/NevermoreEngine/pull/577) ([@Quenty](https://github.com/Quenty))
+- `@quenty/animations@8.19.1`, `@quenty/humanoiddescriptionutils@10.11.1`, `@quenty/rogue-properties@11.24.2`, `@quenty/signal@7.11.1`, `@quenty/valueobject@13.18.1`
+  - Users/quenty/fixes [#578](https://github.com/Quenty/NevermoreEngine/pull/578) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Aug 07 2025)
 
 #### 🚀 Enhancement

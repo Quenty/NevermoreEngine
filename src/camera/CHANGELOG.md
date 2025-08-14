@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.23.0...@quenty/camera@14.23.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
 # [14.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.22.1...@quenty/camera@14.23.0) (2025-08-07)
 
 
