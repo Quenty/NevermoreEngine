@@ -18,4 +18,10 @@ export namespace AttributeUtils {
     attributeName: string,
     defaultValue: any
   ): any;
+  function getAttribute(
+    instance: Instance,
+    attributeName: string,
+    defaultValue: any
+  ): any;
+  function removeAllAttributes(instance: Instance): void;
 }
