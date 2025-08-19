@@ -1,184 +1,150 @@
 import { Observable } from './Observable';
 import { MaidTask } from '../../../maid';
+import { Signal } from '../../../signal/src/Shared/Signal';
 
-export type Predicate<T extends unknown[] = unknown[]> = (
-  ...args: T
-) => boolean;
+export type Predicate<T> = (...args: T extends unknown[] ? T : [T]) => boolean;
+type ToTuple<T> = T extends unknown[] ? T : [T];
 
 export namespace Rx {
-  const EMPTY: Observable<[]>;
-  const NEVER: Observable<[]>;
+  const EMPTY: Observable;
+  const NEVER: Observable;
 
-  function pipe<T extends unknown[], U extends unknown[]>(
+  function pipe<T, U>(
     transformers: Array<(source: Observable<T>) => Observable<U>>
   ): (source: Observable<T>) => Observable<U>;
 
-  function of<T extends unknown[]>(...args: T): Observable<T>;
-  function failed<T extends unknown[]>(...args: T): Observable<T>;
-  function from<T extends unknown[]>(
-    item: Promise<T> | T[] | any
-  ): Observable<T>;
-  function toPromise<T extends unknown[]>(
+  function of<T>(...args: ToTuple<T>): Observable<T>;
+  function failed<T>(...args: ToTuple<T>): Observable<T>;
+  function from<T>(item: Promise<T> | T[] | any): Observable<T>;
+  function toPromise<T>(
     observable: Observable<T>,
     cancelToken?: any
   ): Promise<T>;
-  function merge<T extends unknown[]>(
-    observables: Array<Observable<T>>
+  function merge<T>(observables: Array<Observable<T>>): Observable<T>;
+  function fromSignal<T>(
+    event: Signal | { Connect: (cb: (...args: ToTuple<T>) => void) => any }
   ): Observable<T>;
-  function fromSignal<T extends unknown[]>(
-    event: RBXScriptSignal | { Connect: (cb: (...args: T) => void) => any }
-  ): Observable<T>;
-  function fromPromise<T extends unknown[]>(promise: Promise<T>): Observable<T>;
+  function fromPromise<T>(promise: Promise<T>): Observable<T>;
 
-  function tap<T extends unknown[]>(
-    onFire?: (...args: T) => void,
+  function tap<T>(
+    onFire?: (...args: ToTuple<T>) => void,
     onError?: (...args: unknown[]) => void,
     onComplete?: (...args: unknown[]) => void
   ): (source: Observable<T>) => Observable<T>;
 
-  function start<T extends unknown[]>(
+  function start<T>(
     callback: () => T
   ): (source: Observable<T>) => Observable<T>;
-  function share<T extends unknown[]>(): (
-    source: Observable<T>
-  ) => Observable<T>;
-  function shareReplay<T extends unknown[]>(
+  function share<T>(): (source: Observable<T>) => Observable<T>;
+  function shareReplay<T>(
     bufferSize?: number,
     windowTimeSeconds?: number
   ): (source: Observable<T>) => Observable<T>;
-  function cache<T extends unknown[]>(): (
-    source: Observable<T>
-  ) => Observable<T>;
-  function startFrom<T extends unknown[], U extends unknown[]>(
+  function cache<T>(): (source: Observable<T>) => Observable<T>;
+  function startFrom<T, U>(
     callback: () => U[]
   ): (source: Observable<T>) => Observable<U | T>;
-  function startWith<T extends unknown[], U extends unknown[]>(
+  function startWith<T, U>(
     values: U[]
   ): (source: Observable<T>) => Observable<T | U>;
-  function scan<T extends unknown[], U extends unknown[]>(
-    accumulator: (acc: T | undefined, ...args: U) => T,
+  function scan<T, U>(
+    accumulator: (acc: T | undefined, ...args: ToTuple<U>) => T,
     seed?: T
   ): (source: Observable<U>) => Observable<T>;
-  function reduce<T extends unknown[], U extends unknown[]>(
-    reducer: (acc: T | undefined, ...args: U) => T,
+  function reduce<T, U>(
+    reducer: (acc: T | undefined, ...args: ToTuple<U>) => T,
     seed?: T
   ): (source: Observable<U>) => Observable<T>;
-  function defaultsTo<T extends unknown[]>(
-    value: T
+  function defaultsTo<T>(value: T): (source: Observable<T>) => Observable<T>;
+  function defaultsToNil<T>(source: Observable<T>): Observable<T | [undefined]>;
+  function endWith<T>(
+    ...values: ToTuple<T>
   ): (source: Observable<T>) => Observable<T>;
-  function defaultsToNil<T extends unknown[]>(
-    source: Observable<T>
-  ): Observable<T | [undefined]>;
-  function endWith<T extends unknown[]>(
-    ...values: T
-  ): (source: Observable<T>) => Observable<T>;
-  function where<T extends unknown[]>(
+  function where<T>(
     predicate: Predicate<T>
   ): (source: Observable<T>) => Observable<T>;
-  function distinct<T extends unknown[]>(): (
-    source: Observable<T>
-  ) => Observable<T>;
-  function mapTo<T extends unknown[]>(
-    ...args: T
+  function distinct<T>(): (source: Observable<T>) => Observable<T>;
+  function mapTo<T>(
+    ...args: ToTuple<T>
   ): (source: Observable<any>) => Observable<T>;
-  function map<T extends unknown[], U extends unknown[]>(
-    project: (...args: T) => U
+  function map<T, U>(
+    project: (...args: ToTuple<T>) => U
   ): (source: Observable<T>) => Observable<U>;
-  function mergeAll<T extends unknown[]>(): (
+  function mergeAll<T>(): (
     source: Observable<[Observable<T>]>
   ) => Observable<T>;
-  function switchAll<T extends unknown[]>(): (
+  function switchAll<T>(): (
     source: Observable<[Observable<T>]>
   ) => Observable<T>;
-  function flatMap<T extends unknown[], U extends unknown[]>(
-    project: (...args: T) => Observable<U>
+  function flatMap<T, U>(
+    project: (...args: ToTuple<T>) => Observable<U>
   ): (source: Observable<T>) => Observable<U>;
-  function switchMap<T extends unknown[], U extends unknown[]>(
-    project: (...args: T) => Observable<U>
+  function switchMap<T, U>(
+    project: (...args: ToTuple<T>) => Observable<U>
   ): (source: Observable<T>) => Observable<U>;
-  function takeUntil<T extends unknown[]>(
+  function takeUntil<T>(
     notifier: Observable<any>
   ): (source: Observable<T>) => Observable<T>;
-  function packed<T extends unknown[]>(...args: T): Observable<T>;
-  function unpacked<T extends unknown[]>(
-    observable: Observable<T[]>
-  ): Observable<T>;
-  function finalize<T extends unknown[]>(
+  function packed<T>(...args: ToTuple<T>): Observable<T>;
+  function unpacked<T>(observable: Observable<T[]>): Observable<T>;
+  function finalize<T>(
     finalizerCallback: () => void
   ): (source: Observable<T>) => Observable<T>;
-  function combineLatestAll<T extends unknown[]>(): (
+  function combineLatestAll<T>(): (
     source: Observable<[Observable<T>]>
   ) => Observable<T>;
-  function combineAll<T extends unknown[]>(
-    source: Observable<[Observable<T>]>
-  ): Observable<T>;
-  function catchError<T extends unknown[], E, R extends unknown[]>(
+  function combineAll<T>(source: Observable<[Observable<T>]>): Observable<T>;
+  function catchError<T, E, R>(
     callback: (error: E) => Observable<R>
   ): (source: Observable<T>) => Observable<T | R>;
-  function combineLatest<
-    K extends string | number | symbol,
-    V extends unknown[]
-  >(observables: Record<K, Observable<V> | V>): Observable<[Record<K, V>]>;
-  function combineLatestDefer<
-    K extends string | number | symbol,
-    V extends unknown[]
-  >(observables: Record<K, Observable<V> | V>): Observable<[Record<K, V>]>;
-  function defer<T extends unknown[]>(
-    observableFactory: () => Observable<T>
-  ): Observable<T>;
-  function delay<T extends unknown[]>(
-    seconds: number
-  ): (source: Observable<T>) => Observable<T>;
+  function combineLatest<K extends string | number | symbol, V>(
+    observables: Record<K, Observable<V> | V>
+  ): Observable<[Record<K, V>]>;
+  function combineLatestDefer<K extends string | number | symbol, V>(
+    observables: Record<K, Observable<V> | V>
+  ): Observable<[Record<K, V>]>;
+  function defer<T>(observableFactory: () => Observable<T>): Observable<T>;
+  function delay<T>(seconds: number): (source: Observable<T>) => Observable<T>;
   function delayed(seconds: number): Observable<[]>;
   function timer(
     initialDelaySeconds: number,
     seconds: number
   ): Observable<number[]>;
   function interval(seconds: number): Observable<number[]>;
-  function withLatestFrom<T extends unknown[], U extends unknown[]>(
+  function withLatestFrom<T, U>(
     inputObservables: Array<Observable<U>>
-  ): (source: Observable<T>) => Observable<[T, ...U]>;
-  function throttleTime<T extends unknown[]>(
+  ): (source: Observable<T>) => Observable<[T, ...ToTuple<U>]>;
+  function throttleTime<T>(
     duration: number,
     throttleConfig?: { leading?: boolean; trailing?: boolean }
   ): (source: Observable<T>) => Observable<T>;
-  function onlyAfterDefer<T extends unknown[]>(): (
-    source: Observable<T>
-  ) => Observable<T>;
-  function throttleDefer<T extends unknown[]>(): (
-    source: Observable<T>
-  ) => Observable<T>;
-  function throttle<T extends unknown[]>(
-    durationSelector: (...args: T) => Observable<any>
+  function onlyAfterDefer<T>(): (source: Observable<T>) => Observable<T>;
+  function throttleDefer<T>(): (source: Observable<T>) => Observable<T>;
+  function throttle<T>(
+    durationSelector: (...args: ToTuple<T>) => Observable<any>
   ): (source: Observable<T>) => Observable<T>;
-  function skipUntil<T extends unknown[]>(
+  function skipUntil<T>(
     notifier: Observable<any>
   ): (source: Observable<T>) => Observable<T>;
-  function skipWhile<T extends unknown[]>(
-    predicate: (index: number, ...args: T) => boolean
+  function skipWhile<T>(
+    predicate: (index: number, ...args: ToTuple<T>) => boolean
   ): (source: Observable<T>) => Observable<T>;
-  function takeWhile<T extends unknown[]>(
-    predicate: (index: number, ...args: T) => boolean
+  function takeWhile<T>(
+    predicate: (index: number, ...args: ToTuple<T>) => boolean
   ): (source: Observable<T>) => Observable<T>;
-  function switchScan<T extends unknown[], U extends unknown[]>(
-    accumulator: (acc: T | undefined, ...args: U) => Observable<T>,
+  function switchScan<T, U>(
+    accumulator: (acc: T | undefined, ...args: ToTuple<U>) => Observable<T>,
     seed?: T
   ): (source: Observable<U>) => Observable<T>;
-  function mergeScan<T extends unknown[], U extends unknown[]>(
-    accumulator: (acc: T | undefined, ...args: U) => Observable<T>,
+  function mergeScan<T, U>(
+    accumulator: (acc: T | undefined, ...args: ToTuple<U>) => Observable<T>,
     seed?: T
   ): (source: Observable<U>) => Observable<T>;
-  function using<T extends unknown[]>(
+  function using<T>(
     resourceFactory: () => MaidTask,
     observableFactory: (resource: MaidTask) => Observable<T>
   ): Observable<T>;
-  function first<T extends unknown[]>(): (
-    source: Observable<T>
-  ) => Observable<T>;
-  function take<T extends unknown[]>(
-    count: number
-  ): (source: Observable<T>) => Observable<T>;
-  function skip<T extends unknown[]>(
-    count: number
-  ): (source: Observable<T>) => Observable<T>;
+  function first<T>(): (source: Observable<T>) => Observable<T>;
+  function take<T>(count: number): (source: Observable<T>) => Observable<T>;
+  function skip<T>(count: number): (source: Observable<T>) => Observable<T>;
 }

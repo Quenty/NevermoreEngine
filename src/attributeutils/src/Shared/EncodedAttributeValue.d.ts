@@ -1,7 +1,7 @@
 import { Brio } from '../../../brio';
 import { Observable } from '../../../rx';
 
-interface AttributeValue<T> {
+interface EncodedAttributeValue<T> {
   Value: T;
   Changed: Signal<[T]>;
   Observe(): Observable<[T]>;
@@ -9,13 +9,15 @@ interface AttributeValue<T> {
   Destroy(): void;
 }
 
-interface AttributeValueConstructor {
-  readonly ClassName: 'AttributeValue';
+interface EncodedAttributeValueConstructor {
+  readonly ClassName: 'EncodedAttributeValue';
   new <T>(
     object: Instance,
     attributeName: string,
+    encode: (value: T) => string,
+    decode: (value: string) => T,
     defaultValue: T
-  ): AttributeValue<T>;
+  ): EncodedAttributeValue<T>;
 }
 
-export const AttributeValue: AttributeValueConstructor;
+export const EncodedAttributeValue: EncodedAttributeValueConstructor;

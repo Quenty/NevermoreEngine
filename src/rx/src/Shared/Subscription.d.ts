@@ -1,5 +1,5 @@
-type Subscription<T extends unknown[]> = {
-  Fire(...args: T): void;
+type Subscription<T> = {
+  Fire(...args: T extends unknown[] ? T : [T]): void;
   Fail(): void;
   GetFireFailComplete(): LuaTuple<
     [

@@ -1,5 +1,4 @@
 import { Brio } from '../../../brio';
-import { Maid } from '../../../maid';
 import { Observable } from '../../../rx';
 
 export namespace RxAttributeUtils {
