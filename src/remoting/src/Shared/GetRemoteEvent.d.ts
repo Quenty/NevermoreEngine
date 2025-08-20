@@ -1,3 +1,1 @@
-export function GetRemoteEvent<T extends unknown[]>(
-  name: string
-): RemoteEvent<T>;
+export function GetRemoteEvent<T>(name: string): RemoteEvent<T>;
