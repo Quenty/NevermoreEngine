@@ -1,14 +1,16 @@
 import { Maid } from '../../../maid';
 import { Signal } from '../../../signal/src/Shared/Signal';
 
-type Brio<T extends unknown[] = unknown[]> = {
+type ToTuple<T> = T extends any[] ? T : [T];
+
+type Brio<T = void> = {
   Kill(): void;
   IsDead(): boolean;
   GetDiedSignal(): Signal;
   ErrorIfDead(): void;
   ToMaid(): Maid;
-  ToMaidAndValue(): LuaTuple<[Maid, ...T]>;
-  GetValue(): LuaTuple<[...T]>;
+  ToMaidAndValue(): LuaTuple<[Maid, ...ToTuple<T>]>;
+  GetValue(): LuaTuple<[...ToTuple<T>]>;
   GetPackedValues(): {
     n: number;
     [index: number]: T;
@@ -19,7 +21,7 @@ type Brio<T extends unknown[] = unknown[]> = {
 
 interface BrioConstructor {
   readonly ClassName: 'Brio';
-  new <T extends unknown[] = unknown[]>(...values: T): Brio<T>;
+  new <T>(...values: ToTuple<T>): Brio<T>;
 
   DEAD: Brio;
 }

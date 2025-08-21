@@ -1,4 +1,5 @@
 import { CameraState } from './CameraState';
+import { CameraEffect, CameraLike } from './Effects/CameraEffectUtils';
 
 interface CameraStack {
   PushDisable(): () => void;
@@ -6,10 +7,7 @@ interface CameraStack {
   GetTopCamera(): CameraLike | undefined;
   GetTopState(): CameraState | undefined;
   GetNewStateBelow(): LuaTuple<
-    [
-      customCameraEffect: CustomCameraEffect,
-      setState: (state: CameraState) => void
-    ]
+    [customCameraEffect: CameraEffect, setState: (state: CameraState) => void]
   >;
   GetIndex(state: CameraLike): number | undefined;
   GetStack(): CameraLike[];
