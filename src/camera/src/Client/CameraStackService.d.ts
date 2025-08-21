@@ -3,7 +3,7 @@ import { CameraState } from './CameraState';
 import { CameraEffect, CameraLike } from './Effects/CameraEffectUtils';
 import { DefaultCamera } from './Effects/DefaultCamera';
 
-export class CameraStackService {
+export interface CameraStackService {
   Init(): void;
   Start(): void;
   GetRenderPriority(): number;

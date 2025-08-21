@@ -10,7 +10,7 @@ type Brio<T = void> = {
   ErrorIfDead(): void;
   ToMaid(): Maid;
   ToMaidAndValue(): LuaTuple<[Maid, ...ToTuple<T>]>;
-  GetValue(): LuaTuple<[...ToTuple<T>]>;
+  GetValue(): T;
   GetPackedValues(): {
     n: number;
     [index: number]: T;
