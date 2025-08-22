@@ -1,0 +1,33 @@
+import { Brio } from '../../../brio';
+import { Observable } from '../../../rx';
+import { Signal } from '../../../signal/src/Shared/Signal';
+
+interface ObservableMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
+  CountChanged: Signal<number>;
+  ObserveKeysBrio(): Observable<Brio<TKey>>;
+  ObserveValuesBrio(): Observable<Brio<TValue>>;
+  ObservePairsBrio(): Observable<Brio<[TKey, TValue]>>;
+  Get(key: TKey): TValue | undefined;
+  ContainsKey(key: TKey): boolean;
+  GetCount(): number;
+  ObserveCount(): Observable<number>;
+  ObserveAtKeyBrio(key: TKey): Observable<Brio<TValue>>;
+  ObserveAtKey(key: TKey): Observable<TValue | undefined>;
+  ObserveValueForKey(key: TKey): Observable<TValue | undefined>;
+  Set(key: TKey, value?: TValue): () => void;
+  Remove(key: TKey): void;
+  GetValueList(): TValue[];
+  GetKeyList(): TKey[];
+  ObserveKeyList(): Observable<TKey[]>;
+  Destroy(): void;
+}
+
+interface ObservableMapConstructor {
+  readonly ClassName: 'ObservableMap';
+  new (): ObservableMap<never, never>;
+  new <TKey, TValue>(): ObservableMap<TKey, TValue>;
+
+  isObservableMap(value: any): value is ObservableMap<any, any>;
+}
+
+export const ObservableMap: ObservableMapConstructor;

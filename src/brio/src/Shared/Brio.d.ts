@@ -21,6 +21,7 @@ type Brio<T = void> = {
 
 interface BrioConstructor {
   readonly ClassName: 'Brio';
+  new <T>(value: T): Brio<T>;
   new <T>(...values: ToTuple<T>): Brio<T>;
 
   DEAD: Brio;
