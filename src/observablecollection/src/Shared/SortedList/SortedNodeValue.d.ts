@@ -1,4 +1,4 @@
-type CompareFunction<T> = (a: T, b: T) => number;
+import { CompareFunction } from './SortedNode';
 
 interface SortedNodeValue<T> extends Iterable<T> {
   GetValue(): T;
