@@ -1,6 +1,7 @@
 import { Observable } from './Observable';
 import { MaidTask } from '../../../maid';
 import { Signal } from '../../../signal/src/Shared/Signal';
+import { CancelToken } from '../../../canceltoken';
 
 export type Predicate<T> = (...args: T extends unknown[] ? T : [T]) => boolean;
 type ToTuple<T> = T extends unknown[] ? T : [T];
@@ -15,14 +16,16 @@ export namespace Rx {
 
   function of<T>(...args: ToTuple<T>): Observable<T>;
   function failed<T>(...args: ToTuple<T>): Observable<T>;
-  function from<T>(item: Promise<T> | T[] | any): Observable<T>;
+  function from<T>(item: Promise<T> | T[]): Observable<T>;
   function toPromise<T>(
     observable: Observable<T>,
-    cancelToken?: any
+    cancelToken?: CancelToken
   ): Promise<T>;
-  function merge<T>(observables: Array<Observable<T>>): Observable<T>;
+  function merge<T>(observables: Observable<T>[]): Observable<T>;
   function fromSignal<T>(
-    event: Signal | { Connect: (cb: (...args: ToTuple<T>) => void) => any }
+    event:
+      | Signal<T>
+      | { Connect: (cb: (...args: ToTuple<T>) => void) => unknown }
   ): Observable<T>;
   function fromPromise<T>(promise: Promise<T>): Observable<T>;
 
@@ -66,16 +69,12 @@ export namespace Rx {
   function distinct<T>(): (source: Observable<T>) => Observable<T>;
   function mapTo<T>(
     ...args: ToTuple<T>
-  ): (source: Observable<any>) => Observable<T>;
+  ): (source: Observable<unknown>) => Observable<T>;
   function map<T, U>(
     project: (...args: ToTuple<T>) => U
   ): (source: Observable<T>) => Observable<U>;
-  function mergeAll<T>(): (
-    source: Observable<[Observable<T>]>
-  ) => Observable<T>;
-  function switchAll<T>(): (
-    source: Observable<[Observable<T>]>
-  ) => Observable<T>;
+  function mergeAll<T>(): (source: Observable<Observable<T>>) => Observable<T>;
+  function switchAll<T>(): (source: Observable<Observable<T>>) => Observable<T>;
   function flatMap<T, U>(
     project: (...args: ToTuple<T>) => Observable<U>
   ): (source: Observable<T>) => Observable<U>;
@@ -83,7 +82,7 @@ export namespace Rx {
     project: (...args: ToTuple<T>) => Observable<U>
   ): (source: Observable<T>) => Observable<U>;
   function takeUntil<T>(
-    notifier: Observable<any>
+    notifier: Observable<unknown>
   ): (source: Observable<T>) => Observable<T>;
   function packed<T>(...args: ToTuple<T>): Observable<T>;
   function unpacked<T>(observable: Observable<T[]>): Observable<T>;
@@ -91,28 +90,28 @@ export namespace Rx {
     finalizerCallback: () => void
   ): (source: Observable<T>) => Observable<T>;
   function combineLatestAll<T>(): (
-    source: Observable<[Observable<T>]>
+    source: Observable<Observable<T>>
   ) => Observable<T>;
-  function combineAll<T>(source: Observable<[Observable<T>]>): Observable<T>;
+  function combineAll<T>(source: Observable<Observable<T>>): Observable<T>;
   function catchError<T, E, R>(
     callback: (error: E) => Observable<R>
   ): (source: Observable<T>) => Observable<T | R>;
   function combineLatest<K extends string | number | symbol, V>(
     observables: Record<K, Observable<V> | V>
-  ): Observable<[Record<K, V>]>;
+  ): Observable<Record<K, V>>;
   function combineLatestDefer<K extends string | number | symbol, V>(
     observables: Record<K, Observable<V> | V>
-  ): Observable<[Record<K, V>]>;
+  ): Observable<Record<K, V>>;
   function defer<T>(observableFactory: () => Observable<T>): Observable<T>;
   function delay<T>(seconds: number): (source: Observable<T>) => Observable<T>;
-  function delayed(seconds: number): Observable<[]>;
+  function delayed(seconds: number): Observable;
   function timer(
     initialDelaySeconds: number,
     seconds: number
   ): Observable<number[]>;
   function interval(seconds: number): Observable<number[]>;
   function withLatestFrom<T, U>(
-    inputObservables: Array<Observable<U>>
+    inputObservables: Observable<U>[]
   ): (source: Observable<T>) => Observable<[T, ...ToTuple<U>]>;
   function throttleTime<T>(
     duration: number,
@@ -121,10 +120,10 @@ export namespace Rx {
   function onlyAfterDefer<T>(): (source: Observable<T>) => Observable<T>;
   function throttleDefer<T>(): (source: Observable<T>) => Observable<T>;
   function throttle<T>(
-    durationSelector: (...args: ToTuple<T>) => Observable<any>
+    durationSelector: (...args: ToTuple<T>) => Observable<unknown>
   ): (source: Observable<T>) => Observable<T>;
   function skipUntil<T>(
-    notifier: Observable<any>
+    notifier: Observable<unknown>
   ): (source: Observable<T>) => Observable<T>;
   function skipWhile<T>(
     predicate: (index: number, ...args: ToTuple<T>) => boolean

@@ -27,7 +27,7 @@ interface ObservableSetConstructor {
   new (): ObservableSet<never>;
   new <T>(): ObservableSet<T>;
 
-  isObservableSet(value: any): value is ObservableSet<any>;
+  isObservableSet(value: unknown): value is ObservableSet<unknown>;
 }
 
 export const ObservableSet: ObservableSetConstructor;

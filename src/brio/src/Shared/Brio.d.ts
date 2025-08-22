@@ -1,7 +1,7 @@
 import { Maid } from '../../../maid';
 import { Signal } from '../../../signal/src/Shared/Signal';
 
-type ToTuple<T> = T extends any[] ? T : [T];
+type ToTuple<T> = T extends unknown[] ? T : [T];
 
 type Brio<T = void> = {
   Kill(): void;
@@ -10,7 +10,7 @@ type Brio<T = void> = {
   ErrorIfDead(): void;
   ToMaid(): Maid;
   ToMaidAndValue(): LuaTuple<[Maid, ...ToTuple<T>]>;
-  GetValue(): T;
+  GetValue(): T extends [unknown, ...unknown[]] ? LuaTuple<T> : T;
   GetPackedValues(): {
     n: number;
     [index: number]: T;

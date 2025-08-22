@@ -2,7 +2,7 @@ interface Destroyable {
   Destroy(): void;
 }
 export type MaidTask =
-  | (() => any)
+  | (() => unknown)
   | thread
   | RBXScriptConnection
   | Maid

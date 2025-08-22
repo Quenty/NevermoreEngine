@@ -5,8 +5,8 @@ import { StateStack } from './StateStack';
 export namespace RxStateStackUtils {
   function topOfStack<T extends unknown[]>(
     defaultValue: T
-  ): (source: Observable<[Brio<T>]>) => Observable<T>;
+  ): (source: Observable<Brio<T>>) => Observable<T>;
   function createStateStack<T extends unknown[]>(
-    observable: Observable<[Brio<T>]>
+    observable: Observable<Brio<T>>
   ): StateStack<T>;
 }

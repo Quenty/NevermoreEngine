@@ -18,7 +18,7 @@ interface CameraStack {
 interface CameraStackConstructor {
   readonly ClassName: 'CameraStack';
   new (): CameraStack;
-  isCameraStack: (value: any) => value is CameraStack;
+  isCameraStack: (value: unknown) => value is CameraStack;
 }
 
 export const CameraStack: CameraStackConstructor;

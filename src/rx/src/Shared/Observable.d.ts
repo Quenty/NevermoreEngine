@@ -74,7 +74,7 @@ type Observable<T = void> = {
     op9: Operator<H, I>,
     op10: Operator<I, J>
   ): Observable<J>;
-  Pipe(...operators: Operator<any, any>[]): Observable<any>;
+  Pipe(...operators: Operator<unknown, unknown>[]): Observable<unknown>;
   Subscribe(
     fireCallback?: (...args: T extends unknown[] ? T : [T]) => void,
     failCallback?: () => void,
@@ -90,7 +90,7 @@ interface ObservableConstructor {
     onSubscribe: (subscription: Subscription<T>) => MaidTask
   ): Observable<T>;
 
-  isObservable: (item: any) => item is Observable;
+  isObservable: (item: unknown) => item is Observable<unknown>;
 }
 
 export const Observable: ObservableConstructor;

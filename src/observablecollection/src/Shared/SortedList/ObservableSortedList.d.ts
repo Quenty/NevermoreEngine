@@ -36,7 +36,9 @@ interface ObservableSortedListConstructor {
   new (): ObservableSortedList<never>;
   new <T>(): ObservableSortedList<T>;
 
-  isObservableSortedList(value: any): value is ObservableSortedList<any>;
+  isObservableSortedList(
+    value: unknown
+  ): value is ObservableSortedList<unknown>;
 }
 
 export const ObservableSortedList: ObservableSortedListConstructor;

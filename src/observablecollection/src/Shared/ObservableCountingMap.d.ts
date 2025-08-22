@@ -23,7 +23,7 @@ interface ObservableCountingMapConstructor {
   new (): ObservableCountingMap<never>;
   new <T>(): ObservableCountingMap<T>;
 
-  isObservableMap(value: any): value is ObservableCountingMap<any>;
+  isObservableMap(value: unknown): value is ObservableCountingMap<unknown>;
 }
 
 export const ObservableCountingMap: ObservableCountingMapConstructor;

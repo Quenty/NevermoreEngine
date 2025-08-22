@@ -15,7 +15,7 @@ interface QFrameConstructor {
     Z?: number
   ): QFrame;
 
-  isQFrame: (value: any) => value is QFrame;
+  isQFrame: (value: unknown) => value is QFrame;
   fromCFrameClosestTo: (cframe: CFrame, closestTo: QFrame) => QFrame;
   fromVector3: (vector: Vector3, qframe: QFrame) => QFrame;
   isNAN: (qframe: QFrame) => boolean;

@@ -4,10 +4,10 @@ interface JSONAttributeValue<T> extends EncodedAttributeValue<T> {}
 
 interface JSONAttributeValueConstructor {
   readonly ClassName: 'JSONAttributeValue';
-  new <T>(
+  new <T = unknown>(
     object: Instance,
     attributeName: string,
-    defaultValue: T
+    defaultValue?: T
   ): JSONAttributeValue<T>;
 }
 

@@ -1,3 +1,4 @@
+import { Spring } from '../../../../spring/src/Shared/Spring';
 import { CameraState } from '../CameraState';
 import { CameraEffect, CameraLike } from './CameraEffectUtils';
 
@@ -6,7 +7,7 @@ interface FadingCamera extends CameraEffect {
   Value: number;
   Speed: number;
   Target: number;
-  Spring: Spring;
+  Spring: Spring<number>;
   Camera: CameraLike;
   readonly Velocity: number;
   readonly CameraState: CameraState;

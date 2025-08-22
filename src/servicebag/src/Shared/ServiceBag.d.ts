@@ -13,7 +13,7 @@ interface ServiceBagConstructor {
   readonly ClassName: 'ServiceBag';
   new (): ServiceBag;
 
-  isServiceBag: (value: any) => value is ServiceBag;
+  isServiceBag: (value: unknown) => value is ServiceBag;
 }
 
 export const ServiceBag: ServiceBagConstructor;

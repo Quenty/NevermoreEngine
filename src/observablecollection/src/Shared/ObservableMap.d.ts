@@ -27,7 +27,7 @@ interface ObservableMapConstructor {
   new (): ObservableMap<never, never>;
   new <TKey, TValue>(): ObservableMap<TKey, TValue>;
 
-  isObservableMap(value: any): value is ObservableMap<any, any>;
+  isObservableMap(value: unknown): value is ObservableMap<unknown, unknown>;
 }
 
 export const ObservableMap: ObservableMapConstructor;

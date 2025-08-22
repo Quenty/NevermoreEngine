@@ -137,5 +137,5 @@ export namespace Draw {
     color?: Color3Like,
     parent?: Instance
   ): Folder;
-  function getDefaultParent(): Instance?;
+  function getDefaultParent(): Instance | undefined;
 }

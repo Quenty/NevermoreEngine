@@ -4,14 +4,14 @@ interface Signal<T = void> {
   Fire(...args: ToTuple<T>): void;
   Connect(callback: (...args: ToTuple<T>) => void): RBXScriptConnection;
   DisconnectAll(): void;
-  Wait(): T extends void ? void : T extends any[] ? LuaTuple<T> : T;
+  Wait(): T extends void ? void : T extends unknown[] ? LuaTuple<T> : T;
   Once(callback: (...args: ToTuple<T>) => void): RBXScriptConnection;
   Destroy(): void;
 }
 
 interface SignalConstructor {
   readonly ClassName: 'Signal';
-  isSignal: (value: any) => value is Signal<any>;
+  isSignal: (value: unknown) => value is Signal<unknown>;
   new <T>(): Signal<T>;
 }
 

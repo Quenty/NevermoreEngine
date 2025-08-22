@@ -29,7 +29,7 @@ interface ObservableListConstructor {
   new (): ObservableList<never>;
   new <T>(): ObservableList<T>;
 
-  isObservableList(value: any): value is ObservableList<any>;
+  isObservableList(value: unknown): value is ObservableList<unknown>;
 }
 
 export const ObservableList: ObservableListConstructor;

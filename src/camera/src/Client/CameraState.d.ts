@@ -1,3 +1,5 @@
+import { CameraFrame } from './Utility/CameraFrame';
+
 interface CameraState {
   CFrame: CFrame;
   Position: Vector3;
@@ -15,7 +17,7 @@ interface CameraStateConstructor {
     cameraFrame?: CameraFrame | Camera,
     cameraFrameDerivative?: CameraFrame
   ): CameraState;
-  isCameraState: (value: any) => value is CameraState;
+  isCameraState: (value: unknown) => value is CameraState;
 }
 
 export const CameraState: CameraStateConstructor;

@@ -1,3 +1,4 @@
+import { Binder } from '../../../binder';
 import { Maid } from '../../../maid';
 
 export namespace AttributeUtils {
@@ -5,23 +6,23 @@ export namespace AttributeUtils {
   function promiseAttribute<T = unknown>(
     instance: Instance,
     attributeName: string,
-    predicate?: (value: any) => boolean,
+    predicate?: (value: T) => boolean,
     cancelToken?: CancelToken
   ): Promise<T>;
   function bindToBinder(
     instance: Instance,
     attributeName: string,
-    binder: Binder
+    binder: Binder<unknown>
   ): Maid;
-  function initAttribute(
+  function initAttribute<T>(
     instance: Instance,
     attributeName: string,
-    defaultValue: any
-  ): any;
-  function getAttribute(
+    defaultValue: T
+  ): T;
+  function getAttribute<T = unknown>(
     instance: Instance,
     attributeName: string,
-    defaultValue: any
-  ): any;
+    defaultValue?: T
+  ): T;
   function removeAllAttributes(instance: Instance): void;
 }

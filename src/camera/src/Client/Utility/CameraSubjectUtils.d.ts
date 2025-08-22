@@ -1,3 +1,5 @@
 export namespace CameraSubjectUtils {
-  function getRobloxCameraSubjectCFrame(cameraSubject: Instance): CFrame?;
+  function getRobloxCameraSubjectCFrame(
+    cameraSubject: Instance
+  ): CFrame | undefined;
 }

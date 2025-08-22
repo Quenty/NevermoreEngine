@@ -31,7 +31,9 @@ interface ObservableMapListConstructor {
   new (): ObservableMapList<never, never>;
   new <TKey, TValue>(): ObservableMapList<TKey, TValue>;
 
-  isObservableMapList(value: any): value is ObservableMapList<any, any>;
+  isObservableMapList(
+    value: unknown
+  ): value is ObservableMapList<unknown, unknown>;
 }
 
 export const ObservableMapList: ObservableMapListConstructor;

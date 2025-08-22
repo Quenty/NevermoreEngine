@@ -12,7 +12,7 @@ interface SortedNodeValueConstructor {
   new (): SortedNodeValue<never>;
   new <T>(value: T, compare: CompareFunction<T>): SortedNodeValue<T>;
 
-  isSortedNodeValue(value: any): value is SortedNodeValue<any>;
+  isSortedNodeValue(value: unknown): value is SortedNodeValue<unknown>;
 }
 
 export const SortedNodeValue: SortedNodeValueConstructor;

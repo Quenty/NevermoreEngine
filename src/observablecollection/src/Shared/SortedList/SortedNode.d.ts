@@ -1,5 +1,5 @@
 type CompareFunction<T> = (a: T, b: T) => number;
-type WrappedIterator<T> = (...values: any[]) => T[];
+type WrappedIterator<T> = (...values: unknown[]) => T[];
 
 interface SortedNode<T> extends Iterable<T> {
   IterateNodes(): WrappedIterator<[number, SortedNode<T>]>;
@@ -23,7 +23,7 @@ interface SortedNodeConstructor {
   readonly ClassName: 'SortedNode';
   new <T>(data: T): SortedNode<T>;
 
-  isSortedNode(value: any): value is SortedNode<any>;
+  isSortedNode(value: unknown): value is SortedNode<unknown>;
 }
 
 export const SortedNode: SortedNodeConstructor;

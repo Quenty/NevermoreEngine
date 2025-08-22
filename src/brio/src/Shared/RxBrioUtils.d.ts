@@ -3,103 +3,82 @@ import { Observable } from '../../../rx';
 import { Brio } from './Brio';
 
 export namespace RxBrioUtils {
-  function ofBrio<T extends unknown[]>(
-    callback: ((maid: Maid) => T) | T
-  ): Observable<[Brio<T>]>;
-  function toBrio<T extends unknown[]>(): (
-    source: Observable<[Brio<T> | T]>
-  ) => Observable<[Brio<T>]>;
-  function of<T extends unknown[]>(...values: T): Observable<[Brio<T>]>;
-  function completeOnDeath<T extends unknown[]>(
+  function ofBrio<T>(callback: ((maid: Maid) => T) | T): Observable<Brio<T>>;
+  function toBrio<T>(): (
+    source: Observable<Brio<T> | T>
+  ) => Observable<Brio<T>>;
+  function of<T>(...values: T[]): Observable<Brio<T | T[]>>;
+  function completeOnDeath<T>(
     brio: Brio<unknown[]>,
     observable: Observable<T>
   ): Observable<T>;
-  function emitWhileAllDead<T extends unknown[], U extends unknown[]>(
+  function emitWhileAllDead<T, U>(
     valueToEmitWhileAllDead: T
-  ): (source: Observable<[Brio<U>]>) => Observable<[Brio<U | T>]>;
-  function reduceToAliveList<T extends unknown[], U extends unknown[]>(
+  ): (source: Observable<Brio<U>>) => Observable<Brio<U | T>>;
+  function reduceToAliveList<T, U>(
     selectFromBrio?: (value: T) => U
-  ): (source: Observable<[Brio<T>]>) => Observable<[Brio<U[]>]>;
-  function reemitLastBrioOnDeath<T extends unknown[]>(): (
-    source: Observable<[Brio<T>]>
-  ) => Observable<[Brio<T>]>;
-  function where<T extends unknown[]>(
+  ): (source: Observable<Brio<T>>) => Observable<Brio<U[]>>;
+  function reemitLastBrioOnDeath<T>(): (
+    source: Observable<Brio<T>>
+  ) => Observable<Brio<T>>;
+  function where<T>(
     predicate: (value: T) => boolean
-  ): (source: Observable<[Brio<T>]>) => Observable<[Brio<T>]>;
+  ): (source: Observable<Brio<T>>) => Observable<Brio<T>>;
   const filter: typeof where;
-  function combineLatest<T extends unknown[]>(
-    observables: Record<string, Observable<[Brio<T>]> | Observable<T> | T>
-  ): Observable<[Brio<[Record<string, T>]>]>;
-  function flatCombineLatestBrio<T extends unknown[]>(
-    observables: Record<string, Observable<[Brio<T>]> | Observable<T> | T>,
+  function combineLatest<T>(
+    observables: Record<string, Observable<Brio<T>> | Observable<T> | T>
+  ): Observable<Brio<Record<string, T>>>;
+  function flatCombineLatestBrio<T>(
+    observables: Record<string, Observable<Brio<T>> | Observable<T> | T>,
     filter?: (value: T) => boolean
-  ): Observable<[Brio<[Record<string, T>]>]>;
-  function flatMap<TBrio extends Brio<unknown[]>, TProject extends unknown[]>(
+  ): Observable<Brio<Record<string, T>>>;
+  function flatMap<TBrio extends Brio<unknown[]>, TProject>(
     project: (value: TBrio) => Observable<TProject>
-  ): (source: Observable<[TBrio]>) => Observable<TProject>;
-  function flatMapBrio<
-    TBrio extends Brio<unknown[]>,
-    TProject extends unknown[]
-  >(
-    project: (
-      value: TBrio
-    ) => Observable<TProject> | Observable<[Brio<TProject>]>
-  ): (source: Observable<[TBrio]>) => Observable<[Brio<TProject>]>;
-  function switchMap<TBrio extends Brio<unknown[]>, TProject extends unknown[]>(
+  ): (source: Observable<TBrio>) => Observable<TProject>;
+  function flatMapBrio<TBrio extends Brio<unknown[]>, TProject>(
+    project: (value: TBrio) => Observable<TProject> | Observable<Brio<TProject>>
+  ): (source: Observable<TBrio>) => Observable<Brio<TProject>>;
+  function switchMap<TBrio extends Brio<unknown[]>, TProject>(
     project: (value: TBrio) => Observable<TProject>
-  ): (source: Observable<[TBrio]>) => Observable<TProject>;
-  function switchMapBrio<
-    TBrio extends Brio<unknown[]>,
-    TProject extends unknown[]
-  >(
-    project: (
-      value: TBrio
-    ) => Observable<TProject> | Observable<[Brio<TProject>]>
-  ): (source: Observable<[TBrio]>) => Observable<[Brio<TProject>]>;
-  function flatCombineLatest<T extends unknown[]>(
-    observables: Record<string, Observable<[Brio<T>]> | Observable<T> | T>
-  ): Observable<[Record<string, T | undefined>]>;
-  function mapBrio<TBrio extends Brio<unknown[]>, TProject extends unknown[]>(
+  ): (source: Observable<TBrio>) => Observable<TProject>;
+  function switchMapBrio<TBrio extends Brio<unknown[]>, TProject>(
+    project: (value: TBrio) => Observable<TProject> | Observable<Brio<TProject>>
+  ): (source: Observable<TBrio>) => Observable<Brio<TProject>>;
+  function flatCombineLatest<T>(
+    observables: Record<string, Observable<Brio<T>> | Observable<T> | T>
+  ): Observable<Record<string, T | undefined>>;
+  function mapBrio<TBrio extends Brio<unknown[]>, TProject>(
     project: (value: TBrio) => Observable<TProject>
   ): (brio: TBrio) => Observable<TProject>;
-  function prepend<T extends unknown[]>(
-    ...values: T
-  ): <U extends unknown[]>(
-    source: Observable<[Brio<U>]>
-  ) => Observable<[Brio<U | T>]>;
-  function extend<T extends unknown[]>(
-    ...values: T
-  ): <U extends unknown[]>(
-    source: Observable<[Brio<U>]>
-  ) => Observable<[Brio<U | T>]>;
-  function map<T extends unknown[], U extends unknown[]>(
-    project: (...args: any[]) => U
-  ): (source: Observable<[Brio<T> | T]>) => Observable<[Brio<U>]>;
-  function mapBrioBrio<
-    TBrio extends Brio<unknown[]>,
-    TProject extends unknown[]
-  >(
-    project: (
-      value: TBrio
-    ) => Observable<TProject> | Observable<[Brio<TProject>]>
-  ): (brio: TBrio) => Observable<[Brio<TProject>]>;
-  function toEmitOnDeathObservable<T extends unknown[], U>(
+  function prepend<T>(
+    ...values: T[]
+  ): <U>(source: Observable<Brio<U>>) => Observable<Brio<U | T | (U & T)>>;
+  function extend<T>(
+    ...values: T[]
+  ): <U>(source: Observable<Brio<U>>) => Observable<Brio<U | T | (U & T)>>;
+  function map<T, U>(
+    project: (...args: unknown[]) => U
+  ): (source: Observable<Brio<T> | T>) => Observable<Brio<U>>;
+  function mapBrioBrio<TBrio extends Brio<unknown[]>, TProject>(
+    project: (value: TBrio) => Observable<TProject> | Observable<Brio<TProject>>
+  ): (brio: TBrio) => Observable<Brio<TProject>>;
+  function toEmitOnDeathObservable<T, U>(
     brio: Brio<T> | T,
     emitOnDeathValue: U
-  ): Observable<[T | U]>;
-  function mapBrioToEmitOnDeathObservable<T extends unknown[], U>(
+  ): Observable<T | U>;
+  function mapBrioToEmitOnDeathObservable<T, U>(
     emitOnDeathValue: U
-  ): (brio: Brio<T> | T) => Observable<[T | U]>;
-  function emitOnDeath<T extends unknown[], U>(
+  ): (brio: Brio<T> | T) => Observable<T | U>;
+  function emitOnDeath<T, U>(
     emitOnDeathValue: U
-  ): (source: Observable<[Brio<T> | T]>) => Observable<[T | U]>;
-  function flattenToValueAndNil<T extends unknown[]>(
-    source: Observable<[Brio<T> | T]>
-  ): Observable<[T | undefined]>;
-  function onlyLastBrioSurvives<T extends unknown[]>(): (
-    source: Observable<[Brio<T>]>
-  ) => Observable<[Brio<T>]>;
-  function switchToBrio<T extends unknown[]>(
-    predicate?: (...values: T) => boolean
-  ): (source: Observable<T | [Brio<T>]>) => Observable<[Brio<T>]>;
+  ): (source: Observable<Brio<T> | T>) => Observable<T | U>;
+  function flattenToValueAndNil<T>(
+    source: Observable<Brio<T> | T>
+  ): Observable<T | undefined>;
+  function onlyLastBrioSurvives<T>(): (
+    source: Observable<Brio<T>>
+  ) => Observable<Brio<T>>;
+  function switchToBrio<T>(
+    predicate?: (...values: T[]) => boolean
+  ): (source: Observable<T | Brio<T>>) => Observable<Brio<T>>;
 }
