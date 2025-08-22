@@ -2,10 +2,10 @@ import { Brio } from '../../../brio';
 import { Observable, Predicate } from '../../../rx';
 
 export namespace RxInstanceUtils {
-  function observeProperty<T extends Instance, K extends keyof InstanceProperties<T>>(
-    instance: T,
-    propertyName: K
-  ): Observable<InstanceProperties<T>[K]>;
+  function observeProperty<
+    T extends Instance,
+    K extends keyof InstanceProperties<T>
+  >(instance: T, propertyName: K): Observable<InstanceProperties<T>[K]>;
   function observeAncestry(instance: Instance): Observable<Instance>;
   function observeFirstAncestorBrio(
     instance: Instance,
@@ -16,7 +16,10 @@ export namespace RxInstanceUtils {
     instance: Instance,
     className: string
   ): Observable<Instance | undefined>;
-  function observePropertyBrio<T extends Instance, K extends keyof InstanceProperties<T>>(
+  function observePropertyBrio<
+    T extends Instance,
+    K extends keyof InstanceProperties<T>
+  >(
     instance: T,
     propertyName: K,
     predicate?: (value: InstanceProperties<T>[K]) => boolean
@@ -47,5 +50,8 @@ export namespace RxInstanceUtils {
     parent: Instance,
     predicate?: Predicate<Instance>
   ): Observable<Brio<Instance>>;
-  function observeDescendantsOfClassBrio
+  function observeDescendantsOfClassBrio(
+    parent: InstanceType,
+    className: string
+  ): Observable<Brio<Instance>>;
 }
