@@ -10,7 +10,7 @@ export namespace BrioUtils {
   ): Brio<T> | undefined;
   function flatten<K extends unknown, T extends unknown[]>(
     brioTable: Map<K, Brio<T> | T>
-  ): Brio<[Map<K, T>]>;
+  ): Brio<Map<K, T>>;
   function first<T extends unknown[], U extends unknown[]>(
     brios: Array<Brio<T>>,
     ...values: U

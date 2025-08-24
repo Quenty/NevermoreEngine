@@ -7,15 +7,15 @@ export namespace RxInstanceUtils {
     K extends keyof InstanceProperties<T>
   >(instance: T, propertyName: K): Observable<InstanceProperties<T>[K]>;
   function observeAncestry(instance: Instance): Observable<Instance>;
-  function observeFirstAncestorBrio(
+  function observeFirstAncestorBrio<T extends keyof Instances>(
     instance: Instance,
-    className: string
-  ): Observable<Brio<Instance>>;
+    className: T
+  ): Observable<Brio<Instances[T]>>;
   function observeParentBrio(instance: Instance): Observable<Brio<Instance>>;
-  function observeFirstAncestor(
+  function observeFirstAncestor<T extends keyof Instances>(
     instance: Instance,
-    className: string
-  ): Observable<Instance | undefined>;
+    className: T
+  ): Observable<Instances[T] | undefined>;
   function observePropertyBrio<
     T extends Instance,
     K extends keyof InstanceProperties<T>
@@ -24,20 +24,20 @@ export namespace RxInstanceUtils {
     propertyName: K,
     predicate?: (value: InstanceProperties<T>[K]) => boolean
   ): Observable<Brio<InstanceProperties<T>[K]>>;
-  function observeLastNamedChildBrio(
+  function observeLastNamedChildBrio<T extends keyof Instances>(
     instance: Instance,
-    className: string,
+    className: T,
     name: string
-  ): Observable<Brio<Instance>>;
-  function observeChildrenOfNameBrio(
+  ): Observable<Brio<Instances[T]>>;
+  function observeChildrenOfNameBrio<T extends keyof Instances>(
     parent: Instance,
-    className: string,
+    className: T,
     name: string
-  ): Observable<Brio<Instance>>;
-  function observeChildrenOfClassBrio(
+  ): Observable<Brio<Instances[T]>>;
+  function observeChildrenOfClassBrio<T extends keyof Instances>(
     parent: Instance,
-    className: string
-  ): Observable<Brio<Instance>>;
+    className: T
+  ): Observable<Brio<Instances[T]>>;
   function observeChildrenBrio(
     parent: Instance,
     predicate?: Predicate<Instance>
@@ -50,8 +50,8 @@ export namespace RxInstanceUtils {
     parent: Instance,
     predicate?: Predicate<Instance>
   ): Observable<Brio<Instance>>;
-  function observeDescendantsOfClassBrio(
+  function observeDescendantsOfClassBrio<T extends keyof Instances>(
     parent: InstanceType,
-    className: string
-  ): Observable<Brio<Instance>>;
+    className: T
+  ): Observable<Brio<Instances[T]>>;
 }
