@@ -1,4 +1,4 @@
-import { Maid } from '../../../maid';
+import { Maid } from '@quenty/maid';
 
 type Promise<T extends unknown[] = unknown[]> = {
   Then<R extends unknown[] = unknown[]>(

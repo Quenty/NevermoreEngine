@@ -1,6 +1,6 @@
 import { Brio } from '../../../brio';
 import { Observable, Predicate } from '../../../rx';
-import { Signal } from '../../../signal/src/Shared/Signal';
+import { Signal } from '@quenty/signal';
 import { ValueBaseType } from './ValueBaseUtils';
 
 type ValueBaseValue<T> = {

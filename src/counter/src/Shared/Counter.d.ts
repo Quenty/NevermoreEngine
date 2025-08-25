@@ -1,6 +1,6 @@
 import { BaseObject } from '../../../baseobject';
 import { Observable } from '../../../rx';
-import { Signal } from '../../../signal/src/Shared/Signal';
+import { Signal } from '@quenty/signal';
 
 interface Counter extends BaseObject {
   Changed: Signal<number>;

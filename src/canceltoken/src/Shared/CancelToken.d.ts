@@ -1,5 +1,5 @@
-import { Maid } from '../../../maid';
-import { Signal } from '../../../signal/src/Shared/Signal';
+import { Maid } from '@quenty/maid';
+import { Signal } from '@quenty/signal';
 
 type CancelToken = {
   Cancelled: Signal;

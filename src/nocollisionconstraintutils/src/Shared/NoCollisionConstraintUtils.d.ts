@@ -1,4 +1,4 @@
-import { Maid } from '../../../maid';
+import { Maid } from '@quenty/maid';
 
 export namespace NoCollisionConstraintUtils {
   function create(

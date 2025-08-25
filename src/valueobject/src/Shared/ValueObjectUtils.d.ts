@@ -1,5 +1,5 @@
 import { Brio } from '../../../brio';
-import { Maid } from '../../../maid';
+import { Maid } from '@quenty/maid';
 import { Observable } from '../../../rx';
 import { ValueObject } from './ValueObject';
 

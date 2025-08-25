@@ -1,6 +1,6 @@
 import { Observable } from './Observable';
 import { MaidTask } from '../../../maid';
-import { Signal } from '../../../signal/src/Shared/Signal';
+import { Signal } from '@quenty/signal';
 import { CancelToken } from '../../../canceltoken';
 
 export type Predicate<T> = (...args: T extends unknown[] ? T : [T]) => boolean;

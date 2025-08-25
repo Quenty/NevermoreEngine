@@ -1,6 +1,6 @@
 import { Brio } from '../../../brio';
 import { Observable } from '../../../rx';
-import { Signal } from '../../../signal/src/Shared/Signal';
+import { Signal } from '@quenty/signal';
 
 interface AttributeValue<T> {
   Value: T;

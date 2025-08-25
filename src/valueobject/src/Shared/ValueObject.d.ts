@@ -1,7 +1,7 @@
 import { Brio } from '../../../brio';
 import { MaidTask } from '../../../maid/src/Shared/Maid';
 import { Observable } from '../../../rx';
-import { Signal } from '../../../signal/src/Shared/Signal';
+import { Signal } from '@quenty/signal';
 
 type CheckType = string | ((value: unknown) => LuaTuple<[boolean, string?]>);
 

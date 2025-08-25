@@ -25,6 +25,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
     "@quenty/canceltoken": "file:../canceltoken",
     "@quenty/loader": "file:../loader",

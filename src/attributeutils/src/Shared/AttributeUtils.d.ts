@@ -1,5 +1,5 @@
-import { Binder } from '../../../binder';
-import { Maid } from '../../../maid';
+import { Binder } from '@quenty/binder';
+import { Maid } from '@quenty/maid';
 
 export namespace AttributeUtils {
   function isValidAttributeType(valueType: string): boolean;

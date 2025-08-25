@@ -1,4 +1,4 @@
-import { Maid } from '../../../maid';
+import { Maid } from '@quenty/maid';
 import { Observable } from '../../../rx';
 import { Brio } from './Brio';
 

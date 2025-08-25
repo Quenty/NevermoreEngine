@@ -27,7 +27,7 @@ interface Binder<T> {
   UnbindClient(instance: Instance): void;
   Get(instance: Instance): T | undefined;
   Promise(instance: Instance, cancelToken?: CancelToken): Promise<T>;
-  Create(className: string?): Instance;
+  Create(className?: string): Instance;
   Observe(instance: Instance): Observable<T>;
   Destroy(): void;
 }
