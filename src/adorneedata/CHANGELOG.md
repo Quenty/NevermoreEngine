@@ -1,19 +1,18 @@
-# v7.20.0 (Fri Aug 29 2025)
-
-#### 🚀 Enhancement
-
-- feat: Add datastore session locking system [#580](https://github.com/Quenty/NevermoreEngine/pull/580) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.19.2...@quenty/adorneedata@7.20.0) (2025-08-29)
+
+
+### Features
+
+* Add datastore session locking system ([#580](https://github.com/Quenty/NevermoreEngine/issues/580)) ([06ecef6](https://github.com/Quenty/NevermoreEngine/commit/06ecef60eab81ac0b44d9e408313fb4cc4d59488))
+
+
+
+
 
 ## [7.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.19.1...@quenty/adorneedata@7.19.2) (2025-08-12)
 
