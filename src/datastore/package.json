@@ -33,6 +33,7 @@
     "@quenty/math": "file:../math",
     "@quenty/pagesutils": "file:../pagesutils",
     "@quenty/promise": "file:../promise",
+    "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
