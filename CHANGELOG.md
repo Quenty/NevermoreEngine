@@ -1,3 +1,16 @@
+# (Fri Aug 29 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneedata@7.20.0`, `@quenty/datastore@13.23.0`, `@quenty/promise@10.12.0`
+  - feat: Add datastore session locking system [#580](https://github.com/Quenty/NevermoreEngine/pull/580) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Aug 12 2025)
 
 #### 🐛 Bug Fix

@@ -1,3 +1,15 @@
+# v7.20.0 (Fri Aug 29 2025)
+
+#### 🚀 Enhancement
+
+- feat: Add datastore session locking system [#580](https://github.com/Quenty/NevermoreEngine/pull/580) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
