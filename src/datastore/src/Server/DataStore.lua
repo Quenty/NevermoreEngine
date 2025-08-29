@@ -103,6 +103,7 @@ export type DataStore = typeof(setmetatable(
 		_syncOnSave: ValueObject.ValueObject<boolean>,
 		_loadedOk: ValueObject.ValueObject<boolean>,
 		_firstLoadPromise: Promise.Promise<()>,
+		_promiseSessionLockingFailed: Promise.Promise<()>,
 		Saving: Signal.Signal<Promise.Promise<()>>,
 	},
 	{} :: typeof({ __index = DataStore })
@@ -155,7 +156,7 @@ end
 
 	@param sessionLockingEnabled boolean
 ]=]
-function DataStore:SetSessionLockingEnabled(sessionLockingEnabled: boolean)
+function DataStore.SetSessionLockingEnabled(self: DataStore, sessionLockingEnabled: boolean)
 	assert(not self._firstLoadPromise, "Must set session locking before datastore is loaded")
 
 	self._sessionLockingEnabled = sessionLockingEnabled
@@ -167,7 +168,7 @@ end
 
 	@return Promise<>
 ]=]
-function DataStore:PromiseSessionLockingFailed()
+function DataStore.PromiseSessionLockingFailed(self: DataStore)
 	return self._promiseSessionLockingFailed
 end
 
@@ -361,7 +362,7 @@ function DataStore._setupAutoSaving(self: DataStore)
 	end))
 end
 
-function DataStore._syncData(self: DataStore, doMergeNewData: boolean, doCloseSession: boolean)
+function DataStore._syncData(self: DataStore, doMergeNewData: boolean, doCloseSession: boolean?)
 	if self:DidLoadFail() then
 		warn("[DataStore] - Not syncing, failed to load")
 		return Promise.rejected("Load not successful, not syncing")
@@ -395,7 +396,7 @@ function DataStore._doDataSync(
 	self: DataStore,
 	writer,
 	doMergeNewData: boolean,
-	doCloseSession: boolean
+	doCloseSession: boolean?
 ): Promise.Promise<()>
 	assert(type(doMergeNewData) == "boolean", "Bad doMergeNewData")
 
@@ -541,8 +542,10 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 							local isInvalidLock = false
 							if type(data.lock) == "number" then
 								local timeElapsed = os.time() - data.lock
+								local autoSaveSeconds = self._autoSaveTimeSeconds.Value
 								if
-									timeElapsed > (self._autoSaveTimeSeconds.Value * UNLOCK_BY_DEFAULT_TIME_MULTIPLIER)
+									autoSaveSeconds
+									and timeElapsed > (autoSaveSeconds * UNLOCK_BY_DEFAULT_TIME_MULTIPLIER)
 								then
 									isInvalidLock = true
 								end
@@ -561,7 +564,7 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 							end
 
 							-- Be sure to cleanup stuff
-							data.lock = nil
+							data.lock = nil :: number?
 						end
 
 						-- TODO: Retry
