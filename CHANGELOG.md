@@ -1,5 +1,18 @@
 # (Fri Aug 29 2025)
 
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@13.23.1`
+  - fix: Fix new player data in datastore locking system [#581](https://github.com/Quenty/NevermoreEngine/pull/581) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 29 2025)
+
 #### 🚀 Enhancement
 
 - `@quenty/adorneedata@7.20.0`, `@quenty/datastore@13.23.0`, `@quenty/promise@10.12.0`
