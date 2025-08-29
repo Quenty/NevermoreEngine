@@ -538,7 +538,7 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 							print(string.format("DataStorePromises.updateAsync(%q) -> Got ", tostring(self._key)), data)
 						end
 
-						if data.lock then
+						if type(data) == "table" and data.lock then
 							local isInvalidLock = false
 							if type(data.lock) == "number" then
 								local timeElapsed = os.time() - data.lock
@@ -569,6 +569,13 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 
 						-- TODO: Retry
 						loadPromise:Resolve(data)
+
+						if data == nil then
+							data = {}
+						elseif type(data) ~= "table" then
+							warn("[DataStore] - Data session locking is not available for non-table entries")
+							return data, userIdList, metadata
+						end
 
 						data.lock = os.time()
 
