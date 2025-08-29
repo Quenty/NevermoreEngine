@@ -1,19 +1,18 @@
-# v13.23.1 (Fri Aug 29 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix new player data in datastore locking system [#581](https://github.com/Quenty/NevermoreEngine/pull/581) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.23.0...@quenty/datastore@13.23.1) (2025-08-29)
+
+
+### Bug Fixes
+
+* Fix new player data in datastore locking system ([#581](https://github.com/Quenty/NevermoreEngine/issues/581)) ([7548141](https://github.com/Quenty/NevermoreEngine/commit/754814128ec5395f04cbb90d8c7f0e71610bb352))
+
+
+
+
 
 # [13.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.22.1...@quenty/datastore@13.23.0) (2025-08-29)
 
