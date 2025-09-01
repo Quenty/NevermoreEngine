@@ -15,7 +15,11 @@
     "removeComments": false,
     "sourceMap": true,
     "strict": true,
-    "target": "es6"
+    "target": "es6",
+    "baseUrl": ".",
+    "paths": {
+      "@quenty/*": ["src/*"]
+    }
   },
   "types": ["node"]
 }

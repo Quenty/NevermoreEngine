@@ -1,6 +1,6 @@
 export namespace DuckTypeUtils {
-  function isImplementation<T extends { new (...args: unknown[]): T }>(
+  function isImplementation<T>(
     template: unknown,
-    target: T
+    target: { new (...args: unknown[]): T }
   ): template is T;
 }

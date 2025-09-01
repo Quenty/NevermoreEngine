@@ -1,3 +1,4 @@
+import { Signal } from '@quenty/signal';
 import { Brio } from '../../../brio';
 import { CancelToken } from '../../../canceltoken';
 import { Observable } from '../../../rx';

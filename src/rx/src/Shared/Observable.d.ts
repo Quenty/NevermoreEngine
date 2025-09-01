@@ -82,7 +82,7 @@ type Observable<T = void> = {
   ): Subscription<T>;
 };
 
-type Operator<In, Out> = (source: Observable<In>) => Observable<Out>;
+export type Operator<In, Out> = (source: Observable<In>) => Observable<Out>;
 
 interface ObservableConstructor {
   readonly ClassName: 'Observable';
