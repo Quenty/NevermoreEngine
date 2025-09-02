@@ -1,10 +1,12 @@
 import { Observable } from './Observable';
-import { MaidTask } from '../../../maid';
+import { MaidTask } from '@quenty/maid';
 import { Signal } from '@quenty/signal';
-import { CancelToken } from '../../../canceltoken';
+import { CancelToken } from '@quenty/canceltoken';
+import { Promise } from '@quenty/promise';
 
-export type Predicate<T> = (...args: T extends unknown[] ? T : [T]) => boolean;
 type ToTuple<T> = T extends unknown[] ? T : [T];
+
+export type Predicate<T> = (...args: ToTuple<T>) => boolean;
 
 export namespace Rx {
   const EMPTY: Observable;

@@ -90,7 +90,7 @@ interface ObservableConstructor {
     onSubscribe: (subscription: Subscription<T>) => MaidTask
   ): Observable<T>;
 
-  isObservable: (item: unknown) => item is Observable<unknown>;
+  isObservable: (value: unknown) => value is Observable<unknown>;
 }
 
 export const Observable: ObservableConstructor;

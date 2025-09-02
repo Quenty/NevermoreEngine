@@ -1,1 +1,1 @@
-export function GetRemoteFunction<T>(name: string): RemoteFunction<T>;
+export function GetRemoteFunction(name: string): RemoteFunction;

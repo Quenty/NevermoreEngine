@@ -6,7 +6,7 @@ export namespace InputObjectRayUtils {
     camera?: Camera
   ): Ray;
   function cameraRayFromMouse(
-    mouse: MouseEvent,
+    mouse: Mouse,
     distance: number,
     offset?: Vector3 | Vector2,
     camera?: Camera
@@ -27,9 +27,5 @@ export namespace InputObjectRayUtils {
     distance?: number,
     camera?: Camera
   ): Ray;
-  function generateCircleRays(
-    ray: RsaKeyAlgorithm,
-    count: number,
-    radius: number
-  ): Ray[];
+  function generateCircleRays(ray: Ray, count: number, radius: number): Ray[];
 }

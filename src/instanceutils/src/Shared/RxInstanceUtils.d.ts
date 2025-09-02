@@ -51,7 +51,7 @@ export namespace RxInstanceUtils {
     predicate?: Predicate<Instance>
   ): Observable<Brio<Instance>>;
   function observeDescendantsOfClassBrio<T extends keyof Instances>(
-    parent: InstanceType,
+    parent: Instance,
     className: T
   ): Observable<Brio<Instances[T]>>;
 }

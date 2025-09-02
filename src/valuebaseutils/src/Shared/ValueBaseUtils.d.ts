@@ -42,9 +42,9 @@ export namespace ValueBaseUtils {
     name: string
   ): LuaTuple<
     [
-      getter: (parent: InstanceType, defaultValue?: T) => T | undefined,
-      setter: (parent: InstanceType, value?: T) => T | undefined,
-      initializer: (parent: InstanceType, defaultValue?: T) => T | undefined
+      getter: (parent: Instance, defaultValue?: T) => T | undefined,
+      setter: (parent: Instance, value?: T) => T | undefined,
+      initializer: (parent: Instance, defaultValue?: T) => T | undefined
     ]
   >;
 }

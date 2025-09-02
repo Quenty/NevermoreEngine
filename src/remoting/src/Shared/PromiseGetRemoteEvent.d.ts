@@ -1,1 +1,1 @@
-export function PromiseGetRemoteEvent<T>(name: string): Promise<RemoteEvent<T>>;
+export function PromiseGetRemoteEvent(name: string): Promise<RemoteEvent>;

@@ -17,7 +17,7 @@ type ValueTypeToDefaultValueType = {
   string: '';
   UDim: UDim;
   UDim2: UDim2;
-  userdata: userdata;
+  userdata: {};
   Vector2: Vector2;
   Vector2int16: Vector2int16;
   Vector3: Vector3;

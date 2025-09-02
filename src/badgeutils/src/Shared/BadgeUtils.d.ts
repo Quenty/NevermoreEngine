@@ -6,10 +6,7 @@ interface BadgeInfo {
 }
 
 export namespace BadgeUtils {
-  function promiseAwardBadge(
-    player: PlaybackDirection,
-    badgeId: number
-  ): Promise<void>;
+  function promiseAwardBadge(player: Player, badgeId: number): Promise<void>;
   function promiseBadgeInfo(badgeId: number): Promise<BadgeInfo>;
   function promiseUserHasBadge(
     userId: number,

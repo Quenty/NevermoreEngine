@@ -26,7 +26,10 @@ interface AdorneeValue extends BaseObject {
     center?: Vector3
   ): Vector3 | undefined;
   ObserveAttachmentParent(): Observable<BasePart | Terrain | undefined>;
-  RenderPositionAttachment(props?: { WorldPosition?: Vector3; Name?: string });
+  RenderPositionAttachment(props?: {
+    WorldPosition?: Vector3;
+    Name?: string;
+  }): Observable<Instance | undefined>;
 }
 
 interface AdorneeValueConstructor {

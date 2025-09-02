@@ -1,4 +1,5 @@
 import { Binder } from '@quenty/binder';
+import { CancelToken } from '@quenty/canceltoken';
 import { Maid } from '@quenty/maid';
 
 export namespace AttributeUtils {

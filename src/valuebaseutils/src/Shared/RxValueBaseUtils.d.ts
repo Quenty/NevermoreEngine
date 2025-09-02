@@ -2,17 +2,17 @@ import { Brio } from '../../../brio';
 import { Observable, Predicate } from '../../../rx';
 
 export namespace RxValueBaseUtils {
-  function observeBrio<T = unknown>(
-    parent: InstanceType,
-    className: string,
+  function observeBrio<C extends keyof Instances, V = unknown>(
+    parent: Instance,
+    className: C,
     name: string,
-    predicate?: Predicate<T>
-  ): Observable<Brio<T>>;
-  function observe<T = unknown>(
-    parent: InstanceType,
-    className: string,
+    predicate?: Predicate<V>
+  ): Observable<Brio<V>>;
+  function observe<C extends keyof Instances, V = unknown>(
+    parent: Instance,
+    className: C,
     name: string,
-    defaultValue?: T
-  ): Observable<T>;
+    defaultValue?: V
+  ): Observable<V>;
   function observeValue<T = unknown>(valueObject: ValueBase): Observable<T>;
 }

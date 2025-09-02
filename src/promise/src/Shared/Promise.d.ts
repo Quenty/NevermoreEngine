@@ -1,14 +1,14 @@
-import { Maid } from '@quenty/maid';
+type ToTuple<T> = T extends unknown[] ? T : [T];
 
-type Promise<T extends unknown[] = unknown[]> = {
-  Then<R extends unknown[] = unknown[]>(
-    onFulfilled: (...values: T) => Promise<R>,
+type Promise<T = void> = {
+  Then<R>(
+    onFulfilled: (...values: ToTuple<T>) => Promise<R>,
     onRejected?: (error: unknown) => void
   ): Promise<T>;
   Catch(onRejected: (error: unknown) => void): Promise<T>;
   Finally(onFinally: () => void): Promise<T>;
   Tap(
-    onFulfilled: (...values: T) => void,
+    onFulfilled: (...values: ToTuple<T>) => void,
     onRejected?: (error: unknown) => void
   ): Promise<T>;
 
@@ -17,14 +17,14 @@ type Promise<T extends unknown[] = unknown[]> = {
 
 interface PromiseConstructor {
   readonly ClassName: 'Promise';
-  new <T extends unknown[] = unknown[]>(
+  new <T>(
     func: (
-      resolve: (...values: T) => void,
+      resolve: (...values: ToTuple<T>) => void,
       reject: (error: unknown) => void
     ) => void
   ): Promise<T>;
 
-  isPromise: (value: unknown) => value is Promise<unknown[]>;
+  isPromise: (value: unknown) => value is Promise<unknown>;
 }
 
 export const Promise: PromiseConstructor;

@@ -1,8 +1,8 @@
 export namespace AccessoryTypeUtils {
   function tryGetAccessoryType(
-    avatarAssetType: Enumerator.AvatarAssetType
-  ): LuaTuple<[accessoryType?: Enum.accessoryType, err?: string]>;
-  function getAccessoryTypeFromName(accessoryType: string): Enum.accessoryType;
+    avatarAssetType: Enum.AvatarAssetType
+  ): LuaTuple<[accessoryType?: Enum.AccessoryType, err?: string]>;
+  function getAccessoryTypeFromName(accessoryType: string): Enum.AccessoryType;
   function convertAssetTypeIdToAssetType(
     assetTypeId: number
   ): Enum.AssetType | undefined;

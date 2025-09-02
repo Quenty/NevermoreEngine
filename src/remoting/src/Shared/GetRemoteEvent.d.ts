@@ -1,1 +1,1 @@
-export function GetRemoteEvent<T>(name: string): RemoteEvent<T>;
+export function GetRemoteEvent(name: string): RemoteEvent;

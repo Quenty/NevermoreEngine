@@ -2,6 +2,7 @@ import { CameraStack } from './CameraStack';
 import { CameraState } from './CameraState';
 import { CameraEffect, CameraLike } from './Effects/CameraEffectUtils';
 import { DefaultCamera } from './Effects/DefaultCamera';
+import { ImpulseCamera } from './Effects/ImpulseCamera';
 
 export interface CameraStackService {
   Init(): void;

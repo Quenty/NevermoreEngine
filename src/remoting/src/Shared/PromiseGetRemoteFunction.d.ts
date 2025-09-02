@@ -1,3 +1,1 @@
-export function PromiseGetRemoteFunction<T>(
-  name: string
-): Promise<RemoteFunction<T>>;
+export function PromiseGetRemoteFunction(name: string): Promise<RemoteFunction>;
