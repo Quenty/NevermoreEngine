@@ -1,6 +1,6 @@
 --!strict
 --[=[
-	3D convex hull computation using gift wrappling algorithm
+	3D convex hull computation using gift wrapping algorithm
 
 	https://en.wikipedia.org/wiki/Gift_wrapping_algorithm
 

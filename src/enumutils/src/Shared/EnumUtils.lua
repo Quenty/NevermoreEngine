@@ -1,5 +1,5 @@
 --[=[
-	Helds encode Roblox enums into a string
+	Helps encode Roblox enums into a string
 
 	@class EnumUtils
 ]=]

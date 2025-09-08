@@ -64,7 +64,7 @@ function BasicPane.new(gui: GuiObject?): BasicPane
 	self._visible = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	--[=[
-		Fires whenever visibility changes. FIres with isVisible, doNotAnimate, and a maid which
+		Fires whenever visibility changes. Fires with isVisible, doNotAnimate, and a maid which
 		has the lifetime of the visibility.
 
 		:::info

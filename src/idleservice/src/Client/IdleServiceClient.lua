@@ -121,7 +121,7 @@ function IdleServiceClient:IsMoving(): boolean
 end
 
 --[=[
-	observes if the humanoid is idle.
+	Observes if the humanoid is idle.
 	@return Observable<boolean>
 ]=]
 function IdleServiceClient:ObserveHumanoidIdle()
@@ -137,7 +137,7 @@ function IdleServiceClient:DoShowIdleUI()
 end
 
 --[=[
-	Observes whether to show the the idle UI
+	Observes whether to show the idle UI
 	@return Observable<boolean>
 ]=]
 function IdleServiceClient:ObserveShowIdleUI()

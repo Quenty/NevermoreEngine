@@ -27,7 +27,7 @@ function Tuple.new<T...>(...: T...): Tuple<T...>
 end
 
 --[=[
-	Returns true of the value is a tuple
+	Returns true if the value is a tuple
 
 	@param value any
 	@return boolean

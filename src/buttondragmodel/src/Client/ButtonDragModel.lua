@@ -39,7 +39,7 @@ export type ButtonDragModel = typeof(setmetatable(
 )) & BaseObject.BaseObject
 
 --[=[
-	Construst a new drag model for the button
+	Constructs a new drag model for the button
 
 	@param initialButton GuiButton? -- Optional
 	@return ButtonDragModel

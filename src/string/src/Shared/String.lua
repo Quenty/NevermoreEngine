@@ -71,7 +71,7 @@ function String.toPrivateCase(str: string): string
 end
 
 --[=[
-	Like trim, but only applied to the beginning of the setring
+	Like trim, but only applied to the beginning of the string
 	@param str string
 	@param pattern string? -- Defaults to whitespace
 	@return string

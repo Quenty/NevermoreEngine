@@ -231,7 +231,7 @@ function DataStore.DidLoadFail(self: DataStore): boolean
 end
 
 --[=[
-	Returns whether the datastore has loaded successfully.\
+	Returns whether the datastore has loaded successfully.
 
 	@return Promise<boolean>
 ]=]

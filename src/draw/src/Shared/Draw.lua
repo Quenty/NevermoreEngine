@@ -121,7 +121,7 @@ end
 	@param origin Vector3
 	@param radius number
 	@param direction Vector3
-	@param color Color3?:
+	@param color Color3?
 	@param parent Instance?
 ]=]
 function Draw.spherecast(
@@ -435,7 +435,7 @@ end
 	Draw.text(Vector3.new(0, 10, 0), "Point")
 	```
 
-	@param adornee Instance | Vector3 -- Adornee to rener on
+	@param adornee Instance | Vector3 -- Adornee to render on
 	@param text string -- Text to render
 	@param color Color3? -- Optional color to render
 	@return Instance

@@ -514,7 +514,7 @@ function DataStoreStage.PromiseViewUpToDate(self: DataStoreStage)
 end
 
 --[=[
-	Ovewrites the full stage with the data specified.
+	Overwrites the full stage with the data specified.
 
 	:::tip
 	Use this method carefully as it can lead to data loss in ways that a specific :Store() call
@@ -619,7 +619,7 @@ function DataStoreStage.StoreOnValueChange(self: DataStoreStage, name: DataStore
 end
 
 --[=[
-	If these is data not yet written then this will return true
+	If there is data not yet written then this will return true
 
 	@return boolean
 ]=]

@@ -134,7 +134,7 @@ function SpringObject:ObserveRenderStepped()
 end
 
 --[=[
-	Alias for [ObserveRenderStepped]
+	Alias for [SpringObject:ObserveRenderStepped]
 
 	@return Observable<T>
 ]=]
@@ -176,7 +176,7 @@ function SpringObject:ObserveVelocityOnRenderStepped()
 end
 
 --[=[
-	Promises that the spring is done, based upon the animating property
+	Promises that the spring is done, based upon the animating property.
 	Relatively expensive.
 
 	@param signal RBXScriptSignal | nil

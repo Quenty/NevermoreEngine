@@ -695,7 +695,7 @@ end
 	}):Subscribe(print) --> Hello
 	```
 
-	If empty (or failed) the the sub will fire with the value before it completes.
+	If empty (or failed) then the sub will fire with the value before it completes.
 
 	@param value any
 	@return (source: Observable) -> Observable
