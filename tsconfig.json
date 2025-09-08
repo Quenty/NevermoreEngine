@@ -15,6 +15,10 @@
     "removeComments": false,
     "sourceMap": true,
     "strict": true,
+    "typeRoots": [
+      "node_modules/@rbxts",
+      "node_modules/@quenty"
+    ],
     "target": "es6",
     "baseUrl": ".",
     "paths": {

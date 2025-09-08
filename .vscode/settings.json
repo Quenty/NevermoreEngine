@@ -1,7 +1,7 @@
 {
   "files.exclude": {
     "*.sublime-workspace": true,
-    "**/node_modules/**": true,
+    // "**/node_modules/**": true,
     "roblox.toml": true
   },
   "luau-lsp.ignoreGlobs": ["**/node_modules/**"],
