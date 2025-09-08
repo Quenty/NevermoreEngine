@@ -437,7 +437,7 @@ function SpringObject:_applyDamper(unconverted: number)
 end
 
 --[=[
-	Sets the damper for the spring
+	Sets the speed for the spring
 
 	@param speed number | Observable<number>
 ]=]

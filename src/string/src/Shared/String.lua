@@ -173,7 +173,7 @@ function String.endsWith(str: string, postfix: string): boolean
 end
 
 --[=[
-	Returns if a string starts with a postfix
+	Returns if a string starts with a prefix
 
 	@param str string
 	@param prefix string

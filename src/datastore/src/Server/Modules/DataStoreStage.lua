@@ -494,10 +494,10 @@ function DataStoreStage.MarkDataAsSaved(self: DataStoreStage, parentWriter: Data
 end
 
 --[=[
-	Helper method that when invokes ensures the data view.
+	Helper method that promises the latest data view.
 
 	:::tip
-	This is a helper method. You probably want [DataStore.LoadAll] instead.
+	This is a helper method. You probably want [DataStoreStage.LoadAll] instead.
 	:::
 
 	@return Promise

@@ -87,7 +87,7 @@ end
 
 	@param origin Vector3
 	@param direction Vector3
-	@param color Color3 -- Optional
+	@param color Color3? -- Optional
 	@param parent Instance? -- Optional
 	@param diameter number? -- Optional
 	@return Instance
@@ -155,8 +155,8 @@ end
 	@param cframe CFrame
 	@param size Vector3
 	@param direction Vector3
-	@param color Color3
-	@param parent Parent
+	@param color Color3?
+	@param parent Instance?
 ]=]
 function Draw.blockcast(
 	cframe: CFrameLike,

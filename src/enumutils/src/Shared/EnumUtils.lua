@@ -99,7 +99,7 @@ end
 --[=[
 	Returns true if the value is an encoded enum
 
-	@param value any? -- String to decode
+	@param value any
 	@return boolean
 ]=]
 function EnumUtils.isEncodedEnum(value: any): boolean

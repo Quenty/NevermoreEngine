@@ -1674,9 +1674,9 @@ function Rx.take<T...>(number: number): Observable.Transformer<T..., T...>
 end
 
 --[=[
-	Takes n entries and then completes the observation.
+	Skips n entries and then completes the observation.
 
-	https://rxjs.dev/api/operators/take
+	https://rxjs.dev/api/operators/skip
 	@param toSkip number
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
