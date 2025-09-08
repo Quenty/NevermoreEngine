@@ -6,6 +6,7 @@
 	* Automatic saving every 5 minutes
 	* Jitter (doesn't save all at the same time)
 	* De-duplication (only updates data it needs)
+	* Session locking (prevents concurrent access)
 	* Battle tested across multiple top games.
 
 	```lua
