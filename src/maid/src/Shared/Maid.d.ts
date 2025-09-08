@@ -14,7 +14,7 @@ type Maid = {
   GiveTask(task: MaidTask): number;
   DoCleaning(): void;
   Destroy(): void;
-};
+} & Map<unknown, MaidTask | undefined>;
 
 interface MaidConstructor {
   readonly ClassName: 'Maid';

@@ -13,7 +13,7 @@ interface StateStack<T> extends BaseObject {
 
 interface StateStackConstructor {
   readonly ClassName: 'StateStack';
-  new (): StateStack<unknown>;
+  new <T>(): StateStack<T>;
   new <T>(defaultValue: T, checkType?: string): StateStack<T>;
 }
 

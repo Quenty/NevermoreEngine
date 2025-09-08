@@ -1,4 +1,3 @@
-import { DuckTypeUtils } from '@quenty/ducktype';
 import { Brio } from '@quenty/brio';
 import { Observable } from '@quenty/rx';
 
@@ -17,7 +16,7 @@ interface BasicPaneConstructor {
   readonly ClassName: 'BasicPane';
   new (gui?: GuiObject): BasicPane;
 
-  isBasicPane: typeof DuckTypeUtils.isImplementation<BasicPane>;
+  isBasicPane: (value: unknown) => value is BasicPane;
 }
 
 export const BasicPane: BasicPaneConstructor;

@@ -1,4 +1,3 @@
-import { DuckTypeUtils } from '@quenty/ducktype';
 import { BasicPane } from '@quenty/basicpane';
 import { Observable } from '@quenty/rx';
 import { Maid } from '@quenty/maid';
@@ -24,7 +23,7 @@ interface TransitionModelConstructor {
   readonly ClassName: 'TransitionModel';
   new (): TransitionModel;
 
-  isTransitionModel: typeof DuckTypeUtils.isImplementation<TransitionModel>;
+  isTransitionModel: (value: unknown) => value is TransitionModel;
 }
 
 export const TransitionModel: TransitionModelConstructor;
