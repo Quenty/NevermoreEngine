@@ -45,7 +45,7 @@ These are very similiar to libraries but they tend to export an object, and some
 * [Queue](/api/Queue)
 
 ### Integration services
-There services are primary about providing a contract between two services.
+These services are primarily about providing a contract between two services.
 
 * [GameConfigService](/api/GameConfigService)
 * [CameraStackService](/api/CameraStackService)
