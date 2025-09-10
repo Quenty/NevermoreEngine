@@ -1,5 +1,9 @@
 type ToTuple<T> = T extends unknown[] ? T : [T];
 
+export type SignalLike<T = void> =
+  | Signal<T>
+  | RBXScriptSignal<(...args: ToTuple<T>) => void>;
+
 interface Signal<T = void> {
   Fire(...args: ToTuple<T>): void;
   Connect(callback: (...args: ToTuple<T>) => void): RBXScriptConnection;
