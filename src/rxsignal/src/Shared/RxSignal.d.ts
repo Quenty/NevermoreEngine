@@ -8,9 +8,9 @@ interface RxSignal<T = void> {
   Once(callback: (...args: ToTuple<T>) => void): Subscription<T>;
 }
 
-interface BrioConstructor {
-  readonly ClassName: 'Brio';
+interface RxSignalConstructor {
+  readonly ClassName: 'RxSignal';
   new <T>(observable: Observable<T> | (() => Observable<T>)): RxSignal<T>;
 }
 
-export const Brio: BrioConstructor;
+export const RxSignal: RxSignalConstructor;

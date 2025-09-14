@@ -14,7 +14,7 @@ interface GuiTriangleConstructor {
   readonly ClassName: 'GuiTriangle';
   new (parent?: Instance): GuiTriangle;
 
-  readonly ExtraPixels: 2;
+  ExtraPixels: 2;
 }
 
 export const GuiTriangle: GuiTriangleConstructor;

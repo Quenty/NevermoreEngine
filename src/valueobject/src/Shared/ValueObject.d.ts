@@ -3,7 +3,11 @@ import { MaidTask } from '../../../maid/src/Shared/Maid';
 import { Observable } from '../../../rx';
 import { Signal } from '@quenty/signal';
 
-type CheckType = string | ((value: unknown) => LuaTuple<[boolean, string?]>);
+type CheckType =
+  | keyof CheckableTypes
+  | ((value: unknown) => LuaTuple<[boolean, string?]>);
+
+export type Mountable<T> = T | Observable<T> | ValueBase | ValueObject<T>;
 
 interface ValueObject<T> {
   Value: T;

@@ -1,8 +1,6 @@
-interface SoundOptions {
-  SoundId: number | string;
-}
+import { TemplateProvider } from '@quenty/templateprovider';
 
-type SoundIdLike = string | number | SoundOptions;
+type SoundIdLike = string | number | Partial<WritableInstanceProperties<Sound>>;
 
 export namespace SoundUtils {
   function playFromId(id: SoundIdLike): Sound;

@@ -4,7 +4,7 @@ import { Signal } from '@quenty/signal';
 
 interface AttributeValue<T> {
   Value: T;
-  Changed: Signal<T>;
+  Changed: Signal;
   Observe(): Observable<T>;
   ObserveBrio(condition?: (value: T) => boolean): Observable<Brio<T>>;
   Destroy(): void;

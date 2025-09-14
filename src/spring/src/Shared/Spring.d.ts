@@ -1,3 +1,5 @@
+export type SpringClock = () => number;
+
 type Spring<T> = {
   Value: T;
   Velocity: T;
@@ -13,7 +15,8 @@ type Spring<T> = {
 interface SpringConstructor {
   readonly ClassName: 'Spring';
   new (): Spring<number>;
-  new <T>(value: T, springClock?: () => number): Spring<T>;
+  new <T>(value: T, springClock?: export type SpringClock = () => number;
+): Spring<T>;
 }
 
 export const Spring: SpringConstructor;
