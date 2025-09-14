@@ -1,11 +1,11 @@
 interface GuiTriangle {
   SetParent(parent?: Instance): void;
   Show(): void;
-  Set(a: Vector2, b: Vector2, c: Vector2): GuiTriangle;
+  Set(a: Vector2, b: Vector2, c: Vector2): this;
   Hide(): void;
-  SetA(a: Vector2): GuiTriangle;
-  SetB(b: Vector2): GuiTriangle;
-  SetC(c: Vector2): GuiTriangle;
+  SetA(a: Vector2): this;
+  SetB(b: Vector2): this;
+  SetC(c: Vector2): this;
   UpdateRender(): void;
   Destroy(): void;
 }

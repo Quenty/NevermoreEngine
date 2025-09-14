@@ -14,6 +14,33 @@ interface LayeredLoopedSoundPlayer extends SpringTransitionModel<number> {
     soundId: SoundIdLike | undefined,
     scheduleOptions?: SoundLoopSchedule
   ): void;
+  SwapOnLoop(
+    layerId: string,
+    soundId: SoundIdLike | undefined,
+    scheduleOptions?: SoundLoopSchedule
+  ): void;
+  SwapToSamples(
+    layerId: string,
+    soundId: SoundIdLike | undefined,
+    scheduleOptions?: SoundLoopSchedule
+  ): void;
+  SwapToChoice(
+    layerId: string,
+    soundIdList: SoundIdLike[],
+    scheduleOptions?: SoundLoopSchedule
+  ): void;
+  PlayOnce(
+    layerId: string,
+    soundIdList: SoundIdLike[],
+    scheduleOptions?: SoundLoopSchedule
+  ): void;
+  PlayOnceOnLoop(
+    layerId: string,
+    soundId: SoundIdLike | undefined,
+    scheduleOptions?: SoundLoopSchedule
+  ): void;
+  StopLayer(layerId: string): void;
+  StopAll(): void;
 }
 
 interface LayeredLoopedSoundPlayerConstructor {
