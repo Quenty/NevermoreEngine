@@ -591,6 +591,7 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	do
 		local descendantCount = self._root and self._root.descendantCount or 0
 		for index, node in self:_iterateNodesRange(lowestIndexChanged) do
+			-- TODO: Handle when there are no nodes to iterate, we still need to fire negative indexes
 			-- TODO: Handle negative observations to avoid refiring upon insertion
 			-- TODO: Handle our state changing while we're firing
 			-- TODO: Avoid looping over nodes if we don't need to (track observations in node itself?)
