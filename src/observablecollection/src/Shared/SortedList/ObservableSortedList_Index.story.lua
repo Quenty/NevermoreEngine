@@ -11,7 +11,6 @@ local ObservableSortedList = require("ObservableSortedList")
 return function(_target)
 	local maid = Maid.new()
 
-
 	local observableSortedList = maid:Add(ObservableSortedList.new())
 
 	maid:GiveTask(observableSortedList:ObserveAtIndex(-1):Subscribe(function(entry)
