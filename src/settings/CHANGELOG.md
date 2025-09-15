@@ -1,19 +1,18 @@
-# v11.27.2 (Mon Sep 15 2025)
-
-#### 🐛 Bug Fix
-
-- fix: A few more cleanups [#585](https://github.com/Quenty/NevermoreEngine/pull/585) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.27.1...@quenty/settings@11.27.2) (2025-09-15)
+
+
+### Bug Fixes
+
+* A few more cleanups ([#585](https://github.com/Quenty/NevermoreEngine/issues/585)) ([21fbb0d](https://github.com/Quenty/NevermoreEngine/commit/21fbb0d422ee0339366710ca682c8d4425368d52))
+
+
+
+
 
 ## [11.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.27.0...@quenty/settings@11.27.1) (2025-08-29)
 
