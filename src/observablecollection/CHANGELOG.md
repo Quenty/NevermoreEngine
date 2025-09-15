@@ -1,3 +1,15 @@
+# v12.22.1 (Mon Sep 15 2025)
+
+#### 🐛 Bug Fix
+
+- fix: A few more cleanups [#585](https://github.com/Quenty/NevermoreEngine/pull/585) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
