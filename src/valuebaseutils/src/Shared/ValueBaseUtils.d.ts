@@ -1,44 +1,45 @@
-export type ValueBaseType =
-  | 'BoolValue'
-  | 'NumberValue'
-  | 'IntValue'
-  | 'StringValue'
-  | 'BrickColorValue'
-  | 'CFrameValue'
-  | 'Color3Value'
-  | 'ObjectValue'
-  | 'RayValue'
-  | 'Vector3Value';
+type InstancesInheritingValueBase = {
+  [K in keyof Instances]: Instances[K] extends ValueBase
+    ? K extends 'ValueBase'
+      ? never
+      : K
+    : never;
+};
+
+type ValueBaseType =
+  InstancesInheritingValueBase[keyof InstancesInheritingValueBase];
 
 export namespace ValueBaseUtils {
   function isValueBase(instance: Instance): instance is ValueBase;
-  function getValueBaseType(valueBaseClassName: string): string | undefined;
-  function getClassNameFromType(luaType: string): string | undefined;
+  function getValueBaseType(
+    valueBaseClassName: ValueBaseType
+  ): string | undefined;
+  function getClassNameFromType(luaType: string): ValueBaseType | undefined;
   function getOrCreateValue(
     parent: Instance,
-    instanceType: string,
+    instanceType: ValueBaseType,
     name: string,
     defaultValue?: unknown
   ): Instance;
   function setValue(
     parent: Instance,
-    instanceType: string,
+    instanceType: ValueBaseType,
     name: string,
     value: unknown
   ): void;
   function getValue<T = unknown>(
     parent: Instance,
-    instanceType: string,
+    instanceType: ValueBaseType,
     name: string
   ): T | undefined;
   function getValue<T>(
     parent: Instance,
-    instanceType: string,
+    instanceType: ValueBaseType,
     name: string,
     defaultValue: T
   ): T;
   function createGetSet<T = unknown>(
-    instanceType: string,
+    instanceType: ValueBaseType,
     name: string
   ): LuaTuple<
     [
