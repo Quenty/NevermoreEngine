@@ -1,5 +1,18 @@
 # (Tue Sep 16 2025)
 
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.20.1`
+  - feat: Fix animation stopping playback [#587](https://github.com/Quenty/NevermoreEngine/pull/587) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Sep 16 2025)
+
 #### 🚀 Enhancement
 
 - `@quenty/particles@5.11.0`
