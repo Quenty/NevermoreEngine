@@ -38,23 +38,44 @@ function ParticleEmitterUtils.playFromTemplate(template: Instance, attachment: A
 		newEmitter.Parent = attachment
 		maid:GiveTask(newEmitter)
 
-		local emitDelay = newEmitter:GetAttribute("EmitDelay")
-		local unparsedEmitCount = newEmitter:GetAttribute("EmitCount")
-		local emitCount: number?
-		if type(unparsedEmitCount) ~= "number" then
-			emitCount = nil
-		end
-
-		if type(emitDelay) == "number" then
-			maid:GiveTask(task.delay(emitDelay, function()
-				newEmitter:Emit(emitCount)
-			end))
-		else
-			newEmitter:Emit(emitCount)
-		end
+		maid:GiveTask(ParticleEmitterUtils.playEmitter(newEmitter))
 	end
 
 	return maid
+end
+
+function ParticleEmitterUtils.playAllEmitters(adornee: Instance): Maid.Maid
+	local maid = Maid.new()
+
+	for _, emitter in ParticleEmitterUtils.getParticleEmitters(adornee) do
+		maid:GiveTask(ParticleEmitterUtils.playEmitter(emitter))
+	end
+
+	return maid
+end
+
+function ParticleEmitterUtils.playEmitter(emitter: ParticleEmitter): () -> ()
+	local emitDelay = emitter:GetAttribute("EmitDelay")
+	local unparsedEmitCount = emitter:GetAttribute("EmitCount")
+	local emitCount: number?
+	if type(unparsedEmitCount) == "number" then
+		emitCount = unparsedEmitCount
+	else
+		emitCount = nil
+	end
+
+	if type(emitDelay) == "number" then
+		local delayedEmitTask = task.delay(emitDelay, function()
+			emitter:Emit(emitCount)
+		end)
+		return function()
+			task.cancel(delayedEmitTask)
+		end
+	else
+		emitter:Emit(emitCount)
+
+		return function() end
+	end
 end
 
 --[=[
