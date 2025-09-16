@@ -1,19 +1,18 @@
-# v8.20.1 (Tue Sep 16 2025)
-
-#### 🐛 Bug Fix
-
-- feat: Fix animation stopping playback [#587](https://github.com/Quenty/NevermoreEngine/pull/587) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.20.0...@quenty/animations@8.20.1) (2025-09-16)
+
+
+### Bug Fixes
+
+* Fix animation stopping at 0 frames ([#587](https://github.com/Quenty/NevermoreEngine/issues/587)) ([f97ce5b](https://github.com/Quenty/NevermoreEngine/commit/f97ce5b0a14d69d92fa4eb6120dbfa28ec5d7b62))
+
+
+
+
 
 # [8.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.19.1...@quenty/animations@8.20.0) (2025-08-29)
 
