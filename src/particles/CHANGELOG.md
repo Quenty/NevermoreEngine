@@ -1,3 +1,15 @@
+# v5.11.0 (Tue Sep 16 2025)
+
+#### 🚀 Enhancement
+
+- feat: Add more particle playback stuff, and fix emit count [#586](https://github.com/Quenty/NevermoreEngine/pull/586) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
