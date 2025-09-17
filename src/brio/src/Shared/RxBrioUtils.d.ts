@@ -25,9 +25,22 @@ export namespace RxBrioUtils {
     predicate: (value: T) => boolean
   ): (source: Observable<Brio<T>>) => Observable<Brio<T>>;
   const filter: typeof where;
-  function combineLatest<T>(
-    observables: Record<string, Observable<Brio<T>> | Observable<T> | T>
-  ): Observable<Brio<Record<string, T>>>;
+  function combineLatest<
+    T extends Record<
+      string | number | symbol,
+      Observable<Brio<unknown>> | Observable<unknown> | unknown
+    >
+  >(
+    observables: T
+  ): Observable<
+    Brio<{
+      [K in keyof T]: T[K] extends Observable<Brio<infer V>>
+        ? V
+        : T[K] extends Observable<infer V>
+        ? V
+        : T[K];
+    }>
+  >;
   function flatCombineLatestBrio<T>(
     observables: Record<string, Observable<Brio<T>> | Observable<T> | T>,
     filter?: (value: T) => boolean
