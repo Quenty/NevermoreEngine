@@ -39,7 +39,11 @@ function PlayerHasSettings.new(player: Player, serviceBag)
 end
 
 function PlayerHasSettings:_promiseLoadSettings()
-	self._settings = self._maid:Add(PlayerSettingsUtils.create())
+	self._settings = PlayerSettingsUtils.create()
+	self._maid:GiveTask(function()
+		self._settings:Destroy()
+		self._settings = nil
+	end)
 
 	self._maid
 		:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj))
@@ -64,8 +68,10 @@ function PlayerHasSettings:_promiseLoadSettings()
 			warn(string.format("[PlayerHasSettings] - Failed to load settings for player. %s", tostring(err)))
 		end)
 		:Finally(function()
-			-- Parent anyway...
-			self._settings.Parent = self._obj
+			if self._settings then
+				-- Parent anyway...
+				self._settings.Parent = self._obj
+			end
 		end)
 end
 

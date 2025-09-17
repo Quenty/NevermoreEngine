@@ -8,6 +8,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local AnimationPromiseUtils = require("AnimationPromiseUtils")
 local AnimationUtils = require("AnimationUtils")
 local BaseObject = require("BaseObject")
 local EnumUtils = require("EnumUtils")
@@ -285,6 +286,16 @@ function AnimationSlotPlayer.Play(
 						self._currentAnimationTrackData.Value = nil
 					end
 				end)
+
+				if not track.Looped then
+					-- This is a hack to ensure that animations stop at a set rate instead of roblox's weird default faded time
+					maid:GivePromise(AnimationPromiseUtils.promiseLoaded(track)):Then(function()
+						-- This is very very sad...
+						maid:GiveTask(task.delay(track.Length - track.TimePosition - 2 / 60, function()
+							track:Stop(fadeTime or self._defaultFadeTime.Value)
+						end))
+					end)
+				end
 
 				maid:GiveTask(function()
 					local stopFadeTime = fadeTime or self._defaultFadeTime.Value

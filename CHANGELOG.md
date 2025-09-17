@@ -1,3 +1,42 @@
+# (Tue Sep 16 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.20.1`
+  - feat: Fix animation stopping playback [#587](https://github.com/Quenty/NevermoreEngine/pull/587) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Sep 16 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/particles@5.11.0`
+  - feat: Add more particle playback stuff, and fix emit count [#586](https://github.com/Quenty/NevermoreEngine/pull/586) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Sep 15 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/humanoidmovedirectionutils@10.9.1`, `@quenty/observablecollection@12.22.1`, `@quenty/settings@11.27.2`
+  - fix: A few more cleanups [#585](https://github.com/Quenty/NevermoreEngine/pull/585) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Aug 29 2025)
 
 #### 🐛 Bug Fix
