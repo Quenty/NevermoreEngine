@@ -14,7 +14,7 @@ export namespace Rx {
 
   function pipe<T, U>(transformers: Array<Operator<T, U>>): Operator<T, U>;
 
-  function of<T>(...args: ToTuple<T>): Observable<T>;
+  function of<T extends unknown[]>(...args: T): Observable<T[number]>;
   function failed<T>(...args: ToTuple<T>): Observable<T>;
   function from<T>(item: Promise<T> | T[]): Observable<T>;
   function toPromise<T>(
@@ -78,12 +78,14 @@ export namespace Rx {
   function catchError<T, E, R>(
     callback: (error: E) => Observable<R>
   ): Operator<T, T | R>;
-  function combineLatest<K extends string | number | symbol, V>(
-    observables: Record<K, Observable<V> | V>
-  ): Observable<Record<K, V>>;
-  function combineLatestDefer<K extends string | number | symbol, V>(
-    observables: Record<K, Observable<V> | V>
-  ): Observable<Record<K, V>>;
+  function combineLatest<
+    T extends Record<string | number | symbol, Observable<unknown> | unknown>
+  >(
+    observables: T
+  ): Observable<{
+    [K in keyof T]: T[K] extends Observable<infer V> ? V : T[K];
+  }>;
+  const combineLatestDefer: typeof combineLatest;
   function defer<T>(observableFactory: () => Observable<T>): Observable<T>;
   function delay<T>(seconds: number): Operator<T, T>;
   function delayed(seconds: number): Observable;
