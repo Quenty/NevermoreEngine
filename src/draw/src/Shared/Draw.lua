@@ -299,7 +299,7 @@ end
 
 	@param origin Vector3
 	@param direction Vector3
-	@param color Color3 -- Optional
+	@param color Color3? -- Optional
 	@param parent Instance? -- Optional
 	@param diameter number? -- Optional
 	@return Instance

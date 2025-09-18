@@ -86,7 +86,7 @@ function FakeSkybox:SetPartSize(partSize)
 end
 
 --[=[
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function FakeSkybox:Show(doNotAnimate: boolean?)
 	if self._visible then
@@ -103,7 +103,7 @@ function FakeSkybox:Show(doNotAnimate: boolean?)
 end
 
 --[=[
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function FakeSkybox:Hide(doNotAnimate: boolean?)
 	if not self._visible then
