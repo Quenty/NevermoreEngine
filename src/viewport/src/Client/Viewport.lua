@@ -134,7 +134,7 @@ function Viewport.SetControlsEnabled(self: Viewport, enabled: boolean)
 end
 
 --[=[
-	Sets the field of view on the viewport.
+	Sets the transparency on the viewport.
 
 	@param transparency number
 ]=]
