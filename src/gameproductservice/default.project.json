@@ -1,5 +1,5 @@
 {
-  "name": "gamepassservice",
+  "name": "gameproductservice",
   "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
