@@ -135,7 +135,6 @@ end
 	the camera is pointed at.
 
 	```lua
-
 	serviceBag:GetService(require("IKServiceClient")):SetLookAround(false)
 	```
 

@@ -74,7 +74,7 @@ function CameraStack.PrintCameraStack(self: CameraStack): ()
 end
 
 --[=[
-	Gets the camera current on the top of the stack
+	Gets the camera currently on the top of the stack
 	@return CameraEffect
 ]=]
 function CameraStack.GetTopCamera(self: CameraStack): CameraEffectUtils.CameraLike

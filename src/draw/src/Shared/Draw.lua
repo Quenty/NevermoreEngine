@@ -67,7 +67,7 @@ end
 	@param finish Vector3
 	@param color Color3? -- Optional
 	@param parent Instance? -- Optional
-	@param diameter numbe? -- Optional
+	@param diameter number? -- Optional
 	@return Instance
 ]=]
 function Draw.line(start: Vector3, finish: Vector3, color: Color3Like?, parent: Instance?, diameter: number?): BasePart

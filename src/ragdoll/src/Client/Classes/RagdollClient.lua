@@ -6,7 +6,7 @@
 	Initialize this whole system through [RagdollServiceClient].
 	:::
 
-	```
+	```lua
 	serviceBag:GetService(require("RagdollClient"))
 	```
 

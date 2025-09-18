@@ -129,7 +129,7 @@ end
 --[=[
 	Returns the scale position on the Gui from 0 to 1
 
-	This is reletive to the GUI, so top left is 0, 0
+	This is relative to the GUI, so top left is 0, 0
 
 	@return Vector2?
 ]=]
@@ -140,7 +140,7 @@ end
 --[=[
 	Observes the scale position on the Gui from 0 to 1
 
-	This is reletive to the GUI, so top left is 0, 0
+	This is relative to the GUI, so top left is 0, 0
 
 	@return Observable<Vector2?>
 ]=]

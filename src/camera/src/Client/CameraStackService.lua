@@ -1,6 +1,6 @@
 --[=[
 	Holds camera states and allows for the last camera state to be retrieved. Also
-	initializes an impulse and default camera as the bottom of the stack. Is a singleton.
+	initializes an impulse and default camera at the bottom of the stack. Is a singleton.
 
 	@class CameraStackService
 ]=]
@@ -172,7 +172,7 @@ function CameraStackService.GetRawDefaultCamera(self: CameraStackService): Defau
 end
 
 --[=[
-	Gets the camera current on the top of the stack
+	Gets the camera currently on the top of the stack
 	@return CameraEffect
 ]=]
 function CameraStackService.GetTopCamera(self: CameraStackService): CameraEffectUtils.CameraLike
