@@ -156,6 +156,10 @@ function CameraStateTweener.GetCameraBelow(self: CameraStateTweener): CameraEffe
 	return self._cameraBelow
 end
 
+--[=[
+	Sets the epsilon to stop animating
+	@param epsilon number?
+]=]
 function CameraStateTweener:SetEpsilon(epsilon: number?)
 	self._fadeBetween.Epsilon = epsilon
 end
