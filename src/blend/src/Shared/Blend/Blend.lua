@@ -48,7 +48,7 @@ export type BlendProps = { [any]: any }
 	```
 
 	@param className string
-	@return (props: { [string]: any; }) -> Observable<Instance>
+	@return (props: { [string]: any }) -> Observable<Instance>
 ]=]
 function Blend.New(className: string): (props: BlendProps) -> Observable.Observable<Instance>
 	assert(type(className) == "string", "Bad className")
@@ -286,7 +286,7 @@ function Blend.Attached(constructor)
 end
 
 --[=[
-	Similiar to Fusion's ComputedPairs, where the changes are cached, and the lifetime limited.
+	Similar to Fusion's ComputedPairs, where the changes are cached, and the lifetime limited.
 	@param source Observable<T> | any
 	@param compute (key: any, value: any, innerMaid: Maid) -> Instance | Observable<Instance>
 	@return Observable<Brio<Instance>>

@@ -35,7 +35,7 @@ Library packages tend to be packages that export one or multiple libraries. Thes
 * [Elo](/api/EloUtils)
 
 ### Object utility libraries
-These are very similiar to libraries but they tend to export an object, and some supporting objects. These objects are concepts that are useful to learn, and generally exist outside of Roblox (although they may not). These are fundamental building blocks and patterns in Roblox.
+These are very similar to libraries but they tend to export an object, and some supporting objects. These objects are concepts that are useful to learn, and generally exist outside of Roblox (although they may not). These are fundamental building blocks and patterns in Roblox.
 
 * [Octree](/api/Octree)
 * [Maid](/api/Maid)
