@@ -92,6 +92,6 @@ export namespace RxBrioUtils {
     source: Observable<Brio<T>>
   ) => Observable<Brio<T>>;
   function switchToBrio<T>(
-    predicate?: (...values: T[]) => boolean
+    predicate?: (value: T) => boolean
   ): (source: Observable<T | Brio<T>>) => Observable<Brio<T>>;
 }

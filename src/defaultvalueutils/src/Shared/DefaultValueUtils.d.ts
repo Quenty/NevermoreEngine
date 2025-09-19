@@ -1,4 +1,4 @@
-type ValueTypeToDefaultValueType = {
+export type ValueTypeToDefaultValueType = {
   boolean: false;
   BrickColor: BrickColor;
   CFrame: CFrame;
