@@ -32,6 +32,15 @@ interface PillBackingBuilder {
 interface PillBackingBuilderConstructor {
   readonly ClassName: 'PillBackingBuilder';
   new (options?: PillBackingBuilderOptions): PillBackingBuilder;
+
+  CIRCLE_IMAGE_ID: 'rbxassetid://633244888';
+  CIRCLE_SIZE: Vector2;
+  SHADOW_IMAGE_ID: 'rbxassetid://707852973';
+  SHADOW_SIZE: Vector2;
+  PILL_SHADOW_IMAGE_ID: 'rbxassetid://1304004290';
+  PILL_SHADOW_SIZE: Vector2;
+  SHADOW_OFFSET_Y: UDim;
+  SHADOW_TRANSPARENCY: 0.85;
 }
 
 export const PillBackingBuilder: PillBackingBuilderConstructor;

@@ -5,6 +5,7 @@ import { DefaultCamera } from './Effects/DefaultCamera';
 import { ImpulseCamera } from './Effects/ImpulseCamera';
 
 export interface CameraStackService {
+  readonly ServiceName: 'CameraStackService';
   Init(): void;
   Start(): void;
   GetRenderPriority(): number;

@@ -1,4 +1,5 @@
 export interface TransparencyService {
+  readonly ServiceName: 'TransparencyService';
   Init(): void;
   IsDead(): boolean;
   SetTransparency(

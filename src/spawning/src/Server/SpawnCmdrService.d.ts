@@ -1,6 +1,6 @@
 import { ServiceBag } from '@quenty/servicebag';
 
-export interface RogueHumanoidService {
-  readonly ServiceName: 'RogueHumanoidService';
+export interface SpawnCmdrService {
+  readonly ServiceName: 'SpawnCmdrService';
   Init(serviceBag: ServiceBag): void;
 }

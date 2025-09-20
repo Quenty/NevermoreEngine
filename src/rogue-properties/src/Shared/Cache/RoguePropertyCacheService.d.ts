@@ -3,6 +3,7 @@ import { RoguePropertyDefinition } from '../Definition/RoguePropertyDefinition';
 import { RoguePropertyCache } from './RoguePropertyCache';
 
 export interface RoguePropertyCacheService {
+  readonly ServiceName: 'RoguePropertyCacheService';
   Init(serviceBag: ServiceBag): void;
   GetCache<T>(
     roguePropertyDefinition: RoguePropertyDefinition<T>

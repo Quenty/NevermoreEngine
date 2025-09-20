@@ -3,6 +3,7 @@ import { HumanoidTracker } from './HumanoidTracker';
 import { Brio } from '@quenty/brio';
 
 export interface HumanoidTrackerService {
+  readonly ServiceName: 'HumanoidTrackerService';
   Init(): void;
   GetHumanoidTracker(player?: Player): HumanoidTracker | undefined;
   GetHumanoid(player?: Player): Humanoid | undefined;

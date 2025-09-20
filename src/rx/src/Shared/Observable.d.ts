@@ -3,6 +3,10 @@ import { Subscription } from './Subscription';
 
 type Observable<T = void> = {
   Subscribe(): Subscription<T>;
+  // we type out the Pipe method using varargs instead of an array of operators.
+  // this is because typescript cannot infer types from operator to operator (this is a typescript limitation)
+  // however, typescript can infer types using the overloads below. this is also how rxjs does it.
+  // our fork of roblox-ts will convert the outputted luau to use an array of operators.
   Pipe(): Observable<T>;
   Pipe<A>(op1: Operator<T, A>): Observable<A>;
   Pipe<A, B>(op1: Operator<T, A>, op2: Operator<A, B>): Observable<B>;

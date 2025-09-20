@@ -2,6 +2,7 @@ import { ServiceBag } from '@quenty/servicebag';
 import { SoundEffectApplier } from './Effects/SoundEffectsList';
 
 export interface SoundEffectService {
+  readonly ServiceName: 'SoundEffectService';
   Init(serviceBag: ServiceBag): void;
   Start(): void;
   RegisterSFX(sound: Sound, soundGroupPath?: string): void;

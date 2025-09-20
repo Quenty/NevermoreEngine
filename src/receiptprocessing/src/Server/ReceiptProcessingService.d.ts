@@ -2,6 +2,7 @@ import { Observable } from '@quenty/rx';
 import { ServiceBag } from '@quenty/servicebag';
 
 export interface ReceiptProcessingService {
+  readonly ServiceName: 'ReceiptProcessingService';
   Init(serviceBag: ServiceBag): void;
   Start(): void;
   SetDefaultPurchaseDecision(

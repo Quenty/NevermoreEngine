@@ -1,5 +1,6 @@
 export * from './src/Shared/Binder';
 export * from './src/Shared/BinderGroup';
+export * from './src/Shared/BinderGroupProvider';
 export * from './src/Shared/BinderProvider';
 export * from './src/Shared/BinderUtils';
 export * from './src/Shared/Promise/promiseBoundClass';
