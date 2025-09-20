@@ -28,7 +28,7 @@ interface ObservableMapList<TKey, TValue> {
 
 interface ObservableMapListConstructor {
   readonly ClassName: 'ObservableMapList';
-  new (): ObservableMapList<never, never>;
+  new (): ObservableMapList<unknown, unknown>;
   new <TKey, TValue>(): ObservableMapList<TKey, TValue>;
 
   isObservableMapList(

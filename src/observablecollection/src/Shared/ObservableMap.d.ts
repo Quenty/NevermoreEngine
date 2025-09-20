@@ -6,7 +6,7 @@ interface ObservableMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
   CountChanged: Signal<number>;
   ObserveKeysBrio(): Observable<Brio<TKey>>;
   ObserveValuesBrio(): Observable<Brio<TValue>>;
-  ObservePairsBrio(): Observable<Brio<[TKey, TValue]>>;
+  ObservePairsBrio(): Observable<Brio<[key: TKey, value: TValue]>>;
   Get(key: TKey): TValue | undefined;
   ContainsKey(key: TKey): boolean;
   GetCount(): number;
@@ -24,7 +24,7 @@ interface ObservableMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
 
 interface ObservableMapConstructor {
   readonly ClassName: 'ObservableMap';
-  new (): ObservableMap<never, never>;
+  new (): ObservableMap<unknown, unknown>;
   new <TKey, TValue>(): ObservableMap<TKey, TValue>;
 
   isObservableMap(value: unknown): value is ObservableMap<unknown, unknown>;

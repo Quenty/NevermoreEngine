@@ -1,4 +1,6 @@
 export * from './src/Shared/Binder';
+export * from './src/Shared/BinderGroup';
+export * from './src/Shared/BinderProvider';
 export * from './src/Shared/BinderUtils';
 export * from './src/Shared/Promise/promiseBoundClass';
 export * from './src/Shared/Trackers/BoundAncestorTracker';
