@@ -9,7 +9,7 @@ export type RbxAssetIdConvertable = string | number
 
 --[=[
 	Converts a string or number to a string for playback.
-	@param id string? | number
+	@param id string | number
 	@return string?
 ]=]
 function RbxAssetUtils.toRbxAssetId(id: RbxAssetIdConvertable): string
@@ -22,7 +22,7 @@ end
 
 --[=[
 	Returns if it's convertable to a RBXAssetId
-	@param id string? | number
+	@param id string | number
 	@return boolean
 ]=]
 function RbxAssetUtils.isConvertableToRbxAsset(id: any): boolean
