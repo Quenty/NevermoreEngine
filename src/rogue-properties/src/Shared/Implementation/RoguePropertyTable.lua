@@ -8,6 +8,8 @@ local RogueProperty = require("RogueProperty")
 local RoguePropertyArrayHelper = require("RoguePropertyArrayHelper")
 local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RoguePropertyTable = {} -- inherits from RogueProperty
 RoguePropertyTable.ClassName = "RoguePropertyTable"
@@ -42,13 +44,41 @@ function RoguePropertyTable:SetCanInitialize(canInitialize: boolean)
 end
 
 function RoguePropertyTable:ObserveContainerBrio()
-	return self._definition:ObserveContainerBrio(self._adornee, self:CanInitialize())
+	local cache = rawget(self, "_observeContainerCache")
+	if cache then
+		return cache
+	end
+
+	self._definition:GetContainer(self._adornee, self._canInitialize)
+
+	local parentDefinition = self._definition:GetParentPropertyDefinition()
+	if parentDefinition then
+		local parentTable = parentDefinition:Get(self._serviceBag, self._adornee)
+		cache = parentTable:ObserveContainerBrio():Pipe({
+			RxBrioUtils.switchMapBrio(function(parent)
+				return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self._definition:GetName())
+			end),
+			Rx.cache(),
+		})
+	else
+		cache = RxInstanceUtils.observeLastNamedChildBrio(self._adornee, "Folder", self._definition:GetName()):Pipe({
+			Rx.cache()
+		})
+	end
+
+	cache = cache
+	rawset(self, "_observeContainerCache", cache)
+	return cache
 end
 
 function RoguePropertyTable:GetContainer(): Instance
 	local cached = rawget(self, "_containerCache")
-	if cached and cached:IsDescendantOf(self._adornee) then
-		return cached
+	if cached then
+		if cached:IsDescendantOf(self._adornee) then
+			return cached
+		else
+			rawset(self, "_containerCache", nil)
+		end
 	end
 
 	local container = self._definition:GetContainer(self._adornee, self:CanInitialize())

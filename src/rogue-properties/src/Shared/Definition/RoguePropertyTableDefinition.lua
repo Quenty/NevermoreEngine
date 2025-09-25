@@ -223,27 +223,15 @@ RoguePropertyTableDefinition.GetPropertyTable = RoguePropertyTableDefinition.Get
 --[=[
 	Observes the current container while it exists for the given adornee.
 
-	@param adornee Instance
-	@param canInitialize boolean
 	@return Observable<Brio<Folder>>
 ]=]
-function RoguePropertyTableDefinition:ObserveContainerBrio(adornee: Instance, canInitialize)
+function RoguePropertyTableDefinition:ObserveContainerBrio(serviceBag: ServiceBag.ServiceBag, adornee: Instance, canInitialize: boolean)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
-	-- TODO: Optimize so we aren't duplcating this logic each time we index a property
-	self:GetContainer(adornee, canInitialize)
+	local found = self:Get(serviceBag, adornee)
 
-	local parentDefinition = self:GetParentPropertyDefinition()
-	if parentDefinition then
-		return parentDefinition:ObserveContainerBrio(adornee, canInitialize):Pipe({
-			RxBrioUtils.switchMapBrio(function(parent)
-				return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self:GetName())
-			end),
-		})
-	else
-		return RxInstanceUtils.observeLastNamedChildBrio(adornee, "Folder", self:GetName())
-	end
+	return found:ObserveContainerBrio(canInitialize)
 end
 
 --[=[

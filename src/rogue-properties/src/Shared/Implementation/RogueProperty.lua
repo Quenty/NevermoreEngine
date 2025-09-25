@@ -19,6 +19,7 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local RxSignal = require("RxSignal")
 local ServiceBag = require("ServiceBag")
 local ValueBaseUtils = require("ValueBaseUtils")
+local TieRealmService = require("TieRealmService")
 
 local RogueProperty = {}
 RogueProperty.ClassName = "RogueProperty"
@@ -28,6 +29,7 @@ function RogueProperty.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag,
 	local self = {}
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
 
 	self._adornee = assert(adornee, "Bad adornee")
 	self._definition = assert(definition, "Bad definition")
@@ -59,11 +61,12 @@ end
 function RogueProperty:GetBaseValueObject()
 	local cached = rawget(self, "_baseValueCache")
 	local adornee = rawget(self, "_adornee")
-	local definition = rawget(self, "_definition")
 
 	if cached and cached:IsDescendantOf(adornee) then
 		return cached
 	end
+
+	local definition = rawget(self, "_definition")
 
 	local parent
 	local parentDefinition = definition:GetParentPropertyDefinition()
@@ -94,15 +97,17 @@ end
 function RogueProperty:_observeBaseValueBrio()
 	local parentDefinition = self._definition:GetParentPropertyDefinition()
 	if parentDefinition then
-		return parentDefinition:ObserveContainerBrio(self._adornee, self:CanInitialize()):Pipe({
-			RxBrioUtils.switchMapBrio(function(container)
-				return RxInstanceUtils.observeLastNamedChildBrio(
-					container,
-					self._definition:GetStorageInstanceType(),
-					self._definition:GetName()
-				)
-			end),
-		})
+		local parentTable = parentDefinition:Get(self._serviceBag, self._adornee)
+		return parentTable:ObserveContainerBrio()
+			:Pipe({
+				RxBrioUtils.switchMapBrio(function(container)
+					return RxInstanceUtils.observeLastNamedChildBrio(
+						container,
+						self._definition:GetStorageInstanceType(),
+						self._definition:GetName()
+					)
+				end),
+			})
 	else
 		return RxInstanceUtils.observeLastNamedChildBrio(
 			self._adornee,
@@ -188,7 +193,7 @@ function RogueProperty:GetRogueModifiers()
 		return {}
 	end
 
-	local found = RogueModifierInterface:GetChildren(propObj)
+	local found = RogueModifierInterface:GetChildren(propObj, self._tieRealmService:GetTieRealm())
 
 	local orders = {}
 	for _, item in found do
@@ -202,7 +207,12 @@ function RogueProperty:GetRogueModifiers()
 end
 
 function RogueProperty:_observeModifierSortedList()
-	return Observable.new(function(sub)
+	local cache = rawget(self, "_observeModifierSortedListCache")
+	if cache then
+		return cache
+	end
+
+	cache = Observable.new(function(sub)
 		local topMaid = Maid.new()
 
 		local sortedList = topMaid:Add(ObservableSortedList.new())
@@ -210,7 +220,7 @@ function RogueProperty:_observeModifierSortedList()
 		topMaid:GiveTask(self:_observeBaseValueBrio()
 			:Pipe({
 				RxBrioUtils.flatMapBrio(function(baseValue)
-					return RogueModifierInterface:ObserveChildrenBrio(baseValue)
+					return RogueModifierInterface:ObserveChildrenBrio(baseValue, self._tieRealmService:GetTieRealm())
 				end),
 			})
 			:Subscribe(function(brio)
@@ -220,16 +230,25 @@ function RogueProperty:_observeModifierSortedList()
 				local maid, rogueModifier = brio:ToMaidAndValue()
 				maid:GiveTask(sortedList:Add(rogueModifier, rogueModifier.Order:Observe()))
 			end))
-
+		debug.profilebegin("sorted_list_add")
 		sub:Fire(sortedList)
+		debug.profileend()
 
 		return topMaid
 	end):Pipe({
 		Rx.cache(),
 	})
+
+	rawset(self, "_observeModifierSortedListCache", cache)
+	return cache
 end
 
 function RogueProperty:Observe()
+	local cache = rawget(self, "_observeCache")
+	if cache then
+		return cache
+	end
+
 	local observeInitialValue = self:_observeBaseValueBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(baseValue)
 			return RxInstanceUtils.observeProperty(baseValue, "Value")
@@ -239,7 +258,7 @@ function RogueProperty:Observe()
 		Rx.distinct(),
 	})
 
-	return self:_observeModifierSortedList():Pipe({
+	cache = self:_observeModifierSortedList():Pipe({
 		Rx.switchMap(function(sortedList)
 			return sortedList:Observe()
 		end),
@@ -250,7 +269,10 @@ function RogueProperty:Observe()
 			end
 			return current
 		end),
+		Rx.cache(),
 	})
+	rawset(self, "_observeCache", cache)
+	return cache
 end
 
 function RogueProperty:ObserveBrio(predicate)
