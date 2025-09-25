@@ -1,7 +1,9 @@
 interface ServiceBag {
   PrintInitialization(): void;
-  GetService(service: any): unknown;
-  GetService<T extends { new (): T }>(service: T): T;
+  GetService<T extends new (...args: unknown[]) => unknown>(
+    service: T
+  ): InstanceType<T>;
+  GetService<T>(service: T): T;
   HasService(service: any): boolean;
   Init(): void;
   Start(): void;
