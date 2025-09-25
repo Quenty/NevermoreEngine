@@ -1,12 +1,11 @@
-interface Destroyable {
-  Destroy(): void;
-}
 export type MaidTask =
   | (() => unknown)
   | thread
   | RBXScriptConnection
   | Maid
-  | Destroyable;
+  | {
+      Destroy(): void;
+    };
 
 type Maid = {
   [index in number | string]: MaidTask | undefined;

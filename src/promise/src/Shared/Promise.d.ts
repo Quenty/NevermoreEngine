@@ -2,9 +2,9 @@ type ToTuple<T> = T extends unknown[] ? T : [T];
 
 type Promise<T = void> = {
   Then<R>(
-    onFulfilled: (...values: ToTuple<T>) => Promise<R>,
+    onFulfilled: (...values: ToTuple<T>) => R,
     onRejected?: (error: unknown) => void
-  ): Promise<T>;
+  ): Promise<R>;
   Catch(onRejected: (error: unknown) => void): Promise<T>;
   Finally(onFinally: () => void): Promise<T>;
   Tap(

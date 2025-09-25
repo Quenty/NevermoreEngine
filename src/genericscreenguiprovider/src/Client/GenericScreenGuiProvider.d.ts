@@ -15,6 +15,7 @@ interface GenericScreenGuiProvider<T extends Record<string, number> | unknown> {
 
 interface GenericScreenGuiProviderConstructor {
   readonly ClassName: 'GenericScreenGuiProvider';
+  readonly ServiceName: 'GenericScreenGuiProvider';
   new <T extends Record<string, number>>(
     orders: T
   ): GenericScreenGuiProvider<T>;

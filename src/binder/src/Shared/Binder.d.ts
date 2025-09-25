@@ -7,7 +7,7 @@ interface Binder<T> {
   Init(): void;
   Start(): void;
   GetTag(): string;
-  GetConstructor(): new () => T;
+  GetConstructor(): { new (): T };
   ObserveAllBrio(): Observable<Brio<T>>;
   ObserveBrio(instance: Instance): Observable<Brio<T>>;
   ObserveInstance(

@@ -2,6 +2,7 @@ import { Promise } from '@quenty/promise';
 import { Observable } from '@quenty/rx';
 
 export interface TextFilterServiceClient {
+  readonly ServiceName: 'TextFilterServiceClient';
   PromiseNonChatStringForUser(
     text: string,
     fromUserId: number

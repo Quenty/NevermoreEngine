@@ -2,25 +2,31 @@ import { Promise } from '@quenty/promise';
 import { ServiceBag } from '@quenty/servicebag';
 import { Binder } from './Binder';
 
-interface BinderProvider {
-  PromiseBinder(binderName: string): Promise<Binder<unknown>>;
-  Init(serviceBag: ServiceBag): void;
-  PromiseBindersAdded(): Promise;
-  PromiseBindersStarted(): Promise;
-  Start(): void;
-  Get(tagName: string): Binder<unknown> | undefined;
-  Add(binder: Binder<unknown>): void;
-  Destroy(): void;
-}
+type ToBinderMap<T extends Record<string, unknown> | unknown> = {
+  [K in keyof T]: Binder<T[K]>;
+};
+
+type BinderProvider<T extends Record<string, unknown> | unknown> =
+  ToBinderMap<T> & {
+    PromiseBinder(binderName: string): Promise<Binder<unknown>>;
+    Init(serviceBag: ServiceBag): void;
+    PromiseBindersAdded(): Promise;
+    PromiseBindersStarted(): Promise;
+    Start(): void;
+    Get(tagName: string): Binder<unknown> | undefined;
+    Add(binder: Binder<unknown>): void;
+    Destroy(): void;
+  };
 
 interface BinderProviderConstructor {
   readonly ClassName: 'BinderProvider';
-  new (
+  readonly ServiceName: 'BinderProvider';
+  new <T extends Record<string, unknown> | unknown>(
     serviceName: string,
-    initMethod: (self: BinderProvider, serviceBag: ServiceBag) => void
-  ): BinderProvider;
+    initMethod: (self: BinderProvider<T>, serviceBag: ServiceBag) => void
+  ): BinderProvider<T>;
 
-  isBinderProvider: (value: unknown) => value is BinderProvider;
+  isBinderProvider: (value: unknown) => value is BinderProvider<unknown>;
 }
 
 export const BinderProvider: BinderProviderConstructor;

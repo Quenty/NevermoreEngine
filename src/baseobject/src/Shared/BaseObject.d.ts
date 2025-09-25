@@ -1,10 +1,9 @@
-interface BaseObject {
-  Destroy(): void;
-}
+import { Maid } from '@quenty/maid';
 
-interface BaseObjectConstructor {
-  readonly ClassName: 'BaseObject';
-  new (instance?: Instance): BaseObject;
+export class BaseObject<T extends Instance | undefined = undefined> {
+  public static readonly ClassName: 'BaseObject';
+  protected _instance: T;
+  protected _maid: Maid;
+  constructor(instance?: T);
+  public Destroy(): void;
 }
-
-export const BaseObject: BaseObjectConstructor;

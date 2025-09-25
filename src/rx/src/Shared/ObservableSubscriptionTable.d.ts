@@ -17,8 +17,6 @@ type ObservableSubscriptionTable<T = void> = {
 interface ObservableSubscriptionTableConstructor {
   readonly ClassName: 'ObservableSubscriptionTable';
   new <T>(): ObservableSubscriptionTable<T>;
-
-  DEAD: ObservableSubscriptionTable;
 }
 
 export const ObservableSubscriptionTable: ObservableSubscriptionTableConstructor;

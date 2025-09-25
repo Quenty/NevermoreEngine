@@ -4,6 +4,7 @@ import { ToItemDetails } from '../AvatarEditorUtils';
 import { PagesProxy } from '@quenty/pagesutils';
 
 export interface CatalogSearchServiceCache {
+  readonly ServiceName: 'CatalogSearchServiceCache';
   Init(serviceBag: ServiceBag): void;
   PromiseAvatarRules(): Promise<AvatarRules>;
   PromiseItemDetails<T extends Enum.AvatarItemType>(

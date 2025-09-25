@@ -14,8 +14,6 @@ interface BoundLinkCollectionConstructor {
     linkName: string,
     parent: Instance
   ): BoundLinkCollection<T>;
-
-  DEAD: BoundLinkCollection;
 }
 
 export const BoundLinkCollection: BoundLinkCollectionConstructor;

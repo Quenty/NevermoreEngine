@@ -25,6 +25,7 @@ interface TemplateProvider {
 
 interface TemplateProviderConstructor {
   readonly ClassName: 'TemplateProvider';
+  readonly ServiceName: 'TemplateProvider';
   new (
     providerName: string,
     initialTemplate: TemplateDeclaration

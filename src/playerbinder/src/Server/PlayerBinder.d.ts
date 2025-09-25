@@ -1,16 +1,16 @@
 import { Binder } from '@quenty/binder';
 
-interface PlayerBinder extends Binder<unknown> {}
+interface PlayerBinder<T> extends Binder<T> {}
 
 interface PlayerBinderConstructor {
   readonly ClassName: 'PlayerBinder';
-  new <T extends unknown[]>(
+  new <T extends unknown[], R>(
     tag: string,
     boundClass: {
-      new (...args: T): unknown;
+      new (...args: T): R;
     },
     ...args: T
-  ): PlayerBinder;
+  ): PlayerBinder<R>;
 }
 
 export const PlayerBinder: PlayerBinderConstructor;

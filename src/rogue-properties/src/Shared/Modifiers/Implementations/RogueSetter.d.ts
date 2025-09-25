@@ -9,4 +9,4 @@ export interface RogueSetterConstructor {
   new (obj: ValueBase, serviceBag: ServiceBag): RogueSetter;
 }
 
-export const RogueSetter: Binder<RogueSetterConstructor>;
+export const RogueSetter: Binder<RogueSetter>;

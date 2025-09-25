@@ -3,6 +3,7 @@ import { Observable } from '@quenty/rx';
 import { ServiceBag } from '@quenty/servicebag';
 
 export interface AvatarEditorInventoryServiceClient {
+  readonly ServiceName: 'AvatarEditorInventoryServiceClient';
   Init(serviceBag: ServiceBag): void;
   PromiseInventoryPages(
     avatarAssetType: Enum.AvatarAssetType

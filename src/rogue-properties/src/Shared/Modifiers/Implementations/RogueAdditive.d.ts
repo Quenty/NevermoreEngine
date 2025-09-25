@@ -9,4 +9,4 @@ export interface RogueAdditiveConstructor {
   new (obj: ValueBase, serviceBag: ServiceBag): RogueAdditive;
 }
 
-export const RogueAdditive: Binder<RogueAdditiveConstructor>;
+export const RogueAdditive: Binder<RogueAdditive>;

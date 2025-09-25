@@ -1,6 +1,6 @@
 import { ServiceBag } from '@quenty/servicebag';
 import { RogueHumanoidBase } from '../Shared/RogueHumanoidBase';
-import { Binder } from '@quenty/binder';
+import { PlayerHumanoidBinder } from '@quenty/playerhumanoidbinder';
 
 interface RogueHumanoid extends RogueHumanoidBase {}
 
@@ -9,4 +9,4 @@ interface RogueHumanoidConstructor {
   new (humanoid: Humanoid, serviceBag: ServiceBag): RogueHumanoid;
 }
 
-export const RogueHumanoid: Binder<RogueHumanoid>;
+export const RogueHumanoid: PlayerHumanoidBinder<RogueHumanoid>;

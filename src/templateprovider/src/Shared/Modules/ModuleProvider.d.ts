@@ -6,6 +6,7 @@ interface ModuleProvider {
 
 interface ModuleProviderConstructor {
   readonly ClassName: 'ModuleProvider';
+  readonly ServiceName: 'ModuleProvider';
   new (
     parent: Instance,
     checkModule?: (_module: unknown, moduleScript: ModuleScript) => void,

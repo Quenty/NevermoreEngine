@@ -11,6 +11,7 @@ interface BinderGroupProvider {
 
 interface BinderGroupProviderConstructor {
   readonly ClassName: 'BinderGroupProvider';
+  readonly ServiceName: 'BinderGroupProvider';
   new (
     initMethod: (
       this: BinderGroupProvider,

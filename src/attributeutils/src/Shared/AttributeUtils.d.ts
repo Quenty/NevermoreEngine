@@ -1,6 +1,7 @@
 import { Binder } from '@quenty/binder';
 import { CancelToken } from '@quenty/canceltoken';
 import { Maid } from '@quenty/maid';
+import { Promise } from '@quenty/promise';
 
 export namespace AttributeUtils {
   function isValidAttributeType(valueType: string): boolean;

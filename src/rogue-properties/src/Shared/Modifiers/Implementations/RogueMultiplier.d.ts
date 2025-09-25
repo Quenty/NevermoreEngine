@@ -9,4 +9,4 @@ export interface RogueMultiplierConstructor {
   new (obj: ValueBase, serviceBag: ServiceBag): RogueMultiplier;
 }
 
-export const RogueMultiplier: Binder<RogueMultiplierConstructor>;
+export const RogueMultiplier: Binder<RogueMultiplier>;
