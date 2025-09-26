@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rogue-properties",
-  "version": "11.25.1",
+  "version": "11.26.0",
   "description": "Roguelike properties which can be modified by external provides",
   "keywords": [
     "Roblox",
@@ -25,6 +25,7 @@
   ],
   "dependencies": {
     "@quenty/adorneedata": "file:../adorneedata",
+    "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
@@ -36,6 +37,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/observablecollection": "file:../observablecollection",
+    "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
     "@quenty/rxbinderutils": "file:../rxbinderutils",
     "@quenty/rxsignal": "file:../rxsignal",

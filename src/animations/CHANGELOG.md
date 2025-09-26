@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.20.1...@quenty/animations@8.21.0) (2025-09-26)
+
+
+### Bug Fixes
+
+* Handle priority properly ([1f48083](https://github.com/Quenty/NevermoreEngine/commit/1f48083435c8d14aa0fe21a237fe92f3df4e7a17))
+
+
+
+
+
 ## [8.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.20.0...@quenty/animations@8.20.1) (2025-09-16)
 
 
