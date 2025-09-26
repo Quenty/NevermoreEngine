@@ -1,28 +1,26 @@
-# v11.26.0 (Fri Sep 26 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/rogue property refactor [#590](https://github.com/Quenty/NevermoreEngine/pull/590) ([@Quenty](https://github.com/Quenty))
-- feat: Move the rogue properties over to attributes as required ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix stuff ([@Quenty](https://github.com/Quenty))
-- fix: Fix parenting and application on client ([@Quenty](https://github.com/Quenty))
-- fix: Style stuff ([@Quenty](https://github.com/Quenty))
-- style: Fix styles ([@Quenty](https://github.com/Quenty))
-- fix: Fix caching performance of the rogue system when multiple things want to observe state ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.25.1...@quenty/rogue-properties@11.26.0) (2025-09-26)
+
+
+### Bug Fixes
+
+* Fix caching performance of the rogue system when multiple things want to observe state ([1a067f7](https://github.com/Quenty/NevermoreEngine/commit/1a067f7dec837a2eb4db399e46bf06566824c9a3))
+* Fix parenting and application on client ([ff2f125](https://github.com/Quenty/NevermoreEngine/commit/ff2f1254f45289537444190bc0596f9f519c592e))
+* Fix stuff ([63ba0e0](https://github.com/Quenty/NevermoreEngine/commit/63ba0e0c4b5c8bdaeb452f0b3d742b7b8bc8a7ab))
+* Style stuff ([ff3c47a](https://github.com/Quenty/NevermoreEngine/commit/ff3c47af4e5b23f912aa09a0784849751d5736e1))
+
+
+### Features
+
+* Move the rogue properties over to attributes as required ([4aa23b0](https://github.com/Quenty/NevermoreEngine/commit/4aa23b0092ba07490b615f1d8ab5920f86b78756))
+
+
+
+
 
 ## [11.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.25.0...@quenty/rogue-properties@11.25.1) (2025-09-15)
 

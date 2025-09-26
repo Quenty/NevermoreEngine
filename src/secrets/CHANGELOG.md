@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.26.2...@quenty/secrets@7.27.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
 ## [7.26.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.26.1...@quenty/secrets@7.26.2) (2025-09-15)
 
 **Note:** Version bump only for package @quenty/secrets
