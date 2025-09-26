@@ -114,6 +114,13 @@ end
 function RoguePropertyArrayUtils.getDefaultValueMapFromContainer(container: Instance)
 	local value = {}
 
+	-- This is a hack, kinda
+	for attributeKey, attributeValue in container:GetAttributes() do
+		if attributeKey ~= "HasInitializedArrayComponent" then
+			value[attributeKey] = attributeValue
+		end
+	end
+
 	for _, item in container:GetChildren() do
 		local index = RoguePropertyArrayUtils.getIndexFromName(item.Name)
 		if index then
