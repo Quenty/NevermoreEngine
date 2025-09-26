@@ -232,19 +232,15 @@ RoguePropertyTableDefinition.GetPropertyTable = RoguePropertyTableDefinition.Get
 
 	@return Observable<Brio<Folder>>
 ]=]
-function RoguePropertyTableDefinition:ObserveContainerBrio(
-	serviceBag: ServiceBag.ServiceBag,
-	adornee: Instance,
-	canInitialize: boolean
-)
+function RoguePropertyTableDefinition:ObserveContainerBrio(serviceBag: ServiceBag.ServiceBag, adornee: Instance)
+	assert(serviceBag, "No serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
-	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
 	local found = self:Get(serviceBag, adornee)
 
 	-- TODO: caninitialize is broken
 
-	return found:ObserveContainerBrio(canInitialize)
+	return found:ObserveContainerBrio()
 end
 
 --[=[
@@ -253,20 +249,22 @@ end
 	@param canInitialize boolean
 	@return Folder?
 ]=]
-function RoguePropertyTableDefinition:GetContainer(
-	serviceBag: ServiceBag.ServiceBag,
-	adornee: Instance,
-	canInitialize: boolean
-): Folder?
+function RoguePropertyTableDefinition:GetContainer(serviceBag: ServiceBag.ServiceBag, adornee: Instance): Folder?
+	assert(serviceBag, "No serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
-	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
 	local found = self:Get(serviceBag, adornee)
 
 	return found:GetContainer()
 end
 
-function RoguePropertyTableDefinition:GetOrCreateInstance(parent)
+function RoguePropertyTableDefinition:FindInstance(parent): Folder
+	assert(typeof(parent) == "Instance", "Bad parent")
+
+	return parent:FindFirstChild(self:GetName())
+end
+
+function RoguePropertyTableDefinition:GetOrCreateInstance(parent): Folder
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	local existing = parent:FindFirstChild(self:GetName())

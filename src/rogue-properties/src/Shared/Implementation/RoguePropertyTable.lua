@@ -54,7 +54,10 @@ function RoguePropertyTable:ObserveContainerBrio()
 	local parentDefinition = self._definition:GetParentPropertyDefinition()
 	if parentDefinition then
 		local parentTable = parentDefinition:Get(self._serviceBag, self._adornee)
-		parentTable:GetContainer()
+
+		if self:CanInitialize() then
+			parentTable:GetContainer()
+		end
 
 		cache = parentTable:ObserveContainerBrio():Pipe({
 			RxBrioUtils.switchMapBrio(function(parent)
@@ -73,7 +76,7 @@ function RoguePropertyTable:ObserveContainerBrio()
 	return cache
 end
 
-function RoguePropertyTable:GetContainer(): Instance
+function RoguePropertyTable:GetContainer(): Instance?
 	local cached = rawget(self, "_containerCache")
 	if cached then
 		if cached:IsDescendantOf(self._adornee) then
@@ -92,8 +95,16 @@ function RoguePropertyTable:GetContainer(): Instance
 		parent = self._adornee
 	end
 
-	local container = self._definition:GetOrCreateInstance(parent, self:CanInitialize())
-	container:AddTag("RoguePropertyTable")
+	if not parent then
+		return nil
+	end
+
+	local container
+	if self:CanInitialize() then
+		container = self._definition:GetOrCreateInstance(parent)
+	else
+		container = self._definition:FindInstance(parent)
+	end
 
 	rawset(self, "_containerCache", container)
 	return container

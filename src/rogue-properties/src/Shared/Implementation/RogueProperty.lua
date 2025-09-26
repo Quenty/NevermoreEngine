@@ -261,6 +261,15 @@ function RogueProperty:_getModifierParentContainerList()
 	return containerList
 end
 
+function RogueProperty:PromiseBaseValue()
+	return Rx.toPromise(self:_observeBaseValueBrio():Pipe({
+		RxBrioUtils.flattenToValueAndNil,
+		Rx.where(function(value)
+			return value ~= nil
+		end),
+	}))
+end
+
 function RogueProperty:_observeModifierContainersBrio()
 	local name = self:_getLocalModifierParentName()
 
@@ -290,13 +299,30 @@ function RogueProperty:SetValue(value)
 
 	local baseValue = self:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
 	if not baseValue then
-		warn(
+		local warningText = debug.traceback(
 			string.format(
 				"[RogueProperty.SetValue] - Failed to get the baseValue for %q on %q",
 				self._definition:GetFullName(),
 				self._adornee:GetFullName()
 			)
 		)
+
+		local warnTask = task.delay(5, function()
+			warn(warningText)
+		end)
+
+		self:PromiseBaseValue():Then(function(thisBaseValue)
+			local current = value
+
+			local modifiers = self:GetRogueModifiers()
+			for i = #modifiers, 1, -1 do
+				current = modifiers[i]:GetInvertedVersion(current, value)
+			end
+
+			thisBaseValue.Value = self:_encodeValue(current)
+			task.cancel(warnTask)
+		end)
+
 		return
 	end
 
@@ -457,17 +483,6 @@ end
 function RogueProperty:CreateMultiplier(amount: number, source)
 	assert(type(amount) == "number", "Bad amount")
 
-	local modifierParent = self:_getModifierParentContainerForNewModifier()
-	if not modifierParent then
-		warn(
-			string.format(
-				"[RogueProperty.CreateMultiplier] - Failed to get the modifierParent for %q on %q",
-				self._definition:GetFullName(),
-				self._adornee:GetFullName()
-			)
-		)
-	end
-
 	local className = ValueBaseUtils.getClassNameFromType(typeof(amount))
 	if not className then
 		error(string.format("[RogueProperty.CreateMultiplier] - Can't set to type %q", typeof(amount)))
@@ -484,25 +499,13 @@ function RogueProperty:CreateMultiplier(amount: number, source)
 
 	RogueMultiplier:Tag(multiplier)
 
-	multiplier.Parent = modifierParent
+	self:_parentModifier(multiplier)
 
 	return multiplier
 end
 
 function RogueProperty:CreateAdditive(amount: number, source)
 	assert(type(amount) == "number", "Bad amount")
-
-	local modifierParent = self:_getModifierParentContainerForNewModifier()
-	if not modifierParent then
-		warn(
-			string.format(
-				"[RogueProperty.CreateAdditive] - Failed to get the modifierParent for %q on %q",
-				self._definition:GetFullName(),
-				self._adornee:GetFullName()
-			)
-		)
-		return nil
-	end
 
 	local className = ValueBaseUtils.getClassNameFromType(typeof(amount))
 	if not className then
@@ -520,7 +523,7 @@ function RogueProperty:CreateAdditive(amount: number, source)
 
 	RogueAdditive:Tag(additive)
 
-	additive.Parent = modifierParent
+	self:_parentModifier(additive)
 
 	return additive
 end
@@ -528,11 +531,14 @@ end
 function RogueProperty:GetNamedAdditive(name, source)
 	local modifierParent = self:_getModifierParentContainerForNewModifier()
 	if not modifierParent then
+		-- TODO: Handle this parenting scenario appropriately
 		warn(
-			string.format(
-				"[RogueProperty.GetNamedAdditive] - Failed to get the modifierParent for %q on %q",
-				self._definition:GetFullName(),
-				self._adornee:GetFullName()
+			debug.traceback(
+				string.format(
+					"[RogueProperty.GetNamedAdditive] - Failed to get the modifierParent for %q on %q",
+					self._definition:GetFullName(),
+					self._adornee:GetFullName()
+				)
 			)
 		)
 		return nil
@@ -551,18 +557,6 @@ function RogueProperty:GetNamedAdditive(name, source)
 end
 
 function RogueProperty:CreateSetter(value, source)
-	local modifierParent = self:_getModifierParentContainerForNewModifier()
-	if not modifierParent then
-		warn(
-			string.format(
-				"[RogueProperty.CreateSetter] - Failed to get the modifierParent for %q on %q",
-				self._definition:GetFullName(),
-				self._adornee:GetFullName()
-			)
-		)
-		return nil
-	end
-
 	local className = ValueBaseUtils.getClassNameFromType(typeof(value))
 	if not className then
 		error(string.format("[RogueProperty.CreateSetter] - Can't set to type %q", typeof(value)))
@@ -579,9 +573,52 @@ function RogueProperty:CreateSetter(value, source)
 
 	RogueSetter:Tag(setter)
 
-	setter.Parent = modifierParent
+	self:_parentModifier(setter)
 
 	return setter
+end
+
+function RogueProperty:_parentModifier(modifier: Instance)
+	local modifierParent = self:_getModifierParentContainerForNewModifier()
+	if modifierParent then
+		modifier.Parent = modifierParent
+
+		return
+	end
+
+	local maid = Maid.new()
+
+	local warningText = debug.traceback(
+		string.format(
+			"[RogueProperty._parentModifier] - Failed to get the modifierParent for %q on %q",
+			self._definition:GetFullName(),
+			self._adornee:GetFullName()
+		)
+	)
+
+	maid._warning = task.delay(5, function()
+		warn(warningText)
+	end)
+
+	maid:GivePromise(self:PromiseBaseValue()):Then(function()
+		local newParent = self:_getModifierParentContainerForNewModifier()
+		if not newParent then
+			warn(
+				"[RogueProperty:_parentModifier] - Failed to retrieve modifier parent after load, will never modify value"
+			)
+
+			return
+		end
+
+		maid._warning = nil
+		modifier.Parent = newParent
+	end)
+
+	maid:GiveTask(modifier.Destroying:Connect(function()
+		maid:DoCleaning()
+	end))
+
+	return
 end
 
 function RogueProperty:__index(index)

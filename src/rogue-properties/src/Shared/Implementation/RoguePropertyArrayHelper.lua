@@ -149,7 +149,10 @@ function RoguePropertyArrayHelper:SetArrayData(arrayData)
 
 	for index, definition in definitions do
 		if available[index] and available[index]:GetDefinition():GetValueType() == definition:GetValueType() then
+			-- TODO: Replication is cursed here, and won't be consistent between client vs. server
+			available[index]:SetCanInitialize(true)
 			available[index]:SetValue(definition:GetDefaultValue())
+			available[index]:SetCanInitialize(false)
 		else
 			-- Cleanup this old one and setup a new one
 			if available[index] then
