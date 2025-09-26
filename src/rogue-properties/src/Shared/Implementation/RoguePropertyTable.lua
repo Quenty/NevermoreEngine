@@ -7,9 +7,9 @@ local require = require(script.Parent.loader).load(script)
 local RogueProperty = require("RogueProperty")
 local RoguePropertyArrayHelper = require("RoguePropertyArrayHelper")
 local Rx = require("Rx")
-local ServiceBag = require("ServiceBag")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 
 local RoguePropertyTable = {} -- inherits from RogueProperty
 RoguePropertyTable.ClassName = "RoguePropertyTable"
@@ -64,7 +64,7 @@ function RoguePropertyTable:ObserveContainerBrio()
 		})
 	else
 		cache = RxInstanceUtils.observeLastNamedChildBrio(self._adornee, "Folder", self._definition:GetName()):Pipe({
-			Rx.cache()
+			Rx.cache(),
 		})
 	end
 
@@ -230,7 +230,7 @@ function RoguePropertyTable:_observeDictionary()
 		cache = Rx.of({})
 	else
 		cache = Rx.combineLatest(toObserve):Pipe({
-			Rx.cache();
+			Rx.cache(),
 		})
 	end
 
