@@ -1,21 +1,23 @@
 import { AttributeValue } from '@quenty/attributeutils';
 import { Observable } from '@quenty/rx';
 import { AdorneeDataValue } from './AdorneeDataValue';
+import { AdorneeDataEntry } from './AdorneeDataEntry';
 
-export type ToAdorneeDictionary<
-  T extends Record<PropertyKey, unknown> | unknown
-> = T extends unknown
-  ? {}
-  : {
-      [K in keyof T]: Readonly<
-        T[K] extends Record<PropertyKey, unknown>
-          ? ToAdorneeDictionary<T[K]>
-          : AttributeValue<T[K]>
-      >;
-    };
+export type ToAdorneeEntries<T extends Record<PropertyKey, unknown> | unknown> =
+  T extends unknown
+    ? {}
+    : {
+        [K in keyof T]: Readonly<
+          T[K] extends AdorneeDataEntry<infer V>
+            ? AdorneeDataEntry<V>
+            : T[K] extends Record<PropertyKey, unknown>
+            ? never
+            : AdorneeDataEntry<T[K]>
+        >;
+      };
 
 type AdorneeData<T extends Record<PropertyKey, unknown>> =
-  ToAdorneeDictionary<T> & {
+  ToAdorneeEntries<T> & {
     IsStrictData(
       data: unknown
     ): LuaTuple<[success: boolean, errorMessage: string]>;

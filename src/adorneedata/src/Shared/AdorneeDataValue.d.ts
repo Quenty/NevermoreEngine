@@ -1,10 +1,20 @@
+import { AttributeValue } from '@quenty/attributeutils';
 import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
 
-type AdorneeDataValue<T> = {
+type MapToValues<T extends Record<PropertyKey, unknown> | unknown> =
+  T extends Record<PropertyKey, unknown>
+    ? Readonly<{
+        [K in keyof T]: T[K] extends Record<PropertyKey, unknown>
+          ? never
+          : AttributeValue<T[K]>;
+      }>
+    : {};
+
+type AdorneeDataValue<T> = MapToValues<T> & {
   Value: T;
-  readonly Changed: Signal<Record<PropertyKey, unknown>>;
-  Observe(): Observable<Record<PropertyKey, unknown>>;
+  readonly Changed: Signal<T>;
+  Observe(): Observable<T>;
 };
 
 interface AdorneeDataValueConstructor {

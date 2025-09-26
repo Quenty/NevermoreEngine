@@ -1,3 +1,4 @@
+import { AttributeValue } from '@quenty/attributeutils';
 import { Observable } from '@quenty/rx';
 import { ValueObject } from '@quenty/valueobject';
 
@@ -6,11 +7,7 @@ type ValueInterface = (
 ) => LuaTuple<[success: boolean, errorMessage?: string]>;
 
 type AdorneeDataEntry<T> = {
-  optionalAttribute(
-    interface: string | ValueInterface,
-    name: string
-  ): AdorneeDataEntry<Partial<T>>;
-  Create(adornee: Instance): ValueObject<T>;
+  Create(adornee: Instance): AttributeValue<T>;
   Observe(adornee: Instance): Observable<T>;
   Get(adornee: Instance): T;
   Set(adornee: Instance, value: T): void;
@@ -28,6 +25,10 @@ interface AdorneeDataEntryConstructor {
   ): AdorneeDataEntry<T>;
 
   isAdorneeDataEntry: (value: unknown) => value is AdorneeDataEntry<unknown>;
+  optionalAttribute: (
+    interface: string | ValueInterface,
+    name: string
+  ) => AdorneeDataEntry<unknown>;
 }
 
 export const AdorneeDataEntry: AdorneeDataEntryConstructor;
