@@ -1,3 +1,21 @@
+# (Fri Sep 26 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.21.0`, `@quenty/rbxasset@5.10.0`, `@quenty/rogue-properties@11.26.0`, `@quenty/rx@13.20.0`
+  - Users/quenty/rogue property refactor [#590](https://github.com/Quenty/NevermoreEngine/pull/590) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.21.0`, `@quenty/rbxasset@5.10.0`
+  - fix: Handle priority properly [#588](https://github.com/Quenty/NevermoreEngine/pull/588) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Sep 16 2025)
 
 #### 🐛 Bug Fix

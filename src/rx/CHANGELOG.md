@@ -1,3 +1,20 @@
+# v13.20.0 (Fri Sep 26 2025)
+
+#### 🚀 Enhancement
+
+- Users/quenty/rogue property refactor [#590](https://github.com/Quenty/NevermoreEngine/pull/590) ([@Quenty](https://github.com/Quenty))
+- feat: Move the rogue properties over to attributes as required ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Fix styles ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

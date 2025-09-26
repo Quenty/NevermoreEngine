@@ -1,3 +1,19 @@
+# v5.10.0 (Fri Sep 26 2025)
+
+#### 🚀 Enhancement
+
+- Users/quenty/rogue property refactor [#590](https://github.com/Quenty/NevermoreEngine/pull/590) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Handle priority properly [#588](https://github.com/Quenty/NevermoreEngine/pull/588) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
