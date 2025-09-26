@@ -12,8 +12,6 @@ local RoguePropertyDefinition = require("RoguePropertyDefinition")
 local RoguePropertyDefinitionArrayHelper = require("RoguePropertyDefinitionArrayHelper")
 local RoguePropertyService = require("RoguePropertyService")
 local RoguePropertyTable = require("RoguePropertyTable")
-local RxBrioUtils = require("RxBrioUtils")
-local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
 local Set = require("Set")
 local Table = require("Table")
@@ -133,6 +131,11 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): (bo
 				return false, string.format("Bad index %q, %q is not an array", tostring(key), self:GetFullName())
 			end
 		else
+			if self._arrayDefinitionHelper then
+				-- TODO: Maybe this check is actually wrong...? we might need to remove it.
+				return false, string.format("Bad index %q, %q is an array", tostring(key), self:GetFullName())
+			end
+
 			if self._definitionMap[key] then
 				local canAssign, message = self._definitionMap[key]:CanAssign(value, strict)
 				if not canAssign then
@@ -174,6 +177,10 @@ end
 
 function RoguePropertyTableDefinition:GetDefinitionMap()
 	return self._definitionMap
+end
+
+function RoguePropertyTableDefinition:HasChildren()
+	return true
 end
 
 --[=[
@@ -231,6 +238,8 @@ function RoguePropertyTableDefinition:ObserveContainerBrio(serviceBag: ServiceBa
 
 	local found = self:Get(serviceBag, adornee)
 
+	-- TODO: caninitialize is broken
+
 	return found:ObserveContainerBrio(canInitialize)
 end
 
@@ -240,27 +249,13 @@ end
 	@param canInitialize boolean
 	@return Folder?
 ]=]
-function RoguePropertyTableDefinition:GetContainer(adornee: Instance, canInitialize): Folder?
+function RoguePropertyTableDefinition:GetContainer(serviceBag: ServiceBag.ServiceBag, adornee: Instance, canInitialize: boolean): Folder?
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
-	local parent
-	local parentDefinition = self:GetParentPropertyDefinition()
-	if parentDefinition then
-		parent = parentDefinition:GetContainer(adornee, canInitialize)
-	else
-		parent = adornee
-	end
+	local found = self:Get(serviceBag, adornee)
 
-	if not parent then
-		return nil
-	end
-
-	if canInitialize then
-		return self:GetOrCreateInstance(parent)
-	else
-		return parent:FindFirstChild(self:GetName())
-	end
+	return found:GetContainer()
 end
 
 function RoguePropertyTableDefinition:GetOrCreateInstance(parent)

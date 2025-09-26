@@ -31,15 +31,17 @@ end
 function RoguePropertyTable:SetCanInitialize(canInitialize: boolean)
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
-	RogueProperty.SetCanInitialize(self, canInitialize)
+	if self:CanInitialize() ~= canInitialize then
+		RogueProperty.SetCanInitialize(self, canInitialize)
 
-	for _, property in self:GetRogueProperties() do
-		property:SetCanInitialize(canInitialize)
-	end
+		for _, property in self:GetRogueProperties() do
+			property:SetCanInitialize(canInitialize)
+		end
 
-	local arrayHelper = rawget(self, "_arrayHelper")
-	if arrayHelper then
-		arrayHelper:SetCanInitialize(canInitialize)
+		local arrayHelper = rawget(self, "_arrayHelper")
+		if arrayHelper then
+			arrayHelper:SetCanInitialize(canInitialize)
+		end
 	end
 end
 
@@ -49,11 +51,11 @@ function RoguePropertyTable:ObserveContainerBrio()
 		return cache
 	end
 
-	self._definition:GetContainer(self._adornee, self._canInitialize)
-
 	local parentDefinition = self._definition:GetParentPropertyDefinition()
 	if parentDefinition then
 		local parentTable = parentDefinition:Get(self._serviceBag, self._adornee)
+		parentTable:GetContainer()
+
 		cache = parentTable:ObserveContainerBrio():Pipe({
 			RxBrioUtils.switchMapBrio(function(parent)
 				return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self._definition:GetName())
@@ -81,7 +83,18 @@ function RoguePropertyTable:GetContainer(): Instance
 		end
 	end
 
-	local container = self._definition:GetContainer(self._adornee, self:CanInitialize())
+	local parent
+	local parentDefinition = self._definition:GetParentPropertyDefinition()
+	if parentDefinition then
+		local parentTable = parentDefinition:Get(self._serviceBag, self._adornee)
+		parent = parentTable:GetContainer()
+	else
+		parent = self._adornee
+	end
+
+	local container = self._definition:GetOrCreateInstance(parent, self:CanInitialize())
+	container:AddTag("RoguePropertyTable")
+
 	rawset(self, "_containerCache", container)
 	return container
 end
@@ -197,6 +210,10 @@ end
 
 function RoguePropertyTable:_observeDictionary()
 	-- ok, this is definitely slow
+	local cache = rawget(self, "_observeDictionaryCache")
+	if cache then
+		return cache
+	end
 
 	local toObserve = {}
 
@@ -210,10 +227,16 @@ function RoguePropertyTable:_observeDictionary()
 	end
 
 	if next(toObserve) == nil then
-		return Rx.of({})
+		cache = Rx.of({})
+	else
+		cache = Rx.combineLatest(toObserve):Pipe({
+			Rx.cache();
+		})
 	end
 
-	return Rx.combineLatest(toObserve)
+	rawset(self, "_observeDictionaryCache", cache)
+
+	return cache
 end
 
 function RoguePropertyTable:GetRogueProperty(name: string)
