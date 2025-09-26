@@ -1,6 +1,6 @@
 --!strict
 --[=[
-	Optimized these functions for speed as well as preserving fidality.
+	Optimized these functions for speed as well as preserving fidelity.
 	In the future, use Roblox's orthogonal angle format.
 
 	@class CFrameSerializer
@@ -60,7 +60,7 @@ function CFrameSerializer.toJSONString(cf: CFrame): string
 end
 
 --[=[
-	Returnst true if it's a table encoded cframe
+	Returns true if it's a table encoded CFrame
 
 	@param data any
 	@return boolean

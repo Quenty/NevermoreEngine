@@ -1,5 +1,5 @@
 {
-  "name": "particleplayer",
+  "name": "characterparticleplayer",
   "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"

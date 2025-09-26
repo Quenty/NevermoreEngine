@@ -71,7 +71,7 @@ function String.toPrivateCase(str: string): string
 end
 
 --[=[
-	Like trim, but only applied to the beginning of the setring
+	Like trim, but only applied to the beginning of the string
 	@param str string
 	@param pattern string? -- Defaults to whitespace
 	@return string
@@ -173,7 +173,7 @@ function String.endsWith(str: string, postfix: string): boolean
 end
 
 --[=[
-	Returns if a string starts with a postfix
+	Returns if a string starts with a prefix
 
 	@param str string
 	@param prefix string

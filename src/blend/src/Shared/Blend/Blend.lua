@@ -48,7 +48,7 @@ export type BlendProps = { [any]: any }
 	```
 
 	@param className string
-	@return (props: { [string]: any; }) -> Observable<Instance>
+	@return (props: { [string]: any }) -> Observable<Instance>
 ]=]
 function Blend.New(className: string): (props: BlendProps) -> Observable.Observable<Instance>
 	assert(type(className) == "string", "Bad className")
@@ -286,7 +286,7 @@ function Blend.Attached(constructor)
 end
 
 --[=[
-	Similiar to Fusion's ComputedPairs, where the changes are cached, and the lifetime limited.
+	Similar to Fusion's ComputedPairs, where the changes are cached, and the lifetime limited.
 	@param source Observable<T> | any
 	@param compute (key: any, value: any, innerMaid: Maid) -> Instance | Observable<Instance>
 	@return Observable<Brio<Instance>>
@@ -668,10 +668,6 @@ end
 	}))
 	```
 
-	:::tip
-
-	:::
-
 	@param className string
 	@return function
 ]=]
@@ -816,10 +812,10 @@ end
 	of multiple. Used in conjunction with [Blend.Children] and [Blend.Computed].
 
 	:::warning
-	In general, cosntructing new instances like this is a bad idea, so it's recommended against it.
+	In general, constructing new instances like this is a bad idea, so it's recommended against it.
 	:::
 
-	```
+	```lua
 	local render = Blend.New "ScreenGui" {
 		Parent = game.Players.LocalPlayer.PlayerGui;
 		[Blend.Children] = {
@@ -831,7 +827,7 @@ end
 					Size = UDim2.new(1, 0, 1, 0);
 					BackgroundTransparency = 0.5;
 				};
-			end)
+			end))
 		};
 	};
 
