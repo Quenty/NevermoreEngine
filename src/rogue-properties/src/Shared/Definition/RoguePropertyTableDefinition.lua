@@ -245,8 +245,6 @@ end
 
 --[=[
 	Gets the current container for the given adornee.
-	@param adornee Instance
-	@param canInitialize boolean
 	@return Folder?
 ]=]
 function RoguePropertyTableDefinition:GetContainer(serviceBag: ServiceBag.ServiceBag, adornee: Instance): Folder?
@@ -258,7 +256,7 @@ function RoguePropertyTableDefinition:GetContainer(serviceBag: ServiceBag.Servic
 	return found:GetContainer()
 end
 
-function RoguePropertyTableDefinition:FindInstance(parent): Folder
+function RoguePropertyTableDefinition:FindInstance(parent): Instance?
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	return parent:FindFirstChild(self:GetName())
