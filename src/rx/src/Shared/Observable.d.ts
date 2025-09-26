@@ -2,7 +2,6 @@ import { MaidTask } from '../../../maid';
 import { Subscription } from './Subscription';
 
 type Observable<T = void> = {
-  Subscribe(): Subscription<T>;
   // we type out the Pipe method using varargs instead of an array of operators.
   // this is because typescript cannot infer types from operator to operator (this is a typescript limitation)
   // however, typescript can infer types using the overloads below. this is also how rxjs does it.
@@ -80,7 +79,15 @@ type Observable<T = void> = {
   ): Observable<J>;
   Pipe(...operators: Operator<unknown, unknown>[]): Observable<unknown>;
   Subscribe(
-    fireCallback?: (...args: T extends unknown[] ? T : [T]) => void,
+    fireCallback?: T extends unknown[]
+      ? (...args: T) => void
+      : (value: T) => void,
+    failCallback?: () => void,
+    completeCallback?: () => void
+  ): Subscription<T>;
+  // overload for unresolved generic
+  Subscribe(
+    fireCallback?: (value: T) => void,
     failCallback?: () => void,
     completeCallback?: () => void
   ): Subscription<T>;
