@@ -11,8 +11,8 @@ local ObservableSortedList = require("ObservableSortedList")
 local RogueAdditive = require("RogueAdditive")
 local RogueModifierInterface = require("RogueModifierInterface")
 local RogueMultiplier = require("RogueMultiplier")
-local RoguePropertyBaseValueTypes = require("RoguePropertyBaseValueTypes")
 local RoguePropertyBaseValueTypeUtils = require("RoguePropertyBaseValueTypeUtils")
+local RoguePropertyBaseValueTypes = require("RoguePropertyBaseValueTypes")
 local RoguePropertyConstants = require("RoguePropertyConstants")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
 local RoguePropertyUtils = require("RoguePropertyUtils")
@@ -279,12 +279,11 @@ function RogueProperty:_observeModifierContainersBrio()
 				-- The modifier parent
 				RxInstanceUtils.observeChildrenBrio(parent, function(child)
 					return child:IsA(LOCAL_MODIFIER_CONTAINER_CLASS_NAME) and child.Name == name
-				end);
+				end),
 			})
 		end),
-	});
+	})
 end
-
 
 function RogueProperty:SetValue(value)
 	assert(self._definition:CanAssign(value, false)) -- This has a good error message
@@ -363,7 +362,6 @@ function RogueProperty:GetRogueModifiers()
 	return modifierList
 end
 
-
 function RogueProperty:_observeModifierSortedList()
 	local cache = rawget(self, "_observeModifierSortedListCache")
 	if cache then
@@ -378,11 +376,8 @@ function RogueProperty:_observeModifierSortedList()
 		topMaid:GiveTask(self:_observeModifierContainersBrio()
 			:Pipe({
 				RxBrioUtils.flatMapBrio(function(baseValue)
-					return RogueModifierInterface:ObserveChildrenBrio(
-						baseValue,
-						self._tieRealmService:GetTieRealm()
-					)
-				end)
+					return RogueModifierInterface:ObserveChildrenBrio(baseValue, self._tieRealmService:GetTieRealm())
+				end),
 			})
 			:Subscribe(function(brio)
 				if brio:IsDead() then

@@ -7,10 +7,10 @@ local require = require(script.Parent.loader).load(script)
 local DuckTypeUtils = require("DuckTypeUtils")
 local RogueProperty = require("RogueProperty")
 local RoguePropertyCacheService = require("RoguePropertyCacheService")
+local RoguePropertyConstants = require("RoguePropertyConstants")
 local RoguePropertyUtils = require("RoguePropertyUtils")
 local ServiceBag = require("ServiceBag")
 local ValueBaseUtils = require("ValueBaseUtils")
-local RoguePropertyConstants = require("RoguePropertyConstants")
 
 local RoguePropertyDefinition = {}
 RoguePropertyDefinition.ClassName = "RoguePropertyDefinition"

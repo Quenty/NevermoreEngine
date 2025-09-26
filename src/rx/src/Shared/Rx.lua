@@ -480,7 +480,7 @@ function Rx.shareReplay<T...>(bufferSize: number?, windowTimeSeconds: number?): 
 				buffer = {}
 				lastFail = UNSET_VALUE
 				lastComplete = UNSET_VALUE
-				local futureSub = nil
+				local futureSub: Subscription.Subscription<any>? = nil
 				local alive = true
 
 				shareMaid._currentSub = function()

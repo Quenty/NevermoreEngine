@@ -6,8 +6,8 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
-local Rx = require("Rx")
 local RoguePropertyBaseValueTypes = require("RoguePropertyBaseValueTypes")
+local Rx = require("Rx")
 
 local RoguePropertyArrayHelper = setmetatable({}, BaseObject)
 RoguePropertyArrayHelper.ClassName = "RoguePropertyArrayHelper"
@@ -116,7 +116,8 @@ function RoguePropertyArrayHelper:SetArrayBaseData(arrayData)
 			if available[index] then
 				local found = available[index]:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
 				if typeof(found) == "Instance" then
-					return found:Destroy()
+					found:Destroy()
+					return
 				end
 			end
 
@@ -154,7 +155,8 @@ function RoguePropertyArrayHelper:SetArrayData(arrayData)
 			if available[index] then
 				local found = available[index]:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
 				if typeof(found) == "Instance" then
-					return found:Destroy()
+					found:Destroy()
+					return
 				end
 			end
 

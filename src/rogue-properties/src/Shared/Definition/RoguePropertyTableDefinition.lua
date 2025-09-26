@@ -232,7 +232,11 @@ RoguePropertyTableDefinition.GetPropertyTable = RoguePropertyTableDefinition.Get
 
 	@return Observable<Brio<Folder>>
 ]=]
-function RoguePropertyTableDefinition:ObserveContainerBrio(serviceBag: ServiceBag.ServiceBag, adornee: Instance, canInitialize: boolean)
+function RoguePropertyTableDefinition:ObserveContainerBrio(
+	serviceBag: ServiceBag.ServiceBag,
+	adornee: Instance,
+	canInitialize: boolean
+)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
@@ -249,7 +253,11 @@ end
 	@param canInitialize boolean
 	@return Folder?
 ]=]
-function RoguePropertyTableDefinition:GetContainer(serviceBag: ServiceBag.ServiceBag, adornee: Instance, canInitialize: boolean): Folder?
+function RoguePropertyTableDefinition:GetContainer(
+	serviceBag: ServiceBag.ServiceBag,
+	adornee: Instance,
+	canInitialize: boolean
+): Folder?
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
