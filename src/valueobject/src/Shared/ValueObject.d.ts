@@ -12,12 +12,12 @@ export type Mountable<T> = T | Observable<T> | ValueBase | ValueObject<T>;
 interface ValueObject<T> {
   Value: T;
   Changed: Signal<T>;
-  GetCheckType: () => CheckType | undefined;
-  Mount: (value: T | Observable<T>) => MaidTask;
-  Observe: () => Observable<T>;
-  ObserveBrio: (condition?: (value: T) => boolean) => Observable<Brio<T>>;
-  SetValue: (value: T) => void;
-  Destroy: () => void;
+  GetCheckType(): CheckType | undefined;
+  Mount(value: T | Observable<T>): MaidTask;
+  Observe(): Observable<T>;
+  ObserveBrio(condition?: (value: T) => boolean): Observable<Brio<T>>;
+  SetValue(value: T): void;
+  Destroy(): void;
 }
 
 interface ValueObjectConstructor {
