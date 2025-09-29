@@ -11,6 +11,7 @@ type Maid = {
   [index in number | string]: MaidTask | undefined;
 } & {
   GiveTask(task: MaidTask): number;
+  Add<T extends MaidTask>(task: T): T;
   DoCleaning(): void;
   Destroy(): void;
 } & Map<unknown, MaidTask | undefined>;
