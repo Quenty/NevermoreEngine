@@ -78,8 +78,9 @@ type Observable<T = void> = {
     op10: Operator<I, J>
   ): Observable<J>;
   Pipe(...operators: Operator<unknown, unknown>[]): Observable<unknown>;
+  // tuple wrap to prevent distributive conditional types
   Subscribe(
-    fireCallback?: T extends unknown[]
+    fireCallback?: [T] extends [unknown[]]
       ? (...args: T) => void
       : (value: T) => void,
     failCallback?: () => void,
