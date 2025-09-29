@@ -1,16 +1,13 @@
-export namespace PlayerUtils {
-  function formatName(player: Player): string;
-  function formatDisplayName(name: string, displayName: string): string;
-  function formatDisplayNameFromUserInfo(userInfo: {
-    Username: string;
-    DisplayName: string;
-    HasVerifiedBadge: boolean;
-  }): string;
-  function addVerifiedBadgeToName(name: string): string;
-  function getDefaultNameColor(displayName: string): Color3;
-  function promiseLoadCharacter(player: Player): Promise<Model>;
-  function promiseLoadCharacterWithHumanoidDescription(
-    player: Player,
-    humanoidDescription: HumanoidDescription
-  ): Promise<Model>;
+import { Observable, Predicate } from '@quenty/rx';
+import { Brio } from '@quenty/brio';
+
+export namespace RxPlayerUtils {
+  function observePlayersBrio(
+    predicate?: Predicate<Player>
+  ): Observable<Brio<Player>>;
+  function observeLocalPlayerBrio(
+    predicate?: Predicate<Player>
+  ): Observable<Brio<Player>>;
+  function observePlayers(predicate?: Predicate<Player>): Observable<Player>;
+  function observeFirstAppearanceLoaded(player: Player): Observable;
 }
