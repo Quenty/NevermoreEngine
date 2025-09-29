@@ -55,7 +55,17 @@ export namespace Rx {
   function defaultsTo<T>(value: T): Operator<T, T>;
   function defaultsToNil<T>(source: Observable<T>): Observable<T | undefined>;
   function endWith<T>(...values: ToTuple<T>): Operator<T, T>;
-  function where<T>(predicate: Predicate<T>): Operator<T, T>;
+
+  function where<T>(
+    predicate: (value: T) => value is NonNullable<T>
+  ): Operator<T, NonNullable<T>>;
+  function where<T>(
+    predicate: (value: T) => value is Exclude<T, NonNullable<T>>
+  ): Operator<T, Exclude<T, NonNullable<T>>>;
+  // we cant do a tuple check here so we fallback to any[] (should be ok since not a lot of observables emit tuples)
+  function where<T>(predicate: (value: T) => boolean): Operator<T, T>;
+  function where<T>(predicate: (...values: any[]) => boolean): Operator<T, T>;
+
   function distinct<T>(): Operator<T, T>;
   function mapTo<T>(...args: ToTuple<T>): Operator<unknown, T>;
   function map<T, U>(project: (...args: ToTuple<T>) => U): Operator<T, U>;
