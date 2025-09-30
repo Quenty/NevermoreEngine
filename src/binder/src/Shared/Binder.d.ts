@@ -1,9 +1,14 @@
 import { Signal } from '@quenty/signal';
-import { Brio } from '@quenty/brio';
-import { CancelToken } from '@quenty/canceltoken';
-import { Observable } from '@quenty/rx';
+import { Brio } from '../../../brio';
+import { CancelToken } from '../../../canceltoken';
+import { Observable } from '../../../rx';
 
-interface Binder<T> {
+interface Static {
+  readonly ClassName: 'Binder';
+}
+
+export interface Binder<T> extends Static {
+  readonly ServiceName: string;
   Init(): void;
   Start(): void;
   GetTag(): string;
@@ -33,9 +38,7 @@ interface Binder<T> {
   Destroy(): void;
 }
 
-interface BinderConstructor {
-  readonly ClassName: 'Binder';
-
+interface BinderConstructor extends Static {
   isBinder: (value: unknown) => value is Binder<unknown>;
 
   new <TClass, TArgs extends unknown[], I extends Instance>(
@@ -46,3 +49,5 @@ interface BinderConstructor {
 }
 
 export const Binder: BinderConstructor;
+
+export {};
