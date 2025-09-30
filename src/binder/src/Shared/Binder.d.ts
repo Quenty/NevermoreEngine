@@ -1,7 +1,7 @@
 import { Signal } from '@quenty/signal';
-import { Brio } from '../../../brio';
-import { CancelToken } from '../../../canceltoken';
-import { Observable } from '../../../rx';
+import { Brio } from '@quenty/brio';
+import { CancelToken } from '@quenty/canceltoken';
+import { Observable } from '@quenty/rx';
 
 interface Binder<T> {
   Init(): void;
@@ -38,9 +38,9 @@ interface BinderConstructor {
 
   isBinder: (value: unknown) => value is Binder<unknown>;
 
-  new <TClass, TArgs extends unknown[]>(
+  new <TClass, TArgs extends unknown[], I extends Instance>(
     tagName: string,
-    constructor: new (instance: Instance, ...args: TArgs) => TClass,
+    constructor: new (instance: I, ...args: TArgs) => TClass,
     ...args: TArgs
   ): Binder<TClass>;
 }
