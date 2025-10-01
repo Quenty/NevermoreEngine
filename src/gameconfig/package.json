@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameconfig",
-  "version": "12.29.0",
+  "version": "12.30.0",
   "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
   "keywords": [
     "Roblox",

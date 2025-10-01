@@ -1,19 +1,18 @@
-# v14.24.0 (Wed Oct 01 2025)
-
-#### 🚀 Enhancement
-
-- feat: Add RxHumanoidUtils [#593](https://github.com/Quenty/NevermoreEngine/pull/593) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.23.0...@quenty/binder@14.24.0) (2025-10-01)
+
+
+### Features
+
+* Add RxHumanoidUtils ([#593](https://github.com/Quenty/NevermoreEngine/issues/593)) ([23580a9](https://github.com/Quenty/NevermoreEngine/commit/23580a979936eb13dd850b097b7c050e54373d37))
+
+
+
+
 
 # [14.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.22.0...@quenty/binder@14.23.0) (2025-09-26)
 
