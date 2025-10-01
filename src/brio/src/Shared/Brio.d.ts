@@ -1,9 +1,9 @@
 import { Maid } from '@quenty/maid';
 import { Signal } from '@quenty/signal';
 
-type ToTuple<T> = T extends unknown[] ? T : [T];
+type ToTuple<T> = T extends [unknown, ...unknown] ? T : [T];
 
-type Brio<T = void> = {
+export type Brio<T = void> = {
   Kill(): void;
   IsDead(): boolean;
   GetDiedSignal(): Signal;
@@ -24,7 +24,9 @@ interface BrioConstructor {
   new <T>(value: T): Brio<T>;
   new <T>(...values: ToTuple<T>): Brio<T>;
 
-  DEAD: Brio;
+  readonly DEAD: Brio;
 }
 
 export const Brio: BrioConstructor;
+
+export {};
