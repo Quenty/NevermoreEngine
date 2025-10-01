@@ -1,11 +1,11 @@
-import { Brio } from '../../../brio';
-import { Observable } from '../../../rx';
-import { Symbol } from '../../../symbol/src/Shared/Symbol';
-import { ValueObject } from '../../../valueobject';
+import { Brio } from '@quenty/brio';
+import { Observable } from '@quenty/rx';
+import { Symbol } from '@quenty/symbol';
+import { ValueObject } from '@quenty/valueobject';
 
 interface ObservableList<T> extends Iterable<T> {
   Observe(): Observable<T[]>;
-  ObserveItemsBrio(): Observable<Brio<T>>;
+  ObserveItemsBrio(): Observable<Brio<[T, Symbol]>>;
   ObserveIndex(indexToObserve: number): Observable<number | undefined>;
   ObserveAtIndex(indexToObserve: number): Observable<T | undefined>;
   ObserveAtIndexBrio(indexToObserve: number): Observable<Brio<T>>;
