@@ -99,7 +99,7 @@ function AttributeValue.SetValue<T>(self: AttributeValue<T>, value: T)
 	self._object:SetAttribute(rawget(self :: any, "_attributeName"), value)
 
 	return function()
-		if rawget(self :: any, "_value") == value then
+		if self.Value == value then
 			self._object:SetAttribute(rawget(self :: any, "_attributeName"), rawget(self :: any, "_defaultValue"))
 		end
 	end
