@@ -2,7 +2,7 @@ import { Maid } from '@quenty/maid';
 import { Observable, Operator } from '../../../rx';
 import { Brio } from './Brio';
 
-type ToTuple<T> = T extends unknown[] ? T : [T];
+type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 
 export namespace RxBrioUtils {
   function ofBrio<T>(callback: ((maid: Maid) => T) | T): Observable<Brio<T>>;
@@ -103,7 +103,9 @@ export namespace RxBrioUtils {
   ): (source: Observable<T | Brio<T>>) => Observable<Brio<NonNullable<T>>>;
   function switchToBrio<T>(
     predicate?: (value: T) => value is Exclude<T, NonNullable<T>>
-  ): (source: Observable<T | Brio<T>>) => Observable<Brio<Exclude<T, NonNullable<T>>>>;
+  ): (
+    source: Observable<T | Brio<T>>
+  ) => Observable<Brio<Exclude<T, NonNullable<T>>>>;
   function switchToBrio<T>(
     predicate?: (value: T) => boolean
   ): (source: Observable<T | Brio<T>>) => Observable<Brio<T>>;
