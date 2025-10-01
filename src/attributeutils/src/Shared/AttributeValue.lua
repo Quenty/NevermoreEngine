@@ -90,6 +90,22 @@ function AttributeValue.Observe<T>(self: AttributeValue<T>): Observable.Observab
 end
 
 --[=[
+	Allows you to set a value, and returns a clean up that resets to default value
+
+	@param value T
+	@return () -> () -- Cleanup
+]=]
+function AttributeValue.SetValue<T>(self: AttributeValue<T>, value: T)
+	self._object:SetAttribute(rawget(self :: any, "_attributeName"), value)
+
+	return function()
+		if rawget(self :: any, "_value") == value then
+			self._object:SetAttribute(rawget(self :: any, "_attributeName"), rawget(self :: any, "_defaultValue"))
+		end
+	end
+end
+
+--[=[
 	The current property of the Attribute. Can be assigned to to write
 	the attribute.
 	@prop Value T
@@ -124,7 +140,7 @@ end
 
 function AttributeValue.__newindex<T>(self: AttributeValue<T>, index, value)
 	if index == "Value" then
-		self._object:SetAttribute(rawget(self :: any, "_attributeName"), value)
+		self:SetValue(value)
 	elseif index == "AttributeName" then
 		error("Cannot set AttributeName")
 	else
