@@ -6,9 +6,9 @@ type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 
 type FlattenValues<T extends Record<string | number, unknown>> = {
   [K in keyof T]: T[K] extends Observable<Brio<infer V>>
-    ? V
+    ? V | undefined
     : T[K] extends Observable<infer V>
-    ? V
+    ? V | undefined
     : T[K];
 };
 
