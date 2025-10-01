@@ -4,6 +4,14 @@ import { Brio } from './Brio';
 
 type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 
+type FlattenValues<T extends Record<string | number, unknown>> = {
+  [K in keyof T]: T[K] extends Observable<Brio<infer V>>
+    ? V
+    : T[K] extends Observable<infer V>
+    ? V
+    : T[K];
+};
+
 export namespace RxBrioUtils {
   function ofBrio<T>(callback: ((maid: Maid) => T) | T): Observable<Brio<T>>;
   function toBrio<T>(): (
@@ -29,24 +37,19 @@ export namespace RxBrioUtils {
   const filter: typeof where;
   function combineLatest<
     T extends Record<
-      string | number | symbol,
+      string | number,
+      Observable<Brio<unknown>> | Observable<unknown> | unknown
+    >
+  >(observables: T): Observable<Brio<FlattenValues<T>>>;
+  function flatCombineLatestBrio<
+    T extends Record<
+      string | number,
       Observable<Brio<unknown>> | Observable<unknown> | unknown
     >
   >(
-    observables: T
-  ): Observable<
-    Brio<{
-      [K in keyof T]: T[K] extends Observable<Brio<infer V>>
-        ? V
-        : T[K] extends Observable<infer V>
-        ? V
-        : T[K];
-    }>
-  >;
-  function flatCombineLatestBrio<T>(
-    observables: Record<string, Observable<Brio<T>> | Observable<T> | T>,
-    filter?: (value: T) => boolean
-  ): Observable<Brio<Record<string, T>>>;
+    observables: T,
+    filter?: (value: FlattenValues<T>) => boolean
+  ): Observable<Brio<FlattenValues<T>>>;
   function flatMap<TBrio extends Brio<unknown[]>, TProject>(
     project: (value: TBrio) => Observable<TProject>
   ): (source: Observable<TBrio>) => Observable<TProject>;
