@@ -1,3 +1,15 @@
+# v1.24.0 (Wed Oct 01 2025)
+
+#### 🚀 Enhancement
+
+- feat: Add RxHumanoidUtils [#593](https://github.com/Quenty/NevermoreEngine/pull/593) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# (Wed Oct 01 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.24.0`, `@quenty/humanoidutils@2.3.0`, `@quenty/soundgroup@1.24.0`
+  - feat: Add RxHumanoidUtils [#593](https://github.com/Quenty/NevermoreEngine/pull/593) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Sep 26 2025)
 
 #### 🚀 Enhancement
