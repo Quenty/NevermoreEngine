@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
     "@quenty/counter": "file:../counter",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
