@@ -1,6 +1,6 @@
-import { Brio } from '../../../brio';
+import { Brio } from '@quenty/brio';
 import { Maid } from '@quenty/maid';
-import { Observable } from '../../../rx';
+import { Observable } from '@quenty/rx';
 import { ValueObject } from './ValueObject';
 
 export namespace ValueObjectUtils {

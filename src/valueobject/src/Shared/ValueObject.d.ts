@@ -1,6 +1,6 @@
-import { Brio } from '../../../brio';
-import { MaidTask } from '../../../maid/src/Shared/Maid';
-import { Observable } from '../../../rx';
+import { Brio } from '@quenty/brio';
+import { MaidTask } from '@quenty/maid';
+import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
 
 type CheckType =
@@ -15,6 +15,12 @@ interface ValueObject<T> {
   GetCheckType(): CheckType | undefined;
   Mount(value: T | Observable<T>): MaidTask;
   Observe(): Observable<T>;
+  ObserveBrio(
+    condition?: (value: T) => value is NonNullable<T>
+  ): Observable<Brio<NonNullable<T>>>;
+  ObserveBrio(
+    condition?: (value: T) => value is Exclude<T, NonNullable<T>>
+  ): Observable<Brio<Exclude<T, NonNullable<T>>>>;
   ObserveBrio(condition?: (value: T) => boolean): Observable<Brio<T>>;
   SetValue(value: T): void;
   Destroy(): void;
