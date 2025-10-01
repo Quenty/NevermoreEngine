@@ -32,8 +32,14 @@ export namespace RxBrioUtils {
     source: Observable<Brio<T>>
   ) => Observable<Brio<T>>;
   function where<T>(
+    predicate: (value: T) => value is NonNullable<T>
+  ): Operator<Brio<T>, Brio<NonNullable<T>>>;
+  function where<T>(
+    predicate: (value: T) => value is Exclude<T, NonNullable<T>>
+  ): Operator<Brio<T>, Brio<Exclude<T, NonNullable<T>>>>;
+  function where<T>(
     predicate: (value: T) => boolean
-  ): (source: Observable<Brio<T>>) => Observable<Brio<T>>;
+  ): Operator<Brio<T>, Brio<T>>;
   const filter: typeof where;
   function combineLatest<
     T extends Record<
