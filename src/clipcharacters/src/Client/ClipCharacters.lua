@@ -1,6 +1,6 @@
 --!strict
 --[=[
-	Clip characters locally on the client of other clients so they don't interfer with physics.
+	Clip characters locally on the client of other clients so they don't interfere with physics.
 	@class ClipCharacters
 ]=]
 

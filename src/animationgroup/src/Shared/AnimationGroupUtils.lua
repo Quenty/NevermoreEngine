@@ -1,7 +1,7 @@
 --!strict
 --[=[
 	An animation group is a group of animations, such as the idle animations that Roblox plays.
-	This utility functions are intended to help recreate a custom animation playback system with
+	These utility functions are intended to help recreate a custom animation playback system with
 	weighted values.
 	@class AnimationGroupUtils
 ]=]

@@ -57,7 +57,7 @@ local Rx = {
 }
 
 --[=[
-	Pipes the tranformers through each other
+	Pipes the transformers through each other
 	https://rxjs-dev.firebaseapp.com/api/index/function/pipe
 
 	@param transformers { Observable<any> }

@@ -1,13 +1,13 @@
 --!strict
 --[=[
-	Observables are like an [signal](/api/Signal), except they do not execute code
+	Observables are like [Signals](/api/Signal), except they do not execute code
 	until the observable is subscribed to. This follows the standard
 	Rx API surface for an observable.
 
 	Observables use a [Subscription](/api/Subscription) to emit values.
 
 	```lua
-	-- Constucts an observable which will emit a, b, c via a subscription
+	-- Constructs an observable which will emit a, b, c via a subscription
 	local observable = Observable.new(function(sub)
 		print("Connected")
 		sub:Fire("a")

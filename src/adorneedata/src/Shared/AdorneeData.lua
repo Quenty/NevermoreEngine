@@ -24,7 +24,7 @@
 	```lua
 	local data = CombatConfiguration:Create(workspace)
 
-	-- Can ready any data
+	-- Can read any data
 	print(data.EnableCombat.Value) --> true
 	print(data.PunchDamage.Value) --> 15
 	print(data.Value) --> { EnableCombat = true, PunchDamage = true }

@@ -448,7 +448,7 @@ end
 --[=[
 	Fires all clients with the event.
 
-	Equivalent of [RemoteEvent.FireAllClients].
+	Equivalent of [RemoteEvent:FireAllClients].
 
 	@server
 	@param memberName string

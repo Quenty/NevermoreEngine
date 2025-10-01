@@ -471,7 +471,7 @@ end
 	3. All resources are invalidated
 	4. We still wanted to be able to use most of the resources
 
-	With this method we are able to do this, as we'll re-emit a table with all resoruces
+	With this method we are able to do this, as we'll re-emit a table with all resources
 	except the invalidated one.
 
 	@since 3.6.0
