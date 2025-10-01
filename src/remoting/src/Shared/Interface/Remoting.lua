@@ -229,7 +229,7 @@ end
 
 --[=[
 	If on the server, creates a new [RemoteFunction] with the name `memberName` and binds the
-	invoke. On the client, it waits for the event to exist and then binds to it.
+	invoke. On the client, it waits for the function to exist and then binds to it.
 
 	@param memberName string
 	@param callback any
@@ -322,7 +322,7 @@ function Remoting.DeclareEvent(self: Remoting, memberName: string)
 end
 
 --[=[
-	Forward declares an event on the remoting object
+	Forward declares a method on the remoting object
 
 	@param memberName string
 ]=]
@@ -397,7 +397,7 @@ end
 	remoting.Event:FireClient(otherPlayer, ...)
 	```
 
-	Equivalent of [RemoteFunction.FireClient].
+	Equivalent of [RemoteEvent:FireClient].
 
 
 	@param memberName string
