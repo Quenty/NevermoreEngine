@@ -4,7 +4,7 @@ import { Signal } from '@quenty/signal';
 import { CancelToken } from '@quenty/canceltoken';
 import { Promise } from '@quenty/promise';
 
-type ToTuple<T> = T extends unknown[] ? T : [T];
+type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 
 export type Predicate<T> = (...args: ToTuple<T>) => boolean;
 
