@@ -8,7 +8,7 @@ interface ObservableList<T> extends Iterable<T> {
   ObserveItemsBrio(): Observable<Brio<[T, Symbol]>>;
   ObserveIndex(indexToObserve: number): Observable<number | undefined>;
   ObserveAtIndex(indexToObserve: number): Observable<T | undefined>;
-  ObserveAtIndexBrio(indexToObserve: number): Observable<Brio<T>>;
+  ObserveAtIndexBrio(indexToObserve: number): Observable<Brio<T | undefined>>;
   RemoveFirst(item: T): boolean;
   GetCountValue(): ValueObject<number>;
   ObserveIndexByKey(key: Symbol): Observable<number | undefined>;
