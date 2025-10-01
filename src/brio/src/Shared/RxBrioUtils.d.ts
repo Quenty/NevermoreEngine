@@ -1,6 +1,8 @@
 import { Maid } from '@quenty/maid';
-import { Observable } from '../../../rx';
+import { Observable, Operator } from '../../../rx';
 import { Brio } from './Brio';
+
+type ToTuple<T> = T extends unknown[] ? T : [T];
 
 export namespace RxBrioUtils {
   function ofBrio<T>(callback: ((maid: Maid) => T) | T): Observable<Brio<T>>;
@@ -48,9 +50,14 @@ export namespace RxBrioUtils {
   function flatMap<TBrio extends Brio<unknown[]>, TProject>(
     project: (value: TBrio) => Observable<TProject>
   ): (source: Observable<TBrio>) => Observable<TProject>;
-  function flatMapBrio<TBrio extends Brio<unknown[]>, TProject>(
-    project: (value: TBrio) => Observable<TProject> | Observable<Brio<TProject>>
-  ): (source: Observable<TBrio>) => Observable<Brio<TProject>>;
+  function flatMapBrio<TBrio extends Brio<unknown>, TProject>(
+    project: (
+      ...values: TBrio extends Brio<infer V> ? ToTuple<V> : [never]
+    ) => Observable<TProject>
+  ): Operator<
+    TBrio,
+    TProject extends Brio<unknown> ? TProject : Brio<TProject>
+  >;
   function switchMap<TBrio extends Brio<unknown[]>, TProject>(
     project: (value: TBrio) => Observable<TProject>
   ): (source: Observable<TBrio>) => Observable<TProject>;
@@ -95,3 +102,5 @@ export namespace RxBrioUtils {
     predicate?: (value: T) => boolean
   ): (source: Observable<T | Brio<T>>) => Observable<Brio<T>>;
 }
+
+export {};
