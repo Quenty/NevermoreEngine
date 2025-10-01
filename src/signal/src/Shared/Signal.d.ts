@@ -16,7 +16,7 @@ interface Signal<T = void> {
 interface SignalConstructor {
   readonly ClassName: 'Signal';
   isSignal: (value: unknown) => value is Signal<unknown>;
-  new <T>(): Signal<T>;
+  new <T = void>(): Signal<T>;
 }
 
 export const Signal: SignalConstructor;
