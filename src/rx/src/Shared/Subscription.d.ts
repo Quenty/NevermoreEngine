@@ -1,5 +1,5 @@
 type Subscription<T> = {
-  Fire(...args: T extends unknown[] ? T : [T]): void;
+  Fire(value: T): void;
   Fail(): void;
   GetFireFailComplete(): LuaTuple<
     [
@@ -19,7 +19,7 @@ type Subscription<T> = {
 
 interface SubscriptionConstructor {
   readonly ClassName: 'Subscription';
-  new <T extends unknown[]>(
+  new <T>(
     fireCallback: () => void,
     failCallback: () => void,
     completeCallback: () => void,
