@@ -1,23 +1,18 @@
-# v2.10.0 (Fri Oct 03 2025)
-
-#### 🚀 Enhancement
-
-- feat: Add small fixes [#595](https://github.com/Quenty/NevermoreEngine/pull/595) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Render parabulas that aren't minimum entrance timing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.9.0...@quenty/trajectory@2.10.0) (2025-10-03)
+
+
+### Bug Fixes
+
+* Render parabulas that aren't minimum entrance timing ([f3d4d64](https://github.com/Quenty/NevermoreEngine/commit/f3d4d645701ba2ad1f0cce403cf60c15b1743617))
+
+
+
+
 
 # [2.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.8.0...@quenty/trajectory@2.9.0) (2025-07-11)
 
