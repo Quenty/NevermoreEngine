@@ -1,3 +1,17 @@
+# (Fri Oct 03 2025)
+
+#### 🚀 Enhancement
+
+- feat: Add RxHumanoidUtils [#594](https://github.com/Quenty/NevermoreEngine/pull/594) ([@Quenty](https://github.com/Quenty))
+- `@quenty/collectionserviceutils@8.21.0`, `@quenty/trajectory@2.10.0`
+  - feat: Add small fixes [#595](https://github.com/Quenty/NevermoreEngine/pull/595) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Oct 01 2025)
 
 #### 🚀 Enhancement
