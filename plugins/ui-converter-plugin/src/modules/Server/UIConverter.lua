@@ -189,7 +189,6 @@ function UIConverter:PromiseDefaultValue(class, property, overrideMap)
 		return classCache[propertyName][overrideMap]
 	end
 
-
 	-- then check default
 	local inst = Instance.new(className)
 	local defaultValue
