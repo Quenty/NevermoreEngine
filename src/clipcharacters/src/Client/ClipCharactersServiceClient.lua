@@ -21,8 +21,8 @@ function ClipCharactersServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 end
 
 --[=[
-	Disables collisions between default geometry and other charaters which stops some random physics
-	glitches from occuring.
+	Disables collisions between default geometry and other characters which stops some random physics
+	glitches from occurring.
 ]=]
 function ClipCharactersServiceClient:PushDisableCharacterCollisionsWithDefault()
 	return self._disableCollisions:PushState(true)

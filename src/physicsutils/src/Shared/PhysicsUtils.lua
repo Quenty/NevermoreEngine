@@ -61,7 +61,7 @@ function PhysicsUtils.estimateBuoyancyContribution(parts: { BasePart }): (number
 end
 
 --[=[
-	Return's the world vector center of mass.
+	Returns the world vector center of mass.
 	@param parts { BasePart }
 	@return Vector3 -- position
 	@return number -- mass
@@ -82,7 +82,7 @@ end
 	Calculates the moment of inertia of a solid cuboid.
 
 	:::warning
-	This is wrong for Roblox. Roblox has hollow cuvoids as parts
+	This is wrong for Roblox. Roblox has hollow cuboids as parts
 	:::
 
 	@param part BasePart

@@ -6,7 +6,7 @@
 	:::tip
 	Each method generally takes a random object in as the last argument,
 	which can be used to seed the randomness. This is especially useful for
-	reproducting state in testing.
+	reproducing state in testing.
 	:::
 
 	@class RandomUtils
@@ -186,7 +186,7 @@ function RandomUtils.gaussianRandom(random: Random?): number
 end
 
 --[=[
-	@param random? Random? -- Optional random to use
+	@param random Random? -- Optional random to use
 	@return Vector3
 ]=]
 function RandomUtils.randomUnitVector3(random: Random?): Vector3

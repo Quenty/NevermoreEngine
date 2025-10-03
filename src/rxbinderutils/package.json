@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/binder/"
+    "directory": "src/rxbinderutils/"
   },
   "funding": {
     "type": "patreon",
