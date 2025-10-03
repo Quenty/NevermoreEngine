@@ -211,19 +211,27 @@ end
 
 function RxRagdollUtils.enforceHumanoidState(humanoid: Humanoid)
 	local maid = Maid.new()
+
+	if humanoid:GetState() == Enum.HumanoidStateType.Dead then
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+	end
 	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 
 	-- If you're holding a humanoid and jump, then the humanoid state
 	-- changes to your humanoid's state.
 
 	maid._keepAsPhysics = humanoid.StateChanged:Connect(function(_old, new)
-		if new ~= Enum.HumanoidStateType.Physics and new ~= Enum.HumanoidStateType.Dead then
+		if new ~= Enum.HumanoidStateType.Physics then
+			if new == Enum.HumanoidStateType.Dead then
+				humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+			end
 			humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 		end
 	end)
 
 	maid:GiveTask(function()
 		maid._keepAsPhysics = nil
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
 
 		if humanoid:GetState() ~= Enum.HumanoidStateType.Dead then
 			humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
