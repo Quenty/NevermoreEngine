@@ -56,9 +56,9 @@ export namespace RxBrioUtils {
     observables: T,
     filter?: (value: FlattenValues<T>) => boolean
   ): Observable<Brio<FlattenValues<T>>>;
-  function flatMap<TBrio extends Brio<unknown[]>, TProject>(
-    project: (value: TBrio) => Observable<TProject>
-  ): (source: Observable<TBrio>) => Observable<TProject>;
+  function flatMap<T, TProject>(
+    project: (value: T) => Observable<TProject>
+  ): (source: Observable<Brio<T>>) => Observable<TProject>;
   function flatMapBrio<TBrio extends Brio<unknown>, TProject>(
     project: (
       ...values: TBrio extends Brio<infer V> ? ToTuple<V> : [never]
