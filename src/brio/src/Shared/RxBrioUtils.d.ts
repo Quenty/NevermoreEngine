@@ -67,16 +67,16 @@ export namespace RxBrioUtils {
     TBrio,
     TProject extends Brio<unknown> ? TProject : Brio<TProject>
   >;
-  function switchMap<TBrio extends Brio<unknown[]>, TProject>(
-    project: (value: TBrio) => Observable<TProject>
-  ): (source: Observable<TBrio>) => Observable<TProject>;
-  function switchMapBrio<TBrio extends Brio<unknown[]>, TProject>(
-    project: (value: TBrio) => Observable<TProject> | Observable<Brio<TProject>>
-  ): (source: Observable<TBrio>) => Observable<Brio<TProject>>;
+  function switchMap<T, TProject>(
+    project: (value: T) => Observable<TProject>
+  ): (source: Observable<Brio<T>>) => Observable<TProject>;
+  function switchMapBrio<T, TProject>(
+    project: (value: T) => Observable<TProject> | Observable<Brio<TProject>>
+  ): (source: Observable<Brio<T>>) => Observable<Brio<TProject>>;
   function flatCombineLatest<T>(
     observables: Record<string, Observable<Brio<T>> | Observable<T> | T>
   ): Observable<Record<string, T | undefined>>;
-  function mapBrio<TBrio extends Brio<unknown[]>, TProject>(
+  function mapBrio<TBrio extends Brio<unknown>, TProject>(
     project: (value: TBrio) => Observable<TProject>
   ): (brio: TBrio) => Observable<TProject>;
   function prepend<T>(
@@ -88,9 +88,9 @@ export namespace RxBrioUtils {
   function map<T, U>(
     project: (...args: unknown[]) => U
   ): (source: Observable<Brio<T> | T>) => Observable<Brio<U>>;
-  function mapBrioBrio<TBrio extends Brio<unknown[]>, TProject>(
-    project: (value: TBrio) => Observable<TProject> | Observable<Brio<TProject>>
-  ): (brio: TBrio) => Observable<Brio<TProject>>;
+  function mapBrioBrio<T extends Brio<unknown>, TProject>(
+    project: (value: T) => Observable<TProject> | Observable<Brio<TProject>>
+  ): (brio: Brio<T>) => Observable<Brio<TProject>>;
   function toEmitOnDeathObservable<T, U>(
     brio: Brio<T> | T,
     emitOnDeathValue: U
