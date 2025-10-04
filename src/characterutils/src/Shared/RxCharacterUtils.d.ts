@@ -9,7 +9,7 @@ export namespace RxCharacterUtils {
   function observeIsOfLocalCharacterBrio(
     instance: Instance
   ): Observable<Brio<boolean>>;
-  function observeLocalPlayerCharacter(): Observable<Model>;
+  function observeLocalPlayerCharacter(): Observable<Model | undefined>;
   function observeLastHumanoidBrio(player: Player): Observable<Brio<Humanoid>>;
   function observeLastAliveHumanoidBrio(
     player: Player
