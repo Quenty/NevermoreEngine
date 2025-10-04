@@ -25,6 +25,7 @@ interface BrioConstructor {
   new <T>(...values: ToTuple<T>): Brio<T>;
 
   readonly DEAD: Brio;
+  isBrio: (value: unknown) => value is Brio;
 }
 
 export const Brio: BrioConstructor;
