@@ -1,3 +1,4 @@
+import { AdorneeData } from '@quenty/adorneedata';
 import { AttributeValue } from '@quenty/attributeutils';
 import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
@@ -10,6 +11,9 @@ type MapToValues<T extends Record<PropertyKey, unknown> | unknown> =
           : AttributeValue<T[K]>;
       }>
     : {};
+
+export type FromAdorneeData<T extends AdorneeData<unknown>> =
+      T extends AdorneeData<infer U> ? AdorneeDataValue<U> : never;
 
 type AdorneeDataValue<T> = MapToValues<T> & {
   Value: T;
