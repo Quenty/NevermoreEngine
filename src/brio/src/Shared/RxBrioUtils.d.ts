@@ -19,7 +19,7 @@ export namespace RxBrioUtils {
   ) => Observable<Brio<T>>;
   function of<T>(...values: T[]): Observable<Brio<T | T[]>>;
   function completeOnDeath<T>(
-    brio: Brio<unknown[]>,
+    brio: Brio<unknown>,
     observable: Observable<T>
   ): Observable<T>;
   function emitWhileAllDead<T, U>(
