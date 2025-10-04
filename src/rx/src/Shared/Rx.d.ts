@@ -29,8 +29,8 @@ export namespace Rx {
   ): Observable<T>;
   function fromPromise<T>(promise: Promise<T>): Observable<T>;
 
-  function tap<T>(
-    onFire?: (...args: ToTuple<T>) => void,
+  function tap<T, S extends T>(
+    onFire?: (...args: ToTuple<S>) => void,
     onError?: (...args: unknown[]) => void,
     onComplete?: (...args: unknown[]) => void
   ): Operator<T, T>;
