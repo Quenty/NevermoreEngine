@@ -68,7 +68,7 @@ export namespace Rx {
 
   function distinct<T>(): Operator<T, T>;
   function mapTo<T>(...args: ToTuple<T>): Operator<unknown, T>;
-  function map<T, U>(project: (...args: ToTuple<T>) => U): Operator<T, U>;
+  function map<T, S extends T, U>(project: (...args: ToTuple<S>) => U): Operator<T, U>;
   function mergeAll<T>(): Operator<Observable<T>, T>;
   function switchAll<T>(): Operator<Observable<T>, T>;
   function flatMap<T, U>(
