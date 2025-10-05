@@ -17,7 +17,7 @@ export namespace RxBrioUtils {
   function toBrio<T>(): (
     source: Observable<Brio<T> | T>
   ) => Observable<Brio<T>>;
-  function of<T>(...values: T[]): Observable<Brio<T | T[]>>;
+  function of<T extends unknown[]>(...values: T): Observable<Brio<T[number]>>;
   function completeOnDeath<T>(
     brio: Brio<unknown>,
     observable: Observable<T>
