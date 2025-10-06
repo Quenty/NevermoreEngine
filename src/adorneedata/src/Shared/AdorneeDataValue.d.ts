@@ -1,13 +1,14 @@
-import { AdorneeData } from '@quenty/adorneedata';
+import { AdorneeData, AdorneeDataEntry } from '@quenty/adorneedata';
 import { AttributeValue } from '@quenty/attributeutils';
 import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
+import { ValueObjectLike } from '@quenty/valueobject';
 
 type MapToValues<T extends Record<PropertyKey, unknown> | unknown> =
   T extends Record<PropertyKey, unknown>
     ? Readonly<{
-        [K in keyof T]: T[K] extends Record<PropertyKey, unknown>
-          ? never
+        [K in keyof T]: T[K] extends AdorneeDataEntry<V>
+          ? ValueObjectLike<V>
           : AttributeValue<T[K]>;
       }>
     : {};
