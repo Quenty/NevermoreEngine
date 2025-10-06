@@ -21,7 +21,7 @@ export namespace Rx {
     observable: Observable<T>,
     cancelToken?: CancelToken
   ): Promise<T>;
-  function merge<T>(observables: Observable<T>[]): Observable<T>;
+  function merge<T extends Observable<unknown>[]>(observables: T): Observable<T extends Observable<infer U>[] ? U : never>;
   function fromSignal<T>(
     event:
       | Signal<T>
