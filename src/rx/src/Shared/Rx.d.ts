@@ -21,7 +21,9 @@ export namespace Rx {
     observable: Observable<T>,
     cancelToken?: CancelToken
   ): Promise<T>;
-  function merge<T extends Observable<unknown>[]>(observables: T): Observable<T extends Observable<infer U>[] ? U : never>;
+  function merge<T extends Observable<unknown>[]>(
+    observables: T
+  ): Observable<T extends Observable<infer U>[] ? U : never>;
   function fromSignal<T>(
     event:
       | Signal<T>
@@ -68,7 +70,9 @@ export namespace Rx {
 
   function distinct<T>(): Operator<T, T>;
   function mapTo<T>(...args: ToTuple<T>): Operator<unknown, T>;
-  function map<T, S extends T, U>(project: (...args: ToTuple<S>) => U): Operator<T, U>;
+  function map<T, S extends T, U>(
+    project: (...args: ToTuple<S>) => U
+  ): Operator<T, U>;
   function mergeAll<T>(): Operator<Observable<T>, T>;
   function switchAll<T>(): Operator<Observable<T>, T>;
   function flatMap<T, U>(
@@ -103,7 +107,7 @@ export namespace Rx {
     initialDelaySeconds: number,
     seconds: number
   ): Observable<number[]>;
-  function interval(seconds: number): Observable<number[]>;
+  function interval(seconds: number): Observable<number>;
   function withLatestFrom<T, U>(
     inputObservables: Observable<U>[]
   ): Operator<T, [T, ...ToTuple<U>]>;
