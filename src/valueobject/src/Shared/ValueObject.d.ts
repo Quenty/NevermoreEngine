@@ -3,25 +3,30 @@ import { MaidTask } from '@quenty/maid';
 import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
 
+export interface ValueObjectLike<T> {
+  Value: T;
+  Changed: Signal<T>;
+  Observe(): Observable<T>;
+  ObserveBrio(
+    predicate?: (value: T) => value is NonNullable<T>
+  ): Observable<Brio<NonNullable<T>>>;
+  ObserveBrio(
+    predicate?: (value: T) => value is Exclude<T, NonNullable<T>>
+  ): Observable<Brio<Exclude<T, NonNullable<T>>>>;
+  ObserveBrio(predicate?: (value: T) => boolean): Observable<Brio<T>>;
+}
+
 type CheckType =
   | keyof CheckableTypes
   | ((value: unknown) => LuaTuple<[boolean, string?]>);
 
 export type Mountable<T> = T | Observable<T> | ValueBase | ValueObject<T>;
 
-interface ValueObject<T> {
+export interface ValueObject<T> extends Omit<ValueObjectLike<T>, 'Changed'> {
   Value: T;
-  Changed: Signal<T>;
+  Changed: Signal<[newValue: T, oldValue: T, ...args: unknown[]]>;
   GetCheckType(): CheckType | undefined;
   Mount(value: T | Observable<T>): MaidTask;
-  Observe(): Observable<T>;
-  ObserveBrio(
-    condition?: (value: T) => value is NonNullable<T>
-  ): Observable<Brio<NonNullable<T>>>;
-  ObserveBrio(
-    condition?: (value: T) => value is Exclude<T, NonNullable<T>>
-  ): Observable<Brio<Exclude<T, NonNullable<T>>>>;
-  ObserveBrio(condition?: (value: T) => boolean): Observable<Brio<T>>;
   SetValue(value: T): void;
   Destroy(): void;
 }
@@ -35,3 +40,5 @@ interface ValueObjectConstructor {
 }
 
 export const ValueObject: ValueObjectConstructor;
+
+export {};

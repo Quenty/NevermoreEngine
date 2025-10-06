@@ -1,6 +1,6 @@
 import { AttributeValue } from '@quenty/attributeutils';
 import { Observable } from '@quenty/rx';
-import { ValueObject } from '@quenty/valueobject';
+import { ValueObjectLike } from '@quenty/valueobject';
 
 type ValueInterface = (
   value: unknown
@@ -25,7 +25,7 @@ interface AdorneeDataEntryConstructor {
   readonly ClassName: 'AdorneeDataEntry';
   new <T>(
     interface: string | ValueInterface,
-    createValueObject: (adornee: Instance) => ValueObject<unknown>,
+    createValueObject: (adornee: Instance) => ValueObjectLike<unknown>,
     defaultValue?: T
   ): AdorneeDataEntry<T>;
 
