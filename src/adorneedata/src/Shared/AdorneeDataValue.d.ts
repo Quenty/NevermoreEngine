@@ -7,7 +7,7 @@ import { ValueObjectLike } from '@quenty/valueobject';
 type MapToValues<T extends Record<PropertyKey, unknown> | unknown> =
   T extends Record<PropertyKey, unknown>
     ? Readonly<{
-        [K in keyof T]: T[K] extends AdorneeDataEntry<V>
+        [K in keyof T]: T[K] extends AdorneeDataEntry<infer V>
           ? ValueObjectLike<V>
           : AttributeValue<T[K]>;
       }>
