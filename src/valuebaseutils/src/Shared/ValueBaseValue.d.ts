@@ -5,7 +5,7 @@ interface ValueBaseValue<T> extends ValueObjectLike<T> {}
 
 interface ValueBaseValueConstructor {
   readonly ClassName: 'ValueBaseValue';
-  new <T>(
+  new <T = unknown>(
     parent: Instance,
     className: ValueBaseType,
     name: string,

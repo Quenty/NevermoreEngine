@@ -23,11 +23,11 @@ type AdorneeDataEntry<T> = {
 
 interface AdorneeDataEntryConstructor {
   readonly ClassName: 'AdorneeDataEntry';
-  new <T>(
-    interface: string | ValueInterface,
-    createValueObject: (adornee: Instance) => ValueObjectLike<unknown>,
-    defaultValue?: T
-  ): AdorneeDataEntry<T>;
+  new <T extends keyof CheckableTypes | ValueInterface>(
+    interface: T,
+    createValueObject: (adornee: Instance) => ValueObjectLike<T extends (value: unknown) => value is infer V ? V : CheckableTypes[T]>,
+    defaultValue?: T extends (value: unknown) => value is infer V ? NonNullable<V> : CheckableTypes[T]
+  ): AdorneeDataEntry<T extends (value: unknown) => value is infer V ? V : CheckableTypes[T]>;
 
   isAdorneeDataEntry: (value: unknown) => value is AdorneeDataEntry<unknown>;
   optionalAttribute: (
