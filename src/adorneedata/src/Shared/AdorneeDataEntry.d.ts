@@ -4,7 +4,12 @@ import { ValueObject } from '@quenty/valueobject';
 
 type ValueInterface = (
   value: unknown
-) => LuaTuple<[success: boolean, errorMessage?: string]>;
+) =>
+  | boolean
+  | (
+      | LuaTuple<[success: true, errorMessage: undefined]>
+      | LuaTuple<[success: false, errorMessage: string]>
+    );
 
 type AdorneeDataEntry<T> = {
   Create(adornee: Instance): AttributeValue<T>;
