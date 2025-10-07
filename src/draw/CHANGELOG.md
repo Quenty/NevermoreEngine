@@ -1,19 +1,18 @@
-# v7.9.1 (Tue Oct 07 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Add shapecast to draw library [#598](https://github.com/Quenty/NevermoreEngine/pull/598) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.9.0...@quenty/draw@7.9.1) (2025-10-07)
+
+
+### Bug Fixes
+
+* Drawing ([#598](https://github.com/Quenty/NevermoreEngine/issues/598)) ([97950ce](https://github.com/Quenty/NevermoreEngine/commit/97950ceef7f6107eaa2e11bd05da78353c815542))
+
+
+
+
 
 # [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.8.4...@quenty/draw@7.9.0) (2025-05-10)
 
