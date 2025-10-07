@@ -1,3 +1,15 @@
+# v7.9.1 (Tue Oct 07 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Add shapecast to draw library [#598](https://github.com/Quenty/NevermoreEngine/pull/598) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
