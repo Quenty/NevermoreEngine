@@ -48,7 +48,7 @@ end
 function RogueAdditive:ObserveModifiedVersion(inputValue)
 	return Rx.combineLatest({
 		inputValue = inputValue,
-		enabled = self._data.Enabled:Observe();
+		enabled = self._data.Enabled:Observe(),
 		additive = RxInstanceUtils.observeProperty(self._obj, "Value"),
 	}):Pipe({
 		Rx.map(function(state)

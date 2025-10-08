@@ -48,7 +48,7 @@ end
 function RogueMultiplier:ObserveModifiedVersion(inputValue)
 	return Rx.combineLatest({
 		inputValue = inputValue,
-		enabled = self._data.Enabled:Observe();
+		enabled = self._data.Enabled:Observe(),
 		multiplier = RxInstanceUtils.observeProperty(self._obj, "Value"),
 	}):Pipe({
 		Rx.map(function(state)

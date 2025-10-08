@@ -7,8 +7,8 @@ local require = require(script.Parent.loader).load(script)
 local Binder = require("Binder")
 local RogueModifierBase = require("RogueModifierBase")
 local RogueModifierInterface = require("RogueModifierInterface")
-local RxValueBaseUtils = require("RxValueBaseUtils")
 local Rx = require("Rx")
+local RxValueBaseUtils = require("RxValueBaseUtils")
 
 local RogueSetter = setmetatable({}, RogueModifierBase)
 RogueSetter.ClassName = "RogueSetter"
@@ -38,8 +38,8 @@ function RogueSetter:ObserveModifiedVersion(inputValue)
 			else
 				return inputValue
 			end
-		end);
-		Rx.distinct();
+		end),
+		Rx.distinct(),
 	})
 end
 

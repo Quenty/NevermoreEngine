@@ -87,7 +87,6 @@ function RxHumanoidUtils.observeHumanoidStateType(humanoid: Humanoid): Observabl
 
 		return maid
 	end)
-
 end
 
 return RxHumanoidUtils
