@@ -24,6 +24,10 @@ function RogueMultiplier.new(valueObject, serviceBag)
 end
 
 function RogueMultiplier:GetModifiedVersion(value)
+	if not self._data.Enabled.Value then
+		return value
+	end
+
 	local input = LinearValue.toLinearIfNeeded(value)
 	local multiplier = LinearValue.toLinearIfNeeded(self._obj.Value)
 
@@ -31,6 +35,10 @@ function RogueMultiplier:GetModifiedVersion(value)
 end
 
 function RogueMultiplier:GetInvertedVersion(value)
+	if not self._data.Enabled.Value then
+		return value
+	end
+
 	local input = LinearValue.toLinearIfNeeded(value)
 	local multiplier = LinearValue.toLinearIfNeeded(self._obj.Value)
 
@@ -40,9 +48,14 @@ end
 function RogueMultiplier:ObserveModifiedVersion(inputValue)
 	return Rx.combineLatest({
 		inputValue = inputValue,
+		enabled = self._data.Enabled:Observe();
 		multiplier = RxInstanceUtils.observeProperty(self._obj, "Value"),
 	}):Pipe({
 		Rx.map(function(state)
+			if not state.enabled then
+				return state.inputValue
+			end
+
 			if state.inputValue and type(state.inputValue) == type(state.multiplier) then
 				local input = LinearValue.toLinearIfNeeded(state.inputValue)
 				local multiplier = LinearValue.toLinearIfNeeded(state.multiplier)

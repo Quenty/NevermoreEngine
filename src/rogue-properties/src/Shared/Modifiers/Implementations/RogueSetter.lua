@@ -8,6 +8,7 @@ local Binder = require("Binder")
 local RogueModifierBase = require("RogueModifierBase")
 local RogueModifierInterface = require("RogueModifierInterface")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local Rx = require("Rx")
 
 local RogueSetter = setmetatable({}, RogueModifierBase)
 RogueSetter.ClassName = "RogueSetter"
@@ -21,15 +22,32 @@ function RogueSetter.new(valueObject, serviceBag)
 	return self
 end
 
-function RogueSetter:GetModifiedVersion()
-	return self._obj.Value
+function RogueSetter:GetModifiedVersion(value)
+	if self._data.Enabled.Value then
+		return self._obj.Value
+	else
+		return value
+	end
 end
 
-function RogueSetter:ObserveModifiedVersion()
-	return RxValueBaseUtils.observeValue(self._obj)
+function RogueSetter:ObserveModifiedVersion(inputValue)
+	return self._data.Enabled:Observe():Pipe({
+		Rx.switchMap(function(enabled)
+			if enabled then
+				return RxValueBaseUtils.observeValue(self._obj)
+			else
+				return inputValue
+			end
+		end);
+		Rx.distinct();
+	})
 end
 
-function RogueSetter:GetInvertedVersion(_, initialValue)
+function RogueSetter:GetInvertedVersion(value, initialValue)
+	if not self._data.Enabled.Value then
+		return value
+	end
+
 	return initialValue
 end
 
