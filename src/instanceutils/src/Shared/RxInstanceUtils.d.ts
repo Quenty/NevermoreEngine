@@ -1,5 +1,5 @@
-import { Brio } from '../../../brio';
-import { Observable, Predicate } from '../../../rx';
+import { Brio } from '@quenty/brio';
+import { Observable, Predicate } from '@quenty/rx';
 
 export namespace RxInstanceUtils {
   function observeProperty<
@@ -16,6 +16,34 @@ export namespace RxInstanceUtils {
     instance: Instance,
     className: T
   ): Observable<Instances[T] | undefined>;
+
+  function observePropertyBrio<
+    T extends Instance,
+    K extends keyof InstanceProperties<T>
+  >(
+    instance: T,
+    propertyName: K,
+    predicate: (
+      value: InstanceProperties<T>[K]
+    ) => value is NonNullable<InstanceProperties<T>[K]>
+  ): Observable<Brio<NonNullable<InstanceProperties<T>[K]>>>;
+  function observePropertyBrio<
+    T extends Instance,
+    K extends keyof InstanceProperties<T>
+  >(
+    instance: T,
+    propertyName: K,
+    predicate: (
+      value: InstanceProperties<T>[K]
+    ) => value is Exclude<
+      InstanceProperties<T>[K],
+      NonNullable<InstanceProperties<T>[K]>
+    >
+  ): Observable<
+    Brio<
+      Exclude<InstanceProperties<T>[K], NonNullable<InstanceProperties<T>[K]>>
+    >
+  >;
   function observePropertyBrio<
     T extends Instance,
     K extends keyof InstanceProperties<T>
@@ -24,6 +52,7 @@ export namespace RxInstanceUtils {
     propertyName: K,
     predicate?: (value: InstanceProperties<T>[K]) => boolean
   ): Observable<Brio<InstanceProperties<T>[K]>>;
+
   function observeLastNamedChildBrio<T extends keyof Instances>(
     instance: Instance,
     className: T,
