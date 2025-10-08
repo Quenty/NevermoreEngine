@@ -24,6 +24,10 @@ function RogueAdditive.new(valueObject, serviceBag)
 end
 
 function RogueAdditive:GetModifiedVersion(value)
+	if not self._data.Enabled.Value then
+		return value
+	end
+
 	local input = LinearValue.toLinearIfNeeded(value)
 	local additive = LinearValue.toLinearIfNeeded(self._obj.Value)
 
@@ -31,6 +35,10 @@ function RogueAdditive:GetModifiedVersion(value)
 end
 
 function RogueAdditive:GetInvertedVersion(value)
+	if not self._data.Enabled.Value then
+		return value
+	end
+
 	local input = LinearValue.toLinearIfNeeded(value)
 	local additive = LinearValue.toLinearIfNeeded(self._obj.Value)
 
@@ -40,9 +48,14 @@ end
 function RogueAdditive:ObserveModifiedVersion(inputValue)
 	return Rx.combineLatest({
 		inputValue = inputValue,
+		enabled = self._data.Enabled:Observe(),
 		additive = RxInstanceUtils.observeProperty(self._obj, "Value"),
 	}):Pipe({
 		Rx.map(function(state)
+			if not state.enabled then
+				return state.inputValue
+			end
+
 			if state.inputValue and type(state.inputValue) == type(state.additive) then
 				local input = LinearValue.toLinearIfNeeded(state.inputValue)
 				local additive = LinearValue.toLinearIfNeeded(state.additive)
