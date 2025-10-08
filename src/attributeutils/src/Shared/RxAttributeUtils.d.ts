@@ -1,8 +1,8 @@
-import { Brio } from '../../../brio';
-import { Observable } from '../../../rx';
+import { Brio } from '@quenty/brio';
+import { Observable } from '@quenty/rx';
 
 export namespace RxAttributeUtils {
-  function observeAttribute<T = unknown>(
+  function observeAttribute<T extends AttributeValue | undefined>(
     instance: Instance,
     attributeName: string,
     defaultValue?: T
@@ -11,7 +11,7 @@ export namespace RxAttributeUtils {
     instance: Instance
   ): Observable<Brio<string>>;
   function observeAttributeKeys(instance: Instance): Observable<string>;
-  function observeAttributeBrio<T = unknown>(
+  function observeAttributeBrio<T extends AttributeValue | undefined>(
     instance: Instance,
     attributeName: string,
     condition?: (value: T) => boolean
