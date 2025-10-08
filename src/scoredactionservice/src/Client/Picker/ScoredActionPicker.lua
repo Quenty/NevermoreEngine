@@ -50,7 +50,7 @@ function ScoredActionPicker.Update(self: ScoredActionPicker): ()
 	end
 
 	local actionList: { ScoredAction.ScoredAction } = {}
-	for action, _ in self._actionSet do
+	for action: any, _ in self._actionSet do
 		if not action.Destroy then
 			warn("[ScoredActionPicker] - Action is destroyed. Should have been removed.")
 			continue
