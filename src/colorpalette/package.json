@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/blend": "file:../blend",
+    "@quenty/brio": "file:../brio",
     "@quenty/color3utils": "file:../color3utils",
     "@quenty/colorpicker": "file:../colorpicker",
     "@quenty/loader": "file:../loader",
