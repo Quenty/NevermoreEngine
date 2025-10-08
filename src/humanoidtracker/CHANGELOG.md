@@ -1,23 +1,18 @@
-# v13.21.0 (Wed Oct 08 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/fixes [#599](https://github.com/Quenty/NevermoreEngine/pull/599) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing packages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidtracker@13.20.0...@quenty/humanoidtracker@13.21.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix missing packages ([d87d81a](https://github.com/Quenty/NevermoreEngine/commit/d87d81a83c92c62b07593ac2fd029432565c8ad5))
+
+
+
+
 
 # [13.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidtracker@13.19.0...@quenty/humanoidtracker@13.20.0) (2025-09-26)
 

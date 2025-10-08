@@ -1,24 +1,23 @@
-# v2.4.0 (Wed Oct 08 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/fixes [#599](https://github.com/Quenty/NevermoreEngine/pull/599) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxHumanoidUtils.observeHumanoidStateType(humanoid) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix formatting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.3.0...@quenty/humanoidutils@2.4.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix formatting ([97cfa97](https://github.com/Quenty/NevermoreEngine/commit/97cfa9787cc2d93e90e6d9a9f1a3c3c57b87a8a5))
+
+
+### Features
+
+* Add RxHumanoidUtils.observeHumanoidStateType(humanoid) ([96f9fc9](https://github.com/Quenty/NevermoreEngine/commit/96f9fc946090b597eaebd0011f04b90f7cbb690c))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.2.3...@quenty/humanoidutils@2.3.0) (2025-10-01)
 

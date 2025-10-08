@@ -1,23 +1,18 @@
-# v14.22.0 (Wed Oct 08 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/fixes [#599](https://github.com/Quenty/NevermoreEngine/pull/599) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing package in StateStack and ColorPalette ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.21.0...@quenty/statestack@14.22.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix missing package in StateStack and ColorPalette ([cc7aeb6](https://github.com/Quenty/NevermoreEngine/commit/cc7aeb608945832e4758f4abada050a9d5df19b3))
+
+
+
+
 
 # [14.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.20.0...@quenty/statestack@14.21.0) (2025-09-26)
 

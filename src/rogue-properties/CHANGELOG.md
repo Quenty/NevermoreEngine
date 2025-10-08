@@ -1,24 +1,23 @@
-# v11.29.0 (Wed Oct 08 2025)
-
-#### 🚀 Enhancement
-
-- Users/quenty/fixes [#599](https://github.com/Quenty/NevermoreEngine/pull/599) ([@Quenty](https://github.com/Quenty))
-- feat: Can disable rogue modifier ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix formatting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.28.0...@quenty/rogue-properties@11.29.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix formatting ([97cfa97](https://github.com/Quenty/NevermoreEngine/commit/97cfa9787cc2d93e90e6d9a9f1a3c3c57b87a8a5))
+
+
+### Features
+
+* Can disable rogue modifier ([0570ee2](https://github.com/Quenty/NevermoreEngine/commit/0570ee24eda1bacfe8489165400007f4ffef1374))
+
+
+
+
 
 # [11.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.27.0...@quenty/rogue-properties@11.28.0) (2025-10-03)
 
