@@ -211,19 +211,43 @@ end
 
 function RxRagdollUtils.enforceHumanoidState(humanoid: Humanoid)
 	local maid = Maid.new()
+
+	-- Disabling Enum.HumanoidStateType.Dead on the server prevents it
+	-- from stealing network ownership on death, while also preserving
+	-- respawn behavior.
+
+	local function disableDeadState()
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+		humanoid.MaxHealth = 0 -- Prevent health regen from thwarting respawn
+	end
+
+	local isServer = RunService:IsServer()
+	if isServer and humanoid:GetState() == Enum.HumanoidStateType.Dead then
+		disableDeadState()
+	end
 	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 
 	-- If you're holding a humanoid and jump, then the humanoid state
 	-- changes to your humanoid's state.
 
 	maid._keepAsPhysics = humanoid.StateChanged:Connect(function(_old, new)
-		if new ~= Enum.HumanoidStateType.Physics and new ~= Enum.HumanoidStateType.Dead then
-			humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+		if new == Enum.HumanoidStateType.Physics then
+			return
 		end
+
+		if new == Enum.HumanoidStateType.Dead then
+			if not isServer then
+				return
+			end
+			disableDeadState()
+		end
+
+		humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 	end)
 
 	maid:GiveTask(function()
 		maid._keepAsPhysics = nil
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
 
 		if humanoid:GetState() ~= Enum.HumanoidStateType.Dead then
 			humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
