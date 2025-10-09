@@ -8,10 +8,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local AnimationPromiseUtils = require("AnimationPromiseUtils")
 local AnimationUtils = require("AnimationUtils")
 local BaseObject = require("BaseObject")
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
+local Promise = require("Promise")
+local PromiseMaidUtils = require("PromiseMaidUtils")
 local RbxAssetUtils = require("RbxAssetUtils")
 local ValueObject = require("ValueObject")
 
@@ -59,7 +62,7 @@ end
 	@param defaultFadeTime number
 ]=]
 function AnimationSlotPlayer.SetDefaultFadeTime(self: AnimationSlotPlayer, defaultFadeTime: number)
-	self._defaultFadeTime.Value = defaultFadeTime
+	return self._defaultFadeTime:Mount(defaultFadeTime)
 end
 
 --[=[
@@ -92,6 +95,44 @@ type AnimationData = {
 	originalWeight: number?,
 	originalPriority: Enum.AnimationPriority?,
 }
+
+--[=[
+	Promises that the animation has stopped playing
+]=]
+function AnimationSlotPlayer.PromiseStopped(self: AnimationSlotPlayer): Promise.Promise<boolean>
+	local promise = Promise.new()
+
+	PromiseMaidUtils.whilePromise(promise, function(topMaid)
+		topMaid:GiveTask(self._currentAnimationTrackData
+			:ObserveBrio(function(data: AnimationData?)
+				return data ~= nil
+			end)
+			:Subscribe(function(brio)
+				if brio:IsDead() then
+					return
+				end
+
+				local data: AnimationData = brio:GetValue()
+				if not data.track.IsPlaying then
+					promise:Resolve(true)
+					return
+				end
+
+				local maid = brio:ToMaid()
+				maid:GiveTask(data.track.Stopped:Connect(function()
+					promise:Resolve()
+				end))
+			end))
+
+		topMaid:GiveTask(function()
+			self._maid[promise] = nil
+		end)
+	end)
+
+	self._maid[promise] = promise
+
+	return promise
+end
 
 --[=[
 	Adjusts the speed of the animation playing in the slot
@@ -246,8 +287,23 @@ function AnimationSlotPlayer.Play(
 					end
 				end)
 
+				if not track.Looped then
+					-- This is a hack to ensure that animations stop at a set rate instead of roblox's weird default faded time
+					maid:GivePromise(AnimationPromiseUtils.promiseLoaded(track)):Then(function()
+						-- This is very very sad...
+						maid:GiveTask(task.delay(track.Length - track.TimePosition - 2 / 60, function()
+							track:Stop(fadeTime or self._defaultFadeTime.Value)
+						end))
+					end)
+				end
+
 				maid:GiveTask(function()
-					track:AdjustWeight(0, fadeTime or self._defaultFadeTime.Value)
+					local stopFadeTime = fadeTime or self._defaultFadeTime.Value
+					track:AdjustWeight(0, stopFadeTime)
+
+					if stopFadeTime == 0 then
+						track:Stop(stopFadeTime)
+					end
 				end)
 			else
 				warn("[AnimationSlotPlayer] - Failed to get animation to play")

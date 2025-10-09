@@ -92,6 +92,10 @@ function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate: number)
 	end
 
 	return function()
+		if not self.Destroy then
+			return
+		end
+
 		local index = table.find(self._replicationRates, data)
 		if index then
 			table.remove(self._replicationRates, index)

@@ -11,6 +11,7 @@ local Promise = require("Promise")
 local PromiseRetryUtils = {}
 
 export type RetryOptions = {
+	exponential: number?,
 	initialWaitTime: number,
 	maxAttempts: number,
 	printWarning: boolean,
@@ -57,7 +58,7 @@ function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, op
 				)
 			end
 
-			task.wait(Math.jitter(waitTime * 2 ^ attemptNumber))
+			task.wait(Math.jitter(waitTime * ((options.exponential or 2) ^ attemptNumber)))
 		end
 
 		isLoopResolved = true

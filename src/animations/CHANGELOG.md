@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.21.0...@quenty/animations@8.22.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [8.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.20.1...@quenty/animations@8.21.0) (2025-09-26)
+
+
+### Bug Fixes
+
+* Handle priority properly ([1f48083](https://github.com/Quenty/NevermoreEngine/commit/1f48083435c8d14aa0fe21a237fe92f3df4e7a17))
+
+
+
+
+
+## [8.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.20.0...@quenty/animations@8.20.1) (2025-09-16)
+
+
+### Bug Fixes
+
+* Fix animation stopping at 0 frames ([#587](https://github.com/Quenty/NevermoreEngine/issues/587)) ([f97ce5b](https://github.com/Quenty/NevermoreEngine/commit/f97ce5b0a14d69d92fa4eb6120dbfa28ec5d7b62))
+
+
+
+
+
+# [8.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.19.1...@quenty/animations@8.20.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+## [8.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.19.0...@quenty/animations@8.19.1) (2025-08-12)
+
+
+### Bug Fixes
+
+* Stop playback faster ([7701ae1](https://github.com/Quenty/NevermoreEngine/commit/7701ae11254460a10af61b5cc970320fe087c5b4))
+
+
+
+
+
+# [8.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.18.0...@quenty/animations@8.19.0) (2025-07-11)
+
+
+### Features
+
+* **AnimationSlotPlayer:** promise animation Stopped ([674b3af](https://github.com/Quenty/NevermoreEngine/commit/674b3afe54848bddd18faebace0f075e1b541a12))
+
+
+
+
+
 # [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.17.3...@quenty/animations@8.18.0) (2025-05-10)
 
 

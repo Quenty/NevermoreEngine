@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 local RogueProperty = require("RogueProperty")
 local RoguePropertyArrayHelper = require("RoguePropertyArrayHelper")
 local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
 
 local RoguePropertyTable = {} -- inherits from RogueProperty
@@ -29,29 +31,81 @@ end
 function RoguePropertyTable:SetCanInitialize(canInitialize: boolean)
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
-	RogueProperty.SetCanInitialize(self, canInitialize)
+	if self:CanInitialize() ~= canInitialize then
+		RogueProperty.SetCanInitialize(self, canInitialize)
 
-	for _, property in self:GetRogueProperties() do
-		property:SetCanInitialize(canInitialize)
-	end
+		for _, property in self:GetRogueProperties() do
+			property:SetCanInitialize(canInitialize)
+		end
 
-	local arrayHelper = rawget(self, "_arrayHelper")
-	if arrayHelper then
-		arrayHelper:SetCanInitialize(canInitialize)
+		local arrayHelper = rawget(self, "_arrayHelper")
+		if arrayHelper then
+			arrayHelper:SetCanInitialize(canInitialize)
+		end
 	end
 end
 
 function RoguePropertyTable:ObserveContainerBrio()
-	return self._definition:ObserveContainerBrio(self._adornee, self:CanInitialize())
-end
-
-function RoguePropertyTable:GetContainer(): Instance
-	local cached = rawget(self, "_containerCache")
-	if cached and cached:IsDescendantOf(self._adornee) then
-		return cached
+	local cache = rawget(self, "_observeContainerCache")
+	if cache then
+		return cache
 	end
 
-	local container = self._definition:GetContainer(self._adornee, self:CanInitialize())
+	local parentDefinition = self._definition:GetParentPropertyDefinition()
+	if parentDefinition then
+		local parentTable = parentDefinition:Get(self._serviceBag, self._adornee)
+
+		if self:CanInitialize() then
+			parentTable:GetContainer()
+		end
+
+		cache = parentTable:ObserveContainerBrio():Pipe({
+			RxBrioUtils.switchMapBrio(function(parent)
+				return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self._definition:GetName())
+			end),
+			Rx.cache(),
+		})
+	else
+		cache = RxInstanceUtils.observeLastNamedChildBrio(self._adornee, "Folder", self._definition:GetName()):Pipe({
+			Rx.cache(),
+		})
+	end
+
+	cache = cache
+	rawset(self, "_observeContainerCache", cache)
+	return cache
+end
+
+function RoguePropertyTable:GetContainer(): Instance?
+	local cached = rawget(self, "_containerCache")
+	if cached then
+		if cached:IsDescendantOf(self._adornee) then
+			return cached
+		else
+			rawset(self, "_containerCache", nil)
+		end
+	end
+
+	local parent
+	local parentDefinition = self._definition:GetParentPropertyDefinition()
+	if parentDefinition then
+		local parentTable = parentDefinition:Get(self._serviceBag, self._adornee)
+		parent = parentTable:GetContainer()
+	else
+		parent = self._adornee
+	end
+
+	if not parent then
+		return nil
+	end
+
+	local container
+	if self:CanInitialize() then
+		container = self._definition:GetOrCreateInstance(parent)
+	else
+		container = self._definition:FindInstance(parent)
+	end
+
 	rawset(self, "_containerCache", container)
 	return container
 end
@@ -167,6 +221,10 @@ end
 
 function RoguePropertyTable:_observeDictionary()
 	-- ok, this is definitely slow
+	local cache = rawget(self, "_observeDictionaryCache")
+	if cache then
+		return cache
+	end
 
 	local toObserve = {}
 
@@ -180,10 +238,16 @@ function RoguePropertyTable:_observeDictionary()
 	end
 
 	if next(toObserve) == nil then
-		return Rx.of({})
+		cache = Rx.of({})
+	else
+		cache = Rx.combineLatest(toObserve):Pipe({
+			Rx.cache(),
+		})
 	end
 
-	return Rx.combineLatest(toObserve)
+	rawset(self, "_observeDictionaryCache", cache)
+
+	return cache
 end
 
 function RoguePropertyTable:GetRogueProperty(name: string)
@@ -212,16 +276,16 @@ function RoguePropertyTable:__newindex(index, value)
 	elseif index == "Changed" then
 		error("Cannot set .Changed event")
 	elseif RoguePropertyTable[index] then
-		error(string.format("Cannot set %q", tostring(index)))
+		error(string.format("Cannot set %q on %s", tostring(index), self._definition:GetFullName()))
 	elseif type(index) == "string" then
 		local property = self:GetRogueProperty(index)
 		if not property then
-			error(string.format("Bad index %q", tostring(index)))
+			error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 		end
 
 		error(string.format("Use RoguePropertyTable.%s.Value to assign", index))
 	else
-		error(string.format("Bad index %q", tostring(index)))
+		error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 	end
 end
 
@@ -239,7 +303,7 @@ function RoguePropertyTable:__index(index)
 	elseif type(index) == "string" then
 		local property = self:GetRogueProperty(index)
 		if not property then
-			error(string.format("Bad index %q", tostring(index)))
+			error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 		end
 		return property
 	elseif type(index) == "number" then
@@ -250,13 +314,13 @@ function RoguePropertyTable:__index(index)
 			if result then
 				return result
 			else
-				error(string.format("Bad index %q", tostring(index)))
+				error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 			end
 		else
 			error(string.format("Bad index %q - We are not an array", tostring(index)))
 		end
 	else
-		error(string.format("Bad index %q", tostring(index)))
+		error(string.format("Bad index %q on %s", tostring(index), self._definition:GetFullName()))
 	end
 end
 

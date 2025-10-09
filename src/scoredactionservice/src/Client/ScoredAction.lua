@@ -12,6 +12,7 @@ local BaseObject = require("BaseObject")
 local Observable = require("Observable")
 local Signal = require("Signal")
 local StateStack = require("StateStack")
+local ValueObject = require("ValueObject")
 
 local ScoredAction = setmetatable({}, BaseObject)
 ScoredAction.ClassName = "ScoredAction"
@@ -21,8 +22,10 @@ export type ScoredAction = typeof(setmetatable(
 	{} :: {
 		PreferredChanged: Signal.Signal<boolean>,
 		Removing: Signal.Signal<()>,
+		EnabledChanged: Signal.Signal<boolean>,
 
 		-- Private
+		_isEnabled: ValueObject.ValueObject<boolean>,
 		_score: number,
 		_createdTimeStamp: number,
 		_preferredStack: StateStack.StateStack<boolean>,
@@ -41,6 +44,9 @@ function ScoredAction.new(): ScoredAction
 	self._score = -math.huge
 	self._createdTimeStamp = tick()
 	self._preferredStack = self._maid:Add(StateStack.new(false, "boolean"))
+	self._isEnabled = self._maid:Add(ValueObject.new(true, "boolean"))
+
+	self.EnabledChanged = self._isEnabled.Changed :: Signal.Signal<boolean>
 
 	--[=[
 	@prop PreferredChanged Signal<boolean>
@@ -59,6 +65,27 @@ function ScoredAction.new(): ScoredAction
 	end)
 
 	return self
+end
+
+--[=[
+	Sets if the action is enabled. A disabled action cannot be preferred, even if it's the only option.
+]=]
+function ScoredAction.SetIsEnabled(self: ScoredAction, isEnabled: boolean | Observable.Observable<boolean>)
+	return self._isEnabled:Mount(isEnabled)
+end
+
+--[=[
+	Returns if the action is enabled
+]=]
+function ScoredAction.IsEnabled(self: ScoredAction): boolean
+	return self._isEnabled.Value
+end
+
+--[=[
+	Observes if the action is enabled
+]=]
+function ScoredAction.ObserveIsEnabled(self: ScoredAction): Observable.Observable<boolean>
+	return self._isEnabled:Observe()
 end
 
 --[=[

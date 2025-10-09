@@ -1,6 +1,6 @@
 {
   "name": "@quenty/camera",
-  "version": "14.22.0",
+  "version": "14.26.0",
   "description": "Quenty's camera system for Roblox",
   "keywords": [
     "Roblox",
@@ -35,6 +35,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
     "@quenty/qframe": "file:../qframe",
+    "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/spring": "file:../spring",
     "@quenty/valueobject": "file:../valueobject",

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.12.1...@quenty/roblox-api-dump@8.13.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/roblox-api-dump
+
+
+
+
+
+## [8.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.12.0...@quenty/roblox-api-dump@8.12.1) (2025-07-08)
+
+
+### Bug Fixes
+
+* Check for write RobloxSecurity (UniqueId property) ([198080b](https://github.com/Quenty/NevermoreEngine/commit/198080ba28a3beebab6ea245fd6d6243e1fe3138))
+
+
+
+
+
 # [8.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.11.4...@quenty/roblox-api-dump@8.12.0) (2025-05-10)
 
 

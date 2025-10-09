@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.2.3...@quenty/nevermore-template-helpers@1.3.0) (2025-07-11)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
 ## [1.2.3](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.2.1...@quenty/nevermore-template-helpers@1.2.3) (2025-04-07)
 
 

@@ -3,6 +3,97 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.32.1...@quenty/ik@15.33.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [15.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.32.0...@quenty/ik@15.32.1) (2025-10-07)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [15.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.31.0...@quenty/ik@15.32.0) (2025-10-03)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [15.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.30.0...@quenty/ik@15.31.0) (2025-10-01)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [15.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.29.0...@quenty/ik@15.30.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [15.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.28.1...@quenty/ik@15.29.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [15.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.28.0...@quenty/ik@15.28.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [15.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.27.2...@quenty/ik@15.28.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix errors on cleanup ([8fc6af1](https://github.com/Quenty/NevermoreEngine/commit/8fc6af1fedec7c9c8647f98d9317fac34bb4d895))
+
+
+
+
+
+## [15.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.27.1...@quenty/ik@15.27.2) (2025-07-14)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [15.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.27.0...@quenty/ik@15.27.1) (2025-07-14)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [15.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.26.0...@quenty/ik@15.27.0) (2025-07-11)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
 # [15.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.25.0...@quenty/ik@15.26.0) (2025-05-12)
 
 **Note:** Version bump only for package @quenty/ik

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameconfig",
-  "version": "12.26.0",
+  "version": "12.32.0",
   "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
+    "@quenty/canceltoken": "file:../canceltoken",
     "@quenty/clienttranslator": "file:../clienttranslator",
     "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/instanceutils": "file:../instanceutils",

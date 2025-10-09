@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.28.0...@quenty/deathreport@10.29.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.27.0...@quenty/deathreport@10.28.0) (2025-10-01)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.26.0...@quenty/deathreport@10.27.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.25.1...@quenty/deathreport@10.26.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
+
+## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.25.0...@quenty/deathreport@10.25.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.24.0...@quenty/deathreport@10.25.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix cyclical dependencies ([b9fbb05](https://github.com/Quenty/NevermoreEngine/commit/b9fbb051253e878b47f292f0462f1e8579115d1c))
+* Fix death report stuff ([4366b56](https://github.com/Quenty/NevermoreEngine/commit/4366b567867a14184b24d8cd7e8164f279eefb54))
+
+
+
+
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.23.0...@quenty/deathreport@10.24.0) (2025-07-11)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
+
 # [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.22.0...@quenty/deathreport@10.23.0) (2025-05-12)
 
 **Note:** Version bump only for package @quenty/deathreport

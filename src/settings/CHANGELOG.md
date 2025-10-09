@@ -3,6 +3,95 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.30.0...@quenty/settings@11.31.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.29.0...@quenty/settings@11.30.0) (2025-10-03)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.28.0...@quenty/settings@11.29.0) (2025-10-01)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.27.2...@quenty/settings@11.28.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.27.1...@quenty/settings@11.27.2) (2025-09-15)
+
+
+### Bug Fixes
+
+* A few more cleanups ([#585](https://github.com/Quenty/NevermoreEngine/issues/585)) ([21fbb0d](https://github.com/Quenty/NevermoreEngine/commit/21fbb0d422ee0339366710ca682c8d4425368d52))
+
+
+
+
+
+## [11.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.27.0...@quenty/settings@11.27.1) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.26.1...@quenty/settings@11.27.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.26.0...@quenty/settings@11.26.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.25.1...@quenty/settings@11.26.0) (2025-08-07)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([b8a62b8](https://github.com/Quenty/NevermoreEngine/commit/b8a62b885ac9f43a8f942349918ff477f79f99a9))
+
+
+
+
+
+## [11.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.25.0...@quenty/settings@11.25.1) (2025-07-17)
+
+
+### Bug Fixes
+
+* Fix cancel token ([#572](https://github.com/Quenty/NevermoreEngine/issues/572)) ([787b042](https://github.com/Quenty/NevermoreEngine/commit/787b042a1bc13d52405b909f569ebe47c09ca0ee))
+
+
+
+
+
 # [11.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.24.0...@quenty/settings@11.25.0) (2025-05-12)
 
 **Note:** Version bump only for package @quenty/settings
