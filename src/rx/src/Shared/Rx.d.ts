@@ -47,11 +47,11 @@ export namespace Rx {
   function startFrom<T, U>(callback: () => U[]): Operator<T, T | U>;
   function startWith<T, U>(values: U[]): Operator<T, T | U>;
   function scan<T, U>(
-    accumulator: (acc: T | undefined, ...args: ToTuple<U>) => T,
+    accumulator: (acc: T, ...args: ToTuple<U>) => T,
     seed?: T
   ): Operator<U, T>;
   function reduce<T, U>(
-    reducer: (acc: T | undefined, ...args: ToTuple<U>) => T,
+    reducer: (acc: T, ...args: ToTuple<U>) => T,
     seed?: T
   ): Operator<U, T>;
   function defaultsTo<T>(value: T): Operator<T, T>;
