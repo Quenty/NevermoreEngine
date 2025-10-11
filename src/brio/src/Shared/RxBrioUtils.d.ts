@@ -88,9 +88,9 @@ export namespace RxBrioUtils {
   function map<T, U>(
     project: (...args: unknown[]) => U
   ): (source: Observable<Brio<T> | T>) => Observable<Brio<U>>;
-  function mapBrioBrio<T, TProject>(
-    project: (value: T) => Observable<TProject> | Observable<Brio<TProject>>
-  ): Operator<Brio<T>, Brio<TProject extends Brio<infer V> ? V : TProject>>;
+  function mapBrioBrio<T, S extends T, TProject>(
+    project: (value: S) => Observable<TProject> | Observable<Brio<TProject>>
+  ): (brio: Brio<T>) => Observable<Brio<TProject>>;
   function toEmitOnDeathObservable<T, U>(
     brio: Brio<T> | T,
     emitOnDeathValue: U
