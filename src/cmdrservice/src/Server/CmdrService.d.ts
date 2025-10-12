@@ -8,7 +8,7 @@ export interface CmdrService {
   PromiseCmdr(): Promise<Cmdr>;
   RegisterCommand(
     commandData: CommandDefinition,
-    execute: (context: CommandContext, ...args: unknown[]) => string | undefined
+    execute: (context: CommandContext, ...args: any[]) => string | undefined
   ): void;
   Destroy(): void;
 }
