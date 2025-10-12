@@ -107,6 +107,25 @@ function Draw.direction(
 end
 
 --[=[
+	Draws a shapecast
+]=]
+function Draw.shapecast(part: BasePart, origin: CFrameLike, direction: Vector3Like, color: Color3Like?)
+	local castOrigin = assert(Draw._toCFrame(origin), "Bad origin")
+	local castDirection = assert(Draw._toVector3(direction), "Bad direction")
+
+	local folder = Instance.new("Folder")
+	folder.Name = "ShapeCast"
+	folder.Archivable = false
+
+	for percent = 0, 1, 0.05 do
+		local cframe = castOrigin + (castDirection * percent)
+		Draw.part(part, cframe, color)
+	end
+
+	return folder
+end
+
+--[=[
 	Draws a spherecast
 
 	:::tip

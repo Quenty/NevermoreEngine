@@ -54,7 +54,14 @@ function UIConverter:PromiseProperties(instance, overrideMap)
 				self._maid
 					:GivePromise(self:PromiseDefaultValue(class, property, overrideMap))
 					:Then(function(defaultValue)
-						local currentValue = instance[property:GetName()]
+						local currentValue
+						local ok, err = pcall(function()
+							currentValue = instance[property:GetName()]
+						end)
+						if not ok then
+							return Promise.rejected(err)
+						end
+
 						if currentValue ~= defaultValue then
 							map[property:GetName()] = currentValue
 						end
@@ -184,7 +191,12 @@ function UIConverter:PromiseDefaultValue(class, property, overrideMap)
 
 	-- then check default
 	local inst = Instance.new(className)
-	classCache[propertyName].default = Promise.resolved(inst[propertyName])
+	local defaultValue
+	local _ok = pcall(function()
+		defaultValue = inst[propertyName]
+	end)
+
+	classCache[propertyName].default = Promise.resolved(defaultValue)
 	inst:Destroy()
 
 	return classCache[propertyName].default

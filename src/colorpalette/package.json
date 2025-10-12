@@ -1,6 +1,6 @@
 {
   "name": "@quenty/colorpalette",
-  "version": "10.24.0",
+  "version": "10.25.0",
   "description": "Color palette system for Roblox",
   "keywords": [
     "Roblox",
@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/blend": "file:../blend",
+    "@quenty/brio": "file:../brio",
     "@quenty/color3utils": "file:../color3utils",
     "@quenty/colorpicker": "file:../colorpicker",
     "@quenty/loader": "file:../loader",

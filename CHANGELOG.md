@@ -1,3 +1,43 @@
+# (Wed Oct 08 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/colorpalette@10.25.0`, `@quenty/humanoidtracker@13.21.0`, `@quenty/humanoidutils@2.4.0`, `@quenty/rogue-properties@11.29.0`, `@quenty/scoredactionservice@16.29.0`, `@quenty/statestack@14.22.0`, `@quenty/valueobject@13.21.0`
+  - Users/quenty/fixes [#599](https://github.com/Quenty/NevermoreEngine/pull/599) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Oct 07 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/draw@7.9.1`
+  - fix: Add shapecast to draw library [#598](https://github.com/Quenty/NevermoreEngine/pull/598) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Oct 03 2025)
+
+#### 🚀 Enhancement
+
+- feat: Add RxHumanoidUtils [#594](https://github.com/Quenty/NevermoreEngine/pull/594) ([@Quenty](https://github.com/Quenty))
+- `@quenty/collectionserviceutils@8.21.0`, `@quenty/trajectory@2.10.0`
+  - feat: Add small fixes [#595](https://github.com/Quenty/NevermoreEngine/pull/595) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Oct 01 2025)
 
 #### 🚀 Enhancement
