@@ -1,7 +1,7 @@
 import { Signal } from '@quenty/signal';
-import { Brio } from '../../../brio';
-import { CancelToken } from '../../../canceltoken';
-import { Observable } from '../../../rx';
+import { Brio } from '@quenty/brio';
+import { CancelToken } from '@quenty/canceltoken';
+import { Observable } from '@quenty/rx';
 
 interface Static {
   readonly ClassName: 'Binder';
@@ -34,7 +34,7 @@ export interface Binder<T> extends Static {
   Get(instance: Instance): T | undefined;
   Promise(instance: Instance, cancelToken?: CancelToken): Promise<T>;
   Create(className?: string): Instance;
-  Observe(instance: Instance): Observable<T>;
+  Observe(instance: Instance): Observable<T | undefined>;
   Destroy(): void;
 }
 
