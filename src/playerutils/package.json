@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@quenty/brio": "file:../brio",
+    "@quenty/characterutils": "file:../characterutils",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
