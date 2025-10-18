@@ -54,7 +54,7 @@ export namespace Rx {
     reducer: (acc: T, ...args: ToTuple<U>) => T,
     seed?: T
   ): Operator<U, T>;
-  function defaultsTo<T>(value: T): Operator<T, T>;
+  function defaultsTo<T, V>(value: V): Operator<T, T | V>;
   function defaultsToNil<T>(source: Observable<T>): Observable<T | undefined>;
   function endWith<T>(...values: ToTuple<T>): Operator<T, T>;
 
