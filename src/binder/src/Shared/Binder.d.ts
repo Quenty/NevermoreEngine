@@ -2,6 +2,7 @@ import { Signal } from '@quenty/signal';
 import { Brio } from '@quenty/brio';
 import { CancelToken } from '@quenty/canceltoken';
 import { Observable } from '@quenty/rx';
+import { Promise } from '@quenty/promise';
 
 interface Static {
   readonly ClassName: 'Binder';
