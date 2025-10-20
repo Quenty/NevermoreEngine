@@ -5,7 +5,6 @@ import { Signal } from '@quenty/signal';
 
 export interface ValueObjectLike<T> {
   Value: T;
-  readonly Changed: Signal<T>;
   Observe(): Observable<T>;
   ObserveBrio(
     predicate?: (value: T) => value is NonNullable<T>
@@ -22,7 +21,7 @@ type CheckType =
 
 export type Mountable<T> = T | Observable<T> | ValueBase | ValueObject<T>;
 
-export interface ValueObject<T> extends Omit<ValueObjectLike<T>, 'Changed'> {
+export interface ValueObject<T> extends ValueObjectLike<T> {
   Value: T;
   Changed: Signal<[newValue: T, oldValue: T, ...args: unknown[]]>;
   GetCheckType(): CheckType | undefined;
