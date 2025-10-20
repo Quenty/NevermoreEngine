@@ -1,12 +1,8 @@
-import { Brio } from '../../../brio';
-import { Observable } from '../../../rx';
+import { ValueObjectLike } from '@quenty/valueobject';
 import { Signal } from '@quenty/signal';
 
-interface EncodedAttributeValue<T> {
-  Value: T;
+interface EncodedAttributeValue<T> extends ValueObjectLike<T> {
   Changed: Signal<T>;
-  Observe(): Observable<T>;
-  ObserveBrio(condition?: (value: T) => boolean): Observable<Brio<T>>;
   Destroy(): void;
 }
 
