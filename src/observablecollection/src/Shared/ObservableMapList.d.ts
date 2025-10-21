@@ -1,13 +1,14 @@
-import { Brio } from '../../../brio';
-import { Observable } from '../../../rx';
+import { Brio } from '@quenty/brio';
+import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
 import { ObservableList } from './ObservableList';
+import { Maid } from '@quenty/maid';
 
 interface ObservableMapList<TKey, TValue> {
   ListAdded: Signal<[key: TKey, list: ObservableList<TValue>]>;
   ListRemoved: Signal<TKey>;
   CountChanged: Signal<number>;
-  Push(key: TKey | Observable<TKey>, entry: TValue): () => void;
+  Push(key: TKey | Observable<TKey>, entry: TValue): Maid;
   GetFirstItemForKey(key: TKey): TValue | undefined;
   GetItemForKeyAtIndex(key: TKey, index: number): TValue | undefined;
   GetListCount(): number;
