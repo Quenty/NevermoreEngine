@@ -12,6 +12,9 @@ interface ObservableMapList<TKey, TValue> {
   GetItemForKeyAtIndex(key: TKey, index: number): TValue | undefined;
   GetListCount(): number;
   ObserveListCount(): Observable<number>;
+  GetKeyList(): TKey[];
+  ObserveKeyList(): Observable<TKey[]>;
+  ObserveKeysBrio(): Observable<Brio<TKey>>;
   GetAtListIndex(key: TKey, index: number): TValue | undefined;
   ObserveAtListIndex(key: TKey, index: number): Observable<TValue | undefined>;
   ObserveAtListIndexBrio(key: TKey, index: number): Observable<Brio<TValue>>;
