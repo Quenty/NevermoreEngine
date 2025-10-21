@@ -7,7 +7,7 @@ interface ObservableMapList<TKey, TValue> {
   ListAdded: Signal<[key: TKey, list: ObservableList<TValue>]>;
   ListRemoved: Signal<TKey>;
   CountChanged: Signal<number>;
-  Push(observeKey: Observable<TKey>, entry: TValue): () => void;
+  Push(key: TKey | Observable<TKey>, entry: TValue): () => void;
   GetFirstItemForKey(key: TKey): TValue | undefined;
   GetItemForKeyAtIndex(key: TKey, index: number): TValue | undefined;
   GetListCount(): number;
