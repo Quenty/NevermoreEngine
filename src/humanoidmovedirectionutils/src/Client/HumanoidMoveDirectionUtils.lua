@@ -31,7 +31,7 @@ local HumanoidMoveDirectionUtils = {}
 	@param humanoid Humanoid
 	@return Vector3
 ]=]
-function HumanoidMoveDirectionUtils.getRelativeMoveDirection(cameraCFrame, humanoid)
+function HumanoidMoveDirectionUtils.getRelativeMoveDirection(cameraCFrame: CFrame, humanoid: Humanoid): Vector3
 	if UserInputService:GetFocusedTextBox() then
 		return ZERO_VECTOR
 	end
@@ -39,7 +39,7 @@ function HumanoidMoveDirectionUtils.getRelativeMoveDirection(cameraCFrame, human
 	local moveDirection = humanoid.MoveDirection
 	local flatCameraCFrame = getRotationInXZPlane(cameraCFrame)
 
-	local relative = flatCameraCFrame:vectorToObjectSpace(moveDirection)
+	local relative = flatCameraCFrame:VectorToObjectSpace(moveDirection)
 
 	-- Compensate for lack of camera movement in left/right arrow keys
 	local direction = ZERO_VECTOR

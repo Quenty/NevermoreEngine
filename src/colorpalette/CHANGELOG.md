@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.24.0...@quenty/colorpalette@10.25.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix missing package in StateStack and ColorPalette ([cc7aeb6](https://github.com/Quenty/NevermoreEngine/commit/cc7aeb608945832e4758f4abada050a9d5df19b3))
+
+
+
+
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.23.1...@quenty/colorpalette@10.24.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+## [10.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.23.0...@quenty/colorpalette@10.23.1) (2025-09-15)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.22.1...@quenty/colorpalette@10.23.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
 ## [10.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.22.0...@quenty/colorpalette@10.22.1) (2025-08-12)
 
 **Note:** Version bump only for package @quenty/colorpalette

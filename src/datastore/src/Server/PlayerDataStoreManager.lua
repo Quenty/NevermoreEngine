@@ -131,7 +131,7 @@ end
 	For if you want to disable saving in studio for faster close time!
 ]=]
 function PlayerDataStoreManager.DisableSaveOnCloseStudio(self: PlayerDataStoreManager): ()
-	assert(RunService:IsStudio())
+	assert(RunService:IsStudio(), "Must invoke in studio")
 
 	self._disableSavingInStudio = true
 end
@@ -196,7 +196,12 @@ function PlayerDataStoreManager._createDataStore(self: PlayerDataStoreManager, p
 	assert(not self._datastores[player], "Bad player")
 
 	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(player))
+	datastore:SetSessionLockingEnabled(true)
 	datastore:SetUserIdList({ player.UserId })
+
+	datastore:PromiseSessionLockingFailed():Then(function()
+		player:Kick("DataStore session lock failed to load. Please message developers.")
+	end)
 
 	self._maid._savingConns[player] = datastore.Saving:Connect(function(promise)
 		self._pendingSaves:Add(promise)
@@ -228,7 +233,7 @@ function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreMana
 
 	PromiseUtils.all(removingPromises)
 		:Then(function()
-			return datastore:Save()
+			return datastore:SaveAndCloseSession()
 		end)
 		:Finally(function()
 			datastore:Destroy()

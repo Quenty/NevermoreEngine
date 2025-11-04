@@ -1,3 +1,139 @@
+# (Wed Oct 08 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/colorpalette@10.25.0`, `@quenty/humanoidtracker@13.21.0`, `@quenty/humanoidutils@2.4.0`, `@quenty/rogue-properties@11.29.0`, `@quenty/scoredactionservice@16.29.0`, `@quenty/statestack@14.22.0`, `@quenty/valueobject@13.21.0`
+  - Users/quenty/fixes [#599](https://github.com/Quenty/NevermoreEngine/pull/599) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Oct 07 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/draw@7.9.1`
+  - fix: Add shapecast to draw library [#598](https://github.com/Quenty/NevermoreEngine/pull/598) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Oct 03 2025)
+
+#### 🚀 Enhancement
+
+- feat: Add RxHumanoidUtils [#594](https://github.com/Quenty/NevermoreEngine/pull/594) ([@Quenty](https://github.com/Quenty))
+- `@quenty/collectionserviceutils@8.21.0`, `@quenty/trajectory@2.10.0`
+  - feat: Add small fixes [#595](https://github.com/Quenty/NevermoreEngine/pull/595) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Oct 01 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.24.0`, `@quenty/humanoidutils@2.3.0`, `@quenty/soundgroup@1.24.0`
+  - feat: Add RxHumanoidUtils [#593](https://github.com/Quenty/NevermoreEngine/pull/593) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Sep 26 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.21.0`, `@quenty/rbxasset@5.10.0`, `@quenty/rogue-properties@11.26.0`, `@quenty/rx@13.20.0`
+  - Users/quenty/rogue property refactor [#590](https://github.com/Quenty/NevermoreEngine/pull/590) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.21.0`, `@quenty/rbxasset@5.10.0`
+  - fix: Handle priority properly [#588](https://github.com/Quenty/NevermoreEngine/pull/588) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Sep 16 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.20.1`
+  - feat: Fix animation stopping playback [#587](https://github.com/Quenty/NevermoreEngine/pull/587) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Sep 16 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/particles@5.11.0`
+  - feat: Add more particle playback stuff, and fix emit count [#586](https://github.com/Quenty/NevermoreEngine/pull/586) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Sep 15 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/humanoidmovedirectionutils@10.9.1`, `@quenty/observablecollection@12.22.1`, `@quenty/settings@11.27.2`
+  - fix: A few more cleanups [#585](https://github.com/Quenty/NevermoreEngine/pull/585) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 29 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@13.23.1`
+  - fix: Fix new player data in datastore locking system [#581](https://github.com/Quenty/NevermoreEngine/pull/581) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 29 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneedata@7.20.0`, `@quenty/datastore@13.23.0`, `@quenty/promise@10.12.0`
+  - feat: Add datastore session locking system [#580](https://github.com/Quenty/NevermoreEngine/pull/580) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Aug 12 2025)
 
 #### 🐛 Bug Fix

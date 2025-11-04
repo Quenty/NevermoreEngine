@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.27.0...@quenty/cmdrservice@13.28.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
+# [13.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.26.0...@quenty/cmdrservice@13.27.0) (2025-10-03)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
+# [13.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.25.1...@quenty/cmdrservice@13.26.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
+## [13.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.25.0...@quenty/cmdrservice@13.25.1) (2025-09-15)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
+# [13.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.24.1...@quenty/cmdrservice@13.25.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
 ## [13.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.24.0...@quenty/cmdrservice@13.24.1) (2025-08-12)
 
 **Note:** Version bump only for package @quenty/cmdrservice

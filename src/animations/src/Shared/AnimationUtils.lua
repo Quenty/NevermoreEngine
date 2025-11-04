@@ -14,6 +14,12 @@ local AnimationUtils = {}
 --[=[
 	Plays the animation on the target instance.
 
+	:::tip
+	If you play an animation at 1 priority, and then request another animation track at
+	a different priority, it will give you 2 separate animation tracks. Otherwise it tries to reuse the
+	same animation track.
+	:::
+
 	@return AnimationTrack?
 ]=]
 function AnimationUtils.playAnimation(
@@ -86,12 +92,12 @@ function AnimationUtils.getOrCreateAnimationTrack(
 
 	assert(typeof(animator) == "Instance" and animator:IsA("Animator"), "Bad animator")
 
-	local foundAnimationTrack = AnimationUtils.findAnimationTrackInAnimator(animator, id)
+	local foundAnimationTrack = AnimationUtils.findAnimationTrackInAnimator(animator, id, priority)
 	if foundAnimationTrack then
 		return foundAnimationTrack
 	end
 
-	local animation = AnimationUtils.getOrCreateAnimationFromIdInAnimator(animator, id)
+	local animation = AnimationUtils.getOrCreateAnimationFromIdInAnimator(animator, id, priority)
 
 	local animationTrack
 	local ok, err = pcall(function()
@@ -108,15 +114,24 @@ function AnimationUtils.getOrCreateAnimationTrack(
 		return nil
 	end
 
+	if priority then
+		animationTrack.Priority = priority
+	end
+
 	return animationTrack
 end
 
 --[=[
 	Gets or creates an animation from the id in the animator
 ]=]
-function AnimationUtils.getOrCreateAnimationFromIdInAnimator(animator: Animator, id: string | number): Animation
+function AnimationUtils.getOrCreateAnimationFromIdInAnimator(
+	animator: Animator,
+	id: string | number,
+	priority: Enum.AnimationPriority?
+): Animation
 	assert(typeof(animator) == "Instance" and animator:IsA("Animator"), "Bad animator")
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
+	assert(priority == nil or EnumUtils.isOfType(Enum.AnimationPriority, priority), "Bad priority")
 
 	local animationId = RbxAssetUtils.toRbxAssetId(id)
 	for _, animation in animator:GetChildren() do
@@ -138,31 +153,65 @@ end
 ]=]
 function AnimationUtils.findAnimationTrack(
 	target: Animator | Player | Model | AnimationController,
-	id: string | number
+	id: string | number,
+	priority: Enum.AnimationPriority?
 ): AnimationTrack?
 	assert(typeof(target) == "Instance", "Bad target")
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
+	assert(priority == nil or EnumUtils.isOfType(Enum.AnimationPriority, priority), "Bad priority")
 
 	local animator = AnimationUtils.getOrCreateAnimator(target)
 	if not animator then
 		return nil
 	end
 
-	return AnimationUtils.findAnimationTrackInAnimator(animator, id)
+	return AnimationUtils.findAnimationTrackInAnimator(animator, id, priority)
+end
+
+--[=[
+	Computes whether a given animation track matches the id and priority
+]=]
+function AnimationUtils.isMatchingAnimationTrack(
+	animationTrack: AnimationTrack,
+	id: string | number,
+	priority: Enum.AnimationPriority?
+): boolean
+	assert(typeof(animationTrack) == "Instance" and animationTrack:IsA("AnimationTrack"), "Bad animationTrack")
+	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
+	assert(priority == nil or EnumUtils.isOfType(Enum.AnimationPriority, priority), "Bad priority")
+
+	local animation = animationTrack.Animation
+	if not animation then
+		return false
+	end
+
+	local animationId = RbxAssetUtils.toRbxAssetId(id)
+	if animation.AnimationId ~= animationId then
+		return false
+	end
+
+	if priority and animationTrack.Priority ~= priority then
+		return false
+	end
+
+	return true
 end
 
 --[=[
 	Finds an animation track in an animator
 ]=]
-function AnimationUtils.findAnimationTrackInAnimator(animator: Animator, id: string | number): AnimationTrack?
+function AnimationUtils.findAnimationTrackInAnimator(
+	animator: Animator,
+	id: string | number,
+	priority: Enum.AnimationPriority?
+): AnimationTrack?
 	assert(typeof(animator) == "Instance" and animator:IsA("Animator"), "Bad animator")
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 
 	local animationId = RbxAssetUtils.toRbxAssetId(id)
 
 	for _, animationTrack in animator:GetPlayingAnimationTracks() do
-		local animation = animationTrack.Animation
-		if animation and animation.AnimationId == animationId then
+		if AnimationUtils.isMatchingAnimationTrack(animationTrack, animationId, priority) then
 			return animationTrack
 		end
 	end

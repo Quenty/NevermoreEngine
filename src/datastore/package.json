@@ -1,6 +1,6 @@
 {
   "name": "@quenty/datastore",
-  "version": "13.22.1",
+  "version": "13.25.0",
   "description": "Quenty's Datastore implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -33,6 +33,7 @@
     "@quenty/math": "file:../math",
     "@quenty/pagesutils": "file:../pagesutils",
     "@quenty/promise": "file:../promise",
+    "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",

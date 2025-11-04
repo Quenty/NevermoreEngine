@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.21.0...@quenty/statestack@14.22.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix missing package in StateStack and ColorPalette ([cc7aeb6](https://github.com/Quenty/NevermoreEngine/commit/cc7aeb608945832e4758f4abada050a9d5df19b3))
+
+
+
+
+
+# [14.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.20.0...@quenty/statestack@14.21.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/statestack
+
+
+
+
+
+# [14.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.19.1...@quenty/statestack@14.20.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/statestack
+
+
+
+
+
 ## [14.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.19.0...@quenty/statestack@14.19.1) (2025-08-12)
 
 **Note:** Version bump only for package @quenty/statestack
