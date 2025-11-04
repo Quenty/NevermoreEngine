@@ -147,6 +147,12 @@ end
 function GroupPermissionProvider._handlePlayer(self: GroupPermissionProvider, player: Player): ()
 	assert(player, "Bad player")
 
+	-- when testing with mock players in studio, their userids are negative
+	if player.UserId < 0 then
+		self._creatorCache[player.UserId] = true
+		return
+	end
+
 	self:_promiseRankInGroup(player):Then(function(rank)
 		if rank >= self._config.minAdminRequiredRank then
 			self._adminsCache[player.UserId] = true
