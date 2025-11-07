@@ -61,8 +61,8 @@ function RxPlayerUtils.observeCharactersBrio(): Observable.Observable<Brio.Brio<
 	return RxPlayerUtils.observePlayersBrio():Pipe({
 		RxBrioUtils.flatMapBrio(function(player)
 			return RxCharacterUtils.observeLastCharacterBrio(player)
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -72,8 +72,8 @@ function RxPlayerUtils.observeHumanoidsBrio(): Observable.Observable<Brio.Brio<H
 	return RxPlayerUtils.observePlayersBrio():Pipe({
 		RxBrioUtils.flatMapBrio(function(player)
 			return RxCharacterUtils.observeLastHumanoidBrio(player)
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
 --[=[
