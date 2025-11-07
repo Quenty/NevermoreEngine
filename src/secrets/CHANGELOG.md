@@ -1,20 +1,18 @@
-# v7.30.0 (Fri Nov 07 2025)
-
-#### 🚀 Enhancement
-
-- feat: Support Roblox secrets in secrets service [#603](https://github.com/Quenty/NevermoreEngine/pull/603) ([@Quenty](https://github.com/Quenty))
-- feat: Support native Roblox secrets for back compatibility ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.29.0...@quenty/secrets@7.30.0) (2025-11-07)
+
+
+### Features
+
+* Support native Roblox secrets for back compatibility ([970cccc](https://github.com/Quenty/NevermoreEngine/commit/970cccc023f8516d4358905dac38bd5362687a6e))
+
+
+
+
 
 # [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.28.0...@quenty/secrets@7.29.0) (2025-10-08)
 

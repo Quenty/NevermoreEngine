@@ -1,25 +1,20 @@
-# v8.21.0 (Fri Nov 07 2025)
-
-#### 🚀 Enhancement
-
-- feat: Support Roblox secrets in secrets service [#603](https://github.com/Quenty/NevermoreEngine/pull/603) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: fix typechecking ([@Quenty](https://github.com/Quenty))
-- fix: Format code [#600](https://github.com/Quenty/NevermoreEngine/pull/600) ([@Quenty](https://github.com/Quenty))
-- fix: Fix misc things ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.20.0...@quenty/playerutils@8.21.0) (2025-11-07)
+
+
+### Bug Fixes
+
+* Fix misc things ([6d071f6](https://github.com/Quenty/NevermoreEngine/commit/6d071f61b1f49baa72bf227f37e67d31cfc839a9))
+* fix typechecking ([a565916](https://github.com/Quenty/NevermoreEngine/commit/a565916e05556d37646bbd38587239460ad49719))
+* Format code ([2d60e0b](https://github.com/Quenty/NevermoreEngine/commit/2d60e0b98412ce71474c60782745e1ba849c4205))
+
+
+
+
 
 # [8.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.19.0...@quenty/playerutils@8.20.0) (2025-09-26)
 
