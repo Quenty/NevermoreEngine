@@ -1,3 +1,21 @@
+# (Fri Nov 07 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/coreguienabler@12.23.0`, `@quenty/playerutils@8.21.0`, `@quenty/secrets@7.30.0`
+  - feat: Support Roblox secrets in secrets service [#603](https://github.com/Quenty/NevermoreEngine/pull/603) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/playerutils@8.21.0`
+  - fix: Format code [#600](https://github.com/Quenty/NevermoreEngine/pull/600) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Oct 08 2025)
 
 #### 🚀 Enhancement
