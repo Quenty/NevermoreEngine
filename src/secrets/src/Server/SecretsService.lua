@@ -4,6 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local EllipticCurveCryptography = require("EllipticCurveCryptography")
 local GetRemoteFunction = require("GetRemoteFunction")
 local Maid = require("Maid")
@@ -65,8 +67,16 @@ end
 	@param secretKey string
 	@return Promise<string>
 ]=]
-function SecretsService:PromiseSecret(secretKey: string): Promise.Promise<string>
+function SecretsService:PromiseSecret(secretKey: string): Promise.Promise<string | Secret>
 	assert(type(secretKey) == "string", "Bad secretKey")
+
+	local found
+	local loadOk, _err = pcall(function()
+		found = HttpService:GetSecret(secretKey)
+	end)
+	if loadOk and found then
+		return Promise.resolved(found)
+	end
 
 	return self:_promiseSubstore():Then(function(substore)
 		return self._maid:GivePromise(substore:Load(secretKey)):Then(function(data)
