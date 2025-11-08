@@ -1,8 +1,8 @@
-import { Brio } from '../../../brio';
-import { Observable } from '../../../rx';
+import { Brio } from '@quenty/brio';
+import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
 
-interface ObservableMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
+type ObservableMap<TKey, TValue> = {
   CountChanged: Signal<number>;
   ObserveKeysBrio(): Observable<Brio<TKey>>;
   ObserveValuesBrio(): Observable<Brio<TValue>>;
@@ -20,7 +20,7 @@ interface ObservableMap<TKey, TValue> extends Iterable<[TKey, TValue]> {
   GetKeyList(): TKey[];
   ObserveKeyList(): Observable<TKey[]>;
   Destroy(): void;
-}
+} & IterableFunction<LuaTuple<[TKey, TValue]>>;
 
 interface ObservableMapConstructor {
   readonly ClassName: 'ObservableMap';
