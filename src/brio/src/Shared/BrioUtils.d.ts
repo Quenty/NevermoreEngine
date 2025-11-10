@@ -15,12 +15,15 @@ export namespace BrioUtils {
   function flatten<K extends unknown, T>(
     brioTable: Map<K, Brio<T> | T>
   ): Brio<Map<K, T>>;
-  function first<T, U>(brios: Array<Brio<T>>, ...values: ToTuple<U>): Brio<U>;
+  function first<T extends [unknown, ...unknown[]]>(
+    brios: Brio<unknown>[],
+    ...values: ToTuple<T>
+  ): Brio<LuaTuple<T>>;
   function withOtherValues<T extends [unknown, ...unknown[]]>(
     brio: Brio<unknown>,
     ...values: ToTuple<T>
   ): Brio<LuaTuple<T>>;
-  function extend<T, U extends unknown[]>(
+  function extend<T, U extends [unknown, ...unknown[]]>(
     brio: Brio<T>,
     ...values: U
   ): Brio<
