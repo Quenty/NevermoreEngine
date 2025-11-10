@@ -2,12 +2,6 @@ import { Brio } from './Brio';
 
 type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 
-type BrioInnerOrTuple<B> = B extends Brio<infer R>
-  ? R extends unknown[]
-    ? R
-    : [R]
-  : never;
-
 type FlattenTuples<T extends unknown[]> = T extends [infer Head, ...infer Tail]
   ? Head extends unknown[]
     ? [...Head, ...FlattenTuples<Tail>]
@@ -28,10 +22,7 @@ export namespace BrioUtils {
     ...values: U
   ): Brio<
     LuaTuple<
-      [
-        ...ToTuple<T>,
-        ...FlattenTuples<{ [K in keyof U]: BrioInnerOrTuple<U[K]> }>
-      ]
+      [...ToTuple<T>, ...FlattenTuples<{ [K in keyof U]: ToTuple<U[K]> }>]
     >
   >;
   function prepend<T>(brio: Brio<unknown[]>, ...values: ToTuple<T>): Brio<T>;
