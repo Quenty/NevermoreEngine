@@ -23,7 +23,7 @@ export namespace BrioUtils {
   ): Brio<Map<K, T>>;
   function first<T, U>(brios: Array<Brio<T>>, ...values: ToTuple<U>): Brio<U>;
   function withOtherValues<T, U>(brio: Brio<T>, ...values: ToTuple<U>): Brio<U>;
-  function extend<T, U extends Brio<unknown>[]>(
+  function extend<T, U extends unknown[]>(
     brio: Brio<T>,
     ...values: U
   ): Brio<
