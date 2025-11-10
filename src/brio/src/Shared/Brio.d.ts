@@ -1,7 +1,11 @@
 import { Maid } from '@quenty/maid';
 import { Signal } from '@quenty/signal';
 
-type ToTuple<T> = T extends [unknown, ...unknown] ? T : [T];
+type ToTuple<T> = T extends LuaTuple<infer V>
+  ? V
+  : T extends ?[unknown, ...unknown]
+  ? T
+  : [T];
 
 export type Brio<T = void> = {
   Kill(): void;
