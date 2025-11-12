@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.10.1...@quenty/trajectory@2.10.2) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/trajectory
+
+
+
+
+
 ## [2.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.10.0...@quenty/trajectory@2.10.1) (2025-10-07)
 
 **Note:** Version bump only for package @quenty/trajectory

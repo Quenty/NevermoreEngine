@@ -1,19 +1,15 @@
-# v2.4.1 (Wed Nov 12 2025)
-
-#### 🐛 Bug Fix
-
-- style: Selene upgrade including a major swap from UDim2.new() to UDim2.fromOffset() and UDim2.fromScale() [#604](https://github.com/Quenty/NevermoreEngine/pull/604) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.4.0...@quenty/qgui@2.4.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/qgui
+
+
+
+
 
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.3.4...@quenty/qgui@2.4.0) (2025-05-10)
 
