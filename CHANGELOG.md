@@ -1,3 +1,16 @@
+# (Wed Nov 12 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/blend@12.22.1`, `@quenty/camera@14.26.1`, `@quenty/camerastoryutils@10.12.1`, `@quenty/colorpalette@10.25.1`, `@quenty/colorpicker@10.23.1`, `@quenty/depthoffield@11.23.1`, `@quenty/draw@7.9.2`, `@quenty/elo@7.23.1`, `@quenty/fakeskybox@11.11.2`, `@quenty/flipbook@9.21.1`, `@quenty/guitriangle@2.3.1`, `@quenty/instanceutils@13.20.1`, `@quenty/lipsum@14.22.1`, `@quenty/markdownrender@2.4.1`, `@quenty/observablecollection@12.24.1`, `@quenty/particleengine@13.21.1`, `@quenty/pillbacking@10.10.1`, `@quenty/qgui@2.4.1`, `@quenty/radial-image@9.23.1`, `@quenty/rotatinglabel@11.9.1`, `@quenty/roundedbackingbuilder@2.3.1`, `@quenty/screenshothudservice@7.23.1`, `@quenty/scrollingframe@12.12.2`, `@quenty/selectionimageutils@11.9.1`, `@quenty/snackbar@11.26.1`, `@quenty/softshutdown@9.30.1`, `@quenty/soundplayer@7.23.1`, `@quenty/spring@10.9.1`, `@quenty/sprites@13.19.1`, `@quenty/ultrawidecontainerutils@2.5.1`, `@quenty/viewport@11.27.1`
+  - style: Selene upgrade including a major swap from UDim2.new() to UDim2.fromOffset() and UDim2.fromScale() [#604](https://github.com/Quenty/NevermoreEngine/pull/604) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Nov 07 2025)
 
 #### 🚀 Enhancement
