@@ -34,8 +34,8 @@ function PillBackingBuilder:CreateSingle(gui, options)
 	pillBacking.ImageColor3 = options.BackgroundColor3
 	pillBacking.BorderSizePixel = 0
 	pillBacking.Name = "PillBacking"
-	pillBacking.Position = UDim2.new(0.5, 0, 0.5, 0)
-	pillBacking.Size = UDim2.new(1, 0, 1, 0)
+	pillBacking.Position = UDim2.fromScale(0.5, 0.5)
+	pillBacking.Size = UDim2.fromScale(1, 1)
 	pillBacking.ZIndex = options.ZIndex
 	pillBacking.ScaleType = Enum.ScaleType.Slice
 	pillBacking.SliceScale = SLICE_SCALE_DEFAULT
@@ -59,7 +59,7 @@ function PillBackingBuilder:Create(gui, options)
 	pillBacking.BackgroundColor3 = options.BackgroundColor3
 	pillBacking.BorderSizePixel = 0
 	pillBacking.Name = "PillBacking"
-	pillBacking.Position = UDim2.new(0.5, 0, 0.5, 0)
+	pillBacking.Position = UDim2.fromScale(0.5, 0.5)
 	pillBacking.Size = UDim2.new(1 - diameter.Scale, -diameter.Offset, 1, 0)
 	pillBacking.ZIndex = options.ZIndex
 
@@ -91,7 +91,7 @@ function PillBackingBuilder:CreateVertical(gui, options)
 	pillBacking.BackgroundColor3 = options.BackgroundColor3
 	pillBacking.BorderSizePixel = 0
 	pillBacking.Name = "PillBacking"
-	pillBacking.Position = UDim2.new(0.5, 0, 0.5, 0)
+	pillBacking.Position = UDim2.fromScale(0.5, 0.5)
 	pillBacking.Size = UDim2.new(1, 0, 1 - diameter.Scale, -diameter.Offset)
 	pillBacking.ZIndex = options.ZIndex
 
@@ -196,7 +196,7 @@ function PillBackingBuilder:CreateCircleShadow(gui, options)
 	shadow.ImageTransparency = self.SHADOW_TRANSPARENCY
 	shadow.Name = "CircleShadow"
 	shadow.Position = UDim2.new(UDim.new(0.5, 0), UDim.new(0.5, 0) + self.SHADOW_OFFSET_Y)
-	shadow.Size = UDim2.new(2, 0, 2, 0)
+	shadow.Size = UDim2.fromScale(2, 2)
 	shadow.SizeConstraint = Enum.SizeConstraint.RelativeYY
 
 	shadow.ZIndex = options.ShadowZIndex
@@ -240,8 +240,8 @@ function PillBackingBuilder:_createTop(options)
 	top.AnchorPoint = Vector2.new(0.5, 1)
 	top.ImageRectSize = self.CIRCLE_SIZE * Vector2.new(1, 0.5)
 	top.Name = "TopHalfCircle"
-	top.Position = UDim2.new(0.5, 0, 0, 0)
-	top.Size = UDim2.new(1, 0, 0.5, 0)
+	top.Position = UDim2.fromScale(0.5, 0)
+	top.Size = UDim2.fromScale(1, 0.5)
 
 	return top
 end
@@ -253,8 +253,8 @@ function PillBackingBuilder:_createBottom(options)
 	bottom.ImageRectOffset = self.CIRCLE_SIZE * Vector2.new(0, 0.5)
 	bottom.ImageRectSize = self.CIRCLE_SIZE * Vector2.new(1, 0.5)
 	bottom.Name = "BottomHalfCircle"
-	bottom.Position = UDim2.new(0.5, 0, 1, 0)
-	bottom.Size = UDim2.new(1, 0, 0.5, 0)
+	bottom.Position = UDim2.fromScale(0.5, 1)
+	bottom.Size = UDim2.fromScale(1, 0.5)
 
 	return bottom
 end
@@ -264,8 +264,8 @@ function PillBackingBuilder:_createLeft(options)
 	left.AnchorPoint = Vector2.new(1, 0.5)
 	left.ImageRectSize = self.CIRCLE_SIZE * Vector2.new(0.5, 1)
 	left.Name = "LeftHalfCircle"
-	left.Position = UDim2.new(0, 0, 0.5, 0)
-	left.Size = UDim2.new(0.5, 0, 1, 0)
+	left.Position = UDim2.fromScale(0, 0.5)
+	left.Size = UDim2.fromScale(0.5, 1)
 
 	return left
 end
@@ -278,8 +278,8 @@ function PillBackingBuilder:_createRight(options)
 	right.ImageRectOffset = self.CIRCLE_SIZE * Vector2.new(0.5, 0)
 	right.ImageRectSize = self.CIRCLE_SIZE * Vector2.new(0.5, 1)
 	right.Name = "RightHalfCircle"
-	right.Position = UDim2.new(1, 0, 0.5, 0)
-	right.Size = UDim2.new(0.5, 0, 1, 0)
+	right.Position = UDim2.fromScale(1, 0.5)
+	right.Size = UDim2.fromScale(0.5, 1)
 
 	return right
 end
@@ -289,8 +289,8 @@ function PillBackingBuilder:_createLeftShadow(options)
 	left.AnchorPoint = Vector2.new(1, 0.5)
 	left.ImageRectSize = self.PILL_SHADOW_SIZE * Vector2.new(0.25, 1)
 	left.Name = "LeftShadow"
-	left.Position = UDim2.new(0, 0, 0.5, 0)
-	left.Size = UDim2.new(0.5, 0, 1, 0)
+	left.Position = UDim2.fromScale(0, 0.5)
+	left.Size = UDim2.fromScale(0.5, 1)
 
 	return left
 end
@@ -301,8 +301,8 @@ function PillBackingBuilder:_createRightShadow(options)
 	right.ImageRectOffset = self.PILL_SHADOW_SIZE * Vector2.new(0.75, 0)
 	right.ImageRectSize = self.PILL_SHADOW_SIZE * Vector2.new(0.25, 1)
 	right.Name = "RightShadow"
-	right.Position = UDim2.new(1, 0, 0.5, 0)
-	right.Size = UDim2.new(0.5, 0, 1, 0)
+	right.Position = UDim2.fromScale(1, 0.5)
+	right.Size = UDim2.fromScale(0.5, 1)
 
 	return right
 end
@@ -312,7 +312,7 @@ function PillBackingBuilder:_createCircle(options)
 	circle.BackgroundTransparency = 1
 	circle.Image = self.CIRCLE_IMAGE_ID
 	circle.Name = "Circle"
-	circle.Size = UDim2.new(1, 0, 1, 0)
+	circle.Size = UDim2.fromScale(1, 1)
 	circle.SizeConstraint = Enum.SizeConstraint.RelativeYY
 
 	-- set options
@@ -328,7 +328,7 @@ function PillBackingBuilder:_createPillShadow(options)
 	shadow.Image = self.PILL_SHADOW_IMAGE_ID
 	shadow.ImageTransparency = self.SHADOW_TRANSPARENCY
 	shadow.Name = "PillShadow"
-	shadow.Size = UDim2.new(1, 0, 1, 0)
+	shadow.Size = UDim2.fromScale(1, 1)
 	shadow.SizeConstraint = Enum.SizeConstraint.RelativeYY
 
 	shadow.ZIndex = options.ShadowZIndex

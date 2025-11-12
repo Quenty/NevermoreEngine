@@ -211,7 +211,7 @@ function HSVColorPicker:_render()
 			AnchorPoint = props.AnchorPoint,
 			Position = props.Position,
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0),
+			Size = UDim2.fromScale(1, 1),
 			ZIndex = Blend.Computed(picker:ObserveIsPressed(), function(isPressed)
 				return isPressed and 2 or 1
 			end),
@@ -232,7 +232,7 @@ function HSVColorPicker:_render()
 
 	return Blend.New("Frame")({
 		Name = "HSVColorPicker",
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 
 		Blend.New("UIAspectRatioConstraint")({

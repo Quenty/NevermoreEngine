@@ -41,11 +41,11 @@ return function(target)
 		Parent = target,
 		Font = Enum.Font.FredokaOne,
 		Size = Blend.Computed(percentVisible, function(visible)
-			return UDim2.new(0, visible * 100 + 50, 0, 50)
+			return UDim2.fromOffset(visible * 100 + 50, 50)
 		end),
 		TextTransparency = transparency,
 		BackgroundTransparency = transparency,
-		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Text = state,
 		TextSize = 15,
@@ -76,7 +76,7 @@ return function(target)
 						return nil
 					else
 						return Blend.New "Frame" {
-							Size = UDim2.new(0, 150, 0, 30),
+							Size = UDim2.fromOffset(150, 30),
 							AnchorPoint = Vector2.new(0.5, 0),
 							Position = UDim2.new(0.5, 0, 1, 10),
 							BackgroundTransparency = transparency,
@@ -98,8 +98,8 @@ return function(target)
 						table.insert(
 							results,
 							Blend.New "Frame" {
-								Size = UDim2.new(0, 8, 0, 8),
-								Position = UDim2.new(x / 100, 0, 0.9, 0),
+								Size = UDim2.fromOffset(8, 8),
+								Position = UDim2.fromScale(x / 100, 0.9),
 								AnchorPoint = Vector2.new(0.5, 0.5),
 								BorderSizePixel = 0,
 								BackgroundColor3 = Color3.new(x / 100, 0.5, 0.5),

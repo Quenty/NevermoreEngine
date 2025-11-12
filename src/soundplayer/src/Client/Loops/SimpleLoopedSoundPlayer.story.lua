@@ -24,7 +24,7 @@ return function(target)
 			Text = props.Text,
 			AutoButtonColor = true,
 			Font = Enum.Font.FredokaOne,
-			Size = UDim2.new(0, 100, 0, 30),
+			Size = UDim2.fromOffset(100, 30),
 
 			Blend.New "UICorner" {},
 

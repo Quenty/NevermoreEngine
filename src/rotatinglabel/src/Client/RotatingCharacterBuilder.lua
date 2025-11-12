@@ -30,7 +30,7 @@ function RotatingCharacterBuilder:Generate(Parent)
 	container.Name = "RotatingCharacterContainer"
 	container.ClipsDescendants = true
 	container.SizeConstraint = Enum.SizeConstraint.RelativeYY
-	container.Size = UDim2.new(1, 0, 1, 0)
+	container.Size = UDim2.fromScale(1, 1)
 	container.BackgroundTransparency = Template.BackgroundTransparency
 	container.ZIndex = Template.ZIndex
 	container.BorderSizePixel = Template.BorderSizePixel
@@ -39,7 +39,7 @@ function RotatingCharacterBuilder:Generate(Parent)
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "Label"
 	textLabel.BackgroundTransparency = 1
-	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.ZIndex = Template.ZIndex
 	textLabel.Font = Template.Font
 	textLabel.TextSize = Template.TextSize
@@ -55,7 +55,7 @@ function RotatingCharacterBuilder:Generate(Parent)
 
 	local second = container.Label:Clone()
 	second.Name = "SecondLabel"
-	second.Position = UDim2.new(0, 0, 1, 0)
+	second.Position = UDim2.fromScale(0, 1)
 	second.SizeConstraint = Enum.SizeConstraint.RelativeXY
 	second.Parent = container.Label
 

@@ -37,7 +37,7 @@ end
 function RoundedBackingBuilder:CreateBacking(gui)
 	local backing = Instance.new("ImageLabel")
 	backing.Name = "Backing"
-	backing.Size = UDim2.new(1, 0, 1, 0)
+	backing.Size = UDim2.fromScale(1, 1)
 	backing.Image = self.BACKING_ASSET_ID
 	backing.SliceCenter = Rect.new(4, 4, 16, 16)
 	backing.ImageColor3 = gui.BackgroundColor3
