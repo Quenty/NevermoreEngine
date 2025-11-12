@@ -47,7 +47,7 @@ function RotatingLabelBuilder:WithTemplate(template)
 	local container = Instance.new("Frame")
 	container.Name = "Container"
 	container.SizeConstraint = Enum.SizeConstraint.RelativeYY
-	container.Size = UDim2.new(1, 0, 1, 0)
+	container.Size = UDim2.fromScale(1, 1)
 	container.BackgroundTransparency = 1
 
 	container.Parent = frame

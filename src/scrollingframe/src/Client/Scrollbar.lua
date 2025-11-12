@@ -28,7 +28,7 @@ end
 
 function Scrollbar.fromContainer(container, scrollType)
 	local gui = Instance.new("ImageButton")
-	gui.Size = UDim2.new(1, 0, 1, 0)
+	gui.Size = UDim2.fromScale(1, 1)
 	gui.Name = "ScrollBar"
 	gui.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
 	gui.BorderSizePixel = 0

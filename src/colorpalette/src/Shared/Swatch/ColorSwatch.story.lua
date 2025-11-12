@@ -15,19 +15,19 @@ return function(target)
 	local function entry(color, text, isBaseColor)
 		return Blend.New "Frame" {
 			Name = "Entry",
-			Size = UDim2.new(0, 25, 0, 45),
+			Size = UDim2.fromOffset(25, 45),
 			BackgroundTransparency = 1,
 
 			[Blend.Children] = {
 				Blend.New "Frame" {
 					BackgroundColor3 = color,
-					Size = UDim2.new(0, 25, 0, 25),
+					Size = UDim2.fromOffset(25, 25),
 				},
 
 				Blend.New "TextLabel" {
 					Text = tostring(text),
 					Size = UDim2.new(1, 0, 0, 15),
-					Position = UDim2.new(0, 0, 1, 0),
+					Position = UDim2.fromScale(0, 1),
 					AnchorPoint = Vector2.new(0, 1),
 					Font = Enum.Font.Code,
 					TextScaled = true,
@@ -70,7 +70,7 @@ return function(target)
 	end
 
 	maid:GiveTask((Blend.New "ScrollingFrame" {
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		Parent = target,
 		[Blend.Children] = {
 			palette(Color3.new(0, 0, 0)),

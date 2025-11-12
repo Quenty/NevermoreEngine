@@ -85,7 +85,7 @@ for i = 9, 1, -1 do
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "TextLabel"
-	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.TextScaled = true
 	textLabel.BackgroundTransparency = 1
 	textLabel.TextColor3 = Color3.new(0, 0, 0)

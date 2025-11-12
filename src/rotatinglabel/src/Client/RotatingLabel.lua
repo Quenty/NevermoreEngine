@@ -79,9 +79,9 @@ end
 
 function RotatingLabel:_getLabelPosition(index)
 	if self.TextXAlignment == "Left" then
-		return UDim2.new((index - 1) * self.Width, 0, 0, 0)
+		return UDim2.fromScale((index - 1) * self.Width, 0)
 	else
-		return UDim2.new(-self.TotalWidth + (index - 1) * self.Width, 0, 0, 0)
+		return UDim2.fromScale(-self.TotalWidth + (index - 1) * self.Width, 0)
 	end
 end
 
@@ -205,9 +205,9 @@ function RotatingLabel:__newindex(topindex, value)
 		assert(value == "Left" or value == "Right", 'value must be "Left" or "Right"')
 
 		if value == "Left" then
-			self._container.Position = UDim2.new(0, 0, 0, 0)
+			self._container.Position = UDim2.fromScale(0, 0)
 		else
-			self._container.Position = UDim2.new(1, 0, 0, 0)
+			self._container.Position = UDim2.fromScale(1, 0)
 		end
 
 		self._textXAlignment = value

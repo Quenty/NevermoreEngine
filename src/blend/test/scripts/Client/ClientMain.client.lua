@@ -13,8 +13,8 @@ Blend.New "ScreenGui" {
 	Parent = PlayerGuiUtils.getPlayerGui(),
 	[Blend.Children] = {
 		Blend.New "TextLabel" {
-			Size = UDim2.new(0, 100, 0, 50),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.fromOffset(100, 50),
+			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Text = state,
 		},
