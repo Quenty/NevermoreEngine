@@ -1,24 +1,18 @@
-# v13.19.2 (Fri Nov 14 2025)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Alex Turner ([@alex-y-z](https://github.com/alex-y-z)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Reuse sprites for L3/R3 [#605](https://github.com/Quenty/NevermoreEngine/pull/605) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Reuse sprites for L3/R3 ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.1...@quenty/sprites@13.19.2) (2025-11-14)
+
+
+### Bug Fixes
+
+* Reuse sprites for L3/R3 ([3cde3a3](https://github.com/Quenty/NevermoreEngine/commit/3cde3a3553ba0e30c720769df91702af2aa24744))
+
+
+
+
 
 ## [13.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.0...@quenty/sprites@13.19.1) (2025-11-12)
 
