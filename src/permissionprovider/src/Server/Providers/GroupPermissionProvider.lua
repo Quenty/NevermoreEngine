@@ -148,7 +148,6 @@ end
 function GroupPermissionProvider._handlePlayer(self: GroupPermissionProvider, player: Player): ()
 	assert(player, "Bad player")
 
-	-- when testing with mock players in studio, their userids are negative
 	if RunService:IsStudio() then
 		self._creatorCache[player.UserId] = true
 		return
