@@ -30,8 +30,8 @@ function FakeSkyboxSide.new(PartSize, Normal, Parent)
 
 	local ImageLabel = Instance.new("ImageLabel")
 	ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-	ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-	ImageLabel.Size = UDim2.new(1, 0, 1, 0)
+	ImageLabel.Position = UDim2.fromScale(0.5, 0.5)
+	ImageLabel.Size = UDim2.fromScale(1, 1)
 	ImageLabel.ImageTransparency = self.Transparency
 	ImageLabel.BackgroundColor3 = Color3.new(0, 0, 0)
 	ImageLabel.BackgroundTransparency = 1

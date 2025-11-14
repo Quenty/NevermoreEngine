@@ -1,6 +1,6 @@
 {
   "name": "@quenty/binder",
-  "version": "14.21.0",
+  "version": "14.25.1",
   "description": "Utility object to Bind a class to Roblox object, and associated helper methods",
   "keywords": [
     "Roblox",
@@ -35,6 +35,7 @@
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
+    "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

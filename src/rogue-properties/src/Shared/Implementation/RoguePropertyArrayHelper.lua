@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
+local RoguePropertyBaseValueTypes = require("RoguePropertyBaseValueTypes")
 local Rx = require("Rx")
 
 local RoguePropertyArrayHelper = setmetatable({}, BaseObject)
@@ -113,7 +114,11 @@ function RoguePropertyArrayHelper:SetArrayBaseData(arrayData)
 		else
 			-- Cleanup this old one and setup a new one
 			if available[index] then
-				available[index]:GetBaseValueObject():Destroy()
+				local found = available[index]:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
+				if typeof(found) == "Instance" then
+					found:Destroy()
+					return
+				end
 			end
 
 			local property = definition:Get(self._serviceBag, adornee)
@@ -144,11 +149,18 @@ function RoguePropertyArrayHelper:SetArrayData(arrayData)
 
 	for index, definition in definitions do
 		if available[index] and available[index]:GetDefinition():GetValueType() == definition:GetValueType() then
+			-- TODO: Replication is cursed here, and won't be consistent between client vs. server
+			available[index]:SetCanInitialize(true)
 			available[index]:SetValue(definition:GetDefaultValue())
+			available[index]:SetCanInitialize(false)
 		else
 			-- Cleanup this old one and setup a new one
 			if available[index] then
-				available[index]:GetBaseValueObject():Destroy()
+				local found = available[index]:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
+				if typeof(found) == "Instance" then
+					found:Destroy()
+					return
+				end
 			end
 
 			local property = definition:Get(self._serviceBag, adornee)

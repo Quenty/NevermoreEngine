@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.11.0...@quenty/promise@10.12.0) (2025-08-29)
+
+
+### Features
+
+* Add datastore session locking system ([#580](https://github.com/Quenty/NevermoreEngine/issues/580)) ([06ecef6](https://github.com/Quenty/NevermoreEngine/commit/06ecef60eab81ac0b44d9e408313fb4cc4d59488))
+
+
+
+
+
 # [10.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.10.4...@quenty/promise@10.11.0) (2025-05-10)
 
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/markdownrender@2.4.0...@quenty/markdownrender@2.4.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/markdownrender
+
+
+
+
+
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/markdownrender@2.3.2...@quenty/markdownrender@2.4.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/markdownrender

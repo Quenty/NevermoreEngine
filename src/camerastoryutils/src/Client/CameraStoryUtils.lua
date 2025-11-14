@@ -50,7 +50,7 @@ function CameraStoryUtils.setupViewportFrame(maid: Maid.Maid, target: GuiBase)
 	viewportFrame.ZIndex = 0
 	viewportFrame.BorderSizePixel = 0
 	viewportFrame.BackgroundColor3 = Color3.new(0.9, 0.9, 0.85)
-	viewportFrame.Size = UDim2.new(1, 0, 1, 0)
+	viewportFrame.Size = UDim2.fromScale(1, 1)
 	maid:GiveTask(viewportFrame)
 
 	local reflectedCamera = CameraStoryUtils.reflectCamera(maid, workspace.CurrentCamera)
@@ -159,7 +159,7 @@ function CameraStoryUtils.getInterpolationFactory(
 				maid:GiveTask(label)
 
 				local size = TextService:GetTextSize(labelText, label.TextSize, label.Font, Vector2.new(1e6, 1e6))
-				label.Size = UDim2.new(0, size.x + 20, 0, 20)
+				label.Size = UDim2.fromOffset(size.x + 20, 20)
 
 				local uiCorner = Instance.new("UICorner")
 				uiCorner.CornerRadius = UDim.new(0.5, 0)

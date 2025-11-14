@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.23.0...@quenty/equippedtracker@13.23.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/equippedtracker
+
+
+
+
+
+# [13.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.22.0...@quenty/equippedtracker@13.23.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/equippedtracker
+
+
+
+
+
+# [13.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.21.0...@quenty/equippedtracker@13.22.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/equippedtracker
+
+
+
+
+
+# [13.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.20.1...@quenty/equippedtracker@13.21.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/equippedtracker
+
+
+
+
+
+## [13.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.20.0...@quenty/equippedtracker@13.20.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/equippedtracker
+
+
+
+
+
 # [13.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.19.0...@quenty/equippedtracker@13.20.0) (2025-07-11)
 
 **Note:** Version bump only for package @quenty/equippedtracker

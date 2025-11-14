@@ -236,7 +236,7 @@ function Viewport.Render(self: Viewport, props)
 
 	return Blend.New("ViewportFrame")({
 		Parent = props.Parent,
-		Size = props.Size or UDim2.new(1, 0, 1, 0),
+		Size = props.Size or UDim2.fromScale(1, 1),
 		AnchorPoint = props.AnchorPoint,
 		Position = props.Position,
 		ImageColor3 = props.ImageColor3,

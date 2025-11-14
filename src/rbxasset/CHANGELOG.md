@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxasset@5.9.0...@quenty/rbxasset@5.10.0) (2025-09-26)
+
+
+### Bug Fixes
+
+* Handle priority properly ([1f48083](https://github.com/Quenty/NevermoreEngine/commit/1f48083435c8d14aa0fe21a237fe92f3df4e7a17))
+
+
+
+
+
 # [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxasset@5.8.3...@quenty/rbxasset@5.9.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/rbxasset

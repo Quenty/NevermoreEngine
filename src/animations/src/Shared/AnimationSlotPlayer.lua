@@ -8,6 +8,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local AnimationPromiseUtils = require("AnimationPromiseUtils")
 local AnimationUtils = require("AnimationUtils")
 local BaseObject = require("BaseObject")
 local EnumUtils = require("EnumUtils")
@@ -61,7 +62,7 @@ end
 	@param defaultFadeTime number
 ]=]
 function AnimationSlotPlayer.SetDefaultFadeTime(self: AnimationSlotPlayer, defaultFadeTime: number)
-	self._defaultFadeTime.Value = defaultFadeTime
+	return self._defaultFadeTime:Mount(defaultFadeTime)
 end
 
 --[=[
@@ -286,8 +287,23 @@ function AnimationSlotPlayer.Play(
 					end
 				end)
 
+				if not track.Looped then
+					-- This is a hack to ensure that animations stop at a set rate instead of roblox's weird default faded time
+					maid:GivePromise(AnimationPromiseUtils.promiseLoaded(track)):Then(function()
+						-- This is very very sad...
+						maid:GiveTask(task.delay(track.Length - track.TimePosition - 2 / 60, function()
+							track:Stop(fadeTime or self._defaultFadeTime.Value)
+						end))
+					end)
+				end
+
 				maid:GiveTask(function()
-					track:AdjustWeight(0, fadeTime or self._defaultFadeTime.Value)
+					local stopFadeTime = fadeTime or self._defaultFadeTime.Value
+					track:AdjustWeight(0, stopFadeTime)
+
+					if stopFadeTime == 0 then
+						track:Stop(stopFadeTime)
+					end
 				end)
 			else
 				warn("[AnimationSlotPlayer] - Failed to get animation to play")

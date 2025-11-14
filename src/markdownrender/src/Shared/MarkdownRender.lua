@@ -105,7 +105,7 @@ function MarkdownRender:_getFrame()
 	local frame = Instance.new("Frame")
 	frame.BackgroundTransparency = 1
 	frame.BorderSizePixel = 0
-	frame.Size = UDim2.new(1, 0, 0, 0)
+	frame.Size = UDim2.fromScale(1, 0)
 	frame.ZIndex = self._gui.ZIndex
 
 	return frame
@@ -114,7 +114,7 @@ end
 function MarkdownRender:_getTextLabel()
 	local textLabel = Instance.new("TextLabel")
 	textLabel.BackgroundTransparency = 1
-	textLabel.Size = UDim2.new(1, 0, 0, 0)
+	textLabel.Size = UDim2.fromScale(1, 0)
 	textLabel.ZIndex = self._gui.ZIndex
 
 	return self:_formatTextLabel(textLabel)
@@ -168,9 +168,9 @@ function MarkdownRender:_getBullet(level)
 	bullet.ZIndex = self._gui.ZIndex
 
 	if level == 2 then
-		bullet.Size = UDim2.new(0, 6, 0, 1)
+		bullet.Size = UDim2.fromOffset(6, 1)
 	else
-		bullet.Size = UDim2.new(0, 4, 0, 4)
+		bullet.Size = UDim2.fromOffset(4, 4)
 	end
 
 	return bullet
@@ -182,7 +182,7 @@ function MarkdownRender:_renderList(listData)
 	local frame = self:_getFrame()
 	frame.Name = string.format("List_%d", listData.Level)
 	frame.Size = UDim2.new(1, -listData.Level * self.Indent, 0, 0)
-	frame.Position = UDim2.new(0, -frame.Size.X.Offset, 0, 0)
+	frame.Position = UDim2.fromOffset(-frame.Size.X.Offset, 0)
 	frame.Parent = self._gui
 
 	local height = 0
@@ -193,7 +193,7 @@ function MarkdownRender:_renderList(listData)
 
 		local bullet = self:_getBullet(listData.Level)
 		bullet.AnchorPoint = Vector2.new(0.5, 0.5)
-		bullet.Position = UDim2.new(0, -self.Indent / 2, 0, self.TextSize / 2 + 1)
+		bullet.Position = UDim2.fromOffset(-self.Indent / 2, self.TextSize / 2 + 1)
 		bullet.Parent = textLabel
 
 		height = height + textLabel.Size.Y.Offset
@@ -224,7 +224,7 @@ function MarkdownRender:_renderHeader(headerData)
 	underline.BackgroundColor3 = Color3.new(0.9, 0.9, 0.9)
 	underline.Size = UDim2.new(1, 0, 0, 1)
 	underline.AnchorPoint = Vector2.new(0, 1)
-	underline.Position = UDim2.new(0, 0, 1, 0)
+	underline.Position = UDim2.fromScale(0, 1)
 	underline.Parent = label
 
 	return label

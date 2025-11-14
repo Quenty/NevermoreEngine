@@ -19,10 +19,10 @@ function UltrawideContainerUtils.createContainer(parent: Instance?): (Frame, UIS
 	local frame = Instance.new("Frame")
 	frame.Name = "UltrawideContainer"
 	frame.AnchorPoint = Vector2.new(0.5, 0.5)
-	frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	frame.Position = UDim2.fromScale(0.5, 0.5)
 	frame.BorderSizePixel = 0
 	frame.Transparency = 1
-	frame.Size = UDim2.new(1, 0, 1, 0)
+	frame.Size = UDim2.fromScale(1, 1)
 
 	local uiSizeConstraint = Instance.new("UISizeConstraint")
 	uiSizeConstraint.MaxSize = Vector2.new(1920, 1080)
@@ -43,7 +43,7 @@ function UltrawideContainerUtils.scaleSizeConstraint(
 	scale: number
 ): ()
 	if scale ~= 0 then
-		container.Size = UDim2.new(1 / scale, 0, 1 / scale, 0)
+		container.Size = UDim2.fromScale(1 / scale, 1 / scale)
 		uiSizeConstraint.MaxSize = Vector2.new(1920 / scale, 1080 / scale)
 	end
 end

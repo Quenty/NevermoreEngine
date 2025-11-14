@@ -28,7 +28,7 @@ end
 local function MatchResultCard(props)
 	return Blend.New "Frame" {
 		Name = "MatchResultCard",
-		Size = UDim2.new(0, 140, 0, 0),
+		Size = UDim2.fromOffset(140, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 
@@ -63,7 +63,7 @@ local function MatchResultCard(props)
 					return Color3.fromRGB(103, 39, 39)
 				end
 			end),
-			Size = UDim2.new(0, 60, 0, 30),
+			Size = UDim2.fromOffset(60, 30),
 
 			Blend.New "UICorner" {
 				CornerRadius = UDim.new(0.5, 0),
@@ -103,7 +103,7 @@ local function PlayerScoreChange(props)
 
 	return Blend.New "Frame" {
 		Name = "PlayerScoreChange",
-		Size = UDim2.new(0, 0, 0, 0),
+		Size = UDim2.fromScale(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundColor3 = Color3.new(0.9, 0.9, 0.9),
 		BackgroundTransparency = 0,
@@ -144,7 +144,7 @@ local function PlayerScoreChange(props)
 
 		Blend.New "Frame" {
 			Name = "MatchResults",
-			Size = UDim2.new(0, 90, 0, 40),
+			Size = UDim2.fromOffset(90, 40),
 			BackgroundColor3 = Color3.fromRGB(185, 185, 185),
 
 			Blend.New "UICorner" {
@@ -242,7 +242,7 @@ local function EloGroup(props)
 
 		Blend.New "Frame" {
 			Name = "Header",
-			Size = UDim2.new(0, 200, 0, 30),
+			Size = UDim2.fromOffset(200, 30),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0),
 			BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
@@ -317,7 +317,7 @@ return function(target)
 						TextLabel({
 							TextColor3 = Color3.new(1, 1, 1),
 							Text = matchResultType,
-							Size = UDim2.new(0, 100, 0, 30),
+							Size = UDim2.fromOffset(100, 30),
 						})
 					)
 
@@ -355,9 +355,9 @@ return function(target)
 
 	maid:GiveTask(Blend.mount(target, {
 		Blend.New "ScrollingFrame" {
-			Size = UDim2.new(1, 0, 1, 0),
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
-			CanvasSize = UDim2.new(0, 0, 0, 0),
+			CanvasSize = UDim2.fromScale(0, 0),
 			AutomaticCanvasSize = Enum.AutomaticSize.Y,
 
 			Blend.New "UIPadding" {

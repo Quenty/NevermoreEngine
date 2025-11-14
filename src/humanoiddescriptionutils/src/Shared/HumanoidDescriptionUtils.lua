@@ -19,7 +19,7 @@ local HumanoidDescriptionUtils = {}
 	@param description HumanoidDescription
 	@return Promise
 ]=]
-function HumanoidDescriptionUtils.promiseApplyDescription(humanoid, description)
+function HumanoidDescriptionUtils.promiseApplyDescription(humanoid: Humanoid, description: HumanoidDescription)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(description) == "Instance" and description:IsA("HumanoidDescription"), "Bad description")
 
@@ -43,7 +43,11 @@ end
 	@param assetTypeVerification AssetTypeVerification
 	@return Promise
 ]=]
-function HumanoidDescriptionUtils.promiseApplyDescriptionReset(humanoid, description, assetTypeVerification)
+function HumanoidDescriptionUtils.promiseApplyDescriptionReset(
+	humanoid: Humanoid,
+	description: HumanoidDescription,
+	assetTypeVerification: Enum.AssetTypeVerification
+)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(description) == "Instance" and description:IsA("HumanoidDescription"), "Bad description")
 
@@ -64,7 +68,7 @@ end
 	@param userName string
 	@return Promise
 ]=]
-function HumanoidDescriptionUtils.promiseApplyFromUserName(humanoid, userName)
+function HumanoidDescriptionUtils.promiseApplyFromUserName(humanoid: Humanoid, userName: string)
 	return HumanoidDescriptionUtils.promiseFromUserName(userName):Then(function(description)
 		return HumanoidDescriptionUtils.promiseApplyDescription(humanoid, description)
 	end)
@@ -75,7 +79,7 @@ end
 	@param userName string
 	@return Promise<HumanoidDescription>
 ]=]
-function HumanoidDescriptionUtils.promiseFromUserName(userName)
+function HumanoidDescriptionUtils.promiseFromUserName(userName: string)
 	return PlayersServicePromises.promiseUserIdFromName(userName):Then(function(userId)
 		return HumanoidDescriptionUtils.promiseFromUserId(userId)
 	end)
@@ -86,7 +90,7 @@ end
 	@param userId number
 	@return Promise<HumanoidDescription>
 ]=]
-function HumanoidDescriptionUtils.promiseFromUserId(userId)
+function HumanoidDescriptionUtils.promiseFromUserId(userId: number)
 	assert(type(userId) == "number", "Bad userId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -112,7 +116,7 @@ end
 	@param assetString string -- A comma seperated value of asset ids which should be numbers
 	@return { number }
 ]=]
-function HumanoidDescriptionUtils.getAssetIdsFromString(assetString)
+function HumanoidDescriptionUtils.getAssetIdsFromString(assetString: string): { number }
 	if assetString == "" then
 		return {}
 	end
@@ -140,7 +144,7 @@ end
 	@param assetString string -- A comma seperated value of asset ids which should be numbers
 	@return { Promise<Instance> }
 ]=]
-function HumanoidDescriptionUtils.getAssetPromisesFromString(assetString)
+function HumanoidDescriptionUtils.getAssetPromisesFromString(assetString: string)
 	local promises = {}
 	for _, assetId in HumanoidDescriptionUtils.getAssetIdsFromString(assetString) do
 		table.insert(promises, InsertServiceUtils.promiseAsset(assetId))

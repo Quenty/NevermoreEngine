@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.21.0...@quenty/r15utils@13.21.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [13.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.20.0...@quenty/r15utils@13.21.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [13.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.19.2...@quenty/r15utils@13.20.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+## [13.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.19.1...@quenty/r15utils@13.19.2) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
 ## [13.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.19.0...@quenty/r15utils@13.19.1) (2025-07-14)
 
 

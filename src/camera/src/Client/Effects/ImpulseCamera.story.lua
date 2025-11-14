@@ -53,7 +53,7 @@ return function(target)
 		local button = Instance.new("TextButton")
 		button.Text = text
 		button.BorderSizePixel = 0
-		button.Size = UDim2.new(0, 100, 0, 50)
+		button.Size = UDim2.fromOffset(100, 50)
 		button.Parent = buttonContainer
 		button.Font = Enum.Font.FredokaOne
 		button.TextSize = 20
