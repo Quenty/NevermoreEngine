@@ -1,5 +1,5 @@
 {
-  "name": "NetworkRopeUtils",
+  "name": "networkropeutils",
   "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"

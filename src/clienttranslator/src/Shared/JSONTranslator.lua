@@ -54,8 +54,8 @@ export type JSONTranslator = typeof(setmetatable(
 --[=[
 	Constructs a new JSONTranslator from the given args.
 
-	```
-	local translator = JSONTranslator.new("MyTranslator", en", {
+	```lua
+	local translator = JSONTranslator.new("MyTranslator", "en", {
 		actions = {
 			respawn = "Respawn {playerName}";
 		};
@@ -68,7 +68,7 @@ export type JSONTranslator = typeof(setmetatable(
 		playerName = RxInstanceUtils.observeProperty(player, "DisplayName");
 	}):Subscribe(function(text)
 		print(text) --> "Respawn Quenty"
-	end)
+	end))
 	```
 
 	```lua

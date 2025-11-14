@@ -69,7 +69,7 @@ function AttributeValue.new<T>(object: Instance, attributeName: string, defaultV
 end
 
 --[=[
-	Handles observing the value conditionalli
+	Handles observing the value conditionally
 
 	@param condition function | nil
 	@return Observable<Brio<any>>
@@ -90,7 +90,7 @@ function AttributeValue.Observe<T>(self: AttributeValue<T>): Observable.Observab
 end
 
 --[=[
-	The current property of the Attribute. Can be assigned to to write
+	The current property of the Attribute. Can be assigned to write
 	the attribute.
 	@prop Value T
 	@within AttributeValue
