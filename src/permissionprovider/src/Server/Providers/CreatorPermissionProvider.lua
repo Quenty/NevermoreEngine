@@ -59,7 +59,7 @@ function CreatorPermissionProvider.PromiseIsPermissionLevel(
 	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
 
 	if permissionLevel == PermissionLevel.ADMIN or permissionLevel == PermissionLevel.CREATOR then
-		return Promise.resolved(player.UserId == self._userId or RunService:IsStudio() or player.UserId < 0)
+		return Promise.resolved(player.UserId == self._userId or RunService:IsStudio())
 	else
 		error("Unknown permissionLevel")
 	end

@@ -9,6 +9,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local BasePermissionProvider = require("BasePermissionProvider")
 local GroupUtils = require("GroupUtils")
@@ -148,7 +149,7 @@ function GroupPermissionProvider._handlePlayer(self: GroupPermissionProvider, pl
 	assert(player, "Bad player")
 
 	-- when testing with mock players in studio, their userids are negative
-	if player.UserId < 0 then
+	if RunService:IsStudio() then
 		self._creatorCache[player.UserId] = true
 		return
 	end
