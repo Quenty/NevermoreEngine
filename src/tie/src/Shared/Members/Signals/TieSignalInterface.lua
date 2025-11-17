@@ -55,13 +55,22 @@ function TieSignalInterface:Connect(callback: (...any) -> ())
 end
 
 function TieSignalInterface:Wait()
-	-- TODO: Implement
-	error("Not implemented")
+	local waitingCoroutine = coroutine.running()
+	local connection
+	connection = self:Connect(function(...)
+		connection:Disconnect()
+		task.spawn(waitingCoroutine, ...)
+	end)
+	return coroutine.yield()
 end
 
-function TieSignalInterface:Once(_callback)
-	-- TODO: Implement
-	error("Not implemented")
+function TieSignalInterface:Once(callback: (...any) -> ())
+	local connection
+	connection = self:Connect(function(...)
+		connection:Disconnect()
+		callback(...)
+	end)
+	return connection
 end
 
 function TieSignalInterface:ObserveBindableEventBrio()
