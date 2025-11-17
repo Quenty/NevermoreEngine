@@ -1,3 +1,16 @@
+# (Mon Nov 17 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/tie@10.26.0`
+  - feat: Add tie interface implementations for signals [#606](https://github.com/Quenty/NevermoreEngine/pull/606) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Nov 14 2025)
 
 #### 🐛 Bug Fix
