@@ -4,8 +4,6 @@
 	@class RoguePropertyCache
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local WEAK_KV = { __mode = "kv" }
 
 local RoguePropertyCache = {}

@@ -116,7 +116,9 @@ function PerformanceUtils.countObject(label: string, object: any): ()
 	PerformanceUtils.countCalls(label .. "_new", object, "new")
 	PerformanceUtils.countCalls(label .. "_destroy", object, "Destroy")
 	PerformanceUtils.setLabelFormat(label .. "_total", function()
-		return tostring(PerformanceUtils.readCounter(label .. "_new") - PerformanceUtils.readCounter(label .. "_destroy"))
+		return tostring(
+			PerformanceUtils.readCounter(label .. "_new") - PerformanceUtils.readCounter(label .. "_destroy")
+		)
 	end)
 end
 

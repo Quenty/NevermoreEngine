@@ -215,12 +215,11 @@ function AnimationTrackPlayer:IsPlaying(): boolean
 end
 
 function AnimationTrackPlayer:_onEachTrack(callback)
-	return self._currentTrack:Observe()
-		:Subscribe(function(track)
-			if track ~= nil then
-				callback(track)
-			end
-		end)
+	return self._currentTrack:Observe():Subscribe(function(track)
+		if track ~= nil then
+			callback(track)
+		end
+	end)
 end
 
 return AnimationTrackPlayer
