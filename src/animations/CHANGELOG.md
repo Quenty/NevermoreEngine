@@ -1,3 +1,17 @@
+# v8.22.2 (Sat Nov 22 2025)
+
+#### 🐛 Bug Fix
+
+- perf: Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption [#607](https://github.com/Quenty/NevermoreEngine/pull/607) ([@Quenty](https://github.com/Quenty))
+- fix: Fix styling ([@Quenty](https://github.com/Quenty))
+- perf: Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
