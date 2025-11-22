@@ -1,21 +1,23 @@
-# v4.9.1 (Sat Nov 22 2025)
-
-#### 🐛 Bug Fix
-
-- perf: Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption [#607](https://github.com/Quenty/NevermoreEngine/pull/607) ([@Quenty](https://github.com/Quenty))
-- fix: Fix styling ([@Quenty](https://github.com/Quenty))
-- perf: Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.9.0...@quenty/performanceutils@4.9.1) (2025-11-22)
+
+
+### Bug Fixes
+
+* Fix styling ([a3ac54d](https://github.com/Quenty/NevermoreEngine/commit/a3ac54d43aafa1c37b0e8c9b6e7b20b3f3362742))
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
 
 # [4.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.8.4...@quenty/performanceutils@4.9.0) (2025-05-10)
 
