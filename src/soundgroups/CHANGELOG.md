@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.1...@quenty/soundgroup@1.25.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+## [1.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.0...@quenty/soundgroup@1.25.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+# [1.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.24.0...@quenty/soundgroup@1.25.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+# [1.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.23.0...@quenty/soundgroup@1.24.0) (2025-10-01)
+
+
+### Features
+
+* Add RxHumanoidUtils ([#593](https://github.com/Quenty/NevermoreEngine/issues/593)) ([23580a9](https://github.com/Quenty/NevermoreEngine/commit/23580a979936eb13dd850b097b7c050e54373d37))
+
+
+
+
+
+# [1.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.22.1...@quenty/soundgroup@1.23.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+## [1.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.22.0...@quenty/soundgroup@1.22.1) (2025-09-15)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+# [1.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.21.1...@quenty/soundgroup@1.22.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+## [1.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.21.0...@quenty/soundgroup@1.21.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
 # [1.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.20.3...@quenty/soundgroup@1.21.0) (2025-05-10)
 
 

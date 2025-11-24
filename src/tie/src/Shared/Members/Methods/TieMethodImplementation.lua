@@ -25,6 +25,15 @@ function TieMethodImplementation.new(memberDefinition, parent: Instance, initial
 
 	self:SetImplementation(initialValue)
 
+	-- Since "actualSelf" can be quite large, we clean up our stuff aggressively for GC.
+	self._maid:GiveTask(function()
+		self._maid:DoCleaning()
+
+		for key, _ in pairs(self) do
+			rawset(self, key, nil)
+		end
+	end)
+
 	return self
 end
 

@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.22.1...@quenty/adorneedata@7.22.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/adorneedata
+
+
+
+
+
+## [7.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.22.0...@quenty/adorneedata@7.22.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/adorneedata
+
+
+
+
+
+# [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.21.0...@quenty/adorneedata@7.22.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/adorneedata
+
+
+
+
+
+# [7.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.20.0...@quenty/adorneedata@7.21.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/adorneedata
+
+
+
+
+
+# [7.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.19.2...@quenty/adorneedata@7.20.0) (2025-08-29)
+
+
+### Features
+
+* Add datastore session locking system ([#580](https://github.com/Quenty/NevermoreEngine/issues/580)) ([06ecef6](https://github.com/Quenty/NevermoreEngine/commit/06ecef60eab81ac0b44d9e408313fb4cc4d59488))
+
+
+
+
+
+## [7.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.19.1...@quenty/adorneedata@7.19.2) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/adorneedata
+
+
+
+
+
 ## [7.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.19.0...@quenty/adorneedata@7.19.1) (2025-07-14)
 
 

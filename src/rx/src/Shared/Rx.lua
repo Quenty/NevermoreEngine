@@ -480,8 +480,18 @@ function Rx.shareReplay<T...>(bufferSize: number?, windowTimeSeconds: number?): 
 				buffer = {}
 				lastFail = UNSET_VALUE
 				lastComplete = UNSET_VALUE
+				local futureSub: Subscription.Subscription<any>? = nil
+				local alive = true
 
-				shareMaid._currentSub = source:Subscribe(function(...)
+				shareMaid._currentSub = function()
+					alive = false
+					if futureSub then
+						futureSub:Destroy()
+						futureSub = nil
+					end
+				end
+
+				futureSub = source:Subscribe(function(...)
 					-- TODO: also prune events by timestamp
 
 					if #buffer + 1 > maxBufferSize then
@@ -518,6 +528,14 @@ function Rx.shareReplay<T...>(bufferSize: number?, windowTimeSeconds: number?): 
 						end
 					end
 				end)
+
+				-- Missed cleanup
+				if not alive then
+					if futureSub then
+						futureSub:Destroy()
+						futureSub = nil
+					end
+				end
 			end
 		end
 

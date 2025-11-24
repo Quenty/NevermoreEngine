@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.29.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.29.1...@quenty/scoredactionservice@16.29.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+## [16.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.29.0...@quenty/scoredactionservice@16.29.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [16.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.28.0...@quenty/scoredactionservice@16.29.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix luau type checking ([6a2b0d5](https://github.com/Quenty/NevermoreEngine/commit/6a2b0d5984c4cd1624b81acb209de314e585b9a0))
+
+
+### Features
+
+* ALlow ScoredAction to be disabled ([15d7348](https://github.com/Quenty/NevermoreEngine/commit/15d73486c10d972c4fe0b75db1b459b33516e571))
+
+
+
+
+
+# [16.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.27.1...@quenty/scoredactionservice@16.28.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+## [16.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.27.0...@quenty/scoredactionservice@16.27.1) (2025-09-15)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [16.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.26.1...@quenty/scoredactionservice@16.27.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+## [16.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.26.0...@quenty/scoredactionservice@16.26.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
 # [16.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.25.0...@quenty/scoredactionservice@16.26.0) (2025-05-12)
 
 **Note:** Version bump only for package @quenty/scoredactionservice

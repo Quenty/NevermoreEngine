@@ -12,6 +12,8 @@ local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxCharacterUtils = require("RxCharacterUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxPlayerUtils = {}
@@ -50,6 +52,28 @@ function RxPlayerUtils.observePlayersBrio(predicate: Rx.Predicate<Player>?): Obs
 
 		return maid
 	end) :: any
+end
+
+--[=[
+	Observes the character model for the player
+]=]
+function RxPlayerUtils.observeCharactersBrio(): Observable.Observable<Brio.Brio<Model>>
+	return RxPlayerUtils.observePlayersBrio():Pipe({
+		RxBrioUtils.flatMapBrio(function(player)
+			return RxCharacterUtils.observeLastCharacterBrio(player)
+		end) :: any,
+	}) :: any
+end
+
+--[=[
+	Observes the character model for the player
+]=]
+function RxPlayerUtils.observeHumanoidsBrio(): Observable.Observable<Brio.Brio<Humanoid>>
+	return RxPlayerUtils.observePlayersBrio():Pipe({
+		RxBrioUtils.flatMapBrio(function(player)
+			return RxCharacterUtils.observeLastHumanoidBrio(player)
+		end) :: any,
+	}) :: any
 end
 
 --[=[

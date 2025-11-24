@@ -38,8 +38,8 @@ function ScreenshotHudModel.new(): ScreenshotHudModel
 
 	self._cameraButtonIcon = self._maid:Add(ValueObject.new("", "string"))
 
-	self._cameraButtonPosition = self._maid:Add(ValueObject.new(UDim2.new(0, 0, 0, 0)))
-	self._closeButtonPosition = self._maid:Add(ValueObject.new(UDim2.new(0, 0, 0, 0)))
+	self._cameraButtonPosition = self._maid:Add(ValueObject.new(UDim2.fromScale(0, 0)))
+	self._closeButtonPosition = self._maid:Add(ValueObject.new(UDim2.fromScale(0, 0)))
 	self._closeWhenScreenshotTaken = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._experienceNameOverlayEnabled = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._overlayFont = self._maid:Add(ValueObject.new(Enum.Font.SourceSans))
@@ -126,7 +126,7 @@ end
 function ScreenshotHudModel.SetCloseButtonPosition(self: ScreenshotHudModel, position: UDim2 | nil): ()
 	assert(typeof(position) == "UDim2" or position == nil, "Bad position")
 
-	self._closeButtonPosition.Value = position or UDim2.new(0, 0, 0, 0)
+	self._closeButtonPosition.Value = position or UDim2.fromScale(0, 0)
 end
 
 --[=[
@@ -144,7 +144,7 @@ end
 function ScreenshotHudModel.SetCameraButtonPosition(self: ScreenshotHudModel, position: UDim2 | nil): ()
 	assert(typeof(position) == "UDim2" or position == nil, "Bad position")
 
-	self._cameraButtonPosition.Value = position or UDim2.new(0, 0, 0, 0)
+	self._cameraButtonPosition.Value = position or UDim2.fromScale(0, 0)
 end
 
 --[=[

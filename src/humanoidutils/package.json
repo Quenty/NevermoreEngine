@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidutils",
-  "version": "2.2.3",
+  "version": "2.4.0",
   "description": "General humanoid utility code.",
   "keywords": [
     "Roblox",
@@ -26,5 +26,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx"
   }
 }

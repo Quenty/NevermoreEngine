@@ -136,7 +136,7 @@ function InputImageLibrary:GetScaledImageLabel(keyCode, preferredStyle: string?,
 	uiAspectRatio.AspectRatio = ratio
 	uiAspectRatio.Parent = image
 
-	image.Size = UDim2.new(1, 0, 1, 0)
+	image.Size = UDim2.fromScale(1, 1)
 
 	return image
 end

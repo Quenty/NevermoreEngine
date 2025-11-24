@@ -66,12 +66,16 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local RunService = game:GetService("RunService")
+
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStorePromises = require("DataStorePromises")
 local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
 local Math = require("Math")
 local Promise = require("Promise")
+local PromiseMaidUtils = require("PromiseMaidUtils")
+local PromiseRetryUtils = require("PromiseRetryUtils")
 local Rx = require("Rx")
 local Signal = require("Signal")
 local Symbol = require("Symbol")
@@ -81,6 +85,7 @@ local DEFAULT_DEBUG_WRITING = false
 
 local DEFAULT_AUTO_SAVE_TIME_SECONDS = 60 * 5
 local DEFAULT_JITTER_PROPORTION = 0.1 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
+local UNLOCK_BY_DEFAULT_TIME_MULTIPLIER = 2.1
 
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
@@ -92,11 +97,13 @@ export type DataStore = typeof(setmetatable(
 		_userIdList: { number }?,
 		_robloxDataStore: DataStorePromises.RobloxDataStore,
 		_debugWriting: boolean,
+		_sessionLockingEnabled: boolean,
 		_autoSaveTimeSeconds: ValueObject.ValueObject<number?>,
 		_jitterProportion: ValueObject.ValueObject<number>,
 		_syncOnSave: ValueObject.ValueObject<boolean>,
 		_loadedOk: ValueObject.ValueObject<boolean>,
 		_firstLoadPromise: Promise.Promise<()>,
+		_promiseSessionLockingFailed: Promise.Promise<()>,
 		Saving: Signal.Signal<Promise.Promise<()>>,
 	},
 	{} :: typeof({ __index = DataStore })
@@ -124,6 +131,7 @@ function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: 
 	self._jitterProportion = self._maid:Add(ValueObject.new(DEFAULT_JITTER_PROPORTION, "number"))
 	self._syncOnSave = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._loadedOk = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._promiseSessionLockingFailed = self._maid:Add(Promise.new())
 
 	self._userIdList = nil
 
@@ -141,6 +149,27 @@ function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: 
 	self:_setupAutoSaving()
 
 	return self
+end
+
+--[=[
+	Sets session locking enabled
+
+	@param sessionLockingEnabled boolean
+]=]
+function DataStore.SetSessionLockingEnabled(self: DataStore, sessionLockingEnabled: boolean)
+	assert(not self._firstLoadPromise, "Must set session locking before datastore is loaded")
+
+	self._sessionLockingEnabled = sessionLockingEnabled
+end
+
+--[=[
+	Returns a promise that rejects on datastore cleanup, and resolves only when the session locking
+	code completely fails
+
+	@return Promise<>
+]=]
+function DataStore.PromiseSessionLockingFailed(self: DataStore)
+	return self._promiseSessionLockingFailed
 end
 
 --[=[
@@ -220,6 +249,16 @@ end
 ]=]
 function DataStore.Save(self: DataStore): Promise.Promise<()>
 	return self:_syncData(false)
+end
+
+--[=[
+	Saves all stored data.
+	@return Promise
+]=]
+function DataStore.SaveAndCloseSession(self: DataStore): Promise.Promise<()>
+	assert(self._sessionLockingEnabled, "Cannot invoke unless session locking is enabled")
+
+	return self:_syncData(false, true)
 end
 
 --[=[
@@ -323,7 +362,7 @@ function DataStore._setupAutoSaving(self: DataStore)
 	end))
 end
 
-function DataStore._syncData(self: DataStore, doMergeNewData: boolean)
+function DataStore._syncData(self: DataStore, doMergeNewData: boolean, doCloseSession: boolean?)
 	if self:DidLoadFail() then
 		warn("[DataStore] - Not syncing, failed to load")
 		return Promise.rejected("Load not successful, not syncing")
@@ -335,7 +374,7 @@ function DataStore._syncData(self: DataStore, doMergeNewData: boolean)
 			return self._maid:GivePromise(self:PromiseInvokeSavingCallbacks())
 		end)
 		:Then(function(): Promise.Promise<()>?
-			if not self:HasWritableData() then
+			if not self:HasWritableData() and not doCloseSession then
 				if doMergeNewData then
 					-- Reads are cheaper than update async calls
 					return self:_promiseGetAsyncNoCache()
@@ -348,12 +387,17 @@ function DataStore._syncData(self: DataStore, doMergeNewData: boolean)
 
 				return nil
 			else
-				return self:_doDataSync(self:GetNewWriter(), doMergeNewData)
+				return self:_doDataSync(self:GetNewWriter(), doMergeNewData, doCloseSession)
 			end
 		end)
 end
 
-function DataStore._doDataSync(self: DataStore, writer, doMergeNewData: boolean): Promise.Promise<()>
+function DataStore._doDataSync(
+	self: DataStore,
+	writer,
+	doMergeNewData: boolean,
+	doCloseSession: boolean?
+): Promise.Promise<()>
 	assert(type(doMergeNewData) == "boolean", "Bad doMergeNewData")
 
 	-- Cache user id list
@@ -396,6 +440,11 @@ function DataStore._doDataSync(self: DataStore, writer, doMergeNewData: boolean)
 		promise:Resolve(
 			maid:GivePromise(
 				DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(original, datastoreKeyInfo)
+					if self._sessionLockingEnabled then
+						original = table.clone(original)
+						original.lock = nil
+					end
+
 					if promise:IsRejected() then
 						-- Cancel if we have another request
 						return nil
@@ -434,6 +483,17 @@ function DataStore._doDataSync(self: DataStore, writer, doMergeNewData: boolean)
 						metadata = datastoreKeyInfo:GetMetadata()
 					end
 
+					if doCloseSession then
+						result = table.clone(result)
+						result.lock = nil
+					elseif self._sessionLockingEnabled then
+						-- Maintain the lock with the latest time
+						result = table.clone(result)
+						if result.lock then
+							result.lock = os.time()
+						end
+					end
+
 					return result, userIdList, metadata
 				end)
 			)
@@ -455,36 +515,135 @@ function DataStore._doDataSync(self: DataStore, writer, doMergeNewData: boolean)
 end
 
 function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
-	return self._maid
-		:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key))
-		:Catch(function(err)
-			warn(
-				string.format(
-					"DataStorePromises.getAsync(%q) -> warning - %s",
-					tostring(self._key),
-					tostring(err or "empty error")
+	local promise
+	if self._sessionLockingEnabled then
+		local function promiseLoadUnlockedProfile()
+			local loadPromise = Promise.new()
+			self._maid[loadPromise] = loadPromise
+
+			PromiseMaidUtils.whilePromise(loadPromise, function(maid)
+				maid:GivePromise(
+					DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(data, datastoreKeyInfo)
+						local userIdList = self._userIdList
+						if datastoreKeyInfo then
+							userIdList = datastoreKeyInfo:GetUserIds()
+						end
+
+						local metadata = nil
+						if datastoreKeyInfo then
+							metadata = datastoreKeyInfo:GetMetadata()
+						end
+
+						if self._debugWriting then
+							print(string.format("DataStorePromises.updateAsync(%q) -> Got ", tostring(self._key)), data)
+						end
+
+						if type(data) == "table" and data.lock then
+							local isInvalidLock = false
+							if type(data.lock) == "number" then
+								local timeElapsed = os.time() - data.lock
+								local autoSaveSeconds = self._autoSaveTimeSeconds.Value
+								if
+									autoSaveSeconds
+									and timeElapsed > (autoSaveSeconds * UNLOCK_BY_DEFAULT_TIME_MULTIPLIER)
+								then
+									isInvalidLock = true
+								end
+							end
+
+							-- Allow data locked to load in studio because otherwise testing gets really messy
+							if RunService:IsStudio() then
+								isInvalidLock = true
+							end
+
+							if not isInvalidLock then
+								loadPromise:Reject(string.format("Profile is locked (%s)", tostring(data.lock)))
+
+								-- Cancel write to avoid maintaining lock
+								return nil
+							end
+
+							-- Be sure to cleanup stuff
+							data.lock = nil :: number?
+						end
+
+						-- TODO: Retry
+						loadPromise:Resolve(data)
+
+						if data == nil then
+							data = {}
+						elseif type(data) ~= "table" then
+							warn("[DataStore] - Data session locking is not available for non-table entries")
+							return data, userIdList, metadata
+						end
+
+						data.lock = os.time()
+
+						return data, userIdList, metadata
+					end)
 				)
+			end)
+
+			loadPromise:Finally(function()
+				self._maid[loadPromise] = nil
+			end)
+
+			return loadPromise
+		end
+
+		promise = self._maid
+			:Add(PromiseRetryUtils.retry(promiseLoadUnlockedProfile, {
+				-- https://exponentialbackoffcalculator.com/
+				-- ~10 minutes
+				exponential = 1.5,
+				initialWaitTime = 1,
+				maxAttempts = 15,
+				printWarning = true,
+			}))
+			:Catch(function(err)
+				warn(
+					string.format(
+						"DataStorePromises.updateAsync(%q) -> warning - %s",
+						tostring(self._key),
+						tostring(err or "empty error")
+					)
+				)
+				self._promiseSessionLockingFailed:Resolve()
+				return Promise.rejected(err)
+			end)
+	else
+		promise = self._maid
+			:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key))
+			:Catch(function(err)
+				warn(
+					string.format(
+						"DataStorePromises.getAsync(%q) -> warning - %s",
+						tostring(self._key),
+						tostring(err or "empty error")
+					)
+				)
+				return Promise.rejected(err)
+			end)
+	end
+
+	return promise:Then(function(data)
+		local writer = self:GetNewWriter()
+		local diffSnapshot = writer:ComputeDiffSnapshot(data)
+
+		self:MergeDiffSnapshot(diffSnapshot)
+
+		if self._debugWriting then
+			print(
+				string.format("DataStorePromises.getAsync(%q) -> Got ", tostring(self._key)),
+				data,
+				"with diff snapshot",
+				diffSnapshot,
+				"to view",
+				self._viewSnapshot
 			)
-			return Promise.rejected(err)
-		end)
-		:Then(function(data)
-			local writer = self:GetNewWriter()
-			local diffSnapshot = writer:ComputeDiffSnapshot(data)
-
-			self:MergeDiffSnapshot(diffSnapshot)
-
-			if self._debugWriting then
-				print(
-					string.format("DataStorePromises.getAsync(%q) -> Got ", tostring(self._key)),
-					data,
-					"with diff snapshot",
-					diffSnapshot,
-					"to view",
-					self._viewSnapshot
-				)
-				-- print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data)
-			end
-		end)
+			-- print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data)
+		end
+	end)
 end
 
 return DataStore

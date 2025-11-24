@@ -8,7 +8,6 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local ScoredAction = require("ScoredAction")
-local Set = require("Set")
 local ValueObject = require("ValueObject")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
@@ -50,7 +49,18 @@ function ScoredActionPicker.Update(self: ScoredActionPicker): ()
 		return
 	end
 
-	local actionList: { ScoredAction.ScoredAction } = Set.toList(self._actionSet)
+	local actionList: { ScoredAction.ScoredAction } = {}
+	for action: any, _ in self._actionSet do
+		if not action.Destroy then
+			warn("[ScoredActionPicker] - Action is destroyed. Should have been removed.")
+			continue
+		end
+
+		if action:IsEnabled() then
+			table.insert(actionList, action)
+		end
+	end
+
 	table.sort(actionList, function(a, b)
 		if a._score == b._score then
 			-- Older objects have preference in ties
@@ -102,6 +112,16 @@ end
 function ScoredActionPicker.AddAction(self: ScoredActionPicker, action: ScoredAction.ScoredAction): ()
 	assert(type(action) == "table", "Bad action")
 
+	if self._actionSet[action] then
+		return
+	end
+
+	local maid = Maid.new()
+	maid:GiveTask(action.EnabledChanged:Connect(function()
+		self:Update()
+	end))
+
+	self._maid[action] = maid
 	self._actionSet[action] = true
 	self:Update()
 end
@@ -113,6 +133,7 @@ function ScoredActionPicker.RemoveAction(self: ScoredActionPicker, action: Score
 		self._currentPreferred.Value = nil
 	end
 
+	self._maid[action] = nil
 	self._actionSet[action] = nil
 	self:Update()
 end

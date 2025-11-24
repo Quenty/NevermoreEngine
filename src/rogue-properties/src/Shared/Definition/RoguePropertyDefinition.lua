@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local DuckTypeUtils = require("DuckTypeUtils")
 local RogueProperty = require("RogueProperty")
 local RoguePropertyCacheService = require("RoguePropertyCacheService")
+local RoguePropertyConstants = require("RoguePropertyConstants")
 local RoguePropertyUtils = require("RoguePropertyUtils")
 local ServiceBag = require("ServiceBag")
 local ValueBaseUtils = require("ValueBaseUtils")
@@ -36,6 +37,10 @@ function RoguePropertyDefinition.isRoguePropertyDefinition(value: any): boolean
 	return DuckTypeUtils.isImplementation(RoguePropertyDefinition, value)
 end
 
+function RoguePropertyDefinition:HasChildren(): boolean
+	return false
+end
+
 --[=[
 	@param serviceBag ServiceBag
 	@param adornee Instance
@@ -61,12 +66,21 @@ end
 function RoguePropertyDefinition:GetOrCreateInstance(parent: Instance)
 	assert(typeof(parent) == "Instance", "Bad parent")
 
-	return ValueBaseUtils.getOrCreateValue(
+	-- Note, in forcing the creation, we move to an attribute
+	local original = parent:GetAttribute(self:GetName())
+	local created = ValueBaseUtils.getOrCreateValue(
 		parent,
 		self:GetStorageInstanceType(),
 		self:GetName(),
 		self:GetEncodedDefaultValue()
 	)
+
+	if original ~= nil and original ~= RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE then
+		created.Value = original
+	end
+
+	parent:SetAttribute(self:GetName(), RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE)
+	return created
 end
 
 function RoguePropertyDefinition:SetParentPropertyTableDefinition(parentPropertyTableDefinition)

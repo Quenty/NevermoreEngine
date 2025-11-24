@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.11.0...@quenty/signal@7.11.1) (2025-08-12)
+
+
+### Bug Fixes
+
+* Add some stories for debugging ([ce37c08](https://github.com/Quenty/NevermoreEngine/commit/ce37c08bacf7035e31d0b29ca525cb4521d762a9))
+* Cleanup signals properly ([987af9e](https://github.com/Quenty/NevermoreEngine/commit/987af9e54c71e953eb06f2167406b30c785801c3))
+
+
+
+
+
 # [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.10.3...@quenty/signal@7.11.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/signal

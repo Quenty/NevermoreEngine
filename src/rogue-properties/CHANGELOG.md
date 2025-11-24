@@ -3,6 +3,116 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.0...@quenty/rogue-properties@11.30.1) (2025-11-22)
+
+
+### Bug Fixes
+
+* Fix styling ([a3ac54d](https://github.com/Quenty/NevermoreEngine/commit/a3ac54d43aafa1c37b0e8c9b6e7b20b3f3362742))
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
+
+# [11.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.29.1...@quenty/rogue-properties@11.30.0) (2025-11-17)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.29.0...@quenty/rogue-properties@11.29.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.28.0...@quenty/rogue-properties@11.29.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix formatting ([97cfa97](https://github.com/Quenty/NevermoreEngine/commit/97cfa9787cc2d93e90e6d9a9f1a3c3c57b87a8a5))
+
+
+### Features
+
+* Can disable rogue modifier ([0570ee2](https://github.com/Quenty/NevermoreEngine/commit/0570ee24eda1bacfe8489165400007f4ffef1374))
+
+
+
+
+
+# [11.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.27.0...@quenty/rogue-properties@11.28.0) (2025-10-03)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.26.0...@quenty/rogue-properties@11.27.0) (2025-10-01)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.25.1...@quenty/rogue-properties@11.26.0) (2025-09-26)
+
+
+### Bug Fixes
+
+* Fix caching performance of the rogue system when multiple things want to observe state ([1a067f7](https://github.com/Quenty/NevermoreEngine/commit/1a067f7dec837a2eb4db399e46bf06566824c9a3))
+* Fix parenting and application on client ([ff2f125](https://github.com/Quenty/NevermoreEngine/commit/ff2f1254f45289537444190bc0596f9f519c592e))
+* Fix stuff ([63ba0e0](https://github.com/Quenty/NevermoreEngine/commit/63ba0e0c4b5c8bdaeb452f0b3d742b7b8bc8a7ab))
+* Style stuff ([ff3c47a](https://github.com/Quenty/NevermoreEngine/commit/ff3c47af4e5b23f912aa09a0784849751d5736e1))
+
+
+### Features
+
+* Move the rogue properties over to attributes as required ([4aa23b0](https://github.com/Quenty/NevermoreEngine/commit/4aa23b0092ba07490b615f1d8ab5920f86b78756))
+
+
+
+
+
+## [11.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.25.0...@quenty/rogue-properties@11.25.1) (2025-09-15)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.24.2...@quenty/rogue-properties@11.25.0) (2025-08-29)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.24.1...@quenty/rogue-properties@11.24.2) (2025-08-12)
+
+
+### Bug Fixes
+
+* Index handling has better errors ([b092117](https://github.com/Quenty/NevermoreEngine/commit/b092117e032db8a6b0ed9b680507e80515bb8193))
+
+
+
+
+
 ## [11.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.24.0...@quenty/rogue-properties@11.24.1) (2025-07-14)
 
 **Note:** Version bump only for package @quenty/rogue-properties

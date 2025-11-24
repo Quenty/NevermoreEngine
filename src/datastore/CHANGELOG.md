@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.1...@quenty/datastore@13.25.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [13.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.0...@quenty/datastore@13.25.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.24.0...@quenty/datastore@13.25.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.23.1...@quenty/datastore@13.24.0) (2025-09-26)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [13.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.23.0...@quenty/datastore@13.23.1) (2025-08-29)
+
+
+### Bug Fixes
+
+* Fix new player data in datastore locking system ([#581](https://github.com/Quenty/NevermoreEngine/issues/581)) ([7548141](https://github.com/Quenty/NevermoreEngine/commit/754814128ec5395f04cbb90d8c7f0e71610bb352))
+
+
+
+
+
+# [13.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.22.1...@quenty/datastore@13.23.0) (2025-08-29)
+
+
+### Features
+
+* Add datastore session locking system ([#580](https://github.com/Quenty/NevermoreEngine/issues/580)) ([06ecef6](https://github.com/Quenty/NevermoreEngine/commit/06ecef60eab81ac0b44d9e408313fb4cc4d59488))
+
+
+
+
+
+## [13.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.22.0...@quenty/datastore@13.22.1) (2025-08-12)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
 # [13.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.21.0...@quenty/datastore@13.22.0) (2025-05-12)
 
 **Note:** Version bump only for package @quenty/datastore

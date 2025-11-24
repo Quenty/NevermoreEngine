@@ -123,7 +123,7 @@ end
 function RotatingCharacter:UpdatePositionRender()
 	self._label.Text = self.Character
 	self._labelTwo.Text = self.NextCharacter
-	self._label.Position = UDim2.new(0, 0, -(self.Position % 1), 0)
+	self._label.Position = UDim2.fromScale(0, -(self.Position % 1))
 end
 
 function RotatingCharacter:UpdateRender()
