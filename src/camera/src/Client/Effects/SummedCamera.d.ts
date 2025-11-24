@@ -5,6 +5,7 @@ interface SummedCamera extends CameraEffect {
   readonly CameraAState: CameraState;
   readonly CameraBState: CameraState;
   SetMode(mode: 'World' | 'Relative'): this;
+  __add(other: CameraEffect): SummedCamera;
   __sub(other: CameraEffect): CameraEffect;
 }
 
