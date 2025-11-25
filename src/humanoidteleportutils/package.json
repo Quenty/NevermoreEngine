@@ -25,6 +25,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/cframeutils": "file:../cframeutils",
     "@quenty/loader": "file:../loader",
     "@quenty/raycaster": "file:../raycaster"
   },
