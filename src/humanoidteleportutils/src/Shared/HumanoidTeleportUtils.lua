@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Raycaster = require("Raycaster")
+local getRotationInXZPlane = require("getRotationInXZPlane")
 
 local HumanoidTeleportUtils = {}
 
@@ -66,13 +67,17 @@ end
 	@param rootPart BasePart
 	@param position Vector3
 ]=]
-function HumanoidTeleportUtils.teleportRootPart(humanoid, rootPart, position)
+function HumanoidTeleportUtils.teleportRootPart(humanoid, rootPart, position: Vector3 | CFrame)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(rootPart) == "Instance" and rootPart:IsA("BasePart"), "Bad rootPart")
-	assert(typeof(position) == "Vector3", "Bad position")
+	assert(typeof(position) == "Vector3" or typeof(position) == "CFrame", "Bad position")
 
 	local offset = HumanoidTeleportUtils.getRootPartOffset(humanoid, rootPart)
-	rootPart.CFrame = rootPart.CFrame - rootPart.Position + position + offset
+	if typeof(position) == "Vector3" then
+		rootPart.CFrame = rootPart.CFrame - rootPart.Position + position + offset
+	else
+		rootPart.CFrame = getRotationInXZPlane(position) + offset
+	end
 end
 
 --[=[

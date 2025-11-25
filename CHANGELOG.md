@@ -1,3 +1,16 @@
+# (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/humanoidteleportutils@10.9.1`
+  - fix: Update teleport utils [#608](https://github.com/Quenty/NevermoreEngine/pull/608) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Nov 22 2025)
 
 #### 🐛 Bug Fix
