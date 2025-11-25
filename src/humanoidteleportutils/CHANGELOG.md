@@ -1,19 +1,18 @@
-# v10.9.1 (Tue Nov 25 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Update teleport utils [#608](https://github.com/Quenty/NevermoreEngine/pull/608) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.9.0...@quenty/humanoidteleportutils@10.9.1) (2025-11-25)
+
+
+### Bug Fixes
+
+* Update teleport utils ([#608](https://github.com/Quenty/NevermoreEngine/issues/608)) ([1650e14](https://github.com/Quenty/NevermoreEngine/commit/1650e143cac06980bcef5cb2966468a8f5379619))
+
+
+
+
 
 # [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.8.3...@quenty/humanoidteleportutils@10.9.0) (2025-05-10)
 
