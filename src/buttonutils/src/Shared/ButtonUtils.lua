@@ -15,7 +15,7 @@ local ButtonUtils = {}
 function ButtonUtils.getMouseOverColor(originalColor: Color3, factor: number): Color3
 	factor = factor or 1
 	local h, s, v = Color3.toHSV(originalColor)
-	return Color3.fromHSV(h, s, v - 0.05 * factor)
+	return Color3.fromHSV(h, s, math.max(v - 0.05 * factor, 0))
 end
 
 return ButtonUtils
