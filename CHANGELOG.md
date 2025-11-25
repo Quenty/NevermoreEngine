@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/buttonutils@2.3.1`
+  - fix: Clamp mouse over color [#609](https://github.com/Quenty/NevermoreEngine/pull/609) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
 - `@quenty/humanoidteleportutils@10.9.1`
   - fix: Update teleport utils [#608](https://github.com/Quenty/NevermoreEngine/pull/608) ([@Quenty](https://github.com/Quenty))
 

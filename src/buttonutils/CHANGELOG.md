@@ -1,3 +1,18 @@
+# v2.3.1 (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Clamp mouse over color [#609](https://github.com/Quenty/NevermoreEngine/pull/609) ([@alex-y-z](https://github.com/alex-y-z))
+- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Clamp both ends ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Clamp mouse over color ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
