@@ -1,22 +1,19 @@
-# v2.3.1 (Tue Nov 25 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Clamp mouse over color [#609](https://github.com/Quenty/NevermoreEngine/pull/609) ([@alex-y-z](https://github.com/alex-y-z))
-- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Clamp both ends ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Clamp mouse over color ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonutils@2.3.0...@quenty/buttonutils@2.3.1) (2025-11-25)
+
+
+### Bug Fixes
+
+* Clamp both ends ([f79cf09](https://github.com/Quenty/NevermoreEngine/commit/f79cf0927bc5dbdbcc2c9e436391aff993c0050e))
+* Clamp mouse over color ([b4cd6c5](https://github.com/Quenty/NevermoreEngine/commit/b4cd6c56a2a60248f0b45b06b0c51940e3901925))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonutils@2.2.2...@quenty/buttonutils@2.3.0) (2025-05-10)
 
