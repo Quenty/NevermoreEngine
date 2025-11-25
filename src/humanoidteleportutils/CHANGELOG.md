@@ -1,3 +1,15 @@
+# v10.9.1 (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Update teleport utils [#608](https://github.com/Quenty/NevermoreEngine/pull/608) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
