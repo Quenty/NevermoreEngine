@@ -85,8 +85,8 @@ export namespace RxBrioUtils {
   function extend<T>(
     ...values: T[]
   ): <U>(source: Observable<Brio<U>>) => Observable<Brio<U | T | (U & T)>>;
-  function map<T, U>(
-    project: (...args: ToTuple<T>) => U
+  function map<T, S extends T, U>(
+    project: (...args: ToTuple<S>) => U
   ): (source: Observable<Brio<T>>) => Observable<Brio<U>>;
   function mapBrioBrio<T, S extends T, TProject>(
     project: (value: S) => Observable<TProject> | Observable<Brio<TProject>>
