@@ -135,7 +135,7 @@ end
 	@param fadeTime number
 ]=]
 function AnimationTrackPlayer:SetWeightTargetIfNotSet(weight: number, fadeTime: number)
-	self._maid._adjustWeight = self:_onEachTrack(function(_maid, track)
+	self._maid._adjustWeight = self:_onEachTrack(function(track)
 		if track.WeightTarget ~= weight then
 			track:AdjustWeight(weight, fadeTime)
 		end
@@ -159,7 +159,7 @@ function AnimationTrackPlayer:Play(fadeTime: number, weight: number, speed: numb
 	end
 
 	self._maid._stop = nil
-	self._maid._play = self:_onEachTrack(function(_maid, track)
+	self._maid._play = self:_onEachTrack(function(track)
 		track:Play(fadeTime, weight, speed)
 	end)
 end
@@ -171,7 +171,7 @@ end
 ]=]
 function AnimationTrackPlayer:Stop(fadeTime: number)
 	self._maid._play = nil
-	self._maid._stop = self:_onEachTrack(function(_maid, track)
+	self._maid._stop = self:_onEachTrack(function(track)
 		track:Stop(fadeTime)
 	end)
 end
@@ -183,7 +183,7 @@ end
 	@param fadeTime number
 ]=]
 function AnimationTrackPlayer:AdjustWeight(weight: number, fadeTime: number)
-	self._maid._adjustWeight = self:_onEachTrack(function(_maid, track)
+	self._maid._adjustWeight = self:_onEachTrack(function(track)
 		track:AdjustWeight(weight, fadeTime)
 	end)
 end
@@ -195,7 +195,7 @@ end
 	@param fadeTime number
 ]=]
 function AnimationTrackPlayer:AdjustSpeed(speed: number, fadeTime: number)
-	self._maid._adjustSpeed = self:_onEachTrack(function(_maid, track)
+	self._maid._adjustSpeed = self:_onEachTrack(function(track)
 		track:AdjustSpeed(speed, fadeTime)
 	end)
 end
@@ -215,18 +215,11 @@ function AnimationTrackPlayer:IsPlaying(): boolean
 end
 
 function AnimationTrackPlayer:_onEachTrack(callback)
-	return self._currentTrack
-		:ObserveBrio(function(track)
-			return track ~= nil
-		end)
-		:Subscribe(function(brio)
-			if brio:IsDead() then
-				return
-			end
-
-			local track = brio:GetValue()
-			callback(brio:ToMaid(), track)
-		end)
+	return self._currentTrack:Observe():Subscribe(function(track)
+		if track ~= nil then
+			callback(track)
+		end
+	end)
 end
 
 return AnimationTrackPlayer

@@ -14,25 +14,27 @@ local ServiceBag = require("ServiceBag")
 local RoguePropertyCacheService = {}
 RoguePropertyCacheService.ServiceName = "RoguePropertyCacheService"
 
+local WEAK_K_TABLE = { __mode = "k" }
+
 function RoguePropertyCacheService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._cache = setmetatable({}, { __mode = "k" })
+	self._cache = setmetatable({}, WEAK_K_TABLE)
 end
 
 function RoguePropertyCacheService:GetCache(roguePropertyDefinition)
 	if not self._cache then
 		assert(not RunService:IsRunning(), "Not in test mode")
 		-- Test mode
-		return RoguePropertyCache.new()
+		return RoguePropertyCache.new(roguePropertyDefinition:GetName())
 	end
 
 	if self._cache[roguePropertyDefinition] then
 		return self._cache[roguePropertyDefinition]
 	end
 
-	local cache = RoguePropertyCache.new()
+	local cache = RoguePropertyCache.new(roguePropertyDefinition:GetName())
 	self._cache[roguePropertyDefinition] = cache
 	return cache
 end

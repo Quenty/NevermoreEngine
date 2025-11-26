@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.0...@quenty/tie@10.26.1) (2025-11-22)
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.25.1...@quenty/tie@10.26.0) (2025-11-17)
+
+
+### Features
+
+* Add tie interface implementations for signals ([#606](https://github.com/Quenty/NevermoreEngine/issues/606)) ([91f07f2](https://github.com/Quenty/NevermoreEngine/commit/91f07f2a03d76445969b25dff246fd8b00396ca1))
+
+
+
+
+
 ## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.25.0...@quenty/tie@10.25.1) (2025-11-12)
 
 **Note:** Version bump only for package @quenty/tie

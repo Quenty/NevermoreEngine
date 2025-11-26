@@ -1,3 +1,55 @@
+# (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonutils@2.3.1`
+  - fix: Clamp mouse over color [#609](https://github.com/Quenty/NevermoreEngine/pull/609) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/humanoidteleportutils@10.9.1`
+  - fix: Update teleport utils [#608](https://github.com/Quenty/NevermoreEngine/pull/608) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Nov 22 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.22.2`, `@quenty/brio@14.20.1`, `@quenty/performanceutils@4.9.1`, `@quenty/rogue-properties@11.30.1`, `@quenty/tie@10.26.1`
+  - perf: Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption [#607](https://github.com/Quenty/NevermoreEngine/pull/607) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Nov 17 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/tie@10.26.0`
+  - feat: Add tie interface implementations for signals [#606](https://github.com/Quenty/NevermoreEngine/pull/606) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Nov 14 2025)
 
 #### 🐛 Bug Fix

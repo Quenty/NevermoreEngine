@@ -258,6 +258,10 @@ function TieDefinition:Promise(adornee: Instance, tieRealm: TieRealm?)
 	}))
 end
 
+function TieDefinition:Wait(adornee: Instance, tieRealm: TieRealm?)
+	return self:Promise(adornee, tieRealm):Wait()
+end
+
 --[=[
 	Gets all valid interfaces for this adornee's children
 
