@@ -3,7 +3,7 @@ import { Signal } from '@quenty/signal';
 
 type ToTuple<T> = T extends LuaTuple<infer V>
   ? V
-  : T extends ?[unknown, ...unknown]
+  : T extends [unknown, ...unknown[]]
   ? T
   : [T];
 
