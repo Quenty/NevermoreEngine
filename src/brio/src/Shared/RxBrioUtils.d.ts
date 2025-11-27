@@ -108,10 +108,10 @@ export namespace RxBrioUtils {
     source: Observable<Brio<T>>
   ) => Observable<Brio<T>>;
   function switchToBrio<T>(
-    predicate?: (value: T) => value is NonNullable<T>
+    predicate: (value: T) => value is NonNullable<T>
   ): (source: Observable<T | Brio<T>>) => Observable<Brio<NonNullable<T>>>;
   function switchToBrio<T>(
-    predicate?: (value: T) => value is Exclude<T, NonNullable<T>>
+    predicate: (value: T) => value is Exclude<T, NonNullable<T>>
   ): (
     source: Observable<T | Brio<T>>
   ) => Observable<Brio<Exclude<T, NonNullable<T>>>>;
