@@ -9,7 +9,7 @@ local OrthogonalUtils = {}
 --[=[
 	Decompose the CFrame
 	@param cframe CFrame
-	return { Vector3 }
+	@return { Vector3 }
 ]=]
 function OrthogonalUtils.decomposeCFrameToVectors(cframe: CFrame): { Vector3 }
 	return {
@@ -27,7 +27,7 @@ end
 
 	@param options { Vector3 } -- normals
 	@param unitVector Vector3
-	return Vector3?
+	@return Vector3?
 ]=]
 function OrthogonalUtils.getClosestVector(options: { Vector3 }, unitVector: Vector3): Vector3?
 	local best = nil
@@ -48,7 +48,7 @@ end
 
 	@param cframe CFrame
 	@param snapToCFrame CFrame
-	return CFrame
+	@return CFrame
 ]=]
 function OrthogonalUtils.snapCFrameTo(cframe: CFrame, snapToCFrame: CFrame): CFrame
 	local options = OrthogonalUtils.decomposeCFrameToVectors(snapToCFrame)

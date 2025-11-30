@@ -31,8 +31,8 @@ export type UserInfo = {
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync(userIds)
 
-	::: tip
-	User [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
+	:::tip
+	Use [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
 	:::
 
 	@param userIds { number }
@@ -61,8 +61,8 @@ end
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync({ userId })[1]
 
-	::: tip
-	User [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
+	:::tip
+	Use [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
 	:::
 
 	@param userId number
@@ -85,8 +85,8 @@ end
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync({ userId })[1].DisplayName
 
-	::: tip
-	User [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
+	:::tip
+	Use [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
 	:::
 
 	@param userId number
@@ -103,8 +103,8 @@ end
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync({ userId })[1].Username
 
-	::: tip
-	User [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
+	:::tip
+	Use [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
 	:::
 
 	@param userId number

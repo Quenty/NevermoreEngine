@@ -79,7 +79,7 @@ end
 	Function to calculate the inverse error function (erfinv) using Newton's method
 
 	@param x number
-	@return number
+	@return number?
 ]=]
 function Probability.erfinv(x: number): number?
 	assert(type(x) == "number", "Bad x")
@@ -113,12 +113,10 @@ function Probability.erfinv(x: number): number?
 end
 
 --[=[
-	Standard normal cumulative distribution function. Returns the value from 0 to 1.
-
-	This is also known as percentile!
+	Inverse of the standard normal cumulative distribution function
 
 	@param percentile number
-	@return number
+	@return number?
 ]=]
 function Probability.percentileToZScore(percentile: number): number?
 	assert(type(percentile) == "number" and percentile >= 0 and percentile <= 1, "Bad percentile")
