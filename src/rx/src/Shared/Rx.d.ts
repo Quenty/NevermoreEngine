@@ -24,6 +24,15 @@ export namespace Rx {
   function merge<T extends Observable<unknown>[]>(
     observables: T
   ): Observable<T extends Observable<infer U>[] ? U : never>;
+  function fromSignal<T extends Callback>(
+    event: RBXScriptSignal<T>
+  ): Observable<
+    T extends (...args: infer U) => void
+      ? U['length'] extends 1
+        ? U[0]
+        : LuaTuple<U>
+      : never
+  >;
   function fromSignal<T>(
     event:
       | Signal<T>
