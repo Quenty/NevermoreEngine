@@ -33,6 +33,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
+    "@quenty/raycaster": "file:../raycaster",
     "@quenty/region3utils": "file:../region3utils",
     "@quenty/vector3utils": "file:../vector3utils"
   },
