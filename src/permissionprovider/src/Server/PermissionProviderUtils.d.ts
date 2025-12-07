@@ -2,7 +2,7 @@ export interface GroupRankConfigInput {
   groupId: number;
   minAdminRequiredRank: number;
   minCreatorRequiredRank: number;
-  remoteFunctionName?: string;
+  remoteFunctionName: string;
 }
 
 export interface GroupRankConfig extends GroupRankConfigInput {
@@ -11,7 +11,7 @@ export interface GroupRankConfig extends GroupRankConfigInput {
 
 export interface SingleUserConfigInput {
   userId: number;
-  remoteFunctionName?: string;
+  remoteFunctionName: string;
 }
 
 export interface SingleUserConfig extends SingleUserConfigInput {

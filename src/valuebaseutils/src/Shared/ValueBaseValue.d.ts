@@ -1,7 +1,10 @@
+import { RxSignal } from '@quenty/rxsignal';
 import { ValueBaseType } from './ValueBaseUtils';
 import { ValueObjectLike } from '@quenty/valueobject';
 
-interface ValueBaseValue<T> extends ValueObjectLike<T> {}
+interface ValueBaseValue<T> extends ValueObjectLike<T> {
+  Changed: RxSignal<T>;
+}
 
 interface ValueBaseValueConstructor {
   readonly ClassName: 'ValueBaseValue';
