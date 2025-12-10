@@ -1,6 +1,6 @@
 import { Observable, Operator } from './Observable';
 import { MaidTask } from '@quenty/maid';
-import { Signal } from '@quenty/signal';
+import { Signal, SignalLike } from '@quenty/signal';
 import { CancelToken } from '@quenty/canceltoken';
 import { Promise } from '@quenty/promise';
 
@@ -33,11 +33,12 @@ export namespace Rx {
         : LuaTuple<U>
       : never
   >;
-  function fromSignal<T>(
-    event:
-      | Signal<T>
-      | { Connect: (cb: (...args: ToTuple<T>) => void) => unknown }
-  ): Observable<T>;
+  function fromSignal<T>(event: Signal<T>): Observable<T>;
+  function fromSignal<T extends unknown[]>(event: {
+    Connect: (cb: (...args: T) => void) => unknown;
+  }): Observable<LuaTuple<T>>;
+  function fromSignal(event: SignalLike<unknown>): Observable<unknown>;
+
   function fromPromise<T>(promise: Promise<T>): Observable<T>;
 
   function tap<T, S extends T>(

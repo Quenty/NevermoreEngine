@@ -2,7 +2,7 @@ type ToTuple<T> = T extends LuaTuple<infer V> ? V : [T];
 
 export type SignalLike<T = void> =
   | Signal<T>
-  | RBXScriptSignal<(...args: ToTuple<T>) => void>;
+  | RBXScriptSignal<(...args: T extends LuaTuple<infer V> ? V : [T]) => void>;
 
 interface Connection {
   IsConnected(): boolean;
