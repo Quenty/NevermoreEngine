@@ -1,4 +1,4 @@
-type ToTuple<T> = T extends unknown[] ? T : [T];
+type ToTuple<T> = T extends LuaTuple<infer V> ? V : [T];
 
 export type SignalLike<T = void> =
   | Signal<T>
@@ -14,7 +14,7 @@ export interface Signal<T = void> {
   Fire(...args: ToTuple<T>): void;
   Connect(callback: (...args: ToTuple<T>) => void): Connection;
   DisconnectAll(): void;
-  Wait(): T extends void ? void : T extends unknown[] ? LuaTuple<T> : T;
+  Wait(): T extends void ? void : T extends LuaTuple<infer U> ? LuaTuple<U> : T;
   Once(callback: (...args: ToTuple<T>) => void): Connection;
   Destroy(): void;
 }

@@ -23,7 +23,7 @@ export type Mountable<T> = T | Observable<T> | ValueBase | ValueObject<T>;
 
 export interface ValueObject<T> extends ValueObjectLike<T> {
   Value: T;
-  Changed: Signal<[newValue: T, oldValue: T, ...args: unknown[]]>;
+  Changed: Signal<LuaTuple<[newValue: T, oldValue: T, ...args: unknown[]]>>;
   GetCheckType(): CheckType | undefined;
   Mount(value: T | Observable<T>): MaidTask;
   SetValue(value: T): void;
