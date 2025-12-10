@@ -71,10 +71,16 @@ export namespace RxInstanceUtils {
     parent: Instance,
     predicate?: Predicate<Instance>
   ): Observable<Brio<Instance>>;
+
+  function observeDescendants<T extends Instance>(
+    parent: Instance,
+    predicate: (instance: Instance) => instance is T
+  ): Observable<LuaTuple<[instance: T, wasAdded: boolean]>>;
   function observeDescendants(
     parent: Instance,
     predicate?: Predicate<Instance>
-  ): Observable<[instance: Instance, wasAdded: boolean]>;
+  ): Observable<LuaTuple<[instance: Instance, wasAdded: boolean]>>;
+
   function observeDescendantsBrio(
     parent: Instance,
     predicate?: Predicate<Instance>
