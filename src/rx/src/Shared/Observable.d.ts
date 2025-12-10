@@ -1,4 +1,4 @@
-import { MaidTask } from '../../../maid';
+import { MaidTask } from '@quenty/maid';
 import { Subscription } from './Subscription';
 
 type Observable<T = void> = {
@@ -80,8 +80,8 @@ type Observable<T = void> = {
   Pipe(...operators: Operator<unknown, unknown>[]): Observable<unknown>;
   // tuple wrap to prevent distributive conditional types
   Subscribe(
-    fireCallback?: [T] extends [LuaTuple<[unknown, ...unknown[]]>]
-      ? (...args: T) => void
+    fireCallback?: [T] extends [LuaTuple<infer V>]
+      ? (...args: V) => void
       : (value: T) => void,
     failCallback?: () => void,
     completeCallback?: () => void
