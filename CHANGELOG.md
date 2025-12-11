@@ -1,3 +1,16 @@
+# (Thu Dec 11 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonhighlightmodel@14.22.3`, `@quenty/counter@7.21.3`, `@quenty/friendutils@12.20.2`, `@quenty/grouputils@10.12.1`, `@quenty/humanoiddescriptionutils@10.12.1`, `@quenty/inputmode@13.23.3`, `@quenty/playerutils@8.21.3`, `@quenty/soundgroup@1.25.3`
+  - fix: Fix dependencies and linting within Roblox's typechecking [#611](https://github.com/Quenty/NevermoreEngine/pull/611) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Nov 25 2025)
 
 #### 🐛 Bug Fix
