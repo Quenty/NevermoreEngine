@@ -25,7 +25,7 @@ function HumanoidDescriptionUtils.promiseApplyDescription(humanoid: Humanoid, de
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
-			humanoid:ApplyDescription(description)
+			humanoid:ApplyDescriptionAsync(description)
 		end)
 		if not ok then
 			reject(err)
@@ -53,7 +53,7 @@ function HumanoidDescriptionUtils.promiseApplyDescriptionReset(
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
-			humanoid:ApplyDescriptionReset(description, assetTypeVerification)
+			humanoid:ApplyDescriptionResetAsync(description, assetTypeVerification)
 		end)
 		if not ok then
 			reject(err)

@@ -33,6 +33,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"
   },

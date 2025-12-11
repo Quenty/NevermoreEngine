@@ -124,7 +124,7 @@ function PlayerUtils.getDefaultNameColor(displayName: string): Color3
 end
 
 --[=[
-	Calls :LoadCharacter() in a promise
+	Calls :LoadCharacterAsync() in a promise
 
 	@param player Player
 	@return Promise<Model>
@@ -134,7 +134,7 @@ function PlayerUtils.promiseLoadCharacter(player: Player): Promise.Promise<Model
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
-			player:LoadCharacter()
+			player:LoadCharacterAsync()
 		end)
 		if not ok then
 			return reject(err or "Failed to load character")
@@ -145,7 +145,7 @@ function PlayerUtils.promiseLoadCharacter(player: Player): Promise.Promise<Model
 end
 
 --[=[
-	Calls :LoadCharacterWithHumanoidDescription() in a promise
+	Calls :LoadCharacterWithHumanoidDescriptionAsync() in a promise
 
 	@param player Player
 	@param humanoidDescription HumanoidDescription
@@ -163,7 +163,7 @@ function PlayerUtils.promiseLoadCharacterWithHumanoidDescription(
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
-			player:LoadCharacterWithHumanoidDescription(humanoidDescription)
+			player:LoadCharacterWithHumanoidDescriptionAsync(humanoidDescription)
 		end)
 		if not ok then
 			return reject(err or "Failed to load character")
