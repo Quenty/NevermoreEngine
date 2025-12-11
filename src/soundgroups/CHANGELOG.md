@@ -1,19 +1,18 @@
-# v1.25.3 (Thu Dec 11 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies and linting within Roblox's typechecking [#611](https://github.com/Quenty/NevermoreEngine/pull/611) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.25.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.2...@quenty/soundgroup@1.25.3) (2025-12-11)
+
+
+### Bug Fixes
+
+* Fix dependencies and linting within Roblox's typechecking ([#611](https://github.com/Quenty/NevermoreEngine/issues/611)) ([92011ea](https://github.com/Quenty/NevermoreEngine/commit/92011eac0f2ff31c1434e3642bd63f49025ee982))
+
+
+
+
 
 ## [1.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.1...@quenty/soundgroup@1.25.2) (2025-11-22)
 
