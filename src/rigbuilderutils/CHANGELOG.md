@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.22.2...@quenty/rigbuilderutils@10.22.3) (2025-12-11)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+
+
+
+
 ## [10.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.22.1...@quenty/rigbuilderutils@10.22.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/rigbuilderutils

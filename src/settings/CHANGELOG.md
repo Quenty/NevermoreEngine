@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.33.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.33.1...@quenty/settings@11.33.2) (2025-12-11)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
 ## [11.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.33.0...@quenty/settings@11.33.1) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/settings
