@@ -1,5 +1,5 @@
 --[=[
-	Providers screenGuis with a given display order for easy use.
+	Provides ScreenGuis with a given display order for easy use.
 
 	```lua
 	return GenericScreenGuiProvider.new({

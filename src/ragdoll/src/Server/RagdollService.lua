@@ -53,7 +53,7 @@ function RagdollService:SetRagdollOnFall(ragdollOnFall)
 end
 
 --[=[
-	Sets whether ragdolls should unragdoll automatically.
+	Sets whether ragdolls should ragdoll on death.
 	@param ragdollOnDeath boolean
 ]=]
 function RagdollService:SetRagdollOnDeath(ragdollOnDeath)

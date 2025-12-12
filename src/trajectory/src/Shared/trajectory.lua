@@ -10,13 +10,13 @@
 
 	@function trajectory
 	@within trajectory
-	@param origin Vector3 -- Origin the the bullet
-	@param target Vector3 -- Target for the bullet
+	@param origin Vector3 -- Origin of the bullet
+	@param target Vector3 -- Target of the bullet
 	@param initialVelocity number -- Magnitude of the initial velocity
 	@param gravityForce number -- Force of the gravity
 	@return Vector3? -- lowTrajectory Initial velocity for a low trajectory arc
 	@return Vector3? -- highTrajectory Initial velocity for a high trajectory arc
-	@return Vector3? -- fallbackTrajectory Trajectory directly at target as afallback
+	@return Vector3? -- fallbackTrajectory Trajectory directly at target as a fallback
 ]=]
 local function trajectory(
 	origin: Vector3,

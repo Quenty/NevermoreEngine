@@ -4,10 +4,10 @@
 
 	Lua-side duplication of the [API of events on Roblox objects](https://create.roblox.com/docs/reference/engine/datatypes/RBXScriptSignal).
 
-	Signals are needed for to ensure that for local events objects are passed by
+	Signals are needed to ensure that for local events objects are passed by
 	reference rather than by value where possible, as the BindableEvent objects
 	always pass signal arguments by value, meaning tables will be deep copied.
-	Roblox's deep copy method parses to a non-lua table compatable format.
+	Roblox's deep copy method parses to a non-lua table compatible format.
 
 	This class is designed to work both in deferred mode and in regular mode.
 	It follows whatever mode is set.
@@ -26,7 +26,7 @@
 
 	:::info
 	Why this over a direct [BindableEvent]? Well, in this case, the signal
-	prevents Roblox from trying to serialize and desialize each table reference
+	prevents Roblox from trying to serialize and deserialize each table reference
 	fired through the BindableEvent.
 	:::
 
@@ -39,7 +39,7 @@
 
 	Author notes:
 	stravant - July 31st, 2021 - Created the file.
-	Quenty - Auguest 21st, 2023 - Modified to fit Nevermore contract, with Moonwave docs
+	Quenty - August 21st, 2023 - Modified to fit Nevermore contract, with Moonwave docs
 
 	@class GoodSignal
 ]=]
@@ -201,7 +201,7 @@ end
 --[=[
 	Fire the event with the given arguments. All handlers will be invoked. Handlers follow
 
-	::: info
+	:::info
 	Signal:Fire(...) is implemented by running the handler functions on the
 	coRunnerThread, and any time the resulting thread yielded without returning
 	to us, that means that it yielded to the Roblox scheduler and has been taken
@@ -229,7 +229,7 @@ end
 --[=[
 	Wait for fire to be called, and return the arguments it was given.
 
-	::: info
+	:::info
 	Signal:Wait() is implemented in terms of a temporary connection using
 	a Signal:Connect() which disconnects itself.
 	:::
@@ -252,7 +252,7 @@ end
 --[=[
 	Connect a new, one-time handler to the event. Returns a connection object that can be disconnected.
 
-	::: info
+	:::info
 	-- Implement Signal:Once() in terms of a connection which disconnects
 	-- itself before running the handler.
 	:::
@@ -270,7 +270,7 @@ function Signal.Once<T...>(self: Signal<T...>, fn: SignalHandler<T...>): Connect
 end
 
 --[=[
-	Alias for [DisconnectAll]
+	Alias for [Signal.DisconnectAll]
 
 	@function Destroy
 	@within Signal
