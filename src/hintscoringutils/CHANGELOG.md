@@ -1,23 +1,18 @@
-# v14.26.3 (Fri Dec 12 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Missing dependency [#610](https://github.com/Quenty/NevermoreEngine/pull/610) ([@alex-y-z](https://github.com/alex-y-z) [@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
-- Merge branch 'main' into users/alex-y-z/misc-fixes ([@Quenty](https://github.com/Quenty))
-- fix: Missing dependency ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 2
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.26.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.26.2...@quenty/hintscoringutils@14.26.3) (2025-12-12)
+
+
+### Bug Fixes
+
+* Missing dependency ([b3bc0ae](https://github.com/Quenty/NevermoreEngine/commit/b3bc0aed36e57c527aca560f02f43044903374f3))
+
+
+
+
 
 ## [14.26.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.26.1...@quenty/hintscoringutils@14.26.2) (2025-11-22)
 
