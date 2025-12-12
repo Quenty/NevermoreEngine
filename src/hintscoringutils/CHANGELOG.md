@@ -1,3 +1,19 @@
+# v14.26.3 (Fri Dec 12 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Missing dependency [#610](https://github.com/Quenty/NevermoreEngine/pull/610) ([@alex-y-z](https://github.com/alex-y-z) [@Quenty](https://github.com/Quenty))
+- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
+- Merge branch 'main' into users/alex-y-z/misc-fixes ([@Quenty](https://github.com/Quenty))
+- fix: Missing dependency ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

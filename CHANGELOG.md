@@ -1,3 +1,17 @@
+# (Fri Dec 12 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/hintscoringutils@14.26.3`
+  - fix: Missing dependency [#610](https://github.com/Quenty/NevermoreEngine/pull/610) ([@alex-y-z](https://github.com/alex-y-z) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Dec 11 2025)
 
 #### 🐛 Bug Fix
