@@ -1,3 +1,16 @@
+# (Sat Dec 13 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.22.3`, `@quenty/getmechanismparts@2.3.1`, `@quenty/tie@10.26.2`
+  - fix: Small patches to nevermore libraries [#614](https://github.com/Quenty/NevermoreEngine/pull/614) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Dec 12 2025)
 
 #### 🐛 Bug Fix

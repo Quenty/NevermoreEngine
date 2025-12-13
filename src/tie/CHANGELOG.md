@@ -1,3 +1,15 @@
+# v10.26.2 (Sat Dec 13 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Small patches to nevermore libraries [#614](https://github.com/Quenty/NevermoreEngine/pull/614) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
