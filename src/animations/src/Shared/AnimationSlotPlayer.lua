@@ -254,6 +254,9 @@ function AnimationSlotPlayer.Play(
 	priority = priority or self._defaultAnimationPriority.Value
 	weight = weight or 1 -- We need to explicitly adjust the weight here
 
+	-- Make sure we stop our last animation fully
+	self._maid._current = nil
+
 	local topMaid = Maid.new()
 
 	local animationId = RbxAssetUtils.toRbxAssetId(id)
