@@ -6,13 +6,14 @@ import { Signal } from '@quenty/signal';
 export interface ValueObjectLike<T> {
   Value: T;
   Observe(): Observable<T>;
+  ObserveBrio(): Observable<Brio<T>>;
   ObserveBrio(
-    predicate?: (value: T) => value is NonNullable<T>
+    predicate: (value: T) => value is NonNullable<T>
   ): Observable<Brio<NonNullable<T>>>;
   ObserveBrio(
-    predicate?: (value: T) => value is Exclude<T, NonNullable<T>>
+    predicate: (value: T) => value is Exclude<T, NonNullable<T>>
   ): Observable<Brio<Exclude<T, NonNullable<T>>>>;
-  ObserveBrio(predicate?: (value: T) => boolean): Observable<Brio<T>>;
+  ObserveBrio(predicate: (value: T) => boolean): Observable<Brio<T>>;
 }
 
 type CheckType =
