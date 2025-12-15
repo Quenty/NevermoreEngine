@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.26.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.1...@quenty/tie@10.26.2) (2025-12-13)
+
+
+### Bug Fixes
+
+* Small patches to nevermore libraries ([#614](https://github.com/Quenty/NevermoreEngine/issues/614)) ([6eeb33b](https://github.com/Quenty/NevermoreEngine/commit/6eeb33b9d215d3d753a433e4c612f391bcc0d286))
+
+
+
+
+
 ## [10.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.0...@quenty/tie@10.26.1) (2025-11-22)
 
 
