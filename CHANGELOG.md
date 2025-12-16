@@ -1,3 +1,69 @@
+# (Sat Dec 13 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.22.3`, `@quenty/getmechanismparts@2.3.1`, `@quenty/tie@10.26.2`
+  - fix: Small patches to nevermore libraries [#614](https://github.com/Quenty/NevermoreEngine/pull/614) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Dec 12 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/hintscoringutils@14.26.3`
+  - fix: Missing dependency [#610](https://github.com/Quenty/NevermoreEngine/pull/610) ([@alex-y-z](https://github.com/alex-y-z) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Dec 11 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonhighlightmodel@14.22.3`, `@quenty/counter@7.21.3`, `@quenty/friendutils@12.20.2`, `@quenty/grouputils@10.12.1`, `@quenty/humanoiddescriptionutils@10.12.1`, `@quenty/inputmode@13.23.3`, `@quenty/playerutils@8.21.3`, `@quenty/soundgroup@1.25.3`
+  - fix: Fix dependencies and linting within Roblox's typechecking [#611](https://github.com/Quenty/NevermoreEngine/pull/611) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonutils@2.3.1`
+  - fix: Clamp mouse over color [#609](https://github.com/Quenty/NevermoreEngine/pull/609) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/humanoidteleportutils@10.9.1`
+  - fix: Update teleport utils [#608](https://github.com/Quenty/NevermoreEngine/pull/608) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Nov 22 2025)
 
 #### 🐛 Bug Fix

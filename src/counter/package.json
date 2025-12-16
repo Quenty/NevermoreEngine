@@ -1,6 +1,6 @@
 {
   "name": "@quenty/counter",
-  "version": "7.21.2",
+  "version": "7.21.3",
   "description": "Helps count a total value",
   "keywords": [
     "Roblox",
@@ -29,6 +29,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

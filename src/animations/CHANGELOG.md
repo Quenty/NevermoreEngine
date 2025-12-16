@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.2...@quenty/animations@8.22.3) (2025-12-13)
+
+
+### Bug Fixes
+
+* Small patches to nevermore libraries ([#614](https://github.com/Quenty/NevermoreEngine/issues/614)) ([6eeb33b](https://github.com/Quenty/NevermoreEngine/commit/6eeb33b9d215d3d753a433e4c612f391bcc0d286))
+
+
+
+
+
 ## [8.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.1...@quenty/animations@8.22.2) (2025-11-22)
 
 

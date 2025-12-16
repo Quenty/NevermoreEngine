@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputmode",
-  "version": "13.23.2",
+  "version": "13.23.3",
   "description": "Trace input mode state and trigger changes correctly",
   "keywords": [
     "Roblox",
@@ -25,6 +25,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/brio": "file:../brio",
     "@quenty/ducktype": "file:../ducktype",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
