@@ -1,12 +1,12 @@
-import { Brio } from '../../../../brio';
-import { Observable } from '../../../../rx';
-import { Signal } from '../../../../signal/src/Shared/Signal';
-import { Symbol } from '../../../../symbol/src/Shared/Symbol';
+import { Brio } from '@quenty/brio';
+import { Observable } from '@quenty/rx';
+import { Signal } from '@quenty/signal';
+import { Symbol } from '@quenty/symbol';
 import { SortedNode } from './SortedNode';
 
 interface ObservableSortedList<T> extends Iterable<T> {
-  ItemAdded: Signal<[item: T, index: number, key: Symbol]>;
-  ItemRemoved: Signal<[item: T, key: Symbol]>;
+  ItemAdded: Signal<LuaTuple<[item: T, index: number, key: Symbol]>>;
+  ItemRemoved: Signal<LuaTuple<[item: T, key: Symbol]>>;
   OrderChanged: Signal;
   CountChanged: Signal<number>;
   Observe(): Observable<T[]>;
@@ -14,11 +14,13 @@ interface ObservableSortedList<T> extends Iterable<T> {
   FindFirstKey(item: T): SortedNode<T> | undefined;
   PrintDebug(): void;
   Contains(item: T): boolean;
-  ObserveItemsBrio(): Observable<Brio<[item: T, sortedNode: SortedNode<T>]>>;
+  ObserveItemsBrio(): Observable<
+    Brio<LuaTuple<[item: T, sortedNode: SortedNode<T>]>>
+  >;
   ObserveIndex(indexToObserve: number): Observable<number>;
   ObserveAtIndex(
     indexToObserve: number
-  ): Observable<[item: T, sortedNode: SortedNode<T>]>;
+  ): Observable<LuaTuple<[item: T, sortedNode: SortedNode<T>]>>;
   ObserveIndexByKey(node: SortedNode<T>): Observable<number>;
   GetIndexByKey(node: SortedNode<T>): number | undefined;
   GetCount(): number;
