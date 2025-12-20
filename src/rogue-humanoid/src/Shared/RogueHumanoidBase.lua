@@ -163,8 +163,12 @@ function RogueHumanoidBase:_updateScaleValue(numberValue: NumberValue, state: Sc
 	local min = state.minSize
 
 	local multiplier = min + (math.exp(r * t) * (-min + max)) / (math.exp(r * t) + (-i + max) / (i - min))
-
-	numberValue.Value = initialValue * multiplier
+	-- TODO: Ask trey what's up with this
+	if state.scale == 1 then
+		numberValue = initialValue
+	else
+		numberValue.Value = initialValue * multiplier
+	end
 end
 
 return RogueHumanoidBase
