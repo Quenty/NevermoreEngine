@@ -605,7 +605,12 @@ function DataStoreStage.StoreOnValueChange(self: DataStoreStage, name: DataStore
 	local maid = Maid.new()
 
 	maid:GiveTask(valueObj.Changed:Connect(function()
-		self:_storeAtKey(name, valueObj.Value)
+		local value = valueObj.Value
+		if value == nil then
+			self:_storeAtKey(name, DataStoreDeleteToken)
+		else
+			self:_storeAtKey(name, value)
+		end
 	end))
 
 	-- Hopefully this doesn't result in data-loss when writing as
