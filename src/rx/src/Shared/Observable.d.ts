@@ -98,8 +98,11 @@ export type Operator<In, Out> = (source: Observable<In>) => Observable<Out>;
 
 interface ObservableConstructor {
   readonly ClassName: 'Observable';
+  new (
+    onSubscribe: (subscription: Subscription) => MaidTask | undefined | void
+  ): Observable;
   new <T>(
-    onSubscribe: (subscription: Subscription<T>) => MaidTask
+    onSubscribe: (subscription: Subscription<T>) => MaidTask | undefined | void
   ): Observable<T>;
 
   isObservable: (value: unknown) => value is Observable<unknown>;

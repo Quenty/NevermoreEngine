@@ -1,4 +1,4 @@
-type Subscription<T> = {
+type Subscription<T = void> = {
   Fire(value: T): void;
   Fail(): void;
   GetFireFailComplete(): LuaTuple<
