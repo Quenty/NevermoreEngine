@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Meant to be used with a binder
 	@class IKGripBase
@@ -16,11 +17,23 @@ local IKGripBase = setmetatable({}, BaseObject)
 IKGripBase.ClassName = "IKGripBase"
 IKGripBase.__index = IKGripBase
 
-function IKGripBase.new(objectValue: ObjectValue, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(objectValue), IKGripBase)
+export type IKGripBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Instance,
+			_serviceBag: ServiceBag.ServiceBag,
+			_attachment: Attachment,
+			_ikRigPromise: Promise.Promise<any>,
+		},
+		{} :: typeof({ __index = IKGripBase })
+	))
+	& BaseObject.BaseObject
+
+function IKGripBase.new(objectValue: ObjectValue, serviceBag: ServiceBag.ServiceBag): IKGripBase
+	local self: IKGripBase = setmetatable(BaseObject.new(objectValue) :: any, IKGripBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._attachment = self._obj.Parent
+	self._attachment = self._obj.Parent :: any
 
 	assert(self._obj:IsA("ObjectValue"), "Not an object value")
 	assert(self._attachment:IsA("Attachment"), "Not parented to an attachment")
@@ -28,15 +41,15 @@ function IKGripBase.new(objectValue: ObjectValue, serviceBag: ServiceBag.Service
 	return self
 end
 
-function IKGripBase:GetPriority(): number
+function IKGripBase.GetPriority(self: IKGripBase): number
 	return 1
 end
 
-function IKGripBase:GetAttachment(): Attachment?
-	return self._obj.Parent
+function IKGripBase.GetAttachment(self: IKGripBase): Attachment?
+	return self._attachment
 end
 
-function IKGripBase:PromiseIKRig()
+function IKGripBase.PromiseIKRig(self: IKGripBase): Promise.Promise<any>
 	if self._ikRigPromise then
 		return self._ikRigPromise
 	end
@@ -48,10 +61,7 @@ function IKGripBase:PromiseIKRig()
 		ikService = self._serviceBag:GetService((require :: any)("IKServiceClient"))
 	end
 
-	local promise = promisePropertyValue(self._obj, "Value")
-	self._maid:GiveTask(promise)
-
-	self._ikRigPromise = promise:Then(function(humanoid)
+	self._ikRigPromise = self._maid:Add(promisePropertyValue(self._obj, "Value")):Then(function(humanoid)
 		if not humanoid:IsA("Humanoid") then
 			warn("[IKGripBase.PromiseIKRig] - Humanoid in link is not a humanoid")
 			return Promise.rejected()
@@ -60,7 +70,7 @@ function IKGripBase:PromiseIKRig()
 		return self._maid:GivePromise(ikService:PromiseRig(humanoid))
 	end)
 
-	return self._ikRigPromise
+	return self._ikRigPromise :: any
 end
 
 return IKGripBase

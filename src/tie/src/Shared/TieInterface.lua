@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Tie interfaces can be retrieved from an implementation and allow access to a specific call into the interface
 

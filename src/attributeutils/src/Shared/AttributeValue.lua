@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Allows access to an attribute like a ValueObject.
 
@@ -62,7 +63,7 @@ function AttributeValue.new<T>(object: Instance, attributeName: string, defaultV
 	}
 
 	if defaultValue ~= nil and self._object:GetAttribute(self._attributeName) == nil then
-		self._object:SetAttribute(rawget(self, "_attributeName"), defaultValue)
+		self._object:SetAttribute(rawget(self, "_attributeName") :: string, defaultValue)
 	end
 
 	return setmetatable(self, AttributeValue) :: any

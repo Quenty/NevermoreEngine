@@ -16,8 +16,38 @@ local TorsoIKBase = setmetatable({}, BaseObject)
 TorsoIKBase.__index = TorsoIKBase
 TorsoIKBase.ClassName = "TorsoIKBase"
 
+export type TorsoIKBase =
+	typeof(setmetatable(
+		{} :: {
+			_humanoid: Humanoid,
+			_resources: IKResource.IKResource,
+			_waistY: AccelTween.AccelTween,
+			_waistZ: AccelTween.AccelTween,
+			_headY: AccelTween.AccelTween,
+			_headZ: AccelTween.AccelTween,
+			_relWaistTransform: CFrame?,
+			_relNeckTransform: CFrame?,
+			_lastValidWaistTransform: CFrame,
+			_lastWaistTransform: CFrame,
+			_lastValidNeckTransform: CFrame,
+			_lastNeckTransform: CFrame,
+			_target: Vector3?,
+
+			Pointed: Signal.Signal<Vector3?>,
+
+			Update: (self: TorsoIKBase) -> (),
+			UpdateTransformOnly: (self: TorsoIKBase) -> (),
+			Point: (self: TorsoIKBase, position: Vector3?) -> (),
+			GetAimPosition: (self: TorsoIKBase) -> Vector3?,
+			GetTargetUpperTorsoCFrame: (self: TorsoIKBase) -> CFrame?,
+			GetUpperTorsoCFrame: (self: TorsoIKBase) -> CFrame?,
+		},
+		{} :: typeof({ __index = TorsoIKBase })
+	))
+	& BaseObject.BaseObject
+
 function TorsoIKBase.new(humanoid: Humanoid)
-	local self = setmetatable(BaseObject.new(), TorsoIKBase)
+	local self: TorsoIKBase = setmetatable(BaseObject.new() :: any, TorsoIKBase)
 
 	self._humanoid = humanoid or error("No humanoid")
 
@@ -25,7 +55,8 @@ function TorsoIKBase.new(humanoid: Humanoid)
 
 	self._resources = IKResource.new(IKResourceUtils.createResource({
 		name = "Character",
-		robloxName = self._humanoid.Parent.Name,
+		-- TODO: Fix this potentail error
+		robloxName = (self._humanoid :: any).Parent.Name,
 		children = {
 			IKResourceUtils.createResource({
 				name = "RootPart",
