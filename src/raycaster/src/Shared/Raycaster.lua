@@ -115,7 +115,7 @@ end
 function Raycaster.FindPartOnRay(self: Raycaster, ray: Ray): RaycastData?
 	assert(typeof(ray) == "Ray", "Bad ray")
 
-	local ignoreList = table.clone(rawget(self :: any, "_ignoreList"))
+	local ignoreList = table.clone(rawget(self :: any, "_ignoreList") :: { Instance })
 
 	local casts = self.MaxCasts
 	while casts > 0 do

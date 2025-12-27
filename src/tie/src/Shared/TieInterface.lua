@@ -100,7 +100,7 @@ end
 function TieInterface:__index(index)
 	local interfaceTieRealm = rawget(self, "_interfaceTieRealm")
 
-	local member = rawget(self, "_memberDefinitionMap")[index]
+	local member = (rawget(self, "_memberDefinitionMap") :: any)[index]
 	local definition = rawget(self, "_definition")
 	local adornee = rawget(self, "_adornee")
 	local implParent = rawget(self, "_implParent")

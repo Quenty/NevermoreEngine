@@ -106,7 +106,7 @@ function AttributeValue.__index<T>(self: AttributeValue<T>, index)
 	if AttributeValue[index] then
 		return AttributeValue[index]
 	elseif index == "Value" then
-		local result = self._object:GetAttribute(rawget(self :: any, "_attributeName"))
+		local result = self._object:GetAttribute(rawget(self :: any, "_attributeName") :: string)
 		local default = rawget(self :: any, "_defaultValue")
 		if result == nil then
 			return default
@@ -124,7 +124,7 @@ end
 
 function AttributeValue.__newindex<T>(self: AttributeValue<T>, index, value)
 	if index == "Value" then
-		self._object:SetAttribute(rawget(self :: any, "_attributeName"), value)
+		self._object:SetAttribute(rawget(self :: any, "_attributeName") :: string, value)
 	elseif index == "AttributeName" then
 		error("Cannot set AttributeName")
 	else
