@@ -41,7 +41,7 @@ function IKGripBase.new(objectValue: ObjectValue, serviceBag: ServiceBag.Service
 	return self
 end
 
-function IKGripBase.GetPriority(self: IKGripBase): number
+function IKGripBase.GetPriority(_self: IKGripBase): number
 	return 1
 end
 
