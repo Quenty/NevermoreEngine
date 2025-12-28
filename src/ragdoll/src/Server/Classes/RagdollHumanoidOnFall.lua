@@ -68,7 +68,7 @@ function RagdollHumanoidOnFall:_getOrCreateRagdollLogic()
 	return self._ragdollLogic
 end
 
-function RagdollHumanoidOnFall:_handleServerEvent(player, value)
+function RagdollHumanoidOnFall:_handleServerEvent(player: Player, value)
 	assert(player == self._player, "Bad player")
 	assert(typeof(value) == "boolean", "Bad value")
 

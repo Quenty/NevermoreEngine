@@ -21,6 +21,8 @@ export type SoundOptions = {
 	SoundId: number | string,
 }
 
+export type SoundId = string | number | SoundOptions
+
 local SoundUtils = {}
 
 --[=[
@@ -36,7 +38,7 @@ local SoundUtils = {}
 
 	@return Sound
 ]=]
-function SoundUtils.playFromId(id: string | number | SoundOptions): Sound
+function SoundUtils.playFromId(id: SoundId): Sound
 	local sound = SoundUtils.createSoundFromId(id)
 
 	if RunService:IsClient() then

@@ -44,7 +44,7 @@ end
 	@param observeScore Observable<number> | number?
 	@return AnimatedHighlightModel
 ]=]
-function HighlightServiceClient:Highlight(adornee, observeScore)
+function HighlightServiceClient:Highlight(adornee: Instance, observeScore)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return self._group:Highlight(adornee, observeScore)

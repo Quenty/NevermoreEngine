@@ -258,7 +258,7 @@ function SecretsService:_decrypt(data: SecretsData): (boolean?, string)
 	return true, tostring(decrypted)
 end
 
-function SecretsService:_handleServerInvoke(player, request)
+function SecretsService:_handleServerInvoke(player: Player, request)
 	if request == SecretsServiceConstants.REQUEST_SECRET_KEY_NAMES_LIST then
 		return self:_promiseHandleList(player):Yield()
 	else
@@ -266,7 +266,7 @@ function SecretsService:_handleServerInvoke(player, request)
 	end
 end
 
-function SecretsService:_promiseHandleList(player)
+function SecretsService:_promiseHandleList(player: Player)
 	return self._permissionsService
 		:PromisePermissionProvider()
 		:Then(function(provider)

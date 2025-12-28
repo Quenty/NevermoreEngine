@@ -133,7 +133,7 @@ function AnimatedHighlightGroup:_setDefaultValues(highlight, doNotAnimate: boole
 	highlight:SetOutlineColor(self._defaultValues.OutlineColor.Value)
 end
 
-function AnimatedHighlightGroup:_getOrCreateHighlightStackHandle(adornee, observeScore)
+function AnimatedHighlightGroup:_getOrCreateHighlightStackHandle(adornee: Instance, observeScore)
 	assert(observeScore, "Bad observeScore")
 
 	local foundHighlightStack = self._highlightStacks[adornee]
@@ -196,7 +196,7 @@ function AnimatedHighlightGroup:_removeHighlightStack(highlightStack)
 	self._maid[highlightStack] = nil
 end
 
-function AnimatedHighlightGroup:_findHighlightAdornee(adornee)
+function AnimatedHighlightGroup:_findHighlightAdornee(adornee: Instance)
 	return self._highlightStacks[adornee]
 end
 
