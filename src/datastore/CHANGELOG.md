@@ -1,3 +1,18 @@
+# v13.25.3 (Sun Dec 28 2025)
+
+#### 🐛 Bug Fix
+
+- ci: Upgrade to luau-lsp 1.58.0-quenty.1 [#617](https://github.com/Quenty/NevermoreEngine/pull/617) ([@Quenty](https://github.com/Quenty))
+- style: Update styling (and a little bit of typing) ([@Quenty](https://github.com/Quenty))
+- fix: Handle nil value in StoreOnValueChange [#615](https://github.com/Quenty/NevermoreEngine/pull/615) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

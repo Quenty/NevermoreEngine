@@ -1,3 +1,15 @@
+# v10.32.3 (Sun Dec 28 2025)
+
+#### 🐛 Bug Fix
+
+- Users/quenty/video frames [#616](https://github.com/Quenty/NevermoreEngine/pull/616) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

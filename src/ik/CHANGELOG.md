@@ -1,3 +1,17 @@
+# v15.34.4 (Sun Dec 28 2025)
+
+#### 🐛 Bug Fix
+
+- ci: Upgrade to luau-lsp 1.58.0-quenty.1 [#617](https://github.com/Quenty/NevermoreEngine/pull/617) ([@Quenty](https://github.com/Quenty))
+- fix: Retrieve priority ([@Quenty](https://github.com/Quenty))
+- fix: Typecheck some more things ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
