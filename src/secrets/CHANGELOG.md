@@ -1,3 +1,16 @@
+# v7.31.0 (Sun Dec 28 2025)
+
+#### 🚀 Enhancement
+
+- feat: Update declarations and README.md [#618](https://github.com/Quenty/NevermoreEngine/pull/618) ([@Quenty](https://github.com/Quenty))
+- feat: Update declarations and README.md ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

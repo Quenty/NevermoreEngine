@@ -1,5 +1,18 @@
 # (Sun Dec 28 2025)
 
+#### 🚀 Enhancement
+
+- `@quenty/deathreport@10.30.0`, `@quenty/highlight@10.26.0`, `@quenty/parttouchingcalculator@14.28.0`, `@quenty/ragdoll@15.34.0`, `@quenty/secrets@7.31.0`, `@quenty/settings@11.34.0`, `@quenty/sounds@10.14.0`
+  - feat: Update declarations and README.md [#618](https://github.com/Quenty/NevermoreEngine/pull/618) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Dec 28 2025)
+
 #### 🐛 Bug Fix
 
 - `@quenty/adorneeboundingbox@8.24.3`, `@quenty/adorneevalue@10.23.3`, `@quenty/aggregator@1.7.1`, `@quenty/animationgroup@10.9.1`, `@quenty/animations@8.22.4`, `@quenty/applytagtotaggedchildren@10.9.1`, `@quenty/attributeutils@14.20.2`, `@quenty/avatareditorutils@7.25.3`, `@quenty/binder@14.25.3`, `@quenty/buttondragmodel@1.19.3`, `@quenty/buttonhighlightmodel@14.22.4`, `@quenty/camera@14.26.3`, `@quenty/cframeutils@5.5.4`, `@quenty/chatproviderservice@9.33.4`, `@quenty/colorpalette@10.25.3`, `@quenty/colorpicker@10.23.3`, `@quenty/cooldown@11.26.3`, `@quenty/counter@7.21.4`, `@quenty/datastore@13.25.3`, `@quenty/deathreport@10.29.3`, `@quenty/depthoffield@11.23.3`, `@quenty/firstpersoncharactertransparency@14.23.3`, `@quenty/flipbook@9.21.4`, `@quenty/funnels@1.11.3`, `@quenty/gameconfig@12.33.4`, `@quenty/gamescalingutils@13.22.3`, `@quenty/guivisiblemanager@12.13.3`, `@quenty/highlight@10.25.3`, `@quenty/humanoidspeed@12.32.3`, `@quenty/humanoidtracker@13.21.3`, `@quenty/humanoidutils@2.4.1`, `@quenty/idleservice@13.33.3`, `@quenty/ik@15.34.4`, `@quenty/influxdbclient@7.24.3`, `@quenty/inputkeymaputils@14.28.4`, `@quenty/inputmode@13.23.4`, `@quenty/inputobjectutils@4.21.1`, `@quenty/modeltransparencyeffect@11.9.1`, `@quenty/mouseovermixin@10.9.2`, `@quenty/octree@11.9.3`, `@quenty/permissionprovider@14.24.4`, `@quenty/promptqueue@1.22.3`, `@quenty/raycaster@3.5.1`, `@quenty/roblox-api-dump@8.13.1`, `@quenty/scoredactionservice@16.29.4`, `@quenty/screenshothudservice@7.23.3`, `@quenty/servicebag@11.13.2`, `@quenty/settings@11.33.4`, `@quenty/snackbar@11.26.4`, `@quenty/soundgroup@1.25.4`, `@quenty/soundplayer@7.23.3`, `@quenty/sounds@10.13.1`, `@quenty/statestack@14.22.3`, `@quenty/tie@10.26.3`, `@quenty/timedtween@7.22.3`, `@quenty/timesyncservice@13.22.3`, `@quenty/transitionmodel@7.23.3`, `@quenty/ugcsanitize@1.7.3`, `@quenty/undostack@7.21.3`, `@quenty/userserviceutils@9.22.1`, `@quenty/valuebaseutils@13.20.3`, `@quenty/valueobject@13.21.3`, `@quenty/viewport@11.27.3`, `@quenty/nevermore-cli@4.9.3`
