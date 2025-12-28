@@ -1,20 +1,15 @@
-# v11.9.1 (Sun Dec 28 2025)
-
-#### 🐛 Bug Fix
-
-- ci: Upgrade to luau-lsp 1.58.0-quenty.1 [#617](https://github.com/Quenty/NevermoreEngine/pull/617) ([@Quenty](https://github.com/Quenty))
-- style: Update styling (and a little bit of typing) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.9.0...@quenty/modeltransparencyeffect@11.9.1) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/modeltransparencyeffect
+
+
+
+
 
 # [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.8.4...@quenty/modeltransparencyeffect@11.9.0) (2025-05-10)
 

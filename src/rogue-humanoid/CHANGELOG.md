@@ -1,19 +1,15 @@
-# v10.32.3 (Sun Dec 28 2025)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/video frames [#616](https://github.com/Quenty/NevermoreEngine/pull/616) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.32.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.2...@quenty/rogue-humanoid@10.32.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
 
 ## [10.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.1...@quenty/rogue-humanoid@10.32.2) (2025-12-13)
 

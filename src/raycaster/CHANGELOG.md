@@ -1,20 +1,15 @@
-# v3.5.1 (Sun Dec 28 2025)
-
-#### 🐛 Bug Fix
-
-- ci: Upgrade to luau-lsp 1.58.0-quenty.1 [#617](https://github.com/Quenty/NevermoreEngine/pull/617) ([@Quenty](https://github.com/Quenty))
-- ci: Upgrade to luau-lsp 1.58.0-quenty.1 ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/raycaster@3.5.0...@quenty/raycaster@3.5.1) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/raycaster
+
+
+
+
 
 # [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/raycaster@3.4.2...@quenty/raycaster@3.5.0) (2025-05-10)
 

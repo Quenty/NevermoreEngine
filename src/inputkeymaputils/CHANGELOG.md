@@ -1,20 +1,15 @@
-# v14.28.4 (Sun Dec 28 2025)
-
-#### 🐛 Bug Fix
-
-- ci: Upgrade to luau-lsp 1.58.0-quenty.1 [#617](https://github.com/Quenty/NevermoreEngine/pull/617) ([@Quenty](https://github.com/Quenty))
-- style: Update styling (and a little bit of typing) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.28.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.28.3...@quenty/inputkeymaputils@14.28.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
 
 ## [14.28.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.28.2...@quenty/inputkeymaputils@14.28.3) (2025-12-11)
 
