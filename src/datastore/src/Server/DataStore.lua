@@ -91,23 +91,25 @@ local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
 DataStore.__index = DataStore
 
-export type DataStore = typeof(setmetatable(
-	{} :: {
-		_key: string,
-		_userIdList: { number }?,
-		_robloxDataStore: DataStorePromises.RobloxDataStore,
-		_debugWriting: boolean,
-		_sessionLockingEnabled: boolean,
-		_autoSaveTimeSeconds: ValueObject.ValueObject<number?>,
-		_jitterProportion: ValueObject.ValueObject<number>,
-		_syncOnSave: ValueObject.ValueObject<boolean>,
-		_loadedOk: ValueObject.ValueObject<boolean>,
-		_firstLoadPromise: Promise.Promise<()>,
-		_promiseSessionLockingFailed: Promise.Promise<()>,
-		Saving: Signal.Signal<Promise.Promise<()>>,
-	},
-	{} :: typeof({ __index = DataStore })
-)) & DataStoreStage.DataStoreStage
+export type DataStore =
+	typeof(setmetatable(
+		{} :: {
+			_key: string,
+			_userIdList: { number }?,
+			_robloxDataStore: DataStorePromises.RobloxDataStore,
+			_debugWriting: boolean,
+			_sessionLockingEnabled: boolean,
+			_autoSaveTimeSeconds: ValueObject.ValueObject<number?>,
+			_jitterProportion: ValueObject.ValueObject<number>,
+			_syncOnSave: ValueObject.ValueObject<boolean>,
+			_loadedOk: ValueObject.ValueObject<boolean>,
+			_firstLoadPromise: Promise.Promise<()>,
+			_promiseSessionLockingFailed: Promise.Promise<()>,
+			Saving: Signal.Signal<Promise.Promise<()>>,
+		},
+		{} :: typeof({ __index = DataStore })
+	))
+	& DataStoreStage.DataStoreStage
 
 --[=[
 	Constructs a new DataStore. See [DataStoreStage] for more API.

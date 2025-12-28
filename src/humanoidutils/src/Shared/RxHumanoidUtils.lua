@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RxHumanoidUtils
 ]=]
@@ -58,7 +59,7 @@ function RxHumanoidUtils.observeRunningSpeed(humanoid: Humanoid): Observable.Obs
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -86,7 +87,7 @@ function RxHumanoidUtils.observeHumanoidStateType(humanoid: Humanoid): Observabl
 		end
 
 		return maid
-	end)
+	end) :: any
 end
 
 return RxHumanoidUtils

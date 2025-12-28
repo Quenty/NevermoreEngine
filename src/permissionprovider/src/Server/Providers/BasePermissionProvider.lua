@@ -19,14 +19,16 @@ local BasePermissionProvider = setmetatable({}, BaseObject)
 BasePermissionProvider.ClassName = "BasePermissionProvider"
 BasePermissionProvider.__index = BasePermissionProvider
 
-export type BasePermissionProvider = typeof(setmetatable(
-	{} :: {
-		_config: { remoteFunctionName: string },
-		_remoteFunctionName: string,
-		_remoteFunction: RemoteFunction?,
-	},
-	{} :: typeof({ __index = BasePermissionProvider })
-)) & BaseObject.BaseObject
+export type BasePermissionProvider =
+	typeof(setmetatable(
+		{} :: {
+			_config: { remoteFunctionName: string },
+			_remoteFunctionName: string,
+			_remoteFunction: RemoteFunction?,
+		},
+		{} :: typeof({ __index = BasePermissionProvider })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Initializes a new permission provider

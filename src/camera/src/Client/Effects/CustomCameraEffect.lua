@@ -15,13 +15,15 @@ CustomCameraEffect.ClassName = "CustomCameraEffect"
 
 export type ComputeCameraState = () -> CameraState.CameraState
 
-export type CustomCameraEffect = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		_getCurrentStateFunc: ComputeCameraState,
-	},
-	{} :: typeof({ __index = CustomCameraEffect })
-)) & CameraEffectUtils.CameraEffect
+export type CustomCameraEffect =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			_getCurrentStateFunc: ComputeCameraState,
+		},
+		{} :: typeof({ __index = CustomCameraEffect })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	Constructs a new custom camera effect

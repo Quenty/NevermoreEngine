@@ -18,12 +18,14 @@ AvatarEditorInventory.__index = AvatarEditorInventory
 
 export type AssetData = unknown
 
-export type AvatarEditorInventory = typeof(setmetatable(
-	{} :: {
-		_assetIdToAsset: ObservableMap.ObservableMap<number, AssetData>,
-	},
-	{} :: typeof({ __index = AvatarEditorInventory })
-)) & BaseObject.BaseObject
+export type AvatarEditorInventory =
+	typeof(setmetatable(
+		{} :: {
+			_assetIdToAsset: ObservableMap.ObservableMap<number, AssetData>,
+		},
+		{} :: typeof({ __index = AvatarEditorInventory })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new AvatarEditorInventory

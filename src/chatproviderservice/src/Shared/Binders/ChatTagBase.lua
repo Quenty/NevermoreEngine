@@ -17,20 +17,22 @@ local ChatTagBase = setmetatable({}, BaseObject)
 ChatTagBase.ClassName = "ChatTagBase"
 ChatTagBase.__index = ChatTagBase
 
-export type ChatTagBase = typeof(setmetatable(
-	{} :: {
-		_obj: Folder,
-		_chatTagText: AttributeValue.AttributeValue<string>,
-		_chatTagLocalizedTextData: AttributeValue.AttributeValue<LocalizedTextUtils.LocalizedTextData?>,
-		_chatTagColor: AttributeValue.AttributeValue<Color3>,
-		_chatTagPriority: AttributeValue.AttributeValue<number>,
+export type ChatTagBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Folder,
+			_chatTagText: AttributeValue.AttributeValue<string>,
+			_chatTagLocalizedTextData: AttributeValue.AttributeValue<LocalizedTextUtils.LocalizedTextData?>,
+			_chatTagColor: AttributeValue.AttributeValue<Color3>,
+			_chatTagPriority: AttributeValue.AttributeValue<number>,
 
-		-- Public
-		UserDisabled: AttributeValue.AttributeValue<boolean>,
-		ChatTagKey: AttributeValue.AttributeValue<boolean>,
-	},
-	{} :: typeof({ __index = ChatTagBase })
-)) & BaseObject.BaseObject
+			-- Public
+			UserDisabled: AttributeValue.AttributeValue<boolean>,
+			ChatTagKey: AttributeValue.AttributeValue<boolean>,
+		},
+		{} :: typeof({ __index = ChatTagBase })
+	))
+	& BaseObject.BaseObject
 
 function ChatTagBase.new(obj: Folder): ChatTagBase
 	local self: ChatTagBase = setmetatable(BaseObject.new(obj) :: any, ChatTagBase)

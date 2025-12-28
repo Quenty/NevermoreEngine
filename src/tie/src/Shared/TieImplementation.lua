@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	This class represents the implementation for a given definition. For the lifetime
 	of the class, this implementation will be exposed to consumption by both someone

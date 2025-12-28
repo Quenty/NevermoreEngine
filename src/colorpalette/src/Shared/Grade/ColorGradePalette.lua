@@ -15,14 +15,16 @@ local ColorGradePalette = setmetatable({}, BaseObject)
 ColorGradePalette.ClassName = "ColorGradePalette"
 ColorGradePalette.__index = ColorGradePalette
 
-export type ColorGradePalette = typeof(setmetatable(
-	{} :: {
-		_grades: { [string]: Observable.Observable<number> },
-		_vividness: { [string]: Observable.Observable<number> },
-		_defaultSurfaceName: ValueObject.ValueObject<string>,
-	},
-	{} :: typeof({ __index = ColorGradePalette })
-)) & BaseObject.BaseObject
+export type ColorGradePalette =
+	typeof(setmetatable(
+		{} :: {
+			_grades: { [string]: Observable.Observable<number> },
+			_vividness: { [string]: Observable.Observable<number> },
+			_defaultSurfaceName: ValueObject.ValueObject<string>,
+		},
+		{} :: typeof({ __index = ColorGradePalette })
+	))
+	& BaseObject.BaseObject
 
 function ColorGradePalette.new(): ColorGradePalette
 	local self: ColorGradePalette = setmetatable(BaseObject.new() :: any, ColorGradePalette)

@@ -20,15 +20,17 @@ local Cooldown = setmetatable({}, CooldownBase)
 Cooldown.ClassName = "Cooldown"
 Cooldown.__index = Cooldown
 
-export type Cooldown = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_syncedClock: TimeSyncService.SyncedClock,
-		_finishTime: PropertyValue.PropertyValue<number>,
-		_startTime: AttributeValue.AttributeValue<number>,
-	},
-	{} :: typeof({ __index = Cooldown })
-)) & CooldownBase.CooldownBase
+export type Cooldown =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_syncedClock: TimeSyncService.SyncedClock,
+			_finishTime: PropertyValue.PropertyValue<number>,
+			_startTime: AttributeValue.AttributeValue<number>,
+		},
+		{} :: typeof({ __index = Cooldown })
+	))
+	& CooldownBase.CooldownBase
 
 --[=[
 	Constructs a new cooldown. Should be done via [Binder].

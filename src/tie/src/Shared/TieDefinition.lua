@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Constructs a new interface declaration which allows for interface usage
 	between both Roblox API users and OOP users, as well as without accessing a

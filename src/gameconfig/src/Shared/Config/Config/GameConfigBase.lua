@@ -27,24 +27,26 @@ type GameConfigAssetType = GameConfigAssetTypes.GameConfigAssetType
 type ObservableMapSet<K, V> = ObservableMapSet.ObservableMapSet<K, V>
 type GameConfigAssetBase = GameConfigAssetBase.GameConfigAssetBase
 
-export type GameConfigBase = typeof(setmetatable(
-	{} :: {
-		_obj: Folder,
-		_setupObservation: boolean,
-		_gameConfigBindersServer: any,
-		_gameId: AttributeValue.AttributeValue<number>,
-		_assetTypeToAssetConfig: any,
-		_assetTypeToAssetKeyMappings: {
-			[GameConfigAssetType]: any,
+export type GameConfigBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Folder,
+			_setupObservation: boolean,
+			_gameConfigBindersServer: any,
+			_gameId: AttributeValue.AttributeValue<number>,
+			_assetTypeToAssetConfig: any,
+			_assetTypeToAssetKeyMappings: {
+				[GameConfigAssetType]: any,
+			},
+			_assetTypeToAssetIdMappings: {
+				[GameConfigAssetType]: any,
+			},
+			_assetKeyToAssetConfig: any,
+			_assetIdToAssetConfig: any,
 		},
-		_assetTypeToAssetIdMappings: {
-			[GameConfigAssetType]: any,
-		},
-		_assetKeyToAssetConfig: any,
-		_assetIdToAssetConfig: any,
-	},
-	{} :: typeof({ __index = GameConfigBase })
-)) & BaseObject.BaseObject
+		{} :: typeof({ __index = GameConfigBase })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new game config.

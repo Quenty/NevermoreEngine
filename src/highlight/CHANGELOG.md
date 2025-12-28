@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.3...@quenty/highlight@10.26.0) (2025-12-28)
+
+
+### Features
+
+* Update declarations and README.md ([882056f](https://github.com/Quenty/NevermoreEngine/commit/882056f4c012f9855a0581750968993fb18241ed))
+
+
+
+
+
+## [10.25.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.2...@quenty/highlight@10.25.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
 ## [10.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.1...@quenty/highlight@10.25.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/highlight

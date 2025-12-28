@@ -41,23 +41,25 @@ export type DataStoreStageKey = string | number
 
 export type DataStoreCallback = () -> Promise.Promise<()>?
 
-export type DataStoreStage = typeof(setmetatable(
-	{} :: {
-		_loadName: DataStoreStageKey,
-		_loadParent: DataStoreStage?,
-		_saveDataSnapshot: any,
-		_fullPath: string?,
-		_baseDataSnapshot: any,
-		_viewSnapshot: any,
-		_stores: { [DataStoreStageKey]: DataStoreStage },
-		_savingCallbacks: { DataStoreCallback },
-		_keySubscriptions: ObservableSubscriptionTable.ObservableSubscriptionTable<any>,
+export type DataStoreStage =
+	typeof(setmetatable(
+		{} :: {
+			_loadName: DataStoreStageKey,
+			_loadParent: DataStoreStage?,
+			_saveDataSnapshot: any,
+			_fullPath: string?,
+			_baseDataSnapshot: any,
+			_viewSnapshot: any,
+			_stores: { [DataStoreStageKey]: DataStoreStage },
+			_savingCallbacks: { DataStoreCallback },
+			_keySubscriptions: ObservableSubscriptionTable.ObservableSubscriptionTable<any>,
 
-		Changed: Signal.Signal<any>,
-		DataStored: Signal.Signal<any>,
-	},
-	{} :: typeof({ __index = DataStoreStage })
-)) & BaseObject.BaseObject
+			Changed: Signal.Signal<any>,
+			DataStored: Signal.Signal<any>,
+		},
+		{} :: typeof({ __index = DataStoreStage })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new DataStoreStage to load from. Prefer to use DataStore because this doesn't
@@ -605,7 +607,12 @@ function DataStoreStage.StoreOnValueChange(self: DataStoreStage, name: DataStore
 	local maid = Maid.new()
 
 	maid:GiveTask(valueObj.Changed:Connect(function()
-		self:_storeAtKey(name, valueObj.Value)
+		local value = valueObj.Value
+		if value == nil then
+			self:_storeAtKey(name, DataStoreDeleteToken)
+		else
+			self:_storeAtKey(name, value)
+		end
 	end))
 
 	-- Hopefully this doesn't result in data-loss when writing as

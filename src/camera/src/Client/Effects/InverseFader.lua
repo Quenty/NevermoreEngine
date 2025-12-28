@@ -14,14 +14,16 @@ local SummedCamera = require("SummedCamera")
 local InverseFader = {}
 InverseFader.ClassName = "InverseFader"
 
-export type InverseFader = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		_camera: CameraEffectUtils.CameraEffect,
-		_fader: FadingCamera.FadingCamera,
-	},
-	{} :: typeof({ __index = InverseFader })
-)) & CameraEffectUtils.CameraEffect
+export type InverseFader =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			_camera: CameraEffectUtils.CameraEffect,
+			_fader: FadingCamera.FadingCamera,
+		},
+		{} :: typeof({ __index = InverseFader })
+	))
+	& CameraEffectUtils.CameraEffect
 
 function InverseFader.new(camera: CameraEffectUtils.CameraEffect, fader: FadingCamera.FadingCamera)
 	local self: InverseFader = setmetatable({} :: any, InverseFader)

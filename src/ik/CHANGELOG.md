@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.34.4...@quenty/ik@15.35.0) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [15.34.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.34.3...@quenty/ik@15.34.4) (2025-12-28)
+
+
+### Bug Fixes
+
+* Retrieve priority ([ade11b6](https://github.com/Quenty/NevermoreEngine/commit/ade11b6743f9d9dc7ad2324bcbb31d58669f048e))
+* Typecheck some more things ([41eaaa6](https://github.com/Quenty/NevermoreEngine/commit/41eaaa6d053c469f7548810da72d05dfbf997b26))
+
+
+
+
+
 ## [15.34.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.34.2...@quenty/ik@15.34.3) (2025-12-13)
 
 **Note:** Version bump only for package @quenty/ik
