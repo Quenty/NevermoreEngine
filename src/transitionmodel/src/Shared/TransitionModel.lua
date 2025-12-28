@@ -21,15 +21,17 @@ TransitionModel.__index = TransitionModel
 
 export type ShowHideCallback = (maid: Maid.Maid, doNotAnimate: boolean?) -> Promise.Promise<()>
 
-export type TransitionModel = typeof(setmetatable(
-	{} :: {
-		_isShowingComplete: ValueObject.ValueObject<boolean>,
-		_isHidingComplete: ValueObject.ValueObject<boolean>,
-		_hideCallback: ShowHideCallback?,
-		_showCallback: ShowHideCallback?,
-	},
-	{} :: typeof({ __index = TransitionModel })
-)) & BasicPane.BasicPane
+export type TransitionModel =
+	typeof(setmetatable(
+		{} :: {
+			_isShowingComplete: ValueObject.ValueObject<boolean>,
+			_isHidingComplete: ValueObject.ValueObject<boolean>,
+			_hideCallback: ShowHideCallback?,
+			_showCallback: ShowHideCallback?,
+		},
+		{} :: typeof({ __index = TransitionModel })
+	))
+	& BasicPane.BasicPane
 
 --[=[
 	A transition model that takes a set amount of time to show

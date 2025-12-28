@@ -49,23 +49,25 @@ local Snackbar = setmetatable({}, TransitionModel)
 Snackbar.ClassName = "Snackbar"
 Snackbar.__index = Snackbar
 
-export type Snackbar = typeof(setmetatable(
-	{} :: {
-		Gui: GuiObject,
+export type Snackbar =
+	typeof(setmetatable(
+		{} :: {
+			Gui: GuiObject,
 
-		_text: ValueObject.ValueObject<string>,
-		_backgroundColor: ValueObject.ValueObject<Color3>,
-		_percentVisibleModel: SpringTransitionModel.SpringTransitionModel<number>,
-		_dragSpring: SpringObject.SpringObject<Vector2>,
-		_positionSpringModel: SpringTransitionModel.SpringTransitionModel<UDim2>,
-		_dragModel: ButtonDragModel.ButtonDragModel,
-		_computedTransparency: Observable.Observable<number>,
-		_mainButton: GuiButton?,
-		_callToActionContainer: GuiObject?,
-		_textLabel: TextLabel?,
-	},
-	{} :: typeof({ __index = Snackbar })
-)) & TransitionModel.TransitionModel
+			_text: ValueObject.ValueObject<string>,
+			_backgroundColor: ValueObject.ValueObject<Color3>,
+			_percentVisibleModel: SpringTransitionModel.SpringTransitionModel<number>,
+			_dragSpring: SpringObject.SpringObject<Vector2>,
+			_positionSpringModel: SpringTransitionModel.SpringTransitionModel<UDim2>,
+			_dragModel: ButtonDragModel.ButtonDragModel,
+			_computedTransparency: Observable.Observable<number>,
+			_mainButton: GuiButton?,
+			_callToActionContainer: GuiObject?,
+			_textLabel: TextLabel?,
+		},
+		{} :: typeof({ __index = Snackbar })
+	))
+	& TransitionModel.TransitionModel
 
 function Snackbar.new(text: string, options: SnackbarOptionUtils.SnackbarOptions?): Snackbar
 	assert(SnackbarOptionUtils.isSnackbarOptions(options) or options == nil, "Bad options")

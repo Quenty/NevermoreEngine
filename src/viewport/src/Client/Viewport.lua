@@ -40,19 +40,21 @@ local Viewport = setmetatable({}, BasicPane)
 Viewport.ClassName = "Viewport"
 Viewport.__index = Viewport
 
-export type Viewport = typeof(setmetatable(
-	{} :: {
-		_current: ValueObject.ValueObject<Instance?>,
-		_transparency: ValueObject.ValueObject<number>,
-		_absoluteSize: ValueObject.ValueObject<Vector2>,
-		_fieldOfView: ValueObject.ValueObject<number>,
-		_controlsEnabled: ValueObject.ValueObject<boolean>,
-		_rotationYawSpring: SpringObject.SpringObject<number>,
-		_rotationPitchSpring: SpringObject.SpringObject<number>,
-		_notifyInstanceSizeChanged: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = Viewport })
-)) & BasicPane.BasicPane
+export type Viewport =
+	typeof(setmetatable(
+		{} :: {
+			_current: ValueObject.ValueObject<Instance?>,
+			_transparency: ValueObject.ValueObject<number>,
+			_absoluteSize: ValueObject.ValueObject<Vector2>,
+			_fieldOfView: ValueObject.ValueObject<number>,
+			_controlsEnabled: ValueObject.ValueObject<boolean>,
+			_rotationYawSpring: SpringObject.SpringObject<number>,
+			_rotationPitchSpring: SpringObject.SpringObject<number>,
+			_notifyInstanceSizeChanged: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = Viewport })
+	))
+	& BasicPane.BasicPane
 
 --[=[
 	Constructs a new viewport. Unlike a normal [BasicPane] this will not render anything

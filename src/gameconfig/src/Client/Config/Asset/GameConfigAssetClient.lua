@@ -15,13 +15,15 @@ local GameConfigAssetClient = setmetatable({}, GameConfigAssetBase)
 GameConfigAssetClient.ClassName = "GameConfigAssetClient"
 GameConfigAssetClient.__index = GameConfigAssetClient
 
-export type GameConfigAssetClient = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_configTranslator: JSONTranslator.JSONTranslator,
-	},
-	GameConfigAssetClient
-)) & GameConfigAssetBase.GameConfigAssetBase
+export type GameConfigAssetClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_configTranslator: JSONTranslator.JSONTranslator,
+		},
+		GameConfigAssetClient
+	))
+	& GameConfigAssetBase.GameConfigAssetBase
 
 --[=[
 	Constructs a new GameConfigAssetClient.

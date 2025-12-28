@@ -113,7 +113,7 @@ end
 	Returns a CFrame from an axis angle, handling NaN values
 
 	@param axisAngle Vector3
-	@param position Vector3 | nil
+	@param position Vector3?
 	@return CFrame
 ]=]
 function CFrameUtils.axisAngleToCFrame(axisAngle: Vector3, position: Vector3?): CFrame
@@ -155,7 +155,7 @@ end
 	@param rightVector Vector3
 	@return CFrame?
 ]=]
-function CFrameUtils.fromUpRight(position: Vector3, upVector: Vector3, rightVector: Vector3): CFrame | nil
+function CFrameUtils.fromUpRight(position: Vector3, upVector: Vector3, rightVector: Vector3): CFrame?
 	local forwardVector = rightVector:Cross(upVector)
 	if forwardVector.Magnitude == 0 then
 		return nil

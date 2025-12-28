@@ -18,14 +18,16 @@ local HandleHighlightModel = setmetatable({}, BaseObject)
 HandleHighlightModel.ClassName = "HandleHighlightModel"
 HandleHighlightModel.__index = HandleHighlightModel
 
-export type HandleHighlightModel = typeof(setmetatable(
-	{} :: {
-		IsMouseOver: ValueObject.ValueObject<boolean>,
-		IsMouseDown: ValueObject.ValueObject<boolean>,
-		IsHighlighted: ValueObject.ValueObject<boolean>,
-	},
-	{} :: typeof({ __index = HandleHighlightModel })
-)) & BaseObject.BaseObject
+export type HandleHighlightModel =
+	typeof(setmetatable(
+		{} :: {
+			IsMouseOver: ValueObject.ValueObject<boolean>,
+			IsMouseDown: ValueObject.ValueObject<boolean>,
+			IsHighlighted: ValueObject.ValueObject<boolean>,
+		},
+		{} :: typeof({ __index = HandleHighlightModel })
+	))
+	& BaseObject.BaseObject
 
 function HandleHighlightModel.new(): HandleHighlightModel
 	local self: HandleHighlightModel = setmetatable(BaseObject.new() :: any, HandleHighlightModel)

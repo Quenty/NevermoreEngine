@@ -35,19 +35,21 @@ type ComputedState = {
 	rtime: number,
 }
 
-export type TimedTween = typeof(setmetatable(
-	{} :: {
-		_state: ValueObject.ValueObject<TimedTweenState>,
-		_transitionTime: ValueObject.ValueObject<number>,
+export type TimedTween =
+	typeof(setmetatable(
+		{} :: {
+			_state: ValueObject.ValueObject<TimedTweenState>,
+			_transitionTime: ValueObject.ValueObject<number>,
 
-		-- From BasicPane
-		IsVisible: (self: TimedTween) -> boolean,
-		SetVisible: (self: TimedTween, isVisible: boolean, doNotAnimate: boolean?) -> (),
-		VisibleChanged: Signal.Signal<boolean, boolean>,
-		Destroy: (self: TimedTween) -> (),
-	},
-	{} :: typeof({ __index = TimedTween })
-)) & BasicPane.BasicPane
+			-- From BasicPane
+			IsVisible: (self: TimedTween) -> boolean,
+			SetVisible: (self: TimedTween, isVisible: boolean, doNotAnimate: boolean?) -> (),
+			VisibleChanged: Signal.Signal<boolean, boolean>,
+			Destroy: (self: TimedTween) -> (),
+		},
+		{} :: typeof({ __index = TimedTween })
+	))
+	& BasicPane.BasicPane
 
 --[=[
 	Timed transition module

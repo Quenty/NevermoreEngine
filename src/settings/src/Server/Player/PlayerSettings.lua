@@ -19,14 +19,16 @@ local PlayerSettings = setmetatable({}, PlayerSettingsBase)
 PlayerSettings.ClassName = "PlayerSettings"
 PlayerSettings.__index = PlayerSettings
 
-export type PlayerSettings = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_remoting: Remoting.Remoting,
-		_settingsDataService: SettingsDataService.SettingsDataService,
-	},
-	{} :: typeof({ __index = PlayerSettings })
-)) & PlayerSettingsBase.PlayerSettingsBase
+export type PlayerSettings =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_remoting: Remoting.Remoting,
+			_settingsDataService: SettingsDataService.SettingsDataService,
+		},
+		{} :: typeof({ __index = PlayerSettings })
+	))
+	& PlayerSettingsBase.PlayerSettingsBase
 
 function PlayerSettings.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): PlayerSettings
 	local self: PlayerSettings = setmetatable(PlayerSettingsBase.new(folder, serviceBag) :: any, PlayerSettings)

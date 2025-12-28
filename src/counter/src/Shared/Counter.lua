@@ -15,20 +15,22 @@ local Counter = setmetatable({}, BaseObject)
 Counter.ClassName = "Counter"
 Counter.__index = Counter
 
-export type Counter = typeof(setmetatable(
-	{} :: {
-		_count: ValueObject.ValueObject<number>,
+export type Counter =
+	typeof(setmetatable(
+		{} :: {
+			_count: ValueObject.ValueObject<number>,
 
-		--[=[
+			--[=[
 			Fires when the count changes
 			@readonly
 			@prop Changed Signal.Signal<number>
 			@within Counter
 		]=]
-		Changed: Signal.Signal<number>,
-	},
-	{} :: typeof({ __index = Counter })
-)) & BaseObject.BaseObject
+			Changed: Signal.Signal<number>,
+		},
+		{} :: typeof({ __index = Counter })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new counter

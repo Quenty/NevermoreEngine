@@ -19,12 +19,14 @@ local UserInfoAggregator = setmetatable({}, BaseObject)
 UserInfoAggregator.ClassName = "UserInfoAggregator"
 UserInfoAggregator.__index = UserInfoAggregator
 
-export type UserInfoAggregator = typeof(setmetatable(
-	{} :: {
-		_aggregator: Aggregator.Aggregator<UserServiceUtils.UserInfo>,
-	},
-	{} :: typeof({ __index = UserInfoAggregator })
-)) & BaseObject.BaseObject
+export type UserInfoAggregator =
+	typeof(setmetatable(
+		{} :: {
+			_aggregator: Aggregator.Aggregator<UserServiceUtils.UserInfo>,
+		},
+		{} :: typeof({ __index = UserInfoAggregator })
+	))
+	& BaseObject.BaseObject
 
 function UserInfoAggregator.new(): UserInfoAggregator
 	local self: UserInfoAggregator = setmetatable(BaseObject.new() :: any, UserInfoAggregator)

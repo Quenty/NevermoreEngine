@@ -19,15 +19,17 @@ ModelTransparencyEffect.__index = ModelTransparencyEffect
 
 export type TransparencyMode = "SetTransparency" | "SetLocalTransparencyModifier"
 
-export type ModelTransparencyEffect = typeof(setmetatable(
-	{} :: {
-		_transparency: AccelTween.AccelTween,
-		_transparencyService: TransparencyService.TransparencyService,
-		_transparencyServiceMethodName: TransparencyMode,
-		_parts: { [Instance]: boolean },
-	},
-	{} :: typeof({ __index = ModelTransparencyEffect })
-)) & BaseObject.BaseObject
+export type ModelTransparencyEffect =
+	typeof(setmetatable(
+		{} :: {
+			_transparency: AccelTween.AccelTween,
+			_transparencyService: TransparencyService.TransparencyService,
+			_transparencyServiceMethodName: TransparencyMode,
+			_parts: { [Instance]: boolean },
+		},
+		{} :: typeof({ __index = ModelTransparencyEffect })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	@param serviceBag ServiceBag

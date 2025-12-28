@@ -17,15 +17,17 @@ local SpringTransitionModel = setmetatable({}, BasicPane)
 SpringTransitionModel.ClassName = "SpringTransitionModel"
 SpringTransitionModel.__index = SpringTransitionModel
 
-export type SpringTransitionModel<T> = typeof(setmetatable(
-	{} :: {
-		_showTarget: any,
-		_hideTarget: any,
-		_springObject: any,
-		_transitionModel: TransitionModel.TransitionModel,
-	},
-	{} :: typeof({ __index = SpringTransitionModel })
-)) & BasicPane.BasicPane
+export type SpringTransitionModel<T> =
+	typeof(setmetatable(
+		{} :: {
+			_showTarget: any,
+			_hideTarget: any,
+			_springObject: any,
+			_transitionModel: TransitionModel.TransitionModel,
+		},
+		{} :: typeof({ __index = SpringTransitionModel })
+	))
+	& BasicPane.BasicPane
 
 --[=[
 	A transition model that has a spring underlying it. Very useful

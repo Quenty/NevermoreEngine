@@ -16,16 +16,18 @@ local ColorPickerTriangle = setmetatable({}, BaseObject)
 ColorPickerTriangle.ClassName = "ColorPickerTriangle"
 ColorPickerTriangle.__index = ColorPickerTriangle
 
-export type ColorPickerTriangle = typeof(setmetatable(
-	{} :: {
-		Gui: Frame?,
-		_transparency: ValueObject.ValueObject<number>,
-		_backgroundColorHint: ValueObject.ValueObject<Color3>,
-		_color: ValueObject.ValueObject<Color3>,
-		_sizeValue: ValueObject.ValueObject<Vector2>,
-	},
-	{} :: typeof({ __index = ColorPickerTriangle })
-)) & BaseObject.BaseObject
+export type ColorPickerTriangle =
+	typeof(setmetatable(
+		{} :: {
+			Gui: Frame?,
+			_transparency: ValueObject.ValueObject<number>,
+			_backgroundColorHint: ValueObject.ValueObject<Color3>,
+			_color: ValueObject.ValueObject<Color3>,
+			_sizeValue: ValueObject.ValueObject<Vector2>,
+		},
+		{} :: typeof({ __index = ColorPickerTriangle })
+	))
+	& BaseObject.BaseObject
 
 function ColorPickerTriangle.new(): ColorPickerTriangle
 	local self: ColorPickerTriangle = setmetatable(BaseObject.new() :: any, ColorPickerTriangle)

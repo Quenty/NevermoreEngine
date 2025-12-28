@@ -22,12 +22,14 @@ local GameConfigPicker = setmetatable({}, BaseObject)
 GameConfigPicker.ClassName = "GameConfigPicker"
 GameConfigPicker.__index = GameConfigPicker
 
-export type GameConfigPicker = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-	},
-	{} :: typeof({ __index = GameConfigPicker })
-)) & BaseObject.BaseObject
+export type GameConfigPicker =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+		},
+		{} :: typeof({ __index = GameConfigPicker })
+	))
+	& BaseObject.BaseObject
 type GameConfigAssetType = GameConfigAssetTypes.GameConfigAssetType
 type GameConfigAssetBase = GameConfigAssetBase.GameConfigAssetBase
 
