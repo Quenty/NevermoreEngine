@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[42690],{2835:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IKDataService","desc":"","source":{"line":4,"path":"src/ik/src/Shared/IKDataService.lua"}}')}}]);
