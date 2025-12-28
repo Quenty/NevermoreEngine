@@ -6,7 +6,6 @@
   },
   "luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
   "luau-lsp.ignoreGlobs": ["**/node_modules/**"],
-  "luau-lsp.fflags.enableNewSolver": false,
   "[lua]": {
     "editor.defaultFormatter": "JohnnyMorganz.stylua",
     "editor.formatOnSave": true,
@@ -21,6 +20,5 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file"
-  },
-  "files.trimTrailingWhitespace": true
+  }
 }
