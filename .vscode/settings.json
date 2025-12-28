@@ -4,6 +4,7 @@
     "**/node_modules/**": true,
     "roblox.toml": true
   },
+  "luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
   "luau-lsp.ignoreGlobs": ["**/node_modules/**"],
   "luau-lsp.fflags.enableNewSolver": false,
   "[lua]": {
