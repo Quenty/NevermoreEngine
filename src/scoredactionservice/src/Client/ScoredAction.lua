@@ -18,20 +18,22 @@ local ScoredAction = setmetatable({}, BaseObject)
 ScoredAction.ClassName = "ScoredAction"
 ScoredAction.__index = ScoredAction
 
-export type ScoredAction = typeof(setmetatable(
-	{} :: {
-		PreferredChanged: Signal.Signal<boolean>,
-		Removing: Signal.Signal<()>,
-		EnabledChanged: Signal.Signal<boolean>,
+export type ScoredAction =
+	typeof(setmetatable(
+		{} :: {
+			PreferredChanged: Signal.Signal<boolean>,
+			Removing: Signal.Signal<()>,
+			EnabledChanged: Signal.Signal<boolean>,
 
-		-- Private
-		_isEnabled: ValueObject.ValueObject<boolean>,
-		_score: number,
-		_createdTimeStamp: number,
-		_preferredStack: StateStack.StateStack<boolean>,
-	},
-	{} :: typeof({ __index = ScoredAction })
-)) & BaseObject.BaseObject
+			-- Private
+			_isEnabled: ValueObject.ValueObject<boolean>,
+			_score: number,
+			_createdTimeStamp: number,
+			_preferredStack: StateStack.StateStack<boolean>,
+		},
+		{} :: typeof({ __index = ScoredAction })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new ScoredAction. Should not be called directly. See [ScoredActionServiceClient.GetScoredAction].

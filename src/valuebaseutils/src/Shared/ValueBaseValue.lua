@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	For when attributes don't work
 
@@ -51,7 +52,7 @@ function ValueBaseValue.new(
 	assert(type(className) == "string", "Bad argument 'className'")
 	assert(type(name) == "string", "Bad argument 'name'")
 
-	local self = {}
+	local self: ValueBaseValue = {} :: any
 
 	self._parent = parent
 	self._name = name
@@ -63,7 +64,7 @@ function ValueBaseValue.new(
 		ValueBaseUtils.getOrCreateValue(parent, self._className, self._name, self._defaultValue)
 	end
 
-	return setmetatable(self, ValueBaseValue) :: any
+	return setmetatable(self :: any, ValueBaseValue) :: any
 end
 
 --[=[

@@ -25,20 +25,22 @@ type PlayData = {
 	times: number,
 }
 
-export type FlipbookPlayer = typeof(setmetatable(
-	{} :: {
-		_maid: Maid.Maid,
-		_isPlaying: ValueObject.ValueObject<boolean>,
-		_isBoomarang: ValueObject.ValueObject<boolean>,
-		_playData: ValueObject.ValueObject<PlayData>,
-		_flipbook: ValueObject.ValueObject<Flipbook.Flipbook>,
+export type FlipbookPlayer =
+	typeof(setmetatable(
+		{} :: {
+			_maid: Maid.Maid,
+			_isPlaying: ValueObject.ValueObject<boolean>,
+			_isBoomarang: ValueObject.ValueObject<boolean>,
+			_playData: ValueObject.ValueObject<PlayData>,
+			_flipbook: ValueObject.ValueObject<Flipbook.Flipbook>,
 
-		_originalImage: string,
-		_originalRectOffset: UDim2,
-		_originalRectSize: UDim2,
-	},
-	{} :: typeof({ __index = FlipbookPlayer })
-)) & BaseObject.BaseObject
+			_originalImage: string,
+			_originalRectOffset: UDim2,
+			_originalRectSize: UDim2,
+		},
+		{} :: typeof({ __index = FlipbookPlayer })
+	))
+	& BaseObject.BaseObject
 
 type State = {
 	flipbook: Flipbook.Flipbook?,

@@ -20,14 +20,16 @@ local AdorneeBoundingBox = setmetatable({}, BaseObject)
 AdorneeBoundingBox.ClassName = "AdorneeBoundingBox"
 AdorneeBoundingBox.__index = AdorneeBoundingBox
 
-export type AdorneeBoundingBox = typeof(setmetatable(
-	{} :: {
-		_adornee: ValueObject.ValueObject<Instance?>,
-		_bbCFrame: ValueObject.ValueObject<CFrame?>,
-		_bbSize: ValueObject.ValueObject<Vector3?>,
-	},
-	{} :: typeof({ __index = AdorneeBoundingBox })
-)) & BaseObject.BaseObject
+export type AdorneeBoundingBox =
+	typeof(setmetatable(
+		{} :: {
+			_adornee: ValueObject.ValueObject<Instance?>,
+			_bbCFrame: ValueObject.ValueObject<CFrame?>,
+			_bbSize: ValueObject.ValueObject<Vector3?>,
+		},
+		{} :: typeof({ __index = AdorneeBoundingBox })
+	))
+	& BaseObject.BaseObject
 
 function AdorneeBoundingBox.new(initialAdornee: Instance?): AdorneeBoundingBox
 	local self = setmetatable(BaseObject.new() :: any, AdorneeBoundingBox)

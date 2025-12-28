@@ -22,20 +22,22 @@ local ColorPalette = setmetatable({}, BaseObject)
 ColorPalette.ClassName = "ColorPalette"
 ColorPalette.__index = ColorPalette
 
-export type ColorPalette = typeof(setmetatable(
-	{} :: {
-		_swatches: { ColorSwatch.ColorSwatch },
-		_gradePalette: ColorGradePalette.ColorGradePalette,
-		_swatchMap: any,
-		_colorGradeMap: any,
-		_colorValues: { [string]: ValueObject.ValueObject<Color3> },
-		_vividnessValues: { [string]: ValueObject.ValueObject<number> },
+export type ColorPalette =
+	typeof(setmetatable(
+		{} :: {
+			_swatches: { ColorSwatch.ColorSwatch },
+			_gradePalette: ColorGradePalette.ColorGradePalette,
+			_swatchMap: any,
+			_colorGradeMap: any,
+			_colorValues: { [string]: ValueObject.ValueObject<Color3> },
+			_vividnessValues: { [string]: ValueObject.ValueObject<number> },
 
-		ColorSwatchAdded: Signal.Signal<string>,
-		ColorGradeAdded: Signal.Signal<string>,
-	},
-	{} :: typeof({ __index = ColorPalette })
-)) & BaseObject.BaseObject
+			ColorSwatchAdded: Signal.Signal<string>,
+			ColorGradeAdded: Signal.Signal<string>,
+		},
+		{} :: typeof({ __index = ColorPalette })
+	))
+	& BaseObject.BaseObject
 
 function ColorPalette.new(): ColorPalette
 	local self: ColorPalette = setmetatable(BaseObject.new() :: any, ColorPalette)

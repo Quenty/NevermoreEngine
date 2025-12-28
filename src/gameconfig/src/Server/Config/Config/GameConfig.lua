@@ -17,13 +17,15 @@ local GameConfig = setmetatable({}, GameConfigBase)
 GameConfig.ClassName = "GameConfig"
 GameConfig.__index = GameConfig
 
-export type GameConfig = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_gameConfigBindersServer: any,
-	},
-	{} :: typeof({ __index = GameConfig })
-)) & GameConfigBase.GameConfigBase
+export type GameConfig =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_gameConfigBindersServer: any,
+		},
+		{} :: typeof({ __index = GameConfig })
+	))
+	& GameConfigBase.GameConfigBase
 
 function GameConfig.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): GameConfig
 	local self: GameConfig = setmetatable(GameConfigBase.new(obj) :: any, GameConfig)

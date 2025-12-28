@@ -17,13 +17,15 @@ local AnimatedHighlightGroup = setmetatable({}, BaseObject)
 AnimatedHighlightGroup.ClassName = "AnimatedHighlightGroup"
 AnimatedHighlightGroup.__index = AnimatedHighlightGroup
 
-export type AnimatedHighlightGroup = typeof(setmetatable(
-	{} :: {
-		_defaultValues: AnimatedHighlightModel.AnimatedHighlightModel,
-		_highlightStacks: { [Instance]: AnimatedHighlightStack.AnimatedHighlightStack },
-	},
-	{} :: typeof({ __index = AnimatedHighlightGroup })
-)) & BaseObject.BaseObject
+export type AnimatedHighlightGroup =
+	typeof(setmetatable(
+		{} :: {
+			_defaultValues: AnimatedHighlightModel.AnimatedHighlightModel,
+			_highlightStacks: { [Instance]: AnimatedHighlightStack.AnimatedHighlightStack },
+		},
+		{} :: typeof({ __index = AnimatedHighlightGroup })
+	))
+	& BaseObject.BaseObject
 
 function AnimatedHighlightGroup.new(): AnimatedHighlightGroup
 	local self: AnimatedHighlightGroup = setmetatable(BaseObject.new() :: any, AnimatedHighlightGroup)
@@ -166,7 +168,11 @@ function AnimatedHighlightGroup:_getOrCreateHighlightStackHandle(adornee, observ
 	return handle
 end
 
-function AnimatedHighlightGroup:HighlightWithTransferredProperties(fromAdornee, toAdornee, observeScore)
+function AnimatedHighlightGroup:HighlightWithTransferredProperties(
+	fromAdornee: Instance,
+	toAdornee: Instance,
+	observeScore
+)
 	assert(typeof(fromAdornee) == "Instance", "Bad fromAdornee")
 	assert(typeof(toAdornee) == "Instance", "Bad toAdornee")
 

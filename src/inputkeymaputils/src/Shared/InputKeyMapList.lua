@@ -64,17 +64,19 @@ local InputKeyMapList = setmetatable({}, BaseObject)
 InputKeyMapList.ClassName = "InputKeyMapList"
 InputKeyMapList.__index = InputKeyMapList
 
-export type InputKeyMapList = typeof(setmetatable(
-	{} :: {
-		_inputKeyMapListName: string,
-		_inputModeTypeToInputKeyMap: any, -- ObservableMap.ObservableMap<InputModeType.InputModeType, InputKeyMap.InputKeyMap>,
-		_inputTypesForBinding: any, -- ObservableCountingMap.ObservableCountingMap<InputTypeUtils.InputType>,
-		_isTapInWorld: StateStack.StateStack<boolean>,
-		_isRobloxTouchButton: StateStack.StateStack<boolean>,
-		_options: InputKeyMapListOptions,
-	},
-	{} :: typeof({ __index = InputKeyMapList })
-)) & BaseObject.BaseObject
+export type InputKeyMapList =
+	typeof(setmetatable(
+		{} :: {
+			_inputKeyMapListName: string,
+			_inputModeTypeToInputKeyMap: any, -- ObservableMap.ObservableMap<InputModeType.InputModeType, InputKeyMap.InputKeyMap>,
+			_inputTypesForBinding: any, -- ObservableCountingMap.ObservableCountingMap<InputTypeUtils.InputType>,
+			_isTapInWorld: StateStack.StateStack<boolean>,
+			_isRobloxTouchButton: StateStack.StateStack<boolean>,
+			_options: InputKeyMapListOptions,
+		},
+		{} :: typeof({ __index = InputKeyMapList })
+	))
+	& BaseObject.BaseObject
 
 export type InputKeyMapListOptions = {
 	bindingName: string,

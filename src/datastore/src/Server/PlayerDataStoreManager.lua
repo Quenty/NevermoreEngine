@@ -66,18 +66,20 @@ PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"
 PlayerDataStoreManager.__index = PlayerDataStoreManager
 
 export type KeyGenerator = (Player) -> string
-export type PlayerDataStoreManager = typeof(setmetatable(
-	{} :: {
-		_robloxDataStore: any,
-		_keyGenerator: KeyGenerator,
-		_datastores: { [Player]: DataStore.DataStore },
-		_removing: { [Player]: boolean },
-		_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
-		_removingCallbacks: { (Player) -> any },
-		_disableSavingInStudio: boolean?,
-	},
-	{} :: typeof({ __index = PlayerDataStoreManager })
-)) & BaseObject.BaseObject
+export type PlayerDataStoreManager =
+	typeof(setmetatable(
+		{} :: {
+			_robloxDataStore: any,
+			_keyGenerator: KeyGenerator,
+			_datastores: { [Player]: DataStore.DataStore },
+			_removing: { [Player]: boolean },
+			_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
+			_removingCallbacks: { (Player) -> any },
+			_disableSavingInStudio: boolean?,
+		},
+		{} :: typeof({ __index = PlayerDataStoreManager })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new PlayerDataStoreManager.

@@ -22,17 +22,19 @@ local AnimationSlotPlayer = setmetatable({}, BaseObject)
 AnimationSlotPlayer.ClassName = "AnimationSlotPlayer"
 AnimationSlotPlayer.__index = AnimationSlotPlayer
 
-export type AnimationSlotPlayer = typeof(setmetatable(
-	{} :: {
-		_maid: Maid.Maid,
-		_animationTarget: ValueObject.ValueObject<Instance>,
-		_defaultFadeTime: ValueObject.ValueObject<number>,
-		_defaultAnimationPriority: ValueObject.ValueObject<Enum.AnimationPriority>,
-		_currentAnimationTrackData: ValueObject.ValueObject<any>,
-		_currentAnimationId: ValueObject.ValueObject<string>,
-	},
-	{} :: typeof({ __index = AnimationSlotPlayer })
-)) & BaseObject.BaseObject
+export type AnimationSlotPlayer =
+	typeof(setmetatable(
+		{} :: {
+			_maid: Maid.Maid,
+			_animationTarget: ValueObject.ValueObject<Instance>,
+			_defaultFadeTime: ValueObject.ValueObject<number>,
+			_defaultAnimationPriority: ValueObject.ValueObject<Enum.AnimationPriority>,
+			_currentAnimationTrackData: ValueObject.ValueObject<any>,
+			_currentAnimationId: ValueObject.ValueObject<string>,
+		},
+		{} :: typeof({ __index = AnimationSlotPlayer })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new AnimationSlotPlayer with a target to play the animation on.

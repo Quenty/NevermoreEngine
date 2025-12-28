@@ -14,18 +14,20 @@ local SummedCamera = require("SummedCamera")
 local FadingCamera = {}
 FadingCamera.ClassName = "FadingCamera"
 
-export type FadingCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		Spring: Spring.Spring<number>,
-		Camera: CameraEffectUtils.CameraLike,
-		Damper: number,
-		Speed: number,
-		Target: number,
-		Value: number,
-	},
-	{} :: typeof({ __index = FadingCamera })
-)) & CameraEffectUtils.CameraEffect
+export type FadingCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			Spring: Spring.Spring<number>,
+			Camera: CameraEffectUtils.CameraLike,
+			Damper: number,
+			Speed: number,
+			Target: number,
+			Value: number,
+		},
+		{} :: typeof({ __index = FadingCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	@param camera CameraEffect
