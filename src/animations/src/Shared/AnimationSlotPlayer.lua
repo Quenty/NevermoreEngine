@@ -30,7 +30,7 @@ export type AnimationSlotPlayer =
 			_defaultFadeTime: ValueObject.ValueObject<number>,
 			_defaultAnimationPriority: ValueObject.ValueObject<Enum.AnimationPriority>,
 			_currentAnimationTrackData: ValueObject.ValueObject<any>,
-			_currentAnimationId: ValueObject.ValueObject<string>,
+			_currentAnimationId: ValueObject.ValueObject<string?>,
 		},
 		{} :: typeof({ __index = AnimationSlotPlayer })
 	))
@@ -147,6 +147,8 @@ function AnimationSlotPlayer.AdjustSpeed(self: AnimationSlotPlayer, id: string |
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 	assert(type(speed) == "number", "Bad speed")
 
+	self._maid._currentSpeedAdjustment = nil
+
 	local animationId = RbxAssetUtils.toRbxAssetId(id)
 
 	local topMaid = Maid.new()
@@ -185,6 +187,15 @@ function AnimationSlotPlayer.AdjustSpeed(self: AnimationSlotPlayer, id: string |
 end
 
 --[=[
+	Gets the current animation id playing in the slot
+
+	@return string?
+]=]
+function AnimationSlotPlayer:GetCurrentAnimationId(): string?
+	return self._currentAnimationId.Value
+end
+
+--[=[
 	Adjusts the weight of the animation playing in the slot
 
 	@param id string | number
@@ -192,10 +203,17 @@ end
 	@param fadeTime number?
 	@return () -> () -- Callback to clean things up
 ]=]
-function AnimationSlotPlayer.AdjustWeight(self: AnimationSlotPlayer, id: string, weight: number, fadeTime: number?)
+function AnimationSlotPlayer.AdjustWeight(
+	self: AnimationSlotPlayer,
+	id: string | number,
+	weight: number,
+	fadeTime: number?
+)
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 	assert(type(weight) == "number", "Bad weight")
 	assert(type(fadeTime) == "number" or fadeTime == nil, "Bad fadeTime")
+
+	self._maid._currentWeightAdjustment = nil
 
 	local animationId = RbxAssetUtils.toRbxAssetId(id)
 
@@ -263,6 +281,13 @@ function AnimationSlotPlayer.Play(
 
 	local animationId = RbxAssetUtils.toRbxAssetId(id)
 
+	self._currentAnimationId.Value = animationId
+	topMaid:GiveTask(function()
+		if self._currentAnimationId.Value == animationId then
+			self._currentAnimationId.Value = nil
+		end
+	end)
+
 	topMaid:GiveTask(self._animationTarget
 		:ObserveBrio(function(target)
 			return target ~= nil
@@ -327,8 +352,17 @@ end
 --[=[
 	Stops the current animation playing
 ]=]
-function AnimationSlotPlayer.Stop(self: AnimationSlotPlayer)
-	self._maid._current = nil
+function AnimationSlotPlayer.Stop(self: AnimationSlotPlayer, id: (string | number)?)
+	if id then
+		local animationId = RbxAssetUtils.toRbxAssetId(id)
+		if self._currentAnimationId.Value == animationId then
+			self._maid._current = nil
+		end
+
+		return
+	else
+		self._maid._current = nil
+	end
 end
 
 return AnimationSlotPlayer
