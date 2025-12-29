@@ -19,17 +19,19 @@ local CooldownBase = setmetatable({}, BaseObject)
 CooldownBase.ClassName = "CooldownBase"
 CooldownBase.__index = CooldownBase
 
-export type CooldownBase = typeof(setmetatable(
-	{} :: {
-		_obj: NumberValue,
-		_serviceBag: ServiceBag.ServiceBag,
-		_cooldownModel: CooldownModel.CooldownModel,
-		_timeSyncService: TimeSyncService.TimeSyncService,
-		_syncedClock: TimeSyncService.SyncedClock,
-		Done: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = CooldownBase })
-)) & BaseObject.BaseObject
+export type CooldownBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: NumberValue,
+			_serviceBag: ServiceBag.ServiceBag,
+			_cooldownModel: CooldownModel.CooldownModel,
+			_timeSyncService: TimeSyncService.TimeSyncService,
+			_syncedClock: TimeSyncService.SyncedClock,
+			Done: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = CooldownBase })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new Cooldown.

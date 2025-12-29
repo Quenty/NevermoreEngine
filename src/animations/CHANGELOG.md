@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.22.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.4...@quenty/animations@8.22.5) (2025-12-29)
+
+
+### Bug Fixes
+
+* Update animation slot system ([50b03f4](https://github.com/Quenty/NevermoreEngine/commit/50b03f4c59427be54d7801ca196cf5edf1243795))
+* Update typing to be more accurate ([e4c3d05](https://github.com/Quenty/NevermoreEngine/commit/e4c3d05a0aa9f45a37cbfa372c5e0d8a748c9323))
+
+
+
+
+
+## [8.22.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.3...@quenty/animations@8.22.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
 ## [8.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.2...@quenty/animations@8.22.3) (2025-12-13)
 
 

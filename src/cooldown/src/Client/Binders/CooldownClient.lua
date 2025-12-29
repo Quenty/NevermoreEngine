@@ -16,12 +16,14 @@ local CooldownClient = setmetatable({}, CooldownBase)
 CooldownClient.ClassName = "CooldownClient"
 CooldownClient.__index = CooldownClient
 
-export type CooldownClient = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-	},
-	{} :: typeof({ __index = CooldownClient })
-)) & CooldownBase.CooldownBase
+export type CooldownClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+		},
+		{} :: typeof({ __index = CooldownClient })
+	))
+	& CooldownBase.CooldownBase
 
 --[=[
 	Constructs a new cooldown. Should be done via [CooldownBindersClient]. To create an

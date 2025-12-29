@@ -32,7 +32,7 @@ function SoundPromiseUtils.promiseLoaded(sound: Sound | VideoFrame): Promise.Pro
 		end
 	end))
 
-	maid:GiveTask(sound.Loaded:Connect(function()
+	maid:GiveTask((sound :: any).Loaded:Connect(function()
 		if sound.IsLoaded then
 			promise:Resolve()
 		end

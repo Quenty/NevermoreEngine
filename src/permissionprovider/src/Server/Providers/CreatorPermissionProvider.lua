@@ -21,13 +21,15 @@ local CreatorPermissionProvider = setmetatable({}, BasePermissionProvider)
 CreatorPermissionProvider.ClassName = "CreatorPermissionProvider"
 CreatorPermissionProvider.__index = CreatorPermissionProvider
 
-export type CreatorPermissionProvider = typeof(setmetatable(
-	{} :: {
-		_config: PermissionProviderUtils.SingleUserConfig,
-		_userId: number,
-	},
-	{} :: typeof({ __index = CreatorPermissionProvider })
-)) & BasePermissionProvider.BasePermissionProvider
+export type CreatorPermissionProvider =
+	typeof(setmetatable(
+		{} :: {
+			_config: PermissionProviderUtils.SingleUserConfig,
+			_userId: number,
+		},
+		{} :: typeof({ __index = CreatorPermissionProvider })
+	))
+	& BasePermissionProvider.BasePermissionProvider
 
 --[=[
 	@param config table

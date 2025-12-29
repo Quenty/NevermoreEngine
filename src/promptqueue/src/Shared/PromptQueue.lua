@@ -25,15 +25,17 @@ type PromptEntry = {
 	cancel: (doNotAnimate: boolean?) -> (),
 }
 
-export type PromptQueue = typeof(setmetatable(
-	{} :: {
-		_isShowing: ValueObject.ValueObject<boolean>,
-		_clearRequested: Signal.Signal<(boolean?)>,
-		_queue: { PromptEntry },
-		_currentProcessingEntry: PromptEntry?,
-	},
-	{} :: typeof({ __index = PromptQueue })
-)) & BaseObject.BaseObject
+export type PromptQueue =
+	typeof(setmetatable(
+		{} :: {
+			_isShowing: ValueObject.ValueObject<boolean>,
+			_clearRequested: Signal.Signal<(boolean?)>,
+			_queue: { PromptEntry },
+			_currentProcessingEntry: PromptEntry?,
+		},
+		{} :: typeof({ __index = PromptQueue })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new prompt queue

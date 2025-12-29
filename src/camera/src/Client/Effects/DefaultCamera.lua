@@ -28,17 +28,19 @@ local EPSILON = 0.001
 local DefaultCamera = {}
 DefaultCamera.ClassName = "DefaultCamera"
 
-export type DefaultCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		_key: string,
-		_maid: Maid.Maid,
-		_isFirstPerson: ValueObject.ValueObject<boolean>,
-		_cameraState: CameraState.CameraState,
-		_lastCameraFrame: CameraFrame.CameraFrame?,
-	},
-	{} :: typeof({ __index = DefaultCamera })
-)) & CameraEffectUtils.CameraEffect
+export type DefaultCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			_key: string,
+			_maid: Maid.Maid,
+			_isFirstPerson: ValueObject.ValueObject<boolean>,
+			_cameraState: CameraState.CameraState,
+			_lastCameraFrame: CameraFrame.CameraFrame?,
+		},
+		{} :: typeof({ __index = DefaultCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	Constructs a new DefaultCamera

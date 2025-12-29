@@ -22,18 +22,20 @@ local GroupPermissionProvider = setmetatable({}, BasePermissionProvider)
 GroupPermissionProvider.__index = GroupPermissionProvider
 GroupPermissionProvider.ClassName = "GroupPermissionProvider"
 
-export type GroupPermissionProvider = typeof(setmetatable(
-	{} :: {
-		_config: PermissionProviderUtils.GroupRankConfig,
-		_groupId: number,
-		_minAdminRequiredRank: number,
-		_minCreatorRequiredRank: number,
-		_adminsCache: { [number]: true },
-		_creatorCache: { [number]: true },
-		_promiseRankPromisesCache: { [number]: Promise.Promise<number> },
-	},
-	{} :: typeof({ __index = GroupPermissionProvider })
-)) & BasePermissionProvider.BasePermissionProvider
+export type GroupPermissionProvider =
+	typeof(setmetatable(
+		{} :: {
+			_config: PermissionProviderUtils.GroupRankConfig,
+			_groupId: number,
+			_minAdminRequiredRank: number,
+			_minCreatorRequiredRank: number,
+			_adminsCache: { [number]: true },
+			_creatorCache: { [number]: true },
+			_promiseRankPromisesCache: { [number]: Promise.Promise<number> },
+		},
+		{} :: typeof({ __index = GroupPermissionProvider })
+	))
+	& BasePermissionProvider.BasePermissionProvider
 
 --[=[
 	@param config table

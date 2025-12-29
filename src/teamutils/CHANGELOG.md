@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.20.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.20.2...@quenty/teamutils@10.20.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
 ## [10.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.20.1...@quenty/teamutils@10.20.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/teamutils

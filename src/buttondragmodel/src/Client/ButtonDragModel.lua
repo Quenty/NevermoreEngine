@@ -21,22 +21,24 @@ local ButtonDragModel = setmetatable({}, BaseObject)
 ButtonDragModel.ClassName = "ButtonDragModel"
 ButtonDragModel.__index = ButtonDragModel
 
-export type ButtonDragModel = typeof(setmetatable(
-	{} :: {
-		_dragPosition: ValueObject.ValueObject<Vector2?>,
-		_dragDelta: ValueObject.ValueObject<Vector2?>,
-		_isMouseDown: ValueObject.ValueObject<boolean>,
-		_button: ValueObject.ValueObject<GuiButton?>,
-		_absoluteSize: ValueObject.ValueObject<Vector2>,
-		_isPressed: ValueObject.ValueObject<boolean>,
-		_clampWithinButton: ValueObject.ValueObject<boolean>,
-		_activePositions: { [InputObject | string]: Vector2? },
+export type ButtonDragModel =
+	typeof(setmetatable(
+		{} :: {
+			_dragPosition: ValueObject.ValueObject<Vector2?>,
+			_dragDelta: ValueObject.ValueObject<Vector2?>,
+			_isMouseDown: ValueObject.ValueObject<boolean>,
+			_button: ValueObject.ValueObject<GuiButton?>,
+			_absoluteSize: ValueObject.ValueObject<Vector2>,
+			_isPressed: ValueObject.ValueObject<boolean>,
+			_clampWithinButton: ValueObject.ValueObject<boolean>,
+			_activePositions: { [InputObject | string]: Vector2? },
 
-		DragPositionChanged: Signal.Signal<Vector2>,
-		IsDraggingChanged: Signal.Signal<boolean>,
-	},
-	{} :: typeof({ __index = ButtonDragModel })
-)) & BaseObject.BaseObject
+			DragPositionChanged: Signal.Signal<Vector2>,
+			IsDraggingChanged: Signal.Signal<boolean>,
+		},
+		{} :: typeof({ __index = ButtonDragModel })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Construst a new drag model for the button

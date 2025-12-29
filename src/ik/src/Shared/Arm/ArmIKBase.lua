@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides IK for a given arm
 	@class ArmIKBase

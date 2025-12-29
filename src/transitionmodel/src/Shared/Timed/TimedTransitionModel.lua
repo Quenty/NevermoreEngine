@@ -16,13 +16,15 @@ local TimedTransitionModel = setmetatable({}, BasicPane)
 TimedTransitionModel.ClassName = "TimedTransitionModel"
 TimedTransitionModel.__index = TimedTransitionModel
 
-export type TimedTransitionModel = typeof(setmetatable(
-	{} :: {
-		_transitionModel: TransitionModel.TransitionModel,
-		_timedTween: TimedTween.TimedTween,
-	},
-	{} :: typeof({ __index = TimedTransitionModel })
-)) & BasicPane.BasicPane
+export type TimedTransitionModel =
+	typeof(setmetatable(
+		{} :: {
+			_transitionModel: TransitionModel.TransitionModel,
+			_timedTween: TimedTween.TimedTween,
+		},
+		{} :: typeof({ __index = TimedTransitionModel })
+	))
+	& BasicPane.BasicPane
 
 --[=[
 	A transition model that has a spring underlying it. Very useful

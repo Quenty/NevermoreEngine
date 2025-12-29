@@ -19,13 +19,15 @@ local HasChatTagsBase = setmetatable({}, BaseObject)
 HasChatTagsBase.ClassName = "HasChatTagsBase"
 HasChatTagsBase.__index = HasChatTagsBase
 
-export type HasChatTagsBase = typeof(setmetatable(
-	{} :: {
-		_obj: Player,
-		_lastChatTags: ValueObject.ValueObject<{ ChatTagDataUtils.ChatTagData }?>,
-	},
-	{} :: typeof({ __index = HasChatTagsBase })
-)) & BaseObject.BaseObject
+export type HasChatTagsBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Player,
+			_lastChatTags: ValueObject.ValueObject<{ ChatTagDataUtils.ChatTagData }?>,
+		},
+		{} :: typeof({ __index = HasChatTagsBase })
+	))
+	& BaseObject.BaseObject
 
 function HasChatTagsBase.new(player: Player): HasChatTagsBase
 	local self: HasChatTagsBase = setmetatable(BaseObject.new(player) :: any, HasChatTagsBase)

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.28.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.3...@quenty/motor6d@7.28.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.28.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.2...@quenty/motor6d@7.28.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
 ## [7.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.1...@quenty/motor6d@7.28.2) (2025-12-13)
 
 **Note:** Version bump only for package @quenty/motor6d
