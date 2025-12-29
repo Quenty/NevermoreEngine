@@ -26,7 +26,7 @@ export type AnimationSlotPlayer =
 	typeof(setmetatable(
 		{} :: {
 			_maid: Maid.Maid,
-			_animationTarget: ValueObject.ValueObject<Instance>,
+			_animationTarget: ValueObject.ValueObject<Instance?>,
 			_defaultFadeTime: ValueObject.ValueObject<number>,
 			_defaultAnimationPriority: ValueObject.ValueObject<Enum.AnimationPriority>,
 			_currentAnimationTrackData: ValueObject.ValueObject<any>,
@@ -39,10 +39,10 @@ export type AnimationSlotPlayer =
 --[=[
 	Creates a new AnimationSlotPlayer with a target to play the animation on.
 
-	@param animationTarget Instance? | Observable<Instance>
+	@param animationTarget ValueObject.Mountable<Instance?>
 	@return AnimationSlotPlayer
 ]=]
-function AnimationSlotPlayer.new(animationTarget): AnimationSlotPlayer
+function AnimationSlotPlayer.new(animationTarget: ValueObject.Mountable<Instance?>): AnimationSlotPlayer
 	local self: AnimationSlotPlayer = setmetatable(BaseObject.new() :: any, AnimationSlotPlayer)
 
 	self._animationTarget = self._maid:Add(ValueObject.new(nil))
@@ -63,7 +63,10 @@ end
 
 	@param defaultFadeTime number
 ]=]
-function AnimationSlotPlayer.SetDefaultFadeTime(self: AnimationSlotPlayer, defaultFadeTime: number)
+function AnimationSlotPlayer.SetDefaultFadeTime(
+	self: AnimationSlotPlayer,
+	defaultFadeTime: ValueObject.Mountable<number>
+): () -> ()
 	return self._defaultFadeTime:Mount(defaultFadeTime)
 end
 
@@ -84,10 +87,13 @@ end
 --[=[
 	Sets an animation target to play the animation on
 
-	@param animationTarget Instance | Observable<Instance>
+	@param animationTarget ValueObject.Mountable<Instance?>
 ]=]
-function AnimationSlotPlayer.SetAnimationTarget(self: AnimationSlotPlayer, animationTarget)
-	self._animationTarget:Mount(animationTarget)
+function AnimationSlotPlayer.SetAnimationTarget(
+	self: AnimationSlotPlayer,
+	animationTarget: ValueObject.Mountable<Instance?>
+): () -> ()
+	return self._animationTarget:Mount(animationTarget)
 end
 
 type AnimationData = {
