@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/promise@10.12.2`
+  - fix: Add fallback message for promise rejection [#620](https://github.com/Quenty/NevermoreEngine/pull/620) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Dec 29 2025)
+
+#### 🐛 Bug Fix
+
 - `@quenty/animations@8.22.6`
   - fix: Check Looped after loaded [#613](https://github.com/Quenty/NevermoreEngine/pull/613) ([@alex-y-z](https://github.com/alex-y-z))
 

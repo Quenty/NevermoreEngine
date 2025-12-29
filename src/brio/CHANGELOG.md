@@ -1,3 +1,15 @@
+# v14.20.3 (Mon Dec 29 2025)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
