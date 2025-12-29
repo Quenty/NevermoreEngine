@@ -1,6 +1,6 @@
 {
   "name": "@quenty/jsonutils",
-  "version": "10.12.0",
+  "version": "10.12.1",
   "description": "JSON utility functions for Roblox Lua",
   "keywords": [
     "Roblox",

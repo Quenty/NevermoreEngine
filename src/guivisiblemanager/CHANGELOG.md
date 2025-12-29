@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.13.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.3...@quenty/guivisiblemanager@12.13.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
 ## [12.13.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.2...@quenty/guivisiblemanager@12.13.3) (2025-12-28)
 
 

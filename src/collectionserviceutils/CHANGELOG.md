@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@8.21.1...@quenty/collectionserviceutils@8.21.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/collectionserviceutils
+
+
+
+
+
 ## [8.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@8.21.0...@quenty/collectionserviceutils@8.21.1) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/collectionserviceutils

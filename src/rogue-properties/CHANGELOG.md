@@ -1,20 +1,18 @@
-# v11.30.4 (Mon Dec 29 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Update typing to be more accurate [#619](https://github.com/Quenty/NevermoreEngine/pull/619) ([@Quenty](https://github.com/Quenty))
-- fix: Update typing to be more accurate ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.30.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.3...@quenty/rogue-properties@11.30.4) (2025-12-29)
+
+
+### Bug Fixes
+
+* Update typing to be more accurate ([e4c3d05](https://github.com/Quenty/NevermoreEngine/commit/e4c3d05a0aa9f45a37cbfa372c5e0d8a748c9323))
+
+
+
+
 
 ## [11.30.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.2...@quenty/rogue-properties@11.30.3) (2025-12-28)
 

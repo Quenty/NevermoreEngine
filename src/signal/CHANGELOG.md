@@ -1,20 +1,18 @@
-# v7.11.2 (Mon Dec 29 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Update typing to be more accurate [#619](https://github.com/Quenty/NevermoreEngine/pull/619) ([@Quenty](https://github.com/Quenty))
-- fix: Update typing to be more accurate ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.11.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.11.1...@quenty/signal@7.11.2) (2025-12-29)
+
+
+### Bug Fixes
+
+* Update typing to be more accurate ([e4c3d05](https://github.com/Quenty/NevermoreEngine/commit/e4c3d05a0aa9f45a37cbfa372c5e0d8a748c9323))
+
+
+
+
 
 ## [7.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.11.0...@quenty/signal@7.11.1) (2025-08-12)
 

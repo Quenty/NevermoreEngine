@@ -1,6 +1,6 @@
 {
   "name": "@quenty/remoting",
-  "version": "12.21.2",
+  "version": "12.21.3",
   "description": "Global remoting retrieval system for Roblox (RemoteFunctions/RemoteEvents)",
   "keywords": [
     "Roblox",
