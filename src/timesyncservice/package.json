@@ -1,6 +1,6 @@
 {
   "name": "@quenty/timesyncservice",
-  "version": "13.22.4",
+  "version": "13.22.5",
   "description": "Quenty's TimeSyncService keeps time synchronized between all clients and the server",
   "keywords": [
     "Roblox",

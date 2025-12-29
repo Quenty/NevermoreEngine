@@ -1,21 +1,18 @@
-# v10.12.2 (Mon Dec 29 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Add fallback message for promise rejection [#620](https://github.com/Quenty/NevermoreEngine/pull/620) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Add fallback message for promise rejection ([@alex-y-z](https://github.com/alex-y-z))
-- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.12.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.1...@quenty/promise@10.12.2) (2025-12-29)
+
+
+### Bug Fixes
+
+* Add fallback message for promise rejection ([34546af](https://github.com/Quenty/NevermoreEngine/commit/34546af3dde159c855f8933fa227df5d7cd6f333))
+
+
+
+
 
 ## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.0...@quenty/promise@10.12.1) (2025-12-29)
 

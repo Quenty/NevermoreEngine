@@ -1,19 +1,15 @@
-# v10.25.5 (Mon Dec 29 2025)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.25.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.25.4...@quenty/colorpalette@10.25.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
 
 ## [10.25.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.25.3...@quenty/colorpalette@10.25.4) (2025-12-29)
 

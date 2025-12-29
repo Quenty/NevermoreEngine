@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoiddescriptionutils",
-  "version": "10.12.2",
+  "version": "10.12.3",
   "description": "Handles actions involving HumanoidDescription objects, including loading character appearance.",
   "keywords": [
     "Roblox",

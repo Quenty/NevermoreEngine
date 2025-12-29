@@ -1,6 +1,6 @@
 {
   "name": "@quenty/bodycolorsutils",
-  "version": "7.22.4",
+  "version": "7.22.5",
   "description": "Body color helper utilities for merging and representing body colors over the network and datastore",
   "keywords": [
     "Roblox",

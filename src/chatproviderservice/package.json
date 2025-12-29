@@ -1,6 +1,6 @@
 {
   "name": "@quenty/chatproviderservice",
-  "version": "9.33.5",
+  "version": "9.33.6",
   "description": "Provide wrapper around chat system to allow tags to be set",
   "keywords": [
     "Roblox",
