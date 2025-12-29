@@ -1,3 +1,17 @@
+# v8.22.6 (Mon Dec 29 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Check Looped after loaded [#613](https://github.com/Quenty/NevermoreEngine/pull/613) ([@alex-y-z](https://github.com/alex-y-z))
+- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Check Looped after loaded ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
