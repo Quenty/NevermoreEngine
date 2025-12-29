@@ -1,3 +1,16 @@
+# v10.22.4 (Mon Dec 29 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Update typing to be more accurate [#619](https://github.com/Quenty/NevermoreEngine/pull/619) ([@Quenty](https://github.com/Quenty))
+- fix: Update typing to be more accurate ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
