@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/animations@8.22.6`
+  - fix: Check Looped after loaded [#613](https://github.com/Quenty/NevermoreEngine/pull/613) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Dec 29 2025)
+
+#### 🐛 Bug Fix
+
 - `@quenty/animations@8.22.5`, `@quenty/observablecollection@12.24.4`, `@quenty/promise@10.12.1`, `@quenty/promisemaid@5.12.1`, `@quenty/rigbuilderutils@10.22.4`, `@quenty/rogue-properties@11.30.4`, `@quenty/signal@7.11.2`, `@quenty/templateprovider@11.23.4`
   - fix: Update typing to be more accurate [#619](https://github.com/Quenty/NevermoreEngine/pull/619) ([@Quenty](https://github.com/Quenty))
 
