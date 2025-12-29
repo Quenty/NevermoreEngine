@@ -210,7 +210,13 @@ function Promise.Wait<T...>(self: Promise<T...>): T...
 		coroutine.yield()
 
 		if self._rejected then
-			error(tostring(self._rejected[1]), 2)
+			local msg = self._rejected[1]
+			if msg == nil then
+				msg = "Promise rejected with no error message"
+			else
+				msg = tostring(msg)
+			end
+			error(msg, 2)
 		elseif self._fulfilled then
 			return table.unpack(self._fulfilled, 1, self._fulfilled.n)
 		else
