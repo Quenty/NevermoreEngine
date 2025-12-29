@@ -16,6 +16,7 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local PromiseMaidUtils = require("PromiseMaidUtils")
 local RbxAssetUtils = require("RbxAssetUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 local ValueObject = require("ValueObject")
 
 local AnimationSlotPlayer = setmetatable({}, BaseObject)
@@ -323,15 +324,17 @@ function AnimationSlotPlayer.Play(
 					end
 				end)
 
-				if not track.Looped then
-					-- This is a hack to ensure that animations stop at a set rate instead of roblox's weird default faded time
-					maid:GivePromise(AnimationPromiseUtils.promiseLoaded(track)):Then(function()
+				-- This is a hack to ensure that animations stop at a set rate instead of roblox's weird default faded time
+				maid:GivePromise(AnimationPromiseUtils.promiseLoaded(track)):Then(function()
+					maid:GiveTask(RxInstanceUtils.observePropertyBrio(track, "Looped", function(looped)
+						return not looped
+					end):Subscribe(function()
 						-- This is very very sad...
 						maid:GiveTask(task.delay(track.Length - track.TimePosition - 2 / 60, function()
 							track:Stop(fadeTime or self._defaultFadeTime.Value)
 						end))
-					end)
-				end
+					end))
+				end)
 
 				maid:GiveTask(function()
 					local stopFadeTime = fadeTime or self._defaultFadeTime.Value
