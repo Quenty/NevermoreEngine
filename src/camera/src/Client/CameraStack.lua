@@ -17,13 +17,15 @@ local CameraStack = setmetatable({}, BaseObject)
 CameraStack.ClassName = "CameraStack"
 CameraStack.__index = CameraStack
 
-export type CameraStack = typeof(setmetatable(
-	{} :: {
-		_stack: { CameraEffectUtils.CameraLike },
-		_disabledSet: { [string]: boolean },
-	},
-	{} :: typeof({ __index = CameraStack })
-)) & BaseObject.BaseObject
+export type CameraStack =
+	typeof(setmetatable(
+		{} :: {
+			_stack: { CameraEffectUtils.CameraLike },
+			_disabledSet: { [string]: boolean },
+		},
+		{} :: typeof({ __index = CameraStack })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new camera stack

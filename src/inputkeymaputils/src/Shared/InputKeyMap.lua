@@ -22,14 +22,16 @@ InputKeyMap.__index = InputKeyMap
 
 type InputType = InputTypeUtils.InputType
 
-export type InputKeyMap = typeof(setmetatable(
-	{} :: {
-		_inputModeType: InputModeType.InputModeType,
-		_defaultInputTypes: { InputTypeUtils.InputType },
-		_inputTypeList: ValueObject.ValueObject<{ InputTypeUtils.InputType }>,
-	},
-	{} :: typeof({ __index = InputKeyMap })
-)) & BaseObject.BaseObject
+export type InputKeyMap =
+	typeof(setmetatable(
+		{} :: {
+			_inputModeType: InputModeType.InputModeType,
+			_defaultInputTypes: { InputTypeUtils.InputType },
+			_inputTypeList: ValueObject.ValueObject<{ InputTypeUtils.InputType }>,
+		},
+		{} :: typeof({ __index = InputKeyMap })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new InputKeyMap. Generally this would be sent immediately to an

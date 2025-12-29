@@ -50,7 +50,7 @@ export type ObservableCountingMap<T> = typeof(setmetatable(
 			@prop CountChanged Signal<number>
 			@within ObservableCountingMap
 		]=]
-		TotalKeyCountChanged: Signal.Signal<number>,
+		TotalKeyCountChanged: Signal.Signal<(number, number, ...any)>,
 
 		_maid: Maid.Maid,
 		_map: { [T]: number },
@@ -65,7 +65,7 @@ export type ObservableCountingMap<T> = typeof(setmetatable(
 	@return ObservableCountingMap<T>
 ]=]
 function ObservableCountingMap.new<T>(): ObservableCountingMap<T>
-	local self: any = setmetatable({}, ObservableCountingMap)
+	local self: ObservableCountingMap<T> = setmetatable({} :: any, ObservableCountingMap)
 
 	self._maid = Maid.new()
 	self._map = {}
@@ -73,9 +73,9 @@ function ObservableCountingMap.new<T>(): ObservableCountingMap<T>
 	self._totalKeyCountValue = self._maid:Add(ValueObject.new(0, "number"))
 	self._keySubTable = self._maid:Add(ObservableSubscriptionTable.new())
 
-	self.KeyAdded = self._maid:Add(Signal.new())
-	self.KeyRemoved = self._maid:Add(Signal.new())
-	self.KeyChanged = self._maid:Add(Signal.new())
+	self.KeyAdded = self._maid:Add(Signal.new() :: any)
+	self.KeyRemoved = self._maid:Add(Signal.new() :: any)
+	self.KeyChanged = self._maid:Add(Signal.new() :: any)
 	self.TotalKeyCountChanged = self._totalKeyCountValue.Changed
 
 	return self
@@ -95,7 +95,7 @@ end
 
 	@return (T) -> ((T, nextIndex: any) -> ...any, T?)
 ]=]
-function ObservableCountingMap.__iter<T>(self: ObservableCountingMap<T>)
+function ObservableCountingMap.__iter<T>(self: ObservableCountingMap<T>): any
 	return pairs(self._map)
 end
 
@@ -105,7 +105,7 @@ end
 ]=]
 function ObservableCountingMap.ObserveKeysList<T>(self: ObservableCountingMap<T>): Observable.Observable<{ T }>
 	return self:_observeDerivedDataStructureFromKeys(function()
-		local list = table.create(self._totalKeyCountValue.Value)
+		local list: { T } = table.create(self._totalKeyCountValue.Value)
 
 		for key, _ in self._map do
 			table.insert(list, key)
@@ -121,7 +121,7 @@ end
 ]=]
 function ObservableCountingMap.ObserveKeysSet<T>(self: ObservableCountingMap<T>): Observable.Observable<Set.Set<T>>
 	return self:_observeDerivedDataStructureFromKeys(function()
-		local set = {}
+		local set: Set.Set<T> = {}
 
 		for key, _ in self._map do
 			set[key] = true
@@ -131,10 +131,10 @@ function ObservableCountingMap.ObserveKeysSet<T>(self: ObservableCountingMap<T>)
 	end)
 end
 
-function ObservableCountingMap._observeDerivedDataStructureFromKeys<T>(
+function ObservableCountingMap._observeDerivedDataStructureFromKeys<T, UDerived>(
 	self: ObservableCountingMap<T>,
-	gatherValues
-): Observable.Observable<any>
+	gatherValues: () -> UDerived
+): Observable.Observable<UDerived>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -154,7 +154,7 @@ function ObservableCountingMap._observeDerivedDataStructureFromKeys<T>(
 		end)
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[

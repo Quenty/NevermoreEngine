@@ -16,15 +16,17 @@ local SummedCamera = require("SummedCamera")
 local SmoothPositionCamera = {}
 SmoothPositionCamera.ClassName = "SmoothPositionCamera"
 
-export type SmoothPositionCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		Spring: Spring.Spring<Vector3>,
-		BaseCamera: CameraEffectUtils.CameraEffect,
-		Speed: number,
-	},
-	{} :: typeof({ __index = SmoothPositionCamera })
-)) & CameraEffectUtils.CameraEffect
+export type SmoothPositionCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			Spring: Spring.Spring<Vector3>,
+			BaseCamera: CameraEffectUtils.CameraEffect,
+			Speed: number,
+		},
+		{} :: typeof({ __index = SmoothPositionCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 function SmoothPositionCamera.new(baseCamera): SmoothPositionCamera
 	local self: SmoothPositionCamera = setmetatable({} :: any, SmoothPositionCamera)

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.20.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@13.20.3...@quenty/valuebaseutils@13.20.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/valuebaseutils
+
+
+
+
+
+## [13.20.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@13.20.2...@quenty/valuebaseutils@13.20.3) (2025-12-28)
+
+
+### Bug Fixes
+
+* Typecheck some more things ([41eaaa6](https://github.com/Quenty/NevermoreEngine/commit/41eaaa6d053c469f7548810da72d05dfbf997b26))
+
+
+
+
+
 ## [13.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@13.20.1...@quenty/valuebaseutils@13.20.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/valuebaseutils

@@ -19,20 +19,22 @@ local ColorPickerCursorPreview = setmetatable({}, BasicPane)
 ColorPickerCursorPreview.ClassName = "ColorPickerCursorPreview"
 ColorPickerCursorPreview.__index = ColorPickerCursorPreview
 
-export type ColorPickerCursorPreview = typeof(setmetatable(
-	{} :: {
-		Gui: Frame?,
-		_transparency: ValueObject.ValueObject<number>,
-		_backgroundColorHint: ValueObject.ValueObject<Color3>,
-		_colorValue: ValueObject.ValueObject<Color3>,
-		_heightAbs: ValueObject.ValueObject<number>,
-		_offsetAbs: ValueObject.ValueObject<number>,
-		_position: ValueObject.ValueObject<Vector2>,
+export type ColorPickerCursorPreview =
+	typeof(setmetatable(
+		{} :: {
+			Gui: Frame?,
+			_transparency: ValueObject.ValueObject<number>,
+			_backgroundColorHint: ValueObject.ValueObject<Color3>,
+			_colorValue: ValueObject.ValueObject<Color3>,
+			_heightAbs: ValueObject.ValueObject<number>,
+			_offsetAbs: ValueObject.ValueObject<number>,
+			_position: ValueObject.ValueObject<Vector2>,
 
-		PositionChanged: Signal.Signal<Vector2>,
-	},
-	{} :: typeof({ __index = ColorPickerCursorPreview })
-)) & BasicPane.BasicPane
+			PositionChanged: Signal.Signal<Vector2>,
+		},
+		{} :: typeof({ __index = ColorPickerCursorPreview })
+	))
+	& BasicPane.BasicPane
 
 function ColorPickerCursorPreview.new(): ColorPickerCursorPreview
 	local self: ColorPickerCursorPreview = setmetatable(BasicPane.new() :: any, ColorPickerCursorPreview)

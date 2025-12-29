@@ -44,7 +44,7 @@ end
 
 	@param rig Model
 ]=]
-function RigBuilderUtils.disableAnimateScript(rig: Model)
+function RigBuilderUtils.disableAnimateScript(rig: Model): ()
 	local animate = RigBuilderUtils.findAnimateScript(rig)
 	if animate then
 		(animate :: any).Enabled = false
@@ -360,14 +360,14 @@ function RigBuilderUtils.promiseR15PackageRig(packageAssetId: number): Promise.P
 
 	return AssetServiceUtils.promiseAssetIdsForPackage(packageAssetId)
 		:Then(function(assetIds)
-			local promises = {}
+			local promises: { Promise.Promise<Model> } = {}
 			for _, assetId in assetIds do
 				table.insert(promises, InsertServiceUtils.promiseAsset(assetId))
 			end
 			return PromiseUtils.all(promises)
 		end)
 		:Then(function(...)
-			local limbs = { ... }
+			local limbs: { Model } = { ... } :: any
 			local character, humanoid = RigBuilderUtils._createR15BaseRig()
 			local head = (character :: any).Head
 
@@ -375,20 +375,22 @@ function RigBuilderUtils.promiseR15PackageRig(packageAssetId: number): Promise.P
 			local headMesh = nil
 
 			for _, limb in limbs do
-				if limb:FindFirstChild("R15ArtistIntent") then
-					for _, x in limb.R15ArtistIntent:GetChildren() do
+				local r15ArtistIntent = limb:FindFirstChild("R15ArtistIntent")
+				local r15 = limb:FindFirstChild("R15")
+				if r15ArtistIntent then
+					for _, x in r15ArtistIntent:GetChildren() do
 						x.Parent = character
 					end
-				elseif limb:FindFirstChild("R15") then
-					for _, x in limb.R15:GetChildren() do
+				elseif r15 then
+					for _, x in r15:GetChildren() do
 						x.Parent = character
 					end
 				elseif limb:FindFirstChild("face") then
-					face = limb.face
+					face = limb:FindFirstChild("face")
 				elseif limb:FindFirstChild("Face") then
-					face = limb.Face
+					face = limb:FindFirstChild("Face")
 				elseif limb:FindFirstChild("Mesh") then
-					headMesh = limb.Mesh
+					headMesh = limb:FindFirstChild("Mesh")
 				end
 			end
 
@@ -416,7 +418,7 @@ end
 	Creates a default R15 rig
 	@return Promise<Model>
 ]=]
-function RigBuilderUtils.promiseR15Rig()
+function RigBuilderUtils.promiseR15Rig(): Promise.Promise<Model>
 	return InsertServiceUtils.promiseAsset(1664543044):Then(function(inserted)
 		local character = inserted:GetChildren()[1]
 		if not character then

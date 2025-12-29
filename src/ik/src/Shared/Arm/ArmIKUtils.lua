@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class ArmIKUtils
 ]=]
@@ -10,7 +11,9 @@ local RxR15Utils = require("RxR15Utils")
 
 local ArmIKUtils = {}
 
-function ArmIKUtils.ensureMotorAnimated(character: Model, armName)
+export type ArmName = "Left" | "Right"
+
+function ArmIKUtils.ensureMotorAnimated(character: Model, armName: ArmName): Maid.Maid
 	local topMaid = Maid.new()
 
 	local function disable(brio)

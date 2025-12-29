@@ -1,6 +1,6 @@
 {
   "name": "@quenty/undostack",
-  "version": "7.21.2",
+  "version": "7.21.4",
   "description": "Generalized undo stack for Roblox",
   "keywords": [
     "Roblox",

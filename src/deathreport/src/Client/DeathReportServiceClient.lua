@@ -56,7 +56,7 @@ end
 	@param player Player
 	@return Observable<DeathReport>
 ]=]
-function DeathReportServiceClient:ObservePlayerKillerReports(player)
+function DeathReportServiceClient:ObservePlayerKillerReports(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._reportProcessor:ObservePlayerKillerReports(player)
@@ -68,7 +68,7 @@ end
 	@param player Player
 	@return Observable<DeathReport>
 ]=]
-function DeathReportServiceClient:ObservePlayerDeathReports(player)
+function DeathReportServiceClient:ObservePlayerDeathReports(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._reportProcessor:ObservePlayerDeathReports(player)
@@ -80,7 +80,7 @@ end
 	@param humanoid Humanoid
 	@return Observable<DeathReport>
 ]=]
-function DeathReportServiceClient:ObserveHumanoidKillerReports(humanoid)
+function DeathReportServiceClient:ObserveHumanoidKillerReports(humanoid: Humanoid)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._reportProcessor:ObserveHumanoidKillerReports(humanoid)
@@ -92,7 +92,7 @@ end
 	@param humanoid Humanoid
 	@return Observable<DeathReport>
 ]=]
-function DeathReportServiceClient:ObserveHumanoidDeathReports(humanoid)
+function DeathReportServiceClient:ObserveHumanoidDeathReports(humanoid: Humanoid)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._reportProcessor:ObserveHumanoidDeathReports(humanoid)

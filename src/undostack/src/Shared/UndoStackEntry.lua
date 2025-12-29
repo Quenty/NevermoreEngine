@@ -19,14 +19,16 @@ UndoStackEntry.__index = UndoStackEntry
 export type ExecuteUndo = (Maid.Maid) -> Promise.Promise<()> | any
 export type ExecuteRedo = (Maid.Maid) -> Promise.Promise<()> | any
 
-export type UndoStackEntry = typeof(setmetatable(
-	{} :: {
-		Destroying: Signal.Signal<()>,
-		_promiseUndo: ExecuteUndo?,
-		_promiseRedo: ExecuteRedo?,
-	},
-	{} :: typeof({ __index = UndoStackEntry })
-)) & BaseObject.BaseObject
+export type UndoStackEntry =
+	typeof(setmetatable(
+		{} :: {
+			Destroying: Signal.Signal<()>,
+			_promiseUndo: ExecuteUndo?,
+			_promiseRedo: ExecuteRedo?,
+		},
+		{} :: typeof({ __index = UndoStackEntry })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new undo restack entry. See [UndoStack] for usage.

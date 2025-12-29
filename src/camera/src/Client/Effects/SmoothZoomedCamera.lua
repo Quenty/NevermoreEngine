@@ -20,22 +20,24 @@ SmoothZoomedCamera._maxZoom = 100
 SmoothZoomedCamera._minZoom = 0.5
 SmoothZoomedCamera.BounceAtEnd = true
 
-export type SmoothZoomedCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		Zoom: number,
-		Speed: number,
-		Range: number,
-		MaxZoom: number,
-		MinZoom: number,
-		Target: number,
-		Value: number,
-		Velocity: number,
-		TargetZoom: number,
-		Spring: Spring.Spring<number>,
-	},
-	{} :: typeof({ __index = SmoothZoomedCamera })
-)) & CameraEffectUtils.CameraEffect
+export type SmoothZoomedCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			Zoom: number,
+			Speed: number,
+			Range: number,
+			MaxZoom: number,
+			MinZoom: number,
+			Target: number,
+			Value: number,
+			Velocity: number,
+			TargetZoom: number,
+			Spring: Spring.Spring<number>,
+		},
+		{} :: typeof({ __index = SmoothZoomedCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 function SmoothZoomedCamera.new(): SmoothZoomedCamera
 	local self: SmoothZoomedCamera = setmetatable({} :: any, SmoothZoomedCamera)
