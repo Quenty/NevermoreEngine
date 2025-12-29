@@ -1,21 +1,18 @@
-# v8.22.6 (Mon Dec 29 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Check Looped after loaded [#613](https://github.com/Quenty/NevermoreEngine/pull/613) ([@alex-y-z](https://github.com/alex-y-z))
-- Merge branch 'main' into users/alex-y-z/misc-fixes ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Check Looped after loaded ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.22.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.5...@quenty/animations@8.22.6) (2025-12-29)
+
+
+### Bug Fixes
+
+* Check Looped after loaded ([99eacfd](https://github.com/Quenty/NevermoreEngine/commit/99eacfd66c3484684fb82fb4655c76afb85c5f81))
+
+
+
+
 
 ## [8.22.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.4...@quenty/animations@8.22.5) (2025-12-29)
 
