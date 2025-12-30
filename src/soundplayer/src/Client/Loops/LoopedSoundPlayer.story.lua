@@ -7,9 +7,9 @@ local require =
 
 local Blend = require("Blend")
 local LoopedSoundPlayer = require("LoopedSoundPlayer")
-local SoundLoopScheduleUtils = require("SoundLoopScheduleUtils")
 local Maid = require("Maid")
 local RandomUtils = require("RandomUtils")
+local SoundLoopScheduleUtils = require("SoundLoopScheduleUtils")
 
 return function(target)
 	local maid = Maid.new()
