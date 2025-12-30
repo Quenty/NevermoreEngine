@@ -38,6 +38,7 @@
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table"
   },

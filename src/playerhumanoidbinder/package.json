@@ -29,6 +29,7 @@
     "@quenty/humanoidtracker": "file:../humanoidtracker",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

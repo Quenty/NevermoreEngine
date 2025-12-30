@@ -26,9 +26,12 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/basicpane": "file:../basicpane",
     "@quenty/cancellabledelay": "file:../cancellabledelay",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
+    "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

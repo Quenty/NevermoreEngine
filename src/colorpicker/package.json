@@ -38,6 +38,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
+    "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   }
 }

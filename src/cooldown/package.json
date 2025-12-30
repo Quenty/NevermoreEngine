@@ -28,6 +28,7 @@
     "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
+    "@quenty/brio": "file:../brio",
     "@quenty/ducktype": "file:../ducktype",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",

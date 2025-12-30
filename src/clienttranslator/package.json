@@ -33,6 +33,7 @@
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/pseudolocalize": "file:../pseudolocalize",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"

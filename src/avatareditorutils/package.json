@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/aggregator": "file:../aggregator",
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/loader": "file:../loader",

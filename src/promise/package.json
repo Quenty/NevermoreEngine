@@ -28,7 +28,8 @@
     "@quenty/deferred": "file:../deferred",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math"
+    "@quenty/math": "file:../math",
+    "@quenty/signal": "file:../signal"
   },
   "publishConfig": {
     "access": "public"
