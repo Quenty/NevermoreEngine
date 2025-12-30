@@ -1,6 +1,6 @@
 {
   "name": "@quenty/animationprovider",
-  "version": "11.23.3",
+  "version": "11.23.5",
   "description": "Provides animations for anything tagged with \"AnimationContainer\" and from a folder named \"Animations\" in ReplicatedStorage.",
   "keywords": [
     "Roblox",

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.21.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.5...@quenty/flipbook@9.21.6) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/flipbook
+
+
+
+
+
+## [9.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.4...@quenty/flipbook@9.21.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/flipbook
+
+
+
+
+
 ## [9.21.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.3...@quenty/flipbook@9.21.4) (2025-12-28)
 
 **Note:** Version bump only for package @quenty/flipbook

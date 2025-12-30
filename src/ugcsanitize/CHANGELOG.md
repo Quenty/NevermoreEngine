@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.4...@quenty/ugcsanitize@1.7.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.7.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.3...@quenty/ugcsanitize@1.7.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
 ## [1.7.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.2...@quenty/ugcsanitize@1.7.3) (2025-12-28)
 
 **Note:** Version bump only for package @quenty/ugcsanitize

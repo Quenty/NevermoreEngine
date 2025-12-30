@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.23.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.23.4...@quenty/templateprovider@11.23.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+
+
+
+
+## [11.23.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.23.3...@quenty/templateprovider@11.23.4) (2025-12-29)
+
+
+### Bug Fixes
+
+* Update typing to be more accurate ([e4c3d05](https://github.com/Quenty/NevermoreEngine/commit/e4c3d05a0aa9f45a37cbfa372c5e0d8a748c9323))
+
+
+
+
+
 ## [11.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.23.2...@quenty/templateprovider@11.23.3) (2025-12-28)
 
 **Note:** Version bump only for package @quenty/templateprovider
