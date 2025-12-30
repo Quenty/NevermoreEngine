@@ -7,7 +7,7 @@ local require =
 
 local Blend = require("Blend")
 local LoopedSoundPlayer = require("LoopedSoundPlayer")
-local LoopedSoundScheduleUtils = require("LoopedSoundScheduleUtils")
+local SoundLoopScheduleUtils = require("SoundLoopScheduleUtils")
 local Maid = require("Maid")
 local RandomUtils = require("RandomUtils")
 
@@ -104,7 +104,7 @@ return function(target)
 							SoundId = "rbxassetid://6052547865",
 							Volume = 3,
 						},
-						LoopedSoundScheduleUtils.schedule({
+						SoundLoopScheduleUtils.schedule({
 							loopDelay = NumberRange.new(0.25, 1),
 						})
 					)
