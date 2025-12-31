@@ -1,21 +1,18 @@
-# v7.24.3 (Wed Dec 31 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
-- style: Fix styling ([@Quenty](https://github.com/Quenty))
-- fix: Fix test story ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.24.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.2...@quenty/soundplayer@7.24.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix test story ([90b3b35](https://github.com/Quenty/NevermoreEngine/commit/90b3b3561f1b95fd3d7ff13945455b3df39fadbd))
+
+
+
+
 
 ## [7.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.1...@quenty/soundplayer@7.24.2) (2025-12-29)
 

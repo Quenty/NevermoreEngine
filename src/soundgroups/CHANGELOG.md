@@ -1,21 +1,19 @@
-# v1.25.7 (Wed Dec 31 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
-- fix: Fix directory declaration in soundgroups ([@Quenty](https://github.com/Quenty))
-- fix: Fix dependencies missing in packages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.25.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.6...@quenty/soundgroup@1.25.7) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+* Fix directory declaration in soundgroups ([862839d](https://github.com/Quenty/NevermoreEngine/commit/862839d5fb9026a74e81123c813081c5c6496789))
+
+
+
+
 
 ## [1.25.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.5...@quenty/soundgroup@1.25.6) (2025-12-29)
 

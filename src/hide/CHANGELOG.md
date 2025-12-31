@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.27.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.5...@quenty/hide@11.27.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
 ## [11.27.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.4...@quenty/hide@11.27.5) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/hide

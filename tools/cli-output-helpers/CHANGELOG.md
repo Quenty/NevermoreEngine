@@ -1,20 +1,18 @@
-# v1.2.3 (Wed Dec 31 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
-- fix: Add warning output to output helper ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.2.3](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.2...@quenty/cli-output-helpers@1.2.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Add warning output to output helper ([573ce4e](https://github.com/Quenty/Nevermore/commit/573ce4ed42831d552cfeb4dde1703d4aeda54967))
+
+
+
+
 
 ## [1.2.2](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.0...@quenty/cli-output-helpers@1.2.2) (2025-04-07)
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/tie",
-  "version": "10.26.5",
+  "version": "10.26.6",
   "description": "Tie allows interfaces to be defined between Lua OOP and Roblox objects.",
   "keywords": [
     "Roblox",

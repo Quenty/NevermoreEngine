@@ -1,20 +1,15 @@
-# v4.9.4 (Wed Dec 31 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
-- ci: Upgrade rojo to "quenty/rojo@7.7.0-rc.1-quenty.3" ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.9.4](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.3...@quenty/nevermore-cli@4.9.4) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
 
 ## [4.9.3](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.2...@quenty/nevermore-cli@4.9.3) (2025-12-28)
 

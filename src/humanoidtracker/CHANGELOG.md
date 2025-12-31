@@ -1,20 +1,18 @@
-# v13.21.6 (Wed Dec 31 2025)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
-- fix: Fix dependencies missing in packages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.21.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidtracker@13.21.5...@quenty/humanoidtracker@13.21.6) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
 
 ## [13.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidtracker@13.21.4...@quenty/humanoidtracker@13.21.5) (2025-12-29)
 
