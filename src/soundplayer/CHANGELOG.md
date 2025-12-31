@@ -1,3 +1,17 @@
+# v7.24.3 (Wed Dec 31 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
+- style: Fix styling ([@Quenty](https://github.com/Quenty))
+- fix: Fix test story ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# v4.9.4 (Wed Dec 31 2025)
+
+#### 🐛 Bug Fix
+
+- fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
+- ci: Upgrade rojo to "quenty/rojo@7.7.0-rc.1-quenty.3" ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
