@@ -29,6 +29,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/randomutils": "file:../randomutils",
+    "@quenty/raycaster": "file:../raycaster",
     "@quenty/servicebag": "file:../servicebag",
     "@quentystudios/t": "^3.0.0"
   },

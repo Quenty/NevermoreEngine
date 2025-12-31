@@ -38,6 +38,7 @@
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/rx": "file:../rx",
     "@quenty/selectionutils": "file:../selectionutils",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
     "@quenty/table": "file:../table",

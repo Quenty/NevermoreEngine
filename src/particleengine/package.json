@@ -28,6 +28,7 @@
   "dependencies": {
     "@quenty/loader": "file:../loader",
     "@quenty/remoting": "file:../remoting",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/table": "file:../table"
   },
   "publishConfig": {

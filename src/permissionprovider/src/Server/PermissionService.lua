@@ -6,19 +6,6 @@
 	Be sure to initialize the [PermissionServiceClient] on the client.
 	:::
 
-	```lua
-	local require = require(script.Parent.loader).load(script)
-
-	local PermissionProvider = require("PermissionProvider")
-	local PermissionProviderUtils = require("PermissionProviderUtils")
-
-	return PermissionProvider.new(PermissionProviderUtils.createGroupRankConfig({
-	  groupId = 8668163;
-	  minAdminRequiredRank = 250;
-	  minCreatorRequiredRank = 254;
-	}))
-	```
-
 	@server
 	@class PermissionService
 ]=]

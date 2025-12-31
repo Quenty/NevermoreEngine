@@ -3,6 +3,6 @@
 [tools]
 luau-lsp = "Quenty/luau-lsp@1.58.0-quenty.1"
 moonwave-extractor = "UpliftGames/moonwave@1.3.0"
-rojo = "quenty/rojo@7.5.0-quenty-npm-canary.3"
-selene = "Kampfkarren/selene@0.28.0"
+rojo = "quenty/rojo@7.7.0-rc.1-quenty.3"
+selene = "Kampfkarren/selene@0.29.0"
 stylua = "johnnymorganz/stylua@2.1.0"

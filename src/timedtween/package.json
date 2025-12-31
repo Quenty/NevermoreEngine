@@ -33,6 +33,7 @@
     "@quenty/promise": "file:../promise",
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
     "@quenty/steputils": "file:../steputils",
     "@quenty/valueobject": "file:../valueobject"
   },

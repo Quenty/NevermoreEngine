@@ -37,6 +37,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
     "@quenty/rxsignal": "file:../rxsignal",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/statestack": "file:../statestack",
     "@quenty/string": "file:../string",
     "@quenty/symbol": "file:../symbol",
