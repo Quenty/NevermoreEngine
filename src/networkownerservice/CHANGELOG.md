@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@5.3.0...@quenty/networkownerservice@5.3.1) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
 # [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@5.2.3...@quenty/networkownerservice@5.3.0) (2025-05-10)
 
 

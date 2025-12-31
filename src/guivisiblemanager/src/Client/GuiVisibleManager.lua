@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Help manage the visibility of Guis while only constructing the Gui while visible.
 
@@ -15,6 +16,7 @@ local BaseObject = require("BaseObject")
 local BasicPane = require("BasicPane")
 local Maid = require("Maid")
 local Promise = require("Promise")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 local cancellableDelay = require("cancellableDelay")
 
@@ -24,15 +26,20 @@ GuiVisibleManager.__index = GuiVisibleManager
 
 export type ConstructPane = (maid: Maid.Maid) -> Promise.Promise<BasicPane.BasicPane>
 
-export type GuiVisibleManager = typeof(setmetatable(
-	{} :: {
-		_paneVisible: ValueObject.ValueObject<boolean>,
-		_promiseNewPane: ConstructPane,
-		_maxHideTime: number,
-		_nextDoNotAnimate: boolean?,
-	},
-	{} :: typeof({ __index = GuiVisibleManager })
-)) & BaseObject.BaseObject
+export type GuiVisibleManager =
+	typeof(setmetatable(
+		{} :: {
+			_paneVisible: ValueObject.ValueObject<boolean>,
+			_promiseNewPane: ConstructPane,
+			_maxHideTime: number,
+			_nextDoNotAnimate: boolean?,
+			_showHandles: { [string]: boolean },
+			PaneVisibleChanged: Signal.Signal<boolean>,
+			_boundBoolValue: BoolValue?,
+		},
+		{} :: typeof({ __index = GuiVisibleManager })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new GuiVisibleManager.
@@ -57,7 +64,7 @@ function GuiVisibleManager.new(promiseNewPane: ConstructPane, maxHideTime: numbe
 		self:_onPaneVisibleChanged()
 	end))
 
-	self.PaneVisibleChanged = self._paneVisible.Changed
+	self.PaneVisibleChanged = self._paneVisible.Changed :: any
 
 	return self
 end
@@ -82,6 +89,8 @@ function GuiVisibleManager.BindToBoolValue(self: GuiVisibleManager, boolValue: B
 	assert(not self._boundBoolValue, "Already bound")
 
 	self._boundBoolValue = boolValue
+
+	assert(self._boundBoolValue, "Typechecking fix")
 
 	self._maid:GiveTask(self._boundBoolValue.Changed:Connect(function()
 		if self._boundBoolValue.Value then

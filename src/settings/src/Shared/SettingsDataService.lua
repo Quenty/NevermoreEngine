@@ -134,7 +134,7 @@ end
 	@param player Player
 	@return Observable<PlayerSettingsBase>
 ]=]
-function SettingsDataService:ObservePlayerSettings(player)
+function SettingsDataService:ObservePlayerSettings(player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self:_getPlayerSettingsMapForPlayer(player):ObserveAtKey(player, self._tieRealmService:GetTieRealm())

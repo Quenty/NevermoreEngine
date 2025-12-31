@@ -276,8 +276,22 @@ function ValueObject.SetValue<T>(self: ValueObject<T>, value: T, ...)
 
 	return function()
 		if rawget(self :: any, "_value") == value then
-			ValueObject._applyValue(self, rawget(self :: any, "_default"))
+			ValueObject._applyValue(self, rawget(self :: any, "_default") :: any)
 		end
+	end
+end
+
+--[=[
+	Gets the value and then the additional args from the last event
+]=]
+function ValueObject.GetValue<T>(self: ValueObject<T>): (T, ...any)
+	local value: T = rawget(self :: any, "_value") :: any
+	local args = rawget(self :: any, "_lastEventContext")
+
+	if args then
+		return value, table.unpack(args, 1, args.n)
+	else
+		return value
 	end
 end
 

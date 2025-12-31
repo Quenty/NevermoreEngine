@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.30.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.30.5...@quenty/softshutdown@9.30.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+## [9.30.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.30.4...@quenty/softshutdown@9.30.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+## [9.30.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.30.3...@quenty/softshutdown@9.30.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+## [9.30.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.30.2...@quenty/softshutdown@9.30.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+## [9.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.30.1...@quenty/softshutdown@9.30.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+## [9.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.30.0...@quenty/softshutdown@9.30.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+# [9.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.29.0...@quenty/softshutdown@9.30.0) (2025-11-07)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+# [9.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.28.0...@quenty/softshutdown@9.29.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
 # [9.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.27.1...@quenty/softshutdown@9.28.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/softshutdown

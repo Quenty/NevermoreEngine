@@ -3,6 +3,93 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.26.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.5...@quenty/tie@10.26.6) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [10.26.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.4...@quenty/tie@10.26.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+## [10.26.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.3...@quenty/tie@10.26.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+## [10.26.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.2...@quenty/tie@10.26.3) (2025-12-28)
+
+
+### Bug Fixes
+
+* Typecheck some more things ([41eaaa6](https://github.com/Quenty/NevermoreEngine/commit/41eaaa6d053c469f7548810da72d05dfbf997b26))
+
+
+
+
+
+## [10.26.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.1...@quenty/tie@10.26.2) (2025-12-13)
+
+
+### Bug Fixes
+
+* Small patches to nevermore libraries ([#614](https://github.com/Quenty/NevermoreEngine/issues/614)) ([6eeb33b](https://github.com/Quenty/NevermoreEngine/commit/6eeb33b9d215d3d753a433e4c612f391bcc0d286))
+
+
+
+
+
+## [10.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.26.0...@quenty/tie@10.26.1) (2025-11-22)
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.25.1...@quenty/tie@10.26.0) (2025-11-17)
+
+
+### Features
+
+* Add tie interface implementations for signals ([#606](https://github.com/Quenty/NevermoreEngine/issues/606)) ([91f07f2](https://github.com/Quenty/NevermoreEngine/commit/91f07f2a03d76445969b25dff246fd8b00396ca1))
+
+
+
+
+
+## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.25.0...@quenty/tie@10.25.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.24.0...@quenty/tie@10.25.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
 # [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.23.0...@quenty/tie@10.24.0) (2025-10-03)
 
 **Note:** Version bump only for package @quenty/tie

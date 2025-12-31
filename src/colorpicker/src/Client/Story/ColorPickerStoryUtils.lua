@@ -13,7 +13,7 @@ local ColorPickerStoryUtils = {}
 function ColorPickerStoryUtils.createPicker(maid, valueSync, labelText, currentVisible)
 	local picker = maid:Add(HSVColorPicker.new())
 	picker.Gui.AnchorPoint = Vector2.new(0.5, 1)
-	picker.Gui.Position = UDim2.new(0.5, 0, 1, 0)
+	picker.Gui.Position = UDim2.fromScale(0.5, 1)
 	picker.Gui.Size = UDim2.new(0, 150, 1, -30)
 	picker.Gui.ZIndex = 2
 
@@ -41,9 +41,9 @@ function ColorPickerStoryUtils.createPicker(maid, valueSync, labelText, currentV
 		Size = Blend.Spring(
 			Blend.Computed(visible, function(isVisible)
 				if isVisible then
-					return UDim2.new(0, 170, 0, 190)
+					return UDim2.fromOffset(170, 190)
 				else
-					return UDim2.new(0, 170, 0, 50)
+					return UDim2.fromOffset(170, 50)
 				end
 			end),
 			40
@@ -57,7 +57,7 @@ function ColorPickerStoryUtils.createPicker(maid, valueSync, labelText, currentV
 		Blend.New "TextLabel" {
 			BackgroundTransparency = 1,
 			Text = labelText,
-			Position = UDim2.new(0, 35, 0, 5),
+			Position = UDim2.fromOffset(35, 5),
 			Size = UDim2.new(1, -40, 0, 20),
 			Font = Enum.Font.FredokaOne,
 			TextXAlignment = Enum.TextXAlignment.Left,
@@ -68,8 +68,8 @@ function ColorPickerStoryUtils.createPicker(maid, valueSync, labelText, currentV
 
 		Blend.New "Frame" {
 			BackgroundColor3 = valueSync,
-			Size = UDim2.new(0, 20, 0, 20),
-			Position = UDim2.new(0, 5, 0, 5),
+			Size = UDim2.fromOffset(20, 20),
+			Position = UDim2.fromOffset(5, 5),
 			[Blend.Children] = {
 				Blend.New "UICorner" {
 					CornerRadius = UDim.new(0, 10),
@@ -101,7 +101,7 @@ function ColorPickerStoryUtils.create(maid, buildPickers)
 
 	local function pickerGroup(pickers)
 		return Blend.New "Frame" {
-			Size = UDim2.new(1, 0, 0, 0),
+			Size = UDim2.fromScale(1, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
 			BackgroundTransparency = 1,
@@ -133,7 +133,7 @@ function ColorPickerStoryUtils.create(maid, buildPickers)
 	end
 
 	return Blend.New "Frame" {
-		Size = UDim2.new(0, 0, 0, 0),
+		Size = UDim2.fromScale(0, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
 		BackgroundTransparency = 1,

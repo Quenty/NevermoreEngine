@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.23.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.23.6...@quenty/inputmode@13.23.7) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+## [13.23.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.23.5...@quenty/inputmode@13.23.6) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+## [13.23.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.23.4...@quenty/inputmode@13.23.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+## [13.23.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.23.3...@quenty/inputmode@13.23.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+## [13.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.23.2...@quenty/inputmode@13.23.3) (2025-12-11)
+
+
+### Bug Fixes
+
+* Fix dependencies and linting within Roblox's typechecking ([#611](https://github.com/Quenty/NevermoreEngine/issues/611)) ([92011ea](https://github.com/Quenty/NevermoreEngine/commit/92011eac0f2ff31c1434e3642bd63f49025ee982))
+
+
+
+
+
+## [13.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.23.1...@quenty/inputmode@13.23.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+## [13.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.23.0...@quenty/inputmode@13.23.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+# [13.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.22.0...@quenty/inputmode@13.23.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
 # [13.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.21.0...@quenty/inputmode@13.22.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/inputmode

@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.12.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.12.4...@quenty/pathfindingutils@10.12.5) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+## [10.12.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.12.3...@quenty/pathfindingutils@10.12.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+## [10.12.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.12.2...@quenty/pathfindingutils@10.12.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+## [10.12.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.12.1...@quenty/pathfindingutils@10.12.2) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.12.0...@quenty/pathfindingutils@10.12.1) (2025-10-07)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
 # [10.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.11.0...@quenty/pathfindingutils@10.12.0) (2025-08-29)
 
 **Note:** Version bump only for package @quenty/pathfindingutils

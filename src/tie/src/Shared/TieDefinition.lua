@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Constructs a new interface declaration which allows for interface usage
 	between both Roblox API users and OOP users, as well as without accessing a
@@ -256,6 +257,10 @@ function TieDefinition:Promise(adornee: Instance, tieRealm: TieRealm?)
 			return value ~= nil
 		end),
 	}))
+end
+
+function TieDefinition:Wait(adornee: Instance, tieRealm: TieRealm?)
+	return self:Promise(adornee, tieRealm):Wait()
 end
 
 --[=[

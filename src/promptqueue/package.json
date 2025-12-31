@@ -1,6 +1,6 @@
 {
   "name": "@quenty/promptqueue",
-  "version": "1.21.0",
+  "version": "1.22.6",
   "description": "Queue system for prompts and other UI",
   "keywords": [
     "Roblox",
@@ -28,8 +28,10 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise",
+    "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
-    "@quenty/transitionmodel": "file:../transitionmodel"
+    "@quenty/transitionmodel": "file:../transitionmodel",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

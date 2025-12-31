@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.7.3...@quenty/aggregator@1.7.4) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+
+
+
+
+## [1.7.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.7.2...@quenty/aggregator@1.7.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+
+
+
+
+## [1.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.7.1...@quenty/aggregator@1.7.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+
+
+
+
+## [1.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.7.0...@quenty/aggregator@1.7.1) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+
+
+
+
 # [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.6.0...@quenty/aggregator@1.7.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/aggregator

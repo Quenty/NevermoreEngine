@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.33.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.33.6...@quenty/gameconfig@12.33.7) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+## [12.33.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.33.5...@quenty/gameconfig@12.33.6) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+## [12.33.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.33.4...@quenty/gameconfig@12.33.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+## [12.33.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.33.3...@quenty/gameconfig@12.33.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+## [12.33.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.33.2...@quenty/gameconfig@12.33.3) (2025-12-11)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+## [12.33.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.33.1...@quenty/gameconfig@12.33.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+## [12.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.33.0...@quenty/gameconfig@12.33.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [12.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.32.0...@quenty/gameconfig@12.33.0) (2025-11-07)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [12.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.31.0...@quenty/gameconfig@12.32.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
 # [12.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.30.0...@quenty/gameconfig@12.31.0) (2025-10-03)
 
 **Note:** Version bump only for package @quenty/gameconfig

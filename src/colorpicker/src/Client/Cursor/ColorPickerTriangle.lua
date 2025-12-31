@@ -16,16 +16,18 @@ local ColorPickerTriangle = setmetatable({}, BaseObject)
 ColorPickerTriangle.ClassName = "ColorPickerTriangle"
 ColorPickerTriangle.__index = ColorPickerTriangle
 
-export type ColorPickerTriangle = typeof(setmetatable(
-	{} :: {
-		Gui: Frame?,
-		_transparency: ValueObject.ValueObject<number>,
-		_backgroundColorHint: ValueObject.ValueObject<Color3>,
-		_color: ValueObject.ValueObject<Color3>,
-		_sizeValue: ValueObject.ValueObject<Vector2>,
-	},
-	{} :: typeof({ __index = ColorPickerTriangle })
-)) & BaseObject.BaseObject
+export type ColorPickerTriangle =
+	typeof(setmetatable(
+		{} :: {
+			Gui: Frame?,
+			_transparency: ValueObject.ValueObject<number>,
+			_backgroundColorHint: ValueObject.ValueObject<Color3>,
+			_color: ValueObject.ValueObject<Color3>,
+			_sizeValue: ValueObject.ValueObject<Vector2>,
+		},
+		{} :: typeof({ __index = ColorPickerTriangle })
+	))
+	& BaseObject.BaseObject
 
 function ColorPickerTriangle.new(): ColorPickerTriangle
 	local self: ColorPickerTriangle = setmetatable(BaseObject.new() :: any, ColorPickerTriangle)
@@ -65,22 +67,22 @@ function ColorPickerTriangle.SetTransparency(self: ColorPickerTriangle, transpar
 end
 
 function ColorPickerTriangle._render(self: ColorPickerTriangle)
-	return Blend.New "Frame" {
+	return Blend.New("Frame")({
 		Name = "ColorPickerTriangle",
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 
-		Blend.New "ImageLabel" {
+		Blend.New("ImageLabel")({
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0),
+			Size = UDim2.fromScale(1, 1),
 			ImageColor3 = Blend.Computed(self._color, self._backgroundColorHint, function(color, backingColor)
 				return ColorPickerUtils.getOutlineWithContrast(color, backingColor)
 			end),
 			ImageTransparency = self._transparency,
 			Image = "rbxassetid://9291514809",
-		},
+		}),
 
-		Blend.New "UIAspectRatioConstraint" {
+		Blend.New("UIAspectRatioConstraint")({
 			AspectRatio = Blend.Computed(self._sizeValue, function(size)
 				if size.x <= 0 or size.y <= 0 then
 					return 1
@@ -88,8 +90,8 @@ function ColorPickerTriangle._render(self: ColorPickerTriangle)
 					return size.x / size.y
 				end
 			end),
-		},
-	}
+		}),
+	})
 end
 
 return ColorPickerTriangle

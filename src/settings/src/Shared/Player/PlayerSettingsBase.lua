@@ -19,13 +19,15 @@ local PlayerSettingsBase = setmetatable({}, BaseObject)
 PlayerSettingsBase.ClassName = "PlayerSettingsBase"
 PlayerSettingsBase.__index = PlayerSettingsBase
 
-export type PlayerSettingsBase = typeof(setmetatable(
-	{} :: {
-		_obj: Folder,
-		_serviceBag: ServiceBag.ServiceBag,
-	},
-	{} :: typeof({ __index = PlayerSettingsBase })
-)) & BaseObject.BaseObject
+export type PlayerSettingsBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Folder,
+			_serviceBag: ServiceBag.ServiceBag,
+		},
+		{} :: typeof({ __index = PlayerSettingsBase })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Base class for player settings

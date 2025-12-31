@@ -1,6 +1,6 @@
 {
   "name": "@quenty/hintscoringutils",
-  "version": "14.25.0",
+  "version": "14.26.7",
   "description": "Utility functions that let you score a proximity prompt (i.e. a Hint) based upon its relation to a character in 3D space.",
   "keywords": [
     "Roblox",
@@ -33,6 +33,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
+    "@quenty/raycaster": "file:../raycaster",
     "@quenty/region3utils": "file:../region3utils",
     "@quenty/vector3utils": "file:../vector3utils"
   },

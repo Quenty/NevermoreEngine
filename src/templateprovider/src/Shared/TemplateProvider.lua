@@ -5,7 +5,7 @@
 	Additionally, you can provide template overrides as the last added template will always be used.
 
 	```lua
-	-- shared/CarTemplates.lua
+	-- shared/MyCustomTemplateProvider.lua
 
 	return TemplateProvider.new(script.Name, script) -- Load locally
 	```
@@ -21,7 +21,7 @@
 	```lua
 	-- Server
 	local serviceBag = ServiceBag.new()
-	local templates = serviceBag:GetService(require("CarTemplates"))
+	local templates = serviceBag:GetService(require("MyCustomTemplateProvider"))
 	serviceBag:Init()
 	serviceBag:Start()
 	```
@@ -29,7 +29,7 @@
 	```lua
 	-- Client
 	local serviceBag = ServiceBag.new()
-	local templates = serviceBag:GetService(require("CarTemplates"))
+	local templates = serviceBag:GetService(require("MyCustomTemplateProvider"))
 	serviceBag:Init()
 	serviceBag:Start()
 
@@ -84,7 +84,7 @@ export type TemplateProvider = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_templateMapList: any, -- ObservableMapList.ObservableMapList<Instance>,
 		_unreplicatedTemplateMapList: any, -- ObservableMapList.ObservableMapList<Instance>,
-		_containerRootCountingMap: ObservableCountingMap.ObservableCountingMap<Instance>,
+		_containerRootCountingMap: any, -- ObservableCountingMap.ObservableCountingMap<Instance>,
 		_remoting: Remoting.Remoting,
 		_tombstoneLookup: { [string]: Instance },
 		_pendingTemplatePromises: { [string]: Promise.Promise<Instance> },
@@ -136,7 +136,7 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function TemplateProvider.Init(self: TemplateProvider, serviceBag: ServiceBag.ServiceBag)
+function TemplateProvider.Init(self: TemplateProvider, serviceBag: ServiceBag.ServiceBag): ()
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -153,7 +153,7 @@ function TemplateProvider.Init(self: TemplateProvider, serviceBag: ServiceBag.Se
 	self:_setupTemplateCache()
 end
 
-function TemplateProvider._setupTemplateCache(self: TemplateProvider)
+function TemplateProvider._setupTemplateCache(self: TemplateProvider): ()
 	if self._replicationMode == TemplateReplicationModes.SERVER then
 		self._tombstoneLookup = {}
 		self._remoting = self._maid:Add(Remoting.Server.new(ReplicatedStorage, self.ServiceName .. "TemplateProvider"))
@@ -208,7 +208,7 @@ function TemplateProvider._setupTemplateCache(self: TemplateProvider)
 	end))
 end
 
-function TemplateProvider._handleContainer(self: TemplateProvider, containerMaid: Maid.Maid, container: Instance)
+function TemplateProvider._handleContainer(self: TemplateProvider, containerMaid: Maid.Maid, container: Instance): ()
 	if
 		self._replicationMode == TemplateReplicationModes.SERVER
 		and not container:IsA("Camera")
@@ -257,7 +257,7 @@ function TemplateProvider._replicateTombstones(
 	topMaid: Maid.Maid,
 	unreplicatedParent,
 	replicatedParent
-)
+): ()
 	assert(self._replicationMode == TemplateReplicationModes.SERVER, "Only should be invoked on server")
 
 	-- Tombstone each child so the client knows what is replicated
@@ -566,7 +566,7 @@ function TemplateProvider.AddTemplates(self: TemplateProvider, container: Templa
 	elseif Observable.isObservable(container) then
 		local topMaid = Maid.new()
 
-		self:_addObservableTemplates(topMaid, container)
+		self:_addObservableTemplates(topMaid, container :: any)
 
 		self._maid[topMaid] = topMaid
 		topMaid:GiveTask(function()
@@ -607,7 +607,11 @@ function TemplateProvider.AddTemplates(self: TemplateProvider, container: Templa
 	end
 end
 
-function TemplateProvider._addObservableTemplates(self: TemplateProvider, topMaid: Maid.Maid, observable)
+function TemplateProvider._addObservableTemplates(
+	self: TemplateProvider,
+	topMaid: Maid.Maid,
+	observable: Observable.Observable<Brio.Brio<Instance>>
+): ()
 	topMaid:GiveTask(observable:Subscribe(function(result)
 		if Brio.isBrio(result) then
 			if result:IsDead() then
@@ -626,7 +630,7 @@ function TemplateProvider._addObservableTemplates(self: TemplateProvider, topMai
 	end))
 end
 
-function TemplateProvider._addInstanceTemplate(self: TemplateProvider, topMaid: Maid.Maid, template: Instance)
+function TemplateProvider._addInstanceTemplate(self: TemplateProvider, topMaid: Maid.Maid, template: Instance): ()
 	if self:_shouldAddChildrenAsTemplates(template) then
 		topMaid:GiveTask(self._containerRootCountingMap:Add(template))
 	end
@@ -658,7 +662,7 @@ end
 	@param templateName string
 	@return boolean
 ]=]
-function TemplateProvider.IsTemplateAvailable(self: TemplateProvider, templateName: string)
+function TemplateProvider.IsTemplateAvailable(self: TemplateProvider, templateName: string): boolean
 	assert(type(templateName) == "string", "Bad templateName")
 
 	return self._templateMapList:GetItemForKeyAtIndex(templateName, -1) ~= nil
@@ -707,7 +711,7 @@ TemplateProvider.GetAll = assert(TemplateProvider.GetTemplateList, "Missing meth
 --[=[
 	Cleans up the provider
 ]=]
-function TemplateProvider.Destroy(self: TemplateProvider)
+function TemplateProvider.Destroy(self: TemplateProvider): ()
 	self._maid:DoCleaning()
 end
 

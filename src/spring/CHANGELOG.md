@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@10.9.0...@quenty/spring@10.9.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/spring
+
+
+
+
+
 # [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@10.8.4...@quenty/spring@10.9.0) (2025-05-10)
 
 

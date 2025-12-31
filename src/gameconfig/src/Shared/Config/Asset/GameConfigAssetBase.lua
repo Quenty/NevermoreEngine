@@ -24,16 +24,18 @@ local GameConfigAssetBase = setmetatable({}, BaseObject)
 GameConfigAssetBase.ClassName = "GameConfigAssetBase"
 GameConfigAssetBase.__index = GameConfigAssetBase
 
-export type GameConfigAssetBase = typeof(setmetatable(
-	{} :: {
-		_obj: Folder,
-		_serviceBag: ServiceBag.ServiceBag,
-		_nameTranslationKey: AttributeValue.AttributeValue<string>,
-		_descriptionTranslationKey: AttributeValue.AttributeValue<string>,
-		_configTranslator: JSONTranslator.JSONTranslator,
-	},
-	{} :: typeof({ __index = GameConfigAssetBase })
-)) & BaseObject.BaseObject
+export type GameConfigAssetBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Folder,
+			_serviceBag: ServiceBag.ServiceBag,
+			_nameTranslationKey: AttributeValue.AttributeValue<string>,
+			_descriptionTranslationKey: AttributeValue.AttributeValue<string>,
+			_configTranslator: JSONTranslator.JSONTranslator,
+		},
+		{} :: typeof({ __index = GameConfigAssetBase })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new GameConfigAssetBase. Should be done via binder. This is a base class.

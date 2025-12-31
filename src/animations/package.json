@@ -1,6 +1,6 @@
 {
   "name": "@quenty/animations",
-  "version": "8.21.0",
+  "version": "8.22.8",
   "description": "Utility methods for playing back animations on Roblox",
   "keywords": [
     "Roblox",
@@ -28,6 +28,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/humanoidanimatorutils": "file:../humanoidanimatorutils",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",

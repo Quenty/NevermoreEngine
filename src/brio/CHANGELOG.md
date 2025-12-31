@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.20.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.3...@quenty/brio@14.20.4) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.20.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.2...@quenty/brio@14.20.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.1...@quenty/brio@14.20.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.0...@quenty/brio@14.20.1) (2025-11-22)
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
+
 # [14.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.19.0...@quenty/brio@14.20.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/brio

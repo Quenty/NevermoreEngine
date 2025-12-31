@@ -63,7 +63,7 @@ function RoguePropertyDefinition:Get(serviceBag: ServiceBag.ServiceBag, adornee:
 	return rogueProperty
 end
 
-function RoguePropertyDefinition:GetOrCreateInstance(parent: Instance)
+function RoguePropertyDefinition:GetOrCreateInstance(parent: Instance): Instance
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	-- Note, in forcing the creation, we move to an attribute

@@ -1,3 +1,248 @@
+# (Wed Dec 31 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneevalue@10.23.6`, `@quenty/assetserviceutils@5.22.5`, `@quenty/attributeutils@14.20.5`, `@quenty/avatareditorutils@7.25.6`, `@quenty/binder@14.25.6`, `@quenty/bindtocloseservice@8.21.6`, `@quenty/blend@12.22.6`, `@quenty/buttondragmodel@1.19.6`, `@quenty/camera@14.26.6`, `@quenty/clienttranslator@14.23.6`, `@quenty/colorpicker@10.23.6`, `@quenty/cooldown@11.26.6`, `@quenty/flipbook@9.21.7`, `@quenty/funnels@1.11.6`, `@quenty/genericscreenguiprovider@13.25.6`, `@quenty/guivisiblemanager@12.13.6`, `@quenty/highlight@10.26.3`, `@quenty/humanoidspeed@12.32.6`, `@quenty/humanoidtracker@13.21.6`, `@quenty/idleservice@13.34.3`, `@quenty/marketplaceutils@11.13.3`, `@quenty/modeltransparencyeffect@11.9.2`, `@quenty/networkownerservice@5.3.1`, `@quenty/observablecollection@12.24.6`, `@quenty/particleengine@13.21.5`, `@quenty/permissionprovider@14.24.7`, `@quenty/playerhumanoidbinder@14.25.6`, `@quenty/promise@10.12.3`, `@quenty/promptqueue@1.22.6`, `@quenty/propertyvalue@7.20.5`, `@quenty/ragdoll@15.34.3`, `@quenty/remoting@12.21.5`, `@quenty/scoredactionservice@16.29.7`, `@quenty/settings@11.34.3`, `@quenty/singleton@6.9.1`, `@quenty/soundgroup@1.25.7`, `@quenty/soundplayer@7.24.3`, `@quenty/spawning@10.30.7`, `@quenty/templateprovider@11.23.6`, `@quenty/tie@10.26.6`, `@quenty/timedtween@7.22.6`, `@quenty/toolutils@1.6.5`, `@quenty/undostack@7.21.6`, `@quenty/cli-output-helpers@1.2.3`, `@quenty/nevermore-cli@4.9.4`
+  - fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Dec 29 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/promise@10.12.2`
+  - fix: Add fallback message for promise rejection [#620](https://github.com/Quenty/NevermoreEngine/pull/620) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Dec 29 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.22.6`
+  - fix: Check Looped after loaded [#613](https://github.com/Quenty/NevermoreEngine/pull/613) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Dec 29 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.22.5`, `@quenty/observablecollection@12.24.4`, `@quenty/promise@10.12.1`, `@quenty/promisemaid@5.12.1`, `@quenty/rigbuilderutils@10.22.4`, `@quenty/rogue-properties@11.30.4`, `@quenty/signal@7.11.2`, `@quenty/templateprovider@11.23.4`
+  - fix: Update typing to be more accurate [#619](https://github.com/Quenty/NevermoreEngine/pull/619) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Dec 28 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/deathreport@10.30.0`, `@quenty/highlight@10.26.0`, `@quenty/parttouchingcalculator@14.28.0`, `@quenty/ragdoll@15.34.0`, `@quenty/secrets@7.31.0`, `@quenty/settings@11.34.0`, `@quenty/sounds@10.14.0`
+  - feat: Update declarations and README.md [#618](https://github.com/Quenty/NevermoreEngine/pull/618) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Dec 28 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeboundingbox@8.24.3`, `@quenty/adorneevalue@10.23.3`, `@quenty/aggregator@1.7.1`, `@quenty/animationgroup@10.9.1`, `@quenty/animations@8.22.4`, `@quenty/applytagtotaggedchildren@10.9.1`, `@quenty/attributeutils@14.20.2`, `@quenty/avatareditorutils@7.25.3`, `@quenty/binder@14.25.3`, `@quenty/buttondragmodel@1.19.3`, `@quenty/buttonhighlightmodel@14.22.4`, `@quenty/camera@14.26.3`, `@quenty/cframeutils@5.5.4`, `@quenty/chatproviderservice@9.33.4`, `@quenty/colorpalette@10.25.3`, `@quenty/colorpicker@10.23.3`, `@quenty/cooldown@11.26.3`, `@quenty/counter@7.21.4`, `@quenty/datastore@13.25.3`, `@quenty/deathreport@10.29.3`, `@quenty/depthoffield@11.23.3`, `@quenty/firstpersoncharactertransparency@14.23.3`, `@quenty/flipbook@9.21.4`, `@quenty/funnels@1.11.3`, `@quenty/gameconfig@12.33.4`, `@quenty/gamescalingutils@13.22.3`, `@quenty/guivisiblemanager@12.13.3`, `@quenty/highlight@10.25.3`, `@quenty/humanoidspeed@12.32.3`, `@quenty/humanoidtracker@13.21.3`, `@quenty/humanoidutils@2.4.1`, `@quenty/idleservice@13.33.3`, `@quenty/ik@15.34.4`, `@quenty/influxdbclient@7.24.3`, `@quenty/inputkeymaputils@14.28.4`, `@quenty/inputmode@13.23.4`, `@quenty/inputobjectutils@4.21.1`, `@quenty/modeltransparencyeffect@11.9.1`, `@quenty/mouseovermixin@10.9.2`, `@quenty/octree@11.9.3`, `@quenty/permissionprovider@14.24.4`, `@quenty/promptqueue@1.22.3`, `@quenty/raycaster@3.5.1`, `@quenty/roblox-api-dump@8.13.1`, `@quenty/scoredactionservice@16.29.4`, `@quenty/screenshothudservice@7.23.3`, `@quenty/servicebag@11.13.2`, `@quenty/settings@11.33.4`, `@quenty/snackbar@11.26.4`, `@quenty/soundgroup@1.25.4`, `@quenty/soundplayer@7.23.3`, `@quenty/sounds@10.13.1`, `@quenty/statestack@14.22.3`, `@quenty/tie@10.26.3`, `@quenty/timedtween@7.22.3`, `@quenty/timesyncservice@13.22.3`, `@quenty/transitionmodel@7.23.3`, `@quenty/ugcsanitize@1.7.3`, `@quenty/undostack@7.21.3`, `@quenty/userserviceutils@9.22.1`, `@quenty/valuebaseutils@13.20.3`, `@quenty/valueobject@13.21.3`, `@quenty/viewport@11.27.3`, `@quenty/nevermore-cli@4.9.3`
+  - ci: Upgrade to luau-lsp 1.58.0-quenty.1 [#617](https://github.com/Quenty/NevermoreEngine/pull/617) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rogue-humanoid@10.32.3`, `@quenty/sounds@10.13.1`
+  - Users/quenty/video frames [#616](https://github.com/Quenty/NevermoreEngine/pull/616) ([@Quenty](https://github.com/Quenty))
+- `@quenty/datastore@13.25.3`
+  - fix: Handle nil value in StoreOnValueChange [#615](https://github.com/Quenty/NevermoreEngine/pull/615) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Dec 13 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.22.3`, `@quenty/getmechanismparts@2.3.1`, `@quenty/tie@10.26.2`
+  - fix: Small patches to nevermore libraries [#614](https://github.com/Quenty/NevermoreEngine/pull/614) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Dec 12 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/hintscoringutils@14.26.3`
+  - fix: Missing dependency [#610](https://github.com/Quenty/NevermoreEngine/pull/610) ([@alex-y-z](https://github.com/alex-y-z) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Dec 11 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonhighlightmodel@14.22.3`, `@quenty/counter@7.21.3`, `@quenty/friendutils@12.20.2`, `@quenty/grouputils@10.12.1`, `@quenty/humanoiddescriptionutils@10.12.1`, `@quenty/inputmode@13.23.3`, `@quenty/playerutils@8.21.3`, `@quenty/soundgroup@1.25.3`
+  - fix: Fix dependencies and linting within Roblox's typechecking [#611](https://github.com/Quenty/NevermoreEngine/pull/611) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonutils@2.3.1`
+  - fix: Clamp mouse over color [#609](https://github.com/Quenty/NevermoreEngine/pull/609) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Tue Nov 25 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/humanoidteleportutils@10.9.1`
+  - fix: Update teleport utils [#608](https://github.com/Quenty/NevermoreEngine/pull/608) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Nov 22 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.22.2`, `@quenty/brio@14.20.1`, `@quenty/performanceutils@4.9.1`, `@quenty/rogue-properties@11.30.1`, `@quenty/tie@10.26.1`
+  - perf: Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption [#607](https://github.com/Quenty/NevermoreEngine/pull/607) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Nov 17 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/tie@10.26.0`
+  - feat: Add tie interface implementations for signals [#606](https://github.com/Quenty/NevermoreEngine/pull/606) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Nov 14 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/sprites@13.19.2`
+  - fix: Reuse sprites for L3/R3 [#605](https://github.com/Quenty/NevermoreEngine/pull/605) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Wed Nov 12 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/blend@12.22.1`, `@quenty/camera@14.26.1`, `@quenty/camerastoryutils@10.12.1`, `@quenty/colorpalette@10.25.1`, `@quenty/colorpicker@10.23.1`, `@quenty/depthoffield@11.23.1`, `@quenty/draw@7.9.2`, `@quenty/elo@7.23.1`, `@quenty/fakeskybox@11.11.2`, `@quenty/flipbook@9.21.1`, `@quenty/guitriangle@2.3.1`, `@quenty/instanceutils@13.20.1`, `@quenty/lipsum@14.22.1`, `@quenty/markdownrender@2.4.1`, `@quenty/observablecollection@12.24.1`, `@quenty/particleengine@13.21.1`, `@quenty/pillbacking@10.10.1`, `@quenty/qgui@2.4.1`, `@quenty/radial-image@9.23.1`, `@quenty/rotatinglabel@11.9.1`, `@quenty/roundedbackingbuilder@2.3.1`, `@quenty/screenshothudservice@7.23.1`, `@quenty/scrollingframe@12.12.2`, `@quenty/selectionimageutils@11.9.1`, `@quenty/snackbar@11.26.1`, `@quenty/softshutdown@9.30.1`, `@quenty/soundplayer@7.23.1`, `@quenty/spring@10.9.1`, `@quenty/sprites@13.19.1`, `@quenty/ultrawidecontainerutils@2.5.1`, `@quenty/viewport@11.27.1`
+  - style: Selene upgrade including a major swap from UDim2.new() to UDim2.fromOffset() and UDim2.fromScale() [#604](https://github.com/Quenty/NevermoreEngine/pull/604) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Nov 07 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/coreguienabler@12.23.0`, `@quenty/playerutils@8.21.0`, `@quenty/secrets@7.30.0`
+  - feat: Support Roblox secrets in secrets service [#603](https://github.com/Quenty/NevermoreEngine/pull/603) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/playerutils@8.21.0`
+  - fix: Format code [#600](https://github.com/Quenty/NevermoreEngine/pull/600) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Oct 08 2025)
+
+#### 🚀 Enhancement
+
+- `@quenty/colorpalette@10.25.0`, `@quenty/humanoidtracker@13.21.0`, `@quenty/humanoidutils@2.4.0`, `@quenty/rogue-properties@11.29.0`, `@quenty/scoredactionservice@16.29.0`, `@quenty/statestack@14.22.0`, `@quenty/valueobject@13.21.0`
+  - Users/quenty/fixes [#599](https://github.com/Quenty/NevermoreEngine/pull/599) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Oct 07 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/draw@7.9.1`
+  - fix: Add shapecast to draw library [#598](https://github.com/Quenty/NevermoreEngine/pull/598) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Oct 03 2025)
 
 #### 🚀 Enhancement

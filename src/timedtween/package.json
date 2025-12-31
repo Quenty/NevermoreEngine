@@ -1,6 +1,6 @@
 {
   "name": "@quenty/timedtween",
-  "version": "7.21.0",
+  "version": "7.22.6",
   "description": "Linear timed tweening model",
   "keywords": [
     "Roblox",
@@ -33,6 +33,7 @@
     "@quenty/promise": "file:../promise",
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
     "@quenty/steputils": "file:../steputils",
     "@quenty/valueobject": "file:../valueobject"
   },

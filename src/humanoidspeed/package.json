@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidspeed",
-  "version": "12.30.0",
+  "version": "12.32.6",
   "description": "Handles humanoid speed in a centralized location",
   "keywords": [
     "Roblox",
@@ -31,8 +31,10 @@
     "@quenty/binder": "file:../binder",
     "@quenty/characterutils": "file:../characterutils",
     "@quenty/loader": "file:../loader",
+    "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
     "@quenty/promise": "file:../promise",
     "@quenty/rogue-humanoid": "file:../rogue-humanoid",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/table": "file:../table"
   },
   "publishConfig": {

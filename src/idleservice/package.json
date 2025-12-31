@@ -1,6 +1,6 @@
 {
   "name": "@quenty/idleservice",
-  "version": "13.31.0",
+  "version": "13.34.3",
   "description": "Helps track whether or not a player is idle and if so, then can show UI or other cute things.",
   "keywords": [
     "Roblox",
@@ -34,6 +34,7 @@
     "@quenty/ragdoll": "file:../ragdoll",
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
+    "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
     "@quenty/valueobject": "file:../valueobject"

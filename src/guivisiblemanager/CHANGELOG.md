@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.13.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.5...@quenty/guivisiblemanager@12.13.6) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [12.13.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.4...@quenty/guivisiblemanager@12.13.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.13.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.3...@quenty/guivisiblemanager@12.13.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.13.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.2...@quenty/guivisiblemanager@12.13.3) (2025-12-28)
+
+
+### Bug Fixes
+
+* Typecheck some more things ([41eaaa6](https://github.com/Quenty/NevermoreEngine/commit/41eaaa6d053c469f7548810da72d05dfbf997b26))
+
+
+
+
+
+## [12.13.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.1...@quenty/guivisiblemanager@12.13.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.0...@quenty/guivisiblemanager@12.13.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+# [12.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.12.0...@quenty/guivisiblemanager@12.13.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
 # [12.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.11.0...@quenty/guivisiblemanager@12.12.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/guivisiblemanager

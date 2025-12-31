@@ -1,6 +1,6 @@
 {
   "name": "@quenty/funnels",
-  "version": "1.10.0",
+  "version": "1.11.6",
   "description": "Funnel utility class",
   "keywords": [
     "Roblox",
@@ -30,7 +30,8 @@
     "@quenty/binder": "file:../binder",
     "@quenty/loader": "file:../loader",
     "@quenty/propertyvalue": "file:../propertyvalue",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/signal": "file:../signal"
   },
   "publishConfig": {
     "access": "public"

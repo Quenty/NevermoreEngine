@@ -58,66 +58,68 @@ export type ButtonHighlightUpdateCallback = (
 	percentPressed: AccelTween.AccelTween
 ) -> boolean
 
-export type ButtonHighlightModel = typeof(setmetatable(
-	{} :: {
-		_isPressed: ValueObject.ValueObject<boolean>,
-		_isHighlighted: ValueObject.ValueObject<boolean>,
-		_isMouseOver: ValueObject.ValueObject<boolean>,
-		_isMouseDown: ValueObject.ValueObject<boolean>,
-		_isMouseOrTouchOver: ValueObject.ValueObject<boolean>,
-		_isSelected: ValueObject.ValueObject<boolean>,
-		_isChoosen: ValueObject.ValueObject<boolean>,
-		_isKeyDown: ValueObject.ValueObject<boolean>,
-		_numFingerDown: ValueObject.ValueObject<number>,
-		_interactionEnabled: ValueObject.ValueObject<boolean>,
-		_lastMousePositionForScrollingCheck: ValueObject.ValueObject<Vector3?>,
-		_isMouseOverBasedUponMouseMovement: ValueObject.ValueObject<boolean>,
-		_isMouseOverScrollingCheck: ValueObject.ValueObject<boolean>,
-		_maid: Maid.Maid,
-		_onUpdate: ButtonHighlightUpdateCallback,
-		_percentHighlightedAccelTween: AccelTween.AccelTween,
-		_percentChoosenAccelTween: AccelTween.AccelTween,
-		_percentPressAccelTween: AccelTween.AccelTween,
-		_buttonMaid: Maid.Maid?,
-		StartAnimation: (self: ButtonHighlightModel) -> (),
+export type ButtonHighlightModel =
+	typeof(setmetatable(
+		{} :: {
+			_isPressed: ValueObject.ValueObject<boolean>,
+			_isHighlighted: ValueObject.ValueObject<boolean>,
+			_isMouseOver: ValueObject.ValueObject<boolean>,
+			_isMouseDown: ValueObject.ValueObject<boolean>,
+			_isMouseOrTouchOver: ValueObject.ValueObject<boolean>,
+			_isSelected: ValueObject.ValueObject<boolean>,
+			_isChoosen: ValueObject.ValueObject<boolean>,
+			_isKeyDown: ValueObject.ValueObject<boolean>,
+			_numFingerDown: ValueObject.ValueObject<number>,
+			_interactionEnabled: ValueObject.ValueObject<boolean>,
+			_lastMousePositionForScrollingCheck: ValueObject.ValueObject<Vector3?>,
+			_isMouseOverBasedUponMouseMovement: ValueObject.ValueObject<boolean>,
+			_isMouseOverScrollingCheck: ValueObject.ValueObject<boolean>,
+			_maid: Maid.Maid,
+			_onUpdate: ButtonHighlightUpdateCallback,
+			_percentHighlightedAccelTween: AccelTween.AccelTween,
+			_percentChoosenAccelTween: AccelTween.AccelTween,
+			_percentPressAccelTween: AccelTween.AccelTween,
+			_buttonMaid: Maid.Maid?,
+			StartAnimation: (self: ButtonHighlightModel) -> (),
 
-		--[=[
+			--[=[
 			@prop InteractionEnabledChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		InteractionEnabledChanged: Signal.Signal<boolean>,
+			InteractionEnabledChanged: Signal.Signal<boolean>,
 
-		--[=[
+			--[=[
 			@prop IsSelectedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsSelectedChanged: Signal.Signal<boolean>,
+			IsSelectedChanged: Signal.Signal<boolean>,
 
-		--[=[
+			--[=[
 			@prop IsMouseOrTouchOverChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsMouseOrTouchOverChanged: Signal.Signal<boolean>,
+			IsMouseOrTouchOverChanged: Signal.Signal<boolean>,
 
-		--[=[
+			--[=[
 			@prop IsHighlightedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsHighlightedChanged: Signal.Signal<boolean>,
+			IsHighlightedChanged: Signal.Signal<boolean>,
 
-		--[=[
+			--[=[
 			@prop IsPressedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsPressedChanged: Signal.Signal<boolean>,
-	},
-	{} :: typeof({ __index = ButtonHighlightModel })
-)) & BaseObject.BaseObject
+			IsPressedChanged: Signal.Signal<boolean>,
+		},
+		{} :: typeof({ __index = ButtonHighlightModel })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	A model that dictates the current state of a button.

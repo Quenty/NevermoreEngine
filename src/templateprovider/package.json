@@ -1,6 +1,6 @@
 {
   "name": "@quenty/templateprovider",
-  "version": "11.22.0",
+  "version": "11.23.6",
   "description": "Base of a template retrieval system",
   "keywords": [
     "Roblox",
@@ -38,6 +38,7 @@
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table"
   },

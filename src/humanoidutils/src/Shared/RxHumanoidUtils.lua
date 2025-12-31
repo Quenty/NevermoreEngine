@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class RxHumanoidUtils
 ]=]
@@ -58,7 +59,35 @@ function RxHumanoidUtils.observeRunningSpeed(humanoid: Humanoid): Observable.Obs
 		end
 
 		return maid
-	end)
+	end) :: any
+end
+
+--[=[
+	Observes a humanoid's HumanoidStateType
+]=]
+function RxHumanoidUtils.observeHumanoidStateType(humanoid: Humanoid): Observable.Observable<Enum.HumanoidStateType>
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local lastStateType = nil
+
+		local function emitStateType(stateType: Enum.HumanoidStateType)
+			if lastStateType ~= stateType then
+				lastStateType = stateType
+				sub:Fire(stateType)
+			end
+		end
+
+		maid:GiveTask(humanoid.StateChanged:Connect(function(_oldState, stateType)
+			emitStateType(stateType)
+		end))
+
+		if not lastStateType then
+			emitStateType(humanoid:GetState())
+		end
+
+		return maid
+	end) :: any
 end
 
 return RxHumanoidUtils

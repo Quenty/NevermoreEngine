@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.26.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.2...@quenty/highlight@10.26.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [10.26.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.1...@quenty/highlight@10.26.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.0...@quenty/highlight@10.26.1) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.3...@quenty/highlight@10.26.0) (2025-12-28)
+
+
+### Features
+
+* Update declarations and README.md ([882056f](https://github.com/Quenty/NevermoreEngine/commit/882056f4c012f9855a0581750968993fb18241ed))
+
+
+
+
+
+## [10.25.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.2...@quenty/highlight@10.25.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.1...@quenty/highlight@10.25.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.0...@quenty/highlight@10.25.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.24.0...@quenty/highlight@10.25.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
 # [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.23.1...@quenty/highlight@10.24.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/highlight

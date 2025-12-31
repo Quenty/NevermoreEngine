@@ -204,7 +204,7 @@ end
 function ValueColorPicker:_render()
 	return Blend.New "ImageButton" {
 		Name = "HSColorPicker",
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 		Active = true,
 
@@ -227,10 +227,10 @@ function ValueColorPicker:_render()
 			BackgroundTransparency = self._transparency,
 			Size = Blend.Computed(self._leftWidth, self._sizeValue, function(width, sizeValue)
 				if sizeValue.x == 0 then
-					return UDim2.new(0, 0, 1, 0)
+					return UDim2.fromScale(0, 1)
 				end
 
-				return UDim2.new(width / sizeValue.x, 0, 1, 0)
+				return UDim2.fromScale(width / sizeValue.x, 1)
 			end),
 
 			Blend.New "UIGradient" {
@@ -256,10 +256,10 @@ function ValueColorPicker:_render()
 			AnchorPoint = Vector2.new(1, 0),
 			Size = Blend.Computed(self._leftWidth, self._sizeValue, function(width, sizeValue)
 				if sizeValue.x == 0 then
-					return UDim2.new(0, 0, 1, 0)
+					return UDim2.fromScale(0, 1)
 				end
 
-				return UDim2.new((sizeValue.x - width) / sizeValue.x, 0, 1, 0)
+				return UDim2.fromScale((sizeValue.x - width) / sizeValue.x, 1)
 			end),
 
 			self._triangle.Gui,

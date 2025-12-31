@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.21.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.21.5...@quenty/playerutils@8.21.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
+## [8.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.21.4...@quenty/playerutils@8.21.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
+## [8.21.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.21.3...@quenty/playerutils@8.21.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
+## [8.21.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.21.2...@quenty/playerutils@8.21.3) (2025-12-11)
+
+
+### Bug Fixes
+
+* Fix dependencies and linting within Roblox's typechecking ([#611](https://github.com/Quenty/NevermoreEngine/issues/611)) ([92011ea](https://github.com/Quenty/NevermoreEngine/commit/92011eac0f2ff31c1434e3642bd63f49025ee982))
+
+
+
+
+
+## [8.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.21.1...@quenty/playerutils@8.21.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
+## [8.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.21.0...@quenty/playerutils@8.21.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
+# [8.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.20.0...@quenty/playerutils@8.21.0) (2025-11-07)
+
+
+### Bug Fixes
+
+* Fix misc things ([6d071f6](https://github.com/Quenty/NevermoreEngine/commit/6d071f61b1f49baa72bf227f37e67d31cfc839a9))
+* fix typechecking ([a565916](https://github.com/Quenty/NevermoreEngine/commit/a565916e05556d37646bbd38587239460ad49719))
+* Format code ([2d60e0b](https://github.com/Quenty/NevermoreEngine/commit/2d60e0b98412ce71474c60782745e1ba849c4205))
+
+
+
+
+
 # [8.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.19.0...@quenty/playerutils@8.20.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/playerutils

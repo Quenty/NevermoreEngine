@@ -26,23 +26,25 @@ local LoopedSoundPlayer = setmetatable({}, SpringTransitionModel)
 LoopedSoundPlayer.ClassName = "LoopedSoundPlayer"
 LoopedSoundPlayer.__index = LoopedSoundPlayer
 
-export type LoopedSoundPlayer = typeof(setmetatable(
-	{} :: {
-		_currentSoundLooped: Signal.Signal<()>,
-		_currentSoundLoopedAfterDelay: Signal.Signal<()>,
-		_bpm: ValueObject.ValueObject<number?>,
-		_soundParent: ValueObject.ValueObject<Instance?>,
-		_soundGroup: ValueObject.ValueObject<SoundGroup?>,
-		_crossFadeTime: ValueObject.ValueObject<number>,
-		_volumeMultiplier: ValueObject.ValueObject<number>,
-		_doSyncSoundPlayback: ValueObject.ValueObject<boolean>,
-		_currentActiveSound: ValueObject.ValueObject<Sound?>,
-		_currentSoundId: ValueObject.ValueObject<(string | number)?>,
-		_defaultScheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule,
-		_currentLoopSchedule: ValueObject.ValueObject<SoundLoopScheduleUtils.SoundLoopSchedule>,
-	},
-	{} :: typeof({ __index = LoopedSoundPlayer })
-)) & SpringTransitionModel.SpringTransitionModel<number>
+export type LoopedSoundPlayer =
+	typeof(setmetatable(
+		{} :: {
+			_currentSoundLooped: Signal.Signal<()>,
+			_currentSoundLoopedAfterDelay: Signal.Signal<()>,
+			_bpm: ValueObject.ValueObject<number?>,
+			_soundParent: ValueObject.ValueObject<Instance?>,
+			_soundGroup: ValueObject.ValueObject<SoundGroup?>,
+			_crossFadeTime: ValueObject.ValueObject<number>,
+			_volumeMultiplier: ValueObject.ValueObject<number>,
+			_doSyncSoundPlayback: ValueObject.ValueObject<boolean>,
+			_currentActiveSound: ValueObject.ValueObject<Sound?>,
+			_currentSoundId: ValueObject.ValueObject<(string | number)?>,
+			_defaultScheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule,
+			_currentLoopSchedule: ValueObject.ValueObject<SoundLoopScheduleUtils.SoundLoopSchedule>,
+		},
+		{} :: typeof({ __index = LoopedSoundPlayer })
+	))
+	& SpringTransitionModel.SpringTransitionModel<number>
 
 function LoopedSoundPlayer.new(soundId: (string | number)?, soundParent: Instance?)
 	assert(soundId == nil or SoundUtils.isConvertableToRbxAsset(soundId), "Bad soundId")

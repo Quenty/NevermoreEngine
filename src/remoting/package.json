@@ -1,6 +1,6 @@
 {
   "name": "@quenty/remoting",
-  "version": "12.21.0",
+  "version": "12.21.5",
   "description": "Global remoting retrieval system for Roblox (RemoteFunctions/RemoteEvents)",
   "keywords": [
     "Roblox",
@@ -26,6 +26,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",

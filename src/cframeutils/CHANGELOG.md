@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@5.5.3...@quenty/cframeutils@5.5.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/cframeutils
+
+
+
+
+
 ## [5.5.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@5.5.1...@quenty/cframeutils@5.5.3) (2025-04-07)
 
 

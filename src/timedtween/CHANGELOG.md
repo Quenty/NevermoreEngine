@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.22.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.22.5...@quenty/timedtween@7.22.6) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [7.22.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.22.4...@quenty/timedtween@7.22.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+## [7.22.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.22.3...@quenty/timedtween@7.22.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+## [7.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.22.2...@quenty/timedtween@7.22.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+## [7.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.22.1...@quenty/timedtween@7.22.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+## [7.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.22.0...@quenty/timedtween@7.22.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+# [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.21.0...@quenty/timedtween@7.22.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
 # [7.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.20.0...@quenty/timedtween@7.21.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/timedtween

@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.12.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.12.3...@quenty/grouputils@10.12.4) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+
+
+
+
+## [10.12.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.12.2...@quenty/grouputils@10.12.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+
+
+
+
+## [10.12.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.12.1...@quenty/grouputils@10.12.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+
+
+
+
+## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.12.0...@quenty/grouputils@10.12.1) (2025-12-11)
+
+
+### Bug Fixes
+
+* Fix dependencies and linting within Roblox's typechecking ([#611](https://github.com/Quenty/NevermoreEngine/issues/611)) ([92011ea](https://github.com/Quenty/NevermoreEngine/commit/92011eac0f2ff31c1434e3642bd63f49025ee982))
+
+
+
+
+
 # [10.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.11.0...@quenty/grouputils@10.12.0) (2025-08-29)
 
 **Note:** Version bump only for package @quenty/grouputils

@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.11.5...@quenty/funnels@1.11.6) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [1.11.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.11.4...@quenty/funnels@1.11.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/funnels
+
+
+
+
+
+## [1.11.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.11.3...@quenty/funnels@1.11.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/funnels
+
+
+
+
+
+## [1.11.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.11.2...@quenty/funnels@1.11.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/funnels
+
+
+
+
+
+## [1.11.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.11.1...@quenty/funnels@1.11.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/funnels
+
+
+
+
+
+## [1.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.11.0...@quenty/funnels@1.11.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/funnels
+
+
+
+
+
+# [1.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.10.0...@quenty/funnels@1.11.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/funnels
+
+
+
+
+
 # [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.9.0...@quenty/funnels@1.10.0) (2025-10-01)
 
 **Note:** Version bump only for package @quenty/funnels

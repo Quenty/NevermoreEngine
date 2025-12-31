@@ -3,6 +3,77 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.25.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.6...@quenty/soundgroup@1.25.7) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+* Fix directory declaration in soundgroups ([862839d](https://github.com/Quenty/NevermoreEngine/commit/862839d5fb9026a74e81123c813081c5c6496789))
+
+
+
+
+
+## [1.25.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.5...@quenty/soundgroup@1.25.6) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+## [1.25.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.4...@quenty/soundgroup@1.25.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+## [1.25.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.3...@quenty/soundgroup@1.25.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+## [1.25.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.2...@quenty/soundgroup@1.25.3) (2025-12-11)
+
+
+### Bug Fixes
+
+* Fix dependencies and linting within Roblox's typechecking ([#611](https://github.com/Quenty/NevermoreEngine/issues/611)) ([92011ea](https://github.com/Quenty/NevermoreEngine/commit/92011eac0f2ff31c1434e3642bd63f49025ee982))
+
+
+
+
+
+## [1.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.1...@quenty/soundgroup@1.25.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+## [1.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.0...@quenty/soundgroup@1.25.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+# [1.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.24.0...@quenty/soundgroup@1.25.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
 # [1.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.23.0...@quenty/soundgroup@1.24.0) (2025-10-01)
 
 

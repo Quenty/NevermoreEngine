@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.3...@quenty/humanoidutils@2.4.4) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.4.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.2...@quenty/humanoidutils@2.4.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.4.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.1...@quenty/humanoidutils@2.4.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.0...@quenty/humanoidutils@2.4.1) (2025-12-28)
+
+
+### Bug Fixes
+
+* Typecheck some more things ([41eaaa6](https://github.com/Quenty/NevermoreEngine/commit/41eaaa6d053c469f7548810da72d05dfbf997b26))
+
+
+
+
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.3.0...@quenty/humanoidutils@2.4.0) (2025-10-08)
+
+
+### Bug Fixes
+
+* Fix formatting ([97cfa97](https://github.com/Quenty/NevermoreEngine/commit/97cfa9787cc2d93e90e6d9a9f1a3c3c57b87a8a5))
+
+
+### Features
+
+* Add RxHumanoidUtils.observeHumanoidStateType(humanoid) ([96f9fc9](https://github.com/Quenty/NevermoreEngine/commit/96f9fc946090b597eaebd0011f04b90f7cbb690c))
+
+
+
+
+
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.2.3...@quenty/humanoidutils@2.3.0) (2025-10-01)
 
 

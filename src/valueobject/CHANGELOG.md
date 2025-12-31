@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.21.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.21.5...@quenty/valueobject@13.21.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/valueobject
+
+
+
+
+
+## [13.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.21.4...@quenty/valueobject@13.21.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/valueobject
+
+
+
+
+
+## [13.21.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.21.3...@quenty/valueobject@13.21.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/valueobject
+
+
+
+
+
+## [13.21.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.21.2...@quenty/valueobject@13.21.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/valueobject
+
+
+
+
+
+## [13.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.21.1...@quenty/valueobject@13.21.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/valueobject
+
+
+
+
+
+## [13.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.21.0...@quenty/valueobject@13.21.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/valueobject
+
+
+
+
+
+# [13.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.20.0...@quenty/valueobject@13.21.0) (2025-10-08)
+
+
+### Features
+
+* Add GetValue() method to ValueObject ([e9d1909](https://github.com/Quenty/NevermoreEngine/commit/e9d1909a5377130cf10bd3bdc4a0d6c0ba813b6b))
+
+
+
+
+
 # [13.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@13.19.0...@quenty/valueobject@13.20.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/valueobject

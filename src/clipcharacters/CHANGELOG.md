@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.26.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.26.6...@quenty/clipcharacters@12.26.7) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
+## [12.26.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.26.5...@quenty/clipcharacters@12.26.6) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
+## [12.26.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.26.4...@quenty/clipcharacters@12.26.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
+## [12.26.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.26.3...@quenty/clipcharacters@12.26.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
+## [12.26.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.26.2...@quenty/clipcharacters@12.26.3) (2025-12-11)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
+## [12.26.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.26.1...@quenty/clipcharacters@12.26.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
+## [12.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.26.0...@quenty/clipcharacters@12.26.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
+# [12.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.25.0...@quenty/clipcharacters@12.26.0) (2025-11-07)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
+# [12.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.24.0...@quenty/clipcharacters@12.25.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
 # [12.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.23.0...@quenty/clipcharacters@12.24.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/clipcharacters

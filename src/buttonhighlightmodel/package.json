@@ -1,6 +1,6 @@
 {
   "name": "@quenty/buttonhighlightmodel",
-  "version": "14.21.0",
+  "version": "14.22.7",
   "description": "Contains model information for the current button",
   "keywords": [
     "Roblox",
@@ -34,6 +34,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/rectutils": "file:../rectutils",
     "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
     "@quenty/steputils": "file:../steputils",
     "@quenty/valueobject": "file:../valueobject"
   },

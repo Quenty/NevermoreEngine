@@ -25,7 +25,7 @@ BinderProvider.__index = BinderProvider
 
 	-- Usually in a separate file!
 	local binderProvider = BinderProvider.new("BirdBinders", function(self, serviceBag)
-		self:Add(Binder.new("Bird", require("Bird"), serviceBag))
+		self:Add(Binder.new("MyClass", require("MyClass"), serviceBag))
 	end)
 
 	-- Retrieve binders

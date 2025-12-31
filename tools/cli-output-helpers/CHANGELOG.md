@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.3](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.2...@quenty/cli-output-helpers@1.2.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Add warning output to output helper ([573ce4e](https://github.com/Quenty/Nevermore/commit/573ce4ed42831d552cfeb4dde1703d4aeda54967))
+
+
+
+
+
 ## [1.2.2](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.0...@quenty/cli-output-helpers@1.2.2) (2025-04-07)
 
 

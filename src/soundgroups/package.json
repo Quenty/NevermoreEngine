@@ -1,6 +1,6 @@
 {
   "name": "@quenty/soundgroup",
-  "version": "1.24.0",
+  "version": "1.25.7",
   "description": "Service and utility methods to working with sound groups and sounds in Roblox",
   "keywords": [
     "Roblox",
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/soundgroup/"
+    "directory": "src/soundgroups/"
   },
   "funding": {
     "type": "patreon",
@@ -33,6 +33,8 @@
     "@quenty/maid": "file:../maid",
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"
   },

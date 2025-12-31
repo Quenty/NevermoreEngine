@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.24.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.2...@quenty/soundplayer@7.24.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix test story ([90b3b35](https://github.com/Quenty/NevermoreEngine/commit/90b3b3561f1b95fd3d7ff13945455b3df39fadbd))
+
+
+
+
+
+## [7.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.1...@quenty/soundplayer@7.24.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.0...@quenty/soundplayer@7.24.1) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.23.3...@quenty/soundplayer@7.24.0) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.23.2...@quenty/soundplayer@7.23.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.23.1...@quenty/soundplayer@7.23.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.23.0...@quenty/soundplayer@7.23.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.22.0...@quenty/soundplayer@7.23.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
 # [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.21.0...@quenty/soundplayer@7.22.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/soundplayer

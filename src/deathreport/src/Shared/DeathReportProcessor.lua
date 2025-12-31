@@ -18,17 +18,29 @@ local DeathReportProcessor = setmetatable({}, BaseObject)
 DeathReportProcessor.ClassName = "DeathReportProcessor"
 DeathReportProcessor.__index = DeathReportProcessor
 
-export type DeathReportProcessor = typeof(setmetatable(
-	{} :: {
-		_playerKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
-		_playerDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
-		_humanoidKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
-		_humanoidDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
-		_characterKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
-		_characterDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
-	},
-	{} :: typeof({ __index = DeathReportProcessor })
-)) & BaseObject.BaseObject
+export type DeathReportProcessor =
+	typeof(setmetatable(
+		{} :: {
+			_playerKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<
+				DeathReportUtils.DeathReport
+			>,
+			_playerDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<DeathReportUtils.DeathReport>,
+			_humanoidKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<
+				DeathReportUtils.DeathReport
+			>,
+			_humanoidDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<
+				DeathReportUtils.DeathReport
+			>,
+			_characterKillerSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<
+				DeathReportUtils.DeathReport
+			>,
+			_characterDeathSubTable: ObservableSubscriptionTable.ObservableSubscriptionTable<
+				DeathReportUtils.DeathReport
+			>,
+		},
+		{} :: typeof({ __index = DeathReportProcessor })
+	))
+	& BaseObject.BaseObject
 
 function DeathReportProcessor.new(): DeathReportProcessor
 	local self = setmetatable(BaseObject.new() :: any, DeathReportProcessor)

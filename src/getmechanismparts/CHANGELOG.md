@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/getmechanismparts@2.3.0...@quenty/getmechanismparts@2.3.1) (2025-12-13)
+
+
+### Bug Fixes
+
+* Small patches to nevermore libraries ([#614](https://github.com/Quenty/NevermoreEngine/issues/614)) ([6eeb33b](https://github.com/Quenty/NevermoreEngine/commit/6eeb33b9d215d3d753a433e4c612f391bcc0d286))
+
+
+
+
+
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/getmechanismparts@2.2.2...@quenty/getmechanismparts@2.3.0) (2025-05-10)
 
 

@@ -3,6 +3,96 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.22.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.7...@quenty/animations@8.22.8) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+## [8.22.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.6...@quenty/animations@8.22.7) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+## [8.22.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.5...@quenty/animations@8.22.6) (2025-12-29)
+
+
+### Bug Fixes
+
+* Check Looped after loaded ([99eacfd](https://github.com/Quenty/NevermoreEngine/commit/99eacfd66c3484684fb82fb4655c76afb85c5f81))
+
+
+
+
+
+## [8.22.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.4...@quenty/animations@8.22.5) (2025-12-29)
+
+
+### Bug Fixes
+
+* Update animation slot system ([50b03f4](https://github.com/Quenty/NevermoreEngine/commit/50b03f4c59427be54d7801ca196cf5edf1243795))
+* Update typing to be more accurate ([e4c3d05](https://github.com/Quenty/NevermoreEngine/commit/e4c3d05a0aa9f45a37cbfa372c5e0d8a748c9323))
+
+
+
+
+
+## [8.22.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.3...@quenty/animations@8.22.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+## [8.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.2...@quenty/animations@8.22.3) (2025-12-13)
+
+
+### Bug Fixes
+
+* Small patches to nevermore libraries ([#614](https://github.com/Quenty/NevermoreEngine/issues/614)) ([6eeb33b](https://github.com/Quenty/NevermoreEngine/commit/6eeb33b9d215d3d753a433e4c612f391bcc0d286))
+
+
+
+
+
+## [8.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.1...@quenty/animations@8.22.2) (2025-11-22)
+
+
+### Bug Fixes
+
+* Fix styling ([a3ac54d](https://github.com/Quenty/NevermoreEngine/commit/a3ac54d43aafa1c37b0e8c9b6e7b20b3f3362742))
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
+
+## [8.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.22.0...@quenty/animations@8.22.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [8.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.21.0...@quenty/animations@8.22.0) (2025-10-08)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
 # [8.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.20.1...@quenty/animations@8.21.0) (2025-09-26)
 
 
