@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.21.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.21.5...@quenty/contentproviderutils@12.21.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
 ## [12.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.21.4...@quenty/contentproviderutils@12.21.5) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/contentproviderutils

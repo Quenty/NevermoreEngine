@@ -1,6 +1,6 @@
 {
   "name": "@quenty/scoredactionservice",
-  "version": "16.29.6",
+  "version": "16.29.7",
   "description": "Scores actions and picks the highest rated one every frame",
   "keywords": [
     "Roblox",
@@ -33,6 +33,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
     "@quenty/table": "file:../table",

@@ -23,6 +23,15 @@ export class OutputHelper {
   }
 
   /**
+   * Formats a warning message
+   * @param message Message to format
+   * @returns Formatted string
+   */
+  public static formatWarn(message: string): string {
+    return chalk.yellowBright(message);
+  }
+
+  /**
    * Formats the information
    * @param message Message to format
    * @returns Formatted string
@@ -54,5 +63,13 @@ export class OutputHelper {
    */
   public static info(message: string) {
     console.log(this.formatInfo(message));
+  }
+
+  /**
+   * Logs warning to the console
+   * @param message Message to write
+   */
+  public static warn(message: string) {
+    console.log(this.formatWarn(message));
   }
 }

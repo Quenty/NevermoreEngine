@@ -1,6 +1,6 @@
 {
   "name": "@quenty/attributeutils",
-  "version": "14.20.4",
+  "version": "14.20.5",
   "description": "Provides utility functions to work with attributes in Roblox",
   "keywords": [
     "Roblox",
@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/binder": "file:../binder",
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
     "@quenty/canceltoken": "file:../canceltoken",
     "@quenty/loader": "file:../loader",

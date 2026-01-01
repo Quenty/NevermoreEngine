@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ragdoll",
-  "version": "15.34.2",
+  "version": "15.34.3",
   "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
   "keywords": [
     "Roblox",
@@ -49,6 +49,7 @@
     "@quenty/rx": "file:../rx",
     "@quenty/rxbinderutils": "file:../rxbinderutils",
     "@quenty/rxsignal": "file:../rxsignal",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/spring": "file:../spring",
     "@quenty/steputils": "file:../steputils",
     "@quenty/table": "file:../table",

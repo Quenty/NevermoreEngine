@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.20.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@13.20.4...@quenty/instanceutils@13.20.5) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
 ## [13.20.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@13.20.3...@quenty/instanceutils@13.20.4) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/instanceutils

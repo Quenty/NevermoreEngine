@@ -1,6 +1,6 @@
 {
   "name": "@quenty/highlight",
-  "version": "10.26.2",
+  "version": "10.26.3",
   "description": "Animated highlight system for the Roblox highlight object",
   "keywords": [
     "Roblox",
@@ -38,6 +38,7 @@
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/rx": "file:../rx",
     "@quenty/selectionutils": "file:../selectionutils",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
     "@quenty/table": "file:../table",

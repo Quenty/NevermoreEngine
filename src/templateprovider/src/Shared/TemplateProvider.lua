@@ -5,7 +5,7 @@
 	Additionally, you can provide template overrides as the last added template will always be used.
 
 	```lua
-	-- shared/CarTemplates.lua
+	-- shared/MyCustomTemplateProvider.lua
 
 	return TemplateProvider.new(script.Name, script) -- Load locally
 	```
@@ -21,7 +21,7 @@
 	```lua
 	-- Server
 	local serviceBag = ServiceBag.new()
-	local templates = serviceBag:GetService(require("CarTemplates"))
+	local templates = serviceBag:GetService(require("MyCustomTemplateProvider"))
 	serviceBag:Init()
 	serviceBag:Start()
 	```
@@ -29,7 +29,7 @@
 	```lua
 	-- Client
 	local serviceBag = ServiceBag.new()
-	local templates = serviceBag:GetService(require("CarTemplates"))
+	local templates = serviceBag:GetService(require("MyCustomTemplateProvider"))
 	serviceBag:Init()
 	serviceBag:Start()
 

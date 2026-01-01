@@ -1,6 +1,6 @@
 {
   "name": "@quenty/buttondragmodel",
-  "version": "1.19.5",
+  "version": "1.19.6",
   "description": "Model for dragging buttons around",
   "keywords": [
     "Roblox",
@@ -26,10 +26,12 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
     "@quenty/inputobjectutils": "file:../inputobjectutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

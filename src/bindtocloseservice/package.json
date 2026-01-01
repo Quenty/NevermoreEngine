@@ -1,6 +1,6 @@
 {
   "name": "@quenty/bindtocloseservice",
-  "version": "8.21.5",
+  "version": "8.21.6",
   "description": "Bind to game close API in a centralized location.",
   "keywords": [
     "Roblox",
@@ -30,6 +30,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/symbol": "file:../symbol"
   },
   "devDependencies": {

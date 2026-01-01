@@ -1,6 +1,6 @@
 {
   "name": "@quenty/guivisiblemanager",
-  "version": "12.13.5",
+  "version": "12.13.6",
   "description": "Help manage the visibility of GUIs while only constructing the Gui while visible",
   "keywords": [
     "Roblox",
@@ -26,9 +26,12 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/basicpane": "file:../basicpane",
     "@quenty/cancellabledelay": "file:../cancellabledelay",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
+    "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

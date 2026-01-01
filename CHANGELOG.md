@@ -1,3 +1,16 @@
+# (Wed Dec 31 2025)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneevalue@10.23.6`, `@quenty/assetserviceutils@5.22.5`, `@quenty/attributeutils@14.20.5`, `@quenty/avatareditorutils@7.25.6`, `@quenty/binder@14.25.6`, `@quenty/bindtocloseservice@8.21.6`, `@quenty/blend@12.22.6`, `@quenty/buttondragmodel@1.19.6`, `@quenty/camera@14.26.6`, `@quenty/clienttranslator@14.23.6`, `@quenty/colorpicker@10.23.6`, `@quenty/cooldown@11.26.6`, `@quenty/flipbook@9.21.7`, `@quenty/funnels@1.11.6`, `@quenty/genericscreenguiprovider@13.25.6`, `@quenty/guivisiblemanager@12.13.6`, `@quenty/highlight@10.26.3`, `@quenty/humanoidspeed@12.32.6`, `@quenty/humanoidtracker@13.21.6`, `@quenty/idleservice@13.34.3`, `@quenty/marketplaceutils@11.13.3`, `@quenty/modeltransparencyeffect@11.9.2`, `@quenty/networkownerservice@5.3.1`, `@quenty/observablecollection@12.24.6`, `@quenty/particleengine@13.21.5`, `@quenty/permissionprovider@14.24.7`, `@quenty/playerhumanoidbinder@14.25.6`, `@quenty/promise@10.12.3`, `@quenty/promptqueue@1.22.6`, `@quenty/propertyvalue@7.20.5`, `@quenty/ragdoll@15.34.3`, `@quenty/remoting@12.21.5`, `@quenty/scoredactionservice@16.29.7`, `@quenty/settings@11.34.3`, `@quenty/singleton@6.9.1`, `@quenty/soundgroup@1.25.7`, `@quenty/soundplayer@7.24.3`, `@quenty/spawning@10.30.7`, `@quenty/templateprovider@11.23.6`, `@quenty/tie@10.26.6`, `@quenty/timedtween@7.22.6`, `@quenty/toolutils@1.6.5`, `@quenty/undostack@7.21.6`, `@quenty/cli-output-helpers@1.2.3`, `@quenty/nevermore-cli@4.9.4`
+  - fix: Fix dependencies missing in packages + upgrade Rojo [#621](https://github.com/Quenty/NevermoreEngine/pull/621) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Dec 29 2025)
 
 #### 🐛 Bug Fix

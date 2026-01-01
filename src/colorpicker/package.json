@@ -1,6 +1,6 @@
 {
   "name": "@quenty/colorpicker",
-  "version": "10.23.5",
+  "version": "10.23.6",
   "description": "Color picking UI system for Roblox.",
   "keywords": [
     "Roblox",
@@ -38,6 +38,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
+    "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   }
 }

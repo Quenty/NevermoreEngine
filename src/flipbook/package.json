@@ -1,6 +1,6 @@
 {
   "name": "@quenty/flipbook",
-  "version": "9.21.6",
+  "version": "9.21.7",
   "description": "Handles playing back animated spritesheets",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/sprites": "file:../sprites",
     "@quenty/uiobjectutils": "file:../uiobjectutils",
     "@quenty/valueobject": "file:../valueobject"

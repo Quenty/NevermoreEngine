@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.20.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.20.4...@quenty/attributeutils@14.20.5) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
 ## [14.20.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.20.3...@quenty/attributeutils@14.20.4) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/attributeutils

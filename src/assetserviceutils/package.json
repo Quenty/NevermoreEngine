@@ -1,6 +1,6 @@
 {
   "name": "@quenty/assetserviceutils",
-  "version": "5.22.4",
+  "version": "5.22.5",
   "description": "Provides a wrapper for AssetService&#x27;s async calls",
   "keywords": [
     "Roblox",
@@ -29,7 +29,8 @@
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/memoize": "file:../memoize",
-    "@quenty/promise": "file:../promise"
+    "@quenty/promise": "file:../promise",
+    "@quenty/servicebag": "file:../servicebag"
   },
   "publishConfig": {
     "access": "public"

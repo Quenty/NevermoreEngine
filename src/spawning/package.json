@@ -1,6 +1,6 @@
 {
   "name": "@quenty/spawning",
-  "version": "10.30.6",
+  "version": "10.30.7",
   "description": "Centralized spawning system",
   "keywords": [
     "Roblox",
@@ -29,6 +29,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/randomutils": "file:../randomutils",
+    "@quenty/raycaster": "file:../raycaster",
     "@quenty/servicebag": "file:../servicebag",
     "@quentystudios/t": "^3.0.0"
   },

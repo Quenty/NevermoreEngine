@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.20.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.20.2...@quenty/physicsutils@8.20.3) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+
+
+
+
 ## [8.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.20.1...@quenty/physicsutils@8.20.2) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/physicsutils

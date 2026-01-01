@@ -1,6 +1,6 @@
 {
   "name": "@quenty/blend",
-  "version": "12.22.5",
+  "version": "12.22.6",
   "description": "Declarative UI system.",
   "keywords": [
     "Roblox",
@@ -39,6 +39,7 @@
     "@quenty/spring": "file:../spring",
     "@quenty/steputils": "file:../steputils",
     "@quenty/string": "file:../string",
+    "@quenty/uiobjectutils": "file:../uiobjectutils",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
     "@quenty/valueobject": "file:../valueobject"
   },

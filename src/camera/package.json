@@ -1,6 +1,6 @@
 {
   "name": "@quenty/camera",
-  "version": "14.26.5",
+  "version": "14.26.6",
   "description": "Quenty's camera system for Roblox",
   "keywords": [
     "Roblox",
@@ -29,6 +29,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/cframeutils": "file:../cframeutils",
     "@quenty/cubicspline": "file:../cubicspline",
+    "@quenty/draw": "file:../draw",
     "@quenty/ducktype": "file:../ducktype",
     "@quenty/inputobjectutils": "file:../inputobjectutils",
     "@quenty/loader": "file:../loader",
