@@ -1,4 +1,4 @@
-type ToTuple<T> = T extends LuaTuple<infer V> ? V : [T];
+type ToTuple<T> = [T] extends [LuaTuple<infer V>] ? V : [T];
 
 export type SignalLike<T = void> =
   | Signal<T>
