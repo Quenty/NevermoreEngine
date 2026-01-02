@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides a basis for binders that can be retrieved anywhere
 	@class BinderProvider

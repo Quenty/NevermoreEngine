@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	See [PlayerProductManager] and [PlayerProductManagerClient]
 

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Tracks current cooldown on an object
 	@class CooldownTracker

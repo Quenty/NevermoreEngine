@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Bridge to https://eryn.io/Cmdr/
 

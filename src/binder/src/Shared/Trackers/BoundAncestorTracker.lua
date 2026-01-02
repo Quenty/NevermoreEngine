@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Tracks a parent bound to a specific binder
 	@class BoundAncestorTracker

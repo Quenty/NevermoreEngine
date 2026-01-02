@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles actions involving HumanoidDescription objects, including loading character appearance.
 	@class HumanoidDescriptionUtils

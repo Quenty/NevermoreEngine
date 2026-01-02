@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Holds binders
 	@class HumanoidSpeedBindersClient

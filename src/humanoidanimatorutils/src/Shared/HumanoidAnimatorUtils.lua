@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility functions involving [Animator] underneath a humanoid. These are used
 	because the [Animator] is the preferred API surface by Roblox.

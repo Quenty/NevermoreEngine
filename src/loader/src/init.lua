@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Primary loader which handles bootstrapping different scenarios quickly
 

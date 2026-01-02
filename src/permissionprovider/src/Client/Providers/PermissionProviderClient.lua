@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Permission provider using the remote event. See [PermissionServiceClient].
 

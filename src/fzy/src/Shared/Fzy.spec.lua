@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Tests for fzy-lua
 

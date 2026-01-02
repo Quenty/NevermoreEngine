@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Tests for elo utils
 	@class EloUtils.spec.lua

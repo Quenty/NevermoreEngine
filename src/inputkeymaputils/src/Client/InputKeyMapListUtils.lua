@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Client side utility helpers for observing input modes for the current client.
 

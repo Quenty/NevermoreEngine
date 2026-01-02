@@ -1,3 +1,4 @@
+--!nonstrict
 --strict
 --[=[
 	A list that can be observed for blend and other components and maintains sorting order.

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	This holds the definition for a variety of tables.
 	@class RoguePropertyTableDefinition

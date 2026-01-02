@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	InputImageLibrary with a variety of dark and light themed icons for inputs on keyboard, xbox, touched events,
 	mouse, and more.

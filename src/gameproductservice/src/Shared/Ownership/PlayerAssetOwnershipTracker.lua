@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	This tracking is relatively complicated because we want to track both
 	ownership from attributes (can be customized locally), as well as async

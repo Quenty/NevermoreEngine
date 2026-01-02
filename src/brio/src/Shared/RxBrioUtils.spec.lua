@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Unit tests for RxBrioUtils.lua
 ]]

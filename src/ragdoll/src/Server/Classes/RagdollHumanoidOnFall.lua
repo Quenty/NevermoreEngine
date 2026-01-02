@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	When a humanoid is bound with this, it will ragdoll upon falling. Recommended that you use
 	[UnragdollAutomatically] in conjunction with this.

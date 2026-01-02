@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Ragdolls the humanoid on death. This class exports a [Binder].
 	@server

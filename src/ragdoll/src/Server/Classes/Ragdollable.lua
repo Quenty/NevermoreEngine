@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Should be bound to any humanoid that is ragdollable. This class exports a [Binder].
 	@server

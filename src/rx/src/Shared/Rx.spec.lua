@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class Rx.spec.lua
 ]]

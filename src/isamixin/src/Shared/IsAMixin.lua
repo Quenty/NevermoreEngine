@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Generic IsA interface for Lua classes.
 	@class IsAMixin

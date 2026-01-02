@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides an interface to query game configurations from assets in the world.
 	@class GameConfigPicker

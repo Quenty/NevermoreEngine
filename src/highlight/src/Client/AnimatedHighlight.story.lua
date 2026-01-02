@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class AnimatedHighlight.story
 ]]

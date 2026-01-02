@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility for teleporting humanoids
 	@class HumanoidTeleportUtils

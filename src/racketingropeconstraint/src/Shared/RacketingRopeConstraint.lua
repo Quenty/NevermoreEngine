@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Tries to racket a rope constraint back down to a reasonable length. Use [RopeConstraint.WinchEnabled]
 	@class RacketingRopeConstraint

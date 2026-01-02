@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Holds binders for Ragdoll system. Be sure to initialize on the client too. See [RagdollBindersClient].
 	Be sure to use a [ServiceBag] to initialize this service.

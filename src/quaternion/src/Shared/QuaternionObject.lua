@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Quaternion data type object
 

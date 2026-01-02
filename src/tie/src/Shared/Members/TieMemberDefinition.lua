@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Base class for a member definition/declaration.
 

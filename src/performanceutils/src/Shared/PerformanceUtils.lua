@@ -1,3 +1,4 @@
+--!nonstrict
 --strict
 --[=[
 	@class PerformanceUtils

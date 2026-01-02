@@ -1,3 +1,4 @@
+--!nonstrict
 local require =
 	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 

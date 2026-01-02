@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Registers the settings automatically so we can validate on the server.
 	@class InputKeyMapSetting

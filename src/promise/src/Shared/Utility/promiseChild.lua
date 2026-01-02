@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Warps the WaitForChild API with a promise
 	@class promiseChild

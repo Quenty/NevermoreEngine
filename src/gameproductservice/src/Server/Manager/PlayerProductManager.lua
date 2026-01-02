@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles product prompting state on the server
 

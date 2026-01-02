@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	This service lets you shut down servers without losing a bunch of players.
 	When game.OnClose is called, the script teleports everyone in the server

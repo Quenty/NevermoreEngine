@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	When a humanoid is tagged with this, it will unragdoll automatically. This class exports a [Binder].
 	@server

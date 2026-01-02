@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Allows a model to have transparent set locally on the client
 

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility methods to track public player input mode
 

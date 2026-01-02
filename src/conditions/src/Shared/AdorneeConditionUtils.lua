@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility library that defines a generalized interface for scriptable conditions. These conditions are rooted in [Rx] and
 	can be scripted by a variety of systems. For example, we may have conditions on what ammo we can consume, or whether

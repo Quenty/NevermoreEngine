@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility methods involving maids and tasks.
 	@class MaidTaskUtils

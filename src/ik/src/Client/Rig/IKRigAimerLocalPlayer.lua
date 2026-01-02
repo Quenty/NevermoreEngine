@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles repliation and aiming of the local player's character for
 	IK.

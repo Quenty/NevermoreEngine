@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Parses text into markdown
 	@class MarkdownParser

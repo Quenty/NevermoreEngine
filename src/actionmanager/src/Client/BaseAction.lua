@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	BaseAction state for [ActionManager].
 

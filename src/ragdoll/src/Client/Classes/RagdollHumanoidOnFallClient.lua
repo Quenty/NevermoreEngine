@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Ragdolls the humanoid on death. Should be bound via [RagdollBindersClient].
 

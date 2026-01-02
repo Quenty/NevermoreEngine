@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Distributes the scored action to the correct providers based upon input mode
 	@class InputListScoreHelper

@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class InfluxDBEscapeUtils.spec.lua
 ]]

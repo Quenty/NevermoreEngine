@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility involving the [Hide] binder.
 	@class HideUtils

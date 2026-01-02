@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Right grip
 	@class IKRightGrip

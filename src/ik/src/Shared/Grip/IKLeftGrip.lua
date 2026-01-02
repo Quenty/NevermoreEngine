@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Left grip
 	@class IKLeftGrip

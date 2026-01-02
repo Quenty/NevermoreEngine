@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Plays particle effects for players
 

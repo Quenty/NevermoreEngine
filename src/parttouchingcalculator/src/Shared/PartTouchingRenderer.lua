@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Renders touching parts from the PartTouchingCalculator
 	@class PartTouchingRenderer

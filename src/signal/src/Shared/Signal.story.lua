@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class Signal.story
 ]]

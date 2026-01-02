@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Tracks the equipped player of a tool
 	@class EquippedTracker

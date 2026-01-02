@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Determines if parts are touching or not
 	@class PartTouchingCalculator

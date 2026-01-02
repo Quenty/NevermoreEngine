@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Testing for convex hull logic
 

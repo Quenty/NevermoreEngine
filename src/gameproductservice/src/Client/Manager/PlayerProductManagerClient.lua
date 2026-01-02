@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@client
 	@class PlayerProductManagerClient

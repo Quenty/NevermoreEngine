@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Builds a pill backing for Guis
 	@class PillBackingBuilder

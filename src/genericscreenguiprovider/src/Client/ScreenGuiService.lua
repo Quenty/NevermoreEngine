@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Centralized provider so Hoarcekat stories can bootstrap in a fake PlayerGui
 

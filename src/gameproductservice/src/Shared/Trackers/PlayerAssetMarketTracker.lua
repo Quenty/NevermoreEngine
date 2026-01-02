@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Tracks a single asset type for pending purchase prompts.
 

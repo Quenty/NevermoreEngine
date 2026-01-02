@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Client side ragdolling meant to be used with a binder. This class exports a [Binder].
 	While a humanoid is bound with this class, it is ragdolled.

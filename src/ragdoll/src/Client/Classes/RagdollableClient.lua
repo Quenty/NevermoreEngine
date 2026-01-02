@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Initialize via [RagdollServiceClient].
 

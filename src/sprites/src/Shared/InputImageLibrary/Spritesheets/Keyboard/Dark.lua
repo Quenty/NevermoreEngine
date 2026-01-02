@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Generated KeyboardDark with Python
 	@class KeyboardDark
