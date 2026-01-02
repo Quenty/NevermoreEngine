@@ -7,13 +7,14 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local InputKeyMapSettingConstants = require("InputKeyMapSettingConstants")
 local InputKeyMapSettingUtils = require("InputKeyMapSettingUtils")
+local ServiceBag = require("ServiceBag")
 local SettingsServiceClient = require("SettingsServiceClient")
 
 local InputKeyMapSettingClient = setmetatable({}, BaseObject)
 InputKeyMapSettingClient.ClassName = "InputKeyMapSettingClient"
 InputKeyMapSettingClient.__index = InputKeyMapSettingClient
 
-function InputKeyMapSettingClient.new(serviceBag, inputKeyMapList)
+function InputKeyMapSettingClient.new(serviceBag: ServiceBag.ServiceBag, inputKeyMapList)
 	local self = setmetatable(BaseObject.new(), InputKeyMapSettingClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

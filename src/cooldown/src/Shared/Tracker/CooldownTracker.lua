@@ -10,13 +10,14 @@ local CooldownShared = require("CooldownShared")
 local CooldownTrackerModel = require("CooldownTrackerModel")
 local Maid = require("Maid")
 local RxBinderUtils = require("RxBinderUtils")
+local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 
 local CooldownTracker = setmetatable({}, BaseObject)
 CooldownTracker.ClassName = "CooldownTracker"
 CooldownTracker.__index = CooldownTracker
 
-function CooldownTracker.new(serviceBag, parent)
+function CooldownTracker.new(serviceBag: ServiceBag.ServiceBag, parent)
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	local self = setmetatable(BaseObject.new(parent), CooldownTracker)

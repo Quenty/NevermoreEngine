@@ -13,6 +13,7 @@ local CharacterUtils = require("CharacterUtils")
 local RogueHumanoidProperties = require("RogueHumanoidProperties")
 local Rx = require("Rx")
 local RxRootPartUtils = require("RxRootPartUtils")
+local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 
 local GROWTH_VALUE_NAMES = {
@@ -32,7 +33,7 @@ local RogueHumanoidBase = setmetatable({}, BaseObject)
 RogueHumanoidBase.ClassName = "RogueHumanoidBase"
 RogueHumanoidBase.__index = RogueHumanoidBase
 
-function RogueHumanoidBase.new(humanoid, serviceBag)
+function RogueHumanoidBase.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RogueHumanoidBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

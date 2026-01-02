@@ -18,12 +18,13 @@ local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
+local ServiceBag = require("ServiceBag")
 
 local PlayerProductManagerClient = setmetatable({}, PlayerProductManagerBase)
 PlayerProductManagerClient.ClassName = "PlayerProductManagerClient"
 PlayerProductManagerClient.__index = PlayerProductManagerClient
 
-function PlayerProductManagerClient.new(obj, serviceBag)
+function PlayerProductManagerClient.new(obj, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(PlayerProductManagerBase.new(obj, serviceBag), PlayerProductManagerClient)
 
 	self._avatarEditorInventoryServiceClient = self._serviceBag:GetService(AvatarEditorInventoryServiceClient)

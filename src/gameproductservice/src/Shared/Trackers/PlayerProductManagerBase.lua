@@ -18,6 +18,7 @@ local PlayerAssetMarketTrackerInterface = require("PlayerAssetMarketTrackerInter
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
 local Promise = require("Promise")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local String = require("String")
 local TieRealmService = require("TieRealmService")
 
@@ -33,7 +34,7 @@ PlayerProductManagerBase.__index = PlayerProductManagerBase
 	@param serviceBag ServiceBag
 	@return PlayerProductManagerBase
 ]=]
-function PlayerProductManagerBase.new(player, serviceBag)
+function PlayerProductManagerBase.new(player, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(player), PlayerProductManagerBase)
 
 	self._player = assert(player, "No player")

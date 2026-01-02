@@ -8,13 +8,14 @@ local BaseObject = require("BaseObject")
 local Motor6DAnimator = require("Motor6DAnimator")
 local Motor6DPhysicsTransformer = require("Motor6DPhysicsTransformer")
 local Motor6DStackInterface = require("Motor6DStackInterface")
+local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
 
 local Motor6DStackBase = setmetatable({}, BaseObject)
 Motor6DStackBase.ClassName = "Motor6DStackBase"
 Motor6DStackBase.__index = Motor6DStackBase
 
-function Motor6DStackBase.new(motor6D, serviceBag)
+function Motor6DStackBase.new(motor6D, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(motor6D), Motor6DStackBase)
 
 	self._animator = self._maid:Add(Motor6DAnimator.new(motor6D))

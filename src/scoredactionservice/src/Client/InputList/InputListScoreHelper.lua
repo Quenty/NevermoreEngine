@@ -9,13 +9,14 @@ local BaseObject = require("BaseObject")
 local InputKeyMapList = require("InputKeyMapList")
 local InputKeyMapListUtils = require("InputKeyMapListUtils")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local Set = require("Set")
 
 local InputListScoreHelper = setmetatable({}, BaseObject)
 InputListScoreHelper.ClassName = "InputListScoreHelper"
 InputListScoreHelper.__index = InputListScoreHelper
 
-function InputListScoreHelper.new(serviceBag, provider, scoredAction, inputKeyMapList)
+function InputListScoreHelper.new(serviceBag: ServiceBag.ServiceBag, provider, scoredAction, inputKeyMapList)
 	local self = setmetatable(BaseObject.new(), InputListScoreHelper)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

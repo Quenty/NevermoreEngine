@@ -8,12 +8,13 @@ local BaseObject = require("BaseObject")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
 local RoguePropertyBaseValueTypes = require("RoguePropertyBaseValueTypes")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 
 local RoguePropertyArrayHelper = setmetatable({}, BaseObject)
 RoguePropertyArrayHelper.ClassName = "RoguePropertyArrayHelper"
 RoguePropertyArrayHelper.__index = RoguePropertyArrayHelper
 
-function RoguePropertyArrayHelper.new(serviceBag, arrayDefinitionHelper, roguePropertyTable)
+function RoguePropertyArrayHelper.new(serviceBag: ServiceBag.ServiceBag, arrayDefinitionHelper, roguePropertyTable)
 	local self = setmetatable(BaseObject.new(), RoguePropertyArrayHelper)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

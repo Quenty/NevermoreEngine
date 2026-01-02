@@ -6,12 +6,13 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local ChatTagBase = require("ChatTagBase")
+local ServiceBag = require("ServiceBag")
 
 local ChatTag = setmetatable({}, ChatTagBase)
 ChatTag.ClassName = "ChatTag"
 ChatTag.__index = ChatTag
 
-function ChatTag.new(folder: Folder, serviceBag)
+function ChatTag.new(folder: Folder, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(ChatTagBase.new(folder), ChatTag)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

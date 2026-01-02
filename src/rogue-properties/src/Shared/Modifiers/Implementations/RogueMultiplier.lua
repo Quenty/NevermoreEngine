@@ -10,12 +10,13 @@ local RogueModifierBase = require("RogueModifierBase")
 local RogueModifierInterface = require("RogueModifierInterface")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 
 local RogueMultiplier = setmetatable({}, RogueModifierBase)
 RogueMultiplier.ClassName = "RogueMultiplier"
 RogueMultiplier.__index = RogueMultiplier
 
-function RogueMultiplier.new(valueObject, serviceBag)
+function RogueMultiplier.new(valueObject, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(RogueModifierBase.new(valueObject, serviceBag), RogueMultiplier)
 
 	self._maid:GiveTask(RogueModifierInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm()))

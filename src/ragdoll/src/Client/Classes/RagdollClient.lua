@@ -18,6 +18,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Binder = require("Binder")
+local ServiceBag = require("ServiceBag")
 
 local RagdollClient = setmetatable({}, BaseObject)
 RagdollClient.ClassName = "RagdollClient"
@@ -29,7 +30,7 @@ RagdollClient.__index = RagdollClient
 	@param serviceBag ServiceBag
 	@return RagdollClient
 ]=]
-function RagdollClient.new(humanoid, serviceBag)
+function RagdollClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

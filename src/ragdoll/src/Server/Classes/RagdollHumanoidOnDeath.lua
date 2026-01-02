@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 local Ragdoll = require("Ragdoll")
+local ServiceBag = require("ServiceBag")
 
 local RagdollHumanoidOnDeath = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeath.ClassName = "RagdollHumanoidOnDeath"
@@ -20,7 +21,7 @@ RagdollHumanoidOnDeath.__index = RagdollHumanoidOnDeath
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnDeath
 ]=]
-function RagdollHumanoidOnDeath.new(humanoid, serviceBag)
+function RagdollHumanoidOnDeath.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeath)
 
 	self._serviceBag = assert(serviceBag, "Bad serviceBag")

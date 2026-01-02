@@ -14,6 +14,7 @@ local CharacterUtils = require("CharacterUtils")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 local Ragdoll = require("Ragdoll")
 local RagdollHumanoidOnFallConstants = require("RagdollHumanoidOnFallConstants")
+local ServiceBag = require("ServiceBag")
 
 local RagdollHumanoidOnFall = setmetatable({}, BaseObject)
 RagdollHumanoidOnFall.ClassName = "RagdollHumanoidOnFall"
@@ -25,7 +26,7 @@ RagdollHumanoidOnFall.__index = RagdollHumanoidOnFall
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnFall
 ]=]
-function RagdollHumanoidOnFall.new(humanoid, serviceBag)
+function RagdollHumanoidOnFall.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFall)
 
 	self._serviceBag = assert(serviceBag, "Bad serviceBag")

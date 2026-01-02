@@ -6,12 +6,13 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Motor6DStackBase = require("Motor6DStackBase")
+local ServiceBag = require("ServiceBag")
 
 local Motor6DStack = setmetatable({}, Motor6DStackBase)
 Motor6DStack.ClassName = "Motor6DStack"
 Motor6DStack.__index = Motor6DStack
 
-function Motor6DStack.new(obj, serviceBag)
+function Motor6DStack.new(obj, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(Motor6DStackBase.new(obj, serviceBag), Motor6DStack)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

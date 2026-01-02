@@ -22,7 +22,7 @@ local InputKeyMapListUtils = {}
 	@param serviceBag ServiceBag
 	@return InputModeTypeSelector
 ]=]
-function InputKeyMapListUtils.getNewInputModeTypeSelector(inputKeyMapList, serviceBag)
+function InputKeyMapListUtils.getNewInputModeTypeSelector(inputKeyMapList, serviceBag: ServiceBag.ServiceBag)
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
@@ -36,7 +36,7 @@ end
 	@param serviceBag ServiceBag
 	@return Observable<InputKeyMap>
 ]=]
-function InputKeyMapListUtils.observeActiveInputKeyMap(inputKeyMapList, serviceBag)
+function InputKeyMapListUtils.observeActiveInputKeyMap(inputKeyMapList, serviceBag: ServiceBag.ServiceBag)
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
@@ -63,7 +63,7 @@ end
 	@param serviceBag ServiceBag
 	@return Observable<{ InputType }?>
 ]=]
-function InputKeyMapListUtils.observeActiveInputTypesList(inputKeyMapList, serviceBag)
+function InputKeyMapListUtils.observeActiveInputTypesList(inputKeyMapList, serviceBag: ServiceBag.ServiceBag)
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
@@ -86,7 +86,7 @@ end
 	@param serviceBag ServiceBag
 	@return Observable<InputModeType?>
 ]=]
-function InputKeyMapListUtils.observeActiveInputModeType(inputKeyMapList, serviceBag)
+function InputKeyMapListUtils.observeActiveInputModeType(inputKeyMapList, serviceBag: ServiceBag.ServiceBag)
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 

@@ -10,12 +10,13 @@ local RogueModifierBase = require("RogueModifierBase")
 local RogueModifierInterface = require("RogueModifierInterface")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 
 local RogueAdditive = setmetatable({}, RogueModifierBase)
 RogueAdditive.ClassName = "RogueAdditive"
 RogueAdditive.__index = RogueAdditive
 
-function RogueAdditive.new(valueObject, serviceBag)
+function RogueAdditive.new(valueObject, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(RogueModifierBase.new(valueObject, serviceBag), RogueAdditive)
 
 	self._maid:GiveTask(RogueModifierInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm()))

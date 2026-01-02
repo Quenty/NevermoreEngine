@@ -8,6 +8,7 @@ local ArmIKBase = require("ArmIKBase")
 local BaseObject = require("BaseObject")
 local CharacterUtils = require("CharacterUtils")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local TorsoIKBase = require("TorsoIKBase")
 
@@ -15,7 +16,7 @@ local IKRigBase = setmetatable({}, BaseObject)
 IKRigBase.ClassName = "IKRigBase"
 IKRigBase.__index = IKRigBase
 
-function IKRigBase.new(humanoid, serviceBag)
+function IKRigBase.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid, serviceBag), IKRigBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

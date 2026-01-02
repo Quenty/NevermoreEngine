@@ -12,6 +12,7 @@ local Binder = require("Binder")
 local OverriddenProperty = require("OverriddenProperty")
 local Promise = require("Promise")
 local RacketingRopeConstraintInterface = require("RacketingRopeConstraintInterface")
+local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
 local ValueObject = require("ValueObject")
 
@@ -21,7 +22,7 @@ local RacketingRopeConstraint = setmetatable({}, BaseObject)
 RacketingRopeConstraint.ClassName = "RacketingRopeConstraint"
 RacketingRopeConstraint.__index = RacketingRopeConstraint
 
-function RacketingRopeConstraint.new(ropeConstraint, serviceBag)
+function RacketingRopeConstraint.new(ropeConstraint, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(ropeConstraint), RacketingRopeConstraint)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

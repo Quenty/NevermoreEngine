@@ -19,6 +19,7 @@ local RagdollableInterface = require("RagdollableInterface")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxRagdollUtils = require("RxRagdollUtils")
+local ServiceBag = require("ServiceBag")
 
 local Ragdollable = setmetatable({}, RagdollableBase)
 Ragdollable.ClassName = "Ragdollable"
@@ -30,7 +31,7 @@ Ragdollable.__index = Ragdollable
 	@param serviceBag ServiceBag
 	@return Ragdollable
 ]=]
-function Ragdollable.new(humanoid, serviceBag)
+function Ragdollable.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(RagdollableBase.new(humanoid), Ragdollable)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

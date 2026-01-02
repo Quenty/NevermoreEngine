@@ -17,6 +17,7 @@ local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local ReceiptProcessingService = require("ReceiptProcessingService")
 local Remoting = require("Remoting")
+local ServiceBag = require("ServiceBag")
 
 local PlayerProductManager = setmetatable({}, PlayerProductManagerBase)
 PlayerProductManager.ClassName = "PlayerProductManager"
@@ -29,7 +30,7 @@ PlayerProductManager.__index = PlayerProductManager
 	@param serviceBag ServiceBag
 	@return PlayerProductManager
 ]=]
-function PlayerProductManager.new(player, serviceBag)
+function PlayerProductManager.new(player, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(PlayerProductManagerBase.new(player, serviceBag), PlayerProductManager)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
