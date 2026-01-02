@@ -34,6 +34,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/r15utils": "file:../r15utils",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/statestack": "file:../statestack",
     "@quenty/transparencyservice": "file:../transparencyservice",
     "@quenty/ugcsanitize": "file:../ugcsanitize"
