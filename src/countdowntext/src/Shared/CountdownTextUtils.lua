@@ -18,7 +18,7 @@ function CountdownTextUtils.formatCountdown(seconds: number, whenAtZeroText: str
 	assert(type(seconds) == "number", "Bad seconds")
 	assert(type(whenAtZeroText) == "string" or whenAtZeroText == nil, "Bad whenAtZeroText")
 
-	if seconds < 0 then
+	if seconds <= 0 then
 		return whenAtZeroText or "0"
 	end
 
