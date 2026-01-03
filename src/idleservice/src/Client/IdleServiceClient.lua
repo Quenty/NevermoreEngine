@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Helps track whether or not a player is idle and if so, then can show UI or other cute things.
 

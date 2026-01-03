@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Renders the markdown. See [MarkdownParser] for parsing.
 

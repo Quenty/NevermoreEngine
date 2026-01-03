@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class DeathTrackedHumanoid
 ]=]
@@ -7,12 +8,13 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local DeathReportService = require("DeathReportService")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
+local ServiceBag = require("ServiceBag")
 
 local DeathTrackedHumanoid = setmetatable({}, BaseObject)
 DeathTrackedHumanoid.ClassName = "DeathTrackedHumanoid"
 DeathTrackedHumanoid.__index = DeathTrackedHumanoid
 
-function DeathTrackedHumanoid.new(humanoid: Humanoid, serviceBag)
+function DeathTrackedHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), DeathTrackedHumanoid)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

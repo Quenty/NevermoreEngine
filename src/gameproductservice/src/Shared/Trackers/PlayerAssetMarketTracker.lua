@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Tracks a single asset type for pending purchase prompts.
 
@@ -7,10 +8,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Brio = require("Brio")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
 local Promise = require("Promise")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
@@ -18,6 +21,28 @@ local ValueObject = require("ValueObject")
 local PlayerAssetMarketTracker = setmetatable({}, BaseObject)
 PlayerAssetMarketTracker.ClassName = "PlayerAssetMarketTracker"
 PlayerAssetMarketTracker.__index = PlayerAssetMarketTracker
+
+export type PlayerAssetMarketTracker =
+	typeof(setmetatable(
+		{} :: {
+			_assetType: GameConfigAssetTypes.GameConfigAssetType,
+			_convertIds: (string | number) -> number?,
+			_observeIdsBrio: (string | number) -> Observable.Observable<Brio.Brio<number>>,
+			_pendingPurchasePromises: { Promise.Promise<boolean> },
+			_pendingPromptOpenPromises: { Promise.Promise<boolean> },
+			_purchasedThisSession: { [number]: boolean },
+			_promptsOpenCount: ValueObject.ValueObject<number>,
+			_ownershipTracker: PlayerAssetOwnershipTracker.PlayerAssetOwnershipTracker?,
+
+			Purchased: Signal.Signal<number>,
+			PromptClosed: Signal.Signal<(number, boolean)>,
+			ShowPromptRequested: Signal.Signal<number>,
+
+			_promiseNoPromptOpen: Promise.Promise<()>?,
+		},
+		{} :: typeof({ __index = PlayerAssetMarketTracker })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new market tracker. Generally you should not need to use
@@ -28,10 +53,14 @@ PlayerAssetMarketTracker.__index = PlayerAssetMarketTracker
 	@param observeIdsBrio function
 	@return PlayerAssetMarketTracker
 ]=]
-function PlayerAssetMarketTracker.new(assetType: GameConfigAssetTypes.GameConfigAssetType, convertIds, observeIdsBrio)
+function PlayerAssetMarketTracker.new(
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	convertIds,
+	observeIdsBrio
+): PlayerAssetMarketTracker
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
-	local self = setmetatable(BaseObject.new(), PlayerAssetMarketTracker)
+	local self: PlayerAssetMarketTracker = setmetatable(BaseObject.new() :: any, PlayerAssetMarketTracker)
 
 	self._assetType = assert(assetType, "No assetType")
 	self._convertIds = assert(convertIds, "No convertIds")
@@ -44,9 +73,9 @@ function PlayerAssetMarketTracker.new(assetType: GameConfigAssetTypes.GameConfig
 
 	self._promptsOpenCount = self._maid:Add(ValueObject.new(0, "number"))
 
-	self.Purchased = self._maid:Add(Signal.new()) -- :Fire(id)
-	self.PromptClosed = self._maid:Add(Signal.new()) -- :Fire(id, isPurchased)
-	self.ShowPromptRequested = self._maid:Add(Signal.new()) -- :Fire(id)
+	self.Purchased = self._maid:Add(Signal.new() :: any) -- :Fire(id)
+	self.PromptClosed = self._maid:Add(Signal.new() :: any) -- :Fire(id, isPurchased)
+	self.ShowPromptRequested = self._maid:Add(Signal.new() :: any) -- :Fire(id)
 
 	self._maid:GiveTask(self.Purchased:Connect(function(id)
 		self._purchasedThisSession[id] = true
@@ -65,11 +94,15 @@ function PlayerAssetMarketTracker.new(assetType: GameConfigAssetTypes.GameConfig
 	self._maid:GiveTask(function()
 		while #self._pendingPurchasePromises > 0 do
 			local pending = table.remove(self._pendingPurchasePromises, #self._pendingPurchasePromises)
+			assert(pending, "Typechecking assertion")
+
 			pending:Reject()
 		end
 
 		while #self._pendingPromptOpenPromises > 0 do
 			local pending = table.remove(self._pendingPromptOpenPromises, #self._pendingPromptOpenPromises)
+			assert(pending, "Typechecking assertion")
+
 			pending:Reject()
 		end
 	end)
@@ -82,7 +115,7 @@ end
 
 	@return Observable<number>
 ]=]
-function PlayerAssetMarketTracker:ObservePromptOpenCount(): Observable.Observable<number>
+function PlayerAssetMarketTracker.ObservePromptOpenCount(self: PlayerAssetMarketTracker): Observable.Observable<number>
 	return self._promptsOpenCount:Observe()
 end
 
@@ -92,7 +125,10 @@ end
 	@param idOrKey string | number
 	@return Observable<()>
 ]=]
-function PlayerAssetMarketTracker:ObserveAssetPurchased(idOrKey: string | number): Observable.Observable<()>
+function PlayerAssetMarketTracker.ObserveAssetPurchased(
+	self: PlayerAssetMarketTracker,
+	idOrKey: string | number
+): Observable.Observable<()>
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return Observable.new(function(sub)
@@ -132,7 +168,9 @@ end
 
 	@return GetOwnershipTracker
 ]=]
-function PlayerAssetMarketTracker:GetOwnershipTracker()
+function PlayerAssetMarketTracker.GetOwnershipTracker(
+	self: PlayerAssetMarketTracker
+): PlayerAssetOwnershipTracker.PlayerAssetOwnershipTracker?
 	return self._ownershipTracker
 end
 
@@ -143,7 +181,10 @@ end
 	@param idOrKey number | string
 	@return Promise<boolean>
 ]=]
-function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey: string | number)
+function PlayerAssetMarketTracker.PromisePromptPurchase(
+	self: PlayerAssetMarketTracker,
+	idOrKey: string | number
+): Promise.Promise<boolean>
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	local id = self._convertIds(idOrKey)
@@ -202,7 +243,7 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey: string | number
 			end
 
 			do
-				local promptOpenPromise = Promise.new()
+				local promptOpenPromise: Promise.Promise<boolean> = Promise.new()
 				self._pendingPromptOpenPromises[id] = promptOpenPromise
 
 				self._promptsOpenCount.Value = self._promptsOpenCount.Value + 1
@@ -215,7 +256,7 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey: string | number
 			end
 
 			-- Make sure to do promise here so we can't double-open prompts
-			local purchasePromise = Promise.new()
+			local purchasePromise: Promise.Promise<boolean> = Promise.new()
 			self._pendingPurchasePromises[id] = purchasePromise
 
 			purchasePromise:Finally(function()
@@ -235,7 +276,10 @@ end
 
 	@param ownershipTracker PlayerAssetOwnershipTracker
 ]=]
-function PlayerAssetMarketTracker:SetOwnershipTracker(ownershipTracker)
+function PlayerAssetMarketTracker.SetOwnershipTracker(
+	self: PlayerAssetMarketTracker,
+	ownershipTracker: PlayerAssetOwnershipTracker.PlayerAssetOwnershipTracker?
+): ()
 	assert(type(ownershipTracker) == "table" or ownershipTracker == nil, "Bad ownershipTracker")
 
 	self._ownershipTracker = ownershipTracker
@@ -246,7 +290,7 @@ end
 
 	@return GameConfigAssetTypes
 ]=]
-function PlayerAssetMarketTracker:GetAssetType(): GameConfigAssetTypes.GameConfigAssetType
+function PlayerAssetMarketTracker.GetAssetType(self: PlayerAssetMarketTracker): GameConfigAssetTypes.GameConfigAssetType
 	return self._assetType
 end
 
@@ -256,7 +300,10 @@ end
 	@param idOrKey string | number
 	@return boolean
 ]=]
-function PlayerAssetMarketTracker:HasPurchasedThisSession(idOrKey: string | number)
+function PlayerAssetMarketTracker.HasPurchasedThisSession(
+	self: PlayerAssetMarketTracker,
+	idOrKey: string | number
+): boolean
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "idOrKey")
 
 	local id = self._convertIds(idOrKey)
@@ -277,7 +324,7 @@ end
 
 	@return boolean
 ]=]
-function PlayerAssetMarketTracker:IsPromptOpen(): boolean
+function PlayerAssetMarketTracker.IsPromptOpen(self: PlayerAssetMarketTracker): boolean
 	return self._promptsOpenCount.Value > 0
 end
 
@@ -287,11 +334,15 @@ end
 	@param id number
 	@param isPurchased boolean
 ]=]
-function PlayerAssetMarketTracker:HandlePurchaseEvent(id: number, isPurchased: boolean)
+function PlayerAssetMarketTracker.HandlePurchaseEvent(
+	self: PlayerAssetMarketTracker,
+	id: number,
+	isPurchased: boolean
+): ()
 	assert(type(id) == "number", "Bad id")
 	assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
-	local purchasePromise = self._pendingPurchasePromises[id] or Promise.new()
+	local purchasePromise: any = self._pendingPurchasePromises[id] or Promise.new()
 
 	if isPurchased then
 		self.Purchased:Fire(id)
@@ -305,10 +356,10 @@ end
 
 	@param id number
 ]=]
-function PlayerAssetMarketTracker:HandlePromptClosedEvent(id: number)
+function PlayerAssetMarketTracker.HandlePromptClosedEvent(self: PlayerAssetMarketTracker, id: number): ()
 	assert(type(id) == "number", "Bad id")
 
-	local promptOpenPromise = self._pendingPromptOpenPromises[id] or Promise.new()
+	local promptOpenPromise: any = self._pendingPromptOpenPromises[id] or Promise.new()
 	promptOpenPromise:Resolve()
 end
 

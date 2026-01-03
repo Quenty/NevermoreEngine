@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Centralized death reporting service which can be used to track
 	deaths.

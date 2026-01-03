@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility class that helps cache rogue properties per an instance
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	This tracking is relatively complicated because we want to track both
 	ownership from attributes (can be customized locally), as well as async
@@ -10,6 +11,8 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigPicker = require("GameConfigPicker")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSet = require("ObservableSet")
@@ -20,10 +23,30 @@ local PlayerAssetOwnershipTracker = setmetatable({}, BaseObject)
 PlayerAssetOwnershipTracker.ClassName = "PlayerAssetOwnershipTracker"
 PlayerAssetOwnershipTracker.__index = PlayerAssetOwnershipTracker
 
-function PlayerAssetOwnershipTracker.new(player, configPicker, assetType, marketTracker)
+export type PlayerAssetOwnershipTracker =
+	typeof(setmetatable(
+		{} :: {
+			_player: Player,
+			_configPicker: any,
+			_assetType: GameConfigAssetTypes.GameConfigAssetType,
+			_marketTracker: any,
+			_ownershipCallback: ValueObject.ValueObject<(number) -> Promise.Promise<boolean> | nil>,
+			_ownedAssetIdSet: ObservableSet.ObservableSet<number>,
+			_assetOwnershipPromiseCache: { [number]: Promise.Promise<boolean> | boolean },
+		},
+		{} :: typeof({ __index = PlayerAssetOwnershipTracker })
+	))
+	& BaseObject.BaseObject
+
+function PlayerAssetOwnershipTracker.new(
+	player: Player,
+	configPicker: GameConfigPicker.GameConfigPicker,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	marketTracker: any
+): PlayerAssetOwnershipTracker
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
-	local self = setmetatable(BaseObject.new(), PlayerAssetOwnershipTracker)
+	local self: PlayerAssetOwnershipTracker = setmetatable(BaseObject.new() :: any, PlayerAssetOwnershipTracker)
 
 	self._player = assert(player, "No player")
 	self._configPicker = assert(configPicker, "No configPicker")
@@ -46,7 +69,7 @@ end
 	Sets the callback which will query ownership
 	@param promiseOwnsAsset function
 ]=]
-function PlayerAssetOwnershipTracker:SetQueryOwnershipCallback(promiseOwnsAsset)
+function PlayerAssetOwnershipTracker:SetQueryOwnershipCallback(promiseOwnsAsset: (any) -> Promise.Promise<boolean>?): ()
 	assert(type(promiseOwnsAsset) == "function" or promiseOwnsAsset == nil, "Bad promiseOwnsAsset")
 
 	if self._ownershipCallback.Value == promiseOwnsAsset then
@@ -57,7 +80,7 @@ function PlayerAssetOwnershipTracker:SetQueryOwnershipCallback(promiseOwnsAsset)
 	self._ownershipCallback.Value = promiseOwnsAsset
 end
 
-function PlayerAssetOwnershipTracker:_promiseQueryAssetId(assetId: number)
+function PlayerAssetOwnershipTracker:_promiseQueryAssetId(assetId: number): Promise.Promise<boolean>?
 	assert(type(assetId) == "number", "Bad assetId")
 
 	local promiseOwnershipCallback = self._ownershipCallback.Value
@@ -103,7 +126,7 @@ end
 	@param idOrKey number
 	@param ownsAsset boolean
 ]=]
-function PlayerAssetOwnershipTracker:SetOwnership(idOrKey, ownsAsset)
+function PlayerAssetOwnershipTracker:SetOwnership(idOrKey, ownsAsset: boolean): ()
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "idOrKey")
 	assert(type(ownsAsset) == "boolean", "Bad ownsAsset")
 
@@ -155,7 +178,7 @@ end
 	@param idOrKey number | number
 	@return Observable<boolean>
 ]=]
-function PlayerAssetOwnershipTracker:ObserveOwnsAsset(idOrKey)
+function PlayerAssetOwnershipTracker:ObserveOwnsAsset(idOrKey): Observable.Observable<boolean>
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	-- TODO: Get rid of several concepts here, including well known assets, attributes, and more
@@ -179,7 +202,7 @@ function PlayerAssetOwnershipTracker:ObserveOwnsAsset(idOrKey)
 			end))
 
 			return topMaid
-		end)
+		end) :: any
 	elseif type(idOrKey) == "number" then
 		return Observable.new(function(sub)
 			local maid = Maid.new()
@@ -193,7 +216,7 @@ function PlayerAssetOwnershipTracker:ObserveOwnsAsset(idOrKey)
 			end)
 
 			return maid
-		end)
+		end) :: any
 	else
 		error("Bad idOrKey")
 	end

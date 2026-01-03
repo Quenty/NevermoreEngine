@@ -16,7 +16,7 @@
     "moonwave": "^1.1.2"
   },
   "scripts": {
-    "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json",
+    "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json --absolute",
     "build:link": "npx lerna exec --parallel -- npm install --no-package-lock --no-audit --no-fund",
     "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore=**/node_modules/** --ignore=**/*.story.lua --ignore=**/*.client.lua --ignore=**/*.server.lua src",
     "lint:moonwave": "npx lerna exec --parallel -- moonwave-extractor extract src",

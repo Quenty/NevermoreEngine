@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Serverside implementation of IKRig
 	@server

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Declaration for the adornee data value
 

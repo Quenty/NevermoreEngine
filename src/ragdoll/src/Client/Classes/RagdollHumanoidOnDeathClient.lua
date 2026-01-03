@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Ragdolls the humanoid on death. Should be bound via [RagdollBindersClient].
 
@@ -15,6 +16,7 @@ local BaseObject = require("BaseObject")
 local Binder = require("Binder")
 local CharacterUtils = require("CharacterUtils")
 local RagdollClient = require("RagdollClient")
+local ServiceBag = require("ServiceBag")
 
 local RagdollHumanoidOnDeathClient = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeathClient.ClassName = "RagdollHumanoidOnDeathClient"
@@ -26,7 +28,7 @@ RagdollHumanoidOnDeathClient.__index = RagdollHumanoidOnDeathClient
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnDeathClient
 ]=]
-function RagdollHumanoidOnDeathClient.new(humanoid, serviceBag)
+function RagdollHumanoidOnDeathClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeathClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

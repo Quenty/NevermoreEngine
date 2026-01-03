@@ -34,6 +34,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"

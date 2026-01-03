@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
     Generated PS5Dark with Python
     @class PS5Dark

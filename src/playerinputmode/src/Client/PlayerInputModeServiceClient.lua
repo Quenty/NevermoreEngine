@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Reports back the player input mode to the server which allows for displaying what
 	mode the uesr is using.

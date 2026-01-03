@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility for teleporting humanoids
 	@class HumanoidTeleportUtils
@@ -22,16 +23,23 @@ local SEARCH_UP_TO = 40
 	@return boolean -- True if safe
 	@return Vector3? -- Position if we can hit it
 ]=]
-function HumanoidTeleportUtils.identifySafePosition(position, raycaster)
+function HumanoidTeleportUtils.identifySafePosition(
+	position: Vector3,
+	raycaster: Raycaster.Raycaster?
+): (boolean, Vector3?)
 	assert(typeof(position) == "Vector3", "Bad position")
 
 	if not raycaster then
 		raycaster = Raycaster.new()
+		assert(raycaster, "Typecheck assertion")
+
 		raycaster.MaxCasts = 10
 		raycaster.Filter = function(hitData)
 			return not hitData.Part.CanCollide
 		end
 	end
+
+	assert(raycaster, "Typecheck assertion")
 
 	for i = 1, SEARCH_UP_TO, 2 do
 		local origin = position + Vector3.new(0, i, 0)
@@ -67,7 +75,7 @@ end
 	@param rootPart BasePart
 	@param position Vector3
 ]=]
-function HumanoidTeleportUtils.teleportRootPart(humanoid, rootPart, position: Vector3 | CFrame)
+function HumanoidTeleportUtils.teleportRootPart(humanoid: Humanoid, rootPart: BasePart, position: Vector3 | CFrame): ()
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(rootPart) == "Instance" and rootPart:IsA("BasePart"), "Bad rootPart")
 	assert(typeof(position) == "Vector3" or typeof(position) == "CFrame", "Bad position")
@@ -88,7 +96,12 @@ end
 	@param parts { BasePart }
 	@param position Vector3
 ]=]
-function HumanoidTeleportUtils.teleportParts(humanoid, rootPart, parts, position)
+function HumanoidTeleportUtils.teleportParts(
+	humanoid: Humanoid,
+	rootPart: BasePart,
+	parts: { BasePart },
+	position: Vector3
+): ()
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(rootPart) == "Instance" and rootPart:IsA("BasePart"), "Bad rootPart")
 	assert(type(parts) == "table", "Bad parts")
@@ -118,7 +131,7 @@ end
 	@param character Model
 	@param position Vector3
 ]=]
-function HumanoidTeleportUtils.tryTeleportCharacter(character, position)
+function HumanoidTeleportUtils.tryTeleportCharacter(character: Model, position: Vector3): boolean
 	assert(typeof(character) == "Instance", "Bad character")
 	assert(typeof(position) == "Vector3", "Bad position")
 
@@ -136,7 +149,7 @@ function HumanoidTeleportUtils.tryTeleportCharacter(character, position)
 	return true
 end
 
-function HumanoidTeleportUtils.getRootPartOffset(humanoid, rootPart)
+function HumanoidTeleportUtils.getRootPartOffset(humanoid: Humanoid, rootPart: BasePart): Vector3
 	-- Calculate additional offset for teleportation
 	return Vector3.new(0, rootPart.Size.Y / 2 + humanoid.HipHeight, 0)
 end

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Guarantees that only one snackbar is visible at once
 	@class SnackbarServiceClient

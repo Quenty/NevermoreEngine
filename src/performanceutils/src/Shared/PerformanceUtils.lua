@@ -1,4 +1,4 @@
---strict
+--!strict
 --[=[
 	@class PerformanceUtils
 ]=]
@@ -9,14 +9,18 @@ local String = require("String")
 
 local PerformanceUtils = {}
 
-local timeStack = {}
-local counters = {}
+local timeStack: { ProfilerStamp } = {}
+local counters: { [string]: CounterData } = {}
 local objectStacks = {}
 
 type Formatter = (number) -> string
 export type CounterData = {
 	total: number,
 	formatter: Formatter,
+}
+export type ProfilerStamp = {
+	label: string,
+	startTime: number,
 }
 
 function PerformanceUtils.profileTimeBegin(label: string): () -> ()
@@ -57,12 +61,12 @@ function PerformanceUtils.getOrCreateCounter(label: string): CounterData
 	if data then
 		return data
 	else
-		counters[label] = {
+		local created: CounterData = {
 			total = 0,
-			formatter = tostring,
+			formatter = tostring :: any,
 		}
-
-		return counters[label]
+		counters[label] = created
+		return created
 	end
 end
 
@@ -202,6 +206,9 @@ function PerformanceUtils.trackObjectConstruction(object: any): () -> ()
 	end
 end
 
+--[=[
+	Prints all counters to output.
+]=]
 function PerformanceUtils.printAll(): ()
 	local keys = {}
 	for label, _ in counters do

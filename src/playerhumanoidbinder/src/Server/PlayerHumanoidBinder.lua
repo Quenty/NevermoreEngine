@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Binder that will automatically bind to each player's humanoid
 	@class PlayerHumanoidBinder

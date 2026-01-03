@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Server-side snackbar service. See [SnackbarServiceClient] for more details.
 

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Like a template provider, but it also reparents and retrieves tagged objects
 

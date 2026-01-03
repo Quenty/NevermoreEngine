@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Picker for hue and Saturation in HSV. See [HSVColorPicker] for the full color picker,
 	which also allows you to select "Value".

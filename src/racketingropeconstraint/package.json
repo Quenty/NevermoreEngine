@@ -32,6 +32,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/overriddenproperty": "file:../overriddenproperty",
     "@quenty/promise": "file:../promise",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/tie": "file:../tie",
     "@quenty/valueobject": "file:../valueobject"
   },

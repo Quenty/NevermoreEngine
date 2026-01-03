@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Creates an inertia based scrolling frame that is animated and has inertia frames
 	Alternative to a Roblox ScrollingFrame with inertia scrolling and complete control over behavior and style.

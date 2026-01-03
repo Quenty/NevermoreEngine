@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Generated XboxOneDark with Python
 	@class XboxOneDark

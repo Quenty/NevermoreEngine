@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Picker for value in HSV. See [HSVColorPicker] for usage.
 

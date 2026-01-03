@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class Motor6DServiceClient
 ]=]

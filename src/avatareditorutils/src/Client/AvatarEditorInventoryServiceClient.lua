@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class AvatarEditorInventoryServiceClient
 ]=]
@@ -18,6 +19,14 @@ local ValueObject = require("ValueObject")
 
 local AvatarEditorInventoryServiceClient = {}
 AvatarEditorInventoryServiceClient.ServiceName = "AvatarEditorInventoryServiceClient"
+
+export type AvatarEditorInventoryServiceClient = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_serviceBag: ServiceBag.ServiceBag,
+	},
+	{} :: typeof({ __index = AvatarEditorInventoryServiceClient })
+))
 
 function AvatarEditorInventoryServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")

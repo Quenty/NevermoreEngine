@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class ColorSwatch.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Blend = require("Blend")
 local ColorSwatch = require("ColorSwatch")

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Parses text into markdown
 	@class MarkdownParser
@@ -7,7 +8,7 @@ local MarkdownParser = {}
 MarkdownParser.__index = MarkdownParser
 MarkdownParser.ClassName = "MarkdownParser"
 
-function MarkdownParser.new(text)
+function MarkdownParser.new(text: string)
 	local self = setmetatable({}, MarkdownParser)
 
 	self._text = text or error("No text")

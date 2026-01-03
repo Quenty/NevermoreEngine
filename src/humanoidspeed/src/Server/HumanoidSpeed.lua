@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Manages speed of a humanoid
 

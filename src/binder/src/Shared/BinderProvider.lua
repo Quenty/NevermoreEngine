@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides a basis for binders that can be retrieved anywhere
 	@class BinderProvider
@@ -21,10 +22,12 @@ BinderProvider.__index = BinderProvider
 	:::
 
 	```lua
+	local ServiceBag = require("ServiceBag")
+
 	local serviceBag = ServiceBag.new()
 
 	-- Usually in a separate file!
-	local binderProvider = BinderProvider.new("BirdBinders", function(self, serviceBag)
+	local binderProvider = BinderProvider.new("BirdBinders", function(self, serviceBag: ServiceBag.ServiceBag)
 		self:Add(Binder.new("MyClass", require("MyClass"), serviceBag))
 	end)
 

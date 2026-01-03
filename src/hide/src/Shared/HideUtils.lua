@@ -1,9 +1,11 @@
+--!strict
 --[=[
 	Utility involving the [Hide] binder.
 	@class HideUtils
 ]=]
 
 local CollectionService = game:GetService("CollectionService")
+
 local HideUtils = {}
 
 --[=[
