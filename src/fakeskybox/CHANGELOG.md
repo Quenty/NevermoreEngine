@@ -1,20 +1,15 @@
-# v11.11.4 (Sat Jan 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
-- style: Default to strict ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.11.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.11.3...@quenty/fakeskybox@11.11.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/fakeskybox
+
+
+
+
 
 ## [11.11.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.11.2...@quenty/fakeskybox@11.11.3) (2025-12-29)
 

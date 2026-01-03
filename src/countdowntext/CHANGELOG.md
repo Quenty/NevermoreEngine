@@ -1,20 +1,18 @@
-# v4.9.1 (Sat Jan 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
-- fix: Show zero text when at zero ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.9.0...@quenty/countdowntext@4.9.1) (2026-01-03)
+
+
+### Bug Fixes
+
+* Show zero text when at zero ([8de88e3](https://github.com/Quenty/NevermoreEngine/commit/8de88e30f56ff53a5d846ec41a43cf7bef0bb046))
+
+
+
+
 
 # [4.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.8.3...@quenty/countdowntext@4.9.0) (2025-05-10)
 

@@ -1,20 +1,15 @@
-# v2.3.2 (Sat Jan 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
-- style: Default to strict ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roundedbackingbuilder@2.3.1...@quenty/roundedbackingbuilder@2.3.2) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/roundedbackingbuilder
+
+
+
+
 
 ## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roundedbackingbuilder@2.3.0...@quenty/roundedbackingbuilder@2.3.1) (2025-11-12)
 

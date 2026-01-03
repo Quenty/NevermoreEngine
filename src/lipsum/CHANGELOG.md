@@ -1,21 +1,15 @@
-# v14.22.7 (Sat Jan 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
-- style: Turn on strict typing for some more items ([@Quenty](https://github.com/Quenty))
-- style: Default to strict ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.22.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.22.6...@quenty/lipsum@14.22.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/lipsum
+
+
+
+
 
 ## [14.22.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.22.5...@quenty/lipsum@14.22.6) (2025-12-31)
 

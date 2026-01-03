@@ -1,21 +1,15 @@
-# v7.9.3 (Sat Jan 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
-- style: Turn on strict typing for some more items ([@Quenty](https://github.com/Quenty))
-- style: Default to strict ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.9.2...@quenty/draw@7.9.3) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/draw
+
+
+
+
 
 ## [7.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.9.1...@quenty/draw@7.9.2) (2025-11-12)
 

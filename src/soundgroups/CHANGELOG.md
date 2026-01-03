@@ -1,20 +1,15 @@
-# v1.25.8 (Sat Jan 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
-- style: Default to strict ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.25.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.7...@quenty/soundgroup@1.25.8) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
 
 ## [1.25.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.6...@quenty/soundgroup@1.25.7) (2025-12-31)
 

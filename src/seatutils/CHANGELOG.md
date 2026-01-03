@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.24.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.6...@quenty/seatutils@7.24.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
 ## [7.24.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.5...@quenty/seatutils@7.24.6) (2025-12-31)
 
 **Note:** Version bump only for package @quenty/seatutils

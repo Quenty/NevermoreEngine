@@ -1,21 +1,15 @@
-# v13.19.7 (Sat Jan 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
-- style: Turn on strict typing for some more items ([@Quenty](https://github.com/Quenty))
-- style: Default to strict ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.19.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.6...@quenty/sprites@13.19.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
 
 ## [13.19.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.5...@quenty/sprites@13.19.6) (2025-12-31)
 

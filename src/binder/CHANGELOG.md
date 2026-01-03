@@ -1,23 +1,18 @@
-# v14.25.7 (Sat Jan 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
-- style: Turn on strict typing for some more items ([@Quenty](https://github.com/Quenty))
-- style: Default to strict ([@Quenty](https://github.com/Quenty))
-- fix: Fix missing servicebag dependencies [#623](https://github.com/Quenty/NevermoreEngine/pull/623) ([@Quenty](https://github.com/Quenty))
-- style: Add servicebag ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.25.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.25.6...@quenty/binder@14.25.7) (2026-01-03)
+
+
+### Bug Fixes
+
+* Fix missing servicebag dependencies ([ba2274e](https://github.com/Quenty/NevermoreEngine/commit/ba2274ec070356518a157d80f912b05de9f74451))
+
+
+
+
 
 ## [14.25.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.25.5...@quenty/binder@14.25.6) (2025-12-31)
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidmovedirectionutils",
-  "version": "10.9.2",
+  "version": "10.9.3",
   "description": "Gets the relative move direction from the camera and the humanoid allowing Roblox's input system to be layered on top of a camera system.",
   "keywords": [
     "Roblox",
