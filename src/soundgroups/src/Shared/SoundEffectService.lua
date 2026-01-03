@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles applying global volume and effects to specific sounds in a group based upon a path.
 

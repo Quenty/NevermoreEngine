@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles cmdr integration
 	@class GameConfigCommandService

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.13.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.13.3...@quenty/canceltoken@11.13.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+
+
+
+
 ## [11.13.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.13.2...@quenty/canceltoken@11.13.3) (2025-12-31)
 
 **Note:** Version bump only for package @quenty/canceltoken

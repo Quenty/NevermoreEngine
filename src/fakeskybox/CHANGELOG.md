@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.11.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.11.3...@quenty/fakeskybox@11.11.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/fakeskybox
+
+
+
+
+
 ## [11.11.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.11.2...@quenty/fakeskybox@11.11.3) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/fakeskybox

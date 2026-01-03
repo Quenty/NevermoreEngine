@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	These settings definitions are used to define a setting and register them on both the client and server. See
 	[SettingDefinitionProvider] for more details on grouping these.

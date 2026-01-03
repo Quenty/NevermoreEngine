@@ -1,6 +1,6 @@
 {
   "name": "@quenty/firstpersoncharactertransparency",
-  "version": "14.23.6",
+  "version": "14.23.7",
   "description": "Allows transparency to manually be controlled for a character in first-person mode",
   "keywords": [
     "Roblox",
@@ -34,6 +34,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/r15utils": "file:../r15utils",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/statestack": "file:../statestack",
     "@quenty/transparencyservice": "file:../transparencyservice",
     "@quenty/ugcsanitize": "file:../ugcsanitize"

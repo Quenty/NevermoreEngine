@@ -1,3 +1,4 @@
+--!nonstrict
 -- Don't want to include loader here, so we do this instead
 local Maid = require(game.ServerScriptService.maid.Shared.Maid)
 

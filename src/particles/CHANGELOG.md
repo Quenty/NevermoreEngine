@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particles@5.11.0...@quenty/particles@5.11.1) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/particles
+
+
+
+
+
 # [5.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particles@5.10.0...@quenty/particles@5.11.0) (2025-09-16)
 
 

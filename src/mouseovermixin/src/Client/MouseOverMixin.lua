@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Mouse over mixin for general utility button mouse over effects
 	@class MouseOverMixin

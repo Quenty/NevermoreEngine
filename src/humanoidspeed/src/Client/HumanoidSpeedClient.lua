@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Client version of the [HumanoidSpeed] class
 

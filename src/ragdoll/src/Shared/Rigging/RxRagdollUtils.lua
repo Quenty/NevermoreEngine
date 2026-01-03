@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility methods to assist with rigging the ragdoll in real-time.
 

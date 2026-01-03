@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class IKRigBase
 ]=]
@@ -8,6 +9,7 @@ local ArmIKBase = require("ArmIKBase")
 local BaseObject = require("BaseObject")
 local CharacterUtils = require("CharacterUtils")
 local Promise = require("Promise")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local TorsoIKBase = require("TorsoIKBase")
 
@@ -15,7 +17,7 @@ local IKRigBase = setmetatable({}, BaseObject)
 IKRigBase.ClassName = "IKRigBase"
 IKRigBase.__index = IKRigBase
 
-function IKRigBase.new(humanoid, serviceBag)
+function IKRigBase.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid, serviceBag), IKRigBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -30,19 +32,19 @@ function IKRigBase.new(humanoid, serviceBag)
 	return self
 end
 
-function IKRigBase:GetLastUpdateTime()
+function IKRigBase:GetLastUpdateTime(): number
 	return self._lastUpdateTime
 end
 
-function IKRigBase:GetPlayer()
+function IKRigBase:GetPlayer(): Player?
 	return CharacterUtils.getPlayerFromCharacter(self._obj)
 end
 
-function IKRigBase:GetHumanoid()
+function IKRigBase:GetHumanoid(): Humanoid
 	return self._obj
 end
 
-function IKRigBase:Update()
+function IKRigBase:Update(): ()
 	self._lastUpdateTime = tick()
 	self.Updating:Fire()
 

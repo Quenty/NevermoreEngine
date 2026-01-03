@@ -1,6 +1,6 @@
 {
   "name": "@quenty/steputils",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "description": "Binds animations into step, where the animation only runs as needed",
   "keywords": [
     "Roblox",

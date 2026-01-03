@@ -1,3 +1,4 @@
+--!nonstrict
 --!native
 
 -- Arithmetic on the Finite Field of Integers modulo q

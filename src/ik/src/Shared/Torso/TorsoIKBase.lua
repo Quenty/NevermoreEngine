@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Torso resources for IK
 	@class TorsoIKBase

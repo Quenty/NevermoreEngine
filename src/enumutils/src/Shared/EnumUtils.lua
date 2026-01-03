@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Helds encode Roblox enums into a string
 

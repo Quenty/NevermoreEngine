@@ -32,6 +32,17 @@ export type ReceiptInfo = {
 local ReceiptProcessingService = {}
 ReceiptProcessingService.ServiceName = "ReceiptProcessingService"
 
+export type ReceiptProcessingService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_receiptProcessedForUserId: ObservableSubscriptionTable.ObservableSubscriptionTable<number, ReceiptInfo>,
+		_defaultDecision: ValueObject.ValueObject<Enum.ProductPurchaseDecision>,
+		_processors: any,
+	},
+	{} :: typeof({ __index = ReceiptProcessingService })
+))
+
 function ReceiptProcessingService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")

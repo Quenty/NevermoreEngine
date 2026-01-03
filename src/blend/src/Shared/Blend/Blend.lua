@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Declarative UI system inspired by Fusion.
 	@class Blend

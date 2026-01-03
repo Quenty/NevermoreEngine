@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Construct a rounded backing with a shadow.
 	@class RoundedBackingBuilder

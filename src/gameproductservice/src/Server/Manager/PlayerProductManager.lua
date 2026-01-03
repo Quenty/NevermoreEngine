@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles product prompting state on the server
 
@@ -17,10 +18,21 @@ local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local ReceiptProcessingService = require("ReceiptProcessingService")
 local Remoting = require("Remoting")
+local ServiceBag = require("ServiceBag")
 
 local PlayerProductManager = setmetatable({}, PlayerProductManagerBase)
 PlayerProductManager.ClassName = "PlayerProductManager"
 PlayerProductManager.__index = PlayerProductManager
+
+export type PlayerProductManager =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_receiptProcessingService: ReceiptProcessingService.ReceiptProcessingService,
+		},
+		{} :: typeof({ __index = PlayerProductManager })
+	))
+	& PlayerProductManagerBase.PlayerProductManagerBase
 
 --[=[
 	Managers players products and purchase state. Should be retrieved via binder.
@@ -29,8 +41,9 @@ PlayerProductManager.__index = PlayerProductManager
 	@param serviceBag ServiceBag
 	@return PlayerProductManager
 ]=]
-function PlayerProductManager.new(player, serviceBag)
-	local self = setmetatable(PlayerProductManagerBase.new(player, serviceBag), PlayerProductManager)
+function PlayerProductManager.new(player: Player, serviceBag: ServiceBag.ServiceBag): PlayerProductManager
+	local self: PlayerProductManager =
+		setmetatable(PlayerProductManagerBase.new(player, serviceBag) :: any, PlayerProductManager)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._receiptProcessingService = self._serviceBag:GetService(ReceiptProcessingService)
@@ -54,11 +67,11 @@ function PlayerProductManager.new(player, serviceBag)
 	return self
 end
 
-function PlayerProductManager:_setupRemoting()
+function PlayerProductManager._setupRemoting(self: PlayerProductManager): ()
 	self._remoting = self._maid:Add(Remoting.Server.new(self._obj, "PlayerProductManager", Remoting.Realms.SERVER))
 end
 
-function PlayerProductManager:_setupAssetTracker()
+function PlayerProductManager._setupAssetTracker(self: PlayerProductManager): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)
 
 	self._maid:GiveTask(self._remoting.AssetPromptPurchaseFinished:Connect(function(player, assetId, isPurchased)
@@ -72,7 +85,7 @@ function PlayerProductManager:_setupAssetTracker()
 	end))
 end
 
-function PlayerProductManager:_setupProductTracker()
+function PlayerProductManager._setupProductTracker(self: PlayerProductManager): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
 
 	-- Source of truth for purchase is here
@@ -104,7 +117,7 @@ function PlayerProductManager:_setupProductTracker()
 	)
 end
 
-function PlayerProductManager:_setupPassTracker()
+function PlayerProductManager._setupPassTracker(self: PlayerProductManager): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
 
 	self._maid:GiveTask(self._remoting.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
@@ -118,7 +131,7 @@ function PlayerProductManager:_setupPassTracker()
 	end))
 end
 
-function PlayerProductManager:_setupMembershipTracker()
+function PlayerProductManager._setupMembershipTracker(self: PlayerProductManager): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.MEMBERSHIP)
 
 	self._maid:GiveTask(Players.PlayerMembershipChanged:Connect(function(player)
@@ -130,7 +143,7 @@ function PlayerProductManager:_setupMembershipTracker()
 	end))
 end
 
-function PlayerProductManager:_setupSubscriptionTracker()
+function PlayerProductManager._setupSubscriptionTracker(self: PlayerProductManager): ()
 	self._remoting.UserSubscriptionStatusChanged:DeclareEvent()
 
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.SUBSCRIPTION)
@@ -163,7 +176,7 @@ function PlayerProductManager:_setupSubscriptionTracker()
 	end))
 end
 
-function PlayerProductManager:_setupBundleTracker()
+function PlayerProductManager._setupBundleTracker(self: PlayerProductManager): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE)
 
 	self._maid:GiveTask(MarketplaceService.PromptBundlePurchaseFinished:Connect(function(player, bundleId, isPurchased)

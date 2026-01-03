@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Allows access to an attribute like a ValueObject but in table form.
 

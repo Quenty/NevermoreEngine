@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Generic command definition template
 	@class CmdrCommandDefinitionTemplate

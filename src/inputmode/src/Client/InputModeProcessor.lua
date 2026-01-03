@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Process inputs by evaluating inputModes. Helper object..
 

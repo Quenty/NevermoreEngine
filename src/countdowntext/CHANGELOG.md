@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.9.0...@quenty/countdowntext@4.9.1) (2026-01-03)
+
+
+### Bug Fixes
+
+* Show zero text when at zero ([8de88e3](https://github.com/Quenty/NevermoreEngine/commit/8de88e30f56ff53a5d846ec41a43cf7bef0bb046))
+
+
+
+
+
 # [4.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.8.3...@quenty/countdowntext@4.9.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/countdowntext

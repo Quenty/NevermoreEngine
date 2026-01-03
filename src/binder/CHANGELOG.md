@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.25.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.25.6...@quenty/binder@14.25.7) (2026-01-03)
+
+
+### Bug Fixes
+
+* Fix missing servicebag dependencies ([ba2274e](https://github.com/Quenty/NevermoreEngine/commit/ba2274ec070356518a157d80f912b05de9f74451))
+
+
+
+
+
 ## [14.25.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.25.5...@quenty/binder@14.25.6) (2025-12-31)
 
 

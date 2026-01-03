@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Interface that mirrors [Signal] API
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.11.0...@quenty/randomutils@6.11.1) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/randomutils
+
+
+
+
+
 # [6.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.10.3...@quenty/randomutils@6.11.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/randomutils

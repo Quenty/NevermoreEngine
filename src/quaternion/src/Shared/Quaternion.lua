@@ -1,3 +1,4 @@
+--!nonstrict
 --stylua: ignore
 --[=[
 	Quaternion data type

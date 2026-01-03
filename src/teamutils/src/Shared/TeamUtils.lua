@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Team utility methods
 	@class TeamUtils

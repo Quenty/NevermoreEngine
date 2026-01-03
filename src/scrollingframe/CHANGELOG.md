@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.12.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.12.3...@quenty/scrollingframe@12.12.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/scrollingframe
+
+
+
+
+
 ## [12.12.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.12.2...@quenty/scrollingframe@12.12.3) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/scrollingframe

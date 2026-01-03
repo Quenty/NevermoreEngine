@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Base of a template retrieval system. Templates can be retrieved from Roblox and then retrieved by name. If a folder is used
 	all of their children are also included as templates, which allows for flexible organization by artists.

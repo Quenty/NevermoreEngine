@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Shared between client and server, letting us centralize definitions in one place.
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.23.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.6...@quenty/firstpersoncharactertransparency@14.23.7) (2026-01-03)
+
+
+### Bug Fixes
+
+* Fix missing servicebag dependencies ([ba2274e](https://github.com/Quenty/NevermoreEngine/commit/ba2274ec070356518a157d80f912b05de9f74451))
+
+
+
+
+
 ## [14.23.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.5...@quenty/firstpersoncharactertransparency@14.23.6) (2025-12-31)
 
 **Note:** Version bump only for package @quenty/firstpersoncharactertransparency

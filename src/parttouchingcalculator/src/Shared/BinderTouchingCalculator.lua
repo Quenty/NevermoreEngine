@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Extends PartTouchingCalculator with generic binder stuff
 	@class BinderTouchingCalculator

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Constructing a new rogue property/rogue property table can be expensive.
 	This caches it so frame-usage is cheap.

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class Motor6DStackHumanoid
 ]=]
@@ -9,12 +10,13 @@ local Motor6DStack = require("Motor6DStack")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 
 local Motor6DStackHumanoid = setmetatable({}, BaseObject)
 Motor6DStackHumanoid.ClassName = "Motor6DStackHumanoid"
 Motor6DStackHumanoid.__index = Motor6DStackHumanoid
 
-function Motor6DStackHumanoid.new(humanoid: Humanoid, serviceBag)
+function Motor6DStackHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), Motor6DStackHumanoid)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

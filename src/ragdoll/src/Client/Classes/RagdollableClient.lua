@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Initialize via [RagdollServiceClient].
 
@@ -13,6 +14,7 @@ local RagdollableBase = require("RagdollableBase")
 local RagdollableInterface = require("RagdollableInterface")
 local Rx = require("Rx")
 local RxRagdollUtils = require("RxRagdollUtils")
+local ServiceBag = require("ServiceBag")
 
 local RagdollableClient = setmetatable({}, RagdollableBase)
 RagdollableClient.ClassName = "RagdollableClient"
@@ -24,7 +26,7 @@ RagdollableClient.__index = RagdollableClient
 	@param serviceBag ServiceBag
 	@return RagdollableClient
 ]=]
-function RagdollableClient.new(humanoid, serviceBag)
+function RagdollableClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(RagdollableBase.new(humanoid), RagdollableClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

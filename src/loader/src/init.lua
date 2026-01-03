@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Primary loader which handles bootstrapping different scenarios quickly
 
@@ -26,7 +27,7 @@ local Loader = {}
 Loader.__index = Loader
 Loader.ClassName = "Loader"
 
-function Loader.new(packages, replicationType)
+function Loader.new(packages: Instance, replicationType: ReplicationType.ReplicationType)
 	assert(typeof(packages) == "Instance", "Bad packages")
 	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
 
@@ -40,7 +41,7 @@ function Loader.new(packages, replicationType)
 	return self
 end
 
-function Loader.bootstrapGame(packages)
+function Loader.bootstrapGame(packages: Instance)
 	assert(typeof(packages) == "Instance", "Bad packages")
 
 	local self = Loader.new(packages, ReplicationTypeUtils.inferReplicationType())
@@ -61,7 +62,7 @@ function Loader.bootstrapGame(packages)
 	return self
 end
 
-function Loader.bootstrapPlugin(packages)
+function Loader.bootstrapPlugin(packages: Instance)
 	assert(typeof(packages) == "Instance", "Bad packages")
 
 	local self = Loader.new(packages, ReplicationType.PLUGIN)
@@ -73,7 +74,7 @@ function Loader.bootstrapPlugin(packages)
 	return self
 end
 
-function Loader.bootstrapStory(storyScript)
+function Loader.bootstrapStory(storyScript: Instance)
 	assert(typeof(storyScript) == "Instance", "Bad storyScript")
 
 	-- Prepopulate global package roots
@@ -94,7 +95,7 @@ function Loader.bootstrapStory(storyScript)
 	return self
 end
 
-function Loader.load(packagesOrModuleScript)
+function Loader.load(packagesOrModuleScript: Instance)
 	assert(typeof(packagesOrModuleScript) == "Instance", "Bad packagesOrModuleScript")
 
 	local self = Loader.new(packagesOrModuleScript, ReplicationTypeUtils.inferReplicationType())

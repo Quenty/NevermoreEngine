@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class CatalogSearchServiceCache
 ]=]
@@ -13,6 +14,14 @@ local ServiceBag = require("ServiceBag")
 
 local CatalogSearchServiceCache = {}
 CatalogSearchServiceCache.ServiceName = "CatalogSearchServiceCache"
+
+export type CatalogSearchServiceCache = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_serviceBag: ServiceBag.ServiceBag,
+	},
+	{} :: typeof({ __index = CatalogSearchServiceCache })
+))
 
 function CatalogSearchServiceCache:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
