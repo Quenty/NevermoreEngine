@@ -1,4 +1,5 @@
 type DictionaryLike = Record<any, unknown> | Map<unknown, unknown>;
+type TableLike = DictionaryLike | unknown[];
 
 type InvertDictionary<T extends Record<PropertyKey, PropertyKey>> = {
   [P in keyof T as T[P]]: P;
@@ -30,9 +31,9 @@ export namespace Table {
   ): T extends Map<unknown, infer V> ? V[] : T[keyof T][];
   function count(table: DictionaryLike | unknown[]): number;
   function copy<T extends DictionaryLike | unknown[]>(table: T): T;
-  function deepCopy<T extends DictionaryLike>(
+  function deepCopy<T extends TableLike>(
     table: T,
-    deepCopyContext?: DictionaryLike
+    deepCopyContext?: TableLike
   ): T;
   function deepOverwrite<T extends DictionaryLike, U extends DictionaryLike>(
     target: T,
