@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[54250],{93618:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"AdorneeModelBoundingBox","desc":"","source":{"line":4,"path":"src/adorneeboundingbox/src/Shared/AdorneeModelBoundingBox.lua"}}')}}]);

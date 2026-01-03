@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[5453],{86332:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DeathReportServiceConstants","desc":"","source":{"line":4,"path":"src/deathreport/src/Shared/DeathReportServiceConstants.lua"}}')}}]);

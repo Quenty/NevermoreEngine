@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[9779],{38106:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ChatTag","desc":"","source":{"line":5,"path":"src/chatproviderservice/src/Server/Binders/ChatTag.lua"}}')}}]);

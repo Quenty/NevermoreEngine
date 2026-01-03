@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[74245],{98804:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"AvatarEditorInventoryServiceClient","desc":"","source":{"line":4,"path":"src/avatareditorutils/src/Client/AvatarEditorInventoryServiceClient.lua"}}')}}]);

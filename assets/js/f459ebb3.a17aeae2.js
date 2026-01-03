@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[50335],{13180:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CmdrCommandDefinitionTemplate","desc":"Generic command definition template","source":{"line":6,"path":"src/cmdrservice/src/Server/CmdrTemplateProviderServer/CmdrCommandDefinitionTemplate.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[76748],{71844:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TestMantleConfigProvider","desc":"","source":{"line":5,"path":"src/gameconfig/test/modules/Server/TestMantleConfigProvider/init.lua"}}')}}]);

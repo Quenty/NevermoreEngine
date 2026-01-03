@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[63542],{48210:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ClipCharacterConstants","desc":"","source":{"line":4,"path":"src/clipcharacters/src/Shared/ClipCharactersServiceConstants.lua"}}')}}]);

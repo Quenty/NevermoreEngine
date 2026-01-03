@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[64301],{19373:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RagdollCameraShakeClient","desc":"","source":{"line":4,"path":"src/ragdoll/src/Client/Classes/RagdollCameraShakeClient.lua"}}')}}]);

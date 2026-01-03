@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[96221],{70054:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GameProductCmdrService","desc":"","source":{"line":4,"path":"src/gameproductservice/src/Server/Cmdr/GameProductCmdrService.lua"}}')}}]);

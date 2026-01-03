@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[15418],{23166:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"InputListScoreHelper","desc":"Distributes the scored action to the correct providers based upon input mode","source":{"line":5,"path":"src/scoredactionservice/src/Client/InputList/InputListScoreHelper.lua"}}')}}]);

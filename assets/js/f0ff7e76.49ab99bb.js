@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[78770],{33358:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CmdrTemplateProviderServer","desc":"Retrieves CmdrTemplateProviderServer","source":{"line":6,"path":"src/cmdrservice/src/Server/CmdrTemplateProviderServer/init.lua"}}')}}]);

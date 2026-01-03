@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[12488],{77050:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RagdollableInterface","desc":"","source":{"line":5,"path":"src/ragdoll/src/Shared/Interfaces/RagdollableInterface.lua"}}')}}]);

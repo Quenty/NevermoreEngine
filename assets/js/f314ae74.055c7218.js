@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[13654],{61738:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Motor6DService","desc":"","source":{"line":4,"path":"src/motor6d/src/Server/Motor6DService.lua"}}')}}]);

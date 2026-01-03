@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[67568],{2389:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"FlipbookLibrary","desc":"Holds flipbook data for playback","source":{"line":6,"path":"src/flipbook/src/Client/Library/FlipbookLibrary.lua"}}')}}]);

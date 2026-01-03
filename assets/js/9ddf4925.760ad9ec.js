@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[75520],{77242:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DeathReportBindersClient","desc":"","source":{"line":5,"path":"src/deathreport/src/Client/DeathReportBindersClient.lua"}}')}}]);

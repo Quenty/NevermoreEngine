@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[77919],{71426:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GameConfigBindersServer","desc":"","source":{"line":5,"path":"src/gameconfig/src/Server/GameConfigBindersServer.lua"}}')}}]);

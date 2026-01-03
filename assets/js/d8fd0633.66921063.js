@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[28577],{84126:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HideHead","desc":"","source":{"line":5,"path":"src/firstpersoncharactertransparency/src/Client/HideHead.lua"}}')}}]);

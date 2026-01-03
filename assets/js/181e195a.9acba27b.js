@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[57954],{85141:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SpawnServiceClient","desc":"","source":{"line":4,"path":"src/spawning/src/Client/SpawnServiceClient.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[71585],{37224:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Motor6DStackInterface","desc":"","source":{"line":4,"path":"src/motor6d/src/Shared/Stack/Motor6DStackInterface.lua"}}')}}]);

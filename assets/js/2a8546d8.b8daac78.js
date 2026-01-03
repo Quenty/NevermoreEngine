@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[95551],{82673:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ColorGradePalette","desc":"","source":{"line":5,"path":"src/colorpalette/src/Shared/Grade/ColorGradePalette.lua"}}')}}]);

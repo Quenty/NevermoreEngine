@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[32579],{61053:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IdleService","desc":"","source":{"line":5,"path":"src/idleservice/src/Server/IdleService.lua"}}')}}]);

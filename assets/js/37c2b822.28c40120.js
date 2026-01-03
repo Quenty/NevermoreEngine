@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[31372],{25446:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TieSignalConnection","desc":"","source":{"line":4,"path":"src/tie/src/Shared/Members/Signals/TieSignalConnection.lua"}}')}}]);

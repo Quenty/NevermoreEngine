@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[22554],{37234:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IKRightGrip","desc":"Right grip","source":{"line":6,"path":"src/ik/src/Shared/Grip/IKRightGrip.lua"}}')}}]);

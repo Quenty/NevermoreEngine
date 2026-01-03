@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[727],{57049:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GripPointer","desc":"Simple rig component to point at attachments given","realm":["Client"],"source":{"line":8,"path":"src/ik/src/Client/GripPointer.lua"}}')}}]);
