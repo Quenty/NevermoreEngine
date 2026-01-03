@@ -17,7 +17,7 @@ local IKRigBase = setmetatable({}, BaseObject)
 IKRigBase.ClassName = "IKRigBase"
 IKRigBase.__index = IKRigBase
 
-function IKRigBase.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function IKRigBase.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid, serviceBag), IKRigBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -32,19 +32,19 @@ function IKRigBase.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	return self
 end
 
-function IKRigBase:GetLastUpdateTime()
+function IKRigBase:GetLastUpdateTime(): number
 	return self._lastUpdateTime
 end
 
-function IKRigBase:GetPlayer()
+function IKRigBase:GetPlayer(): Player?
 	return CharacterUtils.getPlayerFromCharacter(self._obj)
 end
 
-function IKRigBase:GetHumanoid()
+function IKRigBase:GetHumanoid(): Humanoid
 	return self._obj
 end
 
-function IKRigBase:Update()
+function IKRigBase:Update(): ()
 	self._lastUpdateTime = tick()
 	self.Updating:Fire()
 

@@ -72,7 +72,7 @@ function Subscription.new<T...>(
 	fireCallback: FireCallback<T...>?,
 	failCallback: FailCallback?,
 	completeCallback: CompleteCallback?,
-	observableSource
+	observableSource: string?
 ): Subscription<T...>
 	assert(type(fireCallback) == "function" or fireCallback == nil, "Bad fireCallback")
 	assert(type(failCallback) == "function" or failCallback == nil, "Bad failCallback")

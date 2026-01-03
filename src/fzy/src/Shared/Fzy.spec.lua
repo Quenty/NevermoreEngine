@@ -35,8 +35,9 @@ THE SOFTWARE.
 
 local EPSILON = 0.000001
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Fzy = require("Fzy")
 local Jest = require("Jest")

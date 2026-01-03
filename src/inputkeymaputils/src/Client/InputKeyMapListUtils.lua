@@ -23,7 +23,10 @@ local InputKeyMapListUtils = {}
 	@param serviceBag ServiceBag
 	@return InputModeTypeSelector
 ]=]
-function InputKeyMapListUtils.getNewInputModeTypeSelector(inputKeyMapList, serviceBag: ServiceBag.ServiceBag)
+function InputKeyMapListUtils.getNewInputModeTypeSelector(
+	inputKeyMapList,
+	serviceBag: ServiceBag.ServiceBag
+): InputModeTypeSelector.InputModeTypeSelector
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 

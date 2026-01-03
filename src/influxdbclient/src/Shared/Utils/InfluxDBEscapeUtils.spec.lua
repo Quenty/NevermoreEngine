@@ -3,8 +3,9 @@
 	@class InfluxDBEscapeUtils.spec.lua
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local InfluxDBEscapeUtils = require("InfluxDBEscapeUtils")
 local Jest = require("Jest")

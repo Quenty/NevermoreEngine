@@ -4,6 +4,10 @@
 	@class IKGripUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local Binder = require("Binder")
+
 local IKGripUtils = {}
 
 --[=[
@@ -27,7 +31,7 @@ local IKGripUtils = {}
 	@param humanoid Humanoid
 	@return ObjectValue
 ]=]
-function IKGripUtils.create(binder, humanoid)
+function IKGripUtils.create(binder: Binder.Binder<any>, humanoid: Humanoid): ObjectValue
 	assert(binder, "Bad binder")
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 

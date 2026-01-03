@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --!native
 
 local util = {}
@@ -32,7 +32,7 @@ util.byteTableMT = {
 	},
 }
 
-function util.stringToByteArray(str)
+function util.stringToByteArray(str: string): { number }
 	if type(str) ~= "string" then
 		return {}
 	end

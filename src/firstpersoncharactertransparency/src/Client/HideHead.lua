@@ -16,7 +16,7 @@ local HideHead = setmetatable({}, BaseObject)
 HideHead.ClassName = "HideHead"
 HideHead.__index = HideHead
 
-function HideHead.new(character, serviceBag: ServiceBag.ServiceBag)
+function HideHead.new(character: Model, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(character), HideHead)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

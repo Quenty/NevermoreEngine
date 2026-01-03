@@ -23,7 +23,7 @@ local RacketingRopeConstraint = setmetatable({}, BaseObject)
 RacketingRopeConstraint.ClassName = "RacketingRopeConstraint"
 RacketingRopeConstraint.__index = RacketingRopeConstraint
 
-function RacketingRopeConstraint.new(ropeConstraint, serviceBag: ServiceBag.ServiceBag)
+function RacketingRopeConstraint.new(ropeConstraint: RopeConstraint, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(ropeConstraint), RacketingRopeConstraint)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

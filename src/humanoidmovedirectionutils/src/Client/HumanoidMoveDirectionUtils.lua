@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Gets the relative move direction from the camera and the humanoid allowing Roblox's input system to
 	be layered on top of a camera system.
