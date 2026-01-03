@@ -1,3 +1,18 @@
+# v4.9.5 (Sat Jan 03 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Nevermore is strict by default [#624](https://github.com/Quenty/NevermoreEngine/pull/624) ([@Quenty](https://github.com/Quenty))
+- style: Default to strict ([@Quenty](https://github.com/Quenty))
+- ci: Update Rojo version ([@Quenty](https://github.com/Quenty))
+- ci: Update CI pipeline ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
