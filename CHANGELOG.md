@@ -1,3 +1,16 @@
+# (Sun Jan 04 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/table@3.9.0`
+  - feat: Add reduce function to Table [#622](https://github.com/Quenty/NevermoreEngine/pull/622) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
 # (Sat Jan 03 2026)
 
 #### 🐛 Bug Fix

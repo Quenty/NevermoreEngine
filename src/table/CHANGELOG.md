@@ -1,3 +1,15 @@
+# v3.9.0 (Sun Jan 04 2026)
+
+#### 🚀 Enhancement
+
+- feat: Add reduce function to Table [#622](https://github.com/Quenty/NevermoreEngine/pull/622) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
