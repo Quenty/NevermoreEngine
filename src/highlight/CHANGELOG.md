@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.4...@quenty/highlight@10.27.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
 ## [10.26.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.3...@quenty/highlight@10.26.4) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/highlight

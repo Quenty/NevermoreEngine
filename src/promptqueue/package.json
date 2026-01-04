@@ -1,6 +1,6 @@
 {
   "name": "@quenty/promptqueue",
-  "version": "1.22.7",
+  "version": "1.23.0",
   "description": "Queue system for prompts and other UI",
   "keywords": [
     "Roblox",

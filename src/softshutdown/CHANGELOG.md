@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.30.7...@quenty/softshutdown@9.31.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
 ## [9.30.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.30.6...@quenty/softshutdown@9.30.7) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/softshutdown
