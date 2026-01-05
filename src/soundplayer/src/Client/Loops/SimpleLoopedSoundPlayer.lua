@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SimpleLoopedSoundPlayer
 ]=]
@@ -16,8 +16,19 @@ local SimpleLoopedSoundPlayer = setmetatable({}, TimedTransitionModel)
 SimpleLoopedSoundPlayer.ClassName = "SimpleLoopedSoundPlayer"
 SimpleLoopedSoundPlayer.__index = SimpleLoopedSoundPlayer
 
-function SimpleLoopedSoundPlayer.new(soundId)
-	local self = setmetatable(TimedTransitionModel.new(), SimpleLoopedSoundPlayer)
+export type SimpleLoopedSoundPlayer =
+	typeof(setmetatable(
+		{} :: {
+			Sound: Sound,
+			_volumeMultiplier: ValueObject.ValueObject<number>,
+			_maxVolume: number,
+		},
+		{} :: typeof({ __index = SimpleLoopedSoundPlayer })
+	))
+	& TimedTransitionModel.TimedTransitionModel
+
+function SimpleLoopedSoundPlayer.new(soundId: SoundUtils.SoundId): SimpleLoopedSoundPlayer
+	local self: SimpleLoopedSoundPlayer = setmetatable(TimedTransitionModel.new() :: any, SimpleLoopedSoundPlayer)
 
 	self.Sound = self._maid:Add(SoundUtils.createSoundFromId(soundId))
 	self.Sound.Looped = true
@@ -32,7 +43,7 @@ function SimpleLoopedSoundPlayer.new(soundId)
 	self._maid:GiveTask(Rx.combineLatest({
 		visible = self:ObserveRenderStepped(),
 		multiplier = self._volumeMultiplier:Observe(),
-	}):Subscribe(function(state)
+	}):Subscribe(function(state: any)
 		self.Sound.Volume = state.visible * self._maxVolume * state.multiplier
 	end))
 
@@ -45,22 +56,35 @@ function SimpleLoopedSoundPlayer.new(soundId)
 	return self
 end
 
-function SimpleLoopedSoundPlayer:SetSoundGroup(soundGroup)
+--[=[
+	Sets the SoundGroup of the internal Sound.
+	@param soundGroup SoundGroup?
+]=]
+function SimpleLoopedSoundPlayer.SetSoundGroup(self: SimpleLoopedSoundPlayer, soundGroup: SoundGroup?): ()
 	assert(typeof(soundGroup) == "Instance" or soundGroup == nil, "Bad soundGroup")
 
 	self.Sound.SoundGroup = soundGroup
 end
 
-function SimpleLoopedSoundPlayer:SetVolumeMultiplier(volume)
+--[=[
+	Sets the volume multiplier for the sound player.
+]=]
+function SimpleLoopedSoundPlayer.SetVolumeMultiplier(self: SimpleLoopedSoundPlayer, volume: number): ()
 	self._volumeMultiplier.Value = volume
 end
 
-function SimpleLoopedSoundPlayer:PromiseSustain()
+--[=[
+	Promises indefinitely until the sound player is destroyed.
+]=]
+function SimpleLoopedSoundPlayer.PromiseSustain(self: SimpleLoopedSoundPlayer): Promise.Promise<()>
 	-- Never resolve
-	return Promise.new()
+	return self._maid:GivePromise(Promise.new())
 end
 
-function SimpleLoopedSoundPlayer:PromiseLoopDone()
+--[=[
+	Promises until the current loop is done.
+]=]
+function SimpleLoopedSoundPlayer.PromiseLoopDone(self: SimpleLoopedSoundPlayer): Promise.Promise<()>
 	return SoundPromiseUtils.promiseLooped(self.Sound)
 end
 
