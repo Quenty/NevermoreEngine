@@ -52,7 +52,7 @@ function PlayerSettings.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): 
 	return self
 end
 
-function PlayerSettings.EnsureInitialized(self: PlayerSettings, settingName: string, defaultValue)
+function PlayerSettings.EnsureInitialized<T>(self: PlayerSettings, settingName: string, defaultValue: T): ()
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 
@@ -68,7 +68,7 @@ function PlayerSettings.EnsureInitialized(self: PlayerSettings, settingName: str
 
 		-- Paranoid UTF8 check
 		if type(encoded) == "string" then
-			assert(DataStoreStringUtils.isValidUTF8(defaultValue), "Bad UTF8 defaultValue")
+			assert(DataStoreStringUtils.isValidUTF8(encoded), "Bad UTF8 defaultValue")
 		end
 
 		self._obj:SetAttribute(attributeName, encoded)

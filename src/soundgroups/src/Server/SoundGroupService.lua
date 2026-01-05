@@ -17,6 +17,10 @@ function SoundGroupService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
+	-- External
+	self._serviceBag:GetService(require("TieRealmService"))
+	self._serviceBag:GetService(require("RoguePropertyService"))
+
 	-- Internal
 	self._soundEffectService = self._serviceBag:GetService(require("SoundEffectService"))
 end

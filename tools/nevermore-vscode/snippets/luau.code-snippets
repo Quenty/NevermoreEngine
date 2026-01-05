@@ -35,11 +35,21 @@
       "${1}.ClassName = \"${1}\"",
       "${1}.__index = ${1}",
       "",
-      "function ${1}.new(serviceBag: ServiceBag.ServiceBag)",
-      "\tlocal self = setmetatable(BasicPane.new(), ${1})",
+      "export type ${1:Class} =",
+      "\ttypeof(setmetatable(",
+      "\t\t{} :: {",
+      "\t\t\t_serviceBag: ServiceBag.ServiceBag,",
+      "\t\t\t_guiThemeService: any,",
+      "\t\t},",
+      "\t\t{} :: typeof({ __index = ${1:Class} })",
+      "\t))",
+      "\t& BasicPane.BasicPane",
+      "",
+      "function ${1}.new(serviceBag: ServiceBag.ServiceBag): ${1:Class}",
+      "\tlocal self: ${1:Class} = setmetatable(BasicPane.new() :: any, ${1})",
       "",
       "\tself._serviceBag = assert(serviceBag, \"No serviceBag\")",
-      "\tself._guiThemeService = self._serviceBag:GetService(GuiThemeService)",
+      "\tself._guiThemeService = self._serviceBag:GetService(GuiThemeService :: any)",
       "",
       "\tself._maid:GiveTask(self:_render():Subscribe(function(gui)",
       "\t\tself.Gui = gui",
@@ -61,6 +71,7 @@
   },
   "Define a new Binder class": {
     "body": [
+      "--!strict",
       "--[=[",
       "\t@class ${1:Class}",
       "]=]",
@@ -75,15 +86,25 @@
       "${1}.ClassName = \"${1}\"",
       "${1}.__index = ${1}",
       "",
-      "function ${1}.new(${3:instance}: Instance, serviceBag: ServiceBag.ServiceBag)",
-      "\tlocal self = setmetatable(${2}.new(${3}), ${1})",
+      "export type ${1:Class} =",
+      "\ttypeof(setmetatable(",
+      "\t\t{} :: {",
+      "\t\t\t_obj: Instance,",
+      "\t\t\t_serviceBag: ServiceBag.ServiceBag,",
+      "\t\t},",
+      "\t\t{} :: typeof({ __index = ${1:Class} })",
+      "\t))",
+      "\t& ${2:BaseObject}.${2:BaseObject}",
+      "",
+      "function ${1}.new(${3:instance}: Instance, serviceBag: ServiceBag.ServiceBag): ${1:Class}",
+      "\tlocal self: ${1:Class} = setmetatable(${2}.new(${3}) :: any, ${1})",
       "",
       "\tself._serviceBag = assert(serviceBag, \"No serviceBag\")",
       "\t${5}",
       "\treturn self",
       "end",
       "",
-      "return Binder.new(\"${1}\", ${1})"
+      "return Binder.new(\"${1}\", ${1} :: any) :: Binder.Binder<${1:Class}>"
     ],
     "description": "Define a new Binder",
     "prefix": "binder"
@@ -252,6 +273,20 @@
     ],
     "description": "Define a new service bag inherited class",
     "prefix": "class"
+  },
+  "Export type for service bag inherited class": {
+    "body": [
+      "export type ${1:Class} =",
+      "\ttypeof(setmetatable(",
+      "\t\t{} :: {",
+      "\t\t\t_serviceBag: ServiceBag.ServiceBag,",
+      "\t\t},",
+      "\t\t{} :: typeof({ __index = ${1:Class} })",
+      "\t))",
+      "\t& ${2:BaseObject}.${2:BaseObject}"
+    ],
+    "description": "Export type declaration for a service bag inherited class",
+    "prefix": "classtype"
   },
   "Define a new tie interface": {
     "body": [

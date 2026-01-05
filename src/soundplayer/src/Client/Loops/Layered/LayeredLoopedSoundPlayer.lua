@@ -1,5 +1,9 @@
---!nonstrict
+--!strict
 --[=[
+	This class provides layered synchronized sound playback with looping and scheduling, which is useful for
+	implementing complex ambient soundscapes or music tracks that require multiple layers to be played in sync, for example,
+	constructed music that adapts to game states.
+
 	@class LayeredLoopedSoundPlayer
 ]=]
 
@@ -12,14 +16,35 @@ local SoundLoopScheduleUtils = require("SoundLoopScheduleUtils")
 local SoundUtils = require("SoundUtils")
 local SpringTransitionModel = require("SpringTransitionModel")
 local ValueObject = require("ValueObject")
-local t = require("t")
+local t: any = require("t")
 
 local LayeredLoopedSoundPlayer = setmetatable({}, SpringTransitionModel)
 LayeredLoopedSoundPlayer.ClassName = "LayeredLoopedSoundPlayer"
 LayeredLoopedSoundPlayer.__index = LayeredLoopedSoundPlayer
 
-function LayeredLoopedSoundPlayer.new(soundParent)
-	local self = setmetatable(SpringTransitionModel.new(), LayeredLoopedSoundPlayer)
+export type LayeredLoopedSoundPlayer =
+	typeof(setmetatable(
+		{} :: {
+			_layerMaid: Maid.Maid,
+			_soundParent: ValueObject.ValueObject<Instance?>,
+			_soundGroup: ValueObject.ValueObject<SoundGroup?>,
+			_bpm: ValueObject.ValueObject<number?>,
+			_defaultCrossFadeTime: ValueObject.ValueObject<number>,
+			_volumeMultiplier: ValueObject.ValueObject<number>,
+			_layers: { [string]: LoopedSoundPlayer.LoopedSoundPlayer },
+		},
+		{} :: typeof({ __index = LayeredLoopedSoundPlayer })
+	))
+	& SpringTransitionModel.SpringTransitionModel<number>
+
+--[=[
+	Constructs a new LayeredLoopedSoundPlayer.
+
+	@param soundParent Instance? -- Optional parent for sounds
+	@return LayeredLoopedSoundPlayer
+]=]
+function LayeredLoopedSoundPlayer.new(soundParent: Instance?): LayeredLoopedSoundPlayer
+	local self: LayeredLoopedSoundPlayer = setmetatable(SpringTransitionModel.new() :: any, LayeredLoopedSoundPlayer)
 
 	self._layerMaid = self._maid:Add(Maid.new())
 
@@ -38,29 +63,61 @@ function LayeredLoopedSoundPlayer.new(soundParent)
 	return self
 end
 
-function LayeredLoopedSoundPlayer:SetDefaultCrossFadeTime(crossFadeTime: ValueObject.Mountable<number>)
+--[=[
+	Sets the default cross fade time for the LayeredLoopedSoundPlayer.
+]=]
+function LayeredLoopedSoundPlayer.SetDefaultCrossFadeTime(
+	self: LayeredLoopedSoundPlayer,
+	crossFadeTime: ValueObject.Mountable<number>
+): () -> ()
 	return self._defaultCrossFadeTime:Mount(crossFadeTime)
 end
 
-function LayeredLoopedSoundPlayer:SetVolumeMultiplier(volumeMultiplier: ValueObject.Mountable<number>)
+--[=[
+	Sets the volume multiplier for the LayeredLoopedSoundPlayer.
+]=]
+function LayeredLoopedSoundPlayer.SetVolumeMultiplier(
+	self: LayeredLoopedSoundPlayer,
+	volumeMultiplier: ValueObject.Mountable<number>
+): () -> ()
 	return self._volumeMultiplier:Mount(volumeMultiplier)
 end
 
-function LayeredLoopedSoundPlayer:SetBPM(bpm: ValueObject.Mountable<number?>)
-	self._bpm.Value = bpm
+--[=[
+	Sets the BPM for syncing sound playback.
+]=]
+function LayeredLoopedSoundPlayer.SetBPM(self: LayeredLoopedSoundPlayer, bpm: ValueObject.Mountable<number?>): () -> ()
+	return self._bpm:Mount(bpm)
 end
 
-function LayeredLoopedSoundPlayer:SetSoundParent(soundParent: Instance?)
+--[=[
+	Sets the parent instance for the LayeredLoopedSoundPlayer.
+]=]
+function LayeredLoopedSoundPlayer.SetSoundParent(self: LayeredLoopedSoundPlayer, soundParent: Instance?): ()
 	assert(typeof(soundParent) == "Instance" or soundParent == nil, "Bad soundParent")
 
 	self._soundParent.Value = soundParent
 end
 
-function LayeredLoopedSoundPlayer:SetSoundGroup(soundGroup: SoundGroup?)
+--[=[
+	Sets the sound group for the LayeredLoopedSoundPlayer.
+]=]
+function LayeredLoopedSoundPlayer.SetSoundGroup(
+	self: LayeredLoopedSoundPlayer,
+	soundGroup: ValueObject.Mountable<SoundGroup?>
+): () -> ()
 	return self._soundGroup:Mount(soundGroup)
 end
 
-function LayeredLoopedSoundPlayer:Swap(layerId: string, soundId, scheduleOptions)
+--[=[
+	Swaps the layer to play the given sound on loop schedule.
+]=]
+function LayeredLoopedSoundPlayer.Swap(
+	self: LayeredLoopedSoundPlayer,
+	layerId: string,
+	soundId: SoundUtils.SoundId,
+	scheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule?
+): ()
 	assert(type(layerId) == "string", "Bad layerId")
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")
@@ -69,7 +126,15 @@ function LayeredLoopedSoundPlayer:Swap(layerId: string, soundId, scheduleOptions
 	layer:Swap(soundId, scheduleOptions)
 end
 
-function LayeredLoopedSoundPlayer:SwapOnLoop(layerId, soundId, scheduleOptions)
+--[=[
+	Swaps the layer to play on the next loop.
+]=]
+function LayeredLoopedSoundPlayer.SwapOnLoop(
+	self: LayeredLoopedSoundPlayer,
+	layerId: string,
+	soundId: SoundUtils.SoundId,
+	scheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule?
+): ()
 	assert(type(layerId) == "string", "Bad layerId")
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 
@@ -77,16 +142,32 @@ function LayeredLoopedSoundPlayer:SwapOnLoop(layerId, soundId, scheduleOptions)
 	layer:SwapOnLoop(soundId, scheduleOptions)
 end
 
-function LayeredLoopedSoundPlayer:SwapToSamples(layerId, soundId, scheduleOptions)
+--[=[
+	Swaps the layer to play from a list of samples.
+]=]
+function LayeredLoopedSoundPlayer.SwapToSamples(
+	self: LayeredLoopedSoundPlayer,
+	layerId: string,
+	soundIdList: { SoundUtils.SoundId },
+	scheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule?
+): ()
 	assert(type(layerId) == "string", "Bad layerId")
-	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
+	assert(type(soundIdList) == "table", "Bad soundIdList")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")
 
 	local layer = self:_getOrCreateLayer(layerId)
-	layer:SwapToSamples(soundId, scheduleOptions)
+	layer:SwapToSamples(soundIdList, scheduleOptions)
 end
 
-function LayeredLoopedSoundPlayer:SwapToChoice(layerId, soundIdList, scheduleOptions)
+--[=[
+	Swaps the layer to play a random choice from a list of samples.
+]=]
+function LayeredLoopedSoundPlayer.SwapToChoice(
+	self: LayeredLoopedSoundPlayer,
+	layerId: string,
+	soundIdList: { SoundUtils.SoundId },
+	scheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule?
+): ()
 	assert(type(layerId) == "string", "Bad layerId")
 	assert(type(soundIdList) == "table", "Bad soundIdList")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")
@@ -95,23 +176,41 @@ function LayeredLoopedSoundPlayer:SwapToChoice(layerId, soundIdList, scheduleOpt
 	layer:SwapToChoice(soundIdList, scheduleOptions)
 end
 
-function LayeredLoopedSoundPlayer:PlayOnce(layerId, soundIdList, scheduleOptions)
+--[=[
+	Plays the given sound once on the layer.
+]=]
+function LayeredLoopedSoundPlayer.PlayOnce(
+	self: LayeredLoopedSoundPlayer,
+	layerId: string,
+	soundId: SoundUtils.SoundId,
+	scheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule?
+): ()
 	assert(type(layerId) == "string", "Bad layerId")
-	assert(type(soundIdList) == "table", "Bad soundIdList")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")
 
 	local layer = self:_getOrCreateLayer(layerId)
-	layer:PlayOnce(soundIdList, scheduleOptions)
+	layer:PlayOnce(soundId, scheduleOptions)
 end
 
-function LayeredLoopedSoundPlayer:PlayOnceOnLoop(layerId, soundId, scheduleOptions)
+--[=[
+	Plays the given sound once on the next loop of the layer.
+]=]
+function LayeredLoopedSoundPlayer.PlayOnceOnLoop(
+	self: LayeredLoopedSoundPlayer,
+	layerId: string,
+	soundId: SoundUtils.SoundId,
+	scheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule?
+): ()
 	assert(type(layerId) == "string", "Bad layerId")
 
 	local layer = self:_getOrCreateLayer(layerId)
 	layer:PlayOnceOnLoop(soundId, scheduleOptions)
 end
 
-function LayeredLoopedSoundPlayer:_getOrCreateLayer(layerId)
+function LayeredLoopedSoundPlayer._getOrCreateLayer(
+	self: LayeredLoopedSoundPlayer,
+	layerId: string
+): LoopedSoundPlayer.LoopedSoundPlayer
 	if self._layers[layerId] then
 		return self._layers[layerId]
 	end
@@ -142,7 +241,7 @@ function LayeredLoopedSoundPlayer:_getOrCreateLayer(layerId)
 	maid:GiveTask(Rx.combineLatest({
 		visible = self:ObserveRenderStepped(),
 		multiplier = self._volumeMultiplier:Observe(),
-	}):Subscribe(function(state)
+	}):Subscribe(function(state: any)
 		layer:SetVolumeMultiplier(state.multiplier * state.visible)
 	end))
 
@@ -158,13 +257,16 @@ function LayeredLoopedSoundPlayer:_getOrCreateLayer(layerId)
 	return layer
 end
 
-function LayeredLoopedSoundPlayer:StopLayer(layerId: string)
+--[=[
+	Stops playback on the given layer.
+]=]
+function LayeredLoopedSoundPlayer.StopLayer(self: LayeredLoopedSoundPlayer, layerId: string): ()
 	assert(type(layerId) == "string", "Bad layerId")
 
 	self._layerMaid[layerId] = nil
 end
 
-function LayeredLoopedSoundPlayer:StopAll()
+function LayeredLoopedSoundPlayer.StopAll(self: LayeredLoopedSoundPlayer): ()
 	self._layerMaid:DoCleaning()
 end
 
