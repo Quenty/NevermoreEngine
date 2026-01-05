@@ -47,7 +47,7 @@ export type LoopedSoundPlayer =
 	))
 	& SpringTransitionModel.SpringTransitionModel<number>
 
-function LoopedSoundPlayer.new(soundId: (string | number)?, soundParent: Instance?): LoopedSoundPlayer
+function LoopedSoundPlayer.new(soundId: SoundUtils.SoundId?, soundParent: Instance?): LoopedSoundPlayer
 	assert(soundId == nil or SoundUtils.isConvertableToRbxAsset(soundId), "Bad soundId")
 
 	local self: LoopedSoundPlayer = setmetatable(SpringTransitionModel.new() :: any, LoopedSoundPlayer)
