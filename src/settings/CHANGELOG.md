@@ -1,3 +1,16 @@
+# v11.35.1 (Mon Jan 05 2026)
+
+#### 🐛 Bug Fix
+
+- ci: Fix CI for Nevermore VSCode extension [#626](https://github.com/Quenty/NevermoreEngine/pull/626) ([@Quenty](https://github.com/Quenty))
+- fix: Adjust typing accordingly for settings system ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
