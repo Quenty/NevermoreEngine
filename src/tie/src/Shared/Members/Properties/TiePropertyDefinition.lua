@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class TiePropertyDefinition
 ]=]
@@ -15,16 +15,25 @@ local TiePropertyDefinition = setmetatable({}, TieMemberDefinition)
 TiePropertyDefinition.ClassName = "TiePropertyDefinition"
 TiePropertyDefinition.__index = TiePropertyDefinition
 
+export type TiePropertyDefinition =
+	typeof(setmetatable(
+		{} :: {
+			_defaultValue: any,
+		},
+		{} :: typeof({ __index = TieMemberDefinition })
+	))
+	& TieMemberDefinition.TieMemberDefinition
+
 function TiePropertyDefinition.new(
-	tieDefinition,
+	tieDefinition: any,
 	propertyName: string,
 	defaultValue: any,
 	memberTieRealm: TieRealms.TieRealm
-)
+): TiePropertyDefinition
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
-	local self =
-		setmetatable(TieMemberDefinition.new(tieDefinition, propertyName, memberTieRealm), TiePropertyDefinition)
+	local self: TiePropertyDefinition =
+		setmetatable(TieMemberDefinition.new(tieDefinition, propertyName, memberTieRealm) :: any, TiePropertyDefinition)
 
 	self._defaultValue = defaultValue
 
@@ -35,7 +44,7 @@ function TiePropertyDefinition:GetDefaultValue()
 	return self._defaultValue
 end
 
-function TiePropertyDefinition:IsRequiredForImplementation(currentRealm): boolean
+function TiePropertyDefinition:IsRequiredForImplementation(currentRealm: TieRealms.TieRealm): boolean
 	-- Override
 	if getmetatable(TiePropertyDefinition).IsRequiredForImplementation(self, currentRealm) then
 		if self:GetDefaultValue() ~= nil then

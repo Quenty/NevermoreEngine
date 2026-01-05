@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Base class for a member definition/declaration.
 
@@ -14,10 +14,23 @@ local TieMemberDefinition = {}
 TieMemberDefinition.ClassName = "TieMemberDefinition"
 TieMemberDefinition.__index = TieMemberDefinition
 
-function TieMemberDefinition.new(tieDefinition, memberName: string, memberTieRealm: TieRealms.TieRealm)
+export type TieMemberDefinition = typeof(setmetatable(
+	{} :: {
+		_tieDefinition: any,
+		_memberName: string,
+		_memberTieRealm: TieRealms.TieRealm,
+	},
+	{} :: typeof({ __index = TieMemberDefinition })
+))
+
+function TieMemberDefinition.new(
+	tieDefinition: any,
+	memberName: string,
+	memberTieRealm: TieRealms.TieRealm
+): TieMemberDefinition
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
-	local self = setmetatable({}, TieMemberDefinition)
+	local self: TieMemberDefinition = setmetatable({} :: any, TieMemberDefinition)
 
 	self._tieDefinition = assert(tieDefinition, "No tieDefinition")
 	self._memberName = assert(memberName, "Bad memberName")
@@ -51,7 +64,7 @@ function TieMemberDefinition:IsRequiredForInterface(currentRealm: TieRealms.TieR
 	end
 end
 
-function TieMemberDefinition:IsAllowedOnInterface(currentRealm): boolean
+function TieMemberDefinition:IsAllowedOnInterface(currentRealm: TieRealms.TieRealm): boolean
 	assert(TieRealmUtils.isTieRealm(currentRealm), "Bad currentRealm")
 
 	if self._memberTieRealm == TieRealms.SHARED then
@@ -64,7 +77,7 @@ function TieMemberDefinition:IsAllowedOnInterface(currentRealm): boolean
 	end
 end
 
-function TieMemberDefinition:IsRequiredForImplementation(currentRealm): boolean
+function TieMemberDefinition:IsRequiredForImplementation(currentRealm: TieRealms.TieRealm): boolean
 	assert(TieRealmUtils.isTieRealm(currentRealm), "Bad currentRealm")
 
 	if currentRealm == TieRealms.SHARED then
@@ -77,7 +90,7 @@ function TieMemberDefinition:IsRequiredForImplementation(currentRealm): boolean
 	end
 end
 
-function TieMemberDefinition:IsAllowedForImplementation(currentRealm): boolean
+function TieMemberDefinition:IsAllowedForImplementation(currentRealm: TieRealms.TieRealm): boolean
 	assert(TieRealmUtils.isTieRealm(currentRealm), "Bad currentRealm")
 
 	if self._memberTieRealm == TieRealms.SHARED then
@@ -90,7 +103,7 @@ function TieMemberDefinition:IsAllowedForImplementation(currentRealm): boolean
 	end
 end
 
-function TieMemberDefinition:GetMemberTieRealm()
+function TieMemberDefinition:GetMemberTieRealm(): TieRealms.TieRealm
 	return self._memberTieRealm
 end
 
