@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - run: npm ci
-        working-directory: tools/nevrmoree-vscode
+        working-directory: tools/nevermore-vscode
 
       - name: Publish VSCode Extension
         working-directory: tools/nevermore-vscode
