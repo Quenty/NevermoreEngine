@@ -1,3 +1,16 @@
+# (Mon Jan 05 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.10.0`, `nevermore-vscode@0.1.0`
+  - feat: Add Nevermore-VSCode extension [#625](https://github.com/Quenty/NevermoreEngine/pull/625) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jan 04 2026)
 
 #### 🚀 Enhancement
