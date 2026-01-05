@@ -11,6 +11,7 @@ local Observable = require("Observable")
 local Promise = require("Promise")
 local TimedTween = require("TimedTween")
 local TransitionModel = require("TransitionModel")
+local ValueObject = require("ValueObject")
 
 local TimedTransitionModel = setmetatable({}, BasicPane)
 TimedTransitionModel.ClassName = "TimedTransitionModel"
@@ -30,10 +31,10 @@ export type TimedTransitionModel =
 	A transition model that has a spring underlying it. Very useful
 	for animations on tracks that need to be on a spring.
 
-	@param transitionTime number? -- Optional
+	@param transitionTime ValueObject.Mountable<number>? -- Optional
 	@return TimedTransitionModel
 ]=]
-function TimedTransitionModel.new(transitionTime: number?): TimedTransitionModel
+function TimedTransitionModel.new(transitionTime: ValueObject.Mountable<number>?): TimedTransitionModel
 	local self: TimedTransitionModel = setmetatable(BasicPane.new() :: any, TimedTransitionModel)
 
 	self._transitionModel = self._maid:Add(TransitionModel.new())
@@ -57,8 +58,11 @@ end
 
 	@param transitionTime number
 ]=]
-function TimedTransitionModel.SetTransitionTime(self: TimedTransitionModel, transitionTime: number)
-	self._timedTween:SetTransitionTime(transitionTime)
+function TimedTransitionModel.SetTransitionTime(
+	self: TimedTransitionModel,
+	transitionTime: ValueObject.Mountable<number>
+): () -> ()
+	return self._timedTween:SetTransitionTime(transitionTime)
 end
 
 --[=[

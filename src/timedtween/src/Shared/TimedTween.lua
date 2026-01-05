@@ -54,10 +54,10 @@ export type TimedTween =
 --[=[
 	Timed transition module
 
-	@param transitionTime number? -- Optional
+	@param transitionTime ValueObject.Mountable<number>? -- Optional transition time
 	@return TimedTween
 ]=]
-function TimedTween.new(transitionTime: number?): TimedTween
+function TimedTween.new(transitionTime: ValueObject.Mountable<number>?): TimedTween
 	local self: TimedTween = setmetatable(BasicPane.new() :: any, TimedTween)
 
 	self._transitionTime = self._maid:Add(ValueObject.new(0.15, "number"))
@@ -87,10 +87,10 @@ end
 --[=[
 	Sets the transition time
 
-	@param transitionTime number | Observable<number>
-	@return MaidTask
+	@param transitionTime ValueObject.Mountable<number>
+	@return () -> ()
 ]=]
-function TimedTween.SetTransitionTime(self: TimedTween, transitionTime: number | Observable.Observable<number>)
+function TimedTween.SetTransitionTime(self: TimedTween, transitionTime: ValueObject.Mountable<number>): () -> ()
 	return self._transitionTime:Mount(transitionTime)
 end
 
