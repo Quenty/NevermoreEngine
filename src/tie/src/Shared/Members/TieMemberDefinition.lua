@@ -14,7 +14,7 @@ local TieMemberDefinition = {}
 TieMemberDefinition.ClassName = "TieMemberDefinition"
 TieMemberDefinition.__index = TieMemberDefinition
 
-function TieMemberDefinition.new(tieDefinition, memberName: string, memberTieRealm)
+function TieMemberDefinition.new(tieDefinition, memberName: string, memberTieRealm: TieRealms.TieRealm)
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
 	local self = setmetatable({}, TieMemberDefinition)
@@ -38,7 +38,7 @@ function TieMemberDefinition:GetFriendlyName(): string
 	return string.format("%s.%s", self._tieDefinition:GetName(), self._memberName)
 end
 
-function TieMemberDefinition:IsRequiredForInterface(currentRealm): boolean
+function TieMemberDefinition:IsRequiredForInterface(currentRealm: TieRealms.TieRealm): boolean
 	assert(TieRealmUtils.isTieRealm(currentRealm), "Bad currentRealm")
 
 	if self._memberTieRealm == TieRealms.SHARED then

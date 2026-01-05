@@ -17,6 +17,7 @@ local String = require("String")
 local Symbol = require("Symbol")
 local TieMemberInterface = require("TieMemberInterface")
 local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
+local TieRealms = require("TieRealms")
 local TieUtils = require("TieUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 
@@ -26,7 +27,12 @@ local TiePropertyInterface = setmetatable({}, TieMemberInterface)
 TiePropertyInterface.ClassName = "TiePropertyInterface"
 TiePropertyInterface.__index = TiePropertyInterface
 
-function TiePropertyInterface.new(implParent, adornee: Instance, memberDefinition, interfaceTieRealm)
+function TiePropertyInterface.new(
+	implParent: Instance,
+	adornee: Instance,
+	memberDefinition,
+	interfaceTieRealm: TieRealms.TieRealm
+)
 	local self = setmetatable(
 		TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm),
 		TiePropertyInterface

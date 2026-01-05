@@ -111,8 +111,12 @@ end
 	@param key string
 	@param value any
 ]=]
-function DataStoreStage.Store(self: DataStoreStage, key: string, value: any)
-	assert(type(key) == "string", "Bad key")
+function DataStoreStage.Store(
+	self: DataStoreStage,
+	key: DataStoreStageKey,
+	value: any | DataStoreDeleteToken.DataStoreDeleteToken
+): ()
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if value == nil then
 		value = DataStoreDeleteToken
@@ -133,7 +137,7 @@ end
 	end)
 	```
 
-	@param key string | number
+	@param key DataStoreStageKey
 	@param defaultValue T?
 	@return Promise<T>
 ]=]
@@ -166,7 +170,7 @@ end
 	@param defaultValue any
 	@return Promise<any>
 ]=]
-function DataStoreStage.LoadAll(self: DataStoreStage, defaultValue)
+function DataStoreStage.LoadAll<T>(self: DataStoreStage, defaultValue: T?): Promise.Promise<T?>
 	return self:PromiseViewUpToDate():Then(function()
 		if self._viewSnapshot == nil then
 			return defaultValue
@@ -187,10 +191,10 @@ end
 	saveslot:Store("Money", 0)
 	```
 
-	@param key string | number
+	@param key DataStoreStageKey
 	@return DataStoreStage
 ]=]
-function DataStoreStage.GetSubStore(self: DataStoreStage, key: DataStoreStageKey)
+function DataStoreStage.GetSubStore(self: DataStoreStage, key: DataStoreStageKey): DataStoreStage
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if self._stores[key] then
@@ -243,10 +247,10 @@ end
 --[=[
 	Explicitely deletes data at the key
 
-	@param key string | number
+	@param key DataStoreStageKey
 ]=]
-function DataStoreStage.Delete(self: DataStoreStage, key: string)
-	assert(type(key) == "string", "Bad key")
+function DataStoreStage.Delete(self: DataStoreStage, key: DataStoreStageKey): ()
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	self:_storeAtKey(key, DataStoreDeleteToken)
 end
@@ -254,7 +258,7 @@ end
 --[=[
 	Queues up a wipe of all values. This will completely set the data to nil.
 ]=]
-function DataStoreStage.Wipe(self: DataStoreStage)
+function DataStoreStage.Wipe(self: DataStoreStage): ()
 	self:Overwrite(DataStoreDeleteToken)
 end
 
@@ -263,12 +267,16 @@ end
 
 	If no key is passed than it will observe the whole view snapshot
 
-	@param key string | number?
+	@param key DataStoreStageKey?
 	@param defaultValue T?
 	@return Observable<T>
 ]=]
-function DataStoreStage.Observe(self: DataStoreStage, key, defaultValue)
-	assert(type(key) == "string" or type(key) == "number" or key == nil, "Bad key")
+function DataStoreStage.Observe<T>(
+	self: DataStoreStage,
+	key: DataStoreStageKey?,
+	defaultValue: T?
+): Observable.Observable<T>
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if key == nil then
 		return Observable.new(function(sub)
@@ -293,7 +301,7 @@ function DataStoreStage.Observe(self: DataStoreStage, key, defaultValue)
 			end)
 
 			return maid
-		end)
+		end) :: any
 	end
 
 	return Observable.new(function(sub)
@@ -315,16 +323,16 @@ function DataStoreStage.Observe(self: DataStoreStage, key, defaultValue)
 		end)
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
 	Adds a callback to be called before save. This may return a promise.
 
 	@param callback function -- May return a promise
-	@return function -- Call to remove
+	@return () -> () -- Call to remove
 ]=]
-function DataStoreStage.AddSavingCallback(self: DataStoreStage, callback: DataStoreCallback?)
+function DataStoreStage.AddSavingCallback(self: DataStoreStage, callback: DataStoreCallback?): () -> ()
 	assert(type(callback) == "function", "Bad callback")
 
 	table.insert(self._savingCallbacks, callback)
@@ -340,7 +348,7 @@ end
 	Removes a saving callback from the data store stage
 	@param callback function
 ]=]
-function DataStoreStage.RemoveSavingCallback(self: DataStoreStage, callback: DataStoreCallback?)
+function DataStoreStage.RemoveSavingCallback(self: DataStoreStage, callback: DataStoreCallback?): ()
 	assert(type(callback) == "function", "Bad callback")
 
 	local index = table.find(self._savingCallbacks, callback)
@@ -434,7 +442,7 @@ end
 
 	@param parentWriter DataStoreWriter
 ]=]
-function DataStoreStage.MarkDataAsSaved(self: DataStoreStage, parentWriter: DataStoreWriter.DataStoreWriter)
+function DataStoreStage.MarkDataAsSaved(self: DataStoreStage, parentWriter: DataStoreWriter.DataStoreWriter): ()
 	-- Update all children first
 	for key, subwriter in pairs(parentWriter:GetSubWritersMap()) do
 		local store = self._stores[key]
@@ -504,7 +512,7 @@ end
 
 	@return Promise
 ]=]
-function DataStoreStage.PromiseViewUpToDate(self: DataStoreStage)
+function DataStoreStage.PromiseViewUpToDate(self: DataStoreStage): Promise.Promise<()>
 	if not self._loadParent then
 		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
 	end
@@ -525,7 +533,7 @@ end
 
 	@param data any
 ]=]
-function DataStoreStage.Overwrite(self: DataStoreStage, data)
+function DataStoreStage.Overwrite(self: DataStoreStage, data: any | DataStoreDeleteToken.DataStoreDeleteToken): ()
 	-- Ensure that we at least start loading (and thus the autosave loop) for write
 	self:PromiseViewUpToDate()
 
@@ -578,7 +586,7 @@ end
 
 	@param data any
 ]=]
-function DataStoreStage.OverwriteMerge(self: DataStoreStage, data)
+function DataStoreStage.OverwriteMerge(self: DataStoreStage, data: any): ()
 	-- Ensure that we at least start loading (and thus the autosave loop) for write
 	self:PromiseViewUpToDate()
 
@@ -775,7 +783,7 @@ end
 function DataStoreStage._updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(
 	self: DataStoreStage,
 	key: DataStoreStageKey,
-	value
+	value: any | DataStoreDeleteToken.DataStoreDeleteToken
 )
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 

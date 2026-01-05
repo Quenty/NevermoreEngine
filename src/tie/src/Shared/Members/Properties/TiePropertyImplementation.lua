@@ -66,7 +66,7 @@ function TiePropertyImplementation:SetImplementation(implementation)
 	self._maid._current = maid
 end
 
-function TiePropertyImplementation:_updateImplementation(maid, implementation)
+function TiePropertyImplementation:_updateImplementation(maid: Maid.Maid, implementation)
 	if ValueObject.isValueObject(implementation) then
 		local checkType = implementation:GetCheckType()
 
@@ -126,7 +126,7 @@ function TiePropertyImplementation:_updateImplementation(maid, implementation)
 	copy.Parent = self._folder
 end
 
-function TiePropertyImplementation:_changeToClassIfNeeded(className)
+function TiePropertyImplementation:_changeToClassIfNeeded(className: string)
 	return TiePropertyImplementationUtils.changeToClassIfNeeded(self._memberDefinition, self._folder, className)
 end
 
@@ -137,7 +137,7 @@ function TiePropertyImplementation:_removeClassIfNeeded()
 	end
 end
 
-function TiePropertyImplementation:_syncMember(maid, copy, implementation)
+function TiePropertyImplementation:_syncMember(maid: Maid.Maid, copy, implementation)
 	copy.Value = implementation.Value
 
 	maid:GiveTask(implementation.Changed:Connect(function()
