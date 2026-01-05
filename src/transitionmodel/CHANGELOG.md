@@ -1,20 +1,18 @@
-# v7.24.1 (Mon Jan 05 2026)
-
-#### 🐛 Bug Fix
-
-- ci: Fix CI for Nevermore VSCode extension [#626](https://github.com/Quenty/NevermoreEngine/pull/626) ([@Quenty](https://github.com/Quenty))
-- fix: Transition times take a mountable value instead of just a number ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.24.0...@quenty/transitionmodel@7.24.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* Transition times take a mountable value instead of just a number ([d63f252](https://github.com/Quenty/NevermoreEngine/commit/d63f2525ec29db3aaabab70fee0956806b4718a1))
+
+
+
+
 
 # [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.7...@quenty/transitionmodel@7.24.0) (2026-01-04)
 

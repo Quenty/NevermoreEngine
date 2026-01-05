@@ -1,20 +1,15 @@
-# v14.23.1 (Mon Jan 05 2026)
-
-#### 🐛 Bug Fix
-
-- ci: Fix CI for Nevermore VSCode extension [#626](https://github.com/Quenty/NevermoreEngine/pull/626) ([@Quenty](https://github.com/Quenty))
-- ci: Update types for misc. instances ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.23.0...@quenty/buttonhighlightmodel@14.23.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
 
 # [14.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.22.8...@quenty/buttonhighlightmodel@14.23.0) (2026-01-04)
 

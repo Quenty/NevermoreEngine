@@ -1,20 +1,18 @@
-# v11.35.1 (Mon Jan 05 2026)
-
-#### 🐛 Bug Fix
-
-- ci: Fix CI for Nevermore VSCode extension [#626](https://github.com/Quenty/NevermoreEngine/pull/626) ([@Quenty](https://github.com/Quenty))
-- fix: Adjust typing accordingly for settings system ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.35.0...@quenty/settings@11.35.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* Adjust typing accordingly for settings system ([4a5438c](https://github.com/Quenty/NevermoreEngine/commit/4a5438c073276c3f1e870fcafb6632ba2dd8a8d8))
+
+
+
+
 
 # [11.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.34.4...@quenty/settings@11.35.0) (2026-01-04)
 

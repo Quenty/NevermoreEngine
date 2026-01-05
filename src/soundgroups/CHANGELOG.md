@@ -1,20 +1,18 @@
-# v1.26.1 (Mon Jan 05 2026)
-
-#### 🐛 Bug Fix
-
-- ci: Fix CI for Nevermore VSCode extension [#626](https://github.com/Quenty/NevermoreEngine/pull/626) ([@Quenty](https://github.com/Quenty))
-- fix: Update the sound group package to include sound volume multipliers ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.26.0...@quenty/soundgroup@1.26.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* Update the sound group package to include sound volume multipliers ([bf9591f](https://github.com/Quenty/NevermoreEngine/commit/bf9591fe2d08dbefae47f8c449b7bbf20c01fdfe))
+
+
+
+
 
 # [1.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.25.8...@quenty/soundgroup@1.26.0) (2026-01-04)
 
