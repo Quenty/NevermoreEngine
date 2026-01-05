@@ -113,9 +113,9 @@ function ValueObject.isValueObject(value: any): boolean
 	return DuckTypeUtils.isImplementation(ValueObject, value)
 end
 
-function ValueObject._toMountableObservable<T>(_self: ValueObject<T>, value: Mountable<T>)
+function ValueObject._toMountableObservable<T>(_self: ValueObject<T>, value: Mountable<T>): Observable.Observable<T>?
 	if Observable.isObservable(value) then
-		return value
+		return value :: any
 	elseif typeof(value) == "Instance" then
 		-- IntValue, ObjectValue, et cetera
 		if ValueBaseUtils.isValueBase(value) then

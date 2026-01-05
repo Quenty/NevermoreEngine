@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.25.0...@quenty/soundplayer@7.25.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* Add typing to SoundPlayer ([a7e538e](https://github.com/Quenty/NevermoreEngine/commit/a7e538eddcb002327c1fdff4e2a60c769f0a1ba5))
+* Update the sound group package to include sound volume multipliers ([bf9591f](https://github.com/Quenty/NevermoreEngine/commit/bf9591fe2d08dbefae47f8c449b7bbf20c01fdfe))
+
+
+
+
+
+# [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.4...@quenty/soundplayer@7.25.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
 ## [7.24.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.3...@quenty/soundplayer@7.24.4) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/soundplayer

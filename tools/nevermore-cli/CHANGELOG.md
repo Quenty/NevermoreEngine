@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.10.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.5...@quenty/nevermore-cli@4.10.0) (2026-01-05)
+
+
+### Features
+
+* Add Nevermore-VSCode extension ([#625](https://github.com/Quenty/Nevermore/issues/625)) ([2057ef5](https://github.com/Quenty/Nevermore/commit/2057ef5b1648d6ccac5c956e35d5c866a56d9c9f))
+
+
+
+
+
 ## [4.9.5](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.4...@quenty/nevermore-cli@4.9.5) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/nevermore-cli

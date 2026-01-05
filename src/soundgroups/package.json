@@ -1,6 +1,6 @@
 {
   "name": "@quenty/soundgroup",
-  "version": "1.25.8",
+  "version": "1.26.1",
   "description": "Service and utility methods to working with sound groups and sounds in Roblox",
   "keywords": [
     "Roblox",
@@ -26,16 +26,20 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
     "@quenty/counter": "file:../counter",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/observablecollection": "file:../observablecollection",
+    "@quenty/promise": "file:../promise",
+    "@quenty/rogue-properties": "file:../rogue-properties",
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
+    "@quenty/tie": "file:../tie",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

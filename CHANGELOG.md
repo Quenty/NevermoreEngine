@@ -1,3 +1,42 @@
+# (Mon Jan 05 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonhighlightmodel@14.23.1`, `@quenty/rogue-properties@11.31.1`, `@quenty/settings@11.35.1`, `@quenty/soundgroup@1.26.1`, `@quenty/soundplayer@7.25.1`, `@quenty/tie@10.27.1`, `@quenty/timedtween@7.23.1`, `@quenty/transitionmodel@7.24.1`, `@quenty/valueobject@13.22.1`, `nevermore-vscode@0.1.1`
+  - ci: Fix CI for Nevermore VSCode extension [#626](https://github.com/Quenty/NevermoreEngine/pull/626) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jan 05 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.10.0`, `nevermore-vscode@0.1.0`
+  - feat: Add Nevermore-VSCode extension [#625](https://github.com/Quenty/NevermoreEngine/pull/625) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jan 04 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/table@3.9.0`
+  - feat: Add reduce function to Table [#622](https://github.com/Quenty/NevermoreEngine/pull/622) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
 # (Sat Jan 03 2026)
 
 #### 🐛 Bug Fix

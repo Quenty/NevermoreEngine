@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/table@3.8.0...@quenty/table@3.9.0) (2026-01-04)
+
+
+### Features
+
+* Add reduce function to Table ([#622](https://github.com/Quenty/NevermoreEngine/issues/622)) ([2459e8e](https://github.com/Quenty/NevermoreEngine/commit/2459e8ea2910eea935525d6680d436bbe78fb54a))
+
+
+
+
+
 # [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/table@3.7.4...@quenty/table@3.8.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/table
