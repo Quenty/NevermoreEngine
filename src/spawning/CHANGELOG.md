@@ -1,3 +1,19 @@
+# v10.32.0 (Tue Jan 06 2026)
+
+#### 🚀 Enhancement
+
+- Users/quenty/typing [#627](https://github.com/Quenty/NevermoreEngine/pull/627) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Add more typing ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# (Tue Jan 06 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/boundingboxutils@4.5.0`, `@quenty/datastore@13.27.0`, `@quenty/debounce@2.5.0`, `@quenty/defaultvalueutils@1.3.0`, `@quenty/settings-inputkeymap@10.38.0`, `@quenty/soundgroup@1.27.0`, `@quenty/soundplayer@7.26.0`, `@quenty/sounds@10.15.0`, `@quenty/spawning@10.32.0`, `@quenty/tie@10.28.0`, `@quenty/transitionmodel@7.25.0`, `nevermore-vscode@0.2.0`
+  - Users/quenty/typing [#627](https://github.com/Quenty/NevermoreEngine/pull/627) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Jan 05 2026)
 
 #### 🐛 Bug Fix
