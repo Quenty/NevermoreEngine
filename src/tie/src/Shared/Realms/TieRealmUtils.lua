@@ -31,7 +31,7 @@ end
 
 	@return TieRealm
 ]=]
-function TieRealmUtils.inferTieRealm(): "server" | "client"
+function TieRealmUtils.inferTieRealm(): TieRealms.TieRealm
 	if RunService:IsServer() then
 		return TieRealms.SERVER
 	elseif RunService:IsClient() then

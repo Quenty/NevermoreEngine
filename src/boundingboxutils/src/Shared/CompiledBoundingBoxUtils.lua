@@ -7,6 +7,8 @@
 
 local CompiledBoundingBoxUtils = {}
 
+export type CompiledBoundingBox = CFrame
+
 --[=[
 	Compiles a bounding box into a CFrame rotation matrix for easy
 	usage.
@@ -15,7 +17,7 @@ local CompiledBoundingBoxUtils = {}
 	@param size Vector3
 	@return CFrame
 ]=]
-function CompiledBoundingBoxUtils.compileBBox(cframe: CFrame, size: Vector3): CFrame
+function CompiledBoundingBoxUtils.compileBBox(cframe: CFrame, size: Vector3): CompiledBoundingBox
 	-- stylua: ignore
 	return CFrame.fromMatrix(
 		cframe.Position,
@@ -31,7 +33,7 @@ end
 	@param bbox CFrame
 	@return boolean
 ]=]
-function CompiledBoundingBoxUtils.testPointBBox(point: Vector3, bbox: CFrame): boolean
+function CompiledBoundingBoxUtils.testPointBBox(point: Vector3, bbox: CompiledBoundingBox): boolean
 	local objPos = bbox * point
 
 	-- stylua: ignore
