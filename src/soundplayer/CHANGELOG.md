@@ -1,20 +1,18 @@
-# v7.26.0 (Tue Jan 06 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/typing [#627](https://github.com/Quenty/NevermoreEngine/pull/627) ([@Quenty](https://github.com/Quenty))
-- feat: Sound utils suppose cloning from an instance ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.25.1...@quenty/soundplayer@7.26.0) (2026-01-06)
+
+
+### Features
+
+* Sound utils suppose cloning from an instance ([4597475](https://github.com/Quenty/NevermoreEngine/commit/4597475cdadf6a7b6d81d1fa59c3a7af6736b27e))
+
+
+
+
 
 ## [7.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.25.0...@quenty/soundplayer@7.25.1) (2026-01-05)
 

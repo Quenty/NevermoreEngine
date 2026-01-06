@@ -1,23 +1,18 @@
-# v1.3.0 (Tue Jan 06 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/typing [#627](https://github.com/Quenty/NevermoreEngine/pull/627) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add more typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/defaultvalueutils@1.2.2...@quenty/defaultvalueutils@1.3.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Add more typing ([f32615e](https://github.com/Quenty/NevermoreEngine/commit/f32615ec9d846a1a4392a3b21a0f594e8d420b44))
+
+
+
+
 
 ## [1.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/defaultvalueutils@1.2.0...@quenty/defaultvalueutils@1.2.2) (2025-04-07)
 

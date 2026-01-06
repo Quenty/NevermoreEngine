@@ -1,24 +1,19 @@
-# v10.28.0 (Tue Jan 06 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/typing [#627](https://github.com/Quenty/NevermoreEngine/pull/627) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add some strict typing to Tie ([@Quenty](https://github.com/Quenty))
-- fix: Add more typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.27.1...@quenty/tie@10.28.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Add more typing ([f32615e](https://github.com/Quenty/NevermoreEngine/commit/f32615ec9d846a1a4392a3b21a0f594e8d420b44))
+* Add some strict typing to Tie ([cbdb842](https://github.com/Quenty/NevermoreEngine/commit/cbdb842d6c2a57cf5c1cabab90505cbfec62037b))
+
+
+
+
 
 ## [10.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.27.0...@quenty/tie@10.27.1) (2026-01-05)
 

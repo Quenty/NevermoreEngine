@@ -1,23 +1,18 @@
-# v7.25.0 (Tue Jan 06 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/typing [#627](https://github.com/Quenty/NevermoreEngine/pull/627) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Transition model starts hidden complete by default ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.24.1...@quenty/transitionmodel@7.25.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Transition model starts hidden complete by default ([92509ec](https://github.com/Quenty/NevermoreEngine/commit/92509ec860229a7b0856df01326cafcae86c98b1))
+
+
+
+
 
 ## [7.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.24.0...@quenty/transitionmodel@7.24.1) (2026-01-05)
 
