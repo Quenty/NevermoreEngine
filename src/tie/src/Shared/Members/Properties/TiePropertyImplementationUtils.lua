@@ -1,11 +1,15 @@
---!nonstrict
+--!strict
 --[=[
 	@class TiePropertyImplementationUtils
 ]=]
 
 local TiePropertyImplementationUtils = {}
 
-function TiePropertyImplementationUtils.changeToClassIfNeeded(memberDefinition, folder: Folder, className: string)
+function TiePropertyImplementationUtils.changeToClassIfNeeded(
+	memberDefinition,
+	folder: Instance,
+	className: string
+): Instance
 	local memberName = memberDefinition:GetMemberName()
 	folder:SetAttribute(memberName, nil)
 

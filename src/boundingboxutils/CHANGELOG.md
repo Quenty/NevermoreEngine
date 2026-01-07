@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.4.0...@quenty/boundingboxutils@4.5.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Export explicit compiled bounding box type ([da1a5dd](https://github.com/Quenty/NevermoreEngine/commit/da1a5ddfdb99521a4f429f8f40c9ead7d2528290))
+
+
+
+
+
 # [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.3.2...@quenty/boundingboxutils@4.4.0) (2025-05-10)
 
 

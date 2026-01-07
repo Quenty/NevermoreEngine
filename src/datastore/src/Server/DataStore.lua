@@ -314,7 +314,7 @@ function DataStore.PromiseViewUpToDate(self: DataStore): Promise.Promise<()>
 	return promise
 end
 
-function DataStore._setupAutoSaving(self: DataStore)
+function DataStore._setupAutoSaving(self: DataStore): ()
 	local startTime = os.clock()
 
 	self._maid:GiveTask(Rx.combineLatest({
@@ -364,7 +364,7 @@ function DataStore._setupAutoSaving(self: DataStore)
 	end))
 end
 
-function DataStore._syncData(self: DataStore, doMergeNewData: boolean, doCloseSession: boolean?)
+function DataStore._syncData(self: DataStore, doMergeNewData: boolean, doCloseSession: boolean?): Promise.Promise<()>
 	if self:DidLoadFail() then
 		warn("[DataStore] - Not syncing, failed to load")
 		return Promise.rejected("Load not successful, not syncing")

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.26.1...@quenty/soundgroup@1.27.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Add more typing ([f32615e](https://github.com/Quenty/NevermoreEngine/commit/f32615ec9d846a1a4392a3b21a0f594e8d420b44))
+
+
+
+
+
 ## [1.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.26.0...@quenty/soundgroup@1.26.1) (2026-01-05)
 
 

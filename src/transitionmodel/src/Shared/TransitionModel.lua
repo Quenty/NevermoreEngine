@@ -45,7 +45,7 @@ function TransitionModel.new(): TransitionModel
 	local self: TransitionModel = setmetatable(BasicPane.new() :: any, TransitionModel)
 
 	self._isShowingComplete = self._maid:Add(ValueObject.new(false, "boolean"))
-	self._isHidingComplete = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isHidingComplete = self._maid:Add(ValueObject.new(true, "boolean"))
 
 	self._showCallback = nil
 	self._hideCallback = nil

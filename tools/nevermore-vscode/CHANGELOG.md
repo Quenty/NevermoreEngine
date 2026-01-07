@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/Quenty/Nevermore/compare/nevermore-vscode@0.1.1...nevermore-vscode@0.2.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Add service typing to luau code snippets ([73ea15c](https://github.com/Quenty/Nevermore/commit/73ea15c9d583bbdb06954d555b1c0d3d5064a883))
+
+
+
+
+
 ## [0.1.1](https://github.com/Quenty/Nevermore/compare/nevermore-vscode@0.1.0...nevermore-vscode@0.1.1) (2026-01-05)
 
 

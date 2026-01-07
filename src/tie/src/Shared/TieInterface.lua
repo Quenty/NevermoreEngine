@@ -7,16 +7,36 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Observable = require("Observable")
 local TieMethodInterfaceUtils = require("TieMethodInterfaceUtils")
 local TiePropertyInterface = require("TiePropertyInterface")
+local TieRealms = require("TieRealms")
 local TieSignalInterface = require("TieSignalInterface")
 
 local TieInterface = {}
 TieInterface.ClassName = "TieInterface"
 TieInterface.__index = TieInterface
 
-function TieInterface.new(definition, implParent: Instance?, adornee: Instance?, interfaceTieRealm)
-	local self = setmetatable({}, TieInterface)
+export type TieInterface<T> =
+	typeof(setmetatable(
+		{} :: {
+			_definition: any,
+			_implParent: Instance?,
+			_adornee: Instance?,
+			_interfaceTieRealm: string,
+			_memberDefinitionMap: { [string]: any },
+		},
+		{} :: typeof({ __index = TieInterface })
+	))
+	& T
+
+function TieInterface.new<T>(
+	definition,
+	implParent: Instance?,
+	adornee: Instance?,
+	interfaceTieRealm: TieRealms.TieRealm
+): TieInterface<T>
+	local self: TieInterface<T> = setmetatable({} :: any, TieInterface)
 
 	assert(implParent or adornee, "ImplParent or adornee required")
 
@@ -34,11 +54,11 @@ end
 
 	@return boolean
 ]=]
-function TieInterface:IsImplemented(): boolean
-	local implParent = rawget(self, "_implParent")
-	local adornee = rawget(self, "_adornee")
-	local definition = rawget(self, "_definition")
-	local interfaceTieRealm = rawget(self, "_interfaceTieRealm")
+function TieInterface.IsImplemented<T>(self: TieInterface<T>): boolean
+	local implParent = rawget(self :: any, "_implParent")
+	local adornee = rawget(self :: any, "_adornee")
+	local definition = rawget(self :: any, "_definition")
+	local interfaceTieRealm = rawget(self :: any, "_interfaceTieRealm")
 
 	if implParent then
 		if adornee then
@@ -62,13 +82,13 @@ end
 
 	@return Instance?
 ]=]
-function TieInterface:GetTieAdornee(): Instance?
-	local adornee = rawget(self, "_adornee")
+function TieInterface.GetTieAdornee<T>(self: TieInterface<T>): Instance?
+	local adornee = rawget(self :: any, "_adornee")
 	if adornee then
 		return adornee
 	end
 
-	local implParent = rawget(self, "_implParent")
+	local implParent = rawget(self :: any, "_implParent")
 	if implParent then
 		return implParent.Parent
 	end
@@ -81,11 +101,11 @@ end
 
 	@return Observable<boolean>
 ]=]
-function TieInterface:ObserveIsImplemented()
-	local implParent = rawget(self, "_implParent")
-	local adornee = rawget(self, "_adornee")
-	local definition = rawget(self, "_definition")
-	local interfaceTieRealm = rawget(self, "_interfaceTieRealm")
+function TieInterface.ObserveIsImplemented<T>(self: TieInterface<T>): Observable.Observable<boolean>
+	local implParent = rawget(self :: any, "_implParent")
+	local adornee = rawget(self :: any, "_adornee")
+	local definition = rawget(self :: any, "_definition")
+	local interfaceTieRealm = rawget(self :: any, "_interfaceTieRealm")
 
 	if implParent then
 		if adornee then
@@ -98,13 +118,13 @@ function TieInterface:ObserveIsImplemented()
 	return definition:ObserveIsImplemented(adornee, interfaceTieRealm)
 end
 
-function TieInterface:__index(index)
-	local interfaceTieRealm = rawget(self, "_interfaceTieRealm")
+function TieInterface.__index<T>(self: TieInterface<T>, index)
+	local interfaceTieRealm = rawget(self :: any, "_interfaceTieRealm")
 
-	local member = (rawget(self, "_memberDefinitionMap") :: any)[index]
-	local definition = rawget(self, "_definition")
-	local adornee = rawget(self, "_adornee")
-	local implParent = rawget(self, "_implParent")
+	local member = (rawget(self :: any, "_memberDefinitionMap") :: any)[index]
+	local definition = rawget(self :: any, "_definition")
+	local adornee = rawget(self :: any, "_adornee")
+	local implParent = rawget(self :: any, "_implParent")
 
 	if member then
 		if member:IsAllowedOnInterface(interfaceTieRealm) then

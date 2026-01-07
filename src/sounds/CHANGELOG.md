@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.14.4...@quenty/sounds@10.15.0) (2026-01-06)
+
+
+### Features
+
+* Sound utils suppose cloning from an instance ([4597475](https://github.com/Quenty/NevermoreEngine/commit/4597475cdadf6a7b6d81d1fa59c3a7af6736b27e))
+
+
+
+
+
 ## [10.14.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.14.3...@quenty/sounds@10.14.4) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/sounds
