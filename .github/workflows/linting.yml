@@ -23,6 +23,34 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Run `npm install --no-package-lock --no-fund` on cli-output-helpers
+        run: npm install --no-package-lock --no-fund
+        working-directory: tools/cli-output-helpers
+
+      - name: Build cli-output-helpers
+        run: npm run build
+        working-directory: tools/cli-output-helpers
+
+      - name: Run `npm install --no-package-lock --no-fund` on nevermore-template-helpers
+        run: npm install --no-package-lock  --no-fund
+        working-directory: tools/nevermore-template-helpers
+
+      - name: Build nevermore-template-helpers
+        run: npm run build
+        working-directory: tools/nevermore-template-helpers
+
+      - name: Run `npm install --no-package-lock` on nevermore-cli
+        run: npm install --no-package-lock
+        working-directory: tools/nevermore-cli
+
+      - name: Build nevermore-cli
+        run: npm run build
+        working-directory: tools/nevermore-cli
+
+      - name: Install nevermore-cli locally
+        run: npm install -g .
+        working-directory: tools/nevermore-cli
+
       - name: Link and install packages
         run: npm run build:link
 
