@@ -1,3 +1,15 @@
+# v4.11.0 (Thu Jan 08 2026)
+
+#### 🐛 Bug Fix
+
+- ci: Nevermore CLI downloads Roblox types for you ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

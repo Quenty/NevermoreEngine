@@ -1,3 +1,25 @@
+# (Thu Jan 08 2026)
+
+#### 🚀 Enhancement
+
+- fix: Self-bootstrap our own nevermore-cli in luau-lsp Nevermore [#628](https://github.com/Quenty/NevermoreEngine/pull/628) ([@Quenty](https://github.com/Quenty))
+- `@quenty/datastore@13.28.0`
+  - feat: DataStoreStage.Load and DataStoreStage.Observe are optionally allowed to take no arguments to observe the full stage's values ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Update package.json ([@Quenty](https://github.com/Quenty))
+- `@quenty/nevermore-cli@4.11.0`
+  - ci: Nevermore CLI downloads Roblox types for you ([@Quenty](https://github.com/Quenty))
+- `@quenty/brio@14.22.0`
+  - fix: Brio.ToMaidAndValue now is correctly typed to Maid.Maid ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jan 06 2026)
 
 #### 🚀 Enhancement

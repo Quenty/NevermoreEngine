@@ -1,3 +1,15 @@
+# v14.22.0 (Thu Jan 08 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Brio.ToMaidAndValue now is correctly typed to Maid.Maid ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

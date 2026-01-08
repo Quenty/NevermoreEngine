@@ -1,3 +1,15 @@
+# v13.28.0 (Thu Jan 08 2026)
+
+#### 🚀 Enhancement
+
+- feat: DataStoreStage.Load and DataStoreStage.Observe are optionally allowed to take no arguments to observe the full stage's values ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
