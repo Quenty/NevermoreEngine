@@ -19,10 +19,13 @@ export namespace BrioUtils {
     brios: Brio<unknown>[],
     ...values: ToTuple<T>
   ): Brio<LuaTuple<T>>;
+
+  function withOtherValues<T>(brio: Brio<unknown>, value: T): Brio<T>;
   function withOtherValues<T extends [unknown, ...unknown[]]>(
     brio: Brio<unknown>,
     ...values: ToTuple<T>
   ): Brio<LuaTuple<T>>;
+
   function extend<T, U extends [unknown, ...unknown[]]>(
     brio: Brio<T>,
     ...values: U
