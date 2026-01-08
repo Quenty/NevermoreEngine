@@ -23,7 +23,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Run `npm install --no-package-lock --no-fund` on cli-output-helpers
+      - name: Run `npm install --no-package-lock` on cli-output-helpers
         run: npm install --no-package-lock --no-fund
         working-directory: tools/cli-output-helpers
 
@@ -31,8 +31,8 @@ jobs:
         run: npm run build
         working-directory: tools/cli-output-helpers
 
-      - name: Run `npm install --no-package-lock --no-fund` on nevermore-template-helpers
-        run: npm install --no-package-lock  --no-fund
+      - name: Run `npm install --no-package-lockd` on nevermore-template-helpers
+        run: npm install --no-package-lock --no-fund
         working-directory: tools/nevermore-template-helpers
 
       - name: Build nevermore-template-helpers
@@ -40,7 +40,7 @@ jobs:
         working-directory: tools/nevermore-template-helpers
 
       - name: Run `npm install --no-package-lock` on nevermore-cli
-        run: npm install --no-package-lock
+        run: npm install --no-package-lock --no-fund
         working-directory: tools/nevermore-cli
 
       - name: Build nevermore-cli
@@ -87,11 +87,8 @@ jobs:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate standard library
-        run: selene generate-roblox-std
-
-      - name: Run Selene
-        run: selene src
+      - name: selene check
+        run: npm run lint:selene
 
   moonwave:
     runs-on: ubuntu-latest
@@ -106,4 +103,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run moonwave-extractor
-        run: moonwave-extractor extract src
+        run: npm run lint:moonwave
