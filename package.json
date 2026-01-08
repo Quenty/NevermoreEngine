@@ -16,15 +16,16 @@
     "moonwave": "^1.1.2"
   },
   "scripts": {
-    "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json --absolute",
     "build:link": "npx lerna exec --parallel -- npm install --no-package-lock --no-audit --no-fund",
+    "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json --absolute",
+    "format": "stylua --config-path=stylua.toml src games tests plugins",
     "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore=**/node_modules/** --ignore=**/*.story.lua --ignore=**/*.client.lua --ignore=**/*.server.lua src",
     "lint:moonwave": "npx lerna exec --parallel -- moonwave-extractor extract src",
-    "lint:selene": "npx lerna exec -- selene --config=../../selene.toml src",
+    "lint:selene": "npx lerna exec --parallel -- selene --no-summary --num-threads=1 --config=../../selene.toml src",
     "lint:stylua": "stylua --config-path=stylua.toml --check src games tests plugins",
-    "format": "stylua --config-path=stylua.toml src games tests plugins",
     "postinstall": "npm run build:link",
     "prelint:luau": "npm run build:sourcemap && npx @quenty/nevermore-cli download-roblox-types",
+    "prelint:selene": "selene generate-roblox-std",
     "release": "auto shipit"
   },
   "author": "James Onnen <rbxquenty@gmail.com>",
