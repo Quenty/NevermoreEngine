@@ -21,8 +21,7 @@ export interface InitGameArgs extends NevermoreGlobalArgs {
  */
 export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
   public command = 'init [game-name]';
-  public describe =
-    'Initializes a new game template.';
+  public describe = 'Initializes a new game template.';
 
   public builder(args: Argv<T>) {
     args.positional('game-name', {
@@ -69,11 +68,39 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
     });
 
     try {
+      await runCommandAsync(args, 'git', ['init'], {
+        cwd: srcRoot,
+      });
+    } catch {
+      OutputHelper.error(
+        'Failed to initialize git repository, is git installed?'
+      );
+    }
+
+    try {
+      await runCommandAsync(args, 'aftman', ['install'], {
+        cwd: srcRoot,
+      });
+    } catch {
+      OutputHelper.error('Failed to install aftman, is aftman installed?');
+    }
+
+    try {
+      await runCommandAsync(args, 'npm', ['run', 'format'], {
+        cwd: srcRoot,
+      });
+    } catch {
+      OutputHelper.error(
+        'Failed to run `npm run format`, is stylua installed?'
+      );
+    }
+
+    try {
       await runCommandAsync(args, 'selene', ['generate-roblox-std'], {
         cwd: srcRoot,
       });
     } catch {
-      OutputHelper.info(
+      OutputHelper.error(
         'Failed to run `selene generate-roblox-std`, is selene installed?'
       );
     }

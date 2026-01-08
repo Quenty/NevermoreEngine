@@ -27,5 +27,13 @@
       "editor.formatOnSave": true,
       "editor.formatOnSaveMode": "file"
     }
+  },
+  "extensions": {
+    "recommendations": [
+      "quenty.nevermore-vscode",
+      "kampfkarren.selene-vscode",
+      "johnnymorganz.luau-lsp",
+      "johnnymorganz.stylua"
+    ]
   }
 }
