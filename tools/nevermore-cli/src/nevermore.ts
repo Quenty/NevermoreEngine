@@ -14,6 +14,7 @@ import { InitPluginCommand } from './commands/init-plugin-command';
 import { PackCommand } from './commands/pack-command';
 import { InstallPackageCommand } from './commands/install-package-command';
 import { TestProjectCommand } from './commands/test-project-command';
+import { DownloadRobloxTypes } from './commands/download-roblox-types';
 
 yargs(hideBin(process.argv))
   .scriptName('nevermore')
@@ -38,6 +39,7 @@ yargs(hideBin(process.argv))
   .command(new PackCommand() as any)
   .command(new InstallPackageCommand() as any)
   .command(new TestProjectCommand() as any)
+  .command(new DownloadRobloxTypes() as any)
   .recommendCommands()
   .demandCommand(
     1,

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.21.0...@quenty/brio@14.22.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* Brio.ToMaidAndValue now is correctly typed to Maid.Maid ([07517dc](https://github.com/Quenty/NevermoreEngine/commit/07517dc3297bfa0fabff24b236365c3e90ed685e))
+
+
+
+
+
 # [14.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.5...@quenty/brio@14.21.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/brio
