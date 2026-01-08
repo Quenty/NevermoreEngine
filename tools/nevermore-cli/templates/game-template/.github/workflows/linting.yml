@@ -80,4 +80,4 @@ jobs:
           token: $\{{ secrets.GITHUB_TOKEN }}
 
       - name: Run moonwave-extractor
-        run: moonwave-extractor extract src
+        run: npm run lint:moonwave
