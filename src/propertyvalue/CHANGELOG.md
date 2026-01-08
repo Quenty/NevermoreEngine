@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.21.0...@quenty/propertyvalue@7.22.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
 # [7.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.20.6...@quenty/propertyvalue@7.21.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/propertyvalue

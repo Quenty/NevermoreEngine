@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.23.1...@quenty/timedtween@7.24.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
 ## [7.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.23.0...@quenty/timedtween@7.23.1) (2026-01-05)
 
 

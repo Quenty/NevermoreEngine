@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.30.0...@quenty/racketingropeconstraint@12.31.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
 # [12.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.29.1...@quenty/racketingropeconstraint@12.30.0) (2026-01-06)
 
 **Note:** Version bump only for package @quenty/racketingropeconstraint

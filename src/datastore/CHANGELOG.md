@@ -1,19 +1,18 @@
-# v13.28.0 (Thu Jan 08 2026)
-
-#### 🚀 Enhancement
-
-- feat: DataStoreStage.Load and DataStoreStage.Observe are optionally allowed to take no arguments to observe the full stage's values ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.27.0...@quenty/datastore@13.28.0) (2026-01-08)
+
+
+### Features
+
+* DataStoreStage.Load and DataStoreStage.Observe are optionally allowed to take no arguments to observe the full stage's values ([f9dc6b7](https://github.com/Quenty/NevermoreEngine/commit/f9dc6b7078e0961aad599ed8197c345ac76036f2))
+
+
+
+
 
 # [13.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.26.1...@quenty/datastore@13.27.0) (2026-01-06)
 
