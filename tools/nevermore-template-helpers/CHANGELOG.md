@@ -1,19 +1,18 @@
-# v1.4.0 (Thu Jan 08 2026)
-
-#### 🚀 Enhancement
-
-- feat: Nevermore init generates complaint luau-lsp checking that can be pushed to github immediately and pass CI/CD ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.3.1...@quenty/nevermore-template-helpers@1.4.0) (2026-01-08)
+
+
+### Features
+
+* Nevermore init generates complaint luau-lsp checking that can be pushed to github immediately and pass CI/CD ([7aaabed](https://github.com/Quenty/Nevermore/commit/7aaabed2d35be08ca2f4956cfb6e87371e939c2f))
+
+
+
+
 
 ## [1.3.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.3.0...@quenty/nevermore-template-helpers@1.3.1) (2025-12-31)
 

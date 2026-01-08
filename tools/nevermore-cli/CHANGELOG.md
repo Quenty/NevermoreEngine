@@ -1,20 +1,18 @@
-# v4.12.0 (Thu Jan 08 2026)
-
-#### 🚀 Enhancement
-
-- docs: Update docs to inform users how to run tools locally [#629](https://github.com/Quenty/NevermoreEngine/pull/629) ([@Quenty](https://github.com/Quenty))
-- feat: Nevermore init generates complaint luau-lsp checking that can be pushed to github immediately and pass CI/CD ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.12.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.11.0...@quenty/nevermore-cli@4.12.0) (2026-01-08)
+
+
+### Features
+
+* Nevermore init generates complaint luau-lsp checking that can be pushed to github immediately and pass CI/CD ([7aaabed](https://github.com/Quenty/Nevermore/commit/7aaabed2d35be08ca2f4956cfb6e87371e939c2f))
+
+
+
+
 
 # [4.11.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.10.0...@quenty/nevermore-cli@4.11.0) (2026-01-08)
 
