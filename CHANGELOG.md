@@ -2,6 +2,27 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/nevermore-cli@4.12.0`
+  - docs: Update docs to inform users how to run tools locally [#629](https://github.com/Quenty/NevermoreEngine/pull/629) ([@Quenty](https://github.com/Quenty))
+- `@quenty/nevermore-cli@4.12.0`, `@quenty/nevermore-template-helpers@1.4.0`
+  - feat: Nevermore init generates complaint luau-lsp checking that can be pushed to github immediately and pass CI/CD ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `nevermore-vscode@0.3.0`
+  - fix: Update luau snippets with new compliant types ([@Quenty](https://github.com/Quenty))
+  - ci: Linting uses consistent npm package calls ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jan 08 2026)
+
+#### 🚀 Enhancement
+
 - fix: Self-bootstrap our own nevermore-cli in luau-lsp Nevermore [#628](https://github.com/Quenty/NevermoreEngine/pull/628) ([@Quenty](https://github.com/Quenty))
 - `@quenty/datastore@13.28.0`
   - feat: DataStoreStage.Load and DataStoreStage.Observe are optionally allowed to take no arguments to observe the full stage's values ([@Quenty](https://github.com/Quenty))

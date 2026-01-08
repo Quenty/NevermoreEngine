@@ -1,3 +1,16 @@
+# v4.12.0 (Thu Jan 08 2026)
+
+#### 🚀 Enhancement
+
+- docs: Update docs to inform users how to run tools locally [#629](https://github.com/Quenty/NevermoreEngine/pull/629) ([@Quenty](https://github.com/Quenty))
+- feat: Nevermore init generates complaint luau-lsp checking that can be pushed to github immediately and pass CI/CD ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
