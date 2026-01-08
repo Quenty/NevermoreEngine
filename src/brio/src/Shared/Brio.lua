@@ -214,7 +214,7 @@ function Brio.ToMaid<T...>(self: Brio<T...>): Maid.Maid
 	return maid
 end
 
-function Brio.ToMaidAndValue<T...>(self: Brio<T...>): (any, T...)
+function Brio.ToMaidAndValue<T...>(self: Brio<T...>): (Maid.Maid, T...)
 	return self:ToMaid(), self:GetValue()
 end
 
