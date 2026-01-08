@@ -137,12 +137,16 @@ end
 	end)
 	```
 
-	@param key DataStoreStageKey
+	@param key DataStoreStageKey?
 	@param defaultValue T?
 	@return Promise<T>
 ]=]
-function DataStoreStage.Load<T>(self: DataStoreStage, key: DataStoreStageKey, defaultValue: T?): Promise.Promise<T>
-	assert(type(key) == "string" or type(key) == "number", "Bad key")
+function DataStoreStage.Load<T>(self: DataStoreStage, key: DataStoreStageKey?, defaultValue: T?): Promise.Promise<T>
+	assert(type(key) == "string" or type(key) == "number" or key == nil, "Bad key")
+
+	if key == nil then
+		return self:LoadAll(defaultValue)
+	end
 
 	return self:PromiseViewUpToDate():Then(function()
 		if type(self._viewSnapshot) == "table" then
@@ -276,7 +280,7 @@ function DataStoreStage.Observe<T>(
 	key: DataStoreStageKey?,
 	defaultValue: T?
 ): Observable.Observable<T>
-	assert(type(key) == "string" or type(key) == "number", "Bad key")
+	assert(type(key) == "string" or type(key) == "number" or key == nil, "Bad key")
 
 	if key == nil then
 		return Observable.new(function(sub)
@@ -874,7 +878,7 @@ function DataStoreStage._computeChangedKeys(_self: DataStoreStage, previousViewS
 	end
 end
 
-function DataStoreStage._updateViewSnapshotAtKey(self: DataStoreStage, key)
+function DataStoreStage._updateViewSnapshotAtKey(self: DataStoreStage, key: DataStoreStageKey)
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if type(self._viewSnapshot) ~= "table" then
