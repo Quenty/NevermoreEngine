@@ -24,7 +24,7 @@
     "lint:stylua": "stylua --config-path=stylua.toml --check src games tests plugins",
     "format": "stylua --config-path=stylua.toml src games tests plugins",
     "postinstall": "npm run build:link",
-    "prelint:luau": "npm run build:sourcemap && nevermore download-roblox-types",
+    "prelint:luau": "npm run build:sourcemap && npx @quenty/nevermore-cli download-roblox-types",
     "release": "auto shipit"
   },
   "author": "James Onnen <rbxquenty@gmail.com>",
