@@ -31,7 +31,7 @@ export type UndoStackEntry =
 	& BaseObject.BaseObject
 
 --[=[
-	Constructs a new undo restack entry. See [UndoStack] for usage.
+	Constructs a new undo stack entry. See [UndoStack] for usage.
 
 	@return UndoStackEntry
 ]=]
@@ -48,7 +48,7 @@ function UndoStackEntry.new(): UndoStackEntry
 end
 
 --[=[
-	Returns true if the etnry is an undo stack entry
+	Returns true if the value is an undo stack entry
 
 	@param value any
 	@return boolean

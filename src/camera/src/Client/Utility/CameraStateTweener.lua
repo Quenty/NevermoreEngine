@@ -1,8 +1,8 @@
 --!strict
 --[=[
 	Makes transitions between states easier. Uses the `CameraStackService` to tween in and
-	out a new camera state Call `:Show()` and `:Hide()` to do so, and make sure to
-	call `:Destroy()` after usage
+	out a new camera state. Call `:Show()` and `:Hide()` to do so, and make sure to
+	call `:Destroy()` after usage.
 
 	@class CameraStateTweener
 ]=]
@@ -89,7 +89,7 @@ end
 
 --[=[
 	Shows the camera to fade in.
-	@param doNotAnimate? boolean -- Optional, defaults to animating
+	@param doNotAnimate boolean? -- Optional, defaults to animating
 ]=]
 function CameraStateTweener.Show(self: CameraStateTweener, doNotAnimate: boolean?)
 	self:SetTarget(1, doNotAnimate)
@@ -97,7 +97,7 @@ end
 
 --[=[
 	Hides the camera to fade in.
-	@param doNotAnimate? boolean -- Optional, defaults to animating
+	@param doNotAnimate boolean? -- Optional, defaults to animating
 ]=]
 function CameraStateTweener.Hide(self: CameraStateTweener, doNotAnimate: boolean?)
 	self:SetTarget(0, doNotAnimate)
@@ -158,6 +158,10 @@ function CameraStateTweener.GetCameraBelow(self: CameraStateTweener): CameraEffe
 	return self._cameraBelow
 end
 
+--[=[
+	Sets the epsilon to stop animating
+	@param epsilon number?
+]=]
 function CameraStateTweener:SetEpsilon(epsilon: number?)
 	self._fadeBetween.Epsilon = epsilon
 end

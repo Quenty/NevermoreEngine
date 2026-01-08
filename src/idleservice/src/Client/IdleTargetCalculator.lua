@@ -1,6 +1,6 @@
 --!strict
 --[=[
-	Assets in calculating whether the player is idle while moving the camera around or
+	Assists in calculating whether the player is idle while moving the camera around or
 	aiming a gun.
 	@class IdleTargetCalculator
 ]=]

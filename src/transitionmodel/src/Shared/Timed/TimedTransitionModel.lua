@@ -168,7 +168,7 @@ end
 --[=[
 	Toggles the model and promises when the transition is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function TimedTransitionModel.PromiseToggle(self: TimedTransitionModel, doNotAnimate: boolean?): Promise.Promise<()>

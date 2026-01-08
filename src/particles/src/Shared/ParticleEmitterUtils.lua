@@ -25,7 +25,7 @@ function ParticleEmitterUtils.scaleSize(adornee: Instance, scale: number): ()
 end
 
 --[=[
-	Playes a particle emitter from a template in the parent
+	Plays a particle emitter from a template in the parent
 
 	@param template Instance
 	@return Maid

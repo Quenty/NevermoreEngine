@@ -47,10 +47,10 @@ end
 --[=[
 	Constructs a new promise.
 
-	::warning
+	:::warning
 	Do not yield within this func callback, as it will yield on the
 	main thread. This is a performance optimization.
-	::
+	:::
 
 	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
 	@return Promise<T...>
@@ -395,7 +395,7 @@ function Promise._toHumanReadable<T...>(_self: Promise<T...>, data: any): string
 end
 
 --[=[
-	Handlers if/when promise is fulfilled/rejected. It takes up to two arguments, callback functions
+	Handles if/when promise is fulfilled/rejected. It takes up to two arguments, callback functions
 	for the success and failure cases of the Promise. May return the same promise if certain behavior
 	is met.
 

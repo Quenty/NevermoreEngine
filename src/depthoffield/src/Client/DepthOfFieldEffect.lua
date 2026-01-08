@@ -82,7 +82,7 @@ end
 --[=[
 	Sets the target depth of field distance
 	@param focusDistanceTarget number
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function DepthOfFieldEffect.SetFocusDistanceTarget(
 	self: DepthOfFieldEffect,
@@ -97,7 +97,7 @@ end
 --[=[
 	Sets the target depth of field radius
 	@param inFocusRadiusTarget number
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function DepthOfFieldEffect.SetInFocusRadiusTarget(
 	self: DepthOfFieldEffect,
@@ -112,7 +112,7 @@ end
 --[=[
 	Sets the near intensity target
 	@param nearIntensityTarget number
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function DepthOfFieldEffect.SetNearIntensityTarget(
 	self: DepthOfFieldEffect,
@@ -127,7 +127,7 @@ end
 --[=[
 	Sets the far intensity target
 	@param farIntensityTarget number
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function DepthOfFieldEffect.SetFarIntensityTarget(
 	self: DepthOfFieldEffect,

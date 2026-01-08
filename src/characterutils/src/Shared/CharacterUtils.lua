@@ -87,7 +87,7 @@ function CharacterUtils.unequipTools(player: Player)
 end
 
 --[=[
-	Returns the player that a descendent is part of, if it is part of one.
+	Returns the player that a descendant is part of, if it is part of one.
 
 	```lua
 	script.Parent.Touched:Connect(function(inst)

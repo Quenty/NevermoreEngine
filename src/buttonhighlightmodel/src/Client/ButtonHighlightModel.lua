@@ -447,7 +447,7 @@ end
 --[=[
 	Sets whether the model is choosen
 	@param isChoosen boolean
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function ButtonHighlightModel.SetIsChoosen(self: ButtonHighlightModel, isChoosen: boolean, doNotAnimate: boolean?): ()
 	assert(type(isChoosen) == "boolean", "Bad isChoosen")
@@ -533,7 +533,7 @@ end
 --[=[
 	Sets whether a key is down
 	@param isKeyDown boolean
-	@param doNotAnimate boolean -- Optional
+	@param doNotAnimate boolean? -- Optional
 ]=]
 function ButtonHighlightModel.SetKeyDown(self: ButtonHighlightModel, isKeyDown: boolean, doNotAnimate: boolean?): ()
 	assert(type(isKeyDown) == "boolean", "Bad isKeyDown")
