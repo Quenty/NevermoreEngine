@@ -26,6 +26,34 @@ To build the game, you want to do the following
 
 To add new packages you can run `npm install @quenty/package-name` or whatever the package you want.
 
+# Running tools locally
+
+To check linting, run the following commands in your terminal.
+
+```bash
+npm run lint:luau
+```
+
+```bash
+npm run lint:selene
+```
+
+```bash
+npm run lint:stylua
+```
+
+```bash
+npm run lint:moonwave
+```
+
+To automatically fix formatting, run
+
+```bash
+npm run format
+```
+
+Note that you should also configure your editor to automatically format files using Stylua.
+
 # Getting Luau-lsp to work in VSCode
 
 Configure your vscode settings to use the custom work!
