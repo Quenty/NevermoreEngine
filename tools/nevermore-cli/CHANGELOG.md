@@ -1,19 +1,18 @@
-# v4.12.1 (Fri Jan 09 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Linting uses npm run lint:moonwave in the game-template [#630](https://github.com/Quenty/NevermoreEngine/pull/630) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.12.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.12.0...@quenty/nevermore-cli@4.12.1) (2026-01-09)
+
+
+### Bug Fixes
+
+* Linting uses npm run lint:moonwave ([#630](https://github.com/Quenty/Nevermore/issues/630)) ([8b6ff9d](https://github.com/Quenty/Nevermore/commit/8b6ff9da717422b0b92cc55759f0b109d0161d24))
+
+
+
+
 
 # [4.12.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.11.0...@quenty/nevermore-cli@4.12.0) (2026-01-08)
 
