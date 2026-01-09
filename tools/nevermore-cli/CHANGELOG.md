@@ -1,3 +1,15 @@
+# v4.12.1 (Fri Jan 09 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Linting uses npm run lint:moonwave in the game-template [#630](https://github.com/Quenty/NevermoreEngine/pull/630) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
