@@ -12,6 +12,12 @@ jobs:
         with:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
 
       - name: Setup npm for GitHub Packages
         run: |
@@ -23,36 +29,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Run `npm install --no-package-lock` on cli-output-helpers
-        run: npm install --no-package-lock --no-fund
-        working-directory: tools/cli-output-helpers
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Build cli-output-helpers
-        run: npm run build
-        working-directory: tools/cli-output-helpers
-
-      - name: Run `npm install --no-package-lockd` on nevermore-template-helpers
-        run: npm install --no-package-lock --no-fund
-        working-directory: tools/nevermore-template-helpers
-
-      - name: Build nevermore-template-helpers
-        run: npm run build
-        working-directory: tools/nevermore-template-helpers
-
-      - name: Run `npm install --no-package-lock` on nevermore-cli
-        run: npm install --no-package-lock --no-fund
-        working-directory: tools/nevermore-cli
-
-      - name: Build nevermore-cli
-        run: npm run build
-        working-directory: tools/nevermore-cli
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' --filter '!./tools/nevermore-vscode' run build
 
       - name: Install nevermore-cli locally
         run: npm install -g .
         working-directory: tools/nevermore-cli
-
-      - name: Link and install packages
-        run: npm run build:link
 
       - name: Generate Sourcemap
         run: npm run build:sourcemap
@@ -71,6 +56,7 @@ jobs:
         with:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: stylua check
         run: npm run lint:stylua
@@ -86,6 +72,7 @@ jobs:
         with:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: selene check
         run: npm run lint:selene
@@ -101,6 +88,7 @@ jobs:
         with:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: Run moonwave-extractor
         run: npm run lint:moonwave

@@ -9,10 +9,11 @@ jobs:
     name: Build and deploy docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v2
+      - name: Setup node
+        uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '21'
+
       - run: npm i -g moonwave@latest
       - name: Publish
         run: |

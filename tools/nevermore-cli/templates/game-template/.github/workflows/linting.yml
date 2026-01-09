@@ -12,6 +12,7 @@ jobs:
         with:
           version: 'v0.3.0'
           token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: Setup npm for GitHub Packages
         run: |
@@ -48,6 +49,7 @@ jobs:
         with:
           version: 'v0.3.0'
           token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: stylua check
         run: npm run lint:stylua
@@ -63,6 +65,7 @@ jobs:
         with:
           version: 'v0.3.0'
           token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: Run Selene
         run: npm run lint:selene
@@ -78,6 +81,7 @@ jobs:
         with:
           version: 'v0.3.0'
           token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: Run moonwave-extractor
         run: npm run lint:moonwave

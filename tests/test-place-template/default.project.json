@@ -1,6 +1,6 @@
 {
   "name": "UnitTest",
-  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "globIgnorePaths": ["**/.package-lock.json", "**/.pnpm/**"],
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
