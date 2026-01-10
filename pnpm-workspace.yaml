@@ -1,0 +1,8 @@
+# pnpm workspace configuration for Nevermore monorepo
+# See: https://pnpm.io/workspaces
+
+packages:
+  - 'src/*'
+  - 'tools/*'
+  - 'games/*'
+  - 'plugins/*'

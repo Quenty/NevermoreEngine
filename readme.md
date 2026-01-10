@@ -26,7 +26,7 @@
 Code in Nevermore has powered over a billion play sessions on Roblox. Nevermore is used in all [Studio Koi Koi](https://studiokoikoi.com/) games, as well as many other games on Roblox.
 
 ## Install using npm
-Nevermore is designed to use [npm](https://www.npmjs.com/) to manage packages. You can install a package like this.
+Nevermore is designed to use [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/) to manage packages. You can install a package like this.
 
 ```
 npm install @quenty/maid

@@ -32,38 +32,15 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
     return args as Argv<InitGameArgs>;
   }
 
-  public async handler(args: InitGameArgs) {
-    const rawGameName = await InitGameCommand._ensureGameName(args);
+  public static async initToolChainAsync(
+    args: NevermoreGlobalArgs,
+    srcRoot: string,
+    packages: string[]
+  ): Promise<void> {
+    // TODO: Something better than this so we don't spam install pnpm every time
+    await runCommandAsync(args, 'npm', ['install', 'pnpm', '-g']);
 
-    const gameName = TemplateHelper.camelize(rawGameName).toLowerCase();
-    const gameNameProper = TemplateHelper.camelize(rawGameName);
-
-    const srcRoot = process.cwd();
-    const templatePath = getTemplatePathByName('game-template');
-
-    OutputHelper.info(
-      `Creating a new game at '${srcRoot}' with template '${templatePath}'`
-    );
-
-    await TemplateHelper.createDirectoryContentsAsync(
-      templatePath,
-      srcRoot,
-      {
-        gameName: gameName,
-        gameNameProper: gameNameProper,
-      },
-      args.dryrun
-    );
-
-    const packages = [
-      '@quenty/loader',
-      '@quenty/servicebag',
-      '@quenty/binder',
-      '@quenty/clienttranslator',
-      '@quenty/cmdrservice',
-    ];
-
-    await runCommandAsync(args, 'npm', ['install', ...packages], {
+    await runCommandAsync(args, 'pnpm', ['install', ...packages], {
       cwd: srcRoot,
     });
 
@@ -104,6 +81,40 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
         'Failed to run `selene generate-roblox-std`, is selene installed?'
       );
     }
+  }
+
+  public async handler(args: InitGameArgs) {
+    const rawGameName = await InitGameCommand._ensureGameName(args);
+
+    const gameName = TemplateHelper.camelize(rawGameName).toLowerCase();
+    const gameNameProper = TemplateHelper.camelize(rawGameName);
+
+    const srcRoot = process.cwd();
+    const templatePath = getTemplatePathByName('game-template');
+
+    OutputHelper.info(
+      `Creating a new game at '${srcRoot}' with template '${templatePath}'`
+    );
+
+    await TemplateHelper.createDirectoryContentsAsync(
+      templatePath,
+      srcRoot,
+      {
+        gameName: gameName,
+        gameNameProper: gameNameProper,
+      },
+      args.dryrun
+    );
+
+    const packages = [
+      '@quenty/loader',
+      '@quenty/servicebag',
+      '@quenty/binder',
+      '@quenty/clienttranslator',
+      '@quenty/cmdrservice',
+    ];
+
+    await InitGameCommand.initToolChainAsync(args, srcRoot, packages);
   }
 
   private static async _ensureGameName(args: InitGameArgs): Promise<string> {

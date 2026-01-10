@@ -1,6 +1,7 @@
 {
   "name": "{{pluginName}}",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.27.0",
   "description": "",
   "keywords": [
     "Roblox",
@@ -8,6 +9,17 @@
     "Lua"
   ],
   "license": "UNLICENSED",
+  "scripts": {
+    "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json --absolute",
+    "format": "stylua --config-path=stylua.toml src",
+    "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore=**/node_modules/** --ignore=**/*.story.lua src",
+    "lint:moonwave": "moonwave-extractor extract src",
+    "lint:selene": "selene --no-summary --config=selene.toml src",
+    "lint:stylua": "stylua --config-path=stylua.toml --check src",
+    "prelint:selene": "selene generate-roblox-std",
+    "prelint:luau": "npm run build:sourcemap && npx @quenty/nevermore-cli download-roblox-types",
+    "preinstall": "npx only-allow pnpm"
+  },
   "dependencies": {},
   "publishConfig": {
     "access": "restricted"

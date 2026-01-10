@@ -12,19 +12,20 @@ This game uses the following tools
 - [Rojo](https://rojo.space/docs/v7/getting-started/installation/) - Build system (syncs into Studio)
 - [Selene](https://kampfkarren.github.io/selene/roblox.html) - Linter
 - [Luau-LSP](https://github.com/JohnnyMorganz/luau-lsp)
-- [npm](https://nodejs.org/en/download/) - Package manager
+- [node](https://nodejs.org/en/download/) - Execution runner + manager
+- [pnpm](https://pnpm.io/) - Package manager
 - [Nevermore](https://github.com/Quenty/NevermoreEngine) - Packages
 
 # Building {{gameNameProper}}
 
 To build the game, you want to do the following
 
-1. Run `npm install` in a terminal of your choice
+1. Run `pnpm install` in a terminal of your choice
 2. Run `rojo serve` to serve the code
 
 # Adding new packages
 
-To add new packages you can run `npm install @quenty/package-name` or whatever the package you want.
+To add new packages you can run `pnpm install @quenty/package-name` or whatever the package you want.
 
 # Running tools locally
 
