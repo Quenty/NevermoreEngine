@@ -9,6 +9,9 @@ jobs:
     name: Build and deploy docs
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Setup node
         uses: actions/setup-node@v6
         with:
