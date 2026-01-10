@@ -36,7 +36,7 @@ jobs:
         run: pnpm -r --filter './tools/**' --filter '!./tools/nevermore-vscode' run build
 
       - name: Install nevermore-cli locally
-        run: npm install -g .
+        run: npm install --ignore-scripts -g .
         working-directory: tools/nevermore-cli
 
       - name: Generate Sourcemap

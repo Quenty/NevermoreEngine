@@ -19,17 +19,20 @@ Contributing to Nevermore is a little bit more difficult than consuming it. That
 ## Tools and technologies we use
 There are certain open source technologies that Nevermore uses to keep the build pipeline clean and working well. These are as follows.
 
-1. [NPM](https://nodejs.org/en/download) - Package manager
-2. [Git](https://git-scm.com/downloads) - Source control
-3. [Rojo](https://rojo.space/docs/v7/getting-started/installation/) - Build system (syncs into Studio)
-4. [Selene](https://kampfkarren.github.io/selene/roblox.html) - Linter
-5. [Aftman](https://github.com/LPGhatguy/aftman) - Toolchain manager
-6. [Lerna](https://github.com/lerna/lerna) - Helps manage multiple repositories
-7. [TestEz](https://roblox.github.io/testez/) - Unit testing system
-8. [Hoarcekat](https://github.com/Kampfkarren/hoarcekat) - Story book (testing)
+1. [Node](https://nodejs.org/en/download) - Toolchain runner
+2. [pnpm](https://pnpm.io/) - Package manager
+3. [Git](https://git-scm.com/downloads) - Source control
+4. [Rojo](https://rojo.space/docs/v7/getting-started/installation/) - Build system (syncs into Studio)
+5. [Selene](https://kampfkarren.github.io/selene/roblox.html) - Linter
+6. [Aftman](https://github.com/LPGhatguy/aftman) - Toolchain manager
+7. [Lerna](https://github.com/lerna/lerna) - Helps manage multiple repositories
+8. [TestEz](https://roblox.github.io/testez/) - Unit testing system
+9. [Hoarcekat](https://github.com/Kampfkarren/hoarcekat) - Story book (testing)
+10. [Luau-lsp](https://github.com/Quenty/luau-lsp) - Language server protocol for rich IDE in VSCode
+11. [VSCode](https://code.visualstudio.com/) - VSCode (other IDEs also work just fine)
 
 :::info
-We use a custom version of Rojo to allow symlinks between components.
+We use a custom version of Rojo to allow symlinks between components, and a custom version of Luau-lsp
 :::
 
 Additionally in the cloud we use
@@ -63,12 +66,24 @@ In general you want to install the following by hand.
 
 After than you will want to clone Nevermore to a folder.
 
-```
+```bash
 git clone https://github.com/Quenty/NevermoreEngine.git
 ```
 
+Then, setup the toolchain by running the following commands:
+
+```bash
+npm install -g pnpm
+aftman install
+```
+
+Finally, install all the packages in the repo
+
+```bash
+pnpm install
+```
+
+You can then serve a test place
 
 ## Why does building need a custom version of Rojo?
 Nevermore does not need a custom version of Rojo to be consumed, but it does need one to be built. This custom version of Rojo understands symlinks and turn them into ObjectValues. These symlinks link the packages together and means that a change to a transient dependency, or direct dependency will immediately be shown in the upstream package.
-
-As an added bonus, this custom version of Rojo also supports live-syncing mesh parts.

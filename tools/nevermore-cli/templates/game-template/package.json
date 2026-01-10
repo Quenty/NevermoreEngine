@@ -1,6 +1,7 @@
 {
   "name": "{{gameName}}",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.27.0",
   "description": "",
   "keywords": [
     "Roblox",
