@@ -18,7 +18,8 @@
   "scripts": {
     "build": "vsce package --out ./nevermore-vscode.vsix",
     "build:install": "code --install-extension ./nevermore-vscode.vsix",
-    "prebuild:install": "npm run build"
+    "prebuild:install": "npm run build",
+    "preinstall": "npx only-allow pnpm"
   },
   "engines": {
     "vscode": "^1.80.0"

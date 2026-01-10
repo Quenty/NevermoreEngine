@@ -43,7 +43,8 @@
   "scripts": {
     "build": "tsc --build",
     "watch": "tsc --build --watch",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "preinstall": "npx only-allow pnpm"
   },
   "publishConfig": {
     "access": "public"

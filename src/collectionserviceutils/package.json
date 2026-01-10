@@ -20,6 +20,9 @@
     "type": "patreon",
     "url": "https://www.patreon.com/quenty"
   },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "dependencies": {
     "@quenty/brio": "file:../brio",
     "@quenty/loader": "file:../loader",

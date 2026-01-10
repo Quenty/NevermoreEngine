@@ -16,7 +16,8 @@
     "lint:selene": "selene --no-summary --config=selene.toml src",
     "lint:stylua": "stylua --config-path=stylua.toml --check src",
     "prelint:selene": "selene generate-roblox-std",
-    "prelint:luau": "npm run build:sourcemap && npx @quenty/nevermore-cli download-roblox-types"
+    "prelint:luau": "npm run build:sourcemap && npx @quenty/nevermore-cli download-roblox-types",
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {},
   "publishConfig": {

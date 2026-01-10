@@ -27,7 +27,8 @@
     "lint:stylua": "stylua --config-path=stylua.toml --check src games tests plugins",
     "prelint:luau": "npm run build:sourcemap && npx @quenty/nevermore-cli download-roblox-types",
     "prelint:selene": "selene generate-roblox-std",
-    "release": "auto shipit"
+    "release": "auto shipit",
+    "preinstall": "npx only-allow pnpm"
   },
   "author": "James Onnen <rbxquenty@gmail.com>",
   "auto": {

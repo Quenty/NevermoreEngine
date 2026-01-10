@@ -8,6 +8,9 @@
     "Lua"
   ],
   "license": "UNLICENSED",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "dependencies": {},
   "publishConfig": {
     "access": "restricted"
