@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cframeserializer",
-  "version": "4.8.1",
+  "version": "4.8.2",
   "description": "Optimized these functions for speed as well as preserving fidality. In the future, use Roblox's orthogonal angle format.",
   "keywords": [
     "Roblox",

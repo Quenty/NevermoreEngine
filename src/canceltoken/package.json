@@ -1,6 +1,6 @@
 {
   "name": "@quenty/canceltoken",
-  "version": "11.13.4",
+  "version": "11.13.5",
   "description": "Cancellation tokens for Roblox Lua",
   "keywords": [
     "Roblox",

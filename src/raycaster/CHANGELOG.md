@@ -1,20 +1,15 @@
-# v3.5.2 (Sat Jan 10 2026)
-
-#### 🐛 Bug Fix
-
-- ci: Update to pnpm for faster CI/CD and local development workflow [#631](https://github.com/Quenty/NevermoreEngine/pull/631) ([@Quenty](https://github.com/Quenty))
-- ci: Enforce pnpm usage for `npm install` to prevent users from accidentally installing via npm ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/raycaster@3.5.1...@quenty/raycaster@3.5.2) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/raycaster
+
+
+
+
 
 ## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/raycaster@3.5.0...@quenty/raycaster@3.5.1) (2025-12-28)
 

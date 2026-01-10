@@ -1,20 +1,15 @@
-# v2.4.1 (Sat Jan 10 2026)
-
-#### 🐛 Bug Fix
-
-- ci: Update to pnpm for faster CI/CD and local development workflow [#631](https://github.com/Quenty/NevermoreEngine/pull/631) ([@Quenty](https://github.com/Quenty))
-- ci: Enforce pnpm usage for `npm install` to prevent users from accidentally installing via npm ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.4.0...@quenty/sunpositionutils@2.4.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+
+
+
 
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.3.2...@quenty/sunpositionutils@2.4.0) (2025-05-10)
 

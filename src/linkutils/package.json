@@ -1,6 +1,6 @@
 {
   "name": "@quenty/linkutils",
-  "version": "13.22.0",
+  "version": "13.22.1",
   "description": "Utility functions for links. Links are object values pointing to other values!",
   "keywords": [
     "Roblox",

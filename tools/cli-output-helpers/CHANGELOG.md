@@ -1,21 +1,15 @@
-# v1.2.4 (Sat Jan 10 2026)
-
-#### 🐛 Bug Fix
-
-- ci: Update to pnpm for faster CI/CD and local development workflow [#631](https://github.com/Quenty/NevermoreEngine/pull/631) ([@Quenty](https://github.com/Quenty))
-- ci: Remove package-lock.json files in favor of pnpm ([@Quenty](https://github.com/Quenty))
-- ci: Update to pnpm for faster CI/CD and local development workflow ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.2.4](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.3...@quenty/cli-output-helpers@1.2.4) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/cli-output-helpers
+
+
+
+
 
 ## [1.2.3](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.2...@quenty/cli-output-helpers@1.2.3) (2025-12-31)
 
