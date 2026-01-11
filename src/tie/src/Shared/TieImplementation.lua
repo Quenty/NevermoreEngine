@@ -57,6 +57,7 @@ function TieImplementation.new<T>(
 	self._implementationTieRealm = assert(implementationTieRealm, "Bad implementationTieRealm")
 
 	self._implParent = self._maid:Add(Instance.new(tieDefinition:GetNewImplClass(implementationTieRealm)))
+	self._implParent.Name = self._tieDefinition:GetNewContainerName(self._implementationTieRealm)
 	self._implParent.Archivable = false
 
 	self._memberImplementations = {}
@@ -170,8 +171,6 @@ function TieImplementation._buildMemberImplementations<T>(self: TieImplementatio
 		)
 		self._memberImplementations[memberDefinition:GetMemberName()] = memberImplementation
 	end
-
-	self._implParent.Name = self._tieDefinition:GetNewContainerName(self._implementationTieRealm)
 end
 
 function TieImplementation._getErrorMessageForNotAllowedMember<T>(self: TieImplementation<T>, memberDefinition)
