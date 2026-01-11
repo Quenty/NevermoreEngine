@@ -2765,6 +2765,9 @@ importers:
       '@quenty/cframeutils':
         specifier: file:../cframeutils
         version: link:../cframeutils
+      '@quenty/draw':
+        specifier: link:..\draw
+        version: link:../draw
       '@quenty/instanceutils':
         specifier: file:../instanceutils
         version: link:../instanceutils
