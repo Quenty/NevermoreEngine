@@ -1,3 +1,20 @@
+# (Sun Jan 11 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/motor6d@7.32.0`, `@quenty/playerhumanoidbinder@14.28.0`, `@quenty/playerutils@8.24.0`, `@quenty/spring@10.10.0`, `@quenty/tie@10.30.0`
+  - feat: Upgrade Motor6D stack to have more helpful interface methods [#633](https://github.com/Quenty/NevermoreEngine/pull/633) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Fix docs publishing [#632](https://github.com/Quenty/NevermoreEngine/pull/632) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Jan 10 2026)
 
 #### 🐛 Bug Fix
