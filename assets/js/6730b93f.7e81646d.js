@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[73527],{43925:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Motor6DStackHumanoidClient","desc":"","source":{"line":5,"path":"src/motor6d/src/Client/Humanoid/Motor6DStackHumanoidClient.lua"}}')}}]);
