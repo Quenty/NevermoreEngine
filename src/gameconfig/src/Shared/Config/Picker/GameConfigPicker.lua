@@ -90,13 +90,13 @@ end
 --[=[
 	Observes all active assets of a type and key.
 
-	```
+	```lua
 	maid:GiveTask(picker:ObserveActiveAssetOfAssetTypeAndKeyBrio(GameConfigAssetType.BADGE, "myBadge")
 		:Pipe({
 			RxStateStackUtils.topOfStack();
 		}):Subscribe(function(activeBadge)
 			print(activeBadge:GetId())
-		end)
+		end))
 	```
 
 	@param assetType

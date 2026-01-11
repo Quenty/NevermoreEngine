@@ -1,6 +1,6 @@
 --!strict
 --[=[
-	Utility functions for hoacekat stories.
+	Utility functions for Hoarcekat stories.
 	@class CameraStoryUtils
 ]=]
 
@@ -63,7 +63,7 @@ function CameraStoryUtils.setupViewportFrame(maid: Maid.Maid, target: GuiBase)
 end
 
 --[=[
-	REturns a promise that resolves to a crate in front of the camera.
+	Returns a promise that resolves to a crate in front of the camera.
 	@param maid Maid
 	@param viewportFrame ViewportFrame
 	@param properties { [string}: any }

@@ -1,6 +1,6 @@
 --!strict
 --[=[
-	Hack to maintain default camera control by binding before and after the camera update cycle
+	Hack to maintain default camera control by binding before and after the camera update cycle.
 	This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme.
 
 	This camera is automatically setup by the [CameraStackService](/api/CameraStackService).

@@ -85,7 +85,7 @@ end
 --[=[
 	Hides the current snackbar shown in the queue
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function SnackbarServiceClient:HideCurrent(doNotAnimate: boolean?)
 	return self._queue:HideCurrent(doNotAnimate)
@@ -94,7 +94,7 @@ end
 --[=[
 	Completely clears the queue
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 ]=]
 function SnackbarServiceClient:ClearQueue(doNotAnimate: boolean?)
 	self._queue:Clear(doNotAnimate)

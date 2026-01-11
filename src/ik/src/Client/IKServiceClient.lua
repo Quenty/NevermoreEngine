@@ -3,8 +3,8 @@
 	Handles IK for local client.
 
 	:::tip
-	Be sure to also initialize the client side service [IKService] on the server
-	to keep IK work.
+	Be sure to also initialize the server side service [IKService] on the server
+	to make sure the IK works.
 	:::
 
 	@client
@@ -136,7 +136,6 @@ end
 	the camera is pointed at.
 
 	```lua
-
 	serviceBag:GetService(require("IKServiceClient")):SetLookAround(false)
 	```
 

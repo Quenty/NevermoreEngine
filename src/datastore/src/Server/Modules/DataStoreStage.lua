@@ -508,10 +508,10 @@ function DataStoreStage.MarkDataAsSaved(self: DataStoreStage, parentWriter: Data
 end
 
 --[=[
-	Helper method that when invokes ensures the data view.
+	Helper method that promises the latest data view.
 
 	:::tip
-	This is a helper method. You probably want [DataStore.LoadAll] instead.
+	This is a helper method. You probably want [DataStoreStage.LoadAll] instead.
 	:::
 
 	@return Promise
@@ -528,7 +528,7 @@ function DataStoreStage.PromiseViewUpToDate(self: DataStoreStage): Promise.Promi
 end
 
 --[=[
-	Ovewrites the full stage with the data specified.
+	Overwrites the full stage with the data specified.
 
 	:::tip
 	Use this method carefully as it can lead to data loss in ways that a specific :Store() call
@@ -638,7 +638,7 @@ function DataStoreStage.StoreOnValueChange(self: DataStoreStage, name: DataStore
 end
 
 --[=[
-	If these is data not yet written then this will return true
+	If there is data not yet written then this will return true
 
 	@return boolean
 ]=]

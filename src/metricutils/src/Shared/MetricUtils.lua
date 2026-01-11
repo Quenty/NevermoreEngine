@@ -52,7 +52,7 @@ end
 	Convert from studs per a second to meters per a second
 
 	@param studsPerSecond number
-	@return number -- kph
+	@return number -- meters per a second
 ]=]
 function MetricUtils.studsPerSecondToMetersPerSecond(studsPerSecond: number): number
 	return studsPerSecond / STUDS_PER_METER

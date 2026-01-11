@@ -21,7 +21,7 @@
 
 	Brios are useful for downstream events where you want to emit a resource. Typically
 	brios should be killed when their source is killed. Brios are intended to be merged
-	with downstream brios so create a chain of reliable resources.
+	with downstream brios to create a chain of reliable resources.
 
 	```lua
 	local brio = Brio.new("a", "b")
@@ -103,7 +103,7 @@ function Brio.new<T...>(...: T...): Brio<T...>
 end
 
 --[=[
-	Constructs a new brio that will cleanup afer the set amount of time
+	Constructs a new brio that will cleanup after the set amount of time
 
 	@since 3.6.0
 	@param time number
@@ -153,7 +153,7 @@ function Brio.GetDiedSignal<T...>(self: Brio<T...>): Signal.Signal<T...>
 end
 
 --[=[
-	Returns true is the brio is dead.
+	Returns true if the brio is dead.
 
 	```lua
 	local brio = Brio.new("a", "b")
@@ -287,7 +287,7 @@ function Brio.Destroy<T...>(self: Brio<T...>)
 end
 
 --[=[
-	Alias for Destroy.
+	Alias for [Brio.Destroy].
 	@method Kill
 	@within Brio
 ]=]

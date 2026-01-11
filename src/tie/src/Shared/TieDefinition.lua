@@ -344,7 +344,7 @@ function TieDefinition.GetChildren<T>(
 end
 
 --[=[
-	Finds the implementation on the adornee. Alais for [FindFirstImplementation]
+	Finds the implementation on the adornee. Alias for [TieDefinition:FindFirstImplementation]
 
 	@param adornee Adornee
 	@param tieRealm TieRealm?
@@ -695,10 +695,6 @@ end
 	Ensures implementation of the object, binding table values and Lua OOP objects
 	to Roblox objects that can be invoked generally.
 
-	```lua
-
-	```
-
 	@param adornee Instance -- Adornee to implement interface on
 	@param implementer table? -- Table with all interface values or nil
 	@param tieRealm TieRealm?
@@ -720,7 +716,7 @@ function TieDefinition.Implement<T>(
 end
 
 --[=[
-	Gets an interface to the tie definition. Not this can be done
+	Gets an interface to the tie definition. Note this can be done
 	on any Roblox instance. If the instance does not implement the interface,
 	invoking interface methods, or querying the interface will result
 	in errors.
@@ -791,7 +787,7 @@ function TieDefinition.GetValidContainerNameSet<T>(self: TieDefinition<T>, tieRe
 end
 
 --[=[
-	Gets a container name for a new container. See [GetValidContainerNameSet]
+	Gets a container name for a new container. See [TieDefinition:GetValidContainerNameSet]
 	for the full set of valid container names for the tie definition.
 
 	@param tieRealm TieRealm

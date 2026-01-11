@@ -74,7 +74,7 @@ end
 --[=[
 	Shows the model and promises when the showing is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function TransitionModel.PromiseShow(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
@@ -88,7 +88,7 @@ end
 --[=[
 	Hides the model and promises when the showing is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function TransitionModel.PromiseHide(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
@@ -102,7 +102,7 @@ end
 --[=[
 	Toggles the model and promises when the transition is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function TransitionModel.PromiseToggle(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>

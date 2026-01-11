@@ -41,7 +41,7 @@ export type ButtonDragModel =
 	& BaseObject.BaseObject
 
 --[=[
-	Construst a new drag model for the button
+	Constructs a new drag model for the button
 
 	@param initialButton GuiButton? -- Optional
 	@return ButtonDragModel
@@ -131,7 +131,7 @@ end
 --[=[
 	Returns the scale position on the Gui from 0 to 1
 
-	This is reletive to the GUI, so top left is 0, 0
+	This is relative to the GUI, so top left is 0, 0
 
 	@return Vector2?
 ]=]
@@ -142,7 +142,7 @@ end
 --[=[
 	Observes the scale position on the Gui from 0 to 1
 
-	This is reletive to the GUI, so top left is 0, 0
+	This is relative to the GUI, so top left is 0, 0
 
 	@return Observable<Vector2?>
 ]=]

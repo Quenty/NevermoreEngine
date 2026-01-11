@@ -1,6 +1,6 @@
 --!nonstrict
 --[=[
-	Ragdolls the humanoid on death. Should be bound via [RagdollBindersClient].
+	Ragdolls the humanoid on fall. Should be bound via [RagdollBindersClient].
 
 	@client
 	@class RagdollHumanoidOnFallClient

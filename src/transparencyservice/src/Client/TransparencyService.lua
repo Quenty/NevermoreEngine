@@ -1,7 +1,7 @@
 --!strict
 --[=[
-	Service that orchistrates transparency setting from multiple colliding sources
-	and handle the transparency appropriately. This means that 2 systems can work with
+	Service that orchestrates transparency setting from multiple colliding sources
+	and handles the transparency appropriately. This means that 2 systems can work with
 	transparency without knowing about each other.
 
 	@class TransparencyService

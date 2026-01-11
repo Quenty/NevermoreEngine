@@ -7,7 +7,7 @@
 	* Handles streaming enabled
 	* Supports NPCs
 	* Client-side animations scale with distance
-	* Client-side animations keep thinks silky
+	* Client-side animations keep things silky
 
 	:::tip
 	Be sure to also initialize the client side service [IKServiceClient] on each
