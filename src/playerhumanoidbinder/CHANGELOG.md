@@ -1,23 +1,18 @@
-# v14.28.0 (Sun Jan 11 2026)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade Motor6D stack to have more helpful interface methods [#633](https://github.com/Quenty/NevermoreEngine/pull/633) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add new types to PlayerHumanoidBinder ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.27.1...@quenty/playerhumanoidbinder@14.28.0) (2026-01-11)
+
+
+### Bug Fixes
+
+* Add new types to PlayerHumanoidBinder ([1a1a239](https://github.com/Quenty/NevermoreEngine/commit/1a1a23926c37474672a54f5e4c89b2576146a450))
+
+
+
+
 
 ## [14.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.27.0...@quenty/playerhumanoidbinder@14.27.1) (2026-01-10)
 

@@ -1,23 +1,18 @@
-# v10.10.0 (Sun Jan 11 2026)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade Motor6D stack to have more helpful interface methods [#633](https://github.com/Quenty/NevermoreEngine/pull/633) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add new types to spring that were missing, but are still valid ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@10.9.3...@quenty/spring@10.10.0) (2026-01-11)
+
+
+### Bug Fixes
+
+* Add new types to spring that were missing, but are still valid ([10aed9b](https://github.com/Quenty/NevermoreEngine/commit/10aed9b8bfc4418f97a924e84f9a075457ad0104))
+
+
+
+
 
 ## [10.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@10.9.2...@quenty/spring@10.9.3) (2026-01-10)
 

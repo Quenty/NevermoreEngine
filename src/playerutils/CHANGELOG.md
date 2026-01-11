@@ -1,20 +1,18 @@
-# v8.24.0 (Sun Jan 11 2026)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade Motor6D stack to have more helpful interface methods [#633](https://github.com/Quenty/NevermoreEngine/pull/633) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxPlayerUtils.observeLocalPlayerHumanoidBrio(): ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.23.1...@quenty/playerutils@8.24.0) (2026-01-11)
+
+
+### Features
+
+* Add RxPlayerUtils.observeLocalPlayerHumanoidBrio(): ([6c80613](https://github.com/Quenty/NevermoreEngine/commit/6c80613f43312461b4648e7fd2c5572a51ed93ea))
+
+
+
+
 
 ## [8.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.23.0...@quenty/playerutils@8.23.1) (2026-01-10)
 

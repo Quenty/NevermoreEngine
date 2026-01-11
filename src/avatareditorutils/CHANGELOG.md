@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.27.1...@quenty/avatareditorutils@7.28.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/avatareditorutils
+
+
+
+
+
 ## [7.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.27.0...@quenty/avatareditorutils@7.27.1) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/avatareditorutils

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/conditions@10.29.1...@quenty/conditions@10.30.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/conditions
+
+
+
+
+
 ## [10.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/conditions@10.29.0...@quenty/conditions@10.29.1) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/conditions

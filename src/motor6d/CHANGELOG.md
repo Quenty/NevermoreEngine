@@ -1,20 +1,18 @@
-# v7.32.0 (Sun Jan 11 2026)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade Motor6D stack to have more helpful interface methods [#633](https://github.com/Quenty/NevermoreEngine/pull/633) ([@Quenty](https://github.com/Quenty))
-- feat: Upgrade Motor6D stack to have more helpful interface methods ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.31.1...@quenty/motor6d@7.32.0) (2026-01-11)
+
+
+### Features
+
+* Upgrade Motor6D stack to have more helpful interface methods ([32dea08](https://github.com/Quenty/NevermoreEngine/commit/32dea080ebf5a97c92b07ad2d3f76bfe406551ae))
+
+
+
+
 
 ## [7.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.31.0...@quenty/motor6d@7.31.1) (2026-01-10)
 
