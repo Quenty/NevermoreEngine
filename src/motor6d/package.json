@@ -32,6 +32,7 @@
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
     "@quenty/cframeutils": "file:../cframeutils",
+    "@quenty/draw": "link:..\\draw",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
