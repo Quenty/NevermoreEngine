@@ -28,8 +28,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/lrucache": "file:../lrucache"
+    "@quenty/loader": "workspace:*",
+    "@quenty/lrucache": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

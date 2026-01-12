@@ -28,20 +28,20 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/adorneedata": "file:../adorneedata",
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/brio": "file:../brio",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
-    "@quenty/rogue-properties": "file:../rogue-properties",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/adorneedata": "workspace:*",
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/playerhumanoidbinder": "workspace:*",
+    "@quenty/rogue-properties": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

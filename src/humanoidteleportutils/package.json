@@ -28,9 +28,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/cframeutils": "file:../cframeutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/raycaster": "file:../raycaster"
+    "@quenty/cframeutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/raycaster": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

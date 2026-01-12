@@ -32,7 +32,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*"
   }
 }

@@ -31,18 +31,18 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/blend": "file:../blend",
-    "@quenty/brio": "file:../brio",
-    "@quenty/color3utils": "file:../color3utils",
-    "@quenty/colorpicker": "file:../colorpicker",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/observablecollection": "file:../observablecollection",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/color3utils": "workspace:*",
+    "@quenty/colorpicker": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   }
 }

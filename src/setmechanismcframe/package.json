@@ -28,8 +28,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/getmechanismparts": "file:../getmechanismparts",
-    "@quenty/loader": "file:../loader"
+    "@quenty/getmechanismparts": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

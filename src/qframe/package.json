@@ -30,12 +30,12 @@
     "AxisAngles"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/camerastoryutils": "file:../camerastoryutils",
-    "@quenty/cubicspline": "file:../cubicspline",
-    "@quenty/maid": "file:../maid"
+    "@quenty/camerastoryutils": "workspace:*",
+    "@quenty/cubicspline": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

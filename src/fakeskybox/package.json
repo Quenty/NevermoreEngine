@@ -28,10 +28,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/acceltween": "file:../acceltween",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/signal": "file:../signal"
+    "@quenty/acceltween": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/signal": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

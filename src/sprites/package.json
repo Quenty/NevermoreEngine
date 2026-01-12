@@ -29,13 +29,13 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/uiobjectutils": "file:../uiobjectutils"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/uiobjectutils": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/string": "file:../string"
+    "@quenty/string": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

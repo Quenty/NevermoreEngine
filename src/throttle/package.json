@@ -29,11 +29,11 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/typeutils": "file:../typeutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/typeutils": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

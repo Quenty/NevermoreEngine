@@ -29,9 +29,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

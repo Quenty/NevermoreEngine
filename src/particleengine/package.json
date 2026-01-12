@@ -29,10 +29,10 @@
     "AxisAngles"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/table": "file:../table"
+    "@quenty/loader": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

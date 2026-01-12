@@ -29,11 +29,11 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/symbol": "file:../symbol"
+    "@quenty/brio": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/symbol": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

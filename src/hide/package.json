@@ -29,9 +29,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binder": "file:../binder",
-    "@quenty/loader": "file:../loader",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/binder": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/servicebag": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

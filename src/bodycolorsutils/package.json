@@ -28,12 +28,12 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/color3serializationutils": "file:../color3serializationutils",
-    "@quenty/color3utils": "file:../color3utils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/rx": "file:../rx",
-    "@quenty/table": "file:../table"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/color3serializationutils": "workspace:*",
+    "@quenty/color3utils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

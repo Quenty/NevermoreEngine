@@ -32,18 +32,18 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/humanoidkillerutils": "file:../humanoidkillerutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/rxbinderutils": "file:../rxbinderutils",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal",
-    "@quenty/table": "file:../table"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/humanoidkillerutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/playerhumanoidbinder": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxbinderutils": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/table": "workspace:*"
   }
 }

@@ -29,10 +29,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/memoize": "file:../memoize",
-    "@quenty/promise": "file:../promise",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/loader": "workspace:*",
+    "@quenty/memoize": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/servicebag": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

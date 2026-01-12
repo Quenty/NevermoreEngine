@@ -33,9 +33,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx"
+    "@quenty/blend": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*"
   }
 }

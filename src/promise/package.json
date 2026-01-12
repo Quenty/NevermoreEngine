@@ -28,11 +28,11 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/deferred": "file:../deferred",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/signal": "file:../signal"
+    "@quenty/deferred": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/signal": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

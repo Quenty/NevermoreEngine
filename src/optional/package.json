@@ -28,7 +28,7 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

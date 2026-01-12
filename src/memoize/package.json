@@ -28,10 +28,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/lrucache": "file:../lrucache",
-    "@quenty/tuple": "file:../tuple",
-    "@quenty/typeutils": "file:../typeutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/lrucache": "workspace:*",
+    "@quenty/tuple": "workspace:*",
+    "@quenty/typeutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

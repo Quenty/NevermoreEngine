@@ -28,9 +28,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/getmechanismparts": "file:../getmechanismparts",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/getmechanismparts": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

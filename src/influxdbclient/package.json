@@ -28,19 +28,19 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/httppromise": "file:../httppromise",
-    "@quenty/jsonutils": "file:../jsonutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal",
-    "@quenty/string": "file:../string",
-    "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/httppromise": "workspace:*",
+    "@quenty/jsonutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -28,8 +28,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

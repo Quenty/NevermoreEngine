@@ -32,7 +32,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/loader": "file:../loader"
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/loader": "workspace:*"
   }
 }

@@ -26,14 +26,14 @@
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/brio": "file:../brio",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/statestack": "file:../statestack",
-    "@quenty/tie": "file:../tie"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/tie": "workspace:*"
   },
   "contributors": [
     "Quenty"

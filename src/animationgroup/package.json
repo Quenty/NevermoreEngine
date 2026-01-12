@@ -29,10 +29,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/animationtrackutils": "file:../animationtrackutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/animationtrackutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

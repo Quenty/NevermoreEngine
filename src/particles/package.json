@@ -28,9 +28,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/numbersequenceutils": "file:../numbersequenceutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/numbersequenceutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

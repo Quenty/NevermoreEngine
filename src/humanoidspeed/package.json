@@ -30,15 +30,15 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rogue-humanoid": "file:../rogue-humanoid",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/table": "file:../table"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/playerhumanoidbinder": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rogue-humanoid": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -29,10 +29,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/draw": "file:../draw",
-    "@quenty/loader": "file:../loader",
-    "@quenty/queue": "file:../queue",
-    "@quenty/vector3utils": "file:../vector3utils"
+    "@quenty/draw": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/queue": "workspace:*",
+    "@quenty/vector3utils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

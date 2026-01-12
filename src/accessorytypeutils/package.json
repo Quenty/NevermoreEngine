@@ -28,8 +28,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/enumutils": "file:../enumutils",
-    "@quenty/loader": "file:../loader"
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

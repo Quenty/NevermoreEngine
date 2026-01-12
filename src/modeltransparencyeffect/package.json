@@ -28,12 +28,12 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/acceltween": "file:../acceltween",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/steputils": "file:../steputils",
-    "@quenty/transparencyservice": "file:../transparencyservice"
+    "@quenty/acceltween": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/steputils": "workspace:*",
+    "@quenty/transparencyservice": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

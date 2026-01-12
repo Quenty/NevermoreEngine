@@ -28,13 +28,13 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/lrucache": "file:../lrucache",
-    "@quenty/promise": "file:../promise",
-    "@quenty/queue": "file:../queue",
-    "@quenty/rx": "file:../rx",
-    "@quenty/tuple": "file:../tuple"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/lrucache": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/queue": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/tuple": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

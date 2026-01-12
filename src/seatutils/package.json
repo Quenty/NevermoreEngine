@@ -28,12 +28,12 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/rx": "file:../rx",
-    "@quenty/statestack": "file:../statestack"
+    "@quenty/brio": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/statestack": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

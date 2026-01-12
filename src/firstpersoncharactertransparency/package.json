@@ -29,18 +29,18 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/brio": "file:../brio",
-    "@quenty/humanoidtracker": "file:../humanoidtracker",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/r15utils": "file:../r15utils",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/statestack": "file:../statestack",
-    "@quenty/transparencyservice": "file:../transparencyservice",
-    "@quenty/ugcsanitize": "file:../ugcsanitize"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/humanoidtracker": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/r15utils": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/transparencyservice": "workspace:*",
+    "@quenty/ugcsanitize": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -31,10 +31,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/rxsignal": "file:../rxsignal"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxsignal": "workspace:*"
   }
 }

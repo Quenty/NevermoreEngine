@@ -28,8 +28,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/cframeutils": "file:../cframeutils",
-    "@quenty/loader": "file:../loader"
+    "@quenty/cframeutils": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
