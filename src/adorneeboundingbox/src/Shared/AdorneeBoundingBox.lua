@@ -1,5 +1,8 @@
 --!strict
 --[=[
+	This utility class can observe the bounding box (size + position) of any Roblox instance effectively.
+	It handles anchored + unanchored instances, and tries to do it in a performance friendly way.
+
 	@class AdorneeBoundingBox
 ]=]
 
@@ -31,6 +34,9 @@ export type AdorneeBoundingBox =
 	))
 	& BaseObject.BaseObject
 
+--[=[
+	Construct a new AdorneeBoundingBox
+]=]
 function AdorneeBoundingBox.new(initialAdornee: Instance?): AdorneeBoundingBox
 	local self = setmetatable(BaseObject.new() :: any, AdorneeBoundingBox)
 
@@ -54,6 +60,9 @@ function AdorneeBoundingBox.new(initialAdornee: Instance?): AdorneeBoundingBox
 	return self
 end
 
+--[=[
+	Sets the Roblox instance that we're going to observe the bounding box of
+]=]
 function AdorneeBoundingBox.SetAdornee(self: AdorneeBoundingBox, adornee: Instance?): () -> ()
 	assert(typeof(adornee) == "Instance" or adornee == nil, "Bad adornee")
 
