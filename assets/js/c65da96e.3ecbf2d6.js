@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[51430],{69254:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DataStoreLockHelper","desc":"","source":{"line":5,"path":"src/datastore/src/Server/DataStoreLockHelper.lua"}}')}}]);
