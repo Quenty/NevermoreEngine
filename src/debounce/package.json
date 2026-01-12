@@ -1,6 +1,6 @@
 {
   "name": "@quenty/debounce",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "debounce a existing function by timeout",
   "keywords": [
     "Roblox",

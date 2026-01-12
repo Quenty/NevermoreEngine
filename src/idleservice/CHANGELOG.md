@@ -1,20 +1,18 @@
-# v13.38.1 (Mon Jan 12 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependency installation process for pnpm [#635](https://github.com/Quenty/NevermoreEngine/pull/635) ([@Quenty](https://github.com/Quenty))
-- fix: Fix dependency installation process for pnpm ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.38.0...@quenty/idleservice@13.38.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
 
 # [13.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.37.1...@quenty/idleservice@13.38.0) (2026-01-11)
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/influxdbclient",
-  "version": "7.26.1",
+  "version": "7.26.2",
   "description": "Provides a Roblox Lua InfluxDB client",
   "keywords": [
     "Roblox",

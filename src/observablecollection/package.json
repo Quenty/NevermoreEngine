@@ -1,6 +1,6 @@
 {
   "name": "@quenty/observablecollection",
-  "version": "12.27.0",
+  "version": "12.27.1",
   "description": "A set of observable collections, such as sets, maps, sorted lists, and more.",
   "keywords": [
     "Roblox",
