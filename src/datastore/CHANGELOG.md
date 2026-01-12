@@ -1,3 +1,17 @@
+# v13.28.2 (Mon Jan 12 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Fix dependency installation process for pnpm [#635](https://github.com/Quenty/NevermoreEngine/pull/635) ([@Quenty](https://github.com/Quenty))
+- fix: Fix dependency installation process for pnpm ([@Quenty](https://github.com/Quenty))
+- fix: Update DataStore to handle locking on non-locked items a bit better ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
