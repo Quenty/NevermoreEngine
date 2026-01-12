@@ -1,20 +1,18 @@
-# v11.38.1 (Mon Jan 12 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Add better warnings to PlayerSettings [#634](https://github.com/Quenty/NevermoreEngine/pull/634) ([@Quenty](https://github.com/Quenty))
-- fix: Add better warnings to PlayerSettings ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.38.0...@quenty/settings@11.38.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Add better warnings to PlayerSettings ([250f473](https://github.com/Quenty/NevermoreEngine/commit/250f47364d04c3c39a52a399f35be5b921d7e352))
+
+
+
+
 
 # [11.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.37.1...@quenty/settings@11.38.0) (2026-01-11)
 

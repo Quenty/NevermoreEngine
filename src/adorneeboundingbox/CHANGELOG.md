@@ -1,20 +1,15 @@
-# v8.27.1 (Mon Jan 12 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Add better warnings to PlayerSettings [#634](https://github.com/Quenty/NevermoreEngine/pull/634) ([@Quenty](https://github.com/Quenty))
-- typing: Update typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.27.0...@quenty/adorneeboundingbox@8.27.1) (2026-01-12)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+
+
+
 
 # [8.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.26.1...@quenty/adorneeboundingbox@8.27.0) (2026-01-11)
 
