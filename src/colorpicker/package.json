@@ -31,17 +31,17 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/basicpane": "file:../basicpane",
-    "@quenty/blend": "file:../blend",
-    "@quenty/buttondragmodel": "file:../buttondragmodel",
-    "@quenty/color3utils": "file:../color3utils",
-    "@quenty/inputobjectutils": "file:../inputobjectutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/signal": "file:../signal",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/basicpane": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/buttondragmodel": "workspace:*",
+    "@quenty/color3utils": "workspace:*",
+    "@quenty/inputobjectutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   }
 }

@@ -31,12 +31,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx"
+    "@quenty/brio": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*"
   }
 }

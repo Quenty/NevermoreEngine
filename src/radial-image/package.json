@@ -29,13 +29,13 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/rx": "file:../rx",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

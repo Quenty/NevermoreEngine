@@ -28,8 +28,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/math": "file:../math"
+    "@quenty/loader": "workspace:*",
+    "@quenty/math": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

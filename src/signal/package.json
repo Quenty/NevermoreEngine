@@ -33,6 +33,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   }
 }

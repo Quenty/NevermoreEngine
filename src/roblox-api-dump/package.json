@@ -29,11 +29,11 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/httppromise": "file:../httppromise",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/table": "file:../table"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/httppromise": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

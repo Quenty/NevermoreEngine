@@ -32,11 +32,11 @@
     "access": "public"
   },
   "devDependencies": {
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/blend": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "dependencies": {
-    "@quenty/probability": "file:../probability"
+    "@quenty/probability": "workspace:*"
   }
 }

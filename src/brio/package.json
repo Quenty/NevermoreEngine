@@ -29,12 +29,12 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/steputils": "file:../steputils",
-    "@quenty/table": "file:../table"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/steputils": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

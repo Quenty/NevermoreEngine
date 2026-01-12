@@ -29,16 +29,16 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/brio": "file:../brio",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/promisemaid": "file:../promisemaid",
-    "@quenty/remotefunctionutils": "file:../remotefunctionutils",
-    "@quenty/rx": "file:../rx",
-    "@quenty/table": "file:../table"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/promisemaid": "workspace:*",
+    "@quenty/remotefunctionutils": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

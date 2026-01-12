@@ -30,9 +30,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binarysearch": "file:../binarysearch",
-    "@quenty/linearsystemssolver": "file:../linearsystemssolver",
-    "@quenty/loader": "file:../loader"
+    "@quenty/binarysearch": "workspace:*",
+    "@quenty/linearsystemssolver": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -27,13 +27,13 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binder": "file:../binder",
-    "@quenty/cmdrservice": "file:../cmdrservice",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/randomutils": "file:../randomutils",
-    "@quenty/raycaster": "file:../raycaster",
-    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/binder": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/randomutils": "workspace:*",
+    "@quenty/raycaster": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

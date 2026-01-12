@@ -28,21 +28,21 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/acceltween": "file:../acceltween",
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/basicpane": "file:../basicpane",
-    "@quenty/blend": "file:../blend",
-    "@quenty/brio": "file:../brio",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/steputils": "file:../steputils",
-    "@quenty/transitionmodel": "file:../transitionmodel",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/acceltween": "workspace:*",
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/basicpane": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/steputils": "workspace:*",
+    "@quenty/transitionmodel": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -29,11 +29,11 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/promisemaid": "file:../promisemaid",
-    "@quenty/rbxasset": "file:../rbxasset"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/promisemaid": "workspace:*",
+    "@quenty/rbxasset": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

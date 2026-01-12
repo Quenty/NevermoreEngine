@@ -29,8 +29,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/draw": "file:../draw",
-    "@quenty/loader": "file:../loader"
+    "@quenty/draw": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -30,17 +30,17 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/cancellabledelay": "file:../cancellabledelay",
-    "@quenty/canceltoken": "file:../canceltoken",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/signal": "file:../signal",
-    "@quenty/symbol": "file:../symbol",
-    "@quenty/table": "file:../table",
-    "@quenty/throttle": "file:../throttle",
-    "@quenty/typeutils": "file:../typeutils"
+    "@quenty/cancellabledelay": "workspace:*",
+    "@quenty/canceltoken": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/symbol": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/throttle": "workspace:*",
+    "@quenty/typeutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

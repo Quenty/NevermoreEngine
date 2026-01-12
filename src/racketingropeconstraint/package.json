@@ -30,14 +30,14 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/loader": "file:../loader",
-    "@quenty/overriddenproperty": "file:../overriddenproperty",
-    "@quenty/promise": "file:../promise",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/tie": "file:../tie",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/overriddenproperty": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/tie": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

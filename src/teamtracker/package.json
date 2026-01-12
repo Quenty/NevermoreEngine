@@ -28,9 +28,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

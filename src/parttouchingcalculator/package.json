@@ -28,11 +28,11 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binder": "file:../binder",
-    "@quenty/boundingboxutils": "file:../boundingboxutils",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/qgui": "file:../qgui"
+    "@quenty/binder": "workspace:*",
+    "@quenty/boundingboxutils": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/qgui": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

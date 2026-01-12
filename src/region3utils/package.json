@@ -28,8 +28,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/boundingboxutils": "file:../boundingboxutils",
-    "@quenty/loader": "file:../loader"
+    "@quenty/boundingboxutils": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

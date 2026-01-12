@@ -28,9 +28,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/throttle": "file:../throttle"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/throttle": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

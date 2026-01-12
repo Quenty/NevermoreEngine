@@ -29,16 +29,16 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/adorneeutils": "file:../adorneeutils",
-    "@quenty/boundingboxutils": "file:../boundingboxutils",
-    "@quenty/camera": "file:../camera",
-    "@quenty/draw": "file:../draw",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/raycaster": "file:../raycaster",
-    "@quenty/region3utils": "file:../region3utils",
-    "@quenty/vector3utils": "file:../vector3utils"
+    "@quenty/adorneeutils": "workspace:*",
+    "@quenty/boundingboxutils": "workspace:*",
+    "@quenty/camera": "workspace:*",
+    "@quenty/draw": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/raycaster": "workspace:*",
+    "@quenty/region3utils": "workspace:*",
+    "@quenty/vector3utils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -31,7 +31,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/math": "file:../math"
+    "@quenty/loader": "workspace:*",
+    "@quenty/math": "workspace:*"
   }
 }

@@ -66,9 +66,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
+local DataStoreLockHelper = require("DataStoreLockHelper")
 local DataStorePromises = require("DataStorePromises")
 local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
@@ -85,7 +84,6 @@ local DEFAULT_DEBUG_WRITING = false
 
 local DEFAULT_AUTO_SAVE_TIME_SECONDS = 60 * 5
 local DEFAULT_JITTER_PROPORTION = 0.1 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
-local UNLOCK_BY_DEFAULT_TIME_MULTIPLIER = 2.1
 
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
@@ -98,7 +96,7 @@ export type DataStore =
 			_userIdList: { number }?,
 			_robloxDataStore: DataStorePromises.RobloxDataStore,
 			_debugWriting: boolean,
-			_sessionLockingEnabled: boolean,
+			_sessionLockingEnabledHelper: DataStoreLockHelper.DataStoreLockHelper?,
 			_autoSaveTimeSeconds: ValueObject.ValueObject<number?>,
 			_jitterProportion: ValueObject.ValueObject<number>,
 			_syncOnSave: ValueObject.ValueObject<boolean>,
@@ -161,7 +159,15 @@ end
 function DataStore.SetSessionLockingEnabled(self: DataStore, sessionLockingEnabled: boolean)
 	assert(not self._firstLoadPromise, "Must set session locking before datastore is loaded")
 
-	self._sessionLockingEnabled = sessionLockingEnabled
+	if sessionLockingEnabled then
+		if not self._sessionLockingEnabledHelper then
+			self._sessionLockingEnabledHelper = DataStoreLockHelper.new(self)
+			self._maid._sessionLockingEnabledHelper = self._sessionLockingEnabledHelper
+		end
+	else
+		self._sessionLockingEnabledHelper = nil
+		self._maid._sessionLockingEnabledHelper = nil
+	end
 end
 
 --[=[
@@ -203,6 +209,13 @@ function DataStore.SetAutoSaveTimeSeconds(self: DataStore, autoSaveTimeSeconds: 
 	assert(type(autoSaveTimeSeconds) == "number" or autoSaveTimeSeconds == nil, "Bad autoSaveTimeSeconds")
 
 	self._autoSaveTimeSeconds.Value = autoSaveTimeSeconds
+end
+
+--[=[
+	Returns how frequent the data store will autosave (or sync) to the cloud.
+]=]
+function DataStore.GetAutoSaveTimeSeconds(self: DataStore): number?
+	return self._autoSaveTimeSeconds.Value
 end
 
 --[=[
@@ -258,7 +271,7 @@ end
 	@return Promise
 ]=]
 function DataStore.SaveAndCloseSession(self: DataStore): Promise.Promise<()>
-	assert(self._sessionLockingEnabled, "Cannot invoke unless session locking is enabled")
+	assert(self._sessionLockingEnabledHelper, "Cannot invoke unless session locking is enabled")
 
 	return self:_syncData(false, true)
 end
@@ -442,9 +455,8 @@ function DataStore._doDataSync(
 		promise:Resolve(
 			maid:GivePromise(
 				DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(original, datastoreKeyInfo)
-					if self._sessionLockingEnabled then
-						original = table.clone(original)
-						original.lock = nil
+					if self._sessionLockingEnabledHelper then
+						original = self._sessionLockingEnabledHelper:ToUnlockedProfile(original)
 					end
 
 					if promise:IsRejected() then
@@ -485,15 +497,8 @@ function DataStore._doDataSync(
 						metadata = datastoreKeyInfo:GetMetadata()
 					end
 
-					if doCloseSession then
-						result = table.clone(result)
-						result.lock = nil
-					elseif self._sessionLockingEnabled then
-						-- Maintain the lock with the latest time
-						result = table.clone(result)
-						if result.lock then
-							result.lock = os.time()
-						end
+					if self._sessionLockingEnabledHelper then
+						result = self._sessionLockingEnabledHelper:ToLockedProfile(result, doCloseSession)
 					end
 
 					return result, userIdList, metadata
@@ -518,7 +523,7 @@ end
 
 function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 	local promise
-	if self._sessionLockingEnabled then
+	if self._sessionLockingEnabledHelper then
 		local function promiseLoadUnlockedProfile()
 			local loadPromise = Promise.new()
 			self._maid[loadPromise] = loadPromise
@@ -540,48 +545,17 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 							print(string.format("DataStorePromises.updateAsync(%q) -> Got ", tostring(self._key)), data)
 						end
 
-						if type(data) == "table" and data.lock then
-							local isInvalidLock = false
-							if type(data.lock) == "number" then
-								local timeElapsed = os.time() - data.lock
-								local autoSaveSeconds = self._autoSaveTimeSeconds.Value
-								if
-									autoSaveSeconds
-									and timeElapsed > (autoSaveSeconds * UNLOCK_BY_DEFAULT_TIME_MULTIPLIER)
-								then
-									isInvalidLock = true
-								end
-							end
+						local lockResult = self._sessionLockingEnabledHelper:AcquireLock(data)
+						if not lockResult.isValid then
+							loadPromise:Reject(string.format("Profile is locked (%s)", tostring(data.lock)))
 
-							-- Allow data locked to load in studio because otherwise testing gets really messy
-							if RunService:IsStudio() then
-								isInvalidLock = true
-							end
-
-							if not isInvalidLock then
-								loadPromise:Reject(string.format("Profile is locked (%s)", tostring(data.lock)))
-
-								-- Cancel write to avoid maintaining lock
-								return nil
-							end
-
-							-- Be sure to cleanup stuff
-							data.lock = nil :: number?
+							-- Cancel write to avoid maintaining lock
+							return nil
 						end
 
-						-- TODO: Retry
-						loadPromise:Resolve(data)
+						loadPromise:Resolve(lockResult.unlockedProfile)
 
-						if data == nil then
-							data = {}
-						elseif type(data) ~= "table" then
-							warn("[DataStore] - Data session locking is not available for non-table entries")
-							return data, userIdList, metadata
-						end
-
-						data.lock = os.time()
-
-						return data, userIdList, metadata
+						return lockResult.lockedProfile, userIdList, metadata
 					end)
 				)
 			end)
@@ -596,10 +570,10 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 		promise = self._maid
 			:Add(PromiseRetryUtils.retry(promiseLoadUnlockedProfile, {
 				-- https://exponentialbackoffcalculator.com/
-				-- ~10 minutes
-				exponential = 1.5,
-				initialWaitTime = 1,
-				maxAttempts = 15,
+				-- 56.294 seconds
+				exponential = 1.25,
+				initialWaitTime = 5,
+				maxAttempts = 7,
 				printWarning = true,
 			}))
 			:Catch(function(err)

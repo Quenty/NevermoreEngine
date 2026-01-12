@@ -24,8 +24,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/cli-output-helpers": "file:../cli-output-helpers",
-    "@quenty/nevermore-template-helpers": "file:../nevermore-template-helpers",
+    "@quenty/cli-output-helpers": "workspace:*",
+    "@quenty/nevermore-template-helpers": "workspace:*",
     "execa": "v5.1.1",
     "find-git-root": "^1.0.4",
     "inquirer": "^8.2.4",

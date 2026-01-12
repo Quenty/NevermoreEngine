@@ -30,12 +30,12 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/table": "file:../table",
-    "@quenty/textfilterutils": "file:../textfilterutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/textfilterutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -28,25 +28,25 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/acceltween": "file:../acceltween",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/cframeutils": "file:../cframeutils",
-    "@quenty/cubicspline": "file:../cubicspline",
-    "@quenty/draw": "file:../draw",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/inputobjectutils": "file:../inputobjectutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/qframe": "file:../qframe",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/spring": "file:../spring",
-    "@quenty/valueobject": "file:../valueobject",
-    "@quenty/vector3utils": "file:../vector3utils"
+    "@quenty/acceltween": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/cframeutils": "workspace:*",
+    "@quenty/cubicspline": "workspace:*",
+    "@quenty/draw": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/inputobjectutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/qframe": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/spring": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
+    "@quenty/vector3utils": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/camerastoryutils": "file:../camerastoryutils"
+    "@quenty/camerastoryutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

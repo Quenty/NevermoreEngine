@@ -29,8 +29,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/vector3utils": "file:../vector3utils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/vector3utils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -31,8 +31,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*"
   }
 }

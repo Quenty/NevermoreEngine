@@ -28,9 +28,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/typeutils": "file:../typeutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/typeutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

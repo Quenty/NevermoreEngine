@@ -29,15 +29,15 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/brio": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

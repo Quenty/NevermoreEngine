@@ -31,10 +31,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/enumutils": "file:../enumutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/rx": "file:../rx"
+    "@quenty/brio": "workspace:*",
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*"
   }
 }
