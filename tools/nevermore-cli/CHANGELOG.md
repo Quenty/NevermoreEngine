@@ -1,3 +1,16 @@
+# v4.12.3 (Mon Jan 12 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Add better warnings to PlayerSettings [#634](https://github.com/Quenty/NevermoreEngine/pull/634) ([@Quenty](https://github.com/Quenty))
+- tool: Update code-workspace to try to prevent Rojo from memory leaking during rebase or other file-heavy operations ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

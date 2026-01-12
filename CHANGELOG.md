@@ -1,3 +1,16 @@
+# (Mon Jan 12 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeboundingbox@8.27.1`, `@quenty/settings@11.38.1`, `@quenty/nevermore-cli@4.12.3`
+  - fix: Add better warnings to PlayerSettings [#634](https://github.com/Quenty/NevermoreEngine/pull/634) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jan 11 2026)
 
 #### 🚀 Enhancement
