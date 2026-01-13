@@ -66,15 +66,20 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStoreLockHelper = require("DataStoreLockHelper")
+local DataStoreMessageHelper = require("DataStoreMessageHelper")
 local DataStorePromises = require("DataStorePromises")
 local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
 local Math = require("Math")
+local MessagingServiceUtils = require("MessagingServiceUtils")
 local Promise = require("Promise")
 local PromiseMaidUtils = require("PromiseMaidUtils")
 local PromiseRetryUtils = require("PromiseRetryUtils")
+local PromiseUtils = require("PromiseUtils")
 local Rx = require("Rx")
 local Signal = require("Signal")
 local Symbol = require("Symbol")
@@ -93,17 +98,24 @@ export type DataStore =
 	typeof(setmetatable(
 		{} :: {
 			_key: string,
+			_sessionId: string,
 			_userIdList: { number }?,
 			_robloxDataStore: DataStorePromises.RobloxDataStore,
 			_debugWriting: boolean,
 			_sessionLockingEnabledHelper: DataStoreLockHelper.DataStoreLockHelper?,
+			_sessionMessagingEnabledHelper: DataStoreMessageHelper.DataStoreMessageHelper?,
+
 			_autoSaveTimeSeconds: ValueObject.ValueObject<number?>,
 			_jitterProportion: ValueObject.ValueObject<number>,
 			_syncOnSave: ValueObject.ValueObject<boolean>,
 			_loadedOk: ValueObject.ValueObject<boolean>,
 			_firstLoadPromise: Promise.Promise<()>,
 			_promiseSessionLockingFailed: Promise.Promise<()>,
+
+			-- Events
 			Saving: Signal.Signal<Promise.Promise<()>>,
+			SessionStolen: Signal.Signal<DataStoreLockHelper.LockedSessionData>,
+			SessionCloseRequested: Signal.Signal<()>,
 		},
 		{} :: typeof({ __index = DataStore })
 	))
@@ -124,6 +136,7 @@ function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: 
 	local self: DataStore = setmetatable(DataStoreStage.new(key) :: any, DataStore)
 
 	self._key = key or error("No key")
+	self._sessionId = HttpService:GenerateGUID(false)
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 	self._debugWriting = DEFAULT_DEBUG_WRITING
 
@@ -145,6 +158,8 @@ function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: 
 	@within DataStore
 ]=]
 	self.Saving = self._maid:Add(Signal.new() :: any) -- :Fire(promise)
+	self.SessionStolen = self._maid:Add(Signal.new() :: any) -- :Fire(thiefSession)
+	self.SessionCloseRequested = self._maid:Add(Signal.new() :: any) -- :Fire()
 
 	self:_setupAutoSaving()
 
@@ -164,10 +179,34 @@ function DataStore.SetSessionLockingEnabled(self: DataStore, sessionLockingEnabl
 			self._sessionLockingEnabledHelper = DataStoreLockHelper.new(self)
 			self._maid._sessionLockingEnabledHelper = self._sessionLockingEnabledHelper
 		end
+
+		if not self._sessionMessagingEnabledHelper then
+			self._sessionMessagingEnabledHelper = DataStoreMessageHelper.new(self)
+			self._maid._sessionMessagingEnabledHelper = self._sessionMessagingEnabledHelper
+		end
 	else
 		self._sessionLockingEnabledHelper = nil
+		self._sessionMessagingEnabledHelper = nil
+
 		self._maid._sessionLockingEnabledHelper = nil
+		self._maid._sessionMessagingEnabledHelper = nil
 	end
+end
+
+--[=[
+	Returns the key for this datastore
+	@return string
+]=]
+function DataStore.GetKey(self: DataStore): string
+	return self._key
+end
+
+--[=[
+	Returns the session id for this datastore
+	@return string
+]=]
+function DataStore.GetSessionId(self: DataStore): string
+	return self._sessionId
 end
 
 --[=[
@@ -176,8 +215,27 @@ end
 
 	@return Promise<>
 ]=]
-function DataStore.PromiseSessionLockingFailed(self: DataStore)
+function DataStore.PromiseSessionLockingFailed(self: DataStore): Promise.Promise<()>
 	return self._promiseSessionLockingFailed
+end
+
+--[=[
+	Returns a promise that resolves when the session is closed. If the session is already closed, or
+	session locking is not enabled, the promise resolves immediately.
+
+	@return Promise<>
+]=]
+function DataStore.PromiseCloseSession(self: DataStore): Promise.Promise<()>
+	-- The PlayerDataStoreManager (or whatever other manager) will actually close the data
+	-- store here.
+
+	self.SessionCloseRequested:Fire()
+
+	if self._sessionLockingEnabledHelper ~= nil then
+		return self._sessionLockingEnabledHelper:PromiseCloseSession()
+	else
+		return Promise.resolved()
+	end
 end
 
 --[=[
@@ -456,7 +514,14 @@ function DataStore._doDataSync(
 			maid:GivePromise(
 				DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(original, datastoreKeyInfo)
 					if self._sessionLockingEnabledHelper then
-						original = self._sessionLockingEnabledHelper:ToUnlockedProfile(original)
+						local unlocked = self._sessionLockingEnabledHelper:ToUnlockedProfile(original)
+						if unlocked.isValid then
+							original = unlocked.unlockedProfile
+						else
+							self.SessionStolen:Fire(unlocked.thiefSession)
+							warn("[DataStore] - Cannot save, profile is stolen by another session")
+							return nil
+						end
 					end
 
 					if promise:IsRejected() then
@@ -524,7 +589,10 @@ end
 function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 	local promise
 	if self._sessionLockingEnabledHelper then
-		local function promiseLoadUnlockedProfile()
+		local function promiseLoadUnlockedProfile(
+			canStealLock: boolean,
+			tryMessagingServiceSessionClose: boolean
+		): Promise.Promise<any>
 			local loadPromise = Promise.new()
 			self._maid[loadPromise] = loadPromise
 
@@ -545,9 +613,35 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 							print(string.format("DataStorePromises.updateAsync(%q) -> Got ", tostring(self._key)), data)
 						end
 
-						local lockResult = self._sessionLockingEnabledHelper:AcquireLock(data)
+						local lockResult = self._sessionLockingEnabledHelper:AcquireLock(data, canStealLock)
 						if not lockResult.isValid then
-							loadPromise:Reject(string.format("Profile is locked (%s)", tostring(data.lock)))
+							if self._sessionMessagingEnabledHelper and tryMessagingServiceSessionClose then
+								-- Gracefully kick to avoid losing memory
+								self._sessionMessagingEnabledHelper
+									:PromiseCloseSessionGraceful(lockResult.blockingSession.SessionId)
+									:Then(function()
+										-- Give enough time for Roblox to replicate changes
+										-- We probably could bump back to the loop but this has slightly better error messages
+										return maid:GivePromise(PromiseUtils.delayed(5))
+									end)
+									:Then(function()
+										return maid:GivePromise(promiseLoadUnlockedProfile(canStealLock, false))
+									end)
+									:Then(function(unlockedProfile)
+										loadPromise:Resolve(unlockedProfile)
+									end, function(err)
+										loadPromise:Reject(
+											`Profile is locked, but gracefully closed. Failed to load with {err}`
+										)
+									end)
+							else
+								loadPromise:Reject(
+									string.format(
+										"Profile is locked (%s)",
+										MessagingServiceUtils.toHumanReadable(data.lock)
+									)
+								)
+							end
 
 							-- Cancel write to avoid maintaining lock
 							return nil
@@ -568,14 +662,27 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 		end
 
 		promise = self._maid
-			:Add(PromiseRetryUtils.retry(promiseLoadUnlockedProfile, {
+			:Add(PromiseRetryUtils.retry(function()
+				return promiseLoadUnlockedProfile(false, true)
+			end, {
 				-- https://exponentialbackoffcalculator.com/
-				-- 56.294 seconds
+				-- 49.242 seconds
 				exponential = 1.25,
-				initialWaitTime = 5,
-				maxAttempts = 7,
+				initialWaitTime = 6,
+				maxAttempts = 6,
 				printWarning = true,
 			}))
+			:Catch(function(err)
+				warn(
+					string.format(
+						"DataStorePromises.updateAsync(%q) (will steal session) -> warning - %s",
+						tostring(self._key),
+						tostring(err or "empty error")
+					)
+				)
+
+				return promiseLoadUnlockedProfile(true, false)
+			end)
 			:Catch(function(err)
 				warn(
 					string.format(
@@ -584,6 +691,7 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 						tostring(err or "empty error")
 					)
 				)
+
 				self._promiseSessionLockingFailed:Resolve()
 				return Promise.rejected(err)
 			end)

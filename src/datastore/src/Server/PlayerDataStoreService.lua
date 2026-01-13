@@ -92,12 +92,18 @@ end
 
 --[=[
 	Gets the datastore for the player.
-	@param player Player
+
+	:::tip
+	If you get the datastore by UserId, be sure to call datastore:PromiseCloseSession()
+	when done to avoid session leaks.
+	:::
+
+	@param player Player | number
 	@return Promise<DataStore>
 ]=]
 function PlayerDataStoreService.PromiseDataStore(
 	self: PlayerDataStoreService,
-	player: Player
+	player: Player | number
 ): Promise.Promise<DataStore.DataStore>
 	return self:PromiseManager():Then(function(manager)
 		return manager:GetDataStore(player)
@@ -135,7 +141,11 @@ function PlayerDataStoreService.PromiseManager(
 		end)
 		:Then(function(dataStore)
 			local manager = self._maid:Add(PlayerDataStoreManager.new(dataStore, function(player)
-				return tostring(player.UserId)
+				if type(player) == "number" then
+					return tostring(player)
+				else
+					return tostring(player.UserId)
+				end
 			end, true))
 
 			-- A lot safer if we're hot reloading or need to monitor bind to close calls
