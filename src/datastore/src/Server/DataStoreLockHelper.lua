@@ -14,7 +14,7 @@ local DataStoreLockHelper = setmetatable({}, BaseObject)
 DataStoreLockHelper.ClassName = "DataStoreLockHelper"
 DataStoreLockHelper.__index = DataStoreLockHelper
 
-local ALWAYS_STEAL_LOCKS_IN_STUDIO = false
+local ALWAYS_STEAL_LOCKS_IN_STUDIO = true
 local UNLOCK_BY_DEFAULT_TIME_MULTIPLIER = 2.1
 
 export type DataStoreLockHelper =
