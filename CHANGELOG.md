@@ -1,3 +1,16 @@
+# (Tue Jan 13 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.29.0`, `@quenty/messagingserviceutils@7.13.0`, `@quenty/promise@10.13.0`
+  - feat: Add new datastore session locking stealing [#636](https://github.com/Quenty/NevermoreEngine/pull/636) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Jan 12 2026)
 
 #### 🐛 Bug Fix

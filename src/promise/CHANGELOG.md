@@ -1,3 +1,16 @@
+# v10.13.0 (Tue Jan 13 2026)
+
+#### 🚀 Enhancement
+
+- feat: Add new datastore session locking stealing [#636](https://github.com/Quenty/NevermoreEngine/pull/636) ([@Quenty](https://github.com/Quenty))
+- feat: Add new datastore session locking ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
