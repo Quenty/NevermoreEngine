@@ -1450,6 +1450,9 @@ importers:
       '@quenty/math':
         specifier: workspace:*
         version: link:../math
+      '@quenty/messagingserviceutils':
+        specifier: workspace:*
+        version: link:../messagingserviceutils
       '@quenty/pagesutils':
         specifier: workspace:*
         version: link:../pagesutils

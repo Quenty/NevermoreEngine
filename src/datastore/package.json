@@ -34,6 +34,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",
+    "@quenty/messagingserviceutils": "workspace:*",
     "@quenty/pagesutils": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
