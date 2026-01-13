@@ -1,6 +1,6 @@
 {
   "name": "@quenty/roblox-api-dump",
-  "version": "8.14.2",
+  "version": "8.15.0",
   "description": "Utility functions for grabbing the Roblox API from the web",
   "keywords": [
     "Roblox",

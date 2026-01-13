@@ -1,6 +1,6 @@
 {
   "name": "@quenty/clipcharacters",
-  "version": "12.29.1",
+  "version": "12.30.0",
   "description": "Clip characters locally on the client of other clients so they don't interfer with physics.",
   "keywords": [
     "Roblox",

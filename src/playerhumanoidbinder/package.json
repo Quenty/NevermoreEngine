@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerhumanoidbinder",
-  "version": "14.28.1",
+  "version": "14.29.0",
   "description": "Binder that will automatically bind to each player's humanoid",
   "keywords": [
     "Roblox",

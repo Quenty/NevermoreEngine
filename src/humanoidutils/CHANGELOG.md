@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.5.2...@quenty/humanoidutils@2.6.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
 ## [2.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.5.1...@quenty/humanoidutils@2.5.2) (2026-01-12)
 
 

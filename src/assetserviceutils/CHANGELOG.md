@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.24.2...@quenty/assetserviceutils@5.25.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+
+
+
+
 ## [5.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.24.1...@quenty/assetserviceutils@5.24.2) (2026-01-12)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/receiptprocessing",
-  "version": "7.25.2",
+  "version": "7.26.0",
   "description": "Centralize receipt processing within games since this is a constrained resource.",
   "keywords": [
     "Roblox",

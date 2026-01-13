@@ -1,21 +1,19 @@
-# v13.29.0 (Tue Jan 13 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add new datastore session locking stealing [#636](https://github.com/Quenty/NevermoreEngine/pull/636) ([@Quenty](https://github.com/Quenty))
-- feat: Add datastore session locking and stealing to DataStore package ([@Quenty](https://github.com/Quenty))
-- feat: Add new datastore session locking ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.28.2...@quenty/datastore@13.29.0) (2026-01-13)
+
+
+### Features
+
+* Add datastore session locking and stealing to DataStore package ([4a3691a](https://github.com/Quenty/NevermoreEngine/commit/4a3691aeefad9a4c7703665ef51ff14e6596e525))
+* Add new datastore session locking ([52f1a4b](https://github.com/Quenty/NevermoreEngine/commit/52f1a4b8988e9271ca639b0fec43315bb63ae97b))
+
+
+
+
 
 ## [13.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.28.1...@quenty/datastore@13.28.2) (2026-01-12)
 
