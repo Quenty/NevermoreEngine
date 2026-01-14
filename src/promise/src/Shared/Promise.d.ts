@@ -10,7 +10,7 @@ type Promise<T = void> = {
     onRejected?: (error: unknown) => void
   ): Promise<R>;
   Catch(onRejected: (error: unknown) => void): Promise<T>;
-  Finally(onFinally: () => void): Promise<T>;
+  Finally(onFinally: (...values: ToTuple<T>) => void): Promise<T>;
   Tap(
     onFulfilled: (...values: ToTuple<T>) => void,
     onRejected?: (error: unknown) => void
