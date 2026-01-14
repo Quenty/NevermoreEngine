@@ -6,15 +6,28 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { checkForUpdatesAsync } from '@quenty/nevermore-cli-helpers';
 
-import { InitGameCommand } from './commands/init-game-command';
-import { InitPackageCommand } from './commands/init-package-command';
-import { InitPluginCommand } from './commands/init-plugin-command';
-import { PackCommand } from './commands/pack-command';
-import { InstallPackageCommand } from './commands/install-package-command';
-import { TestProjectCommand } from './commands/test-project-command';
-import { DownloadRobloxTypes } from './commands/download-roblox-types';
+import { InitGameCommand } from './commands/init-game-command.js';
+import { InitPackageCommand } from './commands/init-package-command.js';
+import { InitPluginCommand } from './commands/init-plugin-command.js';
+import { PackCommand } from './commands/pack-command.js';
+import { InstallPackageCommand } from './commands/install-package-command.js';
+import { TestProjectCommand } from './commands/test-project-command.js';
+import { DownloadRobloxTypes } from './commands/download-roblox-types.js';
+
+await checkForUpdatesAsync({
+  humanReadableName: 'Nevermore CLI',
+  packageName: '@quenty/nevermore-cli',
+  registryUrl: 'https://registry.npmjs.org/',
+  packageJsonPath: join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../package.json'
+  ),
+});
 
 yargs(hideBin(process.argv))
   .scriptName('nevermore')

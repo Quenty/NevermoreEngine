@@ -6,8 +6,8 @@ import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { TemplateHelper } from '@quenty/nevermore-template-helpers';
-import { NevermoreGlobalArgs } from '../args/global-args';
-import { getTemplatePathByName } from '../utils/nevermore-cli-utils';
+import { NevermoreGlobalArgs } from '../args/global-args.js';
+import { getTemplatePathByName } from '../utils/nevermore-cli-utils.js';
 
 export interface InitPackageArgs extends NevermoreGlobalArgs {
   packageName: string;
