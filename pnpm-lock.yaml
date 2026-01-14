@@ -39,65 +39,71 @@ importers:
   games/integration:
     dependencies:
       '@quenty/adorneeutils':
-        specifier: ^2.1.0
-        version: 2.3.0
+        specifier: workspace:*
+        version: link:../../src/adorneeutils
       '@quenty/baseobject':
-        specifier: ^3.2.0
-        version: 3.5.0
+        specifier: workspace:*
+        version: link:../../src/baseobject
+      '@quenty/binder':
+        specifier: workspace:*
+        version: link:../../src/binder
       '@quenty/brio':
-        specifier: ^3.4.0
-        version: 3.8.0
+        specifier: workspace:*
+        version: link:../../src/brio
       '@quenty/camera':
-        specifier: ^4.3.1
-        version: 4.4.0
+        specifier: workspace:*
+        version: link:../../src/camera
       '@quenty/characterutils':
-        specifier: ^3.2.0
-        version: 3.6.0
+        specifier: workspace:*
+        version: link:../../src/characterutils
       '@quenty/clienttranslator':
-        specifier: ^4.3.0
-        version: 4.7.0
+        specifier: workspace:*
+        version: link:../../src/clienttranslator
       '@quenty/ik':
-        specifier: ^4.5.0
-        version: 4.6.0
+        specifier: workspace:*
+        version: link:../../src/ik
       '@quenty/instanceutils':
-        specifier: ^3.4.0
-        version: 3.8.0
+        specifier: workspace:*
+        version: link:../../src/instanceutils
       '@quenty/loader':
-        specifier: ^3.1.1
-        version: 3.4.0
+        specifier: workspace:*
+        version: link:../../src/loader
       '@quenty/maid':
-        specifier: ^2.0.1
-        version: 2.6.0
+        specifier: workspace:*
+        version: link:../../src/maid
       '@quenty/octree':
-        specifier: ^3.3.0
-        version: 3.6.0
+        specifier: workspace:*
+        version: link:../../src/octree
       '@quenty/playerhumanoidbinder':
-        specifier: ^4.4.0
-        version: 4.8.0
+        specifier: workspace:*
+        version: link:../../src/playerhumanoidbinder
       '@quenty/promise':
-        specifier: ^3.2.0
-        version: 3.6.0
+        specifier: workspace:*
+        version: link:../../src/promise
       '@quenty/ragdoll':
-        specifier: ^4.5.0
-        version: 4.6.0
+        specifier: workspace:*
+        version: link:../../src/ragdoll
       '@quenty/remoting':
-        specifier: ^3.2.0
-        version: 3.6.0
+        specifier: workspace:*
+        version: link:../../src/remoting
       '@quenty/rx':
-        specifier: ^3.4.0
-        version: 3.8.0
+        specifier: workspace:*
+        version: link:../../src/rx
       '@quenty/rxbinderutils':
-        specifier: ^4.5.0
-        version: 4.9.0
+        specifier: workspace:*
+        version: link:../../src/rxbinderutils
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../../src/servicebag
       '@quenty/statestack':
-        specifier: ^3.2.0
-        version: 3.5.0
+        specifier: workspace:*
+        version: link:../../src/statestack
       '@quenty/table':
-        specifier: ^2.1.0
-        version: 2.2.0
+        specifier: workspace:*
+        version: link:../../src/table
       '@quenty/timesyncservice':
-        specifier: ^3.2.0
-        version: 3.6.0
+        specifier: workspace:*
+        version: link:../../src/timesyncservice
 
   plugins/preview-plugin:
     dependencies:
@@ -110,6 +116,9 @@ importers:
       '@quenty/blend':
         specifier: workspace:*
         version: link:../../src/blend
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../../src/instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../../src/loader
@@ -6103,147 +6112,6 @@ packages:
     resolution: {integrity: sha512-c83qWb22rNRuB0UaVCI0uRPNRr8Z0FWnEIvT47jiHAmOIUHbBOg5XvV7pM5x+rKn9HRpjxquDbXYSXr3fAKFcw==}
     engines: {node: '>=12'}
 
-  '@quenty/acceltween@2.5.3':
-    resolution: {integrity: sha512-RVvhySEzdB7WS3PSZWmPjHAzdzxmnf8XsOSpKWMxtdxB2sd7SKZNuUpsIvkq5CbcE+dGCo+Qjgij4zOus1ZpyA==}
-
-  '@quenty/adorneeutils@2.3.0':
-    resolution: {integrity: sha512-8Sg+zrBJyHUyyCP0Hmzb3BDbJlI52D2bXNmW3VbBf2iR7aDYSyVcxoTjC7bVd6TUbwiiMW7LmfXfQocVNR/FrQ==}
-
-  '@quenty/baseobject@3.5.0':
-    resolution: {integrity: sha512-GPM6Pp+ChRLetnteXeeEY2WtDN2HpsSQ7MVVhc5LlsaiEE05c1YqT5fZ4vbU8l4aYcT4kiPjINlAhXB23wdMvw==}
-
-  '@quenty/binarysearch@2.3.0':
-    resolution: {integrity: sha512-23Zs7id7nBLgg3ixDr2nsS5R6YeHvFlKwzFgjs4yy3iS00KJ2I67De9WHAvZZA23yVbw5OmxhOdgvXxDVbYG4g==}
-
-  '@quenty/binder@4.8.0':
-    resolution: {integrity: sha512-98YXesw6VuZyCXZE/Movim2G2Zrd4SxW5ZKYnZoEdxvH82m72c8buv5QQEJCPoisVWjhKdRJVJD/7YqTCBnuCA==}
-
-  '@quenty/blend@2.3.0':
-    resolution: {integrity: sha512-o0Qq9Pp7MBRxRkSHrNrXneFIUPUcb2XtlDcodAtGCmp++SSl6PhvBEdvhThMBeoyNZuMHhRC69eRa/+p7iNw+A==}
-
-  '@quenty/brio@3.8.0':
-    resolution: {integrity: sha512-oGJM59NGOlFP4JuY/CpJFpsliqtXKFXwlwPX/y8NzZq0iGBBAASmis1mh/53Rn7OAjVLJ095hjqqWMBLwlTKIw==}
-
-  '@quenty/camera@4.4.0':
-    resolution: {integrity: sha512-BUCBi90Ln43/krfAz6UNs+ylHwG7geM6XZEvGXThg3rnHUmCpdg6t0LGPZ3NA/yUEKTnJH+Cjf+K5d8dAjrCzQ==}
-
-  '@quenty/cframeutils@2.0.1':
-    resolution: {integrity: sha512-16ybzl1+QHJKjxck41Bnl1aKX4dpTCscf3MZWHbrzuytsVOH1+dXCas57L6+8bg4yrlxzjxWbsQ7mFDDeIVxIg==}
-
-  '@quenty/characterutils@3.6.0':
-    resolution: {integrity: sha512-qKjas5ZFIvkmhn83qX50t+fIO8WCThVMVeEnaieTrX2phAJmFN1n8JYp5RhDfQzng/8EILQqLHq87360UHrWQA==}
-
-  '@quenty/clienttranslator@4.7.0':
-    resolution: {integrity: sha512-eZHzOBpL14ATR5+a6+35E08t7cRHp9yKib4Js+PP4cXjty+dEsfJh0Q2nrnELacA+/EAyZloGWyMwfDC9sSfoA==}
-
-  '@quenty/cubicspline@3.5.0':
-    resolution: {integrity: sha512-U3l2xlwQPniGKainKVWtfKJD70dJjcTMMLPDE0grKxe98abpmQHUwdcgoTU/Y34pk/eTxP/dB6CJQv+gx3y+fg==}
-
-  '@quenty/deferred@2.3.0':
-    resolution: {integrity: sha512-KuLtPIgj+fA95QK5G0pTezBNJvSMdaRhm40O0iDr08JSdEKG8Xm3Ua4H9bexcmuXb8bbEsV3Dahs/1SrxZbr9g==}
-
-  '@quenty/draw@2.2.2':
-    resolution: {integrity: sha512-TCey7q8Y7iAak1o4zqkmsxj6m6SAGDrxJk9JmixsvchWeUXPCS0Y55hDTd/KS6OzPdljBt8IaneIIJCd4C4IXg==}
-
-  '@quenty/hapticfeedbackutils@2.1.1':
-    resolution: {integrity: sha512-UH065mgeWuoo0iyEJf3Wx+9u5Hh56c4zVwsw7GKCJkULP5V1mTXmvItoKxSNDbmbOabwBFxHowHyI/JcbMouTg==}
-
-  '@quenty/humanoidanimatorutils@2.2.0':
-    resolution: {integrity: sha512-9EHDBaMoDku80b7K4CVh1YvTWAQdRT9/Ecu8umw1P+2kfK6QEfEx+IemAP2FnFBT6pCSzbovFTTvj7vhzqC56g==}
-
-  '@quenty/humanoidtracker@3.8.0':
-    resolution: {integrity: sha512-nxMSXJY7iYKQHAU3KA61zjcmBuMqwTt0Scfbu+Bbbokwxss2WXtQOB29cNMElLdjvJlr1IT4OFpKdIVjAObt6A==}
-
-  '@quenty/ik@4.6.0':
-    resolution: {integrity: sha512-45a7ExrR/CGBn0ztfByggagQEV8vt9HcQCkjmm7Ny2Fvg1RNtN74sXh4U5UUelS5mQRUtW5SAklbAtIZfPxdIA==}
-
-  '@quenty/inputobjectutils@2.1.0':
-    resolution: {integrity: sha512-0IOLmNp4AwAdKCmopFcsOhNj+aEx4Y+qFVoseuKuuCDT6UTSQDMFGgRF86MS3zFGgI52LZJWmhjmg2cFuS2zGA==}
-
-  '@quenty/instanceutils@3.8.0':
-    resolution: {integrity: sha512-FFQV5H9+6jn08UmEpUFFnpQBk6WX4pPV4yw9LWOvOS31Y4G2Yr32F8LnK1yN0NI13dPJIvg6Ddxreqna5ECEnQ==}
-
-  '@quenty/linearsystemssolver@2.3.1':
-    resolution: {integrity: sha512-p+gsZxxbpLI4MpVwZXrgW43yBs3g2NcMC0gfA7RJvsc8p7cqk/G51+7N89KFWCTiY+3Xe27S6GZH3txSPpn6RQ==}
-
-  '@quenty/linkutils@3.8.0':
-    resolution: {integrity: sha512-zQa9mFjWKgbJj47iVSuvV1oKCQTdEV7yJOR12nHXw5tuBcPaQjNsu2w1inV5XgRUPW0NMVl/tCXBJznsbzNb6w==}
-
-  '@quenty/loader@3.4.0':
-    resolution: {integrity: sha512-7GagJDoN73llKFNSEdQvYIaZeITvSwLLXJkSAIMVTLWNOSF27nqQgwuX8difO/ZK2Qxzuhkl7pG1opQeAPHdww==}
-
-  '@quenty/maid@2.6.0':
-    resolution: {integrity: sha512-rIo3S55ZsEmzDIXklh+mSzBEbw3GxhkTUDjsN5oNmhAOWsVYcPOVdq87l/KYMmY5gX44mW3a/gUdxYay5mD+6A==}
-
-  '@quenty/math@2.7.3':
-    resolution: {integrity: sha512-MdbR9C+mTpBFG2rR3mmgPNOYKzcbAb2qo/s5jab23GWxMV+NhfZroxixAplzKF405LC9Md6/+U1Fd9Ge+Q66qQ==}
-
-  '@quenty/octree@3.6.0':
-    resolution: {integrity: sha512-ptA3vQKyDx0v9Wa+Af1KffM7q+pyeZCLhAuQbYSvL/aLSvthAzQZ7FD6MfteWWl8rgI+W1tdZRWhy4RGFELGhQ==}
-
-  '@quenty/playerhumanoidbinder@4.8.0':
-    resolution: {integrity: sha512-wJrC5B0ykvQdUs8tUCxBHW5a49MSqhaPXw8RtGe/u3t1dzcmBXWfQvkiRFrpKhK9hTaJ9lXY5mp6IBaoE6AW/A==}
-
-  '@quenty/promise@3.6.0':
-    resolution: {integrity: sha512-mQsMmgRfT/xiTpYGQRJ51yZQn0Y3x/KFUkRmX7zNAPZb0ODQ8H+E8PQUxRyGFF6cp5jS/MOwXM2XSY30sVyZ0g==}
-
-  '@quenty/pseudolocalize@2.1.0':
-    resolution: {integrity: sha512-ksnMkR4Ue7Dq5ekPO0jA71WlP55nKkUOUHlxdkhX2SAHFPfwazPwV9HpbQoscEZUAblWYQ0nvxCRl9F9r5mDDQ==}
-
-  '@quenty/qframe@3.6.0':
-    resolution: {integrity: sha512-yPzjbadWQTrMrhnKJq+FNog7Cxb1xxlIxHcltzZGmdHKb/o1GXHrAlE/6bab/ZvAcYM9PdBM8YBI37rhNCPKGg==}
-
-  '@quenty/ragdoll@4.6.0':
-    resolution: {integrity: sha512-q+vzLIAWl48cmf0BlwZ+LfBMBExBvspsyoZPg4UqtTbSb/OYR+Bl4VyK+PsMvxqIYT2wklYl1LkUjFxmlCEbJQ==}
-
-  '@quenty/remoting@3.6.0':
-    resolution: {integrity: sha512-LAF6vrZDeiJZ7CgPS02XtNzveWrSUEwhgCfX21NR0MiwOPenCG8adSGHDBkYEHR8QRZ1Yj39buK/2p+Z8vXzUA==}
-
-  '@quenty/rx@3.8.0':
-    resolution: {integrity: sha512-sBAO5wdbMFDsMMrrVUrb81tjSGUYgRePXMcsOfkzD6AyJmAVzdS59GPorYSPDoJPHEaX5BNWKHKxWhgd/Xd8mA==}
-
-  '@quenty/rxbinderutils@4.9.0':
-    resolution: {integrity: sha512-OAZ5wWUS9Zt6UTMxnB1ACpoSGH3dRaPUQo9fU1egOzb8eiei4vbIlO6fFSFgcd+nChfq/f5ZoWJxqJ8xbUSy8w==}
-
-  '@quenty/servicebag@3.5.0':
-    resolution: {integrity: sha512-DX5+OrQo9vegpXK95Ay1sKyA56pBLIFOOqhissDtM5j0PKf/Ok5S4km2345u6FTIbg39K0q2CKqaZASmCIqc5A==}
-
-  '@quenty/signal@2.4.0':
-    resolution: {integrity: sha512-oPPPdqHUvrgCRz6iCFeywH3u+juu/PZJ+ty1wOvZx5gy//1ZG9zq3nms55t1uZcv7kkrb8jhIdqo9ziYoz2YPA==}
-
-  '@quenty/spring@2.2.0':
-    resolution: {integrity: sha512-xX6jUQhuuqJVnimu/u9+yJXlCFvfEwsHnj6k3RZXDUMLJkFZsRH/73cbCdn1aU3Ksq0A+9/ei50MvL6uae1hVw==}
-
-  '@quenty/spring@3.3.0':
-    resolution: {integrity: sha512-MIZIN8VgNWeLvZJcvlrxVejV1teIEomMtazqaJy0Q2ISCzcOqriYqqzoPM4re8AefIMYFOCLEa36CDTfl2B5TA==}
-
-  '@quenty/statestack@3.5.0':
-    resolution: {integrity: sha512-nHdHmNx889/Y7XKRhRZFuT4J8kS+eB+J6uiEU2ZcCS+jjUeijoFwgRk6eLOLcSNJXwcx/GkGFrnuQL9kGu3+ww==}
-
-  '@quenty/steputils@3.6.1':
-    resolution: {integrity: sha512-smbRsJ/H5l9Jw3KRh/VQqN2ey0rR9f7JYZQDIQFQXqROS0+FMm1+y/SeOX42wUutJShNWdtDdPydYbsYtcDdAQ==}
-
-  '@quenty/string@2.3.0':
-    resolution: {integrity: sha512-lNWzNHTYBYp1JuW7TxAkC/x8PKDv2iqp7+KIa0nG1EV4b8IzLJQOH/DpcZiqd+FKZmcbVBSKR7DN7z1XF0hiyg==}
-
-  '@quenty/symbol@2.2.0':
-    resolution: {integrity: sha512-X7H0/gwo1Sg3d0XHBps29nJ55PN1VTtnhOtTWSe1gqNrqvQ4V7JTzMio3tkkbrmol4yX8EhZn2XUiUsRfmg5Lw==}
-
-  '@quenty/table@2.2.0':
-    resolution: {integrity: sha512-NXl7vqbCs6CrSRSR0ex3dzVMyK27FDjeEkOUW9ju421wAJUGeY73hB17MccnXXeXFAA9dPQ11EsK9v5DW/6K7A==}
-
-  '@quenty/throttle@3.5.0':
-    resolution: {integrity: sha512-Uavmy0fm9quihBV4jJSEgLO52TwQZ25UKynLp3S3fqESHQwABc7/frDzIBPBrne44oppuv1Rau1QClRs4B18gw==}
-
-  '@quenty/timesyncservice@3.6.0':
-    resolution: {integrity: sha512-eJs/htejQBwKlYbW0OW805ogYzM9/e6MC8zN1Vt4j338TA13oLPRqMlNhUAPHg0+fU4lHlzWbwvdCJ0ZuY+4WA==}
-
-  '@quenty/valuebaseutils@3.8.0':
-    resolution: {integrity: sha512-rzq5H9VbfF8FvhGhm3rc8l5sLjDy9ucTkeV/nQiZVeTWa1cLN/Iil7w3EGg8bLyglcKRqz6vVB2EdhHiYOWjqw==}
-
-  '@quenty/valueobject@3.8.0':
-    resolution: {integrity: sha512-QPvWuH0raXvGgC+zI2hNjfmVrRMi/Hbs+9bNBAmM7LJ1rC0Xx0m2Z7BKm1TAUft71cefpssKxODIzd+oG2vcNA==}
-
   '@quentystudios/cmdr@1.12.0-quenty.0':
     resolution: {integrity: sha512-coxG4bEQ3wskTEiVxbh6hTsOycYoq+8jLtUABvfMURHiS3hgF/0jg3uQArZt0JeY+VvkCIXLHUCFTMMbUQOllA==, tarball: https://npm.pkg.github.com/download/@QuentyStudios/cmdr/1.12.0-quenty.0/52cd069ee3ce795e8056e2e42cb012bb75ddf053}
 
@@ -10976,275 +10844,6 @@ snapshots:
       '@pnpm/config.env-replace': 1.1.0
       '@pnpm/network.ca-file': 1.0.2
       config-chain: 1.1.13
-
-  '@quenty/acceltween@2.5.3': {}
-
-  '@quenty/adorneeutils@2.3.0': {}
-
-  '@quenty/baseobject@3.5.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-
-  '@quenty/binarysearch@2.3.0': {}
-
-  '@quenty/binder@4.8.0':
-    dependencies:
-      '@quenty/baseobject': 3.5.0
-      '@quenty/brio': 3.8.0
-      '@quenty/instanceutils': 3.8.0
-      '@quenty/linkutils': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/promise': 3.6.0
-      '@quenty/signal': 2.4.0
-      '@quenty/valueobject': 3.8.0
-
-  '@quenty/blend@2.3.0':
-    dependencies:
-      '@quenty/acceltween': 2.5.3
-      '@quenty/brio': 3.8.0
-      '@quenty/instanceutils': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/promise': 3.6.0
-      '@quenty/rx': 3.8.0
-      '@quenty/signal': 2.4.0
-      '@quenty/spring': 3.3.0
-      '@quenty/steputils': 3.6.1
-      '@quenty/string': 2.3.0
-      '@quenty/valuebaseutils': 3.8.0
-      '@quenty/valueobject': 3.8.0
-
-  '@quenty/brio@3.8.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/rx': 3.8.0
-      '@quenty/statestack': 3.5.0
-
-  '@quenty/camera@4.4.0':
-    dependencies:
-      '@quenty/acceltween': 2.5.3
-      '@quenty/baseobject': 3.5.0
-      '@quenty/cframeutils': 2.0.1
-      '@quenty/cubicspline': 3.5.0
-      '@quenty/inputobjectutils': 2.1.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/math': 2.7.3
-      '@quenty/qframe': 3.6.0
-      '@quenty/servicebag': 3.5.0
-      '@quenty/spring': 2.2.0
-
-  '@quenty/cframeutils@2.0.1': {}
-
-  '@quenty/characterutils@3.6.0':
-    dependencies:
-      '@quenty/deferred': 2.3.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/promise': 3.6.0
-
-  '@quenty/clienttranslator@4.7.0':
-    dependencies:
-      '@quenty/blend': 2.3.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/promise': 3.6.0
-      '@quenty/pseudolocalize': 2.1.0
-      '@quenty/rx': 3.8.0
-
-  '@quenty/cubicspline@3.5.0':
-    dependencies:
-      '@quenty/binarysearch': 2.3.0
-      '@quenty/linearsystemssolver': 2.3.1
-      '@quenty/loader': 3.4.0
-
-  '@quenty/deferred@2.3.0': {}
-
-  '@quenty/draw@2.2.2': {}
-
-  '@quenty/hapticfeedbackutils@2.1.1': {}
-
-  '@quenty/humanoidanimatorutils@2.2.0': {}
-
-  '@quenty/humanoidtracker@3.8.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/promise': 3.6.0
-      '@quenty/signal': 2.4.0
-      '@quenty/valueobject': 3.8.0
-
-  '@quenty/ik@4.6.0':
-    dependencies:
-      '@quenty/acceltween': 2.5.3
-      '@quenty/baseobject': 3.5.0
-      '@quenty/binder': 4.8.0
-      '@quenty/camera': 4.4.0
-      '@quenty/characterutils': 3.6.0
-      '@quenty/humanoidtracker': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/math': 2.7.3
-      '@quenty/promise': 3.6.0
-      '@quenty/ragdoll': 4.6.0
-      '@quenty/remoting': 3.6.0
-      '@quenty/servicebag': 3.5.0
-      '@quenty/signal': 2.4.0
-      '@quenty/table': 2.2.0
-
-  '@quenty/inputobjectutils@2.1.0': {}
-
-  '@quenty/instanceutils@3.8.0':
-    dependencies:
-      '@quenty/brio': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/rx': 3.8.0
-
-  '@quenty/linearsystemssolver@2.3.1': {}
-
-  '@quenty/linkutils@3.8.0':
-    dependencies:
-      '@quenty/brio': 3.8.0
-      '@quenty/instanceutils': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/promise': 3.6.0
-      '@quenty/rx': 3.8.0
-
-  '@quenty/loader@3.4.0': {}
-
-  '@quenty/maid@2.6.0': {}
-
-  '@quenty/math@2.7.3': {}
-
-  '@quenty/octree@3.6.0':
-    dependencies:
-      '@quenty/draw': 2.2.2
-      '@quenty/loader': 3.4.0
-
-  '@quenty/playerhumanoidbinder@4.8.0':
-    dependencies:
-      '@quenty/binder': 4.8.0
-      '@quenty/humanoidtracker': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-
-  '@quenty/promise@3.6.0':
-    dependencies:
-      '@quenty/deferred': 2.3.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-
-  '@quenty/pseudolocalize@2.1.0': {}
-
-  '@quenty/qframe@3.6.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-
-  '@quenty/ragdoll@4.6.0':
-    dependencies:
-      '@quenty/baseobject': 3.5.0
-      '@quenty/binder': 4.8.0
-      '@quenty/camera': 4.4.0
-      '@quenty/characterutils': 3.6.0
-      '@quenty/hapticfeedbackutils': 2.1.1
-      '@quenty/humanoidanimatorutils': 2.2.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/playerhumanoidbinder': 4.8.0
-      '@quenty/promise': 3.6.0
-      '@quenty/remoting': 3.6.0
-      '@quenty/rx': 3.8.0
-      '@quenty/table': 2.2.0
-      '@quenty/valuebaseutils': 3.8.0
-
-  '@quenty/remoting@3.6.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-      '@quenty/promise': 3.6.0
-      '@quenty/table': 2.2.0
-
-  '@quenty/rx@3.8.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/promise': 3.6.0
-      '@quenty/signal': 2.4.0
-      '@quenty/symbol': 2.2.0
-      '@quenty/table': 2.2.0
-      '@quenty/throttle': 3.5.0
-
-  '@quenty/rxbinderutils@4.9.0':
-    dependencies:
-      '@quenty/binder': 4.8.0
-      '@quenty/brio': 3.8.0
-      '@quenty/instanceutils': 3.8.0
-      '@quenty/linkutils': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/rx': 3.8.0
-
-  '@quenty/servicebag@3.5.0':
-    dependencies:
-      '@quenty/baseobject': 3.5.0
-      '@quenty/loader': 3.4.0
-      '@quenty/signal': 2.4.0
-
-  '@quenty/signal@2.4.0': {}
-
-  '@quenty/spring@2.2.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-
-  '@quenty/spring@3.3.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-
-  '@quenty/statestack@3.5.0':
-    dependencies:
-      '@quenty/baseobject': 3.5.0
-      '@quenty/loader': 3.4.0
-      '@quenty/valueobject': 3.8.0
-
-  '@quenty/steputils@3.6.1': {}
-
-  '@quenty/string@2.3.0': {}
-
-  '@quenty/symbol@2.2.0': {}
-
-  '@quenty/table@2.2.0': {}
-
-  '@quenty/throttle@3.5.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-
-  '@quenty/timesyncservice@3.6.0':
-    dependencies:
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/promise': 3.6.0
-      '@quenty/remoting': 3.6.0
-      '@quenty/signal': 2.4.0
-      '@quenty/table': 2.2.0
-
-  '@quenty/valuebaseutils@3.8.0':
-    dependencies:
-      '@quenty/brio': 3.8.0
-      '@quenty/instanceutils': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/promise': 3.6.0
-
-  '@quenty/valueobject@3.8.0':
-    dependencies:
-      '@quenty/brio': 3.8.0
-      '@quenty/loader': 3.4.0
-      '@quenty/maid': 2.6.0
-      '@quenty/rx': 3.8.0
-      '@quenty/signal': 2.4.0
 
   '@quentystudios/cmdr@1.12.0-quenty.0': {}
 

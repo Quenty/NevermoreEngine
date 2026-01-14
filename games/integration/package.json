@@ -23,29 +23,32 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/adorneeutils": "^2.1.0",
-    "@quenty/baseobject": "^3.2.0",
-    "@quenty/brio": "^3.4.0",
-    "@quenty/camera": "^4.3.1",
-    "@quenty/characterutils": "^3.2.0",
-    "@quenty/clienttranslator": "^4.3.0",
-    "@quenty/ik": "^4.5.0",
-    "@quenty/instanceutils": "^3.4.0",
-    "@quenty/loader": "^3.1.1",
-    "@quenty/maid": "^2.0.1",
-    "@quenty/octree": "^3.3.0",
-    "@quenty/playerhumanoidbinder": "^4.4.0",
-    "@quenty/promise": "^3.2.0",
-    "@quenty/ragdoll": "^4.5.0",
-    "@quenty/remoting": "^3.2.0",
-    "@quenty/rx": "^3.4.0",
-    "@quenty/rxbinderutils": "^4.5.0",
-    "@quenty/statestack": "^3.2.0",
-    "@quenty/table": "^2.1.0",
-    "@quenty/timesyncservice": "^3.2.0"
+    "@quenty/adorneeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/camera": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/clienttranslator": "workspace:*",
+    "@quenty/ik": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/octree": "workspace:*",
+    "@quenty/playerhumanoidbinder": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/ragdoll": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxbinderutils": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/timesyncservice": "workspace:*"
   },
   "publishConfig": {
     "access": "restricted",
     "registry": "https://npm.pkg.github.com/"
-  }
+  },
+  "private": true
 }
