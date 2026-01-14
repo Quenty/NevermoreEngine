@@ -1,3 +1,24 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2026-01-14)
+
+
+### Bug Fixes
+
+* Record current version in yargs ([9512418](https://github.com/Quenty/Nevermore/commit/9512418354e5275f96cc757547dd9b5973a93859))
+
+
+### Features
+
+* Nevermore CLI now checks to make sure it is up to date ([d86930c](https://github.com/Quenty/Nevermore/commit/d86930c85f24d879dee9ce5ce413488d1250246d))
+
+
+
+
+
 # v1.1.0 (Wed Jan 14 2026)
 
 #### 🚀 Enhancement
