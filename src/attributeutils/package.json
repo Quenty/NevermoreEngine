@@ -1,6 +1,6 @@
 {
   "name": "@quenty/attributeutils",
-  "version": "14.22.0",
+  "version": "14.23.0",
   "description": "Provides utility functions to work with attributes in Roblox",
   "keywords": [
     "Roblox",
@@ -21,10 +21,14 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
+<<<<<<< HEAD
     "@quenty/binder": "file:../binder",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
@@ -35,6 +39,17 @@
     "@quenty/rx": "file:../rx",
     "@quenty/rxsignal": "file:../rxsignal",
     "@quenty/symbol": "file:../symbol"
+=======
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/canceltoken": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxsignal": "workspace:*",
+    "@quenty/symbol": "workspace:*"
+>>>>>>> main
   },
   "publishConfig": {
     "access": "public"

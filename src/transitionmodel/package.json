@@ -1,6 +1,6 @@
 {
   "name": "@quenty/transitionmodel",
-  "version": "7.26.0",
+  "version": "7.28.0",
   "description": "Helps with Gui visiblity showing and hiding",
   "keywords": [
     "Roblox",
@@ -21,23 +21,26 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/basicpane": "file:../basicpane",
-    "@quenty/blend": "file:../blend",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/spring": "file:../spring",
-    "@quenty/timedtween": "file:../timedtween",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/basicpane": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/spring": "workspace:*",
+    "@quenty/timedtween": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

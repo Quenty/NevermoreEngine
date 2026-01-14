@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.8.2...@quenty/aggregator@1.9.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+
+
+
+
+## [1.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.8.1...@quenty/aggregator@1.8.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [1.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.8.0...@quenty/aggregator@1.8.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+
+
+
+
 # [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.7.5...@quenty/aggregator@1.8.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/aggregator

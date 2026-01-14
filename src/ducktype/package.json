@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ducktype",
-  "version": "5.9.1",
+  "version": "5.9.3",
   "description": "Utility functions to duck type a value",
   "keywords": [
     "Roblox",
@@ -21,11 +21,14 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

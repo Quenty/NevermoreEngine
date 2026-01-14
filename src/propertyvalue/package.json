@@ -1,6 +1,6 @@
 {
   "name": "@quenty/propertyvalue",
-  "version": "7.22.0",
+  "version": "7.23.0",
   "description": "Property value for Roblox instances",
   "keywords": [
     "Roblox",
@@ -21,14 +21,17 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/rx": "file:../rx"
+    "@quenty/brio": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

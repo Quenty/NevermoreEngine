@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textserviceutils",
-  "version": "13.24.0",
+  "version": "13.26.0",
   "description": "Holds utilities involving the Roblox TextService and text fitting to size.",
   "keywords": [
     "Roblox",
@@ -23,6 +23,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -30,9 +33,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx"
+    "@quenty/blend": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*"
   }
 }

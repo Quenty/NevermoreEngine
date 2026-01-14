@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cmdrservice",
-  "version": "13.31.0",
+  "version": "13.33.0",
   "description": "Bridge between cmdr and Nevermore services using servicebag",
   "keywords": [
     "Roblox",
@@ -21,18 +21,21 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/permissionprovider": "file:../permissionprovider",
-    "@quenty/promise": "file:../promise",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/string": "file:../string",
-    "@quenty/templateprovider": "file:../templateprovider",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/permissionprovider": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/templateprovider": "workspace:*",
     "@quentystudios/cmdr": "^1.12.0-quenty.0"
   },
   "publishConfig": {

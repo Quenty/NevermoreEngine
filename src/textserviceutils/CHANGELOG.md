@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@13.25.1...@quenty/textserviceutils@13.26.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [13.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@13.25.0...@quenty/textserviceutils@13.25.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [13.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@13.24.1...@quenty/textserviceutils@13.25.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [13.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@13.24.0...@quenty/textserviceutils@13.24.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
 # [13.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@13.23.1...@quenty/textserviceutils@13.24.0) (2026-01-08)
 
 **Note:** Version bump only for package @quenty/textserviceutils

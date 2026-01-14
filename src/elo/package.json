@@ -1,6 +1,6 @@
 {
   "name": "@quenty/elo",
-  "version": "7.25.0",
+  "version": "7.27.0",
   "description": "Elo rating utility library.",
   "keywords": [
     "Roblox",
@@ -22,6 +22,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -29,11 +32,11 @@
     "access": "public"
   },
   "devDependencies": {
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/blend": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "dependencies": {
-    "@quenty/probability": "file:../probability"
+    "@quenty/probability": "workspace:*"
   }
 }

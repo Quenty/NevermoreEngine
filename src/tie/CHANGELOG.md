@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.30.1...@quenty/tie@10.31.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+## [10.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.30.0...@quenty/tie@10.30.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.29.1...@quenty/tie@10.30.0) (2026-01-11)
+
+
+### Bug Fixes
+
+* Ensure that the name gets asssigned almost immediately ([2a5eba9](https://github.com/Quenty/NevermoreEngine/commit/2a5eba9dd2072a303fa7aaa8d5651ebbb5a1e7c7))
+
+
+
+
+
+## [10.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.29.0...@quenty/tie@10.29.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
 # [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.28.0...@quenty/tie@10.29.0) (2026-01-08)
 
 **Note:** Version bump only for package @quenty/tie

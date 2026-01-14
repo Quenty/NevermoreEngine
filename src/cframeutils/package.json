@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cframeutils",
-  "version": "5.5.4",
+  "version": "5.5.6",
   "description": "CFrameUtils for Roblox",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

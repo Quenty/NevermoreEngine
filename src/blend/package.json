@@ -1,6 +1,6 @@
 {
   "name": "@quenty/blend",
-  "version": "12.24.0",
+  "version": "12.26.0",
   "description": "Declarative UI system.",
   "keywords": [
     "Roblox",
@@ -20,6 +20,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -27,24 +30,24 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/acceltween": "file:../acceltween",
-    "@quenty/brio": "file:../brio",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/spring": "file:../spring",
-    "@quenty/steputils": "file:../steputils",
-    "@quenty/string": "file:../string",
-    "@quenty/uiobjectutils": "file:../uiobjectutils",
-    "@quenty/valuebaseutils": "file:../valuebaseutils",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/acceltween": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/spring": "workspace:*",
+    "@quenty/steputils": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/uiobjectutils": "workspace:*",
+    "@quenty/valuebaseutils": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/contentproviderutils": "file:../contentproviderutils",
-    "@quenty/playerthumbnailutils": "file:../playerthumbnailutils"
+    "@quenty/contentproviderutils": "workspace:*",
+    "@quenty/playerthumbnailutils": "workspace:*"
   }
 }

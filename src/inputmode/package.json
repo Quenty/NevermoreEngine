@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputmode",
-  "version": "13.25.0",
+  "version": "13.26.0",
   "description": "Trace input mode state and trigger changes correctly",
   "keywords": [
     "Roblox",
@@ -21,19 +21,22 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal",
-    "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/brio": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

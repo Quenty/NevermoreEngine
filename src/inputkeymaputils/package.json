@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputkeymaputils",
-  "version": "14.30.0",
+  "version": "14.32.0",
   "description": "System to define rebindable key bindings and inputs for Roblox.",
   "keywords": [
     "Roblox",
@@ -22,27 +22,30 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/brio": "file:../brio",
-    "@quenty/clienttranslator": "file:../clienttranslator",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/enumutils": "file:../enumutils",
-    "@quenty/inputmode": "file:../inputmode",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/observablecollection": "file:../observablecollection",
-    "@quenty/pseudolocalize": "file:../pseudolocalize",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/statestack": "file:../statestack",
-    "@quenty/string": "file:../string",
-    "@quenty/table": "file:../table",
-    "@quenty/valuebaseutils": "file:../valuebaseutils",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/clienttranslator": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/inputmode": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/pseudolocalize": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valuebaseutils": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/seatutils",
-  "version": "7.26.0",
+  "version": "7.27.0",
   "description": "Holds utilities to work with Roblox seats",
   "keywords": [
     "Roblox",
@@ -21,16 +21,19 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/rx": "file:../rx",
-    "@quenty/statestack": "file:../statestack"
+    "@quenty/brio": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/statestack": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/networkownerservice",
-  "version": "5.3.2",
+  "version": "5.3.4",
   "description": "NetworkOwnerService - Tracks a stack of owners so ownership isn't reverted or overwritten in delayed network owner set.",
   "keywords": [
     "Roblox",
@@ -22,6 +22,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -29,7 +32,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/loader": "workspace:*",
+    "@quenty/servicebag": "workspace:*"
   }
 }

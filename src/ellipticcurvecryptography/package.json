@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ellipticcurvecryptography",
-  "version": "1.7.1",
+  "version": "1.7.3",
   "description": "Elliptic curve cryptography forked from BoatBomber, forked from ComputerCraft",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty",
     "BoatBomber"

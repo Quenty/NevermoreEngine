@@ -1,6 +1,6 @@
 {
   "name": "@quenty/coreguienabler",
-  "version": "12.25.0",
+  "version": "12.26.0",
   "description": "Key based CoreGuiEnabler, singleton Use this class to load/unload CoreGuis / other GUIs, by disabling based upon keys Keys are additive, so if you have more than 1 disabled, it's ok.",
   "keywords": [
     "Roblox",
@@ -20,15 +20,18 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/symbol": "file:../symbol"
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/symbol": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

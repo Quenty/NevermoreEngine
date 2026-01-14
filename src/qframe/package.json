@@ -1,6 +1,6 @@
 {
   "name": "@quenty/qframe",
-  "version": "10.12.5",
+  "version": "10.13.0",
   "description": "CFrame representation as a quaternion for Roblox",
   "keywords": [
     "Roblox",
@@ -22,17 +22,20 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty",
     "AxisAngles"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/camerastoryutils": "file:../camerastoryutils",
-    "@quenty/cubicspline": "file:../cubicspline",
-    "@quenty/maid": "file:../maid"
+    "@quenty/camerastoryutils": "workspace:*",
+    "@quenty/cubicspline": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

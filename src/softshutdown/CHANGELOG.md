@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.35.0...@quenty/softshutdown@9.36.0) (2026-01-14)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+# [9.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.34.1...@quenty/softshutdown@9.35.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+## [9.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.34.0...@quenty/softshutdown@9.34.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [9.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.33.1...@quenty/softshutdown@9.34.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+## [9.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.33.0...@quenty/softshutdown@9.33.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
 # [9.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.32.0...@quenty/softshutdown@9.33.0) (2026-01-08)
 
 **Note:** Version bump only for package @quenty/softshutdown

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/equippedtracker",
-  "version": "13.25.0",
+  "version": "13.26.0",
   "description": "Tracks the equipped player of a tool",
   "keywords": [
     "Roblox",
@@ -22,14 +22,17 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

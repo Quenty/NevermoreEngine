@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputobjectutils",
-  "version": "4.22.0",
+  "version": "4.23.0",
   "description": "Provides utility functions involving input objects",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -28,10 +31,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/rxsignal": "file:../rxsignal"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxsignal": "workspace:*"
   }
 }

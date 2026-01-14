@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memorystoreutils@6.12.6...@quenty/memorystoreutils@6.13.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/memorystoreutils
+
+
+
+
+
+## [6.12.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memorystoreutils@6.12.5...@quenty/memorystoreutils@6.12.6) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [6.12.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memorystoreutils@6.12.4...@quenty/memorystoreutils@6.12.5) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/memorystoreutils
+
+
+
+
+
 ## [6.12.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memorystoreutils@6.12.3...@quenty/memorystoreutils@6.12.4) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/memorystoreutils

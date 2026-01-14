@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rigbuilderutils",
-  "version": "10.24.0",
+  "version": "10.25.0",
   "description": "Utility functions for debugging, builds a Roblox character rig",
   "keywords": [
     "Roblox",
@@ -22,19 +22,22 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/assetserviceutils": "file:../assetserviceutils",
-    "@quenty/humanoiddescriptionutils": "file:../humanoiddescriptionutils",
-    "@quenty/insertserviceutils": "file:../insertserviceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/assetserviceutils": "workspace:*",
+    "@quenty/humanoiddescriptionutils": "workspace:*",
+    "@quenty/insertserviceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/camerastoryutils": "file:../camerastoryutils",
-    "@quenty/maid": "file:../maid"
+    "@quenty/camerastoryutils": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

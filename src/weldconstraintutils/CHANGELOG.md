@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/weldconstraintutils@3.1.4...@quenty/weldconstraintutils@3.1.5) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [3.1.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/weldconstraintutils@3.1.3...@quenty/weldconstraintutils@3.1.4) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/weldconstraintutils
+
+
+
+
+
 ## [3.1.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/weldconstraintutils@3.1.1...@quenty/weldconstraintutils@3.1.3) (2025-04-07)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/memorystoreutils",
-  "version": "6.12.4",
+  "version": "6.13.0",
   "description": "Utility functions for memory store srevice",
   "keywords": [
     "Roblox",
@@ -22,15 +22,18 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

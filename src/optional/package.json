@@ -1,6 +1,6 @@
 {
   "name": "@quenty/optional",
-  "version": "11.9.1",
+  "version": "11.9.3",
   "description": "Adds the optional function to Roblox for Nevermore require",
   "keywords": [
     "Roblox",
@@ -21,11 +21,14 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

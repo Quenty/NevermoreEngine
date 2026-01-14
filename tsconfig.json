@@ -6,7 +6,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "CommonJS",
+    "module": "ES2022",
     "moduleResolution": "Node",
     "noEmitOnError": true,
     "noImplicitAny": true,
@@ -15,6 +15,7 @@
     "removeComments": false,
     "sourceMap": true,
     "strict": true,
+<<<<<<< HEAD
     "typeRoots": [
       "node_modules/@rbxts",
       "node_modules/@quenty"
@@ -24,6 +25,10 @@
     "paths": {
       "@quenty/*": ["src/*"]
     }
+=======
+    "target": "ES2022",
+    "skipLibCheck": true
+>>>>>>> main
   },
   "types": ["node"]
 }

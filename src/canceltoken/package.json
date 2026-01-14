@@ -1,6 +1,6 @@
 {
   "name": "@quenty/canceltoken",
-  "version": "11.13.4",
+  "version": "11.14.0",
   "description": "Cancellation tokens for Roblox Lua",
   "keywords": [
     "Roblox",
@@ -22,15 +22,18 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/signal": "file:../signal"
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/signal": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

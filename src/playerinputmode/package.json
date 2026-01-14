@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerinputmode",
-  "version": "9.27.0",
+  "version": "9.29.0",
   "description": "Service that takes active input modes from the player and exposes it to every other player via the server.",
   "keywords": [
     "Roblox",
@@ -22,21 +22,24 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/brio": "file:../brio",
-    "@quenty/inputmode": "file:../inputmode",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/playerutils": "file:../playerutils",
-    "@quenty/promise": "file:../promise",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/table": "file:../table"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/inputmode": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/playerutils": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

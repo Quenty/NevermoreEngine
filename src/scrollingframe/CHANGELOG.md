@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.14.0...@quenty/scrollingframe@12.14.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [12.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.13.1...@quenty/scrollingframe@12.14.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/scrollingframe
+
+
+
+
+
+## [12.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.13.0...@quenty/scrollingframe@12.13.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/scrollingframe
+
+
+
+
+
 # [12.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.12.4...@quenty/scrollingframe@12.13.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/scrollingframe

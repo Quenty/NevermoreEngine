@@ -1,6 +1,6 @@
 {
   "name": "@quenty/defaultvalueutils",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "description": "Helps get the default or zero value for value types in Roblox",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

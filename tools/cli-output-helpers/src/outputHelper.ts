@@ -1,5 +1,9 @@
 import chalk from 'chalk';
 
+export type BoxOptions = {
+  centered?: boolean;
+};
+
 /**
  * Helps with output
  */
@@ -27,7 +31,7 @@ export class OutputHelper {
    * @param message Message to format
    * @returns Formatted string
    */
-  public static formatWarn(message: string): string {
+  public static formatWarning(message: string): string {
     return chalk.yellowBright(message);
   }
 
@@ -49,11 +53,48 @@ export class OutputHelper {
     return chalk.magentaBright(message);
   }
 
+  private static _stripAnsi = (text: string): string =>
+    text.replace(/\x1b\[[0-9;]*m/g, '');
+
+  /**
+   * Helper method to put a box around the output
+   */
+  public static formatBox(message: string, options?: BoxOptions): string {
+    const lines = message.trim().split('\n');
+    const width = lines.reduce(
+      (a, b) => Math.max(a, OutputHelper._stripAnsi(b).length),
+      0
+    );
+
+    const centered = options?.centered ?? false;
+
+    const surround = (text: string) => {
+      const first = centered
+        ? Math.floor((width - OutputHelper._stripAnsi(text).length) / 2)
+        : 0;
+      const last = width - OutputHelper._stripAnsi(text).length - first;
+      return (
+        '║   \x1b[0m' +
+        ' '.repeat(first) +
+        text +
+        ' '.repeat(last) +
+        '\x1b[31m   ║'
+      );
+    };
+
+    const bar = '═'.repeat(width);
+    const top = '\x1b[31m╔═══' + bar + '═══╗';
+    const pad = surround('');
+    const bottom = '╚═══' + bar + '═══╝\x1b[0m';
+
+    return [top, pad, ...lines.map(surround), pad, bottom].join('\n');
+  }
+
   /**
    * Logs information to the console
    * @param message Message to write
    */
-  public static error(message: string) {
+  public static error(message: string): void {
     console.error(this.formatError(message));
   }
 
@@ -61,7 +102,7 @@ export class OutputHelper {
    * Logs information to the console
    * @param message Message to write
    */
-  public static info(message: string) {
+  public static info(message: string): void {
     console.log(this.formatInfo(message));
   }
 
@@ -69,7 +110,23 @@ export class OutputHelper {
    * Logs warning to the console
    * @param message Message to write
    */
-  public static warn(message: string) {
-    console.log(this.formatWarn(message));
+  public static warn(message: string): void {
+    console.log(this.formatWarning(message));
+  }
+
+  /**
+   * Logs hint to the console
+   * @param message Message to write
+   */
+  public static hint(message: string): void {
+    console.log(this.formatHint(message));
+  }
+
+  /**
+   * Renders a box around the message
+   * @param message
+   */
+  public static box(message: string, options?: BoxOptions): void {
+    console.log(this.formatBox(message, options));
   }
 }

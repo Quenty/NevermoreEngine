@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.24.2...@quenty/statestack@14.25.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/statestack
+
+
+
+
+
+## [14.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.24.1...@quenty/statestack@14.24.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [14.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.24.0...@quenty/statestack@14.24.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/statestack
+
+
+
+
+
 # [14.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.23.1...@quenty/statestack@14.24.0) (2026-01-08)
 
 **Note:** Version bump only for package @quenty/statestack

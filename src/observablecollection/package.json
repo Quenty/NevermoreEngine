@@ -1,6 +1,6 @@
 {
   "name": "@quenty/observablecollection",
-  "version": "12.26.0",
+  "version": "12.28.0",
   "description": "A set of observable collections, such as sets, maps, sorted lists, and more.",
   "keywords": [
     "Roblox",
@@ -23,26 +23,29 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/brio": "file:../brio",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/steputils": "file:../steputils",
-    "@quenty/symbol": "file:../symbol",
-    "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/steputils": "workspace:*",
+    "@quenty/symbol": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/blend": "file:../blend"
+    "@quenty/blend": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

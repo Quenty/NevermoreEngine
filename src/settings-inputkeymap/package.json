@@ -1,6 +1,6 @@
 {
   "name": "@quenty/settings-inputkeymap",
-  "version": "10.39.0",
+  "version": "10.42.0",
   "description": "Input key map setting saving for players",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -28,16 +31,16 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/enumutils": "file:../enumutils",
-    "@quenty/inputkeymaputils": "file:../inputkeymaputils",
-    "@quenty/inputmode": "file:../inputmode",
-    "@quenty/jsonutils": "file:../jsonutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/settings": "file:../settings",
-    "@quenty/string": "file:../string",
-    "@quenty/table": "file:../table"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/inputkeymaputils": "workspace:*",
+    "@quenty/inputmode": "workspace:*",
+    "@quenty/jsonutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/settings": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/table": "workspace:*"
   }
 }

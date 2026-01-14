@@ -1,7 +1,7 @@
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { NevermoreGlobalArgs } from '../args/global-args';
-import { runCommandAsync } from '../utils/nevermore-cli-utils';
+import { NevermoreGlobalArgs } from '../args/global-args.js';
+import { runCommandAsync } from '../utils/nevermore-cli-utils.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

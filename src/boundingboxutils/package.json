@@ -1,6 +1,6 @@
 {
   "name": "@quenty/boundingboxutils",
-  "version": "4.5.0",
+  "version": "4.5.2",
   "description": "Bounding box utilties. Prefer model:GetBoundingBox() in most cases. However, sometimes grouping isn't possible.",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

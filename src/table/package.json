@@ -1,6 +1,6 @@
 {
   "name": "@quenty/table",
-  "version": "3.9.0",
+  "version": "3.9.2",
   "description": "Table and Set utility functions for Roblox",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/adorneedata",
-  "version": "7.25.0",
+  "version": "7.26.0",
   "description": "Bridges attributes and serialization",
   "keywords": [
     "Roblox",
@@ -21,18 +21,21 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/defaultvalueutils": "file:../defaultvalueutils",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/loader": "file:../loader",
-    "@quenty/rx": "file:../rx",
-    "@quenty/rxsignal": "file:../rxsignal",
-    "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject",
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/defaultvalueutils": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxsignal": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

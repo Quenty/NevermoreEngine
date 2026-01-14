@@ -1,6 +1,6 @@
 {
   "name": "@quenty/baseobject",
-  "version": "10.9.1",
+  "version": "10.9.3",
   "description": "BaseObject implementation with Maid attached for Roblox",
   "keywords": [
     "Roblox",
@@ -20,12 +20,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

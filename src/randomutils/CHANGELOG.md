@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.12.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.12.1...@quenty/randomutils@6.12.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [6.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.12.0...@quenty/randomutils@6.12.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/randomutils
+
+
+
+
+
 # [6.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.11.1...@quenty/randomutils@6.12.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/randomutils

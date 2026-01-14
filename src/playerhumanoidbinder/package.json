@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerhumanoidbinder",
-  "version": "14.27.0",
+  "version": "14.29.0",
   "description": "Binder that will automatically bind to each player's humanoid",
   "keywords": [
     "Roblox",
@@ -21,16 +21,19 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binder": "file:../binder",
-    "@quenty/humanoidtracker": "file:../humanoidtracker",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/binder": "workspace:*",
+    "@quenty/humanoidtracker": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

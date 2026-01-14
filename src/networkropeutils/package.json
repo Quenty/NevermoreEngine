@@ -1,6 +1,6 @@
 {
   "name": "@quenty/networkropeutils",
-  "version": "10.9.1",
+  "version": "10.9.3",
   "description": "Utility function to create network ropes which hint to Roblox that two assemblies should be considered to be owned by the same network owner.",
   "keywords": [
     "Roblox",
@@ -21,12 +21,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

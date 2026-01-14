@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.11.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-undo@8.11.1...@quenty/rodux-undo@8.11.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [8.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-undo@8.11.0...@quenty/rodux-undo@8.11.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/rodux-undo
+
+
+
+
+
 # [8.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-undo@8.10.1...@quenty/rodux-undo@8.11.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/rodux-undo

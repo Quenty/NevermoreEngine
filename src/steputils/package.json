@@ -1,6 +1,6 @@
 {
   "name": "@quenty/steputils",
-  "version": "3.6.1",
+  "version": "3.6.3",
   "description": "Binds animations into step, where the animation only runs as needed",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

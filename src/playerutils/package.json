@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerutils",
-  "version": "8.23.0",
+  "version": "8.25.0",
   "description": "Player utility functions",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -28,12 +31,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx"
+    "@quenty/brio": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*"
   }
 }

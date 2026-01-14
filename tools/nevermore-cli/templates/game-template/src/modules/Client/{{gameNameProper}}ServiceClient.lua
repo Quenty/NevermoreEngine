@@ -10,8 +10,16 @@ local ServiceBag = require("ServiceBag")
 local {{gameNameProper}}ServiceClient = {}
 {{gameNameProper}}ServiceClient.ServiceName = "{{gameNameProper}}ServiceClient"
 
-function {{gameNameProper}}ServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type {{gameNameProper}}ServiceClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+		},
+		{} :: typeof({ __index = {{gameNameProper}}ServiceClient })
+	))
+
+function {{gameNameProper}}ServiceClient.Init(self: {{gameNameProper}}ServiceClient,serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	-- External

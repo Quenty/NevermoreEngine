@@ -1,7 +1,8 @@
 {
   "name": "@quenty/nevermore-cli",
-  "version": "4.11.0",
+  "version": "4.14.0",
   "description": "CLI interface for Nevermore",
+  "type": "module",
   "keywords": [
     "Roblox",
     "Nevermore",
@@ -24,27 +25,27 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/cli-output-helpers": "file:../cli-output-helpers",
-    "@quenty/nevermore-template-helpers": "file:../nevermore-template-helpers",
-    "execa": "v5.1.1",
+    "@quenty/cli-output-helpers": "workspace:*",
+    "@quenty/nevermore-cli-helpers": "workspace:*",
+    "@quenty/nevermore-template-helpers": "workspace:*",
+    "execa": "^9.6.1",
     "find-git-root": "^1.0.4",
-    "inquirer": "^8.2.4",
+    "inquirer": "^13.2.0",
     "node-fetch": "^3.3.2",
-    "read-package-json": "^6.0.0",
     "typescript-memoize": "^1.1.1",
-    "yargs": "^17.0.13"
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
-    "@types/inquirer": "^9.0.2",
+    "@types/inquirer": "^9.0.9",
     "@types/node": "^18.11.4",
     "@types/yargs": "^17.0.13",
     "prettier": "2.7.1",
-    "typescript": "^4.8.4"
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "build": "tsc --build",
-    "watch": "tsc --build --watch",
-    "clean": "tsc --build --clean"
+    "build:watch": "tsc --build --watch",
+    "build:clean": "tsc --build --clean"
   },
   "publishConfig": {
     "access": "public"

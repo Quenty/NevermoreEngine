@@ -1,6 +1,6 @@
 {
   "name": "@quenty/viewport",
-  "version": "11.29.0",
+  "version": "11.31.0",
   "description": "Rendering functionality for viewportFrames",
   "keywords": [
     "Roblox",
@@ -20,29 +20,32 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/adorneeutils": "file:../adorneeutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/basicpane": "file:../basicpane",
-    "@quenty/blend": "file:../blend",
-    "@quenty/camera": "file:../camera",
-    "@quenty/geometryutils": "file:../geometryutils",
-    "@quenty/inputobjectutils": "file:../inputobjectutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/spring": "file:../spring",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/adorneeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/basicpane": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/camera": "workspace:*",
+    "@quenty/geometryutils": "workspace:*",
+    "@quenty/inputobjectutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/spring": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
-    "@quenty/insertserviceutils": "file:../insertserviceutils"
+    "@quenty/insertserviceutils": "workspace:*"
   }
 }

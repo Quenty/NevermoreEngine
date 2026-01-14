@@ -6,11 +6,9 @@ import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { TemplateHelper } from '@quenty/nevermore-template-helpers';
-import { NevermoreGlobalArgs } from '../args/global-args';
-import {
-  getTemplatePathByName,
-  runCommandAsync,
-} from '../utils/nevermore-cli-utils';
+import { NevermoreGlobalArgs } from '../args/global-args.js';
+import { getTemplatePathByName } from '../utils/nevermore-cli-utils.js';
+import { InitGameCommand } from './init-game-command.js';
 
 export interface initGameArgs extends NevermoreGlobalArgs {
   pluginName: string;
@@ -21,8 +19,7 @@ export interface initGameArgs extends NevermoreGlobalArgs {
  */
 export class InitPluginCommand<T> implements CommandModule<T, initGameArgs> {
   public command = 'init-plugin [plugin-name]';
-  public describe =
-    'Initializes a new plugin template.';
+  public describe = 'Initializes a new plugin template.';
 
   public builder(args: Argv<T>) {
     args.positional('plugin-name', {
@@ -56,24 +53,9 @@ export class InitPluginCommand<T> implements CommandModule<T, initGameArgs> {
       args.dryrun
     );
 
-    const packages = [
-      '@quenty/loader',
-      '@quenty/servicebag',
-    ];
+    const packages = ['@quenty/loader', '@quenty/servicebag'];
 
-    await runCommandAsync(args, 'npm', ['install', ...packages], {
-      cwd: srcRoot,
-    });
-
-    try {
-      await runCommandAsync(args, 'selene', ['generate-roblox-std'], {
-        cwd: srcRoot,
-      });
-    } catch {
-      OutputHelper.info(
-        'Failed to run `selene generate-roblox-std`, is selene installed?'
-      );
-    }
+    await InitGameCommand.initToolChainAsync(args, srcRoot, packages);
   }
 
   private static async _ensurePluginName(args: initGameArgs): Promise<string> {

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/promise",
-  "version": "10.12.4",
+  "version": "10.13.0",
   "description": "Promise implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -21,15 +21,18 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/deferred": "file:../deferred",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/signal": "file:../signal"
+    "@quenty/deferred": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/signal": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

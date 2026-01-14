@@ -1,6 +1,6 @@
 {
   "name": "@quenty/tie",
-  "version": "10.29.0",
+  "version": "10.31.0",
   "description": "Tie allows interfaces to be defined between Lua OOP and Roblox objects.",
   "keywords": [
     "Roblox",
@@ -24,31 +24,34 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/brio": "file:../brio",
-    "@quenty/collectionserviceutils": "file:../collectionserviceutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/rxsignal": "file:../rxsignal",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/statestack": "file:../statestack",
-    "@quenty/string": "file:../string",
-    "@quenty/symbol": "file:../symbol",
-    "@quenty/table": "file:../table",
-    "@quenty/tuple": "file:../tuple",
-    "@quenty/valuebaseutils": "file:../valuebaseutils",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/collectionserviceutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxsignal": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/symbol": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/tuple": "workspace:*",
+    "@quenty/valuebaseutils": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/promise": "file:../promise",
-    "@quenty/signal": "file:../signal"
+    "@quenty/promise": "workspace:*",
+    "@quenty/signal": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/httppromise",
-  "version": "10.12.4",
+  "version": "10.13.0",
   "description": "HttpPromise - Wrapper functions around http requests in Roblox.",
   "keywords": [
     "Roblox",
@@ -23,12 +23,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

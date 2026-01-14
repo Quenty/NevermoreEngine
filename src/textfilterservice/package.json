@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textfilterservice",
-  "version": "13.23.0",
+  "version": "13.24.0",
   "description": "Utility service that provides text filtering to the client",
   "keywords": [
     "Roblox",
@@ -23,16 +23,19 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/table": "file:../table",
-    "@quenty/textfilterutils": "file:../textfilterutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/textfilterutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.38.1...@quenty/gameproductservice@14.39.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
+
+## [14.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.38.0...@quenty/gameproductservice@14.38.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.37.1...@quenty/gameproductservice@14.38.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
+
+## [14.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.37.0...@quenty/gameproductservice@14.37.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
+
 # [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.36.0...@quenty/gameproductservice@14.37.0) (2026-01-08)
 
 **Note:** Version bump only for package @quenty/gameproductservice

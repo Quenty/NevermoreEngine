@@ -1,6 +1,6 @@
 {
   "name": "@quenty/funnels",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "description": "Funnel utility class",
   "keywords": [
     "Roblox",
@@ -21,17 +21,20 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/adorneedata": "file:../adorneedata",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/loader": "file:../loader",
-    "@quenty/propertyvalue": "file:../propertyvalue",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal"
+    "@quenty/adorneedata": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/propertyvalue": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

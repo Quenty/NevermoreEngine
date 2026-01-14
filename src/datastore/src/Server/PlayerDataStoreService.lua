@@ -41,9 +41,10 @@ function PlayerDataStoreService.Init(self: PlayerDataStoreService, serviceBag: S
 
 	-- External
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
+	self._serviceBag:GetService(require("PlaceMessagingService"))
 
+	-- State
 	self._promiseStarted = self._maid:Add(Promise.new())
-
 	self._dataStoreName = "PlayerData"
 	self._dataStoreScope = "SaveData"
 end
@@ -92,12 +93,18 @@ end
 
 --[=[
 	Gets the datastore for the player.
-	@param player Player
+
+	:::tip
+	If you get the datastore by UserId, be sure to call datastore:PromiseCloseSession()
+	when done to avoid session leaks.
+	:::
+
+	@param player Player | number
 	@return Promise<DataStore>
 ]=]
 function PlayerDataStoreService.PromiseDataStore(
 	self: PlayerDataStoreService,
-	player: Player
+	player: Player | number
 ): Promise.Promise<DataStore.DataStore>
 	return self:PromiseManager():Then(function(manager)
 		return manager:GetDataStore(player)
@@ -134,8 +141,12 @@ function PlayerDataStoreService.PromiseManager(
 			return DataStorePromises.promiseDataStore(self._dataStoreName, self._dataStoreScope)
 		end)
 		:Then(function(dataStore)
-			local manager = self._maid:Add(PlayerDataStoreManager.new(dataStore, function(player)
-				return tostring(player.UserId)
+			local manager = self._maid:Add(PlayerDataStoreManager.new(self._serviceBag, dataStore, function(player)
+				if type(player) == "number" then
+					return tostring(player)
+				else
+					return tostring(player.UserId)
+				end
 			end, true))
 
 			-- A lot safer if we're hot reloading or need to monitor bind to close calls

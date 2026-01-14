@@ -1,6 +1,6 @@
 {
   "name": "@quenty/maid",
-  "version": "3.5.1",
+  "version": "3.5.3",
   "description": "Easily cleanup event listeners and objects in Roblox",
   "keywords": [
     "Roblox",
@@ -23,6 +23,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

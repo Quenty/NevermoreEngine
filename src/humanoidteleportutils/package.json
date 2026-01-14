@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidteleportutils",
-  "version": "10.9.3",
+  "version": "10.9.5",
   "description": "Utility for teleporting humanoids",
   "keywords": [
     "Roblox",
@@ -21,13 +21,16 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/cframeutils": "file:../cframeutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/raycaster": "file:../raycaster"
+    "@quenty/cframeutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/raycaster": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

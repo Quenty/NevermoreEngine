@@ -1,6 +1,6 @@
 {
   "name": "@quenty/servicebag",
-  "version": "11.13.4",
+  "version": "11.13.6",
   "description": "Service providing mechanisms for Nevermore",
   "keywords": [
     "Roblox",
@@ -22,13 +22,16 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/signal": "file:../signal"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/signal": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
