@@ -1,3 +1,19 @@
+# v7.14.0 (Wed Jan 14 2026)
+
+#### 🚀 Enhancement
+
+- fix: DataStores now use one message per a place instead of many [#640](https://github.com/Quenty/NevermoreEngine/pull/640) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: DataStores now use one message per a place instead of many, which cuts down on subscription costs ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

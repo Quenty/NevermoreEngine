@@ -1,5 +1,18 @@
 # (Wed Jan 14 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.30.0`, `@quenty/messagingserviceutils@7.14.0`, `@quenty/nevermore-cli-helpers@1.2.0`, `@quenty/nevermore-cli@4.14.0`
+  - fix: DataStores now use one message per a place instead of many [#640](https://github.com/Quenty/NevermoreEngine/pull/640) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jan 14 2026)
+
 :tada: This release contains work from a new contributor! :tada:
 
 Thank you, euvinkeel ([@euvinkeel](https://github.com/euvinkeel)), for all your work!
