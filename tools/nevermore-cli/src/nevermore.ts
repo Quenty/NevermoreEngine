@@ -31,7 +31,11 @@ const versionData = await VersionChecker.checkForUpdatesAsync({
 
 yargs(hideBin(process.argv))
   .scriptName('nevermore')
-  .version(versionData?.currentVersion as any)
+  .version(
+    (versionData
+      ? VersionChecker.getVersionDisplayName(versionData)
+      : undefined) as any
+  )
   .option('yes', {
     description: 'True if this run should not prompt the user in any way',
     default: false,

@@ -9,28 +9,34 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import { readFile, writeFile } from 'fs/promises';
 import { Memoize } from 'typescript-memoize';
 
-const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const CHECK_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
 interface VersionCache {
   lastCheck: number;
   latestVersion: string;
   currentVersion: string;
+  isLocalDev: boolean;
 }
 
 interface UpdateCheckResult {
   updateAvailable: boolean;
   currentVersion: string;
   latestVersion: string;
+  isLocalDev: boolean;
 }
 
 interface VersionCheckerOptions {
   packageName: string;
   humanReadableName?: string;
   registryUrl: string;
-  currentVersion?: string;
   packageJsonPath?: string;
   updateCommand?: string;
   verbose?: boolean;
+}
+
+interface OurVersionData {
+  isLocalDev: boolean;
+  version: string;
 }
 
 export class VersionChecker {
@@ -40,7 +46,7 @@ export class VersionChecker {
     try {
       return await VersionChecker._checkForUpdatesInternalAsync(options);
     } catch (error) {
-      const name = options.humanReadableName || options.packageName;
+      const name = VersionChecker._getDisplayName(options);
       OutputHelper.box(
         `Failed to check for updates for ${name} due to ${error}`
       );
@@ -55,19 +61,18 @@ export class VersionChecker {
     const {
       packageName,
       registryUrl,
-      currentVersion,
       packageJsonPath,
       updateCommand = `npm install -g ${packageName}@latest`,
     } = options;
 
-    const version = await VersionChecker._queryOurVersionAsync(
-      currentVersion,
+    const versionData = await VersionChecker._queryOurVersionAsync(
       packageJsonPath
     );
-    if (!version) {
+    if (!versionData) {
       if (options.verbose) {
+        const name = VersionChecker._getDisplayName(options);
         OutputHelper.error(
-          `Could not determine current version for ${packageName}, skipping update check.`
+          `Could not determine current version for ${name}, skipping update check.`
         );
       }
       return undefined;
@@ -75,20 +80,38 @@ export class VersionChecker {
 
     const result = await VersionChecker._queryUpdateStateAsync(
       packageName,
-      version,
+      versionData,
       registryUrl
     );
 
     if (options.verbose) {
+      const currentyVersionDisplayName =
+        VersionChecker._getLocalVersionDisplayName(versionData);
+
       OutputHelper.info(
-        `Checked for updates for ${packageName}. Current version: ${result.currentVersion}, Latest version: ${result.latestVersion}, and update available: ${result.updateAvailable}`
+        `Checked for updates for ${packageName}. Current version: ${currentyVersionDisplayName}, Latest version: ${result.latestVersion}, and update available: ${result.updateAvailable}`
       );
     }
 
-    if (result.updateAvailable) {
-      const name = options.humanReadableName || packageName;
+    if (result.isLocalDev) {
+      const name = VersionChecker._getDisplayName(options);
       const text = [
-        `${name} update available: ${result.currentVersion} → ${result.latestVersion}`,
+        `${name} is running in local development mode`,
+        '',
+        OutputHelper.formatHint(
+          `Run '${updateCommand}' to switch to production copy`
+        ),
+        '',
+        'This will result in less errors.',
+      ].join('\n');
+
+      OutputHelper.box(text, { centered: true });
+    } else if (result.updateAvailable) {
+      const name = VersionChecker._getDisplayName(options);
+      const currentyVersionDisplayName =
+        VersionChecker._getLocalVersionDisplayName(versionData);
+      const text = [
+        `${name} update available: ${currentyVersionDisplayName} → ${result.latestVersion}`,
         '',
         OutputHelper.formatHint(`Run '${updateCommand}' to update`),
       ].join('\n');
@@ -99,15 +122,32 @@ export class VersionChecker {
     return result;
   }
 
+  private static _getDisplayName(options: VersionCheckerOptions): string {
+    return options.humanReadableName || options.packageName;
+  }
+
+  /**
+   * Helper method to get version display name from UpdateCheckResult
+   */
+  public static getVersionDisplayName(versionData: UpdateCheckResult): string {
+    return VersionChecker._getLocalVersionDisplayName({
+      isLocalDev: versionData.isLocalDev,
+      version: versionData.currentVersion,
+    });
+  }
+
+  private static _getLocalVersionDisplayName(
+    versionData: OurVersionData
+  ): string {
+    return versionData.isLocalDev
+      ? `${versionData.version}-local-copy`
+      : versionData.version;
+  }
+
   @Memoize()
   private static async _queryOurVersionAsync(
-    currentVersion: string | undefined,
     packageJsonPath: string | undefined
-  ): Promise<string | null> {
-    if (currentVersion) {
-      return currentVersion;
-    }
-
+  ): Promise<OurVersionData | null> {
     if (!packageJsonPath) {
       throw new Error(
         'Either currentVersion or packageJsonPath must be provided to determine the current version.'
@@ -115,12 +155,37 @@ export class VersionChecker {
     }
 
     const pkg = JSON.parse(await readFile(packageJsonPath, 'utf8'));
-    return pkg.version || null;
+
+    // Check dependencies and see if they're workspace* or link:* or file:* instead of a version
+    function isLinkedDependencies(
+      deps: Record<string, string> | undefined
+    ): boolean {
+      if (!deps) {
+        return false;
+      }
+
+      return Object.values(deps).some(
+        (dep) =>
+          dep.startsWith('workspace:') ||
+          dep.startsWith('link:') ||
+          dep.startsWith('file:')
+      );
+    }
+
+    const isLocalDev =
+      isLinkedDependencies(pkg.dependencies) ||
+      isLinkedDependencies(pkg.devDependencies) ||
+      isLinkedDependencies(pkg.peerDependencies);
+
+    return {
+      isLocalDev: isLocalDev,
+      version: pkg.version || null,
+    };
   }
 
   private static async _queryUpdateStateAsync(
     packageName: string,
-    currentVersion: string,
+    versionData: OurVersionData,
     registryUrl: string
   ): Promise<UpdateCheckResult> {
     // Use a simple cache file in the user's home directory
@@ -145,12 +210,17 @@ export class VersionChecker {
     if (
       cachedData &&
       (now - cachedData.lastCheck < CHECK_INTERVAL_MS ||
-        cachedData.currentVersion !== currentVersion)
+        cachedData.currentVersion !== versionData.version ||
+        cachedData.isLocalDev !== versionData.isLocalDev)
     ) {
       return {
-        updateAvailable: semver.gt(cachedData.latestVersion, currentVersion),
-        currentVersion: currentVersion,
+        updateAvailable: semver.gt(
+          cachedData.latestVersion,
+          versionData.version
+        ),
+        currentVersion: versionData.version,
         latestVersion: cachedData.latestVersion,
+        isLocalDev: versionData.isLocalDev,
       };
     }
 
@@ -165,7 +235,8 @@ export class VersionChecker {
     const newCache: VersionCache = {
       lastCheck: now,
       latestVersion: latestVersionString,
-      currentVersion: currentVersion,
+      currentVersion: versionData.version,
+      isLocalDev: versionData.isLocalDev,
     };
     const newResults = loadedCacheData || {};
     newResults[cacheKey] = newCache;
@@ -179,9 +250,10 @@ export class VersionChecker {
 
     // Return whether update is available
     return {
-      updateAvailable: semver.gt(latestVersionString, currentVersion),
-      currentVersion: currentVersion,
+      updateAvailable: semver.gt(latestVersionString, versionData.version),
+      currentVersion: versionData.version,
       latestVersion: latestVersionString,
+      isLocalDev: versionData.isLocalDev,
     };
   }
 }
