@@ -1,20 +1,18 @@
-# v4.14.0 (Wed Jan 14 2026)
-
-#### 🚀 Enhancement
-
-- fix: DataStores now use one message per a place instead of many [#640](https://github.com/Quenty/NevermoreEngine/pull/640) ([@Quenty](https://github.com/Quenty))
-- feat: Nevermore CLI also warns if you're in a local development mode, and checks for updates quicker ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.14.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.13.2...@quenty/nevermore-cli@4.14.0) (2026-01-14)
+
+
+### Features
+
+* Nevermore CLI also warns if you're in a local development mode, and checks for updates quicker ([98a24d2](https://github.com/Quenty/Nevermore/commit/98a24d25d50249f2a95c2ec5164074ca7393cd02))
+
+
+
+
 
 ## [4.13.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.13.1...@quenty/nevermore-cli@4.13.2) (2026-01-14)
 
