@@ -1,6 +1,6 @@
 {
   "name": "@quenty/colorsequenceutils",
-  "version": "7.9.0",
+  "version": "7.9.3",
   "description": "Utility functions for Color sequences in Roblox.",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -28,7 +31,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/math": "file:../math"
+    "@quenty/loader": "workspace:*",
+    "@quenty/math": "workspace:*"
   }
 }

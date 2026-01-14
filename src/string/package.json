@@ -1,6 +1,6 @@
 {
   "name": "@quenty/string",
-  "version": "3.3.3",
+  "version": "3.3.6",
   "description": "This module provides utility functions for strings",
   "keywords": [
     "Roblox",
@@ -22,6 +22,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

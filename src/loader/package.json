@@ -1,6 +1,6 @@
 {
   "name": "@quenty/loader",
-  "version": "10.9.0",
+  "version": "10.9.3",
   "description": "A simple module loader for Roblox",
   "keywords": [
     "Roblox",
@@ -20,6 +20,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

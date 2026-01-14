@@ -1,6 +1,6 @@
 {
   "name": "@quenty/adorneevalue",
-  "version": "10.23.2",
+  "version": "10.27.0",
   "description": "Adorneevalue - Helper class to transform a an adornee into relative positions/information.",
   "keywords": [
     "Roblox",
@@ -21,17 +21,21 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/adorneeutils": "file:../adorneeutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/signal": "file:../signal",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/adorneeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class ServerMain
 ]]
@@ -8,7 +9,6 @@ local require = require(loader).bootstrapGame(ServerScriptService.settings)
 
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("SettingsService"))
-local bridge = serviceBag:GetService(require("SettingsServiceBridge"))
 
 local SettingDefinition = require("SettingDefinition")
 
@@ -17,11 +17,8 @@ serviceBag:GetService(screenShakeDefinition)
 serviceBag:Init()
 serviceBag:Start()
 
-local volumeDefinition = SettingDefinition.new("Volume", 1)
-bridge:RegisterSettingDefinition(volumeDefinition)
-
-local rumbleDefinition = SettingDefinition.new("Rumble", true)
-bridge:RegisterSettingDefinition(rumbleDefinition)
+local volumeDefinition = serviceBag:GetService(SettingDefinition.new("Volume", 1))
+local _rumbleDefinition = serviceBag:GetService(SettingDefinition.new("Rumble", true))
 
 local function handlePlayer(player: Player)
 	local volume = volumeDefinition:GetSettingProperty(serviceBag, player)

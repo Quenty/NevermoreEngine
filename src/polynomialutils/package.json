@@ -1,6 +1,6 @@
 {
   "name": "@quenty/polynomialutils",
-  "version": "2.2.1",
+  "version": "2.2.3",
   "description": "Solves polynomials of certain degrees.",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

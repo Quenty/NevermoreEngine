@@ -14,24 +14,26 @@ local ScreenshotHudModel = setmetatable({}, BaseObject)
 ScreenshotHudModel.ClassName = "ScreenshotHudModel"
 ScreenshotHudModel.__index = ScreenshotHudModel
 
-export type ScreenshotHudModel = typeof(setmetatable(
-	{} :: {
-		_cameraButtonIcon: ValueObject.ValueObject<string>,
-		_cameraButtonPosition: ValueObject.ValueObject<UDim2>,
-		_closeButtonPosition: ValueObject.ValueObject<UDim2>,
-		_closeWhenScreenshotTaken: ValueObject.ValueObject<boolean>,
-		_experienceNameOverlayEnabled: ValueObject.ValueObject<boolean>,
-		_overlayFont: ValueObject.ValueObject<Enum.Font>,
-		_usernameOverlayEnabled: ValueObject.ValueObject<boolean>,
-		_visible: ValueObject.ValueObject<boolean>,
-		_cameraButtonVisible: ValueObject.ValueObject<boolean>,
-		_closeButtonVisible: ValueObject.ValueObject<boolean>,
-		_keepOpen: ValueObject.ValueObject<boolean>,
+export type ScreenshotHudModel =
+	typeof(setmetatable(
+		{} :: {
+			_cameraButtonIcon: ValueObject.ValueObject<string>,
+			_cameraButtonPosition: ValueObject.ValueObject<UDim2>,
+			_closeButtonPosition: ValueObject.ValueObject<UDim2>,
+			_closeWhenScreenshotTaken: ValueObject.ValueObject<boolean>,
+			_experienceNameOverlayEnabled: ValueObject.ValueObject<boolean>,
+			_overlayFont: ValueObject.ValueObject<Enum.Font>,
+			_usernameOverlayEnabled: ValueObject.ValueObject<boolean>,
+			_visible: ValueObject.ValueObject<boolean>,
+			_cameraButtonVisible: ValueObject.ValueObject<boolean>,
+			_closeButtonVisible: ValueObject.ValueObject<boolean>,
+			_keepOpen: ValueObject.ValueObject<boolean>,
 
-		CloseRequested: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = ScreenshotHudModel })
-)) & BaseObject.BaseObject
+			CloseRequested: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = ScreenshotHudModel })
+	))
+	& BaseObject.BaseObject
 
 function ScreenshotHudModel.new(): ScreenshotHudModel
 	local self: ScreenshotHudModel = setmetatable(BaseObject.new() :: any, ScreenshotHudModel)

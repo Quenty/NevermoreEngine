@@ -3,6 +3,105 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.26.1...@quenty/animationprovider@11.27.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+## [11.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.26.0...@quenty/animationprovider@11.26.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [11.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.25.1...@quenty/animationprovider@11.26.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+## [11.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.25.0...@quenty/animationprovider@11.25.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+# [11.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.24.1...@quenty/animationprovider@11.25.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+## [11.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.24.0...@quenty/animationprovider@11.24.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+# [11.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.23.7...@quenty/animationprovider@11.24.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+## [11.23.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.23.6...@quenty/animationprovider@11.23.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+## [11.23.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.23.5...@quenty/animationprovider@11.23.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+## [11.23.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.23.4...@quenty/animationprovider@11.23.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+## [11.23.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.23.3...@quenty/animationprovider@11.23.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
+## [11.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.23.2...@quenty/animationprovider@11.23.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/animationprovider
+
+
+
+
+
 ## [11.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@11.23.1...@quenty/animationprovider@11.23.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/animationprovider

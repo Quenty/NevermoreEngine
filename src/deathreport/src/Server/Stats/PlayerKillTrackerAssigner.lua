@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class PlayerKillTrackerAssigner
 ]=]
@@ -16,8 +17,19 @@ local PlayerKillTrackerAssigner = setmetatable({}, BaseObject)
 PlayerKillTrackerAssigner.ClassName = "PlayerKillTrackerAssigner"
 PlayerKillTrackerAssigner.__index = PlayerKillTrackerAssigner
 
-function PlayerKillTrackerAssigner.new(serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(), PlayerKillTrackerAssigner)
+export type PlayerKillTrackerAssigner =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_deathReportBindersServer: any,
+			_killTrackers: { [Player]: Instance },
+		},
+		{} :: typeof({ __index = PlayerKillTrackerAssigner })
+	))
+	& BaseObject.BaseObject
+
+function PlayerKillTrackerAssigner.new(serviceBag: ServiceBag.ServiceBag): PlayerKillTrackerAssigner
+	local self: PlayerKillTrackerAssigner = setmetatable(BaseObject.new() :: any, PlayerKillTrackerAssigner)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._deathReportBindersServer = self._serviceBag:GetService(DeathReportBindersServer)
@@ -38,7 +50,7 @@ function PlayerKillTrackerAssigner.new(serviceBag: ServiceBag.ServiceBag)
 	return self
 end
 
-function PlayerKillTrackerAssigner:GetPlayerKills(player: Player)
+function PlayerKillTrackerAssigner.GetPlayerKills(self: PlayerKillTrackerAssigner, player: Player): number?
 	local tracker = self:GetPlayerKillTracker(player)
 	if tracker then
 		return tracker:GetKills()
@@ -47,7 +59,7 @@ function PlayerKillTrackerAssigner:GetPlayerKills(player: Player)
 	end
 end
 
-function PlayerKillTrackerAssigner:GetPlayerKillTracker(player: Player)
+function PlayerKillTrackerAssigner.GetPlayerKillTracker(self: PlayerKillTrackerAssigner, player: Player)
 	local trackerInstance = self._killTrackers[player]
 	if trackerInstance then
 		return self._deathReportBindersServer.PlayerKillTracker:Get(trackerInstance)
@@ -56,11 +68,11 @@ function PlayerKillTrackerAssigner:GetPlayerKillTracker(player: Player)
 	end
 end
 
-function PlayerKillTrackerAssigner:_handlePlayerRemoving(player)
+function PlayerKillTrackerAssigner._handlePlayerRemoving(self: PlayerKillTrackerAssigner, player: Player)
 	self._maid[player] = nil
 end
 
-function PlayerKillTrackerAssigner:_handlePlayerAdded(player)
+function PlayerKillTrackerAssigner._handlePlayerAdded(self: PlayerKillTrackerAssigner, player: Player)
 	local maid = Maid.new()
 
 	local killTracker = PlayerKillTrackerUtils.create(self._deathReportBindersServer.PlayerKillTracker, player)

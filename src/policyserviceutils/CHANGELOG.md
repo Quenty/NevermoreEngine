@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.12.6...@quenty/policyserviceutils@6.13.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/policyserviceutils
+
+
+
+
+
+## [6.12.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.12.5...@quenty/policyserviceutils@6.12.6) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [6.12.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.12.4...@quenty/policyserviceutils@6.12.5) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/policyserviceutils
+
+
+
+
+
+## [6.12.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.12.3...@quenty/policyserviceutils@6.12.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/policyserviceutils
+
+
+
+
+
+## [6.12.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.12.2...@quenty/policyserviceutils@6.12.3) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/policyserviceutils
+
+
+
+
+
+## [6.12.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.12.1...@quenty/policyserviceutils@6.12.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/policyserviceutils
+
+
+
+
+
+## [6.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.12.0...@quenty/policyserviceutils@6.12.1) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/policyserviceutils
+
+
+
+
+
 # [6.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.11.0...@quenty/policyserviceutils@6.12.0) (2025-08-29)
 
 **Note:** Version bump only for package @quenty/policyserviceutils

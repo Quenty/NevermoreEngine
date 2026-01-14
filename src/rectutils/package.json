@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rectutils",
-  "version": "1.3.0",
+  "version": "1.3.3",
   "description": "Utility methods for Rect data object",
   "keywords": [
     "Roblox",
@@ -21,11 +21,14 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

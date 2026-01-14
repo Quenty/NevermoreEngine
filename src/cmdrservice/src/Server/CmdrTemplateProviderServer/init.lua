@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Retrieves CmdrTemplateProviderServer
 	@class CmdrTemplateProviderServer

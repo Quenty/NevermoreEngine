@@ -15,14 +15,17 @@ local MasterClock = setmetatable({}, BaseObject)
 MasterClock.__index = MasterClock
 MasterClock.ClassName = "MasterClock"
 
-export type MasterClock = typeof(setmetatable(
-	{} :: {
-		_remoteEvent: RemoteEvent,
-		_remoteFunction: RemoteFunction,
-		_clockFunction: BaseClock.ClockFunction,
-	},
-	{} :: typeof({ __index = MasterClock })
-)) & BaseObject.BaseObject & BaseClock.BaseClock
+export type MasterClock =
+	typeof(setmetatable(
+		{} :: {
+			_remoteEvent: RemoteEvent,
+			_remoteFunction: RemoteFunction,
+			_clockFunction: BaseClock.ClockFunction,
+		},
+		{} :: typeof({ __index = MasterClock })
+	))
+	& BaseObject.BaseObject
+	& BaseClock.BaseClock
 
 --[=[
 	Constructs a new MasterClock

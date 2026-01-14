@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class RogueHumanoidBase
 ]=]
@@ -13,6 +14,7 @@ local CharacterUtils = require("CharacterUtils")
 local RogueHumanoidProperties = require("RogueHumanoidProperties")
 local Rx = require("Rx")
 local RxRootPartUtils = require("RxRootPartUtils")
+local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 
 local GROWTH_VALUE_NAMES = {
@@ -32,7 +34,7 @@ local RogueHumanoidBase = setmetatable({}, BaseObject)
 RogueHumanoidBase.ClassName = "RogueHumanoidBase"
 RogueHumanoidBase.__index = RogueHumanoidBase
 
-function RogueHumanoidBase.new(humanoid, serviceBag)
+function RogueHumanoidBase.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RogueHumanoidBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -163,8 +165,12 @@ function RogueHumanoidBase:_updateScaleValue(numberValue: NumberValue, state: Sc
 	local min = state.minSize
 
 	local multiplier = min + (math.exp(r * t) * (-min + max)) / (math.exp(r * t) + (-i + max) / (i - min))
-
-	numberValue.Value = initialValue * multiplier
+	-- TODO: Ask trey what's up with this
+	if state.scale == 1 then
+		numberValue = initialValue
+	else
+		numberValue.Value = initialValue * multiplier
+	end
 end
 
 return RogueHumanoidBase

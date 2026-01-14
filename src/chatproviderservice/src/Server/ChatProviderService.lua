@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Wrapper around Roblox chat service on the server
 	@class ChatProviderService

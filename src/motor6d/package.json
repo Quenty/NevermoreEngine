@@ -1,6 +1,6 @@
 {
   "name": "@quenty/motor6d",
-  "version": "7.28.1",
+  "version": "7.33.0",
   "description": "Centralized service to override motors on humanoids and other places",
   "keywords": [
     "Roblox",
@@ -21,26 +21,30 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/brio": "file:../brio",
-    "@quenty/cframeutils": "file:../cframeutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal",
-    "@quenty/spring": "file:../spring",
-    "@quenty/steputils": "file:../steputils",
-    "@quenty/symbol": "file:../symbol",
-    "@quenty/tie": "file:../tie",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/cframeutils": "workspace:*",
+    "@quenty/draw": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/playerhumanoidbinder": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/spring": "workspace:*",
+    "@quenty/steputils": "workspace:*",
+    "@quenty/symbol": "workspace:*",
+    "@quenty/tie": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

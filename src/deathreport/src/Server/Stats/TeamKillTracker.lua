@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class TeamKillTracker
 ]=]
@@ -6,12 +7,13 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local DeathReportService = require("DeathReportService")
+local ServiceBag = require("ServiceBag")
 
 local TeamKillTracker = setmetatable({}, BaseObject)
 TeamKillTracker.ClassName = "TeamKillTracker"
 TeamKillTracker.__index = TeamKillTracker
 
-function TeamKillTracker.new(scoreObject, serviceBag)
+function TeamKillTracker.new(scoreObject, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(scoreObject), TeamKillTracker)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

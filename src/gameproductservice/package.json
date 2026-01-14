@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameproductservice",
-  "version": "14.34.1",
+  "version": "14.39.0",
   "description": "Generalized monetization system for handling products and purchases correctly.",
   "keywords": [
     "Roblox",
@@ -20,6 +20,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -27,33 +30,33 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/avatareditorutils": "file:../avatareditorutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/brio": "file:../brio",
-    "@quenty/cmdrservice": "file:../cmdrservice",
-    "@quenty/enumutils": "file:../enumutils",
-    "@quenty/gameconfig": "file:../gameconfig",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/marketplaceutils": "file:../marketplaceutils",
-    "@quenty/observablecollection": "file:../observablecollection",
-    "@quenty/playerbinder": "file:../playerbinder",
-    "@quenty/playerutils": "file:../playerutils",
-    "@quenty/promise": "file:../promise",
-    "@quenty/promisemaid": "file:../promisemaid",
-    "@quenty/receiptprocessing": "file:../receiptprocessing",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/rxbinderutils": "file:../rxbinderutils",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal",
-    "@quenty/statestack": "file:../statestack",
-    "@quenty/string": "file:../string",
-    "@quenty/table": "file:../table",
-    "@quenty/tie": "file:../tie",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/avatareditorutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/gameconfig": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/marketplaceutils": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/playerbinder": "workspace:*",
+    "@quenty/playerutils": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/promisemaid": "workspace:*",
+    "@quenty/receiptprocessing": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxbinderutils": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/tie": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   }
 }

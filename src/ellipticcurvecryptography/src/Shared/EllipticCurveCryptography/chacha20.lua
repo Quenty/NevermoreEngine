@@ -1,3 +1,4 @@
+--!nonstrict
 --!native
 
 -- Chacha20 cipher in ComputerCraft

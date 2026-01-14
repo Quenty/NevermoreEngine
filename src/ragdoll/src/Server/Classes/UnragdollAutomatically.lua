@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	When a humanoid is tagged with this, it will unragdoll automatically. This class exports a [Binder].
 	@server
@@ -18,6 +19,7 @@ local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 local UnragdollAutomaticallyConstants = require("UnragdollAutomaticallyConstants")
 local cancellableDelay = require("cancellableDelay")
 
@@ -31,7 +33,7 @@ UnragdollAutomatically.__index = UnragdollAutomatically
 	@param serviceBag ServiceBag
 	@return UnragdollAutomatically
 ]=]
-function UnragdollAutomatically.new(humanoid, serviceBag)
+function UnragdollAutomatically.new(humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), UnragdollAutomatically)
 
 	self._serviceBag = assert(serviceBag, "Bad serviceBag")

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Constants for [RagdollHumanoidOnFall].
 	@class RagdollHumanoidOnFallConstants

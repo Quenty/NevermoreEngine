@@ -3,6 +3,97 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.26.2...@quenty/seatutils@7.27.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+## [7.26.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.26.1...@quenty/seatutils@7.26.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [7.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.26.0...@quenty/seatutils@7.26.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+# [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.25.1...@quenty/seatutils@7.26.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+## [7.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.25.0...@quenty/seatutils@7.25.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+# [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.7...@quenty/seatutils@7.25.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+## [7.24.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.6...@quenty/seatutils@7.24.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+## [7.24.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.5...@quenty/seatutils@7.24.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+## [7.24.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.4...@quenty/seatutils@7.24.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+## [7.24.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.3...@quenty/seatutils@7.24.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
+## [7.24.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.2...@quenty/seatutils@7.24.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/seatutils
+
+
+
+
+
 ## [7.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/seatutils@7.24.1...@quenty/seatutils@7.24.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/seatutils

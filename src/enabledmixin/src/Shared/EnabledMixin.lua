@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Adds Enabled/Disabled state to class
 	@class EnabledMixin

@@ -15,13 +15,15 @@ local GameConfigAsset = setmetatable({}, GameConfigAssetBase)
 GameConfigAsset.ClassName = "GameConfigAsset"
 GameConfigAsset.__index = GameConfigAsset
 
-export type GameConfigAsset = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_translator: JSONTranslator.JSONTranslator,
-	},
-	{} :: typeof({ __index = GameConfigAsset })
-)) & GameConfigAssetBase.GameConfigAssetBase
+export type GameConfigAsset =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_translator: JSONTranslator.JSONTranslator,
+		},
+		{} :: typeof({ __index = GameConfigAsset })
+	))
+	& GameConfigAssetBase.GameConfigAssetBase
 
 function GameConfigAsset.new(obj: Folder, serviceBag: ServiceBag.ServiceBag): GameConfigAsset
 	local self: GameConfigAsset = setmetatable(GameConfigAssetBase.new(obj, serviceBag) :: any, GameConfigAsset)

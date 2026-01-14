@@ -18,16 +18,31 @@ local ServiceBag = require("ServiceBag")
 local GameDataStoreService = {}
 GameDataStoreService.ServiceName = "GameDataStoreService"
 
-function GameDataStoreService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type GameDataStoreService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_dataStorePromise: Promise.Promise<DataStore.DataStore>?,
+		_robloxDataStorePromise: Promise.Promise<any>?,
+		_bindToCloseService: any,
+	},
+	{} :: typeof({ __index = GameDataStoreService })
+))
+
+function GameDataStoreService.Init(self: GameDataStoreService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
 
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
-
-	self._maid = Maid.new()
 end
 
-function GameDataStoreService:PromiseDataStore(): Promise.Promise<DataStore>
+--[=[
+	Promises a DataStore for the current game that is synchronized every 5 seconds.
+
+	@return Promise<DataStore>
+]=]
+function GameDataStoreService.PromiseDataStore(self: GameDataStoreService): Promise.Promise<DataStore>
 	if self._dataStorePromise then
 		return self._dataStorePromise
 	end
@@ -48,11 +63,12 @@ function GameDataStoreService:PromiseDataStore(): Promise.Promise<DataStore>
 
 		return dataStore
 	end)
+	assert(self._dataStorePromise, "Typechecking assertion")
 
 	return self._dataStorePromise
 end
 
-function GameDataStoreService:_promiseRobloxDataStore(): Promise.Promise<any>
+function GameDataStoreService._promiseRobloxDataStore(self: GameDataStoreService): Promise.Promise<any>
 	if self._robloxDataStorePromise then
 		return self._robloxDataStorePromise
 	end
@@ -60,14 +76,16 @@ function GameDataStoreService:_promiseRobloxDataStore(): Promise.Promise<any>
 	self._robloxDataStorePromise =
 		self._maid:GivePromise(DataStorePromises.promiseDataStore("GameDataStore", "Version1"))
 
+	assert(self._robloxDataStorePromise, "Typechecking assertion")
+
 	return self._robloxDataStorePromise
 end
 
-function GameDataStoreService:_getKey(): string
+function GameDataStoreService._getKey(_self: GameDataStoreService): string
 	return "version1"
 end
 
-function GameDataStoreService:Destroy()
+function GameDataStoreService.Destroy(self: GameDataStoreService)
 	self._maid:DoCleaning()
 end
 

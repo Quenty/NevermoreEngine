@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides a service for managing centralized player settings. See [SettingsDataService] for the data service.
 

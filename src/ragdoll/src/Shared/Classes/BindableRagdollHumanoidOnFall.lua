@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Ragdolls the humanoid on fall. This is the base class.
 	@class BindableRagdollHumanoidOnFall

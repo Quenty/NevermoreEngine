@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textboxutils",
-  "version": "7.20.0",
+  "version": "7.22.0",
   "description": "Holds utility methods for textboxes",
   "keywords": [
     "Roblox",
@@ -21,13 +21,16 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

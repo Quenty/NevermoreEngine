@@ -88,6 +88,17 @@ function RxPlayerUtils.observeLocalPlayerBrio(): Observable.Observable<Brio.Brio
 end
 
 --[=[
+	Observes the current local player's humanoid
+]=]
+function RxPlayerUtils.observeLocalPlayerHumanoidBrio(): Observable.Observable<Brio.Brio<Player>>
+	return RxPlayerUtils.observeLocalPlayerBrio():Pipe({
+		RxBrioUtils.switchMapBrio(function(player)
+			return RxCharacterUtils.observeLastHumanoidBrio(player)
+		end) :: any,
+	}) :: any
+end
+
+--[=[
 	Observe players as they're added, and as they are.
 	@param predicate ((Player) -> boolean)?
 	@return Observable<Player>

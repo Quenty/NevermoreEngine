@@ -371,4 +371,20 @@ function Table.deepReadonly<T>(target: T): T
 	return Table.readonly(target)
 end
 
+--[=[
+	Reduces a table into a single value.
+
+	@param target table -- Table to reduce
+	@param reducer function -- Reducer function
+	@param initial any -- Initial value
+	@return any -- Result
+]=]
+function Table.reduce<T, U>(target: T, reducer: (U, T) -> U, initial: U): U
+	local result = initial
+	for _, item in target :: any do
+		result = reducer(result, item)
+	end
+	return result
+end
+
 return Table

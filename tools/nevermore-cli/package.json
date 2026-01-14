@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-cli",
-  "version": "4.9.2",
+  "version": "4.12.4",
   "description": "CLI interface for Nevermore",
   "keywords": [
     "Roblox",
@@ -24,13 +24,12 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/cli-output-helpers": "file:../cli-output-helpers",
-    "@quenty/nevermore-template-helpers": "file:../nevermore-template-helpers",
+    "@quenty/cli-output-helpers": "workspace:*",
+    "@quenty/nevermore-template-helpers": "workspace:*",
     "execa": "v5.1.1",
     "find-git-root": "^1.0.4",
     "inquirer": "^8.2.4",
     "node-fetch": "^3.3.2",
-    "read-package-json": "^6.0.0",
     "typescript-memoize": "^1.1.1",
     "yargs": "^17.0.13"
   },
@@ -44,7 +43,8 @@
   "scripts": {
     "build": "tsc --build",
     "watch": "tsc --build --watch",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "preinstall": "npx only-allow pnpm"
   },
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/promptqueue",
-  "version": "1.22.2",
+  "version": "1.27.0",
   "description": "Queue system for prompts and other UI",
   "keywords": [
     "Roblox",
@@ -21,15 +21,20 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/signal": "file:../signal",
-    "@quenty/transitionmodel": "file:../transitionmodel"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/transitionmodel": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

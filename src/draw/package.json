@@ -1,6 +1,6 @@
 {
   "name": "@quenty/draw",
-  "version": "7.9.2",
+  "version": "7.9.5",
   "description": "A utility library to debug things in 3D space for Roblox.",
   "keywords": [
     "Roblox",
@@ -22,6 +22,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -29,7 +32,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*"
   }
 }

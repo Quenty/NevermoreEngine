@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	See [PlayerProductManager] and [PlayerProductManagerClient]
 
@@ -13,17 +14,40 @@ local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigDataService = require("GameConfigDataService")
 local MarketplaceUtils = require("MarketplaceUtils")
+local Observable = require("Observable")
 local PlayerAssetMarketTracker = require("PlayerAssetMarketTracker")
 local PlayerAssetMarketTrackerInterface = require("PlayerAssetMarketTrackerInterface")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
 local Promise = require("Promise")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local String = require("String")
 local TieRealmService = require("TieRealmService")
 
 local PlayerProductManagerBase = setmetatable({}, BaseObject)
 PlayerProductManagerBase.ClassName = "PlayerProductManagerBase"
 PlayerProductManagerBase.__index = PlayerProductManagerBase
+
+export type PlayerProductManagerBase =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_obj: Player,
+			_player: Player,
+			_tieRealmService: TieRealmService.TieRealmService,
+			_gameConfigDataService: GameConfigDataService.GameConfigDataService,
+			_configPicker: any,
+			_assetMarketTrackers: {
+				[GameConfigAssetTypes.GameConfigAssetType]: PlayerAssetMarketTracker.PlayerAssetMarketTracker,
+			},
+			_ownershipTrackers: {
+				[GameConfigAssetTypes.GameConfigAssetType]: PlayerAssetOwnershipTracker.PlayerAssetOwnershipTracker,
+			},
+			_observeNextNoPromptOpen: Observable.Observable<boolean>?,
+		},
+		{} :: typeof({ __index = PlayerProductManagerBase })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new PlayerProductManagerBase, which provides helper methods for
@@ -33,14 +57,14 @@ PlayerProductManagerBase.__index = PlayerProductManagerBase
 	@param serviceBag ServiceBag
 	@return PlayerProductManagerBase
 ]=]
-function PlayerProductManagerBase.new(player, serviceBag)
-	local self = setmetatable(BaseObject.new(player), PlayerProductManagerBase)
+function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.ServiceBag): PlayerProductManagerBase
+	local self: PlayerProductManagerBase = setmetatable(BaseObject.new(player) :: any, PlayerProductManagerBase)
 
 	self._player = assert(player, "No player")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
-	self._gameConfigDataService = self._serviceBag:GetService(GameConfigDataService)
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService :: any)
+	self._gameConfigDataService = self._serviceBag:GetService(GameConfigDataService :: any)
 
 	self._configPicker = self._gameConfigDataService:GetConfigPicker()
 
@@ -78,7 +102,9 @@ function PlayerProductManagerBase.new(player, serviceBag)
 		MarketplaceService:PromptSubscriptionPurchase(self._player, subscriptionId)
 	end))
 
-	self._maid:GiveTask(membership.ShowPromptRequested:Connect(function(membershipType)
+	self._maid:GiveTask(membership.ShowPromptRequested:Connect(function(membershipType: any)
+		-- TODO: membershipType is not a number and checking is wrong
+
 		if membershipType == Enum.MembershipType.Premium then
 			MarketplaceService:PromptPremiumPurchase(self._player)
 		else
@@ -120,8 +146,8 @@ function PlayerProductManagerBase.new(player, serviceBag)
 	return self
 end
 
-function PlayerProductManagerBase:ExportMarketTrackers(parent)
-	for assetType, assetMarketTracker in self._assetMarketTrackers do
+function PlayerProductManagerBase.ExportMarketTrackers(self: PlayerProductManagerBase, parent)
+	for assetType: GameConfigAssetTypes.GameConfigAssetType, assetMarketTracker in self._assetMarketTrackers do
 		local folder = self._maid:Add(Instance.new("Folder"))
 		folder.Name = String.toCamelCase(GameConfigAssetTypeUtils.getPlural(assetType))
 		folder.Archivable = false
@@ -138,7 +164,7 @@ end
 	Gets the current player
 	@return Player
 ]=]
-function PlayerProductManagerBase:GetPlayer(): Player
+function PlayerProductManagerBase.GetPlayer(self: PlayerProductManagerBase): Player
 	return self._obj
 end
 
@@ -147,7 +173,7 @@ end
 	@param assetType GameConfigAssetType
 	@return PlayerAssetMarketTracker
 ]=]
-function PlayerProductManagerBase:IsOwnable(assetType): boolean
+function PlayerProductManagerBase.IsOwnable(self: PlayerProductManagerBase, assetType): boolean
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	return self._ownershipTrackers[assetType] ~= nil
@@ -158,8 +184,8 @@ end
 
 	@return boolean
 ]=]
-function PlayerProductManagerBase:IsPromptOpen(): boolean
-	for _, assetTracker in self._assetMarketTrackers do
+function PlayerProductManagerBase.IsPromptOpen(self: PlayerProductManagerBase): boolean
+	for _, assetTracker: any in self._assetMarketTrackers do
 		if assetTracker:IsPromptOpen() then
 			return true
 		end
@@ -173,18 +199,18 @@ end
 
 	@return Promise
 ]=]
-function PlayerProductManagerBase:PromisePlayerPromptClosed()
+function PlayerProductManagerBase.PromisePlayerPromptClosed(self: PlayerProductManagerBase): Promise.Promise<()>
 	if not self:IsPromptOpen() then
 		return Promise.resolved()
 	end
 
 	if self._observeNextNoPromptOpen then
-		return Rx.toPromise(self._observeNextNoPromptOpen)
+		return Rx.toPromise(self._observeNextNoPromptOpen :: any)
 	end
 
 	local observeOpenCounts = {}
 
-	for assetType, assetTracker in self._assetMarketTrackers do
+	for assetType, assetTracker: any in self._assetMarketTrackers do
 		observeOpenCounts[assetType] = assetTracker:ObservePromptOpenCount()
 	end
 
@@ -197,15 +223,15 @@ function PlayerProductManagerBase:PromisePlayerPromptClosed()
 			end
 
 			return true
-		end),
+		end) :: any,
 		Rx.where(function(value)
 			return value
-		end),
-		Rx.distinct(),
-		Rx.share(),
-	})
+		end) :: any,
+		Rx.distinct() :: any,
+		Rx.share() :: any,
+	}) :: any
 
-	return Rx.toPromise(self._observeNextNoPromptOpen)
+	return Rx.toPromise(self._observeNextNoPromptOpen :: any)
 end
 
 --[=[
@@ -214,7 +240,10 @@ end
 	@param assetType GameConfigAssetType
 	@return PlayerAssetMarketTracker
 ]=]
-function PlayerProductManagerBase:GetAssetTrackerOrError(assetType)
+function PlayerProductManagerBase.GetAssetTrackerOrError(
+	self: PlayerProductManagerBase,
+	assetType: GameConfigAssetTypes.GameConfigAssetType
+): PlayerAssetMarketTracker.PlayerAssetMarketTracker
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	local assetTracker = self._assetMarketTrackers[assetType]
@@ -230,7 +259,10 @@ end
 	@param assetType GameConfigAssetType
 	@return PlayerAssetMarketTracker
 ]=]
-function PlayerProductManagerBase:GetOwnershipTrackerOrError(assetType)
+function PlayerProductManagerBase.GetOwnershipTrackerOrError(
+	self: PlayerProductManagerBase,
+	assetType: GameConfigAssetTypes.GameConfigAssetType
+): PlayerAssetOwnershipTracker.PlayerAssetOwnershipTracker
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	local assetTracker = self._ownershipTrackers[assetType]
@@ -240,7 +272,10 @@ function PlayerProductManagerBase:GetOwnershipTrackerOrError(assetType)
 	return assetTracker
 end
 
-function PlayerProductManagerBase:_addOwnershipTracker(assetType)
+function PlayerProductManagerBase._addOwnershipTracker(
+	self: PlayerProductManagerBase,
+	assetType: GameConfigAssetTypes.GameConfigAssetType
+): PlayerAssetOwnershipTracker.PlayerAssetOwnershipTracker
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(not self._ownershipTrackers[assetType], "Already have ownership tracker")
 
@@ -255,7 +290,10 @@ function PlayerProductManagerBase:_addOwnershipTracker(assetType)
 	return ownershipTracker
 end
 
-function PlayerProductManagerBase:_addAssetTracker(assetType)
+function PlayerProductManagerBase._addAssetTracker(
+	self: PlayerProductManagerBase,
+	assetType: GameConfigAssetTypes.GameConfigAssetType
+): PlayerAssetMarketTracker.PlayerAssetMarketTracker
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(not self._assetMarketTrackers[assetType], "Already have tracker")
 

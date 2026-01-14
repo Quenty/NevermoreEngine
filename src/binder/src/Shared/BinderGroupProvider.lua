@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides a basis for binderGroups that can be retrieved anywhere
 	@class BinderGroupProvider

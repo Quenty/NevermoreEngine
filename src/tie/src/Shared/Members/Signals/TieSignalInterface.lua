@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Interface that mirrors [Signal] API
 
@@ -36,7 +37,13 @@ end
 function TieSignalInterface:Fire(...)
 	local bindableEvent = self:_getBindableEvent()
 	if not bindableEvent then
-		warn(string.format("[TieSignalInterface] - No bindableEvent for %q", self._memberDefinition:GetMemberName()))
+		warn(
+			string.format(
+				"[TieSignalInterface] - No bindableEvent for %q. Skipping fire.",
+				self._memberDefinition:GetMemberName()
+			)
+		)
+		return
 	end
 
 	bindableEvent:Fire(TieUtils.encode(...))

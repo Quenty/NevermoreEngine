@@ -1,6 +1,6 @@
 {
   "name": "@quenty/region3int16utils",
-  "version": "10.9.0",
+  "version": "10.9.3",
   "description": "Module for working with Region3int16",
   "keywords": [
     "Roblox",
@@ -21,12 +21,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/vector3int16utils": "file:../vector3int16utils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/vector3int16utils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

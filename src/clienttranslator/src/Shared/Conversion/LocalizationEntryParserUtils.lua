@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility to build a localization table from json, intended to be used with rojo. Can also handle Rojo json
 	objects turned into tables!

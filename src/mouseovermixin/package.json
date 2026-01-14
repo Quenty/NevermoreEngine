@@ -1,6 +1,6 @@
 {
   "name": "@quenty/mouseovermixin",
-  "version": "10.9.1",
+  "version": "10.9.5",
   "description": "Mouse over mixin for general utility button mouse over effects",
   "keywords": [
     "Roblox",
@@ -22,13 +22,16 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/buttonutils": "file:../buttonutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/buttonutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

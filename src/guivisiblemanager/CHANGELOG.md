@@ -3,6 +3,103 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.15.2...@quenty/guivisiblemanager@12.16.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.15.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.15.1...@quenty/guivisiblemanager@12.15.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [12.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.15.0...@quenty/guivisiblemanager@12.15.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+# [12.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.14.1...@quenty/guivisiblemanager@12.15.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.14.0...@quenty/guivisiblemanager@12.14.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+# [12.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.7...@quenty/guivisiblemanager@12.14.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.13.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.6...@quenty/guivisiblemanager@12.13.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.13.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.5...@quenty/guivisiblemanager@12.13.6) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [12.13.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.4...@quenty/guivisiblemanager@12.13.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.13.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.3...@quenty/guivisiblemanager@12.13.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+
+
+
+
+## [12.13.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.2...@quenty/guivisiblemanager@12.13.3) (2025-12-28)
+
+
+### Bug Fixes
+
+* Typecheck some more things ([41eaaa6](https://github.com/Quenty/NevermoreEngine/commit/41eaaa6d053c469f7548810da72d05dfbf997b26))
+
+
+
+
+
 ## [12.13.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.13.1...@quenty/guivisiblemanager@12.13.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/guivisiblemanager

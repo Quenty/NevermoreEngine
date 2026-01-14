@@ -22,14 +22,16 @@ local ColorSwatch = setmetatable({}, BaseObject)
 ColorSwatch.ClassName = "ColorSwatch"
 ColorSwatch.__index = ColorSwatch
 
-export type ColorSwatch = typeof(setmetatable(
-	{} :: {
-		_color: ValueObject.ValueObject<Color3>,
-		_vividness: ValueObject.ValueObject<number>,
-		Changed: Signal.Signal<Color3, Color3>,
-	},
-	{} :: typeof({ __index = ColorSwatch })
-)) & BaseObject.BaseObject
+export type ColorSwatch =
+	typeof(setmetatable(
+		{} :: {
+			_color: ValueObject.ValueObject<Color3>,
+			_vividness: ValueObject.ValueObject<number>,
+			Changed: Signal.Signal<Color3, Color3>,
+		},
+		{} :: typeof({ __index = ColorSwatch })
+	))
+	& BaseObject.BaseObject
 
 function ColorSwatch.new(color: ValueObject.Mountable<Color3>, vividness: number?): ColorSwatch
 	local self: ColorSwatch = setmetatable(BaseObject.new() :: any, ColorSwatch)

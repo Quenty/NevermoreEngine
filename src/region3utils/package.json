@@ -1,6 +1,6 @@
 {
   "name": "@quenty/region3utils",
-  "version": "10.10.0",
+  "version": "10.11.2",
   "description": "Utility methods for Region3",
   "keywords": [
     "Roblox",
@@ -21,12 +21,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/boundingboxutils": "file:../boundingboxutils",
-    "@quenty/loader": "file:../loader"
+    "@quenty/boundingboxutils": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

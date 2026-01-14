@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	A HSV color picker component which can be used to select colors using
 	an interface standard to Roblox Studio.

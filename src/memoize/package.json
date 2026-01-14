@@ -1,6 +1,6 @@
 {
   "name": "@quenty/memoize",
-  "version": "1.7.1",
+  "version": "1.7.4",
   "description": "Memoization library",
   "keywords": [
     "Roblox",
@@ -21,14 +21,17 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/lrucache": "file:../lrucache",
-    "@quenty/tuple": "file:../tuple",
-    "@quenty/typeutils": "file:../typeutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/lrucache": "workspace:*",
+    "@quenty/tuple": "workspace:*",
+    "@quenty/typeutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

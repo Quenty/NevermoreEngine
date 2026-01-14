@@ -21,6 +21,8 @@ export type RetryOptions = {
 	Returns a promise that will retry the given callback until it succeeds or the max attempts
 	is reached.
 
+	https://exponentialbackoffcalculator.com/
+
 	@param callback function -- Callback that returns a promise
 	@param options RetryOptions -- Options for retrying
 	@return Promise<T>
@@ -33,12 +35,17 @@ function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, op
 
 	local promise = Promise.new()
 	local isLoopResolved = false
+	local start = os.clock()
 
 	local running = task.spawn(function()
 		local waitTime = options.initialWaitTime
 		local lastResults
 
 		for attemptNumber = 1, options.maxAttempts do
+			if not promise:IsPending() then
+				return
+			end
+
 			lastResults = table.pack(callback():Yield())
 
 			if lastResults[1] then
@@ -47,24 +54,30 @@ function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, op
 				return
 			end
 
-			if options.printWarning then
-				warn(
-					string.format(
-						"[PromiseRetryUtils] - Retrying %d/%d due to failure %q",
-						attemptNumber,
-						options.maxAttempts,
-						tostring(lastResults[2])
+			if attemptNumber ~= options.maxAttempts then
+				local thisWaitTime = Math.jitter(waitTime * ((options.exponential or 2) ^ (attemptNumber - 1)))
+				if options.printWarning then
+					warn(
+						string.format(
+							"[PromiseRetryUtils] - Retrying %d/%d (in %fs) due to failure %q",
+							attemptNumber,
+							options.maxAttempts,
+							thisWaitTime,
+							tostring(lastResults[2])
+						)
 					)
-				)
-			end
+				end
 
-			task.wait(Math.jitter(waitTime * ((options.exponential or 2) ^ attemptNumber)))
+				task.wait(thisWaitTime)
+			end
 		end
 
 		isLoopResolved = true
+		local totalTime = os.clock() - start
 		local errorMessage = string.format(
-			"Attempted request %d times before failing with error %s",
+			"Attempted request %d times (over %0.2fs) before failing with error %s",
 			options.maxAttempts,
+			totalTime,
 			tostring(lastResults[2])
 		)
 		promise:Reject(errorMessage, table.unpack(lastResults, 3, lastResults.n))

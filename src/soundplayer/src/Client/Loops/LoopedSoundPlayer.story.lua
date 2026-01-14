@@ -1,15 +1,17 @@
+--!nonstrict
 --[[
 	@class LoopedSoundPlayer.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Blend = require("Blend")
 local LoopedSoundPlayer = require("LoopedSoundPlayer")
-local LoopedSoundScheduleUtils = require("LoopedSoundScheduleUtils")
 local Maid = require("Maid")
 local RandomUtils = require("RandomUtils")
+local SoundLoopScheduleUtils = require("SoundLoopScheduleUtils")
 
 return function(target)
 	local maid = Maid.new()
@@ -104,7 +106,7 @@ return function(target)
 							SoundId = "rbxassetid://6052547865",
 							Volume = 3,
 						},
-						LoopedSoundScheduleUtils.schedule({
+						SoundLoopScheduleUtils.schedule({
 							loopDelay = NumberRange.new(0.25, 1),
 						})
 					)

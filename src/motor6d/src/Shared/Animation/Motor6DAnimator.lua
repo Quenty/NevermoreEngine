@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class Motor6DAnimator
 ]=]
@@ -8,26 +9,51 @@ local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local CFrameUtils = require("CFrameUtils")
+local Draw = require("Draw")
 local Maid = require("Maid")
+local Motor6DTransformer = require("Motor6DTransformer")
 local StepUtils = require("StepUtils")
 local Symbol = require("Symbol")
+
+local DEBUG_VISUALIZE = false
 
 local Motor6DAnimator = setmetatable({}, BaseObject)
 Motor6DAnimator.ClassName = "Motor6DAnimator"
 Motor6DAnimator.__index = Motor6DAnimator
 
-function Motor6DAnimator.new(motor6D)
-	local self = setmetatable(BaseObject.new(motor6D), Motor6DAnimator)
+export type Motor6DAnimator =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Motor6D,
+			_debugAttachment: Attachment?,
+			_lastSetTransform: CFrame?,
+			_previousTransform: CFrame?,
+			_stack: { Motor6DTransformer.Motor6DTransformer },
+			_startAnimation: (self: Motor6DAnimator) -> (),
+		},
+		{} :: typeof({ __index = Motor6DAnimator })
+	))
+	& BaseObject.BaseObject
+
+function Motor6DAnimator.new(motor6D: Motor6D): Motor6DAnimator
+	local self = setmetatable(BaseObject.new(motor6D) :: any, Motor6DAnimator)
 
 	self._stack = {}
 
-	self._startAnimation, self._maid._stopAnimate = StepUtils.bindToSignal(RunService.Stepped, self._updateStepped)
+	self._startAnimation, self._maid._stopAnimate =
+		StepUtils.bindToSignal(RunService.PreSimulation, self._updateStepped)
 	self:_startAnimation()
 
 	return self
 end
 
-function Motor6DAnimator:Push(transformer)
+--[=[
+	Pushes a Motor6DTransformer onto the animation stack.
+
+	@param transformer Motor6DTransformer -- The transformer to push.
+	@return () -> () -- A function to remove the transformer from the stack.
+]=]
+function Motor6DAnimator.Push(self: Motor6DAnimator, transformer: Motor6DTransformer.Motor6DTransformer): () -> ()
 	assert(transformer, "No transformer")
 
 	local symbol = Symbol.named("transformer")
@@ -60,7 +86,11 @@ function Motor6DAnimator:Push(transformer)
 	end
 end
 
-function Motor6DAnimator:_getTransformResult(stackEntry, defaultTransform)
+function Motor6DAnimator._computeNewTransform(
+	self: Motor6DAnimator,
+	stackEntry: Motor6DTransformer.Motor6DTransformer,
+	defaultTransform: CFrame
+): CFrame?
 	return stackEntry:Transform(function()
 		local index = table.find(self._stack, stackEntry)
 		if not index then
@@ -70,7 +100,7 @@ function Motor6DAnimator:_getTransformResult(stackEntry, defaultTransform)
 
 		local belowIndex = index - 1
 		if self._stack[belowIndex] then
-			local belowResult = self:_getTransformResult(self._stack[belowIndex], defaultTransform)
+			local belowResult = self:_computeNewTransform(self._stack[belowIndex], defaultTransform)
 			if belowResult then
 				return belowResult
 			else
@@ -82,9 +112,26 @@ function Motor6DAnimator:_getTransformResult(stackEntry, defaultTransform)
 	end)
 end
 
-function Motor6DAnimator:_updateStepped()
+function Motor6DAnimator._updateStepped(self: Motor6DAnimator): ()
 	debug.profilebegin("motor6danimator")
-	local current = self._stack[#self._stack]
+	local current: Motor6DTransformer.Motor6DTransformer? = self._stack[#self._stack] :: any
+
+	if DEBUG_VISUALIZE then
+		local maid = Maid.new()
+
+		self._debugAttachment = self._debugAttachment or Instance.new("Attachment")
+		assert(self._debugAttachment, "No debug attachment")
+		self._debugAttachment.Archivable = false
+		self._debugAttachment.Name = "Motor6DAnimatorDebug"
+		self._debugAttachment.CFrame = self._obj.C0
+		self._debugAttachment.Parent = self._obj.Part0
+
+		local billBoard: BillboardGui =
+			maid:Add(Draw.text(self._debugAttachment, if current then "Animating" else "Idle")) :: any
+		billBoard.Size = UDim2.fromScale(billBoard.Size.X.Scale / 5, billBoard.Size.Y.Scale / 5)
+
+		self._maid._debugState = maid
+	end
 
 	-- Detect animation
 	local currentTransform = self._obj.Transform
@@ -96,6 +143,7 @@ function Motor6DAnimator:_updateStepped()
 		end
 
 		if not didAnimationPlay then
+			assert(self._previousTransform, "No previous transform")
 			unmodifiedTransform = self._previousTransform
 		end
 	else
@@ -108,10 +156,10 @@ function Motor6DAnimator:_updateStepped()
 		return false
 	end
 
-	local result = self:_getTransformResult(current, unmodifiedTransform)
-	if result then
-		self._lastSetTransform = result
-		self._obj.Transform = result
+	local transformOverride: CFrame? = self:_computeNewTransform(current, unmodifiedTransform)
+	if transformOverride then
+		self._lastSetTransform = transformOverride
+		self._obj.Transform = transformOverride
 		debug.profileend()
 		return true
 	else
@@ -122,7 +170,7 @@ function Motor6DAnimator:_updateStepped()
 	end
 end
 
-function Motor6DAnimator:_resetTransform(unmodifiedTransform)
+function Motor6DAnimator._resetTransform(self: Motor6DAnimator, unmodifiedTransform: CFrame): ()
 	self._obj.Transform = unmodifiedTransform
 	self._lastSetTransform = nil
 	self._previousTransform = nil

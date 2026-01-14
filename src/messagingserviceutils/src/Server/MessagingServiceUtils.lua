@@ -26,7 +26,7 @@ function MessagingServiceUtils.promisePublish(topic: string, message: any?): Pro
 
 	return Promise.spawn(function(resolve, reject)
 		if DEBUG_PUBLISH then
-			print(string.format("Publishing on %q: ", topic), HttpService:JSONEncode(message))
+			print(string.format("Publishing on %q: ", topic), MessagingServiceUtils.toHumanReadable(message))
 		end
 
 		local ok, err = pcall(function()
@@ -42,6 +42,11 @@ function MessagingServiceUtils.promisePublish(topic: string, message: any?): Pro
 	end)
 end
 
+export type SubscriptionData = {
+	Data: any,
+	Sent: number,
+}
+
 --[=[
 	Wraps MessagingService:SubscribeAsync(topic, callback)
 	@param topic string
@@ -50,7 +55,7 @@ end
 ]=]
 function MessagingServiceUtils.promiseSubscribe(
 	topic: string,
-	callback: (...any) -> ...any
+	callback: (SubscriptionData) -> ()
 ): Promise.Promise<RBXScriptConnection>
 	assert(type(topic) == "string", "Bad topic")
 	assert(type(callback) == "function", "Bad callback")
@@ -59,8 +64,8 @@ function MessagingServiceUtils.promiseSubscribe(
 		print(string.format("Listening on %q", topic))
 
 		local oldCallback = callback
-		callback = function(message)
-			print(string.format("Recieved on %q", topic), HttpService:JSONEncode(message))
+		callback = function(message: SubscriptionData)
+			print(string.format("Recieved on %q", topic), MessagingServiceUtils.toHumanReadable(message))
 			oldCallback(message)
 		end
 	end
@@ -79,6 +84,14 @@ function MessagingServiceUtils.promiseSubscribe(
 
 		return resolve(connection)
 	end)
+end
+
+function MessagingServiceUtils.toHumanReadable(message: any)
+	if type(message) ~= "table" then
+		return tostring(message)
+	end
+
+	return HttpService:JSONEncode(message)
 end
 
 return MessagingServiceUtils

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/softshutdown",
-  "version": "9.30.2",
+  "version": "9.35.0",
   "description": "This service lets you shut down servers without losing a bunch of players. When game.OnClose is called, the script teleports everyone in the server into a reserved server.",
   "keywords": [
     "Roblox",
@@ -22,6 +22,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -29,24 +32,24 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/basicpane": "file:../basicpane",
-    "@quenty/bindtocloseservice": "file:../bindtocloseservice",
-    "@quenty/blend": "file:../blend",
-    "@quenty/clienttranslator": "file:../clienttranslator",
-    "@quenty/coreguienabler": "file:../coreguienabler",
-    "@quenty/datastore": "file:../datastore",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/table": "file:../table",
-    "@quenty/teleportserviceutils": "file:../teleportserviceutils",
-    "@quenty/uiobjectutils": "file:../uiobjectutils",
-    "@quenty/valuebaseutils": "file:../valuebaseutils",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/basicpane": "workspace:*",
+    "@quenty/bindtocloseservice": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/clienttranslator": "workspace:*",
+    "@quenty/coreguienabler": "workspace:*",
+    "@quenty/datastore": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/teleportserviceutils": "workspace:*",
+    "@quenty/uiobjectutils": "workspace:*",
+    "@quenty/valuebaseutils": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   }
 }

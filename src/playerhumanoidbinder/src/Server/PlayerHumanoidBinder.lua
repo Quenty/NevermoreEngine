@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Binder that will automatically bind to each player's humanoid
 	@class PlayerHumanoidBinder
@@ -24,7 +25,7 @@ PlayerHumanoidBinder.__index = PlayerHumanoidBinder
 	@param ... any
 	@return PlayerHumanoidBinder<T>
 ]=]
-function PlayerHumanoidBinder.new(tag, class, ...)
+function PlayerHumanoidBinder.new(tag: string, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerHumanoidBinder)
 
 	return self

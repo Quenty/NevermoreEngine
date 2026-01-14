@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ugcsanitize",
-  "version": "1.7.2",
+  "version": "1.10.0",
   "description": "Sanitizes UGC hats and other items",
   "keywords": [
     "Roblox",
@@ -21,15 +21,18 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/string": "file:../string"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/string": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.13.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.13.5...@quenty/servicebag@11.13.6) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [11.13.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.13.4...@quenty/servicebag@11.13.5) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+## [11.13.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.13.3...@quenty/servicebag@11.13.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+## [11.13.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.13.2...@quenty/servicebag@11.13.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+## [11.13.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.13.1...@quenty/servicebag@11.13.2) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
 ## [11.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.13.0...@quenty/servicebag@11.13.1) (2025-08-12)
 
 **Note:** Version bump only for package @quenty/servicebag

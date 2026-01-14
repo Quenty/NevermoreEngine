@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility service to enable or disable mouse shift lock on the fly on Roblox.
 

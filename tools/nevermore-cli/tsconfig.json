@@ -5,7 +5,9 @@
     "rootDir": "./src",
     "declarationDir": "./dist"
   },
-  "include": [
-    "src/**/*"
-  ]
+  "references": [
+    { "path": "../cli-output-helpers" },
+    { "path": "../nevermore-template-helpers" }
+  ],
+  "include": ["src/**/*"]
 }

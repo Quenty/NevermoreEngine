@@ -1,6 +1,6 @@
 {
   "name": "@quenty/particleengine",
-  "version": "13.21.2",
+  "version": "13.24.0",
   "description": "Adds GUI based particle engine to Roblox",
   "keywords": [
     "Roblox",
@@ -21,14 +21,18 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty",
     "AxisAngles"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/table": "file:../table"
+    "@quenty/loader": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

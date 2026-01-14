@@ -26,7 +26,7 @@
 Code in Nevermore has powered over a billion play sessions on Roblox. Nevermore is used in all [Studio Koi Koi](https://studiokoikoi.com/) games, as well as many other games on Roblox.
 
 ## Install using npm
-Nevermore is designed to use [npm](https://www.npmjs.com/) to manage packages. You can install a package like this.
+Nevermore is designed to use [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/) to manage packages. You can install a package like this.
 
 ```
 npm install @quenty/maid
@@ -171,7 +171,7 @@ There are 270 packages in Nevermore.
 | [HumanoidUtils](https://quenty.github.io/NevermoreEngine/api/HumanoidUtils) | General humanoid utility code. | `npm i @quenty/humanoidutils` | [docs](https://quenty.github.io/NevermoreEngine/api/HumanoidUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/humanoidutils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/humanoidutils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/humanoidutils) |
 | [IdleService](https://quenty.github.io/NevermoreEngine/api/IdleService) | Helps track whether or not a player is idle and if so, then can show UI or other cute things. | `npm i @quenty/idleservice` | [docs](https://quenty.github.io/NevermoreEngine/api/IdleService) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/idleservice) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/idleservice/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/idleservice) |
 | [IK](https://quenty.github.io/NevermoreEngine/api/IKService) | Inverse Kinematics for characters on Roblox | `npm i @quenty/ik` | [docs](https://quenty.github.io/NevermoreEngine/api/IKService) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/ik) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/ik/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/ik) |
-| [InfluxDBClient](https://quenty.github.io/NevermoreEngine/api/InfluxDBClientUtils) | Provides a Roblox Lua InfluxDB client | `npm i @quenty/influxdbclient` | [docs](https://quenty.github.io/NevermoreEngine/api/InfluxDBClientUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/influxdbclient) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/influxdbclient/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/influxdbclient) |
+| [InfluxDBClient](https://quenty.github.io/NevermoreEngine/api/InfluxDBClient) | Provides a Roblox Lua InfluxDB client | `npm i @quenty/influxdbclient` | [docs](https://quenty.github.io/NevermoreEngine/api/InfluxDBClient) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/influxdbclient) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/influxdbclient/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/influxdbclient) |
 | [InputKeyMapUtils](https://quenty.github.io/NevermoreEngine/api/InputKeyMapList) | System to define rebindable key bindings and inputs for Roblox. | `npm i @quenty/inputkeymaputils` | [docs](https://quenty.github.io/NevermoreEngine/api/InputKeyMapList) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/inputkeymaputils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/inputkeymaputils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/inputkeymaputils) |
 | [InputMode](https://quenty.github.io/NevermoreEngine/api/InputMode) | Trace input mode state and trigger changes correctly | `npm i @quenty/inputmode` | [docs](https://quenty.github.io/NevermoreEngine/api/InputMode) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/inputmode) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/inputmode/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/inputmode) |
 | [InputObjectUtils](https://quenty.github.io/NevermoreEngine/api/InputObjectRayUtils) | Provides utility functions involving input objects | `npm i @quenty/inputobjectutils` | [docs](https://quenty.github.io/NevermoreEngine/api/InputObjectRayUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/inputobjectutils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/inputobjectutils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/inputobjectutils) |
@@ -226,8 +226,8 @@ There are 270 packages in Nevermore.
 | [PlayerHumanoidBinder](https://quenty.github.io/NevermoreEngine/api/PlayerHumanoidBinder) | Binder that will automatically bind to each player's humanoid | `npm i @quenty/playerhumanoidbinder` | [docs](https://quenty.github.io/NevermoreEngine/api/PlayerHumanoidBinder) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/playerhumanoidbinder) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/playerhumanoidbinder/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/playerhumanoidbinder) |
 | [PlayerInputMode](https://quenty.github.io/NevermoreEngine/api/PlayerInputModeService) | Service that takes active input modes from the player and exposes it to every other player via the server. | `npm i @quenty/playerinputmode` | [docs](https://quenty.github.io/NevermoreEngine/api/PlayerInputModeService) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/playerinputmode) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/playerinputmode/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/playerinputmode) |
 | [PlayersServicePromises](https://quenty.github.io/NevermoreEngine/api/PlayersServicePromises) | Utility methods for async methods in Players service | `npm i @quenty/playersservicepromises` | [docs](https://quenty.github.io/NevermoreEngine/api/PlayersServicePromises) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/playersservicepromises) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/playersservicepromises/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/playersservicepromises) |
-| [PlayerThumbnailUtils](https://quenty.github.io/NevermoreEngine/api/PlayerThumbnailUtils) | Utility methods to query policies for players from PolicyService. | `npm i @quenty/policyserviceutils` | [docs](https://quenty.github.io/NevermoreEngine/api/PlayerThumbnailUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/policyserviceutils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/policyserviceutils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/policyserviceutils) |
 | [PlayerThumbnailUtils](https://quenty.github.io/NevermoreEngine/api/PlayerThumbnailUtils) | Reimplementation of Player:GetUserThumbnailAsync but as a promise with retry logic | `npm i @quenty/playerthumbnailutils` | [docs](https://quenty.github.io/NevermoreEngine/api/PlayerThumbnailUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/playerthumbnailutils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/playerthumbnailutils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/playerthumbnailutils) |
+| [PlayerThumbnailUtils](https://quenty.github.io/NevermoreEngine/api/PlayerThumbnailUtils) | Utility methods to query policies for players from PolicyService. | `npm i @quenty/policyserviceutils` | [docs](https://quenty.github.io/NevermoreEngine/api/PlayerThumbnailUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/policyserviceutils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/policyserviceutils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/policyserviceutils) |
 | [PlayerUtils](https://quenty.github.io/NevermoreEngine/api/PlayerUtils) | Player utility functions | `npm i @quenty/playerutils` | [docs](https://quenty.github.io/NevermoreEngine/api/PlayerUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/playerutils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/playerutils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/playerutils) |
 | [PolynomialUtils](https://quenty.github.io/NevermoreEngine/api/PolynomialUtils) | Solves polynomials of certain degrees. | `npm i @quenty/polynomialutils` | [docs](https://quenty.github.io/NevermoreEngine/api/PolynomialUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/polynomialutils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/polynomialutils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/polynomialutils) |
 | [PreferredParentUtils](https://quenty.github.io/NevermoreEngine/api/PreferredParentUtils) | Handles logic for creating a "preferred" parent container or erroring if it already exists | `npm i @quenty/preferredparentutils` | [docs](https://quenty.github.io/NevermoreEngine/api/PreferredParentUtils) | [source](https://github.com/Quenty/NevermoreEngine/tree/main/src/preferredparentutils) | [changelog](https://github.com/Quenty/NevermoreEngine/tree/main/src/preferredparentutils/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@quenty/preferredparentutils) |
@@ -336,3 +336,20 @@ There are 270 packages in Nevermore.
 <!--package-list-generated-end-->
 
 To update this package list run `python ./tools/update_readme.py`.
+
+## Linting
+
+In order to pass linting please run the following checks locally, within the Nevermore directory.
+
+```
+npm run lint:luau
+npm run lint:moonwave
+npm run lint:selene
+npm run lint:stylua
+```
+
+To fix stylua formatting you can run the following
+
+```
+npm run format
+```

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles the replication of inverse kinematics (IK) from clients to servers
 

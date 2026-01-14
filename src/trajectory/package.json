@@ -1,6 +1,6 @@
 {
   "name": "@quenty/trajectory",
-  "version": "2.10.2",
+  "version": "2.10.5",
   "description": "Utility function for estimating low and high arcs of projectiles. Solves for bullet drop given",
   "keywords": [
     "Roblox",
@@ -22,6 +22,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -29,7 +32,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/draw": "file:../draw",
-    "@quenty/loader": "file:../loader"
+    "@quenty/draw": "workspace:*",
+    "@quenty/loader": "workspace:*"
   }
 }

@@ -16,13 +16,15 @@ local ScoredActionPicker = setmetatable({}, BaseObject)
 ScoredActionPicker.ClassName = "ScoredActionPicker"
 ScoredActionPicker.__index = ScoredActionPicker
 
-export type ScoredActionPicker = typeof(setmetatable(
-	{} :: {
-		_actionSet: { [ScoredAction.ScoredAction]: boolean },
-		_currentPreferred: ValueObject.ValueObject<ScoredAction.ScoredAction?>,
-	},
-	{} :: typeof({ __index = ScoredActionPicker })
-)) & BaseObject.BaseObject
+export type ScoredActionPicker =
+	typeof(setmetatable(
+		{} :: {
+			_actionSet: { [ScoredAction.ScoredAction]: boolean },
+			_currentPreferred: ValueObject.ValueObject<ScoredAction.ScoredAction?>,
+		},
+		{} :: typeof({ __index = ScoredActionPicker })
+	))
+	& BaseObject.BaseObject
 
 function ScoredActionPicker.new()
 	local self: ScoredActionPicker = setmetatable(BaseObject.new() :: any, ScoredActionPicker)

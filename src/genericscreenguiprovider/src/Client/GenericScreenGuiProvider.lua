@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Providers screenGuis with a given display order for easy use.
 
@@ -13,7 +14,7 @@
 
 	```lua
 	-- Load your games provider (see above for the registration)
-	local screenGuiProvider = require("ScreenGuiProvider")
+	local screenGuiProvider = require("GenericScreenGuiProvider")
 
 	-- Yay, you now have a new screen gui
 	local screenGui = screenGuiProvider:Get("CLOCK")

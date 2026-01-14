@@ -1,6 +1,6 @@
 {
   "name": "@quenty/vector3int16utils",
-  "version": "2.2.1",
+  "version": "2.2.3",
   "description": "Module for working with Vector3int16",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

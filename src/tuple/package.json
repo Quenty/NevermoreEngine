@@ -1,6 +1,6 @@
 {
   "name": "@quenty/tuple",
-  "version": "1.6.0",
+  "version": "1.6.3",
   "description": "Tuple utility package",
   "keywords": [
     "Roblox",
@@ -21,12 +21,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/lrucache": "file:../lrucache"
+    "@quenty/loader": "workspace:*",
+    "@quenty/lrucache": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

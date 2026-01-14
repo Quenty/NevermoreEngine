@@ -3,6 +3,103 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.25.2...@quenty/firstpersoncharactertransparency@14.26.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.25.1...@quenty/firstpersoncharactertransparency@14.25.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [14.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.25.0...@quenty/firstpersoncharactertransparency@14.25.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [14.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.24.1...@quenty/firstpersoncharactertransparency@14.25.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.24.0...@quenty/firstpersoncharactertransparency@14.24.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [14.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.7...@quenty/firstpersoncharactertransparency@14.24.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.23.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.6...@quenty/firstpersoncharactertransparency@14.23.7) (2026-01-03)
+
+
+### Bug Fixes
+
+* Fix missing servicebag dependencies ([ba2274e](https://github.com/Quenty/NevermoreEngine/commit/ba2274ec070356518a157d80f912b05de9f74451))
+
+
+
+
+
+## [14.23.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.5...@quenty/firstpersoncharactertransparency@14.23.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.23.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.4...@quenty/firstpersoncharactertransparency@14.23.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.23.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.3...@quenty/firstpersoncharactertransparency@14.23.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+## [14.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.2...@quenty/firstpersoncharactertransparency@14.23.3) (2025-12-28)
+
+
+### Bug Fixes
+
+* Typecheck some more things ([41eaaa6](https://github.com/Quenty/NevermoreEngine/commit/41eaaa6d053c469f7548810da72d05dfbf997b26))
+
+
+
+
+
 ## [14.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.23.1...@quenty/firstpersoncharactertransparency@14.23.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/firstpersoncharactertransparency

@@ -12,12 +12,14 @@ local TouchButtonScoredActionPicker = setmetatable({}, BaseObject)
 TouchButtonScoredActionPicker.ClassName = "TouchButtonScoredActionPicker"
 TouchButtonScoredActionPicker.__index = TouchButtonScoredActionPicker
 
-export type TouchButtonScoredActionPicker = typeof(setmetatable(
-	{} :: {
-		_actionSet: { [any]: boolean },
-	},
-	{} :: typeof({ __index = TouchButtonScoredActionPicker })
-)) & BaseObject.BaseObject
+export type TouchButtonScoredActionPicker =
+	typeof(setmetatable(
+		{} :: {
+			_actionSet: { [any]: boolean },
+		},
+		{} :: typeof({ __index = TouchButtonScoredActionPicker })
+	))
+	& BaseObject.BaseObject
 
 function TouchButtonScoredActionPicker.new(): TouchButtonScoredActionPicker
 	local self: TouchButtonScoredActionPicker = setmetatable(BaseObject.new() :: any, TouchButtonScoredActionPicker)

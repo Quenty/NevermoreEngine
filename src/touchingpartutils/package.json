@@ -1,6 +1,6 @@
 {
   "name": "@quenty/touchingpartutils",
-  "version": "2.2.3",
+  "version": "2.2.5",
   "description": "Utility to get touching parts on a Roblox part. This acts as a performance-friendly way to query Roblox's spatial tree.",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

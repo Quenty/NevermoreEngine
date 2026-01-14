@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cubicspline",
-  "version": "10.9.0",
+  "version": "10.9.3",
   "description": "Cubic Spline implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -22,14 +22,17 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "AxisAngles",
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binarysearch": "file:../binarysearch",
-    "@quenty/linearsystemssolver": "file:../linearsystemssolver",
-    "@quenty/loader": "file:../loader"
+    "@quenty/binarysearch": "workspace:*",
+    "@quenty/linearsystemssolver": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

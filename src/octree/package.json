@@ -1,6 +1,6 @@
 {
   "name": "@quenty/octree",
-  "version": "11.9.2",
+  "version": "11.9.6",
   "description": "Octree implementation for Roblox - fast spatial queries",
   "keywords": [
     "Roblox",
@@ -22,12 +22,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/draw": "file:../draw",
-    "@quenty/loader": "file:../loader"
+    "@quenty/draw": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

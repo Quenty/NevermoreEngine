@@ -3,6 +3,119 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.29.1...@quenty/highlight@10.30.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.29.0...@quenty/highlight@10.29.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.28.1...@quenty/highlight@10.29.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.28.0...@quenty/highlight@10.28.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.27.1...@quenty/highlight@10.28.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.27.0...@quenty/highlight@10.27.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.4...@quenty/highlight@10.27.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.26.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.3...@quenty/highlight@10.26.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.26.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.2...@quenty/highlight@10.26.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [10.26.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.1...@quenty/highlight@10.26.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+## [10.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.26.0...@quenty/highlight@10.26.1) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.3...@quenty/highlight@10.26.0) (2025-12-28)
+
+
+### Features
+
+* Update declarations and README.md ([882056f](https://github.com/Quenty/NevermoreEngine/commit/882056f4c012f9855a0581750968993fb18241ed))
+
+
+
+
+
+## [10.25.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.2...@quenty/highlight@10.25.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
 ## [10.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.25.1...@quenty/highlight@10.25.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/highlight

@@ -87,7 +87,7 @@ export type Binder<T> = typeof(setmetatable(
 	Constructs a new binder object.
 
 	```lua
-	local binder = Binder.new("Bird", function(inst)
+	local binder = Binder.new("MyClass", function(inst)
 		print("Wow, a new bird!", inst)
 
 		return {
@@ -365,7 +365,7 @@ end
 	Returns a new signal that will fire whenever a class is bound to the binder
 
 	```lua
-	local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
+	local birdBinder = Binder.new("MyClass", require("MyClass")) -- Load bird into binder
 
 	birdBinder:GetClassAddedSignal():Connect(function(bird)
 		bird:Squack() -- Make the bird squack when it's first spawned
@@ -421,7 +421,7 @@ end
 	Returns all of the classes in a new table.
 
 	```lua
-	local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
+	local birdBinder = Binder.new("MyClass", require("MyClass")) -- Load bird into binder
 
 	-- Update every bird every frame
 	RunService.Stepped:Connect(function()
@@ -447,7 +447,7 @@ end
 	Faster method to get all items in a binder
 
 	```lua
-	local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
+	local birdBinder = Binder.new("MyClass", require("MyClass")) -- Load bird into binder
 
 	-- Update every bird every frame
 	RunService.Stepped:Connect(function()

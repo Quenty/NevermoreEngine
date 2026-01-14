@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Generated XboxOneLight with Python
 	@class XboxOneLight

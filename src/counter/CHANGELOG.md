@@ -3,6 +3,108 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.23.2...@quenty/counter@7.24.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+## [7.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.23.1...@quenty/counter@7.23.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [7.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.23.0...@quenty/counter@7.23.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+# [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.22.1...@quenty/counter@7.23.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+## [7.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.22.0...@quenty/counter@7.22.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+# [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.21.8...@quenty/counter@7.22.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+## [7.21.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.21.7...@quenty/counter@7.21.8) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+## [7.21.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.21.6...@quenty/counter@7.21.7) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+## [7.21.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.21.5...@quenty/counter@7.21.6) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+## [7.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.21.4...@quenty/counter@7.21.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+## [7.21.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.21.3...@quenty/counter@7.21.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+## [7.21.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.21.2...@quenty/counter@7.21.3) (2025-12-11)
+
+
+### Bug Fixes
+
+* Fix dependencies and linting within Roblox's typechecking ([#611](https://github.com/Quenty/NevermoreEngine/issues/611)) ([92011ea](https://github.com/Quenty/NevermoreEngine/commit/92011eac0f2ff31c1434e3642bd63f49025ee982))
+
+
+
+
+
 ## [7.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.21.1...@quenty/counter@7.21.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/counter

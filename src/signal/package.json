@@ -1,6 +1,6 @@
 {
   "name": "@quenty/signal",
-  "version": "7.11.1",
+  "version": "7.11.5",
   "description": "A simple signal implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -23,6 +23,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -30,6 +33,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   }
 }

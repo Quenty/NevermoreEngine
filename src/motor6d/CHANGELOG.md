@@ -3,6 +3,124 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.32.1...@quenty/motor6d@7.33.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.32.0...@quenty/motor6d@7.32.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [7.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.31.1...@quenty/motor6d@7.32.0) (2026-01-11)
+
+
+### Features
+
+* Upgrade Motor6D stack to have more helpful interface methods ([32dea08](https://github.com/Quenty/NevermoreEngine/commit/32dea080ebf5a97c92b07ad2d3f76bfe406551ae))
+
+
+
+
+
+## [7.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.31.0...@quenty/motor6d@7.31.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+# [7.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.30.0...@quenty/motor6d@7.31.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.29.1...@quenty/motor6d@7.30.0) (2026-01-06)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.29.0...@quenty/motor6d@7.29.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+# [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.7...@quenty/motor6d@7.29.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.28.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.6...@quenty/motor6d@7.28.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.28.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.5...@quenty/motor6d@7.28.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.28.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.4...@quenty/motor6d@7.28.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.28.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.3...@quenty/motor6d@7.28.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.28.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.2...@quenty/motor6d@7.28.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
+## [7.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.1...@quenty/motor6d@7.28.2) (2025-12-13)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
+
 ## [7.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.28.0...@quenty/motor6d@7.28.1) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/motor6d

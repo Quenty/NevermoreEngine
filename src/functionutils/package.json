@@ -1,6 +1,6 @@
 {
   "name": "@quenty/functionutils",
-  "version": "2.3.0",
+  "version": "2.3.2",
   "description": "Utility functions involving functions",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

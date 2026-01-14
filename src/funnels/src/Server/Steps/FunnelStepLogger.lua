@@ -17,16 +17,18 @@ local FunnelStepLogger = setmetatable({}, BaseObject)
 FunnelStepLogger.ClassName = "FunnelStepLogger"
 FunnelStepLogger.__index = FunnelStepLogger
 
-export type FunnelStepLogger = typeof(setmetatable(
-	{} :: {
-		_player: Player,
-		_stepTracker: FunnelStepTracker.FunnelStepTracker,
-		_funnelName: string,
-		_funnelSessionId: string,
-		_printDebugEnabled: boolean,
-	},
-	{} :: typeof({ __index = FunnelStepLogger })
-)) & BaseObject.BaseObject
+export type FunnelStepLogger =
+	typeof(setmetatable(
+		{} :: {
+			_player: Player,
+			_stepTracker: FunnelStepTracker.FunnelStepTracker,
+			_funnelName: string,
+			_funnelSessionId: string,
+			_printDebugEnabled: boolean,
+		},
+		{} :: typeof({ __index = FunnelStepLogger })
+	))
+	& BaseObject.BaseObject
 
 function FunnelStepLogger.new(player: Player, funnelName: string): FunnelStepLogger
 	local self: any = setmetatable(BaseObject.new() :: any, FunnelStepLogger)

@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class ServerMain
 ]]
@@ -19,7 +20,7 @@ serviceBag:GetService(require("GameConfigService")):AddAsset("FrogOnHead", 45565
 
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 
-local function makePrompt(assetType, idOrKey, cframe)
+local function makePrompt(assetType: GameConfigAssetTypes.GameConfigAssetType, idOrKey: number | string, cframe: CFrame)
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	local promptPart = Instance.new("Part")

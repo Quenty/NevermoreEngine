@@ -5,13 +5,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
         with:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
 
       - name: Setup npm for GitHub Packages
         run: |
@@ -23,8 +29,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Link and install packages
-        run: npm run build:link
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' --filter '!./tools/nevermore-vscode' run build
+
+      - name: Install nevermore-cli locally
+        run: npm install --ignore-scripts -g .
+        working-directory: tools/nevermore-cli
 
       - name: Generate Sourcemap
         run: npm run build:sourcemap
@@ -36,13 +49,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
         with:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: stylua check
         run: npm run lint:stylua
@@ -51,31 +65,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
         with:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
 
-      - name: Generate standard library
-        run: selene generate-roblox-std
-
-      - name: Run Selene
-        run: selene src
+      - name: selene check
+        run: npm run lint:selene
 
   moonwave:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
         with:
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: Run moonwave-extractor
-        run: moonwave-extractor extract src
+        run: npm run lint:moonwave

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/sprites",
-  "version": "13.19.3",
+  "version": "13.22.0",
   "description": "Spritesheet utility for Roblox including a built-in InputImageLibrary",
   "keywords": [
     "Roblox",
@@ -22,17 +22,20 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/uiobjectutils": "file:../uiobjectutils"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/uiobjectutils": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/string": "file:../string"
+    "@quenty/string": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -1,0 +1,92 @@
+name: linting
+on: [pull_request, workflow_call]
+jobs:
+  luau-lsp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - name: Setup npm for GitHub Packages
+        run: |
+          if [[ -n "$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" ]]; then
+            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> .npmrc
+            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> ~/.npmrc
+          fi
+
+          if [[ -n "$NPM_TOKEN" ]]; then
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          fi
+        env:
+          NPM_GITHUB_QUENTYSTUDIOS_TOKEN: $\{{ secrets.NPM_GITHUB_QUENTYSTUDIOS_TOKEN }}
+          NPM_TOKEN: $\{{ secrets.NPM_TOKEN }}
+
+      - name: Link and install packages
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Sourcemap
+        run: npm run build:sourcemap
+
+      - name: luau-lsp analyze
+        run: npm run lint:luau
+
+  stylua:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: stylua check
+        run: npm run lint:stylua
+
+  selene:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Run Selene
+        run: npm run lint:selene
+
+  moonwave:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Run moonwave-extractor
+        run: npm run lint:moonwave

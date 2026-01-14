@@ -24,15 +24,17 @@ local Vector3Utils = require("Vector3Utils")
 local OverrideDefaultCameraToo = {}
 OverrideDefaultCameraToo.ClassName = "OverrideDefaultCameraToo"
 
-export type OverrideDefaultCameraToo = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		BaseCamera: CameraEffectUtils.CameraEffect,
-		DefaultCamera: CameraEffectUtils.CameraEffect,
-		Predicate: ((CameraState.CameraState) -> boolean)?,
-	},
-	{} :: typeof({ __index = OverrideDefaultCameraToo })
-)) & CameraEffectUtils.CameraEffect
+export type OverrideDefaultCameraToo =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			BaseCamera: CameraEffectUtils.CameraEffect,
+			DefaultCamera: CameraEffectUtils.CameraEffect,
+			Predicate: ((CameraState.CameraState) -> boolean)?,
+		},
+		{} :: typeof({ __index = OverrideDefaultCameraToo })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	Initializes a new OverrideDefaultCameraToo

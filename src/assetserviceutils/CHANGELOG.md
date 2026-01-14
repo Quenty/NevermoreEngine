@@ -3,6 +3,84 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.24.2...@quenty/assetserviceutils@5.25.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+
+
+
+
+## [5.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.24.1...@quenty/assetserviceutils@5.24.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [5.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.24.0...@quenty/assetserviceutils@5.24.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+
+
+
+
+# [5.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.23.0...@quenty/assetserviceutils@5.24.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+
+
+
+
+# [5.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.22.6...@quenty/assetserviceutils@5.23.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+
+
+
+
+## [5.22.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.22.5...@quenty/assetserviceutils@5.22.6) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+
+
+
+
+## [5.22.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.22.4...@quenty/assetserviceutils@5.22.5) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [5.22.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.22.3...@quenty/assetserviceutils@5.22.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+
+
+
+
+## [5.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.22.2...@quenty/assetserviceutils@5.22.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+
+
+
+
 ## [5.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.22.1...@quenty/assetserviceutils@5.22.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/assetserviceutils

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/pagesutils",
-  "version": "5.13.0",
+  "version": "5.14.0",
   "description": "Utilities to advance over the Roblox pages API surface",
   "keywords": [
     "Roblox",
@@ -22,13 +22,16 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/promise": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

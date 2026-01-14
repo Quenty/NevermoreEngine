@@ -1,6 +1,6 @@
 {
   "name": "@quenty/qgui",
-  "version": "2.4.1",
+  "version": "2.4.4",
   "description": "A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

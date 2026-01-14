@@ -1,6 +1,6 @@
 {
   "name": "@quenty/localizedtextutils",
-  "version": "12.20.1",
+  "version": "12.23.0",
   "description": "Localized text utils which changes translationKey structures to shared locations",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -28,9 +31,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promisemaid": "file:../promisemaid",
-    "@quenty/rx": "file:../rx"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/promisemaid": "workspace:*",
+    "@quenty/rx": "workspace:*"
   }
 }

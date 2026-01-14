@@ -20,15 +20,17 @@ local HeartbeatCamera = {}
 HeartbeatCamera.ClassName = "HeartbeatCamera"
 HeartbeatCamera.ProfileName = "HeartbeatCamera"
 
-export type HeartbeatCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		_maid: Maid.Maid,
-		_camera: CameraEffectUtils.CameraEffect,
-		_currentStateCache: CameraState.CameraState,
-	},
-	{} :: typeof({ __index = HeartbeatCamera })
-)) & CameraEffectUtils.CameraEffect
+export type HeartbeatCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			_maid: Maid.Maid,
+			_camera: CameraEffectUtils.CameraEffect,
+			_currentStateCache: CameraState.CameraState,
+		},
+		{} :: typeof({ __index = HeartbeatCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 function HeartbeatCamera.new(camera: CameraEffectUtils.CameraEffect): HeartbeatCamera
 	local self: HeartbeatCamera = setmetatable({} :: any, HeartbeatCamera)

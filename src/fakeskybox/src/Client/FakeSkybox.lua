@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Allow transitions between skyboxes
 	@class FakeSkybox

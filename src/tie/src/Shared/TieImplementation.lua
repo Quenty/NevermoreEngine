@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	This class represents the implementation for a given definition. For the lifetime
 	of the class, this implementation will be exposed to consumption by both someone
@@ -17,6 +18,21 @@ local TieImplementation = setmetatable({}, BaseObject)
 TieImplementation.ClassName = "TieImplementation"
 TieImplementation.__index = TieImplementation
 
+export type TieImplementation<T> =
+	typeof(setmetatable(
+		{} :: {
+			_tieDefinition: any,
+			_adornee: Instance,
+			_actualSelf: any,
+			_implementationTieRealm: TieRealms.TieRealm,
+			_implParent: Instance,
+			_memberImplementations: { [string]: any },
+			_memberMap: { [string]: any },
+		},
+		{} :: typeof({ __index = TieImplementation })
+	))
+	& T
+
 --[=[
 	Constructs a new implementation. Use [TieDefinition.Implement] instead of using this directly.
 
@@ -25,15 +41,15 @@ TieImplementation.__index = TieImplementation
 	@param implementer table
 	@param implementationTieRealm TieRealm
 ]=]
-function TieImplementation.new(
+function TieImplementation.new<T>(
 	tieDefinition,
 	adornee: Instance,
 	implementer,
 	implementationTieRealm: TieRealms.TieRealm
-)
+): TieImplementation<T>
 	assert(TieRealmUtils.isTieRealm(implementationTieRealm), "Bad implementationTieRealm")
 
-	local self = setmetatable(BaseObject.new(), TieImplementation)
+	local self: TieImplementation<T> = setmetatable(BaseObject.new() :: any, TieImplementation)
 
 	self._tieDefinition = assert(tieDefinition, "No definition")
 	self._adornee = assert(adornee, "No adornee")
@@ -41,6 +57,7 @@ function TieImplementation.new(
 	self._implementationTieRealm = assert(implementationTieRealm, "Bad implementationTieRealm")
 
 	self._implParent = self._maid:Add(Instance.new(tieDefinition:GetNewImplClass(implementationTieRealm)))
+	self._implParent.Name = self._tieDefinition:GetNewContainerName(self._implementationTieRealm)
 	self._implParent.Archivable = false
 
 	self._memberImplementations = {}
@@ -55,22 +72,22 @@ function TieImplementation.new(
 		self._maid:DoCleaning()
 
 		for key, _ in pairs(self) do
-			rawset(self, key, nil)
+			rawset(self :: any, key, nil)
 		end
 	end)
 
 	return self
 end
 
-function TieImplementation:GetImplementationTieRealm()
+function TieImplementation.GetImplementationTieRealm<T>(self: TieImplementation<T>): TieRealms.TieRealm
 	return self._implementationTieRealm
 end
 
-function TieImplementation:GetImplParent()
+function TieImplementation.GetImplParent<T>(self: TieImplementation<T>): Instance
 	return self._implParent
 end
 
-function TieImplementation:__index(index)
+function TieImplementation.__index<T>(self: TieImplementation<T>, index)
 	if TieImplementation[index] then
 		return TieImplementation[index]
 	end
@@ -84,12 +101,12 @@ function TieImplementation:__index(index)
 		or index == "_memberMap"
 		or index == "_actualSelf"
 	then
-		return rawget(self, index)
+		return rawget(self :: any, index)
 	end
 
-	local memberMap = rawget(self, "_memberMap")
+	local memberMap = rawget(self :: any, "_memberMap")
 	local memberDefinition = memberMap[index]
-	local implementationTieRealm = rawget(self, "_implementationTieRealm")
+	local implementationTieRealm = rawget(self :: any, "_implementationTieRealm")
 
 	if memberDefinition then
 		if memberDefinition:IsAllowedForImplementation(self._implementationTieRealm) then
@@ -108,7 +125,7 @@ function TieImplementation:__index(index)
 	end
 end
 
-function TieImplementation:__newindex(index, value)
+function TieImplementation.__newindex<T>(self: TieImplementation<T>, index, value)
 	if
 		index == "_implParent"
 		or index == "_adornee"
@@ -118,7 +135,7 @@ function TieImplementation:__newindex(index, value)
 		or index == "_memberMap"
 		or index == "_actualSelf"
 	then
-		rawset(self, index, value)
+		rawset(self :: any, index, value)
 	elseif self._memberImplementations[index] then
 		self._memberImplementations[index]:SetImplementation(value, self._actualSelf)
 	elseif TieImplementation[index] then
@@ -128,7 +145,7 @@ function TieImplementation:__newindex(index, value)
 	end
 end
 
-function TieImplementation:_buildMemberImplementations(implementer)
+function TieImplementation._buildMemberImplementations<T>(self: TieImplementation<T>, implementer)
 	for _, memberDefinition in self._memberMap do
 		local memberName = memberDefinition:GetMemberName()
 		local found = nil
@@ -154,11 +171,9 @@ function TieImplementation:_buildMemberImplementations(implementer)
 		)
 		self._memberImplementations[memberDefinition:GetMemberName()] = memberImplementation
 	end
-
-	self._implParent.Name = self._tieDefinition:GetNewContainerName(self._implementationTieRealm)
 end
 
-function TieImplementation:_getErrorMessageForNotAllowedMember(memberDefinition)
+function TieImplementation._getErrorMessageForNotAllowedMember<T>(self: TieImplementation<T>, memberDefinition)
 	local errorMessage = string.format(
 		"[TieImplementation] - Member implements %s only member %s (we are a %s implementation)",
 		memberDefinition:GetMemberTieRealm(),
@@ -181,7 +196,7 @@ function TieImplementation:_getErrorMessageForNotAllowedMember(memberDefinition)
 	return errorMessage
 end
 
-function TieImplementation:_getErrorMessageRequiredMember(memberDefinition)
+function TieImplementation._getErrorMessageRequiredMember<T>(self: TieImplementation<T>, memberDefinition)
 	local errorMessage = string.format(
 		"[TieImplementation] - Missing %s member %s (we are a %s implementation)",
 		memberDefinition:GetMemberTieRealm(),

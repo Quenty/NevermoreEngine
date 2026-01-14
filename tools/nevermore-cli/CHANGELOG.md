@@ -3,6 +3,98 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.12.4](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.12.3...@quenty/nevermore-cli@4.12.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/Nevermore/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [4.12.3](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.12.2...@quenty/nevermore-cli@4.12.3) (2026-01-12)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+## [4.12.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.12.1...@quenty/nevermore-cli@4.12.2) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+## [4.12.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.12.0...@quenty/nevermore-cli@4.12.1) (2026-01-09)
+
+
+### Bug Fixes
+
+* Linting uses npm run lint:moonwave ([#630](https://github.com/Quenty/Nevermore/issues/630)) ([8b6ff9d](https://github.com/Quenty/Nevermore/commit/8b6ff9da717422b0b92cc55759f0b109d0161d24))
+
+
+
+
+
+# [4.12.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.11.0...@quenty/nevermore-cli@4.12.0) (2026-01-08)
+
+
+### Features
+
+* Nevermore init generates complaint luau-lsp checking that can be pushed to github immediately and pass CI/CD ([7aaabed](https://github.com/Quenty/Nevermore/commit/7aaabed2d35be08ca2f4956cfb6e87371e939c2f))
+
+
+
+
+
+# [4.11.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.10.0...@quenty/nevermore-cli@4.11.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+# [4.10.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.5...@quenty/nevermore-cli@4.10.0) (2026-01-05)
+
+
+### Features
+
+* Add Nevermore-VSCode extension ([#625](https://github.com/Quenty/Nevermore/issues/625)) ([2057ef5](https://github.com/Quenty/Nevermore/commit/2057ef5b1648d6ccac5c956e35d5c866a56d9c9f))
+
+
+
+
+
+## [4.9.5](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.4...@quenty/nevermore-cli@4.9.5) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+## [4.9.4](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.3...@quenty/nevermore-cli@4.9.4) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+## [4.9.3](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.2...@quenty/nevermore-cli@4.9.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
 ## [4.9.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.9.1...@quenty/nevermore-cli@4.9.2) (2025-08-07)
 
 
