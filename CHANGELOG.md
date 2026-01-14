@@ -1,3 +1,16 @@
+# (Wed Jan 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.3.0`, `@quenty/nevermore-cli-helpers@1.1.0`, `@quenty/nevermore-cli@4.13.0`, `@quenty/nevermore-template-helpers@1.5.0`
+  - feat: Nevermore CLI now checks to make sure it is up to date [#637](https://github.com/Quenty/NevermoreEngine/pull/637) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jan 13 2026)
 
 #### 🚀 Enhancement
