@@ -1,3 +1,16 @@
+# v4.13.1 (Wed Jan 14 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Fix missing dependencies in game packages [#638](https://github.com/Quenty/NevermoreEngine/pull/638) ([@Quenty](https://github.com/Quenty))
+- fix: Update linting defaults to also activate on main ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

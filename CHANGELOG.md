@@ -1,5 +1,18 @@
 # (Wed Jan 14 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.13.1`
+  - fix: Fix missing dependencies in game packages [#638](https://github.com/Quenty/NevermoreEngine/pull/638) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jan 14 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/cli-output-helpers@1.3.0`, `@quenty/nevermore-cli-helpers@1.1.0`, `@quenty/nevermore-cli@4.13.0`, `@quenty/nevermore-template-helpers@1.5.0`
