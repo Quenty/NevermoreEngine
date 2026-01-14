@@ -1,23 +1,18 @@
-# v4.13.2 (Wed Jan 14 2026)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, euvinkeel ([@euvinkeel](https://github.com/euvinkeel)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: use import.meta.url to define __dirname [#642](https://github.com/Quenty/NevermoreEngine/pull/642) ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.13.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.13.1...@quenty/nevermore-cli@4.13.2) (2026-01-14)
+
+
+### Bug Fixes
+
+* use import.meta.url to define __dirname ([#642](https://github.com/Quenty/Nevermore/issues/642)) ([c2a4036](https://github.com/Quenty/Nevermore/commit/c2a4036aec55040084119052839d9ec170cc6c5d))
+
+
+
+
 
 ## [4.13.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.13.0...@quenty/nevermore-cli@4.13.1) (2026-01-14)
 
