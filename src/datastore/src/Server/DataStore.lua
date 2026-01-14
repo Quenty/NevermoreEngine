@@ -81,6 +81,7 @@ local PromiseMaidUtils = require("PromiseMaidUtils")
 local PromiseRetryUtils = require("PromiseRetryUtils")
 local PromiseUtils = require("PromiseUtils")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
@@ -179,16 +180,41 @@ function DataStore.SetSessionLockingEnabled(self: DataStore, sessionLockingEnabl
 			self._sessionLockingEnabledHelper = DataStoreLockHelper.new(self)
 			self._maid._sessionLockingEnabledHelper = self._sessionLockingEnabledHelper
 		end
+	else
+		self._sessionLockingEnabledHelper = nil
+		self._maid._sessionLockingEnabledHelper = nil
+	end
+end
 
-		if not self._sessionMessagingEnabledHelper then
-			self._sessionMessagingEnabledHelper = DataStoreMessageHelper.new(self)
+--[=[
+	Sets session messaging enabled.
+
+	Currently this only works in conjunction with session locking, and allows for a session lock
+	to gracefully close when requested by another session.
+
+	@param isEnabled boolean
+	@param serviceBag ServiceBag -- Required when enabling
+]=]
+function DataStore.SetSessionMessagingEnabled(
+	self: DataStore,
+	isEnabled: boolean,
+	serviceBag: ServiceBag.ServiceBag
+): ()
+	if isEnabled then
+		assert(serviceBag, "Must provide serviceBag when enabling session messaging")
+
+		if
+			self._sessionMessagingEnabledHelper == nil
+			or self._sessionMessagingEnabledHelper:GetServiceBag() ~= serviceBag
+		then
+			self._maid._sessionMessagingEnabledHelper = nil
+			self._sessionMessagingEnabledHelper = nil
+
+			self._sessionMessagingEnabledHelper = DataStoreMessageHelper.new(serviceBag, self)
 			self._maid._sessionMessagingEnabledHelper = self._sessionMessagingEnabledHelper
 		end
 	else
-		self._sessionLockingEnabledHelper = nil
 		self._sessionMessagingEnabledHelper = nil
-
-		self._maid._sessionLockingEnabledHelper = nil
 		self._maid._sessionMessagingEnabledHelper = nil
 	end
 end
@@ -618,7 +644,11 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 							if self._sessionMessagingEnabledHelper and tryMessagingServiceSessionClose then
 								-- Gracefully kick to avoid losing memory
 								self._sessionMessagingEnabledHelper
-									:PromiseCloseSessionGraceful(lockResult.blockingSession.SessionId)
+									:PromiseCloseSessionGraceful(
+										lockResult.blockingSession.PlaceId,
+										lockResult.blockingSession.JobId,
+										lockResult.blockingSession.SessionId
+									)
 									:Then(function()
 										-- Give enough time for Roblox to replicate changes
 										-- We probably could bump back to the loop but this has slightly better error messages

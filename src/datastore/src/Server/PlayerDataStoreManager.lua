@@ -60,6 +60,7 @@ local Maid = require("Maid")
 local PendingPromiseTracker = require("PendingPromiseTracker")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
+local ServiceBag = require("ServiceBag")
 
 local PlayerDataStoreManager = setmetatable({}, BaseObject)
 PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"
@@ -73,6 +74,7 @@ export type PlayerDataStoreManager =
 	typeof(setmetatable(
 		{} :: {
 			_robloxDataStore: any,
+			_serviceBag: ServiceBag.ServiceBag,
 			_keyGenerator: KeyGenerator,
 			_datastores: { [PlayerUserId]: DataStore.DataStore },
 			_removing: { [PlayerUserId]: boolean },
@@ -93,6 +95,7 @@ export type PlayerDataStoreManager =
 	@return PlayerDataStoreManager
 ]=]
 function PlayerDataStoreManager.new(
+	serviceBag: ServiceBag.ServiceBag,
 	robloxDataStore: DataStore,
 	keyGenerator: KeyGenerator,
 	skipBindingToClose: boolean?
@@ -101,8 +104,9 @@ function PlayerDataStoreManager.new(
 
 	assert(type(skipBindingToClose) == "boolean" or skipBindingToClose == nil, "Bad skipBindingToClose")
 
-	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
-	self._keyGenerator = keyGenerator or error("No keyGenerator")
+	self._robloxDataStore = assert(robloxDataStore, "No robloxDataStore")
+	self._keyGenerator = assert(keyGenerator, "No keyGenerator")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid._savingConns = Maid.new()
 
@@ -220,9 +224,10 @@ function PlayerDataStoreManager._createDataStore(
 
 	local maid = Maid.new()
 
-	-- TODO: Destroy DataStore after cleanup
+	-- DataStore is cleaned up very carefully in _removePlayerDataStore
 	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(userId))
 	datastore:SetSessionLockingEnabled(true)
+	datastore:SetSessionMessagingEnabled(true, self._serviceBag)
 	datastore:SetUserIdList({ userId })
 
 	maid:GivePromise(datastore:PromiseSessionLockingFailed()):Then(function()
@@ -260,9 +265,13 @@ function PlayerDataStoreManager._createDataStore(
 	return datastore
 end
 
-function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreManager, userId: PlayerUserId)
+function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreManager, userId: PlayerUserId): ()
 	local datastore = self._datastores[userId]
 	if not datastore then
+		return
+	end
+
+	if self._removing[userId] then
 		return
 	end
 

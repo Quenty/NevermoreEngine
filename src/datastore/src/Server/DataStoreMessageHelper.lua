@@ -1,5 +1,4 @@
 --!strict
-
 --[=[
     @class DataStoreMessageHelper
 ]=]
@@ -8,8 +7,10 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local MessagingServiceUtils = require("MessagingServiceUtils")
+local PlaceMessagingService = require("PlaceMessagingService")
 local Promise = require("Promise")
 local PromiseMaidUtils = require("PromiseMaidUtils")
+local ServiceBag = require("ServiceBag")
 
 local DEBUG_LOG = false
 
@@ -21,6 +22,8 @@ export type DataStoreMessageHelper =
 	typeof(setmetatable(
 		{} :: {
 			_dataStore: any,
+			_serviceBag: ServiceBag.ServiceBag,
+			_placeMessagingService: PlaceMessagingService.PlaceMessagingService,
 			_sessionClosedNotifications: { [string]: Promise.Promise<()> },
 		},
 		{} :: typeof({ __index = DataStoreMessageHelper })
@@ -38,30 +41,47 @@ export type CloseSessionComplete = {
 
 export type DataStoreMessage = CloseSessionRequest | CloseSessionComplete
 
-function DataStoreMessageHelper.new(dataStore: any): DataStoreMessageHelper
+function DataStoreMessageHelper.new(serviceBag: ServiceBag.ServiceBag, dataStore: any): DataStoreMessageHelper
 	local self: DataStoreMessageHelper = setmetatable(BaseObject.new() :: any, DataStoreMessageHelper)
+
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._placeMessagingService = self._serviceBag:GetService(PlaceMessagingService :: any)
 
 	self._dataStore = assert(dataStore, "No dataStore")
 	self._sessionClosedNotifications = {}
 
-	-- Explicitly don't give to maid so wecan disconnect the subscription before destroying
-	MessagingServiceUtils.promiseSubscribe(self:_getActiveStoreTopic(self._dataStore:GetSessionId()), function(data)
-		self:_handleSubscription(data)
-	end):Then(function(subscription)
-		if not self.Destroy then
-			subscription:Disconnect()
-		end
-
-		self._maid:GiveTask(function()
-			subscription:Disconnect()
-		end)
-	end)
+	self._maid:GiveTask(
+		self._placeMessagingService
+			:ObserveMessages(self:_getActiveStoreTopic(self._dataStore:GetSessionId()))
+			:Subscribe(function(data, metadata)
+				self:_handleSubscription(data, metadata)
+			end)
+	)
 
 	return self
 end
 
+--[=[
+	Returns the service bag used by this helper. (Used for comparison)
+
+	@return ServiceBag
+]=]
+function DataStoreMessageHelper.GetServiceBag(self: DataStoreMessageHelper): ServiceBag.ServiceBag
+	return self._serviceBag
+end
+
+--[=[
+	Promises a graceful close session notification to other sessions.
+
+	@param placeId number
+	@param jobId string
+	@param sessionId string
+	@return Promise<()>
+]=]
 function DataStoreMessageHelper.PromiseCloseSessionGraceful(
 	self: DataStoreMessageHelper,
+	placeId: number,
+	jobId: string,
 	sessionId: string
 ): Promise.Promise<()>
 	local promise: any = self._sessionClosedNotifications[sessionId]
@@ -84,7 +104,7 @@ function DataStoreMessageHelper.PromiseCloseSessionGraceful(
 		end))
 	end)
 
-	return self:PromiseMessage(sessionId, {
+	return self:PromiseSendSessionMessage(placeId, jobId, sessionId, {
 		type = "close-session",
 		requesterSessionId = self._dataStore:GetSessionId(),
 	}):Then(function()
@@ -92,8 +112,19 @@ function DataStoreMessageHelper.PromiseCloseSessionGraceful(
 	end)
 end
 
-function DataStoreMessageHelper.PromiseMessage(
+--[=[
+	Promises sending a message to another DataStore session.
+
+	@param placeId number
+	@param jobId string
+	@param sessionId string
+	@param message DataStoreMessage
+	@return Promise<()>
+]=]
+function DataStoreMessageHelper.PromiseSendSessionMessage(
 	self: DataStoreMessageHelper,
+	placeId: number,
+	jobId: string,
 	sessionId: string,
 	message: DataStoreMessage
 ): Promise.Promise<()>
@@ -103,14 +134,15 @@ function DataStoreMessageHelper.PromiseMessage(
 		print("[DataStoreMessageHelper] - Sending message:", MessagingServiceUtils.toHumanReadable(message))
 	end
 
-	return self._maid:GivePromise(MessagingServiceUtils.promisePublish(self:_getActiveStoreTopic(sessionId), message))
+	local topic = self:_getActiveStoreTopic(sessionId)
+	return self._maid:GivePromise(self._placeMessagingService:SendMessage(placeId, jobId, topic, message))
 end
 
 function DataStoreMessageHelper._handleSubscription(
 	self: DataStoreMessageHelper,
-	subscriptionData: MessagingServiceUtils.SubscriptionData
-)
-	local data = subscriptionData.Data
+	data: any,
+	metadata: PlaceMessagingService.PlacePacketMetadata
+): ()
 	if type(data) ~= "table" or type(data.type) ~= "string" then
 		warn(`[DataStoreMessageHelper] - Received malformed message: {MessagingServiceUtils.toHumanReadable(data)}`)
 		return
@@ -129,13 +161,10 @@ function DataStoreMessageHelper._handleSubscription(
 
 			closeSessionPromise:Then(function()
 				-- We could have GCed by now, but try to send off a notification to the requester
-				MessagingServiceUtils.promisePublish(
-					topic,
-					{
-						type = "close-session-complete",
-						senderId = senderId,
-					} :: CloseSessionComplete
-				)
+				self._placeMessagingService:SendMessageToAddress(metadata.from, topic, {
+					type = "close-session-complete",
+					senderId = senderId,
+				})
 			end)
 		end
 	elseif data.type == "close-session-complete" then

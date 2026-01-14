@@ -41,9 +41,10 @@ function PlayerDataStoreService.Init(self: PlayerDataStoreService, serviceBag: S
 
 	-- External
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
+	self._serviceBag:GetService(require("PlaceMessagingService"))
 
+	-- State
 	self._promiseStarted = self._maid:Add(Promise.new())
-
 	self._dataStoreName = "PlayerData"
 	self._dataStoreScope = "SaveData"
 end
@@ -140,7 +141,7 @@ function PlayerDataStoreService.PromiseManager(
 			return DataStorePromises.promiseDataStore(self._dataStoreName, self._dataStoreScope)
 		end)
 		:Then(function(dataStore)
-			local manager = self._maid:Add(PlayerDataStoreManager.new(dataStore, function(player)
+			local manager = self._maid:Add(PlayerDataStoreManager.new(self._serviceBag, dataStore, function(player)
 				if type(player) == "number" then
 					return tostring(player)
 				else

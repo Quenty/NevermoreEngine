@@ -2727,9 +2727,21 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
+      '@quenty/statestack':
+        specifier: workspace:*
+        version: link:../statestack
 
   src/metricutils: {}
 

@@ -30,7 +30,11 @@
   ],
   "dependencies": {
     "@quenty/loader": "workspace:*",
-    "@quenty/promise": "workspace:*"
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/statestack": "workspace:*"
   },
   "devDependencies": {
     "@quenty/loader": "workspace:*"
