@@ -5,11 +5,11 @@
 import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { TemplateHelper } from '@quenty/nevermore-template-helpers';
-import { NevermoreGlobalArgs } from '../args/global-args';
+import { NevermoreGlobalArgs } from '../args/global-args.js';
 import {
   getTemplatePathByName,
   runCommandAsync,
-} from '../utils/nevermore-cli-utils';
+} from '../utils/nevermore-cli-utils.js';
 
 export interface PackArgs extends NevermoreGlobalArgs {
   packageDirectory: string;

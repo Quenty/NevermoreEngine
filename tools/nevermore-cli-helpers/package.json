@@ -1,6 +1,6 @@
 {
-  "name": "@quenty/cli-output-helpers",
-  "version": "1.2.5",
+  "name": "@quenty/nevermore-cli-helpers",
+  "version": "1.0.0",
   "description": "Helpers to generate Nevermore package and game templates",
   "type": "module",
   "keywords": [
@@ -8,26 +8,30 @@
     "Raven",
     "CLI"
   ],
-  "main": "dist/outputHelper.js",
+  "main": "dist/utils.js",
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/Nevermore.git",
-    "directory": "tools/cli-output-helpers/"
+    "directory": "tools/nevermore-cli-helpers/"
   },
   "license": "UNLICENSED",
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "chalk": "^4.1.2"
+    "@quenty/cli-output-helpers": "workspace:*",
+    "latest-version": "^9.0.0",
+    "semver": "^7.6.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.4",
+    "@types/semver": "^7.5.0",
     "prettier": "2.7.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-memoize": "^1.1.1"
   },
   "scripts": {
     "build": "tsc --build",

@@ -2,6 +2,7 @@
   "name": "@quenty/nevermore-template-helpers",
   "version": "1.4.2",
   "description": "Helpers to generate Nevermore package and game templates",
+  "type": "module",
   "keywords": [
     "Roblox",
     "Raven",
@@ -23,19 +24,19 @@
   "dependencies": {
     "@quenty/cli-output-helpers": "workspace:*",
     "chalk": "^4.1.2",
-    "execa": "v5.1.1",
+    "execa": "9.6.1",
     "handlebars": "^4.7.7",
     "typescript-memoize": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^18.11.4",
     "prettier": "2.7.1",
-    "typescript": "^4.8.4"
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "build": "tsc --build",
-    "watch": "tsc --build --watch",
-    "clean": "tsc --build --clean",
+    "build:watch": "tsc --build --watch",
+    "build:clean": "tsc --build --clean",
     "preinstall": "npx only-allow pnpm"
   },
   "publishConfig": {
