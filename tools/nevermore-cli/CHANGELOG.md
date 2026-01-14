@@ -1,3 +1,19 @@
+# v4.13.2 (Wed Jan 14 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, euvinkeel ([@euvinkeel](https://github.com/euvinkeel)), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: use import.meta.url to define __dirname [#642](https://github.com/Quenty/NevermoreEngine/pull/642) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
