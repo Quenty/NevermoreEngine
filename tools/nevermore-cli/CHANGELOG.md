@@ -1,20 +1,18 @@
-# v4.13.1 (Wed Jan 14 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing dependencies in game packages [#638](https://github.com/Quenty/NevermoreEngine/pull/638) ([@Quenty](https://github.com/Quenty))
-- fix: Update linting defaults to also activate on main ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.13.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.13.0...@quenty/nevermore-cli@4.13.1) (2026-01-14)
+
+
+### Bug Fixes
+
+* Update linting defaults to also activate on main ([e26e988](https://github.com/Quenty/Nevermore/commit/e26e988856c0a33acbc559e23521d4af5d1185d8))
+
+
+
+
 
 # [4.13.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.12.4...@quenty/nevermore-cli@4.13.0) (2026-01-14)
 
