@@ -1,4 +1,8 @@
-type ToTuple<T> = T extends unknown[] ? T : [T];
+type ToTuple<T> = [T] extends [LuaTuple<infer V>] ? V : [T];
+
+type Resolve<T> = (...args: ToTuple<T>) => void;
+type Reject = (error: unknown) => void;
+type ResolveReject<T> = (resolve: Resolve<T>, reject: Reject) => void;
 
 type Promise<T = void> = {
   Then<R>(
@@ -23,6 +27,12 @@ interface PromiseConstructor {
       reject: (error: unknown) => void
     ) => void
   ): Promise<T>;
+
+  spawn: <T>(func: ResolveReject<T>) => Promise<T>;
+  delay: <T>(seconds: number, func: ResolveReject<T>) => Promise<T>;
+  defer: <T>(func: ResolveReject<T>) => Promise<T>;
+  resolved: <T>(...values: ToTuple<T>) => Promise<T>;
+  rejected: (...args: unknown[]) => Promise;
 
   isPromise: (value: unknown) => value is Promise<unknown>;
 }
