@@ -30,7 +30,8 @@
     "@types/node": "^18.11.4",
     "@types/semver": "^7.5.0",
     "prettier": "2.7.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-memoize": "^1.1.1"
   },
   "scripts": {
     "build": "tsc --build",

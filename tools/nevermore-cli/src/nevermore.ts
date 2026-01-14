@@ -9,7 +9,7 @@ import { hideBin } from 'yargs/helpers';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { checkForUpdatesAsync } from '@quenty/nevermore-cli-helpers';
+import { VersionChecker } from '@quenty/nevermore-cli-helpers';
 
 import { InitGameCommand } from './commands/init-game-command.js';
 import { InitPackageCommand } from './commands/init-package-command.js';
@@ -19,7 +19,7 @@ import { InstallPackageCommand } from './commands/install-package-command.js';
 import { TestProjectCommand } from './commands/test-project-command.js';
 import { DownloadRobloxTypes } from './commands/download-roblox-types.js';
 
-await checkForUpdatesAsync({
+const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Nevermore CLI',
   packageName: '@quenty/nevermore-cli',
   registryUrl: 'https://registry.npmjs.org/',
@@ -31,7 +31,7 @@ await checkForUpdatesAsync({
 
 yargs(hideBin(process.argv))
   .scriptName('nevermore')
-  .version()
+  .version(versionData?.currentVersion as any)
   .option('yes', {
     description: 'True if this run should not prompt the user in any way',
     default: false,
