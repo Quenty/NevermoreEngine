@@ -30,7 +30,7 @@ require("PromiseRemoteEventMixin"):Add(RagdollHumanoidOnFallClient, RagdollHuman
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnFallClient
 ]=]
-function RagdollHumanoidOnFallClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function RagdollHumanoidOnFallClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFallClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
