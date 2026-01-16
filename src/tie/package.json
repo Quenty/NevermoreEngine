@@ -35,6 +35,7 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/collectionserviceutils": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

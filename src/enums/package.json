@@ -1,13 +1,12 @@
 {
-  "name": "@quenty/rbxthumb",
-  "version": "5.11.2",
-  "description": "Wraps the rbxthumb URL api surface.",
+  "name": "@quenty/enums",
+  "version": "1.0.0",
+  "description": "Custom Luau enum implementation",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "Thumbnail",
-    "rbxthumb"
+    "enums"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -15,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/rbxthumb/"
+    "directory": "src/enums/"
   },
   "funding": {
     "type": "patreon",
@@ -28,12 +27,11 @@
   "contributors": [
     "Quenty"
   ],
+  "dependencies": {
+    "@quenty/loader": "workspace:*",
+    "@quentystudios/t": "^3.0.0"
+  },
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "@quenty/enums": "workspace:*",
-    "@quenty/loader": "workspace:*",
-    "@quenty/table": "workspace:*"
   }
 }

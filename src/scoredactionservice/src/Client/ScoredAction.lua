@@ -23,7 +23,7 @@ export type ScoredAction =
 		{} :: {
 			PreferredChanged: Signal.Signal<boolean>,
 			Removing: Signal.Signal<()>,
-			EnabledChanged: Signal.Signal<boolean>,
+			EnabledChanged: Signal.Signal<(boolean, boolean, ...any)>,
 
 			-- Private
 			_isEnabled: ValueObject.ValueObject<boolean>,
@@ -48,7 +48,7 @@ function ScoredAction.new(): ScoredAction
 	self._preferredStack = self._maid:Add(StateStack.new(false, "boolean"))
 	self._isEnabled = self._maid:Add(ValueObject.new(true, "boolean"))
 
-	self.EnabledChanged = self._isEnabled.Changed :: Signal.Signal<boolean>
+	self.EnabledChanged = self._isEnabled.Changed
 
 	--[=[
 	@prop PreferredChanged Signal<boolean>

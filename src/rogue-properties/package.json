@@ -34,6 +34,7 @@
     "@quenty/brio": "workspace:*",
     "@quenty/defaultvalueutils": "workspace:*",
     "@quenty/ducktype": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/jsonutils": "workspace:*",
     "@quenty/linkutils": "workspace:*",

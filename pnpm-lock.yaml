@@ -1022,6 +1022,9 @@ importers:
       '@quenty/blend':
         specifier: workspace:*
         version: link:../blend
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
@@ -1637,6 +1640,15 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
 
+  src/enums:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quentystudios/t':
+        specifier: ^3.0.0
+        version: 3.0.0
+
   src/enumutils: {}
 
   src/equippedtracker:
@@ -1822,6 +1834,9 @@ importers:
       '@quenty/cmdrservice':
         specifier: workspace:*
         version: link:../cmdrservice
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
@@ -3072,6 +3087,9 @@ importers:
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/grouputils':
         specifier: workspace:*
         version: link:../grouputils
@@ -3159,6 +3177,9 @@ importers:
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/inputmode':
         specifier: workspace:*
         version: link:../inputmode
@@ -3518,6 +3539,9 @@ importers:
 
   src/rbxthumb:
     dependencies:
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -3593,6 +3617,9 @@ importers:
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
@@ -3779,6 +3806,9 @@ importers:
       '@quenty/ducktype':
         specifier: workspace:*
         version: link:../ducktype
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
@@ -4718,6 +4748,9 @@ importers:
       '@quenty/ducktype':
         specifier: workspace:*
         version: link:../ducktype
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/insertserviceutils':
         specifier: workspace:*
         version: link:../insertserviceutils
@@ -4853,6 +4886,9 @@ importers:
       '@quenty/collectionserviceutils':
         specifier: workspace:*
         version: link:../collectionserviceutils
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils

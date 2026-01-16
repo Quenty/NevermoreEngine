@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/grouputils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
