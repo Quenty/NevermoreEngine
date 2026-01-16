@@ -1,20 +1,18 @@
-# v15.40.0 (Fri Jan 16 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add SimpleEnum package and interface [#644](https://github.com/Quenty/NevermoreEngine/pull/644) ([@Quenty](https://github.com/Quenty))
-- feat: Add luau typing to a variety of classes ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.39.0...@quenty/ragdoll@15.40.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+
+
+
+
 
 # [15.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.38.1...@quenty/ragdoll@15.39.0) (2026-01-13)
 

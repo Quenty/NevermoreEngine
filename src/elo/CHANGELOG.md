@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.27.0...@quenty/elo@7.28.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/elo
+
+
+
+
+
 # [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.26.1...@quenty/elo@7.27.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/elo

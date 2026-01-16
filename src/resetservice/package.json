@@ -1,6 +1,6 @@
 {
   "name": "@quenty/resetservice",
-  "version": "11.28.0",
+  "version": "11.29.0",
   "description": "Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly",
   "keywords": [
     "Roblox",
