@@ -34,7 +34,7 @@ local RogueHumanoidBase = setmetatable({}, BaseObject)
 RogueHumanoidBase.ClassName = "RogueHumanoidBase"
 RogueHumanoidBase.__index = RogueHumanoidBase
 
-function RogueHumanoidBase.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function RogueHumanoidBase.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RogueHumanoidBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

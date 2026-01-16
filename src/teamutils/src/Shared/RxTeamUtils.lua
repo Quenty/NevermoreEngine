@@ -18,6 +18,12 @@ local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxTeamUtils = {}
 
+--[=[
+	Observes the team of a player, returning nil if neutral.
+
+	@param player Player
+	@return Observable<Team?>
+]=]
 function RxTeamUtils.observePlayerTeam(player: Player): Observable.Observable<Team?>
 	return Rx.combineLatest({
 		team = RxInstanceUtils.observeProperty(player, "Team"),
@@ -33,6 +39,12 @@ function RxTeamUtils.observePlayerTeam(player: Player): Observable.Observable<Te
 	}) :: any
 end
 
+--[=[
+	Observes the team color of a player, returning nil if neutral. This handles team changes properly.
+
+	@param player Player
+	@return Observable<BrickColor?>
+]=]
 function RxTeamUtils.observePlayerTeamColor(player: Player): Observable.Observable<BrickColor?>
 	return RxTeamUtils.observePlayerTeam(player):Pipe({
 		Rx.switchMap(function(team: Team?): any

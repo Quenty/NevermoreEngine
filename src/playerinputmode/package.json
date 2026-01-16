@@ -31,6 +31,7 @@
   "dependencies": {
     "@quenty/attributeutils": "workspace:*",
     "@quenty/brio": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/inputmode": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

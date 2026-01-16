@@ -99,7 +99,7 @@ TieDefinition.Types = Table.readonly({
 	PROPERTY = Symbol.named("property"), -- will default to nil
 }) :: TieDefinitionTypes
 
-TieDefinition.Realms = TieRealms :: TieRealms.TieRealms
+TieDefinition.Realms = TieRealms
 
 export type TieDefinition<T> = typeof(setmetatable(
 	{} :: {

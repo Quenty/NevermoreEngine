@@ -32,6 +32,7 @@
     "@quenty/brio": "workspace:*",
     "@quenty/collectionserviceutils": "workspace:*",
     "@quenty/ducktype": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/insertserviceutils": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",

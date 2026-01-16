@@ -33,7 +33,7 @@ UnragdollAutomatically.__index = UnragdollAutomatically
 	@param serviceBag ServiceBag
 	@return UnragdollAutomatically
 ]=]
-function UnragdollAutomatically.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function UnragdollAutomatically.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), UnragdollAutomatically)
 
 	self._serviceBag = assert(serviceBag, "Bad serviceBag")

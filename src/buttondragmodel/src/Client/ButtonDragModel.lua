@@ -33,7 +33,7 @@ export type ButtonDragModel =
 			_clampWithinButton: ValueObject.ValueObject<boolean>,
 			_activePositions: { [InputObject | string]: Vector2? },
 
-			DragPositionChanged: Signal.Signal<Vector2>,
+			DragPositionChanged: Signal.Signal<(Vector2?, Vector2?, ...any)>,
 			IsDraggingChanged: Signal.Signal<boolean>,
 		},
 		{} :: typeof({ __index = ButtonDragModel })

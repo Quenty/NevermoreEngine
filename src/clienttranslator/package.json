@@ -29,6 +29,7 @@
   ],
   "dependencies": {
     "@quenty/blend": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
