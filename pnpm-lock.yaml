@@ -2109,12 +2109,24 @@ importers:
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
+      '@quenty/brio':
+        specifier: workspace:*
+        version: link:../brio
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/transparencyservice':
+        specifier: workspace:*
+        version: link:../transparencyservice
 
   src/highlight:
     dependencies:
@@ -2930,6 +2942,9 @@ importers:
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
+      '@quenty/binarysearch':
+        specifier: workspace:*
+        version: link:../binarysearch
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio
@@ -4533,6 +4548,9 @@ importers:
       '@quenty/numberrangeutils':
         specifier: workspace:*
         version: link:../numberrangeutils
+      '@quenty/observablecollection':
+        specifier: workspace:*
+        version: link:../observablecollection
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -4551,6 +4569,9 @@ importers:
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
+      '@quenty/soundgroup':
+        specifier: workspace:*
+        version: link:../soundgroups
       '@quenty/sounds':
         specifier: workspace:*
         version: link:../sounds

@@ -30,8 +30,12 @@
   ],
   "dependencies": {
     "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
-    "@quenty/servicebag": "workspace:*"
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/transparencyservice": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
