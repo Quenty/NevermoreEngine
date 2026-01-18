@@ -34,7 +34,6 @@ function SoundPlayerServiceClient.Init(self: SoundPlayerServiceClient, serviceBa
 
 	self._soundPlayerHelper = self._maid:Add(LayeredSoundHelper.new(function(maid)
 		local layer: SoundPlayerStack.SoundPlayerStack = maid:Add(SoundPlayerStack.new())
-		layer:Show()
 
 		return layer
 	end))
