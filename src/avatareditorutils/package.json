@@ -1,6 +1,6 @@
 {
   "name": "@quenty/avatareditorutils",
-  "version": "7.30.0",
+  "version": "7.31.0",
   "description": "Provides utility functions to work with the Roblox AvatarEditorService",
   "keywords": [
     "Roblox",

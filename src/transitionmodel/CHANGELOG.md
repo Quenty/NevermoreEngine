@@ -1,20 +1,18 @@
-# v7.30.0 (Sun Jan 18 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/tracking [#645](https://github.com/Quenty/NevermoreEngine/pull/645) ([@Quenty](https://github.com/Quenty))
-- feat: Add helper events to TransitionModel ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.29.0...@quenty/transitionmodel@7.30.0) (2026-01-18)
+
+
+### Features
+
+* Add helper events to TransitionModel ([2c88eab](https://github.com/Quenty/NevermoreEngine/commit/2c88eab68739666688e76113ecb2ce1fcb8973b5))
+
+
+
+
 
 # [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.28.0...@quenty/transitionmodel@7.29.0) (2026-01-16)
 

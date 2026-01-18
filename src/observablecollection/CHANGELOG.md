@@ -1,20 +1,18 @@
-# v12.30.0 (Sun Jan 18 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/tracking [#645](https://github.com/Quenty/NevermoreEngine/pull/645) ([@Quenty](https://github.com/Quenty))
-- feat: ObservableSortedList now correctly fires changed indexes as we replicate in changes. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.29.0...@quenty/observablecollection@12.30.0) (2026-01-18)
+
+
+### Features
+
+* ObservableSortedList now correctly fires changed indexes as we replicate in changes. ([63b41fc](https://github.com/Quenty/NevermoreEngine/commit/63b41fc54acf06b011aea3e8857b44fcc4e6ac2e))
+
+
+
+
 
 # [12.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.28.0...@quenty/observablecollection@12.29.0) (2026-01-16)
 

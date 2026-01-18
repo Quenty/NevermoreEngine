@@ -1,23 +1,18 @@
-# v1.32.0 (Sun Jan 18 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/tracking [#645](https://github.com/Quenty/NevermoreEngine/pull/645) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Remove unnecessary check ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.31.0...@quenty/soundgroup@1.32.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* Remove unnecessary check ([e3119de](https://github.com/Quenty/NevermoreEngine/commit/e3119deae974eca51396d0235e76e166fe929b5a))
+
+
+
+
 
 # [1.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.30.0...@quenty/soundgroup@1.31.0) (2026-01-16)
 

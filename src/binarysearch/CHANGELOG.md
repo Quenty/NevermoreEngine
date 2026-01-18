@@ -1,23 +1,15 @@
-# v2.4.0 (Sun Jan 18 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/tracking [#645](https://github.com/Quenty/NevermoreEngine/pull/645) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Update BinarySearchUtils docs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binarysearch@2.3.2...@quenty/binarysearch@2.4.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/binarysearch
+
+
+
+
 
 ## [2.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binarysearch@2.3.1...@quenty/binarysearch@2.3.2) (2026-01-12)
 

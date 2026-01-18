@@ -1,25 +1,24 @@
-# v7.31.0 (Sun Jan 18 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/tracking [#645](https://github.com/Quenty/NevermoreEngine/pull/645) ([@Quenty](https://github.com/Quenty))
-- feat: Make hiding work ([@Quenty](https://github.com/Quenty))
-- feat: Route sound player into stack ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Push sound order priority ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.30.0...@quenty/soundplayer@7.31.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* Push sound order priority ([45a29f2](https://github.com/Quenty/NevermoreEngine/commit/45a29f21a00d72d7971299695e28129d5b9d0cfb))
+
+
+### Features
+
+* Make hiding work ([8203ae4](https://github.com/Quenty/NevermoreEngine/commit/8203ae460bd4e5866f7328c54ac48f62addfd637))
+* Route sound player into stack ([8ec445b](https://github.com/Quenty/NevermoreEngine/commit/8ec445bc4d3cd60b247f78b37f19ba902e2e477a))
+
+
+
+
 
 # [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.29.0...@quenty/soundplayer@7.30.0) (2026-01-16)
 

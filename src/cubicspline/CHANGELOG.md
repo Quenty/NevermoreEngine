@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cubicspline@10.9.3...@quenty/cubicspline@10.10.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/cubicspline
+
+
+
+
+
 ## [10.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cubicspline@10.9.2...@quenty/cubicspline@10.9.3) (2026-01-12)
 
 
