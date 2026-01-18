@@ -51,6 +51,12 @@ function ObservableSubscriptionTable.Fire<T...>(self: ObservableSubscriptionTabl
 	end
 end
 
+function ObservableSubscriptionTable.GetRawSubscriptionMap<T...>(
+	self: ObservableSubscriptionTable<T...>
+): { [any]: { Subscription.Subscription<T...> } }
+	return self._subMap
+end
+
 --[=[
 	Returns true if subscription exists
 
@@ -59,6 +65,10 @@ end
 ]=]
 function ObservableSubscriptionTable.HasSubscriptions<T...>(self: ObservableSubscriptionTable<T...>, key: any): boolean
 	return self._subMap[key] ~= nil
+end
+
+function ObservableSubscriptionTable.HasAnySubscriptions<T...>(self: ObservableSubscriptionTable<T...>): boolean
+	return next(self._subMap) ~= nil
 end
 
 --[=[
