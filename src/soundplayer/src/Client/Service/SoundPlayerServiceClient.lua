@@ -1,5 +1,4 @@
 --!strict
-local LoopedSoundPlayer = require(script.Parent.Parent.Loops.LoopedSoundPlayer)
 --[=[
     @class SoundPlayerServiceClient
 ]=]
@@ -7,7 +6,9 @@ local LoopedSoundPlayer = require(script.Parent.Parent.Loops.LoopedSoundPlayer)
 local require = require(script.Parent.loader).load(script)
 
 local LayeredSoundHelper = require("LayeredSoundHelper")
+local LoopedSoundPlayer = require("LoopedSoundPlayer")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local ServiceBag = require("ServiceBag")
 local SoundPlayerStack = require("SoundPlayerStack")
 
@@ -55,10 +56,11 @@ end
 function SoundPlayerServiceClient.PushSoundPlayer(
 	self: SoundPlayerServiceClient,
 	layerId: string,
-	soundPlayer: LoopedSoundPlayer.LoopedSoundPlayer
+	soundPlayer: LoopedSoundPlayer.LoopedSoundPlayer,
+	priority: (number | Observable.Observable<number>)?
 ): () -> ()
 	local layer = self._soundPlayerHelper:GetOrCreateLayer(layerId)
-	return layer:PushSoundPlayer(soundPlayer)
+	return layer:PushSoundPlayer(soundPlayer, priority)
 end
 
 function SoundPlayerServiceClient.Destroy(self: SoundPlayerServiceClient): ()
