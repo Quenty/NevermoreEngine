@@ -29,6 +29,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "workspace:*",
     "@quenty/binder": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
