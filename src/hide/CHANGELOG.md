@@ -1,20 +1,18 @@
-# v11.31.1 (Sun Jan 18 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Fix package dependencies that were missing [#646](https://github.com/Quenty/NevermoreEngine/pull/646) ([@Quenty](https://github.com/Quenty))
-- fix: Fix package dependencies that were missing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.0...@quenty/hide@11.31.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* Fix package dependencies that were missing ([89a5112](https://github.com/Quenty/NevermoreEngine/commit/89a511276d1e8430ff55ee021da9992e55ddb52f))
+
+
+
+
 
 # [11.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.30.0...@quenty/hide@11.31.0) (2026-01-18)
 
