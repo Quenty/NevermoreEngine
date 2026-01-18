@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[34518],{92e3:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ChangedSpanTracker","desc":"","source":{"line":5,"path":"src/observablecollection/src/Shared/SortedList/ChangedSpanTracker.lua"}}')}}]);
