@@ -2109,12 +2109,24 @@ importers:
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
+      '@quenty/brio':
+        specifier: workspace:*
+        version: link:../brio
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/transparencyservice':
+        specifier: workspace:*
+        version: link:../transparencyservice
 
   src/highlight:
     dependencies:
