@@ -1,5 +1,18 @@
 # (Sun Jan 18 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/hide@11.31.1`, `@quenty/soundplayer@7.31.1`
+  - fix: Fix package dependencies that were missing [#646](https://github.com/Quenty/NevermoreEngine/pull/646) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jan 18 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/binarysearch@2.4.0`, `@quenty/binder@14.29.0`, `@quenty/hide@11.31.0`, `@quenty/instanceutils@13.24.0`, `@quenty/observablecollection@12.30.0`, `@quenty/rx@13.23.0`, `@quenty/soundgroup@1.32.0`, `@quenty/soundplayer@7.31.0`, `@quenty/transitionmodel@7.30.0`, `@quenty/nevermore-cli@4.15.0`

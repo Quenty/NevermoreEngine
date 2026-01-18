@@ -1,3 +1,16 @@
+# v7.31.1 (Sun Jan 18 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Fix package dependencies that were missing [#646](https://github.com/Quenty/NevermoreEngine/pull/646) ([@Quenty](https://github.com/Quenty))
+- fix: Fix package dependencies that were missing ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
