@@ -42,6 +42,7 @@
     "@quenty/randomutils": "workspace:*",
     "@quenty/rbxasset": "workspace:*",
     "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/soundgroup": "workspace:*",
     "@quenty/sounds": "workspace:*",

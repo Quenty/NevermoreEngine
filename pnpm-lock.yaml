@@ -2106,6 +2106,9 @@ importers:
 
   src/hide:
     dependencies:
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
@@ -4566,6 +4569,9 @@ importers:
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
