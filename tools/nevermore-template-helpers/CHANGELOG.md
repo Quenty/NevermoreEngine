@@ -1,3 +1,18 @@
+# v1.5.1 (Mon Jan 19 2026)
+
+#### 🐛 Bug Fix
+
+- fix: templates now rename 'npmrc' to '.npmrc', similar to .gitignore files (while not on a fork, in order to pass publishing tests) [#647](https://github.com/Quenty/NevermoreEngine/pull/647) ([@euvinkeel](https://github.com/euvinkeel) [@Quenty](https://github.com/Quenty))
+- Merge branch 'main' into fix/pnpm-template ([@Quenty](https://github.com/Quenty))
+- templates now rename 'npmrc' to '.npmrc', similar to .gitignore files ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 2
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

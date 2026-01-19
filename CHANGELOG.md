@@ -1,3 +1,17 @@
+# (Mon Jan 19 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.15.1`, `@quenty/nevermore-template-helpers@1.5.1`
+  - fix: templates now rename 'npmrc' to '.npmrc', similar to .gitignore files (while not on a fork, in order to pass publishing tests) [#647](https://github.com/Quenty/NevermoreEngine/pull/647) ([@euvinkeel](https://github.com/euvinkeel) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jan 18 2026)
 
 #### 🐛 Bug Fix
