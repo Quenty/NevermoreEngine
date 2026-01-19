@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.15.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.14.0...@quenty/nevermore-cli@4.15.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
 # [4.14.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.13.2...@quenty/nevermore-cli@4.14.0) (2026-01-14)
 
 

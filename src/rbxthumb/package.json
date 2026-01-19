@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rbxthumb",
-  "version": "5.11.2",
+  "version": "5.12.0",
   "description": "Wraps the rbxthumb URL api surface.",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@quenty/enums": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/table": "workspace:*"
   }

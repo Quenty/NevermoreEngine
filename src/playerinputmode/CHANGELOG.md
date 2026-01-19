@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.30.0...@quenty/playerinputmode@9.31.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+
+
+
+
+# [9.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.29.0...@quenty/playerinputmode@9.30.0) (2026-01-16)
+
+
+### Features
+
+* Add SimpleEnum package and interface, to simplify enum usage across Nevermore ([d3040d7](https://github.com/Quenty/NevermoreEngine/commit/d3040d7a07ae7b2586bb982399b401fe19f1eb3f))
+
+
+
+
+
 # [9.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.28.1...@quenty/playerinputmode@9.29.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/playerinputmode

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.29.0...@quenty/observablecollection@12.30.0) (2026-01-18)
+
+
+### Features
+
+* ObservableSortedList now correctly fires changed indexes as we replicate in changes. ([63b41fc](https://github.com/Quenty/NevermoreEngine/commit/63b41fc54acf06b011aea3e8857b44fcc4e6ac2e))
+
+
+
+
+
+# [12.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.28.0...@quenty/observablecollection@12.29.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
 # [12.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.27.1...@quenty/observablecollection@12.28.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/observablecollection

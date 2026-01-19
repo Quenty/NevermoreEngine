@@ -1,6 +1,6 @@
 {
   "name": "@quenty/tie",
-  "version": "10.31.0",
+  "version": "10.33.0",
   "description": "Tie allows interfaces to be defined between Lua OOP and Roblox objects.",
   "keywords": [
     "Roblox",
@@ -35,6 +35,7 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/collectionserviceutils": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

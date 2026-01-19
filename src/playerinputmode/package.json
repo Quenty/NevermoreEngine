@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerinputmode",
-  "version": "9.29.0",
+  "version": "9.31.0",
   "description": "Service that takes active input modes from the player and exposes it to every other player via the server.",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@quenty/attributeutils": "workspace:*",
     "@quenty/brio": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/inputmode": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

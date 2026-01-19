@@ -563,7 +563,7 @@ end
 	@param parent Instance? -- Optional parent
 	@return BasePart
 ]=]
-function Draw.sphere(position: Vector3Like, radius: number, color: Color3?, parent: Instance)
+function Draw.sphere(position: Vector3Like, radius: number, color: Color3?, parent: Instance?): BasePart
 	return Draw.point(position, color, parent, radius * 2)
 end
 
@@ -872,7 +872,7 @@ end
 --[=[
 	Draws a screen point
 ]=]
-function Draw.screenPoint(position: Vector2, parent: Instance, color: Color3Like?, diameter: number?): Frame
+function Draw.screenPoint(position: Vector2, parent: Instance?, color: Color3Like?, diameter: number?): Frame
 	local pointColor = Draw._toColor3(color) or Color3.new(0.658824, 0.501961, 0.501961)
 	local pointDiameter = diameter or 3
 

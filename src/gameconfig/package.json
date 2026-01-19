@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameconfig",
-  "version": "12.37.0",
+  "version": "12.39.0",
   "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
   "keywords": [
     "Roblox",
@@ -38,6 +38,7 @@
     "@quenty/canceltoken": "workspace:*",
     "@quenty/clienttranslator": "workspace:*",
     "@quenty/cmdrservice": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

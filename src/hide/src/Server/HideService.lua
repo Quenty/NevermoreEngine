@@ -14,8 +14,9 @@ function HideService:Init(serviceBag: ServiceBag.ServiceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	-- Internal
+	-- Binders
 	self._serviceBag:GetService(require("Hide"))
+	self._serviceBag:GetService(require("DynamicHide"))
 end
 
 return HideService

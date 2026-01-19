@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rogue-properties",
-  "version": "11.35.0",
+  "version": "11.37.0",
   "description": "Roguelike properties which can be modified by external provides",
   "keywords": [
     "Roblox",
@@ -34,6 +34,7 @@
     "@quenty/brio": "workspace:*",
     "@quenty/defaultvalueutils": "workspace:*",
     "@quenty/ducktype": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/jsonutils": "workspace:*",
     "@quenty/linkutils": "workspace:*",

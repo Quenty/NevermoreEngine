@@ -1,6 +1,6 @@
 {
   "name": "@quenty/templateprovider",
-  "version": "11.27.0",
+  "version": "11.29.0",
   "description": "Base of a template retrieval system",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
     "@quenty/brio": "workspace:*",
     "@quenty/collectionserviceutils": "workspace:*",
     "@quenty/ducktype": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/insertserviceutils": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",

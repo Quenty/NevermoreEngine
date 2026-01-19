@@ -1,6 +1,6 @@
 {
   "name": "@quenty/guivisiblemanager",
-  "version": "12.16.0",
+  "version": "12.17.0",
   "description": "Help manage the visibility of GUIs while only constructing the Gui while visible",
   "keywords": [
     "Roblox",

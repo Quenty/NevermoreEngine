@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/acceltween@2.5.5...@quenty/acceltween@2.6.0) (2026-01-16)
+
+
+### Features
+
+* Add SetTarget method to AccelTween ([9d151f0](https://github.com/Quenty/NevermoreEngine/commit/9d151f06f170e5510dc28fb6f9de1bfae161f8dd))
+
+
+
+
+
 ## [2.5.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/acceltween@2.5.4...@quenty/acceltween@2.5.5) (2026-01-12)
 
 

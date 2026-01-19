@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.28.0...@quenty/templateprovider@11.29.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+
+
+
+
+# [11.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.27.0...@quenty/templateprovider@11.28.0) (2026-01-16)
+
+
+### Features
+
+* Add SimpleEnum package and interface, to simplify enum usage across Nevermore ([d3040d7](https://github.com/Quenty/NevermoreEngine/commit/d3040d7a07ae7b2586bb982399b401fe19f1eb3f))
+
+
+
+
+
 # [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.26.1...@quenty/templateprovider@11.27.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/templateprovider

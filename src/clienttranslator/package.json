@@ -1,6 +1,6 @@
 {
   "name": "@quenty/clienttranslator",
-  "version": "14.27.0",
+  "version": "14.29.0",
   "description": "Gets local translator for player",
   "keywords": [
     "Roblox",
@@ -29,6 +29,7 @@
   ],
   "dependencies": {
     "@quenty/blend": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

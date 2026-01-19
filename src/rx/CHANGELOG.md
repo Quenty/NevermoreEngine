@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.22.0...@quenty/rx@13.23.0) (2026-01-18)
+
+
+### Features
+
+* Add ObservableSubscriptionTable.GetRawSubscriptionMap<T...>( ([1b7e45d](https://github.com/Quenty/NevermoreEngine/commit/1b7e45d2a11e568f7078111fe2194a0b68446b27))
+
+
+
+
+
 # [13.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.21.2...@quenty/rx@13.22.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/rx

@@ -5,7 +5,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Table = require("Table")
+local SimpleEnum = require("SimpleEnum")
 
 export type GameConfigAssetType =
 	"badge"
@@ -17,38 +17,27 @@ export type GameConfigAssetType =
 	| "subscription"
 	| "membership"
 
-export type GameConfigAssetTypes = {
-	BADGE: "badge",
-	PRODUCT: "product",
-	PASS: "pass",
-	ASSET: "asset",
-	BUNDLE: "bundle",
-	PLACE: "place",
-	SUBSCRIPTION: "subscription",
-	MEMBERSHIP: "membership",
-}
-
-return Table.readonly({
+return SimpleEnum.new({
 	--[=[
 	Specifies the asset is of type badge
 	@prop BADGE string
 	@within GameConfigAssetTypes
 ]=]
-	BADGE = "badge",
+	BADGE = "badge" :: "badge",
 
 	--[=[
 	Specifies the asset is of type product
 	@prop PRODUCT string
 	@within GameConfigAssetTypes
 ]=]
-	PRODUCT = "product",
+	PRODUCT = "product" :: "product",
 
 	--[=[
 	Specifies the asset is of type pass
 	@prop PASS string
 	@within GameConfigAssetTypes
 ]=]
-	PASS = "pass",
+	PASS = "pass" :: "pass",
 
 	--[=[
 	Specifies the asset is of type asset. This is basically anything in Roblox's asset id system.
@@ -57,7 +46,7 @@ return Table.readonly({
 	@prop ASSET string
 	@within GameConfigAssetTypes
 ]=]
-	ASSET = "asset",
+	ASSET = "asset" :: "asset",
 
 	--[=[
 	Bundle asset type
@@ -65,26 +54,26 @@ return Table.readonly({
 	@prop BUNDLE string
 	@within GameConfigAssetTypes
 ]=]
-	BUNDLE = "bundle",
+	BUNDLE = "bundle" :: "bundle",
 
 	--[=[
 	Specifies the asset is of type place
 	@prop PLACE string
 	@within GameConfigAssetTypes
 ]=]
-	PLACE = "place",
+	PLACE = "place" :: "place",
 
 	--[=[
 	Specifies the asset is of type subscription
 	@prop SUBSCRIPTION string
 	@within GameConfigAssetTypes
 ]=]
-	SUBSCRIPTION = "subscription",
+	SUBSCRIPTION = "subscription" :: "subscription",
 
 	--[=[
 	Specifies the asset is of type membership (Roblox Premium)
 	@prop MEMBERSHIP string
 	@within GameConfigAssetTypes
 ]=]
-	MEMBERSHIP = "membership",
-} :: GameConfigAssetTypes)
+	MEMBERSHIP = "membership" :: "membership",
+})

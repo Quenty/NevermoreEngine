@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.36.0...@quenty/rogue-properties@11.37.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.35.0...@quenty/rogue-properties@11.36.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+* Add SimpleEnum package and interface, to simplify enum usage across Nevermore ([d3040d7](https://github.com/Quenty/NevermoreEngine/commit/d3040d7a07ae7b2586bb982399b401fe19f1eb3f))
+
+
+
+
+
 # [11.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.34.1...@quenty/rogue-properties@11.35.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/rogue-properties

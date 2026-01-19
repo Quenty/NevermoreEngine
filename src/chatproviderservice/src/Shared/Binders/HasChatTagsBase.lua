@@ -40,7 +40,7 @@ function HasChatTagsBase.new(player: Player): HasChatTagsBase
 				return
 			end
 
-			local tagDataList = brio:GetValue()
+			local tagDataList: { ChatTagDataUtils.ChatTagData } = brio:GetValue()
 			local maid = brio:ToMaid()
 
 			table.sort(tagDataList, function(a, b)

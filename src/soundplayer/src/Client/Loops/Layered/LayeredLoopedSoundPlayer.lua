@@ -9,8 +9,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local LayeredSoundHelper = require("LayeredSoundHelper")
 local LoopedSoundPlayer = require("LoopedSoundPlayer")
 local Maid = require("Maid")
+local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 local Rx = require("Rx")
 local SoundLoopScheduleUtils = require("SoundLoopScheduleUtils")
 local SoundUtils = require("SoundUtils")
@@ -25,13 +28,13 @@ LayeredLoopedSoundPlayer.__index = LayeredLoopedSoundPlayer
 export type LayeredLoopedSoundPlayer =
 	typeof(setmetatable(
 		{} :: {
-			_layerMaid: Maid.Maid,
-			_soundParent: ValueObject.ValueObject<Instance?>,
-			_soundGroup: ValueObject.ValueObject<SoundGroup?>,
-			_bpm: ValueObject.ValueObject<number?>,
+			_defaultSoundParent: ValueObject.ValueObject<Instance?>,
+			_defaultSoundGroup: ValueObject.ValueObject<SoundGroup?>,
+			_defaultBPM: ValueObject.ValueObject<number?>,
 			_defaultCrossFadeTime: ValueObject.ValueObject<number>,
 			_volumeMultiplier: ValueObject.ValueObject<number>,
-			_layers: { [string]: LoopedSoundPlayer.LoopedSoundPlayer },
+
+			_layeredSoundHelper: LayeredSoundHelper.LayeredSoundHelper<LoopedSoundPlayer.LoopedSoundPlayer>,
 		},
 		{} :: typeof({ __index = LayeredLoopedSoundPlayer })
 	))
@@ -46,15 +49,17 @@ export type LayeredLoopedSoundPlayer =
 function LayeredLoopedSoundPlayer.new(soundParent: Instance?): LayeredLoopedSoundPlayer
 	local self: LayeredLoopedSoundPlayer = setmetatable(SpringTransitionModel.new() :: any, LayeredLoopedSoundPlayer)
 
-	self._layerMaid = self._maid:Add(Maid.new())
-
-	self._soundParent = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance)))
-	self._soundGroup = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance)))
-	self._bpm = self._maid:Add(ValueObject.new(nil, t.optional(t.number)))
+	self._defaultSoundParent = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance)))
+	self._defaultSoundGroup = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance)))
+	self._defaultBPM = self._maid:Add(ValueObject.new(nil, t.optional(t.number)))
 	self._defaultCrossFadeTime = self._maid:Add(ValueObject.new(0.5, "number"))
 	self._volumeMultiplier = self._maid:Add(ValueObject.new(1, "number"))
 
-	self._layers = {}
+	self._layeredSoundHelper = self._maid:Add(LayeredSoundHelper.new(function(maid): any
+		local layer = maid:Add(LoopedSoundPlayer.new())
+		self:_handleNewLayer(maid, layer)
+		return layer
+	end))
 
 	if soundParent then
 		self:SetSoundParent(soundParent)
@@ -87,7 +92,7 @@ end
 	Sets the BPM for syncing sound playback.
 ]=]
 function LayeredLoopedSoundPlayer.SetBPM(self: LayeredLoopedSoundPlayer, bpm: ValueObject.Mountable<number?>): () -> ()
-	return self._bpm:Mount(bpm)
+	return self._defaultBPM:Mount(bpm)
 end
 
 --[=[
@@ -96,7 +101,7 @@ end
 function LayeredLoopedSoundPlayer.SetSoundParent(self: LayeredLoopedSoundPlayer, soundParent: Instance?): ()
 	assert(typeof(soundParent) == "Instance" or soundParent == nil, "Bad soundParent")
 
-	self._soundParent.Value = soundParent
+	self._defaultSoundParent.Value = soundParent
 end
 
 --[=[
@@ -106,7 +111,7 @@ function LayeredLoopedSoundPlayer.SetSoundGroup(
 	self: LayeredLoopedSoundPlayer,
 	soundGroup: ValueObject.Mountable<SoundGroup?>
 ): () -> ()
-	return self._soundGroup:Mount(soundGroup)
+	return self._defaultSoundGroup:Mount(soundGroup)
 end
 
 --[=[
@@ -122,7 +127,7 @@ function LayeredLoopedSoundPlayer.Swap(
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")
 
-	local layer = self:_getOrCreateLayer(layerId)
+	local layer = self._layeredSoundHelper:GetOrCreateLayer(layerId)
 	layer:Swap(soundId, scheduleOptions)
 end
 
@@ -138,7 +143,7 @@ function LayeredLoopedSoundPlayer.SwapOnLoop(
 	assert(type(layerId) == "string", "Bad layerId")
 	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
 
-	local layer = self:_getOrCreateLayer(layerId)
+	local layer = self._layeredSoundHelper:GetOrCreateLayer(layerId)
 	layer:SwapOnLoop(soundId, scheduleOptions)
 end
 
@@ -155,7 +160,7 @@ function LayeredLoopedSoundPlayer.SwapToSamples(
 	assert(type(soundIdList) == "table", "Bad soundIdList")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")
 
-	local layer = self:_getOrCreateLayer(layerId)
+	local layer = self._layeredSoundHelper:GetOrCreateLayer(layerId)
 	layer:SwapToSamples(soundIdList, scheduleOptions)
 end
 
@@ -172,7 +177,7 @@ function LayeredLoopedSoundPlayer.SwapToChoice(
 	assert(type(soundIdList) == "table", "Bad soundIdList")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")
 
-	local layer = self:_getOrCreateLayer(layerId)
+	local layer = self._layeredSoundHelper:GetOrCreateLayer(layerId)
 	layer:SwapToChoice(soundIdList, scheduleOptions)
 end
 
@@ -188,7 +193,7 @@ function LayeredLoopedSoundPlayer.PlayOnce(
 	assert(type(layerId) == "string", "Bad layerId")
 	assert(SoundLoopScheduleUtils.isLoopedSchedule(scheduleOptions) or scheduleOptions == nil, "Bad scheduleOptions")
 
-	local layer = self:_getOrCreateLayer(layerId)
+	local layer = self._layeredSoundHelper:GetOrCreateLayer(layerId)
 	layer:PlayOnce(soundId, scheduleOptions)
 end
 
@@ -203,39 +208,23 @@ function LayeredLoopedSoundPlayer.PlayOnceOnLoop(
 ): ()
 	assert(type(layerId) == "string", "Bad layerId")
 
-	local layer = self:_getOrCreateLayer(layerId)
+	local layer = self._layeredSoundHelper:GetOrCreateLayer(layerId)
 	layer:PlayOnceOnLoop(soundId, scheduleOptions)
 end
 
-function LayeredLoopedSoundPlayer._getOrCreateLayer(
+function LayeredLoopedSoundPlayer._handleNewLayer(
 	self: LayeredLoopedSoundPlayer,
-	layerId: string
-): LoopedSoundPlayer.LoopedSoundPlayer
-	if self._layers[layerId] then
-		return self._layers[layerId]
-	end
-
-	local maid = Maid.new()
-
-	local layer = maid:Add(LoopedSoundPlayer.new())
+	maid: Maid.Maid,
+	layer: LoopedSoundPlayer.LoopedSoundPlayer
+): ()
 	layer:SetDoSyncSoundPlayback(true)
-
-	maid:GiveTask(self._soundGroup:Observe():Subscribe(function(soundGroup)
-		layer:SetSoundGroup(soundGroup)
-	end))
-
+	maid:GiveTask(layer:SetSoundGroup(self._defaultSoundGroup:Observe()))
 	maid:GiveTask(layer:SetCrossFadeTime(self._defaultCrossFadeTime:Observe()))
-
-	maid:GiveTask(self._bpm:Observe():Subscribe(function(bpm)
-		layer:SetBPM(bpm)
-	end))
+	maid:GiveTask(layer:SetBPM(self._defaultBPM:Observe()))
+	maid:GiveTask(layer:SetSoundParent(self._defaultSoundParent:Observe()))
 
 	maid:GiveTask(self:ObserveVisible():Subscribe(function(isVisible, doNotAnimate)
 		layer:SetVisible(isVisible, doNotAnimate)
-	end))
-
-	maid:GiveTask(self._soundParent:Observe():Subscribe(function(parent)
-		layer:SetSoundParent(parent)
 	end))
 
 	maid:GiveTask(Rx.combineLatest({
@@ -245,29 +234,33 @@ function LayeredLoopedSoundPlayer._getOrCreateLayer(
 		layer:SetVolumeMultiplier(state.multiplier * state.visible)
 	end))
 
-	self._layers[layerId] = layer
-	maid:GiveTask(function()
-		if self._layers[layerId] == layer then
-			self._layers[layerId] = nil
-		end
-	end)
-
-	self._layerMaid[layerId] = maid
-
 	return layer
 end
 
 --[=[
 	Stops playback on the given layer.
 ]=]
-function LayeredLoopedSoundPlayer.StopLayer(self: LayeredLoopedSoundPlayer, layerId: string): ()
+function LayeredLoopedSoundPlayer.StopLayer(
+	self: LayeredLoopedSoundPlayer,
+	layerId: string,
+	doNotAnimate: boolean?
+): Promise.Promise<()>
 	assert(type(layerId) == "string", "Bad layerId")
 
-	self._layerMaid[layerId] = nil
+	local found = self._layeredSoundHelper:FindLayer(layerId)
+	if not found then
+		return Promise.resolved()
+	end
+
+	return found:PromiseHide(doNotAnimate)
 end
 
-function LayeredLoopedSoundPlayer.StopAll(self: LayeredLoopedSoundPlayer): ()
-	self._layerMaid:DoCleaning()
+function LayeredLoopedSoundPlayer.StopAll(self: LayeredLoopedSoundPlayer, doNotAnimate: boolean?): ()
+	local promises: { Promise.Promise<()> } = {}
+	for _, layer: any in self._layeredSoundHelper:GetAllLayers() do
+		table.insert(promises, layer:PromiseHide(doNotAnimate))
+	end
+	return PromiseUtils.all(promises)
 end
 
 return LayeredLoopedSoundPlayer

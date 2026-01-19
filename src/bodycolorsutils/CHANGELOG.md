@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.27.0...@quenty/bodycolorsutils@7.28.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/bodycolorsutils
+
+
+
+
+
+# [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.26.0...@quenty/bodycolorsutils@7.27.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+
+
+
+
+
 # [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.25.1...@quenty/bodycolorsutils@7.26.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/bodycolorsutils

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.40.0...@quenty/chatproviderservice@9.41.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [9.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.39.0...@quenty/chatproviderservice@9.40.0) (2026-01-16)
+
+
+### Bug Fixes
+
+* Fix some simple typing ([d8aadbf](https://github.com/Quenty/NevermoreEngine/commit/d8aadbf30d628e3f8e4d5d0280c99df986b763f2))
+
+
+
+
+
 # [9.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.38.0...@quenty/chatproviderservice@9.39.0) (2026-01-14)
 
 **Note:** Version bump only for package @quenty/chatproviderservice
