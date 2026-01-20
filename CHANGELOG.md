@@ -1,3 +1,16 @@
+# (Tue Jan 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.15.2`
+  - fix: Add managed by raven-cli tip [#649](https://github.com/Quenty/NevermoreEngine/pull/649) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Jan 19 2026)
 
 #### 🐛 Bug Fix
