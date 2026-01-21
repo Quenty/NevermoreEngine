@@ -20,19 +20,21 @@ AnimationTrackPlayer.__index = AnimationTrackPlayer
 
 type AnimationId = string | number
 
-export type AnimationTrackPlayer = typeof(setmetatable(
-	{} :: {
-		-- Public
-		KeyframeReached: Signal.Signal<string>,
+export type AnimationTrackPlayer =
+	typeof(setmetatable(
+		{} :: {
+			-- Public
+			KeyframeReached: Signal.Signal<string>,
 
-		-- Private
-		_animationTarget: ValueObject.ValueObject<Instance?>,
-		_trackId: ValueObject.ValueObject<AnimationId?>,
-		_currentTrack: ValueObject.ValueObject<AnimationTrack?>,
-		_animationPriority: ValueObject.ValueObject<number?>,
-	},
-	{} :: typeof({ __index = AnimationTrackPlayer })
-)) & BaseObject.BaseObject
+			-- Private
+			_animationTarget: ValueObject.ValueObject<Instance?>,
+			_trackId: ValueObject.ValueObject<AnimationId?>,
+			_currentTrack: ValueObject.ValueObject<AnimationTrack?>,
+			_animationPriority: ValueObject.ValueObject<number?>,
+		},
+		{} :: typeof({ __index = AnimationTrackPlayer })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Plays an animation track in the target. Async loads the track when
