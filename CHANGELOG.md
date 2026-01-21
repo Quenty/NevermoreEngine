@@ -1,3 +1,16 @@
+# (Wed Jan 21 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.26.1`, `@quenty/canceltoken@11.14.1`
+  - fix: Enhance annotations [#650](https://github.com/Quenty/NevermoreEngine/pull/650) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Tue Jan 20 2026)
 
 #### 🐛 Bug Fix

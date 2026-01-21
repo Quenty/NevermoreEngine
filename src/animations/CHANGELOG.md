@@ -1,3 +1,17 @@
+# v8.26.1 (Wed Jan 21 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Enhance annotations [#650](https://github.com/Quenty/NevermoreEngine/pull/650) ([@alex-y-z](https://github.com/alex-y-z))
+- style: Format ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Enhance annotations ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
