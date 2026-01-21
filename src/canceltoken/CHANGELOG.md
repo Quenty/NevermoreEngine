@@ -1,20 +1,18 @@
-# v11.14.1 (Wed Jan 21 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Enhance annotations [#650](https://github.com/Quenty/NevermoreEngine/pull/650) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Enhance annotations ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.14.0...@quenty/canceltoken@11.14.1) (2026-01-21)
+
+
+### Bug Fixes
+
+* Enhance annotations ([1a19df4](https://github.com/Quenty/NevermoreEngine/commit/1a19df4ce6ae80aa978c96e300151ea7005bd5f0))
+
+
+
+
 
 # [11.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.13.6...@quenty/canceltoken@11.14.0) (2026-01-13)
 

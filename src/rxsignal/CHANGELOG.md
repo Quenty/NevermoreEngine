@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxsignal@7.23.0...@quenty/rxsignal@7.23.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/rxsignal
+
+
+
+
+
 # [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxsignal@7.22.0...@quenty/rxsignal@7.23.0) (2026-01-18)
 
 **Note:** Version bump only for package @quenty/rxsignal
