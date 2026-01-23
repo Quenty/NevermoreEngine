@@ -1,20 +1,18 @@
-# v10.13.1 (Fri Jan 23 2026)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/support [#651](https://github.com/Quenty/NevermoreEngine/pull/651) ([@Quenty](https://github.com/Quenty))
-- fix: CameraStoryUtils doesn't require InsertService anymore ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.13.0...@quenty/camerastoryutils@10.13.1) (2026-01-23)
+
+
+### Bug Fixes
+
+* CameraStoryUtils doesn't require InsertService anymore ([333a1a0](https://github.com/Quenty/NevermoreEngine/commit/333a1a05b7bc756836edb3e7d1574a547e58194c))
+
+
+
+
 
 # [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.12.7...@quenty/camerastoryutils@10.13.0) (2026-01-13)
 

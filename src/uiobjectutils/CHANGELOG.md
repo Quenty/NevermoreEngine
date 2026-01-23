@@ -1,20 +1,18 @@
-# v6.23.2 (Fri Jan 23 2026)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/support [#651](https://github.com/Quenty/NevermoreEngine/pull/651) ([@Quenty](https://github.com/Quenty))
-- fix: Return inside point for debugging too ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.23.1...@quenty/uiobjectutils@6.23.2) (2026-01-23)
+
+
+### Bug Fixes
+
+* Return inside point for debugging too ([a0cf24f](https://github.com/Quenty/NevermoreEngine/commit/a0cf24f765a387203b8e69099be99afb212260b8))
+
+
+
+
 
 ## [6.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.23.0...@quenty/uiobjectutils@6.23.1) (2026-01-21)
 
