@@ -1,8 +1,8 @@
 import { Brio } from '@quenty/brio';
+import { Maid } from '@quenty/maid';
 import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
 import { ObservableList } from './ObservableList';
-import { Maid } from '@quenty/maid';
 
 interface ObservableMapList<TKey, TValue> {
   ListAdded: Signal<[key: TKey, list: ObservableList<TValue>]>;
@@ -21,7 +21,7 @@ interface ObservableMapList<TKey, TValue> {
   ObserveAtListIndexBrio(key: TKey, index: number): Observable<Brio<TValue>>;
   ObserveItemsForKeyBrio(key: TKey): Observable<Brio<TValue>>;
   GetListFromKey(key: TKey): TValue[];
-  GetListForKey(key: TKey): TValue[];
+  GetListForKey(key: TKey): ObservableList<TValue>;
   GetListOfValuesAtListIndex(index: number): TValue[];
   ObserveList(key: TKey): Observable<ObservableList<TValue>>;
   ObserveListBrio(key: TKey): Observable<Brio<ObservableList<TValue>>>;

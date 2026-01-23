@@ -1,43 +1,35 @@
 import { Brio } from '@quenty/brio';
-import { Maid } from '@quenty/maid';
 import { Observable } from '@quenty/rx';
-import { Signal } from '@quenty/signal';
-import { ObservableList } from './ObservableList';
+import { Symbol } from '@quenty/symbol';
+import { ValueObject } from '@quenty/valueobject';
 
-interface ObservableMapList<TKey, TValue> {
-  ListAdded: Signal<[key: TKey, list: ObservableList<TValue>]>;
-  ListRemoved: Signal<TKey>;
-  CountChanged: Signal<number>;
-  Push(key: TKey | Observable<TKey>, entry: TValue): Maid;
-  GetFirstItemForKey(key: TKey): TValue | undefined;
-  GetItemForKeyAtIndex(key: TKey, index: number): TValue | undefined;
-  GetListCount(): number;
-  ObserveListCount(): Observable<number>;
-  GetKeyList(): TKey[];
-  ObserveKeyList(): Observable<TKey[]>;
-  ObserveKeysBrio(): Observable<Brio<TKey>>;
-  GetAtListIndex(key: TKey, index: number): TValue | undefined;
-  ObserveAtListIndex(key: TKey, index: number): Observable<TValue | undefined>;
-  ObserveAtListIndexBrio(key: TKey, index: number): Observable<Brio<TValue>>;
-  ObserveItemsForKeyBrio(key: TKey): Observable<Brio<TValue>>;
-  GetListFromKey(key: TKey): TValue[];
-  GetListForKey(key: TKey): ObservableList<TValue>;
-  GetListOfValuesAtListIndex(index: number): TValue[];
-  ObserveList(key: TKey): Observable<ObservableList<TValue>>;
-  ObserveListBrio(key: TKey): Observable<Brio<ObservableList<TValue>>>;
-  ObserveListsBrio(): Observable<Brio<ObservableList<TValue>>>;
-  ObserveCountForKey(key: TKey): Observable<number>;
+interface ObservableList<T> extends Iterable<T> {
+  Observe(): Observable<T[]>;
+  ObserveItemsBrio(): Observable<Brio<[T, Symbol]>>;
+  ObserveIndex(indexToObserve: number): Observable<number | undefined>;
+  ObserveAtIndex(indexToObserve: number): Observable<T | undefined>;
+  ObserveAtIndexBrio(indexToObserve: number): Observable<Brio<T | undefined>>;
+  RemoveFirst(item: T): boolean;
+  GetCountValue(): ValueObject<number>;
+  ObserveIndexByKey(key: Symbol): Observable<number | undefined>;
+  GetIndexByKey(key: Symbol): number | undefined;
+  GetCount(): number;
+  ObserveCount(): Observable<number>;
+  Add(item: T): () => void;
+  Get(index: number): T | undefined;
+  InsertAt(item: T, index: number): () => void;
+  RemoveAt(index: number): T | undefined;
+  RemoveByKey(key: Symbol): T | undefined;
+  GetList(): T[];
   Destroy(): void;
 }
 
-interface ObservableMapListConstructor {
-  readonly ClassName: 'ObservableMapList';
-  new (): ObservableMapList<unknown, unknown>;
-  new <TKey, TValue>(): ObservableMapList<TKey, TValue>;
+interface ObservableListConstructor {
+  readonly ClassName: 'ObservableList';
+  new (): ObservableList<never>;
+  new <T>(): ObservableList<T>;
 
-  isObservableMapList(
-    value: unknown
-  ): value is ObservableMapList<unknown, unknown>;
+  isObservableList(value: unknown): value is ObservableList<unknown>;
 }
 
-export const ObservableMapList: ObservableMapListConstructor;
+export const ObservableList: ObservableListConstructor;
