@@ -6,7 +6,7 @@ import { Promise } from '@quenty/promise';
 
 type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 
-export type Predicate<T> = (...args: ToTuple<T>) => boolean;
+export type Predicate<T> = (value: T) => boolean;
 
 export namespace Rx {
   const EMPTY: Observable;
@@ -103,7 +103,7 @@ export namespace Rx {
     callback: (error: E) => Observable<R>
   ): Operator<T, T | R>;
   function combineLatest<
-    T extends Record<string | number | symbol, Observable<unknown> | unknown>
+    T extends Record<string | number | symbol, Observable<unknown> | unknown>,
   >(
     observables: T
   ): Observable<{
