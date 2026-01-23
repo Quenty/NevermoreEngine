@@ -1,3 +1,16 @@
+# (Fri Jan 23 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/camerastoryutils@10.13.1`, `@quenty/uiobjectutils@6.23.2`
+  - Users/quenty/support [#651](https://github.com/Quenty/NevermoreEngine/pull/651) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jan 21 2026)
 
 #### 🐛 Bug Fix
