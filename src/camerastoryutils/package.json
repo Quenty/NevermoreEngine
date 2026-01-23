@@ -29,7 +29,7 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/insertserviceutils": "workspace:*",
+    "@quenty/blend": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/math": "workspace:*",
     "@quenty/promise": "workspace:*"

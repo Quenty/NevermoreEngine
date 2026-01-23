@@ -9,10 +9,10 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
 
-local InsertServiceUtils = require("InsertServiceUtils")
 local Maid = require("Maid")
 local Math = require("Math")
 local Promise = require("Promise")
+local RenderCrateUtils = require("RenderCrateUtils")
 
 local CameraStoryUtils = {}
 
@@ -71,17 +71,16 @@ end
 ]=]
 function CameraStoryUtils.promiseCrate(
 	maid: Maid.Maid,
-	viewportFrame: ViewportFrame,
-	properties
+	viewportFrame: ViewportFrame?,
+	properties: { [string]: any }?
 ): Promise.Promise<Instance>
-	return maid:GivePromise(InsertServiceUtils.promiseAsset(182451181)):Then(function(model)
-		maid:GiveTask(model)
+	local promise = maid:GivePromise(Promise.new())
 
-		local crate = (model :: any):GetChildren()[1]
-		if not crate then
-			return Promise.rejected()
-		end
+	maid:GiveTask(RenderCrateUtils.crate():Subscribe(function(crate)
+		promise:Resolve(crate)
+	end))
 
+	return promise:Then(function(crate)
 		if properties then
 			for _, item in crate:GetDescendants() do
 				if item:IsA("BasePart") then
