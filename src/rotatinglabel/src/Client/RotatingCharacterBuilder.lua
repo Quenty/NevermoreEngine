@@ -23,7 +23,7 @@ function RotatingCharacterBuilder:WithTemplate(TextLabelTemplate)
 	return self
 end
 
-function RotatingCharacterBuilder:Generate(Parent)
+function RotatingCharacterBuilder:Generate(Parent: Instance)
 	local Template = self.TextLabelTemplate or error("Must set TextLabelTemplate")
 
 	local container = Instance.new("Frame")

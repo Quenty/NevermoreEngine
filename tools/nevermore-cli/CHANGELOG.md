@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.15.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.15.1...@quenty/nevermore-cli@4.15.2) (2026-01-20)
+
+
+### Bug Fixes
+
+* Add managed by raven-cli tip ([cdfb3e8](https://github.com/Quenty/Nevermore/commit/cdfb3e83333176f8841e972b035487b6693fa91f))
+
+
+
+
+
+## [4.15.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.15.0...@quenty/nevermore-cli@4.15.1) (2026-01-19)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+# [4.15.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.14.0...@quenty/nevermore-cli@4.15.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
 # [4.14.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.13.2...@quenty/nevermore-cli@4.14.0) (2026-01-14)
 
 

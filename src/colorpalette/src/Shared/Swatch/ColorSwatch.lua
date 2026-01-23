@@ -47,10 +47,10 @@ function ColorSwatch.new(color: ValueObject.Mountable<Color3>, vividness: number
 	return self
 end
 
-function ColorSwatch:GetGraded(colorGrade: number): Color3
+function ColorSwatch:GetGraded(colorGrade: number, vividness: number?): Color3
 	assert(type(colorGrade) == "number", "Bad colorGrade")
 
-	return ColorGradeUtils.getGradedColor(self._color.Value, colorGrade, self._vividness.Value)
+	return ColorGradeUtils.getGradedColor(self._color.Value, colorGrade, vividness or self._vividness.Value)
 end
 
 function ColorSwatch:ObserveGraded(

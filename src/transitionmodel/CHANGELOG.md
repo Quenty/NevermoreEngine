@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.30.1...@quenty/transitionmodel@7.30.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.30.0...@quenty/transitionmodel@7.30.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.29.0...@quenty/transitionmodel@7.30.0) (2026-01-18)
+
+
+### Features
+
+* Add helper events to TransitionModel ([2c88eab](https://github.com/Quenty/NevermoreEngine/commit/2c88eab68739666688e76113ecb2ce1fcb8973b5))
+
+
+
+
+
+# [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.28.0...@quenty/transitionmodel@7.29.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
 # [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.27.1...@quenty/transitionmodel@7.28.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/transitionmodel

@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.1...@quenty/hide@11.31.2) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.0...@quenty/hide@11.31.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* Fix package dependencies that were missing ([89a5112](https://github.com/Quenty/NevermoreEngine/commit/89a511276d1e8430ff55ee021da9992e55ddb52f))
+
+
+
+
+
+# [11.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.30.0...@quenty/hide@11.31.0) (2026-01-18)
+
+
+### Features
+
+* Add DynamicHide to the Hide package to allow for dynamically hiding content ([5c25a4c](https://github.com/Quenty/NevermoreEngine/commit/5c25a4ce76a35164de35cb3a1738e5fa5032336d))
+
+
+
+
+
 # [11.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.29.2...@quenty/hide@11.30.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/hide

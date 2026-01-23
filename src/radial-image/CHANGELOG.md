@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.29.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.29.1...@quenty/radial-image@9.29.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+## [9.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.29.0...@quenty/radial-image@9.29.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+# [9.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.28.0...@quenty/radial-image@9.29.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+# [9.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.27.0...@quenty/radial-image@9.28.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
 # [9.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.26.1...@quenty/radial-image@9.27.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/radial-image

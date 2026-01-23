@@ -18,6 +18,7 @@ return function(target)
 	simpleLoopedSoundPlayer:SetTransitionTime(1)
 
 	simpleLoopedSoundPlayer.Sound.Parent = target
+	simpleLoopedSoundPlayer.Sound:Play()
 
 	simpleLoopedSoundPlayer:Show()
 

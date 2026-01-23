@@ -1,6 +1,6 @@
 {
   "name": "@quenty/soundplayer",
-  "version": "7.29.0",
+  "version": "7.31.3",
   "description": "Sound playback helper",
   "keywords": [
     "Roblox",
@@ -36,12 +36,15 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/numberrangeutils": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
     "@quenty/randomutils": "workspace:*",
     "@quenty/rbxasset": "workspace:*",
     "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
+    "@quenty/soundgroup": "workspace:*",
     "@quenty/sounds": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/transitionmodel": "workspace:*",

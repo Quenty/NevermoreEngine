@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.9.5...@quenty/draw@7.10.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+
+
+
+
+
 ## [7.9.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.9.4...@quenty/draw@7.9.5) (2026-01-12)
 
 

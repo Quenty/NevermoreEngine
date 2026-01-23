@@ -1,6 +1,6 @@
 {
   "name": "@quenty/valuebaseutils",
-  "version": "13.23.0",
+  "version": "13.24.1",
   "description": "Provides utilities for working with valuesbase objects, like IntValue or ObjectValue in Roblox.",
   "keywords": [
     "Roblox",

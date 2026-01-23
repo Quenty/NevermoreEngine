@@ -12,7 +12,6 @@ local RunService = game:GetService("RunService")
 
 local BasePermissionProvider = require("BasePermissionProvider")
 local PermissionLevel = require("PermissionLevel")
-local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
@@ -58,7 +57,7 @@ function CreatorPermissionProvider.PromiseIsPermissionLevel(
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+	assert(PermissionLevel:IsValue(permissionLevel))
 
 	if permissionLevel == PermissionLevel.ADMIN or permissionLevel == PermissionLevel.CREATOR then
 		return Promise.resolved(player.UserId == self._userId or RunService:IsStudio())

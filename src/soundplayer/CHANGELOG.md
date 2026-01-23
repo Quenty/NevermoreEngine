@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.31.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.2...@quenty/soundplayer@7.31.3) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.1...@quenty/soundplayer@7.31.2) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.0...@quenty/soundplayer@7.31.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* Fix package dependencies that were missing ([89a5112](https://github.com/Quenty/NevermoreEngine/commit/89a511276d1e8430ff55ee021da9992e55ddb52f))
+
+
+
+
+
+# [7.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.30.0...@quenty/soundplayer@7.31.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* Push sound order priority ([45a29f2](https://github.com/Quenty/NevermoreEngine/commit/45a29f21a00d72d7971299695e28129d5b9d0cfb))
+
+
+### Features
+
+* Make hiding work ([8203ae4](https://github.com/Quenty/NevermoreEngine/commit/8203ae460bd4e5866f7328c54ac48f62addfd637))
+* Route sound player into stack ([8ec445b](https://github.com/Quenty/NevermoreEngine/commit/8ec445bc4d3cd60b247f78b37f19ba902e2e477a))
+
+
+
+
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.29.0...@quenty/soundplayer@7.30.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
 # [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.28.1...@quenty/soundplayer@7.29.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/soundplayer

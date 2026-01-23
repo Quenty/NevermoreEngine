@@ -19,7 +19,6 @@ local GroupPermissionProvider = require("GroupPermissionProvider")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local PermissionLevel = require("PermissionLevel")
-local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
@@ -134,7 +133,7 @@ function PermissionService.PromiseIsPermissionLevel(
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
-	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+	assert(PermissionLevel:IsValue(permissionLevel), "Bad permissionLevel")
 
 	return self:PromisePermissionProvider():Then(function(permissionProvider)
 		return permissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
@@ -151,7 +150,7 @@ function PermissionService.ObservePermissionedPlayersBrio(
 	self: PermissionService,
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Observable.Observable<Brio.Brio<Player>>
-	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+	assert(PermissionLevel:IsValue(permissionLevel))
 
 	return RxPlayerUtils.observePlayersBrio():Pipe({
 		RxBrioUtils.flatMapBrio(function(player)

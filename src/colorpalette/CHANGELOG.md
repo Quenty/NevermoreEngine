@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.31.1...@quenty/colorpalette@10.31.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+## [10.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.31.0...@quenty/colorpalette@10.31.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+# [10.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.30.0...@quenty/colorpalette@10.31.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.29.0...@quenty/colorpalette@10.30.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+
+
+
+
+
 # [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.28.1...@quenty/colorpalette@10.29.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/colorpalette

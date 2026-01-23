@@ -13,7 +13,7 @@ local RogueHumanoidClient = setmetatable({}, RogueHumanoidBase)
 RogueHumanoidClient.ClassName = "RogueHumanoidClient"
 RogueHumanoidClient.__index = RogueHumanoidClient
 
-function RogueHumanoidClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function RogueHumanoidClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(RogueHumanoidBase.new(humanoid, serviceBag), RogueHumanoidClient)
 
 	return self

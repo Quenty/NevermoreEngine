@@ -1,6 +1,6 @@
 {
   "name": "@quenty/camerastoryutils",
-  "version": "10.13.0",
+  "version": "10.13.1",
   "description": "CameraStoryUtils - utility functions for 3D viewport hoarcekat stories.",
   "keywords": [
     "Roblox",
@@ -29,7 +29,7 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/insertserviceutils": "workspace:*",
+    "@quenty/blend": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/math": "workspace:*",
     "@quenty/promise": "workspace:*"

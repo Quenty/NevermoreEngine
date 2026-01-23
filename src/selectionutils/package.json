@@ -1,6 +1,6 @@
 {
   "name": "@quenty/selectionutils",
-  "version": "8.24.0",
+  "version": "8.25.1",
   "description": "Utility methods around Selection service. Useful for plugins and stories.",
   "keywords": [
     "Roblox",

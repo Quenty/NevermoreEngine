@@ -1,3 +1,95 @@
+# (Fri Jan 23 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/camerastoryutils@10.13.1`, `@quenty/uiobjectutils@6.23.2`
+  - Users/quenty/support [#651](https://github.com/Quenty/NevermoreEngine/pull/651) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jan 21 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.26.1`, `@quenty/canceltoken@11.14.1`
+  - fix: Enhance annotations [#650](https://github.com/Quenty/NevermoreEngine/pull/650) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Tue Jan 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.15.2`
+  - fix: Add managed by raven-cli tip [#649](https://github.com/Quenty/NevermoreEngine/pull/649) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jan 19 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.15.1`, `@quenty/nevermore-template-helpers@1.5.1`
+  - fix: templates now rename 'npmrc' to '.npmrc', similar to .gitignore files (while not on a fork, in order to pass publishing tests) [#647](https://github.com/Quenty/NevermoreEngine/pull/647) ([@euvinkeel](https://github.com/euvinkeel) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jan 18 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/hide@11.31.1`, `@quenty/soundplayer@7.31.1`
+  - fix: Fix package dependencies that were missing [#646](https://github.com/Quenty/NevermoreEngine/pull/646) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jan 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/binarysearch@2.4.0`, `@quenty/binder@14.29.0`, `@quenty/hide@11.31.0`, `@quenty/instanceutils@13.24.0`, `@quenty/observablecollection@12.30.0`, `@quenty/rx@13.23.0`, `@quenty/soundgroup@1.32.0`, `@quenty/soundplayer@7.31.0`, `@quenty/transitionmodel@7.30.0`, `@quenty/nevermore-cli@4.15.0`
+  - Users/quenty/tracking [#645](https://github.com/Quenty/NevermoreEngine/pull/645) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jan 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.6.0`, `@quenty/adorneedata@7.27.0`, `@quenty/bodycolorsutils@7.27.0`, `@quenty/boundlinkutils@14.29.0`, `@quenty/buttondragmodel@1.23.0`, `@quenty/chatproviderservice@9.40.0`, `@quenty/clienttranslator@14.28.0`, `@quenty/colorpalette@10.30.0`, `@quenty/convexhull@4.11.0`, `@quenty/draw@7.10.0`, `@quenty/enums@1.1.0`, `@quenty/gameconfig@12.38.0`, `@quenty/ik@15.41.0`, `@quenty/permissionprovider@14.29.0`, `@quenty/playerinputmode@9.30.0`, `@quenty/ragdoll@15.40.0`, `@quenty/rbxthumb@5.12.0`, `@quenty/remoting@12.25.0`, `@quenty/rogue-humanoid@10.38.0`, `@quenty/rogue-properties@11.36.0`, `@quenty/rotatinglabel@11.11.0`, `@quenty/scoredactionservice@16.34.0`, `@quenty/teamutils@10.24.0`, `@quenty/templateprovider@11.28.0`, `@quenty/tie@10.32.0`
+  - feat: Add SimpleEnum package and interface [#644](https://github.com/Quenty/NevermoreEngine/pull/644) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jan 14 2026)
 
 #### 🚀 Enhancement

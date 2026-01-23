@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.41.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.41.1...@quenty/ragdoll@15.41.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+## [15.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.41.0...@quenty/ragdoll@15.41.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [15.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.40.0...@quenty/ragdoll@15.41.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [15.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.39.0...@quenty/ragdoll@15.40.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+
+
+
+
+
 # [15.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.38.1...@quenty/ragdoll@15.39.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/ragdoll

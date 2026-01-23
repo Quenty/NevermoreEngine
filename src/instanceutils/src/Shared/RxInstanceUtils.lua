@@ -463,6 +463,35 @@ function RxInstanceUtils.observeDescendantsBrio(
 end
 
 --[=[
+	Observes all descendants and self that match a predicate as a brio
+
+	@param parent Instance
+	@param predicate ((value: Instance) -> boolean)? -- Optional filter
+	@return Observable<Brio<Instance>>
+]=]
+function RxInstanceUtils.observeDescendantsAndSelfBrio(
+	parent: Instance,
+	predicate: Rx.Predicate<Instance>?
+): Observable.Observable<Brio.Brio<Instance>>
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		if not predicate or predicate(parent) then
+			local value = Brio.new(parent)
+			maid[parent] = value
+			sub:Fire(value)
+		end
+
+		maid:GiveTask(RxInstanceUtils.observeDescendantsBrio(parent, predicate):Subscribe(sub:GetFireFailComplete()))
+
+		return maid
+	end) :: any
+end
+
+--[=[
 	Observes all descendants of a specific class
 
 	@param parent Instance

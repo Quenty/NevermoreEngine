@@ -1,6 +1,6 @@
 {
   "name": "@quenty/remoting",
-  "version": "12.24.0",
+  "version": "12.26.1",
   "description": "Global remoting retrieval system for Roblox (RemoteFunctions/RemoteEvents)",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

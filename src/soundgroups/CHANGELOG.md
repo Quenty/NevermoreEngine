@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.32.1...@quenty/soundgroup@1.32.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+## [1.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.32.0...@quenty/soundgroup@1.32.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
+# [1.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.31.0...@quenty/soundgroup@1.32.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* Remove unnecessary check ([e3119de](https://github.com/Quenty/NevermoreEngine/commit/e3119deae974eca51396d0235e76e166fe929b5a))
+
+
+
+
+
+# [1.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.30.0...@quenty/soundgroup@1.31.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
 # [1.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.29.1...@quenty/soundgroup@1.30.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/soundgroup

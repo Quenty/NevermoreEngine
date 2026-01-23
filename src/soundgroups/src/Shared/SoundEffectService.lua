@@ -74,12 +74,11 @@ end
 	@param soundGroupPath string
 	@return Promise<NumberValue>
 ]=]
-function SoundEffectService:PromiseCreateVolumeMultiplier(soundGroupPath: string): Promise.Promise<NumberValue>
+function SoundEffectService.PromiseCreateVolumeMultiplier(
+	self: SoundEffectService,
+	soundGroupPath: string
+): Promise.Promise<NumberValue>
 	local soundGroup = self:GetOrCreateSoundGroup(soundGroupPath)
-	if soundGroup == nil then
-		return Promise.rejected("Failed to get or create sound group for path: " .. soundGroupPath)
-	end
-
 	local soundGroupVolumeBinder = self._serviceBag:GetService(require("SoundGroupVolume"))
 	soundGroupVolumeBinder:Tag(soundGroup)
 
