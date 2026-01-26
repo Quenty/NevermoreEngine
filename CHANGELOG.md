@@ -1,3 +1,56 @@
+# (Fri Jan 23 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/camerastoryutils@10.13.1`, `@quenty/uiobjectutils@6.23.2`
+  - Users/quenty/support [#651](https://github.com/Quenty/NevermoreEngine/pull/651) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jan 21 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.26.1`, `@quenty/canceltoken@11.14.1`
+  - fix: Enhance annotations [#650](https://github.com/Quenty/NevermoreEngine/pull/650) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Tue Jan 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.15.2`
+  - fix: Add managed by raven-cli tip [#649](https://github.com/Quenty/NevermoreEngine/pull/649) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jan 19 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.15.1`, `@quenty/nevermore-template-helpers@1.5.1`
+  - fix: templates now rename 'npmrc' to '.npmrc', similar to .gitignore files (while not on a fork, in order to pass publishing tests) [#647](https://github.com/Quenty/NevermoreEngine/pull/647) ([@euvinkeel](https://github.com/euvinkeel) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jan 18 2026)
 
 #### 🐛 Bug Fix

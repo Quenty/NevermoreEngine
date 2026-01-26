@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-template-helpers",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Helpers to generate Nevermore package and game templates",
   "type": "module",
   "keywords": [

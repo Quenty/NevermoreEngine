@@ -866,9 +866,9 @@ importers:
 
   src/camerastoryutils:
     dependencies:
-      '@quenty/insertserviceutils':
+      '@quenty/blend':
         specifier: workspace:*
-        version: link:../insertserviceutils
+        version: link:../blend
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
