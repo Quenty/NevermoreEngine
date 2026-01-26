@@ -1,3 +1,15 @@
+# v10.45.0 (Mon Jan 26 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/unrooot/holdable-input-keymap ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

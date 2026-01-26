@@ -1,3 +1,16 @@
+# (Mon Jan 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/inputkeymaputils@14.35.0`
+  - feat: Add Holdable option to InputKeyMapList [#648](https://github.com/Quenty/NevermoreEngine/pull/648) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Fri Jan 23 2026)
 
 #### 🐛 Bug Fix
