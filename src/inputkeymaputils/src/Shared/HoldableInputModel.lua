@@ -4,8 +4,9 @@
 	and exposes observables for hold progress.
 
 	```lua
-	local holdableInputModel = HoldableInputModel.new()
-	holdableInputModel:SetMaxHoldDuration(1.5)
+	local holdableInputModel = HoldableInputModel.new(1.5)
+	-- Or set it later:
+	-- holdableInputModel:SetMaxHoldDuration(1.5)
 
 	maid:GiveTask(holdableInputModel.HoldReleased:Connect(function(holdPercent)
 		print("Released at", holdPercent)
@@ -50,12 +51,13 @@ export type HoldableInputModel = typeof(setmetatable(
 --[=[
 	Constructs a new HoldableInputModel
 
+	@param maxHoldDuration number? -- Optional max hold duration in seconds (defaults to 1)
 	@return HoldableInputModel
 ]=]
-function HoldableInputModel.new(): HoldableInputModel
+function HoldableInputModel.new(maxHoldDuration: number?): HoldableInputModel
 	local self = setmetatable(BaseObject.new() :: any, HoldableInputModel)
 
-	self._maxHoldDuration = self._maid:Add(ValueObject.new(1, "number"))
+	self._maxHoldDuration = self._maid:Add(ValueObject.new(maxHoldDuration or 1, "number"))
 	self._holdPercent = self._maid:Add(ValueObject.new(0, "number"))
 	self._isHolding = self._maid:Add(ValueObject.new(false, "boolean"))
 

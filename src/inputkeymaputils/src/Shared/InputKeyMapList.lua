@@ -81,8 +81,6 @@ export type InputKeyMapList =
 export type InputKeyMapListOptions = {
 	bindingName: string,
 	rebindable: boolean,
-	holdable: boolean?,
-	maxHoldDuration: number?,
 }
 
 --[=[
@@ -173,37 +171,7 @@ function InputKeyMapList.IsUserRebindable(self: InputKeyMapList): boolean
 	return self._options.rebindable == true
 end
 
---[=[
-	Returns whether this input is holdable
-	@return boolean
-]=]
-function InputKeyMapList.IsHoldable(self: InputKeyMapList): boolean
-	return self._options.holdable == true
-end
 
---[=[
-	Gets the maximum hold duration in seconds
-	@return number
-]=]
-function InputKeyMapList.GetMaxHoldDuration(self: InputKeyMapList): number
-	return self._options.maxHoldDuration or 1
-end
-
---[=[
-	Observes whether this input is holdable
-	@return Observable<boolean>
-]=]
-function InputKeyMapList.ObserveIsHoldable(self: InputKeyMapList): Observable.Observable<boolean>
-	return Rx.of(self:IsHoldable())
-end
-
---[=[
-	Observes the maximum hold duration
-	@return Observable<number>
-]=]
-function InputKeyMapList.ObserveMaxHoldDuration(self: InputKeyMapList): Observable.Observable<number>
-	return Rx.of(self:GetMaxHoldDuration())
-end
 
 --[=[
 	Gets the english name
