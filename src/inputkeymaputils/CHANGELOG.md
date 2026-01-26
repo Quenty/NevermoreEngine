@@ -1,26 +1,24 @@
-# v14.35.0 (Mon Jan 26 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add Holdable option to InputKeyMapList [#648](https://github.com/Quenty/NevermoreEngine/pull/648) ([@unrooot](https://github.com/unrooot))
-- feat: Add Holdable option to InputKeyMapList ([@unrooot](https://github.com/unrooot))
-
-#### 🐛 Bug Fix
-
-- fix: Fix lint ([@unrooot](https://github.com/unrooot))
-- fix: Remove holding state from input system ([@unrooot](https://github.com/unrooot))
-- Merge branch 'main' into users/unrooot/holdable-input-keymap ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.34.2...@quenty/inputkeymaputils@14.35.0) (2026-01-26)
+
+
+### Bug Fixes
+
+* Fix lint ([7c77d1f](https://github.com/Quenty/NevermoreEngine/commit/7c77d1f6d95657072fc756e6f93bed1484646ad9))
+* Remove holding state from input system ([b20d6f8](https://github.com/Quenty/NevermoreEngine/commit/b20d6f88725703864fe8112517dd4a5270274e3a))
+
+
+### Features
+
+* Add Holdable option to InputKeyMapList ([0422fb6](https://github.com/Quenty/NevermoreEngine/commit/0422fb61671d80b110b06c6bf2da00fb293698bb))
+
+
+
+
 
 ## [14.34.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.34.1...@quenty/inputkeymaputils@14.34.2) (2026-01-23)
 

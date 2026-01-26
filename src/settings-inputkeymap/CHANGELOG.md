@@ -1,19 +1,15 @@
-# v10.45.0 (Mon Jan 26 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/unrooot/holdable-input-keymap ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.44.2...@quenty/settings-inputkeymap@10.45.0) (2026-01-26)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+
+
+
 
 ## [10.44.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.44.1...@quenty/settings-inputkeymap@10.44.2) (2026-01-23)
 

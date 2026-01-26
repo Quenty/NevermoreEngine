@@ -1,19 +1,15 @@
-# v16.36.0 (Mon Jan 26 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/unrooot/holdable-input-keymap ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [16.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.35.2...@quenty/scoredactionservice@16.36.0) (2026-01-26)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
 
 ## [16.35.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.35.1...@quenty/scoredactionservice@16.35.2) (2026-01-23)
 
