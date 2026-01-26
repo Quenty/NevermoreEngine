@@ -36,17 +36,19 @@ local HoldableInputModel = setmetatable({}, BaseObject)
 HoldableInputModel.ClassName = "HoldableInputModel"
 HoldableInputModel.__index = HoldableInputModel
 
-export type HoldableInputModel = typeof(setmetatable(
-	{} :: {
-		_maxHoldDuration: ValueObject.ValueObject<number>,
-		_holdPercent: ValueObject.ValueObject<number>,
-		_isHolding: ValueObject.ValueObject<boolean>,
-		HoldStarted: Signal.Signal<()>,
-		HoldUpdated: Signal.Signal<number>,
-		HoldReleased: Signal.Signal<number>,
-	},
-	{} :: typeof({ __index = HoldableInputModel })
-)) & BaseObject.BaseObject
+export type HoldableInputModel =
+	typeof(setmetatable(
+		{} :: {
+			_maxHoldDuration: ValueObject.ValueObject<number>,
+			_holdPercent: ValueObject.ValueObject<number>,
+			_isHolding: ValueObject.ValueObject<boolean>,
+			HoldStarted: Signal.Signal<()>,
+			HoldUpdated: Signal.Signal<number>,
+			HoldReleased: Signal.Signal<number>,
+		},
+		{} :: typeof({ __index = HoldableInputModel })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new HoldableInputModel
@@ -91,7 +93,10 @@ end
 	@param duration number | Observable<number>
 	@return MaidTask
 ]=]
-function HoldableInputModel.SetMaxHoldDuration(self: HoldableInputModel, duration: number | Observable.Observable<number>)
+function HoldableInputModel.SetMaxHoldDuration(
+	self: HoldableInputModel,
+	duration: number | Observable.Observable<number>
+)
 	return self._maxHoldDuration:Mount(duration)
 end
 

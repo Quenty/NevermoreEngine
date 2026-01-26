@@ -171,8 +171,6 @@ function InputKeyMapList.IsUserRebindable(self: InputKeyMapList): boolean
 	return self._options.rebindable == true
 end
 
-
-
 --[=[
 	Gets the english name
 	@return string
