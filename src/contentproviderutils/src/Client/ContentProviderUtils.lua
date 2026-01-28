@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility functions to ensure that content is preloaded (wrapping calls in promises)
 	@class ContentProviderUtils

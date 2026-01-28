@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class ExperienceUtils.spec.lua
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local ExperienceUtils = require("ExperienceUtils")
 local Jest = require("Jest")

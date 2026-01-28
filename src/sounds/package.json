@@ -1,6 +1,6 @@
 {
   "name": "@quenty/sounds",
-  "version": "10.13.0",
+  "version": "10.16.0",
   "description": "Utility functions involving sounds and their state",
   "keywords": [
     "Roblox",
@@ -22,15 +22,18 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/promisemaid": "file:../promisemaid",
-    "@quenty/rbxasset": "file:../rbxasset"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/promisemaid": "workspace:*",
+    "@quenty/rbxasset": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

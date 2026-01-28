@@ -6,6 +6,14 @@
 
 local IKUtils = {}
 
+--[=[
+	Returns a function that dampens angles approaching maxAngle.
+
+	@param maxAngle number -- The maximum angle allowed
+	@param dampenAreaAngle number -- The area over which to dampen
+	@param dampenAreaFactor number? -- The factor to use for dampening. Defaults to dampenAreaAngle.
+	@return (number) -> number -- A function that takes an angle and returns a dampened angle
+]=]
 function IKUtils.getDampenedAngleClamp(
 	maxAngle: number,
 	dampenAreaAngle: number,

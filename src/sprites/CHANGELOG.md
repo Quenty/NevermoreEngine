@@ -3,6 +3,132 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.23.1...@quenty/sprites@13.23.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+## [13.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.23.0...@quenty/sprites@13.23.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [13.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.22.0...@quenty/sprites@13.23.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [13.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.21.2...@quenty/sprites@13.22.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+## [13.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.21.1...@quenty/sprites@13.21.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [13.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.21.0...@quenty/sprites@13.21.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [13.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.20.0...@quenty/sprites@13.21.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [13.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.7...@quenty/sprites@13.20.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+## [13.19.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.6...@quenty/sprites@13.19.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+## [13.19.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.5...@quenty/sprites@13.19.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+## [13.19.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.4...@quenty/sprites@13.19.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+## [13.19.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.3...@quenty/sprites@13.19.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+## [13.19.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.2...@quenty/sprites@13.19.3) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+## [13.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.1...@quenty/sprites@13.19.2) (2025-11-14)
+
+
+### Bug Fixes
+
+* Reuse sprites for L3/R3 ([3cde3a3](https://github.com/Quenty/NevermoreEngine/commit/3cde3a3553ba0e30c720769df91702af2aa24744))
+
+
+
+
+
+## [13.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.19.0...@quenty/sprites@13.19.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
 # [13.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.18.0...@quenty/sprites@13.19.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/sprites

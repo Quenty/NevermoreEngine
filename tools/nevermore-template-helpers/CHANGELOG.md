@@ -3,6 +3,63 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.5.0...@quenty/nevermore-template-helpers@1.5.1) (2026-01-19)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
+# [1.5.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.4.2...@quenty/nevermore-template-helpers@1.5.0) (2026-01-14)
+
+
+### Features
+
+* Nevermore CLI now checks to make sure it is up to date ([d86930c](https://github.com/Quenty/Nevermore/commit/d86930c85f24d879dee9ce5ce413488d1250246d))
+
+
+
+
+
+## [1.4.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.4.1...@quenty/nevermore-template-helpers@1.4.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/Nevermore/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [1.4.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.4.0...@quenty/nevermore-template-helpers@1.4.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
+# [1.4.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.3.1...@quenty/nevermore-template-helpers@1.4.0) (2026-01-08)
+
+
+### Features
+
+* Nevermore init generates complaint luau-lsp checking that can be pushed to github immediately and pass CI/CD ([7aaabed](https://github.com/Quenty/Nevermore/commit/7aaabed2d35be08ca2f4956cfb6e87371e939c2f))
+
+
+
+
+
+## [1.3.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.3.0...@quenty/nevermore-template-helpers@1.3.1) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
 # [1.3.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.2.3...@quenty/nevermore-template-helpers@1.3.0) (2025-07-11)
 
 **Note:** Version bump only for package @quenty/nevermore-template-helpers

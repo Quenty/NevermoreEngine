@@ -1,6 +1,6 @@
 {
   "name": "@quenty/soundplayer",
-  "version": "7.23.0",
+  "version": "7.31.3",
   "description": "Sound playback helper",
   "keywords": [
     "Roblox",
@@ -21,28 +21,34 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/adorneeutils": "file:../adorneeutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/blend": "file:../blend",
-    "@quenty/brio": "file:../brio",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/numberrangeutils": "file:../numberrangeutils",
-    "@quenty/promise": "file:../promise",
-    "@quenty/promisemaid": "file:../promisemaid",
-    "@quenty/randomutils": "file:../randomutils",
-    "@quenty/rbxasset": "file:../rbxasset",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/sounds": "file:../sounds",
-    "@quenty/table": "file:../table",
-    "@quenty/transitionmodel": "file:../transitionmodel",
-    "@quenty/valueobject": "file:../valueobject",
+    "@quenty/adorneeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/numberrangeutils": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/promisemaid": "workspace:*",
+    "@quenty/randomutils": "workspace:*",
+    "@quenty/rbxasset": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/soundgroup": "workspace:*",
+    "@quenty/sounds": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/transitionmodel": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

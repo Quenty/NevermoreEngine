@@ -3,6 +3,162 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.31.0...@quenty/datastore@13.31.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.30.0...@quenty/datastore@13.31.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.29.0...@quenty/datastore@13.30.0) (2026-01-14)
+
+
+### Bug Fixes
+
+* DataStores now use one message per a place instead of many, which cuts down on subscription costs ([177c820](https://github.com/Quenty/NevermoreEngine/commit/177c82062d6cda7b8097d87316475c8fee13221d))
+
+
+
+
+
+# [13.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.28.2...@quenty/datastore@13.29.0) (2026-01-13)
+
+
+### Features
+
+* Add datastore session locking and stealing to DataStore package ([4a3691a](https://github.com/Quenty/NevermoreEngine/commit/4a3691aeefad9a4c7703665ef51ff14e6596e525))
+* Add new datastore session locking ([52f1a4b](https://github.com/Quenty/NevermoreEngine/commit/52f1a4b8988e9271ca639b0fec43315bb63ae97b))
+
+
+
+
+
+## [13.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.28.1...@quenty/datastore@13.28.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+* Update DataStore to handle locking on non-locked items a bit better ([572bd59](https://github.com/Quenty/NevermoreEngine/commit/572bd59b4946fa8c1a2413a50c5402ca32e57b33))
+
+
+
+
+
+## [13.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.28.0...@quenty/datastore@13.28.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.27.0...@quenty/datastore@13.28.0) (2026-01-08)
+
+
+### Features
+
+* DataStoreStage.Load and DataStoreStage.Observe are optionally allowed to take no arguments to observe the full stage's values ([f9dc6b7](https://github.com/Quenty/NevermoreEngine/commit/f9dc6b7078e0961aad599ed8197c345ac76036f2))
+
+
+
+
+
+# [13.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.26.1...@quenty/datastore@13.27.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Add more typing ([f32615e](https://github.com/Quenty/NevermoreEngine/commit/f32615ec9d846a1a4392a3b21a0f594e8d420b44))
+
+
+
+
+
+## [13.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.26.0...@quenty/datastore@13.26.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.7...@quenty/datastore@13.26.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [13.25.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.6...@quenty/datastore@13.25.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [13.25.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.5...@quenty/datastore@13.25.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [13.25.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.4...@quenty/datastore@13.25.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [13.25.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.3...@quenty/datastore@13.25.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [13.25.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.2...@quenty/datastore@13.25.3) (2025-12-28)
+
+
+### Bug Fixes
+
+* Handle nil value in StoreOnValueChange ([#615](https://github.com/Quenty/NevermoreEngine/issues/615)) ([09fa459](https://github.com/Quenty/NevermoreEngine/commit/09fa459b175b6e813cf64a3650d00127fa0cab06))
+
+
+
+
+
+## [13.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.1...@quenty/datastore@13.25.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [13.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.25.0...@quenty/datastore@13.25.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
 # [13.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.24.0...@quenty/datastore@13.25.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/datastore

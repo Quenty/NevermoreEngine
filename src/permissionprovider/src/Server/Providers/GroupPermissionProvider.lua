@@ -13,7 +13,6 @@ local Players = game:GetService("Players")
 local BasePermissionProvider = require("BasePermissionProvider")
 local GroupUtils = require("GroupUtils")
 local PermissionLevel = require("PermissionLevel")
-local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
@@ -22,18 +21,20 @@ local GroupPermissionProvider = setmetatable({}, BasePermissionProvider)
 GroupPermissionProvider.__index = GroupPermissionProvider
 GroupPermissionProvider.ClassName = "GroupPermissionProvider"
 
-export type GroupPermissionProvider = typeof(setmetatable(
-	{} :: {
-		_config: PermissionProviderUtils.GroupRankConfig,
-		_groupId: number,
-		_minAdminRequiredRank: number,
-		_minCreatorRequiredRank: number,
-		_adminsCache: { [number]: true },
-		_creatorCache: { [number]: true },
-		_promiseRankPromisesCache: { [number]: Promise.Promise<number> },
-	},
-	{} :: typeof({ __index = GroupPermissionProvider })
-)) & BasePermissionProvider.BasePermissionProvider
+export type GroupPermissionProvider =
+	typeof(setmetatable(
+		{} :: {
+			_config: PermissionProviderUtils.GroupRankConfig,
+			_groupId: number,
+			_minAdminRequiredRank: number,
+			_minCreatorRequiredRank: number,
+			_adminsCache: { [number]: true },
+			_creatorCache: { [number]: true },
+			_promiseRankPromisesCache: { [number]: Promise.Promise<number> },
+		},
+		{} :: typeof({ __index = GroupPermissionProvider })
+	))
+	& BasePermissionProvider.BasePermissionProvider
 
 --[=[
 	@param config table
@@ -97,7 +98,7 @@ function GroupPermissionProvider.PromiseIsPermissionLevel(
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+	assert(PermissionLevel:IsValue(permissionLevel))
 
 	if permissionLevel == PermissionLevel.ADMIN then
 		return self:_promiseIsAdmin(player)

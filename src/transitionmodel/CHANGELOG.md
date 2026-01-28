@@ -3,6 +3,170 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.30.1...@quenty/transitionmodel@7.30.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.30.0...@quenty/transitionmodel@7.30.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.29.0...@quenty/transitionmodel@7.30.0) (2026-01-18)
+
+
+### Features
+
+* Add helper events to TransitionModel ([2c88eab](https://github.com/Quenty/NevermoreEngine/commit/2c88eab68739666688e76113ecb2ce1fcb8973b5))
+
+
+
+
+
+# [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.28.0...@quenty/transitionmodel@7.29.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+# [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.27.1...@quenty/transitionmodel@7.28.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.27.0...@quenty/transitionmodel@7.27.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.26.1...@quenty/transitionmodel@7.27.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.26.0...@quenty/transitionmodel@7.26.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+# [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.25.0...@quenty/transitionmodel@7.26.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+# [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.24.1...@quenty/transitionmodel@7.25.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Transition model starts hidden complete by default ([92509ec](https://github.com/Quenty/NevermoreEngine/commit/92509ec860229a7b0856df01326cafcae86c98b1))
+
+
+
+
+
+## [7.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.24.0...@quenty/transitionmodel@7.24.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* Transition times take a mountable value instead of just a number ([d63f252](https://github.com/Quenty/NevermoreEngine/commit/d63f2525ec29db3aaabab70fee0956806b4718a1))
+
+
+
+
+
+# [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.7...@quenty/transitionmodel@7.24.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.23.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.6...@quenty/transitionmodel@7.23.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.23.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.5...@quenty/transitionmodel@7.23.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.23.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.4...@quenty/transitionmodel@7.23.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.23.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.3...@quenty/transitionmodel@7.23.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.2...@quenty/transitionmodel@7.23.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.1...@quenty/transitionmodel@7.23.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
+## [7.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.23.0...@quenty/transitionmodel@7.23.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
+
+
+
+
 # [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.22.0...@quenty/transitionmodel@7.23.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/transitionmodel

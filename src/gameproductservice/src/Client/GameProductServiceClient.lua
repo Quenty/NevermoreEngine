@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	This service provides an interface to purchase produces, assets, and other
 	marketplace items. This listens to events, handles requests between server and

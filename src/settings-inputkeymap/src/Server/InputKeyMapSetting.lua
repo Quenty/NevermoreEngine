@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Registers the settings automatically so we can validate on the server.
 	@class InputKeyMapSetting
@@ -8,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local InputKeyMapSettingConstants = require("InputKeyMapSettingConstants")
 local InputKeyMapSettingUtils = require("InputKeyMapSettingUtils")
+local ServiceBag = require("ServiceBag")
 local SettingDefinition = require("SettingDefinition")
 local SettingsDataService = require("SettingsDataService")
 
@@ -15,7 +17,7 @@ local InputKeyMapSetting = setmetatable({}, BaseObject)
 InputKeyMapSetting.ClassName = "InputKeyMapSetting"
 InputKeyMapSetting.__index = InputKeyMapSetting
 
-function InputKeyMapSetting.new(serviceBag, inputKeyMapList)
+function InputKeyMapSetting.new(serviceBag: ServiceBag.ServiceBag, inputKeyMapList)
 	local self = setmetatable(BaseObject.new(), InputKeyMapSetting)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

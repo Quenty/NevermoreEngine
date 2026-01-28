@@ -3,6 +3,143 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.24.0...@quenty/buttondragmodel@1.24.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+# [1.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.23.0...@quenty/buttondragmodel@1.24.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+# [1.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.22.0...@quenty/buttondragmodel@1.23.0) (2026-01-16)
+
+
+### Bug Fixes
+
+* Fix some simple typing ([d8aadbf](https://github.com/Quenty/NevermoreEngine/commit/d8aadbf30d628e3f8e4d5d0280c99df986b763f2))
+
+
+
+
+
+# [1.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.21.2...@quenty/buttondragmodel@1.22.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+## [1.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.21.1...@quenty/buttondragmodel@1.21.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [1.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.21.0...@quenty/buttondragmodel@1.21.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+# [1.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.20.1...@quenty/buttondragmodel@1.21.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+## [1.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.20.0...@quenty/buttondragmodel@1.20.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+# [1.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.19.7...@quenty/buttondragmodel@1.20.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+## [1.19.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.19.6...@quenty/buttondragmodel@1.19.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+## [1.19.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.19.5...@quenty/buttondragmodel@1.19.6) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [1.19.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.19.4...@quenty/buttondragmodel@1.19.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+## [1.19.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.19.3...@quenty/buttondragmodel@1.19.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+## [1.19.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.19.2...@quenty/buttondragmodel@1.19.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+## [1.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.19.1...@quenty/buttondragmodel@1.19.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
+## [1.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.19.0...@quenty/buttondragmodel@1.19.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/buttondragmodel
+
+
+
+
+
 # [1.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttondragmodel@1.18.0...@quenty/buttondragmodel@1.19.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/buttondragmodel

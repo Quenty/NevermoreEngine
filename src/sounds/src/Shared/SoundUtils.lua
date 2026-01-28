@@ -21,6 +21,8 @@ export type SoundOptions = {
 	SoundId: number | string,
 }
 
+export type SoundId = RbxAssetUtils.RbxAssetIdConvertable | SoundOptions | Sound
+
 local SoundUtils = {}
 
 --[=[
@@ -36,7 +38,7 @@ local SoundUtils = {}
 
 	@return Sound
 ]=]
-function SoundUtils.playFromId(id: string | number | SoundOptions): Sound
+function SoundUtils.playFromId(id: SoundId): Sound
 	local sound = SoundUtils.createSoundFromId(id)
 
 	if RunService:IsClient() then
@@ -51,9 +53,36 @@ function SoundUtils.playFromId(id: string | number | SoundOptions): Sound
 end
 
 --[=[
+	Clones a soundId from a base id and applies properties from an overwrite id.
+]=]
+function SoundUtils.cloneMerge(baseId: SoundId, overwriteId: SoundId): SoundId
+	assert(SoundUtils.isConvertableToRbxAsset(baseId), "Bad id")
+	assert(SoundUtils.isConvertableToRbxAsset(overwriteId), "Bad overwriteId")
+
+	local conversion = SoundUtils.toRbxAssetId(overwriteId)
+	assert(conversion, "Bad conversion")
+
+	local sound = SoundUtils.createSoundFromId(baseId)
+	sound.SoundId = conversion
+
+	SoundUtils.applyPropertiesFromId(sound, overwriteId)
+
+	return sound
+end
+
+--[=[
 	Creates a new sound object from the given id
 ]=]
-function SoundUtils.createSoundFromId(id: string | number | SoundOptions): Sound
+function SoundUtils.createSoundFromId(id: SoundId): Sound
+	if typeof(id) == "Instance" and id:IsA("Sound") then
+		local copy = Instance.fromExisting(id)
+		copy.Archivable = false
+
+		SoundUtils.applyPropertiesFromId(copy, id)
+
+		return copy
+	end
+
 	local soundId = SoundUtils.toRbxAssetId(id)
 	assert(type(soundId) == "string", "Bad id")
 
@@ -65,7 +94,7 @@ function SoundUtils.createSoundFromId(id: string | number | SoundOptions): Sound
 	return sound
 end
 
-function SoundUtils.applyPropertiesFromId(sound: Sound, id: string | number | SoundOptions): ()
+function SoundUtils.applyPropertiesFromId(sound: Sound, id: SoundId): ()
 	local soundId = assert(SoundUtils.toRbxAssetId(id), "Unable to convert id to rbxassetid")
 
 	sound.Name = string.format("Sound_%s", soundId)
@@ -95,7 +124,7 @@ end
 --[=[
 	Plays back a template given asset id in the parent
 ]=]
-function SoundUtils.playFromIdInParent(id: string | number | SoundOptions, parent: Instance): Sound
+function SoundUtils.playFromIdInParent(id: SoundId, parent: Instance): Sound
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	local sound = SoundUtils.createSoundFromId(id)
@@ -157,16 +186,20 @@ end
 	@return string?
 	@within SoundUtils
 ]=]
-function SoundUtils.toRbxAssetId(soundId: string | number | SoundOptions): string?
+function SoundUtils.toRbxAssetId(soundId: SoundId): string?
 	if type(soundId) == "table" then
 		return RbxAssetUtils.toRbxAssetId(soundId.SoundId)
+	elseif typeof(soundId) == "Instance" then
+		return soundId.SoundId
 	else
 		return RbxAssetUtils.toRbxAssetId(soundId)
 	end
 end
 
-function SoundUtils.isConvertableToRbxAsset(soundId: string | number | SoundOptions): boolean
+function SoundUtils.isConvertableToRbxAsset(soundId: SoundId): boolean
 	if type(soundId) == "table" then
+		return RbxAssetUtils.isConvertableToRbxAsset(soundId.SoundId)
+	elseif typeof(soundId) == "Instance" then
 		return RbxAssetUtils.isConvertableToRbxAsset(soundId.SoundId)
 	else
 		return RbxAssetUtils.isConvertableToRbxAsset(soundId)

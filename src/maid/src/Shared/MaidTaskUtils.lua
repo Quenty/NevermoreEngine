@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Utility methods involving maids and tasks.
 	@class MaidTaskUtils
@@ -39,7 +40,7 @@ end
 
 	@param job MaidTask -- Task to execute
 ]=]
-function MaidTaskUtils.doTask(job: MaidTask)
+function MaidTaskUtils.doTask(job: MaidTask): ()
 	if typeof(job) == "function" then
 		(job :: any)()
 	elseif typeof(job) == "table" then
@@ -80,11 +81,11 @@ end
 	@param job MaidTask -- Job to delay execution
 	@return () -> () -- function that will execute the job delayed
 ]=]
-function MaidTaskUtils.delayed(time: number, job: MaidTask)
+function MaidTaskUtils.delayed(time: number, job: MaidTask): () -> ()
 	assert(type(time) == "number", "Bad time")
 	assert(MaidTaskUtils.isValidTask(job), "Bad job")
 
-	return function()
+	return function(): ()
 		task.delay(time, function()
 			MaidTaskUtils.doTask(job)
 		end)

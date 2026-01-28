@@ -1,5 +1,11 @@
 name: build
 on: [push]
+
+permissions:
+  contents: write        # Create releases and tags
+  pull-requests: write   # Comment on PRs with release info
+  packages: write        # Publish to GitHub Packages
+
 jobs:
   build-linting:
     uses: ./.github/workflows/linting.yml
@@ -10,34 +16,20 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false # https://stackoverflow.com/questions/74744498/github-pushing-to-protected-branches-with-fine-grained-token
 
       - name: Setup node
-        uses: actions/setup-node@v2
-        env:
-          NPM_TOKEN: '' # https://github.com/JS-DevTools/npm-publish/issues/15
+        uses: actions/setup-node@v6
         with:
-          cache-dependency-path: package.json # we don't have a package-lock.json so we'll use this instead...
-          node-version: '18'
+          node-version: '21'
 
-      - name: Run `npm install --no-package-lock --no-fund` on cli-output-helpers
-        run: npm install --no-package-lock --no-fund
-        working-directory: tools/cli-output-helpers
-
-      - name: Build cli-output-helpers
-        run: npm run build
-        working-directory: tools/cli-output-helpers
-
-      - name: Run `npm install --no-package-lock --no-fund` on nevermore-template-helpers
-        run: npm install --no-package-lock  --no-fund
-        working-directory: tools/nevermore-template-helpers
-
-      - name: Build nevermore-template-helpers
-        run: npm run build
-        working-directory: tools/nevermore-template-helpers
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
 
       - name: Setup npm for GitHub Packages
         run: |
@@ -49,23 +41,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Run `npm install --no-package-lock` on nevermore-cli
-        run: npm install --no-package-lock
-        working-directory: tools/nevermore-cli
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Build nevermore-cli
-        run: npm run build
-        working-directory: tools/nevermore-cli
-
-      - name: Run npm install
-        run: npm install --no-save --no-fund
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' run build
 
       - name: Git reset .npmrc
         run: git checkout .npmrc
 
       - name: Create Release
         env:
-          GITHUB_TOKEN: ${{ secrets.NEVERMORE_CI_PAT }}
+          GITHUB_TOKEN: ${{ github.ref == 'refs/heads/main' && secrets.NEVERMORE_CI_PAT || secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx auto shipit
 

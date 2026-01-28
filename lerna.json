@@ -1,12 +1,8 @@
 {
-  "packages": [
-    "src/*",
-    "tools/*"
-  ],
+  "npmClient": "pnpm",
+  "packages": ["src/*", "tools/*"],
   "command": {
-    "publish": {
-      "verifyAccess": false
-    },
+    "publish": {},
     "version": {
       "conventionalCommits": true,
       "createRelease": "github",

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/templateprovider",
-  "version": "11.23.0",
+  "version": "11.29.2",
   "description": "Base of a template retrieval system",
   "keywords": [
     "Roblox",
@@ -21,25 +21,30 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/brio": "file:../brio",
-    "@quenty/collectionserviceutils": "file:../collectionserviceutils",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/insertserviceutils": "file:../insertserviceutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/observablecollection": "file:../observablecollection",
-    "@quenty/promise": "file:../promise",
-    "@quenty/promisemaid": "file:../promisemaid",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/string": "file:../string",
-    "@quenty/table": "file:../table"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/collectionserviceutils": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/enums": "workspace:*",
+    "@quenty/insertserviceutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/promisemaid": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

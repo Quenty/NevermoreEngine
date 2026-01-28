@@ -35,16 +35,18 @@ local StateStack = setmetatable({}, BaseObject)
 StateStack.ClassName = "StateStack"
 StateStack.__index = StateStack
 
-export type StateStack<T> = typeof(setmetatable(
-	{} :: {
-		Changed: Signal.Signal<T>,
+export type StateStack<T> =
+	typeof(setmetatable(
+		{} :: {
+			Changed: Signal.Signal<T>,
 
-		_state: ValueObject.ValueObject<T>,
-		_defaultValue: T,
-		_stateStack: { { T } },
-	},
-	{} :: typeof({ __index = StateStack })
-)) & BaseObject.BaseObject
+			_state: ValueObject.ValueObject<T>,
+			_defaultValue: T,
+			_stateStack: { { T } },
+		},
+		{} :: typeof({ __index = StateStack })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new StateStack.

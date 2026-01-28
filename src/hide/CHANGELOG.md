@@ -3,6 +3,143 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.1...@quenty/hide@11.31.2) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.0...@quenty/hide@11.31.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* Fix package dependencies that were missing ([89a5112](https://github.com/Quenty/NevermoreEngine/commit/89a511276d1e8430ff55ee021da9992e55ddb52f))
+
+
+
+
+
+# [11.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.30.0...@quenty/hide@11.31.0) (2026-01-18)
+
+
+### Features
+
+* Add DynamicHide to the Hide package to allow for dynamically hiding content ([5c25a4c](https://github.com/Quenty/NevermoreEngine/commit/5c25a4ce76a35164de35cb3a1738e5fa5032336d))
+
+
+
+
+
+# [11.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.29.2...@quenty/hide@11.30.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.29.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.29.1...@quenty/hide@11.29.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [11.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.29.0...@quenty/hide@11.29.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+# [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.28.1...@quenty/hide@11.29.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.28.0...@quenty/hide@11.28.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+# [11.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.7...@quenty/hide@11.28.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.27.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.6...@quenty/hide@11.27.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.27.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.5...@quenty/hide@11.27.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.27.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.4...@quenty/hide@11.27.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.27.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.3...@quenty/hide@11.27.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.27.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.2...@quenty/hide@11.27.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.1...@quenty/hide@11.27.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.27.0...@quenty/hide@11.27.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
 # [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.26.0...@quenty/hide@11.27.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/hide

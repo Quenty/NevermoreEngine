@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class PlayerKillTracker
 ]=]
@@ -12,8 +13,19 @@ local PlayerKillTracker = setmetatable({}, BaseObject)
 PlayerKillTracker.ClassName = "PlayerKillTracker"
 PlayerKillTracker.__index = PlayerKillTracker
 
-function PlayerKillTracker.new(scoreObject, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(scoreObject), PlayerKillTracker)
+export type PlayerKillTracker =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_deathReportService: any,
+			_player: Player,
+		},
+		{} :: typeof({ __index = PlayerKillTracker })
+	))
+	& BaseObject.BaseObject
+
+function PlayerKillTracker.new(scoreObject, serviceBag: ServiceBag.ServiceBag): PlayerKillTracker
+	local self: PlayerKillTracker = setmetatable(BaseObject.new(scoreObject) :: any, PlayerKillTracker)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._deathReportService = self._serviceBag:GetService(DeathReportService)

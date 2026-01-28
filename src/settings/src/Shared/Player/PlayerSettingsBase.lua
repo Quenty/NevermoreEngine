@@ -9,23 +9,27 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local DataStoreStringUtils = require("DataStoreStringUtils")
+local Observable = require("Observable")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local Rx = require("Rx")
 local RxAttributeUtils = require("RxAttributeUtils")
 local ServiceBag = require("ServiceBag")
 local SettingDefinition = require("SettingDefinition")
+local SettingProperty = require("SettingProperty")
 
 local PlayerSettingsBase = setmetatable({}, BaseObject)
 PlayerSettingsBase.ClassName = "PlayerSettingsBase"
 PlayerSettingsBase.__index = PlayerSettingsBase
 
-export type PlayerSettingsBase = typeof(setmetatable(
-	{} :: {
-		_obj: Folder,
-		_serviceBag: ServiceBag.ServiceBag,
-	},
-	{} :: typeof({ __index = PlayerSettingsBase })
-)) & BaseObject.BaseObject
+export type PlayerSettingsBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Folder,
+			_serviceBag: ServiceBag.ServiceBag,
+		},
+		{} :: typeof({ __index = PlayerSettingsBase })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Base class for player settings
@@ -63,16 +67,23 @@ end
 	consider using the setting definitions in a centralized location.
 
 	@param settingName string
-	@param defaultValue any
-	@return SettingProperty
+	@param defaultValue T
+	@return SettingProperty.SettingProperty<T>
 ]=]
-function PlayerSettingsBase.GetSettingProperty(self: PlayerSettingsBase, settingName: string, defaultValue)
+function PlayerSettingsBase.GetSettingProperty<T>(
+	self: PlayerSettingsBase,
+	settingName: string,
+	defaultValue: T
+): SettingProperty.SettingProperty<T>
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 
 	self:EnsureInitialized(settingName, defaultValue)
 
-	return SettingDefinition.new(settingName, defaultValue):GetSettingProperty(self._serviceBag, self:GetPlayer())
+	local player = self:GetPlayer()
+	assert(player ~= nil, "No player found for settings")
+
+	return SettingDefinition.new(settingName, defaultValue):GetSettingProperty(self._serviceBag, player)
 end
 
 --[=[
@@ -82,7 +93,7 @@ end
 	@param defaultValue any
 	@return any
 ]=]
-function PlayerSettingsBase.GetValue(self: PlayerSettingsBase, settingName: string, defaultValue)
+function PlayerSettingsBase.GetValue<T>(self: PlayerSettingsBase, settingName: string, defaultValue: T): T
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
@@ -106,7 +117,7 @@ end
 	@param value any
 	@return any
 ]=]
-function PlayerSettingsBase.SetValue(self: PlayerSettingsBase, settingName: string, value)
+function PlayerSettingsBase.SetValue<T>(self: PlayerSettingsBase, settingName: string, value: T): ()
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 
@@ -122,7 +133,11 @@ end
 	@param defaultValue any
 	@return Observable<any>
 ]=]
-function PlayerSettingsBase.ObserveValue(self: PlayerSettingsBase, settingName: string, defaultValue)
+function PlayerSettingsBase.ObserveValue<T>(
+	self: PlayerSettingsBase,
+	settingName: string,
+	defaultValue: T
+): Observable.Observable<T>
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
@@ -142,7 +157,7 @@ end
 	@param settingName string
 	@param defaultValue T
 ]=]
-function PlayerSettingsBase.RestoreDefault(self: PlayerSettingsBase, settingName: string, defaultValue)
+function PlayerSettingsBase.RestoreDefault<T>(self: PlayerSettingsBase, settingName: string, defaultValue: T): ()
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 
@@ -156,7 +171,7 @@ end
 	@param settingName string
 	@param defaultValue any
 ]=]
-function PlayerSettingsBase.EnsureInitialized(_self: PlayerSettingsBase, settingName: string, defaultValue)
+function PlayerSettingsBase.EnsureInitialized<T>(_self: PlayerSettingsBase, settingName: string, defaultValue: T): ()
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")

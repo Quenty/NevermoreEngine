@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class HasChatTags
 ]=]
@@ -18,13 +19,15 @@ local HasChatTags = setmetatable({}, HasChatTagsBase)
 HasChatTags.ClassName = "HasChatTags"
 HasChatTags.__index = HasChatTags
 
-export type HasChatTags = typeof(setmetatable(
-	{} :: {
-		_chatTagsContainer: Folder,
-		_chatTagBinder: any,
-	},
-	{} :: typeof({ __index = HasChatTags })
-)) & HasChatTagsBase.HasChatTagsBase
+export type HasChatTags =
+	typeof(setmetatable(
+		{} :: {
+			_chatTagsContainer: Folder,
+			_chatTagBinder: any,
+		},
+		{} :: typeof({ __index = HasChatTags })
+	))
+	& HasChatTagsBase.HasChatTagsBase
 
 function HasChatTags.new(player: Player, serviceBag: ServiceBag.ServiceBag): HasChatTags
 	local self: HasChatTags = setmetatable(HasChatTagsBase.new(player) :: any, HasChatTags)

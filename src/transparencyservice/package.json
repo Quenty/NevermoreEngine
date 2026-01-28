@@ -1,6 +1,6 @@
 {
   "name": "@quenty/transparencyservice",
-  "version": "11.9.0",
+  "version": "11.9.3",
   "description": "Service that orchistrates transparency setting from multiple colliding sources and handle the transparency appropriately. This means that 2 systems can work with transparency without knowing about each other.",
   "keywords": [
     "Roblox",
@@ -21,12 +21,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/math": "file:../math"
+    "@quenty/loader": "workspace:*",
+    "@quenty/math": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

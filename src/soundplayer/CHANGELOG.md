@@ -3,6 +3,199 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.31.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.2...@quenty/soundplayer@7.31.3) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.1...@quenty/soundplayer@7.31.2) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.0...@quenty/soundplayer@7.31.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* Fix package dependencies that were missing ([89a5112](https://github.com/Quenty/NevermoreEngine/commit/89a511276d1e8430ff55ee021da9992e55ddb52f))
+
+
+
+
+
+# [7.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.30.0...@quenty/soundplayer@7.31.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* Push sound order priority ([45a29f2](https://github.com/Quenty/NevermoreEngine/commit/45a29f21a00d72d7971299695e28129d5b9d0cfb))
+
+
+### Features
+
+* Make hiding work ([8203ae4](https://github.com/Quenty/NevermoreEngine/commit/8203ae460bd4e5866f7328c54ac48f62addfd637))
+* Route sound player into stack ([8ec445b](https://github.com/Quenty/NevermoreEngine/commit/8ec445bc4d3cd60b247f78b37f19ba902e2e477a))
+
+
+
+
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.29.0...@quenty/soundplayer@7.30.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.28.1...@quenty/soundplayer@7.29.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.28.0...@quenty/soundplayer@7.28.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.27.1...@quenty/soundplayer@7.28.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.27.0...@quenty/soundplayer@7.27.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.26.0...@quenty/soundplayer@7.27.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.25.1...@quenty/soundplayer@7.26.0) (2026-01-06)
+
+
+### Features
+
+* Sound utils suppose cloning from an instance ([4597475](https://github.com/Quenty/NevermoreEngine/commit/4597475cdadf6a7b6d81d1fa59c3a7af6736b27e))
+
+
+
+
+
+## [7.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.25.0...@quenty/soundplayer@7.25.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* Add typing to SoundPlayer ([a7e538e](https://github.com/Quenty/NevermoreEngine/commit/a7e538eddcb002327c1fdff4e2a60c769f0a1ba5))
+* Update the sound group package to include sound volume multipliers ([bf9591f](https://github.com/Quenty/NevermoreEngine/commit/bf9591fe2d08dbefae47f8c449b7bbf20c01fdfe))
+
+
+
+
+
+# [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.4...@quenty/soundplayer@7.25.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.24.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.3...@quenty/soundplayer@7.24.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.24.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.2...@quenty/soundplayer@7.24.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix test story ([90b3b35](https://github.com/Quenty/NevermoreEngine/commit/90b3b3561f1b95fd3d7ff13945455b3df39fadbd))
+
+
+
+
+
+## [7.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.1...@quenty/soundplayer@7.24.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.24.0...@quenty/soundplayer@7.24.1) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.23.3...@quenty/soundplayer@7.24.0) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.23.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.23.2...@quenty/soundplayer@7.23.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.23.1...@quenty/soundplayer@7.23.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.23.0...@quenty/soundplayer@7.23.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
 # [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.22.0...@quenty/soundplayer@7.23.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/soundplayer

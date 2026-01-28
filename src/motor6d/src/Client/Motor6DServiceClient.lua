@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class Motor6DServiceClient
 ]=]
@@ -18,6 +19,7 @@ function Motor6DServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 
 	-- Binders
 	self._serviceBag:GetService(require("Motor6DStackClient"))
+	self._serviceBag:GetService(require("Motor6DStackHumanoidClient"))
 end
 
 return Motor6DServiceClient

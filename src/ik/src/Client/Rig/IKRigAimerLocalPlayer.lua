@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles repliation and aiming of the local player's character for
 	IK.
@@ -11,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local CameraStackService = require("CameraStackService")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
+local ServiceBag = require("ServiceBag")
 
 local MAX_AGE_FOR_AIM_DATA = 0.2
 local DEFAULT_REPLICATION_RATE = 1.3
@@ -27,7 +29,7 @@ IKRigAimerLocalPlayer.__index = IKRigAimerLocalPlayer
 	@param ikRig IKRigClient
 	@return IKRigAimerLocalPlayer
 ]=]
-function IKRigAimerLocalPlayer.new(serviceBag, ikRig)
+function IKRigAimerLocalPlayer.new(serviceBag: ServiceBag.ServiceBag, ikRig)
 	local self = setmetatable(BaseObject.new(), IKRigAimerLocalPlayer)
 
 	self._cameraStackService = serviceBag:GetService(CameraStackService)

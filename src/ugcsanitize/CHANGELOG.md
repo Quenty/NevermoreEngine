@@ -3,6 +3,121 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.11.0...@quenty/ugcsanitize@1.11.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+# [1.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.10.0...@quenty/ugcsanitize@1.11.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+# [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.9.2...@quenty/ugcsanitize@1.10.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.9.1...@quenty/ugcsanitize@1.9.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [1.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.9.0...@quenty/ugcsanitize@1.9.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.8.0...@quenty/ugcsanitize@1.9.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.7...@quenty/ugcsanitize@1.8.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.7.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.6...@quenty/ugcsanitize@1.7.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.7.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.5...@quenty/ugcsanitize@1.7.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.7.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.4...@quenty/ugcsanitize@1.7.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.7.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.3...@quenty/ugcsanitize@1.7.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.7.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.2...@quenty/ugcsanitize@1.7.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.1...@quenty/ugcsanitize@1.7.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
+## [1.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.7.0...@quenty/ugcsanitize@1.7.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/ugcsanitize
+
+
+
+
+
 # [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ugcsanitize@1.6.0...@quenty/ugcsanitize@1.7.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/ugcsanitize

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/teleportserviceutils",
-  "version": "9.21.0",
+  "version": "9.25.1",
   "description": "Utility functions for teleport srevice",
   "keywords": [
     "Roblox",
@@ -22,19 +22,22 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/brio": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

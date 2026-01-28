@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rodux-undo",
-  "version": "8.10.0",
+  "version": "8.11.2",
   "description": "Undo stack for rodux",
   "keywords": [
     "Roblox",
@@ -21,12 +21,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/table": "file:../table"
+    "@quenty/loader": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

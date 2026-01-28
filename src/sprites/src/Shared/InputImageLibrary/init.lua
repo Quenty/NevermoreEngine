@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	InputImageLibrary with a variety of dark and light themed icons for inputs on keyboard, xbox, touched events,
 	mouse, and more.
@@ -136,7 +137,7 @@ function InputImageLibrary:GetScaledImageLabel(keyCode, preferredStyle: string?,
 	uiAspectRatio.AspectRatio = ratio
 	uiAspectRatio.Parent = image
 
-	image.Size = UDim2.new(1, 0, 1, 0)
+	image.Size = UDim2.fromScale(1, 1)
 
 	return image
 end

@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.10.1...@quenty/rotatinglabel@11.11.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+
+
+
+
+
+## [11.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.10.0...@quenty/rotatinglabel@11.10.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [11.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.9.3...@quenty/rotatinglabel@11.10.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/rotatinglabel
+
+
+
+
+
+## [11.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.9.2...@quenty/rotatinglabel@11.9.3) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/rotatinglabel
+
+
+
+
+
+## [11.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.9.1...@quenty/rotatinglabel@11.9.2) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/rotatinglabel
+
+
+
+
+
+## [11.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.9.0...@quenty/rotatinglabel@11.9.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/rotatinglabel
+
+
+
+
+
 # [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@11.8.4...@quenty/rotatinglabel@11.9.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/rotatinglabel

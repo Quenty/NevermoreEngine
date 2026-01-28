@@ -5,20 +5,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
-          cache-dependency-path: package.json
-          node-version: '18'
+          node-version: '21'
 
-      - name: Install GitHub CLI
-        run: |
-          sudo apt update
-          sudo apt install gh -y
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
 
       - name: Setup npm for GitHub Packages
         run: |
@@ -30,10 +29,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Install package dependencies
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Compute changed packages
         run: |
-          echo "Installing package dependencies..."
-          npx lerna exec -- npm install --no-audit --no-fund
           PACKAGES=$(npx lerna ls --since origin/main --json | jq -r '.[] | select(.name != "@quenty/nevermore-cli") | .location' | tr '\n' ' ')
           echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
 
@@ -44,10 +44,10 @@ jobs:
           cd tests/bin
 
           echo "Installing changed packages..."
-          npm i ${{ env.PACKAGES }}
+          pnpm i ${{ env.PACKAGES }}
 
-          echo "Installing Jest"
-          npm i https://github.com/quentystudios/jest-lua.git
+          echo "Installing Jest..."
+          pnpm add https://github.com/quentystudios/jest-lua.git
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
@@ -55,6 +55,7 @@ jobs:
           path: tests/bin
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: Generate test place file
         run: rojo build default.project.json -o testBuild.rbxl

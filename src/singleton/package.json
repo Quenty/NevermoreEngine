@@ -1,6 +1,6 @@
 {
   "name": "@quenty/singleton",
-  "version": "6.9.0",
+  "version": "6.9.4",
   "description": "Provides a way to transform from a class to a singleton",
   "keywords": [
     "Roblox",
@@ -21,12 +21,16 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/servicebag": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

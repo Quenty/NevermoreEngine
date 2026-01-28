@@ -1,6 +1,6 @@
 {
   "name": "@quenty/avatareditorutils",
-  "version": "7.25.0",
+  "version": "7.31.2",
   "description": "Provides utility functions to work with the Roblox AvatarEditorService",
   "keywords": [
     "Roblox",
@@ -21,23 +21,27 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/aggregator": "file:../aggregator",
-    "@quenty/brio": "file:../brio",
-    "@quenty/enumutils": "file:../enumutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/memoize": "file:../memoize",
-    "@quenty/observablecollection": "file:../observablecollection",
-    "@quenty/pagesutils": "file:../pagesutils",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/symbol": "file:../symbol",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/aggregator": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/memoize": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/pagesutils": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/symbol": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

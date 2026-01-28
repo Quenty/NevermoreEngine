@@ -18,13 +18,15 @@ local SoundGroupTracker = setmetatable({}, BaseObject)
 SoundGroupTracker.ClassName = "SoundGroupTracker"
 SoundGroupTracker.__index = SoundGroupTracker
 
-export type SoundGroupTracker = typeof(setmetatable(
-	{} :: {
-		_pathToSoundGroupList: ObservableMapList.ObservableMapList<string, SoundGroup>,
-		_soundGroupToPath: ObservableMap.ObservableMap<SoundGroup, string>,
-	},
-	{} :: typeof({ __index = SoundGroupTracker })
-)) & BaseObject.BaseObject
+export type SoundGroupTracker =
+	typeof(setmetatable(
+		{} :: {
+			_pathToSoundGroupList: ObservableMapList.ObservableMapList<string, SoundGroup>,
+			_soundGroupToPath: ObservableMap.ObservableMap<SoundGroup, string>,
+		},
+		{} :: typeof({ __index = SoundGroupTracker })
+	))
+	& BaseObject.BaseObject
 
 function SoundGroupTracker.new(root): SoundGroupTracker
 	local self: SoundGroupTracker = setmetatable(BaseObject.new() :: any, SoundGroupTracker)

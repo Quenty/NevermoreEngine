@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cancellabledelay",
-  "version": "3.6.0",
+  "version": "3.6.2",
   "description": "cancellableDelay a delay that can be cancelled",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

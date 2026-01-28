@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class Flipbook.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Flipbook = require("Flipbook")
 local FlipbookPlayer = require("FlipbookPlayer")
@@ -70,7 +72,7 @@ return function(target: Instance)
 	local maid = Maid.new()
 
 	local container = Instance.new("Frame")
-	container.Size = UDim2.new(1, 0, 1, 0)
+	container.Size = UDim2.fromScale(1, 1)
 	container.BackgroundTransparency = 0
 	container.BackgroundColor3 = Color3.new(0, 0, 0)
 	container.Parent = target

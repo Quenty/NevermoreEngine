@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class Blend.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local RunService = game:GetService("RunService")
 
@@ -28,20 +30,20 @@ return function(target)
 	end)
 
 	local frame = Instance.new("Frame")
-	frame.Size = UDim2.new(0.5, 0, 0.5, 0)
+	frame.Size = UDim2.fromScale(0.5, 0.5)
 	frame.BackgroundColor3 = Color3.new(0.9, 0.9, 0.9)
 	frame.AnchorPoint = Vector2.new(0.5, 0.5)
-	frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	frame.Position = UDim2.fromScale(0.5, 0.5)
 	frame.BackgroundTransparency = transparency
 	frame.Parent = target
 	maid:GiveTask(frame)
 
 	local subFrame = Instance.new("Frame")
 	subFrame.Name = "CenterFrame"
-	subFrame.Size = UDim2.new(0.5, 0, 0.5, 0)
+	subFrame.Size = UDim2.fromScale(0.5, 0.5)
 	subFrame.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
 	subFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-	subFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	subFrame.Position = UDim2.fromScale(0.5, 0.5)
 	subFrame.BackgroundTransparency = transparency
 	subFrame.Parent = frame
 
@@ -50,7 +52,7 @@ return function(target)
 	uiScale.Parent = subFrame
 
 	maid:GiveTask(Blend.mount(frame, {
-		Size = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.fromScale(0.5, 0.5),
 
 		Blend.New "UICorner" {
 			CornerRadius = UDim.new(0.05, 0),

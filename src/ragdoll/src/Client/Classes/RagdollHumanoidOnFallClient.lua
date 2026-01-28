@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Ragdolls the humanoid on death. Should be bound via [RagdollBindersClient].
 
@@ -15,6 +16,7 @@ local Binder = require("Binder")
 local CharacterUtils = require("CharacterUtils")
 local RagdollClient = require("RagdollClient")
 local RagdollHumanoidOnFallConstants = require("RagdollHumanoidOnFallConstants")
+local ServiceBag = require("ServiceBag")
 
 local RagdollHumanoidOnFallClient = setmetatable({}, BaseObject)
 RagdollHumanoidOnFallClient.ClassName = "RagdollHumanoidOnFallClient"
@@ -28,7 +30,7 @@ require("PromiseRemoteEventMixin"):Add(RagdollHumanoidOnFallClient, RagdollHuman
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnFallClient
 ]=]
-function RagdollHumanoidOnFallClient.new(humanoid, serviceBag)
+function RagdollHumanoidOnFallClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFallClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

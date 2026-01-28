@@ -1,6 +1,6 @@
 {
   "name": "@quenty/spawning",
-  "version": "10.29.0",
+  "version": "10.37.2",
   "description": "Centralized spawning system",
   "keywords": [
     "Roblox",
@@ -20,16 +20,20 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binder": "file:../binder",
-    "@quenty/cmdrservice": "file:../cmdrservice",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/randomutils": "file:../randomutils",
-    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/binder": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/randomutils": "workspace:*",
+    "@quenty/raycaster": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

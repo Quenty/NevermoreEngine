@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class SimpleLoopedSoundPlayer.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Blend = require("Blend")
 local Maid = require("Maid")
@@ -16,6 +18,7 @@ return function(target)
 	simpleLoopedSoundPlayer:SetTransitionTime(1)
 
 	simpleLoopedSoundPlayer.Sound.Parent = target
+	simpleLoopedSoundPlayer.Sound:Play()
 
 	simpleLoopedSoundPlayer:Show()
 
@@ -24,7 +27,7 @@ return function(target)
 			Text = props.Text,
 			AutoButtonColor = true,
 			Font = Enum.Font.FredokaOne,
-			Size = UDim2.new(0, 100, 0, 30),
+			Size = UDim2.fromOffset(100, 30),
 
 			Blend.New "UICorner" {},
 

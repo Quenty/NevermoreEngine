@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Ragdolls the humanoid on fall. This is the base class.
 	@class BindableRagdollHumanoidOnFall
@@ -23,7 +24,7 @@ BindableRagdollHumanoidOnFall.__index = BindableRagdollHumanoidOnFall
 	@param ragdollBinder Binder<Ragdoll | RagdollClient>
 	@return BindableRagdollHumanoidOnFall
 ]=]
-function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
+function BindableRagdollHumanoidOnFall.new(humanoid: Humanoid, ragdollBinder)
 	local self = setmetatable(BaseObject.new(humanoid), BindableRagdollHumanoidOnFall)
 
 	self._ragdollBinder = assert(ragdollBinder, "Bad ragdollBinder")

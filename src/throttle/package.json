@@ -1,6 +1,6 @@
 {
   "name": "@quenty/throttle",
-  "version": "10.10.0",
+  "version": "10.10.3",
   "description": "Adds the throttle function to Roblox",
   "keywords": [
     "Roblox",
@@ -22,15 +22,18 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/typeutils": "file:../typeutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/typeutils": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

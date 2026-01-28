@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class ScreenshotHudServiceClient
 ]=]
@@ -64,7 +65,7 @@ function ScreenshotHudServiceClient:_bindModelToHUD(maid: Maid.Maid, model, scre
 			screenshotHUD.CloseButtonPosition = state.position
 		else
 			-- Hack to hide the close button
-			screenshotHUD.CloseButtonPosition = UDim2.new(2, 0, 2, 0)
+			screenshotHUD.CloseButtonPosition = UDim2.fromScale(2, 2)
 		end
 	end))
 
@@ -77,7 +78,7 @@ function ScreenshotHudServiceClient:_bindModelToHUD(maid: Maid.Maid, model, scre
 			screenshotHUD.CameraButtonPosition = state.position
 		else
 			-- Hack to hide the close button
-			screenshotHUD.CameraButtonPosition = UDim2.new(2, 0, 2, 0)
+			screenshotHUD.CameraButtonPosition = UDim2.fromScale(2, 2)
 		end
 	end))
 

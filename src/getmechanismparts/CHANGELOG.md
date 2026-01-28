@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/getmechanismparts@2.3.2...@quenty/getmechanismparts@2.3.3) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [2.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/getmechanismparts@2.3.1...@quenty/getmechanismparts@2.3.2) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/getmechanismparts
+
+
+
+
+
+## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/getmechanismparts@2.3.0...@quenty/getmechanismparts@2.3.1) (2025-12-13)
+
+
+### Bug Fixes
+
+* Small patches to nevermore libraries ([#614](https://github.com/Quenty/NevermoreEngine/issues/614)) ([6eeb33b](https://github.com/Quenty/NevermoreEngine/commit/6eeb33b9d215d3d753a433e4c612f391bcc0d286))
+
+
+
+
+
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/getmechanismparts@2.2.2...@quenty/getmechanismparts@2.3.0) (2025-05-10)
 
 

@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.5...@quenty/cli-output-helpers@1.3.0) (2026-01-14)
+
+
+### Features
+
+* Nevermore CLI now checks to make sure it is up to date ([d86930c](https://github.com/Quenty/Nevermore/commit/d86930c85f24d879dee9ce5ce413488d1250246d))
+
+
+
+
+
+## [1.2.5](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.4...@quenty/cli-output-helpers@1.2.5) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/Nevermore/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [1.2.4](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.3...@quenty/cli-output-helpers@1.2.4) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/cli-output-helpers
+
+
+
+
+
+## [1.2.3](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.2...@quenty/cli-output-helpers@1.2.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Add warning output to output helper ([573ce4e](https://github.com/Quenty/Nevermore/commit/573ce4ed42831d552cfeb4dde1703d4aeda54967))
+
+
+
+
+
 ## [1.2.2](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.0...@quenty/cli-output-helpers@1.2.2) (2025-04-07)
 
 

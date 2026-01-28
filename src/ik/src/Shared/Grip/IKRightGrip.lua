@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	Right grip
 	@class IKRightGrip
@@ -13,8 +14,10 @@ local IKRightGrip = setmetatable({}, IKGripBase)
 IKRightGrip.ClassName = "IKRightGrip"
 IKRightGrip.__index = IKRightGrip
 
-function IKRightGrip.new(objectValue: ObjectValue, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(IKGripBase.new(objectValue, serviceBag), IKRightGrip)
+export type IKRightGrip = typeof(setmetatable({} :: {}, {} :: typeof({ __index = IKRightGrip }))) & IKGripBase.IKGripBase
+
+function IKRightGrip.new(objectValue: ObjectValue, serviceBag: ServiceBag.ServiceBag): IKRightGrip
+	local self: IKRightGrip = setmetatable(IKGripBase.new(objectValue, serviceBag) :: any, IKRightGrip)
 
 	self:PromiseIKRig()
 		:Then(function(ikRig)
@@ -27,4 +30,4 @@ function IKRightGrip.new(objectValue: ObjectValue, serviceBag: ServiceBag.Servic
 	return self
 end
 
-return Binder.new("IKRightGrip", IKRightGrip)
+return Binder.new("IKRightGrip", IKRightGrip :: any) :: Binder.Binder<IKRightGrip>

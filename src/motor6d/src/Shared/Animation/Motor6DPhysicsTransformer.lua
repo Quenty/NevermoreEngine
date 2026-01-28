@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class Motor6DPhysicsTransformer
 ]=]
@@ -12,8 +13,21 @@ local Motor6DPhysicsTransformer = setmetatable({}, Motor6DTransformer)
 Motor6DPhysicsTransformer.ClassName = "Motor6DPhysicsTransformer"
 Motor6DPhysicsTransformer.__index = Motor6DPhysicsTransformer
 
-function Motor6DPhysicsTransformer.new(physicsTransform)
-	local self = setmetatable(Motor6DTransformer.new(), Motor6DPhysicsTransformer)
+export type Motor6DPhysicsTransformer =
+	typeof(setmetatable(
+		{} :: {
+			_physicsTransform: CFrame,
+			_relativeTransformSpring: Spring.Spring<number>,
+		},
+		{} :: typeof({ __index = Motor6DPhysicsTransformer })
+	))
+	& Motor6DTransformer.Motor6DTransformer
+
+--[=[
+	Transforms from a physics state back to the Motor6D state over time.
+]=]
+function Motor6DPhysicsTransformer.new(physicsTransform: CFrame): Motor6DPhysicsTransformer
+	local self: Motor6DPhysicsTransformer = setmetatable(Motor6DTransformer.new() :: any, Motor6DPhysicsTransformer)
 
 	assert(typeof(physicsTransform) == "CFrame", "Bad physicsTransform")
 
@@ -26,11 +40,14 @@ function Motor6DPhysicsTransformer.new(physicsTransform)
 	return self
 end
 
-function Motor6DPhysicsTransformer:SetSpeed(speed)
+function Motor6DPhysicsTransformer.SetSpeed(self: Motor6DPhysicsTransformer, speed: number)
 	self._relativeTransformSpring.s = speed
 end
 
-function Motor6DPhysicsTransformer:Transform(getBelow)
+function Motor6DPhysicsTransformer.Transform(
+	self: Motor6DPhysicsTransformer,
+	getBelow: Motor6DTransformer.GetBelowFunction
+): CFrame?
 	local isAnimating, percent = SpringUtils.animating(self._relativeTransformSpring)
 
 	local below = getBelow()

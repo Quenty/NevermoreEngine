@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Promises a property value
 	@class promisePropertyValue

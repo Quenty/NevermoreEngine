@@ -1,6 +1,6 @@
 {
   "name": "@quenty/bodycolorsutils",
-  "version": "7.22.0",
+  "version": "7.28.2",
   "description": "Body color helper utilities for merging and representing body colors over the network and datastore",
   "keywords": [
     "Roblox",
@@ -21,16 +21,19 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/color3serializationutils": "file:../color3serializationutils",
-    "@quenty/color3utils": "file:../color3utils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/rx": "file:../rx",
-    "@quenty/table": "file:../table"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/color3serializationutils": "workspace:*",
+    "@quenty/color3utils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/table": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

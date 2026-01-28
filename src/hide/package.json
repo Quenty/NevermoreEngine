@@ -1,6 +1,6 @@
 {
   "name": "@quenty/hide",
-  "version": "11.27.0",
+  "version": "11.31.2",
   "description": "Utility system that leverages the binder system to hide authored objects. Centralized here for cross-system communication.",
   "keywords": [
     "Roblox",
@@ -22,13 +22,21 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binder": "file:../binder",
-    "@quenty/loader": "file:../loader",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/transparencyservice": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

@@ -3,6 +3,95 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.15.2...@quenty/sounds@10.16.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
+## [10.15.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.15.1...@quenty/sounds@10.15.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [10.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.15.0...@quenty/sounds@10.15.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
+# [10.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.14.4...@quenty/sounds@10.15.0) (2026-01-06)
+
+
+### Features
+
+* Sound utils suppose cloning from an instance ([4597475](https://github.com/Quenty/NevermoreEngine/commit/4597475cdadf6a7b6d81d1fa59c3a7af6736b27e))
+
+
+
+
+
+## [10.14.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.14.3...@quenty/sounds@10.14.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
+## [10.14.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.14.2...@quenty/sounds@10.14.3) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
+## [10.14.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.14.1...@quenty/sounds@10.14.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
+## [10.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.14.0...@quenty/sounds@10.14.1) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
+# [10.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.13.1...@quenty/sounds@10.14.0) (2025-12-28)
+
+
+### Features
+
+* Update declarations and README.md ([882056f](https://github.com/Quenty/NevermoreEngine/commit/882056f4c012f9855a0581750968993fb18241ed))
+
+
+
+
+
+## [10.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.13.0...@quenty/sounds@10.13.1) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
 # [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.12.0...@quenty/sounds@10.13.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/sounds

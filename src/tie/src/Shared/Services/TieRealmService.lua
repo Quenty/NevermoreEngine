@@ -32,7 +32,7 @@ end
 --[=[
 	Sets the tie realm for this service bag
 ]=]
-function TieRealmService.SetTieRealm(self: TieRealmService, tieRealm: TieRealms.TieRealm)
+function TieRealmService.SetTieRealm(self: TieRealmService, tieRealm: TieRealms.TieRealm): ()
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 
 	self._tieRealm = tieRealm

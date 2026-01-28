@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Initializes the RagdollService on the client.
 

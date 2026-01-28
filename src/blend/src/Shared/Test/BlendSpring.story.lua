@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class Blend.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local RunService = game:GetService("RunService")
 
@@ -28,10 +30,10 @@ return function(target)
 	end)
 
 	maid:GiveTask((Blend.New "Frame" {
-		Size = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.fromScale(0.5, 0.5),
 		BackgroundColor3 = Color3.new(0.9, 0.9, 0.9),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Position = UDim2.fromScale(0.5, 0.5),
 		BackgroundTransparency = transparency,
 		Parent = target,
 

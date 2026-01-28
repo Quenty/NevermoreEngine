@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class CameraUtils.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Maid = require("Maid")
 
@@ -15,7 +17,7 @@ return function(target: Instance)
 	local viewportFrame = maid:Add(Instance.new("ViewportFrame"))
 	viewportFrame.BorderSizePixel = 0
 	viewportFrame.BackgroundColor3 = Color3.new(0.7, 0.7, 0.7)
-	viewportFrame.Size = UDim2.new(1, 0, 1, 0)
+	viewportFrame.Size = UDim2.fromScale(1, 1)
 
 	local camera: Camera = maid:Add(Instance.new("Camera"))
 	camera.FieldOfViewMode = Enum.FieldOfViewMode.Diagonal

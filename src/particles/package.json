@@ -1,6 +1,6 @@
 {
   "name": "@quenty/particles",
-  "version": "5.11.0",
+  "version": "5.11.3",
   "description": "Holds utilitity for playing back particles",
   "keywords": [
     "Roblox",
@@ -21,13 +21,16 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/numbersequenceutils": "file:../numbersequenceutils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/numbersequenceutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

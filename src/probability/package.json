@@ -1,6 +1,6 @@
 {
   "name": "@quenty/probability",
-  "version": "2.3.1",
+  "version": "2.3.3",
   "description": "Probability utility functions",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

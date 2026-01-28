@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class RadialImage
 ]=]
@@ -167,7 +168,7 @@ end
 function RadialImage:_render()
 	return Blend.New "Frame" {
 		Name = "RadialImage",
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 		[Blend.OnChange("AbsoluteSize")] = self._absoluteSize,
 
@@ -185,15 +186,15 @@ function RadialImage:_render()
 				if size.x % 2 ~= 0 then
 					return UDim2.new(0.5, 1, 1, 0)
 				else
-					return UDim2.new(0.5, 0, 1, 0)
+					return UDim2.fromScale(0.5, 1)
 				end
 			end),
-			Position = UDim2.new(0, 0, 0, 0),
+			Position = UDim2.fromScale(0, 0),
 			BackgroundTransparency = 1,
 			ClipsDescendants = true,
 
 			Blend.New "ImageLabel" {
-				Size = UDim2.new(2, 0, 1, 0),
+				Size = UDim2.fromScale(2, 1),
 				BackgroundTransparency = 1,
 				ImageTransparency = self._transparency,
 				Image = self._image,
@@ -229,15 +230,15 @@ function RadialImage:_render()
 
 		Blend.New "Frame" {
 			Name = "RightFrame",
-			Size = UDim2.new(0.5, 0, 1, 0),
-			Position = UDim2.new(0.5, 0, 0, 0),
+			Size = UDim2.fromScale(0.5, 1),
+			Position = UDim2.fromScale(0.5, 0),
 			BackgroundTransparency = 1,
 			ClipsDescendants = true,
 
 			Blend.New "ImageLabel" {
-				Size = UDim2.new(2, 0, 1, 0),
+				Size = UDim2.fromScale(2, 1),
 				AnchorPoint = Vector2.new(1, 0),
-				Position = UDim2.new(1, 0, 0, 0),
+				Position = UDim2.fromScale(1, 0),
 				BackgroundTransparency = 1,
 				ImageTransparency = self._transparency,
 				Image = self._image,

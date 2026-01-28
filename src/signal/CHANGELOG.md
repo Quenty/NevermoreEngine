@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.11.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.11.4...@quenty/signal@7.11.5) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [7.11.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.11.3...@quenty/signal@7.11.4) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/signal
+
+
+
+
+
+## [7.11.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.11.2...@quenty/signal@7.11.3) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/signal
+
+
+
+
+
+## [7.11.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.11.1...@quenty/signal@7.11.2) (2025-12-29)
+
+
+### Bug Fixes
+
+* Update typing to be more accurate ([e4c3d05](https://github.com/Quenty/NevermoreEngine/commit/e4c3d05a0aa9f45a37cbfa372c5e0d8a748c9323))
+
+
+
+
+
 ## [7.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.11.0...@quenty/signal@7.11.1) (2025-08-12)
 
 

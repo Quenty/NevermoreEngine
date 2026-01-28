@@ -211,35 +211,54 @@ function RxInstanceUtils.observeLastNamedChildBrio(
 
 	return Observable.new(function(sub)
 		local topMaid = Maid.new()
+		local validChildren = {}
+		local lastEmittedChild = UNSET_VALUE
+
+		local function emit()
+			local current = next(validChildren)
+			if current == lastEmittedChild then
+				return
+			end
+
+			lastEmittedChild = current
+			if current ~= nil then
+				local brio = Brio.new(current)
+				topMaid._lastBrio = brio
+				sub:Fire(brio)
+			else
+				topMaid._lastBrio = nil
+			end
+		end
 
 		local function handleChild(child: Instance)
 			if not child:IsA(className) then
 				return
 			end
 
-			local maid = Maid.new()
-
 			local function handleNameChanged()
 				if child.Name == name then
-					local brio = Brio.new(child)
-					maid._brio = brio
-					topMaid._lastBrio = brio
-
-					sub:Fire(brio)
+					validChildren[child] = true
+					emit()
 				else
-					maid._brio = nil
+					validChildren[child] = nil
+
+					if lastEmittedChild == child then
+						emit()
+					end
 				end
 			end
 
-			maid:GiveTask(child:GetPropertyChangedSignal("Name"):Connect(handleNameChanged))
+			topMaid[child] = child:GetPropertyChangedSignal("Name"):Connect(handleNameChanged)
 			handleNameChanged()
-
-			topMaid[child] = maid
 		end
 
 		topMaid:GiveTask(parent.ChildAdded:Connect(handleChild))
 		topMaid:GiveTask(parent.ChildRemoved:Connect(function(child)
 			topMaid[child] = nil
+			validChildren[child] = nil
+			if lastEmittedChild == child then
+				emit()
+			end
 		end))
 
 		for _, child in parent:GetChildren() do
@@ -438,6 +457,35 @@ function RxInstanceUtils.observeDescendantsBrio(
 		for _, descendant in parent:GetDescendants() do
 			handleDescendant(descendant)
 		end
+
+		return maid
+	end) :: any
+end
+
+--[=[
+	Observes all descendants and self that match a predicate as a brio
+
+	@param parent Instance
+	@param predicate ((value: Instance) -> boolean)? -- Optional filter
+	@return Observable<Brio<Instance>>
+]=]
+function RxInstanceUtils.observeDescendantsAndSelfBrio(
+	parent: Instance,
+	predicate: Rx.Predicate<Instance>?
+): Observable.Observable<Brio.Brio<Instance>>
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		if not predicate or predicate(parent) then
+			local value = Brio.new(parent)
+			maid[parent] = value
+			sub:Fire(value)
+		end
+
+		maid:GiveTask(RxInstanceUtils.observeDescendantsBrio(parent, predicate):Subscribe(sub:GetFireFailComplete()))
 
 		return maid
 	end) :: any

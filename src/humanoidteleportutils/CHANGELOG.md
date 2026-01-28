@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.9.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.9.4...@quenty/humanoidteleportutils@10.9.5) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [10.9.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.9.3...@quenty/humanoidteleportutils@10.9.4) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/humanoidteleportutils
+
+
+
+
+
+## [10.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.9.2...@quenty/humanoidteleportutils@10.9.3) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/humanoidteleportutils
+
+
+
+
+
+## [10.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.9.1...@quenty/humanoidteleportutils@10.9.2) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/humanoidteleportutils
+
+
+
+
+
+## [10.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.9.0...@quenty/humanoidteleportutils@10.9.1) (2025-11-25)
+
+
+### Bug Fixes
+
+* Update teleport utils ([#608](https://github.com/Quenty/NevermoreEngine/issues/608)) ([1650e14](https://github.com/Quenty/NevermoreEngine/commit/1650e143cac06980bcef5cb2966468a8f5379619))
+
+
+
+
+
 # [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.8.3...@quenty/humanoidteleportutils@10.9.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/humanoidteleportutils

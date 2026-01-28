@@ -492,8 +492,8 @@ function Draw._textOnAdornee(adornee: Instance, text: string, color: Color3): Bi
 
 	local background = Instance.new("Frame")
 	background.Name = "Background"
-	background.Size = UDim2.new(1, 0, 1, 0)
-	background.Position = UDim2.new(0.5, 0, 1, 0)
+	background.Size = UDim2.fromScale(1, 1)
+	background.Position = UDim2.fromScale(0.5, 1)
 	background.AnchorPoint = Vector2.new(0.5, 1)
 	background.BackgroundTransparency = 0.3
 	background.BorderSizePixel = 0
@@ -507,7 +507,7 @@ function Draw._textOnAdornee(adornee: Instance, text: string, color: Color3): Bi
 	textLabel.BackgroundTransparency = 1
 	textLabel.BorderSizePixel = 0
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
-	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.Parent = background
 
 	if tonumber(text) then
@@ -542,7 +542,7 @@ function Draw._textOnAdornee(adornee: Instance, text: string, color: Color3): Bi
 
 	local height = lines * TEXT_HEIGHT_STUDS * TEXT_HEIGHT_STUDS * PADDING_PERCENT_OF_LINE_HEIGHT
 
-	billboardGui.Size = UDim2.new(height * aspectRatio, 0, height, 0)
+	billboardGui.Size = UDim2.fromScale(height * aspectRatio, height)
 	billboardGui.Parent = adornee
 
 	return billboardGui
@@ -563,7 +563,7 @@ end
 	@param parent Instance? -- Optional parent
 	@return BasePart
 ]=]
-function Draw.sphere(position: Vector3Like, radius: number, color: Color3?, parent: Instance)
+function Draw.sphere(position: Vector3Like, radius: number, color: Color3?, parent: Instance?): BasePart
 	return Draw.point(position, color, parent, radius * 2)
 end
 
@@ -872,12 +872,13 @@ end
 --[=[
 	Draws a screen point
 ]=]
-function Draw.screenPoint(position: Vector2, parent: Instance, color: Color3Like?, diameter: number?): Frame
+function Draw.screenPoint(position: Vector2, parent: Instance?, color: Color3Like?, diameter: number?): Frame
 	local pointColor = Draw._toColor3(color) or Color3.new(0.658824, 0.501961, 0.501961)
+	local pointDiameter = diameter or 3
 
 	local frame = Instance.new("Frame")
 	frame.Name = "DebugScreenPoint"
-	frame.Size = UDim2.new(0, diameter, 0, diameter)
+	frame.Size = UDim2.fromOffset(pointDiameter, pointDiameter)
 	frame.BackgroundColor3 = pointColor
 	frame.BackgroundTransparency = 0.5
 	frame.Position = UDim2.fromScale(position.X, position.Y)

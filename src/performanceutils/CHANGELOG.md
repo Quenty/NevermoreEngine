@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.9.3...@quenty/performanceutils@4.9.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [4.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.9.2...@quenty/performanceutils@4.9.3) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/performanceutils
+
+
+
+
+
+## [4.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.9.1...@quenty/performanceutils@4.9.2) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/performanceutils
+
+
+
+
+
+## [4.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.9.0...@quenty/performanceutils@4.9.1) (2025-11-22)
+
+
+### Bug Fixes
+
+* Fix styling ([a3ac54d](https://github.com/Quenty/NevermoreEngine/commit/a3ac54d43aafa1c37b0e8c9b6e7b20b3f3362742))
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
+
 # [4.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.8.4...@quenty/performanceutils@4.9.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/performanceutils

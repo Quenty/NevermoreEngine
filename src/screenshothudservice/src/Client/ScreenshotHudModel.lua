@@ -14,32 +14,34 @@ local ScreenshotHudModel = setmetatable({}, BaseObject)
 ScreenshotHudModel.ClassName = "ScreenshotHudModel"
 ScreenshotHudModel.__index = ScreenshotHudModel
 
-export type ScreenshotHudModel = typeof(setmetatable(
-	{} :: {
-		_cameraButtonIcon: ValueObject.ValueObject<string>,
-		_cameraButtonPosition: ValueObject.ValueObject<UDim2>,
-		_closeButtonPosition: ValueObject.ValueObject<UDim2>,
-		_closeWhenScreenshotTaken: ValueObject.ValueObject<boolean>,
-		_experienceNameOverlayEnabled: ValueObject.ValueObject<boolean>,
-		_overlayFont: ValueObject.ValueObject<Enum.Font>,
-		_usernameOverlayEnabled: ValueObject.ValueObject<boolean>,
-		_visible: ValueObject.ValueObject<boolean>,
-		_cameraButtonVisible: ValueObject.ValueObject<boolean>,
-		_closeButtonVisible: ValueObject.ValueObject<boolean>,
-		_keepOpen: ValueObject.ValueObject<boolean>,
+export type ScreenshotHudModel =
+	typeof(setmetatable(
+		{} :: {
+			_cameraButtonIcon: ValueObject.ValueObject<string>,
+			_cameraButtonPosition: ValueObject.ValueObject<UDim2>,
+			_closeButtonPosition: ValueObject.ValueObject<UDim2>,
+			_closeWhenScreenshotTaken: ValueObject.ValueObject<boolean>,
+			_experienceNameOverlayEnabled: ValueObject.ValueObject<boolean>,
+			_overlayFont: ValueObject.ValueObject<Enum.Font>,
+			_usernameOverlayEnabled: ValueObject.ValueObject<boolean>,
+			_visible: ValueObject.ValueObject<boolean>,
+			_cameraButtonVisible: ValueObject.ValueObject<boolean>,
+			_closeButtonVisible: ValueObject.ValueObject<boolean>,
+			_keepOpen: ValueObject.ValueObject<boolean>,
 
-		CloseRequested: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = ScreenshotHudModel })
-)) & BaseObject.BaseObject
+			CloseRequested: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = ScreenshotHudModel })
+	))
+	& BaseObject.BaseObject
 
 function ScreenshotHudModel.new(): ScreenshotHudModel
 	local self: ScreenshotHudModel = setmetatable(BaseObject.new() :: any, ScreenshotHudModel)
 
 	self._cameraButtonIcon = self._maid:Add(ValueObject.new("", "string"))
 
-	self._cameraButtonPosition = self._maid:Add(ValueObject.new(UDim2.new(0, 0, 0, 0)))
-	self._closeButtonPosition = self._maid:Add(ValueObject.new(UDim2.new(0, 0, 0, 0)))
+	self._cameraButtonPosition = self._maid:Add(ValueObject.new(UDim2.fromScale(0, 0)))
+	self._closeButtonPosition = self._maid:Add(ValueObject.new(UDim2.fromScale(0, 0)))
 	self._closeWhenScreenshotTaken = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._experienceNameOverlayEnabled = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._overlayFont = self._maid:Add(ValueObject.new(Enum.Font.SourceSans))
@@ -126,7 +128,7 @@ end
 function ScreenshotHudModel.SetCloseButtonPosition(self: ScreenshotHudModel, position: UDim2 | nil): ()
 	assert(typeof(position) == "UDim2" or position == nil, "Bad position")
 
-	self._closeButtonPosition.Value = position or UDim2.new(0, 0, 0, 0)
+	self._closeButtonPosition.Value = position or UDim2.fromScale(0, 0)
 end
 
 --[=[
@@ -144,7 +146,7 @@ end
 function ScreenshotHudModel.SetCameraButtonPosition(self: ScreenshotHudModel, position: UDim2 | nil): ()
 	assert(typeof(position) == "UDim2" or position == nil, "Bad position")
 
-	self._cameraButtonPosition.Value = position or UDim2.new(0, 0, 0, 0)
+	self._cameraButtonPosition.Value = position or UDim2.fromScale(0, 0)
 end
 
 --[=[

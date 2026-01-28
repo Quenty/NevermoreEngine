@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Client side ragdolling meant to be used with a binder. This class exports a [Binder].
 	While a humanoid is bound with this class, it is ragdolled.
@@ -18,6 +19,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Binder = require("Binder")
+local ServiceBag = require("ServiceBag")
 
 local RagdollClient = setmetatable({}, BaseObject)
 RagdollClient.ClassName = "RagdollClient"
@@ -29,7 +31,7 @@ RagdollClient.__index = RagdollClient
 	@param serviceBag ServiceBag
 	@return RagdollClient
 ]=]
-function RagdollClient.new(humanoid, serviceBag)
+function RagdollClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

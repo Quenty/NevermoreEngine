@@ -1,6 +1,6 @@
 {
   "name": "@quenty/convexhull",
-  "version": "4.10.1",
+  "version": "4.11.0",
   "description": "Convex hull computation algorithms",
   "keywords": [
     "Roblox",
@@ -22,14 +22,17 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/draw": "file:../draw",
-    "@quenty/loader": "file:../loader",
-    "@quenty/queue": "file:../queue",
-    "@quenty/vector3utils": "file:../vector3utils"
+    "@quenty/draw": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/queue": "workspace:*",
+    "@quenty/vector3utils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

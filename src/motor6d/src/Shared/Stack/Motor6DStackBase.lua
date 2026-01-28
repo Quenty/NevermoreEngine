@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class Motor6DStackBase
 ]=]
@@ -8,14 +9,28 @@ local BaseObject = require("BaseObject")
 local Motor6DAnimator = require("Motor6DAnimator")
 local Motor6DPhysicsTransformer = require("Motor6DPhysicsTransformer")
 local Motor6DStackInterface = require("Motor6DStackInterface")
+local Motor6DTransformer = require("Motor6DTransformer")
+local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
 
 local Motor6DStackBase = setmetatable({}, BaseObject)
 Motor6DStackBase.ClassName = "Motor6DStackBase"
 Motor6DStackBase.__index = Motor6DStackBase
 
-function Motor6DStackBase.new(motor6D, serviceBag)
-	local self = setmetatable(BaseObject.new(motor6D), Motor6DStackBase)
+export type Motor6DStackBase =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Motor6D,
+			_serviceBag: ServiceBag.ServiceBag,
+			_tieRealmService: any,
+			_animator: Motor6DAnimator.Motor6DAnimator,
+		},
+		{} :: typeof({ __index = Motor6DStackBase })
+	))
+	& BaseObject.BaseObject
+
+function Motor6DStackBase.new(motor6D: Motor6D, serviceBag: ServiceBag.ServiceBag): Motor6DStackBase
+	local self: Motor6DStackBase = setmetatable(BaseObject.new(motor6D) :: any, Motor6DStackBase)
 
 	self._animator = self._maid:Add(Motor6DAnimator.new(motor6D))
 
@@ -27,7 +42,18 @@ function Motor6DStackBase.new(motor6D, serviceBag)
 	return self
 end
 
-function Motor6DStackBase:TransformFromCFrame(physicsTransformCFrame, speed)
+--[=[
+	Creates and pushes a Motor6DPhysicsTransformer onto the stack from a current physics CFrame position.
+
+	@param physicsTransformCFrame CFrame -- The target CFrame for the physics transformer.
+	@param speed number? -- Optional speed to set on the transformer.
+	@return Motor6DPhysicsTransformer -- The created transformer.
+]=]
+function Motor6DStackBase.TransformFromCFrame(
+	self: Motor6DStackBase,
+	physicsTransformCFrame: CFrame,
+	speed: number?
+): Motor6DPhysicsTransformer.Motor6DPhysicsTransformer
 	assert(typeof(physicsTransformCFrame) == "CFrame", "Bad physicsTransformCFrame")
 	assert(type(speed) == "number" or speed == nil, "Bad speed")
 
@@ -41,7 +67,10 @@ function Motor6DStackBase:TransformFromCFrame(physicsTransformCFrame, speed)
 	return transformer
 end
 
-function Motor6DStackBase:Push(transformer)
+--[=[
+	Push a Motor6DTransformer onto the animation stack.
+]=]
+function Motor6DStackBase.Push(self: Motor6DStackBase, transformer: Motor6DTransformer.Motor6DTransformer): () -> ()
 	assert(transformer, "No transformer")
 
 	return self._animator:Push(transformer)

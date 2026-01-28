@@ -208,13 +208,13 @@ function Brio.ToMaid<T...>(self: Brio<T...>): Maid.Maid
 	local maid = Maid.new()
 
 	maid:GiveTask(self:GetDiedSignal():Connect(function()
-		maid:DoCleaning()
+		maid:Destroy()
 	end))
 
 	return maid
 end
 
-function Brio.ToMaidAndValue<T...>(self: Brio<T...>): (any, T...)
+function Brio.ToMaidAndValue<T...>(self: Brio<T...>): (Maid.Maid, T...)
 	return self:ToMaid(), self:GetValue()
 end
 

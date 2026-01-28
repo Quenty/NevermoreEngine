@@ -3,6 +3,127 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.26.0...@quenty/remoting@12.26.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+# [12.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.25.0...@quenty/remoting@12.26.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+# [12.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.24.0...@quenty/remoting@12.25.0) (2026-01-16)
+
+
+### Features
+
+* Add SimpleEnum package and interface, to simplify enum usage across Nevermore ([d3040d7](https://github.com/Quenty/NevermoreEngine/commit/d3040d7a07ae7b2586bb982399b401fe19f1eb3f))
+
+
+
+
+
+# [12.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.23.2...@quenty/remoting@12.24.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+## [12.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.23.1...@quenty/remoting@12.23.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [12.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.23.0...@quenty/remoting@12.23.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+# [12.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.22.0...@quenty/remoting@12.23.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+# [12.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.21.6...@quenty/remoting@12.22.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+## [12.21.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.21.5...@quenty/remoting@12.21.6) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+## [12.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.21.4...@quenty/remoting@12.21.5) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [12.21.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.21.3...@quenty/remoting@12.21.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+## [12.21.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.21.2...@quenty/remoting@12.21.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+## [12.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.21.1...@quenty/remoting@12.21.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
+## [12.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.21.0...@quenty/remoting@12.21.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/remoting
+
+
+
+
+
 # [12.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.20.0...@quenty/remoting@12.21.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/remoting

@@ -63,6 +63,9 @@ export class TemplateHelper {
       if (newName == 'gitignore') {
         newName = '.gitignore';
       }
+      if (newName == 'npmrc') {
+        newName = '.npmrc';
+      }
 
       const stats = await fs.promises.stat(origFilePath);
 

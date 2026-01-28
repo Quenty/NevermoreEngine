@@ -16,19 +16,21 @@ LagPointCamera.ClassName = "LagPointCamera"
 LagPointCamera._FocusCamera = nil
 LagPointCamera._OriginCamera = nil
 
-export type LagPointCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		Origin: CameraState.CameraState,
-		FocusCamera: CameraEffectUtils.CameraEffect,
-		OriginCamera: CameraEffectUtils.CameraEffect,
-		FocusSpring: Spring.Spring<Vector3>,
-		LastFocusUpdate: number,
-		FocusPosition: Vector3,
-		Speed: number,
-	},
-	{} :: typeof({ __index = LagPointCamera })
-)) & CameraEffectUtils.CameraEffect
+export type LagPointCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			Origin: CameraState.CameraState,
+			FocusCamera: CameraEffectUtils.CameraEffect,
+			OriginCamera: CameraEffectUtils.CameraEffect,
+			FocusSpring: Spring.Spring<Vector3>,
+			LastFocusUpdate: number,
+			FocusPosition: Vector3,
+			Speed: number,
+		},
+		{} :: typeof({ __index = LagPointCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	Camera that lags behind the actual camera.

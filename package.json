@@ -1,31 +1,34 @@
 {
   "name": "@quenty/nevermore",
   "private": true,
+  "packageManager": "pnpm@10.27.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git"
   },
   "devDependencies": {
-    "@auto-it/all-contributors": "^v11.0.4",
-    "@auto-it/conventional-commits": "^v11.0.4",
-    "@auto-it/first-time-contributor": "^v11.0.4",
-    "@auto-it/npm": "^v11.0.4",
-    "@auto-it/released": "^v11.0.4",
-    "auto": "^v11.0.4",
-    "lerna": "^7.1.4",
-    "moonwave": "^1.1.2"
+    "@auto-it/all-contributors": "^v11.3.6",
+    "@auto-it/conventional-commits": "^v11.3.6",
+    "@auto-it/first-time-contributor": "^v11.3.6",
+    "@auto-it/npm": "^v11.3.6",
+    "@auto-it/released": "^v11.3.6",
+    "auto": "^v11.3.6",
+    "lerna": "^9.0.3",
+    "moonwave": "^1.3.0",
+    "pnpm": "^10.27.0"
   },
   "scripts": {
-    "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json",
-    "build:link": "npx lerna exec --parallel -- npm install --no-package-lock --no-audit --no-fund",
-    "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore='**/node_modules/**' --ignore='**/*.story.lua' --ignore='**/*.client.lua' --ignore='**/*.server.lua' src",
-    "lint:moonwave": "npx lerna exec --parallel -- moonwave-extractor extract src",
-    "lint:selene": "npx lerna exec -- selene --config=../../selene.toml src",
-    "lint:stylua": "stylua --config-path=stylua.toml --check src games tests plugins",
+    "build:link": "pnpm install",
+    "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json --absolute",
     "format": "stylua --config-path=stylua.toml src games tests plugins",
-    "postinstall": "npm run build:link",
-    "prelint:luau": "npm run build:sourcemap && node tools/scripts/download-roblox-types.js",
-    "release": "auto shipit"
+    "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore=**/node_modules/** --ignore=**/*.story.lua --ignore=**/*.client.lua --ignore=**/*.server.lua src",
+    "lint:moonwave": "npx lerna exec --parallel -- moonwave-extractor extract src",
+    "lint:selene": "npx lerna exec --parallel -- selene --no-summary --num-threads=1 --config=../../selene.toml src",
+    "lint:stylua": "stylua --config-path=stylua.toml --check src games tests plugins",
+    "prelint:luau": "npm run build:sourcemap && npx @quenty/nevermore-cli download-roblox-types",
+    "prelint:selene": "selene generate-roblox-std",
+    "release": "auto shipit",
+    "preinstall": "npx only-allow pnpm"
   },
   "author": "James Onnen <rbxquenty@gmail.com>",
   "auto": {

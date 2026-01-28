@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class BlendTextbox.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Blend = require("Blend")
 local Maid = require("Maid")
@@ -14,13 +16,13 @@ return function(target)
 	local state = Blend.State("hi")
 
 	maid:GiveTask((Blend.New "Frame" {
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 		Parent = target,
 
 		[Blend.Children] = {
 			Blend.New "TextBox" {
-				Size = UDim2.new(0, 200, 0, 50),
+				Size = UDim2.fromOffset(200, 50),
 				Text = state,
 				[Blend.OnChange "Text"] = state,
 				[Blend.OnEvent "Focused"] = function()
@@ -42,7 +44,7 @@ return function(target)
 			},
 
 			Blend.New "TextBox" {
-				Size = UDim2.new(0, 200, 0, 50),
+				Size = UDim2.fromOffset(200, 50),
 				[Blend.OnChange "Text"] = state, -- read state
 				Text = state, -- write state
 			},

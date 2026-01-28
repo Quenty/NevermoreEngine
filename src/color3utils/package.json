@@ -1,6 +1,6 @@
 {
   "name": "@quenty/color3utils",
-  "version": "11.22.0",
+  "version": "11.28.2",
   "description": "Utility methods for Roblox Color3 values",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -28,11 +31,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/rx": "file:../rx",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/blend": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   }
 }

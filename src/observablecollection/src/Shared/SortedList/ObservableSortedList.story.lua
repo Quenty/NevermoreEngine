@@ -1,9 +1,11 @@
+--!strict
 --[[
 	@class observableSortedList.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Blend = require("Blend")
 local Maid = require("Maid")
@@ -15,22 +17,26 @@ local ValueObject = require("ValueObject")
 local ENTRIES = 10
 local CHANGE_TO_NEGATIVE_INDEX = false
 
+type Data = {
+	originalIndex: number,
+	scoreValue: ValueObject.ValueObject<number>,
+}
+
 return function(target)
 	local maid = Maid.new()
 
-	local observableSortedList = maid:Add(ObservableSortedList.new())
+	local observableSortedList: ObservableSortedList.ObservableSortedList<Data> = maid:Add(ObservableSortedList.new())
 
 	local random = Random.new(35)
 
 	local values = {}
 	for i = 1, ENTRIES do
-		local scoreValue = maid:Add(ValueObject.new(0 or random:NextNumber(), "number"))
+		local scoreValue = maid:Add(ValueObject.new(math.floor(random:NextNumber() * 100), "number"))
 
-		local data = {
+		local data: Data = {
 			originalIndex = i,
 			scoreValue = scoreValue,
 		}
-
 		values[i] = data
 
 		maid:GiveTask(task.delay(i * 0.05, function()
@@ -66,13 +72,21 @@ return function(target)
 		end
 	end))
 
+	maid:GiveTask(observableSortedList:ObserveAtIndex(-1):Subscribe(function(item)
+		if item then
+			print(`Last item is {item.originalIndex}, with a score of {item.scoreValue.Value}`)
+		else
+			print("No last item")
+		end
+	end))
+
 	-- maid:GiveTask(task.delay(0.1, function()
 	-- 	values[7].scoreValue.Value = -5
 	-- end))
 
 	maid:GiveTask(Blend.mount(target, {
 		Blend.New "Frame" {
-			Size = UDim2.new(1, 0, 1, 0),
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 
 			Blend.New "UIListLayout" {
@@ -145,6 +159,26 @@ return function(target)
 							AnchorPoint = Vector2.new(1, 0.5),
 							TextColor3 = Color3.new(1, 1, 1),
 							TextXAlignment = Enum.TextXAlignment.Right,
+							TextTransparency = 0.5,
+						},
+
+						Blend.New "TextButton" {
+							Name = "RemoveButton",
+							Text = "X",
+							AutoButtonColor = true,
+							Size = UDim2.fromOffset(20, 20),
+							Position = UDim2.new(0, -50, 0.5, 0),
+							AnchorPoint = Vector2.new(0, 0.5),
+							BackgroundTransparency = 0.5,
+							BackgroundColor3 = Color3.new(0.5, 0, 0),
+							TextColor3 = Color3.new(1, 1, 1),
+							[Blend.OnEvent "Activated"] = function()
+								observableSortedList:RemoveByKey(itemKey)
+							end,
+
+							Blend.New "UICorner" {
+								CornerRadius = UDim.new(0, 5),
+							},
 						},
 					}
 				end),

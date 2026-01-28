@@ -1,12 +1,13 @@
+--!strict
 --[=[
 	@class RoguePropertyBaseValueTypes
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Table = require("Table")
+local SimpleEnum = require("SimpleEnum")
 
-return Table.readonly({
-	INSTANCE = "instance",
-	ANY = "any",
+return SimpleEnum.new({
+	INSTANCE = "instance" :: "instance",
+	ANY = "any" :: "any",
 })

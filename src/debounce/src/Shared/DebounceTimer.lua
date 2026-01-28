@@ -32,14 +32,14 @@ end
 	Gets the length
 	@param length number
 ]=]
-function DebounceTimer.SetLength(self: DebounceTimer, length: number)
+function DebounceTimer.SetLength(self: DebounceTimer, length: number): ()
 	self._length = length or error("No length")
 end
 
 --[=[
 	Restarts the timer
 ]=]
-function DebounceTimer.Restart(self: DebounceTimer)
+function DebounceTimer.Restart(self: DebounceTimer): ()
 	self._startTime = os.clock()
 end
 

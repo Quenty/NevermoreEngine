@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Allows a model to have transparent set locally on the client
 
@@ -19,15 +20,19 @@ ModelTransparencyEffect.__index = ModelTransparencyEffect
 
 export type TransparencyMode = "SetTransparency" | "SetLocalTransparencyModifier"
 
-export type ModelTransparencyEffect = typeof(setmetatable(
-	{} :: {
-		_transparency: AccelTween.AccelTween,
-		_transparencyService: TransparencyService.TransparencyService,
-		_transparencyServiceMethodName: TransparencyMode,
-		_parts: { [Instance]: boolean },
-	},
-	{} :: typeof({ __index = ModelTransparencyEffect })
-)) & BaseObject.BaseObject
+export type ModelTransparencyEffect =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_transparency: AccelTween.AccelTween,
+			_transparencyService: TransparencyService.TransparencyService,
+			_transparencyServiceMethodName: TransparencyMode,
+			_parts: { [Instance]: boolean },
+			_startAnimation: (self: ModelTransparencyEffect) -> (),
+		},
+		{} :: typeof({ __index = ModelTransparencyEffect })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	@param serviceBag ServiceBag
@@ -40,16 +45,18 @@ function ModelTransparencyEffect.new(
 	adornee: Instance,
 	transparencyServiceMethodName: TransparencyMode?
 ): ModelTransparencyEffect
+	assert(adornee, "Bad adornee")
+
 	local self: ModelTransparencyEffect = setmetatable(BaseObject.new(adornee) :: any, ModelTransparencyEffect)
 
-	assert(serviceBag, "Bad serviceBag")
-	assert(adornee, "Bad adornee")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
 	assert(
 		type(transparencyServiceMethodName) == "string" or transparencyServiceMethodName == nil,
 		"Bad transparencyServiceMethodName"
 	)
 
-	self._transparencyService = serviceBag:GetService(TransparencyService)
+	self._transparencyService = self._serviceBag:GetService(TransparencyService :: any)
 
 	self._transparency = AccelTween.new(20)
 	self._transparencyServiceMethodName = transparencyServiceMethodName or "SetTransparency"
@@ -114,9 +121,9 @@ function ModelTransparencyEffect.FinishTransparencyAnimation(self: ModelTranspar
 	end
 end
 
-function ModelTransparencyEffect._update(self: ModelTransparencyEffect)
+function ModelTransparencyEffect._update(self: ModelTransparencyEffect): boolean
 	if self._transparencyService:IsDead() then
-		return
+		return false
 	end
 
 	local transparency = self._transparency.p

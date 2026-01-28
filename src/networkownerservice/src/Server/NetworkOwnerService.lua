@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Tracks a stack of owners so ownership isn't reverted or overwritten in delayed network owner set. Deduplicates network
 	ownership handles.

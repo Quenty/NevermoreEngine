@@ -1,0 +1,37 @@
+{
+  "name": "@quenty/enums",
+  "version": "1.1.0",
+  "description": "Custom Luau enum implementation",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "enums"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/enums/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "workspace:*",
+    "@quentystudios/t": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/terrainutils",
-  "version": "10.10.0",
+  "version": "10.11.2",
   "description": "Utility functions for manipulating terrain",
   "keywords": [
     "Roblox",
@@ -21,14 +21,17 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/region3int16utils": "file:../region3int16utils",
-    "@quenty/region3utils": "file:../region3utils",
-    "@quenty/vector3int16utils": "file:../vector3int16utils"
+    "@quenty/loader": "workspace:*",
+    "@quenty/region3int16utils": "workspace:*",
+    "@quenty/region3utils": "workspace:*",
+    "@quenty/vector3int16utils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

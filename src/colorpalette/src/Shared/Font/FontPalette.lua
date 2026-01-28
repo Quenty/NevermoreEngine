@@ -18,16 +18,18 @@ local FontPalette = setmetatable({}, BaseObject)
 FontPalette.ClassName = "FontPalette"
 FontPalette.__index = FontPalette
 
-export type FontPalette = typeof(setmetatable(
-	{} :: {
-		FontAdded: Signal.Signal<string>,
-		_fontKeys: ObservableSet.ObservableSet<string>,
-		_fonts: { [string]: ValueObject.ValueObject<Enum.Font> },
-		_fontFaces: { [string]: ValueObject.ValueObject<Font> },
-		_defaultFontMap: { [string]: Enum.Font | Font },
-	},
-	{} :: typeof({ __index = FontPalette })
-)) & BaseObject.BaseObject
+export type FontPalette =
+	typeof(setmetatable(
+		{} :: {
+			FontAdded: Signal.Signal<string>,
+			_fontKeys: ObservableSet.ObservableSet<string>,
+			_fonts: { [string]: ValueObject.ValueObject<Enum.Font> },
+			_fontFaces: { [string]: ValueObject.ValueObject<Font> },
+			_defaultFontMap: { [string]: Enum.Font | Font },
+		},
+		{} :: typeof({ __index = FontPalette })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new font palette.

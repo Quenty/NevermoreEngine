@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ik",
-  "version": "15.33.0",
+  "version": "15.42.2",
   "description": "Inverse Kinematics for characters on Roblox",
   "keywords": [
     "Roblox",
@@ -22,37 +22,40 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/acceltween": "file:../acceltween",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/brio": "file:../brio",
-    "@quenty/camera": "file:../camera",
-    "@quenty/characterutils": "file:../characterutils",
-    "@quenty/humanoidtracker": "file:../humanoidtracker",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/motor6d": "file:../motor6d",
-    "@quenty/optional": "file:../optional",
-    "@quenty/promise": "file:../promise",
-    "@quenty/qframe": "file:../qframe",
-    "@quenty/r15utils": "file:../r15utils",
-    "@quenty/ragdoll": "file:../ragdoll",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal",
-    "@quenty/table": "file:../table",
-    "@quenty/tie": "file:../tie",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/acceltween": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/camera": "workspace:*",
+    "@quenty/characterutils": "workspace:*",
+    "@quenty/humanoidtracker": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/motor6d": "workspace:*",
+    "@quenty/optional": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/qframe": "workspace:*",
+    "@quenty/r15utils": "workspace:*",
+    "@quenty/ragdoll": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/tie": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "devDependencies": {
-    "@quenty/rigbuilderutils": "file:../rigbuilderutils"
+    "@quenty/rigbuilderutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

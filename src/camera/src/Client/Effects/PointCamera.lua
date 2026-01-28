@@ -13,16 +13,18 @@ local SummedCamera = require("SummedCamera")
 local PointCamera = {}
 PointCamera.ClassName = "PointCamera"
 
-export type PointCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		OriginCamera: CameraEffectUtils.CameraEffect,
-		FocusCamera: CameraEffectUtils.CameraEffect,
-		Origin: CameraState.CameraState,
-		Focus: CameraState.CameraState,
-	},
-	{} :: typeof({ __index = PointCamera })
-)) & CameraEffectUtils.CameraEffect
+export type PointCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			OriginCamera: CameraEffectUtils.CameraEffect,
+			FocusCamera: CameraEffectUtils.CameraEffect,
+			Origin: CameraState.CameraState,
+			Focus: CameraState.CameraState,
+		},
+		{} :: typeof({ __index = PointCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	Initializes a new PointCamera

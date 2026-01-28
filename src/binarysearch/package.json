@@ -1,6 +1,6 @@
 {
   "name": "@quenty/binarysearch",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Binary search for Roblox",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "AxisAngles",
     "Quenty"

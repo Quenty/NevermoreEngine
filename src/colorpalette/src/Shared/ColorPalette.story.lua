@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class ColorPalette.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Blend = require("Blend")
 local ColorPalette = require("ColorPalette")
@@ -72,14 +74,14 @@ return function(target)
 
 		return Blend.New "Frame" {
 			BackgroundColor3 = palette:ObserveColor("surface"),
-			Size = UDim2.new(0, 250, 0, 100),
+			Size = UDim2.fromOffset(250, 100),
 
 			[Blend.Children] = {
 				Blend.New "TextLabel" {
 					TextColor3 = palette:ObserveColor("text"),
 					Text = labelText,
 					Font = Enum.Font.FredokaOne,
-					Size = UDim2.new(1, 0, 1, 0),
+					Size = UDim2.fromScale(1, 1),
 					BackgroundTransparency = 1,
 					TextScaled = true,
 					ZIndex = 2,
@@ -149,7 +151,7 @@ return function(target)
 							Text = "Action",
 							TextScaled = true,
 							Font = Enum.Font.FredokaOne,
-							Size = UDim2.new(1, 0, 1, 0),
+							Size = UDim2.fromScale(1, 1),
 							BackgroundTransparency = 1,
 							ZIndex = 2,
 						},
@@ -197,10 +199,10 @@ return function(target)
 	end
 
 	maid:GiveTask((Blend.New "ScrollingFrame" {
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.new(0, 0, 0),
 		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		CanvasSize = UDim2.new(1, 0, 0, 0),
+		CanvasSize = UDim2.fromScale(1, 0),
 		Parent = target,
 		[Blend.Children] = {
 			ColorPickerStoryUtils.create(maid, function(createPicker)
@@ -211,7 +213,7 @@ return function(target)
 			end),
 
 			Blend.New "Frame" {
-				Size = UDim2.new(1, 0, 0, 0),
+				Size = UDim2.fromScale(1, 0),
 				BackgroundTransparency = 1,
 				AutomaticSize = Enum.AutomaticSize.Y,
 
@@ -240,7 +242,7 @@ return function(target)
 
 			Blend.New "Frame" {
 				Name = "TestCustomColor",
-				Size = UDim2.new(0, 30, 0, 30),
+				Size = UDim2.fromOffset(30, 30),
 				BackgroundColor3 = palette:ObserveColor(Color3.new(0, 0, 1), "text"),
 			},
 		},

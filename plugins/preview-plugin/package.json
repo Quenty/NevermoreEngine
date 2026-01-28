@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -28,12 +31,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/baseobject": "file:../../src/baseobject",
-    "@quenty/basicpane": "file:../../src/basicpane",
-    "@quenty/blend": "file:../../src/blend",
-    "@quenty/loader": "file:../../src/loader",
-    "@quenty/maid": "file:../../src/maid",
-    "@quenty/rx": "file:../../src/rx",
-    "@quenty/servicebag": "file:../../src/servicebag"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/basicpane": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*"
   }
 }

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Determines if parts are touching or not
 	@class PartTouchingCalculator
@@ -24,12 +25,17 @@ function PartTouchingCalculator.new()
 	return self
 end
 
-function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
+function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid: Humanoid, parts)
 	assert(humanoid, "Bad humanoid")
 	assert(parts, "Must have parts")
 
+	local character = humanoid.Parent
+	if not character then
+		return false
+	end
+
 	local humanoidParts = {}
-	for _, item in humanoid.Parent:GetDescendants() do
+	for _, item in character:GetDescendants() do
 		if item:IsA("BasePart") then
 			table.insert(humanoidParts, item)
 		end

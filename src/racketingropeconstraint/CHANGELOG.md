@@ -3,6 +3,172 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.35.0...@quenty/racketingropeconstraint@12.35.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+# [12.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.34.0...@quenty/racketingropeconstraint@12.35.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+# [12.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.33.0...@quenty/racketingropeconstraint@12.34.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+# [12.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.32.1...@quenty/racketingropeconstraint@12.33.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.32.0...@quenty/racketingropeconstraint@12.32.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [12.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.31.1...@quenty/racketingropeconstraint@12.32.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.31.0...@quenty/racketingropeconstraint@12.31.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+# [12.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.30.0...@quenty/racketingropeconstraint@12.31.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+# [12.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.29.1...@quenty/racketingropeconstraint@12.30.0) (2026-01-06)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.29.0...@quenty/racketingropeconstraint@12.29.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+# [12.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.28.7...@quenty/racketingropeconstraint@12.29.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.28.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.28.6...@quenty/racketingropeconstraint@12.28.7) (2026-01-03)
+
+
+### Bug Fixes
+
+* Fix missing servicebag dependencies ([ba2274e](https://github.com/Quenty/NevermoreEngine/commit/ba2274ec070356518a157d80f912b05de9f74451))
+
+
+
+
+
+## [12.28.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.28.5...@quenty/racketingropeconstraint@12.28.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.28.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.28.4...@quenty/racketingropeconstraint@12.28.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.28.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.28.3...@quenty/racketingropeconstraint@12.28.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.28.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.28.2...@quenty/racketingropeconstraint@12.28.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.28.1...@quenty/racketingropeconstraint@12.28.2) (2025-12-13)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.28.0...@quenty/racketingropeconstraint@12.28.1) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+# [12.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.27.1...@quenty/racketingropeconstraint@12.28.0) (2025-11-17)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
+## [12.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.27.0...@quenty/racketingropeconstraint@12.27.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/racketingropeconstraint
+
+
+
+
+
 # [12.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@12.26.0...@quenty/racketingropeconstraint@12.27.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/racketingropeconstraint

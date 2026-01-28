@@ -1,6 +1,6 @@
 {
   "name": "@quenty/genericscreenguiprovider",
-  "version": "13.25.0",
+  "version": "13.31.2",
   "description": "Providers screenGuis with a given display order for easy use",
   "keywords": [
     "Roblox",
@@ -20,18 +20,21 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/string": "file:../string",
-    "@quenty/uiobjectutils": "file:../uiobjectutils",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/blend": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/uiobjectutils": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

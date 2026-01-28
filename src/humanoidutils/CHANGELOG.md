@@ -3,6 +3,100 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.7.0...@quenty/humanoidutils@2.7.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+# [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.6.0...@quenty/humanoidutils@2.7.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.5.2...@quenty/humanoidutils@2.6.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.5.1...@quenty/humanoidutils@2.5.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [2.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.5.0...@quenty/humanoidutils@2.5.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+# [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.5...@quenty/humanoidutils@2.5.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.4.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.4...@quenty/humanoidutils@2.4.5) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.4.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.3...@quenty/humanoidutils@2.4.4) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.4.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.2...@quenty/humanoidutils@2.4.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.4.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.1...@quenty/humanoidutils@2.4.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+
+
+
+
+## [2.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.4.0...@quenty/humanoidutils@2.4.1) (2025-12-28)
+
+
+### Bug Fixes
+
+* Typecheck some more things ([41eaaa6](https://github.com/Quenty/NevermoreEngine/commit/41eaaa6d053c469f7548810da72d05dfbf997b26))
+
+
+
+
+
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.3.0...@quenty/humanoidutils@2.4.0) (2025-10-08)
 
 

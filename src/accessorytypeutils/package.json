@@ -1,6 +1,6 @@
 {
   "name": "@quenty/accessorytypeutils",
-  "version": "1.7.0",
+  "version": "1.7.3",
   "description": "Utility methods for accessory types",
   "keywords": [
     "Roblox",
@@ -21,12 +21,15 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/enumutils": "file:../enumutils",
-    "@quenty/loader": "file:../loader"
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/loader": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

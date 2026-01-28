@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class SecretsCommandService
 ]=]
@@ -103,7 +104,7 @@ function SecretsCommandService:_registerCommands()
 		local secret = self._secretsService:PromiseSecret(secretKey):Wait()
 
 		if secret then
-			return secret
+			return tostring(secret)
 		else
 			return "<no value>"
 		end

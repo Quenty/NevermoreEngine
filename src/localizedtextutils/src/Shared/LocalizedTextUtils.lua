@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Localized text utils which changes translationKey structures to shared locations
 	@class LocalizedTextUtils

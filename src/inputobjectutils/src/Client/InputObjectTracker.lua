@@ -45,18 +45,20 @@ local InputObjectTracker = setmetatable({}, BaseObject)
 InputObjectTracker.ClassName = "InputObjectTracker"
 InputObjectTracker.__index = InputObjectTracker
 
-export type InputObjectTracker = typeof(setmetatable(
-	{} :: {
-		_initialPosition: Vector2,
-		_initialInputObject: InputObject,
-		_lastMousePosition: Vector2,
-		_isMouse: boolean,
-		_camera: Camera?,
+export type InputObjectTracker =
+	typeof(setmetatable(
+		{} :: {
+			_initialPosition: Vector2,
+			_initialInputObject: InputObject,
+			_lastMousePosition: Vector2,
+			_isMouse: boolean,
+			_camera: Camera?,
 
-		InputEnded: RxSignal.RxSignal<()>,
-	},
-	{} :: typeof({ __index = InputObjectTracker })
-)) & BaseObject.BaseObject
+			InputEnded: RxSignal.RxSignal<()>,
+		},
+		{} :: typeof({ __index = InputObjectTracker })
+	))
+	& BaseObject.BaseObject
 
 local function toVector2(vector3: Vector3): Vector2
 	return Vector2.new(vector3.X, vector3.Y)

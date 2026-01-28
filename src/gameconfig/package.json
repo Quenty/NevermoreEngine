@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameconfig",
-  "version": "12.32.0",
+  "version": "12.39.2",
   "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
   "keywords": [
     "Roblox",
@@ -20,6 +20,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -27,31 +30,32 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/attributeutils": "file:../attributeutils",
-    "@quenty/badgeutils": "file:../badgeutils",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/brio": "file:../brio",
-    "@quenty/canceltoken": "file:../canceltoken",
-    "@quenty/clienttranslator": "file:../clienttranslator",
-    "@quenty/cmdrservice": "file:../cmdrservice",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/marketplaceutils": "file:../marketplaceutils",
-    "@quenty/observablecollection": "file:../observablecollection",
-    "@quenty/playerutils": "file:../playerutils",
-    "@quenty/preferredparentutils": "file:../preferredparentutils",
-    "@quenty/promise": "file:../promise",
-    "@quenty/pseudolocalize": "file:../pseudolocalize",
-    "@quenty/remotefunctionutils": "file:../remotefunctionutils",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/rxbinderutils": "file:../rxbinderutils",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/statestack": "file:../statestack",
-    "@quenty/string": "file:../string",
-    "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/attributeutils": "workspace:*",
+    "@quenty/badgeutils": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/canceltoken": "workspace:*",
+    "@quenty/clienttranslator": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
+    "@quenty/enums": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/marketplaceutils": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/playerutils": "workspace:*",
+    "@quenty/preferredparentutils": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/pseudolocalize": "workspace:*",
+    "@quenty/remotefunctionutils": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/rxbinderutils": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   }
 }

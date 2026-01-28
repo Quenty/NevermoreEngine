@@ -1,6 +1,6 @@
 {
   "name": "@quenty/highlight",
-  "version": "10.25.0",
+  "version": "10.32.2",
   "description": "Animated highlight system for the Roblox highlight object",
   "keywords": [
     "Roblox",
@@ -22,26 +22,30 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/basicpane": "file:../basicpane",
-    "@quenty/blend": "file:../blend",
-    "@quenty/ducktype": "file:../ducktype",
-    "@quenty/enumutils": "file:../enumutils",
-    "@quenty/instanceutils": "file:../instanceutils",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/observablecollection": "file:../observablecollection",
-    "@quenty/rx": "file:../rx",
-    "@quenty/selectionutils": "file:../selectionutils",
-    "@quenty/signal": "file:../signal",
-    "@quenty/statestack": "file:../statestack",
-    "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject"
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/basicpane": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/ducktype": "workspace:*",
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/selectionutils": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

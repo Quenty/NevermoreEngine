@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonutils@2.3.2...@quenty/buttonutils@2.3.3) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [2.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonutils@2.3.1...@quenty/buttonutils@2.3.2) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/buttonutils
+
+
+
+
+
+## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonutils@2.3.0...@quenty/buttonutils@2.3.1) (2025-11-25)
+
+
+### Bug Fixes
+
+* Clamp both ends ([f79cf09](https://github.com/Quenty/NevermoreEngine/commit/f79cf0927bc5dbdbcc2c9e436391aff993c0050e))
+* Clamp mouse over color ([b4cd6c5](https://github.com/Quenty/NevermoreEngine/commit/b4cd6c56a2a60248f0b45b06b0c51940e3901925))
+
+
+
+
+
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonutils@2.2.2...@quenty/buttonutils@2.3.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/buttonutils

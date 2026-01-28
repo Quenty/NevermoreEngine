@@ -4,8 +4,13 @@
     "**/node_modules/**": true,
     "roblox.toml": true
   },
+  "luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
   "luau-lsp.ignoreGlobs": ["**/node_modules/**"],
-  "luau-lsp.fflags.enableNewSolver": false,
+
+  // This prevents Rojo from memory leaking
+  "luau-lsp.sourcemap.generatorCommand": "npm run build:sourcemap",
+  "luau-lsp.sourcemap.useVSCodeWatcher": true,
+
   "[lua]": {
     "editor.defaultFormatter": "JohnnyMorganz.stylua",
     "editor.formatOnSave": true,
@@ -20,6 +25,5 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file"
-  },
-  "files.trimTrailingWhitespace": true
+  }
 }

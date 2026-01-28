@@ -63,7 +63,7 @@ function InputModeTypeSelector.new(
 	-- keep this ordered so we are always stable in selection.
 	self._inputModeTypeList = {}
 
-	self._activeModeType = self._maid:Add(ValueObject.new())
+	self._activeModeType = self._maid:Add(ValueObject.new(nil))
 
 	--[=[
 	Event that fires whenever the active mode changes.
@@ -115,16 +115,18 @@ end
 	Returns the current active mode
 	@return InputModeType
 ]=]
-function InputModeTypeSelector.GetActiveInputType(self: InputModeTypeSelector)
-	return rawget(self :: any, "_activeModeType").Value
+function InputModeTypeSelector.GetActiveInputType(self: InputModeTypeSelector): InputModeType.InputModeType?
+	return (rawget(self :: any, "_activeModeType") :: ValueObject.ValueObject<InputModeType.InputModeType?>).Value
 end
 
 --[=[
 	Observes the current active mode
-	@return Observable<InputModeType>
+	@return Observable<InputModeType?>
 ]=]
-function InputModeTypeSelector.ObserveActiveInputType(self: InputModeTypeSelector)
-	return rawget(self :: any, "_activeModeType"):Observe()
+function InputModeTypeSelector.ObserveActiveInputType(
+	self: InputModeTypeSelector
+): Observable.Observable<InputModeType.InputModeType?>
+	return (rawget(self :: any, "_activeModeType") :: ValueObject.ValueObject<InputModeType.InputModeType?>):Observe()
 end
 
 --[=[
@@ -136,7 +138,8 @@ end
 function InputModeTypeSelector.IsActive(self: InputModeTypeSelector, inputModeType: InputModeType.InputModeType)
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
-	return rawget(self :: any, "_activeModeType").Value == inputModeType
+	return (rawget(self :: any, "_activeModeType") :: ValueObject.ValueObject<InputModeType.InputModeType?>).Value
+		== inputModeType
 end
 
 --[=[
@@ -155,8 +158,8 @@ function InputModeTypeSelector.ObserveIsActive(
 		Rx.map(function(inputType: InputModeType.InputModeType)
 			return inputType == inputModeType
 		end) :: any,
-		Rx.distinct(),
-	})
+		Rx.distinct() :: any,
+	}) :: any
 end
 
 --[=[
@@ -166,7 +169,7 @@ end
 ]=]
 function InputModeTypeSelector.__index(self: InputModeTypeSelector, index)
 	if index == "Value" then
-		return rawget(self :: any, "_activeModeType").Value
+		return (rawget(self :: any, "_activeModeType") :: ValueObject.ValueObject<InputModeType.InputModeType?>).Value
 	elseif InputModeTypeSelector[index] then
 		return InputModeTypeSelector[index]
 	else

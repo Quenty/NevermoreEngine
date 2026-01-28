@@ -17,13 +17,15 @@ local GameConfig = setmetatable({}, GameConfigBase)
 GameConfig.ClassName = "GameConfig"
 GameConfig.__index = GameConfig
 
-export type GameConfig = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_gameConfigBindersServer: any,
-	},
-	{} :: typeof({ __index = GameConfig })
-)) & GameConfigBase.GameConfigBase
+export type GameConfig =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_gameConfigBindersServer: any,
+		},
+		{} :: typeof({ __index = GameConfig })
+	))
+	& GameConfigBase.GameConfigBase
 
 function GameConfig.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): GameConfig
 	local self: GameConfig = setmetatable(GameConfigBase.new(obj) :: any, GameConfig)
@@ -31,7 +33,7 @@ function GameConfig.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): GameC
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)
 
-	for _, assetType: any in GameConfigAssetTypes do
+	for _, assetType: any in GameConfigAssetTypes:GetValues() do
 		GameConfigUtils.getOrCreateAssetFolder(self._obj, assetType)
 	end
 

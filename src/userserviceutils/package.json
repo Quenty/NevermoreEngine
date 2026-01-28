@@ -1,6 +1,6 @@
 {
   "name": "@quenty/userserviceutils",
-  "version": "9.22.0",
+  "version": "9.25.1",
   "description": "Utilities involving UserService in Roblox",
   "keywords": [
     "Roblox",
@@ -21,18 +21,21 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/aggregator": "file:../aggregator",
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/aggregator": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

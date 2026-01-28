@@ -1,6 +1,6 @@
 {
   "name": "@quenty/hintscoringutils",
-  "version": "14.26.0",
+  "version": "14.33.2",
   "description": "Utility functions that let you score a proximity prompt (i.e. a Hint) based upon its relation to a character in 3D space.",
   "keywords": [
     "Roblox",
@@ -22,19 +22,23 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/adorneeutils": "file:../adorneeutils",
-    "@quenty/boundingboxutils": "file:../boundingboxutils",
-    "@quenty/camera": "file:../camera",
-    "@quenty/draw": "file:../draw",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
-    "@quenty/region3utils": "file:../region3utils",
-    "@quenty/vector3utils": "file:../vector3utils"
+    "@quenty/adorneeutils": "workspace:*",
+    "@quenty/boundingboxutils": "workspace:*",
+    "@quenty/camera": "workspace:*",
+    "@quenty/draw": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/math": "workspace:*",
+    "@quenty/raycaster": "workspace:*",
+    "@quenty/region3utils": "workspace:*",
+    "@quenty/vector3utils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

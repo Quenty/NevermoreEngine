@@ -3,6 +3,180 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.39.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.39.1...@quenty/rogue-humanoid@10.39.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.39.0...@quenty/rogue-humanoid@10.39.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [10.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.38.0...@quenty/rogue-humanoid@10.39.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [10.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.37.0...@quenty/rogue-humanoid@10.38.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+
+
+
+
+
+# [10.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.36.1...@quenty/rogue-humanoid@10.37.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.36.0...@quenty/rogue-humanoid@10.36.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [10.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.35.1...@quenty/rogue-humanoid@10.36.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.35.0...@quenty/rogue-humanoid@10.35.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [10.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.34.0...@quenty/rogue-humanoid@10.35.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [10.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.33.1...@quenty/rogue-humanoid@10.34.0) (2026-01-06)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.33.0...@quenty/rogue-humanoid@10.33.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [10.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.7...@quenty/rogue-humanoid@10.33.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.32.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.6...@quenty/rogue-humanoid@10.32.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.32.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.5...@quenty/rogue-humanoid@10.32.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.32.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.4...@quenty/rogue-humanoid@10.32.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.32.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.3...@quenty/rogue-humanoid@10.32.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.32.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.2...@quenty/rogue-humanoid@10.32.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.1...@quenty/rogue-humanoid@10.32.2) (2025-12-13)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.32.0...@quenty/rogue-humanoid@10.32.1) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [10.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.31.1...@quenty/rogue-humanoid@10.32.0) (2025-11-17)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+## [10.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.31.0...@quenty/rogue-humanoid@10.31.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
 # [10.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.30.0...@quenty/rogue-humanoid@10.31.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/rogue-humanoid

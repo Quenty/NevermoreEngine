@@ -1,6 +1,6 @@
 {
   "name": "@quenty/geometryutils",
-  "version": "6.9.1",
+  "version": "6.10.0",
   "description": "Utility functions involving 3D and 2D geometry",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
@@ -28,7 +31,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/draw": "file:../draw",
-    "@quenty/loader": "file:../loader"
+    "@quenty/draw": "workspace:*",
+    "@quenty/loader": "workspace:*"
   }
 }

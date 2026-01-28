@@ -17,14 +17,16 @@ local ViewportControls = setmetatable({}, BaseObject)
 ViewportControls.ClassName = "ViewportControls"
 ViewportControls.__index = ViewportControls
 
-export type ViewportControls = typeof(setmetatable(
-	{} :: {
-		_obj: ViewportFrame,
-		_viewportModel: any,
-		_enabled: ValueObject.ValueObject<boolean>,
-	},
-	{} :: typeof({ __index = ViewportControls })
-)) & BaseObject.BaseObject
+export type ViewportControls =
+	typeof(setmetatable(
+		{} :: {
+			_obj: ViewportFrame,
+			_viewportModel: any,
+			_enabled: ValueObject.ValueObject<boolean>,
+		},
+		{} :: typeof({ __index = ViewportControls })
+	))
+	& BaseObject.BaseObject
 
 --[=[
     Create the controls for dragging.

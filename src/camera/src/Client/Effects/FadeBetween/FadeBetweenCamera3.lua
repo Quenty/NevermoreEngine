@@ -19,21 +19,23 @@ local SummedCamera = require("SummedCamera")
 local FadeBetweenCamera3 = {}
 FadeBetweenCamera3.ClassName = "FadeBetweenCamera3"
 
-export type FadeBetweenCamera3 = typeof(setmetatable(
-	{} :: {
-		_spring: Spring.Spring<number>,
-		CameraA: CameraEffectUtils.CameraLike,
-		CameraB: CameraEffectUtils.CameraLike,
-		HasReachedTarget: boolean,
-		Damper: number,
-		Value: number,
-		Speed: number,
-		Velocity: number,
-		Target: number,
-		Epsilon: number?,
-	},
-	{} :: typeof({ __index = FadeBetweenCamera3 })
-)) & CameraEffectUtils.CameraEffect
+export type FadeBetweenCamera3 =
+	typeof(setmetatable(
+		{} :: {
+			_spring: Spring.Spring<number>,
+			CameraA: CameraEffectUtils.CameraLike,
+			CameraB: CameraEffectUtils.CameraLike,
+			HasReachedTarget: boolean,
+			Damper: number,
+			Value: number,
+			Speed: number,
+			Velocity: number,
+			Target: number,
+			Epsilon: number?,
+		},
+		{} :: typeof({ __index = FadeBetweenCamera3 })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	@param cameraA CameraLike

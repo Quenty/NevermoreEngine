@@ -25,6 +25,8 @@ export type PlayerDataStoreService = typeof(setmetatable(
 		_dataStoreName: string,
 		_dataStoreScope: string,
 		_dataStoreManagerPromise: Promise.Promise<PlayerDataStoreManager.PlayerDataStoreManager>,
+		_bindToCloseService: any,
+		_promiseStarted: Promise.Promise<()>,
 	},
 	{} :: typeof({ __index = PlayerDataStoreService })
 ))
@@ -33,15 +35,16 @@ export type PlayerDataStoreService = typeof(setmetatable(
 	Initializes the PlayerDataStoreService. Should be done via [ServiceBag.Init].
 	@param serviceBag ServiceBag
 ]=]
-function PlayerDataStoreService:Init(serviceBag: ServiceBag.ServiceBag)
+function PlayerDataStoreService.Init(self: PlayerDataStoreService, serviceBag: ServiceBag.ServiceBag): ()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	-- External
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
+	self._serviceBag:GetService(require("PlaceMessagingService"))
 
+	-- State
 	self._promiseStarted = self._maid:Add(Promise.new())
-
 	self._dataStoreName = "PlayerData"
 	self._dataStoreScope = "SaveData"
 end
@@ -49,7 +52,7 @@ end
 --[=[
 	Initializes the datastore service for players. Should be done via [ServiceBag.Start].
 ]=]
-function PlayerDataStoreService:Start()
+function PlayerDataStoreService.Start(self: PlayerDataStoreService): ()
 	-- Give time for configuration
 	self._promiseStarted:Resolve()
 end
@@ -63,7 +66,7 @@ end
 
 	@param dataStoreName string
 ]=]
-function PlayerDataStoreService:SetDataStoreName(dataStoreName: string): ()
+function PlayerDataStoreService.SetDataStoreName(self: PlayerDataStoreService, dataStoreName: string): ()
 	assert(type(dataStoreName) == "string", "Bad dataStoreName")
 	assert(self._promiseStarted, "Not initialized")
 	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
@@ -80,7 +83,7 @@ end
 
 	@param dataStoreScope string
 ]=]
-function PlayerDataStoreService:SetDataStoreScope(dataStoreScope: string): ()
+function PlayerDataStoreService.SetDataStoreScope(self: PlayerDataStoreService, dataStoreScope: string): ()
 	assert(type(dataStoreScope) == "string", "Bad dataStoreScope")
 	assert(self._promiseStarted, "Not initialized")
 	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
@@ -90,10 +93,19 @@ end
 
 --[=[
 	Gets the datastore for the player.
-	@param player Player
+
+	:::tip
+	If you get the datastore by UserId, be sure to call datastore:PromiseCloseSession()
+	when done to avoid session leaks.
+	:::
+
+	@param player Player | number
 	@return Promise<DataStore>
 ]=]
-function PlayerDataStoreService:PromiseDataStore(player: Player): Promise.Promise<DataStore.DataStore>
+function PlayerDataStoreService.PromiseDataStore(
+	self: PlayerDataStoreService,
+	player: Player | number
+): Promise.Promise<DataStore.DataStore>
 	return self:PromiseManager():Then(function(manager)
 		return manager:GetDataStore(player)
 	end)
@@ -104,7 +116,10 @@ end
 	@param callback function -- May return a promise
 	@return Promise
 ]=]
-function PlayerDataStoreService:PromiseAddRemovingCallback(callback)
+function PlayerDataStoreService.PromiseAddRemovingCallback(
+	self: PlayerDataStoreService,
+	callback: () -> Promise.Promise<any>?
+): Promise.Promise<()>
 	return self:PromiseManager():Then(function(manager)
 		manager:AddRemovingCallback(callback)
 	end)
@@ -114,7 +129,9 @@ end
 	Retrieves the manager
 	@return Promise<PlayerDataStoreManager>
 ]=]
-function PlayerDataStoreService:PromiseManager(): Promise.Promise<PlayerDataStoreManager.PlayerDataStoreManager>
+function PlayerDataStoreService.PromiseManager(
+	self: PlayerDataStoreService
+): Promise.Promise<PlayerDataStoreManager.PlayerDataStoreManager>
 	if self._dataStoreManagerPromise then
 		return self._dataStoreManagerPromise
 	end
@@ -124,8 +141,12 @@ function PlayerDataStoreService:PromiseManager(): Promise.Promise<PlayerDataStor
 			return DataStorePromises.promiseDataStore(self._dataStoreName, self._dataStoreScope)
 		end)
 		:Then(function(dataStore)
-			local manager = self._maid:Add(PlayerDataStoreManager.new(dataStore, function(player)
-				return tostring(player.UserId)
+			local manager = self._maid:Add(PlayerDataStoreManager.new(self._serviceBag, dataStore, function(player)
+				if type(player) == "number" then
+					return tostring(player)
+				else
+					return tostring(player.UserId)
+				end
 			end, true))
 
 			-- A lot safer if we're hot reloading or need to monitor bind to close calls
@@ -135,11 +156,12 @@ function PlayerDataStoreService:PromiseManager(): Promise.Promise<PlayerDataStor
 
 			return manager
 		end)
+	assert(self._dataStoreManagerPromise, "Typechecking assertion")
 
 	return self._dataStoreManagerPromise
 end
 
-function PlayerDataStoreService:Destroy()
+function PlayerDataStoreService.Destroy(self: PlayerDataStoreService): ()
 	self._maid:DoCleaning()
 end
 

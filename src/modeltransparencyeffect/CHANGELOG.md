@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.9.5...@quenty/modeltransparencyeffect@11.10.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/modeltransparencyeffect
+
+
+
+
+
+## [11.9.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.9.4...@quenty/modeltransparencyeffect@11.9.5) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [11.9.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.9.3...@quenty/modeltransparencyeffect@11.9.4) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/modeltransparencyeffect
+
+
+
+
+
+## [11.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.9.2...@quenty/modeltransparencyeffect@11.9.3) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/modeltransparencyeffect
+
+
+
+
+
+## [11.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.9.1...@quenty/modeltransparencyeffect@11.9.2) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [11.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.9.0...@quenty/modeltransparencyeffect@11.9.1) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/modeltransparencyeffect
+
+
+
+
+
 # [11.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.8.4...@quenty/modeltransparencyeffect@11.9.0) (2025-05-10)
 
 

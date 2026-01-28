@@ -1,6 +1,6 @@
 {
   "name": "@quenty/acceltween",
-  "version": "2.5.3",
+  "version": "2.6.0",
   "description": "AccelTween implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty",
     "AxisAngles"

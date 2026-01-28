@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
@@ -229,8 +230,8 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	topLeft.BackgroundColor3 = frame.BackgroundColor3
 	topLeft.BorderSizePixel = 0
 	topLeft.Name = "TopLeft"
-	topLeft.Position = UDim2.new(0, 0, 0, 0)
-	topLeft.Size = UDim2.new(0, radius, 0, radius)
+	topLeft.Position = UDim2.fromScale(0, 0)
+	topLeft.Size = UDim2.fromOffset(radius, radius)
 	topLeft.BackgroundTransparency = 1
 	topLeft.ZIndex = frame.ZIndex
 	topLeft.Parent = frame
@@ -241,7 +242,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	bottomLeft.BorderSizePixel = 0
 	bottomLeft.Name = "BottomLeft"
 	bottomLeft.Position = UDim2.new(0, 0, 1, -radius)
-	bottomLeft.Size = UDim2.new(0, radius, 0, radius)
+	bottomLeft.Size = UDim2.fromOffset(radius, radius)
 	bottomLeft.BackgroundTransparency = 1
 	bottomLeft.ZIndex = frame.ZIndex
 	bottomLeft.Parent = frame
@@ -252,7 +253,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	topRight.BorderSizePixel = 0
 	topRight.Name = "TopRight"
 	topRight.Position = UDim2.new(1, -radius, 0, 0)
-	topRight.Size = UDim2.new(0, radius, 0, radius)
+	topRight.Size = UDim2.fromOffset(radius, radius)
 	topRight.BackgroundTransparency = 1
 	topRight.ZIndex = frame.ZIndex
 	topRight.Parent = frame
@@ -263,7 +264,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	bottomRight.BorderSizePixel = 0
 	bottomRight.Name = "BottomRight"
 	bottomRight.Position = UDim2.new(1, -radius, 1, -radius)
-	bottomRight.Size = UDim2.new(0, radius, 0, radius)
+	bottomRight.Size = UDim2.fromOffset(radius, radius)
 	bottomRight.BackgroundTransparency = 1
 	bottomRight.ZIndex = frame.ZIndex
 	bottomRight.Parent = frame
@@ -273,7 +274,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	middle.BackgroundColor3 = frame.BackgroundColor3
 	middle.BorderSizePixel = 0
 	middle.Name = "Middle"
-	middle.Position = UDim2.new(0, radius, 0, 0)
+	middle.Position = UDim2.fromOffset(radius, 0)
 	middle.Size = UDim2.new(1, -radius * 2, 1, 0)
 	middle.BackgroundTransparency = 1
 	middle.ZIndex = frame.ZIndex
@@ -284,7 +285,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	middleLeft.BackgroundColor3 = frame.BackgroundColor3
 	middleLeft.BorderSizePixel = 0
 	middleLeft.Name = "MiddleLeft"
-	middleLeft.Position = UDim2.new(0, 0, 0, radius)
+	middleLeft.Position = UDim2.fromOffset(0, radius)
 	middleLeft.Size = UDim2.new(0, radius, 1, -radius * 2)
 	middleLeft.BackgroundTransparency = 1
 	middleLeft.ZIndex = frame.ZIndex
@@ -328,14 +329,14 @@ function qGUI.AddNinePatch(
 		qGUI.AddTexturedWindowTemplate(frame, radius, type)
 
 	middle.Size = UDim2.new(1, -radius * 2, 1, -radius * 2) -- Fix middle...
-	middle.Position = UDim2.new(0, radius, 0, radius)
+	middle.Position = UDim2.fromOffset(radius, radius)
 
 	local middleTop = Instance.new(type)
 	middleTop.Archivable = false
 	middleTop.BackgroundColor3 = frame.BackgroundColor3
 	middleTop.BorderSizePixel = 0
 	middleTop.Name = "MiddleTop"
-	middleTop.Position = UDim2.new(0, radius, 0, 0)
+	middleTop.Position = UDim2.fromOffset(radius, 0)
 	middleTop.Size = UDim2.new(1, -radius * 2, 0, radius)
 	middleTop.BackgroundTransparency = 1
 	middleTop.ZIndex = frame.ZIndex

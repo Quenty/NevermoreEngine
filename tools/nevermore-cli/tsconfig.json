@@ -3,9 +3,14 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "declarationDir": "./dist"
+    "declarationDir": "./dist",
+    "composite": true,
+    "declaration": true
   },
-  "include": [
-    "src/**/*"
-  ]
+  "references": [
+    { "path": "../cli-output-helpers" },
+    { "path": "../nevermore-template-helpers" },
+    { "path": "../nevermore-cli-helpers" }
+  ],
+  "include": ["src/**/*"]
 }
