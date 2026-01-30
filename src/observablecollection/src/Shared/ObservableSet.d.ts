@@ -1,10 +1,8 @@
-import { Brio } from '../../../brio';
-import { Observable } from '../../../rx';
 import { Signal } from '@quenty/signal';
-import { Symbol } from '../../../symbol/src/Shared/Symbol';
-import { ValueObject } from '../../../valueobject';
+import { Brio } from '@quenty/brio';
+import { Observable } from '@quenty/rx';
 
-interface ObservableSet<T> extends Iterable<T> {
+type ObservableSet<T> = {
   ItemAdded: Signal<T>;
   ItemRemoved: Signal<T>;
   CountChanged: Signal<number>;
@@ -20,7 +18,7 @@ interface ObservableSet<T> extends Iterable<T> {
   GetSetCopy(): Map<T, true>;
   GetRawSet(): ReadonlyMap<T, true>;
   Destroy(): void;
-}
+} & IterableFunction<T>;
 
 interface ObservableSetConstructor {
   readonly ClassName: 'ObservableSet';
