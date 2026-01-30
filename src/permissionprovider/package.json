@@ -39,7 +39,8 @@
     "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/table": "workspace:*",
+    "@quenty/simpleenum": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
