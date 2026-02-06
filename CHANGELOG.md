@@ -1,3 +1,16 @@
+# (Fri Feb 06 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rogue-properties@11.37.3`
+  - chore: roguepropertyarrayhelper silence warning [#652](https://github.com/Quenty/NevermoreEngine/pull/652) ([@klga](https://github.com/klga))
+
+#### Authors: 1
+
+- [@klga](https://github.com/klga)
+
+---
+
 # (Mon Jan 26 2026)
 
 #### 🚀 Enhancement

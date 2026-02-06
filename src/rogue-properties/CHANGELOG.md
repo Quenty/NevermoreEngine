@@ -1,3 +1,16 @@
+# v11.37.3 (Fri Feb 06 2026)
+
+#### 🐛 Bug Fix
+
+- chore: roguepropertyarrayhelper silence warning [#652](https://github.com/Quenty/NevermoreEngine/pull/652) ([@klga](https://github.com/klga))
+- chore: roguepropertyarrayhelper silence warning ([@klga](https://github.com/klga))
+
+#### Authors: 1
+
+- [@klga](https://github.com/klga)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
