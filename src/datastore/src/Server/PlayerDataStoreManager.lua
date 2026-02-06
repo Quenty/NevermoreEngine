@@ -120,7 +120,7 @@ function PlayerDataStoreManager.new(
 			return
 		end
 
-		self:_removePlayerDataStore(player)
+		self:_removePlayerDataStore(player.UserId)
 	end))
 
 	if skipBindingToClose ~= true then
