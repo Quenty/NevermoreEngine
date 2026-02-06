@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.32.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.32.2...@quenty/soundgroup@1.32.3) (2026-02-06)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+
+
+
+
 ## [1.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.32.1...@quenty/soundgroup@1.32.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/soundgroup
