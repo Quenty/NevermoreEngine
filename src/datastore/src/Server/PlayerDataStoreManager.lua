@@ -83,8 +83,8 @@ export type PlayerDataStoreManager =
 			_disableSavingInStudio: boolean?,
 		},
 		{} :: typeof({ __index = PlayerDataStoreManager })
-	))
-	& BaseObject.BaseObject
+		))
+& BaseObject.BaseObject
 
 --[=[
 	Constructs a new PlayerDataStoreManager.
@@ -111,7 +111,7 @@ function PlayerDataStoreManager.new(
 	self._maid._savingConns = Maid.new()
 
 	self._datastores = {} -- [userId] = datastore
-	self._removing = {} -- [player] = true
+	self._removing = {} -- [userId] = true
 	self._pendingSaves = PendingPromiseTracker.new()
 	self._removingCallbacks = {} -- [func, ...]
 
@@ -120,7 +120,7 @@ function PlayerDataStoreManager.new(
 			return
 		end
 
-		self:_removePlayerDataStore(player)
+		self:_removePlayerDataStore(player.UserId)
 	end))
 
 	if skipBindingToClose ~= true then
@@ -286,18 +286,20 @@ function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreMana
 		end
 	end
 
-	PromiseUtils.all(removingPromises)
+	local closePromise = PromiseUtils.all(removingPromises)
 		:Then(function()
 			return datastore:SaveAndCloseSession()
 		end)
 		:Finally(function()
 			datastore:Destroy()
+			self._maid._savingConns[userId] = nil
 			self._removing[userId] = nil
 		end)
 
+	self._pendingSaves:Add(closePromise)
+
 	-- Prevent double removal or additional issues
 	self._datastores[userId] = nil
-	self._maid._savingConns[userId] = nil
 end
 
 function PlayerDataStoreManager._getKey(self: PlayerDataStoreManager, playerOrUserId: Player | PlayerUserId): string
