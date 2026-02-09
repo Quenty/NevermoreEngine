@@ -1,20 +1,18 @@
-# v11.31.3 (Mon Feb 09 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Prevent stack overflow [#654](https://github.com/Quenty/NevermoreEngine/pull/654) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Prevent stack overflow ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.31.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.2...@quenty/hide@11.31.3) (2026-02-09)
+
+
+### Bug Fixes
+
+* Prevent stack overflow ([9a14325](https://github.com/Quenty/NevermoreEngine/commit/9a14325990ffeabaccf6cb0cdd42ac4d0b76fd70))
+
+
+
+
 
 ## [11.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.1...@quenty/hide@11.31.2) (2026-01-21)
 
