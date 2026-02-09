@@ -1,19 +1,18 @@
-# v13.31.2 (Mon Feb 09 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Update player data removal to use UserId [#653](https://github.com/Quenty/NevermoreEngine/pull/653) ([@imagerymartin](https://github.com/imagerymartin))
-
-#### Authors: 1
-
-- Martin ([@imagerymartin](https://github.com/imagerymartin))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.31.1...@quenty/datastore@13.31.2) (2026-02-09)
+
+
+### Bug Fixes
+
+* Update player data removal to use UserId ([#653](https://github.com/Quenty/NevermoreEngine/issues/653)) ([e951d00](https://github.com/Quenty/NevermoreEngine/commit/e951d005848b2bc536bccaf4451687e60881a19e))
+
+
+
+
 
 ## [13.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.31.0...@quenty/datastore@13.31.1) (2026-01-21)
 

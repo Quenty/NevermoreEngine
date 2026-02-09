@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.45.0...@quenty/settings-inputkeymap@10.45.1) (2026-02-09)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+
+
+
+
 # [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.44.2...@quenty/settings-inputkeymap@10.45.0) (2026-01-26)
 
 **Note:** Version bump only for package @quenty/settings-inputkeymap
