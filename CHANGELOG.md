@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/hide@11.31.3`
+  - fix: Prevent stack overflow [#654](https://github.com/Quenty/NevermoreEngine/pull/654) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Feb 09 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/datastore@13.31.2`
   - fix: Update player data removal to use UserId [#653](https://github.com/Quenty/NevermoreEngine/pull/653) ([@imagerymartin](https://github.com/imagerymartin))
 
