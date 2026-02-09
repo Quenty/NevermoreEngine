@@ -41,7 +41,7 @@ function Hide:_hideInstance(instance: Instance)
 		instance.Transparency = 1
 	elseif instance:IsA("Model") or instance:IsA("Folder") then
 		-- Be limited in what we recurse down
-		for _, child in self._instance:GetChildren() do
+		for _, child in instance:GetChildren() do
 			self:_hideInstance(child)
 		end
 	elseif HideUtils.hasTransparency(instance) then
