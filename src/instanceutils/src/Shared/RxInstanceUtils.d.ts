@@ -4,7 +4,7 @@ import { Observable, Predicate } from '@quenty/rx';
 export namespace RxInstanceUtils {
   function observeProperty<
     T extends Instance,
-    K extends keyof InstanceProperties<T>
+    K extends keyof InstanceProperties<T>,
   >(instance: T, propertyName: K): Observable<InstanceProperties<T>[K]>;
   function observeAncestry(instance: Instance): Observable<Instance>;
   function observeFirstAncestorBrio<T extends keyof Instances>(
@@ -19,7 +19,7 @@ export namespace RxInstanceUtils {
 
   function observePropertyBrio<
     T extends Instance,
-    K extends keyof InstanceProperties<T>
+    K extends keyof InstanceProperties<T>,
   >(
     instance: T,
     propertyName: K,
@@ -29,7 +29,7 @@ export namespace RxInstanceUtils {
   ): Observable<Brio<NonNullable<InstanceProperties<T>[K]>>>;
   function observePropertyBrio<
     T extends Instance,
-    K extends keyof InstanceProperties<T>
+    K extends keyof InstanceProperties<T>,
   >(
     instance: T,
     propertyName: K,
@@ -46,7 +46,7 @@ export namespace RxInstanceUtils {
   >;
   function observePropertyBrio<
     T extends Instance,
-    K extends keyof InstanceProperties<T>
+    K extends keyof InstanceProperties<T>,
   >(
     instance: T,
     propertyName: K,
@@ -94,4 +94,13 @@ export namespace RxInstanceUtils {
     parent: Instance,
     className: T
   ): Observable<Brio<Instances[T]>>;
+
+  function observeDescendantsAndSelfBrio<T extends Instance>(
+    parent: Instance,
+    predicate: (instance: Instance) => instance is T
+  ): Observable<Brio<T>>;
+  function observeDescendantsAndSelfBrio(
+    parent: Instance,
+    predicate?: Predicate<Instance>
+  ): Observable<Brio<Instance>>;
 }
