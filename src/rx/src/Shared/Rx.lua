@@ -2243,10 +2243,10 @@ function Rx.window(windowBoundaries)
 	assert(Observable.isObservable(windowBoundaries), "Bad observable")
 
 	return Rx.pipe({
-		Rx.buffer(windowBoundaries),
+		Rx.buffer(windowBoundaries) :: any,
 		Rx.map(function(data)
-			return Rx.of(unpack(data))
-		end),
+			return Rx.of(unpack(data)) :: any
+		end) :: any,
 	})
 end
 
