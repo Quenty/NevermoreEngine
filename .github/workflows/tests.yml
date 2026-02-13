@@ -3,7 +3,6 @@ on: [pull_request]
 jobs:
   tests:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -40,16 +39,20 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           cache: true
 
-      - name: Build CLI
+      - name: Build all tools
         run: pnpm -r --filter './tools/**' run build
 
+      - name: Install nevermore-cli locally
+        run: npm install --ignore-scripts -g .
+        working-directory: tools/nevermore-cli
+
       - name: Run tests
-        run: npx nevermore batch test --base origin/${{ github.base_ref }} --output test-results.json --yes
+        run: nevermore batch test --base origin/${{ github.base_ref }} --output test-results.json --yes
         env:
-          ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
+          ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
 
       - name: Post test results
         if: always()
-        run: npx nevermore ci post-test-results test-results.json --yes
+        run: nevermore tools post-test-results test-results.json --yes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

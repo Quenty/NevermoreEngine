@@ -18,8 +18,8 @@ export interface DeployArgs extends NevermoreGlobalArgs {
 }
 
 export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
-  public command = 'deploy <subcommand>';
-  public describe = 'Build and upload a place via Roblox Open Cloud';
+  public command = 'deploy [target]';
+  public describe = 'Build and upload via Roblox Open Cloud';
 
   public builder = (args: Argv<T>) => {
     args.command(

@@ -6,8 +6,8 @@ import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { TemplateHelper } from '@quenty/nevermore-template-helpers';
-import { NevermoreGlobalArgs } from '../args/global-args.js';
-import { getTemplatePathByName } from '../utils/nevermore-cli-utils.js';
+import { NevermoreGlobalArgs } from '../../args/global-args.js';
+import { getTemplatePathByName } from '../../utils/nevermore-cli-utils.js';
 
 export interface InitPackageArgs extends NevermoreGlobalArgs {
   packageName: string;
@@ -21,9 +21,8 @@ export interface InitPackageArgs extends NevermoreGlobalArgs {
 export class InitPackageCommand<T>
   implements CommandModule<T, InitPackageArgs>
 {
-  public command =
-    'init-package [package-name] [description] [package-template]';
-  public describe = 'Initializes a new package within Nevermore.';
+  public command = 'package [package-name] [description] [package-template]';
+  public describe = 'Scaffold a new package within Nevermore';
 
   public builder(args: Argv<T>) {
     let result = args

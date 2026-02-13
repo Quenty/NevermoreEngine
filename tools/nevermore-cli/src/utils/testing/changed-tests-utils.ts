@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { DeployTarget, loadDeployConfigAsync, resolveDeployConfigPath, resolveTarget } from '../build/deploy-config.js';
+import { DeployTarget, loadDeployConfigAsync, resolveDeployConfigPath, resolveDeployTarget } from '../build/deploy-config.js';
 
 export interface TestablePackage {
   name: string;
@@ -67,7 +67,7 @@ async function _filterTestableAsync(
 
     try {
       const config = await loadDeployConfigAsync(configPath);
-      const target = resolveTarget(config, 'test');
+      const target = resolveDeployTarget(config, 'test');
       results.push({ name: pkg.name, path: pkg.path, target });
     } catch {
       skippedNoTestTarget.push(pkg.name);

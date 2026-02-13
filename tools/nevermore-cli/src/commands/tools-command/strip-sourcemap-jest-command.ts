@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { NevermoreGlobalArgs } from '../args/global-args.js';
+import { NevermoreGlobalArgs } from '../../args/global-args.js';
 
 interface SourcemapNode {
   name: string;

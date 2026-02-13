@@ -19,7 +19,7 @@ export class TestProjectCommand<T>
   implements CommandModule<T, TestProjectArgs>
 {
   public command = 'test';
-  public describe = 'Build, deploy, and run tests via Roblox Open Cloud';
+  public describe = 'Run tests for a single package via Open Cloud';
 
   public builder = (args: Argv<T>) => {
     args.option('api-key', {

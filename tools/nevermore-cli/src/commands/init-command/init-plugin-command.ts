@@ -6,8 +6,8 @@ import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { TemplateHelper } from '@quenty/nevermore-template-helpers';
-import { NevermoreGlobalArgs } from '../args/global-args.js';
-import { getTemplatePathByName } from '../utils/nevermore-cli-utils.js';
+import { NevermoreGlobalArgs } from '../../args/global-args.js';
+import { getTemplatePathByName } from '../../utils/nevermore-cli-utils.js';
 import { InitGameCommand } from './init-game-command.js';
 
 export interface initGameArgs extends NevermoreGlobalArgs {
@@ -18,8 +18,8 @@ export interface initGameArgs extends NevermoreGlobalArgs {
  * Creates a new plugin with Nevermore dependencies
  */
 export class InitPluginCommand<T> implements CommandModule<T, initGameArgs> {
-  public command = 'init-plugin [plugin-name]';
-  public describe = 'Initializes a new plugin template.';
+  public command = 'plugin [plugin-name]';
+  public describe = 'Scaffold a new plugin with Nevermore dependencies';
 
   public builder(args: Argv<T>) {
     args.positional('plugin-name', {

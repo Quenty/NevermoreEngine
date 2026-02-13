@@ -6,7 +6,7 @@ import { getApiKeyAsync, CredentialArgs } from '../auth/credential-store.js';
 import {
   DeployTarget,
   loadDeployConfigAsync,
-  resolveTarget,
+  resolveDeployTarget,
   resolveDeployConfigPath,
 } from './deploy-config.js';
 import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
@@ -37,7 +37,7 @@ export async function buildAndUploadAsync(
 
   const configPath = resolveDeployConfigPath(packagePath);
   const config = await loadDeployConfigAsync(configPath);
-  const target = { ...resolveTarget(config, targetName) };
+  const target = { ...resolveDeployTarget(config, targetName) };
 
   if (args.universeId) target.universeId = args.universeId;
   if (args.placeId) target.placeId = args.placeId;

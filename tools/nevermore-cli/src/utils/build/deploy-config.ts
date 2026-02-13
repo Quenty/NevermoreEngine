@@ -48,7 +48,7 @@ export async function loadDeployConfigAsync(
   return config;
 }
 
-export function resolveTarget(
+export function resolveDeployTarget(
   config: DeployConfig,
   targetName: string
 ): DeployTarget {

@@ -3,7 +3,7 @@
  */
 
 import { Argv, CommandModule } from 'yargs';
-import { NevermoreGlobalArgs } from '../args/global-args.js';
+import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import * as fs from 'fs/promises';
 import * as fsSync from 'fs';
 import * as https from 'https';
