@@ -2197,28 +2197,32 @@ function Rx.buffer(closingNotifier)
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
-		
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
-			local buffer = {}
+			local latestBuffer = {}
 
 			maid:GiveTask(closingNotifier:Subscribe(function()
-				local latest = table.clone(buffer)
+				local latest = table.clone(latestBuffer)
 
-				table.clear(buffer)
+				table.clear(latestBuffer)
 
 				sub:Fire(latest)
 			end))
 
-			maid:GiveTask(source:Subscribe(function(value)
-				table.insert(buffer, value)
-			end, nil, function(value)
-				sub:Fire(buffer)
-				sub:Complete()
-			end))
+			maid:GiveTask(source:Subscribe(
+				function(value)
+					table.insert(latestBuffer, value)
+				end,
+				nil,
+				function()
+					sub:Fire(latestBuffer)
+					sub:Complete()
+				end
+			))
 
 			maid:GiveTask(function()
-				table.clear(buffer)
+				table.clear(latestBuffer)
 			end)
 
 			return maid
@@ -2242,7 +2246,7 @@ function Rx.window(windowBoundaries)
 		Rx.buffer(windowBoundaries),
 		Rx.map(function(data)
 			return Rx.of(unpack(data))
-		end)
+		end),
 	})
 end
 
@@ -2263,7 +2267,7 @@ function Rx.pairwise()
 
 			return source:Subscribe(function(value)
 				if previous ~= UNSET_VALUE then
-					sub:Fire({previous, value})
+					sub:Fire({ previous, value })
 				end
 
 				previous = value
