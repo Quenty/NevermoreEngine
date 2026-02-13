@@ -9,6 +9,8 @@ import {
   pollTaskCompletionAsync,
   getTaskLogsAsync,
 } from '../utils/open-cloud-client.js';
+import { tryRenamePlaceAsync } from '../utils/roblox-auth/index.js';
+import { buildPlaceNameAsync } from '../utils/nevermore-cli-utils.js';
 
 export interface TestProjectArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -36,15 +38,15 @@ export class TestProjectCommand<T>
       default: false,
     });
     args.option('universe-id', {
-      describe: 'Override universe ID from deploy.json',
+      describe: 'Override universe ID from deploy.nevermore.json',
       type: 'number',
     });
     args.option('place-id', {
-      describe: 'Override place ID from deploy.json',
+      describe: 'Override place ID from deploy.nevermore.json',
       type: 'number',
     });
     args.option('script', {
-      describe: 'Override script path from deploy.json',
+      describe: 'Override script path from deploy.nevermore.json',
       type: 'string',
     });
     args.option('script-text', {
@@ -75,6 +77,10 @@ export class TestProjectCommand<T>
 
     const { apiKey, target, version, packagePath } = result;
 
+    // Rename place to reflect current package + commit
+    const placeName = await buildPlaceNameAsync(packagePath);
+    await tryRenamePlaceAsync(target.placeId, placeName);
+
     let scriptContent: string;
     if (args.scriptText) {
       scriptContent = args.scriptText;
@@ -82,7 +88,7 @@ export class TestProjectCommand<T>
       scriptContent = await _readScriptAsync(packagePath, target.script);
     } else {
       throw new Error(
-        'No script to run. Provide --script-text, --script, or add a "script" field to your deploy.json test target.'
+        'No script to run. Provide --script-text, --script, or add a "script" field to your deploy.nevermore.json test target.'
       );
     }
 
@@ -136,3 +142,4 @@ async function _readScriptAsync(
     throw new Error(`Test script not found: ${fullPath}`);
   }
 }
+

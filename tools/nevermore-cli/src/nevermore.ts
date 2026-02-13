@@ -17,7 +17,7 @@ import { InitPluginCommand } from './commands/init-plugin-command.js';
 import { PackCommand } from './commands/pack-command.js';
 import { InstallPackageCommand } from './commands/install-package-command.js';
 import { TestProjectCommand } from './commands/test-project-command.js';
-import { DeployCommand } from './commands/deploy-command.js';
+import { DeployCommand } from './commands/deploy-command/index.js';
 import { DownloadRobloxTypes } from './commands/download-roblox-types.js';
 import { LoginCommand } from './commands/login-command.js';
 

@@ -65,8 +65,11 @@ CLI tools under `tools/` are TypeScript ESM packages using yargs for command par
 - **Process execution**: Use `runCommandAsync()` from `nevermore-cli-utils.ts` to spawn child processes (wraps `execa`).
 - **Dryrun support**: Thread `args` through to `runCommandAsync` for subprocess calls; log-and-skip for API calls when `args.dryrun` is true.
 - **Fail fast**: Validate credentials and config before expensive operations (e.g. check API key before rojo build).
+- **Build via npm scripts**: Always use `npm run build` (not `tsc` or `npx tsc` directly) to compile TypeScript. Each tool package defines `build`, `build:watch`, and `build:clean` scripts in its `package.json`.
 - **ESM imports**: All local imports use `.js` extension.
 - **No section comment headers**: Don't use `// --- Section ---` style dividers. Code organization should be self-evident from structure.
+- **`try*` for best-effort operations**: Functions that can fail gracefully should be named `try*` (e.g. `tryRenamePlaceAsync`) and return a result structure (`{ success: boolean, reason?: string, ... }`) instead of throwing or silently swallowing errors. Reserve throwing for operations where failure should halt the caller.
+- **Platform-specific code in separate files**: When code varies by OS, split into a folder with per-platform files (e.g. `roblox-auth/windows.ts`, `roblox-auth/macos.ts`) re-exported through `index.ts`.
 - **No co-authorship**: Do not include `Co-Authored-By` on Nevermore commits (open source repo).
 
 ## Web Fetch Safety
@@ -93,9 +96,9 @@ Selene config (`selene.toml`):
 
 ## Deploy & Test Infrastructure
 
-### deploy.json (per-package)
+### deploy.nevermore.json (per-package)
 
-Located at `src/<package>/deploy.json`. Each target has `universeId`, `placeId`, `project` (rojo project path), and optional `script` (Luau to execute after deploy):
+Located at `src/<package>/deploy.nevermore.json`. Each target has `universeId`, `placeId`, `project` (rojo project path), and optional `script` (Luau to execute after deploy):
 
 ```json
 {
@@ -116,7 +119,7 @@ All commands operate from within a package directory (cwd).
 
 - `nevermore init-package` — Scaffold a new package under `src/`. Always use this to create new packages rather than manually creating directories.
 - `nevermore login` — Store/validate Roblox Open Cloud API key (`~/.nevermore/credentials.json`). Supports `--status`, `--clear`, `--force`.
-- `nevermore deploy init` — Interactive (or `--universe-id --place-id --project` for CI) creation of `deploy.json`. Auto-detects rojo projects and scripts. Fetches available places from Roblox API.
+- `nevermore deploy init` — Interactive (or `--universe-id --place-id --project` for CI) creation of `deploy.nevermore.json`. Auto-detects rojo projects and scripts. Fetches available places from Roblox API.
 - `nevermore deploy run [target]` — Build rojo project and upload via Open Cloud. `--publish` for Published (default Saved).
 - `nevermore test` — Build, upload, execute test script via Open Cloud Luau Execution API, report results.
 
@@ -149,4 +152,4 @@ Tests use **Jest3** (Roblox Lua Jest implementation) via `@quentystudios/jest-lu
 
 67 packages have `test/` folders serving as Studio test places (rojo projects for interactive testing). ~17 of these have `test/scripts/Server/ServerMain.server.lua` that bootstraps the package — these double as smoke tests via the Open Cloud Luau Execution API.
 
-The `tests/` directory at repo root contains legacy CI infrastructure (to be replaced by per-package `deploy.json` + `nevermore test`).
+The `tests/` directory at repo root contains legacy CI infrastructure (to be replaced by per-package `deploy.nevermore.json` + `nevermore test`).
