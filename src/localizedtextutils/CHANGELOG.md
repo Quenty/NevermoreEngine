@@ -1,19 +1,18 @@
-# v12.24.2 (Fri Feb 13 2026)
-
-#### 🐛 Bug Fix
-
-- fix(localizedtextutils): make translationArgs optional [#655](https://github.com/Quenty/NevermoreEngine/pull/655) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.24.1...@quenty/localizedtextutils@12.24.2) (2026-02-13)
+
+
+### Bug Fixes
+
+* **localizedtextutils:** make translationArgs optional ([#655](https://github.com/Quenty/NevermoreEngine/issues/655)) ([9eb6d7b](https://github.com/Quenty/NevermoreEngine/commit/9eb6d7bb9c26bc6a21bd71bfc7e47fd0dfae26c1))
+
+
+
+
 
 ## [12.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.24.0...@quenty/localizedtextutils@12.24.1) (2026-01-21)
 
