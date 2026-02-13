@@ -44,7 +44,8 @@
     "@quenty/string": "workspace:*",
     "@quenty/uiobjectutils": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "devDependencies": {
     "@quenty/contentproviderutils": "workspace:*",

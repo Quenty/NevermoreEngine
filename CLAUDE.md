@@ -98,7 +98,7 @@ Selene config (`selene.toml`):
 
 ### deploy.nevermore.json (per-package)
 
-Located at `src/<package>/deploy.nevermore.json`. Each target has `universeId`, `placeId`, `project` (rojo project path), and optional `script` (Luau to execute after deploy):
+Located at `src/<package>/deploy.nevermore.json`. Each target has `universeId`, `placeId`, `project` (rojo project path), and optional `scriptTemplate` (Luau script whose contents are sent to Open Cloud Luau Execution API):
 
 ```json
 {
@@ -107,21 +107,24 @@ Located at `src/<package>/deploy.nevermore.json`. Each target has `universeId`, 
       "universeId": 12345,
       "placeId": 67890,
       "project": "test/default.project.json",
-      "script": "test/scripts/Server/ServerMain.server.lua"
+      "scriptTemplate": "test/scripts/Server/ServerMain.server.lua"
     }
   }
 }
 ```
 
+The field is called `scriptTemplate` (not `script`) because the file is read and its contents are sent as the execution payload — it's not a ServerScript that runs in the game tree. The game's actual ServerMain runs from the rojo project; the script template is what Open Cloud executes as a TaskScript.
+
 ### CLI Commands
 
-All commands operate from within a package directory (cwd).
-
-- `nevermore init-package` — Scaffold a new package under `src/`. Always use this to create new packages rather than manually creating directories.
-- `nevermore login` — Store/validate Roblox Open Cloud API key (`~/.nevermore/credentials.json`). Supports `--status`, `--clear`, `--force`.
-- `nevermore deploy init` — Interactive (or `--universe-id --place-id --project` for CI) creation of `deploy.nevermore.json`. Auto-detects rojo projects and scripts. Fetches available places from Roblox API.
-- `nevermore deploy run [target]` — Build rojo project and upload via Open Cloud. `--publish` for Published (default Saved).
-- `nevermore test` — Build, upload, execute test script via Open Cloud Luau Execution API, report results.
+- `nevermore init-package` — Scaffold a new package. Can also be run on existing packages to fill in missing standard files.
+- `nevermore login` — Store/validate Roblox Open Cloud API key. Supports `--status`, `--clear`, `--force`.
+- `nevermore deploy init` — Create `deploy.nevermore.json`. Auto-detects rojo projects and scripts. `--script-template` to set the execution script path.
+- `nevermore deploy run [target]` — Build rojo project and upload via Open Cloud. `--publish` for Published (default Saved). `--place-file` to upload a pre-built `.rbxl` instead of building via rojo.
+- `nevermore test` — Build, upload, execute script template via Open Cloud, report results. `--script-template` overrides the path from config. `--script-text` sends raw Luau code directly instead of reading a file.
+- `nevermore batch test` — Test multiple packages with concurrency control and change detection.
+- `nevermore ci post-test-results <file>` — Post/update PR comment with test results (requires `GITHUB_TOKEN`).
+- `npm run test` — Alias for `nevermore batch test` (change-detected packages).
 
 ### Credential Resolution Order
 
@@ -130,14 +133,13 @@ All commands operate from within a package directory (cwd).
 3. `ROBLOX_UNIT_TEST_API_KEY` env var (backwards compat)
 4. `~/.nevermore/credentials.json` (stored via `nevermore login`)
 
-### Open Cloud API Key Setup
+### Open Cloud API Key Scopes
 
-The API key must have both the correct **scopes** and the target **experience added to the allow list** in the Creator Dashboard.
-
-Scopes:
 - `universe-places:write` — upload place files
 - `universe.place.luau-execution-session:write` — create execution tasks
 - `universe.place.luau-execution-session:read` — poll tasks and read logs
+
+The key must also have the target experience added to its allow list in the Creator Dashboard.
 
 ### Building the CLI
 
@@ -148,8 +150,34 @@ cd tools/nevermore-cli && npm link         # Install globally for local testing
 
 ## Testing Infrastructure
 
-Tests use **Jest3** (Roblox Lua Jest implementation) via `@quentystudios/jest-lua`. Test files are colocated with source as `*.spec.lua`.
+Tests use **Jest3** (`@quentystudios/jest-lua`). Test files are colocated with source as `*.spec.lua`. Each testable package has a `deploy.nevermore.json` with a `test` target.
 
-67 packages have `test/` folders serving as Studio test places (rojo projects for interactive testing). ~17 of these have `test/scripts/Server/ServerMain.server.lua` that bootstraps the package — these double as smoke tests via the Open Cloud Luau Execution API.
+### Test Execution Model
 
-The `tests/` directory at repo root contains legacy CI infrastructure (to be replaced by per-package `deploy.nevermore.json` + `nevermore test`).
+The `scriptTemplate` file is read and sent to Roblox Open Cloud's Luau Execution API as a TaskScript. This means `script` inside the template points to TaskScript (outside the rojo tree), not a ServerScript. Use `loader.bootstrapGame(ServerScriptService.packageName)` instead of `loader.load(script)`.
+
+### Test Project Requirements
+
+Each package's `test/default.project.json` must have `"LoadStringEnabled": true` on ServerScriptService (Jest uses `loadstring()` internally). Each package's `src/` must contain `node_modules.project.json` mapping `../node_modules` into the rojo tree — without it, dependencies like LoaderUtils aren't discoverable.
+
+### Batch Test Options
+
+- `--base origin/main` — Only test packages changed since this ref (default)
+- `--all` — Test all packages with test targets
+- `--concurrency 3` — Max parallel tests (default 3)
+- `--output results.json` — Write JSON results file
+
+### Rate Limiting
+
+The `RateLimiter` class serializes all Open Cloud API requests (one in-flight at a time) and reads `x-ratelimit-remaining` / `x-ratelimit-reset` headers. Note: `x-ratelimit-reset` is **seconds until reset** (not epoch). On 429, retries up to 3 times with backoff.
+
+### CI Design Principles
+
+- **Workflows should be thin.** All logic lives in `nevermore-cli` commands — workflows just call them.
+- **Rate limiting** is shared across concurrent workers via the `OpenCloudClient` instance.
+
+### Adding Tests to a Package
+
+1. Ensure `deploy.nevermore.json` has a `test` target (`nevermore deploy init`)
+2. For Jest tests: add `@quentystudios/jest-lua` and `@quenty/nevermore-test-runner` as dependencies, add `jest.config.lua`
+3. For smoke tests only: just the config and a `ServerMain.server.lua` that bootstraps the package

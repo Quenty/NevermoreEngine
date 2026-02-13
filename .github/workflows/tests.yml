@@ -3,6 +3,7 @@ on: [pull_request]
 jobs:
   tests:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -19,7 +20,7 @@ jobs:
         with:
           cache: true
 
-      - name: Setup npm for GitHub Packages
+      - name: Setup registries
         run: |
           echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
           echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
@@ -32,37 +33,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Compute changed packages
-        run: |
-          PACKAGES=$(npx lerna ls --since origin/main --json | jq -r '.[] | select(.name != "@quenty/nevermore-cli") | .location' | tr '\n' ' ')
-          echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
-
-      - name: Setup test place project
-        run: |
-          echo "Setting up test place project from template..."
-          cp -r tests/test-place-template tests/bin
-          cd tests/bin
-
-          echo "Installing changed packages..."
-          pnpm i ${{ env.PACKAGES }}
-
-          echo "Installing Jest..."
-          pnpm add https://github.com/quentystudios/jest-lua.git
-
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
         with:
-          path: tests/bin
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
           cache: true
 
-      - name: Generate test place file
-        run: rojo build default.project.json -o testBuild.rbxl
-        working-directory: tests/bin
+      - name: Build CLI
+        run: pnpm -r --filter './tools/**' run build
 
-      - name: Publish test place to Roblox and run tests
-        run: lune run cloud/publish-test-place.luau bin/testBuild.rbxl bin/run-tests.luau
-        working-directory: tests
+      - name: Run tests
+        run: npx nevermore batch test --base origin/${{ github.base_ref }} --output test-results.json --yes
         env:
-          ROBLOX_UNIT_TEST_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
+          ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
+
+      - name: Post test results
+        if: always()
+        run: npx nevermore ci post-test-results test-results.json --yes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

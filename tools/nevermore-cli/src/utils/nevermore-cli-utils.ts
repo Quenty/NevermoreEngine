@@ -82,6 +82,12 @@ export function getGitCommitShort(): string | undefined {
   }
 }
 
+export function timeoutAsync(ms: number, message: string): Promise<never> {
+  return new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(message)), ms)
+  );
+}
+
 export async function buildPlaceNameAsync(packagePath: string): Promise<string> {
   const name =
     (await readPackageNameAsync(packagePath)) ?? path.basename(packagePath);

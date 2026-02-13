@@ -29,6 +29,10 @@
   "contributors": [
     "Quenty"
   ],
+  "dependencies": {
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
+  },
   "publishConfig": {
     "access": "public"
   }

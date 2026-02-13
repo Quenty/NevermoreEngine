@@ -2,8 +2,8 @@ import inquirer from 'inquirer';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { DeployConfig, discoverUniverseIdAsync } from '../../utils/deploy-config.js';
-import { getRobloxCookieAsync, createPlaceInUniverseAsync } from '../../utils/roblox-auth/index.js';
+import { DeployConfig, discoverUniverseIdAsync } from '../../utils/build/deploy-config.js';
+import { getRobloxCookieAsync, createPlaceInUniverseAsync } from '../../utils/auth/roblox-auth/index.js';
 import { fileExistsAsync, buildPlaceNameAsync } from '../../utils/nevermore-cli-utils.js';
 import { DeployArgs } from './index.js';
 import { promptPlaceIdAsync } from './deploy-init-prompts.js';
@@ -17,7 +17,7 @@ interface InitState {
   universeId?: number;
   placeId?: number;
   project?: string;
-  script?: string;
+  scriptTemplate?: string;
 }
 
 export async function handleInitAsync(args: DeployArgs): Promise<void> {
@@ -78,7 +78,7 @@ async function detectDefaults(args: DeployArgs, packagePath: string): Promise<In
     universeId,
     placeId: args.placeId,
     project: args.project ?? detectedProject,
-    script: args.script ?? detectedScript,
+    scriptTemplate: args.scriptTemplate ?? detectedScript,
   };
 }
 
@@ -200,19 +200,19 @@ async function promptProjectAndScript(args: DeployArgs, state: InitState): Promi
     {
       type: 'confirm',
       name: 'hasScript',
-      message: state.script
-        ? `Run ${state.script} via Open Cloud after upload? (smoke test)`
-        : 'Run a Luau script after upload? (e.g. a smoke test that boots the place via Open Cloud)',
-      default: !!state.script,
-      when: () => !args.script,
+      message: state.scriptTemplate
+        ? `Run ${state.scriptTemplate} via Open Cloud after upload? (smoke test)`
+        : 'Run a Luau script template after upload? (e.g. a smoke test that boots the place via Open Cloud)',
+      default: !!state.scriptTemplate,
+      when: () => !args.scriptTemplate,
     },
     {
       type: 'input',
-      name: 'script',
-      message: 'Script file (relative to package):',
-      default: state.script ?? 'test/scripts/Server/ServerMain.server.lua',
+      name: 'scriptTemplate',
+      message: 'Script template file (relative to package):',
+      default: state.scriptTemplate ?? 'test/scripts/Server/ServerMain.server.lua',
       when: (promptAnswers: { hasScript?: boolean }) =>
-        !args.script && promptAnswers.hasScript && !state.script,
+        !args.scriptTemplate && promptAnswers.hasScript && !state.scriptTemplate,
       validate: async (input: string) => {
         const fullPath = path.resolve(state.packagePath, input);
         if (await fileExistsAsync(fullPath)) {
@@ -225,9 +225,9 @@ async function promptProjectAndScript(args: DeployArgs, state: InitState): Promi
 
   state.project = answers.project ?? state.project;
   if (answers.hasScript === false) {
-    state.script = undefined;
-  } else if (answers.script) {
-    state.script = answers.script;
+    state.scriptTemplate = undefined;
+  } else if (answers.scriptTemplate) {
+    state.scriptTemplate = answers.scriptTemplate;
   }
 }
 
@@ -238,7 +238,7 @@ async function writeConfig(args: DeployArgs, state: InitState, deployJsonPath: s
         universeId: state.universeId!,
         placeId: state.placeId!,
         project: state.project!,
-        ...(state.script ? { script: state.script } : {}),
+        ...(state.scriptTemplate ? { scriptTemplate: state.scriptTemplate } : {}),
       },
     },
   };

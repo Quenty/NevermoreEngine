@@ -5,7 +5,7 @@ export interface DeployTarget {
   universeId: number;
   placeId: number;
   project: string;
-  script?: string;
+  scriptTemplate?: string;
 }
 
 export interface DeployConfig {

@@ -16,10 +16,13 @@ import { InitPackageCommand } from './commands/init-package-command.js';
 import { InitPluginCommand } from './commands/init-plugin-command.js';
 import { PackCommand } from './commands/pack-command.js';
 import { InstallPackageCommand } from './commands/install-package-command.js';
-import { TestProjectCommand } from './commands/test-project-command.js';
+import { TestProjectCommand } from './commands/test-command.js';
 import { DeployCommand } from './commands/deploy-command/index.js';
 import { DownloadRobloxTypes } from './commands/download-roblox-types.js';
 import { LoginCommand } from './commands/login-command.js';
+import { BatchCommand } from './commands/batch-command/index.js';
+import { CiCommand } from './commands/ci-command/index.js';
+import { stripSourcemapJestCommand } from './commands/strip-sourcemap-jest-command.js';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Nevermore CLI',
@@ -60,7 +63,10 @@ yargs(hideBin(process.argv))
   .command(new TestProjectCommand() as any)
   .command(new DeployCommand() as any)
   .command(new LoginCommand() as any)
+  .command(new BatchCommand() as any)
+  .command(new CiCommand() as any)
   .command(new DownloadRobloxTypes() as any)
+  .command(stripSourcemapJestCommand as any)
   .recommendCommands()
   .demandCommand(
     1,

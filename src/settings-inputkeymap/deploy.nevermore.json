@@ -4,7 +4,7 @@
       "universeId": 9716264427,
       "placeId": 139121290360172,
       "project": "test/default.project.json",
-      "script": "test/scripts/Server/ServerMain.server.lua"
+      "scriptTemplate": "test/scripts/Server/ServerMain.server.lua"
     }
   }
 }

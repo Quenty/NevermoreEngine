@@ -1,0 +1,37 @@
+{
+  "name": "@quenty/nevermore-test-runner",
+  "version": "1.0.0",
+  "description": "Unified test runner service for Nevermore packages",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Testing"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/nevermore-test-runner/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

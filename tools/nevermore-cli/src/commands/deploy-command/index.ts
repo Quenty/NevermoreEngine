@@ -1,7 +1,7 @@
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { buildAndUploadAsync } from '../../utils/build-and-upload.js';
+import { buildAndUploadAsync } from '../../utils/build/build-and-upload.js';
 import { handleInitAsync } from './deploy-init.js';
 
 export interface DeployArgs extends NevermoreGlobalArgs {
@@ -12,8 +12,9 @@ export interface DeployArgs extends NevermoreGlobalArgs {
   placeId?: number;
   target?: string;
   project?: string;
-  script?: string;
+  scriptTemplate?: string;
   createPlace?: boolean;
+  placeFile?: string;
 }
 
 export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
@@ -43,9 +44,9 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             describe: 'Rojo project file (relative to package)',
             type: 'string',
           })
-          .option('script', {
+          .option('script-template', {
             describe:
-              'Luau script to execute after deploy (relative to package)',
+              'Luau script template to execute via Open Cloud (relative to package)',
             type: 'string',
           })
           .option('force', {
@@ -96,6 +97,10 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           .option('place-id', {
             describe: 'Override place ID from deploy.nevermore.json',
             type: 'number',
+          })
+          .option('place-file', {
+            describe: 'Upload a pre-built .rbxl file instead of building via rojo',
+            type: 'string',
           });
       },
       async (runArgs) => {
