@@ -1,3 +1,16 @@
+# (Fri Feb 13 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/localizedtextutils@12.24.2`
+  - fix(localizedtextutils): make translationArgs optional [#655](https://github.com/Quenty/NevermoreEngine/pull/655) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Feb 09 2026)
 
 #### 🐛 Bug Fix
