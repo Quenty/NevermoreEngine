@@ -88,7 +88,7 @@ export class OpenCloudClient {
     rbxlPath: string,
     publish?: boolean
   ): Promise<number> {
-    OutputHelper.info(`Uploading to https://www.roblox.com/games/${placeId}/place ...`);
+    OutputHelper.verbose(`Uploading to https://www.roblox.com/games/${placeId}/place ...`);
 
     const fileBuffer = await fs.readFile(rbxlPath);
     const body = new Uint8Array(fileBuffer);
@@ -153,7 +153,7 @@ export class OpenCloudClient {
 
   async pollTaskCompletionAsync(
     taskPath: string,
-    onProgress?: () => void
+    onProgress?: (state: LuauTask['state']) => void
   ): Promise<LuauTask> {
     const pollIntervalMs = 3000;
 
@@ -180,7 +180,7 @@ export class OpenCloudClient {
       }
 
       if (onProgress) {
-        onProgress();
+        onProgress(task.state);
       }
 
       await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
@@ -188,6 +188,25 @@ export class OpenCloudClient {
   }
 
   async getTaskLogsAsync(taskPath: string): Promise<TaskLogsResult> {
+    // The Open Cloud API may not have logs available immediately after task
+    // completion. Retry a few times with a short delay if we get an empty
+    // response, since the test runner always produces at least some output.
+    const maxAttempts = 3;
+    const retryDelayMs = 1000;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const result = await this._fetchLogsAsync(taskPath);
+      if (result.logs || attempt === maxAttempts) {
+        return result;
+      }
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+    }
+
+    // Unreachable, but satisfies the type checker
+    return this._fetchLogsAsync(taskPath);
+  }
+
+  private async _fetchLogsAsync(taskPath: string): Promise<TaskLogsResult> {
     const response = await this._rateLimiter.fetchAsync(
       `https://apis.roblox.com/cloud/v2/${taskPath}/logs`,
       {

@@ -52,6 +52,15 @@ yargs(hideBin(process.argv))
     global: true,
     type: 'boolean',
   })
+  .option('verbose', {
+    description: 'Show intermediate output (building, uploading, cookie loading, etc.)',
+    default: false,
+    global: true,
+    type: 'boolean',
+  })
+  .middleware((argv) => {
+    OutputHelper.setVerbose(argv.verbose as boolean);
+  })
   .usage(OutputHelper.formatInfo('Usage: $0 <command> [options]'))
   .command(new InitCommand() as any)
   .command(new InstallPackageCommand() as any)

@@ -1,4 +1,4 @@
-import { BatchTestResult } from './batch-test-runner.js';
+import { BatchTestResult, type TestPhase } from './batch-test-runner.js';
 import { TestablePackage } from './changed-tests-utils.js';
 import { formatDurationMs } from '../nevermore-cli-utils.js';
 import {
@@ -11,7 +11,7 @@ import { postOrUpdateCommentAsync } from './github-comment.js';
 
 type PackageStatus =
   | { state: 'pending' }
-  | { state: 'running' }
+  | { state: 'running'; phase?: TestPhase }
   | { state: 'done'; result: BatchTestResult };
 
 /**
@@ -52,6 +52,14 @@ export class LiveTestComment {
     const entry = this._packages.get(packageName);
     if (entry) {
       entry.status = { state: 'running' };
+      this._scheduleUpdate();
+    }
+  }
+
+  markPhase(packageName: string, phase: TestPhase): void {
+    const entry = this._packages.get(packageName);
+    if (entry && entry.status.state === 'running') {
+      entry.status = { state: 'running', phase };
       this._scheduleUpdate();
     }
   }
@@ -143,7 +151,7 @@ export class LiveTestComment {
           statusText = this._formatPendingStatus(pendingIndex++, totalPending);
           break;
         case 'running':
-          statusText = '🔄 Running...';
+          statusText = _formatRunningStatus(status.phase);
           break;
         case 'done':
           statusText = formatResultStatus(status.result);
@@ -176,5 +184,15 @@ export class LiveTestComment {
     }
 
     return formatTestComment(rows, footer);
+  }
+}
+
+function _formatRunningStatus(phase?: TestPhase): string {
+  switch (phase) {
+    case 'building': return '🔨 Building...';
+    case 'uploading': return '📤 Uploading...';
+    case 'scheduling': return '⏳ Scheduling...';
+    case 'executing': return '🔄 Executing...';
+    default: return '🔄 Running...';
   }
 }

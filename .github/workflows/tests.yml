@@ -48,7 +48,7 @@ jobs:
         working-directory: tools/nevermore-cli
 
       - name: Run tests
-        run: nevermore batch test --base origin/${{ github.base_ref }} --output test-results.json --yes
+        run: nevermore batch test --base origin/${{ github.base_ref }} --output test-results.json --yes --verbose --logs
         env:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

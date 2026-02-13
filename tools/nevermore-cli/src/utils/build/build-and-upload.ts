@@ -32,7 +32,8 @@ export async function buildAndUploadAsync(
   targetName: string,
   outputFileName: string = 'build.rbxl',
   packagePath: string = process.cwd(),
-  client?: OpenCloudClient
+  client?: OpenCloudClient,
+  onPhaseChange?: (phase: 'building' | 'uploading') => void
 ): Promise<BuildAndUploadResult | undefined> {
 
   const configPath = resolveDeployConfigPath(packagePath);
@@ -50,7 +51,7 @@ export async function buildAndUploadAsync(
   if (args.placeFile) {
     // Use pre-built place file directly
     rbxlPath = path.resolve(args.placeFile);
-    OutputHelper.info(`Using pre-built place file: ${rbxlPath}`);
+    OutputHelper.verbose(`Using pre-built place file: ${rbxlPath}`);
 
     if (args.dryrun) {
       return undefined;
@@ -67,7 +68,8 @@ export async function buildAndUploadAsync(
     rbxlPath = path.resolve(packagePath, 'build', outputFileName);
 
     const packageName = path.basename(packagePath);
-    OutputHelper.info(
+    onPhaseChange?.('building');
+    OutputHelper.verbose(
       `Building rojo project ${packageName}/${target.project}...`
     );
 
@@ -87,6 +89,7 @@ export async function buildAndUploadAsync(
     });
   }
 
+  onPhaseChange?.('uploading');
   const version = await client.uploadPlaceAsync(
     target.universeId,
     target.placeId,

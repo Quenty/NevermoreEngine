@@ -37,7 +37,7 @@ if idx >= 0:
     ).trim();
 
     if (result && result.startsWith('_|')) {
-      OutputHelper.info('Loaded cookie from macOS HTTPStorages.');
+      OutputHelper.verbose('Loaded cookie from macOS HTTPStorages.');
       return result;
     }
   } catch {
@@ -66,13 +66,13 @@ function readFromPlist(): string | undefined {
     if (result) {
       const cookieMatch = result.match(/COOK::<(.+?)>/);
       if (cookieMatch) {
-        OutputHelper.info('Loaded cookie from macOS plist.');
+        OutputHelper.verbose('Loaded cookie from macOS plist.');
         return cookieMatch[1];
       }
 
       const valueMatch = result.match(/"([^"]*_\|[^"]*)"/);
       if (valueMatch) {
-        OutputHelper.info('Loaded cookie from macOS plist.');
+        OutputHelper.verbose('Loaded cookie from macOS plist.');
         return valueMatch[1];
       }
     }

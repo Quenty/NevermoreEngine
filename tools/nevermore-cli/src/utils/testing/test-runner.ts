@@ -5,6 +5,8 @@ import { tryRenamePlaceAsync } from '../auth/roblox-auth/index.js';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
 import { buildAndUploadAsync } from '../build/build-and-upload.js';
 
+export type TestPhase = 'building' | 'uploading' | 'scheduling' | 'executing';
+
 export interface SingleTestResult {
   success: boolean;
   logs: string;
@@ -21,14 +23,16 @@ export interface SingleTestResult {
 export async function runSingleTestAsync(
   packagePath: string,
   client: OpenCloudClient,
-  timeoutMs: number = 120_000
+  timeoutMs: number = 120_000,
+  onPhaseChange?: (phase: TestPhase) => void
 ): Promise<SingleTestResult> {
   const result = await buildAndUploadAsync(
     { dryrun: false },
     'test',
     'test.rbxl',
     packagePath,
-    client
+    client,
+    onPhaseChange
   );
 
   if (!result) {
@@ -45,6 +49,7 @@ export async function runSingleTestAsync(
   const scriptContent = await readTestScriptAsync(packagePath, target.scriptTemplate);
 
   // Execute script via Open Cloud
+  onPhaseChange?.('scheduling');
   const task = await client.createExecutionTaskAsync(
     target.universeId,
     target.placeId,
@@ -54,7 +59,11 @@ export async function runSingleTestAsync(
 
   // Poll with timeout
   const completedTask = await Promise.race([
-    client.pollTaskCompletionAsync(task.path),
+    client.pollTaskCompletionAsync(task.path, (state) => {
+      if (state === 'PROCESSING') {
+        onPhaseChange?.('executing');
+      }
+    }),
     timeoutAsync(timeoutMs, `Test timed out after ${timeoutMs / 1000}s`),
   ]);
 

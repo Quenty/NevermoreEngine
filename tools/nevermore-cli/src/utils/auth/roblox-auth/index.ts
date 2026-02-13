@@ -102,7 +102,7 @@ export async function createPlaceInUniverseAsync(
   universeId: number,
   placeName: string
 ): Promise<number> {
-  OutputHelper.info(`Creating place "${placeName}" in universe ${universeId}...`);
+  OutputHelper.verbose(`Creating place "${placeName}" in universe ${universeId}...`);
 
   const createResponse = await fetchWithCsrfAsync(
     `https://apis.roblox.com/universes/v1/user/universes/${universeId}/places`,
@@ -144,7 +144,7 @@ export async function createPlaceInUniverseAsync(
     );
   }
 
-  OutputHelper.info(`Created place "${placeName}" — ID: ${placeId}`);
+  OutputHelper.verbose(`Created place "${placeName}" — ID: ${placeId}`);
   return placeId;
 }
 
@@ -181,7 +181,7 @@ export async function tryRenamePlaceAsync(
   );
 
   if (response.ok) {
-    OutputHelper.info(`Renamed place ${placeId} to "${placeName}"`);
+    OutputHelper.verbose(`Renamed place ${placeId} to "${placeName}"`);
     return { success: true };
   }
 

@@ -75,13 +75,13 @@ async function _filterTestableAsync(
   }
 
   if (skippedNoConfig.length > 0) {
-    OutputHelper.info(
+    OutputHelper.verbose(
       `Skipped ${skippedNoConfig.length} packages without deploy.nevermore.json`
     );
   }
 
   if (skippedNoTestTarget.length > 0) {
-    OutputHelper.info(
+    OutputHelper.verbose(
       `Skipped ${skippedNoTestTarget.length} packages without a "test" target: ${skippedNoTestTarget.join(', ')}`
     );
   }

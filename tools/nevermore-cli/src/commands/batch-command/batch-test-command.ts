@@ -14,6 +14,7 @@ import {
 } from '../../utils/testing/batch-test-runner.js';
 import { formatDurationMs } from '../../utils/nevermore-cli-utils.js';
 import { LiveTestComment } from '../../utils/testing/live-test-comment.js';
+import { BatchTestReporter } from '../../utils/testing/batch-test-reporter.js';
 
 interface BatchTestArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -22,6 +23,7 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   all?: boolean;
   output?: string;
   limit?: number;
+  logs?: boolean;
 }
 
 export const batchTestCommand: CommandModule<NevermoreGlobalArgs, BatchTestArgs> = {
@@ -55,6 +57,11 @@ export const batchTestCommand: CommandModule<NevermoreGlobalArgs, BatchTestArgs>
       .option('limit', {
         describe: 'Max number of packages to test (for local debugging)',
         type: 'number',
+      })
+      .option('logs', {
+        describe: 'Show execution logs for all packages (not just failures)',
+        type: 'boolean',
+        default: false,
       });
   },
   handler: async (args) => {
@@ -84,63 +91,46 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     return;
   }
 
-  const names = packages.map((p) => p.name).join(', ');
-  OutputHelper.info(`Testing ${packages.length} packages: ${names}`);
-
   if (args.dryrun) {
-    OutputHelper.info('[DRYRUN] Would run tests for the above packages.');
+    const names = packages.map((p) => p.name).join(', ');
+    OutputHelper.info(`[DRYRUN] Would test ${packages.length} packages: ${names}`);
     return;
   }
 
-  const isGitHubActions = !!process.env.GITHUB_ACTIONS;
-  const total = packages.length;
   const concurrency = args.concurrency ?? 3;
   const liveComment = new LiveTestComment(packages, concurrency);
+  const reporter = new BatchTestReporter(packages, { verbose: args.verbose, showLogs: args.logs ?? false });
 
   await liveComment.postInitialAsync();
 
   const callbacks: BatchTestCallbacks = {
     onPackageStart: (pkg) => {
-      if (isGitHubActions) {
-        console.log(`::group::${pkg.name}`);
-      }
-      OutputHelper.info(`Testing ${pkg.name}...`);
+      reporter.onPackageStart(pkg.name);
       liveComment.markRunning(pkg.name);
     },
-    onPackageResult: (result) => {
-      if (result.success) {
-        OutputHelper.info(`${result.packageName} passed (${formatDurationMs(result.durationMs)})`);
-      } else {
-        OutputHelper.error(`${result.packageName} failed (${formatDurationMs(result.durationMs)})`);
-        if (result.logs) {
-          console.log(result.logs);
-        }
-        if (result.error) {
-          OutputHelper.error(result.error);
-        }
-      }
-      if (isGitHubActions) {
-        console.log('::endgroup::');
-      }
-      liveComment.markComplete(result);
+    onPackagePhaseChange: (name, phase) => {
+      reporter.onPackagePhaseChange(name, phase);
+      liveComment.markPhase(name, phase);
     },
-    onProgress: (completed, _total, elapsedMs) => {
-      let eta = '';
-      if (completed > 0) {
-        const remainingMs = (elapsedMs / completed) * (total - completed);
-        eta = ` (~${formatDurationMs(remainingMs)} remaining)`;
-      }
-      OutputHelper.info(`Progress: ${completed}/${total} packages completed${eta}`);
+    onPackageResult: (result, bufferedOutput) => {
+      reporter.onPackageResult(result, bufferedOutput);
+      liveComment.markComplete(result);
     },
   };
 
   const apiKey = await getApiKeyAsync(args);
+
+  reporter.start();
+
   const results = await runBatchTestsAsync({
     packages,
     apiKey,
     concurrency,
     callbacks,
+    bufferOutput: reporter.mode === 'grouped',
   });
+
+  reporter.stop();
 
   await liveComment.flushAsync();
   _printResultsTable(results);

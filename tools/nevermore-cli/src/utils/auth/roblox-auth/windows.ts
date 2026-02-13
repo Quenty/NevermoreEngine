@@ -54,7 +54,7 @@ function readFromRegistry(): string | undefined {
     if (result && result.length > 10) {
       const parsed = parseStudioCookieValue(result);
       if (parsed) {
-        OutputHelper.info('Loaded cookie from Windows Registry.');
+        OutputHelper.verbose('Loaded cookie from Windows Registry.');
         return parsed;
       }
     }
@@ -73,7 +73,7 @@ export function readCookie(): string | undefined {
       `https://www.roblox.com:RobloxStudioAuth${COOKIE_NAME}${userId}`
     );
     if (cookie) {
-      OutputHelper.info(`Loaded cookie from Windows Credentials (user ${userId}).`);
+      OutputHelper.verbose(`Loaded cookie from Windows Credentials (user ${userId}).`);
       return cookie;
     }
   }
@@ -83,7 +83,7 @@ export function readCookie(): string | undefined {
     `https://www.roblox.com:RobloxStudioAuth${COOKIE_NAME}`
   );
   if (legacyCookie) {
-    OutputHelper.info('Loaded cookie from Windows Credentials (legacy).');
+    OutputHelper.verbose('Loaded cookie from Windows Credentials (legacy).');
     return legacyCookie;
   }
 
