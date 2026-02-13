@@ -2208,7 +2208,7 @@ function Rx.buffer(closingNotifier)
 				table.clear(buffer)
 
 				sub:Fire(latest)
-			end)
+			end))
 
 			maid:GiveTask(source:Subscribe(function(value)
 				table.insert(buffer, value)
@@ -2219,7 +2219,7 @@ function Rx.buffer(closingNotifier)
 
 			maid:GiveTask(function()
 				table.clear(buffer)
-			end)
+			end))
 
 			return maid
 		end)
