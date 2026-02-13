@@ -17,7 +17,9 @@ import { InitPluginCommand } from './commands/init-plugin-command.js';
 import { PackCommand } from './commands/pack-command.js';
 import { InstallPackageCommand } from './commands/install-package-command.js';
 import { TestProjectCommand } from './commands/test-project-command.js';
+import { DeployCommand } from './commands/deploy-command.js';
 import { DownloadRobloxTypes } from './commands/download-roblox-types.js';
+import { LoginCommand } from './commands/login-command.js';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Nevermore CLI',
@@ -56,6 +58,8 @@ yargs(hideBin(process.argv))
   .command(new PackCommand() as any)
   .command(new InstallPackageCommand() as any)
   .command(new TestProjectCommand() as any)
+  .command(new DeployCommand() as any)
+  .command(new LoginCommand() as any)
   .command(new DownloadRobloxTypes() as any)
   .recommendCommands()
   .demandCommand(

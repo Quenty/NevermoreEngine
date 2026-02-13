@@ -1,165 +1,138 @@
 import { Argv, CommandModule } from 'yargs';
-import { OutputHelper } from '@quenty/cli-output-helpers';
-import { NevermoreGlobalArgs } from '../args/global-args.js';
-import { runCommandAsync } from '../utils/nevermore-cli-utils.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-
-const TEMPLATE_BASE_URL =
-  'https://raw.githubusercontent.com/Quenty/NevermoreEngine/main/tests/test-place-template';
-const TEMPLATE_FILES = [
-  'aftman.toml',
-  'default.project.json',
-  'jest.config.lua',
-  'package.json',
-  'run-tests.luau',
-];
+import { OutputHelper } from '@quenty/cli-output-helpers';
+import { NevermoreGlobalArgs } from '../args/global-args.js';
+import { buildAndUploadAsync } from '../utils/build-and-upload.js';
+import {
+  createExecutionTaskAsync,
+  pollTaskCompletionAsync,
+  getTaskLogsAsync,
+} from '../utils/open-cloud-client.js';
 
 export interface TestProjectArgs extends NevermoreGlobalArgs {
-  //
+  apiKey?: string;
+  logs?: boolean;
+  universeId?: number;
+  placeId?: number;
+  script?: string;
+  scriptText?: string;
 }
 
-/**
- * Generate and run tests from a Nevermore package or project
- */
 export class TestProjectCommand<T>
   implements CommandModule<T, TestProjectArgs>
 {
   public command = 'test';
-  public describe = 'Generate and run tests from a package or project';
+  public describe = 'Build, deploy, and run tests via Roblox Open Cloud';
 
   public builder = (args: Argv<T>) => {
+    args.option('api-key', {
+      describe: 'Roblox Open Cloud API key',
+      type: 'string',
+    });
+    args.option('logs', {
+      describe: 'Show Open Cloud execution logs',
+      type: 'boolean',
+      default: false,
+    });
+    args.option('universe-id', {
+      describe: 'Override universe ID from deploy.json',
+      type: 'number',
+    });
+    args.option('place-id', {
+      describe: 'Override place ID from deploy.json',
+      type: 'number',
+    });
+    args.option('script', {
+      describe: 'Override script path from deploy.json',
+      type: 'string',
+    });
+    args.option('script-text', {
+      describe: 'Luau code to execute directly (instead of a script file)',
+      type: 'string',
+    });
+
     return args as Argv<TestProjectArgs>;
   };
 
-  private validateProject = async (srcRoot: string) => {
-    try {
-      await fs.access(path.join(srcRoot, 'package.json'));
-      return true;
-    } catch {
-      throw new Error(
-        'No package.json found - are you in a Nevermore project?'
-      );
-    }
-  };
-
-  private buildDirExists = async (srcRoot: string) => {
-    try {
-      await fs.access(path.join(srcRoot, 'build'));
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  private ensureBuildDir = async (srcRoot: string) => {
-    const buildDir = path.join(srcRoot, 'build');
-    await fs.mkdir(buildDir, { recursive: true });
-    return buildDir;
-  };
-
-  private fetchTemplates = async (buildDir: string) => {
-    OutputHelper.info('Fetching test project templates...');
-
-    const fetch = (await import('node-fetch')).default;
-
-    for (const file of TEMPLATE_FILES) {
-      const fileUrl = `${TEMPLATE_BASE_URL}/${file}`;
-      const response = await fetch(fileUrl);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch template file: ${file}`);
-      }
-
-      const content = await response.text();
-      const targetPath = path.join(buildDir, file);
-
-      await fs.mkdir(path.dirname(targetPath), { recursive: true });
-      await fs.writeFile(targetPath, content);
-
-      OutputHelper.info(`Copied template: ${file}`);
-    }
-  };
-
-  private modifyDefaultProject = async (buildDir: string, srcRoot: string) => {
-    const projectPath = path.join(buildDir, 'default.project.json');
-    const projectConfig = JSON.parse(await fs.readFile(projectPath, 'utf-8'));
-
-    projectConfig.tree.ServerScriptService.UnitTest.project = {
-      $path: path.relative(buildDir, path.join(srcRoot, 'src/modules')),
-    };
-
-    await fs.writeFile(projectPath, JSON.stringify(projectConfig, null, 2));
-  };
-
-  private copyPackageDeps = async (srcRoot: string, buildDir: string) => {
-    const srcPkg = JSON.parse(
-      await fs.readFile(path.join(srcRoot, 'package.json'), 'utf-8')
-    );
-
-    const buildPkg = JSON.parse(
-      await fs.readFile(path.join(buildDir, 'package.json'), 'utf-8')
-    );
-
-    buildPkg.dependencies = {
-      ...buildPkg.dependencies,
-      ...srcPkg.dependencies,
-    };
-
-    await fs.writeFile(
-      path.join(buildDir, 'package.json'),
-      JSON.stringify(buildPkg, null, 2)
-    );
-  };
-
   public handler = async (args: TestProjectArgs) => {
-    const srcRoot = process.cwd();
-    await this.validateProject(srcRoot);
+    try {
+      await this._runAsync(args);
+    } catch (err) {
+      OutputHelper.error(err instanceof Error ? err.message : String(err));
+      process.exit(1);
+    }
+  };
 
-    const buildDir = path.join(srcRoot, 'build');
-    const buildExists = await this.buildDirExists(srcRoot);
-
-    if (!buildExists) {
-      OutputHelper.info('Setting up test environment...');
-      await this.ensureBuildDir(srcRoot);
-      await this.fetchTemplates(buildDir);
-      await this.modifyDefaultProject(buildDir, srcRoot);
-      await this.copyPackageDeps(srcRoot, buildDir);
-
-      OutputHelper.info('Installing Jest...');
-      await runCommandAsync(
-        args,
-        'npm',
-        ['install', 'https://github.com/quentystudios/jest-lua'],
-        {
-          cwd: buildDir,
-        }
+  private _runAsync = async (args: TestProjectArgs) => {
+    const result = await buildAndUploadAsync(args, 'test', 'test.rbxl');
+    if (!result) {
+      OutputHelper.info(
+        '[DRYRUN] Would build, upload, execute script, and report results'
       );
-
-      OutputHelper.info('Installing dependencies...');
-      await runCommandAsync(args, 'npm', ['install'], {
-        cwd: buildDir,
-      });
+      return;
     }
 
-    OutputHelper.info('Building test place...');
-    await runCommandAsync(
-      args,
-      'rojo',
-      ['build', 'default.project.json', '-o', 'testBuild.rbxl'],
-      {
-        cwd: buildDir,
-      }
+    const { apiKey, target, version, packagePath } = result;
+
+    let scriptContent: string;
+    if (args.scriptText) {
+      scriptContent = args.scriptText;
+    } else if (target.script) {
+      scriptContent = await _readScriptAsync(packagePath, target.script);
+    } else {
+      throw new Error(
+        'No script to run. Provide --script-text, --script, or add a "script" field to your deploy.json test target.'
+      );
+    }
+
+    OutputHelper.info('Running script via Open Cloud...');
+
+    const task = await createExecutionTaskAsync(
+      apiKey,
+      target.universeId,
+      target.placeId,
+      version,
+      scriptContent
     );
 
-    OutputHelper.info('Running tests...');
-    await runCommandAsync(
-      args,
-      'run-in-roblox',
-      ['--place', 'testBuild.rbxl', '--script', 'run-tests.luau'],
-      {
-        cwd: buildDir,
-      }
+    const completedTask = await pollTaskCompletionAsync(
+      apiKey,
+      task.path
     );
+
+    const { success, logs } = await getTaskLogsAsync(apiKey, task.path);
+
+    const showLogs = args.logs || !success || completedTask.state !== 'COMPLETE';
+
+    if (logs && showLogs) {
+      console.log(logs);
+    } else if (showLogs) {
+      OutputHelper.info('(no output from script)');
+    }
+
+    if (completedTask.state === 'COMPLETE' && success) {
+      OutputHelper.info('Tests passed!');
+    } else if (completedTask.state === 'COMPLETE' && !success) {
+      OutputHelper.error(
+        'Tests failed! See output above for more information.'
+      );
+      process.exit(1);
+    } else {
+      OutputHelper.error(`Task ended with state: ${completedTask.state}`);
+      process.exit(1);
+    }
   };
+}
+
+async function _readScriptAsync(
+  packagePath: string,
+  scriptPath: string
+): Promise<string> {
+  const fullPath = path.resolve(packagePath, scriptPath);
+  try {
+    return await fs.readFile(fullPath, 'utf-8');
+  } catch {
+    throw new Error(`Test script not found: ${fullPath}`);
+  }
 }
