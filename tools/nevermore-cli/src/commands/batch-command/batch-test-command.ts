@@ -21,6 +21,7 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   concurrency?: number;
   all?: boolean;
   output?: string;
+  limit?: number;
 }
 
 export const batchTestCommand: CommandModule<NevermoreGlobalArgs, BatchTestArgs> = {
@@ -50,6 +51,10 @@ export const batchTestCommand: CommandModule<NevermoreGlobalArgs, BatchTestArgs>
       .option('output', {
         describe: 'Write JSON results to this file',
         type: 'string',
+      })
+      .option('limit', {
+        describe: 'Max number of packages to test (for local debugging)',
+        type: 'number',
       });
   },
   handler: async (args) => {
@@ -63,9 +68,13 @@ export const batchTestCommand: CommandModule<NevermoreGlobalArgs, BatchTestArgs>
 };
 
 async function _runAsync(args: BatchTestArgs): Promise<void> {
-  const packages = args.all
+  let packages = args.all
     ? await discoverAllTestablePackagesAsync()
     : await discoverChangedTestablePackagesAsync(args.base!);
+
+  if (args.limit && args.limit > 0) {
+    packages = packages.slice(0, args.limit);
+  }
 
   if (packages.length === 0) {
     OutputHelper.warn(
@@ -141,9 +150,9 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     OutputHelper.info(`Results written to ${args.output}`);
   }
 
-  if (results.summary.failed > 0) {
-    process.exit(1);
-  }
+  // Node.js fetch (undici) keeps TCP connections alive in a global pool,
+  // which prevents the event loop from draining. Explicit exit required.
+  process.exit(results.summary.failed > 0 ? 1 : 0);
 }
 
 function _printResultsTable(results: BatchTestSummary): void {

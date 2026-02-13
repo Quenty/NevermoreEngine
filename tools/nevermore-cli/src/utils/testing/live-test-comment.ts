@@ -25,6 +25,7 @@ export class LiveTestComment {
   private _concurrency: number;
   private _updateTimer: ReturnType<typeof setTimeout> | undefined;
   private _updatePending = false;
+  private _disposed = false;
   private _enabled: boolean;
 
   private static readonly THROTTLE_MS = 10_000;
@@ -64,6 +65,7 @@ export class LiveTestComment {
   }
 
   async flushAsync(): Promise<void> {
+    this._disposed = true;
     if (this._updateTimer) {
       clearTimeout(this._updateTimer);
       this._updateTimer = undefined;
@@ -74,7 +76,7 @@ export class LiveTestComment {
   }
 
   private _scheduleUpdate(): void {
-    if (!this._enabled) return;
+    if (!this._enabled || this._disposed) return;
     if (this._updateTimer) {
       this._updatePending = true;
       return;
@@ -84,11 +86,12 @@ export class LiveTestComment {
       await this._postUpdateAsync();
       this._updateTimer = undefined;
 
-      if (this._updatePending) {
+      if (this._updatePending && !this._disposed) {
         this._updatePending = false;
         this._scheduleUpdate();
       }
     }, LiveTestComment.THROTTLE_MS);
+    this._updateTimer.unref();
   }
 
   private async _postUpdateAsync(): Promise<void> {
@@ -117,10 +120,10 @@ export class LiveTestComment {
     if (avgMs !== undefined) {
       const roundsAhead = Math.floor(queueIndex / this._concurrency);
       const etaMs = avgMs * (roundsAhead + 1);
-      return `⏳ Pending (#${queueIndex + 1}/${totalPending} in ~${formatDurationMs(etaMs)})`;
+      return `⏳ Pending (${queueIndex + 1}/${totalPending} in ~${formatDurationMs(etaMs)})`;
     }
 
-    return `⏳ Pending (#${queueIndex + 1}/${totalPending})`;
+    return `⏳ Pending (${queueIndex + 1}/${totalPending})`;
   }
 
   private _formatBody(): string {
