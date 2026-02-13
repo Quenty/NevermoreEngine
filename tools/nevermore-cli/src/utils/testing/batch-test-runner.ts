@@ -19,6 +19,7 @@ export interface BatchTestSummary {
     total: number;
     passed: number;
     failed: number;
+    durationMs: number;
   };
 }
 
@@ -93,6 +94,7 @@ export async function runBatchTestsAsync(
 
   const passed = results.filter((r) => r.success).length;
   const failed = results.filter((r) => !r.success).length;
+  const durationMs = Date.now() - startTimeMs;
 
   return {
     packages: results,
@@ -100,6 +102,7 @@ export async function runBatchTestsAsync(
       total: results.length,
       passed,
       failed,
+      durationMs,
     },
   };
 }

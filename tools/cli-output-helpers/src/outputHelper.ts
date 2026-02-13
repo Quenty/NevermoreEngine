@@ -53,6 +53,17 @@ export class OutputHelper {
     return chalk.magentaBright(message);
   }
 
+  public static formatDim(message: string): string {
+    return chalk.dim(message);
+  }
+
+  public static formatSuccess(message: string): string {
+    return chalk.greenBright(message);
+  }
+
+  private static _hasAnsi = (text: string): boolean =>
+    text.includes('\x1b[');
+
   private static _stripAnsi = (text: string): string =>
     text.replace(/\x1b\[[0-9;]*m/g, '');
 
@@ -95,7 +106,7 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static error(message: string): void {
-    console.error(this.formatError(message));
+    console.error(this._hasAnsi(message) ? message : this.formatError(message));
   }
 
   /**
@@ -103,7 +114,7 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static info(message: string): void {
-    console.log(this.formatInfo(message));
+    console.log(this._hasAnsi(message) ? message : this.formatInfo(message));
   }
 
   /**
@@ -111,7 +122,7 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static warn(message: string): void {
-    console.log(this.formatWarning(message));
+    console.log(this._hasAnsi(message) ? message : this.formatWarning(message));
   }
 
   /**
@@ -119,7 +130,7 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static hint(message: string): void {
-    console.log(this.formatHint(message));
+    console.log(this._hasAnsi(message) ? message : this.formatHint(message));
   }
 
   /**

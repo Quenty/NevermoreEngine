@@ -3,7 +3,10 @@ import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { BatchTestSummary } from '../../utils/testing/batch-test-runner.js';
-import { postTestResultsCommentAsync } from '../../utils/testing/github-comment.js';
+import {
+  postTestResultsCommentAsync,
+  postTestRunFailedCommentAsync,
+} from '../../utils/testing/github-comment.js';
 
 interface CiPostTestResultsArgs extends NevermoreGlobalArgs {
   input: string;
@@ -25,7 +28,19 @@ export const ciPostTestResultsCommand: CommandModule<
   },
   handler: async (args) => {
     try {
-      const raw = await fs.readFile(args.input, 'utf-8');
+      let raw: string;
+      try {
+        raw = await fs.readFile(args.input, 'utf-8');
+      } catch {
+        // Results file missing — test run crashed before writing output
+        OutputHelper.warn(`Results file not found: ${args.input}`);
+        OutputHelper.info('Posting failure comment to PR...');
+        await postTestRunFailedCommentAsync(
+          `Results file not found: ${args.input}\nThe test run likely crashed before completing.`
+        );
+        return;
+      }
+
       const results = JSON.parse(raw) as BatchTestSummary;
       const posted = await postTestResultsCommentAsync(results);
 

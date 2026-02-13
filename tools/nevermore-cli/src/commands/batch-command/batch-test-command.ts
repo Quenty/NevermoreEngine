@@ -12,6 +12,8 @@ import {
   BatchTestSummary,
   type BatchTestCallbacks,
 } from '../../utils/testing/batch-test-runner.js';
+import { formatDurationMs } from '../../utils/nevermore-cli-utils.js';
+import { LiveTestComment } from '../../utils/testing/live-test-comment.js';
 
 interface BatchTestArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -83,6 +85,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   const isGitHubActions = !!process.env.GITHUB_ACTIONS;
   const total = packages.length;
+  const concurrency = args.concurrency ?? 3;
+  const liveComment = new LiveTestComment(packages, concurrency);
+
+  await liveComment.postInitialAsync();
 
   const callbacks: BatchTestCallbacks = {
     onPackageStart: (pkg) => {
@@ -90,12 +96,13 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
         console.log(`::group::${pkg.name}`);
       }
       OutputHelper.info(`Testing ${pkg.name}...`);
+      liveComment.markRunning(pkg.name);
     },
     onPackageResult: (result) => {
       if (result.success) {
-        OutputHelper.info(`${result.packageName} passed (${(result.durationMs / 1000).toFixed(1)}s)`);
+        OutputHelper.info(`${result.packageName} passed (${formatDurationMs(result.durationMs)})`);
       } else {
-        OutputHelper.error(`${result.packageName} failed (${(result.durationMs / 1000).toFixed(1)}s)`);
+        OutputHelper.error(`${result.packageName} failed (${formatDurationMs(result.durationMs)})`);
         if (result.logs) {
           console.log(result.logs);
         }
@@ -106,20 +113,13 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       if (isGitHubActions) {
         console.log('::endgroup::');
       }
+      liveComment.markComplete(result);
     },
     onProgress: (completed, _total, elapsedMs) => {
       let eta = '';
       if (completed > 0) {
-        const avgMs = elapsedMs / completed;
-        const remainingMs = avgMs * (total - completed);
-        const remainingSec = Math.ceil(remainingMs / 1000);
-        if (remainingSec >= 60) {
-          const min = Math.floor(remainingSec / 60);
-          const sec = remainingSec % 60;
-          eta = ` (~${min}m${sec}s remaining)`;
-        } else {
-          eta = ` (~${remainingSec}s remaining)`;
-        }
+        const remainingMs = (elapsedMs / completed) * (total - completed);
+        eta = ` (~${formatDurationMs(remainingMs)} remaining)`;
       }
       OutputHelper.info(`Progress: ${completed}/${total} packages completed${eta}`);
     },
@@ -129,10 +129,11 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
   const results = await runBatchTestsAsync({
     packages,
     apiKey,
-    concurrency: args.concurrency,
+    concurrency,
     callbacks,
   });
 
+  await liveComment.flushAsync();
   _printResultsTable(results);
 
   if (args.output) {
@@ -151,13 +152,18 @@ function _printResultsTable(results: BatchTestSummary): void {
   console.log('-'.repeat(60));
 
   for (const result of results.packages) {
-    const status = result.success ? 'Passed' : 'FAILED';
-    const duration = `${(result.durationMs / 1000).toFixed(1)}s`;
-    console.log(result.packageName.padEnd(40) + status.padEnd(10) + duration);
+    const status = result.success
+      ? OutputHelper.formatSuccess('Passed')
+      : OutputHelper.formatError('FAILED');
+    const duration = OutputHelper.formatDim(formatDurationMs(result.durationMs));
+    console.log(result.packageName.padEnd(40) + status.padEnd(20) + duration);
   }
 
   console.log('');
-  console.log(
-    `${results.summary.total} tested, ${results.summary.passed} passed, ${results.summary.failed} failed`
-  );
+  const passed = OutputHelper.formatSuccess(`${results.summary.passed} passed`);
+  const failed = results.summary.failed > 0
+    ? OutputHelper.formatError(`${results.summary.failed} failed`)
+    : `${results.summary.failed} failed`;
+  const totalTime = OutputHelper.formatDim(`in ${formatDurationMs(results.summary.durationMs)}`);
+  console.log(`${results.summary.total} tested, ${passed}, ${failed} ${totalTime}`);
 }

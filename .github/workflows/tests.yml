@@ -6,8 +6,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+
+      - name: Fetch base branch for changeset diff
+        run: git fetch origin ${{ github.base_ref }} --depth=1
 
       - name: Setup node
         uses: actions/setup-node@v6
@@ -50,6 +51,7 @@ jobs:
         run: nevermore batch test --base origin/${{ github.base_ref }} --output test-results.json --yes
         env:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Post test results
         if: always()

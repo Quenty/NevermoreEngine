@@ -29,6 +29,11 @@ export async function getRobloxCookieAsync(): Promise<string> {
     return platformCookie;
   }
 
+  // No interactive prompt in non-TTY environments (CI)
+  if (!process.stdin.isTTY) {
+    throw new Error('No .ROBLOSECURITY cookie available (set ROBLOSECURITY env var for CI)');
+  }
+
   const { cookie } = await inquirer.prompt([
     {
       type: 'password',

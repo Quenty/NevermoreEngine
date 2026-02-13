@@ -82,6 +82,21 @@ export function getGitCommitShort(): string | undefined {
   }
 }
 
+export function formatDurationMs(ms: number): string {
+  if (ms < 1000) {
+    return `${Math.round(ms)}ms`;
+  }
+
+  const totalSeconds = Math.floor(ms / 1000);
+  if (totalSeconds < 60) {
+    return `${(ms / 1000).toFixed(1)}s`;
+  }
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}m${seconds}s`;
+}
+
 export function timeoutAsync(ms: number, message: string): Promise<never> {
   return new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error(message)), ms)

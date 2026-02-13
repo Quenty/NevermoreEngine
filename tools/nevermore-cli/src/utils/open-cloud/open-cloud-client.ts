@@ -34,18 +34,42 @@ function formatAuthError(
   placeId: number,
   status: number,
   statusText: string,
-  body: string
+  body: string,
+  method: string,
+  url: string
 ): string {
+  // Extract human-readable message from JSON body if possible
+  let apiMessage = '';
+  try {
+    const parsed = JSON.parse(body);
+    if (Array.isArray(parsed.errors) && parsed.errors[0]?.message) {
+      apiMessage = parsed.errors[0].message;
+    } else if (typeof parsed.message === 'string') {
+      apiMessage = parsed.message;
+    }
+  } catch {
+    // Not JSON
+  }
+
+  const headline = apiMessage
+    ? `${action} failed: ${apiMessage} (${status})`
+    : `${action} failed: ${status} ${statusText}`;
+
+  const dim = OutputHelper.formatDim;
+  const info = OutputHelper.formatInfo;
+
   return [
-    `${action} failed: ${status} ${statusText}: ${body}`,
+    OutputHelper.formatError(headline),
     '',
-    `Required scope: ${scope}`,
-    `Universe: ${universeId}  Place: ${placeId}`,
+    `  ${dim('Scope:')}       ${scope}`,
+    `  ${dim('Universe:')}    ${universeId}`,
+    `  ${dim('Place:')}       ${placeId}`,
     '',
-    'Make sure the experience is added to your API key\'s allow list.',
+    OutputHelper.formatWarning('Ensure the API key has the required scope and the experience is on its allow list.'),
     '',
-    `Place: https://www.roblox.com/games/${placeId}/place`,
-    `Credentials: https://create.roblox.com/dashboard/credentials`,
+    `  ${dim('Place:')}       ${info(`https://www.roblox.com/games/${placeId}/place`)}`,
+    `  ${dim('Credentials:')} ${info('https://create.roblox.com/dashboard/credentials')}`,
+    `  ${dim('Route:')}       ${dim(`${method} ${url}`)}`,
   ].join('\n');
 }
 
@@ -69,25 +93,23 @@ export class OpenCloudClient {
     const fileBuffer = await fs.readFile(rbxlPath);
     const body = new Uint8Array(fileBuffer);
     const versionType = publish ? 'Published' : 'Saved';
+    const url = `https://apis.roblox.com/universes/v1/${universeId}/places/${placeId}/versions?versionType=${versionType}`;
 
-    const response = await this._rateLimiter.fetchAsync(
-      `https://apis.roblox.com/universes/v1/${universeId}/places/${placeId}/versions?versionType=${versionType}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/octet-stream',
-          Accept: 'application/json',
-          'X-API-Key': this._apiKey,
-        },
-        body,
-      }
-    );
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        Accept: 'application/json',
+        'X-API-Key': this._apiKey,
+      },
+      body,
+    });
 
     if (!response.ok) {
       const text = await response.text();
       if (response.status === 401 || response.status === 403) {
         throw new Error(
-          formatAuthError('Upload', 'universe-places:write', universeId, placeId, response.status, response.statusText, text)
+          formatAuthError('Upload', 'universe-places:write', universeId, placeId, response.status, response.statusText, text, 'POST', url)
         );
       }
       throw new Error(
@@ -105,23 +127,22 @@ export class OpenCloudClient {
     placeVersion: number,
     script: string
   ): Promise<LuauTask> {
-    const response = await this._rateLimiter.fetchAsync(
-      `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': this._apiKey,
-        },
-        body: JSON.stringify({ script }),
-      }
-    );
+    const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
+
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': this._apiKey,
+      },
+      body: JSON.stringify({ script }),
+    });
 
     if (!response.ok) {
       const text = await response.text();
       if (response.status === 401 || response.status === 403) {
         throw new Error(
-          formatAuthError('Luau execution', 'universe.place.luau-execution-session:write', universeId, placeId, response.status, response.statusText, text)
+          formatAuthError('Luau execution', 'universe.place.luau-execution-session:write', universeId, placeId, response.status, response.statusText, text, 'POST', url)
         );
       }
       throw new Error(`Create task failed: ${response.status} ${response.statusText}: ${text}`);

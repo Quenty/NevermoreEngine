@@ -1,8 +1,26 @@
 import * as fsSync from 'fs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { BatchTestSummary } from './batch-test-runner.js';
+import { formatDurationMs } from '../nevermore-cli-utils.js';
+import {
+  COMMENT_MARKER,
+  formatTestComment,
+  formatResultStatus,
+  formatErrorSummary,
+  getActionsRunUrl,
+  type TestCommentRow,
+} from './github-comment-formatting.js';
 
-const COMMENT_MARKER = '<!-- nevermore-test-results -->';
+export {
+  COMMENT_MARKER,
+  formatTestComment,
+  formatResultStatus,
+  formatErrorSummary,
+  getActionsRunUrl,
+  type TestCommentRow,
+} from './github-comment-formatting.js';
+
+// ── GitHub context + API ────────────────────────────────────────────────────
 
 interface GitHubContext {
   token: string;
@@ -24,7 +42,6 @@ function _resolveGitHubContext(): GitHubContext | undefined {
     return undefined;
   }
 
-  // PR number from GITHUB_REF_NAME (e.g. "123/merge") or GITHUB_EVENT_PATH
   let prNumber: number | undefined;
 
   const refName = process.env.GITHUB_REF_NAME;
@@ -36,7 +53,6 @@ function _resolveGitHubContext(): GitHubContext | undefined {
   }
 
   if (!prNumber) {
-    // Try event payload
     const eventPath = process.env.GITHUB_EVENT_PATH;
     if (eventPath) {
       try {
@@ -57,30 +73,7 @@ function _resolveGitHubContext(): GitHubContext | undefined {
   return { token, owner, repo, prNumber };
 }
 
-function _formatCommentBody(results: BatchTestSummary): string {
-  let body = COMMENT_MARKER + '\n';
-  body += '## Test Results\n\n';
-  body += '| Package | Status | Try it |\n';
-  body += '|---------|--------|--------|\n';
-
-  for (const pkg of results.packages) {
-    const status = pkg.success ? 'Passed' : '**Failed**';
-    const link = `[Open in Roblox](https://www.roblox.com/games/${pkg.placeId})`;
-    body += `| ${pkg.packageName} | ${status} | ${link} |\n`;
-  }
-
-  body += `\n**${results.summary.total} tested, ${results.summary.passed} passed, ${results.summary.failed} failed**\n`;
-  return body;
-}
-
-/**
- * Post or update a PR comment with test results.
- * Requires GITHUB_TOKEN, GITHUB_REPOSITORY, and PR number (from GITHUB_REF_NAME or event payload).
- * Returns true if the comment was posted, false if context was unavailable.
- */
-export async function postTestResultsCommentAsync(
-  results: BatchTestSummary
-): Promise<boolean> {
+export async function postOrUpdateCommentAsync(body: string): Promise<boolean> {
   const ctx = _resolveGitHubContext();
   if (!ctx) {
     OutputHelper.warn(
@@ -97,9 +90,6 @@ export async function postTestResultsCommentAsync(
     'Content-Type': 'application/json',
   };
 
-  const body = _formatCommentBody(results);
-
-  // Find existing comment with our marker
   const listResponse = await fetch(
     `${apiBase}/issues/${ctx.prNumber}/comments?per_page=100`,
     { headers }
@@ -157,4 +147,39 @@ export async function postTestResultsCommentAsync(
   }
 
   return true;
+}
+
+// ── High-level posting functions ────────────────────────────────────────────
+
+export async function postTestResultsCommentAsync(
+  results: BatchTestSummary
+): Promise<boolean> {
+  const rows: TestCommentRow[] = results.packages.map((pkg) => ({
+    packageName: pkg.packageName,
+    status: formatResultStatus(pkg),
+    error: formatErrorSummary(pkg),
+    placeId: pkg.placeId,
+  }));
+
+  const totalTime = formatDurationMs(results.summary.durationMs);
+  const footer = `**${results.summary.total} tested, ${results.summary.passed} passed, ${results.summary.failed} failed** in ${totalTime}`;
+
+  return postOrUpdateCommentAsync(formatTestComment(rows, footer));
+}
+
+export async function postTestRunFailedCommentAsync(
+  error: string
+): Promise<boolean> {
+  const actionsRunUrl = getActionsRunUrl();
+
+  let body = COMMENT_MARKER + '\n';
+  body += '## Test Results\n\n';
+  body += `❌ **Test run failed before producing results**\n\n`;
+  body += `\`\`\`\n${error}\n\`\`\`\n`;
+
+  if (actionsRunUrl) {
+    body += `\n[View logs](${actionsRunUrl})\n`;
+  }
+
+  return postOrUpdateCommentAsync(body);
 }
