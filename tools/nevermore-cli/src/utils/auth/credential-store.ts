@@ -20,9 +20,7 @@ export function printApiKeySetupHelp(): void {
   console.log('');
   console.log('Required permissions:');
   console.log('  - universe-places:write           (upload place files)');
-  console.log(
-    '  - universe.place.luau-execution-session:write  (run scripts)'
-  );
+  console.log('  - universe.place.luau-execution-session:write  (run scripts)');
   console.log(
     '  - universe.place.luau-execution-session:read   (read results)'
   );

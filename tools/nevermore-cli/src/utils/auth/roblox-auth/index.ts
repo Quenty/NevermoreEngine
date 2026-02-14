@@ -31,18 +31,18 @@ export async function getRobloxCookieAsync(): Promise<string> {
 
   // No interactive prompt in non-TTY environments (CI)
   if (!process.stdin.isTTY) {
-    throw new Error('No .ROBLOSECURITY cookie available (set ROBLOSECURITY env var for CI)');
+    throw new Error(
+      'No .ROBLOSECURITY cookie available (set ROBLOSECURITY env var for CI)'
+    );
   }
 
   const { cookie } = await inquirer.prompt([
     {
       type: 'password',
       name: 'cookie',
-      message:
-        'Enter your .ROBLOSECURITY cookie (from browser or Studio):',
+      message: 'Enter your .ROBLOSECURITY cookie (from browser or Studio):',
       mask: '*',
-      validate: (input: string) =>
-        input.length > 0 || 'Cookie cannot be empty',
+      validate: (input: string) => input.length > 0 || 'Cookie cannot be empty',
     },
   ]);
 
@@ -102,7 +102,9 @@ export async function createPlaceInUniverseAsync(
   universeId: number,
   placeName: string
 ): Promise<number> {
-  OutputHelper.verbose(`Creating place "${placeName}" in universe ${universeId}...`);
+  OutputHelper.verbose(
+    `Creating place "${placeName}" in universe ${universeId}...`
+  );
 
   const createResponse = await fetchWithCsrfAsync(
     `https://apis.roblox.com/universes/v1/user/universes/${universeId}/places`,

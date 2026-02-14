@@ -28,7 +28,9 @@ export async function loadDeployConfigAsync(
   const config = JSON.parse(content) as DeployConfig;
 
   if (!config.targets || typeof config.targets !== 'object') {
-    throw new Error(`deploy.nevermore.json at ${configPath} is missing "targets" field`);
+    throw new Error(
+      `deploy.nevermore.json at ${configPath} is missing "targets" field`
+    );
   }
 
   for (const [name, target] of Object.entries(config.targets)) {

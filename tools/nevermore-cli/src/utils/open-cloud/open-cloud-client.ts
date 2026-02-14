@@ -1,6 +1,10 @@
 import * as fs from 'fs/promises';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { RateLimiter } from './rate-limiter.js';
+import {
+  parseTestLogs,
+  type ParsedTestLogs,
+} from '../testing/test-log-parser.js';
 
 export interface LuauTask {
   path: string;
@@ -15,11 +19,6 @@ export interface LuauTask {
     | 'COMPLETE'
     | 'FAILED';
   script: string;
-}
-
-export interface TaskLogsResult {
-  success: boolean;
-  logs: string;
 }
 
 interface OpenCloudClientOptions {
@@ -65,10 +64,16 @@ function formatAuthError(
     `  ${dim('Universe:')}    ${universeId}`,
     `  ${dim('Place:')}       ${placeId}`,
     '',
-    OutputHelper.formatWarning('Ensure the API key has the required scope and the experience is on its allow list.'),
+    OutputHelper.formatWarning(
+      'Ensure the API key has the required scope and the experience is on its allow list.'
+    ),
     '',
-    `  ${dim('Place:')}       ${info(`https://www.roblox.com/games/${placeId}/place`)}`,
-    `  ${dim('Credentials:')} ${info('https://create.roblox.com/dashboard/credentials')}`,
+    `  ${dim('Place:')}       ${info(
+      `https://www.roblox.com/games/${placeId}/place`
+    )}`,
+    `  ${dim('Credentials:')} ${info(
+      'https://create.roblox.com/dashboard/credentials'
+    )}`,
     `  ${dim('Route:')}       ${dim(`${method} ${url}`)}`,
   ].join('\n');
 }
@@ -88,7 +93,9 @@ export class OpenCloudClient {
     rbxlPath: string,
     publish?: boolean
   ): Promise<number> {
-    OutputHelper.verbose(`Uploading to https://www.roblox.com/games/${placeId}/place ...`);
+    OutputHelper.verbose(
+      `Uploading to https://www.roblox.com/games/${placeId}/place ...`
+    );
 
     const fileBuffer = await fs.readFile(rbxlPath);
     const body = new Uint8Array(fileBuffer);
@@ -109,7 +116,17 @@ export class OpenCloudClient {
       const text = await response.text();
       if (response.status === 401 || response.status === 403) {
         throw new Error(
-          formatAuthError('Upload', 'universe-places:write', universeId, placeId, response.status, response.statusText, text, 'POST', url)
+          formatAuthError(
+            'Upload',
+            'universe-places:write',
+            universeId,
+            placeId,
+            response.status,
+            response.statusText,
+            text,
+            'POST',
+            url
+          )
         );
       }
       throw new Error(
@@ -142,10 +159,22 @@ export class OpenCloudClient {
       const text = await response.text();
       if (response.status === 401 || response.status === 403) {
         throw new Error(
-          formatAuthError('Luau execution', 'universe.place.luau-execution-session:write', universeId, placeId, response.status, response.statusText, text, 'POST', url)
+          formatAuthError(
+            'Luau execution',
+            'universe.place.luau-execution-session:write',
+            universeId,
+            placeId,
+            response.status,
+            response.statusText,
+            text,
+            'POST',
+            url
+          )
         );
       }
-      throw new Error(`Create task failed: ${response.status} ${response.statusText}: ${text}`);
+      throw new Error(
+        `Create task failed: ${response.status} ${response.statusText}: ${text}`
+      );
     }
 
     return (await response.json()) as LuauTask;
@@ -187,7 +216,7 @@ export class OpenCloudClient {
     }
   }
 
-  async getTaskLogsAsync(taskPath: string): Promise<TaskLogsResult> {
+  async getTaskLogsAsync(taskPath: string): Promise<ParsedTestLogs> {
     // The Open Cloud API may not have logs available immediately after task
     // completion. Retry a few times with a short delay if we get an empty
     // response, since the test runner always produces at least some output.
@@ -206,7 +235,7 @@ export class OpenCloudClient {
     return this._fetchLogsAsync(taskPath);
   }
 
-  private async _fetchLogsAsync(taskPath: string): Promise<TaskLogsResult> {
+  private async _fetchLogsAsync(taskPath: string): Promise<ParsedTestLogs> {
     const response = await this._rateLimiter.fetchAsync(
       `https://apis.roblox.com/cloud/v2/${taskPath}/logs`,
       {
@@ -226,25 +255,9 @@ export class OpenCloudClient {
       luauExecutionSessionTaskLogs: Array<{ messages: string[] }>;
     };
 
-    const messages =
-      data.luauExecutionSessionTaskLogs?.[0]?.messages ?? [];
+    const messages = data.luauExecutionSessionTaskLogs?.[0]?.messages ?? [];
     const logs = messages.join('\n');
 
-    const cleanLogs = logs.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
-
-    // Check for Jest-style test failures
-    const failedSuites = cleanLogs.match(/Test Suites:\s*(\d+)\s+failed/);
-    const failedTests = cleanLogs.match(/Tests:\s*(\d+)\s+failed/);
-    const hasJestFailures =
-      (failedSuites && parseInt(failedSuites[1], 10) > 0) ||
-      (failedTests && parseInt(failedTests[1], 10) > 0);
-
-    // Check for Luau runtime errors (stack traces)
-    const hasRuntimeError = /Stack Begin\s/.test(cleanLogs);
-
-    return {
-      success: !hasJestFailures && !hasRuntimeError,
-      logs,
-    };
+    return parseTestLogs(logs);
   }
 }

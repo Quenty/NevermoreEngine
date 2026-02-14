@@ -31,6 +31,10 @@ end
 	Runs Jest tests if a jest.config is found under root. Otherwise treats
 	boot success as the test (smoke test).
 
+	In Open Cloud, errors propagate naturally and the session terminates.
+	Outside Open Cloud (e.g. run-in-roblox), we call ProcessService:ExitAsync()
+	so Studio exits with the correct code.
+
 	@param root -- The instance to scan for jest.config (e.g. the package folder in ServerScriptService)
 ]=]
 function NevermoreTestRunnerUtils.runTestsIfNeededAsync(root: Instance)
@@ -40,8 +44,23 @@ function NevermoreTestRunnerUtils.runTestsIfNeededAsync(root: Instance)
 
 	if isOpenCloud then
 		print("[NevermoreTestRunner] Running in Open Cloud execution context")
+		NevermoreTestRunnerUtils._runTestsAsync(root)
+	else
+		print("[NevermoreTestRunner] Running in local execution context")
+		local ok, err = pcall(function(): any
+			return NevermoreTestRunnerUtils._runTestsAsync(root)
+		end)
+		local ProcessService = (game :: any):GetService("ProcessService")
+		if ok then
+			(ProcessService :: any):ExitAsync(0)
+		else
+			warn(tostring(err));
+			(ProcessService :: any):ExitAsync(1)
+		end
 	end
+end
 
+function NevermoreTestRunnerUtils._runTestsAsync(root: Instance)
 	local config = root:FindFirstChild("jest.config", true)
 	if not config or not config.Parent then
 		print("[NevermoreTestRunner] No jest.config found — smoke test passed (boot success)")

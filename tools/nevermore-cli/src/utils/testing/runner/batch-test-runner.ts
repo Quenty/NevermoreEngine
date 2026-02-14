@@ -1,10 +1,14 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
-import { RateLimiter } from '../open-cloud/rate-limiter.js';
-import { TestablePackage } from './changed-tests-utils.js';
-import { runSingleTestAsync, SingleTestResult, type TestPhase } from './test-runner.js';
+import { OpenCloudClient } from '../../open-cloud/open-cloud-client.js';
+import { TestablePackage } from '../changed-tests-utils.js';
+import {
+  runSingleCloudTestAsync,
+  runSingleLocalTestAsync,
+  type SingleTestResult,
+} from './test-runner.js';
+import { type TestReporter } from '../reporting/base-test-reporter.js';
 
-export type { TestPhase };
+export type { TestPhase } from './test-runner.js';
 
 export interface BatchTestResult {
   packageName: string;
@@ -25,44 +29,32 @@ export interface BatchTestSummary {
   };
 }
 
-export interface BatchTestCallbacks {
-  onPackageStart?: (pkg: TestablePackage) => void;
-  onPackagePhaseChange?: (packageName: string, phase: TestPhase) => void;
-  onPackageResult?: (result: BatchTestResult, bufferedOutput?: string[]) => void;
-  onProgress?: (completed: number, total: number, elapsedMs: number) => void;
-}
-
 export interface BatchTestOptions {
   packages: TestablePackage[];
-  apiKey: string;
+  client?: OpenCloudClient;
   concurrency?: number;
   timeoutMs?: number;
-  callbacks?: BatchTestCallbacks;
+  reporter: TestReporter;
   bufferOutput?: boolean;
 }
 
 /**
  * Run tests for multiple packages with concurrency control.
- * All packages share a single RateLimiter and API key.
+ * When a client is provided, tests run via Open Cloud; otherwise locally.
  */
 export async function runBatchTestsAsync(
   options: BatchTestOptions
 ): Promise<BatchTestSummary> {
   const {
     packages,
-    apiKey,
+    client,
     concurrency = 3,
     timeoutMs = 120_000,
-    callbacks = {},
+    reporter,
     bufferOutput = false,
   } = options;
 
-  const rateLimiter = new RateLimiter();
-  const client = new OpenCloudClient({ apiKey, rateLimiter });
-
-  const total = packages.length;
   const results: BatchTestResult[] = [];
-  let completedCount = 0;
   let runningCount = 0;
   let nextIndex = 0;
   const startTimeMs = Date.now();
@@ -73,11 +65,9 @@ export async function runBatchTestsAsync(
         const pkg = packages[nextIndex++];
         runningCount++;
 
-        _runOneAsync(pkg, client, timeoutMs, callbacks, bufferOutput)
+        _runOneAsync(pkg, client, timeoutMs, reporter, bufferOutput)
           .then((result) => {
             results.push(result);
-            completedCount++;
-            callbacks.onProgress?.(completedCount, total, Date.now() - startTimeMs);
           })
           .finally(() => {
             runningCount--;
@@ -114,28 +104,34 @@ export async function runBatchTestsAsync(
 
 async function _runOneAsync(
   pkg: TestablePackage,
-  client: OpenCloudClient,
+  client: OpenCloudClient | undefined,
   timeoutMs: number,
-  callbacks: BatchTestCallbacks,
+  reporter: TestReporter,
   bufferOutput: boolean
 ): Promise<BatchTestResult> {
-  callbacks.onPackageStart?.(pkg);
+  reporter.onPackageStart(pkg.name);
 
   const startMs = Date.now();
 
-  const onPhaseChange = callbacks.onPackagePhaseChange
-    ? (phase: TestPhase) => callbacks.onPackagePhaseChange!(pkg.name, phase)
-    : undefined;
-
-  const execute = async (): Promise<{ batchResult: BatchTestResult; output?: string[] }> => {
+  const execute = async (): Promise<{
+    batchResult: BatchTestResult;
+    output?: string[];
+  }> => {
     try {
-      const result = await _runWithRetryAsync(pkg, client, timeoutMs, onPhaseChange);
+      const result = client
+        ? await _runWithRetryAsync(pkg, client, timeoutMs, reporter)
+        : await runSingleLocalTestAsync({
+            packagePath: pkg.path,
+            reporter,
+            packageName: pkg.name,
+            timeoutMs,
+          });
       const durationMs = Date.now() - startMs;
 
       return {
         batchResult: {
           packageName: pkg.name,
-          placeId: result.placeId,
+          placeId: pkg.target.placeId,
           success: result.success,
           logs: result.logs,
           durationMs,
@@ -170,7 +166,7 @@ async function _runOneAsync(
     batchResult = result.batchResult;
   }
 
-  callbacks.onPackageResult?.(batchResult, bufferedOutput);
+  reporter.onPackageResult(batchResult, bufferedOutput);
   return batchResult;
 }
 
@@ -181,17 +177,25 @@ async function _runWithRetryAsync(
   pkg: TestablePackage,
   client: OpenCloudClient,
   timeoutMs: number,
-  onPhaseChange?: (phase: TestPhase) => void
+  reporter: TestReporter
 ): Promise<SingleTestResult> {
+  const opts = {
+    packagePath: pkg.path,
+    client,
+    reporter,
+    packageName: pkg.name,
+    timeoutMs,
+  };
+
   try {
-    return await runSingleTestAsync(pkg.path, client, timeoutMs, onPhaseChange);
+    return await runSingleCloudTestAsync(opts);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
 
     // Only retry on transient failures (timeouts, network errors)
     if (message.includes('timed out') || message.includes('fetch failed')) {
       OutputHelper.warn(`${pkg.name}: transient failure, retrying...`);
-      return await runSingleTestAsync(pkg.path, client, timeoutMs, onPhaseChange);
+      return await runSingleCloudTestAsync(opts);
     }
 
     throw err;

@@ -33,7 +33,10 @@ function winCredRead(target: string): string | undefined {
 
   try {
     const result = execSync(
-      `powershell -NoProfile -ExecutionPolicy Bypass -Command "${script.replace(/"/g, '\\"')}"`,
+      `powershell -NoProfile -ExecutionPolicy Bypass -Command "${script.replace(
+        /"/g,
+        '\\"'
+      )}"`,
       { encoding: 'utf-8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe'] }
     ).trim();
     return result.length > 0 ? result : undefined;
@@ -44,8 +47,7 @@ function winCredRead(target: string): string | undefined {
 
 function readFromRegistry(): string | undefined {
   try {
-    const script =
-      `(Get-ItemProperty -Path 'HKCU:\\Software\\Roblox\\RobloxStudioBrowser\\roblox.com' -Name '${COOKIE_NAME}' -ErrorAction SilentlyContinue).'${COOKIE_NAME}'`;
+    const script = `(Get-ItemProperty -Path 'HKCU:\\Software\\Roblox\\RobloxStudioBrowser\\roblox.com' -Name '${COOKIE_NAME}' -ErrorAction SilentlyContinue).'${COOKIE_NAME}'`;
     const result = execSync(
       `powershell -NoProfile -ExecutionPolicy Bypass -Command "${script}"`,
       { encoding: 'utf-8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe'] }
@@ -73,7 +75,9 @@ export function readCookie(): string | undefined {
       `https://www.roblox.com:RobloxStudioAuth${COOKIE_NAME}${userId}`
     );
     if (cookie) {
-      OutputHelper.verbose(`Loaded cookie from Windows Credentials (user ${userId}).`);
+      OutputHelper.verbose(
+        `Loaded cookie from Windows Credentials (user ${userId}).`
+      );
       return cookie;
     }
   }

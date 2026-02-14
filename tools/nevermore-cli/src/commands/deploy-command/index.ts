@@ -1,7 +1,8 @@
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { buildAndUploadAsync } from '../../utils/build/build-and-upload.js';
+import { buildPlaceAsync } from '../../utils/build/build.js';
+import { uploadPlaceAsync } from '../../utils/build/upload.js';
 import { handleInitAsync } from './deploy-init.js';
 
 export interface DeployArgs extends NevermoreGlobalArgs {
@@ -121,18 +122,25 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
   public handler = async () => {};
 
   private static async _handleRunAsync(args: DeployArgs): Promise<void> {
-    const targetName = args.target ?? 'test';
-
-    const result = await buildAndUploadAsync(args, targetName, args.publish ? 'publish.rbxl' : 'deploy.rbxl');
-    if (!result) {
+    if (args.dryrun) {
       OutputHelper.info(`[DRYRUN] Would build and upload`);
       return;
     }
 
+    const targetName = args.target ?? 'test';
+
+    const buildResult = await buildPlaceAsync({
+      targetName,
+      outputFileName: args.publish ? 'publish.rbxl' : 'deploy.rbxl',
+      overrides: args,
+    });
+
+    const { version } = await uploadPlaceAsync({ buildResult, args });
+
     if (args.publish) {
-      OutputHelper.info(`Published v${result.version} — live in game.`);
+      OutputHelper.info(`Published v${version} — live in game.`);
     } else {
-      OutputHelper.info(`Saved v${result.version} — not yet live.`);
+      OutputHelper.info(`Saved v${version} — not yet live.`);
       OutputHelper.hint('Use --publish to make it live in game.');
     }
   }

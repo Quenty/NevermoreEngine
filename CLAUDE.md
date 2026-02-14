@@ -133,14 +133,6 @@ The field is called `scriptTemplate` (not `script`) because the file is read and
 3. `ROBLOX_UNIT_TEST_API_KEY` env var (backwards compat)
 4. `~/.nevermore/credentials.json` (stored via `nevermore login`)
 
-### Open Cloud API Key Scopes
-
-- `universe-places:write` — upload place files
-- `universe.place.luau-execution-session:write` — create execution tasks
-- `universe.place.luau-execution-session:read` — poll tasks and read logs
-
-The key must also have the target experience added to its allow list in the Creator Dashboard.
-
 ### Building the CLI
 
 ```bash

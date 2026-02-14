@@ -12,7 +12,13 @@ import { fileURLToPath } from 'url';
  * @returns
  */
 export function getTemplatePathByName(name: string) {
-  return path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'templates', name);
+  return path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '..',
+    '..',
+    'templates',
+    name
+  );
 }
 
 export async function runCommandAsync(
@@ -82,6 +88,10 @@ export function getGitCommitShort(): string | undefined {
   }
 }
 
+export function isCI(): boolean {
+  return !!process.env.GITHUB_ACTIONS;
+}
+
 export function formatDurationMs(ms: number): string {
   if (ms < 1000) {
     return `${Math.round(ms)}ms`;
@@ -103,7 +113,9 @@ export function timeoutAsync(ms: number, message: string): Promise<never> {
   );
 }
 
-export async function buildPlaceNameAsync(packagePath: string): Promise<string> {
+export async function buildPlaceNameAsync(
+  packagePath: string
+): Promise<string> {
   const name =
     (await readPackageNameAsync(packagePath)) ?? path.basename(packagePath);
   const commitId = getGitCommitShort();

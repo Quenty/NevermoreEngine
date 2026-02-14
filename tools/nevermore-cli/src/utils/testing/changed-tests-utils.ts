@@ -1,7 +1,12 @@
 import * as fs from 'fs/promises';
 import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { DeployTarget, loadDeployConfigAsync, resolveDeployConfigPath, resolveDeployTarget } from '../build/deploy-config.js';
+import {
+  DeployTarget,
+  loadDeployConfigAsync,
+  resolveDeployConfigPath,
+  resolveDeployTarget,
+} from '../build/deploy-config.js';
 
 export interface TestablePackage {
   name: string;
@@ -12,9 +17,15 @@ export interface TestablePackage {
 /**
  * Discover all packages that have a deploy.nevermore.json with a "test" target.
  */
-export async function discoverAllTestablePackagesAsync(): Promise<TestablePackage[]> {
+export async function discoverAllTestablePackagesAsync(): Promise<
+  TestablePackage[]
+> {
   const { stdout } = await execa('pnpm', [
-    'ls', '--json', '-r', '--depth', '-1',
+    'ls',
+    '--json',
+    '-r',
+    '--depth',
+    '-1',
   ]);
 
   const packages = JSON.parse(stdout) as Array<{ name: string; path: string }>;
@@ -30,8 +41,13 @@ export async function discoverChangedTestablePackagesAsync(
 ): Promise<TestablePackage[]> {
   // pnpm --filter "...[origin/main]" lists changed packages + their dependents
   const { stdout } = await execa('pnpm', [
-    'ls', '--json', '-r', '--depth', '-1',
-    '--filter', `...[${baseBranch}]`,
+    'ls',
+    '--json',
+    '-r',
+    '--depth',
+    '-1',
+    '--filter',
+    `...[${baseBranch}]`,
   ]);
 
   let packages: Array<{ name: string; path: string }>;
@@ -82,7 +98,9 @@ async function _filterTestableAsync(
 
   if (skippedNoTestTarget.length > 0) {
     OutputHelper.verbose(
-      `Skipped ${skippedNoTestTarget.length} packages without a "test" target: ${skippedNoTestTarget.join(', ')}`
+      `Skipped ${
+        skippedNoTestTarget.length
+      } packages without a "test" target: ${skippedNoTestTarget.join(', ')}`
     );
   }
 

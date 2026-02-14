@@ -6,7 +6,8 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
  */
 function _extractRoute(url: string | URL | Request): string {
   try {
-    const urlStr = typeof url === 'string' ? url : url instanceof URL ? url.href : url.url;
+    const urlStr =
+      typeof url === 'string' ? url : url instanceof URL ? url.href : url.url;
     const parsed = new URL(urlStr);
     // Drop the host, keep the last meaningful path segments
     const segments = parsed.pathname.split('/').filter(Boolean);
@@ -124,14 +125,16 @@ export class RateLimiter {
         lastResponse = response;
 
         const retryAfter = response.headers.get('retry-after');
-        const waitSec = retryAfter ? parseFloat(retryAfter) : 10 * (attempt + 1);
+        const waitSec = retryAfter
+          ? parseFloat(retryAfter)
+          : 10 * (attempt + 1);
 
         OutputHelper.warn(
-          `429 on ${route} (attempt ${attempt + 1}/${maxRetries}). Retrying in ${waitSec}s (Roblox requested)...`
+          `429 on ${route} (attempt ${
+            attempt + 1
+          }/${maxRetries}). Retrying in ${waitSec}s (Roblox requested)...`
         );
-        await new Promise((resolve) =>
-          setTimeout(resolve, waitSec * 1000)
-        );
+        await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
       }
 
       // All retries exhausted — return the last 429 response

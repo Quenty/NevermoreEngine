@@ -15,7 +15,7 @@ import { InitCommand } from './commands/init-command/index.js';
 import { InitPackageCommand } from './commands/init-command/init-package-command.js';
 import { InitPluginCommand } from './commands/init-command/init-plugin-command.js';
 import { InstallPackageCommand } from './commands/install-package-command.js';
-import { TestProjectCommand } from './commands/test-command.js';
+import { TestProjectCommand } from './commands/test-command/test-command.js';
 import { DeployCommand } from './commands/deploy-command/index.js';
 import { LoginCommand } from './commands/login-command.js';
 import { BatchCommand } from './commands/batch-command/index.js';
@@ -53,7 +53,8 @@ yargs(hideBin(process.argv))
     type: 'boolean',
   })
   .option('verbose', {
-    description: 'Show intermediate output (building, uploading, cookie loading, etc.)',
+    description:
+      'Show intermediate output (building, uploading, cookie loading, etc.)',
     default: false,
     global: true,
     type: 'boolean',

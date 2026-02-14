@@ -1,5 +1,5 @@
-import { BatchTestResult } from './batch-test-runner.js';
-import { formatDurationMs } from '../nevermore-cli-utils.js';
+import { BatchTestResult } from '../../runner/batch-test-runner.js';
+import { formatDurationMs } from '../../../nevermore-cli-utils.js';
 
 export const COMMENT_MARKER = '<!-- nevermore-test-results -->';
 
@@ -13,7 +13,10 @@ export interface TestCommentRow {
 /**
  * Render a test results comment from pre-formatted rows and a footer line.
  */
-export function formatTestComment(rows: TestCommentRow[], footer: string): string {
+export function formatTestComment(
+  rows: TestCommentRow[],
+  footer: string
+): string {
   const hasErrors = rows.some((r) => r.error.length > 0);
   const actionsRunUrl = getActionsRunUrl();
 
@@ -51,7 +54,9 @@ export function formatTestComment(rows: TestCommentRow[], footer: string): strin
 
 export function formatResultStatus(pkg: BatchTestResult): string {
   const duration = formatDurationMs(pkg.durationMs);
-  return pkg.success ? `✅ Passed (${duration})` : `❌ **Failed** (${duration})`;
+  return pkg.success
+    ? `✅ Passed (${duration})`
+    : `❌ **Failed** (${duration})`;
 }
 
 export function formatErrorSummary(pkg: BatchTestResult): string {
