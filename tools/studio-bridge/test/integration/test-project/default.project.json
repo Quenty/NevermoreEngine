@@ -1,0 +1,11 @@
+{
+  "name": "StudioBridgeSmokeTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      }
+    }
+  }
+}
