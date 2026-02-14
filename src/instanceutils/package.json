@@ -32,8 +32,10 @@
     "@quenty/brio": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quenty/symbol": "workspace:*"
+    "@quenty/symbol": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   },
   "publishConfig": {
     "access": "public"

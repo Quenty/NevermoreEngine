@@ -384,6 +384,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -578,6 +581,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -596,6 +602,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/bindtocloseservice:
     dependencies:
@@ -642,6 +651,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -729,6 +741,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
@@ -741,6 +756,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/buttondragmodel:
     dependencies:
@@ -839,6 +857,9 @@ importers:
       '@quenty/math':
         specifier: workspace:*
         version: link:../math
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/qframe':
         specifier: workspace:*
         version: link:../qframe
@@ -974,6 +995,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/permissionprovider':
         specifier: workspace:*
         version: link:../permissionprovider
@@ -1034,6 +1058,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -1058,6 +1085,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/clipcharacters:
     dependencies:
@@ -1076,6 +1106,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/playerutils':
         specifier: workspace:*
         version: link:../playerutils
@@ -1103,6 +1136,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/permissionprovider':
         specifier: workspace:*
         version: link:../permissionprovider
@@ -1270,6 +1306,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
@@ -1465,6 +1504,9 @@ importers:
       '@quenty/messagingserviceutils':
         specifier: workspace:*
         version: link:../messagingserviceutils
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/pagesutils':
         specifier: workspace:*
         version: link:../pagesutils
@@ -1513,6 +1555,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/playerhumanoidbinder':
         specifier: workspace:*
         version: link:../playerhumanoidbinder
@@ -1604,13 +1649,26 @@ importers:
         specifier: workspace:*
         version: link:../loader
 
-  src/ellipticcurvecryptography: {}
+  src/ellipticcurvecryptography:
+    dependencies:
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/elo:
     dependencies:
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/probability':
         specifier: workspace:*
         version: link:../probability
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
     devDependencies:
       '@quenty/blend':
         specifier: workspace:*
@@ -1666,7 +1724,14 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
 
-  src/experiencecalculator: {}
+  src/experiencecalculator:
+    dependencies:
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/fakeskybox:
     dependencies:
@@ -1807,6 +1872,12 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/gameconfig:
     dependencies:
@@ -1849,6 +1920,9 @@ importers:
       '@quenty/marketplaceutils':
         specifier: workspace:*
         version: link:../marketplaceutils
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
@@ -1930,6 +2004,9 @@ importers:
       '@quenty/marketplaceutils':
         specifier: workspace:*
         version: link:../marketplaceutils
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
@@ -2410,6 +2487,9 @@ importers:
       '@quenty/motor6d':
         specifier: workspace:*
         version: link:../motor6d
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/optional':
         specifier: workspace:*
         version: link:../optional
@@ -2471,6 +2551,9 @@ importers:
       '@quenty/math':
         specifier: workspace:*
         version: link:../math
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -2492,6 +2575,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/inputkeymaputils:
     dependencies:
@@ -2519,6 +2605,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
@@ -2615,12 +2704,18 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
       '@quenty/symbol':
         specifier: workspace:*
         version: link:../symbol
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/isamixin: {}
 
@@ -2665,12 +2760,18 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/randomutils':
         specifier: workspace:*
         version: link:../randomutils
       '@quenty/string':
         specifier: workspace:*
         version: link:../string
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
     devDependencies:
       '@quenty/maid':
         specifier: workspace:*
@@ -2705,7 +2806,14 @@ importers:
         specifier: workspace:*
         version: link:../loader
 
-  src/maid: {}
+  src/maid:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
 
   src/markdownrender: {}
 
@@ -2915,6 +3023,15 @@ importers:
         specifier: workspace:*
         version: link:../maid
 
+  src/nevermore-test-runner:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
+
   src/nocollisionconstraintutils:
     dependencies:
       '@quenty/getmechanismparts':
@@ -2963,6 +3080,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -2984,6 +3104,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
     devDependencies:
       '@quenty/blend':
         specifier: workspace:*
@@ -3117,6 +3240,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/playerutils':
         specifier: workspace:*
         version: link:../playerutils
@@ -3543,9 +3669,15 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/raycaster: {}
 
@@ -3782,6 +3914,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/playerhumanoidbinder':
         specifier: workspace:*
         version: link:../playerhumanoidbinder
@@ -3842,6 +3977,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
@@ -3916,6 +4054,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -3934,6 +4075,9 @@ importers:
       '@quenty/typeutils':
         specifier: workspace:*
         version: link:../typeutils
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/rxbinderutils:
     dependencies:
@@ -4026,6 +4170,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -4101,6 +4248,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/permissionprovider':
         specifier: workspace:*
         version: link:../permissionprovider
@@ -4218,6 +4368,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
@@ -4296,6 +4449,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
@@ -4365,6 +4521,9 @@ importers:
       '@quenty/math':
         specifier: workspace:*
         version: link:../math
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -4497,6 +4656,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
@@ -4925,6 +5087,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
@@ -6189,6 +6354,10 @@ packages:
 
   '@quentystudios/cmdr@1.12.0-quenty.0':
     resolution: {integrity: sha512-coxG4bEQ3wskTEiVxbh6hTsOycYoq+8jLtUABvfMURHiS3hgF/0jg3uQArZt0JeY+VvkCIXLHUCFTMMbUQOllA==, tarball: https://npm.pkg.github.com/download/@QuentyStudios/cmdr/1.12.0-quenty.0/52cd069ee3ce795e8056e2e42cb012bb75ddf053}
+
+  '@quentystudios/jest-lua@https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5':
+    resolution: {tarball: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5}
+    version: 3.10.0-quenty.2
 
   '@quentystudios/t@3.0.0':
     resolution: {integrity: sha512-RTnK+ViHHgnG+pn5xOZ+l4dk4sUaEuA5ljb041yRGVF0jBX77Pqb8EpVsllwOr0ik8juD+/nn0ODuQfEJ49bJg==, tarball: https://npm.pkg.github.com/download/@QuentyStudios/t/3.0.0/531258ee3ed838164450322edce90bc273e5cd42}
@@ -7506,11 +7675,13 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@11.1.0:
     resolution: {integrity: sha512-vuNwKSaKiqm7g0THUBu2x7ckSs3XJLXE+2ssL7/MfTGPLLcrJQ/4Uq1CjPTtO5cCIiRxqvN6Twy1qOwhL0Xjcw==}
     engines: {node: 20 || >=22}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@13.0.0:
@@ -7519,11 +7690,12 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@9.3.5:
     resolution: {integrity: sha512-e1LleDykUz2Iu+MTYdkSsuWX8lvAjAcs0Xef0lNIu0S2wOAzuTxCJtcd9S3cijlwYF18EsU3rzb8jPVobxDh9Q==}
     engines: {node: '>=16 || 14 >=14.17'}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   globalthis@1.0.4:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
@@ -10921,6 +11093,8 @@ snapshots:
       config-chain: 1.1.13
 
   '@quentystudios/cmdr@1.12.0-quenty.0': {}
+
+  '@quentystudios/jest-lua@https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5': {}
 
   '@quentystudios/t@3.0.0': {}
 

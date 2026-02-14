@@ -6,8 +6,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+
+      - name: Fetch base branch for changeset diff
+        run: git fetch origin ${{ github.base_ref }} --depth=1
 
       - name: Setup node
         uses: actions/setup-node@v6
@@ -19,7 +20,7 @@ jobs:
         with:
           cache: true
 
-      - name: Setup npm for GitHub Packages
+      - name: Setup registries
         run: |
           echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
           echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
@@ -32,37 +33,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Compute changed packages
-        run: |
-          PACKAGES=$(npx lerna ls --since origin/main --json | jq -r '.[] | select(.name != "@quenty/nevermore-cli") | .location' | tr '\n' ' ')
-          echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
-
-      - name: Setup test place project
-        run: |
-          echo "Setting up test place project from template..."
-          cp -r tests/test-place-template tests/bin
-          cd tests/bin
-
-          echo "Installing changed packages..."
-          pnpm i ${{ env.PACKAGES }}
-
-          echo "Installing Jest..."
-          pnpm add https://github.com/quentystudios/jest-lua.git
-
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
         with:
-          path: tests/bin
           version: 'v0.3.0'
           token: ${{ secrets.GITHUB_TOKEN }}
           cache: true
 
-      - name: Generate test place file
-        run: rojo build default.project.json -o testBuild.rbxl
-        working-directory: tests/bin
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' run build
 
-      - name: Publish test place to Roblox and run tests
-        run: lune run cloud/publish-test-place.luau bin/testBuild.rbxl bin/run-tests.luau
-        working-directory: tests
+      - name: Install nevermore-cli locally
+        run: npm install --ignore-scripts -g .
+        working-directory: tools/nevermore-cli
+
+      - name: Run tests
+        run: nevermore batch test --cloud --base origin/${{ github.base_ref }} --output test-results.json --yes --verbose --logs
         env:
-          ROBLOX_UNIT_TEST_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
+          ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post test results
+        if: always()
+        run: nevermore tools post-test-results test-results.json --yes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

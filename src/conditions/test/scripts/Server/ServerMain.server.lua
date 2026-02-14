@@ -9,6 +9,7 @@ local require = require(loader).bootstrapGame(ServerScriptService.conditions)
 
 local AdorneeConditionUtils = require("AdorneeConditionUtils")
 local AttributeValue = require("AttributeValue")
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 local TieDefinition = require("TieDefinition")
 
 do
@@ -64,3 +65,5 @@ do
 		print("Is door opening allowed", isAllowed)
 	end)
 end
+
+NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.conditions)

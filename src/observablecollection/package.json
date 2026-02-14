@@ -37,13 +37,15 @@
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/steputils": "workspace:*",
     "@quenty/symbol": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   },
   "devDependencies": {
     "@quenty/blend": "workspace:*"

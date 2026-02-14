@@ -52,7 +52,8 @@
     "@quenty/signal": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "devDependencies": {
     "@quenty/rigbuilderutils": "workspace:*"

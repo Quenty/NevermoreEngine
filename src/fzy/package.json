@@ -27,7 +27,9 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "workspace:*"
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   },
   "publishConfig": {
     "access": "public"

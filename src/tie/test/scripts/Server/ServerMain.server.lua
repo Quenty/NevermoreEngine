@@ -10,6 +10,7 @@ local require = require(loader).bootstrapGame(ServerScriptService.tie)
 local Action = require("Action")
 local ActionInterface = require("ActionInterface")
 local Door = require("Door")
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 local OpenableInterface = require("OpenableInterface")
 local Window = require("Window")
 
@@ -72,13 +73,20 @@ do
 
 	-- Implement via interface calls
 	do
-		local thrust = ActionInterface.Server:Implement(adornee)
+		local Signal = require("Signal")
+
+		local thrustImpl = {
+			DisplayName = Instance.new("StringValue"),
+			IsEnabled = Instance.new("BoolValue"),
+			Activated = Signal.new(),
+		}
+		function thrustImpl:Activate()
+			self.Activated:Fire()
+		end
+
+		local thrust = ActionInterface.Server:Implement(adornee, thrustImpl)
 		-- thrust:GetFolder().Name = "Action_Thrust"
 		thrust.DisplayName.Value = "Thrust"
-
-		function thrust:Activate()
-			thrust.Activated:Fire()
-		end
 
 		thrust.Activated:Connect(function()
 			print("Thrusting")
@@ -157,3 +165,5 @@ end
 -- task.wait(0.1)
 
 -- action.Parent = adornee
+
+NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.tie)

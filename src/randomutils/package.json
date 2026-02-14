@@ -33,6 +33,8 @@
   },
   "dependencies": {
     "@quenty/loader": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   }
 }

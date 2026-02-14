@@ -39,7 +39,8 @@
     "@quenty/rbxasset": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/signal": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

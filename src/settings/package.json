@@ -58,7 +58,8 @@
     "@quenty/table": "workspace:*",
     "@quenty/throttle": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

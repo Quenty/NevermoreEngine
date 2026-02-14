@@ -43,7 +43,8 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/spring": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quenty/vector3utils": "workspace:*"
+    "@quenty/vector3utils": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "devDependencies": {
     "@quenty/camerastoryutils": "workspace:*"

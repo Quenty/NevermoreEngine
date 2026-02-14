@@ -41,6 +41,7 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/settings": "workspace:*",
     "@quenty/string": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/table": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   }
 }

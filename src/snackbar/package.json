@@ -51,7 +51,8 @@
     "@quenty/transitionmodel": "workspace:*",
     "@quenty/utf8": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/t": "^3.0.0"
+    "@quentystudios/t": "^3.0.0",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
