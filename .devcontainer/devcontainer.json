@@ -1,32 +1,56 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.202.3/containers/ubuntu
 {
-	"name": "Ubuntu",
+	"name": "Nevermore",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 	"runArgs": ["--init"],
 
-	"build": {
-		"dockerfile": "Dockerfile",
-		// Update 'VARIANT' to pick an Ubuntu version: hirsute, focal, bionic
-		// Use hirsute or bionic on local arm64/Apple Silicon.
-		"args": {
-			"VARIANT": "focal"
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "18",
+			"pnpmVersion": "10.27.0"
 		}
 	},
 
-	// Set *default* container specific settings.json values on container create.
-	"settings": {},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"quenty.nevermore-vscode",
+				"johnnymorganz.luau-lsp",
+				"johnnymorganz.stylua",
+				"kampfkarren.selene-vscode",
+				"esbenp.prettier-vscode",
+				"editorconfig.editorconfig"
+			],
+			"settings": {
+				"luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
+				"luau-lsp.ignoreGlobs": ["**/node_modules/**"],
+				"luau-lsp.sourcemap.generatorCommand": "npm run build:sourcemap",
+				"luau-lsp.sourcemap.useVSCodeWatcher": true,
+				"files.exclude": {
+					"*.sublime-workspace": true,
+					"**/node_modules/**": true,
+					"roblox.toml": true
+				},
+				"[lua]": {
+					"editor.defaultFormatter": "JohnnyMorganz.stylua",
+					"editor.formatOnSave": true,
+					"editor.formatOnSaveMode": "file"
+				},
+				"[luau]": {
+					"editor.defaultFormatter": "JohnnyMorganz.stylua",
+					"editor.formatOnSave": true,
+					"editor.formatOnSaveMode": "file"
+				},
+				"[typescript]": {
+					"editor.defaultFormatter": "esbenp.prettier-vscode",
+					"editor.formatOnSave": true,
+					"editor.formatOnSaveMode": "file"
+				}
+			}
+		}
+	},
 
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"editorconfig.editorconfig",
-		"evaera.vscode-rojo",
-		"kampfkarren.selene-vscode",
-		"nightrains.robloxlsp",
-		"ms-vsliveshare.vsliveshare",
-		"bungcip.better-toml",
-	],
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [34872],
 	"portsAttributes": {
 		"34872": {
@@ -38,14 +62,9 @@
 		"onAutoForward": "silent"
 	},
 
-	// We do this weird git config setting for environments where the underlying files are stored on the Windows FS.
-	// It is safe to remove if you're only using the devcontainer in Codespaces or on Linux FS.
 	"remoteUser": "vscode",
-	"postCreateCommand": "git config --global --add safe.directory '*' && foreman install",
-	"postStartCommand": "selene generate-roblox-std",
+	"postCreateCommand": "git config --global --add safe.directory '*' && aftman install --no-trust-check && selene generate-roblox-std && pnpm install",
 	"remoteEnv": {
-		"PATH": "${containerEnv:PATH}:/home/vscode/.foreman/bin"
-	},
-
-	"features": {}
+		"PATH": "${containerEnv:PATH}:/home/vscode/.aftman/bin"
+	}
 }

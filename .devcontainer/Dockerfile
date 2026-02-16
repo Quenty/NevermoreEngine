@@ -1,16 +1,12 @@
-# See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.202.3/containers/ubuntu/.devcontainer/base.Dockerfile
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
-# [Choice] Ubuntu version (use hirsuite or bionic on local arm64/Apple Silicon): hirsute, focal, bionic
-ARG VARIANT="hirsute"
-FROM mcr.microsoft.com/vscode/devcontainers/base:0-${VARIANT}
+ARG AFTMAN_VERSION=0.3.0
 
-# Install packages
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN apt-get update
+RUN curl -fsSL "https://github.com/LPGhatguy/aftman/releases/download/v${AFTMAN_VERSION}/aftman-${AFTMAN_VERSION}-linux-x86_64.zip" -o /tmp/aftman.zip \
+    && unzip /tmp/aftman.zip -d /tmp/aftman \
+    && chmod +x /tmp/aftman/aftman \
+    && mv /tmp/aftman/aftman /usr/local/bin/aftman \
+    && rm -rf /tmp/aftman /tmp/aftman.zip
 
-# Install foreman
-RUN curl -fsSL https://github.com/Roblox/foreman/releases/download/v1.0.3/foreman-1.0.3-linux.zip -O
-RUN unzip foreman-1.0.3-linux.zip
-RUN chmod +x ./foreman
-RUN mv foreman /usr/local/bin
-RUN rm foreman-1.0.3-linux.zip
+USER vscode
+RUN aftman self-install
