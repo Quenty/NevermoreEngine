@@ -11,7 +11,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { fileURLToPath } from 'url';
-import { execa } from 'execa';
+import { rojoBuildAsync } from '@quenty/nevermore-template-helpers';
 import { StudioBridge } from '../../src/index.js';
 import { findPluginsFolder } from '../../src/process/studio-process-manager.js';
 
@@ -37,13 +37,9 @@ async function main() {
   console.log('[smoke-test] Building test place with rojo...');
   console.log(`[smoke-test] Project dir: ${TEST_PROJECT_DIR}`);
 
-  // Build the place file — use the full aftman path if rojo isn't on PATH
-  const rojoCmd = process.env.AFTMAN_BIN
-    ? path.join(process.env.AFTMAN_BIN, 'rojo')
-    : 'rojo';
-
-  await execa(rojoCmd, ['build', '-o', PLACE_OUTPUT], {
-    cwd: TEST_PROJECT_DIR,
+  await rojoBuildAsync({
+    projectPath: path.join(TEST_PROJECT_DIR, 'default.project.json'),
+    output: PLACE_OUTPUT,
   });
 
   console.log(`[smoke-test] Place built: ${PLACE_OUTPUT}`);

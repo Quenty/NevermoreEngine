@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { rojoBuildAsync } from '@quenty/nevermore-template-helpers';
 import {
   DeployTarget,
   loadDeployConfigAsync,
@@ -79,7 +79,7 @@ export async function buildPlaceAsync(
   );
 
   await fs.mkdir(path.dirname(rbxlPath), { recursive: true });
-  await execa('rojo', ['build', projectPath, '-o', rbxlPath]);
+  await rojoBuildAsync({ projectPath, output: rbxlPath });
 
   return { rbxlPath, target };
 }

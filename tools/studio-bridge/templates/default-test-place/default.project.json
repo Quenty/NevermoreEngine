@@ -1,0 +1,11 @@
+{
+  "name": "StudioBridgeMinimal",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      }
+    }
+  }
+}

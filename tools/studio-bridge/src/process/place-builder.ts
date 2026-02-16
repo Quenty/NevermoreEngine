@@ -7,20 +7,13 @@
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
-import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { rojoBuildAsync, resolveTemplatePath } from '@quenty/nevermore-template-helpers';
 
-const MINIMAL_PROJECT = {
-  name: 'StudioBridgeMinimal',
-  tree: {
-    $className: 'DataModel',
-    ServerScriptService: {
-      $properties: {
-        LoadStringEnabled: true,
-      },
-    },
-  },
-};
+const projectPath = resolveTemplatePath(
+  import.meta.url,
+  path.join('default-test-place', 'default.project.json')
+);
 
 export interface BuiltPlace {
   /** Absolute path to the .rbxl file */
@@ -34,37 +27,37 @@ export interface BuiltPlace {
  */
 export async function buildMinimalPlaceAsync(): Promise<BuiltPlace> {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'studio-bridge-'));
-  const projectPath = path.join(tmpDir, 'default.project.json');
-  const placePath = path.join(tmpDir, 'minimal.rbxl');
 
-  await fs.writeFile(projectPath, JSON.stringify(MINIMAL_PROJECT, null, 2), 'utf-8');
-
-  OutputHelper.verbose(`[StudioBridge] Building minimal place in ${tmpDir}`);
+  OutputHelper.verbose(
+    `[StudioBridge] Building minimal place in ${tmpDir}`
+  );
 
   try {
-    await execa('rojo', ['build', '-o', placePath], { cwd: tmpDir });
+    const placePath = path.join(tmpDir, 'minimal.rbxl');
+    await rojoBuildAsync({ projectPath, output: placePath });
+
+    OutputHelper.verbose(`[StudioBridge] Minimal place built: ${placePath}`);
+
+    return {
+      placePath,
+      cleanupAsync: async () => {
+        try {
+          await fs.rm(tmpDir, { recursive: true, force: true });
+        } catch {
+          // best effort
+        }
+      },
+    };
   } catch (err) {
-    // Clean up on build failure
-    await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+    try {
+      await fs.rm(tmpDir, { recursive: true, force: true });
+    } catch {
+      // best effort
+    }
 
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(
       `Failed to build minimal place via rojo. Is rojo installed and on PATH?\n${message}`
     );
   }
-
-  OutputHelper.verbose(`[StudioBridge] Minimal place built: ${placePath}`);
-
-  let cleaned = false;
-  const cleanupAsync = async () => {
-    if (cleaned) return;
-    cleaned = true;
-    try {
-      await fs.rm(tmpDir, { recursive: true, force: true });
-    } catch {
-      // best effort
-    }
-  };
-
-  return { placePath, cleanupAsync };
 }

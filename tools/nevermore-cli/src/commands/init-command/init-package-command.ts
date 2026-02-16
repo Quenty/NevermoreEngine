@@ -5,9 +5,8 @@
 import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { TemplateHelper } from '@quenty/nevermore-template-helpers';
+import { resolveTemplatePath, TemplateHelper } from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getTemplatePathByName } from '../../utils/nevermore-cli-utils.js';
 
 export interface InitPackageArgs extends NevermoreGlobalArgs {
   packageName: string;
@@ -53,7 +52,8 @@ export class InitPackageCommand<T>
     const description = await InitPackageCommand._ensureDescription(args);
 
     const srcRoot = process.cwd();
-    const templatePath = getTemplatePathByName(
+    const templatePath = resolveTemplatePath(
+      import.meta.url,
       `nevermore-${args.packageTemplate}-package-template`
     );
 

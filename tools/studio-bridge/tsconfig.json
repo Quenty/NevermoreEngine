@@ -9,7 +9,8 @@
   },
   "references": [
     { "path": "../cli-output-helpers" },
-    { "path": "../nevermore-cli-helpers" }
+    { "path": "../nevermore-cli-helpers" },
+    { "path": "../nevermore-template-helpers" }
   ],
   "include": ["src/**/*", "test/**/*"]
 }

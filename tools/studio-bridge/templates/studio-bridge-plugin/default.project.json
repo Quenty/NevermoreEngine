@@ -1,0 +1,6 @@
+{
+  "name": "StudioBridgePlugin",
+  "tree": {
+    "$path": "plugin-template.server.lua"
+  }
+}

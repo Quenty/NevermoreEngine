@@ -45,7 +45,7 @@ export const batchDeployCommand: CommandModule<
       .option('target', {
         describe: 'Deploy target name in deploy.nevermore.json',
         type: 'string',
-        default: 'deploy',
+        default: 'test',
       })
       .option('api-key', {
         describe: 'Roblox Open Cloud API key',

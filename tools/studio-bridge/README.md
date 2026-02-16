@@ -18,8 +18,8 @@ WebSocket-based bridge for running Luau scripts in Roblox Studio.
 ```
 
 1. Start WebSocket server on a random port
-2. Build a temporary `.rbxmx` plugin with the port and session ID baked in
-3. Write plugin to Studio's plugins folder, launch Studio
+2. Build a `.rbxm` plugin via `rojo build --plugin` with the port and session ID baked in
+3. Plugin is placed in Studio's plugins folder, launch Studio
 4. Plugin connects, handshakes with session ID
 5. Server sends `execute` with Luau script, plugin runs it via `loadstring()` + `xpcall()`
 6. Plugin streams `LogService` output back as batched messages
@@ -163,7 +163,7 @@ pnpm test:integration  # End-to-end (requires Studio)
 
 | Layer | What it tests | Studio? |
 |-------|--------------|---------|
-| Unit (`pnpm test`) | Protocol, XML builder, template substitution, path resolution, WebSocket lifecycle | No |
+| Unit (`pnpm test`) | Protocol, template substitution, path resolution, WebSocket lifecycle | No |
 | Integration (`pnpm test:integration`) | Full pipeline: rojo build, plugin injection, Studio launch, output capture | Yes |
 
 ## Platform Support

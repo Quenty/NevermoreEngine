@@ -5,6 +5,9 @@
   "type": "module",
   "main": "dist/src/index.js",
   "license": "UNLICENSED",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=18"
   },
@@ -14,6 +17,7 @@
   "dependencies": {
     "@quenty/cli-output-helpers": "workspace:*",
     "@quenty/nevermore-cli-helpers": "workspace:*",
+    "@quenty/nevermore-template-helpers": "workspace:*",
     "execa": "^9.6.1",
     "ws": "^8.18.0",
     "yargs": "^18.0.0"

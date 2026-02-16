@@ -71,7 +71,7 @@ CLI tools under `tools/` are TypeScript ESM packages using yargs for command par
 - **Output**: Use `OutputHelper` from `@quenty/cli-output-helpers` for terminal output (`OutputHelper.info()`, `OutputHelper.error()`, `OutputHelper.warn()`, `OutputHelper.hint()`).
 - **Error handling**: Command handlers wrap logic in try/catch, format with `OutputHelper.error()`, and call `process.exit(1)`. Never let raw `Error:` + stack traces reach the user. Error messages should be actionable — include what went wrong, what scope/permission is needed, and links to fix it.
 - **Interactive fallback**: When credentials are missing in interactive mode, prompt inline rather than erroring. Only throw in `--yes` (CI) mode.
-- **Process execution**: Use `runCommandAsync()` from `nevermore-cli-utils.ts` to spawn child processes (wraps `execa`).
+- **Process execution**: Use `runCommandAsync()` from `nevermore-cli-utils.ts` to spawn child processes (wraps `execa`). For rojo builds specifically, always use `rojoBuildAsync` from `@quenty/nevermore-template-helpers` — never invoke rojo directly via `execa`.
 - **Dryrun support**: Thread `args` through to `runCommandAsync` for subprocess calls; log-and-skip for API calls when `args.dryrun` is true.
 - **Fail fast**: Validate credentials and config before expensive operations (e.g. check API key before rojo build).
 - **Build via npm scripts**: Always use `npm run build` (not `tsc` or `npx tsc` directly) to compile TypeScript. Each tool package defines `build`, `build:watch`, and `build:clean` scripts in its `package.json`.

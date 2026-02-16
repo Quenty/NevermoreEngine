@@ -8,7 +8,7 @@
     "Raven",
     "CLI"
   ],
-  "main": "dist/templateHelpers.js",
+  "main": "dist/index.js",
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },

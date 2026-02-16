@@ -4,22 +4,6 @@ import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../args/global-args.js';
 import { execa, Options } from 'execa';
-import { fileURLToPath } from 'url';
-
-/**
- * Gets a temlate path by name
- * @param name
- * @returns
- */
-export function getTemplatePathByName(name: string) {
-  return path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '..',
-    '..',
-    'templates',
-    name
-  );
-}
 
 export async function runCommandAsync(
   initGameArgs: NevermoreGlobalArgs,

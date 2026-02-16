@@ -5,12 +5,9 @@
 import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { TemplateHelper } from '@quenty/nevermore-template-helpers';
+import { resolveTemplatePath, TemplateHelper } from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import {
-  getTemplatePathByName,
-  runCommandAsync,
-} from '../../utils/nevermore-cli-utils.js';
+import { runCommandAsync } from '../../utils/nevermore-cli-utils.js';
 export interface InitGameArgs extends NevermoreGlobalArgs {
   gameName: string;
 }
@@ -89,7 +86,7 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
     const gameNameProper = TemplateHelper.camelize(rawGameName);
 
     const srcRoot = process.cwd();
-    const templatePath = getTemplatePathByName('game-template');
+    const templatePath = resolveTemplatePath(import.meta.url, 'game-template');
 
     OutputHelper.info(
       `Creating a new game at '${srcRoot}' with template '${templatePath}'`

@@ -20,18 +20,13 @@ export type {
 export type { OutputLevel } from './server/web-socket-protocol.js';
 
 // Lower-level exports for advanced usage / testing
-export { buildRbxmx } from './plugin/rbxmx-builder.js';
 export { buildMinimalPlaceAsync } from './process/place-builder.js';
 export {
   findStudioPathAsync,
   findPluginsFolder,
   launchStudioAsync,
 } from './process/studio-process-manager.js';
-export {
-  injectPluginAsync,
-  substituteTemplate,
-  escapeLuaString,
-} from './plugin/plugin-injector.js';
+export { injectPluginAsync } from './plugin/plugin-injector.js';
 export {
   encodeMessage,
   decodePluginMessage,

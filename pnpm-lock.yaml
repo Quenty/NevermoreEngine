@@ -5639,6 +5639,9 @@ importers:
       '@quenty/nevermore-cli-helpers':
         specifier: workspace:*
         version: link:../nevermore-cli-helpers
+      '@quenty/nevermore-template-helpers':
+        specifier: workspace:*
+        version: link:../nevermore-template-helpers
       execa:
         specifier: ^9.6.1
         version: 9.6.1
