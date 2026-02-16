@@ -15,6 +15,16 @@ export interface SpinnerReporterOptions {
 
 const SPINNER_FRAMES = ['◐', '◓', '◑', '◒'];
 
+/** Emoji + label for each active phase in the spinner. */
+const PHASE_LABELS: Record<string, string> = {
+  building: '⚙ Building',
+  uploading: '▲ Uploading',
+  scheduling: '◇ Scheduling',
+  launching: '🚀 Launching',
+  connecting: '🔌 Connecting',
+  executing: '▶ Executing',
+};
+
 /**
  * TTY spinner rendering for batch job progress.
  * Reads all state from IStateTracker; re-renders on a timer interval.
@@ -122,79 +132,32 @@ export class SpinnerReporter extends BaseReporter {
 
       let line: string;
 
-      switch (state.status) {
-        case 'pending': {
-          const icon = OutputHelper.formatDim('○');
-          const statusText = OutputHelper.formatDim('Queued');
-          line = `  ${icon} ${OutputHelper.formatDim(
-            state.name.padEnd(30)
-          )} ${statusText}`;
-          break;
-        }
-        case 'building': {
-          const icon = OutputHelper.formatInfo(spinner);
-          const statusText = OutputHelper.formatInfo('⚙ Building');
-          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-            22
-          )} ${OutputHelper.formatDim(time)}`;
-          break;
-        }
-        case 'uploading': {
-          const icon = OutputHelper.formatInfo(spinner);
-          const statusText = OutputHelper.formatInfo('▲ Uploading');
-          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-            22
-          )} ${OutputHelper.formatDim(time)}`;
-          break;
-        }
-        case 'scheduling': {
-          const icon = OutputHelper.formatInfo(spinner);
-          const statusText = OutputHelper.formatInfo('◇ Scheduling');
-          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-            22
-          )} ${OutputHelper.formatDim(time)}`;
-          break;
-        }
-        case 'launching': {
-          const icon = OutputHelper.formatInfo(spinner);
-          const statusText = OutputHelper.formatInfo('🚀 Launching');
-          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-            22
-          )} ${OutputHelper.formatDim(time)}`;
-          break;
-        }
-        case 'connecting': {
-          const icon = OutputHelper.formatInfo(spinner);
-          const statusText = OutputHelper.formatInfo('🔌 Connecting');
-          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-            22
-          )} ${OutputHelper.formatDim(time)}`;
-          break;
-        }
-        case 'executing': {
-          const icon = OutputHelper.formatInfo(spinner);
-          const statusText = OutputHelper.formatInfo('▶ Executing');
-          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-            22
-          )} ${OutputHelper.formatDim(time)}`;
-          break;
-        }
-        case 'passed': {
-          const icon = OutputHelper.formatSuccess('✓');
-          const statusText = OutputHelper.formatSuccess(this._options.successLabel ?? 'Passed');
-          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-            20
-          )} ${OutputHelper.formatDim(time)}`;
-          break;
-        }
-        case 'failed': {
-          const icon = OutputHelper.formatError('✗');
-          const statusText = OutputHelper.formatError(this._options.failureLabel ?? 'FAILED');
-          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-            20
-          )} ${OutputHelper.formatDim(time)}`;
-          break;
-        }
+      const phaseLabel = PHASE_LABELS[state.status];
+
+      if (state.status === 'pending') {
+        const icon = OutputHelper.formatDim('○');
+        const statusText = OutputHelper.formatDim('Queued');
+        line = `  ${icon} ${OutputHelper.formatDim(
+          state.name.padEnd(30)
+        )} ${statusText}`;
+      } else if (phaseLabel) {
+        const icon = OutputHelper.formatInfo(spinner);
+        const statusText = OutputHelper.formatInfo(phaseLabel);
+        line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
+          22
+        )} ${OutputHelper.formatDim(time)}`;
+      } else if (state.status === 'passed') {
+        const icon = OutputHelper.formatSuccess('✓');
+        const statusText = OutputHelper.formatSuccess(this._options.successLabel ?? 'Passed');
+        line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
+          20
+        )} ${OutputHelper.formatDim(time)}`;
+      } else {
+        const icon = OutputHelper.formatError('✗');
+        const statusText = OutputHelper.formatError(this._options.failureLabel ?? 'FAILED');
+        line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
+          20
+        )} ${OutputHelper.formatDim(time)}`;
       }
 
       lines.push(line);

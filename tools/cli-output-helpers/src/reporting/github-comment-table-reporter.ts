@@ -508,21 +508,15 @@ function _isGithubCommentEnabled(): boolean {
   return isCI() && !!process.env.GITHUB_TOKEN;
 }
 
+const RUNNING_PHASE_LABELS: Record<string, string> = {
+  building: '🔨 Building...',
+  uploading: '📤 Uploading...',
+  scheduling: '⏳ Scheduling...',
+  launching: '🚀 Launching...',
+  connecting: '🔌 Connecting...',
+  executing: '🔄 Executing...',
+};
+
 function _formatRunningStatus(phase: PackageStatus): string {
-  switch (phase) {
-    case 'building':
-      return '🔨 Building...';
-    case 'uploading':
-      return '📤 Uploading...';
-    case 'scheduling':
-      return '⏳ Scheduling...';
-    case 'launching':
-      return '🚀 Launching...';
-    case 'connecting':
-      return '🔌 Connecting...';
-    case 'executing':
-      return '🔄 Executing...';
-    default:
-      return '🔄 Running...';
-  }
+  return RUNNING_PHASE_LABELS[phase] ?? '🔄 Running...';
 }
