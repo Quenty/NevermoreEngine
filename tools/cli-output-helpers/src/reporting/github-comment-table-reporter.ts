@@ -501,6 +501,10 @@ function _formatRunningStatus(phase: PackageStatus): string {
       return '📤 Uploading...';
     case 'scheduling':
       return '⏳ Scheduling...';
+    case 'launching':
+      return '🚀 Launching...';
+    case 'connecting':
+      return '🔌 Connecting...';
     case 'executing':
       return '🔄 Executing...';
     default:

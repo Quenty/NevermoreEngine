@@ -6,7 +6,7 @@
  */
 
 /** Execution phases a package can move through. */
-export type JobPhase = 'building' | 'uploading' | 'scheduling' | 'executing';
+export type JobPhase = 'building' | 'uploading' | 'scheduling' | 'launching' | 'connecting' | 'executing';
 
 /** Unified status for a package moving through the job lifecycle. */
 export type PackageStatus = 'pending' | JobPhase | 'passed' | 'failed';

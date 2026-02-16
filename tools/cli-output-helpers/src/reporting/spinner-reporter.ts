@@ -149,6 +149,22 @@ export class SpinnerReporter extends BaseReporter {
           )} ${OutputHelper.formatDim(time)}`;
           break;
         }
+        case 'launching': {
+          const icon = OutputHelper.formatInfo(spinner);
+          const statusText = OutputHelper.formatInfo('🚀 Launching');
+          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
+            22
+          )} ${OutputHelper.formatDim(time)}`;
+          break;
+        }
+        case 'connecting': {
+          const icon = OutputHelper.formatInfo(spinner);
+          const statusText = OutputHelper.formatInfo('🔌 Connecting');
+          line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
+            22
+          )} ${OutputHelper.formatDim(time)}`;
+          break;
+        }
         case 'executing': {
           const icon = OutputHelper.formatInfo(spinner);
           const statusText = OutputHelper.formatInfo('▶ Executing');

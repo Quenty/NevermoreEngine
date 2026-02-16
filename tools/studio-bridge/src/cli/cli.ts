@@ -14,6 +14,12 @@ import * as path from 'path';
 import { parseArgs } from 'node:util';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
+  CompositeReporter,
+  SimpleReporter,
+  SpinnerReporter,
+  type LiveStateTracker,
+} from '@quenty/cli-output-helpers/reporting';
+import {
   StudioBridgeServer,
   type StudioBridgePhase,
 } from '../server/studio-bridge-server.js';
@@ -35,17 +41,10 @@ Options:
   --verbose          Show internal debug output
   --help, -h         Show this help message
   --version, -v      Show version
+  --logs             Show execution logs in spinner mode (default: true)
 
 Either --script or --script-text is required.
 `.trim();
-
-const PHASE_LABELS: Record<StudioBridgePhase, string> = {
-  building: 'Building place',
-  launching: 'Launching Studio',
-  connecting: 'Waiting for plugin',
-  executing: 'Executing script',
-  done: '',
-};
 
 async function main() {
   const { values } = parseArgs({
@@ -57,6 +56,7 @@ async function main() {
       verbose: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
       version: { type: 'boolean', short: 'v' },
+      logs: { type: 'boolean' },
     },
     strict: true,
   });
@@ -126,45 +126,50 @@ async function main() {
     }
   }
 
+  // Determine display name for reporting
+  const packageName = values.script
+    ? path.basename(values.script, path.extname(values.script))
+    : 'script';
+
+  const useSpinner = !!process.stdout.isTTY && !values.verbose;
+  const showLogs = values.logs ?? true;
+
+  const reporter = new CompositeReporter(
+    [packageName],
+    (state: LiveStateTracker) => [
+      useSpinner
+        ? new SpinnerReporter(state, {
+            showLogs,
+            actionVerb: 'Running',
+          })
+        : new SimpleReporter(state, {
+            alwaysShowLogs: showLogs,
+            successMessage: 'Script completed successfully.',
+            failureMessage: 'Script failed.',
+          }),
+    ]
+  );
+
+  await reporter.startAsync();
+  reporter.onPackageStart(packageName);
+
   const startTime = performance.now();
 
-  // Phase progress display — writes inline status updates
-  let lastPhaseLabel = '';
-  const handlePhase = (phase: StudioBridgePhase) => {
-    const label = PHASE_LABELS[phase];
-    if (!label) {
-      // 'done' phase — finish the last line
-      if (lastPhaseLabel) {
-        process.stderr.write(' done\n');
-        lastPhaseLabel = '';
-      }
-      return;
-    }
-
-    // Finish previous phase line
-    if (lastPhaseLabel) {
-      if (phase === 'connecting') {
-        process.stderr.write(' done\n');
-      } else if (phase === 'executing') {
-        process.stderr.write(' connected\n');
-      } else {
-        process.stderr.write(' done\n');
-      }
-    }
-
-    process.stderr.write(`${label}...`);
-    lastPhaseLabel = label;
-  };
-
-  // Track whether we've printed any output (to add spacing)
-  let hasOutput = false;
+  // Suppress verbose output during spinner rendering
+  if (useSpinner) {
+    OutputHelper.setVerbose(false);
+  }
 
   const server = new StudioBridgeServer({
     placePath,
     timeoutMs,
-    onPhase: handlePhase,
+    onPhase: (phase: StudioBridgePhase) => {
+      if (phase === 'done') return;
+      reporter.onPackagePhaseChange(packageName, phase);
+    },
   });
 
+  const outputLines: string[] = [];
   let result;
   try {
     await server.startAsync();
@@ -176,27 +181,22 @@ async function main() {
           return;
         }
 
-        // Add blank line before first output to separate from progress
-        if (!hasOutput) {
-          // Finish any in-progress phase line
-          if (lastPhaseLabel) {
-            process.stderr.write('\n');
-            lastPhaseLabel = '';
-          }
-          console.log('');
-          hasOutput = true;
-        }
+        // Collect output for the result logs
+        outputLines.push(body);
 
-        switch (level) {
-          case 'Warning':
-            OutputHelper.warn(body);
-            break;
-          case 'Error':
-            OutputHelper.error(body);
-            break;
-          default:
-            console.log(body);
-            break;
+        // In verbose/simple mode, print output in real-time
+        if (!useSpinner) {
+          switch (level) {
+            case 'Warning':
+              OutputHelper.warn(body);
+              break;
+            case 'Error':
+              OutputHelper.error(body);
+              break;
+            default:
+              console.log(body);
+              break;
+          }
         }
       },
     });
@@ -211,20 +211,16 @@ async function main() {
     await server.stopAsync();
   }
 
-  // Finish any in-progress phase line
-  if (lastPhaseLabel) {
-    process.stderr.write('\n');
-    lastPhaseLabel = '';
-  }
+  const elapsed = performance.now() - startTime;
 
-  const elapsed = ((performance.now() - startTime) / 1000).toFixed(1);
+  reporter.onPackageResult({
+    packageName,
+    success: result.success,
+    logs: outputLines.length > 0 ? outputLines.join('\n') : result.logs,
+    durationMs: elapsed,
+  });
 
-  console.log('');
-  if (result.success) {
-    OutputHelper.info(`Script completed successfully. (${elapsed}s)`);
-  } else {
-    OutputHelper.error(`Script failed. (${elapsed}s)`);
-  }
+  await reporter.stopAsync();
 
   process.exit(result.success ? 0 : 1);
 }

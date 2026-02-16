@@ -105,7 +105,7 @@ export async function launchStudioAsync(
   placePath: string
 ): Promise<StudioProcess> {
   const studioExe = await findStudioPathAsync();
-  OutputHelper.verbose(`Launching Studio: ${studioExe} "${placePath}"`);
+  OutputHelper.verbose(`[StudioBridge] ${studioExe} "${placePath}"`);
 
   const proc = execa(studioExe, [placePath], {
     // Don't tie Studio's lifetime to our process
