@@ -3,16 +3,31 @@ import { formatDurationMs } from '../cli-utils.js';
 import { BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
 
+export interface SummaryTableReporterOptions {
+  /** Label for successful results in the table. Default: "Passed" */
+  successLabel?: string;
+  /** Label for failed results in the table. Default: "FAILED" */
+  failureLabel?: string;
+  /** Verb in the footer, e.g. "tested" in "X tested, Y passed, Z failed". Default: "tested" */
+  summaryVerb?: string;
+}
+
 /**
  * Prints a final summary table of all results when jobs complete.
  * All output happens in stopAsync().
  */
 export class SummaryTableReporter extends BaseReporter {
   private _state: IStateTracker;
+  private _successLabel: string;
+  private _failureLabel: string;
+  private _summaryVerb: string;
 
-  constructor(state: IStateTracker) {
+  constructor(state: IStateTracker, options?: SummaryTableReporterOptions) {
     super();
     this._state = state;
+    this._successLabel = options?.successLabel ?? 'Passed';
+    this._failureLabel = options?.failureLabel ?? 'FAILED';
+    this._summaryVerb = options?.summaryVerb ?? 'tested';
   }
 
   override async stopAsync(): Promise<void> {
@@ -29,8 +44,8 @@ export class SummaryTableReporter extends BaseReporter {
 
     for (const result of results) {
       const status = result.success
-        ? OutputHelper.formatSuccess('Passed')
-        : OutputHelper.formatError('FAILED');
+        ? OutputHelper.formatSuccess(this._successLabel)
+        : OutputHelper.formatError(this._failureLabel);
       const duration = OutputHelper.formatDim(
         formatDurationMs(result.durationMs)
       );
@@ -47,7 +62,7 @@ export class SummaryTableReporter extends BaseReporter {
       `in ${formatDurationMs(durationMs)}`
     );
     console.log(
-      `${results.length} tested, ${passedText}, ${failedText} ${totalTime}`
+      `${results.length} ${this._summaryVerb}, ${passedText}, ${failedText} ${totalTime}`
     );
   }
 }

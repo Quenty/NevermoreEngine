@@ -31,6 +31,12 @@ export interface GithubCommentTableConfig {
   extraColumns?: GithubCommentColumn[];
   /** Heading for error-only comment (when setError is used). */
   errorHeading?: string;
+  /** Label for successful results, e.g. "Deployed". Default: "Passed" */
+  successLabel?: string;
+  /** Label for failed results, e.g. "Failed". Default: "Failed" */
+  failureLabel?: string;
+  /** Verb in the footer, e.g. "tested" in "X tested, Y passed, Z failed". Default: "tested" */
+  summaryVerb?: string;
 }
 
 // ── Error summarization (exported utility) ──────────────────────────────────
@@ -130,11 +136,15 @@ function _formatComment(
   return body;
 }
 
-function _formatResultStatus(pkg: PackageResult): string {
+function _formatResultStatus(
+  pkg: PackageResult,
+  successLabel: string,
+  failureLabel: string
+): string {
   const duration = formatDurationMs(pkg.durationMs);
   return pkg.success
-    ? `✅ Passed (${duration})`
-    : `❌ **Failed** (${duration})`;
+    ? `✅ ${successLabel} (${duration})`
+    : `❌ **${failureLabel}** (${duration})`;
 }
 
 function _getActionsRunUrl(): string | undefined {
@@ -442,7 +452,11 @@ export class GithubCommentTableReporter extends BaseReporter {
           break;
         case 'passed':
         case 'failed':
-          statusText = _formatResultStatus(pkg.result!);
+          statusText = _formatResultStatus(
+            pkg.result!,
+            this._config.successLabel ?? 'Passed',
+            this._config.failureLabel ?? 'Failed'
+          );
           break;
         default:
           statusText = _formatRunningStatus(pkg.status);
@@ -462,9 +476,10 @@ export class GithubCommentTableReporter extends BaseReporter {
     if (allDone) {
       const passed = packages.filter((p) => p.status === 'passed').length;
       const failed = packages.filter((p) => p.status === 'failed').length;
+      const verb = this._config.summaryVerb ?? 'tested';
       footer = `**${
         packages.length
-      } tested, ${passed} passed, ${failed} failed** in ${formatDurationMs(
+      } ${verb}, ${passed} passed, ${failed} failed** in ${formatDurationMs(
         elapsedMs
       )}`;
     } else {

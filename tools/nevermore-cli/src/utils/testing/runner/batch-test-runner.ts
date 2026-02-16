@@ -1,7 +1,7 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { OpenCloudClient } from '../../open-cloud/open-cloud-client.js';
-import { TestablePackage } from '../changed-tests-utils.js';
+import { type TargetPackage } from '../changed-tests-utils.js';
 import {
   runSingleCloudTestAsync,
   runSingleLocalTestAsync,
@@ -16,7 +16,7 @@ export type { TestPhase } from './test-runner.js';
 export type { BatchTestResult, BatchTestSummary } from '../reporting/test-types.js';
 
 export interface BatchTestOptions {
-  packages: TestablePackage[];
+  packages: TargetPackage[];
   client?: OpenCloudClient;
   concurrency?: number;
   timeoutMs?: number;
@@ -89,7 +89,7 @@ export async function runBatchTestsAsync(
 }
 
 async function _runOneAsync(
-  pkg: TestablePackage,
+  pkg: TargetPackage,
   client: OpenCloudClient | undefined,
   timeoutMs: number,
   reporter: Reporter,
@@ -160,7 +160,7 @@ async function _runOneAsync(
  * Run a test with a single retry on transient failure.
  */
 async function _runWithRetryAsync(
-  pkg: TestablePackage,
+  pkg: TargetPackage,
   client: OpenCloudClient,
   timeoutMs: number,
   reporter: Reporter

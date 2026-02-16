@@ -8,6 +8,10 @@ export interface GroupedReporterOptions {
   verbose: boolean;
   /** Verb used in the header, e.g. "Testing", "Deploying". Default: "Processing" */
   actionVerb?: string;
+  /** Label for successful results, e.g. "Deployed". Default: "Passed" */
+  successLabel?: string;
+  /** Label for failed results, e.g. "DEPLOY FAILED". Default: "FAILED" */
+  failureLabel?: string;
 }
 
 /**
@@ -65,16 +69,19 @@ export class GroupedReporter extends BaseReporter {
 
     const showLogs = this._options.showLogs || !result.success;
     const duration = formatDurationMs(result.durationMs);
+    const successLabel = this._options.successLabel ?? 'Passed';
+    const failureLabel = this._options.failureLabel ?? 'FAILED';
+
     if (result.success) {
       console.log(
         `  ${OutputHelper.formatSuccess('✓')} ${OutputHelper.formatSuccess(
-          'Passed'
+          successLabel
         )} ${OutputHelper.formatDim(`(${duration})`)}`
       );
     } else {
       console.log(
         `  ${OutputHelper.formatError('✗')} ${OutputHelper.formatError(
-          'FAILED'
+          failureLabel
         )} ${OutputHelper.formatDim(`(${duration})`)}`
       );
     }

@@ -1,8 +1,16 @@
+import * as path from 'path';
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import {
+  type Reporter,
+  type LiveStateTracker,
+  CompositeReporter,
+  SimpleReporter,
+} from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { buildPlaceAsync } from '../../utils/build/build.js';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
+import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
 import { handleInitAsync } from './deploy-init.js';
 
 export interface DeployArgs extends NevermoreGlobalArgs {
@@ -127,21 +135,77 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       return;
     }
 
+    const cwd = process.cwd();
+    const packageName =
+      (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
     const targetName = args.target ?? 'test';
 
-    const buildResult = await buildPlaceAsync({
-      targetName,
-      outputFileName: args.publish ? 'publish.rbxl' : 'deploy.rbxl',
-      overrides: args,
-    });
+    const reporter = new CompositeReporter(
+      [packageName],
+      (state: LiveStateTracker) => {
+        const reporters: Reporter[] = [
+          new SimpleReporter(state, {
+            alwaysShowLogs: false,
+            successMessage: 'Deploy complete!',
+            failureMessage: 'Deploy failed!',
+          }),
+        ];
+        return reporters;
+      }
+    );
 
-    const { version } = await uploadPlaceAsync({ buildResult, args });
+    await reporter.startAsync();
 
-    if (args.publish) {
-      OutputHelper.info(`Published v${version} — live in game.`);
-    } else {
-      OutputHelper.info(`Saved v${version} — not yet live.`);
-      OutputHelper.hint('Use --publish to make it live in game.');
+    const startMs = Date.now();
+    reporter.onPackageStart(packageName);
+
+    try {
+      const buildResult = await buildPlaceAsync({
+        targetName,
+        outputFileName: args.publish ? 'publish.rbxl' : 'deploy.rbxl',
+        overrides: args,
+        reporter,
+        packageName,
+      });
+
+      const { version } = await uploadPlaceAsync({
+        buildResult,
+        args,
+        reporter,
+        packageName,
+      });
+
+      const durationMs = Date.now() - startMs;
+      const action = args.publish ? 'Published' : 'Saved';
+      reporter.onPackageResult({
+        packageName,
+        success: true,
+        logs: `${action} v${version}`,
+        durationMs,
+      });
+
+      if (args.publish) {
+        OutputHelper.info(`Published v${version} — live in game.`);
+      } else {
+        OutputHelper.info(`Saved v${version} — not yet live.`);
+        OutputHelper.hint('Use --publish to make it live in game.');
+      }
+    } catch (err) {
+      const durationMs = Date.now() - startMs;
+      const errorMessage = err instanceof Error ? err.message : String(err);
+
+      reporter.onPackageResult({
+        packageName,
+        success: false,
+        logs: '',
+        durationMs,
+        error: errorMessage,
+      });
+
+      await reporter.stopAsync();
+      throw err;
     }
+
+    await reporter.stopAsync();
   }
 }

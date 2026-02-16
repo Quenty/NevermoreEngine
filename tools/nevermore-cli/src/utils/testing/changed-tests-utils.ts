@@ -8,18 +8,21 @@ import {
   resolveDeployTarget,
 } from '../build/deploy-config.js';
 
-export interface TestablePackage {
+export interface TargetPackage {
   name: string;
   path: string;
   target: DeployTarget;
 }
 
+/** @deprecated Use {@link TargetPackage} instead. */
+export type TestablePackage = TargetPackage;
+
 /**
- * Discover all packages that have a deploy.nevermore.json with a "test" target.
+ * Discover all packages that have a deploy.nevermore.json with the given target.
  */
-export async function discoverAllTestablePackagesAsync(): Promise<
-  TestablePackage[]
-> {
+export async function discoverAllTargetPackagesAsync(
+  targetName: string
+): Promise<TargetPackage[]> {
   const { stdout } = await execa('pnpm', [
     'ls',
     '--json',
@@ -29,16 +32,17 @@ export async function discoverAllTestablePackagesAsync(): Promise<
   ]);
 
   const packages = JSON.parse(stdout) as Array<{ name: string; path: string }>;
-  return _filterTestableAsync(packages);
+  return _filterByTargetAsync(packages, targetName);
 }
 
 /**
- * Discover packages with test targets that have changed since `baseBranch`.
+ * Discover packages with the given target that have changed since `baseBranch`.
  * Uses pnpm's --filter "...[<base>]" to include transitive dependents.
  */
-export async function discoverChangedTestablePackagesAsync(
-  baseBranch: string
-): Promise<TestablePackage[]> {
+export async function discoverChangedTargetPackagesAsync(
+  baseBranch: string,
+  targetName: string
+): Promise<TargetPackage[]> {
   // pnpm --filter "...[origin/main]" lists changed packages + their dependents
   const { stdout } = await execa('pnpm', [
     'ls',
@@ -61,15 +65,35 @@ export async function discoverChangedTestablePackagesAsync(
     return [];
   }
 
-  return _filterTestableAsync(packages);
+  return _filterByTargetAsync(packages, targetName);
 }
 
-async function _filterTestableAsync(
-  packages: Array<{ name: string; path: string }>
-): Promise<TestablePackage[]> {
-  const results: TestablePackage[] = [];
+/**
+ * Discover all packages that have a deploy.nevermore.json with a "test" target.
+ */
+export async function discoverAllTestablePackagesAsync(): Promise<
+  TargetPackage[]
+> {
+  return discoverAllTargetPackagesAsync('test');
+}
+
+/**
+ * Discover packages with test targets that have changed since `baseBranch`.
+ * Uses pnpm's --filter "...[<base>]" to include transitive dependents.
+ */
+export async function discoverChangedTestablePackagesAsync(
+  baseBranch: string
+): Promise<TargetPackage[]> {
+  return discoverChangedTargetPackagesAsync(baseBranch, 'test');
+}
+
+async function _filterByTargetAsync(
+  packages: Array<{ name: string; path: string }>,
+  targetName: string
+): Promise<TargetPackage[]> {
+  const results: TargetPackage[] = [];
   const skippedNoConfig: string[] = [];
-  const skippedNoTestTarget: string[] = [];
+  const skippedNoTarget: string[] = [];
 
   for (const pkg of packages) {
     const configPath = resolveDeployConfigPath(pkg.path);
@@ -83,10 +107,10 @@ async function _filterTestableAsync(
 
     try {
       const config = await loadDeployConfigAsync(configPath);
-      const target = resolveDeployTarget(config, 'test');
+      const target = resolveDeployTarget(config, targetName);
       results.push({ name: pkg.name, path: pkg.path, target });
     } catch {
-      skippedNoTestTarget.push(pkg.name);
+      skippedNoTarget.push(pkg.name);
     }
   }
 
@@ -96,11 +120,13 @@ async function _filterTestableAsync(
     );
   }
 
-  if (skippedNoTestTarget.length > 0) {
+  if (skippedNoTarget.length > 0) {
     OutputHelper.verbose(
       `Skipped ${
-        skippedNoTestTarget.length
-      } packages without a "test" target: ${skippedNoTestTarget.join(', ')}`
+        skippedNoTarget.length
+      } packages without a "${targetName}" target: ${skippedNoTarget.join(
+        ', '
+      )}`
     );
   }
 

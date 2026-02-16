@@ -7,6 +7,10 @@ export interface SpinnerReporterOptions {
   showLogs: boolean;
   /** Verb used in the header, e.g. "Testing", "Deploying". Default: "Processing" */
   actionVerb?: string;
+  /** Label for successful results, e.g. "Deployed". Default: "Passed" */
+  successLabel?: string;
+  /** Label for failed results, e.g. "DEPLOY FAILED". Default: "FAILED" */
+  failureLabel?: string;
 }
 
 const SPINNER_FRAMES = ['◐', '◓', '◑', '◒'];
@@ -82,7 +86,9 @@ export class SpinnerReporter extends BaseReporter {
     const icon = result.success
       ? OutputHelper.formatSuccess('✓')
       : OutputHelper.formatError('✗');
-    const status = result.success ? 'Passed' : 'FAILED';
+    const status = result.success
+      ? (this._options.successLabel ?? 'Passed')
+      : (this._options.failureLabel ?? 'FAILED');
     const formatted = result.success
       ? OutputHelper.formatSuccess(status)
       : OutputHelper.formatError(status);
@@ -175,7 +181,7 @@ export class SpinnerReporter extends BaseReporter {
         }
         case 'passed': {
           const icon = OutputHelper.formatSuccess('✓');
-          const statusText = OutputHelper.formatSuccess('Passed');
+          const statusText = OutputHelper.formatSuccess(this._options.successLabel ?? 'Passed');
           line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
             20
           )} ${OutputHelper.formatDim(time)}`;
@@ -183,7 +189,7 @@ export class SpinnerReporter extends BaseReporter {
         }
         case 'failed': {
           const icon = OutputHelper.formatError('✗');
-          const statusText = OutputHelper.formatError('FAILED');
+          const statusText = OutputHelper.formatError(this._options.failureLabel ?? 'FAILED');
           line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
             20
           )} ${OutputHelper.formatDim(time)}`;

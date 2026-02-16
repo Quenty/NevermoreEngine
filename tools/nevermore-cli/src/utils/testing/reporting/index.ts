@@ -18,6 +18,7 @@ export {
   GroupedReporter,
   type GroupedReporterOptions,
   SummaryTableReporter,
+  type SummaryTableReporterOptions,
   JsonFileReporter,
   GithubCommentTableReporter,
   type GithubCommentColumn,

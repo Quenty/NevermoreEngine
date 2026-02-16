@@ -30,7 +30,10 @@ export {
   GroupedReporter,
   type GroupedReporterOptions,
 } from './grouped-reporter.js';
-export { SummaryTableReporter } from './summary-table-reporter.js';
+export {
+  SummaryTableReporter,
+  type SummaryTableReporterOptions,
+} from './summary-table-reporter.js';
 export { JsonFileReporter } from './json-file-reporter.js';
 export {
   GithubCommentTableReporter,
