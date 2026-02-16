@@ -1,27 +1,27 @@
 import * as fs from 'fs/promises';
 import {
-  type BatchTestResult,
-  type BatchTestSummary,
-} from '../../runner/batch-test-runner.js';
+  type PackageResult,
+  type BatchSummary,
+} from '../reporter.js';
 import {
-  type ITestStateTracker,
+  type IStateTracker,
   type PackageState,
-} from './test-state-tracker.js';
+} from './state-tracker.js';
 
 /**
- * Test state loaded from a previously-saved BatchTestSummary JSON file.
+ * Batch state loaded from a previously-saved BatchSummary JSON file.
  * All packages are already in their final passed/failed state.
  */
-export class LoadedTestStateTracker implements ITestStateTracker {
+export class LoadedStateTracker implements IStateTracker {
   private _packages: Map<string, PackageState>;
-  private _results: BatchTestResult[];
-  private _failures: BatchTestResult[];
+  private _results: PackageResult[];
+  private _failures: PackageResult[];
   private _startTimeMs: number;
 
   private constructor(
     packages: Map<string, PackageState>,
-    results: BatchTestResult[],
-    failures: BatchTestResult[],
+    results: PackageResult[],
+    failures: PackageResult[],
     startTimeMs: number
   ) {
     this._packages = packages;
@@ -32,15 +32,15 @@ export class LoadedTestStateTracker implements ITestStateTracker {
 
   static async fromFileAsync(
     filePath: string
-  ): Promise<LoadedTestStateTracker> {
+  ): Promise<LoadedStateTracker> {
     const raw = await fs.readFile(filePath, 'utf-8');
-    const summary = JSON.parse(raw) as BatchTestSummary;
-    return LoadedTestStateTracker.fromSummary(summary);
+    const summary = JSON.parse(raw) as BatchSummary;
+    return LoadedStateTracker.fromSummary(summary);
   }
 
-  static fromSummary(summary: BatchTestSummary): LoadedTestStateTracker {
+  static fromSummary(summary: BatchSummary): LoadedStateTracker {
     const packages = new Map<string, PackageState>();
-    const failures: BatchTestResult[] = [];
+    const failures: PackageResult[] = [];
 
     for (const result of summary.packages) {
       packages.set(result.packageName, {
@@ -57,7 +57,7 @@ export class LoadedTestStateTracker implements ITestStateTracker {
     // Set startTimeMs so that Date.now() - startTimeMs ≈ summary.durationMs
     const startTimeMs = Date.now() - summary.summary.durationMs;
 
-    return new LoadedTestStateTracker(
+    return new LoadedStateTracker(
       packages,
       summary.packages,
       failures,
@@ -85,11 +85,11 @@ export class LoadedTestStateTracker implements ITestStateTracker {
     return [...this._packages.values()];
   }
 
-  getResults(): BatchTestResult[] {
+  getResults(): PackageResult[] {
     return this._results;
   }
 
-  getFailures(): BatchTestResult[] {
+  getFailures(): PackageResult[] {
     return this._failures;
   }
 }

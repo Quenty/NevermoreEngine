@@ -1,22 +1,21 @@
-import { type BatchTestResult } from '../runner/batch-test-runner.js';
-import { type TestReporter, type TestPhase } from './base-test-reporter.js';
-import { LiveTestStateTracker } from './state/live-test-state-tracker.js';
+import { type PackageResult, type Reporter, type JobPhase } from './reporter.js';
+import { LiveStateTracker } from './state/live-state-tracker.js';
 
 /**
- * Owns a TestRunStateTracker and fans out every lifecycle hook
+ * Owns a LiveStateTracker and fans out every lifecycle hook
  * to an array of reporters created by a factory callback.
  *
  * State is always updated first, so reporters see current data.
  */
-export class CompositeTestReporter implements TestReporter {
-  private _state: LiveTestStateTracker;
-  private _reporters: TestReporter[];
+export class CompositeReporter implements Reporter {
+  private _state: LiveStateTracker;
+  private _reporters: Reporter[];
 
   constructor(
     packageNames: string[],
-    factory: (state: LiveTestStateTracker) => TestReporter[]
+    factory: (state: LiveStateTracker) => Reporter[]
   ) {
-    this._state = new LiveTestStateTracker(packageNames);
+    this._state = new LiveStateTracker(packageNames);
     this._reporters = factory(this._state);
   }
 
@@ -34,14 +33,14 @@ export class CompositeTestReporter implements TestReporter {
     }
   }
 
-  onPackagePhaseChange(packageName: string, phase: TestPhase): void {
+  onPackagePhaseChange(packageName: string, phase: JobPhase): void {
     this._state.onPackagePhaseChange(packageName, phase);
     for (const r of this._reporters) {
       r.onPackagePhaseChange(packageName, phase);
     }
   }
 
-  onPackageResult(result: BatchTestResult, bufferedOutput?: string[]): void {
+  onPackageResult(result: PackageResult, bufferedOutput?: string[]): void {
     this._state.onPackageResult(result, bufferedOutput);
     for (const r of this._reporters) {
       r.onPackageResult(result, bufferedOutput);

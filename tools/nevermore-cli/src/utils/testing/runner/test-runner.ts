@@ -9,7 +9,7 @@ import {
 } from '../../nevermore-cli-utils.js';
 import { buildPlaceAsync } from '../../build/build.js';
 import { uploadPlaceAsync } from '../../build/upload.js';
-import { type TestReporter } from '../reporting/base-test-reporter.js';
+import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { parseTestLogs } from '../test-log-parser.js';
 import { StudioBridge } from '@quenty/studio-bridge';
 
@@ -22,7 +22,7 @@ export interface SingleTestResult {
 
 export interface SingleTestOptions {
   packagePath: string;
-  reporter: TestReporter;
+  reporter: Reporter;
   packageName: string;
   timeoutMs?: number;
   /** Luau code to execute directly, bypassing the configured scriptTemplate. */

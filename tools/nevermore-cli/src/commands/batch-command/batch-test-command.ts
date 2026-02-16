@@ -10,13 +10,15 @@ import {
 } from '../../utils/testing/changed-tests-utils.js';
 import { runBatchTestsAsync } from '../../utils/testing/runner/batch-test-runner.js';
 import {
-  type TestReporter,
-  CompositeTestReporter,
-  GithubCommentTestReporter,
-  GroupedTestReporter,
-  JsonFileTestReporter,
-  SpinnerTestReporter,
-  SummaryTableTestReporter,
+  type Reporter,
+  type LiveStateTracker,
+  CompositeReporter,
+  GithubCommentTableReporter,
+  GroupedReporter,
+  JsonFileReporter,
+  SpinnerReporter,
+  SummaryTableReporter,
+  createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
 import { isCI } from '../../utils/nevermore-cli-utils.js';
 
@@ -116,19 +118,23 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
 
-  const reporter = new CompositeTestReporter(packageNames, (state) => {
-    const reporters: TestReporter[] = [
+  const reporter = new CompositeReporter(packageNames, (state: LiveStateTracker) => {
+    const reporters: Reporter[] = [
       isGrouped
-        ? new GroupedTestReporter(state, {
+        ? new GroupedReporter(state, {
             showLogs: args.logs ?? false,
             verbose: args.verbose,
+            actionVerb: 'Testing',
           })
-        : new SpinnerTestReporter(state, { showLogs: args.logs ?? false }),
-      new SummaryTableTestReporter(state),
-      new GithubCommentTestReporter(state, concurrency),
+        : new SpinnerReporter(state, {
+            showLogs: args.logs ?? false,
+            actionVerb: 'Testing',
+          }),
+      new SummaryTableReporter(state),
+      new GithubCommentTableReporter(state, createTestCommentConfig(), concurrency),
     ];
     if (args.output) {
-      reporters.push(new JsonFileTestReporter(state, args.output));
+      reporters.push(new JsonFileReporter(state, args.output));
     }
     return reporters;
   });

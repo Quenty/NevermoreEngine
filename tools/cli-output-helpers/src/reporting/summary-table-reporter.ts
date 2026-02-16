@@ -1,16 +1,16 @@
-import { OutputHelper } from '@quenty/cli-output-helpers';
-import { formatDurationMs } from '../../nevermore-cli-utils.js';
-import { BaseTestReporter } from './base-test-reporter.js';
-import { type ITestStateTracker } from './state/test-state-tracker.js';
+import { OutputHelper } from '../outputHelper.js';
+import { formatDurationMs } from '../cli-utils.js';
+import { BaseReporter } from './reporter.js';
+import { type IStateTracker } from './state/state-tracker.js';
 
 /**
- * Prints a final summary table of all test results when tests complete.
+ * Prints a final summary table of all results when jobs complete.
  * All output happens in stopAsync().
  */
-export class SummaryTableTestReporter extends BaseTestReporter {
-  private _state: ITestStateTracker;
+export class SummaryTableReporter extends BaseReporter {
+  private _state: IStateTracker;
 
-  constructor(state: ITestStateTracker) {
+  constructor(state: IStateTracker) {
     super();
     this._state = state;
   }

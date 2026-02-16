@@ -11,9 +11,10 @@ import {
   runSingleLocalTestAsync,
 } from '../../utils/testing/runner/test-runner.js';
 import {
-  CompositeTestReporter,
-  SimpleTestReporter,
-  SpinnerTestReporter,
+  type LiveStateTracker,
+  CompositeReporter,
+  SimpleReporter,
+  SpinnerReporter,
 } from '../../utils/testing/reporting/index.js';
 
 export interface TestProjectArgs extends NevermoreGlobalArgs {
@@ -77,10 +78,17 @@ export class TestProjectCommand<T>
       const showLogs = args.logs ?? false;
       const useSpinner = process.stdout.isTTY && !args.verbose;
 
-      const reporter = new CompositeTestReporter([packageName], (state) => [
+      const reporter = new CompositeReporter([packageName], (state: LiveStateTracker) => [
         useSpinner
-          ? new SpinnerTestReporter(state, { showLogs })
-          : new SimpleTestReporter(state, { alwaysShowLogs: showLogs }),
+          ? new SpinnerReporter(state, {
+              showLogs,
+              actionVerb: 'Testing',
+            })
+          : new SimpleReporter(state, {
+              alwaysShowLogs: showLogs,
+              successMessage: 'Tests passed!',
+              failureMessage: 'Tests failed! See output above for more information.',
+            }),
       ]);
       await reporter.startAsync();
 
@@ -111,7 +119,6 @@ export class TestProjectCommand<T>
 
       reporter.onPackageResult({
         packageName,
-        placeId: 0,
         success: result.success,
         logs: result.logs,
         durationMs: 0,

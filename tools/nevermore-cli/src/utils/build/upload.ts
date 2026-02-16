@@ -3,13 +3,13 @@ import { type DeployTarget } from './deploy-config.js';
 import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../open-cloud/rate-limiter.js';
 import { type BuildPlaceResult } from './build.js';
-import { type TestReporter } from '../testing/reporting/base-test-reporter.js';
+import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
 export interface UploadPlaceOptions {
   buildResult: BuildPlaceResult;
   args: CredentialArgs & { publish?: boolean };
   client?: OpenCloudClient;
-  reporter?: TestReporter;
+  reporter?: Reporter;
   packageName?: string;
 }
 

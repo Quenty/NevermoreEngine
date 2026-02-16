@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cli-output-helpers",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Helpers to generate Nevermore package and game templates",
   "type": "module",
   "keywords": [
@@ -9,6 +9,17 @@
     "CLI"
   ],
   "main": "dist/outputHelper.js",
+  "exports": {
+    ".": "./dist/outputHelper.js",
+    "./reporting": "./dist/reporting/index.js",
+    "./cli-utils": "./dist/cli-utils.js"
+  },
+  "typesVersions": {
+    "*": {
+      "reporting": ["dist/reporting/index.d.ts"],
+      "cli-utils": ["dist/cli-utils.d.ts"]
+    }
+  },
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },

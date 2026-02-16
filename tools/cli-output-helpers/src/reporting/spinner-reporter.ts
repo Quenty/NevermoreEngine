@@ -1,27 +1,28 @@
-import { OutputHelper } from '@quenty/cli-output-helpers';
-import { type BatchTestResult } from '../runner/batch-test-runner.js';
-import { formatDurationMs } from '../../nevermore-cli-utils.js';
-import { BaseTestReporter } from './base-test-reporter.js';
-import { type ITestStateTracker } from './state/test-state-tracker.js';
+import { OutputHelper } from '../outputHelper.js';
+import { formatDurationMs } from '../cli-utils.js';
+import { type PackageResult, BaseReporter } from './reporter.js';
+import { type IStateTracker } from './state/state-tracker.js';
 
-export interface SpinnerTestReporterOptions {
+export interface SpinnerReporterOptions {
   showLogs: boolean;
+  /** Verb used in the header, e.g. "Testing", "Deploying". Default: "Processing" */
+  actionVerb?: string;
 }
 
 const SPINNER_FRAMES = ['◐', '◓', '◑', '◒'];
 
 /**
- * TTY spinner rendering for batch test progress.
- * Reads all state from TestStateReader; re-renders on a timer interval.
+ * TTY spinner rendering for batch job progress.
+ * Reads all state from IStateTracker; re-renders on a timer interval.
  */
-export class SpinnerTestReporter extends BaseTestReporter {
-  private _state: ITestStateTracker;
-  private _options: SpinnerTestReporterOptions;
+export class SpinnerReporter extends BaseReporter {
+  private _state: IStateTracker;
+  private _options: SpinnerReporterOptions;
   private _renderedLineCount: number = 0;
   private _renderInterval?: ReturnType<typeof setInterval>;
   private _spinnerFrame: number = 0;
 
-  constructor(state: ITestStateTracker, options: SpinnerTestReporterOptions) {
+  constructor(state: IStateTracker, options: SpinnerReporterOptions) {
     super();
     this._state = state;
     this._options = options;
@@ -29,9 +30,10 @@ export class SpinnerTestReporter extends BaseTestReporter {
 
   override async startAsync(): Promise<void> {
     const count = this._state.total;
+    const verb = this._options.actionVerb ?? 'Processing';
     console.log(
       OutputHelper.formatInfo(
-        `Testing ${count} ${count === 1 ? 'package' : 'packages'}\n`
+        `${verb} ${count} ${count === 1 ? 'package' : 'packages'}\n`
       )
     );
     process.stdout.write('\x1b[?25l');
@@ -76,7 +78,7 @@ export class SpinnerTestReporter extends BaseTestReporter {
     }
   }
 
-  private _printResultLogs(result: BatchTestResult): void {
+  private _printResultLogs(result: PackageResult): void {
     const icon = result.success
       ? OutputHelper.formatSuccess('✓')
       : OutputHelper.formatError('✗');

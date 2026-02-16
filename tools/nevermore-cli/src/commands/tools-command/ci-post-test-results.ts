@@ -1,8 +1,11 @@
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { GithubCommentTestReporter } from '../../utils/testing/reporting/github-comment-test-reporter.js';
-import { LoadedTestStateTracker } from '../../utils/testing/reporting/state/loaded-test-state-tracker.js';
+import {
+  GithubCommentTableReporter,
+  LoadedStateTracker,
+  createTestCommentConfig,
+} from '../../utils/testing/reporting/index.js';
 
 interface CiPostTestResultsArgs extends NevermoreGlobalArgs {
   input: string;
@@ -23,12 +26,13 @@ export const ciPostTestResultsCommand: CommandModule<
     });
   },
   handler: async (args) => {
-    const reporter = new GithubCommentTestReporter();
+    const testCommentConfig = createTestCommentConfig();
+    const reporter = new GithubCommentTableReporter(undefined, testCommentConfig);
 
     try {
-      let state: LoadedTestStateTracker;
+      let state: LoadedStateTracker;
       try {
-        state = await LoadedTestStateTracker.fromFileAsync(args.input);
+        state = await LoadedStateTracker.fromFileAsync(args.input);
       } catch {
         OutputHelper.warn(`Results file not found: ${args.input}`);
         OutputHelper.info('Posting failure comment to PR...');
@@ -39,7 +43,7 @@ export const ciPostTestResultsCommand: CommandModule<
         return;
       }
 
-      const resultsReporter = new GithubCommentTestReporter(state, 1);
+      const resultsReporter = new GithubCommentTableReporter(state, testCommentConfig, 1);
       await resultsReporter.stopAsync();
     } catch (err) {
       OutputHelper.error(err instanceof Error ? err.message : String(err));

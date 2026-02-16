@@ -1,26 +1,22 @@
-import { type BatchTestResult } from '../../runner/batch-test-runner.js';
-import { BaseTestReporter, type TestPhase } from '../base-test-reporter.js';
-import {
-  type ITestStateTracker,
-  type PackageState,
-} from './test-state-tracker.js';
+import { type PackageResult, type JobPhase, BaseReporter } from '../reporter.js';
+import { type IStateTracker, type PackageState } from './state-tracker.js';
 
-export type { PackageState } from './test-state-tracker.js';
+export type { PackageState } from './state-tracker.js';
 
 /**
- * Centralized state container for a live test run.
- * Extends BaseTestReporter to receive lifecycle hooks and mutate state.
- * Reporters read from it via the TestStateReader interface.
+ * Centralized state container for a live batch run.
+ * Extends BaseReporter to receive lifecycle hooks and mutate state.
+ * Reporters read from it via the IStateTracker interface.
  */
-export class LiveTestStateTracker
-  extends BaseTestReporter
-  implements ITestStateTracker
+export class LiveStateTracker
+  extends BaseReporter
+  implements IStateTracker
 {
   private _packages: Map<string, PackageState>;
   private _startTimeMs = 0;
   private _completed = 0;
-  private _failures: BatchTestResult[] = [];
-  private _allResults: BatchTestResult[] = [];
+  private _failures: PackageResult[] = [];
+  private _allResults: PackageResult[] = [];
 
   constructor(packageNames: string[]) {
     super();
@@ -50,11 +46,11 @@ export class LiveTestStateTracker
     return [...this._packages.values()];
   }
 
-  getResults(): BatchTestResult[] {
+  getResults(): PackageResult[] {
     return this._allResults;
   }
 
-  getFailures(): BatchTestResult[] {
+  getFailures(): PackageResult[] {
     return this._failures;
   }
 
@@ -69,14 +65,14 @@ export class LiveTestStateTracker
     state.startMs = Date.now();
   }
 
-  override onPackagePhaseChange(name: string, phase: TestPhase): void {
+  override onPackagePhaseChange(name: string, phase: JobPhase): void {
     const state = this._packages.get(name);
     if (!state) return;
     state.status = phase;
   }
 
   override onPackageResult(
-    result: BatchTestResult,
+    result: PackageResult,
     bufferedOutput?: string[]
   ): void {
     const state = this._packages.get(result.packageName);

@@ -1,24 +1,25 @@
-import { OutputHelper } from '@quenty/cli-output-helpers';
-import { type BatchTestResult } from '../runner/batch-test-runner.js';
-import { formatDurationMs, isCI } from '../../nevermore-cli-utils.js';
-import { BaseTestReporter } from './base-test-reporter.js';
-import { type ITestStateTracker } from './state/test-state-tracker.js';
+import { OutputHelper } from '../outputHelper.js';
+import { formatDurationMs, isCI } from '../cli-utils.js';
+import { type PackageResult, BaseReporter } from './reporter.js';
+import { type IStateTracker } from './state/state-tracker.js';
 
-export interface GroupedTestReporterOptions {
+export interface GroupedReporterOptions {
   showLogs: boolean;
   verbose: boolean;
+  /** Verb used in the header, e.g. "Testing", "Deploying". Default: "Processing" */
+  actionVerb?: string;
 }
 
 /**
- * CI / verbose / non-TTY output for batch test progress.
+ * CI / verbose / non-TTY output for batch job progress.
  * Prints grouped result blocks as each package completes.
  */
-export class GroupedTestReporter extends BaseTestReporter {
-  private _state: ITestStateTracker;
-  private _options: GroupedTestReporterOptions;
+export class GroupedReporter extends BaseReporter {
+  private _state: IStateTracker;
+  private _options: GroupedReporterOptions;
   private _isCI: boolean;
 
-  constructor(state: ITestStateTracker, options: GroupedTestReporterOptions) {
+  constructor(state: IStateTracker, options: GroupedReporterOptions) {
     super();
     this._state = state;
     this._options = options;
@@ -26,7 +27,8 @@ export class GroupedTestReporter extends BaseTestReporter {
   }
 
   override async startAsync(): Promise<void> {
-    OutputHelper.info(`Testing ${this._state.total} packages`);
+    const verb = this._options.actionVerb ?? 'Processing';
+    OutputHelper.info(`${verb} ${this._state.total} packages`);
   }
 
   override onPackageStart(name: string): void {
@@ -36,14 +38,14 @@ export class GroupedTestReporter extends BaseTestReporter {
   }
 
   override onPackageResult(
-    result: BatchTestResult,
+    result: PackageResult,
     bufferedOutput?: string[]
   ): void {
     this._printGroupedResult(result, bufferedOutput);
   }
 
   private _printGroupedResult(
-    result: BatchTestResult,
+    result: PackageResult,
     bufferedOutput?: string[]
   ): void {
     const headerWidth = 50;

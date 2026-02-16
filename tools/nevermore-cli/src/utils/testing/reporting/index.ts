@@ -1,23 +1,39 @@
+// Re-export generic reporting framework
 export {
-  BaseTestReporter,
-  type TestReporter,
-  type TestPhase,
-  type BatchTestResult,
-  type PackageTestStatus,
-} from './base-test-reporter.js';
-export {
-  type ITestStateTracker as TestStateReader,
+  BaseReporter,
+  type Reporter,
+  type JobPhase,
+  type PackageStatus,
+  type PackageResult,
+  type BatchSummary,
+  type IStateTracker,
   type PackageState,
-} from './state/test-state-tracker.js';
-export { LiveTestStateTracker as TestRunStateTracker } from './state/live-test-state-tracker.js';
-export { LoadedTestStateTracker as LoadedTestState } from './state/loaded-test-state-tracker.js';
-export { CompositeTestReporter } from './composite-test-reporter.js';
-export { SimpleTestReporter } from './simple-test-reporter.js';
-export { SpinnerTestReporter } from './spinner-test-reporter.js';
+  LiveStateTracker,
+  LoadedStateTracker,
+  CompositeReporter,
+  SimpleReporter,
+  type SimpleReporterOptions,
+  SpinnerReporter,
+  type SpinnerReporterOptions,
+  GroupedReporter,
+  type GroupedReporterOptions,
+  SummaryTableReporter,
+  JsonFileReporter,
+  GithubCommentTableReporter,
+  type GithubCommentColumn,
+  type GithubCommentTableConfig,
+  summarizeError,
+} from '@quenty/cli-output-helpers/reporting';
+
+// Test-specific types
+export { type BatchTestResult, type BatchTestSummary } from './test-types.js';
+
+// Test-specific GitHub columns and config
+export { createTestColumns, createTestCommentConfig } from './test-github-columns.js';
+
+// Backward-compatible aliases
 export {
-  GroupedTestReporter,
-  type GroupedTestReporterOptions,
-} from './grouped-test-reporter.js';
-export { GithubCommentTestReporter } from './github-comment-test-reporter.js';
-export { SummaryTableTestReporter } from './summary-table-test-reporter.js';
-export { JsonFileTestReporter } from './json-file-test-reporter.js';
+  type Reporter as TestReporter,
+  type JobPhase as TestPhase,
+  type PackageStatus as PackageTestStatus,
+} from '@quenty/cli-output-helpers/reporting';

@@ -1,17 +1,17 @@
 import * as fs from 'fs/promises';
-import { OutputHelper } from '@quenty/cli-output-helpers';
-import { BaseTestReporter } from './base-test-reporter.js';
-import { type ITestStateTracker } from './state/test-state-tracker.js';
+import { OutputHelper } from '../outputHelper.js';
+import { BaseReporter } from './reporter.js';
+import { type IStateTracker } from './state/state-tracker.js';
 
 /**
- * Writes a JSON results file when tests complete.
- * Output matches the BatchTestSummary shape for backward compatibility.
+ * Writes a JSON results file when jobs complete.
+ * Output matches the BatchSummary shape for backward compatibility.
  */
-export class JsonFileTestReporter extends BaseTestReporter {
-  private _state: ITestStateTracker;
+export class JsonFileReporter extends BaseReporter {
+  private _state: IStateTracker;
   private _outputPath: string;
 
-  constructor(state: ITestStateTracker, outputPath: string) {
+  constructor(state: IStateTracker, outputPath: string) {
     super();
     this._state = state;
     this._outputPath = outputPath;

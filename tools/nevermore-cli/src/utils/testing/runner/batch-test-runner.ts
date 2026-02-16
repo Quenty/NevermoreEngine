@@ -1,4 +1,5 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { OpenCloudClient } from '../../open-cloud/open-cloud-client.js';
 import { TestablePackage } from '../changed-tests-utils.js';
 import {
@@ -6,35 +7,20 @@ import {
   runSingleLocalTestAsync,
   type SingleTestResult,
 } from './test-runner.js';
-import { type TestReporter } from '../reporting/base-test-reporter.js';
+import {
+  type BatchTestResult,
+  type BatchTestSummary,
+} from '../reporting/test-types.js';
 
 export type { TestPhase } from './test-runner.js';
-
-export interface BatchTestResult {
-  packageName: string;
-  placeId: number;
-  success: boolean;
-  logs: string;
-  durationMs: number;
-  error?: string;
-}
-
-export interface BatchTestSummary {
-  packages: BatchTestResult[];
-  summary: {
-    total: number;
-    passed: number;
-    failed: number;
-    durationMs: number;
-  };
-}
+export type { BatchTestResult, BatchTestSummary } from '../reporting/test-types.js';
 
 export interface BatchTestOptions {
   packages: TestablePackage[];
   client?: OpenCloudClient;
   concurrency?: number;
   timeoutMs?: number;
-  reporter: TestReporter;
+  reporter: Reporter;
   bufferOutput?: boolean;
 }
 
@@ -106,7 +92,7 @@ async function _runOneAsync(
   pkg: TestablePackage,
   client: OpenCloudClient | undefined,
   timeoutMs: number,
-  reporter: TestReporter,
+  reporter: Reporter,
   bufferOutput: boolean
 ): Promise<BatchTestResult> {
   reporter.onPackageStart(pkg.name);
@@ -177,7 +163,7 @@ async function _runWithRetryAsync(
   pkg: TestablePackage,
   client: OpenCloudClient,
   timeoutMs: number,
-  reporter: TestReporter
+  reporter: Reporter
 ): Promise<SingleTestResult> {
   const opts = {
     packagePath: pkg.path,

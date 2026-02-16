@@ -1,83 +1,45 @@
 import * as fsSync from 'fs';
-import { OutputHelper } from '@quenty/cli-output-helpers';
-import { type BatchTestResult } from '../runner/batch-test-runner.js';
-import { formatDurationMs, isCI } from '../../nevermore-cli-utils.js';
+import { OutputHelper } from '../outputHelper.js';
+import { formatDurationMs, isCI } from '../cli-utils.js';
 import {
-  BaseTestReporter,
-  type PackageTestStatus,
-} from './base-test-reporter.js';
+  type PackageResult,
+  type PackageStatus,
+  BaseReporter,
+} from './reporter.js';
 import {
-  type ITestStateTracker,
+  type IStateTracker,
   type PackageState,
-} from './state/test-state-tracker.js';
+} from './state/state-tracker.js';
 
-// ── Comment formatting ──────────────────────────────────────────────────────
+// ── Public types ────────────────────────────────────────────────────────────
 
-const COMMENT_MARKER = '<!-- nevermore-test-results -->';
-
-interface TestCommentRow {
-  packageName: string;
-  status: string;
-  error: string;
-  placeId: number;
+/** A column to render in the GitHub comment table. */
+export interface GithubCommentColumn {
+  header: string;
+  render(pkg: PackageState): string;
+  /** 'auto' = hidden when all cells are empty. Default: 'always' */
+  visibility?: 'always' | 'auto';
 }
 
-function _formatTestComment(rows: TestCommentRow[], footer: string): string {
-  const hasErrors = rows.some((r) => r.error.length > 0);
-  const actionsRunUrl = _getActionsRunUrl();
-
-  let body = COMMENT_MARKER + '\n';
-  body += '## Test Results\n\n';
-
-  if (hasErrors) {
-    body += '| Package | Status | Error | Try it |\n';
-    body += '|---------|--------|-------|--------|\n';
-  } else {
-    body += '| Package | Status | Try it |\n';
-    body += '|---------|--------|--------|\n';
-  }
-
-  for (const row of rows) {
-    const link = `[Open in Roblox](https://www.roblox.com/games/${row.placeId})`;
-
-    if (hasErrors) {
-      body += `| ${row.packageName} | ${row.status} | ${row.error} | ${link} |\n`;
-    } else {
-      body += `| ${row.packageName} | ${row.status} | ${link} |\n`;
-    }
-  }
-
-  body += '\n';
-  body += footer;
-
-  if (actionsRunUrl) {
-    body += ` · [View logs](${actionsRunUrl})`;
-  }
-
-  body += '\n';
-  return body;
+/** Configuration for the GitHub comment table reporter. */
+export interface GithubCommentTableConfig {
+  /** Heading displayed above the table, e.g. "Test Results". */
+  heading: string;
+  /** HTML comment marker for finding/updating existing comments. */
+  commentMarker: string;
+  /** Extra columns beyond the built-in Package + Status columns. */
+  extraColumns?: GithubCommentColumn[];
+  /** Heading for error-only comment (when setError is used). */
+  errorHeading?: string;
 }
 
-function _formatResultStatus(pkg: BatchTestResult): string {
-  const duration = formatDurationMs(pkg.durationMs);
-  return pkg.success
-    ? `✅ Passed (${duration})`
-    : `❌ **Failed** (${duration})`;
-}
+// ── Error summarization (exported utility) ──────────────────────────────────
 
-function _formatErrorSummary(pkg: BatchTestResult): string {
-  if (pkg.success) {
-    return '';
-  }
-
-  if (pkg.error) {
-    return _summarizeError(pkg.error);
-  }
-
-  return 'Test failed';
-}
-
-function _summarizeError(error: string): string {
+/**
+ * Summarize an error string for display in compact contexts (tables, etc.).
+ * Parses JSON API error bodies and truncates long messages.
+ */
+export function summarizeError(error: string): string {
   const firstLine = error.split('\n')[0];
 
   // Try to extract JSON error body from API responses
@@ -110,6 +72,69 @@ function _extractJsonMessage(text: string): string | undefined {
     // Not JSON
   }
   return undefined;
+}
+
+// ── Comment formatting ──────────────────────────────────────────────────────
+
+interface CommentRow {
+  packageName: string;
+  status: string;
+  extraCells: string[];
+}
+
+function _formatComment(
+  config: GithubCommentTableConfig,
+  rows: CommentRow[],
+  extraColumns: GithubCommentColumn[],
+  footer: string
+): string {
+  // Determine which auto-visibility columns have any content
+  const visibleExtras = extraColumns.filter((col) => {
+    if (col.visibility === 'auto') {
+      return rows.some((r) => {
+        const idx = extraColumns.indexOf(col);
+        return r.extraCells[idx].length > 0;
+      });
+    }
+    return true;
+  });
+
+  const visibleIndices = visibleExtras.map((col) => extraColumns.indexOf(col));
+  const actionsRunUrl = _getActionsRunUrl();
+
+  let body = config.commentMarker + '\n';
+  body += `## ${config.heading}\n\n`;
+
+  // Header row
+  const headers = ['Package', 'Status', ...visibleExtras.map((c) => c.header)];
+  body += '| ' + headers.join(' | ') + ' |\n';
+  body += '|' + headers.map(() => '--------').join('|') + '|\n';
+
+  // Data rows
+  for (const row of rows) {
+    const cells = [row.packageName, row.status];
+    for (const idx of visibleIndices) {
+      cells.push(row.extraCells[idx]);
+    }
+    body += '| ' + cells.join(' | ') + ' |\n';
+  }
+
+  body += '\n';
+  body += footer;
+
+  if (actionsRunUrl) {
+    body += ` · [View logs](${actionsRunUrl})`;
+  }
+
+  body += '\n';
+  return body;
+}
+
+function _formatResultStatus(pkg: PackageResult): string {
+  const duration = formatDurationMs(pkg.durationMs);
+  return pkg.success
+    ? `✅ Passed (${duration})`
+    : `❌ **Failed** (${duration})`;
 }
 
 function _getActionsRunUrl(): string | undefined {
@@ -175,7 +200,10 @@ function _resolveGitHubContext(): GitHubContext | undefined {
   return { token, owner, repo, prNumber };
 }
 
-async function _postOrUpdateCommentAsync(body: string): Promise<boolean> {
+async function _postOrUpdateCommentAsync(
+  commentMarker: string,
+  body: string
+): Promise<boolean> {
   const ctx = _resolveGitHubContext();
   if (!ctx) {
     OutputHelper.warn(
@@ -208,7 +236,7 @@ async function _postOrUpdateCommentAsync(body: string): Promise<boolean> {
     id: number;
     body: string;
   }>;
-  const existing = comments.find((c) => c.body.includes(COMMENT_MARKER));
+  const existing = comments.find((c) => c.body.includes(commentMarker));
 
   if (existing) {
     const updateResponse = await fetch(
@@ -227,7 +255,7 @@ async function _postOrUpdateCommentAsync(body: string): Promise<boolean> {
       return false;
     }
 
-    OutputHelper.info('Updated PR comment with test results.');
+    OutputHelper.info('Updated PR comment with results.');
   } else {
     const createResponse = await fetch(
       `${apiBase}/issues/${ctx.prNumber}/comments`,
@@ -245,7 +273,7 @@ async function _postOrUpdateCommentAsync(body: string): Promise<boolean> {
       return false;
     }
 
-    OutputHelper.info('Posted PR comment with test results.');
+    OutputHelper.info('Posted PR comment with results.');
   }
 
   return true;
@@ -254,15 +282,17 @@ async function _postOrUpdateCommentAsync(body: string): Promise<boolean> {
 // ── Reporter ────────────────────────────────────────────────────────────────
 
 /**
- * Maintains a live PR comment that updates as tests progress.
+ * Maintains a live PR comment that updates as jobs progress.
  * The table grid is stable — same rows throughout, only status changes.
  * Updates are throttled to avoid GitHub API rate limits.
  *
- * Also used for post-hoc posting from a LoadedTestState (call stopAsync directly).
+ * Also used for post-hoc posting from a LoadedStateTracker (call stopAsync directly).
  */
-export class GithubCommentTestReporter extends BaseTestReporter {
-  private _state: ITestStateTracker | undefined;
+export class GithubCommentTableReporter extends BaseReporter {
+  private _state: IStateTracker | undefined;
+  private _config: GithubCommentTableConfig;
   private _concurrency: number;
+  private _extraColumns: GithubCommentColumn[];
   private _updateTimer: ReturnType<typeof setTimeout> | undefined;
   private _updatePending = false;
   private _disposed = false;
@@ -270,10 +300,16 @@ export class GithubCommentTestReporter extends BaseTestReporter {
 
   private static readonly THROTTLE_MS = 10_000;
 
-  constructor(state?: ITestStateTracker, concurrency?: number) {
+  constructor(
+    state: IStateTracker | undefined,
+    config: GithubCommentTableConfig,
+    concurrency?: number
+  ) {
     super();
     this._state = state;
+    this._config = config;
     this._concurrency = concurrency ?? 1;
+    this._extraColumns = config.extraColumns ?? [];
   }
 
   /**
@@ -295,12 +331,12 @@ export class GithubCommentTestReporter extends BaseTestReporter {
 
   override onPackagePhaseChange(
     _name: string,
-    _phase: PackageTestStatus
+    _phase: PackageStatus
   ): void {
     this._scheduleUpdate();
   }
 
-  override onPackageResult(_result: BatchTestResult): void {
+  override onPackageResult(_result: PackageResult): void {
     this._scheduleUpdate();
   }
 
@@ -313,7 +349,10 @@ export class GithubCommentTestReporter extends BaseTestReporter {
     if (!_isGithubCommentEnabled()) return;
 
     if (this._error) {
-      await _postOrUpdateCommentAsync(this._formatErrorBody());
+      await _postOrUpdateCommentAsync(
+        this._config.commentMarker,
+        this._formatErrorBody()
+      );
     } else if (this._state) {
       await this._postUpdateAsync();
     }
@@ -334,22 +373,23 @@ export class GithubCommentTestReporter extends BaseTestReporter {
         this._updatePending = false;
         this._scheduleUpdate();
       }
-    }, GithubCommentTestReporter.THROTTLE_MS);
+    }, GithubCommentTableReporter.THROTTLE_MS);
     this._updateTimer.unref();
   }
 
   private async _postUpdateAsync(): Promise<void> {
     if (!this._state) return;
     const body = this._formatBody();
-    await _postOrUpdateCommentAsync(body);
+    await _postOrUpdateCommentAsync(this._config.commentMarker, body);
   }
 
   private _formatErrorBody(): string {
     const actionsRunUrl = _getActionsRunUrl();
+    const heading = this._config.errorHeading ?? this._config.heading;
 
-    let body = COMMENT_MARKER + '\n';
-    body += '## Test Results\n\n';
-    body += `❌ **Test run failed before producing results**\n\n`;
+    let body = this._config.commentMarker + '\n';
+    body += `## ${heading}\n\n`;
+    body += `❌ **Run failed before producing results**\n\n`;
     body += `\`\`\`\n${this._error}\n\`\`\`\n`;
 
     if (actionsRunUrl) {
@@ -393,9 +433,8 @@ export class GithubCommentTestReporter extends BaseTestReporter {
     let pendingIndex = 0;
     const totalPending = packages.filter((p) => p.status === 'pending').length;
 
-    const rows: TestCommentRow[] = packages.map((pkg: PackageState) => {
+    const rows: CommentRow[] = packages.map((pkg: PackageState) => {
       let statusText: string;
-      let error = '';
 
       switch (pkg.status) {
         case 'pending':
@@ -404,18 +443,18 @@ export class GithubCommentTestReporter extends BaseTestReporter {
         case 'passed':
         case 'failed':
           statusText = _formatResultStatus(pkg.result!);
-          error = _formatErrorSummary(pkg.result!);
           break;
         default:
           statusText = _formatRunningStatus(pkg.status);
           break;
       }
 
+      const extraCells = this._extraColumns.map((col) => col.render(pkg));
+
       return {
         packageName: pkg.name,
         status: statusText,
-        error,
-        placeId: pkg.result?.placeId ?? 0,
+        extraCells,
       };
     });
 
@@ -446,7 +485,7 @@ export class GithubCommentTestReporter extends BaseTestReporter {
       footer = `**${packages.length} packages** · ${parts.join(', ')}`;
     }
 
-    return _formatTestComment(rows, footer);
+    return _formatComment(this._config, rows, this._extraColumns, footer);
   }
 }
 
@@ -454,7 +493,7 @@ function _isGithubCommentEnabled(): boolean {
   return isCI() && !!process.env.GITHUB_TOKEN;
 }
 
-function _formatRunningStatus(phase: PackageTestStatus): string {
+function _formatRunningStatus(phase: PackageStatus): string {
   switch (phase) {
     case 'building':
       return '🔨 Building...';

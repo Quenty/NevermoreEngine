@@ -8,7 +8,7 @@ import {
   resolveDeployTarget,
   resolveDeployConfigPath,
 } from './deploy-config.js';
-import { type TestReporter } from '../testing/reporting/base-test-reporter.js';
+import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
 export interface DeployOverrides {
   universeId?: number;
@@ -22,7 +22,7 @@ export interface BuildPlaceOptions {
   outputFileName?: string;
   packagePath?: string;
   overrides?: DeployOverrides;
-  reporter?: TestReporter;
+  reporter?: Reporter;
   packageName?: string;
 }
 
