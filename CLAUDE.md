@@ -22,6 +22,14 @@ Tools are managed via **Aftman** (`aftman.toml`):
 
 Package management: **pnpm** (monorepo workspaces in `src/*` and `tools/*`), versioned independently via **Lerna** with conventional commits.
 
+## Always update CLAUDE.md
+
+* **Self-improving**: Update CLAUDE.md whenever you learn something new, but think hard about it and synthesize it.
+* **Readability**: CLAUDE.md is for humans + AI, it should be readable to both. Imagine you are a human scanning this document. It must be scannable to both human + AI.
+* **Docs folder first**: Prefer to update docs folder and link to docs as needed
+* **Build tools**: Build tools when needed, prioritize iteration speed via good tooling
+* **Interfaces matter most**: Interfaces and hierarchy matter most
+
 ## Common Commands
 
 Always use `npm run` to invoke toolchain commands rather than calling tools directly.
@@ -55,6 +63,7 @@ Each package under `src/` has a `node_modules/` directory that is symlinked and 
 
 CLI tools under `tools/` are TypeScript ESM packages using yargs for command parsing.
 
+- **No header comments**: Using separating comments to deliminate areas implies these should be split into separate files, classes, or other organizational structures
 - **Async suffix**: Async functions are named with `Async` suffix to indicate they yield (e.g., `uploadPlaceAsync`, `pollTaskCompletionAsync`, `loadDeployConfigAsync`).
 - **Command pattern**: Commands are classes implementing `CommandModule<T, ArgsInterface>` from yargs with `command`, `describe`, `builder`, and `handler` fields. Private helpers use arrow function properties or `_`-prefixed static methods.
 - **Subcommands**: Use nested `args.command()` calls in the builder (see `deploy-command.ts` for the `deploy init` / `deploy run` pattern). Use `$0` alias for the default subcommand.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildRbxmx } from '../../src/rbxmx-builder.js';
+import { buildRbxmx } from './rbxmx-builder.js';
 
 describe('buildRbxmx', () => {
   it('generates valid rbxmx XML structure', () => {

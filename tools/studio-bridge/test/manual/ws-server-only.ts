@@ -10,8 +10,8 @@ import { WebSocketServer } from 'ws';
 import {
   encodeMessage,
   decodePluginMessage,
-} from '../../src/protocol.js';
-import { injectPluginAsync } from '../../src/plugin-injector.js';
+} from '../../src/server/web-socket-protocol.js';
+import { injectPluginAsync } from '../../src/plugin/plugin-injector.js';
 import { randomUUID } from 'crypto';
 
 const sessionId = randomUUID();
@@ -31,15 +31,19 @@ async function main() {
   console.log(`[ws-server] Listening on port ${port}`);
   console.log(`[ws-server] Session ID: ${sessionId}`);
 
-  // Inject plugin
+  const testScript =
+    'print("[studio-bridge] Hello from manual test!")\nprint("[studio-bridge] Script executed successfully")';
+
+  // Inject plugin (scripts are sent via execute messages after handshake)
   const plugin = await injectPluginAsync({
     port,
     sessionId,
-    scriptContent: 'print("[studio-bridge] Hello from manual test!")\nprint("[studio-bridge] Script executed successfully")',
   });
 
   console.log(`[ws-server] Plugin injected: ${plugin.pluginPath}`);
-  console.log(`[ws-server] Open Roblox Studio (any place file) to test the connection.`);
+  console.log(
+    `[ws-server] Open Roblox Studio (any place file) to test the connection.`
+  );
   console.log(`[ws-server] Press Ctrl+C to stop.\n`);
 
   wss.on('connection', (ws) => {
@@ -57,12 +61,18 @@ async function main() {
 
       switch (msg.type) {
         case 'hello':
-          console.log(`[ws-server] Got hello (sessionId: ${msg.payload.sessionId})`);
+          console.log(
+            `[ws-server] Got hello (sessionId: ${msg.payload.sessionId})`
+          );
           if (msg.payload.sessionId === sessionId) {
             console.log('[ws-server] Session ID matches! Sending welcome...');
             ws.send(encodeMessage({ type: 'welcome', payload: { sessionId } }));
+            console.log('[ws-server] Sending execute message...');
+            ws.send(encodeMessage({ type: 'execute', payload: { script: testScript } }));
           } else {
-            console.log(`[ws-server] Wrong session ID (expected: ${sessionId})`);
+            console.log(
+              `[ws-server] Wrong session ID (expected: ${sessionId})`
+            );
           }
           break;
 
@@ -73,7 +83,9 @@ async function main() {
           break;
 
         case 'scriptComplete':
-          console.log(`[ws-server] Script complete! success=${msg.payload.success}`);
+          console.log(
+            `[ws-server] Script complete! success=${msg.payload.success}`
+          );
           if (msg.payload.error) {
             console.log(`[ws-server] Error: ${msg.payload.error}`);
           }

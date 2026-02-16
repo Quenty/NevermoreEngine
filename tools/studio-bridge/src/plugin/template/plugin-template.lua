@@ -4,11 +4,6 @@
 	Connects to a local WebSocket server, streams LogService output, and
 	executes embedded Luau scripts. Template placeholders are substituted
 	by the Node.js side before writing this file to the Studio plugins folder.
-
-	Placeholders:
-	  {{PORT}}       — WebSocket server port
-	  {{SESSION_ID}} — Unique session identifier for handshake validation
-	  {{SCRIPT}}     — Luau script content to execute on connect
 ]]
 
 local HttpService = game:GetService("HttpService")
@@ -22,7 +17,6 @@ end
 
 local PORT = "{{PORT}}"
 local SESSION_ID = "{{SESSION_ID}}"
-local SCRIPT_CONTENT = "{{SCRIPT}}"
 local WS_URL = "ws://localhost:" .. PORT
 
 -- ---------------------------------------------------------------------------
@@ -117,10 +111,7 @@ local function connectAsync()
 	local client
 
 	local ok, err = pcall(function()
-		client = HttpService:CreateWebStreamClient(
-			Enum.WebStreamClientType.WebSocket,
-			{ Url = WS_URL }
-		)
+		client = HttpService:CreateWebStreamClient(Enum.WebStreamClientType.WebSocket, { Url = WS_URL })
 	end)
 
 	if not ok or not client then
@@ -167,11 +158,8 @@ local function connectAsync()
 		end
 
 		if msg.type == "welcome" then
-			-- Handshake accepted — execute the embedded script
-			print("[StudioBridge] Connected, executing script...")
-			task.spawn(function()
-				executeScript(client, SCRIPT_CONTENT)
-			end)
+			-- Handshake accepted — ready for execute messages
+			print("[StudioBridge] Connected, ready for commands")
 		elseif msg.type == "execute" then
 			-- Execute an additional script sent by the server
 			if msg.payload and type(msg.payload.script) == "string" then
@@ -196,7 +184,9 @@ local function connectAsync()
 	end)
 
 	client.Error:Connect(function(responseStatusCode, errorMessage)
-		warn("[StudioBridge] WebSocket error (status " .. tostring(responseStatusCode) .. "): " .. tostring(errorMessage))
+		warn(
+			"[StudioBridge] WebSocket error (status " .. tostring(responseStatusCode) .. "): " .. tostring(errorMessage)
+		)
 	end)
 end
 

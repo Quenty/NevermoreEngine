@@ -5531,6 +5531,9 @@ importers:
       '@quenty/nevermore-template-helpers':
         specifier: workspace:*
         version: link:../nevermore-template-helpers
+      '@quenty/studio-bridge':
+        specifier: workspace:*
+        version: link:../studio-bridge
       execa:
         specifier: ^9.6.1
         version: 9.6.1

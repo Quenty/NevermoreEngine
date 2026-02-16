@@ -13,7 +13,7 @@ import * as fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { execa } from 'execa';
 import { StudioBridge } from '../../src/index.js';
-import { findPluginsFolder } from '../../src/studio-process.js';
+import { findPluginsFolder } from '../../src/process/studio-process-manager.js';
 
 // Resolve paths relative to the *source* tree, not the dist output.
 // __dirname in the compiled JS points to dist/test/integration/, but the
@@ -23,7 +23,12 @@ const __dirname_resolved = path.dirname(__filename_resolved);
 
 // Walk up to the package root, then back into the source test directory
 const PACKAGE_ROOT = path.resolve(__dirname_resolved, '..', '..', '..');
-const TEST_PROJECT_DIR = path.join(PACKAGE_ROOT, 'test', 'integration', 'test-project');
+const TEST_PROJECT_DIR = path.join(
+  PACKAGE_ROOT,
+  'test',
+  'integration',
+  'test-project'
+);
 const FIXTURES_DIR = path.join(PACKAGE_ROOT, 'test', 'fixtures');
 const PLACE_OUTPUT = path.join(TEST_PROJECT_DIR, 'test.rbxl');
 const TIMEOUT_MS = 90_000;
@@ -47,16 +52,28 @@ async function main() {
   const scriptPath = path.join(FIXTURES_DIR, 'hello-world.lua');
   const scriptContent = await fs.readFile(scriptPath, 'utf-8');
 
-  console.log('[smoke-test] Running StudioBridge.executeAsync()...');
+  console.log('[smoke-test] Running StudioBridge...');
 
-  const result = await StudioBridge.executeAsync({
-    placePath: PLACE_OUTPUT,
-    scriptContent,
-    timeoutMs: TIMEOUT_MS,
-    onOutput: (level, body) => {
-      console.log(`  [${level}] ${body}`);
-    },
-  });
+  const bridge = new StudioBridge({ placePath: PLACE_OUTPUT, timeoutMs: TIMEOUT_MS });
+  let result;
+  try {
+    await bridge.startAsync();
+    result = await bridge.executeAsync({
+      scriptContent,
+      onOutput: (level, body) => {
+        console.log(`  [${level}] ${body}`);
+      },
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
+    result = {
+      success: false,
+      logs: `[smoke-test] Error: ${errorMessage}`,
+    };
+  } finally {
+    await bridge.stopAsync();
+  }
 
   console.log(`\n[smoke-test] Success: ${result.success}`);
   console.log('[smoke-test] Logs:\n' + result.logs);
@@ -68,7 +85,9 @@ async function main() {
   }
 
   if (!result.logs.includes('Hello from integration test')) {
-    console.error('[smoke-test] FAIL: Expected logs to contain "Hello from integration test"');
+    console.error(
+      '[smoke-test] FAIL: Expected logs to contain "Hello from integration test"'
+    );
     process.exit(1);
   }
 
@@ -78,7 +97,9 @@ async function main() {
     f.startsWith('studio-bridge-')
   );
   if (remainingPlugins.length > 0) {
-    console.error(`[smoke-test] FAIL: Plugin files not cleaned up: ${remainingPlugins.join(', ')}`);
+    console.error(
+      `[smoke-test] FAIL: Plugin files not cleaned up: ${remainingPlugins.join(', ')}`
+    );
     process.exit(1);
   }
 

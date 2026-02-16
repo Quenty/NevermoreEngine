@@ -6,7 +6,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { buildRbxmx } from './rbxmx-builder.js';
-import { findPluginsFolder } from './studio-process.js';
+import { findPluginsFolder } from '../process/studio-process-manager.js';
 
 const PLUGIN_TEMPLATE_FILENAME = 'plugin-template.lua';
 
@@ -20,13 +20,23 @@ async function readPluginTemplateAsync(): Promise<string> {
     path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'))
   );
 
-  // tsc compiles to dist/src/, so when running from compiled JS thisDir is
-  // dist/src/. The .lua file lives in src/ (not copied by tsc). We try:
+  // tsc compiles to dist/src/plugin/, so when running from compiled JS thisDir
+  // is dist/src/plugin/. The .lua file lives in src/plugin/ (not copied by tsc).
+  // We try:
   //   1. Same directory (works when running source directly via tsx)
-  //   2. ../../src/ (works when running from dist/src/)
+  //   2. ../../../src/plugin/ (works when running from dist/src/plugin/)
   const candidates = [
-    path.resolve(thisDir, PLUGIN_TEMPLATE_FILENAME),
-    path.resolve(thisDir, '..', '..', 'src', PLUGIN_TEMPLATE_FILENAME),
+    path.resolve(thisDir, 'template', PLUGIN_TEMPLATE_FILENAME),
+    path.resolve(
+      thisDir,
+      '..',
+      '..',
+      '..',
+      'src',
+      'plugin',
+      'template',
+      PLUGIN_TEMPLATE_FILENAME
+    ),
   ];
 
   for (const candidate of candidates) {
@@ -45,7 +55,6 @@ async function readPluginTemplateAsync(): Promise<string> {
 export interface InjectPluginOptions {
   port: number;
   sessionId: string;
-  scriptContent: string;
 }
 
 export interface InjectedPlugin {
@@ -62,12 +71,11 @@ export interface InjectedPlugin {
  */
 export function substituteTemplate(
   template: string,
-  vars: { port: string; sessionId: string; script: string }
+  vars: { port: string; sessionId: string }
 ): string {
   return template
     .replace(/\{\{PORT\}\}/g, vars.port)
-    .replace(/\{\{SESSION_ID\}\}/g, vars.sessionId)
-    .replace(/\{\{SCRIPT\}\}/g, vars.script);
+    .replace(/\{\{SESSION_ID\}\}/g, vars.sessionId);
 }
 
 /**
@@ -96,13 +104,12 @@ export function escapeLuaString(source: string): string {
 export async function injectPluginAsync(
   options: InjectPluginOptions
 ): Promise<InjectedPlugin> {
-  const { port, sessionId, scriptContent } = options;
+  const { port, sessionId } = options;
 
   const template = await readPluginTemplateAsync();
   const luaSource = substituteTemplate(template, {
     port: String(port),
     sessionId,
-    script: escapeLuaString(scriptContent),
   });
 
   const rbxmx = buildRbxmx({

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { findPluginsFolder } from '../../src/studio-process.js';
+import { findPluginsFolder } from './studio-process-manager.js';
 
 describe('findPluginsFolder', () => {
   const originalPlatform = process.platform;

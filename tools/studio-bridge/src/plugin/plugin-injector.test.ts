@@ -1,23 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { substituteTemplate, escapeLuaString } from '../../src/plugin-injector.js';
+import { substituteTemplate, escapeLuaString } from './plugin-injector.js';
 
 describe('substituteTemplate', () => {
   const template = [
     'local PORT = "{{PORT}}"',
     'local SESSION_ID = "{{SESSION_ID}}"',
-    'local SCRIPT = "{{SCRIPT}}"',
   ].join('\n');
 
   it('replaces all placeholders', () => {
     const result = substituteTemplate(template, {
       port: '12345',
       sessionId: 'abc-def',
-      script: 'print("hello")',
     });
 
     expect(result).toContain('local PORT = "12345"');
     expect(result).toContain('local SESSION_ID = "abc-def"');
-    expect(result).toContain('local SCRIPT = "print("hello")"');
   });
 
   it('replaces multiple occurrences of the same placeholder', () => {
@@ -25,7 +22,6 @@ describe('substituteTemplate', () => {
     const result = substituteTemplate(tmpl, {
       port: '8080',
       sessionId: 'x',
-      script: 'y',
     });
     expect(result).toBe('8080 and 8080 again');
   });

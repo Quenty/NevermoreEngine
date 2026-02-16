@@ -57,7 +57,8 @@ async function findStudioPathWindowsAsync(): Promise<string> {
 }
 
 async function findStudioPathMacAsync(): Promise<string> {
-  const candidate = '/Applications/RobloxStudio.app/Contents/MacOS/RobloxStudioBeta';
+  const candidate =
+    '/Applications/RobloxStudio.app/Contents/MacOS/RobloxStudioBeta';
   try {
     await fs.access(candidate);
     return candidate;
@@ -100,7 +101,9 @@ export interface StudioProcess {
 /**
  * Launch Roblox Studio with the given place file.
  */
-export async function launchStudioAsync(placePath: string): Promise<StudioProcess> {
+export async function launchStudioAsync(
+  placePath: string
+): Promise<StudioProcess> {
   const studioExe = await findStudioPathAsync();
   OutputHelper.verbose(`Launching Studio: ${studioExe} "${placePath}"`);
 

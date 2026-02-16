@@ -9,7 +9,7 @@
     "node": ">=18"
   },
   "bin": {
-    "studio-bridge": "./dist/src/cli.js"
+    "studio-bridge": "./dist/src/cli/cli.js"
   },
   "dependencies": {
     "@quenty/cli-output-helpers": "workspace:*",

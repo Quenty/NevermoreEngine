@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { randomUUID } from 'crypto';
 import { OpenCloudClient } from '../../open-cloud/open-cloud-client.js';
 import { tryRenamePlaceAsync } from '../../auth/roblox-auth/index.js';
 import {
@@ -10,7 +11,7 @@ import { buildPlaceAsync } from '../../build/build.js';
 import { uploadPlaceAsync } from '../../build/upload.js';
 import { type TestReporter } from '../reporting/base-test-reporter.js';
 import { parseTestLogs } from '../test-log-parser.js';
-import { execa } from 'execa';
+import { StudioBridge } from '@quenty/studio-bridge';
 
 export type TestPhase = 'building' | 'uploading' | 'scheduling' | 'executing';
 
@@ -108,7 +109,7 @@ export async function runSingleCloudTestAsync(
 }
 
 /**
- * Build a place via rojo and run tests locally via run-in-roblox.
+ * Build a place via rojo and run tests locally via studio-bridge.
  */
 export async function runSingleLocalTestAsync(
   options: SingleTestOptions
@@ -121,46 +122,58 @@ export async function runSingleLocalTestAsync(
     scriptText,
   } = options;
 
+  const sessionId = randomUUID();
+
   const { rbxlPath, target } = await buildPlaceAsync({
     targetName: 'test',
-    outputFileName: 'test.rbxl',
+    outputFileName: `test-${sessionId}.rbxl`,
     packagePath,
     reporter,
     packageName,
   });
 
-  let scriptFullPath: string;
+  // Read script content into a string
+  let scriptContent: string;
   if (scriptText) {
-    // Write scriptText to a temp file next to the build output
-    scriptFullPath = path.resolve(packagePath, 'build', '_script-text.server.lua');
-    await fs.writeFile(scriptFullPath, scriptText, 'utf-8');
+    scriptContent = scriptText;
   } else {
     if (!target.scriptTemplate) {
       throw new Error(
         `No scriptTemplate configured for test target in ${packagePath}. Add a "scriptTemplate" field to your deploy.nevermore.json test target.`
       );
     }
-    scriptFullPath = path.resolve(packagePath, target.scriptTemplate);
+    const scriptFullPath = path.resolve(packagePath, target.scriptTemplate);
+    scriptContent = await fs.readFile(scriptFullPath, 'utf-8');
   }
 
   reporter.onPackagePhaseChange(packageName, 'executing');
 
-  const result = await execa(
-    'run-in-roblox',
-    ['--place', rbxlPath, '--script', scriptFullPath],
-    {
-      reject: false,
-      timeout: timeoutMs,
-    }
-  );
+  // Execute via studio-bridge
+  let result;
+  const bridge = new StudioBridge({ placePath: rbxlPath, timeoutMs, sessionId });
+  try {
+    await bridge.startAsync();
+    result = await bridge.executeAsync({ scriptContent });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
+    result = {
+      success: false,
+      logs: `[StudioBridge] Error: ${errorMessage}`,
+    };
+  } finally {
+    await bridge.stopAsync();
+    // Clean up session-specific place file and Studio's lock file
+    await Promise.all([
+      fs.unlink(rbxlPath).catch(() => {}),
+      fs.unlink(`${rbxlPath}.lock`).catch(() => {}),
+    ]);
+  }
 
-  const stdout = result.stdout ?? '';
-  const stderr = result.stderr ?? '';
-  const combinedOutput = [stdout, stderr].filter(Boolean).join('\n');
-  const parsed = parseTestLogs(combinedOutput);
+  const parsed = parseTestLogs(result.logs);
 
   return {
-    success: result.exitCode === 0 && parsed.success,
+    success: result.success && parsed.success,
     logs: parsed.logs,
   };
 }

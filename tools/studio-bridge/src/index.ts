@@ -4,22 +4,38 @@
  *
  * Primary API:
  *   import { StudioBridge } from '@quenty/studio-bridge';
- *   const result = await StudioBridge.executeAsync({ scriptContent });
+ *   const bridge = new StudioBridge({ placePath });
+ *   await bridge.startAsync();
+ *   const result = await bridge.executeAsync({ scriptContent });
+ *   await bridge.stopAsync();
  */
 
-export { StudioBridge } from './studio-bridge.js';
-export type { StudioBridgeOptions, StudioBridgeResult, StudioBridgePhase } from './studio-bridge.js';
-export type { OutputLevel } from './protocol.js';
+export { StudioBridgeServer as StudioBridge } from './server/studio-bridge-server.js';
+export type {
+  StudioBridgeServerOptions,
+  ExecuteOptions,
+  StudioBridgeResult,
+  StudioBridgePhase,
+} from './server/studio-bridge-server.js';
+export type { OutputLevel } from './server/web-socket-protocol.js';
 
 // Lower-level exports for advanced usage / testing
-export { buildRbxmx } from './rbxmx-builder.js';
-export { buildMinimalPlaceAsync } from './place-builder.js';
-export { findStudioPathAsync, findPluginsFolder, launchStudioAsync } from './studio-process.js';
-export { injectPluginAsync, substituteTemplate, escapeLuaString } from './plugin-injector.js';
+export { buildRbxmx } from './plugin/rbxmx-builder.js';
+export { buildMinimalPlaceAsync } from './process/place-builder.js';
+export {
+  findStudioPathAsync,
+  findPluginsFolder,
+  launchStudioAsync,
+} from './process/studio-process-manager.js';
+export {
+  injectPluginAsync,
+  substituteTemplate,
+  escapeLuaString,
+} from './plugin/plugin-injector.js';
 export {
   encodeMessage,
   decodePluginMessage,
-} from './protocol.js';
+} from './server/web-socket-protocol.js';
 export type {
   PluginMessage,
   ServerMessage,
@@ -29,4 +45,4 @@ export type {
   WelcomeMessage,
   ExecuteMessage,
   ShutdownMessage,
-} from './protocol.js';
+} from './server/web-socket-protocol.js';

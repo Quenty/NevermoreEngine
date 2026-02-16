@@ -13,7 +13,10 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { parseArgs } from 'node:util';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { StudioBridge, type StudioBridgePhase } from './studio-bridge.js';
+import {
+  StudioBridgeServer,
+  type StudioBridgePhase,
+} from '../server/studio-bridge-server.js';
 
 const HELP = `
 studio-bridge — run Luau scripts in Roblox Studio via WebSocket bridge
@@ -66,7 +69,10 @@ async function main() {
   if (values.version) {
     const pkgPath = decodeURIComponent(
       path.resolve(
-        path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1')),
+        path.dirname(
+          new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1')
+        ),
+        '..',
         '..',
         '..',
         'package.json'
@@ -82,7 +88,9 @@ async function main() {
   }
 
   if (!values.script && !values['script-text']) {
-    OutputHelper.error('Missing required option: --script <file.lua> or --script-text <code>');
+    OutputHelper.error(
+      'Missing required option: --script <file.lua> or --script-text <code>'
+    );
     console.log(`\nRun "studio-bridge --help" for usage.`);
     process.exit(1);
   }
@@ -151,41 +159,57 @@ async function main() {
   // Track whether we've printed any output (to add spacing)
   let hasOutput = false;
 
-  const result = await StudioBridge.executeAsync({
+  const server = new StudioBridgeServer({
     placePath,
-    scriptContent,
     timeoutMs,
     onPhase: handlePhase,
-    onOutput: (level, body) => {
-      // Filter internal plugin messages that leak through LogService
-      if (body.startsWith('[StudioBridge]')) {
-        return;
-      }
-
-      // Add blank line before first output to separate from progress
-      if (!hasOutput) {
-        // Finish any in-progress phase line
-        if (lastPhaseLabel) {
-          process.stderr.write('\n');
-          lastPhaseLabel = '';
-        }
-        console.log('');
-        hasOutput = true;
-      }
-
-      switch (level) {
-        case 'Warning':
-          OutputHelper.warn(body);
-          break;
-        case 'Error':
-          OutputHelper.error(body);
-          break;
-        default:
-          console.log(body);
-          break;
-      }
-    },
   });
+
+  let result;
+  try {
+    await server.startAsync();
+    result = await server.executeAsync({
+      scriptContent,
+      onOutput: (level, body) => {
+        // Filter internal plugin messages that leak through LogService
+        if (body.startsWith('[StudioBridge]')) {
+          return;
+        }
+
+        // Add blank line before first output to separate from progress
+        if (!hasOutput) {
+          // Finish any in-progress phase line
+          if (lastPhaseLabel) {
+            process.stderr.write('\n');
+            lastPhaseLabel = '';
+          }
+          console.log('');
+          hasOutput = true;
+        }
+
+        switch (level) {
+          case 'Warning':
+            OutputHelper.warn(body);
+            break;
+          case 'Error':
+            OutputHelper.error(body);
+            break;
+          default:
+            console.log(body);
+            break;
+        }
+      },
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
+    result = {
+      success: false,
+      logs: `[StudioBridge] Error: ${errorMessage}`,
+    };
+  } finally {
+    await server.stopAsync();
+  }
 
   // Finish any in-progress phase line
   if (lastPhaseLabel) {
@@ -206,6 +230,8 @@ async function main() {
 }
 
 main().catch((err) => {
-  OutputHelper.error(`Fatal: ${err instanceof Error ? err.message : String(err)}`);
+  OutputHelper.error(
+    `Fatal: ${err instanceof Error ? err.message : String(err)}`
+  );
   process.exit(1);
 });
