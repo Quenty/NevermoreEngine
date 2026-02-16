@@ -31,19 +31,22 @@ Usage:
   studio-bridge --script <file.lua>
   studio-bridge --script-text 'print("hello")'
   studio-bridge --place <file.rbxl> --script <file.lua>
+  studio-bridge --terminal [--script <file.lua>]
 
 Options:
   --place, -p        Path to a .rbxl place file (optional — builds a
                      minimal place via rojo if omitted)
   --script, -s       Path to a Luau script file to execute
   --script-text, -t  Inline Luau script text to execute
+  --terminal         Interactive terminal mode — keep Studio alive and
+                     execute scripts repeatedly via a REPL
   --timeout          Timeout in milliseconds (default: 120000)
   --verbose          Show internal debug output
   --help, -h         Show this help message
   --version, -v      Show version
   --logs             Show execution logs in spinner mode (default: true)
 
-Either --script or --script-text is required.
+Either --script, --script-text, or --terminal is required.
 `.trim();
 
 async function main() {
@@ -53,6 +56,7 @@ async function main() {
       script: { type: 'string', short: 's' },
       'script-text': { type: 'string', short: 't' },
       timeout: { type: 'string' },
+      terminal: { type: 'boolean' },
       verbose: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
       version: { type: 'boolean', short: 'v' },
@@ -87,9 +91,9 @@ async function main() {
     process.exit(0);
   }
 
-  if (!values.script && !values['script-text']) {
+  if (!values.script && !values['script-text'] && !values.terminal) {
     OutputHelper.error(
-      'Missing required option: --script <file.lua> or --script-text <code>'
+      'Missing required option: --script <file.lua>, --script-text <code>, or --terminal'
     );
     console.log(`\nRun "studio-bridge --help" for usage.`);
     process.exit(1);
@@ -110,6 +114,19 @@ async function main() {
       OutputHelper.error(`Place file not found: ${placePath}`);
       process.exit(1);
     }
+  }
+
+  // Terminal mode — interactive REPL
+  if (values.terminal) {
+    const { runTerminalMode } = await import('./terminal-mode.js');
+    await runTerminalMode({
+      placePath,
+      scriptPath: values.script,
+      scriptText: values['script-text'],
+      timeoutMs,
+      verbose: !!values.verbose,
+    });
+    return;
   }
 
   // Resolve script content
