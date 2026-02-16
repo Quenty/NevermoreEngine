@@ -13,12 +13,15 @@
   },
   "dependencies": {
     "@quenty/cli-output-helpers": "workspace:*",
+    "@quenty/nevermore-cli-helpers": "workspace:*",
     "execa": "^9.6.1",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.4",
     "@types/ws": "^8.5.13",
+    "@types/yargs": "^17.0.13",
     "typescript": "^5.9.3",
     "vitest": "^3.0.0"
   },

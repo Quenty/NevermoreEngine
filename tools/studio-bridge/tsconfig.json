@@ -8,7 +8,8 @@
     "declaration": true
   },
   "references": [
-    { "path": "../cli-output-helpers" }
+    { "path": "../cli-output-helpers" },
+    { "path": "../nevermore-cli-helpers" }
   ],
   "include": ["src/**/*", "test/**/*"]
 }

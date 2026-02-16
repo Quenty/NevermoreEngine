@@ -9,7 +9,7 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   StudioBridgeServer,
   type StudioBridgePhase,
-} from '../server/studio-bridge-server.js';
+} from '../../../server/studio-bridge-server.js';
 import { TerminalEditor } from './terminal-editor.js';
 
 // ---------------------------------------------------------------------------

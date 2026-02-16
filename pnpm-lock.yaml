@@ -5636,12 +5636,18 @@ importers:
       '@quenty/cli-output-helpers':
         specifier: workspace:*
         version: link:../cli-output-helpers
+      '@quenty/nevermore-cli-helpers':
+        specifier: workspace:*
+        version: link:../nevermore-cli-helpers
       execa:
         specifier: ^9.6.1
         version: 9.6.1
       ws:
         specifier: ^8.18.0
         version: 8.19.0
+      yargs:
+        specifier: ^18.0.0
+        version: 18.0.0
     devDependencies:
       '@types/node':
         specifier: ^18.11.4
@@ -5649,6 +5655,9 @@ importers:
       '@types/ws':
         specifier: ^8.5.13
         version: 8.18.1
+      '@types/yargs':
+        specifier: ^17.0.13
+        version: 17.0.35
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

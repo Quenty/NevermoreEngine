@@ -20,7 +20,7 @@ Tools are managed via **Aftman** (`aftman.toml`):
 | stylua | 2.3.1 | Luau formatter |
 | moonwave-extractor | 1.3.0 | Documentation extraction |
 
-Package management: **pnpm** (monorepo workspaces in `src/*` and `tools/*`), versioned independently via **Lerna** with conventional commits.
+Package management: **pnpm** (monorepo workspaces in `src/*`, `tools/*`, `games/*`, `plugins/*`). Releases are driven by **Auto** (`auto shipit`) via GitHub CI — do not run releases locally. Auto uses conventional commits to determine version bumps and coordinates publishing through its npm/lerna plugin.
 
 ## Always update CLAUDE.md
 

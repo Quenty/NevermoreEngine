@@ -4,247 +4,75 @@
  * CLI entry point for @quenty/studio-bridge.
  *
  * Usage:
- *   studio-bridge --script <path.lua>
- *   studio-bridge --script-text 'print("hello")'
- *   studio-bridge --place <path.rbxl> --script <path.lua>
+ *   studio-bridge run <file.lua>
+ *   studio-bridge exec 'print("hello")'
+ *   studio-bridge terminal [--script <file.lua>]
  */
 
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { parseArgs } from 'node:util';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import {
-  CompositeReporter,
-  SimpleReporter,
-  SpinnerReporter,
-  type LiveStateTracker,
-} from '@quenty/cli-output-helpers/reporting';
-import {
-  StudioBridgeServer,
-  type StudioBridgePhase,
-} from '../server/studio-bridge-server.js';
+import { VersionChecker } from '@quenty/nevermore-cli-helpers';
 
-const HELP = `
-studio-bridge — run Luau scripts in Roblox Studio via WebSocket bridge
+import { RunCommand } from './commands/run-command.js';
+import { ExecCommand } from './commands/exec-command.js';
+import { TerminalCommand } from './commands/terminal/terminal-command.js';
 
-Usage:
-  studio-bridge --script <file.lua>
-  studio-bridge --script-text 'print("hello")'
-  studio-bridge --place <file.rbxl> --script <file.lua>
-  studio-bridge --terminal [--script <file.lua>]
-
-Options:
-  --place, -p        Path to a .rbxl place file (optional — builds a
-                     minimal place via rojo if omitted)
-  --script, -s       Path to a Luau script file to execute
-  --script-text, -t  Inline Luau script text to execute
-  --terminal         Interactive terminal mode — keep Studio alive and
-                     execute scripts repeatedly via a REPL
-  --timeout          Timeout in milliseconds (default: 120000)
-  --verbose          Show internal debug output
-  --help, -h         Show this help message
-  --version, -v      Show version
-  --logs             Show execution logs in spinner mode (default: true)
-
-Either --script, --script-text, or --terminal is required.
-`.trim();
-
-async function main() {
-  const { values } = parseArgs({
-    options: {
-      place: { type: 'string', short: 'p' },
-      script: { type: 'string', short: 's' },
-      'script-text': { type: 'string', short: 't' },
-      timeout: { type: 'string' },
-      terminal: { type: 'boolean' },
-      verbose: { type: 'boolean' },
-      help: { type: 'boolean', short: 'h' },
-      version: { type: 'boolean', short: 'v' },
-      logs: { type: 'boolean' },
-    },
-    strict: true,
-  });
-
-  if (values.help) {
-    console.log(HELP);
-    process.exit(0);
-  }
-
-  if (values.version) {
-    const pkgPath = decodeURIComponent(
-      path.resolve(
-        path.dirname(
-          new URL(import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1')
-        ),
-        '..',
-        '..',
-        '..',
-        'package.json'
-      )
-    );
-    try {
-      const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf-8'));
-      console.log(pkg.version);
-    } catch {
-      console.log('unknown');
-    }
-    process.exit(0);
-  }
-
-  if (!values.script && !values['script-text'] && !values.terminal) {
-    OutputHelper.error(
-      'Missing required option: --script <file.lua>, --script-text <code>, or --terminal'
-    );
-    console.log(`\nRun "studio-bridge --help" for usage.`);
-    process.exit(1);
-  }
-
-  // Suppress verbose output by default; enable with --verbose
-  OutputHelper.setVerbose(!!values.verbose);
-
-  const timeoutMs = values.timeout ? parseInt(values.timeout, 10) : 120_000;
-
-  // Resolve place path (optional)
-  let placePath: string | undefined;
-  if (values.place) {
-    placePath = path.resolve(values.place);
-    try {
-      await fs.access(placePath);
-    } catch {
-      OutputHelper.error(`Place file not found: ${placePath}`);
-      process.exit(1);
-    }
-  }
-
-  // Terminal mode — interactive REPL
-  if (values.terminal) {
-    const { runTerminalMode } = await import('./terminal-mode.js');
-    await runTerminalMode({
-      placePath,
-      scriptPath: values.script,
-      scriptText: values['script-text'],
-      timeoutMs,
-      verbose: !!values.verbose,
-    });
-    return;
-  }
-
-  // Resolve script content
-  let scriptContent: string;
-  if (values['script-text']) {
-    scriptContent = values['script-text'];
-  } else {
-    const scriptPath = path.resolve(values.script!);
-    try {
-      scriptContent = await fs.readFile(scriptPath, 'utf-8');
-    } catch {
-      OutputHelper.error(`Could not read script file: ${scriptPath}`);
-      process.exit(1);
-    }
-  }
-
-  // Determine display name for reporting
-  const packageName = values.script
-    ? path.basename(values.script, path.extname(values.script))
-    : 'script';
-
-  const useSpinner = !!process.stdout.isTTY && !values.verbose;
-  const showLogs = values.logs ?? true;
-
-  const reporter = new CompositeReporter(
-    [packageName],
-    (state: LiveStateTracker) => [
-      useSpinner
-        ? new SpinnerReporter(state, {
-            showLogs,
-            actionVerb: 'Running',
-          })
-        : new SimpleReporter(state, {
-            alwaysShowLogs: showLogs,
-            successMessage: 'Script completed successfully.',
-            failureMessage: 'Script failed.',
-          }),
-    ]
-  );
-
-  await reporter.startAsync();
-  reporter.onPackageStart(packageName);
-
-  const startTime = performance.now();
-
-  // Suppress verbose output during spinner rendering
-  if (useSpinner) {
-    OutputHelper.setVerbose(false);
-  }
-
-  const server = new StudioBridgeServer({
-    placePath,
-    timeoutMs,
-    onPhase: (phase: StudioBridgePhase) => {
-      if (phase === 'done') return;
-      reporter.onPackagePhaseChange(packageName, phase);
-    },
-  });
-
-  const outputLines: string[] = [];
-  let result;
-  try {
-    await server.startAsync();
-    result = await server.executeAsync({
-      scriptContent,
-      onOutput: (level, body) => {
-        // Filter internal plugin messages that leak through LogService
-        if (body.startsWith('[StudioBridge]')) {
-          return;
-        }
-
-        // Collect output for the result logs
-        outputLines.push(body);
-
-        // In verbose/simple mode, print output in real-time
-        if (!useSpinner) {
-          switch (level) {
-            case 'Warning':
-              OutputHelper.warn(body);
-              break;
-            case 'Error':
-              OutputHelper.error(body);
-              break;
-            default:
-              console.log(body);
-              break;
-          }
-        }
-      },
-    });
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
-    result = {
-      success: false,
-      logs: `[StudioBridge] Error: ${errorMessage}`,
-    };
-  } finally {
-    await server.stopAsync();
-  }
-
-  const elapsed = performance.now() - startTime;
-
-  reporter.onPackageResult({
-    packageName,
-    success: result.success,
-    logs: outputLines.length > 0 ? outputLines.join('\n') : result.logs,
-    durationMs: elapsed,
-  });
-
-  await reporter.stopAsync();
-
-  process.exit(result.success ? 0 : 1);
-}
-
-main().catch((err) => {
-  OutputHelper.error(
-    `Fatal: ${err instanceof Error ? err.message : String(err)}`
-  );
-  process.exit(1);
+const versionData = await VersionChecker.checkForUpdatesAsync({
+  humanReadableName: 'Studio Bridge',
+  packageName: '@quenty/studio-bridge',
+  registryUrl: 'https://registry.npmjs.org/',
+  packageJsonPath: join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../../package.json'
+  ),
 });
+
+yargs(hideBin(process.argv))
+  .scriptName('studio-bridge')
+  .version(
+    (versionData
+      ? VersionChecker.getVersionDisplayName(versionData)
+      : undefined) as any
+  )
+  .option('place', {
+    alias: 'p',
+    description:
+      'Path to a .rbxl place file (builds a minimal place via rojo if omitted)',
+    type: 'string',
+    global: true,
+  })
+  .option('timeout', {
+    description: 'Timeout in milliseconds',
+    type: 'number',
+    default: 120_000,
+    global: true,
+  })
+  .option('verbose', {
+    description: 'Show internal debug output',
+    type: 'boolean',
+    default: false,
+    global: true,
+  })
+  .option('logs', {
+    description: 'Show execution logs in spinner mode',
+    type: 'boolean',
+    default: true,
+    global: true,
+  })
+  .middleware((argv) => {
+    OutputHelper.setVerbose(argv.verbose as boolean);
+  })
+  .usage(OutputHelper.formatInfo('Usage: $0 <command> [options]'))
+  .command(new ExecCommand() as any)
+  .command(new RunCommand() as any)
+  .command(new TerminalCommand() as any)
+  .recommendCommands()
+  .demandCommand(
+    1,
+    OutputHelper.formatHint("Hint: See 'studio-bridge help' for more help")
+  )
+  .wrap(null)
+  .strict().argv;

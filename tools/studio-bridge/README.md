@@ -31,30 +31,39 @@ The session ID (random UUID) prevents stale plugins from previous runs from inte
 
 ```bash
 # Run a script file
-studio-bridge --script test.lua
+studio-bridge run test.lua
 
 # Run inline script
-studio-bridge --script-text 'print("hello world")'
+studio-bridge exec 'print("hello world")'
 
 # With a specific place file (builds a minimal place via rojo if omitted)
-studio-bridge --place build/test.rbxl --script test.lua
+studio-bridge run test.lua --place build/test.rbxl
 
 # Interactive terminal mode (keeps Studio alive between executions)
-studio-bridge --terminal
+studio-bridge terminal
 
 # Terminal mode with initial script
-studio-bridge --terminal --place build/test.rbxl --script init.lua
+studio-bridge terminal --place build/test.rbxl --script init.lua
 
 # Debug output
-studio-bridge --verbose --script test.lua
+studio-bridge run test.lua --verbose
 ```
+
+### Global Options
+
+| Option | Alias | Default | Description |
+|--------|-------|---------|-------------|
+| `--place` | `-p` | — | Path to a `.rbxl` place file (builds minimal place via rojo if omitted) |
+| `--timeout` | — | `120000` | Timeout in milliseconds |
+| `--verbose` | — | `false` | Show internal debug output |
+| `--logs` / `--no-logs` | — | `true` | Show execution logs in spinner mode |
 
 ### Terminal Mode
 
 Keeps Studio alive and provides an interactive REPL. Type Luau, see results, repeat — no re-launch between executions.
 
 ```
-$ studio-bridge --terminal --place build/test.rbxl
+$ studio-bridge terminal --place build/test.rbxl
 Studio connected.
 
 ────────────────────────────────────────────────────────
