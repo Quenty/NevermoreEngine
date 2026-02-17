@@ -13,7 +13,11 @@ import { randomUUID } from 'crypto';
 import * as path from 'path';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { BuildContext, resolveTemplatePath } from '@quenty/nevermore-template-helpers';
+import {
+  BuildContext,
+  resolvePackagePath,
+  resolveTemplatePath,
+} from '@quenty/nevermore-template-helpers';
 import {
   type OutputLevel,
   encodeMessage,
@@ -31,6 +35,12 @@ import {
 const defaultProjectPath = resolveTemplatePath(
   import.meta.url,
   path.join('default-test-place', 'default.project.json')
+);
+
+const sessionAttributeTransformScript = resolvePackagePath(
+  import.meta.url,
+  'build-scripts',
+  'transform-add-session-attribute.luau'
 );
 
 // ---------------------------------------------------------------------------
@@ -142,20 +152,34 @@ export class StudioBridgeServer {
     this._state = 'starting';
 
     try {
+      this._placeBuildContext = await BuildContext.createAsync({
+        prefix: 'studio-bridge-',
+      });
+
       // 0. Build a minimal place if none was provided
       let placePath = this._placePath;
       if (!placePath) {
         this._onPhase?.('building');
-        this._placeBuildContext = await BuildContext.createAsync({
-          prefix: 'studio-bridge-',
-        });
-        const builtPlacePath = this._placeBuildContext.resolvePath('minimal.rbxl');
+        const builtPlacePath =
+          this._placeBuildContext.resolvePath('minimal.rbxl');
         await this._placeBuildContext.rojoBuildAsync({
           projectPath: defaultProjectPath,
           output: builtPlacePath,
         });
         placePath = builtPlacePath;
       }
+
+      // 0b. Stamp session ID attribute onto the place file
+      const transformedPlacePath = this._placeBuildContext.resolvePath(
+        'studio-bridge-with-session-id.rbxl'
+      );
+      await this._placeBuildContext.executeLuneTransformScriptAsync(
+        sessionAttributeTransformScript,
+        placePath,
+        transformedPlacePath,
+        this._sessionId
+      );
+      placePath = transformedPlacePath;
 
       // 1. Start WebSocket server (unique path rejects wrong connections at HTTP upgrade level)
       this._wss = new WebSocketServer({ port: 0, path: `/${this._sessionId}` });
@@ -258,7 +282,11 @@ export class StudioBridgeServer {
     if (this._connectedClient) {
       try {
         this._connectedClient.send(
-          encodeMessage({ type: 'shutdown', sessionId: this._sessionId, payload: {} })
+          encodeMessage({
+            type: 'shutdown',
+            sessionId: this._sessionId,
+            payload: {},
+          })
         );
       } catch {
         // ignore
@@ -298,7 +326,10 @@ export class StudioBridgeServer {
             return;
           }
 
-          if (msg.sessionId !== this._sessionId || msg.payload.sessionId !== this._sessionId) {
+          if (
+            msg.sessionId !== this._sessionId ||
+            msg.payload.sessionId !== this._sessionId
+          ) {
             OutputHelper.verbose(
               `[StudioBridge] Rejecting hello with wrong session ID`
             );

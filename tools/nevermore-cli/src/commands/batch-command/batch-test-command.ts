@@ -126,7 +126,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
   }
 
   const cloud = args.cloud ?? false;
-  const concurrency = args.concurrency ?? (cloud ? 3 : 1);
+  const concurrency = args.concurrency ?? 3;
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
 

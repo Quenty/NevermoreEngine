@@ -15,31 +15,6 @@ export interface RojoBuildOptions {
   pluginsFolder?: string;
 }
 
-/**
- * Single call site for all rojo build invocations across the codebase.
- * Exactly one of `output` or `plugin` must be provided.
- */
-export async function rojoBuildAsync(options: RojoBuildOptions): Promise<void> {
-  const { projectPath, output, plugin } = options;
-
-  if (output && plugin) {
-    throw new Error('rojoBuildAsync: specify either output or plugin, not both');
-  }
-  if (!output && !plugin) {
-    throw new Error('rojoBuildAsync: must specify either output or plugin');
-  }
-
-  const args = ['build', projectPath];
-
-  if (output) {
-    args.push('-o', output);
-  } else if (plugin) {
-    args.push('--plugin', plugin);
-  }
-
-  await execa('rojo', args);
-}
-
 export interface BuildContextOptions {
   /** mkdtemp prefix (e.g. 'rojo-build-') */
   prefix?: string;
@@ -85,19 +60,41 @@ export class BuildContext {
    * Returns the full plugin output path when in plugin mode, undefined otherwise.
    */
   async rojoBuildAsync(options: RojoBuildOptions): Promise<string | undefined> {
-    if (options.plugin && !options.pluginsFolder) {
+    const { projectPath, output, plugin, pluginsFolder } = options;
+
+    if (output && plugin) {
+      throw new Error('rojoBuildAsync: specify either output or plugin, not both');
+    }
+    if (!output && !plugin) {
+      throw new Error('rojoBuildAsync: must specify either output or plugin');
+    }
+    if (plugin && !pluginsFolder) {
       throw new Error('rojoBuildAsync: plugin requires pluginsFolder for cleanup tracking');
     }
 
-    await rojoBuildAsync(options);
+    const args = ['build', projectPath];
+    if (output) {
+      args.push('-o', output);
+    } else if (plugin) {
+      args.push('--plugin', plugin);
+    }
 
-    if (options.plugin && options.pluginsFolder) {
-      const pluginPath = path.join(options.pluginsFolder, options.plugin);
+    await execa('rojo', args);
+
+    if (plugin && pluginsFolder) {
+      const pluginPath = path.join(pluginsFolder, plugin);
       this._trackedFiles.push(pluginPath);
       return pluginPath;
     }
 
     return undefined;
+  }
+
+  /**
+   * Execute a Lune transform script with the given arguments.
+   */
+  async executeLuneTransformScriptAsync(scriptPath: string, ...args: string[]): Promise<void> {
+    await execa('lune', ['run', scriptPath, ...args]);
   }
 
   /**

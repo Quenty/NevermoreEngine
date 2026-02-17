@@ -1,8 +1,8 @@
 // Scaffolding
-export { resolveTemplatePath, TemplateHelper } from './scaffolding/index.js';
+export { resolvePackagePath, resolveTemplatePath, TemplateHelper } from './scaffolding/index.js';
 
 // Build
-export { BuildContext, rojoBuildAsync } from './build/index.js';
+export { BuildContext } from './build/index.js';
 export type { BuildContextOptions, RojoBuildOptions } from './build/index.js';
 
 // Substitution

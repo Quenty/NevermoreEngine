@@ -9,14 +9,21 @@
 local HttpService = game:GetService("HttpService")
 local LogService = game:GetService("LogService")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local PORT = "{{PORT}}"
+local SESSION_ID = "{{SESSION_ID}}"
 
 -- Only run inside Studio
 if not RunService:IsStudio() or RunService:IsRunning() then
 	return
 end
 
-local PORT = "{{PORT}}"
-local SESSION_ID = "{{SESSION_ID}}"
+local thisPlaceSessionId = Workspace:GetAttribute("StudioBridgeSessionId")
+if thisPlaceSessionId ~= SESSION_ID then
+	return
+end
+
 local WS_URL = "ws://localhost:" .. PORT .. "/" .. SESSION_ID
 
 -- ---------------------------------------------------------------------------
