@@ -1,7 +1,44 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { execa } from 'execa';
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
+
+export interface RojoBuildOptions {
+  /** Absolute path to the rojo project JSON file */
+  projectPath: string;
+  /** -o flag: absolute path to output file (.rbxl / .rbxm) */
+  output?: string;
+  /** --plugin flag: filename placed in Studio's plugins folder */
+  plugin?: string;
+  /** Absolute path to Studio's plugins folder (required when plugin is set) */
+  pluginsFolder?: string;
+}
+
+/**
+ * Single call site for all rojo build invocations across the codebase.
+ * Exactly one of `output` or `plugin` must be provided.
+ */
+export async function rojoBuildAsync(options: RojoBuildOptions): Promise<void> {
+  const { projectPath, output, plugin } = options;
+
+  if (output && plugin) {
+    throw new Error('rojoBuildAsync: specify either output or plugin, not both');
+  }
+  if (!output && !plugin) {
+    throw new Error('rojoBuildAsync: must specify either output or plugin');
+  }
+
+  const args = ['build', projectPath];
+
+  if (output) {
+    args.push('-o', output);
+  } else if (plugin) {
+    args.push('--plugin', plugin);
+  }
+
+  await execa('rojo', args);
+}
 
 export interface BuildContextOptions {
   /** 'temp' creates a disposable mkdtemp directory; 'persistent' uses an existing path */
@@ -20,6 +57,7 @@ export class BuildContext {
   private readonly _targetdir: string;
   private _cleaned = false;
   private readonly _mode: 'temp' | 'persistent';
+  private readonly _trackedFiles: string[] = [];
 
   private constructor(dir: string, mode: 'temp' | 'persistent') {
     this._targetdir = dir;
@@ -49,6 +87,36 @@ export class BuildContext {
     return new BuildContext(dir, options.mode);
   }
 
+  /** Absolute path to the managed build directory. */
+  get buildDir(): string {
+    return this._targetdir;
+  }
+
+  /** Resolve a relative path within the build directory. */
+  resolvePath(relativePath: string): string {
+    return path.join(this._targetdir, relativePath);
+  }
+
+  /**
+   * Run rojo build using this context's directory.
+   * Returns the full plugin output path when in plugin mode, undefined otherwise.
+   */
+  async rojoBuildAsync(options: RojoBuildOptions): Promise<string | undefined> {
+    if (options.plugin && !options.pluginsFolder) {
+      throw new Error('rojoBuildAsync: plugin requires pluginsFolder for cleanup tracking');
+    }
+
+    await rojoBuildAsync(options);
+
+    if (options.plugin && options.pluginsFolder) {
+      const pluginPath = path.join(options.pluginsFolder, options.plugin);
+      this._trackedFiles.push(pluginPath);
+      return pluginPath;
+    }
+
+    return undefined;
+  }
+
   /**
    * Write a file into the build directory.
    * @returns Absolute path to the written file.
@@ -67,6 +135,14 @@ export class BuildContext {
   async cleanupAsync(): Promise<void> {
     if (this._cleaned) return;
     this._cleaned = true;
+
+    for (const filePath of this._trackedFiles) {
+      try {
+        await fs.unlink(filePath);
+      } catch {
+        // best effort — file may already be gone
+      }
+    }
 
     if (this._mode === 'temp') {
       OutputHelper.verbose(`Cleaning up build directory: ${this._targetdir}`);

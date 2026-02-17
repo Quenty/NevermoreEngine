@@ -1,5 +1,2 @@
-export { BuildContext } from './build-context.js';
-export type { BuildContextOptions } from './build-context.js';
-
-export { rojoBuildAsync } from './rojo-builder.js';
-export type { RojoBuildOptions } from './rojo-builder.js';
+export { BuildContext, rojoBuildAsync } from './build-context.js';
+export type { BuildContextOptions, RojoBuildOptions } from './build-context.js';

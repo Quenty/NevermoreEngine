@@ -10,8 +10,10 @@
  */
 
 import { randomUUID } from 'crypto';
+import * as path from 'path';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { BuildContext, resolveTemplatePath } from '@quenty/nevermore-template-helpers';
 import {
   type OutputLevel,
   encodeMessage,
@@ -25,10 +27,11 @@ import {
   launchStudioAsync,
   type StudioProcess,
 } from '../process/studio-process-manager.js';
-import {
-  buildMinimalPlaceAsync,
-  type BuiltPlace,
-} from '../process/place-builder.js';
+
+const defaultProjectPath = resolveTemplatePath(
+  import.meta.url,
+  path.join('default-test-place', 'default.project.json')
+);
 
 // ---------------------------------------------------------------------------
 // Public API types
@@ -112,7 +115,7 @@ export class StudioBridgeServer {
   private _wss: WebSocketServer | undefined;
   private _pluginHandle: InjectedPlugin | undefined;
   private _studioProc: StudioProcess | undefined;
-  private _builtPlace: BuiltPlace | undefined;
+  private _placeBuildContext: BuildContext | undefined;
   private _connectedClient: WebSocket | undefined;
 
   constructor(options: StudioBridgeServerOptions = {}) {
@@ -143,8 +146,16 @@ export class StudioBridgeServer {
       let placePath = this._placePath;
       if (!placePath) {
         this._onPhase?.('building');
-        this._builtPlace = await buildMinimalPlaceAsync();
-        placePath = this._builtPlace.placePath;
+        this._placeBuildContext = await BuildContext.createAsync({
+          mode: 'temp',
+          prefix: 'studio-bridge-',
+        });
+        const builtPlacePath = this._placeBuildContext.resolvePath('minimal.rbxl');
+        await this._placeBuildContext.rojoBuildAsync({
+          projectPath: defaultProjectPath,
+          output: builtPlacePath,
+        });
+        placePath = builtPlacePath;
       }
 
       // 1. Start WebSocket server
@@ -461,9 +472,9 @@ export class StudioBridgeServer {
     }
 
     // Remove auto-built place
-    if (this._builtPlace) {
-      await this._builtPlace.cleanupAsync();
-      this._builtPlace = undefined;
+    if (this._placeBuildContext) {
+      await this._placeBuildContext.cleanupAsync();
+      this._placeBuildContext = undefined;
     }
 
     // Close WebSocket server — terminate lingering connections first so

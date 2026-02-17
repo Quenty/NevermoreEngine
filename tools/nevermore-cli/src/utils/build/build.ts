@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { rojoBuildAsync } from '@quenty/nevermore-template-helpers';
+import { BuildContext } from '@quenty/nevermore-template-helpers';
 import {
   DeployTarget,
   loadDeployConfigAsync,
@@ -70,7 +70,6 @@ export async function buildPlaceAsync(
   }
 
   const projectPath = path.resolve(packagePath, target.project);
-  const rbxlPath = path.resolve(packagePath, 'build', outputFileName);
 
   const resolvedPackageName = packageName ?? path.basename(packagePath);
   reporter?.onPackagePhaseChange(resolvedPackageName, 'building');
@@ -78,8 +77,12 @@ export async function buildPlaceAsync(
     `Building rojo project ${resolvedPackageName}/${target.project}...`
   );
 
-  await fs.mkdir(path.dirname(rbxlPath), { recursive: true });
-  await rojoBuildAsync({ projectPath, output: rbxlPath });
+  const buildContext = await BuildContext.createAsync({
+    mode: 'persistent',
+    buildDir: path.resolve(packagePath, 'build'),
+  });
+  const rbxlPath = buildContext.resolvePath(outputFileName);
+  await buildContext.rojoBuildAsync({ projectPath, output: rbxlPath });
 
   return { rbxlPath, target };
 }

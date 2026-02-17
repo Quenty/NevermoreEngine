@@ -20,7 +20,6 @@ export type {
 export type { OutputLevel } from './server/web-socket-protocol.js';
 
 // Lower-level exports for advanced usage / testing
-export { buildMinimalPlaceAsync } from './process/place-builder.js';
 export {
   findStudioPathAsync,
   findPluginsFolder,

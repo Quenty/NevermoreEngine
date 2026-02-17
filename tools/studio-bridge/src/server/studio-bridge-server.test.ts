@@ -29,13 +29,6 @@ vi.mock('../process/studio-process-manager.js', () => ({
   findPluginsFolder: vi.fn(() => '/fake/plugins'),
 }));
 
-vi.mock('../process/place-builder.js', () => ({
-  buildMinimalPlaceAsync: vi.fn(async () => ({
-    placePath: '/fake/place.rbxl',
-    cleanupAsync: vi.fn(async () => {}),
-  })),
-}));
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
