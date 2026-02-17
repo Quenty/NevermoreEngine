@@ -26,9 +26,18 @@ export interface BuildPlaceOptions {
   packageName?: string;
 }
 
-export interface BuildPlaceResult {
+/**
+ * Opaque handle representing a built place file.
+ * Callers see only the path and target — lifecycle is managed by the JobContext.
+ */
+export interface BuiltPlace {
   rbxlPath: string;
   target: DeployTarget;
+}
+
+export interface BuildPlaceResult extends BuiltPlace {
+  /** Present when a rojo build was performed; undefined when using a pre-built placeFile. */
+  buildContext?: BuildContext;
 }
 
 /**
@@ -78,11 +87,10 @@ export async function buildPlaceAsync(
   );
 
   const buildContext = await BuildContext.createAsync({
-    mode: 'persistent',
-    buildDir: path.resolve(packagePath, 'build'),
+    prefix: 'rojo-build-',
   });
   const rbxlPath = buildContext.resolvePath(outputFileName);
   await buildContext.rojoBuildAsync({ projectPath, output: rbxlPath });
 
-  return { rbxlPath, target };
+  return { rbxlPath, target, buildContext };
 }

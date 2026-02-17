@@ -11,7 +11,7 @@ local LogService = game:GetService("LogService")
 local RunService = game:GetService("RunService")
 
 -- Only run inside Studio
-if not RunService:IsStudio() then
+if not RunService:IsStudio() or RunService:IsRunning() then
 	return
 end
 

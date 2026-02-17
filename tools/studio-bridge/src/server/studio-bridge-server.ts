@@ -147,7 +147,6 @@ export class StudioBridgeServer {
       if (!placePath) {
         this._onPhase?.('building');
         this._placeBuildContext = await BuildContext.createAsync({
-          mode: 'temp',
           prefix: 'studio-bridge-',
         });
         const builtPlacePath = this._placeBuildContext.resolvePath('minimal.rbxl');

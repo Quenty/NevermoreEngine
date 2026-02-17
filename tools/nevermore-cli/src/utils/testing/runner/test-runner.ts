@@ -3,7 +3,6 @@ import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { type JobContext } from '../../job-context/job-context.js';
-import { buildPlaceAsync } from '../../build/build.js';
 import { parseTestLogs } from '../test-log-parser.js';
 
 export interface SingleTestResult {
@@ -38,7 +37,7 @@ export async function runSingleTestAsync(
   } = options;
 
   const sessionId = randomUUID();
-  const { rbxlPath, target } = await buildPlaceAsync({
+  const builtPlace = await context.buildPlaceAsync({
     targetName: 'test',
     outputFileName: `test-${sessionId}.rbxl`,
     packagePath,
@@ -47,11 +46,10 @@ export async function runSingleTestAsync(
   });
 
   const scriptContent =
-    scriptText ?? (await readTestScriptAsync(packagePath, target.scriptTemplate));
+    scriptText ?? (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
 
   const deployment = await context.deployBuiltPlaceAsync(reporter, {
-    rbxlPath,
-    deployTarget: target,
+    builtPlace,
     packageName,
     packagePath,
   });

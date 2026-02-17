@@ -1,10 +1,10 @@
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
-import { type DeployTarget } from '../build/deploy-config.js';
+import { type BuildPlaceOptions, type BuiltPlace } from '../build/build.js';
+
+export type { BuiltPlace } from '../build/build.js';
 
 export interface DeployPlaceOptions {
-  rbxlPath: string;
-  /** Required by cloud, ignored by local. */
-  deployTarget?: DeployTarget;
+  builtPlace: BuiltPlace;
   packageName: string;
   packagePath: string;
 }
@@ -28,6 +28,9 @@ export interface ScriptRunResult {
 export interface Deployment {}
 
 export interface JobContext {
+  /** Build a .rbxl place file. Returns an opaque handle — lifecycle managed by the context. */
+  buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace>;
+
   /** Deploy a built place to the execution environment. Returns a handle for subsequent operations. */
   deployBuiltPlaceAsync(reporter: Reporter, options: DeployPlaceOptions): Promise<Deployment>;
 
@@ -40,6 +43,9 @@ export interface JobContext {
   /** Release a single deployment (stop bridge / clear task metadata). */
   releaseAsync(deployment: Deployment): Promise<void>;
 
-  /** Final teardown — release all remaining deployments. Called once at end of batch. */
+  /** Eagerly release a built place's temporary resources. Idempotent. */
+  releaseBuiltPlaceAsync(builtPlace: BuiltPlace): Promise<void>;
+
+  /** Final teardown — release all remaining deployments and built places. Called once at end of batch. */
   disposeAsync(): Promise<void>;
 }

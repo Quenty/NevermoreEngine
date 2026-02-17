@@ -1,4 +1,3 @@
-import * as fs from 'fs/promises';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import {
   type LuauTask,
@@ -8,11 +7,11 @@ import { tryRenamePlaceAsync } from '../auth/roblox-auth/index.js';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
 import {
   type Deployment,
-  type JobContext,
   type DeployPlaceOptions,
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
+import { BaseJobContext } from './base-job-context.js';
 
 class CloudDeployment implements Deployment {
   universeId: number;
@@ -28,10 +27,11 @@ class CloudDeployment implements Deployment {
   }
 }
 
-export class CloudJobContext implements JobContext {
+export class CloudJobContext extends BaseJobContext {
   private _openCloudClient: OpenCloudClient;
 
   constructor(openCloudClient: OpenCloudClient) {
+    super();
     this._openCloudClient = openCloudClient;
   }
 
@@ -39,31 +39,26 @@ export class CloudJobContext implements JobContext {
     reporter: Reporter,
     options: DeployPlaceOptions
   ): Promise<Deployment> {
-    const { rbxlPath, deployTarget, packageName, packagePath } = options;
-
-    if (!deployTarget) {
-      throw new Error(
-        'CloudJobContext requires a deployTarget with universeId and placeId'
-      );
-    }
+    const { builtPlace, packageName, packagePath } = options;
+    const { rbxlPath, target } = builtPlace;
 
     reporter.onPackagePhaseChange(packageName, 'uploading');
     const version = await this._openCloudClient.uploadPlaceAsync(
-      deployTarget.universeId,
-      deployTarget.placeId,
+      target.universeId,
+      target.placeId,
       rbxlPath
     );
 
-    // Clean up the built .rbxl after upload
-    await fs.unlink(rbxlPath).catch(() => {});
+    // Eagerly release build artifacts after upload (disposeAsync is safety net)
+    await this.releaseBuiltPlaceAsync(builtPlace);
 
     // Best-effort rename to reflect current package + commit
     const placeName = await buildPlaceNameAsync(packagePath);
-    await tryRenamePlaceAsync(deployTarget.placeId, placeName);
+    await tryRenamePlaceAsync(target.placeId, placeName);
 
     return new CloudDeployment(
-      deployTarget.universeId,
-      deployTarget.placeId,
+      target.universeId,
+      target.placeId,
       version
     );
   }
@@ -124,6 +119,6 @@ export class CloudJobContext implements JobContext {
   }
 
   async disposeAsync(): Promise<void> {
-    // No-op for cloud — no persistent resources to clean up.
+    await super.disposeAsync();
   }
 }

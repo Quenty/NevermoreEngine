@@ -36,7 +36,6 @@ export async function injectPluginAsync(
   const { port, sessionId } = options;
 
   const buildContext = await BuildContext.createAsync({
-    mode: 'temp',
     prefix: 'studio-bridge-plugin-',
   });
 

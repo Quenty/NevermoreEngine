@@ -41,12 +41,8 @@ export async function rojoBuildAsync(options: RojoBuildOptions): Promise<void> {
 }
 
 export interface BuildContextOptions {
-  /** 'temp' creates a disposable mkdtemp directory; 'persistent' uses an existing path */
-  mode: 'temp' | 'persistent';
-  /** temp mode: mkdtemp prefix (e.g. 'studio-bridge-') */
+  /** mkdtemp prefix (e.g. 'rojo-build-') */
   prefix?: string;
-  /** persistent mode: absolute path to build dir */
-  buildDir?: string;
 }
 
 /**
@@ -56,12 +52,10 @@ export interface BuildContextOptions {
 export class BuildContext {
   private readonly _targetdir: string;
   private _cleaned = false;
-  private readonly _mode: 'temp' | 'persistent';
   private readonly _trackedFiles: string[] = [];
 
-  private constructor(dir: string, mode: 'temp' | 'persistent') {
+  private constructor(dir: string) {
     this._targetdir = dir;
-    this._mode = mode;
   }
 
   /**
@@ -69,22 +63,11 @@ export class BuildContext {
    * when this resolves.
    */
   static async createAsync(
-    options: BuildContextOptions
+    options: BuildContextOptions = {}
   ): Promise<BuildContext> {
-    let dir: string;
-
-    if (options.mode === 'temp') {
-      const prefix = options.prefix ?? 'build-';
-      dir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
-    } else {
-      if (!options.buildDir) {
-        throw new Error('BuildContext: persistent mode requires buildDir');
-      }
-      dir = options.buildDir;
-      await fs.mkdir(dir, { recursive: true });
-    }
-
-    return new BuildContext(dir, options.mode);
+    const prefix = options.prefix ?? 'build-';
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
+    return new BuildContext(dir);
   }
 
   /** Absolute path to the managed build directory. */
@@ -129,8 +112,7 @@ export class BuildContext {
   }
 
   /**
-   * Clean up the build directory. Idempotent — safe to call multiple times.
-   * Only removes temp directories; persistent directories are left intact.
+   * Clean up the build directory and tracked files. Idempotent — safe to call multiple times.
    */
   async cleanupAsync(): Promise<void> {
     if (this._cleaned) return;
@@ -144,14 +126,12 @@ export class BuildContext {
       }
     }
 
-    if (this._mode === 'temp') {
-      OutputHelper.verbose(`Cleaning up build directory: ${this._targetdir}`);
+    OutputHelper.verbose(`Cleaning up build directory: ${this._targetdir}`);
 
-      try {
-        await fs.rm(this._targetdir, { recursive: true, force: true });
-      } catch {
-        // best effort
-      }
+    try {
+      await fs.rm(this._targetdir, { recursive: true, force: true });
+    } catch {
+      // best effort
     }
   }
 }

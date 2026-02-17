@@ -1,11 +1,11 @@
 import { getApiKeyAsync, CredentialArgs } from '../auth/credential-store.js';
 import { type DeployTarget } from './deploy-config.js';
 import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
-import { type BuildPlaceResult } from './build.js';
+import { type BuiltPlace } from './build.js';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
 export interface UploadPlaceOptions {
-  buildResult: BuildPlaceResult;
+  builtPlace: BuiltPlace;
   args: CredentialArgs & { publish?: boolean };
   client: OpenCloudClient;
   reporter?: Reporter;
@@ -26,9 +26,9 @@ export interface UploadPlaceResult {
 export async function uploadPlaceAsync(
   options: UploadPlaceOptions
 ): Promise<UploadPlaceResult> {
-  const { buildResult, args, reporter, packageName } = options;
+  const { builtPlace, args, reporter, packageName } = options;
   let { client } = options;
-  const { rbxlPath, target } = buildResult;
+  const { rbxlPath, target } = builtPlace;
 
   const apiKey = await getApiKeyAsync(args);
 

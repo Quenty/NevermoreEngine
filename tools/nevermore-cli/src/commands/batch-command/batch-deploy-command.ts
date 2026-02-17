@@ -13,11 +13,11 @@ import {
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
-import { buildPlaceAsync } from '../../utils/build/build.js';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
 import { createDeployCommentConfig } from '../../utils/deploy/deploy-github-columns.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
+import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import {
   discoverAllTargetPackagesAsync,
   discoverChangedTargetPackagesAsync,
@@ -170,42 +170,50 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     apiKey,
     rateLimiter: new RateLimiter(),
   });
+  const context = new CloudJobContext(client);
 
   await reporter.startAsync();
 
-  const publish = args.publish ?? false;
-  const results = await runBatchAsync({
-    packages,
-    concurrency,
-    reporter,
-    bufferOutput: isGrouped,
-    executeAsync: async (pkg, pkgReporter) => {
-      const buildResult = await buildPlaceAsync({
-        targetName,
-        outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
-        packagePath: pkg.path,
-        reporter: pkgReporter,
-        packageName: pkg.name,
-      });
+  try {
+    const publish = args.publish ?? false;
+    const results = await runBatchAsync({
+      packages,
+      concurrency,
+      reporter,
+      bufferOutput: isGrouped,
+      executeAsync: async (pkg, pkgReporter) => {
+        const builtPlace = await context.buildPlaceAsync({
+          targetName,
+          outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
+          packagePath: pkg.path,
+          reporter: pkgReporter,
+          packageName: pkg.name,
+        });
 
-      const { version } = await uploadPlaceAsync({
-        buildResult,
-        args: { apiKey, publish },
-        client,
-        reporter: pkgReporter,
-        packageName: pkg.name,
-      });
+        const { version } = await uploadPlaceAsync({
+          builtPlace,
+          args: { apiKey, publish },
+          client,
+          reporter: pkgReporter,
+          packageName: pkg.name,
+        });
 
-      const action = publish ? 'Published' : 'Saved';
-      return {
-        packageName: pkg.name,
-        success: true,
-        logs: `${action} v${version}`,
-      };
-    },
-  });
+        // Eagerly release build artifacts after upload
+        await context.releaseBuiltPlaceAsync(builtPlace);
 
-  await reporter.stopAsync();
+        const action = publish ? 'Published' : 'Saved';
+        return {
+          packageName: pkg.name,
+          success: true,
+          logs: `${action} v${version}`,
+        };
+      },
+    });
 
-  process.exit(results.summary.failed > 0 ? 1 : 0);
+    await reporter.stopAsync();
+
+    process.exit(results.summary.failed > 0 ? 1 : 0);
+  } finally {
+    await context.disposeAsync();
+  }
 }

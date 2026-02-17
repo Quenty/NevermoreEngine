@@ -1,36 +1,36 @@
-import * as fs from 'fs/promises';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { StudioBridge } from '@quenty/studio-bridge';
 import {
+  type BuiltPlace,
   type Deployment,
-  type JobContext,
   type DeployPlaceOptions,
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
+import { BaseJobContext } from './base-job-context.js';
 
 class LocalDeployment implements Deployment {
   bridge: StudioBridge;
-  rbxlPath: string;
+  builtPlace: BuiltPlace;
   cachedLogs = '';
 
-  constructor(bridge: StudioBridge, rbxlPath: string) {
+  constructor(bridge: StudioBridge, builtPlace: BuiltPlace) {
     this.bridge = bridge;
-    this.rbxlPath = rbxlPath;
+    this.builtPlace = builtPlace;
   }
 }
 
-export class LocalJobContext implements JobContext {
+export class LocalJobContext extends BaseJobContext {
   private _deployments = new Set<LocalDeployment>();
 
   async deployBuiltPlaceAsync(
     reporter: Reporter,
     options: DeployPlaceOptions
   ): Promise<Deployment> {
-    const { rbxlPath, packageName } = options;
+    const { builtPlace, packageName } = options;
 
     const bridge = new StudioBridge({
-      placePath: rbxlPath,
+      placePath: builtPlace.rbxlPath,
       onPhase: (phase) => {
         if (phase === 'launching' || phase === 'connecting') {
           reporter.onPackagePhaseChange(packageName, phase);
@@ -40,7 +40,7 @@ export class LocalJobContext implements JobContext {
 
     await bridge.startAsync();
 
-    const deployment = new LocalDeployment(bridge, rbxlPath);
+    const deployment = new LocalDeployment(bridge, builtPlace);
     this._deployments.add(deployment);
     return deployment;
   }
@@ -80,10 +80,8 @@ export class LocalJobContext implements JobContext {
 
     await localDeployment.bridge.stopAsync();
 
-    await Promise.all([
-      fs.unlink(localDeployment.rbxlPath).catch(() => {}),
-      fs.unlink(`${localDeployment.rbxlPath}.lock`).catch(() => {}),
-    ]);
+    // Release build artifacts (removes .rbxl, .rbxl.lock, and temp dir)
+    await this.releaseBuiltPlaceAsync(localDeployment.builtPlace);
 
     this._deployments.delete(localDeployment);
   }
@@ -93,5 +91,6 @@ export class LocalJobContext implements JobContext {
     for (const d of remaining) {
       await this.releaseAsync(d);
     }
+    await super.disposeAsync();
   }
 }
