@@ -4,13 +4,17 @@ import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
+import {
+  CloudJobContext,
+  LocalJobContext,
+} from '../../utils/job-context/index.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import {
   discoverAllTestablePackagesAsync,
   discoverChangedTestablePackagesAsync,
   type TargetPackage,
-} from '../../utils/testing/changed-tests-utils.js';
+} from '../../utils/batch/changed-packages-utils.js';
 import {
   type LiveStateTracker,
   type BatchTestResult,
@@ -24,8 +28,7 @@ import {
   createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
 import {
-  runSingleCloudTestAsync,
-  runSingleLocalTestAsync,
+  runSingleTestAsync,
   type SingleTestResult,
 } from '../../utils/testing/runner/test-runner.js';
 import { isCI } from '../../utils/nevermore-cli-utils.js';
@@ -169,14 +172,12 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     reporter,
     bufferOutput: isGrouped,
     executeAsync: async (pkg, pkgReporter) => {
-      const result = client
-        ? await _runWithRetryAsync(pkg, client, timeoutMs, pkgReporter)
-        : await runSingleLocalTestAsync({
-            packagePath: pkg.path,
-            reporter: pkgReporter,
-            packageName: pkg.name,
-            timeoutMs,
-          });
+      const result = await _runWithRetryAsync(
+        pkg,
+        client,
+        timeoutMs,
+        pkgReporter
+      );
 
       return {
         packageName: pkg.name,
@@ -196,28 +197,37 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
 async function _runWithRetryAsync(
   pkg: TargetPackage,
-  client: OpenCloudClient,
+  client: OpenCloudClient | undefined,
   timeoutMs: number,
   reporter: Reporter
 ): Promise<SingleTestResult> {
   const opts = {
     packagePath: pkg.path,
-    client,
-    reporter,
     packageName: pkg.name,
     timeoutMs,
   };
 
+  const createContext = () =>
+    client ? new CloudJobContext({ client }) : new LocalJobContext();
+
+  const context = createContext();
   try {
-    return await runSingleCloudTestAsync(opts);
+    return await runSingleTestAsync(context, reporter, opts);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
 
     if (message.includes('timed out') || message.includes('fetch failed')) {
       OutputHelper.warn(`${pkg.name}: transient failure, retrying...`);
-      return await runSingleCloudTestAsync(opts);
+      const retryContext = createContext();
+      try {
+        return await runSingleTestAsync(retryContext, reporter, opts);
+      } finally {
+        await retryContext.cleanupAsync();
+      }
     }
 
     throw err;
+  } finally {
+    await context.cleanupAsync();
   }
 }

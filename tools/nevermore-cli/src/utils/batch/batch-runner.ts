@@ -4,7 +4,7 @@ import {
   type PackageResult,
   type BatchSummary,
 } from '@quenty/cli-output-helpers/reporting';
-import { type TargetPackage } from '../testing/changed-tests-utils.js';
+import { type TargetPackage } from './changed-packages-utils.js';
 
 export interface BatchOptions<TResult extends PackageResult> {
   packages: TargetPackage[];

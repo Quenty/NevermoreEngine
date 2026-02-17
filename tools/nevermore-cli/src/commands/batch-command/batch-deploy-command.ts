@@ -21,7 +21,7 @@ import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import {
   discoverAllTargetPackagesAsync,
   discoverChangedTargetPackagesAsync,
-} from '../../utils/testing/changed-tests-utils.js';
+} from '../../utils/batch/changed-packages-utils.js';
 import { isCI } from '../../utils/nevermore-cli-utils.js';
 
 interface BatchDeployArgs extends NevermoreGlobalArgs {

@@ -217,25 +217,32 @@ export class OpenCloudClient {
   }
 
   async getTaskLogsAsync(taskPath: string): Promise<ParsedTestLogs> {
-    // The Open Cloud API may not have logs available immediately after task
-    // completion. Retry a few times with a short delay if we get an empty
-    // response, since the test runner always produces at least some output.
+    const raw = await this.getRawTaskLogsAsync(taskPath);
+    return parseTestLogs(raw);
+  }
+
+  /**
+   * Fetch raw log text from a completed Luau execution task.
+   * Retries a few times if the API returns empty logs, since the test runner
+   * always produces at least some output.
+   */
+  async getRawTaskLogsAsync(taskPath: string): Promise<string> {
     const maxAttempts = 3;
     const retryDelayMs = 1000;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const result = await this._fetchLogsAsync(taskPath);
-      if (result.logs || attempt === maxAttempts) {
-        return result;
+      const logs = await this._fetchRawLogsAsync(taskPath);
+      if (logs || attempt === maxAttempts) {
+        return logs;
       }
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
     }
 
     // Unreachable, but satisfies the type checker
-    return this._fetchLogsAsync(taskPath);
+    return this._fetchRawLogsAsync(taskPath);
   }
 
-  private async _fetchLogsAsync(taskPath: string): Promise<ParsedTestLogs> {
+  private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
     const response = await this._rateLimiter.fetchAsync(
       `https://apis.roblox.com/cloud/v2/${taskPath}/logs`,
       {
@@ -256,8 +263,6 @@ export class OpenCloudClient {
     };
 
     const messages = data.luauExecutionSessionTaskLogs?.[0]?.messages ?? [];
-    const logs = messages.join('\n');
-
-    return parseTestLogs(logs);
+    return messages.join('\n');
   }
 }

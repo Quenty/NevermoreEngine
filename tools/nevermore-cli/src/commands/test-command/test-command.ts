@@ -6,10 +6,8 @@ import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
-import {
-  runSingleCloudTestAsync,
-  runSingleLocalTestAsync,
-} from '../../utils/testing/runner/test-runner.js';
+import { CloudJobContext, LocalJobContext } from '../../utils/job-context/index.js';
+import { runSingleTestAsync } from '../../utils/testing/runner/test-runner.js';
 import {
   type LiveStateTracker,
   CompositeReporter,
@@ -92,29 +90,24 @@ export class TestProjectCommand<T>
       ]);
       await reporter.startAsync();
 
-      const scriptText = args.scriptText;
+      const context = args.cloud
+        ? new CloudJobContext({
+            client: new OpenCloudClient({
+              apiKey: await getApiKeyAsync(args),
+              rateLimiter: new RateLimiter(),
+            }),
+          })
+        : new LocalJobContext();
 
       let result;
-      if (args.cloud) {
-        const apiKey = await getApiKeyAsync(args);
-        const client = new OpenCloudClient({
-          apiKey,
-          rateLimiter: new RateLimiter(),
-        });
-        result = await runSingleCloudTestAsync({
+      try {
+        result = await runSingleTestAsync(context, reporter, {
           packagePath: cwd,
-          client,
-          reporter,
           packageName,
-          scriptText,
+          scriptText: args.scriptText,
         });
-      } else {
-        result = await runSingleLocalTestAsync({
-          packagePath: cwd,
-          reporter,
-          packageName,
-          scriptText,
-        });
+      } finally {
+        await context.cleanupAsync();
       }
 
       reporter.onPackageResult({
