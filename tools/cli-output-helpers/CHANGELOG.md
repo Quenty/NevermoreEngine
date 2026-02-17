@@ -1,25 +1,23 @@
-# v1.6.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add GitHub Actions job summary reporter [#660](https://github.com/Quenty/NevermoreEngine/pull/660) ([@Quenty](https://github.com/Quenty))
-- feat(cli): add GitHub Actions job summary reporter ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor(cli): extract GitHub API into its own module ([@Quenty](https://github.com/Quenty))
-- fix(cli): strip redundant heading from job summary output ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.6.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.5.2...@quenty/cli-output-helpers@1.6.0) (2026-02-17)
+
+
+### Bug Fixes
+
+* **cli:** strip redundant heading from job summary output ([3683d56](https://github.com/Quenty/Nevermore/commit/3683d56fd6ac889db6c33f4b348a32ee9807197e))
+
+
+### Features
+
+* **cli:** add GitHub Actions job summary reporter ([84db8d2](https://github.com/Quenty/Nevermore/commit/84db8d2518df1293fb9bc1d3e05c69cf236e2ed5))
+
+
+
+
 
 ## [1.5.2](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.5.1...@quenty/cli-output-helpers@1.5.2) (2026-02-17)
 

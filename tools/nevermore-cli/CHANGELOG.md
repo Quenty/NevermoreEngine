@@ -1,20 +1,18 @@
-# v4.17.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add GitHub Actions job summary reporter [#660](https://github.com/Quenty/NevermoreEngine/pull/660) ([@Quenty](https://github.com/Quenty))
-- feat(cli): add GitHub Actions job summary reporter ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.17.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.16.2...@quenty/nevermore-cli@4.17.0) (2026-02-17)
+
+
+### Features
+
+* **cli:** add GitHub Actions job summary reporter ([84db8d2](https://github.com/Quenty/Nevermore/commit/84db8d2518df1293fb9bc1d3e05c69cf236e2ed5))
+
+
+
+
 
 ## [4.16.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.16.1...@quenty/nevermore-cli@4.16.2) (2026-02-17)
 
