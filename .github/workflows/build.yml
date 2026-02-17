@@ -47,8 +47,8 @@ jobs:
       - name: Build all tools
         run: pnpm -r --filter './tools/**' run build
 
-      - name: Git reset .npmrc
-        run: git checkout .npmrc
+      - name: Reset .npmrc
+        run: rm .npmrc
 
       - name: Create Release
         env:
@@ -56,11 +56,3 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx auto shipit
 
-      - name: Upload lerna logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lerna-debug-log
-          path: |
-            **/lerna-debug.log
-            **/npm-debug.log
