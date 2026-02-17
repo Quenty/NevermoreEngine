@@ -23,7 +23,7 @@ export class InitPackageCommand<T>
   public command = 'package [package-name] [description] [package-template]';
   public describe = 'Scaffold a new package within Nevermore';
 
-  public builder(args: Argv<T>) {
+  public builder = (args: Argv<T>) => {
     let result = args
       .positional('package-name', {
         describe: 'Name of the new package folder.',
@@ -42,9 +42,9 @@ export class InitPackageCommand<T>
       });
 
     return result as any;
-  }
+  };
 
-  public async handler(args: InitPackageArgs) {
+  public handler = async (args: InitPackageArgs) => {
     let rawPackageName = await InitPackageCommand._ensurePackageName(args);
 
     const packageName = TemplateHelper.camelize(rawPackageName).toLowerCase();

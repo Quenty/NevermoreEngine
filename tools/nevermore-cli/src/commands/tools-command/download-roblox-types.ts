@@ -3,6 +3,7 @@
  */
 
 import { Argv, CommandModule } from 'yargs';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import * as fs from 'fs/promises';
 import * as fsSync from 'fs';
@@ -21,7 +22,7 @@ export class DownloadRobloxTypes<T>
   public command = 'download-roblox-types [file-name]';
   public describe = 'Downloads the Roblox Luau type definitions.';
 
-  public builder(args: Argv<T>) {
+  public builder = (args: Argv<T>) => {
     args.positional('file-name', {
       describe: 'Path to save the downloaded Roblox Luau type definitions.',
       demandOption: false,
@@ -29,26 +30,42 @@ export class DownloadRobloxTypes<T>
       default: 'globalTypes.d.lua',
     });
     return args as Argv<DownloadRobloxTypesArgs>;
-  }
+  };
 
-  public async handler(args: DownloadRobloxTypesArgs) {
+  public handler = async (args: DownloadRobloxTypesArgs) => {
+    const filename = args.fileName ?? 'globalTypes.d.lua';
+
     await DownloadRobloxTypes._download(
-      args.fileName ?? 'globalTypes.d.lua',
+      filename,
       'https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.lua'
     );
-  }
+  };
 
   private static async _download(filename: string, url: string): Promise<void> {
     if (!(await DownloadRobloxTypes._needsDownload(filename))) {
+      OutputHelper.verbose(`Skipping download, ${filename} is up to date`);
       return;
     }
+
+    OutputHelper.verbose(`Downloading Roblox type definitions to ${filename}...`);
 
     return new Promise((resolve, reject) => {
       const file = fsSync.createWriteStream(filename);
       const request = https.get(url, (response: any) => {
+        if (response.statusCode !== 200) {
+          fsSync.unlink(filename, () => {});
+          reject(
+            new Error(
+              `Failed to download ${url}: HTTP ${response.statusCode}`
+            )
+          );
+          return;
+        }
+
         response.pipe(file);
         file.on('finish', () => {
           file.close();
+          OutputHelper.verbose(`Downloaded ${filename}`);
           resolve();
         });
       });
