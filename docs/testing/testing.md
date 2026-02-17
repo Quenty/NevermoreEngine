@@ -1,3 +1,8 @@
+---
+title: Test Infrastructure
+sidebar_position: 1
+---
+
 # Testing
 
 ## Writing tests
@@ -177,3 +182,20 @@ Options:
 | `--output` | Write JSON results to a file |
 | `--limit` | Max number of packages to test |
 | `--logs` | Show execution logs for all packages |
+
+## Credential resolution
+
+The CLI resolves API credentials in this order (first match wins):
+
+1. `--api-key` CLI flag
+2. `ROBLOX_OPEN_CLOUD_API_KEY` environment variable
+3. `ROBLOX_UNIT_TEST_API_KEY` environment variable (backwards compat)
+4. `~/.nevermore/credentials.json` (stored via `nevermore login`)
+
+In interactive mode, if no credentials are found, the CLI prompts inline. In `--yes` (CI) mode, it errors immediately.
+
+## CI design principles
+
+- **Workflows should be thin.** All logic lives in `nevermore-cli` commands — GitHub Actions workflows just call them. This keeps CI debuggable locally.
+- **Rate limiting** is shared across concurrent workers via the `OpenCloudClient` instance. The `RateLimiter` serializes all Open Cloud API requests (one in-flight at a time) and reads `x-ratelimit-remaining` / `x-ratelimit-reset` headers.
+- **Post results via CLI**: `nevermore ci post-test-results <file>` posts or updates a PR comment with test results. Requires `GITHUB_TOKEN`.
