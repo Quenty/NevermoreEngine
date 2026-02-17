@@ -1,6 +1,6 @@
 {
   "name": "@quenty/soundgroup",
-  "version": "1.32.3",
+  "version": "1.33.0",
   "description": "Service and utility methods to working with sound groups and sounds in Roblox",
   "keywords": [
     "Roblox",
@@ -35,6 +35,7 @@
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/rogue-properties": "workspace:*",
@@ -43,8 +44,7 @@
     "@quenty/signal": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

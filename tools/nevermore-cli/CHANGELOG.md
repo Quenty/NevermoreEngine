@@ -1,40 +1,30 @@
-# v4.16.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
-- feat: Refactor studio bridge ([@Quenty](https://github.com/Quenty))
-- feat: Unify plugin testing reporting and start initial local test execution mode ([@Quenty](https://github.com/Quenty))
-- feat: Improve output quality of testing cli tools ([@Quenty](https://github.com/Quenty))
-- feat: Better error messages and optimized tests ([@Quenty](https://github.com/Quenty))
-- feat: Add CI/CD batch unit testing ([@Quenty](https://github.com/Quenty))
-- feat: Create places automatically using nevermore-cli ([@Quenty](https://github.com/Quenty))
-- feat: Add Nevermore deploy and Nevermore test commands that run files in the open cloud ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Local testing works consistently and in batch mode ([@Quenty](https://github.com/Quenty))
-- refactor: Lifecycle of constructed places is handled properly ([@Quenty](https://github.com/Quenty))
-- refactor: Better life-cycle management of the build-context ([@Quenty](https://github.com/Quenty))
-- refactor: Lifecycle management managed better ([@Quenty](https://github.com/Quenty))
-- refactor: Initial batch test split ([@Quenty](https://github.com/Quenty))
-- refactor: Remove unused code and cleanup code here ([@Quenty](https://github.com/Quenty))
-- refactor: Unify rojo building process in plugin ([@Quenty](https://github.com/Quenty))
-- refactor: Add reporting ([@Quenty](https://github.com/Quenty))
-- refactor: Move test reporting to general cli-output-helpers reporting ([@Quenty](https://github.com/Quenty))
-- fix: Tests timing out ([@Quenty](https://github.com/Quenty))
-- refactor: Reorganize nevermore-cli into cleaner sub-commands ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.16.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.15.2...@quenty/nevermore-cli@4.16.0) (2026-02-17)
+
+
+### Bug Fixes
+
+* Local testing works consistently and in batch mode ([67d6ba1](https://github.com/Quenty/Nevermore/commit/67d6ba1d3625dc76f7a54ac13e75da2cc82ccc64))
+* Tests timing out ([8566a58](https://github.com/Quenty/Nevermore/commit/8566a584d7bb30585cdb83c5a56520fab44a8c72))
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/Nevermore/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Add Nevermore deploy and Nevermore test commands that run files in the open cloud ([81f328d](https://github.com/Quenty/Nevermore/commit/81f328db23f4ecdedad121f9c2d4789aded59d4e))
+* Better error messages and optimized tests ([71ca056](https://github.com/Quenty/Nevermore/commit/71ca056517ee98e625d61e7dcd923dc808ac3edc))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/Nevermore/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+* Improve output quality of testing cli tools ([217630c](https://github.com/Quenty/Nevermore/commit/217630c354308b740092c07077341dc82d134965))
+* Refactor studio bridge ([8afe642](https://github.com/Quenty/Nevermore/commit/8afe6424b6635eaa0155734c085934051de88da6))
+* Unify plugin testing reporting and start initial local test execution mode ([5376478](https://github.com/Quenty/Nevermore/commit/53764782b35c7897aa90baeb3bd7c4baacf4e591))
+
+
+
+
 
 ## [4.15.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.15.1...@quenty/nevermore-cli@4.15.2) (2026-01-20)
 

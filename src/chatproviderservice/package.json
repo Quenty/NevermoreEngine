@@ -1,6 +1,6 @@
 {
   "name": "@quenty/chatproviderservice",
-  "version": "9.41.4",
+  "version": "9.42.0",
   "description": "Provide wrapper around chat system to allow tags to be set",
   "keywords": [
     "Roblox",
@@ -40,6 +40,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/localizedtextutils": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/permissionprovider": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
     "@quenty/playerutils": "workspace:*",
@@ -53,8 +54,7 @@
     "@quenty/signal": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

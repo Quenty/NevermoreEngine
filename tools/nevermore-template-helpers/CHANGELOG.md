@@ -1,29 +1,19 @@
-# v1.6.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix spinner design showing stuff ([@Quenty](https://github.com/Quenty))
-- fix: Local testing works consistently and in batch mode ([@Quenty](https://github.com/Quenty))
-- refactor: Lifecycle of constructed places is handled properly ([@Quenty](https://github.com/Quenty))
-- refactor: Better life-cycle management of the build-context ([@Quenty](https://github.com/Quenty))
-- refactor: Lifecycle management managed better ([@Quenty](https://github.com/Quenty))
-- refactor: Remove unused code and cleanup code here ([@Quenty](https://github.com/Quenty))
-- refactor: Unify rojo building process in plugin ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.6.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.5.1...@quenty/nevermore-template-helpers@1.6.0) (2026-02-17)
+
+
+### Bug Fixes
+
+* Fix spinner design showing stuff ([814cd91](https://github.com/Quenty/Nevermore/commit/814cd915358079f7d628a9739d0cd56e472b52f6))
+* Local testing works consistently and in batch mode ([67d6ba1](https://github.com/Quenty/Nevermore/commit/67d6ba1d3625dc76f7a54ac13e75da2cc82ccc64))
+
+
+
+
 
 ## [1.5.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.5.0...@quenty/nevermore-template-helpers@1.5.1) (2026-01-19)
 

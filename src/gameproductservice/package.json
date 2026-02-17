@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameproductservice",
-  "version": "14.41.2",
+  "version": "14.42.0",
   "description": "Generalized monetization system for handling products and purchases correctly.",
   "keywords": [
     "Roblox",
@@ -42,6 +42,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/marketplaceutils": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
     "@quenty/playerutils": "workspace:*",
@@ -57,7 +58,6 @@
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   }
 }

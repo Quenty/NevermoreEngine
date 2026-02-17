@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputkeymaputils",
-  "version": "14.35.0",
+  "version": "14.36.0",
   "description": "System to define rebindable key bindings and inputs for Roblox.",
   "keywords": [
     "Roblox",
@@ -37,6 +37,7 @@
     "@quenty/inputmode": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/pseudolocalize": "workspace:*",
     "@quenty/rx": "workspace:*",
@@ -45,8 +46,7 @@
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

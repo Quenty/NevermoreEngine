@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ik",
-  "version": "15.42.2",
+  "version": "15.43.0",
   "description": "Inverse Kinematics for characters on Roblox",
   "keywords": [
     "Roblox",
@@ -41,6 +41,7 @@
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",
     "@quenty/motor6d": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/optional": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/qframe": "workspace:*",
@@ -52,8 +53,7 @@
     "@quenty/signal": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   },
   "devDependencies": {
     "@quenty/rigbuilderutils": "workspace:*"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cli-output-helpers",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Helpers to generate Nevermore package and game templates",
   "type": "module",
   "keywords": [
@@ -16,8 +16,12 @@
   },
   "typesVersions": {
     "*": {
-      "reporting": ["dist/reporting/index.d.ts"],
-      "cli-utils": ["dist/cli-utils.d.ts"]
+      "reporting": [
+        "dist/reporting/index.d.ts"
+      ],
+      "cli-utils": [
+        "dist/cli-utils.d.ts"
+      ]
     }
   },
   "bugs": {

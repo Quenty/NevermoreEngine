@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.27.1...@quenty/actionmanager@13.28.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/actionmanager
+
+
+
+
+
 ## [13.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.27.0...@quenty/actionmanager@13.27.1) (2026-01-21)
 
 **Note:** Version bump only for package @quenty/actionmanager

@@ -1,23 +1,18 @@
-# v10.10.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix replication mode for detected plugins (this fixes tests bootstrapped through server script) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.9.3...@quenty/loader@10.10.0) (2026-02-17)
+
+
+### Bug Fixes
+
+* Fix replication mode for detected plugins (this fixes tests bootstrapped through server script) ([32d6ff5](https://github.com/Quenty/NevermoreEngine/commit/32d6ff5aaee0136a3e4be4a793d1c3b0411c90ba))
+
+
+
+
 
 ## [10.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.9.2...@quenty/loader@10.9.3) (2026-01-12)
 

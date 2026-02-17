@@ -1,29 +1,25 @@
-# v1.5.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
-- feat: Use reporting system for studio bridge too (a bit ugly) ([@Quenty](https://github.com/Quenty))
-- feat: Improve output quality of testing cli tools ([@Quenty](https://github.com/Quenty))
-- feat: Better error messages and optimized tests ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix spinner design showing stuff ([@Quenty](https://github.com/Quenty))
-- refactor: Simplify code ([@Quenty](https://github.com/Quenty))
-- refactor: Add reporting ([@Quenty](https://github.com/Quenty))
-- refactor: Move test reporting to general cli-output-helpers reporting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.5.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.3.0...@quenty/cli-output-helpers@1.5.0) (2026-02-17)
+
+
+### Bug Fixes
+
+* Fix spinner design showing stuff ([814cd91](https://github.com/Quenty/Nevermore/commit/814cd915358079f7d628a9739d0cd56e472b52f6))
+
+
+### Features
+
+* Better error messages and optimized tests ([71ca056](https://github.com/Quenty/Nevermore/commit/71ca056517ee98e625d61e7dcd923dc808ac3edc))
+* Improve output quality of testing cli tools ([217630c](https://github.com/Quenty/Nevermore/commit/217630c354308b740092c07077341dc82d134965))
+* Use reporting system for studio bridge too (a bit ugly) ([20b675c](https://github.com/Quenty/Nevermore/commit/20b675cb22cb46c88b556f4afdda2700dd1258dd))
+
+
+
+
 
 # [1.3.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.2.5...@quenty/cli-output-helpers@1.3.0) (2026-01-14)
 

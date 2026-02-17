@@ -1,6 +1,6 @@
 {
   "name": "@quenty/animations",
-  "version": "8.26.1",
+  "version": "8.27.0",
   "description": "Utility methods for playing back animations on Roblox",
   "keywords": [
     "Roblox",
@@ -34,13 +34,13 @@
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
     "@quenty/rbxasset": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/signal": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

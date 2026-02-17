@@ -1,6 +1,6 @@
 {
   "name": "@quenty/camera",
-  "version": "14.32.2",
+  "version": "14.33.0",
   "description": "Quenty's camera system for Roblox",
   "keywords": [
     "Roblox",
@@ -38,13 +38,13 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/qframe": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/spring": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quenty/vector3utils": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/vector3utils": "workspace:*"
   },
   "devDependencies": {
     "@quenty/camerastoryutils": "workspace:*"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/blend",
-  "version": "12.28.2",
+  "version": "12.29.0",
   "description": "Declarative UI system.",
   "keywords": [
     "Roblox",
@@ -36,6 +36,7 @@
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/signal": "workspace:*",
@@ -44,8 +45,7 @@
     "@quenty/string": "workspace:*",
     "@quenty/uiobjectutils": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   },
   "devDependencies": {
     "@quenty/contentproviderutils": "workspace:*",

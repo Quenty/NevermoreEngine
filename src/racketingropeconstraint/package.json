@@ -1,6 +1,6 @@
 {
   "name": "@quenty/racketingropeconstraint",
-  "version": "12.35.1",
+  "version": "12.36.0",
   "description": "Tries to racket a rope constraint back down to a reasonable length",
   "keywords": [
     "Roblox",

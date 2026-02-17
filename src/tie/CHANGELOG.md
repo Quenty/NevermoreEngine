@@ -1,21 +1,19 @@
-# v10.34.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
-- feat: Add CI/CD batch unit testing ([@Quenty](https://github.com/Quenty))
-- feat: Create places automatically using nevermore-cli ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.33.1...@quenty/tie@10.34.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
 
 ## [10.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.33.0...@quenty/tie@10.33.1) (2026-01-21)
 

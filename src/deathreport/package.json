@@ -1,6 +1,6 @@
 {
   "name": "@quenty/deathreport",
-  "version": "10.36.1",
+  "version": "10.37.0",
   "description": "Death report service which will track the deaths of players",
   "keywords": [
     "Roblox",
@@ -38,13 +38,13 @@
     "@quenty/humanoidkillerutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/playerhumanoidbinder": "workspace:*",
     "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/rxbinderutils": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
-    "@quenty/table": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/table": "workspace:*"
   }
 }

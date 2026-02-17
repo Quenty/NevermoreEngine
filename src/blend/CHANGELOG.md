@@ -1,22 +1,20 @@
-# v12.29.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
-- feat: Add CI/CD batch unit testing ([@Quenty](https://github.com/Quenty))
-- feat: Create places automatically using nevermore-cli ([@Quenty](https://github.com/Quenty))
-- feat: Add Nevermore deploy and Nevermore test commands that run files in the open cloud ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.28.2...@quenty/blend@12.29.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Add Nevermore deploy and Nevermore test commands that run files in the open cloud ([81f328d](https://github.com/Quenty/NevermoreEngine/commit/81f328db23f4ecdedad121f9c2d4789aded59d4e))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
 
 ## [12.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.28.1...@quenty/blend@12.28.2) (2026-01-23)
 

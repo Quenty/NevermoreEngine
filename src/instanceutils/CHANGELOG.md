@@ -1,20 +1,18 @@
-# v13.25.0 (Tue Feb 17 2026)
-
-#### 🚀 Enhancement
-
-- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
-- feat: Add CI/CD batch unit testing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@13.24.1...@quenty/instanceutils@13.25.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
 
 ## [13.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@13.24.0...@quenty/instanceutils@13.24.1) (2026-01-21)
 

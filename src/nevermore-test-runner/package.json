@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-test-runner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Unified test runner service for Nevermore packages",
   "keywords": [
     "Roblox",

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rogue-humanoid",
-  "version": "10.39.3",
+  "version": "10.40.0",
   "description": "Roguelike humanoid properties which can be modified",
   "keywords": [
     "Roblox",
@@ -36,13 +36,13 @@
     "@quenty/characterutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/playerhumanoidbinder": "workspace:*",
     "@quenty/rogue-properties": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

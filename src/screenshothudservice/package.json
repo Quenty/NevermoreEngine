@@ -1,6 +1,6 @@
 {
   "name": "@quenty/screenshothudservice",
-  "version": "7.27.1",
+  "version": "7.28.0",
   "description": "Provides centralized API surface for screenshot hud API",
   "keywords": [
     "Roblox",
@@ -33,13 +33,13 @@
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/statestack": "workspace:*",
-    "@quenty/valueobject": "workspace:*",
-    "@quenty/nevermore-test-runner": "workspace:*"
+    "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
