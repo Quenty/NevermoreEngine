@@ -84,6 +84,6 @@ Keep descriptions to 1-3 sentences. If a PR needs a long explanation, that's usu
 - Use `users/{username}/{description}` branch names: `users/quenty/job-summary-reporter`, `users/quenty/fix-spinner-cursor`
 - Releases are CI-driven via `auto shipit` — never release locally
 
-## No co-authorship
+## Commit authorship
 
-Do not include `Co-Authored-By` on Nevermore commits (open source repo).
+Commits are attributed to the person who authored them. Do not add `Co-Authored-By` trailers — Nevermore is open source and each commit should have a single clear author.
