@@ -1,3 +1,8 @@
+---
+title: VSCode / Cursor
+sidebar_position: 1
+---
+
 # Getting started with VSCode
 
 VSCode works with Nevermore relatively easily. We have default extensions.json setup. Follow the general setup tips. This types should generally work for Cursor and other VS-Code based IDEs.

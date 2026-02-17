@@ -11,13 +11,16 @@ import { dirname, join } from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { VersionChecker } from '@quenty/nevermore-cli-helpers';
 
-import { InitGameCommand } from './commands/init-game-command.js';
-import { InitPackageCommand } from './commands/init-package-command.js';
-import { InitPluginCommand } from './commands/init-plugin-command.js';
-import { PackCommand } from './commands/pack-command.js';
+import { InitCommand } from './commands/init-command/index.js';
+import { InitPackageCommand } from './commands/init-command/init-package-command.js';
+import { InitPluginCommand } from './commands/init-command/init-plugin-command.js';
 import { InstallPackageCommand } from './commands/install-package-command.js';
-import { TestProjectCommand } from './commands/test-project-command.js';
-import { DownloadRobloxTypes } from './commands/download-roblox-types.js';
+import { TestProjectCommand } from './commands/test-command/test-command.js';
+import { DeployCommand } from './commands/deploy-command/index.js';
+import { LoginCommand } from './commands/login-command.js';
+import { BatchCommand } from './commands/batch-command/index.js';
+import { ToolsCommand } from './commands/tools-command/index.js';
+import { DownloadRobloxTypes } from './commands/tools-command/download-roblox-types.js';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Nevermore CLI',
@@ -49,14 +52,36 @@ yargs(hideBin(process.argv))
     global: true,
     type: 'boolean',
   })
+  .option('verbose', {
+    description:
+      'Show intermediate output (building, uploading, cookie loading, etc.)',
+    default: false,
+    global: true,
+    type: 'boolean',
+  })
+  .middleware((argv) => {
+    OutputHelper.setVerbose(argv.verbose as boolean);
+  })
   .usage(OutputHelper.formatInfo('Usage: $0 <command> [options]'))
-  .command(new InitGameCommand() as any)
-  .command(new InitPackageCommand() as any)
-  .command(new InitPluginCommand() as any)
-  .command(new PackCommand() as any)
+  .command(new InitCommand() as any)
   .command(new InstallPackageCommand() as any)
   .command(new TestProjectCommand() as any)
-  .command(new DownloadRobloxTypes() as any)
+  .command(new DeployCommand() as any)
+  .command(new BatchCommand() as any)
+  .command(new ToolsCommand() as any)
+  .command(new LoginCommand() as any)
+  // Back-compat aliases: hidden from --help but still functional
+  .command({ ...new DownloadRobloxTypes(), describe: false } as any)
+  .command({
+    ...new InitPackageCommand(),
+    command: 'init-package [package-name] [description] [package-template]',
+    describe: false,
+  } as any)
+  .command({
+    ...new InitPluginCommand(),
+    command: 'init-plugin [plugin-name]',
+    describe: false,
+  } as any)
   .recommendCommands()
   .demandCommand(
     1,

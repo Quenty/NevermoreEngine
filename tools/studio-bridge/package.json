@@ -1,0 +1,40 @@
+{
+  "name": "@quenty/studio-bridge",
+  "version": "0.1.0",
+  "description": "WebSocket-based bridge for running Luau scripts in Roblox Studio",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "studio-bridge": "./dist/src/cli/cli.js"
+  },
+  "dependencies": {
+    "@quenty/cli-output-helpers": "workspace:*",
+    "@quenty/nevermore-cli-helpers": "workspace:*",
+    "@quenty/nevermore-template-helpers": "workspace:*",
+    "execa": "^9.6.1",
+    "ws": "^8.18.0",
+    "yargs": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.4",
+    "@types/ws": "^8.5.13",
+    "@types/yargs": "^17.0.13",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "build:watch": "tsc --build --watch",
+    "build:clean": "tsc --build --clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "node dist/test/integration/smoke-test.js"
+  }
+}

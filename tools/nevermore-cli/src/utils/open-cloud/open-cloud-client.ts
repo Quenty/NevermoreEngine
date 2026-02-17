@@ -1,0 +1,268 @@
+import * as fs from 'fs/promises';
+import { OutputHelper } from '@quenty/cli-output-helpers';
+import { RateLimiter } from './rate-limiter.js';
+import {
+  parseTestLogs,
+  type ParsedTestLogs,
+} from '../testing/test-log-parser.js';
+
+export interface LuauTask {
+  path: string;
+  createTime: string;
+  updateTime: string;
+  user: string;
+  state:
+    | 'STATE_UNSPECIFIED'
+    | 'QUEUED'
+    | 'PROCESSING'
+    | 'CANCELLED'
+    | 'COMPLETE'
+    | 'FAILED';
+  script: string;
+}
+
+interface OpenCloudClientOptions {
+  apiKey: string;
+  rateLimiter: RateLimiter;
+}
+
+function formatAuthError(
+  action: string,
+  scope: string,
+  universeId: number,
+  placeId: number,
+  status: number,
+  statusText: string,
+  body: string,
+  method: string,
+  url: string
+): string {
+  // Extract human-readable message from JSON body if possible
+  let apiMessage = '';
+  try {
+    const parsed = JSON.parse(body);
+    if (Array.isArray(parsed.errors) && parsed.errors[0]?.message) {
+      apiMessage = parsed.errors[0].message;
+    } else if (typeof parsed.message === 'string') {
+      apiMessage = parsed.message;
+    }
+  } catch {
+    // Not JSON
+  }
+
+  const headline = apiMessage
+    ? `${action} failed: ${apiMessage} (${status})`
+    : `${action} failed: ${status} ${statusText}`;
+
+  const dim = OutputHelper.formatDim;
+  const info = OutputHelper.formatInfo;
+
+  return [
+    OutputHelper.formatError(headline),
+    '',
+    `  ${dim('Scope:')}       ${scope}`,
+    `  ${dim('Universe:')}    ${universeId}`,
+    `  ${dim('Place:')}       ${placeId}`,
+    '',
+    OutputHelper.formatWarning(
+      'Ensure the API key has the required scope and the experience is on its allow list.'
+    ),
+    '',
+    `  ${dim('Place:')}       ${info(
+      `https://www.roblox.com/games/${placeId}/place`
+    )}`,
+    `  ${dim('Credentials:')} ${info(
+      'https://create.roblox.com/dashboard/credentials'
+    )}`,
+    `  ${dim('Route:')}       ${dim(`${method} ${url}`)}`,
+  ].join('\n');
+}
+
+export class OpenCloudClient {
+  private _apiKey: string;
+  private _rateLimiter: RateLimiter;
+
+  constructor(options: OpenCloudClientOptions) {
+    this._apiKey = options.apiKey;
+    this._rateLimiter = options.rateLimiter;
+  }
+
+  async uploadPlaceAsync(
+    universeId: number,
+    placeId: number,
+    rbxlPath: string,
+    publish?: boolean
+  ): Promise<number> {
+    OutputHelper.verbose(
+      `Uploading to https://www.roblox.com/games/${placeId}/place ...`
+    );
+
+    const fileBuffer = await fs.readFile(rbxlPath);
+    const body = new Uint8Array(fileBuffer);
+    const versionType = publish ? 'Published' : 'Saved';
+    const url = `https://apis.roblox.com/universes/v1/${universeId}/places/${placeId}/versions?versionType=${versionType}`;
+
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        Accept: 'application/json',
+        'X-API-Key': this._apiKey,
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(
+          formatAuthError(
+            'Upload',
+            'universe-places:write',
+            universeId,
+            placeId,
+            response.status,
+            response.statusText,
+            text,
+            'POST',
+            url
+          )
+        );
+      }
+      throw new Error(
+        `Upload failed: ${response.status} ${response.statusText}: ${text}`
+      );
+    }
+
+    const data = (await response.json()) as { versionNumber: number };
+    return data.versionNumber;
+  }
+
+  async createExecutionTaskAsync(
+    universeId: number,
+    placeId: number,
+    placeVersion: number,
+    script: string
+  ): Promise<LuauTask> {
+    const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
+
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': this._apiKey,
+      },
+      body: JSON.stringify({ script }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(
+          formatAuthError(
+            'Luau execution',
+            'universe.place.luau-execution-session:write',
+            universeId,
+            placeId,
+            response.status,
+            response.statusText,
+            text,
+            'POST',
+            url
+          )
+        );
+      }
+      throw new Error(
+        `Create task failed: ${response.status} ${response.statusText}: ${text}`
+      );
+    }
+
+    return (await response.json()) as LuauTask;
+  }
+
+  async pollTaskCompletionAsync(
+    taskPath: string,
+    onProgress?: (state: LuauTask['state']) => void
+  ): Promise<LuauTask> {
+    const pollIntervalMs = 3000;
+
+    while (true) {
+      const response = await this._rateLimiter.fetchAsync(
+        `https://apis.roblox.com/cloud/v2/${taskPath}`,
+        {
+          method: 'GET',
+          headers: {
+            'X-API-Key': this._apiKey,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Poll failed: ${response.status}: ${text}`);
+      }
+
+      const task = (await response.json()) as LuauTask;
+
+      if (task.state !== 'PROCESSING' && task.state !== 'QUEUED') {
+        return task;
+      }
+
+      if (onProgress) {
+        onProgress(task.state);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+    }
+  }
+
+  async getTaskLogsAsync(taskPath: string): Promise<ParsedTestLogs> {
+    const raw = await this.getRawTaskLogsAsync(taskPath);
+    return parseTestLogs(raw);
+  }
+
+  /**
+   * Fetch raw log text from a completed Luau execution task.
+   * Retries a few times if the API returns empty logs, since the test runner
+   * always produces at least some output.
+   */
+  async getRawTaskLogsAsync(taskPath: string): Promise<string> {
+    const maxAttempts = 3;
+    const retryDelayMs = 1000;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const logs = await this._fetchRawLogsAsync(taskPath);
+      if (logs || attempt === maxAttempts) {
+        return logs;
+      }
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+    }
+
+    // Unreachable, but satisfies the type checker
+    return this._fetchRawLogsAsync(taskPath);
+  }
+
+  private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
+    const response = await this._rateLimiter.fetchAsync(
+      `https://apis.roblox.com/cloud/v2/${taskPath}/logs`,
+      {
+        method: 'GET',
+        headers: {
+          'X-API-Key': this._apiKey,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Get logs failed: ${response.status}: ${text}`);
+    }
+
+    const data = (await response.json()) as {
+      luauExecutionSessionTaskLogs: Array<{ messages: string[] }>;
+    };
+
+    const messages = data.luauExecutionSessionTaskLogs?.[0]?.messages ?? [];
+    return messages.join('\n');
+  }
+}

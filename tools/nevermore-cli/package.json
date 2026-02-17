@@ -28,6 +28,7 @@
     "@quenty/cli-output-helpers": "workspace:*",
     "@quenty/nevermore-cli-helpers": "workspace:*",
     "@quenty/nevermore-template-helpers": "workspace:*",
+    "@quenty/studio-bridge": "workspace:*",
     "execa": "^9.6.1",
     "find-git-root": "^1.0.4",
     "inquirer": "^13.2.0",

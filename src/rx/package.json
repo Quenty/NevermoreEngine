@@ -35,12 +35,14 @@
     "@quenty/ducktype": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/symbol": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/throttle": "workspace:*",
-    "@quenty/typeutils": "workspace:*"
+    "@quenty/typeutils": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   },
   "publishConfig": {
     "access": "public"

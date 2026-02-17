@@ -36,7 +36,8 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/templateprovider": "workspace:*",
-    "@quentystudios/cmdr": "^1.12.0-quenty.0"
+    "@quentystudios/cmdr": "^1.12.0-quenty.0",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

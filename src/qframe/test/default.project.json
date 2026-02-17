@@ -8,6 +8,9 @@
       }
     },
     "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
       "Nevermore": {
         "$className": "folder",
         "QFrame": {

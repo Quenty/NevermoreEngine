@@ -4,4 +4,5 @@
 export interface NevermoreGlobalArgs {
   yes: boolean;
   dryrun: boolean;
+  verbose: boolean;
 }

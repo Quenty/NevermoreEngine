@@ -3,6 +3,9 @@
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
       "inputkeymaputils": {
         "$className": "Folder",
         "inputkeymaputils": {

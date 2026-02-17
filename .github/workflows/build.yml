@@ -60,5 +60,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: lerna-debug.log
-          path: lerna-debug.log
+          name: lerna-debug-log
+          path: |
+            **/lerna-debug.log
+            **/npm-debug.log

@@ -33,7 +33,8 @@
     "@quenty/maid": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/statestack": "workspace:*",
-    "@quenty/tie": "workspace:*"
+    "@quenty/tie": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "contributors": [
     "Quenty"

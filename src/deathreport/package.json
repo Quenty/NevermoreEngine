@@ -44,6 +44,7 @@
     "@quenty/rxbinderutils": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/table": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   }
 }

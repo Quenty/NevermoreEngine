@@ -31,10 +31,12 @@
   "dependencies": {
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/steputils": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/table": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   },
   "publishConfig": {
     "access": "public"

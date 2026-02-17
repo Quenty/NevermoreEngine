@@ -10,7 +10,8 @@
   "references": [
     { "path": "../cli-output-helpers" },
     { "path": "../nevermore-template-helpers" },
-    { "path": "../nevermore-cli-helpers" }
+    { "path": "../nevermore-cli-helpers" },
+    { "path": "../studio-bridge" }
   ],
   "include": ["src/**/*"]
 }

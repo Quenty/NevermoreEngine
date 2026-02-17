@@ -55,6 +55,8 @@ function Loader.bootstrapGame(packages: Instance)
 		else
 			self:_setupClientReplication()
 		end
+	elseif self._replicationType == ReplicationType.PLUGIN then
+		self:_setupLoaderPopulation(self._packages)
 	end
 
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)

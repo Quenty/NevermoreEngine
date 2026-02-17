@@ -43,7 +43,8 @@
     "@quenty/signal": "workspace:*",
     "@quenty/symbol": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
