@@ -1,3 +1,17 @@
+# v4.16.2 (Tue Feb 17 2026)
+
+#### 🐛 Bug Fix
+
+- feat: Downloading types works properly [#659](https://github.com/Quenty/NevermoreEngine/pull/659) ([@Quenty](https://github.com/Quenty))
+- fix: When no tests run we report that tests were not run ([@Quenty](https://github.com/Quenty))
+- fix: Fix download roblox types ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

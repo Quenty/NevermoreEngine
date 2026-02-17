@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/cli-output-helpers@1.5.2`, `@quenty/nevermore-cli@4.16.2`
+  - feat: Downloading types works properly [#659](https://github.com/Quenty/NevermoreEngine/pull/659) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Feb 17 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/cmdrservice@13.36.1`, `@quenty/rodux-actions@9.12.1`, `@quenty/rogue-properties@11.38.1`, `@quenty/snackbar@11.34.1`, `@quenty/spawning@10.38.1`, `@quenty/cli-output-helpers@1.5.1`, `@quenty/nevermore-template-helpers@1.6.1`
   - fix: devcontainer initializes properly with luau-lsp working out of the box [#658](https://github.com/Quenty/NevermoreEngine/pull/658) ([@Quenty](https://github.com/Quenty))
 
