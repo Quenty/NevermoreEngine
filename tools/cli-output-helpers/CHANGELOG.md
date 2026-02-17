@@ -1,20 +1,18 @@
-# v1.5.2 (Tue Feb 17 2026)
-
-#### 🐛 Bug Fix
-
-- feat: Downloading types works properly [#659](https://github.com/Quenty/NevermoreEngine/pull/659) ([@Quenty](https://github.com/Quenty))
-- fix: When no tests run we report that tests were not run ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.5.2](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.5.1...@quenty/cli-output-helpers@1.5.2) (2026-02-17)
+
+
+### Bug Fixes
+
+* When no tests run we report that tests were not run ([66a8608](https://github.com/Quenty/Nevermore/commit/66a860829d7241a0055028669a0bf55d4670a245))
+
+
+
+
 
 ## [1.5.1](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.5.0...@quenty/cli-output-helpers@1.5.1) (2026-02-17)
 

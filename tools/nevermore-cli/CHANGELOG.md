@@ -1,21 +1,19 @@
-# v4.16.2 (Tue Feb 17 2026)
-
-#### 🐛 Bug Fix
-
-- feat: Downloading types works properly [#659](https://github.com/Quenty/NevermoreEngine/pull/659) ([@Quenty](https://github.com/Quenty))
-- fix: When no tests run we report that tests were not run ([@Quenty](https://github.com/Quenty))
-- fix: Fix download roblox types ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.16.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.16.1...@quenty/nevermore-cli@4.16.2) (2026-02-17)
+
+
+### Bug Fixes
+
+* Fix download roblox types ([1dbaeda](https://github.com/Quenty/Nevermore/commit/1dbaeda3bc03469bf6ddee60297f747933366743))
+* When no tests run we report that tests were not run ([66a8608](https://github.com/Quenty/Nevermore/commit/66a860829d7241a0055028669a0bf55d4670a245))
+
+
+
+
 
 ## [4.16.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.16.0...@quenty/nevermore-cli@4.16.1) (2026-02-17)
 
