@@ -81,7 +81,7 @@ Keep descriptions to 1-3 sentences. If a PR needs a long explanation, that's usu
 ## Branching
 
 - Branch from `main` for all work
-- Use descriptive branch names: `feat/job-summary-reporter`, `fix/spinner-cursor-up`
+- Use `users/{username}/{description}` branch names: `users/quenty/job-summary-reporter`, `users/quenty/fix-spinner-cursor`
 - Releases are CI-driven via `auto shipit` — never release locally
 
 ## No co-authorship
