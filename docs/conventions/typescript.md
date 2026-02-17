@@ -165,9 +165,10 @@ Use `runCommandAsync()` from `nevermore-cli-utils.ts` to spawn child processes (
 
 ## Other conventions
 
+> **Git workflow**: Commit messages, interactive rebase, and branching conventions are in [Git Workflow](git-workflow.md) (shared across Luau and TypeScript).
+
 - **Fail fast**: Validate credentials and config before expensive operations (e.g., check API key before rojo build)
 - **Utils = exported functions**: Utility modules export standalone async functions, not classes. See `open-cloud-client.ts`, `credential-store.ts`, `deploy-config.ts`
-- **No header comments**: Using separating comments to delimit areas implies these should be split into separate files or classes
-- **No section comment headers**: Don't use `// --- Section ---` style dividers. Code organization should be self-evident from structure
+- **One concern per file**: If a file has distinct concerns separated by comment headers (e.g., `// ── GitHub API ──`), that's a signal to split them into separate files. A reader should understand a file's purpose from its name and top-level structure, not by scrolling past unrelated code. For example, GitHub API helpers belong in `github-api.ts`, not above the reporter class that uses them.
+- **Classes read top-down**: Public API and lifecycle methods go at the top of a class. Private implementation details (helpers, internal state management) go at the bottom. A reader skimming the class should see *what it does* before *how it does it*.
 - **Platform-specific code in separate files**: When code varies by OS, split into a folder with per-platform files (e.g., `roblox-auth/windows.ts`, `roblox-auth/macos.ts`) re-exported through `index.ts`
-- **No co-authorship**: Do not include `Co-Authored-By` on Nevermore commits (open source repo)

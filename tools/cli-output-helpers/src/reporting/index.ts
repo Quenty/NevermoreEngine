@@ -37,7 +37,9 @@ export {
 export { JsonFileReporter } from './json-file-reporter.js';
 export {
   GithubCommentTableReporter,
+  GithubJobSummaryReporter,
   type GithubCommentColumn,
   type GithubCommentTableConfig,
+  type GithubTableRow,
   summarizeError,
-} from './github-comment-table-reporter.js';
+} from './github/index.js';

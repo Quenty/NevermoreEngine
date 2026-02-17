@@ -198,4 +198,5 @@ In interactive mode, if no credentials are found, the CLI prompts inline. In `--
 
 - **Workflows should be thin.** All logic lives in `nevermore-cli` commands — GitHub Actions workflows just call them. This keeps CI debuggable locally.
 - **Rate limiting** is shared across concurrent workers via the `OpenCloudClient` instance. The `RateLimiter` serializes all Open Cloud API requests (one in-flight at a time) and reads `x-ratelimit-remaining` / `x-ratelimit-reset` headers.
-- **Post results via CLI**: `nevermore ci post-test-results <file>` posts or updates a PR comment with test results. Requires `GITHUB_TOKEN`.
+- **Post results via CLI**: `nevermore tools post-test-results <file>` posts or updates a PR comment with test results and writes to the GitHub Actions job summary. Requires `GITHUB_TOKEN` for PR comments; job summaries are written automatically when `GITHUB_STEP_SUMMARY` is set.
+- **Job summaries**: Results are automatically written to the [GitHub Actions job summary](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#adding-a-job-summary) when running in CI. This makes results visible on the workflow run summary page, complementing the PR comment.

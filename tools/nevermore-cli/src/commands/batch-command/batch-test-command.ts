@@ -22,6 +22,7 @@ import {
   type BatchTestSummary,
   CompositeReporter,
   GithubCommentTableReporter,
+  GithubJobSummaryReporter,
   GroupedReporter,
   JsonFileReporter,
   SpinnerReporter,
@@ -146,6 +147,11 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
             }),
         new SummaryTableReporter(state),
         new GithubCommentTableReporter(
+          state,
+          createTestCommentConfig(),
+          concurrency
+        ),
+        new GithubJobSummaryReporter(
           state,
           createTestCommentConfig(),
           concurrency

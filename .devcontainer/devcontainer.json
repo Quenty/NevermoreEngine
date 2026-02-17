@@ -9,7 +9,8 @@
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "22",
 			"pnpmVersion": "10.27.0"
-		}
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 
 	"customizations": {
