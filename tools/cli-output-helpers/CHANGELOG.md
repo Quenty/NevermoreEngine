@@ -1,3 +1,16 @@
+# v1.5.1 (Tue Feb 17 2026)
+
+#### 🐛 Bug Fix
+
+- fix: devcontainer initializes properly with luau-lsp working out of the box [#658](https://github.com/Quenty/NevermoreEngine/pull/658) ([@Quenty](https://github.com/Quenty))
+- fix: devcontainer initializes properly with luau-lsp working out of the box ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
