@@ -1,5 +1,5 @@
 {
-  "name": "StudioBridgeMinimal",
+  "name": "StudioBridgeTestPlace",
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
