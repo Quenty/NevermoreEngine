@@ -82,7 +82,7 @@ export class TemplateHelper {
         } else {
           if (!(await existsAsync(newFilePath))) {
             await fs.promises.writeFile(newFilePath, result, 'utf8');
-            OutputHelper.info(`Created '${newFilePath}'`);
+            OutputHelper.verbose(`Created '${newFilePath}'`);
           } else {
             OutputHelper.error(
               `File already exists ${newFilePath} will not overwrite`

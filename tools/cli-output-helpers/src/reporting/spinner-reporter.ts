@@ -35,6 +35,9 @@ export class SpinnerReporter extends BaseReporter {
   private _renderedLineCount: number = 0;
   private _renderInterval?: ReturnType<typeof setInterval>;
   private _spinnerFrame: number = 0;
+  private _extraLines = 0;
+  private _originalStdoutWrite: typeof process.stdout.write | undefined;
+  private _isRendering = false;
 
   constructor(state: IStateTracker, options: SpinnerReporterOptions) {
     super();
@@ -52,6 +55,18 @@ export class SpinnerReporter extends BaseReporter {
     );
     process.stdout.write('\x1b[?25l');
     this._renderedLineCount = 0;
+
+    // Intercept stdout to track external writes that shift the cursor
+    this._originalStdoutWrite = process.stdout.write.bind(process.stdout);
+    const self = this;
+    process.stdout.write = function (chunk: any, ...args: any[]) {
+      if (!self._isRendering) {
+        const str = typeof chunk === 'string' ? chunk : chunk.toString();
+        self._extraLines += (str.match(/\n/g) || []).length;
+      }
+      return self._originalStdoutWrite!.call(process.stdout, chunk, ...args);
+    } as any;
+
     this._render();
     this._renderInterval = setInterval(() => {
       this._spinnerFrame = (this._spinnerFrame + 1) % SPINNER_FRAMES.length;
@@ -65,6 +80,13 @@ export class SpinnerReporter extends BaseReporter {
       this._renderInterval = undefined;
     }
     this._render();
+
+    // Restore original stdout.write
+    if (this._originalStdoutWrite) {
+      process.stdout.write = this._originalStdoutWrite;
+      this._originalStdoutWrite = undefined;
+    }
+
     process.stdout.write('\x1b[?25h');
     console.log('');
 
@@ -170,12 +192,16 @@ export class SpinnerReporter extends BaseReporter {
       )
     );
 
+    this._isRendering = true;
     let frame = '';
-    if (this._renderedLineCount > 0) {
-      frame += `\x1b[${this._renderedLineCount}A\x1b[0J`;
+    const totalLines = this._renderedLineCount + this._extraLines;
+    this._extraLines = 0;
+    if (totalLines > 0) {
+      frame += `\x1b[${totalLines}A\x1b[0J`;
     }
     frame += lines.join('\n') + '\n';
     process.stdout.write(frame);
     this._renderedLineCount = lines.length;
+    this._isRendering = false;
   }
 }

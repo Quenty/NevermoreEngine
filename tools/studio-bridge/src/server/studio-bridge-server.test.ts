@@ -14,6 +14,19 @@ import { StudioBridgeServer, type StudioBridgePhase } from './studio-bridge-serv
 // Mocks — replace external side-effects with no-ops
 // ---------------------------------------------------------------------------
 
+vi.mock('@quenty/nevermore-template-helpers', () => ({
+  BuildContext: {
+    createAsync: vi.fn(async () => ({
+      resolvePath: vi.fn((rel: string) => `/fake/tmp/${rel}`),
+      executeLuneTransformScriptAsync: vi.fn(async () => {}),
+      rojoBuildAsync: vi.fn(async () => undefined),
+      cleanupAsync: vi.fn(async () => {}),
+    })),
+  },
+  resolvePackagePath: vi.fn((..._args: any[]) => '/fake/transform-script.luau'),
+  resolveTemplatePath: vi.fn((..._args: any[]) => '/fake/default.project.json'),
+}));
+
 vi.mock('../plugin/plugin-injector.js', () => ({
   injectPluginAsync: vi.fn(async () => ({
     pluginPath: '/fake/plugin.rbxmx',

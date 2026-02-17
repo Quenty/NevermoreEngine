@@ -5519,6 +5519,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@18.19.130)(yaml@2.8.2)
 
   tools/nevermore-cli:
     dependencies:
