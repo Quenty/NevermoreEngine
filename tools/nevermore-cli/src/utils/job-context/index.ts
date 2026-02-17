@@ -1,4 +1,5 @@
 export type {
+  Deployment,
   JobContext,
   DeployPlaceOptions,
   RunScriptOptions,

@@ -5,14 +5,12 @@ export interface DeployPlaceOptions {
   rbxlPath: string;
   /** Required by cloud, ignored by local. */
   deployTarget?: DeployTarget;
-  reporter: Reporter;
   packageName: string;
   packagePath: string;
 }
 
 export interface RunScriptOptions {
   scriptContent: string;
-  reporter: Reporter;
   packageName: string;
   timeoutMs?: number;
 }
@@ -22,16 +20,26 @@ export interface ScriptRunResult {
   success: boolean;
 }
 
+/**
+ * Opaque handle representing a single deployed place.
+ * Returned by `deployBuiltPlaceAsync`, threaded through `runScriptAsync`/`getLogsAsync`/`releaseAsync`.
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Deployment {}
+
 export interface JobContext {
-  /** Deploy a built place to the execution environment. */
-  deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<void>;
+  /** Deploy a built place to the execution environment. Returns a handle for subsequent operations. */
+  deployBuiltPlaceAsync(reporter: Reporter, options: DeployPlaceOptions): Promise<Deployment>;
 
-  /** Execute a Luau script in the deployed place. */
-  runScriptAsync(options: RunScriptOptions): Promise<ScriptRunResult>;
+  /** Execute a Luau script in a deployed place. */
+  runScriptAsync(deployment: Deployment, reporter: Reporter, options: RunScriptOptions): Promise<ScriptRunResult>;
 
-  /** Retrieve raw logs from the most recent script execution. */
-  getLogsAsync(): Promise<string>;
+  /** Retrieve raw logs from the most recent script execution on this deployment. */
+  getLogsAsync(deployment: Deployment): Promise<string>;
 
-  /** Clean up resources from the current execution cycle. */
-  cleanupAsync(): Promise<void>;
+  /** Release a single deployment (stop bridge / clear task metadata). */
+  releaseAsync(deployment: Deployment): Promise<void>;
+
+  /** Final teardown — release all remaining deployments. Called once at end of batch. */
+  disposeAsync(): Promise<void>;
 }

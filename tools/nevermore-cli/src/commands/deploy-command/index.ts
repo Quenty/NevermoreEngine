@@ -8,8 +8,11 @@ import {
   SimpleReporter,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
+import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
 import { buildPlaceAsync } from '../../utils/build/build.js';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
+import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
+import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
 import { handleInitAsync } from './deploy-init.js';
 
@@ -168,9 +171,13 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         packageName,
       });
 
+      const apiKey = await getApiKeyAsync(args);
+      const client = new OpenCloudClient({ apiKey, rateLimiter: new RateLimiter() });
+
       const { version } = await uploadPlaceAsync({
         buildResult,
         args,
+        client,
         reporter,
         packageName,
       });

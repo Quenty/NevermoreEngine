@@ -1,29 +1,45 @@
 import * as fs from 'fs/promises';
-import { type LuauTask, OpenCloudClient } from '../open-cloud/open-cloud-client.js';
+import { type Reporter } from '@quenty/cli-output-helpers/reporting';
+import {
+  type LuauTask,
+  OpenCloudClient,
+} from '../open-cloud/open-cloud-client.js';
 import { tryRenamePlaceAsync } from '../auth/roblox-auth/index.js';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
 import {
+  type Deployment,
   type JobContext,
   type DeployPlaceOptions,
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
 
-export class CloudJobContext implements JobContext {
-  private _client: OpenCloudClient;
-  private _universeId = 0;
-  private _placeId = 0;
-  private _version = 0;
-  private _taskPath: string | undefined;
-  private _taskState: LuauTask['state'] | undefined;
+class CloudDeployment implements Deployment {
+  universeId: number;
+  placeId: number;
+  version: number;
+  taskPath?: string;
+  taskState?: LuauTask['state'];
 
-  constructor(options: { client: OpenCloudClient }) {
-    this._client = options.client;
+  constructor(universeId: number, placeId: number, version: number) {
+    this.universeId = universeId;
+    this.placeId = placeId;
+    this.version = version;
+  }
+}
+
+export class CloudJobContext implements JobContext {
+  private _openCloudClient: OpenCloudClient;
+
+  constructor(openCloudClient: OpenCloudClient) {
+    this._openCloudClient = openCloudClient;
   }
 
-  async deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<void> {
-    const { rbxlPath, deployTarget, reporter, packageName, packagePath } =
-      options;
+  async deployBuiltPlaceAsync(
+    reporter: Reporter,
+    options: DeployPlaceOptions
+  ): Promise<Deployment> {
+    const { rbxlPath, deployTarget, packageName, packagePath } = options;
 
     if (!deployTarget) {
       throw new Error(
@@ -31,13 +47,10 @@ export class CloudJobContext implements JobContext {
       );
     }
 
-    this._universeId = deployTarget.universeId;
-    this._placeId = deployTarget.placeId;
-
     reporter.onPackagePhaseChange(packageName, 'uploading');
-    this._version = await this._client.uploadPlaceAsync(
-      this._universeId,
-      this._placeId,
+    const version = await this._openCloudClient.uploadPlaceAsync(
+      deployTarget.universeId,
+      deployTarget.placeId,
       rbxlPath
     );
 
@@ -46,23 +59,33 @@ export class CloudJobContext implements JobContext {
 
     // Best-effort rename to reflect current package + commit
     const placeName = await buildPlaceNameAsync(packagePath);
-    await tryRenamePlaceAsync(this._placeId, placeName);
+    await tryRenamePlaceAsync(deployTarget.placeId, placeName);
+
+    return new CloudDeployment(
+      deployTarget.universeId,
+      deployTarget.placeId,
+      version
+    );
   }
 
-  async runScriptAsync(options: RunScriptOptions): Promise<ScriptRunResult> {
-    const { scriptContent, reporter, packageName, timeoutMs = 120_000 } =
-      options;
+  async runScriptAsync(
+    deployment: Deployment,
+    reporter: Reporter,
+    options: RunScriptOptions
+  ): Promise<ScriptRunResult> {
+    const cloudDeployment = deployment as CloudDeployment;
+    const { scriptContent, packageName, timeoutMs = 120_000 } = options;
 
     reporter.onPackagePhaseChange(packageName, 'scheduling');
-    const task = await this._client.createExecutionTaskAsync(
-      this._universeId,
-      this._placeId,
-      this._version,
+    const task = await this._openCloudClient.createExecutionTaskAsync(
+      cloudDeployment.universeId,
+      cloudDeployment.placeId,
+      cloudDeployment.version,
       scriptContent
     );
 
     const completedTask = await Promise.race([
-      this._client.pollTaskCompletionAsync(task.path, (state) => {
+      this._openCloudClient.pollTaskCompletionAsync(task.path, (state) => {
         if (state === 'PROCESSING') {
           reporter.onPackagePhaseChange(packageName, 'executing');
         }
@@ -70,21 +93,25 @@ export class CloudJobContext implements JobContext {
       timeoutAsync(timeoutMs, `Test timed out after ${timeoutMs / 1000}s`),
     ]);
 
-    this._taskPath = task.path;
-    this._taskState = completedTask.state;
+    cloudDeployment.taskPath = task.path;
+    cloudDeployment.taskState = completedTask.state;
 
     return { success: completedTask.state === 'COMPLETE' };
   }
 
-  async getLogsAsync(): Promise<string> {
-    if (!this._taskPath) {
+  async getLogsAsync(deployment: Deployment): Promise<string> {
+    const cloudDeployment = deployment as CloudDeployment;
+
+    if (!cloudDeployment.taskPath) {
       throw new Error('No task has been run yet');
     }
 
-    const logs = await this._client.getRawTaskLogsAsync(this._taskPath);
+    const logs = await this._openCloudClient.getRawTaskLogsAsync(
+      cloudDeployment.taskPath
+    );
 
-    if (this._taskState && this._taskState !== 'COMPLETE') {
-      return [logs, `Task ended with state: ${this._taskState}`]
+    if (cloudDeployment.taskState && cloudDeployment.taskState !== 'COMPLETE') {
+      return [logs, `Task ended with state: ${cloudDeployment.taskState}`]
         .filter(Boolean)
         .join('\n');
     }
@@ -92,9 +119,11 @@ export class CloudJobContext implements JobContext {
     return logs;
   }
 
-  async cleanupAsync(): Promise<void> {
-    this._taskPath = undefined;
-    this._taskState = undefined;
-    this._version = 0;
+  async releaseAsync(_deployment: Deployment): Promise<void> {
+    // No-op for cloud — place stays on cloud, task metadata discarded with the handle.
+  }
+
+  async disposeAsync(): Promise<void> {
+    // No-op for cloud — no persistent resources to clean up.
   }
 }

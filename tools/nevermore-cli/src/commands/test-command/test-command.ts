@@ -91,12 +91,12 @@ export class TestProjectCommand<T>
       await reporter.startAsync();
 
       const context = args.cloud
-        ? new CloudJobContext({
-            client: new OpenCloudClient({
+        ? new CloudJobContext(
+            new OpenCloudClient({
               apiKey: await getApiKeyAsync(args),
               rateLimiter: new RateLimiter(),
-            }),
-          })
+            })
+          )
         : new LocalJobContext();
 
       let result;
@@ -107,7 +107,7 @@ export class TestProjectCommand<T>
           scriptText: args.scriptText,
         });
       } finally {
-        await context.cleanupAsync();
+        await context.disposeAsync();
       }
 
       reporter.onPackageResult({

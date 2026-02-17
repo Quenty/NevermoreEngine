@@ -1,22 +1,35 @@
 import * as fs from 'fs/promises';
+import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { StudioBridge } from '@quenty/studio-bridge';
 import {
+  type Deployment,
   type JobContext,
   type DeployPlaceOptions,
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
 
+class LocalDeployment implements Deployment {
+  bridge: StudioBridge;
+  rbxlPath: string;
+  cachedLogs = '';
+
+  constructor(bridge: StudioBridge, rbxlPath: string) {
+    this.bridge = bridge;
+    this.rbxlPath = rbxlPath;
+  }
+}
+
 export class LocalJobContext implements JobContext {
-  private _bridge: StudioBridge | undefined;
-  private _cachedLogs = '';
-  private _rbxlPath: string | undefined;
+  private _deployments = new Set<LocalDeployment>();
 
-  async deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<void> {
-    const { rbxlPath, reporter, packageName } = options;
+  async deployBuiltPlaceAsync(
+    reporter: Reporter,
+    options: DeployPlaceOptions
+  ): Promise<Deployment> {
+    const { rbxlPath, packageName } = options;
 
-    this._rbxlPath = rbxlPath;
-    this._bridge = new StudioBridge({
+    const bridge = new StudioBridge({
       placePath: rbxlPath,
       onPhase: (phase) => {
         if (phase === 'launching' || phase === 'connecting') {
@@ -25,51 +38,60 @@ export class LocalJobContext implements JobContext {
       },
     });
 
-    await this._bridge.startAsync();
+    await bridge.startAsync();
+
+    const deployment = new LocalDeployment(bridge, rbxlPath);
+    this._deployments.add(deployment);
+    return deployment;
   }
 
-  async runScriptAsync(options: RunScriptOptions): Promise<ScriptRunResult> {
-    const { scriptContent, reporter, packageName, timeoutMs } = options;
-
-    if (!this._bridge) {
-      throw new Error('No bridge — call deployBuiltPlaceAsync first');
-    }
+  async runScriptAsync(
+    deployment: Deployment,
+    reporter: Reporter,
+    options: RunScriptOptions
+  ): Promise<ScriptRunResult> {
+    const localDeployment = deployment as LocalDeployment;
+    const { scriptContent, packageName, timeoutMs } = options;
 
     reporter.onPackagePhaseChange(packageName, 'executing');
 
     try {
-      const result = await this._bridge.executeAsync({
+      const result = await localDeployment.bridge.executeAsync({
         scriptContent,
         timeoutMs,
       });
-      this._cachedLogs = result.logs;
+      localDeployment.cachedLogs = result.logs;
       return { success: result.success };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      this._cachedLogs = `[StudioBridge] Error: ${errorMessage}`;
+      localDeployment.cachedLogs = `[StudioBridge] Error: ${errorMessage}`;
       return { success: false };
     }
   }
 
-  async getLogsAsync(): Promise<string> {
-    return this._cachedLogs;
+  async getLogsAsync(deployment: Deployment): Promise<string> {
+    const localDeployment = deployment as LocalDeployment;
+    return localDeployment.cachedLogs;
   }
 
-  async cleanupAsync(): Promise<void> {
-    if (this._bridge) {
-      await this._bridge.stopAsync();
-      this._bridge = undefined;
-    }
+  async releaseAsync(deployment: Deployment): Promise<void> {
+    const localDeployment = deployment as LocalDeployment;
 
-    if (this._rbxlPath) {
-      await Promise.all([
-        fs.unlink(this._rbxlPath).catch(() => {}),
-        fs.unlink(`${this._rbxlPath}.lock`).catch(() => {}),
-      ]);
-      this._rbxlPath = undefined;
-    }
+    await localDeployment.bridge.stopAsync();
 
-    this._cachedLogs = '';
+    await Promise.all([
+      fs.unlink(localDeployment.rbxlPath).catch(() => {}),
+      fs.unlink(`${localDeployment.rbxlPath}.lock`).catch(() => {}),
+    ]);
+
+    this._deployments.delete(localDeployment);
+  }
+
+  async disposeAsync(): Promise<void> {
+    const remaining = [...this._deployments];
+    for (const d of remaining) {
+      await this.releaseAsync(d);
+    }
   }
 }

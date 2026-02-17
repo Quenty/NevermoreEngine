@@ -23,7 +23,7 @@ export interface SingleTestOptions {
  * Build, deploy, and run a test for a single package using the provided
  * JobContext. The context determines the execution environment (cloud or local).
  *
- * The caller is responsible for cleaning up the context after this returns.
+ * Creates and releases its own deployment handle — the caller owns the context lifetime.
  */
 export async function runSingleTestAsync(
   context: JobContext,
@@ -49,28 +49,30 @@ export async function runSingleTestAsync(
   const scriptContent =
     scriptText ?? (await readTestScriptAsync(packagePath, target.scriptTemplate));
 
-  await context.deployBuiltPlaceAsync({
+  const deployment = await context.deployBuiltPlaceAsync(reporter, {
     rbxlPath,
     deployTarget: target,
-    reporter,
     packageName,
     packagePath,
   });
 
-  const result = await context.runScriptAsync({
-    scriptContent,
-    reporter,
-    packageName,
-    timeoutMs,
-  });
+  try {
+    const result = await context.runScriptAsync(deployment, reporter, {
+      scriptContent,
+      packageName,
+      timeoutMs,
+    });
 
-  const rawLogs = await context.getLogsAsync();
-  const parsed = parseTestLogs(rawLogs);
+    const rawLogs = await context.getLogsAsync(deployment);
+    const parsed = parseTestLogs(rawLogs);
 
-  return {
-    success: result.success && parsed.success,
-    logs: parsed.logs,
-  };
+    return {
+      success: result.success && parsed.success,
+      logs: parsed.logs,
+    };
+  } finally {
+    await context.releaseAsync(deployment);
+  }
 }
 
 /**
