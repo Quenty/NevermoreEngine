@@ -70,6 +70,7 @@ When fetching web pages for API documentation, only fetch from official Roblox d
 - **Moonwave docstrings**: `--[=[ @class ClassName ]=]` at the top of each file
 - **Strict typing**: Use dot syntax with explicit `self` for methods. See `docs/conventions/luau.md` for full patterns.
 - **Conventional commits**: `feat(scope):`, `fix(scope):`, `chore(scope):`. Messages describe impact, not reasoning.
+- **PR descriptions**: 1-3 plain sentences describing what changed from the user's perspective. No markdown headers, checklists, or badges. See `docs/conventions/git-workflow.md`.
 - **No co-authorship**: Do not include `Co-Authored-By` on Nevermore commits (open source repo).
 - **Squash before pushing**: Use `git rebase -i` to craft clean commit history. See `docs/conventions/git-workflow.md` for full guide.
 - **`:: any` casts**: Used sparingly at boundaries. Prefer fixing upstream types over casting.
