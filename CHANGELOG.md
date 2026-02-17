@@ -1,5 +1,18 @@
 # (Tue Feb 17 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.6.0`, `@quenty/nevermore-cli@4.17.0`
+  - feat(cli): add GitHub Actions job summary reporter [#660](https://github.com/Quenty/NevermoreEngine/pull/660) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Feb 17 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/cli-output-helpers@1.5.2`, `@quenty/nevermore-cli@4.16.2`
