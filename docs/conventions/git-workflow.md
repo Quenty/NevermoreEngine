@@ -51,6 +51,33 @@ docs: document job summary and git rebase  # docs follow-up
 
 A PR where every save was a commit should be squashed down. The goal is that each commit in the final history is a coherent, self-contained change.
 
+## Pull request descriptions
+
+PR descriptions are for reviewers and future readers browsing git history. They should answer "what changed and why?" — not "how was it implemented?" The code already shows the how.
+
+**Good** — says what changed from the user's perspective:
+
+```
+Test and deploy results now appear on the GitHub Actions run summary
+page in addition to PR comments.
+
+Also reorganizes the GitHub reporter code into `reporting/github/`
+with shared formatting and a separate API module.
+```
+
+**Bad** — restates the diff:
+
+```
+- Add `GithubJobSummaryReporter` that writes batch test/deploy results
+  to `$GITHUB_STEP_SUMMARY`
+- Refactor GitHub reporter code into a `reporting/github/` subfolder
+  with shared formatting extracted into `formatting.ts`
+- Wire up the new reporter in `batch test`, `batch deploy`, and
+  `post-test-results` commands
+```
+
+Keep descriptions to 1-3 sentences. If a PR needs a long explanation, that's usually a sign it should be split up.
+
 ## Branching
 
 - Branch from `main` for all work
