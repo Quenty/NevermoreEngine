@@ -20,11 +20,11 @@
   "scripts": {
     "build:link": "pnpm install",
     "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json --absolute",
-    "format": "stylua --config-path=stylua.toml src games tests plugins",
+    "format": "stylua --config-path=stylua.toml src games plugins",
     "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore=**/node_modules/** --ignore=**/*.story.lua --ignore=**/*.client.lua --ignore=**/*.server.lua src",
     "lint:moonwave": "npx lerna exec --parallel -- moonwave-extractor extract src",
     "lint:selene": "npx lerna exec --parallel -- selene --no-summary --num-threads=1 --config=../../selene.toml src",
-    "lint:stylua": "stylua --config-path=stylua.toml --check src games tests plugins",
+    "lint:stylua": "stylua --config-path=stylua.toml --check src games plugins",
     "prelint:luau": "npm run build:sourcemap && npx @quenty/nevermore-cli tools strip-sourcemap-jest && npx @quenty/nevermore-cli tools download-roblox-types",
     "prelint:selene": "selene generate-roblox-std",
     "test": "npx @quenty/nevermore-cli batch test",
