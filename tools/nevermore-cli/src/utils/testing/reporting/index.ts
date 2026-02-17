@@ -21,6 +21,7 @@ export {
   type SummaryTableReporterOptions,
   JsonFileReporter,
   GithubCommentTableReporter,
+  GithubJobSummaryReporter,
   type GithubCommentColumn,
   type GithubCommentTableConfig,
   summarizeError,

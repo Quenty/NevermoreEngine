@@ -5,6 +5,7 @@ import {
   type LiveStateTracker,
   CompositeReporter,
   GithubCommentTableReporter,
+  GithubJobSummaryReporter,
   GroupedReporter,
   JsonFileReporter,
   SpinnerReporter,
@@ -153,6 +154,11 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           summaryVerb: 'deployed',
         }),
         new GithubCommentTableReporter(
+          state,
+          createDeployCommentConfig(),
+          concurrency
+        ),
+        new GithubJobSummaryReporter(
           state,
           createDeployCommentConfig(),
           concurrency
