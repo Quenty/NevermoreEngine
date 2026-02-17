@@ -7,7 +7,7 @@
 
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
-			"version": "18",
+			"version": "22",
 			"pnpmVersion": "10.27.0"
 		}
 	},
@@ -23,6 +23,7 @@
 				"editorconfig.editorconfig"
 			],
 			"settings": {
+				"luau-lsp.server.path": "/home/vscode/.aftman/tool-storage/Quenty/luau-lsp/1.58.0-quenty.1/luau-lsp",
 				"luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
 				"luau-lsp.ignoreGlobs": ["**/node_modules/**"],
 				"luau-lsp.sourcemap.generatorCommand": "npm run build:sourcemap",
@@ -63,8 +64,9 @@
 	},
 
 	"remoteUser": "vscode",
-	"postCreateCommand": "git config --global --add safe.directory '*' && aftman install --no-trust-check && selene generate-roblox-std && pnpm install",
+	"postCreateCommand": "bash .devcontainer/post-create-command.sh",
 	"remoteEnv": {
-		"PATH": "${containerEnv:PATH}:/home/vscode/.aftman/bin"
+		"PATH": "${containerEnv:PATH}:/home/vscode/.aftman/bin:/home/vscode/.npm-global/bin"
 	}
 }
+
