@@ -42,4 +42,12 @@ export {
   type GithubCommentTableConfig,
   type GithubTableRow,
   summarizeError,
+  type DiagnosticSeverity,
+  type Diagnostic,
+  type DiagnosticSummary,
+  formatAnnotation,
+  emitAnnotations,
+  summarizeDiagnostics,
+  formatAnnotationSummaryMarkdown,
+  writeAnnotationSummaryAsync,
 } from './github/index.js';
