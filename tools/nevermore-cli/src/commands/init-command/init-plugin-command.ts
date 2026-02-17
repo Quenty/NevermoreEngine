@@ -20,16 +20,16 @@ export class InitPluginCommand<T> implements CommandModule<T, initGameArgs> {
   public command = 'plugin [plugin-name]';
   public describe = 'Scaffold a new plugin with Nevermore dependencies';
 
-  public builder(args: Argv<T>) {
+  public builder = (args: Argv<T>) => {
     args.positional('plugin-name', {
       describe: 'Name of the new package folder.',
       demandOption: false,
       type: 'string',
     });
     return args as Argv<initGameArgs>;
-  }
+  };
 
-  public async handler(args: initGameArgs) {
+  public handler = async (args: initGameArgs) => {
     const rawPluginName = await InitPluginCommand._ensurePluginName(args);
 
     const pluginName = TemplateHelper.camelize(rawPluginName).toLowerCase();

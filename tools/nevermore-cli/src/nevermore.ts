@@ -88,4 +88,9 @@ yargs(hideBin(process.argv))
     OutputHelper.formatHint("Hint: See 'nevermore help' for more help")
   )
   .wrap(null)
-  .strict().argv;
+  .strict()
+  .parseAsync()
+  .catch((err: unknown) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
