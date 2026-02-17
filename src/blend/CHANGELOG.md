@@ -1,3 +1,18 @@
+# v12.29.0 (Tue Feb 17 2026)
+
+#### 🚀 Enhancement
+
+- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
+- feat: Add CI/CD batch unit testing ([@Quenty](https://github.com/Quenty))
+- feat: Create places automatically using nevermore-cli ([@Quenty](https://github.com/Quenty))
+- feat: Add Nevermore deploy and Nevermore test commands that run files in the open cloud ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

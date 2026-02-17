@@ -1,3 +1,21 @@
+# v3.6.0 (Tue Feb 17 2026)
+
+#### 🚀 Enhancement
+
+- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
+- feat: Add CI/CD batch unit testing ([@Quenty](https://github.com/Quenty))
+- feat: Create places automatically using nevermore-cli ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- refactor: Remove unused code and cleanup code here ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

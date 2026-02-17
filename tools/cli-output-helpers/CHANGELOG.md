@@ -1,3 +1,25 @@
+# v1.5.0 (Tue Feb 17 2026)
+
+#### 🚀 Enhancement
+
+- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
+- feat: Use reporting system for studio bridge too (a bit ugly) ([@Quenty](https://github.com/Quenty))
+- feat: Improve output quality of testing cli tools ([@Quenty](https://github.com/Quenty))
+- feat: Better error messages and optimized tests ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix spinner design showing stuff ([@Quenty](https://github.com/Quenty))
+- refactor: Simplify code ([@Quenty](https://github.com/Quenty))
+- refactor: Add reporting ([@Quenty](https://github.com/Quenty))
+- refactor: Move test reporting to general cli-output-helpers reporting ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

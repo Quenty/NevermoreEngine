@@ -1,3 +1,36 @@
+# v4.16.0 (Tue Feb 17 2026)
+
+#### 🚀 Enhancement
+
+- feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
+- feat: Refactor studio bridge ([@Quenty](https://github.com/Quenty))
+- feat: Unify plugin testing reporting and start initial local test execution mode ([@Quenty](https://github.com/Quenty))
+- feat: Improve output quality of testing cli tools ([@Quenty](https://github.com/Quenty))
+- feat: Better error messages and optimized tests ([@Quenty](https://github.com/Quenty))
+- feat: Add CI/CD batch unit testing ([@Quenty](https://github.com/Quenty))
+- feat: Create places automatically using nevermore-cli ([@Quenty](https://github.com/Quenty))
+- feat: Add Nevermore deploy and Nevermore test commands that run files in the open cloud ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Local testing works consistently and in batch mode ([@Quenty](https://github.com/Quenty))
+- refactor: Lifecycle of constructed places is handled properly ([@Quenty](https://github.com/Quenty))
+- refactor: Better life-cycle management of the build-context ([@Quenty](https://github.com/Quenty))
+- refactor: Lifecycle management managed better ([@Quenty](https://github.com/Quenty))
+- refactor: Initial batch test split ([@Quenty](https://github.com/Quenty))
+- refactor: Remove unused code and cleanup code here ([@Quenty](https://github.com/Quenty))
+- refactor: Unify rojo building process in plugin ([@Quenty](https://github.com/Quenty))
+- refactor: Add reporting ([@Quenty](https://github.com/Quenty))
+- refactor: Move test reporting to general cli-output-helpers reporting ([@Quenty](https://github.com/Quenty))
+- fix: Tests timing out ([@Quenty](https://github.com/Quenty))
+- refactor: Reorganize nevermore-cli into cleaner sub-commands ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

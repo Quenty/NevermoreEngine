@@ -1,3 +1,16 @@
+# (Tue Feb 17 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.7.0`, `@quenty/accessorytypeutils@1.8.0`, `@quenty/adorneeboundingbox@8.31.0`, `@quenty/adorneedata@7.29.0`, `@quenty/aggregator@1.11.0`, `@quenty/animations@8.27.0`, `@quenty/binder@14.30.0`, `@quenty/blend@12.29.0`, `@quenty/brio@14.25.0`, `@quenty/buttondragmodel@1.25.0`, `@quenty/camera@14.33.0`, `@quenty/chatproviderservice@9.42.0`, `@quenty/clienttranslator@14.30.0`, `@quenty/clipcharacters@12.33.0`, `@quenty/cmdrservice@13.36.0`, `@quenty/colorpalette@10.32.0`, `@quenty/colorpicker@10.30.0`, `@quenty/conditions@10.34.0`, `@quenty/convexhull@4.12.0`, `@quenty/countdowntext@4.10.0`, `@quenty/counter@7.26.0`, `@quenty/datastore@13.32.0`, `@quenty/deathreport@10.37.0`, `@quenty/defaultvalueutils@1.4.0`, `@quenty/draw@7.11.0`, `@quenty/ducktype@5.10.0`, `@quenty/ellipticcurvecryptography@1.8.0`, `@quenty/elo@7.30.0`, `@quenty/enums@1.2.0`, `@quenty/experiencecalculator@2.7.0`, `@quenty/funnels@1.18.0`, `@quenty/fzy@5.11.0`, `@quenty/gameconfig@12.40.0`, `@quenty/gameproductservice@14.42.0`, `@quenty/highlight@10.33.0`, `@quenty/ik@15.43.0`, `@quenty/influxdbclient@7.29.0`, `@quenty/inputkeymaputils@14.36.0`, `@quenty/instanceutils@13.25.0`, `@quenty/lipsum@14.29.0`, `@quenty/loader@10.10.0`, `@quenty/lrucache@1.8.0`, `@quenty/maid@3.6.0`, `@quenty/memoize@1.8.0`, `@quenty/nevermore-test-runner@1.1.0`, `@quenty/observablecollection@12.31.0`, `@quenty/particles@5.12.0`, `@quenty/performanceutils@4.10.0`, `@quenty/permissionprovider@14.31.0`, `@quenty/promptqueue@1.30.0`, `@quenty/qframe@10.15.0`, `@quenty/radial-image@9.30.0`, `@quenty/randomutils@6.13.0`, `@quenty/rectutils@1.4.0`, `@quenty/rigbuilderutils@10.27.0`, `@quenty/rogue-humanoid@10.40.0`, `@quenty/rogue-properties@11.38.0`, `@quenty/rx@13.24.0`, `@quenty/screenshothudservice@7.28.0`, `@quenty/secrets@7.40.0`, `@quenty/settings-inputkeymap@10.46.0`, `@quenty/settings@11.43.0`, `@quenty/snackbar@11.34.0`, `@quenty/softshutdown@9.39.0`, `@quenty/soundgroup@1.33.0`, `@quenty/soundplayer@7.32.0`, `@quenty/tie@10.34.0`, `@quenty/timedtween@7.29.0`, `@quenty/toolutils@1.11.0`, `@quenty/tuple@1.7.0`, `@quenty/typeutils@1.2.0`, `@quenty/ugcsanitize@1.12.0`, `@quenty/valueobject@13.26.0`, `@quenty/viewport@11.34.0`, `@quenty/voicechat@5.14.0`, `@quenty/cli-output-helpers@1.5.0`, `@quenty/nevermore-cli@4.16.0`, `@quenty/nevermore-template-helpers@1.6.0`, `@quenty/studio-bridge@0.2.0`
+  - feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Feb 13 2026)
 
 #### 🐛 Bug Fix
