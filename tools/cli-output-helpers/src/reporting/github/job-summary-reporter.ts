@@ -69,6 +69,10 @@ export class GithubJobSummaryReporter extends BaseReporter {
       return;
     }
 
+    // Strip the HTML comment marker and ## heading — the GitHub Actions
+    // job summary page already provides its own section header.
+    body = _stripCommentHeader(body, this._config.commentMarker);
+
     const summaryPath = process.env.GITHUB_STEP_SUMMARY!;
     try {
       await fs.appendFile(summaryPath, body);
@@ -83,4 +87,14 @@ export class GithubJobSummaryReporter extends BaseReporter {
 
 function _isJobSummaryEnabled(): boolean {
   return isCI() && !!process.env.GITHUB_STEP_SUMMARY;
+}
+
+/** Remove the comment marker line and the `## Heading` line from formatted output. */
+function _stripCommentHeader(body: string, commentMarker: string): string {
+  let result = body;
+  if (result.startsWith(commentMarker + '\n')) {
+    result = result.slice(commentMarker.length + 1);
+  }
+  result = result.replace(/^## .+\n\n/, '');
+  return result;
 }
