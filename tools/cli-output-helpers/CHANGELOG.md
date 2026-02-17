@@ -1,20 +1,18 @@
-# v1.5.1 (Tue Feb 17 2026)
-
-#### 🐛 Bug Fix
-
-- fix: devcontainer initializes properly with luau-lsp working out of the box [#658](https://github.com/Quenty/NevermoreEngine/pull/658) ([@Quenty](https://github.com/Quenty))
-- fix: devcontainer initializes properly with luau-lsp working out of the box ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.5.1](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.5.0...@quenty/cli-output-helpers@1.5.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* devcontainer initializes properly with luau-lsp working out of the box ([b8591e8](https://github.com/Quenty/Nevermore/commit/b8591e8a62beda655e90875b0dc22d79fcae8e61))
+
+
+
+
 
 # [1.5.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.3.0...@quenty/cli-output-helpers@1.5.0) (2026-02-17)
 

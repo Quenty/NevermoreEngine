@@ -1,20 +1,18 @@
-# v11.38.1 (Tue Feb 17 2026)
-
-#### 🐛 Bug Fix
-
-- fix: devcontainer initializes properly with luau-lsp working out of the box [#658](https://github.com/Quenty/NevermoreEngine/pull/658) ([@Quenty](https://github.com/Quenty))
-- fix: devcontainer initializes properly with luau-lsp working out of the box ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.38.0...@quenty/rogue-properties@11.38.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* devcontainer initializes properly with luau-lsp working out of the box ([b8591e8](https://github.com/Quenty/NevermoreEngine/commit/b8591e8a62beda655e90875b0dc22d79fcae8e61))
+
+
+
+
 
 # [11.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.37.3...@quenty/rogue-properties@11.38.0) (2026-02-17)
 
