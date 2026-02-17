@@ -12,14 +12,16 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { runBatchAsync } from '../../utils/batch/batch-runner.js';
+import { buildPlaceAsync } from '../../utils/build/build.js';
+import { uploadPlaceAsync } from '../../utils/build/upload.js';
+import { createDeployCommentConfig } from '../../utils/deploy/deploy-github-columns.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import {
   discoverAllTargetPackagesAsync,
   discoverChangedTargetPackagesAsync,
 } from '../../utils/testing/changed-tests-utils.js';
-import { runBatchDeployAsync } from '../../utils/deploy/batch-deploy-runner.js';
-import { createDeployCommentConfig } from '../../utils/deploy/deploy-github-columns.js';
 import { isCI } from '../../utils/nevermore-cli-utils.js';
 
 interface BatchDeployArgs extends NevermoreGlobalArgs {
@@ -171,15 +173,36 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
   await reporter.startAsync();
 
-  const results = await runBatchDeployAsync({
+  const publish = args.publish ?? false;
+  const results = await runBatchAsync({
     packages,
-    client,
-    apiKey,
-    targetName,
     concurrency,
     reporter,
     bufferOutput: isGrouped,
-    publish: args.publish,
+    executeAsync: async (pkg, pkgReporter) => {
+      const buildResult = await buildPlaceAsync({
+        targetName,
+        outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
+        packagePath: pkg.path,
+        reporter: pkgReporter,
+        packageName: pkg.name,
+      });
+
+      const { version } = await uploadPlaceAsync({
+        buildResult,
+        args: { apiKey, publish },
+        client,
+        reporter: pkgReporter,
+        packageName: pkg.name,
+      });
+
+      const action = publish ? 'Published' : 'Saved';
+      return {
+        packageName: pkg.name,
+        success: true,
+        logs: `${action} v${version}`,
+      };
+    },
   });
 
   await reporter.stopAsync();

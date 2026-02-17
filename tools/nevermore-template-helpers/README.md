@@ -13,19 +13,16 @@ Shared utilities for scaffolding, building, and template substitution across Nev
 ### Build API
 
 ```typescript
-import { BuildContext, rojoBuildAsync } from '@quenty/nevermore-template-helpers';
+import { BuildContext, rojoBuildAsync, resolveTemplatePath } from '@quenty/nevermore-template-helpers';
 
-// Temp directory (auto-cleaned)
+// Resolve a template file relative to the calling package's templates/ directory
+const projectPath = resolveTemplatePath(import.meta.url, 'my-template/default.project.json');
+
+// Temp directory for build output (auto-cleaned)
 const ctx = await BuildContext.createAsync({ mode: 'temp', prefix: 'my-build-' });
-const projectPath = await ctx.writeProjectAsync('default.project.json', {
-  name: 'MyProject',
-  tree: { $className: 'DataModel' },
-});
-await rojoBuildAsync({ projectPath, output: path.join(ctx.dir, 'output.rbxl') });
+const placePath = path.join(ctx.dir, 'output.rbxl');
+await rojoBuildAsync({ projectPath, output: placePath });
 await ctx.cleanupAsync();
-
-// Persistent directory (survives across runs)
-const ctx2 = await BuildContext.createAsync({ mode: 'persistent', buildDir: './build' });
 ```
 
 ### Template Substitution

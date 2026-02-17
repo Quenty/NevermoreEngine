@@ -1,7 +1,6 @@
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
-import type { RojoProject } from './rojo-project.js';
 
 export interface BuildContextOptions {
   /** 'temp' creates a disposable mkdtemp directory; 'persistent' uses an existing path */
@@ -56,14 +55,6 @@ export class BuildContext {
     await fs.mkdir(path.dirname(fullPath), { recursive: true });
     await fs.writeFile(fullPath, content, 'utf-8');
     return fullPath;
-  }
-
-  /**
-   * Write a rojo project JSON file into the build directory.
-   * @returns Absolute path to the written project file.
-   */
-  async writeProjectAsync(name: string, project: RojoProject): Promise<string> {
-    return this.writeFileAsync(name, JSON.stringify(project, null, 2));
   }
 
   /**

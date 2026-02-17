@@ -1,17 +1,20 @@
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import {
   discoverAllTestablePackagesAsync,
   discoverChangedTestablePackagesAsync,
+  type TargetPackage,
 } from '../../utils/testing/changed-tests-utils.js';
-import { runBatchTestsAsync } from '../../utils/testing/runner/batch-test-runner.js';
 import {
-  type Reporter,
   type LiveStateTracker,
+  type BatchTestResult,
+  type BatchTestSummary,
   CompositeReporter,
   GithubCommentTableReporter,
   GroupedReporter,
@@ -20,6 +23,11 @@ import {
   SummaryTableReporter,
   createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
+import {
+  runSingleCloudTestAsync,
+  runSingleLocalTestAsync,
+  type SingleTestResult,
+} from '../../utils/testing/runner/test-runner.js';
 import { isCI } from '../../utils/nevermore-cli-utils.js';
 
 interface BatchTestArgs extends NevermoreGlobalArgs {
@@ -118,26 +126,33 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
 
-  const reporter = new CompositeReporter(packageNames, (state: LiveStateTracker) => {
-    const reporters: Reporter[] = [
-      isGrouped
-        ? new GroupedReporter(state, {
-            showLogs: args.logs ?? false,
-            verbose: args.verbose,
-            actionVerb: 'Testing',
-          })
-        : new SpinnerReporter(state, {
-            showLogs: args.logs ?? false,
-            actionVerb: 'Testing',
-          }),
-      new SummaryTableReporter(state),
-      new GithubCommentTableReporter(state, createTestCommentConfig(), concurrency),
-    ];
-    if (args.output) {
-      reporters.push(new JsonFileReporter(state, args.output));
+  const reporter = new CompositeReporter(
+    packageNames,
+    (state: LiveStateTracker) => {
+      const reporters: Reporter[] = [
+        isGrouped
+          ? new GroupedReporter(state, {
+              showLogs: args.logs ?? false,
+              verbose: args.verbose,
+              actionVerb: 'Testing',
+            })
+          : new SpinnerReporter(state, {
+              showLogs: args.logs ?? false,
+              actionVerb: 'Testing',
+            }),
+        new SummaryTableReporter(state),
+        new GithubCommentTableReporter(
+          state,
+          createTestCommentConfig(),
+          concurrency
+        ),
+      ];
+      if (args.output) {
+        reporters.push(new JsonFileReporter(state, args.output));
+      }
+      return reporters;
     }
-    return reporters;
-  });
+  );
 
   let client: OpenCloudClient | undefined;
   if (cloud) {
@@ -147,12 +162,29 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   await reporter.startAsync();
 
-  const results = await runBatchTestsAsync({
+  const timeoutMs = 120_000;
+  const results: BatchTestSummary = await runBatchAsync<BatchTestResult>({
     packages,
-    client,
     concurrency,
     reporter,
     bufferOutput: isGrouped,
+    executeAsync: async (pkg, pkgReporter) => {
+      const result = client
+        ? await _runWithRetryAsync(pkg, client, timeoutMs, pkgReporter)
+        : await runSingleLocalTestAsync({
+            packagePath: pkg.path,
+            reporter: pkgReporter,
+            packageName: pkg.name,
+            timeoutMs,
+          });
+
+      return {
+        packageName: pkg.name,
+        placeId: pkg.target.placeId,
+        success: result.success,
+        logs: result.logs,
+      };
+    },
   });
 
   await reporter.stopAsync();
@@ -160,4 +192,32 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
   // Node.js fetch (undici) keeps TCP connections alive in a global pool,
   // which prevents the event loop from draining. Explicit exit required.
   process.exit(results.summary.failed > 0 ? 1 : 0);
+}
+
+async function _runWithRetryAsync(
+  pkg: TargetPackage,
+  client: OpenCloudClient,
+  timeoutMs: number,
+  reporter: Reporter
+): Promise<SingleTestResult> {
+  const opts = {
+    packagePath: pkg.path,
+    client,
+    reporter,
+    packageName: pkg.name,
+    timeoutMs,
+  };
+
+  try {
+    return await runSingleCloudTestAsync(opts);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+
+    if (message.includes('timed out') || message.includes('fetch failed')) {
+      OutputHelper.warn(`${pkg.name}: transient failure, retrying...`);
+      return await runSingleCloudTestAsync(opts);
+    }
+
+    throw err;
+  }
 }
