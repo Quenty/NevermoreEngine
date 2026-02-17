@@ -1,0 +1,62 @@
+---
+title: Git Workflow
+sidebar_position: 3
+---
+
+# Git Workflow
+
+Git conventions for contributing to Nevermore. These apply to both Luau packages and TypeScript CLI tools.
+
+## Commit messages
+
+Use [conventional commits](https://www.conventionalcommits.org/): `feat(scope):`, `fix(scope):`, `chore(scope):`, `docs:`, `refactor(scope):`. Messages describe impact, not reasoning.
+
+```
+feat(cli): add GitHub Actions job summary reporter
+fix(blend): handle nil parent during cleanup
+chore(devcontainer): add GitHub CLI feature
+docs: update testing guide with job summary details
+```
+
+The scope is typically the package name or area of the codebase. Omit the scope for cross-cutting changes.
+
+## Interactive rebase
+
+Use `git rebase -i` to craft clean commit history before pushing or requesting review:
+
+- **Squash** related work into cohesive commits (e.g., implementation + fix-ups become one commit)
+- **Separate** unrelated changes into distinct commits (e.g., a feature commit and a devcontainer fix should be separate)
+- **Rebase** onto the target branch to resolve conflicts cleanly rather than creating merge commits
+- **Reword** commit messages to be clear and descriptive after squashing
+
+```bash
+# Rebase onto main and clean up commits interactively
+git fetch origin main
+git rebase -i origin/main
+
+# In the editor: pick, squash (s), fixup (f), reword (r)
+# Then force-push the cleaned branch
+git push --force-with-lease
+```
+
+### When to squash vs. keep separate
+
+A PR with three commits like this is ideal:
+
+```
+feat(cli): add job summary reporter       # the feature
+chore(devcontainer): add GitHub CLI        # unrelated improvement, separate commit
+docs: document job summary and git rebase  # docs follow-up
+```
+
+A PR where every save was a commit should be squashed down. The goal is that each commit in the final history is a coherent, self-contained change.
+
+## Branching
+
+- Branch from `main` for all work
+- Use descriptive branch names: `feat/job-summary-reporter`, `fix/spinner-cursor-up`
+- Releases are CI-driven via `auto shipit` — never release locally
+
+## No co-authorship
+
+Do not include `Co-Authored-By` on Nevermore commits (open source repo).

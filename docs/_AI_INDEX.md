@@ -42,5 +42,6 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | [testing/](testing/index.md) | Testing: Jest3, deploy config, CLI commands, credentials, CI |
 | [conventions/luau.md](conventions/luau.md) | Strict typing patterns, class structure, common type imports |
 | [conventions/typescript.md](conventions/typescript.md) | CLI tool conventions: naming, commands, error handling, dryrun |
+| [conventions/git-workflow.md](conventions/git-workflow.md) | Git conventions: conventional commits, interactive rebase, branching |
 | [ides/vscode.md](ides/vscode.md) | VSCode/Cursor setup: extensions, luau-lsp config, settings |
 | [gotchas/tooling.md](gotchas/tooling.md) | Tooling gotchas: Lune, symlinks, Rojo, web fetch safety |

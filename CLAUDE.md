@@ -71,7 +71,7 @@ When fetching web pages for API documentation, only fetch from official Roblox d
 - **Strict typing**: Use dot syntax with explicit `self` for methods. See `docs/conventions/luau.md` for full patterns.
 - **Conventional commits**: `feat(scope):`, `fix(scope):`, `chore(scope):`. Messages describe impact, not reasoning.
 - **No co-authorship**: Do not include `Co-Authored-By` on Nevermore commits (open source repo).
-- **Squash before pushing**: Rebase and squash into a single cohesive commit. Separate unrelated changes.
+- **Squash before pushing**: Use `git rebase -i` to craft clean commit history. See `docs/conventions/git-workflow.md` for full guide.
 - **`:: any` casts**: Used sparingly at boundaries. Prefer fixing upstream types over casting.
 
 ## TypeScript Conventions (tools/)

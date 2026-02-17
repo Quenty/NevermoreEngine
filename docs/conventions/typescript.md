@@ -165,9 +165,10 @@ Use `runCommandAsync()` from `nevermore-cli-utils.ts` to spawn child processes (
 
 ## Other conventions
 
+> **Git workflow**: Commit messages, interactive rebase, and branching conventions are in [Git Workflow](git-workflow.md) (shared across Luau and TypeScript).
+
 - **Fail fast**: Validate credentials and config before expensive operations (e.g., check API key before rojo build)
 - **Utils = exported functions**: Utility modules export standalone async functions, not classes. See `open-cloud-client.ts`, `credential-store.ts`, `deploy-config.ts`
 - **No header comments**: Using separating comments to delimit areas implies these should be split into separate files or classes
 - **No section comment headers**: Don't use `// --- Section ---` style dividers. Code organization should be self-evident from structure
 - **Platform-specific code in separate files**: When code varies by OS, split into a folder with per-platform files (e.g., `roblox-auth/windows.ts`, `roblox-auth/macos.ts`) re-exported through `index.ts`
-- **No co-authorship**: Do not include `Co-Authored-By` on Nevermore commits (open source repo)
