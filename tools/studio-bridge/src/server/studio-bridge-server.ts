@@ -157,8 +157,8 @@ export class StudioBridgeServer {
         placePath = builtPlacePath;
       }
 
-      // 1. Start WebSocket server
-      this._wss = new WebSocketServer({ port: 0 });
+      // 1. Start WebSocket server (unique path rejects wrong connections at HTTP upgrade level)
+      this._wss = new WebSocketServer({ port: 0, path: `/${this._sessionId}` });
       const port = await startWsServerAsync(this._wss);
       OutputHelper.verbose(
         `[StudioBridge] WebSocket server listening on port ${port}`
@@ -218,6 +218,7 @@ export class StudioBridgeServer {
       this._connectedClient.send(
         encodeMessage({
           type: 'execute',
+          sessionId: this._sessionId,
           payload: { script: options.scriptContent },
         })
       );
@@ -257,7 +258,7 @@ export class StudioBridgeServer {
     if (this._connectedClient) {
       try {
         this._connectedClient.send(
-          encodeMessage({ type: 'shutdown', payload: {} })
+          encodeMessage({ type: 'shutdown', sessionId: this._sessionId, payload: {} })
         );
       } catch {
         // ignore
@@ -297,10 +298,11 @@ export class StudioBridgeServer {
             return;
           }
 
-          if (msg.payload.sessionId !== this._sessionId) {
+          if (msg.sessionId !== this._sessionId || msg.payload.sessionId !== this._sessionId) {
             OutputHelper.verbose(
-              `[StudioBridge] Ignoring hello with wrong session ID: ${msg.payload.sessionId}`
+              `[StudioBridge] Rejecting hello with wrong session ID`
             );
+            ws.close();
             return;
           }
 
@@ -309,6 +311,7 @@ export class StudioBridgeServer {
           ws.send(
             encodeMessage({
               type: 'welcome',
+              sessionId: this._sessionId,
               payload: { sessionId: this._sessionId },
             })
           );
@@ -393,6 +396,13 @@ export class StudioBridgeServer {
         if (!msg) {
           OutputHelper.verbose(
             `[StudioBridge] Ignoring malformed message: ${data.slice(0, 200)}`
+          );
+          return;
+        }
+
+        if (msg.sessionId !== this._sessionId) {
+          OutputHelper.verbose(
+            `[StudioBridge] Ignoring message with wrong session ID`
           );
           return;
         }

@@ -17,7 +17,7 @@ end
 
 local PORT = "{{PORT}}"
 local SESSION_ID = "{{SESSION_ID}}"
-local WS_URL = "ws://localhost:" .. PORT
+local WS_URL = "ws://localhost:" .. PORT .. "/" .. SESSION_ID
 
 -- ---------------------------------------------------------------------------
 -- Helpers
@@ -41,6 +41,7 @@ local function send(client, msgType, payload)
 	local ok, err = pcall(function()
 		client:Send(jsonEncode({
 			type = msgType,
+			sessionId = SESSION_ID,
 			payload = payload,
 		}))
 	end)
@@ -154,6 +155,12 @@ local function connectAsync()
 	client.MessageReceived:Connect(function(rawData)
 		local msg = jsonDecode(rawData)
 		if not msg or type(msg.type) ~= "string" then
+			return
+		end
+
+		-- Validate session ID on every incoming message
+		if msg.sessionId ~= SESSION_ID then
+			warn("[StudioBridge] Ignoring message with wrong session ID")
 			return
 		end
 

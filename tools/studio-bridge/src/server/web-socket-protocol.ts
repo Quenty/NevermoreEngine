@@ -1,6 +1,6 @@
 /**
  * WebSocket message protocol shared between the Node.js server and the Roblox
- * Studio plugin. All messages are JSON-encoded: `{ type: string, payload: object }`.
+ * Studio plugin. All messages are JSON-encoded: `{ type: string, sessionId: string, payload: object }`.
  */
 
 // ---------------------------------------------------------------------------
@@ -15,6 +15,7 @@ export type OutputLevel = 'Print' | 'Info' | 'Warning' | 'Error';
 
 export interface HelloMessage {
   type: 'hello';
+  sessionId: string;
   payload: {
     sessionId: string;
   };
@@ -22,6 +23,7 @@ export interface HelloMessage {
 
 export interface OutputMessage {
   type: 'output';
+  sessionId: string;
   payload: {
     messages: Array<{
       level: OutputLevel;
@@ -32,6 +34,7 @@ export interface OutputMessage {
 
 export interface ScriptCompleteMessage {
   type: 'scriptComplete';
+  sessionId: string;
   payload: {
     success: boolean;
     error?: string;
@@ -46,6 +49,7 @@ export type PluginMessage = HelloMessage | OutputMessage | ScriptCompleteMessage
 
 export interface WelcomeMessage {
   type: 'welcome';
+  sessionId: string;
   payload: {
     sessionId: string;
   };
@@ -53,6 +57,7 @@ export interface WelcomeMessage {
 
 export interface ExecuteMessage {
   type: 'execute';
+  sessionId: string;
   payload: {
     script: string;
   };
@@ -60,6 +65,7 @@ export interface ExecuteMessage {
 
 export interface ShutdownMessage {
   type: 'shutdown';
+  sessionId: string;
   payload: Record<string, never>;
 }
 
@@ -90,12 +96,16 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
     return null;
   }
 
-  const { type, payload } = obj as { type: string; payload: Record<string, unknown> };
+  if (typeof obj.sessionId !== 'string') {
+    return null;
+  }
+
+  const { type, sessionId, payload } = obj as { type: string; sessionId: string; payload: Record<string, unknown> };
 
   switch (type) {
     case 'hello':
       if (typeof payload.sessionId === 'string') {
-        return { type: 'hello', payload: { sessionId: payload.sessionId } };
+        return { type: 'hello', sessionId, payload: { sessionId: payload.sessionId } };
       }
       return null;
 
@@ -110,7 +120,7 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
               typeof (m as Record<string, unknown>).body === 'string'
           )
           .map((m) => ({ level: m.level, body: m.body }));
-        return { type: 'output', payload: { messages } };
+        return { type: 'output', sessionId, payload: { messages } };
       }
       return null;
 
@@ -118,6 +128,7 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
       if (typeof payload.success === 'boolean') {
         return {
           type: 'scriptComplete',
+          sessionId,
           payload: {
             success: payload.success,
             error: typeof payload.error === 'string' ? payload.error : undefined,

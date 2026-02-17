@@ -5,29 +5,33 @@ describe('encodeMessage', () => {
   it('encodes a welcome message', () => {
     const json = encodeMessage({
       type: 'welcome',
+      sessionId: 'abc-123',
       payload: { sessionId: 'abc-123' },
     });
     const parsed = JSON.parse(json);
     expect(parsed).toEqual({
       type: 'welcome',
+      sessionId: 'abc-123',
       payload: { sessionId: 'abc-123' },
     });
   });
 
   it('encodes a shutdown message', () => {
-    const json = encodeMessage({ type: 'shutdown', payload: {} });
+    const json = encodeMessage({ type: 'shutdown', sessionId: 'abc-123', payload: {} });
     const parsed = JSON.parse(json);
-    expect(parsed).toEqual({ type: 'shutdown', payload: {} });
+    expect(parsed).toEqual({ type: 'shutdown', sessionId: 'abc-123', payload: {} });
   });
 
   it('encodes an execute message', () => {
     const json = encodeMessage({
       type: 'execute',
+      sessionId: 'abc-123',
       payload: { script: 'print("hi")' },
     });
     const parsed = JSON.parse(json);
     expect(parsed).toEqual({
       type: 'execute',
+      sessionId: 'abc-123',
       payload: { script: 'print("hi")' },
     });
   });
@@ -39,20 +43,33 @@ describe('decodePluginMessage', () => {
       const msg = decodePluginMessage(
         JSON.stringify({
           type: 'hello',
+          sessionId: 'test-session',
           payload: { sessionId: 'test-session' },
         })
       );
       expect(msg).toEqual({
         type: 'hello',
+        sessionId: 'test-session',
         payload: { sessionId: 'test-session' },
       });
     });
 
-    it('returns null for hello without sessionId', () => {
+    it('returns null for hello without sessionId in payload', () => {
       const msg = decodePluginMessage(
         JSON.stringify({
           type: 'hello',
+          sessionId: 'test-session',
           payload: {},
+        })
+      );
+      expect(msg).toBeNull();
+    });
+
+    it('returns null for hello without top-level sessionId', () => {
+      const msg = decodePluginMessage(
+        JSON.stringify({
+          type: 'hello',
+          payload: { sessionId: 'test-session' },
         })
       );
       expect(msg).toBeNull();
@@ -64,6 +81,7 @@ describe('decodePluginMessage', () => {
       const msg = decodePluginMessage(
         JSON.stringify({
           type: 'output',
+          sessionId: 'test-session',
           payload: {
             messages: [
               { level: 'Print', body: 'Hello world' },
@@ -74,6 +92,7 @@ describe('decodePluginMessage', () => {
       );
       expect(msg).toEqual({
         type: 'output',
+        sessionId: 'test-session',
         payload: {
           messages: [
             { level: 'Print', body: 'Hello world' },
@@ -87,6 +106,7 @@ describe('decodePluginMessage', () => {
       const msg = decodePluginMessage(
         JSON.stringify({
           type: 'output',
+          sessionId: 'test-session',
           payload: {
             messages: [
               { level: 'Print', body: 'valid' },
@@ -99,6 +119,7 @@ describe('decodePluginMessage', () => {
       );
       expect(msg).toEqual({
         type: 'output',
+        sessionId: 'test-session',
         payload: {
           messages: [{ level: 'Print', body: 'valid' }],
         },
@@ -109,7 +130,18 @@ describe('decodePluginMessage', () => {
       const msg = decodePluginMessage(
         JSON.stringify({
           type: 'output',
+          sessionId: 'test-session',
           payload: { messages: 'not-an-array' },
+        })
+      );
+      expect(msg).toBeNull();
+    });
+
+    it('returns null for output without top-level sessionId', () => {
+      const msg = decodePluginMessage(
+        JSON.stringify({
+          type: 'output',
+          payload: { messages: [{ level: 'Print', body: 'test' }] },
         })
       );
       expect(msg).toBeNull();
@@ -121,11 +153,13 @@ describe('decodePluginMessage', () => {
       const msg = decodePluginMessage(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId: 'test-session',
           payload: { success: true },
         })
       );
       expect(msg).toEqual({
         type: 'scriptComplete',
+        sessionId: 'test-session',
         payload: { success: true, error: undefined },
       });
     });
@@ -134,11 +168,13 @@ describe('decodePluginMessage', () => {
       const msg = decodePluginMessage(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId: 'test-session',
           payload: { success: false, error: 'Script errored' },
         })
       );
       expect(msg).toEqual({
         type: 'scriptComplete',
+        sessionId: 'test-session',
         payload: { success: false, error: 'Script errored' },
       });
     });
@@ -147,7 +183,18 @@ describe('decodePluginMessage', () => {
       const msg = decodePluginMessage(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId: 'test-session',
           payload: { success: 'yes' },
+        })
+      );
+      expect(msg).toBeNull();
+    });
+
+    it('returns null for scriptComplete without top-level sessionId', () => {
+      const msg = decodePluginMessage(
+        JSON.stringify({
+          type: 'scriptComplete',
+          payload: { success: true },
         })
       );
       expect(msg).toBeNull();
@@ -164,11 +211,19 @@ describe('decodePluginMessage', () => {
     });
 
     it('returns null for missing type', () => {
-      expect(decodePluginMessage(JSON.stringify({ payload: {} }))).toBeNull();
+      expect(decodePluginMessage(JSON.stringify({ sessionId: 's', payload: {} }))).toBeNull();
     });
 
     it('returns null for missing payload', () => {
-      expect(decodePluginMessage(JSON.stringify({ type: 'hello' }))).toBeNull();
+      expect(decodePluginMessage(JSON.stringify({ type: 'hello', sessionId: 's' }))).toBeNull();
+    });
+
+    it('returns null for missing sessionId', () => {
+      expect(
+        decodePluginMessage(
+          JSON.stringify({ type: 'hello', payload: { sessionId: 's' } })
+        )
+      ).toBeNull();
     });
 
     it('returns null for unknown message type', () => {
@@ -176,6 +231,7 @@ describe('decodePluginMessage', () => {
         decodePluginMessage(
           JSON.stringify({
             type: 'unknown',
+            sessionId: 'test',
             payload: {},
           })
         )

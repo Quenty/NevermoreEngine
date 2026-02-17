@@ -41,7 +41,7 @@ async function connectAndHandshake(
   port: number,
   sessionId: string
 ): Promise<WebSocket> {
-  const ws = new WebSocket(`ws://localhost:${port}`);
+  const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
 
   await new Promise<void>((resolve, reject) => {
     ws.on('open', resolve);
@@ -49,7 +49,7 @@ async function connectAndHandshake(
   });
 
   // Send hello
-  ws.send(JSON.stringify({ type: 'hello', payload: { sessionId } }));
+  ws.send(JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } }));
 
   // Wait for welcome
   await new Promise<void>((resolve) => {
@@ -173,7 +173,7 @@ describe('StudioBridgeServer', () => {
       expect(true).toBe(true);
     });
 
-    it('ignores hello with wrong session ID', async () => {
+    it('rejects hello with wrong session ID and closes connection', async () => {
       const sessionId = 'correct-session';
       server = new StudioBridgeServer({
         placePath: '/fake/place.rbxl',
@@ -187,25 +187,65 @@ describe('StudioBridgeServer', () => {
       const wss = (server as any)._wss;
       const port: number = wss.address().port;
 
-      // Connect with wrong session ID
-      const ws = new WebSocket(`ws://localhost:${port}`);
+      // Connect with correct path but wrong session ID in message
+      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
       await new Promise<void>((resolve, reject) => {
         ws.on('open', resolve);
         ws.on('error', reject);
       });
 
+      // Track if server closes the connection
+      const closedPromise = new Promise<void>((resolve) => {
+        ws.on('close', () => resolve());
+      });
+
       ws.send(
         JSON.stringify({
           type: 'hello',
+          sessionId: 'wrong-session',
           payload: { sessionId: 'wrong-session' },
         })
       );
 
+      // Server should close the connection
+      await closedPromise;
+
       // Server should NOT accept — startAsync should time out
       await expect(startPromise).rejects.toThrow('Timed out waiting for Studio plugin handshake');
 
-      ws.close();
       // Server already stopped on failure (startAsync catch cleans up)
+    });
+
+    it('rejects connection to wrong WebSocket path', async () => {
+      const sessionId = 'correct-session';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 1_000,
+      });
+
+      const startPromise = server.startAsync();
+
+      await new Promise((r) => setTimeout(r, 50));
+      const wss = (server as any)._wss;
+      const port: number = wss.address().port;
+
+      // Connect with wrong path
+      const ws = new WebSocket(`ws://localhost:${port}/wrong-path`);
+
+      // Should get an error or unexpected response
+      const errorOrClose = await new Promise<string>((resolve) => {
+        ws.on('error', () => resolve('error'));
+        ws.on('unexpected-response', () => {
+          ws.close();
+          resolve('rejected');
+        });
+      });
+
+      expect(['error', 'rejected']).toContain(errorOrClose);
+
+      // startAsync should time out
+      await expect(startPromise).rejects.toThrow('Timed out waiting for Studio plugin handshake');
     });
   });
 
@@ -214,19 +254,19 @@ describe('StudioBridgeServer', () => {
   // -----------------------------------------------------------------------
 
   describe('executeAsync', () => {
-    it('sends execute message and returns result on scriptComplete', async () => {
+    it('sends execute message with sessionId and returns result on scriptComplete', async () => {
       const ready = await createReadyServer();
       server = ready.server;
       client = ready.client;
 
       // Listen for execute message from server
-      const executePromise = new Promise<string>((resolve) => {
+      const executePromise = new Promise<{ script: string; sessionId: string }>((resolve) => {
         client!.on('message', (raw) => {
           const data = JSON.parse(
             typeof raw === 'string' ? raw : raw.toString('utf-8')
           );
           if (data.type === 'execute') {
-            resolve(data.payload.script);
+            resolve({ script: data.payload.script, sessionId: data.sessionId });
           }
         });
       });
@@ -236,14 +276,16 @@ describe('StudioBridgeServer', () => {
         scriptContent: 'print("hello")',
       });
 
-      // Verify the server sent the execute message with correct script
-      const receivedScript = await executePromise;
-      expect(receivedScript).toBe('print("hello")');
+      // Verify the server sent the execute message with correct script and sessionId
+      const received = await executePromise;
+      expect(received.script).toBe('print("hello")');
+      expect(received.sessionId).toBe(ready.sessionId);
 
       // Simulate plugin sending scriptComplete
       client!.send(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId: ready.sessionId,
           payload: { success: true },
         })
       );
@@ -276,6 +318,7 @@ describe('StudioBridgeServer', () => {
       client!.send(
         JSON.stringify({
           type: 'output',
+          sessionId: ready.sessionId,
           payload: {
             messages: [
               { level: 'Print', body: 'Line 1' },
@@ -288,6 +331,7 @@ describe('StudioBridgeServer', () => {
       client!.send(
         JSON.stringify({
           type: 'output',
+          sessionId: ready.sessionId,
           payload: {
             messages: [{ level: 'Error', body: 'Line 3' }],
           },
@@ -298,6 +342,7 @@ describe('StudioBridgeServer', () => {
       client!.send(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId: ready.sessionId,
           payload: { success: true },
         })
       );
@@ -335,6 +380,7 @@ describe('StudioBridgeServer', () => {
       client!.send(
         JSON.stringify({
           type: 'output',
+          sessionId: ready.sessionId,
           payload: {
             messages: [
               { level: 'Print', body: 'hello' },
@@ -347,6 +393,7 @@ describe('StudioBridgeServer', () => {
       client!.send(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId: ready.sessionId,
           payload: { success: true },
         })
       );
@@ -380,6 +427,7 @@ describe('StudioBridgeServer', () => {
       client!.send(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId: ready.sessionId,
           payload: { success: false, error: 'Script threw: boom' },
         })
       );
@@ -431,6 +479,40 @@ describe('StudioBridgeServer', () => {
       expect(result.success).toBe(false);
       expect(result.logs).toContain('Timed out after 200ms');
     });
+
+    it('ignores messages with wrong session ID during execution', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const resultPromise = server.executeAsync({
+        scriptContent: 'print("test")',
+        timeoutMs: 500,
+      });
+
+      await new Promise<void>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8')
+          );
+          if (data.type === 'execute') resolve();
+        });
+      });
+
+      // Send scriptComplete with wrong session ID — should be ignored
+      client!.send(
+        JSON.stringify({
+          type: 'scriptComplete',
+          sessionId: 'wrong-session',
+          payload: { success: true },
+        })
+      );
+
+      // The server should ignore the above and time out
+      const result = await resultPromise;
+      expect(result.success).toBe(false);
+      expect(result.logs).toContain('Timed out after 500ms');
+    });
   });
 
   // -----------------------------------------------------------------------
@@ -465,6 +547,7 @@ describe('StudioBridgeServer', () => {
         client!.send(
           JSON.stringify({
             type: 'scriptComplete',
+            sessionId: ready.sessionId,
             payload: { success: true },
           })
         );
@@ -508,6 +591,7 @@ describe('StudioBridgeServer', () => {
         client!.send(
           JSON.stringify({
             type: 'output',
+            sessionId: ready.sessionId,
             payload: { messages: [{ level: 'Print', body: outputBody }] },
           })
         );
@@ -515,6 +599,7 @@ describe('StudioBridgeServer', () => {
         client!.send(
           JSON.stringify({
             type: 'scriptComplete',
+            sessionId: ready.sessionId,
             payload: { success: true },
           })
         );
@@ -570,6 +655,7 @@ describe('StudioBridgeServer', () => {
       client!.send(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId: ready.sessionId,
           payload: { success: true },
         })
       );
@@ -590,7 +676,7 @@ describe('StudioBridgeServer', () => {
   // -----------------------------------------------------------------------
 
   describe('stopAsync', () => {
-    it('sends shutdown message to connected client', async () => {
+    it('sends shutdown message with sessionId to connected client', async () => {
       const ready = await createReadyServer();
       server = ready.server;
       client = ready.client;
@@ -603,7 +689,7 @@ describe('StudioBridgeServer', () => {
       await server.stopAsync();
 
       expect(sendSpy).toHaveBeenCalledWith(
-        JSON.stringify({ type: 'shutdown', payload: {} })
+        JSON.stringify({ type: 'shutdown', sessionId: ready.sessionId, payload: {} })
       );
     });
 

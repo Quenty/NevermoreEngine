@@ -16,7 +16,7 @@ import {
  * internal server, returning the port and a promise for the result.
  */
 function createTestServer(expectedSessionId: string) {
-  const wss = new WebSocketServer({ port: 0 });
+  const wss = new WebSocketServer({ port: 0, path: `/${expectedSessionId}` });
   const logLines: string[] = [];
 
   const resultPromise = new Promise<{ success: boolean; logs: string }>(
@@ -27,12 +27,15 @@ function createTestServer(expectedSessionId: string) {
           const msg = decodePluginMessage(data);
           if (!msg) return;
 
+          if (msg.sessionId !== expectedSessionId) return;
+
           switch (msg.type) {
             case 'hello':
               if (msg.payload.sessionId === expectedSessionId) {
                 ws.send(
                   encodeMessage({
                     type: 'welcome',
+                    sessionId: expectedSessionId,
                     payload: { sessionId: expectedSessionId },
                   })
                 );
@@ -80,7 +83,7 @@ describe('WebSocket protocol smoke test', () => {
       const port = await portPromise;
 
       // Simulate the plugin side with a plain WebSocket client
-      const ws = new WebSocket(`ws://localhost:${port}`);
+      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
 
       await new Promise<void>((resolve, reject) => {
         ws.on('open', resolve);
@@ -88,7 +91,7 @@ describe('WebSocket protocol smoke test', () => {
       });
 
       // 1. Send hello
-      ws.send(JSON.stringify({ type: 'hello', payload: { sessionId } }));
+      ws.send(JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } }));
 
       // 2. Wait for welcome
       const welcome = await new Promise<ServerMessage>((resolve) => {
@@ -103,6 +106,7 @@ describe('WebSocket protocol smoke test', () => {
       });
 
       expect(welcome.type).toBe('welcome');
+      expect(welcome.sessionId).toBe(sessionId);
       expect(
         (welcome as { payload: { sessionId: string } }).payload.sessionId
       ).toBe(sessionId);
@@ -111,6 +115,7 @@ describe('WebSocket protocol smoke test', () => {
       ws.send(
         JSON.stringify({
           type: 'output',
+          sessionId,
           payload: {
             messages: [
               { level: 'Print', body: 'Hello from test' },
@@ -124,6 +129,7 @@ describe('WebSocket protocol smoke test', () => {
       ws.send(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId,
           payload: { success: true },
         })
       );
@@ -150,14 +156,14 @@ describe('WebSocket protocol smoke test', () => {
 
     try {
       const port = await portPromise;
-      const ws = new WebSocket(`ws://localhost:${port}`);
+      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
 
       await new Promise<void>((resolve, reject) => {
         ws.on('open', resolve);
         ws.on('error', reject);
       });
 
-      ws.send(JSON.stringify({ type: 'hello', payload: { sessionId } }));
+      ws.send(JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } }));
 
       // Wait for welcome before sending more
       await new Promise<void>((resolve) => {
@@ -172,6 +178,7 @@ describe('WebSocket protocol smoke test', () => {
       ws.send(
         JSON.stringify({
           type: 'output',
+          sessionId,
           payload: {
             messages: [{ level: 'Error', body: 'Something went wrong' }],
           },
@@ -181,6 +188,7 @@ describe('WebSocket protocol smoke test', () => {
       ws.send(
         JSON.stringify({
           type: 'scriptComplete',
+          sessionId,
           payload: { success: false, error: 'Script threw an error' },
         })
       );
@@ -197,7 +205,7 @@ describe('WebSocket protocol smoke test', () => {
 
   it('rejects hello with wrong session ID', async () => {
     const sessionId = 'correct-session';
-    const wss = new WebSocketServer({ port: 0 });
+    const wss = new WebSocketServer({ port: 0, path: `/${sessionId}` });
 
     try {
       const port = await new Promise<number>((resolve) => {
@@ -212,14 +220,14 @@ describe('WebSocket protocol smoke test', () => {
         ws.on('message', (raw) => {
           const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
           const msg = decodePluginMessage(data);
-          if (msg?.type === 'hello' && msg.payload.sessionId === sessionId) {
+          if (msg?.type === 'hello' && msg.sessionId === sessionId && msg.payload.sessionId === sessionId) {
             welcomeSent = true;
-            ws.send(encodeMessage({ type: 'welcome', payload: { sessionId } }));
+            ws.send(encodeMessage({ type: 'welcome', sessionId, payload: { sessionId } }));
           }
         });
       });
 
-      const ws = new WebSocket(`ws://localhost:${port}`);
+      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
       await new Promise<void>((resolve, reject) => {
         ws.on('open', resolve);
         ws.on('error', reject);
@@ -229,6 +237,7 @@ describe('WebSocket protocol smoke test', () => {
       ws.send(
         JSON.stringify({
           type: 'hello',
+          sessionId: 'wrong-session',
           payload: { sessionId: 'wrong-session' },
         })
       );
