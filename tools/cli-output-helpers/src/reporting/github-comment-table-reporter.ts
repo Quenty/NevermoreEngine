@@ -307,6 +307,7 @@ export class GithubCommentTableReporter extends BaseReporter {
   private _updatePending = false;
   private _disposed = false;
   private _error: string | undefined;
+  private _noTestsMessage: string | undefined;
 
   private static readonly THROTTLE_MS = 10_000;
 
@@ -328,6 +329,14 @@ export class GithubCommentTableReporter extends BaseReporter {
    */
   setError(error: string): void {
     this._error = error;
+  }
+
+  /**
+   * Set a "no tests to run" message to post instead of results.
+   * When set, stopAsync() posts a neutral informational comment rather than a results table.
+   */
+  setNoTestsRun(message: string): void {
+    this._noTestsMessage = message;
   }
 
   override async startAsync(): Promise<void> {
@@ -362,6 +371,11 @@ export class GithubCommentTableReporter extends BaseReporter {
       await _postOrUpdateCommentAsync(
         this._config.commentMarker,
         this._formatErrorBody()
+      );
+    } else if (this._noTestsMessage) {
+      await _postOrUpdateCommentAsync(
+        this._config.commentMarker,
+        this._formatNoTestsRunBody()
       );
     } else if (this._state) {
       await this._postUpdateAsync();
@@ -401,6 +415,22 @@ export class GithubCommentTableReporter extends BaseReporter {
     body += `## ${heading}\n\n`;
     body += `❌ **Run failed before producing results**\n\n`;
     body += `\`\`\`\n${this._error}\n\`\`\`\n`;
+
+    if (actionsRunUrl) {
+      body += `\n[View logs](${actionsRunUrl})\n`;
+    }
+
+    return body;
+  }
+
+  private _formatNoTestsRunBody(): string {
+    const actionsRunUrl = _getActionsRunUrl();
+    const heading = this._config.heading;
+
+    let body = this._config.commentMarker + '\n';
+    body += `## ${heading}\n\n`;
+    body += `ℹ️ **No tests to run**\n\n`;
+    body += `${this._noTestsMessage}\n`;
 
     if (actionsRunUrl) {
       body += `\n[View logs](${actionsRunUrl})\n`;
