@@ -1,0 +1,61 @@
+name: integration
+on: [pull_request]
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Fetch base branch for changeset diff
+        run: git fetch origin ${{ github.base_ref }} --depth=1
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '21'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - name: Setup registries
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' run build
+
+      - name: Install nevermore-cli locally
+        run: npm install --ignore-scripts -g .
+        working-directory: tools/nevermore-cli
+
+      - name: Deploy integration games
+        id: deploy-integration
+        run: nevermore batch deploy --target test --publish --base origin/${{ github.base_ref }} --output integration-results.json --yes --verbose --logs
+        env:
+          ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post integration results
+        if: always()
+        run: nevermore tools post-deploy-results integration-results.json --yes --run-outcome ${{ steps.deploy-integration.outcome }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

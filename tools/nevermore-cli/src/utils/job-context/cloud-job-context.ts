@@ -1,7 +1,7 @@
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import {
   type LuauTask,
-  OpenCloudClient,
+  type OpenCloudClient,
 } from '../open-cloud/open-cloud-client.js';
 import { tryRenamePlaceAsync } from '../auth/roblox-auth/index.js';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
@@ -28,11 +28,8 @@ class CloudDeployment implements Deployment {
 }
 
 export class CloudJobContext extends BaseJobContext {
-  private _openCloudClient: OpenCloudClient;
-
   constructor(openCloudClient: OpenCloudClient) {
-    super();
-    this._openCloudClient = openCloudClient;
+    super(openCloudClient);
   }
 
   async deployBuiltPlaceAsync(
@@ -43,7 +40,7 @@ export class CloudJobContext extends BaseJobContext {
     const { rbxlPath, target } = builtPlace;
 
     reporter.onPackagePhaseChange(packageName, 'uploading');
-    const version = await this._openCloudClient.uploadPlaceAsync(
+    const version = await this._openCloudClient!.uploadPlaceAsync(
       target.universeId,
       target.placeId,
       rbxlPath
@@ -72,7 +69,7 @@ export class CloudJobContext extends BaseJobContext {
     const { scriptContent, packageName, timeoutMs = 120_000 } = options;
 
     reporter.onPackagePhaseChange(packageName, 'scheduling');
-    const task = await this._openCloudClient.createExecutionTaskAsync(
+    const task = await this._openCloudClient!.createExecutionTaskAsync(
       cloudDeployment.universeId,
       cloudDeployment.placeId,
       cloudDeployment.version,
@@ -80,7 +77,7 @@ export class CloudJobContext extends BaseJobContext {
     );
 
     const completedTask = await Promise.race([
-      this._openCloudClient.pollTaskCompletionAsync(task.path, (state) => {
+      this._openCloudClient!.pollTaskCompletionAsync(task.path, (state) => {
         if (state === 'PROCESSING') {
           reporter.onPackagePhaseChange(packageName, 'executing');
         }
@@ -101,7 +98,7 @@ export class CloudJobContext extends BaseJobContext {
       throw new Error('No task has been run yet');
     }
 
-    const logs = await this._openCloudClient.getRawTaskLogsAsync(
+    const logs = await this._openCloudClient!.getRawTaskLogsAsync(
       cloudDeployment.taskPath
     );
 

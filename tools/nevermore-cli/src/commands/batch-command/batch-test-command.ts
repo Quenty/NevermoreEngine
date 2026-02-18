@@ -164,15 +164,20 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     }
   );
 
-  let client: OpenCloudClient | undefined;
+  let client: OpenCloudClient;
   if (cloud) {
     const apiKey = await getApiKeyAsync(args);
     client = new OpenCloudClient({ apiKey, rateLimiter: new RateLimiter() });
+  } else {
+    client = new OpenCloudClient({
+      apiKey: () => getApiKeyAsync(args),
+      rateLimiter: new RateLimiter(),
+    });
   }
 
-  const context: JobContext = client
+  const context: JobContext = cloud
     ? new CloudJobContext(client)
-    : new LocalJobContext();
+    : new LocalJobContext(client);
 
   await reporter.startAsync();
 

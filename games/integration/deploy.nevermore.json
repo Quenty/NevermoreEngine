@@ -1,0 +1,13 @@
+{
+  "targets": {
+    "test": {
+      "universeId": 9716264427,
+      "placeId": 124288443407486,
+      "project": "default.project.json",
+      "basePlace": {
+        "universeId": 9716264427,
+        "placeId": 71403466083947
+      }
+    }
+  }
+}

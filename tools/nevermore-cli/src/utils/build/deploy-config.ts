@@ -1,11 +1,17 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+export interface BasePlaceConfig {
+  universeId: number;
+  placeId: number;
+}
+
 export interface DeployTarget {
   universeId: number;
   placeId: number;
   project: string;
   scriptTemplate?: string;
+  basePlace?: BasePlaceConfig;
 }
 
 export interface DeployConfig {
@@ -44,6 +50,18 @@ export async function loadDeployConfigAsync(
     }
     if (typeof target.project !== 'string') {
       throw new Error(`Target "${name}" is missing or has invalid "project"`);
+    }
+    if (target.basePlace != null) {
+      if (typeof target.basePlace.universeId !== 'number') {
+        throw new Error(
+          `Target "${name}" basePlace is missing or has invalid "universeId"`
+        );
+      }
+      if (typeof target.basePlace.placeId !== 'number') {
+        throw new Error(
+          `Target "${name}" basePlace is missing or has invalid "placeId"`
+        );
+      }
     }
   }
 

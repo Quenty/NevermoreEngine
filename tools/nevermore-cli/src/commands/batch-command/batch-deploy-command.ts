@@ -1,3 +1,4 @@
+import * as fs from 'fs/promises';
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
@@ -11,11 +12,15 @@ import {
   SpinnerReporter,
   SummaryTableReporter,
 } from '@quenty/cli-output-helpers/reporting';
+import { resolvePackagePath } from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
-import { createDeployCommentConfig } from '../../utils/deploy/deploy-github-columns.js';
+import {
+  createDeployCommentConfig,
+  type BatchDeployResult,
+} from '../../utils/deploy/deploy-github-columns.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
@@ -24,6 +29,12 @@ import {
   discoverChangedTargetPackagesAsync,
 } from '../../utils/batch/changed-packages-utils.js';
 import { isCI } from '../../utils/nevermore-cli-utils.js';
+import { parseTestLogs } from '../../utils/testing/test-log-parser.js';
+
+const SMOKE_TEST_SCRIPT_PATH = resolvePackagePath(
+  import.meta.url,
+  'build-scripts', 'smoke-test-server.luau'
+);
 
 interface BatchDeployArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -99,7 +110,7 @@ export const batchDeployCommand: CommandModule<
 };
 
 async function _runAsync(args: BatchDeployArgs): Promise<void> {
-  const targetName = args.target ?? 'deploy';
+  const targetName = args.target ?? 'test';
 
   let packages = args.all
     ? await discoverAllTargetPackagesAsync(targetName)
@@ -182,7 +193,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
   try {
     const publish = args.publish ?? false;
-    const results = await runBatchAsync({
+    const results = await runBatchAsync<BatchDeployResult>({
       packages,
       concurrency,
       reporter,
@@ -207,11 +218,36 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         // Eagerly release build artifacts after upload
         await context.releaseBuiltPlaceAsync(builtPlace);
 
-        const action = publish ? 'Published' : 'Saved';
+        // Run smoke test for targets with basePlace
+        let logs: string;
+        if (pkg.target.basePlace) {
+          const smokeResult = await _runSmokeTestAsync(
+            pkgReporter,
+            pkg.name,
+            pkg.target.universeId,
+            pkg.target.placeId,
+            version,
+            client
+          );
+          logs = smokeResult.logs;
+          if (!smokeResult.success) {
+            return {
+              packageName: pkg.name,
+              placeId: pkg.target.placeId,
+              success: false,
+              logs,
+            };
+          }
+        } else {
+          const action = publish ? 'Published' : 'Saved';
+          logs = `${action} v${version}`;
+        }
+
         return {
           packageName: pkg.name,
+          placeId: pkg.target.placeId,
           success: true,
-          logs: `${action} v${version}`,
+          logs,
         };
       },
     });
@@ -222,4 +258,46 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   } finally {
     await context.disposeAsync();
   }
+}
+
+async function _runSmokeTestAsync(
+  reporter: Reporter,
+  packageName: string,
+  universeId: number,
+  placeId: number,
+  version: number,
+  client: OpenCloudClient
+): Promise<{ success: boolean; logs: string }> {
+  let scriptContent: string;
+  try {
+    scriptContent = await fs.readFile(SMOKE_TEST_SCRIPT_PATH, 'utf-8');
+  } catch {
+    throw new Error(`Smoke test script not found: ${SMOKE_TEST_SCRIPT_PATH}`);
+  }
+
+  reporter.onPackagePhaseChange(packageName, 'scheduling');
+  const task = await client.createExecutionTaskAsync(
+    universeId,
+    placeId,
+    version,
+    scriptContent
+  );
+
+  const completedTask = await client.pollTaskCompletionAsync(
+    task.path,
+    (state) => {
+      if (state === 'PROCESSING') {
+        reporter.onPackagePhaseChange(packageName, 'executing');
+      }
+    }
+  );
+
+  const rawLogs = await client.getRawTaskLogsAsync(task.path);
+  const parsed = parseTestLogs(rawLogs);
+
+  const infraSuccess = completedTask.state === 'COMPLETE';
+  return {
+    success: infraSuccess && parsed.success,
+    logs: parsed.logs,
+  };
 }

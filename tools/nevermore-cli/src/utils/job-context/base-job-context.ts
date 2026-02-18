@@ -1,4 +1,7 @@
-import { type BuildContext } from '@quenty/nevermore-template-helpers';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { type BuildContext, resolvePackagePath } from '@quenty/nevermore-template-helpers';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import {
   buildPlaceAsync,
@@ -12,6 +15,12 @@ import {
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
+import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
+
+const MERGE_SCRIPT_PATH = resolvePackagePath(
+  import.meta.url,
+  'build-scripts', 'transform-rojo-merge-place.luau'
+);
 
 /**
  * Internal wrapper — implements BuiltPlace with an internal BuildContext
@@ -35,13 +44,61 @@ class TrackedBuiltPlace implements BuiltPlace {
  * — even when individual deployments fail.
  */
 export abstract class BaseJobContext implements JobContext {
+  protected _openCloudClient: OpenCloudClient | undefined;
   private _builtPlaces = new Set<TrackedBuiltPlace>();
+
+  constructor(openCloudClient?: OpenCloudClient) {
+    this._openCloudClient = openCloudClient;
+  }
 
   async buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace> {
     const result = await buildPlaceAsync(options);
     const tracked = new TrackedBuiltPlace(result.rbxlPath, result.target, result.buildContext);
     this._builtPlaces.add(tracked);
+
+    // When a basePlace is configured, download it and merge with the rojo-built code
+    if (result.target.basePlace && result.buildContext) {
+      await this._mergeBasePlaceAsync(tracked, result.buildContext, options);
+    }
+
     return tracked;
+  }
+
+  private async _mergeBasePlaceAsync(
+    tracked: TrackedBuiltPlace,
+    buildContext: BuildContext,
+    options: BuildPlaceOptions
+  ): Promise<void> {
+    const { basePlace } = tracked.target;
+    if (!basePlace || !this._openCloudClient) {
+      return;
+    }
+
+    const resolvedName = options.packageName ?? '';
+
+    options.reporter?.onPackagePhaseChange(resolvedName, 'downloading');
+    OutputHelper.verbose('Downloading base place for merge...');
+    const buffer = await this._openCloudClient.downloadPlaceAsync(
+      basePlace.universeId,
+      basePlace.placeId
+    );
+    const basePath = buildContext.resolvePath('base.rbxl');
+    await fs.writeFile(basePath, buffer);
+
+    options.reporter?.onPackagePhaseChange(resolvedName, 'merging');
+    const packagePath = options.packagePath ?? process.cwd();
+    const projectPath = path.resolve(packagePath, tracked.target.project);
+    const mergedPath = buildContext.resolvePath('merged.rbxl');
+
+    await buildContext.executeLuneTransformScriptAsync(
+      MERGE_SCRIPT_PATH,
+      basePath,
+      tracked.rbxlPath,
+      projectPath,
+      mergedPath
+    );
+
+    tracked.rbxlPath = mergedPath;
   }
 
   async releaseBuiltPlaceAsync(builtPlace: BuiltPlace): Promise<void> {
