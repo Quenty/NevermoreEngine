@@ -59,6 +59,9 @@ importers:
       '@quenty/clienttranslator':
         specifier: workspace:*
         version: link:../../src/clienttranslator
+      '@quenty/cmdrservice':
+        specifier: workspace:*
+        version: link:../../src/cmdrservice
       '@quenty/ik':
         specifier: workspace:*
         version: link:../../src/ik
