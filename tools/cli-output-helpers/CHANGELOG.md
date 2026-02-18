@@ -1,3 +1,16 @@
+# v1.7.0 (Wed Feb 18 2026)
+
+#### 🚀 Enhancement
+
+- feat(cli): add GitHub Actions workflow annotations for linting [#661](https://github.com/Quenty/NevermoreEngine/pull/661) ([@Quenty](https://github.com/Quenty))
+- feat(cli): add GitHub Actions workflow annotations for linting ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
