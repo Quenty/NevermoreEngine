@@ -50,7 +50,7 @@ jobs:
 
       - name: Deploy integration games
         id: deploy-integration
-        run: nevermore batch deploy --target test --publish --base origin/${{ github.base_ref }} --output integration-results.json --yes --verbose --logs
+        run: nevermore batch deploy --target integration --publish --base origin/${{ github.base_ref }} --output integration-results.json --yes --verbose --logs
         env:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

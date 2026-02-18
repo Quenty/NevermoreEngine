@@ -1,6 +1,6 @@
 {
   "targets": {
-    "test": {
+    "integration": {
       "universeId": 9716264427,
       "placeId": 97496922428977,
       "project": "default.project.json",
