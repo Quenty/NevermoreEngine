@@ -54,6 +54,10 @@ jobs:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build sourcemap for annotation resolution
+        if: always()
+        run: npm run build:sourcemap
+
       - name: Post test results
         if: always()
         run: nevermore tools post-test-results test-results.json --yes --run-outcome ${{ steps.run-tests.outcome }}

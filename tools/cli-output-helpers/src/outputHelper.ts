@@ -72,8 +72,9 @@ export class OutputHelper {
   private static _hasAnsi = (text: string): boolean =>
     text.includes('\x1b[');
 
-  private static _stripAnsi = (text: string): string =>
-    text.replace(/\x1b\[[0-9;]*m/g, '');
+  /** Strip ANSI escape codes from terminal output. */
+  public static stripAnsi = (text: string): string =>
+    text.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
 
   /**
    * Helper method to put a box around the output
@@ -81,7 +82,7 @@ export class OutputHelper {
   public static formatBox(message: string, options?: BoxOptions): string {
     const lines = message.trim().split('\n');
     const width = lines.reduce(
-      (a, b) => Math.max(a, OutputHelper._stripAnsi(b).length),
+      (a, b) => Math.max(a, OutputHelper.stripAnsi(b).length),
       0
     );
 
@@ -89,9 +90,9 @@ export class OutputHelper {
 
     const surround = (text: string) => {
       const first = centered
-        ? Math.floor((width - OutputHelper._stripAnsi(text).length) / 2)
+        ? Math.floor((width - OutputHelper.stripAnsi(text).length) / 2)
         : 0;
-      const last = width - OutputHelper._stripAnsi(text).length - first;
+      const last = width - OutputHelper.stripAnsi(text).length - first;
       return (
         '║   \x1b[0m' +
         ' '.repeat(first) +

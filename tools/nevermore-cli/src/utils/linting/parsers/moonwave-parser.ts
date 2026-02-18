@@ -21,17 +21,12 @@
  */
 
 import { type Diagnostic, type DiagnosticSeverity } from '@quenty/cli-output-helpers/reporting';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   LERNA_PREFIX_PATTERN,
   LERNA_PREFIX_PATTERN_NC,
   resolvePackagePath,
 } from './lerna-utils.js';
-
-/** Strip all ANSI escape sequences from a string. */
-const ANSI_PATTERN = /\x1b\[[0-9;]*m/g;
-function _stripAnsi(text: string): string {
-  return text.replace(ANSI_PATTERN, '');
-}
 
 /**
  * Matches the severity header line.
@@ -64,7 +59,7 @@ export function parseMoonwaveOutput(raw: string): Diagnostic[] {
   let pending: PendingDiagnostic | undefined;
 
   for (const rawLine of lines) {
-    const line = _stripAnsi(rawLine);
+    const line = OutputHelper.stripAnsi(rawLine);
 
     // Skip the "aborting due to diagnostic error" summary line
     if (line.includes('aborting due to')) continue;
