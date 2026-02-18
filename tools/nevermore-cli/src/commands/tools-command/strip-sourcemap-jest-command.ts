@@ -3,13 +3,7 @@ import * as path from 'path';
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-
-interface SourcemapNode {
-  name: string;
-  className?: string;
-  children?: SourcemapNode[];
-  filePaths?: string[];
-}
+import type { SourcemapNode } from '../../utils/sourcemap/index.js';
 
 interface StripSourcemapJestArgs extends NevermoreGlobalArgs {
   sourcemap?: string;

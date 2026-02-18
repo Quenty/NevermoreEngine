@@ -1,5 +1,10 @@
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import {
+  type Diagnostic,
+  emitAnnotations,
+  writeAnnotationSummaryAsync,
+} from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import {
   type IStateTracker,
@@ -9,6 +14,8 @@ import {
   LoadedStateTracker,
   createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
+import { parseJestLuaOutput } from '../../utils/testing/parsers/index.js';
+import { tryLoadSourcemapResolver } from '../../utils/sourcemap/index.js';
 
 type ErrorReporter = Reporter & {
   setError(error: string): void;
@@ -84,6 +91,25 @@ export const ciPostTestResultsCommand: CommandModule<
           await r.stopAsync();
         }
         return;
+      }
+
+      // Emit test failure annotations
+      const sourcemapResolver = tryLoadSourcemapResolver(process.cwd());
+      const allDiagnostics: Diagnostic[] = [];
+      for (const failure of state.getFailures()) {
+        const diagnostics = parseJestLuaOutput(failure.logs, {
+          packageName: failure.packageName,
+          sourcemapResolver,
+        });
+        allDiagnostics.push(...diagnostics);
+      }
+
+      if (allDiagnostics.length > 0) {
+        OutputHelper.info(
+          `Found ${allDiagnostics.length} test failure(s). Emitting annotations...`
+        );
+        emitAnnotations(allDiagnostics);
+        await writeAnnotationSummaryAsync('Test Failures', allDiagnostics);
       }
 
       const reporters = _createGithubReporters(state, 1);

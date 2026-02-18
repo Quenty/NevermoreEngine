@@ -1,3 +1,5 @@
+import { OutputHelper } from '@quenty/cli-output-helpers';
+
 export interface ParsedTestLogs {
   success: boolean;
   logs: string;
@@ -8,7 +10,7 @@ export interface ParsedTestLogs {
  * Shared by both Open Cloud log fetching and local run-in-roblox output.
  */
 export function parseTestLogs(rawOutput: string): ParsedTestLogs {
-  const cleanLogs = rawOutput.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+  const cleanLogs = OutputHelper.stripAnsi(rawOutput);
 
   // Check for Jest-style test failures
   const failedSuites = cleanLogs.match(/Test Suites:\s*(\d+)\s+failed/);
