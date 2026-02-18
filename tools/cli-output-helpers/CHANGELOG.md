@@ -1,20 +1,18 @@
-# v1.7.0 (Wed Feb 18 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add GitHub Actions workflow annotations for linting [#661](https://github.com/Quenty/NevermoreEngine/pull/661) ([@Quenty](https://github.com/Quenty))
-- feat(cli): add GitHub Actions workflow annotations for linting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.7.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.6.0...@quenty/cli-output-helpers@1.7.0) (2026-02-18)
+
+
+### Features
+
+* **cli:** add GitHub Actions workflow annotations for linting ([698f7ba](https://github.com/Quenty/Nevermore/commit/698f7ba6ca2c1448b594b94ca5dedf7b528cc8f3))
+
+
+
+
 
 # [1.6.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.5.2...@quenty/cli-output-helpers@1.6.0) (2026-02-17)
 
