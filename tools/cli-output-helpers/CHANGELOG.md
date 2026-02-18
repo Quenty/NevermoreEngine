@@ -1,20 +1,18 @@
-# v1.8.0 (Wed Feb 18 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add GitHub Actions annotations for test failures [#662](https://github.com/Quenty/NevermoreEngine/pull/662) ([@Quenty](https://github.com/Quenty))
-- feat(cli): add GitHub Actions annotations for test failures ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.8.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.7.0...@quenty/cli-output-helpers@1.8.0) (2026-02-18)
+
+
+### Features
+
+* **cli:** add GitHub Actions annotations for test failures ([2fd2f42](https://github.com/Quenty/Nevermore/commit/2fd2f423991ca6bf483fa2396045410f849223b6))
+
+
+
+
 
 # [1.7.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.6.0...@quenty/cli-output-helpers@1.7.0) (2026-02-18)
 

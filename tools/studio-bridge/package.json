@@ -1,6 +1,6 @@
 {
   "name": "@quenty/studio-bridge",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "WebSocket-based bridge for running Luau scripts in Roblox Studio",
   "type": "module",
   "main": "dist/src/index.js",

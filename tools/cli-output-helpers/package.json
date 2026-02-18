@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cli-output-helpers",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Helpers to generate Nevermore package and game templates",
   "type": "module",
   "keywords": [
