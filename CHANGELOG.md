@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/cli-output-helpers@1.8.0`, `@quenty/nevermore-cli@4.19.0`
+  - feat(cli): add GitHub Actions annotations for test failures [#662](https://github.com/Quenty/NevermoreEngine/pull/662) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Feb 18 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/cli-output-helpers@1.7.0`, `@quenty/nevermore-cli@4.18.0`
   - feat(cli): add GitHub Actions workflow annotations for linting [#661](https://github.com/Quenty/NevermoreEngine/pull/661) ([@Quenty](https://github.com/Quenty))
 
