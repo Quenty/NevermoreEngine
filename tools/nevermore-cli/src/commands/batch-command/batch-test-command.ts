@@ -21,13 +21,10 @@ import {
   type BatchTestResult,
   type BatchTestSummary,
   CompositeReporter,
-  GithubCommentTableReporter,
-  GithubJobSummaryReporter,
   GroupedReporter,
   JsonFileReporter,
   SpinnerReporter,
   SummaryTableReporter,
-  createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
 import {
   runSingleTestAsync,
@@ -146,16 +143,6 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
               actionVerb: 'Testing',
             }),
         new SummaryTableReporter(state),
-        new GithubCommentTableReporter(
-          state,
-          createTestCommentConfig(),
-          concurrency
-        ),
-        new GithubJobSummaryReporter(
-          state,
-          createTestCommentConfig(),
-          concurrency
-        ),
       ];
       if (args.output) {
         reporters.push(new JsonFileReporter(state, args.output));

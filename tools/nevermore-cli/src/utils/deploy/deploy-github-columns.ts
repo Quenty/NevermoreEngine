@@ -16,6 +16,7 @@ export function createDeployCommentConfig(): GithubCommentTableConfig {
   return {
     heading: 'Deploy Results',
     commentMarker: '<!-- nevermore-deploy-results -->',
+    sectionId: 'deploy',
     extraColumns: [createErrorColumn(), createTryItColumn()],
     errorHeading: 'Deploy Results',
     successLabel: 'Deployed',

@@ -11,7 +11,10 @@ import {
   formatGithubErrorBody,
   formatGithubNoTestsBody,
 } from './formatting.js';
-import { postOrUpdateCommentAsync } from './github-api.js';
+import {
+  postOrUpdateCommentAsync,
+  postOrUpdateCommentSectionAsync,
+} from './github-api.js';
 
 // Re-export types that were originally defined in this module
 export type {
@@ -138,7 +141,11 @@ export class GithubCommentTableReporter extends BaseReporter {
   }
 
   private async _postCommentAsync(body: string): Promise<void> {
-    await postOrUpdateCommentAsync(this._config.commentMarker, body);
+    if (this._config.sectionId) {
+      await postOrUpdateCommentSectionAsync(this._config.sectionId, body);
+    } else {
+      await postOrUpdateCommentAsync(this._config.commentMarker, body);
+    }
   }
 }
 

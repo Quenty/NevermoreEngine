@@ -40,6 +40,7 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | [architecture/](architecture/index.md) | Architecture: design philosophy, ServiceBag, dependency injection |
 | [build.md](build.md) | Contributing: local setup, tools, versioning, custom Rojo |
 | [testing/](testing/index.md) | Testing: Jest3, deploy config, CLI commands, credentials, CI |
+| [testing/integration-testing.md](testing/integration-testing.md) | Integration testing: full-game tests, base place merging, deploy pipeline |
 | [conventions/luau.md](conventions/luau.md) | Strict typing patterns, class structure, common type imports |
 | [conventions/typescript.md](conventions/typescript.md) | CLI tool conventions: naming, commands, error handling, dryrun |
 | [conventions/git-workflow.md](conventions/git-workflow.md) | Git conventions: conventional commits, interactive rebase, branching |
