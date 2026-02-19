@@ -1,24 +1,43 @@
 name: build
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [labeled, synchronize]
 
 permissions:
   contents: write        # Create releases and tags
   pull-requests: write   # Comment on PRs with release info
   packages: write        # Publish to GitHub Packages
 
+concurrency:
+  group: release-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build-linting:
+    if: github.event_name == 'push'
     uses: ./.github/workflows/linting.yml
 
   release:
     needs: [build-linting]
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+    if: >-
+      !failure() && !cancelled() &&
+      ((github.event_name == 'push'
+        && !contains(github.event.head_commit.message, 'ci skip')
+        && !contains(github.event.head_commit.message, 'skip ci'))
+      || (github.event_name == 'pull_request'
+        && ((github.event.action == 'labeled' && github.event.label.name == 'canary')
+        || (github.event.action == 'synchronize'
+          && contains(github.event.pull_request.labels.*.name, 'canary')))))
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          fetch-depth: 0             # auto shipit needs full commit graph + tags
+          filter: 'blob:none'        # skip historical blobs to speed checkout
           persist-credentials: false # https://stackoverflow.com/questions/74744498/github-pushing-to-protected-branches-with-fine-grained-token
 
       - name: Setup node
