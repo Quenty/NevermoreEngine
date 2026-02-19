@@ -1,20 +1,18 @@
-# v4.21.0 (Thu Feb 19 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add aggregated batch test execution [#664](https://github.com/Quenty/NevermoreEngine/pull/664) ([@Quenty](https://github.com/Quenty))
-- feat(cli): add aggregated batch test execution ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.21.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.20.0...@quenty/nevermore-cli@4.21.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/Nevermore/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
 
 # [4.20.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.19.0...@quenty/nevermore-cli@4.20.0) (2026-02-19)
 

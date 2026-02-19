@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.11.0...@quenty/toolutils@1.12.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+
+
+
+
 # [1.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.10.1...@quenty/toolutils@1.11.0) (2026-02-17)
 
 
