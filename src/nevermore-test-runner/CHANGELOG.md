@@ -1,3 +1,19 @@
+# v1.2.0 (Thu Feb 19 2026)
+
+#### 🚀 Enhancement
+
+- feat(cli): add aggregated batch test execution [#664](https://github.com/Quenty/NevermoreEngine/pull/664) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test: add spec files for packages missing tests ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

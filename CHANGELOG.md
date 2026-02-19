@@ -2,6 +2,23 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/animations@8.28.0`, `@quenty/binder@14.31.0`, `@quenty/blend@12.31.0`, `@quenty/brio@14.26.0`, `@quenty/camera@14.35.0`, `@quenty/chatproviderservice@9.44.0`, `@quenty/clienttranslator@14.32.0`, `@quenty/clipcharacters@12.34.0`, `@quenty/cmdrservice@13.38.0`, `@quenty/conditions@10.35.0`, `@quenty/datastore@13.33.0`, `@quenty/deathreport@10.38.0`, `@quenty/ellipticcurvecryptography@1.9.0`, `@quenty/elo@7.32.0`, `@quenty/experiencecalculator@2.8.0`, `@quenty/fzy@5.12.0`, `@quenty/gameconfig@12.42.0`, `@quenty/gameproductservice@14.44.0`, `@quenty/ik@15.45.0`, `@quenty/influxdbclient@7.30.0`, `@quenty/inputkeymaputils@14.38.0`, `@quenty/instanceutils@13.26.0`, `@quenty/lipsum@14.31.0`, `@quenty/maid@3.7.0`, `@quenty/nevermore-test-runner@1.2.0`, `@quenty/observablecollection@12.33.0`, `@quenty/permissionprovider@14.32.0`, `@quenty/randomutils@6.14.0`, `@quenty/rogue-humanoid@10.42.0`, `@quenty/rogue-properties@11.40.0`, `@quenty/rx@13.25.0`, `@quenty/screenshothudservice@7.29.0`, `@quenty/secrets@7.42.0`, `@quenty/settings-inputkeymap@10.48.0`, `@quenty/settings@11.45.0`, `@quenty/snackbar@11.36.0`, `@quenty/soundgroup@1.35.0`, `@quenty/tie@10.35.0`, `@quenty/nevermore-cli@4.21.0`
+  - feat(cli): add aggregated batch test execution [#664](https://github.com/Quenty/NevermoreEngine/pull/664) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix(ci): prevent automatic canary releases on non-main branches [#665](https://github.com/Quenty/NevermoreEngine/pull/665) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Feb 19 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/blend@12.30.0`, `@quenty/ragdoll@15.43.0`, `@quenty/cli-output-helpers@1.9.0`, `@quenty/nevermore-cli@4.20.0`
   - feat(cli): add integration game deploy pipeline [#663](https://github.com/Quenty/NevermoreEngine/pull/663) ([@Quenty](https://github.com/Quenty))
 
