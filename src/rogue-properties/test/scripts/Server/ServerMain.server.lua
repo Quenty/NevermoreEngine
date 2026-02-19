@@ -9,6 +9,10 @@ local require = require(loader).bootstrapGame(ServerScriptService.roguepropertie
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.rogueproperties) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("RoguePropertyService"))
 serviceBag:Init()
@@ -121,5 +125,3 @@ local multiplier = ultAttackDamage:CreateMultiplier(2, workspace)
 -- end)
 
 multiplier:Destroy()
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.rogueproperties)

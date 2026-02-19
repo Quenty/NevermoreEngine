@@ -8,6 +8,9 @@
       },
       "rx": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

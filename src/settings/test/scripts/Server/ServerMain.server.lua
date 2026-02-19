@@ -9,6 +9,10 @@ local require = require(loader).bootstrapGame(ServerScriptService.settings)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.settings) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("SettingsService"))
 
@@ -40,5 +44,3 @@ game.Players.PlayerAdded:Connect(handlePlayer)
 for _, player in game.Players:GetPlayers() do
 	handlePlayer(player)
 end
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.settings)

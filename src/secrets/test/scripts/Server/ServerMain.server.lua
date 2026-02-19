@@ -10,6 +10,10 @@ local require = require(loader).bootstrapGame(ServerScriptService.secrets)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.secrets) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("SecretsService"))
 serviceBag:Init()
@@ -21,5 +25,3 @@ serviceBag:GetService(require("SecretsService")):StoreSecret("test", "36dfda27-1
 serviceBag:GetService(require("SecretsService")):PromiseSecret("test"):Then(function(value)
 	print("Got secret", value)
 end)
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.secrets)

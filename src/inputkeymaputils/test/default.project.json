@@ -13,6 +13,9 @@
         },
         "test": {
           "$path": "modules"
+        },
+        "jest.config": {
+          "$path": "jest.config.lua"
         }
       },
       "Script": {

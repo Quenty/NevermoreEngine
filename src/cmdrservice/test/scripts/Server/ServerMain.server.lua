@@ -10,6 +10,10 @@ local require = require(loader).bootstrapGame(ServerScriptService.cmdrservice)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.cmdrservice) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("CmdrService"))
 serviceBag:Init()
@@ -40,5 +44,3 @@ serviceBag:GetService(require("CmdrService")):RegisterCommand({
 
 	return "Exploded!"
 end)
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.cmdrservice)

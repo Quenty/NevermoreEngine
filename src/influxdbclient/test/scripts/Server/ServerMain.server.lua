@@ -10,6 +10,8 @@ local require = require(loader).bootstrapGame(ServerScriptService.influxdbclient
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-require("InfluxDBClient")
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.influxdbclient) then
+	return
+end
 
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.influxdbclient)
+require("InfluxDBClient")

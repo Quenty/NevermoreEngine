@@ -73,6 +73,7 @@ function NevermoreTestRunnerUtils._runTestsAsync(root: Instance)
 		.runCLI(projectRoot, {
 			verbose = true,
 			ci = true,
+			testPathIgnorePatterns = { "/node_modules/" },
 		}, { projectRoot })
 		:awaitStatus()
 

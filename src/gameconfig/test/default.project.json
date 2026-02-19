@@ -13,6 +13,9 @@
         },
         "gameconfig": {
           "$path": ".."
+        },
+        "jest.config": {
+          "$path": "jest.config.lua"
         }
       },
       "Script": {

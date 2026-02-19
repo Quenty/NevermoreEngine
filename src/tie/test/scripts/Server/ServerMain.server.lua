@@ -7,10 +7,15 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.tie)
 
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.tie) then
+	return
+end
+
 local Action = require("Action")
 local ActionInterface = require("ActionInterface")
 local Door = require("Door")
-local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 local OpenableInterface = require("OpenableInterface")
 local Window = require("Window")
 
@@ -165,5 +170,3 @@ end
 -- task.wait(0.1)
 
 -- action.Parent = adornee
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.tie)

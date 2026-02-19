@@ -10,10 +10,12 @@ local require = require(loader).bootstrapGame(ServerScriptService.deathreport)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.deathreport) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("DeathReportService"))
 
 serviceBag:Init()
 serviceBag:Start()
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.deathreport)

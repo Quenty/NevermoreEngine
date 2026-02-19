@@ -54,6 +54,7 @@
     "@quenty/tie": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
     "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

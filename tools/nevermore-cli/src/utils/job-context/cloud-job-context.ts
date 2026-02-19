@@ -13,6 +13,8 @@ import {
 } from './job-context.js';
 import { BaseJobContext } from './base-job-context.js';
 
+const SKIP_RENAMING_PLACE = true;
+
 class CloudDeployment implements Deployment {
   universeId: number;
   placeId: number;
@@ -50,14 +52,12 @@ export class CloudJobContext extends BaseJobContext {
     await this.releaseBuiltPlaceAsync(builtPlace);
 
     // Best-effort rename to reflect current package + commit
-    const placeName = await buildPlaceNameAsync(packagePath);
-    await tryRenamePlaceAsync(target.placeId, placeName);
+    if (!SKIP_RENAMING_PLACE) {
+      const placeName = await buildPlaceNameAsync(packagePath);
+      await tryRenamePlaceAsync(target.placeId, placeName);
+    }
 
-    return new CloudDeployment(
-      target.universeId,
-      target.placeId,
-      version
-    );
+    return new CloudDeployment(target.universeId, target.placeId, version);
   }
 
   async runScriptAsync(

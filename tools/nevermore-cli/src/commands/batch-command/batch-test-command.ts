@@ -6,6 +6,7 @@ import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import {
   type JobContext,
+  BatchScriptJobContext,
   CloudJobContext,
   LocalJobContext,
 } from '../../utils/job-context/index.js';
@@ -41,6 +42,9 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   output?: string;
   limit?: number;
   logs?: boolean;
+  aggregated?: boolean;
+  batchPlaceId?: number;
+  batchUniverseId?: number;
 }
 
 export const batchTestCommand: CommandModule<
@@ -71,7 +75,8 @@ export const batchTestCommand: CommandModule<
         default: 'origin/main',
       })
       .option('concurrency', {
-        describe: 'Max parallel tests (default: 1 local, 3 cloud)',
+        describe:
+          'Max parallel tests (0 = unlimited, default: unlimited)',
         type: 'number',
       })
       .option('output', {
@@ -86,6 +91,22 @@ export const batchTestCommand: CommandModule<
         describe: 'Show execution logs for all packages (not just failures)',
         type: 'boolean',
         default: false,
+      })
+      .option('aggregated', {
+        describe:
+          'Build all packages into a single place and execute one batch script',
+        type: 'boolean',
+        default: true,
+      })
+      .option('batch-place-id', {
+        describe:
+          'Override placeId for the aggregated batch upload (--aggregated only)',
+        type: 'number',
+      })
+      .option('batch-universe-id', {
+        describe:
+          'Override universeId for the aggregated batch upload (--aggregated only)',
+        type: 'number',
       });
   },
   handler: async (args) => {
@@ -124,7 +145,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
   }
 
   const cloud = args.cloud ?? false;
-  const concurrency = args.concurrency ?? 3;
+  const concurrency =
+    args.concurrency === undefined || args.concurrency === 0
+      ? Infinity
+      : args.concurrency;
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
 
@@ -162,13 +186,21 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     });
   }
 
-  const context: JobContext = cloud
+  const timeoutMs = 120_000;
+
+  const innerContext: JobContext = cloud
     ? new CloudJobContext(client)
     : new LocalJobContext(client);
 
-  await reporter.startAsync();
+  const context: JobContext = args.aggregated
+    ? new BatchScriptJobContext(innerContext, packages, {
+        batchPlaceId: args.batchPlaceId,
+        batchUniverseId: args.batchUniverseId,
+        perPackageTimeoutMs: timeoutMs,
+      })
+    : innerContext;
 
-  const timeoutMs = 120_000;
+  await reporter.startAsync();
   let results: BatchTestSummary;
   try {
     results = await runBatchAsync<BatchTestResult>({
