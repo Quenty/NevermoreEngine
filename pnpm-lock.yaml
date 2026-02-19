@@ -408,6 +408,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/animationtrackutils: {}
 
@@ -684,6 +687,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
     devDependencies:
       '@quenty/contentproviderutils':
         specifier: workspace:*
@@ -1043,6 +1049,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/clienttranslator:
     dependencies:
@@ -1130,6 +1139,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/cmdrservice:
     dependencies:
@@ -1537,6 +1549,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/deathreport:
     dependencies:
@@ -1582,6 +1597,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/debounce: {}
 
@@ -2529,6 +2547,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
     devDependencies:
       '@quenty/rigbuilderutils':
         specifier: workspace:*
@@ -2638,6 +2659,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/inputmode:
     dependencies:
@@ -2817,6 +2841,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/markdownrender: {}
 
@@ -3264,6 +3291,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/physicsutils:
     dependencies:
@@ -4022,6 +4052,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
       '@quentystudios/t':
         specifier: ^3.0.0
         version: 3.0.0
@@ -4275,6 +4308,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/selectionimageutils:
     dependencies:
@@ -4428,6 +4464,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/settings-inputkeymap:
     dependencies:
@@ -4467,6 +4506,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/signal:
     dependencies:
@@ -4560,6 +4602,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
       '@quentystudios/t':
         specifier: ^3.0.0
         version: 3.0.0
@@ -4689,6 +4734,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
 
   src/soundplayer:
     dependencies:
@@ -5123,6 +5171,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: https://github.com/quentystudios/jest-lua.git
+        version: https://codeload.github.com/quentystudios/jest-lua/tar.gz/8949ce4e0907425c39a431d6dcf2fe240efeada5
     devDependencies:
       '@quenty/promise':
         specifier: workspace:*

@@ -53,7 +53,8 @@
     "@quenty/signal": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   },
   "devDependencies": {
     "@quenty/rigbuilderutils": "workspace:*"

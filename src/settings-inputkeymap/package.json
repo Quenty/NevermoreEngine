@@ -42,6 +42,7 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/settings": "workspace:*",
     "@quenty/string": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/table": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   }
 }

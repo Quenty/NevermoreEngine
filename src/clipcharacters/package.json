@@ -39,7 +39,8 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/statestack": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
   },
   "publishConfig": {
     "access": "public"
