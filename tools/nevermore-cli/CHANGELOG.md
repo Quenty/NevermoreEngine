@@ -1,3 +1,17 @@
+# v4.20.0 (Thu Feb 19 2026)
+
+#### 🚀 Enhancement
+
+- feat(cli): add integration game deploy pipeline [#663](https://github.com/Quenty/NevermoreEngine/pull/663) ([@Quenty](https://github.com/Quenty))
+- feat(cli): merge test and deploy results into single PR comment ([@Quenty](https://github.com/Quenty))
+- feat(cli): add integration game deploy pipeline with base place merging ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# (Thu Feb 19 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@12.30.0`, `@quenty/ragdoll@15.43.0`, `@quenty/cli-output-helpers@1.9.0`, `@quenty/nevermore-cli@4.20.0`
+  - feat(cli): add integration game deploy pipeline [#663](https://github.com/Quenty/NevermoreEngine/pull/663) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Feb 18 2026)
 
 #### 🚀 Enhancement

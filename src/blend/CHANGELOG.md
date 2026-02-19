@@ -1,3 +1,19 @@
+# v12.30.0 (Thu Feb 19 2026)
+
+#### 🚀 Enhancement
+
+- feat(cli): add integration game deploy pipeline [#663](https://github.com/Quenty/NevermoreEngine/pull/663) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Swap the integration place with blend so at least we can try stuff quickly, add cmdr to integration test place ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
