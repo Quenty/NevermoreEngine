@@ -9,10 +9,12 @@ local require = require(loader).bootstrapGame(ServerScriptService.permissionprov
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.permissionprovider) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("PermissionService"))
 
 serviceBag:Init()
 serviceBag:Start()
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.permissionprovider)

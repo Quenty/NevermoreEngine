@@ -9,9 +9,11 @@ local require = require(loader).bootstrapGame(ServerScriptService.inputkeymaputi
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.inputkeymaputils) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("TestInputKeyMap"))
 serviceBag:Init()
 serviceBag:Start()
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.inputkeymaputils)

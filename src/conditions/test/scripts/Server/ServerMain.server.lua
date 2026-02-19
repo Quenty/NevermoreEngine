@@ -7,9 +7,14 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.conditions)
 
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.conditions) then
+	return
+end
+
 local AdorneeConditionUtils = require("AdorneeConditionUtils")
 local AttributeValue = require("AttributeValue")
-local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 local TieDefinition = require("TieDefinition")
 
 do
@@ -65,5 +70,3 @@ do
 		print("Is door opening allowed", isAllowed)
 	end)
 end
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.conditions)

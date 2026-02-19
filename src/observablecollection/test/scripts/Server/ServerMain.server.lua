@@ -9,6 +9,11 @@ local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.observablecollection)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.observablecollection) then
+	return
+end
+
 local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
@@ -114,5 +119,3 @@ end
 parts[5].Name = "25"
 parts[9].Name = "3.1"
 parts[2].Name = "remove"
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.observablecollection)

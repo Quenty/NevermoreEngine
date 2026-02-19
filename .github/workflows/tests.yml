@@ -49,7 +49,7 @@ jobs:
 
       - name: Run tests
         id: run-tests
-        run: nevermore batch test --cloud --base origin/${{ github.base_ref }} --output test-results.json --yes --verbose --logs
+        run: nevermore batch test --cloud --aggregated --base origin/${{ github.base_ref }} --output test-results.json --yes --verbose --logs
         env:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

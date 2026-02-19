@@ -9,9 +9,11 @@ local require = require(loader).bootstrapGame(ServerScriptService.chatproviderse
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.chatproviderservice) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("ChatProviderService"))
 serviceBag:Init()
 serviceBag:Start()
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.chatproviderservice)

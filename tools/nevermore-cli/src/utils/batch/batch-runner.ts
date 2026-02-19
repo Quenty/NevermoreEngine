@@ -22,7 +22,7 @@ export async function runBatchAsync<TResult extends PackageResult>(
 ): Promise<BatchSummary<TResult>> {
   const {
     packages,
-    concurrency = 3,
+    concurrency = Infinity,
     reporter,
     bufferOutput = false,
     executeAsync,

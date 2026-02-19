@@ -10,6 +10,10 @@ local require = require(loader).bootstrapGame(ServerScriptService.gameproduct)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.gameproduct) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("GameProductService"))
 
@@ -54,5 +58,3 @@ makePrompt(GameConfigAssetTypes.PASS, 27825080, CFrame.new(0, 5, 0))
 makePrompt(GameConfigAssetTypes.PRODUCT, "TestProduct", CFrame.new(0, 5, 10))
 makePrompt(GameConfigAssetTypes.PRODUCT, "SpyglassProduct", CFrame.new(0, 5, 20))
 makePrompt(GameConfigAssetTypes.ASSET, "FrogOnHead", CFrame.new(0, 5, 30))
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.gameproduct)

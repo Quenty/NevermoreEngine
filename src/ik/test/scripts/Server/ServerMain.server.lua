@@ -11,6 +11,10 @@ local require = require(loader).bootstrapGame(ServerScriptService.ik)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.ik) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 local ikService = serviceBag:GetService(require("IKService"))
 serviceBag:Init()
@@ -31,5 +35,3 @@ RigBuilderUtils.promiseR15MeshRig():Then(function(character)
 		ikService:UpdateServerRigTarget(humanoid, Vector3.zero)
 	end)
 end)
-
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.ik)

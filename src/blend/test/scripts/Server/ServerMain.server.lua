@@ -10,4 +10,6 @@ local require = require(loader).bootstrapGame(ServerScriptService.blend)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.blend)
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.blend) then
+	return
+end
