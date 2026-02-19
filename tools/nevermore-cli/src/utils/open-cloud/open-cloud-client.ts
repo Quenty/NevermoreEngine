@@ -21,8 +21,8 @@ export interface LuauTask {
   script: string;
 }
 
-interface OpenCloudClientOptions {
-  apiKey: string;
+export interface OpenCloudClientOptions {
+  apiKey: string | (() => Promise<string>);
   rateLimiter: RateLimiter;
 }
 
@@ -79,12 +79,27 @@ function formatAuthError(
 }
 
 export class OpenCloudClient {
-  private _apiKey: string;
+  private _apiKey: string | undefined;
+  private _apiKeySource: string | (() => Promise<string>);
   private _rateLimiter: RateLimiter;
 
   constructor(options: OpenCloudClientOptions) {
-    this._apiKey = options.apiKey;
+    this._apiKeySource = options.apiKey;
+    if (typeof options.apiKey === 'string') {
+      this._apiKey = options.apiKey;
+    }
     this._rateLimiter = options.rateLimiter;
+  }
+
+  private async _resolveApiKeyAsync(): Promise<string> {
+    if (this._apiKey != null) {
+      return this._apiKey;
+    }
+    if (typeof this._apiKeySource === 'function') {
+      this._apiKey = await this._apiKeySource();
+      return this._apiKey;
+    }
+    return this._apiKeySource;
   }
 
   async uploadPlaceAsync(
@@ -97,6 +112,7 @@ export class OpenCloudClient {
       `Uploading to https://www.roblox.com/games/${placeId}/place ...`
     );
 
+    const apiKey = await this._resolveApiKeyAsync();
     const fileBuffer = await fs.readFile(rbxlPath);
     const body = new Uint8Array(fileBuffer);
     const versionType = publish ? 'Published' : 'Saved';
@@ -107,7 +123,7 @@ export class OpenCloudClient {
       headers: {
         'Content-Type': 'application/octet-stream',
         Accept: 'application/json',
-        'X-API-Key': this._apiKey,
+        'X-API-Key': apiKey,
       },
       body,
     });
@@ -129,6 +145,25 @@ export class OpenCloudClient {
           )
         );
       }
+      if (response.status === 409) {
+        const dim = OutputHelper.formatDim;
+        const info = OutputHelper.formatInfo;
+        throw new Error(
+          [
+            OutputHelper.formatError(
+              'Upload failed: place is locked (409 Conflict)'
+            ),
+            '',
+            '  This usually means someone has the place open in Team Create.',
+            '  Close all Studio sessions for this place and try again.',
+            '',
+            `  ${dim('Place:')}    ${info(
+              `https://www.roblox.com/games/${placeId}/place`
+            )}`,
+            `  ${dim('Route:')}    ${dim(`POST ${url}`)}`,
+          ].join('\n')
+        );
+      }
       throw new Error(
         `Upload failed: ${response.status} ${response.statusText}: ${text}`
       );
@@ -144,13 +179,14 @@ export class OpenCloudClient {
     placeVersion: number,
     script: string
   ): Promise<LuauTask> {
+    const apiKey = await this._resolveApiKeyAsync();
     const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
 
     const response = await this._rateLimiter.fetchAsync(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': this._apiKey,
+        'X-API-Key': apiKey,
       },
       body: JSON.stringify({ script }),
     });
@@ -184,6 +220,7 @@ export class OpenCloudClient {
     taskPath: string,
     onProgress?: (state: LuauTask['state']) => void
   ): Promise<LuauTask> {
+    const apiKey = await this._resolveApiKeyAsync();
     const pollIntervalMs = 3000;
 
     while (true) {
@@ -192,7 +229,7 @@ export class OpenCloudClient {
         {
           method: 'GET',
           headers: {
-            'X-API-Key': this._apiKey,
+            'X-API-Key': apiKey,
           },
         }
       );
@@ -243,12 +280,13 @@ export class OpenCloudClient {
   }
 
   private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
+    const apiKey = await this._resolveApiKeyAsync();
     const response = await this._rateLimiter.fetchAsync(
       `https://apis.roblox.com/cloud/v2/${taskPath}/logs`,
       {
         method: 'GET',
         headers: {
-          'X-API-Key': this._apiKey,
+          'X-API-Key': apiKey,
         },
       }
     );
@@ -264,5 +302,68 @@ export class OpenCloudClient {
 
     const messages = data.luauExecutionSessionTaskLogs?.[0]?.messages ?? [];
     return messages.join('\n');
+  }
+
+  /**
+   * Download a place file via the Asset Delivery API.
+   * Requires the `legacy-asset:manage` scope on the API key.
+   *
+   * Two-step process: fetch a temporary CDN URL, then download the binary.
+   */
+  async downloadPlaceAsync(
+    universeId: number,
+    placeId: number
+  ): Promise<Buffer> {
+    const apiKey = await this._resolveApiKeyAsync();
+    const url = `https://apis.roblox.com/asset-delivery-api/v1/assetId/${placeId}`;
+
+    OutputHelper.verbose(
+      `Downloading base place from https://www.roblox.com/games/${placeId}/place ...`
+    );
+
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(
+          formatAuthError(
+            'Download place',
+            'legacy-asset:manage',
+            universeId,
+            placeId,
+            response.status,
+            response.statusText,
+            text,
+            'GET',
+            url
+          )
+        );
+      }
+      throw new Error(
+        `Download place failed: ${response.status} ${response.statusText}: ${text}`
+      );
+    }
+
+    const data = (await response.json()) as { location: string };
+    if (!data.location) {
+      throw new Error('Download place failed: no CDN location in response');
+    }
+
+    OutputHelper.verbose('Fetching place binary from CDN...');
+    const cdnResponse = await fetch(data.location);
+    if (!cdnResponse.ok) {
+      throw new Error(
+        `Download place CDN fetch failed: ${cdnResponse.status} ${cdnResponse.statusText}`
+      );
+    }
+
+    const arrayBuffer = await cdnResponse.arrayBuffer();
+    return Buffer.from(arrayBuffer);
   }
 }

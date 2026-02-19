@@ -21,13 +21,10 @@ import {
   type BatchTestResult,
   type BatchTestSummary,
   CompositeReporter,
-  GithubCommentTableReporter,
-  GithubJobSummaryReporter,
   GroupedReporter,
   JsonFileReporter,
   SpinnerReporter,
   SummaryTableReporter,
-  createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
 import {
   runSingleTestAsync,
@@ -146,16 +143,6 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
               actionVerb: 'Testing',
             }),
         new SummaryTableReporter(state),
-        new GithubCommentTableReporter(
-          state,
-          createTestCommentConfig(),
-          concurrency
-        ),
-        new GithubJobSummaryReporter(
-          state,
-          createTestCommentConfig(),
-          concurrency
-        ),
       ];
       if (args.output) {
         reporters.push(new JsonFileReporter(state, args.output));
@@ -164,15 +151,20 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     }
   );
 
-  let client: OpenCloudClient | undefined;
+  let client: OpenCloudClient;
   if (cloud) {
     const apiKey = await getApiKeyAsync(args);
     client = new OpenCloudClient({ apiKey, rateLimiter: new RateLimiter() });
+  } else {
+    client = new OpenCloudClient({
+      apiKey: () => getApiKeyAsync(args),
+      rateLimiter: new RateLimiter(),
+    });
   }
 
-  const context: JobContext = client
+  const context: JobContext = cloud
     ? new CloudJobContext(client)
-    : new LocalJobContext();
+    : new LocalJobContext(client);
 
   await reporter.startAsync();
 

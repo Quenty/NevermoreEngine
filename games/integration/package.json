@@ -28,6 +28,7 @@
     "@quenty/binder": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/camera": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
     "@quenty/characterutils": "workspace:*",
     "@quenty/clienttranslator": "workspace:*",
     "@quenty/ik": "workspace:*",

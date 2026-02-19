@@ -41,6 +41,12 @@ export interface GithubCommentTableConfig {
   failureLabel?: string;
   /** Verb in the footer, e.g. "tested" in "X tested, Y passed, Z failed". Default: "tested" */
   summaryVerb?: string;
+  /**
+   * When set, the PR comment reporter uses section-based merging.
+   * Multiple configs with different sectionIds share a single PR comment,
+   * each managing their own section independently.
+   */
+  sectionId?: string;
 }
 
 /** A single row in the rendered GitHub table. */

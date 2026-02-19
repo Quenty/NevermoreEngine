@@ -16,6 +16,7 @@ export function createTestCommentConfig(): GithubCommentTableConfig {
   return {
     heading: 'Test Results',
     commentMarker: '<!-- nevermore-test-results -->',
+    sectionId: 'tests',
     extraColumns: createTestColumns(),
     errorHeading: 'Test Results',
   };

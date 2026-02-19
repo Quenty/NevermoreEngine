@@ -69,22 +69,51 @@ export async function discoverChangedTargetPackagesAsync(
 }
 
 /**
- * Discover all packages that have a deploy.nevermore.json with a "test" target.
+ * Discover all packages that have a deploy.nevermore.json with a "test" target
+ * and a scriptTemplate (required for running tests).
  */
 export async function discoverAllTestablePackagesAsync(): Promise<
   TargetPackage[]
 > {
-  return discoverAllTargetPackagesAsync('test');
+  const packages = await discoverAllTargetPackagesAsync('test');
+  return _requireScriptTemplate(packages);
 }
 
 /**
  * Discover packages with test targets that have changed since `baseBranch`.
+ * Only includes packages with a scriptTemplate (required for running tests).
  * Uses pnpm's --filter "...[<base>]" to include transitive dependents.
  */
 export async function discoverChangedTestablePackagesAsync(
   baseBranch: string
 ): Promise<TargetPackage[]> {
-  return discoverChangedTargetPackagesAsync(baseBranch, 'test');
+  const packages = await discoverChangedTargetPackagesAsync(baseBranch, 'test');
+  return _requireScriptTemplate(packages);
+}
+
+/**
+ * Filter out packages without a scriptTemplate — those are deploy-only targets
+ * (e.g. integration games) that can't be tested via `batch test`.
+ */
+function _requireScriptTemplate(packages: TargetPackage[]): TargetPackage[] {
+  const withTemplate: TargetPackage[] = [];
+  const skipped: string[] = [];
+
+  for (const pkg of packages) {
+    if (pkg.target.scriptTemplate) {
+      withTemplate.push(pkg);
+    } else {
+      skipped.push(pkg.name);
+    }
+  }
+
+  if (skipped.length > 0) {
+    OutputHelper.verbose(
+      `Skipped ${skipped.length} packages without scriptTemplate: ${skipped.join(', ')}`
+    );
+  }
+
+  return withTemplate;
 }
 
 async function _filterByTargetAsync(

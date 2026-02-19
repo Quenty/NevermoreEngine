@@ -8,6 +8,7 @@ import {
   type ScriptRunResult,
 } from './job-context.js';
 import { BaseJobContext } from './base-job-context.js';
+import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 
 class LocalDeployment implements Deployment {
   bridge: StudioBridge;
@@ -22,6 +23,10 @@ class LocalDeployment implements Deployment {
 
 export class LocalJobContext extends BaseJobContext {
   private _deployments = new Set<LocalDeployment>();
+
+  constructor(openCloudClient?: OpenCloudClient) {
+    super(openCloudClient);
+  }
 
   async deployBuiltPlaceAsync(
     reporter: Reporter,

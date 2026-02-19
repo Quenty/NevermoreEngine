@@ -24,6 +24,9 @@ export function printApiKeySetupHelp(): void {
   console.log(
     '  - universe.place.luau-execution-session:read   (read results)'
   );
+  console.log(
+    '  - legacy-asset:manage             (download base places for integration builds)'
+  );
   console.log('');
 }
 
