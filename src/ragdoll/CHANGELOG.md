@@ -1,23 +1,18 @@
-# v15.43.0 (Thu Feb 19 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add integration game deploy pipeline [#663](https://github.com/Quenty/NevermoreEngine/pull/663) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Swap the integration place with blend so at least we can try stuff quickly, add cmdr to integration test place ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.42.0...@quenty/ragdoll@15.43.0) (2026-02-19)
+
+
+### Bug Fixes
+
+* Swap the integration place with blend so at least we can try stuff quickly, add cmdr to integration test place ([e1168e1](https://github.com/Quenty/NevermoreEngine/commit/e1168e16f9c01fb53c6662f091ec42e77766d10f))
+
+
+
+
 
 # [15.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.41.2...@quenty/ragdoll@15.42.0) (2026-02-17)
 

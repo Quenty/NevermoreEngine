@@ -1,21 +1,19 @@
-# v1.9.0 (Thu Feb 19 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add integration game deploy pipeline [#663](https://github.com/Quenty/NevermoreEngine/pull/663) ([@Quenty](https://github.com/Quenty))
-- feat(cli): merge test and deploy results into single PR comment ([@Quenty](https://github.com/Quenty))
-- feat(cli): add integration game deploy pipeline with base place merging ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.9.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.8.0...@quenty/cli-output-helpers@1.9.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add integration game deploy pipeline with base place merging ([b406938](https://github.com/Quenty/Nevermore/commit/b406938cee6a1af59adb6682eb6319c76c51aa1a))
+* **cli:** merge test and deploy results into single PR comment ([6750feb](https://github.com/Quenty/Nevermore/commit/6750feb4bb5c1075ca9931166aebae01c9333f8d))
+
+
+
+
 
 # [1.8.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.7.0...@quenty/cli-output-helpers@1.8.0) (2026-02-18)
 
