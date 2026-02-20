@@ -25,6 +25,7 @@ When a section grows to 10+ items, graduate it to its own doc.
 
 - **Per-package execution**: moonwave-extractor, selene, and other linters run via `npx lerna exec --parallel` must be run per-package, not repo-wide. The recursive symlinked `node_modules` under `src/` will cause them to traverse infinitely and freeze. This is why `package.json` uses `npx lerna exec --parallel` rather than running the tools at the repo root. Same caution applies when debugging locally.
 - **CI annotations**: The `linting.yml` workflow emits GitHub Actions annotations via `nevermore tools post-lint-results`. For the luau-lsp job (which already has pnpm), annotations run in-job. For stylua/selene/moonwave (lightweight Aftman-only jobs), output is uploaded as artifacts and a separate `lint-annotations` job processes them. GitHub caps annotations at 10 per step and 50 per run — the job summary serves as a fallback for large lint failures.
+- **Template CI annotations**: Game and plugin templates use a simpler pattern — every linter job posts annotations inline via `npx @quenty/nevermore-cli tools post-lint-results`. No artifact relay or separate `lint-annotations` job needed, since `setup-node` is sufficient to run `npx` (no pnpm install required in the annotation step).
 
 ## Rojo
 

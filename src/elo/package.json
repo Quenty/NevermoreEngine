@@ -39,6 +39,6 @@
   "dependencies": {
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/probability": "workspace:*",
-    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   }
 }

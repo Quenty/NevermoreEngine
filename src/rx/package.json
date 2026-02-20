@@ -42,7 +42,7 @@
     "@quenty/table": "workspace:*",
     "@quenty/throttle": "workspace:*",
     "@quenty/typeutils": "workspace:*",
-    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"
