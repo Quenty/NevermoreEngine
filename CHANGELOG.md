@@ -1,3 +1,16 @@
+# (Fri Feb 20 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.29.0`, `@quenty/binder@14.32.0`, `@quenty/blend@12.32.0`, `@quenty/brio@14.27.0`, `@quenty/chatproviderservice@9.45.0`, `@quenty/clienttranslator@14.33.0`, `@quenty/clipcharacters@12.35.0`, `@quenty/datastore@13.34.0`, `@quenty/deathreport@10.39.0`, `@quenty/ellipticcurvecryptography@1.10.0`, `@quenty/elo@7.33.0`, `@quenty/experiencecalculator@2.9.0`, `@quenty/fzy@5.13.0`, `@quenty/ik@15.46.0`, `@quenty/influxdbclient@7.31.0`, `@quenty/inputkeymaputils@14.39.0`, `@quenty/instanceutils@13.27.0`, `@quenty/lipsum@14.32.0`, `@quenty/maid@3.8.0`, `@quenty/nevermore-test-runner@1.3.0`, `@quenty/observablecollection@12.34.0`, `@quenty/permissionprovider@14.33.0`, `@quenty/randomutils@6.15.0`, `@quenty/rogue-properties@11.41.0`, `@quenty/rx@13.26.0`, `@quenty/secrets@7.43.0`, `@quenty/settings-inputkeymap@10.49.0`, `@quenty/settings@11.46.0`, `@quenty/snackbar@11.37.0`, `@quenty/soundgroup@1.36.0`, `@quenty/tie@10.36.0`, `@quenty/nevermore-cli@4.22.0`
+  - feat(cli): add CI annotation support to game and plugin templates [#666](https://github.com/Quenty/NevermoreEngine/pull/666) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Feb 19 2026)
 
 #### 🚀 Enhancement

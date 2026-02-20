@@ -1,3 +1,15 @@
+# v1.36.0 (Fri Feb 20 2026)
+
+#### 🚀 Enhancement
+
+- feat(cli): add CI annotation support to game and plugin templates [#666](https://github.com/Quenty/NevermoreEngine/pull/666) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
