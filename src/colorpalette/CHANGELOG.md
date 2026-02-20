@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.34.0...@quenty/colorpalette@10.35.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
 # [10.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.33.0...@quenty/colorpalette@10.34.0) (2026-02-19)
 
 **Note:** Version bump only for package @quenty/colorpalette

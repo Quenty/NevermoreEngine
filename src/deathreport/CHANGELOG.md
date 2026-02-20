@@ -1,19 +1,18 @@
-# v10.39.0 (Fri Feb 20 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add CI annotation support to game and plugin templates [#666](https://github.com/Quenty/NevermoreEngine/pull/666) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.38.0...@quenty/deathreport@10.39.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
 
 # [10.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.37.0...@quenty/deathreport@10.38.0) (2026-02-19)
 

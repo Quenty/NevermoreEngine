@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.44.0...@quenty/ragdoll@15.45.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
 # [15.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.43.0...@quenty/ragdoll@15.44.0) (2026-02-19)
 
 **Note:** Version bump only for package @quenty/ragdoll

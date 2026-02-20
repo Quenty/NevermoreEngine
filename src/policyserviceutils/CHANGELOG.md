@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.15.0...@quenty/policyserviceutils@6.16.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/policyserviceutils
+
+
+
+
+
 # [6.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/policyserviceutils@6.14.0...@quenty/policyserviceutils@6.15.0) (2026-02-19)
 
 **Note:** Version bump only for package @quenty/policyserviceutils
