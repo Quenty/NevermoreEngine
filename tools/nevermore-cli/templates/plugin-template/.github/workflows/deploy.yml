@@ -1,0 +1,82 @@
+# Roblox Deploy
+#
+# Builds and uploads the project to your Roblox place.
+# This workflow is inactive until you complete the setup below.
+#
+# Setup:
+#   1. Run `nevermore deploy init` to create deploy.nevermore.json
+#   2. Add ROBLOX_OPEN_CLOUD_API_KEY as a repository secret
+#      (Create one at https://create.roblox.com/dashboard/credentials)
+#   3. Deploys will run automatically when code is pushed to main
+#   4. You can also trigger a deploy manually from the Actions tab
+#
+# Docs: https://quenty.github.io/NevermoreEngine/docs/testing/integration-testing
+
+name: deploy
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  config-check:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: $\{{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          if [ -n "$KEY" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else echo "::notice::Deploy skipped — ROBLOX_OPEN_CLOUD_API_KEY not configured. See top of this file for setup."; fi
+        env:
+          KEY: $\{{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
+
+  deploy:
+    needs: config-check
+    if: needs.config-check.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - name: Setup npm for GitHub Packages
+        run: |
+          if [[ -n "$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" ]]; then
+            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> .npmrc
+            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> ~/.npmrc
+          fi
+
+          if [[ -n "$NPM_TOKEN" ]]; then
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          fi
+        env:
+          NPM_GITHUB_QUENTYSTUDIOS_TOKEN: $\{{ secrets.NPM_GITHUB_QUENTYSTUDIOS_TOKEN }}
+          NPM_TOKEN: $\{{ secrets.NPM_TOKEN }}
+
+      - name: Link and install packages
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy
+        id: deploy
+        run: npx @quenty/nevermore-cli deploy run --yes --verbose --logs --output deploy-results.json
+        env:
+          ROBLOX_OPEN_CLOUD_API_KEY: $\{{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
+
+      - name: Post deploy results
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-deploy-results deploy-results.json --yes --run-outcome $\{{ steps.deploy.outcome }}
+        env:
+          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}

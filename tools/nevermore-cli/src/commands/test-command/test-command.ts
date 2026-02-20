@@ -9,8 +9,10 @@ import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
 import { CloudJobContext, LocalJobContext } from '../../utils/job-context/index.js';
 import { runSingleTestAsync } from '../../utils/testing/runner/test-runner.js';
 import {
+  type Reporter,
   type LiveStateTracker,
   CompositeReporter,
+  JsonFileReporter,
   SimpleReporter,
   SpinnerReporter,
 } from '../../utils/testing/reporting/index.js';
@@ -23,6 +25,7 @@ export interface TestProjectArgs extends NevermoreGlobalArgs {
   placeId?: number;
   scriptTemplate?: string;
   scriptText?: string;
+  output?: string;
 }
 
 export class TestProjectCommand<T>
@@ -64,6 +67,10 @@ export class TestProjectCommand<T>
         'Luau code to execute directly instead of the configured script template',
       type: 'string',
     });
+    args.option('output', {
+      describe: 'Write JSON results to this file',
+      type: 'string',
+    });
 
     return args as Argv<TestProjectArgs>;
   };
@@ -76,18 +83,24 @@ export class TestProjectCommand<T>
       const showLogs = args.logs ?? false;
       const useSpinner = process.stdout.isTTY && !args.verbose;
 
-      const reporter = new CompositeReporter([packageName], (state: LiveStateTracker) => [
-        useSpinner
-          ? new SpinnerReporter(state, {
-              showLogs,
-              actionVerb: 'Testing',
-            })
-          : new SimpleReporter(state, {
-              alwaysShowLogs: showLogs,
-              successMessage: 'Tests passed!',
-              failureMessage: 'Tests failed! See output above for more information.',
-            }),
-      ]);
+      const reporter = new CompositeReporter([packageName], (state: LiveStateTracker) => {
+        const reporters: Reporter[] = [
+          useSpinner
+            ? new SpinnerReporter(state, {
+                showLogs,
+                actionVerb: 'Testing',
+              })
+            : new SimpleReporter(state, {
+                alwaysShowLogs: showLogs,
+                successMessage: 'Tests passed!',
+                failureMessage: 'Tests failed! See output above for more information.',
+              }),
+        ];
+        if (args.output) {
+          reporters.push(new JsonFileReporter(state, args.output));
+        }
+        return reporters;
+      });
       await reporter.startAsync();
 
       const context = args.cloud

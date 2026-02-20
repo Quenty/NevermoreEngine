@@ -5,6 +5,7 @@ import {
   type Reporter,
   type LiveStateTracker,
   CompositeReporter,
+  JsonFileReporter,
   SimpleReporter,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
@@ -27,6 +28,7 @@ export interface DeployArgs extends NevermoreGlobalArgs {
   scriptTemplate?: string;
   createPlace?: boolean;
   placeFile?: string;
+  output?: string;
 }
 
 export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
@@ -113,6 +115,10 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           .option('place-file', {
             describe: 'Upload a pre-built .rbxl file instead of building via rojo',
             type: 'string',
+          })
+          .option('output', {
+            describe: 'Write JSON results to this file',
+            type: 'string',
           });
       },
       async (runArgs) => {
@@ -153,6 +159,9 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             failureMessage: 'Deploy failed!',
           }),
         ];
+        if (args.output) {
+          reporters.push(new JsonFileReporter(state, args.output));
+        }
         return reporters;
       }
     );

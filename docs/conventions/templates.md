@@ -47,3 +47,12 @@ const templatePath = resolveTemplatePath(import.meta.url, 'batch-test-runner.lua
 ```
 
 This works regardless of where the compiled JS ends up relative to the source.
+
+## CI workflows
+
+Game and plugin templates include GitHub Actions workflows for linting, testing, and deployment. These use `npx @quenty/nevermore-cli` (not building from source) since the CLI is published to npm as a public package.
+
+- **Linting** — Each linter job pipes output through `tee` and posts inline PR annotations via `nevermore tools post-lint-results`. Since templates have node available in every job, annotations are posted inline (no artifact relay needed).
+- **Tests / Deploy** — These workflows use a `config-check` job that tests whether `ROBLOX_OPEN_CLOUD_API_KEY` is set. If not, the main job is skipped (shows "Skipped" in GitHub UI) and a `::notice` annotation explains setup. This means newly scaffolded projects have zero failing workflows until the user deliberately enables testing/deploy.
+
+All `${{ }}` GitHub Actions expressions are written as `$\{{ }}` in template files to prevent Handlebars from interpreting them during scaffolding.
