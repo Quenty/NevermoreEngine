@@ -8,3 +8,4 @@ sidebar_position: 99
 Things that trip people up. Each page collects small tips organized by topic.
 
 - **[Tooling](tooling.md)** — Lune, symlinks, Rojo, web fetch safety, and other toolchain surprises.
+- **[Troubleshooting](troubleshooting.md)** — Common setup and development issues: pnpm, aftman, Rojo, linting, testing.

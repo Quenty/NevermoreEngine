@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # Getting started with VSCode
 
-VSCode works with Nevermore relatively easily. We have default extensions.json setup. Follow the general setup tips. This types should generally work for Cursor and other VS-Code based IDEs.
+VSCode works with Nevermore relatively easily. We have default extensions.json setup. Follow the general setup tips. These types should generally work for Cursor and other VS-Code based IDEs.
 
 ## Extensions
 
@@ -25,7 +25,7 @@ You currently must use the forked version of luau-lsp. You can use the default e
 in `settings.json` configure the luau-lsp server to point towards a custom exe path. This should be your Luau-lsp exe path installed via aftman.toml.
 
 ```json
-  "luau-lsp.server.path": "C:/Users/James Onnen/.aftman/tool-storage/quenty/luau-lsp/1.58.0-quenty.1/luau-lsp.exe",
+  "luau-lsp.server.path": "<path-to-aftman>/tool-storage/quenty/luau-lsp/<version>/luau-lsp.exe",
 ```
 
 ## Other helpful settings for consumption

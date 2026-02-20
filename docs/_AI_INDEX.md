@@ -37,7 +37,8 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 |-----|-------------|
 | [intro.md](intro.md) | Getting started with Nevermore, why use it, key packages |
 | [install.md](install.md) | Installation methods: NPM + CLI, existing Rojo projects, plugins |
-| [architecture/](architecture/index.md) | Architecture: design philosophy, ServiceBag, dependency injection |
+| [architecture/](architecture/index.md) | Architecture: workspace layout, design philosophy, ServiceBag, dependency injection |
+| [architecture/patterns.md](architecture/patterns.md) | Core patterns: Maid, BaseObject, Binder, Rx, Brio, Blend, AdorneeData, TieDefinition |
 | [build.md](build.md) | Contributing: local setup, tools, versioning, custom Rojo |
 | [testing/](testing/index.md) | Testing: Jest3, deploy config, CLI commands, credentials, CI |
 | [testing/integration-testing.md](testing/integration-testing.md) | Integration testing: full-game tests, base place merging, deploy pipeline |
@@ -47,3 +48,4 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | [conventions/templates.md](conventions/templates.md) | Template conventions: directory layout, placeholder pattern, path resolution |
 | [ides/vscode.md](ides/vscode.md) | VSCode/Cursor setup: extensions, luau-lsp config, settings |
 | [gotchas/tooling.md](gotchas/tooling.md) | Tooling gotchas: Lune, symlinks, Rojo, linter CLI tools, CI annotations |
+| [gotchas/troubleshooting.md](gotchas/troubleshooting.md) | Troubleshooting: setup failures, linting issues, test auth, Rojo errors |
