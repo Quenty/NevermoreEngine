@@ -38,7 +38,7 @@ While Nevermore was originally designed to make games, in general Nevermore is n
 * **Plugins** - Roblox Studio plugins that want to use UI, techniques, and other approaches.
 * **Stand alone models** - Models that need to operate but still may want to consume dependencies.
 
-To learn more about the design philosophy of Nevermore see the [Design](/docs/design) guide.
+To learn more about the design philosophy of Nevermore see the [Design](/docs/architecture/design) guide.
 
 ## Why NPM or a package manager at all?
 NPM is a package manager originally intended for JavaScript and node. The alternative option is Wally, Roblox's packages or another package manager. NPM was selected after careful consideration. NPM works best for now, because it has a significant amount of CI/CD pipeline support for monorepos. It works well with the existing Roblox Typescript community, and it was easy to refactor. A package manager is very important because it allows us to consume code without breaking things. This allows for code reuse.
