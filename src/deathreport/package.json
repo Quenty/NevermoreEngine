@@ -46,6 +46,6 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.0"
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   }
 }

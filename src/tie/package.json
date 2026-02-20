@@ -50,7 +50,7 @@
     "@quenty/tuple": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.0"
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "devDependencies": {
     "@quenty/promise": "workspace:*",
