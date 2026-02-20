@@ -34,7 +34,7 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/randomutils": "workspace:*",
     "@quenty/string": "workspace:*",
-    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
+    "@quentystudios/jest-lua": "3.10.0-quenty.0"
   },
   "devDependencies": {
     "@quenty/maid": "workspace:*",

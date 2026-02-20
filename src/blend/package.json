@@ -46,7 +46,7 @@
     "@quenty/uiobjectutils": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "https://github.com/quentystudios/jest-lua.git"
+    "@quentystudios/jest-lua": "3.10.0-quenty.0"
   },
   "devDependencies": {
     "@quenty/contentproviderutils": "workspace:*",
