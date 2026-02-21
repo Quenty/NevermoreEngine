@@ -44,15 +44,17 @@ class TrackedBuiltPlace implements BuiltPlace {
  * — even when individual deployments fail.
  */
 export abstract class BaseJobContext implements JobContext {
+  protected _reporter: Reporter;
   protected _openCloudClient: OpenCloudClient | undefined;
   private _builtPlaces = new Set<TrackedBuiltPlace>();
 
-  constructor(openCloudClient?: OpenCloudClient) {
+  constructor(reporter: Reporter, openCloudClient?: OpenCloudClient) {
+    this._reporter = reporter;
     this._openCloudClient = openCloudClient;
   }
 
   async buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace> {
-    const result = await buildPlaceAsync(options);
+    const result = await buildPlaceAsync({ ...options, reporter: this._reporter });
     const tracked = new TrackedBuiltPlace(result.rbxlPath, result.target, result.buildContext);
     this._builtPlaces.add(tracked);
 
@@ -76,7 +78,7 @@ export abstract class BaseJobContext implements JobContext {
 
     const resolvedName = options.packageName ?? '';
 
-    options.reporter?.onPackagePhaseChange(resolvedName, 'downloading');
+    this._reporter.onPackagePhaseChange(resolvedName, 'downloading');
     OutputHelper.verbose('Downloading base place for merge...');
     const buffer = await this._openCloudClient.downloadPlaceAsync(
       basePlace.universeId,
@@ -85,7 +87,7 @@ export abstract class BaseJobContext implements JobContext {
     const basePath = buildContext.resolvePath('base.rbxl');
     await fs.writeFile(basePath, buffer);
 
-    options.reporter?.onPackagePhaseChange(resolvedName, 'merging');
+    this._reporter.onPackagePhaseChange(resolvedName, 'merging');
     const packagePath = options.packagePath ?? process.cwd();
     const projectPath = path.resolve(packagePath, tracked.target.project);
     const mergedPath = buildContext.resolvePath('merged.rbxl');
@@ -111,8 +113,8 @@ export abstract class BaseJobContext implements JobContext {
     this._builtPlaces.delete(tracked);
   }
 
-  abstract deployBuiltPlaceAsync(reporter: Reporter, options: DeployPlaceOptions): Promise<Deployment>;
-  abstract runScriptAsync(deployment: Deployment, reporter: Reporter, options: RunScriptOptions): Promise<ScriptRunResult>;
+  abstract deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<Deployment>;
+  abstract runScriptAsync(deployment: Deployment, options: RunScriptOptions): Promise<ScriptRunResult>;
   abstract getLogsAsync(deployment: Deployment): Promise<string>;
   abstract releaseAsync(deployment: Deployment): Promise<void>;
 

@@ -1,6 +1,10 @@
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { type Reporter } from '@quenty/cli-output-helpers/reporting';
+import {
+  type Reporter,
+  type JobPhase,
+  type ProgressSummary,
+} from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
@@ -188,15 +192,22 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   const timeoutMs = 120_000;
 
+  // In aggregated mode, the inner context gets a broadcast reporter that translates
+  // phase changes from the shared '_batch_' operation to all real packages
+  const innerReporter: Reporter = args.aggregated
+    ? _createBroadcastReporter(reporter, packageNames)
+    : reporter;
+
   const innerContext: JobContext = cloud
-    ? new CloudJobContext(client)
-    : new LocalJobContext(client);
+    ? new CloudJobContext(innerReporter, client)
+    : new LocalJobContext(innerReporter, client);
 
   const context: JobContext = args.aggregated
     ? new BatchScriptJobContext(innerContext, packages, {
         batchPlaceId: args.batchPlaceId,
         batchUniverseId: args.batchUniverseId,
         perPackageTimeoutMs: timeoutMs,
+        reporter,
       })
     : innerContext;
 
@@ -208,12 +219,12 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       concurrency,
       reporter,
       bufferOutput: isGrouped,
-      executeAsync: async (pkg, pkgReporter) => {
+      stateTracker: reporter.state,
+      executeAsync: async (pkg) => {
         const result = await _runWithRetryAsync(
           pkg,
           context,
-          timeoutMs,
-          pkgReporter
+          timeoutMs
         );
 
         return {
@@ -221,6 +232,9 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
           placeId: pkg.target.placeId,
           success: result.success,
           logs: result.logs,
+          progressSummary: result.testCounts
+            ? { kind: 'test-counts' as const, ...result.testCounts }
+            : undefined,
         };
       },
     });
@@ -238,8 +252,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 async function _runWithRetryAsync(
   pkg: TargetPackage,
   context: JobContext,
-  timeoutMs: number,
-  reporter: Reporter
+  timeoutMs: number
 ): Promise<SingleTestResult> {
   const opts = {
     packagePath: pkg.path,
@@ -248,15 +261,34 @@ async function _runWithRetryAsync(
   };
 
   try {
-    return await runSingleTestAsync(context, reporter, opts);
+    return await runSingleTestAsync(context, opts);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
 
     if (message.includes('timed out') || message.includes('fetch failed')) {
       OutputHelper.warn(`${pkg.name}: transient failure, retrying...`);
-      return await runSingleTestAsync(context, reporter, opts);
+      return await runSingleTestAsync(context, opts);
     }
 
     throw err;
   }
+}
+
+function _createBroadcastReporter(target: Reporter, packageNames: string[]): Reporter {
+  return {
+    startAsync: async () => {},
+    stopAsync: async () => {},
+    onPackageStart: () => {},
+    onPackageResult: () => {},
+    onPackagePhaseChange: (_name: string, phase: JobPhase) => {
+      for (const name of packageNames) {
+        target.onPackagePhaseChange(name, phase);
+      }
+    },
+    onPackageProgressUpdate: (_name: string, progress: ProgressSummary) => {
+      for (const name of packageNames) {
+        target.onPackageProgressUpdate(name, progress);
+      }
+    },
+  };
 }

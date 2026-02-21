@@ -1,4 +1,4 @@
-import { type PackageResult, type PackageStatus } from '../reporter.js';
+import { type PackageResult, type PackageStatus, type ProgressSummary } from '../reporter.js';
 
 export interface PackageState {
   name: string;
@@ -7,6 +7,7 @@ export interface PackageState {
   durationMs?: number;
   result?: PackageResult;
   bufferedOutput?: string[];
+  progress?: ProgressSummary;
 }
 
 /**
@@ -21,4 +22,5 @@ export interface IStateTracker {
   getAllPackages(): PackageState[];
   getResults(): PackageResult[];
   getFailures(): PackageResult[];
+  getCurrentPhase(name: string): PackageStatus | undefined;
 }

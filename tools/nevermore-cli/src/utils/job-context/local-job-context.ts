@@ -24,12 +24,11 @@ class LocalDeployment implements Deployment {
 export class LocalJobContext extends BaseJobContext {
   private _deployments = new Set<LocalDeployment>();
 
-  constructor(openCloudClient?: OpenCloudClient) {
-    super(openCloudClient);
+  constructor(reporter: Reporter, openCloudClient?: OpenCloudClient) {
+    super(reporter, openCloudClient);
   }
 
   async deployBuiltPlaceAsync(
-    reporter: Reporter,
     options: DeployPlaceOptions
   ): Promise<Deployment> {
     const { builtPlace, packageName } = options;
@@ -38,7 +37,7 @@ export class LocalJobContext extends BaseJobContext {
       placePath: builtPlace.rbxlPath,
       onPhase: (phase) => {
         if (phase === 'launching' || phase === 'connecting') {
-          reporter.onPackagePhaseChange(packageName, phase);
+          this._reporter.onPackagePhaseChange(packageName, phase);
         }
       },
     });
@@ -52,13 +51,12 @@ export class LocalJobContext extends BaseJobContext {
 
   async runScriptAsync(
     deployment: Deployment,
-    reporter: Reporter,
     options: RunScriptOptions
   ): Promise<ScriptRunResult> {
     const localDeployment = deployment as LocalDeployment;
     const { scriptContent, packageName, timeoutMs } = options;
 
-    reporter.onPackagePhaseChange(packageName, 'executing');
+    this._reporter.onPackagePhaseChange(packageName, 'executing');
 
     try {
       const result = await localDeployment.bridge.executeAsync({

@@ -1,13 +1,13 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
-import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { type JobContext } from '../../job-context/job-context.js';
-import { parseTestLogs } from '../test-log-parser.js';
+import { type ParsedTestCounts, parseTestLogs, parseTestCounts } from '../test-log-parser.js';
 
 export interface SingleTestResult {
   success: boolean;
   logs: string;
+  testCounts?: ParsedTestCounts;
 }
 
 export interface SingleTestOptions {
@@ -26,7 +26,6 @@ export interface SingleTestOptions {
  */
 export async function runSingleTestAsync(
   context: JobContext,
-  reporter: Reporter,
   options: SingleTestOptions
 ): Promise<SingleTestResult> {
   const {
@@ -41,21 +40,20 @@ export async function runSingleTestAsync(
     targetName: 'test',
     outputFileName: `test-${sessionId}.rbxl`,
     packagePath,
-    reporter,
     packageName,
   });
 
   const scriptContent =
     scriptText ?? (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
 
-  const deployment = await context.deployBuiltPlaceAsync(reporter, {
+  const deployment = await context.deployBuiltPlaceAsync({
     builtPlace,
     packageName,
     packagePath,
   });
 
   try {
-    const result = await context.runScriptAsync(deployment, reporter, {
+    const result = await context.runScriptAsync(deployment, {
       scriptContent,
       packageName,
       timeoutMs,
@@ -67,6 +65,7 @@ export async function runSingleTestAsync(
     return {
       success: result.success && parsed.success,
       logs: parsed.logs,
+      testCounts: parseTestCounts(parsed.logs),
     };
   } finally {
     await context.releaseAsync(deployment);

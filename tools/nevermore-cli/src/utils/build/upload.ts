@@ -33,11 +33,23 @@ export async function uploadPlaceAsync(
   const apiKey = await getApiKeyAsync(args);
 
   reporter?.onPackagePhaseChange(packageName ?? '', 'uploading');
+
+  const onProgress = reporter && packageName
+    ? (transferred: number, total: number) => {
+        reporter.onPackageProgressUpdate(packageName, {
+          kind: 'bytes',
+          transferredBytes: transferred,
+          totalBytes: total,
+        });
+      }
+    : undefined;
+
   const version = await client.uploadPlaceAsync(
     target.universeId,
     target.placeId,
     rbxlPath,
-    args.publish
+    args.publish,
+    onProgress
   );
 
   return { client, apiKey, target, version };

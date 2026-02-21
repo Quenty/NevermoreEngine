@@ -1,4 +1,3 @@
-import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import { type BuildPlaceOptions, type BuiltPlace } from '../build/build.js';
 
 export type { BuiltPlace } from '../build/build.js';
@@ -32,10 +31,10 @@ export interface JobContext {
   buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace>;
 
   /** Deploy a built place to the execution environment. Returns a handle for subsequent operations. */
-  deployBuiltPlaceAsync(reporter: Reporter, options: DeployPlaceOptions): Promise<Deployment>;
+  deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<Deployment>;
 
   /** Execute a Luau script in a deployed place. */
-  runScriptAsync(deployment: Deployment, reporter: Reporter, options: RunScriptOptions): Promise<ScriptRunResult>;
+  runScriptAsync(deployment: Deployment, options: RunScriptOptions): Promise<ScriptRunResult>;
 
   /** Retrieve raw logs from the most recent script execution on this deployment. */
   getLogsAsync(deployment: Deployment): Promise<string>;
