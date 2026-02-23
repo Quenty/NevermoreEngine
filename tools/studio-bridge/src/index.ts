@@ -19,6 +19,42 @@ export type {
 } from './server/studio-bridge-server.js';
 export type { OutputLevel } from './server/web-socket-protocol.js';
 
+// Bridge network layer (persistent sessions)
+export {
+  BridgeConnection,
+  BridgeSession,
+  SessionNotFoundError,
+  ActionTimeoutError,
+  SessionDisconnectedError,
+  CapabilityNotSupportedError,
+  ContextNotFoundError,
+  HostUnreachableError,
+} from './bridge/index.js';
+
+export type {
+  BridgeConnectionOptions,
+  SessionInfo,
+  InstanceInfo,
+  SessionContext,
+  SessionOrigin,
+  ExecResult,
+  StateResult,
+  ScreenshotResult,
+  LogsResult,
+  DataModelResult,
+  LogEntry,
+  LogOptions,
+  QueryDataModelOptions,
+  LogFollowOptions,
+} from './bridge/index.js';
+
+export type {
+  Capability,
+  StudioState,
+  SubscribableEvent,
+  DataModelInstance,
+} from './server/web-socket-protocol.js';
+
 // Lower-level exports for advanced usage / testing
 export {
   findStudioPathAsync,
