@@ -9,3 +9,4 @@ export { serveHandlerAsync, type ServeOptions, type ServeResult } from './serve.
 export { installPluginHandlerAsync, type InstallPluginResult } from './install-plugin.js';
 export { uninstallPluginHandlerAsync, type UninstallPluginResult } from './uninstall-plugin.js';
 export { queryStateHandlerAsync, type StateResult } from './state.js';
+export { queryLogsHandlerAsync, type LogsResult, type LogsOptions } from './logs.js';
