@@ -15,3 +15,5 @@ export { queryDataModelHandlerAsync, type QueryResult, type QueryOptions, type D
 export { execHandlerAsync, type ExecOptions, type ExecResult } from './exec.js';
 export { runHandlerAsync, type RunOptions, type RunResult } from './run.js';
 export { launchHandlerAsync, type LaunchOptions, type LaunchResult } from './launch.js';
+export { connectHandlerAsync, type ConnectOptions, type ConnectResult } from './connect.js';
+export { disconnectHandler, type DisconnectResult } from './disconnect.js';

@@ -1,6 +1,10 @@
 /**
  * Terminal mode for studio-bridge — keeps Studio alive and provides
  * an interactive REPL for executing Luau scripts repeatedly.
+ *
+ * Dot-commands (.state, .screenshot, .logs, .query, .sessions, .connect,
+ * .disconnect) dispatch to the shared command handlers in src/commands/
+ * via the TerminalDotCommands adapter.
  */
 
 import * as fs from 'fs/promises';
@@ -11,6 +15,7 @@ import {
   type StudioBridgePhase,
 } from '../../../server/studio-bridge-server.js';
 import { TerminalEditor } from './terminal-editor.js';
+import { TerminalDotCommands } from './terminal-dot-commands.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -121,8 +126,14 @@ export async function runTerminalMode(
     console.log('');
   }
 
+  // Set up dot-command dispatcher for bridge commands
+  const dotCommands = new TerminalDotCommands();
+
   // Enter REPL
-  const editor = new TerminalEditor();
+  const editor = new TerminalEditor({
+    isExternalCommand: (cmd) => dotCommands.isBridgeCommand(cmd),
+    helpText: dotCommands.generateHelpText(),
+  });
 
   const cleanup = async () => {
     editor.stop();
@@ -133,6 +144,22 @@ export async function runTerminalMode(
 
   editor.on('exit', () => {
     cleanup();
+  });
+
+  editor.on('dot-command', async (input: string) => {
+    try {
+      const result = await dotCommands.dispatchAsync(input);
+      if (result.error) {
+        console.log(`${RED}${result.error}${RESET}`);
+      } else if (result.output) {
+        console.log(result.output);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.log(`${RED}Error: ${msg}${RESET}`);
+    }
+    console.log('');
+    editor._render();
   });
 
   editor.on('submit', async (buffer: string) => {
