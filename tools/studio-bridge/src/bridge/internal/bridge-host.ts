@@ -31,6 +31,14 @@ export interface PluginSessionInfo {
   pluginVersion?: string;
   capabilities: Capability[];
   protocolVersion: number;
+  /** Instance ID from v2 register. Only present for v2 handshakes. */
+  instanceId?: string;
+  /** Place name from v2 register. */
+  placeName?: string;
+  /** Studio state from v2 register. */
+  state?: string;
+  /** Place file from v2 register. */
+  placeFile?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -167,6 +175,10 @@ export class BridgeHost extends EventEmitter {
           pluginVersion,
           capabilities,
           protocolVersion,
+          instanceId: msg.payload.instanceId,
+          placeName: msg.payload.placeName,
+          state: msg.payload.state,
+          placeFile: msg.payload.placeFile,
         });
       }
     };

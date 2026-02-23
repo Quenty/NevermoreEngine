@@ -359,41 +359,25 @@ export class BridgeConnection extends EventEmitter {
 
     // Wire BridgeHost plugin events to the session tracker
     this._host.on('plugin-connected', (info) => {
+      // Derive context from Studio state
+      const state = info.state ?? 'Edit';
+      const context = BridgeConnection._deriveContext(state);
+
       // Build SessionInfo from PluginSessionInfo
       const sessionInfo: SessionInfo = {
         sessionId: info.sessionId,
-        placeName: '',
-        state: 'Edit',
+        placeName: info.placeName ?? '',
+        placeFile: info.placeFile,
+        state: state as SessionInfo['state'],
         pluginVersion: info.pluginVersion ?? '',
         capabilities: info.capabilities,
         connectedAt: new Date(),
         origin: 'user',
-        context: 'edit',
-        instanceId: info.sessionId, // fallback
+        context,
+        instanceId: info.instanceId ?? info.sessionId,
         placeId: 0,
         gameId: 0,
       };
-
-      // Extract extended v2 register fields if present
-      const extended = info as Record<string, unknown>;
-      if (typeof extended.instanceId === 'string') {
-        sessionInfo.instanceId = extended.instanceId;
-      }
-      if (typeof extended.placeName === 'string') {
-        sessionInfo.placeName = extended.placeName;
-      }
-      if (typeof extended.state === 'string') {
-        sessionInfo.state = extended.state as SessionInfo['state'];
-      }
-      if (typeof extended.context === 'string') {
-        sessionInfo.context = extended.context as SessionContext;
-      }
-      if (typeof extended.placeId === 'number') {
-        sessionInfo.placeId = extended.placeId;
-      }
-      if (typeof extended.gameId === 'number') {
-        sessionInfo.gameId = extended.gameId;
-      }
 
       const handle = new HostStubTransportHandle();
       this._hostHandles.set(info.sessionId, handle);
@@ -436,6 +420,22 @@ export class BridgeConnection extends EventEmitter {
     const host = remoteHost ? remoteHost.split(':')[0] : undefined;
     await this._client.connectAsync(port, host);
     this._isConnected = true;
+  }
+
+  // -----------------------------------------------------------------------
+  // Private: Context derivation
+  // -----------------------------------------------------------------------
+
+  /**
+   * Derive the session context from the Studio state reported by the plugin.
+   * - 'Server' state -> 'server' context
+   * - 'Client' state -> 'client' context
+   * - Everything else -> 'edit' context
+   */
+  private static _deriveContext(state: string): SessionContext {
+    if (state === 'Server') return 'server';
+    if (state === 'Client') return 'client';
+    return 'edit';
   }
 
   // -----------------------------------------------------------------------
