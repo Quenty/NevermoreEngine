@@ -30,6 +30,7 @@ import { LogsCommand } from './commands/logs-command.js';
 import { ScreenshotCommand } from './commands/screenshot-command.js';
 import { QueryCommand } from './commands/query-command.js';
 import { LaunchCommand } from './commands/launch-command.js';
+import { McpCommand } from './commands/mcp-command.js';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Studio Bridge',
@@ -101,6 +102,7 @@ yargs(hideBin(process.argv))
   .command(new ScreenshotCommand() as any)
   .command(new QueryCommand() as any)
   .command(new LaunchCommand() as any)
+  .command(new McpCommand() as any)
   .recommendCommands()
   .demandCommand(
     1,

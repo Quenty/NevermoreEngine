@@ -15,6 +15,7 @@
     "studio-bridge": "./dist/src/cli/cli.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "@quenty/cli-output-helpers": "workspace:*",
     "@quenty/nevermore-cli-helpers": "workspace:*",
     "@quenty/nevermore-template-helpers": "workspace:*",

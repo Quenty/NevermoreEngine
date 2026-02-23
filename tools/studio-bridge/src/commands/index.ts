@@ -17,3 +17,4 @@ export { runHandlerAsync, type RunOptions, type RunResult } from './run.js';
 export { launchHandlerAsync, type LaunchOptions, type LaunchResult } from './launch.js';
 export { connectHandlerAsync, type ConnectOptions, type ConnectResult } from './connect.js';
 export { disconnectHandler, type DisconnectResult } from './disconnect.js';
+export { mcpHandlerAsync, type McpResult } from './mcp.js';
