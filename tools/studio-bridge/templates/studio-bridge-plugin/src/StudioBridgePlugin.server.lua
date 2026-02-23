@@ -69,7 +69,16 @@ end
 -- ---------------------------------------------------------------------------
 
 local router = ActionRouter.new()
-router:register("execute", ExecuteAction)
+
+-- Wire outgoing messages (set after WebSocket is connected)
+local sendMessageFn = nil
+
+-- Register action handlers
+ExecuteAction.register(router, function(msg)
+	if sendMessageFn then
+		sendMessageFn(msg)
+	end
+end)
 
 local logBuffer = MessageBuffer.new(1000)
 local connected = false
@@ -87,6 +96,13 @@ local LEVEL_MAP = {
 
 local function wireConnection(ws, sessionId)
 	connected = true
+
+	-- Wire the sendMessage callback for action handlers
+	sendMessageFn = function(msg)
+		pcall(function()
+			ws:Send(jsonEncode(msg))
+		end)
+	end
 
 	-- Send register message
 	ws:Send(jsonEncode({

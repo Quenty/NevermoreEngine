@@ -4,46 +4,174 @@
 	Compiles and runs Luau code received from the server, returning a
 	scriptComplete response on success or an error response on failure.
 
+	Supports:
+	  - requestId correlation: if present in the request, echoed in all
+	    response messages (scriptComplete and output).
+	  - Distinct error codes: SCRIPT_LOAD_ERROR, SCRIPT_RUNTIME_ERROR.
+	  - Sequential queueing: concurrent execute requests are processed
+	    one at a time in FIFO order.
+
 	This module has no Roblox dependencies and is testable under Lune.
 ]]
+
+local ExecuteAction = {}
+
+-- ---------------------------------------------------------------------------
+-- Internal queue for sequential execution
+-- ---------------------------------------------------------------------------
+
+local _queue: { { payload: { [string]: any }, requestId: string?, sessionId: string, sendMessage: ((msg: { [string]: any }) -> ())? } } = {}
+local _processing = false
+
+-- ---------------------------------------------------------------------------
+-- Core execution logic
+-- ---------------------------------------------------------------------------
 
 --[=[
 	Handle an execute request by compiling and running the provided code.
 
-	@param payload Table with a `code` field containing the Luau source to execute.
-	@param requestId The request ID to echo back in the response.
-	@param _sessionId The session ID (unused by this handler).
-	@return Response payload table with `success = true`, or nil to let the
-	        ActionRouter wrap it. Returns an error table when code is missing
-	        or compilation/runtime fails.
+	@param payload Table with a `code` field containing the Luau source.
+	@param requestId The request ID to echo (may be nil or "" for v1 mode).
+	@param sessionId The session ID for response messages.
+	@param sendMessage Optional callback to send messages directly.
+	@return Payload table with success/error info, or nil if sent via sendMessage.
 ]=]
-local function handleExecute(
+function ExecuteAction._handleExecute(
 	payload: { [string]: any },
-	requestId: string,
-	_sessionId: string
+	requestId: string?,
+	sessionId: string,
+	sendMessage: ((msg: { [string]: any }) -> ())?
 ): { [string]: any }?
 	local code = payload and payload.code
 
+	-- Normalize requestId: treat empty string as absent (v1 compatibility)
+	local effectiveRequestId: string? = nil
+	if requestId ~= nil and requestId ~= "" then
+		effectiveRequestId = requestId
+	end
+
+	-- Helper to build response messages with optional requestId
+	local function buildResponse(responsePayload: { [string]: any }): { [string]: any }
+		local msg: { [string]: any } = {
+			type = "scriptComplete",
+			sessionId = sessionId,
+			payload = responsePayload,
+		}
+		if effectiveRequestId then
+			msg.requestId = effectiveRequestId
+		end
+		return msg
+	end
+
+	-- Helper to send or return the result
+	local function sendResult(responsePayload: { [string]: any }): { [string]: any }?
+		if sendMessage then
+			sendMessage(buildResponse(responsePayload))
+			return nil
+		end
+		return responsePayload
+	end
+
 	if not code or type(code) ~= "string" then
-		return { success = false, error = "Missing code in execute request" }
+		return sendResult({ success = false, error = "Missing code in execute request", code = "SCRIPT_LOAD_ERROR" })
 	end
 
 	local compileOk, fnOrErr = pcall(loadstring, code)
 	if not compileOk then
-		return { success = false, error = "Compile error: " .. tostring(fnOrErr) }
+		return sendResult({ success = false, error = tostring(fnOrErr), code = "SCRIPT_LOAD_ERROR" })
 	end
 	if not fnOrErr then
-		return { success = false, error = "Compile error: unknown" }
+		return sendResult({ success = false, error = "Failed to compile script", code = "SCRIPT_LOAD_ERROR" })
 	end
 
 	local fn = fnOrErr
 
 	local success, runtimeError = pcall(fn)
 	if not success then
-		return { success = false, error = "Runtime error: " .. tostring(runtimeError) }
+		return sendResult({ success = false, error = tostring(runtimeError), code = "SCRIPT_RUNTIME_ERROR" })
 	end
 
-	return { success = true }
+	return sendResult({ success = true })
 end
 
-return handleExecute
+-- ---------------------------------------------------------------------------
+-- Queue processing
+-- ---------------------------------------------------------------------------
+
+local function _processQueue()
+	if _processing then
+		return
+	end
+	_processing = true
+
+	while #_queue > 0 do
+		local item = table.remove(_queue, 1)
+		ExecuteAction._handleExecute(
+			item.payload,
+			item.requestId,
+			item.sessionId,
+			item.sendMessage
+		)
+	end
+
+	_processing = false
+end
+
+-- ---------------------------------------------------------------------------
+-- Public API
+-- ---------------------------------------------------------------------------
+
+--[=[
+	Register this handler with the ActionRouter. When sendMessage is
+	provided, the handler sends scriptComplete messages directly and
+	returns nil to the router (so the router does not wrap the result).
+	Concurrent requests are queued and processed sequentially.
+
+	@param router The ActionRouter instance.
+	@param sendMessage Callback to send messages to the server.
+]=]
+function ExecuteAction.register(router: any, sendMessage: ((msg: { [string]: any }) -> ())?)
+	router:register("execute", function(payload: { [string]: any }, requestId: string, sessionId: string)
+		if sendMessage then
+			-- Queue the request for sequential processing
+			table.insert(_queue, {
+				payload = payload,
+				requestId = requestId,
+				sessionId = sessionId,
+				sendMessage = sendMessage,
+			})
+			_processQueue()
+			-- Return nil so the ActionRouter does not generate a response
+			return nil
+		else
+			-- Direct mode (no sendMessage): return payload for ActionRouter wrapping
+			return ExecuteAction._handleExecute(payload, requestId, sessionId, nil)
+		end
+	end)
+end
+
+--[=[
+	Handle an execute request directly (for testing without ActionRouter).
+
+	@param payload Table with a `code` field.
+	@param requestId The request ID (may be nil for v1 mode).
+	@param sessionId The session ID.
+	@return Payload table with success/error info.
+]=]
+function ExecuteAction.handleExecute(
+	payload: { [string]: any },
+	requestId: string?,
+	sessionId: string
+): { [string]: any }?
+	return ExecuteAction._handleExecute(payload, requestId, sessionId, nil)
+end
+
+--[=[
+	Reset the internal queue state (for testing).
+]=]
+function ExecuteAction._resetQueue()
+	_queue = {}
+	_processing = false
+end
+
+return ExecuteAction

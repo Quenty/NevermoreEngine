@@ -230,7 +230,7 @@ table.insert(tests, {
 table.insert(tests, {
 	name = "ExecuteAction: successful execution returns success",
 	fn = function()
-		local result = ExecuteAction({ code = "local x = 1 + 1" }, "req-1", "sess-1")
+		local result = ExecuteAction.handleExecute({ code = "local x = 1 + 1" }, "req-1", "sess-1")
 		assertNotNil(result)
 		assertTrue(result.success, "should succeed")
 	end,
@@ -239,7 +239,7 @@ table.insert(tests, {
 table.insert(tests, {
 	name = "ExecuteAction: missing code returns error",
 	fn = function()
-		local result = ExecuteAction({}, "req-2", "sess-2")
+		local result = ExecuteAction.handleExecute({}, "req-2", "sess-2")
 		assertNotNil(result)
 		assertFalse(result.success, "should fail")
 		assertContains(result.error, "Missing code")
@@ -249,7 +249,7 @@ table.insert(tests, {
 table.insert(tests, {
 	name = "ExecuteAction: nil payload code returns error",
 	fn = function()
-		local result = ExecuteAction({ code = nil }, "req-3", "sess-3")
+		local result = ExecuteAction.handleExecute({ code = nil }, "req-3", "sess-3")
 		assertNotNil(result)
 		assertFalse(result.success, "should fail")
 		assertContains(result.error, "Missing code")
@@ -259,20 +259,20 @@ table.insert(tests, {
 table.insert(tests, {
 	name = "ExecuteAction: compile error returns error with details",
 	fn = function()
-		local result = ExecuteAction({ code = "local x = (" }, "req-4", "sess-4")
+		local result = ExecuteAction.handleExecute({ code = "local x = (" }, "req-4", "sess-4")
 		assertNotNil(result)
 		assertFalse(result.success, "should fail")
-		assertContains(result.error, "Compile error")
+		assertEqual(result.code, "SCRIPT_LOAD_ERROR")
 	end,
 })
 
 table.insert(tests, {
 	name = "ExecuteAction: runtime error returns error with details",
 	fn = function()
-		local result = ExecuteAction({ code = "error('boom')" }, "req-5", "sess-5")
+		local result = ExecuteAction.handleExecute({ code = "error('boom')" }, "req-5", "sess-5")
 		assertNotNil(result)
 		assertFalse(result.success, "should fail")
-		assertContains(result.error, "Runtime error")
+		assertEqual(result.code, "SCRIPT_RUNTIME_ERROR")
 		assertContains(result.error, "boom")
 	end,
 })
@@ -280,7 +280,7 @@ table.insert(tests, {
 table.insert(tests, {
 	name = "ExecuteAction: non-string code returns error",
 	fn = function()
-		local result = ExecuteAction({ code = 42 }, "req-6", "sess-6")
+		local result = ExecuteAction.handleExecute({ code = 42 }, "req-6", "sess-6")
 		assertNotNil(result)
 		assertFalse(result.success, "should fail")
 		assertContains(result.error, "Missing code")
@@ -295,7 +295,7 @@ table.insert(tests, {
 	name = "ActionRouter + ExecuteAction: dispatches execute and returns scriptComplete",
 	fn = function()
 		local router = ActionRouter.new()
-		router:register("execute", ExecuteAction)
+		ExecuteAction.register(router)
 
 		local response = router:dispatch({
 			type = "execute",
@@ -316,7 +316,7 @@ table.insert(tests, {
 	name = "ActionRouter + ExecuteAction: compile error dispatched as scriptComplete with failure",
 	fn = function()
 		local router = ActionRouter.new()
-		router:register("execute", ExecuteAction)
+		ExecuteAction.register(router)
 
 		local response = router:dispatch({
 			type = "execute",
@@ -328,7 +328,7 @@ table.insert(tests, {
 		assertNotNil(response)
 		assertEqual(response.type, "scriptComplete")
 		assertFalse(response.payload.success)
-		assertContains(response.payload.error, "Compile error")
+		assertEqual(response.payload.code, "SCRIPT_LOAD_ERROR")
 	end,
 })
 
@@ -336,7 +336,7 @@ table.insert(tests, {
 	name = "ActionRouter + ExecuteAction: runtime error dispatched as scriptComplete with failure",
 	fn = function()
 		local router = ActionRouter.new()
-		router:register("execute", ExecuteAction)
+		ExecuteAction.register(router)
 
 		local response = router:dispatch({
 			type = "execute",
@@ -348,7 +348,7 @@ table.insert(tests, {
 		assertNotNil(response)
 		assertEqual(response.type, "scriptComplete")
 		assertFalse(response.payload.success)
-		assertContains(response.payload.error, "Runtime error")
+		assertEqual(response.payload.code, "SCRIPT_RUNTIME_ERROR")
 		assertContains(response.payload.error, "test failure")
 	end,
 })
