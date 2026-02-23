@@ -27,6 +27,7 @@ import { UninstallPluginCommand } from './commands/uninstall-plugin-command.js';
 import { StateCommand } from './commands/state-command.js';
 import { LogsCommand } from './commands/logs-command.js';
 import { ScreenshotCommand } from './commands/screenshot-command.js';
+import { QueryCommand } from './commands/query-command.js';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Studio Bridge',
@@ -96,6 +97,7 @@ yargs(hideBin(process.argv))
   .command(new StateCommand() as any)
   .command(new LogsCommand() as any)
   .command(new ScreenshotCommand() as any)
+  .command(new QueryCommand() as any)
   .recommendCommands()
   .demandCommand(
     1,
