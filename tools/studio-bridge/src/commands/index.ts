@@ -10,3 +10,4 @@ export { installPluginHandlerAsync, type InstallPluginResult } from './install-p
 export { uninstallPluginHandlerAsync, type UninstallPluginResult } from './uninstall-plugin.js';
 export { queryStateHandlerAsync, type StateResult } from './state.js';
 export { queryLogsHandlerAsync, type LogsResult, type LogsOptions } from './logs.js';
+export { captureScreenshotHandlerAsync, type ScreenshotResult, type ScreenshotOptions } from './screenshot.js';
