@@ -21,9 +21,12 @@ import {
 import {
   type OutputLevel,
   type Capability,
+  type PluginMessage,
+  type ServerMessage,
   encodeMessage,
   decodePluginMessage,
 } from './web-socket-protocol.js';
+import { ActionDispatcher } from './action-dispatcher.js';
 import {
   injectPluginAsync,
   type InjectedPlugin,
@@ -115,6 +118,20 @@ function startWsServerAsync(wss: WebSocketServer): Promise<number> {
   });
 }
 
+/**
+ * Maps action types to the capability required to perform them.
+ * Used by performActionAsync to validate the plugin supports the action.
+ */
+const ACTION_CAPABILITIES: Record<string, Capability> = {
+  queryState: 'queryState',
+  captureScreenshot: 'captureScreenshot',
+  queryDataModel: 'queryDataModel',
+  queryLogs: 'queryLogs',
+  subscribe: 'subscribe',
+  unsubscribe: 'subscribe',
+  execute: 'execute',
+};
+
 export class StudioBridgeServer {
   private _state: BridgeState = 'idle';
 
@@ -132,6 +149,7 @@ export class StudioBridgeServer {
   private _negotiatedProtocolVersion: number = 1;
   private _negotiatedCapabilities: Capability[] = ['execute'];
   private _lastHeartbeatTimestamp: number | undefined;
+  private _actionDispatcher = new ActionDispatcher();
 
   constructor(options: StudioBridgeServerOptions = {}) {
     this._sessionId = options.sessionId ?? randomUUID();
@@ -152,6 +170,59 @@ export class StudioBridgeServer {
   /** The negotiated set of capabilities shared between plugin and server. */
   get capabilities(): readonly Capability[] {
     return this._negotiatedCapabilities;
+  }
+
+  // -----------------------------------------------------------------------
+  // v2 action dispatch
+  // -----------------------------------------------------------------------
+
+  /**
+   * Send a v2 protocol action to the connected plugin and wait for the
+   * correlated response. Requires protocol version >= 2 and the relevant
+   * capability to be negotiated.
+   *
+   * This is the v2 path -- the v1 `executeAsync` is unchanged.
+   */
+  async performActionAsync<T extends PluginMessage>(
+    message: Omit<ServerMessage, 'requestId' | 'sessionId'>,
+    timeoutMs?: number,
+  ): Promise<T> {
+    if (this._state !== 'ready') {
+      throw new Error(
+        `Cannot perform action: expected state 'ready', got '${this._state}'`,
+      );
+    }
+    if (!this._connectedClient) {
+      throw new Error('Cannot perform action: no connected client');
+    }
+    if (this._negotiatedProtocolVersion < 2) {
+      throw new Error('Plugin does not support v2 actions');
+    }
+
+    // Validate capability
+    const actionType = message.type;
+    const requiredCapability = ACTION_CAPABILITIES[actionType];
+    if (
+      requiredCapability &&
+      !this._negotiatedCapabilities.includes(requiredCapability)
+    ) {
+      throw new Error(`Plugin does not support capability: ${requiredCapability}`);
+    }
+
+    const { requestId, responsePromise } = this._actionDispatcher.createRequestAsync(
+      actionType,
+      timeoutMs,
+    );
+
+    const fullMessage: ServerMessage = {
+      ...message,
+      requestId,
+      sessionId: this._sessionId,
+    } as ServerMessage;
+
+    this._connectedClient.send(encodeMessage(fullMessage));
+
+    return responsePromise as Promise<T>;
   }
 
   // -----------------------------------------------------------------------
@@ -477,11 +548,20 @@ export class StudioBridgeServer {
   ): void {
     this._connectedClient = ws;
 
-    // Listen for heartbeat messages (silently update timestamp)
+    // Listen for all post-handshake messages: route through action dispatcher
+    // first, then handle heartbeats and other messages.
     ws.on('message', (raw: Buffer | string) => {
       const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
       const msg = decodePluginMessage(data);
-      if (msg && msg.type === 'heartbeat') {
+      if (!msg) return;
+
+      // Try action dispatcher first (v2 request/response correlation)
+      if (this._actionDispatcher.handleResponse(msg)) {
+        return;
+      }
+
+      // Heartbeat handling
+      if (msg.type === 'heartbeat') {
         this._lastHeartbeatTimestamp = Date.now();
       }
     });
@@ -615,6 +695,9 @@ export class StudioBridgeServer {
   // -----------------------------------------------------------------------
 
   private async _cleanupResourcesAsync(): Promise<void> {
+    // Cancel all pending v2 action requests
+    this._actionDispatcher.cancelAll('Server shutting down');
+
     // Kill Studio
     if (this._studioProc) {
       await this._studioProc.killAsync();
