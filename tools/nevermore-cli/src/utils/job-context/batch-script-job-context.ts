@@ -23,6 +23,7 @@ import {
 } from '../build/deploy-config.js';
 import { type TargetPackage } from '../batch/changed-packages-utils.js';
 import {
+  type CombinedBuildProgress,
   type CombinedProjectResult,
   generateCombinedProjectAsync,
 } from '../testing/runner/combined-project-generator.js';
@@ -57,6 +58,7 @@ export class BatchScriptJobContext implements JobContext {
   private _batchPlaceId?: number;
   private _batchUniverseId?: number;
   private _perPackageTimeoutMs: number;
+  private _reporter?: Reporter;
 
   // Lazy-promise state
   private _combinedBuildPromise?: Promise<CombinedBuildState>;
@@ -76,6 +78,7 @@ export class BatchScriptJobContext implements JobContext {
       batchPlaceId?: number;
       batchUniverseId?: number;
       perPackageTimeoutMs?: number;
+      reporter?: Reporter;
     }
   ) {
     this._inner = inner;
@@ -84,6 +87,7 @@ export class BatchScriptJobContext implements JobContext {
     this._batchPlaceId = options?.batchPlaceId;
     this._batchUniverseId = options?.batchUniverseId;
     this._perPackageTimeoutMs = options?.perPackageTimeoutMs ?? 120_000;
+    this._reporter = options?.reporter;
   }
 
   async buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace> {
@@ -109,17 +113,15 @@ export class BatchScriptJobContext implements JobContext {
   }
 
   async deployBuiltPlaceAsync(
-    reporter: Reporter,
     options: DeployPlaceOptions
   ): Promise<Deployment> {
-    const innerDeployment = await this._getSharedDeploymentAsync(reporter);
+    const innerDeployment = await this._getSharedDeploymentAsync();
 
     return new BatchDeployment(options.packageName, innerDeployment);
   }
 
   async runScriptAsync(
     deployment: Deployment,
-    _reporter: Reporter,
     options: RunScriptOptions
   ): Promise<ScriptRunResult> {
     const batchDeployment = deployment as BatchDeployment;
@@ -183,11 +185,42 @@ export class BatchScriptJobContext implements JobContext {
   private async _doCombinedBuildAsync(): Promise<CombinedBuildState> {
     OutputHelper.verbose('Building combined batch place...');
 
+    // Set all packages to "waiting" — they're queued for building
+    if (this._reporter) {
+      for (const pkg of this._packages) {
+        this._reporter.onPackagePhaseChange(pkg.name, 'waiting');
+      }
+    }
+
+    const progress: CombinedBuildProgress = {
+      onPackageBuildStart: (name) => {
+        this._reporter?.onPackagePhaseChange(name, 'building');
+      },
+      onPackageBuildComplete: (name) => {
+        this._reporter?.onPackagePhaseChange(name, 'waiting');
+      },
+      onCombineStart: () => {
+        if (this._reporter) {
+          for (const pkg of this._packages) {
+            this._reporter.onPackagePhaseChange(pkg.name, 'combining');
+          }
+        }
+      },
+      onStepProgress: (stepProgress) => {
+        if (this._reporter) {
+          for (const pkg of this._packages) {
+            this._reporter.onPackageProgressUpdate(pkg.name, stepProgress);
+          }
+        }
+      },
+    };
+
     const combinedResult = await generateCombinedProjectAsync({
       packages: this._packages,
       repoRoot: this._repoRoot,
       batchPlaceId: this._batchPlaceId,
       batchUniverseId: this._batchUniverseId,
+      progress,
     });
 
     this._combinedBuildContext = combinedResult.buildContext;
@@ -195,26 +228,23 @@ export class BatchScriptJobContext implements JobContext {
     return { combinedResult, rbxlPath: combinedResult.rbxlPath };
   }
 
-  private _getSharedDeploymentAsync(reporter?: Reporter): Promise<Deployment> {
+  private _getSharedDeploymentAsync(): Promise<Deployment> {
     if (!this._deployPromise) {
-      this._deployPromise = this._doSharedDeployAsync(reporter);
+      this._deployPromise = this._doSharedDeployAsync();
     }
     return this._deployPromise;
   }
 
-  private async _doSharedDeployAsync(reporter?: Reporter): Promise<Deployment> {
+  private async _doSharedDeployAsync(): Promise<Deployment> {
     const buildState = await this._getCombinedBuildAsync();
     const { primaryTarget } = buildState.combinedResult;
-
-    // Create a minimal reporter that doesn't emit per-package phases
-    const batchReporter = reporter ?? _noopReporter();
 
     const builtPlace: BuiltPlace = {
       rbxlPath: buildState.rbxlPath,
       target: primaryTarget,
     };
 
-    const deployment = await this._inner.deployBuiltPlaceAsync(batchReporter, {
+    const deployment = await this._inner.deployBuiltPlaceAsync({
       builtPlace,
       packageName: '_batch_',
       packagePath: this._repoRoot,
@@ -265,7 +295,6 @@ export class BatchScriptJobContext implements JobContext {
 
     const result = await this._inner.runScriptAsync(
       deployment,
-      _noopReporter(),
       {
         scriptContent: batchScript,
         packageName: '_batch_',
@@ -286,14 +315,4 @@ export class BatchScriptJobContext implements JobContext {
     // Parse into per-package results
     return parseBatchTestLogs(rawLogs, slugMap);
   }
-}
-
-function _noopReporter(): Reporter {
-  return {
-    onPackageStart: () => {},
-    onPackagePhaseChange: () => {},
-    onPackageResult: () => {},
-    startAsync: async () => {},
-    stopAsync: async () => {},
-  };
 }

@@ -1,6 +1,7 @@
 import { OutputHelper } from '../outputHelper.js';
 import { type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
+import { formatProgressResult } from './progress-format.js';
 
 export interface SimpleReporterOptions {
   alwaysShowLogs: boolean;
@@ -37,8 +38,10 @@ export class SimpleReporter extends BaseReporter {
       OutputHelper.info('(no output)');
     }
 
+    const progressText = formatProgressResult(result.progressSummary);
     if (result.success) {
-      OutputHelper.info(this._successMessage);
+      const msg = progressText ? `${this._successMessage} ${progressText}` : this._successMessage;
+      OutputHelper.info(msg);
     } else {
       OutputHelper.error(this._failureMessage);
     }

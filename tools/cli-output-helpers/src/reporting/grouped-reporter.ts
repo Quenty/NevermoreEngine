@@ -2,6 +2,7 @@ import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs, isCI } from '../cli-utils.js';
 import { type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
+import { formatProgressResult, isEmptyTestRun } from './progress-format.js';
 
 export interface GroupedReporterOptions {
   showLogs: boolean;
@@ -72,16 +73,26 @@ export class GroupedReporter extends BaseReporter {
     const successLabel = this._options.successLabel ?? 'Passed';
     const failureLabel = this._options.failureLabel ?? 'FAILED';
 
+    const progressText = formatProgressResult(result.progressSummary);
+    const empty = isEmptyTestRun(result.progressSummary);
+
     if (result.success) {
+      const label = progressText ? `${successLabel} ${progressText}` : successLabel;
+      const formatted = empty
+        ? OutputHelper.formatWarning(`${label} ⚠`)
+        : OutputHelper.formatSuccess(label);
+      const icon = empty ? OutputHelper.formatWarning('⚠') : OutputHelper.formatSuccess('✓');
       console.log(
-        `  ${OutputHelper.formatSuccess('✓')} ${OutputHelper.formatSuccess(
-          successLabel
-        )} ${OutputHelper.formatDim(`(${duration})`)}`
+        `  ${icon} ${formatted} ${OutputHelper.formatDim(`(${duration})`)}`
       );
     } else {
+      const failedPhase = result.failedPhase;
+      const label = failedPhase
+        ? `${failureLabel} at ${failedPhase}`
+        : failureLabel;
       console.log(
         `  ${OutputHelper.formatError('✗')} ${OutputHelper.formatError(
-          failureLabel
+          label
         )} ${OutputHelper.formatDim(`(${duration})`)}`
       );
     }

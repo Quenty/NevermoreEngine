@@ -1,4 +1,4 @@
-import { type PackageResult, type JobPhase, BaseReporter } from '../reporter.js';
+import { type PackageResult, type PackageStatus, type JobPhase, type ProgressSummary, BaseReporter } from '../reporter.js';
 import { type IStateTracker, type PackageState } from './state-tracker.js';
 
 export type { PackageState } from './state-tracker.js';
@@ -54,6 +54,10 @@ export class LiveStateTracker
     return this._failures;
   }
 
+  getCurrentPhase(name: string): PackageStatus | undefined {
+    return this._packages.get(name)?.status;
+  }
+
   override async startAsync(): Promise<void> {
     this._startTimeMs = Date.now();
   }
@@ -68,7 +72,15 @@ export class LiveStateTracker
   override onPackagePhaseChange(name: string, phase: JobPhase): void {
     const state = this._packages.get(name);
     if (!state) return;
+    if (state.status === 'passed' || state.status === 'failed') return; // don't regress terminal states
     state.status = phase;
+    state.progress = undefined; // clear progress on phase transition
+  }
+
+  override onPackageProgressUpdate(name: string, progress: ProgressSummary): void {
+    const state = this._packages.get(name);
+    if (!state) return;
+    state.progress = progress;
   }
 
   override onPackageResult(
@@ -82,6 +94,9 @@ export class LiveStateTracker
     state.durationMs = result.durationMs;
     state.result = result;
     state.bufferedOutput = bufferedOutput;
+    if (result.progressSummary) {
+      state.progress = result.progressSummary;
+    }
     this._completed++;
 
     this._allResults.push(result);

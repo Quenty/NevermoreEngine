@@ -1,4 +1,4 @@
-import { type PackageResult, type Reporter, type JobPhase } from './reporter.js';
+import { type PackageResult, type Reporter, type JobPhase, type ProgressSummary } from './reporter.js';
 import { LiveStateTracker } from './state/live-state-tracker.js';
 
 /**
@@ -19,6 +19,10 @@ export class CompositeReporter implements Reporter {
     this._reporters = factory(this._state);
   }
 
+  get state(): LiveStateTracker {
+    return this._state;
+  }
+
   async startAsync(): Promise<void> {
     await this._state.startAsync();
     for (const r of this._reporters) {
@@ -37,6 +41,13 @@ export class CompositeReporter implements Reporter {
     this._state.onPackagePhaseChange(packageName, phase);
     for (const r of this._reporters) {
       r.onPackagePhaseChange(packageName, phase);
+    }
+  }
+
+  onPackageProgressUpdate(packageName: string, progress: ProgressSummary): void {
+    this._state.onPackageProgressUpdate(packageName, progress);
+    for (const r of this._reporters) {
+      r.onPackageProgressUpdate(packageName, progress);
     }
   }
 

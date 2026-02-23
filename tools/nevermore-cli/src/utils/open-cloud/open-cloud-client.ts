@@ -106,7 +106,8 @@ export class OpenCloudClient {
     universeId: number,
     placeId: number,
     rbxlPath: string,
-    publish?: boolean
+    publish?: boolean,
+    onProgress?: (transferredBytes: number, totalBytes: number) => void
   ): Promise<number> {
     OutputHelper.verbose(
       `Uploading to https://www.roblox.com/games/${placeId}/place ...`
@@ -114,19 +115,50 @@ export class OpenCloudClient {
 
     const apiKey = await this._resolveApiKeyAsync();
     const fileBuffer = await fs.readFile(rbxlPath);
-    const body = new Uint8Array(fileBuffer);
+    const totalBytes = fileBuffer.length;
     const versionType = publish ? 'Published' : 'Saved';
     const url = `https://apis.roblox.com/universes/v1/${universeId}/places/${placeId}/versions?versionType=${versionType}`;
 
-    const response = await this._rateLimiter.fetchAsync(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/octet-stream',
-        Accept: 'application/json',
-        'X-API-Key': apiKey,
-      },
-      body,
-    });
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/octet-stream',
+      Accept: 'application/json',
+      'X-API-Key': apiKey,
+    };
+
+    let response: Response;
+
+    if (onProgress) {
+      // Wrap the buffer in a ReadableStream that reports bytes as each chunk
+      // is consumed by the transport, giving real-time upload progress.
+      const CHUNK_SIZE = 64 * 1024;
+      let offset = 0;
+      const stream = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          if (offset >= totalBytes) {
+            controller.close();
+            return;
+          }
+          const end = Math.min(offset + CHUNK_SIZE, totalBytes);
+          controller.enqueue(fileBuffer.subarray(offset, end));
+          offset = end;
+          onProgress(offset, totalBytes);
+        },
+      });
+
+      // fetch with ReadableStream body requires duplex: 'half' in Node
+      response = await this._rateLimiter.fetchAsync(url, {
+        method: 'POST',
+        headers,
+        body: stream,
+        duplex: 'half',
+      } as RequestInit);
+    } else {
+      response = await this._rateLimiter.fetchAsync(url, {
+        method: 'POST',
+        headers,
+        body: new Uint8Array(fileBuffer),
+      });
+    }
 
     if (!response.ok) {
       const text = await response.text();

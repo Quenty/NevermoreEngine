@@ -84,15 +84,6 @@ for _, slug in packageSlugs do
 	-- the marker in the log stream.
 	RunService.Heartbeat:Wait()
 
-	if testOk then
-		print("===BATCH_TEST_END " .. slug .. " PASS===")
-		table.insert(results, { slug = slug, success = true })
-	else
-		warn("[BatchTest] " .. slug .. ": " .. tostring(testErr))
-		print("===BATCH_TEST_END " .. slug .. " FAIL===")
-		table.insert(results, { slug = slug, success = false, error = tostring(testErr) })
-	end
-
 	-- CLEANUP: restore service state
 	allPackages[slug].Parent = nil
 	for _, c in workspace:GetChildren() do
@@ -118,6 +109,15 @@ for _, slug in packageSlugs do
 	-- time wait, since each frame drains its deferred queue.
 	for _ = 1, 3 do
 		RunService.Heartbeat:Wait()
+	end
+
+	if testOk then
+		print("===BATCH_TEST_END " .. slug .. " PASS===")
+		table.insert(results, { slug = slug, success = true })
+	else
+		warn("[BatchTest] " .. slug .. ": " .. tostring(testErr))
+		print("===BATCH_TEST_END " .. slug .. " FAIL===")
+		table.insert(results, { slug = slug, success = false, error = tostring(testErr) })
 	end
 end
 

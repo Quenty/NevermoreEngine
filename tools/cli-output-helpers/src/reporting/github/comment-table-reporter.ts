@@ -2,6 +2,7 @@ import { isCI } from '../../cli-utils.js';
 import {
   type PackageResult,
   type PackageStatus,
+  type ProgressSummary,
   BaseReporter,
 } from '../reporter.js';
 import { type IStateTracker } from '../state/state-tracker.js';
@@ -83,6 +84,10 @@ export class GithubCommentTableReporter extends BaseReporter {
     _name: string,
     _phase: PackageStatus
   ): void {
+    this._scheduleUpdate();
+  }
+
+  override onPackageProgressUpdate(_name: string, _progress: ProgressSummary): void {
     this._scheduleUpdate();
   }
 

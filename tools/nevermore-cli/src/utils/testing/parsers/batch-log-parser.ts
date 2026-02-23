@@ -1,9 +1,11 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { type ParsedTestCounts, parseTestCounts } from '../test-log-parser.js';
 
 export interface BatchPackageResult {
   slug: string;
   success: boolean;
   logs: string;
+  testCounts?: ParsedTestCounts;
 }
 
 const BEGIN_MARKER = '===BATCH_TEST_BEGIN ';
@@ -136,7 +138,8 @@ export function parseBatchTestLogs(
       );
     }
 
-    results.set(packageName, { slug, success, logs: sectionLogs });
+    const testCounts = sectionLogs ? parseTestCounts(sectionLogs) : undefined;
+    results.set(packageName, { slug, success, logs: sectionLogs, testCounts });
   }
 
   return results;

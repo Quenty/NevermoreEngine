@@ -3,6 +3,7 @@ import {
   type Reporter,
   type PackageResult,
   type BatchSummary,
+  type IStateTracker,
 } from '@quenty/cli-output-helpers/reporting';
 import { type TargetPackage } from './changed-packages-utils.js';
 
@@ -11,6 +12,7 @@ export interface BatchOptions<TResult extends PackageResult> {
   concurrency?: number;
   reporter: Reporter;
   bufferOutput?: boolean;
+  stateTracker?: IStateTracker;
   executeAsync: (
     pkg: TargetPackage,
     reporter: Reporter
@@ -25,6 +27,7 @@ export async function runBatchAsync<TResult extends PackageResult>(
     concurrency = Infinity,
     reporter,
     bufferOutput = false,
+    stateTracker,
     executeAsync,
   } = options;
 
@@ -39,7 +42,7 @@ export async function runBatchAsync<TResult extends PackageResult>(
         const pkg = packages[nextIndex++];
         runningCount++;
 
-        _runOneAsync<TResult>(pkg, executeAsync, reporter, bufferOutput)
+        _runOneAsync<TResult>(pkg, executeAsync, reporter, bufferOutput, stateTracker)
           .then((result) => {
             results.push(result);
           })
@@ -78,7 +81,8 @@ async function _runOneAsync<TResult extends PackageResult>(
     reporter: Reporter
   ) => Promise<Omit<TResult, 'durationMs'>>,
   reporter: Reporter,
-  bufferOutput: boolean
+  bufferOutput: boolean,
+  stateTracker?: IStateTracker
 ): Promise<TResult> {
   reporter.onPackageStart(pkg.name);
   const startMs = Date.now();
@@ -89,12 +93,18 @@ async function _runOneAsync<TResult extends PackageResult>(
       return { ...partial, durationMs: Date.now() - startMs } as TResult;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
+      const currentPhase = stateTracker?.getCurrentPhase(pkg.name);
+      const failedPhase =
+        currentPhase && currentPhase !== 'pending' && currentPhase !== 'passed' && currentPhase !== 'failed'
+          ? currentPhase
+          : undefined;
       return {
         packageName: pkg.name,
         success: false,
         logs: '',
         durationMs: Date.now() - startMs,
         error: errorMessage,
+        failedPhase,
       } as TResult;
     }
   };

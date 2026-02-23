@@ -9,11 +9,14 @@ import { formatDurationMs } from '../../cli-utils.js';
 import {
   type PackageResult,
   type PackageStatus,
+  type ProgressSummary,
+  type JobPhase,
 } from '../reporter.js';
 import {
   type IStateTracker,
   type PackageState,
 } from '../state/state-tracker.js';
+import { formatProgressInline, formatProgressResult, isEmptyTestRun } from '../progress-format.js';
 
 // ── Public types ────────────────────────────────────────────────────────────
 
@@ -62,7 +65,7 @@ export interface GithubTableRow {
  * Summarize an error string for display in compact contexts (tables, etc.).
  * Parses JSON API error bodies and truncates long messages.
  */
-export function summarizeError(error: string): string {
+export function summarizeError(error: string, failedPhase?: JobPhase): string {
   const firstLine = error.split('\n')[0];
 
   // Try to extract JSON error body from API responses
@@ -108,8 +111,13 @@ const RUNNING_PHASE_LABELS: Record<string, string> = {
   executing: '🔄 Executing...',
 };
 
-export function formatRunningStatus(phase: PackageStatus): string {
-  return RUNNING_PHASE_LABELS[phase] ?? '🔄 Running...';
+export function formatRunningStatus(phase: PackageStatus, progress?: ProgressSummary): string {
+  const label = RUNNING_PHASE_LABELS[phase] ?? '🔄 Running...';
+  if (progress) {
+    const progressText = formatProgressInline(progress);
+    return progressText ? `${label} ${progressText}` : label;
+  }
+  return label;
 }
 
 export function formatResultStatus(
@@ -118,9 +126,21 @@ export function formatResultStatus(
   failureLabel: string
 ): string {
   const duration = formatDurationMs(pkg.durationMs);
-  return pkg.success
-    ? `✅ ${successLabel} (${duration})`
-    : `❌ **${failureLabel}** (${duration})`;
+  const progressText = formatProgressResult(pkg.progressSummary);
+  const empty = isEmptyTestRun(pkg.progressSummary);
+
+  if (pkg.success) {
+    const label = progressText ? `${successLabel} ${progressText}` : successLabel;
+    return empty
+      ? `⚠️ ${label} (${duration})`
+      : `✅ ${label} (${duration})`;
+  }
+
+  const failedPhase = pkg.failedPhase;
+  const label = failedPhase
+    ? `**${failureLabel}** at ${failedPhase}`
+    : `**${failureLabel}**`;
+  return `❌ ${label} (${duration})`;
 }
 
 export function getActionsRunUrl(): string | undefined {
@@ -252,7 +272,7 @@ export function formatGithubTableBody(
         );
         break;
       default:
-        statusText = formatRunningStatus(pkg.status);
+        statusText = formatRunningStatus(pkg.status, pkg.progress);
         break;
     }
 
@@ -269,12 +289,16 @@ export function formatGithubTableBody(
   if (allDone) {
     const passed = packages.filter((p) => p.status === 'passed').length;
     const failed = packages.filter((p) => p.status === 'failed').length;
+    const emptyRuns = packages.filter((p) => isEmptyTestRun(p.progress)).length;
     const verb = config.summaryVerb ?? 'tested';
     footer = `**${
       packages.length
     } ${verb}, ${passed} passed, ${failed} failed** in ${formatDurationMs(
       elapsedMs
     )}`;
+    if (emptyRuns > 0) {
+      footer += `\n⚠️ ${emptyRuns} package(s) ran 0 tests — check test discovery`;
+    }
   } else {
     const done = packages.filter(
       (p) => p.status === 'passed' || p.status === 'failed'
