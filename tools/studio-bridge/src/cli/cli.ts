@@ -7,6 +7,7 @@
  *   studio-bridge run <file.lua>
  *   studio-bridge exec 'print("hello")'
  *   studio-bridge terminal [--script <file.lua>]
+ *   studio-bridge sessions
  */
 
 import yargs from 'yargs';
@@ -19,6 +20,7 @@ import { VersionChecker } from '@quenty/nevermore-cli-helpers';
 import { RunCommand } from './commands/run-command.js';
 import { ExecCommand } from './commands/exec-command.js';
 import { TerminalCommand } from './commands/terminal/terminal-command.js';
+import { SessionsCommand } from './commands/sessions-command.js';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Studio Bridge',
@@ -69,6 +71,7 @@ yargs(hideBin(process.argv))
   .command(new ExecCommand() as any)
   .command(new RunCommand() as any)
   .command(new TerminalCommand() as any)
+  .command(new SessionsCommand() as any)
   .recommendCommands()
   .demandCommand(
     1,
