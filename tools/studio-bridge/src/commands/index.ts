@@ -11,3 +11,6 @@ export { uninstallPluginHandlerAsync, type UninstallPluginResult } from './unins
 export { queryStateHandlerAsync, type StateResult } from './state.js';
 export { queryLogsHandlerAsync, type LogsResult, type LogsOptions } from './logs.js';
 export { captureScreenshotHandlerAsync, type ScreenshotResult, type ScreenshotOptions } from './screenshot.js';
+export { execHandlerAsync, type ExecOptions, type ExecResult } from './exec.js';
+export { runHandlerAsync, type RunOptions, type RunResult } from './run.js';
+export { launchHandlerAsync, type LaunchOptions, type LaunchResult } from './launch.js';
