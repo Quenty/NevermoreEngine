@@ -8,6 +8,7 @@
  *   studio-bridge exec 'print("hello")'
  *   studio-bridge terminal [--script <file.lua>]
  *   studio-bridge sessions
+ *   studio-bridge launch [--place <file.rbxl>]
  */
 
 import yargs from 'yargs';
@@ -28,6 +29,7 @@ import { StateCommand } from './commands/state-command.js';
 import { LogsCommand } from './commands/logs-command.js';
 import { ScreenshotCommand } from './commands/screenshot-command.js';
 import { QueryCommand } from './commands/query-command.js';
+import { LaunchCommand } from './commands/launch-command.js';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Studio Bridge',
@@ -98,6 +100,7 @@ yargs(hideBin(process.argv))
   .command(new LogsCommand() as any)
   .command(new ScreenshotCommand() as any)
   .command(new QueryCommand() as any)
+  .command(new LaunchCommand() as any)
   .recommendCommands()
   .demandCommand(
     1,
