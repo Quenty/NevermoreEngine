@@ -65,6 +65,18 @@ yargs(hideBin(process.argv))
     default: true,
     global: true,
   })
+  .option('remote', {
+    type: 'string',
+    description: 'Connect to a remote bridge host (host:port)',
+    global: true,
+  })
+  .option('local', {
+    type: 'boolean',
+    description: 'Force local mode (skip devcontainer auto-detection)',
+    default: false,
+    global: true,
+    conflicts: 'remote',
+  })
   .middleware((argv) => {
     OutputHelper.setVerbose(argv.verbose as boolean);
   })

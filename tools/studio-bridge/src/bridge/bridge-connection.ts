@@ -33,8 +33,10 @@ export interface BridgeConnectionOptions {
   timeoutMs?: number;
   /** Keep the host alive even when idle. Default: false. */
   keepAlive?: boolean;
-  /** Skip local port-bind attempt and connect directly as client. */
+  /** Skip local port-bind attempt and connect directly as client (host:port). */
   remoteHost?: string;
+  /** Force local mode -- skip devcontainer auto-detection. */
+  local?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -106,23 +108,55 @@ export class BridgeConnection extends EventEmitter {
    * Connect to the studio-bridge network and return a ready-to-use
    * BridgeConnection.
    *
+   * - If remoteHost is specified: connects directly as a client.
+   * - If local is specified: skips devcontainer auto-detection, uses local mode.
    * - If no host is running: binds the port, becomes the host.
    * - If a host is running: connects as a client.
-   * - If remoteHost is specified: connects directly as a client.
    */
   static async connectAsync(options?: BridgeConnectionOptions): Promise<BridgeConnection> {
-    const port = options?.port ?? DEFAULT_PORT;
     const keepAlive = options?.keepAlive ?? false;
     const remoteHost = options?.remoteHost;
 
-    const detection = await detectRoleAsync({ port, remoteHost });
+    // Parse remoteHost -- append default port if no colon present
+    let parsedRemoteHost: string | undefined;
+    let port = options?.port ?? DEFAULT_PORT;
+
+    if (remoteHost) {
+      if (remoteHost.includes(':')) {
+        const parts = remoteHost.split(':');
+        parsedRemoteHost = remoteHost;
+        port = parseInt(parts[parts.length - 1], 10) || DEFAULT_PORT;
+      } else {
+        parsedRemoteHost = `${remoteHost}:${port}`;
+      }
+    }
+
+    const detection = await detectRoleAsync({ port, remoteHost: parsedRemoteHost });
 
     const conn = new BridgeConnection(detection.role, keepAlive);
 
     if (detection.role === 'host') {
       await conn._initHostAsync(detection.port);
     } else {
-      await conn._initClientAsync(detection.port, remoteHost);
+      try {
+        await conn._initClientAsync(detection.port, parsedRemoteHost);
+      } catch (err: unknown) {
+        if (parsedRemoteHost && err instanceof Error) {
+          const code = (err as NodeJS.ErrnoException).code;
+          if (code === 'ECONNREFUSED') {
+            throw new Error(
+              `Could not connect to bridge host at ${parsedRemoteHost}. ` +
+              `Is \`studio-bridge serve\` running on the host?`,
+            );
+          }
+          if (err.message.includes('timed out') || err.message.includes('timeout')) {
+            throw new Error(
+              `Connection to bridge host at ${parsedRemoteHost} timed out after 5 seconds.`,
+            );
+          }
+        }
+        throw err;
+      }
     }
 
     return conn;
