@@ -1018,6 +1018,149 @@ describe('StudioBridgeServer', () => {
   });
 
   // -----------------------------------------------------------------------
+  // v2 performActionAsync
+  // -----------------------------------------------------------------------
+
+  describe('performActionAsync', () => {
+    /**
+     * Connect with v2 register, start the server, and return a ready state.
+     */
+    async function createV2ReadyServer(
+      options?: { sessionId?: string; capabilities?: string[] },
+    ) {
+      const sessionId = options?.sessionId ?? 'v2-action-session';
+      const capabilities = options?.capabilities ?? ['execute', 'queryState', 'captureScreenshot'];
+
+      const srv = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = srv.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (srv as any)._port;
+
+      // Connect and register as v2 plugin
+      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
+      await new Promise<void>((resolve, reject) => {
+        ws.on('open', resolve);
+        ws.on('error', reject);
+      });
+
+      const welcomePromise = new Promise<Record<string, unknown>>((resolve) => {
+        ws.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8'),
+          );
+          if (data.type === 'welcome') {
+            resolve(data);
+          }
+        });
+      });
+
+      ws.send(JSON.stringify({
+        type: 'register',
+        sessionId,
+        protocolVersion: 2,
+        payload: {
+          pluginVersion: '2.0.0',
+          instanceId: 'inst-action',
+          placeName: 'ActionTestPlace',
+          state: 'Edit',
+          capabilities,
+        },
+      }));
+
+      await welcomePromise;
+      await startPromise;
+
+      return { server: srv, client: ws, port, sessionId };
+    }
+
+    it('sends queryState action and resolves with stateResult', async () => {
+      const ready = await createV2ReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      // Listen for the queryState action from the server
+      const actionPromise = new Promise<Record<string, unknown>>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8'),
+          );
+          if (data.type === 'queryState') {
+            resolve(data);
+          }
+        });
+      });
+
+      // Perform the action
+      const resultPromise = server.performActionAsync({
+        type: 'queryState',
+        payload: {},
+      });
+
+      // Wait for the queryState message to arrive at the mock plugin
+      const queryMsg = await actionPromise;
+      expect(queryMsg.type).toBe('queryState');
+      expect(queryMsg.sessionId).toBe(ready.sessionId);
+      expect(typeof queryMsg.requestId).toBe('string');
+
+      // Respond from the mock plugin
+      client!.send(JSON.stringify({
+        type: 'stateResult',
+        sessionId: ready.sessionId,
+        requestId: queryMsg.requestId,
+        payload: {
+          state: 'Edit',
+          placeId: 12345,
+          placeName: 'ActionTestPlace',
+          gameId: 67890,
+        },
+      }));
+
+      const result = await resultPromise;
+      expect(result.type).toBe('stateResult');
+      expect((result as any).payload.state).toBe('Edit');
+      expect((result as any).payload.placeId).toBe(12345);
+    });
+
+    it('rejects when plugin does not support requested capability', async () => {
+      // Connect with only 'execute' capability — no 'queryState'
+      const ready = await createV2ReadyServer({ capabilities: ['execute'] });
+      server = ready.server;
+      client = ready.client;
+
+      await expect(
+        server.performActionAsync({ type: 'queryState', payload: {} }),
+      ).rejects.toThrow('Plugin does not support capability: queryState');
+    });
+
+    it('rejects when server is not in ready state', async () => {
+      server = new StudioBridgeServer({ placePath: '/fake/place.rbxl' });
+
+      await expect(
+        server.performActionAsync({ type: 'queryState', payload: {} }),
+      ).rejects.toThrow("Cannot perform action: expected state 'ready', got 'idle'");
+    });
+
+    it('rejects when protocol version is v1', async () => {
+      // Use the standard v1 handshake helper
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      // Server should be v1 since connectAndHandshake sends v1 hello
+      expect(server.protocolVersion).toBe(1);
+
+      await expect(
+        server.performActionAsync({ type: 'queryState', payload: {} }),
+      ).rejects.toThrow('Plugin does not support v2 actions');
+    });
+  });
+
+  // -----------------------------------------------------------------------
   // Protocol version / capabilities getters
   // -----------------------------------------------------------------------
 
