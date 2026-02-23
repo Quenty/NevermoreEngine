@@ -11,6 +11,7 @@
  *    b. Health fails -> wait, retry bind (stale host)
  */
 
+import { existsSync } from 'node:fs';
 import { TransportServer } from './transport-server.js';
 import { checkHealthAsync } from './health-endpoint.js';
 
@@ -32,6 +33,7 @@ export interface DetectRoleResult {
 
 const STALE_RETRY_DELAY_MS = 1_000;
 const MAX_STALE_RETRIES = 3;
+const DEFAULT_BRIDGE_PORT = 38741;
 
 // ---------------------------------------------------------------------------
 // Implementation
@@ -99,4 +101,33 @@ export async function detectRoleAsync(options: {
     `Port ${options.port} is held by another process and no bridge host responded on /health. ` +
     `The port may be in use by a non-bridge process.`,
   );
+}
+
+// ---------------------------------------------------------------------------
+// Devcontainer detection
+// ---------------------------------------------------------------------------
+
+/**
+ * Detect whether running inside a devcontainer.
+ * Checks: REMOTE_CONTAINERS, CODESPACES, CONTAINER env vars, /.dockerenv file.
+ * Wide net -- false positive = 3s delay then fallback. False negative = user uses --remote.
+ */
+export function isDevcontainer(): boolean {
+  return !!(
+    process.env.REMOTE_CONTAINERS ||
+    process.env.CODESPACES ||
+    process.env.CONTAINER ||
+    existsSync('/.dockerenv')
+  );
+}
+
+/**
+ * Get default remote host for devcontainer environments.
+ * Returns "localhost:38741" inside devcontainer, null otherwise.
+ */
+export function getDefaultRemoteHost(): string | null {
+  if (isDevcontainer()) {
+    return `localhost:${DEFAULT_BRIDGE_PORT}`;
+  }
+  return null;
 }

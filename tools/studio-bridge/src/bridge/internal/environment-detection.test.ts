@@ -1,11 +1,12 @@
 /**
  * Unit tests for environment-detection -- validates role detection logic
  * including host election on free port, client detection when host exists,
- * and remoteHost override.
+ * remoteHost override, and devcontainer detection.
  */
 
-import { describe, it, expect, afterEach } from 'vitest';
-import { detectRoleAsync } from './environment-detection.js';
+import { existsSync } from 'node:fs';
+import { describe, it, expect, afterEach, beforeEach } from 'vitest';
+import { detectRoleAsync, isDevcontainer, getDefaultRemoteHost } from './environment-detection.js';
 import { BridgeHost } from './bridge-host.js';
 
 // ---------------------------------------------------------------------------
@@ -66,5 +67,114 @@ describe('detectRoleAsync', () => {
     expect(result.role).toBe('host');
     expect(result.port).not.toBe(0);
     expect(result.port).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Devcontainer detection tests
+// ---------------------------------------------------------------------------
+
+const DEVCONTAINER_ENV_KEYS = ['REMOTE_CONTAINERS', 'CODESPACES', 'CONTAINER'] as const;
+const dockerenvExists = existsSync('/.dockerenv');
+
+describe('isDevcontainer', () => {
+  const savedEnv: Record<string, string | undefined> = {};
+
+  beforeEach(() => {
+    // Save current values so we can restore after each test
+    for (const key of DEVCONTAINER_ENV_KEYS) {
+      savedEnv[key] = process.env[key];
+    }
+  });
+
+  afterEach(() => {
+    // Restore original env values
+    for (const key of DEVCONTAINER_ENV_KEYS) {
+      if (savedEnv[key] === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = savedEnv[key];
+      }
+    }
+  });
+
+  function clearDevcontainerEnv(): void {
+    for (const key of DEVCONTAINER_ENV_KEYS) {
+      delete process.env[key];
+    }
+  }
+
+  it('returns true when REMOTE_CONTAINERS is set', () => {
+    clearDevcontainerEnv();
+    process.env.REMOTE_CONTAINERS = 'true';
+    expect(isDevcontainer()).toBe(true);
+  });
+
+  it('returns true when CODESPACES is set', () => {
+    clearDevcontainerEnv();
+    process.env.CODESPACES = 'true';
+    expect(isDevcontainer()).toBe(true);
+  });
+
+  it('returns true when CONTAINER is set', () => {
+    clearDevcontainerEnv();
+    process.env.CONTAINER = 'true';
+    expect(isDevcontainer()).toBe(true);
+  });
+
+  it('returns false when no env vars set and no /.dockerenv', () => {
+    clearDevcontainerEnv();
+    // If /.dockerenv exists on this machine, the function should still return true
+    expect(isDevcontainer()).toBe(dockerenvExists);
+  });
+
+  it('treats empty string as falsy', () => {
+    clearDevcontainerEnv();
+    process.env.REMOTE_CONTAINERS = '';
+    // Empty string is falsy -- result depends only on /.dockerenv
+    expect(isDevcontainer()).toBe(dockerenvExists);
+  });
+});
+
+describe('getDefaultRemoteHost', () => {
+  const savedEnv: Record<string, string | undefined> = {};
+
+  beforeEach(() => {
+    for (const key of DEVCONTAINER_ENV_KEYS) {
+      savedEnv[key] = process.env[key];
+    }
+  });
+
+  afterEach(() => {
+    for (const key of DEVCONTAINER_ENV_KEYS) {
+      if (savedEnv[key] === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = savedEnv[key];
+      }
+    }
+  });
+
+  function clearDevcontainerEnv(): void {
+    for (const key of DEVCONTAINER_ENV_KEYS) {
+      delete process.env[key];
+    }
+  }
+
+  it('returns localhost:38741 in devcontainer', () => {
+    clearDevcontainerEnv();
+    process.env.REMOTE_CONTAINERS = 'true';
+    expect(getDefaultRemoteHost()).toBe('localhost:38741');
+  });
+
+  it('returns null outside devcontainer', () => {
+    clearDevcontainerEnv();
+    // Only null if /.dockerenv doesn't exist
+    if (!dockerenvExists) {
+      expect(getDefaultRemoteHost()).toBeNull();
+    } else {
+      // If /.dockerenv exists, we're in a container, so it returns the host
+      expect(getDefaultRemoteHost()).toBe('localhost:38741');
+    }
   });
 });

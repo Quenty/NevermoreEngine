@@ -10,7 +10,7 @@ import { EventEmitter } from 'events';
 import { BridgeHost } from './internal/bridge-host.js';
 import { BridgeClient } from './internal/bridge-client.js';
 import { SessionTracker, type TrackedSession } from './internal/session-tracker.js';
-import { detectRoleAsync } from './internal/environment-detection.js';
+import { detectRoleAsync, getDefaultRemoteHost } from './internal/environment-detection.js';
 import { BridgeSession } from './bridge-session.js';
 import type {
   SessionInfo,
@@ -128,6 +128,39 @@ export class BridgeConnection extends EventEmitter {
         port = parseInt(parts[parts.length - 1], 10) || DEFAULT_PORT;
       } else {
         parsedRemoteHost = `${remoteHost}:${port}`;
+      }
+    }
+
+    // Devcontainer auto-detection: if no explicit remoteHost and not forced local,
+    // try connecting to the default remote host with a short timeout before falling
+    // back to local mode.
+    if (!parsedRemoteHost && !options?.local) {
+      const autoRemoteHost = getDefaultRemoteHost();
+      if (autoRemoteHost) {
+        const AUTO_DETECT_TIMEOUT_MS = 3_000;
+        try {
+          const autoConn = new BridgeConnection('client', keepAlive);
+          const autoHost = autoRemoteHost.split(':')[0];
+          const autoPort = parseInt(autoRemoteHost.split(':')[1], 10) || DEFAULT_PORT;
+
+          await Promise.race([
+            autoConn._initClientAsync(autoPort, autoHost),
+            new Promise<never>((_, reject) =>
+              setTimeout(
+                () => reject(new Error('Auto-detection timed out')),
+                AUTO_DETECT_TIMEOUT_MS,
+              ),
+            ),
+          ]);
+
+          return autoConn;
+        } catch {
+          console.warn(
+            `Devcontainer detected, but could not connect to bridge host at ${autoRemoteHost}. ` +
+            `Falling back to local mode. Run \`studio-bridge serve\` on the host OS, ` +
+            `or use --remote to specify a different address.`,
+          );
+        }
       }
     }
 
