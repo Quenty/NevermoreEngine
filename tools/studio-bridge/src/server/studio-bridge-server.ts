@@ -10,7 +10,10 @@
  */
 
 import { randomUUID } from 'crypto';
+import * as fs from 'fs';
+import * as http from 'http';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
@@ -46,6 +49,22 @@ const sessionAttributeTransformScript = resolvePackagePath(
   'build-scripts',
   'transform-add-session-attribute.luau'
 );
+
+/** Read the package version from package.json at startup. */
+function readServerVersion(): string {
+  try {
+    const thisDir = path.dirname(fileURLToPath(import.meta.url));
+    // Walk up from src/server/ to package root
+    const pkgPath = path.resolve(thisDir, '..', '..', 'package.json');
+    const raw = fs.readFileSync(pkgPath, 'utf-8');
+    const pkg = JSON.parse(raw) as { version?: string };
+    return pkg.version ?? '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
+
+const SERVER_VERSION = readServerVersion();
 
 // ---------------------------------------------------------------------------
 // Public API types
@@ -101,18 +120,60 @@ type BridgeState =
 // ---------------------------------------------------------------------------
 
 /**
- * Start a WebSocket server on a random available port and return the assigned
- * port number once listening.
+ * Create an HTTP server with health endpoint and a noServer WebSocket server.
+ * The HTTP server handles `GET /health` and 404 for other paths. WebSocket
+ * upgrades to `/${sessionId}` are forwarded to the WSS; others are rejected.
+ *
+ * Returns the assigned port once listening.
  */
-function startWsServerAsync(wss: WebSocketServer): Promise<number> {
+function startHttpAndWsServerAsync(
+  httpServer: http.Server,
+  wss: WebSocketServer,
+  sessionId: string,
+): Promise<number> {
+  // Handle normal HTTP requests
+  httpServer.on('request', (req: http.IncomingMessage, res: http.ServerResponse) => {
+    if (req.method === 'GET' && req.url === '/health') {
+      const addr = httpServer.address();
+      const port = typeof addr === 'object' && addr !== null ? addr.port : 0;
+      const body = JSON.stringify({
+        status: 'ok',
+        sessionId,
+        port,
+        protocolVersion: 2,
+        serverVersion: SERVER_VERSION,
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(body);
+      return;
+    }
+
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
+  });
+
+  // Handle WebSocket upgrades — only allow /${sessionId}
+  httpServer.on('upgrade', (req: http.IncomingMessage, socket: import('stream').Duplex, head: Buffer) => {
+    const expectedPath = `/${sessionId}`;
+    if (req.url !== expectedPath) {
+      socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit('connection', ws, req);
+    });
+  });
+
   return new Promise((resolve, reject) => {
-    wss.on('error', reject);
-    wss.on('listening', () => {
-      const addr = wss.address();
+    httpServer.on('error', reject);
+    httpServer.listen(0, () => {
+      const addr = httpServer.address();
       if (typeof addr === 'object' && addr !== null) {
         resolve(addr.port);
       } else {
-        reject(new Error('WebSocket server address is not available'));
+        reject(new Error('HTTP server address is not available'));
       }
     });
   });
@@ -140,7 +201,9 @@ export class StudioBridgeServer {
   private readonly _onPhase: ((phase: StudioBridgePhase) => void) | undefined;
   private readonly _placePath: string | undefined;
 
+  private _httpServer: http.Server | undefined;
   private _wss: WebSocketServer | undefined;
+  private _port: number = 0;
   private _pluginHandle: InjectedPlugin | undefined;
   private _studioProc: StudioProcess | undefined;
   private _placeBuildContext: BuildContext | undefined;
@@ -271,9 +334,11 @@ export class StudioBridgeServer {
       );
       placePath = transformedPlacePath;
 
-      // 1. Start WebSocket server (unique path rejects wrong connections at HTTP upgrade level)
-      this._wss = new WebSocketServer({ port: 0, path: `/${this._sessionId}` });
-      const port = await startWsServerAsync(this._wss);
+      // 1. Start HTTP + WebSocket server (unique path rejects wrong connections at upgrade level)
+      this._httpServer = http.createServer();
+      this._wss = new WebSocketServer({ noServer: true });
+      const port = await startHttpAndWsServerAsync(this._httpServer, this._wss, this._sessionId);
+      this._port = port;
       OutputHelper.verbose(
         `[StudioBridge] WebSocket server listening on port ${port}`
       );
@@ -716,8 +781,9 @@ export class StudioBridgeServer {
       this._placeBuildContext = undefined;
     }
 
-    // Close WebSocket server — terminate lingering connections first so
-    // the 'close' callback fires promptly.
+    // Terminate lingering WebSocket connections first so close callbacks
+    // fire promptly, then close the HTTP server (which owns the listening
+    // socket) and finally close the WSS.
     if (this._wss) {
       for (const wsClient of this._wss.clients) {
         wsClient.terminate();
@@ -726,6 +792,13 @@ export class StudioBridgeServer {
         this._wss!.close(() => resolve());
       });
       this._wss = undefined;
+    }
+
+    if (this._httpServer) {
+      await new Promise<void>((resolve) => {
+        this._httpServer!.close(() => resolve());
+      });
+      this._httpServer = undefined;
     }
 
     this._connectedClient = undefined;

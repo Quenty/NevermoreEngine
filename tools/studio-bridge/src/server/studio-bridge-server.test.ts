@@ -98,16 +98,14 @@ async function createReadyServer(
   // Start in background — it will wait for handshake
   const startPromise = server.startAsync();
 
-  // We need to discover the port the server is listening on. The WSS is
-  // created inside startAsync and we can't access it directly. However, we
+  // We need to discover the port the server is listening on. The HTTP server
+  // is created inside startAsync and we can't access it directly. However, we
   // know the mock for launchStudioAsync will resolve immediately, so the
   // server will be waiting for a handshake. We just need the port.
   // Access it via the private field (acceptable in tests).
-  // Wait a tick for the WSS to be created
+  // Wait a tick for the HTTP server to be created
   await new Promise((r) => setTimeout(r, 50));
-  const wss = (server as any)._wss;
-  const addr = wss.address();
-  const port: number = addr.port;
+  const port: number = (server as any)._port;
 
   // Simulate plugin connecting and performing handshake
   const client = await connectAndHandshake(port, sessionId);
@@ -197,8 +195,7 @@ describe('StudioBridgeServer', () => {
       const startPromise = server.startAsync();
 
       await new Promise((r) => setTimeout(r, 50));
-      const wss = (server as any)._wss;
-      const port: number = wss.address().port;
+      const port: number = (server as any)._port;
 
       // Connect with correct path but wrong session ID in message
       const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
@@ -240,8 +237,7 @@ describe('StudioBridgeServer', () => {
       const startPromise = server.startAsync();
 
       await new Promise((r) => setTimeout(r, 50));
-      const wss = (server as any)._wss;
-      const port: number = wss.address().port;
+      const port: number = (server as any)._port;
 
       // Connect with wrong path
       const ws = new WebSocket(`ws://localhost:${port}/wrong-path`);
@@ -823,7 +819,7 @@ describe('StudioBridgeServer', () => {
 
       const startPromise = server.startAsync();
       await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._wss.address().port;
+      const port: number = (server as any)._port;
 
       const { ws, welcome } = await connectAndHandshakeV2Hello(port, sessionId, {
         protocolVersion: 2,
@@ -850,7 +846,7 @@ describe('StudioBridgeServer', () => {
 
       const startPromise = server.startAsync();
       await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._wss.address().port;
+      const port: number = (server as any)._port;
 
       // Send capabilities including one the server doesn't support
       const { ws, welcome } = await connectAndHandshakeV2Hello(port, sessionId, {
@@ -880,7 +876,7 @@ describe('StudioBridgeServer', () => {
 
       const startPromise = server.startAsync();
       await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._wss.address().port;
+      const port: number = (server as any)._port;
 
       // Plugin claims v5 — server should negotiate to v2
       const { ws, welcome } = await connectAndHandshakeV2Hello(port, sessionId, {
@@ -906,7 +902,7 @@ describe('StudioBridgeServer', () => {
 
       const startPromise = server.startAsync();
       await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._wss.address().port;
+      const port: number = (server as any)._port;
 
       const { ws, welcome } = await connectAndRegister(port, sessionId, {
         protocolVersion: 2,
@@ -933,7 +929,7 @@ describe('StudioBridgeServer', () => {
 
       const startPromise = server.startAsync();
       await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._wss.address().port;
+      const port: number = (server as any)._port;
 
       const { ws, welcome } = await connectAndRegister(port, sessionId, {
         protocolVersion: 2,
@@ -1030,6 +1026,77 @@ describe('StudioBridgeServer', () => {
       server = new StudioBridgeServer({ placePath: '/fake/place.rbxl' });
       expect(server.protocolVersion).toBe(1);
       expect([...server.capabilities]).toEqual(['execute']);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Health endpoint
+  // -----------------------------------------------------------------------
+
+  describe('health endpoint', () => {
+    it('GET /health returns 200 with correct JSON shape', async () => {
+      const ready = await createReadyServer({ sessionId: 'health-session' });
+      server = ready.server;
+      client = ready.client;
+
+      const res = await fetch(`http://localhost:${ready.port}/health`);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toBe('application/json');
+
+      const body = await res.json() as Record<string, unknown>;
+      expect(body.status).toBe('ok');
+      expect(body.sessionId).toBe('health-session');
+      expect(body.port).toBe(ready.port);
+      expect(body.protocolVersion).toBe(2);
+      expect(typeof body.serverVersion).toBe('string');
+    });
+
+    it('GET /other returns 404', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const res = await fetch(`http://localhost:${ready.port}/other`);
+      expect(res.status).toBe(404);
+
+      const body = await res.text();
+      expect(body).toBe('Not Found');
+    });
+
+    it('health endpoint is available immediately after startAsync', async () => {
+      const sessionId = 'immediate-health';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = server.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (server as any)._port;
+
+      // Health should be available even before handshake completes
+      const res = await fetch(`http://localhost:${port}/health`);
+      expect(res.status).toBe(200);
+
+      const body = await res.json() as Record<string, unknown>;
+      expect(body.status).toBe('ok');
+      expect(body.sessionId).toBe(sessionId);
+
+      // Complete the handshake so startAsync resolves
+      client = await connectAndHandshake(port, sessionId);
+      await startPromise;
+    });
+
+    it('WebSocket upgrades to correct path still work after adding health endpoint', async () => {
+      const ready = await createReadyServer({ sessionId: 'ws-with-health' });
+      server = ready.server;
+      client = ready.client;
+
+      // If we got here, the WebSocket handshake succeeded through the HTTP server
+      // Verify health also works
+      const res = await fetch(`http://localhost:${ready.port}/health`);
+      expect(res.status).toBe(200);
     });
   });
 });
