@@ -22,6 +22,9 @@ import { ExecCommand } from './commands/exec-command.js';
 import { TerminalCommand } from './commands/terminal/terminal-command.js';
 import { SessionsCommand } from './commands/sessions-command.js';
 import { ServeCommand } from './commands/serve-command.js';
+import { InstallPluginCommand } from './commands/install-plugin-command.js';
+import { UninstallPluginCommand } from './commands/uninstall-plugin-command.js';
+import { StateCommand } from './commands/state-command.js';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Studio Bridge',
@@ -86,6 +89,9 @@ yargs(hideBin(process.argv))
   .command(new TerminalCommand() as any)
   .command(new SessionsCommand() as any)
   .command(new ServeCommand() as any)
+  .command(new InstallPluginCommand() as any)
+  .command(new UninstallPluginCommand() as any)
+  .command(new StateCommand() as any)
   .recommendCommands()
   .demandCommand(
     1,
