@@ -6,6 +6,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { WebSocket } from 'ws';
 import { BridgeConnection } from './bridge-connection.js';
+import { SessionNotFoundError, ContextNotFoundError } from './types.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -311,6 +312,216 @@ describe('BridgeConnection', () => {
       await new Promise((r) => setTimeout(r, 100));
 
       expect(conn.getSession('session-gone')).toBeUndefined();
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // resolveSession (1.3d3)
+  // -----------------------------------------------------------------------
+
+  describe('resolveSession', () => {
+    it('throws "No sessions connected" when no sessions exist', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      await expect(conn.resolveSession()).rejects.toThrow(SessionNotFoundError);
+      await expect(conn.resolveSession()).rejects.toThrow('No sessions connected');
+    });
+
+    it('returns the only session automatically', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws } = await performRegisterHandshake(conn.port, 'only-session', {
+        instanceId: 'inst-1',
+      });
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      const session = await conn.resolveSession();
+      expect(session.info.sessionId).toBe('only-session');
+    });
+
+    it('throws with instance list when multiple instances exist', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-1', {
+        instanceId: 'inst-A',
+        placeName: 'PlaceA',
+      });
+      openClients.push(ws1);
+
+      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-2', {
+        instanceId: 'inst-B',
+        placeName: 'PlaceB',
+      });
+      openClients.push(ws2);
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      await expect(conn.resolveSession()).rejects.toThrow(SessionNotFoundError);
+      await expect(conn.resolveSession()).rejects.toThrow('Multiple Studio instances');
+    });
+
+    it('returns specific session by sessionId', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws } = await performRegisterHandshake(conn.port, 'session-abc', {
+        instanceId: 'inst-1',
+      });
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      const session = await conn.resolveSession('session-abc');
+      expect(session.info.sessionId).toBe('session-abc');
+    });
+
+    it('throws SessionNotFoundError for unknown sessionId', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      await expect(conn.resolveSession('nonexistent')).rejects.toThrow(SessionNotFoundError);
+      await expect(conn.resolveSession('nonexistent')).rejects.toThrow("Session 'nonexistent' not found");
+    });
+
+    it('returns Edit context by default when multiple contexts exist', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      // Simulate Play mode: edit + server + client contexts
+      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'edit-session', {
+        instanceId: 'inst-1',
+        state: 'Edit',
+      });
+      openClients.push(ws1);
+
+      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'server-session', {
+        instanceId: 'inst-1',
+        state: 'Server',
+      });
+      openClients.push(ws2);
+
+      const { ws: ws3 } = await performRegisterHandshake(conn.port, 'client-session', {
+        instanceId: 'inst-1',
+        state: 'Client',
+      });
+      openClients.push(ws3);
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      // Should return the Edit context by default
+      const session = await conn.resolveSession();
+      expect(session.info.sessionId).toBe('edit-session');
+      expect(session.context).toBe('edit');
+    });
+
+    it('returns specific context when requested', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'edit-s', {
+        instanceId: 'inst-1',
+        state: 'Edit',
+      });
+      openClients.push(ws1);
+
+      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'server-s', {
+        instanceId: 'inst-1',
+        state: 'Server',
+      });
+      openClients.push(ws2);
+
+      const { ws: ws3 } = await performRegisterHandshake(conn.port, 'client-s', {
+        instanceId: 'inst-1',
+        state: 'Client',
+      });
+      openClients.push(ws3);
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const serverSession = await conn.resolveSession(undefined, 'server');
+      expect(serverSession.info.sessionId).toBe('server-s');
+      expect(serverSession.context).toBe('server');
+
+      const clientSession = await conn.resolveSession(undefined, 'client');
+      expect(clientSession.info.sessionId).toBe('client-s');
+      expect(clientSession.context).toBe('client');
+    });
+
+    it('throws ContextNotFoundError for unavailable context', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      // Only edit context connected
+      const { ws } = await performRegisterHandshake(conn.port, 'edit-only', {
+        instanceId: 'inst-1',
+        state: 'Edit',
+      });
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      await expect(conn.resolveSession(undefined, 'server')).rejects.toThrow(ContextNotFoundError);
+    });
+
+    it('resolves by instanceId', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-A', {
+        instanceId: 'inst-A',
+        placeName: 'PlaceA',
+      });
+      openClients.push(ws1);
+
+      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-B', {
+        instanceId: 'inst-B',
+        placeName: 'PlaceB',
+      });
+      openClients.push(ws2);
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const session = await conn.resolveSession(undefined, undefined, 'inst-B');
+      expect(session.info.sessionId).toBe('session-B');
+    });
+
+    it('resolves by instanceId and context', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'edit-s', {
+        instanceId: 'inst-1',
+        state: 'Edit',
+      });
+      openClients.push(ws1);
+
+      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'server-s', {
+        instanceId: 'inst-1',
+        state: 'Server',
+      });
+      openClients.push(ws2);
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const session = await conn.resolveSession(undefined, 'server', 'inst-1');
+      expect(session.info.sessionId).toBe('server-s');
+    });
+
+    it('throws SessionNotFoundError for unknown instanceId', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws } = await performRegisterHandshake(conn.port, 'session-1', {
+        instanceId: 'inst-1',
+      });
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      await expect(
+        conn.resolveSession(undefined, undefined, 'nonexistent-inst'),
+      ).rejects.toThrow(SessionNotFoundError);
     });
   });
 });
