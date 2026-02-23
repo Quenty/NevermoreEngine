@@ -20,6 +20,7 @@ import {
 } from '@quenty/nevermore-template-helpers';
 import {
   type OutputLevel,
+  type Capability,
   encodeMessage,
   decodePluginMessage,
 } from './web-socket-protocol.js';
@@ -128,11 +129,29 @@ export class StudioBridgeServer {
   private _placeBuildContext: BuildContext | undefined;
   private _connectedClient: WebSocket | undefined;
 
+  private _negotiatedProtocolVersion: number = 1;
+  private _negotiatedCapabilities: Capability[] = ['execute'];
+  private _lastHeartbeatTimestamp: number | undefined;
+
   constructor(options: StudioBridgeServerOptions = {}) {
     this._sessionId = options.sessionId ?? randomUUID();
     this._defaultTimeoutMs = options.timeoutMs ?? 120_000;
     this._onPhase = options.onPhase;
     this._placePath = options.placePath;
+  }
+
+  // -----------------------------------------------------------------------
+  // Public getters for negotiated protocol state
+  // -----------------------------------------------------------------------
+
+  /** The negotiated protocol version (1 for v1, 2 for v2 plugins). */
+  get protocolVersion(): number {
+    return this._negotiatedProtocolVersion;
+  }
+
+  /** The negotiated set of capabilities shared between plugin and server. */
+  get capabilities(): readonly Capability[] {
+    return this._negotiatedCapabilities;
   }
 
   // -----------------------------------------------------------------------
@@ -302,6 +321,16 @@ export class StudioBridgeServer {
   // -----------------------------------------------------------------------
 
   private _waitForHandshakeAsync(): Promise<void> {
+    // The full set of capabilities the server supports for negotiation.
+    const serverSupportedCapabilities: Capability[] = [
+      'execute',
+      'queryState',
+      'captureScreenshot',
+      'queryDataModel',
+      'queryLogs',
+      'subscribe',
+    ];
+
     return new Promise<void>((resolve, reject) => {
       let settled = false;
 
@@ -322,47 +351,98 @@ export class StudioBridgeServer {
         const onMessage = (raw: Buffer | string) => {
           const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
           const msg = decodePluginMessage(data);
-          if (!msg || msg.type !== 'hello') {
+          if (!msg) {
             return;
           }
 
-          if (
-            msg.sessionId !== this._sessionId ||
-            msg.payload.sessionId !== this._sessionId
-          ) {
-            OutputHelper.verbose(
-              `[StudioBridge] Rejecting hello with wrong session ID`
+          if (msg.type === 'hello') {
+            if (
+              msg.sessionId !== this._sessionId ||
+              msg.payload.sessionId !== this._sessionId
+            ) {
+              OutputHelper.verbose(
+                `[StudioBridge] Rejecting hello with wrong session ID`
+              );
+              ws.close();
+              return;
+            }
+
+            // Determine if this is a v2 hello (has protocolVersion in the raw message)
+            let rawProtocolVersion: number | undefined;
+            try {
+              const rawObj = JSON.parse(data) as Record<string, unknown>;
+              if (typeof rawObj.protocolVersion === 'number') {
+                rawProtocolVersion = rawObj.protocolVersion;
+              }
+            } catch {
+              // ignore parse errors, already decoded via decodePluginMessage
+            }
+
+            const isV2 = rawProtocolVersion !== undefined && rawProtocolVersion >= 2;
+
+            if (isV2) {
+              // v2 hello: negotiate protocol version and capabilities
+              this._negotiatedProtocolVersion = Math.min(rawProtocolVersion!, 2);
+              const pluginCapabilities = msg.payload.capabilities ?? ['execute' as Capability];
+              this._negotiatedCapabilities = pluginCapabilities.filter(
+                (cap) => serverSupportedCapabilities.includes(cap),
+              );
+
+              OutputHelper.verbose('[StudioBridge] v2 handshake accepted');
+              const welcomePayload: Record<string, unknown> = {
+                sessionId: this._sessionId,
+                protocolVersion: this._negotiatedProtocolVersion,
+                capabilities: this._negotiatedCapabilities,
+              };
+              ws.send(JSON.stringify({
+                type: 'welcome',
+                sessionId: this._sessionId,
+                payload: welcomePayload,
+              }));
+            } else {
+              // v1 hello: no protocol version or capabilities in welcome
+              this._negotiatedProtocolVersion = 1;
+              this._negotiatedCapabilities = ['execute'];
+
+              OutputHelper.verbose('[StudioBridge] Handshake accepted');
+              ws.send(
+                encodeMessage({
+                  type: 'welcome',
+                  sessionId: this._sessionId,
+                  payload: { sessionId: this._sessionId },
+                })
+              );
+            }
+
+            ws.off('message', onMessage);
+            this._finishHandshake(ws, settled, timer, resolve);
+            settled = true;
+            return;
+          }
+
+          if (msg.type === 'register') {
+            // Always v2
+            this._negotiatedProtocolVersion = Math.min(msg.protocolVersion, 2);
+            this._negotiatedCapabilities = msg.payload.capabilities.filter(
+              (cap) => serverSupportedCapabilities.includes(cap),
             );
-            ws.close();
-            return;
-          }
 
-          // Handshake accepted
-          OutputHelper.verbose('[StudioBridge] Handshake accepted');
-          ws.send(
-            encodeMessage({
+            OutputHelper.verbose('[StudioBridge] v2 register handshake accepted');
+            const welcomePayload: Record<string, unknown> = {
+              sessionId: this._sessionId,
+              protocolVersion: this._negotiatedProtocolVersion,
+              capabilities: this._negotiatedCapabilities,
+            };
+            ws.send(JSON.stringify({
               type: 'welcome',
               sessionId: this._sessionId,
-              payload: { sessionId: this._sessionId },
-            })
-          );
+              payload: welcomePayload,
+            }));
 
-          ws.off('message', onMessage);
-          this._connectedClient = ws;
-
-          // Listen for unexpected disconnect
-          ws.on('close', () => {
-            OutputHelper.verbose('[StudioBridge] Plugin disconnected');
-            this._connectedClient = undefined;
-            if (this._state !== 'stopping' && this._state !== 'stopped') {
-              this._state = 'stopped';
-            }
-          });
-
-          if (!settled) {
+            ws.off('message', onMessage);
+            this._finishHandshake(ws, settled, timer, resolve);
             settled = true;
-            clearTimeout(timer);
-            resolve();
+            return;
           }
         };
 
@@ -383,6 +463,42 @@ export class StudioBridgeServer {
         }
       });
     });
+  }
+
+  /**
+   * Common handshake completion: store the connected client, listen for
+   * heartbeats and disconnect events.
+   */
+  private _finishHandshake(
+    ws: WebSocket,
+    alreadySettled: boolean,
+    timer: ReturnType<typeof setTimeout>,
+    resolve: () => void,
+  ): void {
+    this._connectedClient = ws;
+
+    // Listen for heartbeat messages (silently update timestamp)
+    ws.on('message', (raw: Buffer | string) => {
+      const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+      const msg = decodePluginMessage(data);
+      if (msg && msg.type === 'heartbeat') {
+        this._lastHeartbeatTimestamp = Date.now();
+      }
+    });
+
+    // Listen for unexpected disconnect
+    ws.on('close', () => {
+      OutputHelper.verbose('[StudioBridge] Plugin disconnected');
+      this._connectedClient = undefined;
+      if (this._state !== 'stopping' && this._state !== 'stopped') {
+        this._state = 'stopped';
+      }
+    });
+
+    if (!alreadySettled) {
+      clearTimeout(timer);
+      resolve();
+    }
   }
 
   // -----------------------------------------------------------------------

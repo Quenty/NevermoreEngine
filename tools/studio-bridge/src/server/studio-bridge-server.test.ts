@@ -712,4 +712,324 @@ describe('StudioBridgeServer', () => {
       await server.stopAsync();
     });
   });
+
+  // -----------------------------------------------------------------------
+  // v2 Handshake
+  // -----------------------------------------------------------------------
+
+  describe('v2 handshake', () => {
+    /**
+     * Connect and send a v2 hello (with protocolVersion field on the root
+     * message object). Returns the welcome message.
+     */
+    async function connectAndHandshakeV2Hello(
+      port: number,
+      sessionId: string,
+      options?: { protocolVersion?: number; capabilities?: string[] },
+    ): Promise<{ ws: WebSocket; welcome: Record<string, unknown> }> {
+      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
+
+      await new Promise<void>((resolve, reject) => {
+        ws.on('open', resolve);
+        ws.on('error', reject);
+      });
+
+      const welcomePromise = new Promise<Record<string, unknown>>((resolve) => {
+        ws.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8'),
+          );
+          if (data.type === 'welcome') {
+            resolve(data);
+          }
+        });
+      });
+
+      ws.send(JSON.stringify({
+        type: 'hello',
+        sessionId,
+        protocolVersion: options?.protocolVersion ?? 2,
+        payload: {
+          sessionId,
+          capabilities: options?.capabilities ?? ['execute', 'queryState'],
+        },
+      }));
+
+      const welcome = await welcomePromise;
+      return { ws, welcome };
+    }
+
+    /**
+     * Connect and send a register message (always v2).
+     */
+    async function connectAndRegister(
+      port: number,
+      sessionId: string,
+      options?: { protocolVersion?: number; capabilities?: string[] },
+    ): Promise<{ ws: WebSocket; welcome: Record<string, unknown> }> {
+      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
+
+      await new Promise<void>((resolve, reject) => {
+        ws.on('open', resolve);
+        ws.on('error', reject);
+      });
+
+      const welcomePromise = new Promise<Record<string, unknown>>((resolve) => {
+        ws.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8'),
+          );
+          if (data.type === 'welcome') {
+            resolve(data);
+          }
+        });
+      });
+
+      ws.send(JSON.stringify({
+        type: 'register',
+        sessionId,
+        protocolVersion: options?.protocolVersion ?? 2,
+        payload: {
+          pluginVersion: '2.0.0',
+          instanceId: 'inst-001',
+          placeName: 'TestPlace',
+          state: 'Edit',
+          capabilities: options?.capabilities ?? ['execute', 'queryState'],
+        },
+      }));
+
+      const welcome = await welcomePromise;
+      return { ws, welcome };
+    }
+
+    it('v1 hello (no protocolVersion) sends v1 welcome without protocolVersion or capabilities', async () => {
+      const ready = await createReadyServer({ sessionId: 'v1-session' });
+      server = ready.server;
+      client = ready.client;
+
+      // The existing connectAndHandshake sends a plain v1 hello (no protocolVersion).
+      // Verify the server negotiated as v1.
+      expect(server.protocolVersion).toBe(1);
+      expect([...server.capabilities]).toEqual(['execute']);
+    });
+
+    it('v2 hello sends welcome with protocolVersion and capabilities', async () => {
+      const sessionId = 'v2-hello-session';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = server.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (server as any)._wss.address().port;
+
+      const { ws, welcome } = await connectAndHandshakeV2Hello(port, sessionId, {
+        protocolVersion: 2,
+        capabilities: ['execute', 'queryState', 'captureScreenshot'],
+      });
+      client = ws;
+
+      await startPromise;
+
+      const payload = welcome.payload as Record<string, unknown>;
+      expect(payload.protocolVersion).toBe(2);
+      expect(payload.capabilities).toEqual(['execute', 'queryState', 'captureScreenshot']);
+      expect(server.protocolVersion).toBe(2);
+      expect([...server.capabilities]).toEqual(['execute', 'queryState', 'captureScreenshot']);
+    });
+
+    it('v2 hello negotiates capabilities to intersection with server support', async () => {
+      const sessionId = 'v2-cap-session';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = server.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (server as any)._wss.address().port;
+
+      // Send capabilities including one the server doesn't support
+      const { ws, welcome } = await connectAndHandshakeV2Hello(port, sessionId, {
+        protocolVersion: 2,
+        capabilities: ['execute', 'queryState', 'heartbeat', 'captureScreenshot'],
+      });
+      client = ws;
+
+      await startPromise;
+
+      const payload = welcome.payload as Record<string, unknown>;
+      const caps = payload.capabilities as string[];
+      // 'heartbeat' is not in the server's supported set for negotiation
+      expect(caps).toContain('execute');
+      expect(caps).toContain('queryState');
+      expect(caps).toContain('captureScreenshot');
+      expect(caps).not.toContain('heartbeat');
+    });
+
+    it('v2 hello negotiates protocolVersion to min(plugin, 2)', async () => {
+      const sessionId = 'v2-version-session';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = server.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (server as any)._wss.address().port;
+
+      // Plugin claims v5 — server should negotiate to v2
+      const { ws, welcome } = await connectAndHandshakeV2Hello(port, sessionId, {
+        protocolVersion: 5,
+        capabilities: ['execute'],
+      });
+      client = ws;
+
+      await startPromise;
+
+      const payload = welcome.payload as Record<string, unknown>;
+      expect(payload.protocolVersion).toBe(2);
+      expect(server.protocolVersion).toBe(2);
+    });
+
+    it('register message sends v2 welcome with protocolVersion and capabilities', async () => {
+      const sessionId = 'register-session';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = server.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (server as any)._wss.address().port;
+
+      const { ws, welcome } = await connectAndRegister(port, sessionId, {
+        protocolVersion: 2,
+        capabilities: ['execute', 'queryState', 'subscribe'],
+      });
+      client = ws;
+
+      await startPromise;
+
+      const payload = welcome.payload as Record<string, unknown>;
+      expect(payload.protocolVersion).toBe(2);
+      expect(payload.capabilities).toEqual(['execute', 'queryState', 'subscribe']);
+      expect(server.protocolVersion).toBe(2);
+      expect([...server.capabilities]).toEqual(['execute', 'queryState', 'subscribe']);
+    });
+
+    it('register message negotiates capabilities to intersection', async () => {
+      const sessionId = 'register-cap-session';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = server.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (server as any)._wss.address().port;
+
+      const { ws, welcome } = await connectAndRegister(port, sessionId, {
+        protocolVersion: 2,
+        capabilities: ['execute', 'heartbeat', 'queryDataModel'],
+      });
+      client = ws;
+
+      await startPromise;
+
+      const payload = welcome.payload as Record<string, unknown>;
+      const caps = payload.capabilities as string[];
+      expect(caps).toContain('execute');
+      expect(caps).toContain('queryDataModel');
+      expect(caps).not.toContain('heartbeat');
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Heartbeat handling
+  // -----------------------------------------------------------------------
+
+  describe('heartbeat', () => {
+    it('silently accepts heartbeat messages after handshake', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      // Send a heartbeat message
+      client.send(JSON.stringify({
+        type: 'heartbeat',
+        sessionId: ready.sessionId,
+        payload: {
+          uptimeMs: 5000,
+          state: 'Edit',
+          pendingRequests: 0,
+        },
+      }));
+
+      // Give it time to process
+      await new Promise((r) => setTimeout(r, 50));
+
+      // Verify the server recorded the heartbeat
+      const lastHb = (server as any)._lastHeartbeatTimestamp;
+      expect(lastHb).toBeGreaterThan(0);
+    });
+
+    it('does not interfere with script execution', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const resultPromise = server.executeAsync({
+        scriptContent: 'print("test")',
+      });
+
+      await new Promise<void>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8'),
+          );
+          if (data.type === 'execute') resolve();
+        });
+      });
+
+      // Send a heartbeat during execution
+      client!.send(JSON.stringify({
+        type: 'heartbeat',
+        sessionId: ready.sessionId,
+        payload: {
+          uptimeMs: 10000,
+          state: 'Edit',
+          pendingRequests: 1,
+        },
+      }));
+
+      // Then complete the script
+      client!.send(JSON.stringify({
+        type: 'scriptComplete',
+        sessionId: ready.sessionId,
+        payload: { success: true },
+      }));
+
+      const result = await resultPromise;
+      expect(result.success).toBe(true);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Protocol version / capabilities getters
+  // -----------------------------------------------------------------------
+
+  describe('protocol getters', () => {
+    it('defaults to v1 and [execute] before handshake', () => {
+      server = new StudioBridgeServer({ placePath: '/fake/place.rbxl' });
+      expect(server.protocolVersion).toBe(1);
+      expect([...server.capabilities]).toEqual(['execute']);
+    });
+  });
 });
