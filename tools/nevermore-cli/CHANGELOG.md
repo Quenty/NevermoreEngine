@@ -1,19 +1,18 @@
-# v4.23.0 (Mon Feb 23 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): add structured progress and failure context to reporting [#668](https://github.com/Quenty/NevermoreEngine/pull/668) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.23.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.22.0...@quenty/nevermore-cli@4.23.0) (2026-02-23)
+
+
+### Features
+
+* **cli:** add structured progress and failure context to reporting ([#668](https://github.com/Quenty/Nevermore/issues/668)) ([e716329](https://github.com/Quenty/Nevermore/commit/e716329f5aeace8b213322ba3cce06b98d8ea43d))
+
+
+
+
 
 # [4.22.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.21.0...@quenty/nevermore-cli@4.22.0) (2026-02-20)
 
