@@ -28,6 +28,16 @@ interface RojoNode {
   [key: string]: unknown;
 }
 
+import { type StepProgress } from '@quenty/cli-output-helpers/reporting';
+
+/** Progress callbacks for granular phase reporting during combined builds. */
+export interface CombinedBuildProgress {
+  onPackageBuildStart?(packageName: string): void;
+  onPackageBuildComplete?(packageName: string): void;
+  onCombineStart?(): void;
+  onStepProgress?(progress: StepProgress): void;
+}
+
 /** Per-package build info collected during phase 1. */
 interface PackageBuildInfo {
   slug: string;
@@ -47,8 +57,9 @@ export async function generateCombinedProjectAsync(options: {
   repoRoot: string;
   batchPlaceId?: number;
   batchUniverseId?: number;
+  progress?: CombinedBuildProgress;
 }): Promise<CombinedProjectResult> {
-  const { packages, batchPlaceId, batchUniverseId } = options;
+  const { packages, batchPlaceId, batchUniverseId, progress } = options;
 
   if (packages.length === 0) {
     throw new Error('No packages provided for combined project generation');
@@ -64,6 +75,7 @@ export async function generateCombinedProjectAsync(options: {
 
   // ── Phase 1: Build each package individually ──
 
+  let buildIndex = 0;
   for (const pkg of packages) {
     const configPath = resolveDeployConfigPath(pkg.path);
     const config = await loadDeployConfigAsync(configPath);
@@ -92,7 +104,16 @@ export async function generateCombinedProjectAsync(options: {
     // Build this package's .rbxl
     const rbxlPath = buildContext.resolvePath(`${slug}.rbxl`);
     OutputHelper.verbose(`Building ${pkg.name} (${slug})...`);
+    progress?.onPackageBuildStart?.(pkg.name);
     await buildContext.rojoBuildAsync({ projectPath, output: rbxlPath });
+    buildIndex++;
+    progress?.onPackageBuildComplete?.(pkg.name);
+    progress?.onStepProgress?.({
+      kind: 'steps',
+      completed: buildIndex,
+      total: packages.length,
+      label: pkg.name,
+    });
 
     // Resolve scriptTemplate path
     if (!target.scriptTemplate) {
@@ -123,6 +144,12 @@ export async function generateCombinedProjectAsync(options: {
   OutputHelper.verbose(
     `Merging ${builds.length} packages into combined .rbxl...`
   );
+  progress?.onCombineStart?.();
+  progress?.onStepProgress?.({
+    kind: 'steps',
+    completed: 0,
+    total: builds.length,
+  });
   await buildContext.executeLuneTransformScriptAsync(luneScriptPath, ...luneArgs);
 
   OutputHelper.verbose(

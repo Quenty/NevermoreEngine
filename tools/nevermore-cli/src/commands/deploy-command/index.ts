@@ -168,7 +168,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
     const apiKey = await getApiKeyAsync(args);
     const client = new OpenCloudClient({ apiKey, rateLimiter: new RateLimiter() });
-    const context = new CloudJobContext(client);
+    const context = new CloudJobContext(reporter, client);
 
     await reporter.startAsync();
 

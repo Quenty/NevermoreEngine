@@ -6,10 +6,37 @@
  */
 
 /** Execution phases a package can move through. */
-export type JobPhase = 'building' | 'downloading' | 'merging' | 'uploading' | 'scheduling' | 'launching' | 'connecting' | 'executing';
+export type JobPhase = 'waiting' | 'building' | 'downloading' | 'merging' | 'combining' | 'uploading' | 'scheduling' | 'launching' | 'connecting' | 'executing';
 
 /** Unified status for a package moving through the job lifecycle. */
 export type PackageStatus = 'pending' | JobPhase | 'passed' | 'failed';
+
+// ── Progress summary types ─────────────────────────────────────────────────
+
+/** Test count progress: "23/100 passed" */
+export interface TestCountProgress {
+  kind: 'test-counts';
+  passed: number;
+  failed: number;
+  total: number;
+}
+
+/** Byte-level transfer progress: "45% of 12.3 MB" */
+export interface ByteProgress {
+  kind: 'bytes';
+  transferredBytes: number;
+  totalBytes: number;
+}
+
+/** Generic step progress: "3/10 packages" */
+export interface StepProgress {
+  kind: 'steps';
+  completed: number;
+  total: number;
+  label?: string;
+}
+
+export type ProgressSummary = TestCountProgress | ByteProgress | StepProgress;
 
 /** Result for a single package in a batch run. */
 export interface PackageResult {
@@ -18,6 +45,8 @@ export interface PackageResult {
   logs: string;
   durationMs: number;
   error?: string;
+  progressSummary?: ProgressSummary;
+  failedPhase?: JobPhase;
 }
 
 /** Summary of a complete batch run. */
@@ -47,6 +76,9 @@ export interface Reporter {
   /** Called when a package transitions phases (building, uploading, executing, etc). */
   onPackagePhaseChange(packageName: string, phase: JobPhase): void;
 
+  /** Called when a package's in-progress metrics update (high-frequency). */
+  onPackageProgressUpdate(packageName: string, progress: ProgressSummary): void;
+
   /** Called when a single package job completes. */
   onPackageResult(result: PackageResult, bufferedOutput?: string[]): void;
 
@@ -62,6 +94,7 @@ export class BaseReporter implements Reporter {
   async startAsync(): Promise<void> {}
   onPackageStart(_packageName: string): void {}
   onPackagePhaseChange(_packageName: string, _phase: JobPhase): void {}
+  onPackageProgressUpdate(_packageName: string, _progress: ProgressSummary): void {}
   onPackageResult(_result: PackageResult, _bufferedOutput?: string[]): void {}
   async stopAsync(): Promise<void> {}
 }

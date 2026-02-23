@@ -172,7 +172,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     apiKey,
     rateLimiter: new RateLimiter(),
   });
-  const context = new CloudJobContext(client);
+  const context = new CloudJobContext(reporter, client);
 
   await reporter.startAsync();
 
@@ -188,7 +188,6 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           targetName,
           outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
           packagePath: pkg.path,
-          reporter: pkgReporter,
           packageName: pkg.name,
         });
 

@@ -6,7 +6,19 @@ export {
   type PackageStatus,
   type PackageResult,
   type BatchSummary,
+  type ProgressSummary,
+  type TestCountProgress,
+  type ByteProgress,
+  type StepProgress,
 } from './reporter.js';
+
+// Progress formatting helpers
+export {
+  formatProgressInline,
+  formatProgressResult,
+  isEmptyTestRun,
+  summarizeFailure,
+} from './progress-format.js';
 
 // State tracking
 export {

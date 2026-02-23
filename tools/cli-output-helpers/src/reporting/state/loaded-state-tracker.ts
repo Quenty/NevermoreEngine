@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import {
   type PackageResult,
+  type PackageStatus,
   type BatchSummary,
 } from '../reporter.js';
 import {
@@ -48,6 +49,7 @@ export class LoadedStateTracker implements IStateTracker {
         status: result.success ? 'passed' : 'failed',
         durationMs: result.durationMs,
         result,
+        progress: result.progressSummary,
       });
       if (!result.success) {
         failures.push(result);
@@ -91,5 +93,9 @@ export class LoadedStateTracker implements IStateTracker {
 
   getFailures(): PackageResult[] {
     return this._failures;
+  }
+
+  getCurrentPhase(name: string): PackageStatus | undefined {
+    return this._packages.get(name)?.status;
   }
 }

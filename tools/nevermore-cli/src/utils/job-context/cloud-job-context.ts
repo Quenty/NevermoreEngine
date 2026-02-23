@@ -30,22 +30,30 @@ class CloudDeployment implements Deployment {
 }
 
 export class CloudJobContext extends BaseJobContext {
-  constructor(openCloudClient: OpenCloudClient) {
-    super(openCloudClient);
+  constructor(reporter: Reporter, openCloudClient: OpenCloudClient) {
+    super(reporter, openCloudClient);
   }
 
   async deployBuiltPlaceAsync(
-    reporter: Reporter,
     options: DeployPlaceOptions
   ): Promise<Deployment> {
     const { builtPlace, packageName, packagePath } = options;
     const { rbxlPath, target } = builtPlace;
 
-    reporter.onPackagePhaseChange(packageName, 'uploading');
+    this._reporter.onPackagePhaseChange(packageName, 'uploading');
+
     const version = await this._openCloudClient!.uploadPlaceAsync(
       target.universeId,
       target.placeId,
-      rbxlPath
+      rbxlPath,
+      undefined,
+      (transferred, total) => {
+        this._reporter.onPackageProgressUpdate(packageName, {
+          kind: 'bytes',
+          transferredBytes: transferred,
+          totalBytes: total,
+        });
+      }
     );
 
     // Eagerly release build artifacts after upload (disposeAsync is safety net)
@@ -62,13 +70,12 @@ export class CloudJobContext extends BaseJobContext {
 
   async runScriptAsync(
     deployment: Deployment,
-    reporter: Reporter,
     options: RunScriptOptions
   ): Promise<ScriptRunResult> {
     const cloudDeployment = deployment as CloudDeployment;
     const { scriptContent, packageName, timeoutMs = 120_000 } = options;
 
-    reporter.onPackagePhaseChange(packageName, 'scheduling');
+    this._reporter.onPackagePhaseChange(packageName, 'scheduling');
     const task = await this._openCloudClient!.createExecutionTaskAsync(
       cloudDeployment.universeId,
       cloudDeployment.placeId,
@@ -76,11 +83,20 @@ export class CloudJobContext extends BaseJobContext {
       scriptContent
     );
 
+    let pollCount = 0;
     const completedTask = await Promise.race([
       this._openCloudClient!.pollTaskCompletionAsync(task.path, (state) => {
+        pollCount++;
         if (state === 'PROCESSING') {
-          reporter.onPackagePhaseChange(packageName, 'executing');
+          this._reporter.onPackagePhaseChange(packageName, 'executing');
         }
+        const label = state === 'QUEUED' ? 'queued' : `poll #${pollCount}`;
+        this._reporter.onPackageProgressUpdate(packageName, {
+          kind: 'steps',
+          completed: pollCount,
+          total: 0,
+          label,
+        });
       }),
       timeoutAsync(timeoutMs, `Test timed out after ${timeoutMs / 1000}s`),
     ]);

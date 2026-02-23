@@ -1,3 +1,20 @@
+# (Mon Feb 23 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.10.0`, `@quenty/nevermore-cli@4.23.0`
+  - feat(cli): add structured progress and failure context to reporting [#668](https://github.com/Quenty/NevermoreEngine/pull/668) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Restructure CLAUDE.md and extract tools/ conventions [#667](https://github.com/Quenty/NevermoreEngine/pull/667) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Feb 20 2026)
 
 #### 🚀 Enhancement

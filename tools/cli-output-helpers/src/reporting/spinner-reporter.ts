@@ -2,6 +2,7 @@ import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs } from '../cli-utils.js';
 import { type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
+import { formatProgressInline, formatProgressResult, isEmptyTestRun } from './progress-format.js';
 
 export interface SpinnerReporterOptions {
   showLogs: boolean;
@@ -17,7 +18,9 @@ const SPINNER_FRAMES = ['◐', '◓', '◑', '◒'];
 
 /** Emoji + label for each active phase in the spinner. */
 const PHASE_LABELS: Record<string, string> = {
+  waiting: '◇ Waiting',
   building: '⚙ Building',
+  combining: '🔗 Combining',
   uploading: '▲ Uploading',
   scheduling: '◇ Scheduling',
   launching: '🚀 Launching',
@@ -164,22 +167,31 @@ export class SpinnerReporter extends BaseReporter {
         )} ${statusText}`;
       } else if (phaseLabel) {
         const icon = OutputHelper.formatInfo(spinner);
-        const statusText = OutputHelper.formatInfo(phaseLabel);
-        line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-          22
-        )} ${OutputHelper.formatDim(time)}`;
+        const progressText = formatProgressInline(state.progress);
+        const plain = progressText
+          ? `${phaseLabel} ${progressText}`
+          : phaseLabel;
+        const statusText = OutputHelper.formatInfo(plain.padEnd(22));
+        line = `  ${icon} ${state.name.padEnd(30)} ${statusText} ${OutputHelper.formatDim(time)}`;
       } else if (state.status === 'passed') {
         const icon = OutputHelper.formatSuccess('✓');
-        const statusText = OutputHelper.formatSuccess(this._options.successLabel ?? 'Passed');
-        line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-          20
-        )} ${OutputHelper.formatDim(time)}`;
+        const progressText = formatProgressResult(state.result?.progressSummary);
+        const label = this._options.successLabel ?? 'Passed';
+        const empty = isEmptyTestRun(state.result?.progressSummary);
+        let plain = progressText ? `${label} ${progressText}` : label;
+        if (empty) plain += ' ⚠';
+        const statusText = empty
+          ? OutputHelper.formatWarning(plain.padEnd(22))
+          : OutputHelper.formatSuccess(plain.padEnd(22));
+        line = `  ${icon} ${state.name.padEnd(30)} ${statusText} ${OutputHelper.formatDim(time)}`;
       } else {
         const icon = OutputHelper.formatError('✗');
-        const statusText = OutputHelper.formatError(this._options.failureLabel ?? 'FAILED');
-        line = `  ${icon} ${state.name.padEnd(30)} ${statusText.padEnd(
-          20
-        )} ${OutputHelper.formatDim(time)}`;
+        const failedPhase = state.result?.failedPhase;
+        const plain = failedPhase
+          ? `${this._options.failureLabel ?? 'FAILED'} at ${failedPhase}`
+          : (this._options.failureLabel ?? 'FAILED');
+        const statusText = OutputHelper.formatError(plain.padEnd(22));
+        line = `  ${icon} ${state.name.padEnd(30)} ${statusText} ${OutputHelper.formatDim(time)}`;
       }
 
       lines.push(line);

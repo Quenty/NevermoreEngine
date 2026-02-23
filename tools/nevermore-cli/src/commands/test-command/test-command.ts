@@ -105,16 +105,17 @@ export class TestProjectCommand<T>
 
       const context = args.cloud
         ? new CloudJobContext(
+            reporter,
             new OpenCloudClient({
               apiKey: await getApiKeyAsync(args),
               rateLimiter: new RateLimiter(),
             })
           )
-        : new LocalJobContext();
+        : new LocalJobContext(reporter);
 
       let result;
       try {
-        result = await runSingleTestAsync(context, reporter, {
+        result = await runSingleTestAsync(context, {
           packagePath: cwd,
           packageName,
           scriptText: args.scriptText,
@@ -128,6 +129,9 @@ export class TestProjectCommand<T>
         success: result.success,
         logs: result.logs,
         durationMs: 0,
+        progressSummary: result.testCounts
+          ? { kind: 'test-counts', ...result.testCounts }
+          : undefined,
       });
 
       await reporter.stopAsync();
