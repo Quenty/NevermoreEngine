@@ -3,10 +3,11 @@
  * lifecycle, session listing, resolution, waiting, and event forwarding.
  */
 
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { WebSocket } from 'ws';
 import { BridgeConnection } from './bridge-connection.js';
 import { SessionNotFoundError, ContextNotFoundError } from './types.js';
+import type { BridgeSession } from './bridge-session.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -522,6 +523,210 @@ describe('BridgeConnection', () => {
       await expect(
         conn.resolveSession(undefined, undefined, 'nonexistent-inst'),
       ).rejects.toThrow(SessionNotFoundError);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // waitForSession (1.3d4)
+  // -----------------------------------------------------------------------
+
+  describe('waitForSession', () => {
+    it('resolves immediately when sessions already exist', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws } = await performRegisterHandshake(conn.port, 'existing-session', {
+        instanceId: 'inst-1',
+      });
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      const session = await conn.waitForSession();
+      expect(session.info.sessionId).toBe('existing-session');
+    });
+
+    it('resolves when a plugin connects', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      // Start waiting before plugin connects
+      const waitPromise = conn.waitForSession(5000);
+
+      // Connect plugin after a short delay
+      setTimeout(async () => {
+        const { ws } = await performRegisterHandshake(conn.port, 'late-session', {
+          instanceId: 'inst-1',
+        });
+        openClients.push(ws);
+      }, 100);
+
+      const session = await waitPromise;
+      expect(session.info.sessionId).toBe('late-session');
+    });
+
+    it('rejects after timeout with no plugin', async () => {
+      vi.useFakeTimers();
+
+      try {
+        const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+        connections.push(conn);
+
+        const waitPromise = conn.waitForSession(500);
+
+        // Advance past the timeout
+        vi.advanceTimersByTime(600);
+
+        await expect(waitPromise).rejects.toThrow('Timed out waiting for a session');
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Lifecycle events (1.3d4)
+  // -----------------------------------------------------------------------
+
+  describe('events', () => {
+    it('emits session-connected when plugin registers', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const connectedPromise = new Promise<BridgeSession>((resolve) => {
+        conn.on('session-connected', resolve);
+      });
+
+      const { ws } = await performRegisterHandshake(conn.port, 'session-evt', {
+        instanceId: 'inst-1',
+      });
+      openClients.push(ws);
+
+      const session = await connectedPromise;
+      expect(session.info.sessionId).toBe('session-evt');
+    });
+
+    it('emits session-disconnected when plugin closes', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws } = await performRegisterHandshake(conn.port, 'session-dc', {
+        instanceId: 'inst-1',
+      });
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      const disconnectedPromise = new Promise<string>((resolve) => {
+        conn.on('session-disconnected', resolve);
+      });
+
+      ws.close();
+
+      const sessionId = await disconnectedPromise;
+      expect(sessionId).toBe('session-dc');
+    });
+
+    it('emits instance-connected for first session of an instance', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const instancePromise = new Promise<{ instanceId: string }>((resolve) => {
+        conn.on('instance-connected', (instance) => {
+          resolve(instance);
+        });
+      });
+
+      const { ws } = await performRegisterHandshake(conn.port, 'session-1', {
+        instanceId: 'inst-new',
+        placeName: 'NewPlace',
+      });
+      openClients.push(ws);
+
+      const instance = await instancePromise;
+      expect(instance.instanceId).toBe('inst-new');
+    });
+
+    it('emits instance-disconnected when last session of an instance disconnects', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const { ws } = await performRegisterHandshake(conn.port, 'session-last', {
+        instanceId: 'inst-only',
+      });
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      const instanceDisconnectedPromise = new Promise<string>((resolve) => {
+        conn.on('instance-disconnected', resolve);
+      });
+
+      ws.close();
+
+      const instanceId = await instanceDisconnectedPromise;
+      expect(instanceId).toBe('inst-only');
+    });
+
+    it('does not emit instance-disconnected when other contexts remain', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      // Connect edit and server contexts for the same instance
+      const { ws: wsEdit } = await performRegisterHandshake(conn.port, 'edit-ctx', {
+        instanceId: 'inst-play',
+        state: 'Edit',
+      });
+      openClients.push(wsEdit);
+
+      const { ws: wsServer } = await performRegisterHandshake(conn.port, 'server-ctx', {
+        instanceId: 'inst-play',
+        state: 'Server',
+      });
+      openClients.push(wsServer);
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      let instanceDisconnectedFired = false;
+      conn.on('instance-disconnected', () => {
+        instanceDisconnectedFired = true;
+      });
+
+      // Disconnect only the server context
+      const sessionDisconnectedPromise = new Promise<string>((resolve) => {
+        conn.on('session-disconnected', resolve);
+      });
+
+      wsServer.close();
+      await sessionDisconnectedPromise;
+
+      // Wait a bit more to ensure no stray event
+      await new Promise((r) => setTimeout(r, 50));
+
+      // instance-disconnected should NOT have fired (edit context still connected)
+      expect(instanceDisconnectedFired).toBe(false);
+      expect(conn.listInstances()).toHaveLength(1);
+    });
+
+    it('fires multiple session-connected events for multiple plugins', async () => {
+      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      connections.push(conn);
+
+      const connectedIds: string[] = [];
+      conn.on('session-connected', (session: BridgeSession) => {
+        connectedIds.push(session.info.sessionId);
+      });
+
+      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-1', {
+        instanceId: 'inst-1',
+      });
+      openClients.push(ws1);
+
+      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-2', {
+        instanceId: 'inst-2',
+      });
+      openClients.push(ws2);
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      expect(connectedIds.sort()).toEqual(['session-1', 'session-2']);
     });
   });
 });
