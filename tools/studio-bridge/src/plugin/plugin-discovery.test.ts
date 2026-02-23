@@ -2,7 +2,7 @@
  * Unit tests for plugin discovery utilities.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as path from 'path';
 
 // Mock dependencies before importing the module under test
@@ -20,8 +20,19 @@ import { getPersistentPluginPath, isPersistentPluginInstalled } from './plugin-d
 const mockedExistsSync = vi.mocked(existsSync);
 
 describe('plugin-discovery', () => {
+  let originalCI: string | undefined;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    originalCI = process.env.CI;
+  });
+
+  afterEach(() => {
+    if (originalCI === undefined) {
+      delete process.env.CI;
+    } else {
+      process.env.CI = originalCI;
+    }
   });
 
   describe('getPersistentPluginPath', () => {
@@ -42,6 +53,14 @@ describe('plugin-discovery', () => {
     it('returns false when the plugin file does not exist', () => {
       mockedExistsSync.mockReturnValue(false);
       expect(isPersistentPluginInstalled()).toBe(false);
+    });
+
+    it('returns false in CI environment regardless of file existence', () => {
+      process.env.CI = 'true';
+      mockedExistsSync.mockReturnValue(true);
+      expect(isPersistentPluginInstalled()).toBe(false);
+      // existsSync should not even be called in CI
+      expect(mockedExistsSync).not.toHaveBeenCalled();
     });
   });
 });

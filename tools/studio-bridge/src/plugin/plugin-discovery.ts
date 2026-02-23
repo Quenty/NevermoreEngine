@@ -14,5 +14,8 @@ export function getPersistentPluginPath(): string {
 }
 
 export function isPersistentPluginInstalled(): boolean {
+  if (process.env.CI === 'true') {
+    return false;
+  }
   return fs.existsSync(getPersistentPluginPath());
 }

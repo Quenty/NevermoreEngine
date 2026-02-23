@@ -34,6 +34,7 @@ import {
   injectPluginAsync,
   type InjectedPlugin,
 } from '../plugin/plugin-injector.js';
+import { isPersistentPluginInstalled } from '../plugin/plugin-discovery.js';
 import {
   launchStudioAsync,
   type StudioProcess,
@@ -87,6 +88,11 @@ export interface StudioBridgeServerOptions {
   onPhase?: (phase: StudioBridgePhase) => void;
   /** Session ID for concurrent session isolation. Auto-generated if omitted. */
   sessionId?: string;
+  /** Whether to prefer the persistent plugin over temp injection (default: true).
+   *  When true and the persistent plugin is installed, the server waits for
+   *  the plugin to discover it via the health endpoint before falling back
+   *  to temporary injection. Set to false in CI environments. */
+  preferPersistentPlugin?: boolean;
 }
 
 export interface ExecuteOptions {
@@ -196,6 +202,7 @@ const ACTION_CAPABILITIES: Record<string, Capability> = {
 export class StudioBridgeServer {
   private _state: BridgeState = 'idle';
 
+  private readonly _options: StudioBridgeServerOptions;
   private readonly _sessionId: string;
   private readonly _defaultTimeoutMs: number;
   private readonly _onPhase: ((phase: StudioBridgePhase) => void) | undefined;
@@ -215,6 +222,7 @@ export class StudioBridgeServer {
   private _actionDispatcher = new ActionDispatcher();
 
   constructor(options: StudioBridgeServerOptions = {}) {
+    this._options = options;
     this._sessionId = options.sessionId ?? randomUUID();
     this._defaultTimeoutMs = options.timeoutMs ?? 120_000;
     this._onPhase = options.onPhase;
@@ -343,14 +351,32 @@ export class StudioBridgeServer {
         `[StudioBridge] WebSocket server listening on port ${port}`
       );
 
-      // 2. Inject plugin (no scriptContent — scripts are sent via execute messages)
-      this._pluginHandle = await injectPluginAsync({
-        port,
-        sessionId: this._sessionId,
-      });
-      OutputHelper.verbose(
-        `[StudioBridge] Plugin injected: ${this._pluginHandle.pluginPath}`
-      );
+      // 2. Decide between persistent plugin and temp injection
+      const preferPersistent = this._options.preferPersistentPlugin ?? true;
+
+      if (preferPersistent && isPersistentPluginInstalled()) {
+        // Persistent plugin is installed. Skip injection and wait for the
+        // plugin to discover us via the health endpoint.
+        // Start a grace period timer: if the plugin does not connect within
+        // the grace period, fall back to temporary injection.
+        OutputHelper.verbose(
+          '[StudioBridge] Persistent plugin detected, waiting for connection'
+        );
+        const graceMs = 3_000;
+        const connected = await this._waitForPluginConnectionAsync(graceMs);
+        if (!connected) {
+          // Grace period expired. Plugin may not be running in Studio.
+          // Fall back to temporary injection.
+          OutputHelper.verbose(
+            '[StudioBridge] Grace period expired, falling back to temp injection'
+          );
+          await this._injectPluginAsync();
+        }
+      } else {
+        // No persistent plugin or preference disabled (CI mode).
+        // Use temporary injection (existing v1 behavior).
+        await this._injectPluginAsync();
+      }
 
       // 3. Launch Studio
       this._onPhase?.('launching');
@@ -359,9 +385,11 @@ export class StudioBridgeServer {
         `[StudioBridge] Studio launched (PID: ${this._studioProc.process.pid})`
       );
 
-      // 4. Wait for handshake
+      // 4. Wait for handshake (only if not already connected via persistent plugin)
       this._onPhase?.('connecting');
-      await this._waitForHandshakeAsync();
+      if (!this._connectedClient) {
+        await this._waitForHandshakeAsync();
+      }
 
       this._state = 'ready';
     } catch (error) {
@@ -450,6 +478,203 @@ export class StudioBridgeServer {
 
     await this._cleanupResourcesAsync();
     this._state = 'stopped';
+  }
+
+  // -----------------------------------------------------------------------
+  // Private: _injectPluginAsync
+  // -----------------------------------------------------------------------
+
+  /**
+   * Inject the temporary plugin via rojo build into Studio's plugins folder.
+   */
+  private async _injectPluginAsync(): Promise<void> {
+    this._pluginHandle = await injectPluginAsync({
+      port: this._port,
+      sessionId: this._sessionId,
+    });
+    OutputHelper.verbose(
+      `[StudioBridge] Plugin injected: ${this._pluginHandle.pluginPath}`
+    );
+  }
+
+  // -----------------------------------------------------------------------
+  // Private: _waitForPluginConnectionAsync
+  // -----------------------------------------------------------------------
+
+  /**
+   * Wait for a persistent plugin to connect via WebSocket within the grace
+   * period. Returns true if a plugin connected (sent hello or register),
+   * false if the grace period expired.
+   */
+  private _waitForPluginConnectionAsync(graceMs: number): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      let settled = false;
+
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          resolve(false);
+        }
+      }, graceMs);
+
+      this._wss!.on('connection', (ws: WebSocket) => {
+        if (settled) return;
+
+        const onMessage = (raw: Buffer | string) => {
+          if (settled) return;
+          const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+          const msg = decodePluginMessage(data);
+          if (!msg) return;
+
+          if (msg.type === 'hello' || msg.type === 'register') {
+            settled = true;
+            clearTimeout(timer);
+            ws.off('message', onMessage);
+
+            // Perform the full handshake using the existing logic.
+            // We push this message back by emitting it after re-registering
+            // the handshake handler. Instead, we resolve true and let
+            // _waitForHandshakeAsync handle the actual handshake.
+            // But we need to handle the handshake inline here since the
+            // message is already consumed. Re-emit it.
+            // Actually, we should NOT consume the message. We need to let
+            // _waitForHandshakeAsync handle it. Unfortunately, the 'connection'
+            // event has already fired. We can manually emit the message event.
+            //
+            // The cleanest approach: complete the full handshake here ourselves.
+            this._handlePluginHandshakeMessage(ws, data, msg);
+            resolve(true);
+          }
+        };
+
+        ws.on('message', onMessage);
+
+        ws.on('error', (err) => {
+          OutputHelper.verbose(
+            `[StudioBridge] WebSocket error during grace period: ${err.message}`
+          );
+        });
+      });
+    });
+  }
+
+  /**
+   * Handle the handshake message (hello or register) from a plugin that
+   * connected during the grace period, completing negotiation and storing
+   * the connected client.
+   */
+  private _handlePluginHandshakeMessage(
+    ws: WebSocket,
+    rawData: string,
+    msg: PluginMessage,
+  ): void {
+    const serverSupportedCapabilities: Capability[] = [
+      'execute',
+      'queryState',
+      'captureScreenshot',
+      'queryDataModel',
+      'queryLogs',
+      'subscribe',
+    ];
+
+    if (msg.type === 'hello') {
+      // Check session ID match for hello messages
+      if (
+        msg.sessionId !== this._sessionId ||
+        msg.payload.sessionId !== this._sessionId
+      ) {
+        OutputHelper.verbose(
+          '[StudioBridge] Rejecting hello with wrong session ID during grace period'
+        );
+        ws.close();
+        return;
+      }
+
+      // Determine if this is a v2 hello
+      let rawProtocolVersion: number | undefined;
+      try {
+        const rawObj = JSON.parse(rawData) as Record<string, unknown>;
+        if (typeof rawObj.protocolVersion === 'number') {
+          rawProtocolVersion = rawObj.protocolVersion;
+        }
+      } catch {
+        // ignore
+      }
+
+      const isV2 = rawProtocolVersion !== undefined && rawProtocolVersion >= 2;
+
+      if (isV2) {
+        this._negotiatedProtocolVersion = Math.min(rawProtocolVersion!, 2);
+        const pluginCapabilities = msg.payload.capabilities ?? ['execute' as Capability];
+        this._negotiatedCapabilities = pluginCapabilities.filter(
+          (cap) => serverSupportedCapabilities.includes(cap),
+        );
+
+        OutputHelper.verbose('[StudioBridge] v2 handshake accepted (grace period)');
+        ws.send(JSON.stringify({
+          type: 'welcome',
+          sessionId: this._sessionId,
+          payload: {
+            sessionId: this._sessionId,
+            protocolVersion: this._negotiatedProtocolVersion,
+            capabilities: this._negotiatedCapabilities,
+          },
+        }));
+      } else {
+        this._negotiatedProtocolVersion = 1;
+        this._negotiatedCapabilities = ['execute'];
+
+        OutputHelper.verbose('[StudioBridge] Handshake accepted (grace period)');
+        ws.send(
+          encodeMessage({
+            type: 'welcome',
+            sessionId: this._sessionId,
+            payload: { sessionId: this._sessionId },
+          })
+        );
+      }
+    } else if (msg.type === 'register') {
+      this._negotiatedProtocolVersion = Math.min(msg.protocolVersion, 2);
+      this._negotiatedCapabilities = msg.payload.capabilities.filter(
+        (cap) => serverSupportedCapabilities.includes(cap),
+      );
+
+      OutputHelper.verbose('[StudioBridge] v2 register handshake accepted (grace period)');
+      ws.send(JSON.stringify({
+        type: 'welcome',
+        sessionId: this._sessionId,
+        payload: {
+          sessionId: this._sessionId,
+          protocolVersion: this._negotiatedProtocolVersion,
+          capabilities: this._negotiatedCapabilities,
+        },
+      }));
+    }
+
+    // Finish handshake — store client and wire up post-handshake listeners
+    this._connectedClient = ws;
+
+    ws.on('message', (raw: Buffer | string) => {
+      const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+      const innerMsg = decodePluginMessage(data);
+      if (!innerMsg) return;
+
+      if (this._actionDispatcher.handleResponse(innerMsg)) {
+        return;
+      }
+
+      if (innerMsg.type === 'heartbeat') {
+        this._lastHeartbeatTimestamp = Date.now();
+      }
+    });
+
+    ws.on('close', () => {
+      OutputHelper.verbose('[StudioBridge] Plugin disconnected');
+      this._connectedClient = undefined;
+      if (this._state !== 'stopping' && this._state !== 'stopped') {
+        this._state = 'stopped';
+      }
+    });
   }
 
   // -----------------------------------------------------------------------
