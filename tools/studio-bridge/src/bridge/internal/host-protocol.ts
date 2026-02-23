@@ -61,6 +61,10 @@ export interface SessionEvent {
   instanceId: string;
 }
 
+export interface HostTransferNotice {
+  type: 'host-transfer';
+}
+
 // ---------------------------------------------------------------------------
 // Union type
 // ---------------------------------------------------------------------------
@@ -72,7 +76,8 @@ export type HostProtocolMessage =
   | HostResponse
   | ListSessionsResponse
   | ListInstancesResponse
-  | SessionEvent;
+  | SessionEvent
+  | HostTransferNotice;
 
 // ---------------------------------------------------------------------------
 // Encoding / Decoding
@@ -206,6 +211,10 @@ export function decodeHostMessage(raw: string): HostProtocolMessage | null {
         context: obj.context as SessionContext,
         instanceId: obj.instanceId,
       };
+    }
+
+    case 'host-transfer': {
+      return { type: 'host-transfer' };
     }
 
     default:

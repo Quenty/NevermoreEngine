@@ -25,7 +25,9 @@ import {
   type ListInstancesResponse,
   type SessionEvent,
   type HostProtocolMessage,
+  type HostTransferNotice,
 } from './host-protocol.js';
+import { HandOffManager } from './hand-off.js';
 import type { TransportHandle } from './session-tracker.js';
 import { BridgeSession } from '../bridge-session.js';
 import type { SessionInfo, InstanceInfo, SessionContext } from '../types.js';
@@ -90,6 +92,7 @@ export class BridgeClient extends EventEmitter {
     timer: ReturnType<typeof setTimeout>;
   }>();
   private _isConnected = false;
+  private _handOff: HandOffManager | undefined;
 
   /**
    * Connect to an existing bridge host.
@@ -98,6 +101,8 @@ export class BridgeClient extends EventEmitter {
     const targetHost = host ?? 'localhost';
     const url = `ws://${targetHost}:${port}/client`;
 
+    this._handOff = new HandOffManager({ port });
+
     this._transport.on('message', (data: string) => {
       this._handleMessage(data);
     });
@@ -105,6 +110,9 @@ export class BridgeClient extends EventEmitter {
     this._transport.on('disconnected', () => {
       this._isConnected = false;
       this.emit('disconnected');
+
+      // Trigger failover detection
+      this._handleHostDisconnectAsync();
     });
 
     this._transport.on('connected', () => {
@@ -269,6 +277,10 @@ export class BridgeClient extends EventEmitter {
       case 'session-event':
         this._handleSessionEvent(msg);
         break;
+
+      case 'host-transfer':
+        this._handOff?.onHostTransferNotice();
+        break;
     }
   }
 
@@ -390,5 +402,29 @@ export class BridgeClient extends EventEmitter {
         reject(err);
       }
     });
+  }
+
+  /**
+   * Handle host WebSocket disconnect by running the failover state machine.
+   * Emits 'host-promoted' if this client should become the new host, or
+   * 'host-fallback' if another client won the race.
+   */
+  private async _handleHostDisconnectAsync(): Promise<void> {
+    if (!this._handOff) {
+      return;
+    }
+
+    try {
+      const outcome = await this._handOff.onHostDisconnectedAsync();
+
+      if (outcome === 'promoted') {
+        this.emit('host-promoted');
+      } else {
+        this.emit('host-fallback');
+      }
+    } catch {
+      // HostUnreachableError — nothing we can do
+      this.emit('host-unreachable');
+    }
   }
 }

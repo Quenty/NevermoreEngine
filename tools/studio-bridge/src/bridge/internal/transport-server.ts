@@ -5,7 +5,7 @@
  * routes connections by URL path.
  */
 
-import { createServer, type IncomingMessage, type ServerResponse, type Server } from 'http';
+import { createServer, type IncomingMessage, type ServerResponse, type Server, type Socket } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { URL } from 'url';
 
@@ -35,6 +35,7 @@ export class TransportServer {
   private _wss: WebSocketServer | undefined;
   private _port = 0;
   private _isListening = false;
+  private readonly _sockets = new Set<Socket>();
 
   private readonly _wsHandlers = new Map<string, ConnectionHandler>();
   private readonly _httpHandlers = new Map<string, HttpHandler>();
@@ -55,6 +56,14 @@ export class TransportServer {
 
     this._httpServer = createServer((req, res) => {
       this._handleHttpRequest(req, res);
+    });
+
+    // Track all raw TCP sockets so forceCloseAsync() can destroy them
+    this._httpServer.on('connection', (socket: Socket) => {
+      this._sockets.add(socket);
+      socket.on('close', () => {
+        this._sockets.delete(socket);
+      });
     });
 
     this._wss = new WebSocketServer({ noServer: true });
@@ -98,6 +107,9 @@ export class TransportServer {
 
       server.once('error', onError);
       server.once('listening', onListening);
+      // SO_REUSEADDR is enabled by default in Node's net module, allowing
+      // the port to be rebound immediately after a process crash without
+      // waiting for TIME_WAIT to expire. This is essential for host failover.
       server.listen(port, host, undefined, undefined);
     });
   }
@@ -161,6 +173,45 @@ export class TransportServer {
    */
   onHttpRequest(path: string, handler: HttpHandler): void {
     this._httpHandlers.set(path, handler);
+  }
+
+  /**
+   * Force-close the server by destroying all open TCP sockets immediately.
+   * Unlike stopAsync(), this does not wait for graceful close handshakes.
+   * Used during host shutdown to release the port as fast as possible.
+   */
+  async forceCloseAsync(): Promise<void> {
+    if (!this._isListening) {
+      return;
+    }
+    this._isListening = false;
+
+    // Destroy all raw TCP sockets immediately
+    for (const socket of this._sockets) {
+      socket.destroy();
+    }
+    this._sockets.clear();
+
+    // Terminate all WebSocket connections
+    if (this._wss) {
+      for (const client of this._wss.clients) {
+        client.terminate();
+      }
+      await new Promise<void>((resolve) => {
+        this._wss!.close(() => resolve());
+      });
+      this._wss = undefined;
+    }
+
+    // Close the HTTP server
+    if (this._httpServer) {
+      await new Promise<void>((resolve) => {
+        this._httpServer!.close(() => resolve());
+      });
+      this._httpServer = undefined;
+    }
+
+    this._port = 0;
   }
 
   // -------------------------------------------------------------------------

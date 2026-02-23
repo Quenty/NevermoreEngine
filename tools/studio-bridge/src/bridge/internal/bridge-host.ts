@@ -9,6 +9,7 @@ import type { WebSocket, RawData } from 'ws';
 import type { IncomingMessage } from 'http';
 import { TransportServer, type TransportServerOptions } from './transport-server.js';
 import { createHealthHandler } from './health-endpoint.js';
+import { encodeHostMessage, type HostTransferNotice } from './host-protocol.js';
 import {
   decodePluginMessage,
   encodeMessage,
@@ -46,11 +47,15 @@ export interface PluginSessionInfo {
 // ---------------------------------------------------------------------------
 
 const PROTOCOL_VERSION = 2;
+const SHUTDOWN_TIMEOUT_MS = 2_000;
+const SHUTDOWN_DRAIN_MS = 100;
 
 export class BridgeHost extends EventEmitter {
   private _transport: TransportServer;
   private _plugins: Map<string, WebSocket> = new Map();
+  private _clients: Set<WebSocket> = new Set();
   private _isRunning = false;
+  private _shuttingDown = false;
   private _startTime = 0;
 
   constructor() {
@@ -73,6 +78,17 @@ export class BridgeHost extends EventEmitter {
     // Register /plugin WebSocket handler
     this._transport.onConnection('/plugin', (ws, request) => {
       this._handlePluginConnection(ws, request);
+    });
+
+    // Register /client WebSocket handler for CLI clients
+    this._transport.onConnection('/client', (ws) => {
+      this._clients.add(ws);
+      ws.on('close', () => {
+        this._clients.delete(ws);
+      });
+      ws.on('error', () => {
+        // Errors are handled implicitly via close
+      });
     });
 
     // Register /health HTTP handler
@@ -101,7 +117,78 @@ export class BridgeHost extends EventEmitter {
     }
     this._isRunning = false;
     this._plugins.clear();
+    this._clients.clear();
     await this._transport.stopAsync();
+  }
+
+  /**
+   * Graceful shutdown: broadcast HostTransferNotice to all connected clients,
+   * wait briefly for them to process it, then close all connections and
+   * release the port. Idempotent — calling multiple times is safe.
+   *
+   * Wrapped in a timeout: if the graceful sequence exceeds 2 seconds, the
+   * transport is force-closed to ensure the port is freed.
+   */
+  async shutdownAsync(): Promise<void> {
+    if (this._shuttingDown) {
+      return;
+    }
+    this._shuttingDown = true;
+
+    const gracefulShutdown = async () => {
+      // Step 1: Broadcast HostTransferNotice to all CLI clients
+      const notice: HostTransferNotice = { type: 'host-transfer' };
+      const encoded = encodeHostMessage(notice);
+      for (const ws of this._clients) {
+        try {
+          ws.send(encoded);
+        } catch {
+          // Client may already be disconnected
+        }
+      }
+
+      // Step 2: Wait briefly for clients to process the notice
+      await new Promise<void>((resolve) => setTimeout(resolve, SHUTDOWN_DRAIN_MS));
+
+      // Step 3: Send close frames to all plugins and clients
+      for (const ws of this._plugins.values()) {
+        try {
+          ws.close(1001, 'host shutting down');
+        } catch {
+          // Ignore
+        }
+      }
+      for (const ws of this._clients) {
+        try {
+          ws.close(1001, 'host shutting down');
+        } catch {
+          // Ignore
+        }
+      }
+
+      // Step 4: Stop the transport
+      this._isRunning = false;
+      this._plugins.clear();
+      this._clients.clear();
+      await this._transport.stopAsync();
+    };
+
+    // Wrap in timeout — force-close if graceful exceeds limit
+    const timeoutPromise = new Promise<'timeout'>((resolve) =>
+      setTimeout(() => resolve('timeout'), SHUTDOWN_TIMEOUT_MS),
+    );
+
+    const result = await Promise.race([
+      gracefulShutdown().then(() => 'done' as const),
+      timeoutPromise,
+    ]);
+
+    if (result === 'timeout') {
+      this._isRunning = false;
+      this._plugins.clear();
+      this._clients.clear();
+      await this._transport.forceCloseAsync();
+    }
   }
 
   /** The actual port the server is bound to. */
