@@ -5,3 +5,4 @@
  */
 
 export { listSessionsHandlerAsync, type SessionsResult } from './sessions.js';
+export { serveHandlerAsync, type ServeOptions, type ServeResult } from './serve.js';
