@@ -1,3 +1,15 @@
+# v1.10.0 (Mon Feb 23 2026)
+
+#### 🚀 Enhancement
+
+- feat(cli): add structured progress and failure context to reporting [#668](https://github.com/Quenty/NevermoreEngine/pull/668) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
