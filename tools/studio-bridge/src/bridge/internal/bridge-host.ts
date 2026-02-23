@@ -57,10 +57,34 @@ export class BridgeHost extends EventEmitter {
   private _isRunning = false;
   private _shuttingDown = false;
   private _startTime = 0;
+  private _hostStartTime = 0;
+  private _lastFailoverAt: string | null = null;
 
   constructor() {
     super();
     this._transport = new TransportServer();
+  }
+
+  /** Time (ms) since this process became the host. */
+  get hostUptime(): number {
+    if (this._hostStartTime === 0) {
+      return 0;
+    }
+    return Date.now() - this._hostStartTime;
+  }
+
+  /** ISO timestamp of the last failover event, or null if none. */
+  get lastFailoverAt(): string | null {
+    return this._lastFailoverAt;
+  }
+
+  /**
+   * Mark this host as having been promoted via failover. Sets the
+   * hostStartTime to now and records the failover timestamp.
+   */
+  markFailover(): void {
+    this._hostStartTime = Date.now();
+    this._lastFailoverAt = new Date().toISOString();
   }
 
   /**
@@ -74,6 +98,9 @@ export class BridgeHost extends EventEmitter {
     }
 
     this._startTime = Date.now();
+    if (this._hostStartTime === 0) {
+      this._hostStartTime = this._startTime;
+    }
 
     // Register /plugin WebSocket handler
     this._transport.onConnection('/plugin', (ws, request) => {
@@ -97,6 +124,8 @@ export class BridgeHost extends EventEmitter {
       protocolVersion: PROTOCOL_VERSION,
       sessions: this._plugins.size,
       startTime: this._startTime,
+      hostStartTime: this._hostStartTime,
+      lastFailoverAt: this._lastFailoverAt,
     })));
 
     const port = await this._transport.startAsync({

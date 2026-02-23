@@ -407,12 +407,15 @@ export class BridgeClient extends EventEmitter {
   /**
    * Handle host WebSocket disconnect by running the failover state machine.
    * Emits 'host-promoted' if this client should become the new host, or
-   * 'host-fallback' if another client won the race.
+   * 'host-fallback' if another client won the race, or 'host-unreachable'
+   * if all retries are exhausted.
    */
   private async _handleHostDisconnectAsync(): Promise<void> {
     if (!this._handOff) {
       return;
     }
+
+    console.warn('Bridge host disconnected. Attempting recovery...');
 
     try {
       const outcome = await this._handOff.onHostDisconnectedAsync();

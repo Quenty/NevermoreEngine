@@ -484,6 +484,10 @@ export class BridgeConnection extends EventEmitter {
       this._isConnected = false;
     });
 
+    this._client.on('host-promoted', () => {
+      this._role = 'host';
+    });
+
     const host = remoteHost ? remoteHost.split(':')[0] : undefined;
     await this._client.connectAsync(port, host);
     this._isConnected = true;

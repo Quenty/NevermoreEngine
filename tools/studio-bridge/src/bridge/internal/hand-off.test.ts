@@ -9,8 +9,10 @@ import {
   HandOffManager,
   computeTakeoverJitterMs,
   type HandOffDependencies,
+  type HandOffLogEntry,
 } from './hand-off.js';
 import { HostUnreachableError } from '../types.js';
+import { createHealthHandler, type HealthInfo } from './health-endpoint.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -222,5 +224,196 @@ describe('HandOffManager', () => {
 
       expect(tryConnectAsClientAsync).toHaveBeenCalledWith(54321);
     });
+  });
+
+  // -------------------------------------------------------------------------
+  // Observability: structured debug logging (Task 1.10)
+  // -------------------------------------------------------------------------
+
+  describe('structured debug logging', () => {
+    it('logs state transition on HostTransferNotice', () => {
+      const logger = vi.fn();
+      const deps = createMockDeps();
+      const manager = new HandOffManager({ port: 38741, deps, logger });
+
+      manager.onHostTransferNotice();
+
+      expect(logger).toHaveBeenCalledTimes(1);
+      const entry: HandOffLogEntry = logger.mock.calls[0][0];
+      expect(entry.oldState).toBe('connected');
+      expect(entry.newState).toBe('detecting-failure');
+      expect(entry.reason).toBe('host-transfer-notice');
+      expect(entry.timestamp).toBeDefined();
+    });
+
+    it('logs state transitions during graceful promotion', async () => {
+      const logger = vi.fn();
+      const deps = createMockDeps({
+        tryBindAsync: vi.fn().mockResolvedValue(true),
+      });
+      const manager = new HandOffManager({ port: 38741, deps, logger });
+
+      manager.onHostTransferNotice();
+      await manager.onHostDisconnectedAsync();
+
+      // Should have logs: host-transfer-notice, graceful-disconnect, bind-success
+      const reasons = logger.mock.calls.map((c: [HandOffLogEntry]) => c[0].reason);
+      expect(reasons).toContain('host-transfer-notice');
+      expect(reasons).toContain('graceful-disconnect');
+      expect(reasons).toContain('bind-success');
+    });
+
+    it('logs crash jitter when not graceful', async () => {
+      const logger = vi.fn();
+      const deps = createMockDeps({
+        tryBindAsync: vi.fn().mockResolvedValue(true),
+        delay: vi.fn().mockResolvedValue(undefined),
+      });
+      const manager = new HandOffManager({ port: 38741, deps, logger });
+
+      const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+      await manager.onHostDisconnectedAsync();
+      randomSpy.mockRestore();
+
+      const reasons = logger.mock.calls.map((c: [HandOffLogEntry]) => c[0].reason);
+      expect(reasons).toContain('crash-jitter');
+      expect(reasons).toContain('crash-detected');
+    });
+
+    it('logs retry attempts when bind and connect fail', async () => {
+      const logger = vi.fn();
+      let bindCount = 0;
+      const deps = createMockDeps({
+        tryBindAsync: vi.fn().mockImplementation(async () => {
+          bindCount++;
+          return bindCount >= 3;
+        }),
+        tryConnectAsClientAsync: vi.fn().mockResolvedValue(false),
+        delay: vi.fn().mockResolvedValue(undefined),
+      });
+      const manager = new HandOffManager({ port: 38741, deps, logger });
+
+      manager.onHostTransferNotice();
+      await manager.onHostDisconnectedAsync();
+
+      const retryEntries = logger.mock.calls
+        .map((c: [HandOffLogEntry]) => c[0])
+        .filter((e: HandOffLogEntry) => e.reason === 'retry');
+      expect(retryEntries.length).toBe(2);
+      expect(retryEntries[0].data?.attempt).toBe(0);
+      expect(retryEntries[1].data?.attempt).toBe(1);
+    });
+
+    it('logs retries-exhausted when all attempts fail', async () => {
+      const logger = vi.fn();
+      const deps = createMockDeps({
+        tryBindAsync: vi.fn().mockResolvedValue(false),
+        tryConnectAsClientAsync: vi.fn().mockResolvedValue(false),
+        delay: vi.fn().mockResolvedValue(undefined),
+      });
+      const manager = new HandOffManager({ port: 38741, deps, logger });
+
+      manager.onHostTransferNotice();
+      await expect(manager.onHostDisconnectedAsync()).rejects.toThrow(HostUnreachableError);
+
+      const reasons = logger.mock.calls.map((c: [HandOffLogEntry]) => c[0].reason);
+      expect(reasons).toContain('retries-exhausted');
+    });
+
+    it('does not throw when no logger is provided', async () => {
+      const deps = createMockDeps({
+        tryBindAsync: vi.fn().mockResolvedValue(true),
+      });
+      const manager = new HandOffManager({ port: 38741, deps });
+
+      manager.onHostTransferNotice();
+      const result = await manager.onHostDisconnectedAsync();
+
+      expect(result).toBe('promoted');
+    });
+
+    it('includes ISO timestamp in every log entry', async () => {
+      const logger = vi.fn();
+      const deps = createMockDeps({
+        tryBindAsync: vi.fn().mockResolvedValue(true),
+      });
+      const manager = new HandOffManager({ port: 38741, deps, logger });
+
+      manager.onHostTransferNotice();
+      await manager.onHostDisconnectedAsync();
+
+      for (const call of logger.mock.calls) {
+        const entry: HandOffLogEntry = call[0];
+        expect(entry.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+      }
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Health endpoint: new fields (Task 1.10)
+// ---------------------------------------------------------------------------
+
+describe('Health endpoint observability fields', () => {
+  it('includes hostUptime and lastFailoverAt in response', () => {
+    const startTime = Date.now() - 10_000;
+    const hostStartTime = Date.now() - 5_000;
+    const lastFailoverAt = new Date(hostStartTime).toISOString();
+
+    const handler = createHealthHandler(() => ({
+      port: 38741,
+      protocolVersion: 2,
+      sessions: 3,
+      startTime,
+      hostStartTime,
+      lastFailoverAt,
+    }));
+
+    // Simulate an HTTP response object
+    let statusCode = 0;
+    let headers: Record<string, string> = {};
+    let body = '';
+    const res = {
+      writeHead(code: number, hdrs: Record<string, string | number>) {
+        statusCode = code;
+        headers = hdrs as Record<string, string>;
+      },
+      end(data: string) {
+        body = data;
+      },
+    } as any;
+
+    handler({} as any, res);
+
+    expect(statusCode).toBe(200);
+    const parsed = JSON.parse(body);
+    expect(parsed.status).toBe('ok');
+    expect(typeof parsed.hostUptime).toBe('number');
+    expect(parsed.hostUptime).toBeLessThanOrEqual(parsed.uptime);
+    expect(parsed.lastFailoverAt).toBe(lastFailoverAt);
+  });
+
+  it('defaults hostUptime to uptime when hostStartTime is not provided', () => {
+    const startTime = Date.now() - 10_000;
+
+    const handler = createHealthHandler(() => ({
+      port: 38741,
+      protocolVersion: 2,
+      sessions: 0,
+      startTime,
+    }));
+
+    let body = '';
+    const res = {
+      writeHead() {},
+      end(data: string) { body = data; },
+    } as any;
+
+    handler({} as any, res);
+
+    const parsed = JSON.parse(body);
+    // hostUptime should equal uptime when no separate hostStartTime
+    expect(parsed.hostUptime).toBe(parsed.uptime);
+    expect(parsed.lastFailoverAt).toBeNull();
   });
 });

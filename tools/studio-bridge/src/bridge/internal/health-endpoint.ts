@@ -16,6 +16,8 @@ export interface HealthResponse {
   protocolVersion: number;
   sessions: number;
   uptime: number;
+  hostUptime: number;
+  lastFailoverAt: string | null;
 }
 
 export interface HealthInfo {
@@ -23,6 +25,8 @@ export interface HealthInfo {
   protocolVersion: number;
   sessions: number;
   startTime: number;
+  hostStartTime?: number;
+  lastFailoverAt?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -89,12 +93,16 @@ export function createHealthHandler(
 ): (req: http.IncomingMessage, res: http.ServerResponse) => void {
   return (_req, res) => {
     const info = getInfo();
+    const now = Date.now();
+    const hostStartTime = info.hostStartTime ?? info.startTime;
     const response: HealthResponse = {
       status: 'ok',
       port: info.port,
       protocolVersion: info.protocolVersion,
       sessions: info.sessions,
-      uptime: Date.now() - info.startTime,
+      uptime: now - info.startTime,
+      hostUptime: now - hostStartTime,
+      lastFailoverAt: info.lastFailoverAt ?? null,
     };
 
     const body = JSON.stringify(response);

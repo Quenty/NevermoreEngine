@@ -117,6 +117,21 @@ function delayDefault(ms: number): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Logger type
+// ---------------------------------------------------------------------------
+
+export type HandOffLogEntry = {
+  message: string;
+  oldState: TakeoverState;
+  newState: TakeoverState;
+  timestamp: string;
+  reason: string;
+  data?: Record<string, unknown>;
+};
+
+export type HandOffLogger = (entry: HandOffLogEntry) => void;
+
+// ---------------------------------------------------------------------------
 // HandOffManager
 // ---------------------------------------------------------------------------
 
@@ -125,14 +140,16 @@ export class HandOffManager {
   private _takeoverPending = false;
   private _port: number;
   private _deps: HandOffDependencies;
+  private _logger: HandOffLogger | undefined;
 
-  constructor(options: { port: number; deps?: HandOffDependencies }) {
+  constructor(options: { port: number; deps?: HandOffDependencies; logger?: HandOffLogger }) {
     this._port = options.port;
     this._deps = options.deps ?? {
       tryBindAsync: tryBindDefaultAsync,
       tryConnectAsClientAsync: tryConnectAsClientDefaultAsync,
       delay: delayDefault,
     };
+    this._logger = options.logger;
   }
 
   /** Current state of the takeover state machine. */
@@ -145,8 +162,10 @@ export class HandOffManager {
    * Marks the pending transfer so the subsequent disconnect skips jitter.
    */
   onHostTransferNotice(): void {
+    const oldState = this._state;
     this._takeoverPending = true;
     this._state = 'detecting-failure';
+    this._log('Received host transfer notice', oldState, 'detecting-failure', 'host-transfer-notice');
   }
 
   /**
@@ -169,17 +188,21 @@ export class HandOffManager {
     // Step 1: Jitter
     const jitterMs = computeTakeoverJitterMs({ graceful });
     if (jitterMs > 0) {
+      this._log('Applying crash jitter', this._state, this._state, 'crash-jitter', { jitterMs });
       await this._deps.delay(jitterMs);
     }
 
     // Step 2: Transition to taking-over
+    const prevState = this._state;
     this._state = 'taking-over';
+    this._log('Beginning takeover attempt', prevState, 'taking-over', graceful ? 'graceful-disconnect' : 'crash-detected');
 
     // Step 3: Retry loop
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       const bindSuccess = await this._deps.tryBindAsync(this._port);
 
       if (bindSuccess) {
+        this._log('Port bind succeeded — promoted to host', 'taking-over', 'promoted', 'bind-success', { attempt });
         this._state = 'promoted';
         return 'promoted';
       }
@@ -188,17 +211,45 @@ export class HandOffManager {
       const clientConnected = await this._deps.tryConnectAsClientAsync(this._port);
 
       if (clientConnected) {
+        this._log('Another host detected — falling back to client', 'taking-over', 'fell-back-to-client', 'new-host-found', { attempt });
         this._state = 'fell-back-to-client';
         return 'fell-back-to-client';
       }
 
       // Neither bind nor connect worked — wait and retry
       if (attempt < MAX_RETRIES - 1) {
+        this._log('Retry attempt', 'taking-over', 'taking-over', 'retry', { attempt, maxRetries: MAX_RETRIES });
         await this._deps.delay(RETRY_DELAY_MS);
       }
     }
 
     // Step 4: Exhausted retries
+    this._log('All retries exhausted', 'taking-over', 'taking-over', 'retries-exhausted');
     throw new HostUnreachableError('localhost', this._port);
+  }
+
+  // -------------------------------------------------------------------------
+  // Private
+  // -------------------------------------------------------------------------
+
+  private _log(
+    message: string,
+    oldState: TakeoverState,
+    newState: TakeoverState,
+    reason: string,
+    data?: Record<string, unknown>,
+  ): void {
+    if (!this._logger) {
+      return;
+    }
+
+    this._logger({
+      message,
+      oldState,
+      newState,
+      timestamp: new Date().toISOString(),
+      reason,
+      data,
+    });
   }
 }
