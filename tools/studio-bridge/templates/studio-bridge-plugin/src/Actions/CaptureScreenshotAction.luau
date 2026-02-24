@@ -3,16 +3,18 @@
 	CaptureScreenshot action handler for the studio-bridge plugin.
 
 	Captures the Studio viewport using CaptureService, loads the result into
-	an EditableImage to read raw RGBA pixels, base64-encodes them, and sends
-	the data back over the WebSocket.
+	an EditableImage to read raw RGBA pixels, encodes as PNG via png-luau,
+	base64-encodes the PNG, and sends it over the WebSocket.
 
 	Protocol:
 	  Request:  { type: "captureScreenshot", payload: { format?: "png" } }
 	  Response: { type: "screenshotResult", payload: { data, format, width, height } }
-
-	The plugin sends raw RGBA pixel data (format = "rgba"). The CLI converts
-	to PNG before writing to disk.
 ]]
+
+-- PNG encoder is optional — available in Roblox but not in Lune test context
+local pngEncodeOk, PNG = pcall(function()
+	return require(script.Parent.Parent.Vendor.png)
+end)
 
 local CaptureScreenshotAction = {}
 
@@ -233,14 +235,25 @@ local function captureAsync(
 		return
 	end
 
-	-- Step 4: Base64 encode the RGBA data
-	local encodeOk, encoded = pcall(base64Encode, pixelsBuf)
+	-- Step 4: Encode as PNG (if available) or raw RGBA, then base64
+	local dataBuf = pixelsBuf
+	local format = "rgba"
+
+	if pngEncodeOk and PNG then
+		local pngOk, pngBuf = pcall(PNG.encode, pixelsBuf, { width = width, height = height })
+		if pngOk and pngBuf then
+			dataBuf = pngBuf
+			format = "png"
+		end
+	end
+
+	local encodeOk, encoded = pcall(base64Encode, dataBuf)
 	if not encodeOk or not encoded then
 		sendMessage(buildError(
 			sessionId,
 			requestId,
 			"ENCODE_FAILED",
-			`Failed to base64 encode pixel data: {encoded or "unknown error"}`
+			`Failed to base64 encode data: {encoded or "unknown error"}`
 		))
 		return
 	end
@@ -248,7 +261,7 @@ local function captureAsync(
 	-- Step 5: Send the result
 	sendMessage(buildResponse(sessionId, requestId, {
 		data = encoded,
-		format = "rgba",
+		format = format,
 		width = width,
 		height = height,
 	}))
