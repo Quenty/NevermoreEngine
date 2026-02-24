@@ -347,7 +347,7 @@ export class BridgeConnection extends EventEmitter {
    *    c. If N contexts (Play mode) -> return Edit context by default.
    * 6. N instances -> throw SessionNotFoundError with instance list.
    */
-  async resolveSession(
+  async resolveSessionAsync(
     sessionId?: string,
     context?: SessionContext,
     instanceId?: string

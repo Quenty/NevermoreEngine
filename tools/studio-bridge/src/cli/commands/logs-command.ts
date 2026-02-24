@@ -79,11 +79,13 @@ export class LogsCommand<T> implements CommandModule<T, LogsArgs> {
   public handler = async (args: LogsArgs) => {
     let connection: BridgeConnection | undefined;
     try {
-      connection = await BridgeConnection.connectAsync({ timeoutMs: args.timeout });
-      const session = await connection.resolveSession(
+      connection = await BridgeConnection.connectAsync({
+        timeoutMs: args.timeout,
+      });
+      const session = await connection.resolveSessionAsync(
         args.session,
         args.context as SessionContext | undefined,
-        args.instance,
+        args.instance
       );
 
       // Determine direction and count from --head / --tail flags
@@ -115,7 +117,10 @@ export class LogsCommand<T> implements CommandModule<T, LogsArgs> {
           OutputHelper.warn('No log entries found.');
         } else {
           const columns: TableColumn<LogEntry>[] = [
-            { header: 'Time', value: (e) => new Date(e.timestamp).toLocaleTimeString() },
+            {
+              header: 'Time',
+              value: (e) => new Date(e.timestamp).toLocaleTimeString(),
+            },
             { header: 'Level', value: (e) => e.level },
             { header: 'Message', value: (e) => e.body },
           ];

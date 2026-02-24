@@ -38,7 +38,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('plugin connects and registers with v2 protocol', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const plugin = new MockPluginClient({
@@ -70,7 +74,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('server sends execute, plugin responds with scriptComplete', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const plugin = new MockPluginClient({
@@ -125,7 +133,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('server sends queryState, plugin responds with stateResult', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const plugin = new MockPluginClient({
@@ -159,7 +171,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('plugin sends heartbeat, server accepts silently', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const plugin = new MockPluginClient({
@@ -196,7 +212,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('plugin disconnects, session is removed', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const plugin = new MockPluginClient({
@@ -223,7 +243,11 @@ describe('persistent session e2e', () => {
   });
 
   it('plugin reconnects, new session appears', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     // First connection
@@ -267,7 +291,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('multiple plugins from different instances tracked separately', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const pluginA = new MockPluginClient({
@@ -328,7 +356,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('multiple contexts from same instance are grouped', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const pluginEdit = new MockPluginClient({
@@ -366,7 +398,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('resolveSession returns the only connected session', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const plugin = new MockPluginClient({
@@ -378,12 +414,16 @@ describe('persistent session e2e', () => {
     await plugin.connectAndRegisterAsync();
     await new Promise((r) => setTimeout(r, 100));
 
-    const session = await conn.resolveSession();
+    const session = await conn.resolveSessionAsync();
     expect(session.info.sessionId).toBe(plugin.sessionId);
   });
 
   it('resolveSession by context returns correct session', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     const pluginEdit = new MockPluginClient({
@@ -404,11 +444,11 @@ describe('persistent session e2e', () => {
     await pluginServer.connectAndRegisterAsync();
     await new Promise((r) => setTimeout(r, 100));
 
-    const serverSession = await conn.resolveSession(undefined, 'server');
+    const serverSession = await conn.resolveSessionAsync(undefined, 'server');
     expect(serverSession.info.sessionId).toBe(pluginServer.sessionId);
     expect(serverSession.context).toBe('server');
 
-    const editSession = await conn.resolveSession(undefined, 'edit');
+    const editSession = await conn.resolveSessionAsync(undefined, 'edit');
     expect(editSession.info.sessionId).toBe(pluginEdit.sessionId);
     expect(editSession.context).toBe('edit');
   });
@@ -418,7 +458,11 @@ describe('persistent session e2e', () => {
   // -----------------------------------------------------------------------
 
   it('waitForSession resolves when plugin connects', async () => {
-    const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true, local: true });
+    const conn = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
     connections.push(conn);
 
     // Start waiting before the plugin connects

@@ -91,10 +91,10 @@ export class ExecCommand<T> implements CommandModule<T, ExecArgs> {
         remoteHost: args.remote,
         local: args.local,
       });
-      const session = await connection.resolveSession(
+      const session = await connection.resolveSessionAsync(
         args.session,
         args.context as SessionContext | undefined,
-        args.instance,
+        args.instance
       );
 
       const result = await execHandlerAsync(session, {
@@ -104,11 +104,13 @@ export class ExecCommand<T> implements CommandModule<T, ExecArgs> {
 
       const mode = resolveMode({ json: args.json });
       if (mode === 'json') {
-        console.log(formatAsJson({
-          success: result.success,
-          output: result.output,
-          error: result.error,
-        }));
+        console.log(
+          formatAsJson({
+            success: result.success,
+            output: result.output,
+            error: result.error,
+          })
+        );
       } else {
         for (const line of result.output) {
           console.log(line);

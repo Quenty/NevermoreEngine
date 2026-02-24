@@ -21,9 +21,9 @@ export interface ConnectResult {
  */
 export async function connectHandlerAsync(
   connection: BridgeConnection,
-  options: ConnectOptions,
+  options: ConnectOptions
 ): Promise<ConnectResult> {
-  const session = await connection.resolveSession(options.sessionId);
+  const session = await connection.resolveSessionAsync(options.sessionId);
   const info = session.info;
 
   return {

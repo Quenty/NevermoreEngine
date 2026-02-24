@@ -84,11 +84,13 @@ export class QueryCommand<T> implements CommandModule<T, QueryArgs> {
   public handler = async (args: QueryArgs) => {
     let connection: BridgeConnection | undefined;
     try {
-      connection = await BridgeConnection.connectAsync({ timeoutMs: args.timeout });
-      const session = await connection.resolveSession(
+      connection = await BridgeConnection.connectAsync({
+        timeoutMs: args.timeout,
+      });
+      const session = await connection.resolveSessionAsync(
         args.session,
         args.context as SessionContext | undefined,
-        args.instance,
+        args.instance
       );
 
       const result = await queryDataModelHandlerAsync(session, {
@@ -113,14 +115,20 @@ export class QueryCommand<T> implements CommandModule<T, QueryArgs> {
 
         console.log(formatAsTable(rows, columns));
 
-        if (result.node.properties && Object.keys(result.node.properties).length > 0) {
+        if (
+          result.node.properties &&
+          Object.keys(result.node.properties).length > 0
+        ) {
           console.log('\nProperties:');
           for (const [key, value] of Object.entries(result.node.properties)) {
             console.log(`  ${key}: ${JSON.stringify(value)}`);
           }
         }
 
-        if (result.node.attributes && Object.keys(result.node.attributes).length > 0) {
+        if (
+          result.node.attributes &&
+          Object.keys(result.node.attributes).length > 0
+        ) {
           console.log('\nAttributes:');
           for (const [key, value] of Object.entries(result.node.attributes)) {
             console.log(`  ${key}: ${JSON.stringify(value)}`);

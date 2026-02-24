@@ -79,10 +79,7 @@ export class RunCommand<T> implements CommandModule<T, RunArgs> {
       }
 
       const placePath = await resolvePlacePathAsync(args.place);
-      const packageName = path.basename(
-        args.file,
-        path.extname(args.file)
-      );
+      const packageName = path.basename(args.file, path.extname(args.file));
 
       await executeScriptAsync({
         scriptContent,
@@ -108,10 +105,10 @@ export class RunCommand<T> implements CommandModule<T, RunArgs> {
         remoteHost: args.remote,
         local: args.local,
       });
-      const session = await connection.resolveSession(
+      const session = await connection.resolveSessionAsync(
         args.session,
         args.context as SessionContext | undefined,
-        args.instance,
+        args.instance
       );
 
       const result = await runHandlerAsync(session, {
@@ -121,11 +118,13 @@ export class RunCommand<T> implements CommandModule<T, RunArgs> {
 
       const mode = resolveMode({ json: args.json });
       if (mode === 'json') {
-        console.log(formatAsJson({
-          success: result.success,
-          output: result.output,
-          error: result.error,
-        }));
+        console.log(
+          formatAsJson({
+            success: result.success,
+            output: result.output,
+            error: result.error,
+          })
+        );
       } else {
         for (const line of result.output) {
           console.log(line);

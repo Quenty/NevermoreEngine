@@ -25,7 +25,7 @@ function waitForMessage(ws: WebSocket): Promise<Record<string, unknown>> {
   return new Promise((resolve) => {
     ws.once('message', (raw) => {
       const data = JSON.parse(
-        typeof raw === 'string' ? raw : raw.toString('utf-8'),
+        typeof raw === 'string' ? raw : raw.toString('utf-8')
       );
       resolve(data);
     });
@@ -41,23 +41,25 @@ async function performRegisterHandshake(
     state?: string;
     context?: string;
     capabilities?: string[];
-  },
+  }
 ): Promise<{ ws: WebSocket; welcome: Record<string, unknown> }> {
   const ws = await connectPlugin(port);
   const welcomePromise = waitForMessage(ws);
 
-  ws.send(JSON.stringify({
-    type: 'register',
-    sessionId,
-    protocolVersion: 2,
-    payload: {
-      pluginVersion: '1.0.0',
-      instanceId: options?.instanceId ?? 'inst-1',
-      placeName: options?.placeName ?? 'TestPlace',
-      state: options?.state ?? 'Edit',
-      capabilities: options?.capabilities ?? ['execute', 'queryState'],
-    },
-  }));
+  ws.send(
+    JSON.stringify({
+      type: 'register',
+      sessionId,
+      protocolVersion: 2,
+      payload: {
+        pluginVersion: '1.0.0',
+        instanceId: options?.instanceId ?? 'inst-1',
+        placeName: options?.placeName ?? 'TestPlace',
+        state: options?.state ?? 'Edit',
+        capabilities: options?.capabilities ?? ['execute', 'queryState'],
+      },
+    })
+  );
 
   const welcome = await welcomePromise;
   return { ws, welcome };
@@ -73,7 +75,10 @@ describe('BridgeConnection', () => {
 
   afterEach(async () => {
     for (const ws of openClients) {
-      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+      if (
+        ws.readyState === WebSocket.OPEN ||
+        ws.readyState === WebSocket.CONNECTING
+      ) {
         ws.close();
       }
     }
@@ -91,7 +96,10 @@ describe('BridgeConnection', () => {
 
   describe('connectAsync', () => {
     it('becomes host on unused ephemeral port', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       expect(conn.role).toBe('host');
@@ -100,7 +108,10 @@ describe('BridgeConnection', () => {
     });
 
     it('accepts plugin connections as host', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-1');
@@ -118,7 +129,10 @@ describe('BridgeConnection', () => {
 
   describe('disconnectAsync', () => {
     it('sets isConnected to false', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       expect(conn.isConnected).toBe(true);
@@ -130,7 +144,10 @@ describe('BridgeConnection', () => {
     });
 
     it('is idempotent', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
 
       await conn.disconnectAsync();
       await conn.disconnectAsync();
@@ -139,7 +156,10 @@ describe('BridgeConnection', () => {
     });
 
     it('cleans up host resources', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-1');
@@ -162,37 +182,57 @@ describe('BridgeConnection', () => {
 
   describe('listSessions', () => {
     it('returns empty list when no plugins connected', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       expect(conn.listSessions()).toEqual([]);
     });
 
     it('returns sessions from connected plugins', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
-      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-a', {
-        instanceId: 'inst-A',
-        placeName: 'PlaceA',
-      });
+      const { ws: ws1 } = await performRegisterHandshake(
+        conn.port,
+        'session-a',
+        {
+          instanceId: 'inst-A',
+          placeName: 'PlaceA',
+        }
+      );
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-b', {
-        instanceId: 'inst-B',
-        placeName: 'PlaceB',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'session-b',
+        {
+          instanceId: 'inst-B',
+          placeName: 'PlaceB',
+        }
+      );
       openClients.push(ws2);
 
       await new Promise((r) => setTimeout(r, 50));
 
       const sessions = conn.listSessions();
       expect(sessions).toHaveLength(2);
-      expect(sessions.map((s) => s.sessionId).sort()).toEqual(['session-a', 'session-b']);
+      expect(sessions.map((s) => s.sessionId).sort()).toEqual([
+        'session-a',
+        'session-b',
+      ]);
     });
 
     it('removes session when plugin disconnects', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-dc');
@@ -214,30 +254,44 @@ describe('BridgeConnection', () => {
 
   describe('listInstances', () => {
     it('returns empty list when no plugins connected', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       expect(conn.listInstances()).toEqual([]);
     });
 
     it('groups sessions by instanceId', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       // Two sessions from the same instance (edit + server contexts)
       // Context is derived from state: 'Edit' -> 'edit', 'Server' -> 'server'
-      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-edit', {
-        instanceId: 'inst-A',
-        placeName: 'PlaceA',
-        state: 'Edit',
-      });
+      const { ws: ws1 } = await performRegisterHandshake(
+        conn.port,
+        'session-edit',
+        {
+          instanceId: 'inst-A',
+          placeName: 'PlaceA',
+          state: 'Edit',
+        }
+      );
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-server', {
-        instanceId: 'inst-A',
-        placeName: 'PlaceA',
-        state: 'Server',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'session-server',
+        {
+          instanceId: 'inst-A',
+          placeName: 'PlaceA',
+          state: 'Server',
+        }
+      );
       openClients.push(ws2);
 
       await new Promise((r) => setTimeout(r, 50));
@@ -249,24 +303,38 @@ describe('BridgeConnection', () => {
     });
 
     it('separates different instances', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
-      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-1', {
-        instanceId: 'inst-A',
-      });
+      const { ws: ws1 } = await performRegisterHandshake(
+        conn.port,
+        'session-1',
+        {
+          instanceId: 'inst-A',
+        }
+      );
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-2', {
-        instanceId: 'inst-B',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'session-2',
+        {
+          instanceId: 'inst-B',
+        }
+      );
       openClients.push(ws2);
 
       await new Promise((r) => setTimeout(r, 50));
 
       const instances = conn.listInstances();
       expect(instances).toHaveLength(2);
-      expect(instances.map((i) => i.instanceId).sort()).toEqual(['inst-A', 'inst-B']);
+      expect(instances.map((i) => i.instanceId).sort()).toEqual([
+        'inst-A',
+        'inst-B',
+      ]);
     });
   });
 
@@ -276,7 +344,10 @@ describe('BridgeConnection', () => {
 
   describe('getSession', () => {
     it('returns a BridgeSession for a known session', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-x', {
@@ -293,14 +364,20 @@ describe('BridgeConnection', () => {
     });
 
     it('returns undefined for unknown session', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       expect(conn.getSession('nonexistent')).toBeUndefined();
     });
 
     it('returns undefined after plugin disconnects', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-gone');
@@ -322,17 +399,27 @@ describe('BridgeConnection', () => {
 
   describe('resolveSession', () => {
     it('throws "No sessions connected" when no sessions exist', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       // resolveSession waits up to 5s for a plugin to connect when acting as
       // host with no sessions, so we need a longer test timeout
-      await expect(conn.resolveSession()).rejects.toThrow(SessionNotFoundError);
-      await expect(conn.resolveSession()).rejects.toThrow('No sessions connected');
+      await expect(conn.resolveSessionAsync()).rejects.toThrow(
+        SessionNotFoundError
+      );
+      await expect(conn.resolveSessionAsync()).rejects.toThrow(
+        'No sessions connected'
+      );
     }, 15_000);
 
     it('returns the only session automatically', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'only-session', {
@@ -341,34 +428,52 @@ describe('BridgeConnection', () => {
       openClients.push(ws);
       await new Promise((r) => setTimeout(r, 50));
 
-      const session = await conn.resolveSession();
+      const session = await conn.resolveSessionAsync();
       expect(session.info.sessionId).toBe('only-session');
     });
 
     it('throws with instance list when multiple instances exist', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
-      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-1', {
-        instanceId: 'inst-A',
-        placeName: 'PlaceA',
-      });
+      const { ws: ws1 } = await performRegisterHandshake(
+        conn.port,
+        'session-1',
+        {
+          instanceId: 'inst-A',
+          placeName: 'PlaceA',
+        }
+      );
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-2', {
-        instanceId: 'inst-B',
-        placeName: 'PlaceB',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'session-2',
+        {
+          instanceId: 'inst-B',
+          placeName: 'PlaceB',
+        }
+      );
       openClients.push(ws2);
 
       await new Promise((r) => setTimeout(r, 50));
 
-      await expect(conn.resolveSession()).rejects.toThrow(SessionNotFoundError);
-      await expect(conn.resolveSession()).rejects.toThrow('Multiple Studio instances');
+      await expect(conn.resolveSessionAsync()).rejects.toThrow(
+        SessionNotFoundError
+      );
+      await expect(conn.resolveSessionAsync()).rejects.toThrow(
+        'Multiple Studio instances'
+      );
     });
 
     it('returns specific session by sessionId', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-abc', {
@@ -377,51 +482,76 @@ describe('BridgeConnection', () => {
       openClients.push(ws);
       await new Promise((r) => setTimeout(r, 50));
 
-      const session = await conn.resolveSession('session-abc');
+      const session = await conn.resolveSessionAsync('session-abc');
       expect(session.info.sessionId).toBe('session-abc');
     });
 
     it('throws SessionNotFoundError for unknown sessionId', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
-      await expect(conn.resolveSession('nonexistent')).rejects.toThrow(SessionNotFoundError);
-      await expect(conn.resolveSession('nonexistent')).rejects.toThrow("Session 'nonexistent' not found");
+      await expect(conn.resolveSessionAsync('nonexistent')).rejects.toThrow(
+        SessionNotFoundError
+      );
+      await expect(conn.resolveSessionAsync('nonexistent')).rejects.toThrow(
+        "Session 'nonexistent' not found"
+      );
     });
 
     it('returns Edit context by default when multiple contexts exist', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       // Simulate Play mode: edit + server + client contexts
-      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'edit-session', {
-        instanceId: 'inst-1',
-        state: 'Edit',
-      });
+      const { ws: ws1 } = await performRegisterHandshake(
+        conn.port,
+        'edit-session',
+        {
+          instanceId: 'inst-1',
+          state: 'Edit',
+        }
+      );
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'server-session', {
-        instanceId: 'inst-1',
-        state: 'Server',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'server-session',
+        {
+          instanceId: 'inst-1',
+          state: 'Server',
+        }
+      );
       openClients.push(ws2);
 
-      const { ws: ws3 } = await performRegisterHandshake(conn.port, 'client-session', {
-        instanceId: 'inst-1',
-        state: 'Client',
-      });
+      const { ws: ws3 } = await performRegisterHandshake(
+        conn.port,
+        'client-session',
+        {
+          instanceId: 'inst-1',
+          state: 'Client',
+        }
+      );
       openClients.push(ws3);
 
       await new Promise((r) => setTimeout(r, 50));
 
       // Should return the Edit context by default
-      const session = await conn.resolveSession();
+      const session = await conn.resolveSessionAsync();
       expect(session.info.sessionId).toBe('edit-session');
       expect(session.context).toBe('edit');
     });
 
     it('returns specific context when requested', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws: ws1 } = await performRegisterHandshake(conn.port, 'edit-s', {
@@ -430,31 +560,42 @@ describe('BridgeConnection', () => {
       });
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'server-s', {
-        instanceId: 'inst-1',
-        state: 'Server',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'server-s',
+        {
+          instanceId: 'inst-1',
+          state: 'Server',
+        }
+      );
       openClients.push(ws2);
 
-      const { ws: ws3 } = await performRegisterHandshake(conn.port, 'client-s', {
-        instanceId: 'inst-1',
-        state: 'Client',
-      });
+      const { ws: ws3 } = await performRegisterHandshake(
+        conn.port,
+        'client-s',
+        {
+          instanceId: 'inst-1',
+          state: 'Client',
+        }
+      );
       openClients.push(ws3);
 
       await new Promise((r) => setTimeout(r, 50));
 
-      const serverSession = await conn.resolveSession(undefined, 'server');
+      const serverSession = await conn.resolveSessionAsync(undefined, 'server');
       expect(serverSession.info.sessionId).toBe('server-s');
       expect(serverSession.context).toBe('server');
 
-      const clientSession = await conn.resolveSession(undefined, 'client');
+      const clientSession = await conn.resolveSessionAsync(undefined, 'client');
       expect(clientSession.info.sessionId).toBe('client-s');
       expect(clientSession.context).toBe('client');
     });
 
     it('throws ContextNotFoundError for unavailable context', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       // Only edit context connected
@@ -465,33 +606,53 @@ describe('BridgeConnection', () => {
       openClients.push(ws);
       await new Promise((r) => setTimeout(r, 50));
 
-      await expect(conn.resolveSession(undefined, 'server')).rejects.toThrow(ContextNotFoundError);
+      await expect(
+        conn.resolveSessionAsync(undefined, 'server')
+      ).rejects.toThrow(ContextNotFoundError);
     });
 
     it('resolves by instanceId', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
-      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-A', {
-        instanceId: 'inst-A',
-        placeName: 'PlaceA',
-      });
+      const { ws: ws1 } = await performRegisterHandshake(
+        conn.port,
+        'session-A',
+        {
+          instanceId: 'inst-A',
+          placeName: 'PlaceA',
+        }
+      );
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-B', {
-        instanceId: 'inst-B',
-        placeName: 'PlaceB',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'session-B',
+        {
+          instanceId: 'inst-B',
+          placeName: 'PlaceB',
+        }
+      );
       openClients.push(ws2);
 
       await new Promise((r) => setTimeout(r, 50));
 
-      const session = await conn.resolveSession(undefined, undefined, 'inst-B');
+      const session = await conn.resolveSessionAsync(
+        undefined,
+        undefined,
+        'inst-B'
+      );
       expect(session.info.sessionId).toBe('session-B');
     });
 
     it('resolves by instanceId and context', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws: ws1 } = await performRegisterHandshake(conn.port, 'edit-s', {
@@ -500,20 +661,31 @@ describe('BridgeConnection', () => {
       });
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'server-s', {
-        instanceId: 'inst-1',
-        state: 'Server',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'server-s',
+        {
+          instanceId: 'inst-1',
+          state: 'Server',
+        }
+      );
       openClients.push(ws2);
 
       await new Promise((r) => setTimeout(r, 50));
 
-      const session = await conn.resolveSession(undefined, 'server', 'inst-1');
+      const session = await conn.resolveSessionAsync(
+        undefined,
+        'server',
+        'inst-1'
+      );
       expect(session.info.sessionId).toBe('server-s');
     });
 
     it('throws SessionNotFoundError for unknown instanceId', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-1', {
@@ -523,7 +695,7 @@ describe('BridgeConnection', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       await expect(
-        conn.resolveSession(undefined, undefined, 'nonexistent-inst'),
+        conn.resolveSessionAsync(undefined, undefined, 'nonexistent-inst')
       ).rejects.toThrow(SessionNotFoundError);
     });
   });
@@ -534,12 +706,19 @@ describe('BridgeConnection', () => {
 
   describe('waitForSession', () => {
     it('resolves immediately when sessions already exist', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
-      const { ws } = await performRegisterHandshake(conn.port, 'existing-session', {
-        instanceId: 'inst-1',
-      });
+      const { ws } = await performRegisterHandshake(
+        conn.port,
+        'existing-session',
+        {
+          instanceId: 'inst-1',
+        }
+      );
       openClients.push(ws);
       await new Promise((r) => setTimeout(r, 50));
 
@@ -548,7 +727,10 @@ describe('BridgeConnection', () => {
     });
 
     it('resolves when a plugin connects', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       // Start waiting before plugin connects
@@ -556,9 +738,13 @@ describe('BridgeConnection', () => {
 
       // Connect plugin after a short delay
       setTimeout(async () => {
-        const { ws } = await performRegisterHandshake(conn.port, 'late-session', {
-          instanceId: 'inst-1',
-        });
+        const { ws } = await performRegisterHandshake(
+          conn.port,
+          'late-session',
+          {
+            instanceId: 'inst-1',
+          }
+        );
         openClients.push(ws);
       }, 100);
 
@@ -570,7 +756,10 @@ describe('BridgeConnection', () => {
       vi.useFakeTimers();
 
       try {
-        const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+        const conn = await BridgeConnection.connectAsync({
+          port: 0,
+          keepAlive: true,
+        });
         connections.push(conn);
 
         const waitPromise = conn.waitForSession(500);
@@ -578,7 +767,9 @@ describe('BridgeConnection', () => {
         // Advance past the timeout
         vi.advanceTimersByTime(600);
 
-        await expect(waitPromise).rejects.toThrow('Timed out waiting for a session');
+        await expect(waitPromise).rejects.toThrow(
+          'Timed out waiting for a session'
+        );
       } finally {
         vi.useRealTimers();
       }
@@ -591,7 +782,10 @@ describe('BridgeConnection', () => {
 
   describe('events', () => {
     it('emits session-connected when plugin registers', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const connectedPromise = new Promise<BridgeSession>((resolve) => {
@@ -608,7 +802,10 @@ describe('BridgeConnection', () => {
     });
 
     it('emits session-disconnected when plugin closes', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-dc', {
@@ -628,7 +825,10 @@ describe('BridgeConnection', () => {
     });
 
     it('emits instance-connected for first session of an instance', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const instancePromise = new Promise<{ instanceId: string }>((resolve) => {
@@ -648,7 +848,10 @@ describe('BridgeConnection', () => {
     });
 
     it('emits instance-disconnected when last session of an instance disconnects', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const { ws } = await performRegisterHandshake(conn.port, 'session-last', {
@@ -668,20 +871,31 @@ describe('BridgeConnection', () => {
     });
 
     it('does not emit instance-disconnected when other contexts remain', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       // Connect edit and server contexts for the same instance
-      const { ws: wsEdit } = await performRegisterHandshake(conn.port, 'edit-ctx', {
-        instanceId: 'inst-play',
-        state: 'Edit',
-      });
+      const { ws: wsEdit } = await performRegisterHandshake(
+        conn.port,
+        'edit-ctx',
+        {
+          instanceId: 'inst-play',
+          state: 'Edit',
+        }
+      );
       openClients.push(wsEdit);
 
-      const { ws: wsServer } = await performRegisterHandshake(conn.port, 'server-ctx', {
-        instanceId: 'inst-play',
-        state: 'Server',
-      });
+      const { ws: wsServer } = await performRegisterHandshake(
+        conn.port,
+        'server-ctx',
+        {
+          instanceId: 'inst-play',
+          state: 'Server',
+        }
+      );
       openClients.push(wsServer);
 
       await new Promise((r) => setTimeout(r, 50));
@@ -708,7 +922,10 @@ describe('BridgeConnection', () => {
     });
 
     it('fires multiple session-connected events for multiple plugins', async () => {
-      const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
       connections.push(conn);
 
       const connectedIds: string[] = [];
@@ -716,14 +933,22 @@ describe('BridgeConnection', () => {
         connectedIds.push(session.info.sessionId);
       });
 
-      const { ws: ws1 } = await performRegisterHandshake(conn.port, 'session-1', {
-        instanceId: 'inst-1',
-      });
+      const { ws: ws1 } = await performRegisterHandshake(
+        conn.port,
+        'session-1',
+        {
+          instanceId: 'inst-1',
+        }
+      );
       openClients.push(ws1);
 
-      const { ws: ws2 } = await performRegisterHandshake(conn.port, 'session-2', {
-        instanceId: 'inst-2',
-      });
+      const { ws: ws2 } = await performRegisterHandshake(
+        conn.port,
+        'session-2',
+        {
+          instanceId: 'inst-2',
+        }
+      );
       openClients.push(ws2);
 
       await new Promise((r) => setTimeout(r, 100));

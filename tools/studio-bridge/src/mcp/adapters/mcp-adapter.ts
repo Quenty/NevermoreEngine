@@ -76,7 +76,7 @@ export interface McpToolOptions<TOptions, TResult> {
  */
 export function createMcpTool<TOptions, TResult>(
   connection: BridgeConnection,
-  options: McpToolOptions<TOptions, TResult>,
+  options: McpToolOptions<TOptions, TResult>
 ): McpToolDefinition {
   return {
     name: options.name,
@@ -89,12 +89,16 @@ export function createMcpTool<TOptions, TResult>(
         if (options.needsSession) {
           const sessionId = input.sessionId as string | undefined;
           const context = input.context as SessionContext | undefined;
-          const session = await connection.resolveSession(sessionId, context);
+          const session = await connection.resolveSessionAsync(
+            sessionId,
+            context
+          );
 
           const mapped = options.mapInput ? options.mapInput(input) : undefined;
-          result = mapped !== undefined
-            ? await options.handler(session, mapped)
-            : await options.handler(session);
+          result =
+            mapped !== undefined
+              ? await options.handler(session, mapped)
+              : await options.handler(session);
         } else {
           result = await options.handler(connection);
         }

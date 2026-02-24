@@ -48,23 +48,27 @@ export class StateCommand<T> implements CommandModule<T, StateArgs> {
   public handler = async (args: StateArgs) => {
     let connection: BridgeConnection | undefined;
     try {
-      connection = await BridgeConnection.connectAsync({ timeoutMs: args.timeout });
-      const session = await connection.resolveSession(
+      connection = await BridgeConnection.connectAsync({
+        timeoutMs: args.timeout,
+      });
+      const session = await connection.resolveSessionAsync(
         args.session,
         args.context as SessionContext | undefined,
-        args.instance,
+        args.instance
       );
 
       const result = await queryStateHandlerAsync(session);
 
       const mode = resolveMode({ json: args.json });
       if (mode === 'json') {
-        console.log(formatAsJson({
-          state: result.state,
-          placeId: result.placeId,
-          placeName: result.placeName,
-          gameId: result.gameId,
-        }));
+        console.log(
+          formatAsJson({
+            state: result.state,
+            placeId: result.placeId,
+            placeName: result.placeName,
+            gameId: result.gameId,
+          })
+        );
       } else {
         const rows = [result];
         const columns: TableColumn<typeof result>[] = [

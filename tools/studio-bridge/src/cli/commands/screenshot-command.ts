@@ -66,11 +66,13 @@ export class ScreenshotCommand<T> implements CommandModule<T, ScreenshotArgs> {
   public handler = async (args: ScreenshotArgs) => {
     let connection: BridgeConnection | undefined;
     try {
-      connection = await BridgeConnection.connectAsync({ timeoutMs: args.timeout });
-      const session = await connection.resolveSession(
+      connection = await BridgeConnection.connectAsync({
+        timeoutMs: args.timeout,
+      });
+      const session = await connection.resolveSessionAsync(
         args.session,
         args.context as SessionContext | undefined,
-        args.instance,
+        args.instance
       );
 
       const result = await captureScreenshotHandlerAsync(session, {
@@ -81,11 +83,13 @@ export class ScreenshotCommand<T> implements CommandModule<T, ScreenshotArgs> {
       const mode = resolveMode({ json: args.json });
 
       if (mode === 'json') {
-        console.log(formatAsJson({
-          width: result.width,
-          height: result.height,
-          data: result.data,
-        }));
+        console.log(
+          formatAsJson({
+            width: result.width,
+            height: result.height,
+            data: result.data,
+          })
+        );
         return;
       }
 
