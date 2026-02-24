@@ -505,7 +505,9 @@ export class BridgeConnection extends EventEmitter {
 
     await this._host.startAsync({ port });
     this._isConnected = true;
-    this._resetIdleTimer();
+    // Don't start idle timer on init -- callers like `sessions` manage their
+    // own lifecycle via disconnectAsync().  The idle timer should only fire
+    // when sessions are removed (going from >0 to 0).
   }
 
   // -----------------------------------------------------------------------

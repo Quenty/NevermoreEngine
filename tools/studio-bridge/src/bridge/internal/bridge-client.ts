@@ -133,6 +133,9 @@ export class BridgeClient extends EventEmitter {
    * Disconnect from the bridge host.
    */
   async disconnectAsync(): Promise<void> {
+    // Remove listeners before disconnecting to prevent the 'disconnected'
+    // event from triggering failover recovery on intentional disconnect.
+    this._transport.removeAllListeners();
     this._transport.disconnect();
     this._isConnected = false;
 
