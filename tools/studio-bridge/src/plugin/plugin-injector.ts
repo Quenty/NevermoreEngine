@@ -43,7 +43,7 @@ export async function injectPluginAsync(
     await TemplateHelper.createDirectoryContentsAsync(
       templateDir,
       buildContext.buildDir,
-      { PORT: String(port), SESSION_ID: sessionId },
+      { PORT: String(port), SESSION_ID: sessionId, EPHEMERAL: 'true' },
       false
     );
 

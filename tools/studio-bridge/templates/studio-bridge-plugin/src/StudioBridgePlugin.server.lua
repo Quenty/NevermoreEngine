@@ -23,10 +23,10 @@ local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
 -- Actions
 local ExecuteAction = require(script.Parent.Actions.ExecuteAction)
 
--- Build constants (Handlebars templates before substitution)
+-- Build constants (Handlebars templates substituted at build time)
 local PORT = "{{PORT}}"
 local SESSION_ID = "{{SESSION_ID}}"
-local IS_EPHEMERAL = (PORT ~= "{{" .. "PORT" .. "}}")
+local IS_EPHEMERAL = ("{{EPHEMERAL}}" == "true")
 
 -- Only run inside Studio
 if not RunService:IsStudio() then
