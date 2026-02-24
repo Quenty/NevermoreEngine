@@ -108,8 +108,12 @@ export class BridgeHost extends EventEmitter {
       this._hostStartTime = this._startTime;
     }
 
-    // Register /plugin WebSocket handler
+    // Register /plugin WebSocket handler — reject during shutdown
     this._transport.onConnection('/plugin', (ws, request) => {
+      if (this._shuttingDown) {
+        ws.close(1001, 'host shutting down');
+        return;
+      }
       this._handlePluginConnection(ws, request);
     });
 
@@ -136,15 +140,23 @@ export class BridgeHost extends EventEmitter {
       });
     });
 
-    // Register /health HTTP handler
-    this._transport.onHttpRequest('/health', createHealthHandler(() => ({
-      port: this._transport.port,
-      protocolVersion: PROTOCOL_VERSION,
-      sessions: this._plugins.size,
-      startTime: this._startTime,
-      hostStartTime: this._hostStartTime,
-      lastFailoverAt: this._lastFailoverAt,
-    })));
+    // Register /health HTTP handler — returns 503 during shutdown so
+    // plugins don't rediscover a host that's about to close
+    this._transport.onHttpRequest('/health', (req, res) => {
+      if (this._shuttingDown) {
+        res.writeHead(503);
+        res.end();
+        return;
+      }
+      createHealthHandler(() => ({
+        port: this._transport.port,
+        protocolVersion: PROTOCOL_VERSION,
+        sessions: this._plugins.size,
+        startTime: this._startTime,
+        hostStartTime: this._hostStartTime,
+        lastFailoverAt: this._lastFailoverAt,
+      }))(req, res);
+    });
 
     const port = await this._transport.startAsync({
       port: options?.port,
