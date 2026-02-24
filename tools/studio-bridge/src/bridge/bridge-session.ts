@@ -31,7 +31,7 @@ import type { SubscribableEvent, PluginMessage } from '../server/web-socket-prot
 const DEFAULT_TIMEOUTS: Record<string, number> = {
   execute: 120_000,
   queryState: 5_000,
-  captureScreenshot: 15_000,
+  captureScreenshot: 30_000,
   queryDataModel: 10_000,
   queryLogs: 10_000,
   subscribe: 5_000,

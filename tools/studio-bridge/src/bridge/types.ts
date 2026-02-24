@@ -67,7 +67,7 @@ export interface StateResult {
 
 export interface ScreenshotResult {
   data: string;
-  format: 'png';
+  format: 'png' | 'rgba';
   width: number;
   height: number;
 }

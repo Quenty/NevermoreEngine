@@ -312,7 +312,9 @@ export class BridgeHost extends EventEmitter {
         reject(new Error(`Plugin request timed out after ${timeoutMs}ms`));
       }, timeoutMs);
 
-      const sentRequestId = 'requestId' in message ? (message as any).requestId : undefined;
+      // Normalize requestId: treat empty string as absent (matches plugin convention)
+      const rawRequestId = 'requestId' in message ? (message as any).requestId : undefined;
+      const sentRequestId = rawRequestId === '' ? undefined : rawRequestId;
 
       const onMessage = (raw: RawData) => {
         const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
@@ -340,7 +342,16 @@ export class BridgeHost extends EventEmitter {
           return;
         }
 
-        // Accept error responses
+        // When no requestId was sent, accept the first non-heartbeat response
+        // (error or result) as the reply to our request
+        if (sentRequestId === undefined) {
+          clearTimeout(timer);
+          ws.off('message', onMessage);
+          resolve(parsed as TResponse);
+          return;
+        }
+
+        // Accept error responses even when requestId doesn't match
         if (parsed.type === 'error') {
           clearTimeout(timer);
           ws.off('message', onMessage);

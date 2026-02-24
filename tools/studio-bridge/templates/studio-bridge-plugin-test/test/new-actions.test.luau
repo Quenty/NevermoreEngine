@@ -274,11 +274,14 @@ table.insert(tests, {
 })
 
 -- ===========================================================================
--- CaptureScreenshotAction stub
+-- CaptureScreenshotAction
 -- ===========================================================================
+-- In Lune, game:GetService is not available, so the handler sends a
+-- CAPTURE_FAILED error (services not available). The handler runs in a
+-- spawned thread, so we need task.wait() to let it execute.
 
 table.insert(tests, {
-	name = "CaptureScreenshotAction: sends CAPABILITY_NOT_SUPPORTED error via sendMessage",
+	name = "CaptureScreenshotAction: sends error via sendMessage (services unavailable in Lune)",
 	fn = function()
 		local router = ActionRouter.new()
 		local sentMessages = {}
@@ -296,10 +299,10 @@ table.insert(tests, {
 		-- Handler returns nil, so router produces no wrapped response
 		assertEqual(response, nil, "router should not produce a response")
 
-		-- Error was sent directly via sendMessage
+		-- In Lune, the function runs synchronously (task.spawn unavailable)
 		assertEqual(#sentMessages, 1, "one message sent")
 		assertEqual(sentMessages[1].type, "error")
-		assertEqual(sentMessages[1].payload.code, "CAPABILITY_NOT_SUPPORTED")
+		assertEqual(sentMessages[1].payload.code, "CAPTURE_FAILED")
 		assertEqual(sentMessages[1].requestId, "req-1")
 		assertEqual(sentMessages[1].sessionId, "sess-1")
 	end,
@@ -323,6 +326,25 @@ table.insert(tests, {
 
 		assertEqual(#sentMessages, 1)
 		assertEqual(sentMessages[1].requestId, nil, "requestId should be nil for empty string")
+	end,
+})
+
+table.insert(tests, {
+	name = "CaptureScreenshotAction: returns error payload when no sendMessage provided",
+	fn = function()
+		local router = ActionRouter.new()
+		CaptureScreenshotAction.register(router, nil)
+
+		local response = router:dispatch({
+			type = "captureScreenshot",
+			sessionId = "sess-3",
+			requestId = "req-3",
+			payload = {},
+		})
+
+		assertNotNil(response, "should return a wrapped response")
+		assertEqual(response.type, "screenshotResult")
+		assertEqual(response.payload.code, "CAPABILITY_NOT_SUPPORTED")
 	end,
 })
 
