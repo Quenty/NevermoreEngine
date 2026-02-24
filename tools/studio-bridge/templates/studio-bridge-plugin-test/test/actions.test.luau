@@ -5,8 +5,8 @@
 	MessageBuffer: ring buffer behavior, push, get, clear, capacity overflow.
 ]]
 
-local ActionRouter = require("../src/Shared/ActionRouter")
-local MessageBuffer = require("../src/Shared/MessageBuffer")
+local ActionRouter = require("../../studio-bridge-plugin/src/Shared/ActionRouter")
+local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
 
 -- ---------------------------------------------------------------------------
 -- Test helpers

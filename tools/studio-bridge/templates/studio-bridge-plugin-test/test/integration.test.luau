@@ -6,10 +6,10 @@
 	together, validating the full data flow rather than individual module behavior.
 ]]
 
-local Protocol = require("../src/Shared/Protocol")
-local ActionRouter = require("../src/Shared/ActionRouter")
-local MessageBuffer = require("../src/Shared/MessageBuffer")
-local DiscoveryStateMachine = require("../src/Shared/DiscoveryStateMachine")
+local Protocol = require("../../studio-bridge-plugin/src/Shared/Protocol")
+local ActionRouter = require("../../studio-bridge-plugin/src/Shared/ActionRouter")
+local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
+local DiscoveryStateMachine = require("../../studio-bridge-plugin/src/Shared/DiscoveryStateMachine")
 
 -- ---------------------------------------------------------------------------
 -- Test helpers

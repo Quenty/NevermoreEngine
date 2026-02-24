@@ -4,7 +4,7 @@
 	Covers round-trip for every message type, error cases, and optional field handling.
 ]]
 
-local Protocol = require("../src/Shared/Protocol")
+local Protocol = require("../../studio-bridge-plugin/src/Shared/Protocol")
 
 -- ---------------------------------------------------------------------------
 -- Test helpers

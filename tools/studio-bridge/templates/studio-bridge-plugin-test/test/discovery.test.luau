@@ -5,7 +5,7 @@
 	exponential backoff, and callback invocations using mock callbacks.
 ]]
 
-local DiscoveryStateMachine = require("../src/Shared/DiscoveryStateMachine")
+local DiscoveryStateMachine = require("../../studio-bridge-plugin/src/Shared/DiscoveryStateMachine")
 
 -- ---------------------------------------------------------------------------
 -- Test helpers

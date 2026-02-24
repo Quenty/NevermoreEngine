@@ -9,9 +9,9 @@
 	  - Log capture into MessageBuffer
 ]]
 
-local ActionRouter = require("../src/Shared/ActionRouter")
-local MessageBuffer = require("../src/Shared/MessageBuffer")
-local ExecuteAction = require("../src/Actions/ExecuteAction")
+local ActionRouter = require("../../studio-bridge-plugin/src/Shared/ActionRouter")
+local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
+local ExecuteAction = require("../../studio-bridge-plugin/src/Actions/ExecuteAction")
 local mocks = require("./roblox-mocks")
 
 -- ---------------------------------------------------------------------------

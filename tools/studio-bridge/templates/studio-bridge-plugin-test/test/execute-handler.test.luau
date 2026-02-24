@@ -10,8 +10,8 @@
 	  - Sequential queueing via sendMessage callback
 ]]
 
-local ActionRouter = require("../src/Shared/ActionRouter")
-local ExecuteAction = require("../src/Actions/ExecuteAction")
+local ActionRouter = require("../../studio-bridge-plugin/src/Shared/ActionRouter")
+local ExecuteAction = require("../../studio-bridge-plugin/src/Actions/ExecuteAction")
 
 -- ---------------------------------------------------------------------------
 -- Test helpers
