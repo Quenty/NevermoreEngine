@@ -33,6 +33,17 @@ export class SessionsCommand<T> implements CommandModule<T, SessionsArgs> {
     let connection: BridgeConnection | undefined;
     try {
       connection = await BridgeConnection.connectAsync({ timeoutMs: args.timeout });
+
+      // If we became the host, no server was running before we connected.
+      // Wait briefly for a session so the plugin has a chance to discover us.
+      if (connection.role === 'host') {
+        try {
+          await connection.waitForSession(5_000);
+        } catch {
+          // No session appeared — that's fine, report empty below.
+        }
+      }
+
       const result = await listSessionsHandlerAsync(connection);
 
       const mode = resolveMode({ json: args.json });
