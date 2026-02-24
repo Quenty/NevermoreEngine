@@ -12,21 +12,17 @@ import * as path from 'path';
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { StudioBridgeGlobalArgs } from '../args/global-args.js';
-import { BridgeConnection } from '../../bridge/index.js';
-import type { SessionContext } from '../../bridge/index.js';
 import { runHandlerAsync } from '../../commands/run.js';
 import { formatAsJson, resolveMode } from '../format-output.js';
 import {
   executeScriptAsync,
   resolvePlacePathAsync,
 } from '../script-executor.js';
+import { addSessionOptions, withSessionAsync } from '../with-connection.js';
+import type { SessionCommandOptions } from '../with-connection.js';
 
-export interface RunArgs extends StudioBridgeGlobalArgs {
+export interface RunArgs extends StudioBridgeGlobalArgs, SessionCommandOptions {
   file: string;
-  session?: string;
-  instance?: string;
-  context?: string;
-  json?: boolean;
 }
 
 export class RunCommand<T> implements CommandModule<T, RunArgs> {
@@ -39,24 +35,7 @@ export class RunCommand<T> implements CommandModule<T, RunArgs> {
       type: 'string',
       demandOption: true,
     });
-    args.option('session', {
-      alias: 's',
-      type: 'string',
-      describe: 'Target session ID',
-    });
-    args.option('instance', {
-      type: 'string',
-      describe: 'Target instance ID',
-    });
-    args.option('context', {
-      type: 'string',
-      describe: 'Target context (edit, client, server)',
-    });
-    args.option('json', {
-      type: 'boolean',
-      default: false,
-      describe: 'Output as JSON',
-    });
+    addSessionOptions(args);
 
     return args as Argv<RunArgs>;
   };
@@ -96,21 +75,9 @@ export class RunCommand<T> implements CommandModule<T, RunArgs> {
   };
 
   private _handleViaSessionAsync = async (args: RunArgs) => {
-    let connection: BridgeConnection | undefined;
-    try {
-      const scriptPath = path.resolve(args.file);
+    const scriptPath = path.resolve(args.file);
 
-      connection = await BridgeConnection.connectAsync({
-        timeoutMs: args.timeout,
-        remoteHost: args.remote,
-        local: args.local,
-      });
-      const session = await connection.resolveSessionAsync(
-        args.session,
-        args.context as SessionContext | undefined,
-        args.instance
-      );
-
+    await withSessionAsync(args, async (session) => {
       const result = await runHandlerAsync(session, {
         scriptPath,
         timeout: args.timeout,
@@ -135,13 +102,6 @@ export class RunCommand<T> implements CommandModule<T, RunArgs> {
       if (!result.success) {
         process.exit(1);
       }
-    } catch (err) {
-      OutputHelper.error(err instanceof Error ? err.message : String(err));
-      process.exit(1);
-    } finally {
-      if (connection) {
-        await connection.disconnectAsync();
-      }
-    }
+    });
   };
 }

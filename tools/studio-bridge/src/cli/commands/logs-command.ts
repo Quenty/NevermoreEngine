@@ -5,18 +5,15 @@
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { StudioBridgeGlobalArgs } from '../args/global-args.js';
-import { BridgeConnection } from '../../bridge/index.js';
-import type { SessionContext, LogEntry } from '../../bridge/index.js';
+import type { LogEntry } from '../../bridge/index.js';
 import type { OutputLevel } from '../../server/web-socket-protocol.js';
 import { queryLogsHandlerAsync } from '../../commands/logs.js';
 import { formatAsJson, formatAsTable, resolveMode } from '../format-output.js';
 import type { TableColumn } from '../format-output.js';
+import { addSessionOptions, withSessionAsync } from '../with-connection.js';
+import type { SessionCommandOptions } from '../with-connection.js';
 
-export interface LogsArgs extends StudioBridgeGlobalArgs {
-  session?: string;
-  instance?: string;
-  context?: string;
-  json?: boolean;
+export interface LogsArgs extends StudioBridgeGlobalArgs, SessionCommandOptions {
   tail?: number;
   head?: number;
   follow?: boolean;
@@ -29,24 +26,7 @@ export class LogsCommand<T> implements CommandModule<T, LogsArgs> {
   public describe = 'Retrieve and stream output logs from Studio';
 
   public builder = (args: Argv<T>) => {
-    args.option('session', {
-      alias: 's',
-      type: 'string',
-      describe: 'Target session ID',
-    });
-    args.option('instance', {
-      type: 'string',
-      describe: 'Target instance ID',
-    });
-    args.option('context', {
-      type: 'string',
-      describe: 'Target context (edit, client, server)',
-    });
-    args.option('json', {
-      type: 'boolean',
-      default: false,
-      describe: 'Output as JSON',
-    });
+    addSessionOptions(args);
     args.option('tail', {
       type: 'number',
       default: 50,
@@ -77,17 +57,7 @@ export class LogsCommand<T> implements CommandModule<T, LogsArgs> {
   };
 
   public handler = async (args: LogsArgs) => {
-    let connection: BridgeConnection | undefined;
-    try {
-      connection = await BridgeConnection.connectAsync({
-        timeoutMs: args.timeout,
-      });
-      const session = await connection.resolveSessionAsync(
-        args.session,
-        args.context as SessionContext | undefined,
-        args.instance
-      );
-
+    await withSessionAsync(args, async (session) => {
       // Determine direction and count from --head / --tail flags
       let direction: 'head' | 'tail' = 'tail';
       let count: number = args.tail ?? 50;
@@ -134,13 +104,6 @@ export class LogsCommand<T> implements CommandModule<T, LogsArgs> {
       if (args.follow) {
         OutputHelper.warn('Follow mode (--follow) is not yet supported.');
       }
-    } catch (err) {
-      OutputHelper.error(err instanceof Error ? err.message : String(err));
-      process.exit(1);
-    } finally {
-      if (connection) {
-        await connection.disconnectAsync();
-      }
-    }
+    });
   };
 }

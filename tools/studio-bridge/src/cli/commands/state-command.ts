@@ -5,58 +5,25 @@
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { StudioBridgeGlobalArgs } from '../args/global-args.js';
-import { BridgeConnection } from '../../bridge/index.js';
-import type { SessionContext } from '../../bridge/index.js';
 import { queryStateHandlerAsync } from '../../commands/state.js';
 import { formatAsJson, formatAsTable, resolveMode } from '../format-output.js';
 import type { TableColumn } from '../format-output.js';
+import { addSessionOptions, withSessionAsync } from '../with-connection.js';
+import type { SessionCommandOptions } from '../with-connection.js';
 
-export interface StateArgs extends StudioBridgeGlobalArgs {
-  session?: string;
-  instance?: string;
-  context?: string;
-  json?: boolean;
-}
+export interface StateArgs extends StudioBridgeGlobalArgs, SessionCommandOptions {}
 
 export class StateCommand<T> implements CommandModule<T, StateArgs> {
   public command = 'state';
   public describe = 'Query the current Studio state';
 
   public builder = (args: Argv<T>) => {
-    args.option('session', {
-      alias: 's',
-      type: 'string',
-      describe: 'Target session ID',
-    });
-    args.option('instance', {
-      type: 'string',
-      describe: 'Target instance ID',
-    });
-    args.option('context', {
-      type: 'string',
-      describe: 'Target context (edit, client, server)',
-    });
-    args.option('json', {
-      type: 'boolean',
-      default: false,
-      describe: 'Output as JSON',
-    });
-
+    addSessionOptions(args);
     return args as Argv<StateArgs>;
   };
 
   public handler = async (args: StateArgs) => {
-    let connection: BridgeConnection | undefined;
-    try {
-      connection = await BridgeConnection.connectAsync({
-        timeoutMs: args.timeout,
-      });
-      const session = await connection.resolveSessionAsync(
-        args.session,
-        args.context as SessionContext | undefined,
-        args.instance
-      );
-
+    await withSessionAsync(args, async (session) => {
       const result = await queryStateHandlerAsync(session);
 
       const mode = resolveMode({ json: args.json });
@@ -81,13 +48,6 @@ export class StateCommand<T> implements CommandModule<T, StateArgs> {
         console.log(formatAsTable(rows, columns));
         OutputHelper.info(result.summary);
       }
-    } catch (err) {
-      OutputHelper.error(err instanceof Error ? err.message : String(err));
-      process.exit(1);
-    } finally {
-      if (connection) {
-        await connection.disconnectAsync();
-      }
-    }
+    });
   };
 }

@@ -5,11 +5,11 @@
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { StudioBridgeGlobalArgs } from '../args/global-args.js';
-import { BridgeConnection } from '../../bridge/index.js';
 import { listSessionsHandlerAsync } from '../../commands/sessions.js';
 import { formatAsJson, formatAsTable, resolveMode } from '../format-output.js';
 import type { TableColumn } from '../format-output.js';
 import type { SessionInfo } from '../../bridge/index.js';
+import { withConnectionAsync } from '../with-connection.js';
 
 export interface SessionsArgs extends StudioBridgeGlobalArgs {
   json?: boolean;
@@ -30,13 +30,7 @@ export class SessionsCommand<T> implements CommandModule<T, SessionsArgs> {
   };
 
   public handler = async (args: SessionsArgs) => {
-    let connection: BridgeConnection | undefined;
-    try {
-      connection = await BridgeConnection.connectAsync({
-        timeoutMs: args.timeout,
-        waitForSessions: true,
-      });
-
+    await withConnectionAsync(args, { waitForSessions: true }, async (connection) => {
       const result = await listSessionsHandlerAsync(connection);
 
       const mode = resolveMode({ json: args.json });
@@ -58,13 +52,6 @@ export class SessionsCommand<T> implements CommandModule<T, SessionsArgs> {
           OutputHelper.info(result.summary);
         }
       }
-    } catch (err) {
-      OutputHelper.error(err instanceof Error ? err.message : String(err));
-      process.exit(1);
-    } finally {
-      if (connection) {
-        await connection.disconnectAsync();
-      }
-    }
+    });
   };
 }
