@@ -722,7 +722,7 @@ describe('BridgeConnection', () => {
       openClients.push(ws);
       await new Promise((r) => setTimeout(r, 50));
 
-      const session = await conn.waitForSession();
+      const session = await conn.waitForSessionAsync();
       expect(session.info.sessionId).toBe('existing-session');
     });
 
@@ -734,7 +734,7 @@ describe('BridgeConnection', () => {
       connections.push(conn);
 
       // Start waiting before plugin connects
-      const waitPromise = conn.waitForSession(5000);
+      const waitPromise = conn.waitForSessionAsync(5000);
 
       // Connect plugin after a short delay
       setTimeout(async () => {
@@ -762,7 +762,7 @@ describe('BridgeConnection', () => {
         });
         connections.push(conn);
 
-        const waitPromise = conn.waitForSession(500);
+        const waitPromise = conn.waitForSessionAsync(500);
 
         // Advance past the timeout
         vi.advanceTimersByTime(600);

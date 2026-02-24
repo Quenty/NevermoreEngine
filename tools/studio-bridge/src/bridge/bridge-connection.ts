@@ -352,6 +352,12 @@ export class BridgeConnection extends EventEmitter {
     context?: SessionContext,
     instanceId?: string
   ): Promise<BridgeSession> {
+    // If we're a fresh host with no sessions yet, wait for persistent
+    // plugins to discover us before attempting any lookup path.
+    if (this._role === 'host' && this.listSessions().length === 0) {
+      await this.waitForSessionsToSettleAsync();
+    }
+
     // Step 1: Direct session lookup
     if (sessionId) {
       const session = this.getSession(sessionId);
@@ -369,16 +375,7 @@ export class BridgeConnection extends EventEmitter {
       return this._resolveByInstance(instanceId, context);
     }
 
-    // Step 3: Collect unique instances — if we're the host with no sessions
-    // yet, wait briefly for a plugin to discover us and connect.
-    if (this._role === 'host' && this.listSessions().length === 0) {
-      try {
-        await this.waitForSession(5_000);
-      } catch {
-        // Still no sessions after waiting
-      }
-    }
-
+    // Step 3: Collect unique instances
     const instances = this.listInstances();
 
     // Step 4: No instances
@@ -412,7 +409,7 @@ export class BridgeConnection extends EventEmitter {
    * Wait for at least one session to connect.
    * Resolves with the first session. Rejects after timeout.
    */
-  async waitForSession(timeout?: number): Promise<BridgeSession> {
+  async waitForSessionAsync(timeout?: number): Promise<BridgeSession> {
     // Check if sessions already exist
     const sessions = this.listSessions();
     if (sessions.length > 0) {
@@ -471,7 +468,7 @@ export class BridgeConnection extends EventEmitter {
 
     // Wait for the first session
     try {
-      await this.waitForSession(firstTimeout);
+      await this.waitForSessionAsync(firstTimeout);
     } catch {
       // No session appeared — nothing to settle
       return;

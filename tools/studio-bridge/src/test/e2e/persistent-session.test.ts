@@ -466,7 +466,7 @@ describe('persistent session e2e', () => {
     connections.push(conn);
 
     // Start waiting before the plugin connects
-    const waitPromise = conn.waitForSession(5_000);
+    const waitPromise = conn.waitForSessionAsync(5_000);
 
     // Connect after a short delay
     const plugin = new MockPluginClient({

@@ -129,6 +129,22 @@ local LEVEL_MAP = {
 	[Enum.MessageType.MessageError] = "Error",
 }
 
+-- Hybrid clock: os.time() for absolute wall-clock, os.clock() deltas for sub-second precision
+local clockBase = os.clock()
+local timeBase = os.time()
+
+-- Capture logs from the moment the plugin loads, regardless of WebSocket state
+LogService.MessageOut:Connect(function(message, messageType)
+	if string.sub(message, 1, 14) == "[StudioBridge]" then
+		return
+	end
+	logBuffer:push({
+		level = LEVEL_MAP[messageType] or "Print",
+		body = message,
+		timestamp = timeBase + (os.clock() - clockBase),
+	})
+end)
+
 -- ---------------------------------------------------------------------------
 -- Wire a WebSocket connection
 -- ---------------------------------------------------------------------------
@@ -203,18 +219,6 @@ local function wireConnection(ws, sessionId, connectLabel)
 			end)
 			task.wait(15)
 		end
-	end)
-
-	-- Capture logs into buffer
-	LogService.MessageOut:Connect(function(message, messageType)
-		if string.sub(message, 1, 14) == "[StudioBridge]" then
-			return
-		end
-		logBuffer:push({
-			level = LEVEL_MAP[messageType] or "Print",
-			body = message,
-			timestamp = os.clock(),
-		})
 	end)
 
 	print(`[StudioBridge] Connected to {connectLabel} as {sessionId}`)

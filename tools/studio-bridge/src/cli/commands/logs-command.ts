@@ -89,7 +89,7 @@ export class LogsCommand<T> implements CommandModule<T, LogsArgs> {
           const columns: TableColumn<LogEntry>[] = [
             {
               header: 'Time',
-              value: (e) => new Date(e.timestamp).toLocaleTimeString(),
+              value: (e) => new Date(e.timestamp * 1000).toLocaleTimeString(),
             },
             { header: 'Level', value: (e) => e.level },
             { header: 'Message', value: (e) => e.body },
