@@ -436,4 +436,75 @@ table.insert(tests, {
 	end,
 })
 
+-- ===========================================================================
+-- Instance/session ID helpers (replicate getInstanceId/getSessionId logic)
+-- ===========================================================================
+
+table.insert(tests, {
+	name = "getInstanceId: published place uses GameId-PlaceId",
+	fn = function()
+		local gameId = 12345
+		local placeId = 67890
+		local instanceId
+		if gameId ~= 0 or placeId ~= 0 then
+			instanceId = tostring(gameId) .. "-" .. tostring(placeId)
+		end
+		assertEqual(instanceId, "12345-67890")
+	end,
+})
+
+table.insert(tests, {
+	name = "getInstanceId: unpublished place uses sanitized name",
+	fn = function()
+		local gameId = 0
+		local placeId = 0
+		local placeName = "My Cool Game!"
+		local instanceId
+		if gameId ~= 0 or placeId ~= 0 then
+			instanceId = tostring(gameId) .. "-" .. tostring(placeId)
+		else
+			local name = string.lower(placeName)
+			name = string.gsub(name, "%s+", "-")
+			name = string.gsub(name, "[^%w%-]", "")
+			if name == "" then
+				name = "untitled"
+			end
+			instanceId = "local-" .. name
+		end
+		assertEqual(instanceId, "local-my-cool-game")
+	end,
+})
+
+table.insert(tests, {
+	name = "getInstanceId: empty name falls back to untitled",
+	fn = function()
+		local gameId = 0
+		local placeId = 0
+		local placeName = "!!!"
+		local instanceId
+		if gameId ~= 0 or placeId ~= 0 then
+			instanceId = tostring(gameId) .. "-" .. tostring(placeId)
+		else
+			local name = string.lower(placeName)
+			name = string.gsub(name, "%s+", "-")
+			name = string.gsub(name, "[^%w%-]", "")
+			if name == "" then
+				name = "untitled"
+			end
+			instanceId = "local-" .. name
+		end
+		assertEqual(instanceId, "local-untitled")
+	end,
+})
+
+table.insert(tests, {
+	name = "getSessionId: appends context to instanceId",
+	fn = function()
+		local instanceId = "local-my-game"
+		local context = "edit"
+		local sessionId = instanceId .. "-" .. context
+		assertEqual(sessionId, "local-my-game-edit")
+	end,
+})
+
 return tests
