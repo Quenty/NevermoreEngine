@@ -458,12 +458,30 @@ export class BridgeHost extends EventEmitter {
   }
 
   private _registerPlugin(ws: WebSocket, info: PluginSessionInfo): void {
+    // If a plugin with this sessionId is already connected, close the old
+    // connection first so the Map stays consistent. This can happen when a
+    // plugin reconnects faster than the host detects the old socket's close.
+    const existing = this._plugins.get(info.sessionId);
+    if (existing && existing !== ws) {
+      try {
+        existing.close(1001, 'replaced by new connection');
+      } catch {
+        // Old socket may already be dead
+      }
+      // Remove immediately so the old close handler doesn't delete the new entry
+      this._plugins.delete(info.sessionId);
+    }
+
     this._plugins.set(info.sessionId, ws);
     this.emit('plugin-connected', info);
 
     ws.on('close', () => {
-      this._plugins.delete(info.sessionId);
-      this.emit('plugin-disconnected', info.sessionId);
+      // Only remove if this socket is still the registered one — a newer
+      // connection with the same sessionId may have already replaced us.
+      if (this._plugins.get(info.sessionId) === ws) {
+        this._plugins.delete(info.sessionId);
+        this.emit('plugin-disconnected', info.sessionId);
+      }
     });
   }
 }

@@ -9,23 +9,22 @@
 import { EventEmitter } from 'events';
 import { BridgeHost } from './internal/bridge-host.js';
 import { BridgeClient } from './internal/bridge-client.js';
-import { SessionTracker, type TrackedSession } from './internal/session-tracker.js';
-import { detectRoleAsync, getDefaultRemoteHost } from './internal/environment-detection.js';
+import {
+  SessionTracker,
+  type TrackedSession,
+} from './internal/session-tracker.js';
+import {
+  detectRoleAsync,
+  getDefaultRemoteHost,
+} from './internal/environment-detection.js';
 import { BridgeSession } from './bridge-session.js';
 import type {
   HostProtocolMessage,
   ListSessionsRequest,
   ListInstancesRequest,
 } from './internal/host-protocol.js';
-import type {
-  SessionInfo,
-  SessionContext,
-  InstanceInfo,
-} from './types.js';
-import {
-  SessionNotFoundError,
-  ContextNotFoundError,
-} from './types.js';
+import type { SessionInfo, SessionContext, InstanceInfo } from './types.js';
+import { SessionNotFoundError, ContextNotFoundError } from './types.js';
 import type { ServerMessage } from '../server/web-socket-protocol.js';
 
 // ---------------------------------------------------------------------------
@@ -43,6 +42,12 @@ export interface BridgeConnectionOptions {
   remoteHost?: string;
   /** Force local mode -- skip devcontainer auto-detection. */
   local?: boolean;
+  /**
+   * When true and this process becomes the host, wait for active Studios to
+   * discover and connect before returning. Use for short-lived commands that
+   * need all sessions available immediately. Default: false.
+   */
+  waitForSessions?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -77,8 +82,15 @@ class HostTransportHandle extends EventEmitter {
     return this._connected;
   }
 
-  async sendActionAsync<TResponse>(message: ServerMessage, timeoutMs: number): Promise<TResponse> {
-    return this._host.sendToPluginAsync<TResponse>(this._sessionId, message, timeoutMs);
+  async sendActionAsync<TResponse>(
+    message: ServerMessage,
+    timeoutMs: number
+  ): Promise<TResponse> {
+    return this._host.sendToPluginAsync<TResponse>(
+      this._sessionId,
+      message,
+      timeoutMs
+    );
   }
 
   sendMessage(message: ServerMessage): void {
@@ -127,7 +139,9 @@ export class BridgeConnection extends EventEmitter {
    * - If no host is running: binds the port, becomes the host.
    * - If a host is running: connects as a client.
    */
-  static async connectAsync(options?: BridgeConnectionOptions): Promise<BridgeConnection> {
+  static async connectAsync(
+    options?: BridgeConnectionOptions
+  ): Promise<BridgeConnection> {
     const keepAlive = options?.keepAlive ?? false;
     const remoteHost = options?.remoteHost;
 
@@ -155,15 +169,16 @@ export class BridgeConnection extends EventEmitter {
         try {
           const autoConn = new BridgeConnection('client', keepAlive);
           const autoHost = autoRemoteHost.split(':')[0];
-          const autoPort = parseInt(autoRemoteHost.split(':')[1], 10) || DEFAULT_PORT;
+          const autoPort =
+            parseInt(autoRemoteHost.split(':')[1], 10) || DEFAULT_PORT;
 
           await Promise.race([
             autoConn._initClientAsync(autoPort, autoHost),
             new Promise<never>((_, reject) =>
               setTimeout(
                 () => reject(new Error('Auto-detection timed out')),
-                AUTO_DETECT_TIMEOUT_MS,
-              ),
+                AUTO_DETECT_TIMEOUT_MS
+              )
             ),
           ]);
 
@@ -171,14 +186,17 @@ export class BridgeConnection extends EventEmitter {
         } catch {
           console.warn(
             `Devcontainer detected, but could not connect to bridge host at ${autoRemoteHost}. ` +
-            `Falling back to local mode. Run \`studio-bridge serve\` on the host OS, ` +
-            `or use --remote to specify a different address.`,
+              `Falling back to local mode. Run \`studio-bridge serve\` on the host OS, ` +
+              `or use --remote to specify a different address.`
           );
         }
       }
     }
 
-    const detection = await detectRoleAsync({ port, remoteHost: parsedRemoteHost });
+    const detection = await detectRoleAsync({
+      port,
+      remoteHost: parsedRemoteHost,
+    });
 
     const conn = new BridgeConnection(detection.role, keepAlive);
 
@@ -193,17 +211,25 @@ export class BridgeConnection extends EventEmitter {
           if (code === 'ECONNREFUSED') {
             throw new Error(
               `Could not connect to bridge host at ${parsedRemoteHost}. ` +
-              `Is \`studio-bridge serve\` running on the host?`,
+                `Is \`studio-bridge serve\` running on the host?`
             );
           }
-          if (err.message.includes('timed out') || err.message.includes('timeout')) {
+          if (
+            err.message.includes('timed out') ||
+            err.message.includes('timeout')
+          ) {
             throw new Error(
-              `Connection to bridge host at ${parsedRemoteHost} timed out after 5 seconds.`,
+              `Connection to bridge host at ${parsedRemoteHost} timed out after 5 seconds.`
             );
           }
         }
         throw err;
       }
+    }
+
+    // If requested, wait for active Studios to discover this host and connect
+    if (conn._role === 'host' && options?.waitForSessions) {
+      await conn.waitForSessionsToSettleAsync();
     }
 
     return conn;
@@ -324,7 +350,7 @@ export class BridgeConnection extends EventEmitter {
   async resolveSession(
     sessionId?: string,
     context?: SessionContext,
-    instanceId?: string,
+    instanceId?: string
   ): Promise<BridgeSession> {
     // Step 1: Direct session lookup
     if (sessionId) {
@@ -334,7 +360,7 @@ export class BridgeConnection extends EventEmitter {
       }
       throw new SessionNotFoundError(
         `Session '${sessionId}' not found`,
-        sessionId,
+        sessionId
       );
     }
 
@@ -367,11 +393,14 @@ export class BridgeConnection extends EventEmitter {
 
     // Step 6: Multiple instances
     const instanceList = instances
-      .map((inst) => `  - ${inst.instanceId}: ${inst.placeName} (${inst.contexts.join(', ')})`)
+      .map(
+        (inst) =>
+          `  - ${inst.instanceId}: ${inst.placeName} (${inst.contexts.join(', ')})`
+      )
       .join('\n');
 
     throw new SessionNotFoundError(
-      `Multiple Studio instances connected. Use --session <id> or --instance <id> to select one.\n${instanceList}`,
+      `Multiple Studio instances connected. Use --session <id> or --instance <id> to select one.\n${instanceList}`
     );
   }
 
@@ -407,12 +436,65 @@ export class BridgeConnection extends EventEmitter {
 
       timer = setTimeout(() => {
         this.off('session-connected', onSession);
-        reject(new Error(
-          `Timed out waiting for a session to connect (${timeoutMs}ms)`,
-        ));
+        reject(
+          new Error(
+            `Timed out waiting for a session to connect (${timeoutMs}ms)`
+          )
+        );
       }, timeoutMs);
 
       this.once('session-connected', onSession);
+    });
+  }
+
+  /**
+   * Wait for all active Studios to discover this host and connect. Waits for
+   * the first session, then keeps waiting until no new sessions arrive for a
+   * full plugin poll cycle (~2.5s). Guarantees all polling plugins have had
+   * a chance to find the host. Safe to call when not a host (returns immediately).
+   */
+  async waitForSessionsToSettleAsync(options?: {
+    /** Max time to wait for the first session (ms). Default: 5000 */
+    firstSessionTimeout?: number;
+    /** How long to wait after the last connection before considering settled (ms). Default: 2500 */
+    settleMs?: number;
+    /** Absolute max wait time (ms). Default: 10000 */
+    maxMs?: number;
+  }): Promise<void> {
+    if (this._role !== 'host') {
+      return;
+    }
+
+    const firstTimeout = options?.firstSessionTimeout ?? 5_000;
+    const settleMs = options?.settleMs ?? 2_500;
+    const maxMs = options?.maxMs ?? 10_000;
+
+    // Wait for the first session
+    try {
+      await this.waitForSession(firstTimeout);
+    } catch {
+      // No session appeared — nothing to settle
+      return;
+    }
+
+    // Wait for sessions to stabilize: reset timer on each new connection
+    await new Promise<void>((resolve) => {
+      const cleanup = () => {
+        clearTimeout(settleTimer);
+        clearTimeout(maxTimer);
+        this.off('session-connected', onSession);
+        resolve();
+      };
+
+      const onSession = () => {
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(cleanup, settleMs);
+      };
+
+      let settleTimer = setTimeout(cleanup, settleMs);
+      const maxTimer = setTimeout(cleanup, maxMs);
+
+      this.on('session-connected', onSession);
     });
   }
 
@@ -503,23 +585,26 @@ export class BridgeConnection extends EventEmitter {
     });
 
     // Handle client protocol messages (list-sessions, list-instances, etc.)
-    this._host.on('client-message', (msg: HostProtocolMessage, reply: (m: HostProtocolMessage) => void) => {
-      if (msg.type === 'list-sessions') {
-        const req = msg as ListSessionsRequest;
-        reply({
-          type: 'list-sessions-response',
-          requestId: req.requestId,
-          sessions: this._tracker!.listSessions(),
-        });
-      } else if (msg.type === 'list-instances') {
-        const req = msg as ListInstancesRequest;
-        reply({
-          type: 'list-instances-response',
-          requestId: req.requestId,
-          instances: this._tracker!.listInstances(),
-        });
+    this._host.on(
+      'client-message',
+      (msg: HostProtocolMessage, reply: (m: HostProtocolMessage) => void) => {
+        if (msg.type === 'list-sessions') {
+          const req = msg as ListSessionsRequest;
+          reply({
+            type: 'list-sessions-response',
+            requestId: req.requestId,
+            sessions: this._tracker!.listSessions(),
+          });
+        } else if (msg.type === 'list-instances') {
+          const req = msg as ListInstancesRequest;
+          reply({
+            type: 'list-instances-response',
+            requestId: req.requestId,
+            instances: this._tracker!.listInstances(),
+          });
+        }
       }
-    });
+    );
 
     await this._host.startAsync({ port });
     this._isConnected = true;
@@ -532,7 +617,10 @@ export class BridgeConnection extends EventEmitter {
   // Private: Client initialization
   // -----------------------------------------------------------------------
 
-  private async _initClientAsync(port: number, remoteHost?: string): Promise<void> {
+  private async _initClientAsync(
+    port: number,
+    remoteHost?: string
+  ): Promise<void> {
     this._client = new BridgeClient();
 
     // Wire client events to BridgeConnection events
@@ -579,16 +667,14 @@ export class BridgeConnection extends EventEmitter {
 
   private _resolveByInstance(
     instanceId: string,
-    context?: SessionContext,
+    context?: SessionContext
   ): BridgeSession {
     const sessions = this.listSessions().filter(
-      (s) => s.instanceId === instanceId,
+      (s) => s.instanceId === instanceId
     );
 
     if (sessions.length === 0) {
-      throw new SessionNotFoundError(
-        `Instance '${instanceId}' not found`,
-      );
+      throw new SessionNotFoundError(`Instance '${instanceId}' not found`);
     }
 
     const contexts = sessions.map((s) => s.context);
@@ -629,7 +715,7 @@ export class BridgeConnection extends EventEmitter {
     }
 
     throw new SessionNotFoundError(
-      `No session found for instance '${instanceId}'`,
+      `No session found for instance '${instanceId}'`
     );
   }
 

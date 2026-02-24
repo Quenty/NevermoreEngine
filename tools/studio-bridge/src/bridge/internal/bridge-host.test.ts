@@ -341,6 +341,50 @@ describe('BridgeHost', () => {
 
       expect(host.pluginCount).toBe(1);
     });
+
+    it('handles duplicate sessionId by replacing old connection', async () => {
+      host = new BridgeHost();
+      const port = await host.startAsync({ port: 0 });
+
+      // Connect first plugin
+      const { ws: ws1 } = await performHelloHandshake(port, 'session-dup');
+      openClients.push(ws1);
+      await new Promise((r) => setTimeout(r, 50));
+      expect(host.pluginCount).toBe(1);
+
+      // Connect second plugin with the SAME sessionId
+      const { ws: ws2 } = await performHelloHandshake(port, 'session-dup');
+      openClients.push(ws2);
+      await new Promise((r) => setTimeout(r, 50));
+
+      // Should still be 1 — second replaced first
+      expect(host.pluginCount).toBe(1);
+
+      // Old socket should have been closed by the host
+      await new Promise((r) => setTimeout(r, 100));
+      expect(ws1.readyState).toBe(WebSocket.CLOSED);
+      expect(ws2.readyState).toBe(WebSocket.OPEN);
+    });
+
+    it('old close handler does not remove new connection with same sessionId', async () => {
+      host = new BridgeHost();
+      const port = await host.startAsync({ port: 0 });
+
+      // Connect two plugins with the same sessionId
+      const { ws: ws1 } = await performHelloHandshake(port, 'session-race');
+      openClients.push(ws1);
+      await new Promise((r) => setTimeout(r, 50));
+
+      const { ws: ws2 } = await performHelloHandshake(port, 'session-race');
+      openClients.push(ws2);
+
+      // Wait for close frames to propagate
+      await new Promise((r) => setTimeout(r, 200));
+
+      // ws2 should still be tracked despite ws1's close handler firing
+      expect(host.pluginCount).toBe(1);
+      expect(ws2.readyState).toBe(WebSocket.OPEN);
+    });
   });
 
   // -----------------------------------------------------------------------

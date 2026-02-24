@@ -57,18 +57,22 @@ end
 -- Instance / session ID helpers
 -- ---------------------------------------------------------------------------
 
+-- Short unique nonce for disambiguating unpublished places with the same name.
+-- Generated once per plugin lifecycle so the session ID stays stable across reconnects.
+local _nonce: string = string.sub(HttpService:GenerateGUID(false), 1, 8)
+
 local function getInstanceId()
 	if game.GameId ~= 0 or game.PlaceId ~= 0 then
 		return `{game.GameId}-{game.PlaceId}`
 	end
-	-- Unpublished place: use sanitized place name for readability
+	-- Unpublished place: use sanitized place name + nonce for uniqueness
 	local name = string.lower(game.Name or "untitled")
 	name = string.gsub(name, "%s+", "-")
 	name = string.gsub(name, "[^%w%-]", "")
 	if name == "" then
 		name = "untitled"
 	end
-	return `local-{name}`
+	return `local-{name}-{_nonce}`
 end
 
 local function getSessionId()
@@ -238,16 +242,15 @@ if IS_EPHEMERAL then
 	end
 else
 	-- Persistent mode: discover server via port scanning
+	local POLL_INTERVAL_SEC = 2
+
 	-- Forward-declare so closures inside the callback table can reference it.
 	local discovery
 	discovery = DiscoveryStateMachine.new(nil, {
-		httpGet = function(url)
-			local ok2, body = pcall(HttpService.GetAsync, HttpService, url)
-			return ok2, body
-		end,
-		scanPorts = function(ports)
+		scanPortsAsync = function(ports, timeoutSec)
 			-- Scan all ports in parallel using task.spawn. The calling thread
-			-- yields and is resumed as soon as any port succeeds or all fail.
+			-- yields and is resumed as soon as any port succeeds, all fail,
+			-- or the timeout expires.
 			local callerThread = coroutine.running()
 			local foundPort = nil
 			local foundBody = nil
@@ -266,7 +269,7 @@ else
 						task.spawn(callerThread)
 						return
 					end
-					remaining = remaining - 1
+					remaining -= 1
 					if remaining <= 0 and not settled then
 						settled = true
 						task.spawn(callerThread)
@@ -275,11 +278,20 @@ else
 				table.insert(threads, thread)
 			end
 
+			-- Timeout: use the deadline from the poll loop
+			local timeoutThread = task.delay(timeoutSec, function()
+				if not settled then
+					settled = true
+					task.spawn(callerThread)
+				end
+			end)
+
 			if not settled then
 				coroutine.yield()
 			end
 
-			-- Cancel remaining requests
+			-- Cancel remaining HTTP threads and the timeout
+			pcall(task.cancel, timeoutThread)
 			for _, thread in threads do
 				pcall(task.cancel, thread)
 			end
@@ -315,23 +327,25 @@ else
 			print(`[StudioBridge] Disconnected ({reason}), searching...`)
 		end,
 	})
+	print(`[StudioBridge] Session ID: {getSessionId()}`)
 	discovery:start()
 
-	-- Drive the state machine from RunService.Heartbeat.
-	-- Reentrancy guard: httpGet yields (GetAsync), so a second Heartbeat can
-	-- fire while a tick is still in progress. Without the guard, multiple
-	-- overlapping scans find the same server and each opens its own WebSocket.
-	local lastTick = os.clock()
-	local ticking = false
-	RunService.Heartbeat:Connect(function()
-		if ticking then
-			return
+	-- Drive the state machine with a simple polling loop.
+	-- Each iteration has a fixed time budget (POLL_INTERVAL_SEC). The
+	-- remaining time threads through pollAsync → scanPortsAsync so all
+	-- async operations complete within the budget.
+	task.spawn(function()
+		while true do
+			local startTime = os.clock()
+			discovery:pollAsync(POLL_INTERVAL_SEC)
+			-- Sleep for the remainder of the cycle
+			local elapsed = os.clock() - startTime
+			local remaining = POLL_INTERVAL_SEC - elapsed
+			if remaining > 0 then
+				task.wait(remaining)
+			else
+				task.wait() -- yield at least one frame
+			end
 		end
-		ticking = true
-		local now = os.clock()
-		local deltaMs = (now - lastTick) * 1000
-		lastTick = now
-		discovery:tick(deltaMs)
-		ticking = false
 	end)
 end

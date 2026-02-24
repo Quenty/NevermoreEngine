@@ -437,11 +437,12 @@ table.insert(tests, {
 })
 
 table.insert(tests, {
-	name = "getInstanceId: unpublished place uses sanitized name",
+	name = "getInstanceId: unpublished place uses sanitized name with nonce",
 	fn = function()
 		local gameId = 0
 		local placeId = 0
 		local placeName = "My Cool Game!"
+		local nonce = "a1b2c3"
 		local instanceId
 		if gameId ~= 0 or placeId ~= 0 then
 			instanceId = tostring(gameId) .. "-" .. tostring(placeId)
@@ -452,18 +453,19 @@ table.insert(tests, {
 			if name == "" then
 				name = "untitled"
 			end
-			instanceId = "local-" .. name
+			instanceId = "local-" .. name .. "-" .. nonce
 		end
-		assertEqual(instanceId, "local-my-cool-game")
+		assertEqual(instanceId, "local-my-cool-game-a1b2c3")
 	end,
 })
 
 table.insert(tests, {
-	name = "getInstanceId: empty name falls back to untitled",
+	name = "getInstanceId: empty name falls back to untitled with nonce",
 	fn = function()
 		local gameId = 0
 		local placeId = 0
 		local placeName = "!!!"
+		local nonce = "ff0011"
 		local instanceId
 		if gameId ~= 0 or placeId ~= 0 then
 			instanceId = tostring(gameId) .. "-" .. tostring(placeId)
@@ -474,9 +476,9 @@ table.insert(tests, {
 			if name == "" then
 				name = "untitled"
 			end
-			instanceId = "local-" .. name
+			instanceId = "local-" .. name .. "-" .. nonce
 		end
-		assertEqual(instanceId, "local-untitled")
+		assertEqual(instanceId, "local-untitled-ff0011")
 	end,
 })
 

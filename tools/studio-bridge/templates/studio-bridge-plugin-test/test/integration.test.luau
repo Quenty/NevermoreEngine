@@ -300,21 +300,22 @@ table.insert(tests, {
 
 		local sm = DiscoveryStateMachine.new({
 			portRange = { min = 38740, max = 38759 },
-			pollIntervalMs = 1000,
+			pollIntervalSec = 1,
 		}, {
-			httpGet = function(url: string)
+			scanPortsAsync = function(ports: { number }, _timeoutSec: number): (number?, string?)
 				-- Simulate: only the target port responds
-				if string.find(url, tostring(targetPort)) then
-					-- Return a Protocol-compatible health response body
-					local healthBody = Protocol.encode({
-						type = "welcome",
-						sessionId = "health-check",
-						payload = { sessionId = "health-check" },
-						protocolVersion = 2,
-					})
-					return true, healthBody
+				for _, port in ports do
+					if port == targetPort then
+						local healthBody = Protocol.encode({
+							type = "welcome",
+							sessionId = "health-check",
+							payload = { sessionId = "health-check" },
+							protocolVersion = 2,
+						})
+						return port, healthBody
+					end
 				end
-				return false, nil
+				return nil, nil
 			end,
 			connectWebSocket = function(url: string)
 				-- Simulate: WebSocket connection succeeds for the target port
@@ -339,8 +340,8 @@ table.insert(tests, {
 		sm:start()
 		assertEqual(sm:getState(), "searching")
 
-		-- First tick triggers immediate scan (pollElapsedMs set to pollIntervalMs)
-		sm:tick(0)
+		-- First poll triggers immediate scan (nextPollAt was set to 0)
+		sm:pollAsync()
 
 		-- State machine should have found the port and connected
 		assertEqual(sm:getState(), "connected")
@@ -367,22 +368,19 @@ table.insert(tests, {
 	fn = function()
 		local currentState = "idle"
 		local connectAttempts = 0
-		local httpGetAttempts = 0
+		local scanAttempts = 0
 		local serverUp = true
 
 		local sm = DiscoveryStateMachine.new({
 			portRange = { min = 38740, max = 38740 }, -- single port
-			pollIntervalMs = 100,
-			initialBackoffMs = 200,
-			maxBackoffMs = 800,
-			maxReconnectAttempts = 5,
+			pollIntervalSec = 0.1,
 		}, {
-			httpGet = function(_url: string)
-				httpGetAttempts = httpGetAttempts + 1
+			scanPortsAsync = function(ports: { number }, _timeoutSec: number): (number?, string?)
+				scanAttempts = scanAttempts + 1
 				if serverUp then
-					return true, "ok"
+					return ports[1], "ok"
 				end
-				return false, nil
+				return nil, nil
 			end,
 			connectWebSocket = function(_url: string)
 				connectAttempts = connectAttempts + 1
@@ -400,7 +398,7 @@ table.insert(tests, {
 
 		-- Start and connect
 		sm:start()
-		sm:tick(0)
+		sm:pollAsync()
 		assertEqual(currentState, "connected", "initial connection")
 
 		-- Simulate disconnect with server down
@@ -409,19 +407,20 @@ table.insert(tests, {
 		-- Transitions straight to searching (no backoff)
 		assertEqual(currentState, "searching", "searching immediately after disconnect")
 
-		-- First tick triggers scan (primed), server still down -> stays searching
-		sm:tick(1)
+		-- First poll triggers scan (primed), server still down -> stays searching
+		sm:pollAsync()
 		assertEqual(currentState, "searching", "stays searching when server is down")
 
-		-- Wait for next poll interval, scan again -> still down
-		sm:tick(100)
-		assertEqual(currentState, "searching", "still searching after poll interval")
+		-- Next poll should not scan yet (nextPollAt is in the future)
+		sm:pollAsync()
+		assertEqual(currentState, "searching", "still searching, waiting for poll interval")
 
-		-- Bring server back up
+		-- Bring server back up and force next poll by setting _nextPollAt to 0
 		serverUp = true
+		sm._nextPollAt = 0
 
-		-- Next poll interval triggers scan -> server responds -> connects
-		sm:tick(100)
+		-- Next poll triggers scan -> server responds -> connects
+		sm:pollAsync()
 		assertEqual(currentState, "connected", "reconnected after server came back")
 	end,
 })
@@ -714,10 +713,10 @@ table.insert(tests, {
 
 		local sm = DiscoveryStateMachine.new({
 			portRange = { min = 38740, max = 38740 },
-			pollIntervalMs = 100,
+			pollIntervalSec = 0.1,
 		}, {
-			httpGet = function(_url: string)
-				return true, "ok"
+			scanPortsAsync = function(ports: { number }, _timeoutSec: number): (number?, string?)
+				return ports[1], "ok"
 			end,
 			connectWebSocket = function(_url: string)
 				return true, { id = "conn-stop-test" }
@@ -733,7 +732,7 @@ table.insert(tests, {
 
 		-- Connect
 		sm:start()
-		sm:tick(0)
+		sm:pollAsync()
 		assertTrue(wasConnected, "should be connected")
 		assertEqual(sm:getState(), "connected")
 
@@ -816,13 +815,15 @@ table.insert(tests, {
 		-- Discovery finds the server on port 38742
 		local sm = DiscoveryStateMachine.new({
 			portRange = { min = 38740, max = 38750 },
-			pollIntervalMs = 500,
+			pollIntervalSec = 0.5,
 		}, {
-			httpGet = function(url: string)
-				if string.find(url, "38742") then
-					return true, '{"status":"ok"}'
+			scanPortsAsync = function(ports: { number }, _timeoutSec: number): (number?, string?)
+				for _, port in ports do
+					if port == 38742 then
+						return port, '{"status":"ok"}'
+					end
 				end
-				return false, nil
+				return nil, nil
 			end,
 			connectWebSocket = function(url: string)
 				if string.find(url, "38742") then
@@ -837,7 +838,7 @@ table.insert(tests, {
 		})
 
 		sm:start()
-		sm:tick(0)
+		sm:pollAsync()
 		assertEqual(sm:getState(), "connected")
 		assertEqual(discoveredPort, 38742)
 
@@ -953,10 +954,10 @@ table.insert(tests, {
 		local currentState = "idle"
 		local sm = DiscoveryStateMachine.new({
 			portRange = { min = 38740, max = 38742 }, -- 3 ports
-			pollIntervalMs = 500,
+			pollIntervalSec = 0.5,
 		}, {
-			httpGet = function(_url: string)
-				return false, nil -- all ports fail
+			scanPortsAsync = function(_ports: { number }, _timeoutSec: number): (number?, string?)
+				return nil, nil -- all ports fail
 			end,
 			connectWebSocket = function(_url: string)
 				return false, nil
@@ -971,13 +972,14 @@ table.insert(tests, {
 		sm:start()
 		assertEqual(currentState, "searching")
 
-		-- Tick to trigger scan
-		sm:tick(0)
+		-- Poll to trigger scan
+		sm:pollAsync()
 		-- All ports failed, should stay in searching
 		assertEqual(currentState, "searching")
 
-		-- Wait for another poll interval and try again
-		sm:tick(500)
+		-- Next poll should skip (nextPollAt is in the future), then force it
+		sm._nextPollAt = 0
+		sm:pollAsync()
 		assertEqual(currentState, "searching", "still searching after second scan")
 	end,
 })
