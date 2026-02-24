@@ -325,9 +325,11 @@ describe('BridgeConnection', () => {
       const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });
       connections.push(conn);
 
+      // resolveSession waits up to 5s for a plugin to connect when acting as
+      // host with no sessions, so we need a longer test timeout
       await expect(conn.resolveSession()).rejects.toThrow(SessionNotFoundError);
       await expect(conn.resolveSession()).rejects.toThrow('No sessions connected');
-    });
+    }, 15_000);
 
     it('returns the only session automatically', async () => {
       const conn = await BridgeConnection.connectAsync({ port: 0, keepAlive: true });

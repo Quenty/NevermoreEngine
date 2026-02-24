@@ -30,7 +30,7 @@ local _processing = false
 --[=[
 	Handle an execute request by compiling and running the provided code.
 
-	@param payload Table with a `code` field containing the Luau source.
+	@param payload Table with a `script` field (or `code` for backward compat) containing the Luau source.
 	@param requestId The request ID to echo (may be nil or "" for v1 mode).
 	@param sessionId The session ID for response messages.
 	@param sendMessage Optional callback to send messages directly.
@@ -42,7 +42,7 @@ function ExecuteAction._handleExecute(
 	sessionId: string,
 	sendMessage: ((msg: { [string]: any }) -> ())?
 ): { [string]: any }?
-	local code = payload and payload.code
+	local code = payload and (payload.script or payload.code)
 
 	-- Normalize requestId: treat empty string as absent (v1 compatibility)
 	local effectiveRequestId: string? = nil
@@ -153,7 +153,7 @@ end
 --[=[
 	Handle an execute request directly (for testing without ActionRouter).
 
-	@param payload Table with a `code` field.
+	@param payload Table with a `script` field (or `code` for backward compat).
 	@param requestId The request ID (may be nil for v1 mode).
 	@param sessionId The session ID.
 	@return Payload table with success/error info.

@@ -23,6 +23,10 @@ local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
 -- Actions
 local ExecuteAction = require(script.Parent.Actions.ExecuteAction)
 local QueryDataModelAction = require(script.Parent.Actions.QueryDataModelAction)
+local QueryStateAction = require(script.Parent.Actions.QueryStateAction)
+local QueryLogsAction = require(script.Parent.Actions.QueryLogsAction)
+local CaptureScreenshotAction = require(script.Parent.Actions.CaptureScreenshotAction)
+local SubscribeAction = require(script.Parent.Actions.SubscribeAction)
 
 -- Build constants (Handlebars templates substituted at build time)
 local PORT = "{{PORT}}"
@@ -92,19 +96,26 @@ end
 -- ---------------------------------------------------------------------------
 
 local router = ActionRouter.new()
+local logBuffer = MessageBuffer.new(1000)
 
 -- Wire outgoing messages (set after WebSocket is connected)
 local sendMessageFn = nil
 
--- Register action handlers
-ExecuteAction.register(router, function(msg)
+-- Callback that forwards messages through the active WebSocket
+local function sendMessage(msg)
 	if sendMessageFn then
 		sendMessageFn(msg)
 	end
-end)
-QueryDataModelAction.register(router)
+end
 
-local logBuffer = MessageBuffer.new(1000)
+-- Register action handlers
+ExecuteAction.register(router, sendMessage)
+QueryDataModelAction.register(router)
+QueryStateAction.register(router)
+QueryLogsAction.register(router, logBuffer)
+CaptureScreenshotAction.register(router, sendMessage)
+SubscribeAction.register(router)
+
 local connected = false
 
 local LEVEL_MAP = {
@@ -141,7 +152,7 @@ local function wireConnection(ws, sessionId, connectLabel)
 			placeId = game.PlaceId,
 			gameId = game.GameId,
 			state = "ready",
-			capabilities = { "execute", "queryDataModel", "queryState", "queryLogs" },
+			capabilities = { "execute", "queryState", "queryDataModel", "queryLogs", "captureScreenshot", "subscribe", "heartbeat" },
 		},
 	}))
 
