@@ -37,7 +37,9 @@ local RESPONSE_TYPES: { [string]: string } = {
 
 function ActionRouter.new()
 	local self = setmetatable({
-		_handlers = {} :: { [string]: (payload: { [string]: any }, requestId: string, sessionId: string) -> { [string]: any }? },
+		_handlers = {} :: {
+			[string]: (payload: { [string]: any }, requestId: string, sessionId: string) -> { [string]: any }?,
+		},
 	}, ActionRouter)
 	return self
 end
@@ -46,7 +48,15 @@ end
 -- Register a handler for a message type
 -- ---------------------------------------------------------------------------
 
-function ActionRouter.register(self: any, messageType: string, handler: (payload: { [string]: any }, requestId: string, sessionId: string) -> { [string]: any }?)
+function ActionRouter.register(
+	self: any,
+	messageType: string,
+	handler: (
+		payload: { [string]: any },
+		requestId: string,
+		sessionId: string
+	) -> { [string]: any }?
+)
 	self._handlers[messageType] = handler
 end
 
@@ -60,12 +70,15 @@ end
 	@param message Table with fields: type, sessionId, payload, requestId?
 	@return A response message table, or nil if the handler returns nil.
 ]]
-function ActionRouter.dispatch(self: any, message: {
-	type: string,
-	sessionId: string,
-	payload: { [string]: any },
-	requestId: string?,
-}): { [string]: any }?
+function ActionRouter.dispatch(
+	self: any,
+	message: {
+		type: string,
+		sessionId: string,
+		payload: { [string]: any },
+		requestId: string?,
+	}
+): { [string]: any }?
 	local handler = self._handlers[message.type]
 
 	if handler == nil then

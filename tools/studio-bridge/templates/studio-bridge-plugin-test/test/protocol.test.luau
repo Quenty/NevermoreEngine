@@ -25,24 +25,13 @@ end
 
 local function assertNil(value: any, label: string?)
 	if value ~= nil then
-		error(
-			string.format(
-				"%sexpected nil, got %s",
-				if label then label .. ": " else "",
-				tostring(value)
-			)
-		)
+		error(string.format("%sexpected nil, got %s", if label then label .. ": " else "", tostring(value)))
 	end
 end
 
 local function assertNotNil(value: any, label: string?)
 	if value == nil then
-		error(
-			string.format(
-				"%sexpected non-nil value",
-				if label then label .. ": " else ""
-			)
-		)
+		error(string.format("%sexpected non-nil value", if label then label .. ": " else ""))
 	end
 end
 

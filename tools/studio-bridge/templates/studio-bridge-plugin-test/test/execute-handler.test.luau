@@ -32,48 +32,25 @@ end
 
 local function assertNotNil(value: any, label: string?)
 	if value == nil then
-		error(
-			string.format(
-				"%sexpected non-nil value",
-				if label then label .. ": " else ""
-			)
-		)
+		error(string.format("%sexpected non-nil value", if label then label .. ": " else ""))
 	end
 end
 
 local function assertNil(value: any, label: string?)
 	if value ~= nil then
-		error(
-			string.format(
-				"%sexpected nil, got %s",
-				if label then label .. ": " else "",
-				tostring(value)
-			)
-		)
+		error(string.format("%sexpected nil, got %s", if label then label .. ": " else "", tostring(value)))
 	end
 end
 
 local function assertTrue(value: any, label: string?)
 	if not value then
-		error(
-			string.format(
-				"%sexpected truthy value, got %s",
-				if label then label .. ": " else "",
-				tostring(value)
-			)
-		)
+		error(string.format("%sexpected truthy value, got %s", if label then label .. ": " else "", tostring(value)))
 	end
 end
 
 local function assertFalse(value: any, label: string?)
 	if value then
-		error(
-			string.format(
-				"%sexpected falsy value, got %s",
-				if label then label .. ": " else "",
-				tostring(value)
-			)
-		)
+		error(string.format("%sexpected falsy value, got %s", if label then label .. ": " else "", tostring(value)))
 	end
 end
 

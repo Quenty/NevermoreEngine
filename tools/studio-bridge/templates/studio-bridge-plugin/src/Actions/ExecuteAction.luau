@@ -20,7 +20,8 @@ local ExecuteAction = {}
 -- Internal queue for sequential execution
 -- ---------------------------------------------------------------------------
 
-local _queue: { { payload: { [string]: any }, requestId: string?, sessionId: string, sendMessage: ((msg: { [string]: any }) -> ())? } } = {}
+local _queue: { { payload: { [string]: any }, requestId: string?, sessionId: string, sendMessage: ((msg: { [string]: any }) -> ())? } } =
+	{}
 local _processing = false
 
 -- ---------------------------------------------------------------------------
@@ -106,12 +107,7 @@ local function _processQueue()
 
 	while #_queue > 0 do
 		local item = table.remove(_queue, 1)
-		ExecuteAction._handleExecute(
-			item.payload,
-			item.requestId,
-			item.sessionId,
-			item.sendMessage
-		)
+		ExecuteAction._handleExecute(item.payload, item.requestId, item.sessionId, item.sendMessage)
 	end
 
 	_processing = false

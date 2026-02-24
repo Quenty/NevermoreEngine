@@ -12,8 +12,8 @@
 ]]
 
 local HttpService = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
 local LogService = game:GetService("LogService")
+local RunService = game:GetService("RunService")
 
 -- Layer 1 modules (pure logic, no Roblox deps)
 local ActionRouter = require(script.Parent.Shared.ActionRouter)
@@ -21,11 +21,11 @@ local DiscoveryStateMachine = require(script.Parent.Shared.DiscoveryStateMachine
 local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
 
 -- Actions
+local CaptureScreenshotAction = require(script.Parent.Actions.CaptureScreenshotAction)
 local ExecuteAction = require(script.Parent.Actions.ExecuteAction)
 local QueryDataModelAction = require(script.Parent.Actions.QueryDataModelAction)
-local QueryStateAction = require(script.Parent.Actions.QueryStateAction)
 local QueryLogsAction = require(script.Parent.Actions.QueryLogsAction)
-local CaptureScreenshotAction = require(script.Parent.Actions.CaptureScreenshotAction)
+local QueryStateAction = require(script.Parent.Actions.QueryStateAction)
 local SubscribeAction = require(script.Parent.Actions.SubscribeAction)
 
 -- Build constants (Handlebars templates substituted at build time)
@@ -152,7 +152,15 @@ local function wireConnection(ws, sessionId, connectLabel)
 			placeId = game.PlaceId,
 			gameId = game.GameId,
 			state = "ready",
-			capabilities = { "execute", "queryState", "queryDataModel", "queryLogs", "captureScreenshot", "subscribe", "heartbeat" },
+			capabilities = {
+				"execute",
+				"queryState",
+				"queryDataModel",
+				"queryLogs",
+				"captureScreenshot",
+				"subscribe",
+				"heartbeat",
+			},
 		},
 	}))
 
@@ -166,7 +174,9 @@ local function wireConnection(ws, sessionId, connectLabel)
 		if msg.type == "welcome" or msg.type == "shutdown" then
 			if msg.type == "shutdown" then
 				connected = false
-				pcall(function() ws:Close() end)
+				pcall(function()
+					ws:Close()
+				end)
 			end
 			return
 		end
@@ -214,9 +224,7 @@ if IS_EPHEMERAL then
 	-- Ephemeral mode: CLI substituted PORT and SESSION_ID, connect directly
 	local wsUrl = `ws://localhost:{PORT}/{SESSION_ID}`
 	local ok, ws = pcall(function()
-		return HttpService:CreateWebStreamClient(
-			Enum.WebStreamClientType.WebSocket, { Url = wsUrl }
-		)
+		return HttpService:CreateWebStreamClient(Enum.WebStreamClientType.WebSocket, { Url = wsUrl })
 	end)
 	if ok and ws then
 		ws.Opened:Connect(function()
@@ -280,9 +288,7 @@ else
 		end,
 		connectWebSocket = function(url)
 			local ok2, ws = pcall(function()
-				return HttpService:CreateWebStreamClient(
-					Enum.WebStreamClientType.WebSocket, { Url = url }
-				)
+				return HttpService:CreateWebStreamClient(Enum.WebStreamClientType.WebSocket, { Url = url })
 			end)
 			return ok2, ws
 		end,

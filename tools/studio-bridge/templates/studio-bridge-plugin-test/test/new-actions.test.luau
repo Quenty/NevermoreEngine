@@ -8,10 +8,10 @@
 ]]
 
 local ActionRouter = require("../../studio-bridge-plugin/src/Shared/ActionRouter")
-local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
-local ExecuteAction = require("../../studio-bridge-plugin/src/Actions/ExecuteAction")
-local QueryLogsAction = require("../../studio-bridge-plugin/src/Actions/QueryLogsAction")
 local CaptureScreenshotAction = require("../../studio-bridge-plugin/src/Actions/CaptureScreenshotAction")
+local ExecuteAction = require("../../studio-bridge-plugin/src/Actions/ExecuteAction")
+local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
+local QueryLogsAction = require("../../studio-bridge-plugin/src/Actions/QueryLogsAction")
 local SubscribeAction = require("../../studio-bridge-plugin/src/Actions/SubscribeAction")
 
 -- ---------------------------------------------------------------------------
@@ -33,24 +33,13 @@ end
 
 local function assertTrue(value: any, label: string?)
 	if not value then
-		error(
-			string.format(
-				"%sexpected truthy value, got %s",
-				if label then label .. ": " else "",
-				tostring(value)
-			)
-		)
+		error(string.format("%sexpected truthy value, got %s", if label then label .. ": " else "", tostring(value)))
 	end
 end
 
 local function assertNotNil(value: any, label: string?)
 	if value == nil then
-		error(
-			string.format(
-				"%sexpected non-nil value",
-				if label then label .. ": " else ""
-			)
-		)
+		error(string.format("%sexpected non-nil value", if label then label .. ": " else ""))
 	end
 end
 

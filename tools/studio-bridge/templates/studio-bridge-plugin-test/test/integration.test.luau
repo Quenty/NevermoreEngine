@@ -6,10 +6,10 @@
 	together, validating the full data flow rather than individual module behavior.
 ]]
 
-local Protocol = require("../../studio-bridge-plugin/src/Shared/Protocol")
 local ActionRouter = require("../../studio-bridge-plugin/src/Shared/ActionRouter")
-local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
 local DiscoveryStateMachine = require("../../studio-bridge-plugin/src/Shared/DiscoveryStateMachine")
+local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
+local Protocol = require("../../studio-bridge-plugin/src/Shared/Protocol")
 
 -- ---------------------------------------------------------------------------
 -- Test helpers
@@ -30,36 +30,19 @@ end
 
 local function assertNil(value: any, label: string?)
 	if value ~= nil then
-		error(
-			string.format(
-				"%sexpected nil, got %s",
-				if label then label .. ": " else "",
-				tostring(value)
-			)
-		)
+		error(string.format("%sexpected nil, got %s", if label then label .. ": " else "", tostring(value)))
 	end
 end
 
 local function assertNotNil(value: any, label: string?)
 	if value == nil then
-		error(
-			string.format(
-				"%sexpected non-nil value",
-				if label then label .. ": " else ""
-			)
-		)
+		error(string.format("%sexpected non-nil value", if label then label .. ": " else ""))
 	end
 end
 
 local function assertTrue(value: any, label: string?)
 	if not value then
-		error(
-			string.format(
-				"%sexpected truthy value, got %s",
-				if label then label .. ": " else "",
-				tostring(value)
-			)
-		)
+		error(string.format("%sexpected truthy value, got %s", if label then label .. ": " else "", tostring(value)))
 	end
 end
 
@@ -918,7 +901,8 @@ table.insert(tests, {
 	name = "Protocol: register and welcome preserve protocolVersion and capabilities",
 	fn = function()
 		-- Test that protocolVersion survives the encode/decode round-trip
-		local capabilities = { "execute", "queryState", "captureScreenshot", "queryDataModel", "queryLogs", "subscribe", "heartbeat" }
+		local capabilities =
+			{ "execute", "queryState", "captureScreenshot", "queryDataModel", "queryLogs", "subscribe", "heartbeat" }
 
 		local registerJson = Protocol.encode({
 			type = "register",

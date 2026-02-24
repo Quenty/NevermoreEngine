@@ -86,11 +86,7 @@ end
 -- Helpers
 -- ---------------------------------------------------------------------------
 
-local function buildResponse(
-	sessionId: string,
-	requestId: string?,
-	payload: { [string]: any }
-): { [string]: any }
+local function buildResponse(sessionId: string, requestId: string?, payload: { [string]: any }): { [string]: any }
 	local msg: { [string]: any } = {
 		type = "screenshotResult",
 		sessionId = sessionId,
@@ -102,12 +98,7 @@ local function buildResponse(
 	return msg
 end
 
-local function buildError(
-	sessionId: string,
-	requestId: string?,
-	code: string,
-	message: string
-): { [string]: any }
+local function buildError(sessionId: string, requestId: string?, code: string, message: string): { [string]: any }
 	local msg: { [string]: any } = {
 		type = "error",
 		sessionId = sessionId,
@@ -123,17 +114,15 @@ end
 -- Core capture logic (runs in a spawned thread)
 -- ---------------------------------------------------------------------------
 
-local function captureAsync(
-	sendMessage: (msg: { [string]: any }) -> (),
-	requestId: string?,
-	sessionId: string
-)
+local function captureAsync(sendMessage: (msg: { [string]: any }) -> (), requestId: string?, sessionId: string)
 	-- Resolve services (deferred so the module loads in Lune test context)
 	local getServiceOk, captureServiceOrErr, assetServiceOrErr = pcall(function()
 		return game:GetService("CaptureService"), game:GetService("AssetService")
 	end)
 	if not getServiceOk then
-		sendMessage(buildError(sessionId, requestId, "CAPTURE_FAILED", `Required services not available: {captureServiceOrErr}`))
+		sendMessage(
+			buildError(sessionId, requestId, "CAPTURE_FAILED", `Required services not available: {captureServiceOrErr}`)
+		)
 		return
 	end
 	local CaptureService = captureServiceOrErr
@@ -168,12 +157,14 @@ local function captureAsync(
 	end)
 
 	if not editableOk or not editableImage then
-		sendMessage(buildError(
-			sessionId,
-			requestId,
-			"EDITABLE_IMAGE_FAILED",
-			`Failed to create EditableImage from capture: {editableImage or "unknown error"}`
-		))
+		sendMessage(
+			buildError(
+				sessionId,
+				requestId,
+				"EDITABLE_IMAGE_FAILED",
+				`Failed to create EditableImage from capture: {editableImage or "unknown error"}`
+			)
+		)
 		return
 	end
 
@@ -198,8 +189,8 @@ local function captureAsync(
 			local scaled = AssetService:CreateEditableImage({ Size = Vector2.new(width, height) })
 			scaled:DrawImageTransformed(
 				Vector2.new(width / 2, height / 2), -- center position
-				Vector2.new(scale, scale),           -- scale
-				0,                                   -- rotation
+				Vector2.new(scale, scale), -- scale
+				0, -- rotation
 				editableImage
 			)
 			return scaled
@@ -220,18 +211,24 @@ local function captureAsync(
 	end)
 
 	-- Clean up EditableImages immediately to free memory
-	pcall(function() editableImage:Destroy() end)
+	pcall(function()
+		editableImage:Destroy()
+	end)
 	if scaledImage then
-		pcall(function() scaledImage:Destroy() end)
+		pcall(function()
+			scaledImage:Destroy()
+		end)
 	end
 
 	if not pixelsOk or not pixelsBuf then
-		sendMessage(buildError(
-			sessionId,
-			requestId,
-			"PIXEL_READ_FAILED",
-			`Failed to read pixels: {pixelsBuf or "unknown error"}`
-		))
+		sendMessage(
+			buildError(
+				sessionId,
+				requestId,
+				"PIXEL_READ_FAILED",
+				`Failed to read pixels: {pixelsBuf or "unknown error"}`
+			)
+		)
 		return
 	end
 
@@ -249,12 +246,14 @@ local function captureAsync(
 
 	local encodeOk, encoded = pcall(base64Encode, dataBuf)
 	if not encodeOk or not encoded then
-		sendMessage(buildError(
-			sessionId,
-			requestId,
-			"ENCODE_FAILED",
-			`Failed to base64 encode data: {encoded or "unknown error"}`
-		))
+		sendMessage(
+			buildError(
+				sessionId,
+				requestId,
+				"ENCODE_FAILED",
+				`Failed to base64 encode data: {encoded or "unknown error"}`
+			)
+		)
 		return
 	end
 

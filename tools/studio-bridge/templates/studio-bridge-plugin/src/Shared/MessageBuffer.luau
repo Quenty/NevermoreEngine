@@ -40,11 +40,14 @@ end
 
 	@param entry Table with level, body, timestamp fields.
 ]]
-function MessageBuffer.push(self: any, entry: {
-	level: string,
-	body: string,
-	timestamp: number,
-})
+function MessageBuffer.push(
+	self: any,
+	entry: {
+		level: string,
+		body: string,
+		timestamp: number,
+	}
+)
 	self._buffer[self._head] = entry
 	self._head = (self._head % self._capacity) + 1
 	if self._count < self._capacity then
@@ -63,7 +66,11 @@ end
 	@param count Maximum number of entries to return (default: all).
 	@return Table with entries, total, and bufferCapacity.
 ]]
-function MessageBuffer.get(self: any, direction: string?, count: number?): {
+function MessageBuffer.get(
+	self: any,
+	direction: string?,
+	count: number?
+): {
 	entries: { { level: string, body: string, timestamp: number } },
 	total: number,
 	bufferCapacity: number,

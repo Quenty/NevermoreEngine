@@ -26,13 +26,7 @@ end
 
 local function assertTrue(value: any, label: string?)
 	if not value then
-		error(
-			string.format(
-				"%sexpected truthy value, got %s",
-				if label then label .. ": " else "",
-				tostring(value)
-			)
-		)
+		error(string.format("%sexpected truthy value, got %s", if label then label .. ": " else "", tostring(value)))
 	end
 end
 
