@@ -22,6 +22,7 @@ local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
 
 -- Actions
 local ExecuteAction = require(script.Parent.Actions.ExecuteAction)
+local QueryDataModelAction = require(script.Parent.Actions.QueryDataModelAction)
 
 -- Build constants (Handlebars templates substituted at build time)
 local PORT = "{{PORT}}"
@@ -101,6 +102,7 @@ ExecuteAction.register(router, function(msg)
 		sendMessageFn(msg)
 	end
 end)
+QueryDataModelAction.register(router)
 
 local logBuffer = MessageBuffer.new(1000)
 local connected = false
@@ -139,7 +141,7 @@ local function wireConnection(ws, sessionId, connectLabel)
 			placeId = game.PlaceId,
 			gameId = game.GameId,
 			state = "ready",
-			capabilities = { "execute", "queryState", "queryLogs" },
+			capabilities = { "execute", "queryDataModel", "queryState", "queryLogs" },
 		},
 	}))
 
