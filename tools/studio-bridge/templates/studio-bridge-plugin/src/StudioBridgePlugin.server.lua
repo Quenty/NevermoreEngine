@@ -54,7 +54,7 @@ end
 
 local function getInstanceId()
 	if game.GameId ~= 0 or game.PlaceId ~= 0 then
-		return tostring(game.GameId) .. "-" .. tostring(game.PlaceId)
+		return `{game.GameId}-{game.PlaceId}`
 	end
 	-- Unpublished place: use sanitized place name for readability
 	local name = string.lower(game.Name or "untitled")
@@ -63,11 +63,11 @@ local function getInstanceId()
 	if name == "" then
 		name = "untitled"
 	end
-	return "local-" .. name
+	return `local-{name}`
 end
 
 local function getSessionId()
-	return getInstanceId() .. "-" .. detectContext()
+	return `{getInstanceId()}-{detectContext()}`
 end
 
 -- ---------------------------------------------------------------------------
@@ -116,7 +116,7 @@ local LEVEL_MAP = {
 -- Wire a WebSocket connection
 -- ---------------------------------------------------------------------------
 
-local function wireConnection(ws, sessionId)
+local function wireConnection(ws, sessionId, connectLabel)
 	connected = true
 
 	-- Wire the sendMessage callback for action handlers
@@ -190,7 +190,7 @@ local function wireConnection(ws, sessionId)
 		})
 	end)
 
-	print("[StudioBridge] Connected (context: " .. detectContext() .. ")")
+	print(`[StudioBridge] Connected to {connectLabel} as {sessionId}`)
 end
 
 -- ---------------------------------------------------------------------------
@@ -199,7 +199,7 @@ end
 
 if IS_EPHEMERAL then
 	-- Ephemeral mode: CLI substituted PORT and SESSION_ID, connect directly
-	local wsUrl = "ws://localhost:" .. PORT .. "/" .. SESSION_ID
+	local wsUrl = `ws://localhost:{PORT}/{SESSION_ID}`
 	local ok, ws = pcall(function()
 		return HttpService:CreateWebStreamClient(
 			Enum.WebStreamClientType.WebSocket, { Url = wsUrl }
@@ -207,10 +207,10 @@ if IS_EPHEMERAL then
 	end)
 	if ok and ws then
 		ws.Opened:Connect(function()
-			wireConnection(ws, SESSION_ID)
+			wireConnection(ws, SESSION_ID, `localhost:{PORT} (ephemeral)`)
 		end)
 		ws.Error:Connect(function(status, err)
-			warn("[StudioBridge] WebSocket error (" .. tostring(status) .. "): " .. tostring(err))
+			warn(`[StudioBridge] WebSocket error ({status}): {err}`)
 		end)
 	else
 		warn("[StudioBridge] Failed to create WebSocket client")
@@ -236,7 +236,7 @@ else
 
 			for _, port in ports do
 				local thread = task.spawn(function()
-					local url = "http://localhost:" .. tostring(port) .. "/health"
+					local url = `http://localhost:{port}/health`
 					local ok2, body = pcall(HttpService.GetAsync, HttpService, url)
 					if ok2 and not settled then
 						foundPort = port
@@ -274,16 +274,17 @@ else
 			return ok2, ws
 		end,
 		onStateChange = function(oldState, newState)
-			print("[StudioBridge] " .. oldState .. " -> " .. newState)
+			if newState == "searching" and oldState == "idle" then
+				print("[StudioBridge] Searching for host on ports 38741-38744...")
+			end
 		end,
-		onConnected = function(ws)
+		onConnected = function(ws, port)
 			local sessionId = getSessionId()
 			ws.Opened:Connect(function()
-				wireConnection(ws, sessionId)
+				wireConnection(ws, sessionId, `localhost:{port}`)
 			end)
 			ws.Error:Connect(function(status, err)
-				warn("[StudioBridge] WebSocket error (" .. tostring(status) .. "): " .. tostring(err))
-				discovery:onDisconnect("error: " .. tostring(status))
+				warn(`[StudioBridge] WebSocket error ({status}): {err}`)
 			end)
 			ws.Closed:Connect(function()
 				connected = false
@@ -292,7 +293,7 @@ else
 		end,
 		onDisconnected = function(reason)
 			connected = false
-			print("[StudioBridge] Disconnected: " .. tostring(reason))
+			print(`[StudioBridge] Disconnected ({reason}), searching...`)
 		end,
 	})
 	discovery:start()

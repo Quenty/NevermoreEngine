@@ -183,8 +183,8 @@ function DiscoveryStateMachine.onDisconnect(self: any, reason: string?)
 	self._backoffTargetMs = 0
 	-- Trigger immediate scan on next tick
 	self._pollElapsedMs = self._config.pollIntervalMs
-	self:_transitionTo("searching")
 	self._callbacks.onDisconnected(reason)
+	self:_transitionTo("searching")
 end
 
 --[[
@@ -283,7 +283,7 @@ function DiscoveryStateMachine._attemptConnect(self: any, port: number, _healthR
 		self._backoffElapsedMs = 0
 		self._backoffTargetMs = 0
 		self:_transitionTo("connected")
-		self._callbacks.onConnected(connection)
+		self._callbacks.onConnected(connection, port)
 	else
 		-- Connection failed, go back to searching
 		self._pollElapsedMs = 0
