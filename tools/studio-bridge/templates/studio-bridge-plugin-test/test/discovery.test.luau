@@ -591,4 +591,207 @@ table.insert(tests, {
 	end,
 })
 
+-- ---------------------------------------------------------------------------
+-- Bug 2: Plugin reentrancy and disconnect recovery tests
+-- ---------------------------------------------------------------------------
+
+-- 21. Reentrant tick during httpGet causes multiple connectWebSocket calls
+table.insert(tests, {
+	name = "reentrant tick during httpGet causes multiple connectWebSocket calls",
+	fn = function()
+		-- This documents the hazard that the caller-level reentrancy guard
+		-- (in StudioBridgePlugin.server.lua) prevents. Without that guard,
+		-- if Roblox's GetAsync yields and a reentrant Heartbeat fires, the
+		-- state machine would process a second tick() mid-scan, leading to
+		-- duplicate connectWebSocket calls.
+		local config = {
+			portRange = { min = 38741, max = 38741 },
+			pollIntervalMs = 0,
+			maxReconnectAttempts = 3,
+			initialBackoffMs = 1000,
+			maxBackoffMs = 30000,
+			heartbeatIntervalMs = 5000,
+		}
+
+		local discovery
+		local mock = createMockCallbacks()
+		mock.httpGetResult = { success = true, body = '{"status":"ok"}' }
+		local fakeConnection = { id = "ws-reentrant" }
+		mock.wsResult = { success = true, connection = fakeConnection }
+
+		-- Allow exactly one level of reentrant tick to demonstrate the hazard
+		-- without causing infinite recursion (which is what actually happens
+		-- in production without the guard -- it stack-overflows).
+		local reentrancyDepth = 0
+		local originalHttpGet = mock.httpGet
+		mock.httpGet = function(url: string): (boolean, string?)
+			if reentrancyDepth == 0 then
+				-- Simulate yielding: call tick again (reentrant) before returning.
+				-- This models what happens when Roblox's HttpService:GetAsync yields
+				-- and a Heartbeat fires during the yield.
+				reentrancyDepth = reentrancyDepth + 1
+				discovery:tick(1000)
+				reentrancyDepth = reentrancyDepth - 1
+			end
+			return originalHttpGet(url)
+		end
+
+		discovery = DiscoveryStateMachine.new(config, mock)
+		discovery:start()
+		discovery:tick(1000)
+
+		-- Without a reentrancy guard at the caller level, the reentrant tick()
+		-- inside httpGet fires _scanPorts again while the first scan is still
+		-- in progress. Both scans find the port alive and each calls
+		-- connectWebSocket, resulting in more than one connection attempt.
+		assertTrue(
+			#mock.connectWebSocketCalls > 1,
+			"expected multiple connectWebSocket calls due to reentrancy, got " .. tostring(#mock.connectWebSocketCalls)
+		)
+	end,
+})
+
+-- 22. tick during non-searching state is harmless
+table.insert(tests, {
+	name = "tick during non-searching state is harmless",
+	fn = function()
+		local mock = createMockCallbacks()
+		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
+
+		-- In idle state, tick should be a no-op
+		sm:tick(1000)
+		assertEqual(sm:getState(), "idle", "idle after tick in idle")
+		assertEqual(#mock.httpGetCalls, 0, "no httpGet calls in idle")
+		assertEqual(#mock.connectWebSocketCalls, 0, "no ws calls in idle")
+		assertEqual(#mock.stateChanges, 0, "no state changes in idle")
+
+		-- Transition to connected state
+		mock.httpGetResult = { success = true, body = '{"status":"ok"}' }
+		mock.wsResult = { success = true, connection = { id = "ws-1" } }
+		sm:start()
+		sm:tick(2000)
+		assertEqual(sm:getState(), "connected", "should be connected")
+
+		local httpCallsBefore = #mock.httpGetCalls
+		local wsCallsBefore = #mock.connectWebSocketCalls
+		local stateChangesBefore = #mock.stateChanges
+
+		-- In connected state, tick should be a no-op
+		sm:tick(1000)
+		assertEqual(sm:getState(), "connected", "still connected after tick")
+		assertEqual(#mock.httpGetCalls, httpCallsBefore, "no new httpGet calls in connected")
+		assertEqual(#mock.connectWebSocketCalls, wsCallsBefore, "no new ws calls in connected")
+		assertEqual(#mock.stateChanges, stateChangesBefore, "no new state changes in connected")
+	end,
+})
+
+-- 23. onDisconnect from connected transitions to reconnecting
+table.insert(tests, {
+	name = "onDisconnect from connected transitions to reconnecting with correct state",
+	fn = function()
+		local mock = createMockCallbacks()
+		mock.httpGetResult = { success = true, body = '{"status":"ok"}' }
+		mock.wsResult = { success = true, connection = { id = "ws-1" } }
+		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
+		sm:start()
+		sm:tick(2000)
+		assertEqual(sm:getState(), "connected", "initial connection")
+
+		sm:onDisconnect("error: connection lost")
+
+		-- State should be reconnecting
+		assertEqual(sm:getState(), "reconnecting", "state after disconnect")
+
+		-- onDisconnected callback should have been called with the reason
+		assertEqual(#mock.disconnectedCalls, 1, "onDisconnected called once")
+		assertEqual(mock.disconnectedCalls[1], "error: connection lost", "disconnect reason")
+
+		-- reconnectAttempt should be 0 (reset for the new reconnection cycle)
+		-- We verify this indirectly: the first backoff should be initialBackoffMs * 2^0 = initialBackoffMs
+		-- For TEST_CONFIG, initialBackoffMs = 1000, so ticking 999ms should stay in reconnecting,
+		-- and ticking 1 more ms should transition out.
+		sm:tick(999)
+		assertEqual(sm:getState(), "reconnecting", "still reconnecting before backoff expires")
+		sm:tick(1)
+		assertEqual(sm:getState(), "searching", "searching after initial backoff")
+	end,
+})
+
+-- 24. reconnecting eventually re-discovers and connects
+table.insert(tests, {
+	name = "reconnecting eventually re-discovers and connects",
+	fn = function()
+		local config = {
+			portRange = { min = 38741, max = 38741 },
+			pollIntervalMs = 100,
+			maxReconnectAttempts = 5,
+			initialBackoffMs = 200,
+			maxBackoffMs = 30000,
+			heartbeatIntervalMs = 5000,
+		}
+		local mock = createMockCallbacks()
+		mock.httpGetResult = { success = true, body = '{"status":"ok"}' }
+		mock.wsResult = { success = true, connection = { id = "ws-1" } }
+		local sm = DiscoveryStateMachine.new(config, mock)
+		sm:start()
+		sm:tick(100)
+		assertEqual(sm:getState(), "connected", "initial connection")
+		assertEqual(#mock.connectedCalls, 1, "onConnected called once")
+
+		-- Disconnect
+		sm:onDisconnect("error: connection lost")
+		assertEqual(sm:getState(), "reconnecting", "reconnecting after disconnect")
+		assertEqual(#mock.disconnectedCalls, 1, "onDisconnected called")
+
+		-- Tick past the initial backoff (initialBackoffMs = 200)
+		sm:tick(200)
+		assertEqual(sm:getState(), "searching", "searching after backoff")
+
+		-- Tick to trigger the port scan (pollIntervalMs already primed by reconnect transition)
+		-- The transition from reconnecting to searching sets pollElapsedMs = pollIntervalMs,
+		-- so the next tick should trigger the scan immediately.
+		sm:tick(1)
+		assertEqual(sm:getState(), "connected", "reconnected after re-discovery")
+
+		-- onConnected should have been called a second time
+		assertEqual(#mock.connectedCalls, 2, "onConnected called again after reconnection")
+	end,
+})
+
+-- 25. onDisconnect is no-op when not in connected state
+table.insert(tests, {
+	name = "onDisconnect is no-op when not in connected state",
+	fn = function()
+		local mock = createMockCallbacks()
+		mock.httpGetResult = { success = false, body = nil }
+		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
+
+		-- idle state
+		sm:onDisconnect("some reason")
+		assertEqual(sm:getState(), "idle", "idle unchanged")
+		assertEqual(#mock.disconnectedCalls, 0, "no disconnected callback in idle")
+
+		-- searching state
+		sm:start()
+		assertEqual(sm:getState(), "searching", "in searching state")
+		sm:onDisconnect("some reason")
+		assertEqual(sm:getState(), "searching", "searching unchanged")
+		assertEqual(#mock.disconnectedCalls, 0, "no disconnected callback in searching")
+
+		-- reconnecting state: get there via connect then disconnect
+		mock.httpGetResult = { success = true, body = '{"status":"ok"}' }
+		mock.wsResult = { success = true, connection = { id = "ws-1" } }
+		sm:tick(2000) -- searching -> connecting -> connected
+		assertEqual(sm:getState(), "connected", "connected for setup")
+		sm:onDisconnect("first disconnect")
+		assertEqual(sm:getState(), "reconnecting", "reconnecting for setup")
+		assertEqual(#mock.disconnectedCalls, 1, "one disconnect call from setup")
+
+		-- Now try onDisconnect while in reconnecting state
+		sm:onDisconnect("should be ignored")
+		assertEqual(sm:getState(), "reconnecting", "reconnecting unchanged")
+		assertEqual(#mock.disconnectedCalls, 1, "no new disconnected callback in reconnecting")
+	end,
+})
+
 return tests
