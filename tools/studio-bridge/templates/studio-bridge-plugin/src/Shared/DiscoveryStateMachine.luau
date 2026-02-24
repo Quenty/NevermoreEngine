@@ -21,7 +21,8 @@ DiscoveryStateMachine.__index = DiscoveryStateMachine
 -- ---------------------------------------------------------------------------
 
 local DEFAULT_CONFIG = {
-	portRange = { min = 38740, max = 38759 },
+	portRange = { min = 38741, max = 38744 },
+	defaultPort = 38741,
 	pollIntervalMs = 2000,
 	maxReconnectAttempts = 10,
 	initialBackoffMs = 1000,
@@ -78,7 +79,7 @@ function DiscoveryStateMachine.new(
 		_config = resolvedConfig,
 		_callbacks = callbacks,
 		_state = "idle" :: string,
-		_currentPort = resolvedConfig.portRange.min,
+		_currentPort = resolvedConfig.defaultPort or resolvedConfig.portRange.min,
 		_elapsedMs = 0,
 		_pollElapsedMs = 0,
 		_reconnectAttempt = 0,
@@ -168,7 +169,8 @@ end
 
 --[[
 	Signal that the current connection was lost.
-	Transitions from connected to reconnecting.
+	Transitions from connected back to searching immediately so the
+	plugin can discover a new host without waiting for exponential backoff.
 ]]
 function DiscoveryStateMachine.onDisconnect(self: any, reason: string?)
 	if self._state ~= "connected" then
@@ -176,10 +178,12 @@ function DiscoveryStateMachine.onDisconnect(self: any, reason: string?)
 	end
 	self._connection = nil
 	self._reconnectAttempt = 0
-	self._isReconnecting = true
+	self._isReconnecting = false
 	self._backoffElapsedMs = 0
-	self._backoffTargetMs = self:_calculateBackoff()
-	self:_transitionTo("reconnecting")
+	self._backoffTargetMs = 0
+	-- Trigger immediate scan on next tick
+	self._pollElapsedMs = self._config.pollIntervalMs
+	self:_transitionTo("searching")
 	self._callbacks.onDisconnected(reason)
 end
 
@@ -224,21 +228,34 @@ function DiscoveryStateMachine._scanPorts(self: any)
 	local portMax = self._config.portRange.max
 	local totalPorts = portMax - portMin + 1
 
-	for _ = 1, totalPorts do
-		local port = self._currentPort
-		local url = "http://localhost:" .. tostring(port) .. "/health"
+	-- Build list of ports to scan, starting from defaultPort (most likely)
+	local ports = {}
+	for i = 0, totalPorts - 1 do
+		local port = portMin + ((self._currentPort - portMin + i) % totalPorts)
+		table.insert(ports, port)
+	end
 
-		local success, responseBody = self._callbacks.httpGet(url)
-
-		-- Advance port for next attempt (wrap around)
-		self._currentPort = portMin + ((port - portMin + 1) % totalPorts)
-
-		if success then
-			-- Found a live server, try to connect
-			self:_transitionTo("connecting")
-			self:_attemptConnect(port, responseBody)
-			return
+	-- scanPorts callback allows the plugin layer to scan in parallel.
+	-- Falls back to sequential httpGet if scanPorts is not provided.
+	local foundPort, foundBody
+	if self._callbacks.scanPorts then
+		foundPort, foundBody = self._callbacks.scanPorts(ports)
+	else
+		for _, port in ports do
+			local url = "http://localhost:" .. tostring(port) .. "/health"
+			local success, responseBody = self._callbacks.httpGet(url)
+			if success then
+				foundPort = port
+				foundBody = responseBody
+				break
+			end
 		end
+	end
+
+	if foundPort then
+		self:_transitionTo("connecting")
+		self:_attemptConnect(foundPort, foundBody)
+		return
 	end
 
 	-- All ports failed this scan cycle.

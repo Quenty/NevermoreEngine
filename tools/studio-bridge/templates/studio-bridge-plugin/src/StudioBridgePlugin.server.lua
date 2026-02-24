@@ -202,6 +202,47 @@ else
 			local ok2, body = pcall(HttpService.GetAsync, HttpService, url)
 			return ok2, body
 		end,
+		scanPorts = function(ports)
+			-- Scan all ports in parallel using task.spawn. The calling thread
+			-- yields and is resumed as soon as any port succeeds or all fail.
+			local callerThread = coroutine.running()
+			local foundPort = nil
+			local foundBody = nil
+			local remaining = #ports
+			local settled = false
+			local threads = {}
+
+			for _, port in ports do
+				local thread = task.spawn(function()
+					local url = "http://localhost:" .. tostring(port) .. "/health"
+					local ok2, body = pcall(HttpService.GetAsync, HttpService, url)
+					if ok2 and not settled then
+						foundPort = port
+						foundBody = body
+						settled = true
+						task.spawn(callerThread)
+						return
+					end
+					remaining = remaining - 1
+					if remaining <= 0 and not settled then
+						settled = true
+						task.spawn(callerThread)
+					end
+				end)
+				table.insert(threads, thread)
+			end
+
+			if not settled then
+				coroutine.yield()
+			end
+
+			-- Cancel remaining requests
+			for _, thread in threads do
+				pcall(task.cancel, thread)
+			end
+
+			return foundPort, foundBody
+		end,
 		connectWebSocket = function(url)
 			local ok2, ws = pcall(function()
 				return HttpService:CreateWebStreamClient(
