@@ -39,6 +39,25 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
 };
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a descriptive error from a plugin response that didn't match the
+ * expected type. Extracts error details from error-typed responses.
+ */
+function pluginError(expectedType: string, result: PluginMessage): Error {
+  if (result.type === 'error') {
+    const code = result.payload?.code ?? 'UNKNOWN';
+    const message = result.payload?.message ?? 'Unknown plugin error';
+    return new Error(`Plugin error (${code}): ${message}`);
+  }
+  return new Error(
+    `Expected '${expectedType}' response from plugin, got '${result.type}'`,
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Implementation
 // ---------------------------------------------------------------------------
 
@@ -112,11 +131,11 @@ export class BridgeSession extends EventEmitter {
       return {
         success: false,
         output: [],
-        error: result.payload.message,
+        error: result.payload?.message ?? 'Unknown plugin error',
       };
     }
 
-    return { success: false, output: [], error: 'Unexpected response type' };
+    return { success: false, output: [], error: pluginError('scriptComplete', result).message };
   }
 
   /**
@@ -145,7 +164,7 @@ export class BridgeSession extends EventEmitter {
       };
     }
 
-    throw new Error(`Unexpected response type: ${result.type}`);
+    throw pluginError('stateResult', result);
   }
 
   /**
@@ -174,7 +193,7 @@ export class BridgeSession extends EventEmitter {
       };
     }
 
-    throw new Error(`Unexpected response type: ${result.type}`);
+    throw pluginError('screenshotResult', result);
   }
 
   /**
@@ -207,7 +226,7 @@ export class BridgeSession extends EventEmitter {
       };
     }
 
-    throw new Error(`Unexpected response type: ${result.type}`);
+    throw pluginError('logsResult', result);
   }
 
   /**
@@ -240,7 +259,7 @@ export class BridgeSession extends EventEmitter {
       };
     }
 
-    throw new Error(`Unexpected response type: ${result.type}`);
+    throw pluginError('dataModelResult', result);
   }
 
   /**

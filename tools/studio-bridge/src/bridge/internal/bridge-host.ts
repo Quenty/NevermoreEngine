@@ -54,7 +54,7 @@ export interface PluginSessionInfo {
 
 const PROTOCOL_VERSION = 2;
 const SHUTDOWN_TIMEOUT_MS = 2_000;
-const SHUTDOWN_DRAIN_MS = 100;
+const SHUTDOWN_DRAIN_MS = 250;
 
 export class BridgeHost extends EventEmitter {
   private _transport: TransportServer;
