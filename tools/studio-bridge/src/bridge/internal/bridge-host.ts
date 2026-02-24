@@ -9,7 +9,12 @@ import type { WebSocket, RawData } from 'ws';
 import type { IncomingMessage } from 'http';
 import { TransportServer } from './transport-server.js';
 import { createHealthHandler } from './health-endpoint.js';
-import { encodeHostMessage, type HostTransferNotice } from './host-protocol.js';
+import {
+  decodeHostMessage,
+  encodeHostMessage,
+  type HostProtocolMessage,
+  type HostTransferNotice,
+} from './host-protocol.js';
 import {
   decodePluginMessage,
   encodeMessage,
@@ -110,6 +115,18 @@ export class BridgeHost extends EventEmitter {
     // Register /client WebSocket handler for CLI clients
     this._transport.onConnection('/client', (ws) => {
       this._clients.add(ws);
+
+      ws.on('message', (raw: RawData) => {
+        const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+        const msg = decodeHostMessage(data);
+        if (!msg) {
+          return;
+        }
+        this.emit('client-message', msg, (reply: HostProtocolMessage) => {
+          ws.send(encodeHostMessage(reply));
+        });
+      });
+
       ws.on('close', () => {
         this._clients.delete(ws);
       });
@@ -233,6 +250,20 @@ export class BridgeHost extends EventEmitter {
   /** Number of connected plugin sessions. */
   get pluginCount(): number {
     return this._plugins.size;
+  }
+
+  /**
+   * Send a host protocol message to all connected CLI clients.
+   */
+  broadcastToClients(msg: HostProtocolMessage): void {
+    const encoded = encodeHostMessage(msg);
+    for (const ws of this._clients) {
+      try {
+        ws.send(encoded);
+      } catch {
+        // Client may already be disconnected
+      }
+    }
   }
 
   // -------------------------------------------------------------------------

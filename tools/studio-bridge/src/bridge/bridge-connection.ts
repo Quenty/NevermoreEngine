@@ -13,6 +13,11 @@ import { SessionTracker, type TrackedSession } from './internal/session-tracker.
 import { detectRoleAsync, getDefaultRemoteHost } from './internal/environment-detection.js';
 import { BridgeSession } from './bridge-session.js';
 import type {
+  HostProtocolMessage,
+  ListSessionsRequest,
+  ListInstancesRequest,
+} from './internal/host-protocol.js';
+import type {
   SessionInfo,
   SessionContext,
   InstanceInfo,
@@ -407,13 +412,33 @@ export class BridgeConnection extends EventEmitter {
       this._hostSessions.set(tracked.info.sessionId, session);
       this.emit('session-connected', session);
       this._resetIdleTimer();
+
+      // Broadcast to CLI clients
+      this._host?.broadcastToClients({
+        type: 'session-event',
+        event: 'connected',
+        sessionId: tracked.info.sessionId,
+        session: tracked.info,
+        context: tracked.info.context,
+        instanceId: tracked.info.instanceId,
+      });
     });
 
     this._tracker.on('session-removed', (sessionId: string) => {
+      const removed = this._hostSessions.get(sessionId);
       this._hostSessions.delete(sessionId);
       this._hostHandles.delete(sessionId);
       this.emit('session-disconnected', sessionId);
       this._resetIdleTimer();
+
+      // Broadcast to CLI clients
+      this._host?.broadcastToClients({
+        type: 'session-event',
+        event: 'disconnected',
+        sessionId,
+        context: removed?.info.context ?? 'edit',
+        instanceId: removed?.info.instanceId ?? sessionId,
+      });
     });
 
     this._tracker.on('instance-added', (instance: InstanceInfo) => {
@@ -457,6 +482,25 @@ export class BridgeConnection extends EventEmitter {
         handle.markDisconnected();
       }
       this._tracker!.removeSession(sessionId);
+    });
+
+    // Handle client protocol messages (list-sessions, list-instances, etc.)
+    this._host.on('client-message', (msg: HostProtocolMessage, reply: (m: HostProtocolMessage) => void) => {
+      if (msg.type === 'list-sessions') {
+        const req = msg as ListSessionsRequest;
+        reply({
+          type: 'list-sessions-response',
+          requestId: req.requestId,
+          sessions: this._tracker!.listSessions(),
+        });
+      } else if (msg.type === 'list-instances') {
+        const req = msg as ListInstancesRequest;
+        reply({
+          type: 'list-instances-response',
+          requestId: req.requestId,
+          instances: this._tracker!.listInstances(),
+        });
+      }
     });
 
     await this._host.startAsync({ port });
