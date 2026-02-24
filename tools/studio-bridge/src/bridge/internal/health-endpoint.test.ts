@@ -3,7 +3,7 @@
  * and the checkHealthAsync client function.
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import http from 'http';
 import { checkHealthAsync, createHealthHandler, type HealthInfo } from './health-endpoint.js';
 

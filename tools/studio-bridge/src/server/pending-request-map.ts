@@ -66,7 +66,7 @@ export class PendingRequestMap<T> {
    */
   cancelAll(reason?: string): void {
     const message = reason ?? 'All pending requests cancelled';
-    for (const [requestId, entry] of this._pending) {
+    for (const [, entry] of this._pending) {
       clearTimeout(entry.timer);
       entry.reject(new Error(message));
     }

@@ -31,7 +31,7 @@ const mockInjectPluginAsync = vi.fn(async () => ({
 }));
 
 vi.mock('../plugin/plugin-injector.js', () => ({
-  injectPluginAsync: (...args: any[]) => mockInjectPluginAsync(...args),
+  injectPluginAsync: (..._args: any[]) => mockInjectPluginAsync(),
 }));
 
 const mockIsPersistentPluginInstalled = vi.fn(() => false);

@@ -5,7 +5,8 @@
  * routes connections by URL path.
  */
 
-import { createServer, type IncomingMessage, type ServerResponse, type Server, type Socket } from 'http';
+import { createServer, type IncomingMessage, type ServerResponse, type Server } from 'http';
+import type { Socket } from 'net';
 import { WebSocketServer, WebSocket } from 'ws';
 import { URL } from 'url';
 

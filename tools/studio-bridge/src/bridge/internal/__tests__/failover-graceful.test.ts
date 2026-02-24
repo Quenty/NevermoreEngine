@@ -6,11 +6,11 @@
  * Uses real BridgeHost and HandOffManager instances with ephemeral ports.
  */
 
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { WebSocket } from 'ws';
 import { BridgeHost } from '../bridge-host.js';
-import { HandOffManager, type HandOffDependencies } from '../hand-off.js';
-import { decodeHostMessage, encodeHostMessage } from '../host-protocol.js';
+import { HandOffManager } from '../hand-off.js';
+import { decodeHostMessage } from '../host-protocol.js';
 
 // ---------------------------------------------------------------------------
 // Helpers

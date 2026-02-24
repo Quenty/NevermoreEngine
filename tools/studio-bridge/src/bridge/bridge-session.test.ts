@@ -6,7 +6,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { EventEmitter } from 'events';
 import { BridgeSession } from './bridge-session.js';
-import type { TransportHandle } from './internal/session-tracker.js';
 import type { SessionInfo } from './types.js';
 import { SessionDisconnectedError } from './types.js';
 import type { PluginMessage, ServerMessage } from '../server/web-socket-protocol.js';
@@ -15,13 +14,10 @@ import type { PluginMessage, ServerMessage } from '../server/web-socket-protocol
 // Helpers
 // ---------------------------------------------------------------------------
 
-class MockTransportHandle extends EventEmitter implements TransportHandle {
+class MockTransportHandle extends EventEmitter {
   private _isConnected: boolean;
 
-  sendActionAsync = vi.fn(async <TResponse>(): Promise<TResponse> => {
-    return {} as TResponse;
-  });
-
+  sendActionAsync = vi.fn(async () => ({})) as any;
   sendMessage = vi.fn();
 
   constructor(connected = true) {

@@ -4,7 +4,7 @@
  * dependencies (no real network).
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   HandOffManager,
   computeTakeoverJitterMs,
@@ -12,7 +12,7 @@ import {
   type HandOffLogEntry,
 } from './hand-off.js';
 import { HostUnreachableError } from '../types.js';
-import { createHealthHandler, type HealthInfo } from './health-endpoint.js';
+import { createHealthHandler } from './health-endpoint.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -257,7 +257,7 @@ describe('HandOffManager', () => {
       await manager.onHostDisconnectedAsync();
 
       // Should have logs: host-transfer-notice, graceful-disconnect, bind-success
-      const reasons = logger.mock.calls.map((c: [HandOffLogEntry]) => c[0].reason);
+      const reasons = logger.mock.calls.map((c: any[]) => c[0].reason);
       expect(reasons).toContain('host-transfer-notice');
       expect(reasons).toContain('graceful-disconnect');
       expect(reasons).toContain('bind-success');
@@ -275,7 +275,7 @@ describe('HandOffManager', () => {
       await manager.onHostDisconnectedAsync();
       randomSpy.mockRestore();
 
-      const reasons = logger.mock.calls.map((c: [HandOffLogEntry]) => c[0].reason);
+      const reasons = logger.mock.calls.map((c: any[]) => c[0].reason);
       expect(reasons).toContain('crash-jitter');
       expect(reasons).toContain('crash-detected');
     });
@@ -297,7 +297,7 @@ describe('HandOffManager', () => {
       await manager.onHostDisconnectedAsync();
 
       const retryEntries = logger.mock.calls
-        .map((c: [HandOffLogEntry]) => c[0])
+        .map((c: any[]) => c[0])
         .filter((e: HandOffLogEntry) => e.reason === 'retry');
       expect(retryEntries.length).toBe(2);
       expect(retryEntries[0].data?.attempt).toBe(0);
@@ -316,7 +316,7 @@ describe('HandOffManager', () => {
       manager.onHostTransferNotice();
       await expect(manager.onHostDisconnectedAsync()).rejects.toThrow(HostUnreachableError);
 
-      const reasons = logger.mock.calls.map((c: [HandOffLogEntry]) => c[0].reason);
+      const reasons = logger.mock.calls.map((c: any[]) => c[0].reason);
       expect(reasons).toContain('retries-exhausted');
     });
 
@@ -371,12 +371,10 @@ describe('Health endpoint observability fields', () => {
 
     // Simulate an HTTP response object
     let statusCode = 0;
-    let headers: Record<string, string> = {};
     let body = '';
     const res = {
-      writeHead(code: number, hdrs: Record<string, string | number>) {
+      writeHead(code: number, _hdrs: Record<string, string | number>) {
         statusCode = code;
-        headers = hdrs as Record<string, string>;
       },
       end(data: string) {
         body = data;

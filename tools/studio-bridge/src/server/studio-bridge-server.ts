@@ -243,6 +243,11 @@ export class StudioBridgeServer {
     return this._negotiatedCapabilities;
   }
 
+  /** Timestamp of the last heartbeat received from the plugin, or undefined. */
+  get lastHeartbeatTimestamp(): number | undefined {
+    return this._lastHeartbeatTimestamp;
+  }
+
   // -----------------------------------------------------------------------
   // v2 action dispatch
   // -----------------------------------------------------------------------

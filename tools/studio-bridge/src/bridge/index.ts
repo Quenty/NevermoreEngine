@@ -26,6 +26,9 @@ export type {
   LogOptions,
   QueryDataModelOptions,
   LogFollowOptions,
+  StudioState,
+  DataModelInstance,
+  OutputLevel,
 } from './types.js';
 
 // Error classes

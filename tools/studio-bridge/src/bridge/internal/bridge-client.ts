@@ -13,7 +13,7 @@
 
 import { EventEmitter } from 'events';
 import { randomUUID } from 'crypto';
-import { TransportClient, type TransportClientOptions } from './transport-client.js';
+import { TransportClient } from './transport-client.js';
 import {
   encodeHostMessage,
   decodeHostMessage,
@@ -21,11 +21,8 @@ import {
   type HostResponse,
   type ListSessionsRequest,
   type ListSessionsResponse,
-  type ListInstancesRequest,
   type ListInstancesResponse,
   type SessionEvent,
-  type HostProtocolMessage,
-  type HostTransferNotice,
 } from './host-protocol.js';
 import { HandOffManager } from './hand-off.js';
 import type { TransportHandle } from './session-tracker.js';
@@ -140,7 +137,7 @@ export class BridgeClient extends EventEmitter {
     this._isConnected = false;
 
     // Cancel all pending requests
-    for (const [requestId, entry] of this._pendingRequests) {
+    for (const [, entry] of this._pendingRequests) {
       clearTimeout(entry.timer);
       entry.reject(new Error('Client disconnected'));
     }

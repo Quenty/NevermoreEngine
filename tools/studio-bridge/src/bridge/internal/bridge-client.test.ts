@@ -4,14 +4,12 @@
  * event handling.
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { WebSocketServer, WebSocket } from 'ws';
 import { BridgeClient } from './bridge-client.js';
 import {
   encodeHostMessage,
   decodeHostMessage,
-  type HostEnvelope,
-  type ListSessionsRequest,
   type HostProtocolMessage,
 } from './host-protocol.js';
 import type { SessionInfo } from '../types.js';
@@ -89,7 +87,6 @@ async function createMockHostWithSessions(
   const host = await createMockHost();
 
   // Override the message handler to respond with sessions
-  const originalConnection = host.wss.listeners('connection');
   host.wss.removeAllListeners('connection');
 
   host.wss.on('connection', (ws) => {

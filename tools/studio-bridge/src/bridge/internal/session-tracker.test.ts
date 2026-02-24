@@ -5,8 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SessionTracker, type TransportHandle, type TrackedSession } from './session-tracker.js';
-import type { SessionInfo, InstanceInfo, SessionContext } from '../types.js';
-import type { PluginMessage, ServerMessage } from '../../server/web-socket-protocol.js';
+import type { SessionInfo, InstanceInfo } from '../types.js';
 import { EventEmitter } from 'events';
 
 // ---------------------------------------------------------------------------
@@ -19,7 +18,7 @@ function createMockHandle(connected = true): TransportHandle {
     sendActionAsync: vi.fn(async () => ({}) as any),
     sendMessage: vi.fn(),
     isConnected: connected,
-    on: emitter.on.bind(emitter) as TransportHandle['on'],
+    on: emitter.on.bind(emitter) as unknown as TransportHandle['on'],
   };
 }
 

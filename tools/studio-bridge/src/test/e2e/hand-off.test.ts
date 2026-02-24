@@ -9,7 +9,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { WebSocket } from 'ws';
 import { BridgeHost } from '../../bridge/internal/bridge-host.js';
-import { HandOffManager, type HandOffDependencies } from '../../bridge/internal/hand-off.js';
+import { HandOffManager } from '../../bridge/internal/hand-off.js';
 import { MockPluginClient } from '../helpers/mock-plugin-client.js';
 import { createServer, type Server } from 'net';
 

@@ -7,7 +7,7 @@
 import { EventEmitter } from 'events';
 import type { WebSocket, RawData } from 'ws';
 import type { IncomingMessage } from 'http';
-import { TransportServer, type TransportServerOptions } from './transport-server.js';
+import { TransportServer } from './transport-server.js';
 import { createHealthHandler } from './health-endpoint.js';
 import { encodeHostMessage, type HostTransferNotice } from './host-protocol.js';
 import {

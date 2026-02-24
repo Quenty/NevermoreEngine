@@ -11,7 +11,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { BridgeConnection } from '../../bridge/bridge-connection.js';
 import { MockPluginClient } from '../helpers/mock-plugin-client.js';
-import type { BridgeSession } from '../../bridge/bridge-session.js';
 
 // ---------------------------------------------------------------------------
 // Test suite
@@ -108,7 +107,7 @@ describe('persistent session e2e', () => {
     };
 
     // Listen for scriptComplete from plugin
-    const responsePromise = plugin.waitForMessageAsync('execute', 2_000).catch(() => null);
+    plugin.waitForMessageAsync('execute', 2_000).catch(() => null);
 
     // Send execute to plugin (simulating what the host would do)
     plugin.sendMessage(executeMsg);
