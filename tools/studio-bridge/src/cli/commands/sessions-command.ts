@@ -54,7 +54,7 @@ export class SessionsCommand<T> implements CommandModule<T, SessionsArgs> {
           OutputHelper.warn(result.summary);
         } else {
           const columns: TableColumn<SessionInfo>[] = [
-            { header: 'Session ID', value: (s) => s.sessionId.substring(0, 8) },
+            { header: 'Session ID', value: (s) => s.sessionId },
             { header: 'Place', value: (s) => s.placeName },
             { header: 'Context', value: (s) => s.context },
             { header: 'State', value: (s) => s.state },

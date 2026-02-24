@@ -49,6 +49,28 @@ local function detectContext()
 end
 
 -- ---------------------------------------------------------------------------
+-- Instance / session ID helpers
+-- ---------------------------------------------------------------------------
+
+local function getInstanceId()
+	if game.GameId ~= 0 or game.PlaceId ~= 0 then
+		return tostring(game.GameId) .. "-" .. tostring(game.PlaceId)
+	end
+	-- Unpublished place: use sanitized place name for readability
+	local name = string.lower(game.Name or "untitled")
+	name = string.gsub(name, "%s+", "-")
+	name = string.gsub(name, "[^%w%-]", "")
+	if name == "" then
+		name = "untitled"
+	end
+	return "local-" .. name
+end
+
+local function getSessionId()
+	return getInstanceId() .. "-" .. detectContext()
+end
+
+-- ---------------------------------------------------------------------------
 -- JSON helpers (HttpService wrappers for Roblox environment)
 -- ---------------------------------------------------------------------------
 
@@ -111,7 +133,7 @@ local function wireConnection(ws, sessionId)
 		sessionId = sessionId,
 		payload = {
 			pluginVersion = "0.7.0",
-			instanceId = tostring(game.GameId) .. "-" .. tostring(game.PlaceId),
+			instanceId = getInstanceId(),
 			context = detectContext(),
 			placeName = game.Name or "Unknown",
 			placeId = game.PlaceId,
@@ -255,7 +277,7 @@ else
 			print("[StudioBridge] " .. oldState .. " -> " .. newState)
 		end,
 		onConnected = function(ws)
-			local sessionId = tostring(game.GameId) .. "-" .. tostring(game.PlaceId)
+			local sessionId = getSessionId()
 			ws.Opened:Connect(function()
 				wireConnection(ws, sessionId)
 			end)
