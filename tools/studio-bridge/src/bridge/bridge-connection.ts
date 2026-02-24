@@ -216,7 +216,7 @@ export class BridgeConnection extends EventEmitter {
       for (const handle of this._hostHandles.values()) {
         handle.markDisconnected();
       }
-      await this._host.stopAsync();
+      await this._host.shutdownAsync();
       this._host = undefined;
       this._tracker = undefined;
       this._hostSessions.clear();

@@ -193,7 +193,21 @@ export class BridgeHost extends EventEmitter {
         }
       }
 
-      // Step 2: Wait briefly for clients to process the notice
+      // Step 1.5: Send shutdown message to all plugins so they disconnect
+      // cleanly instead of seeing a WebSocket error
+      for (const [sessionId, ws] of this._plugins) {
+        try {
+          ws.send(encodeMessage({
+            type: 'shutdown',
+            sessionId,
+            payload: {} as Record<string, never>,
+          }));
+        } catch {
+          // Plugin may already be disconnected
+        }
+      }
+
+      // Step 2: Wait briefly for plugins/clients to process
       await new Promise<void>((resolve) => setTimeout(resolve, SHUTDOWN_DRAIN_MS));
 
       // Step 3: Send close frames to all plugins and clients
