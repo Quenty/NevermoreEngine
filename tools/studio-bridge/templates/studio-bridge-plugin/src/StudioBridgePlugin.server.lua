@@ -33,8 +33,10 @@ local PORT = "{{PORT}}"
 local SESSION_ID = "{{SESSION_ID}}"
 local IS_EPHEMERAL = ("{{EPHEMERAL}}" == "true")
 
--- Only run inside Studio
-if not RunService:IsStudio() then
+-- Only run inside Studio edit context. Plugin instances spawned by play
+-- mode (client/server) cannot make HTTP requests, so they cannot discover
+-- the bridge. The edit-context instance stays alive during play mode.
+if not RunService:IsStudio() or RunService:IsRunning() then
 	return
 end
 
@@ -254,7 +256,8 @@ else
 		scanPortsAsync = function(ports, timeoutSec)
 			-- Scan all ports in parallel using task.spawn. The calling thread
 			-- yields and is resumed as soon as any port succeeds, all fail,
-			-- or the timeout expires.
+			-- or the timeout expires. Use task.defer (not task.spawn) to resume
+			-- the caller so it has time to reach coroutine.yield() first.
 			local callerThread = coroutine.running()
 			local foundPort = nil
 			local foundBody = nil
@@ -270,13 +273,13 @@ else
 						foundPort = port
 						foundBody = body
 						settled = true
-						task.spawn(callerThread)
+						task.defer(callerThread)
 						return
 					end
 					remaining -= 1
 					if remaining <= 0 and not settled then
 						settled = true
-						task.spawn(callerThread)
+						task.defer(callerThread)
 					end
 				end)
 				table.insert(threads, thread)
@@ -286,13 +289,11 @@ else
 			local timeoutThread = task.delay(timeoutSec, function()
 				if not settled then
 					settled = true
-					task.spawn(callerThread)
+					task.defer(callerThread)
 				end
 			end)
 
-			if not settled then
-				coroutine.yield()
-			end
+			coroutine.yield()
 
 			-- Cancel remaining HTTP threads and the timeout
 			pcall(task.cancel, timeoutThread)

@@ -451,9 +451,9 @@ export class BridgeConnection extends EventEmitter {
   async waitForSessionsToSettleAsync(options?: {
     /** Max time to wait for the first session (ms). Default: 5000 */
     firstSessionTimeout?: number;
-    /** How long to wait after the last connection before considering settled (ms). Default: 2500 */
+    /** How long to wait after the last connection before considering settled (ms). Default: 4000 */
     settleMs?: number;
-    /** Absolute max wait time (ms). Default: 10000 */
+    /** Absolute max wait time (ms). Default: 15000 */
     maxMs?: number;
   }): Promise<void> {
     if (this._role !== 'host') {
@@ -461,8 +461,8 @@ export class BridgeConnection extends EventEmitter {
     }
 
     const firstTimeout = options?.firstSessionTimeout ?? 5_000;
-    const settleMs = options?.settleMs ?? 2_500;
-    const maxMs = options?.maxMs ?? 10_000;
+    const settleMs = options?.settleMs ?? 4_000;
+    const maxMs = options?.maxMs ?? 15_000;
 
     // Wait for the first session
     try {
