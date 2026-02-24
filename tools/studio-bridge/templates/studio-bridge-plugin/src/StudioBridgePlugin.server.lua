@@ -195,7 +195,9 @@ if IS_EPHEMERAL then
 	end
 else
 	-- Persistent mode: discover server via port scanning
-	local discovery = DiscoveryStateMachine.new(nil, {
+	-- Forward-declare so closures inside the callback table can reference it.
+	local discovery
+	discovery = DiscoveryStateMachine.new(nil, {
 		httpGet = function(url)
 			local ok2, body = pcall(HttpService.GetAsync, HttpService, url)
 			return ok2, body
@@ -218,6 +220,11 @@ else
 			end)
 			ws.Error:Connect(function(status, err)
 				warn("[StudioBridge] WebSocket error (" .. tostring(status) .. "): " .. tostring(err))
+				discovery:onDisconnect("error: " .. tostring(status))
+			end)
+			ws.Closed:Connect(function()
+				connected = false
+				discovery:onDisconnect("closed")
 			end)
 		end,
 		onDisconnected = function(reason)
@@ -227,12 +234,21 @@ else
 	})
 	discovery:start()
 
-	-- Drive the state machine from RunService.Heartbeat
+	-- Drive the state machine from RunService.Heartbeat.
+	-- Reentrancy guard: httpGet yields (GetAsync), so a second Heartbeat can
+	-- fire while a tick is still in progress. Without the guard, multiple
+	-- overlapping scans find the same server and each opens its own WebSocket.
 	local lastTick = os.clock()
+	local ticking = false
 	RunService.Heartbeat:Connect(function()
+		if ticking then
+			return
+		end
+		ticking = true
 		local now = os.clock()
 		local deltaMs = (now - lastTick) * 1000
 		lastTick = now
 		discovery:tick(deltaMs)
+		ticking = false
 	end)
 end
