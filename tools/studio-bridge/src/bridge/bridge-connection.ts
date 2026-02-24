@@ -26,6 +26,7 @@ import {
   SessionNotFoundError,
   ContextNotFoundError,
 } from './types.js';
+import type { ServerMessage } from '../server/web-socket-protocol.js';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -57,23 +58,31 @@ const IDLE_EXIT_GRACE_MS = 5_000;
 // ---------------------------------------------------------------------------
 
 /**
- * Minimal transport handle used by SessionTracker in host mode.
- * The BridgeHost manages WebSocket connections directly; this stub
- * provides the interface that SessionTracker requires.
+ * Transport handle that relays messages to a plugin's WebSocket via BridgeHost.
+ * Used by SessionTracker in host mode so that BridgeSession.sendActionAsync()
+ * works the same way whether we're a host or a client.
  */
-class HostStubTransportHandle extends EventEmitter {
+class HostTransportHandle extends EventEmitter {
   private _connected = true;
+  private _sessionId: string;
+  private _host: BridgeHost;
+
+  constructor(sessionId: string, host: BridgeHost) {
+    super();
+    this._sessionId = sessionId;
+    this._host = host;
+  }
 
   get isConnected(): boolean {
     return this._connected;
   }
 
-  async sendActionAsync<TResponse>(): Promise<TResponse> {
-    throw new Error('Host transport handle: not wired to plugin WebSocket');
+  async sendActionAsync<TResponse>(message: ServerMessage, timeoutMs: number): Promise<TResponse> {
+    return this._host.sendToPluginAsync<TResponse>(this._sessionId, message, timeoutMs);
   }
 
-  sendMessage(): void {
-    // no-op stub
+  sendMessage(message: ServerMessage): void {
+    this._host.sendToPlugin(this._sessionId, message);
   }
 
   markDisconnected(): void {
@@ -95,7 +104,7 @@ export class BridgeConnection extends EventEmitter {
   private _host: BridgeHost | undefined;
   private _tracker: SessionTracker | undefined;
   private _hostSessions: Map<string, BridgeSession> = new Map();
-  private _hostHandles: Map<string, HostStubTransportHandle> = new Map();
+  private _hostHandles: Map<string, HostTransportHandle> = new Map();
 
   // Client mode internals
   private _client: BridgeClient | undefined;
@@ -334,7 +343,16 @@ export class BridgeConnection extends EventEmitter {
       return this._resolveByInstance(instanceId, context);
     }
 
-    // Step 3: Collect unique instances
+    // Step 3: Collect unique instances — if we're the host with no sessions
+    // yet, wait briefly for a plugin to discover us and connect.
+    if (this._role === 'host' && this.listSessions().length === 0) {
+      try {
+        await this.waitForSession(5_000);
+      } catch {
+        // Still no sessions after waiting
+      }
+    }
+
     const instances = this.listInstances();
 
     // Step 4: No instances
@@ -471,7 +489,7 @@ export class BridgeConnection extends EventEmitter {
         gameId: 0,
       };
 
-      const handle = new HostStubTransportHandle();
+      const handle = new HostTransportHandle(info.sessionId, this._host!);
       this._hostHandles.set(info.sessionId, handle);
       this._tracker!.addSession(info.sessionId, sessionInfo, handle);
     });

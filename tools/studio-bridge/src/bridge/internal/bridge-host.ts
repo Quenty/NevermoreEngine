@@ -19,6 +19,7 @@ import {
   decodePluginMessage,
   encodeMessage,
   type Capability,
+  type ServerMessage,
 } from '../../server/web-socket-protocol.js';
 
 // ---------------------------------------------------------------------------
@@ -277,6 +278,88 @@ export class BridgeHost extends EventEmitter {
       } catch {
         // Client may already be disconnected
       }
+    }
+  }
+
+  /**
+   * Send a message to a specific plugin and wait for the response.
+   */
+  async sendToPluginAsync<TResponse>(
+    sessionId: string,
+    message: ServerMessage,
+    timeoutMs: number,
+  ): Promise<TResponse> {
+    const ws = this._plugins.get(sessionId);
+    if (!ws) {
+      throw new Error(`Plugin session '${sessionId}' not connected`);
+    }
+
+    return new Promise<TResponse>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        ws.off('message', onMessage);
+        reject(new Error(`Plugin request timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+
+      const sentRequestId = 'requestId' in message ? (message as any).requestId : undefined;
+
+      const onMessage = (raw: RawData) => {
+        const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+
+        // Parse the raw JSON directly — decodePluginMessage may reject
+        // valid responses that don't match its strict schema
+        let parsed: any;
+        try {
+          parsed = JSON.parse(data);
+        } catch {
+          return;
+        }
+
+        // Skip heartbeat messages
+        if (parsed.type === 'heartbeat') {
+          return;
+        }
+
+        // Match by requestId if both sides have one
+        const msgRequestId = parsed.requestId;
+        if (sentRequestId !== undefined && msgRequestId !== undefined && msgRequestId === sentRequestId) {
+          clearTimeout(timer);
+          ws.off('message', onMessage);
+          resolve(parsed as TResponse);
+          return;
+        }
+
+        // Accept error responses
+        if (parsed.type === 'error') {
+          clearTimeout(timer);
+          ws.off('message', onMessage);
+          resolve(parsed as TResponse);
+        }
+      };
+
+      ws.on('message', onMessage);
+
+      try {
+        ws.send(encodeMessage(message));
+      } catch (err) {
+        clearTimeout(timer);
+        ws.off('message', onMessage);
+        reject(err);
+      }
+    });
+  }
+
+  /**
+   * Send a fire-and-forget message to a specific plugin.
+   */
+  sendToPlugin(sessionId: string, message: ServerMessage): void {
+    const ws = this._plugins.get(sessionId);
+    if (!ws) {
+      return;
+    }
+    try {
+      ws.send(encodeMessage(message));
+    } catch {
+      // Plugin may already be disconnected
     }
   }
 
