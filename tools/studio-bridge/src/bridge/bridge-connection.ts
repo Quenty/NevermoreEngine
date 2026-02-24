@@ -388,16 +388,14 @@ export class BridgeConnection extends EventEmitter {
       return this._resolveByInstance(instances[0].instanceId, context);
     }
 
-    // Step 6: Multiple instances
-    const instanceList = instances
-      .map(
-        (inst) =>
-          `  - ${inst.instanceId}: ${inst.placeName} (${inst.contexts.join(', ')})`
-      )
+    // Step 6: Multiple instances — list individual sessions so the user
+    // can copy an ID directly into --session.
+    const sessionList = this.listSessions()
+      .map((s) => `  - ${s.sessionId}: ${s.placeName} (${s.context})`)
       .join('\n');
 
     throw new SessionNotFoundError(
-      `Multiple Studio instances connected. Use --session <id> or --instance <id> to select one.\n${instanceList}`
+      `Multiple Studio instances connected. Use --session <id> to select one.\n${sessionList}`
     );
   }
 
