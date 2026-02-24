@@ -376,11 +376,11 @@ table.insert(tests, {
 })
 
 -- ===========================================================================
--- 6. DiscoveryStateMachine: reconnection cycle with backoff
+-- 6. DiscoveryStateMachine: disconnect triggers immediate search and recovers
 -- ===========================================================================
 
 table.insert(tests, {
-	name = "DiscoveryStateMachine: reconnect cycle uses exponential backoff then recovers",
+	name = "DiscoveryStateMachine: disconnect searches immediately and reconnects when server returns",
 	fn = function()
 		local currentState = "idle"
 		local connectAttempts = 0
@@ -423,30 +423,22 @@ table.insert(tests, {
 		-- Simulate disconnect with server down
 		serverUp = false
 		sm:onDisconnect("connection lost")
-		assertEqual(currentState, "reconnecting")
+		-- Transitions straight to searching (no backoff)
+		assertEqual(currentState, "searching", "searching immediately after disconnect")
 
-		-- First backoff: 200ms (initialBackoffMs * 2^0)
-		sm:tick(199)
-		assertEqual(currentState, "reconnecting", "still waiting for backoff")
+		-- First tick triggers scan (primed), server still down -> stays searching
+		sm:tick(1)
+		assertEqual(currentState, "searching", "stays searching when server is down")
 
-		-- After backoff expires, state machine transitions to searching
-		sm:tick(1) -- 200ms total -- transitions to searching (scan queued)
-		assertEqual(currentState, "searching", "transitions to searching after backoff")
-
-		-- Next tick triggers the scan; all ports fail so it goes back to reconnecting
-		sm:tick(0)
-		assertEqual(currentState, "reconnecting", "back to reconnecting after failed scan")
+		-- Wait for next poll interval, scan again -> still down
+		sm:tick(100)
+		assertEqual(currentState, "searching", "still searching after poll interval")
 
 		-- Bring server back up
 		serverUp = true
 
-		-- Second backoff: 400ms (initialBackoffMs * 2^1)
-		-- After backoff expires, transitions to searching
-		sm:tick(400)
-		assertEqual(currentState, "searching", "searching after second backoff")
-
-		-- Next tick triggers scan; server is up so it connects
-		sm:tick(0)
+		-- Next poll interval triggers scan -> server responds -> connects
+		sm:tick(100)
 		assertEqual(currentState, "connected", "reconnected after server came back")
 	end,
 })

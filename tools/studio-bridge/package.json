@@ -36,6 +36,7 @@
     "build:clean": "tsc --build --clean",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:plugin": "lune run templates/studio-bridge-plugin-test/test/test-runner",
     "test:integration": "node dist/test/integration/smoke-test.js"
   }
 }

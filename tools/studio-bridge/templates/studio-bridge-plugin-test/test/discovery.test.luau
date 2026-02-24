@@ -178,9 +178,9 @@ table.insert(tests, {
 	end,
 })
 
--- 5. onDisconnect() while connected transitions to reconnecting
+-- 5. onDisconnect() while connected transitions to searching (immediate retry)
 table.insert(tests, {
-	name = "onDisconnect() while connected transitions to reconnecting",
+	name = "onDisconnect() while connected transitions to searching",
 	fn = function()
 		local mock = createMockCallbacks()
 		mock.httpGetResult = { success = true, body = '{"status":"ok"}' }
@@ -191,15 +191,15 @@ table.insert(tests, {
 		assertEqual(sm:getState(), "connected")
 
 		sm:onDisconnect("server closed")
-		assertEqual(sm:getState(), "reconnecting")
+		assertEqual(sm:getState(), "searching")
 		assertEqual(#mock.disconnectedCalls, 1)
 		assertEqual(mock.disconnectedCalls[1], "server closed")
 	end,
 })
 
--- 6. After enough tick() calls with failing reconnection, exhausts attempts -> idle
+-- 6. After disconnect, immediate search allows fast reconnection
 table.insert(tests, {
-	name = "exhausting maxReconnectAttempts transitions to idle",
+	name = "disconnect triggers immediate search without backoff",
 	fn = function()
 		local config = {
 			portRange = { min = 38740, max = 38742 },
@@ -217,33 +217,14 @@ table.insert(tests, {
 		sm:tick(100)
 		assertEqual(sm:getState(), "connected", "initial connection")
 
-		-- Now make everything fail for reconnection
-		mock.httpGetResult = { success = false, body = nil }
-		mock.wsResult = { success = false, connection = nil }
-
+		-- Disconnect goes straight to searching (no backoff)
 		sm:onDisconnect("lost")
-		assertEqual(sm:getState(), "reconnecting", "entered reconnecting")
+		assertEqual(sm:getState(), "searching", "searching immediately after disconnect")
 
-		-- The reconnecting cycle: backoff expires -> attempt++, go to searching
-		-- -> all ports fail -> back to reconnecting (with increased backoff)
-		-- -> repeat until attempts >= maxReconnectAttempts -> idle
-
-		-- Attempt 1: backoff = 100ms (initialBackoffMs * 2^0)
-		sm:tick(100)
-		assertEqual(sm:getState(), "searching", "searching after 1st backoff")
-		-- All ports fail, goes back to reconnecting
-		sm:tick(100) -- poll interval fires, all ports fail
-		assertEqual(sm:getState(), "reconnecting", "back to reconnecting after scan fail")
-
-		-- Attempt 2: backoff = 200ms (initialBackoffMs * 2^1)
-		sm:tick(200)
-		assertEqual(sm:getState(), "searching", "searching after 2nd backoff")
-		sm:tick(100) -- poll fires, all ports fail
-		assertEqual(sm:getState(), "reconnecting", "back to reconnecting again")
-
-		-- Attempt 3: this exhausts maxReconnectAttempts (3)
-		sm:tick(400) -- backoff = 400ms (initialBackoffMs * 2^2)
-		assertEqual(sm:getState(), "idle", "idle after exhausting attempts")
+		-- First tick triggers immediate scan (pollElapsedMs was primed)
+		sm:tick(1)
+		assertEqual(sm:getState(), "connected", "reconnected on first scan")
+		assertEqual(#mock.connectedCalls, 2, "onConnected called twice")
 	end,
 })
 
@@ -270,26 +251,25 @@ table.insert(tests, {
 		sm2:stop()
 		assertEqual(sm2:getState(), "idle", "stop from connected")
 
-		-- stop from reconnecting
+		-- stop from searching (after disconnect)
 		local sm3 = DiscoveryStateMachine.new(TEST_CONFIG, mock)
 		sm3:start()
 		sm3:tick(2000)
 		assertEqual(sm3:getState(), "connected")
-		mock.httpGetResult = { success = false, body = nil }
 		sm3:onDisconnect("lost")
-		assertEqual(sm3:getState(), "reconnecting")
+		assertEqual(sm3:getState(), "searching", "searching after disconnect")
 		sm3:stop()
-		assertEqual(sm3:getState(), "idle", "stop from reconnecting")
+		assertEqual(sm3:getState(), "idle", "stop from searching after disconnect")
 	end,
 })
 
--- 8. Backoff doubles each attempt, capped at maxBackoffMs
+-- 8. Disconnect goes straight to searching (no backoff delay)
 table.insert(tests, {
-	name = "backoff doubles each attempt, capped at maxBackoffMs",
+	name = "disconnect skips backoff and primes immediate scan",
 	fn = function()
 		local config = {
 			portRange = { min = 38740, max = 38741 },
-			pollIntervalMs = 10,
+			pollIntervalMs = 2000,
 			maxReconnectAttempts = 10,
 			initialBackoffMs = 100,
 			maxBackoffMs = 500,
@@ -300,37 +280,18 @@ table.insert(tests, {
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(config, mock)
 		sm:start()
-		sm:tick(10)
+		sm:tick(2000)
 		assertEqual(sm:getState(), "connected")
 
+		-- After disconnect, should be in searching with pollElapsedMs primed
 		mock.httpGetResult = { success = false, body = nil }
 		sm:onDisconnect("lost")
+		assertEqual(sm:getState(), "searching", "searching immediately")
 
-		-- Track how long each backoff takes by ticking 1ms at a time
-		local backoffs = {}
-		for i = 1, 5 do
-			assertEqual(sm:getState(), "reconnecting", "reconnecting before backoff " .. tostring(i))
-			local ticksNeeded = 0
-			while sm:getState() == "reconnecting" do
-				sm:tick(1)
-				ticksNeeded = ticksNeeded + 1
-				if ticksNeeded > 1000 then
-					error("infinite loop in backoff " .. tostring(i))
-				end
-			end
-			table.insert(backoffs, ticksNeeded)
-			-- Now in searching, tick to trigger scan (all ports fail -> back to reconnecting)
-			if sm:getState() == "searching" then
-				sm:tick(10)
-			end
-		end
-
-		-- Expected: 100, 200, 400, 500 (capped), 500 (capped)
-		assertEqual(backoffs[1], 100, "1st backoff")
-		assertEqual(backoffs[2], 200, "2nd backoff")
-		assertEqual(backoffs[3], 400, "3rd backoff")
-		assertLessThanOrEqual(backoffs[4], 500, "4th backoff capped")
-		assertLessThanOrEqual(backoffs[5], 500, "5th backoff capped")
+		-- Even just 1ms tick should trigger scan (primed pollElapsedMs)
+		local httpCallsBefore = #mock.httpGetCalls
+		sm:tick(1)
+		assertTrue(#mock.httpGetCalls > httpCallsBefore, "scan triggered on first tick after disconnect")
 	end,
 })
 
@@ -376,7 +337,7 @@ table.insert(tests, {
 		sm:start() -- idle -> searching
 		sm:tick(2000) -- searching -> connecting -> connected
 
-		sm:onDisconnect("lost") -- connected -> reconnecting
+		sm:onDisconnect("lost") -- connected -> searching (immediate)
 
 		assertEqual(#mock.stateChanges, 4)
 		assertEqual(mock.stateChanges[1].old, "idle")
@@ -386,7 +347,7 @@ table.insert(tests, {
 		assertEqual(mock.stateChanges[3].old, "connecting")
 		assertEqual(mock.stateChanges[3].new, "connected")
 		assertEqual(mock.stateChanges[4].old, "connected")
-		assertEqual(mock.stateChanges[4].new, "reconnecting")
+		assertEqual(mock.stateChanges[4].new, "searching")
 	end,
 })
 
@@ -685,9 +646,9 @@ table.insert(tests, {
 	end,
 })
 
--- 23. onDisconnect from connected transitions to reconnecting
+-- 23. onDisconnect from connected transitions to searching immediately
 table.insert(tests, {
-	name = "onDisconnect from connected transitions to reconnecting with correct state",
+	name = "onDisconnect from connected transitions to searching with primed scan",
 	fn = function()
 		local mock = createMockCallbacks()
 		mock.httpGetResult = { success = true, body = '{"status":"ok"}' }
@@ -699,27 +660,23 @@ table.insert(tests, {
 
 		sm:onDisconnect("error: connection lost")
 
-		-- State should be reconnecting
-		assertEqual(sm:getState(), "reconnecting", "state after disconnect")
+		-- State should be searching (immediate, no backoff)
+		assertEqual(sm:getState(), "searching", "state after disconnect")
 
 		-- onDisconnected callback should have been called with the reason
 		assertEqual(#mock.disconnectedCalls, 1, "onDisconnected called once")
 		assertEqual(mock.disconnectedCalls[1], "error: connection lost", "disconnect reason")
 
-		-- reconnectAttempt should be 0 (reset for the new reconnection cycle)
-		-- We verify this indirectly: the first backoff should be initialBackoffMs * 2^0 = initialBackoffMs
-		-- For TEST_CONFIG, initialBackoffMs = 1000, so ticking 999ms should stay in reconnecting,
-		-- and ticking 1 more ms should transition out.
-		sm:tick(999)
-		assertEqual(sm:getState(), "reconnecting", "still reconnecting before backoff expires")
+		-- pollElapsedMs should be primed so next tick triggers scan
+		local httpCallsBefore = #mock.httpGetCalls
 		sm:tick(1)
-		assertEqual(sm:getState(), "searching", "searching after initial backoff")
+		assertTrue(#mock.httpGetCalls > httpCallsBefore, "scan triggered immediately after disconnect")
 	end,
 })
 
--- 24. reconnecting eventually re-discovers and connects
+-- 24. disconnect then re-discover and connect (full round-trip)
 table.insert(tests, {
-	name = "reconnecting eventually re-discovers and connects",
+	name = "disconnect then immediate re-discovery and reconnection",
 	fn = function()
 		local config = {
 			portRange = { min = 38741, max = 38741 },
@@ -738,18 +695,12 @@ table.insert(tests, {
 		assertEqual(sm:getState(), "connected", "initial connection")
 		assertEqual(#mock.connectedCalls, 1, "onConnected called once")
 
-		-- Disconnect
+		-- Disconnect goes straight to searching
 		sm:onDisconnect("error: connection lost")
-		assertEqual(sm:getState(), "reconnecting", "reconnecting after disconnect")
+		assertEqual(sm:getState(), "searching", "searching after disconnect")
 		assertEqual(#mock.disconnectedCalls, 1, "onDisconnected called")
 
-		-- Tick past the initial backoff (initialBackoffMs = 200)
-		sm:tick(200)
-		assertEqual(sm:getState(), "searching", "searching after backoff")
-
-		-- Tick to trigger the port scan (pollIntervalMs already primed by reconnect transition)
-		-- The transition from reconnecting to searching sets pollElapsedMs = pollIntervalMs,
-		-- so the next tick should trigger the scan immediately.
+		-- First tick triggers scan (pollElapsedMs primed), reconnects immediately
 		sm:tick(1)
 		assertEqual(sm:getState(), "connected", "reconnected after re-discovery")
 
@@ -777,20 +728,71 @@ table.insert(tests, {
 		sm:onDisconnect("some reason")
 		assertEqual(sm:getState(), "searching", "searching unchanged")
 		assertEqual(#mock.disconnectedCalls, 0, "no disconnected callback in searching")
+	end,
+})
 
-		-- reconnecting state: get there via connect then disconnect
-		mock.httpGetResult = { success = true, body = '{"status":"ok"}' }
-		mock.wsResult = { success = true, connection = { id = "ws-1" } }
-		sm:tick(2000) -- searching -> connecting -> connected
-		assertEqual(sm:getState(), "connected", "connected for setup")
-		sm:onDisconnect("first disconnect")
-		assertEqual(sm:getState(), "reconnecting", "reconnecting for setup")
-		assertEqual(#mock.disconnectedCalls, 1, "one disconnect call from setup")
+-- ---------------------------------------------------------------------------
+-- scanPorts callback tests
+-- ---------------------------------------------------------------------------
 
-		-- Now try onDisconnect while in reconnecting state
-		sm:onDisconnect("should be ignored")
-		assertEqual(sm:getState(), "reconnecting", "reconnecting unchanged")
-		assertEqual(#mock.disconnectedCalls, 1, "no new disconnected callback in reconnecting")
+-- 26. scanPorts callback is used instead of sequential httpGet
+table.insert(tests, {
+	name = "scanPorts callback is used when provided",
+	fn = function()
+		local config = {
+			portRange = { min = 38741, max = 38744 },
+			pollIntervalMs = 100,
+			maxReconnectAttempts = 3,
+			initialBackoffMs = 1000,
+			maxBackoffMs = 30000,
+			heartbeatIntervalMs = 5000,
+		}
+		local mock = createMockCallbacks()
+		local scanPortsCalled = false
+		local scannedPorts: { number } = {}
+
+		mock.scanPorts = function(ports: { number }): (number?, string?)
+			scanPortsCalled = true
+			scannedPorts = ports
+			-- Simulate finding port 38743
+			return 38743, '{"status":"ok"}'
+		end
+
+		mock.wsResult = { success = true, connection = { id = "ws-scan" } }
+		local sm = DiscoveryStateMachine.new(config, mock)
+		sm:start()
+		sm:tick(100)
+
+		assertTrue(scanPortsCalled, "scanPorts should have been called")
+		assertEqual(#scannedPorts, 4, "should receive all 4 ports")
+		assertEqual(sm:getState(), "connected", "should connect via scanPorts result")
+		-- httpGet should NOT have been called (scanPorts takes precedence)
+		assertEqual(#mock.httpGetCalls, 0, "httpGet not called when scanPorts is provided")
+	end,
+})
+
+-- 27. scanPorts returns nil when no port found
+table.insert(tests, {
+	name = "scanPorts returning nil stays in searching",
+	fn = function()
+		local config = {
+			portRange = { min = 38741, max = 38744 },
+			pollIntervalMs = 100,
+			maxReconnectAttempts = 3,
+			initialBackoffMs = 1000,
+			maxBackoffMs = 30000,
+			heartbeatIntervalMs = 5000,
+		}
+		local mock = createMockCallbacks()
+
+		mock.scanPorts = function(_ports: { number }): (number?, string?)
+			return nil, nil
+		end
+
+		local sm = DiscoveryStateMachine.new(config, mock)
+		sm:start()
+		sm:tick(100)
+		assertEqual(sm:getState(), "searching", "stays searching when scanPorts finds nothing")
 	end,
 })
 
