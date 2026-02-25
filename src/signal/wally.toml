@@ -1,0 +1,9 @@
+[package]
+name = "quenty/signal"
+description = "Lua-side duplication of the API of events on Roblox objects."
+version = "0.1.0"
+license = "MIT"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
