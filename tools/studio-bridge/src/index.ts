@@ -100,6 +100,9 @@ export type {
   SubscribeMessage,
   UnsubscribeMessage,
   ServerErrorMessage,
+  // v2 dynamic action registration
+  RegisterActionMessage,
+  RegisterActionResultMessage,
 } from './server/web-socket-protocol.js';
 
 // Command handlers

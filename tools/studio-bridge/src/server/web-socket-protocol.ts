@@ -5,7 +5,8 @@
  * v1 messages: hello, output, scriptComplete, welcome, execute, shutdown
  * v2 messages: register, queryState, stateResult, captureScreenshot, screenshotResult,
  *   queryDataModel, dataModelResult, queryLogs, logsResult, subscribe, subscribeResult,
- *   unsubscribe, unsubscribeResult, stateChange, heartbeat, error
+ *   unsubscribe, unsubscribeResult, stateChange, heartbeat, error,
+ *   registerAction, registerActionResult
  */
 
 // ---------------------------------------------------------------------------
@@ -28,7 +29,8 @@ export type Capability =
   | 'queryDataModel'
   | 'queryLogs'
   | 'subscribe'
-  | 'heartbeat';
+  | 'heartbeat'
+  | 'registerAction';
 
 export type ErrorCode =
   | 'UNKNOWN_REQUEST'
@@ -209,6 +211,15 @@ export interface UnsubscribeResultMessage extends RequestMessage {
   };
 }
 
+export interface RegisterActionResultMessage extends RequestMessage {
+  type: 'registerActionResult';
+  payload: {
+    name: string;
+    success: boolean;
+    error?: string;
+  };
+}
+
 export interface PluginErrorMessage extends BaseMessage {
   type: 'error';
   requestId?: string;
@@ -232,6 +243,7 @@ export type PluginMessage =
   | HeartbeatMessage
   | SubscribeResultMessage
   | UnsubscribeResultMessage
+  | RegisterActionResultMessage
   | PluginErrorMessage;
 
 // ---------------------------------------------------------------------------
@@ -310,6 +322,15 @@ export interface UnsubscribeMessage extends RequestMessage {
   };
 }
 
+export interface RegisterActionMessage extends RequestMessage {
+  type: 'registerAction';
+  payload: {
+    name: string;
+    source: string;
+    responseType?: string;
+  };
+}
+
 export interface ServerErrorMessage extends BaseMessage {
   type: 'error';
   requestId?: string;
@@ -330,6 +351,7 @@ export type ServerMessage =
   | QueryLogsMessage
   | SubscribeMessage
   | UnsubscribeMessage
+  | RegisterActionMessage
   | ServerErrorMessage;
 
 // ---------------------------------------------------------------------------
@@ -573,6 +595,20 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         },
       };
 
+    case 'registerActionResult':
+      if (requestId === undefined) return null;
+      if (typeof payload.name !== 'string' || typeof payload.success !== 'boolean') return null;
+      return {
+        type: 'registerActionResult',
+        sessionId,
+        requestId,
+        payload: {
+          name: payload.name,
+          success: payload.success,
+          error: typeof payload.error === 'string' ? payload.error : undefined,
+        },
+      };
+
     case 'error':
       if (typeof payload.code !== 'string' || typeof payload.message !== 'string') return null;
       return {
@@ -708,6 +744,20 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         requestId,
         payload: {
           events: payload.events as SubscribableEvent[],
+        },
+      };
+
+    case 'registerAction':
+      if (requestId === undefined) return null;
+      if (typeof payload.name !== 'string' || typeof payload.source !== 'string') return null;
+      return {
+        type: 'registerAction',
+        sessionId,
+        requestId,
+        payload: {
+          name: payload.name,
+          source: payload.source,
+          responseType: typeof payload.responseType === 'string' ? payload.responseType : undefined,
         },
       };
 

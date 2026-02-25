@@ -34,7 +34,7 @@ Persistent WebSocket bridge between Node.js and Roblox Studio. Install a plugin 
 
 **Host** — A single process binds port 38741, accepts plugin and client connections, and tracks sessions. Any CLI invocation auto-promotes to host if the port is free.
 
-**Plugin** — A persistent Roblox Studio plugin that discovers the host by polling `GET /health`, then connects via WebSocket. Survives Studio restarts.
+**Plugin** — A persistent Roblox Studio plugin that discovers the host by polling `GET /health`, then connects via WebSocket. Survives Studio restarts. Actions are pushed dynamically over the wire on connect.
 
 **Client** — CLI commands and the MCP server connect as clients when a host is already running. Actions are relayed through the host to the target plugin.
 
@@ -42,7 +42,7 @@ Persistent WebSocket bridge between Node.js and Roblox Studio. Install a plugin 
 
 ```bash
 # 1. Install the persistent Studio plugin (one-time)
-studio-bridge install-plugin
+studio-bridge plugin install
 
 # 2. Start a bridge host (or let any command auto-start one)
 studio-bridge serve
@@ -50,68 +50,147 @@ studio-bridge serve
 # 3. Open Roblox Studio — the plugin connects automatically
 
 # 4. Execute Luau code
-studio-bridge exec 'print("hello from the bridge")'
+studio-bridge console exec 'print("hello from the bridge")'
 
-# 5. Run a script file
-studio-bridge run test.lua
+# 5. Query the DataModel
+studio-bridge explorer query Workspace --children
 ```
 
 ## CLI Commands
 
-| Command | Description |
-|---------|-------------|
-| `exec <code>` | Execute inline Luau code |
-| `run <file>` | Execute a Luau script file |
-| `terminal` | Interactive REPL (keeps Studio alive between executions) |
-| `sessions` | List active sessions |
-| `serve` | Start a dedicated bridge host |
-| `state` | Query current Studio state (mode, place, IDs) |
-| `logs` | Retrieve and stream output logs |
-| `screenshot` | Capture a screenshot from Studio |
-| `query <path>` | Query the DataModel (instances, properties, attributes) |
-| `mcp` | Start an MCP server (stdio transport) |
-| `launch` | Launch Roblox Studio |
-| `install-plugin` | Install the persistent bridge plugin |
-| `uninstall-plugin` | Remove the persistent bridge plugin |
+```
+studio-bridge <command> [options]
 
-### `exec`
+Execution:
+  console <command>      Execute code and view logs
+  explorer <command>     Query and modify the DataModel
+  viewport <command>     Screenshots and camera control
+  action <name>          Invoke a Studio action
 
-```bash
-studio-bridge exec 'print(workspace:GetChildren())'
-studio-bridge exec 'return game.PlaceId' --json
-studio-bridge exec 'print("hello")' --session my-session
+Infrastructure:
+  process <command>      Manage Studio processes
+  plugin <command>       Manage the bridge plugin
+  serve                  Start the bridge server
+  mcp                    Start the MCP server
+  terminal               Interactive REPL
 ```
 
-| Option | Alias | Default | Description |
-|--------|-------|---------|-------------|
-| `--session` | `-s` | — | Target session ID |
-| `--instance` | — | — | Target instance ID |
-| `--context` | — | — | Target context (`edit`, `client`, `server`) |
-| `--json` | — | `false` | Output as JSON |
-
-### `run`
+### `console exec`
 
 ```bash
-studio-bridge run test.lua
-studio-bridge run test.lua --context server --json
+studio-bridge console exec 'print(workspace:GetChildren())'
+studio-bridge console exec --file test.lua
+studio-bridge console exec 'return game.PlaceId' --format json
 ```
 
-Same options as `exec`.
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--file` | `-f` | Path to a Luau script file |
+| `--target` | `-t` | Target session ID |
+| `--context` | — | Target context (`edit`, `client`, `server`) |
+
+### `console logs`
+
+```bash
+studio-bridge console logs
+studio-bridge console logs --count 100 --direction head
+studio-bridge console logs --levels Error,Warning
+```
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--count` | `-n` | Number of entries (default: 50) |
+| `--direction` | `-d` | `head` or `tail` (default: `tail`) |
+| `--levels` | `-l` | Filter by level (comma-separated) |
+| `--includeInternal` | — | Include internal bridge messages |
+
+### `explorer query`
+
+```bash
+studio-bridge explorer query Workspace
+studio-bridge explorer query Workspace.SpawnLocation --children --depth 3
+```
+
+| Option | Description |
+|--------|-------------|
+| `--children` | Include direct children |
+| `--depth` | Max depth (default: 0) |
+| `--properties` | Include instance properties |
+| `--attributes` | Include instance attributes |
+
+### `viewport screenshot`
+
+```bash
+studio-bridge viewport screenshot --output viewport.png
+studio-bridge viewport screenshot --format base64
+```
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--output` | `-o` | Write PNG to file |
+
+### `process list`
+
+```bash
+studio-bridge process list
+```
+
+Lists all active sessions with their ID, place, context, state, and origin.
+
+### `process info`
+
+```bash
+studio-bridge process info
+```
+
+Returns the Studio mode (`Edit`, `Play`, `Run`, etc.), place name, place ID, and game ID.
+
+### `process launch`
+
+```bash
+studio-bridge process launch
+studio-bridge process launch --place ./build/test.rbxl
+```
+
+### `process run`
+
+```bash
+studio-bridge process run 'print("hello")'
+studio-bridge process run --file test.lua --place ./build/test.rbxl
+```
+
+Explicit ephemeral mode: launches Studio, executes the script, and shuts down.
+
+### `process close`
+
+```bash
+studio-bridge process close --target session-id
+```
+
+Send a shutdown message to a connected Studio session.
+
+### `plugin install` / `plugin uninstall`
+
+```bash
+studio-bridge plugin install
+studio-bridge plugin uninstall
+```
+
+### `serve`
+
+```bash
+studio-bridge serve
+studio-bridge serve --port 9000
+```
 
 ### `terminal`
 
-Interactive REPL mode. Keeps Studio alive between executions — type Luau, see results, repeat.
+Interactive REPL mode. Keeps Studio alive between executions.
 
 ```bash
 studio-bridge terminal
 studio-bridge terminal --script init.lua
-studio-bridge terminal --script-text 'print("setup")'
 ```
-
-| Option | Alias | Default | Description |
-|--------|-------|---------|-------------|
-| `--script` | `-s` | — | Luau file to run on connect |
-| `--script-text` | `-t` | — | Inline Luau to run on connect |
 
 | Key | Action |
 |-----|--------|
@@ -119,96 +198,6 @@ studio-bridge terminal --script-text 'print("setup")'
 | Ctrl+Enter | Execute buffer |
 | Ctrl+C | Clear buffer (exit if empty) |
 | Ctrl+D | Exit |
-
-| Command | Description |
-|---------|-------------|
-| `.help` | Show keybindings |
-| `.exit` | Exit terminal |
-| `.run <file>` | Execute a Luau file |
-| `.clear` | Clear editor buffer |
-
-### `sessions`
-
-```bash
-studio-bridge sessions
-studio-bridge sessions --json
-```
-
-Lists all active sessions with their ID, place, context, state, and origin.
-
-### `serve`
-
-```bash
-studio-bridge serve
-studio-bridge serve --port 9000 --log-level debug
-studio-bridge serve --json
-```
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--port` | `38741` | Port to listen on |
-| `--json` | `false` | Output structured JSON lines |
-| `--log-level` | `info` | Verbosity (`silent`, `error`, `warn`, `info`, `debug`) |
-
-### `state`
-
-```bash
-studio-bridge state
-studio-bridge state --session my-session --json
-```
-
-Returns the Studio mode (`Edit`, `Play`, `Run`, etc.), place name, place ID, and game ID. Supports `--session`, `--instance`, `--context`, `--json`.
-
-### `logs`
-
-```bash
-studio-bridge logs
-studio-bridge logs --tail 100
-studio-bridge logs --head 20 --level Error,Warning
-studio-bridge logs --all --json
-```
-
-| Option | Alias | Default | Description |
-|--------|-------|---------|-------------|
-| `--tail` | — | `50` | Number of most recent entries |
-| `--head` | — | — | Number of oldest entries (overrides `--tail`) |
-| `--level` | `-l` | — | Filter by level (comma-separated: `Print`, `Warning`, `Error`) |
-| `--all` | — | `false` | Include internal messages |
-
-Also supports `--session`, `--instance`, `--context`, `--json`.
-
-### `screenshot`
-
-```bash
-studio-bridge screenshot --output viewport.png
-studio-bridge screenshot --base64
-studio-bridge screenshot --json
-```
-
-| Option | Alias | Default | Description |
-|--------|-------|---------|-------------|
-| `--output` | `-o` | — | File path to write the PNG |
-| `--base64` | — | `false` | Output raw base64 to stdout |
-
-Also supports `--session`, `--instance`, `--context`, `--json`.
-
-### `query`
-
-```bash
-studio-bridge query Workspace.SpawnLocation
-studio-bridge query Workspace --children
-studio-bridge query Workspace --descendants --depth 3 --properties
-```
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--children` | `false` | Include direct children |
-| `--descendants` | `false` | Include all descendants |
-| `--depth` | `10` | Max depth for descendants |
-| `--properties` | `false` | Include instance properties |
-| `--attributes` | `false` | Include instance attributes |
-
-Also supports `--session`, `--instance`, `--context`, `--json`.
 
 ### `mcp`
 
@@ -218,24 +207,29 @@ studio-bridge mcp
 
 Starts an MCP server over stdio. See [MCP Server](#mcp-server) for integration details.
 
+### `action`
+
+```bash
+studio-bridge action <name> [--payload '{"key": "value"}']
+```
+
+Invoke a named Studio action on the connected session.
+
 ## Global Options
 
-| Option | Alias | Default | Description |
-|--------|-------|---------|-------------|
-| `--place` | `-p` | — | Path to `.rbxl` file (builds minimal place via rojo if omitted) |
-| `--timeout` | — | `120000` | Timeout in milliseconds |
-| `--verbose` | — | `false` | Show internal debug output |
-| `--logs` / `--no-logs` | — | `true` | Show execution logs in spinner mode |
-| `--remote` | — | — | Connect to a remote bridge host (`host:port`) |
-| `--local` | — | `false` | Force local mode (skip devcontainer auto-detection) |
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--timeout` | `120000` | Timeout in milliseconds |
+| `--verbose` | `false` | Show internal debug output |
+| `--remote` | — | Connect to a remote bridge host (`host:port`) |
+| `--local` | `false` | Force local mode (skip devcontainer auto-detection) |
 
-### Session Selection
+### Target Selection
 
-Several commands accept `--session`, `--instance`, and `--context` to target a specific Studio session:
+Commands that target a session accept `--target` and `--context`:
 
 - **No flags** — auto-resolves if only one session exists
-- **`--session <id>`** — target a specific session by ID
-- **`--instance <id>`** — target by instance ID (groups Edit/Client/Server contexts)
+- **`--target <id>`** — target a specific session by ID
 - **`--context <ctx>`** — select context within an instance (`edit`, `client`, `server`)
 
 When Studio is in Play mode, a single instance has multiple contexts (Edit + Client + Server). The default is `edit`.
@@ -248,7 +242,7 @@ When Studio is in Play mode, a single instance has multiple contexts (Edit + Cli
 import { BridgeConnection } from '@quenty/studio-bridge';
 
 const connection = await BridgeConnection.connectAsync();
-const session = await connection.resolveSession();
+const session = await connection.resolveSessionAsync();
 
 const result = await session.execAsync('return game.PlaceId');
 console.log(result.success, result.returnValue);
@@ -338,12 +332,14 @@ Add to your Claude configuration:
 
 | Tool | Description |
 |------|-------------|
-| `studio_sessions` | List active sessions |
-| `studio_state` | Query Studio state (mode, place, IDs) |
-| `studio_exec` | Execute Luau code |
-| `studio_screenshot` | Capture viewport screenshot |
-| `studio_logs` | Retrieve buffered logs |
-| `studio_query` | Query DataModel instances and properties |
+| `studio_console_exec` | Execute Luau code |
+| `studio_console_logs` | Retrieve buffered logs |
+| `studio_explorer_query` | Query DataModel instances and properties |
+| `studio_viewport_screenshot` | Capture viewport screenshot |
+| `studio_process_info` | Query Studio state (mode, place, IDs) |
+| `studio_process_list` | List active sessions |
+| `studio_process_close` | Send shutdown to a session |
+| `studio_action` | Invoke a named Studio action |
 
 All session-aware tools accept optional `sessionId` and `context` parameters and auto-resolve when omitted.
 
@@ -384,6 +380,7 @@ All messages are JSON: `{ type, sessionId, payload }`. The plugin and server neg
 | `heartbeat` | `{ uptimeMs, state, pendingRequests }` | Periodic keep-alive |
 | `subscribeResult` | `{ requestId, events }` | Subscription confirmed |
 | `unsubscribeResult` | `{ requestId, events }` | Unsubscription confirmed |
+| `registerActionResult` | `{ requestId, name, success, error? }` | Dynamic action registration result |
 | `error` | `{ requestId, code, message }` | Error response |
 
 **Server to Plugin:**
@@ -396,10 +393,11 @@ All messages are JSON: `{ type, sessionId, payload }`. The plugin and server neg
 | `queryLogs` | `{ requestId, tail?, head?, levels? }` | Request buffered logs |
 | `subscribe` | `{ requestId, events }` | Subscribe to push events |
 | `unsubscribe` | `{ requestId, events }` | Unsubscribe from events |
+| `registerAction` | `{ requestId, name, source, responseType? }` | Push a Luau action module dynamically |
 
 ### Capabilities
 
-Negotiated during handshake: `execute`, `queryState`, `captureScreenshot`, `queryDataModel`, `queryLogs`, `subscribe`, `heartbeat`.
+Negotiated during handshake: `execute`, `queryState`, `captureScreenshot`, `queryDataModel`, `queryLogs`, `subscribe`, `heartbeat`, `registerAction`.
 
 ### Output Levels
 
@@ -408,6 +406,20 @@ Negotiated during handshake: `execute`, `queryState`, `captureScreenshot`, `quer
 ### Error Codes
 
 `UNKNOWN_REQUEST`, `INVALID_PAYLOAD`, `TIMEOUT`, `CAPABILITY_NOT_SUPPORTED`, `INSTANCE_NOT_FOUND`, `PROPERTY_NOT_FOUND`, `SCREENSHOT_FAILED`, `SCRIPT_LOAD_ERROR`, `SCRIPT_RUNTIME_ERROR`, `BUSY`, `SESSION_MISMATCH`, `INTERNAL_ERROR`
+
+## Dynamic Action Registration
+
+The bridge plugin ships as a thin runtime — no static Luau action modules. Instead, action code is pushed dynamically over the wire when a plugin connects:
+
+1. Plugin connects and sends `register` with `registerAction` capability
+2. Bridge host scans co-located `.luau` files from `src/commands/<group>/<name>/`
+3. Each action's source is sent via `registerAction` message
+4. Plugin calls `loadstring()` to install the handler at runtime
+
+This means:
+- Adding a new command requires only a `.ts` + `.luau` file in the command directory
+- No plugin reinstallation needed when actions change
+- Hot-reload during development: reconnect pushes updated action code
 
 ## Plugin Discovery
 
@@ -418,6 +430,7 @@ The persistent plugin discovers the bridge host automatically:
 3. Connect to `ws://localhost:{port}/plugin`
 4. Send `register` message with capabilities
 5. Receive `welcome` with negotiated protocol version
+6. Receive `registerAction` messages for each command's Luau action
 
 If the health endpoint is unreachable, the plugin retries with backoff. The plugin survives Studio restarts and reconnects automatically when a host becomes available.
 

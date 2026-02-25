@@ -20,13 +20,8 @@ local ActionRouter = require(script.Parent.Shared.ActionRouter)
 local DiscoveryStateMachine = require(script.Parent.Shared.DiscoveryStateMachine)
 local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
 
--- Actions
-local CaptureScreenshotAction = require(script.Parent.Actions.CaptureScreenshotAction)
-local ExecuteAction = require(script.Parent.Actions.ExecuteAction)
-local QueryDataModelAction = require(script.Parent.Actions.QueryDataModelAction)
-local QueryLogsAction = require(script.Parent.Actions.QueryLogsAction)
-local QueryStateAction = require(script.Parent.Actions.QueryStateAction)
-local SubscribeAction = require(script.Parent.Actions.SubscribeAction)
+-- Actions are pushed dynamically over the wire via registerAction.
+-- No static action requires needed.
 
 -- Build constants (Handlebars templates substituted at build time)
 local PORT = "{{PORT}}"
@@ -104,6 +99,15 @@ end
 local router = ActionRouter.new()
 local logBuffer = MessageBuffer.new(1000)
 
+-- Pre-load the PNG encoder and expose it to dynamically loaded actions
+-- via router._vendorPng. The screenshot action reads this in its register().
+local _pngOk, _pngModule = pcall(function()
+	return require(script.Parent.Vendor.png)
+end)
+if _pngOk and _pngModule then
+	router._vendorPng = _pngModule
+end
+
 -- Wire outgoing messages (set after WebSocket is connected)
 local sendMessageFn = nil
 
@@ -114,13 +118,29 @@ local function sendMessage(msg)
 	end
 end
 
--- Register action handlers
-ExecuteAction.register(router, sendMessage)
-QueryDataModelAction.register(router)
-QueryStateAction.register(router)
-QueryLogsAction.register(router, logBuffer)
-CaptureScreenshotAction.register(router, sendMessage)
-SubscribeAction.register(router)
+-- Register the built-in registerAction handler. This allows the bridge
+-- server to push Luau action modules over the wire after a plugin connects.
+router:register("registerAction", function(payload, requestId, sessionId)
+	local name = payload.name
+	local source = payload.source
+	local responseType = payload.responseType
+
+	if type(name) ~= "string" or type(source) ~= "string" then
+		return {
+			name = name or "unknown",
+			success = false,
+			error = "Invalid registerAction payload: name and source are required strings",
+		}
+	end
+
+	local success, err = router:registerAction(name, source, sendMessage, logBuffer, responseType)
+	return {
+		name = name,
+		success = success,
+		error = err,
+	}
+end)
+router:setResponseType("registerAction", "registerActionResult")
 
 local connected = false
 
@@ -182,6 +202,7 @@ local function wireConnection(ws, sessionId, connectLabel)
 				"captureScreenshot",
 				"subscribe",
 				"heartbeat",
+				"registerAction",
 			},
 		},
 	}))

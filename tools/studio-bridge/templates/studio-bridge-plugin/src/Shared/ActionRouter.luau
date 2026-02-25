@@ -18,10 +18,10 @@ local ActionRouter = {}
 ActionRouter.__index = ActionRouter
 
 -- ---------------------------------------------------------------------------
--- Response type mapping
+-- Default response type mapping
 -- ---------------------------------------------------------------------------
 
-local RESPONSE_TYPES: { [string]: string } = {
+local DEFAULT_RESPONSE_TYPES: { [string]: string } = {
 	execute = "scriptComplete",
 	queryState = "stateResult",
 	captureScreenshot = "screenshotResult",
@@ -36,10 +36,17 @@ local RESPONSE_TYPES: { [string]: string } = {
 -- ---------------------------------------------------------------------------
 
 function ActionRouter.new()
+	-- Copy default response types so each instance can be extended
+	local responseTypes = {}
+	for k, v in DEFAULT_RESPONSE_TYPES do
+		responseTypes[k] = v
+	end
+
 	local self = setmetatable({
 		_handlers = {} :: {
 			[string]: (payload: { [string]: any }, requestId: string, sessionId: string) -> { [string]: any }?,
 		},
+		_responseTypes = responseTypes,
 	}, ActionRouter)
 	return self
 end
@@ -113,7 +120,7 @@ function ActionRouter.dispatch(
 	end
 
 	-- Construct response with the appropriate response type
-	local responseType = RESPONSE_TYPES[message.type] or (message.type .. "Result")
+	local responseType = self._responseTypes[message.type] or (message.type .. "Result")
 
 	return {
 		type = responseType,
@@ -121,6 +128,79 @@ function ActionRouter.dispatch(
 		requestId = message.requestId,
 		payload = result,
 	}
+end
+
+-- ---------------------------------------------------------------------------
+-- Set a custom response type for a message type
+-- ---------------------------------------------------------------------------
+
+function ActionRouter.setResponseType(self: any, messageType: string, responseType: string)
+	self._responseTypes[messageType] = responseType
+end
+
+-- ---------------------------------------------------------------------------
+-- Register a dynamic action from source code
+-- ---------------------------------------------------------------------------
+
+--[[
+	Dynamically register an action from Luau source code received over the wire.
+
+	The source is expected to be a module that returns a table with a `register`
+	function: `function(router, sendMessage?, logBuffer?)`. This mirrors the
+	static action module convention.
+
+	If the source defines a simple handler function instead, it is registered
+	directly as the handler for the given action name.
+
+	@param name The action name (used as the message type if not registered otherwise).
+	@param source The Luau source code string.
+	@param sendMessage Optional callback for actions that send their own responses.
+	@param logBuffer Optional log buffer instance.
+	@param responseType Optional response type override.
+	@return success, error?
+]]
+function ActionRouter.registerAction(
+	self: any,
+	name: string,
+	source: string,
+	sendMessage: ((msg: { [string]: any }) -> ())?,
+	logBuffer: any?,
+	responseType: string?
+): (boolean, string?)
+	-- Load the source code
+	local loadOk, moduleOrErr = pcall(function()
+		return (loadstring :: any)(source, `@action/{name}`)
+	end)
+
+	if not loadOk or not moduleOrErr then
+		return false, `Failed to load action source: {moduleOrErr or "loadstring returned nil"}`
+	end
+
+	-- Execute the loaded chunk to get the module table
+	local execOk, moduleTable = pcall(moduleOrErr)
+	if not execOk then
+		return false, `Failed to execute action module: {moduleTable}`
+	end
+
+	-- If the module has a register function, call it
+	if type(moduleTable) == "table" and type(moduleTable.register) == "function" then
+		local regOk, regErr = pcall(moduleTable.register, self, sendMessage, logBuffer)
+		if not regOk then
+			return false, `register() failed: {regErr}`
+		end
+	elseif type(moduleTable) == "function" then
+		-- Simple handler function
+		self:register(name, moduleTable)
+	else
+		return false, `Action module must return a table with .register() or a function`
+	end
+
+	-- Set custom response type if provided
+	if responseType then
+		self._responseTypes[name] = responseType
+	end
+
+	return true, nil
 end
 
 return ActionRouter
