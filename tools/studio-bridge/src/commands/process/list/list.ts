@@ -3,8 +3,11 @@
  */
 
 import { defineCommand } from '../../framework/define-command.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
+import { formatAsTable, type TableColumn } from '../../../cli/format-output.js';
 import type { BridgeConnection } from '../../../bridge/index.js';
 import type { SessionInfo } from '../../../bridge/index.js';
+import type { StudioState } from '../../../server/web-socket-protocol.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -41,6 +44,32 @@ export async function listSessionsHandlerAsync(
 }
 
 // ---------------------------------------------------------------------------
+// Formatters
+// ---------------------------------------------------------------------------
+
+function colorizeState(state: StudioState): string {
+  switch (state) {
+    case 'Edit': return OutputHelper.formatInfo(state);
+    case 'Play':
+    case 'Run': return OutputHelper.formatSuccess(state);
+    case 'Paused': return OutputHelper.formatWarning(state);
+    default: return state;
+  }
+}
+
+const sessionColumns: TableColumn<SessionInfo>[] = [
+  { header: 'Session', value: (s) => s.sessionId.slice(0, 8), format: (v) => OutputHelper.formatHint(v) },
+  { header: 'Context', value: (s) => s.context },
+  { header: 'Place', value: (s) => s.placeName },
+  { header: 'State', value: (s) => s.state, format: (v) => colorizeState(v as StudioState) },
+];
+
+export function formatSessionsTable(result: SessionsResult): string {
+  if (result.sessions.length === 0) return result.summary;
+  return formatAsTable(result.sessions, sessionColumns);
+}
+
+// ---------------------------------------------------------------------------
 // Command definition
 // ---------------------------------------------------------------------------
 
@@ -52,6 +81,12 @@ export const listCommand = defineCommand({
   safety: 'read',
   scope: 'connection',
   args: {},
+  cli: {
+    formatResult: {
+      text: formatSessionsTable,
+      table: formatSessionsTable,
+    },
+  },
   handler: async (connection) => listSessionsHandlerAsync(connection),
   mcp: {
     mapResult: (result) => [

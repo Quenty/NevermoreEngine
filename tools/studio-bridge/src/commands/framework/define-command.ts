@@ -52,10 +52,16 @@ export interface McpConfig<TArgs, TResult> {
   mapResult?: (result: TResult) => McpContentBlock[];
 }
 
+/** Per-mode formatter record. Each key maps to a function that formats the result for that mode. */
+export type FormatResultMap<TResult> = Partial<Record<OutputMode, (result: TResult) => string>>;
+
 /** Optional CLI-specific overrides. */
 export interface CliConfig<TResult> {
-  /** Format the result for display. Falls back to JSON. */
-  formatResult?: (result: TResult, mode: OutputMode) => string;
+  /** Static lookup table of formatters by output mode. The adapter validates the user's
+   *  --format choice against these keys and errors if the mode is unsupported. */
+  formatResult?: FormatResultMap<TResult>;
+  /** Field name containing base64 binary data for raw file writes via --output. */
+  binaryField?: string;
 }
 
 // ---------------------------------------------------------------------------

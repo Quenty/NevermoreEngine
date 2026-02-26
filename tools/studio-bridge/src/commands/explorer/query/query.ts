@@ -5,6 +5,7 @@
 
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { BridgeSession } from '../../../bridge/index.js';
 import type {
   DataModelResult as BridgeDataModelResult,
@@ -105,6 +106,33 @@ export async function queryDataModelHandlerAsync(
 }
 
 // ---------------------------------------------------------------------------
+// Formatters
+// ---------------------------------------------------------------------------
+
+function formatNode(node: DataModelNode, depth: number): string {
+  const indent = '  '.repeat(depth);
+  const lines = [`${indent}${node.name} (${OutputHelper.formatDim(node.className)}) ${OutputHelper.formatDim(node.path)}`];
+  if (node.properties) {
+    for (const [key, val] of Object.entries(node.properties)) {
+      lines.push(`${indent}  ${key}: ${JSON.stringify(val)}`);
+    }
+  }
+  if (node.attributes) {
+    for (const [key, val] of Object.entries(node.attributes)) {
+      lines.push(`${indent}  @${key}: ${JSON.stringify(val)}`);
+    }
+  }
+  for (const child of node.children ?? []) {
+    lines.push(formatNode(child, depth + 1));
+  }
+  return lines.join('\n');
+}
+
+export function formatQueryText(result: QueryResult): string {
+  return formatNode(result.node, 0);
+}
+
+// ---------------------------------------------------------------------------
 // Command definition
 // ---------------------------------------------------------------------------
 
@@ -122,6 +150,12 @@ export const queryCommand = defineCommand<QueryOptions, QueryResult>({
     attributes: arg.flag({ description: 'Include instance attributes' }),
     children: arg.flag({ description: 'Include direct children' }),
     descendants: arg.flag({ description: 'Include all descendants' }),
+  },
+  cli: {
+    formatResult: {
+      text: formatQueryText,
+      table: formatQueryText,
+    },
   },
   handler: async (session, args) => {
     return queryDataModelHandlerAsync(session, args);

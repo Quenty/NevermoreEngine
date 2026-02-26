@@ -4,6 +4,7 @@
  */
 
 import { defineCommand } from '../../framework/define-command.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { BridgeSession } from '../../../bridge/index.js';
 import type { StudioState } from '../../../bridge/index.js';
 
@@ -38,6 +39,29 @@ export async function queryStateHandlerAsync(
 }
 
 // ---------------------------------------------------------------------------
+// Formatters
+// ---------------------------------------------------------------------------
+
+function colorizeState(state: StudioState): string {
+  switch (state) {
+    case 'Edit': return OutputHelper.formatInfo(state);
+    case 'Play':
+    case 'Run': return OutputHelper.formatSuccess(state);
+    case 'Paused': return OutputHelper.formatWarning(state);
+    default: return state;
+  }
+}
+
+export function formatStateText(result: StateResult): string {
+  return [
+    `Mode:    ${colorizeState(result.state)}`,
+    `Place:   ${result.placeName}`,
+    `PlaceId: ${result.placeId}`,
+    `GameId:  ${result.gameId}`,
+  ].join('\n');
+}
+
+// ---------------------------------------------------------------------------
 // Command definition
 // ---------------------------------------------------------------------------
 
@@ -49,6 +73,12 @@ export const infoCommand = defineCommand({
   safety: 'read',
   scope: 'session',
   args: {},
+  cli: {
+    formatResult: {
+      text: formatStateText,
+      table: formatStateText,
+    },
+  },
   handler: async (session) => queryStateHandlerAsync(session),
   mcp: {
     mapResult: (result) => [

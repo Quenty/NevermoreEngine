@@ -5,6 +5,7 @@
 
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { BridgeSession } from '../../../bridge/index.js';
 import type { LogEntry, LogsResult as BridgeLogsResult } from '../../../bridge/index.js';
 import type { OutputLevel } from '../../../server/web-socket-protocol.js';
@@ -51,6 +52,29 @@ export async function queryLogsHandlerAsync(
 }
 
 // ---------------------------------------------------------------------------
+// Formatters
+// ---------------------------------------------------------------------------
+
+function colorizeLevel(level: OutputLevel): string {
+  switch (level) {
+    case 'Error': return OutputHelper.formatError(level);
+    case 'Warning': return OutputHelper.formatWarning(level);
+    default: return level;
+  }
+}
+
+export function formatLogsText(result: LogsResult): string {
+  if (result.entries.length === 0) return result.summary;
+  const lines = result.entries.map((e) => {
+    const ts = OutputHelper.formatDim(new Date(e.timestamp).toLocaleTimeString());
+    const level = colorizeLevel(e.level);
+    return `[${ts}] [${level}] ${e.body}`;
+  });
+  lines.push(OutputHelper.formatDim(`(${result.entries.length} of ${result.total} entries)`));
+  return lines.join('\n');
+}
+
+// ---------------------------------------------------------------------------
 // Command definition
 // ---------------------------------------------------------------------------
 
@@ -78,6 +102,12 @@ export const logsCommand = defineCommand<LogsOptions, LogsResult>({
     includeInternal: arg.flag({
       description: 'Include internal/system log messages',
     }),
+  },
+  cli: {
+    formatResult: {
+      text: formatLogsText,
+      table: formatLogsText,
+    },
   },
   handler: async (session, args) => {
     return queryLogsHandlerAsync(session, {

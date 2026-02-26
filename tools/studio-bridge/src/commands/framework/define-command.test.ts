@@ -136,12 +136,14 @@ describe('defineCommand', () => {
       args: {},
       handler: async () => ({ done: true }),
       cli: {
-        formatResult: () => 'formatted',
+        formatResult: {
+          text: () => 'formatted',
+        },
       },
     });
 
     expect(cmd.cli).toBeDefined();
-    expect(cmd.cli!.formatResult!({} as any, 'text')).toBe('formatted');
+    expect(cmd.cli!.formatResult!.text!({} as any)).toBe('formatted');
   });
 
   it('allows null group for top-level commands', () => {

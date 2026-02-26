@@ -14,7 +14,7 @@ import {
 export type { OutputMode, TableColumn };
 
 export interface FormatOptions {
-  json?: boolean;
+  format?: string;   // 'text' | 'json' | 'base64' | undefined
   isTTY?: boolean;
 }
 
@@ -22,10 +22,10 @@ export interface FormatOptions {
  * Resolve the output mode based on CLI flags and TTY detection.
  */
 export function resolveMode(options: FormatOptions): OutputMode {
-  return resolveOutputMode({
-    json: options.json,
-    isTTY: options.isTTY ?? process.stdout.isTTY,
-  });
+  if (options.format === 'json') return 'json';
+  if (options.format === 'text') return 'text';
+  if (options.format === 'base64') return 'text';  // raw output mode
+  return resolveOutputMode({ isTTY: options.isTTY ?? process.stdout.isTTY });
 }
 
 /**

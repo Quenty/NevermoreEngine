@@ -7,6 +7,7 @@ import { defineCommand } from '../../framework/define-command.js';
 import type { BridgeSession } from '../../../bridge/index.js';
 import type { ScreenshotResult as BridgeScreenshotResult } from '../../../bridge/index.js';
 import { rgbaToPng } from '../../rgba-to-png.js';
+import { formatAsJson } from '../../../cli/format-output.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -56,7 +57,7 @@ export async function captureScreenshotHandlerAsync(
 // Command definition
 // ---------------------------------------------------------------------------
 
-export const screenshotCommand = defineCommand({
+export const screenshotCommand = defineCommand<ScreenshotOptions, ScreenshotResult>({
   group: 'viewport',
   name: 'screenshot',
   description: 'Capture a viewport screenshot from Studio',
@@ -64,6 +65,14 @@ export const screenshotCommand = defineCommand({
   safety: 'read',
   scope: 'session',
   args: {},
+  cli: {
+    binaryField: 'data',
+    formatResult: {
+      text: (result) => result.summary,
+      table: (result) => result.summary,
+      json: (result) => formatAsJson({ width: result.width, height: result.height, summary: result.summary }),
+    },
+  },
   handler: async (session) => captureScreenshotHandlerAsync(session),
   mcp: {
     mapResult: (result) => {
