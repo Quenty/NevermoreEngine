@@ -3,7 +3,7 @@ import { Observable } from '@quenty/rx';
 import { Symbol } from '@quenty/symbol';
 import { ValueObject } from '@quenty/valueobject';
 
-interface ObservableList<T> extends Iterable<T> {
+type ObservableList<T> = {
   Observe(): Observable<T[]>;
   ObserveItemsBrio(): Observable<Brio<[T, Symbol]>>;
   ObserveIndex(indexToObserve: number): Observable<number | undefined>;
@@ -22,7 +22,7 @@ interface ObservableList<T> extends Iterable<T> {
   RemoveByKey(key: Symbol): T | undefined;
   GetList(): T[];
   Destroy(): void;
-}
+} & IterableFunction<T>;
 
 interface ObservableListConstructor {
   readonly ClassName: 'ObservableList';
