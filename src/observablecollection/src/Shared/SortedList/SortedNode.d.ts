@@ -1,7 +1,7 @@
 type CompareFunction<T> = (a: T, b: T) => number;
 type WrappedIterator<T> = (...values: unknown[]) => T[];
 
-interface SortedNode<T> extends Iterable<T> {
+type SortedNode<T> = {
   IterateNodes(): WrappedIterator<[number, SortedNode<T>]>;
   IterateData(): WrappedIterator<[number, T]>;
   IterateNodesRange(
@@ -17,7 +17,7 @@ interface SortedNode<T> extends Iterable<T> {
   MarkBlack(): void;
   InsertNode(node: SortedNode<T>): SortedNode<T>;
   RemoveNode(node: SortedNode<T>): SortedNode<T>;
-}
+} & IterableFunction<LuaTuple<[index: number, value: T]>>;
 
 interface SortedNodeConstructor {
   readonly ClassName: 'SortedNode';

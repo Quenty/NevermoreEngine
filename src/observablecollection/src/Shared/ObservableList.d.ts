@@ -22,7 +22,7 @@ type ObservableList<T> = {
   RemoveByKey(key: Symbol): T | undefined;
   GetList(): T[];
   Destroy(): void;
-} & IterableFunction<T>;
+} & IterableFunction<LuaTuple<[index: number, value: T]>>;
 
 interface ObservableListConstructor {
   readonly ClassName: 'ObservableList';
