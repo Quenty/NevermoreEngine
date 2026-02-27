@@ -72,10 +72,10 @@ export namespace RxInstanceUtils {
     parent: Instance,
     predicate: (instance: Instance) => instance is T
   ): Observable<Brio<T>>;
-  function observeChildrenBrio(
+  function observeChildrenBrio<T extends Instance = Instance>(
     parent: Instance,
-    predicate?: Predicate<Instance>
-  ): Observable<Brio<Instance>>;
+    predicate?: Predicate<T>
+  ): Observable<Brio<T>>;
 
   function observeDescendants<T extends Instance>(
     parent: Instance,
