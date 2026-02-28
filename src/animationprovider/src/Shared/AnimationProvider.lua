@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Provides animations for anything tagged with "AnimationContainer" and from a folder named "Animations"
 	in ReplicatedStorage. See [TemplateProvider].

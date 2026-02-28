@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class IKRigUtils
 ]=]
@@ -22,7 +22,7 @@ function IKRigUtils.getTimeBeforeNextUpdate(distance: number): number
 	return updateRate
 end
 
-function IKRigUtils.getPlayerIKRig(binder, player: Player)
+function IKRigUtils.getPlayerIKRig(binder: any, player: Player): any
 	assert(binder, "Bad binder")
 
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
