@@ -10,7 +10,10 @@
  */
 
 import { randomUUID } from 'crypto';
+import * as fs from 'fs';
+import * as http from 'http';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
@@ -20,13 +23,18 @@ import {
 } from '@quenty/nevermore-template-helpers';
 import {
   type OutputLevel,
+  type Capability,
+  type PluginMessage,
+  type ServerMessage,
   encodeMessage,
   decodePluginMessage,
 } from './web-socket-protocol.js';
+import { ActionDispatcher } from './action-dispatcher.js';
 import {
   injectPluginAsync,
   type InjectedPlugin,
 } from '../plugin/plugin-injector.js';
+import { isPersistentPluginInstalled } from '../plugin/plugin-discovery.js';
 import {
   launchStudioAsync,
   type StudioProcess,
@@ -42,6 +50,22 @@ const sessionAttributeTransformScript = resolvePackagePath(
   'build-scripts',
   'transform-add-session-attribute.luau'
 );
+
+/** Read the package version from package.json at startup. */
+function readServerVersion(): string {
+  try {
+    const thisDir = path.dirname(fileURLToPath(import.meta.url));
+    // Walk up from src/server/ to package root
+    const pkgPath = path.resolve(thisDir, '..', '..', 'package.json');
+    const raw = fs.readFileSync(pkgPath, 'utf-8');
+    const pkg = JSON.parse(raw) as { version?: string };
+    return pkg.version ?? '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
+
+const SERVER_VERSION = readServerVersion();
 
 // ---------------------------------------------------------------------------
 // Public API types
@@ -64,6 +88,11 @@ export interface StudioBridgeServerOptions {
   onPhase?: (phase: StudioBridgePhase) => void;
   /** Session ID for concurrent session isolation. Auto-generated if omitted. */
   sessionId?: string;
+  /** Whether to prefer the persistent plugin over temp injection (default: true).
+   *  When true and the persistent plugin is installed, the server waits for
+   *  the plugin to discover it via the health endpoint before falling back
+   *  to temporary injection. Set to false in CI environments. */
+  preferPersistentPlugin?: boolean;
 }
 
 export interface ExecuteOptions {
@@ -97,42 +126,179 @@ type BridgeState =
 // ---------------------------------------------------------------------------
 
 /**
- * Start a WebSocket server on a random available port and return the assigned
- * port number once listening.
+ * Create an HTTP server with health endpoint and a noServer WebSocket server.
+ * The HTTP server handles `GET /health` and 404 for other paths. WebSocket
+ * upgrades to `/${sessionId}` are forwarded to the WSS; others are rejected.
+ *
+ * Returns the assigned port once listening.
  */
-function startWsServerAsync(wss: WebSocketServer): Promise<number> {
+function startHttpAndWsServerAsync(
+  httpServer: http.Server,
+  wss: WebSocketServer,
+  sessionId: string,
+): Promise<number> {
+  // Handle normal HTTP requests
+  httpServer.on('request', (req: http.IncomingMessage, res: http.ServerResponse) => {
+    if (req.method === 'GET' && req.url === '/health') {
+      const addr = httpServer.address();
+      const port = typeof addr === 'object' && addr !== null ? addr.port : 0;
+      const body = JSON.stringify({
+        status: 'ok',
+        sessionId,
+        port,
+        protocolVersion: 2,
+        serverVersion: SERVER_VERSION,
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(body);
+      return;
+    }
+
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
+  });
+
+  // Handle WebSocket upgrades — only allow /${sessionId}
+  httpServer.on('upgrade', (req: http.IncomingMessage, socket: import('stream').Duplex, head: Buffer) => {
+    const expectedPath = `/${sessionId}`;
+    if (req.url !== expectedPath) {
+      socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit('connection', ws, req);
+    });
+  });
+
   return new Promise((resolve, reject) => {
-    wss.on('error', reject);
-    wss.on('listening', () => {
-      const addr = wss.address();
+    httpServer.on('error', reject);
+    httpServer.listen(0, () => {
+      const addr = httpServer.address();
       if (typeof addr === 'object' && addr !== null) {
         resolve(addr.port);
       } else {
-        reject(new Error('WebSocket server address is not available'));
+        reject(new Error('HTTP server address is not available'));
       }
     });
   });
 }
 
+/**
+ * Maps action types to the capability required to perform them.
+ * Used by performActionAsync to validate the plugin supports the action.
+ */
+const ACTION_CAPABILITIES: Record<string, Capability> = {
+  queryState: 'queryState',
+  captureScreenshot: 'captureScreenshot',
+  queryDataModel: 'queryDataModel',
+  queryLogs: 'queryLogs',
+  subscribe: 'subscribe',
+  unsubscribe: 'subscribe',
+  execute: 'execute',
+};
+
 export class StudioBridgeServer {
   private _state: BridgeState = 'idle';
 
+  private readonly _options: StudioBridgeServerOptions;
   private readonly _sessionId: string;
   private readonly _defaultTimeoutMs: number;
   private readonly _onPhase: ((phase: StudioBridgePhase) => void) | undefined;
   private readonly _placePath: string | undefined;
 
+  private _httpServer: http.Server | undefined;
   private _wss: WebSocketServer | undefined;
+  private _port: number = 0;
   private _pluginHandle: InjectedPlugin | undefined;
   private _studioProc: StudioProcess | undefined;
   private _placeBuildContext: BuildContext | undefined;
   private _connectedClient: WebSocket | undefined;
 
+  private _negotiatedProtocolVersion: number = 1;
+  private _negotiatedCapabilities: Capability[] = ['execute'];
+  private _lastHeartbeatTimestamp: number | undefined;
+  private _actionDispatcher = new ActionDispatcher();
+
   constructor(options: StudioBridgeServerOptions = {}) {
+    this._options = options;
     this._sessionId = options.sessionId ?? randomUUID();
     this._defaultTimeoutMs = options.timeoutMs ?? 120_000;
     this._onPhase = options.onPhase;
     this._placePath = options.placePath;
+  }
+
+  // -----------------------------------------------------------------------
+  // Public getters for negotiated protocol state
+  // -----------------------------------------------------------------------
+
+  /** The negotiated protocol version (1 for v1, 2 for v2 plugins). */
+  get protocolVersion(): number {
+    return this._negotiatedProtocolVersion;
+  }
+
+  /** The negotiated set of capabilities shared between plugin and server. */
+  get capabilities(): readonly Capability[] {
+    return this._negotiatedCapabilities;
+  }
+
+  /** Timestamp of the last heartbeat received from the plugin, or undefined. */
+  get lastHeartbeatTimestamp(): number | undefined {
+    return this._lastHeartbeatTimestamp;
+  }
+
+  // -----------------------------------------------------------------------
+  // v2 action dispatch
+  // -----------------------------------------------------------------------
+
+  /**
+   * Send a v2 protocol action to the connected plugin and wait for the
+   * correlated response. Requires protocol version >= 2 and the relevant
+   * capability to be negotiated.
+   *
+   * This is the v2 path -- the v1 `executeAsync` is unchanged.
+   */
+  async performActionAsync<T extends PluginMessage>(
+    message: Omit<ServerMessage, 'requestId' | 'sessionId'>,
+    timeoutMs?: number,
+  ): Promise<T> {
+    if (this._state !== 'ready') {
+      throw new Error(
+        `Cannot perform action: expected state 'ready', got '${this._state}'`,
+      );
+    }
+    if (!this._connectedClient) {
+      throw new Error('Cannot perform action: no connected client');
+    }
+    if (this._negotiatedProtocolVersion < 2) {
+      throw new Error('Plugin does not support v2 actions');
+    }
+
+    // Validate capability
+    const actionType = message.type;
+    const requiredCapability = ACTION_CAPABILITIES[actionType];
+    if (
+      requiredCapability &&
+      !this._negotiatedCapabilities.includes(requiredCapability)
+    ) {
+      throw new Error(`Plugin does not support capability: ${requiredCapability}`);
+    }
+
+    const { requestId, responsePromise } = this._actionDispatcher.createRequestAsync(
+      actionType,
+      timeoutMs,
+    );
+
+    const fullMessage: ServerMessage = {
+      ...message,
+      requestId,
+      sessionId: this._sessionId,
+    } as ServerMessage;
+
+    this._connectedClient.send(encodeMessage(fullMessage));
+
+    return responsePromise as Promise<T>;
   }
 
   // -----------------------------------------------------------------------
@@ -181,21 +347,41 @@ export class StudioBridgeServer {
       );
       placePath = transformedPlacePath;
 
-      // 1. Start WebSocket server (unique path rejects wrong connections at HTTP upgrade level)
-      this._wss = new WebSocketServer({ port: 0, path: `/${this._sessionId}` });
-      const port = await startWsServerAsync(this._wss);
+      // 1. Start HTTP + WebSocket server (unique path rejects wrong connections at upgrade level)
+      this._httpServer = http.createServer();
+      this._wss = new WebSocketServer({ noServer: true });
+      const port = await startHttpAndWsServerAsync(this._httpServer, this._wss, this._sessionId);
+      this._port = port;
       OutputHelper.verbose(
         `[StudioBridge] WebSocket server listening on port ${port}`
       );
 
-      // 2. Inject plugin (no scriptContent — scripts are sent via execute messages)
-      this._pluginHandle = await injectPluginAsync({
-        port,
-        sessionId: this._sessionId,
-      });
-      OutputHelper.verbose(
-        `[StudioBridge] Plugin injected: ${this._pluginHandle.pluginPath}`
-      );
+      // 2. Decide between persistent plugin and temp injection
+      const preferPersistent = this._options.preferPersistentPlugin ?? true;
+
+      if (preferPersistent && isPersistentPluginInstalled()) {
+        // Persistent plugin is installed. Skip injection and wait for the
+        // plugin to discover us via the health endpoint.
+        // Start a grace period timer: if the plugin does not connect within
+        // the grace period, fall back to temporary injection.
+        OutputHelper.verbose(
+          '[StudioBridge] Persistent plugin detected, waiting for connection'
+        );
+        const graceMs = 3_000;
+        const connected = await this._waitForPluginConnectionAsync(graceMs);
+        if (!connected) {
+          // Grace period expired. Plugin may not be running in Studio.
+          // Fall back to temporary injection.
+          OutputHelper.verbose(
+            '[StudioBridge] Grace period expired, falling back to temp injection'
+          );
+          await this._injectPluginAsync();
+        }
+      } else {
+        // No persistent plugin or preference disabled (CI mode).
+        // Use temporary injection (existing v1 behavior).
+        await this._injectPluginAsync();
+      }
 
       // 3. Launch Studio
       this._onPhase?.('launching');
@@ -204,9 +390,11 @@ export class StudioBridgeServer {
         `[StudioBridge] Studio launched (PID: ${this._studioProc.process.pid})`
       );
 
-      // 4. Wait for handshake
+      // 4. Wait for handshake (only if not already connected via persistent plugin)
       this._onPhase?.('connecting');
-      await this._waitForHandshakeAsync();
+      if (!this._connectedClient) {
+        await this._waitForHandshakeAsync();
+      }
 
       this._state = 'ready';
     } catch (error) {
@@ -298,10 +486,217 @@ export class StudioBridgeServer {
   }
 
   // -----------------------------------------------------------------------
+  // Private: _injectPluginAsync
+  // -----------------------------------------------------------------------
+
+  /**
+   * Inject the temporary plugin via rojo build into Studio's plugins folder.
+   */
+  private async _injectPluginAsync(): Promise<void> {
+    this._pluginHandle = await injectPluginAsync({
+      port: this._port,
+      sessionId: this._sessionId,
+    });
+    OutputHelper.verbose(
+      `[StudioBridge] Plugin injected: ${this._pluginHandle.pluginPath}`
+    );
+  }
+
+  // -----------------------------------------------------------------------
+  // Private: _waitForPluginConnectionAsync
+  // -----------------------------------------------------------------------
+
+  /**
+   * Wait for a persistent plugin to connect via WebSocket within the grace
+   * period. Returns true if a plugin connected (sent hello or register),
+   * false if the grace period expired.
+   */
+  private _waitForPluginConnectionAsync(graceMs: number): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      let settled = false;
+
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          resolve(false);
+        }
+      }, graceMs);
+
+      this._wss!.on('connection', (ws: WebSocket) => {
+        if (settled) return;
+
+        const onMessage = (raw: Buffer | string) => {
+          if (settled) return;
+          const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+          const msg = decodePluginMessage(data);
+          if (!msg) return;
+
+          if (msg.type === 'hello' || msg.type === 'register') {
+            settled = true;
+            clearTimeout(timer);
+            ws.off('message', onMessage);
+
+            // Perform the full handshake using the existing logic.
+            // We push this message back by emitting it after re-registering
+            // the handshake handler. Instead, we resolve true and let
+            // _waitForHandshakeAsync handle the actual handshake.
+            // But we need to handle the handshake inline here since the
+            // message is already consumed. Re-emit it.
+            // Actually, we should NOT consume the message. We need to let
+            // _waitForHandshakeAsync handle it. Unfortunately, the 'connection'
+            // event has already fired. We can manually emit the message event.
+            //
+            // The cleanest approach: complete the full handshake here ourselves.
+            this._handlePluginHandshakeMessage(ws, data, msg);
+            resolve(true);
+          }
+        };
+
+        ws.on('message', onMessage);
+
+        ws.on('error', (err) => {
+          OutputHelper.verbose(
+            `[StudioBridge] WebSocket error during grace period: ${err.message}`
+          );
+        });
+      });
+    });
+  }
+
+  /**
+   * Handle the handshake message (hello or register) from a plugin that
+   * connected during the grace period, completing negotiation and storing
+   * the connected client.
+   */
+  private _handlePluginHandshakeMessage(
+    ws: WebSocket,
+    rawData: string,
+    msg: PluginMessage,
+  ): void {
+    const serverSupportedCapabilities: Capability[] = [
+      'execute',
+      'queryState',
+      'captureScreenshot',
+      'queryDataModel',
+      'queryLogs',
+      'subscribe',
+    ];
+
+    if (msg.type === 'hello') {
+      // Check session ID match for hello messages
+      if (
+        msg.sessionId !== this._sessionId ||
+        msg.payload.sessionId !== this._sessionId
+      ) {
+        OutputHelper.verbose(
+          '[StudioBridge] Rejecting hello with wrong session ID during grace period'
+        );
+        ws.close();
+        return;
+      }
+
+      // Determine if this is a v2 hello
+      let rawProtocolVersion: number | undefined;
+      try {
+        const rawObj = JSON.parse(rawData) as Record<string, unknown>;
+        if (typeof rawObj.protocolVersion === 'number') {
+          rawProtocolVersion = rawObj.protocolVersion;
+        }
+      } catch {
+        // ignore
+      }
+
+      const isV2 = rawProtocolVersion !== undefined && rawProtocolVersion >= 2;
+
+      if (isV2) {
+        this._negotiatedProtocolVersion = Math.min(rawProtocolVersion!, 2);
+        const pluginCapabilities = msg.payload.capabilities ?? ['execute' as Capability];
+        this._negotiatedCapabilities = pluginCapabilities.filter(
+          (cap) => serverSupportedCapabilities.includes(cap),
+        );
+
+        OutputHelper.verbose('[StudioBridge] v2 handshake accepted (grace period)');
+        ws.send(JSON.stringify({
+          type: 'welcome',
+          sessionId: this._sessionId,
+          payload: {
+            sessionId: this._sessionId,
+            protocolVersion: this._negotiatedProtocolVersion,
+            capabilities: this._negotiatedCapabilities,
+          },
+        }));
+      } else {
+        this._negotiatedProtocolVersion = 1;
+        this._negotiatedCapabilities = ['execute'];
+
+        OutputHelper.verbose('[StudioBridge] Handshake accepted (grace period)');
+        ws.send(
+          encodeMessage({
+            type: 'welcome',
+            sessionId: this._sessionId,
+            payload: { sessionId: this._sessionId },
+          })
+        );
+      }
+    } else if (msg.type === 'register') {
+      this._negotiatedProtocolVersion = Math.min(msg.protocolVersion, 2);
+      this._negotiatedCapabilities = msg.payload.capabilities.filter(
+        (cap) => serverSupportedCapabilities.includes(cap),
+      );
+
+      OutputHelper.verbose('[StudioBridge] v2 register handshake accepted (grace period)');
+      ws.send(JSON.stringify({
+        type: 'welcome',
+        sessionId: this._sessionId,
+        payload: {
+          sessionId: this._sessionId,
+          protocolVersion: this._negotiatedProtocolVersion,
+          capabilities: this._negotiatedCapabilities,
+        },
+      }));
+    }
+
+    // Finish handshake — store client and wire up post-handshake listeners
+    this._connectedClient = ws;
+
+    ws.on('message', (raw: Buffer | string) => {
+      const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+      const innerMsg = decodePluginMessage(data);
+      if (!innerMsg) return;
+
+      if (this._actionDispatcher.handleResponse(innerMsg)) {
+        return;
+      }
+
+      if (innerMsg.type === 'heartbeat') {
+        this._lastHeartbeatTimestamp = Date.now();
+      }
+    });
+
+    ws.on('close', () => {
+      OutputHelper.verbose('[StudioBridge] Plugin disconnected');
+      this._connectedClient = undefined;
+      if (this._state !== 'stopping' && this._state !== 'stopped') {
+        this._state = 'stopped';
+      }
+    });
+  }
+
+  // -----------------------------------------------------------------------
   // Private: _waitForHandshakeAsync
   // -----------------------------------------------------------------------
 
   private _waitForHandshakeAsync(): Promise<void> {
+    // The full set of capabilities the server supports for negotiation.
+    const serverSupportedCapabilities: Capability[] = [
+      'execute',
+      'queryState',
+      'captureScreenshot',
+      'queryDataModel',
+      'queryLogs',
+      'subscribe',
+    ];
+
     return new Promise<void>((resolve, reject) => {
       let settled = false;
 
@@ -322,47 +717,98 @@ export class StudioBridgeServer {
         const onMessage = (raw: Buffer | string) => {
           const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
           const msg = decodePluginMessage(data);
-          if (!msg || msg.type !== 'hello') {
+          if (!msg) {
             return;
           }
 
-          if (
-            msg.sessionId !== this._sessionId ||
-            msg.payload.sessionId !== this._sessionId
-          ) {
-            OutputHelper.verbose(
-              `[StudioBridge] Rejecting hello with wrong session ID`
+          if (msg.type === 'hello') {
+            if (
+              msg.sessionId !== this._sessionId ||
+              msg.payload.sessionId !== this._sessionId
+            ) {
+              OutputHelper.verbose(
+                `[StudioBridge] Rejecting hello with wrong session ID`
+              );
+              ws.close();
+              return;
+            }
+
+            // Determine if this is a v2 hello (has protocolVersion in the raw message)
+            let rawProtocolVersion: number | undefined;
+            try {
+              const rawObj = JSON.parse(data) as Record<string, unknown>;
+              if (typeof rawObj.protocolVersion === 'number') {
+                rawProtocolVersion = rawObj.protocolVersion;
+              }
+            } catch {
+              // ignore parse errors, already decoded via decodePluginMessage
+            }
+
+            const isV2 = rawProtocolVersion !== undefined && rawProtocolVersion >= 2;
+
+            if (isV2) {
+              // v2 hello: negotiate protocol version and capabilities
+              this._negotiatedProtocolVersion = Math.min(rawProtocolVersion!, 2);
+              const pluginCapabilities = msg.payload.capabilities ?? ['execute' as Capability];
+              this._negotiatedCapabilities = pluginCapabilities.filter(
+                (cap) => serverSupportedCapabilities.includes(cap),
+              );
+
+              OutputHelper.verbose('[StudioBridge] v2 handshake accepted');
+              const welcomePayload: Record<string, unknown> = {
+                sessionId: this._sessionId,
+                protocolVersion: this._negotiatedProtocolVersion,
+                capabilities: this._negotiatedCapabilities,
+              };
+              ws.send(JSON.stringify({
+                type: 'welcome',
+                sessionId: this._sessionId,
+                payload: welcomePayload,
+              }));
+            } else {
+              // v1 hello: no protocol version or capabilities in welcome
+              this._negotiatedProtocolVersion = 1;
+              this._negotiatedCapabilities = ['execute'];
+
+              OutputHelper.verbose('[StudioBridge] Handshake accepted');
+              ws.send(
+                encodeMessage({
+                  type: 'welcome',
+                  sessionId: this._sessionId,
+                  payload: { sessionId: this._sessionId },
+                })
+              );
+            }
+
+            ws.off('message', onMessage);
+            this._finishHandshake(ws, settled, timer, resolve);
+            settled = true;
+            return;
+          }
+
+          if (msg.type === 'register') {
+            // Always v2
+            this._negotiatedProtocolVersion = Math.min(msg.protocolVersion, 2);
+            this._negotiatedCapabilities = msg.payload.capabilities.filter(
+              (cap) => serverSupportedCapabilities.includes(cap),
             );
-            ws.close();
-            return;
-          }
 
-          // Handshake accepted
-          OutputHelper.verbose('[StudioBridge] Handshake accepted');
-          ws.send(
-            encodeMessage({
+            OutputHelper.verbose('[StudioBridge] v2 register handshake accepted');
+            const welcomePayload: Record<string, unknown> = {
+              sessionId: this._sessionId,
+              protocolVersion: this._negotiatedProtocolVersion,
+              capabilities: this._negotiatedCapabilities,
+            };
+            ws.send(JSON.stringify({
               type: 'welcome',
               sessionId: this._sessionId,
-              payload: { sessionId: this._sessionId },
-            })
-          );
+              payload: welcomePayload,
+            }));
 
-          ws.off('message', onMessage);
-          this._connectedClient = ws;
-
-          // Listen for unexpected disconnect
-          ws.on('close', () => {
-            OutputHelper.verbose('[StudioBridge] Plugin disconnected');
-            this._connectedClient = undefined;
-            if (this._state !== 'stopping' && this._state !== 'stopped') {
-              this._state = 'stopped';
-            }
-          });
-
-          if (!settled) {
+            ws.off('message', onMessage);
+            this._finishHandshake(ws, settled, timer, resolve);
             settled = true;
-            clearTimeout(timer);
-            resolve();
+            return;
           }
         };
 
@@ -383,6 +829,51 @@ export class StudioBridgeServer {
         }
       });
     });
+  }
+
+  /**
+   * Common handshake completion: store the connected client, listen for
+   * heartbeats and disconnect events.
+   */
+  private _finishHandshake(
+    ws: WebSocket,
+    alreadySettled: boolean,
+    timer: ReturnType<typeof setTimeout>,
+    resolve: () => void,
+  ): void {
+    this._connectedClient = ws;
+
+    // Listen for all post-handshake messages: route through action dispatcher
+    // first, then handle heartbeats and other messages.
+    ws.on('message', (raw: Buffer | string) => {
+      const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+      const msg = decodePluginMessage(data);
+      if (!msg) return;
+
+      // Try action dispatcher first (v2 request/response correlation)
+      if (this._actionDispatcher.handleResponse(msg)) {
+        return;
+      }
+
+      // Heartbeat handling
+      if (msg.type === 'heartbeat') {
+        this._lastHeartbeatTimestamp = Date.now();
+      }
+    });
+
+    // Listen for unexpected disconnect
+    ws.on('close', () => {
+      OutputHelper.verbose('[StudioBridge] Plugin disconnected');
+      this._connectedClient = undefined;
+      if (this._state !== 'stopping' && this._state !== 'stopped') {
+        this._state = 'stopped';
+      }
+    });
+
+    if (!alreadySettled) {
+      clearTimeout(timer);
+      resolve();
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -499,6 +990,9 @@ export class StudioBridgeServer {
   // -----------------------------------------------------------------------
 
   private async _cleanupResourcesAsync(): Promise<void> {
+    // Cancel all pending v2 action requests
+    this._actionDispatcher.cancelAll('Server shutting down');
+
     // Kill Studio
     if (this._studioProc) {
       await this._studioProc.killAsync();
@@ -517,8 +1011,9 @@ export class StudioBridgeServer {
       this._placeBuildContext = undefined;
     }
 
-    // Close WebSocket server — terminate lingering connections first so
-    // the 'close' callback fires promptly.
+    // Terminate lingering WebSocket connections first so close callbacks
+    // fire promptly, then close the HTTP server (which owns the listening
+    // socket) and finally close the WSS.
     if (this._wss) {
       for (const wsClient of this._wss.clients) {
         wsClient.terminate();
@@ -527,6 +1022,13 @@ export class StudioBridgeServer {
         this._wss!.close(() => resolve());
       });
       this._wss = undefined;
+    }
+
+    if (this._httpServer) {
+      await new Promise<void>((resolve) => {
+        this._httpServer!.close(() => resolve());
+      });
+      this._httpServer = undefined;
     }
 
     this._connectedClient = undefined;

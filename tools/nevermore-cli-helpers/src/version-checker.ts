@@ -32,6 +32,8 @@ interface VersionCheckerOptions {
   packageJsonPath?: string;
   updateCommand?: string;
   verbose?: boolean;
+  /** Suppress the visual banner (box). The result is still returned so callers can embed it in structured output. */
+  silent?: boolean;
 }
 
 interface OurVersionData {
@@ -93,30 +95,32 @@ export class VersionChecker {
       );
     }
 
-    if (result.isLocalDev) {
-      const name = VersionChecker._getDisplayName(options);
-      const text = [
-        `${name} is running in local development mode`,
-        '',
-        OutputHelper.formatHint(
-          `Run '${updateCommand}' to switch to production copy`
-        ),
-        '',
-        'This will result in less errors.',
-      ].join('\n');
+    if (!options.silent) {
+      if (result.isLocalDev) {
+        const name = VersionChecker._getDisplayName(options);
+        const text = [
+          `${name} is running in local development mode`,
+          '',
+          OutputHelper.formatHint(
+            `Run '${updateCommand}' to switch to production copy`
+          ),
+          '',
+          'This will result in less errors.',
+        ].join('\n');
 
-      OutputHelper.box(text, { centered: true });
-    } else if (result.updateAvailable) {
-      const name = VersionChecker._getDisplayName(options);
-      const currentyVersionDisplayName =
-        VersionChecker._getLocalVersionDisplayName(versionData);
-      const text = [
-        `${name} update available: ${currentyVersionDisplayName} → ${result.latestVersion}`,
-        '',
-        OutputHelper.formatHint(`Run '${updateCommand}' to update`),
-      ].join('\n');
+        OutputHelper.box(text, { centered: true });
+      } else if (result.updateAvailable) {
+        const name = VersionChecker._getDisplayName(options);
+        const currentyVersionDisplayName =
+          VersionChecker._getLocalVersionDisplayName(versionData);
+        const text = [
+          `${name} update available: ${currentyVersionDisplayName} → ${result.latestVersion}`,
+          '',
+          OutputHelper.formatHint(`Run '${updateCommand}' to update`),
+        ].join('\n');
 
-      OutputHelper.box(text, { centered: true });
+        OutputHelper.box(text, { centered: true });
+      }
     }
 
     return result;

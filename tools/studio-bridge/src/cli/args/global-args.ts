@@ -6,4 +6,6 @@ export interface StudioBridgeGlobalArgs {
   place?: string;
   timeout: number;
   logs: boolean;
+  remote?: string;
+  local?: boolean;
 }

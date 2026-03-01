@@ -12,7 +12,8 @@
   "exports": {
     ".": "./dist/outputHelper.js",
     "./reporting": "./dist/reporting/index.js",
-    "./cli-utils": "./dist/cli-utils.js"
+    "./cli-utils": "./dist/cli-utils.js",
+    "./output-modes": "./dist/output-modes/index.js"
   },
   "typesVersions": {
     "*": {
@@ -21,6 +22,9 @@
       ],
       "cli-utils": [
         "dist/cli-utils.d.ts"
+      ],
+      "output-modes": [
+        "dist/output-modes/index.d.ts"
       ]
     }
   },

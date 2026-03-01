@@ -1,0 +1,1 @@
+../../../../src/commands/console/logs/query-logs.luau

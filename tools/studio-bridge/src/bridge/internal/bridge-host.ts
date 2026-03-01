@@ -1,0 +1,503 @@
+/**
+ * Bridge host that manages plugin connections. Creates a TransportServer
+ * and registers handlers for the /plugin and /health paths. Tracks
+ * connected plugins by sessionId and emits events on connect/disconnect.
+ */
+
+import { EventEmitter } from 'events';
+import type { WebSocket, RawData } from 'ws';
+import type { IncomingMessage } from 'http';
+import { TransportServer } from './transport-server.js';
+import { createHealthHandler } from './health-endpoint.js';
+import {
+  decodeHostMessage,
+  encodeHostMessage,
+  type HostProtocolMessage,
+  type HostTransferNotice,
+} from './host-protocol.js';
+import {
+  decodePluginMessage,
+  encodeMessage,
+  type Capability,
+  type ServerMessage,
+} from '../../server/web-socket-protocol.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
+
+// ---------------------------------------------------------------------------
+// Public types
+// ---------------------------------------------------------------------------
+
+export interface BridgeHostOptions {
+  /** Port to bind on. Default: 38741. Use 0 for ephemeral (test-friendly). */
+  port?: number;
+  /** Host to bind on. Default: 'localhost'. */
+  host?: string;
+}
+
+export interface PluginSessionInfo {
+  sessionId: string;
+  pluginVersion?: string;
+  capabilities: Capability[];
+  protocolVersion: number;
+  /** Instance ID from v2 register. Only present for v2 handshakes. */
+  instanceId?: string;
+  /** Place name from v2 register. */
+  placeName?: string;
+  /** Studio state from v2 register. */
+  state?: string;
+  /** Place file from v2 register. */
+  placeFile?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Implementation
+// ---------------------------------------------------------------------------
+
+const PROTOCOL_VERSION = 2;
+const SHUTDOWN_TIMEOUT_MS = 2_000;
+const SHUTDOWN_DRAIN_MS = 250;
+
+export class BridgeHost extends EventEmitter {
+  private _transport: TransportServer;
+  private _plugins: Map<string, WebSocket> = new Map();
+  private _clients: Set<WebSocket> = new Set();
+  private _isRunning = false;
+  private _shuttingDown = false;
+  private _startTime = 0;
+  private _hostStartTime = 0;
+  private _lastFailoverAt: string | null = null;
+
+  constructor() {
+    super();
+    this._transport = new TransportServer();
+  }
+
+  /** Time (ms) since this process became the host. */
+  get hostUptime(): number {
+    if (this._hostStartTime === 0) {
+      return 0;
+    }
+    return Date.now() - this._hostStartTime;
+  }
+
+  /** ISO timestamp of the last failover event, or null if none. */
+  get lastFailoverAt(): string | null {
+    return this._lastFailoverAt;
+  }
+
+  /**
+   * Mark this host as having been promoted via failover. Sets the
+   * hostStartTime to now and records the failover timestamp.
+   */
+  markFailover(): void {
+    this._hostStartTime = Date.now();
+    this._lastFailoverAt = new Date().toISOString();
+  }
+
+  /**
+   * Start the bridge host. Binds to the specified port and begins
+   * accepting plugin connections on /plugin and health checks on /health.
+   * Returns the actual bound port.
+   */
+  async startAsync(options?: BridgeHostOptions): Promise<number> {
+    if (this._isRunning) {
+      throw new Error('BridgeHost is already running');
+    }
+
+    this._startTime = Date.now();
+    if (this._hostStartTime === 0) {
+      this._hostStartTime = this._startTime;
+    }
+
+    // Register /plugin WebSocket handler — reject during shutdown
+    this._transport.onConnection('/plugin', (ws, request) => {
+      if (this._shuttingDown) {
+        ws.close(1001, 'host shutting down');
+        return;
+      }
+      this._handlePluginConnection(ws, request);
+    });
+
+    // Register /client WebSocket handler for CLI clients
+    this._transport.onConnection('/client', (ws) => {
+      this._clients.add(ws);
+
+      ws.on('message', (raw: RawData) => {
+        const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+        const msg = decodeHostMessage(data);
+        if (!msg) {
+          return;
+        }
+        this.emit('client-message', msg, (reply: HostProtocolMessage) => {
+          ws.send(encodeHostMessage(reply));
+        });
+      });
+
+      ws.on('close', () => {
+        this._clients.delete(ws);
+      });
+      ws.on('error', () => {
+        // Errors are handled implicitly via close
+      });
+    });
+
+    // Register /health HTTP handler — returns 503 during shutdown so
+    // plugins don't rediscover a host that's about to close
+    this._transport.onHttpRequest('/health', (req, res) => {
+      if (this._shuttingDown) {
+        res.writeHead(503);
+        res.end();
+        return;
+      }
+      createHealthHandler(() => ({
+        port: this._transport.port,
+        protocolVersion: PROTOCOL_VERSION,
+        sessions: this._plugins.size,
+        startTime: this._startTime,
+        hostStartTime: this._hostStartTime,
+        lastFailoverAt: this._lastFailoverAt,
+      }))(req, res);
+    });
+
+    const port = await this._transport.startAsync({
+      port: options?.port,
+      host: options?.host,
+    });
+
+    this._isRunning = true;
+    return port;
+  }
+
+  /**
+   * Stop the host and close all connections.
+   */
+  async stopAsync(): Promise<void> {
+    if (!this._isRunning) {
+      return;
+    }
+    this._isRunning = false;
+    this._plugins.clear();
+    this._clients.clear();
+    await this._transport.stopAsync();
+  }
+
+  /**
+   * Graceful shutdown: broadcast HostTransferNotice to all connected clients,
+   * wait briefly for them to process it, then close all connections and
+   * release the port. Idempotent — calling multiple times is safe.
+   *
+   * Wrapped in a timeout: if the graceful sequence exceeds 2 seconds, the
+   * transport is force-closed to ensure the port is freed.
+   */
+  async shutdownAsync(): Promise<void> {
+    if (this._shuttingDown) {
+      return;
+    }
+    this._shuttingDown = true;
+    OutputHelper.verbose(`[host] shutdownAsync called (plugins: ${this._plugins.size}, clients: ${this._clients.size})`);
+    OutputHelper.verbose(`[host] shutdown stack: ${new Error().stack?.split('\n').slice(1, 5).map((s) => s.trim()).join(' <- ')}`);
+
+    const gracefulShutdown = async () => {
+      // Step 1: Broadcast HostTransferNotice to all CLI clients
+      const notice: HostTransferNotice = { type: 'host-transfer' };
+      const encoded = encodeHostMessage(notice);
+      for (const ws of this._clients) {
+        try {
+          ws.send(encoded);
+        } catch {
+          // Client may already be disconnected
+        }
+      }
+
+      // Step 1.5: Send shutdown message to all plugins so they disconnect
+      // cleanly instead of seeing a WebSocket error
+      for (const [sessionId, ws] of this._plugins) {
+        try {
+          ws.send(encodeMessage({
+            type: 'shutdown',
+            sessionId,
+            payload: {} as Record<string, never>,
+          }));
+        } catch {
+          // Plugin may already be disconnected
+        }
+      }
+
+      // Step 2: Wait briefly for plugins/clients to process
+      await new Promise<void>((resolve) => setTimeout(resolve, SHUTDOWN_DRAIN_MS));
+
+      // Step 3: Send close frames to all plugins and clients
+      for (const ws of this._plugins.values()) {
+        try {
+          ws.close(1001, 'host shutting down');
+        } catch {
+          // Ignore
+        }
+      }
+      for (const ws of this._clients) {
+        try {
+          ws.close(1001, 'host shutting down');
+        } catch {
+          // Ignore
+        }
+      }
+
+      // Step 4: Stop the transport
+      this._isRunning = false;
+      this._plugins.clear();
+      this._clients.clear();
+      await this._transport.stopAsync();
+    };
+
+    // Wrap in timeout — force-close if graceful exceeds limit
+    const timeoutPromise = new Promise<'timeout'>((resolve) =>
+      setTimeout(() => resolve('timeout'), SHUTDOWN_TIMEOUT_MS),
+    );
+
+    const result = await Promise.race([
+      gracefulShutdown().then(() => 'done' as const),
+      timeoutPromise,
+    ]);
+
+    if (result === 'timeout') {
+      this._isRunning = false;
+      this._plugins.clear();
+      this._clients.clear();
+      await this._transport.forceCloseAsync();
+    }
+  }
+
+  /** The actual port the server is bound to. */
+  get port(): number {
+    return this._transport.port;
+  }
+
+  /** Whether the host is currently running. */
+  get isRunning(): boolean {
+    return this._isRunning;
+  }
+
+  /** Number of connected plugin sessions. */
+  get pluginCount(): number {
+    return this._plugins.size;
+  }
+
+  /**
+   * Send a host protocol message to all connected CLI clients.
+   */
+  broadcastToClients(msg: HostProtocolMessage): void {
+    const encoded = encodeHostMessage(msg);
+    for (const ws of this._clients) {
+      try {
+        ws.send(encoded);
+      } catch {
+        // Client may already be disconnected
+      }
+    }
+  }
+
+  /**
+   * Send a message to a specific plugin and wait for the response.
+   */
+  async sendToPluginAsync<TResponse>(
+    sessionId: string,
+    message: ServerMessage,
+    timeoutMs: number,
+  ): Promise<TResponse> {
+    const ws = this._plugins.get(sessionId);
+    if (!ws) {
+      throw new Error(`Plugin session '${sessionId}' not connected`);
+    }
+
+    const msgType = message.type;
+    OutputHelper.verbose(`[host] → plugin ${sessionId}: ${msgType} (timeout ${timeoutMs}ms)`);
+
+    return new Promise<TResponse>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        ws.off('message', onMessage);
+        OutputHelper.verbose(`[host] ✗ ${msgType} timed out after ${timeoutMs}ms`);
+        reject(new Error(`Plugin request timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+
+      // Normalize requestId: treat empty string as absent (matches plugin convention)
+      const rawRequestId = 'requestId' in message ? (message as any).requestId : undefined;
+      const sentRequestId = rawRequestId === '' ? undefined : rawRequestId;
+
+      const onMessage = (raw: RawData) => {
+        const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+
+        // Parse the raw JSON directly — decodePluginMessage may reject
+        // valid responses that don't match its strict schema
+        let parsed: any;
+        try {
+          parsed = JSON.parse(data);
+        } catch {
+          return;
+        }
+
+        // Skip heartbeat messages
+        if (parsed.type === 'heartbeat') {
+          return;
+        }
+
+        // Match by requestId if both sides have one
+        const msgRequestId = parsed.requestId;
+        if (sentRequestId !== undefined && msgRequestId !== undefined && msgRequestId === sentRequestId) {
+          clearTimeout(timer);
+          ws.off('message', onMessage);
+          OutputHelper.verbose(`[host] ← plugin ${sessionId}: ${parsed.type} (matched requestId)`);
+          resolve(parsed as TResponse);
+          return;
+        }
+
+        // When no requestId was sent, accept the first non-heartbeat response
+        // (error or result) as the reply to our request
+        if (sentRequestId === undefined) {
+          clearTimeout(timer);
+          ws.off('message', onMessage);
+          OutputHelper.verbose(`[host] ← plugin ${sessionId}: ${parsed.type} (no requestId)`);
+          resolve(parsed as TResponse);
+          return;
+        }
+
+        // Accept error responses even when requestId doesn't match
+        if (parsed.type === 'error') {
+          clearTimeout(timer);
+          ws.off('message', onMessage);
+          OutputHelper.verbose(`[host] ← plugin ${sessionId}: error (${parsed.payload?.code}): ${parsed.payload?.message}`);
+          resolve(parsed as TResponse);
+        } else {
+          OutputHelper.verbose(`[host] ← plugin ${sessionId}: ignoring ${parsed.type} (requestId mismatch: sent=${sentRequestId}, got=${msgRequestId})`);
+        }
+      };
+
+      ws.on('message', onMessage);
+
+      try {
+        ws.send(encodeMessage(message));
+      } catch (err) {
+        clearTimeout(timer);
+        ws.off('message', onMessage);
+        reject(err);
+      }
+    });
+  }
+
+  /**
+   * Send a fire-and-forget message to a specific plugin.
+   */
+  sendToPlugin(sessionId: string, message: ServerMessage): void {
+    const ws = this._plugins.get(sessionId);
+    if (!ws) {
+      return;
+    }
+    try {
+      ws.send(encodeMessage(message));
+    } catch {
+      // Plugin may already be disconnected
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Private
+  // -------------------------------------------------------------------------
+
+  private _handlePluginConnection(ws: WebSocket, _request: IncomingMessage): void {
+    // Wait for the first message (handshake: hello or register)
+    const onMessage = (raw: RawData) => {
+      const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+      const msg = decodePluginMessage(data);
+      if (!msg) {
+        return;
+      }
+
+      if (msg.type === 'hello') {
+        const sessionId = msg.payload.sessionId;
+        const capabilities = msg.payload.capabilities ?? ['execute' as Capability];
+        const pluginVersion = msg.payload.pluginVersion;
+
+        // Send welcome
+        ws.send(
+          encodeMessage({
+            type: 'welcome',
+            sessionId,
+            payload: { sessionId },
+          }),
+        );
+
+        ws.off('message', onMessage);
+        this._registerPlugin(ws, {
+          sessionId,
+          pluginVersion,
+          capabilities,
+          protocolVersion: 1,
+        });
+      } else if (msg.type === 'register') {
+        const sessionId = msg.sessionId;
+        const { pluginVersion, capabilities } = msg.payload;
+        const protocolVersion = Math.min(msg.protocolVersion, PROTOCOL_VERSION);
+
+        // Send v2 welcome with protocolVersion and capabilities
+        const welcomePayload: Record<string, unknown> = { sessionId };
+        welcomePayload.protocolVersion = protocolVersion;
+        welcomePayload.capabilities = capabilities;
+
+        ws.send(JSON.stringify({
+          type: 'welcome',
+          sessionId,
+          payload: welcomePayload,
+        }));
+
+        ws.off('message', onMessage);
+        this._registerPlugin(ws, {
+          sessionId,
+          pluginVersion,
+          capabilities,
+          protocolVersion,
+          instanceId: msg.payload.instanceId,
+          placeName: msg.payload.placeName,
+          state: msg.payload.state,
+          placeFile: msg.payload.placeFile,
+        });
+      }
+    };
+
+    ws.on('message', onMessage);
+
+    ws.on('error', () => {
+      // Errors are handled implicitly via close
+    });
+  }
+
+  private _registerPlugin(ws: WebSocket, info: PluginSessionInfo): void {
+    // If a plugin with this sessionId is already connected, close the old
+    // connection first so the Map stays consistent. This can happen when a
+    // plugin reconnects faster than the host detects the old socket's close.
+    const existing = this._plugins.get(info.sessionId);
+    if (existing && existing !== ws) {
+      try {
+        existing.close(1001, 'replaced by new connection');
+      } catch {
+        // Old socket may already be dead
+      }
+      // Remove immediately so the old close handler doesn't delete the new entry
+      this._plugins.delete(info.sessionId);
+    }
+
+    this._plugins.set(info.sessionId, ws);
+    OutputHelper.verbose(
+      `[host] Plugin connected: ${info.sessionId} (v${info.protocolVersion}, caps: ${info.capabilities.join(', ')})`,
+    );
+    this.emit('plugin-connected', info);
+
+    ws.on('close', () => {
+      // Only remove if this socket is still the registered one — a newer
+      // connection with the same sessionId may have already replaced us.
+      if (this._plugins.get(info.sessionId) === ws) {
+        this._plugins.delete(info.sessionId);
+        OutputHelper.verbose(`[host] Plugin disconnected: ${info.sessionId}`);
+        this.emit('plugin-disconnected', info.sessionId);
+      }
+    });
+  }
+}

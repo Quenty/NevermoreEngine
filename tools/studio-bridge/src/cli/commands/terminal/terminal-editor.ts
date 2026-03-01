@@ -18,7 +18,23 @@ import * as path from 'path';
 
 export interface TerminalEditorEvents {
   submit: [buffer: string];
+  'dot-command': [input: string];
   exit: [];
+}
+
+export interface TerminalEditorOptions {
+  /**
+   * Called to check whether a dot-command should be handled externally.
+   * If it returns true, the command is emitted as a 'dot-command' event
+   * instead of being handled by the built-in handler.
+   */
+  isExternalCommand?: (commandName: string) => boolean;
+
+  /**
+   * Custom help text to display for .help. When provided, replaces
+   * the built-in help output.
+   */
+  helpText?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -55,9 +71,11 @@ export class TerminalEditor extends EventEmitter {
   private _active = false;
   private _onKeypress: ((data: Buffer) => void) | undefined;
   private _onResize: (() => void) | undefined;
+  private _options: TerminalEditorOptions;
 
-  constructor() {
+  constructor(options?: TerminalEditorOptions) {
     super();
+    this._options = options ?? {};
   }
 
   // -----------------------------------------------------------------------
@@ -343,28 +361,39 @@ export class TerminalEditor extends EventEmitter {
     const parts = text.split(/\s+/);
     const cmd = parts[0].toLowerCase();
 
+    // Check if this command should be handled externally (bridge commands)
+    if (this._options.isExternalCommand?.(cmd)) {
+      this._clearEditor();
+      this.emit('dot-command', text);
+      return;
+    }
+
     switch (cmd) {
       case '.help':
         this._clearEditor();
-        console.log(
-          [
-            '',
-            `${DIM}Commands:${RESET}`,
-            `  .help          Show this help message`,
-            `  .exit          Exit terminal mode`,
-            `  .run <file>    Read and execute a Luau file`,
-            `  .clear         Clear the editor buffer`,
-            '',
-            `${DIM}Keybindings:${RESET}`,
-            `  Enter          New line`,
-            `  Ctrl+Enter     Execute buffer`,
-            `  Ctrl+C         Clear buffer (or exit if empty)`,
-            `  Ctrl+D         Exit`,
-            `  Tab            Insert 2 spaces`,
-            `  Arrow keys     Move cursor`,
-            '',
-          ].join('\n')
-        );
+        if (this._options.helpText) {
+          console.log(this._options.helpText);
+        } else {
+          console.log(
+            [
+              '',
+              `${DIM}Commands:${RESET}`,
+              `  .help          Show this help message`,
+              `  .exit          Exit terminal mode`,
+              `  .run <file>    Read and execute a Luau file`,
+              `  .clear         Clear the editor buffer`,
+              '',
+              `${DIM}Keybindings:${RESET}`,
+              `  Enter          New line`,
+              `  Ctrl+Enter     Execute buffer`,
+              `  Ctrl+C         Clear buffer (or exit if empty)`,
+              `  Ctrl+D         Exit`,
+              `  Tab            Insert 2 spaces`,
+              `  Arrow keys     Move cursor`,
+              '',
+            ].join('\n')
+          );
+        }
         this._render();
         break;
 
@@ -396,7 +425,7 @@ export class TerminalEditor extends EventEmitter {
       default:
         this._clearEditor();
         console.log(
-          `${DIM}Unknown command: ${cmd} (type .help for available commands)${RESET}\n`
+          `Unknown command. Type .help for available commands.\n`
         );
         this._render();
     }
