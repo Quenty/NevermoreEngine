@@ -23,7 +23,7 @@ import type {
   QueryDataModelOptions,
 } from './types.js';
 import { SessionDisconnectedError } from './types.js';
-import type { SubscribableEvent, PluginMessage } from '../server/web-socket-protocol.js';
+import type { SubscribableEvent, PluginMessage, OutputLevel } from '../server/web-socket-protocol.js';
 import { loadActionSourcesAsync, type ActionSource } from '../commands/framework/action-loader.js';
 
 // ---------------------------------------------------------------------------
@@ -125,9 +125,13 @@ export class BridgeSession extends EventEmitter {
     );
 
     if (result.type === 'scriptComplete') {
+      const output = (result.payload.output ?? []).map((entry) => ({
+        level: entry.level as OutputLevel,
+        body: entry.body,
+      }));
       return {
         success: result.payload.success,
-        output: [],
+        output,
         error: result.payload.error,
       };
     }

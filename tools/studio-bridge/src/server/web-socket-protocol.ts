@@ -119,6 +119,7 @@ export interface ScriptCompleteMessage extends BaseMessage {
   payload: {
     success: boolean;
     error?: string;
+    output?: Array<{ level: string; body: string; timestamp: number }>;
   };
 }
 
@@ -438,6 +439,17 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
 
     case 'scriptComplete':
       if (typeof payload.success === 'boolean') {
+        const output = Array.isArray(payload.output)
+          ? (payload.output as Array<Record<string, unknown>>)
+              .filter(
+                (e): e is { level: string; body: string; timestamp: number } =>
+                  typeof e === 'object' &&
+                  e !== null &&
+                  typeof e.level === 'string' &&
+                  typeof e.body === 'string',
+              )
+              .map((e) => ({ level: e.level, body: e.body, timestamp: typeof e.timestamp === 'number' ? e.timestamp : 0 }))
+          : undefined;
         return {
           type: 'scriptComplete',
           sessionId,
@@ -445,6 +457,7 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
           payload: {
             success: payload.success,
             error: typeof payload.error === 'string' ? payload.error : undefined,
+            output,
           },
         };
       }

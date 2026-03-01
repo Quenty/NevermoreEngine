@@ -29,6 +29,7 @@ local _processing = false
 -- ---------------------------------------------------------------------------
 
 -- Handle an execute request by compiling and running the provided code.
+-- Captures print/warn output by temporarily intercepting the globals.
 function ExecuteAction._handleExecute(
 	payload: { [string]: any },
 	requestId: string?,
@@ -79,12 +80,42 @@ function ExecuteAction._handleExecute(
 
 	local fn = fnOrErr
 
-	local success, runtimeError = pcall(fn)
-	if not success then
-		return sendResult({ success = false, error = tostring(runtimeError), code = "SCRIPT_RUNTIME_ERROR" })
+	-- Capture output by temporarily intercepting print/warn.
+	local captured: { { level: string, body: string, timestamp: number } } = {}
+	local originalPrint = print
+	local originalWarn = warn
+
+	print = function(...)
+		local parts = {}
+		for i = 1, select("#", ...) do
+			parts[i] = tostring(select(i, ...))
+		end
+		local body = table.concat(parts, "\t")
+		table.insert(captured, { level = "Print", body = body, timestamp = os.clock() })
+		originalPrint(...)
 	end
 
-	return sendResult({ success = true })
+	warn = function(...)
+		local parts = {}
+		for i = 1, select("#", ...) do
+			parts[i] = tostring(select(i, ...))
+		end
+		local body = table.concat(parts, "\t")
+		table.insert(captured, { level = "Warning", body = body, timestamp = os.clock() })
+		originalWarn(...)
+	end
+
+	local success, runtimeError = pcall(fn)
+
+	-- Restore originals
+	print = originalPrint
+	warn = originalWarn
+
+	if not success then
+		return sendResult({ success = false, error = tostring(runtimeError), code = "SCRIPT_RUNTIME_ERROR", output = captured })
+	end
+
+	return sendResult({ success = true, output = captured })
 end
 
 -- ---------------------------------------------------------------------------
