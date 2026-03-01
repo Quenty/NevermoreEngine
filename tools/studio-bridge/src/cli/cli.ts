@@ -76,6 +76,11 @@ const { groups, topLevel } = buildGroupCommands(registry);
 // Version check
 // ---------------------------------------------------------------------------
 
+const formatArg = process.argv.includes('--format')
+  ? process.argv[process.argv.indexOf('--format') + 1]
+  : undefined;
+const isMachineReadable = formatArg === 'json' || formatArg === 'base64';
+
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Studio Bridge',
   packageName: '@quenty/studio-bridge',
@@ -84,7 +89,21 @@ const versionData = await VersionChecker.checkForUpdatesAsync({
     dirname(fileURLToPath(import.meta.url)),
     '../../../package.json'
   ),
+  silent: isMachineReadable,
 });
+
+// Expose version metadata so the adapter can inject it into JSON output
+if (isMachineReadable && versionData) {
+  const warnings: string[] = [];
+  if (versionData.isLocalDev) {
+    warnings.push(`Studio Bridge is running in local development mode. Run 'npm install -g @quenty/studio-bridge@latest' to switch to production copy.`);
+  } else if (versionData.updateAvailable) {
+    warnings.push(`Studio Bridge update available: ${VersionChecker.getVersionDisplayName(versionData)} → ${versionData.latestVersion}. Run 'npm install -g @quenty/studio-bridge@latest' to update.`);
+  }
+  if (warnings.length > 0) {
+    (globalThis as any).__studioBridgeWarnings = warnings;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // CLI setup

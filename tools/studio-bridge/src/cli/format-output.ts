@@ -24,7 +24,7 @@ export interface FormatOptions {
 export function resolveMode(options: FormatOptions): OutputMode {
   if (options.format === 'json') return 'json';
   if (options.format === 'text') return 'text';
-  if (options.format === 'base64') return 'text';  // raw output mode
+  if (options.format === 'base64') return 'base64' as OutputMode;
   return resolveOutputMode({ isTTY: options.isTTY ?? process.stdout.isTTY });
 }
 

@@ -97,6 +97,10 @@ export async function queryDataModelHandlerAsync(
     includeAttributes: options.attributes,
   });
 
+  if (!result.instance) {
+    throw new Error(`Instance not found at path '${options.path}'`);
+  }
+
   const node = toDataModelNode(result.instance);
 
   return {

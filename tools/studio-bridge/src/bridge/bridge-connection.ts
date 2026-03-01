@@ -111,6 +111,7 @@ export class BridgeConnection extends EventEmitter {
   private _role: 'host' | 'client';
   private _isConnected: boolean = false;
   private _keepAlive: boolean;
+  private _hasSettled: boolean = false;
 
   // Host mode internals
   private _host: BridgeHost | undefined;
@@ -128,6 +129,9 @@ export class BridgeConnection extends EventEmitter {
     super();
     this._role = role;
     this._keepAlive = keepAlive;
+    // keepAlive connections (serve mode) manage their own lifecycle —
+    // don't auto-settle in resolveSessionAsync
+    this._hasSettled = keepAlive;
   }
 
   /**
@@ -230,7 +234,7 @@ export class BridgeConnection extends EventEmitter {
 
     // If requested, wait for active Studios to discover this host and connect
     if (conn._role === 'host' && options?.waitForSessions) {
-      await conn.waitForSessionsToSettleAsync();
+      await conn._ensureSettledAsync();
     }
 
     return conn;
@@ -355,8 +359,11 @@ export class BridgeConnection extends EventEmitter {
     context?: SessionContext,
     instanceId?: string
   ): Promise<BridgeSession> {
-    // Step 1: Direct session lookup — skip settle wait when the caller
-    // already knows which session they want.
+    // If we're a fresh host that hasn't settled yet, wait for persistent
+    // plugins to discover us before attempting any lookup path.
+    await this._ensureSettledAsync();
+
+    // Direct session lookup by ID
     if (sessionId) {
       const session = this.getSession(sessionId);
       if (session) {
@@ -365,17 +372,6 @@ export class BridgeConnection extends EventEmitter {
       throw new SessionNotFoundError(
         `Session '${sessionId}' not found`,
         sessionId
-      );
-    }
-
-    // If we're a fresh host with no sessions yet, wait for persistent
-    // plugins to discover us before attempting any lookup path.
-    if (this._role === 'host' && this.listSessions().length === 0) {
-      OutputHelper.verbose('[bridge] No sessions yet — waiting for plugins to discover us');
-      await this.waitForSessionsToSettleAsync();
-      const settled = this.listSessions();
-      OutputHelper.verbose(
-        `[bridge] Settled with ${settled.length} session(s)${settled.length > 0 ? ': ' + settled.map((s) => s.sessionId).join(', ') : ''}`,
       );
     }
 
@@ -449,6 +445,24 @@ export class BridgeConnection extends EventEmitter {
 
       this.once('session-connected', onSession);
     });
+  }
+
+  /**
+   * Ensure that session discovery has completed at least once for this
+   * host connection. No-op if already settled, not a host, or sessions
+   * are already connected.
+   */
+  private async _ensureSettledAsync(): Promise<void> {
+    if (this._hasSettled || this._role !== 'host' || this.listSessions().length > 0) {
+      return;
+    }
+    OutputHelper.verbose('[bridge] No sessions yet — waiting for plugins to discover us');
+    await this.waitForSessionsToSettleAsync();
+    this._hasSettled = true;
+    const settled = this.listSessions();
+    OutputHelper.verbose(
+      `[bridge] Settled with ${settled.length} session(s)${settled.length > 0 ? ': ' + settled.map((s) => s.sessionId).join(', ') : ''}`,
+    );
   }
 
   /**

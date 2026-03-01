@@ -104,6 +104,16 @@ async function executeCommandAsync(
   }
 }
 
+/** Inject version/diagnostic warnings into JSON result objects. */
+function injectWarnings(result: unknown): unknown {
+  const warnings = (globalThis as any).__studioBridgeWarnings as string[] | undefined;
+  if (!warnings || warnings.length === 0) return result;
+  if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
+    return { ...result, _warnings: warnings };
+  }
+  return result;
+}
+
 /** Format the command result for the given output mode. */
 function formatForOutput(
   def: CommandDefinition,
@@ -120,7 +130,19 @@ function formatForOutput(
 
   // Built-in defaults
   if (mode === 'json') {
-    return formatAsJson(result);
+    return formatAsJson(injectWarnings(result));
+  }
+
+  // Base64 mode: extract the binaryField data
+  if ((mode as string) === 'base64') {
+    const binaryField = def.cli?.binaryField;
+    if (binaryField && typeof result === 'object' && result !== null) {
+      const data = (result as Record<string, unknown>)[binaryField];
+      if (typeof data === 'string') {
+        return data;
+      }
+    }
+    throw new Error(`Command '${def.name}' does not support --format base64`);
   }
 
   // For text/table: try summary fallback, then JSON
@@ -308,6 +330,11 @@ async function runOnceAsync(
 ): Promise<void> {
   const result = await executeCommandAsync(def, commandArgs, argv, connect);
   outputResult(def, result, outputMode, argv);
+
+  // Exit with non-zero when the command result indicates failure
+  if (typeof result === 'object' && result !== null && 'success' in result && !(result as any).success) {
+    process.exit(1);
+  }
 }
 
 /** Open a connection, poll the command, and render updates. */
