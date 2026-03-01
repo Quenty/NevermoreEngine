@@ -5,7 +5,8 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { execa, type ResultPromise } from 'execa';
+import { spawn, type ChildProcess } from 'child_process';
+import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 
 // ---------------------------------------------------------------------------
@@ -93,13 +94,17 @@ export function findPluginsFolder(): string {
 
 export interface StudioProcess {
   /** The underlying child process handle */
-  process: ResultPromise;
+  process: ChildProcess;
   /** Kill the Studio process (idempotent, best-effort) */
   killAsync: () => Promise<void>;
 }
 
 /**
  * Launch Roblox Studio with the given place file.
+ *
+ * Uses Node's built-in `spawn` with `detached: true` + `unref()` so that
+ * Studio survives after the CLI process exits. execa's internal Job Object
+ * on Windows kills children on parent exit, so we avoid it here.
  */
 export async function launchStudioAsync(
   placePath: string
@@ -107,17 +112,13 @@ export async function launchStudioAsync(
   const studioExe = await findStudioPathAsync();
   OutputHelper.verbose(`[StudioBridge] ${studioExe} "${placePath}"`);
 
-  const proc = execa(studioExe, [placePath], {
-    // Don't tie Studio's lifetime to our process
+  const proc = spawn(studioExe, placePath ? [placePath] : [], {
     detached: true,
-    // Don't wait for stdio
     stdio: 'ignore',
-    // Don't reject on non-zero exit
-    reject: false,
   });
 
-  // Allow our Node process to exit even if Studio is still running
-  proc.unref?.();
+  // Allow our Node process to exit without waiting for Studio
+  proc.unref();
 
   let killed = false;
   const killAsync = async () => {
