@@ -235,6 +235,7 @@ local function wireConnection(ws, sessionId, connectLabel)
 			state = "ready",
 			capabilities = {
 				"registerAction",
+				"syncActions",
 				"heartbeat",
 			},
 		},
@@ -242,24 +243,36 @@ local function wireConnection(ws, sessionId, connectLabel)
 
 	-- Incoming messages -> ActionRouter dispatch
 	ws.MessageReceived:Connect(function(rawData)
-		local msg = jsonDecode(rawData)
-		if not msg or type(msg.type) ~= "string" then
-			return
-		end
-
-		if msg.type == "welcome" or msg.type == "shutdown" then
-			if msg.type == "shutdown" then
-				connected = false
-				pcall(function()
-					ws:Close()
-				end)
+		local ok, err = pcall(function()
+			local msg = jsonDecode(rawData)
+			if not msg or type(msg.type) ~= "string" then
+				print(`[StudioBridge] Failed to decode message: {tostring(rawData):sub(1, 200)}`)
+				return
 			end
-			return
-		end
 
-		local response = router:dispatch(msg)
-		if response then
-			ws:Send(jsonEncode(response))
+			print(`[StudioBridge] Received: {msg.type} (requestId={tostring(msg.requestId):sub(1, 8)}...)`)
+
+			if msg.type == "welcome" or msg.type == "shutdown" then
+				if msg.type == "shutdown" then
+					connected = false
+					pcall(function()
+						ws:Close()
+					end)
+				end
+				return
+			end
+
+			local response = router:dispatch(msg)
+			if response then
+				local encoded = jsonEncode(response)
+				print(`[StudioBridge] Sending: {response.type} ({#encoded} bytes)`)
+				ws:Send(encoded)
+			else
+				print(`[StudioBridge] No response for: {msg.type}`)
+			end
+		end)
+		if not ok then
+			warn(`[StudioBridge] MessageReceived handler error: {tostring(err)}`)
 		end
 	end)
 

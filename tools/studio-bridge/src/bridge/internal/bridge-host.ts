@@ -21,6 +21,7 @@ import {
   type Capability,
   type ServerMessage,
 } from '../../server/web-socket-protocol.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -193,6 +194,8 @@ export class BridgeHost extends EventEmitter {
       return;
     }
     this._shuttingDown = true;
+    OutputHelper.verbose(`[host] shutdownAsync called (plugins: ${this._plugins.size}, clients: ${this._clients.size})`);
+    OutputHelper.verbose(`[host] shutdown stack: ${new Error().stack?.split('\n').slice(1, 5).map((s) => s.trim()).join(' <- ')}`);
 
     const gracefulShutdown = async () => {
       // Step 1: Broadcast HostTransferNotice to all CLI clients
@@ -306,9 +309,13 @@ export class BridgeHost extends EventEmitter {
       throw new Error(`Plugin session '${sessionId}' not connected`);
     }
 
+    const msgType = message.type;
+    OutputHelper.verbose(`[host] → plugin ${sessionId}: ${msgType} (timeout ${timeoutMs}ms)`);
+
     return new Promise<TResponse>((resolve, reject) => {
       const timer = setTimeout(() => {
         ws.off('message', onMessage);
+        OutputHelper.verbose(`[host] ✗ ${msgType} timed out after ${timeoutMs}ms`);
         reject(new Error(`Plugin request timed out after ${timeoutMs}ms`));
       }, timeoutMs);
 
@@ -338,6 +345,7 @@ export class BridgeHost extends EventEmitter {
         if (sentRequestId !== undefined && msgRequestId !== undefined && msgRequestId === sentRequestId) {
           clearTimeout(timer);
           ws.off('message', onMessage);
+          OutputHelper.verbose(`[host] ← plugin ${sessionId}: ${parsed.type} (matched requestId)`);
           resolve(parsed as TResponse);
           return;
         }
@@ -347,6 +355,7 @@ export class BridgeHost extends EventEmitter {
         if (sentRequestId === undefined) {
           clearTimeout(timer);
           ws.off('message', onMessage);
+          OutputHelper.verbose(`[host] ← plugin ${sessionId}: ${parsed.type} (no requestId)`);
           resolve(parsed as TResponse);
           return;
         }
@@ -355,7 +364,10 @@ export class BridgeHost extends EventEmitter {
         if (parsed.type === 'error') {
           clearTimeout(timer);
           ws.off('message', onMessage);
+          OutputHelper.verbose(`[host] ← plugin ${sessionId}: error (${parsed.payload?.code}): ${parsed.payload?.message}`);
           resolve(parsed as TResponse);
+        } else {
+          OutputHelper.verbose(`[host] ← plugin ${sessionId}: ignoring ${parsed.type} (requestId mismatch: sent=${sentRequestId}, got=${msgRequestId})`);
         }
       };
 
@@ -473,6 +485,9 @@ export class BridgeHost extends EventEmitter {
     }
 
     this._plugins.set(info.sessionId, ws);
+    OutputHelper.verbose(
+      `[host] Plugin connected: ${info.sessionId} (v${info.protocolVersion}, caps: ${info.capabilities.join(', ')})`,
+    );
     this.emit('plugin-connected', info);
 
     ws.on('close', () => {
@@ -480,6 +495,7 @@ export class BridgeHost extends EventEmitter {
       // connection with the same sessionId may have already replaced us.
       if (this._plugins.get(info.sessionId) === ws) {
         this._plugins.delete(info.sessionId);
+        OutputHelper.verbose(`[host] Plugin disconnected: ${info.sessionId}`);
         this.emit('plugin-disconnected', info.sessionId);
       }
     });

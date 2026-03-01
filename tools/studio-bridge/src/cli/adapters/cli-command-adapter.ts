@@ -93,9 +93,9 @@ async function executeCommandAsync(
         argv.target as string | undefined,
         argv.context as SessionContext | undefined,
       );
-      return (def.handler as any)(session, commandArgs);
+      return await (def.handler as any)(session, commandArgs);
     }
-    return (def.handler as any)(connection, commandArgs);
+    return await (def.handler as any)(connection, commandArgs);
   } finally {
     // Only disconnect if we created the connection
     if (!existingConnection) {

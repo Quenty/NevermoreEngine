@@ -80,12 +80,15 @@ function ExecuteAction._handleExecute(
 
 	local fn = fnOrErr
 
-	-- Capture output by temporarily intercepting print/warn.
+	-- Capture output by temporarily intercepting print/warn in the global
+	-- environment. Local variable shadowing doesn't work because loadstring'd
+	-- code accesses the global environment, not this module's locals.
 	local captured: { { level: string, body: string, timestamp: number } } = {}
-	local originalPrint = print
-	local originalWarn = warn
+	local env = getfenv(fn)
+	local originalPrint = env.print
+	local originalWarn = env.warn
 
-	print = function(...)
+	env.print = function(...)
 		local parts = {}
 		for i = 1, select("#", ...) do
 			parts[i] = tostring(select(i, ...))
@@ -95,7 +98,7 @@ function ExecuteAction._handleExecute(
 		originalPrint(...)
 	end
 
-	warn = function(...)
+	env.warn = function(...)
 		local parts = {}
 		for i = 1, select("#", ...) do
 			parts[i] = tostring(select(i, ...))
@@ -108,8 +111,8 @@ function ExecuteAction._handleExecute(
 	local success, runtimeError = pcall(fn)
 
 	-- Restore originals
-	print = originalPrint
-	warn = originalWarn
+	env.print = originalPrint
+	env.warn = originalWarn
 
 	if not success then
 		return sendResult({ success = false, error = tostring(runtimeError), code = "SCRIPT_RUNTIME_ERROR", output = captured })

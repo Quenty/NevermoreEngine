@@ -11,6 +11,7 @@
 import { createHash } from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { resolvePackagePath } from '@quenty/nevermore-template-helpers';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -38,9 +39,9 @@ export interface ActionSource {
 export async function loadActionSourcesAsync(
   baseDir?: string,
 ): Promise<ActionSource[]> {
-  const dir = baseDir ?? path.resolve(
-    path.dirname(new URL(import.meta.url).pathname),
-    '..',
+  const dir = baseDir ?? resolvePackagePath(
+    import.meta.url,
+    'src', 'commands',
   );
 
   const actions: ActionSource[] = [];

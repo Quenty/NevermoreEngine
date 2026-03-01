@@ -26,6 +26,7 @@ import type {
 import type { SessionInfo, SessionContext, InstanceInfo } from './types.js';
 import { SessionNotFoundError, ContextNotFoundError } from './types.js';
 import type { ServerMessage } from '../server/web-socket-protocol.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
@@ -198,6 +199,7 @@ export class BridgeConnection extends EventEmitter {
     });
 
     const conn = new BridgeConnection(detection.role, keepAlive);
+    OutputHelper.verbose(`[bridge] Role: ${detection.role}, port: ${detection.port}`);
 
     if (detection.role === 'host') {
       await conn._initHostAsync(detection.port);
@@ -241,6 +243,8 @@ export class BridgeConnection extends EventEmitter {
     if (!this._isConnected) {
       return;
     }
+    OutputHelper.verbose(`[bridge] disconnectAsync called (role=${this._role})`);
+    OutputHelper.verbose(`[bridge] disconnect stack: ${new Error().stack?.split('\n').slice(1, 5).map((s) => s.trim()).join(' <- ')}`);
 
     this._clearIdleTimer();
     this._isConnected = false;
@@ -367,7 +371,12 @@ export class BridgeConnection extends EventEmitter {
     // If we're a fresh host with no sessions yet, wait for persistent
     // plugins to discover us before attempting any lookup path.
     if (this._role === 'host' && this.listSessions().length === 0) {
+      OutputHelper.verbose('[bridge] No sessions yet — waiting for plugins to discover us');
       await this.waitForSessionsToSettleAsync();
+      const settled = this.listSessions();
+      OutputHelper.verbose(
+        `[bridge] Settled with ${settled.length} session(s)${settled.length > 0 ? ': ' + settled.map((s) => s.sessionId).join(', ') : ''}`,
+      );
     }
 
     // Step 2: Instance-specific lookup
@@ -728,7 +737,9 @@ export class BridgeConnection extends EventEmitter {
     // Only start idle timer if we're the host and have no sessions
     if (this._role === 'host' && this._tracker) {
       if (this._tracker.sessionCount === 0) {
+        OutputHelper.verbose(`[bridge] Starting idle exit timer (${IDLE_EXIT_GRACE_MS}ms, sessionCount=0)`);
         this._idleTimer = setTimeout(() => {
+          OutputHelper.verbose('[bridge] Idle exit timer fired — disconnecting');
           this.disconnectAsync().catch(() => {
             // Ignore disconnect errors during idle shutdown
           });

@@ -25,6 +25,7 @@ import type {
 import { SessionDisconnectedError } from './types.js';
 import type { SubscribableEvent, PluginMessage, OutputLevel } from '../server/web-socket-protocol.js';
 import { loadActionSourcesAsync, type ActionSource } from '../commands/framework/action-loader.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 
 // ---------------------------------------------------------------------------
 // Default action timeouts (ms)
@@ -334,9 +335,13 @@ export class BridgeSession extends EventEmitter {
     // Lazy-load action sources from this process's disk
     if (!this._actionSources) {
       this._actionSources = await loadActionSourcesAsync();
+      OutputHelper.verbose(
+        `[actions] Loaded ${this._actionSources.length} action source(s): ${this._actionSources.map((a) => a.name).join(', ') || '(none)'}`,
+      );
     }
 
     if (this._actionSources.length === 0) {
+      OutputHelper.verbose('[actions] No action sources found — skipping sync');
       this._actionsReady = true;
       return;
     }
@@ -348,6 +353,9 @@ export class BridgeSession extends EventEmitter {
     }
 
     // Ask plugin which actions need updating
+    OutputHelper.verbose(
+      `[actions] Sending syncActions (${Object.keys(actions).length} hashes) to session ${this._info.sessionId}`,
+    );
     const syncResult = await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'syncActions',
@@ -360,13 +368,17 @@ export class BridgeSession extends EventEmitter {
 
     if (syncResult.type === 'syncActionsResult') {
       const needed = syncResult.payload.needed as string[];
+      OutputHelper.verbose(
+        `[actions] syncActions response: ${needed.length} action(s) need updating${needed.length > 0 ? ': ' + needed.join(', ') : ''}`,
+      );
 
       // Push only the actions that need updating
       for (const actionName of needed) {
         const action = this._actionSources.find((a) => a.name === actionName);
         if (!action) continue;
 
-        await this._handle.sendActionAsync<PluginMessage>(
+        OutputHelper.verbose(`[actions] Registering action: ${actionName}`);
+        const regResult = await this._handle.sendActionAsync<PluginMessage>(
           {
             type: 'registerAction',
             sessionId: this._info.sessionId,
@@ -379,9 +391,24 @@ export class BridgeSession extends EventEmitter {
           },
           10_000,
         );
+        if (regResult.type === 'registerActionResult') {
+          const p = regResult.payload;
+          OutputHelper.verbose(
+            `[actions]   ${actionName}: ${p.success ? (p.skipped ? 'skipped (same hash)' : 'registered') : `FAILED: ${p.error}`}`,
+          );
+        } else if (regResult.type === 'error') {
+          OutputHelper.verbose(
+            `[actions]   ${actionName}: plugin error: ${(regResult as any).payload?.message ?? regResult.type}`,
+          );
+        }
       }
+    } else {
+      OutputHelper.verbose(
+        `[actions] syncActions returned unexpected type '${syncResult.type}': ${JSON.stringify((syncResult as any).payload ?? {}).slice(0, 200)}`,
+      );
     }
 
     this._actionsReady = true;
+    OutputHelper.verbose('[actions] Action sync complete');
   }
 }
