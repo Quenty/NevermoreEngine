@@ -16,6 +16,8 @@
 local SubscribeAction = {}
 
 function SubscribeAction.register(router: any)
+	router:setResponseType("subscribe", "subscribeResult")
+	router:setResponseType("unsubscribe", "unsubscribeResult")
 	router:register("subscribe", function(payload: { [string]: any }, _requestId: string, _sessionId: string)
 		return { events = payload.events or {} }
 	end)

@@ -18,6 +18,7 @@ local QueryLogsAction = {}
 
 -- Register this handler with the ActionRouter.
 function QueryLogsAction.register(router: any, _sendMessage: any, logBuffer: any)
+	router:setResponseType("queryLogs", "logsResult")
 	router:register("queryLogs", function(payload: { [string]: any }, _requestId: string, _sessionId: string)
 		local direction = payload.direction or "tail"
 		local count = payload.count or 50

@@ -8,6 +8,7 @@
  * ActionRouter at runtime.
  */
 
+import { createHash } from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -22,6 +23,8 @@ export interface ActionSource {
   source: string;
   /** Relative path within the commands directory (for diagnostics). */
   relativePath: string;
+  /** SHA-256 hex digest of the source content. */
+  hash: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -65,7 +68,8 @@ async function scanDirAsync(
       const source = await fs.readFile(fullPath, 'utf-8');
       const name = path.basename(entry.name, '.luau');
       const relativePath = path.relative(baseDir, fullPath);
-      results.push({ name, source, relativePath });
+      const hash = createHash('sha256').update(source).digest('hex');
+      results.push({ name, source, relativePath, hash });
     }
   }
 }

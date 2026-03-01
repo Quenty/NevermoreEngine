@@ -34,6 +34,7 @@ end
 -- ---------------------------------------------------------------------------
 
 function QueryStateAction.register(router: any)
+	router:setResponseType("queryState", "stateResult")
 	router:register("queryState", function(_payload: { [string]: any }, _requestId: string, _sessionId: string)
 		return {
 			state = detectState(),

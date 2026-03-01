@@ -15,7 +15,7 @@ function createMockConnection(sessionInfo: {
   placeName: string;
 }) {
   return {
-    resolveSession: vi.fn().mockResolvedValue({
+    resolveSessionAsync: vi.fn().mockResolvedValue({
       info: sessionInfo,
     }),
   } as any;
@@ -52,12 +52,12 @@ describe('connectHandlerAsync', () => {
 
     await connectHandlerAsync(conn, { sessionId: 'xyz-789' });
 
-    expect(conn.resolveSession).toHaveBeenCalledWith('xyz-789');
+    expect(conn.resolveSessionAsync).toHaveBeenCalledWith('xyz-789');
   });
 
   it('propagates errors from resolveSession', async () => {
     const conn = {
-      resolveSession: vi.fn().mockRejectedValue(new Error('Session not found')),
+      resolveSessionAsync: vi.fn().mockRejectedValue(new Error('Session not found')),
     } as any;
 
     await expect(

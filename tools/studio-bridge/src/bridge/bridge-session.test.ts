@@ -10,6 +10,12 @@ import type { SessionInfo } from './types.js';
 import { SessionDisconnectedError } from './types.js';
 import type { PluginMessage, ServerMessage } from '../server/web-socket-protocol.js';
 
+// Mock loadActionSourcesAsync to return empty array so _ensureActionsAsync
+// is a no-op in unit tests (no syncActions round-trip needed).
+vi.mock('../commands/framework/action-loader.js', () => ({
+  loadActionSourcesAsync: vi.fn(async () => []),
+}));
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

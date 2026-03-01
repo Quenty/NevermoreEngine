@@ -34,7 +34,7 @@ function createMockConnection(options?: {
         gameId: 456,
       })),
     ),
-    resolveSession: vi.fn().mockImplementation(async (sessionId: string) => {
+    resolveSessionAsync: vi.fn().mockImplementation(async (sessionId: string) => {
       const session = sessions.find((s) => s.sessionId === sessionId);
       if (!session) {
         throw new Error(`Session '${sessionId}' not found`);

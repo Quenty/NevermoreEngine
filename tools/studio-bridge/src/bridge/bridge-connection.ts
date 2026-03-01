@@ -26,10 +26,6 @@ import type {
 import type { SessionInfo, SessionContext, InstanceInfo } from './types.js';
 import { SessionNotFoundError, ContextNotFoundError } from './types.js';
 import type { ServerMessage } from '../server/web-socket-protocol.js';
-import { pushActionsToSessionAsync } from './internal/action-pusher.js';
-import { loadActionSourcesAsync, type ActionSource } from '../commands/framework/action-loader.js';
-import { OutputHelper } from '@quenty/cli-output-helpers';
-
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
@@ -120,9 +116,6 @@ export class BridgeConnection extends EventEmitter {
   private _tracker: SessionTracker | undefined;
   private _hostSessions: Map<string, BridgeSession> = new Map();
   private _hostHandles: Map<string, HostTransportHandle> = new Map();
-
-  /** Cached action sources loaded once for pushing to new plugin sessions. */
-  private _actionSources: ActionSource[] | undefined;
 
   // Client mode internals
   private _client: BridgeClient | undefined;
@@ -358,13 +351,8 @@ export class BridgeConnection extends EventEmitter {
     context?: SessionContext,
     instanceId?: string
   ): Promise<BridgeSession> {
-    // If we're a fresh host with no sessions yet, wait for persistent
-    // plugins to discover us before attempting any lookup path.
-    if (this._role === 'host' && this.listSessions().length === 0) {
-      await this.waitForSessionsToSettleAsync();
-    }
-
-    // Step 1: Direct session lookup
+    // Step 1: Direct session lookup — skip settle wait when the caller
+    // already knows which session they want.
     if (sessionId) {
       const session = this.getSession(sessionId);
       if (session) {
@@ -374,6 +362,12 @@ export class BridgeConnection extends EventEmitter {
         `Session '${sessionId}' not found`,
         sessionId
       );
+    }
+
+    // If we're a fresh host with no sessions yet, wait for persistent
+    // plugins to discover us before attempting any lookup path.
+    if (this._role === 'host' && this.listSessions().length === 0) {
+      await this.waitForSessionsToSettleAsync();
     }
 
     // Step 2: Instance-specific lookup
@@ -575,15 +569,6 @@ export class BridgeConnection extends EventEmitter {
       const handle = new HostTransportHandle(info.sessionId, this._host!);
       this._hostHandles.set(info.sessionId, handle);
       this._tracker!.addSession(info.sessionId, sessionInfo, handle);
-
-      // Push action modules to the newly connected plugin (fire and forget)
-      if (info.capabilities.includes('registerAction')) {
-        this._pushActionsAsync(info.sessionId).catch((err) => {
-          OutputHelper.verbose(
-            `[BridgeConnection] Failed to push actions to ${info.sessionId}: ${err instanceof Error ? err.message : String(err)}`,
-          );
-        });
-      }
     });
 
     this._host.on('plugin-disconnected', (sessionId: string) => {
@@ -759,40 +744,4 @@ export class BridgeConnection extends EventEmitter {
     }
   }
 
-  // -----------------------------------------------------------------------
-  // Private: Dynamic action push
-  // -----------------------------------------------------------------------
-
-  /**
-   * Load action sources (cached) and push them to the given plugin session.
-   */
-  private async _pushActionsAsync(sessionId: string): Promise<void> {
-    if (!this._host) return;
-
-    // Lazy-load and cache action sources
-    if (!this._actionSources) {
-      this._actionSources = await loadActionSourcesAsync();
-    }
-
-    if (this._actionSources.length === 0) return;
-
-    const results = await pushActionsToSessionAsync(
-      this._host,
-      sessionId,
-      this._actionSources,
-    );
-
-    const succeeded = results.filter((r) => r.success).length;
-    const failed = results.filter((r) => !r.success).length;
-
-    if (failed > 0) {
-      OutputHelper.verbose(
-        `[BridgeConnection] Pushed ${succeeded}/${results.length} actions to ${sessionId} (${failed} failed)`,
-      );
-    } else {
-      OutputHelper.verbose(
-        `[BridgeConnection] Pushed ${succeeded} action(s) to ${sessionId}`,
-      );
-    }
-  }
 }

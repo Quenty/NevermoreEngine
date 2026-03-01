@@ -111,6 +111,7 @@ end
 
 -- Register this handler with the ActionRouter.
 function ExecuteAction.register(router: any, sendMessage: ((msg: { [string]: any }) -> ())?)
+	router:setResponseType("execute", "scriptComplete")
 	router:register("execute", function(payload: { [string]: any }, requestId: string, sessionId: string)
 		if sendMessage then
 			-- Queue the request for sequential processing
@@ -141,6 +142,25 @@ end
 
 -- Reset the internal queue state (for testing).
 function ExecuteAction._resetQueue()
+	_queue = {}
+	_processing = false
+end
+
+function ExecuteAction.teardown()
+	for _, item in _queue do
+		if item.sendMessage then
+			item.sendMessage({
+				type = "scriptComplete",
+				sessionId = item.sessionId,
+				requestId = item.requestId,
+				payload = {
+					success = false,
+					error = "Action re-registered, request cancelled",
+					code = "ACTION_REPLACED",
+				},
+			})
+		end
+	end
 	_queue = {}
 	_processing = false
 end

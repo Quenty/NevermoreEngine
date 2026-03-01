@@ -8,6 +8,7 @@
  * never construct them directly.
  */
 
+import { randomUUID } from 'crypto';
 import { EventEmitter } from 'events';
 import type { TransportHandle } from './internal/session-tracker.js';
 import type {
@@ -23,6 +24,7 @@ import type {
 } from './types.js';
 import { SessionDisconnectedError } from './types.js';
 import type { SubscribableEvent, PluginMessage } from '../server/web-socket-protocol.js';
+import { loadActionSourcesAsync, type ActionSource } from '../commands/framework/action-loader.js';
 
 // ---------------------------------------------------------------------------
 // Default action timeouts (ms)
@@ -64,6 +66,8 @@ function pluginError(expectedType: string, result: PluginMessage): Error {
 export class BridgeSession extends EventEmitter {
   private _info: SessionInfo;
   private _handle: TransportHandle;
+  private _actionsReady = false;
+  private _actionSources: ActionSource[] | undefined;
 
   constructor(info: SessionInfo, handle: TransportHandle) {
     super();
@@ -107,13 +111,14 @@ export class BridgeSession extends EventEmitter {
    */
   async execAsync(code: string, timeout?: number): Promise<ExecResult> {
     this._assertConnected();
+    await this._ensureActionsAsync();
 
     const timeoutMs = timeout ?? DEFAULT_TIMEOUTS.execute;
     const result = await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'execute',
         sessionId: this._info.sessionId,
-        requestId: '',
+        requestId: randomUUID(),
         payload: { script: code },
       },
       timeoutMs,
@@ -143,13 +148,14 @@ export class BridgeSession extends EventEmitter {
    */
   async queryStateAsync(): Promise<StateResult> {
     this._assertConnected();
+    await this._ensureActionsAsync();
 
     const timeoutMs = DEFAULT_TIMEOUTS.queryState;
     const result = await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'queryState',
         sessionId: this._info.sessionId,
-        requestId: '',
+        requestId: randomUUID(),
         payload: {} as Record<string, never>,
       },
       timeoutMs,
@@ -172,13 +178,14 @@ export class BridgeSession extends EventEmitter {
    */
   async captureScreenshotAsync(): Promise<ScreenshotResult> {
     this._assertConnected();
+    await this._ensureActionsAsync();
 
     const timeoutMs = DEFAULT_TIMEOUTS.captureScreenshot;
     const result = await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'captureScreenshot',
         sessionId: this._info.sessionId,
-        requestId: '',
+        requestId: randomUUID(),
         payload: { format: 'png' },
       },
       timeoutMs,
@@ -201,13 +208,14 @@ export class BridgeSession extends EventEmitter {
    */
   async queryLogsAsync(options?: LogOptions): Promise<LogsResult> {
     this._assertConnected();
+    await this._ensureActionsAsync();
 
     const timeoutMs = DEFAULT_TIMEOUTS.queryLogs;
     const result = await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'queryLogs',
         sessionId: this._info.sessionId,
-        requestId: '',
+        requestId: randomUUID(),
         payload: {
           count: options?.count,
           direction: options?.direction,
@@ -234,13 +242,14 @@ export class BridgeSession extends EventEmitter {
    */
   async queryDataModelAsync(options: QueryDataModelOptions): Promise<DataModelResult> {
     this._assertConnected();
+    await this._ensureActionsAsync();
 
     const timeoutMs = DEFAULT_TIMEOUTS.queryDataModel;
     const result = await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'queryDataModel',
         sessionId: this._info.sessionId,
-        requestId: '',
+        requestId: randomUUID(),
         payload: {
           path: options.path,
           depth: options.depth,
@@ -267,13 +276,14 @@ export class BridgeSession extends EventEmitter {
    */
   async subscribeAsync(events: SubscribableEvent[]): Promise<void> {
     this._assertConnected();
+    await this._ensureActionsAsync();
 
     const timeoutMs = DEFAULT_TIMEOUTS.subscribe;
     await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'subscribe',
         sessionId: this._info.sessionId,
-        requestId: '',
+        requestId: randomUUID(),
         payload: { events },
       },
       timeoutMs,
@@ -285,13 +295,14 @@ export class BridgeSession extends EventEmitter {
    */
   async unsubscribeAsync(events: SubscribableEvent[]): Promise<void> {
     this._assertConnected();
+    await this._ensureActionsAsync();
 
     const timeoutMs = DEFAULT_TIMEOUTS.unsubscribe;
     await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'unsubscribe',
         sessionId: this._info.sessionId,
-        requestId: '',
+        requestId: randomUUID(),
         payload: { events },
       },
       timeoutMs,
@@ -306,5 +317,67 @@ export class BridgeSession extends EventEmitter {
     if (!this._handle.isConnected) {
       throw new SessionDisconnectedError(this._info.sessionId);
     }
+  }
+
+  /**
+   * Ensure action modules are synced to the plugin before first use.
+   * Uses syncActions to determine which actions need updating, then
+   * registers only those that are missing or have changed hashes.
+   */
+  private async _ensureActionsAsync(): Promise<void> {
+    if (this._actionsReady) return;
+
+    // Lazy-load action sources from this process's disk
+    if (!this._actionSources) {
+      this._actionSources = await loadActionSourcesAsync();
+    }
+
+    if (this._actionSources.length === 0) {
+      this._actionsReady = true;
+      return;
+    }
+
+    // Build hash map for syncActions
+    const actions: Record<string, string> = {};
+    for (const action of this._actionSources) {
+      actions[action.name] = action.hash;
+    }
+
+    // Ask plugin which actions need updating
+    const syncResult = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'syncActions',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: { actions },
+      },
+      10_000,
+    );
+
+    if (syncResult.type === 'syncActionsResult') {
+      const needed = syncResult.payload.needed as string[];
+
+      // Push only the actions that need updating
+      for (const actionName of needed) {
+        const action = this._actionSources.find((a) => a.name === actionName);
+        if (!action) continue;
+
+        await this._handle.sendActionAsync<PluginMessage>(
+          {
+            type: 'registerAction',
+            sessionId: this._info.sessionId,
+            requestId: randomUUID(),
+            payload: {
+              name: action.name,
+              source: action.source,
+              hash: action.hash,
+            },
+          },
+          10_000,
+        );
+      }
+    }
+
+    this._actionsReady = true;
   }
 }

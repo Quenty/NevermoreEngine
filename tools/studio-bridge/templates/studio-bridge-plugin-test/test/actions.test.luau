@@ -71,6 +71,7 @@ table.insert(tests, {
 	name = "ActionRouter: register and dispatch returns handler result",
 	fn = function()
 		local router = ActionRouter.new()
+		router:setResponseType("queryState", "stateResult")
 		router:register("queryState", function(payload, requestId, sessionId)
 			return { state = "Edit", placeId = 123, placeName = "TestPlace", gameId = 456 }
 		end)
@@ -152,6 +153,7 @@ table.insert(tests, {
 		}
 
 		for _, mapping in typeMap do
+			router:setResponseType(mapping.input, mapping.expected)
 			router:register(mapping.input, function()
 				return { ok = true }
 			end)
@@ -175,6 +177,7 @@ table.insert(tests, {
 	name = "ActionRouter: response preserves sessionId and requestId",
 	fn = function()
 		local router = ActionRouter.new()
+		router:setResponseType("queryLogs", "logsResult")
 		router:register("queryLogs", function()
 			return { entries = {}, total = 0, bufferCapacity = 1000 }
 		end)
@@ -497,6 +500,7 @@ table.insert(tests, {
 	name = "ActionRouter: dispatch with nil requestId still works",
 	fn = function()
 		local router = ActionRouter.new()
+		router:setResponseType("execute", "scriptComplete")
 		router:register("execute", function(payload, requestId, sessionId)
 			return { success = true }
 		end)

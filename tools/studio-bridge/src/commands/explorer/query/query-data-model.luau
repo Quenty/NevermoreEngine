@@ -177,6 +177,7 @@ end
 -- ---------------------------------------------------------------------------
 
 function QueryDataModelAction.register(router: any)
+	router:setResponseType("queryDataModel", "dataModelResult")
 	router:register("queryDataModel", function(payload: { [string]: any }, _requestId: string, _sessionId: string)
 		local path = payload.path
 		if not path or type(path) ~= "string" then

@@ -14,6 +14,7 @@
 -- PNG encoder is injected via router._vendorPng (set by the plugin before
 -- actions are pushed). Falls back gracefully to raw RGBA if unavailable.
 local _png = nil
+local _disposed = false
 
 local CaptureScreenshotAction = {}
 
@@ -145,6 +146,8 @@ local function captureAsync(sendMessage: (msg: { [string]: any }) -> (), request
 	-- Wait for the callback
 	coroutine.yield()
 
+	if _disposed then return end
+
 	if not contentId or contentId == "" then
 		sendMessage(buildError(sessionId, requestId, "CAPTURE_FAILED", "CaptureService returned no content ID"))
 		return
@@ -270,6 +273,8 @@ end
 -- ---------------------------------------------------------------------------
 
 function CaptureScreenshotAction.register(router: any, sendMessage: ((msg: { [string]: any }) -> ())?)
+	_disposed = false
+	router:setResponseType("captureScreenshot", "screenshotResult")
 	-- Capture the PNG encoder from the router's shared deps (set by the plugin)
 	_png = router._vendorPng or nil
 
@@ -294,6 +299,10 @@ function CaptureScreenshotAction.register(router: any, sendMessage: ((msg: { [st
 		-- Return nil so ActionRouter does not generate a wrapped response
 		return nil
 	end)
+end
+
+function CaptureScreenshotAction.teardown()
+	_disposed = true
 end
 
 return CaptureScreenshotAction

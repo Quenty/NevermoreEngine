@@ -4,9 +4,14 @@
  * event handling.
  */
 
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { WebSocketServer, WebSocket } from 'ws';
 import { BridgeClient } from './bridge-client.js';
+
+// Mock loadActionSourcesAsync so _ensureActionsAsync is a no-op in tests
+vi.mock('../../commands/framework/action-loader.js', () => ({
+  loadActionSourcesAsync: vi.fn(async () => []),
+}));
 import {
   encodeHostMessage,
   decodeHostMessage,

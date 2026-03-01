@@ -10,6 +10,7 @@
 local InvokeAction = {}
 
 function InvokeAction.register(router: any)
+	router:setResponseType("invokeAction", "invokeActionResult")
 	router:register("invokeAction", function(_payload: { [string]: any }, _requestId: string, _sessionId: string)
 		return {
 			success = false,

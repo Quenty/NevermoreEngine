@@ -124,6 +124,7 @@ router:register("registerAction", function(payload, requestId, sessionId)
 	local name = payload.name
 	local source = payload.source
 	local responseType = payload.responseType
+	local hash = payload.hash -- optional content hash for skip-on-same-hash
 
 	if type(name) ~= "string" or type(source) ~= "string" then
 		return {
@@ -133,14 +134,52 @@ router:register("registerAction", function(payload, requestId, sessionId)
 		}
 	end
 
-	local success, err = router:registerAction(name, source, sendMessage, logBuffer, responseType)
+	-- Check for hash-based skip before full registration
+	if type(hash) == "string" and router._actions[name] and router._actions[name].hash == hash then
+		return {
+			name = name,
+			success = true,
+			skipped = true,
+			hash = hash,
+			handlers = router._actions[name].handlerNames,
+		}
+	end
+
+	local success, err = router:registerAction(name, source, sendMessage, logBuffer, responseType, hash)
+
+	-- Build response with handler list from _actions if available
+	local handlers = {}
+	if success and router._actions[name] then
+		handlers = router._actions[name].handlerNames
+	end
+
 	return {
 		name = name,
 		success = success,
+		skipped = false,
+		hash = hash,
+		handlers = handlers,
 		error = err,
 	}
 end)
 router:setResponseType("registerAction", "registerActionResult")
+
+-- Register the built-in syncActions handler. This allows the bridge server
+-- to query which actions need updating by comparing content hashes.
+router:register("syncActions", function(payload, requestId, sessionId)
+	local clientActions = payload.actions or {}
+	local installed = router:getInstalledActions()
+	local needed = {}
+
+	for name, clientHash in clientActions do
+		if installed[name] ~= clientHash then
+			table.insert(needed, name)
+		end
+	end
+
+	return { needed = needed, installed = installed }
+end)
+router:setResponseType("syncActions", "syncActionsResult")
 
 local connected = false
 
@@ -195,14 +234,8 @@ local function wireConnection(ws, sessionId, connectLabel)
 			gameId = game.GameId,
 			state = "ready",
 			capabilities = {
-				"execute",
-				"queryState",
-				"queryDataModel",
-				"queryLogs",
-				"captureScreenshot",
-				"subscribe",
-				"heartbeat",
 				"registerAction",
+				"heartbeat",
 			},
 		},
 	}))

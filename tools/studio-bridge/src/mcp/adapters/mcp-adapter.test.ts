@@ -12,7 +12,7 @@ import { createMcpTool } from './mcp-adapter.js';
 function createMockConnection(sessions: any[] = []) {
   return {
     listSessions: () => sessions,
-    resolveSession: vi.fn().mockResolvedValue({ id: 'test-session' }),
+    resolveSessionAsync: vi.fn().mockResolvedValue({ id: 'test-session' }),
     disconnectAsync: vi.fn(),
   } as any;
 }
@@ -68,7 +68,7 @@ describe('createMcpTool', () => {
   it('resolves session and calls handler when needsSession is true', async () => {
     const mockSession = { id: 'sess-1' };
     const connection = createMockConnection();
-    connection.resolveSession.mockResolvedValue(mockSession);
+    connection.resolveSessionAsync.mockResolvedValue(mockSession);
 
     const handler = vi.fn().mockResolvedValue({ state: 'Edit' });
 
@@ -82,7 +82,7 @@ describe('createMcpTool', () => {
 
     const result = await tool.handler({ sessionId: 'sess-1', context: 'edit' });
 
-    expect(connection.resolveSession).toHaveBeenCalledWith('sess-1', 'edit');
+    expect(connection.resolveSessionAsync).toHaveBeenCalledWith('sess-1', 'edit');
     expect(handler).toHaveBeenCalledWith(mockSession);
     expect(result.isError).toBeUndefined();
   });
@@ -90,7 +90,7 @@ describe('createMcpTool', () => {
   it('passes mapped input to session handler', async () => {
     const mockSession = { id: 'sess-1' };
     const connection = createMockConnection();
-    connection.resolveSession.mockResolvedValue(mockSession);
+    connection.resolveSessionAsync.mockResolvedValue(mockSession);
 
     const handler = vi.fn().mockResolvedValue({
       success: true,
@@ -121,7 +121,7 @@ describe('createMcpTool', () => {
 
   it('wraps errors as isError: true responses', async () => {
     const connection = createMockConnection();
-    connection.resolveSession.mockRejectedValue(new Error('Session not found'));
+    connection.resolveSessionAsync.mockRejectedValue(new Error('Session not found'));
 
     const handler = vi.fn();
 
@@ -145,7 +145,7 @@ describe('createMcpTool', () => {
   it('wraps handler errors as isError: true responses', async () => {
     const mockSession = { id: 'sess-1' };
     const connection = createMockConnection();
-    connection.resolveSession.mockResolvedValue(mockSession);
+    connection.resolveSessionAsync.mockResolvedValue(mockSession);
 
     const handler = vi.fn().mockRejectedValue(new Error('Connection lost'));
 
@@ -236,7 +236,7 @@ describe('createMcpTool', () => {
   it('passes undefined sessionId and context when not provided', async () => {
     const mockSession = { id: 'auto' };
     const connection = createMockConnection();
-    connection.resolveSession.mockResolvedValue(mockSession);
+    connection.resolveSessionAsync.mockResolvedValue(mockSession);
 
     const handler = vi.fn().mockResolvedValue({});
 
@@ -250,6 +250,6 @@ describe('createMcpTool', () => {
 
     await tool.handler({});
 
-    expect(connection.resolveSession).toHaveBeenCalledWith(undefined, undefined);
+    expect(connection.resolveSessionAsync).toHaveBeenCalledWith(undefined, undefined);
   });
 });

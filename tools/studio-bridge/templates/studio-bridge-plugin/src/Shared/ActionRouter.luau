@@ -18,35 +18,16 @@ local ActionRouter = {}
 ActionRouter.__index = ActionRouter
 
 -- ---------------------------------------------------------------------------
--- Default response type mapping
--- ---------------------------------------------------------------------------
-
-local DEFAULT_RESPONSE_TYPES: { [string]: string } = {
-	execute = "scriptComplete",
-	queryState = "stateResult",
-	captureScreenshot = "screenshotResult",
-	queryDataModel = "dataModelResult",
-	queryLogs = "logsResult",
-	subscribe = "subscribeResult",
-	unsubscribe = "unsubscribeResult",
-}
-
--- ---------------------------------------------------------------------------
 -- Constructor
 -- ---------------------------------------------------------------------------
 
 function ActionRouter.new()
-	-- Copy default response types so each instance can be extended
-	local responseTypes = {}
-	for k, v in DEFAULT_RESPONSE_TYPES do
-		responseTypes[k] = v
-	end
-
 	local self = setmetatable({
 		_handlers = {} :: {
 			[string]: (payload: { [string]: any }, requestId: string, sessionId: string) -> { [string]: any }?,
 		},
-		_responseTypes = responseTypes,
+		_responseTypes = {} :: { [string]: string },
+		_actions = {} :: { [string]: { module: any, hash: string, handlerNames: { string } } },
 	}, ActionRouter)
 	return self
 end
@@ -157,6 +138,7 @@ end
 	@param sendMessage Optional callback for actions that send their own responses.
 	@param logBuffer Optional log buffer instance.
 	@param responseType Optional response type override.
+	@param hash Optional content hash for skip-on-same-hash optimization.
 	@return success, error?
 ]]
 function ActionRouter.registerAction(
@@ -165,8 +147,32 @@ function ActionRouter.registerAction(
 	source: string,
 	sendMessage: ((msg: { [string]: any }) -> ())?,
 	logBuffer: any?,
-	responseType: string?
+	responseType: string?,
+	hash: string?
 ): (boolean, string?)
+	-- Hash-based skip: if the same hash is already installed, skip re-registration
+	if hash and self._actions[name] and self._actions[name].hash == hash then
+		return true, nil
+	end
+
+	-- If an old module exists, tear it down and remove its handlers
+	local oldAction = self._actions[name]
+	if oldAction then
+		if type(oldAction.module.teardown) == "function" then
+			pcall(oldAction.module.teardown)
+		end
+		for _, handlerName in oldAction.handlerNames do
+			self._handlers[handlerName] = nil
+			self._responseTypes[handlerName] = nil
+		end
+	end
+
+	-- Snapshot handler keys before registration
+	local beforeHandlers = {}
+	for k, _ in self._handlers do
+		beforeHandlers[k] = true
+	end
+
 	-- Load the source code
 	local loadOk, moduleOrErr = pcall(function()
 		return (loadstring :: any)(source, `@action/{name}`)
@@ -200,7 +206,40 @@ function ActionRouter.registerAction(
 		self._responseTypes[name] = responseType
 	end
 
+	-- Diff handler keys to find newly registered handler names
+	local registeredNames = {}
+	for k, _ in self._handlers do
+		if not beforeHandlers[k] then
+			table.insert(registeredNames, k)
+		end
+	end
+
+	-- Store in _actions for hash tracking
+	if hash then
+		self._actions[name] = {
+			module = moduleTable,
+			hash = hash,
+			handlerNames = registeredNames,
+		}
+	end
+
 	return true, nil
+end
+
+-- ---------------------------------------------------------------------------
+-- Get installed actions with their hashes
+-- ---------------------------------------------------------------------------
+
+--[[
+	Returns a map of action name -> content hash for all installed actions.
+	Used by the syncActions protocol to determine which actions need updating.
+]]
+function ActionRouter.getInstalledActions(self: any): { [string]: string }
+	local result = {}
+	for name, info in self._actions do
+		result[name] = info.hash
+	end
+	return result
 end
 
 return ActionRouter

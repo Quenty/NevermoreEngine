@@ -116,7 +116,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 		local buffer = MessageBuffer.new(100)
-		QueryLogsAction.register(router, buffer)
+		QueryLogsAction.register(router, nil, buffer)
 
 		buffer:push({ level = "Print", body = "first", timestamp = 1000 })
 		buffer:push({ level = "Warning", body = "second", timestamp = 2000 })
@@ -146,7 +146,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 		local buffer = MessageBuffer.new(100)
-		QueryLogsAction.register(router, buffer)
+		QueryLogsAction.register(router, nil, buffer)
 
 		buffer:push({ level = "Print", body = "first", timestamp = 1000 })
 		buffer:push({ level = "Print", body = "second", timestamp = 2000 })
@@ -171,7 +171,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 		local buffer = MessageBuffer.new(100)
-		QueryLogsAction.register(router, buffer)
+		QueryLogsAction.register(router, nil, buffer)
 
 		buffer:push({ level = "Print", body = "info msg", timestamp = 1000 })
 		buffer:push({ level = "Warning", body = "warn msg", timestamp = 2000 })
@@ -197,7 +197,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 		local buffer = MessageBuffer.new(100)
-		QueryLogsAction.register(router, buffer)
+		QueryLogsAction.register(router, nil, buffer)
 
 		buffer:push({ level = "Print", body = "[StudioBridge] Connected", timestamp = 1000 })
 		buffer:push({ level = "Print", body = "user message", timestamp = 2000 })
@@ -223,7 +223,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 		local buffer = MessageBuffer.new(100)
-		QueryLogsAction.register(router, buffer)
+		QueryLogsAction.register(router, nil, buffer)
 
 		buffer:push({ level = "Print", body = "[StudioBridge] Connected", timestamp = 1000 })
 		buffer:push({ level = "Print", body = "user message", timestamp = 2000 })
@@ -246,7 +246,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 		local buffer = MessageBuffer.new(100)
-		QueryLogsAction.register(router, buffer)
+		QueryLogsAction.register(router, nil, buffer)
 
 		local response = router:dispatch({
 			type = "queryLogs",

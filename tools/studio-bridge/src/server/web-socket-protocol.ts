@@ -30,7 +30,8 @@ export type Capability =
   | 'queryLogs'
   | 'subscribe'
   | 'heartbeat'
-  | 'registerAction';
+  | 'registerAction'
+  | 'syncActions';
 
 export type ErrorCode =
   | 'UNKNOWN_REQUEST'
@@ -216,7 +217,16 @@ export interface RegisterActionResultMessage extends RequestMessage {
   payload: {
     name: string;
     success: boolean;
+    skipped?: boolean;
     error?: string;
+  };
+}
+
+export interface SyncActionsResultMessage extends RequestMessage {
+  type: 'syncActionsResult';
+  payload: {
+    needed: string[];
+    installed: Record<string, string>;
   };
 }
 
@@ -244,6 +254,7 @@ export type PluginMessage =
   | SubscribeResultMessage
   | UnsubscribeResultMessage
   | RegisterActionResultMessage
+  | SyncActionsResultMessage
   | PluginErrorMessage;
 
 // ---------------------------------------------------------------------------
@@ -327,7 +338,15 @@ export interface RegisterActionMessage extends RequestMessage {
   payload: {
     name: string;
     source: string;
+    hash?: string;
     responseType?: string;
+  };
+}
+
+export interface SyncActionsMessage extends RequestMessage {
+  type: 'syncActions';
+  payload: {
+    actions: Record<string, string>;
   };
 }
 
@@ -352,6 +371,7 @@ export type ServerMessage =
   | SubscribeMessage
   | UnsubscribeMessage
   | RegisterActionMessage
+  | SyncActionsMessage
   | ServerErrorMessage;
 
 // ---------------------------------------------------------------------------
@@ -605,7 +625,21 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         payload: {
           name: payload.name,
           success: payload.success,
+          skipped: typeof payload.skipped === 'boolean' ? payload.skipped : undefined,
           error: typeof payload.error === 'string' ? payload.error : undefined,
+        },
+      };
+
+    case 'syncActionsResult':
+      if (requestId === undefined) return null;
+      if (!Array.isArray(payload.needed) || typeof payload.installed !== 'object' || payload.installed === null) return null;
+      return {
+        type: 'syncActionsResult',
+        sessionId,
+        requestId,
+        payload: {
+          needed: payload.needed as string[],
+          installed: payload.installed as Record<string, string>,
         },
       };
 
@@ -757,7 +791,20 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         payload: {
           name: payload.name,
           source: payload.source,
+          hash: typeof payload.hash === 'string' ? payload.hash : undefined,
           responseType: typeof payload.responseType === 'string' ? payload.responseType : undefined,
+        },
+      };
+
+    case 'syncActions':
+      if (requestId === undefined) return null;
+      if (typeof payload.actions !== 'object' || payload.actions === null) return null;
+      return {
+        type: 'syncActions',
+        sessionId,
+        requestId,
+        payload: {
+          actions: payload.actions as Record<string, string>,
         },
       };
 

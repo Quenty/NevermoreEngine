@@ -74,6 +74,7 @@ table.insert(tests, {
 	fn = function()
 		-- Set up a router with a queryState handler
 		local router = ActionRouter.new()
+		router:setResponseType("queryState", "stateResult")
 		router:register("queryState", function(_payload, _requestId, _sessionId)
 			return { state = "Edit", placeId = 12345, placeName = "TestPlace", gameId = 67890 }
 		end)
@@ -131,6 +132,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		local capturedScript = nil
 
+		router:setResponseType("execute", "scriptComplete")
 		router:register("execute", function(payload, _requestId, _sessionId)
 			capturedScript = payload.script
 			return { success = true }
@@ -183,6 +185,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 
 		-- Register a queryLogs handler that reads from the buffer
+		router:setResponseType("queryLogs", "logsResult")
 		router:register("queryLogs", function(payload, _requestId, _sessionId)
 			local direction = payload.direction or "tail"
 			local count = payload.count or 50
@@ -238,6 +241,7 @@ table.insert(tests, {
 		local buffer = MessageBuffer.new(50)
 		local router = ActionRouter.new()
 
+		router:setResponseType("queryLogs", "logsResult")
 		router:register("queryLogs", function(payload, _requestId, _sessionId)
 			return buffer:get(payload.direction, payload.count)
 		end)
@@ -437,6 +441,7 @@ table.insert(tests, {
 		local outputBuffer = MessageBuffer.new(100)
 
 		-- Set up execute handler that simulates script execution
+		router:setResponseType("execute", "scriptComplete")
 		router:register("execute", function(payload, _requestId, _sessionId)
 			-- Simulate: script produces output and completes
 			outputBuffer:push({
@@ -589,6 +594,7 @@ table.insert(tests, {
 		local buffer = MessageBuffer.new(5) -- small capacity
 		local router = ActionRouter.new()
 
+		router:setResponseType("queryLogs", "logsResult")
 		router:register("queryLogs", function(payload, _requestId, _sessionId)
 			return buffer:get(payload.direction, payload.count)
 		end)
@@ -633,6 +639,9 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 
 		-- Register multiple handlers
+		router:setResponseType("queryState", "stateResult")
+		router:setResponseType("execute", "scriptComplete")
+		router:setResponseType("queryLogs", "logsResult")
 		router:register("queryState", function(_payload, _requestId, _sessionId)
 			return { state = "Play", placeId = 111, placeName = "GamePlace", gameId = 222 }
 		end)
@@ -803,6 +812,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		local discoveredPort: number? = nil
 
+		router:setResponseType("queryLogs", "logsResult")
 		router:register("queryLogs", function(payload, _requestId, _sessionId)
 			return buffer:get(payload.direction or "tail", payload.count or 50)
 		end)
@@ -994,6 +1004,8 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		local activeSubscriptions: { string } = {}
 
+		router:setResponseType("subscribe", "subscribeResult")
+		router:setResponseType("unsubscribe", "unsubscribeResult")
 		router:register("subscribe", function(payload, _requestId, _sessionId)
 			for _, event in payload.events do
 				table.insert(activeSubscriptions, event)
