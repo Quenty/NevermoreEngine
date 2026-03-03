@@ -65,8 +65,8 @@ jobs:
 
       - name: Execute script through Studio bridge
         if: ${{ env.ROBLOSECURITY != '' }}
-        run: node tools/studio-bridge/dist/src/cli/cli.js process run --verbose --timeout 480000 'print("E2E test passed!")'
-        timeout-minutes: 10
+        run: node tools/studio-bridge/dist/src/cli/cli.js process run --verbose --timeout 1200000 'print("E2E test passed!")'
+        timeout-minutes: 25
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 

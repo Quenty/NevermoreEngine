@@ -150,7 +150,56 @@ export async function injectCredentialsAsync(
     }
   }
 
+  // Also write to the Windows Registry path that Studio checks on startup.
+  // Studio reads HKCU\Software\Roblox\RobloxStudioBrowser\roblox.com for
+  // cached auth before showing the login dialog. Without this, Studio shows
+  // "Is Studio Configured User Id Present: false" and blocks on login.
+  await writeRegistryAuthAsync(cookie, userId, env);
+
   OutputHelper.info('Credentials injected into Wine Credential Manager.');
+}
+
+/**
+ * Write auth data to Wine registry entries that Studio checks on startup.
+ * This bypasses Studio's WebView2 login dialog (which doesn't work on Wine).
+ */
+async function writeRegistryAuthAsync(
+  cookie: string,
+  userId: number,
+  env: Record<string, string>
+): Promise<void> {
+  const regPath = 'HKCU\\Software\\Roblox\\RobloxStudioBrowser\\roblox.com';
+
+  const regEntries: Array<[string, string, string]> = [
+    [regPath, COOKIE_NAME, cookie],
+  ];
+
+  for (const [keyPath, name, value] of regEntries) {
+    OutputHelper.verbose(`Writing registry: ${keyPath}\\${name}`);
+    const result = await execa(
+      'wine',
+      ['reg', 'add', keyPath, '/v', name, '/t', 'REG_SZ', '/d', value, '/f'],
+      { env, reject: false, timeout: 15000 }
+    );
+    if (result.exitCode !== 0) {
+      OutputHelper.warn(
+        `Failed to write registry entry ${name} (non-fatal): ${result.stderr || result.stdout}`
+      );
+    }
+  }
+
+  // Also set the user ID so Studio recognizes a configured user
+  const userRegPath = 'HKCU\\Software\\Roblox\\RobloxStudioBrowser';
+  const userIdResult = await execa(
+    'wine',
+    ['reg', 'add', userRegPath, '/v', 'UserId', '/t', 'REG_SZ', '/d', String(userId), '/f'],
+    { env, reject: false, timeout: 15000 }
+  );
+  if (userIdResult.exitCode !== 0) {
+    OutputHelper.warn(
+      `Failed to write UserId registry entry (non-fatal): ${userIdResult.stderr || userIdResult.stdout}`
+    );
+  }
 }
 
 /**
