@@ -70,10 +70,33 @@ jobs:
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 
-      - name: Upload Wine log
+      - name: Collect Studio logs
+        if: always()
+        run: |
+          mkdir -p /tmp/studio-logs
+          cp /tmp/studio-bridge-wine.log /tmp/studio-logs/wine.log 2>/dev/null || true
+          # Roblox Studio internal logs (inside Wine prefix)
+          find ~/.wine/drive_c/users/ -path "*/Roblox/logs/*" -name "*.log" -exec cp {} /tmp/studio-logs/ \; 2>/dev/null || true
+          # Also check for crash dumps or error logs
+          find ~/.wine/drive_c/users/ -path "*/Roblox/*.log" -exec cp {} /tmp/studio-logs/ \; 2>/dev/null || true
+          # List what we found
+          echo "=== Collected log files ==="
+          ls -la /tmp/studio-logs/ 2>/dev/null || echo "No logs found"
+          echo ""
+          echo "=== Wine log (last 100 lines) ==="
+          tail -100 /tmp/studio-logs/wine.log 2>/dev/null || echo "No Wine log"
+          echo ""
+          echo "=== Studio logs ==="
+          for f in /tmp/studio-logs/*.log; do
+            [ "$f" = "/tmp/studio-logs/wine.log" ] && continue
+            echo "--- $f ---"
+            tail -50 "$f" 2>/dev/null
+          done
+
+      - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wine-log
-          path: /tmp/studio-bridge-wine.log
+          name: studio-bridge-logs
+          path: /tmp/studio-logs/
           if-no-files-found: ignore

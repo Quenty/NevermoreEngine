@@ -17,7 +17,7 @@ export function buildWineEnv(
     DISPLAY: config.display,
     WINEPREFIX: config.winePrefix,
     WINEARCH: 'win64',
-    WINEDEBUG: '-all',
+    WINEDEBUG: process.env.WINEDEBUG ?? 'fixme-all',
     // Suppress Mono/Gecko install dialogs that block headless runs
     WINEDLLOVERRIDES: 'mscoree=d;mshtml=d',
     // Mesa llvmpipe needs these overrides so Wine's WineD3D layer

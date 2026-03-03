@@ -43,6 +43,13 @@ export async function launchStudioLinuxAsync(
   // Close our copy of the fd — the child owns it now
   fs.closeSync(logFd);
 
+  // Detect early process exit (crash or failure to start)
+  proc.on('exit', (code, signal) => {
+    OutputHelper.verbose(
+      `[StudioBridge] Wine process exited (code=${code}, signal=${signal})`
+    );
+  });
+
   // Allow our Node process to exit without waiting for Studio
   proc.unref();
 
