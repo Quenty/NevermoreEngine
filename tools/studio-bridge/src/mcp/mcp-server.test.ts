@@ -60,8 +60,8 @@ describe('buildToolDefinitions', () => {
     const connection = createMockConnection();
     const tools = buildToolDefinitions(connection);
 
-    // 8 commands with mcp config: exec, logs, query, screenshot, info, list, close, action
-    expect(tools).toHaveLength(8);
+    // 7 commands with mcp config: exec, logs, query, screenshot, info, list, close
+    expect(tools).toHaveLength(7);
   });
 
   it('registers tools with correct group-based names', () => {
@@ -76,7 +76,6 @@ describe('buildToolDefinitions', () => {
     expect(names).toContain('studio_process_info');
     expect(names).toContain('studio_process_list');
     expect(names).toContain('studio_process_close');
-    expect(names).toContain('studio_action');
   });
 
   it('all tools have descriptions', () => {
@@ -129,7 +128,6 @@ describe('buildToolDefinitions', () => {
       'studio_viewport_screenshot',
       'studio_process_info',
       'studio_process_close',
-      'studio_action',
     ];
 
     for (const name of sessionTools) {

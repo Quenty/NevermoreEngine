@@ -28,8 +28,6 @@ import { screenshotCommand } from '../commands/viewport/screenshot/screenshot.js
 import { infoCommand } from '../commands/process/info/info.js';
 import { listCommand } from '../commands/process/list/list.js';
 import { processCloseCommand } from '../commands/process/close/close.js';
-import { actionCommand } from '../commands/action/action.js';
-
 // All commands that opt into MCP (those with an `mcp` config)
 const MCP_COMMANDS = [
   execCommand,
@@ -39,7 +37,6 @@ const MCP_COMMANDS = [
   infoCommand,
   listCommand,
   processCloseCommand,
-  actionCommand,
 ];
 
 // ---------------------------------------------------------------------------

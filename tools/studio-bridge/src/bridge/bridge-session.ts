@@ -23,7 +23,7 @@ import type {
   QueryDataModelOptions,
 } from './types.js';
 import { SessionDisconnectedError } from './types.js';
-import type { SubscribableEvent, PluginMessage, OutputLevel } from '../server/web-socket-protocol.js';
+import type { PluginMessage, OutputLevel } from '../server/web-socket-protocol.js';
 import { loadActionSourcesAsync, type ActionSource } from '../commands/framework/action-loader.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 
@@ -37,8 +37,6 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
   captureScreenshot: 30_000,
   queryDataModel: 10_000,
   queryLogs: 10_000,
-  subscribe: 5_000,
-  unsubscribe: 5_000,
 };
 
 // ---------------------------------------------------------------------------
@@ -274,44 +272,6 @@ export class BridgeSession extends EventEmitter {
     }
 
     throw pluginError('dataModelResult', result);
-  }
-
-  /**
-   * Subscribe to push events from the plugin.
-   */
-  async subscribeAsync(events: SubscribableEvent[]): Promise<void> {
-    this._assertConnected();
-    await this._ensureActionsAsync();
-
-    const timeoutMs = DEFAULT_TIMEOUTS.subscribe;
-    await this._handle.sendActionAsync<PluginMessage>(
-      {
-        type: 'subscribe',
-        sessionId: this._info.sessionId,
-        requestId: randomUUID(),
-        payload: { events },
-      },
-      timeoutMs,
-    );
-  }
-
-  /**
-   * Unsubscribe from push events.
-   */
-  async unsubscribeAsync(events: SubscribableEvent[]): Promise<void> {
-    this._assertConnected();
-    await this._ensureActionsAsync();
-
-    const timeoutMs = DEFAULT_TIMEOUTS.unsubscribe;
-    await this._handle.sendActionAsync<PluginMessage>(
-      {
-        type: 'unsubscribe',
-        sessionId: this._info.sessionId,
-        requestId: randomUUID(),
-        payload: { events },
-      },
-      timeoutMs,
-    );
   }
 
   // -----------------------------------------------------------------------

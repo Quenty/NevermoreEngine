@@ -241,12 +241,6 @@ describe('Inflight request handling during failover', () => {
     await expect(
       session!.queryDataModelAsync({ path: 'game' }),
     ).rejects.toThrow(SessionDisconnectedError);
-    await expect(
-      session!.subscribeAsync(['stateChange']),
-    ).rejects.toThrow(SessionDisconnectedError);
-    await expect(
-      session!.unsubscribeAsync(['stateChange']),
-    ).rejects.toThrow(SessionDisconnectedError);
   });
 
   it('client emits disconnected event when host dies', async () => {

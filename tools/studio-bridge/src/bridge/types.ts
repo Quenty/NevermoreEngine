@@ -9,13 +9,12 @@
 import type {
   StudioState,
   Capability,
-  SubscribableEvent,
   DataModelInstance,
   OutputLevel,
 } from '../server/web-socket-protocol.js';
 
 // Re-export protocol types used in the public API
-export type { StudioState, Capability, SubscribableEvent, DataModelInstance, OutputLevel };
+export type { StudioState, Capability, DataModelInstance, OutputLevel };
 
 // ---------------------------------------------------------------------------
 // Session and instance metadata

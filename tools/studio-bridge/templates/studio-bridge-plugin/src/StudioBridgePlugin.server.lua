@@ -20,10 +20,8 @@ local ActionRouter = require(script.Parent.Shared.ActionRouter)
 local DiscoveryStateMachine = require(script.Parent.Shared.DiscoveryStateMachine)
 local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
 
--- The ExecuteAction is pre-registered so the plugin can handle execute
--- messages immediately after handshake, without needing a registerAction
--- push from the server. Additional actions are pushed dynamically.
-local ExecuteAction = require(script.Parent.Actions.ExecuteAction)
+-- Actions are pushed dynamically over the wire via registerAction.
+-- No static action requires needed.
 
 -- Build constants (Handlebars templates substituted at build time)
 local PORT = "{{PORT}}"
@@ -119,11 +117,6 @@ local function sendMessage(msg)
 		sendMessageFn(msg)
 	end
 end
-
--- Pre-register the execute action so it is available immediately after
--- handshake. The sendMessage callback is wired up once a WebSocket connects,
--- so queued responses will flow through the active connection.
-ExecuteAction.register(router, sendMessage)
 
 -- Register the built-in registerAction handler. This allows the bridge
 -- server to push Luau action modules over the wire after a plugin connects.

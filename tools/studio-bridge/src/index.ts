@@ -52,7 +52,6 @@ export type {
 export type {
   Capability,
   StudioState,
-  SubscribableEvent,
   DataModelInstance,
   ErrorCode,
   SerializedValue,
@@ -89,16 +88,12 @@ export type {
   LogsResultMessage,
   StateChangeMessage,
   HeartbeatMessage,
-  SubscribeResultMessage,
-  UnsubscribeResultMessage,
   PluginErrorMessage,
   // v2 server -> plugin messages
   QueryStateMessage,
   CaptureScreenshotMessage,
   QueryDataModelMessage,
   QueryLogsMessage,
-  SubscribeMessage,
-  UnsubscribeMessage,
   ServerErrorMessage,
   // v2 dynamic action registration
   RegisterActionMessage,

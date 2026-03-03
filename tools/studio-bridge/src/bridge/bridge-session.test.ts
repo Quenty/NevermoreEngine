@@ -123,12 +123,6 @@ describe('BridgeSession', () => {
       await expect(
         session.queryDataModelAsync({ path: 'game' }),
       ).rejects.toThrow(SessionDisconnectedError);
-      await expect(
-        session.subscribeAsync(['stateChange']),
-      ).rejects.toThrow(SessionDisconnectedError);
-      await expect(
-        session.unsubscribeAsync(['stateChange']),
-      ).rejects.toThrow(SessionDisconnectedError);
     });
   });
 
@@ -323,47 +317,6 @@ describe('BridgeSession', () => {
 
       expect(result.instance.name).toBe('Workspace');
       expect(result.instance.className).toBe('Workspace');
-    });
-  });
-
-  // -----------------------------------------------------------------------
-  // Action: subscribeAsync / unsubscribeAsync
-  // -----------------------------------------------------------------------
-
-  describe('subscribeAsync', () => {
-    it('sends subscribe message', async () => {
-      const handle = new MockTransportHandle();
-      handle.sendActionAsync.mockResolvedValueOnce({
-        type: 'subscribeResult',
-        sessionId: 'session-1',
-        requestId: 'r-1',
-        payload: { events: ['stateChange'] },
-      });
-
-      const session = new BridgeSession(createSessionInfo(), handle);
-      await session.subscribeAsync(['stateChange']);
-
-      const [msg] = handle.sendActionAsync.mock.calls[0];
-      expect((msg as ServerMessage).type).toBe('subscribe');
-      expect((msg as any).payload.events).toEqual(['stateChange']);
-    });
-  });
-
-  describe('unsubscribeAsync', () => {
-    it('sends unsubscribe message', async () => {
-      const handle = new MockTransportHandle();
-      handle.sendActionAsync.mockResolvedValueOnce({
-        type: 'unsubscribeResult',
-        sessionId: 'session-1',
-        requestId: 'r-1',
-        payload: { events: ['stateChange'] },
-      });
-
-      const session = new BridgeSession(createSessionInfo(), handle);
-      await session.unsubscribeAsync(['stateChange']);
-
-      const [msg] = handle.sendActionAsync.mock.calls[0];
-      expect((msg as ServerMessage).type).toBe('unsubscribe');
     });
   });
 

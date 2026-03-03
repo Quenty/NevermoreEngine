@@ -1,18 +1,17 @@
 --[[
-	Tests for new action handlers: execute field fix, QueryLogsAction,
-	CaptureScreenshotAction stub, and SubscribeAction stubs.
+	Tests for action handlers: execute field fix, QueryLogsAction,
+	and CaptureScreenshotAction stub.
 
 	QueryStateAction requires Roblox services (RunService, game) and
 	cannot be tested under Lune. It is tested manually via
-	`studio-bridge state` after installation.
+	`studio-bridge process info` after installation.
 ]]
 
 local ActionRouter = require("../../studio-bridge-plugin/src/Shared/ActionRouter")
-local CaptureScreenshotAction = require("../../studio-bridge-plugin/src/Actions/CaptureScreenshotAction")
-local ExecuteAction = require("../../studio-bridge-plugin/src/Actions/ExecuteAction")
+local CaptureScreenshotAction = require("../../../src/commands/viewport/screenshot/capture-screenshot")
+local ExecuteAction = require("../../../src/commands/console/exec/execute")
 local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
-local QueryLogsAction = require("../../studio-bridge-plugin/src/Actions/QueryLogsAction")
-local SubscribeAction = require("../../studio-bridge-plugin/src/Actions/SubscribeAction")
+local QueryLogsAction = require("../../../src/commands/console/logs/query-logs")
 
 -- ---------------------------------------------------------------------------
 -- Test helpers
@@ -334,70 +333,6 @@ table.insert(tests, {
 		assertNotNil(response, "should return a wrapped response")
 		assertEqual(response.type, "screenshotResult")
 		assertEqual(response.payload.code, "CAPABILITY_NOT_SUPPORTED")
-	end,
-})
-
--- ===========================================================================
--- SubscribeAction stubs
--- ===========================================================================
-
-table.insert(tests, {
-	name = "SubscribeAction: echoes back requested events",
-	fn = function()
-		local router = ActionRouter.new()
-		SubscribeAction.register(router)
-
-		local response = router:dispatch({
-			type = "subscribe",
-			sessionId = "sess-1",
-			requestId = "req-1",
-			payload = { events = { "stateChange", "logPush" } },
-		})
-
-		assertNotNil(response)
-		assertEqual(response.type, "subscribeResult")
-		assertEqual(#response.payload.events, 2)
-		assertEqual(response.payload.events[1], "stateChange")
-		assertEqual(response.payload.events[2], "logPush")
-	end,
-})
-
-table.insert(tests, {
-	name = "UnsubscribeAction: echoes back requested events",
-	fn = function()
-		local router = ActionRouter.new()
-		SubscribeAction.register(router)
-
-		local response = router:dispatch({
-			type = "unsubscribe",
-			sessionId = "sess-1",
-			requestId = "req-1",
-			payload = { events = { "stateChange" } },
-		})
-
-		assertNotNil(response)
-		assertEqual(response.type, "unsubscribeResult")
-		assertEqual(#response.payload.events, 1)
-		assertEqual(response.payload.events[1], "stateChange")
-	end,
-})
-
-table.insert(tests, {
-	name = "SubscribeAction: handles nil events gracefully",
-	fn = function()
-		local router = ActionRouter.new()
-		SubscribeAction.register(router)
-
-		local response = router:dispatch({
-			type = "subscribe",
-			sessionId = "sess-1",
-			requestId = "req-1",
-			payload = {},
-		})
-
-		assertNotNil(response)
-		assertEqual(response.type, "subscribeResult")
-		assertEqual(#response.payload.events, 0, "empty events when nil")
 	end,
 })
 
