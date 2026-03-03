@@ -4,9 +4,8 @@
  *
  * v1 messages: hello, output, scriptComplete, welcome, execute, shutdown
  * v2 messages: register, queryState, stateResult, captureScreenshot, screenshotResult,
- *   queryDataModel, dataModelResult, queryLogs, logsResult, subscribe, subscribeResult,
- *   unsubscribe, unsubscribeResult, stateChange, heartbeat, error,
- *   registerAction, registerActionResult
+ *   queryDataModel, dataModelResult, queryLogs, logsResult, stateChange, heartbeat,
+ *   error, registerAction, registerActionResult
  */
 
 // ---------------------------------------------------------------------------
@@ -20,7 +19,6 @@ export type OutputLevel = 'Print' | 'Info' | 'Warning' | 'Error';
 // ---------------------------------------------------------------------------
 
 export type StudioState = 'Edit' | 'Play' | 'Paused' | 'Run' | 'Server' | 'Client';
-export type SubscribableEvent = 'stateChange' | 'logPush';
 
 export type Capability =
   | 'execute'
@@ -28,7 +26,6 @@ export type Capability =
   | 'captureScreenshot'
   | 'queryDataModel'
   | 'queryLogs'
-  | 'subscribe'
   | 'heartbeat'
   | 'registerAction'
   | 'syncActions';
@@ -199,20 +196,6 @@ export interface HeartbeatMessage extends PushMessage {
   };
 }
 
-export interface SubscribeResultMessage extends RequestMessage {
-  type: 'subscribeResult';
-  payload: {
-    events: SubscribableEvent[];
-  };
-}
-
-export interface UnsubscribeResultMessage extends RequestMessage {
-  type: 'unsubscribeResult';
-  payload: {
-    events: SubscribableEvent[];
-  };
-}
-
 export interface RegisterActionResultMessage extends RequestMessage {
   type: 'registerActionResult';
   payload: {
@@ -252,8 +235,6 @@ export type PluginMessage =
   | LogsResultMessage
   | StateChangeMessage
   | HeartbeatMessage
-  | SubscribeResultMessage
-  | UnsubscribeResultMessage
   | RegisterActionResultMessage
   | SyncActionsResultMessage
   | PluginErrorMessage;
@@ -320,20 +301,6 @@ export interface QueryLogsMessage extends RequestMessage {
   };
 }
 
-export interface SubscribeMessage extends RequestMessage {
-  type: 'subscribe';
-  payload: {
-    events: SubscribableEvent[];
-  };
-}
-
-export interface UnsubscribeMessage extends RequestMessage {
-  type: 'unsubscribe';
-  payload: {
-    events: SubscribableEvent[];
-  };
-}
-
 export interface RegisterActionMessage extends RequestMessage {
   type: 'registerAction';
   payload: {
@@ -369,8 +336,6 @@ export type ServerMessage =
   | CaptureScreenshotMessage
   | QueryDataModelMessage
   | QueryLogsMessage
-  | SubscribeMessage
-  | UnsubscribeMessage
   | RegisterActionMessage
   | SyncActionsMessage
   | ServerErrorMessage;
@@ -599,30 +564,6 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         },
       };
 
-    case 'subscribeResult':
-      if (requestId === undefined) return null;
-      if (!Array.isArray(payload.events)) return null;
-      return {
-        type: 'subscribeResult',
-        sessionId,
-        requestId,
-        payload: {
-          events: payload.events as SubscribableEvent[],
-        },
-      };
-
-    case 'unsubscribeResult':
-      if (requestId === undefined) return null;
-      if (!Array.isArray(payload.events)) return null;
-      return {
-        type: 'unsubscribeResult',
-        sessionId,
-        requestId,
-        payload: {
-          events: payload.events as SubscribableEvent[],
-        },
-      };
-
     case 'registerActionResult':
       if (requestId === undefined) return null;
       if (typeof payload.name !== 'string' || typeof payload.success !== 'boolean') return null;
@@ -762,30 +703,6 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
           direction: payload.direction === 'head' || payload.direction === 'tail' ? payload.direction : undefined,
           levels: Array.isArray(payload.levels) ? payload.levels as OutputLevel[] : undefined,
           includeInternal: typeof payload.includeInternal === 'boolean' ? payload.includeInternal : undefined,
-        },
-      };
-
-    case 'subscribe':
-      if (requestId === undefined) return null;
-      if (!Array.isArray(payload.events)) return null;
-      return {
-        type: 'subscribe',
-        sessionId,
-        requestId,
-        payload: {
-          events: payload.events as SubscribableEvent[],
-        },
-      };
-
-    case 'unsubscribe':
-      if (requestId === undefined) return null;
-      if (!Array.isArray(payload.events)) return null;
-      return {
-        type: 'unsubscribe',
-        sessionId,
-        requestId,
-        payload: {
-          events: payload.events as SubscribableEvent[],
         },
       };
 

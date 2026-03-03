@@ -194,8 +194,6 @@ const ACTION_CAPABILITIES: Record<string, Capability> = {
   captureScreenshot: 'captureScreenshot',
   queryDataModel: 'queryDataModel',
   queryLogs: 'queryLogs',
-  subscribe: 'subscribe',
-  unsubscribe: 'subscribe',
   execute: 'execute',
 };
 
@@ -579,7 +577,6 @@ export class StudioBridgeServer {
       'captureScreenshot',
       'queryDataModel',
       'queryLogs',
-      'subscribe',
     ];
 
     if (msg.type === 'hello') {
@@ -694,7 +691,6 @@ export class StudioBridgeServer {
       'captureScreenshot',
       'queryDataModel',
       'queryLogs',
-      'subscribe',
     ];
 
     return new Promise<void>((resolve, reject) => {
