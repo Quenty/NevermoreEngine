@@ -6,12 +6,20 @@
  * 2. cookie name: RobloxStudioAuthCookies → ".ROBLOSECURITY"
  * 3. cookie value: RobloxStudioAuth.ROBLOSECURITY{userId} → the actual cookie
  *
+ * Additionally, Studio 0.710+ uses OAuth2 for startup authentication.
+ * Without a valid refresh token, Studio blocks on a WebView2 login dialog
+ * that doesn't work under Wine. This module obtains a refresh token by
+ * calling Roblox's first-party OAuth authorization endpoint with the
+ * .ROBLOSECURITY cookie, then injects it into the Credential Manager.
+ *
  * This module:
  * - Compiles write-cred.c with MinGW (if not already compiled)
  * - Resolves the user ID from the cookie via Roblox API
- * - Runs `wine write-cred.exe` three times to inject all entries
+ * - Obtains an OAuth2 refresh token via Roblox's authorization endpoint
+ * - Runs `wine write-cred.exe` to inject all credential entries
  */
 
+import * as crypto from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { execSync } from 'child_process';
@@ -21,6 +29,15 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import { ROBLOX_USERS_API, type LinuxStudioConfig } from './linux-config.js';
 import { buildWineEnv } from './linux-wine-env.js';
 import { COOKIE_NAME } from '@quenty/nevermore-cli-helpers';
+
+/** Studio's first-party OAuth client ID (extracted from the Studio binary) */
+const STUDIO_OAUTH_CLIENT_ID = '7968549422692352298';
+
+/** Roblox OAuth API base */
+const ROBLOX_OAUTH_API = 'https://apis.roblox.com/oauth/v1';
+
+/** Roblox Auth API base (for CSRF tokens) */
+const ROBLOX_AUTH_API = 'https://auth.roblox.com';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -151,10 +168,12 @@ export async function injectCredentialsAsync(
   }
 
   // Also write to the Windows Registry path that Studio checks on startup.
-  // Studio reads HKCU\Software\Roblox\RobloxStudioBrowser\roblox.com for
-  // cached auth before showing the login dialog. Without this, Studio shows
-  // "Is Studio Configured User Id Present: false" and blocks on login.
   await writeRegistryAuthAsync(cookie, userId, env);
+
+  // Obtain and inject an OAuth2 refresh token. Studio 0.710+ requires this
+  // for startup authentication — without it, Studio blocks on a WebView2
+  // login dialog that doesn't work under Wine.
+  await injectOAuth2RefreshTokenAsync(cookie, userId, writeCredExe, env);
 
   OutputHelper.info('Credentials injected into Wine Credential Manager.');
 }
@@ -200,6 +219,151 @@ async function writeRegistryAuthAsync(
       `Failed to write UserId registry entry (non-fatal): ${userIdResult.stderr || userIdResult.stdout}`
     );
   }
+}
+
+/**
+ * Obtain an OAuth2 refresh token from the .ROBLOSECURITY cookie and inject
+ * it into Wine's Credential Manager. This completes Studio's first-party
+ * OAuth PKCE flow programmatically, bypassing the WebView2 login dialog.
+ */
+async function injectOAuth2RefreshTokenAsync(
+  cookie: string,
+  userId: number,
+  writeCredExe: string,
+  env: Record<string, string>
+): Promise<void> {
+  OutputHelper.verbose('Obtaining OAuth2 refresh token...');
+
+  // Step 1: Get CSRF token (Roblox requires this for mutating API calls)
+  const csrfToken = await getCsrfTokenAsync(cookie);
+
+  // Step 2: Generate PKCE code verifier and challenge
+  const codeVerifier = crypto
+    .randomBytes(32)
+    .toString('base64url')
+    .slice(0, 43);
+  const codeChallenge = crypto
+    .createHash('sha256')
+    .update(codeVerifier)
+    .digest('base64url');
+  const state = crypto.randomBytes(16).toString('hex');
+
+  // Step 3: Request authorization code
+  const authResponse = await fetch(`${ROBLOX_OAUTH_API}/authorizations`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': csrfToken,
+      Cookie: `${COOKIE_NAME}=${cookie}`,
+    },
+    body: JSON.stringify({
+      clientId: STUDIO_OAUTH_CLIENT_ID,
+      responseTypes: ['Code'],
+      redirectUri: 'roblox-studio-auth:/',
+      scopes: [
+        { scopeType: 'openid', operations: ['read'] },
+        { scopeType: 'credentials', operations: ['read'] },
+        { scopeType: 'profile', operations: ['read'] },
+        { scopeType: 'age', operations: ['read'] },
+        { scopeType: 'roles', operations: ['read'] },
+        { scopeType: 'premium', operations: ['read'] },
+      ],
+      nonce: 'id-roblox',
+      codeChallengeMethod: 's256',
+      codeChallenge,
+      state,
+    }),
+  });
+
+  if (!authResponse.ok) {
+    const body = await authResponse.text();
+    throw new Error(
+      `OAuth authorization failed: ${authResponse.status} ${body}`
+    );
+  }
+
+  const authData = (await authResponse.json()) as { location: string };
+  const locationUrl = new URL(authData.location);
+  const authCode = locationUrl.searchParams.get('code');
+  if (!authCode) {
+    throw new Error('OAuth authorization response missing code');
+  }
+
+  OutputHelper.verbose('OAuth authorization code obtained.');
+
+  // Step 4: Exchange authorization code for tokens
+  const tokenResponse = await fetch(`${ROBLOX_OAUTH_API}/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: authCode,
+      code_verifier: codeVerifier,
+      client_id: STUDIO_OAUTH_CLIENT_ID,
+    }).toString(),
+  });
+
+  if (!tokenResponse.ok) {
+    const body = await tokenResponse.text();
+    throw new Error(`OAuth token exchange failed: ${tokenResponse.status} ${body}`);
+  }
+
+  const tokenData = (await tokenResponse.json()) as {
+    refresh_token: string;
+    access_token: string;
+  };
+
+  if (!tokenData.refresh_token) {
+    throw new Error('OAuth token response missing refresh_token');
+  }
+
+  OutputHelper.verbose(
+    `OAuth refresh token obtained (${tokenData.refresh_token.length} chars).`
+  );
+
+  // Step 5: Inject the refresh token into Wine's Credential Manager
+  const target = `https://www.roblox.com:RobloxStudioAuthoauth2RefreshToken${userId}`;
+  OutputHelper.verbose(`Writing OAuth2 credential: ${target}`);
+  const result = await execa(
+    'wine',
+    [writeCredExe, target, tokenData.refresh_token],
+    { env, reject: false, timeout: 15000 }
+  );
+
+  if (result.exitCode !== 0) {
+    const stderr = result.stderr || result.stdout || 'unknown error';
+    throw new Error(`Failed to write OAuth2 refresh token credential: ${stderr}`);
+  }
+
+  OutputHelper.verbose('OAuth2 refresh token injected into Wine Credential Manager.');
+}
+
+/**
+ * Get a CSRF token from Roblox's auth API. The first request returns 403
+ * with the token in the x-csrf-token header.
+ */
+async function getCsrfTokenAsync(cookie: string): Promise<string> {
+  const response = await fetch(
+    `${ROBLOX_AUTH_API}/v1/authentication-ticket/`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `${COOKIE_NAME}=${cookie}`,
+        Referer: 'https://www.roblox.com/',
+      },
+      body: '{}',
+    }
+  );
+
+  const csrfToken = response.headers.get('x-csrf-token');
+  if (!csrfToken) {
+    throw new Error(
+      `Failed to obtain CSRF token: ${response.status} ${response.statusText}`
+    );
+  }
+
+  return csrfToken;
 }
 
 /**
