@@ -51,21 +51,25 @@ jobs:
       - name: Build all tools
         run: pnpm -r --filter './tools/**' run build
 
+      - name: Install studio-bridge CLI
+        run: npm install --ignore-scripts -g .
+        working-directory: tools/studio-bridge
+
       - name: Setup Linux environment
-        run: node tools/studio-bridge/dist/src/cli/cli.js linux setup --install-deps
+        run: studio-bridge linux setup --install-deps
 
       - name: Verify environment health (pre-auth)
-        run: node tools/studio-bridge/dist/src/cli/cli.js linux status
+        run: studio-bridge linux status
 
       - name: Inject authentication
         if: ${{ env.ROBLOSECURITY != '' }}
-        run: node tools/studio-bridge/dist/src/cli/cli.js linux auth
+        run: studio-bridge linux auth
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 
       - name: Execute script through Studio bridge
         if: ${{ env.ROBLOSECURITY != '' }}
-        run: node tools/studio-bridge/dist/src/cli/cli.js process run --verbose --timeout 1200000 'print("E2E test passed!")'
+        run: studio-bridge process run --verbose --timeout 1200000 'print("E2E test passed!")'
         timeout-minutes: 25
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
