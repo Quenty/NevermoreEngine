@@ -1,8 +1,8 @@
-import { OutputHelper } from '@quenty/cli-output-helpers';
 import { execa } from 'execa';
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 
 export interface RojoBuildOptions {
   /** Absolute path to the rojo project JSON file */
@@ -138,9 +138,8 @@ export class BuildContext {
       }
     }
 
-    OutputHelper.verbose(`Cleaning up build directory: ${this._targetdir}`);
-
     try {
+      OutputHelper.verbose(`[Build] Cleaning up build directory: ${this._targetdir}`);
       await fs.rm(this._targetdir, { recursive: true, force: true });
     } catch {
       // best effort
