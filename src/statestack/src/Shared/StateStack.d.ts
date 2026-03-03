@@ -1,8 +1,11 @@
 import { BaseObject } from '@quenty/baseobject';
 import { Brio } from '@quenty/brio';
 import { Observable } from '@quenty/rx';
+import { Signal } from '@quenty/signal';
 
 interface StateStack<T> extends BaseObject {
+  readonly Changed: Signal<T>;
+
   GetCount(): number;
   GetState(): T;
   Observe(): Observable<T>;
