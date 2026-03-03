@@ -348,12 +348,30 @@ describe('decodePluginMessage (v2)', () => {
       });
     });
 
-    it('returns null with missing pendingRequests', () => {
-      expect(roundTripPlugin({
+    it('accepts heartbeat with missing fields using defaults', () => {
+      const msg = roundTripPlugin({
         type: 'heartbeat',
         sessionId: 'sess-1',
         payload: { uptimeMs: 60000, state: 'Edit' },
-      })).toBeNull();
+      });
+      expect(msg).toEqual({
+        type: 'heartbeat',
+        sessionId: 'sess-1',
+        payload: { uptimeMs: 60000, state: 'Edit', pendingRequests: 0 },
+      });
+    });
+
+    it('accepts empty payload with all defaults', () => {
+      const msg = roundTripPlugin({
+        type: 'heartbeat',
+        sessionId: 'sess-1',
+        payload: {},
+      });
+      expect(msg).toEqual({
+        type: 'heartbeat',
+        sessionId: 'sess-1',
+        payload: { uptimeMs: 0, state: 'Edit', pendingRequests: 0 },
+      });
     });
   });
 

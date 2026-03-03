@@ -944,12 +944,33 @@ export class StudioBridgeServer {
                 (msg.payload.error ? ` error=${msg.payload.error}` : '')
             );
 
+            // Extract captured output from the scriptComplete payload
+            if (msg.payload.output) {
+              for (const entry of msg.payload.output) {
+                logLines.push(entry.body);
+                options.onOutput?.(entry.level as OutputLevel, entry.body);
+              }
+            }
+
             if (msg.payload.error) {
               logLines.push(msg.payload.error);
             }
 
             finish({
               success: msg.payload.success,
+              logs: logLines.join('\n'),
+            });
+            break;
+          }
+
+          case 'error': {
+            const errorPayload = msg.payload as { code: string; message: string };
+            OutputHelper.verbose(
+              `[StudioBridge] Plugin error: ${errorPayload.code} — ${errorPayload.message}`
+            );
+            logLines.push(`[StudioBridge] Plugin error: ${errorPayload.code} — ${errorPayload.message}`);
+            finish({
+              success: false,
               logs: logLines.join('\n'),
             });
             break;

@@ -40,6 +40,9 @@ import { serveCommand } from '../commands/serve/serve.js';
 import { mcpCommand } from '../commands/mcp/mcp.js';
 import { terminalCommand } from '../commands/terminal/terminal.js';
 import { actionCommand } from '../commands/action/action.js';
+import { linuxSetupCommand } from '../commands/linux/setup/setup.js';
+import { linuxAuthCommand } from '../commands/linux/auth/auth.js';
+import { linuxStatusCommand } from '../commands/linux/status/status.js';
 
 // ---------------------------------------------------------------------------
 // Build registry
@@ -65,6 +68,11 @@ registry.register(uninstallCommand);
 registry.register(serveCommand);
 registry.register(mcpCommand);
 registry.register(terminalCommand);
+
+// Linux commands
+registry.register(linuxSetupCommand);
+registry.register(linuxAuthCommand);
+registry.register(linuxStatusCommand);
 
 // ---------------------------------------------------------------------------
 // Build yargs commands from registry

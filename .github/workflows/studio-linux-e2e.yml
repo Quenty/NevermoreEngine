@@ -1,0 +1,79 @@
+name: studio-linux-e2e
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'tools/studio-bridge/src/linux/**'
+      - 'tools/studio-bridge/src/process/**'
+      - 'tools/studio-bridge/src/commands/linux/**'
+      - 'tools/nevermore-cli-helpers/src/auth/**'
+      - '.github/workflows/studio-linux-e2e.yml'
+
+jobs:
+  studio-linux-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '21'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - name: Setup registries
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' run build
+
+      - name: Setup Linux environment
+        run: node tools/studio-bridge/dist/src/cli/cli.js linux setup --install-deps
+
+      - name: Verify environment health (pre-auth)
+        run: node tools/studio-bridge/dist/src/cli/cli.js linux status
+
+      - name: Inject authentication
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: node tools/studio-bridge/dist/src/cli/cli.js linux auth
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+
+      - name: Execute script through Studio bridge
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: node tools/studio-bridge/dist/src/cli/cli.js process run --verbose --timeout 480000 'print("E2E test passed!")'
+        timeout-minutes: 10
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+
+      - name: Upload Wine log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wine-log
+          path: /tmp/studio-bridge-wine.log
+          if-no-files-found: ignore

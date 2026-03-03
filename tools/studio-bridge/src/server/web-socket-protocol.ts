@@ -587,20 +587,15 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
       };
 
     case 'heartbeat':
-      if (
-        typeof payload.uptimeMs !== 'number' ||
-        typeof payload.state !== 'string' ||
-        typeof payload.pendingRequests !== 'number'
-      ) {
-        return null;
-      }
+      // Accept empty payloads (Luau empty table encodes as []) with defaults.
+      // v1 plugins send payload: {}, v2 plugins send rich data.
       return {
         type: 'heartbeat',
         sessionId,
         payload: {
-          uptimeMs: payload.uptimeMs,
-          state: payload.state as StudioState,
-          pendingRequests: payload.pendingRequests,
+          uptimeMs: typeof payload.uptimeMs === 'number' ? payload.uptimeMs : 0,
+          state: typeof payload.state === 'string' ? (payload.state as StudioState) : 'Edit',
+          pendingRequests: typeof payload.pendingRequests === 'number' ? payload.pendingRequests : 0,
         },
       };
 

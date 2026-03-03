@@ -20,8 +20,10 @@ local ActionRouter = require(script.Parent.Shared.ActionRouter)
 local DiscoveryStateMachine = require(script.Parent.Shared.DiscoveryStateMachine)
 local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
 
--- Actions are pushed dynamically over the wire via registerAction.
--- No static action requires needed.
+-- The ExecuteAction is pre-registered so the plugin can handle execute
+-- messages immediately after handshake, without needing a registerAction
+-- push from the server. Additional actions are pushed dynamically.
+local ExecuteAction = require(script.Parent.Actions.ExecuteAction)
 
 -- Build constants (Handlebars templates substituted at build time)
 local PORT = "{{PORT}}"
@@ -117,6 +119,11 @@ local function sendMessage(msg)
 		sendMessageFn(msg)
 	end
 end
+
+-- Pre-register the execute action so it is available immediately after
+-- handshake. The sendMessage callback is wired up once a WebSocket connects,
+-- so queued responses will flow through the active connection.
+ExecuteAction.register(router, sendMessage)
 
 -- Register the built-in registerAction handler. This allows the bridge
 -- server to push Luau action modules over the wire after a plugin connects.
@@ -280,11 +287,20 @@ local function wireConnection(ws, sessionId, connectLabel)
 		connected = false
 	end)
 
-	-- Heartbeat coroutine
+	-- Heartbeat coroutine — send v2 rich heartbeat data
+	local heartbeatStart = os.clock()
 	task.spawn(function()
 		while connected do
 			pcall(function()
-				ws:Send(jsonEncode({ type = "heartbeat", sessionId = sessionId, payload = {} }))
+				ws:Send(jsonEncode({
+					type = "heartbeat",
+					sessionId = sessionId,
+					payload = {
+						uptimeMs = math.floor((os.clock() - heartbeatStart) * 1000),
+						state = detectContext() == "edit" and "Edit" or detectContext(),
+						pendingRequests = 0,
+					},
+				}))
 			end)
 			task.wait(15)
 		end

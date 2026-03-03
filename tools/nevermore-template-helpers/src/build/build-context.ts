@@ -73,8 +73,16 @@ export class BuildContext {
     }
 
     const args = ['build', projectPath];
+
+    // On Linux, rojo's --plugin flag is not supported. Build to a temp
+    // file with -o and copy to the plugins folder ourselves.
+    const usePluginFallback = plugin && process.platform === 'linux';
+
     if (output) {
       args.push('-o', output);
+    } else if (usePluginFallback) {
+      const tempOutput = path.join(this._targetdir, plugin);
+      args.push('-o', tempOutput);
     } else if (plugin) {
       args.push('--plugin', plugin);
     }
@@ -83,6 +91,13 @@ export class BuildContext {
 
     if (plugin && pluginsFolder) {
       const pluginPath = path.join(pluginsFolder, plugin);
+
+      if (usePluginFallback) {
+        const tempOutput = path.join(this._targetdir, plugin);
+        await fs.mkdir(pluginsFolder, { recursive: true });
+        await fs.copyFile(tempOutput, pluginPath);
+      }
+
       this._trackedFiles.push(pluginPath);
       return pluginPath;
     }
