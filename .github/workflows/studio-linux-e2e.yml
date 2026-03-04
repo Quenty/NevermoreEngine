@@ -8,25 +8,27 @@ on:
       - 'tools/studio-bridge/src/process/**'
       - 'tools/studio-bridge/src/commands/linux/**'
       - 'tools/nevermore-cli-helpers/src/auth/**'
+      - 'tools/studio-bridge/docker/**'
       - '.github/workflows/studio-linux-e2e.yml'
 
 jobs:
   studio-linux-e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    container:
+      image: ghcr.io/quenty/nevermore-studio-linux:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      options: --user studio
+      env:
+        ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '21'
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          cache: true
 
       - name: Setup registries
         run: |
@@ -42,21 +44,23 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Setup Aftman
-        uses: ok-nick/setup-aftman@v0.4.2
-        with:
-          version: 'v0.3.0'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          cache: true
+        run: |
+          mkdir -p ~/.aftman/bin
+          curl -fsSL https://github.com/LPGhatguy/aftman/releases/download/v0.3.0/aftman-0.3.0-linux-x86_64.zip -o /tmp/aftman.zip
+          unzip -o /tmp/aftman.zip -d /tmp/aftman
+          install -m 755 /tmp/aftman/aftman ~/.aftman/bin/aftman
+          echo "$HOME/.aftman/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.aftman/bin:$PATH"
+          aftman install --no-trust-check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build all tools
         run: pnpm -r --filter './tools/**' run build
 
       - name: Install studio-bridge CLI
-        run: npm install --ignore-scripts -g .
+        run: npm install --ignore-scripts --force -g .
         working-directory: tools/studio-bridge
-
-      - name: Setup Linux environment
-        run: studio-bridge linux setup --install-deps
 
       - name: Verify environment health (pre-auth)
         run: studio-bridge linux status

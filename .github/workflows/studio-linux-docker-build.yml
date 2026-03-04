@@ -1,0 +1,108 @@
+name: studio-linux-docker-build
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Nightly 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      studio_version:
+        description: 'Override Studio version hash (leave empty for latest)'
+        required: false
+  push:
+    paths:
+      - 'tools/studio-bridge/docker/**'
+      - '.github/workflows/studio-linux-docker-build.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: quenty/nevermore-studio-linux
+
+jobs:
+  resolve-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      short: ${{ steps.resolve.outputs.short }}
+    steps:
+      - name: Resolve Studio version
+        id: resolve
+        run: |
+          if [ -n "${{ inputs.studio_version }}" ]; then
+            VERSION="${{ inputs.studio_version }}"
+          else
+            VERSION=$(curl -s https://clientsettingscdn.roblox.com/v2/client-version/WindowsStudio64 | jq -r .clientVersionUpload)
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "short=${VERSION:0:12}" >> "$GITHUB_OUTPUT"
+          echo "Resolved Studio version: $VERSION"
+
+  check-existing:
+    needs: resolve-version
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if image already exists
+        id: check
+        run: |
+          if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.version }} > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Image already exists for version ${{ needs.resolve-version.outputs.version }}, skipping build"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Image not found, will build"
+          fi
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+
+  build-and-push:
+    needs: [resolve-version, check-existing]
+    if: needs.check-existing.outputs.exists != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: tools/studio-bridge/docker
+          build-contexts: workspace=.
+          build-args: |
+            STUDIO_VERSION=${{ needs.resolve-version.outputs.version }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  cleanup:
+    needs: build-and-push
+    if: always() && needs.build-and-push.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Clean up old images
+        uses: snok/container-retention-policy@v3.0.0
+        with:
+          account: quenty
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-names: nevermore-studio-linux
+          cut-off: 30d
+          keep-n-most-recent: 5
