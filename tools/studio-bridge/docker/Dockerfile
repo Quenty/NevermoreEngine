@@ -49,6 +49,19 @@ RUN pnpm install --frozen-lockfile --filter "@quenty/studio-bridge..." \
 RUN node tools/studio-bridge/dist/src/cli/cli.js linux setup \
     ${STUDIO_VERSION:+--studio-version "$STUDIO_VERSION"}
 
+# --- Pre-initialize Wine prefix and compile write-cred.exe ---
+# Doing this at build time saves ~40s per auth invocation at runtime.
+RUN Xvfb :99 -screen 0 1024x768x24 & \
+    sleep 1 \
+    && DISPLAY=:99 WINEPREFIX=/home/studio/.wine WINEARCH=win64 \
+       WINEDEBUG=-all WINEDLLOVERRIDES="mscoree=d;mshtml=d" \
+       wineboot -i \
+    && x86_64-w64-mingw32-gcc \
+       -o /home/studio/roblox-studio/write-cred.exe \
+       tools/studio-bridge/src/linux/write-cred.c \
+       -lcredui -ladvapi32 \
+    && kill %1 || true
+
 # --- Install studio-bridge globally for runtime, then clean up ---
 # Use pnpm deploy to create a self-contained copy with resolved workspace deps,
 # then link the binary. This avoids npm registry lookups for workspace packages.

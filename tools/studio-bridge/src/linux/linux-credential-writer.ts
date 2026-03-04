@@ -126,11 +126,18 @@ export async function injectCredentialsAsync(
   const env = buildWineEnv(config);
   const writeCredExe = config.writeCredExe;
 
-  // Initialize Wine prefix if it doesn't exist yet (wineboot creates it).
-  // This must happen before any wine command; otherwise the first run
-  // blocks on Mono/Gecko install dialogs even with WINEDLLOVERRIDES.
-  OutputHelper.verbose('Initializing Wine prefix...');
-  const bootResult = await execa('wineboot', ['-i'], {
+  // Initialize or update the Wine prefix. wineboot must run before any wine
+  // command to create the prefix on first use, and must also run in containers
+  // where the prefix was pre-built at image time — the update pass refreshes
+  // stale registry entries and user profile paths for the current environment.
+  const prefixExists = await fs.access(path.join(config.winePrefix, 'system.reg')).then(() => true, () => false);
+  const winebootFlag = prefixExists ? '-u' : '-i';
+  OutputHelper.verbose(
+    prefixExists
+      ? 'Updating Wine prefix for current environment...'
+      : 'Initializing Wine prefix...'
+  );
+  const bootResult = await execa('wineboot', [winebootFlag], {
     env,
     reject: false,
     timeout: 120000,
@@ -141,7 +148,7 @@ export async function injectCredentialsAsync(
     );
   }
 
-  // Write all three credential entries
+  // Write all three credential entries in a single Wine invocation
   const entries: Array<[string, string]> = [
     ['https://www.roblox.com:RobloxStudioAuthuserid', String(userId)],
     ['https://www.roblox.com:RobloxStudioAuthCookies', COOKIE_NAME],
@@ -151,20 +158,17 @@ export async function injectCredentialsAsync(
     ],
   ];
 
-  for (const [target, value] of entries) {
-    OutputHelper.verbose(`Writing credential: ${target}`);
-    const result = await execa('wine', [writeCredExe, target, value], {
-      env,
-      reject: false,
-      timeout: 15000,
-    });
+  OutputHelper.verbose(`Writing ${entries.length} credential entries...`);
+  const credArgs = entries.flatMap(([target, value]) => [target, value]);
+  const result = await execa('wine', [writeCredExe, ...credArgs], {
+    env,
+    reject: false,
+    timeout: 30000,
+  });
 
-    if (result.exitCode !== 0) {
-      const stderr = result.stderr || result.stdout || 'unknown error';
-      throw new Error(
-        `Failed to write credential "${target}": ${stderr}`
-      );
-    }
+  if (result.exitCode !== 0) {
+    const stderr = result.stderr || result.stdout || 'unknown error';
+    throw new Error(`Failed to write credentials: ${stderr}`);
   }
 
   // Also write to the Windows Registry path that Studio checks on startup.
