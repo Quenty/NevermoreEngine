@@ -112,12 +112,10 @@ export async function injectCredentialsAsync(
 ): Promise<void> {
   const { cookie, config } = options;
 
-  // Ensure write-cred.exe exists
-  try {
-    await fs.access(config.writeCredExe);
-  } catch {
-    await compileWriteCredAsync(config);
-  }
+  // Always recompile write-cred.exe from source to ensure it matches the
+  // current code (e.g. batch-mode support). A stale binary from a Docker
+  // image may silently ignore extra arguments.
+  await compileWriteCredAsync(config);
 
   // Resolve user ID from cookie
   const userId = await resolveUserIdAsync(cookie);
