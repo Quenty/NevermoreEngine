@@ -44,16 +44,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Setup Aftman
-        run: |
-          mkdir -p ~/.aftman/bin
-          curl -fsSL https://github.com/LPGhatguy/aftman/releases/download/v0.3.0/aftman-0.3.0-linux-x86_64.zip -o /tmp/aftman.zip
-          unzip -o /tmp/aftman.zip -d /tmp/aftman
-          install -m 755 /tmp/aftman/aftman ~/.aftman/bin/aftman
-          echo "$HOME/.aftman/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.aftman/bin:$PATH"
-          aftman install --no-trust-check
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build all tools
         run: pnpm -r --filter './tools/**' run build
@@ -78,33 +71,21 @@ jobs:
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 
-      - name: Collect Studio logs
+      - name: Print logs
         if: always()
         run: |
-          mkdir -p /tmp/studio-logs
-          cp /tmp/studio-bridge-wine.log /tmp/studio-logs/wine.log 2>/dev/null || true
-          # Roblox Studio internal logs (inside Wine prefix)
-          find ~/.wine/drive_c/users/ -path "*/Roblox/logs/*" -name "*.log" -exec cp {} /tmp/studio-logs/ \; 2>/dev/null || true
-          # Also check for crash dumps or error logs
-          find ~/.wine/drive_c/users/ -path "*/Roblox/*.log" -exec cp {} /tmp/studio-logs/ \; 2>/dev/null || true
-          # List what we found
-          echo "=== Collected log files ==="
-          ls -la /tmp/studio-logs/ 2>/dev/null || echo "No logs found"
-          echo ""
           echo "=== Wine log (last 100 lines) ==="
-          tail -100 /tmp/studio-logs/wine.log 2>/dev/null || echo "No Wine log"
+          tail -100 /tmp/studio-bridge-wine.log 2>/dev/null || echo "No Wine log"
           echo ""
           echo "=== Studio logs ==="
-          for f in /tmp/studio-logs/*.log; do
-            [ "$f" = "/tmp/studio-logs/wine.log" ] && continue
-            echo "--- $f ---"
-            tail -50 "$f" 2>/dev/null
-          done
+          tail -50 ~/.wine/drive_c/users/*/AppData/Local/Roblox/logs/*.log 2>/dev/null || echo "No Studio logs"
 
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: studio-bridge-logs
-          path: /tmp/studio-logs/
+          path: |
+            /tmp/studio-bridge-wine.log
+            ~/.wine/drive_c/users/*/AppData/Local/Roblox/logs/
           if-no-files-found: ignore

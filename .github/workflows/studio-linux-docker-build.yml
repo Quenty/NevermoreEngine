@@ -9,6 +9,7 @@ on:
         description: 'Override Studio version hash (leave empty for latest)'
         required: false
   push:
+    branches: [main]
     paths:
       - 'tools/studio-bridge/docker/**'
       - '.github/workflows/studio-linux-docker-build.yml'
@@ -57,7 +58,7 @@ jobs:
 
   build-and-push:
     needs: [resolve-version, check-existing]
-    if: needs.check-existing.outputs.exists != 'true'
+    if: needs.check-existing.outputs.exists != 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
