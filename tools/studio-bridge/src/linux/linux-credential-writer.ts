@@ -172,10 +172,17 @@ export async function injectCredentialsAsync(
   // Also write to the Windows Registry path that Studio checks on startup.
   await writeRegistryAuthAsync(cookie, userId, env);
 
-  // Obtain and inject an OAuth2 refresh token. Studio 0.710+ requires this
+  // Obtain and inject an OAuth2 refresh token. Studio 0.710+ may require this
   // for startup authentication — without it, Studio blocks on a WebView2
-  // login dialog that doesn't work under Wine.
-  await injectOAuth2RefreshTokenAsync(cookie, userId, writeCredExe, env);
+  // login dialog that doesn't work under Wine. Non-fatal: cookie-based
+  // credentials above are sufficient for many Studio versions.
+  try {
+    await injectOAuth2RefreshTokenAsync(cookie, userId, writeCredExe, env);
+  } catch (error) {
+    OutputHelper.warn(
+      `OAuth2 refresh token injection failed (non-fatal): ${error instanceof Error ? error.message : error}`
+    );
+  }
 
   OutputHelper.info('Credentials injected into Wine Credential Manager.');
 }
