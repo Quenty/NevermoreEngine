@@ -12,8 +12,17 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import { validateCookieAsync } from '@quenty/nevermore-cli-helpers';
 import type { ExecuteScriptOptions } from '../cli/script-executor.js';
 
-const DOCKER_IMAGE = 'ghcr.io/quenty/nevermore-studio-linux:latest';
+const DOCKER_IMAGE_BASE = 'ghcr.io/quenty/nevermore-studio-linux';
 const CHECK_TIMEOUT_MS = 5_000;
+
+/**
+ * Resolves the Docker image to use. Defaults to :latest, but can be
+ * overridden with STUDIO_BRIDGE_DOCKER_TAG (e.g. "canary-feat-my-branch").
+ */
+function resolveDockerImage(): string {
+  const tag = process.env.STUDIO_BRIDGE_DOCKER_TAG ?? 'latest';
+  return `${DOCKER_IMAGE_BASE}:${tag}`;
+}
 
 /**
  * Returns true if the current environment should delegate to Docker
@@ -58,10 +67,11 @@ export async function delegateToDockerAsync(
 
   await validateCookieAsync(cookie);
 
-  await ensureImageAsync();
+  const image = resolveDockerImage();
+  await ensureImageAsync(image);
 
   const cwd = process.cwd();
-  const args = await buildDockerRunArgsAsync(options, cwd, cookie);
+  const args = await buildDockerRunArgsAsync(options, cwd, cookie, image);
 
   // Log args without the cookie value
   const safeArgs = args.map(a =>
@@ -80,14 +90,14 @@ export async function delegateToDockerAsync(
 /**
  * Ensures the Docker image is available locally, pulling if needed.
  */
-async function ensureImageAsync(): Promise<void> {
+async function ensureImageAsync(image: string): Promise<void> {
   try {
-    await execa('docker', ['image', 'inspect', DOCKER_IMAGE], {
+    await execa('docker', ['image', 'inspect', image], {
       stdio: 'ignore',
     });
   } catch {
-    OutputHelper.info(`Pulling ${DOCKER_IMAGE}...`);
-    await execa('docker', ['pull', DOCKER_IMAGE], { stdio: 'inherit' });
+    OutputHelper.info(`Pulling ${image}...`);
+    await execa('docker', ['pull', image], { stdio: 'inherit' });
   }
 }
 
@@ -99,6 +109,7 @@ export async function buildDockerRunArgsAsync(
   options: ExecuteScriptOptions,
   cwd: string,
   cookie: string,
+  image: string = `${DOCKER_IMAGE_BASE}:latest`,
 ): Promise<string[]> {
   const { scriptContent, placePath, timeoutMs, verbose } = options;
 
@@ -165,7 +176,7 @@ export async function buildDockerRunArgsAsync(
     '-e', `ROBLOSECURITY=${cookie}`,
     '-v', `${cwd}:${cwd}`,
     '-w', cwd,
-    DOCKER_IMAGE,
+    image,
     'bash', '-c', innerArgs.join(' '),
   ];
 }

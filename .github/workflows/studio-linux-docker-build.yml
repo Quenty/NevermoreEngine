@@ -13,6 +13,10 @@ on:
     paths:
       - 'tools/studio-bridge/docker/**'
       - '.github/workflows/studio-linux-docker-build.yml'
+  pull_request:
+    paths:
+      - 'tools/studio-bridge/docker/**'
+      - '.github/workflows/studio-linux-docker-build.yml'
 
 env:
   REGISTRY: ghcr.io
@@ -24,6 +28,8 @@ jobs:
     outputs:
       version: ${{ steps.resolve.outputs.version }}
       short: ${{ steps.resolve.outputs.short }}
+      is_canary: ${{ steps.resolve.outputs.is_canary }}
+      canary_tag: ${{ steps.resolve.outputs.canary_tag }}
     steps:
       - name: Resolve Studio version
         id: resolve
@@ -37,6 +43,20 @@ jobs:
           echo "short=${VERSION:0:12}" >> "$GITHUB_OUTPUT"
           echo "Resolved Studio version: $VERSION"
 
+          # Canary builds for PRs and non-main branches
+          # For pull_request events, head_ref is the source branch; for push, ref_name is the branch
+          BRANCH="${{ github.head_ref || github.ref_name }}"
+          if [ "$BRANCH" != "main" ]; then
+            # Sanitize branch name for Docker tag (replace / with -)
+            CANARY_TAG="canary-${BRANCH//\//-}"
+            echo "is_canary=true" >> "$GITHUB_OUTPUT"
+            echo "canary_tag=$CANARY_TAG" >> "$GITHUB_OUTPUT"
+            echo "Canary build: $CANARY_TAG"
+          else
+            echo "is_canary=false" >> "$GITHUB_OUTPUT"
+            echo "canary_tag=" >> "$GITHUB_OUTPUT"
+          fi
+
   check-existing:
     needs: resolve-version
     runs-on: ubuntu-latest
@@ -46,6 +66,13 @@ jobs:
       - name: Check if image already exists
         id: check
         run: |
+          # Always rebuild canary images
+          if [ "${{ needs.resolve-version.outputs.is_canary }}" = "true" ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Canary build — always rebuild"
+            exit 0
+          fi
+
           if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.version }} > /dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "Image already exists for version ${{ needs.resolve-version.outputs.version }}, skipping build"
@@ -77,6 +104,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Compute image tags
+        id: tags
+        run: |
+          if [ "${{ needs.resolve-version.outputs.is_canary }}" = "true" ]; then
+            # Canary: only the canary tag, never :latest
+            TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.canary_tag }}"
+          else
+            # Production: latest + version tags
+            TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.version }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.short }}"
+          fi
+          # Use EOF delimiter for multiline
+          echo "tags<<ENDOFTAGS" >> "$GITHUB_OUTPUT"
+          echo "$TAGS" >> "$GITHUB_OUTPUT"
+          echo "ENDOFTAGS" >> "$GITHUB_OUTPUT"
+
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
@@ -85,10 +129,7 @@ jobs:
           build-args: |
             STUDIO_VERSION=${{ needs.resolve-version.outputs.version }}
           push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-version.outputs.short }}
+          tags: ${{ steps.tags.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
