@@ -73,7 +73,8 @@ RUN Xvfb :99 -screen 0 1024x768x24 & \
        -o /home/studio/roblox-studio/write-cred.exe \
        tools/studio-bridge/src/linux/write-cred.c \
        -lcredui -ladvapi32 \
-    && kill %1 || true
+    && kill %1 || true \
+    && rm -f /tmp/.X99-lock
 
 # --- Install studio-bridge globally for runtime, then clean up ---
 # Use pnpm deploy to create a self-contained copy with resolved workspace deps,

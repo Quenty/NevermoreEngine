@@ -18,6 +18,10 @@ on:
       - 'tools/studio-bridge/docker/**'
       - '.github/workflows/studio-linux-docker-build.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: quenty/nevermore-studio-linux
@@ -134,13 +138,17 @@ jobs:
           cache-to: type=gha,mode=max
 
   cleanup:
-    needs: build-and-push
-    if: always() && needs.build-and-push.result == 'success'
+    needs: [resolve-version, build-and-push]
+    if: >-
+      always()
+      && needs.build-and-push.result == 'success'
+      && needs.resolve-version.outputs.is_canary != 'true'
     runs-on: ubuntu-latest
     permissions:
       packages: write
     steps:
       - name: Clean up old images
+        continue-on-error: true
         uses: snok/container-retention-policy@v3.0.0
         with:
           account: quenty
