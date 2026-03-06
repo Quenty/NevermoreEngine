@@ -153,6 +153,34 @@ export async function createPlaceInUniverseAsync(
   return placeId;
 }
 
+/**
+ * Validates the ROBLOSECURITY cookie against the Roblox API.
+ * Exits with an error if the cookie is invalid. Continues with a
+ * warning if the network request itself fails (offline scenario).
+ */
+export async function validateCookieAsync(cookie: string): Promise<void> {
+  try {
+    const response = await fetch('https://users.roblox.com/v1/users/authenticated', {
+      headers: {
+        Cookie: `.ROBLOSECURITY=${cookie}`,
+      },
+    });
+
+    if (response.status !== 200) {
+      OutputHelper.error(
+        `ROBLOSECURITY cookie is invalid or expired (HTTP ${response.status}). Update the cookie and try again.`,
+      );
+      process.exit(1);
+    }
+
+    OutputHelper.verbose('ROBLOSECURITY cookie validated successfully.');
+  } catch {
+    OutputHelper.warn(
+      'Could not validate ROBLOSECURITY cookie (network error). Continuing anyway.',
+    );
+  }
+}
+
 export interface RenamePlaceResult {
   success: boolean;
   reason?: 'no_cookie' | 'api_error';

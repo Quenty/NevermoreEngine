@@ -6,6 +6,7 @@
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { checkLinuxEnvironmentAsync } from '../../../linux/linux-env-guard.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,6 +31,12 @@ interface SetupResult {
 
 export async function setupHandlerAsync(args: SetupArgs): Promise<SetupResult> {
   try {
+    const envError = await checkLinuxEnvironmentAsync();
+    if (envError) {
+      OutputHelper.error(envError);
+      process.exit(1);
+    }
+
     const linux = await import('../../../linux/index.js');
     const config = linux.resolveLinuxConfig();
 
@@ -119,7 +126,7 @@ export async function setupHandlerAsync(args: SetupArgs): Promise<SetupResult> {
 export const linuxSetupCommand = defineCommand<SetupArgs, SetupResult>({
   group: 'linux',
   name: 'setup',
-  description: 'Install Wine dependencies and Roblox Studio for headless Linux operation',
+  description: 'Install Wine + Roblox Studio for headless Linux operation (within Docker image or Linux with Wine)',
   category: 'infrastructure',
   safety: 'none',
   scope: 'standalone',

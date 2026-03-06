@@ -7,6 +7,7 @@ import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { getRobloxCookieAsync } from '@quenty/nevermore-cli-helpers';
+import { checkLinuxEnvironmentAsync } from '../../../linux/linux-env-guard.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -43,6 +44,12 @@ function readStdinAsync(): Promise<string> {
 
 export async function authHandlerAsync(args: AuthArgs): Promise<AuthResult> {
   try {
+    const envError = await checkLinuxEnvironmentAsync();
+    if (envError) {
+      OutputHelper.error(envError);
+      process.exit(1);
+    }
+
     const linux = await import('../../../linux/index.js');
     const config = linux.resolveLinuxConfig();
 
@@ -60,6 +67,10 @@ export async function authHandlerAsync(args: AuthArgs): Promise<AuthResult> {
     } else {
       cookie = await getRobloxCookieAsync();
     }
+
+    // Validate cookie before attempting Wine injection
+    const { validateCookieAsync } = await import('@quenty/nevermore-cli-helpers');
+    await validateCookieAsync(cookie);
 
     // Ensure display is running (Wine needs it for credential write)
     await linux.ensureDisplayAsync(config);
@@ -87,7 +98,7 @@ export async function authHandlerAsync(args: AuthArgs): Promise<AuthResult> {
 export const linuxAuthCommand = defineCommand<AuthArgs, AuthResult>({
   group: 'linux',
   name: 'auth',
-  description: 'Inject .ROBLOSECURITY cookie into Wine Credential Manager',
+  description: 'Inject .ROBLOSECURITY cookie into Wine Credential Manager (within Docker image or Linux with Wine)',
   category: 'infrastructure',
   safety: 'none',
   scope: 'standalone',

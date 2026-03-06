@@ -32,10 +32,23 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && corepack enable pnpm \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# --- Aftman binary ---
+RUN curl -fsSL https://github.com/LPGhatguy/aftman/releases/download/v0.3.0/aftman-0.3.0-linux-x86_64.zip \
+        -o /tmp/aftman.zip \
+    && unzip -o /tmp/aftman.zip -d /tmp/aftman \
+    && install -m 755 /tmp/aftman/aftman /usr/local/bin/aftman \
+    && rm -rf /tmp/aftman.zip /tmp/aftman
+
 # --- Non-root user ---
 RUN useradd -m -s /bin/bash studio
 USER studio
 WORKDIR /home/studio
+
+# --- Install Aftman tools (rojo, lune, etc.) ---
+# aftman.toml lives in $HOME so shims can find it from any CWD
+COPY --from=workspace --chown=studio:studio aftman.toml /home/studio/aftman.toml
+RUN mkdir -p /home/studio/.aftman/bin \
+    && aftman install --no-trust-check
 
 # --- Build studio-bridge from source (via named build context "workspace") ---
 COPY --from=workspace --chown=studio:studio package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.json /home/studio/build/
@@ -81,7 +94,7 @@ ENV STUDIO_DIR=/home/studio/roblox-studio \
     MESA_GL_VERSION_OVERRIDE=4.5 \
     MESA_GLSL_VERSION_OVERRIDE=450 \
     NPM_CONFIG_PREFIX=/home/studio/.npm-global \
-    PATH=/home/studio/.npm-global/bin:$PATH
+    PATH=/home/studio/.aftman/bin:/home/studio/.npm-global/bin:$PATH
 
 COPY --chown=studio:studio entrypoint.sh /home/studio/entrypoint.sh
 RUN chmod +x /home/studio/entrypoint.sh

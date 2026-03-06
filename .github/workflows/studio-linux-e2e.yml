@@ -43,11 +43,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup Aftman
-        uses: ok-nick/setup-aftman@v0.4.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build all tools
         run: pnpm -r --filter './tools/**' run build
 
@@ -57,20 +52,6 @@ jobs:
 
       - name: Verify environment health (pre-auth)
         run: studio-bridge linux status
-
-      - name: Validate cookie
-        if: ${{ env.ROBLOSECURITY != '' }}
-        run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Cookie: .ROBLOSECURITY=$ROBLOSECURITY" \
-            https://users.roblox.com/v1/users/authenticated)
-          if [ "$STATUS" != "200" ]; then
-            echo "::error::ROBLOSECURITY cookie is invalid (HTTP $STATUS). Update the repository secret."
-            exit 1
-          fi
-          echo "Cookie validated (HTTP $STATUS)"
-        env:
-          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 
       - name: Inject authentication
         if: ${{ env.ROBLOSECURITY != '' }}

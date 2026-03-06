@@ -6,6 +6,7 @@
 import * as fs from 'fs/promises';
 import { defineCommand } from '../../framework/define-command.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { checkLinuxEnvironmentAsync } from '../../../linux/linux-env-guard.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -48,6 +49,12 @@ async function fileExistsAsync(filePath: string): Promise<boolean> {
 
 export async function statusHandlerAsync(_args: StatusArgs): Promise<StatusResult> {
   try {
+    const envError = await checkLinuxEnvironmentAsync();
+    if (envError) {
+      OutputHelper.error(envError);
+      process.exit(1);
+    }
+
     const linux = await import('../../../linux/index.js');
     const config = linux.resolveLinuxConfig();
     let allOk = true;
@@ -176,7 +183,7 @@ export async function statusHandlerAsync(_args: StatusArgs): Promise<StatusResul
 export const linuxStatusCommand = defineCommand<StatusArgs, StatusResult>({
   group: 'linux',
   name: 'status',
-  description: 'Check Linux/Wine environment health for Studio',
+  description: 'Check Linux/Wine environment health for Studio (within Docker image or Linux with Wine)',
   category: 'infrastructure',
   safety: 'none',
   scope: 'standalone',
