@@ -9,11 +9,6 @@ on:
         description: 'Override Studio version hash (leave empty for latest)'
         required: false
   push:
-    branches: [main]
-    paths:
-      - 'tools/studio-bridge/docker/**'
-      - '.github/workflows/studio-linux-docker-build.yml'
-  pull_request:
     paths:
       - 'tools/studio-bridge/docker/**'
       - '.github/workflows/studio-linux-docker-build.yml'
