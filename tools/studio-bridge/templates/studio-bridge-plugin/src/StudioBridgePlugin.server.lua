@@ -280,11 +280,20 @@ local function wireConnection(ws, sessionId, connectLabel)
 		connected = false
 	end)
 
-	-- Heartbeat coroutine
+	-- Heartbeat coroutine — send v2 rich heartbeat data
+	local heartbeatStart = os.clock()
 	task.spawn(function()
 		while connected do
 			pcall(function()
-				ws:Send(jsonEncode({ type = "heartbeat", sessionId = sessionId, payload = {} }))
+				ws:Send(jsonEncode({
+					type = "heartbeat",
+					sessionId = sessionId,
+					payload = {
+						uptimeMs = math.floor((os.clock() - heartbeatStart) * 1000),
+						state = detectContext() == "edit" and "Edit" or detectContext(),
+						pendingRequests = 0,
+					},
+				}))
 			end)
 			task.wait(15)
 		end

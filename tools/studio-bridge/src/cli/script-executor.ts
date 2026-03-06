@@ -24,6 +24,7 @@ export interface ExecuteScriptOptions {
   timeoutMs: number;
   verbose: boolean;
   showLogs: boolean;
+  filePath?: string;
 }
 
 /**
@@ -52,6 +53,15 @@ export async function resolvePlacePathAsync(
 export async function executeScriptAsync(
   options: ExecuteScriptOptions
 ): Promise<void> {
+  const { shouldDelegateToDockerAsync, delegateToDockerAsync } =
+    await import('../docker/docker-delegator.js');
+
+  if (await shouldDelegateToDockerAsync()) {
+    OutputHelper.verbose('[StudioBridge] No Wine detected, delegating to Docker');
+    await delegateToDockerAsync(options);
+    return; // unreachable — delegateToDockerAsync calls process.exit
+  }
+
   const { scriptContent, packageName, placePath, timeoutMs, verbose, showLogs } =
     options;
 

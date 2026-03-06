@@ -39,7 +39,9 @@ import { uninstallCommand } from '../commands/plugin/uninstall/uninstall.js';
 import { serveCommand } from '../commands/serve/serve.js';
 import { mcpCommand } from '../commands/mcp/mcp.js';
 import { terminalCommand } from '../commands/terminal/terminal.js';
-import { actionCommand } from '../commands/action/action.js';
+import { linuxSetupCommand } from '../commands/linux/setup/setup.js';
+import { linuxAuthCommand } from '../commands/linux/auth/auth.js';
+import { linuxStatusCommand } from '../commands/linux/status/status.js';
 
 // ---------------------------------------------------------------------------
 // Build registry
@@ -53,7 +55,6 @@ registry.register(logsCommand);
 registry.register(queryCommand);
 registry.register(screenshotCommand);
 registry.register(processRunCommand);
-registry.register(actionCommand);
 
 // Infrastructure commands
 registry.register(infoCommand);
@@ -65,6 +66,11 @@ registry.register(uninstallCommand);
 registry.register(serveCommand);
 registry.register(mcpCommand);
 registry.register(terminalCommand);
+
+// Linux commands
+registry.register(linuxSetupCommand);
+registry.register(linuxAuthCommand);
+registry.register(linuxStatusCommand);
 
 // ---------------------------------------------------------------------------
 // Build yargs commands from registry
@@ -150,7 +156,7 @@ for (const group of groups) {
   cli.command(group as any);
 }
 
-// Register top-level commands from registry (serve, mcp, action)
+// Register top-level commands from registry (serve, mcp)
 // Terminal is handled separately below due to its custom REPL handler
 for (const cmd of topLevel) {
   const cmdDef = cmd as { command?: string };

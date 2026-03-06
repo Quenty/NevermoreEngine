@@ -31,6 +31,10 @@ import {
 } from './web-socket-protocol.js';
 import { ActionDispatcher } from './action-dispatcher.js';
 import {
+  loadActionSourcesAsync,
+  type ActionSource,
+} from '../commands/framework/action-loader.js';
+import {
   injectPluginAsync,
   type InjectedPlugin,
 } from '../plugin/plugin-injector.js';
@@ -194,8 +198,6 @@ const ACTION_CAPABILITIES: Record<string, Capability> = {
   captureScreenshot: 'captureScreenshot',
   queryDataModel: 'queryDataModel',
   queryLogs: 'queryLogs',
-  subscribe: 'subscribe',
-  unsubscribe: 'subscribe',
   execute: 'execute',
 };
 
@@ -220,6 +222,8 @@ export class StudioBridgeServer {
   private _negotiatedCapabilities: Capability[] = ['execute'];
   private _lastHeartbeatTimestamp: number | undefined;
   private _actionDispatcher = new ActionDispatcher();
+  private _actionsReady = false;
+  private _actionSources: ActionSource[] | undefined;
 
   constructor(options: StudioBridgeServerOptions = {}) {
     this._options = options;
@@ -422,6 +426,10 @@ export class StudioBridgeServer {
       throw new Error('Cannot execute: no connected client');
     }
 
+    // Sync action modules before first execute (state must still be 'ready'
+    // because performActionAsync checks for it).
+    await this._ensureActionsAsync();
+
     this._state = 'executing';
     this._onPhase?.('executing');
 
@@ -483,6 +491,75 @@ export class StudioBridgeServer {
 
     await this._cleanupResourcesAsync();
     this._state = 'stopped';
+  }
+
+  // -----------------------------------------------------------------------
+  // Private: _ensureActionsAsync
+  // -----------------------------------------------------------------------
+
+  /**
+   * Ensure action modules (like `execute.luau`) are synced to the plugin
+   * before first use. Uses `syncActions` to check which actions the plugin
+   * is missing, then registers them via `registerAction`.
+   *
+   * Only works with v2 plugins. v1 plugins skip this step (they would need
+   * actions baked in, which the current plugin architecture does not support).
+   */
+  private async _ensureActionsAsync(): Promise<void> {
+    if (this._actionsReady) return;
+
+    if (this._negotiatedProtocolVersion < 2) {
+      this._actionsReady = true;
+      return;
+    }
+
+    if (!this._actionSources) {
+      this._actionSources = await loadActionSourcesAsync();
+      OutputHelper.verbose(
+        `[StudioBridge] Loaded ${this._actionSources.length} action source(s): ${this._actionSources.map((a) => a.name).join(', ') || '(none)'}`,
+      );
+    }
+
+    if (this._actionSources.length === 0) {
+      this._actionsReady = true;
+      return;
+    }
+
+    const actions: Record<string, string> = {};
+    for (const action of this._actionSources) {
+      actions[action.name] = action.hash;
+    }
+
+    OutputHelper.verbose('[StudioBridge] Syncing actions with plugin');
+    const syncResult = await this.performActionAsync<PluginMessage>({
+      type: 'syncActions',
+      payload: { actions },
+    }, 10_000);
+
+    if (syncResult.type === 'syncActionsResult') {
+      const needed = (syncResult.payload as Record<string, unknown>).needed as string[];
+      OutputHelper.verbose(
+        `[StudioBridge] ${needed.length} action(s) need registering${needed.length > 0 ? ': ' + needed.join(', ') : ''}`,
+      );
+
+      for (const actionName of needed) {
+        const action = this._actionSources.find((a) => a.name === actionName);
+        if (!action) continue;
+
+        OutputHelper.verbose(`[StudioBridge] Registering action: ${actionName}`);
+        await this.performActionAsync<PluginMessage>({
+          type: 'registerAction',
+          payload: {
+            name: action.name,
+            source: action.source,
+            hash: action.hash,
+          },
+        }, 10_000);
+      }
+    }
+
+    this._actionsReady = true;
+    OutputHelper.verbose('[StudioBridge] Action sync complete');
   }
 
   // -----------------------------------------------------------------------
@@ -579,7 +656,6 @@ export class StudioBridgeServer {
       'captureScreenshot',
       'queryDataModel',
       'queryLogs',
-      'subscribe',
     ];
 
     if (msg.type === 'hello') {
@@ -694,7 +770,6 @@ export class StudioBridgeServer {
       'captureScreenshot',
       'queryDataModel',
       'queryLogs',
-      'subscribe',
     ];
 
     return new Promise<void>((resolve, reject) => {
@@ -944,12 +1019,33 @@ export class StudioBridgeServer {
                 (msg.payload.error ? ` error=${msg.payload.error}` : '')
             );
 
+            // Extract captured output from the scriptComplete payload
+            if (msg.payload.output) {
+              for (const entry of msg.payload.output) {
+                logLines.push(entry.body);
+                options.onOutput?.(entry.level as OutputLevel, entry.body);
+              }
+            }
+
             if (msg.payload.error) {
               logLines.push(msg.payload.error);
             }
 
             finish({
               success: msg.payload.success,
+              logs: logLines.join('\n'),
+            });
+            break;
+          }
+
+          case 'error': {
+            const errorPayload = msg.payload as { code: string; message: string };
+            OutputHelper.verbose(
+              `[StudioBridge] Plugin error: ${errorPayload.code} — ${errorPayload.message}`
+            );
+            logLines.push(`[StudioBridge] Plugin error: ${errorPayload.code} — ${errorPayload.message}`);
+            finish({
+              success: false,
               logs: logLines.join('\n'),
             });
             break;

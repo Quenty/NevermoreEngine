@@ -906,7 +906,7 @@ describe('StudioBridgeServer', () => {
 
       const { ws, welcome } = await connectAndRegister(port, sessionId, {
         protocolVersion: 2,
-        capabilities: ['execute', 'queryState', 'subscribe'],
+        capabilities: ['execute', 'queryState'],
       });
       client = ws;
 
@@ -914,9 +914,9 @@ describe('StudioBridgeServer', () => {
 
       const payload = welcome.payload as Record<string, unknown>;
       expect(payload.protocolVersion).toBe(2);
-      expect(payload.capabilities).toEqual(['execute', 'queryState', 'subscribe']);
+      expect(payload.capabilities).toEqual(['execute', 'queryState']);
       expect(server.protocolVersion).toBe(2);
-      expect([...server.capabilities]).toEqual(['execute', 'queryState', 'subscribe']);
+      expect([...server.capabilities]).toEqual(['execute', 'queryState']);
     });
 
     it('register message negotiates capabilities to intersection', async () => {

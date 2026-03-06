@@ -1,0 +1,97 @@
+name: studio-linux-e2e
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'tools/studio-bridge/src/linux/**'
+      - 'tools/studio-bridge/src/process/**'
+      - 'tools/studio-bridge/src/commands/linux/**'
+      - 'tools/nevermore-cli-helpers/src/auth/**'
+      - 'tools/studio-bridge/docker/**'
+      - '.github/workflows/studio-linux-e2e.yml'
+
+jobs:
+  studio-linux-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/quenty/nevermore-studio-linux:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      options: --user studio
+      env:
+        ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup registries
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' run build
+
+      - name: Install studio-bridge CLI
+        run: npm install --ignore-scripts --force -g .
+        working-directory: tools/studio-bridge
+
+      - name: Verify environment health (pre-auth)
+        run: studio-bridge linux status
+
+      - name: Inject authentication
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: studio-bridge linux auth --verbose
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+
+      - name: Execute script through Studio bridge
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: studio-bridge process run --verbose --timeout 300000 'print("E2E test passed!")'
+        timeout-minutes: 10
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+
+      - name: Print logs
+        if: always()
+        run: |
+          echo "=== Environment ==="
+          echo "DISPLAY=$DISPLAY WINEPREFIX=$WINEPREFIX STUDIO_DIR=$STUDIO_DIR HOME=$HOME"
+          echo "Xvfb running: $(pgrep -x Xvfb > /dev/null && echo yes || echo no)"
+          echo "openbox running: $(pgrep -x openbox > /dev/null && echo yes || echo no)"
+          echo "Wine procs: $(pgrep -c wine 2>/dev/null || echo 0)"
+          echo ""
+          echo "=== Wine log (last 100 lines) ==="
+          tail -100 /tmp/studio-bridge-wine.log 2>/dev/null || echo "No Wine log"
+          echo ""
+          echo "=== Studio logs ==="
+          find ~/.wine/drive_c/users/ -name "*.log" -path "*/Roblox/logs/*" 2>/dev/null | head -5
+          tail -50 ~/.wine/drive_c/users/*/AppData/Local/Roblox/logs/*.log 2>/dev/null || echo "No Studio logs"
+          echo ""
+          echo "=== Wine prefix check ==="
+          ls -la $WINEPREFIX/system.reg 2>/dev/null || echo "No system.reg at WINEPREFIX=$WINEPREFIX"
+          ls -la /home/studio/.wine/system.reg 2>/dev/null || echo "No system.reg at /home/studio/.wine"
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-bridge-logs
+          path: |
+            /tmp/studio-bridge-wine.log
+            ~/.wine/drive_c/users/*/AppData/Local/Roblox/logs/
+          if-no-files-found: ignore

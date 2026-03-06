@@ -348,62 +348,30 @@ describe('decodePluginMessage (v2)', () => {
       });
     });
 
-    it('returns null with missing pendingRequests', () => {
-      expect(roundTripPlugin({
+    it('accepts heartbeat with missing fields using defaults', () => {
+      const msg = roundTripPlugin({
         type: 'heartbeat',
         sessionId: 'sess-1',
         payload: { uptimeMs: 60000, state: 'Edit' },
-      })).toBeNull();
-    });
-  });
-
-  describe('subscribeResult', () => {
-    it('decodes a valid subscribeResult', () => {
-      const msg = roundTripPlugin({
-        type: 'subscribeResult',
-        sessionId: 'sess-1',
-        requestId: 'req-5',
-        payload: { events: ['stateChange', 'logPush'] },
       });
       expect(msg).toEqual({
-        type: 'subscribeResult',
+        type: 'heartbeat',
         sessionId: 'sess-1',
-        requestId: 'req-5',
-        payload: { events: ['stateChange', 'logPush'] },
+        payload: { uptimeMs: 60000, state: 'Edit', pendingRequests: 0 },
       });
     });
 
-    it('returns null without requestId', () => {
-      expect(roundTripPlugin({
-        type: 'subscribeResult',
-        sessionId: 'sess-1',
-        payload: { events: ['stateChange'] },
-      })).toBeNull();
-    });
-  });
-
-  describe('unsubscribeResult', () => {
-    it('decodes a valid unsubscribeResult', () => {
+    it('accepts empty payload with all defaults', () => {
       const msg = roundTripPlugin({
-        type: 'unsubscribeResult',
+        type: 'heartbeat',
         sessionId: 'sess-1',
-        requestId: 'req-6',
-        payload: { events: ['logPush'] },
+        payload: {},
       });
       expect(msg).toEqual({
-        type: 'unsubscribeResult',
+        type: 'heartbeat',
         sessionId: 'sess-1',
-        requestId: 'req-6',
-        payload: { events: ['logPush'] },
+        payload: { uptimeMs: 0, state: 'Edit', pendingRequests: 0 },
       });
-    });
-
-    it('returns null without requestId', () => {
-      expect(roundTripPlugin({
-        type: 'unsubscribeResult',
-        sessionId: 'sess-1',
-        payload: { events: [] },
-      })).toBeNull();
     });
   });
 
@@ -643,64 +611,6 @@ describe('encodeMessage / decodeServerMessage (v2)', () => {
       expect(decodeServerMessage(JSON.stringify({
         type: 'queryLogs',
         sessionId: 'sess-1',
-        payload: {},
-      }))).toBeNull();
-    });
-  });
-
-  describe('subscribe', () => {
-    it('round-trips subscribe', () => {
-      const msg: ServerMessage = {
-        type: 'subscribe',
-        sessionId: 'sess-1',
-        requestId: 'req-14',
-        payload: { events: ['stateChange', 'logPush'] },
-      };
-      expect(roundTripServer(msg)).toEqual(msg);
-    });
-
-    it('returns null without requestId', () => {
-      expect(decodeServerMessage(JSON.stringify({
-        type: 'subscribe',
-        sessionId: 'sess-1',
-        payload: { events: ['stateChange'] },
-      }))).toBeNull();
-    });
-
-    it('returns null without events array', () => {
-      expect(decodeServerMessage(JSON.stringify({
-        type: 'subscribe',
-        sessionId: 'sess-1',
-        requestId: 'req-14',
-        payload: {},
-      }))).toBeNull();
-    });
-  });
-
-  describe('unsubscribe', () => {
-    it('round-trips unsubscribe', () => {
-      const msg: ServerMessage = {
-        type: 'unsubscribe',
-        sessionId: 'sess-1',
-        requestId: 'req-15',
-        payload: { events: ['logPush'] },
-      };
-      expect(roundTripServer(msg)).toEqual(msg);
-    });
-
-    it('returns null without requestId', () => {
-      expect(decodeServerMessage(JSON.stringify({
-        type: 'unsubscribe',
-        sessionId: 'sess-1',
-        payload: { events: [] },
-      }))).toBeNull();
-    });
-
-    it('returns null without events array', () => {
-      expect(decodeServerMessage(JSON.stringify({
-        type: 'unsubscribe',
-        sessionId: 'sess-1',
-        requestId: 'req-15',
         payload: {},
       }))).toBeNull();
     });

@@ -10,7 +10,7 @@
 ]]
 
 local ActionRouter = require("../../studio-bridge-plugin/src/Shared/ActionRouter")
-local ExecuteAction = require("../../studio-bridge-plugin/src/Actions/ExecuteAction")
+local ExecuteAction = require("../../../src/commands/console/exec/execute")
 local MessageBuffer = require("../../studio-bridge-plugin/src/Shared/MessageBuffer")
 local mocks = require("./roblox-mocks")
 
