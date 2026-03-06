@@ -87,14 +87,24 @@ export async function delegateToDockerAsync(
   process.exit(result.exitCode ?? 1);
 }
 
+const STALE_DAYS = 7;
+
 /**
  * Ensures the Docker image is available locally, pulling if needed.
+ * Warns if the local image is older than STALE_DAYS.
  */
 async function ensureImageAsync(image: string): Promise<void> {
   try {
-    await execa('docker', ['image', 'inspect', image], {
-      stdio: 'ignore',
-    });
+    const { stdout } = await execa('docker', [
+      'image', 'inspect', '--format', '{{.Created}}', image,
+    ]);
+    const created = new Date(stdout.trim());
+    const ageDays = (Date.now() - created.getTime()) / (1000 * 60 * 60 * 24);
+    if (ageDays > STALE_DAYS) {
+      OutputHelper.warn(
+        `Docker image is ${Math.floor(ageDays)} days old. Run 'docker pull ${image}' to update.`,
+      );
+    }
   } catch {
     OutputHelper.info(`Pulling ${image}...`);
     await execa('docker', ['pull', image], { stdio: 'inherit' });
