@@ -11,14 +11,14 @@ local RunService = game:GetService("RunService")
 
 local Blend = require("Blend")
 local Maid = require("Maid")
+local ValueObject = require("ValueObject")
 
 return function(target)
 	local maid = Maid.new()
 
-	local percentTarget = Instance.new("NumberValue")
-	percentTarget.Value = 0
+	local percentTarget = ValueObject.new(0)
 
-	local percentVisible = Blend.AccelTween(percentTarget, 4)
+	local percentVisible = Blend.AccelTween(percentTarget, 1)
 
 	maid:GiveTask((Blend.New "Frame" {
 		Name = "BlendAccelTweenStory",
