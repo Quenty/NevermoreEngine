@@ -353,7 +353,8 @@ function Blend.AccelTween(source, acceleration)
 	end
 
 	return Observable.new(function(sub)
-		local accelTween = AccelTweenObject.new(source, acceleration)
+		local accelTween = AccelTweenObject.new(nil, acceleration)
+		accelTween:SetTarget(source, true)
 
 		accelTween._maid:GiveTask(accelTween:Observe():Subscribe(sub:GetFireFailComplete()))
 
