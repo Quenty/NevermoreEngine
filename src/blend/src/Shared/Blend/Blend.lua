@@ -6,7 +6,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local AccelTween = require("AccelTween")
 local BlendDefaultProps = require("BlendDefaultProps")
 local Brio = require("Brio")
 local BrioUtils = require("BrioUtils")
@@ -19,9 +18,9 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Signal = require("Signal")
-local StepUtils = require("StepUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
+local AccelTweenObject
 local SpringObject
 
 local Blend = {}
@@ -349,46 +348,16 @@ end
 	@return Observable
 ]=]
 function Blend.AccelTween(source, acceleration)
-	local sourceObservable = Blend.toPropertyObservable(source) or Rx.of(source)
-	local accelerationObservable = Blend.toNumberObservable(acceleration)
-
-	local function createAccelTween(maid, initialValue)
-		local accelTween = AccelTween.new()
-
-		if initialValue then
-			accelTween.p = initialValue
-			accelTween.t = initialValue
-			accelTween.v = 0
-		end
-
-		if accelerationObservable then
-			maid:GiveTask(accelerationObservable:Subscribe(function(value)
-				assert(type(value) == "number", "Bad value")
-				accelTween.a = value
-			end))
-		end
-
-		return accelTween
+	if not AccelTweenObject then
+		AccelTweenObject = (require :: any)("AccelTweenObject")
 	end
 
-	-- TODO: Centralize and cache
 	return Observable.new(function(sub)
-		local accelTween
-		local maid = Maid.new()
+		local accelTween = AccelTweenObject.new(source, acceleration)
 
-		local startAnimate, stopAnimate = StepUtils.bindToRenderStep(function()
-			sub:Fire(accelTween.p)
-			return accelTween.rtime > 0
-		end)
+		accelTween._maid:GiveTask(accelTween:Observe():Subscribe(sub:GetFireFailComplete()))
 
-		maid:GiveTask(stopAnimate)
-		maid:GiveTask(sourceObservable:Subscribe(function(value)
-			accelTween = accelTween or createAccelTween(maid, value)
-			accelTween.t = value
-			startAnimate()
-		end))
-
-		return maid
+		return accelTween
 	end)
 end
 
