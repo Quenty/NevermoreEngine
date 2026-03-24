@@ -84,8 +84,8 @@ function extractRotatedCookie(response: Response): string | undefined {
 }
 
 /**
- * Make a cookie-authenticated request to Roblox, handling CSRF token exchange
- * and cookie rotation capture.
+ * Make a cookie-authenticated request to Roblox, handling CSRF token exchange,
+ * cookie rotation capture, and 429 rate-limit retries.
  */
 async function fetchWithCsrfAsync(
   url: string,
@@ -114,6 +114,15 @@ async function fetchWithCsrfAsync(
     }
   }
 
+  // Retry once on rate limit
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('retry-after');
+    const delaySec = retryAfter ? Math.min(parseInt(retryAfter, 10) || 2, 30) : 2;
+    OutputHelper.verbose(`Rate limited (429). Retrying after ${delaySec}s...`);
+    await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
+    response = await fetch(url, { ...options, headers });
+  }
+
   const rotatedCookie = extractRotatedCookie(response);
   if (rotatedCookie) {
     OutputHelper.verbose('Captured rotated .ROBLOSECURITY cookie from response.');
@@ -135,7 +144,7 @@ export async function createPlaceInUniverseAsync(
     `Creating place "${placeName}" in universe ${universeId}...`
   );
 
-  const { response: createResponse } = await fetchWithCsrfAsync(
+  const createResult = await fetchWithCsrfAsync(
     `https://apis.roblox.com/universes/v1/user/universes/${universeId}/places`,
     cookie,
     {
@@ -147,19 +156,20 @@ export async function createPlaceInUniverseAsync(
     }
   );
 
-  if (!createResponse.ok) {
-    const text = await createResponse.text();
+  if (!createResult.response.ok) {
+    const text = await createResult.response.text();
     throw new Error(
-      `Failed to create place: ${createResponse.status} ${createResponse.statusText}: ${text}`
+      `Failed to create place: ${createResult.response.status} ${createResult.response.statusText}: ${text}`
     );
   }
 
-  const createData = (await createResponse.json()) as { placeId: number };
+  const createData = (await createResult.response.json()) as { placeId: number };
   const placeId = createData.placeId;
 
+  // Use rotated cookie if the create request triggered rotation
   const { response: renameResponse } = await fetchWithCsrfAsync(
     `https://develop.roblox.com/v2/places/${placeId}`,
-    cookie,
+    createResult.rotatedCookie ?? cookie,
     {
       method: 'PATCH',
       headers: {
