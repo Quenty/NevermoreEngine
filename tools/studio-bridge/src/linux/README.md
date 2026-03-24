@@ -21,7 +21,7 @@ All can be installed via `studio-bridge linux setup --install-deps` on Debian/Ub
 studio-bridge linux setup --install-deps
 
 # Inject authentication (reads $ROBLOSECURITY env var)
-studio-bridge linux auth
+studio-bridge linux inject-credentials
 
 # Verify everything is ready
 studio-bridge linux status
@@ -78,7 +78,7 @@ Studio expects three entries in Windows Credential Manager:
 2. `https://www.roblox.com:RobloxStudioAuthCookies` → `.ROBLOSECURITY` (cookie name)
 3. `https://www.roblox.com:RobloxStudioAuth.ROBLOSECURITY{userId}` → the cookie value
 
-The `linux auth` command:
+The `linux inject-credentials` command:
 1. Resolves the cookie via `getRobloxCookieAsync()` (env var → Wine cred store → interactive prompt)
 2. Fetches the user ID from `users.roblox.com/v1/users/authenticated`
 3. Compiles `write-cred.c` with MinGW (one-time)
@@ -109,7 +109,7 @@ Install Wine dependencies and Roblox Studio.
 | `--skip-shaders` | Skip shader patching |
 | `--force` | Force reinstall even if same version exists |
 
-### `studio-bridge linux auth`
+### `studio-bridge linux inject-credentials`
 
 Inject .ROBLOSECURITY cookie into Wine Credential Manager.
 

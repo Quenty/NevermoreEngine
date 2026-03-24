@@ -108,7 +108,7 @@ export async function setupHandlerAsync(args: SetupArgs): Promise<SetupResult> {
 
     OutputHelper.info('Linux setup complete.');
     OutputHelper.hint(
-      'Next: run "studio-bridge linux auth" to inject credentials'
+      'Next: run "studio-bridge linux inject-credentials" to inject credentials'
     );
 
     return { success: true, summary: `Studio ${version} installed and configured` };

@@ -211,7 +211,7 @@ Studio can run headlessly on Linux via Wine, enabling E2E tests in devcontainers
 ```bash
 # One-time setup
 studio-bridge linux setup --install-deps
-studio-bridge linux auth  # reads $ROBLOSECURITY env var
+studio-bridge linux inject-credentials  # reads $ROBLOSECURITY env var
 
 # Run tests the same as on Windows/macOS
 nevermore test

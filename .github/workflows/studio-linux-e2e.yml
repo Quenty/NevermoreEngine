@@ -55,7 +55,7 @@ jobs:
 
       - name: Inject authentication
         if: ${{ env.ROBLOSECURITY != '' }}
-        run: studio-bridge linux auth --verbose
+        run: studio-bridge linux inject-credentials --verbose
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 

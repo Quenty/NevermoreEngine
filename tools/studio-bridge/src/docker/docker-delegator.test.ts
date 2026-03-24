@@ -86,7 +86,7 @@ describe('buildDockerRunArgsAsync', () => {
     expect(args).toContain('ghcr.io/quenty/nevermore-studio-linux:latest');
     // Inner command should include auth then run
     const bashCmd = args[args.length - 1];
-    expect(bashCmd).toContain('studio-bridge linux auth');
+    expect(bashCmd).toContain('studio-bridge linux inject-credentials');
     expect(bashCmd).toContain('studio-bridge process run');
     expect(bashCmd).toContain('--timeout 120000');
     expect(bashCmd).not.toContain('--verbose');

@@ -1,6 +1,6 @@
 /**
- * `linux auth` — inject .ROBLOSECURITY cookie into Wine's Credential Manager
- * so Studio can authenticate.
+ * `linux inject-credentials` — inject .ROBLOSECURITY cookie into Wine's
+ * Credential Manager so Studio can authenticate.
  */
 
 import { defineCommand } from '../../framework/define-command.js';
@@ -42,7 +42,7 @@ function readStdinAsync(): Promise<string> {
 // Handler
 // ---------------------------------------------------------------------------
 
-export async function authHandlerAsync(args: AuthArgs): Promise<AuthResult> {
+export async function injectCredentialsHandlerAsync(args: AuthArgs): Promise<AuthResult> {
   try {
     const envError = await checkLinuxEnvironmentAsync();
     if (envError) {
@@ -87,7 +87,7 @@ export async function authHandlerAsync(args: AuthArgs): Promise<AuthResult> {
     // Inject credentials
     await linux.injectCredentialsAsync({ cookie, config });
 
-    OutputHelper.info('Authentication complete.');
+    OutputHelper.info('Credentials injected.');
     OutputHelper.hint(
       'Next: run "studio-bridge process launch" to start Studio'
     );
@@ -104,9 +104,9 @@ export async function authHandlerAsync(args: AuthArgs): Promise<AuthResult> {
 // Command definition
 // ---------------------------------------------------------------------------
 
-export const linuxAuthCommand = defineCommand<AuthArgs, AuthResult>({
+export const linuxInjectCredentialsCommand = defineCommand<AuthArgs, AuthResult>({
   group: 'linux',
-  name: 'auth',
+  name: 'inject-credentials',
   description: 'Inject .ROBLOSECURITY cookie into Wine Credential Manager (within Docker image or Linux with Wine)',
   category: 'infrastructure',
   safety: 'none',
@@ -117,5 +117,5 @@ export const linuxAuthCommand = defineCommand<AuthArgs, AuthResult>({
         'Cookie value (or "-" to read from stdin). Falls back to $ROBLOSECURITY env var or interactive prompt.',
     }),
   },
-  handler: async (args) => authHandlerAsync(args),
+  handler: async (args) => injectCredentialsHandlerAsync(args),
 });

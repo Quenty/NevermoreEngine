@@ -165,7 +165,7 @@ export async function buildDockerRunArgsAsync(
   }
 
   const innerArgs = [
-    'studio-bridge', 'linux', 'auth',
+    'studio-bridge', 'linux', 'inject-credentials',
     '&&',
     'studio-bridge', 'process', 'run',
     '--file', scriptFilePath,

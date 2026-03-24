@@ -40,7 +40,7 @@ import { serveCommand } from '../commands/serve/serve.js';
 import { mcpCommand } from '../commands/mcp/mcp.js';
 import { terminalCommand } from '../commands/terminal/terminal.js';
 import { linuxSetupCommand } from '../commands/linux/setup/setup.js';
-import { linuxAuthCommand } from '../commands/linux/auth/auth.js';
+import { linuxInjectCredentialsCommand } from '../commands/linux/inject-credentials/inject-credentials.js';
 import { linuxStatusCommand } from '../commands/linux/status/status.js';
 
 // ---------------------------------------------------------------------------
@@ -69,7 +69,7 @@ registry.register(terminalCommand);
 
 // Linux commands
 registry.register(linuxSetupCommand);
-registry.register(linuxAuthCommand);
+registry.register(linuxInjectCredentialsCommand);
 registry.register(linuxStatusCommand);
 
 // ---------------------------------------------------------------------------
