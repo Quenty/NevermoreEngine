@@ -5,9 +5,9 @@ export {
   createPlaceInUniverseAsync,
   tryRenamePlaceAsync,
   validateCookieAsync,
-} from './auth/roblox-auth/index.js';
-export type { RenamePlaceResult, CookieValidationResult } from './auth/roblox-auth/index.js';
-export { COOKIE_NAME, parseStudioCookieValue } from './auth/roblox-auth/cookie-parser.js';
+} from './auth/cookie/index.js';
+export type { RenamePlaceResult, CookieValidationResult } from './auth/cookie/index.js';
+export { COOKIE_NAME, parseStudioCookieValue } from './auth/cookie/cookie-parser.js';
 
 export {
   getApiKeyAsync,
@@ -16,5 +16,5 @@ export {
   clearApiKeyAsync,
   validateApiKeyAsync,
   printApiKeySetupHelp,
-} from './auth/credential-store.js';
-export type { CredentialArgs } from './auth/credential-store.js';
+} from './auth/open-cloud/credential-store.js';
+export type { CredentialArgs } from './auth/open-cloud/credential-store.js';
