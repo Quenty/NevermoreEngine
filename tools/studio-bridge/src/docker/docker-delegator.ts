@@ -65,7 +65,17 @@ export async function delegateToDockerAsync(
     process.exit(1);
   }
 
-  await validateCookieAsync(cookie);
+  const validation = await validateCookieAsync(cookie);
+  if (!validation.valid) {
+    if (validation.reason === 'network_error') {
+      OutputHelper.warn('Could not validate ROBLOSECURITY cookie (network error). Continuing anyway.');
+    } else {
+      OutputHelper.error(
+        `ROBLOSECURITY cookie is invalid or expired (HTTP ${validation.status}). Update the cookie and try again.`,
+      );
+      process.exit(1);
+    }
+  }
 
   const image = resolveDockerImage();
   await ensureImageAsync(image);

@@ -63,14 +63,35 @@ function readPlatformCookie(): string | undefined {
   }
 }
 
+interface CsrfFetchResult {
+  response: Response;
+  rotatedCookie?: string;
+}
+
 /**
- * Make a cookie-authenticated request to Roblox, handling CSRF token exchange.
+ * Extract a rotated .ROBLOSECURITY cookie from a response's set-cookie header.
+ */
+function extractRotatedCookie(response: Response): string | undefined {
+  const setCookie = response.headers.get('set-cookie');
+  if (!setCookie) {
+    return undefined;
+  }
+
+  // set-cookie may contain multiple cookies separated by commas (or multiple headers).
+  // Look for .ROBLOSECURITY=<value>.
+  const match = setCookie.match(/\.ROBLOSECURITY=([^;,\s]+)/);
+  return match?.[1];
+}
+
+/**
+ * Make a cookie-authenticated request to Roblox, handling CSRF token exchange
+ * and cookie rotation capture.
  */
 async function fetchWithCsrfAsync(
   url: string,
   cookie: string,
   options: RequestInit = {}
-): Promise<Response> {
+): Promise<CsrfFetchResult> {
   const headers: Record<string, string> = {
     Cookie: `${COOKIE_NAME}=${cookie}`,
     'User-Agent': 'Roblox/WinInet',
@@ -93,7 +114,12 @@ async function fetchWithCsrfAsync(
     }
   }
 
-  return response;
+  const rotatedCookie = extractRotatedCookie(response);
+  if (rotatedCookie) {
+    OutputHelper.verbose('Captured rotated .ROBLOSECURITY cookie from response.');
+  }
+
+  return { response, rotatedCookie };
 }
 
 /**
@@ -109,7 +135,7 @@ export async function createPlaceInUniverseAsync(
     `Creating place "${placeName}" in universe ${universeId}...`
   );
 
-  const createResponse = await fetchWithCsrfAsync(
+  const { response: createResponse } = await fetchWithCsrfAsync(
     `https://apis.roblox.com/universes/v1/user/universes/${universeId}/places`,
     cookie,
     {
@@ -131,7 +157,7 @@ export async function createPlaceInUniverseAsync(
   const createData = (await createResponse.json()) as { placeId: number };
   const placeId = createData.placeId;
 
-  const renameResponse = await fetchWithCsrfAsync(
+  const { response: renameResponse } = await fetchWithCsrfAsync(
     `https://develop.roblox.com/v2/places/${placeId}`,
     cookie,
     {
@@ -153,12 +179,19 @@ export async function createPlaceInUniverseAsync(
   return placeId;
 }
 
+export interface CookieValidationResult {
+  valid: boolean;
+  reason?: 'invalid' | 'network_error';
+  status?: number;
+}
+
 /**
  * Validates the ROBLOSECURITY cookie against the Roblox API.
- * Exits with an error if the cookie is invalid. Continues with a
- * warning if the network request itself fails (offline scenario).
+ * Returns a result indicating whether the cookie is valid.
+ * Network errors are treated as "unknown" (not invalid) so callers
+ * can decide whether to continue in offline scenarios.
  */
-export async function validateCookieAsync(cookie: string): Promise<void> {
+export async function validateCookieAsync(cookie: string): Promise<CookieValidationResult> {
   try {
     const response = await fetch('https://users.roblox.com/v1/users/authenticated', {
       headers: {
@@ -167,17 +200,12 @@ export async function validateCookieAsync(cookie: string): Promise<void> {
     });
 
     if (response.status !== 200) {
-      OutputHelper.error(
-        `ROBLOSECURITY cookie is invalid or expired (HTTP ${response.status}). Update the cookie and try again.`,
-      );
-      process.exit(1);
+      return { valid: false, reason: 'invalid', status: response.status };
     }
 
-    OutputHelper.verbose('ROBLOSECURITY cookie validated successfully.');
+    return { valid: true };
   } catch {
-    OutputHelper.warn(
-      'Could not validate ROBLOSECURITY cookie (network error). Continuing anyway.',
-    );
+    return { valid: false, reason: 'network_error' };
   }
 }
 
@@ -201,7 +229,7 @@ export async function tryRenamePlaceAsync(
     return { success: false, reason: 'no_cookie' };
   }
 
-  const response = await fetchWithCsrfAsync(
+  const { response } = await fetchWithCsrfAsync(
     `https://develop.roblox.com/v2/places/${placeId}`,
     cookie,
     {

@@ -70,7 +70,16 @@ export async function authHandlerAsync(args: AuthArgs): Promise<AuthResult> {
 
     // Validate cookie before attempting Wine injection
     const { validateCookieAsync } = await import('@quenty/nevermore-cli-helpers');
-    await validateCookieAsync(cookie);
+    const validation = await validateCookieAsync(cookie);
+    if (!validation.valid) {
+      if (validation.reason === 'network_error') {
+        OutputHelper.warn('Could not validate ROBLOSECURITY cookie (network error). Continuing anyway.');
+      } else {
+        throw new Error(
+          `ROBLOSECURITY cookie is invalid or expired (HTTP ${validation.status}). Update the cookie and try again.`,
+        );
+      }
+    }
 
     // Ensure display is running (Wine needs it for credential write)
     await linux.ensureDisplayAsync(config);

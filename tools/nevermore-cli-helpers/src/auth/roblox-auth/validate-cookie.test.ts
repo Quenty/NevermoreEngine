@@ -1,18 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('@quenty/cli-output-helpers', () => ({
-  OutputHelper: {
-    error: vi.fn(),
-    warn: vi.fn(),
-    info: vi.fn(),
-    verbose: vi.fn(),
-  },
-}));
-
 import { validateCookieAsync } from './index.js';
-import { OutputHelper } from '@quenty/cli-output-helpers';
-
-const mockedOutputHelper = vi.mocked(OutputHelper);
 
 describe('validateCookieAsync', () => {
   const originalFetch = globalThis.fetch;
@@ -25,39 +13,27 @@ describe('validateCookieAsync', () => {
     globalThis.fetch = originalFetch;
   });
 
-  it('continues without error when cookie is valid (HTTP 200)', async () => {
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+  it('returns valid when cookie is accepted (HTTP 200)', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue({ status: 200 });
 
-    await validateCookieAsync('valid-cookie');
+    const result = await validateCookieAsync('valid-cookie');
 
-    expect(exitSpy).not.toHaveBeenCalled();
-    expect(mockedOutputHelper.error).not.toHaveBeenCalled();
-    expect(mockedOutputHelper.warn).not.toHaveBeenCalled();
+    expect(result).toEqual({ valid: true });
   });
 
-  it('exits with error when cookie is invalid (HTTP 401)', async () => {
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+  it('returns invalid with status when cookie is rejected (HTTP 401)', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue({ status: 401 });
 
-    await validateCookieAsync('expired-cookie');
+    const result = await validateCookieAsync('expired-cookie');
 
-    expect(mockedOutputHelper.error).toHaveBeenCalledWith(
-      'ROBLOSECURITY cookie is invalid or expired (HTTP 401). Update the cookie and try again.',
-    );
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(result).toEqual({ valid: false, reason: 'invalid', status: 401 });
   });
 
-  it('continues with warning when fetch throws (network error)', async () => {
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+  it('returns network_error when fetch throws', async () => {
     globalThis.fetch = vi.fn().mockRejectedValue(new Error('network error'));
 
-    await validateCookieAsync('some-cookie');
+    const result = await validateCookieAsync('some-cookie');
 
-    expect(mockedOutputHelper.warn).toHaveBeenCalledWith(
-      'Could not validate ROBLOSECURITY cookie (network error). Continuing anyway.',
-    );
-    expect(exitSpy).not.toHaveBeenCalled();
-    expect(mockedOutputHelper.error).not.toHaveBeenCalled();
+    expect(result).toEqual({ valid: false, reason: 'network_error' });
   });
 });

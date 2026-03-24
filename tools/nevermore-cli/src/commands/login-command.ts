@@ -8,7 +8,7 @@ import {
   clearApiKeyAsync,
   validateApiKeyAsync,
   printApiKeySetupHelp,
-} from '../utils/auth/credential-store.js';
+} from '@quenty/nevermore-cli-helpers';
 
 export interface LoginArgs extends NevermoreGlobalArgs {
   apiKey?: string;

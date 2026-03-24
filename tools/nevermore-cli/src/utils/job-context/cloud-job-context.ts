@@ -3,7 +3,7 @@ import {
   type LuauTask,
   type OpenCloudClient,
 } from '../open-cloud/open-cloud-client.js';
-import { tryRenamePlaceAsync } from '../auth/roblox-auth/index.js';
+import { tryRenamePlaceAsync } from '@quenty/nevermore-cli-helpers';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
 import {
   type Deployment,
