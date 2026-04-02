@@ -237,9 +237,18 @@ function PlayerDataStoreManager._promiseWaitForRemoving(
 	end
 
 	if self._removing[userId] then
-		return Promise.defer(function(resolve)
+		return Promise.defer(function(resolve, reject)
+			local elapsed = 0
 			while self._removing[userId] do
-				task.wait()
+				elapsed += task.wait()
+
+				if elapsed >= 15 then
+					warn(
+						`[PlayerDataStoreManager] - Last session cleanup for {userId} taking longer than 15 seconds. Rejecting.`
+					)
+					reject()
+					break
+				end
 			end
 			resolve()
 		end)
