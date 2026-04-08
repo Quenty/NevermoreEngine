@@ -17,9 +17,12 @@ RobloxApiClass.__index = RobloxApiClass
 
 local NO_SUPER_CLASS_ERROR = "NO_SUPER_CLASS"
 
+export type MemberLookupCache = { [string]: RobloxApiMember.RobloxApiMember }
+
 export type RobloxApiClass = typeof(setmetatable(
 	{} :: {
 		_robloxApiDump: any,
+		_memberLookupPromise: Promise.Promise<MemberLookupCache>?,
 		_data: RobloxApiDataTypes.ClassData,
 		_allSuperClassesPromise: Promise.Promise<{ RobloxApiClass }>?,
 		_tagCache: { [string]: boolean }?,
@@ -191,6 +194,53 @@ end
 ]=]
 function RobloxApiClass.PromiseMembers(self: RobloxApiClass): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
 	return self._robloxApiDump:PromiseMembers(self:GetClassName())
+end
+
+function RobloxApiClass._promiseMemberLookupCache(
+	self: RobloxApiClass
+): Promise.Promise<{ [string]: RobloxApiMember.RobloxApiMember }>
+	if self._memberLookupPromise then
+		return self._memberLookupPromise
+	end
+
+	self._memberLookupPromise = self:PromiseMembers():Then(function(members)
+		local cache = {}
+		for _, member in members do
+			cache[member:GetName()] = member
+		end
+		return cache
+	end)
+	assert(self._memberLookupPromise, "Typechecking assertion")
+
+	return self._memberLookupPromise
+end
+
+--[=[
+	Returns a specific member by name, or nil if it doesn't exist.
+]=]
+function RobloxApiClass.PromiseMember(
+	self: RobloxApiClass,
+	memberName: string
+): Promise.Promise<RobloxApiMember.RobloxApiMember?>
+	return self:_promiseMemberLookupCache():Then(function(lookup)
+		return lookup[memberName]
+	end)
+end
+
+--[=[
+	Returns a specific property by name, or nil if it doesn't exist.
+]=]
+function RobloxApiClass.PromiseProperty(
+	self: RobloxApiClass,
+	propertyName: string
+): Promise.Promise<RobloxApiMember.RobloxApiMember?>
+	return self:PromiseMember(propertyName):Then(function(member)
+		if member and member:IsProperty() then
+			return member
+		else
+			return nil
+		end
+	end)
 end
 
 --[=[
