@@ -3902,12 +3902,30 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quenty/remoting':
+        specifier: workspace:*
+        version: link:../remoting
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quenty/valueobject':
+        specifier: workspace:*
+        version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/rodux-actions:
     dependencies:
@@ -6613,13 +6631,13 @@ packages:
     engines: {node: '>=12'}
 
   '@quentystudios/cmdr@1.12.0-quenty.0':
-    resolution: {integrity: sha512-coxG4bEQ3wskTEiVxbh6hTsOycYoq+8jLtUABvfMURHiS3hgF/0jg3uQArZt0JeY+VvkCIXLHUCFTMMbUQOllA==}
+    resolution: {integrity: sha512-coxG4bEQ3wskTEiVxbh6hTsOycYoq+8jLtUABvfMURHiS3hgF/0jg3uQArZt0JeY+VvkCIXLHUCFTMMbUQOllA==, tarball: https://npm.pkg.github.com/download/@QuentyStudios/cmdr/1.12.0-quenty.0/52cd069ee3ce795e8056e2e42cb012bb75ddf053}
 
   '@quentystudios/jest-lua@3.10.0-quenty.2':
-    resolution: {integrity: sha512-TE7vhnYjygcBjjqeKLsmbwxhJeiDeekh/E2xcvQ0VZAwHNr+Yn1pk1n/PRJu+KtH2fWYkw20pQO4o/hKPs0lRA==}
+    resolution: {integrity: sha512-TE7vhnYjygcBjjqeKLsmbwxhJeiDeekh/E2xcvQ0VZAwHNr+Yn1pk1n/PRJu+KtH2fWYkw20pQO4o/hKPs0lRA==, tarball: https://npm.pkg.github.com/download/@quentystudios/jest-lua/3.10.0-quenty.2/238e074c8a3d93e2ed9dbed9e0e191bc60cfa8e8}
 
   '@quentystudios/t@3.0.0':
-    resolution: {integrity: sha512-YUBaDzrs69scFgRpzASLOpcvxKho8oaUipyHO+A9z+aRW/ursRhzCXjRtPZ08uoU+fba/cohZuZMMGDMpncg1w==}
+    resolution: {integrity: sha512-RTnK+ViHHgnG+pn5xOZ+l4dk4sUaEuA5ljb041yRGVF0jBX77Pqb8EpVsllwOr0ik8juD+/nn0ODuQfEJ49bJg==, tarball: https://npm.pkg.github.com/download/@QuentyStudios/t/3.0.0/531258ee3ed838164450322edce90bc273e5cd42}
 
   '@rollup/rollup-android-arm-eabi@4.57.1':
     resolution: {integrity: sha512-A6ehUVSiSaaliTxai040ZpZ2zTevHYbvu/lDoeAteHI8QnaosIzm4qwtezfRg1jOYaUmnzLX1AOD6Z+UJjtifg==}

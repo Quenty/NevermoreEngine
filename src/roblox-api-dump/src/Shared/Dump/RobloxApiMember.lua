@@ -4,13 +4,17 @@
 	@class RobloxApiMember
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local RobloxApiDataTypes = require("RobloxApiDataTypes")
+
 local RobloxApiMember = {}
 RobloxApiMember.ClassName = "RobloxApiMember"
 RobloxApiMember.__index = RobloxApiMember
 
 export type RobloxApiMember = typeof(setmetatable(
 	{} :: {
-		_data: {},
+		_data: RobloxApiDataTypes.MemberData,
 		_tagCache: { [string]: boolean }?,
 	},
 	{} :: typeof({ __index = RobloxApiMember })
@@ -22,7 +26,7 @@ export type RobloxApiMember = typeof(setmetatable(
 	@param data table
 	@return RobloxApiMember
 ]=]
-function RobloxApiMember.new(data): RobloxApiMember
+function RobloxApiMember.new(data: RobloxApiDataTypes.MemberData): RobloxApiMember
 	local self: RobloxApiMember = setmetatable({} :: any, RobloxApiMember)
 
 	--[[
@@ -54,7 +58,7 @@ function RobloxApiMember.new(data): RobloxApiMember
 	return self
 end
 
-function RobloxApiMember:GetTypeName(): string?
+function RobloxApiMember.GetTypeName(self: RobloxApiMember): string?
 	local valueType = self._data.ValueType
 	if valueType then
 		return valueType.Name
@@ -67,7 +71,7 @@ end
 	Gets the member name.
 	@return string
 ]=]
-function RobloxApiMember:GetName(): string
+function RobloxApiMember.GetName(self: RobloxApiMember): string
 	assert(type(self._data.Name) == "string", "Bad Name")
 	return self._data.Name
 end
@@ -76,7 +80,7 @@ end
 	Gets the member category.
 	@return string?
 ]=]
-function RobloxApiMember:GetCategory(): string
+function RobloxApiMember.GetCategory(self: RobloxApiMember): RobloxApiDataTypes.Category?
 	return self._data.Category -- might be nil, stuff like "Data" or ""
 end
 
@@ -84,7 +88,7 @@ end
 	Retrieves whether the API member is read only.
 	@return boolean
 ]=]
-function RobloxApiMember:IsReadOnly(): boolean
+function RobloxApiMember.IsReadOnly(self: RobloxApiMember): boolean
 	return self:HasTag("ReadOnly")
 end
 
@@ -92,88 +96,78 @@ end
 	Retrieves the member type.
 	@return string
 ]=]
-function RobloxApiMember:GetMemberType(): string
+function RobloxApiMember.GetMemberType(self: RobloxApiMember): RobloxApiDataTypes.MemberType
 	assert(type(self._data.MemberType) == "string", "Bad MemberType")
 	return self._data.MemberType
 end
 
 --[=[
 	Returns whether the member is an event.
-	@return boolean
 ]=]
-function RobloxApiMember:IsEvent(): boolean
+function RobloxApiMember.IsEvent(self: RobloxApiMember): boolean
 	return self:GetMemberType() == "Event"
 end
 
 --[=[
 	Retrieves the raw member data
-	@return table
 ]=]
-function RobloxApiMember:GetRawData()
+function RobloxApiMember.GetRawData(self: RobloxApiMember): RobloxApiDataTypes.MemberData
 	return self._data
 end
 
 --[=[
 	Returns whether this member has write NotAccessibleSecurity
-	@return boolean
 ]=]
-function RobloxApiMember:IsWriteNotAccessibleSecurity(): boolean
+function RobloxApiMember.IsWriteNotAccessibleSecurity(self: RobloxApiMember): boolean
 	return self:GetWriteSecurity() == "NotAccessibleSecurity"
 end
 
 --[=[
 	Returns whether this member has write NotAccessibleSecurity
-	@return boolean
 ]=]
-function RobloxApiMember:IsReadNotAccessibleSecurity(): boolean
+function RobloxApiMember.IsReadNotAccessibleSecurity(self: RobloxApiMember): boolean
 	return self:GetReadSecurity() == "NotAccessibleSecurity"
 end
 
 --[=[
 	Returns whether this member has write LocalUserSecurity
-	@return boolean
 ]=]
-function RobloxApiMember:IsWriteLocalUserSecurity(): boolean
+function RobloxApiMember.IsWriteLocalUserSecurity(self: RobloxApiMember): boolean
 	return self:GetWriteSecurity() == "LocalUserSecurity"
 end
 
 --[=[
 	Returns whether this member has read LocalUserSecurity
-	@return boolean
 ]=]
-function RobloxApiMember:IsReadLocalUserSecurity(): boolean
+function RobloxApiMember.IsReadLocalUserSecurity(self: RobloxApiMember): boolean
 	return self:GetReadSecurity() == "LocalUserSecurity"
 end
 
 --[=[
 	Returns whether this member has read RobloxScriptSecurity
-	@return boolean
 ]=]
-function RobloxApiMember:IsReadRobloxScriptSecurity(): boolean
+function RobloxApiMember.IsReadRobloxScriptSecurity(self: RobloxApiMember): boolean
 	return self:GetReadSecurity() == "RobloxScriptSecurity"
 end
 
 --[=[
 	Returns whether this member has write RobloxScriptSecurity
-	@return boolean
 ]=]
-function RobloxApiMember:IsWriteRobloxScriptSecurity(): boolean
+function RobloxApiMember.IsWriteRobloxScriptSecurity(self: RobloxApiMember): boolean
 	return self:GetWriteSecurity() == "RobloxScriptSecurity"
 end
 
 --[=[
 	Returns whether this member has write RobloxSecurity
-	@return boolean
 ]=]
-function RobloxApiMember:IsWriteRobloxSecurity(): boolean
+function RobloxApiMember.IsWriteRobloxSecurity(self: RobloxApiMember): boolean
 	return self:GetWriteSecurity() == "RobloxSecurity"
 end
 
 --[=[
 	Returns whether this can serialize save
-	@return boolean?
 ]=]
-function RobloxApiMember:CanSerializeSave(): boolean?
+function RobloxApiMember.CanSerializeSave(self: RobloxApiMember): boolean?
 	local serialization = self._data.Serialization
 	if type(serialization) == "table" then
 		return serialization.CanSave
@@ -184,9 +178,8 @@ end
 
 --[=[
 	Returns whether this can serialize save
-	@return boolean?
 ]=]
-function RobloxApiMember:CanSerializeLoad(): boolean?
+function RobloxApiMember.CanSerializeLoad(self: RobloxApiMember): boolean?
 	local serialization = self._data.Serialization
 	if type(serialization) == "table" then
 		return serialization.CanLoad
@@ -199,7 +192,7 @@ end
 	Returns the member's write security as a string
 	@return string?
 ]=]
-function RobloxApiMember:GetWriteSecurity(): boolean?
+function RobloxApiMember.GetWriteSecurity(self: RobloxApiMember): string?
 	local security = self._data.Security
 	if type(security) == "table" then
 		return security.Write
@@ -212,10 +205,10 @@ end
 	Returns the member's read security as a string
 	@return string?
 ]=]
-function RobloxApiMember:GetReadSecurity(): boolean?
+function RobloxApiMember.GetReadSecurity(self: RobloxApiMember): string?
 	local security = self._data.Security
 	if type(security) == "table" then
-		return security.Write
+		return security.Read
 	else
 		return nil
 	end
@@ -223,33 +216,29 @@ end
 
 --[=[
 	Returns whether the member is a property.
-	@return boolean
 ]=]
-function RobloxApiMember:IsProperty(): boolean
+function RobloxApiMember.IsProperty(self: RobloxApiMember): boolean
 	return self:GetMemberType() == "Property"
 end
 
 --[=[
 	Returns whether the member is a function (i.e. method).
-	@return boolean
 ]=]
-function RobloxApiMember:IsFunction(): boolean
+function RobloxApiMember.IsFunction(self: RobloxApiMember): boolean
 	return self:GetMemberType() == "Function"
 end
 
 --[=[
 	Returns whether the member is a callback.
-	@return boolean
 ]=]
-function RobloxApiMember:IsCallback(): boolean
+function RobloxApiMember.IsCallback(self: RobloxApiMember): boolean
 	return self:GetMemberType() == "Callback"
 end
 
 --[=[
 	Returns whether a script can modify it.
-	@return boolean
 ]=]
-function RobloxApiMember:IsNotScriptable(): boolean
+function RobloxApiMember.IsNotScriptable(self: RobloxApiMember): boolean
 	return self:HasTag("NotScriptable")
 end
 
@@ -257,14 +246,14 @@ end
 	Returns whether the member is not replicated.
 	@return boolean
 ]=]
-function RobloxApiMember:IsNotReplicated(): boolean
+function RobloxApiMember.IsNotReplicated(self: RobloxApiMember): boolean
 	return self:HasTag("NotReplicated")
 end
 
 --[=[
 	Returns whether the member is deprecated..
 ]=]
-function RobloxApiMember:IsDeprecated(): boolean
+function RobloxApiMember.IsDeprecated(self: RobloxApiMember): boolean
 	return self:HasTag("Deprecated")
 end
 
@@ -272,7 +261,7 @@ end
 	Returns whether this api member is hidden.
 	@return boolean
 ]=]
-function RobloxApiMember:IsHidden(): boolean
+function RobloxApiMember.IsHidden(self: RobloxApiMember): boolean
 	return self:HasTag("Hidden")
 end
 
@@ -280,21 +269,23 @@ end
 	Returns a list of tags. Do not modify this list.
 	@return {string}
 ]=]
-function RobloxApiMember:GetTags(): { string }
+function RobloxApiMember.GetTags(self: RobloxApiMember): { string }
 	return self._data.Tags
 end
 
 --[=[
 	Retrieves whether the member has a tag or not.
-	@param tagName string
-	@return boolean
 ]=]
-function RobloxApiMember:HasTag(tagName: string): boolean
+function RobloxApiMember.HasTag(self: RobloxApiMember, tagName: string): boolean
+	assert(type(tagName) == "string", "Bad tagName")
+
 	if self._tagCache then
 		return self._tagCache[tagName] == true
 	end
 
 	self._tagCache = {}
+	assert(self._tagCache, "Typechecking assertion")
+
 	if type(self._data.Tags) == "table" then
 		for _, tag in self._data.Tags do
 			self._tagCache[tag] = true

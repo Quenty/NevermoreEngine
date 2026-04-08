@@ -7,17 +7,21 @@
 local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
+local RobloxApiDataTypes = require("RobloxApiDataTypes")
 local RobloxApiDumpConstants = require("RobloxApiDumpConstants")
+local RobloxApiMember = require("RobloxApiMember")
 
 local RobloxApiClass = {}
 RobloxApiClass.ClassName = "RobloxApiClass"
 RobloxApiClass.__index = RobloxApiClass
 
+local NO_SUPER_CLASS_ERROR = "NO_SUPER_CLASS"
+
 export type RobloxApiClass = typeof(setmetatable(
 	{} :: {
 		_robloxApiDump: any,
-		_data: any,
-		_allSuperClassesPromise: Promise.Promise<any>?,
+		_data: RobloxApiDataTypes.ClassData,
+		_allSuperClassesPromise: Promise.Promise<{ RobloxApiClass }>?,
 		_tagCache: { [string]: boolean }?,
 	},
 	{} :: typeof({ __index = RobloxApiClass })
@@ -30,7 +34,7 @@ export type RobloxApiClass = typeof(setmetatable(
 	@param data table
 	@return RobloxApiClass
 ]=]
-function RobloxApiClass.new(robloxApiDump, data): RobloxApiClass
+function RobloxApiClass.new(robloxApiDump, data: RobloxApiDataTypes.ClassData): RobloxApiClass
 	local self: RobloxApiClass = setmetatable({} :: any, RobloxApiClass)
 
 	--[[
@@ -88,7 +92,7 @@ function RobloxApiClass.PromiseSuperClass(self: RobloxApiClass): Promise.Promise
 	if superclass then
 		return self._robloxApiDump:PromiseClass(superclass)
 	else
-		return Promise.rejected("No super class")
+		return Promise.rejected(NO_SUPER_CLASS_ERROR)
 	end
 end
 
@@ -112,7 +116,7 @@ end
 	@param className string
 	@return Promise<boolean>
 ]=]
-function RobloxApiClass.PromiseIsDescendantOf(self: RobloxApiClass, className: string)
+function RobloxApiClass.PromiseIsDescendantOf(self: RobloxApiClass, className: string): Promise.Promise<boolean>
 	return self:PromiseAllSuperClasses():Then(function(classes)
 		for _, class in classes do
 			if class:GetClassName() == className then
@@ -135,15 +139,24 @@ function RobloxApiClass.PromiseAllSuperClasses(self: RobloxApiClass): Promise.Pr
 
 	local list: { RobloxApiClass } = {}
 
-	local function chain(current: RobloxApiClass): Promise.Promise<{ RobloxApiClass }>
-		return current:PromiseSuperClass():Then(function(superclass)
-			if superclass then
-				table.insert(list, superclass)
-				return chain(superclass)
-			else
-				return list :: any
-			end
-		end)
+	local function chain(current: RobloxApiClass): Promise.Promise<RobloxApiClass>
+		return current
+			:PromiseSuperClass()
+			:Then(function(superclass)
+				if superclass then
+					table.insert(list, superclass)
+					return chain(superclass)
+				else
+					return list :: any
+				end
+			end)
+			:Catch(function(err)
+				if err == NO_SUPER_CLASS_ERROR then
+					return list
+				else
+					return Promise.rejected(err)
+				end
+			end)
 	end
 
 	local promise = chain(self)
@@ -176,7 +189,7 @@ end
 	Retrieves all class members (events, properties, callbacks, functions).
 	@return Promise<{ RobloxApiMember }>
 ]=]
-function RobloxApiClass.PromiseMembers(self: RobloxApiClass)
+function RobloxApiClass.PromiseMembers(self: RobloxApiClass): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
 	return self._robloxApiDump:PromiseMembers(self:GetClassName())
 end
 
@@ -184,7 +197,7 @@ end
 	Gets all class properties.
 	@return Promise<{ RobloxApiMember }>
 ]=]
-function RobloxApiClass.PromiseProperties(self: RobloxApiClass)
+function RobloxApiClass.PromiseProperties(self: RobloxApiClass): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
 	return self:PromiseMembers():Then(function(members)
 		local result = {}
 		for _, member in members do
@@ -200,7 +213,7 @@ end
 	Gets all class events.
 	@return Promise<{ RobloxApiMember }>
 ]=]
-function RobloxApiClass.PromiseEvents(self: RobloxApiClass)
+function RobloxApiClass.PromiseEvents(self: RobloxApiClass): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
 	return self:PromiseMembers():Then(function(members)
 		local result = {}
 		for _, member in members do
@@ -216,7 +229,7 @@ end
 	Gets all class functions (i.e. methods).
 	@return Promise<{ RobloxApiMember }>
 ]=]
-function RobloxApiClass.PromiseFunctions(self: RobloxApiClass)
+function RobloxApiClass.PromiseFunctions(self: RobloxApiClass): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
 	return self:PromiseMembers():Then(function(members)
 		local result = {}
 		for _, member in members do
