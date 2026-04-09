@@ -1759,6 +1759,15 @@ importers:
       '@quenty/acceltween':
         specifier: workspace:*
         version: link:../acceltween
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
+      '@quenty/basicpane':
+        specifier: workspace:*
+        version: link:../basicpane
+      '@quenty/blend':
+        specifier: workspace:*
+        version: link:../blend
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -1768,6 +1777,9 @@ importers:
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
+      '@quenty/valueobject':
+        specifier: workspace:*
+        version: link:../valueobject
 
   src/firstpersoncharactertransparency:
     dependencies:
