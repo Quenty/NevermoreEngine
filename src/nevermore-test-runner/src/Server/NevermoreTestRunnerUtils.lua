@@ -27,6 +27,14 @@ function NevermoreTestRunnerUtils.isOpenCloud(): boolean
 	return success
 end
 
+function NevermoreTestRunnerUtils.canReadScriptSource(): boolean
+	local success, _ = pcall(function()
+		local _ = script.Source
+	end)
+
+	return success
+end
+
 --[=[
 	Runs Jest tests if a jest.config is found under root. Otherwise treats
 	boot success as the test (smoke test).
@@ -37,26 +45,34 @@ end
 
 	@param root -- The instance to scan for jest.config (e.g. the package folder in ServerScriptService)
 ]=]
-function NevermoreTestRunnerUtils.runTestsIfNeededAsync(root: Instance)
+function NevermoreTestRunnerUtils.runTestsIfNeededAsync(root: Instance): boolean
 	assert(typeof(root) == "Instance", "Bad root")
 
 	local isOpenCloud = NevermoreTestRunnerUtils.isOpenCloud()
-
-	if isOpenCloud then
+	local canReadSource = NevermoreTestRunnerUtils.canReadScriptSource()
+	if not canReadSource then
+		return false
+	elseif isOpenCloud then
 		print("[NevermoreTestRunner] Running in Open Cloud execution context")
 		NevermoreTestRunnerUtils._runTestsAsync(root)
+
+		return true
 	else
 		print("[NevermoreTestRunner] Running in local execution context")
 		local ok, err = pcall(function(): any
 			return NevermoreTestRunnerUtils._runTestsAsync(root)
 		end)
-		local ProcessService = (game :: any):GetService("ProcessService")
-		if ok then
-			(ProcessService :: any):ExitAsync(0)
-		else
-			warn(tostring(err));
-			(ProcessService :: any):ExitAsync(1)
+		local processService = (game :: any):GetService("ProcessService")
+		if processService then
+			if ok then
+				(processService :: any):ExitAsync(0)
+			else
+				warn(tostring(err));
+				(processService :: any):ExitAsync(1)
+			end
 		end
+
+		return true
 	end
 end
 

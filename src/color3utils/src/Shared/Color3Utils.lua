@@ -160,4 +160,8 @@ function Color3Utils.toWebHexString(color3: Color3): string
 	return string.format("#%06X", Color3Utils.toHexInteger(color3))
 end
 
+function Color3Utils.max(color: Color3, other: Color3): Color3
+	return Color3.new(math.max(color.R, other.R), math.max(color.G, other.G), math.max(color.B, other.B))
+end
+
 return Color3Utils

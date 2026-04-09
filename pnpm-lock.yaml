@@ -1768,18 +1768,42 @@ importers:
       '@quenty/blend':
         specifier: workspace:*
         version: link:../blend
+      '@quenty/colorsequenceutils':
+        specifier: workspace:*
+        version: link:../colorsequenceutils
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
+      '@quenty/statestack':
+        specifier: workspace:*
+        version: link:../statestack
+      '@quenty/sunpositionutils':
+        specifier: workspace:*
+        version: link:../sunpositionutils
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/firstpersoncharactertransparency:
     dependencies:
@@ -4959,7 +4983,17 @@ importers:
 
   src/string: {}
 
-  src/sunpositionutils: {}
+  src/sunpositionutils:
+    dependencies:
+      '@quenty/color3utils':
+        specifier: workspace:*
+        version: link:../color3utils
+      '@quenty/colorsequenceutils':
+        specifier: workspace:*
+        version: link:../colorsequenceutils
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
 
   src/symbol: {}
 

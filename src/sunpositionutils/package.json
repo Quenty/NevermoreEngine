@@ -29,5 +29,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/color3utils": "workspace:*",
+    "@quenty/colorsequenceutils": "workspace:*",
+    "@quenty/loader": "workspace:*"
   }
 }
