@@ -742,6 +742,42 @@ importers:
         specifier: workspace:*
         version: link:../signal
 
+  src/brine:
+    dependencies:
+      '@quenty/bufferencoder':
+        specifier: workspace:*
+        version: link:../buffer-encoder
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
+      '@quenty/memoize':
+        specifier: workspace:*
+        version: link:../memoize
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/selectionutils':
+        specifier: workspace:*
+        version: link:../selectionutils
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
+      '@quenty/string':
+        specifier: workspace:*
+        version: link:../string
+      '@quenty/symbol':
+        specifier: workspace:*
+        version: link:../symbol
+      '@quenty/viewport':
+        specifier: workspace:*
+        version: link:../viewport
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+
   src/brio:
     dependencies:
       '@quenty/loader':
@@ -768,6 +804,15 @@ importers:
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
+
+  src/buffer-encoder:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      BufferEncoder.git:
+        specifier: github:anexpia/BufferEncoder
+        version: https://codeload.github.com/anexpia/BufferEncoder/tar.gz/126d3141efa32a3484d87e129e805da26bea216e
 
   src/buttondragmodel:
     dependencies:
@@ -1771,6 +1816,9 @@ importers:
       '@quenty/colorsequenceutils':
         specifier: workspace:*
         version: link:../colorsequenceutils
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
@@ -7079,6 +7127,10 @@ packages:
     resolution: {integrity: sha512-nrUSn7hzt7J6JWgWGz78ZYI8wj+gdIJdk0Ynjpp8l+trkn58Uqsf6RYrYkEK+3X18EX+TNdtJI0WxAtc+L84SQ==}
     hasBin: true
 
+  BufferEncoder.git@https://codeload.github.com/anexpia/BufferEncoder/tar.gz/126d3141efa32a3484d87e129e805da26bea216e:
+    resolution: {tarball: https://codeload.github.com/anexpia/BufferEncoder/tar.gz/126d3141efa32a3484d87e129e805da26bea216e}
+    version: 0.0.0
+
   JSONStream@1.3.5:
     resolution: {integrity: sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ==}
     hasBin: true
@@ -12215,6 +12267,8 @@ snapshots:
   '@zkochan/js-yaml@0.0.7':
     dependencies:
       argparse: 2.0.1
+
+  BufferEncoder.git@https://codeload.github.com/anexpia/BufferEncoder/tar.gz/126d3141efa32a3484d87e129e805da26bea216e: {}
 
   JSONStream@1.3.5:
     dependencies:
