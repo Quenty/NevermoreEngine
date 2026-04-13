@@ -2930,6 +2930,12 @@ importers:
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
+      '@quenty/hide':
+        specifier: workspace:*
+        version: link:../hide
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader

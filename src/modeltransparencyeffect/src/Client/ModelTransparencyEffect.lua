@@ -10,6 +10,8 @@ local require = require(script.Parent.loader).load(script)
 
 local AccelTween = require("AccelTween")
 local BaseObject = require("BaseObject")
+local HideUtils = require("HideUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
 local StepUtils = require("StepUtils")
 local TransparencyService = require("TransparencyService")
@@ -155,32 +157,37 @@ function ModelTransparencyEffect._setupParts(self: ModelTransparencyEffect)
 
 	self._parts = {}
 
-	if self._obj:IsA("BasePart") or self._obj:IsA("Decal") then
+	local usingLocalTransparency = (self._transparencyServiceMethodName == "SetLocalTransparencyModifier")
+	local transparencyServiceMethod = self._transparencyService[self._transparencyServiceMethodName]
+
+	local function canHide(part: Instance): boolean
+		return if usingLocalTransparency
+			then HideUtils.hasLocalTransparencyModifier(part)
+			else (part:IsA("BasePart") or part:IsA("Decal"))
+	end
+
+	if canHide(self._obj) then
 		self._parts[self._obj] = true
 	end
 
-	for _, part in self._obj:GetDescendants() do
-		if part:IsA("BasePart") or part:IsA("Decal") then
-			self._parts[part] = true
-		end
-	end
-
-	self._maid:GiveTask(self._obj.DescendantAdded:Connect(function(child)
-		if child:IsA("BasePart") or child:IsA("Decal") then
-			self._parts[child] = true
-			self:_startAnimation()
-		end
-	end))
-
-	self._maid:GiveTask(self._obj.DescendantRemoving:Connect(function(child)
-		if self._transparencyService:IsDead() then
+	self._maid:GiveTask(RxInstanceUtils.observeDescendantsBrio(self._obj, canHide):Subscribe(function(brio)
+		if brio:IsDead() then
 			return
 		end
 
-		if self._parts[child] then
-			self._parts[child] = nil
-			self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, child, nil)
-		end
+		local maid, part = brio:ToMaidAndValue()
+
+		self._parts[part] = true
+		self:_startAnimation()
+
+		maid:GiveTask(function()
+			if self._transparencyService:IsDead() or not self._parts[part] then
+				return
+			end
+
+			self._parts[part] = nil
+			transparencyServiceMethod(self._transparencyService, self, part, nil)
+		end)
 	end))
 
 	self._maid:GiveTask(function()
@@ -188,8 +195,8 @@ function ModelTransparencyEffect._setupParts(self: ModelTransparencyEffect)
 			return
 		end
 
-		for part, _ in self._parts do
-			self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, part, nil)
+		for part in self._parts do
+			transparencyServiceMethod(self._transparencyService, self, part, nil)
 		end
 	end)
 end
