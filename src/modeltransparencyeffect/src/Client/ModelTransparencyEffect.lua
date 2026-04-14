@@ -1,6 +1,6 @@
 --!nonstrict
 --[=[
-	Allows a model to have transparent set locally on the client
+	Allows a model to have transparency set locally on the client
 
 	@client
 	@class ModelTransparencyEffect
@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local AccelTween = require("AccelTween")
 local BaseObject = require("BaseObject")
 local HideUtils = require("HideUtils")
+local ModelTransparencyMode = require("ModelTransparencyMode")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
 local StepUtils = require("StepUtils")
@@ -20,15 +21,13 @@ local ModelTransparencyEffect = setmetatable({}, BaseObject)
 ModelTransparencyEffect.ClassName = "ModelTransparencyEffect"
 ModelTransparencyEffect.__index = ModelTransparencyEffect
 
-export type TransparencyMode = "SetTransparency" | "SetLocalTransparencyModifier"
-
 export type ModelTransparencyEffect =
 	typeof(setmetatable(
 		{} :: {
 			_serviceBag: ServiceBag.ServiceBag,
 			_transparency: AccelTween.AccelTween,
 			_transparencyService: TransparencyService.TransparencyService,
-			_transparencyServiceMethodName: TransparencyMode,
+			_transparencyServiceMethodName: ModelTransparencyMode.ModelTransparencyMode,
 			_parts: { [Instance]: boolean },
 			_startAnimation: (self: ModelTransparencyEffect) -> (),
 		},
@@ -45,7 +44,7 @@ export type ModelTransparencyEffect =
 function ModelTransparencyEffect.new(
 	serviceBag: ServiceBag.ServiceBag,
 	adornee: Instance,
-	transparencyServiceMethodName: TransparencyMode?
+	transparencyServiceMethodName: ModelTransparencyMode.ModelTransparencyMode?
 ): ModelTransparencyEffect
 	assert(adornee, "Bad adornee")
 
@@ -54,14 +53,14 @@ function ModelTransparencyEffect.new(
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	assert(
-		type(transparencyServiceMethodName) == "string" or transparencyServiceMethodName == nil,
+		ModelTransparencyMode:IsValue(transparencyServiceMethodName) or transparencyServiceMethodName == nil,
 		"Bad transparencyServiceMethodName"
 	)
 
 	self._transparencyService = self._serviceBag:GetService(TransparencyService :: any)
 
 	self._transparency = AccelTween.new(20)
-	self._transparencyServiceMethodName = transparencyServiceMethodName or "SetTransparency"
+	self._transparencyServiceMethodName = transparencyServiceMethodName or ModelTransparencyMode.TRANSPARENCY
 
 	self._startAnimation, self._maid._stop = StepUtils.bindToRenderStep(self._update)
 
@@ -157,11 +156,10 @@ function ModelTransparencyEffect._setupParts(self: ModelTransparencyEffect)
 
 	self._parts = {}
 
-	local usingLocalTransparency = (self._transparencyServiceMethodName == "SetLocalTransparencyModifier")
 	local transparencyServiceMethod = self._transparencyService[self._transparencyServiceMethodName]
 
 	local function canHide(part: Instance): boolean
-		return if usingLocalTransparency
+		return if (self._transparencyServiceMethodName == ModelTransparencyMode.LOCAL_TRANSPARENCY)
 			then HideUtils.hasLocalTransparencyModifier(part)
 			else (part:IsA("BasePart") or part:IsA("Decal"))
 	end

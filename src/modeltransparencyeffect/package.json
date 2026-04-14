@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/acceltween": "workspace:*",
     "@quenty/baseobject": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/hide": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",

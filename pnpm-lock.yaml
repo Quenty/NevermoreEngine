@@ -2930,6 +2930,9 @@ importers:
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/hide':
         specifier: workspace:*
         version: link:../hide
