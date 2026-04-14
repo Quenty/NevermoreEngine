@@ -1,24 +1,18 @@
-# v11.14.0 (Tue Apr 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Expand ModelTransparencyEffect support [#680](https://github.com/Quenty/NevermoreEngine/pull/680) ([@alex-y-z](https://github.com/alex-y-z))
-- feat: Expand LocalTransparencyModifier support ([@alex-y-z](https://github.com/alex-y-z))
-
-#### 🐛 Bug Fix
-
-- refactor: ModelTransparencyMode ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.13.0...@quenty/modeltransparencyeffect@11.14.0) (2026-04-14)
+
+
+### Features
+
+* Expand LocalTransparencyModifier support ([1d2bc4d](https://github.com/Quenty/NevermoreEngine/commit/1d2bc4d75a954486c0b8a9c160d06476ca47e2e6))
+
+
+
+
 
 # [11.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.12.0...@quenty/modeltransparencyeffect@11.13.0) (2026-02-20)
 
