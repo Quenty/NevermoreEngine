@@ -1,3 +1,28 @@
+# (Tue Apr 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/modeltransparencyeffect@11.14.0`
+  - feat: Expand ModelTransparencyEffect support [#680](https://github.com/Quenty/NevermoreEngine/pull/680) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### 🐛 Bug Fix
+
+- ci: Update build.yml to warn on npm auth missing [#679](https://github.com/Quenty/NevermoreEngine/pull/679) ([@Quenty](https://github.com/Quenty))
+- `@quenty/observablecollection@12.35.0`
+  - fix: add an immediate emission to ObservableList.Observe [#677](https://github.com/Quenty/NevermoreEngine/pull/677) ([@KreatorKols](https://github.com/KreatorKols))
+- `@quenty/templateprovider@11.34.0`
+  - fix: Ignore PackageLinks in templates [#676](https://github.com/Quenty/NevermoreEngine/pull/676) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/promise@10.17.0`
+  - fix: Better promiseChild timeout message [#675](https://github.com/Quenty/NevermoreEngine/pull/675) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 3
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
+
+---
+
 # (Mon Feb 23 2026)
 
 #### 🚀 Enhancement

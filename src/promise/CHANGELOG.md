@@ -1,3 +1,16 @@
+# v10.17.0 (Tue Apr 14 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Better promiseChild timeout message [#675](https://github.com/Quenty/NevermoreEngine/pull/675) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Better promiseChild timeout message ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

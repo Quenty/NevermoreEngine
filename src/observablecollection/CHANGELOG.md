@@ -1,3 +1,15 @@
+# v12.35.0 (Tue Apr 14 2026)
+
+#### 🐛 Bug Fix
+
+- fix: add an immediate emission to ObservableList.Observe [#677](https://github.com/Quenty/NevermoreEngine/pull/677) ([@KreatorKols](https://github.com/KreatorKols))
+
+#### Authors: 1
+
+- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
