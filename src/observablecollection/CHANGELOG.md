@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.34.0...@quenty/observablecollection@12.35.0) (2026-04-14)
+
+
+### Bug Fixes
+
+* add an immediate emission to ObservableList.Observe ([#677](https://github.com/Quenty/NevermoreEngine/issues/677)) ([6723e35](https://github.com/Quenty/NevermoreEngine/commit/6723e3573c490d40635f083eeaba83bb4f343082))
+
+
+
+
+
 # [12.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.33.0...@quenty/observablecollection@12.34.0) (2026-02-20)
 
 

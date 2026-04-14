@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.16.0...@quenty/promise@10.17.0) (2026-04-14)
+
+
+### Bug Fixes
+
+* Better promiseChild timeout message ([75ee035](https://github.com/Quenty/NevermoreEngine/commit/75ee035ed5465c5f8f6cc5d505d06e7084e4cc6e))
+
+
+
+
+
 # [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.15.0...@quenty/promise@10.16.0) (2026-02-20)
 
 **Note:** Version bump only for package @quenty/promise

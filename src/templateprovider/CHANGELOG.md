@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.33.0...@quenty/templateprovider@11.34.0) (2026-04-14)
+
+
+### Bug Fixes
+
+* Ignore PackageLinks in templates ([ca17e50](https://github.com/Quenty/NevermoreEngine/commit/ca17e50cca0e9ed59d84567f8d49d0e98699cbf4))
+
+
+
+
+
 # [11.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.32.0...@quenty/templateprovider@11.33.0) (2026-02-20)
 
 **Note:** Version bump only for package @quenty/templateprovider
