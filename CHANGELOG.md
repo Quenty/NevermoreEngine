@@ -1,3 +1,17 @@
+# (Wed Apr 15 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.36.0`
+  - fix: wait for data cleanup before attempting load [#678](https://github.com/Quenty/NevermoreEngine/pull/678) ([@klga](https://github.com/klga) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@klga](https://github.com/klga)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Apr 14 2026)
 
 #### 🚀 Enhancement
