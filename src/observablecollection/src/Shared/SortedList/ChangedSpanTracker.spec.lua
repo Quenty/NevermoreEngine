@@ -108,8 +108,7 @@ describe("ChangedSpanTracker", function()
 			expect(spans[1].endIndex).toEqual(9)
 		end)
 
-		-- Skip: AddSpan doesn't fully merge when a new span covers all existing disjoint spans
-		it.skip("should merge a span that covers all existing spans", function()
+		it("should merge a span that covers all existing spans", function()
 			local tracker = ChangedSpanTracker.new()
 			tracker:AddSpan(3, 5)
 			tracker:AddSpan(8, 10)

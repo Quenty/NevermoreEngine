@@ -178,10 +178,33 @@ function ChangedSpanTracker.AddSpan(self: ChangedSpanTracker, startIndex: number
 	elseif highIndex then
 		local highSpan = self._sortedSpans[highIndex]
 		if ChangedSpanTracker.spansTouches(highSpan, span) then
-			self._sortedSpans[highIndex] = ChangedSpanTracker.span(
-				math.min(highSpan.startIndex, startIndex),
-				math.max(highSpan.endIndex, endIndex)
-			)
+			local mergedSpan: ChangedSpan = {
+				startIndex = math.min(highSpan.startIndex, startIndex),
+				endIndex = math.max(highSpan.endIndex, endIndex),
+			}
+
+			-- Check if merged span also touches spans before highIndex
+			local firstOverlap = highIndex
+			for i = highIndex - 1, 1, -1 do
+				if ChangedSpanTracker.spansTouches(self._sortedSpans[i], mergedSpan) then
+					firstOverlap = i
+					mergedSpan.startIndex = math.min(mergedSpan.startIndex, self._sortedSpans[i].startIndex)
+					mergedSpan.endIndex = math.max(mergedSpan.endIndex, self._sortedSpans[i].endIndex)
+				else
+					break
+				end
+			end
+
+			self._sortedSpans[firstOverlap] = table.freeze(mergedSpan)
+
+			-- Remove absorbed spans
+			local numToRemove = highIndex - firstOverlap
+			if numToRemove > 0 then
+				table.move(self._sortedSpans, highIndex + 1, #self._sortedSpans, firstOverlap + 1)
+				for i = #self._sortedSpans - numToRemove + 1, #self._sortedSpans do
+					self._sortedSpans[i] = nil
+				end
+			end
 		else
 			table.insert(self._sortedSpans, highIndex, span)
 		end
