@@ -1,3 +1,20 @@
+# v10.45.0 (Wed Apr 22 2026)
+
+#### 🚀 Enhancement
+
+- feat: RogueHumanoidInterface [#681](https://github.com/Quenty/NevermoreEngine/pull/681) ([@alex-y-z](https://github.com/alex-y-z))
+- feat: RogueHumanoidInterface ([@alex-y-z](https://github.com/alex-y-z))
+
+#### 🐛 Bug Fix
+
+- fix: Dependency ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

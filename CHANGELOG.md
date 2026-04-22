@@ -1,3 +1,16 @@
+# (Wed Apr 22 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/rogue-humanoid@10.45.0`
+  - feat: RogueHumanoidInterface [#681](https://github.com/Quenty/NevermoreEngine/pull/681) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Wed Apr 15 2026)
 
 #### 🚀 Enhancement
