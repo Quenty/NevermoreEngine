@@ -561,10 +561,10 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	local nodesRemoved = self._nodesRemoved
 	self._nodesRemoved = {}
 
-	local newCount = if self._root then self._root.descendantCount else 0
+	local descendantCount = if self._root then self._root.descendantCount else 0
 
 	-- Fire count changed first
-	self._countValue.Value = newCount
+	self._countValue.Value = descendantCount
 
 	if not self.Destroy then
 		return
@@ -598,7 +598,7 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	local changedSpans = self._changedSpanTracker:GetAndClearSpans()
 	local didRemoveNodes = next(nodesRemoved) ~= nil
 	local didAddOrRemoveNodes = next(nodesAdded) ~= nil or didRemoveNodes
-	local shouldFireChangedEvent = self._getShouldFireChangedEvent(changedSpans, newCount, didAddOrRemoveNodes)
+	local shouldFireChangedEvent = self._getShouldFireChangedEvent(changedSpans, descendantCount, didAddOrRemoveNodes)
 
 	-- We assume there's not that many index observers at once (since you're usually looking for the ordinal first/last)
 	for rawIndex, _ in self._indexObservers:GetRawSubscriptionMap() do
@@ -624,16 +624,16 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	if self._nodeIndexObservables:HasAnySubscriptions() then
 		if next(nodesAdded) or next(nodesRemoved) then
 			local lowestChangedIndex: number? = changedSpans[1] and changedSpans[1].startIndex
-			local highestChangedIndex: number? = changedSpans[#changedSpans] and changedSpans[#changedSpans].endIndex
-			assert(lowestChangedIndex ~= nil and highestChangedIndex ~= nil, "Bad changed spans")
+			assert(lowestChangedIndex ~= nil, "Bad changed spans")
 
+			-- All indices from the change point to the end of the list shift when nodes are added/removed
 			-- TODO: Track in tree structure actually observed nodes for better efficiency
-			for index, node in self:_iterateNodesRange(lowestChangedIndex, highestChangedIndex + 1) do
+			for index, node in self:_iterateNodesRange(lowestChangedIndex, descendantCount) do
 				self._nodeIndexObservables:Fire(node, index)
 			end
 		else
 			for _, span in changedSpans do
-				for index, node in self:_iterateNodesRange(span.startIndex, span.endIndex + 1) do
+				for index, node in self:_iterateNodesRange(span.startIndex, span.endIndex) do
 					self._nodeIndexObservables:Fire(node, index)
 				end
 			end

@@ -240,7 +240,7 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		it.skip("should fire for all elements after a removed element", function()
+		it("should fire for all elements after a removed element", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 			list:Add("a", 1)
@@ -1407,8 +1407,7 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		-- Skip: _nodeIndexObservables iterates span.endIndex + 1, firing for nodes just outside the span
-		it.skip("should not fire ObserveIndexByKey for nodes outside changed span on resort", function()
+		it("should not fire ObserveIndexByKey for nodes outside changed span on resort", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
