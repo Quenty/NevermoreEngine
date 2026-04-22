@@ -1,3 +1,4 @@
+--!nonstrict
 --!native
 
 -- random.lua - Random Byte Generator

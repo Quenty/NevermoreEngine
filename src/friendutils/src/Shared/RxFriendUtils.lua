@@ -58,8 +58,9 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 
 		local function handleNewPlayerAsync(otherPlayer: Player)
 			if otherPlayer ~= player then
-				local ok, isFriendsWith = pcall(function()
-					return player:IsFriendsWith(otherPlayer.UserId)
+				local isFriendsWith = false
+				local ok = pcall(function()
+					isFriendsWith = player:IsFriendsWithAsync(otherPlayer.UserId)
 				end)
 				if not ok then
 					warn(

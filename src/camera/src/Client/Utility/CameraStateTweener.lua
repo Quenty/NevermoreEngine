@@ -20,15 +20,17 @@ local CameraStateTweener = setmetatable({}, BaseObject)
 CameraStateTweener.ClassName = "CameraStateTweener"
 CameraStateTweener.__index = CameraStateTweener
 
-export type CameraStateTweener = typeof(setmetatable(
-	{} :: {
-		_cameraStack: CameraStack.CameraStack,
-		_cameraEffect: any,
-		_cameraBelow: any,
-		_fadeBetween: FadeBetweenCamera3.FadeBetweenCamera3,
-	},
-	{} :: typeof({ __index = CameraStateTweener })
-)) & BaseObject.BaseObject
+export type CameraStateTweener =
+	typeof(setmetatable(
+		{} :: {
+			_cameraStack: CameraStack.CameraStack,
+			_cameraEffect: any,
+			_cameraBelow: any,
+			_fadeBetween: FadeBetweenCamera3.FadeBetweenCamera3,
+		},
+		{} :: typeof({ __index = CameraStateTweener })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new camera state tweener

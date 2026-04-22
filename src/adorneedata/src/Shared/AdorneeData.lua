@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Bridges attributes and serializable data table. It's typical to need to define data in 3 ways.
 

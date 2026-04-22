@@ -20,14 +20,16 @@ local InfluxDBClient = setmetatable({}, BaseObject)
 InfluxDBClient.ClassName = "InfluxDBClient"
 InfluxDBClient.__index = InfluxDBClient
 
-export type InfluxDBClient = typeof(setmetatable(
-	{} :: {
-		_clientConfig: ValueObject.ValueObject<InfluxDBClientConfigUtils.InfluxDBClientConfig>,
-		_writeApis: { [string]: { [string]: InfluxDBWriteAPI.InfluxDBWriteAPI } },
-		_flushAllPromises: Promise.Promise<()>,
-	},
-	{} :: typeof({ __index = InfluxDBClient })
-)) & BaseObject.BaseObject
+export type InfluxDBClient =
+	typeof(setmetatable(
+		{} :: {
+			_clientConfig: ValueObject.ValueObject<InfluxDBClientConfigUtils.InfluxDBClientConfig>,
+			_writeApis: { [string]: { [string]: InfluxDBWriteAPI.InfluxDBWriteAPI } },
+			_flushAllPromises: Promise.Promise<()>,
+		},
+		{} :: typeof({ __index = InfluxDBClient })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new InfluxDB client

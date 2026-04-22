@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Picker for hue and Saturation in HSV. See [HSVColorPicker] for the full color picker,
 	which also allows you to select "Value".
@@ -174,7 +175,7 @@ end
 function HSColorPicker:_render()
 	return Blend.New "ImageButton" {
 		Name = "HSColorPicker",
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 		Active = true,
 		Image = "rbxassetid://9290917908",

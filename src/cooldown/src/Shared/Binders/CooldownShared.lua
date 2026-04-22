@@ -13,12 +13,14 @@ local CooldownShared = setmetatable({}, CooldownBase)
 CooldownShared.ClassName = "CooldownShared"
 CooldownShared.__index = CooldownShared
 
-export type CooldownShared = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-	},
-	{} :: typeof({ __index = CooldownShared })
-)) & CooldownBase.CooldownBase
+export type CooldownShared =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+		},
+		{} :: typeof({ __index = CooldownShared })
+	))
+	& CooldownBase.CooldownBase
 
 function CooldownShared.new(numberValue: NumberValue, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(CooldownBase.new(numberValue, serviceBag), CooldownShared)

@@ -28,20 +28,22 @@ ZoomedCamera._maxZoom = 100
 ZoomedCamera._minZoom = 0.5
 ZoomedCamera._zoom = 10
 
-export type ZoomedCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		Zoom: number,
-		MaxZoom: number,
-		MinZoom: number,
+export type ZoomedCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			Zoom: number,
+			MaxZoom: number,
+			MinZoom: number,
 
-		-- Private
-		_zoom: number,
-		_maxZoom: number,
-		_minZoom: number,
-	},
-	{} :: typeof({ __index = ZoomedCamera })
-)) & CameraEffectUtils.CameraEffect
+			-- Private
+			_zoom: number,
+			_maxZoom: number,
+			_minZoom: number,
+		},
+		{} :: typeof({ __index = ZoomedCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 function ZoomedCamera.new(): ZoomedCamera
 	local self: ZoomedCamera = setmetatable({} :: any, ZoomedCamera)

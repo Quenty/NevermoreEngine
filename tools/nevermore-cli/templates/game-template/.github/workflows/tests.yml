@@ -1,0 +1,82 @@
+# Roblox Tests
+#
+# Uploads the project to a test place and runs any configured test scripts.
+# This workflow is inactive until you complete the setup below.
+#
+# Setup:
+#   1. Run `nevermore deploy init` to create deploy.nevermore.json with a test target
+#   2. Add ROBLOX_OPEN_CLOUD_API_KEY as a repository secret
+#      (Create one at https://create.roblox.com/dashboard/credentials)
+#   3. Tests will run automatically on pull requests
+#
+# Docs: https://quenty.github.io/NevermoreEngine/docs/testing
+
+name: tests
+on:
+  pull_request:
+jobs:
+  config-check:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: $\{{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          if [ -n "$KEY" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else echo "::notice::Tests skipped — ROBLOX_OPEN_CLOUD_API_KEY not configured. See top of this file for setup."; fi
+        env:
+          KEY: $\{{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
+
+  tests:
+    needs: config-check
+    if: needs.config-check.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - name: Setup npm for GitHub Packages
+        run: |
+          if [[ -n "$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" ]]; then
+            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> .npmrc
+            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> ~/.npmrc
+          fi
+
+          if [[ -n "$NPM_TOKEN" ]]; then
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          fi
+        env:
+          NPM_GITHUB_QUENTYSTUDIOS_TOKEN: $\{{ secrets.NPM_GITHUB_QUENTYSTUDIOS_TOKEN }}
+          NPM_TOKEN: $\{{ secrets.NPM_TOKEN }}
+
+      - name: Link and install packages
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        id: run-tests
+        run: npx @quenty/nevermore-cli test --cloud --yes --verbose --logs --output test-results.json
+        env:
+          ROBLOX_OPEN_CLOUD_API_KEY: $\{{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
+
+      - name: Build sourcemap for annotation resolution
+        if: always()
+        run: npm run build:sourcemap
+
+      - name: Post test results
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-test-results test-results.json --yes --run-outcome $\{{ steps.run-tests.outcome }}
+        env:
+          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}

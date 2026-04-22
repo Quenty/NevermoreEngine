@@ -3,6 +3,210 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.32.0...@quenty/blend@12.33.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [12.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.31.0...@quenty/blend@12.32.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [12.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.30.0...@quenty/blend@12.31.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [12.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.29.0...@quenty/blend@12.30.0) (2026-02-19)
+
+
+### Bug Fixes
+
+* Swap the integration place with blend so at least we can try stuff quickly, add cmdr to integration test place ([e1168e1](https://github.com/Quenty/NevermoreEngine/commit/e1168e16f9c01fb53c6662f091ec42e77766d10f))
+
+
+
+
+
+# [12.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.28.2...@quenty/blend@12.29.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Add Nevermore deploy and Nevermore test commands that run files in the open cloud ([81f328d](https://github.com/Quenty/NevermoreEngine/commit/81f328db23f4ecdedad121f9c2d4789aded59d4e))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
+## [12.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.28.1...@quenty/blend@12.28.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.28.0...@quenty/blend@12.28.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [12.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.27.0...@quenty/blend@12.28.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [12.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.26.0...@quenty/blend@12.27.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [12.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.25.1...@quenty/blend@12.26.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.25.0...@quenty/blend@12.25.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [12.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.24.1...@quenty/blend@12.25.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.24.0...@quenty/blend@12.24.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [12.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.23.1...@quenty/blend@12.24.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.23.0...@quenty/blend@12.23.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [12.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.22.7...@quenty/blend@12.23.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.22.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.22.6...@quenty/blend@12.22.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.22.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.22.5...@quenty/blend@12.22.6) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [12.22.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.22.4...@quenty/blend@12.22.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.22.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.22.3...@quenty/blend@12.22.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.22.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.22.2...@quenty/blend@12.22.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.22.1...@quenty/blend@12.22.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [12.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.22.0...@quenty/blend@12.22.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
 # [12.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.21.0...@quenty/blend@12.22.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/blend

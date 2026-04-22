@@ -113,9 +113,9 @@ function ValueObject.isValueObject(value: any): boolean
 	return DuckTypeUtils.isImplementation(ValueObject, value)
 end
 
-function ValueObject._toMountableObservable<T>(_self: ValueObject<T>, value: Mountable<T>)
+function ValueObject._toMountableObservable<T>(_self: ValueObject<T>, value: Mountable<T>): Observable.Observable<T>?
 	if Observable.isObservable(value) then
-		return value
+		return value :: any
 	elseif typeof(value) == "Instance" then
 		-- IntValue, ObjectValue, et cetera
 		if ValueBaseUtils.isValueBase(value) then
@@ -276,7 +276,7 @@ function ValueObject.SetValue<T>(self: ValueObject<T>, value: T, ...)
 
 	return function()
 		if rawget(self :: any, "_value") == value then
-			ValueObject._applyValue(self, rawget(self :: any, "_default"))
+			ValueObject._applyValue(self, rawget(self :: any, "_default") :: any)
 		end
 	end
 end
@@ -285,7 +285,7 @@ end
 	Gets the value and then the additional args from the last event
 ]=]
 function ValueObject.GetValue<T>(self: ValueObject<T>): (T, ...any)
-	local value = rawget(self :: any, "_value")
+	local value: T = rawget(self :: any, "_value") :: any
 	local args = rawget(self :: any, "_lastEventContext")
 
 	if args then

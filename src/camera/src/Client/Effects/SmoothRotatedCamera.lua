@@ -18,31 +18,33 @@ local getRotationInXZPlane = require("getRotationInXZPlane")
 local SmoothRotatedCamera = {}
 SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
 
-export type SmoothRotatedCamera = typeof(setmetatable(
-	{} :: {
-		AngleX: number,
-		AngleXZ: number,
-		RenderAngleXZ: number,
-		AngleY: number,
-		CFrame: CFrame,
-		RenderAngleY: number,
-		CameraState: CameraState.CameraState,
-		MaxY: number,
-		MinY: number,
-		Rotation: CFrame,
-		Speed: number,
-		ZoomGiveY: number,
-		SpeedAngleX: number,
-		SpeedAngleY: number,
-		SpringX: Spring.Spring<number>,
-		SpringY: Spring.Spring<number>,
-		TargetAngleX: number,
-		TargetAngleXZ: number,
-		TargetAngleY: number,
-		TargetXZ: number,
-	},
-	{} :: typeof({ __index = SmoothRotatedCamera })
-)) & CameraEffectUtils.CameraEffect
+export type SmoothRotatedCamera =
+	typeof(setmetatable(
+		{} :: {
+			AngleX: number,
+			AngleXZ: number,
+			RenderAngleXZ: number,
+			AngleY: number,
+			CFrame: CFrame,
+			RenderAngleY: number,
+			CameraState: CameraState.CameraState,
+			MaxY: number,
+			MinY: number,
+			Rotation: CFrame,
+			Speed: number,
+			ZoomGiveY: number,
+			SpeedAngleX: number,
+			SpeedAngleY: number,
+			SpringX: Spring.Spring<number>,
+			SpringY: Spring.Spring<number>,
+			TargetAngleX: number,
+			TargetAngleXZ: number,
+			TargetAngleY: number,
+			TargetXZ: number,
+		},
+		{} :: typeof({ __index = SmoothRotatedCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 -- Max/Min aim up and down
 SmoothRotatedCamera._maxY = math.rad(80)

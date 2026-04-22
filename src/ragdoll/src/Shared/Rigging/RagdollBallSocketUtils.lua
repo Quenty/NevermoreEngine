@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Instead of modifying this file, consider setting attributes on each motor on humanoid
 	join.

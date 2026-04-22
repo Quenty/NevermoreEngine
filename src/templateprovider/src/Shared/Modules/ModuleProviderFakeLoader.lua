@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Creates a service that provides modules from a parent module, either by name, or by list!
 	@class ModuleProviderFakeLoader

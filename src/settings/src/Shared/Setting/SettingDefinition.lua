@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	These settings definitions are used to define a setting and register them on both the client and server. See
 	[SettingDefinitionProvider] for more details on grouping these.
@@ -24,6 +25,8 @@ local Players = game:GetService("Players")
 
 local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local SettingProperty = require("SettingProperty")
 local SettingsDataService = require("SettingsDataService")
@@ -33,6 +36,17 @@ SettingDefinition.ClassName = "SettingDefinition"
 SettingDefinition.ServiceName = "SettingDefinition"
 SettingDefinition.__index = SettingDefinition
 
+export type SettingDefinition<T> = typeof(setmetatable(
+	{} :: {
+		_settingName: string,
+		_defaultValue: T,
+		_maid: Maid.Maid,
+		_serviceBag: ServiceBag.ServiceBag,
+		ServiceName: string,
+	},
+	{} :: typeof({ __index = SettingDefinition })
+))
+
 --[=[
 	Constructs a new setting definition which defines the name and the defaultValue
 
@@ -40,11 +54,11 @@ SettingDefinition.__index = SettingDefinition
 	@param defaultValue T
 	@return SettingDefinition<T>
 ]=]
-function SettingDefinition.new(settingName, defaultValue)
+function SettingDefinition.new<T>(settingName: string, defaultValue: T): SettingDefinition<T>
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "DefaultValue cannot be nil")
 
-	local self = setmetatable({}, SettingDefinition)
+	local self: SettingDefinition<T> = setmetatable({} :: any, SettingDefinition)
 
 	self._settingName = settingName
 	self._defaultValue = defaultValue
@@ -59,9 +73,9 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingDefinition:Init(serviceBag: ServiceBag.ServiceBag)
+function SettingDefinition.Init<T>(self: SettingDefinition<T>, serviceBag: ServiceBag.ServiceBag)
 	assert(serviceBag, "No serviceBag")
-	assert(not self._maid, "Already initialized")
+	assert(not (self :: any)._maid, "Already initialized")
 
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -76,11 +90,11 @@ end
 	@param player Player
 	@return T
 ]=]
-function SettingDefinition:Get(player: Player)
+function SettingDefinition.Get<T>(self: SettingDefinition<T>, player: Player): T
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
-	return self:GetSettingProperty(self._serviceBag, player):GetValue()
+	return self:GetSettingProperty(self._serviceBag, player).Value
 end
 
 --[=[
@@ -89,7 +103,7 @@ end
 	@param player Player
 	@param value T
 ]=]
-function SettingDefinition:Set(player: Player, value)
+function SettingDefinition.Set<T>(self: SettingDefinition<T>, player: Player, value: T): ()
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -102,7 +116,7 @@ end
 	@param player Player
 	@return Promise<T>
 ]=]
-function SettingDefinition:Promise(player: Player)
+function SettingDefinition.Promise<T>(self: SettingDefinition<T>, player: Player): Promise.Promise<T>
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -116,7 +130,7 @@ end
 	@param value T
 	@return Promise<T>
 ]=]
-function SettingDefinition:PromiseSet(player: Player, value)
+function SettingDefinition.PromiseSet<T>(self: SettingDefinition<T>, player: Player, value: T): Promise.Promise<()>
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -129,7 +143,7 @@ end
 	@param player Player
 	@return Promise<T>
 ]=]
-function SettingDefinition:Observe(player: Player)
+function SettingDefinition.Observe<T>(self: SettingDefinition<T>, player: Player): Observable.Observable<T>
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 	assert(self._serviceBag, "Retrieve from serviceBag")
 
@@ -153,7 +167,11 @@ end
 	@param player Player
 	@return SettingProperty<T>
 ]=]
-function SettingDefinition:GetSettingProperty(serviceBag, player: Player)
+function SettingDefinition.GetSettingProperty<T>(
+	self: SettingDefinition<T>,
+	serviceBag: ServiceBag.ServiceBag,
+	player: Player
+): SettingProperty.SettingProperty<T>
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 
@@ -168,7 +186,10 @@ end
 	@param serviceBag ServiceBag
 	@return SettingProperty<T>
 ]=]
-function SettingDefinition:GetLocalPlayerSettingProperty(serviceBag)
+function SettingDefinition.GetLocalPlayerSettingProperty<T>(
+	self: SettingDefinition<T>,
+	serviceBag: ServiceBag.ServiceBag
+): SettingProperty.SettingProperty<T>
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
 	return self:GetSettingProperty(serviceBag, Players.LocalPlayer)
@@ -178,7 +199,7 @@ end
 	Retrieves the default name of the setting
 	@return string
 ]=]
-function SettingDefinition:GetSettingName(): string
+function SettingDefinition.GetSettingName<T>(self: SettingDefinition<T>): string
 	return self._settingName
 end
 
@@ -186,11 +207,11 @@ end
 	Retrieves the default value for the setting
 	@return T
 ]=]
-function SettingDefinition:GetDefaultValue()
+function SettingDefinition.GetDefaultValue<T>(self: SettingDefinition<T>): T
 	return self._defaultValue
 end
 
-function SettingDefinition:Destroy()
+function SettingDefinition.Destroy<T>(self: SettingDefinition<T>): ()
 	self._maid:DoCleaning()
 end
 

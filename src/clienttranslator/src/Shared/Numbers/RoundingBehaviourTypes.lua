@@ -5,18 +5,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Table = require("Table")
+local SimpleEnum = require("SimpleEnum")
 
 export type RoundingBehaviourType = "roundToClosest" | "truncate" | "None"
 
-export type RoundingBehaviourTypeMap = {
-	ROUND_TO_CLOSEST: "roundToClosest",
-	TRUNCATE: "truncate",
-	NONE: "none",
-}
-
-return Table.readonly({
-	ROUND_TO_CLOSEST = "roundToClosest",
-	TRUNCATE = "truncate",
-	NONE = "none",
-} :: RoundingBehaviourTypeMap)
+return SimpleEnum.new({
+	ROUND_TO_CLOSEST = "roundToClosest" :: "roundToClosest",
+	TRUNCATE = "truncate" :: "truncate",
+	NONE = "none" :: "none",
+})

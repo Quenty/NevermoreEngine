@@ -16,15 +16,17 @@ local GamepadRotateModel = setmetatable({}, BaseObject)
 GamepadRotateModel.__index = GamepadRotateModel
 GamepadRotateModel.ClassName = "GamepadRotateModel"
 
-export type GamepadRotateModel = typeof(setmetatable(
-	{} :: {
-		_lastInputObject: InputObject?,
-		_rampVelocityX: AccelTween.AccelTween,
-		_rampVelocityY: AccelTween.AccelTween,
-		IsRotating: ValueObject.ValueObject<boolean>,
-	},
-	{} :: typeof({ __index = GamepadRotateModel })
-)) & BaseObject.BaseObject
+export type GamepadRotateModel =
+	typeof(setmetatable(
+		{} :: {
+			_lastInputObject: InputObject?,
+			_rampVelocityX: AccelTween.AccelTween,
+			_rampVelocityY: AccelTween.AccelTween,
+			IsRotating: ValueObject.ValueObject<boolean>,
+		},
+		{} :: typeof({ __index = GamepadRotateModel })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new GamepadRotateModel.

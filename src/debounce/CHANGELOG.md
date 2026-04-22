@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/debounce@2.5.1...@quenty/debounce@2.5.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [2.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/debounce@2.5.0...@quenty/debounce@2.5.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/debounce
+
+
+
+
+
+# [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/debounce@2.4.0...@quenty/debounce@2.5.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Add more typing ([f32615e](https://github.com/Quenty/NevermoreEngine/commit/f32615ec9d846a1a4392a3b21a0f594e8d420b44))
+
+
+
+
+
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/debounce@2.3.3...@quenty/debounce@2.4.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/debounce

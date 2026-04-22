@@ -1,6 +1,6 @@
 {
   "name": "@quenty/symbol",
-  "version": "3.5.0",
+  "version": "3.5.2",
   "description": "Unique symbol implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

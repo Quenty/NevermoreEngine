@@ -1,7 +1,0 @@
-{
-  "name": "{{packageName}}Package",
-  "globIgnorePaths": [ "**/.package-lock.json" ],
-  "tree": {
-    "$path": "src"
-  }
-}

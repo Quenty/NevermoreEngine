@@ -3,6 +3,156 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.27.0...@quenty/localizedtextutils@12.28.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.26.0...@quenty/localizedtextutils@12.27.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.25.0...@quenty/localizedtextutils@12.26.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.24.2...@quenty/localizedtextutils@12.25.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.24.1...@quenty/localizedtextutils@12.24.2) (2026-02-13)
+
+
+### Bug Fixes
+
+* **localizedtextutils:** make translationArgs optional ([#655](https://github.com/Quenty/NevermoreEngine/issues/655)) ([9eb6d7b](https://github.com/Quenty/NevermoreEngine/commit/9eb6d7bb9c26bc6a21bd71bfc7e47fd0dfae26c1))
+
+
+
+
+
+## [12.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.24.0...@quenty/localizedtextutils@12.24.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.23.0...@quenty/localizedtextutils@12.24.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.22.2...@quenty/localizedtextutils@12.23.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.22.1...@quenty/localizedtextutils@12.22.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [12.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.22.0...@quenty/localizedtextutils@12.22.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.21.0...@quenty/localizedtextutils@12.22.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.20.6...@quenty/localizedtextutils@12.21.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.20.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.20.5...@quenty/localizedtextutils@12.20.6) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.20.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.20.4...@quenty/localizedtextutils@12.20.5) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.20.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.20.3...@quenty/localizedtextutils@12.20.4) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.20.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.20.2...@quenty/localizedtextutils@12.20.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.20.1...@quenty/localizedtextutils@12.20.2) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.20.0...@quenty/localizedtextutils@12.20.1) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
 # [12.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.19.0...@quenty/localizedtextutils@12.20.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/localizedtextutils

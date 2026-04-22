@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class ServerMain
 ]]
@@ -6,6 +7,12 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.gameproduct)
+
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.gameproduct) then
+	return
+end
 
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("GameProductService"))
@@ -19,7 +26,7 @@ serviceBag:GetService(require("GameConfigService")):AddAsset("FrogOnHead", 45565
 
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 
-local function makePrompt(assetType, idOrKey, cframe)
+local function makePrompt(assetType: GameConfigAssetTypes.GameConfigAssetType, idOrKey: number | string, cframe: CFrame)
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	local promptPart = Instance.new("Part")

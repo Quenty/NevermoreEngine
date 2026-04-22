@@ -19,15 +19,17 @@ local IdleTargetCalculator = setmetatable({}, BaseObject)
 IdleTargetCalculator.ClassName = "IdleTargetCalculator"
 IdleTargetCalculator.__index = IdleTargetCalculator
 
-export type IdleTargetCalculator = typeof(setmetatable(
-	{} :: {
-		_lastTargetPosition: Vector3?,
-		_lastMoveTime: number?,
-		_disableContextUI: ValueObject.ValueObject<boolean>,
-		Changed: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = IdleTargetCalculator })
-)) & BaseObject.BaseObject
+export type IdleTargetCalculator =
+	typeof(setmetatable(
+		{} :: {
+			_lastTargetPosition: Vector3?,
+			_lastMoveTime: number?,
+			_disableContextUI: ValueObject.ValueObject<boolean>,
+			Changed: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = IdleTargetCalculator })
+	))
+	& BaseObject.BaseObject
 
 function IdleTargetCalculator.new(): IdleTargetCalculator
 	local self: IdleTargetCalculator = setmetatable(BaseObject.new() :: any, IdleTargetCalculator)

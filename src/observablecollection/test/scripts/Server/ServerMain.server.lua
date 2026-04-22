@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class ServerMain
 ]]
@@ -6,6 +7,12 @@ local TweenService = game:GetService("TweenService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.observablecollection)
+
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.observablecollection) then
+	return
+end
 
 local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
@@ -85,7 +92,7 @@ for i = 9, 1, -1 do
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "TextLabel"
-	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.TextScaled = true
 	textLabel.BackgroundTransparency = 1
 	textLabel.TextColor3 = Color3.new(0, 0, 0)

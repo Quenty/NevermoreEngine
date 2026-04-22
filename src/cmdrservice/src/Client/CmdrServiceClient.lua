@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Loads cmdr on the client. See [CmdrService] for the server equivalent.
 

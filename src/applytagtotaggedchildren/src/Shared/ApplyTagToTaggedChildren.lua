@@ -19,15 +19,17 @@ local ApplyTagToTaggedChildren = setmetatable({}, BaseObject)
 ApplyTagToTaggedChildren.ClassName = "ApplyTagToTaggedChildren"
 ApplyTagToTaggedChildren.__index = ApplyTagToTaggedChildren
 
-export type ApplyTagToTaggedChildren = typeof(setmetatable(
-	{} :: {
-		_parent: Instance,
-		_tagged: { [Instance]: boolean },
-		_tag: string,
-		_requiredTag: string,
-	},
-	{} :: typeof({ __index = ApplyTagToTaggedChildren })
-)) & BaseObject.BaseObject
+export type ApplyTagToTaggedChildren =
+	typeof(setmetatable(
+		{} :: {
+			_parent: Instance,
+			_tagged: { [Instance]: boolean },
+			_tag: string,
+			_requiredTag: string,
+		},
+		{} :: typeof({ __index = ApplyTagToTaggedChildren })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new ApplyTagToTaggedChildren.

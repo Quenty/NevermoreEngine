@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles IK rigging for a humanoid
 	@class IKRigClient

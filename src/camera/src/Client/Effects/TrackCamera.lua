@@ -14,13 +14,15 @@ local TrackCamera = {}
 TrackCamera.ClassName = "TrackCamera"
 TrackCamera.FieldOfView = 0
 
-export type TrackCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		CameraSubject: Instance?,
-	},
-	{} :: typeof({ __index = TrackCamera })
-)) & CameraEffectUtils.CameraEffect
+export type TrackCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			CameraSubject: Instance?,
+		},
+		{} :: typeof({ __index = TrackCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 

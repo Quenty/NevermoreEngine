@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Simple mixin to generate code for a class.
 

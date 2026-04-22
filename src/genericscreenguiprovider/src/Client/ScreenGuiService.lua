@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Centralized provider so Hoarcekat stories can bootstrap in a fake PlayerGui
 
@@ -36,7 +37,7 @@ end
 
 	return ScreenGui?
 ]=]
-function ScreenGuiService:GetGuiParent()
+function ScreenGuiService:GetGuiParent(): Instance?
 	self:_ensureInit()
 
 	return self._guiParent.Value
@@ -48,7 +49,7 @@ end
 	@param playerGui PlayerGui | Instance
 	return MaidTask
 ]=]
-function ScreenGuiService:SetGuiParent(playerGui)
+function ScreenGuiService:SetGuiParent(playerGui: Instance?)
 	self:_ensureInit()
 
 	self._guiParent.Value = playerGui

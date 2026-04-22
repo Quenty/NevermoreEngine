@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Declarative UI system inspired by Fusion.
 	@class Blend
@@ -37,7 +38,7 @@ export type BlendProps = { [any]: any }
 		Parent = game.Players.LocalPlayer.PlayerGui;
 
 		Blend.New "Frame" {
-			Size = UDim2.new(1, 0, 1, 0);
+			Size = UDim2.fromScale(1, 1);
 			BackgroundTransparency = 0.5;
 		};
 	};
@@ -529,7 +530,7 @@ end
 		Parent = game.Players.LocalPlayer.PlayerGui;
 		[Blend.Children] = {
 			Blend.New "Frame" {
-				Size = UDim2.new(1, 0, 1, 0);
+				Size = UDim2.fromScale(1, 1);
 				BackgroundTransparency = 0.5;
 			};
 		};
@@ -544,7 +545,7 @@ end
 		Parent = game.Players.LocalPlayer.PlayerGui;
 
 		Blend.New "Frame" {
-			Size = UDim2.new(1, 0, 1, 0);
+			Size = UDim2.fromScale(1, 1);
 			BackgroundTransparency = 0.5;
 		};
 	};
@@ -660,7 +661,7 @@ end
 
 	```lua
 	maid:GiveTask(Blend.mount(frame, {
-		Size = UDim2.new(0.5, 0, 0.5, 0);
+		Size = UDim2.fromScale(0.5, 0.5);
 
 		Blend.Find "UIScale" {
 			Scale = 2;
@@ -828,7 +829,7 @@ end
 				-- every frame.
 
 				Blend.New "Frame" {
-					Size = UDim2.new(1, 0, 1, 0);
+					Size = UDim2.fromScale(1, 1);
 					BackgroundTransparency = 0.5;
 				};
 			end)

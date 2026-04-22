@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class Blend.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Blend = require("Blend")
 local Maid = require("Maid")
@@ -21,7 +23,7 @@ return function(target)
 			Blend.New "TextButton" {
 				Text = "Add",
 				AutoButtonColor = true,
-				Size = UDim2.new(0, 100, 0, 20),
+				Size = UDim2.fromOffset(100, 20),
 				[Blend.OnEvent "Activated"] = function()
 					local newState = {}
 					for _, item in state.Value do
@@ -35,7 +37,7 @@ return function(target)
 				print("Compute", value)
 				return Blend.New "TextLabel" {
 					Text = tostring(value),
-					Size = UDim2.new(0, 20, 0, 20),
+					Size = UDim2.fromOffset(20, 20),
 				}
 			end),
 

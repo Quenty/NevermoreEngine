@@ -19,14 +19,18 @@ local PlayerSettings = setmetatable({}, PlayerSettingsBase)
 PlayerSettings.ClassName = "PlayerSettings"
 PlayerSettings.__index = PlayerSettings
 
-export type PlayerSettings = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_remoting: Remoting.Remoting,
-		_settingsDataService: SettingsDataService.SettingsDataService,
-	},
-	{} :: typeof({ __index = PlayerSettings })
-)) & PlayerSettingsBase.PlayerSettingsBase
+export type PlayerSettings =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_remoting: Remoting.Remoting,
+			_settingsDataService: SettingsDataService.SettingsDataService,
+		},
+		{} :: typeof({ __index = PlayerSettings })
+	))
+	& PlayerSettingsBase.PlayerSettingsBase
+
+export type SettingsMap = { [string]: any }
 
 function PlayerSettings.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): PlayerSettings
 	local self: PlayerSettings = setmetatable(PlayerSettingsBase.new(folder, serviceBag) :: any, PlayerSettings)
@@ -50,7 +54,7 @@ function PlayerSettings.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): 
 	return self
 end
 
-function PlayerSettings.EnsureInitialized(self: PlayerSettings, settingName: string, defaultValue)
+function PlayerSettings.EnsureInitialized<T>(self: PlayerSettings, settingName: string, defaultValue: T): ()
 	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 
@@ -66,24 +70,24 @@ function PlayerSettings.EnsureInitialized(self: PlayerSettings, settingName: str
 
 		-- Paranoid UTF8 check
 		if type(encoded) == "string" then
-			assert(DataStoreStringUtils.isValidUTF8(defaultValue), "Bad UTF8 defaultValue")
+			assert(DataStoreStringUtils.isValidUTF8(encoded), "Bad UTF8 defaultValue")
 		end
 
 		self._obj:SetAttribute(attributeName, encoded)
 	end
 end
 
-function PlayerSettings._setupRemoting(self: PlayerSettings)
+function PlayerSettings._setupRemoting(self: PlayerSettings): ()
 	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.SERVER))
 
-	self._maid:Add(self._remoting.RequestUpdateSettings:Bind(function(player, settingsMap)
+	self._maid:Add(self._remoting.RequestUpdateSettings:Bind(function(player: Player, settingsMap: SettingsMap)
 		assert(self:GetPlayer() == player, "Bad player")
 
 		return self:_setSettingsMap(settingsMap)
 	end))
 end
 
-function PlayerSettings._setSettingsMap(self: PlayerSettings, settingsMap)
+function PlayerSettings._setSettingsMap(self: PlayerSettings, settingsMap: SettingsMap): ()
 	assert(type(settingsMap) == "table", "Bad settingsMap")
 
 	for settingName, value in settingsMap do
@@ -91,7 +95,7 @@ function PlayerSettings._setSettingsMap(self: PlayerSettings, settingsMap)
 
 		-- Avoid even letting these be set.
 		if not DataStoreStringUtils.isValidUTF8(settingName) then
-			warn("[PlayerSettings] - Bad UTF8 settingName. Skipping setting.")
+			warn(`[PlayerSettings] - Bad UTF8 settingName. Skipping setting.`)
 			continue
 		end
 
@@ -99,10 +103,7 @@ function PlayerSettings._setSettingsMap(self: PlayerSettings, settingsMap)
 
 		if self._obj:GetAttribute(attributeName) == nil then
 			warn(
-				string.format(
-					"[PlayerSettings] - Cannot set setting %q on attribute that is not defined on the server.",
-					attributeName
-				)
+				`[PlayerSettings] - Cannot set setting {attributeName} on attribute that is not defined on the server. Be sure to initialize settings on both server + client.`
 			)
 			continue
 		end
@@ -110,12 +111,7 @@ function PlayerSettings._setSettingsMap(self: PlayerSettings, settingsMap)
 		-- Paranoid UTF8 check. Avoid letting this value be set.
 		if type(value) == "string" then
 			if not DataStoreStringUtils.isValidUTF8(value) then
-				warn(
-					string.format(
-						"[PlayerSettings] - Bad UTF8 value setting value for %q. Skipping setting.",
-						settingName
-					)
-				)
+				warn(`[PlayerSettings] - Bad UTF8 value setting value for {settingName}. Skipping setting.`)
 				continue
 			end
 		end

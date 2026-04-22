@@ -3,6 +3,273 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.44.0...@quenty/secrets@7.45.0) (2026-04-15)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.43.0...@quenty/secrets@7.44.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.42.0...@quenty/secrets@7.43.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.41.0...@quenty/secrets@7.42.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [7.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.40.1...@quenty/secrets@7.41.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.40.0...@quenty/secrets@7.40.1) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.39.3...@quenty/secrets@7.40.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
+## [7.39.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.39.2...@quenty/secrets@7.39.3) (2026-02-09)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.39.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.39.1...@quenty/secrets@7.39.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.39.0...@quenty/secrets@7.39.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.38.0...@quenty/secrets@7.39.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.37.0...@quenty/secrets@7.38.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.36.0...@quenty/secrets@7.37.0) (2026-01-14)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.35.1...@quenty/secrets@7.36.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.35.0...@quenty/secrets@7.35.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [7.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.34.1...@quenty/secrets@7.35.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.34.0...@quenty/secrets@7.34.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.33.0...@quenty/secrets@7.34.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.32.1...@quenty/secrets@7.33.0) (2026-01-06)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.32.0...@quenty/secrets@7.32.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.31.4...@quenty/secrets@7.32.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.31.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.31.3...@quenty/secrets@7.31.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.31.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.31.2...@quenty/secrets@7.31.3) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.31.1...@quenty/secrets@7.31.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.31.0...@quenty/secrets@7.31.1) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.30.4...@quenty/secrets@7.31.0) (2025-12-28)
+
+
+### Features
+
+* Update declarations and README.md ([882056f](https://github.com/Quenty/NevermoreEngine/commit/882056f4c012f9855a0581750968993fb18241ed))
+
+
+
+
+
+## [7.30.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.30.3...@quenty/secrets@7.30.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.30.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.30.2...@quenty/secrets@7.30.3) (2025-12-11)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.30.1...@quenty/secrets@7.30.2) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+## [7.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.30.0...@quenty/secrets@7.30.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.29.0...@quenty/secrets@7.30.0) (2025-11-07)
+
+
+### Features
+
+* Support native Roblox secrets for back compatibility ([970cccc](https://github.com/Quenty/NevermoreEngine/commit/970cccc023f8516d4358905dac38bd5362687a6e))
+
+
+
+
+
 # [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.28.0...@quenty/secrets@7.29.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/secrets

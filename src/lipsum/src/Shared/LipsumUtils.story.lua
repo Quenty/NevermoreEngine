@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class LipsumUtils.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local RunService = game:GetService("RunService")
 
@@ -22,7 +24,7 @@ local function showText(text: string, maxWidth: number, optionalPadding: number?
 	local container = Instance.new("Frame")
 	container.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
 	container.BorderSizePixel = 0
-	container.Size = UDim2.new(1, 0, 1, 0)
+	container.Size = UDim2.fromScale(1, 1)
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Text = text
@@ -32,7 +34,7 @@ local function showText(text: string, maxWidth: number, optionalPadding: number?
 	textLabel.TextSize = 20
 	textLabel.TextColor3 = Color3.new(0, 0, 0)
 	textLabel.TextWrapped = true
-	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.TextYAlignment = Enum.TextYAlignment.Top
 	textLabel.Parent = container
@@ -43,7 +45,7 @@ local function showText(text: string, maxWidth: number, optionalPadding: number?
 	UICornerUtils.fromOffset(10, container)
 
 	local size = TextServiceUtils.getSizeForLabel(textLabel, text, maxWidth - padding * 2)
-	container.Size = UDim2.new(0, size.x + 2 * padding, 0, size.y + 2 * padding)
+	container.Size = UDim2.fromOffset(size.x + 2 * padding, size.y + 2 * padding)
 
 	return container
 end
@@ -57,7 +59,7 @@ local function makeTitle(title): TextLabel
 	titleLabel.Font = Enum.Font.Highway
 	titleLabel.Size = UDim2.new(1, -10, 0, 40)
 	titleLabel.AnchorPoint = Vector2.new(0.5, 0)
-	titleLabel.Position = UDim2.new(0.5, 0, 0, 0)
+	titleLabel.Position = UDim2.fromScale(0.5, 0)
 	titleLabel.TextWrapped = true
 	titleLabel.BackgroundTransparency = 1
 	titleLabel.LayoutOrder = 2
@@ -68,7 +70,7 @@ end
 local function makeHorizontalSection(factory: ((Frame) -> ()) -> ()): Frame
 	local container = Instance.new("Frame")
 	container.BackgroundTransparency = 1
-	container.Size = UDim2.new(1, 0, 1, 0)
+	container.Size = UDim2.fromScale(1, 1)
 
 	local uiListLayout = Instance.new("UIListLayout")
 	uiListLayout.Padding = UDim.new(0, 5)
@@ -100,7 +102,7 @@ local function generate(target: Frame)
 
 	local container = Instance.new("Frame")
 	container.BackgroundTransparency = 1
-	container.Size = UDim2.new(1, 0, 1, 0)
+	container.Size = UDim2.fromScale(1, 1)
 	maid:GiveTask(container)
 
 	local uiListLayout = Instance.new("UIListLayout")
@@ -149,8 +151,8 @@ return function(target)
 	local maid = Maid.new()
 
 	local scrollingFrame = maid:Add(Instance.new("ScrollingFrame"))
-	scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-	scrollingFrame.CanvasSize = UDim2.new(1, 0, 5, 0)
+	scrollingFrame.Size = UDim2.fromScale(1, 1)
+	scrollingFrame.CanvasSize = UDim2.fromScale(1, 5)
 	scrollingFrame.BackgroundColor3 = Color3.new(1, 1, 1)
 	scrollingFrame.BackgroundTransparency = 0
 	scrollingFrame.BorderSizePixel = 0

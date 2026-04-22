@@ -22,18 +22,20 @@ local OctreeNode = {}
 OctreeNode.ClassName = "OctreeNode"
 OctreeNode.__index = OctreeNode
 
-export type OctreeNode<T> = typeof(setmetatable(
-	{} :: {
-		_octree: any,
-		_object: T,
-		_currentLowestRegion: any?,
-		_position: Vector3?,
-		_px: number?,
-		_py: number?,
-		_pz: number?,
-	},
-	{} :: typeof({ __index = OctreeNode })
-)) & OctreeRegionUtils.OctreeNode<T>
+export type OctreeNode<T> =
+	typeof(setmetatable(
+		{} :: {
+			_octree: any,
+			_object: T,
+			_currentLowestRegion: any?,
+			_position: Vector3?,
+			_px: number?,
+			_py: number?,
+			_pz: number?,
+		},
+		{} :: typeof({ __index = OctreeNode })
+	))
+	& OctreeRegionUtils.OctreeNode<T>
 
 --[=[
 	Creates a new for the given Octree with the object.

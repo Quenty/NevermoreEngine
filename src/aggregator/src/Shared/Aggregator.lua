@@ -19,17 +19,19 @@ Aggregator.__index = Aggregator
 
 export type PromiseBulkQuery<T> = ({ number }) -> Promise.Promise<T>
 
-export type Aggregator<T> = typeof(setmetatable(
-	{} :: {
-		_debugName: string,
-		_promiseBatchQuery: ({ number }) -> Promise.Promise<T>,
-		_promisesLruCache: any,
-		_maxBatchSize: number,
-		_unsentCount: number,
-		_unsentPromises: { [number]: Promise.Promise<T> },
-	},
-	{} :: typeof({ __index = Aggregator })
-)) & BaseObject.BaseObject
+export type Aggregator<T> =
+	typeof(setmetatable(
+		{} :: {
+			_debugName: string,
+			_promiseBatchQuery: ({ number }) -> Promise.Promise<T>,
+			_promisesLruCache: any,
+			_maxBatchSize: number,
+			_unsentCount: number,
+			_unsentPromises: { [number]: Promise.Promise<T> },
+		},
+		{} :: typeof({ __index = Aggregator })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new aggregator that aggregates promised results together

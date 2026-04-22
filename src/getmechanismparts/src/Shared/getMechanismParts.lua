@@ -86,8 +86,11 @@ return function(originParts: Instance | { BasePart }): { BasePart }
 			local part1
 			if joint:IsA("Constraint") then
 				if not IGNORE_CONSTRAINT_SET[joint.ClassName] then
-					part0 = joint.Attachment0.Parent
-					part1 = joint.Attachment1.Parent
+					local attachment0 = joint.Attachment0
+					local attachment1 = joint.Attachment1
+
+					part0 = if attachment0 then attachment0:FindFirstAncestorWhichIsA("BasePart") else nil
+					part1 = if attachment1 then attachment1:FindFirstAncestorWhichIsA("BasePart") else nil
 				end
 			else
 				part0 = (joint :: any).Part0

@@ -1,13 +1,29 @@
 {
   "name": "@quenty/cli-output-helpers",
-  "version": "1.2.2",
+  "version": "1.10.0",
   "description": "Helpers to generate Nevermore package and game templates",
+  "type": "module",
   "keywords": [
     "Roblox",
     "Raven",
     "CLI"
   ],
   "main": "dist/outputHelper.js",
+  "exports": {
+    ".": "./dist/outputHelper.js",
+    "./reporting": "./dist/reporting/index.js",
+    "./cli-utils": "./dist/cli-utils.js"
+  },
+  "typesVersions": {
+    "*": {
+      "reporting": [
+        "dist/reporting/index.d.ts"
+      ],
+      "cli-utils": [
+        "dist/cli-utils.d.ts"
+      ]
+    }
+  },
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },
@@ -26,12 +42,16 @@
   "devDependencies": {
     "@types/node": "^18.11.4",
     "prettier": "2.7.1",
-    "typescript": "^4.8.4"
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
   },
   "scripts": {
     "build": "tsc --build",
-    "watch": "tsc --build --watch",
-    "clean": "tsc --build --clean"
+    "build:watch": "tsc --build --watch",
+    "build:clean": "tsc --build --clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "preinstall": "npx only-allow pnpm"
   },
   "publishConfig": {
     "access": "public"

@@ -18,19 +18,21 @@ local RobloxApiDump = setmetatable({}, BaseObject)
 RobloxApiDump.ClassName = "RobloxApiDump"
 RobloxApiDump.__index = RobloxApiDump
 
-export type RobloxApiDump = typeof(setmetatable(
-	{} :: {
-		_classMemberPromises: { [string]: Promise.Promise<()> },
-		_ancestorListPromise: { [string]: Promise.Promise<()> },
-		_classPromises: { [string]: Promise.Promise<()> },
-		_classMapPromise: Promise.Promise<()>?,
-		_dumpPromise: Promise.Promise<()>?,
-		_className: string,
-		_obj: Instance?,
-		_maid: any,
-	},
-	{} :: typeof({ __index = RobloxApiDump })
-)) & BaseObject.BaseObject
+export type RobloxApiDump =
+	typeof(setmetatable(
+		{} :: {
+			_classMemberPromises: { [string]: Promise.Promise<()> },
+			_ancestorListPromise: { [string]: Promise.Promise<()> },
+			_classPromises: { [string]: Promise.Promise<()> },
+			_classMapPromise: Promise.Promise<()>?,
+			_dumpPromise: Promise.Promise<()>?,
+			_className: string,
+			_obj: Instance?,
+			_maid: any,
+		},
+		{} :: typeof({ __index = RobloxApiDump })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new RobloxApiDump which will cache all results for its lifetime.

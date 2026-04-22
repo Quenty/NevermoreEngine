@@ -1,3 +1,4 @@
+--!nonstrict
 -- lua-lru, LRU cache in Lua
 -- Copyright (c) 2015 Boris Nagaev
 --[[

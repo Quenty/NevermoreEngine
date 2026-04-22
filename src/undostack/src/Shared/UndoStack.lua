@@ -18,18 +18,20 @@ local UndoStack = setmetatable({}, BaseObject)
 UndoStack.ClassName = "UndoStack"
 UndoStack.__index = UndoStack
 
-export type UndoStack = typeof(setmetatable(
-	{} :: {
-		_undoStack: { UndoStackEntry.UndoStackEntry },
-		_redoStack: { UndoStackEntry.UndoStackEntry },
-		_hasUndoEntries: ValueObject.ValueObject<boolean>,
-		_hasRedoEntries: ValueObject.ValueObject<boolean>,
-		_isActionExecuting: ValueObject.ValueObject<boolean>,
-		_maxSize: number,
-		_latestPromiseChain: Promise.Promise<()>?,
-	},
-	{} :: typeof({ __index = UndoStack })
-)) & BaseObject.BaseObject
+export type UndoStack =
+	typeof(setmetatable(
+		{} :: {
+			_undoStack: { UndoStackEntry.UndoStackEntry },
+			_redoStack: { UndoStackEntry.UndoStackEntry },
+			_hasUndoEntries: ValueObject.ValueObject<boolean>,
+			_hasRedoEntries: ValueObject.ValueObject<boolean>,
+			_isActionExecuting: ValueObject.ValueObject<boolean>,
+			_maxSize: number,
+			_latestPromiseChain: Promise.Promise<()>?,
+		},
+		{} :: typeof({ __index = UndoStack })
+	))
+	& BaseObject.BaseObject
 
 function UndoStack.new(maxSize: number?): UndoStack
 	local self: UndoStack = setmetatable(BaseObject.new() :: any, UndoStack)

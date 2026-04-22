@@ -64,7 +64,7 @@ export type AccelTween = typeof(setmetatable(
 		_y1: number,
 		_a1: number,
 	},
-	{ __index = AccelTween }
+	{} :: typeof({ __index = AccelTween })
 ))
 
 --[=[
@@ -97,6 +97,15 @@ function AccelTween.new(maxaccel: number?): AccelTween
 	}, AccelTween)
 
 	return self :: any
+end
+
+function AccelTween.SetTarget(self: AccelTween, target: number, doNotAnimate: boolean?): ()
+	self.t = target
+
+	if doNotAnimate then
+		self.p = target
+		self.v = 0
+	end
 end
 
 function AccelTween:__index(index)

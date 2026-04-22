@@ -58,66 +58,68 @@ export type ButtonHighlightUpdateCallback = (
 	percentPressed: AccelTween.AccelTween
 ) -> boolean
 
-export type ButtonHighlightModel = typeof(setmetatable(
-	{} :: {
-		_isPressed: ValueObject.ValueObject<boolean>,
-		_isHighlighted: ValueObject.ValueObject<boolean>,
-		_isMouseOver: ValueObject.ValueObject<boolean>,
-		_isMouseDown: ValueObject.ValueObject<boolean>,
-		_isMouseOrTouchOver: ValueObject.ValueObject<boolean>,
-		_isSelected: ValueObject.ValueObject<boolean>,
-		_isChoosen: ValueObject.ValueObject<boolean>,
-		_isKeyDown: ValueObject.ValueObject<boolean>,
-		_numFingerDown: ValueObject.ValueObject<number>,
-		_interactionEnabled: ValueObject.ValueObject<boolean>,
-		_lastMousePositionForScrollingCheck: ValueObject.ValueObject<Vector3?>,
-		_isMouseOverBasedUponMouseMovement: ValueObject.ValueObject<boolean>,
-		_isMouseOverScrollingCheck: ValueObject.ValueObject<boolean>,
-		_maid: Maid.Maid,
-		_onUpdate: ButtonHighlightUpdateCallback,
-		_percentHighlightedAccelTween: AccelTween.AccelTween,
-		_percentChoosenAccelTween: AccelTween.AccelTween,
-		_percentPressAccelTween: AccelTween.AccelTween,
-		_buttonMaid: Maid.Maid?,
-		StartAnimation: (self: ButtonHighlightModel) -> (),
+export type ButtonHighlightModel =
+	typeof(setmetatable(
+		{} :: {
+			_isPressed: ValueObject.ValueObject<boolean>,
+			_isHighlighted: ValueObject.ValueObject<boolean>,
+			_isMouseOver: ValueObject.ValueObject<boolean>,
+			_isMouseDown: ValueObject.ValueObject<boolean>,
+			_isMouseOrTouchOver: ValueObject.ValueObject<boolean>,
+			_isSelected: ValueObject.ValueObject<boolean>,
+			_isChoosen: ValueObject.ValueObject<boolean>,
+			_isKeyDown: ValueObject.ValueObject<boolean>,
+			_numFingerDown: ValueObject.ValueObject<number>,
+			_interactionEnabled: ValueObject.ValueObject<boolean>,
+			_lastMousePositionForScrollingCheck: ValueObject.ValueObject<Vector3?>,
+			_isMouseOverBasedUponMouseMovement: ValueObject.ValueObject<boolean>,
+			_isMouseOverScrollingCheck: ValueObject.ValueObject<boolean>,
+			_maid: Maid.Maid,
+			_onUpdate: ButtonHighlightUpdateCallback,
+			_percentHighlightedAccelTween: AccelTween.AccelTween,
+			_percentChoosenAccelTween: AccelTween.AccelTween,
+			_percentPressAccelTween: AccelTween.AccelTween,
+			_buttonMaid: Maid.Maid?,
+			StartAnimation: (self: ButtonHighlightModel) -> (),
 
-		--[=[
+			--[=[
 			@prop InteractionEnabledChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		InteractionEnabledChanged: Signal.Signal<boolean>,
+			InteractionEnabledChanged: Signal.Signal<boolean>,
 
-		--[=[
+			--[=[
 			@prop IsSelectedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsSelectedChanged: Signal.Signal<boolean>,
+			IsSelectedChanged: Signal.Signal<boolean>,
 
-		--[=[
+			--[=[
 			@prop IsMouseOrTouchOverChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsMouseOrTouchOverChanged: Signal.Signal<boolean>,
+			IsMouseOrTouchOverChanged: Signal.Signal<boolean>,
 
-		--[=[
+			--[=[
 			@prop IsHighlightedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsHighlightedChanged: Signal.Signal<boolean>,
+			IsHighlightedChanged: Signal.Signal<boolean>,
 
-		--[=[
+			--[=[
 			@prop IsPressedChanged Signal<boolean>
 			@readonly
 			@within ButtonHighlightModel
 		]=]
-		IsPressedChanged: Signal.Signal<boolean>,
-	},
-	{} :: typeof({ __index = ButtonHighlightModel })
-)) & BaseObject.BaseObject
+			IsPressedChanged: Signal.Signal<boolean>,
+		},
+		{} :: typeof({ __index = ButtonHighlightModel })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	A model that dictates the current state of a button.
@@ -192,7 +194,7 @@ end
 	Sets the button for the highlight model.
 	@param button
 ]=]
-function ButtonHighlightModel.SetButton(self: ButtonHighlightModel, button: GuiObject?)
+function ButtonHighlightModel.SetButton(self: ButtonHighlightModel, button: GuiObject?): () -> ()
 	assert(typeof(button) == "Instance" or button == nil, "Bad button")
 
 	local maid = Maid.new()
@@ -274,7 +276,7 @@ function ButtonHighlightModel._trackIfButtonMovedOutFromMouse(
 	self: ButtonHighlightModel,
 	maid: Maid.Maid,
 	button: GuiObject
-)
+): ()
 	maid:GiveTask(button.InputChanged:Connect(function(inputObject: InputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 			self._lastMousePositionForScrollingCheck.Value = inputObject.Position
@@ -447,7 +449,7 @@ end
 	@param isChoosen boolean
 	@param doNotAnimate boolean
 ]=]
-function ButtonHighlightModel.SetIsChoosen(self: ButtonHighlightModel, isChoosen: boolean, doNotAnimate: boolean?)
+function ButtonHighlightModel.SetIsChoosen(self: ButtonHighlightModel, isChoosen: boolean, doNotAnimate: boolean?): ()
 	assert(type(isChoosen) == "boolean", "Bad isChoosen")
 
 	self._isChoosen:SetValue(isChoosen, doNotAnimate)
@@ -508,8 +510,8 @@ end
 	Sets whether interaction is enabled
 	@param interactionEnabled boolean
 ]=]
-function ButtonHighlightModel.SetInteractionEnabled(self: ButtonHighlightModel, interactionEnabled: boolean)
-	self._interactionEnabled:Mount(interactionEnabled)
+function ButtonHighlightModel.SetInteractionEnabled(self: ButtonHighlightModel, interactionEnabled: boolean): () -> ()
+	return self._interactionEnabled:Mount(interactionEnabled)
 end
 
 --[=[
@@ -533,13 +535,13 @@ end
 	@param isKeyDown boolean
 	@param doNotAnimate boolean -- Optional
 ]=]
-function ButtonHighlightModel.SetKeyDown(self: ButtonHighlightModel, isKeyDown: boolean, doNotAnimate: boolean?)
+function ButtonHighlightModel.SetKeyDown(self: ButtonHighlightModel, isKeyDown: boolean, doNotAnimate: boolean?): ()
 	assert(type(isKeyDown) == "boolean", "Bad isKeyDown")
 
 	self._isKeyDown:SetValue(isKeyDown, doNotAnimate)
 end
 
-function ButtonHighlightModel._trackTouch(self: ButtonHighlightModel, inputObject: InputObject)
+function ButtonHighlightModel._trackTouch(self: ButtonHighlightModel, inputObject: InputObject): ()
 	if inputObject.UserInputState == Enum.UserInputState.End then
 		return
 	end
@@ -562,12 +564,12 @@ function ButtonHighlightModel._trackTouch(self: ButtonHighlightModel, inputObjec
 	self._maid[inputObject] = maid
 end
 
-function ButtonHighlightModel._stopTouchTrack(self: ButtonHighlightModel, inputObject: InputObject)
+function ButtonHighlightModel._stopTouchTrack(self: ButtonHighlightModel, inputObject: InputObject): ()
 	-- Clears the input tracking as we slide off the button
 	self._maid[inputObject] = nil
 end
 
-function ButtonHighlightModel._updateTargets(self: ButtonHighlightModel)
+function ButtonHighlightModel._updateTargets(self: ButtonHighlightModel): ()
 	self._isMouseOrTouchOver.Value = self._isMouseOver.Value or self._numFingerDown.Value > 0
 
 	-- Assume event emission can lead to cleanup in middle of call
@@ -592,7 +594,7 @@ function ButtonHighlightModel._update(self: ButtonHighlightModel): boolean
 	)
 end
 
-function ButtonHighlightModel._setupLegacySteppedMode(self: ButtonHighlightModel)
+function ButtonHighlightModel._setupLegacySteppedMode(self: ButtonHighlightModel): ()
 	self._percentHighlightedAccelTween = AccelTween.new(200)
 	self._percentHighlightedAccelTween.t = 0
 	self._percentHighlightedAccelTween.p = 0

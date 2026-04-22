@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides permissions on the client. See [PermissionService] for more details.
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/math",
-  "version": "2.7.3",
+  "version": "2.7.5",
   "description": "Utility math functions from Nevermore for Roblox",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

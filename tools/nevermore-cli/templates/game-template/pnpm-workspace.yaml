@@ -1,0 +1,11 @@
+# pnpm workspace configuration for Nevermore monorepo
+# See: https://pnpm.io/workspaces
+
+# Uncomment if you want to include Nevermore and Raven packages in the workspace for local development.
+# You can use `raven link-dependencies` to link the packages together and work on them simultaneously.
+# You should run `raven version-dependencies` before committing to ensure correct versions are set.
+
+#packages:
+  #- '/*'
+  #- '../Nevermore/src/*' # <managed by raven-cli>
+  #- '../Raven/src/*' # <managed by raven-cli>

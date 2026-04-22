@@ -16,20 +16,23 @@ SlaveClock.__index = SlaveClock
 SlaveClock.ClassName = "SlaveClock"
 SlaveClock._offset = -1 -- Set uncalculated values to -1
 
-export type SlaveClock = typeof(setmetatable(
-	{} :: {
-		_remoteEvent: RemoteEvent,
-		_remoteFunction: RemoteFunction,
-		_clockFunction: BaseClock.ClockFunction,
-		_ping: ValueObject.ValueObject<number>,
-		_offset: number,
-		_pneWayDelay: number,
-		_syncedBindable: BindableEvent,
+export type SlaveClock =
+	typeof(setmetatable(
+		{} :: {
+			_remoteEvent: RemoteEvent,
+			_remoteFunction: RemoteFunction,
+			_clockFunction: BaseClock.ClockFunction,
+			_ping: ValueObject.ValueObject<number>,
+			_offset: number,
+			_pneWayDelay: number,
+			_syncedBindable: BindableEvent,
 
-		SyncedEvent: RBXScriptSignal,
-	},
-	{} :: typeof({ __index = SlaveClock })
-)) & BaseObject.BaseObject & BaseClock.BaseClock
+			SyncedEvent: RBXScriptSignal,
+		},
+		{} :: typeof({ __index = SlaveClock })
+	))
+	& BaseObject.BaseObject
+	& BaseClock.BaseClock
 
 --[=[
 	Constructs a new SlaveClock

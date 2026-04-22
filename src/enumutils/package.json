@@ -1,6 +1,6 @@
 {
   "name": "@quenty/enumutils",
-  "version": "3.4.2",
+  "version": "3.4.5",
   "description": "Helds encode Roblox enums into a string",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

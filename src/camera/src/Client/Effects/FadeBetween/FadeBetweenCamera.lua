@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Add another layer of effects that can be faded in/out
 	@class FadeBetweenCamera

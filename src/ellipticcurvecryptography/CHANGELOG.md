@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.9.0...@quenty/ellipticcurvecryptography@1.10.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.8.0...@quenty/ellipticcurvecryptography@1.9.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.7.3...@quenty/ellipticcurvecryptography@1.8.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
+## [1.7.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.7.2...@quenty/ellipticcurvecryptography@1.7.3) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [1.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.7.1...@quenty/ellipticcurvecryptography@1.7.2) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/ellipticcurvecryptography
+
+
+
+
+
+## [1.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.7.0...@quenty/ellipticcurvecryptography@1.7.1) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/ellipticcurvecryptography
+
+
+
+
+
 # [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.6.2...@quenty/ellipticcurvecryptography@1.7.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/ellipticcurvecryptography

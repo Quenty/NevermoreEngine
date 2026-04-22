@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides commands involving player settings
 

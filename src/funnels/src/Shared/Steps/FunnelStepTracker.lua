@@ -12,13 +12,15 @@ local FunnelStepTracker = setmetatable({}, BaseObject)
 FunnelStepTracker.ClassName = "FunnelStepTracker"
 FunnelStepTracker.__index = FunnelStepTracker
 
-export type FunnelStepTracker = typeof(setmetatable(
-	{} :: {
-		_stepsLogged: { [number]: string },
-		StepLogged: Signal.Signal<number, string>,
-	},
-	{} :: typeof({ __index = FunnelStepTracker })
-)) & BaseObject.BaseObject
+export type FunnelStepTracker =
+	typeof(setmetatable(
+		{} :: {
+			_stepsLogged: { [number]: string },
+			StepLogged: Signal.Signal<number, string>,
+		},
+		{} :: typeof({ __index = FunnelStepTracker })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new FunnelStepTracker

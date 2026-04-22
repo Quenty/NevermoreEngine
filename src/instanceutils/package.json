@@ -1,6 +1,6 @@
 {
   "name": "@quenty/instanceutils",
-  "version": "13.20.0",
+  "version": "13.28.0",
   "description": "Utility functions involving instances in Roblox",
   "keywords": [
     "Roblox",
@@ -22,15 +22,20 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/brio": "file:../brio",
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/symbol": "file:../symbol"
+    "@quenty/brio": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/symbol": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

@@ -42,6 +42,12 @@ export type Spring<T> = typeof(setmetatable(
 		Speed: number,
 		Clock: SpringClock,
 
+		s: number,
+		d: number,
+		t: T,
+		p: T,
+		v: T,
+
 		_position0: T,
 		_velocity0: T,
 		_time0: number,

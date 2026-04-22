@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Tracks the equipped player of a tool
 	@class EquippedTracker
@@ -18,10 +19,11 @@ EquippedTracker.__index = EquippedTracker
 	@param tool Tool
 	@return EquippedTracker
 ]=]
-function EquippedTracker.new(tool)
+function EquippedTracker.new(tool: Tool)
+	assert(tool and tool:IsA("Tool"), "Bad tool")
+
 	local self = setmetatable({}, EquippedTracker)
 
-	assert(tool and tool:IsA("Tool"), "Bad tool")
 	self._tool = tool
 
 	self._maid = Maid.new()

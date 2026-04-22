@@ -17,17 +17,19 @@ local getRotationInXZPlane = require("getRotationInXZPlane")
 local RotatedCamera = {}
 RotatedCamera.ClassName = "RotatedCamera"
 
-export type RotatedCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		CFrame: CFrame,
-		AngleX: number,
-		AngleY: number,
-		MaxY: number,
-		MinY: number,
-	},
-	{} :: typeof({ __index = RotatedCamera })
-)) & CameraEffectUtils.CameraEffect
+export type RotatedCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			CFrame: CFrame,
+			AngleX: number,
+			AngleY: number,
+			MaxY: number,
+			MinY: number,
+		},
+		{} :: typeof({ __index = RotatedCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 -- Max/Min aim up and down
 RotatedCamera._maxY = math.rad(80)

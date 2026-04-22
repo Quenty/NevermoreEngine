@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	NumberLocalizationUtils script from Roblox's player scripts in handling the leaderboard.
 

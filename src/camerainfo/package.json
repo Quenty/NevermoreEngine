@@ -1,6 +1,6 @@
 {
   "name": "@quenty/camerainfo",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "description": "Utility method to transfer camera info to and from the client",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

@@ -3,6 +3,9 @@
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
       "inputkeymaputils": {
         "$className": "Folder",
         "inputkeymaputils": {
@@ -10,6 +13,9 @@
         },
         "test": {
           "$path": "modules"
+        },
+        "jest.config": {
+          "$path": "jest.config.lua"
         }
       },
       "Script": {

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Promise that returns an objectValue's value that has a bound
 	value to it.

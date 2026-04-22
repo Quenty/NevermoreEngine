@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Holds flipbook data for playback
 	@class FlipbookLibrary

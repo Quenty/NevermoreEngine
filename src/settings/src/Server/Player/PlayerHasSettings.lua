@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class PlayerHasSettings
 ]=]
@@ -17,14 +18,16 @@ local PlayerHasSettings = setmetatable({}, BaseObject)
 PlayerHasSettings.ClassName = "PlayerHasSettings"
 PlayerHasSettings.__index = PlayerHasSettings
 
-export type PlayerHasSettings = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_playerSettingsBinder: PlayerSettings.PlayerSettings,
-		_playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService,
-	},
-	{} :: typeof({ __index = PlayerHasSettings })
-)) & BaseObject.BaseObject
+export type PlayerHasSettings =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_playerSettingsBinder: PlayerSettings.PlayerSettings,
+			_playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService,
+		},
+		{} :: typeof({ __index = PlayerHasSettings })
+	))
+	& BaseObject.BaseObject
 
 function PlayerHasSettings.new(player: Player, serviceBag)
 	local self = setmetatable(BaseObject.new(player), PlayerHasSettings)

@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Generated Gestures with Python
 	@class Gestures

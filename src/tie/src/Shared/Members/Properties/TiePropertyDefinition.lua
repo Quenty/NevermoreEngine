@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class TiePropertyDefinition
 ]=]
@@ -8,16 +9,31 @@ local TieMemberDefinition = require("TieMemberDefinition")
 local TiePropertyImplementation = require("TiePropertyImplementation")
 local TiePropertyInterface = require("TiePropertyInterface")
 local TieRealmUtils = require("TieRealmUtils")
+local TieRealms = require("TieRealms")
 
 local TiePropertyDefinition = setmetatable({}, TieMemberDefinition)
 TiePropertyDefinition.ClassName = "TiePropertyDefinition"
 TiePropertyDefinition.__index = TiePropertyDefinition
 
-function TiePropertyDefinition.new(tieDefinition, propertyName: string, defaultValue: any, memberTieRealm)
+export type TiePropertyDefinition =
+	typeof(setmetatable(
+		{} :: {
+			_defaultValue: any,
+		},
+		{} :: typeof({ __index = TieMemberDefinition })
+	))
+	& TieMemberDefinition.TieMemberDefinition
+
+function TiePropertyDefinition.new(
+	tieDefinition: any,
+	propertyName: string,
+	defaultValue: any,
+	memberTieRealm: TieRealms.TieRealm
+): TiePropertyDefinition
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
-	local self =
-		setmetatable(TieMemberDefinition.new(tieDefinition, propertyName, memberTieRealm), TiePropertyDefinition)
+	local self: TiePropertyDefinition =
+		setmetatable(TieMemberDefinition.new(tieDefinition, propertyName, memberTieRealm) :: any, TiePropertyDefinition)
 
 	self._defaultValue = defaultValue
 
@@ -28,7 +44,7 @@ function TiePropertyDefinition:GetDefaultValue()
 	return self._defaultValue
 end
 
-function TiePropertyDefinition:IsRequiredForImplementation(currentRealm): boolean
+function TiePropertyDefinition:IsRequiredForImplementation(currentRealm: TieRealms.TieRealm): boolean
 	-- Override
 	if getmetatable(TiePropertyDefinition).IsRequiredForImplementation(self, currentRealm) then
 		if self:GetDefaultValue() ~= nil then
@@ -41,14 +57,14 @@ function TiePropertyDefinition:IsRequiredForImplementation(currentRealm): boolea
 	return false
 end
 
-function TiePropertyDefinition:Implement(implParent: Instance, initialValue, _actualSelf, tieRealm)
+function TiePropertyDefinition:Implement(implParent: Instance, initialValue, _actualSelf, tieRealm: TieRealms.TieRealm)
 	assert(typeof(implParent) == "Instance", "Bad implParent")
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 
 	return TiePropertyImplementation.new(self, implParent, initialValue, tieRealm)
 end
 
-function TiePropertyDefinition:GetInterface(implParent: Instance, _actualSelf, tieRealm)
+function TiePropertyDefinition:GetInterface(implParent: Instance, _actualSelf, tieRealm: TieRealms.TieRealm)
 	assert(typeof(implParent) == "Instance", "Bad implParent")
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 

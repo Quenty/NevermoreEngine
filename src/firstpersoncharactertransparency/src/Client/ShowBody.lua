@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class ShowBody
 ]=]
@@ -7,13 +8,14 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local ServiceBag = require("ServiceBag")
 local TransparencyService = require("TransparencyService")
 
 local ShowBody = setmetatable({}, BaseObject)
 ShowBody.ClassName = "ShowBody"
 ShowBody.__index = ShowBody
 
-function ShowBody.new(character, serviceBag)
+function ShowBody.new(character, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(character), ShowBody)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

@@ -15,21 +15,23 @@ local AnimatedHighlightModel = setmetatable({}, BaseObject)
 AnimatedHighlightModel.ClassName = "AnimatedHighlightModel"
 AnimatedHighlightModel.__index = AnimatedHighlightModel
 
-export type AnimatedHighlightModel = typeof(setmetatable(
-	{} :: {
-		HighlightDepthMode: ValueObject.ValueObject<Enum.HighlightDepthMode?>,
-		FillColor: ValueObject.ValueObject<Color3?>,
-		OutlineColor: ValueObject.ValueObject<Color3?>,
-		FillTransparency: ValueObject.ValueObject<number?>,
-		OutlineTransparency: ValueObject.ValueObject<number?>,
-		Speed: ValueObject.ValueObject<number?>,
-		ColorSpeed: ValueObject.ValueObject<number?>,
-		TransparencySpeed: ValueObject.ValueObject<number?>,
-		FillSpeed: ValueObject.ValueObject<number?>,
-		Destroying: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = AnimatedHighlightModel })
-)) & BaseObject.BaseObject
+export type AnimatedHighlightModel =
+	typeof(setmetatable(
+		{} :: {
+			HighlightDepthMode: ValueObject.ValueObject<Enum.HighlightDepthMode?>,
+			FillColor: ValueObject.ValueObject<Color3?>,
+			OutlineColor: ValueObject.ValueObject<Color3?>,
+			FillTransparency: ValueObject.ValueObject<number?>,
+			OutlineTransparency: ValueObject.ValueObject<number?>,
+			Speed: ValueObject.ValueObject<number?>,
+			ColorSpeed: ValueObject.ValueObject<number?>,
+			TransparencySpeed: ValueObject.ValueObject<number?>,
+			FillSpeed: ValueObject.ValueObject<number?>,
+			Destroying: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = AnimatedHighlightModel })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new data model for an animated highlight. Probably retrieve via an

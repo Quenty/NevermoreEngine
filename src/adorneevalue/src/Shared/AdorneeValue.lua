@@ -21,14 +21,16 @@ AdorneeValue.__index = AdorneeValue
 
 export type AdorneeValueOption = Instance | CFrame | Vector3
 
-export type AdorneeValue = typeof(setmetatable(
-	{} :: {
-		_adornee: ValueObject.ValueObject<AdorneeValueOption?>,
-		Value: AdorneeValueOption?,
-		Changed: Signal.Signal<(AdorneeValueOption?, AdorneeValueOption?)>,
-	},
-	{} :: typeof({ __index = AdorneeValue })
-)) & BaseObject.BaseObject
+export type AdorneeValue =
+	typeof(setmetatable(
+		{} :: {
+			_adornee: ValueObject.ValueObject<AdorneeValueOption?>,
+			Value: AdorneeValueOption?,
+			Changed: Signal.Signal<(AdorneeValueOption?, AdorneeValueOption?)>,
+		},
+		{} :: typeof({ __index = AdorneeValue })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new AdorneeValue

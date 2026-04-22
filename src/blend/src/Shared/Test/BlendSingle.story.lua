@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class BlendSingle.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Blend = require("Blend")
 local Maid = require("Maid")
@@ -18,7 +20,7 @@ return function(target)
 		return Blend.New "TextLabel" {
 			Parent = target,
 			Text = text,
-			Size = UDim2.new(1, 0, 1, 0),
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 0.5,
 			[function()
 				return Observable.new(function()

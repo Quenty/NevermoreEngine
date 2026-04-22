@@ -32,17 +32,19 @@ local PlayerSettingsClient = setmetatable({}, PlayerSettingsBase)
 PlayerSettingsClient.ClassName = "PlayerSettingsClient"
 PlayerSettingsClient.__index = PlayerSettingsClient
 
-export type PlayerSettingsClient = typeof(setmetatable(
-	{} :: {
-		_remoting: Remoting.Remoting,
-		_pendingReplicationDataInTransit: ValueObject.ValueObject<any>,
-		_toReplicate: { [any]: any? }?,
-		_toReplicateCallbacks: { [string]: { [any]: any } },
-		_currentReplicationRequest: Promise.Promise<()>?,
-		_queueSendSettingsFunc: ThrottledFunction.ThrottledFunction<()>,
-	},
-	{} :: typeof({ __index = PlayerSettingsClient })
-)) & PlayerSettingsBase.PlayerSettingsBase
+export type PlayerSettingsClient =
+	typeof(setmetatable(
+		{} :: {
+			_remoting: Remoting.Remoting,
+			_pendingReplicationDataInTransit: ValueObject.ValueObject<any>,
+			_toReplicate: { [any]: any? }?,
+			_toReplicateCallbacks: { [string]: { [any]: any } },
+			_currentReplicationRequest: Promise.Promise<()>?,
+			_queueSendSettingsFunc: ThrottledFunction.ThrottledFunction<()>,
+		},
+		{} :: typeof({ __index = PlayerSettingsClient })
+	))
+	& PlayerSettingsBase.PlayerSettingsBase
 
 --[=[
 	See [SettingsBindersClient] and [SettingsServiceClient] on how to properly use this class.

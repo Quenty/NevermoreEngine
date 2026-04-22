@@ -1,6 +1,6 @@
 {
   "name": "@quenty/fzy",
-  "version": "5.10.0",
+  "version": "5.13.0",
   "description": "Lua implementation of fzy string search algorithm",
   "keywords": [
     "Roblox",
@@ -20,11 +20,16 @@
     "directory": "src/fzy/"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

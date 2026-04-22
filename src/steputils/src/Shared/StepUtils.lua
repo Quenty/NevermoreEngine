@@ -36,7 +36,7 @@ local StepUtils = {}
 	@return (...) -> () -- Connect function
 	@return () -> () -- Disconnect function
 ]=]
-function StepUtils.bindToRenderStep(update: () -> boolean): () -> ()
+function StepUtils.bindToRenderStep(update: () -> boolean): (() -> (), () -> ())
 	return StepUtils.bindToSignal(RunService.RenderStepped, update)
 end
 
@@ -61,7 +61,7 @@ end
 	@return (...) -> () -- Connect function
 	@return () -> () -- Disconnect function
 ]=]
-function StepUtils.bindToStepped(update: () -> boolean): () -> ()
+function StepUtils.bindToStepped(update: () -> boolean): (() -> (), () -> ())
 	return StepUtils.bindToSignal(RunService.Stepped, update)
 end
 

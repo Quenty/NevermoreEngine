@@ -20,21 +20,23 @@ local AnimatedHighlightStack = setmetatable({}, BaseObject)
 AnimatedHighlightStack.ClassName = "AnimatedHighlightStack"
 AnimatedHighlightStack.__index = AnimatedHighlightStack
 
-export type AnimatedHighlightStack = typeof(setmetatable(
-	{} :: {
-		_adornee: Instance,
-		_defaultModelValues: AnimatedHighlightModel.AnimatedHighlightModel,
-		_list: any,
-		_currentModel: AnimatedHighlightModel.AnimatedHighlightModel,
-		_highlight: AnimatedHighlight.AnimatedHighlight,
-		_hasEntries: ValueObject.ValueObject<boolean>,
-		maid: Maid.Maid,
+export type AnimatedHighlightStack =
+	typeof(setmetatable(
+		{} :: {
+			_adornee: Instance,
+			_defaultModelValues: AnimatedHighlightModel.AnimatedHighlightModel,
+			_list: any,
+			_currentModel: AnimatedHighlightModel.AnimatedHighlightModel,
+			_highlight: AnimatedHighlight.AnimatedHighlight,
+			_hasEntries: ValueObject.ValueObject<boolean>,
+			maid: Maid.Maid,
 
-		Done: Signal.Signal<()>,
-		Destroying: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = AnimatedHighlightStack })
-)) & BaseObject.BaseObject
+			Done: Signal.Signal<()>,
+			Destroying: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = AnimatedHighlightStack })
+	))
+	& BaseObject.BaseObject
 
 function AnimatedHighlightStack.new(adornee: Instance, defaultModelValues): AnimatedHighlightStack
 	local self: AnimatedHighlightStack = setmetatable(BaseObject.new() :: any, AnimatedHighlightStack)

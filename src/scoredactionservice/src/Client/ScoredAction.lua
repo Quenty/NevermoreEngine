@@ -18,20 +18,22 @@ local ScoredAction = setmetatable({}, BaseObject)
 ScoredAction.ClassName = "ScoredAction"
 ScoredAction.__index = ScoredAction
 
-export type ScoredAction = typeof(setmetatable(
-	{} :: {
-		PreferredChanged: Signal.Signal<boolean>,
-		Removing: Signal.Signal<()>,
-		EnabledChanged: Signal.Signal<boolean>,
+export type ScoredAction =
+	typeof(setmetatable(
+		{} :: {
+			PreferredChanged: Signal.Signal<boolean>,
+			Removing: Signal.Signal<()>,
+			EnabledChanged: Signal.Signal<(boolean, boolean, ...any)>,
 
-		-- Private
-		_isEnabled: ValueObject.ValueObject<boolean>,
-		_score: number,
-		_createdTimeStamp: number,
-		_preferredStack: StateStack.StateStack<boolean>,
-	},
-	{} :: typeof({ __index = ScoredAction })
-)) & BaseObject.BaseObject
+			-- Private
+			_isEnabled: ValueObject.ValueObject<boolean>,
+			_score: number,
+			_createdTimeStamp: number,
+			_preferredStack: StateStack.StateStack<boolean>,
+		},
+		{} :: typeof({ __index = ScoredAction })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new ScoredAction. Should not be called directly. See [ScoredActionServiceClient.GetScoredAction].
@@ -46,7 +48,7 @@ function ScoredAction.new(): ScoredAction
 	self._preferredStack = self._maid:Add(StateStack.new(false, "boolean"))
 	self._isEnabled = self._maid:Add(ValueObject.new(true, "boolean"))
 
-	self.EnabledChanged = self._isEnabled.Changed :: Signal.Signal<boolean>
+	self.EnabledChanged = self._isEnabled.Changed
 
 	--[=[
 	@prop PreferredChanged Signal<boolean>

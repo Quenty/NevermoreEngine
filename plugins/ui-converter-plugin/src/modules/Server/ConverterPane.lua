@@ -387,7 +387,7 @@ end
 function ConverterPane:_showPreviewText(text: string)
 	local observable = Blend.New("Frame")({
 		Name = self._previewTextName,
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.fromRGB(46, 46, 46),
 		[Blend.Children] = {
 			Blend.New("TextLabel")({
@@ -395,7 +395,7 @@ function ConverterPane:_showPreviewText(text: string)
 				Font = Enum.Font.Arial,
 				TextColor3 = Color3.fromRGB(170, 170, 170),
 				TextWrapped = true,
-				Size = UDim2.new(1, 0, 1, 0),
+				Size = UDim2.fromScale(1, 1),
 				TextSize = 12,
 				BackgroundTransparency = 1,
 			}),
@@ -455,8 +455,8 @@ function ConverterPane:_renderPreviewPane(previewValue)
 			ScaleType = Enum.ScaleType.Tile,
 			TileSize = UDim2.fromOffset(100, 100),
 			Name = "InstanceRenderPreview",
-			Size = UDim2.new(1, 0, 1, 0),
-			Position = UDim2.new(0.5, 0, 1, 0),
+			Size = UDim2.fromScale(1, 1),
+			Position = UDim2.fromScale(0.5, 1),
 			AnchorPoint = Vector2.new(0.5, 1),
 			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 			ZIndex = -1,
@@ -468,12 +468,12 @@ function ConverterPane:_renderPreviewPane(previewValue)
 	local function paddedContainer(child)
 		return {
 			Blend.New("Frame")({
-				Size = UDim2.new(1, 0, 1, 0),
+				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
 				[Blend.Children] = {
 					Blend.New("Frame")({
 						Name = "IsolatedContainer",
-						Size = UDim2.new(1, 0, 1, 0),
+						Size = UDim2.fromScale(1, 1),
 						BackgroundColor3 = Color3.new(1, 1, 1),
 						BackgroundTransparency = 1,
 						[Blend.Children] = child,
@@ -492,16 +492,16 @@ function ConverterPane:_renderPreviewPane(previewValue)
 
 	local function previewTexture(texture)
 		return Blend.New("Frame")({
-			Size = UDim2.new(1, 0, 1, 0),
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Position = UDim2.fromScale(0.5, 0.5),
 			[Blend.Children] = {
 				Blend.New("UIAspectRatioConstraint")({
 					AspectRatio = 1,
 				}),
 				Blend.New("ImageLabel")({
-					Size = UDim2.new(1, 0, 1, 0),
+					Size = UDim2.fromScale(1, 1),
 					BackgroundTransparency = 1,
 					Image = texture,
 				}),
@@ -514,8 +514,8 @@ function ConverterPane:_renderPreviewPane(previewValue)
 		return Blend.New("Frame")({
 			BackgroundColor3 = Color3.new(1, 1, 1),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(1, 0, 1, 0),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromScale(1, 1),
 			[Blend.Children] = inst,
 		})
 	end
@@ -561,16 +561,16 @@ end
 function ConverterPane:_previewCode(codeValue)
 	return Blend.New "ScrollingFrame" {
 		AutomaticCanvasSize = Enum.AutomaticSize.XY,
-		CanvasSize = UDim2.new(0, 0, 0, 0),
+		CanvasSize = UDim2.fromScale(0, 0),
 		ScrollingDirection = Enum.ScrollingDirection.Y,
-		Size = UDim2.new(1, 0, 1, 0),
-		Position = UDim2.new(0, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
+		Position = UDim2.fromScale(0, 1),
 		AnchorPoint = Vector2.new(0, 1),
 		BackgroundColor3 = Color3.fromRGB(37, 37, 37),
 		[Blend.Children] = {
 			Blend.New "TextBox" {
 				Active = false,
-				Size = UDim2.new(1, 0, 0, 0),
+				Size = UDim2.fromScale(1, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextYAlignment = Enum.TextYAlignment.Top,
@@ -659,7 +659,7 @@ function ConverterPane:Render(props)
 		return Blend.New "Frame" {
 			Name = "Content",
 			Size = UDim2.new(1, 0, 1, -HEADER_HEIGHT),
-			Position = UDim2.new(0.5, 0, 1, 0),
+			Position = UDim2.fromScale(0.5, 1),
 			AnchorPoint = Vector2.new(0.5, 1),
 			BackgroundColor3 = Color3.fromRGB(46, 46, 46),
 			[Blend.Children] = child,
@@ -678,7 +678,7 @@ function ConverterPane:Render(props)
 
 	return Blend.New "Frame" {
 		Parent = props.Parent,
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.fromRGB(100, 41, 41),
 
 		[Blend.OnChange "AbsoluteSize"] = self._absoluteSize,
@@ -687,7 +687,7 @@ function ConverterPane:Render(props)
 		[Blend.Children] = {
 			Blend.New "Frame" {
 				Name = "LeftPreviewFrame",
-				Position = UDim2.new(0, 0, 0, 0),
+				Position = UDim2.fromScale(0, 0),
 				Size = Blend.Computed(self._hDividerPosition, function(hPosition)
 					return UDim2.new(hPosition, -DIVIDER_WIDTH / 2, 1, 0)
 				end),
@@ -708,7 +708,7 @@ function ConverterPane:Render(props)
 					return down and true or false
 				end),
 				Active = true,
-				Size = UDim2.new(1, 0, 1, 0),
+				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
 				ZIndex = 1e6,
 
@@ -740,7 +740,7 @@ function ConverterPane:Render(props)
 
 			Blend.New "Frame" {
 				Name = "RenderedPreviewPane",
-				Position = UDim2.new(1, 0, 0, 0),
+				Position = UDim2.fromScale(1, 0),
 				AnchorPoint = Vector2.new(1, 0),
 				Size = Blend.Computed(self._vDividerPosition, self._hDividerPosition, function(vPosition, hPosition)
 					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH / 2, vPosition, 0)
@@ -759,7 +759,7 @@ function ConverterPane:Render(props)
 			Blend.New "TextButton" {
 				AutoButtonColor = true,
 				Position = Blend.Computed(self._vDividerPosition, function(vPosition)
-					return UDim2.new(1, 0, vPosition, 0)
+					return UDim2.fromScale(1, vPosition)
 				end),
 				AnchorPoint = Vector2.new(1, 0.5),
 				Size = Blend.Computed(self._hDividerPosition, function(hPosition)
@@ -778,7 +778,7 @@ function ConverterPane:Render(props)
 			Blend.New "TextButton" {
 				AutoButtonColor = true,
 				Position = Blend.Computed(self._hDividerPosition, function(hPosition)
-					return UDim2.new(hPosition, 0, 0, 0)
+					return UDim2.fromScale(hPosition, 0)
 				end),
 				AnchorPoint = Vector2.new(0.5, 0),
 				Size = UDim2.new(0, DIVIDER_WIDTH, 1, 0),
@@ -794,7 +794,7 @@ function ConverterPane:Render(props)
 
 			Blend.New "Frame" {
 				Name = "CodePane",
-				Position = UDim2.new(1, 0, 1, 0),
+				Position = UDim2.fromScale(1, 1),
 				AnchorPoint = Vector2.new(1, 1),
 				Size = Blend.Computed(self._vDividerPosition, self._hDividerPosition, function(vPosition, hPosition)
 					return UDim2.new(1 - hPosition, -DIVIDER_WIDTH / 2, 1 - vPosition, -DIVIDER_WIDTH / 2)

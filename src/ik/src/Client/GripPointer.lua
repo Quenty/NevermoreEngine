@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Simple rig component to point at attachments given
 

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Allows access to an attribute like a ValueObject, but also encoded or decoded
 
@@ -50,7 +51,7 @@ end
 	@param condition function | nil
 	@return Observable<Brio<any>>
 ]=]
-function EncodedAttributeValue:ObserveBrio(condition)
+function EncodedAttributeValue:ObserveBrio(condition: Rx.Predicate<any>?)
 	return RxAttributeUtils.observeAttributeBrio(self._object, self._attributeName, condition):Pipe({
 		RxBrioUtils.map(rawget(self, "_decode")),
 	})

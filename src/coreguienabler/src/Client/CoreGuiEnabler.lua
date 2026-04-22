@@ -97,8 +97,9 @@ function CoreGuiEnabler.new(): CoreGuiEnabler
 		UserInputService.ModalEnabled = not isEnabled
 	end)
 
+	local wasEnabled = StarterPlayer.EnableMouseLockOption
 	self:AddState("EnableMouseLockOption", function(isEnabled)
-		StarterPlayer.EnableMouseLockOption = isEnabled
+		StarterPlayer.EnableMouseLockOption = wasEnabled and isEnabled
 	end)
 
 	self:AddState("MouseIconEnabled", function(isEnabled)

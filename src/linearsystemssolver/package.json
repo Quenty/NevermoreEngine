@@ -1,6 +1,6 @@
 {
   "name": "@quenty/linearsystemssolver",
-  "version": "2.3.0",
+  "version": "2.3.3",
   "description": "Solves linear systems",
   "keywords": [
     "Roblox",
@@ -20,6 +20,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "AxisAngles",
     "Quenty"

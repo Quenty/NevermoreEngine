@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class AdorneeModelBoundingBox
 ]=]
@@ -18,13 +19,26 @@ local AdorneeModelBoundingBox = setmetatable({}, BaseObject)
 AdorneeModelBoundingBox.ClassName = "AdorneeModelBoundingBox"
 AdorneeModelBoundingBox.__index = AdorneeModelBoundingBox
 
-function AdorneeModelBoundingBox.new(model: Model)
-	local self = setmetatable(BaseObject.new(model), AdorneeModelBoundingBox)
+export type AdorneeModelBoundingBox =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Model,
+			_bbCFrame: ValueObject.ValueObject<CFrame?>,
+			_bbSize: ValueObject.ValueObject<Vector3?>,
+			_isDirty: ValueObject.ValueObject<boolean>,
+			_unanchoredPartsSet: ObservableSet.ObservableSet<BasePart>,
+		},
+		{} :: typeof({ __index = AdorneeModelBoundingBox })
+	))
+	& BaseObject.BaseObject
+
+function AdorneeModelBoundingBox.new(model: Model): AdorneeModelBoundingBox
+	local self: AdorneeModelBoundingBox = setmetatable(BaseObject.new(model) :: any, AdorneeModelBoundingBox)
 
 	self._bbCFrame = self._maid:Add(ValueObject.new(nil))
-	self._bbSize = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
+	self._bbSize = self._maid:Add(ValueObject.new(nil))
 	self._isDirty = self._maid:Add(ValueObject.new(false, "boolean"))
-	self._unanchoredPartsSet = self._maid:Add(ObservableSet.new(false))
+	self._unanchoredPartsSet = self._maid:Add(ObservableSet.new())
 
 	self._maid:GiveTask(RxInstanceUtils.observeDescendantsBrio(self._obj, function(part)
 		return part:IsA("BasePart")
@@ -35,7 +49,7 @@ function AdorneeModelBoundingBox.new(model: Model)
 
 		local maid, part = brio:ToMaidAndValue()
 
-		self:_handlePart(maid, part)
+		self:_handlePart(maid, part :: BasePart)
 	end))
 
 	self._maid:GiveTask(self:_observeBasisChanged():Subscribe(function()
@@ -47,8 +61,8 @@ function AdorneeModelBoundingBox.new(model: Model)
 		:Pipe({
 			Rx.where(function(value)
 				return value
-			end),
-			Rx.throttleDefer(),
+			end) :: any,
+			Rx.throttleDefer() :: any,
 		})
 		:Subscribe(function()
 			debug.profilebegin("modelboundingbox")
@@ -65,8 +79,8 @@ function AdorneeModelBoundingBox.new(model: Model)
 		:Pipe({
 			Rx.map(function(value)
 				return value > 0
-			end),
-			Rx.distinct(),
+			end) :: any,
+			Rx.distinct() :: any,
 		})
 		:Subscribe(function(hasUnanchoredParts)
 			if hasUnanchoredParts then
@@ -79,7 +93,7 @@ function AdorneeModelBoundingBox.new(model: Model)
 	return self
 end
 
-function AdorneeModelBoundingBox:_setupUnanchoredLoop()
+function AdorneeModelBoundingBox._setupUnanchoredLoop(self: AdorneeModelBoundingBox): Maid.Maid
 	local maid = Maid.new()
 
 	-- Paranoid
@@ -90,7 +104,7 @@ function AdorneeModelBoundingBox:_setupUnanchoredLoop()
 	return maid
 end
 
-function AdorneeModelBoundingBox:_handlePart(topMaid, part: BasePart)
+function AdorneeModelBoundingBox._handlePart(self: AdorneeModelBoundingBox, topMaid, part: BasePart)
 	topMaid:GiveTask(RxInstanceUtils.observePropertyBrio(part, "Anchored", function(isAnchored)
 		return not isAnchored
 	end):Subscribe(function(brio)
@@ -111,7 +125,7 @@ function AdorneeModelBoundingBox:_handlePart(topMaid, part: BasePart)
 	self._isDirty.Value = true
 end
 
-function AdorneeModelBoundingBox:_observeBasisChanged()
+function AdorneeModelBoundingBox._observeBasisChanged(self: AdorneeModelBoundingBox): Observable.Observable<()>
 	return RxInstanceUtils.observeProperty(self._obj, "PrimaryPart"):Pipe({
 		Rx.switchMap(function(primaryPart)
 			if primaryPart then
@@ -119,15 +133,15 @@ function AdorneeModelBoundingBox:_observeBasisChanged()
 			else
 				return RxInstanceUtils.observeProperty(self._obj, "WorldPivot")
 			end
-		end),
-	})
+		end) :: any,
+	}) :: any
 end
 
-function AdorneeModelBoundingBox:ObserveCFrame(): Observable.Observable<CFrame>
+function AdorneeModelBoundingBox.ObserveCFrame(self: AdorneeModelBoundingBox): Observable.Observable<CFrame?>
 	return self._bbCFrame:Observe()
 end
 
-function AdorneeModelBoundingBox:ObserveSize(): Observable.Observable<Vector3>
+function AdorneeModelBoundingBox.ObserveSize(self: AdorneeModelBoundingBox): Observable.Observable<Vector3?>
 	return self._bbSize:Observe()
 end
 

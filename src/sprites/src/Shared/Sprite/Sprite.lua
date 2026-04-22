@@ -75,7 +75,7 @@ function Sprite:Get(instanceType: "ImageLabel" | "ImageButton"): ImageLabel | Im
 	assert(type(instanceType) == "string", "Bad instanceType")
 
 	local gui: any = Instance.new(instanceType)
-	gui.Size = UDim2.new(0, self.Size.X, 0, self.Size.Y)
+	gui.Size = UDim2.fromOffset(self.Size.X, self.Size.Y)
 	gui.Name = self.Name
 	gui.BackgroundTransparency = 1
 	gui.BorderSizePixel = 1

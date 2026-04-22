@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class TieMemberInterface
 ]=]
@@ -8,12 +9,18 @@ local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local TieRealmUtils = require("TieRealmUtils")
+local TieRealms = require("TieRealms")
 
 local TieMemberInterface = {}
 TieMemberInterface.ClassName = "TieMemberInterface"
 TieMemberInterface.__index = TieMemberInterface
 
-function TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm)
+function TieMemberInterface.new(
+	implParent: Instance?,
+	adornee: Instance?,
+	memberDefinition,
+	interfaceTieRealm: TieRealms.TieRealm
+)
 	assert(TieRealmUtils.isTieRealm(interfaceTieRealm), "Bad interfaceTieRealm")
 
 	local self = setmetatable({}, TieMemberInterface)

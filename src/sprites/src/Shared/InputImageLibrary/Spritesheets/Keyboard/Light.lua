@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	Generated KeyboardLight with Python
 	@class KeyboardLight

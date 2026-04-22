@@ -47,7 +47,7 @@ end
 --[=[
 	Computes line intersection between vectors
 ]=]
-function ConvexHull2DUtils.lineIntersect(a: Vector2, b: Vector2, c: Vector2, d: Vector2): Vector2 | nil
+function ConvexHull2DUtils.lineIntersect(a: Vector2, b: Vector2, c: Vector2, d: Vector2): Vector2?
 	local r = b - a
 	local s = d - c
 	local dot = r.X * s.Y - r.Y * s.X
@@ -59,11 +59,7 @@ end
 --[=[
 	Raycasts from `from` to `to` against the convex hull.
 ]=]
-function ConvexHull2DUtils.raycast(
-	from: Vector2,
-	to: Vector2,
-	hull: { Vector2 }
-): (Vector2 | nil, Vector2 | nil, Vector2 | nil)
+function ConvexHull2DUtils.raycast(from: Vector2, to: Vector2, hull: { Vector2 }): (Vector2?, Vector2?, Vector2?)
 	local candidates = {}
 	local n = #hull
 

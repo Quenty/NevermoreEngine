@@ -15,13 +15,15 @@ local GameConfigClient = setmetatable({}, GameConfigBase)
 GameConfigClient.ClassName = "GameConfigClient"
 GameConfigClient.__index = GameConfigClient
 
-export type GameConfigClient = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_gameConfigBindersClient: any,
-	},
-	{} :: typeof({ __index = GameConfigClient })
-)) & GameConfigBase.GameConfigBase
+export type GameConfigClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_gameConfigBindersClient: any,
+		},
+		{} :: typeof({ __index = GameConfigClient })
+	))
+	& GameConfigBase.GameConfigBase
 
 function GameConfigClient.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): GameConfigClient
 	local self = setmetatable(GameConfigBase.new(folder), GameConfigClient)

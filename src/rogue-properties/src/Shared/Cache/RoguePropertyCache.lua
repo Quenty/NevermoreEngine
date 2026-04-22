@@ -1,17 +1,21 @@
+--!nonstrict
 --[=[
 	Utility class that helps cache rogue properties per an instance
 
 	@class RoguePropertyCache
 ]=]
 
+local WEAK_KV = { __mode = "kv" }
+
 local RoguePropertyCache = {}
 RoguePropertyCache.ClassName = "RoguePropertyCache"
 RoguePropertyCache.__index = RoguePropertyCache
 
-function RoguePropertyCache.new()
+function RoguePropertyCache.new(debugName: string)
 	local self = setmetatable({}, RoguePropertyCache)
 
-	self._cache = setmetatable({}, { __mode = "v" })
+	self._debugName = debugName
+	self._cache = setmetatable({}, WEAK_KV)
 
 	return self
 end

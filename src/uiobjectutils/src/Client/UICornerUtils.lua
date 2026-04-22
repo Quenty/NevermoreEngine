@@ -47,7 +47,7 @@ function UICornerUtils.clampPositionToFrame(
 	frameSize: Vector2,
 	radius: number,
 	point: Vector2
-): (Vector2?, Vector2?)
+): (Vector2?, Vector2?, Vector2?)
 	assert(radius >= 0, "Bad radius")
 	assert(point, "Bad point")
 
@@ -77,18 +77,18 @@ function UICornerUtils.clampPositionToFrame(
 		rpy = miny
 	end
 
-	local position = Vector2.new(rpx, rpy)
+	local insidePosition = Vector2.new(rpx, rpy)
 
 	-- project in direction of offset
-	local direction = point - position
+	local direction = point - insidePosition
 	if direction.Magnitude == 0 then
 		-- Shouldn't happen!
-		return nil, nil
+		return nil, nil, nil
 	end
 
 	local normal = direction.Unit
-	local outsidePosition = position + normal * radius
-	return outsidePosition, normal
+	local outsidePosition = insidePosition + normal * radius
+	return outsidePosition, normal, insidePosition
 end
 
 return UICornerUtils

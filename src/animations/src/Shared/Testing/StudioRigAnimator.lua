@@ -20,14 +20,16 @@ local StudioRigAnimator = setmetatable({}, BaseObject)
 StudioRigAnimator.ClassName = "StudioRigAnimator"
 StudioRigAnimator.__index = StudioRigAnimator
 
-export type StudioRigAnimator = typeof(setmetatable(
-	{} :: {
-		_animator: Animator?,
-		_obj: Animator | Humanoid,
-		_lastTime: number,
-	},
-	{} :: typeof({ __index = StudioRigAnimator })
-)) & BaseObject.BaseObject
+export type StudioRigAnimator =
+	typeof(setmetatable(
+		{} :: {
+			_animator: Animator?,
+			_obj: Animator | Humanoid,
+			_lastTime: number,
+		},
+		{} :: typeof({ __index = StudioRigAnimator })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new rig animator which will play the animations for the lifetime of the

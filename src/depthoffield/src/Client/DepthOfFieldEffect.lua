@@ -29,18 +29,20 @@ local DepthOfFieldEffect = setmetatable({}, TransitionModel)
 DepthOfFieldEffect.ClassName = "DepthOfFieldEffect"
 DepthOfFieldEffect.__index = DepthOfFieldEffect
 
-export type DepthOfFieldEffect = typeof(setmetatable(
-	{} :: {
-		_depthOfField: Instance,
-		_focusDistanceSpring: SpringObject.SpringObject<number>,
-		_inFocusRadiusSpring: SpringObject.SpringObject<number>,
-		_nearIntensitySpring: SpringObject.SpringObject<number>,
-		_farIntensitySpring: SpringObject.SpringObject<number>,
-		_percentVisibleModel: SpringTransitionModel.SpringTransitionModel<number>,
-		_observeOtherStates: Observable.Observable<Brio.Brio<DepthOfFieldEffect>?>,
-	},
-	{} :: typeof({ __index = DepthOfFieldEffect })
-)) & TransitionModel.TransitionModel
+export type DepthOfFieldEffect =
+	typeof(setmetatable(
+		{} :: {
+			_depthOfField: Instance,
+			_focusDistanceSpring: SpringObject.SpringObject<number>,
+			_inFocusRadiusSpring: SpringObject.SpringObject<number>,
+			_nearIntensitySpring: SpringObject.SpringObject<number>,
+			_farIntensitySpring: SpringObject.SpringObject<number>,
+			_percentVisibleModel: SpringTransitionModel.SpringTransitionModel<number>,
+			_observeOtherStates: Observable.Observable<Brio.Brio<DepthOfFieldEffect>?>,
+		},
+		{} :: typeof({ __index = DepthOfFieldEffect })
+	))
+	& TransitionModel.TransitionModel
 
 function DepthOfFieldEffect.new(): DepthOfFieldEffect
 	local self = setmetatable(TransitionModel.new() :: any, DepthOfFieldEffect)

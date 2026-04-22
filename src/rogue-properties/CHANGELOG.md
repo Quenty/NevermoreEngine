@@ -3,6 +3,261 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.41.0...@quenty/rogue-properties@11.42.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.40.0...@quenty/rogue-properties@11.41.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [11.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.39.0...@quenty/rogue-properties@11.40.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [11.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.38.1...@quenty/rogue-properties@11.39.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.38.0...@quenty/rogue-properties@11.38.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* devcontainer initializes properly with luau-lsp working out of the box ([b8591e8](https://github.com/Quenty/NevermoreEngine/commit/b8591e8a62beda655e90875b0dc22d79fcae8e61))
+
+
+
+
+
+# [11.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.37.3...@quenty/rogue-properties@11.38.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
+## [11.37.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.37.2...@quenty/rogue-properties@11.37.3) (2026-02-06)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.37.1...@quenty/rogue-properties@11.37.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.37.0...@quenty/rogue-properties@11.37.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.36.0...@quenty/rogue-properties@11.37.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.35.0...@quenty/rogue-properties@11.36.0) (2026-01-16)
+
+
+### Features
+
+* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
+* Add SimpleEnum package and interface, to simplify enum usage across Nevermore ([d3040d7](https://github.com/Quenty/NevermoreEngine/commit/d3040d7a07ae7b2586bb982399b401fe19f1eb3f))
+
+
+
+
+
+# [11.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.34.1...@quenty/rogue-properties@11.35.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.34.0...@quenty/rogue-properties@11.34.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+# [11.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.33.1...@quenty/rogue-properties@11.34.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.33.0...@quenty/rogue-properties@11.33.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.32.0...@quenty/rogue-properties@11.33.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.31.1...@quenty/rogue-properties@11.32.0) (2026-01-06)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.31.0...@quenty/rogue-properties@11.31.1) (2026-01-05)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [11.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.7...@quenty/rogue-properties@11.31.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.30.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.6...@quenty/rogue-properties@11.30.7) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.30.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.5...@quenty/rogue-properties@11.30.6) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.30.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.4...@quenty/rogue-properties@11.30.5) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.30.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.3...@quenty/rogue-properties@11.30.4) (2025-12-29)
+
+
+### Bug Fixes
+
+* Update typing to be more accurate ([e4c3d05](https://github.com/Quenty/NevermoreEngine/commit/e4c3d05a0aa9f45a37cbfa372c5e0d8a748c9323))
+
+
+
+
+
+## [11.30.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.2...@quenty/rogue-properties@11.30.3) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.1...@quenty/rogue-properties@11.30.2) (2025-12-13)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.30.0...@quenty/rogue-properties@11.30.1) (2025-11-22)
+
+
+### Bug Fixes
+
+* Fix styling ([a3ac54d](https://github.com/Quenty/NevermoreEngine/commit/a3ac54d43aafa1c37b0e8c9b6e7b20b3f3362742))
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
+
+# [11.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.29.1...@quenty/rogue-properties@11.30.0) (2025-11-17)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [11.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.29.0...@quenty/rogue-properties@11.29.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
 # [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.28.0...@quenty/rogue-properties@11.29.0) (2025-10-08)
 
 

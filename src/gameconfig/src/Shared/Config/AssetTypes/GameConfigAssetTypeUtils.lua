@@ -20,7 +20,7 @@ local pluralMap: { [GameConfigAssetTypes.GameConfigAssetType]: string } = {
 	[GameConfigAssetTypes.MEMBERSHIP] = "memberships",
 }
 
-for _, item: any in GameConfigAssetTypes do
+for _, item: any in GameConfigAssetTypes:GetValues() do
 	assert(pluralMap[item], "Missing plural")
 end
 
@@ -31,7 +31,7 @@ end
 	@return boolean
 ]=]
 function GameConfigAssetTypeUtils.isAssetType(assetType: any): boolean
-	return type(assetType) == "string" and pluralMap[assetType :: any] ~= nil
+	return GameConfigAssetTypes:IsValue(assetType)
 end
 
 --[=[

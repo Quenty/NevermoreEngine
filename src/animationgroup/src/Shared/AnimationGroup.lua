@@ -17,13 +17,15 @@ local AnimationGroup = setmetatable({}, BaseObject)
 AnimationGroup.ClassName = "AnimationGroup"
 AnimationGroup.__index = AnimationGroup
 
-export type AnimationGroup = typeof(setmetatable(
-	{} :: {
-		_weightedTracks: { AnimationGroupUtils.WeightedTrack },
-		_currentTrack: AnimationTrack?,
-	},
-	{} :: typeof({ __index = AnimationGroup })
-)) & BaseObject.BaseObject
+export type AnimationGroup =
+	typeof(setmetatable(
+		{} :: {
+			_weightedTracks: { AnimationGroupUtils.WeightedTrack },
+			_currentTrack: AnimationTrack?,
+		},
+		{} :: typeof({ __index = AnimationGroup })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	@param weightedTracks { WeightedTrack }

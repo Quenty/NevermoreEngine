@@ -1,3 +1,4 @@
+--!nonstrict
 local twoPower = setmetatable({}, {
 	__index = function(self, index)
 		local value = 2 ^ index

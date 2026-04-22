@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Simple undo redo stack history
 	@class UndoableReducer

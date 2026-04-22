@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Allows unregisterable BindToClose callbacks. This is important because you can't unbind
 	:BindToClose calls normally, so we need to provide another place to guarantee clean shutdowns.

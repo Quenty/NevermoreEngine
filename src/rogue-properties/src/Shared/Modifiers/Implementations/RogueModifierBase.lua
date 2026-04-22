@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class RogueModifierBase
 ]=]
@@ -6,13 +7,14 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
+local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
 
 local RogueModifierBase = setmetatable({}, BaseObject)
 RogueModifierBase.ClassName = "RogueModifierBase"
 RogueModifierBase.__index = RogueModifierBase
 
-function RogueModifierBase.new(obj, serviceBag)
+function RogueModifierBase.new(obj, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(obj), RogueModifierBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

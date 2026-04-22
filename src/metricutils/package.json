@@ -1,6 +1,6 @@
 {
   "name": "@quenty/metricutils",
-  "version": "2.4.1",
+  "version": "2.4.3",
   "description": "Provides ways to convert to or from metric",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

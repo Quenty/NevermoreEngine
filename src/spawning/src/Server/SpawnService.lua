@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles spawning stuff in the game
 	@class SpawnService

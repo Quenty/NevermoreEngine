@@ -14,13 +14,15 @@ local getRotationInXZPlane = require("getRotationInXZPlane")
 local XZPlaneLockCamera = {}
 XZPlaneLockCamera.ClassName = "XZPlaneLockCamera"
 
-export type XZPlaneLockCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		_camera: CameraEffectUtils.CameraLike,
-	},
-	{} :: typeof({ __index = XZPlaneLockCamera })
-)) & CameraEffectUtils.CameraEffect
+export type XZPlaneLockCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			_camera: CameraEffectUtils.CameraLike,
+		},
+		{} :: typeof({ __index = XZPlaneLockCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 function XZPlaneLockCamera.new(camera: CameraEffectUtils.CameraLike): XZPlaneLockCamera
 	local self: XZPlaneLockCamera = setmetatable({} :: any, XZPlaneLockCamera)

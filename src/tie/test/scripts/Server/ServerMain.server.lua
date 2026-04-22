@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	@class ServerMain
 ]]
@@ -5,6 +6,12 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.tie)
+
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.tie) then
+	return
+end
 
 local Action = require("Action")
 local ActionInterface = require("ActionInterface")
@@ -71,13 +78,20 @@ do
 
 	-- Implement via interface calls
 	do
-		local thrust = ActionInterface.Server:Implement(adornee)
+		local Signal = require("Signal")
+
+		local thrustImpl = {
+			DisplayName = Instance.new("StringValue"),
+			IsEnabled = Instance.new("BoolValue"),
+			Activated = Signal.new(),
+		}
+		function thrustImpl:Activate()
+			self.Activated:Fire()
+		end
+
+		local thrust = ActionInterface.Server:Implement(adornee, thrustImpl)
 		-- thrust:GetFolder().Name = "Action_Thrust"
 		thrust.DisplayName.Value = "Thrust"
-
-		function thrust:Activate()
-			thrust.Activated:Fire()
-		end
 
 		thrust.Activated:Connect(function()
 			print("Thrusting")

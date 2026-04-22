@@ -17,20 +17,22 @@ local HSColorPickerCursor = setmetatable({}, BaseObject)
 HSColorPickerCursor.ClassName = "HSColorPickerCursor"
 HSColorPickerCursor.__index = HSColorPickerCursor
 
-export type HSColorPickerCursor = typeof(setmetatable(
-	{} :: {
-		Gui: Frame?,
-		_backgroundColorHint: ValueObject.ValueObject<Color3>,
-		_height: ValueObject.ValueObject<number>,
-		_crossHairWidthAbs: ValueObject.ValueObject<number>,
-		_verticalHairVisible: ValueObject.ValueObject<boolean>,
-		_horizontalHairVisible: ValueObject.ValueObject<boolean>,
-		_position: ValueObject.ValueObject<Vector2>,
-		_transparency: ValueObject.ValueObject<number>,
-		PositionChanged: Signal.Signal<Vector2>,
-	},
-	{} :: typeof({ __index = HSColorPickerCursor })
-)) & BaseObject.BaseObject
+export type HSColorPickerCursor =
+	typeof(setmetatable(
+		{} :: {
+			Gui: Frame?,
+			_backgroundColorHint: ValueObject.ValueObject<Color3>,
+			_height: ValueObject.ValueObject<number>,
+			_crossHairWidthAbs: ValueObject.ValueObject<number>,
+			_verticalHairVisible: ValueObject.ValueObject<boolean>,
+			_horizontalHairVisible: ValueObject.ValueObject<boolean>,
+			_position: ValueObject.ValueObject<Vector2>,
+			_transparency: ValueObject.ValueObject<number>,
+			PositionChanged: Signal.Signal<Vector2>,
+		},
+		{} :: typeof({ __index = HSColorPickerCursor })
+	))
+	& BaseObject.BaseObject
 
 function HSColorPickerCursor.new(): HSColorPickerCursor
 	local self: HSColorPickerCursor = setmetatable(BaseObject.new() :: any, HSColorPickerCursor)

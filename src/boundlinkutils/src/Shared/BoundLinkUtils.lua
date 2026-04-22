@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utility functions involving binders and links. It's a common pattern to link
 	back to a bound class. This allows you to quickly retrieve these objects.

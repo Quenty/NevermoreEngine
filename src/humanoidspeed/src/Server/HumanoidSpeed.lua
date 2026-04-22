@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Manages speed of a humanoid
 
@@ -16,13 +17,15 @@ local HumanoidSpeed = setmetatable({}, BaseObject)
 HumanoidSpeed.ClassName = "HumanoidSpeed"
 HumanoidSpeed.__index = HumanoidSpeed
 
-export type HumanoidSpeed = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_properties: any,
-	},
-	{} :: typeof({ __index = HumanoidSpeed })
-)) & BaseObject.BaseObject
+export type HumanoidSpeed =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_properties: any,
+		},
+		{} :: typeof({ __index = HumanoidSpeed })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new HumanoidSpeed

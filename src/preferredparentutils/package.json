@@ -1,6 +1,6 @@
 {
   "name": "@quenty/preferredparentutils",
-  "version": "4.4.0",
+  "version": "4.4.2",
   "description": "Handles logic for creating a \"preferred\" parent container or erroring if it already exists",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

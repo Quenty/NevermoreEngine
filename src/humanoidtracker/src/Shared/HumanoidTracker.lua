@@ -16,33 +16,35 @@ local HumanoidTracker = setmetatable({}, BaseObject)
 HumanoidTracker.ClassName = "HumanoidTracker"
 HumanoidTracker.__index = HumanoidTracker
 
-export type HumanoidTracker = typeof(setmetatable(
-	{} :: {
-		_player: Player,
+export type HumanoidTracker =
+	typeof(setmetatable(
+		{} :: {
+			_player: Player,
 
-		--[=[
+			--[=[
 			Fires when the humanoid dies
 			@prop HumanoidDied Signal<Humanoid>
 			@within HumanoidTracker
 		]=]
-		HumanoidDied: Signal.Signal<Humanoid?>,
+			HumanoidDied: Signal.Signal<Humanoid?>,
 
-		--[=[
+			--[=[
 			Current humanoid which is alive
 			@prop AliveHumanoid ValueObject<Humanoid>
 			@within HumanoidTracker
 		]=]
-		AliveHumanoid: ValueObject.ValueObject<Humanoid?>,
+			AliveHumanoid: ValueObject.ValueObject<Humanoid?>,
 
-		--[=[
+			--[=[
 			Current humanoid
 			@prop Humanoid ValueObject<Humanoid>
 			@within HumanoidTracker
 		]=]
-		Humanoid: ValueObject.ValueObject<Humanoid?>,
-	},
-	{ __index = HumanoidTracker }
-)) & BaseObject.BaseObject
+			Humanoid: ValueObject.ValueObject<Humanoid?>,
+		},
+		{ __index = HumanoidTracker }
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Tracks the player's current humanoid

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Standardized data type to define an input chord, such as Ctrl+Z.
 

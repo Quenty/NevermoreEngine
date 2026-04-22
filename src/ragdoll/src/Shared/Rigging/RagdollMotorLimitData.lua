@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Holds baseline constants for the Ragdoll
 

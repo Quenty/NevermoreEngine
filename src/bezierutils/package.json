@@ -1,6 +1,6 @@
 {
   "name": "@quenty/bezierutils",
-  "version": "2.3.0",
+  "version": "2.3.2",
   "description": "Make interpolation curves like CSS",
   "keywords": [
     "Roblox",
@@ -23,6 +23,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

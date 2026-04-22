@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.5.1...@quenty/boundingboxutils@4.5.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [4.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.5.0...@quenty/boundingboxutils@4.5.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/boundingboxutils
+
+
+
+
+
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.4.0...@quenty/boundingboxutils@4.5.0) (2026-01-06)
+
+
+### Bug Fixes
+
+* Export explicit compiled bounding box type ([da1a5dd](https://github.com/Quenty/NevermoreEngine/commit/da1a5ddfdb99521a4f429f8f40c9ead7d2528290))
+
+
+
+
+
 # [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.3.2...@quenty/boundingboxutils@4.4.0) (2025-05-10)
 
 

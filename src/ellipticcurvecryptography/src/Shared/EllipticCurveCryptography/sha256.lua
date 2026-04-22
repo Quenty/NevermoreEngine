@@ -1,3 +1,4 @@
+--!nonstrict
 --!native
 
 -- SHA-256, HMAC and PBKDF2 functions in ComputerCraft

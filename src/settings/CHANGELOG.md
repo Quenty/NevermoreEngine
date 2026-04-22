@@ -3,6 +3,303 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.47.0...@quenty/settings@11.48.0) (2026-04-15)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.46.0...@quenty/settings@11.47.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.45.0...@quenty/settings@11.46.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [11.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.44.0...@quenty/settings@11.45.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [11.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.43.1...@quenty/settings@11.44.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.43.0...@quenty/settings@11.43.1) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.42.3...@quenty/settings@11.43.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
+## [11.42.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.42.2...@quenty/settings@11.42.3) (2026-02-09)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.42.1...@quenty/settings@11.42.2) (2026-01-23)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.42.0...@quenty/settings@11.42.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.41.0...@quenty/settings@11.42.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.40.0...@quenty/settings@11.41.0) (2026-01-16)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.39.0...@quenty/settings@11.40.0) (2026-01-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.38.2...@quenty/settings@11.39.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.38.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.38.1...@quenty/settings@11.38.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [11.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.38.0...@quenty/settings@11.38.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* Add better warnings to PlayerSettings ([250f473](https://github.com/Quenty/NevermoreEngine/commit/250f47364d04c3c39a52a399f35be5b921d7e352))
+
+
+
+
+
+# [11.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.37.1...@quenty/settings@11.38.0) (2026-01-11)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.37.0...@quenty/settings@11.37.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.36.0...@quenty/settings@11.37.0) (2026-01-08)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.35.1...@quenty/settings@11.36.0) (2026-01-06)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.35.0...@quenty/settings@11.35.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* Adjust typing accordingly for settings system ([4a5438c](https://github.com/Quenty/NevermoreEngine/commit/4a5438c073276c3f1e870fcafb6632ba2dd8a8d8))
+
+
+
+
+
+# [11.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.34.4...@quenty/settings@11.35.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.34.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.34.3...@quenty/settings@11.34.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.34.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.34.2...@quenty/settings@11.34.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [11.34.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.34.1...@quenty/settings@11.34.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.34.0...@quenty/settings@11.34.1) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.33.4...@quenty/settings@11.34.0) (2025-12-28)
+
+
+### Features
+
+* Update declarations and README.md ([882056f](https://github.com/Quenty/NevermoreEngine/commit/882056f4c012f9855a0581750968993fb18241ed))
+
+
+
+
+
+## [11.33.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.33.3...@quenty/settings@11.33.4) (2025-12-28)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.33.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.33.2...@quenty/settings@11.33.3) (2025-12-13)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.33.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.33.1...@quenty/settings@11.33.2) (2025-12-11)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.33.0...@quenty/settings@11.33.1) (2025-11-22)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.32.1...@quenty/settings@11.33.0) (2025-11-17)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.32.0...@quenty/settings@11.32.1) (2025-11-12)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.31.0...@quenty/settings@11.32.0) (2025-11-07)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
 # [11.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.30.0...@quenty/settings@11.31.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/settings

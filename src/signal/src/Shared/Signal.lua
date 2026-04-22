@@ -48,7 +48,11 @@ local require = require(script.Parent.loader).load(script)
 
 local EventHandlerUtils = require("EventHandlerUtils")
 
--- Connection class
+--[=[
+	A connection to a signal.
+
+	@class Connection
+]=]
 local Connection = {}
 Connection.ClassName = "Connection"
 Connection.__index = Connection
@@ -64,6 +68,13 @@ export type Connection<T...> = typeof(setmetatable(
 	{} :: typeof({ __index = Connection })
 ))
 
+--[=[
+	Constructs a new connection object. Not useful directly, use Signal:Connect instead.
+
+	@param signal Signal<T...> -- The signal this connection is connected to
+	@param fn (... T) -> () -- The function handler for this connection
+	@return Connection
+]=]
 function Connection.new<T...>(signal: Signal<T...>, fn: SignalHandler<T...>): Connection<T...>
 	return setmetatable({
 		-- selene: allow(incorrect_standard_library_use)
@@ -73,10 +84,22 @@ function Connection.new<T...>(signal: Signal<T...>, fn: SignalHandler<T...>): Co
 	}, Connection) :: any
 end
 
+--[=[
+	Returns whether the connection is still connected.
+
+	@within Connection
+	@return boolean
+]=]
 function Connection.IsConnected<T...>(self: Connection<T...>): boolean
 	return rawget(self :: any, "_signal") ~= nil
 end
 
+--[=[
+	Disconnects the connection from the signal.
+
+	@within Connection
+	@return ()
+]=]
 function Connection.Disconnect<T...>(self: Connection<T...>)
 	local signal = rawget(self :: any, "_signal")
 	if not signal then
@@ -109,6 +132,12 @@ function Connection.Disconnect<T...>(self: Connection<T...>)
 	table.clear(self :: any)
 end
 
+--[=[
+	Alias for [Disconnect]
+
+	@function Destroy
+	@within Connection
+]=]
 Connection.Destroy = Connection.Disconnect
 
 -- Make signal strict
@@ -170,9 +199,14 @@ function Signal.Connect<T...>(self: Signal<T...>, fn: SignalHandler<T...>): Conn
 	return connection
 end
 
-function Signal:GetConnectionCount()
+--[=[
+	Returns the number of connected handlers to the signal.
+
+	@return number
+]=]
+function Signal.GetConnectionCount<T...>(self: Signal<T...>): number
 	local n = 0
-	local prev = self._handlerListHead
+	local prev: any = self._handlerListHead
 	while prev do
 		n += 1
 		prev = rawget(prev, "_next")

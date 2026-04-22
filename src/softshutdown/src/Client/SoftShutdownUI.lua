@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class SoftShutdownUI
 ]=]
@@ -75,7 +76,7 @@ function SoftShutdownUI:_render()
 
 	return Blend.New "Frame" {
 		Name = "SoftShutdownUI",
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.fromScale(1, 1),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
 		Active = Blend.Computed(percentVisible, function(visible)
@@ -99,7 +100,7 @@ function SoftShutdownUI:_render()
 
 			Blend.New "Frame" {
 				Name = "ContentContainer",
-				Size = UDim2.new(1, 0, 1, 0),
+				Size = UDim2.fromScale(1, 1),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
 				BackgroundTransparency = 1,
@@ -113,13 +114,13 @@ function SoftShutdownUI:_render()
 
 					Blend.New "Frame" {
 						Name = "ImageLabelContainer",
-						Size = UDim2.new(0, 80, 0, 80),
+						Size = UDim2.fromOffset(80, 80),
 						BackgroundTransparency = 1,
 						LayoutOrder = 1,
 
 						[Blend.Children] = {
 							Blend.New "ImageLabel" {
-								Size = UDim2.new(1, 0, 1, 0),
+								Size = UDim2.fromScale(1, 1),
 								ImageTransparency = transparency,
 								BackgroundTransparency = 1,
 								Image = "rbxassetid://6031302916",
@@ -130,7 +131,7 @@ function SoftShutdownUI:_render()
 					Blend.New "Frame" {
 						Name = "LabelContainer",
 						Size = UDim2.new(1, 0, 0, 80),
-						Position = UDim2.new(0.5, 0, 0.5, 0),
+						Position = UDim2.fromScale(0.5, 0.5),
 						AnchorPoint = Vector2.new(0.5, 0.5),
 						BackgroundTransparency = 1,
 						LayoutOrder = 2,
@@ -140,7 +141,7 @@ function SoftShutdownUI:_render()
 								Name = "TitleLabel",
 								BackgroundTransparency = 1,
 								Position = UDim2.fromScale(0.5, 0),
-								Size = UDim2.new(1, 0, 0.6, 0),
+								Size = UDim2.fromScale(1, 0.6),
 								AnchorPoint = Vector2.new(0.5, 0),
 								Text = self._title,
 								Font = Enum.Font.SourceSansBold,
@@ -154,7 +155,7 @@ function SoftShutdownUI:_render()
 								Name = "SubtitleLabel",
 								BackgroundTransparency = 1,
 								Position = UDim2.fromScale(0.5, 1),
-								Size = UDim2.new(1, 0, 0.3, 0),
+								Size = UDim2.fromScale(1, 0.3),
 								AnchorPoint = Vector2.new(0.5, 1),
 								Text = self._subtitle,
 								Font = Enum.Font.SourceSansLight,
@@ -173,7 +174,7 @@ function SoftShutdownUI:_render()
 					Blend.New "Frame" {
 						Name = "Spacer",
 						BackgroundTransparency = 1,
-						Size = UDim2.new(0, 0, 0, 50),
+						Size = UDim2.fromOffset(0, 50),
 						LayoutOrder = 3,
 					},
 
@@ -188,7 +189,7 @@ function SoftShutdownUI:_render()
 						[Blend.Children] = {
 							Blend.New "Frame" {
 								Name = "RobloxLogo",
-								Size = UDim2.new(1, 0, 1, 0),
+								Size = UDim2.fromScale(1, 1),
 								BackgroundColor3 = foregroundColor,
 								AnchorPoint = Vector2.new(0.5, 0.5),
 								Position = UDim2.fromScale(0.5, 0.5),

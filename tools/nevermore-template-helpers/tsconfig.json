@@ -3,9 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "declarationDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "composite": true,
+    "declaration": true
   },
-  "include": [
-    "src/**/*"
-  ]
+  "references": [{ "path": "../cli-output-helpers" }],
+  "include": ["src/**/*"]
 }

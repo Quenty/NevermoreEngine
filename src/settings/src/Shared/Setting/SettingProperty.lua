@@ -130,7 +130,7 @@ end
 
 	@param value T
 ]=]
-function SettingProperty.SetValue<T>(self: SettingProperty<T>, value: T)
+function SettingProperty.SetValue<T>(self: SettingProperty<T>, value: T): ()
 	local settings = self:_getPlayerSettings()
 	if settings then
 		settings:SetValue(self._definition:GetSettingName(), value)

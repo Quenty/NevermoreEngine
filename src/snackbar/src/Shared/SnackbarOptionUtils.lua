@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 --[=[
 	@class SnackbarOptionUtils
 ]=]

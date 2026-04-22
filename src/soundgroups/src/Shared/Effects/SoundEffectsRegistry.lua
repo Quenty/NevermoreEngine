@@ -21,13 +21,15 @@ local SoundEffectsRegistry = setmetatable({}, BaseObject)
 SoundEffectsRegistry.ClassName = "SoundEffectsRegistry"
 SoundEffectsRegistry.__index = SoundEffectsRegistry
 
-export type SoundEffectsRegistry = typeof(setmetatable(
-	{} :: {
-		_pathToEffectList: ObservableMap.ObservableMap<string, SoundEffectsList.SoundEffectsList>,
-		_activeEffectsPathSet: ObservableSet.ObservableSet<string>,
-	},
-	{} :: typeof({ __index = SoundEffectsRegistry })
-)) & BaseObject.BaseObject
+export type SoundEffectsRegistry =
+	typeof(setmetatable(
+		{} :: {
+			_pathToEffectList: ObservableMap.ObservableMap<string, SoundEffectsList.SoundEffectsList>,
+			_activeEffectsPathSet: ObservableSet.ObservableSet<string>,
+		},
+		{} :: typeof({ __index = SoundEffectsRegistry })
+	))
+	& BaseObject.BaseObject
 
 function SoundEffectsRegistry.new(): SoundEffectsRegistry
 	local self: SoundEffectsRegistry = setmetatable(BaseObject.new() :: any, SoundEffectsRegistry)

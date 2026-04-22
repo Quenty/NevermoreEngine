@@ -9,10 +9,10 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
 
-local InsertServiceUtils = require("InsertServiceUtils")
 local Maid = require("Maid")
 local Math = require("Math")
 local Promise = require("Promise")
+local RenderCrateUtils = require("RenderCrateUtils")
 
 local CameraStoryUtils = {}
 
@@ -50,7 +50,7 @@ function CameraStoryUtils.setupViewportFrame(maid: Maid.Maid, target: GuiBase)
 	viewportFrame.ZIndex = 0
 	viewportFrame.BorderSizePixel = 0
 	viewportFrame.BackgroundColor3 = Color3.new(0.9, 0.9, 0.85)
-	viewportFrame.Size = UDim2.new(1, 0, 1, 0)
+	viewportFrame.Size = UDim2.fromScale(1, 1)
 	maid:GiveTask(viewportFrame)
 
 	local reflectedCamera = CameraStoryUtils.reflectCamera(maid, workspace.CurrentCamera)
@@ -71,17 +71,16 @@ end
 ]=]
 function CameraStoryUtils.promiseCrate(
 	maid: Maid.Maid,
-	viewportFrame: ViewportFrame,
-	properties
+	viewportFrame: ViewportFrame?,
+	properties: { [string]: any }?
 ): Promise.Promise<Instance>
-	return maid:GivePromise(InsertServiceUtils.promiseAsset(182451181)):Then(function(model)
-		maid:GiveTask(model)
+	local promise = maid:GivePromise(Promise.new())
 
-		local crate = (model :: any):GetChildren()[1]
-		if not crate then
-			return Promise.rejected()
-		end
+	maid:GiveTask(RenderCrateUtils.crate():Subscribe(function(crate)
+		promise:Resolve(crate)
+	end))
 
+	return promise:Then(function(crate)
 		if properties then
 			for _, item in crate:GetDescendants() do
 				if item:IsA("BasePart") then
@@ -159,7 +158,7 @@ function CameraStoryUtils.getInterpolationFactory(
 				maid:GiveTask(label)
 
 				local size = TextService:GetTextSize(labelText, label.TextSize, label.Font, Vector2.new(1e6, 1e6))
-				label.Size = UDim2.new(0, size.x + 20, 0, 20)
+				label.Size = UDim2.fromOffset(size.x + 20, 20)
 
 				local uiCorner = Instance.new("UICorner")
 				uiCorner.CornerRadius = UDim.new(0.5, 0)

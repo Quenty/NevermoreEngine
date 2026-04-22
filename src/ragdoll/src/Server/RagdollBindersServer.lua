@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Holds binders for Ragdoll system. Be sure to initialize on the client too. See [RagdollBindersClient].
 	Be sure to use a [ServiceBag] to initialize this service.
@@ -14,8 +15,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BinderProvider = require("BinderProvider")
+local ServiceBag = require("ServiceBag")
 
-return BinderProvider.new(script.Name, function(self, serviceBag)
+return BinderProvider.new(script.Name, function(self, serviceBag: ServiceBag.ServiceBag)
 	--[=[
 	Apply this [Binder] to a humanoid to ragdoll it. Humanoid must already have [Ragdollable] defined.
 

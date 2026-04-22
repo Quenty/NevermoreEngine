@@ -18,12 +18,14 @@ local CooldownTrackerModel = setmetatable({}, BaseObject)
 CooldownTrackerModel.ClassName = "CooldownTrackerModel"
 CooldownTrackerModel.__index = CooldownTrackerModel
 
-export type CooldownTrackerModel = typeof(setmetatable(
-	{} :: {
-		_currentCooldownModel: ValueObject.ValueObject<CooldownModel.CooldownModel?>,
-	},
-	{} :: typeof({ __index = CooldownTrackerModel })
-)) & BaseObject.BaseObject
+export type CooldownTrackerModel =
+	typeof(setmetatable(
+		{} :: {
+			_currentCooldownModel: ValueObject.ValueObject<CooldownModel.CooldownModel?>,
+		},
+		{} :: typeof({ __index = CooldownTrackerModel })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new cooldown tracker model

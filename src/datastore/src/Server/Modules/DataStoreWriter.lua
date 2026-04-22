@@ -95,7 +95,7 @@ end
 
 --[=[
 	Adds a recursive child writer to use at the key `name`
-	@param name string | number
+	@param name DataStoreStageKey
 	@param writer DataStoreWriter
 ]=]
 function DataStoreWriter.AddSubWriter(self: DataStoreWriter, name: DataStoreStageKey, writer: DataStoreWriter)
@@ -109,7 +109,7 @@ end
 --[=[
 	Gets a sub writer
 
-	@param name string | number
+	@param name DataStoreStageKey
 	@return DataStoreWriter
 ]=]
 function DataStoreWriter.GetWriter(self: DataStoreWriter, name: DataStoreStageKey): DataStoreWriter?

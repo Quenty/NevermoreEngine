@@ -27,24 +27,26 @@ PushCamera.DefaultAngleXZ0 = 0
 PushCamera._lastUpdateTime = -1
 PushCamera.PushBackAfter = 0.5
 
-export type PushCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		AngleX: number,
-		AngleY: number,
-		AngleXZ: number,
-		LastUpdateTime: number,
-		MinX: number,
-		MinY: number,
-		MaxY: number,
-		Rotation: CFrame,
-		CFrame: CFrame,
-		PushBackDelta: number,
-		PercentFaded: number,
-		PercentFadedCurved: number,
-	},
-	{} :: typeof({ __index = PushCamera })
-)) & CameraEffectUtils.CameraEffect
+export type PushCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			AngleX: number,
+			AngleY: number,
+			AngleXZ: number,
+			LastUpdateTime: number,
+			MinX: number,
+			MinY: number,
+			MaxY: number,
+			Rotation: CFrame,
+			CFrame: CFrame,
+			PushBackDelta: number,
+			PercentFaded: number,
+			PercentFadedCurved: number,
+		},
+		{} :: typeof({ __index = PushCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	Constructs a new PushCamera

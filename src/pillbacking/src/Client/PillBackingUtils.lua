@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Utilities for working with pill backings
 	@class PillBackingUtils

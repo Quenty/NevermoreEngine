@@ -1,6 +1,6 @@
 {
   "name": "@quenty/meshutils",
-  "version": "2.3.3",
+  "version": "2.3.5",
   "description": "Mesh utility methods",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

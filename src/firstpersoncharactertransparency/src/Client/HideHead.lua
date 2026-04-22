@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class HideHead
 ]=]
@@ -8,13 +9,14 @@ local BaseObject = require("BaseObject")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
+local ServiceBag = require("ServiceBag")
 local TransparencyService = require("TransparencyService")
 
 local HideHead = setmetatable({}, BaseObject)
 HideHead.ClassName = "HideHead"
 HideHead.__index = HideHead
 
-function HideHead.new(character, serviceBag)
+function HideHead.new(character: Model, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(character), HideHead)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

@@ -314,8 +314,8 @@ function ParticleEngineClient:_particleRender(
 		end
 	end
 
-	frame.Position = UDim2.new(0, (px + lsp.X - sx) / 2, 0, (py + lsp.Y - sy) / 2)
-	frame.Size = UDim2.new(0, sx, 0, sy)
+	frame.Position = UDim2.fromOffset((px + lsp.X - sx) / 2, (py + lsp.Y - sy) / 2)
+	frame.Size = UDim2.fromOffset(sx, sy)
 	frame.Rotation = 90 + math.atan2(rppy, rppx) * 57.295779513082
 	frame.BackgroundColor3 = particle.Color
 	frame.BackgroundTransparency = bgt + (1 - bgt) * (1 - preSizeY / sy)

@@ -19,17 +19,19 @@ local EPSILON = 1e-6
 local ImpulseCamera = {}
 ImpulseCamera.ClassName = "ImpulseCamera"
 
-export type ImpulseCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		Damper: number,
-		Speed: number,
-		Spring: Spring.Spring<Vector3>,
-		_defaultSpring: Spring.Spring<Vector3>,
-		_springs: { Spring.Spring<Vector3> },
-	},
-	{} :: typeof({ __index = ImpulseCamera })
-)) & CameraEffectUtils.CameraEffect
+export type ImpulseCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			Damper: number,
+			Speed: number,
+			Spring: Spring.Spring<Vector3>,
+			_defaultSpring: Spring.Spring<Vector3>,
+			_springs: { Spring.Spring<Vector3> },
+		},
+		{} :: typeof({ __index = ImpulseCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 function ImpulseCamera.new(): ImpulseCamera
 	local self: ImpulseCamera = setmetatable(

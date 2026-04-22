@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class RxBodyColorsDataUtils
 ]=]
@@ -17,7 +18,7 @@ local RxBodyColorsDataUtils = {}
 	@param instance Instance
 	@return Observable<BodyColorsData>
 ]=]
-function RxBodyColorsDataUtils.observeFromAttributes(instance)
+function RxBodyColorsDataUtils.observeFromAttributes(instance: Instance)
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local observables = {}

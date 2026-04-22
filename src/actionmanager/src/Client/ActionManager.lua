@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Holds single toggleable actions (like a tool system).
 

@@ -12,7 +12,6 @@ local RunService = game:GetService("RunService")
 
 local BasePermissionProvider = require("BasePermissionProvider")
 local PermissionLevel = require("PermissionLevel")
-local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
@@ -21,13 +20,15 @@ local CreatorPermissionProvider = setmetatable({}, BasePermissionProvider)
 CreatorPermissionProvider.ClassName = "CreatorPermissionProvider"
 CreatorPermissionProvider.__index = CreatorPermissionProvider
 
-export type CreatorPermissionProvider = typeof(setmetatable(
-	{} :: {
-		_config: PermissionProviderUtils.SingleUserConfig,
-		_userId: number,
-	},
-	{} :: typeof({ __index = CreatorPermissionProvider })
-)) & BasePermissionProvider.BasePermissionProvider
+export type CreatorPermissionProvider =
+	typeof(setmetatable(
+		{} :: {
+			_config: PermissionProviderUtils.SingleUserConfig,
+			_userId: number,
+		},
+		{} :: typeof({ __index = CreatorPermissionProvider })
+	))
+	& BasePermissionProvider.BasePermissionProvider
 
 --[=[
 	@param config table
@@ -56,7 +57,7 @@ function CreatorPermissionProvider.PromiseIsPermissionLevel(
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+	assert(PermissionLevel:IsValue(permissionLevel))
 
 	if permissionLevel == PermissionLevel.ADMIN or permissionLevel == PermissionLevel.CREATOR then
 		return Promise.resolved(player.UserId == self._userId or RunService:IsStudio())

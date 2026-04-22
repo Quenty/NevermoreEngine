@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles searching for bound objects following links (object values) under a parent
 	with a specific name.
@@ -54,7 +55,7 @@ function BoundLinkCollection:HasClass(class)
 	return self._classes[class] ~= nil
 end
 
-function BoundLinkCollection:TrackParent(parent)
+function BoundLinkCollection:TrackParent(parent: Instance)
 	assert(parent, "Bad parent")
 
 	self._maid:GiveTask(parent.ChildAdded:Connect(function(child)

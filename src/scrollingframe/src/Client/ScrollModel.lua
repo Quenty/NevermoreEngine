@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Scrolling model for scrolling frame
 	@class ScrollModel

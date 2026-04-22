@@ -51,23 +51,25 @@ local ServiceBag = setmetatable({}, BaseObject)
 ServiceBag.ClassName = "ServiceBag"
 ServiceBag.__index = ServiceBag
 
-export type ServiceBag = typeof(setmetatable(
-	{} :: {
-		_services: { [any]: any },
-		_parentProvider: ServiceBag?,
-		_serviceTypesToInitializeSet: { [any]: true }?,
-		_initializedServiceTypeSet: { [any]: true },
-		_serviceTypesToStartSet: { [any]: true }?,
+export type ServiceBag =
+	typeof(setmetatable(
+		{} :: {
+			_services: { [any]: any },
+			_parentProvider: ServiceBag?,
+			_serviceTypesToInitializeSet: { [any]: true }?,
+			_initializedServiceTypeSet: { [any]: true },
+			_serviceTypesToStartSet: { [any]: true }?,
 
-		_initRunAllowed: boolean,
-		_destructing: boolean,
-		_serviceInitLogger: ServiceInitLogger.ServiceInitLogger,
-		_serviceStartLogger: ServiceInitLogger.ServiceInitLogger,
+			_initRunAllowed: boolean,
+			_destructing: boolean,
+			_serviceInitLogger: ServiceInitLogger.ServiceInitLogger,
+			_serviceStartLogger: ServiceInitLogger.ServiceInitLogger,
 
-		_destroyingSignal: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = ServiceBag })
-)) & BaseObject.BaseObject
+			_destroyingSignal: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = ServiceBag })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructs a new ServiceBag

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class TieSignalImplementation
 ]=]
@@ -25,6 +26,15 @@ function TieSignalImplementation.new(memberDefinition, implParent, initialValue)
 	self._bindableEvent.Parent = self._implParent
 
 	self:SetImplementation(initialValue)
+
+	-- Since "actualSelf" can be quite large, we clean up our stuff aggressively for GC.
+	self._maid:GiveTask(function()
+		self._maid:DoCleaning()
+
+		for key, _ in pairs(self) do
+			rawset(self, key, nil)
+		end
+	end)
 
 	return self
 end

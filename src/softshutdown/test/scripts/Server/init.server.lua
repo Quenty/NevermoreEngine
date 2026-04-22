@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
 	This bootstraps both the server and the client code for pretty soft shutdown logic.
 

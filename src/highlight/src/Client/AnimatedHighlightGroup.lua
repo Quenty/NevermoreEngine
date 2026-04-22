@@ -17,13 +17,15 @@ local AnimatedHighlightGroup = setmetatable({}, BaseObject)
 AnimatedHighlightGroup.ClassName = "AnimatedHighlightGroup"
 AnimatedHighlightGroup.__index = AnimatedHighlightGroup
 
-export type AnimatedHighlightGroup = typeof(setmetatable(
-	{} :: {
-		_defaultValues: AnimatedHighlightModel.AnimatedHighlightModel,
-		_highlightStacks: { [Instance]: AnimatedHighlightStack.AnimatedHighlightStack },
-	},
-	{} :: typeof({ __index = AnimatedHighlightGroup })
-)) & BaseObject.BaseObject
+export type AnimatedHighlightGroup =
+	typeof(setmetatable(
+		{} :: {
+			_defaultValues: AnimatedHighlightModel.AnimatedHighlightModel,
+			_highlightStacks: { [Instance]: AnimatedHighlightStack.AnimatedHighlightStack },
+		},
+		{} :: typeof({ __index = AnimatedHighlightGroup })
+	))
+	& BaseObject.BaseObject
 
 function AnimatedHighlightGroup.new(): AnimatedHighlightGroup
 	local self: AnimatedHighlightGroup = setmetatable(BaseObject.new() :: any, AnimatedHighlightGroup)
@@ -131,7 +133,7 @@ function AnimatedHighlightGroup:_setDefaultValues(highlight, doNotAnimate: boole
 	highlight:SetOutlineColor(self._defaultValues.OutlineColor.Value)
 end
 
-function AnimatedHighlightGroup:_getOrCreateHighlightStackHandle(adornee, observeScore)
+function AnimatedHighlightGroup:_getOrCreateHighlightStackHandle(adornee: Instance, observeScore)
 	assert(observeScore, "Bad observeScore")
 
 	local foundHighlightStack = self._highlightStacks[adornee]
@@ -166,7 +168,11 @@ function AnimatedHighlightGroup:_getOrCreateHighlightStackHandle(adornee, observ
 	return handle
 end
 
-function AnimatedHighlightGroup:HighlightWithTransferredProperties(fromAdornee, toAdornee, observeScore)
+function AnimatedHighlightGroup:HighlightWithTransferredProperties(
+	fromAdornee: Instance,
+	toAdornee: Instance,
+	observeScore
+)
 	assert(typeof(fromAdornee) == "Instance", "Bad fromAdornee")
 	assert(typeof(toAdornee) == "Instance", "Bad toAdornee")
 
@@ -190,7 +196,7 @@ function AnimatedHighlightGroup:_removeHighlightStack(highlightStack)
 	self._maid[highlightStack] = nil
 end
 
-function AnimatedHighlightGroup:_findHighlightAdornee(adornee)
+function AnimatedHighlightGroup:_findHighlightAdornee(adornee: Instance)
 	return self._highlightStacks[adornee]
 end
 

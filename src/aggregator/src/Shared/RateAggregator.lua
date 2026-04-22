@@ -21,20 +21,22 @@ export type QueueEntry<TArgs..., T...> = {
 	tuple: Tuple.Tuple<TArgs...>,
 }
 
-export type RateAggregator<TArgs..., T...> = typeof(setmetatable(
-	{} :: {
-		_promiseQuery: (TArgs...) -> Promise.Promise<T...>,
-		_maxRequestsPerSecond: number,
-		_minWaitTime: number,
-		_bankedWaitTime: number,
-		_lastQueryTime: number,
-		_queueRunning: boolean,
-		_queue: Queue.Queue<QueueEntry<(TArgs...), (T...)>>,
-		_tupleLookup: TupleLookup.TupleLookup,
-		_promisesLruCache: any,
-	},
-	{} :: typeof({ __index = RateAggregator })
-)) & BaseObject.BaseObject
+export type RateAggregator<TArgs..., T...> =
+	typeof(setmetatable(
+		{} :: {
+			_promiseQuery: (TArgs...) -> Promise.Promise<T...>,
+			_maxRequestsPerSecond: number,
+			_minWaitTime: number,
+			_bankedWaitTime: number,
+			_lastQueryTime: number,
+			_queueRunning: boolean,
+			_queue: Queue.Queue<QueueEntry<(TArgs...), (T...)>>,
+			_tupleLookup: TupleLookup.TupleLookup,
+			_promisesLruCache: any,
+		},
+		{} :: typeof({ __index = RateAggregator })
+	))
+	& BaseObject.BaseObject
 
 function RateAggregator.new<TArgs..., T...>(promiseQuery: (TArgs...) -> Promise.Promise<T...>): RateAggregator<TArgs..., T...>
 	local self: RateAggregator<TArgs..., T...> = setmetatable(BaseObject.new() :: any, RateAggregator)

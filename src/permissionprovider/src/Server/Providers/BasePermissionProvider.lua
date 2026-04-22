@@ -10,7 +10,6 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local GetRemoteFunction = require("GetRemoteFunction")
 local PermissionLevel = require("PermissionLevel")
-local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
 local Table = require("Table")
@@ -19,14 +18,16 @@ local BasePermissionProvider = setmetatable({}, BaseObject)
 BasePermissionProvider.ClassName = "BasePermissionProvider"
 BasePermissionProvider.__index = BasePermissionProvider
 
-export type BasePermissionProvider = typeof(setmetatable(
-	{} :: {
-		_config: { remoteFunctionName: string },
-		_remoteFunctionName: string,
-		_remoteFunction: RemoteFunction?,
-	},
-	{} :: typeof({ __index = BasePermissionProvider })
-)) & BaseObject.BaseObject
+export type BasePermissionProvider =
+	typeof(setmetatable(
+		{} :: {
+			_config: { remoteFunctionName: string },
+			_remoteFunctionName: string,
+			_remoteFunction: RemoteFunction?,
+		},
+		{} :: typeof({ __index = BasePermissionProvider })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Initializes a new permission provider
@@ -68,7 +69,7 @@ function BasePermissionProvider.PromiseIsPermissionLevel(
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+	assert(PermissionLevel:IsValue(permissionLevel))
 
 	error("Not implemented")
 end
@@ -85,7 +86,7 @@ function BasePermissionProvider.IsPermissionLevel(
 	permissionLevel: PermissionLevel.PermissionLevel
 ): boolean
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+	assert(PermissionLevel:IsValue(permissionLevel))
 
 	local promise = self:PromiseIsPermissionLevel(player, permissionLevel)
 	if promise:IsPending() then

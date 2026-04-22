@@ -33,7 +33,7 @@ local PADDING_FROM_BOTTOM = 10
 
 local DRAG_DISTANCE_TO_HIDE = 48
 local DURATION = 3
-local SHOW_POSITION = UDim2.new(1, 0, 1, 0)
+local SHOW_POSITION = UDim2.fromScale(1, 1)
 local HIDE_POSITION = UDim2.new(1, 0, 1, 48)
 
 local PADDING_X = 24
@@ -49,23 +49,25 @@ local Snackbar = setmetatable({}, TransitionModel)
 Snackbar.ClassName = "Snackbar"
 Snackbar.__index = Snackbar
 
-export type Snackbar = typeof(setmetatable(
-	{} :: {
-		Gui: GuiObject,
+export type Snackbar =
+	typeof(setmetatable(
+		{} :: {
+			Gui: GuiObject,
 
-		_text: ValueObject.ValueObject<string>,
-		_backgroundColor: ValueObject.ValueObject<Color3>,
-		_percentVisibleModel: SpringTransitionModel.SpringTransitionModel<number>,
-		_dragSpring: SpringObject.SpringObject<Vector2>,
-		_positionSpringModel: SpringTransitionModel.SpringTransitionModel<UDim2>,
-		_dragModel: ButtonDragModel.ButtonDragModel,
-		_computedTransparency: Observable.Observable<number>,
-		_mainButton: GuiButton?,
-		_callToActionContainer: GuiObject?,
-		_textLabel: TextLabel?,
-	},
-	{} :: typeof({ __index = Snackbar })
-)) & TransitionModel.TransitionModel
+			_text: ValueObject.ValueObject<string>,
+			_backgroundColor: ValueObject.ValueObject<Color3>,
+			_percentVisibleModel: SpringTransitionModel.SpringTransitionModel<number>,
+			_dragSpring: SpringObject.SpringObject<Vector2>,
+			_positionSpringModel: SpringTransitionModel.SpringTransitionModel<UDim2>,
+			_dragModel: ButtonDragModel.ButtonDragModel,
+			_computedTransparency: Observable.Observable<number>,
+			_mainButton: GuiButton?,
+			_callToActionContainer: GuiObject?,
+			_textLabel: TextLabel?,
+		},
+		{} :: typeof({ __index = Snackbar })
+	))
+	& TransitionModel.TransitionModel
 
 function Snackbar.new(text: string, options: SnackbarOptionUtils.SnackbarOptions?): Snackbar
 	assert(SnackbarOptionUtils.isSnackbarOptions(options) or options == nil, "Bad options")
@@ -189,16 +191,16 @@ function Snackbar._updateHideFromDragTarget(self: Snackbar, doNotAnimate: boolea
 	local hideTarget
 	if target.Y > 0 then
 		-- Down
-		hideTarget = SHOW_POSITION + UDim2.new(0, 0, 0, guiSize.Y)
+		hideTarget = SHOW_POSITION + UDim2.fromOffset(0, guiSize.Y)
 	elseif target.Y < 0 then
 		-- Up
-		hideTarget = SHOW_POSITION + UDim2.new(0, 0, 0, -guiSize.Y)
+		hideTarget = SHOW_POSITION + UDim2.fromOffset(0, -guiSize.Y)
 	elseif target.X < 0 then
-		hideTarget = SHOW_POSITION + UDim2.new(0, -guiSize.X, 0, 0)
+		hideTarget = SHOW_POSITION + UDim2.fromOffset(-guiSize.X, 0)
 	elseif target.X > 0 then
-		hideTarget = SHOW_POSITION + UDim2.new(0, guiSize.X, 0, 0)
+		hideTarget = SHOW_POSITION + UDim2.fromOffset(guiSize.X, 0)
 	else
-		hideTarget = SHOW_POSITION + UDim2.new(0, 0, 0, guiSize.Y)
+		hideTarget = SHOW_POSITION + UDim2.fromOffset(0, guiSize.Y)
 	end
 
 	self._positionSpringModel:SetHideTarget(hideTarget, doNotAnimate)
@@ -219,7 +221,7 @@ function Snackbar._render(self: Snackbar)
 	return Blend.New("Frame")({
 		ZIndex = 1,
 		Name = "Snackbar",
-		Size = UDim2.new(0, 0, 0, 0),
+		Size = UDim2.fromScale(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		Position = Blend.Computed(
 			self._positionSpringModel:Observe(),
@@ -243,7 +245,7 @@ function Snackbar._render(self: Snackbar)
 		}),
 
 		Blend.New("ImageButton")({
-			Size = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.fromScale(0, 0),
 			AnchorPoint = Vector2.new(1, 1),
 			AutomaticSize = Enum.AutomaticSize.XY,
 			BackgroundTransparency = 1,
@@ -286,7 +288,7 @@ function Snackbar._render(self: Snackbar)
 			Blend.New("Frame")({
 				Name = "InnerSnackbarContainer",
 				AutomaticSize = Enum.AutomaticSize.XY,
-				Size = UDim2.new(0, 0, 0, 0),
+				Size = UDim2.fromScale(0, 0),
 				ZIndex = 2,
 				BackgroundColor3 = self._backgroundColor:Observe(),
 				BackgroundTransparency = self._computedTransparency,
@@ -324,8 +326,8 @@ function Snackbar._render(self: Snackbar)
 					BackgroundTransparency = 1,
 					AutomaticSize = Enum.AutomaticSize.XY,
 					TextColor3 = Color3.new(1, 1, 1),
-					Size = UDim2.new(0, 0, 0, 0),
-					Position = UDim2.new(0, 0, 0, 18),
+					Size = UDim2.fromScale(0, 0),
+					Position = UDim2.fromOffset(0, 18),
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextYAlignment = Enum.TextYAlignment.Center,
 					BorderSizePixel = 0,
@@ -358,14 +360,14 @@ function Snackbar._renderCallToAction(self: Snackbar, callToAction)
 
 	local buttonModel = self._maid:Add(ButtonHighlightModel.new())
 
-	return Blend.New "TextButton" {
+	return Blend.New("TextButton")({
 		Name = "CallToActionButton",
 		AnchorPoint = Vector2.new(1, 0.5),
 		LayoutOrder = 2,
 		BackgroundTransparency = 1,
-		Position = UDim2.new(1, 0, 0.5, 0),
+		Position = UDim2.fromScale(1, 0.5),
 		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.new(0, 0, 0, 18),
+		Size = UDim2.fromOffset(0, 18),
 		Text = UTF8.upper(callToActionText),
 		Font = Enum.Font.SourceSans,
 		TextSize = assert(self._textLabel, "Must have textLabel").TextSize,
@@ -380,14 +382,14 @@ function Snackbar._renderCallToAction(self: Snackbar, callToAction)
 			buttonModel:SetButton(gui)
 		end,
 
-		[Blend.OnEvent "Activated"] = function()
+		[Blend.OnEvent("Activated")] = function()
 			self:Hide()
 
 			if onClick then
 				onClick()
 			end
 		end,
-	}
+	})
 end
 
 return Snackbar

@@ -185,10 +185,10 @@ function GuiTriangle.UpdateRender(self: GuiTriangle)
 	local ta, tb = self._ta, self._tb
 	ta.Image = "rbxassetid://319692171"
 	tb.Image = "rbxassetid://319692151"
-	ta.Position = UDim2.new(0, tlc1.X, 0, tlc1.Y)
-	tb.Position = UDim2.new(0, tlc2.X, 0, tlc2.Y)
-	ta.Size = UDim2.new(0, tbsize.X + extra, 0, tbsize.Y + extra)
-	tb.Size = UDim2.new(0, tasize.X + extra, 0, tasize.Y + extra)
+	ta.Position = UDim2.fromOffset(tlc1.X, tlc1.Y)
+	tb.Position = UDim2.fromOffset(tlc2.X, tlc2.Y)
+	ta.Size = UDim2.fromOffset(tbsize.X + extra, tbsize.Y + extra)
+	tb.Size = UDim2.fromOffset(tasize.X + extra, tasize.Y + extra)
 	ta.Rotation = math.deg(rotation)
 	tb.Rotation = ta.Rotation
 end

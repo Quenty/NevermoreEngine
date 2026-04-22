@@ -19,17 +19,19 @@ InfluxDBWriteBuffer.__index = InfluxDBWriteBuffer
 
 export type PromiseHandleFlush = (entries: { string }) -> Promise.Promise<()>
 
-export type InfluxDBWriteBuffer = typeof(setmetatable(
-	{} :: {
-		_bytes: number,
-		_length: number,
-		_entries: { string },
-		_writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
-		_promiseHandleFlush: PromiseHandleFlush,
-		_requestQueueNext: Signal.Signal<()>,
-	},
-	{} :: typeof({ __index = InfluxDBWriteBuffer })
-)) & BaseObject.BaseObject
+export type InfluxDBWriteBuffer =
+	typeof(setmetatable(
+		{} :: {
+			_bytes: number,
+			_length: number,
+			_entries: { string },
+			_writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+			_promiseHandleFlush: PromiseHandleFlush,
+			_requestQueueNext: Signal.Signal<()>,
+		},
+		{} :: typeof({ __index = InfluxDBWriteBuffer })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new InfluxDB write buffer.

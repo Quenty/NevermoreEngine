@@ -22,12 +22,14 @@ type ActionPicker = {
 	HasActions: (unknown) -> boolean,
 }
 
-export type ScoredActionPickerProvider = typeof(setmetatable(
-	{} :: {
-		_scoredActionPickers: { [any]: ActionPicker },
-	},
-	{} :: typeof({ __index = ScoredActionPickerProvider })
-)) & BaseObject.BaseObject
+export type ScoredActionPickerProvider =
+	typeof(setmetatable(
+		{} :: {
+			_scoredActionPickers: { [any]: ActionPicker },
+		},
+		{} :: typeof({ __index = ScoredActionPickerProvider })
+	))
+	& BaseObject.BaseObject
 
 function ScoredActionPickerProvider.new(): ScoredActionPickerProvider
 	local self: ScoredActionPickerProvider = setmetatable(BaseObject.new() :: any, ScoredActionPickerProvider)

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Localized text utils which changes translationKey structures to shared locations
 	@class LocalizedTextUtils
@@ -28,7 +29,7 @@ export type TranslationArgs = { [string]: LocalizedTextData | number | string }
 ]=]
 export type LocalizedTextData = {
 	translationKey: string,
-	translationArgs: TranslationArgs,
+	translationArgs: TranslationArgs?,
 }
 
 --[=[
@@ -37,7 +38,7 @@ export type LocalizedTextData = {
 	@param translationArgs TranslationArgs
 	@return LocalizedTextData
 ]=]
-function LocalizedTextUtils.create(translationKey: string, translationArgs: TranslationArgs): LocalizedTextData
+function LocalizedTextUtils.create(translationKey: string, translationArgs: TranslationArgs?): LocalizedTextData
 	assert(type(translationKey) == "string", "Bad translationKey")
 	assert(type(translationArgs) == "table" or translationArgs == nil, "Bad translationArgs")
 
@@ -69,7 +70,7 @@ end
 function LocalizedTextUtils.formatByKeyRecursive(
 	translator: Translator,
 	translationKey: string,
-	translationArgs: TranslationArgs,
+	translationArgs: TranslationArgs?,
 	extraArgs
 )
 	assert(translator, "Bad translator")
@@ -119,7 +120,7 @@ end
 function LocalizedTextUtils.observeFormatByKeyRecursive(
 	translator,
 	translationKey: string,
-	translationArgs: TranslationArgs,
+	translationArgs: TranslationArgs?,
 	extraArgs
 )
 	assert(translator, "Bad translator")

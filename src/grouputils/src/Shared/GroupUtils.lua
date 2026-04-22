@@ -26,7 +26,7 @@ function GroupUtils.promiseRankInGroup(player: Player, groupId: number): Promise
 	return Promise.spawn(function(resolve, reject)
 		local rank = nil
 		local ok, err = pcall(function()
-			rank = player:GetRankInGroup(groupId)
+			rank = player:GetRankInGroupAsync(groupId)
 		end)
 
 		if not ok then
@@ -55,7 +55,7 @@ function GroupUtils.promiseRoleInGroup(player: Player, groupId: number): Promise
 	return Promise.spawn(function(resolve, reject)
 		local role = nil
 		local ok, err = pcall(function()
-			role = player:GetRoleInGroup(groupId)
+			role = player:GetRoleInGroupAsync(groupId)
 		end)
 
 		if not ok then

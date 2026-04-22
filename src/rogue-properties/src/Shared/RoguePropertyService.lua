@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	This service handles the observable part of a rogue property which allows for us to listen
 	for all of these additives and multipliers in a centralized location.

@@ -15,17 +15,19 @@ local BoundChildCollection = setmetatable({}, BaseObject)
 BoundChildCollection.ClassName = "BoundChildCollection"
 BoundChildCollection.__index = BoundChildCollection
 
-export type BoundChildCollection<T> = typeof(setmetatable(
-	{} :: {
-		_binder: Binder.Binder<T>,
-		_parent: Instance,
-		_classes: Set.Set<T>,
-		ClassAdded: Signal.Signal<T>,
-		ClassRemoved: Signal.Signal<T>,
-		_size: number,
-	},
-	{} :: typeof({ __index = BoundChildCollection })
-)) & BaseObject.BaseObject
+export type BoundChildCollection<T> =
+	typeof(setmetatable(
+		{} :: {
+			_binder: Binder.Binder<T>,
+			_parent: Instance,
+			_classes: Set.Set<T>,
+			ClassAdded: Signal.Signal<T>,
+			ClassRemoved: Signal.Signal<T>,
+			_size: number,
+		},
+		{} :: typeof({ __index = BoundChildCollection })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Constructcs a new BoundChildCollection.

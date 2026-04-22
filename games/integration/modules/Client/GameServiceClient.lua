@@ -17,6 +17,7 @@ function GameServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag:GetService(require("RagdollServiceClient"))
 	self._serviceBag:GetService(require("IKServiceClient"))
 	self._serviceBag:GetService(require("CameraStackService"))
+	self._serviceBag:GetService(require("CmdrServiceClient"))
 
 	--Internal
 	self._serviceBag:GetService(require("GameBindersClient"))

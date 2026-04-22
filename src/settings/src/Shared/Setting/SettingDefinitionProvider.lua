@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides settings in bulk, and can be initialized by a [ServiceBag]. See [SettingDefinition] for
 	more details on how to use this.

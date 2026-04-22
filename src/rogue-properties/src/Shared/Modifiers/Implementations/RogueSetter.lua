@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class RogueSetter
 ]=]
@@ -9,12 +10,13 @@ local RogueModifierBase = require("RogueModifierBase")
 local RogueModifierInterface = require("RogueModifierInterface")
 local Rx = require("Rx")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local ServiceBag = require("ServiceBag")
 
 local RogueSetter = setmetatable({}, RogueModifierBase)
 RogueSetter.ClassName = "RogueSetter"
 RogueSetter.__index = RogueSetter
 
-function RogueSetter.new(valueObject, serviceBag)
+function RogueSetter.new(valueObject, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(RogueModifierBase.new(valueObject, serviceBag), RogueSetter)
 
 	self._maid:GiveTask(RogueModifierInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm()))

@@ -43,7 +43,7 @@ end
 function PromiseUtils.delayed(seconds: number): Promise.Promise<()>
 	assert(type(seconds) == "number", "Bad seconds")
 
-	return Promise.delay(seconds, function(resolve, _reject)
+	return Promise.delay(seconds, function(resolve)
 		resolve()
 	end)
 end
@@ -59,7 +59,7 @@ end
 	@param promises { Promise<T> }
 	@return Promise<T>
 ]=]
-function PromiseUtils.all<T>(promises: { Promise.Promise<T> }): Promise.Promise<T>
+function PromiseUtils.all<T>(promises: { Promise.Promise<T> }): Promise.Promise<...T>
 	if #promises == 0 then
 		return Promise.resolved()
 	elseif #promises == 1 then
@@ -67,7 +67,7 @@ function PromiseUtils.all<T>(promises: { Promise.Promise<T> }): Promise.Promise<
 	end
 
 	local remainingCount = #promises
-	local returnPromise: Promise.Promise<T> = Promise.new()
+	local returnPromise: Promise.Promise<...T> = Promise.new()
 	local results = {}
 	local allFulfilled = true
 

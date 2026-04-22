@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class RogueProperty
 ]=]
@@ -480,7 +481,7 @@ function RogueProperty:ObserveBrio(predicate)
 	})
 end
 
-function RogueProperty:CreateMultiplier(amount: number, source)
+function RogueProperty:CreateMultiplier(amount: number, source): Instance?
 	assert(type(amount) == "number", "Bad amount")
 
 	local className = ValueBaseUtils.getClassNameFromType(typeof(amount))

@@ -21,23 +21,25 @@ local AnimatedHighlight = setmetatable({}, BasicPane)
 AnimatedHighlight.ClassName = "AnimatedHighlight"
 AnimatedHighlight.__index = AnimatedHighlight
 
-export type AnimatedHighlight = typeof(setmetatable(
-	{} :: {
-		-- Public
-		Gui: Highlight,
-		Destroying: Signal.Signal<()>,
+export type AnimatedHighlight =
+	typeof(setmetatable(
+		{} :: {
+			-- Public
+			Gui: Highlight,
+			Destroying: Signal.Signal<()>,
 
-		-- Private
-		_adornee: ValueObject.ValueObject<Instance?>,
-		_highlightDepthMode: ValueObject.ValueObject<Enum.HighlightDepthMode>,
-		_fillColorSpring: SpringObject.SpringObject<Color3>,
-		_outlineColorSpring: SpringObject.SpringObject<Color3>,
-		_fillTransparencySpring: SpringObject.SpringObject<number>,
-		_outlineTransparencySpring: SpringObject.SpringObject<number>,
-		_percentVisible: SpringObject.SpringObject<number>,
-	},
-	{} :: typeof({ __index = AnimatedHighlight })
-)) & BasicPane.BasicPane
+			-- Private
+			_adornee: ValueObject.ValueObject<Instance?>,
+			_highlightDepthMode: ValueObject.ValueObject<Enum.HighlightDepthMode>,
+			_fillColorSpring: SpringObject.SpringObject<Color3>,
+			_outlineColorSpring: SpringObject.SpringObject<Color3>,
+			_fillTransparencySpring: SpringObject.SpringObject<number>,
+			_outlineTransparencySpring: SpringObject.SpringObject<number>,
+			_percentVisible: SpringObject.SpringObject<number>,
+		},
+		{} :: typeof({ __index = AnimatedHighlight })
+	))
+	& BasicPane.BasicPane
 
 function AnimatedHighlight.new(): AnimatedHighlight
 	local self: AnimatedHighlight = setmetatable(BasicPane.new() :: any, AnimatedHighlight)

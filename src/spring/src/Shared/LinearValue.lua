@@ -46,7 +46,7 @@ function LinearValue.isLinear(value: any): boolean
 end
 
 local function convertUDim2(scaleX: number, offsetX: number, scaleY: number, offsetY: number): UDim2
-	-- Roblox UDim2.new(0, 9.999, 0, 9.999) rounds to UDim2.new(0, 9, 0, 9) which means small floating point
+	-- Roblox UDim2.fromOffset(9.999, 9.999) rounds to UDim2.fromOffset(9, 9) which means small floating point
 	-- errors can cause shaking UI.
 
 	return UDim2.new(scaleX, math.round(offsetX), scaleY, math.round(offsetY))

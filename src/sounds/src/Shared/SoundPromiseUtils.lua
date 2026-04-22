@@ -18,7 +18,7 @@ local SoundPromiseUtils = {}
 	@param sound Sound
 	@return Promise
 ]=]
-function SoundPromiseUtils.promiseLoaded(sound: Sound): Promise.Promise<()>
+function SoundPromiseUtils.promiseLoaded(sound: Sound | VideoFrame): Promise.Promise<()>
 	if sound.IsLoaded then
 		return Promise.resolved()
 	end
@@ -32,7 +32,7 @@ function SoundPromiseUtils.promiseLoaded(sound: Sound): Promise.Promise<()>
 		end
 	end))
 
-	maid:GiveTask(sound.Loaded:Connect(function()
+	maid:GiveTask((sound :: any).Loaded:Connect(function()
 		if sound.IsLoaded then
 			promise:Resolve()
 		end
@@ -45,12 +45,18 @@ function SoundPromiseUtils.promiseLoaded(sound: Sound): Promise.Promise<()>
 	return promise
 end
 
-function SoundPromiseUtils.promisePlayed(sound: Sound): Promise.Promise<()>
+--[=[
+	Promise that resolves when the sound is done playing
+]=]
+function SoundPromiseUtils.promisePlayed(sound: Sound | VideoFrame): Promise.Promise<()>
 	return SoundPromiseUtils.promiseLoaded(sound):Then(function()
-		return PromiseUtils.delayed(sound.TimeLength)
+		return PromiseUtils.delayed(sound.TimeLength - sound.TimePosition)
 	end)
 end
 
+--[=[
+	Promise that resolves when the sound is done looping
+]=]
 function SoundPromiseUtils.promiseLooped(sound: Sound): Promise.Promise<()>
 	local promise = Promise.new()
 
@@ -62,6 +68,7 @@ function SoundPromiseUtils.promiseLooped(sound: Sound): Promise.Promise<()>
 
 	return promise
 end
+
 --[=[
 	Promises that all sounds are loaded
 	@param sounds { Sound }

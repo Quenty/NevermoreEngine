@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Base class for ragdolls, meant to be used with binders. This class exports a [Binder].
 	While a humanoid is bound with this class, it is ragdolled.

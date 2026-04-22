@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class InputImageLibrary.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local InputImageLibrary = require("InputImageLibrary")
 local Maid = require("Maid")
@@ -94,7 +96,7 @@ local MOUSE = {
 local function createInputKey(keyCode, theme, platform, parent)
 	local container = Instance.new("Frame")
 	container.BorderSizePixel = 0
-	container.Size = UDim2.new(1, 0, 1, 0)
+	container.Size = UDim2.fromScale(1, 1)
 
 	UICornerUtils.fromOffset(8, container)
 
@@ -109,7 +111,7 @@ local function createInputKey(keyCode, theme, platform, parent)
 	phaseTextLabel.TextColor3 = Color3.new(0.1, 0.1, 0.1)
 	phaseTextLabel.Size = UDim2.new(1, 0, 0, 30)
 	phaseTextLabel.AnchorPoint = Vector2.new(0.5, 0)
-	phaseTextLabel.Position = UDim2.new(0.5, 0, 0, 0)
+	phaseTextLabel.Position = UDim2.fromScale(0.5, 0)
 	phaseTextLabel.TextWrapped = false
 	phaseTextLabel.BackgroundTransparency = 1
 	phaseTextLabel.LayoutOrder = 2
@@ -133,7 +135,7 @@ local function makeTitle(title, parent)
 	titleLabel.Font = Enum.Font.Highway
 	titleLabel.Size = UDim2.new(1, -10, 0, 40)
 	titleLabel.AnchorPoint = Vector2.new(0.5, 0)
-	titleLabel.Position = UDim2.new(0.5, 0, 0, 0)
+	titleLabel.Position = UDim2.fromScale(0.5, 0)
 	titleLabel.TextWrapped = true
 	titleLabel.BackgroundTransparency = 1
 	titleLabel.LayoutOrder = 2
@@ -146,7 +148,7 @@ local function makeSection(keycodes, theme, platform, parent)
 	local container = Instance.new("Frame")
 	container.BorderSizePixel = 0
 	container.BackgroundTransparency = 1
-	container.Size = UDim2.new(1, 0, 0, 0)
+	container.Size = UDim2.fromScale(1, 0)
 	container.BackgroundColor3 = Color3.new(0.5, 0, 0)
 	container.AutomaticSize = Enum.AutomaticSize.Y
 
@@ -155,7 +157,7 @@ local function makeSection(keycodes, theme, platform, parent)
 	uiGridLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 	uiGridLayout.FillDirection = Enum.FillDirection.Horizontal
 	uiGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	uiGridLayout.CellSize = UDim2.new(0, 100, 0, 130)
+	uiGridLayout.CellSize = UDim2.fromOffset(100, 130)
 	uiGridLayout.Parent = container
 
 	for _, item in keycodes do
@@ -171,8 +173,8 @@ return function(target)
 	local maid = Maid.new()
 
 	local scrollingFrame = Instance.new("ScrollingFrame")
-	scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-	scrollingFrame.CanvasSize = UDim2.new(1, 0, 5, 0)
+	scrollingFrame.Size = UDim2.fromScale(1, 1)
+	scrollingFrame.CanvasSize = UDim2.fromScale(1, 5)
 	scrollingFrame.BackgroundColor3 = Color3.new(1, 1, 1)
 	scrollingFrame.BackgroundTransparency = 0
 	scrollingFrame.BorderSizePixel = 0

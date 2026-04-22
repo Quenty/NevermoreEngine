@@ -3,6 +3,152 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.27.0...@quenty/brio@14.28.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [14.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.26.0...@quenty/brio@14.27.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [14.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.25.0...@quenty/brio@14.26.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [14.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.24.1...@quenty/brio@14.25.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
+## [14.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.24.0...@quenty/brio@14.24.1) (2026-01-21)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [14.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.23.0...@quenty/brio@14.24.0) (2026-01-18)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [14.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.22.2...@quenty/brio@14.23.0) (2026-01-13)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.22.1...@quenty/brio@14.22.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [14.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.22.0...@quenty/brio@14.22.1) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [14.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.21.0...@quenty/brio@14.22.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* Brio.ToMaidAndValue now is correctly typed to Maid.Maid ([07517dc](https://github.com/Quenty/NevermoreEngine/commit/07517dc3297bfa0fabff24b236365c3e90ed685e))
+
+
+
+
+
+# [14.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.5...@quenty/brio@14.21.0) (2026-01-04)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.20.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.4...@quenty/brio@14.20.5) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.20.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.3...@quenty/brio@14.20.4) (2025-12-31)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.20.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.2...@quenty/brio@14.20.3) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.1...@quenty/brio@14.20.2) (2025-12-29)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+## [14.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.20.0...@quenty/brio@14.20.1) (2025-11-22)
+
+
+### Performance Improvements
+
+* Fix memory cleanup in Tie + Rogue Properties to try to address memory consumption ([c989f23](https://github.com/Quenty/NevermoreEngine/commit/c989f23bb7741a1f160ee341dfb542ba71775620))
+
+
+
+
+
 # [14.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.19.0...@quenty/brio@14.20.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/brio

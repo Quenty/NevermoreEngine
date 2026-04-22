@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Library handles time based parsing / operations. Untested. Based off of PHP's time system.
 

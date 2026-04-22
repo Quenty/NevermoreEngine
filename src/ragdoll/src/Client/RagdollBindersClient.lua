@@ -15,8 +15,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BinderProvider = require("BinderProvider")
+local ServiceBag = require("ServiceBag")
 
-return BinderProvider.new(script.Name, function(self, serviceBag)
+return BinderProvider.new(script.Name, function(self, serviceBag: ServiceBag.ServiceBag)
 	--[=[
 	Apply this binder to a humanoid to ragdoll it. Humanoid must already have [Ragdollable] defined.
 

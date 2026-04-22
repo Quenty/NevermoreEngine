@@ -3,8 +3,14 @@
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
       "rx": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

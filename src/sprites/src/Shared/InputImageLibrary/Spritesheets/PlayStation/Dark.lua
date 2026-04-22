@@ -1,3 +1,4 @@
+--!nonstrict
 --[[
     Generated PS5Dark with Python
     @class PS5Dark
@@ -38,6 +39,8 @@ function PS5Dark.new()
 	self:AddSprite(Enum.KeyCode.DPadUp, Vector2.new(0, 200), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.Thumbstick1, Vector2.new(100, 200), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.Thumbstick2, Vector2.new(200, 200), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonL3, Vector2.new(500, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonR3, Vector2.new(600, 0), Vector2.new(100, 100))
 
 	return self
 end

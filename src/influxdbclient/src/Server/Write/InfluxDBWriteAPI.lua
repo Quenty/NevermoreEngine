@@ -24,22 +24,24 @@ local InfluxDBWriteAPI = setmetatable({}, BaseObject)
 InfluxDBWriteAPI.ClassName = "InfluxDBWriteAPI"
 InfluxDBWriteAPI.__index = InfluxDBWriteAPI
 
-export type InfluxDBWriteAPI = typeof(setmetatable(
-	{} :: {
-		RequestFinished: Signal.Signal<(any)>,
-		Destroying: Signal.Signal<()>,
+export type InfluxDBWriteAPI =
+	typeof(setmetatable(
+		{} :: {
+			RequestFinished: Signal.Signal<(any)>,
+			Destroying: Signal.Signal<()>,
 
-		_clientConfig: ValueObject.ValueObject<InfluxDBClientConfigUtils.InfluxDBClientConfig>,
-		_printDebugWriteEnabled: boolean,
-		_org: string,
-		_bucket: string,
-		_precision: string,
-		_pointSettings: InfluxDBPointSettings.InfluxDBPointSettings,
-		_writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
-		_writeBuffer: InfluxDBWriteBuffer.InfluxDBWriteBuffer,
-	},
-	{} :: typeof({ __index = InfluxDBWriteAPI })
-)) & BaseObject.BaseObject
+			_clientConfig: ValueObject.ValueObject<InfluxDBClientConfigUtils.InfluxDBClientConfig>,
+			_printDebugWriteEnabled: boolean,
+			_org: string,
+			_bucket: string,
+			_precision: string,
+			_pointSettings: InfluxDBPointSettings.InfluxDBPointSettings,
+			_writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
+			_writeBuffer: InfluxDBWriteBuffer.InfluxDBWriteBuffer,
+		},
+		{} :: typeof({ __index = InfluxDBWriteAPI })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new InfluxDB write API. Retrieve this from the [InfluxDBClient].

@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Sets properties on the client and then replicates them to the server
 	@class OverriddenProperty

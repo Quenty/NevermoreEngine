@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles replication on the server side
 

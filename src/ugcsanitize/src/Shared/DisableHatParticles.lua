@@ -14,12 +14,14 @@ local DisableHatParticles = setmetatable({}, BaseObject)
 DisableHatParticles.ClassName = "DisableHatParticles"
 DisableHatParticles.__index = DisableHatParticles
 
-export type DisableHatParticles = typeof(setmetatable(
-	{} :: {
-		_obj: Model,
-	},
-	{} :: typeof({ __index = DisableHatParticles })
-)) & BaseObject.BaseObject
+export type DisableHatParticles =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Model,
+		},
+		{} :: typeof({ __index = DisableHatParticles })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Disables all particles and sounds in hats for the lifetime of the object

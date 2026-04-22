@@ -42,7 +42,7 @@ function PreviewFinder:_setup()
 	end
 end
 
-function PreviewFinder:_setupParent(parent)
+function PreviewFinder:_setupParent(parent: Instance)
 	local maid = Maid.new()
 
 	maid:GiveTask(parent.DescendantAdded:Connect(function(child)

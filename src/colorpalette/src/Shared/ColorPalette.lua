@@ -22,20 +22,22 @@ local ColorPalette = setmetatable({}, BaseObject)
 ColorPalette.ClassName = "ColorPalette"
 ColorPalette.__index = ColorPalette
 
-export type ColorPalette = typeof(setmetatable(
-	{} :: {
-		_swatches: { ColorSwatch.ColorSwatch },
-		_gradePalette: ColorGradePalette.ColorGradePalette,
-		_swatchMap: any,
-		_colorGradeMap: any,
-		_colorValues: { [string]: ValueObject.ValueObject<Color3> },
-		_vividnessValues: { [string]: ValueObject.ValueObject<number> },
+export type ColorPalette =
+	typeof(setmetatable(
+		{} :: {
+			_swatches: { ColorSwatch.ColorSwatch },
+			_gradePalette: ColorGradePalette.ColorGradePalette,
+			_swatchMap: any,
+			_colorGradeMap: any,
+			_colorValues: { [string]: ValueObject.ValueObject<Color3> },
+			_vividnessValues: { [string]: ValueObject.ValueObject<number> },
 
-		ColorSwatchAdded: Signal.Signal<string>,
-		ColorGradeAdded: Signal.Signal<string>,
-	},
-	{} :: typeof({ __index = ColorPalette })
-)) & BaseObject.BaseObject
+			ColorSwatchAdded: Signal.Signal<string>,
+			ColorGradeAdded: Signal.Signal<string>,
+		},
+		{} :: typeof({ __index = ColorPalette })
+	))
+	& BaseObject.BaseObject
 
 function ColorPalette.new(): ColorPalette
 	local self: ColorPalette = setmetatable(BaseObject.new() :: any, ColorPalette)
@@ -158,13 +160,13 @@ function ColorPalette.ObserveColor(self: ColorPalette, color, grade, vividness):
 	end
 end
 
-function ColorPalette.SetDefaultSurfaceName(self: ColorPalette, surfaceName: string)
+function ColorPalette.SetDefaultSurfaceName(self: ColorPalette, surfaceName: string): ()
 	assert(type(surfaceName) == "string", "Bad surfaceName")
 
 	self._gradePalette:SetDefaultSurfaceName(surfaceName)
 end
 
-function ColorPalette.GetColorSwatch(self: ColorPalette, colorName: string)
+function ColorPalette.GetColorSwatch(self: ColorPalette, colorName: string): ColorSwatch.ColorSwatch
 	local swatch = self._swatchMap:Get(colorName)
 	if not swatch then
 		error(string.format("No swatch with name %q", colorName))
@@ -259,7 +261,7 @@ function ColorPalette._toVividness(self: ColorPalette, vividness, grade, name): 
 	end
 end
 
-function ColorPalette.GetColorValue(self: ColorPalette, colorName: string)
+function ColorPalette.GetColorValue(self: ColorPalette, colorName: string): ValueObject.ValueObject<Color3>
 	assert(type(colorName) == "string", "Bad colorName")
 
 	local colorValue = self._colorValues[colorName]

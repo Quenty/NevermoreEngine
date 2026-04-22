@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	@class RagdollCameraShakeClient
 ]=]
@@ -20,12 +21,13 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxCharacterUtils = require("RxCharacterUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
+local ServiceBag = require("ServiceBag")
 
 local RagdollCameraShakeClient = setmetatable({}, BaseObject)
 RagdollCameraShakeClient.ClassName = "RagdollCameraShakeClient"
 RagdollCameraShakeClient.__index = RagdollCameraShakeClient
 
-function RagdollCameraShakeClient.new(humanoid: Humanoid, serviceBag)
+function RagdollCameraShakeClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollCameraShakeClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

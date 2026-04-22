@@ -1,9 +1,11 @@
+--!nonstrict
 --[[
 	@class DepthOfFieldEffect.story
 ]]
 
-local require =
-	require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
 local Workspace = game:GetService("Workspace")
 
@@ -28,7 +30,7 @@ return function(target)
 
 	maid:Add(Blend.mount(target, {
 		Blend.New "Frame" {
-			Size = UDim2.new(1, 0, 1, 0),
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 
 			Blend.New "UIListLayout" {
@@ -43,7 +45,7 @@ return function(target)
 					return visible and Color3.new(0.5, 1, 0.5) or Color3.new(1, 0.5, 0.5)
 				end),
 				AutoButtonColor = true,
-				Size = UDim2.new(0, 100, 0, 30),
+				Size = UDim2.fromOffset(100, 30),
 				[Blend.OnEvent "Activated"] = function()
 					depthOfFieldEffect:Toggle()
 				end,
@@ -61,7 +63,7 @@ return function(target)
 					return visible and Color3.new(0.5, 1, 0.5) or Color3.new(1, 0.5, 0.5)
 				end),
 				AutoButtonColor = true,
-				Size = UDim2.new(0, 100, 0, 30),
+				Size = UDim2.fromOffset(100, 30),
 				[Blend.OnEvent "Activated"] = function()
 					depthOfFieldEffect2:Toggle()
 				end,

@@ -23,17 +23,19 @@ SoundEffectsList.__index = SoundEffectsList
 
 export type SoundEffectApplier = (SoundGroup | Sound) -> MaidTaskUtils.MaidTask?
 
-export type SoundEffectsList = typeof(setmetatable(
-	{} :: {
-		_effectList: ObservableList.ObservableList<SoundEffectApplier>,
-		_appliedCount: Counter.Counter,
-		_isActive: ValueObject.ValueObject<boolean>,
-		_hasEffects: ValueObject.ValueObject<boolean>,
-		IsActiveChanged: Signal.Signal<boolean>,
-		HasEffects: () -> boolean,
-	},
-	{} :: typeof({ __index = SoundEffectsList })
-)) & BaseObject.BaseObject
+export type SoundEffectsList =
+	typeof(setmetatable(
+		{} :: {
+			_effectList: ObservableList.ObservableList<SoundEffectApplier>,
+			_appliedCount: Counter.Counter,
+			_isActive: ValueObject.ValueObject<boolean>,
+			_hasEffects: ValueObject.ValueObject<boolean>,
+			IsActiveChanged: Signal.Signal<boolean>,
+			HasEffects: () -> boolean,
+		},
+		{} :: typeof({ __index = SoundEffectsList })
+	))
+	& BaseObject.BaseObject
 
 function SoundEffectsList.new(): SoundEffectsList
 	local self: SoundEffectsList = setmetatable(BaseObject.new() :: any, SoundEffectsList)

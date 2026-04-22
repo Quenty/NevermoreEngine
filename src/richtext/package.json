@@ -1,6 +1,6 @@
 {
   "name": "@quenty/richtext",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "description": "Holds rich text utility methods",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

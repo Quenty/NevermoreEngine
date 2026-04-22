@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Mouse over mixin for general utility button mouse over effects
 	@class MouseOverMixin
@@ -41,7 +42,7 @@ function MouseOverMixin:GetMouseOverBoolValue(gui: GuiObject)
 				end
 			end))
 
-			delay(0.2, function()
+			task.delay(0.2, function()
 				if maid[inputObject] then
 					mouseOver.Value = true
 				end

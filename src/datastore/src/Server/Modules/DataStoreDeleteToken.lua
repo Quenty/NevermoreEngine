@@ -9,4 +9,6 @@ local require = require(script.Parent.loader).load(script)
 
 local Symbol = require("Symbol")
 
-return Symbol.named("dataStoreDeleteToken")
+export type DataStoreDeleteToken = Symbol.Symbol
+
+return Symbol.named("dataStoreDeleteToken") :: DataStoreDeleteToken

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/isamixin",
-  "version": "2.3.0",
+  "version": "2.3.3",
   "description": "Generic IsA interface for Lua classes.",
   "keywords": [
     "Roblox",
@@ -21,6 +21,9 @@
     "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "contributors": [
     "Quenty"
   ],

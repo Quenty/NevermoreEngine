@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class IKResource
 ]=]
@@ -5,29 +6,46 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local IKResourceUtils = require("IKResourceUtils")
 local Maid = require("Maid")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local IKResource = setmetatable({}, BaseObject)
 IKResource.ClassName = "IKResource"
 IKResource.__index = IKResource
 
-function IKResource.new(data)
-	local self = setmetatable(BaseObject.new(), IKResource)
+export type IKResource =
+	typeof(setmetatable(
+		{} :: {
+			_data: IKResourceUtils.IKResourceData,
+			_instance: Instance?,
+			_childResourceMap: { [string]: IKResource },
+			_descendantLookupMap: { [string]: IKResource },
+			_ready: ValueObject.ValueObject<boolean>,
+
+			ReadyChanged: Signal.Signal<boolean>,
+		},
+		{} :: typeof({ __index = IKResource })
+	))
+	& BaseObject.BaseObject
+
+function IKResource.new(data: IKResourceUtils.IKResourceData): IKResource
+	local self: IKResource = setmetatable(BaseObject.new() :: any, IKResource)
 
 	self._data = assert(data, "Bad data")
 	assert(data.name, "Bad data.name")
 	assert(data.robloxName, "Bad data.robloxName")
 
 	self._instance = nil
-	self._childResourceMap = {} -- [robloxName] = { data = data; ikResource = ikResource }
+	self._childResourceMap = {} -- [robloxName] = IKResource
 	self._descendantLookupMap = {
 		[data.name] = self,
 	}
 
 	self._ready = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self.ReadyChanged = self._ready.Changed
+	self.ReadyChanged = self._ready.Changed :: any
 
 	if self._data.children then
 		for _, childData in self._data.children do
@@ -38,15 +56,15 @@ function IKResource.new(data)
 	return self
 end
 
-function IKResource:GetData()
+function IKResource.GetData(self: IKResource): IKResourceUtils.IKResourceData
 	return self._data
 end
 
-function IKResource:IsReady(): boolean
+function IKResource.IsReady(self: IKResource): boolean
 	return self._ready.Value
 end
 
-function IKResource:Get(descendantName: string)
+function IKResource.Get(self: IKResource, descendantName: string)
 	local resource = self._descendantLookupMap[descendantName]
 	if not resource then
 		error(string.format("[IKResource.Get] - Resource %q does not exist", tostring(descendantName)))
@@ -60,9 +78,9 @@ function IKResource:Get(descendantName: string)
 	return result
 end
 
-function IKResource:GetInstance(): Instance?
+function IKResource.GetInstance(self: IKResource): Instance?
 	if self._data.isLink then
-		if self._instance then
+		if self._instance and self._instance:IsA("ObjectValue") then
 			return self._instance.Value
 		else
 			return nil
@@ -72,7 +90,7 @@ function IKResource:GetInstance(): Instance?
 	return self._instance
 end
 
-function IKResource:SetInstance(instance: Instance?)
+function IKResource.SetInstance(self: IKResource, instance: Instance?)
 	if self._instance == instance then
 		return
 	end
@@ -91,7 +109,7 @@ function IKResource:SetInstance(instance: Instance?)
 	end
 
 	if instance and self._data.isLink then
-		assert(instance:IsA("ObjectValue"))
+		assert(instance:IsA("ObjectValue"), "Bad instance for link IKResource")
 
 		self._maid:GiveTask(instance.Changed:Connect(function()
 			self:_updateReady()
@@ -102,11 +120,11 @@ function IKResource:SetInstance(instance: Instance?)
 	self:_updateReady()
 end
 
-function IKResource:GetLookupTable()
+function IKResource.GetLookupTable(self: IKResource)
 	return self._descendantLookupMap
 end
 
-function IKResource:_startListening(maid, instance)
+function IKResource._startListening(self: IKResource, maid, instance)
 	for _, child in instance:GetChildren() do
 		self:_handleChildAdded(child)
 	end
@@ -119,7 +137,7 @@ function IKResource:_startListening(maid, instance)
 	end))
 end
 
-function IKResource:_addResource(ikResource)
+function IKResource._addResource(self: IKResource, ikResource: IKResource)
 	local data = ikResource:GetData()
 	assert(data.name, "Bad data.name")
 	assert(data.robloxName, "Bad data.robloxName")
@@ -144,7 +162,7 @@ function IKResource:_addResource(ikResource)
 	end
 end
 
-function IKResource:_handleChildAdded(child)
+function IKResource._handleChildAdded(self: IKResource, child)
 	local resource = self._childResourceMap[child.Name]
 	if not resource then
 		return
@@ -153,7 +171,7 @@ function IKResource:_handleChildAdded(child)
 	resource:SetInstance(child)
 end
 
-function IKResource:_handleChildRemoved(child)
+function IKResource._handleChildRemoved(self: IKResource, child)
 	local resource = self._childResourceMap[child.Name]
 	if not resource then
 		return
@@ -164,28 +182,28 @@ function IKResource:_handleChildRemoved(child)
 	end
 end
 
-function IKResource:_clearChildren()
-	for _, child in self._childResourceMap do
+function IKResource._clearChildren(self: IKResource)
+	for _, child: any in self._childResourceMap do
 		child:SetInstance(nil)
 	end
 end
 
-function IKResource:_updateReady()
+function IKResource._updateReady(self: IKResource)
 	self._ready.Value = self:_calculateIsReady()
 end
 
-function IKResource:_calculateIsReady()
+function IKResource._calculateIsReady(self: IKResource)
 	if not self._instance then
 		return false
 	end
 
 	if self._data.isLink then
-		if not self._instance.Value then
+		if self._instance and self._instance:IsA("ObjectValue") and not self._instance.Value then
 			return false
 		end
 	end
 
-	for _, child in self._childResourceMap do
+	for _, child: any in self._childResourceMap do
 		if not child:IsReady() then
 			return false
 		end

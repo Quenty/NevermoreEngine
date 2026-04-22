@@ -3,6 +3,112 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.16.0...@quenty/promise@10.17.0) (2026-04-14)
+
+
+### Bug Fixes
+
+* Better promiseChild timeout message ([75ee035](https://github.com/Quenty/NevermoreEngine/commit/75ee035ed5465c5f8f6cc5d505d06e7084e4cc6e))
+
+
+
+
+
+# [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.15.0...@quenty/promise@10.16.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/promise
+
+
+
+
+
+# [10.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.14.0...@quenty/promise@10.15.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/promise
+
+
+
+
+
+# [10.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.13.0...@quenty/promise@10.14.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/promise
+
+
+
+
+
+# [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.6...@quenty/promise@10.13.0) (2026-01-13)
+
+
+### Features
+
+* Add new datastore session locking ([52f1a4b](https://github.com/Quenty/NevermoreEngine/commit/52f1a4b8988e9271ca639b0fec43315bb63ae97b))
+
+
+
+
+
+## [10.12.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.5...@quenty/promise@10.12.6) (2026-01-12)
+
+
+### Bug Fixes
+
+* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+
+
+
+
+
+## [10.12.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.4...@quenty/promise@10.12.5) (2026-01-10)
+
+**Note:** Version bump only for package @quenty/promise
+
+
+
+
+
+## [10.12.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.3...@quenty/promise@10.12.4) (2026-01-03)
+
+**Note:** Version bump only for package @quenty/promise
+
+
+
+
+
+## [10.12.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.2...@quenty/promise@10.12.3) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
+
+
+
+
+
+## [10.12.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.1...@quenty/promise@10.12.2) (2025-12-29)
+
+
+### Bug Fixes
+
+* Add fallback message for promise rejection ([34546af](https://github.com/Quenty/NevermoreEngine/commit/34546af3dde159c855f8933fa227df5d7cd6f333))
+
+
+
+
+
+## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.12.0...@quenty/promise@10.12.1) (2025-12-29)
+
+
+### Bug Fixes
+
+* Update typing to be more accurate ([e4c3d05](https://github.com/Quenty/NevermoreEngine/commit/e4c3d05a0aa9f45a37cbfa372c5e0d8a748c9323))
+
+
+
+
+
 # [10.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.11.0...@quenty/promise@10.12.0) (2025-08-29)
 
 

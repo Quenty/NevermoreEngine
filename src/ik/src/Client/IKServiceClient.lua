@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Handles IK for local client.
 

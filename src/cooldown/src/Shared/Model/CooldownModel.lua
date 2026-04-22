@@ -17,17 +17,19 @@ CooldownModel.__index = CooldownModel
 
 export type Clock = () -> number
 
-export type CooldownModel = typeof(setmetatable(
-	{} :: {
-		_length: ValueObject.ValueObject<number>,
-		_startTime: ValueObject.ValueObject<number>,
-		_clock: ValueObject.ValueObject<Clock>,
-		_doneFired: boolean,
-		Done: Signal.Signal<()>,
-		_cleanup: any,
-	},
-	{} :: typeof({ __index = CooldownModel })
-)) & BaseObject.BaseObject
+export type CooldownModel =
+	typeof(setmetatable(
+		{} :: {
+			_length: ValueObject.ValueObject<number>,
+			_startTime: ValueObject.ValueObject<number>,
+			_clock: ValueObject.ValueObject<Clock>,
+			_doneFired: boolean,
+			Done: Signal.Signal<()>,
+			_cleanup: any,
+		},
+		{} :: typeof({ __index = CooldownModel })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new cooldown model

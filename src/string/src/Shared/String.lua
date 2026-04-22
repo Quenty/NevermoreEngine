@@ -192,7 +192,7 @@ end
 	@param seperator string?
 	@return string
 ]=]
-function String.addCommas(number: string | number, seperator: string): string
+function String.addCommas(number: string | number, seperator: string?): string
 	local strNumber
 	if type(number) == "number" then
 		strNumber = tostring(number)
@@ -200,6 +200,8 @@ function String.addCommas(number: string | number, seperator: string): string
 		strNumber = number
 	end
 	seperator = seperator or ","
+
+	assert(seperator ~= nil, "Typechecking requires assertion")
 
 	local index = -1
 

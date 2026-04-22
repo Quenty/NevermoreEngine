@@ -9,7 +9,7 @@ local SelectionImageUtils = {}
 function SelectionImageUtils.overrideWithBlank(button: GuiButton): ImageLabel
 	local selectionImage = Instance.new("ImageLabel")
 	selectionImage.Image = ""
-	selectionImage.Size = UDim2.new(0, 100, 0, 100)
+	selectionImage.Size = UDim2.fromOffset(100, 100)
 	selectionImage.BackgroundTransparency = 1
 	selectionImage.BorderSizePixel = 0
 	selectionImage.Visible = true

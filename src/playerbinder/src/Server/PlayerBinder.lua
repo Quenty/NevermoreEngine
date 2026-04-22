@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Binds the given class to each player in the game
 	@class PlayerBinder

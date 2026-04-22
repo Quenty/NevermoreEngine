@@ -16,17 +16,19 @@ SummedCamera.ClassName = "SummedCamera"
 
 export type SummedCameraMode = "World" | "Relative"
 
-export type SummedCamera = typeof(setmetatable(
-	{} :: {
-		CameraState: CameraState.CameraState,
-		CameraAState: CameraState.CameraState,
-		CameraBState: CameraState.CameraState,
-		_cameraA: CameraEffectUtils.CameraEffect,
-		_cameraB: CameraEffectUtils.CameraEffect,
-		_mode: SummedCameraMode,
-	},
-	{} :: typeof({ __index = SummedCamera })
-)) & CameraEffectUtils.CameraEffect
+export type SummedCamera =
+	typeof(setmetatable(
+		{} :: {
+			CameraState: CameraState.CameraState,
+			CameraAState: CameraState.CameraState,
+			CameraBState: CameraState.CameraState,
+			_cameraA: CameraEffectUtils.CameraEffect,
+			_cameraB: CameraEffectUtils.CameraEffect,
+			_mode: SummedCameraMode,
+		},
+		{} :: typeof({ __index = SummedCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	Construct a new summed camera

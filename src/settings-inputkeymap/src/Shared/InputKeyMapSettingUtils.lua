@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Helper methods for encoding and decoding input lists into network storage
 	@class InputKeyMapSettingUtils

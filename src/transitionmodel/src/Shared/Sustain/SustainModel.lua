@@ -20,15 +20,17 @@ SustainModel.__index = SustainModel
 
 export type SustainCallback = (Maid.Maid, boolean?) -> Promise.Promise<()> | any
 
-export type SustainModel = typeof(setmetatable(
-	{} :: {
-		_isSustained: boolean,
-		_sustainCallback: SustainCallback?,
-		_maid: Maid.Maid,
-		SustainChanged: Signal.Signal<(boolean, boolean?)>,
-	},
-	{} :: typeof({ __index = SustainModel })
-)) & BaseObject.BaseObject
+export type SustainModel =
+	typeof(setmetatable(
+		{} :: {
+			_isSustained: boolean,
+			_sustainCallback: SustainCallback?,
+			_maid: Maid.Maid,
+			SustainChanged: Signal.Signal<(boolean, boolean?)>,
+		},
+		{} :: typeof({ __index = SustainModel })
+	))
+	& BaseObject.BaseObject
 
 function SustainModel.new(): SustainModel
 	local self: SustainModel = setmetatable(BaseObject.new() :: any, SustainModel)

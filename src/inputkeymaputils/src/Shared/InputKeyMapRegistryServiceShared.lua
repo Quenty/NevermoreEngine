@@ -1,3 +1,4 @@
+--!nonstrict
 --[=[
 	Provides retrieval of input key maps across the game. Available on both the client and the server.
 

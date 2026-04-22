@@ -43,7 +43,7 @@ local DEFAULT_VALUES = {
 	@param typeOfName string
 	@return any
 ]=]
-function DefaultValueUtils.getDefaultValueForType(typeOfName: string)
+function DefaultValueUtils.getDefaultValueForType(typeOfName: string): any
 	if DEFAULT_VALUES[typeOfName] ~= nil then
 		return DEFAULT_VALUES[typeOfName]
 	elseif typeOfName == "table" then
