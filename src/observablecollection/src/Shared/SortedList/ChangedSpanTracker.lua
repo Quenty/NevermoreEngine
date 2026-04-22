@@ -1,6 +1,10 @@
 --!strict
 --[=[
-    @class ChangedSpanTracker
+	Tracks changed index spans and merges overlapping or adjacent spans together.
+	Used by [ObservableSortedList] to efficiently determine which index observers
+	need to be notified after mutations.
+
+	@class ChangedSpanTracker
 ]=]
 
 local require = require(script.Parent.loader).load(script)
@@ -11,6 +15,14 @@ local ChangedSpanTracker = {}
 ChangedSpanTracker.ClassName = "ChangedSpanTracker"
 ChangedSpanTracker.__index = ChangedSpanTracker
 
+--[=[
+	A span representing a contiguous range of changed indices.
+
+	@interface ChangedSpan
+	@within ChangedSpanTracker
+	.startIndex number
+	.endIndex number
+]=]
 export type ChangedSpan = {
 	startIndex: number,
 	endIndex: number,
@@ -23,6 +35,11 @@ export type ChangedSpanTracker = typeof(setmetatable(
 	{} :: typeof({ __index = ChangedSpanTracker })
 ))
 
+--[=[
+	Constructs a new ChangedSpanTracker with no spans.
+
+	@return ChangedSpanTracker
+]=]
 function ChangedSpanTracker.new(): ChangedSpanTracker
 	local self: ChangedSpanTracker = setmetatable({} :: any, ChangedSpanTracker)
 
@@ -31,20 +48,40 @@ function ChangedSpanTracker.new(): ChangedSpanTracker
 	return self
 end
 
+--[=[
+	Clears all tracked spans.
+]=]
 function ChangedSpanTracker.Clear(self: ChangedSpanTracker)
 	self._sortedSpans = {}
 end
 
+--[=[
+	Returns the current list of merged spans.
+
+	@return { ChangedSpan }
+]=]
 function ChangedSpanTracker.GetSpans(self: ChangedSpanTracker): { ChangedSpan }
 	return self._sortedSpans
 end
 
+--[=[
+	Adds multiple spans at once, merging as needed.
+
+	@param spans { ChangedSpan }
+]=]
 function ChangedSpanTracker.AddSpans(self: ChangedSpanTracker, spans: { ChangedSpan })
 	for _, span in spans do
 		self:AddSpan(span.startIndex, span.endIndex)
 	end
 end
 
+--[=[
+	Adds a span from startIndex to endIndex, merging with any existing
+	spans that touch or overlap. Handles reversed indices.
+
+	@param startIndex number
+	@param endIndex number
+]=]
 function ChangedSpanTracker.AddSpan(self: ChangedSpanTracker, startIndex: number, endIndex: number)
 	-- TODO: Maybe try to avoid allocating so much here for performance
 	if startIndex > endIndex then
@@ -163,12 +200,24 @@ function ChangedSpanTracker.AddSpan(self: ChangedSpanTracker, startIndex: number
 	end
 end
 
+--[=[
+	Returns the current spans and clears the tracker.
+
+	@return { ChangedSpan }
+]=]
 function ChangedSpanTracker.GetAndClearSpans(self: ChangedSpanTracker): { ChangedSpan }
 	local copy = self._sortedSpans
 	self._sortedSpans = {}
 	return copy
 end
 
+--[=[
+	Creates a frozen ChangedSpan from the given indices.
+
+	@param startIndex number
+	@param endIndex number
+	@return ChangedSpan
+]=]
 function ChangedSpanTracker.span(startIndex: number, endIndex: number): ChangedSpan
 	return table.freeze({
 		startIndex = startIndex,
@@ -176,6 +225,13 @@ function ChangedSpanTracker.span(startIndex: number, endIndex: number): ChangedS
 	})
 end
 
+--[=[
+	Returns true if the given index falls within any of the spans.
+
+	@param span { ChangedSpan }
+	@param index number
+	@return boolean
+]=]
 function ChangedSpanTracker.isIndexInSpan(span: { ChangedSpan }, index: number): boolean
 	-- Binary search
 	local low, high = BinarySearchUtils.spanSearchNodes(span, "startIndex", index)
@@ -197,10 +253,24 @@ function ChangedSpanTracker.isIndexInSpan(span: { ChangedSpan }, index: number):
 	return false
 end
 
+--[=[
+	Returns true if the two spans overlap (share at least one index).
+
+	@param spanA ChangedSpan
+	@param spanB ChangedSpan
+	@return boolean
+]=]
 function ChangedSpanTracker.spanOverlaps(spanA: ChangedSpan, spanB: ChangedSpan): boolean
 	return spanA.startIndex <= spanB.endIndex and spanA.endIndex >= spanB.startIndex
 end
 
+--[=[
+	Returns true if the two spans touch or overlap (adjacent spans count).
+
+	@param spanA ChangedSpan
+	@param spanB ChangedSpan
+	@return boolean
+]=]
 function ChangedSpanTracker.spansTouches(spanA: ChangedSpan, spanB: ChangedSpan): boolean
 	return spanA.startIndex - 1 <= spanB.endIndex and spanA.endIndex + 1 >= spanB.startIndex
 end
