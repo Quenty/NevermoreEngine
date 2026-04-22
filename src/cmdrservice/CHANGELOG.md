@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.39.0...@quenty/cmdrservice@13.40.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
+# [13.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.38.0...@quenty/cmdrservice@13.39.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
+# [13.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.37.0...@quenty/cmdrservice@13.38.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [13.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.36.1...@quenty/cmdrservice@13.37.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
+## [13.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.36.0...@quenty/cmdrservice@13.36.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* devcontainer initializes properly with luau-lsp working out of the box ([b8591e8](https://github.com/Quenty/NevermoreEngine/commit/b8591e8a62beda655e90875b0dc22d79fcae8e61))
+
+
+
+
+
+# [13.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.35.2...@quenty/cmdrservice@13.36.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
 ## [13.35.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.35.1...@quenty/cmdrservice@13.35.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/cmdrservice

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/settings",
-  "version": "11.42.2",
+  "version": "11.48.0",
   "description": "Centralized player settings service",
   "keywords": [
     "Roblox",
@@ -41,6 +41,7 @@
     "@quenty/jsonutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
     "@quenty/playerutils": "workspace:*",
@@ -58,7 +59,8 @@
     "@quenty/table": "workspace:*",
     "@quenty/throttle": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

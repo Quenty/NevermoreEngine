@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.36.0...@quenty/highlight@10.37.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.35.0...@quenty/highlight@10.36.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.34.0...@quenty/highlight@10.35.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.33.0...@quenty/highlight@10.34.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/highlight
+
+
+
+
+
+# [10.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.32.2...@quenty/highlight@10.33.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [10.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.32.1...@quenty/highlight@10.32.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/highlight

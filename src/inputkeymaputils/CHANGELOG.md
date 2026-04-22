@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.39.0...@quenty/inputkeymaputils@14.40.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.38.0...@quenty/inputkeymaputils@14.39.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.37.0...@quenty/inputkeymaputils@14.38.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.36.0...@quenty/inputkeymaputils@14.37.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [14.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.35.0...@quenty/inputkeymaputils@14.36.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
+# [14.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.34.2...@quenty/inputkeymaputils@14.35.0) (2026-01-26)
+
+
+### Bug Fixes
+
+* Fix lint ([7c77d1f](https://github.com/Quenty/NevermoreEngine/commit/7c77d1f6d95657072fc756e6f93bed1484646ad9))
+* Remove holding state from input system ([b20d6f8](https://github.com/Quenty/NevermoreEngine/commit/b20d6f88725703864fe8112517dd4a5270274e3a))
+
+
+### Features
+
+* Add Holdable option to InputKeyMapList ([0422fb6](https://github.com/Quenty/NevermoreEngine/commit/0422fb61671d80b110b06c6bf2da00fb293698bb))
+
+
+
+
+
 ## [14.34.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.34.1...@quenty/inputkeymaputils@14.34.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/inputkeymaputils

@@ -1,13 +1,21 @@
 import chalk from 'chalk';
+import { AsyncLocalStorage } from 'async_hooks';
 
 export type BoxOptions = {
   centered?: boolean;
 };
 
+export interface OutputBuffer {
+  lines: string[];
+}
+
+const _outputStorage = new AsyncLocalStorage<OutputBuffer>();
+
 /**
  * Helps with output
  */
 export class OutputHelper {
+  private static _verbose: boolean = true;
   /**
    * Formats the error with markup
    * @param message Message to format
@@ -53,8 +61,20 @@ export class OutputHelper {
     return chalk.magentaBright(message);
   }
 
-  private static _stripAnsi = (text: string): string =>
-    text.replace(/\x1b\[[0-9;]*m/g, '');
+  public static formatDim(message: string): string {
+    return chalk.dim(message);
+  }
+
+  public static formatSuccess(message: string): string {
+    return chalk.greenBright(message);
+  }
+
+  private static _hasAnsi = (text: string): boolean =>
+    text.includes('\x1b[');
+
+  /** Strip ANSI escape codes from terminal output. */
+  public static stripAnsi = (text: string): string =>
+    text.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
 
   /**
    * Helper method to put a box around the output
@@ -62,7 +82,7 @@ export class OutputHelper {
   public static formatBox(message: string, options?: BoxOptions): string {
     const lines = message.trim().split('\n');
     const width = lines.reduce(
-      (a, b) => Math.max(a, OutputHelper._stripAnsi(b).length),
+      (a, b) => Math.max(a, OutputHelper.stripAnsi(b).length),
       0
     );
 
@@ -70,9 +90,9 @@ export class OutputHelper {
 
     const surround = (text: string) => {
       const first = centered
-        ? Math.floor((width - OutputHelper._stripAnsi(text).length) / 2)
+        ? Math.floor((width - OutputHelper.stripAnsi(text).length) / 2)
         : 0;
-      const last = width - OutputHelper._stripAnsi(text).length - first;
+      const last = width - OutputHelper.stripAnsi(text).length - first;
       return (
         '║   \x1b[0m' +
         ' '.repeat(first) +
@@ -95,7 +115,7 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static error(message: string): void {
-    console.error(this.formatError(message));
+    console.error(this._hasAnsi(message) ? message : this.formatError(message));
   }
 
   /**
@@ -103,7 +123,48 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static info(message: string): void {
-    console.log(this.formatInfo(message));
+    console.log(this._hasAnsi(message) ? message : this.formatInfo(message));
+  }
+
+  /**
+   * Sets whether verbose messages are printed.
+   * Defaults to true. Batch runners set this to false to suppress
+   * intermediate messages during concurrent execution.
+   */
+  public static setVerbose(verbose: boolean): void {
+    this._verbose = verbose;
+  }
+
+  /**
+   * Logs a verbose/intermediate message. Suppressed when verbose is false.
+   * When running inside a buffered context (see runBuffered), messages are
+   * captured to the buffer instead of printed.
+   */
+  public static verbose(message: string): void {
+    if (!this._verbose) {
+      return;
+    }
+
+    const formatted = this._hasAnsi(message) ? message : this.formatDim(message);
+    const buffer = _outputStorage.getStore();
+    if (buffer) {
+      buffer.lines.push(formatted);
+    } else {
+      console.log(formatted);
+    }
+  }
+
+  /**
+   * Run an async function with output buffering. All OutputHelper.verbose()
+   * calls inside the function are captured and returned alongside the result.
+   * Used by batch runners to collect per-package output without interleaving.
+   */
+  public static async runBuffered<T>(
+    fn: () => Promise<T>
+  ): Promise<{ result: T; output: string[] }> {
+    const buffer: OutputBuffer = { lines: [] };
+    const result = await _outputStorage.run(buffer, fn);
+    return { result, output: buffer.lines };
   }
 
   /**
@@ -111,7 +172,7 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static warn(message: string): void {
-    console.log(this.formatWarning(message));
+    console.log(this._hasAnsi(message) ? message : this.formatWarning(message));
   }
 
   /**
@@ -119,7 +180,7 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static hint(message: string): void {
-    console.log(this.formatHint(message));
+    console.log(this._hasAnsi(message) ? message : this.formatHint(message));
   }
 
   /**

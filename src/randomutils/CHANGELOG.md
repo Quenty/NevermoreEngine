@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.14.0...@quenty/randomutils@6.15.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [6.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.13.0...@quenty/randomutils@6.14.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [6.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.12.2...@quenty/randomutils@6.13.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [6.12.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.12.1...@quenty/randomutils@6.12.2) (2026-01-12)
 
 

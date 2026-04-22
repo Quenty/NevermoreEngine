@@ -7,6 +7,12 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.settings)
 
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.settings) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("SettingsService"))
 
@@ -14,11 +20,12 @@ local SettingDefinition = require("SettingDefinition")
 
 local screenShakeDefinition = SettingDefinition.new("ScreenShake", false)
 serviceBag:GetService(screenShakeDefinition)
-serviceBag:Init()
-serviceBag:Start()
 
 local volumeDefinition = serviceBag:GetService(SettingDefinition.new("Volume", 1))
 local _rumbleDefinition = serviceBag:GetService(SettingDefinition.new("Rumble", true))
+
+serviceBag:Init()
+serviceBag:Start()
 
 local function handlePlayer(player: Player)
 	local volume = volumeDefinition:GetSettingProperty(serviceBag, player)

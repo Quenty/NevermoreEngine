@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.12.0...@quenty/draw@7.13.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/draw
+
+
+
+
+
+# [7.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.11.0...@quenty/draw@7.12.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/draw
+
+
+
+
+
+# [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.10.0...@quenty/draw@7.11.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 # [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.9.5...@quenty/draw@7.10.0) (2026-01-16)
 
 

@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/voicechat@5.16.0...@quenty/voicechat@5.17.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/voicechat
+
+
+
+
+
+# [5.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/voicechat@5.15.0...@quenty/voicechat@5.16.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/voicechat
+
+
+
+
+
+# [5.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/voicechat@5.14.0...@quenty/voicechat@5.15.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/voicechat
+
+
+
+
+
+# [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/voicechat@5.13.0...@quenty/voicechat@5.14.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 # [5.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/voicechat@5.12.6...@quenty/voicechat@5.13.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/voicechat

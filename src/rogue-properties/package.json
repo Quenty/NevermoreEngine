@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rogue-properties",
-  "version": "11.37.2",
+  "version": "11.42.0",
   "description": "Roguelike properties which can be modified by external provides",
   "keywords": [
     "Roblox",
@@ -40,6 +40,7 @@
     "@quenty/linkutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
@@ -53,6 +54,7 @@
     "@quenty/tie": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
     "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

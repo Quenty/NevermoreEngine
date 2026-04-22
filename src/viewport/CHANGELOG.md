@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.37.0...@quenty/viewport@11.38.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.36.0...@quenty/viewport@11.37.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.35.0...@quenty/viewport@11.36.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.34.0...@quenty/viewport@11.35.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.33.2...@quenty/viewport@11.34.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [11.33.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.33.1...@quenty/viewport@11.33.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/viewport

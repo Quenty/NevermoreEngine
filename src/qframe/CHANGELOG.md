@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@10.18.0...@quenty/qframe@10.19.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/qframe
+
+
+
+
+
+# [10.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@10.17.0...@quenty/qframe@10.18.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/qframe
+
+
+
+
+
+# [10.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@10.16.0...@quenty/qframe@10.17.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/qframe
+
+
+
+
+
+# [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@10.15.0...@quenty/qframe@10.16.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/qframe
+
+
+
+
+
+# [10.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@10.14.1...@quenty/qframe@10.15.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [10.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@10.14.0...@quenty/qframe@10.14.1) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/qframe

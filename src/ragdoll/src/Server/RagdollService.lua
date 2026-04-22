@@ -45,7 +45,7 @@ end
 	Sets whether ragdolls should ragdoll on fall.
 	@param ragdollOnFall boolean
 ]=]
-function RagdollService:SetRagdollOnFall(ragdollOnFall)
+function RagdollService:SetRagdollOnFall(ragdollOnFall: boolean)
 	assert(self._serviceBag, "Not initialized")
 	assert(type(ragdollOnFall) == "boolean", "Bad ragdollOnFall")
 
@@ -56,7 +56,7 @@ end
 	Sets whether ragdolls should unragdoll automatically.
 	@param ragdollOnDeath boolean
 ]=]
-function RagdollService:SetRagdollOnDeath(ragdollOnDeath)
+function RagdollService:SetRagdollOnDeath(ragdollOnDeath: boolean)
 	assert(self._serviceBag, "Not initialized")
 	assert(type(ragdollOnDeath) == "boolean", "Bad ragdollOnDeath")
 
@@ -67,7 +67,7 @@ end
 	Sets whether ragdolls should unragdoll automatically.
 	@param unragdollAutomatically boolean
 ]=]
-function RagdollService:SetUnragdollAutomatically(unragdollAutomatically)
+function RagdollService:SetUnragdollAutomatically(unragdollAutomatically: boolean)
 	assert(self._serviceBag, "Not initialized")
 	assert(type(unragdollAutomatically) == "boolean", "Bad unragdollAutomatically")
 

@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.27.0...@quenty/brio@14.28.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [14.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.26.0...@quenty/brio@14.27.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [14.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.25.0...@quenty/brio@14.26.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [14.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.24.1...@quenty/brio@14.25.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [14.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.24.0...@quenty/brio@14.24.1) (2026-01-21)
 
 **Note:** Version bump only for package @quenty/brio

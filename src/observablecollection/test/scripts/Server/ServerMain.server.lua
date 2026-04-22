@@ -8,6 +8,12 @@ local TweenService = game:GetService("TweenService")
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.observablecollection)
 
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.observablecollection) then
+	return
+end
+
 local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")

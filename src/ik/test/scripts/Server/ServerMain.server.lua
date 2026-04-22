@@ -9,6 +9,12 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(ServerScriptService.ik)
 
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.ik) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 local ikService = serviceBag:GetService(require("IKService"))
 serviceBag:Init()

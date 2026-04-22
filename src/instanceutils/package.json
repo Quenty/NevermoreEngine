@@ -1,6 +1,6 @@
 {
   "name": "@quenty/instanceutils",
-  "version": "13.24.1",
+  "version": "13.28.0",
   "description": "Utility functions involving instances in Roblox",
   "keywords": [
     "Roblox",
@@ -32,8 +32,10 @@
     "@quenty/brio": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quenty/symbol": "workspace:*"
+    "@quenty/symbol": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.34.0...@quenty/hide@11.35.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+# [11.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.33.0...@quenty/hide@11.34.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+# [11.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.32.0...@quenty/hide@11.33.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+# [11.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.3...@quenty/hide@11.32.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
+## [11.31.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.2...@quenty/hide@11.31.3) (2026-02-09)
+
+
+### Bug Fixes
+
+* Prevent stack overflow ([9a14325](https://github.com/Quenty/NevermoreEngine/commit/9a14325990ffeabaccf6cb0cdd42ac4d0b76fd70))
+
+
+
+
+
 ## [11.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@11.31.1...@quenty/hide@11.31.2) (2026-01-21)
 
 **Note:** Version bump only for package @quenty/hide

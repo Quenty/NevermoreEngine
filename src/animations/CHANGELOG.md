@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.29.0...@quenty/animations@8.30.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [8.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.28.0...@quenty/animations@8.29.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [8.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.27.0...@quenty/animations@8.28.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [8.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.26.1...@quenty/animations@8.27.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
 ## [8.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.26.0...@quenty/animations@8.26.1) (2026-01-21)
 
 

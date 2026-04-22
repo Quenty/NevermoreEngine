@@ -3,6 +3,61 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.43.0...@quenty/gameconfig@12.44.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [12.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.42.0...@quenty/gameconfig@12.43.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [12.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.41.0...@quenty/gameconfig@12.42.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [12.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.40.1...@quenty/gameconfig@12.41.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+## [12.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.40.0...@quenty/gameconfig@12.40.1) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [12.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.39.2...@quenty/gameconfig@12.40.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
 ## [12.39.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.39.1...@quenty/gameconfig@12.39.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/gameconfig

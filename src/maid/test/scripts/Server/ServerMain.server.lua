@@ -1,6 +1,16 @@
 --!nonstrict
--- Don't want to include loader here, so we do this instead
-local Maid = require(game.ServerScriptService.maid.Shared.Maid)
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(ServerScriptService.maid)
+
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.maid) then
+	return
+end
+
+local Maid = require("Maid")
 
 local maid = Maid.new()
 

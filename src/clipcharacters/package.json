@@ -1,6 +1,6 @@
 {
   "name": "@quenty/clipcharacters",
-  "version": "12.32.1",
+  "version": "12.36.0",
   "description": "Clip characters locally on the client of other clients so they don't interfer with physics.",
   "keywords": [
     "Roblox",
@@ -33,12 +33,14 @@
     "@quenty/characterutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/playerutils": "workspace:*",
     "@quenty/remoting": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/statestack": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

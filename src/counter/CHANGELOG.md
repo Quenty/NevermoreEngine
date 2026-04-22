@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.28.0...@quenty/counter@7.29.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+# [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.27.0...@quenty/counter@7.28.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+# [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.26.0...@quenty/counter@7.27.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/counter
+
+
+
+
+
+# [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.25.1...@quenty/counter@7.26.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [7.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@7.25.0...@quenty/counter@7.25.1) (2026-01-21)
 
 **Note:** Version bump only for package @quenty/counter

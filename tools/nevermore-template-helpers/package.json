@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-template-helpers",
-  "version": "1.5.1",
+  "version": "1.11.0",
   "description": "Helpers to generate Nevermore package and game templates",
   "type": "module",
   "keywords": [
@@ -8,7 +8,7 @@
     "Raven",
     "CLI"
   ],
-  "main": "dist/templateHelpers.js",
+  "main": "dist/index.js",
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },

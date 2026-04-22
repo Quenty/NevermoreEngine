@@ -12,7 +12,6 @@ dist
 .DS_Store
 globalTypes.d.lua
 *.vsix
-tests/bin
 
 # Normally it's a good idea to commit this. However, in this mono-repo scenario with linking
 # it adds a ton of noise and no real gain. Instead, we rely upon pnpm-lock.yaml which is less messy.

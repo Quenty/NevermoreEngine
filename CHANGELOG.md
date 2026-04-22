@@ -1,3 +1,258 @@
+# (Wed Apr 22 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/rogue-humanoid@10.45.0`
+  - feat: RogueHumanoidInterface [#681](https://github.com/Quenty/NevermoreEngine/pull/681) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Wed Apr 15 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.36.0`
+  - fix: wait for data cleanup before attempting load [#678](https://github.com/Quenty/NevermoreEngine/pull/678) ([@klga](https://github.com/klga) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@klga](https://github.com/klga)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Apr 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/modeltransparencyeffect@11.14.0`
+  - feat: Expand ModelTransparencyEffect support [#680](https://github.com/Quenty/NevermoreEngine/pull/680) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### 🐛 Bug Fix
+
+- ci: Update build.yml to warn on npm auth missing [#679](https://github.com/Quenty/NevermoreEngine/pull/679) ([@Quenty](https://github.com/Quenty))
+- `@quenty/observablecollection@12.35.0`
+  - fix: add an immediate emission to ObservableList.Observe [#677](https://github.com/Quenty/NevermoreEngine/pull/677) ([@KreatorKols](https://github.com/KreatorKols))
+- `@quenty/templateprovider@11.34.0`
+  - fix: Ignore PackageLinks in templates [#676](https://github.com/Quenty/NevermoreEngine/pull/676) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/promise@10.17.0`
+  - fix: Better promiseChild timeout message [#675](https://github.com/Quenty/NevermoreEngine/pull/675) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 3
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- KreatorKols ([@KreatorKols](https://github.com/KreatorKols))
+
+---
+
+# (Mon Feb 23 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.10.0`, `@quenty/nevermore-cli@4.23.0`
+  - feat(cli): add structured progress and failure context to reporting [#668](https://github.com/Quenty/NevermoreEngine/pull/668) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Restructure CLAUDE.md and extract tools/ conventions [#667](https://github.com/Quenty/NevermoreEngine/pull/667) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Feb 20 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.29.0`, `@quenty/binder@14.32.0`, `@quenty/blend@12.32.0`, `@quenty/brio@14.27.0`, `@quenty/chatproviderservice@9.45.0`, `@quenty/clienttranslator@14.33.0`, `@quenty/clipcharacters@12.35.0`, `@quenty/datastore@13.34.0`, `@quenty/deathreport@10.39.0`, `@quenty/ellipticcurvecryptography@1.10.0`, `@quenty/elo@7.33.0`, `@quenty/experiencecalculator@2.9.0`, `@quenty/fzy@5.13.0`, `@quenty/ik@15.46.0`, `@quenty/influxdbclient@7.31.0`, `@quenty/inputkeymaputils@14.39.0`, `@quenty/instanceutils@13.27.0`, `@quenty/lipsum@14.32.0`, `@quenty/maid@3.8.0`, `@quenty/nevermore-test-runner@1.3.0`, `@quenty/observablecollection@12.34.0`, `@quenty/permissionprovider@14.33.0`, `@quenty/randomutils@6.15.0`, `@quenty/rogue-properties@11.41.0`, `@quenty/rx@13.26.0`, `@quenty/secrets@7.43.0`, `@quenty/settings-inputkeymap@10.49.0`, `@quenty/settings@11.46.0`, `@quenty/snackbar@11.37.0`, `@quenty/soundgroup@1.36.0`, `@quenty/tie@10.36.0`, `@quenty/nevermore-cli@4.22.0`
+  - feat(cli): add CI annotation support to game and plugin templates [#666](https://github.com/Quenty/NevermoreEngine/pull/666) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Feb 19 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.28.0`, `@quenty/binder@14.31.0`, `@quenty/blend@12.31.0`, `@quenty/brio@14.26.0`, `@quenty/camera@14.35.0`, `@quenty/chatproviderservice@9.44.0`, `@quenty/clienttranslator@14.32.0`, `@quenty/clipcharacters@12.34.0`, `@quenty/cmdrservice@13.38.0`, `@quenty/conditions@10.35.0`, `@quenty/datastore@13.33.0`, `@quenty/deathreport@10.38.0`, `@quenty/ellipticcurvecryptography@1.9.0`, `@quenty/elo@7.32.0`, `@quenty/experiencecalculator@2.8.0`, `@quenty/fzy@5.12.0`, `@quenty/gameconfig@12.42.0`, `@quenty/gameproductservice@14.44.0`, `@quenty/ik@15.45.0`, `@quenty/influxdbclient@7.30.0`, `@quenty/inputkeymaputils@14.38.0`, `@quenty/instanceutils@13.26.0`, `@quenty/lipsum@14.31.0`, `@quenty/maid@3.7.0`, `@quenty/nevermore-test-runner@1.2.0`, `@quenty/observablecollection@12.33.0`, `@quenty/permissionprovider@14.32.0`, `@quenty/randomutils@6.14.0`, `@quenty/rogue-humanoid@10.42.0`, `@quenty/rogue-properties@11.40.0`, `@quenty/rx@13.25.0`, `@quenty/screenshothudservice@7.29.0`, `@quenty/secrets@7.42.0`, `@quenty/settings-inputkeymap@10.48.0`, `@quenty/settings@11.45.0`, `@quenty/snackbar@11.36.0`, `@quenty/soundgroup@1.35.0`, `@quenty/tie@10.35.0`, `@quenty/nevermore-cli@4.21.0`
+  - feat(cli): add aggregated batch test execution [#664](https://github.com/Quenty/NevermoreEngine/pull/664) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix(ci): prevent automatic canary releases on non-main branches [#665](https://github.com/Quenty/NevermoreEngine/pull/665) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Feb 19 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@12.30.0`, `@quenty/ragdoll@15.43.0`, `@quenty/cli-output-helpers@1.9.0`, `@quenty/nevermore-cli@4.20.0`
+  - feat(cli): add integration game deploy pipeline [#663](https://github.com/Quenty/NevermoreEngine/pull/663) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Feb 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.8.0`, `@quenty/nevermore-cli@4.19.0`
+  - feat(cli): add GitHub Actions annotations for test failures [#662](https://github.com/Quenty/NevermoreEngine/pull/662) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Feb 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.7.0`, `@quenty/nevermore-cli@4.18.0`
+  - feat(cli): add GitHub Actions workflow annotations for linting [#661](https://github.com/Quenty/NevermoreEngine/pull/661) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Feb 17 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.6.0`, `@quenty/nevermore-cli@4.17.0`
+  - feat(cli): add GitHub Actions job summary reporter [#660](https://github.com/Quenty/NevermoreEngine/pull/660) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Feb 17 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cli-output-helpers@1.5.2`, `@quenty/nevermore-cli@4.16.2`
+  - feat: Downloading types works properly [#659](https://github.com/Quenty/NevermoreEngine/pull/659) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Feb 17 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cmdrservice@13.36.1`, `@quenty/rodux-actions@9.12.1`, `@quenty/rogue-properties@11.38.1`, `@quenty/snackbar@11.34.1`, `@quenty/spawning@10.38.1`, `@quenty/cli-output-helpers@1.5.1`, `@quenty/nevermore-template-helpers@1.6.1`
+  - fix: devcontainer initializes properly with luau-lsp working out of the box [#658](https://github.com/Quenty/NevermoreEngine/pull/658) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Feb 17 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.7.0`, `@quenty/accessorytypeutils@1.8.0`, `@quenty/adorneeboundingbox@8.31.0`, `@quenty/adorneedata@7.29.0`, `@quenty/aggregator@1.11.0`, `@quenty/animations@8.27.0`, `@quenty/binder@14.30.0`, `@quenty/blend@12.29.0`, `@quenty/brio@14.25.0`, `@quenty/buttondragmodel@1.25.0`, `@quenty/camera@14.33.0`, `@quenty/chatproviderservice@9.42.0`, `@quenty/clienttranslator@14.30.0`, `@quenty/clipcharacters@12.33.0`, `@quenty/cmdrservice@13.36.0`, `@quenty/colorpalette@10.32.0`, `@quenty/colorpicker@10.30.0`, `@quenty/conditions@10.34.0`, `@quenty/convexhull@4.12.0`, `@quenty/countdowntext@4.10.0`, `@quenty/counter@7.26.0`, `@quenty/datastore@13.32.0`, `@quenty/deathreport@10.37.0`, `@quenty/defaultvalueutils@1.4.0`, `@quenty/draw@7.11.0`, `@quenty/ducktype@5.10.0`, `@quenty/ellipticcurvecryptography@1.8.0`, `@quenty/elo@7.30.0`, `@quenty/enums@1.2.0`, `@quenty/experiencecalculator@2.7.0`, `@quenty/funnels@1.18.0`, `@quenty/fzy@5.11.0`, `@quenty/gameconfig@12.40.0`, `@quenty/gameproductservice@14.42.0`, `@quenty/highlight@10.33.0`, `@quenty/ik@15.43.0`, `@quenty/influxdbclient@7.29.0`, `@quenty/inputkeymaputils@14.36.0`, `@quenty/instanceutils@13.25.0`, `@quenty/lipsum@14.29.0`, `@quenty/loader@10.10.0`, `@quenty/lrucache@1.8.0`, `@quenty/maid@3.6.0`, `@quenty/memoize@1.8.0`, `@quenty/nevermore-test-runner@1.1.0`, `@quenty/observablecollection@12.31.0`, `@quenty/particles@5.12.0`, `@quenty/performanceutils@4.10.0`, `@quenty/permissionprovider@14.31.0`, `@quenty/promptqueue@1.30.0`, `@quenty/qframe@10.15.0`, `@quenty/radial-image@9.30.0`, `@quenty/randomutils@6.13.0`, `@quenty/rectutils@1.4.0`, `@quenty/rigbuilderutils@10.27.0`, `@quenty/rogue-humanoid@10.40.0`, `@quenty/rogue-properties@11.38.0`, `@quenty/rx@13.24.0`, `@quenty/screenshothudservice@7.28.0`, `@quenty/secrets@7.40.0`, `@quenty/settings-inputkeymap@10.46.0`, `@quenty/settings@11.43.0`, `@quenty/snackbar@11.34.0`, `@quenty/softshutdown@9.39.0`, `@quenty/soundgroup@1.33.0`, `@quenty/soundplayer@7.32.0`, `@quenty/tie@10.34.0`, `@quenty/timedtween@7.29.0`, `@quenty/toolutils@1.11.0`, `@quenty/tuple@1.7.0`, `@quenty/typeutils@1.2.0`, `@quenty/ugcsanitize@1.12.0`, `@quenty/valueobject@13.26.0`, `@quenty/viewport@11.34.0`, `@quenty/voicechat@5.14.0`, `@quenty/cli-output-helpers@1.5.0`, `@quenty/nevermore-cli@4.16.0`, `@quenty/nevermore-template-helpers@1.6.0`, `@quenty/studio-bridge@0.2.0`
+  - feat: Open cloud deploy and testing results [#656](https://github.com/Quenty/NevermoreEngine/pull/656) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Feb 13 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/localizedtextutils@12.24.2`
+  - fix(localizedtextutils): make translationArgs optional [#655](https://github.com/Quenty/NevermoreEngine/pull/655) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Feb 09 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/hide@11.31.3`
+  - fix: Prevent stack overflow [#654](https://github.com/Quenty/NevermoreEngine/pull/654) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Feb 09 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@13.31.2`
+  - fix: Update player data removal to use UserId [#653](https://github.com/Quenty/NevermoreEngine/pull/653) ([@imagerymartin](https://github.com/imagerymartin))
+
+#### Authors: 1
+
+- Martin ([@imagerymartin](https://github.com/imagerymartin))
+
+---
+
+# (Fri Feb 06 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rogue-properties@11.37.3`
+  - chore: roguepropertyarrayhelper silence warning [#652](https://github.com/Quenty/NevermoreEngine/pull/652) ([@klga](https://github.com/klga))
+
+#### Authors: 1
+
+- [@klga](https://github.com/klga)
+
+---
+
+# (Mon Jan 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/inputkeymaputils@14.35.0`
+  - feat: Add Holdable option to InputKeyMapList [#648](https://github.com/Quenty/NevermoreEngine/pull/648) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Fri Jan 23 2026)
 
 #### 🐛 Bug Fix

@@ -3,6 +3,77 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.10.0...@quenty/nevermore-template-helpers@1.11.0) (2026-02-23)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
+# [1.10.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.9.0...@quenty/nevermore-template-helpers@1.10.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
+# [1.9.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.8.0...@quenty/nevermore-template-helpers@1.9.0) (2026-02-18)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
+# [1.8.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.7.0...@quenty/nevermore-template-helpers@1.8.0) (2026-02-18)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
+# [1.7.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.6.2...@quenty/nevermore-template-helpers@1.7.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
+## [1.6.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.6.1...@quenty/nevermore-template-helpers@1.6.2) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/nevermore-template-helpers
+
+
+
+
+
+## [1.6.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.6.0...@quenty/nevermore-template-helpers@1.6.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* devcontainer initializes properly with luau-lsp working out of the box ([b8591e8](https://github.com/Quenty/Nevermore/commit/b8591e8a62beda655e90875b0dc22d79fcae8e61))
+
+
+
+
+
+# [1.6.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.5.1...@quenty/nevermore-template-helpers@1.6.0) (2026-02-17)
+
+
+### Bug Fixes
+
+* Fix spinner design showing stuff ([814cd91](https://github.com/Quenty/Nevermore/commit/814cd915358079f7d628a9739d0cd56e472b52f6))
+* Local testing works consistently and in batch mode ([67d6ba1](https://github.com/Quenty/Nevermore/commit/67d6ba1d3625dc76f7a54ac13e75da2cc82ccc64))
+
+
+
+
+
 ## [1.5.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-template-helpers@1.5.0...@quenty/nevermore-template-helpers@1.5.1) (2026-01-19)
 
 **Note:** Version bump only for package @quenty/nevermore-template-helpers

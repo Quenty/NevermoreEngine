@@ -46,7 +46,12 @@ jobs:
         run: npm run build:sourcemap
 
       - name: luau-lsp analyze
-        run: npm run lint:luau
+        run: npm run lint:luau 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post luau-lsp annotations
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-lint-results lint-output.txt --linter=luau-lsp --yes
 
   stylua:
     runs-on: ubuntu-latest
@@ -62,7 +67,12 @@ jobs:
           cache: true
 
       - name: stylua check
-        run: npm run lint:stylua
+        run: npm run lint:stylua 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post stylua annotations
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-lint-results lint-output.txt --linter=stylua --yes
 
   selene:
     runs-on: ubuntu-latest
@@ -78,7 +88,12 @@ jobs:
           cache: true
 
       - name: Run Selene
-        run: npm run lint:selene
+        run: npm run lint:selene 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post selene annotations
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-lint-results lint-output.txt --linter=selene --yes
 
   moonwave:
     runs-on: ubuntu-latest
@@ -94,4 +109,9 @@ jobs:
           cache: true
 
       - name: Run moonwave-extractor
-        run: npm run lint:moonwave
+        run: npm run lint:moonwave 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post moonwave annotations
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-lint-results lint-output.txt --linter=moonwave --yes

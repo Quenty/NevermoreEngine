@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.33.0...@quenty/radial-image@9.34.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+# [9.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.32.0...@quenty/radial-image@9.33.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+# [9.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.31.0...@quenty/radial-image@9.32.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+# [9.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.30.0...@quenty/radial-image@9.31.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+# [9.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.29.2...@quenty/radial-image@9.30.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [9.29.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.29.1...@quenty/radial-image@9.29.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/radial-image

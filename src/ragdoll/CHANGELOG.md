@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.45.0...@quenty/ragdoll@15.46.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [15.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.44.0...@quenty/ragdoll@15.45.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [15.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.43.0...@quenty/ragdoll@15.44.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [15.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.42.0...@quenty/ragdoll@15.43.0) (2026-02-19)
+
+
+### Bug Fixes
+
+* Swap the integration place with blend so at least we can try stuff quickly, add cmdr to integration test place ([e1168e1](https://github.com/Quenty/NevermoreEngine/commit/e1168e16f9c01fb53c6662f091ec42e77766d10f))
+
+
+
+
+
+# [15.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.41.2...@quenty/ragdoll@15.42.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
 ## [15.41.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.41.1...@quenty/ragdoll@15.41.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/ragdoll

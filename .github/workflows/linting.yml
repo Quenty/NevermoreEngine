@@ -43,7 +43,12 @@ jobs:
         run: npm run build:sourcemap
 
       - name: luau-lsp analyze
-        run: npm run lint:luau
+        run: npm run lint:luau 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post luau-lsp annotations
+        if: always()
+        run: nevermore tools post-lint-results lint-output.txt --linter=luau-lsp --yes
 
   stylua:
     runs-on: ubuntu-latest
@@ -59,7 +64,16 @@ jobs:
           cache: true
 
       - name: stylua check
-        run: npm run lint:stylua
+        run: npm run lint:stylua 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Upload lint output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-stylua
+          path: lint-output.txt
+          retention-days: 1
 
   selene:
     runs-on: ubuntu-latest
@@ -75,7 +89,16 @@ jobs:
           cache: true
 
       - name: selene check
-        run: npm run lint:selene
+        run: npm run lint:selene 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Upload lint output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-selene
+          path: lint-output.txt
+          retention-days: 1
 
   moonwave:
     runs-on: ubuntu-latest
@@ -91,4 +114,73 @@ jobs:
           cache: true
 
       - name: Run moonwave-extractor
-        run: npm run lint:moonwave
+        run: npm run lint:moonwave 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Upload lint output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-moonwave
+          path: lint-output.txt
+          retention-days: 1
+
+  lint-annotations:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [stylua, selene, moonwave]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - name: Setup npm for GitHub Packages
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' --filter '!./tools/nevermore-vscode' run build
+
+      - name: Install nevermore-cli locally
+        run: npm install --ignore-scripts -g .
+        working-directory: tools/nevermore-cli
+
+      - name: Download lint artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: lint-*
+        continue-on-error: true
+
+      - name: Post stylua annotations
+        if: always()
+        run: |
+          if [ -f lint-stylua/lint-output.txt ]; then
+            nevermore tools post-lint-results lint-stylua/lint-output.txt --linter=stylua --yes
+          fi
+
+      - name: Post selene annotations
+        if: always()
+        run: |
+          if [ -f lint-selene/lint-output.txt ]; then
+            nevermore tools post-lint-results lint-selene/lint-output.txt --linter=selene --yes
+          fi
+
+      - name: Post moonwave annotations
+        if: always()
+        run: |
+          if [ -f lint-moonwave/lint-output.txt ]; then
+            nevermore tools post-lint-results lint-moonwave/lint-output.txt --linter=moonwave --yes
+          fi

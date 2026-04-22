@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.7.0...@quenty/nevermore-cli-helpers@1.8.0) (2026-02-23)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+
+
+
+
+# [1.7.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.6.0...@quenty/nevermore-cli-helpers@1.7.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+
+
+
+
+# [1.6.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.5.0...@quenty/nevermore-cli-helpers@1.6.0) (2026-02-18)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+
+
+
+
+# [1.5.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.4.0...@quenty/nevermore-cli-helpers@1.5.0) (2026-02-18)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+
+
+
+
+# [1.4.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.3.2...@quenty/nevermore-cli-helpers@1.4.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+
+
+
+
+## [1.3.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.3.1...@quenty/nevermore-cli-helpers@1.3.2) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+
+
+
+
+## [1.3.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.3.0...@quenty/nevermore-cli-helpers@1.3.1) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+
+
+
+
+# [1.3.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.2.0...@quenty/nevermore-cli-helpers@1.3.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+
+
+
+
 # [1.2.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.1.0...@quenty/nevermore-cli-helpers@1.2.0) (2026-01-14)
 
 

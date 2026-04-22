@@ -1,6 +1,6 @@
 {
   "name": "@quenty/lipsum",
-  "version": "14.28.2",
+  "version": "14.33.0",
   "description": "A Lorem Ipsum generator in Roblox",
   "keywords": [
     "Roblox",
@@ -31,8 +31,10 @@
   ],
   "dependencies": {
     "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/randomutils": "workspace:*",
-    "@quenty/string": "workspace:*"
+    "@quenty/string": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "devDependencies": {
     "@quenty/maid": "workspace:*",

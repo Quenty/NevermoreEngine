@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.27.0...@quenty/localizedtextutils@12.28.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.26.0...@quenty/localizedtextutils@12.27.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.25.0...@quenty/localizedtextutils@12.26.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [12.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.24.2...@quenty/localizedtextutils@12.25.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [12.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.24.1...@quenty/localizedtextutils@12.24.2) (2026-02-13)
+
+
+### Bug Fixes
+
+* **localizedtextutils:** make translationArgs optional ([#655](https://github.com/Quenty/NevermoreEngine/issues/655)) ([9eb6d7b](https://github.com/Quenty/NevermoreEngine/commit/9eb6d7bb9c26bc6a21bd71bfc7e47fd0dfae26c1))
+
+
+
+
+
 ## [12.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.24.0...@quenty/localizedtextutils@12.24.1) (2026-01-21)
 
 **Note:** Version bump only for package @quenty/localizedtextutils

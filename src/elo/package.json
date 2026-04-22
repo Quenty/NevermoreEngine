@@ -1,6 +1,6 @@
 {
   "name": "@quenty/elo",
-  "version": "7.29.2",
+  "version": "7.34.0",
   "description": "Elo rating utility library.",
   "keywords": [
     "Roblox",
@@ -37,6 +37,8 @@
     "@quenty/maid": "workspace:*"
   },
   "dependencies": {
-    "@quenty/probability": "workspace:*"
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/probability": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   }
 }

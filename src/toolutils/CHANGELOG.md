@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.13.0...@quenty/toolutils@1.14.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+
+
+
+
+# [1.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.12.0...@quenty/toolutils@1.13.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+
+
+
+
+# [1.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.11.0...@quenty/toolutils@1.12.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+
+
+
+
+# [1.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.10.1...@quenty/toolutils@1.11.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [1.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.10.0...@quenty/toolutils@1.10.1) (2026-01-21)
 
 **Note:** Version bump only for package @quenty/toolutils

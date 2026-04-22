@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.44.0...@quenty/humanoidspeed@12.45.0) (2026-04-22)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
+# [12.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.43.0...@quenty/humanoidspeed@12.44.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
+# [12.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.42.0...@quenty/humanoidspeed@12.43.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
+# [12.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.41.0...@quenty/humanoidspeed@12.42.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
+# [12.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.40.1...@quenty/humanoidspeed@12.41.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
+## [12.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.40.0...@quenty/humanoidspeed@12.40.1) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
+# [12.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.39.3...@quenty/humanoidspeed@12.40.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
+## [12.39.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.39.2...@quenty/humanoidspeed@12.39.3) (2026-02-06)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+
+
+
+
 ## [12.39.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.39.1...@quenty/humanoidspeed@12.39.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/humanoidspeed

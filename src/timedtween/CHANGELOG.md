@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.32.0...@quenty/timedtween@7.33.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+# [7.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.31.0...@quenty/timedtween@7.32.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+# [7.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.30.0...@quenty/timedtween@7.31.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.29.0...@quenty/timedtween@7.30.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+
+
+
+
+# [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.28.2...@quenty/timedtween@7.29.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [7.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.28.1...@quenty/timedtween@7.28.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/timedtween

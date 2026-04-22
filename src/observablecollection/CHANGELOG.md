@@ -3,6 +3,59 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.34.0...@quenty/observablecollection@12.35.0) (2026-04-14)
+
+
+### Bug Fixes
+
+* add an immediate emission to ObservableList.Observe ([#677](https://github.com/Quenty/NevermoreEngine/issues/677)) ([6723e35](https://github.com/Quenty/NevermoreEngine/commit/6723e3573c490d40635f083eeaba83bb4f343082))
+
+
+
+
+
+# [12.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.33.0...@quenty/observablecollection@12.34.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [12.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.32.0...@quenty/observablecollection@12.33.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [12.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.31.0...@quenty/observablecollection@12.32.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [12.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.30.2...@quenty/observablecollection@12.31.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/NevermoreEngine/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+
+
+
+
+
 ## [12.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.30.1...@quenty/observablecollection@12.30.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/observablecollection

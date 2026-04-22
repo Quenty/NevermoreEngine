@@ -1,6 +1,6 @@
 {
   "name": "@quenty/conditions",
-  "version": "10.33.1",
+  "version": "10.37.0",
   "description": "Adornee based conditional system that is sufficiently generic to script gameplay.",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/statestack": "workspace:*",
     "@quenty/tie": "workspace:*"

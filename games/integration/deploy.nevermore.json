@@ -1,0 +1,13 @@
+{
+  "targets": {
+    "integration": {
+      "universeId": 9716264427,
+      "placeId": 97496922428977,
+      "project": "default.project.json",
+      "basePlace": {
+        "universeId": 9716264427,
+        "placeId": 71403466083947
+      }
+    }
+  }
+}

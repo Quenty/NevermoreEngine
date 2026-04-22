@@ -3,6 +3,127 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.23.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.22.0...@quenty/nevermore-cli@4.23.0) (2026-02-23)
+
+
+### Features
+
+* **cli:** add structured progress and failure context to reporting ([#668](https://github.com/Quenty/Nevermore/issues/668)) ([e716329](https://github.com/Quenty/Nevermore/commit/e716329f5aeace8b213322ba3cce06b98d8ea43d))
+
+
+
+
+
+# [4.22.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.21.0...@quenty/nevermore-cli@4.22.0) (2026-02-20)
+
+
+### Features
+
+* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/Nevermore/issues/666)) ([098971b](https://github.com/Quenty/Nevermore/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
+
+
+
+
+
+# [4.21.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.20.0...@quenty/nevermore-cli@4.21.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/Nevermore/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
+
+
+
+
+
+# [4.20.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.19.0...@quenty/nevermore-cli@4.20.0) (2026-02-19)
+
+
+### Features
+
+* **cli:** add integration game deploy pipeline with base place merging ([b406938](https://github.com/Quenty/Nevermore/commit/b406938cee6a1af59adb6682eb6319c76c51aa1a))
+* **cli:** merge test and deploy results into single PR comment ([6750feb](https://github.com/Quenty/Nevermore/commit/6750feb4bb5c1075ca9931166aebae01c9333f8d))
+
+
+
+
+
+# [4.19.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.18.0...@quenty/nevermore-cli@4.19.0) (2026-02-18)
+
+
+### Features
+
+* **cli:** add GitHub Actions annotations for test failures ([2fd2f42](https://github.com/Quenty/Nevermore/commit/2fd2f423991ca6bf483fa2396045410f849223b6))
+
+
+
+
+
+# [4.18.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.17.0...@quenty/nevermore-cli@4.18.0) (2026-02-18)
+
+
+### Features
+
+* **cli:** add GitHub Actions workflow annotations for linting ([698f7ba](https://github.com/Quenty/Nevermore/commit/698f7ba6ca2c1448b594b94ca5dedf7b528cc8f3))
+
+
+
+
+
+# [4.17.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.16.2...@quenty/nevermore-cli@4.17.0) (2026-02-17)
+
+
+### Features
+
+* **cli:** add GitHub Actions job summary reporter ([84db8d2](https://github.com/Quenty/Nevermore/commit/84db8d2518df1293fb9bc1d3e05c69cf236e2ed5))
+
+
+
+
+
+## [4.16.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.16.1...@quenty/nevermore-cli@4.16.2) (2026-02-17)
+
+
+### Bug Fixes
+
+* Fix download roblox types ([1dbaeda](https://github.com/Quenty/Nevermore/commit/1dbaeda3bc03469bf6ddee60297f747933366743))
+* When no tests run we report that tests were not run ([66a8608](https://github.com/Quenty/Nevermore/commit/66a860829d7241a0055028669a0bf55d4670a245))
+
+
+
+
+
+## [4.16.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.16.0...@quenty/nevermore-cli@4.16.1) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+# [4.16.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.15.2...@quenty/nevermore-cli@4.16.0) (2026-02-17)
+
+
+### Bug Fixes
+
+* Local testing works consistently and in batch mode ([67d6ba1](https://github.com/Quenty/Nevermore/commit/67d6ba1d3625dc76f7a54ac13e75da2cc82ccc64))
+* Tests timing out ([8566a58](https://github.com/Quenty/Nevermore/commit/8566a584d7bb30585cdb83c5a56520fab44a8c72))
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/Nevermore/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+* Add Nevermore deploy and Nevermore test commands that run files in the open cloud ([81f328d](https://github.com/Quenty/Nevermore/commit/81f328db23f4ecdedad121f9c2d4789aded59d4e))
+* Better error messages and optimized tests ([71ca056](https://github.com/Quenty/Nevermore/commit/71ca056517ee98e625d61e7dcd923dc808ac3edc))
+* Create places automatically using nevermore-cli ([d4a6a66](https://github.com/Quenty/Nevermore/commit/d4a6a66e5720d010b4fc3d6f973ccfdaa17dbead))
+* Improve output quality of testing cli tools ([217630c](https://github.com/Quenty/Nevermore/commit/217630c354308b740092c07077341dc82d134965))
+* Refactor studio bridge ([8afe642](https://github.com/Quenty/Nevermore/commit/8afe6424b6635eaa0155734c085934051de88da6))
+* Unify plugin testing reporting and start initial local test execution mode ([5376478](https://github.com/Quenty/Nevermore/commit/53764782b35c7897aa90baeb3bd7c4baacf4e591))
+
+
+
+
+
 ## [4.15.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.15.1...@quenty/nevermore-cli@4.15.2) (2026-01-20)
 
 

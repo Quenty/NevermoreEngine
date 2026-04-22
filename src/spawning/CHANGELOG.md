@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.41.0...@quenty/spawning@10.42.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/spawning
+
+
+
+
+
+# [10.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.40.0...@quenty/spawning@10.41.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/spawning
+
+
+
+
+
+# [10.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.39.0...@quenty/spawning@10.40.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/spawning
+
+
+
+
+
+# [10.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.38.1...@quenty/spawning@10.39.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/spawning
+
+
+
+
+
+## [10.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.38.0...@quenty/spawning@10.38.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* devcontainer initializes properly with luau-lsp working out of the box ([b8591e8](https://github.com/Quenty/NevermoreEngine/commit/b8591e8a62beda655e90875b0dc22d79fcae8e61))
+
+
+
+
+
+# [10.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.37.2...@quenty/spawning@10.38.0) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/spawning
+
+
+
+
+
 ## [10.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.37.1...@quenty/spawning@10.37.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/spawning

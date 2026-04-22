@@ -5,4 +5,10 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-require(loader).bootstrapGame(ServerScriptService.animations)
+local require = require(loader).bootstrapGame(ServerScriptService.animations)
+
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.animations) then
+	return
+end

@@ -11,6 +11,9 @@
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
       "aggregator": {
         "$path": ".."
       }

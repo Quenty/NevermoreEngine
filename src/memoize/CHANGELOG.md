@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memoize@1.7.4...@quenty/memoize@1.8.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
 ## [1.7.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memoize@1.7.3...@quenty/memoize@1.7.4) (2026-01-12)
 
 

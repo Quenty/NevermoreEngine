@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.35.0...@quenty/soundplayer@7.36.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.34.0...@quenty/soundplayer@7.35.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.33.0...@quenty/soundplayer@7.34.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.32.1...@quenty/soundplayer@7.33.0) (2026-02-19)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+## [7.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.32.0...@quenty/soundplayer@7.32.1) (2026-02-17)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
+# [7.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.4...@quenty/soundplayer@7.32.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
+## [7.31.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.3...@quenty/soundplayer@7.31.4) (2026-02-06)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
+
 ## [7.31.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.31.2...@quenty/soundplayer@7.31.3) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/soundplayer

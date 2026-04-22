@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-cli",
-  "version": "4.15.2",
+  "version": "4.23.0",
   "description": "CLI interface for Nevermore",
   "type": "module",
   "keywords": [
@@ -28,6 +28,7 @@
     "@quenty/cli-output-helpers": "workspace:*",
     "@quenty/nevermore-cli-helpers": "workspace:*",
     "@quenty/nevermore-template-helpers": "workspace:*",
+    "@quenty/studio-bridge": "workspace:*",
     "execa": "^9.6.1",
     "find-git-root": "^1.0.4",
     "inquirer": "^13.2.0",
@@ -40,12 +41,15 @@
     "@types/node": "^18.11.4",
     "@types/yargs": "^17.0.13",
     "prettier": "2.7.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
   },
   "scripts": {
     "build": "tsc --build",
     "build:watch": "tsc --build --watch",
-    "build:clean": "tsc --build --clean"
+    "build:clean": "tsc --build --clean",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "publishConfig": {
     "access": "public"
