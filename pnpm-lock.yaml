@@ -3974,6 +3974,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
@@ -6610,13 +6613,13 @@ packages:
     engines: {node: '>=12'}
 
   '@quentystudios/cmdr@1.12.0-quenty.0':
-    resolution: {integrity: sha512-coxG4bEQ3wskTEiVxbh6hTsOycYoq+8jLtUABvfMURHiS3hgF/0jg3uQArZt0JeY+VvkCIXLHUCFTMMbUQOllA==}
+    resolution: {integrity: sha512-coxG4bEQ3wskTEiVxbh6hTsOycYoq+8jLtUABvfMURHiS3hgF/0jg3uQArZt0JeY+VvkCIXLHUCFTMMbUQOllA==, tarball: https://npm.pkg.github.com/download/@QuentyStudios/cmdr/1.12.0-quenty.0/52cd069ee3ce795e8056e2e42cb012bb75ddf053}
 
   '@quentystudios/jest-lua@3.10.0-quenty.2':
-    resolution: {integrity: sha512-TE7vhnYjygcBjjqeKLsmbwxhJeiDeekh/E2xcvQ0VZAwHNr+Yn1pk1n/PRJu+KtH2fWYkw20pQO4o/hKPs0lRA==}
+    resolution: {integrity: sha512-TE7vhnYjygcBjjqeKLsmbwxhJeiDeekh/E2xcvQ0VZAwHNr+Yn1pk1n/PRJu+KtH2fWYkw20pQO4o/hKPs0lRA==, tarball: https://npm.pkg.github.com/download/@quentystudios/jest-lua/3.10.0-quenty.2/238e074c8a3d93e2ed9dbed9e0e191bc60cfa8e8}
 
   '@quentystudios/t@3.0.0':
-    resolution: {integrity: sha512-YUBaDzrs69scFgRpzASLOpcvxKho8oaUipyHO+A9z+aRW/ursRhzCXjRtPZ08uoU+fba/cohZuZMMGDMpncg1w==}
+    resolution: {integrity: sha512-RTnK+ViHHgnG+pn5xOZ+l4dk4sUaEuA5ljb041yRGVF0jBX77Pqb8EpVsllwOr0ik8juD+/nn0ODuQfEJ49bJg==, tarball: https://npm.pkg.github.com/download/@QuentyStudios/t/3.0.0/531258ee3ed838164450322edce90bc273e5cd42}
 
   '@rollup/rollup-android-arm-eabi@4.57.1':
     resolution: {integrity: sha512-A6ehUVSiSaaliTxai040ZpZ2zTevHYbvu/lDoeAteHI8QnaosIzm4qwtezfRg1jOYaUmnzLX1AOD6Z+UJjtifg==}
@@ -9454,6 +9457,7 @@ packages:
   prebuild-install@7.1.3:
     resolution: {integrity: sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==}
     engines: {node: '>=10'}
+    deprecated: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
     hasBin: true
 
   prepend-http@1.0.4:
