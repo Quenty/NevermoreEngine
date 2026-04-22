@@ -157,6 +157,9 @@ interface TypeDefinition {
   Parse: (value: unknown) => unknown;
   /** The `Default` function is optional and should return the "default" value for this type, as a string. For example, the default value of the `players` type is the name of the player who ran the command. */
   Default?: (player: Player) => string;
+
+  ArgumentOperatorAliases?: Record<string, string>;
+
   /**
    * If you set the optional key `Listable` to `true` in your table, this will tell Cmdr that comma-separated lists are allowed for this type. Cmdr will automatically split the list and parse each segment through your Transform, Validate, Autocomplete, and Parse functions individually, so you don't have to change the logic of your Type at all.
    *
