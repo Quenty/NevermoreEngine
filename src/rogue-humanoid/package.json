@@ -42,6 +42,7 @@
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/table": "workspace:*",
+    "@quenty/tie": "workspace:*",
     "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {

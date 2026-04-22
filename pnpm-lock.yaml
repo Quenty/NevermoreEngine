@@ -3974,6 +3974,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
@@ -9454,6 +9457,7 @@ packages:
   prebuild-install@7.1.3:
     resolution: {integrity: sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==}
     engines: {node: '>=10'}
+    deprecated: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
     hasBin: true
 
   prepend-http@1.0.4:
