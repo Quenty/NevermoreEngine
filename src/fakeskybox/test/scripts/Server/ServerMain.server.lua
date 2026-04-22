@@ -4,7 +4,7 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local root = ServerScriptService.fakeskybox
-local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")

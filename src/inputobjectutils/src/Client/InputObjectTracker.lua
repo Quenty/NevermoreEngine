@@ -37,6 +37,7 @@ local Workspace = game:GetService("Workspace")
 local BaseObject = require("BaseObject")
 local InputObjectRayUtils = require("InputObjectRayUtils")
 local InputObjectUtils = require("InputObjectUtils")
+local MousePositionUtils = require("MousePositionUtils")
 local Observable = require("Observable")
 local RxInputObjectUtils = require("RxInputObjectUtils")
 local RxSignal = require("RxSignal")
@@ -83,27 +84,15 @@ function InputObjectTracker.new(initialInputObject: InputObject): InputObjectTra
 end
 
 function InputObjectTracker._setupMouse(self: InputObjectTracker): ()
-	self._lastMousePosition = toVector2(self._initialInputObject.Position)
+	self._lastMousePosition = MousePositionUtils.mouseUserInputObjectToMousePosition(self._initialInputObject)
+		or error("Failed to retrieve position")
 	self._isMouse = true
 
-	self._maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject)
-		if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
-			self._lastMousePosition = toVector2(inputObject.Position)
-		end
-	end))
-
-	self._maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
-		if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
-			self._lastMousePosition = toVector2(inputObject.Position)
-		end
-	end))
-
-	self._maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject)
-		if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
-			self._lastMousePosition = toVector2(inputObject.Position)
-		end
+	self._maid:GiveTask(MousePositionUtils.observeMousePosition(self._initialInputObject):Subscribe(function(position)
+		self._lastMousePosition = position
 	end))
 end
+
 --[=[
 	Observes when the input is ended
 

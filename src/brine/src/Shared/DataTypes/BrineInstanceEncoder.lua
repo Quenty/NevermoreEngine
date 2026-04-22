@@ -15,6 +15,33 @@ local BrineInstanceEncoder = {}
 
 local DISALLOWED_RBX_ATTRIBUTE_PREFIX = "RBX"
 
+local PROPERTY_MODIFIERS = {
+	-- Assigning one of these sets themode to a diferent mode, and we need to compensate for that
+	["Camera"] = {
+		["FieldOfView"] = function(instance: Camera, value: any): any?
+			if instance.FieldOfViewMode == Enum.FieldOfViewMode.Vertical then
+				return value
+			else
+				return nil
+			end
+		end,
+		["DiagonalFieldOfView"] = function(instance: Camera, value: any): any?
+			if instance.FieldOfViewMode == Enum.FieldOfViewMode.Diagonal then
+				return value
+			else
+				return nil
+			end
+		end,
+		["MaxAxisFieldOfView"] = function(instance: Camera, value: any): any?
+			if instance.FieldOfViewMode == Enum.FieldOfViewMode.MaxAxis then
+				return value
+			else
+				return nil
+			end
+		end,
+	},
+}
+
 function BrineInstanceEncoder.encodeProperties(
 	context: BrineContext.BrineContext,
 	instance: Instance
@@ -25,12 +52,19 @@ function BrineInstanceEncoder.encodeProperties(
 		return nil
 	end
 
+	local modifiers = PROPERTY_MODIFIERS[instance.ClassName]
+
 	local properties = {}
 
 	for _, propertyInfo in propertyMetadata.orderedList do
 		local value = (instance :: any)[propertyInfo.Name]
 		if value == propertyInfo.DefaultValue then
 			continue
+		end
+
+		local modifier = if modifiers then modifiers[propertyInfo.Name] else nil
+		if modifier then
+			value = modifier(instance, value)
 		end
 
 		properties[propertyInfo.Name] = value

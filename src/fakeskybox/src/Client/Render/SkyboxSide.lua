@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local ColorSequenceUtils = require("ColorSequenceUtils")
+local FakeSkyboxRenderMethod = require("FakeSkyboxRenderMethod")
+local Observable = require("Observable")
 local SkyboxRenderPart = require("SkyboxRenderPart")
 local ValueObject = require("ValueObject")
 
@@ -69,6 +71,13 @@ function SkyboxSide.new(normal: Enum.NormalId): SkyboxSide
 	return self
 end
 
+function SkyboxSide.SetRenderMethod(
+	self: SkyboxSide,
+	renderMethod: ValueObject.Mountable<FakeSkyboxRenderMethod.FakeSkyboxRenderMethod>
+): () -> ()
+	return self._renderPart:SetRenderMethod(renderMethod)
+end
+
 function SkyboxSide.SetZOffset(self: SkyboxSide, zOffset: ValueObject.Mountable<number>): () -> ()
 	return self._renderPart:SetZOffset(zOffset)
 end
@@ -77,11 +86,21 @@ function SkyboxSide.SetSkyboxGradient(self: SkyboxSide, skyboxGradient: ValueObj
 	return self._skyboxGradient:Mount(skyboxGradient)
 end
 
-function SkyboxSide._observeImageGradientSequence(self): ValueObject.ValueObject<ColorSequence>
+function SkyboxSide._observeImageGradientSequence(self): Observable.Observable<ColorSequence?>
 	return Blend.Computed(
+		self._renderMode,
 		self._skyboxGradient,
 		self._normal,
-		function(skyboxGradient: ColorSequence, normal: Enum.NormalId): ColorSequence
+		function(
+			renderMode: FakeSkyboxRenderMethod.FakeSkyboxRenderMethod,
+			skyboxGradient: ColorSequence,
+			normal: Enum.NormalId
+		): ColorSequence
+			if renderMode == FakeSkyboxRenderMethod.DECAL then
+				-- Decal mode doesn't support gradient, so we just use the lowest color for tinting
+				return ColorSequence.new(ColorSequenceUtils.getColor(skyboxGradient, 0))
+			end
+
 			if normal == Enum.NormalId.Top then
 				return ColorSequence.new(ColorSequenceUtils.getColor(skyboxGradient, 1))
 			elseif normal == Enum.NormalId.Bottom then

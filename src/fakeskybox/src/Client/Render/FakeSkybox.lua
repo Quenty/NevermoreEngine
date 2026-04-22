@@ -13,6 +13,7 @@ local Workspace = game:GetService("Workspace")
 local BasicPane = require("BasicPane")
 local BasicPaneUtils = require("BasicPaneUtils")
 local Blend = require("Blend")
+local FakeSkyboxRenderMethod = require("FakeSkyboxRenderMethod")
 local Observable = require("Observable")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
@@ -48,6 +49,12 @@ local DEFAULT_SKY_DATA = table.freeze({
 	MoonTextureId = "rbxasset://sky/moon.jpg",
 })
 
+-- Can't really render the black image propery
+local DECAL_REPLACEMENTS = {
+	["rbxasset://sky/sun.jpg"] = "rbxassetid://6196665106",
+	["rbxasset://sky/moon.jpg"] = "rbxassetid://6444320592",
+}
+
 local CELESTRIAL_BODY_OFFSET_STUDS = 10
 local CELESTRIAL_BODY_MAX_DISTANCE_RENDER_HACK = 1000
 local CELESTRIAL_BODY_PART_DEPTH = 1
@@ -66,6 +73,8 @@ export type FakeSkybox =
 			_skyValue: ValueObject.ValueObject<Sky?>,
 			_atmosphereValue: ValueObject.ValueObject<Atmosphere?>,
 			_cameraValue: ValueObject.ValueObject<Camera?>,
+			_viewportLightingArgs: ValueObject.ValueObject<SunPositionUtils.ViewportLightingArgs>,
+			_renderMethod: ValueObject.ValueObject<FakeSkyboxRenderMethod.FakeSkyboxRenderMethod>,
 
 			-- Cache
 			_observeSkyboxCFrameCache: Observable.Observable<CFrame>?,
@@ -89,6 +98,10 @@ function FakeSkybox.new(): FakeSkybox
 	self._skyboxWidth = self._maid:Add(ValueObject.new(2000, "number")) -- We want 2,700 but we are limited by max size
 	self._skyboxZOffset = self._maid:Add(ValueObject.new(-700, "number")) -- This adds the extra 700
 	self._cameraValue = self._maid:Add(ValueObject.new(nil))
+	self._viewportLightingArgs =
+		self._maid:Add(ValueObject.fromObservable(SunPositionUtils.observeViewportLightingArgs()))
+	self._renderMethod =
+		self._maid:Add(ValueObject.new(FakeSkyboxRenderMethod.SURFACEGUI :: any, FakeSkyboxRenderMethod:GetInterface()))
 
 	self._maid:GiveTask(self:ObserveVisible():Subscribe(function(isVisible, doNotAnimate)
 		self._percentVisible:SetTarget(isVisible and 1 or 0, doNotAnimate)
@@ -117,8 +130,21 @@ function FakeSkybox.SetPartSize(self: FakeSkybox, skyboxWidth: ValueObject.Mount
 	return self._skyboxWidth:Mount(skyboxWidth)
 end
 
+--[=[
+	Sets the transition speed of the fake skybox
+]=]
 function FakeSkybox.SetSpeed(self: FakeSkybox, speed: number): ()
 	self._percentVisible:SetSpeed(speed)
+end
+
+--[=[
+	Sets the render method for the skybox parts
+]=]
+function FakeSkybox.SetRenderMethod(
+	self: FakeSkybox,
+	renderMethod: ValueObject.Mountable<FakeSkyboxRenderMethod.FakeSkyboxRenderMethod>
+): ()
+	return self._renderMethod:Mount(renderMethod)
 end
 
 --[=[
@@ -128,6 +154,9 @@ function FakeSkybox.SetSky(self: FakeSkybox, sky: ValueObject.Mountable<Sky?>?):
 	return self._skyValue:Mount(sky or self:_observeSkyFromLighting())
 end
 
+--[=[
+	Sets the atmosphere
+]=]
 function FakeSkybox.SetAtmosphere(self: FakeSkybox, atmosphere: ValueObject.Mountable<Atmosphere?>?): () -> ()
 	return self._atmosphereValue:Mount(atmosphere or self:_observeAtmosphereFromLighting())
 end
@@ -155,9 +184,17 @@ function FakeSkybox.SetCamera(self: FakeSkybox, camera: ValueObject.Mountable<Ca
 	return self._cameraValue:Mount(camera or self:_observeCurrentCamera())
 end
 
+function FakeSkybox.SetViewportLightingArgs(
+	self: FakeSkybox,
+	viewportLightingArgs: ValueObject.Mountable<SunPositionUtils.ViewportLightingArgs>
+): () -> ()
+	return self._viewportLightingArgs:Mount(viewportLightingArgs)
+end
+
 function FakeSkybox._renderSkyboxSides(self: FakeSkybox): ()
 	for normalId, propertyName in SKYBOX_PROPERTY_IMAGE_MAP do
 		local skyboxSide = self._maid:Add(SkyboxSide.new(normalId))
+		self._maid:Add(skyboxSide:SetRenderMethod(self._renderMethod:Observe()))
 		self._maid:Add(skyboxSide:SetTransparency(self:_observeTransparency()))
 		self._maid:Add(skyboxSide:SetPartSize(self._skyboxWidth:Observe()))
 		self._maid:Add(skyboxSide:SetImage(self:_observeImage(propertyName)))
@@ -178,6 +215,7 @@ function FakeSkybox._renderSun(self: FakeSkybox): ()
 	local observeSunState = self:_observeCelestrialBodyState("SunAngularSize")
 
 	local sunRender = self._maid:Add(SkyboxRenderPart.new())
+	sunRender:SetRenderMethod(self._renderMethod:Observe())
 	sunRender:SetCanvasSize(Vector2.new(256, 256)) -- TODO: Be smart about this
 	self._maid:Add(sunRender:SetBrightness(self:_observeBodyBrightness(observeSunState, function(state)
 		return SunPositionUtils.getSunImageBrightness(state.sunPositionData) * 10
@@ -196,7 +234,7 @@ function FakeSkybox._renderSun(self: FakeSkybox): ()
 					end
 				end) :: any,
 			}),
-			diffuseScale = RxInstanceUtils.observeProperty(Lighting, "EnvironmentDiffuseScale"),
+			viewportLightingArgs = self._viewportLightingArgs:Observe(),
 		}):Pipe({
 			Rx.map(function(state: any)
 				if not state.atmosphereDensity then
@@ -204,7 +242,7 @@ function FakeSkybox._renderSun(self: FakeSkybox): ()
 					return 1
 				end
 
-				return 1 + (state.atmosphereDensity * state.diffuseScale) / 2
+				return 1 + (state.atmosphereDensity * state.viewportLightingArgs.environmentDiffuseScale) / 2
 			end) :: any,
 		}) :: any
 	)))
@@ -224,6 +262,7 @@ function FakeSkybox._renderMoon(self: FakeSkybox): ()
 	end)
 
 	local moonRender = self._maid:Add(SkyboxRenderPart.new())
+	moonRender:SetRenderMethod(self._renderMethod:Observe())
 	moonRender:SetCanvasSize(Vector2.new(256, 256)) -- TODO: Be smart about this
 	self._maid:Add(moonRender:SetBrightness(observeMoonBrightness))
 	self._maid:Add(moonRender:SetTransparency(self:_observeTransparency()))
@@ -248,11 +287,8 @@ function FakeSkybox._observeSkyboxGradient(self: FakeSkybox): Observable.Observa
 		return self._observeSkyboxGradientCache
 	end
 
-	self._observeSkyboxGradientCache = Rx.combineLatest({
-		clockTime = RxInstanceUtils.observeProperty(Lighting, "ClockTime"),
-		environmentDiffuseScale = RxInstanceUtils.observeProperty(Lighting, "EnvironmentDiffuseScale"),
-	}):Pipe({
-		Rx.map(function(state)
+	self._observeSkyboxGradientCache = self._viewportLightingArgs:Observe():Pipe({
+		Rx.map(function(state: SunPositionUtils.ViewportLightingArgs)
 			return SunPositionUtils.getSkyboxGradient(state.clockTime, state.environmentDiffuseScale)
 		end) :: any,
 	}) :: any
@@ -279,11 +315,10 @@ end
 
 type CelestrialBodyState = {
 	sunPositionData: SunPositionUtils.SunPositionData,
+	viewportLightingArgs: SunPositionUtils.ViewportLightingArgs,
 	bodyAngularSizeDegrees: number?,
 	skyboxWidth: number,
-	brightness: number,
 	celestrialBodiesShown: boolean,
-	environmentDiffuseScale: number,
 }
 
 function FakeSkybox._observeCelestrialBodyState(
@@ -300,6 +335,7 @@ function FakeSkybox._observeCelestrialBodyState(
 				end
 			end) :: any,
 		}),
+		viewportLightingArgs = self._viewportLightingArgs:Observe(),
 		brightness = RxInstanceUtils.observeProperty(Lighting, "Brightness"),
 		skyboxWidth = self._skyboxWidth:Observe(),
 		celestrialBodiesShown = self._skyValue:Observe():Pipe({
@@ -326,13 +362,15 @@ function FakeSkybox._observeCelestialBodyPartSize(
 	return Rx.combineLatest({
 		bodyState = observeCelestrialBodyState,
 		sizeModifier = observeSizeModifier or 1,
+		renderMethod = self._renderMethod:Observe(),
 	}):Pipe({
 		Rx.map(function(state: any): Vector3?
 			if not state.bodyState.bodyAngularSizeDegrees or not state.bodyState.celestrialBodiesShown then
 				return Vector3.zero
 			end
 
-			local celestrialBodiesRadius = self:_getCelestrialBodiesRenderDistance(state.bodyState.skyboxWidth)
+			local celestrialBodiesRadius =
+				self:_getCelestrialBodiesRenderDistance(state.renderMethod, state.bodyState.skyboxWidth)
 			local celestrialBodyRadius = math.tan(math.rad(state.bodyState.bodyAngularSizeDegrees) / 2)
 				* celestrialBodiesRadius
 			local diameter = celestrialBodyRadius * 2
@@ -344,9 +382,24 @@ function FakeSkybox._observeCelestialBodyPartSize(
 	}) :: any
 end
 
-function FakeSkybox._getCelestrialBodiesRenderDistance(_self: FakeSkybox, skyboxWidth: number): number
+function FakeSkybox._getCelestrialBodiesRenderDistance(
+	_self: FakeSkybox,
+	renderMethod: FakeSkyboxRenderMethod.FakeSkyboxRenderMethod,
+	skyboxWidth: number
+): number
+	assert(FakeSkyboxRenderMethod:IsValue(renderMethod))
+
 	local radius = ((skyboxWidth / 2) - CELESTRIAL_BODY_OFFSET_STUDS)
+	if renderMethod == FakeSkyboxRenderMethod.DECAL then
+		-- Decals are rendered at a max distance, so we need to clamp the radius to avoid them disappearing
+		radius = radius / 4
+	end
+
 	return math.clamp(radius, 0, CELESTRIAL_BODY_MAX_DISTANCE_RENDER_HACK)
+end
+
+function FakeSkybox.ObserveBrightness(self: FakeSkybox): Observable.Observable<number>
+	return self:_observeSkyImageBrightness()
 end
 
 function FakeSkybox._observeCelestrialBodyCFrame(
@@ -356,6 +409,7 @@ function FakeSkybox._observeCelestrialBodyCFrame(
 ): Observable.Observable<CFrame>
 	return Rx.combineLatest({
 		bodyState = observeCelestrialBodyState,
+		renderMethod = self._renderMethod:Observe(),
 		celestrialSkyboxCFrame = self:_observeCelestrialSkyCFrame(),
 	}):Pipe({
 		Rx.map(function(state: any): CFrame
@@ -363,7 +417,8 @@ function FakeSkybox._observeCelestrialBodyCFrame(
 				return CFrame.identity
 			end
 
-			local celestrialBodiesRadius = self:_getCelestrialBodiesRenderDistance(state.bodyState.skyboxWidth)
+			local celestrialBodiesRadius =
+				self:_getCelestrialBodiesRenderDistance(state.renderMethod, state.bodyState.skyboxWidth)
 			local direction = state.bodyState.sunPositionData[positionType].Unit
 
 			local cframe: CFrame = state.celestrialSkyboxCFrame
@@ -401,16 +456,28 @@ function FakeSkybox._observeImage(self: FakeSkybox, propertyName: string): Obser
 		error("[FakeSkybox] - No default for property: " .. propertyName)
 	end
 
-	return self._skyValue:Observe():Pipe({
-		Rx.switchMap(function(sky): any
-			if sky then
-				return RxInstanceUtils.observeProperty(sky, propertyName):Pipe({
-					Rx.map(function(value)
-						return value or default
-					end) :: any,
-				})
+	return Rx.combineLatest({
+		renderMethod = self._renderMethod:Observe(),
+		imageValue = self._skyValue:Observe():Pipe({
+			Rx.switchMap(function(sky): any
+				if sky then
+					return RxInstanceUtils.observeProperty(sky, propertyName):Pipe({
+						Rx.map(function(value)
+							return value or default
+						end) :: any,
+					})
+				else
+					return Rx.of(default)
+				end
+			end) :: any,
+		}),
+	}):Pipe({
+		Rx.map(function(state)
+			if state.renderMethod == FakeSkyboxRenderMethod.DECAL and state.imageValue then
+				-- Decal mode doesn't support the sun/moon textures, so we replace them with a solid color texture
+				return DECAL_REPLACEMENTS[state.imageValue] or state.imageValue
 			else
-				return Rx.of(default)
+				return state.imageValue
 			end
 		end) :: any,
 	}) :: any

@@ -13,8 +13,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Lighting = game:GetService("Lighting")
+
 local Color3Utils = require("Color3Utils")
 local ColorSequenceUtils = require("ColorSequenceUtils")
+local GlobalLightSourceType = require("GlobalLightSourceType")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local SunPositionUtils = {}
 
@@ -126,7 +132,30 @@ end
 	A single float in `[0.1, 1.0]` that scales overall scene brightness. peaks at noon (`1.0`), bottoms out at midnight (`0.1`). derived directly from the sun's y position, which is itself just a function of clock time.
 ]=]
 function SunPositionUtils.getLightSourceBrightness(sunPositionData: SunPositionData): number
-	return math.clamp(math.map(sunPositionData.sunPosition.Y, -1, 1, 0.1, 1), 0.1, 1)
+	local lightSourceType = SunPositionUtils.getLightSourceType(sunPositionData)
+	if lightSourceType == GlobalLightSourceType.SUN then
+		return math.clamp(math.map(sunPositionData.sunPosition.Y, -1, 1, 0.1, 1), 0.1, 1)
+	elseif lightSourceType == GlobalLightSourceType.MOON then
+		return math.clamp(math.map(sunPositionData.moonPosition.Y, -1, 1, 0.1, 0.5), 0.1, 1)
+	else
+		error("Unknown light source type: " .. tostring(lightSourceType))
+	end
+end
+
+--[=[
+	Whether the sun or moon is the active light source. This is what actually tints shadows and direct illumination
+
+	@param sunPositionData SunPositionData
+	@return GlobalLightSourceType
+]=]
+function SunPositionUtils.getLightSourceType(
+	sunPositionData: SunPositionData
+): GlobalLightSourceType.GlobalLightSourceType
+	if sunPositionData.sunPosition.Y > -0.3 then
+		return GlobalLightSourceType.SUN
+	else
+		return GlobalLightSourceType.MOON
+	end
 end
 
 --[=[
@@ -136,10 +165,13 @@ end
 	@return Vector3
 ]=]
 function SunPositionUtils.getLightSourceDirection(sunPositionData: SunPositionData): Vector3
-	if sunPositionData.sunPosition.Y > -0.3 then
+	local lightSourceType = SunPositionUtils.getLightSourceType(sunPositionData)
+	if lightSourceType == GlobalLightSourceType.SUN then
 		return sunPositionData.sunPosition
-	else
+	elseif lightSourceType == GlobalLightSourceType.MOON then
 		return sunPositionData.moonPosition
+	else
+		error("Unknown light source type: " .. tostring(lightSourceType))
 	end
 end
 
@@ -227,7 +259,7 @@ end
 ]=]
 function SunPositionUtils.getSkyAmbientBottom(clockTime: number, environmentDiffuseScale: number): Color3
 	local midnight = 0.2 * environmentDiffuseScale
-	local dark = environmentDiffuseScale / 2
+	local dark = midnight / 2
 
 	local SKY_AMBIENT_SEQUENCE = ColorSequenceUtils.fromUnscaledTimesAndColors({
 		MIDNIGHT,
@@ -263,7 +295,7 @@ end
 ]=]
 function SunPositionUtils.getSkyAmbientTop(clockTime: number, environmentDiffuseScale: number): Color3
 	local moon = 0.2 * environmentDiffuseScale
-	local dark = environmentDiffuseScale / 2
+	local dark = moon / 2
 
 	local SKY_AMBIENT_2_SEQUENCE = ColorSequenceUtils.fromUnscaledTimesAndColors({
 		MIDNIGHT,
@@ -326,6 +358,113 @@ function SunPositionUtils.getSkyboxGradient(clockTime: number, environmentDiffus
 	local top = SunPositionUtils.getSkyAmbientTop(clockTime, environmentDiffuseScale)
 
 	return ColorSequence.new(bottom, top)
+end
+
+export type ViewportLighting = {
+	brightness: number, -- Should be applied to a surface gui
+	ambient: Color3,
+	lightColor: Color3,
+	lightDirection: Vector3,
+	backgroundColor3: Color3, -- Approximated sky color
+}
+
+export type ViewportLightingArgs = {
+	ambient: Color3,
+	outdoorAmbient: Color3,
+	clockTime: number,
+	brightness: number,
+	geoLatitude: number,
+	environmentDiffuseScale: number,
+	colorShiftTop: Color3,
+}
+
+--[=[
+	Compute viewport lighting to match Roblox lighting
+]=]
+function SunPositionUtils.computeViewportLighting(args: ViewportLightingArgs): ViewportLighting
+	local sunPositionData = SunPositionUtils.getSunPositionData(args.clockTime, args.geoLatitude)
+	local diffuseAmbient = SunPositionUtils.getDiffuseAmbient(sunPositionData.clockTime)
+
+	local ambient = SunPositionUtils._computeViewportAmbient(args, sunPositionData)
+	local lightColor = SunPositionUtils._computeViewportLightColor(args, ambient, sunPositionData)
+
+	return {
+		backgroundColor3 = diffuseAmbient,
+		brightness = args.brightness,
+		ambient = ambient,
+		lightColor = lightColor,
+		lightDirection = -SunPositionUtils.getLightSourceDirection(sunPositionData),
+	}
+end
+
+function SunPositionUtils._computeViewportLightColor(
+	args: ViewportLightingArgs,
+	computedAmbient: Color3,
+	sunPositionData: SunPositionData
+): Color3
+	local lightColor = SunPositionUtils.getLightColor(sunPositionData.clockTime)
+	local lightSourceBrightness = SunPositionUtils.getLightSourceBrightness(sunPositionData)
+	local ambientStrength = Color3Utils.length(computedAmbient)
+	local scaledLightColor = Color3Utils.multiplyScalar(lightColor, 0.9 * 0.5 * (args.brightness + ambientStrength))
+
+	local shiftedLight = SunPositionUtils._computeLightShift(
+		scaledLightColor,
+		Color3Utils.multiplyScalar(args.colorShiftTop, lightSourceBrightness),
+		args.environmentDiffuseScale
+	)
+
+	return Color3Utils.multiplyScalar(shiftedLight, lightSourceBrightness)
+end
+
+function SunPositionUtils._computeLightShift(lightColor: Color3, colorShiftTop: Color3, diffuseScale: number): Color3
+	local lightStrength = Color3Utils.length(lightColor)
+
+	local shiftBase = (colorShiftTop.R + colorShiftTop.G + colorShiftTop.B) / 3
+	local shift = Color3.new(colorShiftTop.R - shiftBase, colorShiftTop.G - shiftBase, colorShiftTop.B - shiftBase)
+	local baseline = Color3Utils.add(lightColor, Color3Utils.multiplyScalar(shift, lightStrength))
+
+	local shiftStrength = Color3Utils.length(shift)
+	local diffuseLight = lightColor:Lerp(Color3Utils.multiplyScalar(colorShiftTop, lightStrength), shiftStrength)
+
+	return baseline:Lerp(diffuseLight, diffuseScale)
+end
+
+function SunPositionUtils._computeViewportAmbient(args: ViewportLightingArgs, sunPositionData: SunPositionData): Color3
+	local diffuseAmbient = SunPositionUtils.getDiffuseAmbient(sunPositionData.clockTime)
+	local diffuseTotal = Color3Utils.multiplyScalar(diffuseAmbient, args.environmentDiffuseScale)
+
+	local blendedAmbient = Color3.new(
+		math.max(args.ambient.R, args.outdoorAmbient.R),
+		math.max(args.ambient.G, args.outdoorAmbient.G),
+		math.max(args.ambient.B, args.outdoorAmbient.B)
+	)
+
+	local ambient = Color3Utils.add(blendedAmbient, diffuseTotal)
+	return ambient
+end
+
+function SunPositionUtils.captureViewportLightingArgs(): ViewportLightingArgs
+	return {
+		ambient = Lighting.Ambient,
+		outdoorAmbient = Lighting.OutdoorAmbient,
+		clockTime = Lighting.ClockTime,
+		geoLatitude = Lighting.GeographicLatitude,
+		brightness = Lighting.Brightness,
+		environmentDiffuseScale = Lighting.EnvironmentDiffuseScale,
+		colorShiftTop = Lighting.ColorShift_Top,
+	}
+end
+
+function SunPositionUtils.observeViewportLightingArgs(): Observable.Observable<ViewportLightingArgs>
+	return Rx.combineLatest({
+		ambient = RxInstanceUtils.observeProperty(Lighting, "Ambient"),
+		outdoorAmbient = RxInstanceUtils.observeProperty(Lighting, "OutdoorAmbient"),
+		clockTime = RxInstanceUtils.observeProperty(Lighting, "ClockTime"),
+		geoLatitude = RxInstanceUtils.observeProperty(Lighting, "GeographicLatitude"),
+		brightness = RxInstanceUtils.observeProperty(Lighting, "Brightness"),
+		environmentDiffuseScale = RxInstanceUtils.observeProperty(Lighting, "EnvironmentDiffuseScale"),
+		colorShiftTop = RxInstanceUtils.observeProperty(Lighting, "ColorShift_Top"),
+	}) :: any
 end
 
 return SunPositionUtils

@@ -164,4 +164,20 @@ function Color3Utils.max(color: Color3, other: Color3): Color3
 	return Color3.new(math.max(color.R, other.R), math.max(color.G, other.G), math.max(color.B, other.B))
 end
 
+function Color3Utils.multiplyScalar(color: Color3, scalar: number): Color3
+	return Color3.new(color.R * scalar, color.G * scalar, color.B * scalar)
+end
+
+function Color3Utils.addScalar(color: Color3, scalar: number): Color3
+	return Color3.new(color.R + scalar, color.G + scalar, color.B + scalar)
+end
+
+function Color3Utils.add(color: Color3, other: Color3): Color3
+	return Color3.new(color.R + other.R, color.G + other.G, color.B + other.B)
+end
+
+function Color3Utils.length(color: Color3): number
+	return math.sqrt(color.R * color.R + color.G * color.G + color.B * color.B)
+end
+
 return Color3Utils

@@ -29,7 +29,7 @@ function Brine.serialize(data: Instance, options: BrineTypes.BrineOptions?): (Br
 
 	local stream, references = BufferEncoder.write(ensuredIntermediate, nil, {
 		allowdeduplication = true,
-		allowreferences = false,
+		allowreferences = true,
 	})
 
 	stream = EncodingService:CompressBuffer(stream, Enum.CompressionAlgorithm.Zstd, COMPRESSION_LEVEL)
@@ -45,7 +45,7 @@ function Brine.deserialize(data: BrineTypes.Brined, options: BrineTypes.BrineOpt
 
 	local intermediate = BufferEncoder.read(stream, nil, {
 		allowdeduplication = true,
-		allowreferences = false,
+		allowreferences = true,
 		references = safeOptions.references,
 	})
 

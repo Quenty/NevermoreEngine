@@ -15,6 +15,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local Blend = require("Blend")
 local FakeSkybox = require("FakeSkybox")
+local FakeSkyboxRenderMethod = require("FakeSkyboxRenderMethod")
 local Observable = require("Observable")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
@@ -40,6 +41,7 @@ local skybox = FakeSkybox.new()
 skybox.Gui.Parent = workspace.CurrentCamera
 skybox:SetSpeed(10)
 skybox:Show(true)
+skybox:SetRenderMethod(FakeSkyboxRenderMethod.DECAL)
 
 type Props = {
 	Text: string,

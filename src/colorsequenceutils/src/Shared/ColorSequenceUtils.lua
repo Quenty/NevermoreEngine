@@ -82,6 +82,32 @@ function ColorSequenceUtils.getSingleColorInSequence(colorSequence: ColorSequenc
 	return firstColor
 end
 
+function ColorSequenceUtils.getAverageColor(colorSequence: ColorSequence): Color3
+	assert(typeof(colorSequence) == "ColorSequence", "Bad colorSequence")
+	local keypoints = colorSequence.Keypoints
+	assert(#keypoints > 0, "Color sequence must have at least one keypoint")
+
+	if #keypoints == 1 then
+		return keypoints[1].Value
+	end
+
+	local totalR = 0
+	local totalG = 0
+	local totalB = 0
+
+	for i = 2, #keypoints do
+		local prev = keypoints[i - 1]
+		local curr = keypoints[i]
+		local dt = curr.Time - prev.Time
+
+		totalR = totalR + (prev.Value.R + curr.Value.R) * 0.5 * dt
+		totalG = totalG + (prev.Value.G + curr.Value.G) * 0.5 * dt
+		totalB = totalB + (prev.Value.B + curr.Value.B) * 0.5 * dt
+	end
+
+	return Color3.new(totalR, totalG, totalB)
+end
+
 --[=[
 	Makes stripes for color sequences.
 
