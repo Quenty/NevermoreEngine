@@ -1,24 +1,23 @@
-# v10.45.0 (Wed Apr 22 2026)
-
-#### 🚀 Enhancement
-
-- feat: RogueHumanoidInterface [#681](https://github.com/Quenty/NevermoreEngine/pull/681) ([@alex-y-z](https://github.com/alex-y-z))
-- feat: RogueHumanoidInterface ([@alex-y-z](https://github.com/alex-y-z))
-
-#### 🐛 Bug Fix
-
-- fix: Dependency ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.44.0...@quenty/rogue-humanoid@10.45.0) (2026-04-22)
+
+
+### Bug Fixes
+
+* Dependency ([15b55c8](https://github.com/Quenty/NevermoreEngine/commit/15b55c8ec0bbad7bb650684fd496545e77c665c3))
+
+
+### Features
+
+* RogueHumanoidInterface ([d5caa44](https://github.com/Quenty/NevermoreEngine/commit/d5caa4446e69b132626f1094f17400666a5380bc))
+
+
+
+
 
 # [10.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.43.0...@quenty/rogue-humanoid@10.44.0) (2026-04-14)
 
