@@ -86,6 +86,20 @@ function RogueHumanoidBase.new(humanoid: Humanoid, serviceBag: ServiceBag.Servic
 	return self
 end
 
+function RogueHumanoidBase:CreateMultiplier(property: string, amount: number, source: Instance?): ValueBase
+	local rogueProperty = assert(self._properties:GetRogueProperty(property), "Bad property")
+	assert(type(rogueProperty.Value) == "number", "Incompatible property")
+
+	return rogueProperty:CreateMultiplier(amount, source)
+end
+
+function RogueHumanoidBase:CreateAdditive(property: string, amount: number, source: Instance?): ValueBase
+	local rogueProperty = assert(self._properties:GetRogueProperty(property), "Bad property")
+	assert(type(rogueProperty.Value) == "number", "Incompatible property")
+
+	return rogueProperty:CreateAdditive(amount, source)
+end
+
 function RogueHumanoidBase:_setupScaling()
 	self._maid:GiveTask(self._scaleState
 		:Observe()
