@@ -1608,7 +1608,6 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		-- Skip: didAddOrRemoveNodes triggers array-shift logic even when count is unchanged
 		it.skip("should not fire ObserveAtIndex for distant indices when replacing at same position", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
@@ -1646,7 +1645,6 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		-- Skip: nodesAdded/nodesRemoved non-empty triggers broad range iteration even with no net change
 		it.skip("should not fire ObserveIndexByKey for unaffected nodes when replacing at same position", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
@@ -1686,5 +1684,117 @@ describe("ObservableSortedList", function()
 			subE:Destroy()
 			maid:Destroy()
 		end)
+
+		it.skip(
+			"should fire ObserveAtIndex for shifted indices when removing and adding at different positions",
+			function()
+				local maid = Maid.new()
+				local list = maid:Add(ObservableSortedList.new())
+
+				list:Add("a", 1)
+				local removeB = list:Add("b", 2)
+				list:Add("c", 3)
+				list:Add("d", 4)
+				list:Add("e", 5)
+				StepUtils.deferWait()
+
+				-- Observe index 3 (currently "c")
+				local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+				expect(#fires3).toEqual(1)
+				expect(fires3[1]).toEqual("c")
+
+				-- Remove b (index 2), add f at index 4. Count unchanged, but index 3 shifts: c was at 3, now d is at 3
+				removeB()
+				list:Add("f", 4.5)
+				StepUtils.deferWait()
+
+				-- List is now: a, c, d, f, e
+				expect(list:GetList()).toEqual({ "a", "c", "d", "f", "e" })
+
+				-- Index 3 changed from "c" to "d" — must fire
+				expect(#fires3).toEqual(2)
+				expect(fires3[2]).toEqual("d")
+
+				sub3:Destroy()
+				maid:Destroy()
+			end
+		)
+
+		it.skip(
+			"should fire ObserveIndexByKey for shifted nodes when removing and adding at different positions",
+			function()
+				local maid = Maid.new()
+				local list = maid:Add(ObservableSortedList.new())
+
+				list:Add("a", 1)
+				local removeB = list:Add("b", 2)
+				list:Add("c", 3)
+				list:Add("d", 4)
+				list:Add("e", 5)
+				StepUtils.deferWait()
+
+				local nodeC = list:FindFirstKey("c")
+				local nodeD = list:FindFirstKey("d")
+				assert(nodeC and nodeD, "Expected nodes")
+
+				local firesC, subC = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeC))
+				local firesD, subD = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeD))
+
+				expect(firesC[1]).toEqual(3)
+				expect(firesD[1]).toEqual(4)
+
+				-- Remove b (index 2), add f at index 4.5. Count unchanged, but c shifts 3->2, d shifts 4->3
+				removeB()
+				list:Add("f", 4.5)
+				StepUtils.deferWait()
+
+				-- List is now: a, c, d, f, e
+				expect(list:GetList()).toEqual({ "a", "c", "d", "f", "e" })
+
+				-- C shifted 3->2, D shifted 4->3
+				expect(#firesC).toEqual(2)
+				expect(firesC[2]).toEqual(2)
+				expect(#firesD).toEqual(2)
+				expect(firesD[2]).toEqual(3)
+
+				subC:Destroy()
+				subD:Destroy()
+				maid:Destroy()
+			end
+		)
+
+		it.skip(
+			"should fire ObserveAtIndex correctly when removing two and adding two at different positions",
+			function()
+				local maid = Maid.new()
+				local list = maid:Add(ObservableSortedList.new())
+
+				list:Add("a", 1)
+				local removeB = list:Add("b", 2)
+				list:Add("c", 3)
+				local removeD = list:Add("d", 4)
+				list:Add("e", 5)
+				StepUtils.deferWait()
+
+				local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+				expect(fires3[1]).toEqual("c")
+
+				-- Remove b (index 2) and d (index 4), add f (1.5) and g (4.5). Count unchanged.
+				removeB()
+				removeD()
+				list:Add("f", 1.5)
+				list:Add("g", 4.5)
+				StepUtils.deferWait()
+
+				-- List: f, a, c, g, e
+				expect(list:GetList()).toEqual({ "f", "a", "c", "g", "e" })
+
+				-- Index 3 still has "c" — should not fire extra
+				expect(#fires3).toEqual(1)
+
+				sub3:Destroy()
+				maid:Destroy()
+			end
+		)
 	end)
 end)

@@ -622,7 +622,7 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 
 	-- We assume there could be a lot of node index observers at once (used for layout order)
 	if self._nodeIndexObservables:HasAnySubscriptions() then
-		if next(nodesAdded) or next(nodesRemoved) then
+		if didAddOrRemoveNodes then
 			local lowestChangedIndex: number? = changedSpans[1] and changedSpans[1].startIndex
 			assert(lowestChangedIndex ~= nil, "Bad changed spans")
 
