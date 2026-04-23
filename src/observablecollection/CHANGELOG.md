@@ -1,3 +1,29 @@
+# v12.36.0 (Thu Apr 23 2026)
+
+#### 🚀 Enhancement
+
+- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Fix styling and test calls ([@Quenty](https://github.com/Quenty))
+- test: Fix testing requirements ([@Quenty](https://github.com/Quenty))
+- fix: Use unified change span tracker ([@Quenty](https://github.com/Quenty))
+- fix: Track changed removed and added spans which reduces our total effective spans ([@Quenty](https://github.com/Quenty))
+- test: Fix tests to run in root so if you rojo-serve them (or they run in batch mode) they don't fail. ([@Quenty](https://github.com/Quenty))
+- test: Add more tests covering empty triggers ([@Quenty](https://github.com/Quenty))
+- test: Fix tests expecting nil values ([@Quenty](https://github.com/Quenty))
+- fix: Fix sorted node preservation ([@Quenty](https://github.com/Quenty))
+- fix: Changed spans firing behavior ([@Quenty](https://github.com/Quenty))
+- fix: ChangedSpanTracker merges overlapping spans properly ([@Quenty](https://github.com/Quenty))
+- test: Add observable sorted lists comprehensive unit testing, identifying failures as needed ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

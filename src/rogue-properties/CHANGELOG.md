@@ -1,3 +1,19 @@
+# v11.43.0 (Thu Apr 23 2026)
+
+#### 🚀 Enhancement
+
+- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test: Fix tests to run in root so if you rojo-serve them (or they run in batch mode) they don't fail. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

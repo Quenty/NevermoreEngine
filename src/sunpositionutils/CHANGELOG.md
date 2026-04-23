@@ -1,3 +1,21 @@
+# v2.5.0 (Thu Apr 23 2026)
+
+#### 🚀 Enhancement
+
+- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
+- feat: Additional improvments ([@Quenty](https://github.com/Quenty))
+- feat: Upgrade dependent libraries with new functionality ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix dependencies list ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
