@@ -10,25 +10,26 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Promise = require("Promise")
 local RobloxApiClass = require("RobloxApiClass")
+local RobloxApiDataTypes = require("RobloxApiDataTypes")
 local RobloxApiDumpConstants = require("RobloxApiDumpConstants")
 local RobloxApiMember = require("RobloxApiMember")
-local RobloxApiUtils = require("RobloxApiUtils")
 
 local RobloxApiDump = setmetatable({}, BaseObject)
 RobloxApiDump.ClassName = "RobloxApiDump"
 RobloxApiDump.__index = RobloxApiDump
 
+export type PromiseDumpCallback = () -> Promise.Promise<RobloxApiDataTypes.RobloxApiDumpData>
+
 export type RobloxApiDump =
 	typeof(setmetatable(
 		{} :: {
-			_classMemberPromises: { [string]: Promise.Promise<()> },
-			_ancestorListPromise: { [string]: Promise.Promise<()> },
-			_classPromises: { [string]: Promise.Promise<()> },
-			_classMapPromise: Promise.Promise<()>?,
-			_dumpPromise: Promise.Promise<()>?,
+			_classMemberPromises: { [string]: Promise.Promise<{ RobloxApiMember.RobloxApiMember }> },
+			_ancestorListPromise: { [string]: Promise.Promise<{ RobloxApiDataTypes.ClassData }> },
+			_classPromises: { [string]: Promise.Promise<RobloxApiClass.RobloxApiClass> },
+			_classMapPromise: Promise.Promise<RobloxApiDataTypes.ClassMap>?,
+			_dumpPromiseCallback: PromiseDumpCallback,
+			_dumpPromiseCache: Promise.Promise<RobloxApiDataTypes.RobloxApiDumpData>?,
 			_className: string,
-			_obj: Instance?,
-			_maid: any,
 		},
 		{} :: typeof({ __index = RobloxApiDump })
 	))
@@ -38,12 +39,15 @@ export type RobloxApiDump =
 	Constructs a new RobloxApiDump which will cache all results for its lifetime.
 	@return RobloxApiDump
 ]=]
-function RobloxApiDump.new(): RobloxApiDump
+function RobloxApiDump.new(promiseDumpCallback: PromiseDumpCallback): RobloxApiDump
+	assert(promiseDumpCallback, "Must provide promiseDumpCallback")
+
 	local self: RobloxApiDump = setmetatable(BaseObject.new() :: any, RobloxApiDump)
 
 	self._classMemberPromises = {}
 	self._ancestorListPromise = {}
 	self._classPromises = {}
+	self._dumpPromiseCallback = promiseDumpCallback
 
 	return self
 end
@@ -53,7 +57,10 @@ end
 	@param className string
 	@return RobloxApiClass
 ]=]
-function RobloxApiDump:PromiseClass(className: string): Promise.Promise<RobloxApiClass.RobloxApiClass>
+function RobloxApiDump.PromiseClass(
+	self: RobloxApiDump,
+	className: string
+): Promise.Promise<RobloxApiClass.RobloxApiClass>
 	assert(type(className) == "string", "Bad className")
 
 	if self._classPromises[className] then
@@ -72,7 +79,10 @@ end
 	@param className string
 	@return { RobloxApiMember }
 ]=]
-function RobloxApiDump:PromiseMembers(className: string): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
+function RobloxApiDump.PromiseMembers(
+	self: RobloxApiDump,
+	className: string
+): Promise.Promise<{ RobloxApiMember.RobloxApiMember }>
 	assert(type(className) == "string", "Bad className")
 
 	if self._classMemberPromises[className] then
@@ -95,7 +105,10 @@ function RobloxApiDump:PromiseMembers(className: string): Promise.Promise<{ Robl
 	return self._classMemberPromises[className]
 end
 
-function RobloxApiDump:_promiseClassDataAndAncestorList(className: string)
+function RobloxApiDump._promiseClassDataAndAncestorList(
+	self: RobloxApiDump,
+	className: string
+): Promise.Promise<{ RobloxApiDataTypes.ClassData }>
 	assert(type(className) == "string", "Bad className")
 
 	if self._ancestorListPromise[className] then
@@ -129,7 +142,10 @@ function RobloxApiDump:_promiseClassDataAndAncestorList(className: string)
 	return self._ancestorListPromise[className]
 end
 
-function RobloxApiDump:_promiseRawClassData(className: string)
+function RobloxApiDump._promiseRawClassData(
+	self: RobloxApiDump,
+	className: string
+): Promise.Promise<RobloxApiDataTypes.ClassData>
 	assert(type(className) == "string", "Bad className")
 
 	return self:_promiseClassMap():Then(function(classMap)
@@ -142,12 +158,12 @@ function RobloxApiDump:_promiseRawClassData(className: string)
 	end)
 end
 
-function RobloxApiDump:_promiseClassMap()
+function RobloxApiDump._promiseClassMap(self: RobloxApiDump): Promise.Promise<RobloxApiDataTypes.ClassMap>
 	if self._classMapPromise then
 		return self._classMapPromise
 	end
 
-	self._classMapPromise = self:_promiseDump():Then(function(dump)
+	self._classMapPromise = self:PromiseRawDump():Then(function(dump)
 		assert(dump.Version == 1, "Only able to parse version 1 of the dump")
 
 		local classMap = {}
@@ -165,17 +181,20 @@ function RobloxApiDump:_promiseClassMap()
 
 		return classMap
 	end)
+	assert(self._classMapPromise, "Typechecking assetion")
 
 	return self._classMapPromise
 end
 
-function RobloxApiDump:_promiseDump()
-	if self._dumpPromise then
-		return self._dumpPromise
+function RobloxApiDump.PromiseRawDump(self: RobloxApiDump): Promise.Promise<RobloxApiDataTypes.RobloxApiDumpData>
+	if self._dumpPromiseCache then
+		return self._dumpPromiseCache
 	end
 
-	self._dumpPromise = RobloxApiUtils.promiseDump()
-	return self._maid:GivePromise(self._dumpPromise)
+	self._dumpPromiseCache = self._maid:GivePromise(self._dumpPromiseCallback())
+	assert(self._dumpPromiseCache, "Typechecking assertion")
+
+	return self._dumpPromiseCache
 end
 
 return RobloxApiDump

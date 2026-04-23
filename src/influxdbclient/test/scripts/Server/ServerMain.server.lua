@@ -5,12 +5,13 @@
 
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local require = require(loader).bootstrapGame(ServerScriptService.influxdbclient)
+local root = ServerScriptService.influxdbclient
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.influxdbclient) then
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
 	return
 end
 

@@ -35,6 +35,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quenty/rxsignal": "workspace:*"
+    "@quenty/rxsignal": "workspace:*",
+    "@quenty/uiobjectutils": "workspace:*"
   }
 }

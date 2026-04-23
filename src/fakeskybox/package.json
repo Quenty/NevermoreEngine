@@ -29,9 +29,22 @@
   ],
   "dependencies": {
     "@quenty/acceltween": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/basicpane": "workspace:*",
+    "@quenty/blend": "workspace:*",
+    "@quenty/colorsequenceutils": "workspace:*",
+    "@quenty/enums": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
-    "@quenty/signal": "workspace:*"
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quenty/sunpositionutils": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

@@ -4,12 +4,13 @@
 ]]
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local require = require(loader).bootstrapGame(ServerScriptService["settings-inputkeymap"])
+local root = ServerScriptService["settings-inputkeymap"]
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService["settings-inputkeymap"]) then
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
 	return
 end
 
