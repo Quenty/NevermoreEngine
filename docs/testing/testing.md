@@ -14,7 +14,7 @@ Test files must end in `.spec.lua` and live alongside the code they test (e.g. `
 ### Example test
 
 ```luau
---!nonstrict
+--!strict
 --[[
 	@class MyUtils.spec.lua
 ]]
@@ -36,6 +36,34 @@ describe("MyUtils", function()
 	end)
 end)
 ```
+
+### jest.config.lua
+
+Every testable package needs a `jest.config.lua` in its `src/` directory. This tells the test runner to discover `.spec` files:
+
+```luau
+return {
+	testMatch = { "**/*.spec" },
+}
+```
+
+### Migration from TestEZ to Jest
+
+Legacy tests use the TestEZ pattern (`return function()` wrapper, `.to.equal()` matchers). New tests should use the explicit Jest pattern. Key differences:
+
+| TestEZ (old) | Jest (new) |
+|---|---|
+| `--!nonstrict` | `--!strict` |
+| No `Jest` require | `local Jest = require("Jest")` |
+| Implicit `describe`/`it`/`expect` globals | Extract from `Jest.Globals` |
+| `return function() ... end` wrapper | Top-level `describe()` (no wrapper) |
+| `expect(x).to.equal(y)` | `expect(x).toEqual(y)` |
+| `expect(x).to.be.ok()` | `expect(x).toBeTruthy()` |
+| `expect(x).to.be.near(y, 1e-3)` | `expect(x).toBeCloseTo(y, 3)` |
+| `expect(fn).to.throw()` | `expect(fn).toThrow()` |
+| `expect(x).never.to.equal(y)` | `expect(x).never.toEqual(y)` |
+
+Note: `toBeCloseTo(value, numDigits)` takes the number of decimal digits of precision (e.g. `3` means `1e-3` tolerance), not an absolute epsilon.
 
 ## Setting up a package for testing
 
@@ -108,12 +136,15 @@ The script template is executed via Open Cloud (or locally via studio-bridge). I
 
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local require = require(loader).bootstrapGame(ServerScriptService.mypackage)
+local root = ServerScriptService.mypackage
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.mypackage)
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
+	return
+end
 ```
 
 Replace `mypackage` with the key used in your Rojo project tree.
