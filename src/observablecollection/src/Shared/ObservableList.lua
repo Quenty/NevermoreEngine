@@ -324,6 +324,21 @@ function ObservableList.Get<T>(self: ObservableList<T>, index: number): T?
 end
 
 --[=[
+	Checks if the list contains a value
+	@param value T
+	@return boolean
+]=]
+function ObservableList.Contains<T>(self: ObservableList<T>, value: T): boolean
+	for _, item in self._contents do
+		if item == value then
+			return true
+		end
+	end
+
+	return false
+end
+
+--[=[
 	Adds the item to the list at the specified index
 	@param item T
 	@param index number?
