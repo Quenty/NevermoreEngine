@@ -1,23 +1,15 @@
-# v7.46.0 (Thu Apr 23 2026)
-
-#### 🚀 Enhancement
-
-- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Fix tests to run in root so if you rojo-serve them (or they run in batch mode) they don't fail. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.45.0...@quenty/secrets@7.46.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/secrets
+
+
+
+
 
 # [7.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.44.0...@quenty/secrets@7.45.0) (2026-04-15)
 

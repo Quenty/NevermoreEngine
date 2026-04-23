@@ -1,23 +1,15 @@
-# v10.18.0 (Thu Apr 23 2026)
-
-#### 🚀 Enhancement
-
-- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Fix tests and styling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.17.0...@quenty/promise@10.18.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/promise
+
+
+
+
 
 # [10.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.16.0...@quenty/promise@10.17.0) (2026-04-14)
 

@@ -1,24 +1,18 @@
-# v14.41.0 (Thu Apr 23 2026)
-
-#### 🚀 Enhancement
-
-- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies list ([@Quenty](https://github.com/Quenty))
-- test: Fix tests to run in root so if you rojo-serve them (or they run in batch mode) they don't fail. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.40.0...@quenty/inputkeymaputils@14.41.0) (2026-04-23)
+
+
+### Bug Fixes
+
+* Fix dependencies list ([776b270](https://github.com/Quenty/NevermoreEngine/commit/776b2700b97d877b70c487d2f47092bacc373e7a))
+
+
+
+
 
 # [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.39.0...@quenty/inputkeymaputils@14.40.0) (2026-04-14)
 

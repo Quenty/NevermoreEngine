@@ -1,33 +1,22 @@
-# v12.36.0 (Thu Apr 23 2026)
-
-#### 🚀 Enhancement
-
-- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling and test calls ([@Quenty](https://github.com/Quenty))
-- test: Fix testing requirements ([@Quenty](https://github.com/Quenty))
-- fix: Use unified change span tracker ([@Quenty](https://github.com/Quenty))
-- fix: Track changed removed and added spans which reduces our total effective spans ([@Quenty](https://github.com/Quenty))
-- test: Fix tests to run in root so if you rojo-serve them (or they run in batch mode) they don't fail. ([@Quenty](https://github.com/Quenty))
-- test: Add more tests covering empty triggers ([@Quenty](https://github.com/Quenty))
-- test: Fix tests expecting nil values ([@Quenty](https://github.com/Quenty))
-- fix: Fix sorted node preservation ([@Quenty](https://github.com/Quenty))
-- fix: Changed spans firing behavior ([@Quenty](https://github.com/Quenty))
-- fix: ChangedSpanTracker merges overlapping spans properly ([@Quenty](https://github.com/Quenty))
-- test: Add observable sorted lists comprehensive unit testing, identifying failures as needed ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.35.0...@quenty/observablecollection@12.36.0) (2026-04-23)
+
+
+### Bug Fixes
+
+* Changed spans firing behavior ([e2c600f](https://github.com/Quenty/NevermoreEngine/commit/e2c600f937260dcce95ae8a1c8d914a1a481f750))
+* ChangedSpanTracker merges overlapping spans properly ([18fbb3a](https://github.com/Quenty/NevermoreEngine/commit/18fbb3aa83c6d82a18f07c7d60b0b742d4b802df))
+* Fix sorted node preservation ([cc1342b](https://github.com/Quenty/NevermoreEngine/commit/cc1342b87642c1e1c60c36ef34fb5993d9c19268))
+* Track changed removed and added spans which reduces our total effective spans ([54454db](https://github.com/Quenty/NevermoreEngine/commit/54454db643ba4c8cd7214f012c57e2781fa2372c))
+* Use unified change span tracker ([9fc9ef6](https://github.com/Quenty/NevermoreEngine/commit/9fc9ef68c6f9d3aa71ea92c2b5a6f4285e99733f))
+
+
+
+
 
 # [12.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.34.0...@quenty/observablecollection@12.35.0) (2026-04-14)
 

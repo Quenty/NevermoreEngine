@@ -1,21 +1,19 @@
-# v7.11.0 (Thu Apr 23 2026)
-
-#### 🚀 Enhancement
-
-- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
-- feat: Additional improvments ([@Quenty](https://github.com/Quenty))
-- feat: Upgrade dependent libraries with new functionality ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@7.10.0...@quenty/colorsequenceutils@7.11.0) (2026-04-23)
+
+
+### Features
+
+* Additional improvments ([44896ef](https://github.com/Quenty/NevermoreEngine/commit/44896efe8dd9506ad6002bc41f816b9b2b482ebc))
+* Upgrade dependent libraries with new functionality ([22e8c9e](https://github.com/Quenty/NevermoreEngine/commit/22e8c9e3c3dd7288dd264f00c98852653b40a402))
+
+
+
+
 
 # [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@7.9.3...@quenty/colorsequenceutils@7.10.0) (2026-02-17)
 

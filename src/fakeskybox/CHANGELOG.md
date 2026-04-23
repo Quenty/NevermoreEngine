@@ -1,25 +1,19 @@
-# v11.16.0 (Thu Apr 23 2026)
-
-#### 🚀 Enhancement
-
-- Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
-- feat: Additional improvments ([@Quenty](https://github.com/Quenty))
-- feat: Add fake skybox support ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Fix tests and styling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.15.0...@quenty/fakeskybox@11.16.0) (2026-04-23)
+
+
+### Features
+
+* Add fake skybox support ([2c6a1ed](https://github.com/Quenty/NevermoreEngine/commit/2c6a1ed6ed6a4897aab6f9e04e4a3b55b246603d))
+* Additional improvments ([44896ef](https://github.com/Quenty/NevermoreEngine/commit/44896efe8dd9506ad6002bc41f816b9b2b482ebc))
+
+
+
+
 
 # [11.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.14.0...@quenty/fakeskybox@11.15.0) (2026-02-20)
 

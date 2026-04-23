@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rectutils@1.4.0...@quenty/rectutils@1.5.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/rectutils
+
+
+
+
+
 # [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rectutils@1.3.3...@quenty/rectutils@1.4.0) (2026-02-17)
 
 

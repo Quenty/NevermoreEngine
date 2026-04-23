@@ -1,3 +1,20 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2026-04-23)
+
+
+### Features
+
+* Add initial brine library ([2fe6950](https://github.com/Quenty/NevermoreEngine/commit/2fe6950c3032a254f5812ca95cf368d1aa8c5861))
+* Additional improvments ([44896ef](https://github.com/Quenty/NevermoreEngine/commit/44896efe8dd9506ad6002bc41f816b9b2b482ebc))
+
+
+
+
+
 # v1.1.0 (Thu Apr 23 2026)
 
 #### 🚀 Enhancement
