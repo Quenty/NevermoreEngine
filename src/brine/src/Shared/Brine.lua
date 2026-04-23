@@ -20,6 +20,13 @@ local COMPRESSION_LEVEL = 8 -- 1 is fastest, 22 is slowest
 
 local Brine = {}
 
+--[=[
+	Serializes an instance into a string, with optional references
+
+	@param data Instance
+	@param options BrineOptions?
+	@return Brined, References?
+]=]
 function Brine.serialize(data: Instance, options: BrineTypes.BrineOptions?): (BrineTypes.Brined, BrineTypes.References?)
 	local safeOptions = BrineOptionUtils.defaultOptions(options)
 	local context = BrineContext.new(safeOptions)
@@ -37,6 +44,13 @@ function Brine.serialize(data: Instance, options: BrineTypes.BrineOptions?): (Br
 	return buffer.tostring(stream), references
 end
 
+--[=[
+	Deserializes a string into an instance, with optional references
+
+	@param data Brined
+	@param options BrineOptions?
+	@return Instance?
+]=]
 function Brine.deserialize(data: BrineTypes.Brined, options: BrineTypes.BrineOptions?): Instance?
 	local safeOptions = BrineOptionUtils.defaultOptions(options)
 	local context = BrineContext.new(safeOptions)
