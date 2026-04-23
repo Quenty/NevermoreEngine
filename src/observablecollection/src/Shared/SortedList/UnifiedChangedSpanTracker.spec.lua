@@ -7,7 +7,6 @@ local require = (require :: any)(
 		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
 	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
 
-local ChangedSpanTracker = require("ChangedSpanTracker")
 local Jest = require("Jest")
 local UnifiedChangedSpanTracker = require("UnifiedChangedSpanTracker")
 
@@ -31,10 +30,10 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(3, 4)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
 		end)
 
 		it("should only cover the added index when adding at end", function()
@@ -43,10 +42,10 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(3, 4)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
 		end)
 
 		it("should cover entire shifted range when adding three at beginning", function()
@@ -58,7 +57,7 @@ describe("UnifiedChangedSpanTracker", function()
 			local result = tracker:ComputeEffectiveSpans(3, 6)
 
 			for i = 1, 6 do
-				expect(ChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
 			end
 		end)
 	end)
@@ -70,10 +69,10 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(4, 3)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
 		end)
 
 		it("should only cover the removed index when removing from end", function()
@@ -82,10 +81,10 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(4, 3)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
 		end)
 
 		it("should cover all indices when removing from beginning", function()
@@ -95,7 +94,7 @@ describe("UnifiedChangedSpanTracker", function()
 			local result = tracker:ComputeEffectiveSpans(4, 3)
 
 			for i = 1, 4 do
-				expect(ChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
 			end
 		end)
 
@@ -106,9 +105,9 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 3)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
 			for i = 2, 5 do
-				expect(ChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
 			end
 		end)
 
@@ -120,11 +119,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(7, 4)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
 			for i = 4, 7 do
-				expect(ChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
 			end
 		end)
 
@@ -137,7 +136,7 @@ describe("UnifiedChangedSpanTracker", function()
 			local result = tracker:ComputeEffectiveSpans(5, 2)
 
 			for i = 1, 5 do
-				expect(ChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
 			end
 		end)
 
@@ -148,11 +147,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 3)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
 		end)
 	end)
 
@@ -163,11 +162,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(false)
 		end)
 
 		it("should cover entire list for a resort from start to end", function()
@@ -177,7 +176,7 @@ describe("UnifiedChangedSpanTracker", function()
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
 			for i = 1, 5 do
-				expect(ChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
 			end
 		end)
 
@@ -187,9 +186,9 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
 		end)
 	end)
 
@@ -201,10 +200,10 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(4, 4)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
 		end)
 
 		it("should cover the range between remove and add positions", function()
@@ -214,11 +213,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(false)
 		end)
 
 		it("should cover range when removing two and adding two at different positions", function()
@@ -231,11 +230,11 @@ describe("UnifiedChangedSpanTracker", function()
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
 			-- Index 3 stays as item c, so it's not dirty
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(false)
 		end)
 
 		it("should cover full range between distant remove and add when count is unchanged", function()
@@ -246,7 +245,7 @@ describe("UnifiedChangedSpanTracker", function()
 			local result = tracker:ComputeEffectiveSpans(10, 10)
 
 			for i = 1, 10 do
-				expect(ChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
 			end
 		end)
 	end)
@@ -259,10 +258,10 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 6)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
 			for i = 3, 6 do
-				expect(ChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, i)).toEqual(true)
 			end
 		end)
 	end)
@@ -274,7 +273,7 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(0, 1)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
 		end)
 
 		it("should handle remove last item from list", function()
@@ -283,7 +282,7 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(1, 0)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
 		end)
 
 		it("should return no spans when nothing happened", function()
@@ -322,11 +321,11 @@ describe("UnifiedChangedSpanTracker", function()
 				local result = tracker:ComputeEffectiveSpans(5, 5)
 
 				-- Index 5 changed content (was "e", now "c"). Must be covered.
-				expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-				expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-				expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
-				expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
-				expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
 			end
 		)
 
@@ -343,11 +342,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
 		end)
 
 		it("should produce two separate spans for non-overlapping moves when count is unchanged", function()
@@ -358,14 +357,14 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(10, 10)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 7)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 8)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 9)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 10)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 7)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 8)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 9)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 10)).toEqual(false)
 		end)
 
 		it("should not dirty index 3 when removing two and adding two leaves c at index 3", function()
@@ -381,11 +380,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(false)
 		end)
 
 		it("should not dirty middle indices when removing first and last and adding at edges", function()
@@ -401,11 +400,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
 		end)
 
 		it("should not dirty index 3 when two opposite-end moves leave middle unchanged", function()
@@ -419,11 +418,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
 		end)
 
 		it("should dirty index 5 when two removes from end collapse and adds shift content", function()
@@ -439,11 +438,11 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			expect(ChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
-			expect(ChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
+			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
 		end)
 	end)
 end)
