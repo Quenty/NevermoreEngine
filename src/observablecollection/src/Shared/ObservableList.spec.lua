@@ -35,11 +35,6 @@ describe("ObservableList.new()", function()
 		expect(observableList:Get(-2)).toEqual(nil)
 	end)
 
-	it("should allow negative queries", function()
-		expect(observableList:Get(-1)).toEqual("a")
-		expect(observableList:Get(-2)).toEqual(nil)
-	end)
-
 	it("should check if the list contains a value", function()
 		expect(observableList:Contains("a")).toEqual(true)
 	end)
