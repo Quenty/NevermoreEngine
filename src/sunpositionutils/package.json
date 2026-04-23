@@ -33,6 +33,9 @@
   "dependencies": {
     "@quenty/color3utils": "workspace:*",
     "@quenty/colorsequenceutils": "workspace:*",
-    "@quenty/loader": "workspace:*"
+    "@quenty/enums": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/rx": "workspace:*"
   }
 }

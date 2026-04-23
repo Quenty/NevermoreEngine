@@ -2731,6 +2731,9 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
       '@quenty/statestack':
         specifier: workspace:*
         version: link:../statestack
@@ -2797,6 +2800,9 @@ importers:
       '@quenty/rxsignal':
         specifier: workspace:*
         version: link:../rxsignal
+      '@quenty/uiobjectutils':
+        specifier: workspace:*
+        version: link:../uiobjectutils
 
   src/insertserviceutils:
     dependencies:
@@ -5042,9 +5048,18 @@ importers:
       '@quenty/colorsequenceutils':
         specifier: workspace:*
         version: link:../colorsequenceutils
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
 
   src/symbol: {}
 
