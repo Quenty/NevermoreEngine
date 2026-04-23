@@ -5,6 +5,10 @@
 	@class UnifiedChangedSpanTracker
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local BinarySearchUtils = require("BinarySearchUtils")
+
 local UnifiedChangedSpanTracker = {}
 UnifiedChangedSpanTracker.ClassName = "UnifiedChangedSpanTracker"
 UnifiedChangedSpanTracker.__index = UnifiedChangedSpanTracker
@@ -167,6 +171,35 @@ function UnifiedChangedSpanTracker.ComputeEffectiveSpans(
 	end
 
 	return result
+end
+
+function UnifiedChangedSpanTracker.isIndexInSpan(sortedSpans: { ChangedSpan }, index: number): boolean
+	-- Binary search
+	local low, high = BinarySearchUtils.spanSearchNodes(sortedSpans, "startIndex", index)
+
+	if low then
+		local candidateSpan = sortedSpans[low]
+		if candidateSpan.startIndex <= index and candidateSpan.endIndex >= index then
+			return true
+		end
+	end
+
+	if high then
+		local candidateSpan = sortedSpans[high]
+		if candidateSpan.startIndex <= index and candidateSpan.endIndex >= index then
+			return true
+		end
+	end
+
+	return false
+end
+
+function UnifiedChangedSpanTracker.spanOverlaps(spanA: ChangedSpan, spanB: ChangedSpan): boolean
+	return spanA.startIndex <= spanB.endIndex and spanA.endIndex >= spanB.startIndex
+end
+
+function UnifiedChangedSpanTracker.spansTouches(spanA: ChangedSpan, spanB: ChangedSpan): boolean
+	return spanA.startIndex - 1 <= spanB.endIndex and spanA.endIndex + 1 >= spanB.startIndex
 end
 
 return UnifiedChangedSpanTracker

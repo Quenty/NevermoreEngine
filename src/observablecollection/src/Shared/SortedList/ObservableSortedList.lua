@@ -21,7 +21,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
-local ChangedSpanTracker = require("ChangedSpanTracker")
 local DuckTypeUtils = require("DuckTypeUtils")
 local ListIndexUtils = require("ListIndexUtils")
 local Maid = require("Maid")
@@ -612,7 +611,7 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	-- We assume there's not that many index observers at once (since you're usually looking for the ordinal first/last)
 	for rawIndex, _ in self._indexObservers:GetRawSubscriptionMap() do
 		local index = ListIndexUtils.toPositiveIndex(descendantCount, rawIndex)
-		local shouldFire = ChangedSpanTracker.isIndexInSpan(effectiveSpans, index)
+		local shouldFire = UnifiedChangedSpanTracker.isIndexInSpan(effectiveSpans, index)
 
 		-- For negative indices, also fire if the position mapping changed due to count change
 		if not shouldFire and rawIndex < 0 and previousCount ~= descendantCount then
