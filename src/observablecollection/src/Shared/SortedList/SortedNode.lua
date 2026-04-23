@@ -254,14 +254,19 @@ function SortedNode.NeedsToMove<T>(self: SortedNode<T>, root: SortedNode<T>?, ne
 	assert(newValue ~= nil, "Bad newValue")
 
 	if self.parent ~= nil then
-		if self:_isOnLeft() then
-			if self.parent.value < newValue then
-				return true
+		-- Walk all ancestors to validate the full BST range constraint
+		local current = self
+		while current.parent ~= nil do
+			if current:_isOnLeft() then
+				if current.parent.value < newValue then
+					return true
+				end
+			else
+				if current.parent.value > newValue then
+					return true
+				end
 			end
-		else
-			if self.parent.value > newValue then
-				return true
-			end
+			current = current.parent
 		end
 	else
 		if self ~= root or root == nil then
@@ -269,12 +274,26 @@ function SortedNode.NeedsToMove<T>(self: SortedNode<T>, root: SortedNode<T>?, ne
 		end
 	end
 
-	if self.left and self.left.value > newValue then
-		return true
+	-- Check max of left subtree (in-order predecessor), not just immediate left child
+	if self.left then
+		local maxLeft = self.left
+		while maxLeft.right do
+			maxLeft = maxLeft.right
+		end
+		if maxLeft.value > newValue then
+			return true
+		end
 	end
 
-	if self.right and self.right.value < newValue then
-		return true
+	-- Check min of right subtree (in-order successor), not just immediate right child
+	if self.right then
+		local minRight = self.right
+		while minRight.left do
+			minRight = minRight.left
+		end
+		if minRight.value < newValue then
+			return true
+		end
 	end
 
 	return false

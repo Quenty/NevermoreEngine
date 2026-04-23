@@ -1321,9 +1321,7 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		-- Skip: sequential remove/re-insert during simultaneous sort value changes produces
-		-- implementation-dependent ordering that differs from the naive expected swap result
-		it.skip("should preserve order with interleaved static and dynamic sort values", function()
+		it("should preserve order with interleaved static and dynamic sort values", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
@@ -1341,6 +1339,8 @@ describe("ObservableSortedList", function()
 			-- Swap B and D's positions
 			sortB.Value = 4
 			sortD.Value = 2
+
+			StepUtils.deferWait()
 
 			expect(list:Get(2)).toEqual("d")
 			expect(list:Get(4)).toEqual("b")
