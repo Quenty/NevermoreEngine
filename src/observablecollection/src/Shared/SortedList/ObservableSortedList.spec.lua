@@ -13,11 +13,14 @@ local Maid = require("Maid")
 local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
 local StepUtils = require("StepUtils")
+local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+
+local NIL_VALUE = Symbol.named("nil_placeholder")
 
 local ObservableSortedListTestUtils = {}
 
@@ -34,7 +37,11 @@ end
 function ObservableSortedListTestUtils.collectValues(observable: any)
 	local values = {}
 	local sub = observable:Subscribe(function(value: any)
-		table.insert(values, value)
+		if value == nil then
+			table.insert(values, NIL_VALUE)
+		else
+			table.insert(values, value)
+		end
 	end)
 	return values, sub
 end
@@ -585,8 +592,7 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		-- ObserveAtIndex does not fire when the observed index goes out of bounds due to span tracking
-		it.skip("should fire nil for ObserveAtIndex when index goes out of bounds", function()
+		it("should fire nil for ObserveAtIndex when index goes out of bounds", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
@@ -606,7 +612,7 @@ describe("ObservableSortedList", function()
 			sub:Destroy()
 
 			expect(#seenItems).toEqual(2)
-			expect(seenItems[2]).toEqual(nil)
+			expect(seenItems[2]).toEqual(NIL_VALUE)
 			maid:Destroy()
 		end)
 
