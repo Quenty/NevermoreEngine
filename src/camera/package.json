@@ -44,7 +44,8 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/spring": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quenty/vector3utils": "workspace:*"
+    "@quenty/vector3utils": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "devDependencies": {
     "@quenty/camerastoryutils": "workspace:*"

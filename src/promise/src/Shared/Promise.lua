@@ -381,6 +381,11 @@ end
 
 function Promise._toHumanReadable<T...>(_self: Promise<T...>, data: any): string
 	if type(data) == "table" then
+		local converted = tostring(data)
+		if string.sub(converted, 1, 8) ~= "table: 0x" then
+			return converted
+		end
+
 		local errOutput
 		local ok = pcall(function()
 			errOutput = HttpService:JSONEncode(data)

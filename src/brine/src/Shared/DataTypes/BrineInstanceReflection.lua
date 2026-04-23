@@ -28,12 +28,6 @@ local IGNORE_PROPERTIES = {
 	},
 }
 
-local INCLUDE_PROPERTIES = {
-	["Motor6D"] = {
-		["Transform"] = true,
-	},
-}
-
 function BrineInstanceReflection.canConstruct(className: string, securityCapabilities: SecurityCapabilities): boolean
 	local classInfo = ReflectionService:GetClass(className, {
 		ExcludeDisplay = true,

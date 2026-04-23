@@ -254,7 +254,7 @@ end
 
 function FakeSkybox._renderMoon(self: FakeSkybox): ()
 	local observeMoonState = self:_observeCelestrialBodyState("MoonAngularSize")
-	local observeMoonBrightness = self:_observeBodyBrightness(observeMoonState, function(state)
+	local observeMoonBrightness = self:_observeBodyBrightness(observeMoonState, function(_state)
 		-- local brightness = SunPositionUtils.getMoonImageBrightness(state.sunPositionData, state.environmentDiffuseScale)
 		-- return brightness
 

@@ -10,10 +10,10 @@ local BrineTypes = require("BrineTypes")
 local BrineOptionUtils = {}
 
 local DEFAULT_HOOK: BrineTypes.InstanceHook = {
-	encode = function(_instance: Instance, data: BrineTypes.BrineInstance): BrineTypes.BrineInstance
+	encode = function(_instance: Instance, data: BrineTypes.BrineInstanceWithExtraData?): BrineTypes.BrineInstanceWithExtraData?
 		return data
 	end,
-	decode = function(data: BrineTypes.BrineInstance): Instance
+	decode = function(data: BrineTypes.BrineInstanceWithExtraData): Instance
 		return Instance.new(data.ClassName)
 	end,
 }

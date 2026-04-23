@@ -5,8 +5,8 @@
 --
 -- For each triple (slug, rbxl, scriptPath):
 --   1. Deserializes the .rbxl
---   2. Reparents SSS children (the package root) into the combined SSS
---   3. Reads the test script file and creates a Script under RS._BatchScripts
+--   2. Reparents ServerScriptService children (the package root) into the combined ServerScriptService
+--   3. Reads the test script file and creates a Script under ReplicatedStorage._BatchScripts
 
 local fs = require("@lune/fs")
 local process = require("@lune/process")
@@ -38,38 +38,20 @@ end
 -- Use the first package's place as the base (preserves DataModel properties)
 local baseContents = fs.readFile(packages[1].rbxlPath)
 local game = roblox.deserializePlace(baseContents)
-local sss = game:GetService("ServerScriptService")
 
--- Enable LoadStringEnabled on SSS
-sss:SetAttribute("LoadStringEnabled", true)
+local HttpService = game:GetService("HttpService")
+local ServerScriptService = game:GetService("ServerScriptService")
 
--- Create _BatchScripts folder in ReplicatedStorage
-local rs = game:GetService("ReplicatedStorage")
-local batchScriptsFolder = roblox.Instance.new("Folder")
-batchScriptsFolder.Name = "_BatchScripts"
-batchScriptsFolder.Parent = rs
+ServerScriptService.LoadStringEnabled = true
 
--- Process the first package (already loaded as the base)
-do
-	local pkg = packages[1]
-
-	-- SSS children are already in place from the base build.
-	-- Read the test script and add to _BatchScripts.
-	local scriptSource = fs.readFile(pkg.scriptPath)
-	local scriptInst = roblox.Instance.new("Script")
-	scriptInst.Name = pkg.slug
-	scriptInst:AddTag("_BatchTest_" .. pkg.slug)
-	local ok, err = pcall(function()
-		(scriptInst :: any).Source = scriptSource
-	end)
-	if not ok then
-		warn("[CombinePlaces] Cannot set Source on " .. pkg.slug .. ": " .. tostring(err))
-		scriptInst:SetAttribute("ScriptSource", scriptSource)
+-- Process first package
+for _, descendant in ServerScriptService:GetDescendants() do
+	if descendant:IsA("Script") then
+		descendant:AddTag("_BatchTest_" .. packages[1].slug)
 	end
-	scriptInst.Parent = batchScriptsFolder
 end
 
--- Process remaining packages: deserialize each and reparent SSS children.
+-- Process remaining packages: deserialize each and reparent ServerScriptService children.
 -- NOTE: ObjectValues (links) within each package's subtree are preserved when the
 -- whole subtree is reparented as a unit. This works because all ObjectValue targets
 -- are siblings within the same tree. If this breaks in a future Lune version, the
@@ -80,37 +62,22 @@ for idx = 2, #packages do
 
 	local contents = fs.readFile(pkg.rbxlPath)
 	local pkgGame = roblox.deserializePlace(contents)
-	local pkgSSS = pkgGame:GetService("ServerScriptService")
+	local packageServerScriptService = pkgGame:GetService("ServerScriptService")
+	local packageHttpService = pkgGame:GetService("HttpService")
 
-	-- Reparent all SSS children (non-recursively, just move the roots)
-	for _, child in pkgSSS:GetChildren() do
-		-- Skip Script instances (these are test entry points, not package roots)
-		if child.ClassName == "Script" and child.Name == "Script" then
-			continue
+	if packageHttpService.HttpEnabled then
+		HttpService.HttpEnabled = true
+	end
+
+	for _, descendant in packageServerScriptService:GetDescendants() do
+		if descendant:IsA("Script") then
+			descendant:AddTag("_BatchTest_" .. pkg.slug)
 		end
-		child.Parent = sss
 	end
 
-	-- Read the test script and add to _BatchScripts
-	local scriptSource = fs.readFile(pkg.scriptPath)
-	local scriptInst = roblox.Instance.new("Script")
-	scriptInst.Name = pkg.slug
-	scriptInst:AddTag("_BatchTest_" .. pkg.slug)
-	local ok, err = pcall(function()
-		(scriptInst :: any).Source = scriptSource
-	end)
-	if not ok then
-		warn("[CombinePlaces] Cannot set Source on " .. pkg.slug .. ": " .. tostring(err))
-		scriptInst:SetAttribute("ScriptSource", scriptSource)
-	end
-	scriptInst.Parent = batchScriptsFolder
-end
-
--- Also remove any Script instances from the base build's SSS
--- (the batch runner uses loadstring, not auto-executed scripts)
-for _, child in sss:GetChildren() do
-	if child.ClassName == "Script" and child.Name == "Script" then
-		child.Parent = nil
+	-- Reparent all ServerScriptService children (non-recursively, just move the roots)
+	for _, child in packageServerScriptService:GetChildren() do
+		child.Parent = ServerScriptService
 	end
 end
 

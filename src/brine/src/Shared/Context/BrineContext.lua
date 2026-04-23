@@ -28,6 +28,7 @@ export type BrineContext = typeof(setmetatable(
 function BrineContext.new(options: BrineTypes.SafeBrineOptions): BrineContext
 	local self: BrineContext = setmetatable({} :: any, BrineContext)
 
+	-- selene: allow(undefined_variable)
 	self.SecurityCapabilities = SecurityCapabilities.fromCurrent()
 	self.Options = options
 	self._instanceToBrineInstance = {}

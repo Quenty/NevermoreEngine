@@ -31,7 +31,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 
 local BaseObject = require("BaseObject")
@@ -60,10 +59,6 @@ export type InputObjectTracker =
 		{} :: typeof({ __index = InputObjectTracker })
 	))
 	& BaseObject.BaseObject
-
-local function toVector2(vector3: Vector3): Vector2
-	return Vector2.new(vector3.X, vector3.Y)
-end
 
 function InputObjectTracker.new(initialInputObject: InputObject): InputObjectTracker
 	assert(typeof(initialInputObject) == "Instance" and initialInputObject:IsA("InputObject"), "Bad initialInputObject")

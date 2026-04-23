@@ -932,6 +932,9 @@ importers:
       '@quenty/vector3utils':
         specifier: workspace:*
         version: link:../vector3utils
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
     devDependencies:
       '@quenty/camerastoryutils':
         specifier: workspace:*
