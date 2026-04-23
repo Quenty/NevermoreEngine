@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[98880],{23722:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BufferEncoder","desc":"","source":{"line":4,"path":"src/buffer-encoder/src/Shared/BufferEncoder.lua"}}')}}]);

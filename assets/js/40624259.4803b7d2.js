@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[65291],{59663:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BrineInstanceEncoder","desc":"","source":{"line":6,"path":"src/brine/src/Shared/DataTypes/BrineInstanceEncoder.lua"}}')}}]);

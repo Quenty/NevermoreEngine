@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[85520],{98300:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GlobalLightSourceType","desc":"","source":{"line":5,"path":"src/sunpositionutils/src/Shared/GlobalLightSourceType.lua"}}')}}]);

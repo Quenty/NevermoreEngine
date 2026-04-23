@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[9861],{14549:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"FakeSkyboxServiceClient","desc":"","source":{"line":4,"path":"src/fakeskybox/src/Client/FakeSkyboxServiceClient.lua"}}')}}]);

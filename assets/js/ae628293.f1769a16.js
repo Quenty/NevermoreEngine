@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[19567],{23120:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".GetRobloxApiDump","id":"GetRobloxApiDump","level":3},{"value":".SetPromiseApiDump","id":"SetPromiseApiDump","level":3}]')}}]);

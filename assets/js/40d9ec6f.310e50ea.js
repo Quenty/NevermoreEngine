@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[63266],{61990:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BrineServiceClient","desc":"","source":{"line":4,"path":"src/brine/src/Client/BrineServiceClient.lua"}}')}}]);
