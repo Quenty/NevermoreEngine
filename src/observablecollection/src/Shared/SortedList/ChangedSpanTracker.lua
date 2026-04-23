@@ -298,4 +298,61 @@ function ChangedSpanTracker.spansTouches(spanA: ChangedSpan, spanB: ChangedSpan)
 	return spanA.startIndex - 1 <= spanB.endIndex and spanA.endIndex + 1 >= spanB.startIndex
 end
 
+--[=[
+	Computes the effective set of changed spans by merging move spans with the
+	index-shift effects caused by additions and removals.
+
+	When the list count stays the same (balanced adds/removes), shifts are bounded
+	by the range of add/remove indices. When count changes, shifts extend to the
+	end of the list (max of previous and current count).
+
+	@param changedSpans { ChangedSpan } -- Spans from value moves/swaps
+	@param addedSpans { ChangedSpan } -- Indices where nodes were inserted
+	@param removedSpans { ChangedSpan } -- Indices where nodes were removed
+	@param previousCount number -- List count before mutations
+	@param currentCount number -- List count after mutations
+	@return { ChangedSpan }
+]=]
+function ChangedSpanTracker.computeEffectiveSpans(
+	changedSpans: { ChangedSpan },
+	addedSpans: { ChangedSpan },
+	removedSpans: { ChangedSpan },
+	previousCount: number,
+	currentCount: number
+): { ChangedSpan }
+	local hasAdds = #addedSpans > 0
+	local hasRemoves = #removedSpans > 0
+
+	if not hasAdds and not hasRemoves then
+		return changedSpans
+	end
+
+	local tracker = ChangedSpanTracker.new()
+	tracker:AddSpans(changedSpans)
+
+	-- Find the lowest and highest indices where structural changes occurred
+	local lowestShiftIndex = math.huge
+	local highestShiftIndex = 0
+
+	for _, span in addedSpans do
+		lowestShiftIndex = math.min(lowestShiftIndex, span.startIndex)
+		highestShiftIndex = math.max(highestShiftIndex, span.endIndex)
+	end
+
+	for _, span in removedSpans do
+		lowestShiftIndex = math.min(lowestShiftIndex, span.startIndex)
+		highestShiftIndex = math.max(highestShiftIndex, span.endIndex)
+	end
+
+	-- When count changes, indices shift all the way to the end of the list
+	-- When count stays the same, shifts are bounded by the add/remove range
+	if previousCount ~= currentCount then
+		tracker:AddSpan(lowestShiftIndex, math.max(previousCount, currentCount))
+	else
+		tracker:AddSpan(lowestShiftIndex, highestShiftIndex)
+	end
+
+	return tracker:GetSpans()
+end
+
 return ChangedSpanTracker

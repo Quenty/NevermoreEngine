@@ -298,4 +298,78 @@ describe("ChangedSpanTracker", function()
 			expect(ChangedSpanTracker.spansTouches(c, d)).toEqual(ChangedSpanTracker.spansTouches(d, c))
 		end)
 	end)
+
+	describe("computeEffectiveSpans", function()
+		it("should return changedSpans unchanged when no adds or removes", function()
+			local changed = { ChangedSpanTracker.span(3, 5) }
+			local result = ChangedSpanTracker.computeEffectiveSpans(changed, {}, {}, 10, 10)
+			expect(#result).toEqual(1)
+			expect(result[1].startIndex).toEqual(3)
+			expect(result[1].endIndex).toEqual(5)
+		end)
+
+		it("should bound shift range to add/remove points when count stays the same", function()
+			-- Remove at 3, add at 3. Count unchanged. Shift span = [3, 3]
+			local changed = { ChangedSpanTracker.span(3, 3) }
+			local added = { ChangedSpanTracker.span(3, 3) }
+			local removed = { ChangedSpanTracker.span(3, 3) }
+			local result = ChangedSpanTracker.computeEffectiveSpans(changed, added, removed, 10, 10)
+			expect(#result).toEqual(1)
+			expect(result[1].startIndex).toEqual(3)
+			expect(result[1].endIndex).toEqual(3)
+		end)
+
+		it("should extend shift range between different add/remove positions when count unchanged", function()
+			-- Remove at 2, add at 5. Count unchanged. Shift span = [2, 5]
+			local changed = { ChangedSpanTracker.span(2, 2), ChangedSpanTracker.span(5, 5) }
+			local added = { ChangedSpanTracker.span(5, 5) }
+			local removed = { ChangedSpanTracker.span(2, 2) }
+			local result = ChangedSpanTracker.computeEffectiveSpans(changed, added, removed, 10, 10)
+			expect(#result).toEqual(1)
+			expect(result[1].startIndex).toEqual(2)
+			expect(result[1].endIndex).toEqual(5)
+		end)
+
+		it("should extend shift range to max count when count increases", function()
+			-- Add at 3, count 10 -> 11. Shift span = [3, 11]
+			local changed = { ChangedSpanTracker.span(3, 3) }
+			local added = { ChangedSpanTracker.span(3, 3) }
+			local result = ChangedSpanTracker.computeEffectiveSpans(changed, added, {}, 10, 11)
+			expect(#result).toEqual(1)
+			expect(result[1].startIndex).toEqual(3)
+			expect(result[1].endIndex).toEqual(11)
+		end)
+
+		it("should extend shift range to previous count when count decreases", function()
+			-- Remove at 5, count 10 -> 9. Shift span = [5, 10]
+			local changed = { ChangedSpanTracker.span(5, 5) }
+			local removed = { ChangedSpanTracker.span(5, 5) }
+			local result = ChangedSpanTracker.computeEffectiveSpans(changed, {}, removed, 10, 9)
+			expect(#result).toEqual(1)
+			expect(result[1].startIndex).toEqual(5)
+			expect(result[1].endIndex).toEqual(10)
+		end)
+
+		it("should merge move spans with shift spans", function()
+			-- Move from 2 to 6, plus add at 8, count 10 -> 11
+			local changed = { ChangedSpanTracker.span(2, 6) }
+			local added = { ChangedSpanTracker.span(6, 6), ChangedSpanTracker.span(8, 8) }
+			local removed = { ChangedSpanTracker.span(2, 2) }
+			local result = ChangedSpanTracker.computeEffectiveSpans(changed, added, removed, 10, 11)
+			-- Shift range: min(2,6,8,2)=2, count changed → max(10,11)=11
+			-- Merged: [{2, 11}]
+			expect(#result).toEqual(1)
+			expect(result[1].startIndex).toEqual(2)
+			expect(result[1].endIndex).toEqual(11)
+		end)
+
+		it("should handle empty changed spans with adds/removes", function()
+			-- Can happen if changedSpanTracker was cleared separately
+			local added = { ChangedSpanTracker.span(5, 5) }
+			local result = ChangedSpanTracker.computeEffectiveSpans({}, added, {}, 10, 11)
+			expect(#result).toEqual(1)
+			expect(result[1].startIndex).toEqual(5)
+			expect(result[1].endIndex).toEqual(11)
+		end)
+	end)
 end)

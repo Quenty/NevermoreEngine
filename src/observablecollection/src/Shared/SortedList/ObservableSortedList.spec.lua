@@ -12,7 +12,6 @@ local Jest = require("Jest")
 local Maid = require("Maid")
 local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
-local StepUtils = require("StepUtils")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
 
@@ -160,7 +159,7 @@ describe("ObservableSortedList", function()
 			local list = maid:Add(ObservableSortedListTestUtils.fromList({ "a", "b" }))
 
 			-- GetCount reads from _countValue which updates via deferred events
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetCount()).toEqual(2)
 			maid:Destroy()
@@ -204,13 +203,13 @@ describe("ObservableSortedList", function()
 			local seenCounts, sub = ObservableSortedListTestUtils.collectValues(list:ObserveCount())
 
 			local removeA = list:Add("a", 1)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			list:Add("b", 2)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			removeA()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			sub:Destroy()
 
@@ -229,7 +228,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			local removeB = list:Add("b", 2)
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenIndices, sub = ObservableSortedListTestUtils.collectValues(list:ObserveIndex(3))
 
@@ -238,7 +237,7 @@ describe("ObservableSortedList", function()
 
 			-- Remove B (index 2). C should shift from 3 to 2
 			removeB()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			sub:Destroy()
 
@@ -255,7 +254,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:Add("d", 4)
 			list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetCount()).toEqual(5)
 
@@ -267,7 +266,7 @@ describe("ObservableSortedList", function()
 
 			-- Remove B (index 2). This should shift C->2, D->3, E->4
 			removeB()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetCount()).toEqual(4)
 			expect(list:GetList()).toEqual({ "a", "c", "d", "e" })
@@ -288,7 +287,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			local removeB = list:Add("b", 2)
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenItems, sub = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
 
@@ -297,7 +296,7 @@ describe("ObservableSortedList", function()
 
 			-- Remove B. Now C should be at index 2
 			removeB()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			sub:Destroy()
 
@@ -311,14 +310,14 @@ describe("ObservableSortedList", function()
 		it("should fire for existing and new items", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedListTestUtils.fromList({ "a", "b" }))
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenBrios, sub = ObservableSortedListTestUtils.collectValues(list:ObserveItemsBrio())
 
 			expect(#seenBrios).toEqual(2)
 
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(#seenBrios).toEqual(3)
 
@@ -331,7 +330,7 @@ describe("ObservableSortedList", function()
 			local list = maid:Add(ObservableSortedList.new())
 
 			local removeA = list:Add("a", 1)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenBrios: { Brio.Brio<string> } = {}
 			local sub = list:ObserveItemsBrio():Subscribe(function(brio)
@@ -342,7 +341,7 @@ describe("ObservableSortedList", function()
 			expect(seenBrios[1]:IsDead()).toEqual(false)
 
 			removeA()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(seenBrios[1]:IsDead()).toEqual(true)
 
@@ -377,10 +376,10 @@ describe("ObservableSortedList", function()
 			end)
 
 			list:Add("b", 2)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			list:Add("a", 1)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			sub:Destroy()
 
@@ -459,7 +458,7 @@ describe("ObservableSortedList", function()
 		it("should track index of a specific node", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedListTestUtils.fromList({ "a", "b", "c" }))
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local node = list:FindFirstKey("c")
 			assert(node ~= nil, "Expected to find node for 'c'")
@@ -489,7 +488,7 @@ describe("ObservableSortedList", function()
 		it("should kill all brios on Destroy", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedListTestUtils.fromList({ "a", "b" }))
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenBrios, sub = ObservableSortedListTestUtils.collectValues(list:ObserveItemsBrio())
 
@@ -598,7 +597,7 @@ describe("ObservableSortedList", function()
 
 			local removeA = list:Add("a", 1)
 			list:Add("b", 2)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenItems, sub = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
 
@@ -607,7 +606,7 @@ describe("ObservableSortedList", function()
 
 			-- Remove A. B moves to index 1, index 2 is now empty
 			removeA()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			sub:Destroy()
 
@@ -627,7 +626,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", sortValueA:Observe())
 			list:Add("b", sortValueB:Observe())
 			list:Add("c", sortValueC:Observe())
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local fireCount = 0
 			local sub = list:Observe():Subscribe(function()
@@ -642,7 +641,7 @@ describe("ObservableSortedList", function()
 			sortValueB.Value = 20
 			sortValueC.Value = 10
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Should have batched into a single additional fire
 			expect(fireCount).toEqual(2)
@@ -658,7 +657,7 @@ describe("ObservableSortedList", function()
 
 			local removeA = list:Add("a", 1)
 			list:Add("b", 2)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local completed = false
 			local sub = list:ObserveIndex(1):Subscribe(function() end, function() end, function()
@@ -669,7 +668,7 @@ describe("ObservableSortedList", function()
 
 			-- Remove A (the tracked node at index 1)
 			removeA()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(completed).toEqual(true)
 			sub:Destroy()
@@ -679,7 +678,7 @@ describe("ObservableSortedList", function()
 		it("should fire ObserveItemsBrio synchronously for existing items on subscribe", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedListTestUtils.fromList({ "a", "b" }))
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenBrios, sub = ObservableSortedListTestUtils.collectValues(list:ObserveItemsBrio())
 
@@ -719,7 +718,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			list:Add("b", sortValue:Observe())
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local fireCount = 0
 			local sub = list:Observe():Subscribe(function()
@@ -730,7 +729,7 @@ describe("ObservableSortedList", function()
 
 			-- Set to same value - should be a no-op
 			sortValue.Value = 2
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(fireCount).toEqual(1)
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
@@ -747,7 +746,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", sortValue:Observe())
 			list:Add("b", 2)
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
@@ -759,7 +758,7 @@ describe("ObservableSortedList", function()
 			-- Tree should reflect the final state synchronously
 			expect(list:GetList()).toEqual({ "b", "c", "a" })
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Should still be correct after events fire
 			expect(list:GetList()).toEqual({ "b", "c", "a" })
@@ -775,7 +774,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", sortValue:Observe())
 			list:Add("b", 2)
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local fireCount = 0
 			local sub = list:Observe():Subscribe(function()
@@ -788,7 +787,7 @@ describe("ObservableSortedList", function()
 			sortValue.Value = 1
 
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Events may or may not fire depending on span tracker,
 			-- but the list should be correct
@@ -821,7 +820,7 @@ describe("ObservableSortedList", function()
 			sortD.Value = 1
 
 			expect(list:GetList()).toEqual({ "d", "c", "b", "a" })
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "d", "c", "b", "a" })
 
@@ -866,14 +865,14 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			list:Add("b", sortB:Observe())
 			list:Add("c", 10)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenIndices, sub = ObservableSortedListTestUtils.collectValues(list:ObserveIndex(2))
 			expect(seenIndices[1]).toEqual(2)
 
 			-- Change from 5 to 7 - still between 1 and 10, no movement needed
 			sortB.Value = 7
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Index should not have changed
 			expect(#seenIndices).toEqual(1)
@@ -936,7 +935,7 @@ describe("ObservableSortedList", function()
 			local sortValue = maid:Add(ValueObject.new(2))
 			list:Add("a", 1)
 			list:Add("b", sortValue:Observe())
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenBrios, sub = ObservableSortedListTestUtils.collectValues(list:ObserveItemsBrio())
 			expect(#seenBrios).toEqual(2)
@@ -945,7 +944,7 @@ describe("ObservableSortedList", function()
 
 			-- Emit nil - B's brio should die
 			sortValue.Value = nil
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(seenBrios[2]:IsDead()).toEqual(true)
 			expect(seenBrios[1]:IsDead()).toEqual(false)
@@ -966,7 +965,7 @@ describe("ObservableSortedList", function()
 			expect(list:GetList()).toEqual({ "a", "c" })
 			expect(list:Contains("b")).toEqual(false)
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Still not there after events fire
 			expect(list:GetList()).toEqual({ "a", "c" })
@@ -1008,7 +1007,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			list:Add("b", sortValue:Observe())
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
@@ -1018,7 +1017,7 @@ describe("ObservableSortedList", function()
 
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
 			maid:Destroy()
@@ -1030,7 +1029,7 @@ describe("ObservableSortedList", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 			list:Add("a", 1)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local addCount = 0
 			local removeCount = 0
@@ -1045,7 +1044,7 @@ describe("ObservableSortedList", function()
 			local remove = list:Add("b", 2)
 			remove()
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Should have cancelled out - no add or remove events
 			expect(addCount).toEqual(0)
@@ -1089,7 +1088,7 @@ describe("ObservableSortedList", function()
 			-- Don't wait - add more before events fire
 			list:Add("c", 3)
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- All three should batch into one count update
 			expect(counts[1]).toEqual(0)
@@ -1103,7 +1102,7 @@ describe("ObservableSortedList", function()
 		it("should handle interleaved adds and removes before events fire", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local counts, countSub = ObservableSortedListTestUtils.collectValues(list:ObserveCount())
 			expect(counts[1]).toEqual(0)
@@ -1114,7 +1113,7 @@ describe("ObservableSortedList", function()
 			removeA() -- remove A before events fire
 			list:Add("d", 4)
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Net result: b, c, d (3 items)
 			expect(list:GetList()).toEqual({ "b", "c", "d" })
@@ -1141,7 +1140,7 @@ describe("ObservableSortedList", function()
 			expect(list:GetList()).toEqual({ "a" })
 			expect(list:Contains("b")).toEqual(false)
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 			expect(list:GetList()).toEqual({ "a" })
 
 			maid:Destroy()
@@ -1152,7 +1151,7 @@ describe("ObservableSortedList", function()
 		it("should fire signals in correct order: count, add, remove, order", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local events: { string } = {}
 
@@ -1167,7 +1166,7 @@ describe("ObservableSortedList", function()
 			end))
 
 			list:Add("a", 1)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(events).toEqual({ "add", "order" })
 
@@ -1177,7 +1176,7 @@ describe("ObservableSortedList", function()
 		it("should fire correct count of ItemAdded events on batch add", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local addedItems: { string } = {}
 			maid:Add(list.ItemAdded:Connect(function(data)
@@ -1187,7 +1186,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:Add("a", 1)
 			list:Add("b", 2)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(#addedItems).toEqual(3)
 			maid:Destroy()
@@ -1201,14 +1200,14 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			list:Add("b", sortB:Observe())
 			list:Add("c", 10)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local indexChanges, sub = ObservableSortedListTestUtils.collectValues(list:ObserveIndex(2))
 			expect(#indexChanges).toEqual(1)
 
 			-- Change value but stay in same position (between 1 and 10)
 			sortB.Value = 8
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(#indexChanges).toEqual(1)
 			expect(list:Get(2)).toEqual("b")
@@ -1225,14 +1224,14 @@ describe("ObservableSortedList", function()
 			list:Add("a", sortA:Observe())
 			list:Add("b", 2)
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenAtIndex1, sub = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
 			expect(seenAtIndex1[1]).toEqual("a")
 
 			-- Move A to the end
 			sortA.Value = 10
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(seenAtIndex1[2]).toEqual("b")
 
@@ -1247,7 +1246,7 @@ describe("ObservableSortedList", function()
 			local sortValue = maid:Add(ValueObject.new(2))
 			list:Add("a", 1)
 			list:Add("b", sortValue:Observe())
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local seenBrios: { Brio.Brio<string> } = {}
 			local sub = list:ObserveItemsBrio():Subscribe(function(brio)
@@ -1258,13 +1257,13 @@ describe("ObservableSortedList", function()
 
 			-- Remove via nil
 			sortValue.Value = nil
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(seenBrios[2]:IsDead()).toEqual(true)
 
 			-- Re-add via value
 			sortValue.Value = 2
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Should have gotten a new brio
 			expect(#seenBrios).toEqual(3)
@@ -1277,7 +1276,7 @@ describe("ObservableSortedList", function()
 		it("should survive listener destroying the list during event processing", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			maid:Add(list.ItemAdded:Connect(function()
 				maid:Destroy()
@@ -1285,7 +1284,7 @@ describe("ObservableSortedList", function()
 
 			-- Should not error when the list is destroyed during event firing
 			list:Add("a", 1)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			maid:Destroy()
 		end)
@@ -1346,7 +1345,7 @@ describe("ObservableSortedList", function()
 			sortB.Value = 4
 			sortD.Value = 2
 
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:Get(2)).toEqual("d")
 			expect(list:Get(4)).toEqual("b")
@@ -1392,7 +1391,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:Add("d", 4)
 			list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
 			local fires5, sub5 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(5))
@@ -1402,7 +1401,7 @@ describe("ObservableSortedList", function()
 
 			-- Move B past C and D: changed span [2, 4], indices 1, 5 unaffected
 			sortB.Value = 4.5
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "c", "d", "b", "e" })
 			expect(#fires1).toEqual(1)
@@ -1423,7 +1422,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:Add("d", 4)
 			list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local nodeA = list:FindFirstKey("a")
 			local nodeE = list:FindFirstKey("e")
@@ -1437,7 +1436,7 @@ describe("ObservableSortedList", function()
 
 			-- Move B past C and D: only span [2, 4] changed
 			sortB.Value = 4.5
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(#firesA).toEqual(1)
 			expect(#firesE).toEqual(1)
@@ -1456,7 +1455,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:Add("d", 4)
 			local removeE = list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
 			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
@@ -1469,7 +1468,7 @@ describe("ObservableSortedList", function()
 			expect(#fires4).toEqual(1)
 
 			removeE()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "b", "c", "d" })
 			expect(#fires1).toEqual(1)
@@ -1491,7 +1490,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			list:Add("b", 2)
 			list:Add("c", 3)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
 			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
@@ -1502,7 +1501,7 @@ describe("ObservableSortedList", function()
 			expect(#fires3).toEqual(1)
 
 			list:Add("d", 4)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "b", "c", "d" })
 			expect(#fires1).toEqual(1)
@@ -1524,7 +1523,7 @@ describe("ObservableSortedList", function()
 			local removeC = list:Add("c", 3)
 			list:Add("d", 4)
 			list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
 			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
@@ -1534,7 +1533,7 @@ describe("ObservableSortedList", function()
 
 			-- Remove c from middle (index 3). Indices 1, 2 unaffected.
 			removeC()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "b", "d", "e" })
 			expect(#fires1).toEqual(1)
@@ -1554,7 +1553,7 @@ describe("ObservableSortedList", function()
 			local removeC = list:Add("c", 3)
 			list:Add("d", 4)
 			list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- Index 4 (currently "d") will shift to index 3 after c is removed
 			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
@@ -1562,7 +1561,7 @@ describe("ObservableSortedList", function()
 			expect(fires4[1]).toEqual("d")
 
 			removeC()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "b", "d", "e" })
 			-- Index 4 should have fired — now contains "e" instead of "d"
@@ -1582,7 +1581,7 @@ describe("ObservableSortedList", function()
 			local removeC = list:Add("c", 3)
 			list:Add("d", 4)
 			list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local nodeD = list:FindFirstKey("d")
 			local nodeE = list:FindFirstKey("e")
@@ -1595,7 +1594,7 @@ describe("ObservableSortedList", function()
 			expect(firesE[1]).toEqual(5)
 
 			removeC()
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			-- D shifted 4->3, E shifted 5->4
 			expect(#firesD).toEqual(2)
@@ -1608,7 +1607,7 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		it.skip("should not fire ObserveAtIndex for distant indices when replacing at same position", function()
+		it("should not fire ObserveAtIndex for distant indices when replacing at same position", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
@@ -1617,7 +1616,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:Add("d", 4)
 			list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
 			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
@@ -1630,7 +1629,7 @@ describe("ObservableSortedList", function()
 			-- Remove b at index 2, add f at index 2. Count unchanged, only index 2 content changed.
 			removeB()
 			list:Add("f", 2)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "f", "c", "d", "e" })
 
@@ -1645,7 +1644,7 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		it.skip("should not fire ObserveIndexByKey for unaffected nodes when replacing at same position", function()
+		it("should not fire ObserveIndexByKey for unaffected nodes when replacing at same position", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
@@ -1654,7 +1653,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:Add("d", 4)
 			list:Add("e", 5)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			local nodeC = list:FindFirstKey("c")
 			local nodeD = list:FindFirstKey("d")
@@ -1672,7 +1671,7 @@ describe("ObservableSortedList", function()
 			-- Replace b with f at same index. C, D, E positions unchanged.
 			removeB()
 			list:Add("f", 2)
-			StepUtils.deferWait()
+			list:_testForceFireEvents()
 
 			expect(list:GetList()).toEqual({ "a", "f", "c", "d", "e" })
 			expect(#firesC).toEqual(1)
@@ -1685,116 +1684,107 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
-		it.skip(
-			"should fire ObserveAtIndex for shifted indices when removing and adding at different positions",
-			function()
-				local maid = Maid.new()
-				local list = maid:Add(ObservableSortedList.new())
+		it("should fire ObserveAtIndex for shifted indices when removing and adding at different positions", function()
+			local maid = Maid.new()
+			local list = maid:Add(ObservableSortedList.new())
 
-				list:Add("a", 1)
-				local removeB = list:Add("b", 2)
-				list:Add("c", 3)
-				list:Add("d", 4)
-				list:Add("e", 5)
-				StepUtils.deferWait()
+			list:Add("a", 1)
+			local removeB = list:Add("b", 2)
+			list:Add("c", 3)
+			list:Add("d", 4)
+			list:Add("e", 5)
+			list:_testForceFireEvents()
 
-				-- Observe index 3 (currently "c")
-				local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
-				expect(#fires3).toEqual(1)
-				expect(fires3[1]).toEqual("c")
+			-- Observe index 3 (currently "c")
+			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			expect(#fires3).toEqual(1)
+			expect(fires3[1]).toEqual("c")
 
-				-- Remove b (index 2), add f at index 4. Count unchanged, but index 3 shifts: c was at 3, now d is at 3
-				removeB()
-				list:Add("f", 4.5)
-				StepUtils.deferWait()
+			-- Remove b (index 2), add f at index 4. Count unchanged, but index 3 shifts: c was at 3, now d is at 3
+			removeB()
+			list:Add("f", 4.5)
+			list:_testForceFireEvents()
 
-				-- List is now: a, c, d, f, e
-				expect(list:GetList()).toEqual({ "a", "c", "d", "f", "e" })
+			-- List is now: a, c, d, f, e
+			expect(list:GetList()).toEqual({ "a", "c", "d", "f", "e" })
 
-				-- Index 3 changed from "c" to "d" — must fire
-				expect(#fires3).toEqual(2)
-				expect(fires3[2]).toEqual("d")
+			-- Index 3 changed from "c" to "d" — must fire
+			expect(#fires3).toEqual(2)
+			expect(fires3[2]).toEqual("d")
 
-				sub3:Destroy()
-				maid:Destroy()
-			end
-		)
+			sub3:Destroy()
+			maid:Destroy()
+		end)
 
-		it.skip(
-			"should fire ObserveIndexByKey for shifted nodes when removing and adding at different positions",
-			function()
-				local maid = Maid.new()
-				local list = maid:Add(ObservableSortedList.new())
+		it("should fire ObserveIndexByKey for shifted nodes when removing and adding at different positions", function()
+			local maid = Maid.new()
+			local list = maid:Add(ObservableSortedList.new())
 
-				list:Add("a", 1)
-				local removeB = list:Add("b", 2)
-				list:Add("c", 3)
-				list:Add("d", 4)
-				list:Add("e", 5)
-				StepUtils.deferWait()
+			list:Add("a", 1)
+			local removeB = list:Add("b", 2)
+			list:Add("c", 3)
+			list:Add("d", 4)
+			list:Add("e", 5)
+			list:_testForceFireEvents()
 
-				local nodeC = list:FindFirstKey("c")
-				local nodeD = list:FindFirstKey("d")
-				assert(nodeC and nodeD, "Expected nodes")
+			local nodeC = list:FindFirstKey("c")
+			local nodeD = list:FindFirstKey("d")
+			assert(nodeC and nodeD, "Expected nodes")
 
-				local firesC, subC = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeC))
-				local firesD, subD = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeD))
+			local firesC, subC = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeC))
+			local firesD, subD = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeD))
 
-				expect(firesC[1]).toEqual(3)
-				expect(firesD[1]).toEqual(4)
+			expect(firesC[1]).toEqual(3)
+			expect(firesD[1]).toEqual(4)
 
-				-- Remove b (index 2), add f at index 4.5. Count unchanged, but c shifts 3->2, d shifts 4->3
-				removeB()
-				list:Add("f", 4.5)
-				StepUtils.deferWait()
+			-- Remove b (index 2), add f at index 4.5. Count unchanged, but c shifts 3->2, d shifts 4->3
+			removeB()
+			list:Add("f", 4.5)
+			list:_testForceFireEvents()
 
-				-- List is now: a, c, d, f, e
-				expect(list:GetList()).toEqual({ "a", "c", "d", "f", "e" })
+			-- List is now: a, c, d, f, e
+			expect(list:GetList()).toEqual({ "a", "c", "d", "f", "e" })
 
-				-- C shifted 3->2, D shifted 4->3
-				expect(#firesC).toEqual(2)
-				expect(firesC[2]).toEqual(2)
-				expect(#firesD).toEqual(2)
-				expect(firesD[2]).toEqual(3)
+			-- C shifted 3->2, D shifted 4->3
+			expect(#firesC).toEqual(2)
+			expect(firesC[2]).toEqual(2)
+			expect(#firesD).toEqual(2)
+			expect(firesD[2]).toEqual(3)
 
-				subC:Destroy()
-				subD:Destroy()
-				maid:Destroy()
-			end
-		)
+			subC:Destroy()
+			subD:Destroy()
+			maid:Destroy()
+		end)
 
-		it.skip(
-			"should fire ObserveAtIndex correctly when removing two and adding two at different positions",
-			function()
-				local maid = Maid.new()
-				local list = maid:Add(ObservableSortedList.new())
+		it("should fire ObserveAtIndex correctly when removing two and adding two at different positions", function()
+			local maid = Maid.new()
+			local list = maid:Add(ObservableSortedList.new())
 
-				list:Add("a", 1)
-				local removeB = list:Add("b", 2)
-				list:Add("c", 3)
-				local removeD = list:Add("d", 4)
-				list:Add("e", 5)
-				StepUtils.deferWait()
+			list:Add("a", 1)
+			local removeB = list:Add("b", 2)
+			list:Add("c", 3)
+			local removeD = list:Add("d", 4)
+			list:Add("e", 5)
+			list:_testForceFireEvents()
 
-				local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
-				expect(fires3[1]).toEqual("c")
+			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			expect(fires3[1]).toEqual("c")
 
-				-- Remove b (index 2) and d (index 4), add f (1.5) and g (4.5). Count unchanged.
-				removeB()
-				removeD()
-				list:Add("f", 1.5)
-				list:Add("g", 4.5)
-				StepUtils.deferWait()
+			-- Remove b (index 2) and d (index 4), add f (1.5) and g (4.5). Count unchanged.
+			removeB()
+			removeD()
+			list:Add("f", 1.5)
+			list:Add("g", 4.5)
+			list:_testForceFireEvents()
 
-				-- List: f, a, c, g, e
-				expect(list:GetList()).toEqual({ "f", "a", "c", "g", "e" })
+			-- List: a, f, c, g, e
+			expect(list:GetList()).toEqual({ "a", "f", "c", "g", "e" })
 
-				-- Index 3 still has "c" — should not fire extra
-				expect(#fires3).toEqual(1)
+			-- Index 3 still has "c" — should not fire extra
+			expect(#fires3).toEqual(1)
 
-				sub3:Destroy()
-				maid:Destroy()
-			end
-		)
+			sub3:Destroy()
+			maid:Destroy()
+		end)
 	end)
 end)

@@ -50,6 +50,8 @@ export type ObservableSortedList<T> = typeof(setmetatable(
 		_countValue: ValueObject.ValueObject<number>,
 
 		_changedSpanTracker: ChangedSpanTracker.ChangedSpanTracker,
+		_addedIndexTracker: ChangedSpanTracker.ChangedSpanTracker,
+		_removedIndexTracker: ChangedSpanTracker.ChangedSpanTracker,
 
 		_indexObservers: any,
 		_nodeIndexObservables: any,
@@ -82,6 +84,8 @@ function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunct
 
 	-- Trackers
 	self._changedSpanTracker = ChangedSpanTracker.new()
+	self._addedIndexTracker = ChangedSpanTracker.new()
+	self._removedIndexTracker = ChangedSpanTracker.new()
 
 	self._nodesAdded = {}
 	self._nodesRemoved = {}
@@ -490,7 +494,9 @@ function ObservableSortedList._assignSortValue<T>(
 			end
 
 			-- Everything after this node's index changed, but we'll only log the changed internal range
-			self._changedSpanTracker:AddSpan(node:GetIndex(), node:GetIndex())
+			local removeIndex = node:GetIndex()
+			self._changedSpanTracker:AddSpan(removeIndex, removeIndex)
+			self._removedIndexTracker:AddSpan(removeIndex, removeIndex)
 			self:_removeNode(node)
 			node.value = nil
 			self:_queueFireEvents()
@@ -515,7 +521,9 @@ function ObservableSortedList._assignSortValue<T>(
 	local originalIndex: number?
 
 	if self._root and self._root:ContainsNode(node) then
-		originalIndex = node:GetIndex()
+		local index = node:GetIndex()
+		originalIndex = index
+		self._removedIndexTracker:AddSpan(index, index)
 		self:_removeNode(node)
 	else
 		originalIndex = nil
@@ -528,6 +536,7 @@ function ObservableSortedList._assignSortValue<T>(
 	assert(self._root, "Root should exist after insert")
 
 	local newIndex = node:GetIndex()
+	self._addedIndexTracker:AddSpan(newIndex, newIndex)
 
 	if originalIndex then
 		-- Only changed a range
@@ -551,6 +560,16 @@ function ObservableSortedList._queueFireEvents<T>(self: ObservableSortedList<T>)
 	end)
 end
 
+-- For tests to avoid task.defer re-entrance limit
+function ObservableSortedList._testForceFireEvents<T>(self: ObservableSortedList<T>)
+	if not self._maid._fireEvents then
+		return
+	end
+
+	self._maid._fireEvents = nil
+	self:_fireEvents()
+end
+
 function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	-- TODO: Handle dirty state changing in the middle of event firing here
 	-- print(self._root)
@@ -561,6 +580,7 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	local nodesRemoved = self._nodesRemoved
 	self._nodesRemoved = {}
 
+	local previousCount = self._countValue.Value or 0
 	local descendantCount = if self._root then self._root.descendantCount else 0
 
 	-- Fire count changed first
@@ -596,22 +616,30 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	end
 
 	local changedSpans = self._changedSpanTracker:GetAndClearSpans()
-	local didRemoveNodes = next(nodesRemoved) ~= nil
-	local didAddOrRemoveNodes = next(nodesAdded) ~= nil or didRemoveNodes
-	local shouldFireChangedEvent = self._getShouldFireChangedEvent(changedSpans, descendantCount, didAddOrRemoveNodes)
+	local addedSpans = self._addedIndexTracker:GetAndClearSpans()
+	local removedSpans = self._removedIndexTracker:GetAndClearSpans()
+	local effectiveSpans =
+		ChangedSpanTracker.computeEffectiveSpans(changedSpans, addedSpans, removedSpans, previousCount, descendantCount)
 
 	-- We assume there's not that many index observers at once (since you're usually looking for the ordinal first/last)
 	for rawIndex, _ in self._indexObservers:GetRawSubscriptionMap() do
-		-- TODO: Consider grouping into cached spans for efficiency here for less conditionals
-		-- but we're at O(n log(n)) right now
-		if not (shouldFireChangedEvent(rawIndex)) then
+		local index = ListIndexUtils.toPositiveIndex(descendantCount, rawIndex)
+		local shouldFire = ChangedSpanTracker.isIndexInSpan(effectiveSpans, index)
+
+		-- For negative indices, also fire if the position mapping changed due to count change
+		if not shouldFire and rawIndex < 0 and previousCount ~= descendantCount then
+			local oldIndex = ListIndexUtils.toPositiveIndex(previousCount, rawIndex)
+			shouldFire = oldIndex ~= index
+		end
+
+		if not shouldFire then
 			continue
 		end
 
-		local node = self:_findNodeAtIndex(rawIndex) -- O(log n)
+		local node = self:_findNodeAtIndex(index) -- O(log n)
 		if node then
 			self._indexObservers:Fire(rawIndex, node.data, node)
-		elseif didRemoveNodes then
+		else
 			self._indexObservers:Fire(rawIndex, nil, nil)
 		end
 	end
@@ -622,20 +650,9 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 
 	-- We assume there could be a lot of node index observers at once (used for layout order)
 	if self._nodeIndexObservables:HasAnySubscriptions() then
-		if didAddOrRemoveNodes then
-			local lowestChangedIndex: number? = changedSpans[1] and changedSpans[1].startIndex
-			assert(lowestChangedIndex ~= nil, "Bad changed spans")
-
-			-- All indices from the change point to the end of the list shift when nodes are added/removed
-			-- TODO: Track in tree structure actually observed nodes for better efficiency
-			for index, node in self:_iterateNodesRange(lowestChangedIndex, descendantCount) do
+		for _, span in effectiveSpans do
+			for index, node in self:_iterateNodesRange(span.startIndex, span.endIndex) do
 				self._nodeIndexObservables:Fire(node, index)
-			end
-		else
-			for _, span in changedSpans do
-				for index, node in self:_iterateNodesRange(span.startIndex, span.endIndex) do
-					self._nodeIndexObservables:Fire(node, index)
-				end
 			end
 		end
 	end
@@ -648,37 +665,6 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 		-- TODO: Reuse list
 		local list = self:GetList()
 		self._mainObservables:Fire("list", list)
-	end
-end
-
-function ObservableSortedList._getShouldFireChangedEvent(
-	changedSpans: { ChangedSpanTracker.ChangedSpan },
-	descendantCount: number,
-	didAddOrRemoveNodes: boolean?
-): (rawIndex: number) -> boolean
-	local lowestChangedIndex: number? = changedSpans[1] and changedSpans[1].startIndex
-	local highestChangedIndex: number? = changedSpans[#changedSpans] and changedSpans[#changedSpans].endIndex
-
-	return function(rawIndex: number): boolean
-		local index = ListIndexUtils.toPositiveIndex(descendantCount, rawIndex)
-		if ChangedSpanTracker.isIndexInSpan(changedSpans, index) then
-			return true
-		end
-
-		-- We only need to care about array shifts if we added or removed nodes
-		if didAddOrRemoveNodes then
-			if lowestChangedIndex and rawIndex > 0 and index >= lowestChangedIndex then
-				-- Since the array shifts over, anything after the lowest changed index is affected
-				return true
-			end
-
-			if rawIndex < 0 and highestChangedIndex and index <= highestChangedIndex then
-				-- Highest index matters for negative indices
-				return true
-			end
-		end
-
-		return false
 	end
 end
 
