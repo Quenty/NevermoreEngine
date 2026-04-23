@@ -32,6 +32,7 @@ local Signal = require("Signal")
 local SortFunctionUtils = require("SortFunctionUtils")
 local SortedNode = require("SortedNode")
 local SortedNodeValue = require("SortedNodeValue")
+local UnifiedChangedSpanTracker = require("UnifiedChangedSpanTracker")
 local ValueObject = require("ValueObject")
 
 local ObservableSortedList = {}
@@ -49,9 +50,7 @@ export type ObservableSortedList<T> = typeof(setmetatable(
 		_compare: CompareFunction<T>?,
 		_countValue: ValueObject.ValueObject<number>,
 
-		_changedSpanTracker: ChangedSpanTracker.ChangedSpanTracker,
-		_addedIndexTracker: ChangedSpanTracker.ChangedSpanTracker,
-		_removedIndexTracker: ChangedSpanTracker.ChangedSpanTracker,
+		_unifiedTracker: UnifiedChangedSpanTracker.UnifiedChangedSpanTracker,
 
 		_indexObservers: any,
 		_nodeIndexObservables: any,
@@ -83,9 +82,7 @@ function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunct
 	self._mainObservables = self._maid:Add(ObservableSubscriptionTable.new())
 
 	-- Trackers
-	self._changedSpanTracker = ChangedSpanTracker.new()
-	self._addedIndexTracker = ChangedSpanTracker.new()
-	self._removedIndexTracker = ChangedSpanTracker.new()
+	self._unifiedTracker = UnifiedChangedSpanTracker.new()
 
 	self._nodesAdded = {}
 	self._nodesRemoved = {}
@@ -495,8 +492,7 @@ function ObservableSortedList._assignSortValue<T>(
 
 			-- Everything after this node's index changed, but we'll only log the changed internal range
 			local removeIndex = node:GetIndex()
-			self._changedSpanTracker:AddSpan(removeIndex, removeIndex)
-			self._removedIndexTracker:AddSpan(removeIndex, removeIndex)
+			self._unifiedTracker:LogRemove(removeIndex)
 			self:_removeNode(node)
 			node.value = nil
 			self:_queueFireEvents()
@@ -523,7 +519,6 @@ function ObservableSortedList._assignSortValue<T>(
 	if self._root and self._root:ContainsNode(node) then
 		local index = node:GetIndex()
 		originalIndex = index
-		self._removedIndexTracker:AddSpan(index, index)
 		self:_removeNode(node)
 	else
 		originalIndex = nil
@@ -536,14 +531,11 @@ function ObservableSortedList._assignSortValue<T>(
 	assert(self._root, "Root should exist after insert")
 
 	local newIndex = node:GetIndex()
-	self._addedIndexTracker:AddSpan(newIndex, newIndex)
 
 	if originalIndex then
-		-- Only changed a range
-		self._changedSpanTracker:AddSpan(originalIndex, newIndex)
+		self._unifiedTracker:LogMove(originalIndex, newIndex)
 	else
-		-- New node added, but only log internal change
-		self._changedSpanTracker:AddSpan(newIndex, newIndex)
+		self._unifiedTracker:LogAdd(newIndex)
 	end
 
 	self:_queueFireEvents()
@@ -615,11 +607,7 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 		return
 	end
 
-	local changedSpans = self._changedSpanTracker:GetAndClearSpans()
-	local addedSpans = self._addedIndexTracker:GetAndClearSpans()
-	local removedSpans = self._removedIndexTracker:GetAndClearSpans()
-	local effectiveSpans =
-		ChangedSpanTracker.computeEffectiveSpans(changedSpans, addedSpans, removedSpans, previousCount, descendantCount)
+	local effectiveSpans = self._unifiedTracker:ComputeEffectiveSpans(previousCount, descendantCount)
 
 	-- We assume there's not that many index observers at once (since you're usually looking for the ordinal first/last)
 	for rawIndex, _ in self._indexObservers:GetRawSubscriptionMap() do
