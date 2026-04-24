@@ -12,4 +12,8 @@ if ! pgrep -x openbox > /dev/null 2>&1; then
     sleep 0.5
 fi
 
+# Re-detect network interfaces so Wine sees the runtime network, not the
+# stale build-time config baked in by wineboot -i during docker build.
+wineboot -u > /dev/null 2>&1 || true
+
 exec "$@"
