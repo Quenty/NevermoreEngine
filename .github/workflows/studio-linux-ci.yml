@@ -164,6 +164,24 @@ jobs:
       env:
         ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
     steps:
+      - name: Start display server and Wine networking
+        run: |
+          # GitHub Actions overrides the container ENTRYPOINT, so we must
+          # start Xvfb + openbox and refresh Wine networking manually.
+          echo "Wine prefix before Xvfb:"
+          ls -la $WINEPREFIX/system.reg $WINEPREFIX/user.reg 2>/dev/null || echo "  No prefix files at $WINEPREFIX"
+          ls -la /home/studio/.wine/system.reg 2>/dev/null || echo "  No prefix at /home/studio/.wine"
+
+          Xvfb "${DISPLAY:-:99}" -screen 0 1024x768x24 &
+          sleep 0.5
+          DISPLAY="${DISPLAY:-:99}" openbox &
+          sleep 0.5
+          # Re-detect network interfaces so Wine sees the runtime network
+          wineboot -u > /dev/null 2>&1 || true
+
+          echo "Wine ipconfig after wineboot -u:"
+          wine ipconfig /all 2>/dev/null || echo "  ipconfig failed"
+
       - name: Checkout repository
         uses: actions/checkout@v6
 
