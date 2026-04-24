@@ -160,7 +160,7 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-      options: --user studio
+      options: --user studio --network host
       env:
         ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
     steps:
