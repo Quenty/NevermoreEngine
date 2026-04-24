@@ -107,7 +107,7 @@ function PlayerDataStoreService.PromiseDataStore(
 	player: Player | number
 ): Promise.Promise<DataStore.DataStore>
 	return self:PromiseManager():Then(function(manager)
-		return manager:GetDataStore(player)
+		return manager:PromiseDataStore(player)
 	end)
 end
 

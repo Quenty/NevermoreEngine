@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.36.0...@quenty/datastore@13.37.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.35.0...@quenty/datastore@13.36.0) (2026-04-15)
+
+
+### Bug Fixes
+
+* wait for data cleanup before attempting load ([#678](https://github.com/Quenty/NevermoreEngine/issues/678)) ([80adc48](https://github.com/Quenty/NevermoreEngine/commit/80adc48669603d9a30f1bb4aa8c45d09e995ada6))
+
+
+
+
+
+# [13.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.34.0...@quenty/datastore@13.35.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
 # [13.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.33.0...@quenty/datastore@13.34.0) (2026-02-20)
 
 

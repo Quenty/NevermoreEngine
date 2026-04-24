@@ -15,7 +15,7 @@
 
 import type { SourcemapResolver } from '../../sourcemap/index.js';
 
-const SSS_PREFIX = 'ServerScriptService.';
+const SERVER_SCRIPT_SERVICE_PREFIX = 'ServerScriptService.';
 
 /**
  * Resolve a Roblox instance path (from Jest-lua or a stack trace) to a
@@ -46,8 +46,8 @@ function _resolveHeuristic(instancePath: string): string {
   let path = instancePath.replace(/:\d+$/, '');
 
   // Strip ServerScriptService. prefix
-  if (path.startsWith(SSS_PREFIX)) {
-    path = path.slice(SSS_PREFIX.length);
+  if (path.startsWith(SERVER_SCRIPT_SERVICE_PREFIX)) {
+    path = path.slice(SERVER_SCRIPT_SERVICE_PREFIX.length);
   }
 
   // First dot-separated segment is the package slug
@@ -70,10 +70,7 @@ function _resolveHeuristic(instancePath: string): string {
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
     // If this segment is a known file suffix, merge it with the previous
-    if (
-      i > 0 &&
-      (seg === 'spec' || seg === 'story')
-    ) {
+    if (i > 0 && (seg === 'spec' || seg === 'story')) {
       rejoined[rejoined.length - 1] += `.${seg}`;
     } else {
       rejoined.push(seg);

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rogue-humanoid",
-  "version": "10.43.0",
+  "version": "10.46.0",
   "description": "Roguelike humanoid properties which can be modified",
   "keywords": [
     "Roblox",
@@ -42,6 +42,7 @@
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/table": "workspace:*",
+    "@quenty/tie": "workspace:*",
     "@quenty/valueobject": "workspace:*"
   },
   "publishConfig": {

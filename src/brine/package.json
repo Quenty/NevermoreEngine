@@ -1,0 +1,46 @@
+{
+  "name": "@quenty/brine",
+  "version": "1.1.0",
+  "description": "Fast and efficient extensible serialiation and deserialization library for Roblox with native instance support out of the box",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "brine"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/brine/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/bufferencoder": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/memoize": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/selectionutils": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/string": "workspace:*",
+    "@quenty/symbol": "workspace:*",
+    "@quenty/viewport": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

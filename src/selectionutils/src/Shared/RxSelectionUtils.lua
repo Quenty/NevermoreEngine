@@ -101,18 +101,16 @@ end
 	@param where callback
 	@return Observable<Instance?>
 ]=]
-function RxSelectionUtils.observeFirstSelection(where: Rx.Predicate<Instance>): Observable.Observable<Instance?>
-	assert(type(where) == "function", "Bad where")
+function RxSelectionUtils.observeFirstSelection(where: Rx.Predicate<Instance>?): Observable.Observable<Instance?>
+	assert(type(where) == "function" or where == nil, "Bad where")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
-
-		local current = ValueObject.new(nil)
-		maid:GiveTask(current)
+		local current = maid:Add(ValueObject.new(nil))
 
 		local function handleSelectionChanged()
 			for _, item in Selection:Get() do
-				if where(item) then
+				if where == nil or where(item) then
 					current.Value = item
 					return
 				end
@@ -141,9 +139,9 @@ end
 	@return Observable<Brio<Instance>>
 ]=]
 function RxSelectionUtils.observeFirstSelectionBrio(
-	where: Rx.Predicate<Instance>
+	where: Rx.Predicate<Instance>?
 ): Observable.Observable<Brio.Brio<Instance>>
-	assert(type(where) == "function", "Bad where")
+	assert(type(where) == "function" or where == nil, "Bad where")
 
 	return RxSelectionUtils.observeFirstSelection(where):Pipe({
 		RxBrioUtils.toBrio() :: any,

@@ -4,8 +4,9 @@
 ]]
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local loader = ServerScriptService.{{gameNameProper}}:FindFirstChild("LoaderUtils", true).Parent
-local require = require(loader).bootstrapGame(ServerScriptService.{{gameNameProper}})
+local root = ServerScriptService.{{gameNameProper}}
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
 
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("{{gameNameProper}}Service"))

@@ -78,6 +78,7 @@ export type PlayerDataStoreManager =
 			_keyGenerator: KeyGenerator,
 			_datastores: { [PlayerUserId]: DataStore.DataStore },
 			_removing: { [PlayerUserId]: boolean },
+			_removingPromises: { [PlayerUserId]: Promise.Promise<any> },
 			_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
 			_removingCallbacks: { RemovingCallback },
 			_disableSavingInStudio: boolean?,
@@ -112,6 +113,7 @@ function PlayerDataStoreManager.new(
 
 	self._datastores = {} -- [userId] = datastore
 	self._removing = {} -- [player] = true
+	self._removingPromises = {} -- [player] = removal promise
 	self._pendingSaves = PendingPromiseTracker.new()
 	self._removingCallbacks = {} -- [func, ...]
 
@@ -192,6 +194,67 @@ function PlayerDataStoreManager.GetDataStore(
 	end
 
 	return self:_createDataStore(userId)
+end
+
+--[=[
+	Gets the datastore for a player, waiting for any in-progress removal/save first.
+	Use this in async flows to safely support fast leave/rejoin behavior.
+
+	@return Promise<DataStore>
+]=]
+function PlayerDataStoreManager.PromiseDataStore(
+	self: PlayerDataStoreManager,
+	playerOrUserId: Player | PlayerUserId
+): Promise.Promise<DataStore.DataStore>
+	local userId = self:_toPlayerUserIdOrError(playerOrUserId)
+
+	return self:_promiseDataStoreByUserId(userId)
+end
+
+function PlayerDataStoreManager._promiseDataStoreByUserId(
+	self: PlayerDataStoreManager,
+	userId: PlayerUserId
+): Promise.Promise<DataStore.DataStore>
+	local dataStore = self:GetDataStore(userId)
+	if dataStore then
+		return Promise.resolved(dataStore)
+	end
+
+	return self:_promiseWaitForRemoving(userId):Then(function()
+		return self:_promiseDataStoreByUserId(userId)
+	end)
+end
+
+function PlayerDataStoreManager._promiseWaitForRemoving(
+	self: PlayerDataStoreManager,
+	userId: PlayerUserId
+): Promise.Promise<()>
+	local removingPromise = self._removingPromises[userId]
+	if removingPromise then
+		return removingPromise:Then(function()
+			return nil
+		end)
+	end
+
+	if self._removing[userId] then
+		return Promise.defer(function(resolve, reject)
+			local elapsed = 0
+			while self._removing[userId] do
+				elapsed += task.wait()
+
+				if elapsed >= 15 then
+					warn(
+						`[PlayerDataStoreManager] - Last session cleanup for {userId} taking longer than 15 seconds. Rejecting.`
+					)
+					reject()
+					break
+				end
+			end
+			resolve()
+		end)
+	end
+
+	return Promise.resolved()
 end
 
 function PlayerDataStoreManager:_toPlayerUserIdOrError(playerOrUserId: Player | PlayerUserId): PlayerUserId
@@ -286,7 +349,7 @@ function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreMana
 		end
 	end
 
-	PromiseUtils.all(removingPromises)
+	local removalPromise = PromiseUtils.all(removingPromises)
 		:Then(function()
 			return datastore:SaveAndCloseSession()
 		end)
@@ -294,6 +357,13 @@ function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreMana
 			datastore:Destroy()
 			self._removing[userId] = nil
 		end)
+
+	self._removingPromises[userId] = removalPromise
+	removalPromise:Finally(function()
+		if self._removingPromises[userId] == removalPromise then
+			self._removingPromises[userId] = nil
+		end
+	end)
 
 	-- Prevent double removal or additional issues
 	self._datastores[userId] = nil

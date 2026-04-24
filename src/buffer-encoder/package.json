@@ -1,0 +1,37 @@
+{
+  "name": "@quenty/bufferencoder",
+  "version": "1.1.0",
+  "description": "Buffer encoding redirection library",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "bufferencoder"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/bufferencoder/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "workspace:*",
+    "BufferEncoder.git": "github:anexpia/BufferEncoder"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.14.0...@quenty/modeltransparencyeffect@11.15.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/modeltransparencyeffect
+
+
+
+
+
+# [11.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.13.0...@quenty/modeltransparencyeffect@11.14.0) (2026-04-14)
+
+
+### Features
+
+* Expand LocalTransparencyModifier support ([1d2bc4d](https://github.com/Quenty/NevermoreEngine/commit/1d2bc4d75a954486c0b8a9c160d06476ca47e2e6))
+
+
+
+
+
 # [11.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.12.0...@quenty/modeltransparencyeffect@11.13.0) (2026-02-20)
 
 **Note:** Version bump only for package @quenty/modeltransparencyeffect

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/roblox-api-dump",
-  "version": "8.18.0",
+  "version": "8.20.0",
   "description": "Utility functions for grabbing the Roblox API from the web",
   "keywords": [
     "Roblox",
@@ -32,8 +32,14 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/httppromise": "workspace:*",
     "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/remoting": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

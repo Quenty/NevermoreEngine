@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.45.0...@quenty/rogue-humanoid@10.46.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.44.0...@quenty/rogue-humanoid@10.45.0) (2026-04-22)
+
+
+### Bug Fixes
+
+* Dependency ([15b55c8](https://github.com/Quenty/NevermoreEngine/commit/15b55c8ec0bbad7bb650684fd496545e77c665c3))
+
+
+### Features
+
+* RogueHumanoidInterface ([d5caa44](https://github.com/Quenty/NevermoreEngine/commit/d5caa4446e69b132626f1094f17400666a5380bc))
+
+
+
+
+
+# [10.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.43.0...@quenty/rogue-humanoid@10.44.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
 # [10.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.42.0...@quenty/rogue-humanoid@10.43.0) (2026-02-20)
 
 **Note:** Version bump only for package @quenty/rogue-humanoid

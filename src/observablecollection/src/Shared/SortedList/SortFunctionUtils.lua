@@ -42,6 +42,9 @@ function SortFunctionUtils.default(a: any, b: any): number
 	end
 end
 
+--[=[
+	An empty iterator that returns nothing
+]=]
 function SortFunctionUtils.emptyIterator() end
 
 return SortFunctionUtils

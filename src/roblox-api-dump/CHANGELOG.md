@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.19.0...@quenty/roblox-api-dump@8.20.0) (2026-04-23)
+
+
+### Bug Fixes
+
+* Add caching member lookup ([4d3fd23](https://github.com/Quenty/NevermoreEngine/commit/4d3fd23ee146a83e8414df576cae9f207c16e9a3))
+
+
+### Features
+
+* RobloxApiDump has server/client helpers, unit tests, and proper type checking ([c9f6eb0](https://github.com/Quenty/NevermoreEngine/commit/c9f6eb0640231935a72ef9a1eaf94814b2999ad8))
+
+
+
+
+
+# [8.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.18.0...@quenty/roblox-api-dump@8.19.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/roblox-api-dump
+
+
+
+
+
 # [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@8.17.0...@quenty/roblox-api-dump@8.18.0) (2026-02-20)
 
 **Note:** Version bump only for package @quenty/roblox-api-dump

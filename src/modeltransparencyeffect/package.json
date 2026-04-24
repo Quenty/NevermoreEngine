@@ -1,6 +1,6 @@
 {
   "name": "@quenty/modeltransparencyeffect",
-  "version": "11.13.0",
+  "version": "11.15.0",
   "description": "Allows a model to have transparent set locally on the client",
   "keywords": [
     "Roblox",
@@ -30,6 +30,9 @@
   "dependencies": {
     "@quenty/acceltween": "workspace:*",
     "@quenty/baseobject": "workspace:*",
+    "@quenty/enums": "workspace:*",
+    "@quenty/hide": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/steputils": "workspace:*",
