@@ -325,6 +325,11 @@ end
 
 --[=[
 	Checks if the list contains a value
+
+	:::warning
+	This can scan the whole list each call; cost is linear in the number of entries.
+	:::
+
 	@param value T
 	@return boolean
 ]=]
