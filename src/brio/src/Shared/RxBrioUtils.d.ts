@@ -1,16 +1,30 @@
 import { Maid } from '@quenty/maid';
-import { Observable, Operator } from '../../../rx';
+import { Observable, Operator } from '@quenty/rx';
 import { Brio } from './Brio';
 
+export {};
+
 type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
+
+type NormalizeTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 
 type FlattenValues<T extends Record<string | number, unknown>> = {
   [K in keyof T]: T[K] extends Observable<Brio<infer V>>
     ? V | undefined
     : T[K] extends Observable<infer V>
-    ? V | undefined
-    : T[K];
+      ? V | undefined
+      : T[K];
 };
+
+type FlattenTuples<T extends unknown[]> = T extends [infer Head, ...infer Tail]
+  ? Head extends unknown[]
+    ? [...Head, ...FlattenTuples<Tail>]
+    : [Head, ...FlattenTuples<Tail>]
+  : [];
+
+type ToTupleArray<T extends unknown[]> = T extends [infer Head, ...infer Tail]
+  ? [ToTuple<Head>, ...ToTupleArray<Tail>]
+  : [];
 
 export namespace RxBrioUtils {
   function ofBrio<T>(callback: ((maid: Maid) => T) | T): Observable<Brio<T>>;
@@ -45,13 +59,13 @@ export namespace RxBrioUtils {
     T extends Record<
       string | number,
       Observable<Brio<unknown>> | Observable<unknown> | unknown
-    >
+    >,
   >(observables: T): Observable<Brio<FlattenValues<T>>>;
   function flatCombineLatestBrio<
     T extends Record<
       string | number,
       Observable<Brio<unknown>> | Observable<unknown> | unknown
-    >
+    >,
   >(
     observables: T,
     filter?: (value: FlattenValues<T>) => boolean
@@ -83,8 +97,16 @@ export namespace RxBrioUtils {
     ...values: T[]
   ): <U>(source: Observable<Brio<U>>) => Observable<Brio<U | T | (U & T)>>;
   function extend<T>(
-    ...values: T[]
-  ): <U>(source: Observable<Brio<U>>) => Observable<Brio<U | T | (U & T)>>;
+    ...values: NormalizeTuple<T>
+  ): <U>(
+    source: Observable<Brio<U>>
+  ) => Observable<
+    Brio<
+      LuaTuple<
+        [...ToTuple<U>, ...FlattenTuples<ToTupleArray<NormalizeTuple<T>>>]
+      >
+    >
+  >;
   function map<T, S extends T, U>(
     project: (...args: ToTuple<S>) => U
   ): (source: Observable<Brio<T>>) => Observable<Brio<U>>;
@@ -119,5 +141,3 @@ export namespace RxBrioUtils {
     predicate?: (value: T) => boolean
   ): (source: Observable<T | Brio<T>>) => Observable<Brio<T>>;
 }
-
-export {};
