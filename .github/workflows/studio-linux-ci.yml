@@ -222,8 +222,8 @@ jobs:
           tail -100 /tmp/studio-bridge-wine.log 2>/dev/null || echo "No Wine log"
           echo ""
           echo "=== Studio logs ==="
-          find ~/.wine/drive_c/users/ -name "*.log" -path "*/Roblox/logs/*" 2>/dev/null | head -5
-          tail -50 ~/.wine/drive_c/users/*/AppData/Local/Roblox/logs/*.log 2>/dev/null || echo "No Studio logs"
+          find $WINEPREFIX/drive_c/users/ -name "*.log" -path "*/Roblox/logs/*" 2>/dev/null | head -5
+          tail -50 $WINEPREFIX/drive_c/users/*/AppData/Local/Roblox/logs/*.log 2>/dev/null || echo "No Studio logs"
           echo ""
           echo "=== Wine prefix check ==="
           ls -la $WINEPREFIX/system.reg 2>/dev/null || echo "No system.reg at WINEPREFIX=$WINEPREFIX"
@@ -236,5 +236,5 @@ jobs:
           name: studio-bridge-logs
           path: |
             /tmp/studio-bridge-wine.log
-            ~/.wine/drive_c/users/*/AppData/Local/Roblox/logs/
+            /home/studio/.wine/drive_c/users/*/AppData/Local/Roblox/logs/
           if-no-files-found: ignore
