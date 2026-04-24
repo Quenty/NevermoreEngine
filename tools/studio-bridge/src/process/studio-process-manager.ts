@@ -1,9 +1,10 @@
 /**
  * Locates a Roblox Studio installation and manages the Studio process
- * lifecycle. Supports Windows and macOS.
+ * lifecycle. Supports Windows, macOS, and Linux (via Wine).
  */
 
 import * as fs from 'fs/promises';
+import * as os from 'os';
 import * as path from 'path';
 import { spawn, type ChildProcess } from 'child_process';
 import { execa } from 'execa';
@@ -22,6 +23,8 @@ export async function findStudioPathAsync(): Promise<string> {
     return findStudioPathWindowsAsync();
   } else if (process.platform === 'darwin') {
     return findStudioPathMacAsync();
+  } else if (process.platform === 'linux') {
+    return findStudioPathLinuxAsync();
   }
   throw new Error(`Unsupported platform: ${process.platform}`);
 }
@@ -68,6 +71,20 @@ async function findStudioPathMacAsync(): Promise<string> {
   }
 }
 
+async function findStudioPathLinuxAsync(): Promise<string> {
+  const { resolveLinuxConfig } = await import('../linux/linux-config.js');
+  const config = resolveLinuxConfig();
+
+  try {
+    await fs.access(config.studioExe);
+    return config.studioExe;
+  } catch {
+    throw new Error(
+      `Could not find Roblox Studio at ${config.studioExe}. Run "studio-bridge linux setup" first.`
+    );
+  }
+}
+
 /**
  * Resolve the Studio plugins folder for the current platform.
  */
@@ -84,6 +101,14 @@ export function findPluginsFolder(): string {
       throw new Error('HOME environment variable is not set');
     }
     return path.join(home, 'Documents', 'Roblox', 'Plugins');
+  } else if (process.platform === 'linux') {
+    // Studio runs under Wine and resolves plugins via %LOCALAPPDATA%
+    const winePrefix = process.env.WINEPREFIX || path.join(os.homedir(), '.wine');
+    const wineUser = process.env.USER || os.userInfo().username;
+    return path.join(
+      winePrefix, 'drive_c', 'users', wineUser,
+      'AppData', 'Local', 'Roblox', 'Plugins',
+    );
   }
   throw new Error(`Unsupported platform: ${process.platform}`);
 }
@@ -109,6 +134,10 @@ export interface StudioProcess {
 export async function launchStudioAsync(
   placePath: string
 ): Promise<StudioProcess> {
+  if (process.platform === 'linux') {
+    return launchStudioLinuxAsync(placePath);
+  }
+
   const studioExe = await findStudioPathAsync();
   OutputHelper.verbose(`[StudioBridge] ${studioExe} "${placePath}"`);
 
@@ -141,4 +170,14 @@ export async function launchStudioAsync(
   };
 
   return { process: proc, killAsync };
+}
+
+async function launchStudioLinuxAsync(
+  placePath: string
+): Promise<StudioProcess> {
+  const { launchStudioLinuxAsync: launch } = await import(
+    '../linux/linux-studio-launcher.js'
+  );
+  const studioExe = await findStudioPathAsync();
+  return launch(studioExe, placePath);
 }

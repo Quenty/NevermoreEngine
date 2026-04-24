@@ -204,6 +204,23 @@ When tests fail in CI, the `post-test-results` command parses Jest-lua output an
 
 The resolver code lives in `tools/nevermore-cli/src/utils/sourcemap/` and is shared with the `strip-sourcemap-jest` command.
 
+## Linux headless testing
+
+Studio can run headlessly on Linux via Wine, enabling E2E tests in devcontainers and GitHub Actions without a display or GPU. The `studio-bridge` CLI handles all environment setup:
+
+```bash
+# One-time setup
+studio-bridge linux setup --install-deps
+studio-bridge linux inject-credentials  # reads $ROBLOSECURITY env var
+
+# Run tests the same as on Windows/macOS
+nevermore test
+```
+
+Prerequisites (Wine 11, Xvfb, openbox, Mesa llvmpipe) are documented in `tools/studio-bridge/src/linux/README.md`. The `linux setup --install-deps` flag installs everything on Debian/Ubuntu but is opt-in — it never runs sudo automatically.
+
+For CI, set `ROBLOSECURITY` as a repository or Codespace secret. The `.github/workflows/studio-linux-e2e.yml` workflow demonstrates the full flow.
+
 ## CI design principles
 
 - **Workflows should be thin.** All logic lives in `nevermore-cli` commands — GitHub Actions workflows just call them. This keeps CI debuggable locally.

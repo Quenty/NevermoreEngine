@@ -21,4 +21,3 @@ export { mcpHandlerAsync, type McpResult } from './mcp/mcp.js';
 export { type TerminalOptions, type TerminalResult } from './terminal/terminal.js';
 export { processRunHandlerAsync, type ProcessRunOptions, type ProcessRunResult } from './process/run/run.js';
 export { processCloseHandlerAsync, type ProcessCloseResult } from './process/close/close.js';
-export { invokeActionHandlerAsync, type ActionResult } from './action/action.js';

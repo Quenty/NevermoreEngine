@@ -28,6 +28,7 @@ const GROUP_DESCRIPTIONS: Record<string, string> = {
   process: 'Manage Studio processes',
   plugin: 'Manage the bridge plugin',
   action: 'Invoke a Studio action',
+  linux: 'Linux/Wine environment management',
 };
 
 // ---------------------------------------------------------------------------

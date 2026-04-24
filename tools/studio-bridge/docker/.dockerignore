@@ -1,0 +1,2 @@
+# Primary build context is this directory — only entrypoint.sh is needed.
+# The workspace named build context handles repo files.

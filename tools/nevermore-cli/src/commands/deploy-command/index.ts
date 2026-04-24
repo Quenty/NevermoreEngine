@@ -9,7 +9,7 @@ import {
   SimpleReporter,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';

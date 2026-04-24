@@ -1,4 +1,4 @@
-import { getApiKeyAsync, CredentialArgs } from '../auth/credential-store.js';
+import { getApiKeyAsync, type CredentialArgs } from '@quenty/nevermore-cli-helpers';
 import { type DeployTarget } from './deploy-config.js';
 import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 import { type BuiltPlace } from './build.js';

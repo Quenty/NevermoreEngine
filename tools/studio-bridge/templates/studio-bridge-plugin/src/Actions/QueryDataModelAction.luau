@@ -1,1 +1,0 @@
-../../../../src/commands/explorer/query/query-data-model.luau

@@ -3,7 +3,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { DeployConfig, discoverUniverseIdAsync } from '../../utils/build/deploy-config.js';
-import { getRobloxCookieAsync, createPlaceInUniverseAsync } from '../../utils/auth/roblox-auth/index.js';
+import { getRobloxCookieAsync, createPlaceInUniverseAsync } from '@quenty/nevermore-cli-helpers';
 import { fileExistsAsync, buildPlaceNameAsync } from '../../utils/nevermore-cli-utils.js';
 import { DeployArgs } from './index.js';
 import { promptPlaceIdAsync } from './deploy-init-prompts.js';

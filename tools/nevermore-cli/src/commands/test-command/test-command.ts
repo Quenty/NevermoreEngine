@@ -2,7 +2,7 @@ import * as path from 'path';
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';

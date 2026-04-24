@@ -12,7 +12,7 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import { resolvePackagePath } from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
 import { type BatchDeployResult } from '../../utils/deploy/deploy-github-columns.js';

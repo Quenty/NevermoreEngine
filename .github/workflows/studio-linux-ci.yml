@@ -1,0 +1,288 @@
+name: studio-linux-ci
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Nightly 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      studio_version:
+        description: 'Override Studio version hash (leave empty for latest)'
+        required: false
+  push:
+    branches: [main]
+    paths:
+      - 'tools/studio-bridge/docker/**'
+      - 'tools/studio-bridge/src/**'
+      - '.github/workflows/studio-linux-ci.yml'
+  pull_request:
+    paths:
+      - 'tools/studio-bridge/docker/**'
+      - 'tools/studio-bridge/src/**'
+      - 'tools/nevermore-cli-helpers/src/auth/**'
+      - '.github/workflows/studio-linux-ci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: quenty/nevermore-studio-linux
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Resolve Studio version
+        id: resolve
+        run: |
+          if [ -n "${{ inputs.studio_version }}" ]; then
+            VERSION="${{ inputs.studio_version }}"
+          else
+            VERSION=$(curl -s https://clientsettingscdn.roblox.com/v2/client-version/WindowsStudio64 | jq -r .clientVersionUpload)
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "short=${VERSION:0:12}" >> "$GITHUB_OUTPUT"
+          echo "Resolved Studio version: $VERSION"
+
+          # Canary builds for PRs and non-main branches
+          BRANCH="${{ github.head_ref || github.ref_name }}"
+          if [ "$BRANCH" != "main" ]; then
+            BRANCH_SLUG="${BRANCH//\//-}"
+            SHORT_SHA="${GITHUB_SHA:0:8}"
+            echo "is_canary=true" >> "$GITHUB_OUTPUT"
+            echo "canary_tag=canary-${BRANCH_SLUG}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+            echo "branch_tag=canary-${BRANCH_SLUG}" >> "$GITHUB_OUTPUT"
+            echo "Canary build: canary-${BRANCH_SLUG}-${SHORT_SHA}"
+          else
+            echo "is_canary=false" >> "$GITHUB_OUTPUT"
+            echo "canary_tag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute image tag for downstream jobs
+        id: tag
+        run: |
+          if [ "${{ steps.resolve.outputs.is_canary }}" = "true" ]; then
+            echo "tag=${{ steps.resolve.outputs.branch_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check if image already exists
+        id: check
+        run: |
+          # Always rebuild canary images
+          if [ "${{ steps.resolve.outputs.is_canary }}" = "true" ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Canary build — always rebuild"
+            exit 0
+          fi
+
+          if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.version }} > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Image already exists for version ${{ steps.resolve.outputs.version }}, skipping build"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Image not found, will build"
+          fi
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+
+      - name: Checkout repository
+        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute image tags
+        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        id: tags
+        run: |
+          if [ "${{ steps.resolve.outputs.is_canary }}" = "true" ]; then
+            # Tag with both the SHA-specific and stable branch tags
+            TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.canary_tag }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.branch_tag }}"
+          else
+            TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.version }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.short }}"
+          fi
+          echo "tags<<ENDOFTAGS" >> "$GITHUB_OUTPUT"
+          echo "$TAGS" >> "$GITHUB_OUTPUT"
+          echo "ENDOFTAGS" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push image
+        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: tools/studio-bridge/docker
+          build-contexts: workspace=.
+          build-args: |
+            STUDIO_VERSION=${{ steps.resolve.outputs.version }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Clean up old images
+        if: steps.check.outputs.exists != 'true' && steps.resolve.outputs.is_canary != 'true'
+        continue-on-error: true
+        uses: snok/container-retention-policy@v3.0.0
+        with:
+          account: quenty
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-names: nevermore-studio-linux
+          cut-off: 30d
+          keep-n-most-recent: 5
+
+  e2e:
+    needs: build
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/quenty/nevermore-studio-linux:${{ needs.build.outputs.tag }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      options: --user studio --dns 8.8.8.8 --dns 8.8.4.4 --cap-add NET_RAW
+      env:
+        ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+    steps:
+      - name: Start display server and Wine networking
+        run: |
+          # GitHub Actions overrides the container ENTRYPOINT, so we must
+          # start Xvfb + openbox and refresh Wine networking manually.
+          echo "Wine prefix before Xvfb:"
+          ls -la $WINEPREFIX/system.reg $WINEPREFIX/user.reg 2>/dev/null || echo "  No prefix files at $WINEPREFIX"
+          ls -la /home/studio/.wine/system.reg 2>/dev/null || echo "  No prefix at /home/studio/.wine"
+
+          Xvfb "${DISPLAY:-:99}" -screen 0 1024x768x24 &
+          sleep 0.5
+          DISPLAY="${DISPLAY:-:99}" openbox &
+          sleep 0.5
+          # Re-detect network interfaces so Wine sees the runtime network
+          wineboot -u > /dev/null 2>&1 || true
+
+          echo "Wine ipconfig after wineboot -u:"
+          wine ipconfig /all 2>/dev/null || echo "  ipconfig failed"
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install aftman tools
+        run: aftman install --no-trust-check
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup registries
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' run build
+
+      - name: Install studio-bridge CLI
+        run: npm install --ignore-scripts --force -g .
+        working-directory: tools/studio-bridge
+
+      - name: Verify environment health (pre-auth)
+        run: studio-bridge linux status
+
+      - name: Diagnose Wine networking
+        if: always()
+        run: |
+          echo "=== /etc/resolv.conf ==="
+          cat /etc/resolv.conf
+          echo ""
+          echo "=== Host DNS test (curl) ==="
+          curl -sI https://clientsettingscdn.roblox.com/ 2>&1 | head -5 || echo "curl failed"
+          echo ""
+          echo "=== /sys/class/net ==="
+          ls -la /sys/class/net/ 2>/dev/null || echo "/sys/class/net not accessible"
+          echo ""
+          echo "=== /proc/net/route ==="
+          cat /proc/net/route 2>/dev/null || echo "/proc/net/route not accessible"
+          echo ""
+          echo "=== /proc/net/if_inet6 ==="
+          cat /proc/net/if_inet6 2>/dev/null || echo "No IPv6 info"
+          echo ""
+          echo "=== Wine ipconfig (before wineboot -u) ==="
+          wine ipconfig /all 2>/dev/null || echo "wine ipconfig failed"
+          echo ""
+          echo "=== Running wineboot -u ==="
+          WINEDEBUG=+nsi wineboot -u 2>&1 | head -30 || echo "wineboot -u failed"
+          echo ""
+          echo "=== Wine ipconfig (after wineboot -u) ==="
+          wine ipconfig /all 2>/dev/null || echo "wine ipconfig failed"
+          echo ""
+          echo "=== Wine prefix files ==="
+          ls -la $WINEPREFIX/system.reg $WINEPREFIX/user.reg 2>/dev/null || echo "No Wine prefix files"
+
+      - name: Inject authentication
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: studio-bridge linux inject-credentials --verbose
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+
+      - name: Execute script through Studio bridge
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: studio-bridge process run --verbose --timeout 60000 'print("E2E test passed!")'
+        timeout-minutes: 5
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+
+      - name: Print logs
+        if: always()
+        run: |
+          echo "=== Environment ==="
+          echo "DISPLAY=$DISPLAY WINEPREFIX=$WINEPREFIX STUDIO_DIR=$STUDIO_DIR HOME=$HOME"
+          echo "Xvfb running: $(pgrep -x Xvfb > /dev/null && echo yes || echo no)"
+          echo "openbox running: $(pgrep -x openbox > /dev/null && echo yes || echo no)"
+          echo "Wine procs: $(pgrep -c wine 2>/dev/null || echo 0)"
+          echo ""
+          echo "=== Wine log (last 100 lines) ==="
+          tail -100 /tmp/studio-bridge-wine.log 2>/dev/null || echo "No Wine log"
+          echo ""
+          echo "=== Studio logs ==="
+          find $WINEPREFIX/drive_c/users/ -name "*.log" -path "*/Roblox/logs/*" 2>/dev/null | head -5
+          tail -50 $WINEPREFIX/drive_c/users/*/AppData/Local/Roblox/logs/*.log 2>/dev/null || echo "No Studio logs"
+          echo ""
+          echo "=== Wine prefix check ==="
+          ls -la $WINEPREFIX/system.reg 2>/dev/null || echo "No system.reg at WINEPREFIX=$WINEPREFIX"
+          ls -la /home/studio/.wine/system.reg 2>/dev/null || echo "No system.reg at /home/studio/.wine"
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-bridge-logs
+          path: |
+            /tmp/studio-bridge-wine.log
+            /home/studio/.wine/drive_c/users/*/AppData/Local/Roblox/logs/
+          if-no-files-found: ignore

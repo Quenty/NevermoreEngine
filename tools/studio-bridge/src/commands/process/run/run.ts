@@ -21,6 +21,7 @@ export interface ProcessRunOptions {
   timeoutMs: number;
   verbose: boolean;
   showLogs: boolean;
+  filePath?: string;
 }
 
 export interface ProcessRunResult {
@@ -107,6 +108,7 @@ export const processRunCommand = defineCommand<ProcessRunArgs, ProcessRunResult>
       timeoutMs: args.timeout ?? 120_000,
       verbose: false,
       showLogs: true,
+      filePath: args.file,
     });
   },
   // No MCP config -- process run is CLI-only

@@ -314,11 +314,10 @@ export class BridgeClient extends EventEmitter {
       }
       // Resolve with a synthetic message (the caller only cares about the list)
       pending.resolve({
-        type: 'subscribeResult',
+        type: 'heartbeat',
         sessionId: '',
-        requestId: msg.requestId,
-        payload: { events: [] },
-      } as PluginMessage);
+        payload: { uptimeMs: 0, state: 'Edit', pendingRequests: 0 },
+      });
     }
   }
 

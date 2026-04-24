@@ -31,8 +31,29 @@ describe('findPluginsFolder', () => {
     expect(result).toMatch(/Roblox[/\\]Plugins$/);
   });
 
-  it('throws on unsupported platform', () => {
+  it('returns correct Linux path using WINEPREFIX', () => {
     Object.defineProperty(process, 'platform', { value: 'linux' });
+    process.env.WINEPREFIX = '/home/test/.wine';
+    process.env.USER = 'testuser';
+
+    const result = findPluginsFolder();
+    expect(result).toMatch(/Plugins$/);
+    expect(result).toContain('/home/test/.wine/drive_c/users/testuser');
+    expect(result).toContain('Roblox');
+  });
+
+  it('returns correct Linux path with default Wine prefix', () => {
+    Object.defineProperty(process, 'platform', { value: 'linux' });
+    delete process.env.WINEPREFIX;
+
+    const result = findPluginsFolder();
+    expect(result).toMatch(/Plugins$/);
+    expect(result).toContain('.wine');
+    expect(result).toContain('Roblox');
+  });
+
+  it('throws on unsupported platform', () => {
+    Object.defineProperty(process, 'platform', { value: 'freebsd' });
 
     expect(() => findPluginsFolder()).toThrow('Unsupported platform');
   });
