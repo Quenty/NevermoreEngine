@@ -167,6 +167,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Install aftman tools
+        run: aftman install --no-trust-check
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
