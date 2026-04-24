@@ -204,8 +204,8 @@ jobs:
 
       - name: Execute script through Studio bridge
         if: ${{ env.ROBLOSECURITY != '' }}
-        run: studio-bridge process run --verbose --timeout 300000 'print("E2E test passed!")'
-        timeout-minutes: 10
+        run: studio-bridge process run --verbose --timeout 60000 'print("E2E test passed!")'
+        timeout-minutes: 5
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 
