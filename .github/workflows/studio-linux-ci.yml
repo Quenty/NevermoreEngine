@@ -202,6 +202,23 @@ jobs:
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 
+      - name: Diagnose Wine networking
+        run: |
+          echo "=== /etc/resolv.conf ==="
+          cat /etc/resolv.conf
+          echo ""
+          echo "=== Host DNS test ==="
+          nslookup clientsettingscdn.roblox.com 2>&1 || echo "nslookup failed"
+          echo ""
+          echo "=== Wine ipconfig ==="
+          wine ipconfig /all 2>/dev/null || echo "wine ipconfig failed"
+          echo ""
+          echo "=== Wine prefix files ==="
+          ls -la $WINEPREFIX/system.reg $WINEPREFIX/user.reg 2>/dev/null || echo "No Wine prefix files"
+          echo ""
+          echo "=== Network interfaces ==="
+          ip addr show 2>/dev/null || ifconfig 2>/dev/null || echo "No network tools"
+
       - name: Execute script through Studio bridge
         if: ${{ env.ROBLOSECURITY != '' }}
         run: studio-bridge process run --verbose --timeout 60000 'print("E2E test passed!")'
