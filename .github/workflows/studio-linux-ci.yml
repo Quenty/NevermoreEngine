@@ -1,4 +1,4 @@
-name: studio-linux-docker-build
+name: studio-linux-ci
 
 on:
   schedule:
@@ -13,12 +13,13 @@ on:
     paths:
       - 'tools/studio-bridge/docker/**'
       - 'tools/studio-bridge/src/**'
-      - '.github/workflows/studio-linux-docker-build.yml'
+      - '.github/workflows/studio-linux-ci.yml'
   pull_request:
     paths:
       - 'tools/studio-bridge/docker/**'
       - 'tools/studio-bridge/src/**'
-      - '.github/workflows/studio-linux-docker-build.yml'
+      - 'tools/nevermore-cli-helpers/src/auth/**'
+      - '.github/workflows/studio-linux-ci.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
@@ -34,6 +35,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Resolve Studio version
         id: resolve
@@ -50,14 +53,24 @@ jobs:
           # Canary builds for PRs and non-main branches
           BRANCH="${{ github.head_ref || github.ref_name }}"
           if [ "$BRANCH" != "main" ]; then
+            BRANCH_SLUG="${BRANCH//\//-}"
             SHORT_SHA="${GITHUB_SHA:0:8}"
-            CANARY_TAG="canary-${BRANCH//\//-}-${SHORT_SHA}"
             echo "is_canary=true" >> "$GITHUB_OUTPUT"
-            echo "canary_tag=$CANARY_TAG" >> "$GITHUB_OUTPUT"
-            echo "Canary build: $CANARY_TAG"
+            echo "canary_tag=canary-${BRANCH_SLUG}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+            echo "branch_tag=canary-${BRANCH_SLUG}" >> "$GITHUB_OUTPUT"
+            echo "Canary build: canary-${BRANCH_SLUG}-${SHORT_SHA}"
           else
             echo "is_canary=false" >> "$GITHUB_OUTPUT"
             echo "canary_tag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute image tag for downstream jobs
+        id: tag
+        run: |
+          if [ "${{ steps.resolve.outputs.is_canary }}" = "true" ]; then
+            echo "tag=${{ steps.resolve.outputs.branch_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check if image already exists
@@ -101,7 +114,9 @@ jobs:
         id: tags
         run: |
           if [ "${{ steps.resolve.outputs.is_canary }}" = "true" ]; then
-            TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.canary_tag }}"
+            # Tag with both the SHA-specific and stable branch tags
+            TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.canary_tag }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.branch_tag }}"
           else
             TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.resolve.outputs.version }}
@@ -134,3 +149,89 @@ jobs:
           image-names: nevermore-studio-linux
           cut-off: 30d
           keep-n-most-recent: 5
+
+  e2e:
+    needs: build
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.tag }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      options: --user studio
+      env:
+        ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup registries
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' run build
+
+      - name: Install studio-bridge CLI
+        run: npm install --ignore-scripts --force -g .
+        working-directory: tools/studio-bridge
+
+      - name: Verify environment health (pre-auth)
+        run: studio-bridge linux status
+
+      - name: Inject authentication
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: studio-bridge linux inject-credentials --verbose
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+
+      - name: Execute script through Studio bridge
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: studio-bridge process run --verbose --timeout 300000 'print("E2E test passed!")'
+        timeout-minutes: 10
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+
+      - name: Print logs
+        if: always()
+        run: |
+          echo "=== Environment ==="
+          echo "DISPLAY=$DISPLAY WINEPREFIX=$WINEPREFIX STUDIO_DIR=$STUDIO_DIR HOME=$HOME"
+          echo "Xvfb running: $(pgrep -x Xvfb > /dev/null && echo yes || echo no)"
+          echo "openbox running: $(pgrep -x openbox > /dev/null && echo yes || echo no)"
+          echo "Wine procs: $(pgrep -c wine 2>/dev/null || echo 0)"
+          echo ""
+          echo "=== Wine log (last 100 lines) ==="
+          tail -100 /tmp/studio-bridge-wine.log 2>/dev/null || echo "No Wine log"
+          echo ""
+          echo "=== Studio logs ==="
+          find ~/.wine/drive_c/users/ -name "*.log" -path "*/Roblox/logs/*" 2>/dev/null | head -5
+          tail -50 ~/.wine/drive_c/users/*/AppData/Local/Roblox/logs/*.log 2>/dev/null || echo "No Studio logs"
+          echo ""
+          echo "=== Wine prefix check ==="
+          ls -la $WINEPREFIX/system.reg 2>/dev/null || echo "No system.reg at WINEPREFIX=$WINEPREFIX"
+          ls -la /home/studio/.wine/system.reg 2>/dev/null || echo "No system.reg at /home/studio/.wine"
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-bridge-logs
+          path: |
+            /tmp/studio-bridge-wine.log
+            ~/.wine/drive_c/users/*/AppData/Local/Roblox/logs/
+          if-no-files-found: ignore
