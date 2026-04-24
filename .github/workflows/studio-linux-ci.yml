@@ -196,13 +196,8 @@ jobs:
       - name: Verify environment health (pre-auth)
         run: studio-bridge linux status
 
-      - name: Inject authentication
-        if: ${{ env.ROBLOSECURITY != '' }}
-        run: studio-bridge linux inject-credentials --verbose
-        env:
-          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
-
       - name: Diagnose Wine networking
+        if: always()
         run: |
           echo "=== /etc/resolv.conf ==="
           cat /etc/resolv.conf
@@ -230,6 +225,12 @@ jobs:
           echo ""
           echo "=== Wine prefix files ==="
           ls -la $WINEPREFIX/system.reg $WINEPREFIX/user.reg 2>/dev/null || echo "No Wine prefix files"
+
+      - name: Inject authentication
+        if: ${{ env.ROBLOSECURITY != '' }}
+        run: studio-bridge linux inject-credentials --verbose
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 
       - name: Execute script through Studio bridge
         if: ${{ env.ROBLOSECURITY != '' }}
