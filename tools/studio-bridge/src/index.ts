@@ -19,6 +19,44 @@ export type {
 } from './server/studio-bridge-server.js';
 export type { OutputLevel } from './server/web-socket-protocol.js';
 
+// Bridge network layer (persistent sessions)
+export {
+  BridgeConnection,
+  BridgeSession,
+  SessionNotFoundError,
+  ActionTimeoutError,
+  SessionDisconnectedError,
+  CapabilityNotSupportedError,
+  ContextNotFoundError,
+  HostUnreachableError,
+} from './bridge/index.js';
+
+export type {
+  BridgeConnectionOptions,
+  SessionInfo,
+  InstanceInfo,
+  SessionContext,
+  SessionOrigin,
+  ExecResult,
+  StateResult,
+  ScreenshotResult,
+  LogsResult,
+  DataModelResult,
+  LogEntry,
+  LogOptions,
+  QueryDataModelOptions,
+  LogFollowOptions,
+} from './bridge/index.js';
+
+// v2 protocol types
+export type {
+  Capability,
+  StudioState,
+  DataModelInstance,
+  ErrorCode,
+  SerializedValue,
+} from './server/web-socket-protocol.js';
+
 // Lower-level exports for advanced usage / testing
 export {
   findStudioPathAsync,
@@ -29,8 +67,10 @@ export { injectPluginAsync } from './plugin/plugin-injector.js';
 export {
   encodeMessage,
   decodePluginMessage,
+  decodeServerMessage,
 } from './server/web-socket-protocol.js';
 export type {
+  // v1 messages
   PluginMessage,
   ServerMessage,
   HelloMessage,
@@ -39,4 +79,22 @@ export type {
   WelcomeMessage,
   ExecuteMessage,
   ShutdownMessage,
+  // v2 plugin -> server messages
+  RegisterMessage,
+  StateResultMessage,
+  ScreenshotResultMessage,
+  DataModelResultMessage,
+  LogsResultMessage,
+  StateChangeMessage,
+  HeartbeatMessage,
+  PluginErrorMessage,
+  // v2 server -> plugin messages
+  QueryStateMessage,
+  CaptureScreenshotMessage,
+  QueryDataModelMessage,
+  QueryLogsMessage,
+  ServerErrorMessage,
+  // v2 dynamic action registration
+  RegisterActionMessage,
+  RegisterActionResultMessage,
 } from './server/web-socket-protocol.js';
