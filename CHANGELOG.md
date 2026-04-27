@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/cli-output-helpers@1.10.1`
+  - docs: Update docs and improve CLI a bit [#686](https://github.com/Quenty/NevermoreEngine/pull/686) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Apr 27 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/settings@11.49.1`
   - fix: Prevent input rebind oscillation [#687](https://github.com/Quenty/NevermoreEngine/pull/687) ([@alex-y-z](https://github.com/alex-y-z))
 

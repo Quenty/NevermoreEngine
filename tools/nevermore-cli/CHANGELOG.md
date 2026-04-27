@@ -1,3 +1,15 @@
+# v4.24.1 (Mon Apr 27 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/misc-updates ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
