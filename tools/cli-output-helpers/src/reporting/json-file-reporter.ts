@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import { OutputHelper } from '../outputHelper.js';
 import { BaseReporter } from './reporter.js';
+import { formatJson } from './format-json.js';
 import { type IStateTracker } from './state/state-tracker.js';
 
 /**
@@ -32,7 +33,7 @@ export class JsonFileReporter extends BaseReporter {
       },
     };
 
-    await fs.writeFile(this._outputPath, JSON.stringify(summary, null, 2));
+    await fs.writeFile(this._outputPath, formatJson(summary, { pretty: true }));
     OutputHelper.info(`Results written to ${this._outputPath}`);
   }
 }
