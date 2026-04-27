@@ -44,6 +44,43 @@ Both CLIs define global args applied via middleware:
 - **nevermore-cli**: `NevermoreGlobalArgs` — `--yes` (skip prompts), `--dryrun`, `--verbose`
 - **studio-bridge**: `StudioBridgeGlobalArgs` — `--verbose`, `--place` (path to .rbxl), `--timeout`, `--logs`
 
+## CLI Output
+
+**All CLI output goes through `cli-output-helpers/reporting`. Do not build parallel formatting modules.**
+
+Two reporter shapes for two output situations:
+
+- **`Reporter`** — batch lifecycle. Many packages, phases (`onPackageStart`, `onPackagePhaseChange`, `onPackageProgressUpdate`, `onPackageResult`), aggregated `BatchSummary`. Used by `nevermore-cli batch`. Fan out via `CompositeReporter`. Concrete reporters: `SimpleReporter`, `SpinnerReporter`, `SummaryTableReporter`, `JsonFileReporter`, `GroupedReporter`, `github/*`.
+- **`ResultReporter<T>`** — single-result output (one-shot or polled). `startAsync` → repeated `onResult` → `stopAsync`. Used by `studio-bridge` commands. Fan out via `CompositeResultReporter`. Concrete reporters: `StdoutResultReporter`, `FileResultReporter` (handles binary), `WatchResultReporter` (TTY redraw).
+
+```typescript
+import {
+	StdoutResultReporter,
+	FileResultReporter,
+	WatchResultReporter,
+	type ResultReporter,
+} from "@quenty/cli-output-helpers/reporting";
+```
+
+Shared formatting primitives also live in `reporting/` and are usable from command handlers when you need a string from data:
+
+```typescript
+import {
+	formatTable,
+	formatJson,
+	resolveOutputMode,
+	type TableColumn,
+	type OutputMode,
+} from "@quenty/cli-output-helpers/reporting";
+```
+
+**Rules:**
+
+- New output need that fits one of the existing reporters? Use it.
+- New output shape? Extend `BaseReporter` (batch) or `BaseResultReporter` (single-result). Put the new reporter in `cli-output-helpers/src/reporting/`.
+- Need a primitive (table, JSON, watch redraw)? Use the ones in `reporting/`. Don't add a new formatting module elsewhere.
+- Tempted to build a "format-output utility module" for your tool? You're rolling parallel infra. Stop and use `ResultReporter` instead.
+
 ## Error Handling
 
 Two patterns, depending on whether failure is expected:
