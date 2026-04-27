@@ -98,3 +98,49 @@ export type {
   RegisterActionMessage,
   RegisterActionResultMessage,
 } from './server/web-socket-protocol.js';
+
+// Command handlers
+export {
+  listSessionsHandlerAsync,
+  serveHandlerAsync,
+  installPluginHandlerAsync,
+  uninstallPluginHandlerAsync,
+  queryStateHandlerAsync,
+  queryLogsHandlerAsync,
+  captureScreenshotHandlerAsync,
+  queryDataModelHandlerAsync,
+  execHandlerAsync,
+  runHandlerAsync,
+  launchHandlerAsync,
+  connectHandlerAsync,
+  disconnectHandler,
+} from './commands/index.js';
+
+export type {
+  SessionsResult,
+  ServeOptions,
+  ServeResult,
+  InstallPluginResult,
+  UninstallPluginResult,
+  QueryOptions,
+  QueryResult,
+  DataModelNode,
+  RunOptions,
+  RunResult,
+  LaunchOptions,
+  LaunchResult,
+  ConnectOptions,
+  ConnectResult,
+  DisconnectResult,
+} from './commands/index.js';
+
+// Command option/result types that conflict with bridge types are aliased
+export type {
+  StateResult as CommandStateResult,
+  LogsResult as CommandLogsResult,
+  LogsOptions as CommandLogsOptions,
+  ScreenshotResult as CommandScreenshotResult,
+  ScreenshotOptions as CommandScreenshotOptions,
+  ExecOptions as CommandExecOptions,
+  ExecResult as CommandExecResult,
+} from './commands/index.js';

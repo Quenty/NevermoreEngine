@@ -35,4 +35,20 @@ describe('index barrel exports', () => {
     expect(barrel.launchStudioAsync).toBeDefined();
     expect(barrel.injectPluginAsync).toBeDefined();
   });
+
+  it('exports command handler functions', () => {
+    expect(barrel.listSessionsHandlerAsync).toBeDefined();
+    expect(barrel.serveHandlerAsync).toBeDefined();
+    expect(barrel.installPluginHandlerAsync).toBeDefined();
+    expect(barrel.uninstallPluginHandlerAsync).toBeDefined();
+    expect(barrel.queryStateHandlerAsync).toBeDefined();
+    expect(barrel.queryLogsHandlerAsync).toBeDefined();
+    expect(barrel.captureScreenshotHandlerAsync).toBeDefined();
+    expect(barrel.queryDataModelHandlerAsync).toBeDefined();
+    expect(barrel.execHandlerAsync).toBeDefined();
+    expect(barrel.runHandlerAsync).toBeDefined();
+    expect(barrel.launchHandlerAsync).toBeDefined();
+    expect(barrel.connectHandlerAsync).toBeDefined();
+    expect(barrel.disconnectHandler).toBeDefined();
+  });
 });
