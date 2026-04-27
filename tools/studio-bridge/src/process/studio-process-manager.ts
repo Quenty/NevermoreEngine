@@ -1,16 +1,14 @@
 /**
  * Locates a Roblox Studio installation and manages the Studio process
- * lifecycle. Supports Windows and macOS.
+ * lifecycle. Supports Windows, macOS, and Linux (via Wine).
  */
 
 import * as fs from 'fs/promises';
+import * as os from 'os';
 import * as path from 'path';
-import { execa, type ResultPromise } from 'execa';
+import { spawn, type ChildProcess } from 'child_process';
+import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-
-// ---------------------------------------------------------------------------
-// Path resolution
-// ---------------------------------------------------------------------------
 
 /**
  * Find the path to the RobloxStudioBeta executable.
@@ -21,6 +19,8 @@ export async function findStudioPathAsync(): Promise<string> {
     return findStudioPathWindowsAsync();
   } else if (process.platform === 'darwin') {
     return findStudioPathMacAsync();
+  } else if (process.platform === 'linux') {
+    return findStudioPathLinuxAsync();
   }
   throw new Error(`Unsupported platform: ${process.platform}`);
 }
@@ -67,6 +67,20 @@ async function findStudioPathMacAsync(): Promise<string> {
   }
 }
 
+async function findStudioPathLinuxAsync(): Promise<string> {
+  const { resolveLinuxConfig } = await import('../linux/linux-config.js');
+  const config = resolveLinuxConfig();
+
+  try {
+    await fs.access(config.studioExe);
+    return config.studioExe;
+  } catch {
+    throw new Error(
+      `Could not find Roblox Studio at ${config.studioExe}. Run "studio-bridge linux setup" first.`
+    );
+  }
+}
+
 /**
  * Resolve the Studio plugins folder for the current platform.
  */
@@ -83,41 +97,56 @@ export function findPluginsFolder(): string {
       throw new Error('HOME environment variable is not set');
     }
     return path.join(home, 'Documents', 'Roblox', 'Plugins');
+  } else if (process.platform === 'linux') {
+    // Studio runs under Wine and resolves plugins via %LOCALAPPDATA%
+    const winePrefix =
+      process.env.WINEPREFIX || path.join(os.homedir(), '.wine');
+    const wineUser = process.env.USER || os.userInfo().username;
+    return path.join(
+      winePrefix,
+      'drive_c',
+      'users',
+      wineUser,
+      'AppData',
+      'Local',
+      'Roblox',
+      'Plugins'
+    );
   }
   throw new Error(`Unsupported platform: ${process.platform}`);
 }
 
-// ---------------------------------------------------------------------------
-// Process management
-// ---------------------------------------------------------------------------
-
 export interface StudioProcess {
   /** The underlying child process handle */
-  process: ResultPromise;
+  process: ChildProcess;
   /** Kill the Studio process (idempotent, best-effort) */
   killAsync: () => Promise<void>;
 }
 
 /**
  * Launch Roblox Studio with the given place file.
+ *
+ * Uses Node's built-in `spawn` with `detached: true` + `unref()` so that
+ * Studio survives after the CLI process exits. execa's internal Job Object
+ * on Windows kills children on parent exit, so we avoid it here.
  */
 export async function launchStudioAsync(
   placePath: string
 ): Promise<StudioProcess> {
+  if (process.platform === 'linux') {
+    return launchStudioLinuxAsync(placePath);
+  }
+
   const studioExe = await findStudioPathAsync();
   OutputHelper.verbose(`[StudioBridge] ${studioExe} "${placePath}"`);
 
-  const proc = execa(studioExe, [placePath], {
-    // Don't tie Studio's lifetime to our process
+  const proc = spawn(studioExe, placePath ? [placePath] : [], {
     detached: true,
-    // Don't wait for stdio
     stdio: 'ignore',
-    // Don't reject on non-zero exit
-    reject: false,
   });
 
-  // Allow our Node process to exit even if Studio is still running
-  proc.unref?.();
+  // Allow our Node process to exit without waiting for Studio
+  proc.unref();
 
   let killed = false;
   const killAsync = async () => {
@@ -140,4 +169,14 @@ export async function launchStudioAsync(
   };
 
   return { process: proc, killAsync };
+}
+
+async function launchStudioLinuxAsync(
+  placePath: string
+): Promise<StudioProcess> {
+  const { launchStudioLinuxAsync: launch } = await import(
+    '../linux/linux-studio-launcher.js'
+  );
+  const studioExe = await findStudioPathAsync();
+  return launch(studioExe, placePath);
 }
