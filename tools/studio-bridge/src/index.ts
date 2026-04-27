@@ -64,6 +64,7 @@ export {
   launchStudioAsync,
 } from './process/studio-process-manager.js';
 export { injectPluginAsync } from './plugin/plugin-injector.js';
+export { isPersistentPluginInstalled } from './plugin/plugin-discovery.js';
 export {
   encodeMessage,
   decodePluginMessage,
