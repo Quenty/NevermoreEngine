@@ -69,8 +69,7 @@ export class OutputHelper {
     return chalk.greenBright(message);
   }
 
-  private static _hasAnsi = (text: string): boolean =>
-    text.includes('\x1b[');
+  private static _hasAnsi = (text: string): boolean => text.includes('\x1b[');
 
   /** Strip ANSI escape codes from terminal output. */
   public static stripAnsi = (text: string): string =>
@@ -145,7 +144,9 @@ export class OutputHelper {
       return;
     }
 
-    const formatted = this._hasAnsi(message) ? message : this.formatDim(message);
+    const formatted = this._hasAnsi(message)
+      ? message
+      : this.formatDim(message);
     const buffer = _outputStorage.getStore();
     if (buffer) {
       buffer.lines.push(formatted);

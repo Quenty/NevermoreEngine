@@ -20,7 +20,10 @@
  * for the `┌─` location marker.
  */
 
-import { type Diagnostic, type DiagnosticSeverity } from '@quenty/cli-output-helpers/reporting';
+import {
+  type Diagnostic,
+  type DiagnosticSeverity,
+} from '@quenty/cli-output-helpers/reporting';
 import {
   LERNA_PREFIX_PATTERN,
   LERNA_PREFIX_PATTERN_NC,

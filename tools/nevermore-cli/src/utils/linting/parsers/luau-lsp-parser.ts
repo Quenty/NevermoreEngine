@@ -5,7 +5,10 @@
  * Example: `src/foo/Bar.lua(10,5): TypeMismatch: expected 'string', got 'number'`
  */
 
-import { type Diagnostic, type DiagnosticSeverity } from '@quenty/cli-output-helpers/reporting';
+import {
+  type Diagnostic,
+  type DiagnosticSeverity,
+} from '@quenty/cli-output-helpers/reporting';
 
 /** Known warning-level diagnostic codes from luau-lsp. */
 const WARNING_CODES = new Set([
@@ -23,8 +26,7 @@ const WARNING_CODES = new Set([
  * Group 4: error code
  * Group 5: message
  */
-const LINE_PATTERN =
-  /^(.+?)\((\d+),(\d+)\): (\w+): (.+)$/;
+const LINE_PATTERN = /^(.+?)\((\d+),(\d+)\): (\w+): (.+)$/;
 
 export function parseLuauLspOutput(raw: string): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];

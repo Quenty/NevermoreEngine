@@ -20,7 +20,10 @@
  * moonwave only emits errors (no warnings).
  */
 
-import { type Diagnostic, type DiagnosticSeverity } from '@quenty/cli-output-helpers/reporting';
+import {
+  type Diagnostic,
+  type DiagnosticSeverity,
+} from '@quenty/cli-output-helpers/reporting';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   LERNA_PREFIX_PATTERN,

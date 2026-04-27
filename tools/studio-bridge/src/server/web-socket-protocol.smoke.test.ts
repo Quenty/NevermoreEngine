@@ -91,7 +91,9 @@ describe('WebSocket protocol smoke test', () => {
       });
 
       // 1. Send hello
-      ws.send(JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } }));
+      ws.send(
+        JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } })
+      );
 
       // 2. Wait for welcome
       const welcome = await new Promise<ServerMessage>((resolve) => {
@@ -163,7 +165,9 @@ describe('WebSocket protocol smoke test', () => {
         ws.on('error', reject);
       });
 
-      ws.send(JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } }));
+      ws.send(
+        JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } })
+      );
 
       // Wait for welcome before sending more
       await new Promise<void>((resolve) => {
@@ -220,9 +224,19 @@ describe('WebSocket protocol smoke test', () => {
         ws.on('message', (raw) => {
           const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
           const msg = decodePluginMessage(data);
-          if (msg?.type === 'hello' && msg.sessionId === sessionId && msg.payload.sessionId === sessionId) {
+          if (
+            msg?.type === 'hello' &&
+            msg.sessionId === sessionId &&
+            msg.payload.sessionId === sessionId
+          ) {
             welcomeSent = true;
-            ws.send(encodeMessage({ type: 'welcome', sessionId, payload: { sessionId } }));
+            ws.send(
+              encodeMessage({
+                type: 'welcome',
+                sessionId,
+                payload: { sessionId },
+              })
+            );
           }
         });
       });
