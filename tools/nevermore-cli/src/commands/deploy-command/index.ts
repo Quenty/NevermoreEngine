@@ -9,7 +9,7 @@ import {
   SimpleReporter,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
@@ -113,7 +113,8 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             type: 'number',
           })
           .option('place-file', {
-            describe: 'Upload a pre-built .rbxl file instead of building via rojo',
+            describe:
+              'Upload a pre-built .rbxl file instead of building via rojo',
             type: 'string',
           })
           .option('output', {
@@ -123,9 +124,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       },
       async (runArgs) => {
         try {
-          await DeployCommand._handleRunAsync(
-            runArgs as unknown as DeployArgs
-          );
+          await DeployCommand._handleRunAsync(runArgs as unknown as DeployArgs);
         } catch (err) {
           OutputHelper.error(err instanceof Error ? err.message : String(err));
           process.exit(1);
@@ -145,8 +144,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     }
 
     const cwd = process.cwd();
-    const packageName =
-      (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
+    const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
     const targetName = args.target ?? 'test';
 
     const reporter = new CompositeReporter(
@@ -167,7 +165,10 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     );
 
     const apiKey = await getApiKeyAsync(args);
-    const client = new OpenCloudClient({ apiKey, rateLimiter: new RateLimiter() });
+    const client = new OpenCloudClient({
+      apiKey,
+      rateLimiter: new RateLimiter(),
+    });
     const context = new CloudJobContext(reporter, client);
 
     await reporter.startAsync();

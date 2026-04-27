@@ -8,13 +8,14 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import { COOKIE_NAME } from './cookie-parser.js';
 import { readCookie as readWindowsCookie } from './windows.js';
 import { readCookie as readMacOSCookie } from './macos.js';
+import { readCookie as readLinuxCookie } from './linux.js';
 
 /**
  * Resolve the .ROBLOSECURITY cookie for legacy Roblox API calls.
  *
  * Resolution order (matching Mantle's rbx_cookie crate):
  * 1. ROBLOSECURITY environment variable
- * 2. Platform credential store (Windows Credential Manager / macOS HTTPStorages)
+ * 2. Platform credential store (Windows Credential Manager / macOS HTTPStorages / Wine Credential Manager)
  * 3. Platform legacy store (Windows Registry / macOS plist)
  * 4. Interactive prompt
  */
@@ -55,19 +56,42 @@ function readPlatformCookie(): string | undefined {
       return readWindowsCookie();
     case 'darwin':
       return readMacOSCookie();
+    case 'linux':
+      return readLinuxCookie();
     default:
       return undefined;
   }
 }
 
+interface CsrfFetchResult {
+  response: Response;
+  rotatedCookie?: string;
+}
+
 /**
- * Make a cookie-authenticated request to Roblox, handling CSRF token exchange.
+ * Extract a rotated .ROBLOSECURITY cookie from a response's set-cookie header.
+ */
+function extractRotatedCookie(response: Response): string | undefined {
+  const setCookie = response.headers.get('set-cookie');
+  if (!setCookie) {
+    return undefined;
+  }
+
+  // set-cookie may contain multiple cookies separated by commas (or multiple headers).
+  // Look for .ROBLOSECURITY=<value>.
+  const match = setCookie.match(/\.ROBLOSECURITY=([^;,\s]+)/);
+  return match?.[1];
+}
+
+/**
+ * Make a cookie-authenticated request to Roblox, handling CSRF token exchange,
+ * cookie rotation capture, and 429 rate-limit retries.
  */
 async function fetchWithCsrfAsync(
   url: string,
   cookie: string,
   options: RequestInit = {}
-): Promise<Response> {
+): Promise<CsrfFetchResult> {
   const headers: Record<string, string> = {
     Cookie: `${COOKIE_NAME}=${cookie}`,
     'User-Agent': 'Roblox/WinInet',
@@ -90,7 +114,25 @@ async function fetchWithCsrfAsync(
     }
   }
 
-  return response;
+  // Retry once on rate limit
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('retry-after');
+    const delaySec = retryAfter
+      ? Math.min(parseInt(retryAfter, 10) || 2, 30)
+      : 2;
+    OutputHelper.verbose(`Rate limited (429). Retrying after ${delaySec}s...`);
+    await new Promise((resolve) => setTimeout(resolve, delaySec * 1000));
+    response = await fetch(url, { ...options, headers });
+  }
+
+  const rotatedCookie = extractRotatedCookie(response);
+  if (rotatedCookie) {
+    OutputHelper.verbose(
+      'Captured rotated .ROBLOSECURITY cookie from response.'
+    );
+  }
+
+  return { response, rotatedCookie };
 }
 
 /**
@@ -106,7 +148,7 @@ export async function createPlaceInUniverseAsync(
     `Creating place "${placeName}" in universe ${universeId}...`
   );
 
-  const createResponse = await fetchWithCsrfAsync(
+  const createResult = await fetchWithCsrfAsync(
     `https://apis.roblox.com/universes/v1/user/universes/${universeId}/places`,
     cookie,
     {
@@ -118,19 +160,22 @@ export async function createPlaceInUniverseAsync(
     }
   );
 
-  if (!createResponse.ok) {
-    const text = await createResponse.text();
+  if (!createResult.response.ok) {
+    const text = await createResult.response.text();
     throw new Error(
-      `Failed to create place: ${createResponse.status} ${createResponse.statusText}: ${text}`
+      `Failed to create place: ${createResult.response.status} ${createResult.response.statusText}: ${text}`
     );
   }
 
-  const createData = (await createResponse.json()) as { placeId: number };
+  const createData = (await createResult.response.json()) as {
+    placeId: number;
+  };
   const placeId = createData.placeId;
 
-  const renameResponse = await fetchWithCsrfAsync(
+  // Use rotated cookie if the create request triggered rotation
+  const { response: renameResponse } = await fetchWithCsrfAsync(
     `https://develop.roblox.com/v2/places/${placeId}`,
-    cookie,
+    createResult.rotatedCookie ?? cookie,
     {
       method: 'PATCH',
       headers: {
@@ -148,6 +193,41 @@ export async function createPlaceInUniverseAsync(
 
   OutputHelper.verbose(`Created place "${placeName}" — ID: ${placeId}`);
   return placeId;
+}
+
+export interface CookieValidationResult {
+  valid: boolean;
+  reason?: 'invalid' | 'network_error';
+  status?: number;
+}
+
+/**
+ * Validates the ROBLOSECURITY cookie against the Roblox API.
+ * Returns a result indicating whether the cookie is valid.
+ * Network errors are treated as "unknown" (not invalid) so callers
+ * can decide whether to continue in offline scenarios.
+ */
+export async function validateCookieAsync(
+  cookie: string
+): Promise<CookieValidationResult> {
+  try {
+    const response = await fetch(
+      'https://users.roblox.com/v1/users/authenticated',
+      {
+        headers: {
+          Cookie: `.ROBLOSECURITY=${cookie}`,
+        },
+      }
+    );
+
+    if (response.status !== 200) {
+      return { valid: false, reason: 'invalid', status: response.status };
+    }
+
+    return { valid: true };
+  } catch {
+    return { valid: false, reason: 'network_error' };
+  }
 }
 
 export interface RenamePlaceResult {
@@ -170,7 +250,7 @@ export async function tryRenamePlaceAsync(
     return { success: false, reason: 'no_cookie' };
   }
 
-  const response = await fetchWithCsrfAsync(
+  const { response } = await fetchWithCsrfAsync(
     `https://develop.roblox.com/v2/places/${placeId}`,
     cookie,
     {
