@@ -1,7 +1,49 @@
 name: tests
 on: [pull_request]
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      luau: ${{ steps.filter.outputs.luau }}
+      ts: ${{ steps.filter.outputs.ts }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Detect changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            luau:
+              - 'src/**'
+              - 'games/**'
+              - 'plugins/**'
+              - '**/*.lua'
+              - '**/*.luau'
+              - '*.toml'
+              - '.luaurc'
+              - 'globalTypes.d.lua'
+              - 'default.project.json'
+              - '.github/workflows/tests.yml'
+            ts:
+              - 'tools/**/*.ts'
+              - 'tools/**/*.tsx'
+              - 'tools/**/*.js'
+              - 'tools/**/*.jsx'
+              - 'tools/**/*.cjs'
+              - 'tools/**/*.mjs'
+              - 'tools/**/package.json'
+              - 'tools/**/tsconfig*.json'
+              - 'tools/**/vitest.config.*'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/tests.yml'
+
   tests:
+    needs: changes
+    if: needs.changes.outputs.luau == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -63,3 +105,40 @@ jobs:
         run: nevermore tools post-test-results test-results.json --yes --run-outcome ${{ steps.run-tests.outcome }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  typescript-tests:
+    needs: changes
+    if: needs.changes.outputs.ts == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '21'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - name: Setup npm for GitHub Packages
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all tools
+        run: pnpm -r --filter './tools/**' --filter '!./tools/nevermore-vscode' run build
+
+      - name: Run TypeScript tests (test:ts)
+        run: npm run test:ts

@@ -32,6 +32,9 @@ importers:
       pnpm:
         specifier: ^10.27.0
         version: 10.33.1
+      prettier:
+        specifier: 2.7.1
+        version: 2.7.1
 
   games/integration:
     dependencies:

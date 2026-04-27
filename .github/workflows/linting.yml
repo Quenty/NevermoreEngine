@@ -1,7 +1,50 @@
 name: linting
 on: [pull_request, workflow_call]
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      luau: ${{ steps.filter.outputs.luau }}
+      ts: ${{ steps.filter.outputs.ts }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Detect changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            luau:
+              - 'src/**'
+              - 'games/**'
+              - 'plugins/**'
+              - '**/*.lua'
+              - '**/*.luau'
+              - '*.toml'
+              - '.luaurc'
+              - 'globalTypes.d.lua'
+              - 'default.project.json'
+              - '.github/workflows/linting.yml'
+            ts:
+              - 'tools/**/*.ts'
+              - 'tools/**/*.tsx'
+              - 'tools/**/*.js'
+              - 'tools/**/*.jsx'
+              - 'tools/**/*.cjs'
+              - 'tools/**/*.mjs'
+              - 'tools/**/package.json'
+              - 'tools/**/tsconfig*.json'
+              - 'tools/**/vitest.config.*'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.prettierrc'
+              - '.github/workflows/linting.yml'
+
   luau-lsp:
+    needs: changes
+    if: needs.changes.outputs.luau == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -51,6 +94,8 @@ jobs:
         run: nevermore tools post-lint-results lint-output.txt --linter=luau-lsp --yes
 
   stylua:
+    needs: changes
+    if: needs.changes.outputs.luau == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -76,6 +121,8 @@ jobs:
           retention-days: 1
 
   selene:
+    needs: changes
+    if: needs.changes.outputs.luau == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -101,6 +148,8 @@ jobs:
           retention-days: 1
 
   moonwave:
+    needs: changes
+    if: needs.changes.outputs.luau == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -125,10 +174,47 @@ jobs:
           path: lint-output.txt
           retention-days: 1
 
-  lint-annotations:
+  typescript:
+    needs: changes
+    if: needs.changes.outputs.ts == 'true'
     runs-on: ubuntu-latest
-    if: always()
-    needs: [stylua, selene, moonwave]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '21'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          cache: true
+
+      - name: Setup npm for GitHub Packages
+        run: |
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check (lint:ts)
+        run: npm run lint:ts
+
+      - name: Prettier check (lint:prettier)
+        run: npm run lint:prettier
+
+  lint-annotations:
+    needs: [changes, stylua, selene, moonwave]
+    if: always() && needs.changes.outputs.luau == 'true'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
