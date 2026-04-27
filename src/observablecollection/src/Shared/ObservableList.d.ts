@@ -5,7 +5,7 @@ import { ValueObject } from '@quenty/valueobject';
 
 type ObservableList<T> = {
   Observe(): Observable<T[]>;
-  ObserveItemsBrio(): Observable<Brio<[T, Symbol]>>;
+  ObserveItemsBrio(): Observable<Brio<LuaTuple<[T, Symbol]>>>;
   ObserveIndex(indexToObserve: number): Observable<number | undefined>;
   ObserveAtIndex(indexToObserve: number): Observable<T | undefined>;
   ObserveAtIndexBrio(indexToObserve: number): Observable<Brio<T | undefined>>;
