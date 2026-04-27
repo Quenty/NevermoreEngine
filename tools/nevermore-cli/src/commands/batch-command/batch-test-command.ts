@@ -6,7 +6,7 @@ import {
   type ProgressSummary,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import {
   type JobContext,
@@ -79,8 +79,7 @@ export const batchTestCommand: CommandModule<
         default: 'origin/main',
       })
       .option('concurrency', {
-        describe:
-          'Max parallel tests (0 = unlimited, default: unlimited)',
+        describe: 'Max parallel tests (0 = unlimited, default: unlimited)',
         type: 'number',
       })
       .option('output', {
@@ -221,11 +220,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       bufferOutput: isGrouped,
       stateTracker: reporter.state,
       executeAsync: async (pkg) => {
-        const result = await _runWithRetryAsync(
-          pkg,
-          context,
-          timeoutMs
-        );
+        const result = await _runWithRetryAsync(pkg, context, timeoutMs);
 
         return {
           packageName: pkg.name,
@@ -274,7 +269,10 @@ async function _runWithRetryAsync(
   }
 }
 
-function _createBroadcastReporter(target: Reporter, packageNames: string[]): Reporter {
+function _createBroadcastReporter(
+  target: Reporter,
+  packageNames: string[]
+): Reporter {
   return {
     startAsync: async () => {},
     stopAsync: async () => {},
