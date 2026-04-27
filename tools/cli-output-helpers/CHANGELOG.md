@@ -1,21 +1,18 @@
-# v1.10.1 (Mon Apr 27 2026)
-
-#### 🐛 Bug Fix
-
-- docs: Update docs and improve CLI a bit [#686](https://github.com/Quenty/NevermoreEngine/pull/686) ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/misc-updates ([@Quenty](https://github.com/Quenty))
-- fix(cli-output-helpers): collapse no-results PR comment to single line ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.10.1](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.10.0...@quenty/cli-output-helpers@1.10.1) (2026-04-27)
+
+
+### Bug Fixes
+
+* **cli-output-helpers:** collapse no-results PR comment to single line ([083969c](https://github.com/Quenty/Nevermore/commit/083969c128b14f8b8accceb6bc3e1dfd37c3739d))
+
+
+
+
 
 # [1.10.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.9.0...@quenty/cli-output-helpers@1.10.0) (2026-02-23)
 
