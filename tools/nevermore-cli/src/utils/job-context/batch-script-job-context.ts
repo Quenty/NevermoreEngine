@@ -293,14 +293,11 @@ export class BatchScriptJobContext implements JobContext {
       }s)...`
     );
 
-    const result = await this._inner.runScriptAsync(
-      deployment,
-      {
-        scriptContent: batchScript,
-        packageName: '_batch_',
-        timeoutMs: totalTimeoutMs,
-      }
-    );
+    const result = await this._inner.runScriptAsync(deployment, {
+      scriptContent: batchScript,
+      packageName: '_batch_',
+      timeoutMs: totalTimeoutMs,
+    });
 
     // Fetch the combined logs
     const rawLogs = await this._inner.getLogsAsync(deployment);

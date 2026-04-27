@@ -42,7 +42,9 @@ export class SummaryTableReporter extends BaseReporter {
     const STATUS_WIDTH = 26;
 
     console.log('');
-    console.log('Package'.padEnd(40) + 'Status'.padEnd(STATUS_WIDTH) + 'Duration');
+    console.log(
+      'Package'.padEnd(40) + 'Status'.padEnd(STATUS_WIDTH) + 'Duration'
+    );
     console.log('─'.repeat(40 + STATUS_WIDTH + 8));
 
     let emptyRunCount = 0;
@@ -53,7 +55,9 @@ export class SummaryTableReporter extends BaseReporter {
 
       let label: string;
       if (result.success) {
-        label = progressText ? `${this._successLabel} ${progressText}` : this._successLabel;
+        label = progressText
+          ? `${this._successLabel} ${progressText}`
+          : this._successLabel;
       } else {
         const failedPhase = result.failedPhase;
         label = failedPhase

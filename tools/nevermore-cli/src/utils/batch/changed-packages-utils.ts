@@ -109,7 +109,9 @@ function _requireScriptTemplate(packages: TargetPackage[]): TargetPackage[] {
 
   if (skipped.length > 0) {
     OutputHelper.verbose(
-      `Skipped ${skipped.length} packages without scriptTemplate: ${skipped.join(', ')}`
+      `Skipped ${
+        skipped.length
+      } packages without scriptTemplate: ${skipped.join(', ')}`
     );
   }
 

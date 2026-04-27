@@ -40,7 +40,9 @@ export function parseTestLogs(rawOutput: string): ParsedTestLogs {
  * Parse Jest "Tests: N failed, N passed, N total" line into structured counts.
  * Returns undefined if no test summary line is found.
  */
-export function parseTestCounts(rawOutput: string): ParsedTestCounts | undefined {
+export function parseTestCounts(
+  rawOutput: string
+): ParsedTestCounts | undefined {
   const clean = OutputHelper.stripAnsi(rawOutput);
 
   // Match "Tests:  2 failed, 23 passed, 25 total" or "Tests:  25 passed, 25 total"

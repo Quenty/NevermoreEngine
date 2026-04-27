@@ -43,7 +43,9 @@ export const ciPostLintResultsCommand: CommandModule<
       const parser = LINTER_PARSERS[args.linter];
       if (!parser) {
         OutputHelper.error(
-          `Unknown linter: ${args.linter}. Supported: ${SUPPORTED_LINTERS.join(', ')}`
+          `Unknown linter: ${args.linter}. Supported: ${SUPPORTED_LINTERS.join(
+            ', '
+          )}`
         );
         process.exit(1);
       }
@@ -56,14 +58,11 @@ export const ciPostLintResultsCommand: CommandModule<
         return;
       }
 
-      const displayName =
-        LINTER_DISPLAY_NAMES[args.linter] ?? args.linter;
+      const displayName = LINTER_DISPLAY_NAMES[args.linter] ?? args.linter;
       const diagnostics = parser(raw);
 
       if (diagnostics.length === 0) {
-        OutputHelper.info(
-          `${displayName}: no issues found in lint output.`
-        );
+        OutputHelper.info(`${displayName}: no issues found in lint output.`);
         return;
       }
 

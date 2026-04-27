@@ -17,9 +17,17 @@ describe('encodeMessage', () => {
   });
 
   it('encodes a shutdown message', () => {
-    const json = encodeMessage({ type: 'shutdown', sessionId: 'abc-123', payload: {} });
+    const json = encodeMessage({
+      type: 'shutdown',
+      sessionId: 'abc-123',
+      payload: {},
+    });
     const parsed = JSON.parse(json);
-    expect(parsed).toEqual({ type: 'shutdown', sessionId: 'abc-123', payload: {} });
+    expect(parsed).toEqual({
+      type: 'shutdown',
+      sessionId: 'abc-123',
+      payload: {},
+    });
   });
 
   it('encodes an execute message', () => {
@@ -211,11 +219,15 @@ describe('decodePluginMessage', () => {
     });
 
     it('returns null for missing type', () => {
-      expect(decodePluginMessage(JSON.stringify({ sessionId: 's', payload: {} }))).toBeNull();
+      expect(
+        decodePluginMessage(JSON.stringify({ sessionId: 's', payload: {} }))
+      ).toBeNull();
     });
 
     it('returns null for missing payload', () => {
-      expect(decodePluginMessage(JSON.stringify({ type: 'hello', sessionId: 's' }))).toBeNull();
+      expect(
+        decodePluginMessage(JSON.stringify({ type: 'hello', sessionId: 's' }))
+      ).toBeNull();
     });
 
     it('returns null for missing sessionId', () => {

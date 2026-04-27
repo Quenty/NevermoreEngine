@@ -2,7 +2,11 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { type JobContext } from '../../job-context/job-context.js';
-import { type ParsedTestCounts, parseTestLogs, parseTestCounts } from '../test-log-parser.js';
+import {
+  type ParsedTestCounts,
+  parseTestLogs,
+  parseTestCounts,
+} from '../test-log-parser.js';
 
 export interface SingleTestResult {
   success: boolean;
@@ -28,12 +32,7 @@ export async function runSingleTestAsync(
   context: JobContext,
   options: SingleTestOptions
 ): Promise<SingleTestResult> {
-  const {
-    packagePath,
-    packageName,
-    timeoutMs = 120_000,
-    scriptText,
-  } = options;
+  const { packagePath, packageName, timeoutMs = 120_000, scriptText } = options;
 
   const sessionId = randomUUID();
   const builtPlace = await context.buildPlaceAsync({
@@ -44,7 +43,8 @@ export async function runSingleTestAsync(
   });
 
   const scriptContent =
-    scriptText ?? (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
+    scriptText ??
+    (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
 
   const deployment = await context.deployBuiltPlaceAsync({
     builtPlace,

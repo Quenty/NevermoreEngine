@@ -4,10 +4,7 @@ import {
   type PackageStatus,
   type BatchSummary,
 } from '../reporter.js';
-import {
-  type IStateTracker,
-  type PackageState,
-} from './state-tracker.js';
+import { type IStateTracker, type PackageState } from './state-tracker.js';
 
 /**
  * Batch state loaded from a previously-saved BatchSummary JSON file.
@@ -31,9 +28,7 @@ export class LoadedStateTracker implements IStateTracker {
     this._startTimeMs = startTimeMs;
   }
 
-  static async fromFileAsync(
-    filePath: string
-  ): Promise<LoadedStateTracker> {
+  static async fromFileAsync(filePath: string): Promise<LoadedStateTracker> {
     const raw = await fs.readFile(filePath, 'utf-8');
     const summary = JSON.parse(raw) as BatchSummary;
     return LoadedStateTracker.fromSummary(summary);
