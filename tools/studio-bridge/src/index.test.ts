@@ -36,6 +36,10 @@ describe('index barrel exports', () => {
     expect(barrel.injectPluginAsync).toBeDefined();
   });
 
+  it('exports plugin discovery', () => {
+    expect(barrel.isPersistentPluginInstalled).toBeDefined();
+  });
+
   it('exports command handler functions', () => {
     expect(barrel.listSessionsHandlerAsync).toBeDefined();
     expect(barrel.serveHandlerAsync).toBeDefined();
