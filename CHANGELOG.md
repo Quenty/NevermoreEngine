@@ -1,3 +1,16 @@
+# (Mon Apr 27 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/settings@11.49.1`
+  - fix: Prevent input rebind oscillation [#687](https://github.com/Quenty/NevermoreEngine/pull/687) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Thu Apr 23 2026)
 
 #### 🚀 Enhancement

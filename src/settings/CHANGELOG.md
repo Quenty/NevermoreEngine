@@ -1,3 +1,16 @@
+# v11.49.1 (Mon Apr 27 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Prevent input rebind oscillation [#687](https://github.com/Quenty/NevermoreEngine/pull/687) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Prevent input rebind oscillation ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
