@@ -1,3 +1,34 @@
+# (Mon Apr 27 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/settings@11.49.1`
+  - fix: Prevent input rebind oscillation [#687](https://github.com/Quenty/NevermoreEngine/pull/687) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Thu Apr 23 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.31.0`, `@quenty/blend@12.34.0`, `@quenty/brine@1.1.0`, `@quenty/bufferencoder@1.1.0`, `@quenty/camera@14.38.0`, `@quenty/chatproviderservice@9.48.0`, `@quenty/clipcharacters@12.37.0`, `@quenty/cmdrservice@13.41.0`, `@quenty/color3utils@11.34.0`, `@quenty/colorsequenceutils@7.11.0`, `@quenty/conditions@10.38.0`, `@quenty/datastore@13.37.0`, `@quenty/deathreport@10.41.0`, `@quenty/fakeskybox@11.16.0`, `@quenty/gameconfig@12.45.0`, `@quenty/gameproductservice@14.47.0`, `@quenty/ik@15.48.0`, `@quenty/influxdbclient@7.33.0`, `@quenty/inputkeymaputils@14.41.0`, `@quenty/inputobjectutils@4.29.0`, `@quenty/loader@10.11.0`, `@quenty/maid@3.9.0`, `@quenty/nevermore-test-runner@1.4.0`, `@quenty/observablecollection@12.36.0`, `@quenty/permissionprovider@14.35.0`, `@quenty/promise@10.18.0`, `@quenty/roblox-api-dump@8.20.0`, `@quenty/rogue-humanoid@10.46.0`, `@quenty/rogue-properties@11.43.0`, `@quenty/rx@13.28.0`, `@quenty/screenshothudservice@7.32.0`, `@quenty/secrets@7.46.0`, `@quenty/selectionutils@8.30.0`, `@quenty/settings-inputkeymap@10.52.0`, `@quenty/settings@11.49.0`, `@quenty/snackbar@11.39.0`, `@quenty/soundgroup@1.38.0`, `@quenty/sunpositionutils@2.5.0`, `@quenty/tie@10.38.0`, `@quenty/viewport@11.39.0`, `@quenty/nevermore-cli@4.24.0`
+  - Add fake-skybox package, brine, and fix ObservableList behavior [#682](https://github.com/Quenty/NevermoreEngine/pull/682) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix(ci): restore .npmrc instead of deleting it [#684](https://github.com/Quenty/NevermoreEngine/pull/684) ([@Quenty](https://github.com/Quenty))
+- fix(ci): remove unused all-contributors auto plugin [#683](https://github.com/Quenty/NevermoreEngine/pull/683) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Apr 22 2026)
 
 #### 🚀 Enhancement

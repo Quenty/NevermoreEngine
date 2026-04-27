@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-test-runner@1.3.0...@quenty/nevermore-test-runner@1.4.0) (2026-04-23)
+
+
+### Features
+
+* Upgrade dependent libraries with new functionality ([22e8c9e](https://github.com/Quenty/NevermoreEngine/commit/22e8c9e3c3dd7288dd264f00c98852653b40a402))
+
+
+
+
+
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-test-runner@1.2.0...@quenty/nevermore-test-runner@1.3.0) (2026-02-20)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/brine",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Fast and efficient extensible serialiation and deserialization library for Roblox with native instance support out of the box",
   "keywords": [
     "Roblox",

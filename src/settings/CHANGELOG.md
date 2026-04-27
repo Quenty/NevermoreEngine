@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.49.0...@quenty/settings@11.49.1) (2026-04-27)
+
+
+### Bug Fixes
+
+* Prevent input rebind oscillation ([59049b8](https://github.com/Quenty/NevermoreEngine/commit/59049b8159cf79b1715a2efe6fafd952ca7e6e2f))
+
+
+
+
+
+# [11.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.48.0...@quenty/settings@11.49.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
 # [11.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.47.0...@quenty/settings@11.48.0) (2026-04-15)
 
 **Note:** Version bump only for package @quenty/settings
