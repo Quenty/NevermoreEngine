@@ -6,7 +6,7 @@ type ObservableMap<TKey, TValue> = {
   CountChanged: Signal<number>;
   ObserveKeysBrio(): Observable<Brio<TKey>>;
   ObserveValuesBrio(): Observable<Brio<TValue>>;
-  ObservePairsBrio(): Observable<Brio<[key: TKey, value: TValue]>>;
+  ObservePairsBrio(): Observable<Brio<LuaTuple<[key: TKey, value: TValue]>>>;
   Get(key: TKey): TValue | undefined;
   ContainsKey(key: TKey): boolean;
   GetCount(): number;

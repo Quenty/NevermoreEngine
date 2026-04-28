@@ -5,7 +5,7 @@ import { Signal } from '@quenty/signal';
 import { ObservableList } from './ObservableList';
 
 interface ObservableMapList<TKey, TValue> {
-  ListAdded: Signal<[key: TKey, list: ObservableList<TValue>]>;
+  ListAdded: Signal<LuaTuple<[key: TKey, list: ObservableList<TValue>]>>;
   ListRemoved: Signal<TKey>;
   CountChanged: Signal<number>;
   Push(key: TKey | Observable<TKey>, entry: TValue): Maid;
