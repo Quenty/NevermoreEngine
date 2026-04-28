@@ -1,8 +1,8 @@
-import { OutputHelper } from '@quenty/cli-output-helpers';
 import { execa } from 'execa';
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 
 export interface RojoBuildOptions {
   /** Absolute path to the rojo project JSON file */
@@ -63,18 +63,30 @@ export class BuildContext {
     const { projectPath, output, plugin, pluginsFolder } = options;
 
     if (output && plugin) {
-      throw new Error('rojoBuildAsync: specify either output or plugin, not both');
+      throw new Error(
+        'rojoBuildAsync: specify either output or plugin, not both'
+      );
     }
     if (!output && !plugin) {
       throw new Error('rojoBuildAsync: must specify either output or plugin');
     }
     if (plugin && !pluginsFolder) {
-      throw new Error('rojoBuildAsync: plugin requires pluginsFolder for cleanup tracking');
+      throw new Error(
+        'rojoBuildAsync: plugin requires pluginsFolder for cleanup tracking'
+      );
     }
 
     const args = ['build', projectPath];
+
+    // On Linux, rojo's --plugin flag is not supported. Build to a temp
+    // file with -o and copy to the plugins folder ourselves.
+    const usePluginFallback = plugin && process.platform === 'linux';
+
     if (output) {
       args.push('-o', output);
+    } else if (usePluginFallback) {
+      const tempOutput = path.join(this._targetdir, plugin);
+      args.push('-o', tempOutput);
     } else if (plugin) {
       args.push('--plugin', plugin);
     }
@@ -83,6 +95,13 @@ export class BuildContext {
 
     if (plugin && pluginsFolder) {
       const pluginPath = path.join(pluginsFolder, plugin);
+
+      if (usePluginFallback) {
+        const tempOutput = path.join(this._targetdir, plugin);
+        await fs.mkdir(pluginsFolder, { recursive: true });
+        await fs.copyFile(tempOutput, pluginPath);
+      }
+
       this._trackedFiles.push(pluginPath);
       return pluginPath;
     }
@@ -93,7 +112,10 @@ export class BuildContext {
   /**
    * Execute a Lune transform script with the given arguments.
    */
-  async executeLuneTransformScriptAsync(scriptPath: string, ...args: string[]): Promise<void> {
+  async executeLuneTransformScriptAsync(
+    scriptPath: string,
+    ...args: string[]
+  ): Promise<void> {
     await execa('lune', ['run', scriptPath, ...args]);
   }
 
@@ -123,9 +145,10 @@ export class BuildContext {
       }
     }
 
-    OutputHelper.verbose(`Cleaning up build directory: ${this._targetdir}`);
-
     try {
+      OutputHelper.verbose(
+        `[Build] Cleaning up build directory: ${this._targetdir}`
+      );
       await fs.rm(this._targetdir, { recursive: true, force: true });
     } catch {
       // best effort
