@@ -17,17 +17,6 @@ function connectPlugin(port: number): Promise<WebSocket> {
   });
 }
 
-function waitForMessage(ws: WebSocket): Promise<Record<string, unknown>> {
-  return new Promise((resolve) => {
-    ws.once('message', (raw) => {
-      const data = JSON.parse(
-        typeof raw === 'string' ? raw : raw.toString('utf-8')
-      );
-      resolve(data);
-    });
-  });
-}
-
 function httpGet(
   port: number,
   path: string
@@ -48,52 +37,23 @@ function httpGet(
   });
 }
 
-async function performHelloHandshake(
-  port: number,
-  sessionId: string,
-  options?: { capabilities?: string[]; pluginVersion?: string }
-): Promise<{ ws: WebSocket; welcome: Record<string, unknown> }> {
-  const ws = await connectPlugin(port);
-
-  const welcomePromise = waitForMessage(ws);
-
-  ws.send(
-    JSON.stringify({
-      type: 'hello',
-      sessionId,
-      payload: {
-        sessionId,
-        pluginVersion: options?.pluginVersion,
-        capabilities: options?.capabilities,
-      },
-    })
-  );
-
-  const welcome = await welcomePromise;
-  return { ws, welcome };
-}
-
 async function performRegisterHandshake(
   port: number,
   sessionId: string,
   options?: {
-    protocolVersion?: number;
     capabilities?: string[];
     pluginVersion?: string;
     instanceId?: string;
     placeName?: string;
     state?: string;
   }
-): Promise<{ ws: WebSocket; welcome: Record<string, unknown> }> {
+): Promise<{ ws: WebSocket }> {
   const ws = await connectPlugin(port);
-
-  const welcomePromise = waitForMessage(ws);
 
   ws.send(
     JSON.stringify({
       type: 'register',
       sessionId,
-      protocolVersion: options?.protocolVersion ?? 2,
       payload: {
         pluginVersion: options?.pluginVersion ?? '1.0.0',
         instanceId: options?.instanceId ?? 'inst-1',
@@ -104,8 +64,9 @@ async function performRegisterHandshake(
     })
   );
 
-  const welcome = await welcomePromise;
-  return { ws, welcome };
+  // Allow the host to process the register message
+  await new Promise((r) => setTimeout(r, 10));
+  return { ws };
 }
 
 describe('BridgeHost', () => {
@@ -169,21 +130,8 @@ describe('BridgeHost', () => {
     });
   });
 
-  describe('hello handshake', () => {
-    it('accepts hello and sends welcome with correct sessionId', async () => {
-      host = new BridgeHost();
-      const port = await host.startAsync({ port: 0 });
-
-      const { ws, welcome } = await performHelloHandshake(port, 'session-1');
-      openClients.push(ws);
-
-      expect(welcome.type).toBe('welcome');
-      expect((welcome.payload as Record<string, unknown>).sessionId).toBe(
-        'session-1'
-      );
-    });
-
-    it('emits plugin-connected event with session info', async () => {
+  describe('register handshake', () => {
+    it('emits plugin-connected with session info on register', async () => {
       host = new BridgeHost();
       const port = await host.startAsync({ port: 0 });
 
@@ -191,17 +139,16 @@ describe('BridgeHost', () => {
         host!.on('plugin-connected', resolve);
       });
 
-      const { ws } = await performHelloHandshake(port, 'session-abc', {
-        capabilities: ['execute', 'queryState'],
-        pluginVersion: '1.2.0',
+      const { ws } = await performRegisterHandshake(port, 'session-1', {
+        capabilities: ['execute', 'captureScreenshot'],
+        pluginVersion: '2.0.0',
       });
       openClients.push(ws);
 
       const info = await connectedPromise;
-      expect(info.sessionId).toBe('session-abc');
-      expect(info.capabilities).toEqual(['execute', 'queryState']);
-      expect(info.pluginVersion).toBe('1.2.0');
-      expect(info.protocolVersion).toBe(1);
+      expect(info.sessionId).toBe('session-1');
+      expect(info.capabilities).toEqual(['execute', 'captureScreenshot']);
+      expect(info.pluginVersion).toBe('2.0.0');
     });
 
     it('tracks the plugin in pluginCount', async () => {
@@ -210,90 +157,10 @@ describe('BridgeHost', () => {
 
       expect(host.pluginCount).toBe(0);
 
-      const { ws } = await performHelloHandshake(port, 'session-1');
+      const { ws } = await performRegisterHandshake(port, 'session-1');
       openClients.push(ws);
-
-      // Wait for event processing
-      await new Promise((r) => setTimeout(r, 50));
 
       expect(host.pluginCount).toBe(1);
-    });
-
-    it('defaults capabilities to [execute] when not provided', async () => {
-      host = new BridgeHost();
-      const port = await host.startAsync({ port: 0 });
-
-      const connectedPromise = new Promise<PluginSessionInfo>((resolve) => {
-        host!.on('plugin-connected', resolve);
-      });
-
-      const { ws } = await performHelloHandshake(port, 'session-1');
-      openClients.push(ws);
-
-      const info = await connectedPromise;
-      expect(info.capabilities).toEqual(['execute']);
-    });
-  });
-
-  describe('register handshake', () => {
-    it('accepts register and sends v2 welcome with protocolVersion and capabilities', async () => {
-      host = new BridgeHost();
-      const port = await host.startAsync({ port: 0 });
-
-      const { ws, welcome } = await performRegisterHandshake(
-        port,
-        'session-v2',
-        {
-          protocolVersion: 2,
-          capabilities: ['execute', 'queryState'],
-        }
-      );
-      openClients.push(ws);
-
-      expect(welcome.type).toBe('welcome');
-      const payload = welcome.payload as Record<string, unknown>;
-      expect(payload.sessionId).toBe('session-v2');
-      expect(payload.protocolVersion).toBe(2);
-      expect(payload.capabilities).toEqual(['execute', 'queryState']);
-    });
-
-    it('emits plugin-connected with v2 session info', async () => {
-      host = new BridgeHost();
-      const port = await host.startAsync({ port: 0 });
-
-      const connectedPromise = new Promise<PluginSessionInfo>((resolve) => {
-        host!.on('plugin-connected', resolve);
-      });
-
-      const { ws } = await performRegisterHandshake(port, 'session-v2', {
-        protocolVersion: 2,
-        capabilities: ['execute', 'captureScreenshot'],
-        pluginVersion: '2.0.0',
-      });
-      openClients.push(ws);
-
-      const info = await connectedPromise;
-      expect(info.sessionId).toBe('session-v2');
-      expect(info.protocolVersion).toBe(2);
-      expect(info.capabilities).toEqual(['execute', 'captureScreenshot']);
-      expect(info.pluginVersion).toBe('2.0.0');
-    });
-
-    it('caps protocolVersion to server max (2)', async () => {
-      host = new BridgeHost();
-      const port = await host.startAsync({ port: 0 });
-
-      const { ws, welcome } = await performRegisterHandshake(
-        port,
-        'session-v3',
-        {
-          protocolVersion: 5,
-        }
-      );
-      openClients.push(ws);
-
-      const payload = welcome.payload as Record<string, unknown>;
-      expect(payload.protocolVersion).toBe(2);
     });
   });
 
@@ -302,7 +169,7 @@ describe('BridgeHost', () => {
       host = new BridgeHost();
       const port = await host.startAsync({ port: 0 });
 
-      const { ws } = await performHelloHandshake(port, 'session-dc');
+      const { ws } = await performRegisterHandshake(port, 'session-dc');
       openClients.push(ws);
 
       // Wait for the plugin to be registered
@@ -324,9 +191,9 @@ describe('BridgeHost', () => {
       host = new BridgeHost();
       const port = await host.startAsync({ port: 0 });
 
-      const { ws: ws1 } = await performHelloHandshake(port, 'session-1');
+      const { ws: ws1 } = await performRegisterHandshake(port, 'session-1');
       openClients.push(ws1);
-      const { ws: ws2 } = await performHelloHandshake(port, 'session-2');
+      const { ws: ws2 } = await performRegisterHandshake(port, 'session-2');
       openClients.push(ws2);
 
       await new Promise((r) => setTimeout(r, 50));
@@ -347,13 +214,13 @@ describe('BridgeHost', () => {
       const port = await host.startAsync({ port: 0 });
 
       // Connect first plugin
-      const { ws: ws1 } = await performHelloHandshake(port, 'session-dup');
+      const { ws: ws1 } = await performRegisterHandshake(port, 'session-dup');
       openClients.push(ws1);
       await new Promise((r) => setTimeout(r, 50));
       expect(host.pluginCount).toBe(1);
 
       // Connect second plugin with the SAME sessionId
-      const { ws: ws2 } = await performHelloHandshake(port, 'session-dup');
+      const { ws: ws2 } = await performRegisterHandshake(port, 'session-dup');
       openClients.push(ws2);
       await new Promise((r) => setTimeout(r, 50));
 
@@ -371,11 +238,11 @@ describe('BridgeHost', () => {
       const port = await host.startAsync({ port: 0 });
 
       // Connect two plugins with the same sessionId
-      const { ws: ws1 } = await performHelloHandshake(port, 'session-race');
+      const { ws: ws1 } = await performRegisterHandshake(port, 'session-race');
       openClients.push(ws1);
       await new Promise((r) => setTimeout(r, 50));
 
-      const { ws: ws2 } = await performHelloHandshake(port, 'session-race');
+      const { ws: ws2 } = await performRegisterHandshake(port, 'session-race');
       openClients.push(ws2);
 
       // Wait for close frames to propagate
@@ -398,7 +265,6 @@ describe('BridgeHost', () => {
       const json = JSON.parse(result.body);
       expect(json.status).toBe('ok');
       expect(json.port).toBe(port);
-      expect(json.protocolVersion).toBe(2);
       expect(json.sessions).toBe(0);
       expect(typeof json.uptime).toBe('number');
     });
@@ -408,7 +274,7 @@ describe('BridgeHost', () => {
       const port = await host.startAsync({ port: 0 });
 
       // Connect a plugin
-      const { ws } = await performHelloHandshake(port, 'session-h');
+      const { ws } = await performRegisterHandshake(port, 'session-h');
       openClients.push(ws);
       await new Promise((r) => setTimeout(r, 50));
 

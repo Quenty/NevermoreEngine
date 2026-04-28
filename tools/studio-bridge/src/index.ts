@@ -48,7 +48,7 @@ export type {
   LogFollowOptions,
 } from './bridge/index.js';
 
-// v2 protocol types
+// Protocol types
 export type {
   Capability,
   StudioState,
@@ -71,16 +71,12 @@ export {
   decodeServerMessage,
 } from './server/web-socket-protocol.js';
 export type {
-  // v1 messages
   PluginMessage,
   ServerMessage,
-  HelloMessage,
-  OutputMessage,
   ScriptCompleteMessage,
-  WelcomeMessage,
   ExecuteMessage,
   ShutdownMessage,
-  // v2 plugin -> server messages
+  // plugin -> server
   RegisterMessage,
   StateResultMessage,
   ScreenshotResultMessage,
@@ -89,13 +85,13 @@ export type {
   StateChangeMessage,
   HeartbeatMessage,
   PluginErrorMessage,
-  // v2 server -> plugin messages
+  // server -> plugin
   QueryStateMessage,
   CaptureScreenshotMessage,
   QueryDataModelMessage,
   QueryLogsMessage,
   ServerErrorMessage,
-  // v2 dynamic action registration
+  // dynamic action registration
   RegisterActionMessage,
   RegisterActionResultMessage,
 } from './server/web-socket-protocol.js';

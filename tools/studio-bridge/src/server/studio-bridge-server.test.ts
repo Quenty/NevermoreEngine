@@ -42,8 +42,8 @@ vi.mock('../process/studio-process-manager.js', () => ({
 }));
 
 /**
- * Connect a WebSocket client to the server and perform the hello/welcome
- * handshake, returning the connected client.
+ * Connect a WebSocket client to the server and send a register message,
+ * returning the connected client.
  */
 async function connectAndHandshake(
   port: number,
@@ -56,20 +56,22 @@ async function connectAndHandshake(
     ws.on('error', reject);
   });
 
-  // Send hello
-  ws.send(JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } }));
+  ws.send(
+    JSON.stringify({
+      type: 'register',
+      sessionId,
+      payload: {
+        pluginVersion: '1.0.0',
+        instanceId: 'inst-1',
+        placeName: 'TestPlace',
+        state: 'Edit',
+        capabilities: ['execute', 'queryState'],
+      },
+    })
+  );
 
-  // Wait for welcome
-  await new Promise<void>((resolve) => {
-    ws.on('message', (raw) => {
-      const data = JSON.parse(
-        typeof raw === 'string' ? raw : raw.toString('utf-8')
-      );
-      if (data.type === 'welcome') {
-        resolve();
-      }
-    });
-  });
+  // Allow the server to process the register message
+  await new Promise((r) => setTimeout(r, 20));
 
   return ws;
 }
@@ -171,50 +173,6 @@ describe('StudioBridgeServer', () => {
       expect(true).toBe(true);
     });
 
-    it('rejects hello with wrong session ID and closes connection', async () => {
-      const sessionId = 'correct-session';
-      server = new StudioBridgeServer({
-        placePath: '/fake/place.rbxl',
-        sessionId,
-        timeoutMs: 1_000,
-      });
-
-      const startPromise = server.startAsync();
-
-      await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._port;
-
-      // Connect with correct path but wrong session ID in message
-      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
-      await new Promise<void>((resolve, reject) => {
-        ws.on('open', resolve);
-        ws.on('error', reject);
-      });
-
-      // Track if server closes the connection
-      const closedPromise = new Promise<void>((resolve) => {
-        ws.on('close', () => resolve());
-      });
-
-      ws.send(
-        JSON.stringify({
-          type: 'hello',
-          sessionId: 'wrong-session',
-          payload: { sessionId: 'wrong-session' },
-        })
-      );
-
-      // Server should close the connection
-      await closedPromise;
-
-      // Server should NOT accept — startAsync should time out
-      await expect(startPromise).rejects.toThrow(
-        'Timed out waiting for Studio plugin handshake'
-      );
-
-      // Server already stopped on failure (startAsync catch cleans up)
-    });
-
     it('rejects connection to wrong WebSocket path', async () => {
       const sessionId = 'correct-session';
       server = new StudioBridgeServer({
@@ -294,117 +252,6 @@ describe('StudioBridgeServer', () => {
       const result = await resultPromise;
       expect(result.success).toBe(true);
       expect(result.logs).toBe('');
-    });
-
-    it('collects output messages into logs', async () => {
-      const ready = await createReadyServer();
-      server = ready.server;
-      client = ready.client;
-
-      const resultPromise = server.executeAsync({
-        scriptContent: 'print("test")',
-      });
-
-      // Wait for execute message to arrive
-      await new Promise<void>((resolve) => {
-        client!.on('message', (raw) => {
-          const data = JSON.parse(
-            typeof raw === 'string' ? raw : raw.toString('utf-8')
-          );
-          if (data.type === 'execute') resolve();
-        });
-      });
-
-      // Send output messages
-      client!.send(
-        JSON.stringify({
-          type: 'output',
-          sessionId: ready.sessionId,
-          payload: {
-            messages: [
-              { level: 'Print', body: 'Line 1' },
-              { level: 'Warning', body: 'Line 2' },
-            ],
-          },
-        })
-      );
-
-      client!.send(
-        JSON.stringify({
-          type: 'output',
-          sessionId: ready.sessionId,
-          payload: {
-            messages: [{ level: 'Error', body: 'Line 3' }],
-          },
-        })
-      );
-
-      // Complete
-      client!.send(
-        JSON.stringify({
-          type: 'scriptComplete',
-          sessionId: ready.sessionId,
-          payload: { success: true },
-        })
-      );
-
-      const result = await resultPromise;
-      expect(result.success).toBe(true);
-      expect(result.logs).toContain('Line 1');
-      expect(result.logs).toContain('Line 2');
-      expect(result.logs).toContain('Line 3');
-    });
-
-    it('calls onOutput for each output entry', async () => {
-      const ready = await createReadyServer();
-      server = ready.server;
-      client = ready.client;
-
-      const outputEntries: Array<{ level: string; body: string }> = [];
-
-      const resultPromise = server.executeAsync({
-        scriptContent: 'print("test")',
-        onOutput: (level, body) => {
-          outputEntries.push({ level, body });
-        },
-      });
-
-      await new Promise<void>((resolve) => {
-        client!.on('message', (raw) => {
-          const data = JSON.parse(
-            typeof raw === 'string' ? raw : raw.toString('utf-8')
-          );
-          if (data.type === 'execute') resolve();
-        });
-      });
-
-      client!.send(
-        JSON.stringify({
-          type: 'output',
-          sessionId: ready.sessionId,
-          payload: {
-            messages: [
-              { level: 'Print', body: 'hello' },
-              { level: 'Error', body: 'oops' },
-            ],
-          },
-        })
-      );
-
-      client!.send(
-        JSON.stringify({
-          type: 'scriptComplete',
-          sessionId: ready.sessionId,
-          payload: { success: true },
-        })
-      );
-
-      await resultPromise;
-
-      expect(outputEntries).toEqual([
-        { level: 'Print', body: 'hello' },
-        { level: 'Error', body: 'oops' },
-      ]);
     });
 
     it('returns failure with error message on script error', async () => {
@@ -563,57 +410,6 @@ describe('StudioBridgeServer', () => {
       const r3 = await runOnce('print("third")');
       expect(r3.success).toBe(true);
     });
-
-    it('isolates logs between executions', async () => {
-      const ready = await createReadyServer();
-      server = ready.server;
-      client = ready.client;
-
-      const runWithOutput = async (outputBody: string) => {
-        const resultPromise = server!.executeAsync({
-          scriptContent: 'print("x")',
-        });
-
-        await new Promise<void>((resolve) => {
-          const handler = (raw: any) => {
-            const data = JSON.parse(
-              typeof raw === 'string' ? raw : raw.toString('utf-8')
-            );
-            if (data.type === 'execute') {
-              client!.off('message', handler);
-              resolve();
-            }
-          };
-          client!.on('message', handler);
-        });
-
-        client!.send(
-          JSON.stringify({
-            type: 'output',
-            sessionId: ready.sessionId,
-            payload: { messages: [{ level: 'Print', body: outputBody }] },
-          })
-        );
-
-        client!.send(
-          JSON.stringify({
-            type: 'scriptComplete',
-            sessionId: ready.sessionId,
-            payload: { success: true },
-          })
-        );
-
-        return resultPromise;
-      };
-
-      const r1 = await runWithOutput('output-from-first');
-      const r2 = await runWithOutput('output-from-second');
-
-      expect(r1.logs).toBe('output-from-first');
-      expect(r1.logs).not.toContain('output-from-second');
-      expect(r2.logs).toBe('output-from-second');
-      expect(r2.logs).not.toContain('output-from-first');
-    });
   });
 
   describe('onPhase', () => {
@@ -692,269 +488,6 @@ describe('StudioBridgeServer', () => {
       server = new StudioBridgeServer({ placePath: '/fake/place.rbxl' });
       // Should not throw
       await server.stopAsync();
-    });
-  });
-
-  describe('v2 handshake', () => {
-    /**
-     * Connect and send a v2 hello (with protocolVersion field on the root
-     * message object). Returns the welcome message.
-     */
-    async function connectAndHandshakeV2Hello(
-      port: number,
-      sessionId: string,
-      options?: { protocolVersion?: number; capabilities?: string[] }
-    ): Promise<{ ws: WebSocket; welcome: Record<string, unknown> }> {
-      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
-
-      await new Promise<void>((resolve, reject) => {
-        ws.on('open', resolve);
-        ws.on('error', reject);
-      });
-
-      const welcomePromise = new Promise<Record<string, unknown>>((resolve) => {
-        ws.on('message', (raw) => {
-          const data = JSON.parse(
-            typeof raw === 'string' ? raw : raw.toString('utf-8')
-          );
-          if (data.type === 'welcome') {
-            resolve(data);
-          }
-        });
-      });
-
-      ws.send(
-        JSON.stringify({
-          type: 'hello',
-          sessionId,
-          protocolVersion: options?.protocolVersion ?? 2,
-          payload: {
-            sessionId,
-            capabilities: options?.capabilities ?? ['execute', 'queryState'],
-          },
-        })
-      );
-
-      const welcome = await welcomePromise;
-      return { ws, welcome };
-    }
-
-    /**
-     * Connect and send a register message (always v2).
-     */
-    async function connectAndRegister(
-      port: number,
-      sessionId: string,
-      options?: { protocolVersion?: number; capabilities?: string[] }
-    ): Promise<{ ws: WebSocket; welcome: Record<string, unknown> }> {
-      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
-
-      await new Promise<void>((resolve, reject) => {
-        ws.on('open', resolve);
-        ws.on('error', reject);
-      });
-
-      const welcomePromise = new Promise<Record<string, unknown>>((resolve) => {
-        ws.on('message', (raw) => {
-          const data = JSON.parse(
-            typeof raw === 'string' ? raw : raw.toString('utf-8')
-          );
-          if (data.type === 'welcome') {
-            resolve(data);
-          }
-        });
-      });
-
-      ws.send(
-        JSON.stringify({
-          type: 'register',
-          sessionId,
-          protocolVersion: options?.protocolVersion ?? 2,
-          payload: {
-            pluginVersion: '2.0.0',
-            instanceId: 'inst-001',
-            placeName: 'TestPlace',
-            state: 'Edit',
-            capabilities: options?.capabilities ?? ['execute', 'queryState'],
-          },
-        })
-      );
-
-      const welcome = await welcomePromise;
-      return { ws, welcome };
-    }
-
-    it('v1 hello (no protocolVersion) sends v1 welcome without protocolVersion or capabilities', async () => {
-      const ready = await createReadyServer({ sessionId: 'v1-session' });
-      server = ready.server;
-      client = ready.client;
-
-      // The existing connectAndHandshake sends a plain v1 hello (no protocolVersion).
-      // Verify the server negotiated as v1.
-      expect(server.protocolVersion).toBe(1);
-      expect([...server.capabilities]).toEqual(['execute']);
-    });
-
-    it('v2 hello sends welcome with protocolVersion and capabilities', async () => {
-      const sessionId = 'v2-hello-session';
-      server = new StudioBridgeServer({
-        placePath: '/fake/place.rbxl',
-        sessionId,
-        timeoutMs: 5_000,
-      });
-
-      const startPromise = server.startAsync();
-      await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._port;
-
-      const { ws, welcome } = await connectAndHandshakeV2Hello(
-        port,
-        sessionId,
-        {
-          protocolVersion: 2,
-          capabilities: ['execute', 'queryState', 'captureScreenshot'],
-        }
-      );
-      client = ws;
-
-      await startPromise;
-
-      const payload = welcome.payload as Record<string, unknown>;
-      expect(payload.protocolVersion).toBe(2);
-      expect(payload.capabilities).toEqual([
-        'execute',
-        'queryState',
-        'captureScreenshot',
-      ]);
-      expect(server.protocolVersion).toBe(2);
-      expect([...server.capabilities]).toEqual([
-        'execute',
-        'queryState',
-        'captureScreenshot',
-      ]);
-    });
-
-    it('v2 hello negotiates capabilities to intersection with server support', async () => {
-      const sessionId = 'v2-cap-session';
-      server = new StudioBridgeServer({
-        placePath: '/fake/place.rbxl',
-        sessionId,
-        timeoutMs: 5_000,
-      });
-
-      const startPromise = server.startAsync();
-      await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._port;
-
-      // Send capabilities including one the server doesn't support
-      const { ws, welcome } = await connectAndHandshakeV2Hello(
-        port,
-        sessionId,
-        {
-          protocolVersion: 2,
-          capabilities: [
-            'execute',
-            'queryState',
-            'heartbeat',
-            'captureScreenshot',
-          ],
-        }
-      );
-      client = ws;
-
-      await startPromise;
-
-      const payload = welcome.payload as Record<string, unknown>;
-      const caps = payload.capabilities as string[];
-      // 'heartbeat' is not in the server's supported set for negotiation
-      expect(caps).toContain('execute');
-      expect(caps).toContain('queryState');
-      expect(caps).toContain('captureScreenshot');
-      expect(caps).not.toContain('heartbeat');
-    });
-
-    it('v2 hello negotiates protocolVersion to min(plugin, 2)', async () => {
-      const sessionId = 'v2-version-session';
-      server = new StudioBridgeServer({
-        placePath: '/fake/place.rbxl',
-        sessionId,
-        timeoutMs: 5_000,
-      });
-
-      const startPromise = server.startAsync();
-      await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._port;
-
-      // Plugin claims v5 — server should negotiate to v2
-      const { ws, welcome } = await connectAndHandshakeV2Hello(
-        port,
-        sessionId,
-        {
-          protocolVersion: 5,
-          capabilities: ['execute'],
-        }
-      );
-      client = ws;
-
-      await startPromise;
-
-      const payload = welcome.payload as Record<string, unknown>;
-      expect(payload.protocolVersion).toBe(2);
-      expect(server.protocolVersion).toBe(2);
-    });
-
-    it('register message sends v2 welcome with protocolVersion and capabilities', async () => {
-      const sessionId = 'register-session';
-      server = new StudioBridgeServer({
-        placePath: '/fake/place.rbxl',
-        sessionId,
-        timeoutMs: 5_000,
-      });
-
-      const startPromise = server.startAsync();
-      await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._port;
-
-      const { ws, welcome } = await connectAndRegister(port, sessionId, {
-        protocolVersion: 2,
-        capabilities: ['execute', 'queryState'],
-      });
-      client = ws;
-
-      await startPromise;
-
-      const payload = welcome.payload as Record<string, unknown>;
-      expect(payload.protocolVersion).toBe(2);
-      expect(payload.capabilities).toEqual(['execute', 'queryState']);
-      expect(server.protocolVersion).toBe(2);
-      expect([...server.capabilities]).toEqual(['execute', 'queryState']);
-    });
-
-    it('register message negotiates capabilities to intersection', async () => {
-      const sessionId = 'register-cap-session';
-      server = new StudioBridgeServer({
-        placePath: '/fake/place.rbxl',
-        sessionId,
-        timeoutMs: 5_000,
-      });
-
-      const startPromise = server.startAsync();
-      await new Promise((r) => setTimeout(r, 50));
-      const port: number = (server as any)._port;
-
-      const { ws, welcome } = await connectAndRegister(port, sessionId, {
-        protocolVersion: 2,
-        capabilities: ['execute', 'heartbeat', 'queryDataModel'],
-      });
-      client = ws;
-
-      await startPromise;
-
-      const payload = welcome.payload as Record<string, unknown>;
-      const caps = payload.capabilities as string[];
-      expect(caps).toContain('execute');
-      expect(caps).toContain('queryDataModel');
-      expect(caps).not.toContain('heartbeat');
     });
   });
 
@@ -1055,29 +588,16 @@ describe('StudioBridgeServer', () => {
       await new Promise((r) => setTimeout(r, 50));
       const port: number = (srv as any)._port;
 
-      // Connect and register as v2 plugin
       const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
       await new Promise<void>((resolve, reject) => {
         ws.on('open', resolve);
         ws.on('error', reject);
       });
 
-      const welcomePromise = new Promise<Record<string, unknown>>((resolve) => {
-        ws.on('message', (raw) => {
-          const data = JSON.parse(
-            typeof raw === 'string' ? raw : raw.toString('utf-8')
-          );
-          if (data.type === 'welcome') {
-            resolve(data);
-          }
-        });
-      });
-
       ws.send(
         JSON.stringify({
           type: 'register',
           sessionId,
-          protocolVersion: 2,
           payload: {
             pluginVersion: '2.0.0',
             instanceId: 'inst-action',
@@ -1088,7 +608,6 @@ describe('StudioBridgeServer', () => {
         })
       );
 
-      await welcomePromise;
       await startPromise;
 
       return { server: srv, client: ws, port, sessionId };
@@ -1164,28 +683,6 @@ describe('StudioBridgeServer', () => {
         "Cannot perform action: expected state 'ready', got 'idle'"
       );
     });
-
-    it('rejects when protocol version is v1', async () => {
-      // Use the standard v1 handshake helper
-      const ready = await createReadyServer();
-      server = ready.server;
-      client = ready.client;
-
-      // Server should be v1 since connectAndHandshake sends v1 hello
-      expect(server.protocolVersion).toBe(1);
-
-      await expect(
-        server.performActionAsync({ type: 'queryState', payload: {} })
-      ).rejects.toThrow('Plugin does not support v2 actions');
-    });
-  });
-
-  describe('protocol getters', () => {
-    it('defaults to v1 and [execute] before handshake', () => {
-      server = new StudioBridgeServer({ placePath: '/fake/place.rbxl' });
-      expect(server.protocolVersion).toBe(1);
-      expect([...server.capabilities]).toEqual(['execute']);
-    });
   });
 
   describe('health endpoint', () => {
@@ -1202,7 +699,6 @@ describe('StudioBridgeServer', () => {
       expect(body.status).toBe('ok');
       expect(body.sessionId).toBe('health-session');
       expect(body.port).toBe(ready.port);
-      expect(body.protocolVersion).toBe(2);
       expect(typeof body.serverVersion).toBe('string');
     });
 

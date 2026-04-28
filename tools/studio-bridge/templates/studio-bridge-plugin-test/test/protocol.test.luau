@@ -67,43 +67,6 @@ end
 
 local tests = {}
 
--- 1. Round-trip: hello
-table.insert(tests, {
-	name = "round-trip hello",
-	fn = function()
-		local msg = {
-			type = "hello",
-			sessionId = "sess-001",
-			payload = { sessionId = "sess-001" },
-		}
-		local result = roundTrip(msg)
-		assertEqual(result.type, "hello")
-		assertEqual(result.sessionId, "sess-001")
-		assertEqual(result.payload.sessionId, "sess-001")
-	end,
-})
-
--- 2. Round-trip: output
-table.insert(tests, {
-	name = "round-trip output",
-	fn = function()
-		local msg = {
-			type = "output",
-			sessionId = "sess-002",
-			payload = {
-				messages = {
-					{ level = "Print", body = "hello world" },
-					{ level = "Warning", body = "be careful" },
-				},
-			},
-		}
-		local result = roundTrip(msg)
-		assertEqual(result.type, "output")
-		assertEqual(#result.payload.messages, 2)
-		assertEqual(result.payload.messages[1].level, "Print")
-		assertEqual(result.payload.messages[1].body, "hello world")
-	end,
-})
 
 -- 3. Round-trip: scriptComplete
 table.insert(tests, {
@@ -127,7 +90,6 @@ table.insert(tests, {
 		local msg = {
 			type = "register",
 			sessionId = "sess-004",
-			protocolVersion = 2,
 			payload = {
 				pluginVersion = "1.0.0",
 				instanceId = "inst-xyz",
@@ -141,30 +103,8 @@ table.insert(tests, {
 		}
 		local result = roundTrip(msg)
 		assertEqual(result.type, "register")
-		assertEqual(result.protocolVersion, 2)
 		assertEqual(result.payload.pluginVersion, "1.0.0")
 		assertEqual(result.payload.instanceId, "inst-xyz")
-	end,
-})
-
--- 5. Round-trip: welcome
-table.insert(tests, {
-	name = "round-trip welcome",
-	fn = function()
-		local msg = {
-			type = "welcome",
-			sessionId = "sess-005",
-			protocolVersion = 2,
-			payload = {
-				sessionId = "sess-005",
-				capabilities = { "execute", "queryState" },
-				serverVersion = "0.5.0",
-			},
-		}
-		local result = roundTrip(msg)
-		assertEqual(result.type, "welcome")
-		assertEqual(result.protocolVersion, 2)
-		assertEqual(result.payload.serverVersion, "0.5.0")
 	end,
 })
 
@@ -466,7 +406,7 @@ table.insert(tests, {
 table.insert(tests, {
 	name = "decode rejects missing sessionId",
 	fn = function()
-		local json = '{"type":"hello","payload":{}}'
+		local json = '{"type":"register","payload":{}}'
 		local result, err = Protocol.decode(json)
 		assertNil(result, "result")
 		assertNotNil(err, "error")
@@ -478,7 +418,7 @@ table.insert(tests, {
 table.insert(tests, {
 	name = "decode rejects missing payload",
 	fn = function()
-		local json = '{"type":"hello","sessionId":"x"}'
+		local json = '{"type":"register","sessionId":"x"}'
 		local result, err = Protocol.decode(json)
 		assertNil(result, "result")
 		assertNotNil(err, "error")
@@ -523,47 +463,19 @@ table.insert(tests, {
 	end,
 })
 
--- 22. protocolVersion preserved when present, absent when nil
-table.insert(tests, {
-	name = "protocolVersion preserved when present, absent when nil",
-	fn = function()
-		-- With protocolVersion
-		local withVer = {
-			type = "hello",
-			sessionId = "sess-pv",
-			protocolVersion = 2,
-			payload = { sessionId = "sess-pv" },
-		}
-		local result1 = roundTrip(withVer)
-		assertEqual(result1.protocolVersion, 2)
-
-		-- Without protocolVersion
-		local withoutVer = {
-			type = "hello",
-			sessionId = "sess-pv",
-			payload = { sessionId = "sess-pv" },
-		}
-		local result2 = roundTrip(withoutVer)
-		assertNil(result2.protocolVersion)
-	end,
-})
-
 -- 23. Encode omits nil optional fields from JSON output
 table.insert(tests, {
-	name = "encode omits nil requestId and protocolVersion",
+	name = "encode omits nil requestId",
 	fn = function()
 		local msg = {
-			type = "hello",
+			type = "register",
 			sessionId = "sess-omit",
 			payload = { sessionId = "sess-omit" },
 		}
 		local json = Protocol.encode(msg :: any)
-		-- The JSON string should not contain requestId or protocolVersion
+		-- The JSON string should not contain requestId
 		if string.find(json, "requestId", 1, true) then
 			error("JSON should not contain requestId when nil")
-		end
-		if string.find(json, "protocolVersion", 1, true) then
-			error("JSON should not contain protocolVersion when nil")
 		end
 	end,
 })

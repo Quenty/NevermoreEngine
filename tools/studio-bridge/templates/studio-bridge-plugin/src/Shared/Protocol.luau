@@ -8,7 +8,7 @@
 	  { type: string, sessionId: string, payload: object }
 
 	Extended fields (optional):
-	  { requestId?: string, protocolVersion?: number }
+	  { requestId?: string }
 ]]
 
 local serde = require("@lune/serde")
@@ -20,13 +20,9 @@ local Protocol = {}
 -- ---------------------------------------------------------------------------
 
 local KNOWN_TYPES: { [string]: boolean } = {
-	-- Plugin -> Server (v1)
-	hello = true,
-	output = true,
-	scriptComplete = true,
-
-	-- Plugin -> Server (v2)
+	-- Plugin -> Server
 	register = true,
+	scriptComplete = true,
 	stateResult = true,
 	screenshotResult = true,
 	dataModelResult = true,
@@ -36,12 +32,9 @@ local KNOWN_TYPES: { [string]: boolean } = {
 	subscribeResult = true,
 	unsubscribeResult = true,
 
-	-- Server -> Plugin (v1)
-	welcome = true,
+	-- Server -> Plugin
 	execute = true,
 	shutdown = true,
-
-	-- Server -> Plugin (v2)
 	queryState = true,
 	captureScreenshot = true,
 	queryDataModel = true,
@@ -49,7 +42,7 @@ local KNOWN_TYPES: { [string]: boolean } = {
 	subscribe = true,
 	unsubscribe = true,
 
-	-- Bidirectional (v2)
+	-- Bidirectional
 	error = true,
 }
 
@@ -61,7 +54,7 @@ local KNOWN_TYPES: { [string]: boolean } = {
 	Encode a message table to a JSON string.
 
 	@param message - Table with required fields: type, sessionId, payload.
-	                 Optional fields: requestId, protocolVersion.
+	                 Optional fields: requestId.
 	@return JSON string representation of the message.
 ]]
 function Protocol.encode(message: {
@@ -69,7 +62,6 @@ function Protocol.encode(message: {
 	sessionId: string,
 	payload: { [string]: any },
 	requestId: string?,
-	protocolVersion: number?,
 }): string
 	local envelope: { [string]: any } = {
 		type = message.type,
@@ -79,10 +71,6 @@ function Protocol.encode(message: {
 
 	if message.requestId ~= nil then
 		envelope.requestId = message.requestId
-	end
-
-	if message.protocolVersion ~= nil then
-		envelope.protocolVersion = message.protocolVersion
 	end
 
 	return serde.encode("json", envelope)
@@ -136,10 +124,6 @@ function Protocol.decode(raw: string): ({ [string]: any }?, string?)
 	-- Pass through optional fields when present
 	if type(parsed.requestId) == "string" then
 		result.requestId = parsed.requestId
-	end
-
-	if type(parsed.protocolVersion) == "number" then
-		result.protocolVersion = parsed.protocolVersion
 	end
 
 	return result, nil

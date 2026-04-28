@@ -1,6 +1,6 @@
 /**
  * Reusable mock plugin client for E2E tests. Connects to a bridge host
- * on the /plugin WebSocket path, performs v2 register handshake, and
+ * on the /plugin WebSocket path, sends the register handshake, and
  * supports receiving and responding to action requests from the host.
  */
 
@@ -17,7 +17,6 @@ export interface MockPluginClientOptions {
   context?: 'edit' | 'client' | 'server';
   placeName?: string;
   capabilities?: Capability[];
-  protocolVersion?: number;
 }
 
 export class MockPluginClient {
@@ -25,7 +24,6 @@ export class MockPluginClient {
   private _options: Required<MockPluginClientOptions>;
   private _sessionId: string;
   private _isConnected = false;
-  private _welcomePayload: Record<string, unknown> | undefined;
   private _messageHandlers = new Map<
     string,
     Array<(msg: Record<string, unknown>) => void>
@@ -41,7 +39,6 @@ export class MockPluginClient {
       context: options.context ?? 'edit',
       placeName: options.placeName ?? 'TestPlace',
       capabilities: options.capabilities ?? ['execute', 'queryState'],
-      protocolVersion: options.protocolVersion ?? 2,
     };
   }
 
@@ -113,7 +110,6 @@ export class MockPluginClient {
       JSON.stringify({
         type: 'register',
         sessionId: this._sessionId,
-        protocolVersion: this._options.protocolVersion,
         payload: {
           pluginVersion: '2.0.0-test',
           instanceId: this._options.instanceId,
@@ -123,29 +119,6 @@ export class MockPluginClient {
         },
       })
     );
-  }
-
-  /**
-   * Wait for a welcome message from the host. Returns the welcome payload.
-   */
-  async waitForWelcomeAsync(
-    timeoutMs = 5_000
-  ): Promise<Record<string, unknown>> {
-    if (this._welcomePayload) {
-      return this._welcomePayload;
-    }
-
-    return new Promise<Record<string, unknown>>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(new Error(`Timed out waiting for welcome after ${timeoutMs}ms`));
-      }, timeoutMs);
-
-      this.onMessage('welcome', (msg) => {
-        clearTimeout(timer);
-        this._welcomePayload = msg.payload as Record<string, unknown>;
-        resolve(this._welcomePayload);
-      });
-    });
   }
 
   /**
@@ -261,7 +234,6 @@ export class MockPluginClient {
     this._isConnected = false;
     this._messageHandlers.clear();
     this._allMessageHandlers = [];
-    this._welcomePayload = undefined;
   }
 
   /** Whether the client is currently connected. */
@@ -280,13 +252,14 @@ export class MockPluginClient {
   }
 
   /**
-   * Connect, register, and wait for welcome. Returns the welcome payload.
+   * Connect and send register. Returns the session ID assigned to this client.
    */
-  async connectAndRegisterAsync(): Promise<Record<string, unknown>> {
+  async connectAndRegisterAsync(): Promise<string> {
     await this.connectAsync();
-    const welcomePromise = this.waitForWelcomeAsync();
     await this.sendRegisterAsync();
-    return welcomePromise;
+    // Yield to let the host process the register before the test continues
+    await new Promise((r) => setTimeout(r, 20));
+    return this._sessionId;
   }
 
   private _addHandler(

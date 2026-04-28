@@ -9,7 +9,6 @@ import http from 'http';
 export interface HealthResponse {
   status: 'ok';
   port: number;
-  protocolVersion: number;
   sessions: number;
   uptime: number;
   hostUptime: number;
@@ -18,7 +17,6 @@ export interface HealthResponse {
 
 export interface HealthInfo {
   port: number;
-  protocolVersion: number;
   sessions: number;
   startTime: number;
   hostStartTime?: number;
@@ -86,7 +84,6 @@ export function createHealthHandler(
     const response: HealthResponse = {
       status: 'ok',
       port: info.port,
-      protocolVersion: info.protocolVersion,
       sessions: info.sessions,
       uptime: now - info.startTime,
       hostUptime: now - hostStartTime,

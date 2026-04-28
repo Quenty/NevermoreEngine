@@ -257,7 +257,6 @@ describe('split-server e2e', () => {
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.status).toBe('ok');
     expect(body.port).toBe(port);
-    expect(body.protocolVersion).toBe(2);
     expect(body.sessions).toBe(1);
   });
 

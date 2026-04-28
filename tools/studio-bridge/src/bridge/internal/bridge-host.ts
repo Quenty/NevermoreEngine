@@ -34,18 +34,16 @@ export interface PluginSessionInfo {
   sessionId: string;
   pluginVersion?: string;
   capabilities: Capability[];
-  protocolVersion: number;
-  /** Instance ID from v2 register. Only present for v2 handshakes. */
+  /** Instance ID from register. */
   instanceId?: string;
-  /** Place name from v2 register. */
+  /** Place name from register. */
   placeName?: string;
-  /** Studio state from v2 register. */
+  /** Studio state from register. */
   state?: string;
-  /** Place file from v2 register. */
+  /** Place file from register. */
   placeFile?: string;
 }
 
-const PROTOCOL_VERSION = 2;
 const SHUTDOWN_TIMEOUT_MS = 2_000;
 const SHUTDOWN_DRAIN_MS = 250;
 
@@ -135,7 +133,6 @@ export class BridgeHost extends EventEmitter {
       }
       createHealthHandler(() => ({
         port: this._transport.port,
-        protocolVersion: PROTOCOL_VERSION,
         sessions: this._plugins.size,
         startTime: this._startTime,
         hostStartTime: this._hostStartTime,
@@ -405,67 +402,26 @@ export class BridgeHost extends EventEmitter {
     ws: WebSocket,
     _request: IncomingMessage
   ): void {
-    // Wait for the first message (handshake: hello or register)
     const onMessage = (raw: RawData) => {
       const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
       const msg = decodePluginMessage(data);
-      if (!msg) {
+      if (!msg || msg.type !== 'register') {
         return;
       }
 
-      if (msg.type === 'hello') {
-        const sessionId = msg.payload.sessionId;
-        const capabilities = msg.payload.capabilities ?? [
-          'execute' as Capability,
-        ];
-        const pluginVersion = msg.payload.pluginVersion;
+      const sessionId = msg.sessionId;
+      const { pluginVersion, capabilities } = msg.payload;
 
-        // Send welcome
-        ws.send(
-          encodeMessage({
-            type: 'welcome',
-            sessionId,
-            payload: { sessionId },
-          })
-        );
-
-        ws.off('message', onMessage);
-        this._registerPlugin(ws, {
-          sessionId,
-          pluginVersion,
-          capabilities,
-          protocolVersion: 1,
-        });
-      } else if (msg.type === 'register') {
-        const sessionId = msg.sessionId;
-        const { pluginVersion, capabilities } = msg.payload;
-        const protocolVersion = Math.min(msg.protocolVersion, PROTOCOL_VERSION);
-
-        // Send v2 welcome with protocolVersion and capabilities
-        const welcomePayload: Record<string, unknown> = { sessionId };
-        welcomePayload.protocolVersion = protocolVersion;
-        welcomePayload.capabilities = capabilities;
-
-        ws.send(
-          JSON.stringify({
-            type: 'welcome',
-            sessionId,
-            payload: welcomePayload,
-          })
-        );
-
-        ws.off('message', onMessage);
-        this._registerPlugin(ws, {
-          sessionId,
-          pluginVersion,
-          capabilities,
-          protocolVersion,
-          instanceId: msg.payload.instanceId,
-          placeName: msg.payload.placeName,
-          state: msg.payload.state,
-          placeFile: msg.payload.placeFile,
-        });
-      }
+      ws.off('message', onMessage);
+      this._registerPlugin(ws, {
+        sessionId,
+        pluginVersion,
+        capabilities,
+        instanceId: msg.payload.instanceId,
+        placeName: msg.payload.placeName,
+        state: msg.payload.state,
+        placeFile: msg.payload.placeFile,
+      });
     };
 
     ws.on('message', onMessage);
@@ -492,9 +448,9 @@ export class BridgeHost extends EventEmitter {
 
     this._plugins.set(info.sessionId, ws);
     OutputHelper.verbose(
-      `[host] Plugin connected: ${info.sessionId} (v${
-        info.protocolVersion
-      }, caps: ${info.capabilities.join(', ')})`
+      `[host] Plugin connected: ${
+        info.sessionId
+      } (caps: ${info.capabilities.join(', ')})`
     );
     this.emit('plugin-connected', info);
 

@@ -55,7 +55,6 @@ describe('health-endpoint', () => {
       const startTime = Date.now() - 5000;
       const { port, closeAsync } = await startHealthServerAsync(() => ({
         port: 38741,
-        protocolVersion: 2,
         sessions: 3,
         startTime,
       }));
@@ -66,7 +65,6 @@ describe('health-endpoint', () => {
       expect(result).not.toBeNull();
       expect(result!.status).toBe('ok');
       expect(result!.port).toBe(38741);
-      expect(result!.protocolVersion).toBe(2);
       expect(result!.sessions).toBe(3);
       expect(result!.uptime).toBeGreaterThanOrEqual(4000);
     });
@@ -75,7 +73,6 @@ describe('health-endpoint', () => {
       let sessionCount = 0;
       const { port, closeAsync } = await startHealthServerAsync(() => ({
         port: 38741,
-        protocolVersion: 2,
         sessions: ++sessionCount,
         startTime: Date.now(),
       }));
@@ -135,7 +132,6 @@ describe('health-endpoint', () => {
     it('returns valid health response from a running host', async () => {
       const { port, closeAsync } = await startHealthServerAsync(() => ({
         port: 38741,
-        protocolVersion: 2,
         sessions: 1,
         startTime: Date.now() - 1000,
       }));
