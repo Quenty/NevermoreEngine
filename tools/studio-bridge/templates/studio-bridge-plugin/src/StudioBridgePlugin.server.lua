@@ -223,7 +223,6 @@ local function wireConnection(ws, sessionId, connectLabel)
 	-- Send register message
 	ws:Send(jsonEncode({
 		type = "register",
-		protocolVersion = 2,
 		sessionId = sessionId,
 		payload = {
 			pluginVersion = "0.7.0",
@@ -252,13 +251,11 @@ local function wireConnection(ws, sessionId, connectLabel)
 
 			print(`[StudioBridge] Received: {msg.type} (requestId={tostring(msg.requestId):sub(1, 8)}...)`)
 
-			if msg.type == "welcome" or msg.type == "shutdown" then
-				if msg.type == "shutdown" then
-					connected = false
-					pcall(function()
-						ws:Close()
-					end)
-				end
+			if msg.type == "shutdown" then
+				connected = false
+				pcall(function()
+					ws:Close()
+				end)
 				return
 			end
 
@@ -280,7 +277,7 @@ local function wireConnection(ws, sessionId, connectLabel)
 		connected = false
 	end)
 
-	-- Heartbeat coroutine — send v2 rich heartbeat data
+	-- Heartbeat coroutine
 	local heartbeatStart = os.clock()
 	task.spawn(function()
 		while connected do

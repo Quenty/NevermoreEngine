@@ -210,7 +210,7 @@ When Studio is in Play mode, a single instance has multiple contexts (Edit + Cli
 
 ## Programmatic API
 
-### Persistent sessions (v2)
+### Persistent sessions
 
 ```typescript
 import { BridgeConnection } from '@quenty/studio-bridge';
@@ -282,41 +282,20 @@ The legacy API launches Studio, injects a temporary plugin, executes a script, a
 
 ## WebSocket Protocol
 
-All messages are JSON: `{ type, sessionId, payload }`. The plugin and server negotiate protocol version on connect — v1 plugins get the minimal message set, v2 plugins get the full feature set.
-
-### v1 Messages (legacy)
+All messages are JSON: `{ type, sessionId, payload }`. The plugin sends `register` on connect with its capabilities; the server dispatches actions and the plugin replies via `requestId` correlation.
 
 **Plugin to Server:**
 
 | Type | Payload | Description |
 |------|---------|-------------|
-| `hello` | `{ sessionId }` | Handshake |
-| `output` | `{ messages: [{ level, body }] }` | Batched log output |
-| `scriptComplete` | `{ success, error? }` | Script finished |
-
-**Server to Plugin:**
-
-| Type | Payload | Description |
-|------|---------|-------------|
-| `welcome` | `{ sessionId }` | Handshake accepted |
-| `execute` | `{ script }` | Luau script to run |
-| `shutdown` | `{}` | Graceful disconnect |
-
-### v2 Messages
-
-**Plugin to Server:**
-
-| Type | Payload | Description |
-|------|---------|-------------|
-| `register` | `{ sessionId, capabilities, pluginVersion, … }` | v2 handshake with capabilities |
+| `register` | `{ sessionId, capabilities, pluginVersion, … }` | Handshake with capabilities |
+| `scriptComplete` | `{ requestId, success, error?, output? }` | Response to `execute` |
 | `stateResult` | `{ requestId, mode, placeName, placeId, gameId }` | Response to `queryState` |
 | `screenshotResult` | `{ requestId, base64, width, height }` | Response to `captureScreenshot` |
 | `dataModelResult` | `{ requestId, instances }` | Response to `queryDataModel` |
 | `logsResult` | `{ requestId, entries }` | Response to `queryLogs` |
 | `stateChange` | `{ state, previousState }` | Push event on state transition |
 | `heartbeat` | `{ uptimeMs, state, pendingRequests }` | Periodic keep-alive |
-| `subscribeResult` | `{ requestId, events }` | Subscription confirmed |
-| `unsubscribeResult` | `{ requestId, events }` | Unsubscription confirmed |
 | `registerActionResult` | `{ requestId, name, success, error? }` | Dynamic action registration result |
 | `error` | `{ requestId, code, message }` | Error response |
 
@@ -324,13 +303,13 @@ All messages are JSON: `{ type, sessionId, payload }`. The plugin and server neg
 
 | Type | Payload | Description |
 |------|---------|-------------|
+| `execute` | `{ requestId, script }` | Luau script to run |
 | `queryState` | `{ requestId }` | Request current state |
 | `captureScreenshot` | `{ requestId }` | Request viewport screenshot |
 | `queryDataModel` | `{ requestId, path, depth?, properties?, attributes? }` | Request instance tree |
 | `queryLogs` | `{ requestId, tail?, head?, levels? }` | Request buffered logs |
-| `subscribe` | `{ requestId, events }` | Subscribe to push events |
-| `unsubscribe` | `{ requestId, events }` | Unsubscribe from events |
 | `registerAction` | `{ requestId, name, source, responseType? }` | Push a Luau action module dynamically |
+| `shutdown` | `{}` | Graceful disconnect |
 
 ### Capabilities
 
@@ -363,10 +342,9 @@ This means:
 The persistent plugin discovers the bridge host automatically:
 
 1. Poll `GET http://localhost:38741/health` (default port)
-2. Health endpoint returns `{ status, port, protocolVersion, sessions, uptime }`
+2. Health endpoint returns `{ status, port, sessions, uptime }`
 3. Connect to `ws://localhost:{port}/plugin`
 4. Send `register` message with capabilities
-5. Receive `welcome` with negotiated protocol version
 6. Receive `registerAction` messages for each command's Luau action
 
 If the health endpoint is unreachable, the plugin retries with backoff. The plugin survives Studio restarts and reconnects automatically when a host becomes available.

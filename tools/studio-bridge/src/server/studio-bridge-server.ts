@@ -132,7 +132,6 @@ function startHttpAndWsServerAsync(
           status: 'ok',
           sessionId,
           port,
-          protocolVersion: 2,
           serverVersion: SERVER_VERSION,
         });
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -205,7 +204,6 @@ export class StudioBridgeServer {
   private _placeBuildContext: BuildContext | undefined;
   private _connectedClient: WebSocket | undefined;
 
-  private _negotiatedProtocolVersion: number = 1;
   private _negotiatedCapabilities: Capability[] = ['execute'];
   private _lastHeartbeatTimestamp: number | undefined;
   private _actionDispatcher = new ActionDispatcher();
@@ -220,11 +218,6 @@ export class StudioBridgeServer {
     this._placePath = options.placePath;
   }
 
-  /** The negotiated protocol version (1 for v1, 2 for v2 plugins). */
-  get protocolVersion(): number {
-    return this._negotiatedProtocolVersion;
-  }
-
   /** The negotiated set of capabilities shared between plugin and server. */
   get capabilities(): readonly Capability[] {
     return this._negotiatedCapabilities;
@@ -235,7 +228,7 @@ export class StudioBridgeServer {
     return this._lastHeartbeatTimestamp;
   }
 
-  /** Requires v2 plugin with the relevant capability negotiated. */
+  /** Requires the plugin to advertise the relevant capability. */
   async performActionAsync<T extends PluginMessage>(
     message: Omit<ServerMessage, 'requestId' | 'sessionId'>,
     timeoutMs?: number
@@ -247,9 +240,6 @@ export class StudioBridgeServer {
     }
     if (!this._connectedClient) {
       throw new Error('Cannot perform action: no connected client');
-    }
-    if (this._negotiatedProtocolVersion < 2) {
-      throw new Error('Plugin does not support v2 actions');
     }
 
     const actionType = message.type;
@@ -355,7 +345,7 @@ export class StudioBridgeServer {
         }
       } else {
         // No persistent plugin or preference disabled (CI mode).
-        // Use temporary injection (existing v1 behavior).
+        // Use temporary injection (legacy launch-and-execute flow).
         await this._injectPluginAsync();
       }
 
@@ -453,16 +443,10 @@ export class StudioBridgeServer {
    * before first use. Uses `syncActions` to check which actions the plugin
    * is missing, then registers them via `registerAction`.
    *
-   * Only works with v2 plugins. v1 plugins skip this step (they would need
-   * actions baked in, which the current plugin architecture does not support).
+   * Loads action sources and registers them with the connected plugin.
    */
   private async _ensureActionsAsync(): Promise<void> {
     if (this._actionsReady) return;
-
-    if (this._negotiatedProtocolVersion < 2) {
-      this._actionsReady = true;
-      return;
-    }
 
     if (!this._actionSources) {
       this._actionSources = await loadActionSourcesAsync();
@@ -566,12 +550,12 @@ export class StudioBridgeServer {
           const msg = decodePluginMessage(data);
           if (!msg) return;
 
-          if (msg.type === 'hello' || msg.type === 'register') {
+          if (msg.type === 'register') {
             settled = true;
             clearTimeout(timer);
             ws.off('message', onMessage);
 
-            this._handlePluginHandshakeMessage(ws, data, msg);
+            this._handlePluginHandshakeMessage(ws, msg);
             resolve(true);
           }
         };
@@ -589,9 +573,10 @@ export class StudioBridgeServer {
 
   private _handlePluginHandshakeMessage(
     ws: WebSocket,
-    rawData: string,
     msg: PluginMessage
   ): void {
+    if (msg.type !== 'register') return;
+
     const serverSupportedCapabilities: Capability[] = [
       'execute',
       'queryState',
@@ -600,90 +585,13 @@ export class StudioBridgeServer {
       'queryLogs',
     ];
 
-    if (msg.type === 'hello') {
-      if (
-        msg.sessionId !== this._sessionId ||
-        msg.payload.sessionId !== this._sessionId
-      ) {
-        OutputHelper.verbose(
-          '[StudioBridge] Rejecting hello with wrong session ID during grace period'
-        );
-        ws.close();
-        return;
-      }
+    this._negotiatedCapabilities = msg.payload.capabilities.filter((cap) =>
+      serverSupportedCapabilities.includes(cap)
+    );
 
-      // v2 adds protocolVersion at the top level — not in the v1-typed payload
-      let rawProtocolVersion: number | undefined;
-      try {
-        const rawObj = JSON.parse(rawData) as Record<string, unknown>;
-        if (typeof rawObj.protocolVersion === 'number') {
-          rawProtocolVersion = rawObj.protocolVersion;
-        }
-      } catch {
-        // ignore
-      }
-
-      const isV2 = rawProtocolVersion !== undefined && rawProtocolVersion >= 2;
-
-      if (isV2) {
-        this._negotiatedProtocolVersion = Math.min(rawProtocolVersion!, 2);
-        const pluginCapabilities = msg.payload.capabilities ?? [
-          'execute' as Capability,
-        ];
-        this._negotiatedCapabilities = pluginCapabilities.filter((cap) =>
-          serverSupportedCapabilities.includes(cap)
-        );
-
-        OutputHelper.verbose(
-          '[StudioBridge] v2 handshake accepted (grace period)'
-        );
-        ws.send(
-          JSON.stringify({
-            type: 'welcome',
-            sessionId: this._sessionId,
-            payload: {
-              sessionId: this._sessionId,
-              protocolVersion: this._negotiatedProtocolVersion,
-              capabilities: this._negotiatedCapabilities,
-            },
-          })
-        );
-      } else {
-        this._negotiatedProtocolVersion = 1;
-        this._negotiatedCapabilities = ['execute'];
-
-        OutputHelper.verbose(
-          '[StudioBridge] Handshake accepted (grace period)'
-        );
-        ws.send(
-          encodeMessage({
-            type: 'welcome',
-            sessionId: this._sessionId,
-            payload: { sessionId: this._sessionId },
-          })
-        );
-      }
-    } else if (msg.type === 'register') {
-      this._negotiatedProtocolVersion = Math.min(msg.protocolVersion, 2);
-      this._negotiatedCapabilities = msg.payload.capabilities.filter((cap) =>
-        serverSupportedCapabilities.includes(cap)
-      );
-
-      OutputHelper.verbose(
-        '[StudioBridge] v2 register handshake accepted (grace period)'
-      );
-      ws.send(
-        JSON.stringify({
-          type: 'welcome',
-          sessionId: this._sessionId,
-          payload: {
-            sessionId: this._sessionId,
-            protocolVersion: this._negotiatedProtocolVersion,
-            capabilities: this._negotiatedCapabilities,
-          },
-        })
-      );
-    }
+    OutputHelper.verbose(
+      '[StudioBridge] Plugin register handshake accepted (grace period)'
+    );
 
     this._connectedClient = ws;
 
@@ -743,100 +651,13 @@ export class StudioBridgeServer {
             return;
           }
 
-          if (msg.type === 'hello') {
-            if (
-              msg.sessionId !== this._sessionId ||
-              msg.payload.sessionId !== this._sessionId
-            ) {
-              OutputHelper.verbose(
-                `[StudioBridge] Rejecting hello with wrong session ID`
-              );
-              ws.close();
-              return;
-            }
-
-            // v2 adds protocolVersion at the top level — not in the v1-typed payload
-            let rawProtocolVersion: number | undefined;
-            try {
-              const rawObj = JSON.parse(data) as Record<string, unknown>;
-              if (typeof rawObj.protocolVersion === 'number') {
-                rawProtocolVersion = rawObj.protocolVersion;
-              }
-            } catch {
-              // ignore
-            }
-
-            const isV2 =
-              rawProtocolVersion !== undefined && rawProtocolVersion >= 2;
-
-            if (isV2) {
-              // v2 hello: negotiate protocol version and capabilities
-              this._negotiatedProtocolVersion = Math.min(
-                rawProtocolVersion!,
-                2
-              );
-              const pluginCapabilities = msg.payload.capabilities ?? [
-                'execute' as Capability,
-              ];
-              this._negotiatedCapabilities = pluginCapabilities.filter((cap) =>
-                serverSupportedCapabilities.includes(cap)
-              );
-
-              OutputHelper.verbose('[StudioBridge] v2 handshake accepted');
-              const welcomePayload: Record<string, unknown> = {
-                sessionId: this._sessionId,
-                protocolVersion: this._negotiatedProtocolVersion,
-                capabilities: this._negotiatedCapabilities,
-              };
-              ws.send(
-                JSON.stringify({
-                  type: 'welcome',
-                  sessionId: this._sessionId,
-                  payload: welcomePayload,
-                })
-              );
-            } else {
-              // v1 hello: no protocol version or capabilities in welcome
-              this._negotiatedProtocolVersion = 1;
-              this._negotiatedCapabilities = ['execute'];
-
-              OutputHelper.verbose('[StudioBridge] Handshake accepted');
-              ws.send(
-                encodeMessage({
-                  type: 'welcome',
-                  sessionId: this._sessionId,
-                  payload: { sessionId: this._sessionId },
-                })
-              );
-            }
-
-            ws.off('message', onMessage);
-            this._finishHandshake(ws, settled, timer, resolve);
-            settled = true;
-            return;
-          }
-
           if (msg.type === 'register') {
-            // Always v2
-            this._negotiatedProtocolVersion = Math.min(msg.protocolVersion, 2);
             this._negotiatedCapabilities = msg.payload.capabilities.filter(
               (cap) => serverSupportedCapabilities.includes(cap)
             );
 
             OutputHelper.verbose(
-              '[StudioBridge] v2 register handshake accepted'
-            );
-            const welcomePayload: Record<string, unknown> = {
-              sessionId: this._sessionId,
-              protocolVersion: this._negotiatedProtocolVersion,
-              capabilities: this._negotiatedCapabilities,
-            };
-            ws.send(
-              JSON.stringify({
-                type: 'welcome',
-                sessionId: this._sessionId,
-                payload: welcomePayload,
-              })
+              '[StudioBridge] Plugin register handshake accepted'
             );
 
             ws.off('message', onMessage);
@@ -882,7 +703,7 @@ export class StudioBridgeServer {
       const msg = decodePluginMessage(data);
       if (!msg) return;
 
-      // Action dispatcher first — v2 request/response correlation
+      // Action dispatcher first — request/response correlation
       if (this._actionDispatcher.handleResponse(msg)) {
         return;
       }
@@ -956,14 +777,6 @@ export class StudioBridgeServer {
         }
 
         switch (msg.type) {
-          case 'output': {
-            for (const entry of msg.payload.messages) {
-              logLines.push(entry.body);
-              options.onOutput?.(entry.level, entry.body);
-            }
-            break;
-          }
-
           case 'scriptComplete': {
             OutputHelper.verbose(
               `[StudioBridge] Script complete: success=${msg.payload.success}` +

@@ -17,17 +17,6 @@ function connectPlugin(port: number): Promise<WebSocket> {
   });
 }
 
-function waitForMessage(ws: WebSocket): Promise<Record<string, unknown>> {
-  return new Promise((resolve) => {
-    ws.once('message', (raw) => {
-      const data = JSON.parse(
-        typeof raw === 'string' ? raw : raw.toString('utf-8')
-      );
-      resolve(data);
-    });
-  });
-}
-
 async function performRegisterHandshake(
   port: number,
   sessionId: string,
@@ -38,15 +27,13 @@ async function performRegisterHandshake(
     context?: string;
     capabilities?: string[];
   }
-): Promise<{ ws: WebSocket; welcome: Record<string, unknown> }> {
+): Promise<{ ws: WebSocket }> {
   const ws = await connectPlugin(port);
-  const welcomePromise = waitForMessage(ws);
 
   ws.send(
     JSON.stringify({
       type: 'register',
       sessionId,
-      protocolVersion: 2,
       payload: {
         pluginVersion: '1.0.0',
         instanceId: options?.instanceId ?? 'inst-1',
@@ -57,8 +44,9 @@ async function performRegisterHandshake(
     })
   );
 
-  const welcome = await welcomePromise;
-  return { ws, welcome };
+  // Allow the host to process the register message
+  await new Promise((r) => setTimeout(r, 20));
+  return { ws };
 }
 
 describe('BridgeConnection', () => {

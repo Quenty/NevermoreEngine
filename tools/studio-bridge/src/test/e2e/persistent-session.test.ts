@@ -45,20 +45,17 @@ describe('persistent session e2e', () => {
     });
     plugins.push(plugin);
 
-    const welcome = await plugin.connectAndRegisterAsync();
+    await plugin.connectAndRegisterAsync();
 
     // Wait for the session to appear in the host
     await new Promise((r) => setTimeout(r, 100));
-
-    expect(welcome.sessionId).toBeDefined();
-    expect(welcome.protocolVersion).toBe(2);
-    expect(welcome.capabilities).toEqual(['execute', 'queryState']);
 
     const sessions = conn.listSessions();
     expect(sessions).toHaveLength(1);
     expect(sessions[0].sessionId).toBe(plugin.sessionId);
     expect(sessions[0].placeName).toBe('RegisterPlace');
     expect(sessions[0].instanceId).toBe('inst-register');
+    expect(sessions[0].capabilities).toEqual(['execute', 'queryState']);
   });
 
   it('server sends execute, plugin responds with scriptComplete', async () => {

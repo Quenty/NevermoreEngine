@@ -1,11 +1,6 @@
 /**
  * WebSocket message protocol shared between the Node.js server and the Roblox
  * Studio plugin. All messages are JSON-encoded: `{ type: string, sessionId: string, payload: object }`.
- *
- * v1 messages: hello, output, scriptComplete, welcome, execute, shutdown
- * v2 messages: register, queryState, stateResult, captureScreenshot, screenshotResult,
- *   queryDataModel, dataModelResult, queryLogs, logsResult, stateChange, heartbeat,
- *   error, registerAction, registerActionResult
  */
 
 export type OutputLevel = 'Print' | 'Info' | 'Warning' | 'Error';
@@ -97,25 +92,6 @@ interface PushMessage extends BaseMessage {
   // no requestId
 }
 
-export interface HelloMessage extends PushMessage {
-  type: 'hello';
-  payload: {
-    sessionId: string;
-    pluginVersion?: string;
-    capabilities?: Capability[];
-  };
-}
-
-export interface OutputMessage extends PushMessage {
-  type: 'output';
-  payload: {
-    messages: Array<{
-      level: OutputLevel;
-      body: string;
-    }>;
-  };
-}
-
 export interface ScriptCompleteMessage extends BaseMessage {
   type: 'scriptComplete';
   requestId?: string;
@@ -128,7 +104,6 @@ export interface ScriptCompleteMessage extends BaseMessage {
 
 export interface RegisterMessage extends PushMessage {
   type: 'register';
-  protocolVersion: number;
   payload: {
     pluginVersion: string;
     instanceId: string;
@@ -227,8 +202,6 @@ export interface PluginErrorMessage extends BaseMessage {
 }
 
 export type PluginMessage =
-  | HelloMessage
-  | OutputMessage
   | ScriptCompleteMessage
   | RegisterMessage
   | StateResultMessage
@@ -240,13 +213,6 @@ export type PluginMessage =
   | RegisterActionResultMessage
   | SyncActionsResultMessage
   | PluginErrorMessage;
-
-export interface WelcomeMessage extends PushMessage {
-  type: 'welcome';
-  payload: {
-    sessionId: string;
-  };
-}
 
 export interface ExecuteMessage extends BaseMessage {
   type: 'execute';
@@ -323,7 +289,6 @@ export interface ServerErrorMessage extends BaseMessage {
 }
 
 export type ServerMessage =
-  | WelcomeMessage
   | ExecuteMessage
   | ShutdownMessage
   | QueryStateMessage
@@ -372,40 +337,6 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
     typeof obj.requestId === 'string' ? obj.requestId : undefined;
 
   switch (type) {
-    case 'hello':
-      if (typeof payload.sessionId === 'string') {
-        return {
-          type: 'hello',
-          sessionId,
-          payload: {
-            sessionId: payload.sessionId,
-            pluginVersion:
-              typeof payload.pluginVersion === 'string'
-                ? payload.pluginVersion
-                : undefined,
-            capabilities: Array.isArray(payload.capabilities)
-              ? (payload.capabilities as Capability[])
-              : undefined,
-          },
-        };
-      }
-      return null;
-
-    case 'output':
-      if (Array.isArray(payload.messages)) {
-        const messages = payload.messages
-          .filter(
-            (m: unknown): m is { level: OutputLevel; body: string } =>
-              typeof m === 'object' &&
-              m !== null &&
-              typeof (m as Record<string, unknown>).level === 'string' &&
-              typeof (m as Record<string, unknown>).body === 'string'
-          )
-          .map((m) => ({ level: m.level, body: m.body }));
-        return { type: 'output', sessionId, payload: { messages } };
-      }
-      return null;
-
     case 'scriptComplete':
       if (typeof payload.success === 'boolean') {
         const output = Array.isArray(payload.output)
@@ -438,8 +369,6 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
       return null;
 
     case 'register': {
-      const protocolVersion = (obj as Record<string, unknown>).protocolVersion;
-      if (typeof protocolVersion !== 'number') return null;
       if (
         typeof payload.pluginVersion !== 'string' ||
         typeof payload.instanceId !== 'string' ||
@@ -453,7 +382,6 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
       return {
         type: 'register',
         sessionId,
-        protocolVersion,
         payload: {
           pluginVersion: payload.pluginVersion,
           instanceId: payload.instanceId,
@@ -569,8 +497,6 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
       };
 
     case 'heartbeat':
-      // Accept empty payloads (Luau empty table encodes as []) with defaults.
-      // v1 plugins send payload: {}, v2 plugins send rich data.
       return {
         type: 'heartbeat',
         sessionId,
@@ -681,16 +607,6 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
     typeof obj.requestId === 'string' ? obj.requestId : undefined;
 
   switch (type) {
-    case 'welcome':
-      if (typeof payload.sessionId === 'string') {
-        return {
-          type: 'welcome',
-          sessionId,
-          payload: { sessionId: payload.sessionId },
-        };
-      }
-      return null;
-
     case 'execute':
       if (typeof payload.script === 'string') {
         return {

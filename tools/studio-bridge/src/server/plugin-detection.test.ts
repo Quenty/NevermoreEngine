@@ -45,7 +45,7 @@ vi.mock('../process/studio-process-manager.js', () => ({
 }));
 
 /**
- * Connect a WebSocket client and perform the hello/welcome handshake.
+ * Connect a WebSocket client and send a register message.
  */
 async function connectAndHandshake(
   port: number,
@@ -58,19 +58,22 @@ async function connectAndHandshake(
     ws.on('error', reject);
   });
 
-  ws.send(JSON.stringify({ type: 'hello', sessionId, payload: { sessionId } }));
+  ws.send(
+    JSON.stringify({
+      type: 'register',
+      sessionId,
+      payload: {
+        pluginVersion: '1.0.0',
+        instanceId: 'inst-1',
+        placeName: 'TestPlace',
+        state: 'Edit',
+        capabilities: ['execute', 'queryState'],
+      },
+    })
+  );
 
-  await new Promise<void>((resolve) => {
-    ws.on('message', (raw) => {
-      const data = JSON.parse(
-        typeof raw === 'string' ? raw : raw.toString('utf-8')
-      );
-      if (data.type === 'welcome') {
-        resolve();
-      }
-    });
-  });
-
+  // Allow server to process register
+  await new Promise((r) => setTimeout(r, 20));
   return ws;
 }
 

@@ -244,12 +244,14 @@ describe('Graceful shutdown failover', () => {
       pluginWs.on('open', () => {
         pluginWs.send(
           JSON.stringify({
-            type: 'hello',
+            type: 'register',
             sessionId: 'plugin-session-1',
             payload: {
-              sessionId: 'plugin-session-1',
-              capabilities: ['execute'],
               pluginVersion: '1.0.0',
+              instanceId: 'inst-1',
+              placeName: 'TestPlace',
+              state: 'Edit',
+              capabilities: ['execute'],
             },
           })
         );

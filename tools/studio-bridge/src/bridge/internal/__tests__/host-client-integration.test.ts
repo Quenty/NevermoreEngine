@@ -165,7 +165,7 @@ function wireHostAndTracker(host: BridgeHost): SessionTracker {
 }
 
 /**
- * Send a v2 register message on a plugin WebSocket and wait for the welcome.
+ * Send a register message on a plugin WebSocket.
  */
 async function registerPluginAsync(
   pluginWs: WebSocket,
@@ -178,15 +178,10 @@ async function registerPluginAsync(
     capabilities?: Capability[];
   }
 ): Promise<void> {
-  const welcomePromise = new Promise<void>((resolve) => {
-    pluginWs.once('message', () => resolve());
-  });
-
   pluginWs.send(
     JSON.stringify({
       type: 'register',
       sessionId: options.sessionId,
-      protocolVersion: 2,
       payload: {
         pluginVersion: options.pluginVersion ?? '0.7.0',
         instanceId: options.instanceId,
@@ -197,7 +192,8 @@ async function registerPluginAsync(
     })
   );
 
-  await welcomePromise;
+  // Yield to let the host process the register
+  await new Promise((r) => setTimeout(r, 20));
 }
 
 describe('Host-client integration', { timeout: 10_000 }, () => {

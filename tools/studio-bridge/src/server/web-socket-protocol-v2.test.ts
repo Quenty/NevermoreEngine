@@ -17,48 +17,8 @@ function roundTripServer(msg: ServerMessage): ServerMessage | null {
   return decodeServerMessage(encodeMessage(msg));
 }
 
-describe('decodePluginMessage (v2)', () => {
-  describe('hello (v2 extensions)', () => {
-    it('decodes hello with pluginVersion and capabilities', () => {
-      const msg = roundTripPlugin({
-        type: 'hello',
-        sessionId: 'sess-1',
-        payload: {
-          sessionId: 'sess-1',
-          pluginVersion: '2.0.0',
-          capabilities: ['execute', 'queryState'],
-        },
-      });
-      expect(msg).toEqual({
-        type: 'hello',
-        sessionId: 'sess-1',
-        payload: {
-          sessionId: 'sess-1',
-          pluginVersion: '2.0.0',
-          capabilities: ['execute', 'queryState'],
-        },
-      });
-    });
-
-    it('decodes hello without v2 fields (backward compat)', () => {
-      const msg = roundTripPlugin({
-        type: 'hello',
-        sessionId: 'sess-1',
-        payload: { sessionId: 'sess-1' },
-      });
-      expect(msg).toEqual({
-        type: 'hello',
-        sessionId: 'sess-1',
-        payload: {
-          sessionId: 'sess-1',
-          pluginVersion: undefined,
-          capabilities: undefined,
-        },
-      });
-    });
-  });
-
-  describe('scriptComplete (v2 requestId)', () => {
+describe('decodePluginMessage', () => {
+  describe('scriptComplete', () => {
     it('decodes scriptComplete with requestId', () => {
       const msg = roundTripPlugin({
         type: 'scriptComplete',
@@ -93,7 +53,6 @@ describe('decodePluginMessage (v2)', () => {
     const validRegister = {
       type: 'register',
       sessionId: 'sess-1',
-      protocolVersion: 2,
       payload: {
         pluginVersion: '2.0.0',
         instanceId: 'inst-abc',
@@ -108,7 +67,6 @@ describe('decodePluginMessage (v2)', () => {
       expect(msg).toEqual({
         type: 'register',
         sessionId: 'sess-1',
-        protocolVersion: 2,
         payload: {
           pluginVersion: '2.0.0',
           instanceId: 'inst-abc',
@@ -133,11 +91,6 @@ describe('decodePluginMessage (v2)', () => {
       expect(msg).not.toBeNull();
       expect((msg as any).payload.placeFile).toBe('TestPlace.rbxl');
       expect((msg as any).payload.pid).toBe(12345);
-    });
-
-    it('returns null when protocolVersion is missing', () => {
-      const { protocolVersion: _, ...noVersion } = validRegister;
-      expect(roundTripPlugin(noVersion)).toBeNull();
     });
 
     it('returns null when required payload field is missing', () => {
@@ -496,16 +449,7 @@ describe('decodePluginMessage (v2)', () => {
 });
 
 describe('encodeMessage / decodeServerMessage (v2)', () => {
-  describe('v1 backward compatibility', () => {
-    it('round-trips welcome', () => {
-      const msg: ServerMessage = {
-        type: 'welcome',
-        sessionId: 'sess-1',
-        payload: { sessionId: 'sess-1' },
-      };
-      expect(roundTripServer(msg)).toEqual(msg);
-    });
-
+  describe('basic messages', () => {
     it('round-trips execute without requestId', () => {
       const msg: ServerMessage = {
         type: 'execute',
@@ -776,15 +720,13 @@ describe('decodeServerMessage (malformed)', () => {
 
   it('returns null for missing payload', () => {
     expect(
-      decodeServerMessage(JSON.stringify({ type: 'welcome', sessionId: 's' }))
+      decodeServerMessage(JSON.stringify({ type: 'shutdown', sessionId: 's' }))
     ).toBeNull();
   });
 
   it('returns null for missing sessionId', () => {
     expect(
-      decodeServerMessage(
-        JSON.stringify({ type: 'welcome', payload: { sessionId: 's' } })
-      )
+      decodeServerMessage(JSON.stringify({ type: 'shutdown', payload: {} }))
     ).toBeNull();
   });
 
