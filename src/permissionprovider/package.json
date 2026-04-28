@@ -41,6 +41,7 @@
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/table": "workspace:*",
+    "@quenty/simpleenum": "workspace:*",
     "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {

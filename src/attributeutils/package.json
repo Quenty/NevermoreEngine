@@ -28,6 +28,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/binder": "workspace:*",
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/canceltoken": "workspace:*",
