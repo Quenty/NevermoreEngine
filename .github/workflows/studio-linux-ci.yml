@@ -193,10 +193,14 @@ jobs:
 
       - name: Setup registries
         run: |
-          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
-          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
-          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          if [ -n "$GITHUB_TOKEN" ]; then
+            echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+            echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          fi
+          if [ -n "$NPM_TOKEN" ]; then
+            echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+            echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -215,7 +219,7 @@ jobs:
         run: studio-bridge linux status
 
       - name: Diagnose Wine networking
-        if: always()
+        if: failure()
         run: |
           echo "=== /etc/resolv.conf ==="
           cat /etc/resolv.conf

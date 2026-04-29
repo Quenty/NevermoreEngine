@@ -135,6 +135,14 @@ export class OutputHelper {
   }
 
   /**
+   * Returns the current verbose flag. Useful for handlers that need to
+   * forward the global `--verbose` setting to downstream APIs.
+   */
+  public static isVerbose(): boolean {
+    return this._verbose;
+  }
+
+  /**
    * Logs a verbose/intermediate message. Suppressed when verbose is false.
    * When running inside a buffered context (see runBuffered), messages are
    * captured to the buffer instead of printed.

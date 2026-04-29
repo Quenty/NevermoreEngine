@@ -4,16 +4,14 @@
  */
 
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import {
   BuildContext,
   TemplateHelper,
   resolveTemplatePath,
 } from '@quenty/nevermore-template-helpers';
 import { findPluginsFolder } from '../process/studio-process-manager.js';
-import {
-  getPersistentPluginPath,
-  isPersistentPluginInstalled,
-} from './plugin-discovery.js';
+import { getPersistentPluginPath } from './plugin-discovery.js';
 
 const templateDir = resolveTemplatePath(
   import.meta.url,
@@ -23,8 +21,12 @@ const templateDir = resolveTemplatePath(
 const PERSISTENT_PLUGIN_FILENAME = 'StudioBridgePersistentPlugin.rbxm';
 
 /**
- * Build the persistent plugin template via rojo and copy the resulting
- * `.rbxm` into the Studio plugins folder.
+ * Build the persistent plugin template via rojo and atomically install the
+ * resulting `.rbxm` into the Studio plugins folder.
+ *
+ * The build runs inside the BuildContext's temp dir; the file is then
+ * copied to a temp name in the plugins folder and renamed into place so
+ * Studio's polling watcher never observes a partially-written .rbxm.
  *
  * @returns The absolute path to the installed plugin file.
  */
@@ -41,29 +43,33 @@ export async function installPersistentPluginAsync(): Promise<string> {
       false
     );
 
-    const pluginsFolder = findPluginsFolder();
-    const pluginPath = await buildContext.rojoBuildAsync({
+    const builtPath = buildContext.resolvePath(PERSISTENT_PLUGIN_FILENAME);
+    await buildContext.rojoBuildAsync({
       projectPath: buildContext.resolvePath('default.project.json'),
-      plugin: PERSISTENT_PLUGIN_FILENAME,
-      pluginsFolder,
+      output: builtPath,
     });
 
-    // rojoBuildAsync tracks the file for cleanup, but we want the plugin
-    // to persist. Cleanup only removes the temp build directory, not the
-    // plugin file, because we return before cleanupAsync is called for
-    // tracked files. However, BuildContext.cleanupAsync removes tracked
-    // files. We need to avoid that — so we skip cleanupAsync and remove
-    // only the build dir manually.
+    const pluginsFolder = findPluginsFolder();
+    await fs.mkdir(pluginsFolder, { recursive: true });
+
+    const finalPath = path.join(pluginsFolder, PERSISTENT_PLUGIN_FILENAME);
+    // Stage in the destination filesystem so the rename is atomic.
+    const stagingPath = path.join(
+      pluginsFolder,
+      `.${PERSISTENT_PLUGIN_FILENAME}.tmp-${process.pid}`
+    );
+    await fs.copyFile(builtPath, stagingPath);
     try {
-      await fs.rm(buildContext.buildDir, { recursive: true, force: true });
-    } catch {
-      // best effort
+      await fs.rename(stagingPath, finalPath);
+    } catch (err) {
+      // Best-effort cleanup of the staging file before propagating.
+      await fs.unlink(stagingPath).catch(() => {});
+      throw err;
     }
 
-    return pluginPath!;
-  } catch (err) {
+    return finalPath;
+  } finally {
     await buildContext.cleanupAsync();
-    throw err;
   }
 }
 
@@ -72,10 +78,13 @@ export async function installPersistentPluginAsync(): Promise<string> {
  * Throws if the plugin is not installed.
  */
 export async function uninstallPersistentPluginAsync(): Promise<void> {
-  if (!isPersistentPluginInstalled()) {
-    throw new Error('Persistent plugin is not installed. Nothing to remove.');
-  }
-
   const pluginPath = getPersistentPluginPath();
-  await fs.unlink(pluginPath);
+  try {
+    await fs.unlink(pluginPath);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new Error('Persistent plugin is not installed. Nothing to remove.');
+    }
+    throw err;
+  }
 }

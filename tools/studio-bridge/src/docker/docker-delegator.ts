@@ -88,15 +88,15 @@ export async function delegateToDockerAsync(
   const cwd = process.cwd();
   const args = await buildDockerRunArgsAsync(options, cwd, cookie, image);
 
-  // Log args without the cookie value
-  const safeArgs = args.map((a) =>
-    a.startsWith('ROBLOSECURITY=') ? 'ROBLOSECURITY=<redacted>' : a
-  );
-  OutputHelper.verbose(`[StudioBridge] docker run args: ${safeArgs.join(' ')}`);
+  OutputHelper.verbose(`[StudioBridge] docker run args: ${args.join(' ')}`);
 
+  // Pass ROBLOSECURITY through the docker process's env (referenced by name in
+  // the args via `-e ROBLOSECURITY`) rather than baking the value into argv,
+  // where it would be visible via `ps`.
   const result = await execa('docker', args, {
     stdio: 'inherit',
     reject: false,
+    env: { ...process.env, ROBLOSECURITY: cookie },
   });
 
   process.exit(result.exitCode ?? 1);
@@ -135,11 +135,18 @@ async function ensureImageAsync(image: string): Promise<void> {
 /**
  * Builds the docker run argument array, writing inline script content
  * to a temp file if needed.
+ *
+ * The cookie value is NOT placed in the returned argv. Instead `-e
+ * ROBLOSECURITY` (no value) is used so docker reads the value from its own
+ * environment at spawn time, keeping the cookie out of `ps` output. The
+ * caller is responsible for setting ROBLOSECURITY in the spawned docker
+ * process's env. The `cookie` parameter is retained only for validation in
+ * `delegateToDockerAsync`.
  */
 export async function buildDockerRunArgsAsync(
   options: ExecuteScriptOptions,
   cwd: string,
-  cookie: string,
+  _cookie: string,
   image: string = `${DOCKER_IMAGE_BASE}:latest`
 ): Promise<string[]> {
   const { scriptContent, placePath, timeoutMs, verbose } = options;
@@ -220,7 +227,7 @@ export async function buildDockerRunArgsAsync(
     '--stop-timeout',
     String(dockerTimeoutSec),
     '-e',
-    `ROBLOSECURITY=${cookie}`,
+    'ROBLOSECURITY',
     '-v',
     `${cwd}:${cwd}`,
     '-w',

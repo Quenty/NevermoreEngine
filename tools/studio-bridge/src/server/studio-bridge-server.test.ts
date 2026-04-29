@@ -163,13 +163,13 @@ describe('StudioBridgeServer', () => {
   });
 
   describe('handshake', () => {
-    it('accepts hello with correct session ID and sends welcome', async () => {
+    it('accepts register with correct session ID', async () => {
       const ready = await createReadyServer({ sessionId: 'my-session' });
       server = ready.server;
       client = ready.client;
 
-      // If we got here, the handshake succeeded (connectAndHandshake waits
-      // for the welcome message)
+      // If we got here the server accepted the register handshake and
+      // resolved startAsync — connectAndHandshake yields the connected client.
       expect(true).toBe(true);
     });
 
