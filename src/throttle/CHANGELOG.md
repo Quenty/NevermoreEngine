@@ -1,3 +1,19 @@
+# v10.12.1 (Wed Apr 29 2026)
+
+#### 🐛 Bug Fix
+
+- fix: fixed `trailing = false` bug + added tests [#688](https://github.com/Quenty/NevermoreEngine/pull/688) ([@euvinkeel](https://github.com/euvinkeel))
+- re-add tests with fake timers + better docs ([@euvinkeel](https://github.com/euvinkeel))
+- removing tests because they take too long ([@euvinkeel](https://github.com/euvinkeel))
+- made a place under Integration publish place ([@euvinkeel](https://github.com/euvinkeel))
+- fixed trailing = false bug, also tests ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

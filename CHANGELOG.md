@@ -1,3 +1,16 @@
+# (Wed Apr 29 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/throttle@10.12.1`
+  - fix: fixed `trailing = false` bug + added tests [#688](https://github.com/Quenty/NevermoreEngine/pull/688) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Mon Apr 27 2026)
 
 #### 🐛 Bug Fix
