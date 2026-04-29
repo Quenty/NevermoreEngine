@@ -728,6 +728,175 @@ describe('BridgeConnection', () => {
     });
   });
 
+  describe('waitForSessionsToSettleAsync', () => {
+    it('returns when no plugin appears within firstSessionTimeout', async () => {
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
+      connections.push(conn);
+
+      const start = Date.now();
+      await conn.waitForSessionsToSettleAsync({
+        firstSessionTimeout: 150,
+        settleMs: 100,
+        maxMs: 1000,
+      });
+      const elapsed = Date.now() - start;
+
+      // Should resolve once firstSessionTimeout elapses with no plugin,
+      // not wait the full settleMs window.
+      expect(elapsed).toBeGreaterThanOrEqual(140);
+      expect(elapsed).toBeLessThan(400);
+      expect(conn.listSessions()).toHaveLength(0);
+    });
+
+    it('settles after settleMs of quiet time when one plugin connects', async () => {
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
+      connections.push(conn);
+
+      let pluginConnectedAt = 0;
+      conn.once('session-connected', () => {
+        pluginConnectedAt = Date.now();
+      });
+
+      // Schedule a single plugin to connect mid-settle.
+      setTimeout(async () => {
+        const { ws } = await performRegisterHandshake(
+          conn.port,
+          'lone-session'
+        );
+        openClients.push(ws);
+      }, 50);
+
+      await conn.waitForSessionsToSettleAsync({
+        firstSessionTimeout: 2000,
+        settleMs: 200,
+        maxMs: 5000,
+      });
+      const finishedAt = Date.now();
+
+      expect(pluginConnectedAt).toBeGreaterThan(0);
+      // settle should have waited at least settleMs after plugin connected.
+      expect(finishedAt - pluginConnectedAt).toBeGreaterThanOrEqual(180);
+      expect(conn.listSessions()).toHaveLength(1);
+    });
+
+    it('resets settle timer when a second plugin connects within window', async () => {
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
+      connections.push(conn);
+
+      const connectTimes: number[] = [];
+      conn.on('session-connected', () => {
+        connectTimes.push(Date.now());
+      });
+
+      setTimeout(async () => {
+        const { ws } = await performRegisterHandshake(conn.port, 'first');
+        openClients.push(ws);
+      }, 50);
+      // Second plugin within settleMs (200) of the first → resets timer.
+      setTimeout(async () => {
+        const { ws } = await performRegisterHandshake(conn.port, 'second');
+        openClients.push(ws);
+      }, 180);
+
+      await conn.waitForSessionsToSettleAsync({
+        firstSessionTimeout: 2000,
+        settleMs: 200,
+        maxMs: 5000,
+      });
+      const finishedAt = Date.now();
+
+      expect(connectTimes).toHaveLength(2);
+      // Settle should have waited at least settleMs after the SECOND plugin.
+      const lastConnectAt = connectTimes[1];
+      expect(finishedAt - lastConnectAt).toBeGreaterThanOrEqual(180);
+      expect(conn.listSessions()).toHaveLength(2);
+    });
+
+    it('caps wait at maxMs when sessions stream continuously', async () => {
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
+      connections.push(conn);
+
+      let firstConnectedAt = 0;
+      conn.once('session-connected', () => {
+        firstConnectedAt = Date.now();
+      });
+
+      // Stream plugins every 80ms (well within settleMs=200) so the settle
+      // timer would never fire on its own — only maxMs can stop it.
+      const streamTimers: ReturnType<typeof setTimeout>[] = [];
+      for (let i = 0; i < 8; i++) {
+        const t = setTimeout(async () => {
+          try {
+            const { ws } = await performRegisterHandshake(
+              conn.port,
+              `stream-${i}`
+            );
+            openClients.push(ws);
+          } catch {
+            // Connection may close while streaming — fine.
+          }
+        }, 50 + i * 80);
+        streamTimers.push(t);
+      }
+
+      try {
+        await conn.waitForSessionsToSettleAsync({
+          firstSessionTimeout: 2000,
+          settleMs: 200,
+          maxMs: 300,
+        });
+        const finishedAt = Date.now();
+
+        expect(firstConnectedAt).toBeGreaterThan(0);
+        // Should hit maxMs cap (~300ms) rather than wait for settleMs quiet.
+        expect(finishedAt - firstConnectedAt).toBeLessThan(450);
+        expect(finishedAt - firstConnectedAt).toBeGreaterThanOrEqual(280);
+      } finally {
+        for (const t of streamTimers) clearTimeout(t);
+      }
+    });
+
+    it('returns immediately when role is client', async () => {
+      const host = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
+      connections.push(host);
+
+      const client = await BridgeConnection.connectAsync({
+        port: host.port,
+        keepAlive: true,
+        local: true,
+      });
+      connections.push(client);
+
+      expect(client.role).toBe('client');
+
+      const start = Date.now();
+      await client.waitForSessionsToSettleAsync({
+        firstSessionTimeout: 5000,
+        settleMs: 1000,
+        maxMs: 10_000,
+      });
+      const elapsed = Date.now() - start;
+
+      // Should bail at the role check, not wait on any timer.
+      expect(elapsed).toBeLessThan(50);
+    });
+  });
+
   describe('events', () => {
     it('emits session-connected when plugin registers', async () => {
       const conn = await BridgeConnection.connectAsync({
