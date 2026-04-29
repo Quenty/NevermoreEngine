@@ -295,4 +295,121 @@ describe('host-protocol', () => {
       ).toBeNull();
     });
   });
+
+  describe('HostEnvelope action validation', () => {
+    function envelope(action: unknown): string {
+      return JSON.stringify({
+        type: 'host-envelope',
+        requestId: 'r-1',
+        targetSessionId: 's-1',
+        action,
+      });
+    }
+
+    it('returns null when action.type is missing', () => {
+      expect(
+        decodeHostMessage(
+          envelope({ sessionId: 's-1', payload: { script: 'x' } })
+        )
+      ).toBeNull();
+    });
+
+    it('returns null when action.type is unknown', () => {
+      expect(
+        decodeHostMessage(
+          envelope({
+            type: 'totally-fake',
+            sessionId: 's-1',
+            payload: {},
+          })
+        )
+      ).toBeNull();
+    });
+
+    it('returns null when execute action is missing payload.script', () => {
+      expect(
+        decodeHostMessage(
+          envelope({ type: 'execute', sessionId: 's-1', payload: {} })
+        )
+      ).toBeNull();
+    });
+
+    it('returns null when execute action has wrong script type', () => {
+      expect(
+        decodeHostMessage(
+          envelope({
+            type: 'execute',
+            sessionId: 's-1',
+            payload: { script: 42 },
+          })
+        )
+      ).toBeNull();
+    });
+
+    it('returns null when queryDataModel action is missing payload.path', () => {
+      expect(
+        decodeHostMessage(
+          envelope({
+            type: 'queryDataModel',
+            sessionId: 's-1',
+            requestId: 'a',
+            payload: {},
+          })
+        )
+      ).toBeNull();
+    });
+
+    it('returns null when error action has unknown error code', () => {
+      expect(
+        decodeHostMessage(
+          envelope({
+            type: 'error',
+            sessionId: 's-1',
+            payload: { code: 'NOT_A_REAL_CODE', message: 'oops' },
+          })
+        )
+      ).toBeNull();
+    });
+
+    it('returns null when sessionId is missing on action', () => {
+      expect(
+        decodeHostMessage(
+          envelope({ type: 'execute', payload: { script: 'x' } })
+        )
+      ).toBeNull();
+    });
+
+    it('accepts a well-formed execute action', () => {
+      const decoded = decodeHostMessage(
+        envelope({
+          type: 'execute',
+          sessionId: 's-1',
+          payload: { script: 'print("ok")' },
+        })
+      );
+      expect(decoded).not.toBeNull();
+      expect(decoded!.type).toBe('host-envelope');
+      expect((decoded as HostEnvelope).action.type).toBe('execute');
+    });
+
+    it('accepts a well-formed queryDataModel action with all fields', () => {
+      const decoded = decodeHostMessage(
+        envelope({
+          type: 'queryDataModel',
+          sessionId: 's-1',
+          requestId: 'q-1',
+          payload: {
+            path: 'workspace',
+            depth: 2,
+            properties: ['Name', 'ClassName'],
+            includeAttributes: true,
+            find: { name: 'Camera', recursive: false },
+            listServices: false,
+          },
+        })
+      );
+      expect(decoded).not.toBeNull();
+      expect(decoded!.type).toBe('host-envelope');
+    });
+  });
 });
