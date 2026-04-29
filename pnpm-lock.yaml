@@ -5247,9 +5247,15 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/typeutils':
         specifier: workspace:*
         version: link:../typeutils
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/tie:
     dependencies:

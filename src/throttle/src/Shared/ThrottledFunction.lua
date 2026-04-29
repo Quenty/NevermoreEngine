@@ -1,9 +1,17 @@
 --!strict
 --[=[
-	Throttles execution of a functon. Does both leading, and following
+	Throttles execution of a function with configurable leading and trailing behavior.
 	@class ThrottledFunction
 ]=]
 
+--[=[
+	@interface ThrottleConfig
+	.leading boolean? -- If true, will dispatch immediately after creating this ThrottledFunction.
+	.trailing boolean? -- If true, will dispatch after the timeout with the latest-called args.
+	.leadingFirstTimeOnly boolean? -- If true, will dispatch immediately after creating this ThrottledFunction, but from then on, will begin the <timeout> window upon manual call
+	and delay dispatch until <timeout> seconds have passed (with latest-called args).
+	@within ThrottledFunction
+]=]
 export type ThrottleConfig = {
 	leading: boolean?,
 	trailing: boolean?,
@@ -25,14 +33,23 @@ export type ThrottledFunction<T...> = typeof(setmetatable(
 		_callLeading: boolean,
 		_callTrailing: boolean,
 		_callLeadingFirstTime: boolean?,
+		_delayedDispatchThread: thread?,
 	},
 	{} :: typeof({ __index = ThrottledFunction })
 ))
 
+--[=[
+	@function new
+	@within ThrottledFunction
+	@param timeoutInSeconds number -- The (minimum) time in seconds to wait between each function dispatch; the "cooldown".
+	@param func function -- The actual function whose calls will be throttled.
+	@param config? ThrottleConfig -- The configuration for how throttling will behave.
+	@return ThrottledFunction<T...>
+]=]
 function ThrottledFunction.new<T...>(
 	timeoutInSeconds: number,
 	func: Func<T...>,
-	config: ThrottleConfig
+	config: ThrottleConfig?
 ): ThrottledFunction<T...>
 	local self: ThrottledFunction<T...> = setmetatable({} :: any, ThrottledFunction)
 
@@ -44,21 +61,30 @@ function ThrottledFunction.new<T...>(
 
 	self._callLeading = true
 	self._callTrailing = true
+	self._delayedDispatchThread = nil
 
-	self:_configureOrError(config)
+	self:_configureOrError(config or {
+		leading = true,
+		trailing = true,
+	})
 
 	return self
 end
 
--- If leading = true, will enable dispatching immediately upon the creation of this ThrottledFunction.
--- Else, will have to wait <timeout> seconds before it calls with the latest-called args.
+--[=[
+	If leading = true, will enable Call() dispatching immediately after creating this ThrottledFunction.
+	Else, will have to wait <timeout> seconds before it dispatches with the latest-called args.
 
--- If trailing = true, will call after the timeout with the latest-called args.
--- Else, will not call, and must manually call again after <timeout> seconds.
+	If trailing = true, will dispatch after the timeout with the latest-called args.
+	Else, will not automatically dispatch, and must manually call again after <timeout> seconds.
 
--- If leadingFirstTimeOnly = true, will enable dispatching immediately upon the creation of this
--- ThrottledFunction, but from then on, will begin the <timeout> window upon manual call
--- and delay it until <timeout> seconds have passed (with latest-called args).
+	If leadingFirstTimeOnly = true, will enable Call() dispatching immediately after creating this
+	ThrottledFunction, but from then on, will begin the <timeout> window upon manual call
+	and delay dispatch until <timeout> seconds have passed (with latest-called args).
+
+	@function Call
+	@within ThrottledFunction
+]=]
 function ThrottledFunction.Call<T...>(self: ThrottledFunction<T...>, ...: T...)
 	local now = os.clock()
 
@@ -100,7 +126,10 @@ ThrottledFunction.__call = ThrottledFunction.Call
 
 function ThrottledFunction._scheduleTrailing<T...>(self: ThrottledFunction<T...>, delayTime: number, ...: T...)
 	self._trailingValue = table.pack(...)
-	task.delay(delayTime, function()
+	if self._delayedDispatchThread then
+		task.cancel(self._delayedDispatchThread)
+	end
+	self._delayedDispatchThread = task.delay(delayTime, function()
 		if self.Destroy then
 			self:_dispatch()
 		end
@@ -109,6 +138,7 @@ end
 
 function ThrottledFunction._dispatch<T...>(self: ThrottledFunction<T...>)
 	self._nextCallTimeStamp = os.clock() + self._timeout
+	self._delayedDispatchThread = nil
 
 	local trailingValue = self._trailingValue
 	if trailingValue then
@@ -142,10 +172,20 @@ function ThrottledFunction._configureOrError<T...>(self: ThrottledFunction<T...>
 	assert(self._callLeading or self._callTrailing, "Cannot configure both leading and trailing disabled")
 end
 
+--[=[
+	Cancels any pending trailing calls.
+
+	@function Destroy
+	@within ThrottledFunction
+]=]
 function ThrottledFunction.Destroy<T...>(self: ThrottledFunction<T...>)
 	local private: any = self
 	private._trailingValue = nil
 	private._func = nil
+	if private._delayedDispatchThread then
+		task.cancel(private._delayedDispatchThread)
+	end
+	private._delayedDispatchThread = nil
 	setmetatable(private, nil)
 end
 
