@@ -220,7 +220,12 @@ local function wireConnection(ws, sessionId, connectLabel)
 		end)
 	end
 
-	-- Send register message
+	-- Send register message. The plugin only runs in edit context (the
+	-- early-return at top of file rejects play-mode instances), so state
+	-- is always "Edit". Capabilities include the dynamically-dispatchable
+	-- actions — the bridge pushes their source via registerAction after
+	-- this register completes, but the plugin is capable of handling any
+	-- of them.
 	ws:Send(jsonEncode({
 		type = "register",
 		sessionId = sessionId,
@@ -231,11 +236,16 @@ local function wireConnection(ws, sessionId, connectLabel)
 			placeName = game.Name or "Unknown",
 			placeId = game.PlaceId,
 			gameId = game.GameId,
-			state = "ready",
+			state = "Edit",
 			capabilities = {
 				"registerAction",
 				"syncActions",
 				"heartbeat",
+				"execute",
+				"queryState",
+				"captureScreenshot",
+				"queryDataModel",
+				"queryLogs",
 			},
 		},
 	}))

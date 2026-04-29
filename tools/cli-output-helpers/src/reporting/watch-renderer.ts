@@ -57,26 +57,75 @@ export function createWatchRenderer(
     }
   }
 
+  let _cursorHidden = false;
+  let _signalsBound = false;
+
+  function _showCursor(): void {
+    if (_cursorHidden) {
+      _cursorHidden = false;
+      process.stdout.write('\x1b[?25h');
+    }
+  }
+
+  function _onSignal(signal: NodeJS.Signals): void {
+    _clearInterval();
+    _showCursor();
+    // Restore default behavior so the process actually exits
+    process.removeListener('SIGINT', _onSignal);
+    process.removeListener('SIGTERM', _onSignal);
+    process.kill(process.pid, signal);
+  }
+
+  function _bindSignals(): void {
+    if (_signalsBound) return;
+    _signalsBound = true;
+    process.once('SIGINT', _onSignal);
+    process.once('SIGTERM', _onSignal);
+  }
+
+  function _unbindSignals(): void {
+    if (!_signalsBound) return;
+    _signalsBound = false;
+    process.removeListener('SIGINT', _onSignal);
+    process.removeListener('SIGTERM', _onSignal);
+  }
+
   return {
     start(): void {
       if (rewrite) {
         process.stdout.write('\x1b[?25l'); // hide cursor
+        _cursorHidden = true;
+        _bindSignals();
       }
-      _render();
+      try {
+        _render();
+      } catch (err) {
+        _showCursor();
+        _unbindSignals();
+        throw err;
+      }
       _startInterval();
     },
 
     update(): void {
       _clearInterval();
-      _render();
+      try {
+        _render();
+      } catch (err) {
+        _showCursor();
+        _unbindSignals();
+        throw err;
+      }
       _startInterval();
     },
 
     stop(): void {
       _clearInterval();
-      _render();
-      if (rewrite) {
-        process.stdout.write('\x1b[?25h'); // show cursor
+      try {
+        _render();
+      } finally {
+        _showCursor();
+        _unbindSignals();
       }
     },
   };

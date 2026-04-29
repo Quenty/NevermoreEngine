@@ -7,8 +7,10 @@
  * MCP does NOT expose this command.
  */
 
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
+import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
 
 export interface ProcessRunOptions {
   scriptContent: string;
@@ -80,25 +82,16 @@ export const processRunCommand = defineCommand<
     }),
   },
   handler: async (args) => {
-    const fs = await import('fs');
-
-    let scriptContent: string;
-    if (args.file) {
-      scriptContent = fs.readFileSync(args.file, 'utf-8');
-    } else if (args.code) {
-      scriptContent = args.code;
-    } else {
-      throw new Error('Either inline code or --file must be provided');
-    }
+    const { scriptContent, filePath } = await resolveScriptContentAsync(args);
 
     return processRunHandlerAsync({
       scriptContent,
       packageName: 'studio-bridge',
       placePath: args.place,
       timeoutMs: args.timeout ?? 120_000,
-      verbose: false,
+      verbose: OutputHelper.isVerbose(),
       showLogs: true,
-      filePath: args.file,
+      filePath,
     });
   },
   // No MCP config -- process run is CLI-only

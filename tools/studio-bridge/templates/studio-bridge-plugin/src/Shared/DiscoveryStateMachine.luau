@@ -19,7 +19,6 @@ DiscoveryStateMachine.__index = DiscoveryStateMachine
 
 local DEFAULT_CONFIG = {
 	portRange = { min = 38741, max = 38744 },
-	defaultPort = 38741,
 	pollIntervalSec = 2,
 }
 
@@ -62,7 +61,6 @@ function DiscoveryStateMachine.new(
 		_config = resolvedConfig,
 		_callbacks = callbacks,
 		_state = "idle" :: string,
-		_currentPort = resolvedConfig.defaultPort or resolvedConfig.portRange.min,
 		_nextPollAt = 0, -- os.clock() time for next scan
 		_connection = nil :: any?,
 	}, DiscoveryStateMachine)
@@ -99,7 +97,6 @@ function DiscoveryStateMachine.start(self: any)
 	if self._state ~= "idle" then
 		return
 	end
-	self._currentPort = self._config.portRange.min
 	self._nextPollAt = 0
 	self:_transitionTo("searching")
 end
@@ -111,7 +108,6 @@ function DiscoveryStateMachine.stop(self: any)
 	local wasConnected = self._state == "connected"
 	self._connection = nil
 	self._nextPollAt = 0
-	self._currentPort = self._config.portRange.min
 	self:_transitionTo("idle")
 	if wasConnected then
 		self._callbacks.onDisconnected("stopped")
@@ -163,11 +159,13 @@ end
 function DiscoveryStateMachine._scanPortsAsync(self: any, timeoutSec: number)
 	local portMin = self._config.portRange.min
 	local portMax = self._config.portRange.max
-	local totalPorts = portMax - portMin + 1
 
+	-- scanPortsAsync probes every port in parallel and returns whichever
+	-- responds first, so the order is irrelevant. (An earlier version
+	-- rotated the starting port via self._currentPort, but the field was
+	-- never advanced after a failed scan, making the rotation a no-op.)
 	local ports = {}
-	for i = 0, totalPorts - 1 do
-		local port = portMin + ((self._currentPort - portMin + i) % totalPorts)
+	for port = portMin, portMax do
 		table.insert(ports, port)
 	end
 

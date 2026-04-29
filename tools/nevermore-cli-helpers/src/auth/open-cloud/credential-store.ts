@@ -45,9 +45,11 @@ export async function loadStoredApiKeyAsync(): Promise<string | undefined> {
 }
 
 export async function saveApiKeyAsync(apiKey: string): Promise<void> {
-  await fs.mkdir(CREDENTIALS_DIR, { recursive: true });
+  await fs.mkdir(CREDENTIALS_DIR, { recursive: true, mode: 0o700 });
   const credentials: StoredCredentials = { apiKey };
-  await fs.writeFile(CREDENTIALS_PATH, JSON.stringify(credentials, null, 2));
+  await fs.writeFile(CREDENTIALS_PATH, JSON.stringify(credentials, null, 2), {
+    mode: 0o600,
+  });
 }
 
 export async function clearApiKeyAsync(): Promise<void> {
@@ -110,7 +112,9 @@ export async function validateApiKeyAsync(
   } catch (err) {
     return {
       valid: false,
-      reason: `Could not reach Roblox API: ${err}`,
+      reason: `Could not reach Roblox API: ${
+        err instanceof Error ? err.message : 'unknown'
+      }`,
     };
   }
 }

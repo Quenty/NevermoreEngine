@@ -83,7 +83,10 @@ describe('buildDockerRunArgsAsync', () => {
 
     expect(args).toContain('--rm');
     expect(args).toContain('--init');
-    expect(args).toContain(`ROBLOSECURITY=${cookie}`);
+    // Cookie value must NOT appear in argv; docker reads it from its own env
+    expect(args).toContain('ROBLOSECURITY');
+    expect(args).not.toContain(`ROBLOSECURITY=${cookie}`);
+    expect(args.every((a) => !a.includes(cookie))).toBe(true);
     expect(args).toContain(`${cwd}:${cwd}`);
     expect(args).toContain(cwd);
     expect(args).toContain('ghcr.io/quenty/nevermore-studio-linux:latest');

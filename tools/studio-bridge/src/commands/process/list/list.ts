@@ -11,6 +11,7 @@ import {
 import type { BridgeConnection } from '../../../bridge/index.js';
 import type { SessionInfo } from '../../../bridge/index.js';
 import type { StudioState } from '../../../server/web-socket-protocol.js';
+import { colorizeState } from '../format-state.js';
 
 export interface SessionsResult {
   sessions: SessionInfo[];
@@ -37,20 +38,6 @@ export async function listSessionsHandlerAsync(
     sessions,
     summary: `${sessions.length} session(s) connected.`,
   };
-}
-
-function colorizeState(state: StudioState): string {
-  switch (state) {
-    case 'Edit':
-      return OutputHelper.formatInfo(state);
-    case 'Play':
-    case 'Run':
-      return OutputHelper.formatSuccess(state);
-    case 'Paused':
-      return OutputHelper.formatWarning(state);
-    default:
-      return state;
-  }
 }
 
 const sessionColumns: TableColumn<SessionInfo>[] = [

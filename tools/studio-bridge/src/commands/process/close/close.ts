@@ -13,6 +13,7 @@ import { arg } from '../../framework/arg-builder.js';
 import type { BridgeSession } from '../../../bridge/index.js';
 
 export interface ProcessCloseResult {
+  success: boolean;
   sessionId: string;
   summary: string;
 }
@@ -25,6 +26,7 @@ export async function processCloseHandlerAsync(
   session: BridgeSession
 ): Promise<ProcessCloseResult> {
   return {
+    success: false,
     sessionId: session.info.sessionId,
     summary: `process close is not yet implemented. Closing a Studio process requires OS process scanning which has not been built yet.`,
   };

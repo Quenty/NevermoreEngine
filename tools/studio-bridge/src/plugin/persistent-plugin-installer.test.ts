@@ -4,31 +4,28 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Use vi.hoisted to declare mock functions that will be available in vi.mock factories
 const {
-  mockIsPersistentPluginInstalled,
   mockGetPersistentPluginPath,
   mockRojoBuildAsync,
   mockCleanupAsync,
   mockResolvePath,
   mockCreateDirectoryContentsAsync,
+  mockMkdir,
+  mockCopyFile,
+  mockRename,
   mockUnlink,
-  mockRm,
 } = vi.hoisted(() => ({
-  mockIsPersistentPluginInstalled: vi.fn(() => true),
   mockGetPersistentPluginPath: vi.fn(
     () => '/mock/plugins/folder/StudioBridgePersistentPlugin.rbxm'
   ),
-  mockRojoBuildAsync: vi
-    .fn()
-    .mockResolvedValue(
-      '/mock/plugins/folder/StudioBridgePersistentPlugin.rbxm'
-    ),
+  mockRojoBuildAsync: vi.fn().mockResolvedValue(undefined),
   mockCleanupAsync: vi.fn().mockResolvedValue(undefined),
   mockResolvePath: vi.fn((rel: string) => `/tmp/mock-build-dir/${rel}`),
   mockCreateDirectoryContentsAsync: vi.fn().mockResolvedValue(undefined),
+  mockMkdir: vi.fn().mockResolvedValue(undefined),
+  mockCopyFile: vi.fn().mockResolvedValue(undefined),
+  mockRename: vi.fn().mockResolvedValue(undefined),
   mockUnlink: vi.fn().mockResolvedValue(undefined),
-  mockRm: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../process/studio-process-manager.js', () => ({
@@ -37,7 +34,6 @@ vi.mock('../process/studio-process-manager.js', () => ({
 
 vi.mock('./plugin-discovery.js', () => ({
   getPersistentPluginPath: mockGetPersistentPluginPath,
-  isPersistentPluginInstalled: mockIsPersistentPluginInstalled,
 }));
 
 vi.mock('@quenty/nevermore-template-helpers', () => ({
@@ -59,8 +55,10 @@ vi.mock('fs/promises', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs/promises')>();
   return {
     ...actual,
+    mkdir: mockMkdir,
+    copyFile: mockCopyFile,
+    rename: mockRename,
     unlink: mockUnlink,
-    rm: mockRm,
   };
 });
 
@@ -72,26 +70,41 @@ import {
 describe('persistent-plugin-installer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset defaults
-    mockIsPersistentPluginInstalled.mockReturnValue(true);
-    mockRojoBuildAsync.mockResolvedValue(
-      '/mock/plugins/folder/StudioBridgePersistentPlugin.rbxm'
-    );
+    mockRojoBuildAsync.mockResolvedValue(undefined);
     mockCreateDirectoryContentsAsync.mockResolvedValue(undefined);
     mockCleanupAsync.mockResolvedValue(undefined);
+    mockMkdir.mockResolvedValue(undefined);
+    mockCopyFile.mockResolvedValue(undefined);
+    mockRename.mockResolvedValue(undefined);
     mockUnlink.mockResolvedValue(undefined);
-    mockRm.mockResolvedValue(undefined);
   });
 
   describe('installPersistentPluginAsync', () => {
-    it('builds plugin from template and returns installed path', async () => {
+    it('builds plugin and atomically renames into the plugins folder', async () => {
       const result = await installPersistentPluginAsync();
 
       expect(result).toBe(
         '/mock/plugins/folder/StudioBridgePersistentPlugin.rbxm'
       );
       expect(mockCreateDirectoryContentsAsync).toHaveBeenCalled();
-      expect(mockRojoBuildAsync).toHaveBeenCalled();
+      // rojo builds into the temp dir, not the plugins folder.
+      expect(mockRojoBuildAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          output: '/tmp/mock-build-dir/StudioBridgePersistentPlugin.rbxm',
+        })
+      );
+      // copyFile -> rename pattern keeps Studio's polling watcher from
+      // observing a partially-written .rbxm.
+      expect(mockCopyFile).toHaveBeenCalledTimes(1);
+      expect(mockRename).toHaveBeenCalledTimes(1);
+      const [renameSrc, renameDest] = mockRename.mock.calls[0];
+      expect(renameDest).toBe(
+        '/mock/plugins/folder/StudioBridgePersistentPlugin.rbxm'
+      );
+      // Staging file lives in the destination filesystem.
+      expect(renameSrc).toMatch(
+        /^\/mock\/plugins\/folder\/\.StudioBridgePersistentPlugin\.rbxm\.tmp-/
+      );
     });
 
     it('cleans up build context on error', async () => {
@@ -104,12 +117,28 @@ describe('persistent-plugin-installer', () => {
       );
       expect(mockCleanupAsync).toHaveBeenCalled();
     });
+
+    it('cleans up build context on success', async () => {
+      await installPersistentPluginAsync();
+      expect(mockCleanupAsync).toHaveBeenCalled();
+    });
+
+    it('removes staging file when rename fails', async () => {
+      mockRename.mockRejectedValueOnce(new Error('rename failed'));
+
+      await expect(installPersistentPluginAsync()).rejects.toThrow(
+        'rename failed'
+      );
+      expect(mockUnlink).toHaveBeenCalledWith(
+        expect.stringMatching(
+          /^\/mock\/plugins\/folder\/\.StudioBridgePersistentPlugin\.rbxm\.tmp-/
+        )
+      );
+    });
   });
 
   describe('uninstallPersistentPluginAsync', () => {
     it('removes the plugin file when installed', async () => {
-      mockIsPersistentPluginInstalled.mockReturnValue(true);
-
       await uninstallPersistentPluginAsync();
 
       expect(mockUnlink).toHaveBeenCalledWith(
@@ -117,12 +146,23 @@ describe('persistent-plugin-installer', () => {
       );
     });
 
-    it('throws when the plugin is not installed', async () => {
-      mockIsPersistentPluginInstalled.mockReturnValue(false);
+    it('throws a friendly error when the plugin is not installed', async () => {
+      const enoent = Object.assign(new Error('ENOENT'), {
+        code: 'ENOENT',
+      });
+      mockUnlink.mockRejectedValueOnce(enoent);
 
       await expect(uninstallPersistentPluginAsync()).rejects.toThrow(
         'Persistent plugin is not installed'
       );
+    });
+
+    it('propagates non-ENOENT errors', async () => {
+      mockUnlink.mockRejectedValueOnce(
+        Object.assign(new Error('EACCES'), { code: 'EACCES' })
+      );
+
+      await expect(uninstallPersistentPluginAsync()).rejects.toThrow('EACCES');
     });
   });
 });

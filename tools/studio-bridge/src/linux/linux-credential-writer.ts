@@ -22,7 +22,7 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { execa } from 'execa';
 import { fileURLToPath } from 'url';
 import { OutputHelper } from '@quenty/cli-output-helpers';
@@ -83,10 +83,9 @@ export async function compileWriteCredAsync(
   await fs.mkdir(path.dirname(writeCredExe), { recursive: true });
 
   try {
-    execSync(
-      `x86_64-w64-mingw32-gcc -o ${JSON.stringify(
-        writeCredExe
-      )} ${JSON.stringify(sourcePath)} -lcredui -ladvapi32`,
+    execFileSync(
+      'x86_64-w64-mingw32-gcc',
+      ['-o', writeCredExe, sourcePath, '-lcredui', '-ladvapi32'],
       {
         stdio: ['pipe', 'pipe', 'pipe'],
         timeout: 30000,

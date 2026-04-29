@@ -7,7 +7,7 @@
  */
 
 import * as fs from 'fs';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { BaseResultReporter } from './result-reporter.js';
 
 export interface FileResultReporterOptions<T> {
@@ -62,13 +62,13 @@ export class FileResultReporter<T = unknown> extends BaseResultReporter<T> {
 /** Best-effort open a file with the platform's default viewer. */
 function tryOpenFile(filePath: string): void {
   try {
-    const cmd =
-      process.platform === 'darwin'
-        ? 'open'
-        : process.platform === 'win32'
-        ? 'start ""'
-        : 'xdg-open';
-    execSync(`${cmd} ${JSON.stringify(filePath)}`, { stdio: 'ignore' });
+    if (process.platform === 'win32') {
+      // `start` is a cmd builtin; the empty "" is the window title slot
+      execFileSync('cmd', ['/c', 'start', '""', filePath], { stdio: 'ignore' });
+    } else {
+      const cmd = process.platform === 'darwin' ? 'open' : 'xdg-open';
+      execFileSync(cmd, [filePath], { stdio: 'ignore' });
+    }
   } catch {
     // Fire-and-forget — don't fail the command if open doesn't work
   }

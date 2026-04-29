@@ -169,7 +169,6 @@ table.insert(tests, {
 		local context = "edit"
 		local registerMsg = {
 			type = "register",
-			protocolVersion = 2,
 			sessionId = "test-session",
 			payload = {
 				pluginVersion = "0.7.0",
@@ -178,17 +177,16 @@ table.insert(tests, {
 				placeName = "TestPlace",
 				placeId = 0,
 				gameId = 0,
-				state = "ready",
+				state = "Edit",
 				capabilities = { "execute", "queryState", "queryLogs" },
 			},
 		}
 
 		assertEqual(registerMsg.type, "register")
-		assertEqual(registerMsg.protocolVersion, 2)
 		assertEqual(registerMsg.sessionId, "test-session")
 		assertEqual(registerMsg.payload.pluginVersion, "0.7.0")
 		assertEqual(registerMsg.payload.context, "edit")
-		assertEqual(registerMsg.payload.state, "ready")
+		assertEqual(registerMsg.payload.state, "Edit")
 		assertEqual(#registerMsg.payload.capabilities, 3)
 		assertEqual(registerMsg.payload.capabilities[1], "execute")
 		assertEqual(registerMsg.payload.capabilities[2], "queryState")

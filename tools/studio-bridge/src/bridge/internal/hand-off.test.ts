@@ -353,7 +353,6 @@ describe('Health endpoint observability fields', () => {
 
     const handler = createHealthHandler(() => ({
       port: 38741,
-      protocolVersion: 2,
       sessions: 3,
       startTime,
       hostStartTime,
@@ -387,7 +386,6 @@ describe('Health endpoint observability fields', () => {
 
     const handler = createHealthHandler(() => ({
       port: 38741,
-      protocolVersion: 2,
       sessions: 0,
       startTime,
     }));

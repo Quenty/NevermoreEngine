@@ -72,11 +72,15 @@ export async function queryDataModelHandlerAsync(
 ): Promise<QueryResult> {
   const normalizedPath = normalizePath(options.path);
 
-  const depth = options.descendants
-    ? options.depth ?? 10
-    : options.children
-    ? 1
-    : 0;
+  // --depth wins when explicitly set; otherwise fall back to flag-driven defaults.
+  const depth =
+    options.depth !== undefined
+      ? options.depth
+      : options.descendants
+      ? 10
+      : options.children
+      ? 1
+      : 0;
 
   const result: BridgeDataModelResult = await session.queryDataModelAsync({
     path: normalizedPath,

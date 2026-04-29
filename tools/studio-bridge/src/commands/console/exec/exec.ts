@@ -5,9 +5,10 @@
  * This unifies the old `exec` and `run` commands.
  */
 
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
+import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
 import type { BridgeSession } from '../../../bridge/index.js';
 
 export interface ExecOptions {
@@ -73,7 +74,7 @@ export async function runHandlerAsync(
   session: BridgeSession,
   options: RunOptions
 ): Promise<RunResult> {
-  const scriptContent = fs.readFileSync(options.scriptPath, 'utf-8');
+  const scriptContent = await fs.readFile(options.scriptPath, 'utf-8');
   const result = await session.execAsync(scriptContent, options.timeout);
 
   const output = (result.output ?? []).map((entry) =>
@@ -126,15 +127,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
     },
   },
   handler: async (session, args) => {
-    let scriptContent: string;
-
-    if (args.file) {
-      scriptContent = fs.readFileSync(args.file, 'utf-8');
-    } else if (args.code) {
-      scriptContent = args.code;
-    } else {
-      throw new Error('Either inline code or --file must be provided');
-    }
+    const { scriptContent } = await resolveScriptContentAsync(args);
 
     return execHandlerAsync(session, {
       scriptContent,

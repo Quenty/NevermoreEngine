@@ -307,16 +307,11 @@ table.insert(tests, {
 			pollIntervalSec = 1,
 		}, {
 			scanPortsAsync = function(ports: { number }, _timeoutSec: number): (number?, string?)
-				-- Simulate: only the target port responds
+				-- Simulate: only the target port responds. The health body is
+				-- opaque to DiscoveryStateMachine, so a stub JSON suffices.
 				for _, port in ports do
 					if port == targetPort then
-						local healthBody = Protocol.encode({
-							type = "welcome",
-							sessionId = "health-check",
-							payload = { sessionId = "health-check" },
-							protocolVersion = 2,
-						})
-						return port, healthBody
+						return port, '{"status":"ok"}'
 					end
 				end
 				return nil, nil
@@ -430,11 +425,11 @@ table.insert(tests, {
 })
 
 -- ===========================================================================
--- 7. Full message lifecycle: register -> welcome -> execute -> output -> scriptComplete
+-- 7. Full message lifecycle: register -> execute -> output -> scriptComplete
 -- ===========================================================================
 
 table.insert(tests, {
-	name = "Full lifecycle: register -> welcome -> execute -> output -> scriptComplete",
+	name = "Full lifecycle: register -> execute -> output -> scriptComplete",
 	fn = function()
 		local sessionId = "lifecycle-sess-001"
 		local router = ActionRouter.new()
@@ -456,7 +451,6 @@ table.insert(tests, {
 		local registerMsg = Protocol.encode({
 			type = "register",
 			sessionId = sessionId,
-			protocolVersion = 2,
 			payload = {
 				pluginVersion = "1.0.0",
 				instanceId = "inst-abc",
@@ -469,27 +463,9 @@ table.insert(tests, {
 		local registerDecoded, regErr = Protocol.decode(registerMsg)
 		assertNil(regErr, "register decode error")
 		assertEqual(registerDecoded.type, "register")
-		assertEqual(registerDecoded.protocolVersion, 2)
 		assertEqual(registerDecoded.payload.pluginVersion, "1.0.0")
 
-		-- Step 2: Server sends welcome
-		local welcomeMsg = Protocol.encode({
-			type = "welcome",
-			sessionId = sessionId,
-			protocolVersion = 2,
-			payload = {
-				sessionId = sessionId,
-				capabilities = { "execute", "queryState", "queryLogs" },
-			},
-		})
-
-		local welcomeDecoded, welErr = Protocol.decode(welcomeMsg)
-		assertNil(welErr, "welcome decode error")
-		assertEqual(welcomeDecoded.type, "welcome")
-		assertEqual(welcomeDecoded.protocolVersion, 2)
-		assertEqual(welcomeDecoded.payload.sessionId, sessionId)
-
-		-- Step 3: Server sends execute
+		-- Step 2: Server sends execute
 		local executeMsg = Protocol.encode({
 			type = "execute",
 			sessionId = sessionId,
@@ -512,23 +488,10 @@ table.insert(tests, {
 		local logs = outputBuffer:get("tail", 1)
 		assertContains(logs.entries[1].body, "print('hello')")
 
-		-- Step 6: Encode the output message (as plugin would send it)
-		local outputMsg = Protocol.encode({
-			type = "output",
-			sessionId = sessionId,
-			payload = {
-				messages = {
-					{ level = "Print", body = logs.entries[1].body },
-				},
-			},
-		})
-
-		local outputDecoded, outErr = Protocol.decode(outputMsg)
-		assertNil(outErr, "output decode error")
-		assertEqual(outputDecoded.type, "output")
-		assertEqual(#outputDecoded.payload.messages, 1)
-
-		-- Step 7: Encode the scriptComplete response
+		-- Step 6: Encode the scriptComplete response (script output rides
+		-- inside the scriptComplete payload — there is no separate "output"
+		-- protocol message).
+		local _ = sessionId -- suppress unused-warning when output step is gone
 		local completeMsg = Protocol.encode({
 			type = scriptCompleteResponse.type,
 			sessionId = scriptCompleteResponse.sessionId,
@@ -852,11 +815,10 @@ table.insert(tests, {
 		assertEqual(sm:getState(), "connected")
 		assertEqual(discoveredPort, 38742)
 
-		-- Now simulate register + welcome handshake via Protocol
+		-- Now simulate the register handshake via Protocol
 		local registerJson = Protocol.encode({
 			type = "register",
 			sessionId = "full-sys-sess",
-			protocolVersion = 2,
 			payload = {
 				pluginVersion = "1.0.0",
 				instanceId = "inst-full",
@@ -869,17 +831,6 @@ table.insert(tests, {
 		local registerDecoded, regErr = Protocol.decode(registerJson)
 		assertNil(regErr, "register decode error")
 		assertEqual(registerDecoded.type, "register")
-
-		-- Server sends welcome
-		local welcomeJson = Protocol.encode({
-			type = "welcome",
-			sessionId = "full-sys-sess",
-			protocolVersion = 2,
-			payload = { sessionId = "full-sys-sess" },
-		})
-		local welcomeDecoded, welErr = Protocol.decode(welcomeJson)
-		assertNil(welErr, "welcome decode error")
-		assertEqual(welcomeDecoded.type, "welcome")
 
 		-- Server sends queryLogs
 		local queryLogsJson = Protocol.encode({
@@ -905,24 +856,22 @@ table.insert(tests, {
 })
 
 -- ===========================================================================
--- 14. Protocol validates v2 handshake fields in register/welcome cycle
+-- 14. Protocol preserves register payload fields across encode/decode
 -- ===========================================================================
 
 table.insert(tests, {
-	name = "Protocol: register and welcome preserve protocolVersion and capabilities",
+	name = "Protocol: register preserves payload fields across encode/decode",
 	fn = function()
-		-- Test that protocolVersion survives the encode/decode round-trip
 		local capabilities =
 			{ "execute", "queryState", "captureScreenshot", "queryDataModel", "queryLogs", "subscribe", "heartbeat" }
 
 		local registerJson = Protocol.encode({
 			type = "register",
-			sessionId = "v2-test-sess",
-			protocolVersion = 2,
+			sessionId = "register-test-sess",
 			payload = {
 				pluginVersion = "1.2.3",
-				instanceId = "inst-v2",
-				placeName = "V2Place",
+				instanceId = "inst-x",
+				placeName = "TestPlace",
 				state = "Edit",
 				capabilities = capabilities,
 			},
@@ -930,27 +879,9 @@ table.insert(tests, {
 
 		local registerParsed, regErr = Protocol.decode(registerJson)
 		assertNil(regErr, "register error")
-		assertEqual(registerParsed.protocolVersion, 2)
 		assertEqual(registerParsed.payload.pluginVersion, "1.2.3")
-		assertEqual(registerParsed.payload.instanceId, "inst-v2")
+		assertEqual(registerParsed.payload.instanceId, "inst-x")
 		assertEqual(#registerParsed.payload.capabilities, 7)
-
-		-- Welcome with protocolVersion
-		local welcomeJson = Protocol.encode({
-			type = "welcome",
-			sessionId = "v2-test-sess",
-			protocolVersion = 2,
-			payload = {
-				sessionId = "v2-test-sess",
-				capabilities = capabilities,
-			},
-		})
-
-		local welcomeParsed, welErr = Protocol.decode(welcomeJson)
-		assertNil(welErr, "welcome error")
-		assertEqual(welcomeParsed.protocolVersion, 2)
-		assertEqual(welcomeParsed.payload.sessionId, "v2-test-sess")
-		assertEqual(#welcomeParsed.payload.capabilities, 7)
 	end,
 })
 

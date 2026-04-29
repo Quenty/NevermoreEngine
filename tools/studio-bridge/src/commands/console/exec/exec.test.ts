@@ -5,12 +5,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { execHandlerAsync, runHandlerAsync } from './exec.js';
 
-// Mock fs.readFileSync for runHandlerAsync
-vi.mock('fs', () => ({
-  readFileSync: vi.fn(),
+// Mock fs/promises.readFile for runHandlerAsync
+vi.mock('fs/promises', () => ({
+  readFile: vi.fn(),
 }));
 
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 
 function createMockSession(execResult: {
   success: boolean;
@@ -141,7 +141,7 @@ describe('execHandlerAsync', () => {
 
 describe('runHandlerAsync', () => {
   it('reads file and delegates to session.execAsync', async () => {
-    vi.mocked(fs.readFileSync).mockReturnValue('print("from file")');
+    vi.mocked(fs.readFile).mockResolvedValue('print("from file")');
 
     const session = createMockSession({
       success: true,
@@ -152,7 +152,7 @@ describe('runHandlerAsync', () => {
       scriptPath: '/tmp/test.lua',
     });
 
-    expect(fs.readFileSync).toHaveBeenCalledWith('/tmp/test.lua', 'utf-8');
+    expect(fs.readFile).toHaveBeenCalledWith('/tmp/test.lua', 'utf-8');
     expect(session.execAsync).toHaveBeenCalledWith(
       'print("from file")',
       undefined
@@ -163,7 +163,7 @@ describe('runHandlerAsync', () => {
   });
 
   it('returns failure result with script path in summary', async () => {
-    vi.mocked(fs.readFileSync).mockReturnValue('bad code');
+    vi.mocked(fs.readFile).mockResolvedValue('bad code');
 
     const session = createMockSession({
       success: false,
@@ -181,7 +181,7 @@ describe('runHandlerAsync', () => {
   });
 
   it('forwards timeout to session.execAsync', async () => {
-    vi.mocked(fs.readFileSync).mockReturnValue('print("test")');
+    vi.mocked(fs.readFile).mockResolvedValue('print("test")');
 
     const session = createMockSession({
       success: true,
@@ -197,9 +197,9 @@ describe('runHandlerAsync', () => {
   });
 
   it('throws when file cannot be read', async () => {
-    vi.mocked(fs.readFileSync).mockImplementation(() => {
-      throw new Error('ENOENT: no such file or directory');
-    });
+    vi.mocked(fs.readFile).mockRejectedValue(
+      new Error('ENOENT: no such file or directory')
+    );
 
     const session = createMockSession({
       success: true,
@@ -212,7 +212,7 @@ describe('runHandlerAsync', () => {
   });
 
   it('captures multiple output lines', async () => {
-    vi.mocked(fs.readFileSync).mockReturnValue('print("a") print("b")');
+    vi.mocked(fs.readFile).mockResolvedValue('print("a") print("b")');
 
     const session = createMockSession({
       success: true,
@@ -230,7 +230,7 @@ describe('runHandlerAsync', () => {
   });
 
   it('handles empty output', async () => {
-    vi.mocked(fs.readFileSync).mockReturnValue('local x = 1');
+    vi.mocked(fs.readFile).mockResolvedValue('local x = 1');
 
     const session = createMockSession({
       success: true,
@@ -245,7 +245,7 @@ describe('runHandlerAsync', () => {
   });
 
   it('propagates errors from session', async () => {
-    vi.mocked(fs.readFileSync).mockReturnValue('print("test")');
+    vi.mocked(fs.readFile).mockResolvedValue('print("test")');
 
     const session = {
       execAsync: vi.fn().mockRejectedValue(new Error('Connection lost')),

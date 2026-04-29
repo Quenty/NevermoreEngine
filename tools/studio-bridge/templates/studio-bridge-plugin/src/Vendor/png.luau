@@ -524,6 +524,12 @@ local FIXED_LIT = {
 								if code <= 15 then
 									litLength = code
 								elseif code == 16 then
+									-- RFC 1951: code 16 means "repeat previous length"
+									-- and is invalid as the first symbol. Without this
+									-- assert table.insert(nil) is a no-op, the until
+									-- loop never reaches litsCount, and decoding spins
+									-- forever.
+									assert(litLength ~= nil, "deflate: code 16 cannot be the first dynamic Huffman symbol")
 									repeatCount = readBits(2) + 3
 								elseif code == 17 then
 									litLength = 0
@@ -546,6 +552,7 @@ local FIXED_LIT = {
 								if code <= 15 then
 									distLength = code
 								elseif code == 16 then
+									assert(distLength ~= nil, "deflate: code 16 cannot be the first dynamic Huffman symbol")
 									repeatCount = readBits(2) + 3
 								elseif code == 17 then
 									distLength = 0

@@ -4,9 +4,9 @@
  */
 
 import { defineCommand } from '../../framework/define-command.js';
-import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { BridgeSession } from '../../../bridge/index.js';
 import type { StudioState } from '../../../bridge/index.js';
+import { colorizeState } from '../format-state.js';
 
 export interface StateResult {
   state: StudioState;
@@ -28,20 +28,6 @@ export async function queryStateHandlerAsync(
     gameId: result.gameId,
     summary: `Mode: ${result.state}, Place: ${result.placeName} (${result.placeId})`,
   };
-}
-
-function colorizeState(state: StudioState): string {
-  switch (state) {
-    case 'Edit':
-      return OutputHelper.formatInfo(state);
-    case 'Play':
-    case 'Run':
-      return OutputHelper.formatSuccess(state);
-    case 'Paused':
-      return OutputHelper.formatWarning(state);
-    default:
-      return state;
-  }
 }
 
 export function formatStateText(result: StateResult): string {

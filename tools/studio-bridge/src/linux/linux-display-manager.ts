@@ -31,7 +31,7 @@ export async function ensureDisplayAsync(
   xvfb.unref?.();
 
   // Give it a moment to start
-  await sleep(500);
+  await sleepAsync(500);
 
   if (!isXvfbRunning(displayNum)) {
     throw new Error(`Failed to start Xvfb on display ${display}`);
@@ -60,7 +60,7 @@ export async function ensureWindowManagerAsync(
   });
   openbox.unref?.();
 
-  await sleep(500);
+  await sleepAsync(500);
 }
 
 /**
@@ -101,6 +101,6 @@ export function isOpenboxRunning(): boolean {
   }
 }
 
-function sleep(ms: number): Promise<void> {
+function sleepAsync(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
