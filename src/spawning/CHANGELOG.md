@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.43.0...@quenty/spawning@10.43.1) (2026-04-29)
+
+**Note:** Version bump only for package @quenty/spawning
+
+
+
+
+
 # [10.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.42.0...@quenty/spawning@10.43.0) (2026-04-23)
 
 **Note:** Version bump only for package @quenty/spawning

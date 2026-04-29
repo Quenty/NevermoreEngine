@@ -1,6 +1,6 @@
 {
   "name": "@quenty/throttle",
-  "version": "10.12.0",
+  "version": "10.12.1",
   "description": "Adds the throttle function to Roblox",
   "keywords": [
     "Roblox",
@@ -31,8 +31,8 @@
   "dependencies": {
     "@quenty/loader": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2",
-    "@quenty/typeutils": "workspace:*"
+    "@quenty/typeutils": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "devDependencies": {
     "@quenty/loader": "workspace:*"
