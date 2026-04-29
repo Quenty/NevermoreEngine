@@ -5,6 +5,7 @@
  */
 
 import { EventEmitter } from 'events';
+import { randomUUID } from 'crypto';
 import type { WebSocket, RawData } from 'ws';
 import type { IncomingMessage } from 'http';
 import { TransportServer } from './transport-server.js';
@@ -21,6 +22,7 @@ import {
   type Capability,
   type ServerMessage,
 } from '../../server/web-socket-protocol.js';
+import { PendingRequestMap } from '../../server/pending-request-map.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 
 export interface BridgeHostOptions {
@@ -47,9 +49,21 @@ export interface PluginSessionInfo {
 const SHUTDOWN_TIMEOUT_MS = 2_000;
 const SHUTDOWN_DRAIN_MS = 250;
 
+/**
+ * Per-plugin connection state. The `pendingRequests` map correlates outgoing
+ * requests to incoming responses by `requestId`. A single message dispatcher
+ * is installed per connection and routes through this map; this avoids the
+ * older per-call `ws.on('message', ...)` pattern, which both leaked listeners
+ * and could match the wrong response when ≥2 requests were in flight.
+ */
+interface PluginConnectionState {
+  ws: WebSocket;
+  pendingRequests: PendingRequestMap<unknown>;
+}
+
 export class BridgeHost extends EventEmitter {
   private _transport: TransportServer;
-  private _plugins: Map<string, WebSocket> = new Map();
+  private _plugins: Map<string, PluginConnectionState> = new Map();
   private _clients: Set<WebSocket> = new Set();
   private _isRunning = false;
   private _shuttingDown = false;
@@ -154,6 +168,7 @@ export class BridgeHost extends EventEmitter {
       return;
     }
     this._isRunning = false;
+    this._cancelAllPending('host stopped');
     this._plugins.clear();
     this._clients.clear();
     await this._transport.stopAsync();
@@ -197,9 +212,9 @@ export class BridgeHost extends EventEmitter {
 
       // Step 1.5: Send shutdown message to all plugins so they disconnect
       // cleanly instead of seeing a WebSocket error
-      for (const [sessionId, ws] of this._plugins) {
+      for (const [sessionId, state] of this._plugins) {
         try {
-          ws.send(
+          state.ws.send(
             encodeMessage({
               type: 'shutdown',
               sessionId,
@@ -217,9 +232,9 @@ export class BridgeHost extends EventEmitter {
       );
 
       // Step 3: Send close frames to all plugins and clients
-      for (const ws of this._plugins.values()) {
+      for (const state of this._plugins.values()) {
         try {
-          ws.close(1001, 'host shutting down');
+          state.ws.close(1001, 'host shutting down');
         } catch {
           // Ignore
         }
@@ -234,6 +249,7 @@ export class BridgeHost extends EventEmitter {
 
       // Step 4: Stop the transport
       this._isRunning = false;
+      this._cancelAllPending('host shutting down');
       this._plugins.clear();
       this._clients.clear();
       await this._transport.stopAsync();
@@ -251,6 +267,7 @@ export class BridgeHost extends EventEmitter {
 
     if (result === 'timeout') {
       this._isRunning = false;
+      this._cancelAllPending('host force-closed');
       this._plugins.clear();
       this._clients.clear();
       await this._transport.forceCloseAsync();
@@ -288,111 +305,53 @@ export class BridgeHost extends EventEmitter {
     message: ServerMessage,
     timeoutMs: number
   ): Promise<TResponse> {
-    const ws = this._plugins.get(sessionId);
-    if (!ws) {
+    const state = this._plugins.get(sessionId);
+    if (!state) {
       throw new Error(`Plugin session '${sessionId}' not connected`);
     }
 
-    const msgType = message.type;
+    // Every request must carry a requestId so the response can be correlated.
+    // All real callers (BridgeSession, BridgeClient) generate one; the fallback
+    // here is purely defensive.
+    const messageWithId = ensureRequestId(message);
+    const requestId = (messageWithId as { requestId: string }).requestId;
+    const msgType = messageWithId.type;
+
     OutputHelper.verbose(
-      `[host] → plugin ${sessionId}: ${msgType} (timeout ${timeoutMs}ms)`
+      `[host] → plugin ${sessionId}: ${msgType} (requestId=${requestId.slice(
+        0,
+        8
+      )}, timeout ${timeoutMs}ms)`
     );
 
-    return new Promise<TResponse>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        ws.off('message', onMessage);
-        OutputHelper.verbose(
-          `[host] ✗ ${msgType} timed out after ${timeoutMs}ms`
-        );
-        reject(new Error(`Plugin request timed out after ${timeoutMs}ms`));
-      }, timeoutMs);
+    const responsePromise = state.pendingRequests.addRequestAsync(
+      requestId,
+      timeoutMs
+    ) as Promise<TResponse>;
 
-      // Normalize requestId: treat empty string as absent (matches plugin convention)
-      const rawRequestId =
-        'requestId' in message ? (message as any).requestId : undefined;
-      const sentRequestId = rawRequestId === '' ? undefined : rawRequestId;
+    try {
+      state.ws.send(encodeMessage(messageWithId));
+    } catch (err) {
+      state.pendingRequests.rejectRequest(
+        requestId,
+        err instanceof Error ? err : new Error(String(err))
+      );
+      throw err;
+    }
 
-      const onMessage = (raw: RawData) => {
-        const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
-
-        // Parse the raw JSON directly — decodePluginMessage may reject
-        // valid responses that don't match its strict schema
-        let parsed: any;
-        try {
-          parsed = JSON.parse(data);
-        } catch {
-          return;
-        }
-
-        if (parsed.type === 'heartbeat') {
-          return;
-        }
-
-        // Match by requestId if both sides have one
-        const msgRequestId = parsed.requestId;
-        if (
-          sentRequestId !== undefined &&
-          msgRequestId !== undefined &&
-          msgRequestId === sentRequestId
-        ) {
-          clearTimeout(timer);
-          ws.off('message', onMessage);
-          OutputHelper.verbose(
-            `[host] ← plugin ${sessionId}: ${parsed.type} (matched requestId)`
-          );
-          resolve(parsed as TResponse);
-          return;
-        }
-
-        // When no requestId was sent, accept the first non-heartbeat response
-        // (error or result) as the reply to our request
-        if (sentRequestId === undefined) {
-          clearTimeout(timer);
-          ws.off('message', onMessage);
-          OutputHelper.verbose(
-            `[host] ← plugin ${sessionId}: ${parsed.type} (no requestId)`
-          );
-          resolve(parsed as TResponse);
-          return;
-        }
-
-        // Accept error responses even when requestId doesn't match
-        if (parsed.type === 'error') {
-          clearTimeout(timer);
-          ws.off('message', onMessage);
-          OutputHelper.verbose(
-            `[host] ← plugin ${sessionId}: error (${parsed.payload?.code}): ${parsed.payload?.message}`
-          );
-          resolve(parsed as TResponse);
-        } else {
-          OutputHelper.verbose(
-            `[host] ← plugin ${sessionId}: ignoring ${parsed.type} (requestId mismatch: sent=${sentRequestId}, got=${msgRequestId})`
-          );
-        }
-      };
-
-      ws.on('message', onMessage);
-
-      try {
-        ws.send(encodeMessage(message));
-      } catch (err) {
-        clearTimeout(timer);
-        ws.off('message', onMessage);
-        reject(err);
-      }
-    });
+    return responsePromise;
   }
 
   /**
    * Send a fire-and-forget message to a specific plugin.
    */
   sendToPlugin(sessionId: string, message: ServerMessage): void {
-    const ws = this._plugins.get(sessionId);
-    if (!ws) {
+    const state = this._plugins.get(sessionId);
+    if (!state) {
       return;
     }
     try {
-      ws.send(encodeMessage(message));
+      state.ws.send(encodeMessage(message));
     } catch {
       // Plugin may already be disconnected
     }
@@ -436,17 +395,32 @@ export class BridgeHost extends EventEmitter {
     // connection first so the Map stays consistent. This can happen when a
     // plugin reconnects faster than the host detects the old socket's close.
     const existing = this._plugins.get(info.sessionId);
-    if (existing && existing !== ws) {
+    if (existing && existing.ws !== ws) {
       try {
-        existing.close(1001, 'replaced by new connection');
+        existing.ws.close(1001, 'replaced by new connection');
       } catch {
         // Old socket may already be dead
       }
+      existing.pendingRequests.cancelAll(
+        'plugin connection replaced by new session'
+      );
       // Remove immediately so the old close handler doesn't delete the new entry
       this._plugins.delete(info.sessionId);
     }
 
-    this._plugins.set(info.sessionId, ws);
+    const state: PluginConnectionState = {
+      ws,
+      pendingRequests: new PendingRequestMap<unknown>(),
+    };
+    this._plugins.set(info.sessionId, state);
+
+    // Install the persistent dispatcher on this connection. All plugin
+    // responses arrive through this listener; matched by requestId via the
+    // pending-request map.
+    ws.on('message', (raw: RawData) =>
+      this._dispatchPluginMessage(info.sessionId, state, raw)
+    );
+
     OutputHelper.verbose(
       `[host] Plugin connected: ${
         info.sessionId
@@ -457,11 +431,101 @@ export class BridgeHost extends EventEmitter {
     ws.on('close', () => {
       // Only remove if this socket is still the registered one — a newer
       // connection with the same sessionId may have already replaced us.
-      if (this._plugins.get(info.sessionId) === ws) {
+      const current = this._plugins.get(info.sessionId);
+      if (current && current.ws === ws) {
+        current.pendingRequests.cancelAll('plugin disconnected');
         this._plugins.delete(info.sessionId);
         OutputHelper.verbose(`[host] Plugin disconnected: ${info.sessionId}`);
         this.emit('plugin-disconnected', info.sessionId);
       }
     });
   }
+
+  /**
+   * Persistent per-connection message dispatcher. Routes responses to the
+   * pending-request map by `requestId`. Heartbeats and unsolicited messages
+   * are logged but otherwise ignored — there are no host-side consumers of
+   * push messages today.
+   */
+  private _dispatchPluginMessage(
+    sessionId: string,
+    state: PluginConnectionState,
+    raw: RawData
+  ): void {
+    const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
+
+    // Parse the raw JSON directly — decodePluginMessage's strict schema may
+    // reject valid responses we still want to surface to callers.
+    let parsed: { type?: unknown; requestId?: unknown; payload?: unknown };
+    try {
+      parsed = JSON.parse(data);
+    } catch {
+      return;
+    }
+
+    if (parsed.type === 'heartbeat') {
+      return;
+    }
+
+    const requestId =
+      typeof parsed.requestId === 'string' && parsed.requestId !== ''
+        ? parsed.requestId
+        : undefined;
+
+    if (requestId !== undefined) {
+      if (state.pendingRequests.hasPendingRequest(requestId)) {
+        OutputHelper.verbose(
+          `[host] ← plugin ${sessionId}: ${String(
+            parsed.type
+          )} (matched requestId=${requestId.slice(0, 8)})`
+        );
+        state.pendingRequests.resolveRequest(requestId, parsed);
+        return;
+      }
+      OutputHelper.verbose(
+        `[host] ← plugin ${sessionId}: dropped ${String(
+          parsed.type
+        )} for unknown requestId=${requestId.slice(0, 8)}`
+      );
+      return;
+    }
+
+    // No requestId: nothing to correlate against. Errors without a requestId
+    // mean the plugin couldn't even parse the inbound request, so there's no
+    // pending entry to fail. Surface as a log so failures aren't silent.
+    if (parsed.type === 'error') {
+      const payload = parsed.payload as
+        | { code?: string; message?: string }
+        | undefined;
+      OutputHelper.warn(
+        `[host] plugin ${sessionId} sent error without requestId (${
+          payload?.code ?? 'unknown'
+        }): ${payload?.message ?? ''}`
+      );
+      return;
+    }
+
+    OutputHelper.verbose(
+      `[host] ← plugin ${sessionId}: dropped unsolicited ${String(parsed.type)}`
+    );
+  }
+
+  private _cancelAllPending(reason: string): void {
+    for (const state of this._plugins.values()) {
+      state.pendingRequests.cancelAll(reason);
+    }
+  }
+}
+
+/**
+ * Ensure the outgoing message carries a `requestId`. All real callers
+ * (BridgeSession, BridgeClient) supply one; this is a defensive fallback
+ * so the strict-correlation path always has a key to match against.
+ */
+function ensureRequestId(message: ServerMessage): ServerMessage {
+  const existing = (message as { requestId?: string }).requestId;
+  if (typeof existing === 'string' && existing !== '') {
+    return message;
+  }
+  return { ...message, requestId: randomUUID() } as ServerMessage;
 }
