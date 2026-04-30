@@ -1,20 +1,15 @@
-# v10.12.2 (Thu Apr 30 2026)
-
-#### 🐛 Bug Fix
-
-- allow cmdr admin for every client in multiplayer tests in studio [#689](https://github.com/Quenty/NevermoreEngine/pull/689) ([@euvinkeel](https://github.com/euvinkeel))
-- leftover docs tweak from throttledfunction ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.12.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/throttle@10.12.1...@quenty/throttle@10.12.2) (2026-04-30)
+
+**Note:** Version bump only for package @quenty/throttle
+
+
+
+
 
 ## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/throttle@10.12.0...@quenty/throttle@10.12.1) (2026-04-29)
 
