@@ -8,8 +8,7 @@
 	@interface ThrottleConfig
 	.leading boolean? -- If true, will dispatch immediately after creating this ThrottledFunction.
 	.trailing boolean? -- If true, will dispatch after the timeout with the latest-called args.
-	.leadingFirstTimeOnly boolean? -- If true, will dispatch immediately after creating this ThrottledFunction, but from then on, will begin the <timeout> window upon manual call
-	and delay dispatch until <timeout> seconds have passed (with latest-called args).
+	.leadingFirstTimeOnly boolean? -- If true, will dispatch immediately after creating this ThrottledFunction, but from then on, will begin the <timeout> window upon manual call and delay dispatch until <timeout> seconds have passed (with latest-called args).
 	@within ThrottledFunction
 ]=]
 export type ThrottleConfig = {
