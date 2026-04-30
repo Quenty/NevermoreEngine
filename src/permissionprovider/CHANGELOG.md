@@ -1,3 +1,16 @@
+# v14.35.2 (Thu Apr 30 2026)
+
+#### 🐛 Bug Fix
+
+- allow cmdr admin for every client in multiplayer tests in studio [#689](https://github.com/Quenty/NevermoreEngine/pull/689) ([@euvinkeel](https://github.com/euvinkeel))
+- allow cmdr admin for every client in multiplayer tests in studio ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

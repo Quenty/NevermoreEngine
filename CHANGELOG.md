@@ -1,3 +1,16 @@
+# (Thu Apr 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/permissionprovider@14.35.2`, `@quenty/throttle@10.12.2`
+  - allow cmdr admin for every client in multiplayer tests in studio [#689](https://github.com/Quenty/NevermoreEngine/pull/689) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Wed Apr 29 2026)
 
 #### 🐛 Bug Fix
