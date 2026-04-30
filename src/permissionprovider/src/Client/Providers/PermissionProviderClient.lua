@@ -9,6 +9,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local Promise = require("Promise")
@@ -73,7 +74,12 @@ function PermissionProviderClient.PromiseIsAdmin(
 				return reject("Got non-boolean from server")
 			end
 
-			return resolve(result)
+			-- Always allow in studio, for multi-client tests.
+			if RunService:IsStudio() then
+				return resolve(true)
+			else
+				return resolve(result)
+			end
 		end)
 	end)
 
