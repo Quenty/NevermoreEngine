@@ -48,10 +48,7 @@ export const infoCommand = defineCommand({
   scope: 'session',
   args: {},
   cli: {
-    formatResult: {
-      text: formatStateText,
-      table: formatStateText,
-    },
+    format: formatStateText,
   },
   handler: async (session) => queryStateHandlerAsync(session),
 });

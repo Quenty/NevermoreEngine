@@ -113,17 +113,10 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
     }),
   },
   cli: {
-    formatResult: {
-      text: (result) => {
-        const lines = result.output.join('\n');
-        if (result.error) return lines + (lines ? '\n' : '') + result.error;
-        return lines || result.summary;
-      },
-      table: (result) => {
-        const lines = result.output.join('\n');
-        if (result.error) return lines + (lines ? '\n' : '') + result.error;
-        return lines || result.summary;
-      },
+    format: (result) => {
+      const lines = result.output.join('\n');
+      if (result.error) return lines + (lines ? '\n' : '') + result.error;
+      return lines || result.summary;
     },
   },
   handler: async (session, args) => {

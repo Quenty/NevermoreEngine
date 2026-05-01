@@ -12,11 +12,11 @@ import { queryCommand, formatQueryText } from './explorer/query/query.js';
 import { screenshotCommand } from './viewport/screenshot/screenshot.js';
 
 describe('exec formatter', () => {
-  const format = execCommand.cli!.formatResult!;
+  const format = execCommand.cli!.format!;
 
   it('joins output lines', () => {
     const result = { success: true, output: ['Hello', 'World'], summary: 'ok' };
-    expect(format.text!(result)).toBe('Hello\nWorld');
+    expect(format(result)).toBe('Hello\nWorld');
   });
 
   it('appends error when present', () => {
@@ -26,7 +26,7 @@ describe('exec formatter', () => {
       error: 'boom',
       summary: 'fail',
     };
-    expect(format.text!(result)).toBe('partial\nboom');
+    expect(format(result)).toBe('partial\nboom');
   });
 
   it('falls back to summary when no output lines', () => {
@@ -35,7 +35,7 @@ describe('exec formatter', () => {
       output: [],
       summary: 'Script executed successfully',
     };
-    expect(format.text!(result)).toBe('Script executed successfully');
+    expect(format(result)).toBe('Script executed successfully');
   });
 
   it('handles error with no output', () => {
@@ -45,7 +45,7 @@ describe('exec formatter', () => {
       error: 'boom',
       summary: 'fail',
     };
-    expect(format.text!(result)).toBe('boom');
+    expect(format(result)).toBe('boom');
   });
 });
 
@@ -78,9 +78,7 @@ describe('logs formatter', () => {
   });
 
   it('is wired into command definition', () => {
-    const format = logsCommand.cli!.formatResult!;
-    expect(format.text).toBe(formatLogsText);
-    expect(format.table).toBe(formatLogsText);
+    expect(logsCommand.cli!.format).toBe(formatLogsText);
   });
 });
 
@@ -118,9 +116,7 @@ describe('list formatter', () => {
   });
 
   it('is wired into command definition', () => {
-    const format = listCommand.cli!.formatResult!;
-    expect(format.text).toBe(formatSessionsTable);
-    expect(format.table).toBe(formatSessionsTable);
+    expect(listCommand.cli!.format).toBe(formatSessionsTable);
   });
 });
 
@@ -142,9 +138,7 @@ describe('info formatter', () => {
   });
 
   it('is wired into command definition', () => {
-    const format = infoCommand.cli!.formatResult!;
-    expect(format.text).toBe(formatStateText);
-    expect(format.table).toBe(formatStateText);
+    expect(infoCommand.cli!.format).toBe(formatStateText);
   });
 });
 
@@ -206,37 +200,35 @@ describe('query formatter', () => {
   });
 
   it('is wired into command definition', () => {
-    const format = queryCommand.cli!.formatResult!;
-    expect(format.text).toBe(formatQueryText);
-    expect(format.table).toBe(formatQueryText);
+    expect(queryCommand.cli!.format).toBe(formatQueryText);
   });
 });
 
 describe('screenshot formatter', () => {
-  it('text formatter returns summary only', () => {
-    const format = screenshotCommand.cli!.formatResult!;
+  it('format returns summary only', () => {
+    const format = screenshotCommand.cli!.format!;
     const result = {
       data: 'base64...',
       width: 800,
       height: 600,
       summary: 'Screenshot captured (800x600)',
     };
-    expect(format.text!(result)).toBe('Screenshot captured (800x600)');
+    expect(format(result)).toBe('Screenshot captured (800x600)');
   });
 
-  it('json formatter omits data field', () => {
-    const format = screenshotCommand.cli!.formatResult!;
+  it('json override omits data field', () => {
+    const json = screenshotCommand.cli!.json!;
     const result = {
       data: 'base64...',
       width: 800,
       height: 600,
       summary: 'Screenshot captured (800x600)',
     };
-    const json = JSON.parse(format.json!(result));
-    expect(json).not.toHaveProperty('data');
-    expect(json.width).toBe(800);
-    expect(json.height).toBe(600);
-    expect(json.summary).toBe('Screenshot captured (800x600)');
+    const parsed = JSON.parse(json(result));
+    expect(parsed).not.toHaveProperty('data');
+    expect(parsed.width).toBe(800);
+    expect(parsed.height).toBe(600);
+    expect(parsed.summary).toBe('Screenshot captured (800x600)');
   });
 
   it('has binaryField set to data', () => {

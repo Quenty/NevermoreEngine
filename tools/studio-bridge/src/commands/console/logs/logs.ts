@@ -102,10 +102,7 @@ export const logsCommand = defineCommand<LogsOptions, LogsResult>({
     }),
   },
   cli: {
-    formatResult: {
-      text: formatLogsText,
-      table: formatLogsText,
-    },
+    format: formatLogsText,
   },
   handler: async (session, args) => {
     return queryLogsHandlerAsync(session, {

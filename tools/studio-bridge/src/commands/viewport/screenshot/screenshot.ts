@@ -18,7 +18,6 @@ export interface ScreenshotResult {
 
 export interface ScreenshotOptions {
   output?: string;
-  base64?: boolean;
 }
 
 export async function captureScreenshotHandlerAsync(
@@ -57,19 +56,16 @@ export const screenshotCommand = defineCommand<
   args: {},
   cli: {
     binaryField: 'data',
-    formatResult: {
-      text: (result) => result.summary,
-      table: (result) => result.summary,
-      json: (result) =>
-        formatJson(
-          {
-            width: result.width,
-            height: result.height,
-            summary: result.summary,
-          },
-          { pretty: process.stdout.isTTY }
-        ),
-    },
+    format: (result) => result.summary,
+    json: (result) =>
+      formatJson(
+        {
+          width: result.width,
+          height: result.height,
+          summary: result.summary,
+        },
+        { pretty: process.stdout.isTTY }
+      ),
   },
   handler: async (session) => captureScreenshotHandlerAsync(session),
 });

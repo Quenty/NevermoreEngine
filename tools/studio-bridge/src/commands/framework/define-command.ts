@@ -10,7 +10,6 @@
  */
 
 import type { BridgeSession, BridgeConnection } from '../../bridge/index.js';
-import type { OutputMode } from '../../cli/format-output.js';
 import type { ArgDefinition } from './arg-builder.js';
 
 /**
@@ -26,13 +25,18 @@ export type CommandScope = 'session' | 'connection' | 'standalone';
 
 export type CommandCategory = 'execution' | 'infrastructure';
 
-export type FormatResultMap<TResult> = Partial<
-  Record<OutputMode, (result: TResult) => string>
->;
-
 export interface CliConfig<TResult> {
-  /** Adapter validates the user's --format choice against these keys and errors if unsupported. */
-  formatResult?: FormatResultMap<TResult>;
+  /**
+   * Render the result for human (terminal) output. Used as the default and
+   * for `--format=text`. Falls back to `result.summary` then JSON if not set.
+   */
+  format?: (result: TResult) => string;
+  /**
+   * Override the default JSON output (which is `formatJson(result)`). Use
+   * this when the result has fields that don't belong in machine output —
+   * e.g. dropping a base64 binary field.
+   */
+  json?: (result: TResult) => string;
   /** Field name containing base64 binary data for raw file writes via --output. */
   binaryField?: string;
 }

@@ -67,7 +67,7 @@ const { groups, topLevel } = buildGroupCommands(registry);
 const formatArg = process.argv.includes('--format')
   ? process.argv[process.argv.indexOf('--format') + 1]
   : undefined;
-const isMachineReadable = formatArg === 'json' || formatArg === 'base64';
+const isMachineReadable = formatArg === 'json';
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Studio Bridge',

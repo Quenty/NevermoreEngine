@@ -173,7 +173,6 @@ describe('captureScreenshotHandlerAsync', () => {
 
     const result = await captureScreenshotHandlerAsync(session, {
       output: '/tmp/screenshot.png',
-      base64: true,
     });
 
     expect(result.data).toBe('base64data');

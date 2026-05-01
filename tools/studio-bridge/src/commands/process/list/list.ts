@@ -69,10 +69,7 @@ export const listCommand = defineCommand({
   scope: 'connection',
   args: {},
   cli: {
-    formatResult: {
-      text: formatSessionsTable,
-      table: formatSessionsTable,
-    },
+    format: formatSessionsTable,
   },
   handler: async (connection) => listSessionsHandlerAsync(connection),
 });
