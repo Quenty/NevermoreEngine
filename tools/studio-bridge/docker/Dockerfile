@@ -32,6 +32,15 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && corepack enable pnpm \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# --- Image manifest ---
+# Dump the installed apt package list so CI can archive it as a build
+# artifact. Apt deps (winehq-stable, nodejs, gh, etc.) are intentionally
+# not pinned to specific versions — this manifest gives post-hoc
+# visibility into what was actually pulled, so version drift across
+# rebuilds is diagnosable rather than mysterious.
+RUN dpkg-query -W -f='${Package}\t${Version}\t${Architecture}\n' \
+    | sort > /image-manifest-apt.tsv
+
 # --- Aftman binary ---
 RUN curl -fsSL https://github.com/LPGhatguy/aftman/releases/download/v0.3.0/aftman-0.3.0-linux-x86_64.zip \
         -o /tmp/aftman.zip \
