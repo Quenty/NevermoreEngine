@@ -9,6 +9,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local BasePermissionProvider = require("BasePermissionProvider")
 local GroupUtils = require("GroupUtils")
@@ -147,6 +148,11 @@ end
 
 function GroupPermissionProvider._handlePlayer(self: GroupPermissionProvider, player: Player): ()
 	assert(player, "Bad player")
+
+	if RunService:IsStudio() then
+		self._creatorCache[player.UserId] = true
+		return
+	end
 
 	self:_promiseRankInGroup(player):Then(function(rank)
 		if rank >= self._config.minAdminRequiredRank then
