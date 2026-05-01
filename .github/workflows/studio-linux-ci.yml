@@ -139,6 +139,22 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Extract image manifest
+        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        run: |
+          PRIMARY_TAG=$(printf '%s\n' "${{ steps.tags.outputs.tags }}" | head -n1)
+          docker pull "$PRIMARY_TAG"
+          docker run --rm --entrypoint cat "$PRIMARY_TAG" /image-manifest-apt.tsv > image-manifest-apt.tsv
+          wc -l image-manifest-apt.tsv
+
+      - name: Upload image manifest
+        if: steps.check.outputs.exists != 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-manifest-${{ steps.resolve.outputs.version }}-${{ steps.resolve.outputs.short }}
+          path: image-manifest-apt.tsv
+          retention-days: 90
+
       - name: Clean up old images
         if: steps.check.outputs.exists != 'true' && steps.resolve.outputs.is_canary != 'true'
         continue-on-error: true
