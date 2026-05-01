@@ -125,13 +125,11 @@ describe('handler — format flags', () => {
     expect(output[0]).toBe('Found 2 items');
   });
 
-  it('uses cli.formatResult.text when --format text', async () => {
+  it('uses cli.format when --format text', async () => {
     const lifecycle = createMockLifecycle();
     const cmd = readCommand({
       cli: {
-        formatResult: {
-          text: (result: any) => `Custom: ${result.items.join(', ')}`,
-        },
+        format: (result: any) => `Custom: ${result.items.join(', ')}`,
       },
     });
     const module = buildYargsCommand(cmd, { lifecycle });
@@ -143,19 +141,18 @@ describe('handler — format flags', () => {
     expect(output[0]).toBe('Custom: a, b');
   });
 
-  it('errors when explicit --format text and no formatter or summary', async () => {
+  it('falls back to JSON when --format text and no formatter or summary', async () => {
     const lifecycle = createMockLifecycle();
     const cmd = readCommand({
       handler: async () => ({ data: [1, 2, 3] }),
     });
     const module = buildYargsCommand(cmd, { lifecycle });
 
-    // Should error because explicit --format text, no formatter, no summary
-    await expect(
-      captureOutput(async () => {
-        await (module.handler as any)({ format: 'text' });
-      })
-    ).rejects.toThrow('process.exit called');
+    const output = await captureOutput(async () => {
+      await (module.handler as any)({ format: 'text' });
+    });
+
+    expect(JSON.parse(output[0])).toEqual({ data: [1, 2, 3] });
   });
 
   it('defaults to JSON when no format specified and no formatter (non-TTY)', async () => {
@@ -219,9 +216,7 @@ describe('handler — output file writing', () => {
       }),
       cli: {
         binaryField: 'data',
-        formatResult: {
-          text: (result: any) => result.summary,
-        },
+        format: (result: any) => result.summary,
       },
     });
     const module = buildYargsCommand(cmd, { lifecycle });
@@ -260,9 +255,7 @@ describe('handler — output file writing', () => {
       }),
       cli: {
         binaryField: 'data',
-        formatResult: {
-          json: (result: any) => JSON.stringify({ summary: result.summary }),
-        },
+        json: (result: any) => JSON.stringify({ summary: result.summary }),
       },
     });
     const module = buildYargsCommand(cmd, { lifecycle });

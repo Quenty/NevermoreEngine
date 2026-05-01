@@ -27,6 +27,10 @@ export {
   type WatchResultReporterOptions,
 } from './watch-result-reporter.js';
 export { CompositeResultReporter } from './composite-result-reporter.js';
+export {
+  buildResultReporter,
+  type BuildResultReporterOptions,
+} from './build-result-reporter.js';
 
 // Output formatting primitives.
 export {
@@ -40,7 +44,6 @@ export {
   type WatchRenderer,
   type WatchRendererOptions,
 } from './watch-renderer.js';
-export { resolveOutputMode, type OutputMode } from './output-mode.js';
 
 // Progress formatting helpers
 export {

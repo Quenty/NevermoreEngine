@@ -149,10 +149,7 @@ export const queryCommand = defineCommand<QueryOptions, QueryResult>({
     descendants: arg.flag({ description: 'Include all descendants' }),
   },
   cli: {
-    formatResult: {
-      text: formatQueryText,
-      table: formatQueryText,
-    },
+    format: formatQueryText,
   },
   handler: async (session, args) => {
     return queryDataModelHandlerAsync(session, args);

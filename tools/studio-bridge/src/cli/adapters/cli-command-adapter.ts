@@ -12,9 +12,7 @@
 import type { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
-  StdoutResultReporter,
-  FileResultReporter,
-  WatchResultReporter,
+  buildResultReporter,
   type ResultReporter,
   formatJson,
 } from '@quenty/cli-output-helpers/reporting';
@@ -22,7 +20,6 @@ import { BridgeConnection } from '../../bridge/index.js';
 import type { SessionContext } from '../../bridge/index.js';
 import type { CommandDefinition } from '../../commands/framework/define-command.js';
 import { toYargsOptions } from '../../commands/framework/arg-builder.js';
-import { resolveMode, type CliFormatMode } from '../format-output.js';
 
 /** Args injected by the adapter (not defined on CommandDefinition). */
 export interface AdapterArgs {
@@ -112,44 +109,27 @@ function injectWarnings(result: unknown): unknown {
   return result;
 }
 
-/** Format a command result as a string for the given output mode. */
-function formatResultForMode(
+/**
+ * Render a command result for stdout/file output. `--format=json` (or any
+ * explicit non-text format) routes through the command's `json` override or
+ * falls back to `formatJson`. Anything else (default, `--format=text`)
+ * routes through the command's `format` callback, then `result.summary`,
+ * then JSON as a last resort.
+ */
+function renderResult(
   def: CommandDefinition,
   result: unknown,
-  mode: CliFormatMode,
   explicitFormat: string | undefined
 ): string {
-  const formatters = def.cli?.formatResult;
-
-  // Command-specific formatter for non-base64 modes
-  if (mode !== 'base64' && formatters?.[mode]) {
-    return formatters[mode]!(result as any);
-  }
-
-  if (mode === 'json') {
+  if (explicitFormat === 'json') {
+    if (def.cli?.json) return def.cli.json(result as any);
     return formatJson(injectWarnings(result), { pretty: process.stdout.isTTY });
   }
 
-  if (mode === 'base64') {
-    const binaryField = def.cli?.binaryField;
-    if (binaryField && typeof result === 'object' && result !== null) {
-      const data = (result as Record<string, unknown>)[binaryField];
-      if (typeof data === 'string') {
-        return data;
-      }
-    }
-    throw new Error(`Command '${def.name}' does not support --format base64`);
-  }
+  if (def.cli?.format) return def.cli.format(result as any);
 
-  // Try summary fallback for text/table when no formatter is registered
   if (typeof result === 'object' && result !== null && 'summary' in result) {
     return (result as any).summary;
-  }
-
-  if (explicitFormat && explicitFormat !== 'json') {
-    throw new Error(
-      `Command '${def.name}' does not support --format ${explicitFormat}`
-    );
   }
 
   return formatJson(result);
@@ -173,41 +153,6 @@ function extractBinaryBuffer(
   const data = (result as Record<string, unknown>)[binaryField];
   if (typeof data !== 'string') return undefined;
   return Buffer.from(data, 'base64');
-}
-
-/**
- * Build the `ResultReporter` for this command run based on flags.
- *   --output <path>           → FileResultReporter (single write or watch overwrite)
- *   --watch (and `read` only) → WatchResultReporter (TTY redraw)
- *   default                   → StdoutResultReporter
- */
-function buildReporter(
-  def: CommandDefinition,
-  argv: Record<string, unknown>,
-  mode: CliFormatMode
-): ResultReporter<unknown> {
-  const renderText = (result: unknown): string =>
-    formatResultForMode(def, result, mode, argv.format as string | undefined);
-
-  const outputPath = argv.output as string | undefined;
-  if (outputPath) {
-    return new FileResultReporter<unknown>({
-      outputPath,
-      render: renderText,
-      binary: (result) =>
-        extractBinaryBuffer(def, result, argv.format as string | undefined),
-      open: argv.open as boolean | undefined,
-    });
-  }
-
-  if (argv.watch && def.safety === 'read') {
-    return new WatchResultReporter<unknown>({
-      render: renderText,
-      intervalMs: (argv.interval as number | undefined) ?? 1000,
-    });
-  }
-
-  return new StdoutResultReporter<unknown>({ render: renderText });
 }
 
 export function buildYargsCommand(
@@ -251,7 +196,7 @@ export function buildYargsCommand(
 
       yargs.option('format', {
         type: 'string',
-        choices: ['text', 'json', 'base64'],
+        choices: ['text', 'json'],
         describe: 'Output format',
       });
       yargs.option('output', {
@@ -283,16 +228,24 @@ export function buildYargsCommand(
     },
     handler: async (argv: any) => {
       const commandArgs = extractCommandArgs(argv, def);
-      const outputMode = resolveMode({ format: argv.format });
+      const explicitFormat = argv.format as string | undefined;
+      const reporter = buildResultReporter<unknown>({
+        outputPath: argv.output as string | undefined,
+        watch: !!argv.watch && def.safety === 'read',
+        open: argv.open as boolean | undefined,
+        intervalMs: argv.interval as number | undefined,
+        render: (result) => renderResult(def, result, explicitFormat),
+        binary: (result) => extractBinaryBuffer(def, result, explicitFormat),
+      });
       const connect =
         options?.lifecycle?.connectAsync.bind(options.lifecycle) ??
         BridgeConnection.connectAsync.bind(BridgeConnection);
 
       try {
         if (argv.watch && def.safety === 'read') {
-          await runWatchModeAsync(def, commandArgs, argv, outputMode, connect);
+          await runWatchModeAsync(def, commandArgs, argv, reporter, connect);
         } else {
-          await runOnceAsync(def, commandArgs, argv, outputMode, connect);
+          await runOnceAsync(def, commandArgs, argv, reporter, connect);
         }
       } catch (err) {
         OutputHelper.error(err instanceof Error ? err.message : String(err));
@@ -306,11 +259,10 @@ async function runOnceAsync(
   def: CommandDefinition,
   commandArgs: Record<string, unknown>,
   argv: Record<string, unknown>,
-  outputMode: CliFormatMode,
+  reporter: ResultReporter<unknown>,
   connect: CliLifecycleProvider['connectAsync']
 ): Promise<void> {
   const result = await executeCommandAsync(def, commandArgs, argv, connect);
-  const reporter = buildReporter(def, argv, outputMode);
 
   await reporter.startAsync();
   reporter.onResult(result);
@@ -330,11 +282,10 @@ async function runWatchModeAsync(
   def: CommandDefinition,
   commandArgs: Record<string, unknown>,
   argv: Record<string, unknown>,
-  outputMode: CliFormatMode,
+  reporter: ResultReporter<unknown>,
   connect: CliLifecycleProvider['connectAsync']
 ): Promise<void> {
   const intervalMs = (argv.interval as number | undefined) ?? 1000;
-  const reporter = buildReporter(def, argv, outputMode);
 
   // Standalone commands run without a persistent connection
   const connection: BridgeConnection | undefined =

@@ -68,11 +68,11 @@ Shared formatting primitives also live in `reporting/` and are usable from comma
 import {
 	formatTable,
 	formatJson,
-	resolveOutputMode,
 	type TableColumn,
-	type OutputMode,
 } from "@quenty/cli-output-helpers/reporting";
 ```
+
+Single-result commands typically don't need to construct reporters by hand — pass argv-style flags to `buildResultReporter({ outputPath, watch, render, binary? })` and it picks the right concrete reporter.
 
 **Rules:**
 

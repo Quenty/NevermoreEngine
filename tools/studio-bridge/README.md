@@ -120,7 +120,6 @@ studio-bridge explorer query Workspace.SpawnLocation --children --depth 3
 
 ```bash
 studio-bridge viewport screenshot --output viewport.png
-studio-bridge viewport screenshot --format base64
 ```
 
 | Option | Alias | Description |
