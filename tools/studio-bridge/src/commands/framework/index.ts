@@ -30,4 +30,4 @@ export {
   type JsonSchemaOutput,
 } from './arg-builder.js';
 
-export { CommandRegistry, type DiscoverOptions } from './command-registry.js';
+export { CommandRegistry } from './command-registry.js';
