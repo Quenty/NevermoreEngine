@@ -4,7 +4,7 @@
 
 	Captures the Studio viewport using CaptureService, loads the result into
 	an EditableImage to read raw RGBA pixels, encodes as PNG via png-luau,
-	base64-encodes the PNG, and sends it over the WebSocket.
+	base64-encodes the PNG via EncodingService, and sends it over the WebSocket.
 
 	Protocol:
 	  Request:  { type: "captureScreenshot", payload: { format?: "png" } }
@@ -17,70 +17,6 @@ local _png = nil
 local _disposed = false
 
 local CaptureScreenshotAction = {}
-
--- ---------------------------------------------------------------------------
--- Base64 encoder for buffer data
--- ---------------------------------------------------------------------------
-
--- Pre-compute lookup: index 0..63 → ASCII byte
-local ENCODE_LUT: buffer = buffer.create(64)
-do
-	local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-	for i = 0, 63 do
-		buffer.writeu8(ENCODE_LUT, i, string.byte(chars, i + 1))
-	end
-end
-
--- Encode a buffer as a base64 string. Uses buffer I/O throughout for speed.
-local function base64Encode(buf: buffer): string
-	local len = buffer.len(buf)
-	local outLen = math.ceil(len / 3) * 4
-	local out = buffer.create(outLen)
-	local outIdx = 0
-
-	-- Localize for tight loop performance
-	local readu8 = buffer.readu8
-	local writeu8 = buffer.writeu8
-	local lut = ENCODE_LUT
-	local rshift = bit32.rshift
-	local band = bit32.band
-
-	-- Process full 3-byte groups
-	local fullLen = len - (len % 3)
-	for i = 0, fullLen - 1, 3 do
-		local b0 = readu8(buf, i)
-		local b1 = readu8(buf, i + 1)
-		local b2 = readu8(buf, i + 2)
-		local n = b0 * 65536 + b1 * 256 + b2
-
-		writeu8(out, outIdx, readu8(lut, rshift(n, 18)))
-		writeu8(out, outIdx + 1, readu8(lut, band(rshift(n, 12), 63)))
-		writeu8(out, outIdx + 2, readu8(lut, band(rshift(n, 6), 63)))
-		writeu8(out, outIdx + 3, readu8(lut, band(n, 63)))
-		outIdx += 4
-	end
-
-	-- Handle remaining 1 or 2 bytes
-	local rem = len % 3
-	if rem == 1 then
-		local b0 = readu8(buf, fullLen)
-		local n = b0 * 65536
-		writeu8(out, outIdx, readu8(lut, rshift(n, 18)))
-		writeu8(out, outIdx + 1, readu8(lut, band(rshift(n, 12), 63)))
-		writeu8(out, outIdx + 2, 61) -- '='
-		writeu8(out, outIdx + 3, 61) -- '='
-	elseif rem == 2 then
-		local b0 = readu8(buf, fullLen)
-		local b1 = readu8(buf, fullLen + 1)
-		local n = b0 * 65536 + b1 * 256
-		writeu8(out, outIdx, readu8(lut, rshift(n, 18)))
-		writeu8(out, outIdx + 1, readu8(lut, band(rshift(n, 12), 63)))
-		writeu8(out, outIdx + 2, readu8(lut, band(rshift(n, 6), 63)))
-		writeu8(out, outIdx + 3, 61) -- '='
-	end
-
-	return buffer.tostring(out)
-end
 
 -- ---------------------------------------------------------------------------
 -- Helpers
@@ -116,8 +52,8 @@ end
 
 local function captureAsync(sendMessage: (msg: { [string]: any }) -> (), requestId: string?, sessionId: string)
 	-- Resolve services (deferred so the module loads in Lune test context)
-	local getServiceOk, captureServiceOrErr, assetServiceOrErr = pcall(function()
-		return game:GetService("CaptureService"), game:GetService("AssetService")
+	local getServiceOk, captureServiceOrErr, assetServiceOrErr, encodingServiceOrErr = pcall(function()
+		return game:GetService("CaptureService"), game:GetService("AssetService"), game:GetService("EncodingService")
 	end)
 	if not getServiceOk then
 		sendMessage(
@@ -127,6 +63,7 @@ local function captureAsync(sendMessage: (msg: { [string]: any }) -> (), request
 	end
 	local CaptureService = captureServiceOrErr
 	local AssetService = assetServiceOrErr
+	local EncodingService = encodingServiceOrErr
 
 	-- Step 1: Capture the viewport via CaptureService
 	local callerThread = coroutine.running()
@@ -246,7 +183,9 @@ local function captureAsync(sendMessage: (msg: { [string]: any }) -> (), request
 		end
 	end
 
-	local encodeOk, encoded = pcall(base64Encode, dataBuf)
+	local encodeOk, encoded = pcall(function()
+		return EncodingService:Base64Encode(dataBuf)
+	end)
 	if not encodeOk or not encoded then
 		sendMessage(
 			buildError(
