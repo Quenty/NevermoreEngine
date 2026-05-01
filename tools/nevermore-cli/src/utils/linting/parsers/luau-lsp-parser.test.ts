@@ -40,7 +40,7 @@ describe('parseLuauLspOutput', () => {
 
   it('parses multiple lines', () => {
     const input = [
-      "src/a.lua(1,1): TypeError: type mismatch",
+      'src/a.lua(1,1): TypeError: type mismatch',
       "src/b.lua(5,3): LocalUnused: Variable 'x' is never used; prefix with '_' to silence",
       '',
       '> some other output line',
@@ -58,11 +58,7 @@ describe('parseLuauLspOutput', () => {
   });
 
   it('skips non-matching lines', () => {
-    const input = [
-      '> lint:luau',
-      '> luau-lsp analyze ...',
-      '',
-    ].join('\n');
+    const input = ['> lint:luau', '> luau-lsp analyze ...', ''].join('\n');
 
     const result = parseLuauLspOutput(input);
     expect(result).toEqual([]);

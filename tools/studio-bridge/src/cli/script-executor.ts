@@ -24,6 +24,7 @@ export interface ExecuteScriptOptions {
   timeoutMs: number;
   verbose: boolean;
   showLogs: boolean;
+  filePath?: string;
 }
 
 /**
@@ -52,8 +53,26 @@ export async function resolvePlacePathAsync(
 export async function executeScriptAsync(
   options: ExecuteScriptOptions
 ): Promise<void> {
-  const { scriptContent, packageName, placePath, timeoutMs, verbose, showLogs } =
-    options;
+  const { shouldDelegateToDockerAsync, delegateToDockerAsync } = await import(
+    '../docker/docker-delegator.js'
+  );
+
+  if (await shouldDelegateToDockerAsync()) {
+    OutputHelper.verbose(
+      '[StudioBridge] No Wine detected, delegating to Docker'
+    );
+    await delegateToDockerAsync(options);
+    return; // unreachable — delegateToDockerAsync calls process.exit
+  }
+
+  const {
+    scriptContent,
+    packageName,
+    placePath,
+    timeoutMs,
+    verbose,
+    showLogs,
+  } = options;
 
   const useSpinner = !!process.stdout.isTTY && !verbose;
 
@@ -124,8 +143,7 @@ export async function executeScriptAsync(
       },
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     result = {
       success: false,
       logs: `[StudioBridge] Error: ${errorMessage}`,

@@ -1,0 +1,113 @@
+# syntax=docker/dockerfile:1
+FROM ubuntu:24.04
+ARG STUDIO_VERSION
+ARG DEBIAN_FRONTEND=noninteractive
+
+# --- System deps (cached layer, rarely changes) ---
+# Mirrors linux-prerequisites.ts:installDependenciesAsync()
+RUN dpkg --add-architecture i386 \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl gnupg software-properties-common \
+        xvfb openbox mesa-utils \
+        gcc-mingw-w64-x86-64 unzip procps \
+    # WineHQ repo for Wine 11+ (same logic as linux-prerequisites.ts:91-128)
+    && mkdir -pm755 /etc/apt/keyrings \
+    && curl -sL https://dl.winehq.org/wine-builds/winehq.key \
+        -o /etc/apt/keyrings/winehq-archive.key \
+    && curl -sfL https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources \
+        -o /etc/apt/sources.list.d/winehq-noble.sources \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends winehq-stable \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# --- Node.js 22 LTS + GitHub CLI (needed by setup-aftman action) ---
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs gh \
+    && corepack enable pnpm \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# --- Image manifest ---
+# Dump the installed apt package list so CI can archive it as a build
+# artifact. Apt deps (winehq-stable, nodejs, gh, etc.) are intentionally
+# not pinned to specific versions — this manifest gives post-hoc
+# visibility into what was actually pulled, so version drift across
+# rebuilds is diagnosable rather than mysterious.
+RUN dpkg-query -W -f='${Package}\t${Version}\t${Architecture}\n' \
+    | sort > /image-manifest-apt.tsv
+
+# --- Aftman binary ---
+RUN curl -fsSL https://github.com/LPGhatguy/aftman/releases/download/v0.3.0/aftman-0.3.0-linux-x86_64.zip \
+        -o /tmp/aftman.zip \
+    && unzip -o /tmp/aftman.zip -d /tmp/aftman \
+    && install -m 755 /tmp/aftman/aftman /usr/local/bin/aftman \
+    && rm -rf /tmp/aftman.zip /tmp/aftman
+
+# --- Non-root user ---
+RUN useradd -m -s /bin/bash studio
+USER studio
+WORKDIR /home/studio
+
+# --- Install Aftman tools (rojo, lune, etc.) ---
+# aftman.toml lives in $HOME so shims can find it from any CWD
+COPY --from=workspace --chown=studio:studio aftman.toml /home/studio/aftman.toml
+RUN mkdir -p /home/studio/.aftman/bin \
+    && aftman install --no-trust-check
+
+# --- Build studio-bridge from source (via named build context "workspace") ---
+COPY --from=workspace --chown=studio:studio package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.json /home/studio/build/
+COPY --from=workspace --chown=studio:studio tools/ /home/studio/build/tools/
+WORKDIR /home/studio/build
+RUN pnpm install --frozen-lockfile --filter "@quenty/studio-bridge..." \
+    && pnpm -r --filter "@quenty/studio-bridge..." run build
+
+# --- Run studio-bridge to set up Studio (single source of truth!) ---
+# Invoke cli.js directly — workspace deps are resolved by pnpm in node_modules.
+RUN node tools/studio-bridge/dist/src/cli/cli.js linux setup \
+    ${STUDIO_VERSION:+--studio-version "$STUDIO_VERSION"}
+
+# --- Pre-initialize Wine prefix and compile write-cred.exe ---
+# Doing this at build time saves ~40s per auth invocation at runtime.
+RUN Xvfb :99 -screen 0 1024x768x24 & \
+    sleep 1 \
+    && DISPLAY=:99 WINEPREFIX=/home/studio/.wine WINEARCH=win64 \
+       WINEDEBUG=-all WINEDLLOVERRIDES="mscoree=d;mshtml=d" \
+       wineboot -i \
+    && x86_64-w64-mingw32-gcc \
+       -o /home/studio/roblox-studio/write-cred.exe \
+       tools/studio-bridge/src/linux/write-cred.c \
+       -lcredui -ladvapi32 \
+    && kill %1 || true \
+    && rm -f /tmp/.X99-lock
+
+# --- Install studio-bridge globally for runtime, then clean up ---
+# Use pnpm deploy to create a self-contained copy with resolved workspace deps,
+# then link the binary. This avoids npm registry lookups for workspace packages.
+RUN pnpm --filter "@quenty/studio-bridge" deploy --legacy --prod /home/studio/.studio-bridge \
+    && mkdir -p /home/studio/.npm-global/bin \
+    && ln -s /home/studio/.studio-bridge/dist/src/cli/cli.js /home/studio/.npm-global/bin/studio-bridge \
+    && chmod +x /home/studio/.studio-bridge/dist/src/cli/cli.js \
+    && rm -rf /home/studio/build
+
+# --- Environment (matches linux-wine-env.ts:buildWineEnv) ---
+ENV STUDIO_DIR=/home/studio/roblox-studio \
+    WINEPREFIX=/home/studio/.wine \
+    DISPLAY=:99 \
+    WINEDEBUG=-all \
+    WINEARCH=win64 \
+    WINEDLLOVERRIDES="mscoree=d;mshtml=d" \
+    MESA_GL_VERSION_OVERRIDE=4.5 \
+    MESA_GLSL_VERSION_OVERRIDE=450 \
+    NPM_CONFIG_PREFIX=/home/studio/.npm-global \
+    PATH=/home/studio/.aftman/bin:/home/studio/.npm-global/bin:$PATH
+
+COPY --chown=studio:studio entrypoint.sh /home/studio/entrypoint.sh
+RUN chmod +x /home/studio/entrypoint.sh
+WORKDIR /home/studio
+ENTRYPOINT ["/home/studio/entrypoint.sh"]
+CMD ["bash"]

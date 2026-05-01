@@ -1,4 +1,10 @@
-import { type PackageResult, type PackageStatus, type JobPhase, type ProgressSummary, BaseReporter } from '../reporter.js';
+import {
+  type PackageResult,
+  type PackageStatus,
+  type JobPhase,
+  type ProgressSummary,
+  BaseReporter,
+} from '../reporter.js';
 import { type IStateTracker, type PackageState } from './state-tracker.js';
 
 export type { PackageState } from './state-tracker.js';
@@ -8,10 +14,7 @@ export type { PackageState } from './state-tracker.js';
  * Extends BaseReporter to receive lifecycle hooks and mutate state.
  * Reporters read from it via the IStateTracker interface.
  */
-export class LiveStateTracker
-  extends BaseReporter
-  implements IStateTracker
-{
+export class LiveStateTracker extends BaseReporter implements IStateTracker {
   private _packages: Map<string, PackageState>;
   private _startTimeMs = 0;
   private _completed = 0;
@@ -77,7 +80,10 @@ export class LiveStateTracker
     state.progress = undefined; // clear progress on phase transition
   }
 
-  override onPackageProgressUpdate(name: string, progress: ProgressSummary): void {
+  override onPackageProgressUpdate(
+    name: string,
+    progress: ProgressSummary
+  ): void {
     const state = this._packages.get(name);
     if (!state) return;
     state.progress = progress;

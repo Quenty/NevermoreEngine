@@ -20,7 +20,10 @@ export function resolveTemplatePath(callerUrl: string, name: string): string {
  * @param callerUrl - Pass `import.meta.url` from the calling module
  * @param segments - Path segments to join (e.g. 'build-scripts', 'transform.luau')
  */
-export function resolvePackagePath(callerUrl: string, ...segments: string[]): string {
+export function resolvePackagePath(
+  callerUrl: string,
+  ...segments: string[]
+): string {
   const callerDir = path.dirname(fileURLToPath(callerUrl));
   const packageRoot = findPackageRoot(callerDir);
   return path.join(packageRoot, ...segments);

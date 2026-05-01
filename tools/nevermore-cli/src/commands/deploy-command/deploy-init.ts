@@ -2,12 +2,24 @@ import inquirer from 'inquirer';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { DeployConfig, discoverUniverseIdAsync } from '../../utils/build/deploy-config.js';
-import { getRobloxCookieAsync, createPlaceInUniverseAsync } from '../../utils/auth/roblox-auth/index.js';
-import { fileExistsAsync, buildPlaceNameAsync } from '../../utils/nevermore-cli-utils.js';
+import {
+  DeployConfig,
+  discoverUniverseIdAsync,
+} from '../../utils/build/deploy-config.js';
+import {
+  getRobloxCookieAsync,
+  createPlaceInUniverseAsync,
+} from '@quenty/nevermore-cli-helpers';
+import {
+  fileExistsAsync,
+  buildPlaceNameAsync,
+} from '../../utils/nevermore-cli-utils.js';
 import { DeployArgs } from './index.js';
 import { promptPlaceIdAsync } from './deploy-init-prompts.js';
-import { detectProjectFileAsync, detectScriptFileAsync } from './deploy-init-utils.js';
+import {
+  detectProjectFileAsync,
+  detectScriptFileAsync,
+} from './deploy-init-utils.js';
 
 interface InitState {
   packagePath: string;
@@ -24,8 +36,10 @@ export async function handleInitAsync(args: DeployArgs): Promise<void> {
   const packagePath = process.cwd();
   const deployJsonPath = path.join(packagePath, 'deploy.nevermore.json');
 
-  if (await fileExistsAsync(deployJsonPath) && !args.force) {
-    OutputHelper.warn(`deploy.nevermore.json already exists at ${deployJsonPath}`);
+  if ((await fileExistsAsync(deployJsonPath)) && !args.force) {
+    OutputHelper.warn(
+      `deploy.nevermore.json already exists at ${deployJsonPath}`
+    );
     OutputHelper.hint('Use --force to overwrite, or edit it manually.');
     return;
   }
@@ -45,7 +59,10 @@ export async function handleInitAsync(args: DeployArgs): Promise<void> {
   await writeConfig(args, state, deployJsonPath);
 }
 
-async function detectDefaults(args: DeployArgs, packagePath: string): Promise<InitState> {
+async function detectDefaults(
+  args: DeployArgs,
+  packagePath: string
+): Promise<InitState> {
   const packageName = path.basename(packagePath);
   const placeName = await buildPlaceNameAsync(packagePath);
 
@@ -65,7 +82,9 @@ async function detectDefaults(args: DeployArgs, packagePath: string): Promise<In
   if (!universeId) {
     const discovered = await discoverUniverseIdAsync(packagePath);
     if (discovered) {
-      OutputHelper.info(`Discovered universe ID ${discovered} from parent deploy.nevermore.json`);
+      OutputHelper.info(
+        `Discovered universe ID ${discovered} from parent deploy.nevermore.json`
+      );
       universeId = discovered;
     }
   }
@@ -82,7 +101,10 @@ async function detectDefaults(args: DeployArgs, packagePath: string): Promise<In
   };
 }
 
-async function resolveNonInteractive(args: DeployArgs, state: InitState): Promise<void> {
+async function resolveNonInteractive(
+  args: DeployArgs,
+  state: InitState
+): Promise<void> {
   const missing: string[] = [];
   if (!state.universeId) missing.push('--universe-id');
   if (!state.project) missing.push('--project');
@@ -94,7 +116,11 @@ async function resolveNonInteractive(args: DeployArgs, state: InitState): Promis
 
   if (args.createPlace && state.universeId && !state.placeId) {
     const cookie = await getRobloxCookieAsync();
-    state.placeId = await createPlaceInUniverseAsync(cookie, state.universeId, state.placeName);
+    state.placeId = await createPlaceInUniverseAsync(
+      cookie,
+      state.universeId,
+      state.placeName
+    );
   }
 
   if (!state.placeId) {
@@ -104,7 +130,10 @@ async function resolveNonInteractive(args: DeployArgs, state: InitState): Promis
   }
 }
 
-async function resolveInteractive(args: DeployArgs, state: InitState): Promise<void> {
+async function resolveInteractive(
+  args: DeployArgs,
+  state: InitState
+): Promise<void> {
   if (state.universeId && state.placeId && state.project) {
     return;
   }
@@ -146,11 +175,18 @@ async function tryAutoSetup(state: InitState): Promise<boolean> {
   }
 
   const cookie = await getRobloxCookieAsync();
-  state.placeId = await createPlaceInUniverseAsync(cookie, state.universeId, state.placeName);
+  state.placeId = await createPlaceInUniverseAsync(
+    cookie,
+    state.universeId,
+    state.placeName
+  );
   return true;
 }
 
-async function promptUniverseId(args: DeployArgs, state: InitState): Promise<void> {
+async function promptUniverseId(
+  args: DeployArgs,
+  state: InitState
+): Promise<void> {
   const answers = await inquirer.prompt([
     {
       type: 'input',
@@ -162,10 +198,13 @@ async function promptUniverseId(args: DeployArgs, state: InitState): Promise<voi
     {
       type: 'number',
       name: 'universeId',
-      message: 'Universe ID (find at https://create.roblox.com/dashboard/creations):',
+      message:
+        'Universe ID (find at https://create.roblox.com/dashboard/creations):',
       when: () => !state.universeId,
       validate: (input: number) =>
-        Number.isInteger(input) && input > 0 ? true : 'Must be a positive integer',
+        Number.isInteger(input) && input > 0
+          ? true
+          : 'Must be a positive integer',
     },
   ]);
 
@@ -181,7 +220,10 @@ async function promptPlaceId(state: InitState): Promise<void> {
   state.placeId = await promptPlaceIdAsync(state.universeId, state.placeName);
 }
 
-async function promptProjectAndScript(args: DeployArgs, state: InitState): Promise<void> {
+async function promptProjectAndScript(
+  args: DeployArgs,
+  state: InitState
+): Promise<void> {
   const answers = await inquirer.prompt([
     {
       type: 'input',
@@ -210,9 +252,12 @@ async function promptProjectAndScript(args: DeployArgs, state: InitState): Promi
       type: 'input',
       name: 'scriptTemplate',
       message: 'Script template file (relative to package):',
-      default: state.scriptTemplate ?? 'test/scripts/Server/ServerMain.server.lua',
+      default:
+        state.scriptTemplate ?? 'test/scripts/Server/ServerMain.server.lua',
       when: (promptAnswers: { hasScript?: boolean }) =>
-        !args.scriptTemplate && promptAnswers.hasScript && !state.scriptTemplate,
+        !args.scriptTemplate &&
+        promptAnswers.hasScript &&
+        !state.scriptTemplate,
       validate: async (input: string) => {
         const fullPath = path.resolve(state.packagePath, input);
         if (await fileExistsAsync(fullPath)) {
@@ -231,14 +276,20 @@ async function promptProjectAndScript(args: DeployArgs, state: InitState): Promi
   }
 }
 
-async function writeConfig(args: DeployArgs, state: InitState, deployJsonPath: string): Promise<void> {
+async function writeConfig(
+  args: DeployArgs,
+  state: InitState,
+  deployJsonPath: string
+): Promise<void> {
   const config: DeployConfig = {
     targets: {
       [state.targetName]: {
         universeId: state.universeId!,
         placeId: state.placeId!,
         project: state.project!,
-        ...(state.scriptTemplate ? { scriptTemplate: state.scriptTemplate } : {}),
+        ...(state.scriptTemplate
+          ? { scriptTemplate: state.scriptTemplate }
+          : {}),
       },
     },
   };

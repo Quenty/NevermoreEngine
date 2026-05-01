@@ -69,7 +69,5 @@ function _walkNode(
 /** Return the first `.lua` or `.luau` file path from a node's filePaths. */
 function _findLuaFilePath(filePaths?: string[]): string | undefined {
   if (!filePaths) return undefined;
-  return filePaths.find(
-    (fp) => fp.endsWith('.lua') || fp.endsWith('.luau')
-  );
+  return filePaths.find((fp) => fp.endsWith('.lua') || fp.endsWith('.luau'));
 }

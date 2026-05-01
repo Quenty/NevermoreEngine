@@ -20,7 +20,9 @@ export function formatProgressInline(progress?: ProgressSummary): string {
       return `(${progress.passed}/${progress.total})`;
     case 'bytes':
       if (progress.totalBytes > 0 && progress.transferredBytes > 0) {
-        return `(${_formatBytes(progress.transferredBytes)}/${_formatBytes(progress.totalBytes)})`;
+        return `(${_formatBytes(progress.transferredBytes)}/${_formatBytes(
+          progress.totalBytes
+        )})`;
       }
       return `(${_formatBytes(progress.totalBytes)})`;
     case 'steps':
@@ -79,7 +81,8 @@ export function summarizeFailure(
 
   if (error) {
     const firstLine = error.split('\n')[0];
-    const short = firstLine.length > 60 ? firstLine.slice(0, 57) + '...' : firstLine;
+    const short =
+      firstLine.length > 60 ? firstLine.slice(0, 57) + '...' : firstLine;
     if (parts.length > 0) {
       parts.push(`: ${short}`);
     } else {

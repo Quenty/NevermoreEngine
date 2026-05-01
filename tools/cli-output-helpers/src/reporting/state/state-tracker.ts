@@ -1,4 +1,8 @@
-import { type PackageResult, type PackageStatus, type ProgressSummary } from '../reporter.js';
+import {
+  type PackageResult,
+  type PackageStatus,
+  type ProgressSummary,
+} from '../reporter.js';
 
 export interface PackageState {
   name: string;

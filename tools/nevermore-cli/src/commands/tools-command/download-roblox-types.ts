@@ -47,7 +47,9 @@ export class DownloadRobloxTypes<T>
       return;
     }
 
-    OutputHelper.verbose(`Downloading Roblox type definitions to ${filename}...`);
+    OutputHelper.verbose(
+      `Downloading Roblox type definitions to ${filename}...`
+    );
 
     return new Promise((resolve, reject) => {
       const file = fsSync.createWriteStream(filename);
@@ -55,9 +57,7 @@ export class DownloadRobloxTypes<T>
         if (response.statusCode !== 200) {
           fsSync.unlink(filename, () => {});
           reject(
-            new Error(
-              `Failed to download ${url}: HTTP ${response.statusCode}`
-            )
+            new Error(`Failed to download ${url}: HTTP ${response.statusCode}`)
           );
           return;
         }

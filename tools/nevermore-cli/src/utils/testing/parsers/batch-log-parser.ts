@@ -111,7 +111,10 @@ export function parseBatchTestLogs(
       );
     } catch {
       OutputHelper.verbose(
-        `[batch-log-parser] Failed to parse JSON summary: ${jsonLine.slice(0, 200)}`
+        `[batch-log-parser] Failed to parse JSON summary: ${jsonLine.slice(
+          0,
+          200
+        )}`
       );
     }
   }
@@ -134,7 +137,9 @@ export function parseBatchTestLogs(
 
     if (!success) {
       console.error(
-        `[batch-log-parser] ${slug}: summarySuccess=${summarySuccess} hasLogs=${sectionLogs.length > 0} logsLen=${sectionLogs.length}`
+        `[batch-log-parser] ${slug}: summarySuccess=${summarySuccess} hasLogs=${
+          sectionLogs.length > 0
+        } logsLen=${sectionLogs.length}`
       );
     }
 

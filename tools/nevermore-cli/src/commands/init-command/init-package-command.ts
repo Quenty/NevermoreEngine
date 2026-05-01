@@ -5,7 +5,10 @@
 import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { resolveTemplatePath, TemplateHelper } from '@quenty/nevermore-template-helpers';
+import {
+  resolveTemplatePath,
+  TemplateHelper,
+} from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 
 export interface InitPackageArgs extends NevermoreGlobalArgs {
@@ -71,7 +74,7 @@ export class InitPackageCommand<T>
       },
       args.dryrun
     );
-  }
+  };
 
   private static async _ensurePackageName(
     args: InitPackageArgs

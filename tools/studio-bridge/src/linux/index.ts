@@ -1,0 +1,25 @@
+export {
+  resolveLinuxConfig,
+  ROBLOX_CDN_BASE,
+  ROBLOX_USERS_API,
+  STUDIO_PACKAGES,
+} from './linux-config.js';
+export type { LinuxStudioConfig } from './linux-config.js';
+export { buildWineEnv } from './linux-wine-env.js';
+export {
+  checkPrerequisites,
+  allPrerequisitesMet,
+  installDependenciesAsync,
+} from './linux-prerequisites.js';
+export {
+  ensureDisplayAsync,
+  ensureWindowManagerAsync,
+  isXvfbRunning,
+  isOpenboxRunning,
+} from './linux-display-manager.js';
+export { resolveStudioVersionAsync } from './linux-version-resolver.js';
+export { installStudioAsync } from './linux-studio-installer.js';
+export { patchShadersAsync } from './linux-shader-patcher.js';
+export { writeFflagsAsync } from './linux-fflags.js';
+export { injectCredentialsAsync } from './linux-credential-writer.js';
+export { launchStudioLinuxAsync } from './linux-studio-launcher.js';
