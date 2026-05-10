@@ -498,6 +498,56 @@ function Binder.Bind<T>(self: Binder<T>, inst: Instance): T?
 end
 
 --[=[
+	Tags the instance (if needed), invokes the constructor synchronously via `_add` when
+	the instance is not already bound, and returns the bound class. Prefer this over `Bind`
+	when you must have the object in the same stack frame (still fails if the constructor yields).
+
+	If `:Start()` is listening, `GetInstanceAddedSignal` may call `_add` first when the
+	tag is added; `_add` ignores duplicate work on the same instance.
+
+	@server
+	@param inst Instance
+	@return T
+]=]
+function Binder.BindSynchronous<T>(self: Binder<T>, inst: Instance): T
+	if RunService:IsClient() then
+		warn(
+			string.format(
+				"[Binder.BindSynchronous] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s",
+				self._tagName,
+				debug.traceback()
+			)
+		)
+	end
+
+	if not self._initialized then
+		-- self:Init()
+		error(`You should initialize the binder before binding instances!`)
+	end
+
+	if not CollectionService:HasTag(inst, self._tagName) then
+		CollectionService:AddTag(inst, self._tagName)
+	end
+
+	if not self._instToClass[inst] then
+		self:_add(inst)
+	end
+
+	local class = self:Get(inst)
+	assert(
+		class,
+		string.format(
+			"[Binder.BindSynchronous] Failed to bind instance %q (%s) for tag %q (constructor yielded, error, or instance removed during construction)",
+			inst:GetFullName(),
+			inst.ClassName,
+			self._tagName
+		)
+	)
+
+	return class
+end
+
+--[=[
 	Tags the instance with the tag for the binder
 
 	@param inst Instance
