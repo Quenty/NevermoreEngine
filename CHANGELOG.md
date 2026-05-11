@@ -1,3 +1,16 @@
+# (Mon May 11 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/humanoidmovedirectionutils@10.11.1`, `@quenty/humanoidteleportutils@10.11.1`
+  - fix: Fix direction utils luau-lsp [#691](https://github.com/Quenty/NevermoreEngine/pull/691) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Apr 30 2026)
 
 #### 🐛 Bug Fix

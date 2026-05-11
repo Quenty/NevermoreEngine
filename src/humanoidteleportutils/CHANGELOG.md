@@ -1,3 +1,16 @@
+# v10.11.1 (Mon May 11 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Fix direction utils luau-lsp [#691](https://github.com/Quenty/NevermoreEngine/pull/691) ([@Quenty](https://github.com/Quenty))
+- fix: Fix direction utils luau-lsp ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
