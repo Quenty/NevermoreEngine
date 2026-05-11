@@ -1,20 +1,18 @@
-# v10.11.1 (Mon May 11 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Fix direction utils luau-lsp [#691](https://github.com/Quenty/NevermoreEngine/pull/691) ([@Quenty](https://github.com/Quenty))
-- fix: Fix direction utils luau-lsp ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.11.0...@quenty/humanoidteleportutils@10.11.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* Fix direction utils luau-lsp ([4505987](https://github.com/Quenty/NevermoreEngine/commit/4505987af5ccdd7d116f3f88ccfe568f85138ba7))
+
+
+
+
 
 # [10.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@10.10.0...@quenty/humanoidteleportutils@10.11.0) (2026-04-23)
 
