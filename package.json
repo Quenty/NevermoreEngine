@@ -7,7 +7,6 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git"
   },
   "devDependencies": {
-    "@auto-it/all-contributors": "^v11.3.6",
     "@auto-it/conventional-commits": "^v11.3.6",
     "@auto-it/first-time-contributor": "^v11.3.6",
     "@auto-it/npm": "^v11.3.6",
@@ -46,7 +45,6 @@
           "defaultReleaseType": "patch"
         }
       ],
-      "all-contributors",
       "first-time-contributor",
       "released"
     ]

@@ -44,6 +44,70 @@ function ColorSequenceUtils.getColor(colorSequence: ColorSequence, t: number): C
 	return keypoints[#keypoints].Value
 end
 
+function ColorSequenceUtils.fromUnscaledTimesAndColors(times: { number }, colors: { Color3 }): ColorSequence
+	assert(#times == #colors, "Mismatched times and colors")
+	local min = math.huge
+	local max = -math.huge
+	local previous = -math.huge
+	for i = 1, #times do
+		assert(type(times[i]) == "number", "Bad time")
+		assert(typeof(colors[i]) == "Color3", "Bad color")
+		assert(times[i] >= previous, "Times must be in ascending order")
+		previous = times[i]
+
+		min = math.min(min, times[i])
+		max = math.max(max, times[i])
+	end
+
+	local keypoints: { ColorSequenceKeypoint } = {}
+	for i = 1, #times do
+		local scaledTime = math.map(times[i], min, max, 0, 1)
+		table.insert(keypoints, ColorSequenceKeypoint.new(scaledTime, colors[i]))
+	end
+
+	return ColorSequence.new(keypoints)
+end
+
+function ColorSequenceUtils.getSingleColorInSequence(colorSequence: ColorSequence): Color3?
+	assert(typeof(colorSequence) == "ColorSequence", "Bad colorSequence")
+
+	local keypoints = colorSequence.Keypoints
+	local firstColor = keypoints[1].Value
+	for i = 2, #keypoints do
+		if keypoints[i].Value ~= firstColor then
+			return nil
+		end
+	end
+
+	return firstColor
+end
+
+function ColorSequenceUtils.getAverageColor(colorSequence: ColorSequence): Color3
+	assert(typeof(colorSequence) == "ColorSequence", "Bad colorSequence")
+	local keypoints = colorSequence.Keypoints
+	assert(#keypoints > 0, "Color sequence must have at least one keypoint")
+
+	if #keypoints == 1 then
+		return keypoints[1].Value
+	end
+
+	local totalR = 0
+	local totalG = 0
+	local totalB = 0
+
+	for i = 2, #keypoints do
+		local prev = keypoints[i - 1]
+		local curr = keypoints[i]
+		local dt = curr.Time - prev.Time
+
+		totalR = totalR + (prev.Value.R + curr.Value.R) * 0.5 * dt
+		totalG = totalG + (prev.Value.G + curr.Value.G) * 0.5 * dt
+		totalB = totalB + (prev.Value.B + curr.Value.B) * 0.5 * dt
+	end
+
+	return Color3.new(totalR, totalG, totalB)
+end
+
 --[=[
 	Makes stripes for color sequences.
 

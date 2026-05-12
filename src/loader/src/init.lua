@@ -12,16 +12,12 @@ local DependencyUtils = require(script.Dependencies.DependencyUtils)
 local LoaderLinkCreator = require(script.LoaderLink.LoaderLinkCreator)
 local LoaderLinkUtils = require(script.LoaderLink.LoaderLinkUtils)
 local Maid = require(script.Maid)
-local PackageTrackerProvider = require(script.Dependencies.PackageTrackerProvider)
 local ReplicationType = require(script.Replication.ReplicationType)
 local ReplicationTypeUtils = require(script.Replication.ReplicationTypeUtils)
 local Replicator = require(script.Replication.Replicator)
 local ReplicatorReferences = require(script.Replication.ReplicatorReferences)
 
-local GLOBAL_PACKAGE_TRACKER = PackageTrackerProvider.new()
-script.Destroying:Connect(function()
-	GLOBAL_PACKAGE_TRACKER:Destroy()
-end)
+local GLOBAL_PACKAGE_TRACKER = require(script["GlobalPackageTracker.global"])
 
 local Loader = {}
 Loader.__index = Loader

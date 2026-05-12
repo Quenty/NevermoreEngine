@@ -4,12 +4,13 @@
 ]]
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local require = require(loader).bootstrapGame(ServerScriptService.rogueproperties)
+local root = ServerScriptService.rogueproperties
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.rogueproperties) then
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
 	return
 end
 

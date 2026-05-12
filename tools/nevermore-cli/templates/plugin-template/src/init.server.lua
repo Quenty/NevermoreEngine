@@ -3,8 +3,9 @@
     {{pluginName}} initialization script
 ]]
 
-local loader = script.Parent:FindFirstChild("LoaderUtils", true).Parent
-local require = (require :: any)(loader).bootstrapPlugin(script) :: typeof(require(script.Parent.loader).load(script))
+local root = script.Parent
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = (require :: any)(loader).bootstrapPlugin(script) :: typeof(require(root.loader).load(script))
 
 local ServiceBag = require("ServiceBag")
 

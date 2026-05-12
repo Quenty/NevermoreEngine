@@ -16,7 +16,11 @@ import {
   type IStateTracker,
   type PackageState,
 } from '../state/state-tracker.js';
-import { formatProgressInline, formatProgressResult, isEmptyTestRun } from '../progress-format.js';
+import {
+  formatProgressInline,
+  formatProgressResult,
+  isEmptyTestRun,
+} from '../progress-format.js';
 
 // ── Public types ────────────────────────────────────────────────────────────
 
@@ -111,7 +115,10 @@ const RUNNING_PHASE_LABELS: Record<string, string> = {
   executing: '🔄 Executing...',
 };
 
-export function formatRunningStatus(phase: PackageStatus, progress?: ProgressSummary): string {
+export function formatRunningStatus(
+  phase: PackageStatus,
+  progress?: ProgressSummary
+): string {
   const label = RUNNING_PHASE_LABELS[phase] ?? '🔄 Running...';
   if (progress) {
     const progressText = formatProgressInline(progress);
@@ -130,10 +137,10 @@ export function formatResultStatus(
   const empty = isEmptyTestRun(pkg.progressSummary);
 
   if (pkg.success) {
-    const label = progressText ? `${successLabel} ${progressText}` : successLabel;
-    return empty
-      ? `⚠️ ${label} (${duration})`
-      : `✅ ${label} (${duration})`;
+    const label = progressText
+      ? `${successLabel} ${progressText}`
+      : successLabel;
+    return empty ? `⚠️ ${label} (${duration})` : `✅ ${label} (${duration})`;
   }
 
   const failedPhase = pkg.failedPhase;
@@ -305,9 +312,7 @@ export function formatGithubTableBody(
     ).length;
     const running = packages.filter(
       (p) =>
-        p.status !== 'pending' &&
-        p.status !== 'passed' &&
-        p.status !== 'failed'
+        p.status !== 'pending' && p.status !== 'passed' && p.status !== 'failed'
     ).length;
     const pending = packages.filter((p) => p.status === 'pending').length;
     const parts: string[] = [];
@@ -330,14 +335,11 @@ export function formatGithubNoTestsBody(
   const actionsRunUrl = getActionsRunUrl();
   const heading = config.heading;
 
-  let body = config.commentMarker + '\n';
-  body += `## ${heading}\n\n`;
-  body += `ℹ️ **No tests to run**\n\n`;
-  body += `${message}\n`;
+  const logsPart = actionsRunUrl ? ` · [View logs](${actionsRunUrl})` : '';
 
-  if (actionsRunUrl) {
-    body += `\n[View logs](${actionsRunUrl})\n`;
-  }
+  let body = config.commentMarker + '\n';
+  body += `## ${heading}\n`;
+  body += `ℹ️ ${message}${logsPart}\n`;
 
   return body;
 }

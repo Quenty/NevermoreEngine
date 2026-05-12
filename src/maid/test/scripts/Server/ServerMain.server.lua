@@ -1,12 +1,13 @@
 --!nonstrict
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local require = require(loader).bootstrapGame(ServerScriptService.maid)
+local root = ServerScriptService.maid
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-if NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.maid) then
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
 	return
 end
 

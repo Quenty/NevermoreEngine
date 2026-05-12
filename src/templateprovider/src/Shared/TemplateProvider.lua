@@ -268,6 +268,11 @@ function TemplateProvider._replicateTombstones(
 		end
 
 		local maid, child = brio:ToMaidAndValue()
+
+		if child:IsA("PackageLink") then
+			return
+		end
+
 		self:_addInstanceTemplate(maid, child)
 
 		local tombstoneId = HttpService:GenerateGUID(false)

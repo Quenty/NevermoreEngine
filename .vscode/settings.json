@@ -25,5 +25,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file"
+  },
+  "chat.tools.terminal.autoApprove": {
+    "nevermore": true
   }
 }

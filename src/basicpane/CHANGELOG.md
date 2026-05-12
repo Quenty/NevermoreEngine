@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@13.30.1...@quenty/basicpane@13.30.2) (2026-04-30)
+
+**Note:** Version bump only for package @quenty/basicpane
+
+
+
+
+
+## [13.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@13.30.0...@quenty/basicpane@13.30.1) (2026-04-29)
+
+**Note:** Version bump only for package @quenty/basicpane
+
+
+
+
+
+# [13.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@13.29.0...@quenty/basicpane@13.30.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/basicpane
+
+
+
+
+
+# [13.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@13.28.0...@quenty/basicpane@13.29.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/basicpane
+
+
+
+
+
 # [13.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@13.27.0...@quenty/basicpane@13.28.0) (2026-02-20)
 
 **Note:** Version bump only for package @quenty/basicpane

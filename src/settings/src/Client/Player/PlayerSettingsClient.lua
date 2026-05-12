@@ -152,7 +152,11 @@ function PlayerSettingsClient.ObserveValue<T>(
 			end
 		end
 
-		maid:GiveTask(self._pendingReplicationDataInTransit.Changed:Connect(update))
+		maid:GiveTask(self._pendingReplicationDataInTransit.Changed:Connect(function(newValue)
+			if newValue ~= nil then
+				update()
+			end
+		end))
 
 		self._toReplicateCallbacks[settingName] = self._toReplicateCallbacks[settingName] or {}
 		self._toReplicateCallbacks[settingName][update] = true

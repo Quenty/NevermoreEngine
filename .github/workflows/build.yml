@@ -67,7 +67,14 @@ jobs:
         run: pnpm -r --filter './tools/**' run build
 
       - name: Reset .npmrc
-        run: rm .npmrc
+        run: git checkout -- .npmrc
+
+      - name: Verify npm auth
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
+          npm whoami --registry=https://registry.npmjs.org/
 
       - name: Create Release
         env:
