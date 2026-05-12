@@ -65,7 +65,7 @@ end
 	Observes the player's active slot list
 ]=]
 function SaveSlotDataService.ObserveSlotList(
-	self: SaveSlotDataService,
+	_self: SaveSlotDataService,
 	player: Player
 ): Observable.Observable<{ SaveSlotData.SaveSlotMetadata }?>
 	return (
@@ -86,7 +86,7 @@ end
 --[=[
 	Returns the player's slot list
 ]=]
-function SaveSlotDataService.GetSlotList(self: SaveSlotDataService, player: Player): { SaveSlotData.SaveSlotMetadata }
+function SaveSlotDataService.GetSlotList(_self: SaveSlotDataService, player: Player): { SaveSlotData.SaveSlotMetadata }
 	local slotList = {}
 
 	local slotContainer = player:FindFirstChild(SaveSlotConstants.METADATA_CONTAINER_NAME)
@@ -103,7 +103,7 @@ end
 	Observes the slot metadata at the given index for the player
 ]=]
 function SaveSlotDataService.ObserveSlotMetadata(
-	self: SaveSlotDataService,
+	_self: SaveSlotDataService,
 	player: Player,
 	slotIndex: number
 ): Observable.Observable<SaveSlotData.SaveSlotMetadata?>
@@ -124,7 +124,7 @@ end
 	Returns the slot metadata at the given index for the player
 ]=]
 function SaveSlotDataService.GetSlotMetadata(
-	self: SaveSlotDataService,
+	_self: SaveSlotDataService,
 	player: Player,
 	slotIndex: number
 ): SaveSlotData.SaveSlotMetadata?
