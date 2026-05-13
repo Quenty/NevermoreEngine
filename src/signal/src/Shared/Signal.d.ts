@@ -4,7 +4,7 @@ export type SignalLike<T = void> =
   | Signal<T>
   | RBXScriptSignal<(...args: T extends LuaTuple<infer V> ? V : [T]) => void>;
 
-interface Connection {
+export interface SignalConnection {
   IsConnected(): boolean;
   Disconnect(): void;
   Destroy(): void;
@@ -12,14 +12,14 @@ interface Connection {
 
 export interface Signal<T = void> {
   Fire(...args: ToTuple<T>): void;
-  Connect(callback: (...args: ToTuple<T>) => void): Connection;
+  Connect(callback: (...args: ToTuple<T>) => void): SignalConnection;
   DisconnectAll(): void;
   Wait(): [T] extends [void]
     ? void
     : T extends LuaTuple<infer U>
       ? LuaTuple<U>
       : T;
-  Once(callback: (...args: ToTuple<T>) => void): Connection;
+  Once(callback: (...args: ToTuple<T>) => void): SignalConnection;
   Destroy(): void;
 }
 
