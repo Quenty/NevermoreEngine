@@ -14,7 +14,11 @@ export interface Signal<T = void> {
   Fire(...args: ToTuple<T>): void;
   Connect(callback: (...args: ToTuple<T>) => void): Connection;
   DisconnectAll(): void;
-  Wait(): T extends void ? void : T extends LuaTuple<infer U> ? LuaTuple<U> : T;
+  Wait(): [T] extends [void]
+    ? void
+    : T extends LuaTuple<infer U>
+      ? LuaTuple<U>
+      : T;
   Once(callback: (...args: ToTuple<T>) => void): Connection;
   Destroy(): void;
 }
