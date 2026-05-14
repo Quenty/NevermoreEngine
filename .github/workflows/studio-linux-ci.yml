@@ -265,13 +265,27 @@ jobs:
           ls -la $WINEPREFIX/system.reg $WINEPREFIX/user.reg 2>/dev/null || echo "No Wine prefix files"
 
       - name: Inject authentication
+        id: auth
         if: ${{ env.ROBLOSECURITY != '' }}
-        run: studio-bridge linux inject-credentials --verbose
+        shell: bash
+        run: |
+          set +e
+          studio-bridge linux inject-credentials --verbose 2>&1 | tee inject-output.txt
+          exit_code=${PIPESTATUS[0]}
+          set -e
+          if [ $exit_code -ne 0 ]; then
+            if grep -qE 'cookie is invalid or expired \(HTTP (401|403)\)' inject-output.txt; then
+              echo "::warning::ROBLOSECURITY cookie is stale (HTTP 401/403). Skipping execute step — rotate the secret to re-enable e2e."
+              echo "cookie_stale=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            exit $exit_code
+          fi
         env:
           ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
 
       - name: Execute script through Studio bridge
-        if: ${{ env.ROBLOSECURITY != '' }}
+        if: ${{ env.ROBLOSECURITY != '' && steps.auth.outputs.cookie_stale != 'true' }}
         run: studio-bridge process run --verbose --timeout 60000 'print("E2E test passed!")'
         timeout-minutes: 5
         env:
