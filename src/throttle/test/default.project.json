@@ -1,0 +1,17 @@
+{
+  "name": "ThrottleTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
+      "throttle": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    }
+  }
+}

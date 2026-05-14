@@ -49,8 +49,8 @@ function HumanoidMoveDirectionUtils.getRelativeMoveDirection(cameraCFrame: CFram
 			direction = direction + add
 		end
 	end
-	if direction.magnitude > 0 then
-		return (relative + direction.unit).unit
+	if direction.Magnitude > 0 then
+		return (relative + direction.Unit).Unit
 	end
 
 	return relative

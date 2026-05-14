@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidmovedirectionutils@10.11.0...@quenty/humanoidmovedirectionutils@10.11.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* Fix direction utils luau-lsp ([4505987](https://github.com/Quenty/NevermoreEngine/commit/4505987af5ccdd7d116f3f88ccfe568f85138ba7))
+
+
+
+
+
 # [10.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidmovedirectionutils@10.10.0...@quenty/humanoidmovedirectionutils@10.11.0) (2026-04-23)
 
 **Note:** Version bump only for package @quenty/humanoidmovedirectionutils

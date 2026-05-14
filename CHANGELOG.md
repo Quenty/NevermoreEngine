@@ -1,3 +1,42 @@
+# (Mon May 11 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/humanoidmovedirectionutils@10.11.1`, `@quenty/humanoidteleportutils@10.11.1`
+  - fix: Fix direction utils luau-lsp [#691](https://github.com/Quenty/NevermoreEngine/pull/691) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Apr 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/permissionprovider@14.35.2`, `@quenty/throttle@10.12.2`
+  - allow cmdr admin for every client in multiplayer tests in studio [#689](https://github.com/Quenty/NevermoreEngine/pull/689) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Wed Apr 29 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/throttle@10.12.1`
+  - fix: fixed `trailing = false` bug + added tests [#688](https://github.com/Quenty/NevermoreEngine/pull/688) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Mon Apr 27 2026)
 
 #### 🐛 Bug Fix
