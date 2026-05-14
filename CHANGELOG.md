@@ -1,3 +1,16 @@
+# (Thu May 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.11.0`, `@quenty/nevermore-cli-helpers@1.9.0`, `@quenty/nevermore-cli@4.25.0`, `@quenty/nevermore-template-helpers@1.12.0`, `@quenty/studio-bridge@0.8.0`
+  - feat(studio-bridge): persistent sessions and Linux/Wine support [#669](https://github.com/Quenty/NevermoreEngine/pull/669) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon May 11 2026)
 
 #### 🐛 Bug Fix
