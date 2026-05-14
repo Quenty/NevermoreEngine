@@ -6,6 +6,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local BrineInstanceRegistry = require("BrineInstanceRegistry")
 local BrineTypes = require("BrineTypes")
 local Symbol = require("Symbol")
 
@@ -21,6 +22,7 @@ export type BrineContext = typeof(setmetatable(
 		_instanceToBrineInstance: { [Instance]: BrineTypes.BrineInstance },
 		_brineInstanceToInstance: { [BrineTypes.BrineInstance]: Instance },
 		Options: BrineTypes.SafeBrineOptions,
+		InstanceRegistry: BrineInstanceRegistry.BrineInstanceRegistry,
 	},
 	{} :: typeof({ __index = BrineContext })
 ))
@@ -31,6 +33,8 @@ function BrineContext.new(options: BrineTypes.SafeBrineOptions): BrineContext
 	-- selene: allow(undefined_variable)
 	self.SecurityCapabilities = SecurityCapabilities.fromCurrent()
 	self.Options = options
+	self.InstanceRegistry = BrineInstanceRegistry.new()
+
 	self._instanceToBrineInstance = {}
 	self._brineInstanceToInstance = {}
 
@@ -50,6 +54,9 @@ function BrineContext.StoreSerialization(self: BrineContext, instance: Instance,
 	self._brineInstanceToInstance[data] = instance
 end
 
+--[=[
+	Done on encode
+]=]
 function BrineContext.ReplaceInstancesWithSerializedInstances(
 	self: BrineContext,
 	intermediate: BrineTypes.Intermediate?
@@ -96,6 +103,7 @@ function BrineContext.ReplaceInstancesWithSerializedInstances(
 	end
 
 	local result = encode(intermediate)
+
 	if result == nil then
 		return {}
 	else
@@ -103,18 +111,23 @@ function BrineContext.ReplaceInstancesWithSerializedInstances(
 	end
 end
 
+--[=[
+	Done on decode
+]=]
 function BrineContext.ReplaceSerializedInstancesWithInstances(
 	self: BrineContext,
 	intermediate: BrineTypes.Intermediate
 ): BrineTypes.Intermediate
-	local decodedLookup = {}
+	local seenTables = {}
 
 	local function decode(value: any): any
 		if value == BrineTypes.PENDING_INSTANCE_MARKER then
 			return BrineTypes.PENDING_INSTANCE_MARKER
+		elseif value == UNSET_VALUE then
+			return nil
 		elseif type(value) == "table" then
-			if decodedLookup[value] ~= nil then
-				return decodedLookup[value]
+			if seenTables[value] ~= nil then
+				return seenTables[value]
 			end
 
 			local finalValue = value
@@ -124,6 +137,7 @@ function BrineContext.ReplaceSerializedInstancesWithInstances(
 				if existing == nil then
 					local constructed = self.Options.instanceHook.decode(value)
 					value[BrineTypes.PENDING_INSTANCE_MARKER] = constructed
+					self.InstanceRegistry:SetInstanceId(constructed, value.Id)
 					self:StoreSerialization(constructed, value)
 					finalValue = constructed
 				else
@@ -131,7 +145,8 @@ function BrineContext.ReplaceSerializedInstancesWithInstances(
 				end
 			end
 
-			decodedLookup[value] = finalValue
+			assert(finalValue ~= nil, "Decoded instance cannot be nil")
+			seenTables[value] = finalValue
 
 			for k, v in value do
 				value[decode(k)] = decode(v)
@@ -144,6 +159,11 @@ function BrineContext.ReplaceSerializedInstancesWithInstances(
 	end
 
 	return decode(intermediate)
+end
+
+function BrineContext.ClearState(self: BrineContext): ()
+	self._instanceToBrineInstance = {}
+	self._brineInstanceToInstance = {}
 end
 
 return BrineContext
