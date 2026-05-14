@@ -69,8 +69,7 @@ export class OutputHelper {
     return chalk.greenBright(message);
   }
 
-  private static _hasAnsi = (text: string): boolean =>
-    text.includes('\x1b[');
+  private static _hasAnsi = (text: string): boolean => text.includes('\x1b[');
 
   /** Strip ANSI escape codes from terminal output. */
   public static stripAnsi = (text: string): string =>
@@ -136,6 +135,14 @@ export class OutputHelper {
   }
 
   /**
+   * Returns the current verbose flag. Useful for handlers that need to
+   * forward the global `--verbose` setting to downstream APIs.
+   */
+  public static isVerbose(): boolean {
+    return this._verbose;
+  }
+
+  /**
    * Logs a verbose/intermediate message. Suppressed when verbose is false.
    * When running inside a buffered context (see runBuffered), messages are
    * captured to the buffer instead of printed.
@@ -145,7 +152,9 @@ export class OutputHelper {
       return;
     }
 
-    const formatted = this._hasAnsi(message) ? message : this.formatDim(message);
+    const formatted = this._hasAnsi(message)
+      ? message
+      : this.formatDim(message);
     const buffer = _outputStorage.getStore();
     if (buffer) {
       buffer.lines.push(formatted);

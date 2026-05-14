@@ -1,4 +1,7 @@
-import { getApiKeyAsync, CredentialArgs } from '../auth/credential-store.js';
+import {
+  getApiKeyAsync,
+  type CredentialArgs,
+} from '@quenty/nevermore-cli-helpers';
 import { type DeployTarget } from './deploy-config.js';
 import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 import { type BuiltPlace } from './build.js';
@@ -34,15 +37,16 @@ export async function uploadPlaceAsync(
 
   reporter?.onPackagePhaseChange(packageName ?? '', 'uploading');
 
-  const onProgress = reporter && packageName
-    ? (transferred: number, total: number) => {
-        reporter.onPackageProgressUpdate(packageName, {
-          kind: 'bytes',
-          transferredBytes: transferred,
-          totalBytes: total,
-        });
-      }
-    : undefined;
+  const onProgress =
+    reporter && packageName
+      ? (transferred: number, total: number) => {
+          reporter.onPackageProgressUpdate(packageName, {
+            kind: 'bytes',
+            transferredBytes: transferred,
+            totalBytes: total,
+          });
+        }
+      : undefined;
 
   const version = await client.uploadPlaceAsync(
     target.universeId,

@@ -47,9 +47,7 @@ describe('formatAnnotation', () => {
   });
 
   it('escapes special characters in properties', () => {
-    const result = formatAnnotation(
-      makeDiagnostic({ title: 'a:b,c' })
-    );
+    const result = formatAnnotation(makeDiagnostic({ title: 'a:b,c' }));
     expect(result).toContain('title=a%3Ab%2Cc');
   });
 

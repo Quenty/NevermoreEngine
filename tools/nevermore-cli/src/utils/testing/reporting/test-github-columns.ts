@@ -42,8 +42,7 @@ function createTryItColumn(): GithubCommentColumn {
   return {
     header: 'Try it',
     render(pkg: PackageState) {
-      const placeId =
-        (pkg.result as BatchTestResult | undefined)?.placeId ?? 0;
+      const placeId = (pkg.result as BatchTestResult | undefined)?.placeId ?? 0;
       return placeId
         ? `[Open in Roblox](https://www.roblox.com/games/${placeId})`
         : '';

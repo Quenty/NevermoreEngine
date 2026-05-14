@@ -31,7 +31,10 @@ export {
 export { type BatchTestResult, type BatchTestSummary } from './test-types.js';
 
 // Test-specific GitHub columns and config
-export { createTestColumns, createTestCommentConfig } from './test-github-columns.js';
+export {
+  createTestColumns,
+  createTestCommentConfig,
+} from './test-github-columns.js';
 
 // Backward-compatible aliases
 export {

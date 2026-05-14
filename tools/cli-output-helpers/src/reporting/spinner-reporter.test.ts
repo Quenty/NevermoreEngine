@@ -13,12 +13,13 @@ function setup() {
   // Capture everything written to stdout
   const writes: string[] = [];
   const realWrite = process.stdout.write.bind(process.stdout);
-  vi.spyOn(process.stdout, 'write').mockImplementation(
-    ((chunk: any, ...args: any[]) => {
-      writes.push(typeof chunk === 'string' ? chunk : chunk.toString());
-      return true;
-    }) as any
-  );
+  vi.spyOn(process.stdout, 'write').mockImplementation(((
+    chunk: any,
+    ...args: any[]
+  ) => {
+    writes.push(typeof chunk === 'string' ? chunk : chunk.toString());
+    return true;
+  }) as any);
 
   // Suppress console.log (used by startAsync header)
   vi.spyOn(console, 'log').mockImplementation(() => {});

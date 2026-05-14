@@ -2,11 +2,14 @@ import * as path from 'path';
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
-import { CloudJobContext, LocalJobContext } from '../../utils/job-context/index.js';
+import {
+  CloudJobContext,
+  LocalJobContext,
+} from '../../utils/job-context/index.js';
 import { runSingleTestAsync } from '../../utils/testing/runner/test-runner.js';
 import {
   type Reporter,
@@ -83,24 +86,28 @@ export class TestProjectCommand<T>
       const showLogs = args.logs ?? false;
       const useSpinner = process.stdout.isTTY && !args.verbose;
 
-      const reporter = new CompositeReporter([packageName], (state: LiveStateTracker) => {
-        const reporters: Reporter[] = [
-          useSpinner
-            ? new SpinnerReporter(state, {
-                showLogs,
-                actionVerb: 'Testing',
-              })
-            : new SimpleReporter(state, {
-                alwaysShowLogs: showLogs,
-                successMessage: 'Tests passed!',
-                failureMessage: 'Tests failed! See output above for more information.',
-              }),
-        ];
-        if (args.output) {
-          reporters.push(new JsonFileReporter(state, args.output));
+      const reporter = new CompositeReporter(
+        [packageName],
+        (state: LiveStateTracker) => {
+          const reporters: Reporter[] = [
+            useSpinner
+              ? new SpinnerReporter(state, {
+                  showLogs,
+                  actionVerb: 'Testing',
+                })
+              : new SimpleReporter(state, {
+                  alwaysShowLogs: showLogs,
+                  successMessage: 'Tests passed!',
+                  failureMessage:
+                    'Tests failed! See output above for more information.',
+                }),
+          ];
+          if (args.output) {
+            reporters.push(new JsonFileReporter(state, args.output));
+          }
+          return reporters;
         }
-        return reporters;
-      });
+      );
       await reporter.startAsync();
 
       const context = args.cloud

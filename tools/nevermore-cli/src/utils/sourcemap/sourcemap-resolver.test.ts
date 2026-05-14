@@ -19,7 +19,9 @@ function _createTestSourcemap(repoRoot: string): SourcemapNode {
       {
         name: 'observablecollection',
         className: 'Folder',
-        filePaths: [`${repoRoot}/src/observablecollection/default.project.json`],
+        filePaths: [
+          `${repoRoot}/src/observablecollection/default.project.json`,
+        ],
         children: [
           {
             name: 'Shared',
@@ -101,9 +103,7 @@ describe('SourcemapResolver', () => {
 
   it('strips :LINE suffix before lookup', () => {
     expect(
-      resolver.resolve(
-        'ServerScriptService.maid.Shared.Maid.Maid.spec:23'
-      )
+      resolver.resolve('ServerScriptService.maid.Shared.Maid.Maid.spec:23')
     ).toBe('src/maid/src/Shared/Maid.spec.lua');
   });
 
@@ -122,9 +122,9 @@ describe('SourcemapResolver', () => {
   });
 
   it('resolves paths in a different package', () => {
-    expect(
-      resolver.resolve('ServerScriptService.maid.Shared.Maid')
-    ).toBe('src/maid/src/Shared/Maid.lua');
+    expect(resolver.resolve('ServerScriptService.maid.Shared.Maid')).toBe(
+      'src/maid/src/Shared/Maid.lua'
+    );
   });
 
   it('supports a custom root alias', () => {
@@ -134,17 +134,13 @@ describe('SourcemapResolver', () => {
       'ReplicatedStorage'
     );
 
-    expect(
-      customResolver.resolve(
-        'ReplicatedStorage.maid.Shared.Maid'
-      )
-    ).toBe('src/maid/src/Shared/Maid.lua');
+    expect(customResolver.resolve('ReplicatedStorage.maid.Shared.Maid')).toBe(
+      'src/maid/src/Shared/Maid.lua'
+    );
 
     // ServerScriptService should NOT work with a different alias
     expect(
-      customResolver.resolve(
-        'ServerScriptService.maid.Shared.Maid'
-      )
+      customResolver.resolve('ServerScriptService.maid.Shared.Maid')
     ).toBeUndefined();
   });
 });

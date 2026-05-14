@@ -34,7 +34,10 @@ export interface JobContext {
   deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<Deployment>;
 
   /** Execute a Luau script in a deployed place. */
-  runScriptAsync(deployment: Deployment, options: RunScriptOptions): Promise<ScriptRunResult>;
+  runScriptAsync(
+    deployment: Deployment,
+    options: RunScriptOptions
+  ): Promise<ScriptRunResult>;
 
   /** Retrieve raw logs from the most recent script execution on this deployment. */
   getLogsAsync(deployment: Deployment): Promise<string>;

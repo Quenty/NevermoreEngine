@@ -42,7 +42,13 @@ export async function runBatchAsync<TResult extends PackageResult>(
         const pkg = packages[nextIndex++];
         runningCount++;
 
-        _runOneAsync<TResult>(pkg, executeAsync, reporter, bufferOutput, stateTracker)
+        _runOneAsync<TResult>(
+          pkg,
+          executeAsync,
+          reporter,
+          bufferOutput,
+          stateTracker
+        )
           .then((result) => {
             results.push(result);
           })
@@ -95,7 +101,10 @@ async function _runOneAsync<TResult extends PackageResult>(
       const errorMessage = err instanceof Error ? err.message : String(err);
       const currentPhase = stateTracker?.getCurrentPhase(pkg.name);
       const failedPhase =
-        currentPhase && currentPhase !== 'pending' && currentPhase !== 'passed' && currentPhase !== 'failed'
+        currentPhase &&
+        currentPhase !== 'pending' &&
+        currentPhase !== 'passed' &&
+        currentPhase !== 'failed'
           ? currentPhase
           : undefined;
       return {

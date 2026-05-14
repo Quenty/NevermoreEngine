@@ -77,11 +77,15 @@ export class GroupedReporter extends BaseReporter {
     const empty = isEmptyTestRun(result.progressSummary);
 
     if (result.success) {
-      const label = progressText ? `${successLabel} ${progressText}` : successLabel;
+      const label = progressText
+        ? `${successLabel} ${progressText}`
+        : successLabel;
       const formatted = empty
         ? OutputHelper.formatWarning(`${label} ⚠`)
         : OutputHelper.formatSuccess(label);
-      const icon = empty ? OutputHelper.formatWarning('⚠') : OutputHelper.formatSuccess('✓');
+      const icon = empty
+        ? OutputHelper.formatWarning('⚠')
+        : OutputHelper.formatSuccess('✓');
       console.log(
         `  ${icon} ${formatted} ${OutputHelper.formatDim(`(${duration})`)}`
       );

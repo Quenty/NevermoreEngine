@@ -80,14 +80,14 @@ export class GithubCommentTableReporter extends BaseReporter {
     this._scheduleUpdate();
   }
 
-  override onPackagePhaseChange(
-    _name: string,
-    _phase: PackageStatus
-  ): void {
+  override onPackagePhaseChange(_name: string, _phase: PackageStatus): void {
     this._scheduleUpdate();
   }
 
-  override onPackageProgressUpdate(_name: string, _progress: ProgressSummary): void {
+  override onPackageProgressUpdate(
+    _name: string,
+    _progress: ProgressSummary
+  ): void {
     this._scheduleUpdate();
   }
 

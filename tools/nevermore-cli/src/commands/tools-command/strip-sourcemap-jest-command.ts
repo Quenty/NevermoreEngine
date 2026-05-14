@@ -19,16 +19,19 @@ interface StripSourcemapJestArgs extends NevermoreGlobalArgs {
  *
  * Long-term fix: smarter require resolution in luau-lsp (plugins or fork).
  */
-export const stripSourcemapJestCommand: CommandModule<NevermoreGlobalArgs, StripSourcemapJestArgs> = {
+export const stripSourcemapJestCommand: CommandModule<
+  NevermoreGlobalArgs,
+  StripSourcemapJestArgs
+> = {
   command: 'strip-sourcemap-jest',
-  describe: 'Remove Jest nodes from sourcemap.json to avoid luau-lsp name conflicts',
+  describe:
+    'Remove Jest nodes from sourcemap.json to avoid luau-lsp name conflicts',
   builder: (yargs) => {
-    return yargs
-      .option('sourcemap', {
-        describe: 'Path to sourcemap.json',
-        type: 'string',
-        default: 'sourcemap.json',
-      });
+    return yargs.option('sourcemap', {
+      describe: 'Path to sourcemap.json',
+      type: 'string',
+      default: 'sourcemap.json',
+    });
   },
   handler: (args) => {
     const sourcemapPath = path.resolve(args.sourcemap!);
@@ -66,7 +69,9 @@ export const stripSourcemapJestCommand: CommandModule<NevermoreGlobalArgs, Strip
     fs.writeFileSync(sourcemapPath, JSON.stringify(sourcemap));
 
     if (removed > 0) {
-      OutputHelper.info(`Removed ${removed} Jest node(s) from ${sourcemapPath}`);
+      OutputHelper.info(
+        `Removed ${removed} Jest node(s) from ${sourcemapPath}`
+      );
     }
   },
 };

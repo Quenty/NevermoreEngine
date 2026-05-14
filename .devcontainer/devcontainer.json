@@ -10,7 +10,8 @@
 			"version": "22",
 			"pnpmVersion": "10.27.0"
 		},
-		"ghcr.io/devcontainers/features/github-cli:1": {}
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	},
 
 	"customizations": {

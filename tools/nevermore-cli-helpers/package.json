@@ -23,6 +23,7 @@
   ],
   "dependencies": {
     "@quenty/cli-output-helpers": "workspace:*",
+    "inquirer": "^13.2.0",
     "latest-version": "^9.0.0",
     "semver": "^7.6.0"
   },
@@ -31,12 +32,15 @@
     "@types/semver": "^7.5.0",
     "prettier": "2.7.1",
     "typescript": "^5.9.3",
-    "typescript-memoize": "^1.1.1"
+    "typescript-memoize": "^1.1.1",
+    "vitest": "^3.0.0"
   },
   "scripts": {
     "build": "tsc --build",
     "build:watch": "tsc --build --watch",
     "build:clean": "tsc --build --clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "preinstall": "npx only-allow pnpm"
   },
   "publishConfig": {
