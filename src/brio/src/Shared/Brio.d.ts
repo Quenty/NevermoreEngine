@@ -10,7 +10,7 @@ export type Brio<T = void> = {
   ToMaidAndValue(): LuaTuple<
     [Maid, ...(T extends LuaTuple<infer V> ? V : [T])]
   >;
-  GetValue(): T extends LuaTuple<infer V> ? V : T;
+  GetValue(): T;
   GetPackedValues(): {
     n: number;
     [index: number]: T;
