@@ -9,8 +9,8 @@ type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 export type Predicate<T> = (value: T) => boolean;
 
 export namespace Rx {
-  const EMPTY: Observable;
-  const NEVER: Observable;
+  const EMPTY: Observable<any>;
+  const NEVER: Observable<any>;
 
   function pipe<T, U>(transformers: Array<Operator<T, U>>): Operator<T, U>;
 
