@@ -238,6 +238,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
           placeId: pkg.target.placeId,
           success: result.success,
           logs: result.logs,
+          // Aggregated mode reports per-package pcall time; the outer
+          // wall-clock would otherwise be identical for every package
+          // (they all await the same shared batch execution).
+          durationMs: result.durationMs,
           progressSummary: result.testCounts
             ? { kind: 'test-counts' as const, ...result.testCounts }
             : undefined,

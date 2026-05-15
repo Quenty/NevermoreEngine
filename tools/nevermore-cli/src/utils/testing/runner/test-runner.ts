@@ -12,6 +12,12 @@ export interface SingleTestResult {
   success: boolean;
   logs: string;
   testCounts?: ParsedTestCounts;
+  /**
+   * Inner script execution time, forwarded from the JobContext when it can
+   * measure pcall duration directly (aggregated batch mode). Undefined for
+   * non-aggregated cloud/local runs — callers should fall back to wall-clock.
+   */
+  durationMs?: number;
 }
 
 export interface SingleTestOptions {
@@ -66,6 +72,7 @@ export async function runSingleTestAsync(
       success: result.success && parsed.success,
       logs: parsed.logs,
       testCounts: parseTestCounts(parsed.logs),
+      durationMs: result.durationMs,
     };
   } finally {
     await context.releaseAsync(deployment);

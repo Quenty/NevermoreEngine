@@ -132,7 +132,7 @@ export class BatchScriptJobContext implements JobContext {
       return { success: false };
     }
 
-    return { success: result.success };
+    return { success: result.success, durationMs: result.durationMs };
   }
 
   async getLogsAsync(deployment: Deployment): Promise<string> {

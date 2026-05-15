@@ -5,6 +5,8 @@ export interface BatchPackageResult {
   slug: string;
   success: boolean;
   logs: string;
+  /** Inner pcall execution time reported by the Luau batch runner. */
+  durationMs?: number;
   testCounts?: ParsedTestCounts;
 }
 
@@ -15,6 +17,7 @@ const SUMMARY_MARKER = '===BATCH_TEST_SUMMARY===';
 interface SummaryEntry {
   slug: string;
   success: boolean;
+  durationMs?: number;
   error?: string;
 }
 
@@ -24,9 +27,9 @@ interface SummaryEntry {
  * The batch Luau template prints structured markers around each package's output:
  *   ===BATCH_TEST_BEGIN <slug>===
  *   ... test output ...
- *   ===BATCH_TEST_END <slug> PASS|FAIL===
+ *   ===BATCH_TEST_END <slug> PASS|FAIL <durationMs>===
  *   ===BATCH_TEST_SUMMARY===
- *   [{"slug":"maid","success":true}, ...]
+ *   [{"slug":"maid","success":true,"durationMs":1234}, ...]
  *
  * Success is determined from the JSON summary (based on pcall results), which is
  * immune to log reordering. The BEGIN/END markers are used only for splitting logs
@@ -48,9 +51,13 @@ export function parseBatchTestLogs(
   // ── Pass 1: Extract per-package log sections from markers ──
 
   const logSections = new Map<string, string>();
+  const markerDurations = new Map<string, number>();
   let currentSlug: string | null = null;
   let currentLines: string[] = [];
   let summaryLineIndex = -1;
+
+  // Matches "<slug> PASS|FAIL [<durationMs>]" — slugs have no whitespace.
+  const endInnerPattern = /^(\S+)\s+(?:PASS|FAIL)(?:\s+(\d+))?$/;
 
   for (let i = 0; i < lines.length; i++) {
     const trimmed = lines[i].trimEnd();
@@ -63,11 +70,15 @@ export function parseBatchTestLogs(
 
     if (trimmed.startsWith(END_MARKER) && trimmed.endsWith('===')) {
       const inner = trimmed.slice(END_MARKER.length, -3);
-      const spaceIndex = inner.lastIndexOf(' ');
-      const endSlug = spaceIndex >= 0 ? inner.slice(0, spaceIndex) : inner;
+      const match = endInnerPattern.exec(inner);
+      const endSlug = match ? match[1] : inner;
+      const durationStr = match?.[2];
 
       if (currentSlug && endSlug === currentSlug) {
         logSections.set(currentSlug, currentLines.join('\n'));
+        if (durationStr !== undefined) {
+          markerDurations.set(currentSlug, parseInt(durationStr, 10));
+        }
         currentSlug = null;
         currentLines = [];
       }
@@ -89,6 +100,7 @@ export function parseBatchTestLogs(
   // ── Pass 2: Parse the JSON summary for authoritative pcall results ──
 
   const summaryResults = new Map<string, boolean>();
+  const summaryDurations = new Map<string, number>();
   if (summaryLineIndex >= 0 && summaryLineIndex + 1 < lines.length) {
     const jsonLine = lines
       .slice(summaryLineIndex + 1)
@@ -98,6 +110,9 @@ export function parseBatchTestLogs(
       const entries = JSON.parse(jsonLine) as SummaryEntry[];
       for (const entry of entries) {
         summaryResults.set(entry.slug, entry.success);
+        if (typeof entry.durationMs === 'number') {
+          summaryDurations.set(entry.slug, entry.durationMs);
+        }
       }
       // Log any pcall failures from the Luau template
       const failures = entries.filter((e) => !e.success);
@@ -144,7 +159,16 @@ export function parseBatchTestLogs(
     }
 
     const testCounts = sectionLogs ? parseTestCounts(sectionLogs) : undefined;
-    results.set(packageName, { slug, success, logs: sectionLogs, testCounts });
+    // Prefer the JSON summary (authoritative, immune to log reordering);
+    // fall back to the END-marker value if the summary was truncated.
+    const durationMs = summaryDurations.get(slug) ?? markerDurations.get(slug);
+    results.set(packageName, {
+      slug,
+      success,
+      logs: sectionLogs,
+      durationMs,
+      testCounts,
+    });
   }
 
   return results;
