@@ -44,6 +44,7 @@ export class SpinnerReporter extends BaseReporter {
   private _spinnerFrame: number = 0;
   private _extraLines = 0;
   private _originalStdoutWrite: typeof process.stdout.write | undefined;
+  private _originalStderrWrite: typeof process.stderr.write | undefined;
   private _isRendering = false;
 
   constructor(state: IStateTracker, options: SpinnerReporterOptions) {
@@ -63,15 +64,24 @@ export class SpinnerReporter extends BaseReporter {
     process.stdout.write('\x1b[?25l');
     this._renderedLineCount = 0;
 
-    // Intercept stdout to track external writes that shift the cursor
+    // Intercept stdout/stderr to track external writes that shift the cursor.
+    // Both streams visually consume rows in the same terminal, so both must
+    // count toward the cursor-rewind math.
     this._originalStdoutWrite = process.stdout.write.bind(process.stdout);
+    this._originalStderrWrite = process.stderr.write.bind(process.stderr);
     const self = this;
+    const countNewlines = (chunk: any): void => {
+      if (self._isRendering) return;
+      const str = typeof chunk === 'string' ? chunk : chunk.toString();
+      self._extraLines += (str.match(/\n/g) || []).length;
+    };
     process.stdout.write = function (chunk: any, ...args: any[]) {
-      if (!self._isRendering) {
-        const str = typeof chunk === 'string' ? chunk : chunk.toString();
-        self._extraLines += (str.match(/\n/g) || []).length;
-      }
+      countNewlines(chunk);
       return self._originalStdoutWrite!.call(process.stdout, chunk, ...args);
+    } as any;
+    process.stderr.write = function (chunk: any, ...args: any[]) {
+      countNewlines(chunk);
+      return self._originalStderrWrite!.call(process.stderr, chunk, ...args);
     } as any;
 
     this._render();
@@ -88,10 +98,14 @@ export class SpinnerReporter extends BaseReporter {
     }
     this._render();
 
-    // Restore original stdout.write
+    // Restore original stdout.write / stderr.write
     if (this._originalStdoutWrite) {
       process.stdout.write = this._originalStdoutWrite;
       this._originalStdoutWrite = undefined;
+    }
+    if (this._originalStderrWrite) {
+      process.stderr.write = this._originalStderrWrite;
+      this._originalStderrWrite = undefined;
     }
 
     process.stdout.write('\x1b[?25h');
