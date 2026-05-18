@@ -17,6 +17,13 @@ export interface RunScriptOptions {
 export interface ScriptRunResult {
   /** Whether the execution infrastructure succeeded (not test assertions). */
   success: boolean;
+  /**
+   * Optional inner script execution time, reported when the context can
+   * measure it directly (e.g. aggregated batch mode reports per-package
+   * pcall durations). When undefined, callers should fall back to their own
+   * wall-clock measurement.
+   */
+  durationMs?: number;
 }
 
 /**

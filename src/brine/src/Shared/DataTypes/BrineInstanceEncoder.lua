@@ -93,6 +93,7 @@ function BrineInstanceEncoder.encodeInstance(
 	local brineInstance: any = {}
 	context:StoreSerialization(instance, brineInstance)
 
+	brineInstance.Id = context.InstanceRegistry:InstanceToId(instance)
 	brineInstance.ClassName = instance.ClassName
 	brineInstance.Properties = BrineInstanceEncoder.encodeProperties(context, instance)
 	brineInstance.Attributes = BrineInstanceEncoder.encodeAttributes(context, instance)
@@ -172,6 +173,7 @@ function BrineInstanceEncoder.decodeInstance(
 				BrineInstanceEncoder.decodeProperties(context, instance, data.Properties)
 				BrineInstanceEncoder.decodeAttributes(context, instance, data.Attributes)
 				BrineInstanceEncoder.decodeChildren(context, instance, data.Children)
+				BrineInstanceEncoder.decodeTags(context, instance, data.Tags)
 			end
 		end
 
@@ -182,10 +184,13 @@ function BrineInstanceEncoder.decodeInstance(
 end
 
 function BrineInstanceEncoder.decodeAttributes(
-	_context: BrineContext.BrineContext,
+	context: BrineContext.BrineContext,
 	instance: Instance,
 	attributes: BrineTypes.BrineAttributes?
 ): ()
+	if not context.Options.includeAttributes then
+		return
+	end
 	if not attributes then
 		return
 	end
@@ -195,11 +200,31 @@ function BrineInstanceEncoder.decodeAttributes(
 	end
 end
 
+function BrineInstanceEncoder.decodeTags(
+	context: BrineContext.BrineContext,
+	instance: Instance,
+	tags: BrineTypes.BrineTags?
+): ()
+	if not context.Options.includeTags then
+		return
+	end
+	if not tags then
+		return
+	end
+
+	for _, tag in tags do
+		instance:AddTag(tag)
+	end
+end
+
 function BrineInstanceEncoder.decodeChildren(
 	context: BrineContext.BrineContext,
 	instance: Instance,
 	children: { BrineTypes.BrineInstance }?
 ): ()
+	if not context.Options.includeDescendants then
+		return
+	end
 	if not children then
 		return
 	end
@@ -228,10 +253,56 @@ function BrineInstanceEncoder.decodeProperties(
 	end
 
 	for propertyName, value in properties do
-		-- If we constructed a different class type then the instance we need to guard against this
-		if propertyMetadata.lookup[propertyName] then
+		if propertyName == "Parent" then
+			-- Parent is filtered out of the encoded properties list (it's a containment
+			-- relationship, not a serialized property), but a live observer still needs
+			-- to forward reparenting within the source tree.
+			(instance :: any).Parent = value
+		elseif propertyMetadata.lookup[propertyName] then
+			-- If we constructed a different class type then the instance we need to guard against this
 			(instance :: any)[propertyName] = value
 		end
+	end
+end
+
+function BrineInstanceEncoder.clearProperties(
+	context: BrineContext.BrineContext,
+	instance: Instance,
+	clearedProperties: { string }?
+): ()
+	if not clearedProperties then
+		return
+	end
+
+	local propertyMetadata =
+		BrineInstanceReflection.getEncodedPropertiesMemoized(instance.ClassName, context.SecurityCapabilities)
+	if propertyMetadata == nil then
+		return
+	end
+
+	for _, propertyName in clearedProperties do
+		if propertyName == "Parent" then
+			(instance :: any).Parent = nil
+		elseif propertyMetadata.lookup[propertyName] then
+			(instance :: any)[propertyName] = nil
+		end
+	end
+end
+
+function BrineInstanceEncoder.clearAttributes(
+	context: BrineContext.BrineContext,
+	instance: Instance,
+	clearedAttributes: { string }?
+): ()
+	if not context.Options.includeAttributes then
+		return
+	end
+	if not clearedAttributes then
+		return
+	end
+
+	for _, attributeName in clearedAttributes do
+		instance:SetAttribute(attributeName, nil)
 	end
 end
 

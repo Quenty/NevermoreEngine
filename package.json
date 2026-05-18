@@ -22,7 +22,7 @@
     "build:sourcemap": "rojo sourcemap default.project.json --output sourcemap.json --absolute && npx @quenty/nevermore-cli tools strip-sourcemap-jest",
     "build:ts": "pnpm -r --filter './tools/**' --filter '!./tools/nevermore-vscode' run build",
     "format": "stylua --config-path=stylua.toml src games plugins",
-    "format:ts": "prettier --ignore-path .gitignore --write 'tools/**/*.{ts,tsx,js,jsx}'",
+    "format:ts": "prettier --ignore-path .gitignore --write \"tools/**/*.{ts,tsx,js,jsx}\"",
     "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore=**/node_modules/** --ignore=**/*.story.lua --ignore=**/*.client.lua --ignore=**/*.server.lua src",
     "lint:moonwave": "npx lerna exec --parallel -- moonwave-extractor extract src",
     "lint:prettier": "prettier --ignore-path .gitignore --check 'tools/**/*.{ts,tsx,js,jsx}'",

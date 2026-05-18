@@ -743,9 +743,15 @@ importers:
 
   src/brine:
     dependencies:
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
       '@quenty/bufferencoder':
         specifier: workspace:*
         version: link:../buffer-encoder
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -758,18 +764,27 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
       '@quenty/selectionutils':
         specifier: workspace:*
         version: link:../selectionutils
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/string':
         specifier: workspace:*
         version: link:../string
       '@quenty/symbol':
         specifier: workspace:*
         version: link:../symbol
+      '@quenty/table':
+        specifier: workspace:*
+        version: link:../table
       '@quenty/viewport':
         specifier: workspace:*
         version: link:../viewport

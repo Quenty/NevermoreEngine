@@ -2,7 +2,18 @@
  * Unit tests for the persistent plugin installer.
  */
 
+import * as path from 'path';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// The installer joins paths via node's `path.join`, which uses the host
+// separator. Compute expectations the same way so these assertions work on
+// both POSIX hosts and Windows.
+const PLUGINS_FOLDER = '/mock/plugins/folder';
+const PLUGIN_FILENAME = 'StudioBridgePersistentPlugin.rbxm';
+const EXPECTED_PLUGIN_PATH = path.join(PLUGINS_FOLDER, PLUGIN_FILENAME);
+const STAGING_PREFIX = path.join(PLUGINS_FOLDER, `.${PLUGIN_FILENAME}.tmp-`);
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const STAGING_REGEX = new RegExp(`^${escapeRegex(STAGING_PREFIX)}`);
 
 const {
   mockGetPersistentPluginPath,
@@ -83,9 +94,7 @@ describe('persistent-plugin-installer', () => {
     it('builds plugin and atomically renames into the plugins folder', async () => {
       const result = await installPersistentPluginAsync();
 
-      expect(result).toBe(
-        '/mock/plugins/folder/StudioBridgePersistentPlugin.rbxm'
-      );
+      expect(result).toBe(EXPECTED_PLUGIN_PATH);
       expect(mockCreateDirectoryContentsAsync).toHaveBeenCalled();
       // rojo builds into the temp dir, not the plugins folder.
       expect(mockRojoBuildAsync).toHaveBeenCalledWith(
@@ -98,13 +107,9 @@ describe('persistent-plugin-installer', () => {
       expect(mockCopyFile).toHaveBeenCalledTimes(1);
       expect(mockRename).toHaveBeenCalledTimes(1);
       const [renameSrc, renameDest] = mockRename.mock.calls[0];
-      expect(renameDest).toBe(
-        '/mock/plugins/folder/StudioBridgePersistentPlugin.rbxm'
-      );
+      expect(renameDest).toBe(EXPECTED_PLUGIN_PATH);
       // Staging file lives in the destination filesystem.
-      expect(renameSrc).toMatch(
-        /^\/mock\/plugins\/folder\/\.StudioBridgePersistentPlugin\.rbxm\.tmp-/
-      );
+      expect(renameSrc).toMatch(STAGING_REGEX);
     });
 
     it('cleans up build context on error', async () => {
@@ -130,9 +135,7 @@ describe('persistent-plugin-installer', () => {
         'rename failed'
       );
       expect(mockUnlink).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /^\/mock\/plugins\/folder\/\.StudioBridgePersistentPlugin\.rbxm\.tmp-/
-        )
+        expect.stringMatching(STAGING_REGEX)
       );
     });
   });

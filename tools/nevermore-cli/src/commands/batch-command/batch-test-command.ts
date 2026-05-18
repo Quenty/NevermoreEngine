@@ -26,10 +26,12 @@ import {
   type BatchTestResult,
   type BatchTestSummary,
   CompositeReporter,
+  GithubCommentTableReporter,
   GroupedReporter,
   JsonFileReporter,
   SpinnerReporter,
   SummaryTableReporter,
+  createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
 import {
   runSingleTestAsync,
@@ -174,6 +176,15 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       if (args.output) {
         reporters.push(new JsonFileReporter(state, args.output));
       }
+      if (isCI()) {
+        reporters.push(
+          new GithubCommentTableReporter(
+            state,
+            createTestCommentConfig(),
+            concurrency
+          )
+        );
+      }
       return reporters;
     }
   );
@@ -227,6 +238,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
           placeId: pkg.target.placeId,
           success: result.success,
           logs: result.logs,
+          // Aggregated mode reports per-package pcall time; the outer
+          // wall-clock would otherwise be identical for every package
+          // (they all await the same shared batch execution).
+          durationMs: result.durationMs,
           progressSummary: result.testCounts
             ? { kind: 'test-counts' as const, ...result.testCounts }
             : undefined,
@@ -273,17 +288,28 @@ function _createBroadcastReporter(
   target: Reporter,
   packageNames: string[]
 ): Reporter {
+  // Phases from the inner context apply to the whole batch in aggregated mode.
+  // The cloud poll loop re-fires 'executing' on every poll tick, and we don't
+  // want that to keep flushing identical updates downstream — dedupe on the
+  // last broadcast phase so each transition is reported exactly once.
+  let lastBroadcastPhase: JobPhase | undefined;
   return {
     startAsync: async () => {},
     stopAsync: async () => {},
     onPackageStart: () => {},
     onPackageResult: () => {},
     onPackagePhaseChange: (_name: string, phase: JobPhase) => {
+      if (lastBroadcastPhase === phase) return;
+      lastBroadcastPhase = phase;
       for (const name of packageNames) {
         target.onPackagePhaseChange(name, phase);
       }
     },
     onPackageProgressUpdate: (_name: string, progress: ProgressSummary) => {
+      // Upload progress (byte transfer) is genuinely informative when fanned
+      // out. Poll progress during 'executing' is just an incrementing counter
+      // duplicated across every row, so skip it once we're in lock-step.
+      if (lastBroadcastPhase === 'executing') return;
       for (const name of packageNames) {
         target.onPackageProgressUpdate(name, progress);
       }

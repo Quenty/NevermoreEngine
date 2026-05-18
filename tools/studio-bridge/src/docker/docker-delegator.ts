@@ -6,7 +6,7 @@
 
 import * as fs from 'fs/promises';
 import * as os from 'os';
-import * as path from 'path';
+import { posix as path } from 'path';
 import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { validateCookieAsync } from '@quenty/nevermore-cli-helpers';

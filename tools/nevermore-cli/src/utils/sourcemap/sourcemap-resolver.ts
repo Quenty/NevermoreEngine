@@ -55,7 +55,11 @@ function _walkNode(
 ): void {
   const luaFile = _findLuaFilePath(node.filePaths);
   if (luaFile) {
-    const relative = path.relative(repoRoot, luaFile);
+    // Rojo's sourcemap.json uses POSIX separators on every platform, and
+    // downstream consumers (test output, CI annotations) compare paths
+    // assuming POSIX style. Normalize so Windows backslashes from
+    // `path.relative` don't leak through.
+    const relative = path.relative(repoRoot, luaFile).replace(/\\/g, '/');
     index.set(dottedPath, relative);
   }
 

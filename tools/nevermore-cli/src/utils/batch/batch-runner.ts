@@ -7,6 +7,19 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import { type TargetPackage } from './changed-packages-utils.js';
 
+/** Partial result returned by executeAsync — durationMs is optional. */
+export type PartialBatchResult<TResult extends PackageResult> = Omit<
+  TResult,
+  'durationMs'
+> & {
+  /**
+   * Inner-measured duration. When provided, overrides the outer wall-clock
+   * timing (useful in aggregated batch mode where every package's outer
+   * await resolves at the same instant).
+   */
+  durationMs?: number;
+};
+
 export interface BatchOptions<TResult extends PackageResult> {
   packages: TargetPackage[];
   concurrency?: number;
@@ -16,7 +29,7 @@ export interface BatchOptions<TResult extends PackageResult> {
   executeAsync: (
     pkg: TargetPackage,
     reporter: Reporter
-  ) => Promise<Omit<TResult, 'durationMs'>>;
+  ) => Promise<PartialBatchResult<TResult>>;
 }
 
 export async function runBatchAsync<TResult extends PackageResult>(
@@ -85,7 +98,7 @@ async function _runOneAsync<TResult extends PackageResult>(
   executeAsync: (
     pkg: TargetPackage,
     reporter: Reporter
-  ) => Promise<Omit<TResult, 'durationMs'>>,
+  ) => Promise<PartialBatchResult<TResult>>,
   reporter: Reporter,
   bufferOutput: boolean,
   stateTracker?: IStateTracker
@@ -96,7 +109,8 @@ async function _runOneAsync<TResult extends PackageResult>(
   const execute = async (): Promise<TResult> => {
     try {
       const partial = await executeAsync(pkg, reporter);
-      return { ...partial, durationMs: Date.now() - startMs } as TResult;
+      const durationMs = partial.durationMs ?? Date.now() - startMs;
+      return { ...partial, durationMs } as TResult;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       const currentPhase = stateTracker?.getCurrentPhase(pkg.name);
