@@ -1,3 +1,19 @@
+# v12.35.0 (Mon May 18 2026)
+
+#### 🚀 Enhancement
+
+- Fix spelling mistakes + improve brine [#693](https://github.com/Quenty/NevermoreEngine/pull/693) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Fix spelling mistakes ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

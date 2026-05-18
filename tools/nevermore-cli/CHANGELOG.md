@@ -1,3 +1,21 @@
+# v4.26.0 (Mon May 18 2026)
+
+#### 🚀 Enhancement
+
+- Fix spelling mistakes + improve brine [#693](https://github.com/Quenty/NevermoreEngine/pull/693) ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): Report per-package pcall duration in aggregated batch test mode ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test: Fix tests on Windows ([@Quenty](https://github.com/Quenty))
+- fix: Ensure we broadcast test results on github ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

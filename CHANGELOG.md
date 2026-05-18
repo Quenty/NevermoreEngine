@@ -1,3 +1,16 @@
+# (Mon May 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@12.35.0`, `@quenty/brine@1.2.0`, `@quenty/camera@14.39.0`, `@quenty/servicebag@11.18.0`, `@quenty/cli-output-helpers@1.12.0`, `@quenty/nevermore-cli@4.26.0`, `@quenty/studio-bridge@0.9.0`
+  - Fix spelling mistakes + improve brine [#693](https://github.com/Quenty/NevermoreEngine/pull/693) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu May 14 2026)
 
 #### 🚀 Enhancement
