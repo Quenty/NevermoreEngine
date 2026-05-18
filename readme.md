@@ -1,7 +1,7 @@
 <div align="center">
   <h1>Nevermore</h1>
   <p>
-    <a href="http://quenty.github.io/NevermoreEngine/">
+    <a href="https://quenty.github.io/NevermoreEngine/">
       <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
     </a>
     <a href="https://discord.gg/mhtGUS8">
