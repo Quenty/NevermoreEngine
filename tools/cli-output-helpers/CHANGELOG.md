@@ -1,23 +1,13 @@
-# v1.12.0 (Mon May 18 2026)
-
-#### 🚀 Enhancement
-
-- Fix spelling mistakes + improve brine [#693](https://github.com/Quenty/NevermoreEngine/pull/693) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix rendering issues in terminal ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.12.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.11.0...@quenty/cli-output-helpers@1.12.0) (2026-05-18)
+
+### Bug Fixes
+
+- Fix rendering issues in terminal ([c7b39e7](https://github.com/Quenty/Nevermore/commit/c7b39e7f15b7db281b29cd833569334d7d26f183))
 
 # [1.11.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.10.1...@quenty/cli-output-helpers@1.11.0) (2026-05-14)
 

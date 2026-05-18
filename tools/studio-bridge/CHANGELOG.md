@@ -1,23 +1,11 @@
-# v0.9.0 (Mon May 18 2026)
-
-#### 🚀 Enhancement
-
-- Fix spelling mistakes + improve brine [#693](https://github.com/Quenty/NevermoreEngine/pull/693) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Fix tests on Windows ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [0.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.8.0...@quenty/studio-bridge@0.9.0) (2026-05-18)
+
+**Note:** Version bump only for package @quenty/studio-bridge
 
 # [0.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.7.1...@quenty/studio-bridge@0.8.0) (2026-05-14)
 

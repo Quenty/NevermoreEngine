@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.9.0...@quenty/nevermore-cli-helpers@1.10.0) (2026-05-18)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
 # [1.9.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.8.1...@quenty/nevermore-cli-helpers@1.9.0) (2026-05-14)
 
 ### Features

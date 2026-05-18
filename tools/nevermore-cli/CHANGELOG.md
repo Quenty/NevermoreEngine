@@ -1,25 +1,17 @@
-# v4.26.0 (Mon May 18 2026)
-
-#### 🚀 Enhancement
-
-- Fix spelling mistakes + improve brine [#693](https://github.com/Quenty/NevermoreEngine/pull/693) ([@Quenty](https://github.com/Quenty))
-- feat(nevermore-cli): Report per-package pcall duration in aggregated batch test mode ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Fix tests on Windows ([@Quenty](https://github.com/Quenty))
-- fix: Ensure we broadcast test results on github ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.26.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.25.0...@quenty/nevermore-cli@4.26.0) (2026-05-18)
+
+### Bug Fixes
+
+- Ensure we broadcast test results on github ([2b02240](https://github.com/Quenty/Nevermore/commit/2b022402205eb3b534f6ca33b8368bc37b6000fb))
+
+### Features
+
+- **nevermore-cli:** Report per-package pcall duration in aggregated batch test mode ([64c6aa8](https://github.com/Quenty/Nevermore/commit/64c6aa8f07a424b9fbc8a4cf0a5df2903e66660a))
 
 # [4.25.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.24.1...@quenty/nevermore-cli@4.25.0) (2026-05-14)
 
