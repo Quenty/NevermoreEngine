@@ -3,7 +3,7 @@
  * under Wine on Linux.
  */
 
-import * as path from 'path';
+import { posix as path } from 'path';
 import * as os from 'os';
 
 export interface LinuxStudioConfig {

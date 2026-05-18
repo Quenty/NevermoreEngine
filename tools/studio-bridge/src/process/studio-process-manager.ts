@@ -98,11 +98,13 @@ export function findPluginsFolder(): string {
     }
     return path.join(home, 'Documents', 'Roblox', 'Plugins');
   } else if (process.platform === 'linux') {
-    // Studio runs under Wine and resolves plugins via %LOCALAPPDATA%
+    // Studio runs under Wine and resolves plugins via %LOCALAPPDATA%.
+    // Use path.posix so the produced path is a real Linux/Wine path even
+    // when this function is exercised on a Windows host (tests).
     const winePrefix =
-      process.env.WINEPREFIX || path.join(os.homedir(), '.wine');
+      process.env.WINEPREFIX || path.posix.join(os.homedir(), '.wine');
     const wineUser = process.env.USER || os.userInfo().username;
-    return path.join(
+    return path.posix.join(
       winePrefix,
       'drive_c',
       'users',
