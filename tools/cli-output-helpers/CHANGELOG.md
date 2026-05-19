@@ -1,3 +1,24 @@
+# v1.13.0 (Tue May 19 2026)
+
+#### 🚀 Enhancement
+
+- Add additional improvements to the deployment system [#695](https://github.com/Quenty/NevermoreEngine/pull/695) ([@Quenty](https://github.com/Quenty))
+- feat: Progress summary includes version and the action word "Publishing" vs. "Deploying" ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Apply prettier formatting to spinner-reporter ([@Quenty](https://github.com/Quenty))
+- fix: Phase labels were missing data before, and now are enforced properly ([@Quenty](https://github.com/Quenty))
+- fix: Show hints and output after spinner writing ([@Quenty](https://github.com/Quenty))
+- fix: Deploying uses spinner ([@Quenty](https://github.com/Quenty))
+- fix: Deployment auto-resolves a target ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
