@@ -84,9 +84,13 @@ export namespace RxBrioUtils {
   function switchMap<T, TProject>(
     project: (value: T) => Observable<TProject>
   ): (source: Observable<Brio<T>>) => Observable<TProject>;
+
   function switchMapBrio<T, TProject>(
-    project: (value: T) => Observable<TProject> | Observable<Brio<TProject>>
+    project: (
+      ...values: T extends LuaTuple<infer V> ? V : [T]
+    ) => Observable<TProject> | Observable<Brio<TProject>>
   ): (source: Observable<Brio<T>>) => Observable<Brio<TProject>>;
+
   function flatCombineLatest<T>(
     observables: Record<string, Observable<Brio<T>> | Observable<T> | T>
   ): Observable<Record<string, T | undefined>>;
