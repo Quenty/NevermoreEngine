@@ -1,6 +1,10 @@
 import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs } from '../cli-utils.js';
-import { type PackageResult, BaseReporter } from './reporter.js';
+import {
+  type JobPhase,
+  type PackageResult,
+  BaseReporter,
+} from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
 import {
   formatProgressInline,
@@ -22,10 +26,14 @@ export interface SpinnerReporterOptions {
 
 const SPINNER_FRAMES = ['◐', '◓', '◑', '◒'];
 
-/** Emoji + label for each active phase in the spinner. */
-const PHASE_LABELS: Record<string, string> = {
+// Typed Record<JobPhase, string> so adding a new JobPhase fails the build
+// until a label is supplied here — otherwise the renderer's else branch
+// would silently flash the failure label during the missing phase.
+const PHASE_LABELS: Record<JobPhase, string> = {
   waiting: '◇ Waiting',
   building: '⚙ Building',
+  downloading: '⬇ Downloading',
+  merging: '🔀 Merging',
   combining: '🔗 Combining',
   uploading: '▲ Uploading',
   scheduling: '◇ Scheduling',
@@ -204,24 +212,12 @@ export class SpinnerReporter extends BaseReporter {
 
       let line: string;
 
-      const phaseLabel = PHASE_LABELS[state.status];
-
       if (state.status === 'pending') {
         const icon = OutputHelper.formatDim('○');
         const statusText = OutputHelper.formatDim('Queued');
         line = `  ${icon} ${OutputHelper.formatDim(
           state.name.padEnd(30)
         )} ${statusText}`;
-      } else if (phaseLabel) {
-        const icon = OutputHelper.formatInfo(spinner);
-        const progressText = formatProgressInline(state.progress);
-        const plain = progressText
-          ? `${phaseLabel} ${progressText}`
-          : phaseLabel;
-        const statusText = OutputHelper.formatInfo(plain.padEnd(22));
-        line = `  ${icon} ${state.name.padEnd(
-          30
-        )} ${statusText} ${OutputHelper.formatDim(time)}`;
       } else if (state.status === 'passed') {
         const icon = OutputHelper.formatSuccess('✓');
         const progressText = formatProgressResult(
@@ -237,13 +233,24 @@ export class SpinnerReporter extends BaseReporter {
         line = `  ${icon} ${state.name.padEnd(
           30
         )} ${statusText} ${OutputHelper.formatDim(time)}`;
-      } else {
+      } else if (state.status === 'failed') {
         const icon = OutputHelper.formatError('✗');
         const failedPhase = state.result?.failedPhase;
         const plain = failedPhase
           ? `${this._options.failureLabel ?? 'FAILED'} at ${failedPhase}`
           : this._options.failureLabel ?? 'FAILED';
         const statusText = OutputHelper.formatError(plain.padEnd(22));
+        line = `  ${icon} ${state.name.padEnd(
+          30
+        )} ${statusText} ${OutputHelper.formatDim(time)}`;
+      } else {
+        const phaseLabel = PHASE_LABELS[state.status];
+        const icon = OutputHelper.formatInfo(spinner);
+        const progressText = formatProgressInline(state.progress);
+        const plain = progressText
+          ? `${phaseLabel} ${progressText}`
+          : phaseLabel;
+        const statusText = OutputHelper.formatInfo(plain.padEnd(22));
         line = `  ${icon} ${state.name.padEnd(
           30
         )} ${statusText} ${OutputHelper.formatDim(time)}`;
