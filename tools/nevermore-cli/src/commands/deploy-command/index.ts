@@ -7,6 +7,7 @@ import {
   CompositeReporter,
   JsonFileReporter,
   SimpleReporter,
+  SpinnerReporter,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
@@ -34,6 +35,7 @@ export interface DeployArgs extends NevermoreGlobalArgs {
   createPlace?: boolean;
   placeFile?: string;
   output?: string;
+  logs?: boolean;
 }
 
 export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
@@ -125,6 +127,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           .option('output', {
             describe: 'Write JSON results to this file',
             type: 'string',
+          })
+          .option('logs', {
+            describe: 'Show build/upload logs (not just on failure)',
+            type: 'boolean',
+            default: false,
           });
       },
       async (runArgs) => {
@@ -152,11 +159,25 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
 
     let targetName: string;
+    let targetAutoDetected = false;
     if (args.target) {
       targetName = args.target;
     } else {
       const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
       targetName = resolveDefaultTargetName(config);
+      targetAutoDetected = true;
+    }
+
+    const useSpinner = process.stdout.isTTY && !args.verbose;
+    const showLogs = args.logs ?? false;
+    const deployLabels = {
+      successLabel: 'Deployed',
+      failureLabel: 'DEPLOY FAILED',
+    };
+
+    // Spinner embeds the target in its header; SimpleReporter has no header, so
+    // surface auto-detection here like before.
+    if (!useSpinner && targetAutoDetected) {
       OutputHelper.info(`Using target '${targetName}'.`);
     }
 
@@ -164,11 +185,18 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       [packageName],
       (state: LiveStateTracker) => {
         const reporters: Reporter[] = [
-          new SimpleReporter(state, {
-            alwaysShowLogs: false,
-            successMessage: 'Deploy complete!',
-            failureMessage: 'Deploy failed!',
-          }),
+          useSpinner
+            ? new SpinnerReporter(state, {
+                showLogs,
+                actionVerb: 'Deploying',
+                actionContext: `to target '${targetName}'`,
+                ...deployLabels,
+              })
+            : new SimpleReporter(state, {
+                alwaysShowLogs: showLogs,
+                successMessage: 'Deploy complete!',
+                failureMessage: 'Deploy failed!',
+              }),
         ];
         if (args.output) {
           reporters.push(new JsonFileReporter(state, args.output));
@@ -189,6 +217,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     const startMs = Date.now();
     reporter.onPackageStart(packageName);
 
+    let uploadedVersion: number | undefined;
     try {
       const builtPlace = await context.buildPlaceAsync({
         targetName,
@@ -205,6 +234,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         reporter,
         packageName,
       });
+      uploadedVersion = version;
 
       const durationMs = Date.now() - startMs;
       const action = args.publish ? 'Published' : 'Saved';
@@ -214,13 +244,6 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         logs: `${action} v${version}`,
         durationMs,
       });
-
-      if (args.publish) {
-        OutputHelper.info(`Published v${version} — live in game.`);
-      } else {
-        OutputHelper.info(`Saved v${version} — not yet live.`);
-        OutputHelper.hint('Use --publish to make it live in game.');
-      }
     } catch (err) {
       const durationMs = Date.now() - startMs;
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -240,5 +263,16 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     }
 
     await reporter.stopAsync();
+
+    // Print version summary after stopAsync so the spinner doesn't clobber it
+    // by rewinding stdout on its next render tick.
+    if (uploadedVersion !== undefined) {
+      if (args.publish) {
+        OutputHelper.info(`Published v${uploadedVersion} — live in game.`);
+      } else {
+        OutputHelper.info(`Saved v${uploadedVersion} — not yet live.`);
+        OutputHelper.hint('Use --publish to make it live in game.');
+      }
+    }
   }
 }

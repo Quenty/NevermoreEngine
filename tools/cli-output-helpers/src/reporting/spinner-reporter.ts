@@ -12,6 +12,8 @@ export interface SpinnerReporterOptions {
   showLogs: boolean;
   /** Verb used in the header, e.g. "Testing", "Deploying". Default: "Processing" */
   actionVerb?: string;
+  /** Extra context appended to the header line, e.g. "to target 'integration'". */
+  actionContext?: string;
   /** Label for successful results, e.g. "Deployed". Default: "Passed" */
   successLabel?: string;
   /** Label for failed results, e.g. "DEPLOY FAILED". Default: "FAILED" */
@@ -56,11 +58,12 @@ export class SpinnerReporter extends BaseReporter {
   override async startAsync(): Promise<void> {
     const count = this._state.total;
     const verb = this._options.actionVerb ?? 'Processing';
-    console.log(
-      OutputHelper.formatInfo(
-        `${verb} ${count} ${count === 1 ? 'package' : 'packages'}\n`
-      )
-    );
+    const noun = count === 1 ? 'package' : 'packages';
+    const context = this._options.actionContext;
+    const header = context
+      ? `${verb} ${count} ${noun} ${context}`
+      : `${verb} ${count} ${noun}`;
+    console.log(OutputHelper.formatInfo(`${header}\n`));
     process.stdout.write('\x1b[?25l');
     this._renderedLineCount = 0;
 
