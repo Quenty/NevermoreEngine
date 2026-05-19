@@ -1,3 +1,15 @@
+# v4.27.0 (Tue May 19 2026)
+
+#### 🚀 Enhancement
+
+- feat: Add better deploy UX including preview and stuff [#694](https://github.com/Quenty/NevermoreEngine/pull/694) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
