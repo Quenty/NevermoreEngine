@@ -31,7 +31,10 @@ export namespace BrioUtils {
     ...values: U
   ): Brio<
     LuaTuple<
-      [...ToTuple<T>, ...FlattenTuples<{ [K in keyof U]: ToTuple<U[K]> }>]
+      [
+        ...(T extends LuaTuple<infer V> ? V : [T]),
+        ...FlattenTuples<{ [K in keyof U]: ToTuple<U[K]> }>,
+      ]
     >
   >;
   function prepend<T>(brio: Brio<unknown[]>, ...values: ToTuple<T>): Brio<T>;
