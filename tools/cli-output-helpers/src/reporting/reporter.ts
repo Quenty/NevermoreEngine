@@ -46,7 +46,17 @@ export interface StepProgress {
   label?: string;
 }
 
-export type ProgressSummary = TestCountProgress | ByteProgress | StepProgress;
+/** Place version label: "v14" */
+export interface VersionProgress {
+  kind: 'version';
+  version: number;
+}
+
+export type ProgressSummary =
+  | TestCountProgress
+  | ByteProgress
+  | StepProgress
+  | VersionProgress;
 
 /** Result for a single package in a batch run. */
 export interface PackageResult {

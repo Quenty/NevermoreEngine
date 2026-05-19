@@ -135,10 +135,12 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   const concurrency = args.concurrency ?? 3;
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
+  const publish = args.publish ?? false;
   const deployLabels = {
-    successLabel: 'Deployed',
-    failureLabel: 'DEPLOY FAILED',
+    successLabel: publish ? 'Published' : 'Deployed',
+    failureLabel: publish ? 'PUBLISH FAILED' : 'DEPLOY FAILED',
   };
+  const actionVerb = publish ? 'Publishing' : 'Deploying';
 
   const reporter = new CompositeReporter(
     packageNames,
@@ -148,17 +150,17 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           ? new GroupedReporter(state, {
               showLogs: args.logs ?? false,
               verbose: args.verbose,
-              actionVerb: 'Deploying',
+              actionVerb,
               ...deployLabels,
             })
           : new SpinnerReporter(state, {
               showLogs: args.logs ?? false,
-              actionVerb: 'Deploying',
+              actionVerb,
               ...deployLabels,
             }),
         new SummaryTableReporter(state, {
           ...deployLabels,
-          summaryVerb: 'deployed',
+          summaryVerb: publish ? 'published' : 'deployed',
         }),
       ];
       if (args.output) {
@@ -178,7 +180,6 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   await reporter.startAsync();
 
   try {
-    const publish = args.publish ?? false;
     const results = await runBatchAsync<BatchDeployResult>({
       packages,
       concurrency,
@@ -234,6 +235,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           placeId: pkg.target.placeId,
           success: true,
           logs,
+          progressSummary: { kind: 'version', version },
         };
       },
     });

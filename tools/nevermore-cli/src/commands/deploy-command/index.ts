@@ -170,10 +170,12 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
     const useSpinner = process.stdout.isTTY && !args.verbose;
     const showLogs = args.logs ?? false;
+    const publish = args.publish ?? false;
     const deployLabels = {
-      successLabel: 'Deployed',
-      failureLabel: 'DEPLOY FAILED',
+      successLabel: publish ? 'Published' : 'Deployed',
+      failureLabel: publish ? 'PUBLISH FAILED' : 'DEPLOY FAILED',
     };
+    const actionVerb = publish ? 'Publishing' : 'Deploying';
 
     // Spinner embeds the target in its header; SimpleReporter has no header, so
     // surface auto-detection here like before.
@@ -188,7 +190,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           useSpinner
             ? new SpinnerReporter(state, {
                 showLogs,
-                actionVerb: 'Deploying',
+                actionVerb,
                 actionContext: `to target '${targetName}'`,
                 ...deployLabels,
               })
@@ -241,6 +243,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         success: true,
         logs: `${action} v${version}`,
         durationMs,
+        progressSummary: { kind: 'version', version },
       });
 
       if (args.publish) {
