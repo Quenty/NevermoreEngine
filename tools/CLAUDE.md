@@ -81,6 +81,12 @@ Single-result commands typically don't need to construct reporters by hand — p
 - Need a primitive (table, JSON, watch redraw)? Use the ones in `reporting/`. Don't add a new formatting module elsewhere.
 - Tempted to build a "format-output utility module" for your tool? You're rolling parallel infra. Stop and use `ResultReporter` instead.
 
+### SpinnerReporter and stdout
+
+While a `SpinnerReporter` is active (between `startAsync()` and `stopAsync()`), direct stdout/stderr writes (`console.log`, `OutputHelper.info`, hints, etc.) are **captured into a buffer** and flushed during `stopAsync()` rather than emitted live. This is a guardrail: the spinner repaints every 80ms via a cursor-rewind (`\x1b[NA\x1b[0J`), which would otherwise clobber any text written into the render region. The captured output appears below the final spinner frame.
+
+Takeaway: don't expect real-time progress messages from outside the reporter to show up on TTY. End-of-run summaries can be printed before *or* after `stopAsync` and will surface either way.
+
 ## Error Handling
 
 Two patterns, depending on whether failure is expected:

@@ -37,6 +37,14 @@ const PHASE_LABELS: Record<string, string> = {
 /**
  * TTY spinner rendering for batch job progress.
  * Reads all state from IStateTracker; re-renders on a timer interval.
+ *
+ * Stdout/stderr writes between startAsync() and stopAsync() are *captured*,
+ * not passed through. The spinner repaints by rewinding the cursor with
+ * `\x1b[NA\x1b[0J`, so any write that landed inside the spinner's render
+ * region would be erased on the next 80ms tick. Callers should not have to
+ * think about that — we buffer writes and flush them in stopAsync(), so
+ * `console.log` / `OutputHelper.info` / etc. during a run still surface,
+ * just after the spinner has finished.
  */
 export class SpinnerReporter extends BaseReporter {
   private _state: IStateTracker;
@@ -44,7 +52,7 @@ export class SpinnerReporter extends BaseReporter {
   private _renderedLineCount: number = 0;
   private _renderInterval?: ReturnType<typeof setInterval>;
   private _spinnerFrame: number = 0;
-  private _extraLines = 0;
+  private _capturedOutput: string = '';
   private _originalStdoutWrite: typeof process.stdout.write | undefined;
   private _originalStderrWrite: typeof process.stderr.write | undefined;
   private _isRendering = false;
@@ -67,25 +75,36 @@ export class SpinnerReporter extends BaseReporter {
     process.stdout.write('\x1b[?25l');
     this._renderedLineCount = 0;
 
-    // Intercept stdout/stderr to track external writes that shift the cursor.
-    // Both streams visually consume rows in the same terminal, so both must
-    // count toward the cursor-rewind math.
+    // Intercept stdout/stderr. External writes during the spinner are
+    // captured into a buffer instead of going to the terminal, otherwise the
+    // next 80ms render tick would clobber them via the cursor-rewind. The
+    // buffer is flushed in stopAsync() so callers still see their output —
+    // just after the spinner finishes. Writes made *by* the spinner itself
+    // (_isRendering=true) pass through normally.
     this._originalStdoutWrite = process.stdout.write.bind(process.stdout);
     this._originalStderrWrite = process.stderr.write.bind(process.stderr);
     const self = this;
-    const countNewlines = (chunk: any): void => {
-      if (self._isRendering) return;
-      const str = typeof chunk === 'string' ? chunk : chunk.toString();
-      self._extraLines += (str.match(/\n/g) || []).length;
-    };
-    process.stdout.write = function (chunk: any, ...args: any[]) {
-      countNewlines(chunk);
-      return self._originalStdoutWrite!.call(process.stdout, chunk, ...args);
-    } as any;
-    process.stderr.write = function (chunk: any, ...args: any[]) {
-      countNewlines(chunk);
-      return self._originalStderrWrite!.call(process.stderr, chunk, ...args);
-    } as any;
+    const intercept =
+      (originalWrite: typeof process.stdout.write, stream: NodeJS.WriteStream) =>
+        function (chunk: any, ...args: any[]) {
+          if (self._isRendering) {
+            return originalWrite.call(stream, chunk, ...args);
+          }
+          const str = typeof chunk === 'string' ? chunk : chunk.toString();
+          self._capturedOutput += str;
+          // Invoke the optional Node-style completion callback if present.
+          const cb = args.find((a) => typeof a === 'function');
+          if (cb) cb();
+          return true;
+        };
+    process.stdout.write = intercept(
+      this._originalStdoutWrite,
+      process.stdout
+    ) as any;
+    process.stderr.write = intercept(
+      this._originalStderrWrite,
+      process.stderr
+    ) as any;
 
     this._render();
     this._renderInterval = setInterval(() => {
@@ -113,6 +132,13 @@ export class SpinnerReporter extends BaseReporter {
 
     process.stdout.write('\x1b[?25h');
     console.log('');
+
+    // Flush anything captured during the run. Goes out *after* the final
+    // spinner frame so callers see their late prints below the progress.
+    if (this._capturedOutput.length > 0) {
+      process.stdout.write(this._capturedOutput);
+      this._capturedOutput = '';
+    }
 
     if (this._options.showLogs) {
       this._printAllLogs();
@@ -235,10 +261,8 @@ export class SpinnerReporter extends BaseReporter {
 
     this._isRendering = true;
     let frame = '';
-    const totalLines = this._renderedLineCount + this._extraLines;
-    this._extraLines = 0;
-    if (totalLines > 0) {
-      frame += `\x1b[${totalLines}A\x1b[0J`;
+    if (this._renderedLineCount > 0) {
+      frame += `\x1b[${this._renderedLineCount}A\x1b[0J`;
     }
     frame += lines.join('\n') + '\n';
     process.stdout.write(frame);

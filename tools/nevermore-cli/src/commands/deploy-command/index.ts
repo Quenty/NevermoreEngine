@@ -217,7 +217,6 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     const startMs = Date.now();
     reporter.onPackageStart(packageName);
 
-    let uploadedVersion: number | undefined;
     try {
       const builtPlace = await context.buildPlaceAsync({
         targetName,
@@ -234,7 +233,6 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         reporter,
         packageName,
       });
-      uploadedVersion = version;
 
       const durationMs = Date.now() - startMs;
       const action = args.publish ? 'Published' : 'Saved';
@@ -244,6 +242,13 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         logs: `${action} v${version}`,
         durationMs,
       });
+
+      if (args.publish) {
+        OutputHelper.info(`Published v${version} — live in game.`);
+      } else {
+        OutputHelper.info(`Saved v${version} — not yet live.`);
+        OutputHelper.hint('Use --publish to make it live in game.');
+      }
     } catch (err) {
       const durationMs = Date.now() - startMs;
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -263,16 +268,5 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     }
 
     await reporter.stopAsync();
-
-    // Print version summary after stopAsync so the spinner doesn't clobber it
-    // by rewinding stdout on its next render tick.
-    if (uploadedVersion !== undefined) {
-      if (args.publish) {
-        OutputHelper.info(`Published v${uploadedVersion} — live in game.`);
-      } else {
-        OutputHelper.info(`Saved v${uploadedVersion} — not yet live.`);
-        OutputHelper.hint('Use --publish to make it live in game.');
-      }
-    }
   }
 }
