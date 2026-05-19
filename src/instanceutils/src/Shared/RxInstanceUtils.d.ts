@@ -5,7 +5,12 @@ export namespace RxInstanceUtils {
   function observeProperty<
     T extends Instance,
     K extends keyof InstanceProperties<T>,
-  >(instance: T, propertyName: K): Observable<InstanceProperties<T>[K]>;
+  >(
+    instance: T,
+    propertyName: K
+  ): Observable<
+    LuaTuple<[propertyValue: InstanceProperties<T>[K], instance: T]>
+  >;
   function observeAncestry(instance: Instance): Observable<Instance>;
   function observeFirstAncestorBrio<T extends keyof Instances>(
     instance: Instance,
