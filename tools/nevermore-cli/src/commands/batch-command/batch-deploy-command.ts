@@ -206,6 +206,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         // Run smoke test for targets with basePlace
         let logs: string;
         if (pkg.target.basePlace) {
+          OutputHelper.verbose('Running post-deploy smoke test...');
           const smokeResult = await _runSmokeTestAsync(
             pkgReporter,
             pkg.name,
@@ -220,7 +221,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
               packageName: pkg.name,
               placeId: pkg.target.placeId,
               success: false,
-              logs,
+              logs: _annotateSmokeTestFailure(logs),
             };
           }
         } else {
@@ -243,6 +244,17 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   } finally {
     await context.disposeAsync();
   }
+}
+
+function _annotateSmokeTestFailure(logs: string): string {
+  const header =
+    'Post-deploy smoke test failed. The deploy itself succeeded, but a server ' +
+    "script errored on boot. ('TaskScript' in any stack trace below refers to " +
+    "Nevermore's smoke-test-server.luau, which loadstring()s each Script under " +
+    'ServerScriptService — if you see "loadstring() is not available", set ' +
+    '$properties.LoadStringEnabled = true on ServerScriptService in your ' +
+    'rojo project.)';
+  return `${header}\n\n${logs}`;
 }
 
 async function _runSmokeTestAsync(
