@@ -1,27 +1,20 @@
-# v4.28.0 (Tue May 19 2026)
-
-#### 🚀 Enhancement
-
-- Add additional improvements to the deployment system [#695](https://github.com/Quenty/NevermoreEngine/pull/695) ([@Quenty](https://github.com/Quenty))
-- feat: Progress summary includes version and the action word "Publishing" vs. "Deploying" ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Smoke test failures are more clear ([@Quenty](https://github.com/Quenty))
-- fix: Show hints and output after spinner writing ([@Quenty](https://github.com/Quenty))
-- fix: Deploying uses spinner ([@Quenty](https://github.com/Quenty))
-- fix: Deployment auto-resolves a target ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.28.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.27.0...@quenty/nevermore-cli@4.28.0) (2026-05-19)
+
+### Bug Fixes
+
+- Deploying uses spinner ([51f485d](https://github.com/Quenty/Nevermore/commit/51f485d00925cbba4cc23eb6b767ca3bfef34dea))
+- Deployment auto-resolves a target ([1114a01](https://github.com/Quenty/Nevermore/commit/1114a0150d133d5223be9ce8b8ee056ea09c9285))
+- Show hints and output after spinner writing ([fcac46d](https://github.com/Quenty/Nevermore/commit/fcac46d8bb9c8869b07a1522e3fcab5a11f96535))
+- Smoke test failures are more clear ([3acb5c3](https://github.com/Quenty/Nevermore/commit/3acb5c3f18b562ba379daf3e49d1c0c4cc753977))
+
+### Features
+
+- Progress summary includes version and the action word "Publishing" vs. "Deploying" ([ae1313f](https://github.com/Quenty/Nevermore/commit/ae1313f78e49a255f31f9f8b87bce4755ee01400))
 
 # [4.27.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.26.0...@quenty/nevermore-cli@4.27.0) (2026-05-19)
 

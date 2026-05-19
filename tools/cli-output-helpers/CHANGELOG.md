@@ -1,28 +1,20 @@
-# v1.13.0 (Tue May 19 2026)
-
-#### 🚀 Enhancement
-
-- Add additional improvements to the deployment system [#695](https://github.com/Quenty/NevermoreEngine/pull/695) ([@Quenty](https://github.com/Quenty))
-- feat: Progress summary includes version and the action word "Publishing" vs. "Deploying" ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Apply prettier formatting to spinner-reporter ([@Quenty](https://github.com/Quenty))
-- fix: Phase labels were missing data before, and now are enforced properly ([@Quenty](https://github.com/Quenty))
-- fix: Show hints and output after spinner writing ([@Quenty](https://github.com/Quenty))
-- fix: Deploying uses spinner ([@Quenty](https://github.com/Quenty))
-- fix: Deployment auto-resolves a target ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.13.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.12.0...@quenty/cli-output-helpers@1.13.0) (2026-05-19)
+
+### Bug Fixes
+
+- Deploying uses spinner ([51f485d](https://github.com/Quenty/Nevermore/commit/51f485d00925cbba4cc23eb6b767ca3bfef34dea))
+- Deployment auto-resolves a target ([1114a01](https://github.com/Quenty/Nevermore/commit/1114a0150d133d5223be9ce8b8ee056ea09c9285))
+- Phase labels were missing data before, and now are enforced properly ([79f8b4c](https://github.com/Quenty/Nevermore/commit/79f8b4ca1a9ef741e57f94a20ba1b13ce8e6f4d9))
+- Show hints and output after spinner writing ([fcac46d](https://github.com/Quenty/Nevermore/commit/fcac46d8bb9c8869b07a1522e3fcab5a11f96535))
+
+### Features
+
+- Progress summary includes version and the action word "Publishing" vs. "Deploying" ([ae1313f](https://github.com/Quenty/Nevermore/commit/ae1313f78e49a255f31f9f8b87bce4755ee01400))
 
 # [1.12.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.11.0...@quenty/cli-output-helpers@1.12.0) (2026-05-18)
 
