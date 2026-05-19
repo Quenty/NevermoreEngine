@@ -1,9 +1,22 @@
 import { RxSignal } from '@quenty/rxsignal';
 import { ValueBaseType } from './ValueBaseUtils';
-import { ValueObjectLike } from '@quenty/valueobject';
 
-interface ValueBaseValue<T> extends ValueObjectLike<T> {
-  Changed: RxSignal<T>;
+interface ValueBaseValue<T> {
+  Value: T;
+  Changed: RxSignal<LuaTuple<[value: T, instance: Instance]>>;
+  Observe(): Observable<LuaTuple<[value: T, instance: Instance]>>;
+  ObserveBrio(): Observable<Brio<LuaTuple<[value: T, instance: Instance]>>>;
+  ObserveBrio(
+    predicate: (value: T) => value is NonNullable<T>
+  ): Observable<Brio<LuaTuple<[value: NonNullable<T>, instance: Instance]>>>;
+  ObserveBrio(
+    predicate: (value: T) => value is Exclude<T, NonNullable<T>>
+  ): Observable<
+    Brio<LuaTuple<[value: Exclude<T, NonNullable<T>>, instance: Instance]>>
+  >;
+  ObserveBrio(
+    predicate: (value: T) => boolean
+  ): Observable<Brio<LuaTuple<[value: T, instance: Instance]>>>;
 }
 
 interface ValueBaseValueConstructor {
