@@ -9,6 +9,7 @@ import {
 import {
   getRobloxCookieAsync,
   createPlaceInUniverseAsync,
+  findGitRepoRootAsync,
 } from '@quenty/nevermore-cli-helpers';
 import {
   fileExistsAsync,
@@ -19,6 +20,7 @@ import { promptPlaceIdAsync } from './deploy-init-prompts.js';
 import {
   detectProjectFileAsync,
   detectScriptFileAsync,
+  detectTargetNameAsync,
 } from './deploy-init-utils.js';
 
 interface InitState {
@@ -30,6 +32,7 @@ interface InitState {
   placeId?: number;
   project?: string;
   scriptTemplate?: string;
+  mode: 'auto' | 'interactive' | 'non-interactive';
 }
 
 export async function handleInitAsync(args: DeployArgs): Promise<void> {
@@ -53,7 +56,7 @@ export async function handleInitAsync(args: DeployArgs): Promise<void> {
   if (args.yes) {
     await resolveNonInteractive(args, state);
   } else {
-    await resolveInteractive(args, state);
+    await resolveInteractiveAsync(args, state);
   }
 
   await writeConfig(args, state, deployJsonPath);
@@ -66,25 +69,14 @@ async function detectDefaults(
   const packageName = path.basename(packagePath);
   const placeName = await buildPlaceNameAsync(packagePath);
 
-  OutputHelper.info(`Setting up deploy.nevermore.json for ${packageName}`);
-
   const detectedProject = await detectProjectFileAsync(packagePath);
   const detectedScript = await detectScriptFileAsync(packagePath);
-
-  if (detectedProject) {
-    OutputHelper.info(`Detected rojo project: ${detectedProject}`);
-  }
-  if (detectedScript) {
-    OutputHelper.info(`Detected test script: ${detectedScript}`);
-  }
+  const detectedTarget = await detectTargetNameAsync(packagePath);
 
   let universeId = args.universeId;
   if (!universeId) {
     const discovered = await discoverUniverseIdAsync(packagePath);
     if (discovered) {
-      OutputHelper.info(
-        `Discovered universe ID ${discovered} from parent deploy.nevermore.json`
-      );
       universeId = discovered;
     }
   }
@@ -93,11 +85,12 @@ async function detectDefaults(
     packagePath,
     packageName,
     placeName,
-    targetName: args.target ?? 'test',
+    targetName: args.target ?? detectedTarget,
     universeId,
     placeId: args.placeId,
     project: args.project ?? detectedProject,
     scriptTemplate: args.scriptTemplate ?? detectedScript,
+    mode: args.yes ? 'non-interactive' : 'interactive',
   };
 }
 
@@ -108,6 +101,9 @@ async function resolveNonInteractive(
   const missing: string[] = [];
   if (!state.universeId) missing.push('--universe-id');
   if (!state.project) missing.push('--project');
+  if (isTestTarget(state) && !state.scriptTemplate) {
+    missing.push('--script-template');
+  }
   if (missing.length > 0) {
     throw new Error(
       `Missing required flags for non-interactive mode: ${missing.join(', ')}`
@@ -130,77 +126,101 @@ async function resolveNonInteractive(
   }
 }
 
-async function resolveInteractive(
+async function resolveInteractiveAsync(
   args: DeployArgs,
   state: InitState
 ): Promise<void> {
-  if (state.universeId && state.placeId && state.project) {
-    return;
-  }
-
-  if (await tryAutoSetup(state)) {
-    return;
-  }
-
-  await promptUniverseId(args, state);
-  await promptPlaceId(state);
-  await promptProjectAndScript(args, state);
+  await promptModeAsync(state);
+  await ensureUniverseIdAsync(args, state); // Resolves targetName before script prompt
+  await ensureProjectAndScriptAsync(args, state);
+  await ensurePromptPlaceIdAsync(state); // This modifies the cloud, so is last
 }
 
-async function tryAutoSetup(state: InitState): Promise<boolean> {
-  if (!state.universeId || !state.project || state.placeId) {
-    return false;
-  }
+function isTestTarget(state: InitState): boolean {
+  return state.targetName === 'test';
+}
+
+async function promptModeAsync(state: InitState): Promise<void> {
+  const repoRoot = await findGitRepoRootAsync(state.packagePath);
+  const deployJsonPath = path.join(state.packagePath, 'deploy.nevermore.json');
+  const displayPath = repoRoot
+    ? path.relative(repoRoot, deployJsonPath).replace(/\\/g, '/')
+    : `${state.packageName}/deploy.nevermore.json`;
+
+  const autoPreview = buildAutoPreview(state);
 
   const { mode } = await inquirer.prompt([
     {
       type: 'select',
       name: 'mode',
-      message: 'How would you like to set up?',
+      message: `How would you like to set up ${displayPath}?`,
       choices: [
         {
-          name: `Setup automatically (creates a new place in universe ${state.universeId})`,
+          name: `Automatically set up as '${state.targetName}' target`,
           value: 'auto',
+          description: `\nPreview:\n${autoPreview}`,
         },
         {
-          name: 'Configure manually',
-          value: 'manual',
+          name: 'Manually configure each field',
+          value: 'interactive',
+          description: '\nWalk through prompts for each field.',
         },
       ],
     },
   ]);
 
-  if (mode !== 'auto') {
-    return false;
-  }
-
-  const cookie = await getRobloxCookieAsync();
-  state.placeId = await createPlaceInUniverseAsync(
-    cookie,
-    state.universeId,
-    state.placeName
-  );
-  return true;
+  state.mode = mode;
 }
 
-async function promptUniverseId(
+function buildAutoPreview(state: InitState): string {
+  const projectDefault = 'test/default.project.json';
+  const scriptDefault = 'test/scripts/Server/ServerMain.server.lua';
+
+  const target: Record<string, unknown> = {
+    universeId: state.universeId ?? '<prompted>',
+    placeId: '<auto-created>',
+    project:
+      state.project ?? `<prompted — ${projectDefault} not found, create it>`,
+  };
+  if (state.scriptTemplate) {
+    target.scriptTemplate = state.scriptTemplate;
+  } else if (isTestTarget(state)) {
+    target.scriptTemplate = `<prompted — ${scriptDefault} not found, create it>`;
+  }
+
+  return JSON.stringify({ targets: { [state.targetName]: target } }, null, 2);
+}
+
+async function ensureUniverseIdAsync(
   args: DeployArgs,
   state: InitState
 ): Promise<void> {
   const answers = await inquirer.prompt([
     {
-      type: 'input',
+      type: 'select',
       name: 'targetName',
       message: 'Target name:',
       default: state.targetName,
-      when: () => !args.target,
+      choices: [
+        {
+          name: 'test — unit-test place with a script template',
+          value: 'test',
+        },
+        {
+          name: 'integration — integration game / place without a test script',
+          value: 'integration',
+        },
+      ],
+      when: () => !args.target && state.mode !== 'auto',
     },
     {
       type: 'number',
       name: 'universeId',
       message:
         'Universe ID (find at https://create.roblox.com/dashboard/creations):',
-      when: () => !state.universeId,
+      default: state.universeId,
+      when: () =>
+        !args.universeId && (state.mode === 'interactive' || !state.universeId),
       validate: (input: number) =>
         Number.isInteger(input) && input > 0
           ? true
@@ -212,18 +232,36 @@ async function promptUniverseId(
   state.universeId = answers.universeId ?? state.universeId;
 }
 
-async function promptPlaceId(state: InitState): Promise<void> {
-  if (state.placeId || !state.universeId) {
-    return;
+async function ensurePromptPlaceIdAsync(state: InitState): Promise<void> {
+  if (!state.universeId) {
+    throw new Error('Universe ID is required to set up place ID');
   }
 
-  state.placeId = await promptPlaceIdAsync(state.universeId, state.placeName);
+  try {
+    const cookie = await getRobloxCookieAsync();
+    state.placeId = await createPlaceInUniverseAsync(
+      cookie,
+      state.universeId,
+      state.placeName
+    );
+  } catch (err) {
+    OutputHelper.warn(
+      `Failed to auto-create place in universe ${state.universeId}: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
+
+    state.placeId = await promptPlaceIdAsync(state.universeId, state.placeName);
+  }
 }
 
-async function promptProjectAndScript(
+async function ensureProjectAndScriptAsync(
   args: DeployArgs,
   state: InitState
 ): Promise<void> {
+  const scriptRequired = isTestTarget(state);
+  const needsScript = !state.scriptTemplate && !args.scriptTemplate;
+
   const answers = await inquirer.prompt([
     {
       type: 'input',
@@ -242,22 +280,21 @@ async function promptProjectAndScript(
     {
       type: 'confirm',
       name: 'hasScript',
-      message: state.scriptTemplate
-        ? `Run ${state.scriptTemplate} via Open Cloud after upload? (smoke test)`
-        : 'Run a Luau script template after upload? (e.g. a smoke test that boots the place via Open Cloud)',
-      default: !!state.scriptTemplate,
-      when: () => !args.scriptTemplate,
+      message: 'Include a Luau testing script?',
+      default: false,
+      when: () => needsScript && state.mode !== 'auto' && !scriptRequired,
     },
     {
       type: 'input',
       name: 'scriptTemplate',
-      message: 'Script template file (relative to package):',
-      default:
-        state.scriptTemplate ?? 'test/scripts/Server/ServerMain.server.lua',
+      message: scriptRequired
+        ? 'Script template file for test target (required, relative to package):'
+        : 'Script template file (relative to package):',
+      default: 'test/scripts/Server/ServerMain.server.lua',
       when: (promptAnswers: { hasScript?: boolean }) =>
-        !args.scriptTemplate &&
-        promptAnswers.hasScript &&
-        !state.scriptTemplate,
+        needsScript &&
+        (scriptRequired ||
+          (state.mode !== 'auto' && !!promptAnswers.hasScript)),
       validate: async (input: string) => {
         const fullPath = path.resolve(state.packagePath, input);
         if (await fileExistsAsync(fullPath)) {
@@ -269,9 +306,7 @@ async function promptProjectAndScript(
   ]);
 
   state.project = answers.project ?? state.project;
-  if (answers.hasScript === false) {
-    state.scriptTemplate = undefined;
-  } else if (answers.scriptTemplate) {
+  if (answers.scriptTemplate) {
     state.scriptTemplate = answers.scriptTemplate;
   }
 }
@@ -303,21 +338,6 @@ async function writeConfig(
   }
 
   console.log(configJson);
-  if (!args.yes) {
-    const { confirm } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'confirm',
-        message: `Write deploy.nevermore.json to ${state.packageName}?`,
-        default: true,
-      },
-    ]);
-    if (!confirm) {
-      OutputHelper.info('Aborted.');
-      return;
-    }
-  }
-
   await fs.writeFile(deployJsonPath, configJson + '\n');
   OutputHelper.info(`Created ${deployJsonPath}`);
 }

@@ -1,5 +1,7 @@
 export { VersionChecker } from './version-checker.js';
 
+export { findGitRepoRootAsync } from './find-git-repo-root.js';
+
 export {
   getRobloxCookieAsync,
   createPlaceInUniverseAsync,
