@@ -34,8 +34,12 @@ export class SimpleReporter extends BaseReporter {
 
     if (result.logs && showLogs) {
       console.log(result.logs);
-    } else if (showLogs) {
+    } else if (showLogs && !result.error) {
       OutputHelper.info('(no output)');
+    }
+
+    if (result.error) {
+      OutputHelper.error(result.error);
     }
 
     const progressText = formatProgressResult(result.progressSummary);

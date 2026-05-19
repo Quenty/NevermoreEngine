@@ -12,10 +12,9 @@ function setup() {
 
   // Capture everything written to stdout
   const writes: string[] = [];
-  const realWrite = process.stdout.write.bind(process.stdout);
   vi.spyOn(process.stdout, 'write').mockImplementation(((
     chunk: any,
-    ...args: any[]
+    ..._args: any[]
   ) => {
     writes.push(typeof chunk === 'string' ? chunk : chunk.toString());
     return true;
@@ -24,7 +23,7 @@ function setup() {
   // Suppress console.log (used by startAsync header)
   vi.spyOn(console, 'log').mockImplementation(() => {});
 
-  return { state, spinner, writes, realWrite };
+  return { state, spinner, writes };
 }
 
 /** Extract cursor-up escape codes (\x1b[NA) from captured writes. */
@@ -39,7 +38,7 @@ function extractCursorUps(writes: string[]): number[] {
   return results;
 }
 
-describe('SpinnerReporter stdout resilience', () => {
+describe('SpinnerReporter cursor math', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -49,7 +48,7 @@ describe('SpinnerReporter stdout resilience', () => {
     vi.restoreAllMocks();
   });
 
-  it('cursor-up matches rendered line count with no external writes', async () => {
+  it('cursor-up matches rendered line count', async () => {
     const { state, spinner, writes } = setup();
 
     state.onPackageStart('pkg-a');
@@ -69,65 +68,96 @@ describe('SpinnerReporter stdout resilience', () => {
     await spinner.stopAsync();
   });
 
-  it('accounts for single external stdout write between renders', async () => {
+  it('cursor-up ignores external writes (they are captured, not emitted)', async () => {
     const { state, spinner, writes } = setup();
 
     state.onPackageStart('pkg-a');
     await spinner.startAsync();
 
-    // Simulate an external write between renders
+    // External writes during the spinner are buffered, not sent to the terminal.
     process.stdout.write('external log\n');
+    process.stdout.write('more\nstuff\n');
 
     writes.length = 0;
     vi.advanceTimersByTime(80);
 
-    // Should be 3 (rendered) + 1 (external) = 4
-    const ups = extractCursorUps(writes);
-    expect(ups.length).toBe(1);
-    expect(ups[0]).toBe(4);
-
-    await spinner.stopAsync();
-  });
-
-  it('accounts for multiple external stdout writes', async () => {
-    const { state, spinner, writes } = setup();
-
-    state.onPackageStart('pkg-a');
-    await spinner.startAsync();
-
-    // 3 external lines
-    process.stdout.write('line1\n');
-    process.stdout.write('line2\nline3\n');
-
-    writes.length = 0;
-    vi.advanceTimersByTime(80);
-
-    // Should be 3 (rendered) + 3 (external) = 6
-    const ups = extractCursorUps(writes);
-    expect(ups.length).toBe(1);
-    expect(ups[0]).toBe(6);
-
-    await spinner.stopAsync();
-  });
-
-  it('resets extra line count after each render', async () => {
-    const { state, spinner, writes } = setup();
-
-    state.onPackageStart('pkg-a');
-    await spinner.startAsync();
-
-    // External write before render 2
-    process.stdout.write('noise\n');
-    vi.advanceTimersByTime(80);
-
-    // No external write before render 3
-    writes.length = 0;
-    vi.advanceTimersByTime(80);
-
-    // Render 3 should only cursor-up by renderedLineCount (3), no extras
+    // Still just 3 — external writes never actually reach stdout, so they
+    // can't shift the cursor.
     const ups = extractCursorUps(writes);
     expect(ups.length).toBe(1);
     expect(ups[0]).toBe(3);
+
+    await spinner.stopAsync();
+  });
+});
+
+describe('SpinnerReporter output capture', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('captures writes during the run and flushes them on stop', async () => {
+    const { state, spinner, writes } = setup();
+
+    state.onPackageStart('pkg-a');
+    await spinner.startAsync();
+
+    // Capture index where post-spinner output begins.
+    process.stdout.write('hello\n');
+    process.stdout.write('world\n');
+
+    // Verify nothing was emitted live (only spinner frames so far).
+    expect(writes.join('')).not.toContain('hello');
+    expect(writes.join('')).not.toContain('world');
+
+    await spinner.stopAsync();
+
+    // After stopAsync, the captured output must have been flushed.
+    const all = writes.join('');
+    expect(all).toContain('hello');
+    expect(all).toContain('world');
+    // Order is preserved
+    expect(all.indexOf('hello')).toBeLessThan(all.indexOf('world'));
+  });
+
+  it('captures stderr writes too', async () => {
+    const { state, spinner, writes } = setup();
+    // Intercept stderr the same way stdout is mocked.
+    vi.spyOn(process.stderr, 'write').mockImplementation(((
+      chunk: any,
+      ..._args: any[]
+    ) => {
+      writes.push(typeof chunk === 'string' ? chunk : chunk.toString());
+      return true;
+    }) as any);
+
+    state.onPackageStart('pkg-a');
+    await spinner.startAsync();
+
+    process.stderr.write('err line\n');
+
+    expect(writes.join('')).not.toContain('err line');
+
+    await spinner.stopAsync();
+
+    expect(writes.join('')).toContain('err line');
+  });
+
+  it('invokes the Node-style completion callback on captured writes', async () => {
+    const { state, spinner } = setup();
+
+    state.onPackageStart('pkg-a');
+    await spinner.startAsync();
+
+    const cb = vi.fn();
+    process.stdout.write('payload\n', cb);
+
+    expect(cb).toHaveBeenCalledTimes(1);
 
     await spinner.stopAsync();
   });

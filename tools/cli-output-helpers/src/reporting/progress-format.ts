@@ -31,6 +31,8 @@ export function formatProgressInline(progress?: ProgressSummary): string {
       }
       // Indeterminate: show label or just the count
       return progress.label ? `(${progress.label})` : `(${progress.completed})`;
+    case 'version':
+      return `(v${progress.version})`;
   }
 }
 
@@ -52,6 +54,8 @@ export function formatProgressResult(progress?: ProgressSummary): string {
       return `(${_formatBytes(progress.totalBytes)})`;
     case 'steps':
       return `(${progress.completed}/${progress.total})`;
+    case 'version':
+      return `(v${progress.version})`;
   }
 }
 
