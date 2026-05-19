@@ -1,10 +1,6 @@
 import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs } from '../cli-utils.js';
-import {
-  type JobPhase,
-  type PackageResult,
-  BaseReporter,
-} from './reporter.js';
+import { type JobPhase, type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
 import {
   formatProgressInline,
@@ -92,19 +88,21 @@ export class SpinnerReporter extends BaseReporter {
     this._originalStdoutWrite = process.stdout.write.bind(process.stdout);
     this._originalStderrWrite = process.stderr.write.bind(process.stderr);
     const self = this;
-    const intercept =
-      (originalWrite: typeof process.stdout.write, stream: NodeJS.WriteStream) =>
-        function (chunk: any, ...args: any[]) {
-          if (self._isRendering) {
-            return originalWrite.call(stream, chunk, ...args);
-          }
-          const str = typeof chunk === 'string' ? chunk : chunk.toString();
-          self._capturedOutput += str;
-          // Invoke the optional Node-style completion callback if present.
-          const cb = args.find((a) => typeof a === 'function');
-          if (cb) cb();
-          return true;
-        };
+    const intercept = (
+      originalWrite: typeof process.stdout.write,
+      stream: NodeJS.WriteStream
+    ) =>
+      function (chunk: any, ...args: any[]) {
+        if (self._isRendering) {
+          return originalWrite.call(stream, chunk, ...args);
+        }
+        const str = typeof chunk === 'string' ? chunk : chunk.toString();
+        self._capturedOutput += str;
+        // Invoke the optional Node-style completion callback if present.
+        const cb = args.find((a) => typeof a === 'function');
+        if (cb) cb();
+        return true;
+      };
     process.stdout.write = intercept(
       this._originalStdoutWrite,
       process.stdout
