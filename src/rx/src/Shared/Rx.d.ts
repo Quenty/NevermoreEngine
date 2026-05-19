@@ -1,8 +1,8 @@
-import { Observable, Operator } from './Observable';
-import { MaidTask } from '@quenty/maid';
-import { Signal, SignalLike } from '@quenty/signal';
 import { CancelToken } from '@quenty/canceltoken';
+import { MaidTask } from '@quenty/maid';
 import { Promise } from '@quenty/promise';
+import { Signal, SignalLike } from '@quenty/signal';
+import { Observable, Operator } from './Observable';
 
 type ToTuple<T> = T extends [unknown, ...unknown[]] ? T : [T];
 
@@ -107,7 +107,11 @@ export namespace Rx {
   >(
     observables: T
   ): Observable<{
-    [K in keyof T]: T[K] extends Observable<infer V> ? V : T[K];
+    [K in keyof T]: T[K] extends Observable<infer V>
+      ? V extends LuaTuple<infer L>
+        ? L[0]
+        : V
+      : T[K];
   }>;
   const combineLatestDefer: typeof combineLatest;
   function defer<T>(observableFactory: () => Observable<T>): Observable<T>;
