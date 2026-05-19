@@ -15,6 +15,11 @@ import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
+import {
+  loadDeployConfigAsync,
+  resolveDefaultTargetName,
+  resolveDeployConfigPath,
+} from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
 
 export interface DeployArgs extends NevermoreGlobalArgs {
@@ -91,9 +96,9 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       (yargs) => {
         return yargs
           .positional('target', {
-            describe: 'Deploy target name from deploy.nevermore.json',
+            describe:
+              'Deploy target name from deploy.nevermore.json (defaults to the only target if there is just one, otherwise "test")',
             type: 'string',
-            default: 'test',
           })
           .option('api-key', {
             describe: 'Roblox Open Cloud API key',
@@ -145,7 +150,15 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
     const cwd = process.cwd();
     const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
-    const targetName = args.target ?? 'test';
+
+    let targetName: string;
+    if (args.target) {
+      targetName = args.target;
+    } else {
+      const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
+      targetName = resolveDefaultTargetName(config);
+      OutputHelper.info(`Using target '${targetName}'.`);
+    }
 
     const reporter = new CompositeReporter(
       [packageName],
