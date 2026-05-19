@@ -1,19 +1,13 @@
-# v1.11.0 (Tue May 19 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add better deploy UX including preview and stuff [#694](https://github.com/Quenty/NevermoreEngine/pull/694) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.11.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.10.0...@quenty/nevermore-cli-helpers@1.11.0) (2026-05-19)
+
+### Features
+
+- Add better deploy UX including preview and stuff ([#694](https://github.com/Quenty/Nevermore/issues/694)) ([a3e9458](https://github.com/Quenty/Nevermore/commit/a3e9458670ec04482dbe688c92e2c3a9e1c01faa))
 
 # [1.10.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.9.0...@quenty/nevermore-cli-helpers@1.10.0) (2026-05-18)
 

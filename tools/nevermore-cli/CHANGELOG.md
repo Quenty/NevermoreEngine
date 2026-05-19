@@ -1,19 +1,13 @@
-# v4.27.0 (Tue May 19 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add better deploy UX including preview and stuff [#694](https://github.com/Quenty/NevermoreEngine/pull/694) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.27.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.26.0...@quenty/nevermore-cli@4.27.0) (2026-05-19)
+
+### Features
+
+- Add better deploy UX including preview and stuff ([#694](https://github.com/Quenty/Nevermore/issues/694)) ([a3e9458](https://github.com/Quenty/Nevermore/commit/a3e9458670ec04482dbe688c92e2c3a9e1c01faa))
 
 # [4.26.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.25.0...@quenty/nevermore-cli@4.26.0) (2026-05-18)
 
