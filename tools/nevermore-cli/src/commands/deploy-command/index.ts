@@ -50,9 +50,9 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             type: 'number',
           })
           .option('target', {
-            describe: 'Deploy target name',
+            describe:
+              'Deploy target name (auto-detects "test" or "integration" if omitted)',
             type: 'string',
-            default: 'test',
           })
           .option('project', {
             describe: 'Rojo project file (relative to package)',
