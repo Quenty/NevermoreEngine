@@ -16,12 +16,8 @@ import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
-import {
-  loadDeployConfigAsync,
-  resolveDefaultTargetName,
-  resolveDeployConfigPath,
-} from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
+import { selectTargetAsync } from './select-target.js';
 
 export interface DeployArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -158,15 +154,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     const cwd = process.cwd();
     const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
 
-    let targetName: string;
-    let targetAutoDetected = false;
-    if (args.target) {
-      targetName = args.target;
-    } else {
-      const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
-      targetName = resolveDefaultTargetName(config);
-      targetAutoDetected = true;
-    }
+    const { targetName, autoDetected: targetAutoDetected } =
+      await selectTargetAsync(cwd, {
+        explicitTarget: args.target,
+        publish: args.publish ?? false,
+      });
 
     const useSpinner = process.stdout.isTTY && !args.verbose;
     const showLogs = args.logs ?? false;
@@ -219,6 +211,8 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     const startMs = Date.now();
     reporter.onPackageStart(packageName);
 
+    let exitCode = 0;
+    let publishedVersion: number | undefined;
     try {
       const builtPlace = await context.buildPlaceAsync({
         targetName,
@@ -235,6 +229,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         reporter,
         packageName,
       });
+      publishedVersion = version;
 
       const durationMs = Date.now() - startMs;
       const action = args.publish ? 'Published' : 'Saved';
@@ -245,13 +240,6 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         durationMs,
         progressSummary: { kind: 'version', version },
       });
-
-      if (args.publish) {
-        OutputHelper.info(`Published v${version} — live in game.`);
-      } else {
-        OutputHelper.info(`Saved v${version} — not yet live.`);
-        OutputHelper.hint('Use --publish to make it live in game.');
-      }
     } catch (err) {
       const durationMs = Date.now() - startMs;
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -263,13 +251,22 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         durationMs,
         error: errorMessage,
       });
-
-      await reporter.stopAsync();
-      throw err;
+      exitCode = 1;
     } finally {
       await context.disposeAsync();
     }
 
     await reporter.stopAsync();
+
+    if (publishedVersion !== undefined) {
+      if (args.publish) {
+        OutputHelper.info(`Published v${publishedVersion} — live in game.`);
+      } else {
+        OutputHelper.info(`Saved v${publishedVersion} — not yet live.`);
+        OutputHelper.hint('Use --publish to make it live in game.');
+      }
+    }
+
+    if (exitCode !== 0) process.exit(exitCode);
   }
 }

@@ -102,18 +102,18 @@ export async function executeScriptAsync(
     OutputHelper.setVerbose(false);
   }
 
-  const server = new StudioBridgeServer({
-    placePath,
-    timeoutMs,
-    onPhase: (phase: StudioBridgePhase) => {
-      if (phase === 'done') return;
-      reporter.onPackagePhaseChange(packageName, phase);
-    },
-  });
-
   const outputLines: string[] = [];
+  let server: StudioBridgeServer | undefined;
   let result;
   try {
+    server = new StudioBridgeServer({
+      placePath,
+      timeoutMs,
+      onPhase: (phase: StudioBridgePhase) => {
+        if (phase === 'done') return;
+        reporter.onPackagePhaseChange(packageName, phase);
+      },
+    });
     await server.startAsync();
     result = await server.executeAsync({
       scriptContent,
@@ -149,7 +149,7 @@ export async function executeScriptAsync(
       logs: `[StudioBridge] Error: ${errorMessage}`,
     };
   } finally {
-    await server.stopAsync();
+    await server?.stopAsync();
   }
 
   const elapsed = performance.now() - startTime;

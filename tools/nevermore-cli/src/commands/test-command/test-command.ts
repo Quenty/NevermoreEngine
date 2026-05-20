@@ -29,6 +29,7 @@ export interface TestProjectArgs extends NevermoreGlobalArgs {
   scriptTemplate?: string;
   scriptText?: string;
   output?: string;
+  timeout?: number;
 }
 
 export class TestProjectCommand<T>
@@ -74,42 +75,48 @@ export class TestProjectCommand<T>
       describe: 'Write JSON results to this file',
       type: 'string',
     });
+    args.option('timeout', {
+      describe:
+        'Max script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun (default: 120)',
+      type: 'number',
+    });
 
     return args as Argv<TestProjectArgs>;
   };
 
   public handler = async (args: TestProjectArgs) => {
-    try {
-      const cwd = process.cwd();
-      const packageName =
-        (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
-      const showLogs = args.logs ?? false;
-      const useSpinner = process.stdout.isTTY && !args.verbose;
+    const cwd = process.cwd();
+    const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
+    const showLogs = args.logs ?? false;
+    const useSpinner = process.stdout.isTTY && !args.verbose;
 
-      const reporter = new CompositeReporter(
-        [packageName],
-        (state: LiveStateTracker) => {
-          const reporters: Reporter[] = [
-            useSpinner
-              ? new SpinnerReporter(state, {
-                  showLogs,
-                  actionVerb: 'Testing',
-                })
-              : new SimpleReporter(state, {
-                  alwaysShowLogs: showLogs,
-                  successMessage: 'Tests passed!',
-                  failureMessage:
-                    'Tests failed! See output above for more information.',
-                }),
-          ];
-          if (args.output) {
-            reporters.push(new JsonFileReporter(state, args.output));
-          }
-          return reporters;
+    const reporter = new CompositeReporter(
+      [packageName],
+      (state: LiveStateTracker) => {
+        const reporters: Reporter[] = [
+          useSpinner
+            ? new SpinnerReporter(state, {
+                showLogs,
+                actionVerb: 'Testing',
+              })
+            : new SimpleReporter(state, {
+                alwaysShowLogs: showLogs,
+                verbose: args.verbose,
+                successMessage: 'Tests passed!',
+                failureMessage:
+                  'Tests failed! See output above for more information.',
+              }),
+        ];
+        if (args.output) {
+          reporters.push(new JsonFileReporter(state, args.output));
         }
-      );
-      await reporter.startAsync();
+        return reporters;
+      }
+    );
+    await reporter.startAsync();
 
+    let exitCode = 0;
+    try {
       const context = args.cloud
         ? new CloudJobContext(
             reporter,
@@ -126,6 +133,8 @@ export class TestProjectCommand<T>
           packagePath: cwd,
           packageName,
           scriptText: args.scriptText,
+          timeoutMs:
+            args.timeout !== undefined ? args.timeout * 1000 : undefined,
         });
       } finally {
         await context.disposeAsync();
@@ -140,13 +149,19 @@ export class TestProjectCommand<T>
           ? { kind: 'test-counts', ...result.testCounts }
           : undefined,
       });
-
-      await reporter.stopAsync();
+      if (!result.success) exitCode = 1;
     } catch (err) {
-      OutputHelper.error(err instanceof Error ? err.message : String(err));
-      process.exit(1);
+      reporter.onPackageResult({
+        packageName,
+        success: false,
+        logs: '',
+        durationMs: 0,
+        error: OutputHelper.formatErrorChain(err),
+      });
+      exitCode = 1;
     }
 
-    process.exit(0);
+    await reporter.stopAsync();
+    process.exit(exitCode);
   };
 }

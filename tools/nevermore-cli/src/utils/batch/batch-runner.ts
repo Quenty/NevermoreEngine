@@ -112,7 +112,7 @@ async function _runOneAsync<TResult extends PackageResult>(
       const durationMs = partial.durationMs ?? Date.now() - startMs;
       return { ...partial, durationMs } as TResult;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorMessage = OutputHelper.formatErrorChain(err);
       const currentPhase = stateTracker?.getCurrentPhase(pkg.name);
       const failedPhase =
         currentPhase &&

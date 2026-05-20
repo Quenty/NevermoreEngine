@@ -7,47 +7,46 @@
 #   1. Run `nevermore deploy init` to create deploy.nevermore.json with a test target
 #   2. Add ROBLOX_OPEN_CLOUD_API_KEY as a repository secret
 #      (Create one at https://create.roblox.com/dashboard/credentials)
-#   3. Tests will run automatically on pull requests
+#   3. Tests will run automatically on pull requests and on push to main
 #
 # Docs: https://quenty.github.io/NevermoreEngine/docs/testing
 
 name: tests
 on:
   pull_request:
+  push:
+    branches: [main]
 jobs:
-  config-check:
+  tests:
     runs-on: ubuntu-latest
-    outputs:
-      enabled: $\{{ steps.check.outputs.enabled }}
     steps:
       - id: check
+        name: Check config
         run: |
-          if [ -n "$KEY" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else echo "::notice::Tests skipped — ROBLOX_OPEN_CLOUD_API_KEY not configured. See top of this file for setup."; fi
+          if [ -n "$KEY" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Tests skipped — ROBLOX_OPEN_CLOUD_API_KEY not configured. See top of this file for setup."
+          fi
         env:
           KEY: $\{{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
 
-  tests:
-    needs: config-check
-    if: needs.config-check.outputs.enabled == 'true'
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout repository
+        if: steps.check.outputs.enabled == 'true'
         uses: actions/checkout@v6
 
-      - name: Setup Aftman
-        uses: ok-nick/setup-aftman@v0.4.2
-        with:
-          version: 'v0.3.0'
-          token: $\{{ secrets.GITHUB_TOKEN }}
-          cache: true
+      - name: Fetch base branch for changeset diff
+        if: steps.check.outputs.enabled == 'true' && github.event_name == 'pull_request'
+        run: git fetch origin $\{{ github.base_ref }} --depth=1
 
       - name: Setup pnpm
+        if: steps.check.outputs.enabled == 'true'
         uses: pnpm/action-setup@v4
         with:
           cache: true
 
       - name: Setup npm for GitHub Packages
+        if: steps.check.outputs.enabled == 'true'
         run: |
           if [[ -n "$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" ]]; then
             echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> .npmrc
@@ -63,20 +62,31 @@ jobs:
           NPM_TOKEN: $\{{ secrets.NPM_TOKEN }}
 
       - name: Link and install packages
+        if: steps.check.outputs.enabled == 'true'
         run: pnpm install --frozen-lockfile
+
+      - name: Setup Aftman
+        if: steps.check.outputs.enabled == 'true'
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.3.0'
+          token: $\{{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: Run tests
         id: run-tests
-        run: npx @quenty/nevermore-cli test --cloud --yes --verbose --logs --output test-results.json
+        if: steps.check.outputs.enabled == 'true'
+        run: npx @quenty/nevermore-cli batch test --cloud --aggregated $\{{ github.event_name == 'pull_request' && format('--base origin/{0}', github.base_ref) || '' }} --output test-results.json --yes --verbose --logs
         env:
           ROBLOX_OPEN_CLOUD_API_KEY: $\{{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
+          GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}
 
       - name: Build sourcemap for annotation resolution
-        if: always()
+        if: always() && steps.check.outputs.enabled == 'true'
         run: npm run build:sourcemap
 
       - name: Post test results
-        if: always()
+        if: always() && steps.check.outputs.enabled == 'true'
         run: npx @quenty/nevermore-cli tools post-test-results test-results.json --yes --run-outcome $\{{ steps.run-tests.outcome }}
         env:
           GITHUB_TOKEN: $\{{ secrets.GITHUB_TOKEN }}

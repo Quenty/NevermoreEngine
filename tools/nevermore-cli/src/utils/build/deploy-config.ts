@@ -88,15 +88,19 @@ export function resolveDeployTarget(
 }
 
 /**
- * Pick a target name when the user did not specify one. If the config has
- * exactly one target, use it. Otherwise prefer "test" if it exists; if not,
- * throw with the list of available targets.
+ * Pick a target name when the user did not specify one and we cannot prompt
+ * (non-TTY / CI). Single target wins; otherwise prefer "integration" over
+ * "test" so `--publish` does not silently target the test place. Throws when
+ * neither is present.
  */
 export function resolveDefaultTargetName(config: DeployConfig): string {
   const availableTargets = Object.keys(config.targets);
 
   if (availableTargets.length === 1) {
     return availableTargets[0]!;
+  }
+  if (config.targets['integration']) {
+    return 'integration';
   }
   if (config.targets['test']) {
     return 'test';

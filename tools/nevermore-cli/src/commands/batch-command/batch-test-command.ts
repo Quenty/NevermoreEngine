@@ -24,7 +24,6 @@ import {
 import {
   type LiveStateTracker,
   type BatchTestResult,
-  type BatchTestSummary,
   CompositeReporter,
   GithubCommentTableReporter,
   GroupedReporter,
@@ -51,6 +50,7 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   aggregated?: boolean;
   batchPlaceId?: number;
   batchUniverseId?: number;
+  timeout?: number;
 }
 
 export const batchTestCommand: CommandModule<
@@ -111,6 +111,11 @@ export const batchTestCommand: CommandModule<
       .option('batch-universe-id', {
         describe:
           'Override universeId for the aggregated batch upload (--aggregated only)',
+        type: 'number',
+      })
+      .option('timeout', {
+        describe:
+          'Per-package script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun (default: 120)',
         type: 'number',
       });
   },
@@ -200,7 +205,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     });
   }
 
-  const timeoutMs = 120_000;
+  const timeoutMs = (args.timeout ?? 120) * 1000;
 
   // In aggregated mode, the inner context gets a broadcast reporter that translates
   // phase changes from the shared '_batch_' operation to all real packages
@@ -222,9 +227,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     : innerContext;
 
   await reporter.startAsync();
-  let results: BatchTestSummary;
+
+  let exitCode = 0;
   try {
-    results = await runBatchAsync<BatchTestResult>({
+    const results = await runBatchAsync<BatchTestResult>({
       packages,
       concurrency,
       reporter,
@@ -248,6 +254,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
         };
       },
     });
+    if (results.summary.failed > 0) exitCode = 1;
+  } catch (err) {
+    OutputHelper.error(OutputHelper.formatErrorChain(err));
+    exitCode = 1;
   } finally {
     await context.disposeAsync();
   }
@@ -256,7 +266,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   // Node.js fetch (undici) keeps TCP connections alive in a global pool,
   // which prevents the event loop from draining. Explicit exit required.
-  process.exit(results.summary.failed > 0 ? 1 : 0);
+  process.exit(exitCode);
 }
 
 async function _runWithRetryAsync(

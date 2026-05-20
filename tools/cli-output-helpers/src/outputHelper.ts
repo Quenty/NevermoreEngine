@@ -117,6 +117,25 @@ export class OutputHelper {
     console.error(this._hasAnsi(message) ? message : this.formatError(message));
   }
 
+  /** Format an error including its `.cause` chain. Appends the stack in verbose mode. */
+  public static formatErrorChain(err: unknown): string {
+    if (!(err instanceof Error)) return String(err);
+
+    const parts = [err.message];
+    const seen = new Set<unknown>([err]);
+    let cur: unknown = (err as { cause?: unknown }).cause;
+    while (cur instanceof Error && !seen.has(cur)) {
+      seen.add(cur);
+      parts.push(`  caused by: ${cur.message}`);
+      cur = (cur as { cause?: unknown }).cause;
+    }
+
+    if (this._verbose && err.stack) {
+      parts.push('', err.stack);
+    }
+    return parts.join('\n');
+  }
+
   /**
    * Logs information to the console
    * @param message Message to write
