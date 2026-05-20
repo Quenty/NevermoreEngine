@@ -29,6 +29,7 @@ export interface TestProjectArgs extends NevermoreGlobalArgs {
   scriptTemplate?: string;
   scriptText?: string;
   output?: string;
+  timeout?: number;
 }
 
 export class TestProjectCommand<T>
@@ -73,6 +74,11 @@ export class TestProjectCommand<T>
     args.option('output', {
       describe: 'Write JSON results to this file',
       type: 'string',
+    });
+    args.option('timeout', {
+      describe:
+        'Max script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun (default: 120)',
+      type: 'number',
     });
 
     return args as Argv<TestProjectArgs>;
@@ -128,6 +134,8 @@ export class TestProjectCommand<T>
           packagePath: cwd,
           packageName,
           scriptText: args.scriptText,
+          timeoutMs:
+            args.timeout !== undefined ? args.timeout * 1000 : undefined,
         });
       } finally {
         await context.disposeAsync();

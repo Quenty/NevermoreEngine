@@ -50,6 +50,7 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   aggregated?: boolean;
   batchPlaceId?: number;
   batchUniverseId?: number;
+  timeout?: number;
 }
 
 export const batchTestCommand: CommandModule<
@@ -110,6 +111,11 @@ export const batchTestCommand: CommandModule<
       .option('batch-universe-id', {
         describe:
           'Override universeId for the aggregated batch upload (--aggregated only)',
+        type: 'number',
+      })
+      .option('timeout', {
+        describe:
+          'Per-package script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun (default: 120)',
         type: 'number',
       });
   },
@@ -199,7 +205,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     });
   }
 
-  const timeoutMs = 120_000;
+  const timeoutMs = (args.timeout ?? 120) * 1000;
 
   // In aggregated mode, the inner context gets a broadcast reporter that translates
   // phase changes from the shared '_batch_' operation to all real packages

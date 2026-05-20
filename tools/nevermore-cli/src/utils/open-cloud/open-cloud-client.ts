@@ -19,6 +19,7 @@ export interface LuauTask {
     | 'COMPLETE'
     | 'FAILED';
   script: string;
+  timeout?: string;
 }
 
 export interface OpenCloudClientOptions {
@@ -209,10 +210,18 @@ export class OpenCloudClient {
     universeId: number,
     placeId: number,
     placeVersion: number,
-    script: string
+    script: string,
+    timeoutMs?: number
   ): Promise<LuauTask> {
     const apiKey = await this._resolveApiKeyAsync();
     const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
+
+    const body: { script: string; timeout?: string } = { script };
+    if (timeoutMs !== undefined) {
+      // Roblox encodes durations as Google AIP duration strings (e.g. "120s").
+      // The server uses this to cancel runaway scripts on its end.
+      body.timeout = `${Math.max(1, Math.ceil(timeoutMs / 1000))}s`;
+    }
 
     const response = await this._rateLimiter.fetchAsync(url, {
       method: 'POST',
@@ -220,7 +229,7 @@ export class OpenCloudClient {
         'Content-Type': 'application/json',
         'X-API-Key': apiKey,
       },
-      body: JSON.stringify({ script }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
