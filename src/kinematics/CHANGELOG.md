@@ -1,3 +1,25 @@
+# v2.5.0 (Wed May 20 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Claude ([@claude](https://github.com/claude)), for all your work!
+
+#### 🚀 Enhancement
+
+- feat(luau): convert 41 trivial files to --!strict typing [#671](https://github.com/Quenty/NevermoreEngine/pull/671) ([@claude](https://github.com/claude) [@Quenty](https://github.com/Quenty))
+- feat(luau): convert 41 trivial files to --!strict typing ([@claude](https://github.com/claude))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into claude/luau-strict-typing-9CjQp ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- Claude ([@claude](https://github.com/claude))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

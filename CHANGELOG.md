@@ -1,5 +1,23 @@
 # (Wed May 20 2026)
 
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Claude ([@claude](https://github.com/claude)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/animationprovider@11.37.0`, `@quenty/chatproviderservice@9.50.0`, `@quenty/clipcharacters@12.39.0`, `@quenty/cmdrservice@13.43.0`, `@quenty/deathreport@10.43.0`, `@quenty/gameconfig@12.47.0`, `@quenty/humanoidspeed@12.48.0`, `@quenty/ik@15.50.0`, `@quenty/kinematics@2.5.0`, `@quenty/racketingropeconstraint@12.42.0`, `@quenty/ragdoll@15.49.0`, `@quenty/rogue-humanoid@10.48.0`, `@quenty/rogue-properties@11.45.0`, `@quenty/settings-inputkeymap@10.54.0`, `@quenty/settings@11.51.0`, `@quenty/snackbar@11.41.0`, `@quenty/softshutdown@9.47.0`, `@quenty/templateprovider@11.37.0`
+  - feat(luau): convert 41 trivial files to --!strict typing [#671](https://github.com/Quenty/NevermoreEngine/pull/671) ([@claude](https://github.com/claude) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- Claude ([@claude](https://github.com/claude))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed May 20 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/nevermore-cli@4.28.1`

@@ -1,3 +1,15 @@
+# v7.39.0 (Wed May 20 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into claude/luau-strict-typing-9CjQp ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
