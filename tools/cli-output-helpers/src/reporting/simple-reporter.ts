@@ -6,7 +6,10 @@ import {
   BaseReporter,
 } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
-import { formatProgressInline, formatProgressResult } from './progress-format.js';
+import {
+  formatProgressInline,
+  formatProgressResult,
+} from './progress-format.js';
 
 export interface SimpleReporterOptions {
   alwaysShowLogs: boolean;

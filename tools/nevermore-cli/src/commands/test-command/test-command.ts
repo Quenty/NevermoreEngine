@@ -86,8 +86,7 @@ export class TestProjectCommand<T>
 
   public handler = async (args: TestProjectArgs) => {
     const cwd = process.cwd();
-    const packageName =
-      (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
+    const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
     const showLogs = args.logs ?? false;
     const useSpinner = process.stdout.isTTY && !args.verbose;
 
