@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 --[=[
 	Test input key map provider
 	@class TestInputKeyMap
