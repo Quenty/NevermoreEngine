@@ -96,6 +96,7 @@ export class TestProjectCommand<T>
               })
             : new SimpleReporter(state, {
                 alwaysShowLogs: showLogs,
+                verbose: args.verbose,
                 successMessage: 'Tests passed!',
                 failureMessage:
                   'Tests failed! See output above for more information.',
