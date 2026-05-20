@@ -40,7 +40,7 @@ describe('parseLuauLspOutput', () => {
 
   it('parses multiple lines', () => {
     const input = [
-      "src/a.lua(1,1): TypeError: type mismatch",
+      'src/a.lua(1,1): TypeError: type mismatch',
       "src/b.lua(5,3): LocalUnused: Variable 'x' is never used; prefix with '_' to silence",
       '',
       '> some other output line',
@@ -58,13 +58,46 @@ describe('parseLuauLspOutput', () => {
   });
 
   it('skips non-matching lines', () => {
-    const input = [
-      '> lint:luau',
-      '> luau-lsp analyze ...',
-      '',
-    ].join('\n');
+    const input = ['> lint:luau', '> luau-lsp analyze ...', ''].join('\n');
 
     const result = parseLuauLspOutput(input);
     expect(result).toEqual([]);
+  });
+
+  it('captures multi-line diagnostic continuations', () => {
+    const input = [
+      'src/foo/Bar.lua(52,5): TypeError: Expected this to be',
+      "\t'(BrineInstance & any)?'",
+      'but got',
+      "\t'{| ClassName: string |}'",
+    ].join('\n');
+
+    const result = parseLuauLspOutput(input);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].message).toBe(
+      [
+        'Expected this to be',
+        "\t'(BrineInstance & any)?'",
+        'but got',
+        "\t'{| ClassName: string |}'",
+      ].join('\n')
+    );
+  });
+
+  it('terminates a multi-line diagnostic at a blank line', () => {
+    const input = [
+      'src/a.lua(1,1): TypeError: type mismatch',
+      "\t'string'",
+      '',
+      '> some other output line',
+      'src/b.lua(5,3): TypeError: another mismatch',
+    ].join('\n');
+
+    const result = parseLuauLspOutput(input);
+
+    expect(result).toHaveLength(2);
+    expect(result[0].message).toBe("type mismatch\n\t'string'");
+    expect(result[1].message).toBe('another mismatch');
   });
 });

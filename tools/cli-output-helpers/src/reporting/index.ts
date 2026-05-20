@@ -1,4 +1,4 @@
-// Core types and base class
+// Core types and base class — batch lifecycle (multi-package, phases, progress).
 export {
   BaseReporter,
   type Reporter,
@@ -11,6 +11,39 @@ export {
   type ByteProgress,
   type StepProgress,
 } from './reporter.js';
+
+// Single-result reporter — for one-shot or polled command output.
+export { BaseResultReporter, type ResultReporter } from './result-reporter.js';
+export {
+  StdoutResultReporter,
+  type StdoutResultReporterOptions,
+} from './stdout-result-reporter.js';
+export {
+  FileResultReporter,
+  type FileResultReporterOptions,
+} from './file-result-reporter.js';
+export {
+  WatchResultReporter,
+  type WatchResultReporterOptions,
+} from './watch-result-reporter.js';
+export { CompositeResultReporter } from './composite-result-reporter.js';
+export {
+  buildResultReporter,
+  type BuildResultReporterOptions,
+} from './build-result-reporter.js';
+
+// Output formatting primitives.
+export {
+  formatTable,
+  type TableColumn,
+  type TableOptions,
+} from './format-table.js';
+export { formatJson, type JsonOutputOptions } from './format-json.js';
+export {
+  createWatchRenderer,
+  type WatchRenderer,
+  type WatchRendererOptions,
+} from './watch-renderer.js';
 
 // Progress formatting helpers
 export {

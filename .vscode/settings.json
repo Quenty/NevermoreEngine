@@ -25,5 +25,18 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file"
-  }
+  },
+  "chat.tools.terminal.autoApprove": {
+    "nevermore": true
+  },
+
+  // Make init files not horrible
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "init.lua": "*.lua",
+    "*": "${basename}.*.${extname}"
+  },
+  "workbench.editor.customLabels.patterns": {
+    "**/init.lua": "${dirname}.lua"
+  },
 }

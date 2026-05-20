@@ -6,7 +6,17 @@
  */
 
 /** Execution phases a package can move through. */
-export type JobPhase = 'waiting' | 'building' | 'downloading' | 'merging' | 'combining' | 'uploading' | 'scheduling' | 'launching' | 'connecting' | 'executing';
+export type JobPhase =
+  | 'waiting'
+  | 'building'
+  | 'downloading'
+  | 'merging'
+  | 'combining'
+  | 'uploading'
+  | 'scheduling'
+  | 'launching'
+  | 'connecting'
+  | 'executing';
 
 /** Unified status for a package moving through the job lifecycle. */
 export type PackageStatus = 'pending' | JobPhase | 'passed' | 'failed';
@@ -36,7 +46,17 @@ export interface StepProgress {
   label?: string;
 }
 
-export type ProgressSummary = TestCountProgress | ByteProgress | StepProgress;
+/** Place version label: "v14" */
+export interface VersionProgress {
+  kind: 'version';
+  version: number;
+}
+
+export type ProgressSummary =
+  | TestCountProgress
+  | ByteProgress
+  | StepProgress
+  | VersionProgress;
 
 /** Result for a single package in a batch run. */
 export interface PackageResult {
@@ -94,7 +114,10 @@ export class BaseReporter implements Reporter {
   async startAsync(): Promise<void> {}
   onPackageStart(_packageName: string): void {}
   onPackagePhaseChange(_packageName: string, _phase: JobPhase): void {}
-  onPackageProgressUpdate(_packageName: string, _progress: ProgressSummary): void {}
+  onPackageProgressUpdate(
+    _packageName: string,
+    _progress: ProgressSummary
+  ): void {}
   onPackageResult(_result: PackageResult, _bufferedOutput?: string[]): void {}
   async stopAsync(): Promise<void> {}
 }

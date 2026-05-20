@@ -9,6 +9,7 @@ local Color3Utils = require("Color3Utils")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local RobloxApiDump = require("RobloxApiDump")
+local RobloxApiUtils = require("RobloxApiUtils")
 local UIConverterNeverSkipProps = require("UIConverterNeverSkipProps")
 
 local UIConverter = setmetatable({}, BaseObject)
@@ -18,8 +19,7 @@ UIConverter.__index = UIConverter
 function UIConverter.new()
 	local self = setmetatable(BaseObject.new(), UIConverter)
 
-	self._apiDump = RobloxApiDump.new()
-	self._maid:GiveTask(self._apiDump)
+	self._apiDump = self._maid:Add(RobloxApiDump.new(RobloxApiUtils.promiseDump()))
 
 	self._promiseDefaultValueCache = {}
 	self._propertyPromisesForClass = {}
@@ -27,7 +27,7 @@ function UIConverter.new()
 	return self
 end
 
-function UIConverter:PromiseProperties(instance, overrideMap)
+function UIConverter:PromiseProperties(instance: Instance, overrideMap)
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(overrideMap) == "table", "Bad overrideMap")
 
@@ -100,7 +100,7 @@ function UIConverter:PromiseProperties(instance, overrideMap)
 	end)
 end
 
-function UIConverter:PromiseCanClone(instance)
+function UIConverter:PromiseCanClone(instance: Instance)
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return self._apiDump:PromiseClass(instance.ClassName):Then(function(class)

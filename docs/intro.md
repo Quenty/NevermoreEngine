@@ -31,7 +31,7 @@ Nevermore has had significant cultural impact. There are some packages this repo
 * [DataStore](/api/DataStore) - Battle-tested datastore wrapper
 * [Camera](/api/CameraStackService) - Layered camera system that interops with Roblox's cameras
 
-## Nevermore can by used in many cases
+## Nevermore can be used in many cases
 While Nevermore was originally designed to make games, in general Nevermore is now a collection of utility libraries that can be used in the following. These use cases have been carefully battle tested. Nevermore is in many top games, gamejams, plugins, and other components across Roblox.
 
 * **Top Games** - Both built originally with Nevermore, or games that use other systems and frameworks but may want to include Nevermore

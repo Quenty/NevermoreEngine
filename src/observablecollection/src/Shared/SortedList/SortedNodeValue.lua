@@ -23,6 +23,13 @@ export type SortedNodeValue<T> = typeof(setmetatable(
 	{} :: typeof({ __index = SortedNodeValue })
 ))
 
+--[=[
+	Constructs a new SortedNodeValue
+
+	@param value T
+	@param compare (a: T, b: T) -> number
+	@return SortedNodeValue
+]=]
 function SortedNodeValue.new<T>(value: T, compare: CompareFunction<T>): SortedNodeValue<T>
 	local self = setmetatable({}, SortedNodeValue)
 
@@ -32,10 +39,19 @@ function SortedNodeValue.new<T>(value: T, compare: CompareFunction<T>): SortedNo
 	return self
 end
 
+--[=[
+	Returns the value of the SortedNodeValue
+	@return T
+]=]
 function SortedNodeValue.GetValue<T>(self: SortedNodeValue<T>): T
 	return self._value
 end
 
+--[=[
+	Returns whether or not a value is a SortedNodeValue
+	@param value any
+	@return boolean
+]=]
 function SortedNodeValue.isSortedNodeValue(value: any): boolean
 	return DuckTypeUtils.isImplementation(SortedNodeValue, value)
 end

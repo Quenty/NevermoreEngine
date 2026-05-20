@@ -16,7 +16,7 @@ import { type TargetPackage } from '../../batch/changed-packages-utils.js';
 export interface CombinedProjectResult {
   /** Absolute path to the combined .rbxl file. */
   rbxlPath: string;
-  /** packageName → SSS slug mapping. */
+  /** packageName → ServerScriptService slug mapping. */
   slugMap: Map<string, string>;
   /** First package's deploy target (provides placeId/universeId for upload). */
   primaryTarget: DeployTarget;
@@ -87,7 +87,7 @@ export async function generateCombinedProjectAsync(options: {
       if (batchUniverseId) primaryTarget.universeId = batchUniverseId;
     }
 
-    // Parse the rojo project to extract the SSS slug
+    // Parse the rojo project to extract the ServerScriptService slug
     const projectPath = path.resolve(pkg.path, target.project);
     const slug = await _extractSlugAsync(pkg.name, projectPath);
 
@@ -150,7 +150,10 @@ export async function generateCombinedProjectAsync(options: {
     completed: 0,
     total: builds.length,
   });
-  await buildContext.executeLuneTransformScriptAsync(luneScriptPath, ...luneArgs);
+  await buildContext.executeLuneTransformScriptAsync(
+    luneScriptPath,
+    ...luneArgs
+  );
 
   OutputHelper.verbose(
     `Combined ${slugMap.size} packages at ${combinedRbxlPath}`
@@ -184,20 +187,20 @@ async function _extractSlugAsync(
   const project = JSON.parse(content) as {
     tree: { ServerScriptService?: RojoNode };
   };
-  const sss = project.tree?.ServerScriptService;
-  if (!sss) {
+  const serverScriptService = project.tree?.ServerScriptService;
+  if (!serverScriptService) {
     throw new Error(
       `Test project for ${packageName} is missing ServerScriptService in tree`
     );
   }
 
-  for (const key of Object.keys(sss)) {
+  for (const key of Object.keys(serverScriptService)) {
     if (!key.startsWith('$') && key !== 'Script') {
       return key;
     }
   }
 
   throw new Error(
-    `Test project for ${packageName} has no package entry under SSS`
+    `Test project for ${packageName} has no package entry under ServerScriptService`
   );
 }

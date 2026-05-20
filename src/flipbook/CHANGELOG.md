@@ -3,485 +3,273 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [9.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.27.0...@quenty/flipbook@9.28.0) (2026-02-20)
+# [9.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.30.2...@quenty/flipbook@9.31.0) (2026-05-18)
 
 **Note:** Version bump only for package @quenty/flipbook
 
+## [9.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.30.1...@quenty/flipbook@9.30.2) (2026-04-30)
 
+**Note:** Version bump only for package @quenty/flipbook
 
+## [9.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.30.0...@quenty/flipbook@9.30.1) (2026-04-29)
 
+**Note:** Version bump only for package @quenty/flipbook
+
+# [9.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.29.0...@quenty/flipbook@9.30.0) (2026-04-23)
+
+**Note:** Version bump only for package @quenty/flipbook
+
+# [9.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.28.0...@quenty/flipbook@9.29.0) (2026-04-14)
+
+**Note:** Version bump only for package @quenty/flipbook
+
+# [9.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.27.0...@quenty/flipbook@9.28.0) (2026-02-20)
+
+**Note:** Version bump only for package @quenty/flipbook
 
 # [9.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.26.0...@quenty/flipbook@9.27.0) (2026-02-19)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.25.2...@quenty/flipbook@9.26.0) (2026-02-17)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.25.1...@quenty/flipbook@9.25.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.25.0...@quenty/flipbook@9.25.1) (2026-01-21)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.24.0...@quenty/flipbook@9.25.0) (2026-01-18)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.23.2...@quenty/flipbook@9.24.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.23.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.23.1...@quenty/flipbook@9.23.2) (2026-01-12)
-
 
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
-
-
-
-
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 ## [9.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.23.0...@quenty/flipbook@9.23.1) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.22.1...@quenty/flipbook@9.23.0) (2026-01-08)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.22.0...@quenty/flipbook@9.22.1) (2026-01-05)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.8...@quenty/flipbook@9.22.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.21.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.7...@quenty/flipbook@9.21.8) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.21.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.6...@quenty/flipbook@9.21.7) (2025-12-31)
-
 
 ### Bug Fixes
 
-* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
-
-
-
-
+- Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
 
 ## [9.21.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.5...@quenty/flipbook@9.21.6) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.21.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.4...@quenty/flipbook@9.21.5) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.21.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.3...@quenty/flipbook@9.21.4) (2025-12-28)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.21.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.2...@quenty/flipbook@9.21.3) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.1...@quenty/flipbook@9.21.2) (2025-11-14)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.21.0...@quenty/flipbook@9.21.1) (2025-11-12)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.20.0...@quenty/flipbook@9.21.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.19.0...@quenty/flipbook@9.20.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.18.1...@quenty/flipbook@9.19.0) (2025-08-29)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.18.0...@quenty/flipbook@9.18.1) (2025-08-12)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.17.3...@quenty/flipbook@9.18.0) (2025-05-10)
-
 
 ### Bug Fixes
 
-* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
-
-
-
-
+- Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
 
 ## [9.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.17.2...@quenty/flipbook@9.17.3) (2025-04-10)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.17.0...@quenty/flipbook@9.17.2) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [9.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.17.0...@quenty/flipbook@9.17.1) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 # [9.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.16.2...@quenty/flipbook@9.17.0) (2025-04-02)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.16.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.16.1...@quenty/flipbook@9.16.2) (2025-03-31)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.16.0...@quenty/flipbook@9.16.1) (2025-03-21)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.15.1...@quenty/flipbook@9.16.0) (2025-02-18)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.15.0...@quenty/flipbook@9.15.1) (2025-01-22)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.14.0...@quenty/flipbook@9.15.0) (2024-12-15)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.13.0...@quenty/flipbook@9.14.0) (2024-12-03)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.12.0...@quenty/flipbook@9.13.0) (2024-11-13)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.11.1...@quenty/flipbook@9.12.0) (2024-11-06)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [9.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.11.0...@quenty/flipbook@9.11.1) (2024-11-04)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.10.0...@quenty/flipbook@9.11.0) (2024-11-03)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.9.1...@quenty/flipbook@9.10.0) (2024-10-23)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.9.0...@quenty/flipbook@9.9.1) (2024-10-09)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.8.1...@quenty/flipbook@9.9.0) (2024-10-06)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.8.0...@quenty/flipbook@9.8.1) (2024-10-04)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.7.0...@quenty/flipbook@9.8.0) (2024-10-04)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.6.0...@quenty/flipbook@9.7.0) (2024-09-25)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.5.1...@quenty/flipbook@9.6.0) (2024-09-25)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [9.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.5.0...@quenty/flipbook@9.5.1) (2024-09-20)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.4.0...@quenty/flipbook@9.5.0) (2024-09-12)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.3.0...@quenty/flipbook@9.4.0) (2024-08-09)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.2.0...@quenty/flipbook@9.3.0) (2024-05-09)
-
 
 ### Bug Fixes
 
-* Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
-
-
-
+- Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 # [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.1.0...@quenty/flipbook@9.2.0) (2024-04-27)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.0.0...@quenty/flipbook@9.1.0) (2024-03-09)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@8.0.0...@quenty/flipbook@9.0.0) (2024-02-14)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@7.0.0...@quenty/flipbook@8.0.0) (2024-02-14)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@6.0.0...@quenty/flipbook@7.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@5.0.0...@quenty/flipbook@6.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@4.0.0...@quenty/flipbook@5.0.0) (2024-02-13)
-
 
 ### Features
 
-* New loader (breaking changes), fixing loader issues  ([#439](https://github.com/Quenty/NevermoreEngine/issues/439)) ([3534345](https://github.com/Quenty/NevermoreEngine/commit/353434522918812953bd9f13fece73e27a4d034d))
-
+- New loader (breaking changes), fixing loader issues ([#439](https://github.com/Quenty/NevermoreEngine/issues/439)) ([3534345](https://github.com/Quenty/NevermoreEngine/commit/353434522918812953bd9f13fece73e27a4d034d))
 
 ### BREAKING CHANGES
 
-* Standard loader
+- Standard loader
 
 Adds new loader version which replicates full structure instead of some partial structure. This allows us to have hot-reloading (in the future), as well as generally do less computation, handle dependencies more carefully, and other changes.
 
@@ -489,324 +277,181 @@ This means you'll need to change you how require client-side modules, as we expo
 
 Signed-off-by: James Onnen <jonnen0@gmail.com>
 
-* fix: Fix missing dependency in ResetService
+- fix: Fix missing dependency in ResetService
 
-* feat: Add RxPhysicsUtils.observePartMass
+- feat: Add RxPhysicsUtils.observePartMass
 
-* fix: Fix package discovery for games
+- fix: Fix package discovery for games
 
-* feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+- feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
 
-* feat: AdorneeData:InitAttributes() does not require data as a  secondparameter
+- feat: AdorneeData:InitAttributes() does not require data as a secondparameter
 
-* ci: Upgrade to new rojo 7.4.0
+- ci: Upgrade to new rojo 7.4.0
 
-* fix: Update loader to handle hoarcekat properly
+- fix: Update loader to handle hoarcekat properly
 
-* docs: Fix spacing in Maid
+- docs: Fix spacing in Maid
 
-* fix: Add new ragdoll constants
+- fix: Add new ragdoll constants
 
-* fix: Compress influxDB sends
+- fix: Compress influxDB sends
 
-* style: Errors use string.format
+- style: Errors use string.format
 
-* fix: Handle motor animations
+- fix: Handle motor animations
 
-* ci: Upgrade rojo version
+- ci: Upgrade rojo version
 
-* feat!: Maid no longer is includd in ValueObject.Changed event
+- feat!: Maid no longer is includd in ValueObject.Changed event
 
-* docs: Fix docs
-
-
-
-
+- docs: Fix docs
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@3.5.0...@quenty/flipbook@4.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@3.4.0...@quenty/flipbook@3.5.0) (2024-01-08)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@3.3.0...@quenty/flipbook@3.4.0) (2023-12-28)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@3.2.1...@quenty/flipbook@3.3.0) (2023-12-14)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 ## [3.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@3.2.0...@quenty/flipbook@3.2.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@3.1.0...@quenty/flipbook@3.2.0) (2023-10-18)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@3.0.0...@quenty/flipbook@3.1.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.19.0...@quenty/flipbook@3.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [2.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.18.0...@quenty/flipbook@2.19.0) (2023-09-21)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.17.0...@quenty/flipbook@2.18.0) (2023-09-04)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [2.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.16.0...@quenty/flipbook@2.17.0) (2023-08-23)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.15.0...@quenty/flipbook@2.16.0) (2023-08-01)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [2.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.14.0...@quenty/flipbook@2.15.0) (2023-07-28)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.13.0...@quenty/flipbook@2.14.0) (2023-07-25)
-
 
 ### Features
 
-* Add restFrame support to Flipbooks to control the frame the flipbooks rest on ([cbf5f4f](https://github.com/Quenty/NevermoreEngine/commit/cbf5f4f4211156144e150dd960d9e2225cf9c5f5))
-
-
-
-
+- Add restFrame support to Flipbooks to control the frame the flipbooks rest on ([cbf5f4f](https://github.com/Quenty/NevermoreEngine/commit/cbf5f4f4211156144e150dd960d9e2225cf9c5f5))
 
 # [2.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.12.0...@quenty/flipbook@2.13.0) (2023-07-23)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.11.0...@quenty/flipbook@2.12.0) (2023-07-15)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [2.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.10.0...@quenty/flipbook@2.11.0) (2023-07-10)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.9.0...@quenty/flipbook@2.10.0) (2023-06-17)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [2.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.8.0...@quenty/flipbook@2.9.0) (2023-06-05)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.7.0...@quenty/flipbook@2.8.0) (2023-05-26)
-
 
 ### Features
 
-* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
-
-
-
-
+- Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
 
 # [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.6.0...@quenty/flipbook@2.7.0) (2023-05-08)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.5.0...@quenty/flipbook@2.6.0) (2023-04-24)
-
 
 ### Bug Fixes
 
-* Fix missing dependencies ([3fbd817](https://github.com/Quenty/NevermoreEngine/commit/3fbd817b1fee45bda1b963b61a6ed22b0db12b82))
-
-
-
-
+- Fix missing dependencies ([3fbd817](https://github.com/Quenty/NevermoreEngine/commit/3fbd817b1fee45bda1b963b61a6ed22b0db12b82))
 
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.4.1...@quenty/flipbook@2.5.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [2.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.4.0...@quenty/flipbook@2.4.1) (2023-04-07)
 
 **Note:** Version bump only for package @quenty/flipbook
-
-
-
-
 
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.3.0...@quenty/flipbook@2.4.0) (2023-04-06)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.2.0...@quenty/flipbook@2.3.0) (2023-04-03)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.1.0...@quenty/flipbook@2.2.0) (2023-03-31)
-
 
 ### Bug Fixes
 
-* Fix flipbook package missing dependency ([e5043c3](https://github.com/Quenty/NevermoreEngine/commit/e5043c3174f3ecc2753c79b7b17a16193fb94e07))
-
-
-
-
+- Fix flipbook package missing dependency ([e5043c3](https://github.com/Quenty/NevermoreEngine/commit/e5043c3174f3ecc2753c79b7b17a16193fb94e07))
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.0.3...@quenty/flipbook@2.1.0) (2023-03-31)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [2.0.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.0.2...@quenty/flipbook@2.0.3) (2023-03-06)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 ## [2.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.0.1...@quenty/flipbook@2.0.2) (2023-03-06)
-
 
 ### Bug Fixes
 
-* Fix flipbook playback on odd row/column scenarios ([fc60b33](https://github.com/Quenty/NevermoreEngine/commit/fc60b33bf451ac2d9cd0195ebd3a620d2f6c7907))
-
-
-
-
+- Fix flipbook playback on odd row/column scenarios ([fc60b33](https://github.com/Quenty/NevermoreEngine/commit/fc60b33bf451ac2d9cd0195ebd3a620d2f6c7907))
 
 ## [2.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.0.0...@quenty/flipbook@2.0.1) (2023-03-06)
 
-
 ### Bug Fixes
 
-* Fix flipbook player restoring old image values ([231f0eb](https://github.com/Quenty/NevermoreEngine/commit/231f0eb6a30608cd5b9185c56c790fe06b19080e))
-
-
-
-
+- Fix flipbook player restoring old image values ([231f0eb](https://github.com/Quenty/NevermoreEngine/commit/231f0eb6a30608cd5b9185c56c790fe06b19080e))
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@1.1.0...@quenty/flipbook@2.0.0) (2023-03-06)
 
 **Note:** Version bump only for package @quenty/flipbook
 
-
-
-
-
 # 1.1.0 (2023-03-06)
-
 
 ### Features
 
-* Add flipbook package (which replaces AnimatedSpritesheet and AnimatedSpritesheetPlayer) ([054ff85](https://github.com/Quenty/NevermoreEngine/commit/054ff850302982ad52e6a781c40e9635ec95b3ce))
-
-
-
-
+- Add flipbook package (which replaces AnimatedSpritesheet and AnimatedSpritesheetPlayer) ([054ff85](https://github.com/Quenty/NevermoreEngine/commit/054ff850302982ad52e6a781c40e9635ec95b3ce))
 
 # v1.1.0 (Mon Mar 06 2023)
 

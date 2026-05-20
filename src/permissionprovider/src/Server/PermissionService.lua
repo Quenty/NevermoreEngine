@@ -1,4 +1,5 @@
 --!strict
+local RunService = game:GetService("RunService")
 --[=[
 	Provides permissions for the game. See [BasePermissionProvider].
 
@@ -134,6 +135,10 @@ function PermissionService.PromiseIsPermissionLevel(
 ): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 	assert(PermissionLevel:IsValue(permissionLevel), "Bad permissionLevel")
+
+	if RunService:IsStudio() then
+		return Promise.resolved(true)
+	end
 
 	return self:PromisePermissionProvider():Then(function(permissionProvider)
 		return permissionProvider:PromiseIsPermissionLevel(player, permissionLevel)

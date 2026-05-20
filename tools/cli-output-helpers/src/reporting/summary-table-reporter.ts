@@ -1,6 +1,7 @@
 import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs } from '../cli-utils.js';
-import { BaseReporter } from './reporter.js';
+import { BaseReporter, type PackageResult } from './reporter.js';
+import { formatTable, type TableColumn } from './format-table.js';
 import { type IStateTracker } from './state/state-tracker.js';
 import { formatProgressResult, isEmptyTestRun } from './progress-format.js';
 
@@ -39,44 +40,30 @@ export class SummaryTableReporter extends BaseReporter {
     const passed = results.length - failures.length;
     const durationMs = Date.now() - this._state.startTimeMs;
 
-    const STATUS_WIDTH = 26;
+    let emptyRunCount = 0;
+
+    const columns: TableColumn<PackageResult>[] = [
+      {
+        header: 'Package',
+        value: (r) => r.packageName,
+        minWidth: 40,
+      },
+      {
+        header: 'Status',
+        value: (r) => this._statusLabel(r),
+        format: (label, r) =>
+          this._colorStatus(label, r, () => emptyRunCount++),
+        minWidth: 26,
+      },
+      {
+        header: 'Duration',
+        value: (r) => formatDurationMs(r.durationMs),
+        format: (v) => OutputHelper.formatDim(v),
+      },
+    ];
 
     console.log('');
-    console.log('Package'.padEnd(40) + 'Status'.padEnd(STATUS_WIDTH) + 'Duration');
-    console.log('─'.repeat(40 + STATUS_WIDTH + 8));
-
-    let emptyRunCount = 0;
-    for (const result of results) {
-      const progressText = formatProgressResult(result.progressSummary);
-      const empty = isEmptyTestRun(result.progressSummary);
-      if (empty) emptyRunCount++;
-
-      let label: string;
-      if (result.success) {
-        label = progressText ? `${this._successLabel} ${progressText}` : this._successLabel;
-      } else {
-        const failedPhase = result.failedPhase;
-        label = failedPhase
-          ? `${this._failureLabel} at ${failedPhase}`
-          : this._failureLabel;
-      }
-
-      // Pad the plain text BEFORE wrapping in ANSI so padEnd counts visible chars
-      const paddedLabel = label.padEnd(STATUS_WIDTH);
-      let status: string;
-      if (result.success) {
-        status = empty
-          ? OutputHelper.formatWarning(paddedLabel)
-          : OutputHelper.formatSuccess(paddedLabel);
-      } else {
-        status = OutputHelper.formatError(paddedLabel);
-      }
-
-      const duration = OutputHelper.formatDim(
-        formatDurationMs(result.durationMs)
-      );
-      console.log(result.packageName.padEnd(40) + status + duration);
-    }
+    console.log(formatTable(results, columns));
 
     console.log('');
     const passedText = OutputHelper.formatSuccess(`${passed} passed`);
@@ -98,5 +85,33 @@ export class SummaryTableReporter extends BaseReporter {
         )
       );
     }
+  }
+
+  private _statusLabel(result: PackageResult): string {
+    if (result.success) {
+      const progressText = formatProgressResult(result.progressSummary);
+      return progressText
+        ? `${this._successLabel} ${progressText}`
+        : this._successLabel;
+    }
+    const failedPhase = result.failedPhase;
+    return failedPhase
+      ? `${this._failureLabel} at ${failedPhase}`
+      : this._failureLabel;
+  }
+
+  private _colorStatus(
+    label: string,
+    result: PackageResult,
+    countEmpty: () => void
+  ): string {
+    if (result.success) {
+      const empty = isEmptyTestRun(result.progressSummary);
+      if (empty) countEmpty();
+      return empty
+        ? OutputHelper.formatWarning(label)
+        : OutputHelper.formatSuccess(label);
+    }
+    return OutputHelper.formatError(label);
   }
 }

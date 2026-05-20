@@ -112,9 +112,7 @@ export function parseJestLuaOutput(
   let lastNonEmptyLine = '';
 
   function _emitFailure(ctx: FailureContext): void {
-    const message = ctx.messageLines
-      .join('\n')
-      .trim();
+    const message = ctx.messageLines.join('\n').trim();
 
     // 3-tier line resolution:
     //  1. Primary: line number extracted from `at <path>:<line>` or similar
@@ -229,9 +227,12 @@ export function parseJestLuaOutput(
         if (rawLine.trim() === 'Stack Begin') {
           _emitFailure(failureCtx);
           stackCtx = {
-            errorMessage: failureCtx.messageLines.length > 0
-              ? failureCtx.messageLines[failureCtx.messageLines.length - 1].trim()
-              : failureCtx.title,
+            errorMessage:
+              failureCtx.messageLines.length > 0
+                ? failureCtx.messageLines[
+                    failureCtx.messageLines.length - 1
+                  ].trim()
+                : failureCtx.title,
           };
           failureCtx = undefined;
           state = State.STACK_BLOCK;

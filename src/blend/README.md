@@ -22,7 +22,7 @@ npm install @quenty/blend --save
 
 ## Attributes
 
-This system is designed to be very similar to fusion, except that we do not having any global state management, do not rely upon weak references, works with my types, and is built on top of Rx types.
+This system is designed to be very similar to fusion, except that we do not have any global state management, do not rely upon weak references, works with my types, and is built on top of Rx types.
 
 * No global state
 * Extensible

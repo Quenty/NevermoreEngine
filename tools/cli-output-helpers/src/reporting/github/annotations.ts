@@ -52,10 +52,7 @@ function _escapeProperty(value: string): string {
 
 /** Escape a workflow command message (data portion). */
 function _escapeMessage(value: string): string {
-  return value
-    .replace(/%/g, '%25')
-    .replace(/\r/g, '%0D')
-    .replace(/\n/g, '%0A');
+  return value.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
 }
 
 // ── Annotation emission ─────────────────────────────────────────────────────
@@ -153,12 +150,12 @@ export function formatAnnotationSummaryMarkdown(
     );
   }
   if (summary.notices > 0) {
-    parts.push(
-      `${summary.notices} notice${summary.notices !== 1 ? 's' : ''}`
-    );
+    parts.push(`${summary.notices} notice${summary.notices !== 1 ? 's' : ''}`);
   }
 
-  md += `**${summary.total} issue${summary.total !== 1 ? 's' : ''}** across ${summary.fileCount} file${summary.fileCount !== 1 ? 's' : ''}: ${parts.join(', ')}\n\n`;
+  md += `**${summary.total} issue${summary.total !== 1 ? 's' : ''}** across ${
+    summary.fileCount
+  } file${summary.fileCount !== 1 ? 's' : ''}: ${parts.join(', ')}\n\n`;
 
   // Group diagnostics by file
   const byFile = new Map<string, Diagnostic[]>();
@@ -189,14 +186,16 @@ export function formatAnnotationSummaryMarkdown(
         d.severity === 'error'
           ? '`error`'
           : d.severity === 'warning'
-            ? '`warning`'
-            : '`notice`';
+          ? '`warning`'
+          : '`notice`';
       const escapedMsg = d.message.replace(/\|/g, '\\|').replace(/\n/g, ' ');
       md += `| ${d.line} | ${sev} | ${escapedMsg} |\n`;
     }
 
     if (diags.length > MAX_PER_FILE) {
-      md += `\n_... and ${diags.length - MAX_PER_FILE} more issue(s) in this file_\n`;
+      md += `\n_... and ${
+        diags.length - MAX_PER_FILE
+      } more issue(s) in this file_\n`;
     }
 
     md += '\n</details>\n\n';
@@ -226,7 +225,9 @@ export async function writeAnnotationSummaryAsync(
     OutputHelper.info('Written lint results to GitHub job summary.');
   } catch (err) {
     OutputHelper.warn(
-      `Failed to write job summary: ${err instanceof Error ? err.message : String(err)}`
+      `Failed to write job summary: ${
+        err instanceof Error ? err.message : String(err)
+      }`
     );
   }
 }

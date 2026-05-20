@@ -1,6 +1,9 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { type BuildContext, resolvePackagePath } from '@quenty/nevermore-template-helpers';
+import {
+  type BuildContext,
+  resolvePackagePath,
+} from '@quenty/nevermore-template-helpers';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import {
@@ -19,7 +22,8 @@ import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 
 const MERGE_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
-  'build-scripts', 'transform-rojo-merge-place.luau'
+  'build-scripts',
+  'transform-rojo-merge-place.luau'
 );
 
 /**
@@ -31,7 +35,11 @@ class TrackedBuiltPlace implements BuiltPlace {
   target: BuiltPlace['target'];
   buildContext?: BuildContext;
 
-  constructor(rbxlPath: string, target: BuiltPlace['target'], buildContext?: BuildContext) {
+  constructor(
+    rbxlPath: string,
+    target: BuiltPlace['target'],
+    buildContext?: BuildContext
+  ) {
     this.rbxlPath = rbxlPath;
     this.target = target;
     this.buildContext = buildContext;
@@ -54,8 +62,15 @@ export abstract class BaseJobContext implements JobContext {
   }
 
   async buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace> {
-    const result = await buildPlaceAsync({ ...options, reporter: this._reporter });
-    const tracked = new TrackedBuiltPlace(result.rbxlPath, result.target, result.buildContext);
+    const result = await buildPlaceAsync({
+      ...options,
+      reporter: this._reporter,
+    });
+    const tracked = new TrackedBuiltPlace(
+      result.rbxlPath,
+      result.target,
+      result.buildContext
+    );
     this._builtPlaces.add(tracked);
 
     // When a basePlace is configured, download it and merge with the rojo-built code
@@ -113,8 +128,13 @@ export abstract class BaseJobContext implements JobContext {
     this._builtPlaces.delete(tracked);
   }
 
-  abstract deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<Deployment>;
-  abstract runScriptAsync(deployment: Deployment, options: RunScriptOptions): Promise<ScriptRunResult>;
+  abstract deployBuiltPlaceAsync(
+    options: DeployPlaceOptions
+  ): Promise<Deployment>;
+  abstract runScriptAsync(
+    deployment: Deployment,
+    options: RunScriptOptions
+  ): Promise<ScriptRunResult>;
   abstract getLogsAsync(deployment: Deployment): Promise<string>;
   abstract releaseAsync(deployment: Deployment): Promise<void>;
 

@@ -14,7 +14,7 @@ Test files must end in `.spec.lua` and live alongside the code they test (e.g. `
 ### Example test
 
 ```luau
---!nonstrict
+--!strict
 --[[
 	@class MyUtils.spec.lua
 ]]
@@ -36,6 +36,34 @@ describe("MyUtils", function()
 	end)
 end)
 ```
+
+### jest.config.lua
+
+Every testable package needs a `jest.config.lua` in its `src/` directory. This tells the test runner to discover `.spec` files:
+
+```luau
+return {
+	testMatch = { "**/*.spec" },
+}
+```
+
+### Migration from TestEZ to Jest
+
+Legacy tests use the TestEZ pattern (`return function()` wrapper, `.to.equal()` matchers). New tests should use the explicit Jest pattern. Key differences:
+
+| TestEZ (old) | Jest (new) |
+|---|---|
+| `--!nonstrict` | `--!strict` |
+| No `Jest` require | `local Jest = require("Jest")` |
+| Implicit `describe`/`it`/`expect` globals | Extract from `Jest.Globals` |
+| `return function() ... end` wrapper | Top-level `describe()` (no wrapper) |
+| `expect(x).to.equal(y)` | `expect(x).toEqual(y)` |
+| `expect(x).to.be.ok()` | `expect(x).toBeTruthy()` |
+| `expect(x).to.be.near(y, 1e-3)` | `expect(x).toBeCloseTo(y, 3)` |
+| `expect(fn).to.throw()` | `expect(fn).toThrow()` |
+| `expect(x).never.to.equal(y)` | `expect(x).never.toEqual(y)` |
+
+Note: `toBeCloseTo(value, numDigits)` takes the number of decimal digits of precision (e.g. `3` means `1e-3` tolerance), not an absolute epsilon.
 
 ## Setting up a package for testing
 
@@ -108,12 +136,15 @@ The script template is executed via Open Cloud (or locally via studio-bridge). I
 
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local require = require(loader).bootstrapGame(ServerScriptService.mypackage)
+local root = ServerScriptService.mypackage
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(ServerScriptService.mypackage)
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
+	return
+end
 ```
 
 Replace `mypackage` with the key used in your Rojo project tree.
@@ -204,9 +235,27 @@ When tests fail in CI, the `post-test-results` command parses Jest-lua output an
 
 The resolver code lives in `tools/nevermore-cli/src/utils/sourcemap/` and is shared with the `strip-sourcemap-jest` command.
 
+## Linux headless testing
+
+Studio can run headlessly on Linux via Wine, enabling E2E tests in devcontainers and GitHub Actions without a display or GPU. The `studio-bridge` CLI handles all environment setup:
+
+```bash
+# One-time setup
+studio-bridge linux setup --install-deps
+studio-bridge linux inject-credentials  # reads $ROBLOSECURITY env var
+
+# Run tests the same as on Windows/macOS
+nevermore test
+```
+
+Prerequisites (Wine 11, Xvfb, openbox, Mesa llvmpipe) are documented in `tools/studio-bridge/src/linux/README.md`. The `linux setup --install-deps` flag installs everything on Debian/Ubuntu but is opt-in — it never runs sudo automatically.
+
+For CI, set `ROBLOSECURITY` as a repository or Codespace secret. The `.github/workflows/studio-linux-e2e.yml` workflow demonstrates the full flow.
+
 ## CI design principles
 
 - **Workflows should be thin.** All logic lives in `nevermore-cli` commands — GitHub Actions workflows just call them. This keeps CI debuggable locally.
 - **Rate limiting** is shared across concurrent workers via the `OpenCloudClient` instance. The `RateLimiter` serializes all Open Cloud API requests (one in-flight at a time) and reads `x-ratelimit-remaining` / `x-ratelimit-reset` headers.
 - **Post results via CLI**: `nevermore tools post-test-results <file>` posts or updates a PR comment with test results and writes to the GitHub Actions job summary. Requires `GITHUB_TOKEN` for PR comments; job summaries are written automatically when `GITHUB_STEP_SUMMARY` is set.
-- **Job summaries**: Results are automatically written to the [GitHub Actions job summary](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#adding-a-job-summary) when running in CI. This makes results visible on the workflow run summary page, complementing the PR comment.
+- **Live comment updates during the run**: When `nevermore batch test` detects a CI environment, it also updates the PR comment as packages transition between phases (throttled to ~10s). The `post-test-results` step still writes the final snapshot, but reviewers see progress without waiting for the full run to finish. In `--aggregated` mode every package shares one execution, so they move through `uploading` → `scheduling` → `executing` in lock-step — that's expected, not a bug.
+- **Job summaries**: Results are automatically written to the [GitHub Actions job summary](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#adding-a-job-summary) when running in CI. This makes results visible on the workflow run summary page, complementing the PR comment. The job summary is only written by `post-test-results` (not by the live batch run) to avoid duplicate entries on the workflow summary page.

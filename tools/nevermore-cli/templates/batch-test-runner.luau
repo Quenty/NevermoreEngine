@@ -32,6 +32,7 @@ end
 type Result = {
 	success: boolean,
 	slug: string,
+	durationMs: number,
 	error: string?,
 }
 
@@ -42,8 +43,8 @@ for _, slug in packageSlugs do
 	if not scriptSource then
 		warn(`[BatchTest] No script for {slug}`)
 		print("===BATCH_TEST_BEGIN " .. slug .. "===")
-		print("===BATCH_TEST_END " .. slug .. " FAIL===")
-		table.insert(results, { slug = slug, success = false, error = "No test script found" })
+		print("===BATCH_TEST_END " .. slug .. " FAIL 0===")
+		table.insert(results, { slug = slug, success = false, durationMs = 0, error = "No test script found" })
 		continue
 	end
 
@@ -71,6 +72,10 @@ for _, slug in packageSlugs do
 
 	print("===BATCH_TEST_BEGIN " .. slug .. "===")
 
+	-- Measure pcall execution time only. The surrounding cleanup/yield cost
+	-- is amortized across all packages and would otherwise dominate fast tests.
+	local startClock = os.clock()
+
 	local testOk, testErr = pcall(function()
 		local fn, compileErr = loadstring(scriptSource, slug)
 		if not fn then
@@ -78,6 +83,8 @@ for _, slug in packageSlugs do
 		end
 		fn()
 	end)
+
+	local durationMs = math.floor((os.clock() - startClock) * 1000 + 0.5)
 
 	-- Yield before the END marker for the same reason: leaked deferred
 	-- callbacks may fire during fn() and their output must land before
@@ -112,12 +119,12 @@ for _, slug in packageSlugs do
 	end
 
 	if testOk then
-		print("===BATCH_TEST_END " .. slug .. " PASS===")
-		table.insert(results, { slug = slug, success = true })
+		print("===BATCH_TEST_END " .. slug .. " PASS " .. tostring(durationMs) .. "===")
+		table.insert(results, { slug = slug, success = true, durationMs = durationMs })
 	else
 		warn("[BatchTest] " .. slug .. ": " .. tostring(testErr))
-		print("===BATCH_TEST_END " .. slug .. " FAIL===")
-		table.insert(results, { slug = slug, success = false, error = tostring(testErr) })
+		print("===BATCH_TEST_END " .. slug .. " FAIL " .. tostring(durationMs) .. "===")
+		table.insert(results, { slug = slug, success = false, durationMs = durationMs, error = tostring(testErr) })
 	end
 end
 

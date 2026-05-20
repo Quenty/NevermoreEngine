@@ -87,6 +87,29 @@ export function resolveDeployTarget(
   return target;
 }
 
+/**
+ * Pick a target name when the user did not specify one. If the config has
+ * exactly one target, use it. Otherwise prefer "test" if it exists; if not,
+ * throw with the list of available targets.
+ */
+export function resolveDefaultTargetName(config: DeployConfig): string {
+  const availableTargets = Object.keys(config.targets);
+
+  if (availableTargets.length === 1) {
+    return availableTargets[0]!;
+  }
+  if (config.targets['test']) {
+    return 'test';
+  }
+
+  throw new Error(
+    [
+      'No --target specified and no default could be inferred.',
+      `Available targets: ${availableTargets.join(', ')}`,
+    ].join('\n')
+  );
+}
+
 export function resolveDeployConfigPath(packagePath: string): string {
   return path.resolve(packagePath, 'deploy.nevermore.json');
 }

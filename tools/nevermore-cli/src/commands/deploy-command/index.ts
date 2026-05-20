@@ -7,14 +7,20 @@ import {
   CompositeReporter,
   JsonFileReporter,
   SimpleReporter,
+  SpinnerReporter,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
+import {
+  loadDeployConfigAsync,
+  resolveDefaultTargetName,
+  resolveDeployConfigPath,
+} from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
 
 export interface DeployArgs extends NevermoreGlobalArgs {
@@ -29,6 +35,7 @@ export interface DeployArgs extends NevermoreGlobalArgs {
   createPlace?: boolean;
   placeFile?: string;
   output?: string;
+  logs?: boolean;
 }
 
 export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
@@ -50,9 +57,9 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             type: 'number',
           })
           .option('target', {
-            describe: 'Deploy target name',
+            describe:
+              'Deploy target name (auto-detects "test" or "integration" if omitted)',
             type: 'string',
-            default: 'test',
           })
           .option('project', {
             describe: 'Rojo project file (relative to package)',
@@ -91,9 +98,9 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       (yargs) => {
         return yargs
           .positional('target', {
-            describe: 'Deploy target name from deploy.nevermore.json',
+            describe:
+              'Deploy target name from deploy.nevermore.json (defaults to the only target if there is just one, otherwise "test")',
             type: 'string',
-            default: 'test',
           })
           .option('api-key', {
             describe: 'Roblox Open Cloud API key',
@@ -113,19 +120,23 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             type: 'number',
           })
           .option('place-file', {
-            describe: 'Upload a pre-built .rbxl file instead of building via rojo',
+            describe:
+              'Upload a pre-built .rbxl file instead of building via rojo',
             type: 'string',
           })
           .option('output', {
             describe: 'Write JSON results to this file',
             type: 'string',
+          })
+          .option('logs', {
+            describe: 'Show build/upload logs (not just on failure)',
+            type: 'boolean',
+            default: false,
           });
       },
       async (runArgs) => {
         try {
-          await DeployCommand._handleRunAsync(
-            runArgs as unknown as DeployArgs
-          );
+          await DeployCommand._handleRunAsync(runArgs as unknown as DeployArgs);
         } catch (err) {
           OutputHelper.error(err instanceof Error ? err.message : String(err));
           process.exit(1);
@@ -145,19 +156,49 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     }
 
     const cwd = process.cwd();
-    const packageName =
-      (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
-    const targetName = args.target ?? 'test';
+    const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
+
+    let targetName: string;
+    let targetAutoDetected = false;
+    if (args.target) {
+      targetName = args.target;
+    } else {
+      const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
+      targetName = resolveDefaultTargetName(config);
+      targetAutoDetected = true;
+    }
+
+    const useSpinner = process.stdout.isTTY && !args.verbose;
+    const showLogs = args.logs ?? false;
+    const publish = args.publish ?? false;
+    const deployLabels = {
+      successLabel: publish ? 'Published' : 'Deployed',
+      failureLabel: publish ? 'PUBLISH FAILED' : 'DEPLOY FAILED',
+    };
+    const actionVerb = publish ? 'Publishing' : 'Deploying';
+
+    // Spinner embeds the target in its header; SimpleReporter has no header, so
+    // surface auto-detection here like before.
+    if (!useSpinner && targetAutoDetected) {
+      OutputHelper.info(`Using target '${targetName}'.`);
+    }
 
     const reporter = new CompositeReporter(
       [packageName],
       (state: LiveStateTracker) => {
         const reporters: Reporter[] = [
-          new SimpleReporter(state, {
-            alwaysShowLogs: false,
-            successMessage: 'Deploy complete!',
-            failureMessage: 'Deploy failed!',
-          }),
+          useSpinner
+            ? new SpinnerReporter(state, {
+                showLogs,
+                actionVerb,
+                actionContext: `to target '${targetName}'`,
+                ...deployLabels,
+              })
+            : new SimpleReporter(state, {
+                alwaysShowLogs: showLogs,
+                successMessage: 'Deploy complete!',
+                failureMessage: 'Deploy failed!',
+              }),
         ];
         if (args.output) {
           reporters.push(new JsonFileReporter(state, args.output));
@@ -167,7 +208,10 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     );
 
     const apiKey = await getApiKeyAsync(args);
-    const client = new OpenCloudClient({ apiKey, rateLimiter: new RateLimiter() });
+    const client = new OpenCloudClient({
+      apiKey,
+      rateLimiter: new RateLimiter(),
+    });
     const context = new CloudJobContext(reporter, client);
 
     await reporter.startAsync();
@@ -199,6 +243,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         success: true,
         logs: `${action} v${version}`,
         durationMs,
+        progressSummary: { kind: 'version', version },
       });
 
       if (args.publish) {

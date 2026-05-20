@@ -15,8 +15,7 @@ local Viewport = require("Viewport")
 return function(target)
 	local maid = Maid.new()
 
-	local viewport = Viewport.new()
-	maid:GiveTask(viewport)
+	local viewport = maid:Add(Viewport.new())
 
 	maid
 		:GivePromise(InsertServiceUtils.promiseAsset(182451181)) --The account must own the asset in order to insert it.
