@@ -40,11 +40,6 @@ jobs:
           filter: 'blob:none'        # skip historical blobs to speed checkout
           persist-credentials: false # https://stackoverflow.com/questions/74744498/github-pushing-to-protected-branches-with-fine-grained-token
 
-      - name: Setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '21'
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
