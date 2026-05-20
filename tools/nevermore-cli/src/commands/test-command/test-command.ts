@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { Argv, CommandModule } from 'yargs';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
@@ -147,7 +148,7 @@ export class TestProjectCommand<T>
         success: false,
         logs: '',
         durationMs: 0,
-        error: err instanceof Error ? err.message : String(err),
+        error: OutputHelper.formatErrorChain(err),
       });
       exitCode = 1;
     }

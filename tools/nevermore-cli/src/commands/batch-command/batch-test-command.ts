@@ -250,7 +250,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     });
     if (results.summary.failed > 0) exitCode = 1;
   } catch (err) {
-    OutputHelper.error(err instanceof Error ? err.message : String(err));
+    OutputHelper.error(OutputHelper.formatErrorChain(err));
     exitCode = 1;
   } finally {
     await context.disposeAsync();
