@@ -179,6 +179,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
   await reporter.startAsync();
 
+  let exitCode = 0;
   try {
     const results = await runBatchAsync<BatchDeployResult>({
       packages,
@@ -239,13 +240,16 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         };
       },
     });
-
-    await reporter.stopAsync();
-
-    process.exit(results.summary.failed > 0 ? 1 : 0);
+    if (results.summary.failed > 0) exitCode = 1;
+  } catch (err) {
+    OutputHelper.error(err instanceof Error ? err.message : String(err));
+    exitCode = 1;
   } finally {
     await context.disposeAsync();
   }
+
+  await reporter.stopAsync();
+  process.exit(exitCode);
 }
 
 function _annotateSmokeTestFailure(logs: string): string {

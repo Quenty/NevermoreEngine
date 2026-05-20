@@ -24,7 +24,6 @@ import {
 import {
   type LiveStateTracker,
   type BatchTestResult,
-  type BatchTestSummary,
   CompositeReporter,
   GithubCommentTableReporter,
   GroupedReporter,
@@ -222,9 +221,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     : innerContext;
 
   await reporter.startAsync();
-  let results: BatchTestSummary;
+
+  let exitCode = 0;
   try {
-    results = await runBatchAsync<BatchTestResult>({
+    const results = await runBatchAsync<BatchTestResult>({
       packages,
       concurrency,
       reporter,
@@ -248,6 +248,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
         };
       },
     });
+    if (results.summary.failed > 0) exitCode = 1;
+  } catch (err) {
+    OutputHelper.error(err instanceof Error ? err.message : String(err));
+    exitCode = 1;
   } finally {
     await context.disposeAsync();
   }
@@ -256,7 +260,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   // Node.js fetch (undici) keeps TCP connections alive in a global pool,
   // which prevents the event loop from draining. Explicit exit required.
-  process.exit(results.summary.failed > 0 ? 1 : 0);
+  process.exit(exitCode);
 }
 
 async function _runWithRetryAsync(

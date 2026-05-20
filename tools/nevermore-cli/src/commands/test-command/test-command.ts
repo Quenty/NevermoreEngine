@@ -1,6 +1,5 @@
 import * as path from 'path';
 import { Argv, CommandModule } from 'yargs';
-import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
@@ -79,37 +78,38 @@ export class TestProjectCommand<T>
   };
 
   public handler = async (args: TestProjectArgs) => {
-    try {
-      const cwd = process.cwd();
-      const packageName =
-        (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
-      const showLogs = args.logs ?? false;
-      const useSpinner = process.stdout.isTTY && !args.verbose;
+    const cwd = process.cwd();
+    const packageName =
+      (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
+    const showLogs = args.logs ?? false;
+    const useSpinner = process.stdout.isTTY && !args.verbose;
 
-      const reporter = new CompositeReporter(
-        [packageName],
-        (state: LiveStateTracker) => {
-          const reporters: Reporter[] = [
-            useSpinner
-              ? new SpinnerReporter(state, {
-                  showLogs,
-                  actionVerb: 'Testing',
-                })
-              : new SimpleReporter(state, {
-                  alwaysShowLogs: showLogs,
-                  successMessage: 'Tests passed!',
-                  failureMessage:
-                    'Tests failed! See output above for more information.',
-                }),
-          ];
-          if (args.output) {
-            reporters.push(new JsonFileReporter(state, args.output));
-          }
-          return reporters;
+    const reporter = new CompositeReporter(
+      [packageName],
+      (state: LiveStateTracker) => {
+        const reporters: Reporter[] = [
+          useSpinner
+            ? new SpinnerReporter(state, {
+                showLogs,
+                actionVerb: 'Testing',
+              })
+            : new SimpleReporter(state, {
+                alwaysShowLogs: showLogs,
+                successMessage: 'Tests passed!',
+                failureMessage:
+                  'Tests failed! See output above for more information.',
+              }),
+        ];
+        if (args.output) {
+          reporters.push(new JsonFileReporter(state, args.output));
         }
-      );
-      await reporter.startAsync();
+        return reporters;
+      }
+    );
+    await reporter.startAsync();
 
+    let exitCode = 0;
+    try {
       const context = args.cloud
         ? new CloudJobContext(
             reporter,
@@ -140,13 +140,19 @@ export class TestProjectCommand<T>
           ? { kind: 'test-counts', ...result.testCounts }
           : undefined,
       });
-
-      await reporter.stopAsync();
+      if (!result.success) exitCode = 1;
     } catch (err) {
-      OutputHelper.error(err instanceof Error ? err.message : String(err));
-      process.exit(1);
+      reporter.onPackageResult({
+        packageName,
+        success: false,
+        logs: '',
+        durationMs: 0,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      exitCode = 1;
     }
 
-    process.exit(0);
+    await reporter.stopAsync();
+    process.exit(exitCode);
   };
 }
