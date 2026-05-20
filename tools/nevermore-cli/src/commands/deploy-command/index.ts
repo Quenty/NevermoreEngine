@@ -16,12 +16,8 @@ import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
-import {
-  loadDeployConfigAsync,
-  resolveDefaultTargetName,
-  resolveDeployConfigPath,
-} from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
+import { selectTargetAsync } from './select-target.js';
 
 export interface DeployArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -158,15 +154,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     const cwd = process.cwd();
     const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
 
-    let targetName: string;
-    let targetAutoDetected = false;
-    if (args.target) {
-      targetName = args.target;
-    } else {
-      const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
-      targetName = resolveDefaultTargetName(config);
-      targetAutoDetected = true;
-    }
+    const { targetName, autoDetected: targetAutoDetected } =
+      await selectTargetAsync(cwd, {
+        explicitTarget: args.target,
+        publish: args.publish ?? false,
+      });
 
     const useSpinner = process.stdout.isTTY && !args.verbose;
     const showLogs = args.logs ?? false;
