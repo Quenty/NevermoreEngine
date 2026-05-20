@@ -1,19 +1,11 @@
-# v10.45.0 (Wed May 20 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into claude/luau-strict-typing-9CjQp ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.44.0...@quenty/spawning@10.45.0) (2026-05-20)
+
+**Note:** Version bump only for package @quenty/spawning
 
 # [10.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.43.2...@quenty/spawning@10.44.0) (2026-05-18)
 

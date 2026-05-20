@@ -1,29 +1,13 @@
-# v10.54.0 (Wed May 20 2026)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Claude ([@claude](https://github.com/claude)), for all your work!
-
-#### 🚀 Enhancement
-
-- feat(luau): convert 41 trivial files to --!strict typing [#671](https://github.com/Quenty/NevermoreEngine/pull/671) ([@claude](https://github.com/claude) [@Quenty](https://github.com/Quenty))
-- feat(luau): convert 41 trivial files to --!strict typing ([@claude](https://github.com/claude))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into claude/luau-strict-typing-9CjQp ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- Claude ([@claude](https://github.com/claude))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.53.0...@quenty/settings-inputkeymap@10.54.0) (2026-05-20)
+
+### Features
+
+- **luau:** convert 41 trivial files to --!strict typing ([0edcac1](https://github.com/Quenty/NevermoreEngine/commit/0edcac1e5ce096662406c2685e22469c22c187e4))
 
 # [10.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.52.3...@quenty/settings-inputkeymap@10.53.0) (2026-05-18)
 

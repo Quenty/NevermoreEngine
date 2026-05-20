@@ -1,29 +1,11 @@
-# v14.49.0 (Wed May 20 2026)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Claude ([@claude](https://github.com/claude)), for all your work!
-
-#### 🚀 Enhancement
-
-- feat(luau): convert 41 trivial files to --!strict typing ([@claude](https://github.com/claude))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into claude/luau-strict-typing-9CjQp ([@Quenty](https://github.com/Quenty))
-- fix(luau): revert 6 files where --!strict broke downstream typecheck ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- Claude ([@claude](https://github.com/claude))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.48.0...@quenty/gameproductservice@14.49.0) (2026-05-20)
+
+**Note:** Version bump only for package @quenty/gameproductservice
 
 # [14.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.47.2...@quenty/gameproductservice@14.48.0) (2026-05-18)
 
