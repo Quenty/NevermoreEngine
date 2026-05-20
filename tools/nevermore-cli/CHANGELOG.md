@@ -1,3 +1,26 @@
+# v4.29.0 (Wed May 20 2026)
+
+#### 🚀 Enhancement
+
+- Improve `nevermore deploy` error reporting and `nevermore init` to include deployment and tests as part of the template [#697](https://github.com/Quenty/NevermoreEngine/pull/697) ([@Quenty](https://github.com/Quenty))
+- feat: Add tests and integration work to game-template ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Deploy prompts for targets if multiple exist ([@Quenty](https://github.com/Quenty))
+- style: Apply prettier formatting ([@Quenty](https://github.com/Quenty))
+- fix: Retrieve all structured logs, not just some ([@Quenty](https://github.com/Quenty))
+- fix: Thread timeout properly to Roblox for faster debugging ([@Quenty](https://github.com/Quenty))
+- fix: Verbose output is properly verbose ([@Quenty](https://github.com/Quenty))
+- fix: Format output error chains nicer ([@Quenty](https://github.com/Quenty))
+- fest: Errors always get reported, and not eaten by spinner ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

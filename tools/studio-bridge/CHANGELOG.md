@@ -1,3 +1,19 @@
+# v0.12.0 (Wed May 20 2026)
+
+#### 🚀 Enhancement
+
+- Improve `nevermore deploy` error reporting and `nevermore init` to include deployment and tests as part of the template [#697](https://github.com/Quenty/NevermoreEngine/pull/697) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fest: Errors always get reported, and not eaten by spinner ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

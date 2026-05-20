@@ -1,5 +1,18 @@
 # (Wed May 20 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.14.0`, `@quenty/nevermore-cli@4.29.0`, `@quenty/studio-bridge@0.12.0`
+  - Improve `nevermore deploy` error reporting and `nevermore init` to include deployment and tests as part of the template [#697](https://github.com/Quenty/NevermoreEngine/pull/697) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed May 20 2026)
+
 :tada: This release contains work from a new contributor! :tada:
 
 Thank you, Claude ([@claude](https://github.com/claude)), for all your work!
