@@ -1,3 +1,16 @@
+# (Wed May 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.28.1`
+  - ci: Luau-lsp multi-line parsing errors are reported nicely in CI/CD [#696](https://github.com/Quenty/NevermoreEngine/pull/696) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue May 19 2026)
 
 #### 🚀 Enhancement
