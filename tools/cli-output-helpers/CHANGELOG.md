@@ -1,25 +1,14 @@
-# v1.14.0 (Wed May 20 2026)
-
-#### 🚀 Enhancement
-
-- Improve `nevermore deploy` error reporting and `nevermore init` to include deployment and tests as part of the template [#697](https://github.com/Quenty/NevermoreEngine/pull/697) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Apply prettier formatting ([@Quenty](https://github.com/Quenty))
-- fix: Verbose output is properly verbose ([@Quenty](https://github.com/Quenty))
-- fix: Format output error chains nicer ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.14.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.13.0...@quenty/cli-output-helpers@1.14.0) (2026-05-20)
+
+### Bug Fixes
+
+- Format output error chains nicer ([176f965](https://github.com/Quenty/Nevermore/commit/176f9656d761ac2e1ec93887a5bd310cca78abba))
+- Verbose output is properly verbose ([5b72693](https://github.com/Quenty/Nevermore/commit/5b726934bc019d3905e2e8aa594a6fec3eaee279))
 
 # [1.13.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.12.0...@quenty/cli-output-helpers@1.13.0) (2026-05-19)
 

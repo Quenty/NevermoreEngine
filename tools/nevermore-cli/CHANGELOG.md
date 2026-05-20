@@ -1,30 +1,21 @@
-# v4.29.0 (Wed May 20 2026)
-
-#### 🚀 Enhancement
-
-- Improve `nevermore deploy` error reporting and `nevermore init` to include deployment and tests as part of the template [#697](https://github.com/Quenty/NevermoreEngine/pull/697) ([@Quenty](https://github.com/Quenty))
-- feat: Add tests and integration work to game-template ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Deploy prompts for targets if multiple exist ([@Quenty](https://github.com/Quenty))
-- style: Apply prettier formatting ([@Quenty](https://github.com/Quenty))
-- fix: Retrieve all structured logs, not just some ([@Quenty](https://github.com/Quenty))
-- fix: Thread timeout properly to Roblox for faster debugging ([@Quenty](https://github.com/Quenty))
-- fix: Verbose output is properly verbose ([@Quenty](https://github.com/Quenty))
-- fix: Format output error chains nicer ([@Quenty](https://github.com/Quenty))
-- fest: Errors always get reported, and not eaten by spinner ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.29.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.28.1...@quenty/nevermore-cli@4.29.0) (2026-05-20)
+
+### Bug Fixes
+
+- Deploy prompts for targets if multiple exist ([c91dcba](https://github.com/Quenty/Nevermore/commit/c91dcba66e5f141084bce2c82b33ac30c15745aa))
+- Format output error chains nicer ([176f965](https://github.com/Quenty/Nevermore/commit/176f9656d761ac2e1ec93887a5bd310cca78abba))
+- Retrieve all structured logs, not just some ([c384024](https://github.com/Quenty/Nevermore/commit/c3840242724bbddbf825f5a3fc71b898cc3e6894))
+- Thread timeout properly to Roblox for faster debugging ([6b8f382](https://github.com/Quenty/Nevermore/commit/6b8f382eb715b948c77a432c4a399e606bf77278))
+- Verbose output is properly verbose ([5b72693](https://github.com/Quenty/Nevermore/commit/5b726934bc019d3905e2e8aa594a6fec3eaee279))
+
+### Features
+
+- Add tests and integration work to game-template ([b5f17d8](https://github.com/Quenty/Nevermore/commit/b5f17d80a26b04f2ae0feecaad5ec104066114f3))
 
 ## [4.28.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.28.0...@quenty/nevermore-cli@4.28.1) (2026-05-20)
 
