@@ -1,22 +1,14 @@
-# v4.29.2 (Thu May 21 2026)
-
-#### 🐛 Bug Fix
-
-- fix: More CI/CD fixes, including nevermore templates failing CI release [#700](https://github.com/Quenty/NevermoreEngine/pull/700) ([@Quenty](https://github.com/Quenty))
-- style: Run prettier on deploy-command and test-command ([@Quenty](https://github.com/Quenty))
-- fix: Fix templates when appending to .npmrc files without a trailing new line, we lose the last entry registration in the .npmrc and thus cause a failure in pnpm install ([@Quenty](https://github.com/Quenty))
-- fix: Deploy now reports status live ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.29.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.29.1...@quenty/nevermore-cli@4.29.2) (2026-05-21)
+
+### Bug Fixes
+
+- Deploy now reports status live ([286a0fa](https://github.com/Quenty/Nevermore/commit/286a0fa2542d45a7946b4a4aae9a58987e491e5a))
+- Fix templates when appending to .npmrc files without a trailing new line, we lose the last entry registration in the .npmrc and thus cause a failure in pnpm install ([2ebddca](https://github.com/Quenty/Nevermore/commit/2ebddca32039ab196b6e44716a0a180a4866886f))
 
 ## [4.29.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.29.0...@quenty/nevermore-cli@4.29.1) (2026-05-21)
 
