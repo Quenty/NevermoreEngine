@@ -1,3 +1,16 @@
+# v4.29.1 (Thu May 21 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Make sure timeout lies within bounds [#699](https://github.com/Quenty/NevermoreEngine/pull/699) ([@Quenty](https://github.com/Quenty))
+- fix: Make sure timeout lies within bounds ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
