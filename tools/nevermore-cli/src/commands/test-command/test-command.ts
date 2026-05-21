@@ -5,10 +5,7 @@ import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
-import {
-  isCI,
-  readPackageNameAsync,
-} from '../../utils/nevermore-cli-utils.js';
+import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
 import {
   CloudJobContext,
   LocalJobContext,

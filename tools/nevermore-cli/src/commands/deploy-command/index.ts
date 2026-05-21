@@ -17,10 +17,7 @@ import { createDeployCommentConfig } from '../../utils/deploy/deploy-github-colu
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
-import {
-  isCI,
-  readPackageNameAsync,
-} from '../../utils/nevermore-cli-utils.js';
+import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
 import { handleInitAsync } from './deploy-init.js';
 import { selectTargetAsync } from './select-target.js';
 
@@ -202,7 +199,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         }
         if (isCI()) {
           reporters.push(
-            new GithubCommentTableReporter(state, createDeployCommentConfig(), 1)
+            new GithubCommentTableReporter(
+              state,
+              createDeployCommentConfig(),
+              1
+            )
           );
         }
         return reporters;
