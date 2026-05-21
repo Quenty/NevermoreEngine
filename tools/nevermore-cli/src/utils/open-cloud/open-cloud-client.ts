@@ -223,8 +223,16 @@ export class OpenCloudClient {
     } = { script, enableBinaryOutput: false };
     if (timeoutMs !== undefined) {
       // Roblox encodes durations as Google AIP duration strings (e.g. "120s").
-      // The server uses this to cancel runaway scripts on its end.
-      body.timeout = `${Math.max(1, Math.ceil(timeoutMs / 1000))}s`;
+      // The server uses this to cancel runaway scripts on its end and rejects
+      // values outside [1, 300] seconds inclusive.
+      const requestedSeconds = Math.ceil(timeoutMs / 1000);
+      const clampedSeconds = Math.min(300, Math.max(1, requestedSeconds));
+      if (requestedSeconds > clampedSeconds) {
+        OutputHelper.warn(
+          `Requested execution timeout of ${requestedSeconds}s exceeds the Open Cloud API maximum of 300s; clamping. The server will cancel the task if it runs longer than 5 minutes.`
+        );
+      }
+      body.timeout = `${clampedSeconds}s`;
     }
 
     const response = await this._rateLimiter.fetchAsync(url, {

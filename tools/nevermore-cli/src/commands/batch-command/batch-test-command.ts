@@ -115,7 +115,7 @@ export const batchTestCommand: CommandModule<
       })
       .option('timeout', {
         describe:
-          'Per-package script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun (default: 120)',
+          'Max script execution time in seconds for the whole batch. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
         type: 'number',
       });
   },
@@ -205,7 +205,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     });
   }
 
-  const timeoutMs = (args.timeout ?? 120) * 1000;
+  const timeoutMs = (args.timeout ?? 300) * 1000;
 
   // In aggregated mode, the inner context gets a broadcast reporter that translates
   // phase changes from the shared '_batch_' operation to all real packages
@@ -221,7 +221,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     ? new BatchScriptJobContext(innerContext, packages, {
         batchPlaceId: args.batchPlaceId,
         batchUniverseId: args.batchUniverseId,
-        perPackageTimeoutMs: timeoutMs,
+        batchTimeoutMs: timeoutMs,
         reporter,
       })
     : innerContext;

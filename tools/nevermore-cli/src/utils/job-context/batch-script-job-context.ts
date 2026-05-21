@@ -57,7 +57,7 @@ export class BatchScriptJobContext implements JobContext {
   private _repoRoot: string;
   private _batchPlaceId?: number;
   private _batchUniverseId?: number;
-  private _perPackageTimeoutMs: number;
+  private _batchTimeoutMs: number;
   private _reporter?: Reporter;
 
   // Lazy-promise state
@@ -77,7 +77,7 @@ export class BatchScriptJobContext implements JobContext {
       repoRoot?: string;
       batchPlaceId?: number;
       batchUniverseId?: number;
-      perPackageTimeoutMs?: number;
+      batchTimeoutMs?: number;
       reporter?: Reporter;
     }
   ) {
@@ -86,7 +86,7 @@ export class BatchScriptJobContext implements JobContext {
     this._repoRoot = options?.repoRoot ?? process.cwd();
     this._batchPlaceId = options?.batchPlaceId;
     this._batchUniverseId = options?.batchUniverseId;
-    this._perPackageTimeoutMs = options?.perPackageTimeoutMs ?? 120_000;
+    this._batchTimeoutMs = options?.batchTimeoutMs ?? 300_000;
     this._reporter = options?.reporter;
   }
 
@@ -285,18 +285,16 @@ export class BatchScriptJobContext implements JobContext {
       JSON.stringify(slugArray)
     );
 
-    const totalTimeoutMs = this._packages.length * this._perPackageTimeoutMs;
-
     OutputHelper.verbose(
       `Executing batch script for ${slugMap.size} packages (timeout: ${
-        totalTimeoutMs / 1000
+        this._batchTimeoutMs / 1000
       }s)...`
     );
 
     const result = await this._inner.runScriptAsync(deployment, {
       scriptContent: batchScript,
       packageName: '_batch_',
-      timeoutMs: totalTimeoutMs,
+      timeoutMs: this._batchTimeoutMs,
     });
 
     // Fetch the combined logs
