@@ -1,3 +1,18 @@
+# v4.29.2 (Thu May 21 2026)
+
+#### 🐛 Bug Fix
+
+- fix: More CI/CD fixes, including nevermore templates failing CI release [#700](https://github.com/Quenty/NevermoreEngine/pull/700) ([@Quenty](https://github.com/Quenty))
+- style: Run prettier on deploy-command and test-command ([@Quenty](https://github.com/Quenty))
+- fix: Fix templates when appending to .npmrc files without a trailing new line, we lose the last entry registration in the .npmrc and thus cause a failure in pnpm install ([@Quenty](https://github.com/Quenty))
+- fix: Deploy now reports status live ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

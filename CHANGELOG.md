@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/nevermore-cli@4.29.2`
+  - fix: More CI/CD fixes, including nevermore templates failing CI release [#700](https://github.com/Quenty/NevermoreEngine/pull/700) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu May 21 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/nevermore-cli@4.29.1`
   - fix: Make sure timeout lies within bounds [#699](https://github.com/Quenty/NevermoreEngine/pull/699) ([@Quenty](https://github.com/Quenty))
 
