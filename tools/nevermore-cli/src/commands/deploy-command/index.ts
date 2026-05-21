@@ -5,6 +5,7 @@ import {
   type Reporter,
   type LiveStateTracker,
   CompositeReporter,
+  GithubCommentTableReporter,
   JsonFileReporter,
   SimpleReporter,
   SpinnerReporter,
@@ -12,10 +13,11 @@ import {
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
+import { createDeployCommentConfig } from '../../utils/deploy/deploy-github-columns.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
-import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
+import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
 import { handleInitAsync } from './deploy-init.js';
 import { selectTargetAsync } from './select-target.js';
 
@@ -194,6 +196,15 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         ];
         if (args.output) {
           reporters.push(new JsonFileReporter(state, args.output));
+        }
+        if (isCI()) {
+          reporters.push(
+            new GithubCommentTableReporter(
+              state,
+              createDeployCommentConfig(),
+              1
+            )
+          );
         }
         return reporters;
       }
