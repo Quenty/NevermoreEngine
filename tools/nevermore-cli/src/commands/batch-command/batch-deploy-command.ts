@@ -5,6 +5,7 @@ import {
   type Reporter,
   type LiveStateTracker,
   CompositeReporter,
+  GithubCommentTableReporter,
   GroupedReporter,
   JsonFileReporter,
   SpinnerReporter,
@@ -15,7 +16,10 @@ import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
-import { type BatchDeployResult } from '../../utils/deploy/deploy-github-columns.js';
+import {
+  type BatchDeployResult,
+  createDeployCommentConfig,
+} from '../../utils/deploy/deploy-github-columns.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
@@ -165,6 +169,15 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
       ];
       if (args.output) {
         reporters.push(new JsonFileReporter(state, args.output));
+      }
+      if (isCI()) {
+        reporters.push(
+          new GithubCommentTableReporter(
+            state,
+            createDeployCommentConfig(),
+            concurrency
+          )
+        );
       }
       return reporters;
     }

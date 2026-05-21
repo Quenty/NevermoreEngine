@@ -5,7 +5,10 @@ import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
-import { readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
+import {
+  isCI,
+  readPackageNameAsync,
+} from '../../utils/nevermore-cli-utils.js';
 import {
   CloudJobContext,
   LocalJobContext,
@@ -15,9 +18,11 @@ import {
   type Reporter,
   type LiveStateTracker,
   CompositeReporter,
+  GithubCommentTableReporter,
   JsonFileReporter,
   SimpleReporter,
   SpinnerReporter,
+  createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
 
 export interface TestProjectArgs extends NevermoreGlobalArgs {
@@ -109,6 +114,11 @@ export class TestProjectCommand<T>
         ];
         if (args.output) {
           reporters.push(new JsonFileReporter(state, args.output));
+        }
+        if (isCI()) {
+          reporters.push(
+            new GithubCommentTableReporter(state, createTestCommentConfig(), 1)
+          );
         }
         return reporters;
       }
