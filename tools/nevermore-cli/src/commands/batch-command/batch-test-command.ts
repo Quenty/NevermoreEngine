@@ -230,8 +230,8 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   let exitCode = 0;
   try {
-    const results = await runBatchAsync<BatchTestResult>({
-      packages,
+    const results = await runBatchAsync<TargetPackage, BatchTestResult>({
+      items: packages,
       concurrency,
       reporter,
       bufferOutput: isGrouped,

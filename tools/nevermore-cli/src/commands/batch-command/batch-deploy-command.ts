@@ -24,6 +24,7 @@ import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import {
+  type TargetPackage,
   discoverAllTargetPackagesAsync,
   discoverChangedTargetPackagesAsync,
 } from '../../utils/batch/changed-packages-utils.js';
@@ -194,8 +195,8 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
   let exitCode = 0;
   try {
-    const results = await runBatchAsync<BatchDeployResult>({
-      packages,
+    const results = await runBatchAsync<TargetPackage, BatchDeployResult>({
+      items: packages,
       concurrency,
       reporter,
       bufferOutput: isGrouped,
