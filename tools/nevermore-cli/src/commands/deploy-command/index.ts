@@ -224,6 +224,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
     let exitCode = 0;
     let publishedVersion: number | undefined;
+    let publishedPlaceId: number | undefined;
     try {
       const builtPlace = await context.buildPlaceAsync({
         targetName,
@@ -233,7 +234,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         packageName,
       });
 
-      const { version } = await uploadPlaceAsync({
+      const { version, target } = await uploadPlaceAsync({
         builtPlace,
         args,
         client,
@@ -241,6 +242,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         packageName,
       });
       publishedVersion = version;
+      publishedPlaceId = target.placeId;
 
       const durationMs = Date.now() - startMs;
       const action = args.publish ? 'Published' : 'Saved';
@@ -270,10 +272,22 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     await reporter.stopAsync();
 
     if (publishedVersion !== undefined) {
+      const placeUrl =
+        publishedPlaceId !== undefined
+          ? `https://www.roblox.com/games/${publishedPlaceId}`
+          : undefined;
       if (args.publish) {
-        OutputHelper.info(`Published v${publishedVersion} — live in game.`);
+        OutputHelper.info(
+          placeUrl
+            ? `Published v${publishedVersion} — live in game. ${placeUrl}`
+            : `Published v${publishedVersion} — live in game.`
+        );
       } else {
-        OutputHelper.info(`Saved v${publishedVersion} — not yet live.`);
+        OutputHelper.info(
+          placeUrl
+            ? `Saved v${publishedVersion} — not yet live. ${placeUrl}`
+            : `Saved v${publishedVersion} — not yet live.`
+        );
         OutputHelper.hint('Use --publish to make it live in game.');
       }
     }
