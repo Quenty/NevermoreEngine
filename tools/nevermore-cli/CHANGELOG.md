@@ -1,20 +1,13 @@
-# v4.29.1 (Thu May 21 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Make sure timeout lies within bounds [#699](https://github.com/Quenty/NevermoreEngine/pull/699) ([@Quenty](https://github.com/Quenty))
-- fix: Make sure timeout lies within bounds ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.29.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.29.0...@quenty/nevermore-cli@4.29.1) (2026-05-21)
+
+### Bug Fixes
+
+- Make sure timeout lies within bounds ([7552bba](https://github.com/Quenty/Nevermore/commit/7552bba8f24a561f11d4be2c6f91491557f062f5))
 
 # [4.29.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.28.1...@quenty/nevermore-cli@4.29.0) (2026-05-20)
 
