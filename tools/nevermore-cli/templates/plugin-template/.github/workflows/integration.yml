@@ -55,13 +55,13 @@ jobs:
         if: steps.check.outputs.enabled == 'true'
         run: |
           if [[ -n "$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" ]]; then
-            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> .npmrc
-            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> ~/.npmrc
+            echo -e "\n//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> .npmrc
+            echo -e "\n//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> ~/.npmrc
           fi
 
           if [[ -n "$NPM_TOKEN" ]]; then
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+            echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
           fi
         env:
           NPM_GITHUB_QUENTYSTUDIOS_TOKEN: $\{{ secrets.NPM_GITHUB_QUENTYSTUDIOS_TOKEN }}
