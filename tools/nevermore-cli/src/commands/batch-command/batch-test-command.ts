@@ -241,7 +241,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
         return {
           packageName: pkg.name,
-          placeId: pkg.target.placeId,
+          placeId: pkg.activeTargets[0]!.placeId,
           success: result.success,
           logs: result.logs,
           // Aggregated mode reports per-package pcall time; the outer

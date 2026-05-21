@@ -5,13 +5,18 @@ import {
   DeployTarget,
   loadDeployConfigAsync,
   resolveDeployConfigPath,
-  resolveDeployTarget,
+  resolveDeployTargetPlaces,
 } from '../build/deploy-config.js';
 
 export interface TargetPackage {
   name: string;
   path: string;
-  target: DeployTarget;
+  /**
+   * Every place this package deploys to under the chosen target. For a
+   * single-place target this has length 1; for a multi-place target (e.g.
+   * `places: [chapter0, chapter1]`) it has one entry per place.
+   */
+  activeTargets: DeployTarget[];
 }
 
 /** @deprecated Use {@link TargetPackage} instead. */
@@ -100,7 +105,7 @@ function _requireScriptTemplate(packages: TargetPackage[]): TargetPackage[] {
   const skipped: string[] = [];
 
   for (const pkg of packages) {
-    if (pkg.target.scriptTemplate) {
+    if (pkg.activeTargets[0]!.scriptTemplate) {
       withTemplate.push(pkg);
     } else {
       skipped.push(pkg.name);
@@ -138,8 +143,8 @@ async function _filterByTargetAsync(
 
     try {
       const config = await loadDeployConfigAsync(configPath);
-      const target = resolveDeployTarget(config, targetName);
-      results.push({ name: pkg.name, path: pkg.path, target });
+      const activeTargets = resolveDeployTargetPlaces(config, targetName);
+      results.push({ name: pkg.name, path: pkg.path, activeTargets });
     } catch {
       skippedNoTarget.push(pkg.name);
     }

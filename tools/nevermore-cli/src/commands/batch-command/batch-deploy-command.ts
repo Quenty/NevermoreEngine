@@ -220,13 +220,13 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
         // Run smoke test for targets with basePlace
         let logs: string;
-        if (pkg.target.basePlace) {
+        if (pkg.activeTargets[0]!.basePlace) {
           OutputHelper.verbose('Running post-deploy smoke test...');
           const smokeResult = await _runSmokeTestAsync(
             pkgReporter,
             pkg.name,
-            pkg.target.universeId,
-            pkg.target.placeId,
+            pkg.activeTargets[0]!.universeId,
+            pkg.activeTargets[0]!.placeId,
             version,
             client
           );
@@ -234,7 +234,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           if (!smokeResult.success) {
             return {
               packageName: pkg.name,
-              placeId: pkg.target.placeId,
+              placeId: pkg.activeTargets[0]!.placeId,
               success: false,
               logs: _annotateSmokeTestFailure(logs),
             };
@@ -246,7 +246,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
         return {
           packageName: pkg.name,
-          placeId: pkg.target.placeId,
+          placeId: pkg.activeTargets[0]!.placeId,
           success: true,
           logs,
           progressSummary: { kind: 'version', version },
