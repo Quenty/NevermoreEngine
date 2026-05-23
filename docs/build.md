@@ -64,7 +64,7 @@ In general you want to install the following by hand.
 2. [Git](https://git-scm.com/downloads)
 3. [Aftman](https://github.com/LPGhatguy/aftman)
 
-After than you will want to clone Nevermore to a folder.
+After that you will want to clone Nevermore to a folder.
 
 ```bash
 git clone https://github.com/Quenty/NevermoreEngine.git
@@ -86,4 +86,4 @@ pnpm install
 You can then serve a test place
 
 ## Why does building need a custom version of Rojo?
-Nevermore does not need a custom version of Rojo to be consumed, but it does need one to be built. This custom version of Rojo understands symlinks and turn them into ObjectValues. These symlinks link the packages together and means that a change to a transient dependency, or direct dependency will immediately be shown in the upstream package.
+Nevermore does not need a custom version of Rojo to be consumed, but it does need one to be built. This custom version of Rojo understands symlinks and turn them into ObjectValues. These symlinks link the packages together and means that a change to a transitive dependency, or direct dependency will immediately be shown in the upstream package.

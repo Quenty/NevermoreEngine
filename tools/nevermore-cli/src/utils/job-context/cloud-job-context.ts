@@ -3,7 +3,7 @@ import {
   type LuauTask,
   type OpenCloudClient,
 } from '../open-cloud/open-cloud-client.js';
-import { tryRenamePlaceAsync } from '../auth/roblox-auth/index.js';
+import { tryRenamePlaceAsync } from '@quenty/nevermore-cli-helpers';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
 import {
   type Deployment,
@@ -80,8 +80,13 @@ export class CloudJobContext extends BaseJobContext {
       cloudDeployment.universeId,
       cloudDeployment.placeId,
       cloudDeployment.version,
-      scriptContent
+      scriptContent,
+      timeoutMs
     );
+
+    // Give the server-side timeout a head start so we observe the cancelled
+    // task state instead of bailing out on the client first.
+    const CLIENT_TIMEOUT_GRACE_MS = 30_000;
 
     let pollCount = 0;
     const completedTask = await Promise.race([
@@ -98,7 +103,10 @@ export class CloudJobContext extends BaseJobContext {
           label,
         });
       }),
-      timeoutAsync(timeoutMs, `Test timed out after ${timeoutMs / 1000}s`),
+      timeoutAsync(
+        timeoutMs + CLIENT_TIMEOUT_GRACE_MS,
+        `Test timed out after ${timeoutMs / 1000}s`
+      ),
     ]);
 
     cloudDeployment.taskPath = task.path;

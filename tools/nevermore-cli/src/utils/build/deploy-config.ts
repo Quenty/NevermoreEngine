@@ -87,6 +87,33 @@ export function resolveDeployTarget(
   return target;
 }
 
+/**
+ * Pick a target name when the user did not specify one and we cannot prompt
+ * (non-TTY / CI). Single target wins; otherwise prefer "integration" over
+ * "test" so `--publish` does not silently target the test place. Throws when
+ * neither is present.
+ */
+export function resolveDefaultTargetName(config: DeployConfig): string {
+  const availableTargets = Object.keys(config.targets);
+
+  if (availableTargets.length === 1) {
+    return availableTargets[0]!;
+  }
+  if (config.targets['integration']) {
+    return 'integration';
+  }
+  if (config.targets['test']) {
+    return 'test';
+  }
+
+  throw new Error(
+    [
+      'No --target specified and no default could be inferred.',
+      `Available targets: ${availableTargets.join(', ')}`,
+    ].join('\n')
+  );
+}
+
 export function resolveDeployConfigPath(packagePath: string): string {
   return path.resolve(packagePath, 'deploy.nevermore.json');
 }

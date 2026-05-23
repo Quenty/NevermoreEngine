@@ -26,8 +26,8 @@ function BrineOptionUtils.defaultOptions(options: BrineTypes.BrineOptions?): Bri
 
 	return table.freeze({
 		includeDescendants = if current.includeDescendants == nil then true else current.includeDescendants,
-		includeAttributes = if current.includeAttributes == nil then true else current.includeDescendants,
-		includeTags = if current.includeTags == nil then true else current.includeDescendants,
+		includeAttributes = if current.includeAttributes == nil then true else current.includeAttributes,
+		includeTags = if current.includeTags == nil then true else current.includeTags,
 		instanceHook = if current.instanceHook == nil then DEFAULT_HOOK else current.instanceHook,
 		references = current.references,
 	})

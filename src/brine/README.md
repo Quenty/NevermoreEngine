@@ -12,7 +12,7 @@
   </a>
 </div>
 
-Fast and efficient extensible serialiation and deserialization library for Roblox with native instance support out of the box
+Fast and efficient extensible serialization and deserialization library for Roblox with native instance support out of the box
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/BrineUtils">View docs →</a></div>
 

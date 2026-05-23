@@ -3,33 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.1.2...@quenty/brine@1.2.0) (2026-05-18)
+
+### Features
+
+- Brine can stream and has unit tests ([21e66a7](https://github.com/Quenty/NevermoreEngine/commit/21e66a7951808685d3f776d906b4ff666b52bb09))
+
 ## [1.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.1.1...@quenty/brine@1.1.2) (2026-04-30)
 
 **Note:** Version bump only for package @quenty/brine
-
-
-
-
 
 ## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.1.0...@quenty/brine@1.1.1) (2026-04-29)
 
 **Note:** Version bump only for package @quenty/brine
 
-
-
-
-
 # 1.1.0 (2026-04-23)
-
 
 ### Features
 
-* Add initial brine library ([2fe6950](https://github.com/Quenty/NevermoreEngine/commit/2fe6950c3032a254f5812ca95cf368d1aa8c5861))
-* Additional improvments ([44896ef](https://github.com/Quenty/NevermoreEngine/commit/44896efe8dd9506ad6002bc41f816b9b2b482ebc))
-
-
-
-
+- Add initial brine library ([2fe6950](https://github.com/Quenty/NevermoreEngine/commit/2fe6950c3032a254f5812ca95cf368d1aa8c5861))
+- Additional improvments ([44896ef](https://github.com/Quenty/NevermoreEngine/commit/44896efe8dd9506ad6002bc41f816b9b2b482ebc))
 
 # v1.1.0 (Thu Apr 23 2026)
 

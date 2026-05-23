@@ -24,7 +24,7 @@ npm install @quenty/servicebag --save
 - Remove requirement for many services to be loaded
 - Make installing new modules really easy
 - Make testing easier
-- Reduce maintaince costs
+- Reduce maintenance costs
 - Explicitly declare service pattern
 - Force declaration of service usage
 - Make it easy to trace service dependencies
@@ -82,7 +82,7 @@ function TestClass.new(serviceBag)
 	self._serviceProvider = assert(serviceBag, "No serviceBag")
 
 	self._transparencyService = self._serviceProvider:GetRequiredService(TransparencyService)
-	
+
 	return self
 end
 

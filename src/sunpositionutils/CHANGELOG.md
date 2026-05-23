@@ -3,168 +3,100 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [2.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.5.1...@quenty/sunpositionutils@2.5.2) (2026-04-30)
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.5.2...@quenty/sunpositionutils@2.6.0) (2026-05-18)
 
 **Note:** Version bump only for package @quenty/sunpositionutils
 
+## [2.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.5.1...@quenty/sunpositionutils@2.5.2) (2026-04-30)
 
-
-
+**Note:** Version bump only for package @quenty/sunpositionutils
 
 ## [2.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.5.0...@quenty/sunpositionutils@2.5.1) (2026-04-29)
 
 **Note:** Version bump only for package @quenty/sunpositionutils
 
-
-
-
-
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.4.2...@quenty/sunpositionutils@2.5.0) (2026-04-23)
-
 
 ### Bug Fixes
 
-* Fix dependencies list ([776b270](https://github.com/Quenty/NevermoreEngine/commit/776b2700b97d877b70c487d2f47092bacc373e7a))
-
+- Fix dependencies list ([776b270](https://github.com/Quenty/NevermoreEngine/commit/776b2700b97d877b70c487d2f47092bacc373e7a))
 
 ### Features
 
-* Additional improvments ([44896ef](https://github.com/Quenty/NevermoreEngine/commit/44896efe8dd9506ad6002bc41f816b9b2b482ebc))
-* Upgrade dependent libraries with new functionality ([22e8c9e](https://github.com/Quenty/NevermoreEngine/commit/22e8c9e3c3dd7288dd264f00c98852653b40a402))
-
-
-
-
+- Additional improvments ([44896ef](https://github.com/Quenty/NevermoreEngine/commit/44896efe8dd9506ad6002bc41f816b9b2b482ebc))
+- Upgrade dependent libraries with new functionality ([22e8c9e](https://github.com/Quenty/NevermoreEngine/commit/22e8c9e3c3dd7288dd264f00c98852653b40a402))
 
 ## [2.4.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.4.1...@quenty/sunpositionutils@2.4.2) (2026-01-12)
 
-
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
-
-
-
-
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 ## [2.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.4.0...@quenty/sunpositionutils@2.4.1) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/sunpositionutils
 
-
-
-
-
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.3.2...@quenty/sunpositionutils@2.4.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/sunpositionutils
 
-
-
-
-
 ## [2.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.3.0...@quenty/sunpositionutils@2.3.2) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.3.0...@quenty/sunpositionutils@2.3.1) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.2.1...@quenty/sunpositionutils@2.3.0) (2024-05-09)
 
-
 ### Bug Fixes
 
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
-
-
-
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 ## [2.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.2.0...@quenty/sunpositionutils@2.2.1) (2022-08-16)
 
 **Note:** Version bump only for package @quenty/sunpositionutils
 
-
-
-
-
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.1.1...@quenty/sunpositionutils@2.2.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/sunpositionutils
-
-
-
-
 
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.1.0...@quenty/sunpositionutils@2.1.1) (2021-12-30)
 
 **Note:** Version bump only for package @quenty/sunpositionutils
 
-
-
-
-
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.0.0...@quenty/sunpositionutils@2.1.0) (2021-12-18)
-
 
 ### Bug Fixes
 
-* Selene linting Vector3.zAxis ([6a24a62](https://github.com/Quenty/NevermoreEngine/commit/6a24a62975d92665b1291e3fbb8a1ea49ee4f69d))
-
+- Selene linting Vector3.zAxis ([6a24a62](https://github.com/Quenty/NevermoreEngine/commit/6a24a62975d92665b1291e3fbb8a1ea49ee4f69d))
 
 ### Features
 
-* Add SunPositionUtils.getSunPosition(clockTime, geoLatitude), SunPositionUtils.getClockTimeFromMoonDirection(direction), and SunPositionUtils.getGeographicalLatitudeFromMoonDirection ([4adeb92](https://github.com/Quenty/NevermoreEngine/commit/4adeb92ecb6a9093062bd4659a8423d16f897454))
-
-
-
-
+- Add SunPositionUtils.getSunPosition(clockTime, geoLatitude), SunPositionUtils.getClockTimeFromMoonDirection(direction), and SunPositionUtils.getGeographicalLatitudeFromMoonDirection ([4adeb92](https://github.com/Quenty/NevermoreEngine/commit/4adeb92ecb6a9093062bd4659a8423d16f897454))
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@1.2.0...@quenty/sunpositionutils@2.0.0) (2021-09-05)
 
-
 ### Bug Fixes
 
-* Remove peer dependencies. This is because lerna doesn't really support peer dependencies being linked and getting a new version on build, which is unfortunate. ([5f5aeee](https://github.com/Quenty/NevermoreEngine/commit/5f5aeeea8de9975435309e53679f0ef7064f9dd0))
-
-
-
-
+- Remove peer dependencies. This is because lerna doesn't really support peer dependencies being linked and getting a new version on build, which is unfortunate. ([5f5aeee](https://github.com/Quenty/NevermoreEngine/commit/5f5aeeea8de9975435309e53679f0ef7064f9dd0))
 
 # 1.2.0 (2021-07-31)
 
-
 ### Bug Fixes
 
-* Add CI and CD ([47513e9](https://github.com/Quenty/NevermoreEngine/commit/47513e9b568162707534af132396dd8756947dd3))
-* Adjust CI badge to show automatic build and release state ([5a55d3f](https://github.com/Quenty/NevermoreEngine/commit/5a55d3f19bf8d66a760d67da9b56ed47fab74656))
-* Fix selene linting ([45fc074](https://github.com/Quenty/NevermoreEngine/commit/45fc07489ee59127ac6582689f19a0e87c1e5b5a))
-
-
+- Add CI and CD ([47513e9](https://github.com/Quenty/NevermoreEngine/commit/47513e9b568162707534af132396dd8756947dd3))
+- Adjust CI badge to show automatic build and release state ([5a55d3f](https://github.com/Quenty/NevermoreEngine/commit/5a55d3f19bf8d66a760d67da9b56ed47fab74656))
+- Fix selene linting ([45fc074](https://github.com/Quenty/NevermoreEngine/commit/45fc07489ee59127ac6582689f19a0e87c1e5b5a))
 
 ## 1.0.2 (2021-07-25)
 
-
-
 ## 1.0.1 (2021-07-25)
-
-
 
 # 1.0.0 (2021-07-24)

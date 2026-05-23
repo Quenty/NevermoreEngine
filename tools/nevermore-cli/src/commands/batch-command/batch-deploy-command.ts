@@ -5,6 +5,7 @@ import {
   type Reporter,
   type LiveStateTracker,
   CompositeReporter,
+  GithubCommentTableReporter,
   GroupedReporter,
   JsonFileReporter,
   SpinnerReporter,
@@ -12,10 +13,13 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import { resolvePackagePath } from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
-import { type BatchDeployResult } from '../../utils/deploy/deploy-github-columns.js';
+import {
+  type BatchDeployResult,
+  createDeployCommentConfig,
+} from '../../utils/deploy/deploy-github-columns.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
@@ -28,7 +32,8 @@ import { parseTestLogs } from '../../utils/testing/test-log-parser.js';
 
 const SMOKE_TEST_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
-  'build-scripts', 'smoke-test-server.luau'
+  'build-scripts',
+  'smoke-test-server.luau'
 );
 
 interface BatchDeployArgs extends NevermoreGlobalArgs {
@@ -134,10 +139,12 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   const concurrency = args.concurrency ?? 3;
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
+  const publish = args.publish ?? false;
   const deployLabels = {
-    successLabel: 'Deployed',
-    failureLabel: 'DEPLOY FAILED',
+    successLabel: publish ? 'Published' : 'Deployed',
+    failureLabel: publish ? 'PUBLISH FAILED' : 'DEPLOY FAILED',
   };
+  const actionVerb = publish ? 'Publishing' : 'Deploying';
 
   const reporter = new CompositeReporter(
     packageNames,
@@ -147,21 +154,30 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           ? new GroupedReporter(state, {
               showLogs: args.logs ?? false,
               verbose: args.verbose,
-              actionVerb: 'Deploying',
+              actionVerb,
               ...deployLabels,
             })
           : new SpinnerReporter(state, {
               showLogs: args.logs ?? false,
-              actionVerb: 'Deploying',
+              actionVerb,
               ...deployLabels,
             }),
         new SummaryTableReporter(state, {
           ...deployLabels,
-          summaryVerb: 'deployed',
+          summaryVerb: publish ? 'published' : 'deployed',
         }),
       ];
       if (args.output) {
         reporters.push(new JsonFileReporter(state, args.output));
+      }
+      if (isCI()) {
+        reporters.push(
+          new GithubCommentTableReporter(
+            state,
+            createDeployCommentConfig(),
+            concurrency
+          )
+        );
       }
       return reporters;
     }
@@ -176,8 +192,8 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
   await reporter.startAsync();
 
+  let exitCode = 0;
   try {
-    const publish = args.publish ?? false;
     const results = await runBatchAsync<BatchDeployResult>({
       packages,
       concurrency,
@@ -205,6 +221,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         // Run smoke test for targets with basePlace
         let logs: string;
         if (pkg.target.basePlace) {
+          OutputHelper.verbose('Running post-deploy smoke test...');
           const smokeResult = await _runSmokeTestAsync(
             pkgReporter,
             pkg.name,
@@ -219,7 +236,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
               packageName: pkg.name,
               placeId: pkg.target.placeId,
               success: false,
-              logs,
+              logs: _annotateSmokeTestFailure(logs),
             };
           }
         } else {
@@ -232,16 +249,31 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           placeId: pkg.target.placeId,
           success: true,
           logs,
+          progressSummary: { kind: 'version', version },
         };
       },
     });
-
-    await reporter.stopAsync();
-
-    process.exit(results.summary.failed > 0 ? 1 : 0);
+    if (results.summary.failed > 0) exitCode = 1;
+  } catch (err) {
+    OutputHelper.error(err instanceof Error ? err.message : String(err));
+    exitCode = 1;
   } finally {
     await context.disposeAsync();
   }
+
+  await reporter.stopAsync();
+  process.exit(exitCode);
+}
+
+function _annotateSmokeTestFailure(logs: string): string {
+  const header =
+    'Post-deploy smoke test failed. The deploy itself succeeded, but a server ' +
+    "script errored on boot. ('TaskScript' in any stack trace below refers to " +
+    "Nevermore's smoke-test-server.luau, which loadstring()s each Script under " +
+    'ServerScriptService — if you see "loadstring() is not available", set ' +
+    '$properties.LoadStringEnabled = true on ServerScriptService in your ' +
+    'rojo project.)';
+  return `${header}\n\n${logs}`;
 }
 
 async function _runSmokeTestAsync(

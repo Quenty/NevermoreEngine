@@ -2,12 +2,22 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { type JobContext } from '../../job-context/job-context.js';
-import { type ParsedTestCounts, parseTestLogs, parseTestCounts } from '../test-log-parser.js';
+import {
+  type ParsedTestCounts,
+  parseTestLogs,
+  parseTestCounts,
+} from '../test-log-parser.js';
 
 export interface SingleTestResult {
   success: boolean;
   logs: string;
   testCounts?: ParsedTestCounts;
+  /**
+   * Inner script execution time, forwarded from the JobContext when it can
+   * measure pcall duration directly (aggregated batch mode). Undefined for
+   * non-aggregated cloud/local runs — callers should fall back to wall-clock.
+   */
+  durationMs?: number;
 }
 
 export interface SingleTestOptions {
@@ -28,12 +38,7 @@ export async function runSingleTestAsync(
   context: JobContext,
   options: SingleTestOptions
 ): Promise<SingleTestResult> {
-  const {
-    packagePath,
-    packageName,
-    timeoutMs = 120_000,
-    scriptText,
-  } = options;
+  const { packagePath, packageName, timeoutMs = 120_000, scriptText } = options;
 
   const sessionId = randomUUID();
   const builtPlace = await context.buildPlaceAsync({
@@ -44,7 +49,8 @@ export async function runSingleTestAsync(
   });
 
   const scriptContent =
-    scriptText ?? (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
+    scriptText ??
+    (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
 
   const deployment = await context.deployBuiltPlaceAsync({
     builtPlace,
@@ -66,6 +72,7 @@ export async function runSingleTestAsync(
       success: result.success && parsed.success,
       logs: parsed.logs,
       testCounts: parseTestCounts(parsed.logs),
+      durationMs: result.durationMs,
     };
   } finally {
     await context.releaseAsync(deployment);

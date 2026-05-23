@@ -14,9 +14,7 @@ describe('resolveRobloxTestPath', () => {
 
   it('resolves a nested subdirectory path', () => {
     expect(
-      resolveRobloxTestPath(
-        'ServerScriptService.maid.Shared.Maid.spec'
-      )
+      resolveRobloxTestPath('ServerScriptService.maid.Shared.Maid.spec')
     ).toBe('src/maid/src/Shared/Maid.spec.lua');
   });
 
@@ -43,21 +41,21 @@ describe('resolveRobloxTestPath', () => {
   });
 
   it('handles path without ServerScriptService prefix and with :LINE suffix', () => {
-    expect(
-      resolveRobloxTestPath('maid.Shared.Maid.spec:23')
-    ).toBe('src/maid/src/Shared/Maid.spec.lua');
+    expect(resolveRobloxTestPath('maid.Shared.Maid.spec:23')).toBe(
+      'src/maid/src/Shared/Maid.spec.lua'
+    );
   });
 
   it('handles a bare package slug', () => {
-    expect(
-      resolveRobloxTestPath('ServerScriptService.maid')
-    ).toBe('src/maid/src');
+    expect(resolveRobloxTestPath('ServerScriptService.maid')).toBe(
+      'src/maid/src'
+    );
   });
 
   it('handles a single-level spec path', () => {
-    expect(
-      resolveRobloxTestPath('ServerScriptService.maid.Maid.spec')
-    ).toBe('src/maid/src/Maid.spec.lua');
+    expect(resolveRobloxTestPath('ServerScriptService.maid.Maid.spec')).toBe(
+      'src/maid/src/Maid.spec.lua'
+    );
   });
 
   describe('with sourcemap resolver', () => {

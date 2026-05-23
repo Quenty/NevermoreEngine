@@ -9,7 +9,7 @@ Services in Nevermore use [ServiceBag](/api/ServiceBag/) and need to be
 required through them. ServiceBag provides services and helps with game or
 plugin initialization, and is like a `game` in Roblox. You can retrieve
 services from it, and it will ensure the service exists and is initialized.
-This will bootstrap any other dependent dependencies.
+This will bootstrap any other dependencies.
 
 ## tl;dr
 
@@ -107,7 +107,7 @@ serviceBag:Start()
 :::warning
 An important detail of ServiceBag is that it does not allow your services to
 yield in the `:Init()` methods. This is to prevent a service from delaying your
-entires game start. If you need to yield, do work in `:Start()` or export your
+entire game start. If you need to yield, do work in `:Start()` or export your
 API calls as promises. See [Cmdr](/api/CmdrService/) for a good example of how
 this works.
 :::
@@ -205,7 +205,7 @@ end
 
 ## Extras
 
-### Why is understanding ServiceBag is important?
+### Why is understanding ServiceBag important?
 
 Nevermore tries to be a collection of libraries that can be plugged together,
 and not exist as a set framework that forces specific design decisions. While
@@ -244,7 +244,7 @@ and dependency injection system is a really good idea.
 ### What ServiceBag tries to achieve
 
 ServiceBag does service dependency injection and initialization. These words
-may be unfamiliar with you. Dependency injection is the process of retrieving
+may be unfamiliar to you. Dependency injection is the process of retrieving
 dependencies instead of constructing them in an object. Lifecycle management is
 the process of managing the life of services, which often includes the game.
 
@@ -374,6 +374,6 @@ local function getAnyModule(module)
 end
 ```
 
-It's preferably your systems interop with ServiceBag directly as ServiceBag
+It's preferable that your systems interop with ServiceBag directly as ServiceBag
 provides more control, better testability, and more clarity on where things are
 coming from.

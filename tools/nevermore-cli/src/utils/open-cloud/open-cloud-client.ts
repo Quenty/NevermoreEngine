@@ -19,6 +19,7 @@ export interface LuauTask {
     | 'COMPLETE'
     | 'FAILED';
   script: string;
+  timeout?: string;
 }
 
 export interface OpenCloudClientOptions {
@@ -209,10 +210,30 @@ export class OpenCloudClient {
     universeId: number,
     placeId: number,
     placeVersion: number,
-    script: string
+    script: string,
+    timeoutMs?: number
   ): Promise<LuauTask> {
     const apiKey = await this._resolveApiKeyAsync();
     const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
+
+    const body: {
+      script: string;
+      timeout?: string;
+      enableBinaryOutput?: boolean;
+    } = { script, enableBinaryOutput: false };
+    if (timeoutMs !== undefined) {
+      // Roblox encodes durations as Google AIP duration strings (e.g. "120s").
+      // The server uses this to cancel runaway scripts on its end and rejects
+      // values outside [1, 300] seconds inclusive.
+      const requestedSeconds = Math.ceil(timeoutMs / 1000);
+      const clampedSeconds = Math.min(300, Math.max(1, requestedSeconds));
+      if (requestedSeconds > clampedSeconds) {
+        OutputHelper.warn(
+          `Requested execution timeout of ${requestedSeconds}s exceeds the Open Cloud API maximum of 300s; clamping. The server will cancel the task if it runs longer than 5 minutes.`
+        );
+      }
+      body.timeout = `${clampedSeconds}s`;
+    }
 
     const response = await this._rateLimiter.fetchAsync(url, {
       method: 'POST',
@@ -220,7 +241,7 @@ export class OpenCloudClient {
         'Content-Type': 'application/json',
         'X-API-Key': apiKey,
       },
-      body: JSON.stringify({ script }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -313,26 +334,53 @@ export class OpenCloudClient {
 
   private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
     const apiKey = await this._resolveApiKeyAsync();
-    const response = await this._rateLimiter.fetchAsync(
-      `https://apis.roblox.com/cloud/v2/${taskPath}/logs`,
-      {
+    const messages: string[] = [];
+    let pageToken: string | undefined;
+
+    do {
+      const url = new URL(`https://apis.roblox.com/cloud/v2/${taskPath}/logs`);
+      url.searchParams.set('view', 'STRUCTURED');
+      if (pageToken) {
+        url.searchParams.set('pageToken', pageToken);
+      }
+
+      const response = await this._rateLimiter.fetchAsync(url.toString(), {
         method: 'GET',
         headers: {
           'X-API-Key': apiKey,
         },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Get logs failed: ${response.status}: ${text}`);
       }
-    );
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Get logs failed: ${response.status}: ${text}`);
-    }
+      const data = (await response.json()) as {
+        luauExecutionSessionTaskLogs?: Array<{
+          messages?: string[];
+          structuredMessages?: Array<{
+            message: string;
+            createTime: string;
+            messageType: string;
+          }>;
+        }>;
+        nextPageToken?: string;
+      };
 
-    const data = (await response.json()) as {
-      luauExecutionSessionTaskLogs: Array<{ messages: string[] }>;
-    };
+      for (const entry of data.luauExecutionSessionTaskLogs ?? []) {
+        if (entry.structuredMessages?.length) {
+          for (const msg of entry.structuredMessages) {
+            messages.push(msg.message);
+          }
+        } else if (entry.messages?.length) {
+          messages.push(...entry.messages);
+        }
+      }
 
-    const messages = data.luauExecutionSessionTaskLogs?.[0]?.messages ?? [];
+      pageToken = data.nextPageToken || undefined;
+    } while (pageToken);
+
     return messages.join('\n');
   }
 

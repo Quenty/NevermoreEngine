@@ -5,7 +5,10 @@
 import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { resolveTemplatePath, TemplateHelper } from '@quenty/nevermore-template-helpers';
+import {
+  resolveTemplatePath,
+  TemplateHelper,
+} from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { InitGameCommand } from './init-game-command.js';
 
@@ -36,7 +39,10 @@ export class InitPluginCommand<T> implements CommandModule<T, initGameArgs> {
     const pluginNameProper = TemplateHelper.camelize(rawPluginName);
 
     const srcRoot = process.cwd();
-    const templatePath = resolveTemplatePath(import.meta.url, 'plugin-template');
+    const templatePath = resolveTemplatePath(
+      import.meta.url,
+      'plugin-template'
+    );
 
     OutputHelper.info(
       `Creating a new plugin at '${srcRoot}' with template '${templatePath}'`
@@ -55,7 +61,7 @@ export class InitPluginCommand<T> implements CommandModule<T, initGameArgs> {
     const packages = ['@quenty/loader', '@quenty/servicebag'];
 
     await InitGameCommand.initToolChainAsync(args, srcRoot, packages);
-  }
+  };
 
   private static async _ensurePluginName(args: initGameArgs): Promise<string> {
     let { pluginName } = args;

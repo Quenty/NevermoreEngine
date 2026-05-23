@@ -11,11 +11,6 @@ jobs:
       - name: Fetch base branch for changeset diff
         run: git fetch origin ${{ github.base_ref }} --depth=1
 
-      - name: Setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '21'
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:

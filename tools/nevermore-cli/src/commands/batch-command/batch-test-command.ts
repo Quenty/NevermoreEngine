@@ -6,7 +6,7 @@ import {
   type ProgressSummary,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
-import { getApiKeyAsync } from '../../utils/auth/credential-store.js';
+import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import {
   type JobContext,
@@ -24,12 +24,13 @@ import {
 import {
   type LiveStateTracker,
   type BatchTestResult,
-  type BatchTestSummary,
   CompositeReporter,
+  GithubCommentTableReporter,
   GroupedReporter,
   JsonFileReporter,
   SpinnerReporter,
   SummaryTableReporter,
+  createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
 import {
   runSingleTestAsync,
@@ -49,6 +50,7 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   aggregated?: boolean;
   batchPlaceId?: number;
   batchUniverseId?: number;
+  timeout?: number;
 }
 
 export const batchTestCommand: CommandModule<
@@ -79,8 +81,7 @@ export const batchTestCommand: CommandModule<
         default: 'origin/main',
       })
       .option('concurrency', {
-        describe:
-          'Max parallel tests (0 = unlimited, default: unlimited)',
+        describe: 'Max parallel tests (0 = unlimited, default: unlimited)',
         type: 'number',
       })
       .option('output', {
@@ -110,6 +111,11 @@ export const batchTestCommand: CommandModule<
       .option('batch-universe-id', {
         describe:
           'Override universeId for the aggregated batch upload (--aggregated only)',
+        type: 'number',
+      })
+      .option('timeout', {
+        describe:
+          'Max script execution time in seconds for the whole batch. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
         type: 'number',
       });
   },
@@ -175,6 +181,15 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       if (args.output) {
         reporters.push(new JsonFileReporter(state, args.output));
       }
+      if (isCI()) {
+        reporters.push(
+          new GithubCommentTableReporter(
+            state,
+            createTestCommentConfig(),
+            concurrency
+          )
+        );
+      }
       return reporters;
     }
   );
@@ -190,7 +205,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     });
   }
 
-  const timeoutMs = 120_000;
+  const timeoutMs = (args.timeout ?? 300) * 1000;
 
   // In aggregated mode, the inner context gets a broadcast reporter that translates
   // phase changes from the shared '_batch_' operation to all real packages
@@ -206,38 +221,43 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     ? new BatchScriptJobContext(innerContext, packages, {
         batchPlaceId: args.batchPlaceId,
         batchUniverseId: args.batchUniverseId,
-        perPackageTimeoutMs: timeoutMs,
+        batchTimeoutMs: timeoutMs,
         reporter,
       })
     : innerContext;
 
   await reporter.startAsync();
-  let results: BatchTestSummary;
+
+  let exitCode = 0;
   try {
-    results = await runBatchAsync<BatchTestResult>({
+    const results = await runBatchAsync<BatchTestResult>({
       packages,
       concurrency,
       reporter,
       bufferOutput: isGrouped,
       stateTracker: reporter.state,
       executeAsync: async (pkg) => {
-        const result = await _runWithRetryAsync(
-          pkg,
-          context,
-          timeoutMs
-        );
+        const result = await _runWithRetryAsync(pkg, context, timeoutMs);
 
         return {
           packageName: pkg.name,
           placeId: pkg.target.placeId,
           success: result.success,
           logs: result.logs,
+          // Aggregated mode reports per-package pcall time; the outer
+          // wall-clock would otherwise be identical for every package
+          // (they all await the same shared batch execution).
+          durationMs: result.durationMs,
           progressSummary: result.testCounts
             ? { kind: 'test-counts' as const, ...result.testCounts }
             : undefined,
         };
       },
     });
+    if (results.summary.failed > 0) exitCode = 1;
+  } catch (err) {
+    OutputHelper.error(OutputHelper.formatErrorChain(err));
+    exitCode = 1;
   } finally {
     await context.disposeAsync();
   }
@@ -246,7 +266,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   // Node.js fetch (undici) keeps TCP connections alive in a global pool,
   // which prevents the event loop from draining. Explicit exit required.
-  process.exit(results.summary.failed > 0 ? 1 : 0);
+  process.exit(exitCode);
 }
 
 async function _runWithRetryAsync(
@@ -274,18 +294,32 @@ async function _runWithRetryAsync(
   }
 }
 
-function _createBroadcastReporter(target: Reporter, packageNames: string[]): Reporter {
+function _createBroadcastReporter(
+  target: Reporter,
+  packageNames: string[]
+): Reporter {
+  // Phases from the inner context apply to the whole batch in aggregated mode.
+  // The cloud poll loop re-fires 'executing' on every poll tick, and we don't
+  // want that to keep flushing identical updates downstream — dedupe on the
+  // last broadcast phase so each transition is reported exactly once.
+  let lastBroadcastPhase: JobPhase | undefined;
   return {
     startAsync: async () => {},
     stopAsync: async () => {},
     onPackageStart: () => {},
     onPackageResult: () => {},
     onPackagePhaseChange: (_name: string, phase: JobPhase) => {
+      if (lastBroadcastPhase === phase) return;
+      lastBroadcastPhase = phase;
       for (const name of packageNames) {
         target.onPackagePhaseChange(name, phase);
       }
     },
     onPackageProgressUpdate: (_name: string, progress: ProgressSummary) => {
+      // Upload progress (byte transfer) is genuinely informative when fanned
+      // out. Poll progress during 'executing' is just an incrementing counter
+      // duplicated across every row, so skip it once we're in lock-step.
+      if (lastBroadcastPhase === 'executing') return;
       for (const name of packageNames) {
         target.onPackageProgressUpdate(name, progress);
       }

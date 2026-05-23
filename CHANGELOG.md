@@ -1,3 +1,125 @@
+# (Thu May 21 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.29.2`
+  - fix: More CI/CD fixes, including nevermore templates failing CI release [#700](https://github.com/Quenty/NevermoreEngine/pull/700) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu May 21 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.29.1`
+  - fix: Make sure timeout lies within bounds [#699](https://github.com/Quenty/NevermoreEngine/pull/699) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed May 20 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.14.0`, `@quenty/nevermore-cli@4.29.0`, `@quenty/studio-bridge@0.12.0`
+  - Improve `nevermore deploy` error reporting and `nevermore init` to include deployment and tests as part of the template [#697](https://github.com/Quenty/NevermoreEngine/pull/697) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed May 20 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Claude ([@claude](https://github.com/claude)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/animationprovider@11.37.0`, `@quenty/chatproviderservice@9.50.0`, `@quenty/clipcharacters@12.39.0`, `@quenty/cmdrservice@13.43.0`, `@quenty/deathreport@10.43.0`, `@quenty/gameconfig@12.47.0`, `@quenty/humanoidspeed@12.48.0`, `@quenty/ik@15.50.0`, `@quenty/kinematics@2.5.0`, `@quenty/racketingropeconstraint@12.42.0`, `@quenty/ragdoll@15.49.0`, `@quenty/rogue-humanoid@10.48.0`, `@quenty/rogue-properties@11.45.0`, `@quenty/settings-inputkeymap@10.54.0`, `@quenty/settings@11.51.0`, `@quenty/snackbar@11.41.0`, `@quenty/softshutdown@9.47.0`, `@quenty/templateprovider@11.37.0`
+  - feat(luau): convert 41 trivial files to --!strict typing [#671](https://github.com/Quenty/NevermoreEngine/pull/671) ([@claude](https://github.com/claude) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- Claude ([@claude](https://github.com/claude))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed May 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.28.1`
+  - ci: Luau-lsp multi-line parsing errors are reported nicely in CI/CD [#696](https://github.com/Quenty/NevermoreEngine/pull/696) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue May 19 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.13.0`, `@quenty/nevermore-cli@4.28.0`
+  - Add additional improvements to the deployment system [#695](https://github.com/Quenty/NevermoreEngine/pull/695) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue May 19 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli-helpers@1.11.0`, `@quenty/nevermore-cli@4.27.0`
+  - feat: Add better deploy UX including preview and stuff [#694](https://github.com/Quenty/NevermoreEngine/pull/694) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon May 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@12.35.0`, `@quenty/brine@1.2.0`, `@quenty/camera@14.39.0`, `@quenty/servicebag@11.18.0`, `@quenty/cli-output-helpers@1.12.0`, `@quenty/nevermore-cli@4.26.0`, `@quenty/studio-bridge@0.9.0`
+  - Fix spelling mistakes + improve brine [#693](https://github.com/Quenty/NevermoreEngine/pull/693) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu May 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.11.0`, `@quenty/nevermore-cli-helpers@1.9.0`, `@quenty/nevermore-cli@4.25.0`, `@quenty/nevermore-template-helpers@1.12.0`, `@quenty/studio-bridge@0.8.0`
+  - feat(studio-bridge): persistent sessions and Linux/Wine support [#669](https://github.com/Quenty/NevermoreEngine/pull/669) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon May 11 2026)
 
 #### 🐛 Bug Fix
