@@ -47,17 +47,17 @@ function HasSaveSlotsClient.new(player: Player, serviceBag: ServiceBag.ServiceBa
 end
 
 --[=[
-	Returns whether the slot at the given index exists
+	Returns whether the slot with the given ID exists
 ]=]
-function HasSaveSlotsClient.PromiseHasSlot(self: HasSaveSlotsClient, slotIndex: number): Promise.Promise<boolean>
-	return self._remoting.PromiseHasSlot:PromiseInvokeServer(slotIndex)
+function HasSaveSlotsClient.PromiseHasSlot(self: HasSaveSlotsClient, slotId: string?): Promise.Promise<boolean>
+	return self._remoting.PromiseHasSlot:PromiseInvokeServer(slotId)
 end
 
 --[=[
-	Selects the slot at the given index
+	Selects the slot with the given ID
 ]=]
-function HasSaveSlotsClient.PromiseSelectSlot(self: HasSaveSlotsClient, slotIndex: number): Promise.Promise<any>
-	return self._remoting.PromiseSelectSlot:PromiseInvokeServer(slotIndex)
+function HasSaveSlotsClient.PromiseSelectSlot(self: HasSaveSlotsClient, slotId: string): Promise.Promise<any>
+	return self._remoting.PromiseSelectSlot:PromiseInvokeServer(slotId)
 end
 
 --[=[
@@ -72,38 +72,48 @@ function HasSaveSlotsClient.PromiseCreateSlot(
 end
 
 --[=[
-	Deletes the slot at the given index
+	Deletes the slot with the given ID
 ]=]
-function HasSaveSlotsClient.PromiseDeleteSlot(self: HasSaveSlotsClient, slotIndex: number): Promise.Promise<any>
-	return self._remoting.PromiseDeleteSlot:PromiseInvokeServer(slotIndex)
+function HasSaveSlotsClient.PromiseDeleteSlot(self: HasSaveSlotsClient, slotId: string): Promise.Promise<any>
+	return self._remoting.PromiseDeleteSlot:PromiseInvokeServer(slotId)
 end
 
 --[=[
-	Sets the metadata for the slot at the given index
+	Sets the metadata for the slot with the given ID
 ]=]
 function HasSaveSlotsClient.PromiseSetSlotMetadata(
 	self: HasSaveSlotsClient,
-	slotIndex: number,
+	slotId: string,
 	data: SaveSlotData.SaveSlotMetadata
 ): Promise.Promise<any>
-	return self._remoting.PromiseSetSlotMetadata:PromiseInvokeServer(slotIndex, data)
+	return self._remoting.PromiseSetSlotMetadata:PromiseInvokeServer(slotId, data)
 end
 
 --[=[
-	Gets the metadata for the slot at the given index
+	Gets the metadata for the slot with the given ID
 ]=]
 function HasSaveSlotsClient.PromiseGetSlotMetadata(
 	self: HasSaveSlotsClient,
-	slotIndex: number
+	slotId: string
 ): Promise.Promise<SaveSlotData.SaveSlotMetadata>
-	return self._remoting.PromiseGetSlotMetadata:PromiseInvokeServer(slotIndex)
+	return self._remoting.PromiseGetSlotMetadata:PromiseInvokeServer(slotId)
 end
 
 --[=[
-	Gets the last active slot index
+	Gets the last active slot ID
 ]=]
-function HasSaveSlotsClient.PromiseLastActiveSlotIndex(self: HasSaveSlotsClient): Promise.Promise<number?>
-	return self._remoting.PromiseLastActiveSlotIndex:PromiseInvokeServer()
+function HasSaveSlotsClient.PromiseLastActiveSlotId(self: HasSaveSlotsClient): Promise.Promise<string?>
+	return self._remoting.PromiseLastActiveSlotId:PromiseInvokeServer()
+end
+
+--[=[
+	Returns the slot ID from the given index
+]=]
+function HasSaveSlotsClient.PromiseSlotIdFromIndex(
+	self: HasSaveSlotsClient,
+	slotIndex: number
+): Promise.Promise<string?>
+	return self._remoting.PromiseSlotIdFromIndex:PromiseInvokeServer(slotIndex)
 end
 
 --[=[

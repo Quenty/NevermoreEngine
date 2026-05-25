@@ -53,11 +53,12 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Group = "SaveSlots",
 		Args = {},
 	}, function(context)
+		local activeSlotId = self._saveSlotDataService:GetActiveSlotId(context.Executor)
 		local slotList = self._saveSlotDataService:GetSlotList(context.Executor)
 		local listString = ""
 
 		for _, slot in slotList do
-			local isActive = (slot.SlotIndex == self._saveSlotDataService:GetActiveSlotIndex(context.Executor))
+			local isActive = (slot.SlotId == activeSlotId)
 			listString ..= `\n"{slot.SlotName}" ({slot.SlotIndex}){isActive and " — Active" or ""}\n{slot.Summary}\n`
 		end
 
@@ -70,10 +71,14 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Group = "SaveSlots",
 		Args = {},
 	}, function(context)
-		local slotIndex = self._saveSlotDataService:GetActiveSlotIndex(context.Executor)
-		local slotData = self._saveSlotDataService:GetSlotMetadata(context.Executor, slotIndex)
+		local activeSlotId = self._saveSlotDataService:GetActiveSlotId(context.Executor)
+		if not activeSlotId then
+			return "No active slot."
+		end
 
-		return `Currently using slot {slotIndex} ("{slotData.SlotName}").`
+		local slotData = self._saveSlotDataService:GetSlotMetadata(context.Executor, activeSlotId)
+
+		return `Currently using slot {slotData.SlotIndex} ("{slotData.SlotName}").`
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -88,10 +93,15 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(context, slotIndex: number)
+		local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
+		if not slotId then
+			return `No slot with index {slotIndex}.`
+		end
+
 		self._maid
 			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
 			:Then(function(hasSaveSlots)
-				return hasSaveSlots:PromiseSelectSlot(slotIndex)
+				return hasSaveSlots:PromiseSelectSlot(slotId)
 			end)
 			:Wait()
 
@@ -115,14 +125,17 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			return `Index must be in range [1, {maxSlotCount}].`
 		end
 
-		local hasSaveSlots = self._maid:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor)):Wait()
-
-		local hasSlot = self._maid:GivePromise(hasSaveSlots:PromiseHasSlot(slotIndex)):Wait()
-		if hasSlot then
+		local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
+		if slotId then
 			return "Slot already exists."
 		end
 
-		self._maid:GivePromise(hasSaveSlots:PromiseCreateSlot(slotIndex)):Wait()
+		self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				return hasSaveSlots:PromiseCreateSlot(slotIndex)
+			end)
+			:Wait()
 
 		return `Created slot {slotIndex}.`
 	end)
@@ -139,14 +152,19 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(context, slotIndex: number)
-		if slotIndex == self._saveSlotDataService:GetActiveSlotIndex(context.Executor) then
+		local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
+		if not slotId then
+			return `No slot with index {slotIndex}.`
+		end
+
+		if slotId == self._saveSlotDataService:GetActiveSlotId(context.Executor) then
 			return "Cannot delete active slot."
 		end
 
 		self._maid
 			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
 			:Then(function(hasSaveSlots)
-				return hasSaveSlots:PromiseDeleteSlot(slotIndex)
+				return hasSaveSlots:PromiseDeleteSlot(slotId)
 			end)
 			:Wait()
 

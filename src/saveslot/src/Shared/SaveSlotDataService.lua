@@ -39,26 +39,26 @@ function SaveSlotDataService.Init(self: SaveSlotDataService, serviceBag: Service
 end
 
 --[=[
-	Observes the player's active slot index
+	Observes the player's active slot ID
 ]=]
-function SaveSlotDataService.ObserveActiveSlotIndex(
+function SaveSlotDataService.ObserveActiveSlotId(
 	self: SaveSlotDataService,
 	player: Player
-): Observable.Observable<number?>
+): Observable.Observable<string?>
 	return (HasSaveSlotsInterface:ObserveBrio(player, self._realm) :: any):Pipe({
 		RxBrioUtils.switchMapBrio(function(hasSaveSlots)
-			return hasSaveSlots.ActiveSlotIndex:Observe()
+			return hasSaveSlots.ActiveSlotId:Observe()
 		end),
 		RxBrioUtils.emitOnDeath(nil),
 	})
 end
 
 --[=[
-	Returns the player's active slot index
+	Returns the player's active slot ID
 ]=]
-function SaveSlotDataService.GetActiveSlotIndex(self: SaveSlotDataService, player: Player): number?
+function SaveSlotDataService.GetActiveSlotId(self: SaveSlotDataService, player: Player): string?
 	local hasSaveSlots = HasSaveSlotsInterface:Find(player, self._realm)
-	return hasSaveSlots and hasSaveSlots.ActiveSlotIndex.Value
+	return hasSaveSlots and hasSaveSlots.ActiveSlotId.Value
 end
 
 --[=[
@@ -100,18 +100,18 @@ function SaveSlotDataService.GetSlotList(_self: SaveSlotDataService, player: Pla
 end
 
 --[=[
-	Observes the slot metadata at the given index for the player
+	Observes the slot metadata with the given ID for the player
 ]=]
 function SaveSlotDataService.ObserveSlotMetadata(
 	_self: SaveSlotDataService,
 	player: Player,
-	slotIndex: number
+	slotId: string
 ): Observable.Observable<SaveSlotData.SaveSlotMetadata?>
 	return (
 		RxInstanceUtils.observeLastNamedChildBrio(player, "Folder", SaveSlotConstants.METADATA_CONTAINER_NAME) :: any
 	):Pipe({
 		RxBrioUtils.switchMapBrio(function(slotContainer: Folder)
-			return RxInstanceUtils.observeLastNamedChildBrio(slotContainer, "Folder", tostring(slotIndex))
+			return RxInstanceUtils.observeLastNamedChildBrio(slotContainer, "Folder", slotId)
 		end),
 		RxBrioUtils.emitOnDeath(nil),
 		Rx.switchMap(function(slot: Folder?)
@@ -121,21 +121,33 @@ function SaveSlotDataService.ObserveSlotMetadata(
 end
 
 --[=[
-	Returns the slot metadata at the given index for the player
+	Returns the slot metadata with the given ID for the player
 ]=]
 function SaveSlotDataService.GetSlotMetadata(
 	_self: SaveSlotDataService,
 	player: Player,
-	slotIndex: number
+	slotId: string
 ): SaveSlotData.SaveSlotMetadata?
 	local slotContainer = player:FindFirstChild(SaveSlotConstants.METADATA_CONTAINER_NAME)
-	local slot = slotContainer and slotContainer:FindFirstChild(tostring(slotIndex))
+	local slot = slotContainer and slotContainer:FindFirstChild(slotId)
 
 	if slot then
 		return SaveSlotData:Get(slot)
 	else
 		return nil
 	end
+end
+
+--[=[
+	Returns the ID for the slot at the given index
+]=]
+function SaveSlotDataService.GetSlotIdFromIndex(self: SaveSlotDataService, player: Player, slotIndex: number): string?
+	for _, slot in self:GetSlotList(player) do
+		if slotIndex == slot.SlotIndex then
+			return slot.SlotId
+		end
+	end
+	return nil
 end
 
 return SaveSlotDataService

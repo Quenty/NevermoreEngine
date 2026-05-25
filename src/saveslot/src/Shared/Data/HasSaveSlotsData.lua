@@ -9,6 +9,6 @@ local AdorneeData = require("AdorneeData")
 local AdorneeDataEntry = require("AdorneeDataEntry")
 
 return AdorneeData.new({
-	ActiveSlotIndex = AdorneeDataEntry.optionalAttribute("number", "ActiveSlotIndex"),
+	ActiveSlotId = AdorneeDataEntry.optionalAttribute("string", "ActiveSlotId"),
 	MaxSlotCount = math.huge,
 })
