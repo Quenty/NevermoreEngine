@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local HasSaveSlotsData = require("HasSaveSlotsData")
 local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local HasSaveSlotsBase = setmetatable({}, BaseObject)
@@ -21,8 +22,10 @@ export type HasSaveSlotsBase =
 			_serviceBag: ServiceBag.ServiceBag,
 			_attributes: any,
 
-			ActiveSlotIndex: ValueObject.ValueObject<number?>,
+			ActiveSlotId: ValueObject.ValueObject<string?>,
 			MaxSlotCount: ValueObject.ValueObject<number>,
+
+			SlotChanged: Signal.Signal<string>,
 		},
 		{} :: typeof({ __index = HasSaveSlotsBase })
 	))
@@ -35,8 +38,10 @@ function HasSaveSlotsBase.new(player: Player, serviceBag: ServiceBag.ServiceBag)
 
 	self._attributes = HasSaveSlotsData:Create(self._obj)
 
-	self.ActiveSlotIndex = self._attributes.ActiveSlotIndex
+	self.ActiveSlotId = self._attributes.ActiveSlotId
 	self.MaxSlotCount = self._attributes.MaxSlotCount
+
+	self.SlotChanged = self.ActiveSlotId.Changed
 
 	return self
 end

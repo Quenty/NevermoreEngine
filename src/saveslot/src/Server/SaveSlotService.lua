@@ -12,10 +12,8 @@ local DataStoreStage = require("DataStoreStage")
 local HasSaveSlots = require("HasSaveSlots")
 local Maid = require("Maid")
 local Observable = require("Observable")
-local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
-local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
@@ -28,7 +26,6 @@ export type SaveSlotService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
-		_playerDataStoreService: any,
 		_hasSaveSlotsBinder: any,
 		_selectionRequired: boolean,
 		_maxSlotCount: number,
@@ -44,7 +41,7 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 	self._maid = Maid.new()
 
 	-- External
-	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
+	self._serviceBag:GetService(require("PlayerDataStoreService"))
 
 	-- Internal
 	self._serviceBag:GetService(require("SaveSlotCmdrService"))
@@ -83,22 +80,24 @@ function SaveSlotService.Start(self: SaveSlotService)
 			end
 
 			-- Select last active slot
-			return hasSaveSlots:PromiseLastActiveSlotIndex():Then(function(lastActiveSlotIndex: number?)
-				return hasSaveSlots:PromiseHasSlot(lastActiveSlotIndex):Then(function(hasLastSlot: boolean)
+			return hasSaveSlots:PromiseLastActiveSlotId():Then(function(lastActiveSlotId: string?)
+				return hasSaveSlots:PromiseHasSlot(lastActiveSlotId):Then(function(hasLastSlot: boolean)
 					if hasLastSlot then
-						return hasSaveSlots:PromiseSelectSlot(lastActiveSlotIndex)
+						return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
 					end
 
 					-- Or create and select default slot
 					return hasSaveSlots
-						:PromiseHasSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
-						:Then(function(hasDefaultSlot: boolean)
-							if not hasDefaultSlot then
+						:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX)
+						:Then(function(defaultSlotId: string?)
+							if defaultSlotId then
+								return defaultSlotId
+							else
 								return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
 							end
 						end)
-						:Then(function()
-							return hasSaveSlots:PromiseSelectSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
+						:Then(function(slotId: string)
+							return hasSaveSlots:PromiseSelectSlot(slotId)
 						end)
 				end)
 			end)
@@ -139,7 +138,7 @@ function SaveSlotService.SetSummaryProvider(self: SaveSlotService, provider: (Pl
 end
 
 --[=[
-	Observes the [DataStoreStage] for the player's active slot
+	Observes the [DataStoreStage] for the player's active slot as a [Brio]
 ]=]
 function SaveSlotService.ObserveActiveSlotStoreBrio(
 	self: SaveSlotService,
@@ -147,19 +146,7 @@ function SaveSlotService.ObserveActiveSlotStoreBrio(
 ): Observable.Observable<Brio.Brio<DataStoreStage.DataStoreStage>>
 	return self._hasSaveSlotsBinder:ObserveBrio(player):Pipe({
 		RxBrioUtils.switchMapBrio(function(hasSaveSlots)
-			return Rx.fromPromise(self._playerDataStoreService:PromiseDataStore(player)):Pipe({
-				Rx.switchMap(function(dataStore)
-					return hasSaveSlots.ActiveSlotIndex
-						:ObserveBrio(function(slotIndex: number?)
-							return (slotIndex ~= nil)
-						end)
-						:Pipe({
-							RxBrioUtils.map(function(slotIndex: number)
-								return dataStore:GetSubStore("saveSlots"):GetSubStore(tostring(slotIndex))
-							end),
-						})
-				end) :: any,
-			})
+			return hasSaveSlots:ObserveActiveSlotStoreBrio()
 		end),
 	})
 end
@@ -170,40 +157,31 @@ end
 function SaveSlotService.PromiseActiveSlotStore(
 	self: SaveSlotService,
 	player: Player
-): Promise.Promise<DataStoreStage.DataStoreStage>
+): Promise.Promise<DataStoreStage.DataStoreStage?>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
-		return hasSaveSlots:PromiseSlotsLoaded():Then(function()
-			return self._playerDataStoreService:PromiseDataStore(player):Then(function(dataStore)
-				local slotKey = tostring(hasSaveSlots.ActiveSlotIndex.Value)
-				return dataStore:GetSubStore("saveSlots"):GetSubStore(slotKey)
-			end)
-		end)
+		return hasSaveSlots:PromiseActiveSlotStore()
 	end)
 end
 
 --[=[
-	Returns whether the player has a slot at the given index
+	Returns whether the player has a slot with the given ID
 ]=]
-function SaveSlotService.PromiseHasSlot(
-	self: SaveSlotService,
-	player: Player,
-	slotIndex: number
-): Promise.Promise<boolean>
+function SaveSlotService.PromiseHasSlot(self: SaveSlotService, player: Player, slotId: string): Promise.Promise<boolean>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
-		return hasSaveSlots:PromiseHasSlot(slotIndex)
+		return hasSaveSlots:PromiseHasSlot(slotId)
 	end)
 end
 
 --[=[
-	Selects the slot at the given index for the player
+	Selects the slot with the given ID for the player
 ]=]
 function SaveSlotService.PromiseSelectSlot(
 	self: SaveSlotService,
 	player: Player,
-	slotIndex: number
+	slotId: string
 ): Promise.Promise<DataStoreStage.DataStoreStage>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
-		return hasSaveSlots:PromiseSelectSlot(slotIndex)
+		return hasSaveSlots:PromiseSelectSlot(slotId)
 	end)
 end
 
@@ -222,15 +200,11 @@ function SaveSlotService.PromiseCreateSlot(
 end
 
 --[=[
-	Deletes the slot at the given index for the player
+	Deletes the slot with the given ID for the player
 ]=]
-function SaveSlotService.PromiseDeleteSlot(
-	self: SaveSlotService,
-	player: Player,
-	slotIndex: number
-): Promise.Promise<any>
+function SaveSlotService.PromiseDeleteSlot(self: SaveSlotService, player: Player, slotId: string): Promise.Promise<any>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
-		return hasSaveSlots:PromiseDeleteSlot(slotIndex)
+		return hasSaveSlots:PromiseDeleteSlot(slotId)
 	end)
 end
 

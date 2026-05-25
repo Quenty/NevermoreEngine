@@ -5,7 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local Binder = require("Binder")
+local Brio = require("Brio")
+local DataStoreStage = require("DataStoreStage")
 local HasSaveSlotsBase = require("HasSaveSlotsBase")
 local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
 local Maid = require("Maid")
@@ -13,11 +17,13 @@ local PlayerBinder = require("PlayerBinder")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
+local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local ServiceBag = require("ServiceBag")
 
-type SaveSlot = {
+type SaveSlotStruct = {
 	folder: Folder,
 	attributes: any,
 	maid: Maid.Maid,
@@ -34,13 +40,14 @@ export type HasSaveSlots =
 			_serviceBag: ServiceBag.ServiceBag,
 			_playerDataStoreService: any,
 			_slotContainer: Folder,
-			_slotMap: { [number]: SaveSlot },
+			_slotMap: { [string]: SaveSlotStruct },
 			_loadPromise: Promise.Promise<{}>,
 			_remoting: any,
 			_dataStore: any,
+			_systemStore: any,
 			_metadataStore: any,
 			_summaryProvider: ((Player, any) -> string)?,
-			_lastActiveSlotIndex: number?,
+			_lastActiveSlotId: string?,
 		},
 		{} :: typeof({ __index = HasSaveSlots })
 	))
@@ -71,6 +78,38 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 end
 
 --[=[
+	Observes the [DataStoreStage] for the active slot as a [Brio]
+]=]
+function HasSaveSlots.ObserveActiveSlotStoreBrio(self: HasSaveSlots): Brio.Brio<DataStoreStage.DataStoreStage>
+	return Rx.fromPromise(self._loadPromise):Pipe({
+		Rx.switchMap(function()
+			return self.ActiveSlotId
+				:ObserveBrio(function(slotId: string?)
+					return (slotId ~= nil)
+				end)
+				:Pipe({
+					RxBrioUtils.map(function(slotId: string)
+						return self:_getSlotStore(slotId)
+					end) :: any,
+				}) :: any
+		end) :: any,
+	}) :: any
+end
+
+--[=[
+	Returns the [DataStoreStage] for the active slot
+]=]
+function HasSaveSlots.PromiseActiveSlotStore(self: HasSaveSlots): Promise.Promise<DataStoreStage.DataStoreStage?>
+	return (self._loadPromise :: any):Then(function()
+		print(self.ActiveSlotId.Value)
+		if not self.ActiveSlotId.Value then
+			return (Promise :: any).resolved(nil)
+		end
+		return self:_getSlotStore(self.ActiveSlotId.Value)
+	end)
+end
+
+--[=[
 	Promises that all slots have loaded
 ]=]
 function HasSaveSlots.PromiseSlotsLoaded(self: HasSaveSlots): Promise.Promise<any>
@@ -78,35 +117,35 @@ function HasSaveSlots.PromiseSlotsLoaded(self: HasSaveSlots): Promise.Promise<an
 end
 
 --[=[
-	Returns whether the slot at the given index exists
+	Returns whether the slot with the given ID exists
 ]=]
-function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotIndex: number): Promise.Promise<boolean>
+function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: string?): Promise.Promise<boolean>
 	return (self._loadPromise :: any):Then(function()
-		return (self._slotMap[slotIndex] ~= nil)
+		return slotId and (self._slotMap[slotId] ~= nil)
 	end)
 end
 
 --[=[
-	Selects the slot at the given index
+	Selects the slot with the given ID
 ]=]
-function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotIndex: number): Promise.Promise<any>
+function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: string): Promise.Promise<any>
 	return (self._loadPromise :: any):Then(function()
-		if slotIndex == self.ActiveSlotIndex.Value then
+		if slotId == self.ActiveSlotId.Value then
 			return -- Already set
 		end
 
-		local slot = self._slotMap[slotIndex]
+		local slot = self._slotMap[slotId]
 		if not slot then
-			return (Promise :: any).rejected(`Slot {slotIndex} not found`)
+			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
 		end
 
 		local function setSlot()
-			self.ActiveSlotIndex.Value = slotIndex
+			self.ActiveSlotId.Value = slotId
 			slot.attributes.LastPlayedTime.Value = os.time()
 		end
 
 		-- Initialize or save and switch
-		if self.ActiveSlotIndex.Value == nil then
+		if self.ActiveSlotId.Value == nil then
 			setSlot()
 			return
 		end
@@ -122,84 +161,123 @@ function HasSaveSlots.PromiseCreateSlot(
 	self: HasSaveSlots,
 	slotIndex: number,
 	metadata: SaveSlotData.SaveSlotMetadata?
-): Promise.Promise<any>
+): Promise.Promise<string>
 	return (self._loadPromise :: any):Then(function()
-		if self._slotMap[slotIndex] then
-			return (Promise :: any).rejected(`Slot {slotIndex} already exists`)
+		if (slotIndex < 1) or (slotIndex > self.MaxSlotCount.Value) then
+			return (Promise :: any).rejected(`Index must be in range [1, {self.MaxSlotCount.Value}]`)
 		end
 
-		if slotIndex > self.MaxSlotCount.Value then
-			return (Promise :: any).rejected(`Index {slotIndex} exceeds max of {self.MaxSlotCount.Value}`)
+		for _, slot in self._slotMap do
+			if slotIndex == slot.attributes.SlotIndex.Value then
+				return (Promise :: any).rejected(`Slot {slotIndex} already exists`)
+			end
 		end
 
+		local slotId = HttpService:GenerateGUID(false)
 		local data = {
+			SlotId = slotId,
 			SlotIndex = slotIndex,
 			SlotName = (metadata and metadata.SlotName) or `Slot {slotIndex}`,
 			CreatedTime = os.time(),
 			Summary = metadata and metadata.Summary,
 		}
 
-		self:_buildSlot(slotIndex, data, true)
+		self:_buildSlot(slotId, data, true)
+		return slotId
 	end)
 end
 
 --[=[
-	Deletes the slot at the given index
+	Deletes the slot with the given ID
 ]=]
-function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotIndex: number): Promise.Promise<any>
+function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: string): Promise.Promise<any>
 	return (self._loadPromise :: any):Then(function()
-		if slotIndex == self.ActiveSlotIndex.Value then
+		if slotId == self.ActiveSlotId.Value then
 			return (Promise :: any).rejected("Cannot delete active slot")
 		end
 
-		local slot = self._slotMap[slotIndex]
+		local slot = self._slotMap[slotId]
 		if not slot then
-			return (Promise :: any).rejected(`Slot {slotIndex} not found`)
+			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
 		end
 
 		slot.maid:Destroy()
 
-		local slotKey = tostring(slotIndex)
-		self._metadataStore:Delete(slotKey)
-		self._dataStore:GetSubStore("saveSlots"):Delete(slotKey)
+		-- Wipe default slot
+		if slot.attributes.SlotIndex.Value == SaveSlotConstants.DEFAULT_SLOT_INDEX then
+			return self._dataStore:PromiseKeyList():Then(function(keys)
+				for _, key in keys do
+					if key ~= SaveSlotConstants.INTERNAL_STORE_KEY then
+						self._dataStore:Delete(key)
+					end
+				end
+				self._metadataStore:Delete(slotId)
+			end)
+		end
+
+		-- Or delete slot from substore
+		self._systemStore:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY):Delete(slotId)
+		self._metadataStore:Delete(slotId)
 	end)
 end
 
 --[=[
-	Sets the metadata for the slot at the given index
+	Sets the metadata for the slot with the given ID
 ]=]
 function HasSaveSlots.PromiseSetSlotMetadata(
 	self: HasSaveSlots,
-	slotIndex: number,
+	slotId: string,
 	data: SaveSlotData.SaveSlotMetadata
 ): Promise.Promise<any>
-	assert(data.SlotIndex == nil or data.SlotIndex == slotIndex, "SlotIndex is locked")
+	if data.SlotId and (data.SlotId ~= slotId) then
+		return (Promise :: any).rejected("SlotId is locked")
+	end
 
 	return (self._loadPromise :: any):Then(function()
-		local slot = self._slotMap[slotIndex]
+		local slot = self._slotMap[slotId]
+
+		-- Routing depends on immutable indices to distinguish the default slot
+		if data.SlotIndex and (data.SlotIndex ~= slot.attributes.SlotIndex.Value) then
+			return (Promise :: any).rejected("SlotIndex is locked")
+		end
+
 		SaveSlotData:Set(slot.folder, data)
 	end)
 end
 
 --[=[
-	Gets the metadata for the slot at the given index
+	Gets the metadata for the slot with the given ID
 ]=]
 function HasSaveSlots.PromiseGetSlotMetadata(
 	self: HasSaveSlots,
-	slotIndex: number
+	slotId: string
 ): Promise.Promise<SaveSlotData.SaveSlotMetadata>
 	return (self._loadPromise :: any):Then(function()
-		local slot = self._slotMap[slotIndex]
+		local slot = self._slotMap[slotId]
 		return (Promise :: any).resolved(slot and slot.attributes)
 	end)
 end
 
 --[=[
-	Gets the last active slot index
+	Returns the slot ID from the given index
 ]=]
-function HasSaveSlots.PromiseLastActiveSlotIndex(self: HasSaveSlots): Promise.Promise<number?>
+function HasSaveSlots.PromiseSlotIdFromIndex(self: HasSaveSlots, slotIndex: number): Promise.Promise<string?>
 	return (self._loadPromise :: any):Then(function()
-		return self.ActiveSlotIndex.Value or self._lastActiveSlotIndex
+		for _, slot in self._slotMap do
+			if slotIndex == slot.attributes.SlotIndex.Value then
+				return (Promise :: any).resolved(slot.attributes.SlotId.Value)
+			end
+		end
+		return (Promise :: any).resolved(nil)
+	end)
+end
+
+--[=[
+	Gets the last active slot ID
+]=]
+function HasSaveSlots.PromiseLastActiveSlotId(self: HasSaveSlots): Promise.Promise<string?>
+	return (self._loadPromise :: any):Then(function()
+		return self.ActiveSlotId.Value or self._lastActiveSlotId
 	end)
 end
 
@@ -220,66 +298,79 @@ function HasSaveSlots.PromiseRefreshActiveSlotSummary(self: HasSaveSlots): Promi
 end
 
 function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
-	return self._maid:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj)):Then(function(dataStore)
+	return self._playerDataStoreService:PromiseDataStore(self._obj):Then(function(dataStore)
 		self._dataStore = dataStore
-		self._metadataStore = dataStore:GetSubStore("saveSlotMetadata")
+		self._systemStore = dataStore:GetSubStore(SaveSlotConstants.INTERNAL_STORE_KEY)
+		self._metadataStore = self._systemStore:GetSubStore(SaveSlotConstants.METADATA_STORE_KEY)
 
 		self._maid:GiveTask(self._dataStore:AddSavingCallback(function()
 			self:_refreshActiveSlotSummary()
 		end))
 
 		return self._metadataStore:LoadAll({}):Then(function(metadata)
-			for key, data in metadata do
-				local slotIndex = tonumber(key)
-				if slotIndex then
-					self:_buildSlot(slotIndex, data)
-				end
+			for slotId, data in metadata do
+				self:_buildSlot(slotId, data)
 			end
 
-			return dataStore:Load("ActiveSlotIndex"):Then(function(activeIndex: number?)
-				self._lastActiveSlotIndex = activeIndex
-				self._maid:GiveTask(dataStore:StoreOnValueChange("ActiveSlotIndex", self.ActiveSlotIndex))
+			return self._systemStore:Load("activeSlotId"):Then(function(activeId: string?)
+				self._lastActiveSlotId = activeId
+				self._maid:GiveTask(self._systemStore:StoreOnValueChange("activeSlotId", self.ActiveSlotId))
 			end)
 		end)
 	end)
 end
 
+function HasSaveSlots._getSlotStore(self: HasSaveSlots, slotId: string): DataStoreStage.DataStoreStage
+	local slot = self._slotMap[slotId]
+	if slot and (slot.attributes.SlotIndex.Value == SaveSlotConstants.DEFAULT_SLOT_INDEX) then
+		return self._dataStore
+	end
+	return self._systemStore:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY):GetSubStore(slotId)
+end
+
 function HasSaveSlots._buildSlot(
 	self: HasSaveSlots,
-	slotIndex: number,
+	slotId: string,
 	data: SaveSlotData.SaveSlotMetadata,
 	isNew: boolean?
 ): ()
 	local maid = self._maid:Add(Maid.new())
 
 	local folder = maid:Add(Instance.new("Folder"))
-	folder.Name = tostring(slotIndex)
+	folder.Name = slotId
 	folder.Archivable = false
 
+	local metadataStore = self._metadataStore:GetSubStore(slotId)
+
 	local attributes = SaveSlotData:Create(folder)
-	attributes.SlotIndex.Value = slotIndex
+	attributes.SlotId.Value = slotId
+	attributes.SlotIndex.Value = data.SlotIndex
 
-	local slotStore = self._metadataStore:GetSubStore(tostring(slotIndex))
+	-- Store immutable SlotIndex once on creation
+	if isNew then
+		metadataStore:Store("SlotIndex", data.SlotIndex)
+	end
 
+	-- Store mutable metadata on change
 	for _, key in { "SlotName", "CreatedTime", "LastPlayedTime", "Summary" } do
 		attributes[key].Value = data[key]
-		maid:GiveTask(slotStore:StoreOnValueChange(key, attributes[key]))
+		maid:GiveTask(metadataStore:StoreOnValueChange(key, attributes[key]))
 
 		if isNew then
-			slotStore:Store(key, attributes[key].Value)
+			metadataStore:Store(key, attributes[key].Value)
 		end
 	end
 
 	folder.Parent = self._slotContainer
 
-	self._slotMap[slotIndex] = {
+	self._slotMap[slotId] = {
 		folder = folder,
 		attributes = attributes,
 		maid = maid,
 	}
 
 	maid:GiveTask(function()
-		self._slotMap[slotIndex] = nil
+		self._slotMap[slotId] = nil
 	end)
 end
 
@@ -288,13 +379,13 @@ function HasSaveSlots._refreshActiveSlotSummary(self: HasSaveSlots): ()
 		return -- No summary provider
 	end
 
-	local activeSlotIndex = self.ActiveSlotIndex.Value
-	local activeSlot = activeSlotIndex and self._slotMap[activeSlotIndex]
+	local activeSlotId = self.ActiveSlotId.Value
+	local activeSlot = activeSlotId and self._slotMap[activeSlotId]
 	if not activeSlot then
 		return -- No active slot
 	end
 
-	local slotStore = self._dataStore:GetSubStore("saveSlots"):GetSubStore(tostring(activeSlotIndex))
+	local slotStore = self:_getSlotStore(activeSlotId :: string)
 	local success, result = pcall(self._summaryProvider, self._obj, slotStore)
 
 	if not success then
@@ -310,7 +401,7 @@ function HasSaveSlots._refreshActiveSlotSummary(self: HasSaveSlots): ()
 	activeSlot.attributes.Summary.Value = result
 
 	-- Store directly to avoid deferral during save callback
-	self._metadataStore:GetSubStore(tostring(activeSlotIndex)):Store("Summary", result)
+	self._metadataStore:GetSubStore(activeSlotId):Store("Summary", result)
 end
 
 function HasSaveSlots._setupRemotes(self: HasSaveSlots): ()
@@ -362,9 +453,17 @@ function HasSaveSlots._setupRemotes(self: HasSaveSlots): ()
 		end
 	end))
 
-	self._maid:GiveTask(self._remoting.PromiseLastActiveSlotIndex:Bind(function(remotePlayer)
+	self._maid:GiveTask(self._remoting.PromiseSlotIdFromIndex:Bind(function(remotePlayer, ...)
 		if remotePlayer == self._obj then
-			return self:PromiseLastActiveSlotIndex()
+			return self:PromiseSlotIdFromIndex(...)
+		else
+			return (Promise :: any).rejected("Bad player")
+		end
+	end))
+
+	self._maid:GiveTask(self._remoting.PromiseLastActiveSlotId:Bind(function(remotePlayer)
+		if remotePlayer == self._obj then
+			return self:PromiseLastActiveSlotId()
 		else
 			return (Promise :: any).rejected("Bad player")
 		end

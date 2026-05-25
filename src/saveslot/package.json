@@ -39,8 +39,11 @@
     "@quenty/maid": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
     "@quenty/promise": "workspace:*",
+    "@quenty/propertyvalue": "workspace:*",
     "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
     "@quenty/valueobject": "workspace:*"
