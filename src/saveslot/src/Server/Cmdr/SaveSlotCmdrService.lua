@@ -98,6 +98,10 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			return `No slot with index {slotIndex}.`
 		end
 
+		if slotId == self._saveSlotDataService:GetActiveSlotId(context.Executor) then
+			return "Slot is already active."
+		end
+
 		self._maid
 			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
 			:Then(function(hasSaveSlots)
