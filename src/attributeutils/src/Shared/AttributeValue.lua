@@ -1,21 +1,21 @@
 --!nonstrict
 --[=[
-	Allows access to an attribute like a ValueObject.
+    Allows access to an attribute like a ValueObject.
 
-	```lua
-	local attributeValue = AttributeValue.new(workspace, "Version", "1.0.0")
-	print(attributeValue.Value) --> 1.0.0
-	print(workspace:GetAttribute("version")) --> 1.0.0
+    ```lua
+    local attributeValue = AttributeValue.new(workspace, "Version", "1.0.0")
+    print(attributeValue.Value) --> 1.0.0
+    print(workspace:GetAttribute("version")) --> 1.0.0
 
-	attributeValue.Changed:Connect(function()
-		print(attributeValue.Value)
-	end)
+    attributeValue.Changed:Connect(function()
+        print(attributeValue.Value)
+    end)
 
-	workspace:SetAttribute("1.1.0") --> 1.1.0
-	attributeValue.Value = "1.2.0" --> 1.2.0
-	```
+    workspace:SetAttribute("1.1.0") --> 1.1.0
+    attributeValue.Value = "1.2.0" --> 1.2.0
+    ```
 
-	@class AttributeValue
+    @class AttributeValue
 ]=]
 
 local require = require(script.Parent.loader).load(script)
@@ -44,13 +44,13 @@ export type AttributeValue<T> = typeof(setmetatable(
 ))
 
 --[=[
-	Constructs a new AttributeValue. If a defaultValue that is not nil
-	is defined, then this value will be set on the Roblox object.
+    Constructs a new AttributeValue. If a defaultValue that is not nil
+    is defined, then this value will be set on the Roblox object.
 
-	@param object Instance
-	@param attributeName string
-	@param defaultValue T
-	@return AttributeValue<T>
+    @param object Instance
+    @param attributeName string
+    @param defaultValue T
+    @return AttributeValue<T>
 ]=]
 function AttributeValue.new<T>(object: Instance, attributeName: string, defaultValue: T): AttributeValue<T>
 	assert(typeof(object) == "Instance", "Bad object")
@@ -70,10 +70,29 @@ function AttributeValue.new<T>(object: Instance, attributeName: string, defaultV
 end
 
 --[=[
-	Handles observing the value conditionalli
+    Allows you to set an attribute, and provides a cleanup
 
-	@param condition function | nil
-	@return Observable<Brio<any>>
+    @param value T
+    @return () -> () -- Cleanup
+]=]
+function AttributeValue.SetValue<T>(self: AttributeValue<T>, value: T)
+	self._object:SetAttribute(rawget(self :: any, "_attributeName") :: string, value)
+
+	return function()
+		if self._object:GetAttribute(rawget(self :: any, "_attributeName") :: string) == value then
+			self._object:SetAttribute(
+				rawget(self :: any, "_attributeName") :: string,
+				rawget(self :: any, "_default") :: any
+			)
+		end
+	end
+end
+
+--[=[
+    Handles observing the value conditionalli
+
+    @param condition function | nil
+    @return Observable<Brio<any>>
 ]=]
 function AttributeValue.ObserveBrio<T>(
 	self: AttributeValue<T>,
@@ -83,25 +102,25 @@ function AttributeValue.ObserveBrio<T>(
 end
 
 --[=[
-	Observes an attribute on an instance.
-	@return Observable<any>
+    Observes an attribute on an instance.
+    @return Observable<any>
 ]=]
 function AttributeValue.Observe<T>(self: AttributeValue<T>): Observable.Observable<T>
 	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self :: any, "_defaultValue"))
 end
 
 --[=[
-	The current property of the Attribute. Can be assigned to to write
-	the attribute.
-	@prop Value T
-	@within AttributeValue
+    The current property of the Attribute. Can be assigned to to write
+    the attribute.
+    @prop Value T
+    @within AttributeValue
 ]=]
 
 --[=[
-	Signal that fires when the attribute changes
-	@readonly
-	@prop Changed Signal<()>
-	@within AttributeValue
+    Signal that fires when the attribute changes
+    @readonly
+    @prop Changed Signal<()>
+    @within AttributeValue
 ]=]
 function AttributeValue.__index<T>(self: AttributeValue<T>, index)
 	if AttributeValue[index] then
