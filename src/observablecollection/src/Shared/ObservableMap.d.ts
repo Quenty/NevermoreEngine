@@ -3,7 +3,15 @@ import { Observable } from '@quenty/rx';
 import { Signal } from '@quenty/signal';
 
 type ObservableMap<TKey, TValue> = {
+  KeyAdded: Signal<LuaTuple<[key: TKey, value: TValue]>>;
+  KeyRemoved: Signal<TKey>;
+  KeyValueChanged: Signal<
+    LuaTuple<
+      [key: TKey, value: TValue | undefined, oldValue: TValue | undefined]
+    >
+  >;
   CountChanged: Signal<number>;
+
   ObserveKeysBrio(): Observable<Brio<TKey>>;
   ObserveValuesBrio(): Observable<Brio<TValue>>;
   ObservePairsBrio(): Observable<Brio<LuaTuple<[key: TKey, value: TValue]>>>;
@@ -20,7 +28,7 @@ type ObservableMap<TKey, TValue> = {
   GetKeyList(): TKey[];
   ObserveKeyList(): Observable<TKey[]>;
   Destroy(): void;
-} & IterableFunction<LuaTuple<[TKey, TValue]>>;
+} & IterableFunction<LuaTuple<[key: TKey, value: TValue]>>;
 
 interface ObservableMapConstructor {
   readonly ClassName: 'ObservableMap';
