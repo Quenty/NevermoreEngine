@@ -1,3 +1,16 @@
+# v1.16.0 (Tue May 26 2026)
+
+#### 🚀 Enhancement
+
+- fix: Fix deployment bugs in CI/CD [#702](https://github.com/Quenty/NevermoreEngine/pull/702) ([@Quenty](https://github.com/Quenty))
+- feat: Download progress report is streamed during deployment too ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
