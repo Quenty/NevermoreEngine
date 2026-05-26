@@ -1,3 +1,16 @@
+# v1.15.0 (Tue May 26 2026)
+
+#### 🚀 Enhancement
+
+- feat: Parallel upload in 12s instead of serial 20s ([@Quenty](https://github.com/Quenty))
+- feat: Add clickable hyperlinks to deployment ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

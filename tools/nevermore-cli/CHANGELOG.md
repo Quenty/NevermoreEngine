@@ -1,3 +1,27 @@
+# v4.30.0 (Tue May 26 2026)
+
+#### 🚀 Enhancement
+
+- feat: Parallel upload in 12s instead of serial 20s ([@Quenty](https://github.com/Quenty))
+- feat: Share rojo builds in bulk building operation ([@Quenty](https://github.com/Quenty))
+- feat: Add clickable hyperlinks to deployment ([@Quenty](https://github.com/Quenty))
+- feat: Make `nevermore deploy` handle multiple place targets ([@Quenty](https://github.com/Quenty))
+- feat: Handle multiple targets in batch command ([@Quenty](https://github.com/Quenty))
+- feat: Parse targets, but do not support more than the first one ([@Quenty](https://github.com/Quenty))
+- feat: Allow to launch roblox directly ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- format: Fix formatting ([@Quenty](https://github.com/Quenty))
+- refactor: Batch runner doesn't know about PackageName ([@Quenty](https://github.com/Quenty))
+- fix: Provide better place url on CLI output too ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
