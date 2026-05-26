@@ -1,3 +1,20 @@
+# v4.32.0 (Tue May 26 2026)
+
+#### 🚀 Enhancement
+
+- fix: Fix package reports + make smoketest more consistent [#703](https://github.com/Quenty/NevermoreEngine/pull/703) ([@Quenty](https://github.com/Quenty))
+- feat: Smoke test opt-in instead of opt-out ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix package reports ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

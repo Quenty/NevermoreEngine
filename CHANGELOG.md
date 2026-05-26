@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/cli-output-helpers@1.17.0`, `@quenty/nevermore-cli@4.32.0`
+  - fix: Fix package reports + make smoketest more consistent [#703](https://github.com/Quenty/NevermoreEngine/pull/703) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue May 26 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/cli-output-helpers@1.16.0`, `@quenty/nevermore-cli@4.31.0`
   - fix: Fix deployment bugs in CI/CD [#702](https://github.com/Quenty/NevermoreEngine/pull/702) ([@Quenty](https://github.com/Quenty))
 
