@@ -33,7 +33,10 @@ export class SummaryTableReporter extends BaseReporter {
   }
 
   override async stopAsync(): Promise<void> {
-    const results = this._state.getResults();
+    const results = this._state
+      .getAllPackages()
+      .map((p) => p.result)
+      .filter((r): r is PackageResult => r !== undefined);
     if (results.length === 0) return;
 
     const failures = this._state.getFailures();
