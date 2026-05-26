@@ -1,24 +1,17 @@
-# v4.32.0 (Tue May 26 2026)
-
-#### 🚀 Enhancement
-
-- fix: Fix package reports + make smoketest more consistent [#703](https://github.com/Quenty/NevermoreEngine/pull/703) ([@Quenty](https://github.com/Quenty))
-- feat: Smoke test opt-in instead of opt-out ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix package reports ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.32.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.31.0...@quenty/nevermore-cli@4.32.0) (2026-05-26)
+
+### Bug Fixes
+
+- Fix package reports ([7b86f54](https://github.com/Quenty/Nevermore/commit/7b86f54e17914bb3992f85018cf96c75725fed1e))
+
+### Features
+
+- Smoke test opt-in instead of opt-out ([af15222](https://github.com/Quenty/Nevermore/commit/af15222989ad37094da002c843629a45d1b2cbcc))
 
 # [4.31.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.30.0...@quenty/nevermore-cli@4.31.0) (2026-05-26)
 

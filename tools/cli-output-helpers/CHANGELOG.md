@@ -1,23 +1,13 @@
-# v1.17.0 (Tue May 26 2026)
-
-#### 🚀 Enhancement
-
-- fix: Fix package reports + make smoketest more consistent [#703](https://github.com/Quenty/NevermoreEngine/pull/703) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix package reports ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.17.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.16.0...@quenty/cli-output-helpers@1.17.0) (2026-05-26)
+
+### Bug Fixes
+
+- Fix package reports ([7b86f54](https://github.com/Quenty/Nevermore/commit/7b86f54e17914bb3992f85018cf96c75725fed1e))
 
 # [1.16.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.15.0...@quenty/cli-output-helpers@1.16.0) (2026-05-26)
 
