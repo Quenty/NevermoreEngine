@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import { OutputHelper } from '../outputHelper.js';
-import { BaseReporter } from './reporter.js';
+import { BaseReporter, type PackageResult } from './reporter.js';
 import { formatJson } from './format-json.js';
 import { type IStateTracker } from './state/state-tracker.js';
 
@@ -19,7 +19,10 @@ export class JsonFileReporter extends BaseReporter {
   }
 
   override async stopAsync(): Promise<void> {
-    const results = this._state.getResults();
+    const results = this._state
+      .getAllPackages()
+      .map((p) => p.result)
+      .filter((r): r is PackageResult => r !== undefined);
     const failures = this._state.getFailures();
     const durationMs = Date.now() - this._state.startTimeMs;
 

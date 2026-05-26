@@ -48,6 +48,7 @@ interface BatchDeployArgs extends NevermoreGlobalArgs {
   limit?: number;
   logs?: boolean;
   target?: string;
+  smokeTest?: boolean;
 }
 
 export const batchDeployCommand: CommandModule<
@@ -97,6 +98,13 @@ export const batchDeployCommand: CommandModule<
       })
       .option('logs', {
         describe: 'Show build/upload logs for all packages (not just failures)',
+        type: 'boolean',
+        default: false,
+      })
+      .option('smoke-test', {
+        describe:
+          'Run a post-deploy smoke test on targets with basePlace ' +
+          '(executes server scripts via Open Cloud and waits for errors)',
         type: 'boolean',
         default: false,
       });
@@ -228,9 +236,8 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         // Eagerly release build artifacts after upload
         await context.releaseBuiltPlaceAsync(builtPlace);
 
-        // Run smoke test for targets with basePlace
         let logs: string;
-        if (buildTarget.target.basePlace) {
+        if (args.smokeTest && buildTarget.target.basePlace) {
           OutputHelper.verbose('Running post-deploy smoke test...');
           const smokeResult = await _runSmokeTestAsync(
             pkgReporter,
@@ -247,6 +254,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
               placeId: buildTarget.target.placeId,
               success: false,
               logs: _annotateSmokeTestFailure(logs),
+              failureLabel: 'SMOKE TEST FAILED',
             };
           }
         } else {

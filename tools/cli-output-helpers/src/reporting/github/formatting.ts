@@ -149,9 +149,10 @@ export function formatResultStatus(
   }
 
   const failedPhase = pkg.failedPhase;
+  const effectiveLabel = pkg.failureLabel ?? failureLabel;
   const label = failedPhase
-    ? `**${failureLabel}** at ${failedPhase}`
-    : `**${failureLabel}**`;
+    ? `**${effectiveLabel}** at ${failedPhase}`
+    : `**${effectiveLabel}**`;
   return `❌ ${label} (${duration})`;
 }
 
