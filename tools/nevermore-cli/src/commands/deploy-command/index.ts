@@ -33,7 +33,7 @@ import {
 import { handleInitAsync } from './deploy-init.js';
 import { selectTargetAsync } from './select-target.js';
 
-const MULTI_PLACE_CONCURRENCY = 3;
+const MULTI_PLACE_CONCURRENCY = 10;
 
 export interface DeployArgs extends NevermoreGlobalArgs {
   apiKey?: string;
