@@ -436,14 +436,47 @@ export class OpenCloudClient {
     }
 
     OutputHelper.verbose('Fetching place binary from CDN...');
-    const cdnResponse = await fetch(data.location);
-    if (!cdnResponse.ok) {
-      throw new Error(
-        `Download place CDN fetch failed: ${cdnResponse.status} ${cdnResponse.statusText}`
-      );
-    }
-
-    const arrayBuffer = await cdnResponse.arrayBuffer();
+    const arrayBuffer = await _fetchCdnBinaryAsync(data.location);
     return Buffer.from(arrayBuffer);
   }
+}
+
+const CDN_MAX_ATTEMPTS = 4;
+
+async function _fetchCdnBinaryAsync(url: string): Promise<ArrayBuffer> {
+  let lastError: unknown = null;
+  for (let attempt = 1; attempt <= CDN_MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        return await response.arrayBuffer();
+      }
+      lastError = new Error(
+        `Download place CDN fetch failed: ${response.status} ${response.statusText}`
+      );
+      // 4xx (other than 408/429) won't fix itself — stop retrying.
+      if (
+        response.status >= 400 &&
+        response.status < 500 &&
+        response.status !== 408 &&
+        response.status !== 429
+      ) {
+        throw lastError;
+      }
+    } catch (err) {
+      lastError = err;
+    }
+
+    if (attempt === CDN_MAX_ATTEMPTS) {
+      break;
+    }
+    const waitMs = Math.min(8000, 500 * Math.pow(2, attempt - 1));
+    OutputHelper.warn(
+      `CDN download attempt ${attempt}/${CDN_MAX_ATTEMPTS} failed (${
+        lastError instanceof Error ? lastError.message : String(lastError)
+      }). Retrying in ${(waitMs / 1000).toFixed(1)}s...`
+    );
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+  }
+  throw lastError ?? new Error('Download place CDN fetch failed');
 }

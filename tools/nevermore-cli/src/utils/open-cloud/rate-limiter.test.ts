@@ -132,21 +132,69 @@ describe('RateLimiter', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it('returns the last 429 response after exhausting all retries', async () => {
+  it('returns the last 429 response after exhausting all retries without sleeping past the final attempt', async () => {
     vi.useFakeTimers();
-    const limiter = new RateLimiter();
+    const limiter = new RateLimiter({ maxRetries: 3 });
 
     fetchMock.mockResolvedValue(makeResponse(429, { 'retry-after': '1' }));
 
     const promise = limiter.fetchAsync('https://apis.roblox.com/cloud/v2/a');
 
-    // Three attempts, each waiting 1s before the next (or before giving up).
-    await vi.advanceTimersByTimeAsync(1000);
+    // Two backoffs between three attempts. After the third failure the
+    // limiter must return immediately rather than sleeping pointlessly.
     await vi.advanceTimersByTimeAsync(1000);
     await vi.advanceTimersByTimeAsync(1000);
 
     const response = await promise;
     expect(response.status).toBe(429);
     expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('retries on 503 with backoff before returning success', async () => {
+    vi.useFakeTimers();
+    const limiter = new RateLimiter();
+
+    fetchMock
+      .mockResolvedValueOnce(makeResponse(503))
+      .mockResolvedValueOnce(makeResponse(200));
+
+    const promise = limiter.fetchAsync('https://apis.roblox.com/cloud/v2/a');
+
+    await vi.advanceTimersByTimeAsync(0);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    // Exponential fallback for attempt 0 is 2^0 = 1s.
+    await vi.advanceTimersByTimeAsync(1000);
+    const response = await promise;
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries on transport errors and surfaces the last error if all attempts reject', async () => {
+    vi.useFakeTimers();
+    const limiter = new RateLimiter({ maxRetries: 2 });
+
+    fetchMock.mockRejectedValue(new TypeError('ECONNRESET'));
+
+    const promise = limiter.fetchAsync('https://apis.roblox.com/cloud/v2/a');
+    const settled = promise.catch((err) => err);
+
+    await vi.advanceTimersByTimeAsync(1000);
+
+    const err = await settled;
+    expect(err).toBeInstanceOf(TypeError);
+    expect((err as Error).message).toBe('ECONNRESET');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not retry on non-retryable 4xx responses', async () => {
+    const limiter = new RateLimiter();
+    fetchMock.mockResolvedValueOnce(makeResponse(404));
+
+    const response = await limiter.fetchAsync(
+      'https://apis.roblox.com/cloud/v2/a'
+    );
+    expect(response.status).toBe(404);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

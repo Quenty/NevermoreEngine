@@ -19,7 +19,9 @@ function _extractRoute(url: string | URL | Request): string {
 }
 
 const DEFAULT_MAX_CONCURRENCY = 4;
+const DEFAULT_MAX_RETRIES = 6;
 const RETRY_JITTER_FRACTION = 0.3;
+const RETRYABLE_SERVER_ERROR_STATUSES = new Set([502, 503, 504]);
 
 export interface RateLimiterOptions {
   /**
@@ -28,6 +30,12 @@ export interface RateLimiterOptions {
    * keeping a tight feedback loop on `x-ratelimit-remaining`.
    */
   maxConcurrency?: number;
+  /**
+   * Total attempts per request before giving up (including the initial try).
+   * Defaults to 6, sized to ride out the Luau-execution endpoint's burst
+   * windows during a multi-place deploy.
+   */
+  maxRetries?: number;
 }
 
 /**
@@ -48,11 +56,16 @@ export class RateLimiter {
   private _queue: Array<() => void> = [];
   private _inflight = 0;
   private _maxConcurrency: number;
+  private _maxRetries: number;
 
   constructor(options: RateLimiterOptions = {}) {
     this._maxConcurrency = Math.max(
       1,
       options.maxConcurrency ?? DEFAULT_MAX_CONCURRENCY
+    );
+    this._maxRetries = Math.max(
+      1,
+      options.maxRetries ?? DEFAULT_MAX_RETRIES
     );
   }
 
@@ -122,7 +135,8 @@ export class RateLimiter {
    * - Caps concurrency at `_maxConcurrency` (default 4) so we keep getting
    *   header feedback before each new wave fans out
    * - Delays if we know we're out of quota
-   * - Retries on 429 with jittered back-off (up to 3 attempts)
+   * - Retries on 429, retryable 5xx (502/503/504), and transport errors
+   *   with jittered back-off
    * - Tracks rate-limit headers from every response
    */
   async fetchAsync(
@@ -134,44 +148,95 @@ export class RateLimiter {
     const route = _extractRoute(url);
 
     try {
-      await this._waitIfNeededAsync(route);
-
       let lastResponse: Response | null = null;
-      const maxRetries = 3;
+      let lastError: unknown = null;
 
-      for (let attempt = 0; attempt < maxRetries; attempt++) {
-        const response = await fetch(url, init);
-        this._updateFromHeaders(response.headers);
+      for (let attempt = 0; attempt < this._maxRetries; attempt++) {
+        await this._waitIfNeededAsync(route);
 
-        if (response.status !== 429) {
+        let response: Response | null = null;
+        let transportError: unknown = null;
+
+        try {
+          response = await fetch(url, init);
+          this._updateFromHeaders(response.headers);
+        } catch (err) {
+          transportError = err;
+        }
+
+        if (response && !_isRetryableStatus(response.status)) {
           return response;
         }
 
-        lastResponse = response;
+        if (response) {
+          lastResponse = response;
+        } else {
+          lastError = transportError;
+        }
 
-        const retryAfter = response.headers.get('retry-after');
-        const baseSec = retryAfter
-          ? parseFloat(retryAfter)
-          : 10 * (attempt + 1);
-        // Additive jitter only — never wait less than retry-after asked for,
-        // but desynchronize concurrent callers so they don't all retry on the
-        // exact same millisecond and re-collide on the next attempt.
-        const waitSec = baseSec * (1 + Math.random() * RETRY_JITTER_FRACTION);
+        const isFinalAttempt = attempt === this._maxRetries - 1;
+        if (isFinalAttempt) {
+          break;
+        }
 
+        const waitSec = _computeWaitSeconds(response, attempt);
+        const reason = response
+          ? `${response.status} on ${route}`
+          : `transport error on ${route} (${_describeError(transportError)})`;
         OutputHelper.warn(
-          `429 on ${route} (attempt ${
-            attempt + 1
-          }/${maxRetries}). Retrying in ${waitSec.toFixed(
-            1
-          )}s (Roblox requested)...`
+          `${reason} (attempt ${attempt + 1}/${
+            this._maxRetries
+          }). Retrying in ${waitSec.toFixed(1)}s...`
         );
         await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
       }
 
-      // All retries exhausted — return the last 429 response
-      return lastResponse!;
+      if (lastResponse) {
+        return lastResponse;
+      }
+      throw lastError ?? new Error(`Request to ${route} failed`);
     } finally {
       this._release();
     }
   }
+}
+
+function _isRetryableStatus(status: number): boolean {
+  return status === 429 || RETRYABLE_SERVER_ERROR_STATUSES.has(status);
+}
+
+function _computeWaitSeconds(
+  response: Response | null,
+  attempt: number
+): number {
+  const retryAfter = response?.headers.get('retry-after');
+  const parsed = retryAfter != null ? _parseRetryAfter(retryAfter) : null;
+  // Exponential fallback capped at 30s — keeps multi-place deploys from
+  // ballooning to minutes of compounded backoff while still spacing out
+  // collisions when the server doesn't pin a retry-after.
+  const baseSec = parsed ?? Math.min(30, Math.pow(2, attempt));
+  // Additive jitter only — never wait less than retry-after asked for, but
+  // desynchronize concurrent callers so they don't all retry on the exact
+  // same millisecond and re-collide on the next attempt.
+  return baseSec * (1 + Math.random() * RETRY_JITTER_FRACTION);
+}
+
+function _parseRetryAfter(value: string): number | null {
+  const trimmed = value.trim();
+  const asSeconds = Number(trimmed);
+  if (Number.isFinite(asSeconds) && asSeconds >= 0) {
+    return asSeconds;
+  }
+  const asDateMs = Date.parse(trimmed);
+  if (Number.isFinite(asDateMs)) {
+    return Math.max(0, (asDateMs - Date.now()) / 1000);
+  }
+  return null;
+}
+
+function _describeError(err: unknown): string {
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return String(err);
 }
