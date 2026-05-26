@@ -6,25 +6,34 @@ import {
   type LiveStateTracker,
   CompositeReporter,
   GithubCommentTableReporter,
+  GroupedReporter,
   JsonFileReporter,
   SimpleReporter,
   SpinnerReporter,
+  SummaryTableReporter,
 } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
-import { createDeployCommentConfig } from '../../utils/deploy/deploy-github-columns.js';
+import {
+  type BatchDeployResult,
+  createDeployCommentConfig,
+} from '../../utils/deploy/deploy-github-columns.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
+import { runBatchAsync } from '../../utils/batch/batch-runner.js';
+import { type BatchTarget } from '../../utils/batch/changed-packages-utils.js';
 import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
 import {
   loadDeployConfigAsync,
   resolveDeployConfigPath,
-  resolveSingleDeployTarget,
+  resolveDeployTargetPlaces,
 } from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
 import { selectTargetAsync } from './select-target.js';
+
+const MULTI_PLACE_CONCURRENCY = 3;
 
 export interface DeployArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -115,16 +124,18 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             default: false,
           })
           .option('universe-id', {
-            describe: 'Override universe ID from deploy.nevermore.json',
+            describe:
+              'Override universe ID from deploy.nevermore.json (single-place targets only)',
             type: 'number',
           })
           .option('place-id', {
-            describe: 'Override place ID from deploy.nevermore.json',
+            describe:
+              'Override place ID from deploy.nevermore.json (single-place targets only)',
             type: 'number',
           })
           .option('place-file', {
             describe:
-              'Upload a pre-built .rbxl file instead of building via rojo',
+              'Upload a pre-built .rbxl file instead of building via rojo (single-place targets only)',
             type: 'string',
           })
           .option('output', {
@@ -167,38 +178,102 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         publish: args.publish ?? false,
       });
 
-    const useSpinner = process.stdout.isTTY && !args.verbose;
-    const showLogs = args.logs ?? false;
+    const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
+    const places = resolveDeployTargetPlaces(config, targetName);
+    const isMultiPlace = places.length > 1;
+
+    if (isMultiPlace) {
+      const overrides: string[] = [];
+      if (args.universeId != null) overrides.push('--universe-id');
+      if (args.placeId != null) overrides.push('--place-id');
+      if (args.placeFile != null) overrides.push('--place-file');
+      if (overrides.length > 0) {
+        throw new Error(
+          `Target "${targetName}" has ${places.length} places; ` +
+            `${overrides.join(', ')} only applies to single-place targets.`
+        );
+      }
+    }
+
+    const batchTargets: BatchTarget[] = isMultiPlace
+      ? places.map((place, i) => {
+          const suffix = place.name ?? `places[${i}]`;
+          return {
+            name: `${packageName} - ${suffix}`,
+            packageName,
+            path: cwd,
+            target: place,
+          };
+        })
+      : [
+          {
+            name: packageName,
+            packageName,
+            path: cwd,
+            target: places[0]!,
+          },
+        ];
+
     const publish = args.publish ?? false;
+    const showLogs = args.logs ?? false;
+    const useSpinner = process.stdout.isTTY && !args.verbose;
+    const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
     const deployLabels = {
       successLabel: publish ? 'Published' : 'Deployed',
       failureLabel: publish ? 'PUBLISH FAILED' : 'DEPLOY FAILED',
     };
     const actionVerb = publish ? 'Publishing' : 'Deploying';
+    const targetNames = batchTargets.map((t) => t.name);
 
     // Spinner embeds the target in its header; SimpleReporter has no header, so
-    // surface auto-detection here like before.
-    if (!useSpinner && targetAutoDetected) {
+    // surface auto-detection here like before. (Multi-place uses GroupedReporter
+    // / SummaryTableReporter, which both name the target separately.)
+    if (!useSpinner && !isMultiPlace && targetAutoDetected) {
       OutputHelper.info(`Using target '${targetName}'.`);
     }
 
     const reporter = new CompositeReporter(
-      [packageName],
+      targetNames,
       (state: LiveStateTracker) => {
-        const reporters: Reporter[] = [
-          useSpinner
-            ? new SpinnerReporter(state, {
-                showLogs,
-                actionVerb,
-                actionContext: `to target '${targetName}'`,
-                ...deployLabels,
-              })
-            : new SimpleReporter(state, {
-                alwaysShowLogs: showLogs,
-                successMessage: 'Deploy complete!',
-                failureMessage: 'Deploy failed!',
-              }),
-        ];
+        const reporters: Reporter[] = [];
+        if (isMultiPlace) {
+          reporters.push(
+            isGrouped
+              ? new GroupedReporter(state, {
+                  showLogs,
+                  verbose: args.verbose,
+                  actionVerb,
+                  ...deployLabels,
+                })
+              : new SpinnerReporter(state, {
+                  showLogs,
+                  actionVerb,
+                  actionContext: `to target '${targetName}'`,
+                  ...deployLabels,
+                })
+          );
+          reporters.push(
+            new SummaryTableReporter(state, {
+              ...deployLabels,
+              summaryVerb: publish ? 'published' : 'deployed',
+            })
+          );
+        } else {
+          reporters.push(
+            useSpinner
+              ? new SpinnerReporter(state, {
+                  showLogs,
+                  actionVerb,
+                  actionContext: `to target '${targetName}'`,
+                  ...deployLabels,
+                })
+              : new SimpleReporter(state, {
+                  alwaysShowLogs: showLogs,
+                  successMessage: 'Deploy complete!',
+                  failureMessage: 'Deploy failed!',
+                })
+          );
+        }
         if (args.output) {
           reporters.push(new JsonFileReporter(state, args.output));
         }
@@ -207,7 +282,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             new GithubCommentTableReporter(
               state,
               createDeployCommentConfig(),
-              1
+              isMultiPlace ? MULTI_PLACE_CONCURRENCY : 1
             )
           );
         }
@@ -224,54 +299,54 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
     await reporter.startAsync();
 
-    const startMs = Date.now();
-    reporter.onPackageStart(packageName);
-
     let exitCode = 0;
+    // Captured only for the single-place success message printed after the run.
     let publishedVersion: number | undefined;
     let publishedPlaceId: number | undefined;
+
     try {
-      const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
-      const target = resolveSingleDeployTarget(config, targetName);
-
-      const builtPlace = await context.buildPlaceAsync({
-        target,
-        outputFileName: args.publish ? 'publish.rbxl' : 'deploy.rbxl',
-        overrides: args,
+      const results = await runBatchAsync<BatchTarget, BatchDeployResult>({
+        items: batchTargets,
+        concurrency: isMultiPlace ? MULTI_PLACE_CONCURRENCY : 1,
         reporter,
-        packageName,
-      });
+        bufferOutput: isMultiPlace && isGrouped,
+        executeAsync: async (buildTarget, pkgReporter) => {
+          const builtPlace = await context.buildPlaceAsync({
+            target: buildTarget.target,
+            outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
+            packagePath: buildTarget.path,
+            packageName: buildTarget.name,
+            overrides: isMultiPlace ? undefined : args,
+          });
 
-      const { version, target: uploadedTarget } = await uploadPlaceAsync({
-        builtPlace,
-        args,
-        client,
-        reporter,
-        packageName,
-      });
-      publishedVersion = version;
-      publishedPlaceId = uploadedTarget.placeId;
+          const { version, target: uploadedTarget } = await uploadPlaceAsync({
+            builtPlace,
+            args,
+            client,
+            reporter: pkgReporter,
+            packageName: buildTarget.name,
+          });
 
-      const durationMs = Date.now() - startMs;
-      const action = args.publish ? 'Published' : 'Saved';
-      reporter.onPackageResult({
-        packageName,
-        success: true,
-        logs: `${action} v${version}`,
-        durationMs,
-        progressSummary: { kind: 'version', version },
+          await context.releaseBuiltPlaceAsync(builtPlace);
+
+          if (!isMultiPlace) {
+            publishedVersion = version;
+            publishedPlaceId = uploadedTarget.placeId;
+          }
+
+          const action = publish ? 'Published' : 'Saved';
+          return {
+            packageName: buildTarget.name,
+            placeId: uploadedTarget.placeId,
+            success: true,
+            logs: `${action} v${version}`,
+            progressSummary: { kind: 'version', version },
+          };
+        },
       });
+      if (results.summary.failed > 0) exitCode = 1;
     } catch (err) {
-      const durationMs = Date.now() - startMs;
-      const errorMessage = err instanceof Error ? err.message : String(err);
-
-      reporter.onPackageResult({
-        packageName,
-        success: false,
-        logs: '',
-        durationMs,
-        error: errorMessage,
-      });
+      OutputHelper.error(err instanceof Error ? err.message : String(err));
       exitCode = 1;
     } finally {
       await context.disposeAsync();
@@ -284,7 +359,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         publishedPlaceId !== undefined
           ? `https://www.roblox.com/games/${publishedPlaceId}`
           : undefined;
-      if (args.publish) {
+      if (publish) {
         OutputHelper.info(
           placeUrl
             ? `Published v${publishedVersion} — live in game. ${placeUrl}`
