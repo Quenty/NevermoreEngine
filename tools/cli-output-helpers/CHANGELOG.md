@@ -1,20 +1,13 @@
-# v1.16.0 (Tue May 26 2026)
-
-#### 🚀 Enhancement
-
-- fix: Fix deployment bugs in CI/CD [#702](https://github.com/Quenty/NevermoreEngine/pull/702) ([@Quenty](https://github.com/Quenty))
-- feat: Download progress report is streamed during deployment too ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.16.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.15.0...@quenty/cli-output-helpers@1.16.0) (2026-05-26)
+
+### Features
+
+- Download progress report is streamed during deployment too ([b2c3c95](https://github.com/Quenty/Nevermore/commit/b2c3c951f0c9b8e4320b8a7b05a93628cb27a453))
 
 # [1.15.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.14.0...@quenty/cli-output-helpers@1.15.0) (2026-05-26)
 

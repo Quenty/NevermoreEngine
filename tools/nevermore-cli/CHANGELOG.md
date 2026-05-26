@@ -1,26 +1,18 @@
-# v4.31.0 (Tue May 26 2026)
-
-#### 🚀 Enhancement
-
-- fix: Fix deployment bugs in CI/CD [#702](https://github.com/Quenty/NevermoreEngine/pull/702) ([@Quenty](https://github.com/Quenty))
-- feat: Download progress report is streamed during deployment too ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- format: Fix formatting ([@Quenty](https://github.com/Quenty))
-- fix: Rate limiting open-cloud is handled safer ([@Quenty](https://github.com/Quenty))
-- fix: Play URL launches to safe Roblox URL ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.31.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.30.0...@quenty/nevermore-cli@4.31.0) (2026-05-26)
+
+### Bug Fixes
+
+- Play URL launches to safe Roblox URL ([620d703](https://github.com/Quenty/Nevermore/commit/620d7034283c3c8f6581e97a430075a9bb79d1e4))
+- Rate limiting open-cloud is handled safer ([4e09015](https://github.com/Quenty/Nevermore/commit/4e0901596fa366048ca90bdc977a2cf91f71b7bf))
+
+### Features
+
+- Download progress report is streamed during deployment too ([b2c3c95](https://github.com/Quenty/Nevermore/commit/b2c3c951f0c9b8e4320b8a7b05a93628cb27a453))
 
 # [4.30.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.29.2...@quenty/nevermore-cli@4.30.0) (2026-05-26)
 
