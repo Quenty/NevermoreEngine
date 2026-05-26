@@ -63,10 +63,7 @@ export class RateLimiter {
       1,
       options.maxConcurrency ?? DEFAULT_MAX_CONCURRENCY
     );
-    this._maxRetries = Math.max(
-      1,
-      options.maxRetries ?? DEFAULT_MAX_RETRIES
-    );
+    this._maxRetries = Math.max(1, options.maxRetries ?? DEFAULT_MAX_RETRIES);
   }
 
   private _updateFromHeaders(headers: Headers): void {
