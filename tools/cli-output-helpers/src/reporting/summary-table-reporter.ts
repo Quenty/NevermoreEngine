@@ -98,9 +98,8 @@ export class SummaryTableReporter extends BaseReporter {
         : this._successLabel;
     }
     const failedPhase = result.failedPhase;
-    return failedPhase
-      ? `${this._failureLabel} at ${failedPhase}`
-      : this._failureLabel;
+    const failureLabel = result.failureLabel ?? this._failureLabel;
+    return failedPhase ? `${failureLabel} at ${failedPhase}` : failureLabel;
   }
 
   private _colorStatus(

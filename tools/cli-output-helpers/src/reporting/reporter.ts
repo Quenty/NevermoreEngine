@@ -69,6 +69,8 @@ export interface PackageResult {
   error?: string;
   progressSummary?: ProgressSummary;
   failedPhase?: JobPhase;
+  /** Per-result override of the reporter's default failure label. */
+  failureLabel?: string;
 }
 
 /** Summary of a complete batch run. */

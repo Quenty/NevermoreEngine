@@ -181,7 +181,7 @@ export class SpinnerReporter extends BaseReporter {
       : OutputHelper.formatError('✗');
     const status = result.success
       ? this._options.successLabel ?? 'Passed'
-      : this._options.failureLabel ?? 'FAILED';
+      : result.failureLabel ?? this._options.failureLabel ?? 'FAILED';
     const formatted = result.success
       ? OutputHelper.formatSuccess(status)
       : OutputHelper.formatError(status);
@@ -240,9 +240,11 @@ export class SpinnerReporter extends BaseReporter {
       } else if (state.status === 'failed') {
         const icon = OutputHelper.formatError('✗');
         const failedPhase = state.result?.failedPhase;
+        const failureLabel =
+          state.result?.failureLabel ?? this._options.failureLabel ?? 'FAILED';
         const plain = failedPhase
-          ? `${this._options.failureLabel ?? 'FAILED'} at ${failedPhase}`
-          : this._options.failureLabel ?? 'FAILED';
+          ? `${failureLabel} at ${failedPhase}`
+          : failureLabel;
         const statusText = OutputHelper.formatError(
           plain.padEnd(STATUS_COLUMN_WIDTH)
         );

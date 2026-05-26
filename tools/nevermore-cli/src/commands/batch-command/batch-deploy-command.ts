@@ -247,6 +247,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
               placeId: buildTarget.target.placeId,
               success: false,
               logs: _annotateSmokeTestFailure(logs),
+              failureLabel: 'SMOKE TEST FAILED',
             };
           }
         } else {
