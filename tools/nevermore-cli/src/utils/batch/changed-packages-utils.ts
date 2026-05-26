@@ -155,9 +155,9 @@ function _requireScriptTemplate(targets: BatchTarget[]): BatchTarget[] {
 
   if (skipped.length > 0) {
     OutputHelper.verbose(
-      `Skipped ${
-        skipped.length
-      } targets without scriptTemplate: ${skipped.join(', ')}`
+      `Skipped ${skipped.length} targets without scriptTemplate: ${skipped.join(
+        ', '
+      )}`
     );
   }
 

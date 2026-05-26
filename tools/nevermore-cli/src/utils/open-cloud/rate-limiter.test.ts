@@ -55,7 +55,11 @@ describe('RateLimiter', () => {
 
   it('caps in-flight requests at maxConcurrency and dispatches queued callers on release', async () => {
     const limiter = new RateLimiter({ maxConcurrency: 2 });
-    const gates = [deferred<Response>(), deferred<Response>(), deferred<Response>()];
+    const gates = [
+      deferred<Response>(),
+      deferred<Response>(),
+      deferred<Response>(),
+    ];
     let callIndex = 0;
     fetchMock.mockImplementation(() => gates[callIndex++]!.promise);
 

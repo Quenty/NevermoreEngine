@@ -57,7 +57,9 @@ export async function generateCombinedProjectAsync(options: {
   const { batchTargets, batchPlaceId, batchUniverseId, progress } = options;
 
   if (batchTargets.length === 0) {
-    throw new Error('No batch targets provided for combined project generation');
+    throw new Error(
+      'No batch targets provided for combined project generation'
+    );
   }
 
   const buildContext = await BuildContext.createAsync({

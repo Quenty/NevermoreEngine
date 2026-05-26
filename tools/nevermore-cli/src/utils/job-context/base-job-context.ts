@@ -127,7 +127,8 @@ export abstract class BaseJobContext implements JobContext {
     const out = { ...target };
     if (overrides?.universeId) out.universeId = overrides.universeId;
     if (overrides?.placeId) out.placeId = overrides.placeId;
-    if (overrides?.scriptTemplate) out.scriptTemplate = overrides.scriptTemplate;
+    if (overrides?.scriptTemplate)
+      out.scriptTemplate = overrides.scriptTemplate;
     return out;
   }
 

@@ -30,7 +30,7 @@ export type PartialBatchResult<TResult extends PackageResult> = Omit<
 
 export interface BatchOptions<
   TItem extends BatchItem,
-  TResult extends PackageResult,
+  TResult extends PackageResult
 > {
   items: TItem[];
   concurrency?: number;
@@ -45,7 +45,7 @@ export interface BatchOptions<
 
 export async function runBatchAsync<
   TItem extends BatchItem,
-  TResult extends PackageResult,
+  TResult extends PackageResult
 >(options: BatchOptions<TItem, TResult>): Promise<BatchSummary<TResult>> {
   const {
     items,
@@ -107,7 +107,7 @@ export async function runBatchAsync<
 
 async function _runOneAsync<
   TItem extends BatchItem,
-  TResult extends PackageResult,
+  TResult extends PackageResult
 >(
   item: TItem,
   executeAsync: (
