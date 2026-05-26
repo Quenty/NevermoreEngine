@@ -225,9 +225,10 @@ export class SpinnerReporter extends BaseReporter {
         const empty = isEmptyTestRun(state.result?.progressSummary);
         let plain = progressText ? `${label} ${progressText}` : label;
         if (empty) plain += ' ⚠';
+        const padded = OutputHelper.padVisible(plain, 22);
         const statusText = empty
-          ? OutputHelper.formatWarning(plain.padEnd(22))
-          : OutputHelper.formatSuccess(plain.padEnd(22));
+          ? OutputHelper.formatWarning(padded)
+          : OutputHelper.formatSuccess(padded);
         line = `  ${icon} ${state.name.padEnd(
           30
         )} ${statusText} ${OutputHelper.formatDim(time)}`;
@@ -248,7 +249,9 @@ export class SpinnerReporter extends BaseReporter {
         const plain = progressText
           ? `${phaseLabel} ${progressText}`
           : phaseLabel;
-        const statusText = OutputHelper.formatInfo(plain.padEnd(22));
+        const statusText = OutputHelper.formatInfo(
+          OutputHelper.padVisible(plain, 22)
+        );
         line = `  ${icon} ${state.name.padEnd(
           30
         )} ${statusText} ${OutputHelper.formatDim(time)}`;

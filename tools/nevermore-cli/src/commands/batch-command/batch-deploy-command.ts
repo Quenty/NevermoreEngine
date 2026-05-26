@@ -259,7 +259,11 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           placeId: buildTarget.target.placeId,
           success: true,
           logs,
-          progressSummary: { kind: 'version', version },
+          progressSummary: {
+            kind: 'version',
+            version,
+            url: `https://www.roblox.com/games/${buildTarget.target.placeId}`,
+          },
         };
       },
     });

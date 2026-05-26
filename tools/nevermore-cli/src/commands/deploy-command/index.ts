@@ -340,7 +340,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             placeId: uploadedTarget.placeId,
             success: true,
             logs: `${action} v${version}`,
-            progressSummary: { kind: 'version', version },
+            progressSummary: {
+              kind: 'version',
+              version,
+              url: `https://www.roblox.com/games/${uploadedTarget.placeId}`,
+            },
           };
         },
       });

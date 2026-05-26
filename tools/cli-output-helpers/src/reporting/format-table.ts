@@ -17,9 +17,14 @@ export interface TableOptions {
   indent?: string;
 }
 
-/** Strip ANSI escape codes so width calculations reflect visible characters. */
+/**
+ * Strip ANSI color codes and OSC 8 hyperlink escapes so width calculations
+ * reflect visible characters.
+ */
 function stripAnsi(text: string): string {
-  return text.replace(/\x1b\[[0-9;]*m/g, '');
+  return text
+    .replace(/\x1b\]8;[^\x07\x1b]*(?:\x07|\x1b\\)/g, '')
+    .replace(/\x1b\[[0-9;]*m/g, '');
 }
 
 function padCell(text: string, width: number, align: 'left' | 'right'): string {
