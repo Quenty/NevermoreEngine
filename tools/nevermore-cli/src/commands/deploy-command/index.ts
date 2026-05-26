@@ -18,6 +18,11 @@ import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
+import {
+  loadDeployConfigAsync,
+  resolveDeployConfigPath,
+  resolveSingleDeployTarget,
+} from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
 import { selectTargetAsync } from './select-target.js';
 
@@ -226,15 +231,18 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
     let publishedVersion: number | undefined;
     let publishedPlaceId: number | undefined;
     try {
+      const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
+      const target = resolveSingleDeployTarget(config, targetName);
+
       const builtPlace = await context.buildPlaceAsync({
-        targetName,
+        target,
         outputFileName: args.publish ? 'publish.rbxl' : 'deploy.rbxl',
         overrides: args,
         reporter,
         packageName,
       });
 
-      const { version, target } = await uploadPlaceAsync({
+      const { version, target: uploadedTarget } = await uploadPlaceAsync({
         builtPlace,
         args,
         client,
@@ -242,7 +250,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         packageName,
       });
       publishedVersion = version;
-      publishedPlaceId = target.placeId;
+      publishedPlaceId = uploadedTarget.placeId;
 
       const durationMs = Date.now() - startMs;
       const action = args.publish ? 'Published' : 'Saved';

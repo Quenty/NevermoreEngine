@@ -17,9 +17,9 @@ import {
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import {
-  discoverAllTestablePackagesAsync,
-  discoverChangedTestablePackagesAsync,
-  type TargetPackage,
+  discoverAllTestableBatchTargetsAsync,
+  discoverChangedTestableBatchTargetsAsync,
+  type BatchTarget,
 } from '../../utils/batch/changed-packages-utils.js';
 import {
   type LiveStateTracker,
@@ -131,8 +131,8 @@ export const batchTestCommand: CommandModule<
 
 async function _runAsync(args: BatchTestArgs): Promise<void> {
   let packages = args.all
-    ? await discoverAllTestablePackagesAsync()
-    : await discoverChangedTestablePackagesAsync(args.base!);
+    ? await discoverAllTestableBatchTargetsAsync()
+    : await discoverChangedTestableBatchTargetsAsync(args.base!);
 
   if (args.limit && args.limit > 0) {
     packages = packages.slice(0, args.limit);
@@ -230,7 +230,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   let exitCode = 0;
   try {
-    const results = await runBatchAsync<TargetPackage, BatchTestResult>({
+    const results = await runBatchAsync<BatchTarget, BatchTestResult>({
       items: packages,
       concurrency,
       reporter,
@@ -241,7 +241,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
         return {
           packageName: pkg.name,
-          placeId: pkg.activeTargets[0]!.placeId,
+          placeId: pkg.target.placeId,
           success: result.success,
           logs: result.logs,
           // Aggregated mode reports per-package pcall time; the outer
@@ -270,7 +270,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 }
 
 async function _runWithRetryAsync(
-  pkg: TargetPackage,
+  pkg: BatchTarget,
   context: JobContext,
   timeoutMs: number
 ): Promise<SingleTestResult> {
@@ -278,6 +278,7 @@ async function _runWithRetryAsync(
     packagePath: pkg.path,
     packageName: pkg.name,
     timeoutMs,
+    target: pkg.target,
   };
 
   try {

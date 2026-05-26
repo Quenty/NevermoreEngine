@@ -51,9 +51,7 @@ function _validatePlace(label: string, place: DeployTarget): void {
       );
     }
     if (typeof place.basePlace.placeId !== 'number') {
-      throw new Error(
-        `${label} basePlace is missing or has invalid "placeId"`
-      );
+      throw new Error(`${label} basePlace is missing or has invalid "placeId"`);
     }
   }
 }
@@ -120,11 +118,30 @@ export function resolveDeployTargetPlaces(
   return _isMultiPlace(target) ? target.places : [target];
 }
 
-export function resolveDeployTarget(
+/**
+ * Like `resolveDeployTarget`, but throws when the target is multi-place. Use
+ * in single-shot commands (`nevermore deploy`, `nevermore test`) where it is
+ * not meaningful to deploy to "the first place" of a multi-chapter target —
+ * the caller should pick one explicitly or use the batch commands.
+ */
+export function resolveSingleDeployTarget(
   config: DeployConfig,
-  targetName: string
+  targetName: string,
+  commandHint = 'nevermore batch deploy'
 ): DeployTarget {
-  return resolveDeployTargetPlaces(config, targetName)[0]!;
+  const places = resolveDeployTargetPlaces(config, targetName);
+  if (places.length > 1) {
+    const placeNames = places
+      .map((p, i) => p.name ?? `places[${i}]`)
+      .join(', ');
+    throw new Error(
+      [
+        `Target "${targetName}" has multiple places (${placeNames}); cannot deploy to it as a single place.`,
+        `Use \`${commandHint} --target ${targetName}\` to fan out across every place.`,
+      ].join('\n')
+    );
+  }
+  return places[0]!;
 }
 
 /**
