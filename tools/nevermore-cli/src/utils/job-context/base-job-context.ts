@@ -196,7 +196,14 @@ export abstract class BaseJobContext implements JobContext {
     OutputHelper.verbose('Downloading base place for merge...');
     const buffer = await this._openCloudClient.downloadPlaceAsync(
       basePlace.universeId,
-      basePlace.placeId
+      basePlace.placeId,
+      (transferred, total) => {
+        this._reporter.onPackageProgressUpdate(resolvedName, {
+          kind: 'bytes',
+          transferredBytes: transferred,
+          totalBytes: total,
+        });
+      }
     );
     const basePath = mergeContext.resolvePath('base.rbxl');
     await fs.writeFile(basePath, buffer);

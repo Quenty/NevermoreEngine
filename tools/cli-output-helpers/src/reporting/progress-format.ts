@@ -25,6 +25,9 @@ export function formatProgressInline(progress?: ProgressSummary): string {
           progress.totalBytes
         )})`;
       }
+      if (progress.transferredBytes > 0) {
+        return `(${_formatBytes(progress.transferredBytes)})`;
+      }
       return `(${_formatBytes(progress.totalBytes)})`;
     case 'steps':
       if (progress.total > 0) {
@@ -52,7 +55,10 @@ export function formatProgressResult(progress?: ProgressSummary): string {
     case 'test-counts':
       return `(${progress.passed}/${progress.total})`;
     case 'bytes':
-      return `(${_formatBytes(progress.totalBytes)})`;
+      if (progress.totalBytes > 0) {
+        return `(${_formatBytes(progress.totalBytes)})`;
+      }
+      return `(${_formatBytes(progress.transferredBytes)})`;
     case 'steps':
       return `(${progress.completed}/${progress.total})`;
     case 'version':

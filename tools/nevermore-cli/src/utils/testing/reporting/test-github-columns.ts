@@ -47,7 +47,7 @@ function createTryItColumn(): GithubCommentColumn {
         return '';
       }
       const openUrl = `https://www.roblox.com/games/${placeId}`;
-      const playUrl = `roblox://experiences/start?placeId=${placeId}`;
+      const playUrl = `https://www.roblox.com/games/start?placeId=${placeId}`;
       return `[Open](${openUrl}) \\| [Play](${playUrl})`;
     },
   };

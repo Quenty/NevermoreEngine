@@ -22,6 +22,11 @@ export interface SpinnerReporterOptions {
 
 const SPINNER_FRAMES = ['◐', '◓', '◑', '◒'];
 
+// Wide enough to fit "⬇ Downloading (12.3 MB/12.3 MB)" without bumping the
+// duration column out of alignment. Bytes progress is the widest case; test
+// counts and version labels comfortably fit.
+const STATUS_COLUMN_WIDTH = 32;
+
 // Typed Record<JobPhase, string> so adding a new JobPhase fails the build
 // until a label is supplied here — otherwise the renderer's else branch
 // would silently flash the failure label during the missing phase.
@@ -225,7 +230,7 @@ export class SpinnerReporter extends BaseReporter {
         const empty = isEmptyTestRun(state.result?.progressSummary);
         let plain = progressText ? `${label} ${progressText}` : label;
         if (empty) plain += ' ⚠';
-        const padded = OutputHelper.padVisible(plain, 22);
+        const padded = OutputHelper.padVisible(plain, STATUS_COLUMN_WIDTH);
         const statusText = empty
           ? OutputHelper.formatWarning(padded)
           : OutputHelper.formatSuccess(padded);
@@ -238,7 +243,9 @@ export class SpinnerReporter extends BaseReporter {
         const plain = failedPhase
           ? `${this._options.failureLabel ?? 'FAILED'} at ${failedPhase}`
           : this._options.failureLabel ?? 'FAILED';
-        const statusText = OutputHelper.formatError(plain.padEnd(22));
+        const statusText = OutputHelper.formatError(
+          plain.padEnd(STATUS_COLUMN_WIDTH)
+        );
         line = `  ${icon} ${state.name.padEnd(
           30
         )} ${statusText} ${OutputHelper.formatDim(time)}`;
@@ -250,7 +257,7 @@ export class SpinnerReporter extends BaseReporter {
           ? `${phaseLabel} ${progressText}`
           : phaseLabel;
         const statusText = OutputHelper.formatInfo(
-          OutputHelper.padVisible(plain, 22)
+          OutputHelper.padVisible(plain, STATUS_COLUMN_WIDTH)
         );
         line = `  ${icon} ${state.name.padEnd(
           30
