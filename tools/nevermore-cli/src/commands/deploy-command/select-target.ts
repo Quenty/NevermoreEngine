@@ -4,6 +4,7 @@ import {
   loadDeployConfigAsync,
   resolveDefaultTargetName,
   resolveDeployConfigPath,
+  resolveDeployTargetPlaces,
 } from '../../utils/build/deploy-config.js';
 
 export interface SelectTargetOptions {
@@ -53,9 +54,13 @@ async function _promptForTargetAsync(
     : targets;
 
   const choices = orderedTargets.map((name) => {
-    const target = config.targets[name]!;
+    const places = resolveDeployTargetPlaces(config, name);
+    const placeLabel =
+      places.length === 1
+        ? `place ${places[0]!.placeId}`
+        : `${places.length} places`;
     return {
-      name: `${name} (place ${target.placeId})`,
+      name: `${name} (${placeLabel})`,
       value: name,
     };
   });

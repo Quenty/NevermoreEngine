@@ -2,12 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { BuildContext } from '@quenty/nevermore-template-helpers';
-import {
-  DeployTarget,
-  loadDeployConfigAsync,
-  resolveDeployTarget,
-  resolveDeployConfigPath,
-} from './deploy-config.js';
+import { DeployTarget } from './deploy-config.js';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
 export interface DeployOverrides {
@@ -18,7 +13,12 @@ export interface DeployOverrides {
 }
 
 export interface BuildPlaceOptions {
-  targetName: string;
+  /**
+   * Resolved place to build. The caller picks which place — multi-place targets
+   * must be fanned out (see flattenToBatchTargets) before reaching this point,
+   * otherwise places[1..] would be silently dropped.
+   */
+  target: DeployTarget;
   outputFileName?: string;
   packagePath?: string;
   overrides?: DeployOverrides;
@@ -41,14 +41,14 @@ export interface BuildPlaceResult extends BuiltPlace {
 }
 
 /**
- * Build a .rbxl place file via rojo from a deploy.nevermore.json target.
+ * Build a .rbxl place file via rojo from a resolved deploy target.
  * Shared by both local test execution and cloud (build + upload) paths.
  */
 export async function buildPlaceAsync(
   options: BuildPlaceOptions
 ): Promise<BuildPlaceResult> {
   const {
-    targetName,
+    target: inputTarget,
     outputFileName = 'build.rbxl',
     packagePath = process.cwd(),
     overrides,
@@ -56,9 +56,7 @@ export async function buildPlaceAsync(
     packageName,
   } = options;
 
-  const configPath = resolveDeployConfigPath(packagePath);
-  const config = await loadDeployConfigAsync(configPath);
-  const target = { ...resolveDeployTarget(config, targetName) };
+  const target: DeployTarget = { ...inputTarget };
 
   if (overrides?.universeId) target.universeId = overrides.universeId;
   if (overrides?.placeId) target.placeId = overrides.placeId;

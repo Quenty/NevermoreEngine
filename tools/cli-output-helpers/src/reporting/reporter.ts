@@ -50,6 +50,8 @@ export interface StepProgress {
 export interface VersionProgress {
   kind: 'version';
   version: number;
+  /** When set, terminal renderers wrap "(v14)" as a clickable OSC 8 hyperlink. */
+  url?: string;
 }
 
 export type ProgressSummary =

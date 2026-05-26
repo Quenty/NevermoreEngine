@@ -12,6 +12,11 @@ import {
 } from '../../utils/job-context/index.js';
 import { runSingleTestAsync } from '../../utils/testing/runner/test-runner.js';
 import {
+  loadDeployConfigAsync,
+  resolveDeployConfigPath,
+  resolveSingleDeployTarget,
+} from '../../utils/build/deploy-config.js';
+import {
   type Reporter,
   type LiveStateTracker,
   CompositeReporter,
@@ -136,9 +141,19 @@ export class TestProjectCommand<T>
 
       let result;
       try {
+        const config = await loadDeployConfigAsync(
+          resolveDeployConfigPath(cwd)
+        );
+        const target = resolveSingleDeployTarget(
+          config,
+          'test',
+          'nevermore batch test'
+        );
+
         result = await runSingleTestAsync(context, {
           packagePath: cwd,
           packageName,
+          target,
           scriptText: args.scriptText,
           timeoutMs:
             args.timeout !== undefined ? args.timeout * 1000 : undefined,
