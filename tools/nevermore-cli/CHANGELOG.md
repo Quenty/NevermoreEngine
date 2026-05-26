@@ -1,31 +1,23 @@
-# v4.30.0 (Tue May 26 2026)
-
-#### 🚀 Enhancement
-
-- feat: Parallel upload in 12s instead of serial 20s ([@Quenty](https://github.com/Quenty))
-- feat: Share rojo builds in bulk building operation ([@Quenty](https://github.com/Quenty))
-- feat: Add clickable hyperlinks to deployment ([@Quenty](https://github.com/Quenty))
-- feat: Make `nevermore deploy` handle multiple place targets ([@Quenty](https://github.com/Quenty))
-- feat: Handle multiple targets in batch command ([@Quenty](https://github.com/Quenty))
-- feat: Parse targets, but do not support more than the first one ([@Quenty](https://github.com/Quenty))
-- feat: Allow to launch roblox directly ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- format: Fix formatting ([@Quenty](https://github.com/Quenty))
-- refactor: Batch runner doesn't know about PackageName ([@Quenty](https://github.com/Quenty))
-- fix: Provide better place url on CLI output too ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.30.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.29.2...@quenty/nevermore-cli@4.30.0) (2026-05-26)
+
+### Bug Fixes
+
+- Provide better place url on CLI output too ([0cc66d7](https://github.com/Quenty/Nevermore/commit/0cc66d736232d820db4c55046192607a3f3d36f2))
+
+### Features
+
+- Add clickable hyperlinks to deployment ([7d9913d](https://github.com/Quenty/Nevermore/commit/7d9913d7216fc606cb4aecdb8f6941a29edf576c))
+- Allow to launch roblox directly ([a508d31](https://github.com/Quenty/Nevermore/commit/a508d31d736db07ecd70797bb7293977f16bf3a5))
+- Handle multiple targets in batch command ([98f0778](https://github.com/Quenty/Nevermore/commit/98f077835f500570c1b122a527ec373d7bfacaaa))
+- Make `nevermore deploy` handle multiple place targets ([55d6287](https://github.com/Quenty/Nevermore/commit/55d628710401dc3929d538efdc8460d4d405630a))
+- Parallel upload in 12s instead of serial 20s ([cdd7f00](https://github.com/Quenty/Nevermore/commit/cdd7f009f9b811ceffce7bb1119ee1d169945cef))
+- Parse targets, but do not support more than the first one ([74ec0c7](https://github.com/Quenty/Nevermore/commit/74ec0c7e102bda55e9d34217abff93f1834922c5))
+- Share rojo builds in bulk building operation ([2fde0c5](https://github.com/Quenty/Nevermore/commit/2fde0c573c38a0e6ca93d96b7efada0212fd043f))
 
 ## [4.29.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.29.1...@quenty/nevermore-cli@4.29.2) (2026-05-21)
 

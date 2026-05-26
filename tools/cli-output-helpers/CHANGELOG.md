@@ -1,20 +1,14 @@
-# v1.15.0 (Tue May 26 2026)
-
-#### 🚀 Enhancement
-
-- feat: Parallel upload in 12s instead of serial 20s ([@Quenty](https://github.com/Quenty))
-- feat: Add clickable hyperlinks to deployment ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.15.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.14.0...@quenty/cli-output-helpers@1.15.0) (2026-05-26)
+
+### Features
+
+- Add clickable hyperlinks to deployment ([7d9913d](https://github.com/Quenty/Nevermore/commit/7d9913d7216fc606cb4aecdb8f6941a29edf576c))
+- Parallel upload in 12s instead of serial 20s ([cdd7f00](https://github.com/Quenty/Nevermore/commit/cdd7f009f9b811ceffce7bb1119ee1d169945cef))
 
 # [1.14.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.13.0...@quenty/cli-output-helpers@1.14.0) (2026-05-20)
 
