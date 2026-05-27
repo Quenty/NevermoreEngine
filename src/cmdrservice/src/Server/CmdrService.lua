@@ -99,7 +99,7 @@ function CmdrService.Init(self: CmdrService, serviceBag: ServiceBag.ServiceBag)
 				end
 			end
 
-			if not provider:IsAdmin(context.Executor) then
+			if not provider:IsAdmin(context.Executor) and not RunService:IsStudio() then
 				return "You don't have permission to run this command"
 			else
 				-- allow
