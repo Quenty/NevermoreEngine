@@ -27,12 +27,6 @@ local ValueObject = require("ValueObject")
 
 export type SaveSlotSummaryProvider = (Player, any) -> Observable.Observable<string>
 
-type SaveSlotStruct = {
-	folder: Folder,
-	attributes: any,
-	maid: Maid.Maid,
-}
-
 local HasSaveSlots = setmetatable({}, HasSaveSlotsBase)
 HasSaveSlots.ClassName = "HasSaveSlots"
 HasSaveSlots.__index = HasSaveSlots
@@ -44,7 +38,7 @@ export type HasSaveSlots =
 			_serviceBag: ServiceBag.ServiceBag,
 			_playerDataStoreService: any,
 			_slotContainer: Folder,
-			_slotMap: { [SaveSlotData.SlotId]: SaveSlotStruct },
+			_slotMap: { [SaveSlotData.SlotId]: Folder },
 			_loadPromise: Promise.Promise<{}>,
 			_remoting: any,
 			_dataStore: any,
@@ -130,7 +124,7 @@ end
 ]=]
 function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: SaveSlotData.SlotId?): Promise.Promise<boolean>
 	return (self._loadPromise :: any):Then(function()
-		return slotId and (self._slotMap[slotId] ~= nil)
+		return slotId and ((self._slotMap[slotId] :: Folder?) ~= nil)
 	end)
 end
 
@@ -150,7 +144,7 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 
 		local function setSlot()
 			self.ActiveSlotId.Value = slotId
-			slot.attributes.LastPlayedTime.Value = os.time()
+			SaveSlotData.LastPlayedTime:Set(slot, os.time())
 		end
 
 		-- Initialize or save and switch
@@ -177,7 +171,7 @@ function HasSaveSlots.PromiseCreateSlot(
 		end
 
 		for _, slot in self._slotMap do
-			if slotIndex == slot.attributes.SlotIndex.Value then
+			if slotIndex == SaveSlotData.SlotIndex:Get(slot) then
 				return (Promise :: any).rejected(`Slot {slotIndex} already exists`)
 			end
 		end
@@ -210,10 +204,12 @@ function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData
 			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
 		end
 
-		slot.maid:Destroy()
+		self._maid[slotId] = nil
 
 		-- Wipe default slot
-		if slot.attributes.SlotIndex.Value == SaveSlotConstants.DEFAULT_SLOT_INDEX then
+		local slotIndex = SaveSlotData.SlotIndex:Get(slot)
+
+		if slotIndex == SaveSlotConstants.DEFAULT_SLOT_INDEX then
 			return self._dataStore:PromiseKeyList():Then(function(keys)
 				for _, key in keys do
 					if key ~= SaveSlotConstants.INTERNAL_STORE_KEY then
@@ -246,11 +242,11 @@ function HasSaveSlots.PromiseSetSlotMetadata(
 		local slot = self._slotMap[slotId]
 
 		-- Routing depends on immutable indices to distinguish the default slot
-		if data.SlotIndex and (data.SlotIndex ~= slot.attributes.SlotIndex.Value) then
+		if data.SlotIndex and (data.SlotIndex ~= SaveSlotData.SlotIndex:Get(slot)) then
 			return (Promise :: any).rejected("SlotIndex is locked")
 		end
 
-		SaveSlotData:Set(slot.folder, data)
+		SaveSlotData:Set(slot, data)
 	end)
 end
 
@@ -260,10 +256,10 @@ end
 function HasSaveSlots.PromiseGetSlotMetadata(
 	self: HasSaveSlots,
 	slotId: SaveSlotData.SlotId
-): Promise.Promise<SaveSlotData.SaveSlotMetadata>
+): Promise.Promise<SaveSlotData.SaveSlotMetadata?>
 	return (self._loadPromise :: any):Then(function()
 		local slot = self._slotMap[slotId]
-		return (Promise :: any).resolved(slot and slot.attributes)
+		return (Promise :: any).resolved(slot and SaveSlotData:Get(slot))
 	end)
 end
 
@@ -275,9 +271,9 @@ function HasSaveSlots.PromiseSlotIdFromIndex(
 	slotIndex: number
 ): Promise.Promise<SaveSlotData.SlotId?>
 	return (self._loadPromise :: any):Then(function()
-		for _, slot in self._slotMap do
-			if slotIndex == slot.attributes.SlotIndex.Value then
-				return (Promise :: any).resolved(slot.attributes.SlotId.Value)
+		for slotId, slot in self._slotMap do
+			if slotIndex == SaveSlotData.SlotIndex:Get(slot) then
+				return (Promise :: any).resolved(slotId)
 			end
 		end
 		return (Promise :: any).resolved(nil)
@@ -321,7 +317,7 @@ end
 
 function HasSaveSlots._getSlotStore(self: HasSaveSlots, slotId: SaveSlotData.SlotId): DataStoreStage.DataStoreStage
 	local slot = self._slotMap[slotId]
-	if slot and (slot.attributes.SlotIndex.Value == SaveSlotConstants.DEFAULT_SLOT_INDEX) then
+	if slot and (SaveSlotData.SlotIndex:Get(slot) == SaveSlotConstants.DEFAULT_SLOT_INDEX) then
 		return self._dataStore
 	end
 	return self._systemStore:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY):GetSubStore(slotId)
@@ -333,15 +329,16 @@ function HasSaveSlots._buildSlot(
 	data: SaveSlotData.SaveSlotMetadata,
 	isNew: boolean?
 ): ()
-	local maid = self._maid:Add(Maid.new())
+	local maid = Maid.new()
+	self._maid[slotId] = maid
 
-	local folder = maid:Add(Instance.new("Folder"))
-	folder.Name = slotId
-	folder.Archivable = false
+	local slot = maid:Add(Instance.new("Folder"))
+	slot.Name = slotId
+	slot.Archivable = false
 
 	local metadataStore = self._metadataStore:GetSubStore(slotId)
 
-	local attributes = SaveSlotData:Create(folder)
+	local attributes = SaveSlotData:Create(slot)
 	attributes.SlotId.Value = slotId
 	attributes.SlotIndex.Value = data.SlotIndex
 
@@ -360,13 +357,9 @@ function HasSaveSlots._buildSlot(
 		end
 	end
 
-	folder.Parent = self._slotContainer
+	slot.Parent = self._slotContainer
 
-	self._slotMap[slotId] = {
-		folder = folder,
-		attributes = attributes,
-		maid = maid,
-	}
+	self._slotMap[slotId] = slot
 
 	maid:GiveTask(function()
 		self._slotMap[slotId] = nil
@@ -411,7 +404,7 @@ function HasSaveSlots._setupSummary(self: HasSaveSlots): ()
 						return
 					end
 
-					activeSlot.attributes.Summary.Value = summary
+					SaveSlotData.Summary:Set(activeSlot, summary)
 				end))
 		end)
 	)

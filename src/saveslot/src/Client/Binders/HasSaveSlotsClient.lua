@@ -104,7 +104,7 @@ end
 function HasSaveSlotsClient.PromiseGetSlotMetadata(
 	self: HasSaveSlotsClient,
 	slotId: SaveSlotData.SlotId
-): Promise.Promise<SaveSlotData.SaveSlotMetadata>
+): Promise.Promise<SaveSlotData.SaveSlotMetadata?>
 	return self._remoting.PromiseGetSlotMetadata:PromiseInvokeServer(slotId)
 end
 
