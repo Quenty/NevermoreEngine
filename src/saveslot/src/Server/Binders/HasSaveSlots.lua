@@ -13,6 +13,7 @@ local DataStoreStage = require("DataStoreStage")
 local HasSaveSlotsBase = require("HasSaveSlotsBase")
 local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local PlayerBinder = require("PlayerBinder")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
@@ -22,6 +23,9 @@ local RxBrioUtils = require("RxBrioUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local ServiceBag = require("ServiceBag")
+local ValueObject = require("ValueObject")
+
+export type SaveSlotSummaryProvider = (Player, any) -> Observable.Observable<string>
 
 type SaveSlotStruct = {
 	folder: Folder,
@@ -46,7 +50,7 @@ export type HasSaveSlots =
 			_dataStore: any,
 			_systemStore: any,
 			_metadataStore: any,
-			_summaryProvider: ((Player, any) -> string)?,
+			_summaryProvider: ValueObject.ValueObject<SaveSlotSummaryProvider?>,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 		},
 		{} :: typeof({ __index = HasSaveSlots })
@@ -66,10 +70,13 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 
 	self._slotMap = {}
 
+	self._summaryProvider = self._maid:Add(ValueObject.new(nil))
+
 	self._loadPromise = self._maid:GivePromise(self:_promiseLoadSlots())
 
 	self._remoting = self._maid:Add(Remoting.Server.new(self._obj, "HasSaveSlots"))
 
+	self:_setupSummary()
 	self:_setupRemotes()
 
 	self._maid:GiveTask(HasSaveSlotsInterface.Server:Implement(self._obj, self))
@@ -80,7 +87,9 @@ end
 --[=[
 	Observes the [DataStoreStage] for the active slot as a [Brio]
 ]=]
-function HasSaveSlots.ObserveActiveSlotStoreBrio(self: HasSaveSlots): Brio.Brio<DataStoreStage.DataStoreStage>
+function HasSaveSlots.ObserveActiveSlotStoreBrio(
+	self: HasSaveSlots
+): Observable.Observable<Brio.Brio<DataStoreStage.DataStoreStage>>
 	return Rx.fromPromise(self._loadPromise):Pipe({
 		Rx.switchMap(function()
 			return self.ActiveSlotId
@@ -285,19 +294,10 @@ function HasSaveSlots.PromiseLastActiveSlotId(self: HasSaveSlots): Promise.Promi
 end
 
 --[=[
-	Sets the summary provider callback
+	Sets the summary provider
 ]=]
-function HasSaveSlots.SetSummaryProvider(self: HasSaveSlots, provider: ((Player, any) -> string)?): ()
-	self._summaryProvider = provider
-end
-
---[=[
-	Refreshes the active slot summary
-]=]
-function HasSaveSlots.PromiseRefreshActiveSlotSummary(self: HasSaveSlots): Promise.Promise<any>
-	return (self._loadPromise :: any):Then(function()
-		self:_refreshActiveSlotSummary()
-	end)
+function HasSaveSlots.SetSummaryProvider(self: HasSaveSlots, provider: SaveSlotSummaryProvider?): ()
+	self._summaryProvider.Value = provider
 end
 
 function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
@@ -305,10 +305,6 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 		self._dataStore = dataStore
 		self._systemStore = dataStore:GetSubStore(SaveSlotConstants.INTERNAL_STORE_KEY)
 		self._metadataStore = self._systemStore:GetSubStore(SaveSlotConstants.METADATA_STORE_KEY)
-
-		self._maid:GiveTask(self._dataStore:AddSavingCallback(function()
-			self:_refreshActiveSlotSummary()
-		end))
 
 		return self._metadataStore:LoadAll({}):Then(function(metadata)
 			for slotId, data in metadata do
@@ -377,34 +373,48 @@ function HasSaveSlots._buildSlot(
 	end)
 end
 
-function HasSaveSlots._refreshActiveSlotSummary(self: HasSaveSlots): ()
-	if not self._summaryProvider then
-		return -- No summary provider
-	end
+function HasSaveSlots._setupSummary(self: HasSaveSlots): ()
+	self._maid:GiveTask(
+		self:ObserveActiveSlotStoreBrio():Subscribe(function(brio: Brio.Brio<DataStoreStage.DataStoreStage>)
+			if brio:IsDead() then
+				return
+			end
 
-	local activeSlotId = self.ActiveSlotId.Value
-	local activeSlot = activeSlotId and self._slotMap[activeSlotId]
-	if not activeSlot then
-		return -- No active slot
-	end
+			local activeSlotId = self.ActiveSlotId.Value
+			local activeSlot = activeSlotId and self._slotMap[activeSlotId]
+			if not activeSlot then
+				return
+			end
 
-	local slotStore = self:_getSlotStore(activeSlotId :: SaveSlotData.SlotId)
-	local success, result = pcall(self._summaryProvider, self._obj, slotStore)
+			local maid, slotStore = brio:ToMaidAndValue()
 
-	if not success then
-		warn(`[HasSaveSlots] Summary provider errored: {result}`)
-		return
-	end
+			maid:GiveTask(self._summaryProvider
+				:Observe()
+				:Pipe({
+					Rx.switchMap(function(provider: SaveSlotSummaryProvider?)
+						if not provider then
+							return Rx.of("") :: any
+						end
 
-	if type(result) ~= "string" then
-		warn(`[HasSaveSlots] Summary provider returned non-string ({typeof(result)})`)
-		return
-	end
+						local success, observable = pcall(provider, self._obj, slotStore)
+						if not success then
+							warn(`[HasSaveSlots] Summary provider errored: {observable}`)
+							return Rx.of("") :: any
+						end
 
-	activeSlot.attributes.Summary.Value = result
+						return observable
+					end) :: any,
+				})
+				:Subscribe(function(summary: string)
+					if type(summary) ~= "string" then
+						warn(`[HasSaveSlots] Summary provider emitted non-string ({typeof(summary)})`)
+						return
+					end
 
-	-- Store directly to avoid deferral during save callback
-	self._metadataStore:GetSubStore(activeSlotId):Store("Summary", result)
+					activeSlot.attributes.Summary.Value = summary
+				end))
+		end)
+	)
 end
 
 function HasSaveSlots._setupRemotes(self: HasSaveSlots): ()
@@ -467,14 +477,6 @@ function HasSaveSlots._setupRemotes(self: HasSaveSlots): ()
 	self._maid:GiveTask(self._remoting.PromiseLastActiveSlotId:Bind(function(remotePlayer)
 		if remotePlayer == self._obj then
 			return self:PromiseLastActiveSlotId()
-		else
-			return (Promise :: any).rejected("Bad player")
-		end
-	end))
-
-	self._maid:GiveTask(self._remoting.PromiseRefreshActiveSlotSummary:Bind(function(remotePlayer)
-		if remotePlayer == self._obj then
-			return self:PromiseRefreshActiveSlotSummary()
 		else
 			return (Promise :: any).rejected("Bad player")
 		end

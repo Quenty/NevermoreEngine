@@ -29,7 +29,7 @@ export type SaveSlotService = typeof(setmetatable(
 		_hasSaveSlotsBinder: any,
 		_selectionRequired: boolean,
 		_maxSlotCount: number,
-		_summaryProvider: ((Player, any) -> string)?,
+		_defaultSummaryProvider: HasSaveSlots.SaveSlotSummaryProvider?,
 		_remoting: any,
 	},
 	{} :: typeof({ __index = SaveSlotService })
@@ -70,8 +70,8 @@ function SaveSlotService.Start(self: SaveSlotService)
 
 		-- Pass consumer-specified configs
 		hasSaveSlots.MaxSlotCount.Value = self._maxSlotCount
-		if self._summaryProvider then
-			hasSaveSlots:SetSummaryProvider(self._summaryProvider)
+		if self._defaultSummaryProvider then
+			hasSaveSlots:SetSummaryProvider(self._defaultSummaryProvider)
 		end
 
 		maid:GivePromise(hasSaveSlots:PromiseSlotsLoaded()):Then(function()
@@ -130,11 +130,14 @@ function SaveSlotService.SetMaxSlotCount(self: SaveSlotService, maxSlotCount: nu
 end
 
 --[=[
-	Sets the slot summary provider
+	Sets the default slot summary provider
 ]=]
-function SaveSlotService.SetSummaryProvider(self: SaveSlotService, provider: (Player, any) -> string): ()
+function SaveSlotService.SetDefaultSummaryProvider(
+	self: SaveSlotService,
+	provider: HasSaveSlots.SaveSlotSummaryProvider
+): ()
 	assert(type(provider) == "function", "Bad provider")
-	self._summaryProvider = provider
+	self._defaultSummaryProvider = provider
 end
 
 --[=[
@@ -213,15 +216,6 @@ function SaveSlotService.PromiseDeleteSlot(
 ): Promise.Promise<any>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
 		return hasSaveSlots:PromiseDeleteSlot(slotId)
-	end)
-end
-
---[=[
-	Refreshes the player's active slot summary
-]=]
-function SaveSlotService.PromiseRefreshActiveSlotSummary(self: SaveSlotService, player: Player): Promise.Promise<any>
-	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
-		return hasSaveSlots:PromiseRefreshActiveSlotSummary()
 	end)
 end
 

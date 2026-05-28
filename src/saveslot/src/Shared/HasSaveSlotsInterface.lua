@@ -19,7 +19,6 @@ return TieDefinition.new("HasSaveSlots", {
 	PromiseGetSlotMetadata = TieDefinition.Types.METHOD,
 	PromiseSlotIdFromIndex = TieDefinition.Types.METHOD,
 	PromiseLastActiveSlotId = TieDefinition.Types.METHOD,
-	PromiseRefreshActiveSlotSummary = TieDefinition.Types.METHOD,
 
 	SlotChanged = TieDefinition.Types.SIGNAL,
 
