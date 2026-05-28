@@ -125,11 +125,4 @@ function HasSaveSlotsClient.PromiseSlotIdFromIndex(
 	return self._remoting.PromiseSlotIdFromIndex:PromiseInvokeServer(slotIndex)
 end
 
---[=[
-	Refreshes the active slot summary
-]=]
-function HasSaveSlotsClient.PromiseRefreshActiveSlotSummary(self: HasSaveSlotsClient): Promise.Promise<any>
-	return self._remoting.PromiseRefreshActiveSlotSummary:PromiseInvokeServer()
-end
-
 return Binder.new("HasSaveSlots", HasSaveSlotsClient :: any) :: Binder.Binder<HasSaveSlotsClient>
