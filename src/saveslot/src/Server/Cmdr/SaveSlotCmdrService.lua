@@ -66,7 +66,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "active-save-slot",
+		Name = "get-active-save-slot",
 		Description = "Returns the active save slot.",
 		Group = "SaveSlots",
 		Args = {},

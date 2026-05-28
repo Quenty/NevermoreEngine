@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local HasSaveSlotsData = require("HasSaveSlotsData")
+local SaveSlotData = require("SaveSlotData")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
@@ -22,10 +23,10 @@ export type HasSaveSlotsBase =
 			_serviceBag: ServiceBag.ServiceBag,
 			_attributes: any,
 
-			ActiveSlotId: ValueObject.ValueObject<string?>,
+			ActiveSlotId: ValueObject.ValueObject<SaveSlotData.SlotId?>,
 			MaxSlotCount: ValueObject.ValueObject<number>,
 
-			SlotChanged: Signal.Signal<string>,
+			SlotChanged: Signal.Signal<SaveSlotData.SlotId>,
 		},
 		{} :: typeof({ __index = HasSaveSlotsBase })
 	))

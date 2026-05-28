@@ -44,7 +44,7 @@ end
 function SaveSlotDataService.ObserveActiveSlotId(
 	self: SaveSlotDataService,
 	player: Player
-): Observable.Observable<string?>
+): Observable.Observable<SaveSlotData.SlotId?>
 	return (HasSaveSlotsInterface:ObserveBrio(player, self._realm) :: any):Pipe({
 		RxBrioUtils.switchMapBrio(function(hasSaveSlots)
 			return hasSaveSlots.ActiveSlotId:Observe()
@@ -56,7 +56,7 @@ end
 --[=[
 	Returns the player's active slot ID
 ]=]
-function SaveSlotDataService.GetActiveSlotId(self: SaveSlotDataService, player: Player): string?
+function SaveSlotDataService.GetActiveSlotId(self: SaveSlotDataService, player: Player): SaveSlotData.SlotId?
 	local hasSaveSlots = HasSaveSlotsInterface:Find(player, self._realm)
 	return hasSaveSlots and hasSaveSlots.ActiveSlotId.Value
 end
@@ -105,7 +105,7 @@ end
 function SaveSlotDataService.ObserveSlotMetadata(
 	_self: SaveSlotDataService,
 	player: Player,
-	slotId: string
+	slotId: SaveSlotData.SlotId
 ): Observable.Observable<SaveSlotData.SaveSlotMetadata?>
 	return (
 		RxInstanceUtils.observeLastNamedChildBrio(player, "Folder", SaveSlotConstants.METADATA_CONTAINER_NAME) :: any
@@ -126,7 +126,7 @@ end
 function SaveSlotDataService.GetSlotMetadata(
 	_self: SaveSlotDataService,
 	player: Player,
-	slotId: string
+	slotId: SaveSlotData.SlotId
 ): SaveSlotData.SaveSlotMetadata?
 	local slotContainer = player:FindFirstChild(SaveSlotConstants.METADATA_CONTAINER_NAME)
 	local slot = slotContainer and slotContainer:FindFirstChild(slotId)
@@ -141,7 +141,11 @@ end
 --[=[
 	Returns the ID for the slot at the given index
 ]=]
-function SaveSlotDataService.GetSlotIdFromIndex(self: SaveSlotDataService, player: Player, slotIndex: number): string?
+function SaveSlotDataService.GetSlotIdFromIndex(
+	self: SaveSlotDataService,
+	player: Player,
+	slotIndex: number
+): SaveSlotData.SlotId?
 	for _, slot in self:GetSlotList(player) do
 		if slotIndex == slot.SlotIndex then
 			return slot.SlotId

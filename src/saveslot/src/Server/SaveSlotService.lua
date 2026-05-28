@@ -80,7 +80,7 @@ function SaveSlotService.Start(self: SaveSlotService)
 			end
 
 			-- Select last active slot
-			return hasSaveSlots:PromiseLastActiveSlotId():Then(function(lastActiveSlotId: string?)
+			return hasSaveSlots:PromiseLastActiveSlotId():Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
 				return hasSaveSlots:PromiseHasSlot(lastActiveSlotId):Then(function(hasLastSlot: boolean)
 					if hasLastSlot then
 						return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
@@ -89,14 +89,14 @@ function SaveSlotService.Start(self: SaveSlotService)
 					-- Or create and select default slot
 					return hasSaveSlots
 						:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX)
-						:Then(function(defaultSlotId: string?)
+						:Then(function(defaultSlotId: SaveSlotData.SlotId?)
 							if defaultSlotId then
 								return defaultSlotId
 							else
 								return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
 							end
 						end)
-						:Then(function(slotId: string)
+						:Then(function(slotId: SaveSlotData.SlotId)
 							return hasSaveSlots:PromiseSelectSlot(slotId)
 						end)
 				end)
@@ -166,7 +166,11 @@ end
 --[=[
 	Returns whether the player has a slot with the given ID
 ]=]
-function SaveSlotService.PromiseHasSlot(self: SaveSlotService, player: Player, slotId: string): Promise.Promise<boolean>
+function SaveSlotService.PromiseHasSlot(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<boolean>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
 		return hasSaveSlots:PromiseHasSlot(slotId)
 	end)
@@ -178,7 +182,7 @@ end
 function SaveSlotService.PromiseSelectSlot(
 	self: SaveSlotService,
 	player: Player,
-	slotId: string
+	slotId: SaveSlotData.SlotId
 ): Promise.Promise<DataStoreStage.DataStoreStage>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
 		return hasSaveSlots:PromiseSelectSlot(slotId)
@@ -202,7 +206,11 @@ end
 --[=[
 	Deletes the slot with the given ID for the player
 ]=]
-function SaveSlotService.PromiseDeleteSlot(self: SaveSlotService, player: Player, slotId: string): Promise.Promise<any>
+function SaveSlotService.PromiseDeleteSlot(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<any>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
 		return hasSaveSlots:PromiseDeleteSlot(slotId)
 	end)

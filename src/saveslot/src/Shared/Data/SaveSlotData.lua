@@ -9,8 +9,10 @@ local AdorneeData = require("AdorneeData")
 local AdorneeDataEntry = require("AdorneeDataEntry")
 local PropertyValue = require("PropertyValue")
 
+export type SlotId = string
+
 export type SaveSlotMetadata = {
-	SlotId: string,
+	SlotId: SlotId,
 	SlotIndex: number,
 	SlotName: string?,
 	CreatedTime: number?,
