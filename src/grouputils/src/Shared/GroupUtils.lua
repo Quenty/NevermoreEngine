@@ -1,4 +1,5 @@
 --!strict
+--!nolint DeprecatedApi
 --[=[
 	Helpful functions involving Roblox groups.
 	@class GroupUtils
@@ -26,6 +27,7 @@ function GroupUtils.promiseRankInGroup(player: Player, groupId: number): Promise
 	return Promise.spawn(function(resolve, reject)
 		local rank = nil
 		local ok, err = pcall(function()
+			-- TODO: Replace with GroupService:GetRolesInGroupAsync() once enabled
 			rank = player:GetRankInGroupAsync(groupId)
 		end)
 
@@ -55,6 +57,7 @@ function GroupUtils.promiseRoleInGroup(player: Player, groupId: number): Promise
 	return Promise.spawn(function(resolve, reject)
 		local role = nil
 		local ok, err = pcall(function()
+			-- TODO: Replace with GroupService:GetRolesInGroupAsync() once enabled
 			role = player:GetRoleInGroupAsync(groupId)
 		end)
 
