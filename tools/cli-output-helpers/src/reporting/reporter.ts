@@ -50,6 +50,8 @@ export interface StepProgress {
 export interface VersionProgress {
   kind: 'version';
   version: number;
+  /** When set, terminal renderers wrap "(v14)" as a clickable OSC 8 hyperlink. */
+  url?: string;
 }
 
 export type ProgressSummary =
@@ -67,6 +69,8 @@ export interface PackageResult {
   error?: string;
   progressSummary?: ProgressSummary;
   failedPhase?: JobPhase;
+  /** Per-result override of the reporter's default failure label. */
+  failureLabel?: string;
 }
 
 /** Summary of a complete batch run. */

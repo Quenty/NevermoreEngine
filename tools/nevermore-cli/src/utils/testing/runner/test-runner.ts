@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
+import { type DeployTarget } from '../../build/deploy-config.js';
 import { type JobContext } from '../../job-context/job-context.js';
 import {
   type ParsedTestCounts,
@@ -23,6 +24,11 @@ export interface SingleTestResult {
 export interface SingleTestOptions {
   packagePath: string;
   packageName: string;
+  /**
+   * Resolved test place. Callers fan multi-place targets out before reaching
+   * here (see flattenToBatchTargets) — the runner never picks places[0] itself.
+   */
+  target: DeployTarget;
   timeoutMs?: number;
   /** Luau code to execute directly, bypassing the configured scriptTemplate. */
   scriptText?: string;
@@ -38,11 +44,17 @@ export async function runSingleTestAsync(
   context: JobContext,
   options: SingleTestOptions
 ): Promise<SingleTestResult> {
-  const { packagePath, packageName, timeoutMs = 120_000, scriptText } = options;
+  const {
+    packagePath,
+    packageName,
+    timeoutMs = 120_000,
+    scriptText,
+    target,
+  } = options;
 
   const sessionId = randomUUID();
   const builtPlace = await context.buildPlaceAsync({
-    targetName: 'test',
+    target,
     outputFileName: `test-${sessionId}.rbxl`,
     packagePath,
     packageName,

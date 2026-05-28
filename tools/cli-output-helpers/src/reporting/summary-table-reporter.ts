@@ -33,7 +33,10 @@ export class SummaryTableReporter extends BaseReporter {
   }
 
   override async stopAsync(): Promise<void> {
-    const results = this._state.getResults();
+    const results = this._state
+      .getAllPackages()
+      .map((p) => p.result)
+      .filter((r): r is PackageResult => r !== undefined);
     if (results.length === 0) return;
 
     const failures = this._state.getFailures();
@@ -95,9 +98,8 @@ export class SummaryTableReporter extends BaseReporter {
         : this._successLabel;
     }
     const failedPhase = result.failedPhase;
-    return failedPhase
-      ? `${this._failureLabel} at ${failedPhase}`
-      : this._failureLabel;
+    const failureLabel = result.failureLabel ?? this._failureLabel;
+    return failedPhase ? `${failureLabel} at ${failedPhase}` : failureLabel;
   }
 
   private _colorStatus(

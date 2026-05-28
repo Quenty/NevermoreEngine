@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.17.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.16.0...@quenty/cli-output-helpers@1.17.0) (2026-05-26)
+
+### Bug Fixes
+
+- Fix package reports ([7b86f54](https://github.com/Quenty/Nevermore/commit/7b86f54e17914bb3992f85018cf96c75725fed1e))
+
+# [1.16.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.15.0...@quenty/cli-output-helpers@1.16.0) (2026-05-26)
+
+### Features
+
+- Download progress report is streamed during deployment too ([b2c3c95](https://github.com/Quenty/Nevermore/commit/b2c3c951f0c9b8e4320b8a7b05a93628cb27a453))
+
+# [1.15.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.14.0...@quenty/cli-output-helpers@1.15.0) (2026-05-26)
+
+### Features
+
+- Add clickable hyperlinks to deployment ([7d9913d](https://github.com/Quenty/Nevermore/commit/7d9913d7216fc606cb4aecdb8f6941a29edf576c))
+- Parallel upload in 12s instead of serial 20s ([cdd7f00](https://github.com/Quenty/Nevermore/commit/cdd7f009f9b811ceffce7bb1119ee1d169945cef))
+
 # [1.14.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.13.0...@quenty/cli-output-helpers@1.14.0) (2026-05-20)
 
 ### Bug Fixes

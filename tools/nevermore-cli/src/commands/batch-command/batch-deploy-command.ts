@@ -24,8 +24,10 @@ import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import {
+  type BatchTarget,
   discoverAllTargetPackagesAsync,
   discoverChangedTargetPackagesAsync,
+  flattenToBatchTargets,
 } from '../../utils/batch/changed-packages-utils.js';
 import { isCI } from '../../utils/nevermore-cli-utils.js';
 import { parseTestLogs } from '../../utils/testing/test-log-parser.js';
@@ -46,6 +48,7 @@ interface BatchDeployArgs extends NevermoreGlobalArgs {
   limit?: number;
   logs?: boolean;
   target?: string;
+  smokeTest?: boolean;
 }
 
 export const batchDeployCommand: CommandModule<
@@ -97,6 +100,13 @@ export const batchDeployCommand: CommandModule<
         describe: 'Show build/upload logs for all packages (not just failures)',
         type: 'boolean',
         default: false,
+      })
+      .option('smoke-test', {
+        describe:
+          'Run a post-deploy smoke test on targets with basePlace ' +
+          '(executes server scripts via Open Cloud and waits for errors)',
+        type: 'boolean',
+        default: false,
       });
   },
   handler: async (args) => {
@@ -112,33 +122,41 @@ export const batchDeployCommand: CommandModule<
 async function _runAsync(args: BatchDeployArgs): Promise<void> {
   const targetName = args.target ?? 'test';
 
-  let packages = args.all
+  const discovered = args.all
     ? await discoverAllTargetPackagesAsync(targetName)
     : await discoverChangedTargetPackagesAsync(args.base!, targetName);
+  let batchTargets = flattenToBatchTargets(discovered);
 
   if (args.limit && args.limit > 0) {
-    packages = packages.slice(0, args.limit);
+    batchTargets = batchTargets.slice(0, args.limit);
   }
 
-  if (packages.length === 0) {
-    OutputHelper.warn(
-      `No packages found with a "${targetName}" target. Packages need a deploy.nevermore.json with a "${targetName}" target.\n` +
-        'Run "nevermore deploy init" inside a package to set one up.'
-    );
+  if (batchTargets.length === 0) {
+    if (args.all) {
+      OutputHelper.warn(
+        `No packages have a "${targetName}" target. Packages need a deploy.nevermore.json with a "${targetName}" target.\n` +
+          'Run "nevermore deploy init" inside a package to set one up.'
+      );
+    } else {
+      OutputHelper.warn(
+        `No packages changed since ${args.base} have a "${targetName}" target.\n` +
+          'Use --all to deploy every package with this target, or --base <ref> to change the comparison ref.'
+      );
+    }
     return;
   }
 
   if (args.dryrun) {
-    const names = packages.map((p) => p.name).join(', ');
+    const names = batchTargets.map((p) => p.name).join(', ');
     OutputHelper.info(
-      `[DRYRUN] Would deploy ${packages.length} packages: ${names}`
+      `[DRYRUN] Would deploy ${batchTargets.length} targets: ${names}`
     );
     return;
   }
 
   const concurrency = args.concurrency ?? 3;
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
-  const packageNames = packages.map((p) => p.name);
+  const targetNames = batchTargets.map((p) => p.name);
   const publish = args.publish ?? false;
   const deployLabels = {
     successLabel: publish ? 'Published' : 'Deployed',
@@ -147,7 +165,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   const actionVerb = publish ? 'Publishing' : 'Deploying';
 
   const reporter = new CompositeReporter(
-    packageNames,
+    targetNames,
     (state: LiveStateTracker) => {
       const reporters: Reporter[] = [
         isGrouped
@@ -194,17 +212,17 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
   let exitCode = 0;
   try {
-    const results = await runBatchAsync<BatchDeployResult>({
-      packages,
+    const results = await runBatchAsync<BatchTarget, BatchDeployResult>({
+      items: batchTargets,
       concurrency,
       reporter,
       bufferOutput: isGrouped,
-      executeAsync: async (pkg, pkgReporter) => {
+      executeAsync: async (buildTarget, pkgReporter) => {
         const builtPlace = await context.buildPlaceAsync({
-          targetName,
+          target: buildTarget.target,
           outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
-          packagePath: pkg.path,
-          packageName: pkg.name,
+          packagePath: buildTarget.path,
+          packageName: buildTarget.name,
         });
 
         const { version } = await uploadPlaceAsync({
@@ -212,31 +230,31 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           args: { apiKey, publish },
           client,
           reporter: pkgReporter,
-          packageName: pkg.name,
+          packageName: buildTarget.name,
         });
 
         // Eagerly release build artifacts after upload
         await context.releaseBuiltPlaceAsync(builtPlace);
 
-        // Run smoke test for targets with basePlace
         let logs: string;
-        if (pkg.target.basePlace) {
+        if (args.smokeTest && buildTarget.target.basePlace) {
           OutputHelper.verbose('Running post-deploy smoke test...');
           const smokeResult = await _runSmokeTestAsync(
             pkgReporter,
-            pkg.name,
-            pkg.target.universeId,
-            pkg.target.placeId,
+            buildTarget.name,
+            buildTarget.target.universeId,
+            buildTarget.target.placeId,
             version,
             client
           );
           logs = smokeResult.logs;
           if (!smokeResult.success) {
             return {
-              packageName: pkg.name,
-              placeId: pkg.target.placeId,
+              packageName: buildTarget.name,
+              placeId: buildTarget.target.placeId,
               success: false,
               logs: _annotateSmokeTestFailure(logs),
+              failureLabel: 'SMOKE TEST FAILED',
             };
           }
         } else {
@@ -245,11 +263,15 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         }
 
         return {
-          packageName: pkg.name,
-          placeId: pkg.target.placeId,
+          packageName: buildTarget.name,
+          placeId: buildTarget.target.placeId,
           success: true,
           logs,
-          progressSummary: { kind: 'version', version },
+          progressSummary: {
+            kind: 'version',
+            version,
+            url: `https://www.roblox.com/games/${buildTarget.target.placeId}`,
+          },
         };
       },
     });
