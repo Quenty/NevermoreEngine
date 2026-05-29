@@ -134,10 +134,24 @@ export function parseBatchTestLogs(
     }
   }
 
+  // ── Warn when the batch produced no recognizable output ──
+
+  const noOutputAtAll = logSections.size === 0 && summaryResults.size === 0;
+  if (noOutputAtAll) {
+    OutputHelper.warn(
+      `[batch-log-parser] No batch markers or summary found in logs (${lines.length} lines, ${rawLogs.length} chars). ` +
+        'The batch script may not have started or produced output.'
+    );
+  }
+
   // ── Pass 3: Combine log sections with summary results ──
 
+  // When the batch produced zero output, surface the raw error in every
+  // package's logs so reporters show the actual failure instead of "(no output)".
+  const fallbackLogs = noOutputAtAll ? rawLogs.trim() : '';
+
   for (const [packageName, slug] of slugMap) {
-    const sectionLogs = logSections.get(slug) ?? '';
+    const sectionLogs = logSections.get(slug) ?? fallbackLogs;
     const summarySuccess = summaryResults.get(slug);
 
     // The JSON summary (pcall result) is the primary success signal.
@@ -150,7 +164,7 @@ export function parseBatchTestLogs(
       }
     }
 
-    if (!success) {
+    if (!success && !noOutputAtAll) {
       console.error(
         `[batch-log-parser] ${slug}: summarySuccess=${summarySuccess} hasLogs=${
           sectionLogs.length > 0
