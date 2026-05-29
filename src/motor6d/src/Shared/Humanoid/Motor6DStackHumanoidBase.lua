@@ -11,11 +11,13 @@ local Maid = require("Maid")
 local Motor6DStackHumanoidInterface = require("Motor6DStackHumanoidInterface")
 local Motor6DStackInterface = require("Motor6DStackInterface")
 local Observable = require("Observable")
+local R15Utils = require("R15Utils")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
+
 local Motor6DStackHumanoidBase = setmetatable({}, BaseObject)
 Motor6DStackHumanoidBase.ClassName = "Motor6DStackHumanoidBase"
 Motor6DStackHumanoidBase.__index = Motor6DStackHumanoidBase
@@ -26,7 +28,7 @@ export type Motor6DStackHumanoidBase =
 			_obj: Humanoid,
 			_serviceBag: ServiceBag.ServiceBag,
 			_tieRealmService: TieRealmService.TieRealmService,
-			_observeMotor6DsBrioCache: Observable.Observable<Brio.Brio<Motor6D>>?,
+			_observeMotor6DsBrioCache: Observable.Observable<Brio.Brio<R15Utils.AnimationConstraintOrMotor6D>>?,
 		},
 		{} :: typeof({ __index = Motor6DStackHumanoidBase })
 	))
@@ -76,18 +78,16 @@ end
 
 	@return Observable<Brio<Motor6D>>
 ]=]
-function Motor6DStackHumanoidBase.ObserveMotor6DsBrio(
-	self: Motor6DStackHumanoidBase
-): Observable.Observable<Brio.Brio<Motor6D>>
+function Motor6DStackHumanoidBase.ObserveMotor6DsBrio(self: Motor6DStackHumanoidBase): Observable.Observable<
+	Brio.Brio<R15Utils.AnimationConstraintOrMotor6D>
+>
 	if self._observeMotor6DsBrioCache then
 		return self._observeMotor6DsBrioCache
 	end
 
 	self._observeMotor6DsBrioCache = RxInstanceUtils.observeParentBrio(self._obj):Pipe({
 		RxBrioUtils.flatMapBrio(function(character)
-			return RxInstanceUtils.observeDescendantsBrio(character, function(descendant)
-				return descendant:IsA("Motor6D")
-			end)
+			return RxInstanceUtils.observeDescendantsBrio(character, R15Utils.isAnimationConstraintOrMotor6D)
 		end) :: any,
 		Rx.cache() :: any,
 	}) :: any
