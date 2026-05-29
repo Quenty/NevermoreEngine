@@ -35,7 +35,9 @@ end)
 describe("RxBrioUtils.combineLatest({ value = Observable(Brio(5)) })", function()
 	it("should execute immediately", function()
 		local observe = RxBrioUtils.combineLatest({
-			value = Rx.of(Brio.new(5)),
+			value = Observable.new(function(innerSub)
+				innerSub:Fire(Brio.new(5))
+			end),
 			otherValue = 25,
 		})
 		local brio
@@ -126,7 +128,9 @@ end)
 describe("RxBrioUtils.switchToBrio", function()
 	it("should wrap a plain value in a brio", function()
 		local result
-		local sub = Rx.of(42)
+		local sub = Observable.new(function(innerSub)
+			innerSub:Fire(42)
+		end)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -144,7 +148,9 @@ describe("RxBrioUtils.switchToBrio", function()
 
 	it("should wrap multiple plain values, packing them into a brio", function()
 		local result
-		local sub = Rx.of("a", "b")
+		local sub = Observable.new(function(innerSub)
+			innerSub:Fire("a", "b")
+		end)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -166,7 +172,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should clone an input brio instead of forwarding it directly", function()
 		local inputBrio = Brio.new(99)
 		local result
-		local sub = Rx.of(inputBrio)
+		local sub = Observable.new(function(innerSub)
+			innerSub:Fire(inputBrio)
+		end)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -262,7 +270,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should kill clone when the source brio dies", function()
 		local inputBrio = Brio.new(5)
 		local result
-		local sub = Rx.of(inputBrio)
+		local sub = Observable.new(function(innerSub)
+			innerSub:Fire(inputBrio)
+		end)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -281,7 +291,9 @@ describe("RxBrioUtils.switchToBrio", function()
 
 	it("should kill the last brio on unsubscribe", function()
 		local result
-		local sub = Rx.of(77)
+		local sub = Observable.new(function(innerSub)
+			innerSub:Fire(77)
+		end)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
