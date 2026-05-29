@@ -212,7 +212,7 @@ function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData
 		if slotIndex == SaveSlotConstants.DEFAULT_SLOT_INDEX then
 			return self._dataStore:PromiseKeyList():Then(function(keys)
 				for _, key in keys do
-					if key ~= SaveSlotConstants.INTERNAL_STORE_KEY then
+					if key ~= SaveSlotConstants.SYSTEM_STORE_KEY then
 						self._dataStore:Delete(key)
 					end
 				end
@@ -299,7 +299,7 @@ end
 function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 	return self._playerDataStoreService:PromiseDataStore(self._obj):Then(function(dataStore)
 		self._dataStore = dataStore
-		self._systemStore = dataStore:GetSubStore(SaveSlotConstants.INTERNAL_STORE_KEY)
+		self._systemStore = dataStore:GetSubStore(SaveSlotConstants.SYSTEM_STORE_KEY)
 		self._metadataStore = self._systemStore:GetSubStore(SaveSlotConstants.METADATA_STORE_KEY)
 
 		return self._metadataStore:LoadAll({}):Then(function(metadata)

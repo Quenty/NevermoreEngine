@@ -8,7 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local Table = require("Table")
 
 return Table.readonly({
-	INTERNAL_STORE_KEY = "SaveSlotInternal",
+	SYSTEM_STORE_KEY = "SaveSlots",
 	SLOT_STORE_KEY = "slots",
 	METADATA_STORE_KEY = "slotMetadata",
 	METADATA_CONTAINER_NAME = "SaveSlots",
