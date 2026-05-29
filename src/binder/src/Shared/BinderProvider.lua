@@ -203,12 +203,22 @@ end
 function BinderProvider:Destroy()
 	self._destroyed = true
 
-	for _, item in self._binders do
-		rawset(self, item:GetTag(), nil)
+	local binders = rawget(self, "_binders")
+	rawset(self, "_binders", nil)
+
+	if binders then
+		for _, item in binders do
+			rawset(self, item:GetTag(), nil)
+		end
 	end
 
-	self._maid:DoCleaning()
-	self._binders = nil
+	local maid = rawget(self, "_maid")
+	rawset(self, "_maid", nil)
+
+	if maid then
+		maid:DoCleaning()
+		maid = nil
+	end
 end
 
 return BinderProvider
