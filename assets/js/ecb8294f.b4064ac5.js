@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[98544],{47970:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SaveSlotConstants","desc":"","source":{"line":5,"path":"src/saveslot/src/Shared/SaveSlotConstants.lua"}}')}}]);

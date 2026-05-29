@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[45128],{14130:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HasSaveSlotsData","desc":"","source":{"line":5,"path":"src/saveslot/src/Shared/Data/HasSaveSlotsData.lua"}}')}}]);

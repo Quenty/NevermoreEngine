@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[18352],{4326:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SaveSlotCmdrService","desc":"","source":{"line":5,"path":"src/saveslot/src/Server/Cmdr/SaveSlotCmdrService.lua"}}')}}]);
