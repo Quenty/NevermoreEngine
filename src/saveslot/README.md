@@ -14,7 +14,7 @@
 
 PlayerDataStoreService wrapper for save slots
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/SaveSlotUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/SaveSlot">View docs →</a></div>
 
 ## Installation
 
