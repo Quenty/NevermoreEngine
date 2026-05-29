@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
 local Observable = require("Observable")
+local R15Utils = require("R15Utils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 
@@ -52,7 +53,7 @@ function RxR15Utils.observeRigMotorBrio(
 
 	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", partName):Pipe({
 		RxBrioUtils.switchMapBrio(function(part)
-			return RxInstanceUtils.observeLastNamedChildBrio(part, "Motor6D", motorName)
+			return RxInstanceUtils.observeLastNamedChildBrio(part, R15Utils.isAnimationConstraintOrMotor6D, motorName)
 		end) :: any,
 		RxBrioUtils.onlyLastBrioSurvives() :: any,
 	}) :: any
@@ -65,7 +66,11 @@ end
 	@param weldName string
 	@return Observable<Brio<Motor6D>>
 ]=]
-function RxR15Utils.observeRigWeldBrio(character: Model, partName: string, weldName: string)
+function RxR15Utils.observeRigWeldBrio(
+	character: Model,
+	partName: string,
+	weldName: string
+): Observable.Observable<Brio.Brio<R15Utils.AnimationConstraintOrMotor6D>>
 	assert(typeof(character) == "Instance", "Bad character")
 	assert(type(partName) == "string", "Bad partName")
 	assert(type(weldName) == "string", "Bad weldName")

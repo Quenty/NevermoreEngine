@@ -1,4 +1,5 @@
 --!strict
+--!nolint DeprecatedApi
 --[=[
 	Helpful functions involving Roblox groups.
 	@class GroupUtils

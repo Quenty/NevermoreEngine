@@ -6,8 +6,11 @@
       "$properties": {
         "LoadStringEnabled": true
       },
-      "experience": {
+      "experiencecalculator": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

@@ -19,7 +19,7 @@ for _, slug in packageSlugs do
 	if inst then
 		scriptSources[slug] = inst.Source
 	else
-		error(`Failed to find script source for {slug}`)
+		warn(`[BatchTest] Failed to find script source for {slug}`)
 	end
 end
 
@@ -41,8 +41,8 @@ local results: { Result } = {}
 for _, slug in packageSlugs do
 	local scriptSource = scriptSources[slug]
 	if not scriptSource then
-		warn(`[BatchTest] No script for {slug}`)
 		print("===BATCH_TEST_BEGIN " .. slug .. "===")
+		warn(`[BatchTest] {slug}: No test script found for {slug}. Is it tagged with _BatchTest_{slug}?`)
 		print("===BATCH_TEST_END " .. slug .. " FAIL 0===")
 		table.insert(results, { slug = slug, success = false, durationMs = 0, error = "No test script found" })
 		continue
@@ -93,14 +93,14 @@ for _, slug in packageSlugs do
 
 	-- CLEANUP: restore service state
 	allPackages[slug].Parent = nil
-	for _, c in workspace:GetChildren() do
-		if not preWorkspace[c] and not c:IsA("Terrain") and not c:IsA("Camera") then
-			pcall(c.Destroy, c)
+	for _, child in workspace:GetChildren() do
+		if not preWorkspace[child] and not child:IsA("Terrain") and not child:IsA("Camera") then
+			pcall(child.Destroy, child)
 		end
 	end
-	for _, c in ReplicatedStorage:GetChildren() do
-		if not preRunService[c] then
-			pcall(c.Destroy, c)
+	for _, child in ReplicatedStorage:GetChildren() do
+		if not preRunService[child] then
+			pcall(child.Destroy, child)
 		end
 	end
 	-- Destroy injected LoaderLinks (non-archivable, created by LoaderLinkCreator)
