@@ -16,6 +16,9 @@
       },
       "lipsum": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

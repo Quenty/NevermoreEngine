@@ -8,6 +8,9 @@
       },
       "fzy": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

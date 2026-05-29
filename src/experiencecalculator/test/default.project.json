@@ -8,6 +8,9 @@
       },
       "experiencecalculator": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }
