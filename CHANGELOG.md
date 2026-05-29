@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/grouputils@10.20.0`, `@quenty/saveslot@1.1.0`
+  - feat: Save slots [#692](https://github.com/Quenty/NevermoreEngine/pull/692) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Fri May 29 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/binder@14.36.0`, `@quenty/brio@14.30.0`, `@quenty/characterutils@12.32.0`, `@quenty/clienttranslator@14.37.0`, `@quenty/ellipticcurvecryptography@1.12.0`, `@quenty/elo@7.37.0`, `@quenty/experiencecalculator@2.11.0`, `@quenty/fzy@5.15.0`, `@quenty/grouputils@10.19.0`, `@quenty/ik@15.51.0`, `@quenty/instanceutils@13.30.0`, `@quenty/lipsum@14.36.0`, `@quenty/motor6d@7.42.0`, `@quenty/r15utils@13.31.0`, `@quenty/ragdoll@15.50.0`, `@quenty/randomutils@6.17.0`, `@quenty/rogue-humanoid@10.49.0`, `@quenty/nevermore-cli@4.33.0`
   - fix: Handle new animation constraints in ragdoll package + add more tests [#705](https://github.com/Quenty/NevermoreEngine/pull/705) ([@Quenty](https://github.com/Quenty))
 
