@@ -10,6 +10,7 @@ local require = (require :: any)(
 local Brio = require("Brio")
 local Jest = require("Jest")
 local Observable = require("Observable")
+local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 
 local describe = Jest.Globals.describe
@@ -34,9 +35,7 @@ end)
 describe("RxBrioUtils.combineLatest({ value = Observable(Brio(5)) })", function()
 	it("should execute immediately", function()
 		local observe = RxBrioUtils.combineLatest({
-			value = Observable.new(function(sub)
-				sub:Fire(Brio.new(5))
-			end),
+			value = Rx.of(Brio.new(5)),
 			otherValue = 25,
 		})
 		local brio
@@ -127,9 +126,7 @@ end)
 describe("RxBrioUtils.switchToBrio", function()
 	it("should wrap a plain value in a brio", function()
 		local result
-		local sub = Observable.new(function(sub)
-			sub:Fire(42)
-		end)
+		local sub = Rx.of(42)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -147,9 +144,7 @@ describe("RxBrioUtils.switchToBrio", function()
 
 	it("should wrap multiple plain values, packing them into a brio", function()
 		local result
-		local sub = Observable.new(function(sub)
-			sub:Fire("a", "b")
-		end)
+		local sub = Rx.of("a", "b")
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -171,9 +166,7 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should clone an input brio instead of forwarding it directly", function()
 		local inputBrio = Brio.new(99)
 		local result
-		local sub = Observable.new(function(sub)
-			sub:Fire(inputBrio)
-		end)
+		local sub = Rx.of(inputBrio)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -194,9 +187,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should kill the previous brio when a new value is emitted", function()
 		local doFire
 		local results = {}
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
@@ -220,9 +213,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should kill the previous brio even when the new value is filtered by predicate", function()
 		local doFire
 		local results = {}
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
@@ -251,9 +244,7 @@ describe("RxBrioUtils.switchToBrio", function()
 
 		local result
 		local fireCount = 0
-		local sub = Observable.new(function(sub)
-			sub:Fire(deadBrio)
-		end)
+		local sub = Rx.of(deadBrio)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -271,9 +262,7 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should kill clone when the source brio dies", function()
 		local inputBrio = Brio.new(5)
 		local result
-		local sub = Observable.new(function(sub)
-			sub:Fire(inputBrio)
-		end)
+		local sub = Rx.of(inputBrio)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -292,9 +281,7 @@ describe("RxBrioUtils.switchToBrio", function()
 
 	it("should kill the last brio on unsubscribe", function()
 		local result
-		local sub = Observable.new(function(sub)
-			sub:Fire(77)
-		end)
+		local sub = Rx.of(77)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
 			})
@@ -312,8 +299,8 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should propagate failure from source", function()
 		local failed = false
 		local failMsg
-		local sub = Observable.new(function(sub)
-			sub:Fail("test error")
+		local sub = Observable.new(function(innerSub)
+			innerSub:Fail("test error")
 		end)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
@@ -331,8 +318,8 @@ describe("RxBrioUtils.switchToBrio", function()
 
 	it("should propagate completion from source", function()
 		local completed = false
-		local sub = Observable.new(function(sub)
-			sub:Complete()
+		local sub = Observable.new(function(innerSub)
+			innerSub:Complete()
 		end)
 			:Pipe({
 				RxBrioUtils.switchToBrio(),
@@ -349,9 +336,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should apply predicate to plain values", function()
 		local doFire
 		local results = {}
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
@@ -380,9 +367,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should apply predicate to unwrapped brio values", function()
 		local doFire
 		local results = {}
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
@@ -407,9 +394,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should handle rapid succession of emissions correctly", function()
 		local doFire
 		local results = {}
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
@@ -438,9 +425,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should handle interleaved brio and plain value emissions", function()
 		local doFire
 		local results = {}
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
@@ -467,9 +454,9 @@ describe("RxBrioUtils.switchToBrio", function()
 	it("should handle source brio dying while subscribed then new emission", function()
 		local doFire
 		local results = {}
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
@@ -503,9 +490,9 @@ describe("RxBrioUtils.switchToBrio", function()
 		local results = {}
 		local reEmitted = false
 
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
@@ -537,9 +524,9 @@ describe("RxBrioUtils.switchToBrio", function()
 		local doFire
 		local fireCount = 0
 
-		local sub = Observable.new(function(sub)
+		local sub = Observable.new(function(innerSub)
 			doFire = function(...)
-				sub:Fire(...)
+				innerSub:Fire(...)
 			end
 		end)
 			:Pipe({
