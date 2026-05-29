@@ -4293,6 +4293,66 @@ importers:
 
   src/safedestroy: {}
 
+  src/saveslot:
+    dependencies:
+      '@quenty/adorneedata':
+        specifier: workspace:*
+        version: link:../adorneedata
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
+      '@quenty/binder':
+        specifier: workspace:*
+        version: link:../binder
+      '@quenty/brio':
+        specifier: workspace:*
+        version: link:../brio
+      '@quenty/cmdrservice':
+        specifier: workspace:*
+        version: link:../cmdrservice
+      '@quenty/datastore':
+        specifier: workspace:*
+        version: link:../datastore
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
+      '@quenty/playerbinder':
+        specifier: workspace:*
+        version: link:../playerbinder
+      '@quenty/promise':
+        specifier: workspace:*
+        version: link:../promise
+      '@quenty/propertyvalue':
+        specifier: workspace:*
+        version: link:../propertyvalue
+      '@quenty/remoting':
+        specifier: workspace:*
+        version: link:../remoting
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
+      '@quenty/table':
+        specifier: workspace:*
+        version: link:../table
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
+      '@quenty/valueobject':
+        specifier: workspace:*
+        version: link:../valueobject
+
   src/scoredactionservice:
     dependencies:
       '@quenty/baseobject':
