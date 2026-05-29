@@ -282,9 +282,18 @@ export class BatchScriptJobContext implements JobContext {
     const rawLogs = await this._inner.getLogsAsync(deployment);
 
     if (!result.success) {
+      const stateInfo = result.taskState ? ` (state: ${result.taskState})` : '';
       OutputHelper.warn(
-        'Batch execution task did not complete successfully — parsing partial results'
+        `Batch execution task did not complete successfully${stateInfo} — parsing partial results`
       );
+      if (result.errorMessage) {
+        OutputHelper.error(result.errorMessage);
+      }
+      if (!rawLogs || rawLogs.trim().length === 0) {
+        OutputHelper.warn(
+          'No logs were returned from the execution — the script may not have started'
+        );
+      }
       OutputHelper.verbose(`Raw batch logs:\n${rawLogs || '(empty)'}`);
     }
 

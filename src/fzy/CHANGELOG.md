@@ -3,300 +3,164 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.14.0...@quenty/fzy@5.15.0) (2026-05-29)
+
+### Bug Fixes
+
+- Fix missing scripts in packages ([d5e6cf3](https://github.com/Quenty/NevermoreEngine/commit/d5e6cf38cbf5f5ed1d3858a445ab82f1853a411f))
+
 # [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.13.0...@quenty/fzy@5.14.0) (2026-04-23)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [5.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.12.0...@quenty/fzy@5.13.0) (2026-02-20)
-
 
 ### Features
 
-* **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
-
-
-
-
+- **cli:** add CI annotation support to game and plugin templates ([#666](https://github.com/Quenty/NevermoreEngine/issues/666)) ([098971b](https://github.com/Quenty/NevermoreEngine/commit/098971bb04dfe40be09f475330b69a48b38c54c5))
 
 # [5.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.11.0...@quenty/fzy@5.12.0) (2026-02-19)
 
-
 ### Features
 
-* **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
-
-
-
-
+- **cli:** add aggregated batch test execution ([58f20e4](https://github.com/Quenty/NevermoreEngine/commit/58f20e437540c597ea445f47d47076c08ea9ca21))
 
 # [5.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.10.3...@quenty/fzy@5.11.0) (2026-02-17)
 
-
 ### Features
 
-* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
-
-
-
-
+- Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
 
 ## [5.10.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.10.2...@quenty/fzy@5.10.3) (2026-01-12)
 
-
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
-
-
-
-
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 ## [5.10.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.10.1...@quenty/fzy@5.10.2) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 ## [5.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.10.0...@quenty/fzy@5.10.1) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/fzy
-
-
-
-
 
 # [5.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.9.3...@quenty/fzy@5.10.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 ## [5.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.9.2...@quenty/fzy@5.9.3) (2025-04-10)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 ## [5.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.9.0...@quenty/fzy@5.9.2) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [5.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.9.0...@quenty/fzy@5.9.1) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 # [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.8.0...@quenty/fzy@5.9.0) (2025-04-02)
 
-
 ### Bug Fixes
 
-* Fix existing tests ([655787c](https://github.com/Quenty/NevermoreEngine/commit/655787ced1139136e12f81800e229aa076731561))
-
-
-
-
+- Fix existing tests ([655787c](https://github.com/Quenty/NevermoreEngine/commit/655787ced1139136e12f81800e229aa076731561))
 
 # [5.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.7.1...@quenty/fzy@5.8.0) (2025-02-18)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 ## [5.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.7.0...@quenty/fzy@5.7.1) (2024-11-04)
 
 **Note:** Version bump only for package @quenty/fzy
-
-
-
-
 
 # [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.6.0...@quenty/fzy@5.7.0) (2024-10-06)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.5.0...@quenty/fzy@5.6.0) (2024-10-04)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [5.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.4.0...@quenty/fzy@5.5.0) (2024-09-25)
-
 
 ### Bug Fixes
 
-* Rename `:sub()` to `string.sub` ([6874e06](https://github.com/Quenty/NevermoreEngine/commit/6874e06e456d7094a2d7f25a3a7b24a40d77fe3c))
-
-
-
-
+- Rename `:sub()` to `string.sub` ([6874e06](https://github.com/Quenty/NevermoreEngine/commit/6874e06e456d7094a2d7f25a3a7b24a40d77fe3c))
 
 # [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.3.0...@quenty/fzy@5.4.0) (2024-09-12)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.2.0...@quenty/fzy@5.3.0) (2024-05-09)
-
 
 ### Bug Fixes
 
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
-
-
-
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.1.0...@quenty/fzy@5.2.0) (2024-04-27)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.0.0...@quenty/fzy@5.1.0) (2024-03-09)
 
 **Note:** Version bump only for package @quenty/fzy
-
-
-
-
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@4.0.0...@quenty/fzy@5.0.0) (2024-02-14)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@3.0.0...@quenty/fzy@4.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/fzy
-
-
-
-
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@2.2.0...@quenty/fzy@3.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@2.1.0...@quenty/fzy@2.2.0) (2024-01-08)
 
 **Note:** Version bump only for package @quenty/fzy
-
-
-
-
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@2.0.0...@quenty/fzy@2.1.0) (2023-12-14)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@1.5.0...@quenty/fzy@2.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/fzy
-
-
-
-
 
 # [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@1.4.1...@quenty/fzy@1.5.0) (2023-08-23)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 ## [1.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@1.4.0...@quenty/fzy@1.4.1) (2023-04-07)
 
 **Note:** Version bump only for package @quenty/fzy
-
-
-
-
 
 # [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@1.3.0...@quenty/fzy@1.4.0) (2023-03-05)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@1.2.0...@quenty/fzy@1.3.0) (2023-02-21)
 
 **Note:** Version bump only for package @quenty/fzy
-
-
-
-
 
 # [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@1.1.0...@quenty/fzy@1.2.0) (2023-01-01)
 
 **Note:** Version bump only for package @quenty/fzy
 
-
-
-
-
 # 1.1.0 (2022-12-29)
-
 
 ### Features
 
-* Add Fzy package for fuzzy searching ([d1a4864](https://github.com/Quenty/NevermoreEngine/commit/d1a486423c84db737895c65c4b7f44005bc48e2f))
-
-
-
-
+- Add Fzy package for fuzzy searching ([d1a4864](https://github.com/Quenty/NevermoreEngine/commit/d1a486423c84db737895c65c4b7f44005bc48e2f))
 
 # v1.1.0 (Thu Dec 29 2022)
 

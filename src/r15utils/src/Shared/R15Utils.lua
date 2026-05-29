@@ -9,12 +9,10 @@ local R15Utils = {}
 
 export type R15Side = "Left" | "Right"
 
+export type AnimationConstraintOrMotor6D = AnimationConstraint | Motor6D
+
 --[=[
 	Searches the rig for an attachment
-	@param character Model
-	@param partName string
-	@param attachmentName string
-	@return Attachment?
 ]=]
 function R15Utils.searchForRigAttachment(character: Model, partName: string, attachmentName: string): Attachment?
 	local part = R15Utils.getBodyPart(character, partName)
@@ -32,12 +30,8 @@ end
 
 --[=[
 	Finds a rig motor
-	@param character Model
-	@param partName string
-	@param motorName string
-	@return Motor6D?
 ]=]
-function R15Utils.getRigMotor(character: Model, partName: string, motorName: string): Motor6D?
+function R15Utils.getRigMotor(character: Model, partName: string, motorName: string): AnimationConstraintOrMotor6D?
 	assert(typeof(character) == "Instance", "Bad character")
 	assert(type(partName) == "string", "Bad partName")
 	assert(type(motorName) == "string", "Bad motorName")
@@ -47,8 +41,8 @@ function R15Utils.getRigMotor(character: Model, partName: string, motorName: str
 		return nil
 	end
 
-	local motor = basePart:FindFirstChild(motorName)
-	if motor == nil or not motor:IsA("Motor6D") then
+	local motor: any = basePart:FindFirstChild(motorName)
+	if motor == nil or not (R15Utils.isAnimationConstraintOrMotor6D(motor)) then
 		return nil
 	end
 
@@ -56,9 +50,14 @@ function R15Utils.getRigMotor(character: Model, partName: string, motorName: str
 end
 
 --[=[
+	Determines if the instance is a Motor6D or AnimationConstraint
+]=]
+function R15Utils.isAnimationConstraintOrMotor6D(instance: Instance): boolean
+	return instance:IsA("Motor6D") or instance:IsA("AnimationConstraint")
+end
+
+--[=[
 	Retrieves the upper torso
-	@param character Model
-	@return BasePart?
 ]=]
 function R15Utils.getUpperTorso(character: Model): BasePart?
 	return R15Utils.getBodyPart(character, "UpperTorso")
@@ -66,13 +65,14 @@ end
 
 --[=[
 	Retrieves the lower torso
-	@param character Model
-	@return BasePart?
 ]=]
 function R15Utils.getLowerTorso(character: Model): BasePart?
 	return R15Utils.getBodyPart(character, "LowerTorso")
 end
 
+--[=[
+	Gets a body part for a character
+]=]
 function R15Utils.getBodyPart(character: Model, partName: string): BasePart?
 	local found = character:FindFirstChild(partName)
 	if found == nil then
@@ -88,27 +88,20 @@ end
 
 --[=[
 	Retrieves the waist joint
-	@param character Model
-	@return Motor6D?
 ]=]
-function R15Utils.getWaistJoint(character: Model): Motor6D?
+function R15Utils.getWaistJoint(character: Model): AnimationConstraintOrMotor6D?
 	return R15Utils.getRigMotor(character, "UpperTorso", "Waist")
 end
 
 --[=[
 	Retrieves the neck joint
-	@param character Model
-	@return Motor6D?
 ]=]
-function R15Utils.getNeckJoint(character: Model): Motor6D?
+function R15Utils.getNeckJoint(character: Model): AnimationConstraintOrMotor6D?
 	return R15Utils.getRigMotor(character, "Head", "Neck")
 end
 
 --[=[
 	Retrieves hand attachment
-	@param character Model
-	@param side "Left" | "Right"
-	@return BasePart?
 ]=]
 function R15Utils.getHand(character: Model, side: R15Side): BasePart?
 	local result = character:FindFirstChild(R15Utils.getHandName(side))
@@ -121,18 +114,15 @@ end
 
 --[=[
 	Retrieves grip weld
-	@param character Model
-	@param side "Left" | "Right"
-	@return Motor6D?
 ]=]
-function R15Utils.getGripWeld(character: Model, side: R15Side): Motor6D?
+function R15Utils.getGripWeld(character: Model, side: R15Side): AnimationConstraintOrMotor6D?
 	local rightHand = R15Utils.getHand(character, side)
 	if rightHand == nil then
 		return nil
 	end
 
-	local result = rightHand:FindFirstChild(R15Utils.getGripWeldName(side))
-	if result == nil or not result:IsA("Motor6D") then
+	local result: any = rightHand:FindFirstChild(R15Utils.getGripWeldName(side))
+	if result == nil or not R15Utils.isAnimationConstraintOrMotor6D(result) then
 		return nil
 	end
 
@@ -141,8 +131,6 @@ end
 
 --[=[
 	Retrieves grip weld name for a given side
-	@param side "Left" | "Right"
-	@return "LeftGrip" | "RightGrip"
 ]=]
 function R15Utils.getGripWeldName(side: R15Side): "LeftGrip" | "RightGrip"
 	if side == "Left" then
@@ -155,9 +143,7 @@ function R15Utils.getGripWeldName(side: R15Side): "LeftGrip" | "RightGrip"
 end
 
 --[=[
-	Retrieves grip weld name for a given side
-	@param side "Left" | "Right"
-	@return "LeftHand" | "RightHand"
+	Retrieves hand name for a given side
 ]=]
 function R15Utils.getHandName(side: R15Side): "LeftHand" | "RightHand"
 	if side == "Left" then
@@ -171,8 +157,6 @@ end
 
 --[=[
 	Retrieves the grip attachment name
-	@param side "Left" | "Right"
-	@return "LeftGripAttachment" | "RightGripAttachment"
 ]=]
 function R15Utils.getGripAttachmentName(side: R15Side): "LeftGripAttachment" | "RightGripAttachment"
 	if side == "Left" then
@@ -186,9 +170,6 @@ end
 
 --[=[
 	Retrieves the shoulder rig attachment
-	@param character Model
-	@param side "Left" | "Right"
-	@return Attachment?
 ]=]
 function R15Utils.getShoulderRigAttachment(character: Model, side: R15Side): Attachment?
 	if side == "Left" then
@@ -202,9 +183,6 @@ end
 
 --[=[
 	Retrieves the grip attachment for the given side
-	@param character Model
-	@param side "Left" | "Right"
-	@return Attachment?
 ]=]
 function R15Utils.getGripAttachment(character: Model, side: R15Side): Attachment?
 	if side == "Left" then
@@ -218,8 +196,6 @@ end
 
 --[=[
 	Retrieves the expected root part y offset for a humanoid
-	@param humanoid Humanoid
-	@return number?
 ]=]
 function R15Utils.getExpectedRootPartYOffset(humanoid: Humanoid): number?
 	local rootPart = humanoid.RootPart
@@ -232,11 +208,6 @@ end
 
 --[=[
 	Gets the length of a segment for a rig
-	@param character Model
-	@param partName string
-	@param rigAttachment0 string
-	@param rigAttachment1 string
-	@return number?
 ]=]
 function R15Utils.getRigLength(
 	character: Model,
@@ -259,8 +230,6 @@ end
 
 --[=[
 	Adds the lengths together
-	@param lengths { number? }
-	@return number?
 ]=]
 function R15Utils.addLengthsOrNil(lengths: { number? }): number?
 	local total = 0
@@ -277,9 +246,6 @@ end
 
 --[=[
 	Retrieves the upper arm length for a character
-	@param character Model
-	@param side "Left" | "Right"
-	@return number?
 ]=]
 function R15Utils.getUpperArmRigLength(character: Model, side: R15Side): number?
 	if side == "Left" then
@@ -298,9 +264,6 @@ end
 
 --[=[
 	Retrieves the lower arm length for a character
-	@param character Model
-	@param side "Left" | "Right"
-	@return number?
 ]=]
 function R15Utils.getLowerArmRigLength(character: Model, side: R15Side): number?
 	if side == "Left" then
@@ -314,9 +277,6 @@ end
 
 --[=[
 	Retrieves the wrist to hand length
-	@param character Model
-	@param side "Left" | "Right"
-	@return number?
 ]=]
 function R15Utils.getWristToGripLength(character: Model, side: R15Side): number?
 	if side == "Left" then
@@ -330,9 +290,6 @@ end
 
 --[=[
 	Retrieves the humanoid scale property
-	@param humanoid Humanoid
-	@param scaleValueName string
-	@return number?
 ]=]
 function R15Utils.getHumanoidScaleProperty(humanoid: Humanoid, scaleValueName: string): number?
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
@@ -347,9 +304,6 @@ end
 
 --[=[
 	Computes the length of an arm for a given character
-	@param character Model
-	@param side "Left" | "Right"
-	@return number?
 ]=]
 function R15Utils.getArmRigToGripLength(character: Model, side: R15Side): number?
 	return R15Utils.addLengthsOrNil({

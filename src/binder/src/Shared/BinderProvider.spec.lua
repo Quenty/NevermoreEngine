@@ -16,33 +16,44 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 describe("BinderProvider.new()", function()
-	local provider
-	local initialized = false
-
-	it("should execute immediately", function()
-		provider = BinderProvider.new("BinderServiceName", function(self, arg)
-			initialized = true
-			assert(arg == 12345, "Bad arg")
-
-			self:Add(Binder.new("Test", function()
-				return { Destroy = function() end }
-			end))
-		end)
-
+	it("should construct a provider", function()
+		local provider = BinderProvider.new("BinderServiceName", function(_self) end)
 		expect(provider).toEqual(expect.any("table"))
+		provider:Destroy()
 	end)
 
-	it("should initialize", function()
+	it("should initialize and call the init callback", function()
+		local initialized = false
+
+		local provider = BinderProvider.new("BinderServiceName", function(_self, arg)
+			initialized = true
+			assert(arg == 12345, "Bad arg")
+		end)
+
 		expect(initialized).toEqual(false)
 		provider:Init(12345)
 		expect(initialized).toEqual(true)
-	end)
 
-	it("should contain the binder", function()
-		expect(provider.Test).toEqual(expect.any("table"))
-	end)
-
-	if provider then
 		provider:Destroy()
-	end
+	end)
+
+	it("should contain the binder after init", function()
+		local binder
+
+		local provider = BinderProvider.new("BinderServiceName", function(self)
+			binder = Binder.new("Test", function()
+				return { Destroy = function() end }
+			end)
+			self:Add(binder)
+		end)
+
+		provider:Init()
+
+		expect(provider.Test).toEqual(expect.any("table"))
+
+		provider:Destroy()
+		if binder then
+			binder:Destroy()
+		end
+	end)
 end)

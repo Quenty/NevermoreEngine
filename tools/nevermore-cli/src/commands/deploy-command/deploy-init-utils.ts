@@ -42,7 +42,7 @@ export async function detectProjectFileAsync(
 
   for (const candidate of candidates) {
     if (await fileExistsAsync(candidate)) {
-      return path.relative(packagePath, candidate);
+      return path.relative(packagePath, candidate).replace(/\\/g, '/');
     }
   }
 

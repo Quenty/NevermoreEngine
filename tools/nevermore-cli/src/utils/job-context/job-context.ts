@@ -24,6 +24,10 @@ export interface ScriptRunResult {
    * wall-clock measurement.
    */
   durationMs?: number;
+  /** Final task state (e.g. 'COMPLETE', 'FAILED', 'CANCELLED'). */
+  taskState?: string;
+  /** Error message from the execution backend, if any. */
+  errorMessage?: string;
 }
 
 /**

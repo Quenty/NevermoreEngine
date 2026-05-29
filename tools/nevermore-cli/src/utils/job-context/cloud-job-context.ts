@@ -112,7 +112,24 @@ export class CloudJobContext extends BaseJobContext {
     cloudDeployment.taskPath = task.path;
     cloudDeployment.taskState = completedTask.state;
 
-    return { success: completedTask.state === 'COMPLETE' };
+    // Surface error details from the Roblox API when the task didn't complete
+    let errorMessage: string | undefined;
+    if (completedTask.state !== 'COMPLETE') {
+      const parts: string[] = [`Task ended with state: ${completedTask.state}`];
+      if (completedTask.error?.message) {
+        parts.push(`Error: ${completedTask.error.message}`);
+      }
+      if (completedTask.error?.code) {
+        parts.push(`Code: ${completedTask.error.code}`);
+      }
+      errorMessage = parts.join('. ');
+    }
+
+    return {
+      success: completedTask.state === 'COMPLETE',
+      taskState: completedTask.state,
+      errorMessage,
+    };
   }
 
   async getLogsAsync(deployment: Deployment): Promise<string> {

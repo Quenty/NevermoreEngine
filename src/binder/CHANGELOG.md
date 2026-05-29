@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.35.0...@quenty/binder@14.36.0) (2026-05-29)
+
+### Bug Fixes
+
+- Binder provider tests are self contained and safer ([9c90efb](https://github.com/Quenty/NevermoreEngine/commit/9c90efbe9972f88fb16f948937b4e0c18f45a531))
+
 # [14.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.34.2...@quenty/binder@14.35.0) (2026-05-18)
 
 **Note:** Version bump only for package @quenty/binder

@@ -17,6 +17,7 @@ local Math = require("Math")
 local Motor6DSmoothTransformer = require("Motor6DSmoothTransformer")
 local Motor6DStackInterface = require("Motor6DStackInterface")
 local QFrame = require("QFrame")
+local R15Utils = require("R15Utils")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
@@ -179,19 +180,31 @@ function ArmIKBase:_observeStateBrio()
 
 			local observeShoulderBrio = observeUpperArmBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(upperArm)
-					return RxInstanceUtils.observeLastNamedChildBrio(upperArm, "Motor6D", self._armName .. "Shoulder")
+					return RxInstanceUtils.observeLastNamedChildBrio(
+						upperArm,
+						R15Utils.isAnimationConstraintOrMotor6D,
+						self._armName .. "Shoulder"
+					)
 				end),
 				Rx.shareReplay(1),
 			})
 			local observeElbowBrio = observeLowerArmBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(lowerArm)
-					return RxInstanceUtils.observeLastNamedChildBrio(lowerArm, "Motor6D", self._armName .. "Elbow")
+					return RxInstanceUtils.observeLastNamedChildBrio(
+						lowerArm,
+						R15Utils.isAnimationConstraintOrMotor6D,
+						self._armName .. "Elbow"
+					)
 				end),
 				Rx.shareReplay(1),
 			})
 			local observeWristBrio = observeHandBrio:Pipe({
 				RxBrioUtils.switchMapBrio(function(hand)
-					return RxInstanceUtils.observeLastNamedChildBrio(hand, "Motor6D", self._armName .. "Wrist")
+					return RxInstanceUtils.observeLastNamedChildBrio(
+						hand,
+						R15Utils.isAnimationConstraintOrMotor6D,
+						self._armName .. "Wrist"
+					)
 				end),
 				Rx.shareReplay(1),
 			})
