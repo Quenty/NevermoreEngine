@@ -1,5 +1,18 @@
 # (Fri May 29 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.32.1`
+  - fix: Prevent playback on invalid targets [#706](https://github.com/Quenty/NevermoreEngine/pull/706) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Fri May 29 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/grouputils@10.20.0`, `@quenty/saveslot@1.1.0`

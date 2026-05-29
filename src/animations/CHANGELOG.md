@@ -1,3 +1,16 @@
+# v8.32.1 (Fri May 29 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Prevent playback on invalid targets [#706](https://github.com/Quenty/NevermoreEngine/pull/706) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Prevent playback on invalid targets ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
