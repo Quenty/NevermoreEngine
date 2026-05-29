@@ -1,20 +1,13 @@
-# v8.32.1 (Fri May 29 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Prevent playback on invalid targets [#706](https://github.com/Quenty/NevermoreEngine/pull/706) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Prevent playback on invalid targets ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.32.0...@quenty/animations@8.32.1) (2026-05-29)
+
+### Bug Fixes
+
+- Prevent playback on invalid targets ([fd1f826](https://github.com/Quenty/NevermoreEngine/commit/fd1f8262a21319dbab036ebd256f7af524b1ebe6))
 
 # [8.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.31.2...@quenty/animations@8.32.0) (2026-05-29)
 
