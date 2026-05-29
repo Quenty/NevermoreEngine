@@ -1,23 +1,11 @@
-# v10.49.0 (Fri May 29 2026)
-
-#### 🚀 Enhancement
-
-- fix: Handle new animation constraints in ragdoll package + add more tests [#705](https://github.com/Quenty/NevermoreEngine/pull/705) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Strict type RogueHumanoidBase + use RxCharacterUtils.observeIsOfLocalCharacterBrio(self._obj) in order to support deferred signal mode ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.48.0...@quenty/rogue-humanoid@10.49.0) (2026-05-29)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
 
 # [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.47.0...@quenty/rogue-humanoid@10.48.0) (2026-05-20)
 

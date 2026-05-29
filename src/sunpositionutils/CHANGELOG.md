@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.6.0...@quenty/sunpositionutils@2.7.0) (2026-05-29)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
 # [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.5.2...@quenty/sunpositionutils@2.6.0) (2026-05-18)
 
 **Note:** Version bump only for package @quenty/sunpositionutils

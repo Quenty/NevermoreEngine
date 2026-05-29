@@ -1,24 +1,13 @@
-# v14.36.0 (Fri May 29 2026)
-
-#### 🚀 Enhancement
-
-- fix: Handle new animation constraints in ragdoll package + add more tests [#705](https://github.com/Quenty/NevermoreEngine/pull/705) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing scripts in packages ([@Quenty](https://github.com/Quenty))
-- test: Add deploys for all other packages with tests that are missing deploys ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.35.0...@quenty/lipsum@14.36.0) (2026-05-29)
+
+### Bug Fixes
+
+- Fix missing scripts in packages ([d5e6cf3](https://github.com/Quenty/NevermoreEngine/commit/d5e6cf38cbf5f5ed1d3858a445ab82f1853a411f))
 
 # [14.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.34.2...@quenty/lipsum@14.35.0) (2026-05-18)
 

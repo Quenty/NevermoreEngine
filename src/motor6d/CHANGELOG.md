@@ -1,23 +1,13 @@
-# v7.42.0 (Fri May 29 2026)
-
-#### 🚀 Enhancement
-
-- fix: Handle new animation constraints in ragdoll package + add more tests [#705](https://github.com/Quenty/NevermoreEngine/pull/705) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Handle new animation constraints ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.41.0...@quenty/motor6d@7.42.0) (2026-05-29)
+
+### Bug Fixes
+
+- Handle new animation constraints ([519e52a](https://github.com/Quenty/NevermoreEngine/commit/519e52a227fe241e30c9d92b6c9e6e92246552d3))
 
 # [7.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.40.2...@quenty/motor6d@7.41.0) (2026-05-18)
 

@@ -1,23 +1,11 @@
-# v14.37.0 (Fri May 29 2026)
-
-#### 🚀 Enhancement
-
-- fix: Handle new animation constraints in ragdoll package + add more tests [#705](https://github.com/Quenty/NevermoreEngine/pull/705) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Add deploys for all other packages with tests that are missing deploys ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.36.0...@quenty/clienttranslator@14.37.0) (2026-05-29)
+
+**Note:** Version bump only for package @quenty/clienttranslator
 
 # [14.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.35.2...@quenty/clienttranslator@14.36.0) (2026-05-18)
 

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@10.21.0...@quenty/qframe@10.22.0) (2026-05-29)
+
+**Note:** Version bump only for package @quenty/qframe
+
 # [10.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@10.20.2...@quenty/qframe@10.21.0) (2026-05-18)
 
 **Note:** Version bump only for package @quenty/qframe
