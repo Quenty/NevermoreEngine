@@ -1,23 +1,11 @@
-# v10.20.0 (Fri May 29 2026)
-
-#### 🚀 Enhancement
-
-- feat: Save slots [#692](https://github.com/Quenty/NevermoreEngine/pull/692) ([@alex-y-z](https://github.com/alex-y-z))
-
-#### 🐛 Bug Fix
-
-- chore: Lint ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.19.0...@quenty/grouputils@10.20.0) (2026-05-29)
+
+**Note:** Version bump only for package @quenty/grouputils
 
 # [10.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.18.0...@quenty/grouputils@10.19.0) (2026-05-29)
 

@@ -1,3 +1,14 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2026-05-29)
+
+### Features
+
+- Save slots ([55c926a](https://github.com/Quenty/NevermoreEngine/commit/55c926a29d6e304971b8d0123bb3a684be496899))
+
 # v1.1.0 (Fri May 29 2026)
 
 #### 🚀 Enhancement
