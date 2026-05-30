@@ -1,6 +1,6 @@
 --!strict
 --[=[
-	Utilties for IK system
+	Utilities for IK system
 	@class IKUtils
 ]=]
 

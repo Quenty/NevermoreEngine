@@ -1,7 +1,7 @@
 --!strict
 --[=[
-	Key based CoreGuiEnabler, singleton
-	Use this class to load/unload CoreGuis / other GUIs, by disabling based upon keys
+	Key based CoreGuiEnabler, singleton.
+	Use this class to load/unload CoreGuis / other GUIs by disabling based upon keys.
 	Keys are additive, so if you have more than 1 disabled, it's ok.
 
 	```lua

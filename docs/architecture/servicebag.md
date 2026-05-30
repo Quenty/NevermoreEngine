@@ -77,7 +77,7 @@ return ServiceName
 
 There are 3 methods in a service that are precoded in a `ServiceBag`.
 
-All three of these services are optional. However, if you want to have services
+All three of these methods are optional. However, if you want to have services
 bootstrapped that this service depends upon, then you should do this in `Init`.
 
 ### `ServiceBag:Init(serviceBag)`
@@ -210,8 +210,7 @@ end
 Nevermore tries to be a collection of libraries that can be plugged together,
 and not exist as a set framework that forces specific design decisions. While
 there are certainly some design patterns these libraries will guide you to,
-you shouldn't necessarily feel forced to operate within these set of
-scenarios.
+you shouldn't necessarily feel forced to operate within this set of scenarios.
 
 That being said, in order to use certain services, like `CmdrService` or
 permission service, you need to be familiar with `ServiceBag`.

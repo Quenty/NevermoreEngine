@@ -1,8 +1,8 @@
 --!strict
 --[=[
 	Allow freedom of movement around a current place, much like the classic script works now.
-	Not intended to be use with the current character script
-	Intended to be used with a SummedCamera, relative.
+	Not intended to be used with the current character script.
+	Intended to be used with a [SummedCamera], relative.
 
 	```lua
 	local zoom = ZoomedCamera.new()

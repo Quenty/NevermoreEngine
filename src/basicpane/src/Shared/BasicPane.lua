@@ -64,7 +64,7 @@ function BasicPane.new(gui: GuiObject?): BasicPane
 	self._visible = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	--[=[
-		Fires whenever visibility changes. FIres with isVisible, doNotAnimate, and a maid which
+		Fires whenever visibility changes. Fires with isVisible, doNotAnimate, and a maid which
 		has the lifetime of the visibility.
 
 		:::info
@@ -120,7 +120,7 @@ end
 --[=[
 	Returns an observable that observes visibility
 
-	@param predicate function | nil -- Optional predicate. If not includeded returns the value.
+	@param predicate function | nil -- Optional predicate. If not included returns the value.
 	@return Observable<Brio<boolean>>
 ]=]
 function BasicPane.ObserveVisibleBrio(
