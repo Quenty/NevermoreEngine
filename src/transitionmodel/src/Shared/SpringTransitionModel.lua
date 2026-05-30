@@ -224,7 +224,7 @@ end
 --[=[
 	Shows the model and promises when the showing is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function SpringTransitionModel.PromiseShow<T>(self: SpringTransitionModel<T>, doNotAnimate: boolean?): Promise.Promise<()>
@@ -232,9 +232,9 @@ function SpringTransitionModel.PromiseShow<T>(self: SpringTransitionModel<T>, do
 end
 
 --[=[
-	Hides the model and promises when the showing is complete.
+	Hides the model and promises when the hiding is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function SpringTransitionModel.PromiseHide<T>(self: SpringTransitionModel<T>, doNotAnimate: boolean?): Promise.Promise<()>
@@ -244,7 +244,7 @@ end
 --[=[
 	Toggles the model and promises when the transition is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function SpringTransitionModel.PromiseToggle<T>(
