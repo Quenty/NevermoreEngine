@@ -1,21 +1,11 @@
-# v12.49.1 (Sat May 30 2026)
-
-#### 🐛 Bug Fix
-
-- docs: Fix an assortment of minor issues [#707](https://github.com/Quenty/NevermoreEngine/pull/707) ([@alex-y-z](https://github.com/alex-y-z))
-- docs: Fix typos, formatting, and inaccuracies ([@alex-y-z](https://github.com/alex-y-z))
-- chore: Fix package directories ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.49.0...@quenty/gameconfig@12.49.1) (2026-05-30)
+
+**Note:** Version bump only for package @quenty/gameconfig
 
 # [12.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.48.0...@quenty/gameconfig@12.49.0) (2026-05-29)
 

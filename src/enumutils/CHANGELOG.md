@@ -1,133 +1,72 @@
-# v3.4.6 (Sat May 30 2026)
-
-#### 🐛 Bug Fix
-
-- docs: Fix an assortment of minor issues [#707](https://github.com/Quenty/NevermoreEngine/pull/707) ([@alex-y-z](https://github.com/alex-y-z))
-- docs: Fix typos, formatting, and inaccuracies ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.4.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.4.4...@quenty/enumutils@3.4.5) (2026-01-12)
+## [3.4.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.4.5...@quenty/enumutils@3.4.6) (2026-05-30)
 
+**Note:** Version bump only for package @quenty/enumutils
+
+## [3.4.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.4.4...@quenty/enumutils@3.4.5) (2026-01-12)
 
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
-
-
-
-
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 ## [3.4.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.4.3...@quenty/enumutils@3.4.4) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/enumutils
 
-
-
-
-
 ## [3.4.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.4.2...@quenty/enumutils@3.4.3) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/enumutils
 
-
-
-
-
 ## [3.4.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.4.0...@quenty/enumutils@3.4.2) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [3.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.4.0...@quenty/enumutils@3.4.1) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.3.0...@quenty/enumutils@3.4.0) (2024-12-03)
 
-
 ### Bug Fixes
 
-* Use enum:FromValue and enum:FromName API methods ([52a0cf9](https://github.com/Quenty/NevermoreEngine/commit/52a0cf99d32995644d6bb00a94a59dcd6f62939c))
-
-
-
-
+- Use enum:FromValue and enum:FromName API methods ([52a0cf9](https://github.com/Quenty/NevermoreEngine/commit/52a0cf99d32995644d6bb00a94a59dcd6f62939c))
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.2.0...@quenty/enumutils@3.3.0) (2024-09-25)
 
 **Note:** Version bump only for package @quenty/enumutils
 
-
-
-
-
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.1.0...@quenty/enumutils@3.2.0) (2024-05-09)
-
 
 ### Bug Fixes
 
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
-
-
-
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.0.0...@quenty/enumutils@3.1.0) (2023-03-03)
 
-
 ### Features
 
-* Add EnumUtils.toEnum(enumType, value) ([04aa32c](https://github.com/Quenty/NevermoreEngine/commit/04aa32c899c27f7ec87325cf7bb72c3ea900a767))
-
-
-
-
+- Add EnumUtils.toEnum(enumType, value) ([04aa32c](https://github.com/Quenty/NevermoreEngine/commit/04aa32c899c27f7ec87325cf7bb72c3ea900a767))
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@2.0.0...@quenty/enumutils@3.0.0) (2022-09-27)
 
-
 ### Features
 
-* Add EnumUtils.isOfType() ([eaafef1](https://github.com/Quenty/NevermoreEngine/commit/eaafef12fcf57fb6e96de865c6f0b2c110bf3bcc))
-
-
-
-
+- Add EnumUtils.isOfType() ([eaafef1](https://github.com/Quenty/NevermoreEngine/commit/eaafef12fcf57fb6e96de865c6f0b2c110bf3bcc))
 
 # 2.0.0 (2022-08-14)
 
-
 ### Features
 
-* Add EnumUtils package. This package helps serialize and unserialize enums ([0036230](https://github.com/Quenty/NevermoreEngine/commit/003623062250ede4d8327959f131bdab516f7ac6))
-
-
-
-
+- Add EnumUtils package. This package helps serialize and unserialize enums ([0036230](https://github.com/Quenty/NevermoreEngine/commit/003623062250ede4d8327959f131bdab516f7ac6))
 
 # v2.0.0 (Sun Aug 14 2022)
 
