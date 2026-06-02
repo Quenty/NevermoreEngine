@@ -1,20 +1,13 @@
-# v7.42.2 (Tue Jun 02 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Adjust formatting so our pnpm lock doesn't get formatted by pret… [#708](https://github.com/Quenty/NevermoreEngine/pull/708) ([@Quenty](https://github.com/Quenty))
-- fix: Adjust formatting so our pnpm lock doesn't get formatted by prettier ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.42.1...@quenty/motor6d@7.42.2) (2026-06-02)
+
+### Bug Fixes
+
+- Adjust formatting so our pnpm lock doesn't get formatted by prettier ([220c019](https://github.com/Quenty/NevermoreEngine/commit/220c0190b4644413f0a79383b0bc4f6bfe3786d3))
 
 ## [7.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.42.0...@quenty/motor6d@7.42.1) (2026-05-30)
 
