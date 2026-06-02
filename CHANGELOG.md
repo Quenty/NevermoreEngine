@@ -1,3 +1,68 @@
+# (Tue Jun 02 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/motor6d@7.42.2`, `@quenty/nevermore-cli@4.33.1`
+  - fix: Adjust formatting so our pnpm lock doesn't get formatted by pret… [#708](https://github.com/Quenty/NevermoreEngine/pull/708) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat May 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/actionmanager@13.33.1`, `@quenty/adorneedata@7.34.1`, `@quenty/animationgroup@10.13.1`, `@quenty/attributeutils@14.30.1`, `@quenty/basicpane@13.31.1`, `@quenty/bindtocloseservice@8.32.1`, `@quenty/blend@12.36.1`, `@quenty/brio@14.30.1`, `@quenty/buttondragmodel@1.30.1`, `@quenty/buttonhighlightmodel@14.36.1`, `@quenty/camera@14.40.1`, `@quenty/camerastoryutils@10.21.1`, `@quenty/cframeserializer@4.10.1`, `@quenty/characterparticleplayer@2.3.4`, `@quenty/characterutils@12.32.1`, `@quenty/clienttranslator@14.37.1`, `@quenty/clipcharacters@12.40.1`, `@quenty/convexhull@4.15.1`, `@quenty/coreguienabler@12.33.1`, `@quenty/datastore@13.39.1`, `@quenty/defaultvalueutils@1.4.1`, `@quenty/depthoffield@11.38.1`, `@quenty/draw@7.14.1`, `@quenty/enumutils@3.4.6`, `@quenty/fzy@5.15.1`, `@quenty/gameconfig@12.49.1`, `@quenty/gameproductservice@14.51.1`, `@quenty/generatewithmixin@11.11.1`, `@quenty/genericscreenguiprovider@13.39.1`, `@quenty/geometryutils@6.14.1`, `@quenty/humanoidanimatorutils@3.2.4`, `@quenty/humanoidspeed@12.49.1`, `@quenty/idleservice@13.50.1`, `@quenty/ik@15.51.1`, `@quenty/linearsystemssolver@2.3.4`, `@quenty/markdownrender@2.4.5`, `@quenty/metricutils@2.4.4`, `@quenty/networkropeutils@10.13.1`, `@quenty/particles@5.15.1`, `@quenty/physicsutils@8.28.3`, `@quenty/probability@2.3.4`, `@quenty/promise@10.18.1`, `@quenty/ragdoll@15.50.1`, `@quenty/randomutils@6.17.1`, `@quenty/remoting@12.32.1`, `@quenty/rx@13.28.3`, `@quenty/rxbinderutils@14.36.1`, `@quenty/servicebag@11.18.1`, `@quenty/signal@7.13.1`, `@quenty/snackbar@11.42.1`, `@quenty/soundgroup@1.41.1`, `@quenty/string@3.3.7`, `@quenty/tie@10.40.1`, `@quenty/trajectory@2.15.1`, `@quenty/transitionmodel@7.38.1`, `@quenty/transparencyservice@11.11.1`, `@quenty/tuple@1.8.1`, `@quenty/undostack@7.31.1`, `@quenty/userserviceutils@9.31.1`, `@quenty/viewport@11.41.1`
+  - docs: Fix an assortment of minor issues [#707](https://github.com/Quenty/NevermoreEngine/pull/707) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Fri May 29 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.32.1`
+  - fix: Prevent playback on invalid targets [#706](https://github.com/Quenty/NevermoreEngine/pull/706) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Fri May 29 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/grouputils@10.20.0`, `@quenty/saveslot@1.1.0`
+  - feat: Save slots [#692](https://github.com/Quenty/NevermoreEngine/pull/692) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Fri May 29 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.36.0`, `@quenty/brio@14.30.0`, `@quenty/characterutils@12.32.0`, `@quenty/clienttranslator@14.37.0`, `@quenty/ellipticcurvecryptography@1.12.0`, `@quenty/elo@7.37.0`, `@quenty/experiencecalculator@2.11.0`, `@quenty/fzy@5.15.0`, `@quenty/grouputils@10.19.0`, `@quenty/ik@15.51.0`, `@quenty/instanceutils@13.30.0`, `@quenty/lipsum@14.36.0`, `@quenty/motor6d@7.42.0`, `@quenty/r15utils@13.31.0`, `@quenty/ragdoll@15.50.0`, `@quenty/randomutils@6.17.0`, `@quenty/rogue-humanoid@10.49.0`, `@quenty/nevermore-cli@4.33.0`
+  - fix: Handle new animation constraints in ragdoll package + add more tests [#705](https://github.com/Quenty/NevermoreEngine/pull/705) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue May 26 2026)
 
 #### 🚀 Enhancement

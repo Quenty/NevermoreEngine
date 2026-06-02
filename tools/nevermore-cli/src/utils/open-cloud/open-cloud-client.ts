@@ -20,6 +20,10 @@ export interface LuauTask {
     | 'FAILED';
   script: string;
   timeout?: string;
+  /** Script return value (populated on COMPLETE). */
+  output?: { results?: Array<{ value?: string }> };
+  /** Error details (populated on FAILED). */
+  error?: { code?: string; message?: string };
 }
 
 export interface OpenCloudClientOptions {

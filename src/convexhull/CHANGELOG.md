@@ -3,263 +3,143 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.14.0...@quenty/convexhull@4.15.0) (2026-04-23)
+## [4.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.15.0...@quenty/convexhull@4.15.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/convexhull
 
+# [4.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.14.0...@quenty/convexhull@4.15.0) (2026-04-23)
 
-
-
+**Note:** Version bump only for package @quenty/convexhull
 
 # [4.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.13.0...@quenty/convexhull@4.14.0) (2026-02-20)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [4.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.12.0...@quenty/convexhull@4.13.0) (2026-02-19)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [4.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.11.0...@quenty/convexhull@4.12.0) (2026-02-17)
-
 
 ### Features
 
-* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
-
-
-
-
+- Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
 
 # [4.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.10.5...@quenty/convexhull@4.11.0) (2026-01-16)
 
-
 ### Features
 
-* Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
-
-
-
-
+- Add luau typing to a variety of classes ([0271856](https://github.com/Quenty/NevermoreEngine/commit/0271856de02cc28c1d1d512c43bd6adeeaa41587))
 
 ## [4.10.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.10.4...@quenty/convexhull@4.10.5) (2026-01-12)
 
-
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
-
-
-
-
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 ## [4.10.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.10.3...@quenty/convexhull@4.10.4) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 ## [4.10.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.10.2...@quenty/convexhull@4.10.3) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/convexhull
-
-
-
-
 
 ## [4.10.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.10.1...@quenty/convexhull@4.10.2) (2025-11-12)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 ## [4.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.10.0...@quenty/convexhull@4.10.1) (2025-10-07)
 
 **Note:** Version bump only for package @quenty/convexhull
-
-
-
-
 
 # [4.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.9.4...@quenty/convexhull@4.10.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 ## [4.9.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.9.3...@quenty/convexhull@4.9.4) (2025-04-10)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 ## [4.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.9.1...@quenty/convexhull@4.9.3) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [4.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.9.1...@quenty/convexhull@4.9.2) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 ## [4.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.9.0...@quenty/convexhull@4.9.1) (2025-03-21)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [4.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.8.0...@quenty/convexhull@4.9.0) (2025-02-18)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [4.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.7.1...@quenty/convexhull@4.8.0) (2024-12-03)
-
 
 ### Bug Fixes
 
-* Use modern Roblox APIs ([b4b9047](https://github.com/Quenty/NevermoreEngine/commit/b4b90471fbb678c6fb84664dbfc32cb9bfc56c2c))
-
-
-
-
+- Use modern Roblox APIs ([b4b9047](https://github.com/Quenty/NevermoreEngine/commit/b4b90471fbb678c6fb84664dbfc32cb9bfc56c2c))
 
 ## [4.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.7.0...@quenty/convexhull@4.7.1) (2024-11-04)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.6.0...@quenty/convexhull@4.7.0) (2024-10-06)
 
 **Note:** Version bump only for package @quenty/convexhull
-
-
-
-
 
 # [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.5.0...@quenty/convexhull@4.6.0) (2024-10-04)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.4.0...@quenty/convexhull@4.5.0) (2024-09-25)
 
 **Note:** Version bump only for package @quenty/convexhull
-
-
-
-
 
 # [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.3.0...@quenty/convexhull@4.4.0) (2024-09-12)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.2.0...@quenty/convexhull@4.3.0) (2024-05-09)
-
 
 ### Bug Fixes
 
-* Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
-
-
-
+- Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.1.0...@quenty/convexhull@4.2.0) (2024-04-27)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.0.0...@quenty/convexhull@4.1.0) (2024-03-09)
 
 **Note:** Version bump only for package @quenty/convexhull
-
-
-
-
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@3.0.0...@quenty/convexhull@4.0.0) (2024-02-14)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@2.0.0...@quenty/convexhull@3.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/convexhull
-
-
-
-
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@1.1.0...@quenty/convexhull@2.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/convexhull
 
-
-
-
-
 # 1.1.0 (2024-01-08)
-
 
 ### Bug Fixes
 
-* Add ConvexHull package ([2d1a582](https://github.com/Quenty/NevermoreEngine/commit/2d1a582403fcf7f8ee6eda9c5619de78181b6608))
-
-
-
-
+- Add ConvexHull package ([2d1a582](https://github.com/Quenty/NevermoreEngine/commit/2d1a582403fcf7f8ee6eda9c5619de78181b6608))
 
 # v1.1.0 (Mon Jan 08 2024)
 

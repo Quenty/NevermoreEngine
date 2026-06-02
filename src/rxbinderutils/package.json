@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rxbinderutils",
-  "version": "14.35.0",
+  "version": "14.36.1",
   "description": "Reactive extensions for binders",
   "keywords": [
     "Roblox",
@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/binder/"
+    "directory": "src/rxbinderutils/"
   },
   "funding": {
     "type": "patreon",

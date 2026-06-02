@@ -296,8 +296,8 @@ function AnimationSlotPlayer.Play(
 	end)
 
 	topMaid:GiveTask(self._animationTarget
-		:ObserveBrio(function(target)
-			return target ~= nil
+		:ObserveBrio(function(target: Instance?)
+			return (target ~= nil) and (target.Parent ~= nil)
 		end)
 		:Subscribe(function(brio)
 			if brio:IsDead() then

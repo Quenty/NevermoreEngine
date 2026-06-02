@@ -1,6 +1,6 @@
 {
   "name": "@quenty/motor6d",
-  "version": "7.41.0",
+  "version": "7.42.2",
   "description": "Centralized service to override motors on humanoids and other places",
   "keywords": [
     "Roblox",
@@ -37,6 +37,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/playerhumanoidbinder": "workspace:*",
+    "@quenty/r15utils": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",

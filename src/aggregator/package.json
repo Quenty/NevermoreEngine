@@ -1,6 +1,6 @@
 {
   "name": "@quenty/aggregator",
-  "version": "1.15.2",
+  "version": "1.15.3",
   "description": "Aggregates async promise requests",
   "keywords": [
     "Roblox",

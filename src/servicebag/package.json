@@ -1,6 +1,6 @@
 {
   "name": "@quenty/servicebag",
-  "version": "11.18.0",
+  "version": "11.18.1",
   "description": "Service providing mechanisms for Nevermore",
   "keywords": [
     "Roblox",
@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/services/"
+    "directory": "src/servicebag/"
   },
   "funding": {
     "type": "patreon",

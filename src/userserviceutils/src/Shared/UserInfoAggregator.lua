@@ -72,7 +72,7 @@ function UserInfoAggregator:PromiseDisplayName(userId: number): Promise.Promise<
 end
 
 --[=[
-	Promises the Username for the userId
+	Promises the username for the userId
 
 	@param userId number
 	@return Promise<string>
@@ -86,7 +86,7 @@ function UserInfoAggregator:PromiseUsername(userId: number): Promise.Promise<str
 end
 
 --[=[
-	Promises the user display name for the userId
+	Promises the verified badge state for the userId
 
 	@param userId number
 	@return Promise<boolean>
@@ -100,7 +100,7 @@ function UserInfoAggregator:PromiseHasVerifiedBadge(userId: number): Promise.Pro
 end
 
 --[=[
-	Observes the user display name for the userId
+	Observes the user info for the userId
 
 	@param userId number
 	@return Observable<UserInfo>
@@ -144,7 +144,7 @@ function UserInfoAggregator:ObserveUsername(userId: number): Observable.Observab
 end
 
 --[=[
-	Observes the user display name for the userId
+	Observes the user verified badge state for the userId
 
 	@param userId number
 	@return Observable<boolean>

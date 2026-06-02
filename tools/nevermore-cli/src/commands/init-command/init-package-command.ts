@@ -3,6 +3,7 @@
  */
 
 import { Argv, CommandModule } from 'yargs';
+import * as fs from 'fs';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
@@ -30,12 +31,12 @@ export class InitPackageCommand<T>
     let result = args
       .positional('package-name', {
         describe: 'Name of the new package folder.',
-        demandOption: true,
+        demandOption: false,
         type: 'string',
       })
       .positional('description', {
         describe: 'The description of the package.',
-        demandOption: true,
+        demandOption: false,
         type: 'string',
       })
       .positional('package-template', {
@@ -76,10 +77,39 @@ export class InitPackageCommand<T>
     );
   };
 
+  private static _readExistingPackageJson(): Record<string, any> | null {
+    const packageJsonPath = path.join(process.cwd(), 'package.json');
+    try {
+      const content = fs.readFileSync(packageJsonPath, 'utf-8');
+      return JSON.parse(content);
+    } catch {
+      return null;
+    }
+  }
+
+  private static _extractNameFromPackageJson(
+    pkg: Record<string, any>
+  ): string | null {
+    const name = pkg.name;
+    if (typeof name !== 'string' || name.length === 0) {
+      return null;
+    }
+    // Strip scope prefix (e.g. "@quenty/brio" -> "brio")
+    const slashIndex = name.indexOf('/');
+    return slashIndex >= 0 ? name.substring(slashIndex + 1) : name;
+  }
+
   private static async _ensurePackageName(
     args: InitPackageArgs
   ): Promise<string> {
     let { packageName } = args;
+
+    if (!packageName) {
+      const pkg = InitPackageCommand._readExistingPackageJson();
+      if (pkg) {
+        packageName = InitPackageCommand._extractNameFromPackageJson(pkg) ?? '';
+      }
+    }
 
     if (!packageName) {
       packageName = path.basename(process.cwd());
@@ -104,6 +134,17 @@ export class InitPackageCommand<T>
     args: InitPackageArgs
   ): Promise<string> {
     let { description } = args;
+
+    if (!description) {
+      const pkg = InitPackageCommand._readExistingPackageJson();
+      if (
+        pkg &&
+        typeof pkg.description === 'string' &&
+        pkg.description.length > 0
+      ) {
+        description = pkg.description;
+      }
+    }
 
     InitPackageCommand.validateDescription(description);
 

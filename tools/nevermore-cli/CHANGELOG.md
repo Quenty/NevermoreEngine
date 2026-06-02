@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.33.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.33.0...@quenty/nevermore-cli@4.33.1) (2026-06-02)
+
+### Bug Fixes
+
+- Adjust formatting so our pnpm lock doesn't get formatted by prettier ([220c019](https://github.com/Quenty/Nevermore/commit/220c0190b4644413f0a79383b0bc4f6bfe3786d3))
+
+# [4.33.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.32.0...@quenty/nevermore-cli@4.33.0) (2026-05-29)
+
+### Bug Fixes
+
+- Nevemore init produces standard file formats on windows ([de30160](https://github.com/Quenty/Nevermore/commit/de30160bb2e9d5630684df48ae4deb6a26a81b1c))
+- Package init doesn't require description + name if already defined in package.json ([db2066c](https://github.com/Quenty/Nevermore/commit/db2066cbe0a6204ba3c87d17dfbea078c935bc8a))
+- Report better errors via the batch-log-parser when our task script generally fails ([c6f622a](https://github.com/Quenty/Nevermore/commit/c6f622a3f10c24c9a9498ee4b51e9a8b841c8169))
+- Run all tests even if some test sources are missing ([ebb8987](https://github.com/Quenty/Nevermore/commit/ebb89873342eff52262197b7d52b0ababf761348))
+
+### Features
+
+- Nevermore library package template comes with jest configured by default ([30ce43c](https://github.com/Quenty/Nevermore/commit/30ce43ca6206e1d8165a365db64de6038cfd82cf))
+
 # [4.32.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.31.0...@quenty/nevermore-cli@4.32.0) (2026-05-26)
 
 ### Bug Fixes

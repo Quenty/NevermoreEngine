@@ -51,7 +51,7 @@ end
 	Binds to the member.
 
 	On the server this will create the remote function. On the client
-	this will connect to the remote event once it's created.
+	this will bind to the remote function once it's created.
 
 	@param callback function
 	@return MaidTask
@@ -117,7 +117,7 @@ function RemotingMember.InvokeServer(self: RemotingMember, ...): Promise.Promise
 end
 
 --[=[
-	Invokes the client from the server.
+	Invokes the server from the client.
 
 	@client
 	@param ... any

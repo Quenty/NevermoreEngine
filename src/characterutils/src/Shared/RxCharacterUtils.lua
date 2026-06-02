@@ -53,6 +53,10 @@ function RxCharacterUtils.observeCharacterBrio(player: Player): Observable.Obser
 	end)
 end
 
+function RxCharacterUtils._test_injectPlayerService(newPlayers: Players)
+	Players = newPlayers or game:GetService("Players")
+end
+
 --[=[
 	Observes whether the instance is part of the local player's character
 

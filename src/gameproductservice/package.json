@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameproductservice",
-  "version": "14.49.0",
+  "version": "14.51.1",
   "description": "Generalized monetization system for handling products and purchases correctly.",
   "keywords": [
     "Roblox",
@@ -13,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/maid/"
+    "directory": "src/gameproductservice/"
   },
   "funding": {
     "type": "patreon",

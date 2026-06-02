@@ -8,6 +8,9 @@
       },
       "elo": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

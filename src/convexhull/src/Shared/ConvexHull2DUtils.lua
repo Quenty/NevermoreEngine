@@ -38,7 +38,7 @@ function ConvexHull2DUtils.convexHull(points: { Vector2 }): { Vector2 }
 end
 
 --[=[
-	Retrns whether these 3 points are in a clockwise turn
+	Returns whether these 3 points are in a clockwise turn
 ]=]
 function ConvexHull2DUtils.isClockWiseTurn(p1: Vector2, p2: Vector2, p3: Vector2): boolean
 	return (p3.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (p3.X - p1.X)

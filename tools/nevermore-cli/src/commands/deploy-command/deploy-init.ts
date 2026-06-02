@@ -321,9 +321,9 @@ async function writeConfig(
       [state.targetName]: {
         universeId: state.universeId!,
         placeId: state.placeId!,
-        project: state.project!,
+        project: state.project!.replace(/\\/g, '/'),
         ...(state.scriptTemplate
-          ? { scriptTemplate: state.scriptTemplate }
+          ? { scriptTemplate: state.scriptTemplate.replace(/\\/g, '/') }
           : {}),
       },
     },
