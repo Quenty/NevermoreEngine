@@ -12,6 +12,29 @@ local Promise = require("Promise")
 
 local GroupUtils = {}
 
+type RoleTable = {
+	Id: number,
+	Name: string,
+	Rank: number,
+}
+type RoleTableList = { RoleTable }
+type GetRolesInGroupAsyncResult = {
+	IsMember: boolean,
+	Roles: RoleTableList,
+}
+
+local function _getHighestRoleTable(roleTableList: RoleTableList): RoleTable?
+	local highestRank = 0
+	local highestRankRoleTable: RoleTable? = nil
+	for _, roleTable in roleTableList do
+		if roleTable.Rank > highestRank then
+			highestRank = roleTable.Rank
+			highestRankRoleTable = roleTable
+		end
+	end
+	return highestRankRoleTable
+end
+
 --[=[
 	Retrieves the rank of the player in the group.
 
@@ -26,7 +49,14 @@ function GroupUtils.promiseRankInGroup(player: Player, groupId: number): Promise
 	return Promise.spawn(function(resolve, reject)
 		local rank = nil
 		local ok, err = pcall(function()
-			rank = player:GetRankInGroupAsync(groupId)
+			-- GetRankInGroupAsync is deprecated, changed from GetRankInGroupAsync to GetRolesInGroupAsync
+			local result = GroupService:GetRolesInGroupAsync(player.UserId, groupId) :: GetRolesInGroupAsyncResult
+			if result.IsMember then
+				local highestRoleTable = _getHighestRoleTable(result.Roles)
+				if highestRoleTable then
+					rank = highestRoleTable.Rank
+				end
+			end
 		end)
 
 		if not ok then
@@ -55,7 +85,14 @@ function GroupUtils.promiseRoleInGroup(player: Player, groupId: number): Promise
 	return Promise.spawn(function(resolve, reject)
 		local role = nil
 		local ok, err = pcall(function()
-			role = player:GetRoleInGroupAsync(groupId)
+			-- GetRoleInGroupAsync is deprecated, changed from GetRoleInGroupAsync to GetRolesInGroupAsync
+			local result = GroupService:GetRolesInGroupAsync(player.UserId, groupId) :: GetRolesInGroupAsyncResult
+			if result.IsMember then
+				local highestRoleTable = _getHighestRoleTable(result.Roles)
+				if highestRoleTable then
+					role = highestRoleTable.Name
+				end
+			end
 		end)
 
 		if not ok then
