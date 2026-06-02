@@ -1,3 +1,16 @@
+# (Tue Jun 02 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/motor6d@7.42.2`, `@quenty/nevermore-cli@4.33.1`
+  - fix: Adjust formatting so our pnpm lock doesn't get formatted by pret… [#708](https://github.com/Quenty/NevermoreEngine/pull/708) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat May 30 2026)
 
 #### 🐛 Bug Fix

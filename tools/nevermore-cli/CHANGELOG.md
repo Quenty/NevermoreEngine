@@ -1,3 +1,16 @@
+# v4.33.1 (Tue Jun 02 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Adjust formatting so our pnpm lock doesn't get formatted by pret… [#708](https://github.com/Quenty/NevermoreEngine/pull/708) ([@Quenty](https://github.com/Quenty))
+- fix: Adjust formatting so our pnpm lock doesn't get formatted by prettier ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
