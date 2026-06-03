@@ -1,20 +1,13 @@
-# v14.41.0 (Wed Jun 03 2026)
-
-#### 🚀 Enhancement
-
-- feat: ConstrainedLookCamera [#709](https://github.com/Quenty/NevermoreEngine/pull/709) ([@alex-y-z](https://github.com/alex-y-z))
-- feat: ConstrainedLookCamera ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.40.1...@quenty/camera@14.41.0) (2026-06-03)
+
+### Features
+
+- ConstrainedLookCamera ([8247ba8](https://github.com/Quenty/NevermoreEngine/commit/8247ba88b84c8f209bd1f72b7a384b907f735338))
 
 ## [14.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.40.0...@quenty/camera@14.40.1) (2026-05-30)
 
