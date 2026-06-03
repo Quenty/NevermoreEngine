@@ -1,5 +1,18 @@
 # (Wed Jun 03 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/camera@14.41.0`
+  - feat: ConstrainedLookCamera [#709](https://github.com/Quenty/NevermoreEngine/pull/709) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Wed Jun 03 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/cmdrservice@13.45.2`, `@quenty/grouputils@10.20.2`

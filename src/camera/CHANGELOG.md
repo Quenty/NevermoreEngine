@@ -1,3 +1,16 @@
+# v14.41.0 (Wed Jun 03 2026)
+
+#### 🚀 Enhancement
+
+- feat: ConstrainedLookCamera [#709](https://github.com/Quenty/NevermoreEngine/pull/709) ([@alex-y-z](https://github.com/alex-y-z))
+- feat: ConstrainedLookCamera ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
