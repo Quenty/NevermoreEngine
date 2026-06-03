@@ -1,22 +1,11 @@
-# v10.20.2 (Wed Jun 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: multi player studio test has cmdr permissions [#704](https://github.com/Quenty/NevermoreEngine/pull/704) ([@euvinkeel](https://github.com/euvinkeel))
-- added fallback that wont trigger luau lint errors ([@euvinkeel](https://github.com/euvinkeel))
-- Merge remote-tracking branch 'origin/main' into users/euvinkeel/cmdrstudio2 ([@euvinkeel](https://github.com/euvinkeel))
-- replace deprecated methods ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.20.1...@quenty/grouputils@10.20.2) (2026-06-03)
+
+**Note:** Version bump only for package @quenty/grouputils
 
 ## [10.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.20.0...@quenty/grouputils@10.20.1) (2026-05-30)
 

@@ -1,19 +1,11 @@
-# v14.38.2 (Wed Jun 03 2026)
-
-#### 🐛 Bug Fix
-
-- Merge remote-tracking branch 'origin/main' into users/euvinkeel/cmdrstudio2 ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.38.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.38.1...@quenty/permissionprovider@14.38.2) (2026-06-03)
+
+**Note:** Version bump only for package @quenty/permissionprovider
 
 ## [14.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.38.0...@quenty/permissionprovider@14.38.1) (2026-05-30)
 

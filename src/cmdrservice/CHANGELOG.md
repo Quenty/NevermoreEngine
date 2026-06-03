@@ -1,21 +1,13 @@
-# v13.45.2 (Wed Jun 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix: multi player studio test has cmdr permissions [#704](https://github.com/Quenty/NevermoreEngine/pull/704) ([@euvinkeel](https://github.com/euvinkeel))
-- Merge remote-tracking branch 'origin/main' into users/euvinkeel/cmdrstudio2 ([@euvinkeel](https://github.com/euvinkeel))
-- fix: multi player studio test has cmdr permissions ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.45.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.45.1...@quenty/cmdrservice@13.45.2) (2026-06-03)
+
+### Bug Fixes
+
+- multi player studio test has cmdr permissions ([ea41608](https://github.com/Quenty/NevermoreEngine/commit/ea41608eaab1479fd4141b7e2a92444194ba55e3))
 
 ## [13.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.45.0...@quenty/cmdrservice@13.45.1) (2026-05-30)
 
