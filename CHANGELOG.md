@@ -1,3 +1,16 @@
+# (Wed Jun 03 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cmdrservice@13.45.2`, `@quenty/grouputils@10.20.2`
+  - fix: multi player studio test has cmdr permissions [#704](https://github.com/Quenty/NevermoreEngine/pull/704) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Tue Jun 02 2026)
 
 #### 🐛 Bug Fix

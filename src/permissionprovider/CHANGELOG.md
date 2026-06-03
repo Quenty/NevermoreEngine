@@ -1,3 +1,15 @@
+# v14.38.2 (Wed Jun 03 2026)
+
+#### 🐛 Bug Fix
+
+- Merge remote-tracking branch 'origin/main' into users/euvinkeel/cmdrstudio2 ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
