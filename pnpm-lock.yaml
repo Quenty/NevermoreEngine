@@ -1952,6 +1952,12 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
 
+  src/fontutils:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+
   src/friendutils:
     dependencies:
       '@quenty/brio':
