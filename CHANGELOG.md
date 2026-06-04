@@ -1,3 +1,16 @@
+# (Thu Jun 04 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/fontutils@1.1.0`
+  - feat: FontUtils [#710](https://github.com/Quenty/NevermoreEngine/pull/710) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Wed Jun 03 2026)
 
 #### 🚀 Enhancement
