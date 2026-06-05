@@ -1,3 +1,16 @@
+# (Fri Jun 05 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/camera@14.41.1`
+  - fix: Pass constrained camera input [#711](https://github.com/Quenty/NevermoreEngine/pull/711) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Thu Jun 04 2026)
 
 #### 🚀 Enhancement
