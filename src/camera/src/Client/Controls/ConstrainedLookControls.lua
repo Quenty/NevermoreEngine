@@ -101,10 +101,12 @@ function ConstrainedLookControls.Enable(self: ConstrainedLookControls)
 		if userInputState == Enum.UserInputState.Begin then
 			self:_beginDrag(inputObject)
 		end
+		return Enum.ContextActionResult.Pass
 	end, false, unpack(self._dragBeginTypes))
 
 	ContextActionService:BindAction(self._key .. "Rotate", function(_, _, inputObject)
 		self._gamepadRotateModel:HandleThumbstickInput(inputObject)
+		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.Thumbstick2)
 
 	maid:GiveTask(function()
