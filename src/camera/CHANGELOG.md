@@ -1,20 +1,13 @@
-# v14.41.1 (Fri Jun 05 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Pass constrained camera input [#711](https://github.com/Quenty/NevermoreEngine/pull/711) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Pass input ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.41.0...@quenty/camera@14.41.1) (2026-06-05)
+
+### Bug Fixes
+
+- Pass input ([faf1d56](https://github.com/Quenty/NevermoreEngine/commit/faf1d567726e8d640d8fd0060342fc200840a640))
 
 # [14.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.40.1...@quenty/camera@14.41.0) (2026-06-03)
 
