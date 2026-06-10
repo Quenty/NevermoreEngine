@@ -1,3 +1,16 @@
+# (Wed Jun 10 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/saveslot@1.2.0`
+  - feat: Optionally keep slot active between teleports [#712](https://github.com/Quenty/NevermoreEngine/pull/712) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Fri Jun 05 2026)
 
 #### 🐛 Bug Fix
