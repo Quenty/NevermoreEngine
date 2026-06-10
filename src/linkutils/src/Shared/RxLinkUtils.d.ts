@@ -9,7 +9,7 @@ export namespace RxLinkUtils {
   function observeLinkValueBrio(
     linkName: string,
     parent: Instance
-  ): Observable<Instance | undefined>;
+  ): Observable<Brio<Instance>>;
   function observeValidityBrio(
     linkName: string,
     link: Instance
