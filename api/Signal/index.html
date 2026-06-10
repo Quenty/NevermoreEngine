@@ -56,8 +56,8 @@ Why this over a direct [BindableEvent]? Well, in this case, the signal
 prevents Roblox from trying to serialize and deserialize each table reference
 fired through the BindableEvent.
 :::"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Signal"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Signal" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Signal" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.51c798a7.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.d1ba2eda.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.e5a456da.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.2909e896.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.3c3b9f62.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -106,7 +106,11 @@ signal<span class="token punctuation">:</span><span class="token function">Fire<
     
   
 
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/Signal.lua#L169"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code></div><div>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isSignal"><code style="text-decoration:none">isSignal</code><a href="#isSignal" class="hash-link" aria-label="Direct link to isSignal" title="Direct link to isSignal" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/OldSignal.lua#L55"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->.</code><code class="green_DgR4">isSignal</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>Returns whether a class is a signal</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/OldSignal.lua#L63"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
+<p>Constructs a new signal.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/Signal.lua#L169"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Constructs a new signal.</p>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isSignal"><code style="text-decoration:none">isSignal</code><a href="#isSignal" class="hash-link" aria-label="Direct link to isSignal" title="Direct link to isSignal" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/Signal.lua#L181"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->.</code><code class="green_DgR4">isSignal</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns whether a class is a signal</p>
@@ -212,10 +216,6 @@ signal<span class="token punctuation">:</span><span class="token function">Fire<
 
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/Signal.lua#L312"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Alias for <a href="/NevermoreEngine/api/Signal#DisconnectAll">Signal.DisconnectAll</a></p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isSignal"><code style="text-decoration:none">isSignal</code><a href="#isSignal" class="hash-link" aria-label="Direct link to isSignal" title="Direct link to isSignal" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/OldSignal.lua#L55"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->.</code><code class="green_DgR4">isSignal</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
-<p>Returns whether a class is a signal</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/OldSignal.lua#L63"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
-<p>Constructs a new signal.</p>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Fire"><code style="text-decoration:none">Fire</code><a href="#Fire" class="hash-link" aria-label="Direct link to Fire" title="Direct link to Fire" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/signal/src/Shared/OldSignal.lua#L91"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Signal<!-- -->:</code><code class="green_DgR4">Fire</code><code>(</code><div class="inset_uKQm"><div><code>...<!-- -->: </code><code class="blue_P4bS">T</code><span class="inlineDescription_G7Er">-- <span>
 <p>Variable arguments to pass to handler</p>
 </span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
@@ -237,6 +237,133 @@ signal<span class="token punctuation">:</span><span class="token function">Fire<
 </p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
+        {
+            &quot;name&quot;: &quot;isSignal&quot;,
+            &quot;desc&quot;: &quot;Returns whether a class is a signal&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;value&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;any&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 55,
+                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;new&quot;,
+            &quot;desc&quot;: &quot;Constructs a new signal.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Signal&lt;T&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 63,
+                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Fire&quot;,
+            &quot;desc&quot;: &quot;Fire the event with the given arguments. All handlers will be invoked. Handlers follow&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;...&quot;,
+                    &quot;desc&quot;: &quot;Variable arguments to pass to handler&quot;,
+                    &quot;lua_type&quot;: &quot;T&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 91,
+                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Connect&quot;,
+            &quot;desc&quot;: &quot;Connect a new handler to the event. Returns a connection object that can be disconnected.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;handler&quot;,
+                    &quot;desc&quot;: &quot;Function handler called when `:Fire(...)` is called&quot;,
+                    &quot;lua_type&quot;: &quot;(... T) -&gt; ()&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;RBXScriptConnection&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 112,
+                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Once&quot;,
+            &quot;desc&quot;: &quot;Connect a new, one-time handler to the event. Returns a connection object that can be disconnected.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;handler&quot;,
+                    &quot;desc&quot;: &quot;One-time function handler called when `:Fire(...)` is called&quot;,
+                    &quot;lua_type&quot;: &quot;(... T) -&gt; ()&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;RBXScriptConnection&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 135,
+                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Wait&quot;,
+            &quot;desc&quot;: &quot;Wait for fire to be called, and return the arguments it was given.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;T&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;yields&quot;: true,
+            &quot;source&quot;: {
+                &quot;line&quot;: 155,
+                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Destroy&quot;,
+            &quot;desc&quot;: &quot;Disconnects all connected events to the signal. Voids the signal as unusable.\nSets the metatable to nil.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 170,
+                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
+            }
+        },
         {
             &quot;name&quot;: &quot;new&quot;,
             &quot;desc&quot;: &quot;Constructs a new signal.&quot;,
@@ -422,133 +549,6 @@ signal<span class="token punctuation">:</span><span class="token function">Fire<
             &quot;source&quot;: {
                 &quot;line&quot;: 312,
                 &quot;path&quot;: &quot;src/signal/src/Shared/Signal.lua&quot;
-            }
-        },
-        {
-            &quot;name&quot;: &quot;isSignal&quot;,
-            &quot;desc&quot;: &quot;Returns whether a class is a signal&quot;,
-            &quot;params&quot;: [
-                {
-                    &quot;name&quot;: &quot;value&quot;,
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;any&quot;
-                }
-            ],
-            &quot;returns&quot;: [
-                {
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;boolean&quot;
-                }
-            ],
-            &quot;function_type&quot;: &quot;static&quot;,
-            &quot;source&quot;: {
-                &quot;line&quot;: 55,
-                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
-            }
-        },
-        {
-            &quot;name&quot;: &quot;new&quot;,
-            &quot;desc&quot;: &quot;Constructs a new signal.&quot;,
-            &quot;params&quot;: [],
-            &quot;returns&quot;: [
-                {
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;Signal&lt;T&gt;&quot;
-                }
-            ],
-            &quot;function_type&quot;: &quot;static&quot;,
-            &quot;source&quot;: {
-                &quot;line&quot;: 63,
-                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
-            }
-        },
-        {
-            &quot;name&quot;: &quot;Fire&quot;,
-            &quot;desc&quot;: &quot;Fire the event with the given arguments. All handlers will be invoked. Handlers follow&quot;,
-            &quot;params&quot;: [
-                {
-                    &quot;name&quot;: &quot;...&quot;,
-                    &quot;desc&quot;: &quot;Variable arguments to pass to handler&quot;,
-                    &quot;lua_type&quot;: &quot;T&quot;
-                }
-            ],
-            &quot;returns&quot;: [],
-            &quot;function_type&quot;: &quot;method&quot;,
-            &quot;source&quot;: {
-                &quot;line&quot;: 91,
-                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
-            }
-        },
-        {
-            &quot;name&quot;: &quot;Connect&quot;,
-            &quot;desc&quot;: &quot;Connect a new handler to the event. Returns a connection object that can be disconnected.&quot;,
-            &quot;params&quot;: [
-                {
-                    &quot;name&quot;: &quot;handler&quot;,
-                    &quot;desc&quot;: &quot;Function handler called when `:Fire(...)` is called&quot;,
-                    &quot;lua_type&quot;: &quot;(... T) -&gt; ()&quot;
-                }
-            ],
-            &quot;returns&quot;: [
-                {
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;RBXScriptConnection&quot;
-                }
-            ],
-            &quot;function_type&quot;: &quot;method&quot;,
-            &quot;source&quot;: {
-                &quot;line&quot;: 112,
-                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
-            }
-        },
-        {
-            &quot;name&quot;: &quot;Once&quot;,
-            &quot;desc&quot;: &quot;Connect a new, one-time handler to the event. Returns a connection object that can be disconnected.&quot;,
-            &quot;params&quot;: [
-                {
-                    &quot;name&quot;: &quot;handler&quot;,
-                    &quot;desc&quot;: &quot;One-time function handler called when `:Fire(...)` is called&quot;,
-                    &quot;lua_type&quot;: &quot;(... T) -&gt; ()&quot;
-                }
-            ],
-            &quot;returns&quot;: [
-                {
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;RBXScriptConnection&quot;
-                }
-            ],
-            &quot;function_type&quot;: &quot;method&quot;,
-            &quot;source&quot;: {
-                &quot;line&quot;: 135,
-                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
-            }
-        },
-        {
-            &quot;name&quot;: &quot;Wait&quot;,
-            &quot;desc&quot;: &quot;Wait for fire to be called, and return the arguments it was given.&quot;,
-            &quot;params&quot;: [],
-            &quot;returns&quot;: [
-                {
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;T&quot;
-                }
-            ],
-            &quot;function_type&quot;: &quot;method&quot;,
-            &quot;yields&quot;: true,
-            &quot;source&quot;: {
-                &quot;line&quot;: 155,
-                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
-            }
-        },
-        {
-            &quot;name&quot;: &quot;Destroy&quot;,
-            &quot;desc&quot;: &quot;Disconnects all connected events to the signal. Voids the signal as unusable.\nSets the metatable to nil.&quot;,
-            &quot;params&quot;: [],
-            &quot;returns&quot;: [],
-            &quot;function_type&quot;: &quot;method&quot;,
-            &quot;source&quot;: {
-                &quot;line&quot;: 170,
-                &quot;path&quot;: &quot;src/signal/src/Shared/OldSignal.lua&quot;
             }
         }
     ],
