@@ -74,35 +74,56 @@ function SaveSlotService.Start(self: SaveSlotService)
 			hasSaveSlots:SetSummaryProvider(self._defaultSummaryProvider)
 		end
 
+		-- Select incoming slot from teleport or proceed with default flow
 		maid:GivePromise(hasSaveSlots:PromiseSlotsLoaded()):Then(function()
-			if self._selectionRequired then
-				return -- Consumer handles selection
+			local joinData = hasSaveSlots._obj:GetJoinData()
+			local teleportData = joinData and joinData.TeleportData
+			local incomingSlotId = teleportData and teleportData[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]
+
+			if type(incomingSlotId) ~= "string" then
+				return self:_promiseSelectDefaultSlot(hasSaveSlots)
 			end
 
-			-- Select last active slot
-			return hasSaveSlots:PromiseLastActiveSlotId():Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
-				return hasSaveSlots:PromiseHasSlot(lastActiveSlotId):Then(function(hasLastSlot: boolean)
-					if hasLastSlot then
-						return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
-					end
-
-					-- Or create and select default slot
-					return hasSaveSlots
-						:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX)
-						:Then(function(defaultSlotId: SaveSlotData.SlotId?)
-							if defaultSlotId then
-								return defaultSlotId
-							else
-								return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
-							end
-						end)
-						:Then(function(slotId: SaveSlotData.SlotId)
-							return hasSaveSlots:PromiseSelectSlot(slotId)
-						end)
-				end)
+			return hasSaveSlots:PromiseHasSlot(incomingSlotId):Then(function(hasSlot: boolean)
+				if hasSlot then
+					return hasSaveSlots:PromiseSelectSlot(incomingSlotId)
+				end
+				return self:_promiseSelectDefaultSlot(hasSaveSlots)
 			end)
 		end)
 	end))
+end
+
+--[=[
+	Selects the player's last active slot, or creates and selects the default slot.
+	Does nothing when explicit selection is required.
+]=]
+function SaveSlotService._promiseSelectDefaultSlot(self: SaveSlotService, hasSaveSlots: any): Promise.Promise<any>?
+	if self._selectionRequired then
+		return nil -- Consumer handles selection
+	end
+
+	return hasSaveSlots:PromiseLastActiveSlotId():Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
+		return hasSaveSlots:PromiseHasSlot(lastActiveSlotId):Then(function(hasLastSlot: boolean)
+			if hasLastSlot then
+				return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
+			end
+
+			-- Or create and select default slot
+			return hasSaveSlots
+				:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX)
+				:Then(function(defaultSlotId: SaveSlotData.SlotId?)
+					if defaultSlotId then
+						return defaultSlotId
+					else
+						return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
+					end
+				end)
+				:Then(function(slotId: SaveSlotData.SlotId)
+					return hasSaveSlots:PromiseSelectSlot(slotId)
+				end)
+		end)
+	end)
 end
 
 --[=[

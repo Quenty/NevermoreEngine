@@ -12,5 +12,6 @@ return Table.readonly({
 	SLOT_STORE_KEY = "slots",
 	METADATA_STORE_KEY = "slotMetadata",
 	METADATA_CONTAINER_NAME = "SaveSlots",
+	TELEPORT_DATA_SLOT_KEY = "IncomingSaveSlotId",
 	DEFAULT_SLOT_INDEX = 1,
 })
