@@ -104,7 +104,6 @@ end
 ]=]
 function HasSaveSlots.PromiseActiveSlotStore(self: HasSaveSlots): Promise.Promise<DataStoreStage.DataStoreStage?>
 	return (self._loadPromise :: any):Then(function()
-		print(self.ActiveSlotId.Value)
 		if not self.ActiveSlotId.Value then
 			return (Promise :: any).resolved(nil)
 		end
