@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.33.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.33.0...@quenty/nevermore-cli@4.33.1) (2026-06-02)
+
+### Bug Fixes
+
+- Adjust formatting so our pnpm lock doesn't get formatted by prettier ([220c019](https://github.com/Quenty/Nevermore/commit/220c0190b4644413f0a79383b0bc4f6bfe3786d3))
+
 # [4.33.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.32.0...@quenty/nevermore-cli@4.33.0) (2026-05-29)
 
 ### Bug Fixes

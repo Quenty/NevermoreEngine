@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.42.1...@quenty/motor6d@7.42.2) (2026-06-02)
+
+### Bug Fixes
+
+- Adjust formatting so our pnpm lock doesn't get formatted by prettier ([220c019](https://github.com/Quenty/NevermoreEngine/commit/220c0190b4644413f0a79383b0bc4f6bfe3786d3))
+
+## [7.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.42.0...@quenty/motor6d@7.42.1) (2026-05-30)
+
+**Note:** Version bump only for package @quenty/motor6d
+
 # [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.41.0...@quenty/motor6d@7.42.0) (2026-05-29)
 
 ### Bug Fixes

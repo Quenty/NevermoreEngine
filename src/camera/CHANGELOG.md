@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.41.0...@quenty/camera@14.41.1) (2026-06-05)
+
+### Bug Fixes
+
+- Pass input ([faf1d56](https://github.com/Quenty/NevermoreEngine/commit/faf1d567726e8d640d8fd0060342fc200840a640))
+
+# [14.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.40.1...@quenty/camera@14.41.0) (2026-06-03)
+
+### Features
+
+- ConstrainedLookCamera ([8247ba8](https://github.com/Quenty/NevermoreEngine/commit/8247ba88b84c8f209bd1f72b7a384b907f735338))
+
+## [14.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.40.0...@quenty/camera@14.40.1) (2026-05-30)
+
+**Note:** Version bump only for package @quenty/camera
+
 # [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.39.0...@quenty/camera@14.40.0) (2026-05-29)
 
 **Note:** Version bump only for package @quenty/camera

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.20.1...@quenty/grouputils@10.20.2) (2026-06-03)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+## [10.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.20.0...@quenty/grouputils@10.20.1) (2026-05-30)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.19.0...@quenty/grouputils@10.20.0) (2026-05-29)
+
+**Note:** Version bump only for package @quenty/grouputils
+
 # [10.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.18.0...@quenty/grouputils@10.19.0) (2026-05-29)
 
 ### Bug Fixes

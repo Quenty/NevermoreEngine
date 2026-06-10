@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.51.0...@quenty/ragdoll@15.51.1) (2026-06-05)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.50.2...@quenty/ragdoll@15.51.0) (2026-06-03)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.50.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.50.1...@quenty/ragdoll@15.50.2) (2026-06-02)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.50.0...@quenty/ragdoll@15.50.1) (2026-05-30)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
 # [15.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.49.0...@quenty/ragdoll@15.50.0) (2026-05-29)
 
 ### Bug Fixes
