@@ -1,3 +1,16 @@
+# (Mon Jun 15 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/settings@11.53.3`
+  - fix: Async guard for settings [#713](https://github.com/Quenty/NevermoreEngine/pull/713) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Wed Jun 10 2026)
 
 #### 🚀 Enhancement
