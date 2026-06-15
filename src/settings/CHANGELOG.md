@@ -1,20 +1,13 @@
-# v11.53.3 (Mon Jun 15 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Async guard for settings [#713](https://github.com/Quenty/NevermoreEngine/pull/713) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Async guard ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.53.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.53.2...@quenty/settings@11.53.3) (2026-06-15)
+
+### Bug Fixes
+
+- Async guard ([7b793d9](https://github.com/Quenty/NevermoreEngine/commit/7b793d91973d137b18c0eac95b99ca27796b7a89))
 
 ## [11.53.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.53.1...@quenty/settings@11.53.2) (2026-06-03)
 
