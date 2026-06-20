@@ -1,3 +1,16 @@
+# (Sat Jun 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@1.2.1`
+  - fix: Flush save slot deletions [#714](https://github.com/Quenty/NevermoreEngine/pull/714) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Mon Jun 15 2026)
 
 #### 🐛 Bug Fix
