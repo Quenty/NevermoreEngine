@@ -1,20 +1,13 @@
-# v1.2.1 (Sat Jun 20 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Flush save slot deletions [#714](https://github.com/Quenty/NevermoreEngine/pull/714) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Flush deletions ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.2.0...@quenty/saveslot@1.2.1) (2026-06-20)
+
+### Bug Fixes
+
+- Flush deletions ([ad6c821](https://github.com/Quenty/NevermoreEngine/commit/ad6c821ac21b12db120c01e02d4f2a95d3c10616))
 
 # [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.1.2...@quenty/saveslot@1.2.0) (2026-06-10)
 
