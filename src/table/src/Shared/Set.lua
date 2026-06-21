@@ -81,6 +81,39 @@ function Set.count<T>(set: Set<T>): number
 end
 
 --[=[
+	Adds `key` to `set` (mutating).
+
+	@param set Set<T>
+	@param key T
+]=]
+function Set.add<T>(set: Set<T>, key: T)
+	set[key] = true
+end
+
+--[=[
+	Removes `key` from `set` (mutating).
+
+	@param set Set<T>
+	@param key T
+]=]
+function Set.remove<T>(set: Set<T>, key: T)
+	set[key] = nil
+end
+
+--[=[
+	Returns whether `key` is present in `set`.
+
+	@param set Set<T>
+	@param key T
+	@return boolean
+]=]
+function Set.contains<T>(set: Set<T>, key: T): boolean
+	return set[key] ~= nil
+end
+
+Set.has = Set.contains
+
+--[=[
 	Makes a new set from the given keys of a table
 	@param tab table
 	@return table
