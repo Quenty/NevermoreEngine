@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RogueSetter
 ]=]
@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
+local Observable = require("Observable")
 local RogueModifierBase = require("RogueModifierBase")
 local RogueModifierInterface = require("RogueModifierInterface")
 local Rx = require("Rx")
@@ -16,36 +17,43 @@ local RogueSetter = setmetatable({}, RogueModifierBase)
 RogueSetter.ClassName = "RogueSetter"
 RogueSetter.__index = RogueSetter
 
-function RogueSetter.new(valueObject, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(RogueModifierBase.new(valueObject, serviceBag), RogueSetter)
+export type RogueSetter =
+	typeof(setmetatable({} :: {}, {} :: typeof({ __index = RogueSetter })))
+	& RogueModifierBase.RogueModifierBase
 
-	self._maid:GiveTask(RogueModifierInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm()))
+function RogueSetter.new(valueObject: ValueBase, serviceBag: ServiceBag.ServiceBag): RogueSetter
+	local self: RogueSetter = setmetatable(RogueModifierBase.new(valueObject, serviceBag) :: any, RogueSetter)
+
+	self._maid:GiveTask(RogueModifierInterface:Implement(self._obj :: any, self, self._tieRealmService:GetTieRealm()))
 
 	return self
 end
 
-function RogueSetter:GetModifiedVersion(value)
+function RogueSetter.GetModifiedVersion(self: RogueSetter, value: any): any
 	if self._data.Enabled.Value then
-		return self._obj.Value
+		return (self._obj :: any).Value
 	else
 		return value
 	end
 end
 
-function RogueSetter:ObserveModifiedVersion(inputValue)
-	return self._data.Enabled:Observe():Pipe({
-		Rx.switchMap(function(enabled)
+function RogueSetter.ObserveModifiedVersion(
+	self: RogueSetter,
+	inputValue: Observable.Observable<any>
+): Observable.Observable<any>
+	return (self._data.Enabled:Observe() :: any):Pipe({
+		Rx.switchMap(function(enabled: any)
 			if enabled then
-				return RxValueBaseUtils.observeValue(self._obj)
+				return RxValueBaseUtils.observeValue(self._obj :: any)
 			else
 				return inputValue
 			end
 		end),
 		Rx.distinct(),
-	})
+	} :: { any }) :: any
 end
 
-function RogueSetter:GetInvertedVersion(value, initialValue)
+function RogueSetter.GetInvertedVersion(self: RogueSetter, value: any, initialValue: any): any
 	if not self._data.Enabled.Value then
 		return value
 	end
@@ -53,4 +61,4 @@ function RogueSetter:GetInvertedVersion(value, initialValue)
 	return initialValue
 end
 
-return Binder.new("RogueSetter", RogueSetter)
+return Binder.new("RogueSetter", RogueSetter :: any) :: Binder.Binder<RogueSetter>
