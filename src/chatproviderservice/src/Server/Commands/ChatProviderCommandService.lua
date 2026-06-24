@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class ChatProviderCommandService
 ]=]
@@ -7,8 +7,11 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local Binder = require("Binder")
+local ChatTag = require("ChatTag")
 local ChatTagCmdrUtils = require("ChatTagCmdrUtils")
 local ChatTagDataUtils = require("ChatTagDataUtils")
+local HasChatTags = require("HasChatTags")
 local Maid = require("Maid")
 local PlayerUtils = require("PlayerUtils")
 local ServiceBag = require("ServiceBag")
@@ -17,8 +20,22 @@ local Set = require("Set")
 local ChatProviderCommandService = {}
 ChatProviderCommandService.ServiceName = "ChatProviderCommandService"
 
-function ChatProviderCommandService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type ChatProviderCommandService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_cmdrService: any, -- CmdrService (GetService returns the module type, not the instance type)
+		_permissionService: any, -- PermissionService (GetService returns the module type, not the instance type)
+		_chatProviderService: any, -- require cycle with ChatProviderService
+		_chatTagBinder: Binder.Binder<ChatTag.ChatTag>,
+		_hasChatTagsBinder: Binder.Binder<HasChatTags.HasChatTags>,
+		_remoting: any, -- never assigned in this service (pre-existing)
+	},
+	{} :: typeof({ __index = ChatProviderCommandService })
+))
+
+function ChatProviderCommandService.Init(self: ChatProviderCommandService, serviceBag: ServiceBag.ServiceBag)
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -28,16 +45,16 @@ function ChatProviderCommandService:Init(serviceBag: ServiceBag.ServiceBag)
 
 	-- Internal
 	self._chatProviderService = self._serviceBag:GetService((require :: any)("ChatProviderService"))
-	self._chatTagBinder = self._serviceBag:GetService(require("ChatTag"))
-	self._hasChatTagsBinder = self._serviceBag:GetService(require("HasChatTags"))
+	self._chatTagBinder = self._serviceBag:GetService(ChatTag)
+	self._hasChatTagsBinder = self._serviceBag:GetService(HasChatTags)
 end
 
-function ChatProviderCommandService:Start()
+function ChatProviderCommandService.Start(self: ChatProviderCommandService)
 	self:_registerCommands()
 	self:_createActivateChatCommand()
 end
 
-function ChatProviderCommandService:_createActivateChatCommand()
+function ChatProviderCommandService._createActivateChatCommand(self: ChatProviderCommandService)
 	local command = Instance.new("TextChatCommand")
 	command.Name = "OpenCmdrCommand"
 	command.PrimaryAlias = "/cmdr"
@@ -59,8 +76,8 @@ function ChatProviderCommandService:_createActivateChatCommand()
 	self._chatProviderService:AddChatCommand(command)
 end
 
-function ChatProviderCommandService:GetChatTagKeyList()
-	local tagSet = {}
+function ChatProviderCommandService.GetChatTagKeyList(self: ChatProviderCommandService)
+	local tagSet: { [any]: boolean } = {}
 	for chatTag, _ in pairs(self._chatTagBinder:GetAllSet()) do
 		local tagKey = chatTag.ChatTagKey.Value
 		tagSet[tagKey] = true
@@ -69,7 +86,7 @@ function ChatProviderCommandService:GetChatTagKeyList()
 	return Set.toList(tagSet)
 end
 
-function ChatProviderCommandService:_registerCommands()
+function ChatProviderCommandService._registerCommands(self: ChatProviderCommandService)
 	self._cmdrService:PromiseCmdr():Then(function(cmdr)
 		ChatTagCmdrUtils.registerChatTagKeys(cmdr, self)
 	end)
@@ -95,17 +112,17 @@ function ChatProviderCommandService:_registerCommands()
 				Type = "color3",
 				Description = "Color for the tag to have",
 				Optional = true,
-				Default = Color3.fromRGB(255, 170, 0),
+				Default = Color3.fromRGB(255, 170, 0) :: any,
 			},
 			{
 				Name = "TagPriority",
 				Type = "number",
 				Description = "Priority for the tag to have",
 				Optional = true,
-				Default = 0,
+				Default = 0 :: any,
 			},
 		},
-	}, function(_context, player, tagText, tagColor, priority)
+	}, function(_context, player: Player, tagText, tagColor, priority)
 		self._chatProviderService:PromiseAddChatTag(
 			player,
 			ChatTagDataUtils.createChatTagData({
@@ -130,7 +147,7 @@ function ChatProviderCommandService:_registerCommands()
 				Description = "Player to add a tag for",
 			},
 		},
-	}, function(_context, player)
+	}, function(_context, player: Player)
 		self._chatProviderService:ClearChatTags(player)
 
 		return string.format("Cleared chat tags on a player %q", PlayerUtils.formatName(player))
@@ -159,7 +176,7 @@ function ChatProviderCommandService:_registerCommands()
 				Default = true,
 			},
 		},
-	}, function(_context, player, chatTagKey, chatTagDisabled)
+	}, function(_context, player: Player, chatTagKey, chatTagDisabled)
 		local hasChatTags = self._hasChatTagsBinder:Get(player)
 
 		if not hasChatTags then
@@ -182,7 +199,7 @@ function ChatProviderCommandService:_registerCommands()
 	end)
 end
 
-function ChatProviderCommandService:Destroy()
+function ChatProviderCommandService.Destroy(self: ChatProviderCommandService)
 	self._maid:DoCleaning()
 end
 
