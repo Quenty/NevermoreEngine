@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class ChatTag
 ]=]
@@ -13,8 +13,18 @@ local ChatTag = setmetatable({}, ChatTagBase)
 ChatTag.ClassName = "ChatTag"
 ChatTag.__index = ChatTag
 
-function ChatTag.new(folder: Folder, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(ChatTagBase.new(folder), ChatTag)
+export type ChatTag =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_playerDataStoreService: any, -- PlayerDataStoreService (GetService returns the module type, not the instance type)
+		},
+		{} :: typeof({ __index = ChatTag })
+	))
+	& ChatTagBase.ChatTagBase
+
+function ChatTag.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): ChatTag
+	local self: ChatTag = setmetatable(ChatTagBase.new(folder) :: any, ChatTag)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._playerDataStoreService = self._serviceBag:GetService(require("PlayerDataStoreService"))
@@ -24,18 +34,18 @@ function ChatTag.new(folder: Folder, serviceBag: ServiceBag.ServiceBag)
 	return self
 end
 
-function ChatTag:_getPlayer(): Player
-	return self._obj:FindFirstAncestorWhichIsA("Player")
+function ChatTag._getPlayer(self: ChatTag): Player?
+	return self._obj:FindFirstAncestorWhichIsA("Player") :: Player?
 end
 
-function ChatTag:_loadData()
+function ChatTag._loadData(self: ChatTag)
 	local player = self:_getPlayer()
 	if not player then
 		return
 	end
 
 	local tagKey = self.ChatTagKey.Value
-	if not tagKey then
+	if tagKey == "" then
 		return
 	end
 
@@ -53,4 +63,4 @@ function ChatTag:_loadData()
 		end)
 end
 
-return Binder.new("ChatTag", ChatTag)
+return Binder.new("ChatTag", ChatTag :: any) :: Binder.Binder<ChatTag>

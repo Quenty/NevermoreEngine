@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Wrapper around Roblox chat service on the server
 	@class ChatProviderService
@@ -9,8 +9,10 @@ local require = require(script.Parent.loader).load(script)
 local ServerScriptService = game:GetService("ServerScriptService")
 local TextChatService = game:GetService("TextChatService")
 
+local Binder = require("Binder")
 local Brio = require("Brio")
 local ChatTagDataUtils = require("ChatTagDataUtils")
+local HasChatTags = require("HasChatTags")
 local LocalizedTextUtils = require("LocalizedTextUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
@@ -25,7 +27,19 @@ local Signal = require("Signal")
 local ChatProviderService = {}
 ChatProviderService.ServiceName = "ChatProviderService"
 
-function ChatProviderService:Init(serviceBag: ServiceBag.ServiceBag)
+export type ChatProviderService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		MessageIncoming: Signal.Signal<any>,
+		_hasChatTagsBinder: Binder.Binder<HasChatTags.HasChatTags>,
+		_chatService: any, -- legacy ChatServiceRunner.ChatService (untyped)
+		_chatServicePromise: any, -- Promise.Promise<any>
+	},
+	{} :: typeof({ __index = ChatProviderService })
+))
+
+function ChatProviderService.Init(self: ChatProviderService, serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -43,25 +57,25 @@ function ChatProviderService:Init(serviceBag: ServiceBag.ServiceBag)
 
 	-- Binders
 	self._serviceBag:GetService(require("ChatTag"))
-	self._hasChatTagsBinder = self._serviceBag:GetService(require("HasChatTags"))
+	self._hasChatTagsBinder = self._serviceBag:GetService(HasChatTags)
 
 	-- note: normally we don't expose default API surfaces like this with defaults, however, because this only affects developers and this
 	-- tends to significantly improve feedback we're leaving this default configuration in place.
 	self:SetDeveloperTag(ChatTagDataUtils.createChatTagData({
 		TagText = "(dev)",
-		LocalizedText = LocalizedTextUtils.create("chatTags.dev"),
+		TagLocalizedText = LocalizedTextUtils.create("chatTags.dev"),
 		TagPriority = 15,
 		TagColor = Color3.fromRGB(245, 163, 27),
 	}))
 	self:SetAdminTag(ChatTagDataUtils.createChatTagData({
 		TagText = "(mod)",
-		LocalizedText = LocalizedTextUtils.create("chatTags.mod"),
+		TagLocalizedText = LocalizedTextUtils.create("chatTags.mod"),
 		TagPriority = 10,
 		TagColor = Color3.fromRGB(78, 205, 196),
 	}))
 end
 
-function ChatProviderService:AddChatCommand(textChatCommand: TextChatCommand)
+function ChatProviderService.AddChatCommand(_self: ChatProviderService, textChatCommand: TextChatCommand)
 	assert(typeof(textChatCommand) == "Instance", "Bad textChatCommand")
 
 	textChatCommand.Parent = PreferredParentUtils.getPreferredParent(TextChatService, "ChatProviderCommands")
@@ -73,11 +87,11 @@ end
 	@param chatTagData ChatTagData?
 	@return Maid
 ]=]
-function ChatProviderService:SetDeveloperTag(chatTagData: ChatTagDataUtils.ChatTagData)
+function ChatProviderService.SetDeveloperTag(self: ChatProviderService, chatTagData: ChatTagDataUtils.ChatTagData?)
 	assert(ChatTagDataUtils.isChatTagData(chatTagData) or chatTagData == nil, "Bad chatTagData")
 
 	if chatTagData then
-		local permissionService = self._serviceBag:GetService(require("PermissionService"))
+		local permissionService: any = self._serviceBag:GetService(require("PermissionService"))
 		local observeBrio = permissionService:ObservePermissionedPlayersBrio(PermissionLevel.CREATOR)
 
 		self._maid._developer = self:_addObservablePlayerTag(observeBrio, chatTagData)
@@ -92,24 +106,24 @@ end
 	@param chatTagData ChatTagData?
 	@return Maid
 ]=]
-function ChatProviderService:SetAdminTag(chatTagData: ChatTagDataUtils.ChatTagData?)
+function ChatProviderService.SetAdminTag(self: ChatProviderService, chatTagData: ChatTagDataUtils.ChatTagData?)
 	assert(ChatTagDataUtils.isChatTagData(chatTagData) or chatTagData == nil, "Bad chatTagData")
 
 	if chatTagData then
-		local permissionService = self._serviceBag:GetService(require("PermissionService"))
+		local permissionService: any = self._serviceBag:GetService(require("PermissionService"))
 		local observeBrio = permissionService:ObservePermissionedPlayersBrio(PermissionLevel.ADMIN):Pipe({
 			RxBrioUtils.flatMapBrio(function(player: Player)
 				return Rx.fromPromise(permissionService:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR))
 					:Pipe({
-						Rx.switchMap(function(isAlsoCreator)
+						Rx.switchMap(function(isAlsoCreator): any
 							if not isAlsoCreator then
 								return Rx.of(player)
 							else
 								return Rx.EMPTY
 							end
-						end),
+						end) :: any,
 					})
-			end),
+			end) :: any,
 		})
 
 		self._maid._admin = self:_addObservablePlayerTag(observeBrio, chatTagData)
@@ -118,10 +132,11 @@ function ChatProviderService:SetAdminTag(chatTagData: ChatTagDataUtils.ChatTagDa
 	end
 end
 
-function ChatProviderService:_addObservablePlayerTag(
+function ChatProviderService._addObservablePlayerTag(
+	self: ChatProviderService,
 	observePlayersBrio: Observable.Observable<Brio.Brio<Player>>,
 	chatTagData: ChatTagDataUtils.ChatTagData
-)
+): Maid.Maid
 	assert(ChatTagDataUtils.isChatTagData(chatTagData), "Bad chatTagData")
 
 	local topMaid = Maid.new()
@@ -153,14 +168,15 @@ end
 	@param chatTagData ChatTagData
 	@return Promise<Instance>
 ]=]
-function ChatProviderService:PromiseAddChatTag(
+function ChatProviderService.PromiseAddChatTag(
+	self: ChatProviderService,
 	player: Player,
 	chatTagData: ChatTagDataUtils.ChatTagData
 ): Promise.Promise<Instance>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(ChatTagDataUtils.isChatTagData(chatTagData), "Bad chatTagData")
 
-	local hasChatTagBinder = self._serviceBag:GetService(require("HasChatTags"))
+	local hasChatTagBinder = self._serviceBag:GetService(HasChatTags)
 
 	return hasChatTagBinder:Promise(player):Then(function(hasChatTag)
 		return hasChatTag:AddChatTag(chatTagData)
@@ -172,10 +188,10 @@ end
 
 	@param player Player
 ]=]
-function ChatProviderService:ClearChatTags(player: Player)
+function ChatProviderService.ClearChatTags(self: ChatProviderService, player: Player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	local hasChatTagBinder = self._serviceBag:GetService(require("HasChatTags"))
+	local hasChatTagBinder = self._serviceBag:GetService(HasChatTags)
 	local hasChatTags = hasChatTagBinder:Get(player)
 
 	if hasChatTags then
@@ -190,7 +206,8 @@ end
 	@param chatTagDataList { ChatTagData }
 	@return Promise
 ]=]
-function ChatProviderService:PromiseSetSpeakerTags(
+function ChatProviderService.PromiseSetSpeakerTags(
+	self: ChatProviderService,
 	speakerName: string,
 	chatTagDataList: { ChatTagDataUtils.ChatTagData }
 ): Promise.Promise<()>
@@ -208,7 +225,7 @@ function ChatProviderService:PromiseSetSpeakerTags(
 	end)
 end
 
-function ChatProviderService:_getChatServiceAsync()
+function ChatProviderService._getChatServiceAsync(self: ChatProviderService): any
 	if self._chatService then
 		return self._chatService
 	end
@@ -219,13 +236,13 @@ function ChatProviderService:_getChatServiceAsync()
 		return nil
 	end
 
-	local chatService = require(chatServiceRunner:WaitForChild("ChatService"))
+	local chatService = (require :: any)(chatServiceRunner:WaitForChild("ChatService"))
 	self._chatService = chatService or error("No chatService retrieved")
 
 	return self._chatService
 end
 
-function ChatProviderService:_promiseChatService(): Promise.Promise<any>
+function ChatProviderService._promiseChatService(self: ChatProviderService): Promise.Promise<any>
 	if self._chatService then
 		return Promise.resolved(self._chatService)
 	end
@@ -241,7 +258,7 @@ function ChatProviderService:_promiseChatService(): Promise.Promise<any>
 	return Promise.resolved(self._chatServicePromise)
 end
 
-function ChatProviderService:_promiseSpeaker(speakerName: string)
+function ChatProviderService._promiseSpeaker(self: ChatProviderService, speakerName: string): Promise.Promise<any>
 	assert(type(speakerName) == "string", "Bad speakerName")
 
 	return self:_promiseChatService():Then(function(chatService)
