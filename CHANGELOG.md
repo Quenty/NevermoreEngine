@@ -2,6 +2,20 @@
 
 #### 🚀 Enhancement
 
+- feat: Automate Luau strict typing with conversion skill and eval harness [#717](https://github.com/Quenty/NevermoreEngine/pull/717) ([@Quenty](https://github.com/Quenty))
+- `@quenty/deathreport@10.45.0`
+  - feat(deathreport): convert package to --!strict [#719](https://github.com/Quenty/NevermoreEngine/pull/719) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jun 24 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/chatproviderservice@9.53.0`
   - feat(chatproviderservice): convert package to --!strict typing [#718](https://github.com/Quenty/NevermoreEngine/pull/718) ([@Quenty](https://github.com/Quenty))
 

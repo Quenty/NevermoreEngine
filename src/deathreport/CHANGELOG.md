@@ -1,3 +1,15 @@
+# v10.45.0 (Wed Jun 24 2026)
+
+#### 🚀 Enhancement
+
+- feat(deathreport): convert package to --!strict [#719](https://github.com/Quenty/NevermoreEngine/pull/719) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
