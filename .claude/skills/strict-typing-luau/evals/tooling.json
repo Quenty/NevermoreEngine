@@ -1,0 +1,17 @@
+{
+  "_doc": "Action-scoping tests for the skill's Tooling guidance. Now that SKILL.md surfaces the package planner (run.sh plan) and the eval harness, a worker could over-apply it: a SINGLE-file or scoped-node task must convert directly and must NOT run the planner or any eval-harness command (gold/convert/place/score). Only a genuine WHOLE-PACKAGE task should reach for the planner. A judge reads the live SKILL.md and decides, per task, whether the right action is 'planner' or 'direct'; we score against expect. Run via lib/tooling.sh — one batched claude -p call.",
+  "skill_name": "strict-typing-luau",
+  "cases": [
+    { "expect": "direct",  "tag": "one-util",        "prompt": "Strictly type src/animationtrackutils/src/Shared/AnimationTrackUtils.lua" },
+    { "expect": "direct",  "tag": "type-this",        "prompt": "type this" },
+    { "expect": "direct",  "tag": "fix-errors",       "prompt": "this --!strict file is throwing luau-lsp type errors, fix the typing" },
+    { "expect": "direct",  "tag": "scoped-node",      "prompt": "Convert ONLY src/settings/src/Shared/Setting/SettingProperty.lua to --!strict; its dependencies are already strict." },
+    { "expect": "direct",  "tag": "one-class",        "prompt": "make src/actionmanager/src/Client/ActionManager.lua strict" },
+    { "expect": "direct",  "tag": "no-eval-harness",  "prompt": "Convert src/maid/src/Shared/Maid.lua to --!strict." },
+    { "expect": "direct",  "tag": "two-named-files",  "prompt": "Strictly type src/foo/src/Shared/A.lua and src/foo/src/Shared/B.lua" },
+
+    { "expect": "planner", "tag": "whole-package",    "prompt": "Convert the entire src/settings package to --!strict." },
+    { "expect": "planner", "tag": "package-order",    "prompt": "I need to strict-type all of src/rogue-properties — what order should I convert the files in?" },
+    { "expect": "planner", "tag": "whole-with-deps",  "prompt": "Make the whole gameconfig package strict, handling the inter-file dependencies properly." }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "_doc": "Eval cases mined from MAIN history only (stable long-term). Each case = a real conversion the maintainers shipped to main. `input` is the pre-conversion (nonstrict) blob the worker starts from; `gold` is always \"main\" — the file as it lives on main HEAD now, which by construction matches the main-built sourcemap (so single-file analyze can never go stale). The harness lays `input` at the file's real path, runs the worker to convert it, then scores mechanically: header is --!strict, single-file analyze is clean, and `any` count vs the gold. Negatives come from the revert commit: a naive flip that broke downstream and was reverted, so on main the correct end-state is nonstrict.",
+  "skill_name": "strict-typing-luau",
+  "cases": [
+    {
+      "id": "trivial-util",
+      "archetype": "plain data/constants module — header flip, no class block",
+      "path": "src/deathreport/src/Shared/DeathReportServiceConstants.lua",
+      "input": "7f6f73dc51",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "util-typed-fns",
+      "archetype": "util module — type the function signatures (pure typing conversion)",
+      "path": "src/deathreport/src/Shared/Stats/PlayerKillTrackerUtils.lua",
+      "input": "7f6f73dc51",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "class-pane",
+      "archetype": "inherited UI class — export type block + & Parent (Snackbar < TransitionModel)",
+      "path": "src/snackbar/src/Client/Gui/Snackbar.lua",
+      "input": "b1bc1512aa",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "class-stateful",
+      "archetype": "stateful class with methods — dot-syntax self + export type",
+      "path": "src/viewport/src/Client/Viewport.lua",
+      "input": "c3e5c8977f",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "t-quickpath",
+      "archetype": "module importing t — `local t: any = require(\"t\")` boundary",
+      "path": "src/soundplayer/src/Client/Loops/Layered/LayeredLoopedSoundPlayer.lua",
+      "input": "ed5f2db1f7",
+      "gold": "main",
+      "polarity": "positive"
+    },
+
+    {
+      "id": "settings-constants",
+      "archetype": "[settings pkg] trivial constants module",
+      "path": "src/settings/src/Shared/Player/PlayerSettingsConstants.lua",
+      "input": "b1bc1512aa",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "settings-utils",
+      "archetype": "[settings pkg] util module with typed signatures",
+      "path": "src/settings/src/Shared/Player/PlayerSettingsUtils.lua",
+      "input": "b1bc1512aa",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "settings-property",
+      "archetype": "[settings pkg] core class — export type block",
+      "path": "src/settings/src/Shared/Setting/SettingProperty.lua",
+      "input": "b1bc1512aa",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "settings-base",
+      "archetype": "[settings pkg] base class others inherit from",
+      "path": "src/settings/src/Shared/Player/PlayerSettingsBase.lua",
+      "input": "b1bc1512aa",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "settings-playersettings",
+      "archetype": "[settings pkg] headline class — inherits PlayerSettingsBase (& Parent)",
+      "path": "src/settings/src/Server/Player/PlayerSettings.lua",
+      "input": "b1bc1512aa",
+      "gold": "main",
+      "polarity": "positive"
+    },
+    {
+      "id": "settings-client",
+      "archetype": "[settings pkg] client-realm class",
+      "path": "src/settings/src/Client/Player/PlayerSettingsClient.lua",
+      "input": "b1bc1512aa",
+      "gold": "main",
+      "polarity": "positive"
+    },
+
+    {
+      "id": "neg-breaks-downstream",
+      "archetype": "naive flip broke downstream; maintainer reverted — correct end-state is nonstrict",
+      "path": "src/tie/test/modules/Server/OpenableInterface.lua",
+      "input": "0edcac1e5c",
+      "gold": "main",
+      "polarity": "negative",
+      "_note": "input is the naive --!strict flip (pre-revert); gold (main) is the reverted --!nonstrict. A worker that blindly flips this must be caught by the downstream lint:luau gate."
+    }
+  ]
+}
