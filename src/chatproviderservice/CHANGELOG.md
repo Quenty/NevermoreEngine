@@ -1,3 +1,15 @@
+# v9.53.0 (Wed Jun 24 2026)
+
+#### 🚀 Enhancement
+
+- feat(chatproviderservice): convert package to --!strict typing [#718](https://github.com/Quenty/NevermoreEngine/pull/718) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
