@@ -67,6 +67,21 @@ return Binder.new("MyTag", MyClass :: any) :: Binder.Binder<MyClass>
 The binder constructor receives `(instance, serviceBag)`; type the constructor accordingly:
 `function MyClass.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): MyClass`.
 
+**Tightening a binder-bound constructor's param ripples to the BinderProvider that registers
+it.** A `*BindersClient.lua` / `*BindersServer.lua` does `Binder.new("Tag", require("X"), bag)`;
+once `X.new` takes a concrete type (e.g. `IntValue`) instead of being nonstrict, that registration
+fails the `(Instance) -> any | ClassDefinition<any> | ...` union and needs the sanctioned `:: any`.
+But **do NOT write `require("X") :: any`** — luau-lsp's require resolver only fires on a *bare*
+`require(...)` call, so casting the call expression makes it emit a spurious
+`TypeError: Unknown require: .../X.lua`. Hoist the require to a module-level local and cast the
+**local** instead:
+
+```lua
+local TeamKillTracker = require("TeamKillTracker")
+-- ...
+self:Add(Binder.new("TeamKillTracker", TeamKillTracker :: any, serviceBag))
+```
+
 ## Generic class
 
 `T` must be load-bearing — appear in a field — or `MyClass<number>` and `MyClass<string>`
