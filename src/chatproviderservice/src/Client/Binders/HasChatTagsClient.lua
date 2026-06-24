@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class HasChatTagsClient
 ]=]
@@ -18,8 +18,19 @@ local HasChatTagsClient = setmetatable({}, HasChatTagsBase)
 HasChatTagsClient.ClassName = "HasChatTagsClient"
 HasChatTagsClient.__index = HasChatTagsClient
 
-function HasChatTagsClient.new(player: Player, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(HasChatTagsBase.new(player), HasChatTagsClient)
+export type HasChatTagsClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_chatTagBinder: Binder.Binder<ChatTagClient.ChatTagClient>,
+			_translator: typeof(ChatProviderTranslator),
+		},
+		{} :: typeof({ __index = HasChatTagsClient })
+	))
+	& HasChatTagsBase.HasChatTagsBase
+
+function HasChatTagsClient.new(player: Player, serviceBag: ServiceBag.ServiceBag): HasChatTagsClient
+	local self: HasChatTagsClient = setmetatable(HasChatTagsBase.new(player) :: any, HasChatTagsClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._chatTagBinder = self._serviceBag:GetService(ChatTagClient)
@@ -28,11 +39,11 @@ function HasChatTagsClient.new(player: Player, serviceBag: ServiceBag.ServiceBag
 	return self
 end
 
-function HasChatTagsClient:GetChatTagBinder()
+function HasChatTagsClient.GetChatTagBinder(self: HasChatTagsClient): Binder.Binder<ChatTagClient.ChatTagClient>
 	return self._chatTagBinder
 end
 
-function HasChatTagsClient:GetAsRichText(): string?
+function HasChatTagsClient.GetAsRichText(self: HasChatTagsClient): string?
 	local lastChatTags = self._lastChatTags.Value
 	if not (lastChatTags and #lastChatTags > 0) then
 		return nil
@@ -42,7 +53,7 @@ function HasChatTagsClient:GetAsRichText(): string?
 	for index, tagData in lastChatTags do
 		output = output .. string.format("<font color='%s'>", Color3Utils.toWebHexString(tagData.TagColor))
 
-		local translatedText
+		local translatedText: string
 		if tagData.TagLocalizedText then
 			translatedText = LocalizedTextUtils.localizedTextToString(self._translator, tagData.TagLocalizedText)
 		else
@@ -63,4 +74,4 @@ function HasChatTagsClient:GetAsRichText(): string?
 	return output
 end
 
-return Binder.new("HasChatTags", HasChatTagsClient)
+return Binder.new("HasChatTags", HasChatTagsClient :: any) :: Binder.Binder<HasChatTagsClient>
