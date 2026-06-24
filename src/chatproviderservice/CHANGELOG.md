@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.52.2...@quenty/chatproviderservice@9.53.0) (2026-06-24)
+
+### Features
+
+- **chatproviderservice:** convert package to --!strict typing ([#718](https://github.com/Quenty/NevermoreEngine/issues/718)) ([3bfbf13](https://github.com/Quenty/NevermoreEngine/commit/3bfbf13db961a91beec8a476126a5f1dbc32b40f))
+
 ## [9.52.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.52.1...@quenty/chatproviderservice@9.52.2) (2026-06-03)
 
 **Note:** Version bump only for package @quenty/chatproviderservice
