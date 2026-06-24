@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RoguePropertyUtils
 ]=]
@@ -6,10 +6,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local JSONUtils = require("JSONUtils")
+local RoguePropertyTypes = require("RoguePropertyTypes")
 
 local RoguePropertyUtils = {}
 
-function RoguePropertyUtils.decodeProperty(definition, value)
+function RoguePropertyUtils.decodeProperty(definition: RoguePropertyTypes.RoguePropertyDefinition, value: any): any
 	if definition:GetValueType() == "table" then
 		local ok, decoded, err = JSONUtils.jsonDecode(value)
 		if not ok then
@@ -23,7 +24,7 @@ function RoguePropertyUtils.decodeProperty(definition, value)
 	end
 end
 
-function RoguePropertyUtils.encodeProperty(definition, value)
+function RoguePropertyUtils.encodeProperty(definition: RoguePropertyTypes.RoguePropertyDefinition, value: any): any
 	if definition:GetValueType() == "table" then
 		local ok, encoded, err = JSONUtils.jsonEncode(value)
 		if not ok then

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RogueProperty
 ]=]
@@ -34,24 +34,46 @@ local RogueProperty = {}
 RogueProperty.ClassName = "RogueProperty"
 RogueProperty.__index = RogueProperty
 
-function RogueProperty.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag, definition)
+-- Generic over the value type T. Like ValueObject<T>, RogueProperty exposes `.Value`
+-- and `.Changed` through a *function* `__index`/`__newindex` (assigned below); they are
+-- declared here as virtual fields so callers can read them and so T is load-bearing.
+-- Methods are derived from the class table via `__index = RogueProperty`. `_definition`
+-- is the RoguePropertyDefinition back-reference across the require cycle (those classes
+-- require this module and are still nonstrict), so it stays `any`.
+export type RogueProperty<T> = typeof(setmetatable(
+	{} :: {
+		Value: T,
+		Changed: any,
+
+		_serviceBag: ServiceBag.ServiceBag,
+		_tieRealmService: TieRealmService.TieRealmService,
+		_adornee: Instance,
+		_definition: any,
+		_canInitialize: boolean,
+	},
+	{} :: typeof({ __index = RogueProperty })
+))
+
+function RogueProperty.new<T>(adornee: Instance, serviceBag: ServiceBag.ServiceBag, definition: any): RogueProperty<T>
 	local self = {}
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
+	-- Cast: duplicate nested node_modules copies of TieRealmService produce a
+	-- spurious "Expected 'TieRealmService', got 'TieRealmService'" cyclic error.
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService) :: any
 
 	self._adornee = assert(adornee, "Bad adornee")
 	self._definition = assert(definition, "Bad definition")
 	self._canInitialize = false
 
-	return setmetatable(self, RogueProperty)
+	return setmetatable(self, RogueProperty) :: any
 end
 
-function RogueProperty:SetCanInitialize(canInitialize: boolean)
+function RogueProperty.SetCanInitialize<T>(self: RogueProperty<T>, canInitialize: boolean)
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
-	if rawget(self, "_canInitialize") ~= canInitialize then
-		rawset(self, "_canInitialize", canInitialize)
+	if rawget(self :: any, "_canInitialize") ~= canInitialize then
+		rawset(self :: any, "_canInitialize", canInitialize)
 
 		if canInitialize then
 			self:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
@@ -59,15 +81,15 @@ function RogueProperty:SetCanInitialize(canInitialize: boolean)
 	end
 end
 
-function RogueProperty:GetAdornee()
+function RogueProperty.GetAdornee<T>(self: RogueProperty<T>): Instance
 	return self._adornee
 end
 
-function RogueProperty:CanInitialize()
-	return rawget(self, "_canInitialize")
+function RogueProperty.CanInitialize<T>(self: RogueProperty<T>): boolean
+	return rawget(self :: any, "_canInitialize") :: boolean
 end
 
-function RogueProperty:_getParentContainer()
+function RogueProperty._getParentContainer<T>(self: RogueProperty<T>): Instance?
 	local parentDefinition = self._definition:GetParentPropertyDefinition()
 	if parentDefinition then
 		return parentDefinition:Get(self._serviceBag, self._adornee):GetContainer()
@@ -76,25 +98,25 @@ function RogueProperty:_getParentContainer()
 	end
 end
 
-function RogueProperty:GetBaseValueObject(roguePropertyBaseValueType)
+function RogueProperty.GetBaseValueObject<T>(self: RogueProperty<T>, roguePropertyBaseValueType: any): any
 	assert(
 		RoguePropertyBaseValueTypeUtils.isRoguePropertyBaseValueType(roguePropertyBaseValueType),
 		"Bad roguePropertyBaseValueType"
 	)
 
 	-- TODO: check this caching!
-	local cachedInstance = rawget(self, "_baseValueInstanceCache")
-	local adornee = rawget(self, "_adornee")
+	local cachedInstance = rawget(self :: any, "_baseValueInstanceCache")
+	local adornee = rawget(self :: any, "_adornee")
 
 	if cachedInstance then
 		if cachedInstance:IsDescendantOf(adornee) then
 			return cachedInstance
 		else
-			rawset(self, "_baseValueInstanceCache", nil)
+			rawset(self :: any, "_baseValueInstanceCache", nil)
 		end
 	end
 
-	local definition = rawget(self, "_definition")
+	local definition = rawget(self :: any, "_definition") :: any
 
 	local parent = self:_getParentContainer()
 	if not parent then
@@ -123,7 +145,7 @@ function RogueProperty:GetBaseValueObject(roguePropertyBaseValueType)
 	end
 
 	if found then
-		rawset(self, "_baseValueInstanceCache", found)
+		rawset(self :: any, "_baseValueInstanceCache", found)
 		parent:SetAttribute(definition:GetName(), RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE)
 		return found
 	elseif not instanceRequired then
@@ -141,8 +163,8 @@ function RogueProperty:GetBaseValueObject(roguePropertyBaseValueType)
 	end
 end
 
-function RogueProperty:_observeParentBrio()
-	local cache = rawget(self, "_observeParentBrioCache")
+function RogueProperty._observeParentBrio<T>(self: RogueProperty<T>): any
+	local cache = rawget(self :: any, "_observeParentBrioCache")
 	if cache then
 		return cache
 	end
@@ -156,13 +178,13 @@ function RogueProperty:_observeParentBrio()
 		cache = RxBrioUtils.of(self._adornee)
 	end
 
-	rawset(self, "_observeParentBrioCache", cache)
+	rawset(self :: any, "_observeParentBrioCache", cache)
 
 	return cache
 end
 
-function RogueProperty:_observeBaseValueBrio()
-	local cache = rawget(self, "_observeBaseValueBrioCache")
+function RogueProperty._observeBaseValueBrio<T>(self: RogueProperty<T>): any
+	local cache = rawget(self :: any, "_observeBaseValueBrioCache")
 	if cache then
 		return cache
 	end
@@ -178,12 +200,12 @@ function RogueProperty:_observeBaseValueBrio()
 		Rx.cache(),
 	})
 
-	rawset(self, "_observeBaseValueBrioCache", cache)
+	rawset(self :: any, "_observeBaseValueBrioCache", cache)
 
 	return cache
 end
 
-function RogueProperty:SetBaseValue(value)
+function RogueProperty.SetBaseValue<T>(self: RogueProperty<T>, value: T)
 	assert(self._definition:CanAssign(value, false)) -- This has a good error message
 
 	local baseValue = self:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
@@ -200,7 +222,7 @@ function RogueProperty:SetBaseValue(value)
 	end
 end
 
-function RogueProperty:_getModifierParentContainerForNewModifier()
+function RogueProperty._getModifierParentContainerForNewModifier<T>(self: RogueProperty<T>): Instance?
 	if self:CanInitialize() then
 		return self:GetBaseValueObject(RoguePropertyBaseValueTypes.INSTANCE)
 	end
@@ -235,11 +257,11 @@ function RogueProperty:_getModifierParentContainerForNewModifier()
 	return localParent
 end
 
-function RogueProperty:_getLocalModifierParentName()
+function RogueProperty._getLocalModifierParentName<T>(self: RogueProperty<T>): string
 	return self._definition:GetName() .. "_LocalModifiers"
 end
 
-function RogueProperty:_getModifierParentContainerList()
+function RogueProperty._getModifierParentContainerList<T>(self: RogueProperty<T>): { Instance }
 	local containerList = {}
 
 	if self:CanInitialize() then
@@ -262,7 +284,7 @@ function RogueProperty:_getModifierParentContainerList()
 	return containerList
 end
 
-function RogueProperty:PromiseBaseValue()
+function RogueProperty.PromiseBaseValue<T>(self: RogueProperty<T>): any
 	return Rx.toPromise(self:_observeBaseValueBrio():Pipe({
 		RxBrioUtils.flattenToValueAndNil,
 		Rx.where(function(value)
@@ -271,16 +293,16 @@ function RogueProperty:PromiseBaseValue()
 	}))
 end
 
-function RogueProperty:_observeModifierContainersBrio()
+function RogueProperty._observeModifierContainersBrio<T>(self: RogueProperty<T>): any
 	local name = self:_getLocalModifierParentName()
 
 	return self:_observeParentBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(parent)
 			return Rx.merge({
 				-- The main container
-				RxAttributeUtils.observeAttributeBrio(parent, self._definition:GetName(), function(attribute)
+				(RxAttributeUtils.observeAttributeBrio(parent, self._definition:GetName(), function(attribute)
 					return attribute == RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE
-				end):Pipe({
+				end) :: any):Pipe({
 					Rx.switchMap(function()
 						return self:_observeBaseValueBrio()
 					end),
@@ -290,12 +312,12 @@ function RogueProperty:_observeModifierContainersBrio()
 				RxInstanceUtils.observeChildrenBrio(parent, function(child)
 					return child:IsA(LOCAL_MODIFIER_CONTAINER_CLASS_NAME) and child.Name == name
 				end),
-			})
+			} :: { any })
 		end),
 	})
 end
 
-function RogueProperty:SetValue(value)
+function RogueProperty.SetValue<T>(self: RogueProperty<T>, value: T)
 	assert(self._definition:CanAssign(value, false)) -- This has a good error message
 
 	local baseValue = self:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
@@ -337,7 +359,7 @@ function RogueProperty:SetValue(value)
 	baseValue.Value = self:_encodeValue(current)
 end
 
-function RogueProperty:GetBaseValue()
+function RogueProperty.GetBaseValue<T>(self: RogueProperty<T>): T
 	local baseValue = self:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
 	if baseValue then
 		return self:_decodeValue(baseValue.Value)
@@ -346,7 +368,7 @@ function RogueProperty:GetBaseValue()
 	end
 end
 
-function RogueProperty:GetValue()
+function RogueProperty.GetValue<T>(self: RogueProperty<T>): T
 	local propObj = self:GetBaseValueObject(RoguePropertyBaseValueTypes.ANY)
 	if not propObj then
 		return self._definition:GetDefaultValue()
@@ -361,11 +383,11 @@ function RogueProperty:GetValue()
 	return current
 end
 
-function RogueProperty:GetDefinition()
+function RogueProperty.GetDefinition<T>(self: RogueProperty<T>): any
 	return self._definition
 end
 
-function RogueProperty:GetRogueModifiers()
+function RogueProperty.GetRogueModifiers<T>(self: RogueProperty<T>): { any }
 	local modifierList = {}
 
 	for _, parent in self:_getModifierParentContainerList() do
@@ -389,13 +411,13 @@ function RogueProperty:GetRogueModifiers()
 	return modifierList
 end
 
-function RogueProperty:_observeModifierSortedList()
-	local cache = rawget(self, "_observeModifierSortedListCache")
+function RogueProperty._observeModifierSortedList<T>(self: RogueProperty<T>): any
+	local cache = rawget(self :: any, "_observeModifierSortedListCache")
 	if cache then
 		return cache
 	end
 
-	cache = Observable.new(function(sub)
+	cache = (Observable.new(function(sub)
 		local topMaid = Maid.new()
 
 		local sortedList = topMaid:Add(ObservableSortedList.new())
@@ -420,16 +442,16 @@ function RogueProperty:_observeModifierSortedList()
 		debug.profileend()
 
 		return topMaid
-	end):Pipe({
+	end) :: any):Pipe({
 		Rx.cache(),
 	})
 
-	rawset(self, "_observeModifierSortedListCache", cache)
+	rawset(self :: any, "_observeModifierSortedListCache", cache)
 	return cache
 end
 
-function RogueProperty:Observe()
-	local cache = rawget(self, "_observeCache")
+function RogueProperty.Observe<T>(self: RogueProperty<T>): Observable.Observable<T>
+	local cache = rawget(self :: any, "_observeCache") :: any
 	if cache then
 		return cache
 	end
@@ -456,7 +478,7 @@ function RogueProperty:Observe()
 		RxBrioUtils.emitOnDeath(self._definition:GetDefaultValue()),
 		Rx.defaultsTo(self._definition:GetDefaultValue()),
 		Rx.distinct(),
-	})
+	} :: { any })
 
 	cache = self:_observeModifierSortedList():Pipe({
 		Rx.switchMap(function(sortedList)
@@ -470,18 +492,18 @@ function RogueProperty:Observe()
 			return current
 		end),
 		Rx.cache(),
-	})
-	rawset(self, "_observeCache", cache)
+	} :: { any })
+	rawset(self :: any, "_observeCache", cache)
 	return cache
 end
 
-function RogueProperty:ObserveBrio(predicate)
-	return self:Observe():Pipe({
+function RogueProperty.ObserveBrio<T>(self: RogueProperty<T>, predicate: ((T) -> boolean)?): any
+	return (self:Observe() :: any):Pipe({
 		RxBrioUtils.switchToBrio(predicate),
 	})
 end
 
-function RogueProperty:CreateMultiplier(amount: number, source): Instance?
+function RogueProperty.CreateMultiplier<T>(self: RogueProperty<T>, amount: number, source: Instance?): Instance?
 	assert(type(amount) == "number", "Bad amount")
 
 	local className = ValueBaseUtils.getClassNameFromType(typeof(amount))
@@ -490,7 +512,7 @@ function RogueProperty:CreateMultiplier(amount: number, source): Instance?
 		return nil
 	end
 
-	local multiplier = Instance.new(className)
+	local multiplier = Instance.new(className) :: any
 	multiplier.Name = "Multiplier"
 	multiplier.Value = amount
 
@@ -505,7 +527,7 @@ function RogueProperty:CreateMultiplier(amount: number, source): Instance?
 	return multiplier
 end
 
-function RogueProperty:CreateAdditive(amount: number, source)
+function RogueProperty.CreateAdditive<T>(self: RogueProperty<T>, amount: number, source: Instance?): Instance?
 	assert(type(amount) == "number", "Bad amount")
 
 	local className = ValueBaseUtils.getClassNameFromType(typeof(amount))
@@ -514,7 +536,7 @@ function RogueProperty:CreateAdditive(amount: number, source)
 		return nil
 	end
 
-	local additive = Instance.new(className)
+	local additive = Instance.new(className) :: any
 	additive.Name = "Additive"
 	additive.Value = amount
 
@@ -529,7 +551,7 @@ function RogueProperty:CreateAdditive(amount: number, source)
 	return additive
 end
 
-function RogueProperty:GetNamedAdditive(name, source)
+function RogueProperty.GetNamedAdditive<T>(self: RogueProperty<T>, name: string, source: Instance?): Instance?
 	local modifierParent = self:_getModifierParentContainerForNewModifier()
 	if not modifierParent then
 		-- TODO: Handle this parenting scenario appropriately
@@ -552,19 +574,19 @@ function RogueProperty:GetNamedAdditive(name, source)
 		return found
 	end
 
-	local created = self:CreateAdditive(0, source)
+	local created = self:CreateAdditive(0, source) :: any
 	created.Name = searchName
 	return created
 end
 
-function RogueProperty:CreateSetter(value, source)
+function RogueProperty.CreateSetter<T>(self: RogueProperty<T>, value: any, source: Instance?): Instance?
 	local className = ValueBaseUtils.getClassNameFromType(typeof(value))
 	if not className then
 		error(string.format("[RogueProperty.CreateSetter] - Can't set to type %q", typeof(value)))
 		return nil
 	end
 
-	local setter = Instance.new(className)
+	local setter = Instance.new(className) :: any
 	setter.Name = "Setter"
 	setter.Value = value
 
@@ -579,7 +601,7 @@ function RogueProperty:CreateSetter(value, source)
 	return setter
 end
 
-function RogueProperty:_parentModifier(modifier: Instance)
+function RogueProperty._parentModifier<T>(self: RogueProperty<T>, modifier: Instance)
 	local modifierParent = self:_getModifierParentContainerForNewModifier()
 	if modifierParent then
 		modifier.Parent = modifierParent
@@ -622,40 +644,42 @@ function RogueProperty:_parentModifier(modifier: Instance)
 	return
 end
 
-function RogueProperty:__index(index)
-	if RogueProperty[index] then
-		return RogueProperty[index]
+local rawRogueProperty = RogueProperty :: any
+
+rawRogueProperty.__index = function(self: RogueProperty<any>, index: any): any
+	if rawRogueProperty[index] then
+		return rawRogueProperty[index]
 	elseif index == "Value" then
 		return self:GetValue()
 	elseif index == "Changed" then
-		return self:GetChangedEvent()
+		return (self :: any):GetChangedEvent()
 	else
 		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 
-function RogueProperty:__newindex(index, value)
+rawRogueProperty.__newindex = function(self: RogueProperty<any>, index: any, value: any)
 	if index == "Value" then
 		self:SetValue(value)
 	elseif index == "Changed" then
 		error("Cannot set .Changed event")
-	elseif RogueProperty[index] then
+	elseif rawRogueProperty[index] then
 		error(string.format("Cannot set %q", tostring(index)))
 	else
 		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 
-function RogueProperty:_decodeValue(current)
+function RogueProperty._decodeValue<T>(self: RogueProperty<T>, current: any): any
 	return RoguePropertyUtils.decodeProperty(self._definition, current)
 end
 
-function RogueProperty:_encodeValue(current)
+function RogueProperty._encodeValue<T>(self: RogueProperty<T>, current: any): any
 	return RoguePropertyUtils.encodeProperty(self._definition, current)
 end
 
-function RogueProperty:GetChangedEvent()
-	return RxSignal.new(self:Observe():Pipe({
+function RogueProperty.GetChangedEvent<T>(self: RogueProperty<T>): any
+	return RxSignal.new((self:Observe() :: any):Pipe({
 		Rx.skip(1),
 	}))
 end

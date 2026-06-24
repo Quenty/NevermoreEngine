@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Constructing a new rogue property/rogue property table can be expensive.
 	This caches it so frame-usage is cheap.
@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local RoguePropertyCache = require("RoguePropertyCache")
+local RoguePropertyTypes = require("RoguePropertyTypes")
 local ServiceBag = require("ServiceBag")
 
 local RoguePropertyCacheService = {}
@@ -17,14 +18,25 @@ RoguePropertyCacheService.ServiceName = "RoguePropertyCacheService"
 
 local WEAK_K_TABLE = { __mode = "k" }
 
-function RoguePropertyCacheService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type RoguePropertyCacheService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_cache: { [RoguePropertyTypes.RoguePropertyDefinition]: RoguePropertyCache.RoguePropertyCache },
+	},
+	{} :: typeof({ __index = RoguePropertyCacheService })
+))
+
+function RoguePropertyCacheService.Init(self: RoguePropertyCacheService, serviceBag: ServiceBag.ServiceBag)
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._cache = setmetatable({}, WEAK_K_TABLE)
+	self._cache = setmetatable({}, WEAK_K_TABLE) :: any
 end
 
-function RoguePropertyCacheService:GetCache(roguePropertyDefinition)
+function RoguePropertyCacheService.GetCache(
+	self: RoguePropertyCacheService,
+	roguePropertyDefinition: RoguePropertyTypes.RoguePropertyDefinition
+): RoguePropertyCache.RoguePropertyCache
 	if not self._cache then
 		assert(not RunService:IsRunning(), "Not in test mode")
 		-- Test mode
