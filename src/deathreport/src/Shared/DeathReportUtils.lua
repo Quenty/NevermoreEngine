@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class DeathReportUtils
 ]=]
@@ -19,11 +19,11 @@ local DeathReportUtils = {}
 	@param weaponData WeaponData
 	@return DeathReport
 ]=]
-function DeathReportUtils.fromDeceasedHumanoid(humanoid: Humanoid, weaponData: WeaponData?)
+function DeathReportUtils.fromDeceasedHumanoid(humanoid: Humanoid, weaponData: WeaponData?): DeathReport
 	assert(DeathReportUtils.isWeaponData(weaponData) or weaponData == nil, "Bad weaponData")
 
 	local killerHumanoid = HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid)
-	local character = humanoid.Parent
+	local character = assert(humanoid.Parent, "No character for humanoid")
 	return DeathReportUtils.create(character, killerHumanoid, weaponData)
 end
 
@@ -44,7 +44,7 @@ export type DeathReport = {
 function DeathReportUtils.create(adornee: Instance, killerAdornee: Instance?, weaponData: WeaponData?): DeathReport
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	local humanoid
+	local humanoid: Humanoid?
 	if adornee:IsA("Humanoid") then
 		humanoid = adornee
 	else
@@ -79,7 +79,7 @@ end
 	@param weaponData any
 	@return boolean
 ]=]
-function DeathReportUtils.isWeaponData(weaponData): boolean
+function DeathReportUtils.isWeaponData(weaponData: any): boolean
 	return type(weaponData) == "table"
 		and (typeof(weaponData.weaponInstance) == "Instance" or weaponData.weaponInstance == nil)
 end
