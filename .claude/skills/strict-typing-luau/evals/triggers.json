@@ -1,0 +1,24 @@
+{
+  "_doc": "Triggering tests for the skill's frontmatter `description`. A judge model is shown ONLY the skill's name+description and each user message, and decides whether the skill should fire. We score `fire` against `expect`. Positives are real ways users ask for the conversion; negatives are near-misses that an over-broad description would wrongly capture (TypeScript strict, tsconfig, formatting, feature work, wrong language). Run via lib/triggers.sh — one batched claude -p call.",
+  "cases": [
+    { "expect": true,  "tag": "explicit-strict",   "prompt": "src/ragdoll/src/Server/Classes/RagdollCameraShake.lua is still --!nonstrict. Can you strictly type it?" },
+    { "expect": true,  "tag": "convert-strict",     "prompt": "convert this file to --!strict please" },
+    { "expect": true,  "tag": "make-strict",        "prompt": "make ActionManager.lua strict, it's still on the old --!nonstrict header" },
+    { "expect": true,  "tag": "add-types-lua",      "prompt": "can you add types to this Luau module?" },
+    { "expect": true,  "tag": "type-this-selected", "prompt": "type this" },
+    { "expect": true,  "tag": "resolve-strict-errs","prompt": "this --!strict file is throwing a bunch of luau-lsp type errors, fix the typing following our conventions" },
+    { "expect": true,  "tag": "type-annotate",      "prompt": "type-annotate RoguePropertyTable.lua for me" },
+    { "expect": true,  "tag": "legacy-cleanup",     "prompt": "clean up the typing on this legacy nonstrict module" },
+
+    { "expect": false, "tag": "format",             "prompt": "format this file with stylua" },
+    { "expect": false, "tag": "bugfix",             "prompt": "fix the off-by-one bug in this loop" },
+    { "expect": false, "tag": "ts-strict",          "prompt": "turn on strict mode for this TypeScript file under tools/" },
+    { "expect": false, "tag": "tsconfig-strict",    "prompt": "set \"strict\": true in our tsconfig.json" },
+    { "expect": false, "tag": "add-method",         "prompt": "add a new :Reset() method to this class" },
+    { "expect": false, "tag": "run-tests",          "prompt": "run the tests for the ragdoll package" },
+    { "expect": false, "tag": "docstring",          "prompt": "write a moonwave docstring for this function" },
+    { "expect": false, "tag": "rename",             "prompt": "rename _enabled to _isEnabled across this file" },
+    { "expect": false, "tag": "perf",               "prompt": "make this function faster" },
+    { "expect": false, "tag": "loader-refactor",    "prompt": "convert this Lua file to use the new module loader pattern" }
+  ]
+}
