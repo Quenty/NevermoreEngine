@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class InputKeyMapSettingClient
 ]=]
@@ -16,11 +16,20 @@ local InputKeyMapSettingClient = setmetatable({}, BaseObject)
 InputKeyMapSettingClient.ClassName = "InputKeyMapSettingClient"
 InputKeyMapSettingClient.__index = InputKeyMapSettingClient
 
+export type InputKeyMapSettingClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_settingServiceClient: any,
+		_inputKeyMapList: InputKeyMapList.InputKeyMapList,
+	},
+	{} :: typeof({ __index = InputKeyMapSettingClient })
+)) & BaseObject.BaseObject
+
 function InputKeyMapSettingClient.new(
 	serviceBag: ServiceBag.ServiceBag,
 	inputKeyMapList: InputKeyMapList.InputKeyMapList
-)
-	local self = setmetatable(BaseObject.new(), InputKeyMapSettingClient)
+): InputKeyMapSettingClient
+	local self: InputKeyMapSettingClient = setmetatable(BaseObject.new() :: any, InputKeyMapSettingClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._settingServiceClient = self._serviceBag:GetService(SettingsServiceClient)
