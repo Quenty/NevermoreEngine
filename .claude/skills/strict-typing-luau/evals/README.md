@@ -77,6 +77,19 @@ one sub-agent per file within a dependency layer, for a package > ~3 files) or `
 file / handful / error-fix). Guards the real-use regression where the agent converted a whole package
 serially because the skill never told it to parallelize.
 
+### 6. Routing test (~instant, no LLM) — model routing heuristic
+
+```bash
+bash evals/lib/run.sh routing
+```
+
+Mechanical assert on `plan.js`'s model routing: a **ServiceBag service** (`.ServiceName`, a plain
+table with no `setmetatable`) must route to **opus**, a plain util to **sonnet**. It reads `plan.js`'s
+real `isClass` predicate (single source of truth, so it can't drift) and applies the same model rule
+to inline samples — no fixtures, no git, no judge call. Guards the real-use regression where a service
+mis-routed to sonnet got a shallow conversion (colon syntax, no `export type`) that broke a consumer.
+Add a case = one entry in `routing.js`'s `cases`.
+
 ## Design notes
 
 - **Files are placed at package granularity** (`src/<pkg>`): a package is the unit of
