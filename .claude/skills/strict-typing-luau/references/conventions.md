@@ -227,6 +227,7 @@ end
 | Required arg the method ignores, or optional arg passed as required | Fix the upstream signature (make optional / remove dead param) if in scope; else flag it. Don't paper with a call-site `:: any`. |
 | `Internal error: Code is too complex to typecheck!` on a class typed `typeof(setmetatable(...)) & SomeMixin.Mixin` | Old solver chokes on intersecting a record (mixin surface) onto a metatable type — worsens when the class is stored in containers. **Inline** the mixin's runtime-injected fields/methods directly into the class's field record (with a `-- <Mixin> surface (injected at runtime)` comment) instead of intersecting. Type the injected methods' receivers as `self: any`. |
 | `different number of generic type pack parameters` on a `Signal`/generic metatable field when the class is used in an invariant position (`{T}` return, `table.insert(list, x)`, etc.) | Old-solver bug comparing generic metatable types invariantly across modules. Cast the element to `any` at the invariant site only (`table.insert(list, x :: any)`); keep the public/field type precise. |
+| A direct cast `v :: T` rejected as **"types are unrelated"** (e.g. a metatable'd `setmetatable({number}, mt)` alias vs a plain `{number}`) | Old solver won't cast between unrelated types in one step — launder through `any`: `(v :: any) :: T`. Same trick to reach a metatable method the alias type doesn't surface: `(v :: any):method()`. Sound when `v` genuinely is a `T` at runtime; keep the public signature precise. |
 
 ## Common type imports
 
