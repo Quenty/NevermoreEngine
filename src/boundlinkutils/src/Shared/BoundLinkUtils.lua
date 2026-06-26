@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Utility functions involving binders and links. It's a common pattern to link
 	back to a bound class. This allows you to quickly retrieve these objects.
@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 
 local CollectionService = game:GetService("CollectionService")
 
+local Binder = require("Binder")
 local BinderUtils = require("BinderUtils")
 local LinkUtils = require("LinkUtils")
 
@@ -23,7 +24,7 @@ local BoundLinkUtils = {}
 	@param from Instance
 	@return T?
 ]=]
-function BoundLinkUtils.getLinkClass(binder, linkName, from)
+function BoundLinkUtils.getLinkClass<T>(binder: Binder.Binder<T>, linkName: string, from: Instance): T?
 	assert(type(binder) == "table", "Bad binder")
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad froM")
@@ -44,12 +45,12 @@ end
 	@param from Instance
 	@return { T }
 ]=]
-function BoundLinkUtils.getLinkClasses(binder, linkName, from)
+function BoundLinkUtils.getLinkClasses<T>(binder: Binder.Binder<T>, linkName: string, from: Instance): { T }
 	assert(type(binder) == "table", "Bad binder")
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad from")
 
-	local classes = {}
+	local classes: { T } = {}
 	for _, value in LinkUtils.getAllLinkValues(linkName, from) do
 		local class = binder:Get(value)
 		if class then
@@ -67,7 +68,11 @@ end
 	@param from Instance
 	@return { T }
 ]=]
-function BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
+function BoundLinkUtils.getClassesForLinkValues<T>(
+	binders: { Binder.Binder<T> },
+	linkName: string,
+	from: Instance
+): { T }
 	assert(type(binders) == "table", "Bad binders")
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad from")
@@ -77,7 +82,7 @@ function BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
 	end
 
 	local tags = BinderUtils.mapBinderListToTable(binders)
-	local classes = {}
+	local classes: { T } = {}
 
 	for _, instance in LinkUtils.getAllLinkValues(linkName, from) do
 		for _, tag in CollectionService:GetTags(instance) do
@@ -103,7 +108,13 @@ end
 	@param methodName string
 	@param args {}
 ]=]
-function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, methodName, args)
+function BoundLinkUtils.callMethodOnLinkedClasses(
+	binders: { Binder.Binder<any> },
+	linkName: string,
+	from: Instance,
+	methodName: string,
+	args: { any }
+)
 	assert(type(binders) == "table", "Bad arg 'binders'")
 	assert(type(linkName) == "string", "Bad arg 'linkName'")
 	assert(typeof(from) == "Instance", "Bad arg 'from'")
@@ -116,9 +127,9 @@ function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, metho
 
 	local tags = BinderUtils.mapBinderListToTable(binders)
 
-	local called = {}
+	local called: { [any]: boolean } = {}
 
-	local function callForTag(value, tag)
+	local function callForTag(value: Instance, tag: string)
 		local binder = tags[tag]
 		if not binder then
 			return
