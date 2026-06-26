@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --!native
 
 -- SHA-256, HMAC and PBKDF2 functions in ComputerCraft
@@ -10,8 +10,10 @@
 -- Last update: October 10, 2017
 -- Updated by Quenty December 4th, 2023
 
-local twoPower = require(script.Parent.twoPower)
+local twoPower: { [number]: number } = require(script.Parent.twoPower) :: any
 local util = require(script.Parent.util)
+
+type ByteTable = typeof(setmetatable({} :: { number }, {} :: typeof(util.byteTableMT)))
 
 local mod32 = 2 ^ 32
 local band = bit32.band
@@ -19,13 +21,13 @@ local bnot = bit32.bnot
 local bxor = bit32.bxor
 local blshift = bit32.lshift
 
-local function rrotate(n, b)
+local function rrotate(n: number, b: number): number
 	local s = n / twoPower[b]
 	local f = s % 1
 	return (s - f) + f * mod32
 end
 
-local function brshift(int, by) -- Thanks bit32 for bad rshift
+local function brshift(int: number, by: number): number -- Thanks bit32 for bad rshift
 	return math.floor(int / twoPower[by])
 end
 
@@ -107,7 +109,7 @@ local K = {
 	0xc67178f2,
 }
 
-local function counter(incr)
+local function counter(incr: number): (number, number)
 	local t1, t2 = 0, 0
 	if 0xFFFFFFFF - t1 < incr then
 		t2 = t2 + 1
@@ -119,11 +121,11 @@ local function counter(incr)
 	return t2, t1
 end
 
-local function BE_toInt(bs, i)
+local function BE_toInt(bs: { number }, i: number): number
 	return blshift((bs[i] or 0), 24) + blshift((bs[i + 1] or 0), 16) + blshift((bs[i + 2] or 0), 8) + (bs[i + 3] or 0)
 end
 
-local function preprocess(data)
+local function preprocess(data: { number }): { { number } }
 	local len = #data
 	local data_len = #data + 1
 
@@ -135,9 +137,9 @@ local function preprocess(data)
 
 	local blocks = math.ceil(data_len / 64)
 
-	local proc = table.create(blocks)
+	local proc: { { number } } = table.create(blocks)
 	for i = 1, blocks do
-		local block = table.create(16)
+		local block: { number } = table.create(16)
 		proc[i] = block
 		for j = 1, 16 do
 			block[j] = BE_toInt(data, 1 + ((i - 1) * 64) + ((j - 1) * 4))
@@ -148,7 +150,7 @@ local function preprocess(data)
 	return proc
 end
 
-local function digestblock(w, C)
+local function digestblock(w: { number }, C: { number }): { number }
 	for j = 17, 64 do
 		local s0 = bxor(bxor(rrotate(w[j - 15], 7), rrotate(w[j - 15], 18)), brshift(w[j - 15], 3))
 		local s1 = bxor(bxor(rrotate(w[j - 2], 17), rrotate(w[j - 2], 19)), brshift(w[j - 2], 10))
@@ -177,8 +179,8 @@ local function digestblock(w, C)
 	return C
 end
 
-local function toBytes(t, n)
-	local b = table.create(n * 4)
+local function toBytes(t: { number }, n: number): ByteTable
+	local b: { number } = table.create(n * 4)
 	for i = 1, n do
 		b[(i - 1) * 4 + 1] = band(brshift(t[i], 24), 0xFF)
 		b[(i - 1) * 4 + 2] = band(brshift(t[i], 16), 0xFF)
@@ -189,29 +191,34 @@ local function toBytes(t, n)
 	return setmetatable(b, util.byteTableMT)
 end
 
-local function digest(data)
-	data = data or ""
-	data = type(data) == "table" and { table.unpack(data) } or util.stringToByteArray(data)
+local function digest(data: (string | { number })?): ByteTable
+	local rawData: string | { number } = data or ""
+	local byteData: { number }
+	if type(rawData) == "table" then
+		byteData = { table.unpack(rawData) }
+	else
+		byteData = util.stringToByteArray(rawData)
+	end
 
-	data = preprocess(data)
-	local C = { table.unpack(H) }
-	for _, value in ipairs(data) do
+	local proc = preprocess(byteData)
+	local C: { number } = { table.unpack(H) }
+	for _, value in ipairs(proc) do
 		C = digestblock(value, C)
 	end
 
 	return toBytes(C, 8)
 end
 
-local function hmac(data, key)
-	local actualData = type(data) == "table" and { table.unpack(data) } or util.stringToByteArray(data)
-	local actualKey = type(key) == "table" and { table.unpack(key) } or util.stringToByteArray(key)
+local function hmac(data: string | { number }, key: string | { number }): ByteTable
+	local actualData: { number } = type(data) == "table" and { table.unpack(data :: { number }) } or util.stringToByteArray(data :: string)
+	local actualKey: { number } = type(key) == "table" and { table.unpack(key :: { number }) } or util.stringToByteArray(key :: string)
 
 	local blocksize = 64
 
-	actualKey = #actualKey > blocksize and digest(actualKey) or actualKey
+	actualKey = #actualKey > blocksize and (digest(actualKey) :: any) or actualKey
 
-	local ipad = table.create(blocksize)
-	local opad = table.create(blocksize)
+	local ipad: { number } = table.create(blocksize)
+	local opad: { number } = table.create(blocksize)
 
 	for i = 1, blocksize do
 		ipad[i] = bxor(0x36, actualKey[i] or 0)
@@ -222,26 +229,26 @@ local function hmac(data, key)
 		ipad[blocksize + i] = value
 	end
 
-	ipad = digest(ipad)
-	local padded_key = table.create(blocksize * 2)
+	local ipadDigest = digest(ipad)
+	local padded_key: { number } = table.create(blocksize * 2)
 	for i = 1, blocksize do
 		padded_key[i] = opad[i]
-		padded_key[blocksize + i] = ipad[i]
+		padded_key[blocksize + i] = ipadDigest[i]
 	end
 
 	return digest(padded_key)
 end
 
-local function pbkdf2(pass, salt, iter, dklen)
-	local actualSalt = type(salt) == "table" and salt or util.stringToByteArray(salt)
+local function pbkdf2(pass: string | { number }, salt: string | { number }, iter: number, dklen: number?): ByteTable
+	local actualSalt: { number } = type(salt) == "table" and salt :: { number } or util.stringToByteArray(salt :: string)
 	local hashlen = 32
 	local actualDklen = dklen or 32
 	local block = 1
-	local out = {}
+	local out: { number } = {}
 
 	while actualDklen > 0 do
-		local ikey = {}
-		local isalt = { table.unpack(actualSalt) }
+		local ikey: { number } = {}
+		local isalt: { number } = { table.unpack(actualSalt) }
 		local isalt_len = #isalt
 		local clen = actualDklen > hashlen and hashlen or actualDklen
 
@@ -253,7 +260,7 @@ local function pbkdf2(pass, salt, iter, dklen)
 		isalt_len += 4
 
 		for _ = 1, iter do
-			isalt = hmac(isalt, pass)
+			isalt = hmac(isalt, pass) :: any
 			for k = 1, clen do
 				ikey[k] = bxor(isalt[k], ikey[k] or 0)
 			end

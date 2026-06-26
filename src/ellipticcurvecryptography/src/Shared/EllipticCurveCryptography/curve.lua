@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --!native
 
 --[=[
@@ -49,7 +49,7 @@ local montgomeryModP = modp.montgomeryModP
 local expModP = modp.expModP
 local inverseMontgomeryModQ = modq.inverseMontgomeryModQ
 
-local pointMT
+local pointMT: any
 local ZERO = table.create(7, 0)
 local ONE = montgomeryModP({ 1, 0, 0, 0, 0, 0, 0 })
 
@@ -193,9 +193,9 @@ end
 local function scalarMult(multiplier, P1)
 	-- w = 5
 	local naf = NAF(multiplier, 5)
-	local PTable = { P1 }
+	local PTable: { any } = { P1 }
 	local P2 = pointDouble(P1)
-	local Q = { table.create(7, 0), { table.unpack(ONE) }, { table.unpack(ONE) } }
+	local Q: any = { table.create(7, 0), { table.unpack(ONE) }, { table.unpack(ONE) } }
 
 	for i = 3, 31, 2 do
 		PTable[i] = pointAdd(PTable[i - 2], P2)
@@ -215,14 +215,14 @@ end
 
 -- Lookup table 4-ary NAF method for scalar multiplication by G.
 -- Precomputations for the regular NAF method are done before the multiplication.
-local GTable = { G }
+local GTable: { any } = { G }
 for i = 2, 168 do
 	GTable[i] = pointDouble(GTable[i - 1])
 end
 
 local function scalarMultG(multiplier)
 	local naf = NAF(multiplier, 2)
-	local Q = { table.create(7, 0), { table.unpack(ONE) }, { table.unpack(ONE) } }
+	local Q: any = { table.create(7, 0), { table.unpack(ONE) }, { table.unpack(ONE) } }
 
 	for i = 1, 168 do
 		if naf[i] == 1 then
@@ -237,7 +237,7 @@ end
 
 -- Point compression and encoding.
 -- Compresses curve points to 22 bytes.
-local function pointEncode(P1)
+local function pointEncode(P1: any)
 	P1 = pointScale(P1)
 	local result = {}
 	local x, y = P1[1], P1[2]
@@ -321,7 +321,7 @@ pointMT = {
 		return pointIsEqual(P1, P2)
 	end,
 
-	__mul = function(P1, s)
+	__mul = function(P1: any, s: any)
 		if type(P1) == "number" then
 			return s * P1
 		end

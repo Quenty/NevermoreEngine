@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --!native
 
 --[=[
@@ -39,6 +39,9 @@ local modq = require(script.modq)
 local random = require(script.random)
 local sha256 = require(script.sha256)
 local util = require(script.util)
+
+type ByteTable = typeof(setmetatable({} :: { number }, {} :: typeof(util.byteTableMT)))
+
 local EllipticCurveCryptography = {}
 
 EllipticCurveCryptography.chacha20 = chacha20
@@ -52,7 +55,7 @@ EllipticCurveCryptography._byteMetatable = assert(util.byteTableMT, "No byteTabl
 	@param key any
 	@return boolean
 ]=]
-function EllipticCurveCryptography.isByteTable(key)
+function EllipticCurveCryptography.isByteTable(key: any): boolean
 	return type(key) == "table" and getmetatable(key) == EllipticCurveCryptography._byteMetatable
 end
 
@@ -61,14 +64,14 @@ end
 
 	@param value any
 ]=]
-function EllipticCurveCryptography.createByteTable(value)
+function EllipticCurveCryptography.createByteTable(value: { number }): ByteTable
 	assert(type(value) == "table", "Bad value")
 
 	return setmetatable(table.clone(value), EllipticCurveCryptography._byteMetatable)
 end
 
-function EllipticCurveCryptography._getNonceFromEpoch()
-	local nonce = table.create(12)
+function EllipticCurveCryptography._getNonceFromEpoch(): { number }
+	local nonce: { number } = table.create(12)
 	local epoch = DateTime.now().UnixTimestampMillis
 	for i = 1, 12 do
 		nonce[i] = epoch % 256
@@ -98,23 +101,23 @@ end
 	@param key ByteTable
 	@return ByteTable
 ]=]
-function EllipticCurveCryptography.encrypt(data, key)
+function EllipticCurveCryptography.encrypt(data: string | ByteTable, key: ByteTable): ByteTable
 	assert(type(data) == "string" or EllipticCurveCryptography.isByteTable(data), "Bad data")
 	assert(EllipticCurveCryptography.isByteTable(key), "Bad key")
 
-	local encKey = sha256.hmac("encKey", key)
-	local macKey = sha256.hmac("macKey", key)
+	local encKey = sha256.hmac("encKey", (key :: any) :: { number })
+	local macKey = sha256.hmac("macKey", (key :: any) :: { number })
 	local nonce = EllipticCurveCryptography._getNonceFromEpoch()
 
-	local ciphertext = chacha20.crypt(data, encKey, nonce)
+	local ciphertext = chacha20.crypt(data :: any, (encKey :: any) :: { number }, nonce)
 
-	local result = nonce
-	for _, value in ipairs(ciphertext) do
+	local result: { number } = nonce
+	for _, value in ipairs(ciphertext :: any) do
 		table.insert(result, value)
 	end
 
-	local mac = sha256.hmac(result, macKey)
-	for _, value in ipairs(mac) do
+	local mac = sha256.hmac(result, (macKey :: any) :: { number })
+	for _, value in ipairs((mac :: any) :: { number }) do
 		table.insert(result, value)
 	end
 
@@ -135,21 +138,22 @@ end
 	@param key ByteTable
 	@return ByteTable
 ]=]
-function EllipticCurveCryptography.decrypt(data, key)
+function EllipticCurveCryptography.decrypt(data: string | ByteTable, key: ByteTable): ByteTable
 	assert(type(data) == "string" or EllipticCurveCryptography.isByteTable(data), "Bad data")
 	assert(EllipticCurveCryptography.isByteTable(key), "Bad key")
 
-	local actualData = type(data) == "table" and { table.unpack(data) } or { string.byte(tostring(data), 1, -1) }
-	local encKey = sha256.hmac("encKey", key)
-	local macKey = sha256.hmac("macKey", key)
-	local mac = sha256.hmac({ table.unpack(actualData, 1, #actualData - 32) }, macKey)
+	local actualData: { number } = type(data) == "table" and { table.unpack(data :: any) }
+		or { string.byte(tostring(data), 1, -1) }
+	local encKey = sha256.hmac("encKey", (key :: any) :: { number })
+	local macKey = sha256.hmac("macKey", (key :: any) :: { number })
+	local mac = sha256.hmac({ table.unpack(actualData, 1, #actualData - 32) }, (macKey :: any) :: { number })
 	local messageMac = { table.unpack(actualData, #actualData - 31) }
-	assert(mac:isEqual(messageMac), "invalid mac")
+	assert((mac :: any):isEqual(messageMac), "invalid mac")
 	local nonce = { table.unpack(actualData, 1, 12) }
 	local ciphertext = { table.unpack(actualData, 13, #actualData - 32) }
-	local result = chacha20.crypt(ciphertext, encKey, nonce)
+	local result: ByteTable = chacha20.crypt(ciphertext, (encKey :: any) :: { number }, nonce)
 
-	return setmetatable(result, util.byteTableMT)
+	return result
 end
 
 --[=[
@@ -167,10 +171,10 @@ end
 	@return ByteTable -- privateKey
 	@return ByteTable -- publicKey
 ]=]
-function EllipticCurveCryptography.keypair(seed)
+function EllipticCurveCryptography.keypair(seed: number): (ByteTable, ByteTable)
 	assert(type(seed) == "number", "Bad seed")
 
-	local x
+	local x: any
 	if seed then
 		x = modq.hashModQ(seed)
 	else
@@ -179,8 +183,8 @@ function EllipticCurveCryptography.keypair(seed)
 
 	local Y = curve.G * x
 
-	local privateKey = x:encode()
-	local publicKey = Y:encode()
+	local privateKey: ByteTable = x:encode()
+	local publicKey: ByteTable = Y:encode()
 
 	return privateKey, publicKey
 end
@@ -203,15 +207,15 @@ end
 	@param publicKey ByteTable
 	@return ByteTable
 ]=]
-function EllipticCurveCryptography.exchange(privateKey, publicKey)
+function EllipticCurveCryptography.exchange(privateKey: ByteTable, publicKey: ByteTable): ByteTable
 	assert(EllipticCurveCryptography.isByteTable(privateKey), "Bad privateKey")
 	assert(EllipticCurveCryptography.isByteTable(publicKey), "Bad publicKey")
 
 	local x = modq.decodeModQ(privateKey)
-	local Y = curve.pointDecode(publicKey)
+	local Y = curve.pointDecode(publicKey :: any)
 	local Z = Y * x
 
-	local sharedSecret = sha256.digest(Z:encode())
+	local sharedSecret: ByteTable = sha256.digest(Z:encode())
 
 	return sharedSecret
 end
@@ -227,24 +231,26 @@ end
 	@param message string | EncodedMessage
 	@return ByteTable
 ]=]
-function EllipticCurveCryptography.sign(privateKey, message)
+function EllipticCurveCryptography.sign(privateKey: ByteTable, message: string | ByteTable): ByteTable
 	assert(EllipticCurveCryptography.isByteTable(privateKey), "Bad privateKey")
 	assert(type(message) == "string" or EllipticCurveCryptography.isByteTable(message), "Bad message")
 
-	local actualMessage = type(message) == "table" and string.char(table.unpack(message)) or tostring(message)
-	local actualPrivateKey = type(privateKey) == "table" and string.char(table.unpack(privateKey))
+	local actualMessage = type(message) == "table" and string.char(table.unpack(message :: any))
+		or tostring(message)
+	local actualPrivateKey = type(privateKey) == "table" and string.char(table.unpack(privateKey :: any))
 		or tostring(privateKey)
 
-	local x = modq.decodeModQ(actualPrivateKey)
-	local k = modq.randomModQ()
+	local x: any = modq.decodeModQ(actualPrivateKey)
+	local k: any = modq.randomModQ()
 	local R = curve.G * k
-	local e = modq.hashModQ(actualMessage .. tostring(R))
+	local e: any = modq.hashModQ(actualMessage .. tostring(R))
 	local s = k - x * e
 
 	e = e:encode()
 	s = s:encode()
 
-	local result, result_len = e, #e
+	local result: { number } = e
+	local result_len = #e
 	for index, value in ipairs(s) do
 		result[result_len + index] = value
 	end
@@ -265,16 +271,17 @@ end
 	@param message ByteTable | string
 	@param signature ByteTable
 ]=]
-function EllipticCurveCryptography.verify(publicKey, message, signature)
+function EllipticCurveCryptography.verify(publicKey: ByteTable, message: string | ByteTable, signature: ByteTable): boolean
 	assert(EllipticCurveCryptography.isByteTable(publicKey), "Bad privateKey")
 	assert(type(message) == "string" or EllipticCurveCryptography.isByteTable(message), "Bad message")
 	assert(EllipticCurveCryptography.isByteTable(signature), "Bad signature")
 
-	local actualMessage = type(message) == "table" and string.char(table.unpack(message)) or tostring(message)
+	local actualMessage = type(message) == "table" and string.char(table.unpack(message :: any))
+		or tostring(message)
 	local sigLen = #signature
-	local Y = curve.pointDecode(publicKey)
-	local e = modq.decodeModQ({ table.unpack(signature, 1, sigLen / 2) })
-	local s = modq.decodeModQ({ table.unpack(signature, sigLen / 2 + 1) })
+	local Y = curve.pointDecode(publicKey :: any)
+	local e = modq.decodeModQ({ table.unpack(signature :: any, 1, sigLen / 2) })
+	local s = modq.decodeModQ({ table.unpack(signature :: any, sigLen / 2 + 1) })
 	local Rv = curve.G * s + Y * e
 	local ev = modq.hashModQ(actualMessage .. tostring(Rv))
 

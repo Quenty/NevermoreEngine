@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 -- Arithmetic on the finite field of integers modulo p
 -- Where p is the finite field modulus
 local arith = require(script.Parent.arith)
@@ -8,17 +8,20 @@ local addDouble = arith.addDouble
 local mult = arith.mult
 local square = arith.square
 
-local p = { 3, 0, 0, 0, 0, 0, 15761408 }
+type BigInt = { number }
+type DoubleInt = { number }
+
+local p: BigInt = { 3, 0, 0, 0, 0, 0, 15761408 }
 
 -- We're using the Montgomery Reduction for fast modular multiplication.
 -- https://en.wikipedia.org/wiki/Montgomery_modular_multiplication
 -- r = 2^168
 -- p * pInverse = -1 (mod r)
 -- r2 = r * r (mod p)
-local pInverse = { 5592405, 5592405, 5592405, 5592405, 5592405, 5592405, 14800213 }
-local r2 = { 13533400, 837116, 6278376, 13533388, 837116, 6278376, 7504076 }
+local pInverse: BigInt = { 5592405, 5592405, 5592405, 5592405, 5592405, 5592405, 14800213 }
+local r2: BigInt = { 13533400, 837116, 6278376, 13533388, 837116, 6278376, 7504076 }
 
-local function multByP(a)
+local function multByP(a: BigInt): DoubleInt
 	local a1, a2, a3, a4, a5, a6, a7 = a[1], a[2], a[3], a[4], a[5], a[6], a[7]
 
 	local c1 = a1 * 3
@@ -82,7 +85,7 @@ local function multByP(a)
 end
 
 -- Reduces a number from [0, 2p - 1] to [0, p - 1]
-local function reduceModP(a)
+local function reduceModP(a: BigInt): BigInt
 	-- a < p
 	if a[7] < 15761408 or a[7] == 15761408 and a[1] < 3 then
 		return { table.unpack(a) }
@@ -133,11 +136,11 @@ local function reduceModP(a)
 	return { c1, c2, c3, c4, c5, c6, c7 }
 end
 
-local function addModP(a, b)
+local function addModP(a: BigInt, b: BigInt): BigInt
 	return reduceModP(add(a, b))
 end
 
-local function subModP(a, b)
+local function subModP(a: BigInt, b: BigInt): BigInt
 	local result = sub(a, b)
 
 	if result[7] < 0 then
@@ -149,29 +152,29 @@ end
 
 -- Montgomery REDC algorithn
 -- Reduces a number from [0, p^2 - 1] to [0, p - 1]
-local function REDC(T)
+local function REDC(T: DoubleInt): BigInt
 	local m = mult(T, pInverse, true)
-	local t = { table.unpack(addDouble(T, multByP(m)), 8, 14) }
+	local t: BigInt = { table.unpack(addDouble(T, multByP(m)), 8, 14) }
 
 	return reduceModP(t)
 end
 
-local function multModP(a, b)
+local function multModP(a: BigInt, b: BigInt): BigInt
 	-- Only works with a, b in Montgomery form
-	return REDC(mult(a, b))
+	return REDC(mult(a, b, false))
 end
 
-local function squareModP(a)
+local function squareModP(a: BigInt): BigInt
 	-- Only works with a in Montgomery form
 	return REDC(square(a))
 end
 
-local function montgomeryModP(a)
+local function montgomeryModP(a: BigInt): BigInt
 	return multModP(a, r2)
 end
 
-local function inverseMontgomeryModP(a)
-	local newA = { table.unpack(a) }
+local function inverseMontgomeryModP(a: BigInt): BigInt
+	local newA: DoubleInt = { table.unpack(a) }
 
 	for i = 8, 14 do
 		newA[i] = 0
@@ -180,11 +183,11 @@ local function inverseMontgomeryModP(a)
 	return REDC(newA)
 end
 
-local ONE = montgomeryModP({ 1, 0, 0, 0, 0, 0, 0 })
+local ONE: BigInt = montgomeryModP({ 1, 0, 0, 0, 0, 0, 0 })
 
-local function expModP(base, exponentBinary)
-	local newBase = { table.unpack(base) }
-	local result = { table.unpack(ONE) }
+local function expModP(base: BigInt, exponentBinary: { number }): BigInt
+	local newBase: BigInt = { table.unpack(base) }
+	local result: BigInt = { table.unpack(ONE) }
 
 	for i = 1, 168 do
 		if exponentBinary[i] == 1 then
