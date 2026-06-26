@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	BaseAction state for [ActionManager].
 
@@ -15,6 +15,7 @@ local ContextActionService = game:GetService("ContextActionService")
 
 local EnabledMixin = require("EnabledMixin")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
@@ -24,18 +25,49 @@ BaseAction.ClassName = "BaseAction"
 
 EnabledMixin:Add(BaseAction)
 
-function BaseAction.new(actionData)
+export type ActionData = {
+	Name: string,
+	Shortcuts: { any }?,
+	[any]: any,
+}
+
+export type BaseAction = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_name: string,
+		_contextActionKey: string,
+		_activateData: { any }?,
+		_actionData: ActionData,
+		Activated: Signal.Signal<...any>,
+		Deactivated: Signal.Signal<()>,
+		IsActivatedValue: ValueObject.ValueObject<boolean>,
+
+		-- EnabledMixin surface (methods injected at runtime via EnabledMixin:Add)
+		_enabledMaidReference: Maid.Maid,
+		_enabledState: ValueObject.ValueObject<boolean>,
+		EnabledChanged: Signal.Signal<(boolean, boolean?)>,
+		InitEnabledMixin: (self: any, maid: Maid.Maid?) -> (),
+		IsEnabled: (self: any) -> boolean,
+		Enable: (self: any, doNotAnimate: boolean?) -> (),
+		Disable: (self: any, doNotAnimate: boolean?) -> (),
+		SetEnabled: (self: any, isEnabled: boolean, doNotAnimate: boolean?) -> (),
+		ObserveIsEnabled: (self: any) -> Observable.Observable<boolean>,
+	},
+	{} :: typeof({ __index = BaseAction })
+))
+
+function BaseAction.new(actionData: ActionData): BaseAction
 	assert(type(actionData) == "table", "Bad actionData")
 
-	local self = setmetatable({}, BaseAction)
+	local self: BaseAction = setmetatable({} :: any, BaseAction)
 
 	self._maid = Maid.new()
 	self._name = actionData.Name or error("No name")
 	self._contextActionKey = string.format("%s_ContextAction", tostring(self._name))
 	self._activateData = nil -- Data to be fired with the Activated event
 
-	self.Activated = self._maid:Add(Signal.new()) -- :Fire(actionMaid, ... (activateData))
-	self.Deactivated = self._maid:Add(Signal.new()) -- :Fire()
+	self.Activated = self._maid:Add(Signal.new() :: Signal.Signal<...any>) -- :Fire(actionMaid, ... (activateData))
+	self.Deactivated = self._maid:Add(Signal.new() :: Signal.Signal<()>) -- :Fire()
 
 	self.IsActivatedValue = self._maid:Add(ValueObject.new(false, "boolean"))
 
@@ -55,7 +87,7 @@ function BaseAction.new(actionData)
 	return self
 end
 
-function BaseAction:_handleEnabledChanged(isEnabled)
+function BaseAction._handleEnabledChanged(self: BaseAction, isEnabled: boolean): ()
 	if not isEnabled then
 		self:Deactivate()
 	end
@@ -63,11 +95,11 @@ function BaseAction:_handleEnabledChanged(isEnabled)
 	self:_updateShortcuts()
 end
 
-function BaseAction:_handleIsActiveValueChanged()
+function BaseAction._handleIsActiveValueChanged(self: BaseAction): ()
 	if self.IsActivatedValue.Value then
 		local actionMaid = Maid.new()
 		self._maid._actionMaid = actionMaid
-		self.Activated:Fire(actionMaid, unpack(self._activateData))
+		self.Activated:Fire(actionMaid, unpack(self._activateData or {}))
 		self._activateData = nil
 	else
 		self._maid._actionMaid = nil
@@ -75,11 +107,11 @@ function BaseAction:_handleIsActiveValueChanged()
 	end
 end
 
-function BaseAction:GetName()
+function BaseAction.GetName(self: BaseAction): string
 	return self._name
 end
 
-function BaseAction:_withActionData(actionData)
+function BaseAction._withActionData(self: BaseAction, actionData: ActionData): BaseAction
 	self._actionData = actionData or error("No actionData")
 
 	self:_updateShortcuts()
@@ -87,7 +119,7 @@ function BaseAction:_withActionData(actionData)
 	return self
 end
 
-function BaseAction:_updateShortcuts()
+function BaseAction._updateShortcuts(self: BaseAction): ()
 	if not self._actionData then
 		return
 	end
@@ -108,11 +140,11 @@ function BaseAction:_updateShortcuts()
 	end
 end
 
-function BaseAction:GetData()
+function BaseAction.GetData(self: BaseAction): ActionData
 	return self._actionData
 end
 
-function BaseAction:ToggleActivate(...)
+function BaseAction.ToggleActivate(self: BaseAction, ...): ()
 	self._activateData = { ... }
 
 	if self:IsEnabled() then
@@ -123,15 +155,15 @@ function BaseAction:ToggleActivate(...)
 	end
 end
 
-function BaseAction:IsActive()
+function BaseAction.IsActive(self: BaseAction): boolean
 	return self.IsActivatedValue.Value
 end
 
-function BaseAction:Deactivate()
+function BaseAction.Deactivate(self: BaseAction): ()
 	self.IsActivatedValue.Value = false
 end
 
-function BaseAction:Activate(...)
+function BaseAction.Activate(self: BaseAction, ...): ()
 	self._activateData = { ... }
 
 	if self:IsEnabled() then
@@ -141,10 +173,10 @@ function BaseAction:Activate(...)
 	end
 end
 
-function BaseAction:Destroy()
+function BaseAction.Destroy(self: BaseAction): ()
 	self._maid:DoCleaning()
 
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return BaseAction
