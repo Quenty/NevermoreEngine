@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Guarantees that only one snackbar is visible at once
 	@class SnackbarServiceClient
@@ -21,7 +21,7 @@ SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
 
 	@param serviceBag ServiceBag
 ]=]
-function SnackbarServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
+function SnackbarServiceClient:Init(serviceBag: ServiceBag.ServiceBag): ()
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -38,7 +38,7 @@ end
 	@param screenGui ScreenGui
 	@return SnackbarServiceClient
 ]=]
-function SnackbarServiceClient:SetScreenGui(screenGui)
+function SnackbarServiceClient:SetScreenGui(screenGui: ScreenGui)
 	self._screenGui = screenGui or error("No screenGui")
 
 	return self
@@ -96,14 +96,14 @@ end
 
 	@param doNotAnimate boolean?
 ]=]
-function SnackbarServiceClient:ClearQueue(doNotAnimate: boolean?)
+function SnackbarServiceClient:ClearQueue(doNotAnimate: boolean?): ()
 	self._queue:Clear(doNotAnimate)
 end
 
 --[=[
 	Cleans up the snackbar service!
 ]=]
-function SnackbarServiceClient:Destroy()
+function SnackbarServiceClient:Destroy(): ()
 	self._maid:DoCleaning()
 end
 
