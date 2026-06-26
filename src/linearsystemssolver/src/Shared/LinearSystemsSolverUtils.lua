@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class LinearSystemsSolverUtils
 ]=]
@@ -29,7 +29,7 @@ local LinearSystemsSolverUtils = {}
 	@param mutOutput { number }
 	@return { number }
 ]=]
-function LinearSystemsSolverUtils.solve(mutSystem, mutOutput)
+function LinearSystemsSolverUtils.solve(mutSystem: { { number } }, mutOutput: { number }): { number }
 	local n = #mutSystem
 
 	for i = 1, n do
@@ -84,7 +84,7 @@ end
 
 --handles the case 0*a = 0, solve for a
 --picks a to be 0
-local function getValidRatio(num, den)
+local function getValidRatio(num: number, den: number): number
 	if den == 0 then
 		return 0 * num
 	end
@@ -99,7 +99,7 @@ end
 	@param mutOutput table
 	@return table
 ]=]
-function LinearSystemsSolverUtils.solveTridiagonal(mutMainDiag, mutUpperDiag, mutLowerDiag, mutOutput)
+function LinearSystemsSolverUtils.solveTridiagonal(mutMainDiag: { number }, mutUpperDiag: { number }, mutLowerDiag: { number }, mutOutput: { number }): { number }
 	local n = #mutMainDiag
 
 	for i = 1, n - 1 do
