@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Renders touching parts from the PartTouchingCalculator
 	@class PartTouchingRenderer
@@ -14,13 +14,18 @@ local PartTouchingRenderer = {}
 PartTouchingRenderer.__index = PartTouchingRenderer
 PartTouchingRenderer.ClassName = "PartTouchingRenderer"
 
-function PartTouchingRenderer.new()
-	local self = setmetatable({}, PartTouchingRenderer)
+export type PartTouchingRenderer = typeof(setmetatable(
+	{} :: {},
+	{} :: typeof({ __index = PartTouchingRenderer })
+))
+
+function PartTouchingRenderer.new(): PartTouchingRenderer
+	local self: PartTouchingRenderer = setmetatable({}, PartTouchingRenderer)
 
 	return self
 end
 
-function PartTouchingRenderer:RenderTouchingProps(touchingPartList)
+function PartTouchingRenderer.RenderTouchingProps(self: PartTouchingRenderer, touchingPartList: { BasePart }): ()
 	for _, part in touchingPartList do
 		local selectionBox = Instance.new("SelectionBox")
 		selectionBox.Name = "TouchingWarning"

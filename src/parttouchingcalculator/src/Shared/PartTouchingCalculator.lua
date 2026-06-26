@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Determines if parts are touching or not
 	@class PartTouchingCalculator
@@ -16,16 +16,28 @@ local PartTouchingCalculator = {}
 PartTouchingCalculator.__index = PartTouchingCalculator
 PartTouchingCalculator.ClassName = "PartTouchingCalculator"
 
+export type TouchingHumanoidData = {
+	Humanoid: Humanoid,
+	Character: Model?,
+	Player: Player?,
+	Touching: { BasePart },
+}
+
+export type PartTouchingCalculator = typeof(setmetatable(
+	{} :: {},
+	{} :: typeof({ __index = PartTouchingCalculator })
+))
+
 --[=[
 	Constructs a new PartTouchingCalculator
 ]=]
-function PartTouchingCalculator.new()
+function PartTouchingCalculator.new(): PartTouchingCalculator
 	local self = setmetatable({}, PartTouchingCalculator)
 
 	return self
 end
 
-function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid: Humanoid, parts)
+function PartTouchingCalculator.CheckIfTouchingHumanoid(self: PartTouchingCalculator, humanoid: Humanoid, parts: { BasePart }): boolean
 	assert(humanoid, "Bad humanoid")
 	assert(parts, "Must have parts")
 
@@ -48,17 +60,18 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid: Humanoid, part
 
 	local dummyPart = self:GetCollidingPartFromParts(humanoidParts)
 
-	local previousProperties = {}
-	local toSet = {
+	local previousProperties: { [BasePart]: { [string]: any } } = {}
+	local toSet: { [string]: any } = {
 		CanCollide = true,
 		Anchored = false,
 	}
-	local partSet = {}
+	local partSet: { [BasePart]: boolean } = {}
 	for _, part in parts do
 		previousProperties[part] = {}
+		local anyPart = part :: any
 		for name, value in toSet do
-			previousProperties[part][name] = part[name]
-			part[name] = value
+			previousProperties[part][name] = anyPart[name]
+			anyPart[name] = value
 		end
 		partSet[part] = true
 	end
@@ -77,17 +90,17 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid: Humanoid, part
 
 	for part, properties in previousProperties do
 		for name, value in properties do
-			part[name] = value
+			(part :: any)[name] = value
 		end
 	end
 
 	return returnValue
 end
 
-function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, padding)
-	relativeTo = relativeTo or CFrame.new()
+function PartTouchingCalculator.GetCollidingPartFromParts(self: PartTouchingCalculator, parts: { BasePart }, relativeTo: CFrame?, padding: number?): BasePart
+	local actualRelativeTo = relativeTo or CFrame.new()
 
-	local size, position = BoundingBoxUtils.getPartsBoundingBox(parts, relativeTo)
+	local size, position = BoundingBoxUtils.getPartsBoundingBox(parts, actualRelativeTo)
 
 	if padding then
 		size = size + Vector3.new(padding, padding, padding)
@@ -96,7 +109,7 @@ function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, pad
 	local dummyPart = Instance.new("Part")
 	dummyPart.Name = "CollisionDetection"
 	dummyPart.Size = size
-	dummyPart.CFrame = relativeTo + relativeTo:vectorToWorldSpace(position)
+	dummyPart.CFrame = actualRelativeTo + actualRelativeTo:VectorToWorldSpace(position)
 	dummyPart.Anchored = false
 	dummyPart.CanCollide = true
 	dummyPart.Parent = Workspace
@@ -104,7 +117,7 @@ function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, pad
 	return dummyPart
 end
 
-function PartTouchingCalculator:GetTouchingBoundingBox(parts, relativeTo, padding)
+function PartTouchingCalculator.GetTouchingBoundingBox(self: PartTouchingCalculator, parts: { BasePart }, relativeTo: CFrame?, padding: number?): { BasePart }
 	local dummy = self:GetCollidingPartFromParts(parts, relativeTo, padding)
 	local touching = dummy:GetTouchingParts()
 	dummy:Destroy()
@@ -113,8 +126,8 @@ function PartTouchingCalculator:GetTouchingBoundingBox(parts, relativeTo, paddin
 end
 
 -- Expensive hull check on a list of parts (aggregating each parts touching list)
-function PartTouchingCalculator:GetTouchingHull(parts, padding)
-	local hitParts = {}
+function PartTouchingCalculator.GetTouchingHull(self: PartTouchingCalculator, parts: { BasePart }, padding: number?): { BasePart }
+	local hitParts: { [BasePart]: boolean } = {}
 
 	for _, part in parts do
 		for _, TouchingPart in self:GetTouching(part, padding) do
@@ -136,9 +149,9 @@ end
 	@param padding number -- studs of padding around the part
 	@return { BasePart }
 ]=]
-function PartTouchingCalculator:GetTouching(basePart, padding)
-	padding = padding or 2
-	local part
+function PartTouchingCalculator.GetTouching(self: PartTouchingCalculator, basePart: BasePart, padding: number?): { BasePart }
+	local actualPadding = padding or 2
+	local part: BasePart
 
 	if basePart:IsA("TrussPart") then
 		-- Truss parts can't be resized
@@ -155,7 +168,7 @@ function PartTouchingCalculator:GetTouching(basePart, padding)
 		part:ClearAllChildren()
 	end
 
-	part.Size = basePart.Size + Vector3.new(padding, padding, padding)
+	part.Size = basePart.Size + Vector3.new(actualPadding, actualPadding, actualPadding)
 	part.CFrame = basePart.CFrame
 	part.Anchored = false
 	part.CanCollide = true
@@ -169,11 +182,12 @@ function PartTouchingCalculator:GetTouching(basePart, padding)
 	return touching
 end
 
-function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
-	local touchingHumanoids = {}
+function PartTouchingCalculator.GetTouchingHumanoids(self: PartTouchingCalculator, touchingList: { BasePart }): { TouchingHumanoidData }
+	local touchingHumanoids: { [Humanoid]: TouchingHumanoidData } = {}
 
 	for _, part in touchingList do
-		local humanoid = part.Parent:FindFirstChildOfClass("Humanoid")
+		local parent = part.Parent
+		local humanoid = parent and parent:FindFirstChildOfClass("Humanoid")
 		if humanoid then
 			if not touchingHumanoids[humanoid] then
 				local player = CharacterUtils.getPlayerFromCharacter(humanoid)

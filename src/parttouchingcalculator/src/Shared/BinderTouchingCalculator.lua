@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Extends PartTouchingCalculator with generic binder stuff
 	@class BinderTouchingCalculator
@@ -6,6 +6,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Binder = require("Binder")
 local BinderUtils = require("BinderUtils")
 local PartTouchingCalculator = require("PartTouchingCalculator")
 
@@ -13,14 +14,29 @@ local BinderTouchingCalculator = setmetatable({}, PartTouchingCalculator)
 BinderTouchingCalculator.ClassName = "BinderTouchingCalculator"
 BinderTouchingCalculator.__index = BinderTouchingCalculator
 
-function BinderTouchingCalculator.new()
-	local self = setmetatable(PartTouchingCalculator.new(), BinderTouchingCalculator)
+export type TouchingClassData<T> = {
+	Object: T,
+	Touching: { BasePart },
+}
+
+export type BinderTouchingCalculator = typeof(setmetatable(
+	{} :: {},
+	{} :: typeof({ __index = BinderTouchingCalculator })
+)) & PartTouchingCalculator.PartTouchingCalculator
+
+function BinderTouchingCalculator.new(): BinderTouchingCalculator
+	local self: BinderTouchingCalculator = setmetatable(PartTouchingCalculator.new() :: any, BinderTouchingCalculator)
 
 	return self
 end
 
-function BinderTouchingCalculator:GetTouchingClass(binder, touchingList, ignoreObject)
-	local touching = {}
+function BinderTouchingCalculator.GetTouchingClass<T>(
+	self: BinderTouchingCalculator,
+	binder: Binder.Binder<T>,
+	touchingList: { BasePart },
+	ignoreObject: T?
+): { TouchingClassData<T> }
+	local touching: { [T]: TouchingClassData<T> } = {}
 
 	for _, part in touchingList do
 		local object = BinderUtils.findFirstAncestor(binder, part)
