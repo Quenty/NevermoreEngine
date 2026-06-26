@@ -12,24 +12,26 @@ local CubicSplineUtils = require("CubicSplineUtils")
 local FadeBetweenCamera2 = {}
 FadeBetweenCamera2.ClassName = "FadeBetweenCamera2"
 
-export type FadeBetweenCamera2 = typeof(setmetatable(
-	{} :: {
-		CameraA: CameraEffectUtils.CameraEffect,
-		CameraB: CameraEffectUtils.CameraEffect,
-		CameraState: CameraState.CameraState,
-		Value: number,
-		Target: number,
-		HasReachedTarget: boolean,
-		Speed: number,
-		Velocity: number,
-		_state0: CameraState.CameraState,
-		_time0: number,
-		_target: number,
-		_position0: number,
-		_speed: number,
-	},
-	{} :: typeof({ __index = FadeBetweenCamera2 })
-)) & CameraEffectUtils.CameraEffect
+export type FadeBetweenCamera2 =
+	typeof(setmetatable(
+		{} :: {
+			CameraA: CameraEffectUtils.CameraEffect,
+			CameraB: CameraEffectUtils.CameraEffect,
+			CameraState: CameraState.CameraState,
+			Value: number,
+			Target: number,
+			HasReachedTarget: boolean,
+			Speed: number,
+			Velocity: number,
+			_state0: CameraState.CameraState,
+			_time0: number,
+			_target: number,
+			_position0: number,
+			_speed: number,
+		},
+		{} :: typeof({ __index = FadeBetweenCamera2 })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	@param cameraA CameraLike
@@ -40,15 +42,18 @@ function FadeBetweenCamera2.new(
 	cameraA: CameraEffectUtils.CameraEffect,
 	cameraB: CameraEffectUtils.CameraEffect
 ): FadeBetweenCamera2
-	local self: FadeBetweenCamera2 = setmetatable({
-		CameraA = cameraA or error("No cameraA"),
-		CameraB = cameraB or error("No cameraB"),
-		_state0 = cameraA.CameraState,
-		_time0 = os.clock(),
-		_target = 0,
-		_position0 = 0,
-		_speed = 15,
-	} :: any, FadeBetweenCamera2)
+	local self: FadeBetweenCamera2 = setmetatable(
+		{
+			CameraA = cameraA or error("No cameraA"),
+			CameraB = cameraB or error("No cameraB"),
+			_state0 = cameraA.CameraState,
+			_time0 = os.clock(),
+			_target = 0,
+			_position0 = 0,
+			_speed = 15,
+		} :: any,
+		FadeBetweenCamera2
+	)
 
 	return self
 end
@@ -134,10 +139,7 @@ function FadeBetweenCamera2._computeTargetState(self: FadeBetweenCamera2): Camer
 	end
 end
 
-function FadeBetweenCamera2._computeCameraState(
-	self: FadeBetweenCamera2,
-	t: number
-): (CameraState.CameraState, number)
+function FadeBetweenCamera2._computeCameraState(self: FadeBetweenCamera2, t: number): (CameraState.CameraState, number)
 	if t <= 0 then
 		return self._state0, 0
 	end

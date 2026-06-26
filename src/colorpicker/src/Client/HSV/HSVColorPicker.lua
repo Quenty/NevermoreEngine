@@ -22,19 +22,21 @@ local HSVColorPicker = setmetatable({}, BaseObject)
 HSVColorPicker.ClassName = "HSVColorPicker"
 HSVColorPicker.__index = HSVColorPicker
 
-export type HSVColorPicker = typeof(setmetatable(
-	{} :: {
-		_hsvColorValue: ValueObject.ValueObject<Vector3>,
-		_sizeValue: ValueObject.ValueObject<Vector2>,
-		_innerPadding: ValueObject.ValueObject<number>,
-		_transparency: ValueObject.ValueObject<number>,
-		_hueSaturationPicker: HSColorPicker.HSColorPicker,
-		_valuePicker: ValueColorPicker.ValueColorPicker,
-		ColorChanged: Signal.Signal<(Vector3, Vector3, ...any)>,
-		Gui: Instance?,
-	},
-	{} :: typeof({ __index = HSVColorPicker })
-)) & BaseObject.BaseObject
+export type HSVColorPicker =
+	typeof(setmetatable(
+		{} :: {
+			_hsvColorValue: ValueObject.ValueObject<Vector3>,
+			_sizeValue: ValueObject.ValueObject<Vector2>,
+			_innerPadding: ValueObject.ValueObject<number>,
+			_transparency: ValueObject.ValueObject<number>,
+			_hueSaturationPicker: HSColorPicker.HSColorPicker,
+			_valuePicker: ValueColorPicker.ValueColorPicker,
+			ColorChanged: Signal.Signal<(Vector3, Vector3, ...any)>,
+			Gui: Instance?,
+		},
+		{} :: typeof({ __index = HSVColorPicker })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	Creates a new color picker!

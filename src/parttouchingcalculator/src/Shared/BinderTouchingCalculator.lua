@@ -19,10 +19,9 @@ export type TouchingClassData<T> = {
 	Touching: { BasePart },
 }
 
-export type BinderTouchingCalculator = typeof(setmetatable(
-	{} :: {},
-	{} :: typeof({ __index = BinderTouchingCalculator })
-)) & PartTouchingCalculator.PartTouchingCalculator
+export type BinderTouchingCalculator =
+	typeof(setmetatable({} :: {}, {} :: typeof({ __index = BinderTouchingCalculator })))
+	& PartTouchingCalculator.PartTouchingCalculator
 
 function BinderTouchingCalculator.new(): BinderTouchingCalculator
 	local self: BinderTouchingCalculator = setmetatable(PartTouchingCalculator.new() :: any, BinderTouchingCalculator)

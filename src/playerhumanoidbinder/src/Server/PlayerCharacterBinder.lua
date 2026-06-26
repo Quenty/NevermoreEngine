@@ -19,12 +19,14 @@ local PlayerCharacterBinder = setmetatable({}, Binder)
 PlayerCharacterBinder.ClassName = "PlayerCharacterBinder"
 PlayerCharacterBinder.__index = PlayerCharacterBinder
 
-export type PlayerCharacterBinder<T> = typeof(setmetatable(
-	{} :: {
-		_shouldTag: ValueObject.ValueObject<boolean>,
-	},
-	{} :: typeof({ __index = PlayerCharacterBinder })
-)) & Binder.Binder<T>
+export type PlayerCharacterBinder<T> =
+	typeof(setmetatable(
+		{} :: {
+			_shouldTag: ValueObject.ValueObject<boolean>,
+		},
+		{} :: typeof({ __index = PlayerCharacterBinder })
+	))
+	& Binder.Binder<T>
 
 --[=[
 	Returns a new PlayerCharacterBinder
@@ -33,11 +35,7 @@ export type PlayerCharacterBinder<T> = typeof(setmetatable(
 	@param ... any
 	@return PlayerCharacterBinder<T>
 ]=]
-function PlayerCharacterBinder.new<T>(
-	tag: string,
-	class: Binder.BinderConstructor<T>,
-	...
-): PlayerCharacterBinder<T>
+function PlayerCharacterBinder.new<T>(tag: string, class: Binder.BinderConstructor<T>, ...): PlayerCharacterBinder<T>
 	local self: PlayerCharacterBinder<T> = setmetatable(Binder.new(tag, class, ...) :: any, PlayerCharacterBinder)
 
 	return self

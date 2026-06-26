@@ -50,10 +50,12 @@ function AvatarEditorInventoryServiceClient.Init(
 	end))
 
 	self._promiseInventoryPages = MemorizeUtils.memoize(function(avatarAssetTypes: { Enum.AvatarAssetType })
-		return (AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes):Then(function(catalogPages)
-			-- Allow for replay
-			return PagesProxy.new(catalogPages)
-		end)) :: any
+		return (
+			AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes):Then(function(catalogPages)
+				-- Allow for replay
+				return PagesProxy.new(catalogPages)
+			end)
+		) :: any
 	end)
 end
 
@@ -61,19 +63,23 @@ function AvatarEditorInventoryServiceClient.PromiseInventoryPages(
 	self: AvatarEditorInventoryServiceClient,
 	avatarAssetTypes: Enum.AvatarAssetType
 ): Promise.Promise<PagesProxy.PagesProxy>
-	return (self:PromiseEnsureAccess()
-		:Then(function()
-			return self._promiseInventoryPages(avatarAssetTypes)
-		end)
-		:Then(function(pagesProxy)
-			return pagesProxy:Clone()
-		end)) :: any
+	return (
+		self:PromiseEnsureAccess()
+			:Then(function()
+				return self._promiseInventoryPages(avatarAssetTypes)
+			end)
+			:Then(function(pagesProxy)
+				return pagesProxy:Clone()
+			end)
+	) :: any
 end
 
 function AvatarEditorInventoryServiceClient.PromiseInventoryForAvatarAssetType(
 	self: AvatarEditorInventoryServiceClient,
 	avatarAssetType: Enum.AvatarAssetType
-): Promise.Promise<AvatarEditorInventory.AvatarEditorInventory>
+): Promise.Promise<
+	AvatarEditorInventory.AvatarEditorInventory
+>
 	assert(EnumUtils.isOfType(Enum.AvatarAssetType, avatarAssetType), "Bad avatarAssetType")
 
 	if self._assetTypeToInventoryPromises[avatarAssetType] then
@@ -82,15 +88,17 @@ function AvatarEditorInventoryServiceClient.PromiseInventoryForAvatarAssetType(
 
 	local inventory = self._maid:Add(AvatarEditorInventory.new())
 
-	self._assetTypeToInventoryPromises[avatarAssetType] = (AvatarEditorUtils.promiseInventoryPages({
-		avatarAssetType,
-	})
-		:Then(function(inventoryPages)
-			return inventory:PromiseProcessPages(inventoryPages)
-		end)
-		:Then(function()
-			return inventory
-		end)) :: any
+	self._assetTypeToInventoryPromises[avatarAssetType] = (
+		AvatarEditorUtils.promiseInventoryPages({
+			avatarAssetType,
+		})
+			:Then(function(inventoryPages)
+				return inventory:PromiseProcessPages(inventoryPages)
+			end)
+			:Then(function()
+				return inventory
+			end)
+	) :: any
 
 	return self._assetTypeToInventoryPromises[avatarAssetType]
 end

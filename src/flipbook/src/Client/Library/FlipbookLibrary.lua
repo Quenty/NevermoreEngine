@@ -84,7 +84,12 @@ function FlipbookLibrary.GetFlipbook(self: FlipbookLibrary, flipbookName: string
 	end
 end
 
-function FlipbookLibrary.Register(self: FlipbookLibrary, flipbookName: string, theme: string, flipbook: Flipbook.Flipbook): ()
+function FlipbookLibrary.Register(
+	self: FlipbookLibrary,
+	flipbookName: string,
+	theme: string,
+	flipbook: Flipbook.Flipbook
+): ()
 	assert(type(flipbookName) == "string", "Bad flipbookName")
 	assert(type(theme) == "string", "Bad theme")
 	assert(Flipbook.isFlipbook(flipbook), "Bad flipbook")

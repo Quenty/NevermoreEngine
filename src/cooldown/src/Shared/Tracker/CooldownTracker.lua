@@ -19,15 +19,17 @@ local CooldownTracker = setmetatable({}, BaseObject)
 CooldownTracker.ClassName = "CooldownTracker"
 CooldownTracker.__index = CooldownTracker
 
-export type CooldownTracker = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_cooldownBinder: Binder.Binder<CooldownShared.CooldownShared>,
-		CurrentCooldown: ValueObject.ValueObject<CooldownShared.CooldownShared?>,
-		_cooldownTrackModel: CooldownTrackerModel.CooldownTrackerModel,
-	},
-	{} :: typeof({ __index = CooldownTracker })
-)) & BaseObject.BaseObject
+export type CooldownTracker =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_cooldownBinder: Binder.Binder<CooldownShared.CooldownShared>,
+			CurrentCooldown: ValueObject.ValueObject<CooldownShared.CooldownShared?>,
+			_cooldownTrackModel: CooldownTrackerModel.CooldownTrackerModel,
+		},
+		{} :: typeof({ __index = CooldownTracker })
+	))
+	& BaseObject.BaseObject
 
 function CooldownTracker.new(serviceBag: ServiceBag.ServiceBag, parent: Instance): CooldownTracker
 	assert(typeof(parent) == "Instance", "Bad parent")

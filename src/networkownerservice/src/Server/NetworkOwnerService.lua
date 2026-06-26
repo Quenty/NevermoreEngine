@@ -72,7 +72,11 @@ end
 	@param player Player?
 	@return function -- Cleanup function
 ]=]
-function NetworkOwnerService.AddSetNetworkOwnerHandle(self: NetworkOwnerService, part: BasePart, player: Player?): () -> ()
+function NetworkOwnerService.AddSetNetworkOwnerHandle(
+	self: NetworkOwnerService,
+	part: BasePart,
+	player: Player?
+): () -> ()
 	assert((self :: any) ~= NetworkOwnerService, "Make sure to retrieve NetworkOwnerService from a ServiceBag")
 	assert(self._partOwnerData, "Not initialized")
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")

@@ -193,7 +193,7 @@ end
 
 local function randomModQ(): BigInt
 	while true do
-		local s: { number } = { table.unpack((random.random() :: any), 1, 21) }
+		local s: { number } = { table.unpack(random.random() :: any, 1, 21) }
 		local result: BigInt = decodeInt(s)
 		if result[7] < q[7] then
 			return setmetatable(result, modQMT) :: any

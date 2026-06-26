@@ -16,14 +16,16 @@ local InputKeyMapSettingClient = setmetatable({}, BaseObject)
 InputKeyMapSettingClient.ClassName = "InputKeyMapSettingClient"
 InputKeyMapSettingClient.__index = InputKeyMapSettingClient
 
-export type InputKeyMapSettingClient = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_settingServiceClient: any,
-		_inputKeyMapList: InputKeyMapList.InputKeyMapList,
-	},
-	{} :: typeof({ __index = InputKeyMapSettingClient })
-)) & BaseObject.BaseObject
+export type InputKeyMapSettingClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_settingServiceClient: any,
+			_inputKeyMapList: InputKeyMapList.InputKeyMapList,
+		},
+		{} :: typeof({ __index = InputKeyMapSettingClient })
+	))
+	& BaseObject.BaseObject
 
 function InputKeyMapSettingClient.new(
 	serviceBag: ServiceBag.ServiceBag,

@@ -14,10 +14,9 @@ local RogueHumanoid = setmetatable({}, RogueHumanoidBase)
 RogueHumanoid.ClassName = "RogueHumanoid"
 RogueHumanoid.__index = RogueHumanoid
 
-export type RogueHumanoid = typeof(setmetatable(
-	{} :: {},
-	{} :: typeof({ __index = RogueHumanoid })
-)) & RogueHumanoidBase.RogueHumanoidBase
+export type RogueHumanoid =
+	typeof(setmetatable({} :: {}, {} :: typeof({ __index = RogueHumanoid })))
+	& RogueHumanoidBase.RogueHumanoidBase
 
 function RogueHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): RogueHumanoid
 	local self: RogueHumanoid = setmetatable(RogueHumanoidBase.new(humanoid, serviceBag) :: any, RogueHumanoid)
@@ -27,4 +26,7 @@ function RogueHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag
 	return self
 end
 
-return PlayerHumanoidBinder.new("RogueHumanoid", RogueHumanoid :: any) :: PlayerHumanoidBinder.PlayerHumanoidBinder<RogueHumanoid>
+return PlayerHumanoidBinder.new(
+		"RogueHumanoid",
+		RogueHumanoid :: any
+	) :: PlayerHumanoidBinder.PlayerHumanoidBinder<RogueHumanoid>

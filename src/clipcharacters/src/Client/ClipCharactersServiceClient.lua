@@ -34,7 +34,9 @@ end
 	Disables collisions between default geometry and other characters which stops some random physics
 	glitches from occurring.
 ]=]
-function ClipCharactersServiceClient.PushDisableCharacterCollisionsWithDefault(self: ClipCharactersServiceClient): () -> ()
+function ClipCharactersServiceClient.PushDisableCharacterCollisionsWithDefault(
+	self: ClipCharactersServiceClient
+): () -> ()
 	return self._disableCollisions:PushState(true)
 end
 

@@ -99,7 +99,12 @@ end
 	@param mutOutput table
 	@return table
 ]=]
-function LinearSystemsSolverUtils.solveTridiagonal(mutMainDiag: { number }, mutUpperDiag: { number }, mutLowerDiag: { number }, mutOutput: { number }): { number }
+function LinearSystemsSolverUtils.solveTridiagonal(
+	mutMainDiag: { number },
+	mutUpperDiag: { number },
+	mutLowerDiag: { number },
+	mutOutput: { number }
+): { number }
 	local n = #mutMainDiag
 
 	for i = 1, n - 1 do

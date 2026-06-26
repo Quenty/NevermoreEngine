@@ -49,7 +49,10 @@ end
 	@param player Player | nil
 	@return Promise<boolean>
 ]=]
-function PermissionServiceClient.PromiseIsAdmin(self: PermissionServiceClient, player: Player?): Promise.Promise<boolean>
+function PermissionServiceClient.PromiseIsAdmin(
+	self: PermissionServiceClient,
+	player: Player?
+): Promise.Promise<boolean>
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
 
 	return self:PromisePermissionProvider():Then(function(permissionProvider)
@@ -61,9 +64,9 @@ end
 	Returns the permission provider
 	@return Promise<PermissionProviderClient>
 ]=]
-function PermissionServiceClient.PromisePermissionProvider(
-	self: PermissionServiceClient
-): Promise.Promise<PermissionProviderClient.PermissionProviderClient>
+function PermissionServiceClient.PromisePermissionProvider(self: PermissionServiceClient): Promise.Promise<
+	PermissionProviderClient.PermissionProviderClient
+>
 	return self._providerPromise
 end
 

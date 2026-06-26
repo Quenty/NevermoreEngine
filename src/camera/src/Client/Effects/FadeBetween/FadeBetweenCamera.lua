@@ -16,24 +16,26 @@ local SummedCamera = require("SummedCamera")
 local FadeBetweenCamera = {}
 FadeBetweenCamera.ClassName = "FadeBetweenCamera"
 
-export type FadeBetweenCamera = typeof(setmetatable(
-	{} :: {
-		_spring: Spring.Spring<number>,
-		CameraA: CameraEffectUtils.CameraLike,
-		CameraB: CameraEffectUtils.CameraLike,
-		CameraState: CameraState.CameraState,
-		CameraStateA: CameraState.CameraState,
-		CameraStateB: CameraState.CameraState,
-		Damper: number,
-		Value: number,
-		Speed: number,
-		Target: number,
-		Velocity: number,
-		HasReachedTarget: boolean,
-		Spring: Spring.Spring<number>,
-	},
-	{} :: typeof({ __index = FadeBetweenCamera })
-)) & CameraEffectUtils.CameraEffect
+export type FadeBetweenCamera =
+	typeof(setmetatable(
+		{} :: {
+			_spring: Spring.Spring<number>,
+			CameraA: CameraEffectUtils.CameraLike,
+			CameraB: CameraEffectUtils.CameraLike,
+			CameraState: CameraState.CameraState,
+			CameraStateA: CameraState.CameraState,
+			CameraStateB: CameraState.CameraState,
+			Damper: number,
+			Value: number,
+			Speed: number,
+			Target: number,
+			Velocity: number,
+			HasReachedTarget: boolean,
+			Spring: Spring.Spring<number>,
+		},
+		{} :: typeof({ __index = FadeBetweenCamera })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	@param cameraA CameraLike
@@ -44,11 +46,14 @@ function FadeBetweenCamera.new(
 	cameraA: CameraEffectUtils.CameraLike,
 	cameraB: CameraEffectUtils.CameraLike
 ): FadeBetweenCamera
-	local self: FadeBetweenCamera = setmetatable({
-		_spring = Spring.new(0),
-		CameraA = cameraA or error("No cameraA"),
-		CameraB = cameraB or error("No cameraB"),
-	} :: any, FadeBetweenCamera)
+	local self: FadeBetweenCamera = setmetatable(
+		{
+			_spring = Spring.new(0),
+			CameraA = cameraA or error("No cameraA"),
+			CameraB = cameraB or error("No cameraB"),
+		} :: any,
+		FadeBetweenCamera
+	)
 
 	self.Damper = 1
 	self.Speed = 15
@@ -56,7 +61,10 @@ function FadeBetweenCamera.new(
 	return self
 end
 
-function FadeBetweenCamera.__add(self: FadeBetweenCamera, other: CameraEffectUtils.CameraEffect): SummedCamera.SummedCamera
+function FadeBetweenCamera.__add(
+	self: FadeBetweenCamera,
+	other: CameraEffectUtils.CameraEffect
+): SummedCamera.SummedCamera
 	return SummedCamera.new(self, other)
 end
 

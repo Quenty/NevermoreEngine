@@ -16,7 +16,11 @@ type ScrollType = typeof(SCROLL_TYPE.Vertical)
 -- ScrollingFrame is still nonstrict and exports no type; type the surface we use.
 type ScrollingFrameLike = {
 	GetModel: (self: ScrollingFrameLike) -> ScrollModel.ScrollModel,
-	StartScrollbarScrolling: (self: ScrollingFrameLike, scrollbarContainer: Instance, inputBeganObject: InputObject) -> Maid.Maid,
+	StartScrollbarScrolling: (
+		self: ScrollingFrameLike,
+		scrollbarContainer: Instance,
+		inputBeganObject: InputObject
+	) -> Maid.Maid,
 }
 
 local Scrollbar = {}

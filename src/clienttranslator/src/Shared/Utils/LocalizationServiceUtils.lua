@@ -64,15 +64,17 @@ function LocalizationServiceUtils.promisePlayerTranslator(player: Player): Promi
 		end))
 	end)
 
-	return (promiseTranslator:Catch(function(err)
-		if err ~= ERROR_PUBLISH_REQUIRED and (error :: any) ~= ERROR_TIMEOUT then
-			warn(string.format("[LocalizationServiceUtils.promisePlayerTranslator] - %s", tostring(err)))
-		end
+	return (
+		promiseTranslator:Catch(function(err)
+			if err ~= ERROR_PUBLISH_REQUIRED and (error :: any) ~= ERROR_TIMEOUT then
+				warn(string.format("[LocalizationServiceUtils.promisePlayerTranslator] - %s", tostring(err)))
+			end
 
-		-- Fallback to just local stuff
-		local translator = LocalizationService:GetTranslatorForPlayer(player)
-		return translator
-	end) :: any) :: Promise.Promise<Translator>
+			-- Fallback to just local stuff
+			local translator = LocalizationService:GetTranslatorForPlayer(player)
+			return translator
+		end) :: any
+	) :: Promise.Promise<Translator>
 end
 
 return LocalizationServiceUtils

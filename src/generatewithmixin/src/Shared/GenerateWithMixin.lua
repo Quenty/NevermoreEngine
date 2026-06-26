@@ -20,7 +20,7 @@ local GenerateWithMixin = {}
 	@param class table
 	@param staticResources table -- These resources are added to the class automatically
 ]=]
-function GenerateWithMixin:Add(class: {[string]: any}, staticResources: {string})
+function GenerateWithMixin:Add(class: { [string]: any }, staticResources: { string })
 	assert(class, "Bad class")
 	assert(staticResources, "Bad staticResources")
 
@@ -33,7 +33,7 @@ end
 	@param class table -- Resources to add
 	@param resources { string }
 ]=]
-function GenerateWithMixin._generateWith(class: {[string]: any}, resources: {string}): {[string]: any}
+function GenerateWithMixin._generateWith(class: { [string]: any }, resources: { string }): { [string]: any }
 	assert(type(resources) == "table", "Bad resources")
 
 	for _, resourceName in ipairs(resources) do

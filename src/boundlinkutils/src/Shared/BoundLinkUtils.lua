@@ -68,11 +68,7 @@ end
 	@param from Instance
 	@return { T }
 ]=]
-function BoundLinkUtils.getClassesForLinkValues<T>(
-	binders: { Binder.Binder<T> },
-	linkName: string,
-	from: Instance
-): { T }
+function BoundLinkUtils.getClassesForLinkValues<T>(binders: { Binder.Binder<T> }, linkName: string, from: Instance): { T }
 	assert(type(binders) == "table", "Bad binders")
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad from")

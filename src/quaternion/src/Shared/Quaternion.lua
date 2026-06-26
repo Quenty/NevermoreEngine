@@ -124,7 +124,9 @@ local function SlerpQuaternions(q0: Quaternion, q1: Quaternion, t: number): Quat
 end
 lib.SlerpQuaternions = SlerpQuaternions
 
-local function QuaternionToCFrame(q: Quaternion): (number, number, number, number, number, number, number, number, number)
+local function QuaternionToCFrame(
+	q: Quaternion
+): (number, number, number, number, number, number, number, number, number)
 	local w, x, y, z = q[1], q[2], q[3], q[4]
 	local xs, ys, zs = x + x, y + y, z + z
 	local wx, wy, wz = w * xs, w * ys, w * zs
@@ -391,7 +393,12 @@ local function updateCFrameTweens(timeNow: number): ()
 end
 lib.updateCFrameTweens = updateCFrameTweens
 
-local function newTween<T>(name: any, value: T, updateFunction: ((T) -> ())?, time: (number | ((T, T, T, T) -> number))?): ()
+local function newTween<T>(
+	name: any,
+	value: T,
+	updateFunction: ((T) -> ())?,
+	time: (number | ((T, T, T, T) -> number))?
+): ()
 	TweenData[name] = {
 		x0 = value,
 		x1 = value,
@@ -409,7 +416,13 @@ local function newTween<T>(name: any, value: T, updateFunction: ((T) -> ())?, ti
 end
 lib.newTween = newTween
 
-local function newQuaternionTween(name: any, value: Quaternion, updateFunction: ((Quaternion) -> ())?, time: (number | ((Quaternion, Quaternion, Quaternion, Quaternion) -> number))?, autoChoose: boolean?): ()
+local function newQuaternionTween(
+	name: any,
+	value: Quaternion,
+	updateFunction: ((Quaternion) -> ())?,
+	time: (number | ((Quaternion, Quaternion, Quaternion, Quaternion) -> number))?,
+	autoChoose: boolean?
+): ()
 	QuaternionTweenData[name] = {
 		q0 = value,
 		q1 = value,

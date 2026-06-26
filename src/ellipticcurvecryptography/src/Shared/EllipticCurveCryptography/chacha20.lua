@@ -105,7 +105,13 @@ end
 
 export type ByteTable = typeof(setmetatable({} :: { number }, {} :: typeof(util.byteTableMT)))
 
-local function crypt(data: string | { number }, key: { number }, nonce: { number }, cntr: number?, round: number?): ByteTable
+local function crypt(
+	data: string | { number },
+	key: { number },
+	nonce: { number },
+	cntr: number?,
+	round: number?
+): ByteTable
 	assert(type(key) == "table", "ChaCha20: Invalid key format (" .. type(key) .. "), must be table")
 	assert(type(nonce) == "table", "ChaCha20: Invalid nonce format (" .. type(nonce) .. "), must be table")
 	assert(#key == 16 or #key == 32, "ChaCha20: Invalid key length (" .. #key .. "), must be 16 or 32")

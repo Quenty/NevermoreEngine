@@ -14,22 +14,24 @@ local SpringUtils = require("SpringUtils")
 local FadeBetweenCamera4 = {}
 FadeBetweenCamera4.ClassName = "FadeBetweenCamera4"
 
-export type FadeBetweenCamera4 = typeof(setmetatable(
-	{} :: {
-		CameraA: CameraEffectUtils.CameraEffect,
-		CameraB: CameraEffectUtils.CameraEffect,
-		_spring: Spring.Spring<number>,
-		_position0: number,
-		_state0: CameraState.CameraState,
-		CameraState: CameraState.CameraState,
-		Value: number,
-		Target: number,
-		HasReachedTarget: boolean,
-		Speed: number,
-		Velocity: number,
-	},
-	{} :: typeof({ __index = FadeBetweenCamera4 })
-)) & CameraEffectUtils.CameraEffect
+export type FadeBetweenCamera4 =
+	typeof(setmetatable(
+		{} :: {
+			CameraA: CameraEffectUtils.CameraEffect,
+			CameraB: CameraEffectUtils.CameraEffect,
+			_spring: Spring.Spring<number>,
+			_position0: number,
+			_state0: CameraState.CameraState,
+			CameraState: CameraState.CameraState,
+			Value: number,
+			Target: number,
+			HasReachedTarget: boolean,
+			Speed: number,
+			Velocity: number,
+		},
+		{} :: typeof({ __index = FadeBetweenCamera4 })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	@param cameraA CameraLike
@@ -40,13 +42,16 @@ function FadeBetweenCamera4.new(
 	cameraA: CameraEffectUtils.CameraEffect,
 	cameraB: CameraEffectUtils.CameraEffect
 ): FadeBetweenCamera4
-	local self: FadeBetweenCamera4 = setmetatable({
-		CameraA = cameraA or error("No cameraA"),
-		CameraB = cameraB or error("No cameraB"),
-		_spring = Spring.new(0),
-		_position0 = 0,
-		_state0 = cameraA.CameraState,
-	} :: any, FadeBetweenCamera4)
+	local self: FadeBetweenCamera4 = setmetatable(
+		{
+			CameraA = cameraA or error("No cameraA"),
+			CameraB = cameraB or error("No cameraB"),
+			_spring = Spring.new(0),
+			_position0 = 0,
+			_state0 = cameraA.CameraState,
+		} :: any,
+		FadeBetweenCamera4
+	)
 
 	self._spring.s = 15
 

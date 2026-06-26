@@ -89,22 +89,19 @@ end
 	Starts the service. Should be done via [ServiceBag].
 ]=]
 function CmdrServiceClient.Start(self: CmdrServiceClient): ()
-	assert(self._serviceBag, "Not initialized")
-
-	;(self._maid
-		:GivePromise(PromiseUtils.all({
-			self:PromiseCmdr(),
-			self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider()):Then(function(provider)
-				return provider:PromiseIsAdmin()
-			end),
-		})) :: any)
-		:Then(function(cmdr: any, isAdmin: any)
-			if isAdmin then
-				self:_setBindings(cmdr)
-			else
-				cmdr:SetActivationKeys({})
-			end
-		end)
+	assert(self._serviceBag, "Not initialized");
+	(self._maid:GivePromise(PromiseUtils.all({
+		self:PromiseCmdr(),
+		self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider()):Then(function(provider)
+			return provider:PromiseIsAdmin()
+		end),
+	})) :: any):Then(function(cmdr: any, isAdmin: any)
+		if isAdmin then
+			self:_setBindings(cmdr)
+		else
+			cmdr:SetActivationKeys({})
+		end
+	end)
 end
 
 function CmdrServiceClient._setBindings(self: CmdrServiceClient, cmdr: any): ()

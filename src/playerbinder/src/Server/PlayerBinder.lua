@@ -14,10 +14,7 @@ local PlayerBinder = setmetatable({}, Binder)
 PlayerBinder.ClassName = "PlayerBinder"
 PlayerBinder.__index = PlayerBinder
 
-export type PlayerBinder<T> = typeof(setmetatable(
-	{} :: {},
-	{} :: typeof({ __index = PlayerBinder })
-)) & Binder.Binder<T>
+export type PlayerBinder<T> = typeof(setmetatable({} :: {}, {} :: typeof({ __index = PlayerBinder }))) & Binder.Binder<T>
 
 --[=[
 	Returns a new PlayerBinder

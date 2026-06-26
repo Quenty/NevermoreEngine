@@ -210,8 +210,10 @@ local function digest(data: (string | { number })?): ByteTable
 end
 
 local function hmac(data: string | { number }, key: string | { number }): ByteTable
-	local actualData: { number } = type(data) == "table" and { table.unpack(data :: { number }) } or util.stringToByteArray(data :: string)
-	local actualKey: { number } = type(key) == "table" and { table.unpack(key :: { number }) } or util.stringToByteArray(key :: string)
+	local actualData: { number } = type(data) == "table" and { table.unpack(data :: { number }) }
+		or util.stringToByteArray(data :: string)
+	local actualKey: { number } = type(key) == "table" and { table.unpack(key :: { number }) }
+		or util.stringToByteArray(key :: string)
 
 	local blocksize = 64
 
@@ -240,7 +242,8 @@ local function hmac(data: string | { number }, key: string | { number }): ByteTa
 end
 
 local function pbkdf2(pass: string | { number }, salt: string | { number }, iter: number, dklen: number?): ByteTable
-	local actualSalt: { number } = type(salt) == "table" and salt :: { number } or util.stringToByteArray(salt :: string)
+	local actualSalt: { number } = type(salt) == "table" and salt :: { number }
+		or util.stringToByteArray(salt :: string)
 	local hashlen = 32
 	local actualDklen = dklen or 32
 	local block = 1

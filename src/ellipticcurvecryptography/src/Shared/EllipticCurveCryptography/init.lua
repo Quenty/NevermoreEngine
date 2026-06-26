@@ -235,8 +235,7 @@ function EllipticCurveCryptography.sign(privateKey: ByteTable, message: string |
 	assert(EllipticCurveCryptography.isByteTable(privateKey), "Bad privateKey")
 	assert(type(message) == "string" or EllipticCurveCryptography.isByteTable(message), "Bad message")
 
-	local actualMessage = type(message) == "table" and string.char(table.unpack(message :: any))
-		or tostring(message)
+	local actualMessage = type(message) == "table" and string.char(table.unpack(message :: any)) or tostring(message)
 	local actualPrivateKey = type(privateKey) == "table" and string.char(table.unpack(privateKey :: any))
 		or tostring(privateKey)
 
@@ -271,13 +270,16 @@ end
 	@param message ByteTable | string
 	@param signature ByteTable
 ]=]
-function EllipticCurveCryptography.verify(publicKey: ByteTable, message: string | ByteTable, signature: ByteTable): boolean
+function EllipticCurveCryptography.verify(
+	publicKey: ByteTable,
+	message: string | ByteTable,
+	signature: ByteTable
+): boolean
 	assert(EllipticCurveCryptography.isByteTable(publicKey), "Bad privateKey")
 	assert(type(message) == "string" or EllipticCurveCryptography.isByteTable(message), "Bad message")
 	assert(EllipticCurveCryptography.isByteTable(signature), "Bad signature")
 
-	local actualMessage = type(message) == "table" and string.char(table.unpack(message :: any))
-		or tostring(message)
+	local actualMessage = type(message) == "table" and string.char(table.unpack(message :: any)) or tostring(message)
 	local sigLen = #signature
 	local Y = curve.pointDecode(publicKey :: any)
 	local e = modq.decodeModQ({ table.unpack(signature :: any, 1, sigLen / 2) })

@@ -14,10 +14,7 @@ local PartTouchingRenderer = {}
 PartTouchingRenderer.__index = PartTouchingRenderer
 PartTouchingRenderer.ClassName = "PartTouchingRenderer"
 
-export type PartTouchingRenderer = typeof(setmetatable(
-	{} :: {},
-	{} :: typeof({ __index = PartTouchingRenderer })
-))
+export type PartTouchingRenderer = typeof(setmetatable({} :: {}, {} :: typeof({ __index = PartTouchingRenderer })))
 
 function PartTouchingRenderer.new(): PartTouchingRenderer
 	local self: PartTouchingRenderer = setmetatable({}, PartTouchingRenderer)

@@ -40,9 +40,10 @@ function CatalogSearchServiceCache.Init(self: CatalogSearchServiceCache, service
 		end)
 	end)
 
-	self._assetAggregator = self._maid:Add(Aggregator.new("AvatarEditorUtils.promiseBatchItemDetails", function(itemIds: { number })
-		return AvatarEditorUtils.promiseBatchItemDetails(itemIds, Enum.AvatarItemType.Asset)
-	end))
+	self._assetAggregator =
+		self._maid:Add(Aggregator.new("AvatarEditorUtils.promiseBatchItemDetails", function(itemIds: { number })
+			return AvatarEditorUtils.promiseBatchItemDetails(itemIds, Enum.AvatarItemType.Asset)
+		end))
 	self._assetAggregator:SetMaxBatchSize(100)
 
 	self._bundleAggregator =
@@ -52,7 +53,9 @@ function CatalogSearchServiceCache.Init(self: CatalogSearchServiceCache, service
 	self._bundleAggregator:SetMaxBatchSize(100)
 end
 
-function CatalogSearchServiceCache.PromiseAvatarRules(self: CatalogSearchServiceCache): Promise.Promise<AvatarEditorUtils.AvatarRules>
+function CatalogSearchServiceCache.PromiseAvatarRules(
+	self: CatalogSearchServiceCache
+): Promise.Promise<AvatarEditorUtils.AvatarRules>
 	if self._avatarRulesPromise then
 		return self._avatarRulesPromise
 	end
@@ -62,7 +65,11 @@ function CatalogSearchServiceCache.PromiseAvatarRules(self: CatalogSearchService
 	return promise
 end
 
-function CatalogSearchServiceCache.PromiseItemDetails(self: CatalogSearchServiceCache, assetId: number, avatarItemType: Enum.AvatarItemType): Promise.Promise<{ AvatarEditorUtils.AvatarItemDetails }>
+function CatalogSearchServiceCache.PromiseItemDetails(
+	self: CatalogSearchServiceCache,
+	assetId: number,
+	avatarItemType: Enum.AvatarItemType
+): Promise.Promise<{ AvatarEditorUtils.AvatarItemDetails }>
 	if avatarItemType == Enum.AvatarItemType.Asset then
 		return self._assetAggregator:Promise(assetId)
 	elseif avatarItemType == Enum.AvatarItemType.Bundle then
@@ -72,10 +79,15 @@ function CatalogSearchServiceCache.PromiseItemDetails(self: CatalogSearchService
 	end
 end
 
-function CatalogSearchServiceCache.PromiseSearchCatalog(self: CatalogSearchServiceCache, params: CatalogSearchParams): Promise.Promise<PagesProxy.PagesProxy>
-	return (self._promiseSearchCatalog :: any)(params):Then(function(pagesProxy: PagesProxy.PagesProxy)
-		return pagesProxy:Clone()
-	end) :: Promise.Promise<PagesProxy.PagesProxy>
+function CatalogSearchServiceCache.PromiseSearchCatalog(
+	self: CatalogSearchServiceCache,
+	params: CatalogSearchParams
+): Promise.Promise<PagesProxy.PagesProxy>
+	return (self._promiseSearchCatalog :: any)(params):Then(
+			function(pagesProxy: PagesProxy.PagesProxy)
+				return pagesProxy:Clone()
+			end
+		) :: Promise.Promise<PagesProxy.PagesProxy>
 end
 
 function CatalogSearchServiceCache.Destroy(self: CatalogSearchServiceCache): ()

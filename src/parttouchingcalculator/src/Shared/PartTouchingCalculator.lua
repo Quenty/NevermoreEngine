@@ -23,10 +23,7 @@ export type TouchingHumanoidData = {
 	Touching: { BasePart },
 }
 
-export type PartTouchingCalculator = typeof(setmetatable(
-	{} :: {},
-	{} :: typeof({ __index = PartTouchingCalculator })
-))
+export type PartTouchingCalculator = typeof(setmetatable({} :: {}, {} :: typeof({ __index = PartTouchingCalculator })))
 
 --[=[
 	Constructs a new PartTouchingCalculator
@@ -37,7 +34,11 @@ function PartTouchingCalculator.new(): PartTouchingCalculator
 	return self
 end
 
-function PartTouchingCalculator.CheckIfTouchingHumanoid(self: PartTouchingCalculator, humanoid: Humanoid, parts: { BasePart }): boolean
+function PartTouchingCalculator.CheckIfTouchingHumanoid(
+	self: PartTouchingCalculator,
+	humanoid: Humanoid,
+	parts: { BasePart }
+): boolean
 	assert(humanoid, "Bad humanoid")
 	assert(parts, "Must have parts")
 
@@ -97,7 +98,12 @@ function PartTouchingCalculator.CheckIfTouchingHumanoid(self: PartTouchingCalcul
 	return returnValue
 end
 
-function PartTouchingCalculator.GetCollidingPartFromParts(self: PartTouchingCalculator, parts: { BasePart }, relativeTo: CFrame?, padding: number?): BasePart
+function PartTouchingCalculator.GetCollidingPartFromParts(
+	self: PartTouchingCalculator,
+	parts: { BasePart },
+	relativeTo: CFrame?,
+	padding: number?
+): BasePart
 	local actualRelativeTo = relativeTo or CFrame.new()
 
 	local size, position = BoundingBoxUtils.getPartsBoundingBox(parts, actualRelativeTo)
@@ -117,7 +123,12 @@ function PartTouchingCalculator.GetCollidingPartFromParts(self: PartTouchingCalc
 	return dummyPart
 end
 
-function PartTouchingCalculator.GetTouchingBoundingBox(self: PartTouchingCalculator, parts: { BasePart }, relativeTo: CFrame?, padding: number?): { BasePart }
+function PartTouchingCalculator.GetTouchingBoundingBox(
+	self: PartTouchingCalculator,
+	parts: { BasePart },
+	relativeTo: CFrame?,
+	padding: number?
+): { BasePart }
 	local dummy = self:GetCollidingPartFromParts(parts, relativeTo, padding)
 	local touching = dummy:GetTouchingParts()
 	dummy:Destroy()
@@ -126,7 +137,11 @@ function PartTouchingCalculator.GetTouchingBoundingBox(self: PartTouchingCalcula
 end
 
 -- Expensive hull check on a list of parts (aggregating each parts touching list)
-function PartTouchingCalculator.GetTouchingHull(self: PartTouchingCalculator, parts: { BasePart }, padding: number?): { BasePart }
+function PartTouchingCalculator.GetTouchingHull(
+	self: PartTouchingCalculator,
+	parts: { BasePart },
+	padding: number?
+): { BasePart }
 	local hitParts: { [BasePart]: boolean } = {}
 
 	for _, part in parts do
@@ -149,7 +164,11 @@ end
 	@param padding number -- studs of padding around the part
 	@return { BasePart }
 ]=]
-function PartTouchingCalculator.GetTouching(self: PartTouchingCalculator, basePart: BasePart, padding: number?): { BasePart }
+function PartTouchingCalculator.GetTouching(
+	self: PartTouchingCalculator,
+	basePart: BasePart,
+	padding: number?
+): { BasePart }
 	local actualPadding = padding or 2
 	local part: BasePart
 
@@ -182,7 +201,10 @@ function PartTouchingCalculator.GetTouching(self: PartTouchingCalculator, basePa
 	return touching
 end
 
-function PartTouchingCalculator.GetTouchingHumanoids(self: PartTouchingCalculator, touchingList: { BasePart }): { TouchingHumanoidData }
+function PartTouchingCalculator.GetTouchingHumanoids(
+	self: PartTouchingCalculator,
+	touchingList: { BasePart }
+): { TouchingHumanoidData }
 	local touchingHumanoids: { [Humanoid]: TouchingHumanoidData } = {}
 
 	for _, part in touchingList do

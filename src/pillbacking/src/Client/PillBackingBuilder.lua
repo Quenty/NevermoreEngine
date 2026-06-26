@@ -45,7 +45,11 @@ function PillBackingBuilder.new(inputOptions: PillBackingOptions?): PillBackingB
 	return self
 end
 
-function PillBackingBuilder.CreateSingle(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): ImageLabel
+function PillBackingBuilder.CreateSingle(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
 	local options = self:_configureOptions(gui, inputOptions)
 
 	local pillBacking = Instance.new("ImageLabel")
@@ -100,7 +104,11 @@ function PillBackingBuilder.Create(self: PillBackingBuilder, gui: GuiObject, inp
 	return pillBacking
 end
 
-function PillBackingBuilder.CreateVertical(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): Frame
+function PillBackingBuilder.CreateVertical(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): Frame
 	warn("Use CreateSingle" .. debug.traceback())
 	local options = self:_configureOptions(gui, inputOptions)
 	local diameter = gui.Size.X
@@ -168,7 +176,11 @@ function PillBackingBuilder.CreateSingleShadow(
 	return shadow
 end
 
-function PillBackingBuilder.CreateShadow(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): ImageLabel
+function PillBackingBuilder.CreateShadow(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
 	-- warn("Use CreateSingleShadow" .. debug.traceback())
 	local options = self:_configureOptions(gui, inputOptions)
 	local diameter = gui.Size.Y
@@ -199,7 +211,11 @@ function PillBackingBuilder.CreateShadow(self: PillBackingBuilder, gui: GuiObjec
 	return shadow
 end
 
-function PillBackingBuilder.CreateCircle(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): ImageLabel
+function PillBackingBuilder.CreateCircle(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
 	local options = self:_configureOptions(gui, inputOptions)
 	local circle = self:_createCircle(options)
 
@@ -234,28 +250,44 @@ function PillBackingBuilder.CreateCircleShadow(
 	return shadow
 end
 
-function PillBackingBuilder.CreateLeft(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): ImageLabel
+function PillBackingBuilder.CreateLeft(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
 	local options = self:_configureOptions(gui, inputOptions)
 	local left = self:_createLeft(options)
 	left.Parent = gui
 	return left
 end
 
-function PillBackingBuilder.CreateRight(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): ImageLabel
+function PillBackingBuilder.CreateRight(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
 	local options = self:_configureOptions(gui, inputOptions)
 	local right = self:_createRight(options)
 	right.Parent = gui
 	return right
 end
 
-function PillBackingBuilder.CreateTop(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): ImageLabel
+function PillBackingBuilder.CreateTop(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
 	local options = self:_configureOptions(gui, inputOptions)
 	local top = self:_createTop(options)
 	top.Parent = gui
 	return top
 end
 
-function PillBackingBuilder.CreateBottom(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): ImageLabel
+function PillBackingBuilder.CreateBottom(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
 	local options = self:_configureOptions(gui, inputOptions)
 	local bottom = self:_createBottom(options)
 	bottom.Parent = gui

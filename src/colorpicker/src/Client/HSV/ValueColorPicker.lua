@@ -21,21 +21,23 @@ local ValueColorPicker = setmetatable({}, BaseObject)
 ValueColorPicker.ClassName = "ValueColorPicker"
 ValueColorPicker.__index = ValueColorPicker
 
-export type ValueColorPicker = typeof(setmetatable(
-	{} :: {
-		ColorChanged: Signal.Signal<(Vector3, Vector3, ...any)>,
-		Gui: ImageButton?,
-		_hsvColorValue: ValueObject.ValueObject<Vector3>,
-		_backgroundColorHint: ValueObject.ValueObject<Color3>,
-		_sizeValue: ValueObject.ValueObject<Vector2>,
-		_leftWidth: ValueObject.ValueObject<number>,
-		_transparency: ValueObject.ValueObject<number>,
-		_dragModel: ButtonDragModel.ButtonDragModel,
-		_triangle: ColorPickerTriangle.ColorPickerTriangle,
-		_preview: ColorPickerCursorPreview.ColorPickerCursorPreview,
-	},
-	{} :: typeof({ __index = ValueColorPicker })
-)) & BaseObject.BaseObject
+export type ValueColorPicker =
+	typeof(setmetatable(
+		{} :: {
+			ColorChanged: Signal.Signal<(Vector3, Vector3, ...any)>,
+			Gui: ImageButton?,
+			_hsvColorValue: ValueObject.ValueObject<Vector3>,
+			_backgroundColorHint: ValueObject.ValueObject<Color3>,
+			_sizeValue: ValueObject.ValueObject<Vector2>,
+			_leftWidth: ValueObject.ValueObject<number>,
+			_transparency: ValueObject.ValueObject<number>,
+			_dragModel: ButtonDragModel.ButtonDragModel,
+			_triangle: ColorPickerTriangle.ColorPickerTriangle,
+			_preview: ColorPickerCursorPreview.ColorPickerCursorPreview,
+		},
+		{} :: typeof({ __index = ValueColorPicker })
+	))
+	& BaseObject.BaseObject
 
 function ValueColorPicker.new(): ValueColorPicker
 	local self: ValueColorPicker = setmetatable(BaseObject.new() :: any, ValueColorPicker)

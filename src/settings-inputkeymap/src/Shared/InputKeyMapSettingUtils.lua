@@ -24,7 +24,10 @@ local InputKeyMapSettingUtils = {}
 	@param inputModeType InputModeType
 	@return string
 ]=]
-function InputKeyMapSettingUtils.getSettingName(inputKeyMapList: InputKeyMapList.InputKeyMapList, inputModeType: InputModeType.InputModeType): string
+function InputKeyMapSettingUtils.getSettingName(
+	inputKeyMapList: InputKeyMapList.InputKeyMapList,
+	inputModeType: InputModeType.InputModeType
+): string
 	return string.format("Keybind_%s_%s", String.toCamelCase(inputKeyMapList:GetListName()), inputModeType.Name)
 end
 

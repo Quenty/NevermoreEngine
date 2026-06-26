@@ -212,13 +212,14 @@ do
 		)
 	end
 
-	TweenColor3, StopColor3Tween =
-		makePropertyTweener(function(gui: any, percent: number, startProperties: any, newProperties: any)
+	TweenColor3, StopColor3Tween = makePropertyTweener(
+		function(gui: any, percent: number, startProperties: any, newProperties: any)
 			for index, endValue in next, newProperties do
 				local StartProperty = startProperties[index]
 				gui[index] = LerpColor3(StartProperty, endValue, percent)
 			end
-		end)
+		end
+	)
 end
 
 qGUI.TweenColor3 = TweenColor3
@@ -393,7 +394,11 @@ function qGUI.AddNinePatch(
 	return topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight, middleTop, middleBottom
 end
 
-function qGUI.BackWithRoundedRectangle(Frame: Frame, Radius: number, Color: Color3?): (any, any, any, any, any, any, any, any, any)
+function qGUI.BackWithRoundedRectangle(
+	Frame: Frame,
+	Radius: number,
+	Color: Color3?
+): (any, any, any, any, any, any, any, any, any)
 	Color = Color or Color3.new(1, 1, 1)
 
 	return qGUI.AddNinePatch(Frame, "rbxassetid://176688412", Vector2.new(150, 150), Radius, "ImageLabel", {

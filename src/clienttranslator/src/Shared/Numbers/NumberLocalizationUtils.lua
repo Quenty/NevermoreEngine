@@ -31,7 +31,7 @@ local NumberLocalizationUtils = {}
 local DEFAULT_LOCALE = "en-us"
 
 -- Each abbreviation entry is {baseValue, suffix}
-type AbbreviationEntry = {any}
+type AbbreviationEntry = { any }
 
 -- Named string fields + numeric indexer: Luau can represent this as a single coherent type.
 type LocaleInfo = {
@@ -40,7 +40,7 @@ type LocaleInfo = {
 	[number]: AbbreviationEntry,
 }
 
-local localeInfos: {[string]: LocaleInfo} = {}
+local localeInfos: { [string]: LocaleInfo } = {}
 
 localeInfos["en-us"] = {
 	decimalSeparator = ".",
@@ -246,7 +246,7 @@ local function findDenominationEntry(
 	for i = #localeInfo, 2, -1 do
 		local entry = localeInfo[i]
 		local baseValue: number
-		if roundingBehaviourType == (RoundingBehaviourTypes.TRUNCATE :: RoundingBehaviourTypes.RoundingBehaviourType) then
+		if roundingBehaviourType == RoundingBehaviourTypes.TRUNCATE :: RoundingBehaviourTypes.RoundingBehaviourType then
 			baseValue = entry[1]
 		else
 			baseValue = entry[1] - localeInfo[i - 1][1] / 2
@@ -303,9 +303,8 @@ function NumberLocalizationUtils.abbreviate(
 	numSignificantDigits: number?
 ): string
 	assert(type(number) == "number", "Bad number")
-	local roundingBehavior: RoundingBehaviourTypes.RoundingBehaviourType =
-		roundingBehaviourType
-		or (RoundingBehaviourTypes.ROUND_TO_CLOSEST :: RoundingBehaviourTypes.RoundingBehaviourType)
+	local roundingBehavior: RoundingBehaviourTypes.RoundingBehaviourType = roundingBehaviourType
+		or RoundingBehaviourTypes.ROUND_TO_CLOSEST :: RoundingBehaviourTypes.RoundingBehaviourType
 	local significantDigits = numSignificantDigits or 3
 
 	-- RoundingBehaviourTypes.NONE is "none" at runtime; the exported RoundingBehaviourType
@@ -346,7 +345,9 @@ function NumberLocalizationUtils.abbreviate(
 	local roundingFactor = 10 ^ maxDecimals
 	if roundingBehavior == (RoundingBehaviourTypes.TRUNCATE :: RoundingBehaviourTypes.RoundingBehaviourType) then
 		trimmedQuotient = math.modf(significantQuotient * roundingFactor) / roundingFactor
-	elseif roundingBehavior == (RoundingBehaviourTypes.ROUND_TO_CLOSEST :: RoundingBehaviourTypes.RoundingBehaviourType) then
+	elseif
+		roundingBehavior == RoundingBehaviourTypes.ROUND_TO_CLOSEST :: RoundingBehaviourTypes.RoundingBehaviourType
+	then
 		trimmedQuotient = math.floor(significantQuotient * roundingFactor + 0.5) / roundingFactor
 	else
 		error(

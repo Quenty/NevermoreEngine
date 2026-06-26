@@ -241,7 +241,11 @@ function ScrollingFrame.BindInput(self: ScrollingFrame, gui: GuiObject, options:
 	return maid
 end
 
-function ScrollingFrame.StartScrolling(self: ScrollingFrame, inputBeganObject: InputObject, options: ScrollingFrameOptions?): ()
+function ScrollingFrame.StartScrolling(
+	self: ScrollingFrame,
+	inputBeganObject: InputObject,
+	options: ScrollingFrameOptions?
+): ()
 	if inputBeganObject.UserInputState ~= Enum.UserInputState.Begin then
 		-- Touch events moving into GUIs occur sometimes
 		return
@@ -296,7 +300,11 @@ function ScrollingFrame.StartScrolling(self: ScrollingFrame, inputBeganObject: I
 	end
 end
 
-function ScrollingFrame.StartScrollbarScrolling(self: ScrollingFrame, scrollbarContainer: GuiObject, inputBeganObject: InputObject): Maid.Maid
+function ScrollingFrame.StartScrollbarScrolling(
+	self: ScrollingFrame,
+	scrollbarContainer: GuiObject,
+	inputBeganObject: InputObject
+): Maid.Maid
 	assert(scrollbarContainer, "Bad scrollbarContainer")
 	assert(inputBeganObject, "Bad inputBeganObject")
 

@@ -18,14 +18,16 @@ local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
 PlayerHumanoidBinder.__index = PlayerHumanoidBinder
 
-export type PlayerHumanoidBinder<T> = typeof(setmetatable(
-	{} :: {
-		_serviceBag: ServiceBag.ServiceBag,
-		_humanoidTrackerService: any,
-		_shouldTag: ValueObject.ValueObject<boolean>,
-	},
-	{} :: typeof({ __index = PlayerHumanoidBinder })
-)) & Binder.Binder<T>
+export type PlayerHumanoidBinder<T> =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_humanoidTrackerService: any,
+			_shouldTag: ValueObject.ValueObject<boolean>,
+		},
+		{} :: typeof({ __index = PlayerHumanoidBinder })
+	))
+	& Binder.Binder<T>
 
 --[=[
 	Returns a new PlayerHumanoidBinder
@@ -34,11 +36,7 @@ export type PlayerHumanoidBinder<T> = typeof(setmetatable(
 	@param ... any
 	@return PlayerHumanoidBinder<T>
 ]=]
-function PlayerHumanoidBinder.new<T>(
-	tag: string,
-	class: Binder.BinderConstructor<T>,
-	...
-): PlayerHumanoidBinder<T>
+function PlayerHumanoidBinder.new<T>(tag: string, class: Binder.BinderConstructor<T>, ...): PlayerHumanoidBinder<T>
 	local self: PlayerHumanoidBinder<T> = setmetatable(Binder.new(tag, class, ...) :: any, PlayerHumanoidBinder)
 
 	return self
@@ -140,7 +138,11 @@ function PlayerHumanoidBinder._bindTagging<T>(self: PlayerHumanoidBinder<T>, doU
 	end
 end
 
-function PlayerHumanoidBinder._handlePlayerAdded<T>(self: PlayerHumanoidBinder<T>, playerMaid: Maid.Maid, player: Player): ()
+function PlayerHumanoidBinder._handlePlayerAdded<T>(
+	self: PlayerHumanoidBinder<T>,
+	playerMaid: Maid.Maid,
+	player: Player
+): ()
 	local maid = Maid.new()
 
 	-- TODO: Use HumanoidTrackerService

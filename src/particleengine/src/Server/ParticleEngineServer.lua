@@ -41,7 +41,11 @@ function ParticleEngineServer.Init(self: typeof(ParticleEngineServer))
 	end)
 end
 
-function ParticleEngineServer._replicate(self: typeof(ParticleEngineServer), player: Player, particle: ParticleProperties)
+function ParticleEngineServer._replicate(
+	self: typeof(ParticleEngineServer),
+	player: Player,
+	particle: ParticleProperties
+)
 	particle.Global = nil
 
 	local remoteEvent = self._remoteEvent

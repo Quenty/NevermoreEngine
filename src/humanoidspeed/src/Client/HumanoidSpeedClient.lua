@@ -16,10 +16,9 @@ local HumanoidSpeedClient = setmetatable({}, BaseObject)
 HumanoidSpeedClient.ClassName = "HumanoidSpeedClient"
 HumanoidSpeedClient.__index = HumanoidSpeedClient
 
-export type HumanoidSpeedClient = typeof(setmetatable(
-	{} :: {},
-	{} :: typeof({ __index = HumanoidSpeedClient })
-)) & BaseObject.BaseObject
+export type HumanoidSpeedClient =
+	typeof(setmetatable({} :: {}, {} :: typeof({ __index = HumanoidSpeedClient })))
+	& BaseObject.BaseObject
 
 function HumanoidSpeedClient.new(humanoid: Humanoid): HumanoidSpeedClient
 	local self: HumanoidSpeedClient = setmetatable(BaseObject.new(humanoid) :: any, HumanoidSpeedClient)

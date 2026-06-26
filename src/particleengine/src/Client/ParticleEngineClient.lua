@@ -154,7 +154,7 @@ function ParticleEngineClient.Add(self: ParticleEngineClient, p: Particle): ()
 		local removeOnCollision = p.RemoveOnCollision
 		p.Global = nil
 		p.Function = nil
-		p.RemoveOnCollision = if p.RemoveOnCollision then (true :: any) else nil
+		p.RemoveOnCollision = if p.RemoveOnCollision then true :: any else nil
 
 		if self._remoteEvent then
 			self._remoteEvent:FireServer(p)
@@ -205,7 +205,12 @@ end
 
 -- Handles both priority and regular particles
 -- @return boolean alive, true if still fine
-function ParticleEngineClient._updateParticle(self: ParticleEngineClient, particle: Particle, t: number, dt: number): boolean
+function ParticleEngineClient._updateParticle(
+	self: ParticleEngineClient,
+	particle: Particle,
+	t: number,
+	dt: number
+): boolean
 	if particle.LifeTime - t <= 0 then
 		return false
 	end
