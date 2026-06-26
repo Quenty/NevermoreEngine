@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	A HSV color picker component which can be used to select colors using
 	an interface standard to Roblox Studio.
@@ -13,12 +13,28 @@ local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local HSColorPicker = require("HSColorPicker")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local Signal = require("Signal")
 local ValueColorPicker = require("ValueColorPicker")
 local ValueObject = require("ValueObject")
 
 local HSVColorPicker = setmetatable({}, BaseObject)
 HSVColorPicker.ClassName = "HSVColorPicker"
 HSVColorPicker.__index = HSVColorPicker
+
+export type HSVColorPicker = typeof(setmetatable(
+	{} :: {
+		_hsvColorValue: ValueObject.ValueObject<Vector3>,
+		_sizeValue: ValueObject.ValueObject<Vector2>,
+		_innerPadding: ValueObject.ValueObject<number>,
+		_transparency: ValueObject.ValueObject<number>,
+		_hueSaturationPicker: HSColorPicker.HSColorPicker,
+		_valuePicker: ValueColorPicker.ValueColorPicker,
+		ColorChanged: Signal.Signal<(Vector3, Vector3, ...any)>,
+		Gui: Instance?,
+	},
+	{} :: typeof({ __index = HSVColorPicker })
+)) & BaseObject.BaseObject
 
 --[=[
 	Creates a new color picker!
@@ -31,8 +47,8 @@ HSVColorPicker.__index = HSVColorPicker
 
 	@return HSVColorPicker
 ]=]
-function HSVColorPicker.new()
-	local self = setmetatable(BaseObject.new(), HSVColorPicker)
+function HSVColorPicker.new(): HSVColorPicker
+	local self: HSVColorPicker = setmetatable(BaseObject.new() :: any, HSVColorPicker)
 
 	self._hsvColorValue = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
 	self._sizeValue = self._maid:Add(ValueObject.new(Vector2.new(6, 4), "Vector2"))
@@ -86,7 +102,7 @@ end
 
 	@param height number
 ]=]
-function HSVColorPicker:SetSize(height: number)
+function HSVColorPicker.SetSize(self: HSVColorPicker, height: number): ()
 	assert(type(height) == "number", "Bad height")
 
 	self._hueSaturationPicker:SetSize(height)
@@ -99,7 +115,7 @@ end
 	@param color3Value Color3Value
 	@return maid
 ]=]
-function HSVColorPicker:SyncValue(color3Value)
+function HSVColorPicker.SyncValue(self: HSVColorPicker, color3Value: Color3Value): Maid.Maid
 	local maid = Maid.new()
 
 	self:SetColor(color3Value.Value)
@@ -128,7 +144,7 @@ end
 
 	@param color Color3
 ]=]
-function HSVColorPicker:HintBackgroundColor(color)
+function HSVColorPicker.HintBackgroundColor(self: HSVColorPicker, color: Color3): ()
 	self._valuePicker:HintBackgroundColor(color)
 end
 
@@ -137,7 +153,7 @@ end
 
 	@param hsvColor Vector3
 ]=]
-function HSVColorPicker:SetHSVColor(hsvColor)
+function HSVColorPicker.SetHSVColor(self: HSVColorPicker, hsvColor: Vector3): ()
 	assert(typeof(hsvColor) == "Vector3", "Bad hsvColor")
 
 	self._hsvColorValue.Value = hsvColor
@@ -148,7 +164,7 @@ end
 
 	@return Vector3
 ]=]
-function HSVColorPicker:GetHSVColor()
+function HSVColorPicker.GetHSVColor(self: HSVColorPicker): Vector3
 	return self._hsvColorValue.Value
 end
 
@@ -157,7 +173,7 @@ end
 
 	@param color Color3
 ]=]
-function HSVColorPicker:SetColor(color: Color3)
+function HSVColorPicker.SetColor(self: HSVColorPicker, color: Color3): ()
 	local h, s, v = Color3.toHSV(color)
 	self._hsvColorValue.Value = Vector3.new(h, s, v)
 end
@@ -167,9 +183,9 @@ end
 
 	@return Color3
 ]=]
-function HSVColorPicker:GetColor(): Color3
+function HSVColorPicker.GetColor(self: HSVColorPicker): Color3
 	local current = self._hsvColorValue.Value
-	local h, s, v = current.x, current.y, current.z
+	local h, s, v = current.X, current.Y, current.Z
 	return Color3.fromHSV(h, s, v)
 end
 
@@ -177,11 +193,11 @@ end
 	A size value that defines the aspect ratio and size of this picker. See [SetSize]
 	@return ValueObject<Vector2>
 ]=]
-function HSVColorPicker:GetSizeValue(): ValueObject.ValueObject<Vector2>
+function HSVColorPicker.GetSizeValue(self: HSVColorPicker): ValueObject.ValueObject<Vector2>
 	return self._sizeValue
 end
 
-function HSVColorPicker:GetMeasureValue(): ValueObject.ValueObject<Vector2>
+function HSVColorPicker.GetMeasureValue(self: HSVColorPicker): ValueObject.ValueObject<Vector2>
 	return self._sizeValue
 end
 
@@ -190,24 +206,24 @@ end
 
 	@param transparency number
 ]=]
-function HSVColorPicker:SetTransparency(transparency: number)
+function HSVColorPicker.SetTransparency(self: HSVColorPicker, transparency: number): ()
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
 end
 
-function HSVColorPicker:_updateSize()
+function HSVColorPicker._updateSize(self: HSVColorPicker): ()
 	local valueSize = self._valuePicker:GetSizeValue().Value
 	local hueSize = self._hueSaturationPicker:GetSizeValue().Value
 
-	local width = valueSize.x + hueSize.x + self._innerPadding.Value
-	local height = math.max(valueSize.y, hueSize.y)
+	local width = valueSize.X + hueSize.X + self._innerPadding.Value
+	local height = math.max(valueSize.Y, hueSize.Y)
 
 	self._sizeValue.Value = Vector2.new(width, height)
 end
 
-function HSVColorPicker:_render()
-	local function container(picker, props)
+function HSVColorPicker._render(self: HSVColorPicker): Observable.Observable<Instance>
+	local function container(picker: any, props: { AnchorPoint: Vector2, Position: UDim2 })
 		return Blend.New("Frame")({
 			AnchorPoint = props.AnchorPoint,
 			Position = props.Position,

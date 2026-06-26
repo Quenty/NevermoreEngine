@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Picker for value in HSV. See [HSVColorPicker] for usage.
 
@@ -13,14 +13,32 @@ local Blend = require("Blend")
 local ButtonDragModel = require("ButtonDragModel")
 local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
 local ColorPickerTriangle = require("ColorPickerTriangle")
+local Observable = require("Observable")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local ValueColorPicker = setmetatable({}, BaseObject)
 ValueColorPicker.ClassName = "ValueColorPicker"
 ValueColorPicker.__index = ValueColorPicker
 
-function ValueColorPicker.new()
-	local self = setmetatable(BaseObject.new(), ValueColorPicker)
+export type ValueColorPicker = typeof(setmetatable(
+	{} :: {
+		ColorChanged: Signal.Signal<(Vector3, Vector3, ...any)>,
+		Gui: ImageButton?,
+		_hsvColorValue: ValueObject.ValueObject<Vector3>,
+		_backgroundColorHint: ValueObject.ValueObject<Color3>,
+		_sizeValue: ValueObject.ValueObject<Vector2>,
+		_leftWidth: ValueObject.ValueObject<number>,
+		_transparency: ValueObject.ValueObject<number>,
+		_dragModel: ButtonDragModel.ButtonDragModel,
+		_triangle: ColorPickerTriangle.ColorPickerTriangle,
+		_preview: ColorPickerCursorPreview.ColorPickerCursorPreview,
+	},
+	{} :: typeof({ __index = ValueColorPicker })
+)) & BaseObject.BaseObject
+
+function ValueColorPicker.new(): ValueColorPicker
+	local self: ValueColorPicker = setmetatable(BaseObject.new() :: any, ValueColorPicker)
 
 	self._hsvColorValue = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
 	self._backgroundColorHint = self._maid:Add(ValueObject.new(Color3.new(0, 0, 0), "Color3"))
@@ -39,8 +57,10 @@ function ValueColorPicker.new()
 	-- self._maid:GiveTask(self._cursor)
 
 	self._triangle = self._maid:Add(ColorPickerTriangle.new())
-	self._triangle.Gui.AnchorPoint = Vector2.new(0, 0.5)
-	self._triangle.Gui.Position = UDim2.fromScale(0, 1)
+
+	local triangleGui = assert(self._triangle.Gui, "No triangle Gui")
+	triangleGui.AnchorPoint = Vector2.new(0, 0.5)
+	triangleGui.Position = UDim2.fromScale(0, 1)
 
 	self._preview = self._maid:Add(ColorPickerCursorPreview.new())
 
@@ -60,16 +80,22 @@ function ValueColorPicker.new()
 		local position = self._dragModel:GetDragPosition()
 		if position then
 			local current = self._hsvColorValue.Value
-			local h, s = current.x, current.y
-			self._hsvColorValue.Value = Vector3.new(h, s, 1 - position.y)
+			local h, s = current.X, current.Y
+			self._hsvColorValue.Value = Vector3.new(h, s, 1 - position.Y)
 			-- self._cursor:SetPosition(Vector3.new(0.5, position.y, 0))
-			self._triangle.Gui.Position = UDim2.fromScale(0, position.y)
+			local gui = self._triangle.Gui
+			if gui then
+				gui.Position = UDim2.fromScale(0, position.Y)
+			end
 		end
 	end))
 	self._maid:GiveTask(self._hsvColorValue.Changed:Connect(function()
-		local v = self._hsvColorValue.Value.z
+		local v = self._hsvColorValue.Value.Z
 		-- self._cursor:SetPosition(Vector3.new(0.5, 1 - v, 0))
-		self._triangle.Gui.Position = UDim2.fromScale(0, 1 - v)
+		local gui = self._triangle.Gui
+		if gui then
+			gui.Position = UDim2.fromScale(0, 1 - v)
+		end
 	end))
 
 	-- Setup preview
@@ -108,7 +134,7 @@ end
 
 	@param height number
 ]=]
-function ValueColorPicker:SetSize(height: number)
+function ValueColorPicker.SetSize(self: ValueColorPicker, height: number): ()
 	assert(type(height) == "number", "Bad height")
 
 	self:_updateSize(height)
@@ -119,11 +145,11 @@ end
 
 	@param color
 ]=]
-function ValueColorPicker:HintBackgroundColor(color: Color3)
+function ValueColorPicker.HintBackgroundColor(self: ValueColorPicker, color: Color3): ()
 	self._backgroundColorHint.Value = color
 end
 
-function ValueColorPicker:ObserveIsPressed()
+function ValueColorPicker.ObserveIsPressed(self: ValueColorPicker): Observable.Observable<boolean>
 	return self._dragModel:ObserveIsPressed()
 end
 
@@ -132,7 +158,7 @@ end
 
 	@param hsvColor
 ]=]
-function ValueColorPicker:SetHSVColor(hsvColor: Vector3)
+function ValueColorPicker.SetHSVColor(self: ValueColorPicker, hsvColor: Vector3): ()
 	assert(typeof(hsvColor) == "Vector3", "Bad hsvColor")
 
 	self._hsvColorValue.Value = hsvColor
@@ -143,7 +169,7 @@ end
 
 	@return Vector3
 ]=]
-function ValueColorPicker:GetHSVColor()
+function ValueColorPicker.GetHSVColor(self: ValueColorPicker): Vector3
 	return self._hsvColorValue.Value
 end
 
@@ -152,7 +178,7 @@ end
 
 	@param color
 ]=]
-function ValueColorPicker:SetColor(color: Color3)
+function ValueColorPicker.SetColor(self: ValueColorPicker, color: Color3): ()
 	local h, s, v = Color3.toHSV(color)
 	self._hsvColorValue.Value = Vector3.new(h, s, v)
 end
@@ -160,41 +186,41 @@ end
 --[=[
 	Gets the current color
 ]=]
-function ValueColorPicker:GetColor(): Color3
+function ValueColorPicker.GetColor(self: ValueColorPicker): Color3
 	local current = self._hsvColorValue.Value
-	local h, s, v = current.x, current.y, current.z
+	local h, s, v = current.X, current.Y, current.Z
 	return Color3.fromHSV(h, s, v)
 end
 
-function ValueColorPicker:GetSizeValue()
+function ValueColorPicker.GetSizeValue(self: ValueColorPicker): ValueObject.ValueObject<Vector2>
 	return self._sizeValue
 end
 
-function ValueColorPicker:GetMeasureValue()
+function ValueColorPicker.GetMeasureValue(self: ValueColorPicker): ValueObject.ValueObject<Vector2>
 	return self._sizeValue
 end
 
-function ValueColorPicker:SetTransparency(transparency: number)
+function ValueColorPicker.SetTransparency(self: ValueColorPicker, transparency: number): ()
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
 end
 
-function ValueColorPicker:_updatePreviewPosition()
-	self._preview:SetPosition(Vector2.new(0.5, 1 - self._hsvColorValue.Value.z))
+function ValueColorPicker._updatePreviewPosition(self: ValueColorPicker): ()
+	self._preview:SetPosition(Vector2.new(0.5, 1 - self._hsvColorValue.Value.Z))
 end
 
-function ValueColorPicker:_updateSize(newHeight)
+function ValueColorPicker._updateSize(self: ValueColorPicker, newHeight: number?): ()
 	local triangleSize = self._triangle:GetSizeValue().Value
-	local width = self._leftWidth.Value + triangleSize.y
-	local height = newHeight or self._sizeValue.Value.y
+	local width = self._leftWidth.Value + triangleSize.Y
+	local height = newHeight or self._sizeValue.Value.Y
 
 	self._sizeValue.Value = Vector2.new(width, height)
 end
 
-function ValueColorPicker:_updateHintedColors()
+function ValueColorPicker._updateHintedColors(self: ValueColorPicker): ()
 	local current = self._hsvColorValue.Value
-	local h, s, v = current.x, current.y, current.z
+	local h, s, v = current.X, current.Y, current.Z
 	local color = Color3.fromHSV(h, s, v)
 
 	-- self._cursor:HintBackgroundColor(color)
@@ -202,7 +228,7 @@ function ValueColorPicker:_updateHintedColors()
 	self._preview:SetColor(color)
 end
 
-function ValueColorPicker:_render()
+function ValueColorPicker._render(self: ValueColorPicker)
 	return Blend.New "ImageButton" {
 		Name = "HSColorPicker",
 		Size = UDim2.fromScale(1, 1),
@@ -214,11 +240,11 @@ function ValueColorPicker:_render()
 		end,
 
 		Blend.New "UIAspectRatioConstraint" {
-			AspectRatio = Blend.Computed(self._sizeValue, function(size)
-				if size.x <= 0 or size.y <= 0 then
+			AspectRatio = Blend.Computed(self._sizeValue, function(size: Vector2)
+				if size.X <= 0 or size.Y <= 0 then
 					return 1
 				else
-					return size.x / size.y
+					return size.X / size.Y
 				end
 			end),
 		},
@@ -226,17 +252,17 @@ function ValueColorPicker:_render()
 		Blend.New "Frame" {
 			BackgroundColor3 = Color3.new(1, 1, 1),
 			BackgroundTransparency = self._transparency,
-			Size = Blend.Computed(self._leftWidth, self._sizeValue, function(width, sizeValue)
-				if sizeValue.x == 0 then
+			Size = Blend.Computed(self._leftWidth, self._sizeValue, function(width: number, sizeValue: Vector2)
+				if sizeValue.X == 0 then
 					return UDim2.fromScale(0, 1)
 				end
 
-				return UDim2.fromScale(width / sizeValue.x, 1)
+				return UDim2.fromScale(width / sizeValue.X, 1)
 			end),
 
 			Blend.New "UIGradient" {
-				Color = Blend.Computed(self._hsvColorValue, function(color)
-					local h, s = color.x, color.y
+				Color = Blend.Computed(self._hsvColorValue, function(color: Vector3)
+					local h, s = color.X, color.Y
 					local start = Color3.fromHSV(h, s, 0)
 					local finish = Color3.fromHSV(h, s, 1)
 					return ColorSequence.new(start, finish)
@@ -255,12 +281,12 @@ function ValueColorPicker:_render()
 			BackgroundTransparency = 1,
 			Position = UDim2.fromScale(1, 0),
 			AnchorPoint = Vector2.new(1, 0),
-			Size = Blend.Computed(self._leftWidth, self._sizeValue, function(width, sizeValue)
-				if sizeValue.x == 0 then
+			Size = Blend.Computed(self._leftWidth, self._sizeValue, function(width: number, sizeValue: Vector2)
+				if sizeValue.X == 0 then
 					return UDim2.fromScale(0, 1)
 				end
 
-				return UDim2.fromScale((sizeValue.x - width) / sizeValue.x, 1)
+				return UDim2.fromScale((sizeValue.X - width) / sizeValue.X, 1)
 			end),
 
 			self._triangle.Gui,
