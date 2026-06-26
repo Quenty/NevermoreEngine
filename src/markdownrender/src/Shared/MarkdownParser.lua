@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Parses text into markdown
 	@class MarkdownParser
@@ -8,16 +8,37 @@ local MarkdownParser = {}
 MarkdownParser.__index = MarkdownParser
 MarkdownParser.ClassName = "MarkdownParser"
 
-function MarkdownParser.new(text: string)
-	local self = setmetatable({}, MarkdownParser)
+export type MarkdownList = {
+	Level: number,
+	Type: string,
+	[number]: string,
+}
+
+export type MarkdownHeader = {
+	Type: string,
+	Level: number,
+	Text: string,
+}
+
+export type MarkdownLine = string | MarkdownList | MarkdownHeader
+
+export type MarkdownParser = typeof(setmetatable(
+	{} :: {
+		_text: string,
+	},
+	{} :: typeof({ __index = MarkdownParser })
+))
+
+function MarkdownParser.new(text: string): MarkdownParser
+	local self: MarkdownParser = setmetatable({} :: any, MarkdownParser)
 
 	self._text = text or error("No text")
 
 	return self
 end
 
-function MarkdownParser:GetLines()
-	local lines = {}
+function MarkdownParser.GetLines(self: MarkdownParser): { string }
+	local lines: { string } = {}
 	local text = self._text .. "\n" -- append extra line to force ending match
 	for line in text:gmatch("([^\r\n]*)[\r\n]") do
 		table.insert(lines, line)
@@ -25,12 +46,12 @@ function MarkdownParser:GetLines()
 	return lines
 end
 
-function MarkdownParser:ParseList(oldLines)
-	local lines = {}
-	local currentList
+function MarkdownParser.ParseList(self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
+	local lines: { MarkdownLine } = {}
+	local currentList: MarkdownList? = nil
 
 	for _, line in oldLines do
-		local space, bullet, text
+		local space: string?, bullet: string?, text: string?
 
 		if type(line) == "string" then
 			space, bullet, text = line:match("^([ \t]*)([%-%*])%s*(.+)%s*$")
@@ -48,13 +69,14 @@ function MarkdownParser:ParseList(oldLines)
 			end
 
 			if currentList then
-				table.insert(currentList, text)
+				currentList[#currentList + 1] = text
 			else
-				currentList = {}
-				currentList.Level = Level
-				currentList.Type = "List"
-
-				table.insert(currentList, text)
+				local newList: MarkdownList = {
+					Level = Level,
+					Type = "List",
+				}
+				newList[#newList + 1] = text
+				currentList = newList
 			end
 		else
 			if currentList then
@@ -72,11 +94,11 @@ function MarkdownParser:ParseList(oldLines)
 	return lines
 end
 
-function MarkdownParser:ParseHeaders(oldLines)
-	local lines = {}
+function MarkdownParser.ParseHeaders(self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
+	local lines: { MarkdownLine } = {}
 
 	for _, line in oldLines do
-		local poundSymbols, text
+		local poundSymbols: string?, text: string?
 
 		if type(line) == "string" then
 			poundSymbols, text = line:match("^%s*([#]+)%s*(.+)%s*$")
@@ -97,10 +119,10 @@ function MarkdownParser:ParseHeaders(oldLines)
 	return lines
 end
 
-function MarkdownParser:ParseParagraphs(oldLines)
-	local lines = {}
+function MarkdownParser.ParseParagraphs(self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
+	local lines: { MarkdownLine } = {}
 
-	local currentParagraph
+	local currentParagraph: string? = nil
 	for _, line in oldLines do
 		if type(line) == "table" then
 			table.insert(lines, line)
@@ -128,8 +150,8 @@ function MarkdownParser:ParseParagraphs(oldLines)
 end
 
 -- Parses the given text into a list of lines
-function MarkdownParser:Parse()
-	local lines = self:GetLines()
+function MarkdownParser.Parse(self: MarkdownParser): { MarkdownLine }
+	local lines: { MarkdownLine } = self:GetLines()
 
 	lines = self:ParseList(lines)
 	lines = self:ParseHeaders(lines)
