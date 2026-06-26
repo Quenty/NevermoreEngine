@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SpawnBinderGroupsServer
 ]=]
@@ -6,9 +6,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BinderGroup = require("BinderGroup")
-local t = require("t")
+local t: any = require("t")
 
-return require("BinderGroupProvider").new(function(self, _serviceBag)
+return require("BinderGroupProvider").new(function(self: any, _serviceBag: any)
 	-- SpawnProvider
 	-- self:Add("SpawnProviders", BinderGroup.new(
 	-- 	{
