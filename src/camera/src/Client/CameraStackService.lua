@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Holds camera states and allows for the last camera state to be retrieved. Also
 	initializes an impulse and default camera at the bottom of the stack. Is a singleton.
@@ -70,9 +70,8 @@ function CameraStackService.Start(self: CameraStackService): ()
 
 		local state = self:GetTopState()
 
-		self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
-
 		if state then
+			self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
 			state:Set(Workspace.CurrentCamera)
 		end
 
