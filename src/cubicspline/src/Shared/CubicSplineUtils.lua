@@ -138,9 +138,9 @@ function CubicSplineUtils.populateVelocities<T>(nodeList: { CubicSplineNode<T> }
 	local i1 = index1 or #nodeList
 
 	local output = {}
-	local mainDiag = {}
-	local lowerDiag = {}
-	local upperDiag = {}
+	local mainDiag: { number } = {}
+	local lowerDiag: { number } = {}
+	local upperDiag: { number } = {}
 
 	-- first pass
 	for i = i0, i1 do
@@ -180,7 +180,7 @@ function CubicSplineUtils.populateVelocities<T>(nodeList: { CubicSplineNode<T> }
 		end
 	end
 
-	local solution = LinearSystemsSolverUtils.solveTridiagonal(mainDiag, upperDiag, lowerDiag, output)
+	local solution = LinearSystemsSolverUtils.solveTridiagonal(mainDiag, upperDiag, lowerDiag, (output :: any) :: { number })
 
 	for i = i0, i1 do
 		local v = solution[i - i0 + 1]
