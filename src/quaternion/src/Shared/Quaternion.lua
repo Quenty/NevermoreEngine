@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --stylua: ignore
 --[=[
 	Quaternion data type
@@ -28,21 +28,25 @@ local CF = CFrame.new
 local iv = vec3()
 local iq = { 1, 0, 0, 0 }
 
+export type Quaternion = { number }
+
 local lib = {}
 
-local function BezierPosition(x0, x1, v0, v1, t)
-	local T = 1 - t
-	return x0 * T * T * T + (3 * x0 + v0) * t * T * T + (3 * x1 - v1) * t * t * T + x1 * t * t * t
+local function BezierPosition<T>(x0: T, x1: T, v0: T, v1: T, t: number): T
+	local a0, a1, b0, b1 = x0 :: any, x1 :: any, v0 :: any, v1 :: any
+	local T2 = 1 - t
+	return (a0 * T2 * T2 * T2 + (3 * a0 + b0) * t * T2 * T2 + (3 * a1 - b1) * t * t * T2 + a1 * t * t * t) :: T
 end
 lib.BezierPosition = BezierPosition
 
-local function BezierVelocity(x0, x1, v0, v1, t)
-	local T = 1 - t
-	return v0 * T * T + 2 * (3 * (x1 - x0) - (v1 + v0)) * t * T + v1 * t * t
+local function BezierVelocity<T>(x0: T, x1: T, v0: T, v1: T, t: number): T
+	local a0, a1, b0, b1 = x0 :: any, x1 :: any, v0 :: any, v1 :: any
+	local T2 = 1 - t
+	return (b0 * T2 * T2 + 2 * (3 * (a1 - a0) - (b1 + b0)) * t * T2 + b1 * t * t) :: T
 end
 lib.BezierVelocity = BezierVelocity
 
-local function Qmul(q1, q2) -- Multiply
+local function Qmul(q1: Quaternion, q2: Quaternion): Quaternion -- Multiply
 	local w1, x1, y1, z1, w2, x2, y2, z2 = q1[1], q1[2], q1[3], q1[4], q2[1], q2[2], q2[3], q2[4]
 	return {
 		w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
@@ -53,7 +57,7 @@ local function Qmul(q1, q2) -- Multiply
 end
 lib.Qmul = Qmul
 
-local function Qinv(q) --Inverse. (q^-1)
+local function Qinv(q: Quaternion): Quaternion --Inverse. (q^-1)
 	local w, x, y, z = q[1], q[2], q[3], q[4]
 	local m = w * w + x * x + y * y + z * z
 	if m > 0 then
@@ -64,15 +68,15 @@ local function Qinv(q) --Inverse. (q^-1)
 end
 lib.Qinv = Qinv
 
-local function Qpow(q, exponent, choice)
-	choice = choice or 0
+local function Qpow(q: Quaternion, exponent: number, choice: number?): Quaternion
+	local c = choice or 0
 	local w, x, y, z = q[1], q[2], q[3], q[4]
 	local vv = x * x + y * y + z * z
 	if vv > 0 then
 		--Convert to polar form and exponentiate (all in one go)
 		local v = sqrt(vv)
 		local m = (w * w + vv) ^ (0.5 * exponent)
-		local theta = exponent * (atan2(v, w) + tau * choice) --swag
+		local theta = exponent * (atan2(v, w) + tau * c) --swag
 		local s = m * sin(theta) / v
 		return { m * cos(theta), x * s, y * s, z * s }
 	else --This is a regular number.  srs.  lol.
@@ -87,8 +91,8 @@ local function Qpow(q, exponent, choice)
 end
 lib.Qpow = Qpow
 
-local function QuaternionFromCFrame(cf)
-	local _, _, _, m00, m01, m02, m10, m11, m12, m20, m21, m22 = cf:components()
+local function QuaternionFromCFrame(cf: CFrame): (number?, number?, number?, number?)
+	local _, _, _, m00, m01, m02, m10, m11, m12, m20, m21, m22 = cf:GetComponents()
 	local trace = m00 + m11 + m22
 	if trace > 0 then
 		local s = sqrt(1 + trace)
@@ -115,12 +119,12 @@ local function QuaternionFromCFrame(cf)
 end
 lib.QuaternionFromCFrame = QuaternionFromCFrame
 
-local function SlerpQuaternions(q0, q1, t)
+local function SlerpQuaternions(q0: Quaternion, q1: Quaternion, t: number): Quaternion
 	return Qmul(Qpow(Qmul(q1, Qinv(q0)), t), q0)
 end
 lib.SlerpQuaternions = SlerpQuaternions
 
-local function QuaternionToCFrame(q)
+local function QuaternionToCFrame(q: Quaternion): (number, number, number, number, number, number, number, number, number)
 	local w, x, y, z = q[1], q[2], q[3], q[4]
 	local xs, ys, zs = x + x, y + y, z + z
 	local wx, wy, wz = w * xs, w * ys, w * zs
@@ -129,7 +133,7 @@ local function QuaternionToCFrame(q)
 end
 lib.QuaternionToCFrame = QuaternionToCFrame
 
-local function BezierRotation(q0, q1, w0, w1, t)
+local function BezierRotation(q0: Quaternion, q1: Quaternion, w0: Quaternion, w1: Quaternion, t: number): Quaternion
 	local _30, _31, _32, _33 = q0, Qmul(q0, w0), Qmul(q1, Qinv(w1)), q1
 	local _20, _21, _22 =
 		Qmul(_30, Qpow(Qmul(Qinv(_30), _31), t)),
@@ -141,7 +145,7 @@ local function BezierRotation(q0, q1, w0, w1, t)
 end
 lib.BezierRotation = BezierRotation
 
-local function BezierAngularV(q0, q1, w0, w1, t)
+local function BezierAngularV(q0: Quaternion, q1: Quaternion, w0: Quaternion, w1: Quaternion, t: number): Quaternion
 	local _30, _31, _32, _33 = q0, Qmul(q0, w0), Qmul(q1, Qinv(w1)), q1
 	local _20, _21, _22 = Qmul(Qinv(_30), _31), Qmul(Qinv(_31), _32), Qmul(Qinv(_32), _33)
 	local _10, _11 = Qmul(_20, Qpow(Qmul(Qinv(_20), _21), t)), Qmul(_21, Qpow(Qmul(Qinv(_21), _22), t))
@@ -151,10 +155,10 @@ end
 lib.BezierAngularV = BezierAngularV
 
 --Regular tweening
-local TweenData = {}
+local TweenData: { [any]: any } = {}
 -- stylua: ignore
 local Tweens=setmetatable({},{
-	__index=function(_,i)
+	__index=function(_: any, i: any): any
 		local data=TweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -169,7 +173,7 @@ local Tweens=setmetatable({},{
 
 		return nil
 	end,
-	__newindex=function(_,i,v)
+	__newindex=function(_: any, i: any, v: any)
 		local data=TweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -205,10 +209,10 @@ local Tweens=setmetatable({},{
 lib.Tweens = Tweens
 
 --Quaternion tweening
-local QuaternionTweenData = {}
+local QuaternionTweenData: { [any]: any } = {}
 -- stylua: ignore
 local QuaternionTweens=setmetatable({},{
-	__index=function(_,i)
+	__index=function(_: any, i: any): any
 		local data=QuaternionTweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -223,7 +227,7 @@ local QuaternionTweens=setmetatable({},{
 
 		return nil
 	end,
-	__newindex=function(_,i,v)
+	__newindex=function(_: any, i: any, v: any)
 		local data=QuaternionTweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -262,10 +266,10 @@ local QuaternionTweens=setmetatable({},{
 lib.QuaternionTweens = QuaternionTweens
 
 --CFrame tweening
-local CFrameTweenData = {}
+local CFrameTweenData: { [any]: any } = {}
 -- stylua: ignore
 local CFrameTweens=setmetatable({},{
-	__index=function(_,i)
+	__index=function(_: any, i: any): any
 		local data=CFrameTweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -282,7 +286,7 @@ local CFrameTweens=setmetatable({},{
 
 		return nil
 	end,
-	__newindex=function(_,i,v)
+	__newindex=function(_: any, i: any, v: any)
 		local data=CFrameTweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -296,13 +300,13 @@ local CFrameTweens=setmetatable({},{
 					BezierVelocity(data.x0,data.x1,data.v0,data.v1,t)/dt,
 					iv,
 					BezierRotation(data.q0,data.q1,data.w0,data.w1,t),
-					{QuaternionFromCFrame(v)},
+					{QuaternionFromCFrame(v)} :: any,
 					Qpow(BezierAngularV(data.q0,data.q1,data.w0,data.w1,t),1/dt),
 					iq
 			elseif timeNow>=t1 then
-				x0,x1,v0,v1,q0,q1,w0,w1=data.x1,v.p,iv,iv,data.q1,{QuaternionFromCFrame(v)},iq,iq
+				x0,x1,v0,v1,q0,q1,w0,w1=data.x1,v.p,iv,iv,data.q1,{QuaternionFromCFrame(v)} :: any,iq,iq
 			elseif timeNow<=t0 then
-				x0,x1,v0,v1,q0,q1,w0,w1=data.x0,v.p,iv,iv,data.q0,{QuaternionFromCFrame(v)},iq,iq
+				x0,x1,v0,v1,q0,q1,w0,w1=data.x0,v.p,iv,iv,data.q0,{QuaternionFromCFrame(v)} :: any,iq,iq
 			end
 			local a1,b1,c1,d1,a2,b2,c2,d2
 				=q0[1]-q1[1],q0[2]-q1[2],q0[3]-q1[3],q0[4]-q1[4],q0[1]+q1[1],q0[2]+q1[2],q0[3]+q1[3],q0[4]+q1[4]
@@ -328,7 +332,7 @@ local CFrameTweens=setmetatable({},{
 })
 lib.CFrameTweens = CFrameTweens
 
-local function updateTweens(timeNow)
+local function updateTweens(timeNow: number): ()
 	for _, data in next, TweenData do
 		local f, t0, t1 = data.update, data.t0, data.t1
 		if f then
@@ -347,7 +351,7 @@ local function updateTweens(timeNow)
 end
 lib.updateTweens = updateTweens
 
-local function updateQuaternionTweens(timeNow)
+local function updateQuaternionTweens(timeNow: number): ()
 	for _, data in next, QuaternionTweenData do
 		local f, t0, t1 = data.update, data.t0, data.t1
 		if f then
@@ -366,7 +370,7 @@ local function updateQuaternionTweens(timeNow)
 end
 lib.updateQuaternionTweens = updateQuaternionTweens
 
-local function updateCFrameTweens(timeNow)
+local function updateCFrameTweens(timeNow: number): ()
 	for _, data in next, CFrameTweenData do
 		local f, t0, t1 = data.update, data.t0, data.t1
 		if f then
@@ -387,12 +391,12 @@ local function updateCFrameTweens(timeNow)
 end
 lib.updateCFrameTweens = updateCFrameTweens
 
-local function newTween(name, value, updateFunction, time)
+local function newTween<T>(name: any, value: T, updateFunction: ((T) -> ())?, time: (number | ((T, T, T, T) -> number))?): ()
 	TweenData[name] = {
 		x0 = value,
 		x1 = value,
-		v0 = value * 0,
-		v1 = value * 0,
+		v0 = (value :: any) * 0,
+		v1 = (value :: any) * 0,
 		t0 = 0,
 		t1 = tick(),
 		time = time or 1,
@@ -405,7 +409,7 @@ local function newTween(name, value, updateFunction, time)
 end
 lib.newTween = newTween
 
-local function newQuaternionTween(name, value, updateFunction, time, autoChoose)
+local function newQuaternionTween(name: any, value: Quaternion, updateFunction: ((Quaternion) -> ())?, time: (number | ((Quaternion, Quaternion, Quaternion, Quaternion) -> number))?, autoChoose: boolean?): ()
 	QuaternionTweenData[name] = {
 		q0 = value,
 		q1 = value,
@@ -424,13 +428,13 @@ local function newQuaternionTween(name, value, updateFunction, time, autoChoose)
 end
 lib.newQuaternionTween = newQuaternionTween
 
-local function newCFrameTween(name, value, updateFunction, time)
+local function newCFrameTween(name: any, value: CFrame, updateFunction: ((CFrame) -> ())?, time: any): ()
 	local q = { QuaternionFromCFrame(value) }
 	CFrameTweenData[name] = {
 		c0 = value,
 		c1 = value,
-		x0 = value.p,
-		x1 = value.p,
+		x0 = (value :: any).p,
+		x1 = (value :: any).p,
 		v0 = iv,
 		v1 = iv,
 		q0 = q,
