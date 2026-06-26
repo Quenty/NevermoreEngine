@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 -- lua-lru, LRU cache in Lua
 -- Copyright (c) 2015 Boris Nagaev
 --[[
@@ -29,7 +29,19 @@ SOFTWARE.
 local LRUCache = {}
 LRUCache.ClassName = "LRUCache"
 
-function LRUCache.new(maxSize: number, maxBytes: number?)
+export type LRUCache = typeof(setmetatable(
+	{} :: {},
+	{} :: {
+		__index: {
+			get: (LRUCache, key: any) -> any,
+			set: (LRUCache, key: any, value: any, bytes: number?) -> (),
+			delete: (LRUCache, key: any) -> (),
+			pairs: (LRUCache) -> ((any, any?) -> (any, any), any, any),
+		},
+	}
+))
+
+function LRUCache.new(maxSize: number, maxBytes: number?): LRUCache
 	assert(maxSize >= 1, "maxSize must be >= 1")
 	assert(not maxBytes or maxBytes >= 1, "maxBytes must be >= 1")
 
@@ -40,7 +52,7 @@ function LRUCache.new(maxSize: number, maxBytes: number?)
 	-- map is a hash map from keys to tuples
 	-- tuple: value, prev, next, key
 	-- prev and next are pointers to tuples
-	local map = {}
+	local map: { [any]: { any } } = {}
 
 	-- indices of tuple
 	local VALUE = 1
@@ -50,13 +62,13 @@ function LRUCache.new(maxSize: number, maxBytes: number?)
 	local BYTES = 5
 
 	-- newest and oldest are ends of double-linked list
-	local newest = nil -- first
-	local oldest = nil -- last
+	local newest: { any }? = nil -- first
+	local oldest: { any }? = nil -- last
 
-	local removed_tuple -- created in del(), removed in set()
+	local removed_tuple: { any }? -- created in del(), removed in set()
 
 	-- remove a tuple from linked list
-	local function cut(tuple)
+	local function cut(tuple: { any })
 		local tuple_prev = tuple[PREV]
 		local tuple_next = tuple[NEXT]
 		tuple[PREV] = nil
@@ -80,7 +92,7 @@ function LRUCache.new(maxSize: number, maxBytes: number?)
 	end
 
 	-- insert a tuple to the newest end
-	local function setNewest(tuple)
+	local function setNewest(tuple: { any })
 		if not newest then
 			newest = tuple
 			oldest = tuple
@@ -91,7 +103,7 @@ function LRUCache.new(maxSize: number, maxBytes: number?)
 		end
 	end
 
-	local function del(key, tuple)
+	local function del(key: any, tuple: { any }): ()
 		map[key] = nil
 		cut(tuple)
 		size = size - 1
@@ -101,14 +113,14 @@ function LRUCache.new(maxSize: number, maxBytes: number?)
 
 	-- removes elemenets to provide enough memory
 	-- returns last removed element or nil
-	local function makeFreeSpace(bytes)
+	local function makeFreeSpace(bytes: number): ()
 		while size + 1 > maxSize or (maxBytes and bytesUsed + bytes > maxBytes) do
 			assert(oldest, "not enough storage for cache")
 			del(oldest[KEY], oldest)
 		end
 	end
 
-	local function get(_, key)
+	local function get(_: any, key: any): any
 		local tuple = map[key]
 		if not tuple then
 			return nil
@@ -118,22 +130,22 @@ function LRUCache.new(maxSize: number, maxBytes: number?)
 		return tuple[VALUE]
 	end
 
-	local function set(_, key, value, bytes)
+	local function set(_: any, key: any, value: any, bytes: number?): ()
 		local tuple = map[key]
 		if tuple then
 			del(key, tuple)
 		end
 		if value ~= nil then
 			-- the value is not removed
-			bytes = maxBytes and (bytes or #value) or 0
-			makeFreeSpace(bytes)
+			local computedBytes = maxBytes and (bytes or #value) or 0
+			makeFreeSpace(computedBytes)
 			local tuple1 = removed_tuple or {}
 			map[key] = tuple1
 			tuple1[VALUE] = value
 			tuple1[KEY] = key
-			tuple1[BYTES] = maxBytes and bytes
+			tuple1[BYTES] = maxBytes and computedBytes
 			size = size + 1
-			bytesUsed = bytesUsed + bytes
+			bytesUsed = bytesUsed + computedBytes
 			setNewest(tuple1)
 		else
 			assert(key ~= nil, "Key may not be nil")
@@ -141,11 +153,11 @@ function LRUCache.new(maxSize: number, maxBytes: number?)
 		removed_tuple = nil
 	end
 
-	local function delete(_, key)
+	local function delete(_: any, key: any): ()
 		return set(nil, key, nil)
 	end
 
-	local function mynext(_, prev_key)
+	local function mynext(_: any, prev_key: any): (any, any)
 		local tuple
 		if prev_key then
 			tuple = map[prev_key][NEXT]
@@ -174,7 +186,7 @@ function LRUCache.new(maxSize: number, maxBytes: number?)
 		__pairs = lru_pairs,
 	}
 
-	return setmetatable({}, mt)
+	return setmetatable({}, mt) :: any
 end
 
 return LRUCache
