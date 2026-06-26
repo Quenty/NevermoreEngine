@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Mouse over mixin for general utility button mouse over effects
 	@class MouseOverMixin
@@ -11,7 +11,7 @@ local Maid = require("Maid")
 
 local MouseOverMixin = {}
 
-function MouseOverMixin:Add(class)
+function MouseOverMixin:Add(class: any)
 	assert(class, "Bad class")
 	assert(not class.GetMouseOverColor, "Class already has GetMouseOverColor")
 
@@ -20,7 +20,7 @@ function MouseOverMixin:Add(class)
 	class._getMouseOverTweenProperties = self._getMouseOverTweenProperties
 end
 
-function MouseOverMixin:GetMouseOverBoolValue(gui: GuiObject)
+function MouseOverMixin:GetMouseOverBoolValue(gui: GuiObject): (Maid.Maid, BoolValue)
 	local maid = Maid.new()
 
 	local mouseOver = Instance.new("BoolValue")
@@ -59,35 +59,35 @@ function MouseOverMixin:GetMouseOverBoolValue(gui: GuiObject)
 	return maid, mouseOver
 end
 
-function MouseOverMixin:_getMouseOverTweenProperties(gui: GuiObject)
+function MouseOverMixin:_getMouseOverTweenProperties(gui: GuiObject): { BackgroundColor3: Color3, ImageColor3: Color3? }
 	if gui:IsA("ImageButton") then
 		return {
-			ImageColor3 = ButtonUtils.getMouseOverColor(gui.ImageColor3),
-			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3),
+			ImageColor3 = ButtonUtils.getMouseOverColor(gui.ImageColor3, 1),
+			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3, 1),
 		}
 	else
 		return {
-			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3),
+			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3, 1),
 		}
 	end
 end
 
-function MouseOverMixin:AddMouseOverEffect(gui: GuiObject, tweenProperties)
-	tweenProperties = tweenProperties or ButtonUtils._getMouseOverTweenProperties(gui)
+function MouseOverMixin:AddMouseOverEffect(gui: GuiObject, tweenProperties: { [string]: any }?)
+	local tweenProps: { [string]: any } = tweenProperties or (ButtonUtils :: any)._getMouseOverTweenProperties(gui)
 
 	if gui:IsA("GuiButton") then
 		gui.AutoButtonColor = false
 	end
 
-	local maid, boolValue = ButtonUtils.getMouseOverBoolValue(gui)
-	local original = {}
-	for property, _ in tweenProperties do
-		original[property] = gui[property]
+	local maid, boolValue = (ButtonUtils :: any).getMouseOverBoolValue(gui)
+	local original: { [string]: any } = {}
+	for property, _ in tweenProps do
+		original[property] = (gui :: any)[property]
 	end
 
 	local function update()
-		for property, Value in boolValue.Value and tweenProperties or original do
-			gui[property] = Value
+		for property, Value in boolValue.Value and tweenProps or original do
+			(gui :: any)[property] = Value
 		end
 	end
 	update()
