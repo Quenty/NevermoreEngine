@@ -3699,6 +3699,9 @@ importers:
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
