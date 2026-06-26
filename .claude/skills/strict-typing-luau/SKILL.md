@@ -37,7 +37,12 @@ luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc \
 ```
 
 Clean = only the `[INFO] Loading...` line. `LuauSolverV2=false` is required (repo pins the old
-solver). Iterate until clean, then run `npm run lint:luau` **once** as the final gate — single-file
+solver). **Never drop `--defs=globalTypes.d.lua` or `--base-luaurc=.luaurc`** — without `--defs`
+the analyzer loses the Roblox global declarations and reports *false* `Unknown global 'tick'/'time'`
+(and similar) errors while still resolving `game`/`Enum`, which looks like a real conversion bug but
+isn't. If you see unknown-global errors only on deprecated globals, you forgot `--defs`; confirm with
+`npm run lint:luau` (which always passes the flag) before "fixing" anything. Iterate until clean,
+then run `npm run lint:luau` **once** as the final gate — single-file
 analyze can't see files that depend on *yours*, and tightening a type ripples to subclasses and
 callers. Triage new downstream errors: pre-existing → leave & flag; your type is genuinely too
 tight for the real contract → loosen *your* type (often `T?` not `T`); a small obvious follow-on

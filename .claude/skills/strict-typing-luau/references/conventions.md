@@ -55,6 +55,28 @@ end
 return MyClass
 ```
 
+## Annotate no-return functions with `: ()`
+
+Every function/method that doesn't return a value gets an explicit `: ()` return annotation
+(see `Destroy`/`SetEnabled` above). This is the repo convention — it states "returns nothing"
+on purpose rather than leaving it inferred, and it reads symmetrically with functions that do
+declare a return type. Applies to constructors' siblings, lifecycle methods (`Init`, `Start`),
+setters, and private helpers alike:
+
+```lua
+function MyClass.SetEnabled(self: MyClass, enabled: boolean): ()
+	self._enabled.Value = enabled
+end
+
+function MyService.Init(self: MyService, serviceBag: ServiceBag.ServiceBag): ()
+	-- ...
+end
+```
+
+A function with only bare `return` statements (early-outs, no value) still returns nothing —
+annotate it `: ()` too. Only omit the annotation when the function actually returns a value
+(then annotate the real type instead).
+
 ## Binder-bound class
 
 Same as a BaseObject class, but registered via a binder. The `:: any` on the class and the
@@ -132,14 +154,14 @@ export type MyService = typeof(setmetatable(
 	{} :: typeof({ __index = MyService })
 ))
 
-function MyService.Init(self: MyService, serviceBag: ServiceBag.ServiceBag)
+function MyService.Init(self: MyService, serviceBag: ServiceBag.ServiceBag): ()
 	-- the field isn't set yet, so the typed `self` narrows it to nil — cast for the guard:
 	assert(not (self :: any)._serviceBag, "MyService is already initialized!")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._otherService = serviceBag:GetService(require("OtherService"))
 end
 
-function MyService.Start(self: MyService)
+function MyService.Start(self: MyService): ()
 	-- ...
 end
 
@@ -203,6 +225,8 @@ end
 | `Key 'k' not found` on `rawget(self, k)` / `self[dynamicKey]` | Cast the receiver: `rawget(self :: any, k)`. |
 | `T` not flowing (generic collapses) | Make `T` load-bearing — add a `Value: T` (or similar) field. |
 | Required arg the method ignores, or optional arg passed as required | Fix the upstream signature (make optional / remove dead param) if in scope; else flag it. Don't paper with a call-site `:: any`. |
+| `Internal error: Code is too complex to typecheck!` on a class typed `typeof(setmetatable(...)) & SomeMixin.Mixin` | Old solver chokes on intersecting a record (mixin surface) onto a metatable type — worsens when the class is stored in containers. **Inline** the mixin's runtime-injected fields/methods directly into the class's field record (with a `-- <Mixin> surface (injected at runtime)` comment) instead of intersecting. Type the injected methods' receivers as `self: any`. |
+| `different number of generic type pack parameters` on a `Signal`/generic metatable field when the class is used in an invariant position (`{T}` return, `table.insert(list, x)`, etc.) | Old-solver bug comparing generic metatable types invariantly across modules. Cast the element to `any` at the invariant site only (`table.insert(list, x :: any)`); keep the public/field type precise. |
 
 ## Common type imports
 
