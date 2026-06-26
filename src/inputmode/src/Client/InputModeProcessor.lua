@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Process inputs by evaluating inputModes. Helper object..
 
@@ -11,7 +11,7 @@ local InputMode = require("InputMode")
 
 local InputModeProcessor = {}
 InputModeProcessor.__index = InputModeProcessor
-InputModeProcessor.ClassName = InputModeProcessor
+InputModeProcessor.ClassName = "InputModeProcessor"
 
 export type InputModeProcessor = typeof(setmetatable(
 	{} :: {
@@ -26,13 +26,13 @@ export type InputModeProcessor = typeof(setmetatable(
 	@return InputModeProcessor
 ]=]
 function InputModeProcessor.new(inputModes: { InputMode.InputMode }?): InputModeProcessor
-	local self = setmetatable({}, InputModeProcessor)
+	local self: InputModeProcessor = setmetatable({} :: any, InputModeProcessor)
 
 	self._inputModes = {}
 
 	if inputModes then
 		for _, inputMode in inputModes do
-			self:AddInputMode(inputMode)
+			self:AddInputMode(inputMode :: any)
 		end
 	end
 
@@ -43,7 +43,7 @@ end
 	Adds an input mode to the inputModeProcessor
 	@param inputMode InputMode
 ]=]
-function InputModeProcessor.AddInputMode(self: InputModeProcessor, inputMode: InputMode.InputMode)
+function InputModeProcessor.AddInputMode(self: InputModeProcessor, inputMode: InputMode.InputMode): ()
 	table.insert(self._inputModes, inputMode)
 end
 
@@ -59,9 +59,9 @@ end
 	Applies the inputObject as an evaluation for the inputm odes
 	@param inputObject InputObject
 ]=]
-function InputModeProcessor.Evaluate(self: InputModeProcessor, inputObject: InputObject)
+function InputModeProcessor.Evaluate(self: InputModeProcessor, inputObject: InputObject): ()
 	for _, inputMode in self._inputModes do
-		inputMode:Evaluate(inputObject)
+		(inputMode :: any):Evaluate(inputObject)
 	end
 end
 
