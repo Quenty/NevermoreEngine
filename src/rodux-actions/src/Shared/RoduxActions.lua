@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RoduxActions
 ]=]
@@ -12,22 +12,34 @@ local RoduxActions = {}
 RoduxActions.ServiceName = "RoduxActions"
 RoduxActions.ClassName = "RoduxActions"
 
-function RoduxActions.new(initFunction)
-	local self = setmetatable({}, RoduxActions)
+export type RoduxActions = typeof(setmetatable(
+	{} :: {
+		_initFunction: (RoduxActions) -> (),
+		_actionFactories: { [string]: RoduxActionFactory.RoduxActionFactory },
+	},
+	{} :: typeof({ __index = RoduxActions })
+))
+
+function RoduxActions.new(initFunction: (RoduxActions) -> ()): RoduxActions
+	local self: RoduxActions = setmetatable({}, RoduxActions) :: any
 
 	self._initFunction = initFunction or error("No initFunction")
 
 	return self
 end
 
-function RoduxActions:Init()
-	assert(not rawget(self, "_actionFactories"), "Already initialized")
+function RoduxActions.Init(self: RoduxActions): ()
+	assert(not rawget(self :: any, "_actionFactories"), "Already initialized")
 
 	self._actionFactories = {}
 	self._initFunction(self)
 end
 
-function RoduxActions:CreateReducer(initialState, handlers)
+function RoduxActions.CreateReducer(
+	self: RoduxActions,
+	initialState: any,
+	handlers: { [string]: (state: any, action: any) -> any }
+): (state: any, action: any) -> any
 	assert(type(handlers) == "table", "Bad handlers")
 
 	for actionType, func in handlers do
@@ -56,7 +68,7 @@ function RoduxActions:CreateReducer(initialState, handlers)
 	end
 end
 
-function RoduxActions:Validate(action)
+function RoduxActions.Validate(self: RoduxActions, action: any): (boolean, string?)
 	assert(type(action) == "table", "Bad action")
 	assert(type(action.type) == "string", "Bad action")
 
@@ -68,15 +80,15 @@ function RoduxActions:Validate(action)
 	return actionFactory:Validate(action)
 end
 
-function RoduxActions:Get(actionName)
-	local actionFactories = rawget(self, "_actionFactories")
+function RoduxActions.Get(self: RoduxActions, actionName: string): RoduxActionFactory.RoduxActionFactory?
+	local actionFactories = rawget(self :: any, "_actionFactories")
 	assert(actionFactories, "Not initialized yet")
 
 	return actionFactories[actionName]
 end
 
-function RoduxActions:Add(actionName, typeTable)
-	local actionFactories = rawget(self, "_actionFactories")
+function RoduxActions.Add(self: RoduxActions, actionName: string, typeTable: { [any]: any }?): ()
+	local actionFactories = rawget(self :: any, "_actionFactories")
 	assert(actionFactories, "Not initialized yet")
 
 	assert(actionFactories[actionName] == nil, "Duplicate action already exists")
@@ -84,7 +96,7 @@ function RoduxActions:Add(actionName, typeTable)
 	actionFactories[actionName] = RoduxActionFactory.new(actionName, typeTable)
 end
 
-function RoduxActions:__index(index)
+(RoduxActions :: any).__index = function(self, index)
 	if RoduxActions[index] then
 		return RoduxActions[index]
 	end
