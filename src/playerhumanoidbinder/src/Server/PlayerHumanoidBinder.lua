@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Binder that will automatically bind to each player's humanoid
 	@class PlayerHumanoidBinder
@@ -18,6 +18,15 @@ local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
 PlayerHumanoidBinder.__index = PlayerHumanoidBinder
 
+export type PlayerHumanoidBinder<T> = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_humanoidTrackerService: any,
+		_shouldTag: ValueObject.ValueObject<boolean>,
+	},
+	{} :: typeof({ __index = PlayerHumanoidBinder })
+)) & Binder.Binder<T>
+
 --[=[
 	Returns a new PlayerHumanoidBinder
 	@param tag string
@@ -25,8 +34,12 @@ PlayerHumanoidBinder.__index = PlayerHumanoidBinder
 	@param ... any
 	@return PlayerHumanoidBinder<T>
 ]=]
-function PlayerHumanoidBinder.new(tag: string, class, ...)
-	local self = setmetatable(Binder.new(tag, class, ...), PlayerHumanoidBinder)
+function PlayerHumanoidBinder.new<T>(
+	tag: string,
+	class: Binder.BinderConstructor<T>,
+	...
+): PlayerHumanoidBinder<T>
+	local self: PlayerHumanoidBinder<T> = setmetatable(Binder.new(tag, class, ...) :: any, PlayerHumanoidBinder)
 
 	return self
 end
@@ -38,7 +51,7 @@ end
 	@param serviceBag ServiceBag
 	@param ... any
 ]=]
-function PlayerHumanoidBinder:Init(serviceBag: ServiceBag.ServiceBag, ...)
+function PlayerHumanoidBinder.Init<T>(self: PlayerHumanoidBinder<T>, serviceBag: ServiceBag.ServiceBag, ...): ()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	getmetatable(PlayerHumanoidBinder).Init(self, serviceBag, ...)
@@ -54,7 +67,7 @@ end
 	Sets whether tagging should be enabled
 	@param shouldTag boolean
 ]=]
-function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag: boolean)
+function PlayerHumanoidBinder.SetAutomaticTagging<T>(self: PlayerHumanoidBinder<T>, shouldTag: boolean): ()
 	assert(type(shouldTag) == "boolean", "Bad shouldTag")
 	assert(self._shouldTag, "Missing self._shouldTag")
 
@@ -64,7 +77,7 @@ end
 --[=[
 	@return Observable<boolean>
 ]=]
-function PlayerHumanoidBinder:ObserveAutomaticTagging()
+function PlayerHumanoidBinder.ObserveAutomaticTagging<T>(self: PlayerHumanoidBinder<T>)
 	return self._shouldTag:Observe()
 end
 
@@ -72,7 +85,10 @@ end
 	@param predicate function -- Optional predicate
 	@return Observable<Brio<boolean>>
 ]=]
-function PlayerHumanoidBinder:ObserveAutomaticTaggingBrio(predicate)
+function PlayerHumanoidBinder.ObserveAutomaticTaggingBrio<T>(
+	self: PlayerHumanoidBinder<T>,
+	predicate: ((boolean) -> boolean)?
+)
 	return self._shouldTag:ObserveBrio(predicate)
 end
 
@@ -80,7 +96,7 @@ end
 	Starts the binder. See [Binder.Start].
 	Should be done via a [ServiceBag].
 ]=]
-function PlayerHumanoidBinder:Start()
+function PlayerHumanoidBinder.Start<T>(self: PlayerHumanoidBinder<T>)
 	local results = { getmetatable(PlayerHumanoidBinder).Start(self) }
 
 	self._maid:GiveTask(self._shouldTag.Changed:Connect(function()
@@ -91,7 +107,7 @@ function PlayerHumanoidBinder:Start()
 	return unpack(results)
 end
 
-function PlayerHumanoidBinder:_bindTagging(doUnbinding)
+function PlayerHumanoidBinder._bindTagging<T>(self: PlayerHumanoidBinder<T>, doUnbinding: boolean?): ()
 	if self._shouldTag.Value then
 		local maid = Maid.new()
 
@@ -124,7 +140,7 @@ function PlayerHumanoidBinder:_bindTagging(doUnbinding)
 	end
 end
 
-function PlayerHumanoidBinder:_handlePlayerAdded(playerMaid, player)
+function PlayerHumanoidBinder._handlePlayerAdded<T>(self: PlayerHumanoidBinder<T>, playerMaid: Maid.Maid, player: Player): ()
 	local maid = Maid.new()
 
 	-- TODO: Use HumanoidTrackerService
