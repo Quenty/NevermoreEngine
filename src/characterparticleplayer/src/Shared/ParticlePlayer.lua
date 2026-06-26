@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Plays particle effects for players
 
@@ -21,7 +21,7 @@ function ParticlePlayer.new(): ParticlePlayer
 	return self
 end
 
-function ParticlePlayer:PlayLevelUpEffect(humanoid: Humanoid)
+function ParticlePlayer.PlayLevelUpEffect(self: ParticlePlayer, humanoid: Humanoid): boolean
 	if not humanoid then
 		warn("[ParticlePlayer] - No humanoid")
 		return false
@@ -34,10 +34,10 @@ function ParticlePlayer:PlayLevelUpEffect(humanoid: Humanoid)
 	local track = (humanoid :: any):LoadAnimation(animation)
 	track:Play()
 
-	return self:_playHumanoidEffect(humanoid, ReplicatedStorage.Particles.LevelUpEffect)
+	return self:_playHumanoidEffect(humanoid, (ReplicatedStorage :: any).Particles.LevelUpEffect)
 end
 
-function ParticlePlayer:_playDescendantsOnce(parent: Instance)
+function ParticlePlayer._playDescendantsOnce(self: ParticlePlayer, parent: Instance): number
 	local longestLife = 0
 
 	for _, item in parent:GetDescendants() do
@@ -50,7 +50,7 @@ function ParticlePlayer:_playDescendantsOnce(parent: Instance)
 	return longestLife
 end
 
-function ParticlePlayer:_playHumanoidEffect(humanoid: Humanoid, effectTemplate: Instance)
+function ParticlePlayer._playHumanoidEffect(self: ParticlePlayer, humanoid: Humanoid, effectTemplate: Instance): boolean
 	local rootPart = humanoid.RootPart
 	if not rootPart then
 		warn("[ParticlePlayer] - No root part")
@@ -76,24 +76,25 @@ function ParticlePlayer:_playHumanoidEffect(humanoid: Humanoid, effectTemplate: 
 	-- Add non-core items to
 	for _, part in effect:GetChildren() do
 		if part ~= core then
-			local relative = core.CFrame:toObjectSpace(part.CFrame)
-			part.CFrame = rootPart.CFrame:toWorldSpace(relative)
+			local basePart = part :: BasePart
+			local relative = (core :: BasePart).CFrame:ToObjectSpace(basePart.CFrame)
+			basePart.CFrame = rootPart.CFrame:ToWorldSpace(relative)
 
-			part.CanCollide = false
-			part.Anchored = false
+			basePart.CanCollide = false
+			basePart.Anchored = false
 			--part.Transparency = 1
 
 			local weld = Instance.new("Weld")
-			weld.Parent = part
-			weld.Part0 = part
+			weld.Parent = basePart
+			weld.Part0 = basePart
 			weld.Part1 = rootPart
 			weld.C1 = relative
 			weld.Name = "ParticleEmitterWeld"
 
-			part.Parent = humanoid.Parent
-			local longestTime = self:_playDescendantsOnce(part)
+			basePart.Parent = humanoid.Parent
+			local longestTime = self:_playDescendantsOnce(basePart)
 
-			Debris:AddItem(part, longestTime)
+			Debris:AddItem(basePart, longestTime)
 		end
 	end
 
