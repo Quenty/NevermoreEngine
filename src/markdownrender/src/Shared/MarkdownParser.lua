@@ -46,7 +46,7 @@ function MarkdownParser.GetLines(self: MarkdownParser): { string }
 	return lines
 end
 
-function MarkdownParser.ParseList(self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
+function MarkdownParser.ParseList(_self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
 	local lines: { MarkdownLine } = {}
 	local currentList: MarkdownList? = nil
 
@@ -94,7 +94,7 @@ function MarkdownParser.ParseList(self: MarkdownParser, oldLines: { MarkdownLine
 	return lines
 end
 
-function MarkdownParser.ParseHeaders(self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
+function MarkdownParser.ParseHeaders(_self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
 	local lines: { MarkdownLine } = {}
 
 	for _, line in oldLines do
@@ -119,7 +119,7 @@ function MarkdownParser.ParseHeaders(self: MarkdownParser, oldLines: { MarkdownL
 	return lines
 end
 
-function MarkdownParser.ParseParagraphs(self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
+function MarkdownParser.ParseParagraphs(_self: MarkdownParser, oldLines: { MarkdownLine }): { MarkdownLine }
 	local lines: { MarkdownLine } = {}
 
 	local currentParagraph: string? = nil

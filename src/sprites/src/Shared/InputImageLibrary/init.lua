@@ -127,7 +127,7 @@ function InputImageLibrary.StyleImage(
 	return nil
 end
 
-function InputImageLibrary._getDefaultPreferredPlatform(self: InputImageLibrary): string?
+function InputImageLibrary._getDefaultPreferredPlatform(_self: InputImageLibrary): string?
 	-- Hack to select the right preferred platform
 	-- TODO: Maybe pass this into our selector?
 	local result = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonA)

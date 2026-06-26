@@ -37,7 +37,7 @@ function ParticlePlayer.PlayLevelUpEffect(self: ParticlePlayer, humanoid: Humano
 	return self:_playHumanoidEffect(humanoid, (ReplicatedStorage :: any).Particles.LevelUpEffect)
 end
 
-function ParticlePlayer._playDescendantsOnce(self: ParticlePlayer, parent: Instance): number
+function ParticlePlayer._playDescendantsOnce(_self: ParticlePlayer, parent: Instance): number
 	local longestLife = 0
 
 	for _, item in parent:GetDescendants() do

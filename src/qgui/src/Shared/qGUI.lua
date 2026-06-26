@@ -317,10 +317,10 @@ end
 	Makes a NinePatch in the frame, with the image.
 
 	@param frame Frame -- The frame to texturize
-	@param radius -- the radius you want the image to be at
-	@param type -- The type (Class) that the frame should be, either an ImageLabel or an ImageButton
 	@param image -- The URL of the image in question
 	@param imageSize -- The size of the image overall, suggested to be 99/divisible by 3. Vector2 value.
+	@param radius -- the radius you want the image to be at
+	@param instanceType -- The type (Class) that the frame should be, either an ImageLabel or an ImageButton
 	@param properties any
 ]=]
 function qGUI.AddNinePatch(

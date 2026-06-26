@@ -98,7 +98,7 @@ end
 	@param channel TextChannel?
 ]=]
 function ChatProviderServiceClient.SendSystemMessage(
-	self: ChatProviderServiceClient,
+	_self: ChatProviderServiceClient,
 	message: string,
 	encodedMessageData: string?,
 	channel: TextChannel?

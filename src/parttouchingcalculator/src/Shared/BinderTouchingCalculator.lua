@@ -30,7 +30,7 @@ function BinderTouchingCalculator.new(): BinderTouchingCalculator
 end
 
 function BinderTouchingCalculator.GetTouchingClass<T>(
-	self: BinderTouchingCalculator,
+	_self: BinderTouchingCalculator,
 	binder: Binder.Binder<T>,
 	touchingList: { BasePart },
 	ignoreObject: T?

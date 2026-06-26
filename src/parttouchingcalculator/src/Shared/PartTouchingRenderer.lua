@@ -22,7 +22,7 @@ function PartTouchingRenderer.new(): PartTouchingRenderer
 	return self
 end
 
-function PartTouchingRenderer.RenderTouchingProps(self: PartTouchingRenderer, touchingPartList: { BasePart }): ()
+function PartTouchingRenderer.RenderTouchingProps(_self: PartTouchingRenderer, touchingPartList: { BasePart }): ()
 	for _, part in touchingPartList do
 		local selectionBox = Instance.new("SelectionBox")
 		selectionBox.Name = "TouchingWarning"

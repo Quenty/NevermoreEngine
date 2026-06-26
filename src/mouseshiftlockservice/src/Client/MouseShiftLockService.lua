@@ -114,7 +114,7 @@ end
 
 function MouseShiftLockService._update(self: MouseShiftLockService): ()
 	local promiseReady = self._promiseReady
-	assert(promiseReady)
+	assert(promiseReady, "Not initialized")
 	assert(promiseReady:IsFulfilled())
 
 	if self._enabled.Value then

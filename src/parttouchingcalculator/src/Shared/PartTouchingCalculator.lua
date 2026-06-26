@@ -99,7 +99,7 @@ function PartTouchingCalculator.CheckIfTouchingHumanoid(
 end
 
 function PartTouchingCalculator.GetCollidingPartFromParts(
-	self: PartTouchingCalculator,
+	_self: PartTouchingCalculator,
 	parts: { BasePart },
 	relativeTo: CFrame?,
 	padding: number?
@@ -165,7 +165,7 @@ end
 	@return { BasePart }
 ]=]
 function PartTouchingCalculator.GetTouching(
-	self: PartTouchingCalculator,
+	_self: PartTouchingCalculator,
 	basePart: BasePart,
 	padding: number?
 ): { BasePart }
@@ -202,7 +202,7 @@ function PartTouchingCalculator.GetTouching(
 end
 
 function PartTouchingCalculator.GetTouchingHumanoids(
-	self: PartTouchingCalculator,
+	_self: PartTouchingCalculator,
 	touchingList: { BasePart }
 ): { TouchingHumanoidData }
 	local touchingHumanoids: { [Humanoid]: TouchingHumanoidData } = {}

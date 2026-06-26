@@ -30,7 +30,7 @@ function ClipCharactersService.Init(self: ClipCharactersService, serviceBag: Ser
 	self:_setupPhysicsGroup()
 end
 
-function ClipCharactersService._setupPhysicsGroup(self: ClipCharactersService): ()
+function ClipCharactersService._setupPhysicsGroup(_self: ClipCharactersService): ()
 	PhysicsService:RegisterCollisionGroup(ClipCharactersServiceConstants.COLLISION_GROUP_NAME)
 	PhysicsService:CollisionGroupSetCollidable(ClipCharactersServiceConstants.COLLISION_GROUP_NAME, "Default", false)
 end

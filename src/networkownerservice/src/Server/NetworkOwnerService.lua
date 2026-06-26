@@ -154,7 +154,7 @@ function NetworkOwnerService._updateOwner(self: NetworkOwnerService, part: BaseP
 	self:_setNetworkOwner(part, player)
 end
 
-function NetworkOwnerService._setNetworkOwner(self: NetworkOwnerService, part: BasePart, player: Player?): ()
+function NetworkOwnerService._setNetworkOwner(_self: NetworkOwnerService, part: BasePart, player: Player?): ()
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerService] - Cannot set network ownership:", err, part:GetFullName())
@@ -164,7 +164,7 @@ function NetworkOwnerService._setNetworkOwner(self: NetworkOwnerService, part: B
 	part:SetNetworkOwner(player)
 end
 
-function NetworkOwnerService._setNetworkOwnershipAuto(self: NetworkOwnerService, part: BasePart): ()
+function NetworkOwnerService._setNetworkOwnershipAuto(_self: NetworkOwnerService, part: BasePart): ()
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerService] - Cannot set network ownership:", err, part:GetFullName())

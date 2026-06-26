@@ -67,7 +67,7 @@ function ScrollModel.GetDisplacementPastBounds(self: ScrollModel, position: numb
 	end
 end
 
-function ScrollModel.GetScale(self: ScrollModel, timesOverBounds: number): number
+function ScrollModel.GetScale(_self: ScrollModel, timesOverBounds: number): number
 	return 1 - 0.5 ^ math.abs(timesOverBounds)
 end
 
