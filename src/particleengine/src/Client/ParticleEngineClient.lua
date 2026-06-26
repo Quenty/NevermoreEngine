@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 --[=[
 	Legacy code written by AxisAngles to simulate particles with Guis
 
@@ -33,48 +33,6 @@ local function newFrame(name: string): Frame
 	return frame
 end
 
-function ParticleEngineClient:Init(serviceBag: ServiceBag.ServiceBag)
-	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._screen = nil :: ScreenGui?
-
-	PromiseGetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME):Then(function(remoteEvent: RemoteEvent)
-		self._remoteEvent = remoteEvent
-
-		self._remoteEvent.OnClientEvent:Connect(function(...)
-			self:ParticleNew(...)
-		end)
-	end)
-
-	self._player = Players.LocalPlayer or error("No LocalPlayer")
-
-	self._lastUpdateTime = tick()
-	self._particleCount = 0
-	self._particles = {} :: { Particle }
-	self._particleFrames = {} :: { Frame }
-
-	for i = 1, self._maxParticles do
-		self._particleFrames[i] = newFrame("_particle")
-	end
-
-	RunService.Heartbeat:Connect(function()
-		debug.profilebegin("particleUpdate")
-		self:_update()
-		debug.profileend()
-	end)
-end
-
-function ParticleEngineClient:SetScreenGui(screenGui: ScreenGui)
-	self._screen = screenGui
-end
-
--- Removes a particle
-function ParticleEngineClient:Remove(p: Particle)
-	if self._particles[p] then
-		self._particles[p] = nil
-		self._particleCount -= 1
-	end
-end
-
 -- Adds a new particle
 -- @param p PropertiesTable
 --[[
@@ -98,22 +56,87 @@ end
 --]]
 export type Particle = {
 	Position: Vector3,
-	Global: boolean,
+	Global: boolean?,
 	Velocity: Vector3,
 	Gravity: Vector3,
-	WindResistance: number,
+	WindResistance: number?,
 	LifeTime: number,
 	Size: Vector2,
 	Bloom: Vector2,
 	Transparency: number,
 	Color: Color3,
 	Occlusion: boolean?,
-	RemoveOnCollision: ((BasePart, Vector3) -> boolean)?,
+	RemoveOnCollision: ((Particle, BasePart, Vector3, Vector3, Enum.Material) -> boolean)?,
 	Function: ((Particle, number, number) -> ())?,
 	_lastScreenPosition: Vector2?,
 }
 
-function ParticleEngineClient:Add(p: Particle)
+export type ParticleEngineClient = typeof(setmetatable(
+	{} :: {
+		ServiceName: string,
+		_maxParticles: number,
+		_windSpeed: number,
+		_serviceBag: ServiceBag.ServiceBag,
+		_screen: ScreenGui?,
+		_remoteEvent: RemoteEvent?,
+		_player: Player,
+		_lastUpdateTime: number,
+		_particleCount: number,
+		_particles: { [Particle]: Particle },
+		_particleFrames: { Frame },
+		_planeSizeX: number,
+		_planeSizeY: number,
+		_screenSizeX: number,
+		_screenSizeY: number,
+	},
+	{} :: typeof({ __index = ParticleEngineClient })
+))
+
+function ParticleEngineClient.Init(self: ParticleEngineClient, serviceBag: ServiceBag.ServiceBag): ()
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._screen = nil
+
+	PromiseGetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME):Then(function(remoteEvent: RemoteEvent)
+		self._remoteEvent = remoteEvent
+
+		remoteEvent.OnClientEvent:Connect(function(...)
+			(self :: any):ParticleNew(...)
+		end)
+	end)
+
+	self._player = Players.LocalPlayer or error("No LocalPlayer")
+
+	self._lastUpdateTime = tick()
+	self._particleCount = 0
+	self._particles = {}
+	self._particleFrames = {}
+
+	for i = 1, self._maxParticles do
+		self._particleFrames[i] = newFrame("_particle")
+	end
+
+	RunService.Heartbeat:Connect(function()
+		debug.profilebegin("particleUpdate")
+		self:_update()
+		debug.profileend()
+	end)
+end
+
+function ParticleEngineClient.SetScreenGui(self: ParticleEngineClient, screenGui: ScreenGui): ()
+	self._screen = screenGui
+end
+
+-- Removes a particle
+function ParticleEngineClient.Remove(self: ParticleEngineClient, p: Particle): ()
+	if self._particles[p] then
+		self._particles[p] = nil
+		self._particleCount -= 1
+	end
+end
+
+-- Adds a new particle
+-- @param p PropertiesTable
+function ParticleEngineClient.Add(self: ParticleEngineClient, p: Particle): ()
 	if self._particles[p] then
 		return
 	end
@@ -131,7 +154,7 @@ function ParticleEngineClient:Add(p: Particle)
 		local removeOnCollision = p.RemoveOnCollision
 		p.Global = nil
 		p.Function = nil
-		p.RemoveOnCollision = p.RemoveOnCollision and true or nil
+		p.RemoveOnCollision = if p.RemoveOnCollision then (true :: any) else nil
 
 		if self._remoteEvent then
 			self._remoteEvent:FireServer(p)
@@ -146,7 +169,8 @@ function ParticleEngineClient:Add(p: Particle)
 	p.LifeTime = p.LifeTime and p.LifeTime + tick()
 
 	if self._particleCount > self._maxParticles then
-		self._particles[next(self._particles)] = nil
+		local firstKey: any = next(self._particles)
+		self._particles[firstKey] = nil
 	else
 		self._particleCount = self._particleCount + 1
 	end
@@ -166,7 +190,7 @@ end
 
 -- @param p ParticleProperties
 -- @param dt ChangeInTime
-function ParticleEngineClient:_updatePosVel(p: Particle, dt: number, t: number)
+function ParticleEngineClient._updatePosVel(self: ParticleEngineClient, p: Particle, dt: number, t: number): ()
 	p.Position = p.Position + p.Velocity * dt
 
 	local wind
@@ -181,7 +205,7 @@ end
 
 -- Handles both priority and regular particles
 -- @return boolean alive, true if still fine
-function ParticleEngineClient:_updateParticle(particle: Particle, t: number, dt: number)
+function ParticleEngineClient._updateParticle(self: ParticleEngineClient, particle: Particle, t: number, dt: number): boolean
 	if particle.LifeTime - t <= 0 then
 		return false
 	end
@@ -221,7 +245,7 @@ function ParticleEngineClient:_updateParticle(particle: Particle, t: number, dt:
 	return true
 end
 
-function ParticleEngineClient:_update()
+function ParticleEngineClient._update(self: ParticleEngineClient): ()
 	local t = tick()
 	local dt = t - self._lastUpdateTime
 	self._lastUpdateTime = t
@@ -244,8 +268,8 @@ function ParticleEngineClient:_update()
 	self:_updateRender()
 end
 
-function ParticleEngineClient:_updateRender()
-	local camera: Camera = Workspace.CurrentCamera
+function ParticleEngineClient._updateRender(self: ParticleEngineClient): ()
+	local camera: Camera = Workspace.CurrentCamera :: Camera
 	self:_updateScreenInfo(camera)
 
 	local cameraInverse = camera.CFrame:Inverse()
@@ -253,14 +277,14 @@ function ParticleEngineClient:_updateRender()
 
 	local frameIndex, frame = next(self._particleFrames)
 	for particle in pairs(self._particles) do
-		if self:_particleRender(cameraPosition, cameraInverse, frame, particle) then
+		if frame and self:_particleRender(cameraPosition, cameraInverse, frame, particle) then
 			frame.Parent = self._screen
 			frameIndex, frame = next(self._particleFrames, frameIndex)
 		end
 	end
 
 	-- Cleanup remaining frames that are parented
-	while frameIndex and frame.Parent do
+	while frameIndex and frame and frame.Parent do
 		frame.Parent = nil
 		frameIndex, frame = next(self._particleFrames, frameIndex)
 	end
@@ -268,12 +292,13 @@ end
 
 -- @param f frame
 -- @param cameraInverse The inverse camera cframe
-function ParticleEngineClient:_particleRender(
+function ParticleEngineClient._particleRender(
+	self: ParticleEngineClient,
 	cameraPosition: Vector3,
 	cameraInverse: CFrame,
 	frame: Frame,
 	particle: Particle
-)
+): boolean
 	local rp: Vector3 = cameraInverse * particle.Position
 	local lsp: Vector2? = particle._lastScreenPosition
 
@@ -296,10 +321,10 @@ function ParticleEngineClient:_particleRender(
 	local bgt: number = particle.Transparency
 	local px: number = (0.5 - sp.X / self._planeSizeX) * self._screenSizeX
 	local py: number = (0.5 + sp.Y / self._planeSizeY) * self._screenSizeY
-	local preSizeY = -particle.Size.Y / rp.z * self._screenSizeY / self._planeSizeY
-	local sx: number = -particle.Size.X / rp.z * self._screenSizeY / self._planeSizeY + b.X
-	local rppx, rppy = px - lsp.x, py - lsp.y
-	local sy = preSizeY + math.sqrt(rppx * rppx + rppy * rppy) + b.y
+	local preSizeY = -particle.Size.Y / rp.Z * self._screenSizeY / self._planeSizeY
+	local sx: number = -particle.Size.X / rp.Z * self._screenSizeY / self._planeSizeY + b.X
+	local rppx, rppy = px - lsp.X, py - lsp.Y
+	local sy = preSizeY + math.sqrt(rppx * rppx + rppy * rppy) + b.Y
 	particle._lastScreenPosition = Vector2.new(px, py)
 
 	if particle.Occlusion then
@@ -323,9 +348,13 @@ function ParticleEngineClient:_particleRender(
 	return true
 end
 
-function ParticleEngineClient:_updateScreenInfo(camera: Camera)
-	self._screenSizeX = self._screen.AbsoluteSize.x
-	self._screenSizeY = self._screen.AbsoluteSize.y
+function ParticleEngineClient._updateScreenInfo(self: ParticleEngineClient, camera: Camera): ()
+	local screen = self._screen
+	if not screen then
+		return
+	end
+	self._screenSizeX = screen.AbsoluteSize.X
+	self._screenSizeY = screen.AbsoluteSize.Y
 	self._planeSizeY = 2 * math.tan(camera.FieldOfView * 0.0087266462599716)
 	self._planeSizeX = self._planeSizeY * self._screenSizeX / self._screenSizeY
 end
