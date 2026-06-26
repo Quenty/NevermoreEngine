@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class ClipCharactersServiceClient
 ]=]
@@ -13,8 +13,17 @@ local StateStack = require("StateStack")
 local ClipCharactersServiceClient = {}
 ClipCharactersServiceClient.ServiceName = "ClipCharactersServiceClient"
 
-function ClipCharactersServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type ClipCharactersServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_disableCollisions: StateStack.StateStack<boolean>,
+	},
+	{} :: typeof({ __index = ClipCharactersServiceClient })
+))
+
+function ClipCharactersServiceClient.Init(self: ClipCharactersServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -25,11 +34,11 @@ end
 	Disables collisions between default geometry and other characters which stops some random physics
 	glitches from occurring.
 ]=]
-function ClipCharactersServiceClient:PushDisableCharacterCollisionsWithDefault()
+function ClipCharactersServiceClient.PushDisableCharacterCollisionsWithDefault(self: ClipCharactersServiceClient): () -> ()
 	return self._disableCollisions:PushState(true)
 end
 
-function ClipCharactersServiceClient:Start()
+function ClipCharactersServiceClient.Start(self: ClipCharactersServiceClient): ()
 	self._maid:GiveTask(self._disableCollisions
 		:ObserveBrio(function(value)
 			return value
@@ -44,7 +53,7 @@ function ClipCharactersServiceClient:Start()
 		end))
 end
 
-function ClipCharactersServiceClient:Destroy()
+function ClipCharactersServiceClient.Destroy(self: ClipCharactersServiceClient): ()
 	self._maid:DoCleaning()
 end
 
