@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class LocalizationServiceUtils
 ]=]
@@ -21,9 +21,9 @@ local ERROR_TIMEOUT = string.format("GetTranslatorForPlayerAsync is still pendin
 
 local LocalizationServiceUtils = {}
 
-function LocalizationServiceUtils.promiseTranslatorForLocale(localeId)
+function LocalizationServiceUtils.promiseTranslatorForLocale(localeId: string): Promise.Promise<Translator>
 	return Promise.spawn(function(resolve, reject)
-		local translator = nil
+		local translator: Translator? = nil
 		local ok, err = pcall(function()
 			translator = LocalizationService:GetTranslatorForLocaleAsync(localeId)
 		end)
@@ -36,13 +36,13 @@ function LocalizationServiceUtils.promiseTranslatorForLocale(localeId)
 			return reject("Translator was not returned")
 		end
 
-		return resolve(translator)
+		return resolve(translator :: Translator)
 	end)
 end
 
-function LocalizationServiceUtils.promisePlayerTranslator(player: Player)
+function LocalizationServiceUtils.promisePlayerTranslator(player: Player): Promise.Promise<Translator>
 	local promiseTranslator = Promise.spawn(function(resolve, reject)
-		local translator = nil
+		local translator: Translator? = nil
 		local ok, err = pcall(function()
 			translator = LocalizationService:GetTranslatorForPlayerAsync(player)
 		end)
@@ -55,7 +55,7 @@ function LocalizationServiceUtils.promisePlayerTranslator(player: Player)
 			return reject("Translator was not returned")
 		end
 
-		return resolve(translator)
+		return resolve(translator :: Translator)
 	end)
 
 	PromiseMaidUtils.whilePromise(promiseTranslator, function(maid)
@@ -64,15 +64,17 @@ function LocalizationServiceUtils.promisePlayerTranslator(player: Player)
 		end))
 	end)
 
-	return promiseTranslator:Catch(function(err)
-		if err ~= ERROR_PUBLISH_REQUIRED and error ~= ERROR_TIMEOUT then
-			warn(string.format("[LocalizationServiceUtils.promisePlayerTranslator] - %s", tostring(err)))
-		end
+	return (
+		promiseTranslator:Catch(function(err)
+			if err ~= ERROR_PUBLISH_REQUIRED and (error :: any) ~= ERROR_TIMEOUT then
+				warn(string.format("[LocalizationServiceUtils.promisePlayerTranslator] - %s", tostring(err)))
+			end
 
-		-- Fallback to just local stuff
-		local translator = LocalizationService:GetTranslatorForPlayer(player)
-		return translator
-	end)
+			-- Fallback to just local stuff
+			local translator = LocalizationService:GetTranslatorForPlayer(player)
+			return translator
+		end) :: any
+	) :: Promise.Promise<Translator>
 end
 
 return LocalizationServiceUtils

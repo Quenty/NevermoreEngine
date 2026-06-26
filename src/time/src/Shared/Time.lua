@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Library handles time based parsing / operations. Untested. Based off of PHP's time system.
 
@@ -111,9 +111,9 @@ end
 function Time.getYearShortFormatted(currentTime: number): string
 	local shortYear = Time.getYearShort(currentTime)
 	if shortYear < 10 then
-		shortYear = "0" .. shortYear
+		return "0" .. shortYear
 	end
-	return shortYear
+	return tostring(shortYear)
 end
 
 --[=[
@@ -144,12 +144,12 @@ end
 	@return string
 ]=]
 function Time.getFormattedMonth(currentTime: number): string
-	local month = Time.getMonth(currentTime)
+	local month = assert(Time.getMonth(currentTime), "Failed to get month")
 	if month < 10 then
-		month = "0" .. month
+		return "0" .. month
 	end
 
-	return month
+	return tostring(month)
 end
 
 --[=[
@@ -180,13 +180,13 @@ end
 	@return string
 ]=]
 function Time.getFormattedDayOfTheMonth(currentTime: number): string
-	local dayOfTheMonth = Time.getDayOfTheMonth(currentTime)
+	local dayOfTheMonth = assert(Time.getDayOfTheMonth(currentTime), "Failed to get day of the month")
 
 	if dayOfTheMonth < 10 then
-		dayOfTheMonth = "0" .. dayOfTheMonth
+		return "0" .. dayOfTheMonth
 	end
 
-	return dayOfTheMonth
+	return tostring(dayOfTheMonth)
 end
 
 --[=[
@@ -222,8 +222,8 @@ end
 	@param currentTime number
 	@return number
 ]=]
-function Time.getJulianDate(currentTime: number)
-	local month = Time.getMonth(currentTime)
+function Time.getJulianDate(currentTime: number): number
+	local month = assert(Time.getMonth(currentTime), "Failed to get month")
 	local year = Time.getYear(currentTime)
 	local day = Time.getDay(currentTime)
 
@@ -317,9 +317,9 @@ end
 function Time.getFormattedSecond(currentTime: number): string
 	local currentSecond = Time.getSecond(currentTime)
 	if currentSecond < 10 then
-		currentSecond = "0" .. currentSecond
+		return "0" .. currentSecond
 	end
-	return currentSecond
+	return tostring(currentSecond)
 end
 
 --[=[
@@ -330,9 +330,9 @@ end
 function Time.getFormattedMinute(currentTime: number): string
 	local currentMinute = Time.getMinute(currentTime)
 	if currentMinute < 10 then
-		currentMinute = "0" .. currentMinute
+		return "0" .. currentMinute
 	end
-	return currentMinute
+	return tostring(currentMinute)
 end
 
 --[=[
@@ -353,12 +353,12 @@ end
 	@param currentTime number
 	@return string
 ]=]
-function Time.getHourFormatted(currentTime): string
+function Time.getHourFormatted(currentTime: number): string
 	local hour = Time.getHour(currentTime)
 	if hour < 10 then
-		hour = "0" .. hour
+		return "0" .. hour
 	end
-	return hour
+	return tostring(hour)
 end
 
 --[=[
@@ -369,9 +369,9 @@ end
 function Time.getRegularHourFormatted(currentTime: number): string
 	local hour = Time.getRegularHour(currentTime)
 	if hour < 10 then
-		hour = "0" .. hour
+		return "0" .. hour
 	end
-	return hour
+	return tostring(hour)
 end
 
 --[=[
@@ -414,7 +414,7 @@ function Time.getMilitaryHour(currentTime: number): string
 	if hour < 10 then
 		return "0" .. hour
 	end
-	return hour
+	return tostring(hour)
 end
 
 --[=[
@@ -437,12 +437,12 @@ end
 	@return number
 ]=]
 function Time.getDaysInMonth(currentTime: number): number
-	local month = Time.getMonth(currentTime)
+	local month = assert(Time.getMonth(currentTime), "Failed to get month")
 	local year = Time.getYear(currentTime)
 	return Time.getDaysMonthTable(year)[month]
 end
 
-local ISO_FORMAT_STRINGS = {
+local ISO_FORMAT_STRINGS: { [string]: (number) -> any } = {
 	d = Time.getFormattedDayOfTheMonth,
 	D = Time.getDayOfTheWeekNameShort,
 	j = Time.getDayOfTheMonth,
@@ -500,14 +500,14 @@ end
 --[=[
 	Formats the given time based on the provided format string.
 	@param format string
-	@param currentTime number
+	@param currentTime number?
 	@return string
 ]=]
-function Time.getFormattedTime(format: string, currentTime: number)
-	currentTime = currentTime or tick()
+function Time.getFormattedTime(format: string, currentTime: number?): string
+	local resolvedTime = currentTime or tick()
 
 	local returnString = format
-	local formatsRequired = {}
+	local formatsRequired: { string } = {}
 
 	for newFormat in string.gmatch(format, matchString) do
 		formatsRequired[#formatsRequired + 1] = newFormat
@@ -518,8 +518,8 @@ function Time.getFormattedTime(format: string, currentTime: number)
 	end
 
 	for _, formatType in formatsRequired do
-		local replacement = ISO_FORMAT_STRINGS[formatType](currentTime)
-		returnString = string.gsub(returnString, string.rep(formatType, 3), replacement)
+		local replacement = ISO_FORMAT_STRINGS[formatType](resolvedTime)
+		returnString = string.gsub(returnString, string.rep(formatType, 3), tostring(replacement))
 	end
 
 	return returnString

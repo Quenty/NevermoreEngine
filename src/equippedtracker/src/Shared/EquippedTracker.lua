@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Tracks the equipped player of a tool
 	@class EquippedTracker
@@ -14,15 +14,24 @@ local EquippedTracker = {}
 EquippedTracker.ClassName = "EquippedTracker"
 EquippedTracker.__index = EquippedTracker
 
+export type EquippedTracker = typeof(setmetatable(
+	{} :: {
+		_tool: Tool,
+		_maid: Maid.Maid,
+		Player: ValueObject.ValueObject<Player?>,
+	},
+	{} :: typeof({ __index = EquippedTracker })
+))
+
 --[=[
 	Tracks the state of a tool being equipped
 	@param tool Tool
 	@return EquippedTracker
 ]=]
-function EquippedTracker.new(tool: Tool)
+function EquippedTracker.new(tool: Tool): EquippedTracker
 	assert(tool and tool:IsA("Tool"), "Bad tool")
 
-	local self = setmetatable({}, EquippedTracker)
+	local self: EquippedTracker = setmetatable({} :: any, EquippedTracker)
 
 	self._tool = tool
 
@@ -46,7 +55,7 @@ function EquippedTracker.new(tool: Tool)
 	return self
 end
 
-function EquippedTracker:_update()
+function EquippedTracker._update(self: EquippedTracker): ()
 	local player = CharacterUtils.getPlayerFromCharacter(self._tool)
 	if not player then
 		self._maid._diedConn = nil
@@ -70,9 +79,9 @@ end
 --[=[
 	Cleans up the EquippedTracker
 ]=]
-function EquippedTracker:Destroy()
+function EquippedTracker.Destroy(self: EquippedTracker): ()
 	self._maid:DoCleaning()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return EquippedTracker

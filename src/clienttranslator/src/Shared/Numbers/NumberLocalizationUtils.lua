@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	NumberLocalizationUtils script from Roblox's player scripts in handling the leaderboard.
 
@@ -30,15 +30,21 @@ local NumberLocalizationUtils = {}
 
 local DEFAULT_LOCALE = "en-us"
 
--- Separator aliases to help avoid spelling errors
-local DECIMAL_SEPARATOR = "decimalSeparator"
-local GROUP_DELIMITER = "groupDelimiter"
+-- Each abbreviation entry is {baseValue, suffix}
+type AbbreviationEntry = { any }
 
-local localeInfos = {}
+-- Named string fields + numeric indexer: Luau can represent this as a single coherent type.
+type LocaleInfo = {
+	decimalSeparator: string,
+	groupDelimiter: string?,
+	[number]: AbbreviationEntry,
+}
+
+local localeInfos: { [string]: LocaleInfo } = {}
 
 localeInfos["en-us"] = {
-	[DECIMAL_SEPARATOR] = ".",
-	[GROUP_DELIMITER] = ",",
+	decimalSeparator = ".",
+	groupDelimiter = ",",
 	{ 1, "" },
 	{ 1e3, "K" },
 	{ 1e6, "M" },
@@ -46,16 +52,16 @@ localeInfos["en-us"] = {
 }
 
 localeInfos["es-es"] = {
-	[DECIMAL_SEPARATOR] = ",",
-	[GROUP_DELIMITER] = ".",
+	decimalSeparator = ",",
+	groupDelimiter = ".",
 	{ 1, "" },
 	{ 1e3, " mil" },
 	{ 1e6, " M" },
 }
 
 localeInfos["fr-fr"] = {
-	[DECIMAL_SEPARATOR] = ",",
-	[GROUP_DELIMITER] = " ",
+	decimalSeparator = ",",
+	groupDelimiter = " ",
 	{ 1, "" },
 	{ 1e3, " k" },
 	{ 1e6, " M" },
@@ -63,8 +69,8 @@ localeInfos["fr-fr"] = {
 }
 
 localeInfos["de-de"] = {
-	[DECIMAL_SEPARATOR] = ",",
-	[GROUP_DELIMITER] = " ",
+	decimalSeparator = ",",
+	groupDelimiter = " ",
 	{ 1, "" },
 	{ 1e3, " Tsd." },
 	{ 1e6, " Mio." },
@@ -72,8 +78,8 @@ localeInfos["de-de"] = {
 }
 
 localeInfos["pt-br"] = {
-	[DECIMAL_SEPARATOR] = ",",
-	[GROUP_DELIMITER] = ".",
+	decimalSeparator = ",",
+	groupDelimiter = ".",
 	{ 1, "" },
 	{ 1e3, " mil" },
 	{ 1e6, " mi" },
@@ -81,8 +87,8 @@ localeInfos["pt-br"] = {
 }
 
 localeInfos["zh-cn"] = {
-	[DECIMAL_SEPARATOR] = ".",
-	[GROUP_DELIMITER] = ",", -- Chinese commonly uses 3 digit groupings, despite 10000s rule
+	decimalSeparator = ".",
+	groupDelimiter = ",", -- Chinese commonly uses 3 digit groupings, despite 10000s rule
 	{ 1, "" },
 	{ 1e3, "千" },
 	{ 1e4, "万" },
@@ -90,8 +96,8 @@ localeInfos["zh-cn"] = {
 }
 
 localeInfos["zh-cjv"] = {
-	[DECIMAL_SEPARATOR] = ".",
-	[GROUP_DELIMITER] = ",",
+	decimalSeparator = ".",
+	groupDelimiter = ",",
 	{ 1, "" },
 	{ 1e3, "千" },
 	{ 1e4, "万" },
@@ -99,8 +105,8 @@ localeInfos["zh-cjv"] = {
 }
 
 localeInfos["zh-tw"] = {
-	[DECIMAL_SEPARATOR] = ".",
-	[GROUP_DELIMITER] = ",",
+	decimalSeparator = ".",
+	groupDelimiter = ",",
 	{ 1, "" },
 	{ 1e3, "千" },
 	{ 1e4, "萬" },
@@ -108,8 +114,8 @@ localeInfos["zh-tw"] = {
 }
 
 localeInfos["ko-kr"] = {
-	[DECIMAL_SEPARATOR] = ".",
-	[GROUP_DELIMITER] = ",",
+	decimalSeparator = ".",
+	groupDelimiter = ",",
 	{ 1, "" },
 	{ 1e3, "천" },
 	{ 1e4, "만" },
@@ -117,8 +123,8 @@ localeInfos["ko-kr"] = {
 }
 
 localeInfos["ja-jp"] = {
-	[DECIMAL_SEPARATOR] = ".",
-	[GROUP_DELIMITER] = ",",
+	decimalSeparator = ".",
+	groupDelimiter = ",",
 	{ 1, "" },
 	{ 1e3, "千" },
 	{ 1e4, "万" },
@@ -126,8 +132,8 @@ localeInfos["ja-jp"] = {
 }
 
 localeInfos["it-it"] = {
-	[DECIMAL_SEPARATOR] = ",",
-	[GROUP_DELIMITER] = " ",
+	decimalSeparator = ",",
+	groupDelimiter = " ",
 	{ 1, "" },
 	{ 1e3, " mila" },
 	{ 1e6, " Mln" },
@@ -135,8 +141,8 @@ localeInfos["it-it"] = {
 }
 
 localeInfos["ru-ru"] = {
-	[DECIMAL_SEPARATOR] = ",",
-	[GROUP_DELIMITER] = ".",
+	decimalSeparator = ",",
+	groupDelimiter = ".",
 	{ 1, "" },
 	{ 1e3, " тыс" },
 	{ 1e6, " млн" },
@@ -144,8 +150,8 @@ localeInfos["ru-ru"] = {
 }
 
 localeInfos["id-id"] = {
-	[DECIMAL_SEPARATOR] = ",",
-	[GROUP_DELIMITER] = ".",
+	decimalSeparator = ",",
+	groupDelimiter = ".",
 	{ 1, "" },
 	{ 1e3, " rb" },
 	{ 1e6, " jt" },
@@ -153,8 +159,8 @@ localeInfos["id-id"] = {
 }
 
 localeInfos["vi-vn"] = {
-	[DECIMAL_SEPARATOR] = ".",
-	[GROUP_DELIMITER] = " ",
+	decimalSeparator = ".",
+	groupDelimiter = " ",
 	{ 1, "" },
 	{ 1e3, " N" },
 	{ 1e6, " Tr" },
@@ -162,8 +168,8 @@ localeInfos["vi-vn"] = {
 }
 
 localeInfos["th-th"] = {
-	[DECIMAL_SEPARATOR] = ".",
-	[GROUP_DELIMITER] = ",",
+	decimalSeparator = ".",
+	groupDelimiter = ",",
 	{ 1, "" },
 	{ 1e3, " พ" },
 	{ 1e4, " ม" },
@@ -172,8 +178,8 @@ localeInfos["th-th"] = {
 }
 
 localeInfos["tr-tr"] = {
-	[DECIMAL_SEPARATOR] = ",",
-	[GROUP_DELIMITER] = ".",
+	decimalSeparator = ",",
+	groupDelimiter = ".",
 	{ 1, "" },
 	{ 1e3, " B" },
 	{ 1e6, " Mn" },
@@ -185,12 +191,12 @@ localeInfos["en"] = localeInfos["en-us"]
 localeInfos["en-gb"] = localeInfos["en-us"]
 localeInfos["es-mx"] = localeInfos["es-es"]
 
-local function findDecimalPointIndex(numberStr: string)
+local function findDecimalPointIndex(numberStr: string): number
 	return string.find(numberStr, "%.") or #numberStr + 1
 end
 
 -- Find the base 10 offset needed to make 0.1 <= abs(number) < 1
-local function findDecimalOffset(number: number)
+local function findDecimalOffset(number: number): number
 	if number == 0 then
 		return 0
 	end
@@ -203,11 +209,11 @@ local function roundToSignificantDigits(
 	number: number,
 	significantDigits: number,
 	roundingBehaviourType: RoundingBehaviourTypes.RoundingBehaviourType
-)
+): number
 	local offset = findDecimalOffset(number)
 	local multiplier = 10 ^ (significantDigits + offset)
 	local significand
-	if roundingBehaviourType == RoundingBehaviourTypes.TRUNCATE then
+	if roundingBehaviourType == (RoundingBehaviourTypes.TRUNCATE :: RoundingBehaviourTypes.RoundingBehaviourType) then
 		significand = math.modf(number * multiplier)
 	else
 		significand = math.floor(number * multiplier + 0.5)
@@ -215,7 +221,7 @@ local function roundToSignificantDigits(
 	return significand / multiplier
 end
 
-local function addGroupDelimiters(numberStr, delimiter: string): string
+local function addGroupDelimiters(numberStr: string, delimiter: string): string
 	local formatted = numberStr
 	local delimiterSubStr = string.format("%%1%s%%2", delimiter)
 	while true do
@@ -228,17 +234,19 @@ local function addGroupDelimiters(numberStr, delimiter: string): string
 	return formatted
 end
 
+-- localeInfo is typed `any` because the `[number]` indexer on LocaleInfo returns
+-- AbbreviationEntry? (optional), requiring nil-checks the original code doesn't do.
 local function findDenominationEntry(
-	localeInfo,
+	localeInfo: any,
 	number: number,
 	roundingBehaviourType: RoundingBehaviourTypes.RoundingBehaviourType
-)
+): any
 	local denominationEntry = localeInfo[1] -- Default to base denominations
 	local absOfNumber = math.abs(number)
 	for i = #localeInfo, 2, -1 do
 		local entry = localeInfo[i]
-		local baseValue
-		if roundingBehaviourType == RoundingBehaviourTypes.TRUNCATE then
+		local baseValue: number
+		if roundingBehaviourType == RoundingBehaviourTypes.TRUNCATE :: RoundingBehaviourTypes.RoundingBehaviourType then
 			baseValue = entry[1]
 		else
 			baseValue = entry[1] - localeInfo[i - 1][1] / 2
@@ -256,7 +264,7 @@ function NumberLocalizationUtils.localize(number: number, locale: string): strin
 		return "0"
 	end
 
-	local localeInfo = localeInfos[locale]
+	local localeInfo: LocaleInfo = localeInfos[locale]
 	if not localeInfo then
 		localeInfo = localeInfos[DEFAULT_LOCALE]
 		warn(
@@ -269,7 +277,7 @@ function NumberLocalizationUtils.localize(number: number, locale: string): strin
 	end
 
 	if localeInfo.groupDelimiter then
-		return addGroupDelimiters(number, localeInfo.groupDelimiter)
+		return addGroupDelimiters(tostring(number), localeInfo.groupDelimiter)
 	end
 
 	return tostring(number)
@@ -295,10 +303,13 @@ function NumberLocalizationUtils.abbreviate(
 	numSignificantDigits: number?
 ): string
 	assert(type(number) == "number", "Bad number")
-	local roundingBehavior = roundingBehaviourType or RoundingBehaviourTypes.ROUND_TO_CLOSEST
+	local roundingBehavior: RoundingBehaviourTypes.RoundingBehaviourType = roundingBehaviourType
+		or RoundingBehaviourTypes.ROUND_TO_CLOSEST :: RoundingBehaviourTypes.RoundingBehaviourType
 	local significantDigits = numSignificantDigits or 3
 
-	if roundingBehavior == RoundingBehaviourTypes.NONE then
+	-- RoundingBehaviourTypes.NONE is "none" at runtime; the exported RoundingBehaviourType
+	-- union spells it "None" (upstream casing inconsistency we cannot change here).
+	if roundingBehavior == (RoundingBehaviourTypes.NONE :: any) then
 		return NumberLocalizationUtils.localize(number, locale)
 	end
 
@@ -306,7 +317,7 @@ function NumberLocalizationUtils.abbreviate(
 		return "0"
 	end
 
-	local localeInfo = localeInfos[locale]
+	local localeInfo: LocaleInfo = localeInfos[locale]
 	if not localeInfo then
 		localeInfo = localeInfos[DEFAULT_LOCALE]
 		warn(
@@ -319,9 +330,9 @@ function NumberLocalizationUtils.abbreviate(
 	end
 
 	-- select which denomination we are going to use
-	local denominationEntry = findDenominationEntry(localeInfo, number, roundingBehavior)
-	local baseValue = denominationEntry[1]
-	local symbol = denominationEntry[2]
+	local denominationEntry: any = findDenominationEntry(localeInfo, number, roundingBehavior)
+	local baseValue: number = denominationEntry[1]
+	local symbol: string = denominationEntry[2]
 
 	-- Round to required significant digits
 	local significantQuotient = roundToSignificantDigits(number / baseValue, significantDigits, roundingBehavior)
@@ -332,9 +343,11 @@ function NumberLocalizationUtils.abbreviate(
 	local maxDecimals = math.max(1, significantDigits - symbolsAboveDecimal)
 	local trimmedQuotient
 	local roundingFactor = 10 ^ maxDecimals
-	if roundingBehavior == RoundingBehaviourTypes.TRUNCATE then
+	if roundingBehavior == (RoundingBehaviourTypes.TRUNCATE :: RoundingBehaviourTypes.RoundingBehaviourType) then
 		trimmedQuotient = math.modf(significantQuotient * roundingFactor) / roundingFactor
-	elseif roundingBehavior == RoundingBehaviourTypes.ROUND_TO_CLOSEST then
+	elseif
+		roundingBehavior == RoundingBehaviourTypes.ROUND_TO_CLOSEST :: RoundingBehaviourTypes.RoundingBehaviourType
+	then
 		trimmedQuotient = math.floor(significantQuotient * roundingFactor + 0.5) / roundingFactor
 	else
 		error(

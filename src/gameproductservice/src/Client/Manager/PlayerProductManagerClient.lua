@@ -25,6 +25,24 @@ local PlayerProductManagerClient = setmetatable({}, PlayerProductManagerBase)
 PlayerProductManagerClient.ClassName = "PlayerProductManagerClient"
 PlayerProductManagerClient.__index = PlayerProductManagerClient
 
+-- Structural subset of AvatarEditorInventoryServiceClient covering only the methods this
+-- manager calls. Naming the full exported type here makes the Luau solver's normalization of
+-- the PlayerProductManagerClient intersection blow up ("Code is too complex to typecheck") --
+-- AvatarEditorInventoryServiceClient and AvatarEditorInventory are both metatable/BaseObject
+-- intersection types, and nesting them inside this manager's own intersection explodes the
+-- solver. We keep call-site precision with these minimal interfaces instead.
+type AvatarEditorInventoryEntry = {
+	IsAssetIdInInventory: (self: AvatarEditorInventoryEntry, assetId: number) -> boolean,
+}
+
+type AvatarEditorInventoryQuerier = {
+	IsInventoryAccessAllowed: (self: AvatarEditorInventoryQuerier) -> boolean,
+	PromiseInventoryForAvatarAssetType: (
+		self: AvatarEditorInventoryQuerier,
+		avatarAssetType: Enum.AvatarAssetType
+	) -> Promise.Promise<AvatarEditorInventoryEntry>,
+}
+
 export type PlayerProductManagerClient =
 	typeof(setmetatable(
 		{} :: {
@@ -33,7 +51,7 @@ export type PlayerProductManagerClient =
 			_serviceBag: ServiceBag.ServiceBag,
 			_remoting: Remoting.Remoting,
 
-			_avatarEditorInventoryServiceClient: AvatarEditorInventoryServiceClient.AvatarEditorInventoryServiceClient,
+			_avatarEditorInventoryServiceClient: AvatarEditorInventoryQuerier,
 			_catalogSearchServiceCache: CatalogSearchServiceCache.CatalogSearchServiceCache,
 		},
 		{} :: typeof({ __index = PlayerProductManagerClient })
@@ -242,31 +260,38 @@ function PlayerProductManagerClient._setupBundleTracker(self: PlayerProductManag
 	end))
 end
 
-function PlayerProductManagerClient._promiseBulkOwnsAssetQuery(self: PlayerProductManagerClient, assetId)
+function PlayerProductManagerClient._promiseBulkOwnsAssetQuery(
+	self: PlayerProductManagerClient,
+	assetId: number
+): Promise.Promise<boolean>
 	if self._avatarEditorInventoryServiceClient:IsInventoryAccessAllowed() then
 		-- When scrolling through a ton of entries in the avatar editor we want to query
 		-- this is typically faster. We really hope we aren't the Roblox account.
-		return self._catalogSearchServiceCache
-			:PromiseItemDetails(assetId, Enum.AvatarItemType.Asset)
-			:Then(function(itemDetails)
-				-- https://devforum.roblox.com/t/avatareditorservicegetitemdetails-returns-ownership-where-as-avatareditorservicegetbatchitemdetails-does-not/3257431
+		local detailsPromise: Promise.Promise<any> =
+			self._catalogSearchServiceCache:PromiseItemDetails(assetId, Enum.AvatarItemType.Asset)
 
-				local assetType: Enum.AvatarAssetType? =
-					EnumUtils.toEnum(Enum.AvatarAssetType, itemDetails.AssetType) :: any
-				if not assetType then
-					-- TODO: Fallback to standard query?
-					return Promise.rejected("Failed to get assetType")
-				end
+		return detailsPromise:Then(function(itemDetails: any): Promise.Promise<boolean>
+			-- https://devforum.roblox.com/t/avatareditorservicegetitemdetails-returns-ownership-where-as-avatareditorservicegetbatchitemdetails-does-not/3257431
 
-				return self._avatarEditorInventoryServiceClient
-					:PromiseInventoryForAvatarAssetType(assetType)
-					:Then(function(inventory)
+			local assetType: Enum.AvatarAssetType? =
+				EnumUtils.toEnum(Enum.AvatarAssetType, itemDetails.AssetType) :: any
+			if not assetType then
+				-- TODO: Fallback to standard query?
+				return Promise.rejected("Failed to get assetType") :: any
+			end
+
+			local inventoryPromise: Promise.Promise<AvatarEditorInventoryEntry> =
+				self._avatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(assetType)
+
+			return inventoryPromise:Then(
+					function(inventory: AvatarEditorInventoryEntry): boolean
 						return inventory:IsAssetIdInInventory(assetId)
-					end)
-			end)
+					end
+				) :: Promise.Promise<boolean>
+		end)
 	end
 
-	return MarketplaceUtils.promisePlayerOwnsAsset(self._player, assetId)
+	return MarketplaceUtils.promisePlayerOwnsAsset(self._player, assetId) :: Promise.Promise<boolean>
 end
 
 function PlayerProductManagerClient._promiseBulkOwnsBundleQuery(self: PlayerProductManagerClient, bundleId: number)

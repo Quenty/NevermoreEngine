@@ -27,6 +27,9 @@
 #                         single-file workers over-orchestrating). One claude -p call.
 #   run.sh parallelism    Judge the execution STRATEGY — fan out parallel sub-agents for a package
 #                         (> ~3 files) vs sequential for a single file/handful. One claude -p call.
+#   run.sh routing        Mechanical (no-LLM, ~instant): assert plan.js's model heuristic routes a
+#                         ServiceBag service (.ServiceName, no setmetatable) to opus, a plain util to
+#                         sonnet. Reads plan.js's real predicate so it can't drift. See routing.js.
 #
 # Files are laid down at PACKAGE granularity (src/<pkg>) because a package is the unit of
 # type-consistency: a cyclic file scored against nonstrict siblings would error falsely.
@@ -57,6 +60,7 @@ case "${1:-}" in
   triggers) bash "$HERE/triggers.sh" ;;
   tooling)  bash "$HERE/tooling.sh" ;;
   parallelism) bash "$HERE/parallelism.sh" ;;
+  routing)  node "$HERE/routing.js" ;;
   gold)
     printf '%-22s %-8s %-6s %-8s %-5s %s\n' CASE POLARITY STRICT ANALYZE ANY VERDICT
     fails=0

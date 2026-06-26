@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Creates an inertia based scrolling frame that is animated and has inertia frames
 	Alternative to a Roblox ScrollingFrame with inertia scrolling and complete control over behavior and style.
@@ -21,6 +21,26 @@ local ScrollingFrame = {}
 ScrollingFrame.ClassName = "ScrollingFrame"
 ScrollingFrame.__index = ScrollingFrame
 
+export type ScrollType = {
+	Direction: string,
+}
+
+export type ScrollingFrameOptions = {
+	OnClick: ((inputObject: InputObject) -> ())?,
+}
+
+export type ScrollingFrame = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		Gui: GuiObject,
+		_container: GuiObject,
+		_scrollType: ScrollType,
+		_scrollbars: { any },
+		_model: ScrollModel.ScrollModel,
+	},
+	{} :: typeof({ __index = ScrollingFrame })
+))
+
 --[=[
 	Creates a new ScrollingFrame which can be used. Prefer Container.Active = true so scroll wheel works.
 	Container should be in a Frame with ClipsDescendants = true
@@ -28,12 +48,12 @@ ScrollingFrame.__index = ScrollingFrame
 	@param gui BaseGui -- Gui to use
 	@return ScrollingFrame
 ]=]
-function ScrollingFrame.new(gui)
-	local self = setmetatable({}, ScrollingFrame)
+function ScrollingFrame.new(gui: GuiObject): ScrollingFrame
+	local self: ScrollingFrame = setmetatable({} :: any, ScrollingFrame)
 
 	self._maid = Maid.new()
 	self.Gui = gui or error("No Gui")
-	self._container = self.Gui.Parent or error("No container")
+	self._container = (self.Gui.Parent or error("No container")) :: GuiObject
 	self._scrollType = SCROLL_TYPE.Vertical
 
 	self._scrollbars = {}
@@ -59,12 +79,12 @@ function ScrollingFrame.new(gui)
 end
 
 -- Sets the scroll type for the frame
-function ScrollingFrame:SetScrollType(scrollType)
-	assert(Table.contains(SCROLL_TYPE, scrollType))
+function ScrollingFrame.SetScrollType(self: ScrollingFrame, scrollType: ScrollType): ()
+	assert(Table.contains(SCROLL_TYPE :: any, scrollType))
 	self._scrollType = scrollType
 end
 
-function ScrollingFrame:AddScrollbar(scrollbar)
+function ScrollingFrame.AddScrollbar(self: ScrollingFrame, scrollbar: any): ()
 	assert(scrollbar, "Bad scrollbar")
 	scrollbar:SetScrollingFrame(self)
 
@@ -72,7 +92,7 @@ function ScrollingFrame:AddScrollbar(scrollbar)
 	self._maid[scrollbar] = scrollbar
 end
 
-function ScrollingFrame:RemoveScrollbar(scrollbar)
+function ScrollingFrame.RemoveScrollbar(self: ScrollingFrame, scrollbar: any): ()
 	local index = Table.getIndex(self._scrollbars, scrollbar)
 	if index then
 		table.remove(self._scrollbars, index)
@@ -81,34 +101,34 @@ function ScrollingFrame:RemoveScrollbar(scrollbar)
 end
 
 -- Scrolls to the position in pixels offset
-function ScrollingFrame:ScrollTo(position, doNotAnimate: boolean?)
+function ScrollingFrame.ScrollTo(self: ScrollingFrame, position: number, doNotAnimate: boolean?): ()
 	self._model.Target = position
 	if doNotAnimate then
-		self._model.position = self._model.Target
+		(self._model :: any).position = self._model.Target
 		self._model.Velocity = 0
 	end
 end
 
 -- Scrolls to the top
-function ScrollingFrame:ScrollToTop(doNotAnimate: boolean?)
+function ScrollingFrame.ScrollToTop(self: ScrollingFrame, doNotAnimate: boolean?): ()
 	self:ScrollTo(self._model.Min, doNotAnimate)
 end
 
 -- Scrolls to the bottom
-function ScrollingFrame:ScrollToBottom(doNotAnimate: boolean?)
+function ScrollingFrame.ScrollToBottom(self: ScrollingFrame, doNotAnimate: boolean?): ()
 	self:ScrollTo(self._model.Max, doNotAnimate)
 end
 
-function ScrollingFrame:GetModel()
+function ScrollingFrame.GetModel(self: ScrollingFrame): ScrollModel.ScrollModel
 	return self._model
 end
 
-function ScrollingFrame:_updateScrollerSize()
-	self._model.TotalContentLength = self.Gui.AbsoluteSize[self._scrollType.Direction]
-	self._model.ViewSize = self._container.AbsoluteSize[self._scrollType.Direction]
+function ScrollingFrame._updateScrollerSize(self: ScrollingFrame): ()
+	self._model.TotalContentLength = (self.Gui.AbsoluteSize :: any)[self._scrollType.Direction]
+	self._model.ViewSize = (self._container.AbsoluteSize :: any)[self._scrollType.Direction]
 end
 
-function ScrollingFrame:_updateRender()
+function ScrollingFrame._updateRender(self: ScrollingFrame): ()
 	if self._scrollType == SCROLL_TYPE.Vertical then
 		self.Gui.Position = UDim2.new(self.Gui.Position.X, UDim.new(0, self._model.BoundedRenderPosition))
 	elseif self._scrollType == SCROLL_TYPE.Horizontal then
@@ -126,7 +146,7 @@ function ScrollingFrame:_updateRender()
 	end
 end
 
-function ScrollingFrame:StopDrag()
+function ScrollingFrame.StopDrag(self: ScrollingFrame): ()
 	local position = self._model.Position
 
 	if self._model:GetDisplacementPastBounds(position) == 0 then
@@ -141,7 +161,7 @@ function ScrollingFrame:StopDrag()
 end
 
 -- Scrolls until model is at rest
-function ScrollingFrame:_freeScroll(lowPriority)
+function ScrollingFrame._freeScroll(self: ScrollingFrame, lowPriority: boolean?): ()
 	if lowPriority and self._maid._updateMaid then
 		return
 	end
@@ -161,14 +181,14 @@ end
 
 --
 -- @param[opt=1] strength
-function ScrollingFrame:_getVelocityTracker(strength)
-	strength = strength or 1
+function ScrollingFrame._getVelocityTracker(self: ScrollingFrame, strength: number?): () -> ()
+	local actualStrength = strength or 1
 	self._model.Velocity = 0
 
 	local lastUpdate = tick()
 	local lastPos = self._model.Position
 
-	return function()
+	return function(): ()
 		local pos = self._model.Position
 		local elapsed = tick() - lastUpdate
 		local delta = lastPos - pos
@@ -177,19 +197,19 @@ function ScrollingFrame:_getVelocityTracker(strength)
 			elapsed = 0.03
 		end
 
-		self._model.Velocity = self._model.Velocity - (delta / elapsed) * strength
+		self._model.Velocity = self._model.Velocity - (delta / elapsed) * actualStrength
 		lastPos = pos
 		lastUpdate = tick()
 	end
 end
 
-function ScrollingFrame:_getInputProcessor(inputBeganObject: InputObject)
+function ScrollingFrame._getInputProcessor(self: ScrollingFrame, inputBeganObject: InputObject): (InputObject) -> number
 	local startPos = self._model.Position
 	local updateVelocity = self:_getVelocityTracker()
 	local originalPos = inputBeganObject.Position
 
-	return function(inputObject: InputObject)
-		local distance = (inputObject.Position - originalPos)[self._scrollType.Direction]
+	return function(inputObject: InputObject): number
+		local distance = ((inputObject.Position - originalPos) :: any)[self._scrollType.Direction]
 		local pos = startPos - distance
 		self._model.Position = pos
 		self._model.Target = pos
@@ -203,7 +223,7 @@ end
 
 -- Binds input to a specific GUI
 -- @return maid Maid -- To cleanup inputs
-function ScrollingFrame:BindInput(gui, options)
+function ScrollingFrame.BindInput(self: ScrollingFrame, gui: GuiObject, options: ScrollingFrameOptions?): Maid.Maid
 	local maid = Maid.new()
 
 	maid:GiveTask(gui.InputBegan:Connect(function(inputObject)
@@ -212,7 +232,7 @@ function ScrollingFrame:BindInput(gui, options)
 
 	maid:GiveTask(gui.InputChanged:Connect(function(inputObject)
 		if gui.Active and inputObject.UserInputType == Enum.UserInputType.MouseWheel then
-			self._model.Target = self._model.Target - inputObject.Position.z * 80
+			self._model.Target = self._model.Target - (inputObject.Position :: any).z * 80
 			self:_freeScroll()
 		end
 	end))
@@ -221,7 +241,11 @@ function ScrollingFrame:BindInput(gui, options)
 	return maid
 end
 
-function ScrollingFrame:StartScrolling(inputBeganObject, options)
+function ScrollingFrame.StartScrolling(
+	self: ScrollingFrame,
+	inputBeganObject: InputObject,
+	options: ScrollingFrameOptions?
+): ()
 	if inputBeganObject.UserInputState ~= Enum.UserInputState.Begin then
 		-- Touch events moving into GUIs occur sometimes
 		return
@@ -262,7 +286,7 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 			end
 		end)
 
-		maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, _)
+		maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject: InputObject, _)
 			if inputObject == inputBeganObject then
 				self:StopDrag()
 			end
@@ -276,7 +300,11 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 	end
 end
 
-function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganObject)
+function ScrollingFrame.StartScrollbarScrolling(
+	self: ScrollingFrame,
+	scrollbarContainer: GuiObject,
+	inputBeganObject: InputObject
+): Maid.Maid
 	assert(scrollbarContainer, "Bad scrollbarContainer")
 	assert(inputBeganObject, "Bad inputBeganObject")
 
@@ -286,12 +314,12 @@ function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganOb
 	local startPercent = self._model.ContentScrollPercent
 	local updateVelocity = self:_getVelocityTracker(0.25)
 
-	maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
+	maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject: InputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 			local direction = self._scrollType.Direction
-			local offset = (inputObject.Position - startPosition)[direction]
+			local offset = ((inputObject.Position - startPosition) :: any)[direction]
 			local percent = offset
-				/ (scrollbarContainer.AbsoluteSize[direction] * (1 - self._model.ContentScrollPercentSize))
+				/ ((scrollbarContainer.AbsoluteSize :: any)[direction] * (1 - self._model.ContentScrollPercentSize))
 			self._model.ContentScrollPercent = startPercent + percent
 			self._model.TargetContentScrollPercent = self._model.ContentScrollPercent
 
@@ -300,7 +328,7 @@ function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganOb
 		end
 	end))
 
-	maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject)
+	maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject: InputObject)
 		if inputObject == inputBeganObject then
 			self:StopDrag()
 		end
@@ -311,10 +339,10 @@ function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganOb
 	return maid
 end
 
-function ScrollingFrame:Destroy()
-	self._maid:DoCleaning()
-	self._maid = nil
-	setmetatable(self, nil)
+function ScrollingFrame.Destroy(self: ScrollingFrame): ()
+	self._maid:DoCleaning();
+	(self :: any)._maid = nil
+	setmetatable(self :: any, nil)
 end
 
 return ScrollingFrame

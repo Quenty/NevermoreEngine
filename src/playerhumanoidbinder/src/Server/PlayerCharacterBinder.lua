@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Binder that will automatically bind to each player's character
 	@class PlayerCharacterBinder
@@ -9,12 +9,24 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local Binder = require("Binder")
+local Brio = require("Brio")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
 local ValueObject = require("ValueObject")
 
 local PlayerCharacterBinder = setmetatable({}, Binder)
 PlayerCharacterBinder.ClassName = "PlayerCharacterBinder"
 PlayerCharacterBinder.__index = PlayerCharacterBinder
+
+export type PlayerCharacterBinder<T> =
+	typeof(setmetatable(
+		{} :: {
+			_shouldTag: ValueObject.ValueObject<boolean>,
+		},
+		{} :: typeof({ __index = PlayerCharacterBinder })
+	))
+	& Binder.Binder<T>
 
 --[=[
 	Returns a new PlayerCharacterBinder
@@ -23,8 +35,8 @@ PlayerCharacterBinder.__index = PlayerCharacterBinder
 	@param ... any
 	@return PlayerCharacterBinder<T>
 ]=]
-function PlayerCharacterBinder.new(tag: string, class, ...)
-	local self = setmetatable(Binder.new(tag, class, ...), PlayerCharacterBinder)
+function PlayerCharacterBinder.new<T>(tag: string, class: Binder.BinderConstructor<T>, ...): PlayerCharacterBinder<T>
+	local self: PlayerCharacterBinder<T> = setmetatable(Binder.new(tag, class, ...) :: any, PlayerCharacterBinder)
 
 	return self
 end
@@ -35,7 +47,7 @@ end
 
 	@param ... any
 ]=]
-function PlayerCharacterBinder:Init(...)
+function PlayerCharacterBinder.Init<T>(self: PlayerCharacterBinder<T>, ...): ()
 	getmetatable(PlayerCharacterBinder).Init(self, ...)
 
 	if not self._shouldTag then
@@ -47,7 +59,7 @@ end
 	Sets whether tagging should be enabled
 	@param shouldTag boolean
 ]=]
-function PlayerCharacterBinder:SetAutomaticTagging(shouldTag: boolean)
+function PlayerCharacterBinder.SetAutomaticTagging<T>(self: PlayerCharacterBinder<T>, shouldTag: boolean): ()
 	assert(type(shouldTag) == "boolean", "Bad shouldTag")
 	assert(self._shouldTag, "Missing self._shouldTag")
 
@@ -57,7 +69,7 @@ end
 --[=[
 	@return Observable<boolean>
 ]=]
-function PlayerCharacterBinder:ObserveAutomaticTagging()
+function PlayerCharacterBinder.ObserveAutomaticTagging<T>(self: PlayerCharacterBinder<T>): Observable.Observable<boolean>
 	return self._shouldTag:Observe()
 end
 
@@ -65,7 +77,10 @@ end
 	@param predicate function -- Optional predicate
 	@return Observable<Brio<boolean>>
 ]=]
-function PlayerCharacterBinder:ObserveAutomaticTaggingBrio(predicate)
+function PlayerCharacterBinder.ObserveAutomaticTaggingBrio<T>(
+	self: PlayerCharacterBinder<T>,
+	predicate: Rx.Predicate<boolean>?
+): Observable.Observable<Brio.Brio<boolean>>
 	return self._shouldTag:ObserveBrio(predicate)
 end
 
@@ -73,7 +88,7 @@ end
 	Starts the binder. See [Binder.Start].
 	Should be done via a [ServiceBag].
 ]=]
-function PlayerCharacterBinder:Start()
+function PlayerCharacterBinder.Start<T>(self: PlayerCharacterBinder<T>): ...any
 	local results = { getmetatable(PlayerCharacterBinder).Start(self) }
 
 	self._maid:GiveTask(self._shouldTag.Changed:Connect(function()
@@ -84,7 +99,7 @@ function PlayerCharacterBinder:Start()
 	return unpack(results)
 end
 
-function PlayerCharacterBinder:_bindTagging(doUnbinding)
+function PlayerCharacterBinder._bindTagging<T>(self: PlayerCharacterBinder<T>, doUnbinding: boolean?): ()
 	if self._shouldTag.Value then
 		local maid = Maid.new()
 
@@ -117,7 +132,11 @@ function PlayerCharacterBinder:_bindTagging(doUnbinding)
 	end
 end
 
-function PlayerCharacterBinder:_handlePlayerAdded(playerMaid, player)
+function PlayerCharacterBinder._handlePlayerAdded<T>(
+	self: PlayerCharacterBinder<T>,
+	playerMaid: Maid.Maid,
+	player: Player
+): ()
 	local maid = Maid.new()
 
 	maid:GiveTask(player.CharacterAdded:Connect(function(character)
