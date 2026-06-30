@@ -130,7 +130,7 @@ end
 	@return Observable<boolean>
 ]=]
 function GameProductDataService.ObserveServerOnlyPrompting(
-	self: GameProductDataService,
+	_self: GameProductDataService,
 	player: Player
 ): Observable.Observable<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
@@ -138,14 +138,14 @@ function GameProductDataService.ObserveServerOnlyPrompting(
 	-- Always read the server-authoritative value (the server implementation), which
 	-- replicates down to clients as an attribute on the PlayerProductManager folder.
 	return PlayerProductManagerInterface:Observe(player, TieRealms.SERVER):Pipe({
-		Rx.switchMap(function(interface): any
+		Rx.switchMap(function(interface: any): any
 			if interface then
 				return interface.ServerOnlyPrompting:Observe()
 			else
 				return Rx.of(false)
 			end
 		end) :: any,
-		Rx.map(function(value)
+		Rx.map(function(value: any)
 			return value == true
 		end) :: any,
 		Rx.distinct() :: any,
@@ -168,7 +168,7 @@ function GameProductDataService._promiseServerOnlyPromptingGuard(
 		return Promise.resolved()
 	end
 
-	return Rx.toPromise(self:ObserveServerOnlyPrompting(player)):Then(function(serverOnly)
+	return Rx.toPromise(self:ObserveServerOnlyPrompting(player) :: any):Then(function(serverOnly)
 		if serverOnly then
 			return Promise.rejected(
 				"[GameProductDataService] - Server-only prompting is enabled. The client cannot prompt purchases "
@@ -466,7 +466,7 @@ function GameProductDataService.PromisePlayerOwnershipOrPrompt(
 				if ownsAsset then
 					return true
 				else
-					return self:_promiseGuardedPromptPurchase(player, assetTracker, idOrKey)
+					return self:_promiseGuardedPromptPurchase(player, assetTracker, idOrKey) :: any
 				end
 			end)
 		else
