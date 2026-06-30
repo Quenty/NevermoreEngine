@@ -17,6 +17,8 @@ local RxBrioUtils = require("RxBrioUtils")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
+local ValueObject = require("ValueObject")
 
 local GameProductDataService = {}
 GameProductDataService.ServiceName = "GameProductDataService"
@@ -26,6 +28,7 @@ export type GameProductDataService = typeof(setmetatable(
 		_serviceBag: ServiceBag.ServiceBag,
 		_tieRealmService: TieRealmService.TieRealmService,
 		_maid: Maid.Maid,
+		_serverOnlyPrompting: ValueObject.ValueObject<boolean>,
 
 		GamePassPurchased: Signal.Signal<Player, number>,
 		ProductPurchased: Signal.Signal<Player, number>,
@@ -45,6 +48,12 @@ function GameProductDataService.Init(self: GameProductDataService, serviceBag: S
 	self._tieRealmService = self._serviceBag:GetService(TieRealmService) :: any
 
 	self._maid = Maid.new()
+
+	-- Source of truth for server-only prompting. On the server this is set via
+	-- [GameProductService:SetServerOnlyPromptingEnabled] and replicated to clients
+	-- through the PlayerProductManager tie. On the client we read the replicated
+	-- value to decide whether to refuse local prompts.
+	self._serverOnlyPrompting = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	-- Configure
 	self.GamePassPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(player, gamePassId)
@@ -82,6 +91,113 @@ function GameProductDataService.Start(self: GameProductDataService)
 				exportSignal(self.MembershipPurchased, GameConfigAssetTypes.MEMBERSHIP)
 			end)
 	)
+end
+
+--[=[
+	Sets whether prompting is restricted to the server. When enabled, clients can no
+	longer prompt purchases directly via [GameProductDataService:PromisePromptPurchase];
+	prompts must be initiated from the server. Can only be set from the server.
+
+	@param serverOnly boolean
+]=]
+function GameProductDataService.SetServerOnlyPrompting(self: GameProductDataService, serverOnly: boolean): ()
+	assert(type(serverOnly) == "boolean", "Bad serverOnly")
+	assert(
+		self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT,
+		"[GameProductDataService] - Server-only prompting can only be configured from the server"
+	)
+
+	self._serverOnlyPrompting.Value = serverOnly
+end
+
+--[=[
+	Returns the server-authoritative server-only prompting [ValueObject]. This is
+	exported through the PlayerProductManager tie so it replicates to clients.
+
+	@return ValueObject<boolean>
+]=]
+function GameProductDataService.GetServerOnlyPromptingValue(
+	self: GameProductDataService
+): ValueObject.ValueObject<boolean>
+	return self._serverOnlyPrompting
+end
+
+--[=[
+	Returns true if server-only prompting is currently enabled. On the client this
+	reads the value replicated from the server for the local player.
+
+	@param player Player
+	@return Observable<boolean>
+]=]
+function GameProductDataService.ObserveServerOnlyPrompting(
+	self: GameProductDataService,
+	player: Player
+): Observable.Observable<boolean>
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
+	-- Always read the server-authoritative value (the server implementation), which
+	-- replicates down to clients as an attribute on the PlayerProductManager folder.
+	return PlayerProductManagerInterface:Observe(player, TieRealms.SERVER):Pipe({
+		Rx.switchMap(function(interface): any
+			if interface then
+				return interface.ServerOnlyPrompting:Observe()
+			else
+				return Rx.of(false)
+			end
+		end) :: any,
+		Rx.map(function(value)
+			return value == true
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
+end
+
+--[=[
+	Resolves if the caller is allowed to prompt a purchase, rejecting if server-only
+	prompting is enabled and we are on the client. The server is always authorized.
+
+	@param player Player
+	@return Promise
+]=]
+function GameProductDataService._promiseServerOnlyPromptingGuard(
+	self: GameProductDataService,
+	player: Player
+): Promise.Promise<()>
+	-- The server (and a single shared realm) is the authority and may always prompt.
+	if self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT then
+		return Promise.resolved()
+	end
+
+	return Rx.toPromise(self:ObserveServerOnlyPrompting(player)):Then(function(serverOnly)
+		if serverOnly then
+			return Promise.rejected(
+				"[GameProductDataService] - Server-only prompting is enabled. The client cannot prompt purchases "
+					.. "directly; prompts must be initiated from the server."
+			)
+		end
+
+		return nil
+	end)
+end
+
+--[=[
+	Applies the server-only prompting guard and then prompts the purchase. Used by all
+	prompt entry points so the guard is enforced consistently.
+
+	@param player Player
+	@param assetTracker PlayerAssetMarketTracker
+	@param idOrKey string | number
+	@return Promise<boolean>
+]=]
+function GameProductDataService._promiseGuardedPromptPurchase(
+	self: GameProductDataService,
+	player: Player,
+	assetTracker: any,
+	idOrKey: string | number
+): Promise.Promise<boolean>
+	return self:_promiseServerOnlyPromptingGuard(player):Then(function()
+		return assetTracker:PromisePromptPurchase(idOrKey)
+	end)
 end
 
 --[=[
@@ -132,7 +248,7 @@ function GameProductDataService.PromisePromptPurchase(
 
 	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
 		local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
-		return assetTracker:PromisePromptPurchase(idOrKey)
+		return self:_promiseGuardedPromptPurchase(player, assetTracker, idOrKey)
 	end)
 end
 
@@ -350,7 +466,7 @@ function GameProductDataService.PromisePlayerOwnershipOrPrompt(
 				if ownsAsset then
 					return true
 				else
-					return assetTracker:PromisePromptPurchase(idOrKey)
+					return self:_promiseGuardedPromptPurchase(player, assetTracker, idOrKey)
 				end
 			end)
 		else
@@ -359,7 +475,7 @@ function GameProductDataService.PromisePlayerOwnershipOrPrompt(
 				return Promise.resolved(true)
 			end
 
-			return assetTracker:PromisePromptPurchase(idOrKey)
+			return self:_promiseGuardedPromptPurchase(player, assetTracker, idOrKey)
 		end
 	end)
 end

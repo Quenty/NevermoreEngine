@@ -14,4 +14,8 @@ return TieDefinition.new("PlayerProductManager", {
 	PromisePlayerPromptClosed = TieDefinition.Types.METHOD,
 	GetAssetTrackerOrError = TieDefinition.Types.METHOD,
 	GetOwnershipTrackerOrError = TieDefinition.Types.METHOD,
+
+	[TieDefinition.Realms.SERVER] = {
+		ServerOnlyPrompting = false,
+	},
 })
