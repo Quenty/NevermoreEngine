@@ -16,8 +16,8 @@ assetIds.
 
 See [GameProductServiceClient] for the client equivalent. The API surface should be
 effectively the same between the two."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/GameProductService"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/GameProductService" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/GameProductService" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.51c798a7.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.3e9fffdc.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.10006307.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.89553aaa.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.aa556db9.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -58,7 +58,16 @@ effectively the same between the two."><link data-rh="true" rel="canonical" href
 </p>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObservePlayerOwnership"><code style="text-decoration:none">ObservePlayerOwnership</code><a href="#ObservePlayerOwnership" class="hash-link" aria-label="Direct link to ObservePlayerOwnership" title="Direct link to ObservePlayerOwnership" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/gameproductservice/src/Server/GameProductService.lua#L239"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>GameProductService<!-- -->.</code><code class="green_DgR4">ObservePlayerOwnership</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/GameProductService">GameProductService</a></code><code>,</code></div><div><code>player<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Player" target="_blank" rel="noopener noreferrer">Player<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>assetType<!-- -->: </code><code class="blue_P4bS">GameConfigAssetType</code><code>,</code></div><div><code>idOrKey<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">boolean</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes if the player owns this cloud asset or not</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/gameproductservice/src/Server/GameProductService.lua#L255"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>GameProductService<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/GameProductService">GameProductService</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetServerOnlyPromptingEnabled"><code style="text-decoration:none">SetServerOnlyPromptingEnabled</code><a href="#SetServerOnlyPromptingEnabled" class="hash-link" aria-label="Direct link to SetServerOnlyPromptingEnabled" title="Direct link to SetServerOnlyPromptingEnabled" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/gameproductservice/src/Server/GameProductService.lua#L260"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>GameProductService<!-- -->.</code><code class="green_DgR4">SetServerOnlyPromptingEnabled</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/GameProductService">GameProductService</a></code><code>,</code></div><div><code>enabled<!-- -->: </code><code class="blue_P4bS">boolean</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+<p>
+  Restricts purchase prompting to the server. When enabled, clients can no longer
+  prompt purchases directly via <a href="/NevermoreEngine/api/GameProductServiceClient#PromisePromptPurchase">GameProductServiceClient:PromisePromptPurchase</a> (it
+  rejects); prompts must be initiated from the server, where the developer can validate
+  the asset id. Defaults to disabled.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="IsServerOnlyPromptingEnabled"><code style="text-decoration:none">IsServerOnlyPromptingEnabled</code><a href="#IsServerOnlyPromptingEnabled" class="hash-link" aria-label="Direct link to IsServerOnlyPromptingEnabled" title="Direct link to IsServerOnlyPromptingEnabled" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/gameproductservice/src/Server/GameProductService.lua#L271"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>GameProductService<!-- -->.</code><code class="green_DgR4">IsServerOnlyPromptingEnabled</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/GameProductService">GameProductService</a></code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>Returns true if server-only prompting is enabled.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/gameproductservice/src/Server/GameProductService.lua#L278"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>GameProductService<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/GameProductService">GameProductService</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Cleans up the game product service</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -393,6 +402,50 @@ effectively the same between the two."><link data-rh="true" rel="canonical" href
             }
         },
         {
+            &quot;name&quot;: &quot;SetServerOnlyPromptingEnabled&quot;,
+            &quot;desc&quot;: &quot;Restricts purchase prompting to the server. When enabled, clients can no longer\nprompt purchases directly via [GameProductServiceClient:PromisePromptPurchase] (it\nrejects); prompts must be initiated from the server, where the developer can validate\nthe asset id. Defaults to disabled.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;self&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;GameProductService&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;enabled&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 260,
+                &quot;path&quot;: &quot;src/gameproductservice/src/Server/GameProductService.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsServerOnlyPromptingEnabled&quot;,
+            &quot;desc&quot;: &quot;Returns true if server-only prompting is enabled.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;self&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;GameProductService&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 271,
+                &quot;path&quot;: &quot;src/gameproductservice/src/Server/GameProductService.lua&quot;
+            }
+        },
+        {
             &quot;name&quot;: &quot;Destroy&quot;,
             &quot;desc&quot;: &quot;Cleans up the game product service&quot;,
             &quot;params&quot;: [
@@ -405,7 +458,7 @@ effectively the same between the two."><link data-rh="true" rel="canonical" href
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 255,
+                &quot;line&quot;: 278,
                 &quot;path&quot;: &quot;src/gameproductservice/src/Server/GameProductService.lua&quot;
             }
         }
@@ -421,6 +474,6 @@ effectively the same between the two."><link data-rh="true" rel="canonical" href
         &quot;line&quot;: 14,
         &quot;path&quot;: &quot;src/gameproductservice/src/Server/GameProductService.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Destroy" class="table-of-contents__link toc-highlight">.Destroy</a></li><li><a href="#HasPlayerPurchasedThisSession" class="table-of-contents__link toc-highlight">.HasPlayerPurchasedThisSession</a></li><li><a href="#Init" class="table-of-contents__link toc-highlight">.Init</a></li><li><a href="#ObserveAssetPurchased" class="table-of-contents__link toc-highlight">.ObserveAssetPurchased</a></li><li><a href="#ObservePlayerAssetPurchased" class="table-of-contents__link toc-highlight">.ObservePlayerAssetPurchased</a></li><li><a href="#ObservePlayerOwnership" class="table-of-contents__link toc-highlight">.ObservePlayerOwnership</a></li><li><a href="#PromisePlayerIsPromptOpen" class="table-of-contents__link toc-highlight">.PromisePlayerIsPromptOpen</a></li><li><a href="#PromisePlayerOwnership" class="table-of-contents__link toc-highlight">.PromisePlayerOwnership</a></li><li><a href="#PromisePlayerOwnershipOrPrompt" class="table-of-contents__link toc-highlight">.PromisePlayerOwnershipOrPrompt</a></li><li><a href="#PromisePlayerPromptClosed" class="table-of-contents__link toc-highlight">.PromisePlayerPromptClosed</a></li><li><a href="#PromisePlayerPromptPurchase" class="table-of-contents__link toc-highlight">.PromisePlayerPromptPurchase</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Destroy" class="table-of-contents__link toc-highlight">.Destroy</a></li><li><a href="#HasPlayerPurchasedThisSession" class="table-of-contents__link toc-highlight">.HasPlayerPurchasedThisSession</a></li><li><a href="#Init" class="table-of-contents__link toc-highlight">.Init</a></li><li><a href="#IsServerOnlyPromptingEnabled" class="table-of-contents__link toc-highlight">.IsServerOnlyPromptingEnabled</a></li><li><a href="#ObserveAssetPurchased" class="table-of-contents__link toc-highlight">.ObserveAssetPurchased</a></li><li><a href="#ObservePlayerAssetPurchased" class="table-of-contents__link toc-highlight">.ObservePlayerAssetPurchased</a></li><li><a href="#ObservePlayerOwnership" class="table-of-contents__link toc-highlight">.ObservePlayerOwnership</a></li><li><a href="#PromisePlayerIsPromptOpen" class="table-of-contents__link toc-highlight">.PromisePlayerIsPromptOpen</a></li><li><a href="#PromisePlayerOwnership" class="table-of-contents__link toc-highlight">.PromisePlayerOwnership</a></li><li><a href="#PromisePlayerOwnershipOrPrompt" class="table-of-contents__link toc-highlight">.PromisePlayerOwnershipOrPrompt</a></li><li><a href="#PromisePlayerPromptClosed" class="table-of-contents__link toc-highlight">.PromisePlayerPromptClosed</a></li><li><a href="#PromisePlayerPromptPurchase" class="table-of-contents__link toc-highlight">.PromisePlayerPromptPurchase</a></li><li><a href="#SetServerOnlyPromptingEnabled" class="table-of-contents__link toc-highlight">.SetServerOnlyPromptingEnabled</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
