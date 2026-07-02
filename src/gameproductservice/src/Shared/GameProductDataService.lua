@@ -13,6 +13,7 @@ local Observable = require("Observable")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Promise = require("Promise")
 local Rx = require("Rx")
+local RxAttributeUtils = require("RxAttributeUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -22,6 +23,8 @@ local ValueObject = require("ValueObject")
 
 local GameProductDataService = {}
 GameProductDataService.ServiceName = "GameProductDataService"
+
+GameProductDataService.ServerOnlyPromptingAttribute = "GameProductServerOnlyPrompting"
 
 export type GameProductDataService = typeof(setmetatable(
 	{} :: {
@@ -137,19 +140,17 @@ function GameProductDataService.ObserveServerOnlyPrompting(
 
 	-- Always read the server-authoritative value (the server implementation), which
 	-- replicates down to clients as an attribute on the PlayerProductManager folder.
-	return PlayerProductManagerInterface:Observe(player, TieRealms.SERVER):Pipe({
-		Rx.switchMap(function(interface: any): any
-			if interface then
-				return interface.ServerOnlyPrompting:Observe()
-			else
-				return Rx.of(false)
-			end
-		end) :: any,
-		Rx.map(function(value: any)
-			return value == true
-		end) :: any,
-		Rx.distinct() :: any,
-	}) :: any
+	return RxAttributeUtils.observeAttribute(
+			player,
+			GameProductDataService.ServerOnlyPromptingAttribute,
+			false
+		)
+			:Pipe({
+				Rx.map(function(value: any)
+					return value == true
+				end) :: any,
+				Rx.distinct() :: any,
+			}) :: any
 end
 
 --[=[

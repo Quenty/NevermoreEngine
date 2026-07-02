@@ -61,7 +61,10 @@ function PlayerProductManager.new(player: Player, serviceBag: ServiceBag.Service
 
 	-- Initialize attributes
 
-	self.ServerOnlyPrompting = self._serviceBag:GetService(GameProductDataService):GetServerOnlyPromptingValue()
+	local serverOnlyPrompting = self._serviceBag:GetService(GameProductDataService):GetServerOnlyPromptingValue()
+	self._maid:GiveTask(serverOnlyPrompting:Observe():Subscribe(function(value)
+		self._obj:SetAttribute(GameProductDataService.ServerOnlyPromptingAttribute, value)
+	end))
 
 	-- Implement
 	local impl = self._maid:Add(PlayerProductManagerInterface.Server:Implement(self._obj, self))
