@@ -1,3 +1,21 @@
+# (Thu Jul 02 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/gameproductservice@14.52.0`
+  - feat: Add server-only purchasing mode to GameProductService [#721](https://github.com/Quenty/NevermoreEngine/pull/721) ([@unrooot](https://github.com/unrooot))
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameproductservice@14.52.0`
+  - fix: Fix attribute replication for server-only prompting [#722](https://github.com/Quenty/NevermoreEngine/pull/722) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Wed Jun 24 2026)
 
 #### 🚀 Enhancement

@@ -1,3 +1,22 @@
+# v14.52.0 (Thu Jul 02 2026)
+
+#### 🚀 Enhancement
+
+- feat: Add server-only purchasing mode to GameProductService [#721](https://github.com/Quenty/NevermoreEngine/pull/721) ([@unrooot](https://github.com/unrooot))
+- feat: Add server-only purchasing mode to GameProductService ([@unrooot](https://github.com/unrooot))
+
+#### 🐛 Bug Fix
+
+- fix: Fix attribute replication for server-only prompting [#722](https://github.com/Quenty/NevermoreEngine/pull/722) ([@unrooot](https://github.com/unrooot))
+- fix: Fix property replication ([@unrooot](https://github.com/unrooot))
+- fix: Fix lint ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
