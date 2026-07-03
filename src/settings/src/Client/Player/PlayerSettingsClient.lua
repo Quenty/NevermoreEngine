@@ -28,14 +28,32 @@ local ValueObject = require("ValueObject")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
-local PlayerSettingsClient = setmetatable({}, PlayerSettingsBase)
+local PlayerSettingsClient = {}
 PlayerSettingsClient.ClassName = "PlayerSettingsClient"
 PlayerSettingsClient.__index = PlayerSettingsClient
+-- Runtime inheritance only. Typing the metatable target as `any` keeps the old solver from
+-- chasing the full PlayerSettingsBase type here, which otherwise overflows its complexity
+-- budget ("Code is too complex"). The inherited surface is supplied structurally below.
+setmetatable(PlayerSettingsClient :: any, PlayerSettingsBase)
+
+-- Only the dynamic remoting member this class touches.
+type RemotingLike = {
+	RequestUpdateSettings: any,
+}
+
+-- Minimal structural surface inherited from PlayerSettingsBase that this class uses. See the
+-- setmetatable note above for why we don't intersect PlayerSettingsBase.PlayerSettingsBase.
+type PlayerSettingsBaseLike = {
+	_obj: Folder,
+	_maid: Maid.Maid,
+	GetPlayer: (self: any) -> Player?,
+	Destroy: (self: any) -> (),
+}
 
 export type PlayerSettingsClient =
 	typeof(setmetatable(
 		{} :: {
-			_remoting: Remoting.Remoting,
+			_remoting: RemotingLike,
 			_pendingReplicationDataInTransit: ValueObject.ValueObject<any>,
 			_toReplicate: { [any]: any? }?,
 			_toReplicateCallbacks: { [string]: { [any]: any } },
@@ -44,7 +62,7 @@ export type PlayerSettingsClient =
 		},
 		{} :: typeof({ __index = PlayerSettingsClient })
 	))
-	& PlayerSettingsBase.PlayerSettingsBase
+	& PlayerSettingsBaseLike
 
 --[=[
 	See [SettingsBindersClient] and [SettingsServiceClient] on how to properly use this class.
@@ -58,7 +76,7 @@ function PlayerSettingsClient.new(folder: Folder, serviceBag: ServiceBag.Service
 		setmetatable(PlayerSettingsBase.new(folder, serviceBag) :: any, PlayerSettingsClient)
 
 	if self:GetPlayer() == Players.LocalPlayer then
-		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.CLIENT))
+		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.CLIENT)) :: any
 
 		self._toReplicate = nil
 		self._toReplicateCallbacks = {}
@@ -99,7 +117,7 @@ function PlayerSettingsClient.GetValue<T>(self: PlayerSettingsClient, settingNam
 		return PlayerSettingsUtils.decodeForNetwork(pending[settingName])
 	end
 
-	return getmetatable(PlayerSettingsClient).GetValue(self, settingName, defaultValue)
+	return (getmetatable(PlayerSettingsClient :: any) :: any).GetValue(self, settingName, defaultValue)
 end
 
 --[=[
@@ -116,7 +134,11 @@ function PlayerSettingsClient.ObserveValue<T>(
 ): Observable.Observable<T>
 	assert(type(settingName) == "string", "Bad settingName")
 
-	local baseObservable = getmetatable(PlayerSettingsClient).ObserveValue(self, settingName, defaultValue)
+	local baseObservable = (getmetatable(PlayerSettingsClient :: any) :: any).ObserveValue(
+		self,
+		settingName,
+		defaultValue
+	)
 
 	-- We need to register our own replication checkers...
 	return Observable.new(function(sub)

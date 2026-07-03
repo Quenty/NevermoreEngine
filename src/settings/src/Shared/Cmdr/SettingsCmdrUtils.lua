@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SettingsCmdrUtils
 ]=]
@@ -10,10 +10,10 @@ local SettingsDataService = require("SettingsDataService")
 
 local SettingsCmdrUtils = {}
 
-function SettingsCmdrUtils.registerSettingDefinition(cmdr, serviceBag: ServiceBag.ServiceBag)
+function SettingsCmdrUtils.registerSettingDefinition(cmdr: any, serviceBag: ServiceBag.ServiceBag): ()
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
-	local settingsDataService = serviceBag:GetService(SettingsDataService)
+	local settingsDataService: any = serviceBag:GetService(SettingsDataService)
 
 	local settingDefinitionType = {
 		Transform = function(text)

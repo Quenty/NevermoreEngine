@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Provides settings in bulk, and can be initialized by a [ServiceBag]. See [SettingDefinition] for
 	more details on how to use this.
@@ -36,6 +36,17 @@ SettingDefinitionProvider.ClassName = "SettingDefinitionProvider"
 SettingDefinitionProvider.ServiceName = "SettingDefinitionProvider"
 SettingDefinitionProvider.__index = SettingDefinitionProvider
 
+export type SettingDefinitionProvider = typeof(setmetatable(
+	{} :: {
+		_settingDefinitionList: { SettingDefinition.SettingDefinition<any> },
+		_lookup: { [string]: SettingDefinition.SettingDefinition<any> },
+		_maid: Maid.Maid,
+		_serviceBag: ServiceBag.ServiceBag,
+		_initializedDefinitionLookup: { [any]: SettingDefinition.SettingDefinition<any> },
+	},
+	{} :: typeof({ __index = SettingDefinitionProvider })
+))
+
 --[=[
 	Constructs a new provider with a list of [SettingDefinition]'s.
 
@@ -68,8 +79,8 @@ SettingDefinitionProvider.__index = SettingDefinitionProvider
 	@param settingDefinitions { SettingDefinition }
 	@return SettingDefinitionProvider
 ]=]
-function SettingDefinitionProvider.new(settingDefinitions)
-	local self = setmetatable({}, SettingDefinitionProvider)
+function SettingDefinitionProvider.new(settingDefinitions: { [any]: any }): SettingDefinitionProvider
+	local self: SettingDefinitionProvider = setmetatable({} :: any, SettingDefinitionProvider)
 
 	self._settingDefinitionList = {}
 	self._lookup = {}
@@ -78,7 +89,7 @@ function SettingDefinitionProvider.new(settingDefinitions)
 		if type(key) == "number" then
 			assert(SettingDefinition.isSettingDefinition(key), "Bad settingDefinition")
 
-			self:_addSettingDefinition(key)
+			self:_addSettingDefinition(key :: any)
 		elseif type(key) == "string" then
 			if SettingDefinition.isSettingDefinition(value) then
 				self:_addSettingDefinition(value)
@@ -94,7 +105,10 @@ function SettingDefinitionProvider.new(settingDefinitions)
 	return self
 end
 
-function SettingDefinitionProvider:_addSettingDefinition(settingDefinition)
+function SettingDefinitionProvider._addSettingDefinition(
+	self: SettingDefinitionProvider,
+	settingDefinition: SettingDefinition.SettingDefinition<any>
+): ()
 	assert(SettingDefinition.isSettingDefinition(settingDefinition), "Bad settingDefinition")
 
 	table.insert(self._settingDefinitionList, settingDefinition)
@@ -106,9 +120,9 @@ end
 
 	@param serviceBag ServiceBag
 ]=]
-function SettingDefinitionProvider:Init(serviceBag: ServiceBag.ServiceBag)
+function SettingDefinitionProvider.Init(self: SettingDefinitionProvider, serviceBag: ServiceBag.ServiceBag): ()
 	assert(serviceBag, "No serviceBag")
-	assert(not self._maid, "Already initialized")
+	assert(not (self :: any)._maid, "Already initialized")
 
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -117,18 +131,20 @@ function SettingDefinitionProvider:Init(serviceBag: ServiceBag.ServiceBag)
 
 	-- Register our setting definitions
 	for _, settingDefinition in self._settingDefinitionList do
-		local initialized = self._serviceBag:GetService(settingDefinition)
-		self._initializedDefinitionLookup[settingDefinition] = initialized
+		local rawSettingDefinition = settingDefinition :: any
+		local initialized = self._serviceBag:GetService(rawSettingDefinition)
+		self._initializedDefinitionLookup[rawSettingDefinition] = initialized
 
 		-- Store lookup to overcome metatable lookup
-		self[settingDefinition:GetSettingName()] = initialized
+		local rawSelf = self :: any
+		rawSelf[rawSettingDefinition:GetSettingName()] = initialized
 	end
 end
 
 --[=[
 	Starts the provider. Empty.
 ]=]
-function SettingDefinitionProvider:Start()
+function SettingDefinitionProvider.Start(self: SettingDefinitionProvider): ()
 	-- Empty, to prevent us from erroring on service bag init
 end
 
@@ -137,7 +153,9 @@ end
 
 	@return { SettingDefinition }
 ]=]
-function SettingDefinitionProvider:GetSettingDefinitions()
+function SettingDefinitionProvider.GetSettingDefinitions(
+	self: SettingDefinitionProvider
+): { SettingDefinition.SettingDefinition<any> }
 	if self._serviceBag then
 		local copy = table.clone(self._settingDefinitionList)
 
@@ -172,7 +190,7 @@ end
 	@param index string
 	@return SettingDefinition
 ]=]
-function SettingDefinitionProvider:__index(index)
+(SettingDefinitionProvider :: any).__index = function(self: any, index: any)
 	if index == nil then
 		error("[SettingDefinitionProvider] - Cannot index provider with nil value")
 	elseif SettingDefinitionProvider[index] then
@@ -186,7 +204,7 @@ function SettingDefinitionProvider:__index(index)
 	then
 		return rawget(self, index)
 	elseif type(index) == "string" then
-		local lookup = rawget(self, "_lookup")
+		local lookup = rawget(self, "_lookup") :: any
 		local settingDefinition = lookup[index]
 		if not settingDefinition then
 			error(string.format("Bad index %q into SettingDefinitionProvider", tostring(index)))
@@ -208,7 +226,10 @@ end
 	@param settingName string
 	@return SettingDefinition
 ]=]
-function SettingDefinitionProvider:Get(settingName: string)
+function SettingDefinitionProvider.Get(
+	self: SettingDefinitionProvider,
+	settingName: string
+): SettingDefinition.SettingDefinition<any>?
 	assert(type(settingName) == "string", "Bad settingName")
 
 	local found = self._lookup[settingName]
@@ -226,7 +247,7 @@ end
 --[=[
 	Cleans up the setting registration
 ]=]
-function SettingDefinitionProvider:Destroy()
+function SettingDefinitionProvider.Destroy(self: SettingDefinitionProvider): ()
 	self._maid:DoCleaning()
 end
 
