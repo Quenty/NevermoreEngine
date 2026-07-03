@@ -37,7 +37,7 @@ function IKRig.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): IKRig
 
 	self:_setupRemoting()
 
-	self._maid:Add(IKRigInterface.Server:Implement(self._obj :: Instance, self))
+	self._maid:Add((IKRigInterface :: any).Server:Implement(self._obj :: Instance, self))
 
 	return self
 end

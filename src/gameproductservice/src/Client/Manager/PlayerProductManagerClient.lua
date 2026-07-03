@@ -90,7 +90,7 @@ function PlayerProductManagerClient.new(player: Player, serviceBag: ServiceBag.S
 		self:_connectBulkPurchaseMarketplace()
 	end
 
-	local impl = self._maid:Add(PlayerProductManagerInterface.Client:Implement(self._obj, self))
+	local impl = self._maid:Add((PlayerProductManagerInterface :: any).Client:Implement(self._obj, self))
 	self:ExportMarketTrackers(impl:GetImplParent())
 
 	return self

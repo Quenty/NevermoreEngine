@@ -47,7 +47,7 @@ function RagdollableClient.new(humanoid: Humanoid, serviceBag: ServiceBag.Servic
 		self:_onRagdollChanged(ragdoll)
 	end))
 
-	self._maid:GiveTask(RagdollableInterface.Client:Implement(self._obj :: Instance, self))
+	self._maid:GiveTask((RagdollableInterface :: any).Client:Implement(self._obj :: Instance, self))
 
 	return self
 end

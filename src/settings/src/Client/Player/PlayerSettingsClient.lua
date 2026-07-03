@@ -92,7 +92,7 @@ function PlayerSettingsClient.new(folder: Folder, serviceBag: ServiceBag.Service
 			self:_sendSettings()
 		end, { leading = true, trailing = true }))
 
-		self._maid:GiveTask(PlayerSettingsInterface.Client:Implement(self._obj, self))
+		self._maid:GiveTask((PlayerSettingsInterface :: any).Client:Implement(self._obj, self))
 	end
 
 	return self

@@ -21,7 +21,7 @@ export type RogueHumanoid =
 function RogueHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): RogueHumanoid
 	local self: RogueHumanoid = setmetatable(RogueHumanoidBase.new(humanoid, serviceBag) :: any, RogueHumanoid)
 
-	self._maid:GiveTask(RogueHumanoidInterface.Server:Implement(self._obj, self))
+	self._maid:GiveTask((RogueHumanoidInterface :: any).Server:Implement(self._obj, self))
 
 	return self
 end

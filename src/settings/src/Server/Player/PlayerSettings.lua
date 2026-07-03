@@ -76,7 +76,7 @@ function PlayerSettings.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): 
 		self:EnsureInitialized(value:GetSettingName(), value:GetDefaultValue())
 	end))
 
-	self._maid:GiveTask(PlayerSettingsInterface.Server:Implement(self._obj, self))
+	self._maid:GiveTask((PlayerSettingsInterface :: any).Server:Implement(self._obj, self))
 
 	return self
 end

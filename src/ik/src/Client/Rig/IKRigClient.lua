@@ -41,7 +41,7 @@ function IKRigClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag):
 		self:_setupLocalPlayer()
 	end
 
-	self._maid:Add(IKRigInterface.Client:Implement(self._obj :: Instance, self))
+	self._maid:Add((IKRigInterface :: any).Client:Implement(self._obj :: Instance, self))
 
 	return self
 end
