@@ -12,7 +12,7 @@ local EnumUtils = require("EnumUtils")
 --[=[
 	A modifier input chord data type that separates keyCode from modifier keys.
 
-	@type ModifierInputChord
+	@type ModifierInputChord { type: "ModifierInputChord", modifiers: { Enum.KeyCode }, keyCode: Enum.KeyCode }
 	@within InputChordUtils
 ]=]
 export type ModifierInputChord = {
