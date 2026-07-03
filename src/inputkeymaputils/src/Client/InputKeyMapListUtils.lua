@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Client side utility helpers for observing input modes for the current client.
 
@@ -7,8 +7,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local InputKeyMap = require("InputKeyMap")
 local InputKeyMapList = require("InputKeyMapList")
+local InputModeType = require("InputModeType")
 local InputModeTypeSelector = require("InputModeTypeSelector")
+local InputTypeUtils = require("InputTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
@@ -24,7 +27,7 @@ local InputKeyMapListUtils = {}
 	@return InputModeTypeSelector
 ]=]
 function InputKeyMapListUtils.getNewInputModeTypeSelector(
-	inputKeyMapList,
+	inputKeyMapList: InputKeyMapList.InputKeyMapList,
 	serviceBag: ServiceBag.ServiceBag
 ): InputModeTypeSelector.InputModeTypeSelector
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
@@ -40,19 +43,22 @@ end
 	@param serviceBag ServiceBag
 	@return Observable<InputKeyMap>
 ]=]
-function InputKeyMapListUtils.observeActiveInputKeyMap(inputKeyMapList, serviceBag: ServiceBag.ServiceBag)
+function InputKeyMapListUtils.observeActiveInputKeyMap(
+	inputKeyMapList: InputKeyMapList.InputKeyMapList,
+	serviceBag: ServiceBag.ServiceBag
+): Observable.Observable<InputKeyMap.InputKeyMap?>
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
-	return InputKeyMapListUtils.observeActiveInputModeType(inputKeyMapList, serviceBag):Pipe({
-		Rx.switchMap(function(activeInputModeType)
+	return (InputKeyMapListUtils.observeActiveInputModeType(inputKeyMapList, serviceBag) :: any):Pipe({
+		Rx.switchMap(function(activeInputModeType): any
 			if activeInputModeType then
 				return inputKeyMapList:ObserveInputKeyMapForInputMode(activeInputModeType)
 			else
 				return Rx.of(nil)
 			end
 		end),
-	})
+	}) :: any
 end
 
 --[=[
@@ -67,20 +73,23 @@ end
 	@param serviceBag ServiceBag
 	@return Observable<{ InputType }?>
 ]=]
-function InputKeyMapListUtils.observeActiveInputTypesList(inputKeyMapList, serviceBag: ServiceBag.ServiceBag)
+function InputKeyMapListUtils.observeActiveInputTypesList(
+	inputKeyMapList: InputKeyMapList.InputKeyMapList,
+	serviceBag: ServiceBag.ServiceBag
+): Observable.Observable<{ InputTypeUtils.InputType }?>
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
-	return InputKeyMapListUtils.observeActiveInputKeyMap(inputKeyMapList, serviceBag):Pipe({
-		Rx.switchMap(function(activeInputMap)
+	return (InputKeyMapListUtils.observeActiveInputKeyMap(inputKeyMapList, serviceBag) :: any):Pipe({
+		Rx.switchMap(function(activeInputMap): any
 			if activeInputMap then
 				return activeInputMap:ObserveInputTypesList()
 			else
 				return Rx.of(nil)
 			end
-		end),
-		Rx.distinct(),
-	})
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
 end
 
 --[=[
@@ -90,11 +99,14 @@ end
 	@param serviceBag ServiceBag
 	@return Observable<InputModeType?>
 ]=]
-function InputKeyMapListUtils.observeActiveInputModeType(inputKeyMapList, serviceBag: ServiceBag.ServiceBag)
+function InputKeyMapListUtils.observeActiveInputModeType(
+	inputKeyMapList: InputKeyMapList.InputKeyMapList,
+	serviceBag: ServiceBag.ServiceBag
+): Observable.Observable<InputModeType.InputModeType?>
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
-	return Observable.new(function(sub)
+	return Observable.new((function(sub: any)
 		local maid = Maid.new()
 
 		local selector = maid:Add(InputKeyMapListUtils.getNewInputModeTypeSelector(inputKeyMapList, serviceBag))
@@ -105,7 +117,7 @@ function InputKeyMapListUtils.observeActiveInputModeType(inputKeyMapList, servic
 		sub:Fire(selector.Value)
 
 		return maid
-	end)
+	end) :: any) :: any
 end
 
 return InputKeyMapListUtils
