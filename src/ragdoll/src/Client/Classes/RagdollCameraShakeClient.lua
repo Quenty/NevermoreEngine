@@ -144,7 +144,7 @@ function RagdollCameraShakeClient._setupCameraShake(self: RagdollCameraShakeClie
 	return topMaid
 end
 
-function RagdollCameraShakeClient._setupHapticFeedback(self: RagdollCameraShakeClient): Maid.Maid
+function RagdollCameraShakeClient._setupHapticFeedback(_self: RagdollCameraShakeClient): Maid.Maid
 	local maid = Maid.new()
 
 	local lastInputType = UserInputService:GetLastInputType()

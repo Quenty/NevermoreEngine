@@ -144,7 +144,7 @@ end
 --[=[
 	Starts the provider. Empty.
 ]=]
-function SettingDefinitionProvider.Start(self: SettingDefinitionProvider): ()
+function SettingDefinitionProvider.Start(_self: SettingDefinitionProvider): ()
 	-- Empty, to prevent us from erroring on service bag init
 end
 

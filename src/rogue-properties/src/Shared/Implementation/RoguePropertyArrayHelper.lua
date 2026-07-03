@@ -192,7 +192,7 @@ function RoguePropertyArrayHelper.SetArrayData(self: RoguePropertyArrayHelper, a
 end
 
 function RoguePropertyArrayHelper._removeUnspecified(
-	self: RoguePropertyArrayHelper,
+	_self: RoguePropertyArrayHelper,
 	container: Instance,
 	definitions: any
 ): ()

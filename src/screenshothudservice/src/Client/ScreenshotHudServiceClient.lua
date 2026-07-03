@@ -72,7 +72,7 @@ function ScreenshotHudServiceClient.PushModel(
 end
 
 function ScreenshotHudServiceClient._bindModelToHUD(
-	self: ScreenshotHudServiceClient,
+	_self: ScreenshotHudServiceClient,
 	maid: Maid.Maid,
 	model: ScreenshotHudModel.ScreenshotHudModel,
 	screenshotHUD: any
@@ -153,7 +153,7 @@ function ScreenshotHudServiceClient._bindModelToHUD(
 end
 
 function ScreenshotHudServiceClient._observeScreenshotHudBrio(
-	self: ScreenshotHudServiceClient
+	_self: ScreenshotHudServiceClient
 ): Observable.Observable<Brio.Brio<Instance>>
 	return RxInstanceUtils.observeLastNamedChildBrio(GuiService, "ScreenshotHud", "ScreenshotHud") :: any
 end

@@ -64,11 +64,11 @@ end
 --[=[
 	Starts the binder provider. Should be called via ServiceBag.
 ]=]
-function BinderGroupProvider.Start(self: BinderGroupProvider): ()
+function BinderGroupProvider.Start(_self: BinderGroupProvider): ()
 	-- Do nothing
 end
 
-(BinderGroupProvider :: any).__index = function(self, index)
+(BinderGroupProvider :: any).__index = function(_self, index)
 	if BinderGroupProvider[index] then
 		return BinderGroupProvider[index]
 	end
@@ -103,7 +103,7 @@ function BinderGroupProvider.Add(self: BinderGroupProvider, groupName: string, b
 	(self :: any)[groupName] = binderGroup
 end
 
-function BinderGroupProvider.Destroy(self: BinderGroupProvider): ()
+function BinderGroupProvider.Destroy(_self: BinderGroupProvider): ()
 	-- Do nothing
 end
 

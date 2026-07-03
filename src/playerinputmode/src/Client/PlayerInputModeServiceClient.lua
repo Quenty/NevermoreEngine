@@ -85,7 +85,7 @@ end
 	@return Observable<PlayerInputModeType>
 ]=]
 function PlayerInputModeServiceClient.ObservePlayerInputType(
-	self: PlayerInputModeServiceClient,
+	_self: PlayerInputModeServiceClient,
 	player: Player
 ): Observable.Observable<
 	PlayerInputModeUtils.PlayerInputModeType?
@@ -102,7 +102,7 @@ end
 	@return PlayerInputModeType
 ]=]
 function PlayerInputModeServiceClient.GetPlayerInputModeType(
-	self: PlayerInputModeServiceClient,
+	_self: PlayerInputModeServiceClient,
 	player: Player
 ): PlayerInputModeUtils.PlayerInputModeType?
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")

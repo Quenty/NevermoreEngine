@@ -44,7 +44,7 @@ function GameConfigServiceClient.Init(self: GameConfigServiceClient, serviceBag:
 	(dataService :: any):SetConfigPicker(self._configPicker)
 end
 
-function GameConfigServiceClient.Start(self: GameConfigServiceClient): () end
+function GameConfigServiceClient.Start(_self: GameConfigServiceClient): () end
 
 --[=[
 	Retrieves the game configuration picker for the config service.

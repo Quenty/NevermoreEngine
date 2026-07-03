@@ -108,7 +108,7 @@ function SoftShutdownServiceClient.Init(self: SoftShutdownServiceClient, service
 	end))
 end
 
-function SoftShutdownServiceClient._queryIsArrivingAfterShutdown(self: SoftShutdownServiceClient): boolean
+function SoftShutdownServiceClient._queryIsArrivingAfterShutdown(_self: SoftShutdownServiceClient): boolean
 	local data = TeleportService:GetLocalPlayerTeleportData()
 	if type(data) == "table" and data.isSoftShutdownArrivingIntoUpdatedServer then
 		return true
@@ -117,7 +117,7 @@ function SoftShutdownServiceClient._queryIsArrivingAfterShutdown(self: SoftShutd
 	end
 end
 
-function SoftShutdownServiceClient._queryLocalTeleportInfo(self: SoftShutdownServiceClient): boolean
+function SoftShutdownServiceClient._queryLocalTeleportInfo(_self: SoftShutdownServiceClient): boolean
 	local data = TeleportService:GetLocalPlayerTeleportData()
 	if type(data) == "table" and data.isSoftShutdownReserveServer then
 		return true
@@ -177,7 +177,7 @@ function SoftShutdownServiceClient._showSoftShutdownUI(
 end
 
 function SoftShutdownServiceClient._hideCoreGuiUI(
-	self: SoftShutdownServiceClient,
+	_self: SoftShutdownServiceClient,
 	maid: Maid.Maid,
 	ignoreScreenGui: ScreenGui
 ): ()

@@ -51,7 +51,7 @@ end
 	@return PlayerInputModeType
 ]=]
 function PlayerInputModeService.GetPlayerInputModeType(
-	self: PlayerInputModeService,
+	_self: PlayerInputModeService,
 	player: Player
 ): PlayerInputModeUtils.PlayerInputModeType?
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
@@ -67,7 +67,7 @@ end
 	@return Promise<PlayerInputModeType>
 ]=]
 function PlayerInputModeService.PromisePlayerInputMode(
-	self: PlayerInputModeService,
+	_self: PlayerInputModeService,
 	player: Player,
 	cancelToken: any?
 ): Promise.Promise<PlayerInputModeUtils.PlayerInputModeType?>
@@ -83,7 +83,7 @@ end
 	@return Observable<PlayerInputModeType>
 ]=]
 function PlayerInputModeService.ObservePlayerInputType(
-	self: PlayerInputModeService,
+	_self: PlayerInputModeService,
 	player: Player
 ): Observable.Observable<PlayerInputModeUtils.PlayerInputModeType?>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
@@ -105,7 +105,7 @@ function PlayerInputModeService._handleServerEvent(
 end
 
 function PlayerInputModeService._setPlayerInputModeType(
-	self: PlayerInputModeService,
+	_self: PlayerInputModeService,
 	player: Player,
 	inputModeType: any
 ): ()

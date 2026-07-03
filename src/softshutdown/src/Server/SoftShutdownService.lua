@@ -73,7 +73,7 @@ function SoftShutdownService.Init(self: SoftShutdownService, serviceBag: Service
 	end)
 end
 
-function SoftShutdownService._isReservedServer(self: SoftShutdownService): boolean
+function SoftShutdownService._isReservedServer(_self: SoftShutdownService): boolean
 	return game.PrivateServerId ~= "" and game.PrivateServerOwnerId == 0
 end
 
@@ -156,7 +156,7 @@ function SoftShutdownService._promiseTeleportPlayersToLobby(self: SoftShutdownSe
 		end)
 end
 
-function SoftShutdownService._containsPending(self: SoftShutdownService, promises: { any }): boolean
+function SoftShutdownService._containsPending(_self: SoftShutdownService, promises: { any }): boolean
 	for _, item in promises do
 		if item:IsPending() then
 			return true

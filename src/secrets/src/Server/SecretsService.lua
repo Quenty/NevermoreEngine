@@ -243,7 +243,7 @@ function SecretsService._warnAboutNoPublicKeyStoredInSourceCode(self: SecretsSer
 	end
 end
 
-function SecretsService._getInstructions(self: SecretsService): string
+function SecretsService._getInstructions(_self: SecretsService): string
 	local instructions =
 		"[SecretsService.StoreSecret] - Security - Current private key seed is GameId, which is guessable."
 	instructions = instructions .. "\n\tTIP: This is only applicable if we're storing API keys for use in here."

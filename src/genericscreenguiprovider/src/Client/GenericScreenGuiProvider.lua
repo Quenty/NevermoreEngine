@@ -78,7 +78,7 @@ function GenericScreenGuiProvider.Init(self: GenericScreenGuiProvider, serviceBa
 	end
 end
 
-function GenericScreenGuiProvider.Start(self: GenericScreenGuiProvider): () end
+function GenericScreenGuiProvider.Start(_self: GenericScreenGuiProvider): () end
 
 (GenericScreenGuiProvider :: any).__index = function(self, index)
 	if GenericScreenGuiProvider[index] then

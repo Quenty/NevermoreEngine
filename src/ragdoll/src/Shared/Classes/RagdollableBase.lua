@@ -56,7 +56,7 @@ function RagdollableBase.Unragdoll(self: RagdollableBase): ()
 	(self._obj :: Instance):RemoveTag("Ragdoll")
 end
 
-function RagdollableBase.ObserveIsRagdolled(self: RagdollableBase): Observable.Observable<boolean>
+function RagdollableBase.ObserveIsRagdolled(_self: RagdollableBase): Observable.Observable<boolean>
 	return error("Not implemented")
 end
 

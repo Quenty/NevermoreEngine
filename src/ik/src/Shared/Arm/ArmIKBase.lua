@@ -19,10 +19,10 @@ local Motor6DSmoothTransformer = require("Motor6DSmoothTransformer")
 local Motor6DStackInterface = require("Motor6DStackInterface")
 local QFrame = require("QFrame")
 local R15Utils = require("R15Utils")
-local Rx = require("Rx")
-local RxBrioUtils = require("RxBrioUtils")
-local RxInstanceUtils = require("RxInstanceUtils")
-local RxR15Utils = require("RxR15Utils")
+local Rx: any = require("Rx")
+local RxBrioUtils: any = require("RxBrioUtils")
+local RxInstanceUtils: any = require("RxInstanceUtils")
+local RxR15Utils: any = require("RxR15Utils")
 local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
 local ValueObject = require("ValueObject")
@@ -150,9 +150,6 @@ function ArmIKBase._ensureAnimator(
 	motorName: string,
 	getTranform: () -> CFrame?
 ): Maid.Maid
-	local RxR15Utils = RxR15Utils :: any
-	local RxBrioUtils = RxBrioUtils :: any
-
 	local topMaid = Maid.new()
 
 	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, partName, motorName)
@@ -187,9 +184,6 @@ function ArmIKBase._ensureAnimator(
 end
 
 function ArmIKBase._observeCharacterBrio(self: ArmIKBase): any
-	local RxInstanceUtils = RxInstanceUtils :: any
-	local Rx = Rx :: any
-
 	if self._characterObservable then
 		return self._characterObservable
 	end
@@ -204,10 +198,6 @@ function ArmIKBase._observeCharacterBrio(self: ArmIKBase): any
 end
 
 function ArmIKBase._observeStateBrio(self: ArmIKBase): any
-	local RxInstanceUtils = RxInstanceUtils :: any
-	local RxBrioUtils = RxBrioUtils :: any
-	local Rx = Rx :: any
-
 	return (self:_observeCharacterBrio() :: any):Pipe({
 		RxBrioUtils.switchMapBrio(function(character)
 			local observeUpperTorsoBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", "UpperTorso")
@@ -406,7 +396,7 @@ end
 
 -- Sets transform
 if RunService:IsRunning() and not USE_MOTOR_6D_RAW then
-	function ArmIKBase.UpdateTransformOnly(self: ArmIKBase): ()
+	function ArmIKBase.UpdateTransformOnly(_self: ArmIKBase): ()
 		-- no work!
 	end
 else

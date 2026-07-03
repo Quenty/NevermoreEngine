@@ -41,11 +41,11 @@ function RogueModifierBase.new(obj: Instance, serviceBag: ServiceBag.ServiceBag)
 	return self
 end
 
-function RogueModifierBase.GetModifiedVersion(self: RogueModifierBase, _value: any): any
+function RogueModifierBase.GetModifiedVersion(_self: RogueModifierBase, _value: any): any
 	error("Not implemented")
 end
 
-function RogueModifierBase.ObserveModifiedVersion(self: RogueModifierBase, _value: any): any
+function RogueModifierBase.ObserveModifiedVersion(_self: RogueModifierBase, _value: any): any
 	error("Not implemented")
 end
 

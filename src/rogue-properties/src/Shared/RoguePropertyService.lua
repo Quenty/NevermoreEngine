@@ -40,7 +40,7 @@ function RoguePropertyService.Init(self: RoguePropertyService, serviceBag: Servi
 	self._serviceBag:GetService(require("RogueSetter"))
 end
 
-function RoguePropertyService.CanInitializeProperties(self: RoguePropertyService): boolean
+function RoguePropertyService.CanInitializeProperties(_self: RoguePropertyService): boolean
 	return RunService:IsServer()
 end
 
