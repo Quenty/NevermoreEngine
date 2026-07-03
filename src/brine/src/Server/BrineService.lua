@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class BrineService
 ]=]
@@ -9,8 +10,15 @@ local ServiceBag = require("ServiceBag")
 local BrineService = {}
 BrineService.ServiceName = "BrineService"
 
-function BrineService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type BrineService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+	},
+	{} :: typeof({ __index = BrineService })
+))
+
+function BrineService.Init(self: BrineService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 end
 

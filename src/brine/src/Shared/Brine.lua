@@ -1,5 +1,5 @@
---!optimize 2
 --!strict
+--!optimize 2
 --[=[
     Fast and efficient extensible serialiation and deserialization library for Roblox with native instance support out of the box
 
