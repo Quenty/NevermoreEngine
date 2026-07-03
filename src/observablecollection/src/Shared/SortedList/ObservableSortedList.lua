@@ -1,5 +1,4 @@
---!nonstrict
---strict
+--!strict
 --[=[
 	A list that can be observed for blend and other components and maintains sorting order.
 
@@ -97,7 +96,7 @@ function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunct
 	@prop ItemAdded Signal<T, number, Symbol>
 	@within ObservableSortedList
 ]=]
-	self.ItemAdded = self._maid:Add(Signal.new())
+	self.ItemAdded = self._maid:Add(Signal.new()) :: any
 
 	--[=[
 	Fires when an item is removed.
@@ -106,7 +105,7 @@ function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunct
 	@prop ItemRemoved Signal<T, Symbol>
 	@within ObservableSortedList
 ]=]
-	self.ItemRemoved = self._maid:Add(Signal.new())
+	self.ItemRemoved = self._maid:Add(Signal.new()) :: any
 
 	--[=[
 	Fires when the order could have changed
@@ -160,7 +159,7 @@ function ObservableSortedList.__iter<T>(self: ObservableSortedList<T>): SortFunc
 	if self._root then
 		return self._root:IterateData()
 	else
-		return SortFunctionUtils.emptyIterator
+		return SortFunctionUtils.emptyIterator :: any
 	end
 end
 
@@ -189,7 +188,7 @@ function ObservableSortedList._iterateNodes<T>(
 	if self._root then
 		return self._root:IterateNodes()
 	else
-		return SortFunctionUtils.emptyIterator
+		return SortFunctionUtils.emptyIterator :: any
 	end
 end
 
@@ -201,7 +200,7 @@ function ObservableSortedList._iterateNodesRange<T>(
 	if self._root then
 		return self._root:IterateNodesRange(start, finish)
 	else
-		return SortFunctionUtils.emptyIterator
+		return SortFunctionUtils.emptyIterator :: any
 	end
 end
 
@@ -358,7 +357,7 @@ function ObservableSortedList.ObserveAtIndex<T>(
 		if node then
 			sub:Fire(node.data, node)
 		else
-			sub:Fire(nil, nil)
+			sub:Fire(nil :: any, nil :: any)
 		end
 	end) :: any
 end
@@ -503,7 +502,7 @@ function ObservableSortedList._assignSortValue<T>(
 	end
 
 	if self._compare ~= nil then
-		value = SortedNodeValue.new(value, self._compare) :: any
+		value = SortedNodeValue.new(value, self._compare :: any) :: any
 	end
 
 	-- our value changing didn't change anything
@@ -583,9 +582,10 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 
 	-- TODO: Prevent Rx.of(itemAdded) stuff in our UI
 	for node in nodesAdded do
+		local anyNode = node :: any
 		-- TODO: Prevent query slow here...?
-		local index = node:GetIndex()
-		self.ItemAdded:Fire(node.data, index, node)
+		local index = anyNode:GetIndex()
+		self.ItemAdded:Fire(anyNode.data, index, anyNode)
 	end
 
 	if not self.Destroy then
@@ -593,7 +593,8 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	end
 
 	for node in nodesRemoved do
-		self.ItemRemoved:Fire(node.data, node)
+		local anyNode = node :: any
+		self.ItemRemoved:Fire(anyNode.data, anyNode)
 	end
 
 	if not self.Destroy then
