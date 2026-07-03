@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SecretsServiceClient
 ]=]
@@ -16,8 +16,19 @@ local ServiceBag = require("ServiceBag")
 local SecretsServiceClient = {}
 SecretsServiceClient.ServiceName = "SecretsServiceClient"
 
-function SecretsServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type SecretsServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_cmdrService: any,
+		_permissionsService: any,
+		_remoteFunctionPromise: Promise.Promise<any>?,
+	},
+	{} :: typeof({ __index = SecretsServiceClient })
+))
+
+function SecretsServiceClient.Init(self: SecretsServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -26,46 +37,49 @@ function SecretsServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	self._permissionsService = self._serviceBag:GetService(require("PermissionServiceClient"))
 end
 
-function SecretsServiceClient:Start()
+function SecretsServiceClient.Start(self: SecretsServiceClient): ()
 	self:_registerCmdrTypes()
 end
 
-function SecretsServiceClient:PromiseSecretKeyNamesList(): Promise.Promise<{ string }>
-	return self:_promiseRemoteFunction()
-		:Then(function(remoteFunction)
-			return self._maid:GivePromise(
-				RemoteFunctionUtils.promiseInvokeServer(
-					remoteFunction,
-					SecretsServiceConstants.REQUEST_SECRET_KEY_NAMES_LIST
+function SecretsServiceClient.PromiseSecretKeyNamesList(self: SecretsServiceClient): Promise.Promise<{ string }>
+	return (
+		self:_promiseRemoteFunction()
+			:Then(function(remoteFunction)
+				return self._maid:GivePromise(
+					RemoteFunctionUtils.promiseInvokeServer(
+						remoteFunction,
+						SecretsServiceConstants.REQUEST_SECRET_KEY_NAMES_LIST
+					)
 				)
-			)
-		end)
-		:Then(function(ok, list)
-			if not ok then
-				return Promise.rejected(list or "Failed to get list")
-			else
-				return Promise.resolved(list)
-			end
-		end)
+			end)
+			:Then(function(ok, list)
+				if not ok then
+					return Promise.rejected(list or "Failed to get list")
+				else
+					return Promise.resolved(list)
+				end
+			end) :: any
+	) :: Promise.Promise<{ string }>
 end
 
-function SecretsServiceClient:_registerCmdrTypes()
+function SecretsServiceClient._registerCmdrTypes(self: SecretsServiceClient): ()
 	self._maid:GivePromise(self._cmdrService:PromiseCmdr()):Then(function(cmdr)
 		SecretsCmdrTypeUtils.registerSecretKeyTypes(cmdr, self)
 	end)
 end
 
-function SecretsServiceClient:_promiseRemoteFunction()
+function SecretsServiceClient._promiseRemoteFunction(self: SecretsServiceClient): Promise.Promise<any>
 	if self._remoteFunctionPromise then
 		return self._remoteFunctionPromise
 	end
 
-	self._remoteFunctionPromise =
+	local remoteFunctionPromise =
 		self._maid:GivePromise(PromiseGetRemoteFunction(SecretsServiceConstants.REMOTE_FUNCTION_NAME))
-	return self._remoteFunctionPromise
+	self._remoteFunctionPromise = remoteFunctionPromise
+	return remoteFunctionPromise
 end
 
-function SecretsServiceClient:Destroy()
+function SecretsServiceClient.Destroy(self: SecretsServiceClient): ()
 	self._maid:DoCleaning()
 end
 
