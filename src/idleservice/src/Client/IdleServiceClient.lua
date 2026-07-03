@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Helps track whether or not a player is idle and if so, then can show UI or other cute things.
 
@@ -12,6 +12,7 @@ local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
 
 local Maid = require("Maid")
+local Observable = require("Observable")
 local RagdollClient = require("RagdollClient")
 local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
@@ -21,6 +22,21 @@ local ValueObject = require("ValueObject")
 local IdleServiceClient = {}
 IdleServiceClient.ServiceName = "IdleServiceClient"
 
+export type IdleServiceClient = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_serviceBag: ServiceBag.ServiceBag,
+		_ragdollBinder: any,
+		_humanoidTracker: any,
+		_disableStack: StateStack.StateStack<boolean>,
+		_enabled: ValueObject.ValueObject<boolean>,
+		_showIdleUI: ValueObject.ValueObject<boolean>,
+		_humanoidIdle: ValueObject.ValueObject<boolean>,
+		_lastPosition: ValueObject.ValueObject<Vector3?>,
+	},
+	{} :: typeof({ __index = IdleServiceClient })
+))
+
 local STANDING_TIME_REQUIRED = 0.5
 local MOVE_DISTANCE_REQUIRED = 2.5
 
@@ -28,8 +44,8 @@ local MOVE_DISTANCE_REQUIRED = 2.5
 	Initializes the idle service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function IdleServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._maid, "Already initialized")
+function IdleServiceClient.Init(self: IdleServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._maid, "Already initialized")
 
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -51,7 +67,7 @@ end
 --[=[
 	Starts idle service on the client. Should be done via [ServiceBag].
 ]=]
-function IdleServiceClient:Start()
+function IdleServiceClient.Start(self: IdleServiceClient): ()
 	self._maid:GiveTask(self._humanoidIdle.Changed:Connect(function()
 		self:_updateShowIdleUI()
 	end))
@@ -59,7 +75,7 @@ function IdleServiceClient:Start()
 		self:_updateShowIdleUI()
 	end))
 
-	self._humanoidTracker = self._serviceBag:GetService(require("HumanoidTrackerService")):GetHumanoidTracker()
+	self._humanoidTracker = (self._serviceBag:GetService(require("HumanoidTrackerService")) :: any):GetHumanoidTracker()
 	if self._humanoidTracker then
 		self._maid:GiveTask(self._humanoidTracker.AliveHumanoid.Changed:Connect(function(...)
 			self:_handleAliveHumanoidChanged(...)
@@ -82,26 +98,30 @@ end
 
 	@return Observable
 ]=]
-function IdleServiceClient:ObserveHumanoidMoveFromCurrentPosition(minimumTimeVisible: number)
+function IdleServiceClient.ObserveHumanoidMoveFromCurrentPosition(
+	self: IdleServiceClient,
+	minimumTimeVisible: number
+): Observable.Observable<Vector3?>
 	assert(type(minimumTimeVisible) == "number", "Bad minimumTimeVisible")
 
-	return Rx.of(true):Pipe({
-		Rx.delay(minimumTimeVisible),
-		Rx.flatMap(function()
+	local rx = Rx :: any
+	return rx.of(true):Pipe({
+		rx.delay(minimumTimeVisible),
+		rx.flatMap(function()
 			return self._lastPosition:Observe()
 		end),
-		Rx.where(function(value)
+		rx.where(function(value)
 			return value ~= nil
 		end),
-		Rx.first(),
-		Rx.flatMap(function(initialPosition)
+		rx.first(),
+		rx.flatMap(function(initialPosition: any)
 			return self._lastPosition:Observe():Pipe({
-				Rx.where(function(position)
+				rx.where(function(position)
 					return position == nil or (initialPosition - position).magnitude >= MOVE_DISTANCE_REQUIRED
 				end),
 			})
 		end),
-		Rx.first(),
+		rx.first(),
 	})
 end
 
@@ -109,7 +129,7 @@ end
 	Returns whether the humanoid is idle.
 	@return boolean
 ]=]
-function IdleServiceClient:IsHumanoidIdle(): boolean
+function IdleServiceClient.IsHumanoidIdle(self: IdleServiceClient): boolean
 	return self._humanoidIdle.Value
 end
 
@@ -117,7 +137,7 @@ end
 	Returns whether the humanoid is idle.
 	@return boolean
 ]=]
-function IdleServiceClient:IsMoving(): boolean
+function IdleServiceClient.IsMoving(self: IdleServiceClient): boolean
 	return not self._humanoidIdle.Value
 end
 
@@ -125,7 +145,7 @@ end
 	Observes if the humanoid is idle.
 	@return Observable<boolean>
 ]=]
-function IdleServiceClient:ObserveHumanoidIdle()
+function IdleServiceClient.ObserveHumanoidIdle(self: IdleServiceClient): Observable.Observable<boolean>
 	return self._humanoidIdle:Observe()
 end
 
@@ -133,7 +153,7 @@ end
 	Returns whether UI should be shown (if the humanoid is idle)
 	@return boolean
 ]=]
-function IdleServiceClient:DoShowIdleUI()
+function IdleServiceClient.DoShowIdleUI(self: IdleServiceClient): boolean
 	return self._showIdleUI.Value
 end
 
@@ -141,7 +161,7 @@ end
 	Observes whether to show the idle UI
 	@return Observable<boolean>
 ]=]
-function IdleServiceClient:ObserveShowIdleUI()
+function IdleServiceClient.ObserveShowIdleUI(self: IdleServiceClient): Observable.Observable<boolean>
 	return self._showIdleUI:Observe()
 end
 
@@ -149,7 +169,7 @@ end
 	Returns a show idle bool value.
 	@return BoolValue
 ]=]
-function IdleServiceClient:GetShowIdleUIBoolValue()
+function IdleServiceClient.GetShowIdleUIBoolValue(self: IdleServiceClient): ValueObject.ValueObject<boolean>
 	assert(self._showIdleUI, "Not initialized")
 
 	return self._showIdleUI
@@ -159,7 +179,7 @@ end
 	Pushes a disabling function that disables idle UI
 	@return boolean
 ]=]
-function IdleServiceClient:PushDisable()
+function IdleServiceClient.PushDisable(self: IdleServiceClient): () -> ()
 	if not RunService:IsRunning() then
 		return function() end
 	end
@@ -168,16 +188,16 @@ function IdleServiceClient:PushDisable()
 	return self._disableStack:PushState(true)
 end
 
-function IdleServiceClient:_setEnabled(enabled: boolean)
+function IdleServiceClient._setEnabled(self: IdleServiceClient, enabled: boolean): ()
 	assert(type(enabled) == "boolean", "Bad enabled")
 	self._enabled.Value = enabled
 end
 
-function IdleServiceClient:_updateShowIdleUI()
+function IdleServiceClient._updateShowIdleUI(self: IdleServiceClient): ()
 	self._showIdleUI.Value = self._humanoidIdle.Value and self._enabled.Value and not VRService.VREnabled
 end
 
-function IdleServiceClient:_handleAliveHumanoidChanged()
+function IdleServiceClient._handleAliveHumanoidChanged(self: IdleServiceClient): ()
 	local humanoid = self._humanoidTracker.AliveHumanoid.Value
 	if not humanoid then
 		self._maid._humanoidMaid = nil
@@ -226,7 +246,7 @@ function IdleServiceClient:_handleAliveHumanoidChanged()
 	self._maid._humanoidMaid = maid
 end
 
-function IdleServiceClient:Destroy()
+function IdleServiceClient.Destroy(self: IdleServiceClient): ()
 	self._maid:DoCleaning()
 end
 
