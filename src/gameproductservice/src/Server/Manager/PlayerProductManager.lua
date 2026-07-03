@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 --[=[
 	Handles product prompting state on the server
 
@@ -65,7 +65,7 @@ function PlayerProductManager.new(player: Player, serviceBag: ServiceBag.Service
 	-- Initialize attributes
 
 	-- Implement
-	local impl = selfAny._maid:Add((PlayerProductManagerInterface :: any).Server:Implement(selfAny._obj, selfAny))
+	local impl = self._maid:Add(PlayerProductManagerInterface.Server:Implement(self._obj, self))
 	selfAny:ExportMarketTrackers(impl:GetImplParent())
 
 	return self
