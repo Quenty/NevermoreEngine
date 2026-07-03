@@ -1,14 +1,14 @@
---!nonstrict
+--!strict
 --[=[
 	@class PlayerInputModeTypes
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Table = require("Table")
+local SimpleEnum = require("SimpleEnum")
 
-return Table.readonly({
-	GAMEPAD = "gamepad",
-	TOUCH = "touch",
-	KEYBOARD = "keyboard",
+return SimpleEnum.new({
+	GAMEPAD = "gamepad" :: "gamepad",
+	TOUCH = "touch" :: "touch",
+	KEYBOARD = "keyboard" :: "keyboard",
 })

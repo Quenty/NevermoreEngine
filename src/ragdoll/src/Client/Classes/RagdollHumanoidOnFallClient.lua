@@ -1,6 +1,6 @@
 --!nonstrict
 --[=[
-	Ragdolls the humanoid on death. Should be bound via [RagdollBindersClient].
+	Ragdolls the humanoid on fall. Should be bound via [RagdollBindersClient].
 
 	@client
 	@class RagdollHumanoidOnFallClient
@@ -30,7 +30,7 @@ require("PromiseRemoteEventMixin"):Add(RagdollHumanoidOnFallClient, RagdollHuman
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnFallClient
 ]=]
-function RagdollHumanoidOnFallClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function RagdollHumanoidOnFallClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFallClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

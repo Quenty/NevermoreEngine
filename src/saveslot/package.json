@@ -1,0 +1,54 @@
+{
+  "name": "@quenty/saveslot",
+  "version": "1.2.1",
+  "description": "PlayerDataStoreService wrapper for save slots",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "saveslot"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/saveslot/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/adorneedata": "workspace:*",
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
+    "@quenty/brio": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
+    "@quenty/datastore": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/playerbinder": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/propertyvalue": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/table": "workspace:*",
+    "@quenty/tie": "workspace:*",
+    "@quenty/valueobject": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

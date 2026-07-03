@@ -67,7 +67,7 @@ end
 	@param finish Vector3
 	@param color Color3? -- Optional
 	@param parent Instance? -- Optional
-	@param diameter numbe? -- Optional
+	@param diameter number? -- Optional
 	@return Instance
 ]=]
 function Draw.line(start: Vector3, finish: Vector3, color: Color3Like?, parent: Instance?, diameter: number?): BasePart
@@ -87,7 +87,7 @@ end
 
 	@param origin Vector3
 	@param direction Vector3
-	@param color Color3 -- Optional
+	@param color Color3? -- Optional
 	@param parent Instance? -- Optional
 	@param diameter number? -- Optional
 	@return Instance
@@ -140,7 +140,7 @@ end
 	@param origin Vector3
 	@param radius number
 	@param direction Vector3
-	@param color Color3?:
+	@param color Color3?
 	@param parent Instance?
 ]=]
 function Draw.spherecast(
@@ -174,8 +174,8 @@ end
 	@param cframe CFrame
 	@param size Vector3
 	@param direction Vector3
-	@param color Color3
-	@param parent Parent
+	@param color Color3?
+	@param parent Instance?
 ]=]
 function Draw.blockcast(
 	cframe: CFrameLike,
@@ -318,7 +318,7 @@ end
 
 	@param origin Vector3
 	@param direction Vector3
-	@param color Color3 -- Optional
+	@param color Color3? -- Optional
 	@param parent Instance? -- Optional
 	@param diameter number? -- Optional
 	@return Instance
@@ -454,7 +454,7 @@ end
 	Draw.text(Vector3.new(0, 10, 0), "Point")
 	```
 
-	@param adornee Instance | Vector3 -- Adornee to rener on
+	@param adornee Instance | Vector3 -- Adornee to render on
 	@param text string -- Text to render
 	@param color Color3? -- Optional color to render
 	@return Instance
@@ -563,7 +563,7 @@ end
 	@param parent Instance? -- Optional parent
 	@return BasePart
 ]=]
-function Draw.sphere(position: Vector3Like, radius: number, color: Color3?, parent: Instance)
+function Draw.sphere(position: Vector3Like, radius: number, color: Color3?, parent: Instance?): BasePart
 	return Draw.point(position, color, parent, radius * 2)
 end
 
@@ -872,7 +872,7 @@ end
 --[=[
 	Draws a screen point
 ]=]
-function Draw.screenPoint(position: Vector2, parent: Instance, color: Color3Like?, diameter: number?): Frame
+function Draw.screenPoint(position: Vector2, parent: Instance?, color: Color3Like?, diameter: number?): Frame
 	local pointColor = Draw._toColor3(color) or Color3.new(0.658824, 0.501961, 0.501961)
 	local pointDiameter = diameter or 3
 

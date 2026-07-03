@@ -60,6 +60,7 @@ local Maid = require("Maid")
 local PendingPromiseTracker = require("PendingPromiseTracker")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
+local ServiceBag = require("ServiceBag")
 
 local PlayerDataStoreManager = setmetatable({}, BaseObject)
 PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"
@@ -73,9 +74,11 @@ export type PlayerDataStoreManager =
 	typeof(setmetatable(
 		{} :: {
 			_robloxDataStore: any,
+			_serviceBag: ServiceBag.ServiceBag,
 			_keyGenerator: KeyGenerator,
 			_datastores: { [PlayerUserId]: DataStore.DataStore },
 			_removing: { [PlayerUserId]: boolean },
+			_removingPromises: { [PlayerUserId]: Promise.Promise<any> },
 			_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
 			_removingCallbacks: { RemovingCallback },
 			_disableSavingInStudio: boolean?,
@@ -93,6 +96,7 @@ export type PlayerDataStoreManager =
 	@return PlayerDataStoreManager
 ]=]
 function PlayerDataStoreManager.new(
+	serviceBag: ServiceBag.ServiceBag,
 	robloxDataStore: DataStore,
 	keyGenerator: KeyGenerator,
 	skipBindingToClose: boolean?
@@ -101,13 +105,15 @@ function PlayerDataStoreManager.new(
 
 	assert(type(skipBindingToClose) == "boolean" or skipBindingToClose == nil, "Bad skipBindingToClose")
 
-	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
-	self._keyGenerator = keyGenerator or error("No keyGenerator")
+	self._robloxDataStore = assert(robloxDataStore, "No robloxDataStore")
+	self._keyGenerator = assert(keyGenerator, "No keyGenerator")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid._savingConns = Maid.new()
 
 	self._datastores = {} -- [userId] = datastore
 	self._removing = {} -- [player] = true
+	self._removingPromises = {} -- [player] = removal promise
 	self._pendingSaves = PendingPromiseTracker.new()
 	self._removingCallbacks = {} -- [func, ...]
 
@@ -116,7 +122,7 @@ function PlayerDataStoreManager.new(
 			return
 		end
 
-		self:_removePlayerDataStore(player)
+		self:_removePlayerDataStore(player.UserId)
 	end))
 
 	if skipBindingToClose ~= true then
@@ -190,6 +196,67 @@ function PlayerDataStoreManager.GetDataStore(
 	return self:_createDataStore(userId)
 end
 
+--[=[
+	Gets the datastore for a player, waiting for any in-progress removal/save first.
+	Use this in async flows to safely support fast leave/rejoin behavior.
+
+	@return Promise<DataStore>
+]=]
+function PlayerDataStoreManager.PromiseDataStore(
+	self: PlayerDataStoreManager,
+	playerOrUserId: Player | PlayerUserId
+): Promise.Promise<DataStore.DataStore>
+	local userId = self:_toPlayerUserIdOrError(playerOrUserId)
+
+	return self:_promiseDataStoreByUserId(userId)
+end
+
+function PlayerDataStoreManager._promiseDataStoreByUserId(
+	self: PlayerDataStoreManager,
+	userId: PlayerUserId
+): Promise.Promise<DataStore.DataStore>
+	local dataStore = self:GetDataStore(userId)
+	if dataStore then
+		return Promise.resolved(dataStore)
+	end
+
+	return self:_promiseWaitForRemoving(userId):Then(function()
+		return self:_promiseDataStoreByUserId(userId)
+	end)
+end
+
+function PlayerDataStoreManager._promiseWaitForRemoving(
+	self: PlayerDataStoreManager,
+	userId: PlayerUserId
+): Promise.Promise<()>
+	local removingPromise = self._removingPromises[userId]
+	if removingPromise then
+		return removingPromise:Then(function()
+			return nil
+		end)
+	end
+
+	if self._removing[userId] then
+		return Promise.defer(function(resolve, reject)
+			local elapsed = 0
+			while self._removing[userId] do
+				elapsed += task.wait()
+
+				if elapsed >= 15 then
+					warn(
+						`[PlayerDataStoreManager] - Last session cleanup for {userId} taking longer than 15 seconds. Rejecting.`
+					)
+					reject()
+					break
+				end
+			end
+			resolve()
+		end)
+	end
+
+	return Promise.resolved()
+end
+
 function PlayerDataStoreManager:_toPlayerUserIdOrError(playerOrUserId: Player | PlayerUserId): PlayerUserId
 	if typeof(playerOrUserId) == "Instance" and playerOrUserId:IsA("Player") then
 		return playerOrUserId.UserId
@@ -220,9 +287,10 @@ function PlayerDataStoreManager._createDataStore(
 
 	local maid = Maid.new()
 
-	-- TODO: Destroy DataStore after cleanup
+	-- DataStore is cleaned up very carefully in _removePlayerDataStore
 	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(userId))
 	datastore:SetSessionLockingEnabled(true)
+	datastore:SetSessionMessagingEnabled(true, self._serviceBag)
 	datastore:SetUserIdList({ userId })
 
 	maid:GivePromise(datastore:PromiseSessionLockingFailed()):Then(function()
@@ -260,9 +328,13 @@ function PlayerDataStoreManager._createDataStore(
 	return datastore
 end
 
-function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreManager, userId: PlayerUserId)
+function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreManager, userId: PlayerUserId): ()
 	local datastore = self._datastores[userId]
 	if not datastore then
+		return
+	end
+
+	if self._removing[userId] then
 		return
 	end
 
@@ -277,7 +349,7 @@ function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreMana
 		end
 	end
 
-	PromiseUtils.all(removingPromises)
+	local removalPromise = PromiseUtils.all(removingPromises)
 		:Then(function()
 			return datastore:SaveAndCloseSession()
 		end)
@@ -285,6 +357,13 @@ function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreMana
 			datastore:Destroy()
 			self._removing[userId] = nil
 		end)
+
+	self._removingPromises[userId] = removalPromise
+	removalPromise:Finally(function()
+		if self._removingPromises[userId] == removalPromise then
+			self._removingPromises[userId] = nil
+		end
+	end)
 
 	-- Prevent double removal or additional issues
 	self._datastores[userId] = nil

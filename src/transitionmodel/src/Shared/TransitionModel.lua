@@ -13,6 +13,7 @@ local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local TransitionModel = setmetatable({}, BasicPane)
@@ -28,6 +29,9 @@ export type TransitionModel =
 			_isHidingComplete: ValueObject.ValueObject<boolean>,
 			_hideCallback: ShowHideCallback?,
 			_showCallback: ShowHideCallback?,
+
+			HidingComplete: Signal.Signal<()>,
+			ShowingComplete: Signal.Signal<()>,
 		},
 		{} :: typeof({ __index = TransitionModel })
 	))
@@ -46,6 +50,9 @@ function TransitionModel.new(): TransitionModel
 
 	self._isShowingComplete = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._isHidingComplete = self._maid:Add(ValueObject.new(true, "boolean"))
+
+	self.HidingComplete = self._maid:Add(Signal.new())
+	self.ShowingComplete = self._maid:Add(Signal.new())
 
 	self._showCallback = nil
 	self._hideCallback = nil
@@ -74,7 +81,7 @@ end
 --[=[
 	Shows the model and promises when the showing is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function TransitionModel.PromiseShow(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
@@ -88,7 +95,7 @@ end
 --[=[
 	Hides the model and promises when the showing is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function TransitionModel.PromiseHide(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
@@ -102,7 +109,7 @@ end
 --[=[
 	Toggles the model and promises when the transition is complete.
 
-	@param doNotAnimate boolean
+	@param doNotAnimate boolean?
 	@return Promise
 ]=]
 function TransitionModel.PromiseToggle(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
@@ -281,6 +288,7 @@ function TransitionModel._executeShow(self: TransitionModel, doNotAnimate: boole
 
 	promise:Then(function()
 		self._isShowingComplete.Value = true
+		self.ShowingComplete:Fire()
 	end)
 
 	if self.Destroy then
@@ -319,6 +327,7 @@ function TransitionModel._executeHide(self: TransitionModel, doNotAnimate: boole
 
 	promise:Then(function()
 		self._isHidingComplete.Value = true
+		self.HidingComplete:Fire()
 	end)
 
 	if self.Destroy then

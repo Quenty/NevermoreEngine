@@ -113,13 +113,13 @@ function HumanoidTeleportUtils.teleportParts(
 
 	local relCFrame = {}
 	for _, part in parts do
-		relCFrame[part] = rootPartCFrame:toObjectSpace(part.CFrame)
+		relCFrame[part] = rootPartCFrame:ToObjectSpace(part.CFrame)
 	end
 
 	relCFrame[rootPart] = nil
 
 	for part, relative in relCFrame do
-		part.CFrame = newRootPartCFrame:toWorldSpace(relative)
+		part.CFrame = newRootPartCFrame:ToWorldSpace(relative)
 	end
 
 	rootPart.CFrame = newRootPartCFrame

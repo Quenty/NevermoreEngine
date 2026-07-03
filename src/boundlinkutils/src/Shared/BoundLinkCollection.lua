@@ -55,7 +55,7 @@ function BoundLinkCollection:HasClass(class)
 	return self._classes[class] ~= nil
 end
 
-function BoundLinkCollection:TrackParent(parent)
+function BoundLinkCollection:TrackParent(parent: Instance)
 	assert(parent, "Bad parent")
 
 	self._maid:GiveTask(parent.ChildAdded:Connect(function(child)

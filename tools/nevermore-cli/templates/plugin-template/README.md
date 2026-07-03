@@ -15,6 +15,7 @@ This plugin uses the following tools
 - [node](https://nodejs.org/en/download/) - Execution runner + manager
 - [pnpm](https://pnpm.io/) - Package manager
 - [Nevermore](https://github.com/Quenty/NevermoreEngine) - Packages
+- [Nevermore CLI](https://github.com/Quenty/NevermoreEngine/tree/main/tools/nevermore-cli) - Testing, deployment, and CI utilities
 
 # Building {{pluginNameProper}}
 
@@ -55,6 +56,16 @@ npm run format
 ```
 
 Note that you should also configure your editor to automatically format files using Stylua.
+
+# CI/CD
+
+This project includes GitHub Actions workflows in `.github/workflows/`:
+
+- **Linting** (`linting.yml`) — Runs automatically on PRs and push to main. Posts inline annotations on PRs for luau-lsp, stylua, selene, and moonwave issues.
+- **Tests** (`tests.yml`) — Runs on PRs when configured. Set up with `nevermore deploy init` to create a `deploy.nevermore.json`, then add `ROBLOX_OPEN_CLOUD_API_KEY` as a repository secret.
+- **Deploy** (`deploy.yml`) — Runs on push to main when configured. Same setup as tests: `nevermore deploy init` + `ROBLOX_OPEN_CLOUD_API_KEY` secret.
+
+Tests and deploy workflows are inactive until configured — they skip cleanly with a notice annotation explaining the setup steps.
 
 # Getting Luau-lsp to work in VSCode
 

@@ -41,7 +41,7 @@ function ReplicationTypeUtils.getFolderReplicationType(
 end
 
 function ReplicationTypeUtils.inferReplicationType(): ReplicationType.ReplicationType
-	if (not RunService:IsRunning()) and RunService:IsStudio() then
+	if (not RunService:IsRunning()) and (RunService:IsStudio() or ReplicationTypeUtils.isOpenCloud()) then
 		return ReplicationType.PLUGIN
 	elseif RunService:IsServer() then
 		return ReplicationType.SERVER
@@ -50,6 +50,20 @@ function ReplicationTypeUtils.inferReplicationType(): ReplicationType.Replicatio
 	else
 		error("Unknown ReplicationType state")
 	end
+end
+
+local isOpenCloudCached: boolean? = nil
+function ReplicationTypeUtils.isOpenCloud(): boolean
+	if isOpenCloudCached ~= nil then
+		return isOpenCloudCached
+	end
+
+	local success, _ = pcall(function()
+		return game:GetService("OpenCloudService")
+	end)
+
+	isOpenCloudCached = success
+	return success
 end
 
 function ReplicationTypeUtils.isAllowed(

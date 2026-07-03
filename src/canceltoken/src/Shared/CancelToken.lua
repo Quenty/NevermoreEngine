@@ -17,7 +17,7 @@ local CancelToken = {}
 CancelToken.ClassName = "CancelToken"
 CancelToken.__index = CancelToken
 
-export type Executor = (cancel: () -> (), maid: any) -> ()
+export type Executor = (cancel: () -> (), maid: Maid.Maid) -> ()
 
 export type CancelToken = typeof(setmetatable(
 	{} :: {
@@ -71,10 +71,7 @@ function CancelToken.isCancelToken(value: any): boolean
 end
 
 --[=[
-	Constructs a new CancelToken that cancels whenever the maid does.
-
-	@param maid Maid
-	@return CancelToken
+	Constructs a new CancelToken that cancels whenever the maid does
 ]=]
 function CancelToken.fromMaid(maid: Maid.Maid): CancelToken
 	local token = CancelToken.new(EMPTY_FUNCTION)
@@ -92,9 +89,6 @@ end
 
 --[=[
 	Cancels after the set amount of seconds
-
-	@param seconds number
-	@return CancelToken
 ]=]
 function CancelToken.fromSeconds(seconds: number): CancelToken
 	assert(type(seconds) == "number", "Bad seconds")
@@ -115,7 +109,6 @@ end
 
 --[=[
 	Returns true if cancelled
-	@return boolean
 ]=]
 function CancelToken.IsCancelled(self: CancelToken): boolean
 	return self.PromiseCancelled:IsFulfilled()

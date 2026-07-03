@@ -38,7 +38,7 @@ npm install -g @quenty/nevermore-cli
 This will install the current version of Maid and all dependencies into the `node_modules` folder. To upgrade you will want to run `npm upgrade` You should ignore the `node_modules` folder in your source control system.
 
 ### What is NPM and why are we using it?
-[npm](https://www.npmjs.com/) is a package manager. Nevermore uses npm to manage package versions and install transient dependencies. A transient dependency is a dependency of a dependency (for example, [Blend](/api/Blend) depends upon [Maid](/api/Maid).
+[npm](https://www.npmjs.com/) is a package manager. Nevermore uses npm to manage package versions and install transitive dependencies. A transitive dependency is a dependency of a dependency (for example, [Blend](/api/Blend) depends upon [Maid](/api/Maid)).
 
 ### How do I install additional packages?
 The default installation comes with very few packages. This is normal. You can see which packages are installed by looking at the `package.json` file in a text editor. To install additional packages, simply run the following command in a terminal:
@@ -135,7 +135,7 @@ local require = require(loader).bootstrapGame(loader.Parent)
 Assuming you've changed nothing, the path to the replicated modules should be the same as the one used on the server, just indexed under ReplicatedStorage instead.
 
 ## Manually installing via NPM for a stand-alone module.
-If you want to use Nevermore for more stand-alone or reusable scenarios (where you can't assume that a packages folder will be reused, you can manually bootstrap the components using the loader system.
+If you want to use Nevermore for more stand-alone or reusable scenarios (where you can't assume that a packages folder will be reused), you can manually bootstrap the components using the loader system.
 
 Ensure that you have [Node.js](https://nodejs.org/en/download/) v14+ installed on your computer.
 

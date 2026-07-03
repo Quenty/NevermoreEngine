@@ -7,18 +7,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Table = require("Table")
+local SimpleEnum = require("SimpleEnum")
 
 export type TieRealm = "shared" | "client" | "server"
 
-export type TieRealms = {
-	SHARED: TieRealm,
-	CLIENT: TieRealm,
-	SERVER: TieRealm,
-}
-
-return Table.readonly({
-	SHARED = "shared",
-	CLIENT = "client",
-	SERVER = "server",
-} :: TieRealms)
+return SimpleEnum.new({
+	SHARED = "shared" :: "shared",
+	CLIENT = "client" :: "client",
+	SERVER = "server" :: "server",
+})

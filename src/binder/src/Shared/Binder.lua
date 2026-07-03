@@ -249,7 +249,7 @@ end
 	@param instance Instance
 	@return Observable<T?>
 ]=]
-function Binder:Observe(instance: Instance)
+function Binder.Observe<T>(self: Binder<T>, instance: Instance): Observable.Observable<T?>
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return Observable.new(function(sub)

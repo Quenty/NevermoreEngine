@@ -31,6 +31,7 @@ local Signal = require("Signal")
 local SortFunctionUtils = require("SortFunctionUtils")
 local SortedNode = require("SortedNode")
 local SortedNodeValue = require("SortedNodeValue")
+local UnifiedChangedSpanTracker = require("UnifiedChangedSpanTracker")
 local ValueObject = require("ValueObject")
 
 local ObservableSortedList = {}
@@ -45,9 +46,11 @@ export type ObservableSortedList<T> = typeof(setmetatable(
 		_root: SortedNode.SortedNode<T>?,
 		_nodesAdded: { [SortedNode.SortedNode<T>]: boolean },
 		_nodesRemoved: { [SortedNode.SortedNode<T>]: boolean },
-		_lowestIndexChanged: number?,
-		_compare: CompareFunction<T>,
+		_compare: CompareFunction<T>?,
 		_countValue: ValueObject.ValueObject<number>,
+
+		_unifiedTracker: UnifiedChangedSpanTracker.UnifiedChangedSpanTracker,
+
 		_indexObservers: any,
 		_nodeIndexObservables: any,
 		_mainObservables: any,
@@ -68,18 +71,20 @@ export type ObservableSortedList<T> = typeof(setmetatable(
 function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunction<T>?): ObservableSortedList<T>
 	assert(type(isReversed) == "boolean" or isReversed == nil, "Bad isReversed")
 
-	local self = setmetatable({} :: any, ObservableSortedList)
+	local self: ObservableSortedList<T> = setmetatable({} :: any, ObservableSortedList)
 
 	self._maid = Maid.new()
 
+	-- Obesrvables
 	self._indexObservers = self._maid:Add(ObservableSubscriptionTable.new())
 	self._nodeIndexObservables = self._maid:Add(ObservableSubscriptionTable.new())
-
 	self._mainObservables = self._maid:Add(ObservableSubscriptionTable.new())
+
+	-- Trackers
+	self._unifiedTracker = UnifiedChangedSpanTracker.new()
 
 	self._nodesAdded = {}
 	self._nodesRemoved = {}
-	self._lowestIndexChanged = nil
 
 	self._compare = if isReversed then SortFunctionUtils.reverse(compare) else compare
 
@@ -119,7 +124,7 @@ function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunct
 	@prop CountChanged Signal<number>
 	@within ObservableSortedList
 ]=]
-	self.CountChanged = self._countValue.Changed
+	self.CountChanged = self._countValue.Changed :: any
 
 	return self
 end
@@ -346,6 +351,7 @@ function ObservableSortedList.ObserveAtIndex<T>(
 	indexToObserve: number
 ): Observable.Observable<T, SortedNode.SortedNode<T>>
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
+	assert(indexToObserve ~= 0, "Index cannot be zero")
 
 	return self._indexObservers:Observe(indexToObserve, function(sub)
 		local node = self:_findNodeAtIndex(indexToObserve)
@@ -483,7 +489,9 @@ function ObservableSortedList._assignSortValue<T>(
 				self._nodesRemoved[node] = true
 			end
 
-			self:_applyLowestIndexChanged(node:GetIndex())
+			-- Everything after this node's index changed, but we'll only log the changed internal range
+			local removeIndex = node:GetIndex()
+			self._unifiedTracker:LogRemove(removeIndex)
 			self:_removeNode(node)
 			node.value = nil
 			self:_queueFireEvents()
@@ -505,30 +513,31 @@ function ObservableSortedList._assignSortValue<T>(
 	end
 
 	self._nodesRemoved[node] = nil
+	local originalIndex: number?
 
 	if self._root and self._root:ContainsNode(node) then
-		self:_applyLowestIndexChanged(node:GetIndex())
+		local index = node:GetIndex()
+		originalIndex = index
 		self:_removeNode(node)
 	else
+		originalIndex = nil
 		self._nodesAdded[node] = true
 	end
 
 	node.value = value
 
 	self:_insertNode(node)
-	self:_applyLowestIndexChanged(node:GetIndex())
+	assert(self._root, "Root should exist after insert")
+
+	local newIndex = node:GetIndex()
+
+	if originalIndex then
+		self._unifiedTracker:LogMove(originalIndex, newIndex)
+	else
+		self._unifiedTracker:LogAdd(newIndex)
+	end
+
 	self:_queueFireEvents()
-end
-
-function ObservableSortedList._applyLowestIndexChanged<T>(self: ObservableSortedList<T>, index: number)
-	if self._lowestIndexChanged == nil then
-		self._lowestIndexChanged = index
-		return
-	end
-
-	if index < self._lowestIndexChanged then
-		self._lowestIndexChanged = index
-	end
 end
 
 function ObservableSortedList._queueFireEvents<T>(self: ObservableSortedList<T>)
@@ -542,11 +551,19 @@ function ObservableSortedList._queueFireEvents<T>(self: ObservableSortedList<T>)
 	end)
 end
 
-function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
-	-- print(self._root)
+-- For tests to avoid task.defer re-entrance limit
+function ObservableSortedList._testForceFireEvents<T>(self: ObservableSortedList<T>)
+	if not self._maid._fireEvents then
+		return
+	end
 
-	local lowestIndexChanged = self._lowestIndexChanged
-	self._lowestIndexChanged = nil
+	self._maid._fireEvents = nil
+	self:_fireEvents()
+end
+
+function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
+	-- TODO: Handle dirty state changing in the middle of event firing here
+	-- print(self._root)
 
 	local nodesAdded = self._nodesAdded
 	self._nodesAdded = {}
@@ -554,11 +571,11 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 	local nodesRemoved = self._nodesRemoved
 	self._nodesRemoved = {}
 
-	local lastCount = self._countValue.Value
-	local newCount = if self._root then self._root.descendantCount else 0
+	local previousCount = self._countValue.Value or 0
+	local descendantCount = if self._root then self._root.descendantCount else 0
 
 	-- Fire count changed first
-	self._countValue.Value = newCount
+	self._countValue.Value = descendantCount
 
 	if not self.Destroy then
 		return
@@ -589,24 +606,42 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 		return
 	end
 
-	do
-		local descendantCount = self._root and self._root.descendantCount or 0
-		for index, node in self:_iterateNodesRange(lowestIndexChanged) do
-			-- TODO: Handle when there are no nodes to iterate, we still need to fire negative indexes
-			-- TODO: Handle negative observations to avoid refiring upon insertion
-			-- TODO: Handle our state changing while we're firing
-			-- TODO: Avoid looping over nodes if we don't need to (track observations in node itself?)
-			local negative = ListIndexUtils.toNegativeIndex(descendantCount, index)
-			self._nodeIndexObservables:Fire(node, index)
-			self._indexObservers:Fire(index, node.data, node)
-			self._indexObservers:Fire(negative, node.data, node)
+	local effectiveSpans = self._unifiedTracker:ComputeEffectiveSpans(previousCount, descendantCount)
+
+	-- We assume there's not that many index observers at once (since you're usually looking for the ordinal first/last)
+	for rawIndex, _ in self._indexObservers:GetRawSubscriptionMap() do
+		local index = ListIndexUtils.toPositiveIndex(descendantCount, rawIndex)
+		local shouldFire = UnifiedChangedSpanTracker.isIndexInSpan(effectiveSpans, index)
+
+		-- For negative indices, also fire if the position mapping changed due to count change
+		if not shouldFire and rawIndex < 0 and previousCount ~= descendantCount then
+			local oldIndex = ListIndexUtils.toPositiveIndex(previousCount, rawIndex)
+			shouldFire = oldIndex ~= index
 		end
 
-		for index = newCount + 1, lastCount do
-			self._indexObservers:Fire(index, nil, nil)
+		if not shouldFire then
+			continue
 		end
 
-		-- TODO: Fire negatives beyond range
+		local node = self:_findNodeAtIndex(index) -- O(log n)
+		if node then
+			self._indexObservers:Fire(rawIndex, node.data, node)
+		else
+			self._indexObservers:Fire(rawIndex, nil, nil)
+		end
+	end
+
+	if not self.Destroy then
+		return
+	end
+
+	-- We assume there could be a lot of node index observers at once (used for layout order)
+	if self._nodeIndexObservables:HasAnySubscriptions() then
+		for _, span in effectiveSpans do
+			for index, node in self:_iterateNodesRange(span.startIndex, span.endIndex) do
+				self._nodeIndexObservables:Fire(node, index)
+			end
+		end
 	end
 
 	if not self.Destroy then

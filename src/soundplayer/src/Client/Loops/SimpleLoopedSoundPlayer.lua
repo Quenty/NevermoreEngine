@@ -47,12 +47,6 @@ function SimpleLoopedSoundPlayer.new(soundId: SoundUtils.SoundId): SimpleLoopedS
 		self.Sound.Volume = state.visible * self._maxVolume * state.multiplier
 	end))
 
-	self._maid:GiveTask(self.VisibleChanged:Connect(function(isVisible)
-		if isVisible then
-			self.Sound:Play()
-		end
-	end))
-
 	return self
 end
 

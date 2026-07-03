@@ -49,6 +49,13 @@ end
 --[=[
 	Same as searching a span, but uses a list of nodes
 
+	```
+		if t lands within the domain of two spans of time
+		t = 5
+		[3   5][5   7]
+		          ^ picks this one
+	```
+
 	@param list { TNode }
 	@param index string
 	@param t number

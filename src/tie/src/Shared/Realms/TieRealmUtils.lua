@@ -1,6 +1,6 @@
 --!strict
 --[=[
-	Utility methods to oeprate around [TieRealms]
+	Utility methods to operate around [TieRealms]
 
 	@class TieRealmUtils
 ]=]

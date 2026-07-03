@@ -1,6 +1,6 @@
 --!nonstrict
 --[=[
-	Warps the WaitForChild API with a promise
+	Wraps the WaitForChild API with a promise
 	@class promiseChild
 ]=]
 
@@ -35,7 +35,7 @@ return function(parent: Instance, name: string, timeOut: number?): Promise.Promi
 		if child then
 			resolve(child)
 		else
-			reject("Timed out")
+			reject(`Timed out while waiting for {parent.Name}.{name}`)
 		end
 	end)
 end

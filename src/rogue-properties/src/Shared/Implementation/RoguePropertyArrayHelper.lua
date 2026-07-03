@@ -202,7 +202,7 @@ function RoguePropertyArrayHelper:GetArrayValues()
 end
 
 function RoguePropertyArrayHelper:ObserveArrayValues()
-	warn("[RoguePropertyArrayHelper] - Observing arrays is only partially supported")
+	--warn("[RoguePropertyArrayHelper] - Observing arrays is only partially supported")
 
 	-- TODO: Allow for observing
 	local observables = {}

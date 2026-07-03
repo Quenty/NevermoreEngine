@@ -1,6 +1,6 @@
 {
   "name": "@quenty/messagingserviceutils",
-  "version": "7.13.0",
+  "version": "7.22.1",
   "description": "Utility functions for messaging srevice",
   "keywords": [
     "Roblox",
@@ -30,7 +30,11 @@
   ],
   "dependencies": {
     "@quenty/loader": "workspace:*",
-    "@quenty/promise": "workspace:*"
+    "@quenty/maid": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/statestack": "workspace:*"
   },
   "devDependencies": {
     "@quenty/loader": "workspace:*"

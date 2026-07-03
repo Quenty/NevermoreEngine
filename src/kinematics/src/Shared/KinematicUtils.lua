@@ -1,11 +1,11 @@
---!nonstrict
+--!strict
 --[=[
 	@class KinematicUtils
 ]=]
 
 local KinematicUtils = {}
 
-function KinematicUtils.positionVelocity(now, t0, p0, v0, a0)
+function KinematicUtils.positionVelocity(now: number, t0: number, p0: number, v0: number, a0: number): (number, number)
 	local dt = now - t0
 
 	-- stylua: ignore

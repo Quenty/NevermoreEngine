@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameconfig",
-  "version": "12.37.0",
+  "version": "12.49.2",
   "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
   "keywords": [
     "Roblox",
@@ -13,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/maid/"
+    "directory": "src/gameconfig/"
   },
   "funding": {
     "type": "patreon",
@@ -38,10 +38,12 @@
     "@quenty/canceltoken": "workspace:*",
     "@quenty/clienttranslator": "workspace:*",
     "@quenty/cmdrservice": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/marketplaceutils": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/playerutils": "workspace:*",
     "@quenty/preferredparentutils": "workspace:*",

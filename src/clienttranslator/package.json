@@ -1,6 +1,6 @@
 {
   "name": "@quenty/clienttranslator",
-  "version": "14.27.0",
+  "version": "14.37.1",
   "description": "Gets local translator for player",
   "keywords": [
     "Roblox",
@@ -29,9 +29,11 @@
   ],
   "dependencies": {
     "@quenty/blend": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
     "@quenty/pseudolocalize": "workspace:*",
@@ -39,7 +41,8 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

@@ -38,7 +38,7 @@ function ConvexHull2DUtils.convexHull(points: { Vector2 }): { Vector2 }
 end
 
 --[=[
-	Retrns whether these 3 points are in a clockwise turn
+	Returns whether these 3 points are in a clockwise turn
 ]=]
 function ConvexHull2DUtils.isClockWiseTurn(p1: Vector2, p2: Vector2, p3: Vector2): boolean
 	return (p3.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (p3.X - p1.X)
@@ -47,7 +47,7 @@ end
 --[=[
 	Computes line intersection between vectors
 ]=]
-function ConvexHull2DUtils.lineIntersect(a: Vector2, b: Vector2, c: Vector2, d: Vector2): Vector2 | nil
+function ConvexHull2DUtils.lineIntersect(a: Vector2, b: Vector2, c: Vector2, d: Vector2): Vector2?
 	local r = b - a
 	local s = d - c
 	local dot = r.X * s.Y - r.Y * s.X
@@ -59,11 +59,7 @@ end
 --[=[
 	Raycasts from `from` to `to` against the convex hull.
 ]=]
-function ConvexHull2DUtils.raycast(
-	from: Vector2,
-	to: Vector2,
-	hull: { Vector2 }
-): (Vector2 | nil, Vector2 | nil, Vector2 | nil)
+function ConvexHull2DUtils.raycast(from: Vector2, to: Vector2, hull: { Vector2 }): (Vector2?, Vector2?, Vector2?)
 	local candidates = {}
 	local n = #hull
 

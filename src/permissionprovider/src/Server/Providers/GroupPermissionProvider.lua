@@ -14,7 +14,6 @@ local RunService = game:GetService("RunService")
 local BasePermissionProvider = require("BasePermissionProvider")
 local GroupUtils = require("GroupUtils")
 local PermissionLevel = require("PermissionLevel")
-local PermissionLevelUtils = require("PermissionLevelUtils")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
@@ -100,7 +99,7 @@ function GroupPermissionProvider.PromiseIsPermissionLevel(
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+	assert(PermissionLevel:IsValue(permissionLevel))
 
 	if permissionLevel == PermissionLevel.ADMIN then
 		return self:_promiseIsAdmin(player)

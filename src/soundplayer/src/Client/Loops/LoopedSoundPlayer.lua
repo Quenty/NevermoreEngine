@@ -22,10 +22,17 @@ local SoundPromiseUtils = require("SoundPromiseUtils")
 local SoundUtils = require("SoundUtils")
 local SpringTransitionModel = require("SpringTransitionModel")
 local ValueObject = require("ValueObject")
+local t = require("t")
 
 local LoopedSoundPlayer = setmetatable({}, SpringTransitionModel)
 LoopedSoundPlayer.ClassName = "LoopedSoundPlayer"
 LoopedSoundPlayer.__index = LoopedSoundPlayer
+
+type TimePositionData = {
+	SoundId: SoundUtils.SoundId,
+	TimePosition: number,
+	Timestamp: number,
+}
 
 export type LoopedSoundPlayer =
 	typeof(setmetatable(
@@ -38,10 +45,12 @@ export type LoopedSoundPlayer =
 			_crossFadeTime: ValueObject.ValueObject<number>,
 			_volumeMultiplier: ValueObject.ValueObject<number>,
 			_doSyncSoundPlayback: ValueObject.ValueObject<boolean>,
+			_restoreTimePosition: ValueObject.ValueObject<boolean>,
 			_currentActiveSound: ValueObject.ValueObject<Sound?>,
 			_currentSoundId: ValueObject.ValueObject<SoundUtils.SoundId?>,
 			_defaultScheduleOptions: SoundLoopScheduleUtils.SoundLoopSchedule,
 			_currentLoopSchedule: ValueObject.ValueObject<SoundLoopScheduleUtils.SoundLoopSchedule>,
+			_lastTimePositionData: TimePositionData?,
 		},
 		{} :: typeof({ __index = LoopedSoundPlayer })
 	))
@@ -57,14 +66,16 @@ function LoopedSoundPlayer.new(soundId: SoundUtils.SoundId?, soundParent: Instan
 
 	self:SetSpeed(10)
 
-	self._bpm = self._maid:Add(ValueObject.new(nil))
-	self._soundParent = self._maid:Add(ValueObject.new(nil))
-	self._soundGroup = self._maid:Add(ValueObject.new(nil))
+	self._bpm = self._maid:Add(ValueObject.new(nil, t.optional(t.number :: any)))
+	self._soundParent = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance :: any)))
+	self._soundGroup = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance :: any)))
 	self._crossFadeTime = self._maid:Add(ValueObject.new(0.5, "number"))
 	self._volumeMultiplier = self._maid:Add(ValueObject.new(1, "number"))
 	self._doSyncSoundPlayback = self._maid:Add(ValueObject.new(false, "boolean"))
-	self._currentActiveSound = self._maid:Add(ValueObject.new(nil))
+	self._restoreTimePosition = self._maid:Add(ValueObject.new(true, "boolean"))
+	self._currentActiveSound = self._maid:Add(ValueObject.new(nil, t.optional(t.Instance :: any)))
 	self._currentSoundId = self._maid:Add(ValueObject.new(soundId))
+	self._lastTimePositionData = nil
 
 	self._defaultScheduleOptions = SoundLoopScheduleUtils.default()
 	self._currentLoopSchedule = self._maid:Add(ValueObject.new(self._defaultScheduleOptions))
@@ -114,25 +125,23 @@ end
 --[=[
 	Sets the BPM for syncing sound playback.
 ]=]
-function LoopedSoundPlayer.SetBPM(self: LoopedSoundPlayer, bpm: number?): ()
-	assert(type(bpm) == "number" or bpm == nil, "Bad bpm")
-
-	self._bpm.Value = bpm
+function LoopedSoundPlayer.SetBPM(self: LoopedSoundPlayer, bpm: ValueObject.Mountable<number?>): () -> ()
+	return self._bpm:Mount(bpm)
 end
 
 --[=[
 	Sets the parent instance for the sound.
 ]=]
-function LoopedSoundPlayer.SetSoundParent(self: LoopedSoundPlayer, parent: Instance?): ()
-	self._soundParent.Value = parent
+function LoopedSoundPlayer.SetSoundParent(self: LoopedSoundPlayer, parent: ValueObject.Mountable<Instance?>): () -> ()
+	return self._soundParent:Mount(parent)
 end
 
 function LoopedSoundPlayer.Swap(
 	self: LoopedSoundPlayer,
-	soundId: SoundUtils.SoundId,
+	soundId: SoundUtils.SoundId?,
 	loopSchedule: SoundLoopScheduleUtils.SoundLoopSchedule?
 ): ()
-	assert(SoundUtils.isConvertableToRbxAsset(soundId) or soundId == nil, "Bad soundId")
+	assert(soundId == nil or SoundUtils.isConvertableToRbxAsset(soundId), "Bad soundId")
 	loopSchedule = self:_convertToLoopedSchedule(loopSchedule)
 	assert(loopSchedule ~= nil, "Bad loopSchedule")
 
@@ -153,6 +162,10 @@ function LoopedSoundPlayer.SetDoSyncSoundPlayback(self: LoopedSoundPlayer, doSyn
 	self._doSyncSoundPlayback.Value = doSyncSoundPlayback
 end
 
+function LoopedSoundPlayer.SetDoRestoreTimePosition(self: LoopedSoundPlayer, doRestoreTimePosition: boolean): ()
+	self._restoreTimePosition.Value = doRestoreTimePosition
+end
+
 function LoopedSoundPlayer._setupRender(self: LoopedSoundPlayer): ()
 	self._maid:GiveTask(self._currentSoundId
 		:ObserveBrio(function(value)
@@ -170,6 +183,18 @@ function LoopedSoundPlayer._setupRender(self: LoopedSoundPlayer): ()
 		end))
 end
 
+function LoopedSoundPlayer._captureTimePositionData(
+	self: LoopedSoundPlayer,
+	soundId: SoundUtils.SoundId,
+	timePosition: number
+): ()
+	self._lastTimePositionData = {
+		SoundId = soundId,
+		TimePosition = timePosition,
+		Timestamp = os.clock(),
+	}
+end
+
 function LoopedSoundPlayer._renderSoundPlayer(self: LoopedSoundPlayer, soundId: SoundUtils.SoundId): Maid.Maid
 	local maid = Maid.new()
 
@@ -177,6 +202,7 @@ function LoopedSoundPlayer._renderSoundPlayer(self: LoopedSoundPlayer, soundId: 
 	local soundPlayer: SimpleLoopedSoundPlayer.SimpleLoopedSoundPlayer =
 		renderMaid:Add(SimpleLoopedSoundPlayer.new(soundId))
 	soundPlayer:SetTransitionTime(self._crossFadeTime)
+	soundPlayer.Sound:Play()
 
 	renderMaid:GiveTask(self._soundGroup:Observe():Subscribe(function(soundGroup)
 		soundPlayer:SetSoundGroup(soundGroup)
@@ -185,10 +211,21 @@ function LoopedSoundPlayer._renderSoundPlayer(self: LoopedSoundPlayer, soundId: 
 	renderMaid:GiveTask(Rx.combineLatest({
 		bpm = self._bpm:Observe(),
 		isLoaded = Rx.fromPromise(SoundPromiseUtils.promiseLoaded(soundPlayer.Sound)),
+		restoreTimePosition = self._restoreTimePosition:Observe(),
 		doSyncSoundPlayback = self._doSyncSoundPlayback:Observe(),
 		timeLength = RxInstanceUtils.observeProperty(soundPlayer.Sound, "TimeLength"),
 	}):Subscribe(function(state: any)
 		local syncMaid = Maid.new()
+
+		if state.restoreTimePosition then
+			local data = self._lastTimePositionData
+			if data and data.SoundId == soundId then
+				local ourFinalPosition = (data.TimePosition + (os.clock() - data.Timestamp)) % state.timeLength
+				soundPlayer.Sound.TimePosition = ourFinalPosition
+			end
+		end
+
+		self:_captureTimePositionData(soundId, soundPlayer.Sound.TimePosition)
 
 		if state.doSyncSoundPlayback then
 			if state.bpm then
@@ -468,6 +505,10 @@ function LoopedSoundPlayer.StopAfterLoop(self: LoopedSoundPlayer): ()
 	end))
 
 	self._maid._swappingTo = swapMaid
+end
+
+function LoopedSoundPlayer.GetCurrentSoundId(self: LoopedSoundPlayer): SoundUtils.SoundId?
+	return self._currentSoundId.Value
 end
 
 function LoopedSoundPlayer._observeActiveSoundFinishLoop(

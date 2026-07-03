@@ -34,6 +34,7 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/basicpane": "workspace:*",
     "@quenty/blend": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/rx": "workspace:*",

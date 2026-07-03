@@ -1,0 +1,199 @@
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import {
+  BuildContext,
+  resolvePackagePath,
+} from '@quenty/nevermore-template-helpers';
+import { OutputHelper } from '@quenty/cli-output-helpers';
+import { type DeployTarget } from '../../build/deploy-config.js';
+import { type BatchTarget } from '../../batch/changed-packages-utils.js';
+
+export interface CombinedProjectResult {
+  /** Absolute path to the combined .rbxl file. */
+  rbxlPath: string;
+  /** batchTarget.name → ServerScriptService slug mapping. */
+  slugMap: Map<string, string>;
+  /** First batch target's deploy target (provides placeId/universeId for upload). */
+  primaryTarget: DeployTarget;
+  /** Owns the temp directory — caller must clean up via buildContext.cleanupAsync(). */
+  buildContext: BuildContext;
+}
+
+interface RojoNode {
+  [key: string]: unknown;
+}
+
+import { type StepProgress } from '@quenty/cli-output-helpers/reporting';
+
+/** Progress callbacks for granular phase reporting during combined builds. */
+export interface CombinedBuildProgress {
+  onPackageBuildStart?(packageName: string): void;
+  onPackageBuildComplete?(packageName: string): void;
+  onCombineStart?(): void;
+  onStepProgress?(progress: StepProgress): void;
+}
+
+/** Per-package build info collected during phase 1. */
+interface PackageBuildInfo {
+  slug: string;
+  rbxlPath: string;
+  scriptPath: string;
+}
+
+/**
+ * Build a combined .rbxl containing all testable packages.
+ *
+ * Two-phase approach to avoid rojo's symlink deduplication:
+ *   Phase 1: Build each package's .rbxl individually via rojo
+ *   Phase 2: Use Lune to merge the individual builds into a single .rbxl
+ */
+export async function generateCombinedProjectAsync(options: {
+  batchTargets: BatchTarget[];
+  repoRoot: string;
+  batchPlaceId?: number;
+  batchUniverseId?: number;
+  progress?: CombinedBuildProgress;
+}): Promise<CombinedProjectResult> {
+  const { batchTargets, batchPlaceId, batchUniverseId, progress } = options;
+
+  if (batchTargets.length === 0) {
+    throw new Error(
+      'No batch targets provided for combined project generation'
+    );
+  }
+
+  const buildContext = await BuildContext.createAsync({
+    prefix: 'batch-project-',
+  });
+
+  const slugMap = new Map<string, string>();
+  const firstTarget = batchTargets[0]!.target;
+  const primaryTarget: DeployTarget = { ...firstTarget };
+  if (batchPlaceId) primaryTarget.placeId = batchPlaceId;
+  if (batchUniverseId) primaryTarget.universeId = batchUniverseId;
+
+  const builds: PackageBuildInfo[] = [];
+
+  // ── Phase 1: Build each batch target individually ──
+
+  let buildIndex = 0;
+  for (const buildTarget of batchTargets) {
+    const { target } = buildTarget;
+
+    // Parse the rojo project to extract the ServerScriptService slug
+    const projectPath = path.resolve(buildTarget.path, target.project);
+    const slug = await _extractSlugAsync(buildTarget.name, projectPath);
+
+    // Validate slug uniqueness
+    for (const [existingName, existingSlug] of slugMap) {
+      if (existingSlug === slug) {
+        throw new Error(
+          `Slug collision: ${buildTarget.name} and ${existingName} both use slug "${slug}"`
+        );
+      }
+    }
+    slugMap.set(buildTarget.name, slug);
+
+    // Build this target's .rbxl
+    const rbxlPath = buildContext.resolvePath(`${slug}.rbxl`);
+    OutputHelper.verbose(`Building ${buildTarget.name} (${slug})...`);
+    progress?.onPackageBuildStart?.(buildTarget.name);
+    await buildContext.rojoBuildAsync({ projectPath, output: rbxlPath });
+    buildIndex++;
+    progress?.onPackageBuildComplete?.(buildTarget.name);
+    progress?.onStepProgress?.({
+      kind: 'steps',
+      completed: buildIndex,
+      total: batchTargets.length,
+      label: buildTarget.name,
+    });
+
+    // Resolve scriptTemplate path
+    if (!target.scriptTemplate) {
+      throw new Error(
+        `No scriptTemplate for ${buildTarget.name} — required for batch testing`
+      );
+    }
+    const scriptPath = path.resolve(buildTarget.path, target.scriptTemplate);
+
+    builds.push({ slug, rbxlPath, scriptPath });
+  }
+
+  // ── Phase 2: Merge via Lune ──
+
+  const combinedRbxlPath = buildContext.resolvePath('batch-test.rbxl');
+  const luneScriptPath = resolvePackagePath(
+    import.meta.url,
+    'build-scripts',
+    'combine-test-places.luau'
+  );
+
+  // Build args: <outputPath> <slug1> <rbxl1> <script1> <slug2> <rbxl2> <script2> ...
+  const luneArgs: string[] = [combinedRbxlPath];
+  for (const build of builds) {
+    luneArgs.push(build.slug, build.rbxlPath, build.scriptPath);
+  }
+
+  OutputHelper.verbose(
+    `Merging ${builds.length} targets into combined .rbxl...`
+  );
+  progress?.onCombineStart?.();
+  progress?.onStepProgress?.({
+    kind: 'steps',
+    completed: 0,
+    total: builds.length,
+  });
+  await buildContext.executeLuneTransformScriptAsync(
+    luneScriptPath,
+    ...luneArgs
+  );
+
+  OutputHelper.verbose(
+    `Combined ${slugMap.size} targets at ${combinedRbxlPath}`
+  );
+
+  return {
+    rbxlPath: combinedRbxlPath,
+    slugMap,
+    primaryTarget,
+    buildContext,
+  };
+}
+
+/**
+ * Extract the slug from a test rojo project.
+ * The slug is the first non-`$`, non-`Script` key under ServerScriptService.
+ */
+async function _extractSlugAsync(
+  batchTargetName: string,
+  projectPath: string
+): Promise<string> {
+  let content: string;
+  try {
+    content = await fs.readFile(projectPath, 'utf-8');
+  } catch {
+    throw new Error(
+      `Cannot read test project for ${batchTargetName}: ${projectPath}`
+    );
+  }
+
+  const project = JSON.parse(content) as {
+    tree: { ServerScriptService?: RojoNode };
+  };
+  const serverScriptService = project.tree?.ServerScriptService;
+  if (!serverScriptService) {
+    throw new Error(
+      `Test project for ${batchTargetName} is missing ServerScriptService in tree`
+    );
+  }
+
+  for (const key of Object.keys(serverScriptService)) {
+    if (!key.startsWith('$') && key !== 'Script') {
+      return key;
+    }
+  }
+
+  throw new Error(
+    `Test project for ${batchTargetName} has no entry under ServerScriptService`
+  );
+}

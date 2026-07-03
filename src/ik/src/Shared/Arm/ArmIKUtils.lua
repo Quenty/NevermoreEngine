@@ -5,6 +5,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
 local Maid = require("Maid")
 local RagdollMotorData = require("RagdollMotorData")
 local RxR15Utils = require("RxR15Utils")
@@ -16,7 +17,7 @@ export type ArmName = "Left" | "Right"
 function ArmIKUtils.ensureMotorAnimated(character: Model, armName: ArmName): Maid.Maid
 	local topMaid = Maid.new()
 
-	local function disable(brio)
+	local function disable(brio: Brio.Brio<Motor6D>)
 		if brio:IsDead() then
 			return
 		end

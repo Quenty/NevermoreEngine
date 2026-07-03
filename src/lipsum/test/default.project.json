@@ -11,8 +11,14 @@
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
       "lipsum": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

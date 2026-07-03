@@ -111,6 +111,7 @@ function ObservableList.Observe<T>(self: ObservableList<T>): Observable.Observab
 			end)
 		end
 
+		queueFire()
 		maid:GiveTask(self.ItemAdded:Connect(queueFire))
 		maid:GiveTask(self.ItemRemoved:Connect(queueFire))
 

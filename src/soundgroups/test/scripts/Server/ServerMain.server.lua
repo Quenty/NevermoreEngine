@@ -4,8 +4,15 @@
 ]]
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local require = require(loader).bootstrapGame(ServerScriptService.soundgroup)
+local root = ServerScriptService.soundgroup
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
+
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
+	return
+end
 
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("SoundGroupService"))

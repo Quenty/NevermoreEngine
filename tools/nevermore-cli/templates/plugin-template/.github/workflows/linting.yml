@@ -1,5 +1,10 @@
 name: linting
-on: [pull_request, workflow_call]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_call:
 jobs:
   luau-lsp:
     runs-on: ubuntu-latest
@@ -22,13 +27,13 @@ jobs:
       - name: Setup npm for GitHub Packages
         run: |
           if [[ -n "$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" ]]; then
-            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> .npmrc
-            echo "//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> ~/.npmrc
+            echo -e "\n//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> .npmrc
+            echo -e "\n//npm.pkg.github.com/:_authToken=$NPM_GITHUB_QUENTYSTUDIOS_TOKEN" >> ~/.npmrc
           fi
 
           if [[ -n "$NPM_TOKEN" ]]; then
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+            echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
           fi
         env:
           NPM_GITHUB_QUENTYSTUDIOS_TOKEN: $\{{ secrets.NPM_GITHUB_QUENTYSTUDIOS_TOKEN }}
@@ -41,7 +46,12 @@ jobs:
         run: npm run build:sourcemap
 
       - name: luau-lsp analyze
-        run: npm run lint:luau
+        run: npm run lint:luau 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post luau-lsp annotations
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-lint-results lint-output.txt --linter=luau-lsp --yes
 
   stylua:
     runs-on: ubuntu-latest
@@ -57,7 +67,12 @@ jobs:
           cache: true
 
       - name: stylua check
-        run: npm run lint:stylua
+        run: npm run lint:stylua 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post stylua annotations
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-lint-results lint-output.txt --linter=stylua --yes
 
   selene:
     runs-on: ubuntu-latest
@@ -73,7 +88,12 @@ jobs:
           cache: true
 
       - name: Run Selene
-        run: npm run lint:selene
+        run: npm run lint:selene 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post selene annotations
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-lint-results lint-output.txt --linter=selene --yes
 
   moonwave:
     runs-on: ubuntu-latest
@@ -89,4 +109,9 @@ jobs:
           cache: true
 
       - name: Run moonwave-extractor
-        run: npm run lint:moonwave
+        run: npm run lint:moonwave 2>&1 | tee lint-output.txt
+        shell: bash -eo pipefail {0}
+
+      - name: Post moonwave annotations
+        if: always()
+        run: npx @quenty/nevermore-cli tools post-lint-results lint-output.txt --linter=moonwave --yes

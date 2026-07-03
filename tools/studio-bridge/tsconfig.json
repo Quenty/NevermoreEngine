@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "declarationDir": "./dist",
+    "composite": true,
+    "declaration": true
+  },
+  "references": [
+    { "path": "../cli-output-helpers" },
+    { "path": "../nevermore-cli-helpers" },
+    { "path": "../nevermore-template-helpers" }
+  ],
+  "include": ["src/**/*", "test/**/*"]
+}

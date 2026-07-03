@@ -1,9 +1,21 @@
 import chalk from 'chalk';
+import { AsyncLocalStorage } from 'async_hooks';
+
+export type BoxOptions = {
+  centered?: boolean;
+};
+
+export interface OutputBuffer {
+  lines: string[];
+}
+
+const _outputStorage = new AsyncLocalStorage<OutputBuffer>();
 
 /**
  * Helps with output
  */
 export class OutputHelper {
+  private static _verbose: boolean = true;
   /**
    * Formats the error with markup
    * @param message Message to format
@@ -27,7 +39,7 @@ export class OutputHelper {
    * @param message Message to format
    * @returns Formatted string
    */
-  public static formatWarn(message: string): string {
+  public static formatWarning(message: string): string {
     return chalk.yellowBright(message);
   }
 
@@ -49,27 +61,188 @@ export class OutputHelper {
     return chalk.magentaBright(message);
   }
 
+  public static formatDim(message: string): string {
+    return chalk.dim(message);
+  }
+
+  public static formatSuccess(message: string): string {
+    return chalk.greenBright(message);
+  }
+
+  private static _hasAnsi = (text: string): boolean => text.includes('\x1b[');
+
   /**
-   * Logs information to the console
-   * @param message Message to write
+   * Strip ANSI escape codes and OSC 8 hyperlink sequences from terminal
+   * output. Both are removed so visible-width calculations match what the
+   * terminal actually shows.
    */
-  public static error(message: string) {
-    console.error(this.formatError(message));
+  public static stripAnsi = (text: string): string =>
+    text
+      .replace(/\x1b\]8;[^\x07\x1b]*(?:\x07|\x1b\\)/g, '')
+      .replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+
+  /**
+   * Wrap text in an OSC 8 hyperlink so supporting terminals render it as
+   * clickable. Falls back to the plain text when stdout is not a TTY or the
+   * user opts out via NO_HYPERLINKS — so CI logs and piped output stay clean.
+   */
+  public static formatHyperlink(text: string, url: string): string {
+    if (!process.stdout.isTTY) return text;
+    if (process.env.NO_HYPERLINKS) return text;
+    return `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`;
+  }
+
+  /**
+   * Pad `text` on the right to `width` visible columns, ignoring ANSI color
+   * codes and OSC 8 hyperlink escapes when measuring.
+   */
+  public static padVisible(text: string, width: number): string {
+    const visible = OutputHelper.stripAnsi(text).length;
+    const pad = Math.max(0, width - visible);
+    return text + ' '.repeat(pad);
+  }
+
+  /**
+   * Helper method to put a box around the output
+   */
+  public static formatBox(message: string, options?: BoxOptions): string {
+    const lines = message.trim().split('\n');
+    const width = lines.reduce(
+      (a, b) => Math.max(a, OutputHelper.stripAnsi(b).length),
+      0
+    );
+
+    const centered = options?.centered ?? false;
+
+    const surround = (text: string) => {
+      const first = centered
+        ? Math.floor((width - OutputHelper.stripAnsi(text).length) / 2)
+        : 0;
+      const last = width - OutputHelper.stripAnsi(text).length - first;
+      return (
+        '║   \x1b[0m' +
+        ' '.repeat(first) +
+        text +
+        ' '.repeat(last) +
+        '\x1b[31m   ║'
+      );
+    };
+
+    const bar = '═'.repeat(width);
+    const top = '\x1b[31m╔═══' + bar + '═══╗';
+    const pad = surround('');
+    const bottom = '╚═══' + bar + '═══╝\x1b[0m';
+
+    return [top, pad, ...lines.map(surround), pad, bottom].join('\n');
   }
 
   /**
    * Logs information to the console
    * @param message Message to write
    */
-  public static info(message: string) {
-    console.log(this.formatInfo(message));
+  public static error(message: string): void {
+    console.error(this._hasAnsi(message) ? message : this.formatError(message));
+  }
+
+  /** Format an error including its `.cause` chain. Appends the stack in verbose mode. */
+  public static formatErrorChain(err: unknown): string {
+    if (!(err instanceof Error)) return String(err);
+
+    const parts = [err.message];
+    const seen = new Set<unknown>([err]);
+    let cur: unknown = (err as { cause?: unknown }).cause;
+    while (cur instanceof Error && !seen.has(cur)) {
+      seen.add(cur);
+      parts.push(`  caused by: ${cur.message}`);
+      cur = (cur as { cause?: unknown }).cause;
+    }
+
+    if (this._verbose && err.stack) {
+      parts.push('', err.stack);
+    }
+    return parts.join('\n');
+  }
+
+  /**
+   * Logs information to the console
+   * @param message Message to write
+   */
+  public static info(message: string): void {
+    console.log(this._hasAnsi(message) ? message : this.formatInfo(message));
+  }
+
+  /**
+   * Sets whether verbose messages are printed.
+   * Defaults to true. Batch runners set this to false to suppress
+   * intermediate messages during concurrent execution.
+   */
+  public static setVerbose(verbose: boolean): void {
+    this._verbose = verbose;
+  }
+
+  /**
+   * Returns the current verbose flag. Useful for handlers that need to
+   * forward the global `--verbose` setting to downstream APIs.
+   */
+  public static isVerbose(): boolean {
+    return this._verbose;
+  }
+
+  /**
+   * Logs a verbose/intermediate message. Suppressed when verbose is false.
+   * When running inside a buffered context (see runBuffered), messages are
+   * captured to the buffer instead of printed.
+   */
+  public static verbose(message: string): void {
+    if (!this._verbose) {
+      return;
+    }
+
+    const formatted = this._hasAnsi(message)
+      ? message
+      : this.formatDim(message);
+    const buffer = _outputStorage.getStore();
+    if (buffer) {
+      buffer.lines.push(formatted);
+    } else {
+      console.log(formatted);
+    }
+  }
+
+  /**
+   * Run an async function with output buffering. All OutputHelper.verbose()
+   * calls inside the function are captured and returned alongside the result.
+   * Used by batch runners to collect per-package output without interleaving.
+   */
+  public static async runBuffered<T>(
+    fn: () => Promise<T>
+  ): Promise<{ result: T; output: string[] }> {
+    const buffer: OutputBuffer = { lines: [] };
+    const result = await _outputStorage.run(buffer, fn);
+    return { result, output: buffer.lines };
   }
 
   /**
    * Logs warning to the console
    * @param message Message to write
    */
-  public static warn(message: string) {
-    console.log(this.formatWarn(message));
+  public static warn(message: string): void {
+    console.log(this._hasAnsi(message) ? message : this.formatWarning(message));
+  }
+
+  /**
+   * Logs hint to the console
+   * @param message Message to write
+   */
+  public static hint(message: string): void {
+    console.log(this._hasAnsi(message) ? message : this.formatHint(message));
+  }
+
+  /**
+   * Renders a box around the message
+   * @param message
+   */
+  public static box(message: string, options?: BoxOptions): void {
+    console.log(this.formatBox(message, options));
   }
 }

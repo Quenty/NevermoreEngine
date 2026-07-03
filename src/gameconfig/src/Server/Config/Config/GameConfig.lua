@@ -33,7 +33,7 @@ function GameConfig.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): GameC
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)
 
-	for _, assetType: any in GameConfigAssetTypes do
+	for _, assetType: any in GameConfigAssetTypes:GetValues() do
 		GameConfigUtils.getOrCreateAssetFolder(self._obj, assetType)
 	end
 

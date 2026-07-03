@@ -14,7 +14,7 @@
     "luau-lsp.ignoreGlobs": ["**/node_modules/**"],
 
     // This prevents Rojo from memory leaking
-    "luau-lsp.sourcemap.generatorCommand": "rojo sourcemap",
+    "luau-lsp.sourcemap.generatorCommand": "npm run build:sourcemap",
     "luau-lsp.sourcemap.useVSCodeWatcher": true,
 
     "[lua]": {

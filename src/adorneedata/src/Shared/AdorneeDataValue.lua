@@ -39,7 +39,7 @@ AdorneeDataValue.__index = AdorneeDataValue
 	@param prototype table
 	@return AdorneeDataValue<T>
 ]=]
-function AdorneeDataValue.new(adornee, prototype)
+function AdorneeDataValue.new(adornee: Instance, prototype)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(prototype) == "table", "Bad prototype")
 

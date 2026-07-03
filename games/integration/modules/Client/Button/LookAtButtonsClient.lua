@@ -24,7 +24,7 @@ local LookAtButtonsClient = setmetatable({}, BaseObject)
 LookAtButtonsClient.ClassName = "LookAtButtonsClient"
 LookAtButtonsClient.__index = LookAtButtonsClient
 
-function LookAtButtonsClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function LookAtButtonsClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), LookAtButtonsClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

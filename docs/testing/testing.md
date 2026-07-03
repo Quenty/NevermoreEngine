@@ -1,0 +1,261 @@
+---
+title: Test Infrastructure
+sidebar_position: 1
+---
+
+# Testing
+
+## Writing tests
+
+We use [Jest3](https://github.com/jsdotlua/jest-lua) via the Nevermore-compatible wrapper `@quentystudios/jest-lua`. The only difference from upstream Jest is how you access globals — require `Jest` and access them via `Jest.Globals`.
+
+Test files must end in `.spec.lua` and live alongside the code they test (e.g. `src/Shared/MyUtils.spec.lua`).
+
+### Example test
+
+```luau
+--!strict
+--[[
+	@class MyUtils.spec.lua
+]]
+
+local require = (require :: any)(
+		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
+	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+
+local Jest = require("Jest")
+local MyUtils = require("MyUtils")
+
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
+
+describe("MyUtils", function()
+	it("should do something", function()
+		expect(MyUtils.doSomething()).toBe(true)
+	end)
+end)
+```
+
+### jest.config.lua
+
+Every testable package needs a `jest.config.lua` in its `src/` directory. This tells the test runner to discover `.spec` files:
+
+```luau
+return {
+	testMatch = { "**/*.spec" },
+}
+```
+
+### Migration from TestEZ to Jest
+
+Legacy tests use the TestEZ pattern (`return function()` wrapper, `.to.equal()` matchers). New tests should use the explicit Jest pattern. Key differences:
+
+| TestEZ (old) | Jest (new) |
+|---|---|
+| `--!nonstrict` | `--!strict` |
+| No `Jest` require | `local Jest = require("Jest")` |
+| Implicit `describe`/`it`/`expect` globals | Extract from `Jest.Globals` |
+| `return function() ... end` wrapper | Top-level `describe()` (no wrapper) |
+| `expect(x).to.equal(y)` | `expect(x).toEqual(y)` |
+| `expect(x).to.be.ok()` | `expect(x).toBeTruthy()` |
+| `expect(x).to.be.near(y, 1e-3)` | `expect(x).toBeCloseTo(y, 3)` |
+| `expect(fn).to.throw()` | `expect(fn).toThrow()` |
+| `expect(x).never.to.equal(y)` | `expect(x).never.toEqual(y)` |
+
+Note: `toBeCloseTo(value, numDigits)` takes the number of decimal digits of precision (e.g. `3` means `1e-3` tolerance), not an absolute epsilon.
+
+## Setting up a package for testing
+
+Each testable package needs:
+
+1. **A `deploy.nevermore.json`** with a `test` target
+2. **A Rojo project file** (typically `test/default.project.json`) that builds the test place
+3. **A script template** (typically `test/scripts/Server/ServerMain.server.lua`) that boots the package and runs tests
+
+### 1. deploy.nevermore.json
+
+Run `nevermore deploy init` from inside a package directory. The interactive wizard will walk you through setting up the test target, or use flags for non-interactive setup:
+
+```bash
+# Interactive (recommended for first time)
+nevermore deploy init
+
+# Non-interactive
+nevermore deploy init --yes --universe-id 12345 --create-place --project test/default.project.json --script-template test/scripts/Server/ServerMain.server.lua
+```
+
+The resulting config looks like:
+
+```json
+{
+  "targets": {
+    "test": {
+      "universeId": 12345,
+      "placeId": 67890,
+      "project": "test/default.project.json",
+      "scriptTemplate": "test/scripts/Server/ServerMain.server.lua"
+    }
+  }
+}
+```
+
+### 2. Rojo project (test/default.project.json)
+
+The test project maps the package into `ServerScriptService` so the test runner can find it:
+
+```json
+{
+  "name": "MyPackageTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
+      "mypackage": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    }
+  }
+}
+```
+
+### 3. Script template (test/scripts/Server/ServerMain.server.lua)
+
+The script template is executed via Open Cloud (or locally via studio-bridge). It bootstraps the loader and delegates to `NevermoreTestRunnerUtils`:
+
+```luau
+--!nonstrict
+--[[
+	@class ServerMain
+]]
+
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local root = ServerScriptService.mypackage
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
+
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
+	return
+end
+```
+
+Replace `mypackage` with the key used in your Rojo project tree.
+
+### NevermoreTestRunnerUtils
+
+The `@quenty/nevermore-test-runner` package provides `NevermoreTestRunnerUtils`, which handles the test execution lifecycle:
+
+- If a `jest.config` is found under the given root, it runs Jest tests
+- If no `jest.config` is found, boot success is the test (smoke test)
+- Detects Open Cloud vs local execution context and exits appropriately
+
+## Running tests
+
+### Single package
+
+From a package directory with a `deploy.nevermore.json`:
+
+```bash
+# Run locally via studio-bridge (default)
+nevermore test
+
+# Run via Roblox Open Cloud
+nevermore test --cloud
+
+# Show execution logs
+nevermore test --logs
+```
+
+Options:
+| Flag | Description |
+|------|-------------|
+| `--cloud` | Run tests via Open Cloud instead of locally |
+| `--logs` | Show execution logs |
+| `--api-key` | Roblox Open Cloud API key (`--cloud` only) |
+| `--universe-id` | Override universe ID from deploy.nevermore.json |
+| `--place-id` | Override place ID from deploy.nevermore.json |
+| `--script-template` | Override script template path |
+| `--script-text` | Luau code to execute directly instead of the configured template |
+
+### Batch testing
+
+Run tests across multiple packages, with automatic change detection:
+
+```bash
+# Test only packages changed vs origin/main
+nevermore batch test
+
+# Test all packages with test targets
+nevermore batch test --all
+
+# Run via Open Cloud with concurrency
+nevermore batch test --cloud --concurrency 3
+
+# Write JSON results to file
+nevermore batch test --output results.json
+```
+
+Options:
+| Flag | Description |
+|------|-------------|
+| `--cloud` | Run tests via Open Cloud instead of locally |
+| `--all` | Test all packages, not just changed ones |
+| `--base` | Git ref to diff against (default: `origin/main`) |
+| `--concurrency` | Max parallel tests (default: 1 local, 3 cloud) |
+| `--output` | Write JSON results to a file |
+| `--limit` | Max number of packages to test |
+| `--logs` | Show execution logs for all packages |
+
+## Credential resolution
+
+The CLI resolves API credentials in this order (first match wins):
+
+1. `--api-key` CLI flag
+2. `ROBLOX_OPEN_CLOUD_API_KEY` environment variable
+3. `ROBLOX_UNIT_TEST_API_KEY` environment variable (backwards compat)
+4. `~/.nevermore/credentials.json` (stored via `nevermore login`)
+
+In interactive mode, if no credentials are found, the CLI prompts inline. In `--yes` (CI) mode, it errors immediately.
+
+## Failure annotations
+
+When tests fail in CI, the `post-test-results` command parses Jest-lua output and emits GitHub Actions annotations pointing to the failing spec files. To map Roblox instance paths (e.g. `ServerScriptService.maid.Shared.Maid.spec`) back to repo-relative filesystem paths, two strategies are used:
+
+1. **Sourcemap resolution** (preferred) — If `sourcemap.json` exists (generated by `rojo sourcemap --absolute`), the `SourcemapResolver` builds a lookup index from the tree. This is exact and handles all project layouts. The CI workflow runs `npm run build:sourcemap` before posting results to ensure the file is available.
+
+2. **Heuristic fallback** — When no sourcemap is available, the resolver assumes the standard `src/{slug}/src/` layout and rejoins known dotted suffixes (`.spec`, `.story`). This works for the common case but can produce wrong paths for non-standard layouts or dotted filenames.
+
+The resolver code lives in `tools/nevermore-cli/src/utils/sourcemap/` and is shared with the `strip-sourcemap-jest` command.
+
+## Linux headless testing
+
+Studio can run headlessly on Linux via Wine, enabling E2E tests in devcontainers and GitHub Actions without a display or GPU. The `studio-bridge` CLI handles all environment setup:
+
+```bash
+# One-time setup
+studio-bridge linux setup --install-deps
+studio-bridge linux inject-credentials  # reads $ROBLOSECURITY env var
+
+# Run tests the same as on Windows/macOS
+nevermore test
+```
+
+Prerequisites (Wine 11, Xvfb, openbox, Mesa llvmpipe) are documented in `tools/studio-bridge/src/linux/README.md`. The `linux setup --install-deps` flag installs everything on Debian/Ubuntu but is opt-in — it never runs sudo automatically.
+
+For CI, set `ROBLOSECURITY` as a repository or Codespace secret. The `.github/workflows/studio-linux-e2e.yml` workflow demonstrates the full flow.
+
+## CI design principles
+
+- **Workflows should be thin.** All logic lives in `nevermore-cli` commands — GitHub Actions workflows just call them. This keeps CI debuggable locally.
+- **Rate limiting** is shared across concurrent workers via the `OpenCloudClient` instance. The `RateLimiter` caps concurrent Open Cloud API requests (default 4 in-flight via a semaphore), reads `x-ratelimit-remaining` / `x-ratelimit-reset` headers, and retries 429s with jittered back-off.
+- **Post results via CLI**: `nevermore tools post-test-results <file>` posts or updates a PR comment with test results and writes to the GitHub Actions job summary. Requires `GITHUB_TOKEN` for PR comments; job summaries are written automatically when `GITHUB_STEP_SUMMARY` is set.
+- **Live comment updates during the run**: When `nevermore batch test` detects a CI environment, it also updates the PR comment as packages transition between phases (throttled to ~10s). The `post-test-results` step still writes the final snapshot, but reviewers see progress without waiting for the full run to finish. In `--aggregated` mode every package shares one execution, so they move through `uploading` → `scheduling` → `executing` in lock-step — that's expected, not a bug.
+- **Job summaries**: Results are automatically written to the [GitHub Actions job summary](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#adding-a-job-summary) when running in CI. This makes results visible on the workflow run summary page, complementing the PR comment. The job summary is only written by `post-test-results` (not by the live batch run) to avoid duplicate entries on the workflow summary page.

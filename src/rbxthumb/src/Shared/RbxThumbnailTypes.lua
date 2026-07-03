@@ -6,28 +6,27 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Table = require("Table")
+local SimpleEnum = require("SimpleEnum")
 
-export type RbxThumbnailTypes = {
-	ASSET: "Asset",
-	AVATAR: "Avatar",
-	AVATAR_HEAD_SHOT: "AvatarHeadShot",
-	BADGE: "BadgeIcon",
-	BUNDLE: "BundleThumbnail",
-	GAME_ICON: "GameIcon",
-	GAME_PASS: "GamePass",
-	GROUP_ICON: "GroupIcon",
-	OUTFIT: "Outfit",
-}
+export type RbxThumbnailType =
+	"Asset"
+	| "Avatar"
+	| "AvatarHeadShot"
+	| "BadgeIcon"
+	| "BundleThumbnail"
+	| "GameIcon"
+	| "GamePass"
+	| "GroupIcon"
+	| "Outfit"
 
-return Table.readonly({
-	ASSET = "Asset",
-	AVATAR = "Avatar",
-	AVATAR_HEAD_SHOT = "AvatarHeadShot",
-	BADGE = "BadgeIcon",
-	BUNDLE = "BundleThumbnail",
-	GAME_ICON = "GameIcon",
-	GAME_PASS = "GamePass",
-	GROUP_ICON = "GroupIcon",
-	OUTFIT = "Outfit",
-} :: RbxThumbnailTypes)
+return SimpleEnum.new({
+	ASSET = "Asset" :: "Asset",
+	AVATAR = "Avatar" :: "Avatar",
+	AVATAR_HEAD_SHOT = "AvatarHeadShot" :: "AvatarHeadShot",
+	BADGE = "BadgeIcon" :: "BadgeIcon",
+	BUNDLE = "BundleThumbnail" :: "BundleThumbnail",
+	GAME_ICON = "GameIcon" :: "GameIcon",
+	GAME_PASS = "GamePass" :: "GamePass",
+	GROUP_ICON = "GroupIcon" :: "GroupIcon",
+	OUTFIT = "Outfit" :: "Outfit",
+})

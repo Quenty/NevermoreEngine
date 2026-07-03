@@ -3,6 +3,9 @@
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
       "gameconfig": {
         "$className": "Folder",
         "test": {
@@ -10,6 +13,9 @@
         },
         "gameconfig": {
           "$path": ".."
+        },
+        "jest.config": {
+          "$path": "jest.config.lua"
         }
       },
       "Script": {

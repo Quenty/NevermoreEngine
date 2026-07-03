@@ -400,7 +400,7 @@ end
 	The minimum score returned for normal matches.
 
 	For matches that don't return [Fzy.getMinScore], their score will be greater
-	than than this value.
+	than this value.
 
 	@param config FzyConfig
 	@return number

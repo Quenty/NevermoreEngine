@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/acceltween@2.6.0...@quenty/acceltween@2.7.0) (2026-02-17)
+
+
+### Features
+
+* Add CI/CD batch unit testing ([016a366](https://github.com/Quenty/NevermoreEngine/commit/016a3663509c8fffa518b07cfc49ebecba2a1fa6))
+
+
+
+
+
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/acceltween@2.5.5...@quenty/acceltween@2.6.0) (2026-01-16)
+
+
+### Features
+
+* Add SetTarget method to AccelTween ([9d151f0](https://github.com/Quenty/NevermoreEngine/commit/9d151f06f170e5510dc28fb6f9de1bfae161f8dd))
+
+
+
+
+
 ## [2.5.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/acceltween@2.5.4...@quenty/acceltween@2.5.5) (2026-01-12)
 
 

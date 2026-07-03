@@ -28,7 +28,7 @@ RagdollHumanoidOnDeathClient.__index = RagdollHumanoidOnDeathClient
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnDeathClient
 ]=]
-function RagdollHumanoidOnDeathClient.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function RagdollHumanoidOnDeathClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeathClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

@@ -32,7 +32,7 @@ Ragdollable.__index = Ragdollable
 	@param serviceBag ServiceBag
 	@return Ragdollable
 ]=]
-function Ragdollable.new(humanoid, serviceBag: ServiceBag.ServiceBag)
+function Ragdollable.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 	local self = setmetatable(RagdollableBase.new(humanoid), Ragdollable)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

@@ -257,13 +257,13 @@ function RoguePropertyTableDefinition:GetContainer(serviceBag: ServiceBag.Servic
 	return found:GetContainer()
 end
 
-function RoguePropertyTableDefinition:FindInstance(parent): Instance?
+function RoguePropertyTableDefinition:FindInstance(parent: Instance): Instance?
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	return parent:FindFirstChild(self:GetName())
 end
 
-function RoguePropertyTableDefinition:GetOrCreateInstance(parent): Folder
+function RoguePropertyTableDefinition:GetOrCreateInstance(parent: Instance): Folder
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	local existing = parent:FindFirstChild(self:GetName())

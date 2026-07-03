@@ -1,0 +1,753 @@
+/**
+ * Unit tests for StudioBridgeServer — validates the lifecycle state machine,
+ * WebSocket handshake, execute-message protocol, multi-execution reuse,
+ * timeout handling, and cleanup. External dependencies (plugin injection,
+ * Studio launch, place building) are mocked so no file I/O or processes are
+ * needed.
+ */
+
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { WebSocket } from 'ws';
+import {
+  StudioBridgeServer,
+  type StudioBridgePhase,
+} from './studio-bridge-server.js';
+
+vi.mock('@quenty/nevermore-template-helpers', () => ({
+  BuildContext: {
+    createAsync: vi.fn(async () => ({
+      resolvePath: vi.fn((rel: string) => `/fake/tmp/${rel}`),
+      executeLuneTransformScriptAsync: vi.fn(async () => {}),
+      rojoBuildAsync: vi.fn(async () => undefined),
+      cleanupAsync: vi.fn(async () => {}),
+    })),
+  },
+  resolvePackagePath: vi.fn((..._args: any[]) => '/fake/transform-script.luau'),
+  resolveTemplatePath: vi.fn((..._args: any[]) => '/fake/default.project.json'),
+}));
+
+vi.mock('../plugin/plugin-injector.js', () => ({
+  injectPluginAsync: vi.fn(async () => ({
+    pluginPath: '/fake/plugin.rbxmx',
+    cleanupAsync: vi.fn(async () => {}),
+  })),
+}));
+
+vi.mock('../process/studio-process-manager.js', () => ({
+  launchStudioAsync: vi.fn(async () => ({
+    process: { pid: 12345 },
+    killAsync: vi.fn(async () => {}),
+  })),
+  findPluginsFolder: vi.fn(() => '/fake/plugins'),
+}));
+
+/**
+ * Connect a WebSocket client to the server and send a register message,
+ * returning the connected client.
+ */
+async function connectAndHandshake(
+  port: number,
+  sessionId: string
+): Promise<WebSocket> {
+  const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
+
+  await new Promise<void>((resolve, reject) => {
+    ws.on('open', resolve);
+    ws.on('error', reject);
+  });
+
+  ws.send(
+    JSON.stringify({
+      type: 'register',
+      sessionId,
+      payload: {
+        pluginVersion: '1.0.0',
+        instanceId: 'inst-1',
+        placeName: 'TestPlace',
+        state: 'Edit',
+        capabilities: ['execute', 'queryState'],
+      },
+    })
+  );
+
+  // Allow the server to process the register message
+  await new Promise((r) => setTimeout(r, 20));
+
+  return ws;
+}
+
+/**
+ * Create a StudioBridgeServer with a known sessionId, start it by simulating
+ * a plugin client connecting. Returns the server, the simulated client WS,
+ * and the port.
+ */
+async function createReadyServer(
+  options: {
+    sessionId?: string;
+    timeoutMs?: number;
+    onPhase?: (p: StudioBridgePhase) => void;
+  } = {}
+) {
+  const sessionId = options.sessionId ?? 'test-session';
+  const server = new StudioBridgeServer({
+    placePath: '/fake/place.rbxl',
+    sessionId,
+    timeoutMs: options.timeoutMs ?? 5_000,
+    onPhase: options.onPhase,
+  });
+
+  // Start in background — it will wait for handshake
+  const startPromise = server.startAsync();
+
+  // We need to discover the port the server is listening on. The HTTP server
+  // is created inside startAsync and we can't access it directly. However, we
+  // know the mock for launchStudioAsync will resolve immediately, so the
+  // server will be waiting for a handshake. We just need the port.
+  // Access it via the private field (acceptable in tests).
+  // Wait a tick for the HTTP server to be created
+  await new Promise((r) => setTimeout(r, 50));
+  const port: number = (server as any)._port;
+
+  // Simulate plugin connecting and performing handshake
+  const client = await connectAndHandshake(port, sessionId);
+
+  // Now startAsync should resolve
+  await startPromise;
+
+  return { server, client, port, sessionId };
+}
+
+describe('StudioBridgeServer', () => {
+  let server: StudioBridgeServer | undefined;
+  let client: WebSocket | undefined;
+
+  afterEach(async () => {
+    // Clean up any open connections
+    if (client && client.readyState === WebSocket.OPEN) {
+      client.close();
+    }
+    if (server) {
+      await server.stopAsync();
+    }
+    client = undefined;
+    server = undefined;
+  });
+
+  describe('state guards', () => {
+    it('throws when executeAsync is called before startAsync', async () => {
+      server = new StudioBridgeServer({ placePath: '/fake/place.rbxl' });
+      await expect(
+        server.executeAsync({ scriptContent: 'print("hi")' })
+      ).rejects.toThrow("Cannot execute: expected state 'ready', got 'idle'");
+    });
+
+    it('throws when startAsync is called twice', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      await expect(server.startAsync()).rejects.toThrow(
+        "Cannot start: expected state 'idle', got 'ready'"
+      );
+    });
+
+    it('stopAsync is idempotent', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      await server.stopAsync();
+      // Second call should not throw
+      await server.stopAsync();
+    });
+  });
+
+  describe('handshake', () => {
+    it('accepts register with correct session ID', async () => {
+      const ready = await createReadyServer({ sessionId: 'my-session' });
+      server = ready.server;
+      client = ready.client;
+
+      // If we got here the server accepted the register handshake and
+      // resolved startAsync — connectAndHandshake yields the connected client.
+      expect(true).toBe(true);
+    });
+
+    it('rejects connection to wrong WebSocket path', async () => {
+      const sessionId = 'correct-session';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 1_000,
+      });
+
+      const startPromise = server.startAsync();
+
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (server as any)._port;
+
+      // Connect with wrong path
+      const ws = new WebSocket(`ws://localhost:${port}/wrong-path`);
+
+      // Should get an error or unexpected response
+      const errorOrClose = await new Promise<string>((resolve) => {
+        ws.on('error', () => resolve('error'));
+        ws.on('unexpected-response', () => {
+          ws.close();
+          resolve('rejected');
+        });
+      });
+
+      expect(['error', 'rejected']).toContain(errorOrClose);
+
+      // startAsync should time out
+      await expect(startPromise).rejects.toThrow(
+        'Timed out waiting for Studio plugin handshake'
+      );
+    });
+  });
+
+  describe('executeAsync', () => {
+    it('sends execute message with sessionId and returns result on scriptComplete', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      // Listen for execute message from server
+      const executePromise = new Promise<{ script: string; sessionId: string }>(
+        (resolve) => {
+          client!.on('message', (raw) => {
+            const data = JSON.parse(
+              typeof raw === 'string' ? raw : raw.toString('utf-8')
+            );
+            if (data.type === 'execute') {
+              resolve({
+                script: data.payload.script,
+                sessionId: data.sessionId,
+              });
+            }
+          });
+        }
+      );
+
+      // Start execution
+      const resultPromise = server.executeAsync({
+        scriptContent: 'print("hello")',
+      });
+
+      // Verify the server sent the execute message with correct script and sessionId
+      const received = await executePromise;
+      expect(received.script).toBe('print("hello")');
+      expect(received.sessionId).toBe(ready.sessionId);
+
+      // Simulate plugin sending scriptComplete
+      client!.send(
+        JSON.stringify({
+          type: 'scriptComplete',
+          sessionId: ready.sessionId,
+          payload: { success: true },
+        })
+      );
+
+      const result = await resultPromise;
+      expect(result.success).toBe(true);
+      expect(result.logs).toBe('');
+    });
+
+    it('returns failure with error message on script error', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const resultPromise = server.executeAsync({
+        scriptContent: 'error("boom")',
+      });
+
+      await new Promise<void>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8')
+          );
+          if (data.type === 'execute') resolve();
+        });
+      });
+
+      client!.send(
+        JSON.stringify({
+          type: 'scriptComplete',
+          sessionId: ready.sessionId,
+          payload: { success: false, error: 'Script threw: boom' },
+        })
+      );
+
+      const result = await resultPromise;
+      expect(result.success).toBe(false);
+      expect(result.logs).toContain('Script threw: boom');
+    });
+
+    it('returns failure when client disconnects during execution', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const resultPromise = server.executeAsync({
+        scriptContent: 'print("hi")',
+      });
+
+      await new Promise<void>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8')
+          );
+          if (data.type === 'execute') resolve();
+        });
+      });
+
+      // Close the client without sending scriptComplete
+      client!.close();
+
+      const result = await resultPromise;
+      expect(result.success).toBe(false);
+      expect(result.logs).toContain(
+        'Plugin disconnected before script completed'
+      );
+    });
+
+    it('times out when script takes too long', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const resultPromise = server.executeAsync({
+        scriptContent: 'while true do end',
+        timeoutMs: 200,
+      });
+
+      // Don't send scriptComplete — let it time out
+
+      const result = await resultPromise;
+      expect(result.success).toBe(false);
+      expect(result.logs).toContain('Timed out after 200ms');
+    });
+
+    it('ignores messages with wrong session ID during execution', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const resultPromise = server.executeAsync({
+        scriptContent: 'print("test")',
+        timeoutMs: 500,
+      });
+
+      await new Promise<void>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8')
+          );
+          if (data.type === 'execute') resolve();
+        });
+      });
+
+      // Send scriptComplete with wrong session ID — should be ignored
+      client!.send(
+        JSON.stringify({
+          type: 'scriptComplete',
+          sessionId: 'wrong-session',
+          payload: { success: true },
+        })
+      );
+
+      // The server should ignore the above and time out
+      const result = await resultPromise;
+      expect(result.success).toBe(false);
+      expect(result.logs).toContain('Timed out after 500ms');
+    });
+  });
+
+  describe('multi-execution', () => {
+    it('supports executing multiple scripts on the same session', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      // Helper: run one execute cycle
+      const runOnce = async (script: string) => {
+        const resultPromise = server!.executeAsync({ scriptContent: script });
+
+        // Wait for execute message
+        await new Promise<void>((resolve) => {
+          const handler = (raw: any) => {
+            const data = JSON.parse(
+              typeof raw === 'string' ? raw : raw.toString('utf-8')
+            );
+            if (data.type === 'execute') {
+              client!.off('message', handler);
+              resolve();
+            }
+          };
+          client!.on('message', handler);
+        });
+
+        // Respond with success
+        client!.send(
+          JSON.stringify({
+            type: 'scriptComplete',
+            sessionId: ready.sessionId,
+            payload: { success: true },
+          })
+        );
+
+        return resultPromise;
+      };
+
+      const r1 = await runOnce('print("first")');
+      expect(r1.success).toBe(true);
+
+      const r2 = await runOnce('print("second")');
+      expect(r2.success).toBe(true);
+
+      const r3 = await runOnce('print("third")');
+      expect(r3.success).toBe(true);
+    });
+  });
+
+  describe('onPhase', () => {
+    it('fires phase callbacks in order during lifecycle', async () => {
+      const phases: StudioBridgePhase[] = [];
+
+      const ready = await createReadyServer({
+        onPhase: (phase) => phases.push(phase),
+      });
+      server = ready.server;
+      client = ready.client;
+
+      // startAsync fires: launching, connecting
+      // (no 'building' since we provided placePath)
+      expect(phases).toContain('launching');
+      expect(phases).toContain('connecting');
+
+      // Execute
+      const resultPromise = server.executeAsync({
+        scriptContent: 'print("hi")',
+      });
+
+      await new Promise<void>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8')
+          );
+          if (data.type === 'execute') resolve();
+        });
+      });
+
+      expect(phases).toContain('executing');
+
+      client!.send(
+        JSON.stringify({
+          type: 'scriptComplete',
+          sessionId: ready.sessionId,
+          payload: { success: true },
+        })
+      );
+
+      await resultPromise;
+      expect(phases).toContain('done');
+
+      // Verify order
+      const idx = (p: StudioBridgePhase) => phases.indexOf(p);
+      expect(idx('launching')).toBeLessThan(idx('connecting'));
+      expect(idx('connecting')).toBeLessThan(idx('executing'));
+      expect(idx('executing')).toBeLessThan(idx('done'));
+    });
+  });
+
+  describe('stopAsync', () => {
+    it('sends shutdown message with sessionId to connected client', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      // Spy on the server-side socket's send method to verify the shutdown
+      // message is sent (avoids race between send and terminate in cleanup).
+      const connectedClient = (server as any)._connectedClient;
+      const sendSpy = vi.spyOn(connectedClient, 'send');
+
+      await server.stopAsync();
+
+      expect(sendSpy).toHaveBeenCalledWith(
+        JSON.stringify({
+          type: 'shutdown',
+          sessionId: ready.sessionId,
+          payload: {},
+        })
+      );
+    });
+
+    it('can be called from idle state', async () => {
+      server = new StudioBridgeServer({ placePath: '/fake/place.rbxl' });
+      // Should not throw
+      await server.stopAsync();
+    });
+  });
+
+  describe('heartbeat', () => {
+    it('silently accepts heartbeat messages after handshake', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      // Send a heartbeat message
+      client.send(
+        JSON.stringify({
+          type: 'heartbeat',
+          sessionId: ready.sessionId,
+          payload: {
+            uptimeMs: 5000,
+            state: 'Edit',
+            pendingRequests: 0,
+          },
+        })
+      );
+
+      // Give it time to process
+      await new Promise((r) => setTimeout(r, 50));
+
+      // Verify the server recorded the heartbeat
+      const lastHb = (server as any)._lastHeartbeatTimestamp;
+      expect(lastHb).toBeGreaterThan(0);
+    });
+
+    it('does not interfere with script execution', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const resultPromise = server.executeAsync({
+        scriptContent: 'print("test")',
+      });
+
+      await new Promise<void>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8')
+          );
+          if (data.type === 'execute') resolve();
+        });
+      });
+
+      // Send a heartbeat during execution
+      client!.send(
+        JSON.stringify({
+          type: 'heartbeat',
+          sessionId: ready.sessionId,
+          payload: {
+            uptimeMs: 10000,
+            state: 'Edit',
+            pendingRequests: 1,
+          },
+        })
+      );
+
+      // Then complete the script
+      client!.send(
+        JSON.stringify({
+          type: 'scriptComplete',
+          sessionId: ready.sessionId,
+          payload: { success: true },
+        })
+      );
+
+      const result = await resultPromise;
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe('performActionAsync', () => {
+    /**
+     * Connect with v2 register, start the server, and return a ready state.
+     */
+    async function createV2ReadyServer(options?: {
+      sessionId?: string;
+      capabilities?: string[];
+    }) {
+      const sessionId = options?.sessionId ?? 'v2-action-session';
+      const capabilities = options?.capabilities ?? [
+        'execute',
+        'queryState',
+        'captureScreenshot',
+      ];
+
+      const srv = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = srv.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (srv as any)._port;
+
+      const ws = new WebSocket(`ws://localhost:${port}/${sessionId}`);
+      await new Promise<void>((resolve, reject) => {
+        ws.on('open', resolve);
+        ws.on('error', reject);
+      });
+
+      ws.send(
+        JSON.stringify({
+          type: 'register',
+          sessionId,
+          payload: {
+            pluginVersion: '2.0.0',
+            instanceId: 'inst-action',
+            placeName: 'ActionTestPlace',
+            state: 'Edit',
+            capabilities,
+          },
+        })
+      );
+
+      await startPromise;
+
+      return { server: srv, client: ws, port, sessionId };
+    }
+
+    it('sends queryState action and resolves with stateResult', async () => {
+      const ready = await createV2ReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      // Listen for the queryState action from the server
+      const actionPromise = new Promise<Record<string, unknown>>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8')
+          );
+          if (data.type === 'queryState') {
+            resolve(data);
+          }
+        });
+      });
+
+      // Perform the action
+      const resultPromise = server.performActionAsync({
+        type: 'queryState',
+        payload: {},
+      });
+
+      // Wait for the queryState message to arrive at the mock plugin
+      const queryMsg = await actionPromise;
+      expect(queryMsg.type).toBe('queryState');
+      expect(queryMsg.sessionId).toBe(ready.sessionId);
+      expect(typeof queryMsg.requestId).toBe('string');
+
+      // Respond from the mock plugin
+      client!.send(
+        JSON.stringify({
+          type: 'stateResult',
+          sessionId: ready.sessionId,
+          requestId: queryMsg.requestId,
+          payload: {
+            state: 'Edit',
+            placeId: 12345,
+            placeName: 'ActionTestPlace',
+            gameId: 67890,
+          },
+        })
+      );
+
+      const result = await resultPromise;
+      expect(result.type).toBe('stateResult');
+      expect((result as any).payload.state).toBe('Edit');
+      expect((result as any).payload.placeId).toBe(12345);
+    });
+
+    it('rejects when plugin does not support requested capability', async () => {
+      // Connect with only 'execute' capability — no 'queryState'
+      const ready = await createV2ReadyServer({ capabilities: ['execute'] });
+      server = ready.server;
+      client = ready.client;
+
+      await expect(
+        server.performActionAsync({ type: 'queryState', payload: {} })
+      ).rejects.toThrow('Plugin does not support capability: queryState');
+    });
+
+    it('rejects when server is not in ready state', async () => {
+      server = new StudioBridgeServer({ placePath: '/fake/place.rbxl' });
+
+      await expect(
+        server.performActionAsync({ type: 'queryState', payload: {} })
+      ).rejects.toThrow(
+        "Cannot perform action: expected state 'ready', got 'idle'"
+      );
+    });
+  });
+
+  describe('health endpoint', () => {
+    it('GET /health returns 200 with correct JSON shape', async () => {
+      const ready = await createReadyServer({ sessionId: 'health-session' });
+      server = ready.server;
+      client = ready.client;
+
+      const res = await fetch(`http://localhost:${ready.port}/health`);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toBe('application/json');
+
+      const body = (await res.json()) as Record<string, unknown>;
+      expect(body.status).toBe('ok');
+      expect(body.sessionId).toBe('health-session');
+      expect(body.port).toBe(ready.port);
+      expect(typeof body.serverVersion).toBe('string');
+    });
+
+    it('GET /other returns 404', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const res = await fetch(`http://localhost:${ready.port}/other`);
+      expect(res.status).toBe(404);
+
+      const body = await res.text();
+      expect(body).toBe('Not Found');
+    });
+
+    it('health endpoint is available immediately after startAsync', async () => {
+      const sessionId = 'immediate-health';
+      server = new StudioBridgeServer({
+        placePath: '/fake/place.rbxl',
+        sessionId,
+        timeoutMs: 5_000,
+      });
+
+      const startPromise = server.startAsync();
+      await new Promise((r) => setTimeout(r, 50));
+      const port: number = (server as any)._port;
+
+      // Health should be available even before handshake completes
+      const res = await fetch(`http://localhost:${port}/health`);
+      expect(res.status).toBe(200);
+
+      const body = (await res.json()) as Record<string, unknown>;
+      expect(body.status).toBe('ok');
+      expect(body.sessionId).toBe(sessionId);
+
+      // Complete the handshake so startAsync resolves
+      client = await connectAndHandshake(port, sessionId);
+      await startPromise;
+    });
+
+    it('WebSocket upgrades to correct path still work after adding health endpoint', async () => {
+      const ready = await createReadyServer({ sessionId: 'ws-with-health' });
+      server = ready.server;
+      client = ready.client;
+
+      // If we got here, the WebSocket handshake succeeded through the HTTP server
+      // Verify health also works
+      const res = await fetch(`http://localhost:${ready.port}/health`);
+      expect(res.status).toBe(200);
+    });
+  });
+});

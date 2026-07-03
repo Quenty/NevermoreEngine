@@ -1,6 +1,6 @@
 {
   "name": "@quenty/permissionprovider",
-  "version": "14.28.0",
+  "version": "14.38.2",
   "description": "Permission provider for Roblox, including authenticating against group membership",
   "keywords": [
     "Roblox",
@@ -30,15 +30,18 @@
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/grouputils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/playerutils": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/table": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

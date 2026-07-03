@@ -7,5 +7,5 @@
 
 #packages:
   #- '/*'
-  #- '../Nevermore/src/*'
-  #- '../Raven/src/*'
+  #- '../Nevermore/src/*' # <managed by raven-cli>
+  #- '../Raven/src/*' # <managed by raven-cli>

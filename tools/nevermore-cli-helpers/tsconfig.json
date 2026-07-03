@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declarationDir": "./dist",
+    "composite": true,
+    "declaration": true
+  },
+  "references": [
+    { "path": "../cli-output-helpers" },
+  ],
+  "include": ["src/**/*"]
+}

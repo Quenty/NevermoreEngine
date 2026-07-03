@@ -1,6 +1,6 @@
 --!nonstrict
 --[=[
-	Ragdolls the humanoid on death. This class exports a [Binder].
+	Shakes the camera on ragdoll. This class exports a [Binder].
 	@server
 	@class RagdollCameraShake
 ]=]

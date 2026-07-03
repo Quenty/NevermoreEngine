@@ -1,6 +1,6 @@
 {
   "name": "@quenty/bindtocloseservice",
-  "version": "8.24.0",
+  "version": "8.32.1",
   "description": "Bind to game close API in a centralized location.",
   "keywords": [
     "Roblox",
@@ -13,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/blend/"
+    "directory": "src/bindtocloseservice/"
   },
   "funding": {
     "type": "patreon",

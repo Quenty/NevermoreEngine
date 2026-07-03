@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AnimationUtils = require("AnimationUtils")
 local BaseObject = require("BaseObject")
+local Maid = require("Maid")
 local Rx = require("Rx")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
@@ -17,17 +18,19 @@ local AnimationTrackPlayer = setmetatable({}, BaseObject)
 AnimationTrackPlayer.ClassName = "AnimationTrackPlayer"
 AnimationTrackPlayer.__index = AnimationTrackPlayer
 
+type AnimationId = string | number
+
 export type AnimationTrackPlayer =
 	typeof(setmetatable(
 		{} :: {
 			-- Public
-			KeyframeReached: Signal.Signal<()>,
+			KeyframeReached: Signal.Signal<string>,
 
 			-- Private
-			_animationTarget: ValueObject.ValueObject<Instance>,
-			_trackId: ValueObject.ValueObject<string | number>,
+			_animationTarget: ValueObject.ValueObject<Instance?>,
+			_trackId: ValueObject.ValueObject<AnimationId?>,
 			_currentTrack: ValueObject.ValueObject<AnimationTrack?>,
-			_animationPriority: ValueObject.ValueObject<number>,
+			_animationPriority: ValueObject.ValueObject<number?>,
 		},
 		{} :: typeof({ __index = AnimationTrackPlayer })
 	))
@@ -36,12 +39,11 @@ export type AnimationTrackPlayer =
 --[=[
 	Plays an animation track in the target. Async loads the track when
 	all data is found.
-
-	@param animationTarget Instance | Observable<Instance>
-	@param animationId string | number?
-	@return AnimationTrackPlayer
 ]=]
-function AnimationTrackPlayer.new(animationTarget, animationId: string | number): AnimationTrackPlayer
+function AnimationTrackPlayer.new(
+	animationTarget: ValueObject.Mountable<Instance?>,
+	animationId: AnimationId?
+): AnimationTrackPlayer
 	local self: AnimationTrackPlayer = setmetatable(BaseObject.new() :: any, AnimationTrackPlayer)
 
 	self._animationTarget = self._maid:Add(ValueObject.new(nil))
@@ -49,7 +51,7 @@ function AnimationTrackPlayer.new(animationTarget, animationId: string | number)
 	self._currentTrack = self._maid:Add(ValueObject.new(nil))
 	self._animationPriority = self._maid:Add(ValueObject.new(nil))
 
-	self.KeyframeReached = self._maid:Add(Signal.new())
+	self.KeyframeReached = self._maid:Add(Signal.new() :: any)
 
 	if animationTarget then
 		self:SetAnimationTarget(animationTarget)
@@ -64,7 +66,7 @@ function AnimationTrackPlayer.new(animationTarget, animationId: string | number)
 	return self
 end
 
-function AnimationTrackPlayer:_setupState()
+function AnimationTrackPlayer._setupState(self: AnimationTrackPlayer): ()
 	self._maid:GiveTask(Rx.combineLatest({
 		animationTarget = self._animationTarget:Observe(),
 		trackId = self._trackId:Observe(),
@@ -95,7 +97,7 @@ function AnimationTrackPlayer:_setupState()
 			end
 
 			local maid = brio:ToMaid()
-			local track = brio:GetValue()
+			local track = brio:GetValue() :: AnimationTrack
 
 			maid:GiveTask(track.KeyframeReached:Connect(function(...)
 				self.KeyframeReached:Fire(...)
@@ -105,39 +107,40 @@ end
 
 --[=[
 	Sets the animation id to play
-
-	@param animationId string | number
 ]=]
-function AnimationTrackPlayer:SetAnimationId(animationId: string | number)
+function AnimationTrackPlayer.SetAnimationId(
+	self: AnimationTrackPlayer,
+	animationId: ValueObject.Mountable<AnimationId?>
+): Maid.MaidTask
 	return self._trackId:Mount(animationId)
 end
 
 --[=[
 	Returns the current animation id
-
-	@return string | number
 ]=]
-function AnimationTrackPlayer:GetAnimationId(): string | number
+function AnimationTrackPlayer.GetAnimationId(self: AnimationTrackPlayer): AnimationId?
 	return self._trackId.Value
 end
 
 --[=[
 	Sets an animation target to play the animation on
-
-	@param animationTarget Instance | Observable<Instance>
 ]=]
-function AnimationTrackPlayer:SetAnimationTarget(animationTarget)
+function AnimationTrackPlayer.SetAnimationTarget(
+	self: AnimationTrackPlayer,
+	animationTarget: ValueObject.Mountable<Instance?>
+): Maid.MaidTask
 	return self._animationTarget:Mount(animationTarget)
 end
 
 --[=[
 	Sets the weight target if it hasn't been set
-
-	@param weight number
-	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:SetWeightTargetIfNotSet(weight: number, fadeTime: number)
-	self._maid._adjustWeight = self:_onEachTrack(function(track)
+function AnimationTrackPlayer.SetWeightTargetIfNotSet(
+	self: AnimationTrackPlayer,
+	weight: number?,
+	fadeTime: number?
+): ()
+	self._maid._adjustWeight = self:_onEachTrack(function(track: AnimationTrack)
 		if track.WeightTarget ~= weight then
 			track:AdjustWeight(weight, fadeTime)
 		end
@@ -146,12 +149,8 @@ end
 
 --[=[
 	Plays the current animation specified
-
-	@param fadeTime number
-	@param weight number
-	@param speed number
 ]=]
-function AnimationTrackPlayer:Play(fadeTime: number, weight: number, speed: number)
+function AnimationTrackPlayer.Play(self: AnimationTrackPlayer, fadeTime: number?, weight: number?, speed: number): ()
 	if weight then
 		self._maid._adjustWeight = nil
 	end
@@ -161,54 +160,44 @@ function AnimationTrackPlayer:Play(fadeTime: number, weight: number, speed: numb
 	end
 
 	self._maid._stop = nil
-	self._maid._play = self:_onEachTrack(function(track)
+	self._maid._play = self:_onEachTrack(function(track: AnimationTrack)
 		track:Play(fadeTime, weight, speed)
 	end)
 end
 
 --[=[
 	Stops the current animation
-
-	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:Stop(fadeTime: number)
+function AnimationTrackPlayer.Stop(self: AnimationTrackPlayer, fadeTime: number?): ()
 	self._maid._play = nil
-	self._maid._stop = self:_onEachTrack(function(track)
+	self._maid._stop = self:_onEachTrack(function(track: AnimationTrack)
 		track:Stop(fadeTime)
 	end)
 end
 
 --[=[
 	Adjusts the weight of the animation track
-
-	@param weight number
-	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:AdjustWeight(weight: number, fadeTime: number)
-	self._maid._adjustWeight = self:_onEachTrack(function(track)
+function AnimationTrackPlayer.AdjustWeight(self: AnimationTrackPlayer, weight: number?, fadeTime: number?): ()
+	self._maid._adjustWeight = self:_onEachTrack(function(track: AnimationTrack)
 		track:AdjustWeight(weight, fadeTime)
 	end)
 end
 
 --[=[
 	Adjusts the speed of the animation track
-
-	@param speed number
-	@param fadeTime number
 ]=]
-function AnimationTrackPlayer:AdjustSpeed(speed: number, fadeTime: number)
-	self._maid._adjustSpeed = self:_onEachTrack(function(track)
-		track:AdjustSpeed(speed, fadeTime)
+function AnimationTrackPlayer.AdjustSpeed(self: AnimationTrackPlayer, speed: number?): ()
+	self._maid._adjustSpeed = self:_onEachTrack(function(track: AnimationTrack)
+		track:AdjustSpeed(speed)
 	end)
 end
 
 --[=[
 	Returns true if playing
-
-	@return boolean
 ]=]
-function AnimationTrackPlayer:IsPlaying(): boolean
-	local track = self._currentTrack.Value
+function AnimationTrackPlayer.IsPlaying(self: AnimationTrackPlayer): boolean
+	local track: AnimationTrack? = self._currentTrack.Value
 	if track then
 		return track.IsPlaying
 	else
@@ -216,8 +205,8 @@ function AnimationTrackPlayer:IsPlaying(): boolean
 	end
 end
 
-function AnimationTrackPlayer:_onEachTrack(callback)
-	return self._currentTrack:Observe():Subscribe(function(track)
+function AnimationTrackPlayer._onEachTrack(self: AnimationTrackPlayer, callback)
+	return self._currentTrack:Observe():Subscribe(function(track: AnimationTrack?)
 		if track ~= nil then
 			callback(track)
 		end

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class TeamKillTrackerClient
 ]=]
@@ -11,24 +11,33 @@ local TeamKillTrackerClient = setmetatable({}, BaseObject)
 TeamKillTrackerClient.ClassName = "TeamKillTrackerClient"
 TeamKillTrackerClient.__index = TeamKillTrackerClient
 
-function TeamKillTrackerClient.new(tracker)
-	local self = setmetatable(BaseObject.new(tracker), TeamKillTrackerClient)
+export type TeamKillTrackerClient =
+	typeof(setmetatable(
+		{} :: {
+			KillsChanged: RBXScriptSignal,
+		},
+		{} :: typeof({ __index = TeamKillTrackerClient })
+	))
+	& BaseObject.BaseObject
 
-	self.KillsChanged = self._obj.Changed
+function TeamKillTrackerClient.new(tracker: IntValue): TeamKillTrackerClient
+	local self: TeamKillTrackerClient = setmetatable(BaseObject.new(tracker) :: any, TeamKillTrackerClient)
+
+	self.KillsChanged = self:GetKillValue().Changed
 
 	return self
 end
 
-function TeamKillTrackerClient:GetKillValue()
-	return self._obj
+function TeamKillTrackerClient.GetKillValue(self: TeamKillTrackerClient): IntValue
+	return self._obj :: IntValue
 end
 
-function TeamKillTrackerClient:GetTeam()
-	return self._obj.Parent
+function TeamKillTrackerClient.GetTeam(self: TeamKillTrackerClient): Instance?
+	return self:GetKillValue().Parent
 end
 
-function TeamKillTrackerClient:GetKills()
-	return self._obj.Value
+function TeamKillTrackerClient.GetKills(self: TeamKillTrackerClient): number
+	return self:GetKillValue().Value
 end
 
 return TeamKillTrackerClient
