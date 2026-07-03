@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Handles IK for local client.
 
@@ -16,12 +16,26 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
+local Binder = require("Binder")
+local IKRigAimerLocalPlayer = require("IKRigAimerLocalPlayer")
+local IKRigClient = require("IKRigClient")
 local IKRigUtils = require("IKRigUtils")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
 local IKServiceClient = {}
 IKServiceClient.ServiceName = "IKServiceClient"
+
+export type IKServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_lookAround: boolean,
+		_ikRigBinderClient: Binder.Binder<IKRigClient.IKRigClient>,
+	},
+	{} :: typeof({ __index = IKServiceClient })
+))
 
 --[=[
 	Initializes the service. Should be called via the [ServiceBag].
@@ -39,8 +53,8 @@ IKServiceClient.ServiceName = "IKServiceClient"
 
 	@param serviceBag ServiceBag
 ]=]
-function IKServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function IKServiceClient.Init(self: IKServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -64,7 +78,7 @@ end
 --[=[
 	Starts the service. Should be called via the [ServiceBag].
 ]=]
-function IKServiceClient:Start()
+function IKServiceClient.Start(self: IKServiceClient): ()
 	assert(self._serviceBag, "Not initialized")
 
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
@@ -77,7 +91,7 @@ end
 	@param humanoid Humanoid
 	@return IKRigClient?
 ]=]
-function IKServiceClient:GetRig(humanoid: Humanoid)
+function IKServiceClient.GetRig(self: IKServiceClient, humanoid: Humanoid): IKRigClient.IKRigClient?
 	assert(self._serviceBag, "Not initialized")
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
@@ -89,7 +103,7 @@ end
 	@param humanoid Humanoid
 	@return Promise<IKRigClient>
 ]=]
-function IKServiceClient:PromiseRig(humanoid: Humanoid)
+function IKServiceClient.PromiseRig(self: IKServiceClient, humanoid: Humanoid): Promise.Promise<IKRigClient.IKRigClient>
 	assert(self._serviceBag, "Not initialized")
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
@@ -114,7 +128,7 @@ end
 	@param position Vector3? -- May be nil to set no position
 	@param priority number?
 ]=]
-function IKServiceClient:SetAimPosition(position: Vector3, priority: number?)
+function IKServiceClient.SetAimPosition(self: IKServiceClient, position: Vector3, priority: number?): ()
 	assert(self._serviceBag, "Not initialized")
 
 	if position ~= position then
@@ -140,7 +154,7 @@ end
 
 	@param lookAround boolean
 ]=]
-function IKServiceClient:SetLookAround(lookAround)
+function IKServiceClient.SetLookAround(self: IKServiceClient, lookAround: boolean): ()
 	assert(self._serviceBag, "Not initialized")
 
 	self._lookAround = lookAround
@@ -151,7 +165,7 @@ end
 
 	@return IKRigAimerLocalPlayer
 ]=]
-function IKServiceClient:GetLocalAimer()
+function IKServiceClient.GetLocalAimer(self: IKServiceClient): IKRigAimerLocalPlayer.IKRigAimerLocalPlayer?
 	assert(self._serviceBag, "Not initialized")
 
 	local rig = self:GetLocalPlayerRig()
@@ -167,14 +181,14 @@ end
 
 	@return IKRigClient?
 ]=]
-function IKServiceClient:GetLocalPlayerRig()
+function IKServiceClient.GetLocalPlayerRig(self: IKServiceClient): IKRigClient.IKRigClient?
 	assert(self._serviceBag, "Not initialized")
 	assert(self._ikRigBinderClient, "Not initialize")
 
 	return IKRigUtils.getPlayerIKRig(self._ikRigBinderClient, Players.LocalPlayer)
 end
 
-function IKServiceClient:_updateStepped()
+function IKServiceClient._updateStepped(self: IKServiceClient): ()
 	debug.profilebegin("IKUpdate")
 
 	local localAimer = self:GetLocalAimer()
@@ -185,7 +199,7 @@ function IKServiceClient:_updateStepped()
 
 	local camPosition = Workspace.CurrentCamera.CFrame.p
 
-	for _, rig in self._ikRigBinderClient:GetAll() do
+	for _, rig in self._ikRigBinderClient:GetAll() :: any do
 		debug.profilebegin("RigUpdate")
 
 		local position = rig:GetPositionOrNil()
@@ -208,7 +222,7 @@ function IKServiceClient:_updateStepped()
 	debug.profileend()
 end
 
-function IKServiceClient:Destroy()
+function IKServiceClient.Destroy(self: IKServiceClient): ()
 	self._maid:DoCleaning()
 end
 

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Utility methods for grip attachments
 	@class IKGripUtils

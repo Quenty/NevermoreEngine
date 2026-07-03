@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Provides IK for a given arm
 	@class ArmIKBase
@@ -11,7 +11,8 @@ local RunService = game:GetService("RunService")
 local ArmIKUtils = require("ArmIKUtils")
 local BaseObject = require("BaseObject")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
-local LimbIKUtils = require("optional")(require, "LimbIKUtils")
+local optional = require("optional")
+local LimbIKUtils = (optional :: any)(require, "LimbIKUtils")
 local Maid = require("Maid")
 local Math = require("Math")
 local Motor6DSmoothTransformer = require("Motor6DSmoothTransformer")
@@ -34,8 +35,40 @@ local ArmIKBase = setmetatable({}, BaseObject)
 ArmIKBase.ClassName = "ArmIKBase"
 ArmIKBase.__index = ArmIKBase
 
-function ArmIKBase.new(humanoid: Humanoid, armName, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(), ArmIKBase)
+type GripData = {
+	attachment: Attachment,
+	priority: number,
+}
+
+export type ArmIKBase =
+	typeof(setmetatable(
+		{} :: {
+			_humanoid: Humanoid,
+			_armName: string,
+			_serviceBag: ServiceBag.ServiceBag,
+			_tieRealmService: any,
+			_grips: { GripData },
+			_direction: number,
+			_gripping: any, -- ValueObject.ValueObject<boolean> (heavy Signal cycle; old solver collapses self)
+			_characterObservable: any,
+			_lastState: any,
+			_shoulderTransform: CFrame?,
+			_elbowTransform: CFrame?,
+			_wristTransform: CFrame?,
+			_offset: Vector3?,
+			_shoulderXAngle: number,
+			_elbowXAngle: number,
+			_initTest: boolean?,
+			_testDefaultShoulderC0: CFrame,
+			_testDefaultElbowC0: CFrame,
+			_testDefaultWristC0: CFrame,
+		},
+		{} :: typeof({ __index = ArmIKBase })
+	))
+	& BaseObject.BaseObject
+
+function ArmIKBase.new(humanoid: Humanoid, armName: string, serviceBag: ServiceBag.ServiceBag): ArmIKBase
+	local self: ArmIKBase = setmetatable(BaseObject.new() :: any, ArmIKBase)
 
 	self._humanoid = humanoid or error("No humanoid")
 	self._armName = assert(armName, "No armName")
@@ -60,7 +93,7 @@ function ArmIKBase.new(humanoid: Humanoid, armName, serviceBag: ServiceBag.Servi
 			return
 		end
 
-		local maid = brio:ToMaid()
+		local maid: any = brio:ToMaid()
 		local character = brio:GetValue()
 
 		maid:GiveTask(self._gripping:Observe():Subscribe(function(isGripping)
@@ -92,10 +125,10 @@ function ArmIKBase.new(humanoid: Humanoid, armName, serviceBag: ServiceBag.Servi
 	return self
 end
 
-function ArmIKBase:_startUpdateLoop(character)
+function ArmIKBase._startUpdateLoop(self: ArmIKBase, character: Instance): Maid.Maid
 	local maid = Maid.new()
 
-	maid:GiveTask(ArmIKUtils.ensureMotorAnimated(character, self._armName))
+	maid:GiveTask(ArmIKUtils.ensureMotorAnimated(character :: any, self._armName :: any))
 
 	maid:GiveTask(self:_ensureAnimator(character, self._armName .. "UpperArm", self._armName .. "Shoulder", function()
 		return self._shoulderTransform
@@ -110,7 +143,16 @@ function ArmIKBase:_startUpdateLoop(character)
 	return maid
 end
 
-function ArmIKBase:_ensureAnimator(character, partName, motorName, getTranform)
+function ArmIKBase._ensureAnimator(
+	self: ArmIKBase,
+	character: Instance,
+	partName: string,
+	motorName: string,
+	getTranform: () -> CFrame?
+): Maid.Maid
+	local RxR15Utils = RxR15Utils :: any
+	local RxBrioUtils = RxBrioUtils :: any
+
 	local topMaid = Maid.new()
 
 	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, partName, motorName)
@@ -144,7 +186,10 @@ function ArmIKBase:_ensureAnimator(character, partName, motorName, getTranform)
 	return topMaid
 end
 
-function ArmIKBase:_observeCharacterBrio()
+function ArmIKBase._observeCharacterBrio(self: ArmIKBase): any
+	local RxInstanceUtils = RxInstanceUtils :: any
+	local Rx = Rx :: any
+
 	if self._characterObservable then
 		return self._characterObservable
 	end
@@ -158,8 +203,12 @@ function ArmIKBase:_observeCharacterBrio()
 	return self._characterObservable
 end
 
-function ArmIKBase:_observeStateBrio()
-	return self:_observeCharacterBrio():Pipe({
+function ArmIKBase._observeStateBrio(self: ArmIKBase): any
+	local RxInstanceUtils = RxInstanceUtils :: any
+	local RxBrioUtils = RxBrioUtils :: any
+	local Rx = Rx :: any
+
+	return (self:_observeCharacterBrio() :: any):Pipe({
 		RxBrioUtils.switchMapBrio(function(character)
 			local observeUpperTorsoBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", "UpperTorso")
 				:Pipe({
@@ -316,19 +365,19 @@ function ArmIKBase:_observeStateBrio()
 	})
 end
 
-function ArmIKBase:Grip(attachment, priority)
+function ArmIKBase.Grip(self: ArmIKBase, attachment: Attachment, priority: number?): () -> ()
 	assert(typeof(attachment) == "Instance", "Bad attachment")
 	assert(type(priority) == "number" or priority == nil, "Bad priority")
 
-	priority = priority or IKAimPositionPriorites.DEFAULT
+	local finalPriority: number = priority or IKAimPositionPriorites.DEFAULT
 
-	local gripData = {
+	local gripData: GripData = {
 		attachment = attachment,
-		priority = priority,
+		priority = finalPriority,
 	}
 
 	local i = 1
-	while self._grips[i] and self._grips[i].priority > priority do
+	while self._grips[i] and self._grips[i].priority > finalPriority do
 		i = i + 1
 	end
 
@@ -342,7 +391,7 @@ function ArmIKBase:Grip(attachment, priority)
 	end
 end
 
-function ArmIKBase:_stopGrip(grip)
+function ArmIKBase._stopGrip(self: ArmIKBase, grip: GripData): ()
 	for index, value in self._grips do
 		if value == grip then
 			table.remove(self._grips, index)
@@ -357,11 +406,11 @@ end
 
 -- Sets transform
 if RunService:IsRunning() and not USE_MOTOR_6D_RAW then
-	function ArmIKBase:UpdateTransformOnly()
+	function ArmIKBase.UpdateTransformOnly(self: ArmIKBase): ()
 		-- no work!
 	end
 else
-	function ArmIKBase:UpdateTransformOnly()
+	function ArmIKBase.UpdateTransformOnly(self: ArmIKBase): ()
 		if not self._grips[1] then
 			return
 		end
@@ -381,8 +430,8 @@ else
 
 		if RunService:IsRunning() then
 			if USE_MOTOR_6D_RAW then
-				shoulder.Transform = self._shoulderTransform
-				elbow.Transform = self._elbowTransform
+				shoulder.Transform = self._shoulderTransform;
+				(elbow :: any).Transform = self._elbowTransform
 				wrist.Transform = self._wristTransform
 			else
 				error("Should not be called")
@@ -396,37 +445,14 @@ else
 				self._testDefaultWristC0 = wrist.C0
 			end
 
-			shoulder.C0 = self._testDefaultShoulderC0 * self._shoulderTransform
-			elbow.C0 = self._testDefaultElbowC0 * self._elbowTransform
+			shoulder.C0 = self._testDefaultShoulderC0 * self._shoulderTransform;
+			(elbow :: any).C0 = self._testDefaultElbowC0 * self._elbowTransform
 			wrist.C0 = self._testDefaultWristC0 * self._wristTransform
 		end
 	end
 end
 
-if USE_OLD_IK_SYSTEM then
-	function ArmIKBase:Update()
-		if self:_oldUpdatePoint() then
-			local shoulderXAngle = self._shoulderXAngle
-			local elbowXAngle = self._elbowXAngle
-
-			local yrot = CFrame.new(Vector3.zero, self._offset)
-
-			self._shoulderTransform = (yrot * CFA_90X * CFrame.Angles(shoulderXAngle, 0, 0)) --:inverse()
-			self._elbowTransform = CFrame.Angles(elbowXAngle, 0, 0)
-			self._wristTransform = CFrame.new()
-
-			self:UpdateTransformOnly()
-		end
-	end
-else
-	function ArmIKBase:Update()
-		if self:_newUpdate() then
-			self:UpdateTransformOnly()
-		end
-	end
-end
-
-function ArmIKBase:_oldUpdatePoint()
+function ArmIKBase._oldUpdatePoint(self: ArmIKBase): boolean
 	local grip = self._grips[1]
 	if not grip then
 		self:_clear()
@@ -441,14 +467,14 @@ function ArmIKBase:_oldUpdatePoint()
 	return true
 end
 
-function ArmIKBase:_clear()
+function ArmIKBase._clear(self: ArmIKBase): ()
 	self._offset = nil
 	self._elbowTransform = nil
 	self._shoulderTransform = nil
 	self._wristTransform = nil
 end
 
-function ArmIKBase:_newUpdate()
+function ArmIKBase._newUpdate(self: ArmIKBase): boolean
 	local grip = self._grips[1]
 	if not (grip and self._lastState) then
 		self._elbowTransform = nil
@@ -504,7 +530,7 @@ function ArmIKBase:_newUpdate()
 	return true
 end
 
-function ArmIKBase:_oldCalculatePoint(targetPositionWorld)
+function ArmIKBase._oldCalculatePoint(self: ArmIKBase, targetPositionWorld: Vector3): boolean
 	if not self._lastState then
 		return false
 	end
@@ -558,6 +584,29 @@ function ArmIKBase:_oldCalculatePoint(targetPositionWorld)
 	self._offset = offset.unit * d
 
 	return true
+end
+
+if USE_OLD_IK_SYSTEM then
+	function ArmIKBase.Update(self: ArmIKBase): ()
+		if self:_oldUpdatePoint() then
+			local shoulderXAngle = self._shoulderXAngle
+			local elbowXAngle = self._elbowXAngle
+
+			local yrot = CFrame.new(Vector3.zero, self._offset :: Vector3)
+
+			self._shoulderTransform = (yrot * CFA_90X * CFrame.Angles(shoulderXAngle, 0, 0)) --:inverse()
+			self._elbowTransform = CFrame.Angles(elbowXAngle, 0, 0)
+			self._wristTransform = CFrame.new()
+
+			self:UpdateTransformOnly()
+		end
+	end
+else
+	function ArmIKBase.Update(self: ArmIKBase): ()
+		if self:_newUpdate() then
+			self:UpdateTransformOnly()
+		end
+	end
 end
 
 return ArmIKBase
