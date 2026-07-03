@@ -43,16 +43,28 @@ type AvatarEditorInventoryQuerier = {
 	) -> Promise.Promise<AvatarEditorInventoryEntry>,
 }
 
+-- Structural subset of CatalogSearchServiceCache covering only PromiseItemDetails. Naming the
+-- full exported type here reintroduces the "Code is too complex to typecheck" blow-up --
+-- CatalogSearchServiceCache is a heavy metatable type (generic Aggregator fields), and nesting
+-- it inside this manager's own intersection explodes the solver.
+type CatalogSearchServiceCacheQuerier = {
+	PromiseItemDetails: (
+		self: CatalogSearchServiceCacheQuerier,
+		assetId: number,
+		avatarItemType: Enum.AvatarItemType
+	) -> Promise.Promise<any>,
+}
+
 export type PlayerProductManagerClient =
 	typeof(setmetatable(
 		{} :: {
 			_obj: Player,
 			_player: Player,
 			_serviceBag: ServiceBag.ServiceBag,
-			_remoting: Remoting.Remoting,
+			_remoting: any, -- Remoting.Remoting (naming the full type here explodes the class-intersection normalization)
 
 			_avatarEditorInventoryServiceClient: AvatarEditorInventoryQuerier,
-			_catalogSearchServiceCache: CatalogSearchServiceCache.CatalogSearchServiceCache,
+			_catalogSearchServiceCache: CatalogSearchServiceCacheQuerier,
 		},
 		{} :: typeof({ __index = PlayerProductManagerClient })
 	))
@@ -92,11 +104,15 @@ function PlayerProductManagerClient.GetPlayer(self: PlayerProductManagerClient):
 	return self._obj
 end
 
-function PlayerProductManagerClient._setupAssetTracker(self: PlayerProductManagerClient): ()
+-- The private setup/query helpers below take `self: any` on purpose. Typing them
+-- `self: PlayerProductManagerClient` makes the solver renormalize the full class-&-base
+-- intersection at every `self:...` call inside them (and at the constructor call sites),
+-- which trips "Code is too complex to typecheck". `self: any` breaks that inference chain.
+function PlayerProductManagerClient._setupAssetTracker(self: any): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)
 	local assetOwnership = assert(tracker:GetOwnershipTracker(), "Missing ownershipTracker on client")
 
-	assetOwnership:SetQueryOwnershipCallback(function(assetId)
+	assetOwnership:SetQueryOwnershipCallback(function(assetId: number): Promise.Promise<boolean>
 		return self:_promiseBulkOwnsAssetQuery(assetId)
 	end)
 
@@ -109,7 +125,7 @@ function PlayerProductManagerClient._setupAssetTracker(self: PlayerProductManage
 	end))
 end
 
-function PlayerProductManagerClient._setupMembershipTracker(self: PlayerProductManagerClient): ()
+function PlayerProductManagerClient._setupMembershipTracker(self: any): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.MEMBERSHIP)
 
 	self._maid:GiveTask(MarketplaceService.PromptPremiumPurchaseFinished:Connect(function()
@@ -133,7 +149,7 @@ function PlayerProductManagerClient._setupMembershipTracker(self: PlayerProductM
 	end))
 end
 
-function PlayerProductManagerClient._setupSubscriptionTracker(self: PlayerProductManagerClient): ()
+function PlayerProductManagerClient._setupSubscriptionTracker(self: any): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.SUBSCRIPTION)
 
 	-- Main event
@@ -166,7 +182,7 @@ function PlayerProductManagerClient._setupSubscriptionTracker(self: PlayerProduc
 	end))
 end
 
-function PlayerProductManagerClient._connectBulkPurchaseMarketplace(self: PlayerProductManagerClient): ()
+function PlayerProductManagerClient._connectBulkPurchaseMarketplace(self: any): ()
 	self._maid:GiveTask(MarketplaceService.PromptBulkPurchaseFinished:Connect(function(player, status, results)
 		if player ~= self._obj then
 			return
@@ -200,7 +216,7 @@ function PlayerProductManagerClient._connectBulkPurchaseMarketplace(self: Player
 	end))
 end
 
-function PlayerProductManagerClient._setupProductTracker(self: PlayerProductManagerClient): ()
+function PlayerProductManagerClient._setupProductTracker(self: any): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
 
 	self._maid:GiveTask(
@@ -224,7 +240,7 @@ function PlayerProductManagerClient._setupProductTracker(self: PlayerProductMana
 	end))
 end
 
-function PlayerProductManagerClient._connectGamePassTracker(self: PlayerProductManagerClient): ()
+function PlayerProductManagerClient._connectGamePassTracker(self: any): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
 
 	self._maid:GiveTask(
@@ -241,12 +257,12 @@ function PlayerProductManagerClient._connectGamePassTracker(self: PlayerProductM
 	)
 end
 
-function PlayerProductManagerClient._setupBundleTracker(self: PlayerProductManagerClient): ()
+function PlayerProductManagerClient._setupBundleTracker(self: any): ()
 	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE)
 
 	local bundleOwnership = assert(tracker:GetOwnershipTracker(), "Missing ownershipTracker on client")
 
-	bundleOwnership:SetQueryOwnershipCallback(function(assetId)
+	bundleOwnership:SetQueryOwnershipCallback(function(assetId: number): Promise.Promise<boolean>
 		return self:_promiseBulkOwnsBundleQuery(assetId)
 	end)
 
@@ -260,10 +276,7 @@ function PlayerProductManagerClient._setupBundleTracker(self: PlayerProductManag
 	end))
 end
 
-function PlayerProductManagerClient._promiseBulkOwnsAssetQuery(
-	self: PlayerProductManagerClient,
-	assetId: number
-): Promise.Promise<boolean>
+function PlayerProductManagerClient._promiseBulkOwnsAssetQuery(self: any, assetId: number): Promise.Promise<boolean>
 	if self._avatarEditorInventoryServiceClient:IsInventoryAccessAllowed() then
 		-- When scrolling through a ton of entries in the avatar editor we want to query
 		-- this is typically faster. We really hope we aren't the Roblox account.
@@ -294,7 +307,7 @@ function PlayerProductManagerClient._promiseBulkOwnsAssetQuery(
 	return MarketplaceUtils.promisePlayerOwnsAsset(self._player, assetId) :: Promise.Promise<boolean>
 end
 
-function PlayerProductManagerClient._promiseBulkOwnsBundleQuery(self: PlayerProductManagerClient, bundleId: number)
+function PlayerProductManagerClient._promiseBulkOwnsBundleQuery(self: any, bundleId: number): Promise.Promise<boolean>
 	return MarketplaceUtils.promisePlayerOwnsBundle(self._player, bundleId)
 end
 

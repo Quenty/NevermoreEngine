@@ -305,7 +305,7 @@ function GameProductDataService.ObserveAssetPurchased(
 						return playerProductManager:GetPlayer()
 					end),
 				})
-			end),
+			end) :: any,
 			Rx.map(function(brio)
 				-- I THINK THIS LEAKS
 				if brio:IsDead() then
@@ -313,10 +313,10 @@ function GameProductDataService.ObserveAssetPurchased(
 				end
 
 				return brio:GetValue()
-			end),
+			end) :: any,
 			Rx.where(function(value)
 				return value ~= nil
-			end),
+			end) :: any,
 		})
 end
 
@@ -382,7 +382,7 @@ function GameProductDataService._promisePlayerProductManager(
 	return PlayerProductManagerInterface:Promise(player, self._tieRealmService:GetTieRealm())
 end
 
-function GameProductDataService._getPlayerProductManager(self: GameProductDataService, player: Player)
+function GameProductDataService._getPlayerProductManager(self: GameProductDataService, player: Player): any
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerProductManagerInterface:Find(player, self._tieRealmService:GetTieRealm())
