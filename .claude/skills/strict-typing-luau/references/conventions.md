@@ -234,6 +234,12 @@ end
 
 - **`unused_variable: self`** — converting `function C:M()` → `function C.M(self: C)` on a body that never uses `self` makes the now-explicit param unused. Rename it **`_self`** (repo idiom, 70+ uses; the leading `_` is selene's unused-allow). Callers still write `obj:M()`.
 - **`shadowing`** — an Rx escape written as `local RxX = RxX :: any` *inside a function* shadows the module require. Don't. Cast at the source: `local RxX: any = require("RxX")` at the top (the sanctioned nonstrict-module boundary) and drop the per-function casts.
+
+**moonwave (`lint:moonwave`) is a THIRD gate the conversion can break** (docstrings, not types — run `moonwave-extractor extract src` in the package):
+- `@type Name` with **no type value** → "Property type is required". Give it the value: `@type ModifierInputChord { type: "ModifierInputChord", ... }`.
+- Converting a metamethod `function C:__index(i)` → `(C :: any).__index = function(self, i)` **loses moonwave's class association**, so its docstring now needs an explicit `@within C` tag ("Function requires @within tag").
+
+**A cross-package `Expected 'X' but got 'X'` (same name) may be un-reproducible locally and unfixable by casting** — it's a luau-lsp V1-solver symlink-nominal cache flake whose appearance depends on CI's file-resolution order. If casting every value on the line doesn't clear it and you can't reproduce it, the honest escape is to drop *that one file* to `--!nonstrict` and flag it.
 | A direct cast `v :: T` rejected as **"types are unrelated"** (e.g. a metatable'd `setmetatable({number}, mt)` alias vs a plain `{number}`) | Old solver won't cast between unrelated types in one step — launder through `any`: `(v :: any) :: T`. Same trick to reach a metatable method the alias type doesn't surface: `(v :: any):method()`. Sound when `v` genuinely is a `T` at runtime; keep the public signature precise. |
 
 ## Common type imports
