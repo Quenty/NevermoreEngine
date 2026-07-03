@@ -26,7 +26,7 @@ export type GameConfigClient =
 	& GameConfigBase.GameConfigBase
 
 function GameConfigClient.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): GameConfigClient
-	local self = setmetatable(GameConfigBase.new(folder), GameConfigClient)
+	local self: GameConfigClient = setmetatable(GameConfigBase.new(folder) :: any, GameConfigClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigBindersClient = self._serviceBag:GetService(GameConfigBindersClient)
