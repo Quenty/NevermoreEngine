@@ -36,5 +36,12 @@ GOLD_SRC="$(git show "$GOLD_REF:$FILE" 2>/dev/null || true)"
 ANY_GOLD="$(printf '%s' "$GOLD_SRC" | count_any)"
 ANY_GOLD_NONRX="$(printf '%s' "$GOLD_SRC" | count_any_nonrx)"
 
-printf '{"file":"%s","strict":%s,"analyze_errors":%s,"any":%s,"any_gold":%s,"any_nonrx":%s,"any_gold_nonrx":%s}\n' \
-  "$FILE" "$STRICT" "$ERRORS" "$ANY_FILE" "$ANY_GOLD" "$ANY_FILE_NONRX" "$ANY_GOLD_NONRX"
+# --- selene: the SECOND gate. Dot-syntax conversion trips `unused_variable: self` (→ rename `_self`)
+# and Rx `local X = X :: any` trips `shadowing` — both pass analyze but FAIL lint:selene (CI-failing).
+# Count selene findings in the target file only. Best-effort: needs the roblox std (generate once).
+[ -f roblox.yml ] || selene generate-roblox-std >/dev/null 2>&1 || true
+SELENE_OUT="$(selene --display-style=Json --config=selene.toml "$FILE" 2>/dev/null || true)"
+SELENE="$(printf '%s\n' "$SELENE_OUT" | grep -c '"severity"' || true)"
+
+printf '{"file":"%s","strict":%s,"analyze_errors":%s,"selene":%s,"any":%s,"any_gold":%s,"any_nonrx":%s,"any_gold_nonrx":%s}\n' \
+  "$FILE" "$STRICT" "$ERRORS" "$SELENE" "$ANY_FILE" "$ANY_GOLD" "$ANY_FILE_NONRX" "$ANY_GOLD_NONRX"

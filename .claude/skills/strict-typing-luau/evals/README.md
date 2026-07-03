@@ -24,13 +24,16 @@ Per case, drive the worker (an agent running the skill) with these primitives:
 ```bash
 bash evals/lib/run.sh place   <case_id>   # lay the nonstrict INPUT at the file's real path
 #   ... run the skill on that path to convert it in place ...
-bash evals/lib/run.sh score   <case_id>   # -> {strict, analyze_errors, any, any_gold}
+bash evals/lib/run.sh score   <case_id>   # -> {strict, analyze_errors, selene, any, any_gold}
 bash evals/lib/run.sh restore <case_id>   # undo: restore the package to main
 ```
 
-A conversion **passes** when `strict=true`, `analyze_errors=0`, and `any_nonrx <= any_gold_nonrx`
+A conversion **passes** when `strict=true`, `analyze_errors=0`, `selene=0`, and `any_nonrx <= any_gold_nonrx`
 (no looser than the maintainer's output, *excluding* Rx-chain casts — those are deliberate policy,
-see `references/rx.md`). `score.sh` reports both the total `any` and the budgeted `any_nonrx`. Run
+see `references/rx.md`). `selene` is the SECOND gate (CI-failing): dot-syntax conversion trips
+`unused_variable: self` (→ rename `_self`) and an Rx `local X = X :: any` trips `shadowing` (→
+`local X: any = require`), both of which pass analyze but fail selene — so the scorer counts selene
+findings in the target file. `score.sh` reports both the total `any` and the budgeted `any_nonrx`. Run
 `npm run lint:luau` once at the end as the downstream gate.
 
 **Whole-package runs.** Cases sharing an `input` commit belong to one package conversion — e.g.

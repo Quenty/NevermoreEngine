@@ -62,7 +62,7 @@ case "${1:-}" in
   parallelism) bash "$HERE/parallelism.sh" ;;
   routing)  node "$HERE/routing.js" ;;
   gold)
-    printf '%-22s %-8s %-6s %-8s %-5s %s\n' CASE POLARITY STRICT ANALYZE ANY VERDICT
+    printf '%-22s %-8s %-6s %-8s %-7s %-5s %s\n' CASE POLARITY STRICT ANALYZE SELENE ANY VERDICT
     fails=0
     for id in $(ids); do
       pol="$(field "$id" polarity)"
@@ -71,15 +71,16 @@ case "${1:-}" in
       restore "$id"
       strict="$(node -e "console.log(JSON.parse(process.argv[1]).strict)" "$row")"
       errs="$(node -e "console.log(JSON.parse(process.argv[1]).analyze_errors)" "$row")"
+      selene="$(node -e "console.log(JSON.parse(process.argv[1]).selene)" "$row")"
       any="$(node -e "console.log(JSON.parse(process.argv[1]).any)" "$row")"
-      # gold expectation: positive => strict & 0 errors; negative => nonstrict (reverted)
+      # gold expectation: positive => strict & 0 analyze errors & 0 selene findings; negative => nonstrict (reverted)
       verdict=PASS
       if [ "$pol" = positive ]; then
-        { [ "$strict" = true ] && [ "$errs" -eq 0 ]; } || { verdict=FAIL; fails=$((fails+1)); }
+        { [ "$strict" = true ] && [ "$errs" -eq 0 ] && [ "$selene" -eq 0 ]; } || { verdict=FAIL; fails=$((fails+1)); }
       else
         [ "$strict" = false ] || { verdict=FAIL; fails=$((fails+1)); }
       fi
-      printf '%-22s %-8s %-6s %-8s %-5s %s\n' "$id" "$pol" "$strict" "$errs" "$any" "$verdict"
+      printf '%-22s %-8s %-6s %-8s %-7s %-5s %s\n' "$id" "$pol" "$strict" "$errs" "$selene" "$any" "$verdict"
     done
     echo
     [ "$fails" -eq 0 ] && echo "GOLD SMOKE TEST: all cases passed" || { echo "GOLD SMOKE TEST: $fails FAILED"; exit 1; }

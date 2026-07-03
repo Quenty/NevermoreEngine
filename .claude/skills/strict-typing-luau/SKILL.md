@@ -48,6 +48,12 @@ callers. Triage new downstream errors: pre-existing → leave & flag; your type 
 tight for the real contract → loosen *your* type (often `T?` not `T`); a small obvious follow-on
 → fix it.
 
+The gate is **both** `lint:luau` (types) **and** `lint:selene` (lints), which exits non-zero.
+Dot-syntax conversion routinely trips selene even when analyze is clean: an `unused_variable: self`
+(method body ignores the now-explicit param → rename it **`_self`**) or a `shadowing` from an Rx escape
+`local X = X :: any` inside a function (→ cast at the source, `local X: any = require("X")`). See the
+"selene" section in `references/conventions.md`.
+
 ## Core patterns
 
 **Class with a parent (the common case):**
