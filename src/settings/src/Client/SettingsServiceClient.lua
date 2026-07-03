@@ -165,9 +165,9 @@ function SettingsServiceClient.PromisePlayerSettings(
 end
 
 function SettingsServiceClient._setupCmdr(self: SettingsServiceClient)
-	local cmdrServiceClient = self._serviceBag:GetService(require("CmdrServiceClient")) :: any
+	local cmdrServiceClient = self._serviceBag:GetService(require("CmdrServiceClient"))
 
-	self._maid:GivePromise(cmdrServiceClient:PromiseCmdr()):Then(function(cmdr)
+	self._maid:GivePromise((cmdrServiceClient :: any):PromiseCmdr()):Then(function(cmdr)
 		SettingsCmdrUtils.registerSettingDefinition(cmdr, self._serviceBag)
 	end)
 end
