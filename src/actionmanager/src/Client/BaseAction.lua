@@ -23,7 +23,7 @@ local BaseAction = {}
 BaseAction.__index = BaseAction
 BaseAction.ClassName = "BaseAction"
 
-EnabledMixin:Add(BaseAction)
+(EnabledMixin :: any):Add(BaseAction)
 
 export type ActionData = {
 	Name: string,
