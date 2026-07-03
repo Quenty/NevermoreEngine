@@ -189,6 +189,7 @@ end
 
 	@param index string
 	@return SettingDefinition
+	@within SettingDefinitionProvider
 ]=]
 (SettingDefinitionProvider :: any).__index = function(self: any, index: any)
 	if index == nil then

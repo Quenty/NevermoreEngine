@@ -65,7 +65,7 @@ function PlayerProductManager.new(player: Player, serviceBag: ServiceBag.Service
 	-- Initialize attributes
 
 	-- Implement
-	local impl = self._maid:Add(PlayerProductManagerInterface.Server:Implement(self._obj, selfAny))
+	local impl = self._maid:Add((PlayerProductManagerInterface.Server :: any):Implement(self._obj, self))
 	selfAny:ExportMarketTrackers(impl:GetImplParent())
 
 	return self
