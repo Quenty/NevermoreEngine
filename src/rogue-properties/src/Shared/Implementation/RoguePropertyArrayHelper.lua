@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RoguePropertyArrayHelper
 ]=]
@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Observable = require("Observable")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
 local RoguePropertyBaseValueTypes = require("RoguePropertyBaseValueTypes")
 local Rx = require("Rx")
@@ -15,8 +16,24 @@ local RoguePropertyArrayHelper = setmetatable({}, BaseObject)
 RoguePropertyArrayHelper.ClassName = "RoguePropertyArrayHelper"
 RoguePropertyArrayHelper.__index = RoguePropertyArrayHelper
 
-function RoguePropertyArrayHelper.new(serviceBag: ServiceBag.ServiceBag, arrayDefinitionHelper, roguePropertyTable)
-	local self = setmetatable(BaseObject.new(), RoguePropertyArrayHelper)
+export type RoguePropertyArrayHelper =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_roguePropertyTable: any,
+			_arrayDefinitionHelper: any,
+			_defaultRogueProperties: { any }?,
+		},
+		{} :: typeof({ __index = RoguePropertyArrayHelper })
+	))
+	& BaseObject.BaseObject
+
+function RoguePropertyArrayHelper.new(
+	serviceBag: ServiceBag.ServiceBag,
+	arrayDefinitionHelper: any,
+	roguePropertyTable: any
+): RoguePropertyArrayHelper
+	local self: RoguePropertyArrayHelper = setmetatable(BaseObject.new() :: any, RoguePropertyArrayHelper)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._roguePropertyTable = assert(roguePropertyTable, "No roguePropertyTable")
@@ -25,13 +42,13 @@ function RoguePropertyArrayHelper.new(serviceBag: ServiceBag.ServiceBag, arrayDe
 	return self
 end
 
-function RoguePropertyArrayHelper:SetCanInitialize(canInitialize: boolean)
+function RoguePropertyArrayHelper.SetCanInitialize(self: RoguePropertyArrayHelper, canInitialize: boolean): ()
 	if canInitialize then
 		self:GetArrayRogueProperties()
 	end
 end
 
-function RoguePropertyArrayHelper:GetArrayRogueProperty(index: number)
+function RoguePropertyArrayHelper.GetArrayRogueProperty(self: RoguePropertyArrayHelper, index: number): any
 	assert(type(index) == "number", "Bad index")
 
 	-- TODO: Maybe return something general for that index
@@ -41,7 +58,7 @@ function RoguePropertyArrayHelper:GetArrayRogueProperty(index: number)
 	return rogueProperties[index]
 end
 
-function RoguePropertyArrayHelper:GetArrayRogueProperties()
+function RoguePropertyArrayHelper.GetArrayRogueProperties(self: RoguePropertyArrayHelper): { any }
 	-- Dynamic construction of the properties based upon when exists
 	local container = self._roguePropertyTable:GetContainer()
 
@@ -79,7 +96,7 @@ function RoguePropertyArrayHelper:GetArrayRogueProperties()
 	return rogueProperties
 end
 
-function RoguePropertyArrayHelper:_getDefaultRogueProperties()
+function RoguePropertyArrayHelper._getDefaultRogueProperties(self: RoguePropertyArrayHelper): { any }
 	if self._defaultRogueProperties then
 		return self._defaultRogueProperties
 	end
@@ -92,10 +109,10 @@ function RoguePropertyArrayHelper:_getDefaultRogueProperties()
 	end
 
 	self._defaultRogueProperties = defaultRogueProperties
-	return self._defaultRogueProperties
+	return defaultRogueProperties
 end
 
-function RoguePropertyArrayHelper:SetArrayBaseData(arrayData)
+function RoguePropertyArrayHelper.SetArrayBaseData(self: RoguePropertyArrayHelper, arrayData: any): ()
 	assert(self._arrayDefinitionHelper:CanAssign(arrayData, false)) -- This has good error messages
 
 	local container = self._roguePropertyTable:GetContainer()
@@ -135,7 +152,7 @@ function RoguePropertyArrayHelper:SetArrayBaseData(arrayData)
 	self:_removeUnspecified(container, definitions)
 end
 
-function RoguePropertyArrayHelper:SetArrayData(arrayData)
+function RoguePropertyArrayHelper.SetArrayData(self: RoguePropertyArrayHelper, arrayData: any): ()
 	assert(self._arrayDefinitionHelper:CanAssign(arrayData, false)) -- This has good error messages
 
 	local container = self._roguePropertyTable:GetContainer()
@@ -174,7 +191,11 @@ function RoguePropertyArrayHelper:SetArrayData(arrayData)
 	self:_removeUnspecified(container, definitions)
 end
 
-function RoguePropertyArrayHelper:_removeUnspecified(container, definitions)
+function RoguePropertyArrayHelper._removeUnspecified(
+	self: RoguePropertyArrayHelper,
+	container: Instance,
+	definitions: any
+): ()
 	for _, item in container:GetChildren() do
 		local index = RoguePropertyArrayUtils.getIndexFromName(item.Name)
 		if index then
@@ -185,7 +206,7 @@ function RoguePropertyArrayHelper:_removeUnspecified(container, definitions)
 	end
 end
 
-function RoguePropertyArrayHelper:GetArrayBaseValues()
+function RoguePropertyArrayHelper.GetArrayBaseValues(self: RoguePropertyArrayHelper): { any }
 	local result = {}
 	for index, rogueProperty in pairs(self:GetArrayRogueProperties()) do
 		result[index] = rogueProperty:GetBaseValue()
@@ -193,7 +214,7 @@ function RoguePropertyArrayHelper:GetArrayBaseValues()
 	return result
 end
 
-function RoguePropertyArrayHelper:GetArrayValues()
+function RoguePropertyArrayHelper.GetArrayValues(self: RoguePropertyArrayHelper): { any }
 	local result = {}
 	for index, rogueProperty in pairs(self:GetArrayRogueProperties()) do
 		result[index] = rogueProperty:GetValue()
@@ -201,7 +222,7 @@ function RoguePropertyArrayHelper:GetArrayValues()
 	return result
 end
 
-function RoguePropertyArrayHelper:ObserveArrayValues()
+function RoguePropertyArrayHelper.ObserveArrayValues(self: RoguePropertyArrayHelper): Observable.Observable<{ any }>
 	--warn("[RoguePropertyArrayHelper] - Observing arrays is only partially supported")
 
 	-- TODO: Allow for observing
@@ -211,7 +232,7 @@ function RoguePropertyArrayHelper:ObserveArrayValues()
 		table.insert(observables, rogueProperty:Observe())
 	end
 
-	return Rx.combineLatest(observables)
+	return Rx.combineLatest(observables) :: any
 end
 
 return RoguePropertyArrayHelper
