@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Instead of modifying this file, consider setting attributes on each motor on humanoid
 	join.
@@ -21,7 +21,16 @@ local RxR15Utils = require("RxR15Utils")
 
 local RagdollBallSocketUtils = {}
 
-local R6_RAGDOLL_RIG = {
+export type RagdollRigData = {
+	part0Name: string,
+	part1Name: string,
+	attachmentName: string,
+	motorParentName: string,
+	motorName: string,
+	limitData: any,
+}
+
+local R6_RAGDOLL_RIG: { RagdollRigData } = {
 	{
 		part0Name = "Torso",
 		part1Name = "Head",
@@ -64,7 +73,7 @@ local R6_RAGDOLL_RIG = {
 	},
 }
 
-local R15_RAGDOLL_RIG = {
+local R15_RAGDOLL_RIG: { RagdollRigData } = {
 	{
 		part0Name = "UpperTorso",
 		part1Name = "Head",
@@ -181,7 +190,7 @@ local R15_RAGDOLL_RIG = {
 	},
 }
 
-function RagdollBallSocketUtils.getRigData(rigType)
+function RagdollBallSocketUtils.getRigData(rigType: Enum.HumanoidRigType): { RagdollRigData }
 	if rigType == Enum.HumanoidRigType.R15 then
 		return R15_RAGDOLL_RIG
 	elseif rigType == Enum.HumanoidRigType.R6 then
@@ -191,7 +200,7 @@ function RagdollBallSocketUtils.getRigData(rigType)
 	end
 end
 
-function RagdollBallSocketUtils.ensureBallSockets(character, rigType)
+function RagdollBallSocketUtils.ensureBallSockets(character: Model, rigType: Enum.HumanoidRigType): Maid.Maid
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
@@ -204,7 +213,7 @@ function RagdollBallSocketUtils.ensureBallSockets(character, rigType)
 		local attachmentName = assert(data.attachmentName, "No attachmentName")
 		local limitData = assert(data.limitData, "No limits")
 
-		local observable = RxR15Utils.observeRigMotorBrio(character, data.motorParentName, motorName):Pipe({
+		local observable = (RxR15Utils.observeRigMotorBrio(character, data.motorParentName, motorName) :: any):Pipe({
 			RxBrioUtils.switchMapBrio(function(motor)
 				if motor then
 					return RxBrioUtils.flatCombineLatest({
@@ -217,15 +226,15 @@ function RagdollBallSocketUtils.ensureBallSockets(character, rigType)
 				else
 					return Rx.of({})
 				end
-			end),
-			RxBrioUtils.where(function(motorState)
+			end) :: any,
+			RxBrioUtils.where(function(motorState: any)
 				return motorState.attachment0
 						and motorState.attachment1
 						and motorState.part1
 						and motorState.motor
 						and true
 					or false
-			end),
+			end) :: any,
 		})
 
 		topMaid:GiveTask(observable:Subscribe(function(brio)
@@ -263,7 +272,7 @@ function RagdollBallSocketUtils.ensureBallSockets(character, rigType)
 				referenceMass = limitValue.ReferenceMass:Observe(),
 				gravity = RxInstanceUtils.observeProperty(Workspace, "Gravity"),
 				mass = RxPhysicsUtils.observePartMass(motorState.part1),
-			}):Subscribe(function(state)
+			}):Subscribe(function(state: any)
 				local gravityScale = state.gravity / state.referenceGravity
 				local referenceMass = state.referenceMass
 				local massScale = referenceMass and (state.mass / referenceMass) or 1
