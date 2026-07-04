@@ -1,13 +1,19 @@
 import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs } from '../cli-utils.js';
-import { type PackageResult, BaseReporter } from './reporter.js';
+import { type JobPhase, type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
-import { formatProgressInline, formatProgressResult, isEmptyTestRun } from './progress-format.js';
+import {
+  formatProgressInline,
+  formatProgressResult,
+  isEmptyTestRun,
+} from './progress-format.js';
 
 export interface SpinnerReporterOptions {
   showLogs: boolean;
   /** Verb used in the header, e.g. "Testing", "Deploying". Default: "Processing" */
   actionVerb?: string;
+  /** Extra context appended to the header line, e.g. "to target 'integration'". */
+  actionContext?: string;
   /** Label for successful results, e.g. "Deployed". Default: "Passed" */
   successLabel?: string;
   /** Label for failed results, e.g. "DEPLOY FAILED". Default: "FAILED" */
@@ -16,10 +22,19 @@ export interface SpinnerReporterOptions {
 
 const SPINNER_FRAMES = ['◐', '◓', '◑', '◒'];
 
-/** Emoji + label for each active phase in the spinner. */
-const PHASE_LABELS: Record<string, string> = {
+// Wide enough to fit "⬇ Downloading (12.3 MB/12.3 MB)" without bumping the
+// duration column out of alignment. Bytes progress is the widest case; test
+// counts and version labels comfortably fit.
+const STATUS_COLUMN_WIDTH = 32;
+
+// Typed Record<JobPhase, string> so adding a new JobPhase fails the build
+// until a label is supplied here — otherwise the renderer's else branch
+// would silently flash the failure label during the missing phase.
+const PHASE_LABELS: Record<JobPhase, string> = {
   waiting: '◇ Waiting',
   building: '⚙ Building',
+  downloading: '⬇ Downloading',
+  merging: '🔀 Merging',
   combining: '🔗 Combining',
   uploading: '▲ Uploading',
   scheduling: '◇ Scheduling',
@@ -31,6 +46,14 @@ const PHASE_LABELS: Record<string, string> = {
 /**
  * TTY spinner rendering for batch job progress.
  * Reads all state from IStateTracker; re-renders on a timer interval.
+ *
+ * Stdout/stderr writes between startAsync() and stopAsync() are *captured*,
+ * not passed through. The spinner repaints by rewinding the cursor with
+ * `\x1b[NA\x1b[0J`, so any write that landed inside the spinner's render
+ * region would be erased on the next 80ms tick. Callers should not have to
+ * think about that — we buffer writes and flush them in stopAsync(), so
+ * `console.log` / `OutputHelper.info` / etc. during a run still surface,
+ * just after the spinner has finished.
  */
 export class SpinnerReporter extends BaseReporter {
   private _state: IStateTracker;
@@ -38,8 +61,9 @@ export class SpinnerReporter extends BaseReporter {
   private _renderedLineCount: number = 0;
   private _renderInterval?: ReturnType<typeof setInterval>;
   private _spinnerFrame: number = 0;
-  private _extraLines = 0;
+  private _capturedOutput: string = '';
   private _originalStdoutWrite: typeof process.stdout.write | undefined;
+  private _originalStderrWrite: typeof process.stderr.write | undefined;
   private _isRendering = false;
 
   constructor(state: IStateTracker, options: SpinnerReporterOptions) {
@@ -51,24 +75,47 @@ export class SpinnerReporter extends BaseReporter {
   override async startAsync(): Promise<void> {
     const count = this._state.total;
     const verb = this._options.actionVerb ?? 'Processing';
-    console.log(
-      OutputHelper.formatInfo(
-        `${verb} ${count} ${count === 1 ? 'package' : 'packages'}\n`
-      )
-    );
+    const noun = count === 1 ? 'package' : 'packages';
+    const context = this._options.actionContext;
+    const header = context
+      ? `${verb} ${count} ${noun} ${context}`
+      : `${verb} ${count} ${noun}`;
+    console.log(OutputHelper.formatInfo(`${header}\n`));
     process.stdout.write('\x1b[?25l');
     this._renderedLineCount = 0;
 
-    // Intercept stdout to track external writes that shift the cursor
+    // Intercept stdout/stderr. External writes during the spinner are
+    // captured into a buffer instead of going to the terminal, otherwise the
+    // next 80ms render tick would clobber them via the cursor-rewind. The
+    // buffer is flushed in stopAsync() so callers still see their output —
+    // just after the spinner finishes. Writes made *by* the spinner itself
+    // (_isRendering=true) pass through normally.
     this._originalStdoutWrite = process.stdout.write.bind(process.stdout);
+    this._originalStderrWrite = process.stderr.write.bind(process.stderr);
     const self = this;
-    process.stdout.write = function (chunk: any, ...args: any[]) {
-      if (!self._isRendering) {
+    const intercept = (
+      originalWrite: typeof process.stdout.write,
+      stream: NodeJS.WriteStream
+    ) =>
+      function (chunk: any, ...args: any[]) {
+        if (self._isRendering) {
+          return originalWrite.call(stream, chunk, ...args);
+        }
         const str = typeof chunk === 'string' ? chunk : chunk.toString();
-        self._extraLines += (str.match(/\n/g) || []).length;
-      }
-      return self._originalStdoutWrite!.call(process.stdout, chunk, ...args);
-    } as any;
+        self._capturedOutput += str;
+        // Invoke the optional Node-style completion callback if present.
+        const cb = args.find((a) => typeof a === 'function');
+        if (cb) cb();
+        return true;
+      };
+    process.stdout.write = intercept(
+      this._originalStdoutWrite,
+      process.stdout
+    ) as any;
+    process.stderr.write = intercept(
+      this._originalStderrWrite,
+      process.stderr
+    ) as any;
 
     this._render();
     this._renderInterval = setInterval(() => {
@@ -84,14 +131,25 @@ export class SpinnerReporter extends BaseReporter {
     }
     this._render();
 
-    // Restore original stdout.write
+    // Restore original stdout.write / stderr.write
     if (this._originalStdoutWrite) {
       process.stdout.write = this._originalStdoutWrite;
       this._originalStdoutWrite = undefined;
     }
+    if (this._originalStderrWrite) {
+      process.stderr.write = this._originalStderrWrite;
+      this._originalStderrWrite = undefined;
+    }
 
     process.stdout.write('\x1b[?25h');
     console.log('');
+
+    // Flush anything captured during the run. Goes out *after* the final
+    // spinner frame so callers see their late prints below the progress.
+    if (this._capturedOutput.length > 0) {
+      process.stdout.write(this._capturedOutput);
+      this._capturedOutput = '';
+    }
 
     if (this._options.showLogs) {
       this._printAllLogs();
@@ -122,8 +180,8 @@ export class SpinnerReporter extends BaseReporter {
       ? OutputHelper.formatSuccess('✓')
       : OutputHelper.formatError('✗');
     const status = result.success
-      ? (this._options.successLabel ?? 'Passed')
-      : (this._options.failureLabel ?? 'FAILED');
+      ? this._options.successLabel ?? 'Passed'
+      : result.failureLabel ?? this._options.failureLabel ?? 'FAILED';
     const formatted = result.success
       ? OutputHelper.formatSuccess(status)
       : OutputHelper.formatError(status);
@@ -157,41 +215,55 @@ export class SpinnerReporter extends BaseReporter {
 
       let line: string;
 
-      const phaseLabel = PHASE_LABELS[state.status];
-
       if (state.status === 'pending') {
         const icon = OutputHelper.formatDim('○');
         const statusText = OutputHelper.formatDim('Queued');
         line = `  ${icon} ${OutputHelper.formatDim(
           state.name.padEnd(30)
         )} ${statusText}`;
-      } else if (phaseLabel) {
+      } else if (state.status === 'passed') {
+        const icon = OutputHelper.formatSuccess('✓');
+        const progressText = formatProgressResult(
+          state.result?.progressSummary
+        );
+        const label = this._options.successLabel ?? 'Passed';
+        const empty = isEmptyTestRun(state.result?.progressSummary);
+        let plain = progressText ? `${label} ${progressText}` : label;
+        if (empty) plain += ' ⚠';
+        const padded = OutputHelper.padVisible(plain, STATUS_COLUMN_WIDTH);
+        const statusText = empty
+          ? OutputHelper.formatWarning(padded)
+          : OutputHelper.formatSuccess(padded);
+        line = `  ${icon} ${state.name.padEnd(
+          30
+        )} ${statusText} ${OutputHelper.formatDim(time)}`;
+      } else if (state.status === 'failed') {
+        const icon = OutputHelper.formatError('✗');
+        const failedPhase = state.result?.failedPhase;
+        const failureLabel =
+          state.result?.failureLabel ?? this._options.failureLabel ?? 'FAILED';
+        const plain = failedPhase
+          ? `${failureLabel} at ${failedPhase}`
+          : failureLabel;
+        const statusText = OutputHelper.formatError(
+          plain.padEnd(STATUS_COLUMN_WIDTH)
+        );
+        line = `  ${icon} ${state.name.padEnd(
+          30
+        )} ${statusText} ${OutputHelper.formatDim(time)}`;
+      } else {
+        const phaseLabel = PHASE_LABELS[state.status];
         const icon = OutputHelper.formatInfo(spinner);
         const progressText = formatProgressInline(state.progress);
         const plain = progressText
           ? `${phaseLabel} ${progressText}`
           : phaseLabel;
-        const statusText = OutputHelper.formatInfo(plain.padEnd(22));
-        line = `  ${icon} ${state.name.padEnd(30)} ${statusText} ${OutputHelper.formatDim(time)}`;
-      } else if (state.status === 'passed') {
-        const icon = OutputHelper.formatSuccess('✓');
-        const progressText = formatProgressResult(state.result?.progressSummary);
-        const label = this._options.successLabel ?? 'Passed';
-        const empty = isEmptyTestRun(state.result?.progressSummary);
-        let plain = progressText ? `${label} ${progressText}` : label;
-        if (empty) plain += ' ⚠';
-        const statusText = empty
-          ? OutputHelper.formatWarning(plain.padEnd(22))
-          : OutputHelper.formatSuccess(plain.padEnd(22));
-        line = `  ${icon} ${state.name.padEnd(30)} ${statusText} ${OutputHelper.formatDim(time)}`;
-      } else {
-        const icon = OutputHelper.formatError('✗');
-        const failedPhase = state.result?.failedPhase;
-        const plain = failedPhase
-          ? `${this._options.failureLabel ?? 'FAILED'} at ${failedPhase}`
-          : (this._options.failureLabel ?? 'FAILED');
-        const statusText = OutputHelper.formatError(plain.padEnd(22));
-        line = `  ${icon} ${state.name.padEnd(30)} ${statusText} ${OutputHelper.formatDim(time)}`;
+        const statusText = OutputHelper.formatInfo(
+          OutputHelper.padVisible(plain, STATUS_COLUMN_WIDTH)
+        );
+        line = `  ${icon} ${state.name.padEnd(
+          30
+        )} ${statusText} ${OutputHelper.formatDim(time)}`;
       }
 
       lines.push(line);
@@ -206,10 +278,8 @@ export class SpinnerReporter extends BaseReporter {
 
     this._isRendering = true;
     let frame = '';
-    const totalLines = this._renderedLineCount + this._extraLines;
-    this._extraLines = 0;
-    if (totalLines > 0) {
-      frame += `\x1b[${totalLines}A\x1b[0J`;
+    if (this._renderedLineCount > 0) {
+      frame += `\x1b[${this._renderedLineCount}A\x1b[0J`;
     }
     frame += lines.join('\n') + '\n';
     process.stdout.write(frame);

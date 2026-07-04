@@ -1,13 +1,12 @@
 {
   "name": "@quenty/humanoidspeed",
-  "version": "12.46.2",
+  "version": "12.49.1",
   "description": "Handles humanoid speed in a centralized location",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
     "Input",
-    "Idle",
     "Humanoids"
   ],
   "bugs": {
@@ -16,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/idleservice/"
+    "directory": "src/humanoidspeed/"
   },
   "funding": {
     "type": "patreon",

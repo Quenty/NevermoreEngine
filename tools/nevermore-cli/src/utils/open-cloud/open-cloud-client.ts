@@ -19,6 +19,11 @@ export interface LuauTask {
     | 'COMPLETE'
     | 'FAILED';
   script: string;
+  timeout?: string;
+  /** Script return value (populated on COMPLETE). */
+  output?: { results?: Array<{ value?: string }> };
+  /** Error details (populated on FAILED). */
+  error?: { code?: string; message?: string };
 }
 
 export interface OpenCloudClientOptions {
@@ -209,10 +214,30 @@ export class OpenCloudClient {
     universeId: number,
     placeId: number,
     placeVersion: number,
-    script: string
+    script: string,
+    timeoutMs?: number
   ): Promise<LuauTask> {
     const apiKey = await this._resolveApiKeyAsync();
     const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
+
+    const body: {
+      script: string;
+      timeout?: string;
+      enableBinaryOutput?: boolean;
+    } = { script, enableBinaryOutput: false };
+    if (timeoutMs !== undefined) {
+      // Roblox encodes durations as Google AIP duration strings (e.g. "120s").
+      // The server uses this to cancel runaway scripts on its end and rejects
+      // values outside [1, 300] seconds inclusive.
+      const requestedSeconds = Math.ceil(timeoutMs / 1000);
+      const clampedSeconds = Math.min(300, Math.max(1, requestedSeconds));
+      if (requestedSeconds > clampedSeconds) {
+        OutputHelper.warn(
+          `Requested execution timeout of ${requestedSeconds}s exceeds the Open Cloud API maximum of 300s; clamping. The server will cancel the task if it runs longer than 5 minutes.`
+        );
+      }
+      body.timeout = `${clampedSeconds}s`;
+    }
 
     const response = await this._rateLimiter.fetchAsync(url, {
       method: 'POST',
@@ -220,7 +245,7 @@ export class OpenCloudClient {
         'Content-Type': 'application/json',
         'X-API-Key': apiKey,
       },
-      body: JSON.stringify({ script }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -313,26 +338,53 @@ export class OpenCloudClient {
 
   private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
     const apiKey = await this._resolveApiKeyAsync();
-    const response = await this._rateLimiter.fetchAsync(
-      `https://apis.roblox.com/cloud/v2/${taskPath}/logs`,
-      {
+    const messages: string[] = [];
+    let pageToken: string | undefined;
+
+    do {
+      const url = new URL(`https://apis.roblox.com/cloud/v2/${taskPath}/logs`);
+      url.searchParams.set('view', 'STRUCTURED');
+      if (pageToken) {
+        url.searchParams.set('pageToken', pageToken);
+      }
+
+      const response = await this._rateLimiter.fetchAsync(url.toString(), {
         method: 'GET',
         headers: {
           'X-API-Key': apiKey,
         },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Get logs failed: ${response.status}: ${text}`);
       }
-    );
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Get logs failed: ${response.status}: ${text}`);
-    }
+      const data = (await response.json()) as {
+        luauExecutionSessionTaskLogs?: Array<{
+          messages?: string[];
+          structuredMessages?: Array<{
+            message: string;
+            createTime: string;
+            messageType: string;
+          }>;
+        }>;
+        nextPageToken?: string;
+      };
 
-    const data = (await response.json()) as {
-      luauExecutionSessionTaskLogs: Array<{ messages: string[] }>;
-    };
+      for (const entry of data.luauExecutionSessionTaskLogs ?? []) {
+        if (entry.structuredMessages?.length) {
+          for (const msg of entry.structuredMessages) {
+            messages.push(msg.message);
+          }
+        } else if (entry.messages?.length) {
+          messages.push(...entry.messages);
+        }
+      }
 
-    const messages = data.luauExecutionSessionTaskLogs?.[0]?.messages ?? [];
+      pageToken = data.nextPageToken || undefined;
+    } while (pageToken);
+
     return messages.join('\n');
   }
 
@@ -344,7 +396,8 @@ export class OpenCloudClient {
    */
   async downloadPlaceAsync(
     universeId: number,
-    placeId: number
+    placeId: number,
+    onProgress?: (transferredBytes: number, totalBytes: number) => void
   ): Promise<Buffer> {
     const apiKey = await this._resolveApiKeyAsync();
     const url = `https://apis.roblox.com/asset-delivery-api/v1/assetId/${placeId}`;
@@ -388,14 +441,78 @@ export class OpenCloudClient {
     }
 
     OutputHelper.verbose('Fetching place binary from CDN...');
-    const cdnResponse = await fetch(data.location);
-    if (!cdnResponse.ok) {
-      throw new Error(
-        `Download place CDN fetch failed: ${cdnResponse.status} ${cdnResponse.statusText}`
+    return _fetchCdnBinaryAsync(data.location, onProgress);
+  }
+}
+
+const CDN_MAX_ATTEMPTS = 4;
+
+async function _fetchCdnBinaryAsync(
+  url: string,
+  onProgress?: (transferredBytes: number, totalBytes: number) => void
+): Promise<Buffer> {
+  let lastError: unknown = null;
+  for (let attempt = 1; attempt <= CDN_MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        return await _readBodyWithProgressAsync(response, onProgress);
+      }
+      lastError = new Error(
+        `Download place CDN fetch failed: ${response.status} ${response.statusText}`
       );
+      // 4xx (other than 408/429) won't fix itself — stop retrying.
+      if (
+        response.status >= 400 &&
+        response.status < 500 &&
+        response.status !== 408 &&
+        response.status !== 429
+      ) {
+        throw lastError;
+      }
+    } catch (err) {
+      lastError = err;
     }
 
-    const arrayBuffer = await cdnResponse.arrayBuffer();
-    return Buffer.from(arrayBuffer);
+    if (attempt === CDN_MAX_ATTEMPTS) {
+      break;
+    }
+    const waitMs = Math.min(8000, 500 * Math.pow(2, attempt - 1));
+    OutputHelper.warn(
+      `CDN download attempt ${attempt}/${CDN_MAX_ATTEMPTS} failed (${
+        lastError instanceof Error ? lastError.message : String(lastError)
+      }). Retrying in ${(waitMs / 1000).toFixed(1)}s...`
+    );
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
   }
+  throw lastError ?? new Error('Download place CDN fetch failed');
+}
+
+async function _readBodyWithProgressAsync(
+  response: Response,
+  onProgress?: (transferredBytes: number, totalBytes: number) => void
+): Promise<Buffer> {
+  if (!onProgress || !response.body) {
+    return Buffer.from(await response.arrayBuffer());
+  }
+
+  // Content-Length may be absent (chunked transfer); report 0 in that case
+  // and let the formatter render "transferred so far" without a denominator.
+  const contentLength = response.headers.get('content-length');
+  const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
+
+  const chunks: Uint8Array[] = [];
+  let transferred = 0;
+  const reader = response.body.getReader();
+  onProgress(0, totalBytes);
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    transferred += value.byteLength;
+    onProgress(transferred, totalBytes);
+  }
+
+  return Buffer.concat(chunks);
 }

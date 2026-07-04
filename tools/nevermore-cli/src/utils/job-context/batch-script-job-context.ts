@@ -1,5 +1,4 @@
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import {
   type BuildContext,
   resolveTemplatePath,
@@ -15,13 +14,7 @@ import {
   type ScriptRunResult,
 } from './job-context.js';
 import { type BuildPlaceOptions } from '../build/build.js';
-import {
-  type DeployTarget,
-  loadDeployConfigAsync,
-  resolveDeployConfigPath,
-  resolveDeployTarget,
-} from '../build/deploy-config.js';
-import { type TargetPackage } from '../batch/changed-packages-utils.js';
+import { type BatchTarget } from '../batch/changed-packages-utils.js';
 import {
   type CombinedBuildProgress,
   type CombinedProjectResult,
@@ -53,18 +46,17 @@ interface CombinedBuildState {
  */
 export class BatchScriptJobContext implements JobContext {
   private _inner: JobContext;
-  private _packages: TargetPackage[];
+  private _batchTargets: BatchTarget[];
   private _repoRoot: string;
   private _batchPlaceId?: number;
   private _batchUniverseId?: number;
-  private _perPackageTimeoutMs: number;
+  private _batchTimeoutMs: number;
   private _reporter?: Reporter;
 
   // Lazy-promise state
   private _combinedBuildPromise?: Promise<CombinedBuildState>;
   private _deployPromise?: Promise<Deployment>;
   private _executionPromise?: Promise<Map<string, BatchPackageResult>>;
-  private _packageTargets = new Map<string, DeployTarget>();
 
   // State for cleanup
   private _combinedBuildContext?: BuildContext;
@@ -72,43 +64,32 @@ export class BatchScriptJobContext implements JobContext {
 
   constructor(
     inner: JobContext,
-    packages: TargetPackage[],
+    batchTargets: BatchTarget[],
     options?: {
       repoRoot?: string;
       batchPlaceId?: number;
       batchUniverseId?: number;
-      perPackageTimeoutMs?: number;
+      batchTimeoutMs?: number;
       reporter?: Reporter;
     }
   ) {
     this._inner = inner;
-    this._packages = packages;
+    this._batchTargets = batchTargets;
     this._repoRoot = options?.repoRoot ?? process.cwd();
     this._batchPlaceId = options?.batchPlaceId;
     this._batchUniverseId = options?.batchUniverseId;
-    this._perPackageTimeoutMs = options?.perPackageTimeoutMs ?? 120_000;
+    this._batchTimeoutMs = options?.batchTimeoutMs ?? 300_000;
     this._reporter = options?.reporter;
   }
 
   async buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace> {
     const buildState = await this._getCombinedBuildAsync();
-    const packageName =
-      options.packageName ?? path.basename(options.packagePath ?? '');
-
-    // Load per-package target for the BuiltPlace.target field
-    // (runSingleTestAsync reads scriptTemplate from it, but we ignore the script content)
-    let target = this._packageTargets.get(packageName);
-    if (!target) {
-      const packagePath = options.packagePath ?? process.cwd();
-      const configPath = resolveDeployConfigPath(packagePath);
-      const config = await loadDeployConfigAsync(configPath);
-      target = resolveDeployTarget(config, options.targetName);
-      this._packageTargets.set(packageName, target);
-    }
-
+    // The script content baked into BuiltPlace.target is read by
+    // runSingleTestAsync but discarded in aggregated batch mode — we just
+    // echo back the caller's resolved place.
     return {
       rbxlPath: buildState.rbxlPath,
-      target,
+      target: options.target,
     };
   }
 
@@ -132,7 +113,7 @@ export class BatchScriptJobContext implements JobContext {
       return { success: false };
     }
 
-    return { success: result.success };
+    return { success: result.success, durationMs: result.durationMs };
   }
 
   async getLogsAsync(deployment: Deployment): Promise<string> {
@@ -187,7 +168,7 @@ export class BatchScriptJobContext implements JobContext {
 
     // Set all packages to "waiting" — they're queued for building
     if (this._reporter) {
-      for (const pkg of this._packages) {
+      for (const pkg of this._batchTargets) {
         this._reporter.onPackagePhaseChange(pkg.name, 'waiting');
       }
     }
@@ -201,14 +182,14 @@ export class BatchScriptJobContext implements JobContext {
       },
       onCombineStart: () => {
         if (this._reporter) {
-          for (const pkg of this._packages) {
+          for (const pkg of this._batchTargets) {
             this._reporter.onPackagePhaseChange(pkg.name, 'combining');
           }
         }
       },
       onStepProgress: (stepProgress) => {
         if (this._reporter) {
-          for (const pkg of this._packages) {
+          for (const pkg of this._batchTargets) {
             this._reporter.onPackageProgressUpdate(pkg.name, stepProgress);
           }
         }
@@ -216,7 +197,7 @@ export class BatchScriptJobContext implements JobContext {
     };
 
     const combinedResult = await generateCombinedProjectAsync({
-      packages: this._packages,
+      batchTargets: this._batchTargets,
       repoRoot: this._repoRoot,
       batchPlaceId: this._batchPlaceId,
       batchUniverseId: this._batchUniverseId,
@@ -285,30 +266,34 @@ export class BatchScriptJobContext implements JobContext {
       JSON.stringify(slugArray)
     );
 
-    const totalTimeoutMs = this._packages.length * this._perPackageTimeoutMs;
-
     OutputHelper.verbose(
       `Executing batch script for ${slugMap.size} packages (timeout: ${
-        totalTimeoutMs / 1000
+        this._batchTimeoutMs / 1000
       }s)...`
     );
 
-    const result = await this._inner.runScriptAsync(
-      deployment,
-      {
-        scriptContent: batchScript,
-        packageName: '_batch_',
-        timeoutMs: totalTimeoutMs,
-      }
-    );
+    const result = await this._inner.runScriptAsync(deployment, {
+      scriptContent: batchScript,
+      packageName: '_batch_',
+      timeoutMs: this._batchTimeoutMs,
+    });
 
     // Fetch the combined logs
     const rawLogs = await this._inner.getLogsAsync(deployment);
 
     if (!result.success) {
+      const stateInfo = result.taskState ? ` (state: ${result.taskState})` : '';
       OutputHelper.warn(
-        'Batch execution task did not complete successfully — parsing partial results'
+        `Batch execution task did not complete successfully${stateInfo} — parsing partial results`
       );
+      if (result.errorMessage) {
+        OutputHelper.error(result.errorMessage);
+      }
+      if (!rawLogs || rawLogs.trim().length === 0) {
+        OutputHelper.warn(
+          'No logs were returned from the execution — the script may not have started'
+        );
+      }
       OutputHelper.verbose(`Raw batch logs:\n${rawLogs || '(empty)'}`);
     }
 

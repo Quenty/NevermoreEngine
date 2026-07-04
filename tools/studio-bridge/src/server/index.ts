@@ -11,10 +11,7 @@ export type {
   OutputLevel,
   PluginMessage,
   ServerMessage,
-  HelloMessage,
-  OutputMessage,
   ScriptCompleteMessage,
-  WelcomeMessage,
   ExecuteMessage,
   ShutdownMessage,
 } from './web-socket-protocol.js';

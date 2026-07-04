@@ -79,7 +79,9 @@ export class GithubJobSummaryReporter extends BaseReporter {
       OutputHelper.info('Written results to GitHub job summary.');
     } catch (err) {
       OutputHelper.warn(
-        `Failed to write job summary: ${err instanceof Error ? err.message : String(err)}`
+        `Failed to write job summary: ${
+          err instanceof Error ? err.message : String(err)
+        }`
       );
     }
   }

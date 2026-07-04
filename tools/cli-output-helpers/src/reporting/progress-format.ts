@@ -2,6 +2,7 @@
  * Formatting helpers for ProgressSummary values.
  */
 
+import { OutputHelper } from '../outputHelper.js';
 import { type ProgressSummary, type JobPhase } from './reporter.js';
 
 /**
@@ -20,7 +21,12 @@ export function formatProgressInline(progress?: ProgressSummary): string {
       return `(${progress.passed}/${progress.total})`;
     case 'bytes':
       if (progress.totalBytes > 0 && progress.transferredBytes > 0) {
-        return `(${_formatBytes(progress.transferredBytes)}/${_formatBytes(progress.totalBytes)})`;
+        return `(${_formatBytes(progress.transferredBytes)}/${_formatBytes(
+          progress.totalBytes
+        )})`;
+      }
+      if (progress.transferredBytes > 0) {
+        return `(${_formatBytes(progress.transferredBytes)})`;
       }
       return `(${_formatBytes(progress.totalBytes)})`;
     case 'steps':
@@ -29,6 +35,8 @@ export function formatProgressInline(progress?: ProgressSummary): string {
       }
       // Indeterminate: show label or just the count
       return progress.label ? `(${progress.label})` : `(${progress.completed})`;
+    case 'version':
+      return _formatVersion(progress.version, progress.url);
   }
 }
 
@@ -47,10 +55,20 @@ export function formatProgressResult(progress?: ProgressSummary): string {
     case 'test-counts':
       return `(${progress.passed}/${progress.total})`;
     case 'bytes':
-      return `(${_formatBytes(progress.totalBytes)})`;
+      if (progress.totalBytes > 0) {
+        return `(${_formatBytes(progress.totalBytes)})`;
+      }
+      return `(${_formatBytes(progress.transferredBytes)})`;
     case 'steps':
       return `(${progress.completed}/${progress.total})`;
+    case 'version':
+      return _formatVersion(progress.version, progress.url);
   }
+}
+
+function _formatVersion(version: number, url?: string): string {
+  const label = `(v${version})`;
+  return url ? OutputHelper.formatHyperlink(label, url) : label;
 }
 
 /** True when progress is test-counts with total === 0. */
@@ -79,7 +97,8 @@ export function summarizeFailure(
 
   if (error) {
     const firstLine = error.split('\n')[0];
-    const short = firstLine.length > 60 ? firstLine.slice(0, 57) + '...' : firstLine;
+    const short =
+      firstLine.length > 60 ? firstLine.slice(0, 57) + '...' : firstLine;
     if (parts.length > 0) {
       parts.push(`: ${short}`);
     } else {

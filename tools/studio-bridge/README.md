@@ -1,169 +1,225 @@
 # @quenty/studio-bridge
 
-WebSocket-based bridge for running Luau scripts in Roblox Studio.
+Persistent WebSocket bridge between Node.js and Roblox Studio. Install a plugin once, then execute Luau, capture screenshots, query the DataModel, and stream logs — all from the CLI or programmatically.
 
-## How It Works
+## Architecture
 
 ```
-┌─────────────┐    WebSocket     ┌──────────────────┐
-│   Node.js   │◄───────────────►│  Studio Plugin    │
-│   Server    │   ws://localhost │  (auto-injected)  │
-│             │                  │                   │
-│ 1. Start WS │                  │ 4. Connect + hello│
-│ 2. Inject   │                  │ 5. Run script     │
-│    plugin   │                  │ 6. Stream output  │
-│ 3. Launch   │                  │ 7. scriptComplete │
-│    Studio   │                  │                   │
-└─────────────┘                  └──────────────────┘
+                          ┌──────────────────────────┐
+                          │    Roblox Studio (1..N)   │
+                          │  ┌────────────────────┐  │
+                          │  │ Persistent Plugin   │  │
+                          │  │ (port scan → connect│  │
+                          │  │  via /health)       │  │
+                          │  └────────┬───────────┘  │
+                          └───────────┼──────────────┘
+                  WebSocket /plugin   │
+                          ┌───────────┴──────────────┐
+                          │      Bridge Host          │
+                          │  ┌──────────────────────┐│
+                          │  │ SessionTracker       ││
+                          │  │  (groups by instance) ││
+                          │  └──────────────────────┘│
+                          │  /health  /plugin  /client│
+                          └──┬───────────────────┬───┘
+              WebSocket /client │
+                 ┌──────────┘
+                 │
+          ┌──────┴──────┐
+          │  CLI Client  │
+          │ (exec, run,  │
+          │  query…)     │
+          └─────────────┘
 ```
 
-1. Start WebSocket server on a random port
-2. Build a `.rbxm` plugin via `rojo build --plugin` with the port and session ID baked in
-3. Plugin is placed in Studio's plugins folder, launch Studio
-4. Plugin connects, handshakes with session ID
-5. Server sends `execute` with Luau script, plugin runs it via `loadstring()` + `xpcall()`
-6. Plugin streams `LogService` output back as batched messages
-7. Plugin sends `scriptComplete` — server can send another `execute` or `shutdown`
+**Host** — A single process binds port 38741, accepts plugin and client connections, and tracks sessions. Any CLI invocation auto-promotes to host if the port is free.
 
-The session ID (random UUID) prevents stale plugins from previous runs from interfering.
+**Plugin** — A persistent Roblox Studio plugin that discovers the host by polling `GET /health`, then connects via WebSocket. Survives Studio restarts. Actions are pushed dynamically over the wire on connect.
 
-## CLI
+**Client** — CLI commands connect as clients when a host is already running. Actions are relayed through the host to the target plugin.
+
+## Quick Start
 
 ```bash
-# Run a script file
-studio-bridge run test.lua
+# 1. Install the persistent Studio plugin (one-time)
+studio-bridge plugin install
 
-# Run inline script
-studio-bridge exec 'print("hello world")'
+# 2. Start a bridge host (or let any command auto-start one)
+studio-bridge serve
 
-# With a specific place file (builds a minimal place via rojo if omitted)
-studio-bridge run test.lua --place build/test.rbxl
+# 3. Open Roblox Studio — the plugin connects automatically
 
-# Interactive terminal mode (keeps Studio alive between executions)
-studio-bridge terminal
+# 4. Execute Luau code
+studio-bridge console exec 'print("hello from the bridge")'
 
-# Terminal mode with initial script
-studio-bridge terminal --place build/test.rbxl --script init.lua
-
-# Debug output
-studio-bridge run test.lua --verbose
+# 5. Query the DataModel
+studio-bridge explorer query Workspace --children
 ```
 
-### Global Options
-
-| Option | Alias | Default | Description |
-|--------|-------|---------|-------------|
-| `--place` | `-p` | — | Path to a `.rbxl` place file (builds minimal place via rojo if omitted) |
-| `--timeout` | — | `120000` | Timeout in milliseconds |
-| `--verbose` | — | `false` | Show internal debug output |
-| `--logs` / `--no-logs` | — | `true` | Show execution logs in spinner mode |
-
-### Terminal Mode
-
-Keeps Studio alive and provides an interactive REPL. Type Luau, see results, repeat — no re-launch between executions.
+## CLI Commands
 
 ```
-$ studio-bridge terminal --place build/test.rbxl
-Studio connected.
+studio-bridge <command> [options]
 
-────────────────────────────────────────────────────────
-❯ print("hello")
-────────────────────────────────────────────────────────
-  ctrl+enter to run · ctrl+c to clear · .help for commands
+Execution:
+  console <command>      Execute code and view logs
+  explorer <command>     Query and modify the DataModel
+  viewport <command>     Screenshots and camera control
+  action <name>          Invoke a Studio action
+
+Infrastructure:
+  process <command>      Manage Studio processes
+  plugin <command>       Manage the bridge plugin
+  serve                  Start the bridge server
 ```
 
-| Key | Action |
-|-----|--------|
-| Enter | New line |
-| Ctrl+Enter | Execute buffer |
-| Ctrl+C | Clear buffer (exit if empty) |
-| Ctrl+D | Exit |
+### `console exec`
 
-| Command | Description |
-|---------|-------------|
-| `.help` | Show keybindings and commands |
-| `.exit` | Exit terminal mode |
-| `.run <file>` | Execute a Luau file |
-| `.clear` | Clear the editor buffer |
-
-## API
-
-```typescript
-import { StudioBridge } from '@quenty/studio-bridge';
-
-const bridge = new StudioBridge({ placePath: './build/test.rbxl' });
-await bridge.startAsync();
-
-const result = await bridge.executeAsync({
-  scriptContent: 'print("Hello from studio-bridge!")',
-  timeoutMs: 90_000,
-  onOutput: (level, body) => console.log(`[${level}] ${body}`),
-});
-
-console.log(result.success); // boolean
-console.log(result.logs);    // all captured output, newline-separated
-
-// Can call executeAsync() again without relaunching Studio
-await bridge.stopAsync();
+```bash
+studio-bridge console exec 'print(workspace:GetChildren())'
+studio-bridge console exec --file test.lua
+studio-bridge console exec 'return game.PlaceId' --format json
 ```
 
-### `StudioBridgeServerOptions`
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--file` | `-f` | Path to a Luau script file |
+| `--target` | `-t` | Target session ID |
+| `--context` | — | Target context (`edit`, `client`, `server`) |
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `placePath` | `string` | — | Path to `.rbxl` file (auto-builds via rojo if omitted) |
-| `timeoutMs` | `number` | `120_000` | Default timeout for operations |
-| `onPhase` | `(phase) => void` | — | Progress callback: `building`, `launching`, `connecting`, `executing`, `done` |
-| `sessionId` | `string` | auto UUID | Session ID for concurrent isolation |
+### `console logs`
 
-### `ExecuteOptions`
+```bash
+studio-bridge console logs
+studio-bridge console logs --count 100 --direction head
+studio-bridge console logs --levels Error,Warning
+```
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `scriptContent` | `string` | required | Luau source code to execute |
-| `timeoutMs` | `number` | inherited | Timeout for this execution |
-| `onOutput` | `(level, body) => void` | — | Called for each log message |
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--count` | `-n` | Number of entries (default: 50) |
+| `--direction` | `-d` | `head` or `tail` (default: `tail`) |
+| `--levels` | `-l` | Filter by level (comma-separated) |
+| `--includeInternal` | — | Include internal bridge messages |
 
-### `StudioBridgeResult`
+### `explorer query`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | `boolean` | `true` if the script ran without errors |
-| `logs` | `string` | All captured output, newline-separated |
+```bash
+studio-bridge explorer query Workspace
+studio-bridge explorer query Workspace.SpawnLocation --children --depth 3
+```
 
-## WebSocket Protocol
+| Option | Description |
+|--------|-------------|
+| `--children` | Include direct children |
+| `--depth` | Max depth (default: 0) |
+| `--properties` | Include instance properties |
+| `--attributes` | Include instance attributes |
 
-All messages are JSON: `{ "type": string, "payload": object }`.
+### `viewport screenshot`
 
-**Plugin to Server:**
+```bash
+studio-bridge viewport screenshot --output viewport.png
+```
 
-| Type | Payload | Description |
-|------|---------|-------------|
-| `hello` | `{ sessionId }` | Handshake |
-| `output` | `{ messages: [{ level, body }] }` | Batched log output |
-| `scriptComplete` | `{ success, error? }` | Script finished |
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--output` | `-o` | Write PNG to file |
 
-Output levels: `"Print"`, `"Info"`, `"Warning"`, `"Error"` (matches `Enum.MessageType`).
+### `process list`
 
-**Server to Plugin:**
+```bash
+studio-bridge process list
+```
 
-| Type | Payload | Description |
-|------|---------|-------------|
-| `welcome` | `{ sessionId }` | Handshake accepted |
-| `execute` | `{ script }` | Luau script to run |
-| `shutdown` | `{}` | Disconnect |
+Lists all active sessions with their ID, place, context, state, and origin.
+
+### `process info`
+
+```bash
+studio-bridge process info
+```
+
+Returns the Studio mode (`Edit`, `Play`, `Run`, etc.), place name, place ID, and game ID.
+
+### `process launch`
+
+```bash
+studio-bridge process launch
+studio-bridge process launch --place ./build/test.rbxl
+```
+
+### `process run`
+
+```bash
+studio-bridge process run 'print("hello")'
+studio-bridge process run --file test.lua --place ./build/test.rbxl
+```
+
+Explicit ephemeral mode: launches Studio, executes the script, and shuts down.
+
+### `process close`
+
+```bash
+studio-bridge process close --target session-id
+```
+
+Send a shutdown message to a connected Studio session.
+
+### `plugin install` / `plugin uninstall`
+
+```bash
+studio-bridge plugin install
+studio-bridge plugin uninstall
+```
+
+### `serve`
+
+```bash
+studio-bridge serve
+studio-bridge serve --port 9000
+```
+
+### `action`
+
+```bash
+studio-bridge action <name> [--payload '{"key": "value"}']
+```
+
+Invoke a named Studio action on the connected session.
+
+## Global Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--timeout` | `120000` | Timeout in milliseconds |
+| `--verbose` | `false` | Show internal debug output |
+| `--remote` | — | Connect to a remote bridge host (`host:port`) |
+| `--local` | `false` | Force local mode (skip devcontainer auto-detection) |
+
+### Target Selection
+
+Commands that target a session accept `--target` and `--context`:
+
+- **No flags** — auto-resolves if only one session exists
+- **`--target <id>`** — target a specific session by ID
+- **`--context <ctx>`** — select context within an instance (`edit`, `client`, `server`)
+
+When Studio is in Play mode, a single instance has multiple contexts (Edit + Client + Server). The default is `edit`.
 
 ## Testing
 
 ```bash
-pnpm test              # Unit tests (no Studio needed)
+pnpm test              # Unit tests (Vitest, no Studio needed)
 pnpm test:watch        # Watch mode
-pnpm test:integration  # End-to-end (requires Studio)
+pnpm test:plugin       # Lune-based plugin tests
+pnpm test:integration  # End-to-end smoke test (requires Studio)
 ```
 
 | Layer | What it tests | Studio? |
 |-------|--------------|---------|
-| Unit (`pnpm test`) | Protocol, template substitution, path resolution, WebSocket lifecycle | No |
+| Unit (`pnpm test`) | Protocol, bridge connection, session tracking, command handlers, WebSocket lifecycle | No |
+| Plugin (`pnpm test:plugin`) | Luau plugin logic via Lune runner | No |
 | Integration (`pnpm test:integration`) | Full pipeline: rojo build, plugin injection, Studio launch, output capture | Yes |
 
 ## Platform Support
@@ -172,8 +228,3 @@ pnpm test:integration  # End-to-end (requires Studio)
 |----------|----------------|----------------|
 | Windows | `%LOCALAPPDATA%\Roblox\Versions\*\RobloxStudioBeta.exe` | `%LOCALAPPDATA%\Roblox\Plugins\` |
 | macOS | `/Applications/RobloxStudio.app/Contents/MacOS/RobloxStudioBeta` | `~/Documents/Roblox/Plugins/` |
-
-## Future Plans
-
-- **StudioTestService integration** — Use `ExecuteRunModeAsync()` / `EndTest()` for better isolation vs. `loadstring()`
-- **Structured test results** — Protocol extension for typed result messages instead of log parsing

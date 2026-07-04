@@ -19,7 +19,7 @@ for _, slug in packageSlugs do
 	if inst then
 		scriptSources[slug] = inst.Source
 	else
-		error(`Failed to find script source for {slug}`)
+		warn(`[BatchTest] Failed to find script source for {slug}`)
 	end
 end
 
@@ -32,6 +32,7 @@ end
 type Result = {
 	success: boolean,
 	slug: string,
+	durationMs: number,
 	error: string?,
 }
 
@@ -40,10 +41,10 @@ local results: { Result } = {}
 for _, slug in packageSlugs do
 	local scriptSource = scriptSources[slug]
 	if not scriptSource then
-		warn(`[BatchTest] No script for {slug}`)
 		print("===BATCH_TEST_BEGIN " .. slug .. "===")
-		print("===BATCH_TEST_END " .. slug .. " FAIL===")
-		table.insert(results, { slug = slug, success = false, error = "No test script found" })
+		warn(`[BatchTest] {slug}: No test script found for {slug}. Is it tagged with _BatchTest_{slug}?`)
+		print("===BATCH_TEST_END " .. slug .. " FAIL 0===")
+		table.insert(results, { slug = slug, success = false, durationMs = 0, error = "No test script found" })
 		continue
 	end
 
@@ -71,6 +72,10 @@ for _, slug in packageSlugs do
 
 	print("===BATCH_TEST_BEGIN " .. slug .. "===")
 
+	-- Measure pcall execution time only. The surrounding cleanup/yield cost
+	-- is amortized across all packages and would otherwise dominate fast tests.
+	local startClock = os.clock()
+
 	local testOk, testErr = pcall(function()
 		local fn, compileErr = loadstring(scriptSource, slug)
 		if not fn then
@@ -79,6 +84,8 @@ for _, slug in packageSlugs do
 		fn()
 	end)
 
+	local durationMs = math.floor((os.clock() - startClock) * 1000 + 0.5)
+
 	-- Yield before the END marker for the same reason: leaked deferred
 	-- callbacks may fire during fn() and their output must land before
 	-- the marker in the log stream.
@@ -86,14 +93,14 @@ for _, slug in packageSlugs do
 
 	-- CLEANUP: restore service state
 	allPackages[slug].Parent = nil
-	for _, c in workspace:GetChildren() do
-		if not preWorkspace[c] and not c:IsA("Terrain") and not c:IsA("Camera") then
-			pcall(c.Destroy, c)
+	for _, child in workspace:GetChildren() do
+		if not preWorkspace[child] and not child:IsA("Terrain") and not child:IsA("Camera") then
+			pcall(child.Destroy, child)
 		end
 	end
-	for _, c in ReplicatedStorage:GetChildren() do
-		if not preRunService[c] then
-			pcall(c.Destroy, c)
+	for _, child in ReplicatedStorage:GetChildren() do
+		if not preRunService[child] then
+			pcall(child.Destroy, child)
 		end
 	end
 	-- Destroy injected LoaderLinks (non-archivable, created by LoaderLinkCreator)
@@ -112,12 +119,12 @@ for _, slug in packageSlugs do
 	end
 
 	if testOk then
-		print("===BATCH_TEST_END " .. slug .. " PASS===")
-		table.insert(results, { slug = slug, success = true })
+		print("===BATCH_TEST_END " .. slug .. " PASS " .. tostring(durationMs) .. "===")
+		table.insert(results, { slug = slug, success = true, durationMs = durationMs })
 	else
 		warn("[BatchTest] " .. slug .. ": " .. tostring(testErr))
-		print("===BATCH_TEST_END " .. slug .. " FAIL===")
-		table.insert(results, { slug = slug, success = false, error = tostring(testErr) })
+		print("===BATCH_TEST_END " .. slug .. " FAIL " .. tostring(durationMs) .. "===")
+		table.insert(results, { slug = slug, success = false, durationMs = durationMs, error = tostring(testErr) })
 	end
 end
 

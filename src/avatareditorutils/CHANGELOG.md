@@ -3,867 +3,461 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [7.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.37.1...@quenty/avatareditorutils@7.37.2) (2026-04-30)
+## [7.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.39.0...@quenty/avatareditorutils@7.39.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
+# [7.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.38.0...@quenty/avatareditorutils@7.39.0) (2026-05-29)
 
+**Note:** Version bump only for package @quenty/avatareditorutils
 
+# [7.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.37.2...@quenty/avatareditorutils@7.38.0) (2026-05-18)
 
+**Note:** Version bump only for package @quenty/avatareditorutils
+
+## [7.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.37.1...@quenty/avatareditorutils@7.37.2) (2026-04-30)
+
+**Note:** Version bump only for package @quenty/avatareditorutils
 
 ## [7.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.37.0...@quenty/avatareditorutils@7.37.1) (2026-04-29)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.36.0...@quenty/avatareditorutils@7.37.0) (2026-04-23)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.35.0...@quenty/avatareditorutils@7.36.0) (2026-04-14)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.34.0...@quenty/avatareditorutils@7.35.0) (2026-02-20)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.33.0...@quenty/avatareditorutils@7.34.0) (2026-02-19)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.32.0...@quenty/avatareditorutils@7.33.0) (2026-02-19)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.31.2...@quenty/avatareditorutils@7.32.0) (2026-02-17)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.31.1...@quenty/avatareditorutils@7.31.2) (2026-01-23)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 ## [7.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.31.0...@quenty/avatareditorutils@7.31.1) (2026-01-21)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.30.0...@quenty/avatareditorutils@7.31.0) (2026-01-18)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.29.0...@quenty/avatareditorutils@7.30.0) (2026-01-16)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.28.1...@quenty/avatareditorutils@7.29.0) (2026-01-13)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.28.0...@quenty/avatareditorutils@7.28.1) (2026-01-12)
-
 
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
-
-
-
-
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 # [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.27.1...@quenty/avatareditorutils@7.28.0) (2026-01-11)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.27.0...@quenty/avatareditorutils@7.27.1) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.26.1...@quenty/avatareditorutils@7.27.0) (2026-01-08)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.26.0...@quenty/avatareditorutils@7.26.1) (2026-01-05)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.25.7...@quenty/avatareditorutils@7.26.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.25.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.25.6...@quenty/avatareditorutils@7.25.7) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.25.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.25.5...@quenty/avatareditorutils@7.25.6) (2025-12-31)
-
 
 ### Bug Fixes
 
-* Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
-
-
-
-
+- Fix dependencies missing in packages ([97bd47d](https://github.com/Quenty/NevermoreEngine/commit/97bd47d341017152f91a28d8444252d20a8de9fa))
 
 ## [7.25.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.25.4...@quenty/avatareditorutils@7.25.5) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.25.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.25.3...@quenty/avatareditorutils@7.25.4) (2025-12-29)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 ## [7.25.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.25.2...@quenty/avatareditorutils@7.25.3) (2025-12-28)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.25.1...@quenty/avatareditorutils@7.25.2) (2025-11-22)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 ## [7.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.25.0...@quenty/avatareditorutils@7.25.1) (2025-11-12)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.24.0...@quenty/avatareditorutils@7.25.0) (2025-10-08)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.23.1...@quenty/avatareditorutils@7.24.0) (2025-09-26)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.23.0...@quenty/avatareditorutils@7.23.1) (2025-09-15)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.22.2...@quenty/avatareditorutils@7.23.0) (2025-08-29)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.22.1...@quenty/avatareditorutils@7.22.2) (2025-08-12)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 ## [7.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.22.0...@quenty/avatareditorutils@7.22.1) (2025-07-14)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.21.0...@quenty/avatareditorutils@7.22.0) (2025-05-12)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.20.3...@quenty/avatareditorutils@7.21.0) (2025-05-10)
-
 
 ### Bug Fixes
 
-* Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
-
-
-
-
+- Additional type checking updates ([05ba29a](https://github.com/Quenty/NevermoreEngine/commit/05ba29a03efc9f3feed74b34f1d9dfb237496214))
 
 ## [7.20.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.20.2...@quenty/avatareditorutils@7.20.3) (2025-04-10)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.20.0...@quenty/avatareditorutils@7.20.2) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [7.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.20.0...@quenty/avatareditorutils@7.20.1) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 # [7.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.19.4...@quenty/avatareditorutils@7.20.0) (2025-04-02)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.19.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.19.3...@quenty/avatareditorutils@7.19.4) (2025-03-31)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 ## [7.19.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.19.2...@quenty/avatareditorutils@7.19.3) (2025-03-21)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.19.1...@quenty/avatareditorutils@7.19.2) (2025-03-13)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 ## [7.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.19.0...@quenty/avatareditorutils@7.19.1) (2025-03-09)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.18.1...@quenty/avatareditorutils@7.19.0) (2025-02-18)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 ## [7.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.18.0...@quenty/avatareditorutils@7.18.1) (2025-01-22)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.17.0...@quenty/avatareditorutils@7.18.0) (2025-01-19)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.16.0...@quenty/avatareditorutils@7.17.0) (2024-12-15)
-
 
 ### Bug Fixes
 
-* Limit batch request size ([0a48559](https://github.com/Quenty/NevermoreEngine/commit/0a485593478e3a4696d1433219233323cb30fbeb))
-
-
-
-
+- Limit batch request size ([0a48559](https://github.com/Quenty/NevermoreEngine/commit/0a485593478e3a4696d1433219233323cb30fbeb))
 
 # [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.15.0...@quenty/avatareditorutils@7.16.0) (2024-12-03)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.14.0...@quenty/avatareditorutils@7.15.0) (2024-12-03)
-
 
 ### Bug Fixes
 
-* Reject promises when failing to succeed prompt ([8995ffc](https://github.com/Quenty/NevermoreEngine/commit/8995ffc94abe3e6e34f6a924f275177e7a22b641))
-
+- Reject promises when failing to succeed prompt ([8995ffc](https://github.com/Quenty/NevermoreEngine/commit/8995ffc94abe3e6e34f6a924f275177e7a22b641))
 
 ### Features
 
-* Break up logic into inventory and catalog to allow centralized querying ([939f8b1](https://github.com/Quenty/NevermoreEngine/commit/939f8b10398b9955129195b71e95f12bb29bd219))
-* PlayerProductManagerClient queries inventory when inventory is available ([d159eea](https://github.com/Quenty/NevermoreEngine/commit/d159eeade8701bcbcd87e97126df3c3dfb155b8c))
-
-
-
-
+- Break up logic into inventory and catalog to allow centralized querying ([939f8b1](https://github.com/Quenty/NevermoreEngine/commit/939f8b10398b9955129195b71e95f12bb29bd219))
+- PlayerProductManagerClient queries inventory when inventory is available ([d159eea](https://github.com/Quenty/NevermoreEngine/commit/d159eeade8701bcbcd87e97126df3c3dfb155b8c))
 
 # [7.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.13.0...@quenty/avatareditorutils@7.14.0) (2024-11-13)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.12.1...@quenty/avatareditorutils@7.13.0) (2024-11-06)
-
 
 ### Features
 
-* Promise avatar rules properly ([66a3833](https://github.com/Quenty/NevermoreEngine/commit/66a38333ffcf2af788ae7356b8e1fb4169114556))
-
-
-
-
+- Promise avatar rules properly ([66a3833](https://github.com/Quenty/NevermoreEngine/commit/66a38333ffcf2af788ae7356b8e1fb4169114556))
 
 ## [7.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.12.0...@quenty/avatareditorutils@7.12.1) (2024-11-04)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.11.0...@quenty/avatareditorutils@7.12.0) (2024-11-03)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.10.1...@quenty/avatareditorutils@7.11.0) (2024-10-23)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.10.0...@quenty/avatareditorutils@7.10.1) (2024-10-09)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.9.1...@quenty/avatareditorutils@7.10.0) (2024-10-06)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [7.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.9.0...@quenty/avatareditorutils@7.9.1) (2024-10-04)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.8.0...@quenty/avatareditorutils@7.9.0) (2024-10-04)
-
 
 ### Features
 
-* Add CatalogSearchServiceCache:PromiseInventoryPages(avatarAssetTypes) ([d7eba4b](https://github.com/Quenty/NevermoreEngine/commit/d7eba4bb08317ba8043ba1e29d68b2145a1852e0))
-
-
-
-
+- Add CatalogSearchServiceCache:PromiseInventoryPages(avatarAssetTypes) ([d7eba4b](https://github.com/Quenty/NevermoreEngine/commit/d7eba4bb08317ba8043ba1e29d68b2145a1852e0))
 
 # [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.7.0...@quenty/avatareditorutils@7.8.0) (2024-09-25)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.6.0...@quenty/avatareditorutils@7.7.0) (2024-09-25)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.5.0...@quenty/avatareditorutils@7.6.0) (2024-09-12)
-
 
 ### Features
 
-* Add AccessoryTypeUtils ([dd92f34](https://github.com/Quenty/NevermoreEngine/commit/dd92f349d0331a92921046cdb3e446dad8052f10))
-* Add CatalogSearchServiceCache ([b71203a](https://github.com/Quenty/NevermoreEngine/commit/b71203aabeabe614df60da1e74d7019b11525e8b))
-
-
-
-
+- Add AccessoryTypeUtils ([dd92f34](https://github.com/Quenty/NevermoreEngine/commit/dd92f349d0331a92921046cdb3e446dad8052f10))
+- Add CatalogSearchServiceCache ([b71203a](https://github.com/Quenty/NevermoreEngine/commit/b71203aabeabe614df60da1e74d7019b11525e8b))
 
 # [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.4.0...@quenty/avatareditorutils@7.5.0) (2024-08-09)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.3.0...@quenty/avatareditorutils@7.4.0) (2024-05-09)
-
 
 ### Bug Fixes
 
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 ### Features
 
-* Add AvatarEditorUtils.tryGetAccessoryType(avatarAssetType) ([2316a2e](https://github.com/Quenty/NevermoreEngine/commit/2316a2eee55174b0f1ac82d20616b03572bffd63))
-* better testing when prompting inventory access ([0efbdb1](https://github.com/Quenty/NevermoreEngine/commit/0efbdb116df0770dd418b8faddbdc6671bee3d9d))
-
-
-
-
+- Add AvatarEditorUtils.tryGetAccessoryType(avatarAssetType) ([2316a2e](https://github.com/Quenty/NevermoreEngine/commit/2316a2eee55174b0f1ac82d20616b03572bffd63))
+- better testing when prompting inventory access ([0efbdb1](https://github.com/Quenty/NevermoreEngine/commit/0efbdb116df0770dd418b8faddbdc6671bee3d9d))
 
 # [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.2.0...@quenty/avatareditorutils@7.3.0) (2024-04-27)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.1.0...@quenty/avatareditorutils@7.2.0) (2024-03-27)
-
 
 ### Features
 
-* Update avatar editor stuff ([16d10a8](https://github.com/Quenty/NevermoreEngine/commit/16d10a876c90d3b43d69b5f66e217e4c3749296b))
-
-
-
-
+- Update avatar editor stuff ([16d10a8](https://github.com/Quenty/NevermoreEngine/commit/16d10a876c90d3b43d69b5f66e217e4c3749296b))
 
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.0.0...@quenty/avatareditorutils@7.1.0) (2024-03-09)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@6.0.0...@quenty/avatareditorutils@7.0.0) (2024-02-14)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@5.0.0...@quenty/avatareditorutils@6.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@4.0.0...@quenty/avatareditorutils@5.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@3.0.0...@quenty/avatareditorutils@4.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@2.4.0...@quenty/avatareditorutils@3.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@2.3.0...@quenty/avatareditorutils@2.4.0) (2024-01-08)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@2.2.0...@quenty/avatareditorutils@2.3.0) (2023-12-28)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@2.1.1...@quenty/avatareditorutils@2.2.0) (2023-12-14)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@2.1.0...@quenty/avatareditorutils@2.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@2.0.0...@quenty/avatareditorutils@2.1.0) (2023-10-18)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.21.0...@quenty/avatareditorutils@2.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [1.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.20.0...@quenty/avatareditorutils@1.21.0) (2023-09-21)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.19.0...@quenty/avatareditorutils@1.20.0) (2023-09-04)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [1.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.18.0...@quenty/avatareditorutils@1.19.0) (2023-08-23)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.17.0...@quenty/avatareditorutils@1.18.0) (2023-07-28)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [1.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.16.0...@quenty/avatareditorutils@1.17.0) (2023-07-15)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.15.0...@quenty/avatareditorutils@1.16.0) (2023-06-17)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [1.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.14.0...@quenty/avatareditorutils@1.15.0) (2023-05-26)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.13.0...@quenty/avatareditorutils@1.14.0) (2023-05-08)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [1.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.12.1...@quenty/avatareditorutils@1.13.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 ## [1.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.12.0...@quenty/avatareditorutils@1.12.1) (2023-04-07)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [1.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.11.0...@quenty/avatareditorutils@1.12.0) (2023-04-06)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.10.0...@quenty/avatareditorutils@1.11.0) (2023-04-03)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.9.0...@quenty/avatareditorutils@1.10.0) (2023-03-31)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.8.0...@quenty/avatareditorutils@1.9.0) (2023-03-05)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 # [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.7.0...@quenty/avatareditorutils@1.8.0) (2023-03-03)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.6.0...@quenty/avatareditorutils@1.7.0) (2023-02-27)
-
 
 ### Features
 
-* Add AvatarEditorUtils.promiseSearchCatalog(catalogSearchParams: CatalogSearchParams) ([3784e65](https://github.com/Quenty/NevermoreEngine/commit/3784e658bac1fd82b5d90f805414864ec0a0e2da))
-
-
-
-
+- Add AvatarEditorUtils.promiseSearchCatalog(catalogSearchParams: CatalogSearchParams) ([3784e65](https://github.com/Quenty/NevermoreEngine/commit/3784e658bac1fd82b5d90f805414864ec0a0e2da))
 
 # [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.5.0...@quenty/avatareditorutils@1.6.0) (2023-02-21)
 
-
 ### Bug Fixes
 
-* Make AvatarEditorUtils shared ([6d72a2c](https://github.com/Quenty/NevermoreEngine/commit/6d72a2c981d7d1427d22b20f8203ce0d45ad936f))
-
-
-
-
+- Make AvatarEditorUtils shared ([6d72a2c](https://github.com/Quenty/NevermoreEngine/commit/6d72a2c981d7d1427d22b20f8203ce0d45ad936f))
 
 # [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.4.0...@quenty/avatareditorutils@1.5.0) (2023-01-11)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.3.1...@quenty/avatareditorutils@1.4.0) (2023-01-01)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
-
-
-
-
 
 ## [1.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.3.0...@quenty/avatareditorutils@1.3.1) (2022-12-27)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.2.0...@quenty/avatareditorutils@1.3.0) (2022-12-05)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.1.1...@quenty/avatareditorutils@1.2.0) (2022-11-19)
-
 
 ### Bug Fixes
 
-* Fix avatar editor dependencies (missing promise and enumutils) ([1bc2ca8](https://github.com/Quenty/NevermoreEngine/commit/1bc2ca8e99cc5775222263a7ae06c96604ac1aba))
-
-
-
-
+- Fix avatar editor dependencies (missing promise and enumutils) ([1bc2ca8](https://github.com/Quenty/NevermoreEngine/commit/1bc2ca8e99cc5775222263a7ae06c96604ac1aba))
 
 ## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.1.0...@quenty/avatareditorutils@1.1.1) (2022-11-04)
 
 **Note:** Version bump only for package @quenty/avatareditorutils
 
-
-
-
-
 # 1.1.0 (2022-11-04)
-
 
 ### Features
 
-* Add untested AvatarEditorUtils ([3c6ceee](https://github.com/Quenty/NevermoreEngine/commit/3c6ceeeb792561648f8985644703c13a03d95155))
-
-
-
-
+- Add untested AvatarEditorUtils ([3c6ceee](https://github.com/Quenty/NevermoreEngine/commit/3c6ceeeb792561648f8985644703c13a03d95155))
 
 # v1.1.0 (Fri Nov 04 2022)
 

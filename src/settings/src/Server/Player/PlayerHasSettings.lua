@@ -57,6 +57,10 @@ function PlayerHasSettings:_promiseLoadSettings()
 			local subStore = dataStore:GetSubStore("settings")
 
 			return dataStore:Load("settings", {}):Then(function(settings)
+				if not self._settings then
+					return
+				end
+
 				for settingName, value in settings do
 					local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 					self._settings:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(value))

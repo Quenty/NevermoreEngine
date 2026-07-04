@@ -47,9 +47,12 @@ function createTryItColumn(): GithubCommentColumn {
     render(pkg: PackageState) {
       const placeId =
         (pkg.result as BatchDeployResult | undefined)?.placeId ?? 0;
-      return placeId
-        ? `[Open in Roblox](https://www.roblox.com/games/${placeId})`
-        : '';
+      if (!placeId) {
+        return '';
+      }
+      const openUrl = `https://www.roblox.com/games/${placeId}`;
+      const playUrl = `https://www.roblox.com/games/start?placeId=${placeId}`;
+      return `[Open](${openUrl}) \\| [Play](${playUrl})`;
     },
   };
 }

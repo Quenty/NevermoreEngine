@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class PlayerDeathTrackerClient
 ]=]
@@ -12,26 +12,36 @@ local PlayerDeathTrackerClient = setmetatable({}, BaseObject)
 PlayerDeathTrackerClient.ClassName = "PlayerDeathTrackerClient"
 PlayerDeathTrackerClient.__index = PlayerDeathTrackerClient
 
-function PlayerDeathTrackerClient.new(tracker, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(tracker), PlayerDeathTrackerClient)
+export type PlayerDeathTrackerClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			DeathsChanged: RBXScriptSignal,
+		},
+		{} :: typeof({ __index = PlayerDeathTrackerClient })
+	))
+	& BaseObject.BaseObject
+
+function PlayerDeathTrackerClient.new(tracker: IntValue, serviceBag: ServiceBag.ServiceBag): PlayerDeathTrackerClient
+	local self: PlayerDeathTrackerClient = setmetatable(BaseObject.new(tracker) :: any, PlayerDeathTrackerClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self.DeathsChanged = self._obj.Changed
+	self.DeathsChanged = (self._obj :: IntValue).Changed
 
 	return self
 end
 
-function PlayerDeathTrackerClient:GetDeathValue()
-	return self._obj
+function PlayerDeathTrackerClient.GetDeathValue(self: PlayerDeathTrackerClient): IntValue
+	return self._obj :: IntValue
 end
 
-function PlayerDeathTrackerClient:GetPlayer()
-	return self._obj.Parent
+function PlayerDeathTrackerClient.GetPlayer(self: PlayerDeathTrackerClient): Instance?
+	return (self._obj :: IntValue).Parent
 end
 
-function PlayerDeathTrackerClient:GetKills()
-	return self._obj.Value
+function PlayerDeathTrackerClient.GetKills(self: PlayerDeathTrackerClient): number
+	return (self._obj :: IntValue).Value
 end
 
 return PlayerDeathTrackerClient

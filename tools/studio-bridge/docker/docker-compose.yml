@@ -1,0 +1,20 @@
+services:
+  studio:
+    build:
+      context: .
+      additional_contexts:
+        workspace: ../../..
+      args:
+        STUDIO_VERSION: ${STUDIO_VERSION:-}
+    image: ghcr.io/quenty/nevermore-studio-linux:${STUDIO_VERSION:-latest}
+    environment:
+      - ROBLOSECURITY=${ROBLOSECURITY:-}
+    volumes:
+      - ../../../:/workspace
+      - wine-prefix:/home/studio/.wine
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+
+volumes:
+  wine-prefix:

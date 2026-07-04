@@ -68,7 +68,7 @@ This class takes two arguments and returns the summation of the two
 * Arguments can be either `CameraState` or a CameraEffect, assuming the effect has a `CameraState` member
 
 #### FadingCamera
-This classes allows the effects of a camera to be faded / varied based upon a spring
+This class allows the effects of a camera to be faded / varied based upon a spring
 
 * Starts at 0 percent effect
 

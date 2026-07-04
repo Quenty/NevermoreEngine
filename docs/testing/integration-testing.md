@@ -190,6 +190,7 @@ nevermore batch deploy --output results.json
 | `--logs` | Show build/upload logs |
 | `--publish` | Publish all deployed places |
 | `--target` | Deploy target name (default: `test`) |
+| `--smoke-test` | Run a post-deploy smoke test on targets with `basePlace` (off by default) |
 
 Change detection uses `pnpm ls --filter "...[base]"` to find packages (and their dependents) that changed since the base ref, then filters to those with a matching deploy target.
 
@@ -232,7 +233,9 @@ Downloading a base place uses the Roblox Asset Delivery API, which requires the 
 
 ### Smoke testing
 
-When `basePlace` is configured, the deploy pipeline automatically runs a smoke test after uploading. The smoke test spawns all `Script` instances in `ServerScriptService` and waits 30 seconds for errors. If any script throws, the deploy is marked as failed. No test assertions are needed — a clean boot is the test.
+`nevermore batch deploy --smoke-test` runs a smoke test after uploading, for any target with `basePlace` configured. The smoke test spawns all `Script` instances in `ServerScriptService` and waits 30 seconds for errors. If any script throws, the deploy is marked as failed. No test assertions are needed — a clean boot is the test.
+
+The flag is opt-in: without `--smoke-test`, deploys finish as soon as the upload completes, even when `basePlace` is set. Targets without `basePlace` ignore the flag.
 
 ## CI integration
 

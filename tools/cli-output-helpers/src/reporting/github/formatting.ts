@@ -8,7 +8,6 @@
 import { formatDurationMs } from '../../cli-utils.js';
 import {
   type PackageResult,
-  type PackageStatus,
   type ProgressSummary,
   type JobPhase,
 } from '../reporter.js';
@@ -106,8 +105,14 @@ function _extractJsonMessage(text: string): string | undefined {
 
 // ── Table rendering ─────────────────────────────────────────────────────────
 
-const RUNNING_PHASE_LABELS: Record<string, string> = {
+// Typed Record<JobPhase, string> so adding a new JobPhase fails the build
+// until a label is supplied here.
+const RUNNING_PHASE_LABELS: Record<JobPhase, string> = {
+  waiting: '⏸ Waiting...',
   building: '🔨 Building...',
+  downloading: '⬇ Downloading...',
+  merging: '🔀 Merging...',
+  combining: '🔗 Combining...',
   uploading: '📤 Uploading...',
   scheduling: '⏳ Scheduling...',
   launching: '🚀 Launching...',
@@ -116,10 +121,10 @@ const RUNNING_PHASE_LABELS: Record<string, string> = {
 };
 
 export function formatRunningStatus(
-  phase: PackageStatus,
+  phase: JobPhase,
   progress?: ProgressSummary
 ): string {
-  const label = RUNNING_PHASE_LABELS[phase] ?? '🔄 Running...';
+  const label = RUNNING_PHASE_LABELS[phase];
   if (progress) {
     const progressText = formatProgressInline(progress);
     return progressText ? `${label} ${progressText}` : label;
@@ -144,9 +149,10 @@ export function formatResultStatus(
   }
 
   const failedPhase = pkg.failedPhase;
+  const effectiveLabel = pkg.failureLabel ?? failureLabel;
   const label = failedPhase
-    ? `**${failureLabel}** at ${failedPhase}`
-    : `**${failureLabel}**`;
+    ? `**${effectiveLabel}** at ${failedPhase}`
+    : `**${effectiveLabel}**`;
   return `❌ ${label} (${duration})`;
 }
 

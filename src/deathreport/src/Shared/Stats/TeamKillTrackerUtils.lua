@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class TeamKillTrackerUtils
 ]=]
@@ -10,7 +10,7 @@ local RxBinderUtils = require("RxBinderUtils")
 
 local TeamKillTrackerUtils = {}
 
-function TeamKillTrackerUtils.create(binder)
+function TeamKillTrackerUtils.create(binder: any): IntValue
 	local score = Instance.new("IntValue")
 	score.Name = "TeamKillTracker"
 	score.Value = 0
@@ -20,14 +20,14 @@ function TeamKillTrackerUtils.create(binder)
 	return score
 end
 
-function TeamKillTrackerUtils.observeBrio(binder, player)
+function TeamKillTrackerUtils.observeBrio(binder: any, player: Instance): any
 	assert(typeof(player) == "Instance", "Bad player")
 
 	-- This ain't performant, but it's ok
 	return RxBinderUtils.observeBoundChildClassBrio(binder, player)
 end
 
-function TeamKillTrackerUtils.getTeamKillTracker(binder, team)
+function TeamKillTrackerUtils.getTeamKillTracker(binder: any, team: Instance): any
 	return BinderUtils.findFirstChild(binder, team)
 end
 

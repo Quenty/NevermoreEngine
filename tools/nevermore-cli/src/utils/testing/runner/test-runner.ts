@@ -1,18 +1,34 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
+import { type DeployTarget } from '../../build/deploy-config.js';
 import { type JobContext } from '../../job-context/job-context.js';
-import { type ParsedTestCounts, parseTestLogs, parseTestCounts } from '../test-log-parser.js';
+import {
+  type ParsedTestCounts,
+  parseTestLogs,
+  parseTestCounts,
+} from '../test-log-parser.js';
 
 export interface SingleTestResult {
   success: boolean;
   logs: string;
   testCounts?: ParsedTestCounts;
+  /**
+   * Inner script execution time, forwarded from the JobContext when it can
+   * measure pcall duration directly (aggregated batch mode). Undefined for
+   * non-aggregated cloud/local runs — callers should fall back to wall-clock.
+   */
+  durationMs?: number;
 }
 
 export interface SingleTestOptions {
   packagePath: string;
   packageName: string;
+  /**
+   * Resolved test place. Callers fan multi-place targets out before reaching
+   * here (see flattenToBatchTargets) — the runner never picks places[0] itself.
+   */
+  target: DeployTarget;
   timeoutMs?: number;
   /** Luau code to execute directly, bypassing the configured scriptTemplate. */
   scriptText?: string;
@@ -33,18 +49,20 @@ export async function runSingleTestAsync(
     packageName,
     timeoutMs = 120_000,
     scriptText,
+    target,
   } = options;
 
   const sessionId = randomUUID();
   const builtPlace = await context.buildPlaceAsync({
-    targetName: 'test',
+    target,
     outputFileName: `test-${sessionId}.rbxl`,
     packagePath,
     packageName,
   });
 
   const scriptContent =
-    scriptText ?? (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
+    scriptText ??
+    (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
 
   const deployment = await context.deployBuiltPlaceAsync({
     builtPlace,
@@ -66,6 +84,7 @@ export async function runSingleTestAsync(
       success: result.success && parsed.success,
       logs: parsed.logs,
       testCounts: parseTestCounts(parsed.logs),
+      durationMs: result.durationMs,
     };
   } finally {
     await context.releaseAsync(deployment);

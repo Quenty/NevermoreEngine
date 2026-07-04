@@ -5,17 +5,35 @@ import {
   DeployTarget,
   loadDeployConfigAsync,
   resolveDeployConfigPath,
-  resolveDeployTarget,
+  resolveDeployTargetPlaces,
 } from '../build/deploy-config.js';
 
 export interface TargetPackage {
   name: string;
   path: string;
-  target: DeployTarget;
+  /**
+   * Every place this package deploys to under the chosen target. For a
+   * single-place target this has length 1; for a multi-place target (e.g.
+   * `places: [chapter0, chapter1]`) it has one entry per place.
+   */
+  activeTargets: DeployTarget[];
 }
 
-/** @deprecated Use {@link TargetPackage} instead. */
-export type TestablePackage = TargetPackage;
+/**
+ * One runnable unit: a single place to build / deploy / test. Multi-place
+ * targets fan out into one BatchTarget per place; the place's `name` is
+ * appended to the display name (e.g. `@x/y - chapter0`).
+ */
+export interface BatchTarget {
+  /** Display name. Suffixed with ` - <place.name>` for fanned-out places. */
+  name: string;
+  /** Underlying package name (no suffix), used to load files relative to the package. */
+  packageName: string;
+  /** Package directory. */
+  path: string;
+  /** The single resolved place this BatchTarget represents. */
+  target: DeployTarget;
+}
 
 /**
  * Discover all packages that have a deploy.nevermore.json with the given target.
@@ -72,44 +90,74 @@ export async function discoverChangedTargetPackagesAsync(
  * Discover all packages that have a deploy.nevermore.json with a "test" target
  * and a scriptTemplate (required for running tests).
  */
-export async function discoverAllTestablePackagesAsync(): Promise<
-  TargetPackage[]
+export async function discoverAllTestableBatchTargetsAsync(): Promise<
+  BatchTarget[]
 > {
   const packages = await discoverAllTargetPackagesAsync('test');
-  return _requireScriptTemplate(packages);
+  return _requireScriptTemplate(flattenToBatchTargets(packages));
 }
 
 /**
  * Discover packages with test targets that have changed since `baseBranch`.
- * Only includes packages with a scriptTemplate (required for running tests).
+ * Only includes targets with a scriptTemplate (required for running tests).
  * Uses pnpm's --filter "...[<base>]" to include transitive dependents.
  */
-export async function discoverChangedTestablePackagesAsync(
+export async function discoverChangedTestableBatchTargetsAsync(
   baseBranch: string
-): Promise<TargetPackage[]> {
+): Promise<BatchTarget[]> {
   const packages = await discoverChangedTargetPackagesAsync(baseBranch, 'test');
-  return _requireScriptTemplate(packages);
+  return _requireScriptTemplate(flattenToBatchTargets(packages));
 }
 
 /**
- * Filter out packages without a scriptTemplate — those are deploy-only targets
+ * Fan a list of TargetPackages out into BatchTargets — one per place. A
+ * single-place package produces one BatchTarget with the package name; a
+ * multi-place package produces one per place, with ` - <place.name>` suffix.
+ */
+export function flattenToBatchTargets(
+  packages: TargetPackage[]
+): BatchTarget[] {
+  const result: BatchTarget[] = [];
+  for (const pkg of packages) {
+    if (pkg.activeTargets.length === 1) {
+      result.push({
+        name: pkg.name,
+        packageName: pkg.name,
+        path: pkg.path,
+        target: pkg.activeTargets[0]!,
+      });
+      continue;
+    }
+    for (const target of pkg.activeTargets) {
+      const suffix = target.name;
+      const name = suffix ? `${pkg.name} - ${suffix}` : pkg.name;
+      result.push({ name, packageName: pkg.name, path: pkg.path, target });
+    }
+  }
+  return result;
+}
+
+/**
+ * Filter out targets without a scriptTemplate — those are deploy-only places
  * (e.g. integration games) that can't be tested via `batch test`.
  */
-function _requireScriptTemplate(packages: TargetPackage[]): TargetPackage[] {
-  const withTemplate: TargetPackage[] = [];
+function _requireScriptTemplate(targets: BatchTarget[]): BatchTarget[] {
+  const withTemplate: BatchTarget[] = [];
   const skipped: string[] = [];
 
-  for (const pkg of packages) {
-    if (pkg.target.scriptTemplate) {
-      withTemplate.push(pkg);
+  for (const buildTarget of targets) {
+    if (buildTarget.target.scriptTemplate) {
+      withTemplate.push(buildTarget);
     } else {
-      skipped.push(pkg.name);
+      skipped.push(buildTarget.name);
     }
   }
 
   if (skipped.length > 0) {
     OutputHelper.verbose(
-      `Skipped ${skipped.length} packages without scriptTemplate: ${skipped.join(', ')}`
+      `Skipped ${skipped.length} targets without scriptTemplate: ${skipped.join(
+        ', '
+      )}`
     );
   }
 
@@ -136,8 +184,8 @@ async function _filterByTargetAsync(
 
     try {
       const config = await loadDeployConfigAsync(configPath);
-      const target = resolveDeployTarget(config, targetName);
-      results.push({ name: pkg.name, path: pkg.path, target });
+      const activeTargets = resolveDeployTargetPlaces(config, targetName);
+      results.push({ name: pkg.name, path: pkg.path, activeTargets });
     } catch {
       skippedNoTarget.push(pkg.name);
     }

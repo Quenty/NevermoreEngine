@@ -208,7 +208,7 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor: Motor6D, part0, part
 			weld.C0 = innerState.C0 * innerState.Transform
 		end))
 
-		-- if weld:IsA("Motor6D") then
+		-- if R15Utils.isAnimationConstraintOrMotor6D(weld) then
 		-- 	-- Suppress animations on any weld connection
 		-- 	weldMaid:GiveTask(RunService.Stepped:Connect(function()
 		-- 		weld.Transform = CFrame.new()

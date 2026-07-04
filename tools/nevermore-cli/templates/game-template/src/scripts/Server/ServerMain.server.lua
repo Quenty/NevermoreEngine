@@ -8,6 +8,12 @@ local root = ServerScriptService.{{gameNameProper}}
 local loader = root:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(root)
 
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root.game) then
+	return
+end
+
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("{{gameNameProper}}Service"))
 serviceBag:Init()

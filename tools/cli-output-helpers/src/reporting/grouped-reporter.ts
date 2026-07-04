@@ -71,17 +71,22 @@ export class GroupedReporter extends BaseReporter {
     const showLogs = this._options.showLogs || !result.success;
     const duration = formatDurationMs(result.durationMs);
     const successLabel = this._options.successLabel ?? 'Passed';
-    const failureLabel = this._options.failureLabel ?? 'FAILED';
+    const failureLabel =
+      result.failureLabel ?? this._options.failureLabel ?? 'FAILED';
 
     const progressText = formatProgressResult(result.progressSummary);
     const empty = isEmptyTestRun(result.progressSummary);
 
     if (result.success) {
-      const label = progressText ? `${successLabel} ${progressText}` : successLabel;
+      const label = progressText
+        ? `${successLabel} ${progressText}`
+        : successLabel;
       const formatted = empty
         ? OutputHelper.formatWarning(`${label} ⚠`)
         : OutputHelper.formatSuccess(label);
-      const icon = empty ? OutputHelper.formatWarning('⚠') : OutputHelper.formatSuccess('✓');
+      const icon = empty
+        ? OutputHelper.formatWarning('⚠')
+        : OutputHelper.formatSuccess('✓');
       console.log(
         `  ${icon} ${formatted} ${OutputHelper.formatDim(`(${duration})`)}`
       );

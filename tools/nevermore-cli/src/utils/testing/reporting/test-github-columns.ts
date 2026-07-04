@@ -42,11 +42,13 @@ function createTryItColumn(): GithubCommentColumn {
   return {
     header: 'Try it',
     render(pkg: PackageState) {
-      const placeId =
-        (pkg.result as BatchTestResult | undefined)?.placeId ?? 0;
-      return placeId
-        ? `[Open in Roblox](https://www.roblox.com/games/${placeId})`
-        : '';
+      const placeId = (pkg.result as BatchTestResult | undefined)?.placeId ?? 0;
+      if (!placeId) {
+        return '';
+      }
+      const openUrl = `https://www.roblox.com/games/${placeId}`;
+      const playUrl = `https://www.roblox.com/games/start?placeId=${placeId}`;
+      return `[Open](${openUrl}) \\| [Play](${playUrl})`;
     },
   };
 }

@@ -17,6 +17,17 @@ export interface RunScriptOptions {
 export interface ScriptRunResult {
   /** Whether the execution infrastructure succeeded (not test assertions). */
   success: boolean;
+  /**
+   * Optional inner script execution time, reported when the context can
+   * measure it directly (e.g. aggregated batch mode reports per-package
+   * pcall durations). When undefined, callers should fall back to their own
+   * wall-clock measurement.
+   */
+  durationMs?: number;
+  /** Final task state (e.g. 'COMPLETE', 'FAILED', 'CANCELLED'). */
+  taskState?: string;
+  /** Error message from the execution backend, if any. */
+  errorMessage?: string;
 }
 
 /**
@@ -34,7 +45,10 @@ export interface JobContext {
   deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<Deployment>;
 
   /** Execute a Luau script in a deployed place. */
-  runScriptAsync(deployment: Deployment, options: RunScriptOptions): Promise<ScriptRunResult>;
+  runScriptAsync(
+    deployment: Deployment,
+    options: RunScriptOptions
+  ): Promise<ScriptRunResult>;
 
   /** Retrieve raw logs from the most recent script execution on this deployment. */
   getLogsAsync(deployment: Deployment): Promise<string>;

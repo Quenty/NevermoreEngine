@@ -65,14 +65,18 @@ export const ciPostDeployResultsCommand: CommandModule<
         const reporters = _createGithubReporters(undefined);
 
         if (args.runOutcome === 'success') {
-          OutputHelper.info('Deploy step succeeded — posting informational comment to PR...');
+          OutputHelper.info(
+            'Deploy step succeeded — posting informational comment to PR...'
+          );
           for (const r of reporters) {
             r.setNoTestsRun(
               'No changed packages with deploy targets were discovered for this PR.'
             );
           }
         } else {
-          OutputHelper.info('Deploy step failed — posting failure comment to PR...');
+          OutputHelper.info(
+            'Deploy step failed — posting failure comment to PR...'
+          );
           for (const r of reporters) {
             r.setError(
               `Results file not found: ${args.input}\nThe deploy run likely crashed before completing.`

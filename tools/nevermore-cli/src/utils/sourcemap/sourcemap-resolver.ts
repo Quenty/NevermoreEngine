@@ -55,7 +55,11 @@ function _walkNode(
 ): void {
   const luaFile = _findLuaFilePath(node.filePaths);
   if (luaFile) {
-    const relative = path.relative(repoRoot, luaFile);
+    // Rojo's sourcemap.json uses POSIX separators on every platform, and
+    // downstream consumers (test output, CI annotations) compare paths
+    // assuming POSIX style. Normalize so Windows backslashes from
+    // `path.relative` don't leak through.
+    const relative = path.relative(repoRoot, luaFile).replace(/\\/g, '/');
     index.set(dottedPath, relative);
   }
 
@@ -69,7 +73,5 @@ function _walkNode(
 /** Return the first `.lua` or `.luau` file path from a node's filePaths. */
 function _findLuaFilePath(filePaths?: string[]): string | undefined {
   if (!filePaths) return undefined;
-  return filePaths.find(
-    (fp) => fp.endsWith('.lua') || fp.endsWith('.luau')
-  );
+  return filePaths.find((fp) => fp.endsWith('.lua') || fp.endsWith('.luau'));
 }

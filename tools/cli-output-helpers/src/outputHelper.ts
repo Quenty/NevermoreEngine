@@ -69,12 +69,38 @@ export class OutputHelper {
     return chalk.greenBright(message);
   }
 
-  private static _hasAnsi = (text: string): boolean =>
-    text.includes('\x1b[');
+  private static _hasAnsi = (text: string): boolean => text.includes('\x1b[');
 
-  /** Strip ANSI escape codes from terminal output. */
+  /**
+   * Strip ANSI escape codes and OSC 8 hyperlink sequences from terminal
+   * output. Both are removed so visible-width calculations match what the
+   * terminal actually shows.
+   */
   public static stripAnsi = (text: string): string =>
-    text.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+    text
+      .replace(/\x1b\]8;[^\x07\x1b]*(?:\x07|\x1b\\)/g, '')
+      .replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+
+  /**
+   * Wrap text in an OSC 8 hyperlink so supporting terminals render it as
+   * clickable. Falls back to the plain text when stdout is not a TTY or the
+   * user opts out via NO_HYPERLINKS — so CI logs and piped output stay clean.
+   */
+  public static formatHyperlink(text: string, url: string): string {
+    if (!process.stdout.isTTY) return text;
+    if (process.env.NO_HYPERLINKS) return text;
+    return `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`;
+  }
+
+  /**
+   * Pad `text` on the right to `width` visible columns, ignoring ANSI color
+   * codes and OSC 8 hyperlink escapes when measuring.
+   */
+  public static padVisible(text: string, width: number): string {
+    const visible = OutputHelper.stripAnsi(text).length;
+    const pad = Math.max(0, width - visible);
+    return text + ' '.repeat(pad);
+  }
 
   /**
    * Helper method to put a box around the output
@@ -118,6 +144,25 @@ export class OutputHelper {
     console.error(this._hasAnsi(message) ? message : this.formatError(message));
   }
 
+  /** Format an error including its `.cause` chain. Appends the stack in verbose mode. */
+  public static formatErrorChain(err: unknown): string {
+    if (!(err instanceof Error)) return String(err);
+
+    const parts = [err.message];
+    const seen = new Set<unknown>([err]);
+    let cur: unknown = (err as { cause?: unknown }).cause;
+    while (cur instanceof Error && !seen.has(cur)) {
+      seen.add(cur);
+      parts.push(`  caused by: ${cur.message}`);
+      cur = (cur as { cause?: unknown }).cause;
+    }
+
+    if (this._verbose && err.stack) {
+      parts.push('', err.stack);
+    }
+    return parts.join('\n');
+  }
+
   /**
    * Logs information to the console
    * @param message Message to write
@@ -136,6 +181,14 @@ export class OutputHelper {
   }
 
   /**
+   * Returns the current verbose flag. Useful for handlers that need to
+   * forward the global `--verbose` setting to downstream APIs.
+   */
+  public static isVerbose(): boolean {
+    return this._verbose;
+  }
+
+  /**
    * Logs a verbose/intermediate message. Suppressed when verbose is false.
    * When running inside a buffered context (see runBuffered), messages are
    * captured to the buffer instead of printed.
@@ -145,7 +198,9 @@ export class OutputHelper {
       return;
     }
 
-    const formatted = this._hasAnsi(message) ? message : this.formatDim(message);
+    const formatted = this._hasAnsi(message)
+      ? message
+      : this.formatDim(message);
     const buffer = _outputStorage.getStore();
     if (buffer) {
       buffer.lines.push(formatted);

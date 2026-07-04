@@ -192,22 +192,29 @@ function RxInstanceUtils.observePropertyBrio(
 	end) :: any
 end
 
+function RxInstanceUtils._toPredicate(className: string | Rx.Predicate<Instance>): Rx.Predicate<Instance>
+	if type(className) == "string" then
+		return function(instance: Instance)
+			return instance:IsA(className)
+		end
+	else
+		return className
+	end
+end
+
 --[=[
 	Observes the last child with a specific name.
-
-	@param parent Instance
-	@param className string
-	@param name string
-	@return Observable<Brio<Instance>>
 ]=]
 function RxInstanceUtils.observeLastNamedChildBrio(
 	parent: Instance,
-	className: string,
+	className: string | Rx.Predicate<Instance>,
 	name: string
 ): Observable.Observable<Brio.Brio<Instance>>
 	assert(typeof(parent) == "Instance", "Bad parent")
-	assert(type(className) == "string", "Bad className")
+	assert(type(className) == "string" or type(className) == "function", "Bad className")
 	assert(type(name) == "string", "Bad name")
+
+	local predicate = RxInstanceUtils._toPredicate(className)
 
 	return Observable.new(function(sub)
 		local topMaid = Maid.new()
@@ -231,7 +238,7 @@ function RxInstanceUtils.observeLastNamedChildBrio(
 		end
 
 		local function handleChild(child: Instance)
-			if not child:IsA(className) then
+			if not predicate(child) then
 				return
 			end
 
@@ -271,26 +278,23 @@ end
 
 --[=[
 	Observes the children with a specific name.
-
-	@param parent Instance
-	@param className string
-	@param name string
-	@return Observable<Brio<Instance>>
 ]=]
 function RxInstanceUtils.observeChildrenOfNameBrio(
 	parent: Instance,
-	className: string,
+	className: string | Rx.Predicate<Instance>,
 	name: string
 ): Observable.Observable<Brio.Brio<Instance>>
 	assert(typeof(parent) == "Instance", "Bad parent")
-	assert(type(className) == "string", "Bad className")
+	assert(type(className) == "string" or type(className) == "function", "Bad className")
 	assert(type(name) == "string", "Bad name")
+
+	local predicate = RxInstanceUtils._toPredicate(className)
 
 	return Observable.new(function(sub)
 		local topMaid = Maid.new()
 
 		local function handleChild(child: Instance)
-			if not child:IsA(className) then
+			if not predicate(child) then
 				return
 			end
 
@@ -328,10 +332,6 @@ end
 
 --[=[
 	Observes all children of a specific class
-
-	@param parent Instance
-	@param className string
-	@return Observable<Brio<Instance>>
 ]=]
 function RxInstanceUtils.observeChildrenOfClassBrio(
 	parent: Instance,

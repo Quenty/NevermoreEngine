@@ -72,14 +72,18 @@ export const ciPostTestResultsCommand: CommandModule<
         const reporters = _createGithubReporters(undefined);
 
         if (args.runOutcome === 'success') {
-          OutputHelper.info('Test step succeeded — posting informational comment to PR...');
+          OutputHelper.info(
+            'Test step succeeded — posting informational comment to PR...'
+          );
           for (const r of reporters) {
             r.setNoTestsRun(
               'No changed packages with test targets were discovered for this PR.'
             );
           }
         } else {
-          OutputHelper.info('Test step failed — posting failure comment to PR...');
+          OutputHelper.info(
+            'Test step failed — posting failure comment to PR...'
+          );
           for (const r of reporters) {
             r.setError(
               `Results file not found: ${args.input}\nThe test run likely crashed before completing.`

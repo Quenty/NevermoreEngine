@@ -7,6 +7,8 @@ export interface BasePlaceConfig {
 }
 
 export interface DeployTarget {
+  /** Set on places that belong to a multi-place target (e.g. "chapter0"). */
+  name?: string;
   universeId: number;
   placeId: number;
   project: string;
@@ -14,9 +16,44 @@ export interface DeployTarget {
   basePlace?: BasePlaceConfig;
 }
 
+/** Wire-format shape: a target may be a single place or a `{ places: [...] }` group. */
+export interface MultiPlaceTargetConfig {
+  places: DeployTarget[];
+}
+
+export type DeployTargetConfig = DeployTarget | MultiPlaceTargetConfig;
+
 export interface DeployConfig {
   universeId?: number;
-  targets: Record<string, DeployTarget>;
+  targets: Record<string, DeployTargetConfig>;
+}
+
+function _isMultiPlace(
+  target: DeployTargetConfig
+): target is MultiPlaceTargetConfig {
+  return Array.isArray((target as MultiPlaceTargetConfig).places);
+}
+
+function _validatePlace(label: string, place: DeployTarget): void {
+  if (typeof place.universeId !== 'number') {
+    throw new Error(`${label} is missing or has invalid "universeId"`);
+  }
+  if (typeof place.placeId !== 'number') {
+    throw new Error(`${label} is missing or has invalid "placeId"`);
+  }
+  if (typeof place.project !== 'string') {
+    throw new Error(`${label} is missing or has invalid "project"`);
+  }
+  if (place.basePlace != null) {
+    if (typeof place.basePlace.universeId !== 'number') {
+      throw new Error(
+        `${label} basePlace is missing or has invalid "universeId"`
+      );
+    }
+    if (typeof place.basePlace.placeId !== 'number') {
+      throw new Error(`${label} basePlace is missing or has invalid "placeId"`);
+    }
+  }
 }
 
 export async function loadDeployConfigAsync(
@@ -40,38 +77,32 @@ export async function loadDeployConfigAsync(
   }
 
   for (const [name, target] of Object.entries(config.targets)) {
-    if (typeof target.universeId !== 'number') {
-      throw new Error(
-        `Target "${name}" is missing or has invalid "universeId"`
-      );
-    }
-    if (typeof target.placeId !== 'number') {
-      throw new Error(`Target "${name}" is missing or has invalid "placeId"`);
-    }
-    if (typeof target.project !== 'string') {
-      throw new Error(`Target "${name}" is missing or has invalid "project"`);
-    }
-    if (target.basePlace != null) {
-      if (typeof target.basePlace.universeId !== 'number') {
-        throw new Error(
-          `Target "${name}" basePlace is missing or has invalid "universeId"`
-        );
+    if (_isMultiPlace(target)) {
+      if (target.places.length === 0) {
+        throw new Error(`Target "${name}" has an empty "places" array`);
       }
-      if (typeof target.basePlace.placeId !== 'number') {
-        throw new Error(
-          `Target "${name}" basePlace is missing or has invalid "placeId"`
-        );
+      for (const [i, place] of target.places.entries()) {
+        const placeLabel = place.name
+          ? `Target "${name}" place "${place.name}"`
+          : `Target "${name}" places[${i}]`;
+        _validatePlace(placeLabel, place);
       }
+    } else {
+      _validatePlace(`Target "${name}"`, target);
     }
   }
 
   return config;
 }
 
-export function resolveDeployTarget(
+/**
+ * Expand a target into one DeployTarget per place. Single-place targets resolve
+ * to a 1-element array; multi-place targets expand to one entry per `places[]`.
+ */
+export function resolveDeployTargetPlaces(
   config: DeployConfig,
   targetName: string
-): DeployTarget {
+): DeployTarget[] {
   const availableTargets = Object.keys(config.targets);
   const target = config.targets[targetName];
 
@@ -84,7 +115,60 @@ export function resolveDeployTarget(
     );
   }
 
-  return target;
+  return _isMultiPlace(target) ? target.places : [target];
+}
+
+/**
+ * Like `resolveDeployTarget`, but throws when the target is multi-place. Use
+ * in single-shot commands (`nevermore deploy`, `nevermore test`) where it is
+ * not meaningful to deploy to "the first place" of a multi-chapter target —
+ * the caller should pick one explicitly or use the batch commands.
+ */
+export function resolveSingleDeployTarget(
+  config: DeployConfig,
+  targetName: string,
+  commandHint = 'nevermore batch deploy'
+): DeployTarget {
+  const places = resolveDeployTargetPlaces(config, targetName);
+  if (places.length > 1) {
+    const placeNames = places
+      .map((p, i) => p.name ?? `places[${i}]`)
+      .join(', ');
+    throw new Error(
+      [
+        `Target "${targetName}" has multiple places (${placeNames}); cannot deploy to it as a single place.`,
+        `Use \`${commandHint} --target ${targetName}\` to fan out across every place.`,
+      ].join('\n')
+    );
+  }
+  return places[0]!;
+}
+
+/**
+ * Pick a target name when the user did not specify one and we cannot prompt
+ * (non-TTY / CI). Single target wins; otherwise prefer "integration" over
+ * "test" so `--publish` does not silently target the test place. Throws when
+ * neither is present.
+ */
+export function resolveDefaultTargetName(config: DeployConfig): string {
+  const availableTargets = Object.keys(config.targets);
+
+  if (availableTargets.length === 1) {
+    return availableTargets[0]!;
+  }
+  if (config.targets['integration']) {
+    return 'integration';
+  }
+  if (config.targets['test']) {
+    return 'test';
+  }
+
+  throw new Error(
+    [
+      'No --target specified and no default could be inferred.',
+      `Available targets: ${availableTargets.join(', ')}`,
+    ].join('\n')
+  );
 }
 
 export function resolveDeployConfigPath(packagePath: string): string {
@@ -110,11 +194,14 @@ export async function discoverUniverseIdAsync(
         return config.universeId;
       }
 
-      // Check if any target has a universeId
+      // Check if any target (or any place within a multi-place target) has a universeId
       if (config.targets) {
         for (const target of Object.values(config.targets)) {
-          if (typeof target.universeId === 'number') {
-            return target.universeId;
+          const places = _isMultiPlace(target) ? target.places : [target];
+          for (const place of places) {
+            if (typeof place.universeId === 'number') {
+              return place.universeId;
+            }
           }
         }
       }

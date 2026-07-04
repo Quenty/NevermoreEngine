@@ -5,25 +5,50 @@ import {
   type BatchSummary,
   type IStateTracker,
 } from '@quenty/cli-output-helpers/reporting';
-import { type TargetPackage } from './changed-packages-utils.js';
 
-export interface BatchOptions<TResult extends PackageResult> {
-  packages: TargetPackage[];
+/**
+ * Minimal contract the runner needs from each work item: a name used to key
+ * reporter lifecycle calls. Callers pass anything richer (a TargetPackage,
+ * a multi-place deploy unit, etc.); the runner only reads `.name`.
+ */
+export interface BatchItem {
+  name: string;
+}
+
+/** Partial result returned by executeAsync — durationMs is optional. */
+export type PartialBatchResult<TResult extends PackageResult> = Omit<
+  TResult,
+  'durationMs'
+> & {
+  /**
+   * Inner-measured duration. When provided, overrides the outer wall-clock
+   * timing (useful in aggregated batch mode where every package's outer
+   * await resolves at the same instant).
+   */
+  durationMs?: number;
+};
+
+export interface BatchOptions<
+  TItem extends BatchItem,
+  TResult extends PackageResult
+> {
+  items: TItem[];
   concurrency?: number;
   reporter: Reporter;
   bufferOutput?: boolean;
   stateTracker?: IStateTracker;
   executeAsync: (
-    pkg: TargetPackage,
+    item: TItem,
     reporter: Reporter
-  ) => Promise<Omit<TResult, 'durationMs'>>;
+  ) => Promise<PartialBatchResult<TResult>>;
 }
 
-export async function runBatchAsync<TResult extends PackageResult>(
-  options: BatchOptions<TResult>
-): Promise<BatchSummary<TResult>> {
+export async function runBatchAsync<
+  TItem extends BatchItem,
+  TResult extends PackageResult
+>(options: BatchOptions<TItem, TResult>): Promise<BatchSummary<TResult>> {
   const {
-    packages,
+    items,
     concurrency = Infinity,
     reporter,
     bufferOutput = false,
@@ -38,17 +63,23 @@ export async function runBatchAsync<TResult extends PackageResult>(
 
   await new Promise<void>((resolveAll) => {
     function tryStartNext(): void {
-      while (runningCount < concurrency && nextIndex < packages.length) {
-        const pkg = packages[nextIndex++];
+      while (runningCount < concurrency && nextIndex < items.length) {
+        const item = items[nextIndex++]!;
         runningCount++;
 
-        _runOneAsync<TResult>(pkg, executeAsync, reporter, bufferOutput, stateTracker)
+        _runOneAsync<TItem, TResult>(
+          item,
+          executeAsync,
+          reporter,
+          bufferOutput,
+          stateTracker
+        )
           .then((result) => {
             results.push(result);
           })
           .finally(() => {
             runningCount--;
-            if (nextIndex >= packages.length && runningCount === 0) {
+            if (nextIndex >= items.length && runningCount === 0) {
               resolveAll();
             } else {
               tryStartNext();
@@ -56,7 +87,7 @@ export async function runBatchAsync<TResult extends PackageResult>(
           });
       }
 
-      if (packages.length === 0) {
+      if (items.length === 0) {
         resolveAll();
       }
     }
@@ -74,32 +105,39 @@ export async function runBatchAsync<TResult extends PackageResult>(
   };
 }
 
-async function _runOneAsync<TResult extends PackageResult>(
-  pkg: TargetPackage,
+async function _runOneAsync<
+  TItem extends BatchItem,
+  TResult extends PackageResult
+>(
+  item: TItem,
   executeAsync: (
-    pkg: TargetPackage,
+    item: TItem,
     reporter: Reporter
-  ) => Promise<Omit<TResult, 'durationMs'>>,
+  ) => Promise<PartialBatchResult<TResult>>,
   reporter: Reporter,
   bufferOutput: boolean,
   stateTracker?: IStateTracker
 ): Promise<TResult> {
-  reporter.onPackageStart(pkg.name);
+  reporter.onPackageStart(item.name);
   const startMs = Date.now();
 
   const execute = async (): Promise<TResult> => {
     try {
-      const partial = await executeAsync(pkg, reporter);
-      return { ...partial, durationMs: Date.now() - startMs } as TResult;
+      const partial = await executeAsync(item, reporter);
+      const durationMs = partial.durationMs ?? Date.now() - startMs;
+      return { ...partial, durationMs } as TResult;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      const currentPhase = stateTracker?.getCurrentPhase(pkg.name);
+      const errorMessage = OutputHelper.formatErrorChain(err);
+      const currentPhase = stateTracker?.getCurrentPhase(item.name);
       const failedPhase =
-        currentPhase && currentPhase !== 'pending' && currentPhase !== 'passed' && currentPhase !== 'failed'
+        currentPhase &&
+        currentPhase !== 'pending' &&
+        currentPhase !== 'passed' &&
+        currentPhase !== 'failed'
           ? currentPhase
           : undefined;
       return {
-        packageName: pkg.name,
+        packageName: item.name,
         success: false,
         logs: '',
         durationMs: Date.now() - startMs,

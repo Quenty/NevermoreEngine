@@ -37,8 +37,8 @@ local DEFAULT_VALUES = {
 }
 
 --[=[
-	Returns the default value for a given value type. If the type is mutable than
-	a new value will ge cosntructed.
+	Returns the default value for a given value type. If the type is mutable then
+	a new value will be constructed.
 
 	@param typeOfName string
 	@return any

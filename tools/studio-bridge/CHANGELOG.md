@@ -3,90 +3,86 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.7.0...@quenty/studio-bridge@0.7.1) (2026-04-27)
+# [0.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.14.0...@quenty/studio-bridge@0.15.0) (2026-05-26)
 
 **Note:** Version bump only for package @quenty/studio-bridge
 
+# [0.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.13.0...@quenty/studio-bridge@0.14.0) (2026-05-26)
 
+**Note:** Version bump only for package @quenty/studio-bridge
 
+# [0.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.12.0...@quenty/studio-bridge@0.13.0) (2026-05-26)
 
+**Note:** Version bump only for package @quenty/studio-bridge
+
+# [0.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.11.0...@quenty/studio-bridge@0.12.0) (2026-05-20)
+
+**Note:** Version bump only for package @quenty/studio-bridge
+
+# [0.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.10.0...@quenty/studio-bridge@0.11.0) (2026-05-19)
+
+**Note:** Version bump only for package @quenty/studio-bridge
+
+# [0.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.9.0...@quenty/studio-bridge@0.10.0) (2026-05-19)
+
+**Note:** Version bump only for package @quenty/studio-bridge
+
+# [0.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.8.0...@quenty/studio-bridge@0.9.0) (2026-05-18)
+
+**Note:** Version bump only for package @quenty/studio-bridge
+
+# [0.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.7.1...@quenty/studio-bridge@0.8.0) (2026-05-14)
+
+### Features
+
+- **studio-bridge:** persistent sessions and Linux/Wine support ([#669](https://github.com/Quenty/NevermoreEngine/issues/669)) ([51514c9](https://github.com/Quenty/NevermoreEngine/commit/51514c90cfe438ad1217dabb7fd64fd7350097a9))
+
+## [0.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.7.0...@quenty/studio-bridge@0.7.1) (2026-04-27)
+
+**Note:** Version bump only for package @quenty/studio-bridge
 
 # [0.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.6.0...@quenty/studio-bridge@0.7.0) (2026-02-23)
 
 **Note:** Version bump only for package @quenty/studio-bridge
 
-
-
-
-
 # [0.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.5.0...@quenty/studio-bridge@0.6.0) (2026-02-19)
 
 **Note:** Version bump only for package @quenty/studio-bridge
-
-
-
-
 
 # [0.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.4.0...@quenty/studio-bridge@0.5.0) (2026-02-18)
 
 **Note:** Version bump only for package @quenty/studio-bridge
 
-
-
-
-
 # [0.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.3.0...@quenty/studio-bridge@0.4.0) (2026-02-18)
 
 **Note:** Version bump only for package @quenty/studio-bridge
-
-
-
-
 
 # [0.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.2.2...@quenty/studio-bridge@0.3.0) (2026-02-17)
 
 **Note:** Version bump only for package @quenty/studio-bridge
 
-
-
-
-
 ## [0.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.2.1...@quenty/studio-bridge@0.2.2) (2026-02-17)
 
 **Note:** Version bump only for package @quenty/studio-bridge
-
-
-
-
 
 ## [0.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.2.0...@quenty/studio-bridge@0.2.1) (2026-02-17)
 
 **Note:** Version bump only for package @quenty/studio-bridge
 
-
-
-
-
 # 0.2.0 (2026-02-17)
-
 
 ### Bug Fixes
 
-* Fix spinner design showing stuff ([814cd91](https://github.com/Quenty/NevermoreEngine/commit/814cd915358079f7d628a9739d0cd56e472b52f6))
-* Local testing works consistently and in batch mode ([67d6ba1](https://github.com/Quenty/NevermoreEngine/commit/67d6ba1d3625dc76f7a54ac13e75da2cc82ccc64))
-
+- Fix spinner design showing stuff ([814cd91](https://github.com/Quenty/NevermoreEngine/commit/814cd915358079f7d628a9739d0cd56e472b52f6))
+- Local testing works consistently and in batch mode ([67d6ba1](https://github.com/Quenty/NevermoreEngine/commit/67d6ba1d3625dc76f7a54ac13e75da2cc82ccc64))
 
 ### Features
 
-* Add a terminal mode to studio-bridge for easier debugging ([92cdca9](https://github.com/Quenty/NevermoreEngine/commit/92cdca97ee6ece9a8622559f8846f59b831788de))
-* Add initial studio-bridge package that can replace run-in-roblox ([aec737f](https://github.com/Quenty/NevermoreEngine/commit/aec737fd0eb3f2b045fc469a2b46f833de84a24b))
-* Refactor studio bridge ([8afe642](https://github.com/Quenty/NevermoreEngine/commit/8afe6424b6635eaa0155734c085934051de88da6))
-* Use reporting system for studio bridge too (a bit ugly) ([20b675c](https://github.com/Quenty/NevermoreEngine/commit/20b675cb22cb46c88b556f4afdda2700dd1258dd))
-* Use yargs in studio-bridge cli ([2203601](https://github.com/Quenty/NevermoreEngine/commit/220360168e79d57cd576150134949d8f2325a38f))
-
-
-
-
+- Add a terminal mode to studio-bridge for easier debugging ([92cdca9](https://github.com/Quenty/NevermoreEngine/commit/92cdca97ee6ece9a8622559f8846f59b831788de))
+- Add initial studio-bridge package that can replace run-in-roblox ([aec737f](https://github.com/Quenty/NevermoreEngine/commit/aec737fd0eb3f2b045fc469a2b46f833de84a24b))
+- Refactor studio bridge ([8afe642](https://github.com/Quenty/NevermoreEngine/commit/8afe6424b6635eaa0155734c085934051de88da6))
+- Use reporting system for studio bridge too (a bit ugly) ([20b675c](https://github.com/Quenty/NevermoreEngine/commit/20b675cb22cb46c88b556f4afdda2700dd1258dd))
+- Use yargs in studio-bridge cli ([2203601](https://github.com/Quenty/NevermoreEngine/commit/220360168e79d57cd576150134949d8f2325a38f))
 
 # v0.2.0 (Tue Feb 17 2026)
 

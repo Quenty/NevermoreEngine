@@ -8,7 +8,7 @@ import {
   clearApiKeyAsync,
   validateApiKeyAsync,
   printApiKeySetupHelp,
-} from '../utils/auth/credential-store.js';
+} from '@quenty/nevermore-cli-helpers';
 
 export interface LoginArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -78,7 +78,9 @@ export class LoginCommand<T> implements CommandModule<T, LoginArgs> {
       const existingSource = await this._findExistingKeySourceAsync();
       if (existingSource) {
         OutputHelper.info(`Already logged in (via ${existingSource}).`);
-        OutputHelper.hint('Use "nevermore login --force" to replace credentials.');
+        OutputHelper.hint(
+          'Use "nevermore login --force" to replace credentials.'
+        );
         return;
       }
     }
@@ -143,7 +145,9 @@ export class LoginCommand<T> implements CommandModule<T, LoginArgs> {
         stored.length > 8
           ? stored.slice(0, 4) + '...' + stored.slice(-4)
           : '****';
-      OutputHelper.info(`API key: stored in ~/.nevermore/credentials.json (${masked})`);
+      OutputHelper.info(
+        `API key: stored in ~/.nevermore/credentials.json (${masked})`
+      );
 
       OutputHelper.info('Validating stored key...');
       const validation = await validateApiKeyAsync(stored);
@@ -157,7 +161,9 @@ export class LoginCommand<T> implements CommandModule<T, LoginArgs> {
       return;
     }
 
-    OutputHelper.warn('Not logged in. Run "nevermore login" to set up credentials.');
+    OutputHelper.warn(
+      'Not logged in. Run "nevermore login" to set up credentials.'
+    );
   };
 
   private _findExistingKeySourceAsync = async (): Promise<

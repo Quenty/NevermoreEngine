@@ -5,9 +5,9 @@ sidebar_position: 2
 
 # Nevermore design principles
 
-Nevermore consists of a few hundred packages in a [mono-repo](https://en.wikipedia.org/wiki/Monorepo). These packages are [semantically versioned](https://semver.org/) such that long-term maintaince can be done. Nevermore it trying to provide utility modules, and is not a framework.
+Nevermore consists of a few hundred packages in a [mono-repo](https://en.wikipedia.org/wiki/Monorepo). These packages are [semantically versioned](https://semver.org/) such that long-term maintenance can be done. Nevermore is trying to provide utility modules, and is not a framework.
 
-* **Lego blocks** - Nevermore provides utility modules that can combined in a variety of ways
+* **Lego blocks** - Nevermore provides utility modules that can be combined in a variety of ways
 * **Not a framework** - Nevermore works in a variety of other architectures
 * **Versioned** - Nevermore should be versioned. Nevermore should not break games when changes are made.
 * **Fast development** - Nevermore should accelerate game development
@@ -35,7 +35,7 @@ Library packages tend to be packages that export one or multiple libraries. Thes
 * [Elo](/api/EloUtils)
 
 ### Object utility libraries
-These are very similiar to libraries but they tend to export an object, and some supporting objects. These objects are concepts that are useful to learn, and generally exist outside of Roblox (although they may not). These are fundamental building blocks and patterns in Roblox.
+These are very similar to libraries but they tend to export an object, and some supporting objects. These objects are concepts that are useful to learn, and generally exist outside of Roblox (although they may not). These are fundamental building blocks and patterns in Roblox.
 
 * [Octree](/api/Octree)
 * [Maid](/api/Maid)
@@ -45,7 +45,7 @@ These are very similiar to libraries but they tend to export an object, and some
 * [Queue](/api/Queue)
 
 ### Integration services
-There services are primary about providing a contract between two services.
+These services are primarily about providing a contract between two services.
 
 * [GameConfigService](/api/GameConfigService)
 * [CameraStackService](/api/CameraStackService)
@@ -63,7 +63,7 @@ opinionated about...
 2. Consumption of code (plugin, game, et cetera)
 
 Code is designed to be copied and pasted as needed, but first and foremost, is designed to empower James's (Quenty's) workflow. For this reason, while Nevermore tries its best to be useful
-to as wide of an audience as possible, in many ways document and design notes are lacking because this is not its first purpose.
+to as wide of an audience as possible, in many ways documentation and design notes are lacking because this is not its first purpose.
 
 
 ## Loading system

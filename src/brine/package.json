@@ -1,6 +1,6 @@
 {
   "name": "@quenty/brine",
-  "version": "1.1.2",
+  "version": "1.4.1",
   "description": "Fast and efficient extensible serialiation and deserialization library for Roblox with native instance support out of the box",
   "keywords": [
     "Roblox",
@@ -28,15 +28,20 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "workspace:*",
     "@quenty/bufferencoder": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/memoize": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/rx": "workspace:*",
     "@quenty/selectionutils": "workspace:*",
     "@quenty/servicebag": "workspace:*",
+    "@quenty/steputils": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/symbol": "workspace:*",
+    "@quenty/table": "workspace:*",
     "@quenty/viewport": "workspace:*",
     "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },

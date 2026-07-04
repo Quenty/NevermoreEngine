@@ -5,20 +5,15 @@ import {
   resolvePackagePath,
 } from '@quenty/nevermore-template-helpers';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import {
-  type DeployTarget,
-  loadDeployConfigAsync,
-  resolveDeployConfigPath,
-  resolveDeployTarget,
-} from '../../build/deploy-config.js';
-import { type TargetPackage } from '../../batch/changed-packages-utils.js';
+import { type DeployTarget } from '../../build/deploy-config.js';
+import { type BatchTarget } from '../../batch/changed-packages-utils.js';
 
 export interface CombinedProjectResult {
   /** Absolute path to the combined .rbxl file. */
   rbxlPath: string;
-  /** packageName → ServerScriptService slug mapping. */
+  /** batchTarget.name → ServerScriptService slug mapping. */
   slugMap: Map<string, string>;
-  /** First package's deploy target (provides placeId/universeId for upload). */
+  /** First batch target's deploy target (provides placeId/universeId for upload). */
   primaryTarget: DeployTarget;
   /** Owns the temp directory — caller must clean up via buildContext.cleanupAsync(). */
   buildContext: BuildContext;
@@ -53,16 +48,18 @@ interface PackageBuildInfo {
  *   Phase 2: Use Lune to merge the individual builds into a single .rbxl
  */
 export async function generateCombinedProjectAsync(options: {
-  packages: TargetPackage[];
+  batchTargets: BatchTarget[];
   repoRoot: string;
   batchPlaceId?: number;
   batchUniverseId?: number;
   progress?: CombinedBuildProgress;
 }): Promise<CombinedProjectResult> {
-  const { packages, batchPlaceId, batchUniverseId, progress } = options;
+  const { batchTargets, batchPlaceId, batchUniverseId, progress } = options;
 
-  if (packages.length === 0) {
-    throw new Error('No packages provided for combined project generation');
+  if (batchTargets.length === 0) {
+    throw new Error(
+      'No batch targets provided for combined project generation'
+    );
   }
 
   const buildContext = await BuildContext.createAsync({
@@ -70,58 +67,54 @@ export async function generateCombinedProjectAsync(options: {
   });
 
   const slugMap = new Map<string, string>();
-  let primaryTarget: DeployTarget | undefined;
+  const firstTarget = batchTargets[0]!.target;
+  const primaryTarget: DeployTarget = { ...firstTarget };
+  if (batchPlaceId) primaryTarget.placeId = batchPlaceId;
+  if (batchUniverseId) primaryTarget.universeId = batchUniverseId;
+
   const builds: PackageBuildInfo[] = [];
 
-  // ── Phase 1: Build each package individually ──
+  // ── Phase 1: Build each batch target individually ──
 
   let buildIndex = 0;
-  for (const pkg of packages) {
-    const configPath = resolveDeployConfigPath(pkg.path);
-    const config = await loadDeployConfigAsync(configPath);
-    const target = resolveDeployTarget(config, 'test');
-
-    if (!primaryTarget) {
-      primaryTarget = { ...target };
-      if (batchPlaceId) primaryTarget.placeId = batchPlaceId;
-      if (batchUniverseId) primaryTarget.universeId = batchUniverseId;
-    }
+  for (const buildTarget of batchTargets) {
+    const { target } = buildTarget;
 
     // Parse the rojo project to extract the ServerScriptService slug
-    const projectPath = path.resolve(pkg.path, target.project);
-    const slug = await _extractSlugAsync(pkg.name, projectPath);
+    const projectPath = path.resolve(buildTarget.path, target.project);
+    const slug = await _extractSlugAsync(buildTarget.name, projectPath);
 
     // Validate slug uniqueness
     for (const [existingName, existingSlug] of slugMap) {
       if (existingSlug === slug) {
         throw new Error(
-          `Slug collision: ${pkg.name} and ${existingName} both use slug "${slug}"`
+          `Slug collision: ${buildTarget.name} and ${existingName} both use slug "${slug}"`
         );
       }
     }
-    slugMap.set(pkg.name, slug);
+    slugMap.set(buildTarget.name, slug);
 
-    // Build this package's .rbxl
+    // Build this target's .rbxl
     const rbxlPath = buildContext.resolvePath(`${slug}.rbxl`);
-    OutputHelper.verbose(`Building ${pkg.name} (${slug})...`);
-    progress?.onPackageBuildStart?.(pkg.name);
+    OutputHelper.verbose(`Building ${buildTarget.name} (${slug})...`);
+    progress?.onPackageBuildStart?.(buildTarget.name);
     await buildContext.rojoBuildAsync({ projectPath, output: rbxlPath });
     buildIndex++;
-    progress?.onPackageBuildComplete?.(pkg.name);
+    progress?.onPackageBuildComplete?.(buildTarget.name);
     progress?.onStepProgress?.({
       kind: 'steps',
       completed: buildIndex,
-      total: packages.length,
-      label: pkg.name,
+      total: batchTargets.length,
+      label: buildTarget.name,
     });
 
     // Resolve scriptTemplate path
     if (!target.scriptTemplate) {
       throw new Error(
-        `No scriptTemplate for ${pkg.name} — required for batch testing`
+        `No scriptTemplate for ${buildTarget.name} — required for batch testing`
       );
     }
-    const scriptPath = path.resolve(pkg.path, target.scriptTemplate);
+    const scriptPath = path.resolve(buildTarget.path, target.scriptTemplate);
 
     builds.push({ slug, rbxlPath, scriptPath });
   }
@@ -142,7 +135,7 @@ export async function generateCombinedProjectAsync(options: {
   }
 
   OutputHelper.verbose(
-    `Merging ${builds.length} packages into combined .rbxl...`
+    `Merging ${builds.length} targets into combined .rbxl...`
   );
   progress?.onCombineStart?.();
   progress?.onStepProgress?.({
@@ -156,23 +149,23 @@ export async function generateCombinedProjectAsync(options: {
   );
 
   OutputHelper.verbose(
-    `Combined ${slugMap.size} packages at ${combinedRbxlPath}`
+    `Combined ${slugMap.size} targets at ${combinedRbxlPath}`
   );
 
   return {
     rbxlPath: combinedRbxlPath,
     slugMap,
-    primaryTarget: primaryTarget!,
+    primaryTarget,
     buildContext,
   };
 }
 
 /**
- * Extract the package slug from a test rojo project.
+ * Extract the slug from a test rojo project.
  * The slug is the first non-`$`, non-`Script` key under ServerScriptService.
  */
 async function _extractSlugAsync(
-  packageName: string,
+  batchTargetName: string,
   projectPath: string
 ): Promise<string> {
   let content: string;
@@ -180,7 +173,7 @@ async function _extractSlugAsync(
     content = await fs.readFile(projectPath, 'utf-8');
   } catch {
     throw new Error(
-      `Cannot read test project for ${packageName}: ${projectPath}`
+      `Cannot read test project for ${batchTargetName}: ${projectPath}`
     );
   }
 
@@ -190,7 +183,7 @@ async function _extractSlugAsync(
   const serverScriptService = project.tree?.ServerScriptService;
   if (!serverScriptService) {
     throw new Error(
-      `Test project for ${packageName} is missing ServerScriptService in tree`
+      `Test project for ${batchTargetName} is missing ServerScriptService in tree`
     );
   }
 
@@ -201,6 +194,6 @@ async function _extractSlugAsync(
   }
 
   throw new Error(
-    `Test project for ${packageName} has no package entry under ServerScriptService`
+    `Test project for ${batchTargetName} has no entry under ServerScriptService`
   );
 }

@@ -2,10 +2,10 @@
 --[=[
 	Lua-side duplication of the [API of events on Roblox objects](https://create.roblox.com/docs/reference/engine/datatypes/RBXScriptSignal).
 
-	Signals are needed for to ensure that for local events objects are passed by
+	Signals are needed to ensure that for local events objects are passed by
 	reference rather than by value where possible, as the BindableEvent objects
 	always pass signal arguments by value, meaning tables will be deep copied.
-	Roblox's deep copy method parses to a non-lua table compatable format.
+	Roblox's deep copy method parses to a non-lua table compatible format.
 
 	This class is designed to work both in deferred mode and in regular mode.
 	It follows whatever mode is set.
@@ -24,7 +24,7 @@
 
 	:::info
 	Why this over a direct [BindableEvent]? Well, in this case, the signal
-	prevents Roblox from trying to serialize and desialize each table reference
+	prevents Roblox from trying to serialize and deserialize each table reference
 	fired through the BindableEvent.
 	:::
 
