@@ -41,7 +41,7 @@ function BadgeUtils.promiseAwardBadge(player: Player, badgeId: number): Promise.
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
-			BadgeService:AwardBadge(player.UserId, badgeId)
+			BadgeService:AwardBadgeAsync(player.UserId, badgeId)
 		end)
 
 		if not ok then
