@@ -54,7 +54,8 @@ export const launchCommand = defineCommand<LaunchArgs, LaunchResult>({
       type: 'number',
     }),
     universeId: arg.option({
-      description: 'Cloud universe id for the place (recommended with --place-id)',
+      description:
+        'Cloud universe id for the place (recommended with --place-id)',
       type: 'number',
     }),
   },
