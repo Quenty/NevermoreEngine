@@ -29,15 +29,38 @@ describe('launchHandlerAsync', () => {
       placePath: '/tmp/game.rbxl',
     });
 
-    expect(launchStudioAsync).toHaveBeenCalledWith('/tmp/game.rbxl');
+    expect(launchStudioAsync).toHaveBeenCalledWith({
+      placePath: '/tmp/game.rbxl',
+    });
     expect(result.launched).toBe(true);
     expect(result.summary).toBe('Studio launched with /tmp/game.rbxl');
   });
 
-  it('passes empty string when no place path', async () => {
+  it('passes cloud place + universe ids to launchStudioAsync', async () => {
+    const result = await launchHandlerAsync({
+      placeId: 84760113521251,
+      universeId: 9893751595,
+    });
+
+    expect(launchStudioAsync).toHaveBeenCalledWith({
+      placeId: 84760113521251,
+      universeId: 9893751595,
+    });
+    expect(result.summary).toBe(
+      'Studio launched with place 84760113521251 (universe 9893751595)'
+    );
+  });
+
+  it('summarizes a cloud place id without a universe id', async () => {
+    const result = await launchHandlerAsync({ placeId: 123 });
+
+    expect(result.summary).toBe('Studio launched with place 123');
+  });
+
+  it('passes an empty options object when nothing is specified', async () => {
     await launchHandlerAsync({});
 
-    expect(launchStudioAsync).toHaveBeenCalledWith('');
+    expect(launchStudioAsync).toHaveBeenCalledWith({});
   });
 
   it('returns correct summary without place path', async () => {
