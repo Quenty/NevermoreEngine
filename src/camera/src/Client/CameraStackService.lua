@@ -70,9 +70,8 @@ function CameraStackService.Start(self: CameraStackService): ()
 
 		local state = self:GetTopState()
 
-		self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
-
 		if state then
+			self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
 			state:Set(Workspace.CurrentCamera)
 		end
 
