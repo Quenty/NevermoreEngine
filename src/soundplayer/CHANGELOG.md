@@ -1,20 +1,13 @@
-# v7.41.0 (Sun Jul 12 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Prevent redundant emission [#726](https://github.com/Quenty/NevermoreEngine/pull/726) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Prevent redundant emission ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.40.1...@quenty/soundplayer@7.41.0) (2026-07-12)
+
+### Bug Fixes
+
+- Prevent redundant emission ([2075628](https://github.com/Quenty/NevermoreEngine/commit/20756282d97f632928349e7f65d19fc15752be0b))
 
 ## [7.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.40.0...@quenty/soundplayer@7.40.1) (2026-05-30)
 

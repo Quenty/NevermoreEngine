@@ -1,19 +1,13 @@
-# v0.16.0 (Sun Jul 12 2026)
-
-#### 🚀 Enhancement
-
-- feat: Launch with placeId + universeId options [#723](https://github.com/Quenty/NevermoreEngine/pull/723) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [0.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.15.0...@quenty/studio-bridge@0.16.0) (2026-07-12)
+
+### Features
+
+- Launch with placeId + universeId options ([#723](https://github.com/Quenty/NevermoreEngine/issues/723)) ([5e2da87](https://github.com/Quenty/NevermoreEngine/commit/5e2da87544c5b587bdc2e919b4805a20381c57f1))
 
 # [0.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.14.0...@quenty/studio-bridge@0.15.0) (2026-05-26)
 
