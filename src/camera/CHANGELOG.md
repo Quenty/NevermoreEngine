@@ -1,3 +1,16 @@
+# v14.42.0 (Sun Jul 12 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Ensure valid camera state [#724](https://github.com/Quenty/NevermoreEngine/pull/724) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Ensure valid camera state ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

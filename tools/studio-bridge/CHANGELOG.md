@@ -1,3 +1,15 @@
+# v0.16.0 (Sun Jul 12 2026)
+
+#### 🚀 Enhancement
+
+- feat: Launch with placeId + universeId options [#723](https://github.com/Quenty/NevermoreEngine/pull/723) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

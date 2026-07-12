@@ -1,3 +1,16 @@
+# v7.41.0 (Sun Jul 12 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Prevent redundant emission [#726](https://github.com/Quenty/NevermoreEngine/pull/726) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Prevent redundant emission ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

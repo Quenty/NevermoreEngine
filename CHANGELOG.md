@@ -1,3 +1,24 @@
+# (Sun Jul 12 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/studio-bridge@0.16.0`
+  - feat: Launch with placeId + universeId options [#723](https://github.com/Quenty/NevermoreEngine/pull/723) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/soundplayer@7.41.0`
+  - fix: Prevent redundant emission [#726](https://github.com/Quenty/NevermoreEngine/pull/726) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/camera@14.42.0`
+  - fix: Ensure valid camera state [#724](https://github.com/Quenty/NevermoreEngine/pull/724) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Jul 02 2026)
 
 #### 🚀 Enhancement
