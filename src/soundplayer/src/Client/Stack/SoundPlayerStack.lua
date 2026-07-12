@@ -20,6 +20,7 @@ export type SoundPlayerStack =
 	typeof(setmetatable(
 		{} :: {
 			_stack: any, --ObservableSortedList.ObservableSortedList<LoopedSoundPlayer.LoopedSoundPlayer>,
+			_current: LoopedSoundPlayer.LoopedSoundPlayer?,
 			HidingComplete: Signal.Signal<()>,
 		},
 		{} :: typeof({ __index = SoundPlayerStack })
@@ -38,6 +39,11 @@ function SoundPlayerStack.new(): SoundPlayerStack
 	-- TODO: connect to visible + fire hiding finished when our stack is empty
 
 	self._maid:GiveTask(self._stack:ObserveAtIndex(-1):Subscribe(function(soundPlayer)
+		if self._current == soundPlayer then
+			return
+		end
+		self._current = soundPlayer
+
 		if soundPlayer then
 			local maid = Maid.new()
 			soundPlayer:Show()
