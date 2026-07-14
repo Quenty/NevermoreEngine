@@ -1,0 +1,16 @@
+{
+  "_doc": "Execution-strategy tests for the skill's parallelism guidance. SKILL.md tells the agent to fan out one sub-agent per file within a dependency layer when a PACKAGE has more than ~3 files to convert, and to stay sequential below that. A judge reads the live SKILL.md and classifies each task as 'parallel' (fan out sub-agents per layer) or 'sequential', scored against expect. Guards against a real-use regression we saw: the agent converted a whole package serially because the skill never told it to parallelize. Run via lib/parallelism.sh — one batched claude -p call.",
+  "skill_name": "strict-typing-luau",
+  "cases": [
+    { "expect": "sequential", "tag": "one-file",        "prompt": "Strictly type src/animationtrackutils/src/Shared/AnimationTrackUtils.lua" },
+    { "expect": "sequential", "tag": "type-this",        "prompt": "type this" },
+    { "expect": "sequential", "tag": "fix-errors-one",   "prompt": "this --!strict file is throwing luau-lsp type errors, fix the typing" },
+    { "expect": "sequential", "tag": "two-named",        "prompt": "Strictly type src/foo/src/Shared/A.lua and src/foo/src/Shared/B.lua" },
+    { "expect": "sequential", "tag": "three-files",      "prompt": "Strictly type these three files in src/foo: A.lua, B.lua, C.lua" },
+
+    { "expect": "parallel",   "tag": "whole-settings",   "prompt": "Convert the entire src/settings package (about 9 files) to --!strict." },
+    { "expect": "parallel",   "tag": "whole-gameconfig", "prompt": "Strictly type all of src/gameconfig, handling the dependencies properly." },
+    { "expect": "parallel",   "tag": "large-package",    "prompt": "Convert this whole 14-file package to --!strict." },
+    { "expect": "parallel",   "tag": "package-order",    "prompt": "I need to strict-type all of src/rogue-properties — convert the whole package." }
+  ]
+}

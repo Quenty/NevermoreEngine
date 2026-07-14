@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Centralized death reporting service which can be used to track
 	deaths.
@@ -105,7 +105,7 @@ end
 	@param character Model
 	@return Observable<DeathReport>
 ]=]
-function DeathReportServiceClient:ObserveCharacterKillerReports(character)
+function DeathReportServiceClient:ObserveCharacterKillerReports(character: Model)
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	return self._reportProcessor:ObserveCharacterKillerReports(character)
@@ -117,7 +117,7 @@ end
 	@param character Model
 	@return Observable<DeathReport>
 ]=]
-function DeathReportServiceClient:ObserveCharacterDeathReports(character)
+function DeathReportServiceClient:ObserveCharacterDeathReports(character: Model)
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	return self._reportProcessor:ObserveCharacterDeathReports(character)
@@ -131,7 +131,7 @@ function DeathReportServiceClient:GetLastDeathReports()
 	return self._lastDeathReports
 end
 
-function DeathReportServiceClient:_handleClientEvent(deathReport)
+function DeathReportServiceClient:_handleClientEvent(deathReport: DeathReportUtils.DeathReport)
 	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathreport")
 
 	if typeof(deathReport.adornee) ~= "Instance" then

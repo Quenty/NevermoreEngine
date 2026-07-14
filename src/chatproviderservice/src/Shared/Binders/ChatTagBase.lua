@@ -28,7 +28,7 @@ export type ChatTagBase =
 
 			-- Public
 			UserDisabled: AttributeValue.AttributeValue<boolean>,
-			ChatTagKey: AttributeValue.AttributeValue<boolean>,
+			ChatTagKey: AttributeValue.AttributeValue<string>,
 		},
 		{} :: typeof({ __index = ChatTagBase })
 	))
@@ -43,7 +43,7 @@ function ChatTagBase.new(obj: Folder): ChatTagBase
 	self._chatTagPriority = AttributeValue.new(self._obj, ChatTagConstants.TAG_PRIORITY_ATTRIBUTE, 0)
 
 	self.UserDisabled = AttributeValue.new(self._obj, ChatTagConstants.USER_DISABLED_ATTRIBUTE, false)
-	self.ChatTagKey = AttributeValue.new(self._obj, ChatTagConstants.TAG_KEY_ATTRIBUTE, false)
+	self.ChatTagKey = AttributeValue.new(self._obj, ChatTagConstants.TAG_KEY_ATTRIBUTE, "")
 
 	return self
 end

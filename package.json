@@ -25,7 +25,7 @@
     "format:ts": "prettier --ignore-path .gitignore --write \"tools/**/*.{ts,tsx,js,jsx}\"",
     "lint:luau": "luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc --defs=globalTypes.d.lua --flag:LuauSolverV2=false --ignore=**/node_modules/** --ignore=**/*.story.lua --ignore=**/*.client.lua --ignore=**/*.server.lua src",
     "lint:moonwave": "npx lerna exec --parallel -- moonwave-extractor extract src",
-    "lint:prettier": "prettier --ignore-path .gitignore --check 'tools/**/*.{ts,tsx,js,jsx}'",
+    "lint:prettier": "prettier --ignore-path .gitignore --check \"tools/**/*.{ts,tsx,js,jsx}\"",
     "lint:selene": "npx lerna exec --parallel -- selene --no-summary --num-threads=1 --config=../../selene.toml src",
     "lint:stylua": "stylua --config-path=stylua.toml --check src games plugins",
     "lint:ts": "pnpm -r --filter './tools/**' --filter '!./tools/nevermore-vscode' run build",
