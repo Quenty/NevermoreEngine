@@ -1,29 +1,21 @@
-# v11.54.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(settings): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix: cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([@Quenty](https://github.com/Quenty))
-- fix: add @within for moonwave on SettingDefinitionProvider __index; cast Tie :Implement receiver ([@Quenty](https://github.com/Quenty))
-- fix(settings): cast cmdr handle to dodge flaky symlink-nominal analyze error ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
-- fix(settings): cast cmdr service handle for strict CmdrServiceClient ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.53.3...@quenty/settings@11.54.0) (2026-07-14)
+
+### Bug Fixes
+
+- add [@within](https://github.com/within) for moonwave on SettingDefinitionProvider \_\_index; cast Tie :Implement receiver ([388e3f8](https://github.com/Quenty/NevermoreEngine/commit/388e3f8c658b14d991b2328776d6cac5b11501c0))
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+- **settings:** cast cmdr handle to dodge flaky symlink-nominal analyze error ([bdaf1b4](https://github.com/Quenty/NevermoreEngine/commit/bdaf1b45f24882af05f40a941f48eb5b125eac84))
+- **settings:** cast cmdr service handle for strict CmdrServiceClient ([18b38b3](https://github.com/Quenty/NevermoreEngine/commit/18b38b3d4ceb3f1c9476015f545822a78f34747f))
+
+### Features
+
+- **settings:** convert package to --!strict ([5a93f97](https://github.com/Quenty/NevermoreEngine/commit/5a93f9791f9dcdc4843c3ada174ddc130e071104))
 
 ## [11.53.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.53.2...@quenty/settings@11.53.3) (2026-06-15)
 

@@ -1,25 +1,17 @@
-# v2.5.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(markdownrender): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene and moonwave issues from strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/markdownrender@2.4.5...@quenty/markdownrender@2.5.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **markdownrender:** convert package to --!strict ([0184224](https://github.com/Quenty/NevermoreEngine/commit/0184224d2b6f79a28778eb8648fb45d5d7c67d1b))
 
 ## [2.4.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/markdownrender@2.4.4...@quenty/markdownrender@2.4.5) (2026-05-30)
 

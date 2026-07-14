@@ -1,25 +1,13 @@
-# v10.57.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(settings-inputkeymap): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.56.3...@quenty/settings-inputkeymap@10.57.0) (2026-07-14)
+
+### Features
+
+- **settings-inputkeymap:** convert package to --!strict ([f4f876f](https://github.com/Quenty/NevermoreEngine/commit/f4f876f25653df06157c4070f04bc445e2c66b0d))
 
 ## [10.56.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.56.2...@quenty/settings-inputkeymap@10.56.3) (2026-06-15)
 

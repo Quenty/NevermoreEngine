@@ -1,28 +1,19 @@
-# v11.47.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(rogue-properties): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test(rogue-properties): cover RogueProperty, modifiers, and arrays ([@Quenty](https://github.com/Quenty))
-- fix(rogue-properties): read attribute-serialized scalar array elements ([@Quenty](https://github.com/Quenty))
-- fix(rogue-properties): preserve rawget and metatable order in RogueProperty ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.46.1...@quenty/rogue-properties@11.47.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+- **rogue-properties:** preserve rawget and metatable order in RogueProperty ([ff098bd](https://github.com/Quenty/NevermoreEngine/commit/ff098bdeb5a78773a51bdfca76799ae6a9607a83))
+- **rogue-properties:** read attribute-serialized scalar array elements ([0567942](https://github.com/Quenty/NevermoreEngine/commit/05679426244036a1ff83d4f4b207ed4ba9ead9ec))
+
+### Features
+
+- **rogue-properties:** convert package to --!strict ([a078592](https://github.com/Quenty/NevermoreEngine/commit/a07859268739b3826a749d5ff5e9c59553def95e))
 
 ## [11.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.46.0...@quenty/rogue-properties@11.46.1) (2026-05-30)
 

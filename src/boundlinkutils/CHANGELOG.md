@@ -1,25 +1,13 @@
-# v14.38.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(boundlinkutils): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundlinkutils@14.37.1...@quenty/boundlinkutils@14.38.0) (2026-07-14)
+
+### Features
+
+- **boundlinkutils:** convert package to --!strict ([6cd3e7f](https://github.com/Quenty/NevermoreEngine/commit/6cd3e7f518ffb74c0ba5266bee786b91f879a99d))
 
 ## [14.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundlinkutils@14.37.0...@quenty/boundlinkutils@14.37.1) (2026-05-30)
 

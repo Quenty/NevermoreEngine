@@ -1,25 +1,13 @@
-# v13.34.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(particleengine): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@13.33.1...@quenty/particleengine@13.34.0) (2026-07-14)
+
+### Features
+
+- **particleengine:** convert package to --!strict ([8140733](https://github.com/Quenty/NevermoreEngine/commit/8140733549712d162714c2093773ff93a11dadd9))
 
 ## [13.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@13.33.0...@quenty/particleengine@13.33.1) (2026-05-30)
 

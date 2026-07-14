@@ -1,25 +1,13 @@
-# v14.37.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(playerbinder): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.36.1...@quenty/playerbinder@14.37.0) (2026-07-14)
+
+### Features
+
+- **playerbinder:** convert package to --!strict ([c00dce7](https://github.com/Quenty/NevermoreEngine/commit/c00dce77720dfd0af4fc0c50ea619bf677ec79ae))
 
 ## [14.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.36.0...@quenty/playerbinder@14.36.1) (2026-05-30)
 

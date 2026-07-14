@@ -1,24 +1,13 @@
-# v7.37.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(bodycolorsutils): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.36.1...@quenty/bodycolorsutils@7.37.0) (2026-07-14)
+
+### Features
+
+- **bodycolorsutils:** convert package to --!strict ([0f48453](https://github.com/Quenty/NevermoreEngine/commit/0f48453fa448b6c59930da9e20e859745d34d744))
 
 ## [7.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.36.0...@quenty/bodycolorsutils@7.36.1) (2026-05-30)
 

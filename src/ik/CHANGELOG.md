@@ -1,26 +1,18 @@
-# v15.54.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(ik): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix: cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.53.0...@quenty/ik@15.54.0) (2026-07-14)
+
+### Bug Fixes
+
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **ik:** convert package to --!strict ([8728c25](https://github.com/Quenty/NevermoreEngine/commit/8728c25c8bcead4107630e2edd8d2cd7d1d06d65))
 
 # [15.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.52.1...@quenty/ik@15.53.0) (2026-07-12)
 

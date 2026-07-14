@@ -1,25 +1,17 @@
-# v7.35.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(screenshothudservice): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.34.1...@quenty/screenshothudservice@7.35.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **screenshothudservice:** convert package to --!strict ([02f67bf](https://github.com/Quenty/NevermoreEngine/commit/02f67bfe7dbd55fc5c6a4982180f523a1a683807))
 
 ## [7.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.34.0...@quenty/screenshothudservice@7.34.1) (2026-05-30)
 

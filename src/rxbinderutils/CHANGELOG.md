@@ -1,24 +1,13 @@
-# v14.37.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(rxbinderutils): launder Rx chain for strict binder observers ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.36.1...@quenty/rxbinderutils@14.37.0) (2026-07-14)
+
+### Bug Fixes
+
+- **rxbinderutils:** launder Rx chain for strict binder observers ([516a304](https://github.com/Quenty/NevermoreEngine/commit/516a3044eb24b38634029af807fb1ecbc18a01e4))
 
 ## [14.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.36.0...@quenty/rxbinderutils@14.36.1) (2026-05-30)
 

@@ -1,25 +1,17 @@
-# v14.37.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(binder): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.36.1...@quenty/binder@14.37.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **binder:** convert package to --!strict ([78f42c2](https://github.com/Quenty/NevermoreEngine/commit/78f42c2265f2ef9313db146220cb15e87baf6747))
 
 ## [14.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.36.0...@quenty/binder@14.36.1) (2026-05-30)
 

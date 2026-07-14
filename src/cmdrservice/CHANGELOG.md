@@ -1,25 +1,13 @@
-# v13.46.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(cmdrservice): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.45.2...@quenty/cmdrservice@13.46.0) (2026-07-14)
+
+### Features
+
+- **cmdrservice:** convert package to --!strict ([b5662ad](https://github.com/Quenty/NevermoreEngine/commit/b5662adab31b5fad3e15977b45f50ee277c41299))
 
 ## [13.45.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.45.1...@quenty/cmdrservice@13.45.2) (2026-06-03)
 

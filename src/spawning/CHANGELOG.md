@@ -1,24 +1,13 @@
-# v10.48.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(spawning): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.47.2...@quenty/spawning@10.48.0) (2026-07-14)
+
+### Features
+
+- **spawning:** convert package to --!strict ([541257b](https://github.com/Quenty/NevermoreEngine/commit/541257b9ce23eacaf298f5b2aad8939ac3ea17ad))
 
 ## [10.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.47.1...@quenty/spawning@10.47.2) (2026-06-03)
 

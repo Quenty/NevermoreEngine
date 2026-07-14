@@ -1,25 +1,13 @@
-# v10.38.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(colorpicker): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.37.1...@quenty/colorpicker@10.38.0) (2026-07-14)
+
+### Features
+
+- **colorpicker:** convert package to --!strict ([1355e31](https://github.com/Quenty/NevermoreEngine/commit/1355e3191589018841fb51c4917bf0fc9b5c068f))
 
 ## [10.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.37.0...@quenty/colorpicker@10.37.1) (2026-05-30)
 

@@ -1,24 +1,13 @@
-# v10.46.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(deathreport): cast humanoid binder registration for strict PlayerHumanoidBinder ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.45.0...@quenty/deathreport@10.46.0) (2026-07-14)
+
+### Bug Fixes
+
+- **deathreport:** cast humanoid binder registration for strict PlayerHumanoidBinder ([778aa52](https://github.com/Quenty/NevermoreEngine/commit/778aa52bc206918f38327eaf7669a579aaaccfff))
 
 # [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.44.1...@quenty/deathreport@10.45.0) (2026-06-24)
 

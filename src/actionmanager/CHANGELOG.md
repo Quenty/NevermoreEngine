@@ -1,25 +1,17 @@
-# v13.34.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(actionmanager): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(actionmanager): cast enabledmixin application for strict EnabledMixin ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.33.1...@quenty/actionmanager@13.34.0) (2026-07-14)
+
+### Bug Fixes
+
+- **actionmanager:** cast enabledmixin application for strict EnabledMixin ([9c257d3](https://github.com/Quenty/NevermoreEngine/commit/9c257d3229574baacc636de89ede4e2dc0ae2d84))
+
+### Features
+
+- **actionmanager:** convert package to --!strict ([969be92](https://github.com/Quenty/NevermoreEngine/commit/969be92474791bab5c6c2515ff14557cdd0e3f9a))
 
 ## [13.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.33.0...@quenty/actionmanager@13.33.1) (2026-05-30)
 

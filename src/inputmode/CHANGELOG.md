@@ -1,24 +1,13 @@
-# v13.35.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(inputmode): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.34.1...@quenty/inputmode@13.35.0) (2026-07-14)
+
+### Features
+
+- **inputmode:** convert package to --!strict ([7468a77](https://github.com/Quenty/NevermoreEngine/commit/7468a779a9ac8e23dc80b0162a931cda8a1247ef))
 
 ## [13.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.34.0...@quenty/inputmode@13.34.1) (2026-05-30)
 

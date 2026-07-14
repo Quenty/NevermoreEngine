@@ -1,24 +1,13 @@
-# v11.27.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(enabledmixin): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.26.1...@quenty/enabledmixin@11.27.0) (2026-07-14)
+
+### Features
+
+- **enabledmixin:** convert package to --!strict ([221965e](https://github.com/Quenty/NevermoreEngine/commit/221965ea0255cbd8fede74f7bc0cfe72d7ce8041))
 
 ## [11.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.26.0...@quenty/enabledmixin@11.26.1) (2026-05-30)
 

@@ -1,24 +1,13 @@
-# v11.39.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(templateprovider): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.38.1...@quenty/templateprovider@11.39.0) (2026-07-14)
+
+### Features
+
+- **templateprovider:** convert package to --!strict ([c379f12](https://github.com/Quenty/NevermoreEngine/commit/c379f127eb4a40570d1c7be2cb29c82b0e636e09))
 
 ## [11.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.38.0...@quenty/templateprovider@11.38.1) (2026-05-30)
 

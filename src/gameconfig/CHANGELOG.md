@@ -1,25 +1,17 @@
-# v12.50.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(gameconfig): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.49.2...@quenty/gameconfig@12.50.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **gameconfig:** convert package to --!strict ([360d65c](https://github.com/Quenty/NevermoreEngine/commit/360d65cc66e9cf4e169af175f1914286ccdb789f))
 
 ## [12.49.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.49.1...@quenty/gameconfig@12.49.2) (2026-06-03)
 

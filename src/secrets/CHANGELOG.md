@@ -1,25 +1,17 @@
-# v7.51.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(secrets): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.50.2...@quenty/secrets@7.51.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **secrets:** convert package to --!strict ([d0771a1](https://github.com/Quenty/NevermoreEngine/commit/d0771a1e22b964bb9b06a072e3d43ff5e1443923))
 
 ## [7.50.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.50.1...@quenty/secrets@7.50.2) (2026-06-03)
 

@@ -1,25 +1,13 @@
-# v14.43.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(camera): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.42.0...@quenty/camera@14.43.0) (2026-07-14)
+
+### Features
+
+- **camera:** convert package to --!strict ([9fe73f4](https://github.com/Quenty/NevermoreEngine/commit/9fe73f4a3d2cc98a171f6e9f92e592d0aeb30d15))
 
 # [14.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.41.1...@quenty/camera@14.42.0) (2026-07-12)
 

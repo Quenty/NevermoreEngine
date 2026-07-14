@@ -1,25 +1,17 @@
-# v13.30.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(sprites): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene and moonwave issues from strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.29.1...@quenty/sprites@13.30.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **sprites:** convert package to --!strict ([ef4f22e](https://github.com/Quenty/NevermoreEngine/commit/ef4f22eae0898aff5d9cae458c39a25f1dd05451))
 
 ## [13.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.29.0...@quenty/sprites@13.29.1) (2026-05-30)
 

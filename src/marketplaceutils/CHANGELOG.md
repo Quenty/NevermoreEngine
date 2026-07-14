@@ -1,24 +1,13 @@
-# v11.21.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(marketplaceutils): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.20.1...@quenty/marketplaceutils@11.21.0) (2026-07-14)
+
+### Features
+
+- **marketplaceutils:** convert package to --!strict ([13671ec](https://github.com/Quenty/NevermoreEngine/commit/13671ec4352370464ddce6f2e0ee8bf815e8e01f))
 
 ## [11.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.20.0...@quenty/marketplaceutils@11.20.1) (2026-05-30)
 

@@ -1,25 +1,13 @@
-# v7.40.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(avatareditorutils): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.39.1...@quenty/avatareditorutils@7.40.0) (2026-07-14)
+
+### Features
+
+- **avatareditorutils:** convert package to --!strict ([3c907b7](https://github.com/Quenty/NevermoreEngine/commit/3c907b74f87ae696f769b16acdac38ebc8d1dfc3))
 
 ## [7.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@7.39.0...@quenty/avatareditorutils@7.39.1) (2026-05-30)
 

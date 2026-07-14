@@ -1,26 +1,18 @@
-# v15.53.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(ragdoll): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix: cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.52.0...@quenty/ragdoll@15.53.0) (2026-07-14)
+
+### Bug Fixes
+
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **ragdoll:** convert package to --!strict ([3f16ada](https://github.com/Quenty/NevermoreEngine/commit/3f16ada0d2371662bde94d8949a52f853152dac3))
 
 # [15.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.51.1...@quenty/ragdoll@15.52.0) (2026-07-12)
 

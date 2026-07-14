@@ -1,24 +1,13 @@
-# v10.40.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(colorpalette): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.39.1...@quenty/colorpalette@10.40.0) (2026-07-14)
+
+### Features
+
+- **colorpalette:** convert package to --!strict ([1e7e2dd](https://github.com/Quenty/NevermoreEngine/commit/1e7e2dd09dbbac8d891739db1f7a5c91e8e427de))
 
 ## [10.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.39.0...@quenty/colorpalette@10.39.1) (2026-05-30)
 

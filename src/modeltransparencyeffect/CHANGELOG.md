@@ -1,24 +1,13 @@
-# v11.18.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(modeltransparencyeffect): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.17.1...@quenty/modeltransparencyeffect@11.18.0) (2026-07-14)
+
+### Features
+
+- **modeltransparencyeffect:** convert package to --!strict ([5f79b2d](https://github.com/Quenty/NevermoreEngine/commit/5f79b2db483728f247be010729a1564735c08d20))
 
 ## [11.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.17.0...@quenty/modeltransparencyeffect@11.17.1) (2026-05-30)
 

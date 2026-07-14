@@ -1,25 +1,13 @@
-# v12.50.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(humanoidspeed): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.49.1...@quenty/humanoidspeed@12.50.0) (2026-07-14)
+
+### Features
+
+- **humanoidspeed:** convert package to --!strict ([b37508d](https://github.com/Quenty/NevermoreEngine/commit/b37508dde19f2d8191e28a1e4d44bf09ffe63319))
 
 ## [12.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.49.0...@quenty/humanoidspeed@12.49.1) (2026-05-30)
 

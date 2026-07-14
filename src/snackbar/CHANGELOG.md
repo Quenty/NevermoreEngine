@@ -1,24 +1,13 @@
-# v11.43.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(snackbar): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.42.1...@quenty/snackbar@11.43.0) (2026-07-14)
+
+### Features
+
+- **snackbar:** convert package to --!strict ([6f276af](https://github.com/Quenty/NevermoreEngine/commit/6f276afe817ddcc59c1c7a6079d8f9f73787fed2))
 
 ## [11.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.42.0...@quenty/snackbar@11.42.1) (2026-05-30)
 

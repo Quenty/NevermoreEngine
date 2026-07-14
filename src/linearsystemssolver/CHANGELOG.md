@@ -1,25 +1,13 @@
-# v2.4.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(linearsystemssolver): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linearsystemssolver@2.3.4...@quenty/linearsystemssolver@2.4.0) (2026-07-14)
+
+### Features
+
+- **linearsystemssolver:** convert package to --!strict ([b35afd1](https://github.com/Quenty/NevermoreEngine/commit/b35afd15d1f1e314306f54a12c23a7a8f6e20693))
 
 ## [2.3.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linearsystemssolver@2.3.3...@quenty/linearsystemssolver@2.3.4) (2026-05-30)
 

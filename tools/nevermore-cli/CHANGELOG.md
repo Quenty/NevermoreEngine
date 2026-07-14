@@ -1,24 +1,11 @@
-# v4.35.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(tooling): add lune .luaurc for build-scripts ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.35.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.34.0...@quenty/nevermore-cli@4.35.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
 
 # [4.34.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.33.1...@quenty/nevermore-cli@4.34.0) (2026-07-12)
 

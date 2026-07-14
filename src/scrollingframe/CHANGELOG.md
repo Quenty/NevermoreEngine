@@ -1,26 +1,17 @@
-# v12.19.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(scrollingframe): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(lint): resolve selene and moonwave issues from strict conversions ([@Quenty](https://github.com/Quenty))
-- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.18.1...@quenty/scrollingframe@12.19.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **scrollingframe:** convert package to --!strict ([bd5908a](https://github.com/Quenty/NevermoreEngine/commit/bd5908afefafaaa181cb1d72a85176d1838adcfa))
 
 ## [12.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.18.0...@quenty/scrollingframe@12.18.1) (2026-05-30)
 

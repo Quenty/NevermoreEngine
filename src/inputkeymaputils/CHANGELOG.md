@@ -1,25 +1,17 @@
-# v14.44.0 (Tue Jul 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
-- feat(inputkeymaputils): convert package to --!strict ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
-- fix(inputkeymaputils): supply @type value so moonwave-extractor passes ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.43.1...@quenty/inputkeymaputils@14.44.0) (2026-07-14)
+
+### Bug Fixes
+
+- **inputkeymaputils:** supply [@type](https://github.com/type) value so moonwave-extractor passes ([8f6d832](https://github.com/Quenty/NevermoreEngine/commit/8f6d8324ac613a39e31cdb317b9fdd796749fe01))
+
+### Features
+
+- **inputkeymaputils:** convert package to --!strict ([6eb30a3](https://github.com/Quenty/NevermoreEngine/commit/6eb30a34f76212e77326a5aa3310f3d6579e0de2))
 
 ## [14.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.43.0...@quenty/inputkeymaputils@14.43.1) (2026-05-30)
 
