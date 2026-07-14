@@ -36,8 +36,8 @@ Some Chinese dialects group by 10000 instead of 1000.
 Indian natural language groups the first 3 to left of decimal, then every 2 after that.
 
 See https://en.wikipedia.org/wiki/Decimal_separator#Digit_grouping"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/NumberLocalizationUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/NumberLocalizationUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/NumberLocalizationUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.51c798a7.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.86a6ed74.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.534e9ff3.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.42b95e32.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.cb2b8b5a.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -67,7 +67,7 @@ See https://en.wikipedia.org/wiki/Decimal_separator#Digit_grouping"><link data-r
   </li>
 </ul>
 <p>See <a href="https://en.wikipedia.org/wiki/Decimal_separator#Digit_grouping">https://en.wikipedia.org/wiki/Decimal_separator#Digit_grouping</a></p>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="abbreviate"><code style="text-decoration:none">abbreviate</code><a href="#abbreviate" class="hash-link" aria-label="Direct link to abbreviate" title="Direct link to abbreviate" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/Numbers/NumberLocalizationUtils.lua#L291"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NumberLocalizationUtils<!-- -->.</code><code class="green_DgR4">abbreviate</code><code>(</code><div class="inset_uKQm"><div><code>number<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>locale<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>roundingBehaviourType<!-- -->: </code><code class="blue_P4bS">RoundingBehaviourType?</code><code>,</code></div><div><code>numSignificantDigits<!-- -->: </code><code class="blue_P4bS">number?</code></div></div><code>) → </code><code class="blue_P4bS">string</code></div><div>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="abbreviate"><code style="text-decoration:none">abbreviate</code><a href="#abbreviate" class="hash-link" aria-label="Direct link to abbreviate" title="Direct link to abbreviate" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/Numbers/NumberLocalizationUtils.lua#L299"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NumberLocalizationUtils<!-- -->.</code><code class="green_DgR4">abbreviate</code><code>(</code><div class="inset_uKQm"><div><code>number<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>locale<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>roundingBehaviourType<!-- -->: </code><code class="blue_P4bS">RoundingBehaviourType?</code><code>,</code></div><div><code>numSignificantDigits<!-- -->: </code><code class="blue_P4bS">number?</code></div></div><code>) → </code><code class="blue_P4bS">string</code></div><div>
 <p>Abbreviates the number to a truncated amount in a localized way.</p>
 <pre class="language-lua"><code class="language-lua"><span class="token function">print</span><span class="token punctuation">(</span>NumberLocalizationUtils<span class="token punctuation">.</span><span class="token function">abbreviate</span><span class="token punctuation">(</span><span class="token number">2500</span><span class="token punctuation">,</span> <span class="token string">"en-us"</span><span class="token punctuation">,</span> RoundingBehaviourTypes<span class="token punctuation">.</span>ROUND_TO_CLOSEST<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> 2.5k</span>
 </code></pre>
@@ -106,7 +106,7 @@ See https://en.wikipedia.org/wiki/Decimal_separator#Digit_grouping"><link data-r
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 291,
+                &quot;line&quot;: 299,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/Numbers/NumberLocalizationUtils.lua&quot;
             }
         }

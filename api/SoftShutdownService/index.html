@@ -24,8 +24,8 @@ Originally written by Merely
 https://github.com/MerelyRBLX/ROBLOX-Lua/blob/master/SoftShutdown.lua
 
 Modified by Quenty"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/SoftShutdownService"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/SoftShutdownService" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/SoftShutdownService" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.51c798a7.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.86a6ed74.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.534e9ff3.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.42b95e32.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.cb2b8b5a.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -46,7 +46,7 @@ Modified by Quenty"><link data-rh="true" rel="canonical" href="https://quenty.gi
   <a href="https://github.com/MerelyRBLX/ROBLOX-Lua/blob/master/SoftShutdown.lua">https://github.com/MerelyRBLX/ROBLOX-Lua/blob/master/SoftShutdown.lua</a>
 </p>
 <p>Modified by Quenty</p>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Init"><code style="text-decoration:none">Init</code><a href="#Init" class="hash-link" aria-label="Direct link to Init" title="Direct link to Init" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/softshutdown/src/Server/SoftShutdownService.lua#L45"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>SoftShutdownService<!-- -->:</code><code class="green_DgR4">Init</code><code>(</code><code>serviceBag<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ServiceBag">ServiceBag</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Init"><code style="text-decoration:none">Init</code><a href="#Init" class="hash-link" aria-label="Direct link to Init" title="Direct link to Init" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/softshutdown/src/Server/SoftShutdownService.lua#L56"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>SoftShutdownService<!-- -->.</code><code class="green_DgR4">Init</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/SoftShutdownService">SoftShutdownService</a></code><code>,</code></div><div><code>serviceBag<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ServiceBag">ServiceBag</a></code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Initialize the service. Should be done via <a href="/NevermoreEngine/api/ServiceBag">ServiceBag</a>.</p>
 
   
@@ -75,15 +75,20 @@ Modified by Quenty"><link data-rh="true" rel="canonical" href="https://quenty.gi
             &quot;desc&quot;: &quot;Initialize the service. Should be done via [ServiceBag].\n\n:::warning\nInitializing this service effectively initializes side effects, which is, to initialize\nthe soft shutdown behavior.\n:::&quot;,
             &quot;params&quot;: [
                 {
+                    &quot;name&quot;: &quot;self&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;SoftShutdownService&quot;
+                },
+                {
                     &quot;name&quot;: &quot;serviceBag&quot;,
                     &quot;desc&quot;: &quot;&quot;,
                     &quot;lua_type&quot;: &quot;ServiceBag&quot;
                 }
             ],
             &quot;returns&quot;: [],
-            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 45,
+                &quot;line&quot;: 56,
                 &quot;path&quot;: &quot;src/softshutdown/src/Server/SoftShutdownService.lua&quot;
             }
         }
@@ -96,6 +101,6 @@ Modified by Quenty"><link data-rh="true" rel="canonical" href="https://quenty.gi
         &quot;line&quot;: 17,
         &quot;path&quot;: &quot;src/softshutdown/src/Server/SoftShutdownService.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Init" class="table-of-contents__link toc-highlight">:Init</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Init" class="table-of-contents__link toc-highlight">.Init</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[70121],{8213:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":":RegisterPromiseOnCloseCallback","id":"RegisterPromiseOnCloseCallback","level":3}]')}}]);

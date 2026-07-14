@@ -6,8 +6,8 @@
 <title data-rh="true">BindToCloseService | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/BindToCloseService"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="BindToCloseService | Nevermore"><meta data-rh="true" name="description" content="Allows unregisterable BindToClose callbacks. This is important because you can&#x27;t unbind
 :BindToClose calls normally, so we need to provide another place to guarantee clean shutdowns."><meta data-rh="true" property="og:description" content="Allows unregisterable BindToClose callbacks. This is important because you can&#x27;t unbind
 :BindToClose calls normally, so we need to provide another place to guarantee clean shutdowns."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/BindToCloseService"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/BindToCloseService" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/BindToCloseService" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.51c798a7.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.86a6ed74.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.534e9ff3.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.42b95e32.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.cb2b8b5a.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -18,7 +18,7 @@
   Allows unregisterable BindToClose callbacks. This is important because you can't unbind
   :BindToClose calls normally, so we need to provide another place to guarantee clean shutdowns.
 </p>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RegisterPromiseOnCloseCallback"><code style="text-decoration:none">RegisterPromiseOnCloseCallback</code><a href="#RegisterPromiseOnCloseCallback" class="hash-link" aria-label="Direct link to RegisterPromiseOnCloseCallback" title="Direct link to RegisterPromiseOnCloseCallback" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/bindtocloseservice/src/Server/BindToCloseService.lua#L70"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>BindToCloseService<!-- -->:</code><code class="green_DgR4">RegisterPromiseOnCloseCallback</code><code>(</code><code>saveCallback<!-- -->: </code><code class="blue_P4bS">function</code><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RegisterPromiseOnCloseCallback"><code style="text-decoration:none">RegisterPromiseOnCloseCallback</code><a href="#RegisterPromiseOnCloseCallback" class="hash-link" aria-label="Direct link to RegisterPromiseOnCloseCallback" title="Direct link to RegisterPromiseOnCloseCallback" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/bindtocloseservice/src/Server/BindToCloseService.lua#L79"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>BindToCloseService<!-- -->.</code><code class="green_DgR4">RegisterPromiseOnCloseCallback</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/BindToCloseService">BindToCloseService</a></code><code>,</code></div><div><code>saveCallback<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Call to unregister callback</p>
 </span></span></div><div>
 <p>Binds the promise to call on close. Can be unregistered</p>
@@ -28,6 +28,11 @@
             &quot;name&quot;: &quot;RegisterPromiseOnCloseCallback&quot;,
             &quot;desc&quot;: &quot;Binds the promise to call on close. Can be unregistered&quot;,
             &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;self&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindToCloseService&quot;
+                },
                 {
                     &quot;name&quot;: &quot;saveCallback&quot;,
                     &quot;desc&quot;: &quot;&quot;,
@@ -40,9 +45,9 @@
                     &quot;lua_type&quot;: &quot;function&quot;
                 }
             ],
-            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 70,
+                &quot;line&quot;: 79,
                 &quot;path&quot;: &quot;src/bindtocloseservice/src/Server/BindToCloseService.lua&quot;
             }
         }
@@ -55,6 +60,6 @@
         &quot;line&quot;: 8,
         &quot;path&quot;: &quot;src/bindtocloseservice/src/Server/BindToCloseService.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#RegisterPromiseOnCloseCallback" class="table-of-contents__link toc-highlight">:RegisterPromiseOnCloseCallback</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#RegisterPromiseOnCloseCallback" class="table-of-contents__link toc-highlight">.RegisterPromiseOnCloseCallback</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
