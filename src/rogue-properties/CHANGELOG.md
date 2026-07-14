@@ -1,3 +1,24 @@
+# v11.47.0 (Tue Jul 14 2026)
+
+#### 🚀 Enhancement
+
+- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
+- feat(rogue-properties): convert package to --!strict ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test(rogue-properties): cover RogueProperty, modifiers, and arrays ([@Quenty](https://github.com/Quenty))
+- fix(rogue-properties): read attribute-serialized scalar array elements ([@Quenty](https://github.com/Quenty))
+- fix(rogue-properties): preserve rawget and metatable order in RogueProperty ([@Quenty](https://github.com/Quenty))
+- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
+- fix(lint): resolve selene unused-self and Rx shadowing from --!strict conversions ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,26 @@
+# v14.53.0 (Tue Jul 14 2026)
+
+#### 🚀 Enhancement
+
+- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
+- feat(gameproductservice): convert package to --!strict ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
+- fix(gameproductservice): drop PlayerProductManager to --!nonstrict (luau-lsp V1 symlink-nominal flake, unreproducible locally) ([@Quenty](https://github.com/Quenty))
+- fix(gameproductservice): route PlayerProductManager :Implement line through selfAny (any) to kill nominal flake ([@Quenty](https://github.com/Quenty))
+- fix: cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([@Quenty](https://github.com/Quenty))
+- fix: add @within for moonwave on SettingDefinitionProvider __index; cast Tie :Implement receiver ([@Quenty](https://github.com/Quenty))
+- fix(gameproductservice): pass selfAny to Tie :Implement to dodge symlink-nominal error ([@Quenty](https://github.com/Quenty))
+- fix(gameproductservice): annotate manager to avoid strict avatareditorutils inference blowup ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

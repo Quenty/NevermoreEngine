@@ -1,3 +1,21 @@
+# v10.13.0 (Tue Jul 14 2026)
+
+#### 🚀 Enhancement
+
+- feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/strict-typing ([@Quenty](https://github.com/Quenty))
+- style: apply stylua formatting to --!strict conversions ([@Quenty](https://github.com/Quenty))
+- fix(cubicspline): type numeric diagonals for strict LinearSystemsSolverUtils ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
