@@ -13,6 +13,7 @@ local Players = game:GetService("Players")
 
 local EnumUtils = require("EnumUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameProductDataService = require("GameProductDataService")
 local PlayerBinder = require("PlayerBinder")
 local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
@@ -63,6 +64,11 @@ function PlayerProductManager.new(player: Player, serviceBag: ServiceBag.Service
 	selfAny:_setupBundleTracker()
 
 	-- Initialize attributes
+
+	local serverOnlyPrompting = self._serviceBag:GetService(GameProductDataService):GetServerOnlyPromptingValue()
+	self._maid:GiveTask(serverOnlyPrompting:Observe():Subscribe(function(value)
+		self._obj:SetAttribute(GameProductDataService.ServerOnlyPromptingAttribute, value)
+	end))
 
 	-- Implement
 	local impl = self._maid:Add(PlayerProductManagerInterface.Server:Implement(self._obj, self))

@@ -249,6 +249,29 @@ function GameProductService.ObservePlayerOwnership(
 end
 
 --[=[
+	Restricts purchase prompting to the server. When enabled, clients can no longer
+	prompt purchases directly via [GameProductServiceClient:PromisePromptPurchase] (it
+	rejects); prompts must be initiated from the server, where the developer can validate
+	the asset id. Defaults to disabled.
+
+	@param enabled boolean
+]=]
+function GameProductService.SetServerOnlyPromptingEnabled(self: GameProductService, enabled: boolean)
+	assert(type(enabled) == "boolean", "Bad enabled")
+
+	self._gameProductDataService:SetServerOnlyPrompting(enabled)
+end
+
+--[=[
+	Returns true if server-only prompting is enabled.
+
+	@return boolean
+]=]
+function GameProductService.IsServerOnlyPromptingEnabled(self: GameProductService): boolean
+	return self._gameProductDataService:GetServerOnlyPromptingValue().Value
+end
+
+--[=[
 	Cleans up the game product service
 ]=]
 function GameProductService.Destroy(self: GameProductService): ()

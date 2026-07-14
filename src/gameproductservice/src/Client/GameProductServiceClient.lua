@@ -169,6 +169,17 @@ function GameProductServiceClient.PromisePromptPurchase(
 end
 
 --[=[
+	Observes whether server-only prompting is enabled. When enabled,
+	[GameProductServiceClient:PromisePromptPurchase] rejects and prompts must be
+	initiated from the server. Useful for hiding or disabling buy buttons on the client.
+
+	@return Observable<boolean>
+]=]
+function GameProductServiceClient:ObserveServerOnlyPromptingEnabled(): Observable.Observable<boolean>
+	return self._gameProductDataService:ObserveServerOnlyPrompting(Players.LocalPlayer)
+end
+
+--[=[
 	Returns true if item has been purchased this session
 
 	@param player Player
