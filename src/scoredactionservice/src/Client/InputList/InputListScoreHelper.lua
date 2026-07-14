@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Distributes the scored action to the correct providers based upon input mode
 	@class InputListScoreHelper
@@ -17,8 +17,26 @@ local InputListScoreHelper = setmetatable({}, BaseObject)
 InputListScoreHelper.ClassName = "InputListScoreHelper"
 InputListScoreHelper.__index = InputListScoreHelper
 
-function InputListScoreHelper.new(serviceBag: ServiceBag.ServiceBag, provider, scoredAction, inputKeyMapList)
-	local self = setmetatable(BaseObject.new(), InputListScoreHelper)
+export type InputListScoreHelper =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_provider: any,
+			_scoredAction: any,
+			_inputKeyMapList: InputKeyMapList.InputKeyMapList,
+			_currentTypes: Set.Set<any>,
+		},
+		{} :: typeof({ __index = InputListScoreHelper })
+	))
+	& BaseObject.BaseObject
+
+function InputListScoreHelper.new(
+	serviceBag: ServiceBag.ServiceBag,
+	provider: any,
+	scoredAction: any,
+	inputKeyMapList: InputKeyMapList.InputKeyMapList
+): InputListScoreHelper
+	local self: InputListScoreHelper = setmetatable(BaseObject.new() :: any, InputListScoreHelper)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._provider = assert(provider, "No provider")
@@ -29,9 +47,9 @@ function InputListScoreHelper.new(serviceBag: ServiceBag.ServiceBag, provider, s
 
 	self._currentTypes = {}
 
-	self._maid:GiveTask(InputKeyMapListUtils.observeActiveInputKeyMap(self._inputKeyMapList, self._serviceBag)
+	self._maid:GiveTask((InputKeyMapListUtils.observeActiveInputKeyMap(self._inputKeyMapList, self._serviceBag) :: any)
 		:Pipe({
-			Rx.switchMap(function(activeInputKeyMap)
+			Rx.switchMap(function(activeInputKeyMap): any
 				if activeInputKeyMap then
 					return activeInputKeyMap:ObserveInputTypesList()
 				else
@@ -57,7 +75,7 @@ function InputListScoreHelper.new(serviceBag: ServiceBag.ServiceBag, provider, s
 	return self
 end
 
-function InputListScoreHelper:_updateInputTypeSet(inputTypeList)
+function InputListScoreHelper._updateInputTypeSet(self: InputListScoreHelper, inputTypeList: { any }): ()
 	local remaining = Set.copy(self._currentTypes)
 
 	-- Register inputTypes
@@ -81,7 +99,7 @@ function InputListScoreHelper:_updateInputTypeSet(inputTypeList)
 	end
 end
 
-function InputListScoreHelper:_unregisterAction(inputType)
+function InputListScoreHelper._unregisterAction(self: InputListScoreHelper, inputType: any): ()
 	if not self.Destroy then
 		return
 	end

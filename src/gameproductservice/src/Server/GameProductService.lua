@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	This service provides an interface to purchase produces, assets, and other
 	marketplace items. This listens to events, handles requests between server and
@@ -16,7 +16,6 @@ local require = require(script.Parent.loader).load(script)
 
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
-local GameProductDataService = require("GameProductDataService")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
@@ -30,7 +29,7 @@ export type GameProductService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
-		_gameProductDataService: GameProductDataService.GameProductDataService,
+		_gameProductDataService: any,
 
 		GamePassPurchased: Signal.Signal<Player, number>,
 		ProductPurchased: Signal.Signal<Player, number>,
@@ -46,7 +45,7 @@ export type GameProductService = typeof(setmetatable(
 	Initializes the service. Should be done via [ServiceBag]
 	@param serviceBag ServiceBag
 ]=]
-function GameProductService.Init(self: GameProductService, serviceBag: ServiceBag.ServiceBag)
+function GameProductService.Init(self: GameProductService, serviceBag: ServiceBag.ServiceBag): ()
 	assert(not (self :: any)._serviceBag, "Already initialized")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -102,7 +101,7 @@ end
 function GameProductService.ObserveAssetPurchased(
 	self: GameProductService,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
-	idOrKey
+	idOrKey: string | number
 ): Observable.Observable<Player>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -275,7 +274,7 @@ end
 --[=[
 	Cleans up the game product service
 ]=]
-function GameProductService.Destroy(self: GameProductService)
+function GameProductService.Destroy(self: GameProductService): ()
 	self._maid:DoCleaning()
 end
 

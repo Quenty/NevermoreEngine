@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Utility methods to assist with rigging the ragdoll in real-time.
 
@@ -10,8 +10,10 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local Brio = require("Brio")
 local CharacterUtils = require("CharacterUtils")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local RagdollMotorUtils = require("RagdollMotorUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
@@ -25,8 +27,8 @@ local RxRagdollUtils = {}
 	@param humanoid Humanoid
 	@return Observable<Enum.RigType>
 ]=]
-function RxRagdollUtils.observeRigType(humanoid: Humanoid)
-	return RxInstanceUtils.observeProperty(humanoid, "RigType")
+function RxRagdollUtils.observeRigType(humanoid: Humanoid): Observable.Observable<Enum.HumanoidRigType>
+	return RxInstanceUtils.observeProperty(humanoid, "RigType") :: any
 end
 
 --[=[
@@ -35,13 +37,13 @@ end
 	@param humanoid Humanoid
 	@return Observable<Model>
 ]=]
-function RxRagdollUtils.observeCharacterBrio(humanoid: Humanoid)
+function RxRagdollUtils.observeCharacterBrio(humanoid: Humanoid): Observable.Observable<Brio.Brio<Model>>
 	return RxInstanceUtils.observePropertyBrio(humanoid, "Parent", function(value)
 		return value ~= nil
-	end)
+	end) :: any
 end
 
-function RxRagdollUtils.suppressRootPartCollision(character: Model)
+function RxRagdollUtils.suppressRootPartCollision(character: Model): Maid.Maid
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	local topMaid = Maid.new()
@@ -51,7 +53,7 @@ function RxRagdollUtils.suppressRootPartCollision(character: Model)
 			return
 		end
 
-		local rootPart = brio:GetValue()
+		local rootPart = brio:GetValue() :: BasePart
 		local maid = brio:ToMaid()
 
 		local oldProperties = rootPart.CustomPhysicalProperties
@@ -75,7 +77,7 @@ function RxRagdollUtils.suppressRootPartCollision(character: Model)
 	return topMaid
 end
 
-function RxRagdollUtils.enforceHeadCollision(character: Model)
+function RxRagdollUtils.enforceHeadCollision(character: Model): Maid.Maid
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	local topMaid = Maid.new()
@@ -86,17 +88,18 @@ function RxRagdollUtils.enforceHeadCollision(character: Model)
 		end
 
 		local maid, head = brio:ToMaidAndValue()
-		head.CanCollide = true
+		local headPart = head :: BasePart
+		headPart.CanCollide = true
 
 		maid:GiveTask(function()
-			head.CanCollide = false
+			headPart.CanCollide = false
 		end)
 	end))
 
 	return topMaid
 end
 
-function RxRagdollUtils.enforceHumanoidStateMachineOff(character: Model, humanoid: Humanoid)
+function RxRagdollUtils.enforceHumanoidStateMachineOff(character: Model, humanoid: Humanoid): Maid.Maid
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	local topMaid = Maid.new()
@@ -117,7 +120,7 @@ function RxRagdollUtils.enforceHumanoidStateMachineOff(character: Model, humanoi
 	return topMaid
 end
 
-function RxRagdollUtils.enforceLimbCollisions(character: Model)
+function RxRagdollUtils.enforceLimbCollisions(character: Model): Maid.Maid
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 
 	local topMaid = Maid.new()
@@ -145,29 +148,30 @@ function RxRagdollUtils.enforceLimbCollisions(character: Model)
 	}
 
 	topMaid:GiveTask(RxInstanceUtils.observeChildrenBrio(character, function(child)
-		return child:IsA("BasePart") and LIMB_NAMES[child.Name]
+		return child:IsA("BasePart") and LIMB_NAMES[child.Name] == true
 	end):Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end
 
 		local maid, part = brio:ToMaidAndValue()
-		part.CanCollide = true
+		local basePart = part :: BasePart
+		basePart.CanCollide = true
 		maid:GiveTask(function()
-			part.CanCollide = false
+			basePart.CanCollide = false
 		end)
 	end))
 
 	return topMaid
 end
 
-function RxRagdollUtils.runLocal(humanoid: Humanoid)
+function RxRagdollUtils.runLocal(humanoid: Humanoid): Maid.Maid
 	local topMaid = Maid.new()
 
-	topMaid:GiveTask(RxBrioUtils.flatCombineLatest({
+	topMaid:GiveTask((RxBrioUtils.flatCombineLatest({
 		character = RxRagdollUtils.observeCharacterBrio(humanoid),
 		rigType = RxRagdollUtils.observeRigType(humanoid),
-	}):Subscribe(function(state)
+	}) :: any):Subscribe(function(state)
 		if state.character and state.rigType then
 			local character = state.character
 			local rigType = state.rigType
@@ -201,30 +205,26 @@ function RxRagdollUtils.runLocal(humanoid: Humanoid)
 				debug.profileend()
 			end
 
-			topMaid._current = maid
+			(topMaid :: any)._current = maid
 		else
-			topMaid._current = nil
+			(topMaid :: any)._current = nil
 		end
 	end))
 
 	return topMaid
 end
 
-function RxRagdollUtils.enforceHumanoidState(humanoid: Humanoid)
+function RxRagdollUtils.enforceHumanoidState(humanoid: Humanoid): Maid.Maid
 	local maid = Maid.new()
-	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-
-	-- If you're holding a humanoid and jump, then the humanoid state
-	-- changes to your humanoid's state.
-
-	maid._keepAsPhysics = humanoid.StateChanged:Connect(function(_old, new)
+	humanoid:ChangeState(Enum.HumanoidStateType.Physics); -- If you're holding a humanoid and jump, then the humanoid state -- changes to your humanoid's state.
+	(maid :: any)._keepAsPhysics = humanoid.StateChanged:Connect(function(_old, new)
 		if new ~= Enum.HumanoidStateType.Physics and new ~= Enum.HumanoidStateType.Dead then
 			humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 		end
 	end)
 
 	maid:GiveTask(function()
-		maid._keepAsPhysics = nil
+		(maid :: any)._keepAsPhysics = nil
 
 		if humanoid:GetState() ~= Enum.HumanoidStateType.Dead then
 			humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)

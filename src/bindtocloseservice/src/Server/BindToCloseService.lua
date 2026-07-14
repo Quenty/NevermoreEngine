@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Allows unregisterable BindToClose callbacks. This is important because you can't unbind
 	:BindToClose calls normally, so we need to provide another place to guarantee clean shutdowns.
@@ -19,15 +19,24 @@ local Symbol = require("Symbol")
 local BindToCloseService = {}
 BindToCloseService.ServiceName = "BindToCloseService"
 
-function BindToCloseService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type BindToCloseService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_subscriptions: { [Symbol.Symbol]: () -> Promise.Promise<any> },
+	},
+	{} :: typeof({ __index = BindToCloseService })
+))
+
+function BindToCloseService.Init(self: BindToCloseService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	self._subscriptions = {}
 end
 
-function BindToCloseService:Start()
+function BindToCloseService.Start(self: BindToCloseService): ()
 	if RunService:IsServer() then
 		game:BindToClose(function()
 			local ok, err = self:_promiseClose():Yield()
@@ -46,13 +55,13 @@ function BindToCloseService:Start()
 	end
 end
 
-function BindToCloseService:_promiseClose()
-	local promises = {}
+function BindToCloseService._promiseClose(self: BindToCloseService): Promise.Promise<any>
+	local promises: { Promise.Promise<any> } = {}
 
 	for _, caller in self._subscriptions do
 		local promise = caller()
 		if Promise.isPromise(promise) then
-			table.insert(promises, promise)
+			table.insert(promises, promise :: any)
 		else
 			warn("[BindToCloseService.BindToClose] - Bad promise returned from close callback.")
 		end
@@ -67,7 +76,10 @@ end
 	@param saveCallback function
 	@return function -- Call to unregister callback
 ]=]
-function BindToCloseService:RegisterPromiseOnCloseCallback(saveCallback: () -> ())
+function BindToCloseService.RegisterPromiseOnCloseCallback(
+	self: BindToCloseService,
+	saveCallback: () -> Promise.Promise<any>
+): () -> ()
 	assert(type(saveCallback) == "function", "Bad saveCallback")
 
 	local id = Symbol.named("savingCallbackId")
@@ -79,7 +91,7 @@ function BindToCloseService:RegisterPromiseOnCloseCallback(saveCallback: () -> (
 	end
 end
 
-function BindToCloseService:Destroy()
+function BindToCloseService.Destroy(self: BindToCloseService): ()
 	self._maid:DoCleaning()
 end
 

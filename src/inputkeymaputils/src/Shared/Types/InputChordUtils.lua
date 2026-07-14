@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Standardized data type to define an input chord, such as Ctrl+Z.
 
@@ -9,6 +9,18 @@ local require = require(script.Parent.loader).load(script)
 
 local EnumUtils = require("EnumUtils")
 
+--[=[
+	A modifier input chord data type that separates keyCode from modifier keys.
+
+	@type ModifierInputChord { type: "ModifierInputChord", modifiers: { Enum.KeyCode }, keyCode: Enum.KeyCode }
+	@within InputChordUtils
+]=]
+export type ModifierInputChord = {
+	type: "ModifierInputChord",
+	modifiers: { Enum.KeyCode },
+	keyCode: Enum.KeyCode,
+}
+
 local InputChordUtils = {}
 
 --[=[
@@ -16,7 +28,7 @@ local InputChordUtils = {}
 	@param data any
 	@return boolean
 ]=]
-function InputChordUtils.isModifierInputChord(data)
+function InputChordUtils.isModifierInputChord(data: any): boolean
 	return type(data) == "table"
 		and data.type == "ModifierInputChord"
 		and type(data.modifiers) == "table"
@@ -34,7 +46,10 @@ end
 	@param keyCode KeyCode
 	@return ModifierInputChord
 ]=]
-function InputChordUtils.createModifierInputChord(modifiers, keyCode)
+function InputChordUtils.createModifierInputChord(
+	modifiers: { Enum.KeyCode },
+	keyCode: Enum.KeyCode
+): ModifierInputChord
 	assert(type(modifiers) == "table", "Bad modifiers")
 	assert(EnumUtils.isOfType(Enum.KeyCode, keyCode), "Bad keyCode")
 

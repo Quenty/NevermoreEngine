@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class ColorGradePalette
 ]=]
@@ -39,13 +39,13 @@ function ColorGradePalette.new(): ColorGradePalette
 	return self
 end
 
-function ColorGradePalette:SetDefaultSurfaceName(gradeName: string)
+function ColorGradePalette.SetDefaultSurfaceName(self: ColorGradePalette, gradeName: string): ()
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	self._defaultSurfaceName.Value = gradeName
 end
 
-function ColorGradePalette:HasGrade(gradeName: string): boolean
+function ColorGradePalette.HasGrade(self: ColorGradePalette, gradeName: string): boolean
 	if self._grades[gradeName] then
 		return true
 	else
@@ -53,16 +53,15 @@ function ColorGradePalette:HasGrade(gradeName: string): boolean
 	end
 end
 
-function ColorGradePalette:GetGrade(gradeName: string)
+function ColorGradePalette.GetGrade(self: ColorGradePalette, gradeName: string): (number, number)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	local observable = self._grades[gradeName]
 	if not observable then
 		error(string.format("No grade for gradeName %q defined", gradeName))
-		return
 	end
 
-	local promise = Rx.toPromise(observable)
+	local promise = Rx.toPromise(observable :: any)
 	if promise:IsPending() then
 		error("Failed to retrieve grade, async load required")
 	end
@@ -76,16 +75,15 @@ function ColorGradePalette:GetGrade(gradeName: string)
 	return grade, self:GetVividness(gradeName)
 end
 
-function ColorGradePalette:GetVividness(gradeName: string)
+function ColorGradePalette.GetVividness(self: ColorGradePalette, gradeName: string): number
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	local observable = self._vividness[gradeName]
 	if not observable then
 		error(string.format("No vividness for gradeName %q defined", gradeName))
-		return
 	end
 
-	local promise = Rx.toPromise(observable)
+	local promise = Rx.toPromise(observable :: any)
 	if promise:IsPending() then
 		error("Failed to retrieve vividness, async load required")
 	end
@@ -99,31 +97,36 @@ function ColorGradePalette:GetVividness(gradeName: string)
 	return vividness
 end
 
-function ColorGradePalette:Add(gradeName: string, colorGrade, vividness)
+function ColorGradePalette.Add(self: ColorGradePalette, gradeName: string, colorGrade: any, vividness: any): ()
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	self._grades[gradeName] = Blend.toPropertyObservable(colorGrade) or Rx.of(colorGrade)
 	self._vividness[gradeName] = Blend.toPropertyObservable(vividness) or Rx.of(nil)
 end
 
-function ColorGradePalette:ObserveGrade(gradeName)
+function ColorGradePalette.ObserveGrade(self: ColorGradePalette, gradeName: any): Observable.Observable<number>
 	return self:_observeGradeFromName(gradeName)
 end
 
-function ColorGradePalette:ObserveVividness(gradeName: string)
+function ColorGradePalette.ObserveVividness(self: ColorGradePalette, gradeName: string): Observable.Observable<number>
 	assert(type(gradeName) == "string", "Bad gradeName")
 	assert(self._vividness[gradeName], "No vividness for gradeName")
 
-	return self._vividness[gradeName]
+	return self._vividness[gradeName] :: any
 end
 
-function ColorGradePalette:ObserveModified(gradeName, amount, multiplier)
-	return Rx.combineLatest({
+function ColorGradePalette.ObserveModified(
+	self: ColorGradePalette,
+	gradeName: any,
+	amount: any,
+	multiplier: any
+): Observable.Observable<number>
+	return (Rx.combineLatest({
 		grade = self:_observeGradeFromName(gradeName),
 		amount = self:_observeGradeFromName(amount),
 		multiplier = multiplier or 1,
-	}):Pipe({
-		Rx.map(function(state)
+	}) :: any):Pipe({
+		Rx.map(function(state: any)
 			assert(type(state.grade) == "number", "Bad state.grade")
 			assert(type(state.amount) == "number", "Bad state.amount")
 			assert(type(state.multiplier) == "number", "Bad state.multiplier")
@@ -133,7 +136,12 @@ function ColorGradePalette:ObserveModified(gradeName, amount, multiplier)
 	})
 end
 
-function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
+function ColorGradePalette.ObserveOn(
+	self: ColorGradePalette,
+	gradeName: any,
+	newSurfaceName: any,
+	baseSurfaceName: any
+): (Observable.Observable<number>, Observable.Observable<number>)
 	local observeBaseSurfaceGrade
 	if baseSurfaceName == nil then
 		observeBaseSurfaceGrade = self:ObserveDefaultSurfaceGrade()
@@ -142,12 +150,12 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 		assert(observeBaseSurfaceGrade, "Bad baseSurfaceName")
 	end
 
-	return Rx.combineLatest({
+	return (Rx.combineLatest({
 		grade = self:_observeGradeFromName(gradeName),
 		newSurfaceGrade = self:_observeGradeFromName(newSurfaceName),
 		baseSurfaceGrade = observeBaseSurfaceGrade,
-	}):Pipe({
-		Rx.map(function(state)
+	}) :: any):Pipe({
+		Rx.map(function(state: any)
 			local difference = state.grade - state.baseSurfaceGrade
 			local finalGrade = state.newSurfaceGrade + difference
 
@@ -166,17 +174,17 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 			return finalGrade
 		end),
 	}),
-		self._vividness[gradeName]
+		self._vividness[gradeName] :: any
 end
 
-function ColorGradePalette:_observeGradeFromName(gradeName)
+function ColorGradePalette._observeGradeFromName(self: ColorGradePalette, gradeName: any): Observable.Observable<number>
 	if type(gradeName) == "number" then
-		return Rx.of(gradeName)
+		return Rx.of(gradeName) :: any
 	elseif typeof(gradeName) == "Color3" then
-		return Rx.of(ColorGradeUtils.getGrade(gradeName))
+		return Rx.of(ColorGradeUtils.getGrade(gradeName)) :: any
 	elseif Observable.isObservable(gradeName) then
-		return gradeName:Pipe({
-			Rx.map(function(value)
+		return (gradeName :: any):Pipe({
+			Rx.map(function(value: any)
 				if typeof(value) == "Color3" then
 					return ColorGradeUtils.getGrade(value)
 				elseif typeof(value) == "number" then
@@ -190,13 +198,13 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 
 	local gradeObservable = self._grades[gradeName]
 	if gradeObservable then
-		return gradeObservable
+		return gradeObservable :: any
 	end
 
 	-- Support custom colors passed in here
 	local colorOrObservable = Blend.toPropertyObservable(gradeName)
 	if colorOrObservable then
-		return colorOrObservable:Pipe({
+		return (colorOrObservable :: any):Pipe({
 			Rx.map(ColorGradeUtils.getGrade),
 		})
 	end
@@ -204,16 +212,16 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 	error(string.format("No grade for gradeName %q", tostring(gradeName)))
 end
 
-function ColorGradePalette:ObserveDefaultSurfaceGrade()
-	return self._defaultSurfaceName:Observe():Pipe({
-		Rx.switchMap(function(surfaceName)
+function ColorGradePalette.ObserveDefaultSurfaceGrade(self: ColorGradePalette): Observable.Observable<number>
+	return (self._defaultSurfaceName:Observe() :: any):Pipe({
+		Rx.switchMap(function(surfaceName: any): any
 			if surfaceName and self._grades[surfaceName] then
 				return self._grades[surfaceName]
 			else
 				return Rx.EMPTY
 			end
 		end),
-	})
+	}) :: any
 end
 
 return ColorGradePalette

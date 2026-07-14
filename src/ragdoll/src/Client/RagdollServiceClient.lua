@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Initializes the RagdollService on the client.
 
@@ -16,12 +16,20 @@ local ServiceBag = require("ServiceBag")
 local RagdollServiceClient = {}
 RagdollServiceClient.ServiceName = "RagdollServiceClient"
 
+export type RagdollServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_screenShakeEnabled: AttributeValue.AttributeValue<boolean>,
+	},
+	{} :: typeof({ __index = RagdollServiceClient })
+))
+
 --[=[
 	Initializes the ragdoll service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function RagdollServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function RagdollServiceClient.Init(self: RagdollServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	-- External
@@ -43,7 +51,7 @@ end
 	Sets screen shake enabled for the local player
 	@param value boolelan
 ]=]
-function RagdollServiceClient:SetScreenShakeEnabled(value: boolean)
+function RagdollServiceClient.SetScreenShakeEnabled(self: RagdollServiceClient, value: boolean): ()
 	assert(type(value) == "boolean", "Bad value")
 
 	self._screenShakeEnabled.Value = value
@@ -53,7 +61,7 @@ end
 	Returns wheher screenshake is enabled.
 	@return boolean
 ]=]
-function RagdollServiceClient:GetScreenShakeEnabled()
+function RagdollServiceClient.GetScreenShakeEnabled(self: RagdollServiceClient): boolean
 	assert(self._serviceBag, "Not initialized")
 
 	return self._screenShakeEnabled.Value

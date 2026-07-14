@@ -42,7 +42,10 @@ for (const f of files) {
   const reqs = [...src.matchAll(/require\("([^"]+)"\)/g)].map((m) => m[1]);
   adj[f] = [...new Set(reqs.filter((r) => nameToFile[r] && nameToFile[r] !== f).map((r) => nameToFile[r]))];
   traits[f] = {
-    isClass: /setmetatable\(\{\}/.test(src),
+    // class-grade for typing = needs an `export type` block + dot-syntax methods. Covers true
+    // metatable classes AND ServiceBag services (plain table + `.ServiceName`, no setmetatable) —
+    // the latter still need the full class treatment, so route them to opus, not sonnet.
+    isClass: /setmetatable\(\{\}/.test(src) || /\.ServiceName\s*=/.test(src),
     usesRx: reqs.some((r) => /^(Rx|RxSignal|Observable|Brio)$/.test(r)),
   };
 }

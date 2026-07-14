@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RoguePropertyArrayUtils
 ]=]
@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DefaultValueUtils = require("DefaultValueUtils")
 local RoguePropertyArrayConstants = require("RoguePropertyArrayConstants")
+local RoguePropertyConstants = require("RoguePropertyConstants")
 local String = require("String")
 
 local RoguePropertyArrayUtils = {}
@@ -19,7 +20,10 @@ function RoguePropertyArrayUtils.getIndexFromName(name: string): number?
 	return tonumber(String.removePrefix(name, RoguePropertyArrayConstants.ARRAY_ENTRY_PERFIX))
 end
 
-function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(arrayData, parentPropertyTableDefinition)
+function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(
+	arrayData: { any },
+	parentPropertyTableDefinition: any
+): (any?, string?)
 	local expectedType = typeof(arrayData[1])
 	if expectedType == "table" then
 		return RoguePropertyArrayUtils.createRequiredTableDefinition(arrayData, parentPropertyTableDefinition)
@@ -29,16 +33,18 @@ function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromArray(array
 
 	for index, item in arrayData do
 		if typeof(item) ~= expectedType then
-			expectedType = nil
 			-- TODO: Maybe union?
-			return nil, string.format("Expected type %q on %q, got %q", expectedType, tostring(index), typeof(item))
+			return nil, string.format("Expected type %q on %q, got %q", nil :: any, tostring(index), typeof(item))
 		end
 	end
 
 	return RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromType(expectedType, parentPropertyTableDefinition)
 end
 
-function RoguePropertyArrayUtils.createRequiredTableDefinition(arrayData, parentPropertyTableDefinition)
+function RoguePropertyArrayUtils.createRequiredTableDefinition(
+	arrayData: { any },
+	parentPropertyTableDefinition: any
+): (any?, string?)
 	local RoguePropertyTableDefinition = (require :: any)("RoguePropertyTableDefinition")
 
 	local entry = arrayData[1]
@@ -64,8 +70,8 @@ end
 
 function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromType(
 	expectedType: string,
-	parentPropertyTableDefinition
-)
+	parentPropertyTableDefinition: any
+): (any?, string?)
 	local RoguePropertyDefinition = (require :: any)("RoguePropertyDefinition")
 
 	local default = DefaultValueUtils.getDefaultValueForType(expectedType)
@@ -81,19 +87,23 @@ function RoguePropertyArrayUtils.createRequiredPropertyDefinitionFromType(
 	return propertyDefinition
 end
 
-function RoguePropertyArrayUtils.createDefinitionsFromContainer(container: Instance, parentPropertyTableDefinition)
+function RoguePropertyArrayUtils.createDefinitionsFromContainer(
+	container: Instance,
+	parentPropertyTableDefinition: any
+): { [number]: any }
 	local RoguePropertyTableDefinition = (require :: any)("RoguePropertyTableDefinition")
 	local RoguePropertyDefinition = (require :: any)("RoguePropertyDefinition")
 
-	local value = {}
+	local value: { [number]: any } = {}
 
+	-- Instance-serialized elements: Folders for table entries, ValueBase for scalars.
 	for _, item in container:GetChildren() do
 		local index = RoguePropertyArrayUtils.getIndexFromName(item.Name)
 		if not index then
 			continue
 		end
 
-		local definition
+		local definition: any
 		if item:IsA("Folder") then
 			definition = RoguePropertyTableDefinition.new(item.Name)
 			definition:SetName(item.Name)
@@ -103,17 +113,40 @@ function RoguePropertyArrayUtils.createDefinitionsFromContainer(container: Insta
 			definition = RoguePropertyDefinition.new()
 			definition:SetName(item.Name)
 			definition:SetParentPropertyTableDefinition(parentPropertyTableDefinition)
-			definition:SetDefaultValue(item.Value)
+			definition:SetDefaultValue((item :: any).Value)
 		end
 
+		value[index] = definition
+	end
+
+	-- Attribute-serialized scalar elements. Games serialize array scalars either as
+	-- ValueBase instances (above) or as attributes on the container. Discover the
+	-- attribute form too, without clobbering an instance-backed element already found and
+	-- skipping the sentinel that marks an element as instance-backed.
+	for attributeKey, attributeValue in container:GetAttributes() do
+		local index = RoguePropertyArrayUtils.getIndexFromName(attributeKey)
+		if not index then
+			continue
+		end
+		if value[index] ~= nil then
+			continue
+		end
+		if attributeValue == RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE then
+			continue
+		end
+
+		local definition = RoguePropertyDefinition.new()
+		definition:SetName(attributeKey)
+		definition:SetParentPropertyTableDefinition(parentPropertyTableDefinition)
+		definition:SetDefaultValue(attributeValue)
 		value[index] = definition
 	end
 
 	return value
 end
 
-function RoguePropertyArrayUtils.getDefaultValueMapFromContainer(container: Instance)
-	local value = {}
+function RoguePropertyArrayUtils.getDefaultValueMapFromContainer(container: Instance): { [any]: any }
+	local value: { [any]: any } = {}
 
 	-- This is a hack, kinda
 	for attributeKey, attributeValue in container:GetAttributes() do
@@ -128,13 +161,13 @@ function RoguePropertyArrayUtils.getDefaultValueMapFromContainer(container: Inst
 			if item:IsA("Folder") then
 				value[index] = RoguePropertyArrayUtils.getDefaultValueMapFromContainer(item)
 			elseif item:IsA("ValueBase") then
-				value[index] = item.Value
+				value[index] = (item :: any).Value
 			end
 		else
 			if item:IsA("Folder") then
 				value[item.Name] = RoguePropertyArrayUtils.getDefaultValueMapFromContainer(item)
 			else
-				value[item.Name] = item.Value
+				value[item.Name] = (item :: any).Value
 			end
 		end
 	end
@@ -142,11 +175,14 @@ function RoguePropertyArrayUtils.getDefaultValueMapFromContainer(container: Inst
 	return value
 end
 
-function RoguePropertyArrayUtils.createDefinitionsFromArrayData(arrayData, propertyTableDefinition)
+function RoguePropertyArrayUtils.createDefinitionsFromArrayData(
+	arrayData: { any },
+	propertyTableDefinition: any
+): { [number]: any }
 	local RoguePropertyTableDefinition = (require :: any)("RoguePropertyTableDefinition")
 	local RoguePropertyDefinition = (require :: any)("RoguePropertyDefinition")
 
-	local definitions = {}
+	local definitions: { [number]: any } = {}
 	for index, defaultValue in arrayData do
 		local name = RoguePropertyArrayUtils.getNameFromIndex(index)
 

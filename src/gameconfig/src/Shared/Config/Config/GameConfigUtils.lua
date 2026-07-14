@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class GameConfigUtils
 ]=]
@@ -16,7 +16,7 @@ local RxInstanceUtils = require("RxInstanceUtils")
 
 local GameConfigUtils = {}
 
-function GameConfigUtils.create(binder, gameId: number): Folder
+function GameConfigUtils.create(binder: Binder.Binder<any>, gameId: number): Folder
 	assert(Binder.isBinder(binder), "Bad binder")
 	assert(type(gameId) == "number", "Bad gameId")
 
@@ -25,7 +25,7 @@ function GameConfigUtils.create(binder, gameId: number): Folder
 
 	AttributeUtils.initAttribute(config, GameConfigConstants.GAME_ID_ATTRIBUTE, gameId)
 
-	for _, assetType in GameConfigAssetTypes do
+	for _, assetType in GameConfigAssetTypes :: any do
 		GameConfigUtils.getOrCreateAssetFolder(config, assetType)
 	end
 
@@ -45,12 +45,13 @@ function GameConfigUtils.getOrCreateAssetFolder(
 
 	local folder = config:FindFirstChild(folderName)
 	if not folder then
-		folder = Instance.new("Folder")
-		folder.Name = folderName
-		folder.Parent = config
+		local newFolder = Instance.new("Folder")
+		newFolder.Name = folderName
+		newFolder.Parent = config
+		folder = newFolder
 	end
 
-	return folder
+	return folder :: Folder
 end
 
 function GameConfigUtils.observeAssetFolderBrio(
@@ -62,7 +63,9 @@ function GameConfigUtils.observeAssetFolderBrio(
 
 	local folderName = GameConfigAssetTypeUtils.getPlural(assetType)
 
-	return RxInstanceUtils.observeLastNamedChildBrio(config, "Folder", folderName)
+	return (
+		RxInstanceUtils.observeLastNamedChildBrio(config, "Folder", folderName) :: any
+	) :: Observable.Observable<Brio.Brio<Folder>>
 end
 
 return GameConfigUtils

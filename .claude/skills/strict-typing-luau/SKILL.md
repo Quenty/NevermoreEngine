@@ -37,11 +37,22 @@ luau-lsp analyze --sourcemap=sourcemap.json --base-luaurc=.luaurc \
 ```
 
 Clean = only the `[INFO] Loading...` line. `LuauSolverV2=false` is required (repo pins the old
-solver). Iterate until clean, then run `npm run lint:luau` **once** as the final gate — single-file
+solver). **Never drop `--defs=globalTypes.d.lua` or `--base-luaurc=.luaurc`** — without `--defs`
+the analyzer loses the Roblox global declarations and reports *false* `Unknown global 'tick'/'time'`
+(and similar) errors while still resolving `game`/`Enum`, which looks like a real conversion bug but
+isn't. If you see unknown-global errors only on deprecated globals, you forgot `--defs`; confirm with
+`npm run lint:luau` (which always passes the flag) before "fixing" anything. Iterate until clean,
+then run `npm run lint:luau` **once** as the final gate — single-file
 analyze can't see files that depend on *yours*, and tightening a type ripples to subclasses and
 callers. Triage new downstream errors: pre-existing → leave & flag; your type is genuinely too
 tight for the real contract → loosen *your* type (often `T?` not `T`); a small obvious follow-on
 → fix it.
+
+The gate is **both** `lint:luau` (types) **and** `lint:selene` (lints), which exits non-zero.
+Dot-syntax conversion routinely trips selene even when analyze is clean: an `unused_variable: self`
+(method body ignores the now-explicit param → rename it **`_self`**) or a `shadowing` from an Rx escape
+`local X = X :: any` inside a function (→ cast at the source, `local X: any = require("X")`). See the
+"selene" section in `references/conventions.md`.
 
 ## Core patterns
 
@@ -80,6 +91,47 @@ function MyClass.GetEnabled(self: MyClass): boolean
 	return self._enabled.Value
 end
 ```
+
+### ⚠️ Metamethod classes — NEVER rewrite `rawget`/`rawset` or hoist `setmetatable`
+
+The patterns above assume the ordinary metatable (`__index = MyClass`, default `__newindex`).
+Some classes define a **custom `__index` and/or `__newindex` function** that intercepts field
+access — often to expose computed keys (`.Value`, `.Changed`) and to **`error()` on any unknown
+key**. Grep for `(MyClass :: any).__index = function` / `.__newindex = function` before touching
+the constructor or any `self._field` access. For these classes, two edits that look like harmless
+cleanups are **runtime-breaking changes** — do not make them:
+
+1. **Do not replace `rawget(self, "_x")` with `self._x`, or `rawset(self, "_x", v)` with
+   `self._x = v`.** The raw calls are load-bearing: they deliberately bypass the custom metamethod.
+   Routing the access through `self._x` fires the metamethod, which may compute a different value or
+   `error("Bad index")` — silently for present fields, fatally for absent ones (e.g. lazy caches
+   that start unset). Keep every `rawget`/`rawset` exactly as-is; the only allowed change is adding
+   the receiver cast: `rawget(self, "_x")` → `rawget(self :: any, "_x")` (and `:: any` on the result
+   if the checker complains about `any?`).
+
+2. **Do not hoist `setmetatable` above the field assignments in the constructor.** The strict
+   pattern `local self = setmetatable(Base.new() :: any, MyClass)` followed by `self._x = ...` is
+   correct **only** when `__newindex` is the default (raw write). If the class has a custom
+   `__newindex` that errors on unknown keys, that pattern makes **every** field assignment throw
+   `"Bad index"`. Build a plain table first, then apply the metatable last — the original order:
+
+   ```lua
+   function MyClass.new(...): MyClass
+       -- __newindex errors on unknown keys: assign fields BEFORE the metatable.
+       local self = {} :: any
+       self._serviceBag = assert(serviceBag, "No serviceBag")
+       self._definition = assert(definition, "Bad definition")
+       return setmetatable(self, MyClass)
+   end
+   ```
+
+   (Equivalently, keep `setmetatable` first but write each field with `rawset(self :: any, "_x", v)`.)
+   When a subclass wraps a metamethod parent — `setmetatable(Parent.new(...) :: any, MyClass)` — the
+   fields it adds must use `rawset` too, since `MyClass.__newindex` will reject them.
+
+These classes carry no test coverage during conversion, so the checker won't catch either mistake —
+they only surface at runtime. When in doubt, preserve the original access/order verbatim and just
+add casts.
 
 ## The export type rule — always `typeof(setmetatable(...))`, never hand-list methods
 

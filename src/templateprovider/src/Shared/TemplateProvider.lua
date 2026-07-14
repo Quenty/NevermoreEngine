@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Base of a template retrieval system. Templates can be retrieved from Roblox and then retrieved by name. If a folder is used
 	all of their children are also included as templates, which allows for flexible organization by artists.
@@ -80,6 +80,7 @@ export type TemplateDeclaration = Instance | Observable.Observable<Brio.Brio<Ins
 
 export type TemplateProvider = typeof(setmetatable(
 	{} :: {
+		ServiceName: string,
 		_serviceBag: ServiceBag.ServiceBag,
 		_initialTemplates: TemplateDeclaration,
 		_maid: Maid.Maid,
@@ -103,7 +104,7 @@ export type TemplateProvider = typeof(setmetatable(
 ]=]
 function TemplateProvider.new(providerName: string, initialTemplates: TemplateDeclaration): TemplateProvider
 	assert(type(providerName) == "string", "Bad providerName")
-	local self = setmetatable({}, TemplateProvider)
+	local self: TemplateProvider = setmetatable({} :: any, TemplateProvider)
 
 	self.ServiceName = assert(providerName, "No providerName")
 	self._initialTemplates = initialTemplates
@@ -183,7 +184,7 @@ function TemplateProvider._setupTemplateCache(self: TemplateProvider): ()
 			copy.Parent = playerGui
 
 			task.delay(0.1, function()
-				copy:Remove()
+				(copy :: any):Remove()
 			end)
 
 			return copy
@@ -221,7 +222,7 @@ function TemplateProvider._handleContainer(self: TemplateProvider, containerMaid
 		camera.Name = "PreventReplication"
 		camera.Parent = container
 
-		local function handleChild(child)
+		local function handleChild(child: Instance)
 			if child == camera then
 				return
 			end
@@ -256,8 +257,8 @@ end
 function TemplateProvider._replicateTombstones(
 	self: TemplateProvider,
 	topMaid: Maid.Maid,
-	unreplicatedParent,
-	replicatedParent
+	unreplicatedParent: Instance,
+	replicatedParent: Instance
 ): ()
 	assert(self._replicationMode == TemplateReplicationModes.SERVER, "Only should be invoked on server")
 
@@ -313,8 +314,8 @@ function TemplateProvider.ObserveTemplate(self: TemplateProvider, templateName: 
 			end
 
 			return list:ObserveAtIndex(-1)
-		end),
-	})
+		end :: any),
+	} :: any) :: any
 end
 
 function TemplateProvider.ObserveTemplateNamesBrio(self: TemplateProvider): Observable.Observable<Brio.Brio<string>>
@@ -562,7 +563,7 @@ end
 	@param container Template
 	@return MaidTask
 ]=]
-function TemplateProvider.AddTemplates(self: TemplateProvider, container: TemplateDeclaration): () -> ()
+function TemplateProvider.AddTemplates(self: TemplateProvider, container: TemplateDeclaration): Maid.MaidTask
 	assert(self:_isValidTemplateDeclaration(container), "Bad container")
 
 	if typeof(container) == "Instance" then
@@ -653,8 +654,8 @@ function TemplateProvider._addInstanceTemplate(self: TemplateProvider, topMaid: 
 						return name
 					end
 				end),
-				Rx.distinct(),
-			}),
+				Rx.distinct() :: any,
+			} :: any),
 			template
 		))
 	else

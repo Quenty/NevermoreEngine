@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Simple mixin to generate code for a class.
 
@@ -20,7 +20,7 @@ local GenerateWithMixin = {}
 	@param class table
 	@param staticResources table -- These resources are added to the class automatically
 ]=]
-function GenerateWithMixin:Add(class, staticResources)
+function GenerateWithMixin:Add(class: { [string]: any }, staticResources: { string })
 	assert(class, "Bad class")
 	assert(staticResources, "Bad staticResources")
 
@@ -33,20 +33,20 @@ end
 	@param class table -- Resources to add
 	@param resources { string }
 ]=]
-function GenerateWithMixin._generateWith(class, resources)
+function GenerateWithMixin._generateWith(class: { [string]: any }, resources: { string }): { [string]: any }
 	assert(type(resources) == "table", "Bad resources")
 
 	for _, resourceName in ipairs(resources) do
 		local storeName = String.toPrivateCase(resourceName)
 
-		class[string.format("With%s", resourceName)] = function(self, resource)
+		class[string.format("With%s", resourceName)] = function(self: any, resource: any): any
 			self[storeName] = resource
 				or error(string.format("Failed to set '%s', %s", resourceName, tostring(resource)))
 			self[resourceName] = resource -- inject publically too, for now
 			return self
 		end
 
-		class[string.format("Get%s", resourceName)] = function(self)
+		class[string.format("Get%s", resourceName)] = function(self: any): any
 			return self[storeName]
 		end
 	end

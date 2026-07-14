@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	This service lets you shut down servers without losing a bunch of players.
 	When game.OnClose is called, the script teleports everyone in the server
@@ -22,6 +22,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
+local BindToCloseService = require("BindToCloseService")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
 local Promise = require("Promise")
@@ -31,6 +32,16 @@ local TeleportServiceUtils = require("TeleportServiceUtils")
 
 local SoftShutdownService = {}
 SoftShutdownService.ServiceName = "SoftShutdownService"
+
+export type SoftShutdownService = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_serviceBag: ServiceBag.ServiceBag,
+		_bindToCloseService: BindToCloseService.BindToCloseService,
+		_dataStore: DataStore,
+	},
+	{} :: typeof({ __index = SoftShutdownService })
+))
 
 --[=[
 	Initialize the service. Should be done via [ServiceBag].
@@ -42,11 +53,11 @@ SoftShutdownService.ServiceName = "SoftShutdownService"
 
 	@param serviceBag ServiceBag
 ]=]
-function SoftShutdownService:Init(serviceBag: ServiceBag.ServiceBag)
+function SoftShutdownService.Init(self: SoftShutdownService, serviceBag: ServiceBag.ServiceBag): ()
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
+	self._bindToCloseService = self._serviceBag:GetService(BindToCloseService) :: any
 	self._serviceBag:GetService(require("SoftShutdownTranslator"))
 
 	self._dataStore = DataStoreService:GetDataStore("IsSoftShutdownServer")
@@ -62,11 +73,11 @@ function SoftShutdownService:Init(serviceBag: ServiceBag.ServiceBag)
 	end)
 end
 
-function SoftShutdownService:_isReservedServer(): boolean
+function SoftShutdownService._isReservedServer(_self: SoftShutdownService): boolean
 	return game.PrivateServerId ~= "" and game.PrivateServerOwnerId == 0
 end
 
-function SoftShutdownService:_promiseIsLobby()
+function SoftShutdownService._promiseIsLobby(self: SoftShutdownService): Promise.Promise<boolean>
 	if not self:_isReservedServer() then
 		return Promise.resolved(false)
 	end
@@ -74,7 +85,7 @@ function SoftShutdownService:_promiseIsLobby()
 	return self._maid:GivePromise(DataStorePromises.getAsync(self._dataStore, game.PrivateServerId))
 end
 
-function SoftShutdownService:_promiseTeleportPlayersToLobby()
+function SoftShutdownService._promiseTeleportPlayersToLobby(self: SoftShutdownService): Promise.Promise<()>
 	local players = Players:GetPlayers()
 	if RunService:IsStudio() or #players == 0 or game.JobId == "" then
 		return Promise.resolved()
@@ -90,7 +101,7 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 
 	-- Collect any players remaining
 	local remainingPlayers = {}
-	self._maid._playerAddedCollector = Players.PlayerAdded:Connect(function(player)
+	(self._maid :: any)._playerAddedCollector = Players.PlayerAdded:Connect(function(player: Player)
 		table.insert(remainingPlayers, player)
 	end)
 
@@ -102,7 +113,7 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 			return TeleportServiceUtils.promiseTeleport(game.PlaceId, players, initialTeleportOptions)
 		end)
 		:Then(function(teleportResult)
-			self._maid._playerAddedCollector = nil
+			(self._maid :: any)._playerAddedCollector = nil
 
 			-- Construct new teleport options
 			local newTeleportOptions = Instance.new("TeleportOptions")
@@ -122,7 +133,7 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 				)
 			end
 
-			self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
+			self._maid:GiveTask(Players.PlayerAdded:Connect(function(player: Player)
 				table.insert(
 					promises,
 					TeleportServiceUtils.promiseTeleport(game.PlaceId, { player }, newTeleportOptions)
@@ -130,7 +141,10 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 			end))
 
 			-- We hope this works!
-			table.insert(promises, DataStorePromises.setAsync(self._dataStore, teleportResult.PrivateServerId, true))
+			table.insert(
+				promises,
+				DataStorePromises.setAsync(self._dataStore, teleportResult.PrivateServerId, true :: any)
+			)
 
 			return Promise.spawn(function(resolve)
 				while #Players:GetPlayers() > 0 and self:_containsPending(promises) do
@@ -142,7 +156,7 @@ function SoftShutdownService:_promiseTeleportPlayersToLobby()
 		end)
 end
 
-function SoftShutdownService:_containsPending(promises)
+function SoftShutdownService._containsPending(_self: SoftShutdownService, promises: { any }): boolean
 	for _, item in promises do
 		if item:IsPending() then
 			return true
@@ -152,7 +166,7 @@ function SoftShutdownService:_containsPending(promises)
 	return false
 end
 
-function SoftShutdownService:_promiseRedirectAllPlayers()
+function SoftShutdownService._promiseRedirectAllPlayers(self: SoftShutdownService): Promise.Promise<()>
 	Workspace:SetAttribute(SoftShutdownConstants.IS_SOFT_SHUTDOWN_LOBBY_ATTRIBUTE, true)
 
 	-- Wait for some players
@@ -174,7 +188,7 @@ function SoftShutdownService:_promiseRedirectAllPlayers()
 		})
 
 		-- Teleport all remaining players
-		self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
+		self._maid:GiveTask(Players.PlayerAdded:Connect(function(player: Player)
 			task.wait(1) -- Let the teleport GUI be set
 			TeleportServiceUtils.promiseTeleport(game.PlaceId, { player }, teleportOptions)
 		end))
@@ -184,7 +198,7 @@ function SoftShutdownService:_promiseRedirectAllPlayers()
 	end)
 end
 
-function SoftShutdownService:Destroy()
+function SoftShutdownService.Destroy(self: SoftShutdownService): ()
 	self._maid:DoCleaning()
 end
 

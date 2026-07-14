@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Interface that mirrors [Signal] API
 
@@ -7,10 +7,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
+local Observable = require("Observable")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local TieMemberInterface = require("TieMemberInterface")
 local TieRealmUtils = require("TieRealmUtils")
+local TieRealms = require("TieRealms")
 local TieSignalConnection = require("TieSignalConnection")
 local TieUtils = require("TieUtils")
 
@@ -18,11 +21,20 @@ local TieSignalInterface = setmetatable({}, TieMemberInterface)
 TieSignalInterface.ClassName = "TieSignalInterface"
 TieSignalInterface.__index = TieSignalInterface
 
-function TieSignalInterface.new(implParent: Instance, adornee: Instance, memberDefinition, interfaceTieRealm)
+export type TieSignalInterface =
+	typeof(setmetatable({} :: {}, {} :: typeof({ __index = TieSignalInterface })))
+	& TieMemberInterface.TieMemberInterface
+
+function TieSignalInterface.new(
+	implParent: Instance?,
+	adornee: Instance?,
+	memberDefinition: any,
+	interfaceTieRealm: TieRealms.TieRealm
+): TieSignalInterface
 	assert(TieRealmUtils.isTieRealm(interfaceTieRealm), "Bad interfaceTieRealm")
 
-	local self = setmetatable(
-		TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm),
+	local self: TieSignalInterface = setmetatable(
+		TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm) :: any,
 		TieSignalInterface
 	)
 
@@ -34,7 +46,7 @@ end
 
 	@param ... T
 ]=]
-function TieSignalInterface:Fire(...)
+function TieSignalInterface.Fire(self: TieSignalInterface, ...: any): ()
 	local bindableEvent = self:_getBindableEvent()
 	if not bindableEvent then
 		warn(
@@ -55,13 +67,16 @@ end
 	@param callback (T...) -> ()
 	@return TieSignalConnection
 ]=]
-function TieSignalInterface:Connect(callback: (...any) -> ())
+function TieSignalInterface.Connect(
+	self: TieSignalInterface,
+	callback: (...any) -> ()
+): TieSignalConnection.TieSignalConnection
 	assert(type(callback) == "function", "Bad callback")
 
 	return TieSignalConnection.new(self, callback)
 end
 
-function TieSignalInterface:Wait()
+function TieSignalInterface.Wait(self: TieSignalInterface): ...any
 	local waitingCoroutine = coroutine.running()
 	local connection
 	connection = self:Connect(function(...)
@@ -71,7 +86,10 @@ function TieSignalInterface:Wait()
 	return coroutine.yield()
 end
 
-function TieSignalInterface:Once(callback: (...any) -> ())
+function TieSignalInterface.Once(
+	self: TieSignalInterface,
+	callback: (...any) -> ()
+): TieSignalConnection.TieSignalConnection
 	local connection
 	connection = self:Connect(function(...)
 		connection:Disconnect()
@@ -80,18 +98,20 @@ function TieSignalInterface:Once(callback: (...any) -> ())
 	return connection
 end
 
-function TieSignalInterface:ObserveBindableEventBrio()
+function TieSignalInterface.ObserveBindableEventBrio(
+	self: TieSignalInterface
+): Observable.Observable<Brio.Brio<BindableEvent>>
 	local name = self._memberDefinition:GetMemberName()
 
-	return self:ObserveImplParentBrio():Pipe({
-		RxBrioUtils.switchMapBrio(function(implParent)
+	return (self:ObserveImplParentBrio() :: any):Pipe({
+		RxBrioUtils.switchMapBrio(function(implParent): any
 			return RxInstanceUtils.observeLastNamedChildBrio(implParent, "BindableEvent", name)
 		end),
 		RxBrioUtils.onlyLastBrioSurvives(),
-	})
+	} :: { any }) :: any
 end
 
-function TieSignalInterface:_getBindableEvent()
+function TieSignalInterface._getBindableEvent(self: TieSignalInterface): BindableEvent?
 	local implParent = self:GetImplParent()
 	if not implParent then
 		return nil

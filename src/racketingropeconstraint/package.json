@@ -35,6 +35,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/overriddenproperty": "workspace:*",
     "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/tie": "workspace:*",
     "@quenty/valueobject": "workspace:*"

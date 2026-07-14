@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Manages speed of a humanoid
 
@@ -46,7 +46,7 @@ end
 	Sets the default speed for the humanoid
 	@param defaultSpeed number
 ]=]
-function HumanoidSpeed:SetDefaultSpeed(defaultSpeed)
+function HumanoidSpeed.SetDefaultSpeed(self: HumanoidSpeed, defaultSpeed: number): ()
 	self._properties.WalkSpeed:SetBaseValue(defaultSpeed)
 end
 
@@ -55,7 +55,7 @@ end
 	@param multiplier number
 	@return function -- Cleanup function
 ]=]
-function HumanoidSpeed:ApplySpeedMultiplier(multiplier: number)
+function HumanoidSpeed.ApplySpeedMultiplier(self: HumanoidSpeed, multiplier: number): Instance?
 	assert(type(multiplier) == "number", "Bad multiplier")
 	assert(multiplier >= 0, "Bad multiplier")
 
@@ -67,10 +67,10 @@ end
 	@param amount number
 	@return function -- Cleanup function
 ]=]
-function HumanoidSpeed:ApplySpeedAdditive(amount: number)
+function HumanoidSpeed.ApplySpeedAdditive(self: HumanoidSpeed, amount: number): Instance?
 	assert(type(amount) == "number", "Bad amount")
 
 	return self._properties.WalkSpeed:CreateAdditive(amount)
 end
 
-return PlayerHumanoidBinder.new("HumanoidSpeed", HumanoidSpeed)
+return PlayerHumanoidBinder.new("HumanoidSpeed", HumanoidSpeed :: any)

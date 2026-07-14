@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	This class represents the implementation for a given definition. For the lifetime
 	of the class, this implementation will be exposed to consumption by both someone
@@ -31,6 +31,7 @@ export type TieImplementation<T> =
 		},
 		{} :: typeof({ __index = TieImplementation })
 	))
+	& BaseObject.BaseObject
 	& T
 
 --[=[
@@ -42,9 +43,9 @@ export type TieImplementation<T> =
 	@param implementationTieRealm TieRealm
 ]=]
 function TieImplementation.new<T>(
-	tieDefinition,
+	tieDefinition: any,
 	adornee: Instance,
-	implementer,
+	implementer: any,
 	implementationTieRealm: TieRealms.TieRealm
 ): TieImplementation<T>
 	assert(TieRealmUtils.isTieRealm(implementationTieRealm), "Bad implementationTieRealm")
@@ -86,8 +87,7 @@ end
 function TieImplementation.GetImplParent<T>(self: TieImplementation<T>): Instance
 	return self._implParent
 end
-
-function TieImplementation.__index<T>(self: TieImplementation<T>, index)
+(TieImplementation :: any).__index = function(self, index)
 	if TieImplementation[index] then
 		return TieImplementation[index]
 	end
@@ -104,7 +104,7 @@ function TieImplementation.__index<T>(self: TieImplementation<T>, index)
 		return rawget(self :: any, index)
 	end
 
-	local memberMap = rawget(self :: any, "_memberMap")
+	local memberMap = rawget(self :: any, "_memberMap") :: any
 	local memberDefinition = memberMap[index]
 	local implementationTieRealm = rawget(self :: any, "_implementationTieRealm")
 
@@ -124,8 +124,7 @@ function TieImplementation.__index<T>(self: TieImplementation<T>, index)
 		error(string.format("Bad index %q for TieImplementation", tostring(index)))
 	end
 end
-
-function TieImplementation.__newindex<T>(self: TieImplementation<T>, index, value)
+(TieImplementation :: any).__newindex = function(self, index, value)
 	if
 		index == "_implParent"
 		or index == "_adornee"
