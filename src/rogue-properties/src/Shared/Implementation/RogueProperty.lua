@@ -51,7 +51,10 @@ export type RogueProperty = typeof(setmetatable(
 ))
 
 function RogueProperty.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag, definition: any): RogueProperty
-	local self: RogueProperty = setmetatable({} :: any, RogueProperty)
+	-- NOTE: RogueProperty uses a custom __index/__newindex that errors on unknown
+	-- keys, so fields must be assigned on a plain table before the metatable is
+	-- applied. Do not hoist the setmetatable() above these assignments.
+	local self = {} :: any
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
@@ -60,7 +63,7 @@ function RogueProperty.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag,
 	self._definition = assert(definition, "Bad definition")
 	self._canInitialize = false
 
-	return self
+	return setmetatable(self, RogueProperty)
 end
 
 function RogueProperty.SetCanInitialize(self: RogueProperty, canInitialize: boolean): ()
@@ -80,7 +83,7 @@ function RogueProperty.GetAdornee(self: RogueProperty): Instance
 end
 
 function RogueProperty.CanInitialize(self: RogueProperty): boolean
-	return self._canInitialize
+	return rawget(self :: any, "_canInitialize") :: boolean
 end
 
 function RogueProperty._getParentContainer(self: RogueProperty): any
@@ -100,7 +103,7 @@ function RogueProperty.GetBaseValueObject(self: RogueProperty, roguePropertyBase
 
 	-- TODO: check this caching!
 	local cachedInstance = rawget(self :: any, "_baseValueInstanceCache")
-	local adornee = self._adornee
+	local adornee = rawget(self :: any, "_adornee") :: any
 
 	if cachedInstance then
 		if cachedInstance:IsDescendantOf(adornee) then
@@ -110,7 +113,7 @@ function RogueProperty.GetBaseValueObject(self: RogueProperty, roguePropertyBase
 		end
 	end
 
-	local definition = self._definition
+	local definition = rawget(self :: any, "_definition") :: any
 
 	local parent = self:_getParentContainer()
 	if not parent then
