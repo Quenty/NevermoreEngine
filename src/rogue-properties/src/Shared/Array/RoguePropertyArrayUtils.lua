@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DefaultValueUtils = require("DefaultValueUtils")
 local RoguePropertyArrayConstants = require("RoguePropertyArrayConstants")
+local RoguePropertyConstants = require("RoguePropertyConstants")
 local String = require("String")
 
 local RoguePropertyArrayUtils = {}
@@ -95,6 +96,7 @@ function RoguePropertyArrayUtils.createDefinitionsFromContainer(
 
 	local value: { [number]: any } = {}
 
+	-- Instance-serialized elements: Folders for table entries, ValueBase for scalars.
 	for _, item in container:GetChildren() do
 		local index = RoguePropertyArrayUtils.getIndexFromName(item.Name)
 		if not index then
@@ -114,6 +116,29 @@ function RoguePropertyArrayUtils.createDefinitionsFromContainer(
 			definition:SetDefaultValue((item :: any).Value)
 		end
 
+		value[index] = definition
+	end
+
+	-- Attribute-serialized scalar elements. Games serialize array scalars either as
+	-- ValueBase instances (above) or as attributes on the container. Discover the
+	-- attribute form too, without clobbering an instance-backed element already found and
+	-- skipping the sentinel that marks an element as instance-backed.
+	for attributeKey, attributeValue in container:GetAttributes() do
+		local index = RoguePropertyArrayUtils.getIndexFromName(attributeKey)
+		if not index then
+			continue
+		end
+		if value[index] ~= nil then
+			continue
+		end
+		if attributeValue == RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE then
+			continue
+		end
+
+		local definition = RoguePropertyDefinition.new()
+		definition:SetName(attributeKey)
+		definition:SetParentPropertyTableDefinition(parentPropertyTableDefinition)
+		definition:SetDefaultValue(attributeValue)
 		value[index] = definition
 	end
 

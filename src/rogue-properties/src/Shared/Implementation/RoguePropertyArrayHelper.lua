@@ -196,11 +196,22 @@ function RoguePropertyArrayHelper._removeUnspecified(
 	container: Instance,
 	definitions: any
 ): ()
+	-- Instance-serialized elements
 	for _, item in container:GetChildren() do
 		local index = RoguePropertyArrayUtils.getIndexFromName(item.Name)
 		if index then
 			if not definitions[index] then
 				item:Destroy()
+			end
+		end
+	end
+
+	-- Attribute-serialized elements
+	for attributeKey in container:GetAttributes() do
+		local index = RoguePropertyArrayUtils.getIndexFromName(attributeKey)
+		if index then
+			if not definitions[index] then
+				container:SetAttribute(attributeKey, nil)
 			end
 		end
 	end
