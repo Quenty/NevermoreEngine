@@ -62,7 +62,7 @@ case "${1:-}" in
   parallelism) bash "$HERE/parallelism.sh" ;;
   routing)  node "$HERE/routing.js" ;;
   gold)
-    printf '%-22s %-8s %-6s %-8s %-7s %-5s %s\n' CASE POLARITY STRICT ANALYZE SELENE ANY VERDICT
+    printf '%-22s %-8s %-6s %-8s %-7s %-5s %-7s %s\n' CASE POLARITY STRICT ANALYZE SELENE ANY RAW VERDICT
     fails=0
     for id in $(ids); do
       pol="$(field "$id" polarity)"
@@ -73,14 +73,18 @@ case "${1:-}" in
       errs="$(node -e "console.log(JSON.parse(process.argv[1]).analyze_errors)" "$row")"
       selene="$(node -e "console.log(JSON.parse(process.argv[1]).selene)" "$row")"
       any="$(node -e "console.log(JSON.parse(process.argv[1]).any)" "$row")"
-      # gold expectation: positive => strict & 0 analyze errors & 0 selene findings; negative => nonstrict (reverted)
+      raw="$(node -e "console.log(JSON.parse(process.argv[1]).raw)" "$row")"
+      raw_gold="$(node -e "console.log(JSON.parse(process.argv[1]).raw_gold)" "$row")"
+      # gold expectation: positive => strict & 0 analyze errors & 0 selene findings & no raw-access
+      # regression (raw >= raw_gold, tautological on gold — proves the check doesn't false-positive);
+      # negative => nonstrict (reverted)
       verdict=PASS
       if [ "$pol" = positive ]; then
-        { [ "$strict" = true ] && [ "$errs" -eq 0 ] && [ "$selene" -eq 0 ]; } || { verdict=FAIL; fails=$((fails+1)); }
+        { [ "$strict" = true ] && [ "$errs" -eq 0 ] && [ "$selene" -eq 0 ] && [ "$raw" -ge "$raw_gold" ]; } || { verdict=FAIL; fails=$((fails+1)); }
       else
         [ "$strict" = false ] || { verdict=FAIL; fails=$((fails+1)); }
       fi
-      printf '%-22s %-8s %-6s %-8s %-7s %-5s %s\n' "$id" "$pol" "$strict" "$errs" "$selene" "$any" "$verdict"
+      printf '%-22s %-8s %-6s %-8s %-7s %-5s %-7s %s\n' "$id" "$pol" "$strict" "$errs" "$selene" "$any" "$raw/$raw_gold" "$verdict"
     done
     echo
     [ "$fails" -eq 0 ] && echo "GOLD SMOKE TEST: all cases passed" || { echo "GOLD SMOKE TEST: $fails FAILED"; exit 1; }

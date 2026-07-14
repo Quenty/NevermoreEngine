@@ -28,13 +28,25 @@ bash evals/lib/run.sh score   <case_id>   # -> {strict, analyze_errors, selene, 
 bash evals/lib/run.sh restore <case_id>   # undo: restore the package to main
 ```
 
-A conversion **passes** when `strict=true`, `analyze_errors=0`, `selene=0`, and `any_nonrx <= any_gold_nonrx`
+A conversion **passes** when `strict=true`, `analyze_errors=0`, `selene=0`, `any_nonrx <= any_gold_nonrx`
 (no looser than the maintainer's output, *excluding* Rx-chain casts — those are deliberate policy,
-see `references/rx.md`). `selene` is the SECOND gate (CI-failing): dot-syntax conversion trips
-`unused_variable: self` (→ rename `_self`) and an Rx `local X = X :: any` trips `shadowing` (→
-`local X: any = require`), both of which pass analyze but fail selene — so the scorer counts selene
-findings in the target file. `score.sh` reports both the total `any` and the budgeted `any_nonrx`. Run
-`npm run lint:luau` once at the end as the downstream gate.
+see `references/rx.md`), and `raw >= raw_gold` (no raw-access regression, below). `selene` is the SECOND
+gate (CI-failing): dot-syntax conversion trips `unused_variable: self` (→ rename `_self`) and an Rx
+`local X = X :: any` trips `shadowing` (→ `local X: any = require`), both of which pass analyze but fail
+selene — so the scorer counts selene findings in the target file. `score.sh` reports both the total
+`any` and the budgeted `any_nonrx`. Run `npm run lint:luau` once at the end as the downstream gate.
+
+**Raw-access regression gate (`raw` vs `raw_gold`) — silent runtime break, no analyze/selene signal.**
+Classes with a custom `__index`/`__newindex` that `error()`s on unknown keys use `rawget`/`rawset`
+deliberately to bypass the metamethod. A correct conversion only ever *adds* `:: any` casts to those
+calls; it must never remove one by rewriting `rawget(self, "_x")` → `self._x` (which re-fires the
+metamethod → wrong value, or `"Bad index"` on absent/lazy fields) or hoisting `setmetatable` above the
+constructor's field assignments. None of that is a type or lint error — it only breaks at runtime, and
+conversion cases carry no test coverage. So the scorer counts `rawget(`/`rawset(` calls in the target
+vs gold; `raw < raw_gold` fails the case. Gold defines the approved count, making the check
+false-positive-free. This guards the real regression the maintainer caught in `RogueProperty` (PR
+`users/quenty/strict-typing`), and the `settings-property` case (a custom-`__index` class with a
+`rawset`) exercises it. See the "Metamethod classes" section in SKILL.md.
 
 **Whole-package runs.** Cases sharing an `input` commit belong to one package conversion — e.g.
 the six `settings-*` cases (all `input: b1bc1512aa`, `src/settings`, the `PlayerSettings` package

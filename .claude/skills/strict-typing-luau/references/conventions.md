@@ -213,6 +213,21 @@ After:
 end
 ```
 
+**Behavior-preserving rules for these classes (breaking if violated — no test catches it):**
+
+- The custom `__index`/`__newindex` usually `error()`s on unknown keys and serves computed keys.
+  Because of that, existing `rawget(self, "_x")` / `rawset(self, "_x", v)` calls are **deliberate**
+  — they bypass the metamethod. **Keep them.** Never "simplify" them to `self._x` / `self._x = v`;
+  that routes through the metamethod and can return the wrong value or throw `"Bad index"`. The only
+  allowed edit is the receiver cast: `rawget(self :: any, "_x")` (add `:: any` on the result if you
+  get an `any?` nil error).
+- **Constructor order matters.** The usual strict form `local self = setmetatable({} :: any, C)`
+  then `self._x = ...` only works when `__newindex` is the default raw write. With a custom
+  error-on-unknown `__newindex`, that order makes every field assignment throw. Assign fields on a
+  plain `local self = {} :: any` first and `return setmetatable(self, C)` last (or `rawset` each
+  field). This applies to subclasses wrapping a metamethod parent too: their added fields need
+  `rawset(self :: any, "_x", v)`.
+
 ## Common strict-mode errors → mechanical fix
 
 | Error | Fix |

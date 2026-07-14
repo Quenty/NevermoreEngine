@@ -36,6 +36,15 @@ GOLD_SRC="$(git show "$GOLD_REF:$FILE" 2>/dev/null || true)"
 ANY_GOLD="$(printf '%s' "$GOLD_SRC" | count_any)"
 ANY_GOLD_NONRX="$(printf '%s' "$GOLD_SRC" | count_any_nonrx)"
 
+# --- raw-access regression: metamethod classes (custom __index/__newindex that errors on unknown
+# keys) use rawget/rawset DELIBERATELY to bypass the metamethod. A correct conversion only ever ADDS
+# `:: any` casts to those calls — it must never remove one by rewriting `rawget(self,"_x")` -> `self._x`
+# (which re-fires the metamethod: wrong value or a "Bad index" runtime error). Gold is the approved
+# count, so `raw < raw_gold` is a definitive, false-positive-free regression. awk is pipefail-safe.
+count_raw() { awk '{n+=gsub(/rawget\(|rawset\(/,"")} END{print n+0}'; }
+RAW_FILE="$(count_raw < "$FILE")"
+RAW_GOLD="$(printf '%s' "$GOLD_SRC" | count_raw)"
+
 # --- selene: the SECOND gate. Dot-syntax conversion trips `unused_variable: self` (→ rename `_self`)
 # and Rx `local X = X :: any` trips `shadowing` — both pass analyze but FAIL lint:selene (CI-failing).
 # Count selene findings in the target file only. Best-effort: needs the roblox std (generate once).
@@ -43,5 +52,5 @@ ANY_GOLD_NONRX="$(printf '%s' "$GOLD_SRC" | count_any_nonrx)"
 SELENE_OUT="$(selene --display-style=Json --config=selene.toml "$FILE" 2>/dev/null || true)"
 SELENE="$(printf '%s\n' "$SELENE_OUT" | grep -c '"severity"' || true)"
 
-printf '{"file":"%s","strict":%s,"analyze_errors":%s,"selene":%s,"any":%s,"any_gold":%s,"any_nonrx":%s,"any_gold_nonrx":%s}\n' \
-  "$FILE" "$STRICT" "$ERRORS" "$SELENE" "$ANY_FILE" "$ANY_GOLD" "$ANY_FILE_NONRX" "$ANY_GOLD_NONRX"
+printf '{"file":"%s","strict":%s,"analyze_errors":%s,"selene":%s,"any":%s,"any_gold":%s,"any_nonrx":%s,"any_gold_nonrx":%s,"raw":%s,"raw_gold":%s}\n' \
+  "$FILE" "$STRICT" "$ERRORS" "$SELENE" "$ANY_FILE" "$ANY_GOLD" "$ANY_FILE_NONRX" "$ANY_GOLD_NONRX" "$RAW_FILE" "$RAW_GOLD"
