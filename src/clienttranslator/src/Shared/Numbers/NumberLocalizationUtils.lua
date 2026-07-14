@@ -186,10 +186,64 @@ localeInfos["tr-tr"] = {
 	{ 1e9, " Mr" },
 }
 
--- Aliases for languages that use the same mappings.
-localeInfos["en"] = localeInfos["en-us"]
-localeInfos["en-gb"] = localeInfos["en-us"]
-localeInfos["es-mx"] = localeInfos["es-es"]
+localeInfos["pl-pl"] = {
+	decimalSeparator = ",",
+	groupDelimiter = " ",
+	{ 1, "" },
+	{ 1e3, " tys." },
+	{ 1e6, " mln" },
+	{ 1e9, " mld" },
+}
+
+-- Arabic. tostring(number) emits Western (Latin) digits, so Western separators are paired with the
+-- Arabic compact-scale words. (CLDR `ar` defaults to Arabic-Indic digits + "٬"/"٫" grouping; that
+-- digit shaping isn't modeled here, so we keep the Latin-digit convention the rest of this file uses.)
+localeInfos["ar"] = {
+	decimalSeparator = ".",
+	groupDelimiter = ",",
+	{ 1, "" },
+	{ 1e3, " ألف" },
+	{ 1e6, " مليون" },
+	{ 1e9, " مليار" },
+}
+
+-- Resolve a locale id to its formatting info. The runtime passes a full Roblox locale id (e.g.
+-- "es-es", "pt-br", "zh-hant"); when there's no exact entry, fall back to the language subtag so a
+-- regional variant lands on its closest same-language match ("es-mx" -> "es-es", "fr-ca" -> "fr-fr",
+-- "en-gb" -> "en-us") instead of the wrong-language default. Chinese is script-sensitive (Simplified
+-- and Traditional abbreviate differently), so its variant is chosen explicitly. Returns nil only when
+-- no entry shares the language — callers then fall back to DEFAULT_LOCALE.
+local function resolveLocaleInfo(locale: string?): LocaleInfo?
+	if type(locale) ~= "string" or locale == "" then
+		return nil
+	end
+	locale = string.lower(locale)
+
+	local exact = localeInfos[locale]
+	if exact then
+		return exact
+	end
+
+	local lang = string.match(locale, "^%a+") or locale
+
+	-- Chinese: hant / tw / hk / mo are Traditional; hans / cn / sg / bare zh are Simplified.
+	if lang == "zh" then
+		local traditional = string.find(locale, "hant", 1, true)
+			or string.find(locale, "-tw", 1, true)
+			or string.find(locale, "-hk", 1, true)
+			or string.find(locale, "-mo", 1, true)
+		return if traditional then localeInfos["zh-tw"] else localeInfos["zh-cn"]
+	end
+
+	-- Closest entry sharing the language subtag (smallest key, so the pick is deterministic).
+	local closest: string? = nil
+	for key in localeInfos do
+		if string.match(key, "^%a+") == lang and (closest == nil or key < closest) then
+			closest = key
+		end
+	end
+	return if closest then localeInfos[closest] else nil
+end
 
 local function findDecimalPointIndex(numberStr: string): number
 	return string.find(numberStr, "%.") or #numberStr + 1
@@ -264,7 +318,7 @@ function NumberLocalizationUtils.localize(number: number, locale: string): strin
 		return "0"
 	end
 
-	local localeInfo: LocaleInfo = localeInfos[locale]
+	local localeInfo: LocaleInfo? = resolveLocaleInfo(locale)
 	if not localeInfo then
 		localeInfo = localeInfos[DEFAULT_LOCALE]
 		warn(
@@ -317,7 +371,7 @@ function NumberLocalizationUtils.abbreviate(
 		return "0"
 	end
 
-	local localeInfo: LocaleInfo = localeInfos[locale]
+	local localeInfo: LocaleInfo? = resolveLocaleInfo(locale)
 	if not localeInfo then
 		localeInfo = localeInfos[DEFAULT_LOCALE]
 		warn(
