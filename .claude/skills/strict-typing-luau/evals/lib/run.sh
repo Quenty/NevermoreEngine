@@ -8,7 +8,7 @@
 #   run.sh place <id>     Worker loop primitive: put the pre-conversion (nonstrict) INPUT at
 #                         the file's real path so an agent can convert it in place.
 #   run.sh score <id>     Score whatever is at the file's path now, vs gold.
-#   run.sh restore <id>   Restore the file's package back to main (undo place/convert).
+#   run.sh restore <id>   Restore the file's package back to its committed state (HEAD, undo place/convert).
 #   run.sh plan <pkg>     Print the INTRA-PACKAGE conversion order (dependency-first, cyclic
 #                         clusters collapsed). The orchestration artifact a driver walks. Add
 #                         `json` for machine-readable output. Intra-package only — see plan.js.
@@ -45,8 +45,10 @@ pkg_of(){ echo "$1" | cut -d/ -f1-3 | sed -E 's#(src/[^/]+)/.*#\1#'; }
 place_gold(){ local p; p="$(field "$1" path)"; git checkout "$(field "$1" gold)"  -- "$(pkg_of "$p")"; }
 place_in()  { local p; p="$(field "$1" path)"; git checkout "$(field "$1" input)" -- "$(pkg_of "$p")"; }
 restore()   { local p pk; p="$(field "$1" path)"; pk="$(pkg_of "$p")";
-              # back to main, unstage, and remove gold-only NEW files (e.g. a new *Types.lua)
-              git checkout main -- "$pk" 2>/dev/null || true
+              # back to the current branch's committed state (HEAD), unstage, and remove gold-only
+              # NEW files (e.g. a new *Types.lua). HEAD not main: on main they're identical, but on a
+              # feature branch `git checkout main` would revert the branch's own work in this package.
+              git checkout HEAD -- "$pk" 2>/dev/null || true
               git reset -q HEAD -- "$pk"; git clean -fdq -- "$pk"; }
 score()     { bash "$HERE/score.sh" "$(field "$1" path)" "$(field "$1" gold)"; }
 
