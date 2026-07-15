@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[90140],{67004:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".getLanguageSubtag","id":"getLanguageSubtag","level":3},{"value":".isTraditionalChinese","id":"isTraditionalChinese","level":3},{"value":".resolveClosestKey","id":"resolveClosestKey","level":3}]')}}]);
