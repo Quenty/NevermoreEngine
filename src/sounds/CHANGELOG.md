@@ -1,3 +1,19 @@
+# v10.22.0 (Wed Jul 15 2026)
+
+#### 🚀 Enhancement
+
+- feat: Localize numbers for new locales [#729](https://github.com/Quenty/NevermoreEngine/pull/729) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Do not override sound volume when cloning from sound ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

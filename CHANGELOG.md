@@ -1,3 +1,16 @@
+# (Wed Jul 15 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/characterutils@12.33.0`, `@quenty/clienttranslator@14.39.0`, `@quenty/sounds@10.22.0`
+  - feat: Localize numbers for new locales [#729](https://github.com/Quenty/NevermoreEngine/pull/729) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jul 14 2026)
 
 #### 🚀 Enhancement
