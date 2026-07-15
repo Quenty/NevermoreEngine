@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.32.1...@quenty/bindtocloseservice@8.33.0) (2026-07-14)
+
+### Features
+
+- **bindtocloseservice:** convert package to --!strict ([e90dffb](https://github.com/Quenty/NevermoreEngine/commit/e90dffb75f355e31c5a8d60e2994c8d5fd82249e))
+
 ## [8.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.32.0...@quenty/bindtocloseservice@8.32.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/bindtocloseservice

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Creates a service that provides modules from a parent module, either by name, or by list!
 	@class ModuleProvider
@@ -9,8 +9,30 @@ ModuleProvider.ClassName = "ModuleProvider"
 ModuleProvider.ServiceName = "ModuleProvider"
 ModuleProvider.__index = ModuleProvider
 
-function ModuleProvider.new(parent, checkModule, initModule, sortList)
-	local self = setmetatable({}, ModuleProvider)
+export type ModuleCheckCallback = (module: any, moduleScript: ModuleScript) -> (boolean, any)
+export type ModuleInitCallback = (module: any, moduleScript: ModuleScript) -> ()
+export type ModuleSortCallback = (modulesList: { any }) -> ()
+
+export type ModuleProvider = typeof(setmetatable(
+	{} :: {
+		_parent: Instance,
+		_initModule: ModuleInitCallback?,
+		_checkModule: ModuleCheckCallback?,
+		_sortList: ModuleSortCallback?,
+		_modulesList: { any },
+		_moduleScriptToModule: { [ModuleScript]: any },
+		_registry: { [string]: any },
+	},
+	{} :: typeof({ __index = ModuleProvider })
+))
+
+function ModuleProvider.new(
+	parent: Instance,
+	checkModule: ModuleCheckCallback?,
+	initModule: ModuleInitCallback?,
+	sortList: ModuleSortCallback?
+): ModuleProvider
+	local self: ModuleProvider = setmetatable({} :: any, ModuleProvider)
 
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(checkModule == nil or type(checkModule) == "function", "Bad checkModule")
@@ -26,8 +48,8 @@ function ModuleProvider.new(parent, checkModule, initModule, sortList)
 	return self
 end
 
-function ModuleProvider:Init()
-	assert(not self._modulesList, "Already initialized")
+function ModuleProvider.Init(self: ModuleProvider): ()
+	assert(not (self :: any)._modulesList, "Already initialized")
 
 	self._modulesList = {}
 	self._moduleScriptToModule = {}
@@ -45,23 +67,23 @@ function ModuleProvider:Init()
 		end
 	end
 
-	self._moduleScriptToModule = nil
+	self._moduleScriptToModule = nil :: any
 end
 
-function ModuleProvider:GetModules()
+function ModuleProvider.GetModules(self: ModuleProvider): { any }
 	assert(self._modulesList, "Not initialized yet")
 
 	return self._modulesList
 end
 
-function ModuleProvider:GetFromName(name)
+function ModuleProvider.GetFromName(self: ModuleProvider, name: string): any
 	assert(self._registry, "Not initialized yet")
 	assert(type(name) == "string", "Bad name")
 
 	return self._registry[name]
 end
 
-function ModuleProvider:_processFolder(folder)
+function ModuleProvider._processFolder(self: ModuleProvider, folder: Instance): ()
 	for _, moduleScript in folder:GetChildren() do
 		if moduleScript:IsA("ModuleScript") then
 			self:_addToRegistery(moduleScript)
@@ -71,21 +93,22 @@ function ModuleProvider:_processFolder(folder)
 	end
 end
 
-function ModuleProvider:_addToRegistery(moduleScript)
+function ModuleProvider._addToRegistery(self: ModuleProvider, moduleScript: ModuleScript): ()
 	if self._registry[moduleScript.Name] then
 		error(string.format("[ModuleProvider._addToRegistery] - Duplicate %q in registery", moduleScript.Name))
 	end
 
-	if not moduleScript.Parent:FindFirstChild("loader") then
+	local moduleParent = assert(moduleScript.Parent, "No moduleScript.Parent")
+	if not moduleParent:FindFirstChild("loader") then
 		local fakeLoader = script.Parent.ModuleProviderFakeLoader:Clone()
 		fakeLoader.Name = "loader"
 		fakeLoader.Archivable = false
-		fakeLoader.Parent = moduleScript.Parent
+		fakeLoader.Parent = moduleParent
 	end
 
-	local _module
+	local _module: any
 	xpcall(function()
-		_module = require(moduleScript)
+		_module = (require :: any)(moduleScript)
 	end, function(err)
 		error(
 			string.format(

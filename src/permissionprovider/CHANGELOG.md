@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.39.0...@quenty/permissionprovider@14.40.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.38.2...@quenty/permissionprovider@14.39.0) (2026-07-14)
+
+### Features
+
+- **permissionprovider:** convert package to --!strict ([04813e7](https://github.com/Quenty/NevermoreEngine/commit/04813e72bb22546bc0bc460fc0761a2463d2d875))
+
 ## [14.38.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.38.1...@quenty/permissionprovider@14.38.2) (2026-06-03)
 
 **Note:** Version bump only for package @quenty/permissionprovider

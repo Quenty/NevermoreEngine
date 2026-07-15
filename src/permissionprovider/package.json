@@ -1,6 +1,6 @@
 {
   "name": "@quenty/permissionprovider",
-  "version": "14.38.2",
+  "version": "14.40.0",
   "description": "Permission provider for Roblox, including authenticating against group membership",
   "keywords": [
     "Roblox",

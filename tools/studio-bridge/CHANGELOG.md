@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.16.0...@quenty/studio-bridge@0.17.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/studio-bridge
+
+# [0.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.15.0...@quenty/studio-bridge@0.16.0) (2026-07-12)
+
+### Features
+
+- Launch with placeId + universeId options ([#723](https://github.com/Quenty/NevermoreEngine/issues/723)) ([5e2da87](https://github.com/Quenty/NevermoreEngine/commit/5e2da87544c5b587bdc2e919b4805a20381c57f1))
+
 # [0.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.14.0...@quenty/studio-bridge@0.15.0) (2026-05-26)
 
 **Note:** Version bump only for package @quenty/studio-bridge

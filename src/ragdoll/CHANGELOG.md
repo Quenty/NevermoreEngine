@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.53.0...@quenty/ragdoll@15.54.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.52.0...@quenty/ragdoll@15.53.0) (2026-07-14)
+
+### Bug Fixes
+
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **ragdoll:** convert package to --!strict ([3f16ada](https://github.com/Quenty/NevermoreEngine/commit/3f16ada0d2371662bde94d8949a52f853152dac3))
+
+# [15.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.51.1...@quenty/ragdoll@15.52.0) (2026-07-12)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
 ## [15.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.51.0...@quenty/ragdoll@15.51.1) (2026-06-05)
 
 **Note:** Version bump only for package @quenty/ragdoll

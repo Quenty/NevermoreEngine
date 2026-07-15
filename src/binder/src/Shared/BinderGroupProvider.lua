@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Provides a basis for binderGroups that can be retrieved anywhere
 	@class BinderGroupProvider
@@ -13,13 +13,23 @@ BinderGroupProvider.ClassName = "BinderGroupProvider"
 BinderGroupProvider.ServiceName = "BinderGroupProvider"
 BinderGroupProvider.__index = BinderGroupProvider
 
+export type BinderGroupProvider = typeof(setmetatable(
+	{} :: {
+		_initMethod: (BinderGroupProvider, ...any) -> (),
+		_groupsAddedPromise: Promise.Promise<()>,
+		_init: boolean,
+		_binderGroups: { any },
+	},
+	{} :: typeof({ __index = BinderGroupProvider })
+))
+
 --[=[
 	Constructs a new BinderGroupProvider
 	@param initMethod (BinderGroupProvider) -> ()
 	@return BinderGroupProvider
 ]=]
-function BinderGroupProvider.new(initMethod)
-	local self = setmetatable({}, BinderGroupProvider)
+function BinderGroupProvider.new(initMethod: (BinderGroupProvider, ...any) -> ()): BinderGroupProvider
+	local self: BinderGroupProvider = setmetatable({} :: any, BinderGroupProvider)
 
 	self._initMethod = initMethod or error("No initMethod")
 	self._groupsAddedPromise = Promise.new()
@@ -34,7 +44,7 @@ end
 	Returns a promise that will resolve once groups are added.
 	@return Promise
 ]=]
-function BinderGroupProvider:PromiseGroupsAdded()
+function BinderGroupProvider.PromiseGroupsAdded(self: BinderGroupProvider): Promise.Promise<()>
 	return self._groupsAddedPromise
 end
 
@@ -42,7 +52,7 @@ end
 	Starts the binder provider. Should be called via ServiceBag.
 	@param ... ServiceBag | any
 ]=]
-function BinderGroupProvider:Init(...)
+function BinderGroupProvider.Init(self: BinderGroupProvider, ...: any): ()
 	assert(not self._init, "Already initialized")
 
 	self._initMethod(self, ...)
@@ -54,11 +64,11 @@ end
 --[=[
 	Starts the binder provider. Should be called via ServiceBag.
 ]=]
-function BinderGroupProvider:Start()
+function BinderGroupProvider.Start(_self: BinderGroupProvider): ()
 	-- Do nothing
 end
 
-function BinderGroupProvider:__index(index)
+(BinderGroupProvider :: any).__index = function(_self, index)
 	if BinderGroupProvider[index] then
 		return BinderGroupProvider[index]
 	end
@@ -72,9 +82,9 @@ end
 	@param groupName string
 	@return BinderGroup?
 ]=]
-function BinderGroupProvider:Get(groupName: string)
+function BinderGroupProvider.Get(self: BinderGroupProvider, groupName: string): any
 	assert(type(groupName) == "string", "Bad groupName")
-	return rawget(self, groupName)
+	return rawget(self :: any, groupName)
 end
 
 --[=[
@@ -83,17 +93,17 @@ end
 	@param groupName string
 	@param binderGroup BinderGroup
 ]=]
-function BinderGroupProvider:Add(groupName, binderGroup)
+function BinderGroupProvider.Add(self: BinderGroupProvider, groupName: string, binderGroup: any): ()
 	assert(type(groupName) == "string", "Bad groupName")
 	assert(type(binderGroup) == "table", "Bad binderGroup")
 	assert(not self._init, "Already initialized")
 	assert(not self:Get(groupName), "Duplicate groupName")
 
-	table.insert(self._binderGroups, binderGroup)
-	self[groupName] = binderGroup
+	table.insert(self._binderGroups, binderGroup);
+	(self :: any)[groupName] = binderGroup
 end
 
-function BinderGroupProvider:Destroy()
+function BinderGroupProvider.Destroy(_self: BinderGroupProvider): ()
 	-- Do nothing
 end
 

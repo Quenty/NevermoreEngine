@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.18.1...@quenty/fakeskybox@11.19.0) (2026-07-14)
+
+### Features
+
+- **fakeskybox:** convert package to --!strict ([a4d0f28](https://github.com/Quenty/NevermoreEngine/commit/a4d0f2811eaf9947f3b1c5e6a0e3c345947335da))
+
 ## [11.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fakeskybox@11.18.0...@quenty/fakeskybox@11.18.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/fakeskybox

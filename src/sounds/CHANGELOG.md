@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.21.1...@quenty/sounds@10.22.0) (2026-07-15)
+
+### Bug Fixes
+
+- Do not override sound volume when cloning from sound ([28ff010](https://github.com/Quenty/NevermoreEngine/commit/28ff01093b57338b13b64990aedf4a8c4d35c75f))
+
 ## [10.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.21.0...@quenty/sounds@10.21.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/sounds

@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.41.0...@quenty/clipcharacters@12.42.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+# [12.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.40.1...@quenty/clipcharacters@12.41.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **clipcharacters:** convert package to --!strict ([a46ab2b](https://github.com/Quenty/NevermoreEngine/commit/a46ab2b90413b12dff060b57e672dd14acdb8675))
+
 ## [12.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.40.0...@quenty/clipcharacters@12.40.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/clipcharacters

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class TiePropertyInterface
 ]=]
@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AttributeUtils = require("AttributeUtils")
 local AttributeValue = require("AttributeValue")
+local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
@@ -27,23 +28,30 @@ local TiePropertyInterface = setmetatable({}, TieMemberInterface)
 TiePropertyInterface.ClassName = "TiePropertyInterface"
 TiePropertyInterface.__index = TiePropertyInterface
 
+export type TiePropertyInterface =
+	typeof(setmetatable({} :: {}, {} :: typeof({ __index = TiePropertyInterface })))
+	& TieMemberInterface.TieMemberInterface
+
 function TiePropertyInterface.new(
-	implParent: Instance,
-	adornee: Instance,
-	memberDefinition,
+	implParent: Instance?,
+	adornee: Instance?,
+	memberDefinition: any,
 	interfaceTieRealm: TieRealms.TieRealm
-)
-	local self = setmetatable(
-		TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm),
+): TiePropertyInterface
+	local self: TiePropertyInterface = setmetatable(
+		TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm) :: any,
 		TiePropertyInterface
 	)
 
 	return self
 end
 
-function TiePropertyInterface:ObserveBrio(predicate)
-	return self:_observeValueBaseBrio():Pipe({
-		RxBrioUtils.switchMapBrio(function(valueBase)
+function TiePropertyInterface.ObserveBrio(
+	self: TiePropertyInterface,
+	predicate: any
+): Observable.Observable<Brio.Brio<any>>
+	return (self:_observeValueBaseBrio() :: any):Pipe({
+		RxBrioUtils.switchMapBrio(function(valueBase): any
 			if typeof(valueBase) == "Instance" then
 				return RxInstanceUtils.observePropertyBrio(valueBase, "Value", predicate)
 			else
@@ -51,13 +59,13 @@ function TiePropertyInterface:ObserveBrio(predicate)
 				return valueBase:ObserveBrio(predicate)
 			end
 		end),
-	})
+	} :: { any })
 end
 
-function TiePropertyInterface:Observe()
-	return self:_observeValueBaseBrio():Pipe({
-		Rx.switchMap(function(brio)
-			return Observable.new(function(sub)
+function TiePropertyInterface.Observe(self: TiePropertyInterface): Observable.Observable<any>
+	return (self:_observeValueBaseBrio() :: any):Pipe({
+		Rx.switchMap(function(brio: any): any
+			return Observable.new(function(sub: any)
 				if brio:IsDead() then
 					sub:Fire(nil)
 					sub:Complete()
@@ -89,10 +97,10 @@ function TiePropertyInterface:Observe()
 			end)
 		end),
 		Rx.distinct(),
-	})
+	} :: { any })
 end
 
-function TiePropertyInterface:_findValueBase()
+function TiePropertyInterface._findValueBase(self: TiePropertyInterface): any
 	local implParent = self:GetImplParent()
 	if not implParent then
 		return nil
@@ -113,12 +121,12 @@ function TiePropertyInterface:_findValueBase()
 	end
 end
 
-function TiePropertyInterface:_getValueBaseOrError()
+function TiePropertyInterface._getValueBaseOrError(self: TiePropertyInterface): any
 	local valueBase = self:_findValueBase()
 	if not valueBase then
 		error(
 			string.format(
-				"%s.%s is not implemented for %s",
+				"%s.%s is not implemented for %s" :: string,
 				self._memberDefinition:GetFriendlyName(),
 				self:_getFullName()
 			)
@@ -127,7 +135,7 @@ function TiePropertyInterface:_getValueBaseOrError()
 	return valueBase
 end
 
-function TiePropertyInterface:_getFullName()
+function TiePropertyInterface._getFullName(self: TiePropertyInterface): string
 	if self._implParent then
 		return self._implParent:GetFullName()
 	elseif self._adornee then
@@ -137,10 +145,10 @@ function TiePropertyInterface:_getFullName()
 	end
 end
 
-function TiePropertyInterface:_getChangedEvent()
-	return RxSignal.new(self:Observe():Pipe({
+function TiePropertyInterface._getChangedEvent(self: TiePropertyInterface): RxSignal.RxSignal<any>
+	return RxSignal.new((self:Observe() :: any):Pipe({
 		Rx.skip(1),
-	}))
+	} :: { any }))
 end
 
 local IMPLEMENTATION_TYPES = {
@@ -148,8 +156,11 @@ local IMPLEMENTATION_TYPES = {
 	none = "none",
 }
 
-function TiePropertyInterface:_observeFromImplParent(implParent)
-	return Observable.new(function(sub)
+function TiePropertyInterface._observeFromImplParent(
+	self: TiePropertyInterface,
+	implParent: Instance
+): Observable.Observable<any>
+	return Observable.new(function(sub: any)
 		local memberName = self._memberDefinition:GetMemberName()
 		local topMaid = Maid.new()
 
@@ -167,7 +178,7 @@ function TiePropertyInterface:_observeFromImplParent(implParent)
 			if currentAttribute ~= nil then
 				if lastImplementationType ~= IMPLEMENTATION_TYPES.attribute then
 					lastImplementationType = IMPLEMENTATION_TYPES.attribute
-					sub:Fire(AttributeValue.new(implParent, memberName))
+					sub:Fire((AttributeValue.new :: any)(implParent, memberName))
 				end
 
 				return
@@ -234,16 +245,18 @@ function TiePropertyInterface:_observeFromImplParent(implParent)
 	end)
 end
 
-function TiePropertyInterface:_observeValueBaseBrio()
-	return self:ObserveImplParentBrio():Pipe({
-		RxBrioUtils.switchMapBrio(function(implParent)
+function TiePropertyInterface._observeValueBaseBrio(self: TiePropertyInterface): Observable.Observable<Brio.Brio<any>>
+	return (self:ObserveImplParentBrio() :: any):Pipe({
+		RxBrioUtils.switchMapBrio(function(implParent): any
 			return self:_observeFromImplParent(implParent)
 		end),
 		RxBrioUtils.onlyLastBrioSurvives(),
-	})
+	} :: { any })
 end
 
-function TiePropertyInterface:__index(index)
+local rawTiePropertyInterface = TiePropertyInterface :: any
+
+rawTiePropertyInterface.__index = function(self: any, index: any)
 	if TiePropertyInterface[index] then
 		return TiePropertyInterface[index]
 	elseif index == "Value" then
@@ -271,7 +284,7 @@ function TiePropertyInterface:__index(index)
 	end
 end
 
-function TiePropertyInterface:__newindex(index, value)
+rawTiePropertyInterface.__newindex = function(self: any, index: any, value: any)
 	if index == "_adornee" or index == "_implParent" or index == "_memberDefinition" or index == "_tieDefinition" then
 		rawset(self, index, value)
 	elseif index == "Value" then
@@ -303,8 +316,11 @@ function TiePropertyInterface:__newindex(index, value)
 		else
 			local implParent = self:GetImplParent()
 			if implParent then
-				local copy =
-					TiePropertyImplementationUtils.changeToClassIfNeeded(self._memberDefinition, implParent, className)
+				local copy = TiePropertyImplementationUtils.changeToClassIfNeeded(
+					self._memberDefinition,
+					implParent,
+					className
+				) :: any
 				copy.Value = value
 				copy.Parent = implParent
 			else

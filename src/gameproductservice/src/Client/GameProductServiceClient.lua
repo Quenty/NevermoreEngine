@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	This service provides an interface to purchase produces, assets, and other
 	marketplace items. This listens to events, handles requests between server and
@@ -27,12 +27,27 @@ local Signal = require("Signal")
 local GameProductServiceClient = {}
 GameProductServiceClient.ServiceName = "GameProductServiceClient"
 
+export type GameProductServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_gameProductDataService: any,
+		GamePassPurchased: Signal.Signal<number>,
+		ProductPurchased: Signal.Signal<number>,
+		AssetPurchased: Signal.Signal<number>,
+		BundlePurchased: Signal.Signal<number>,
+		SubscriptionPurchased: Signal.Signal<string>,
+		MembershipPurchased: Signal.Signal<number>,
+	},
+	{} :: typeof({ __index = GameProductServiceClient })
+))
+
 --[=[
 	Initializes the service. Should be done via [ServiceBag]
 	@param serviceBag ServiceBag
 ]=]
-function GameProductServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function GameProductServiceClient.Init(self: GameProductServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -47,19 +62,19 @@ function GameProductServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag:GetService(require("PlayerProductManagerClient"))
 
 	-- Additional API for ergonomics
-	self.GamePassPurchased = self._maid:Add(Signal.new()) -- :Fire(gamePassId)
-	self.ProductPurchased = self._maid:Add(Signal.new()) -- :Fire(productId)
-	self.AssetPurchased = self._maid:Add(Signal.new()) -- :Fire(assetId)
-	self.BundlePurchased = self._maid:Add(Signal.new()) -- :Fire(bundleId)
-	self.SubscriptionPurchased = self._maid:Add(Signal.new()) -- :Fire(subscriptionId)
-	self.MembershipPurchased = self._maid:Add(Signal.new()) -- :Fire(membershipId)
+	self.GamePassPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(gamePassId)
+	self.ProductPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(productId)
+	self.AssetPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(assetId)
+	self.BundlePurchased = self._maid:Add(Signal.new() :: any) -- :Fire(bundleId)
+	self.SubscriptionPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(subscriptionId)
+	self.MembershipPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(membershipId)
 end
 
 --[=[
 	Starts the service. Should be done via [ServiceBag]
 ]=]
-function GameProductServiceClient:Start()
-	local function forwardSignal(origSignal, signal)
+function GameProductServiceClient.Start(self: GameProductServiceClient): ()
+	local function forwardSignal(origSignal: any, signal: any)
 		self._maid:GiveTask(origSignal:Connect(function(player, ...)
 			if player == Players.LocalPlayer then
 				signal:Fire(...)
@@ -82,7 +97,11 @@ end
 	@param idOrKey string | number
 	@return Observable<>
 ]=]
-function GameProductServiceClient:ObservePlayerAssetPurchased(assetType, idOrKey)
+function GameProductServiceClient.ObservePlayerAssetPurchased(
+	self: GameProductServiceClient,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Observable.Observable<()>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -96,7 +115,8 @@ end
 	@param idOrKey string | number
 	@return Observable<boolean>
 ]=]
-function GameProductServiceClient:ObserveAssetPurchased(
+function GameProductServiceClient.ObserveAssetPurchased(
+	self: GameProductServiceClient,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<boolean>
@@ -114,7 +134,8 @@ end
 	@param idOrKey string | number
 	@return boolean
 ]=]
-function GameProductServiceClient:HasPlayerPurchasedThisSession(
+function GameProductServiceClient.HasPlayerPurchasedThisSession(
+	self: GameProductServiceClient,
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -134,7 +155,8 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePromptPurchase(
+function GameProductServiceClient.PromisePromptPurchase(
+	self: GameProductServiceClient,
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -147,6 +169,17 @@ function GameProductServiceClient:PromisePromptPurchase(
 end
 
 --[=[
+	Observes whether server-only prompting is enabled. When enabled,
+	[GameProductServiceClient:PromisePromptPurchase] rejects and prompts must be
+	initiated from the server. Useful for hiding or disabling buy buttons on the client.
+
+	@return Observable<boolean>
+]=]
+function GameProductServiceClient:ObserveServerOnlyPromptingEnabled(): Observable.Observable<boolean>
+	return self._gameProductDataService:ObserveServerOnlyPrompting(Players.LocalPlayer)
+end
+
+--[=[
 	Returns true if item has been purchased this session
 
 	@param player Player
@@ -154,7 +187,8 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerOwnership(
+function GameProductServiceClient.PromisePlayerOwnership(
+	self: GameProductServiceClient,
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -174,9 +208,10 @@ end
 	@param idOrKey string | number
 	@return Observable<boolean>
 ]=]
-function GameProductServiceClient:ObservePlayerOwnership(
+function GameProductServiceClient.ObservePlayerOwnership(
+	self: GameProductServiceClient,
 	player: Player,
-	assetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
@@ -192,9 +227,12 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerIsPromptOpen(player: Player): Promise.Promise<boolean>
+function GameProductServiceClient.PromisePlayerIsPromptOpen(
+	self: GameProductServiceClient,
+	player: Player
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(self ~= GameProductServiceClient, "Use serviceBag")
+	assert(self ~= (GameProductServiceClient :: any), "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
 	return self._gameProductDataService:PromisePlayerIsPromptOpen(player)
@@ -206,9 +244,12 @@ end
 	@param player Player
 	@return Promise
 ]=]
-function GameProductServiceClient:PromisePlayerPromptClosed(player: Player): Promise.Promise<boolean>
+function GameProductServiceClient.PromisePlayerPromptClosed(
+	self: GameProductServiceClient,
+	player: Player
+): Promise.Promise<boolean>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(self ~= GameProductServiceClient, "Use serviceBag")
+	assert(self ~= (GameProductServiceClient :: any), "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
 	return self._gameProductDataService:PromisePlayerPromptClosed(player)
@@ -224,7 +265,8 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerOwnershipOrPrompt(
+function GameProductServiceClient.PromisePlayerOwnershipOrPrompt(
+	self: GameProductServiceClient,
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
@@ -243,7 +285,8 @@ end
 	@param productIdOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(
+function GameProductServiceClient.PromiseGamePassOrProductUnlockOrPrompt(
+	self: GameProductServiceClient,
 	gamePassIdOrKey: string | number,
 	productIdOrKey: string | number
 ): Promise.Promise<boolean>
@@ -264,7 +307,7 @@ function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(
 		end)
 end
 
-function GameProductServiceClient:Destroy()
+function GameProductServiceClient.Destroy(self: GameProductServiceClient): ()
 	self._maid:DoCleaning()
 end
 

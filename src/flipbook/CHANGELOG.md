@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.32.1...@quenty/flipbook@9.33.0) (2026-07-14)
+
+### Features
+
+- **flipbook:** convert package to --!strict ([dd7ec70](https://github.com/Quenty/NevermoreEngine/commit/dd7ec7034c7790e1b6d40806770eff964b41a910))
+
 ## [9.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.32.0...@quenty/flipbook@9.32.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/flipbook

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class IdleService
 ]=]
@@ -10,8 +10,15 @@ local ServiceBag = require("ServiceBag")
 local IdleService = {}
 IdleService.ServiceName = "IdleService"
 
-function IdleService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type IdleService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+	},
+	{} :: typeof({ __index = IdleService })
+))
+
+function IdleService.Init(self: IdleService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._serviceBag:GetService(require("RagdollService"))

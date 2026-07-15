@@ -1,11 +1,13 @@
---!nonstrict
+--!strict
 --[=[
 	@class HasChatTags
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
+local Binder = require("Binder")
 local BinderUtils = require("BinderUtils")
+local ChatTag = require("ChatTag")
 local ChatTagConstants = require("ChatTagConstants")
 local ChatTagDataUtils = require("ChatTagDataUtils")
 local HasChatTagsBase = require("HasChatTagsBase")
@@ -22,8 +24,10 @@ HasChatTags.__index = HasChatTags
 export type HasChatTags =
 	typeof(setmetatable(
 		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_chatProviderService: any, -- require cycle with ChatProviderService
 			_chatTagsContainer: Folder,
-			_chatTagBinder: any,
+			_chatTagBinder: Binder.Binder<ChatTag.ChatTag>,
 		},
 		{} :: typeof({ __index = HasChatTags })
 	))
@@ -34,7 +38,7 @@ function HasChatTags.new(player: Player, serviceBag: ServiceBag.ServiceBag): Has
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._chatProviderService = self._serviceBag:GetService((require :: any)("ChatProviderService"))
-	self._chatTagBinder = self._serviceBag:GetService(require("ChatTag"))
+	self._chatTagBinder = self._serviceBag:GetService(ChatTag)
 
 	self._chatTagsContainer = Instance.new("Folder")
 	self._chatTagsContainer.Name = HasChatTagsConstants.TAG_CONTAINER_NAME
@@ -50,7 +54,7 @@ function HasChatTags.new(player: Player, serviceBag: ServiceBag.ServiceBag): Has
 	return self
 end
 
-function HasChatTags:GetChatTagBinder()
+function HasChatTags.GetChatTagBinder(self: HasChatTags): Binder.Binder<ChatTag.ChatTag>
 	return self._chatTagBinder
 end
 
@@ -58,8 +62,9 @@ end
 	Adds chat tags to the player
 
 	@param chatTagData ChatTagData
+	@return Instance
 ]=]
-function HasChatTags:AddChatTag(chatTagData: ChatTagDataUtils.ChatTagData)
+function HasChatTags.AddChatTag(self: HasChatTags, chatTagData: ChatTagDataUtils.ChatTagData): Instance
 	assert(ChatTagDataUtils.isChatTagData(chatTagData), "Bad chatTagData")
 
 	local tag = self._chatTagBinder:Create("Folder")
@@ -81,12 +86,13 @@ function HasChatTags:AddChatTag(chatTagData: ChatTagDataUtils.ChatTagData)
 	return tag
 end
 
-function HasChatTags:GetChatTagByKey(chatTagKey: string): ChatTagDataUtils.ChatTagData?
+function HasChatTags.GetChatTagByKey(self: HasChatTags, chatTagKey: string): ChatTag.ChatTag?
 	assert(type(chatTagKey) == "string", "Bad chatTagKey")
 
 	for _, item in BinderUtils.getChildren(self._chatTagBinder, self._chatTagsContainer) do
 		if item.ChatTagKey.Value == chatTagKey then
-			return item
+			-- cast dodges an old-solver recursive-type blowup on ChatTagData; value is already ChatTag.ChatTag
+			return item :: any
 		end
 	end
 
@@ -96,7 +102,7 @@ end
 --[=[
 	Removes all chat tags from the player
 ]=]
-function HasChatTags:ClearTags()
+function HasChatTags.ClearTags(self: HasChatTags)
 	for _, item in self._chatTagsContainer:GetChildren() do
 		if self._chatTagBinder:Get(item) then
 			item:Destroy()
@@ -104,4 +110,4 @@ function HasChatTags:ClearTags()
 	end
 end
 
-return PlayerBinder.new("HasChatTags", HasChatTags)
+return PlayerBinder.new("HasChatTags", HasChatTags :: any) :: Binder.Binder<HasChatTags>

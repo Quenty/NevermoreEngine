@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.48.0...@quenty/spawning@10.49.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.47.2...@quenty/spawning@10.48.0) (2026-07-14)
+
+### Features
+
+- **spawning:** convert package to --!strict ([541257b](https://github.com/Quenty/NevermoreEngine/commit/541257b9ce23eacaf298f5b2aad8939ac3ea17ad))
+
 ## [10.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.47.1...@quenty/spawning@10.47.2) (2026-06-03)
 
 **Note:** Version bump only for package @quenty/spawning

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.37.1...@quenty/radial-image@9.38.0) (2026-07-14)
+
+### Features
+
+- **radial-image:** convert package to --!strict ([586432a](https://github.com/Quenty/NevermoreEngine/commit/586432a613e9482683ee435d1da4069809484e29))
+
 ## [9.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@9.37.0...@quenty/radial-image@9.37.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/radial-image

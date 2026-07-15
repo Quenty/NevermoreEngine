@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	This service handles the observable part of a rogue property which allows for us to listen
 	for all of these additives and multipliers in a centralized location.
@@ -16,8 +16,16 @@ local ServiceBag = require("ServiceBag")
 local RoguePropertyService = {}
 RoguePropertyService.ServiceName = "RoguePropertyService"
 
-function RoguePropertyService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type RoguePropertyService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+	},
+	{} :: typeof({ __index = RoguePropertyService })
+))
+
+function RoguePropertyService.Init(self: RoguePropertyService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
@@ -32,11 +40,11 @@ function RoguePropertyService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag:GetService(require("RogueSetter"))
 end
 
-function RoguePropertyService:CanInitializeProperties(): boolean
+function RoguePropertyService.CanInitializeProperties(_self: RoguePropertyService): boolean
 	return RunService:IsServer()
 end
 
-function RoguePropertyService:Destroy()
+function RoguePropertyService.Destroy(self: RoguePropertyService): ()
 	self._maid:DoCleaning()
 end
 

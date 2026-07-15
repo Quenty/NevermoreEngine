@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.34.0...@quenty/equippedtracker@13.35.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/equippedtracker
+
+# [13.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.33.1...@quenty/equippedtracker@13.34.0) (2026-07-14)
+
+### Features
+
+- **equippedtracker:** convert package to --!strict ([6a2ba4a](https://github.com/Quenty/NevermoreEngine/commit/6a2ba4a963ac89b58422c4eafde0c285b9a06c63))
+
 ## [13.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.33.0...@quenty/equippedtracker@13.33.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/equippedtracker

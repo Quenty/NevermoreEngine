@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.37.1...@quenty/playerhumanoidbinder@14.38.0) (2026-07-14)
+
+### Features
+
+- **playerhumanoidbinder:** convert package to --!strict ([cf5990a](https://github.com/Quenty/NevermoreEngine/commit/cf5990ae9074db50c2a714e1d27e0bd7a07f70f6))
+
 ## [14.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@14.37.0...@quenty/playerhumanoidbinder@14.37.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/playerhumanoidbinder

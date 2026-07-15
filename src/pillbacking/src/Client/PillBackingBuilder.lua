@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Builds a pill backing for Guis
 	@class PillBackingBuilder
@@ -18,16 +18,39 @@ PillBackingBuilder.SHADOW_TRANSPARENCY = 0.85
 
 local SLICE_SCALE_DEFAULT = 1024 -- Arbitrary large number to scale against so we're always a pill
 
-function PillBackingBuilder.new(options)
-	local self = setmetatable({}, PillBackingBuilder)
+export type PillBackingOptions = {
+	ZIndex: number?,
+	ShadowZIndex: number?,
+	BackgroundColor3: Color3?,
+}
 
-	self._options = options or {}
+type ConfiguredOptions = {
+	ZIndex: number,
+	ShadowZIndex: number,
+	BackgroundColor3: Color3,
+}
+
+export type PillBackingBuilder = typeof(setmetatable(
+	{} :: {
+		_options: PillBackingOptions,
+	},
+	{} :: typeof({ __index = PillBackingBuilder })
+))
+
+function PillBackingBuilder.new(inputOptions: PillBackingOptions?): PillBackingBuilder
+	local self: PillBackingBuilder = setmetatable({}, PillBackingBuilder) :: any
+
+	self._options = inputOptions or {}
 
 	return self
 end
 
-function PillBackingBuilder:CreateSingle(gui, options)
-	options = self:_configureOptions(gui, options)
+function PillBackingBuilder.CreateSingle(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
+	local options = self:_configureOptions(gui, inputOptions)
 
 	local pillBacking = Instance.new("ImageLabel")
 	pillBacking.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -41,7 +64,7 @@ function PillBackingBuilder:CreateSingle(gui, options)
 	pillBacking.ScaleType = Enum.ScaleType.Slice
 	pillBacking.SliceScale = SLICE_SCALE_DEFAULT
 	pillBacking.SliceCenter =
-		Rect.new(self.CIRCLE_SIZE.x / 2, self.CIRCLE_SIZE.x / 2, self.CIRCLE_SIZE.y / 2, self.CIRCLE_SIZE.y / 2)
+		Rect.new(self.CIRCLE_SIZE.X / 2, self.CIRCLE_SIZE.X / 2, self.CIRCLE_SIZE.Y / 2, self.CIRCLE_SIZE.Y / 2)
 	pillBacking.Image = self.CIRCLE_IMAGE_ID
 
 	gui.BackgroundTransparency = 1
@@ -50,9 +73,9 @@ function PillBackingBuilder:CreateSingle(gui, options)
 	return pillBacking
 end
 
-function PillBackingBuilder:Create(gui, options)
+function PillBackingBuilder.Create(self: PillBackingBuilder, gui: GuiObject, inputOptions: PillBackingOptions?): Frame
 	warn("Use CreateSingle" .. debug.traceback())
-	options = self:_configureOptions(gui, options)
+	local options = self:_configureOptions(gui, inputOptions)
 	local diameter = gui.Size.Y
 
 	local pillBacking = Instance.new("Frame")
@@ -81,9 +104,13 @@ function PillBackingBuilder:Create(gui, options)
 	return pillBacking
 end
 
-function PillBackingBuilder:CreateVertical(gui, options)
+function PillBackingBuilder.CreateVertical(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): Frame
 	warn("Use CreateSingle" .. debug.traceback())
-	options = self:_configureOptions(gui, options)
+	local options = self:_configureOptions(gui, inputOptions)
 	local diameter = gui.Size.X
 
 	local pillBacking = Instance.new("Frame")
@@ -114,8 +141,12 @@ function PillBackingBuilder:CreateVertical(gui, options)
 	return pillBacking
 end
 
-function PillBackingBuilder:CreateSingleShadow(gui, options)
-	options = self:_configureOptions(gui, options)
+function PillBackingBuilder.CreateSingleShadow(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
+	local options = self:_configureOptions(gui, inputOptions)
 
 	local diameter = gui.Size.Y
 	local width = gui.Size.X
@@ -132,12 +163,12 @@ function PillBackingBuilder:CreateSingleShadow(gui, options)
 	shadow.BorderSizePixel = 0
 	shadow.ImageTransparency = self.SHADOW_TRANSPARENCY
 	shadow.Name = "PillShadow"
-	shadow.Position = UDim2.new(0.5, 0, 0.5, self.SHADOW_OFFSET_Y)
+	shadow.Position = UDim2.new(0.5, 0, 0.5, self.SHADOW_OFFSET_Y :: any)
 	shadow.Size = UDim2.new(1 + addedScale, diameter.Offset / 2, 2, 0)
 	shadow.ZIndex = options.ShadowZIndex
 	shadow.ScaleType = Enum.ScaleType.Slice
 	shadow.SliceCenter =
-		Rect.new(self.SHADOW_SIZE.x / 2, self.SHADOW_SIZE.x / 2, self.SHADOW_SIZE.y / 2, self.SHADOW_SIZE.y / 2)
+		Rect.new(self.SHADOW_SIZE.X / 2, self.SHADOW_SIZE.X / 2, self.SHADOW_SIZE.Y / 2, self.SHADOW_SIZE.Y / 2)
 	shadow.Image = self.SHADOW_IMAGE_ID
 
 	shadow.Parent = gui
@@ -145,9 +176,13 @@ function PillBackingBuilder:CreateSingleShadow(gui, options)
 	return shadow
 end
 
-function PillBackingBuilder:CreateShadow(gui, options)
+function PillBackingBuilder.CreateShadow(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
 	-- warn("Use CreateSingleShadow" .. debug.traceback())
-	options = self:_configureOptions(gui, options)
+	local options = self:_configureOptions(gui, inputOptions)
 	local diameter = gui.Size.Y
 
 	local shadow = self:_createPillShadow(options)
@@ -176,8 +211,12 @@ function PillBackingBuilder:CreateShadow(gui, options)
 	return shadow
 end
 
-function PillBackingBuilder:CreateCircle(gui, options)
-	options = self:_configureOptions(gui, options)
+function PillBackingBuilder.CreateCircle(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
+	local options = self:_configureOptions(gui, inputOptions)
 	local circle = self:_createCircle(options)
 
 	circle.ImageTransparency = gui.BackgroundTransparency
@@ -187,8 +226,12 @@ function PillBackingBuilder:CreateCircle(gui, options)
 	return circle
 end
 
-function PillBackingBuilder:CreateCircleShadow(gui, options)
-	options = self:_configureOptions(gui, options)
+function PillBackingBuilder.CreateCircleShadow(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
+	local options = self:_configureOptions(gui, inputOptions)
 	local shadow = Instance.new("ImageLabel")
 	shadow.SliceScale = SLICE_SCALE_DEFAULT
 	shadow.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -207,35 +250,51 @@ function PillBackingBuilder:CreateCircleShadow(gui, options)
 	return shadow
 end
 
-function PillBackingBuilder:CreateLeft(gui, options)
-	options = self:_configureOptions(gui, options)
+function PillBackingBuilder.CreateLeft(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
+	local options = self:_configureOptions(gui, inputOptions)
 	local left = self:_createLeft(options)
 	left.Parent = gui
 	return left
 end
 
-function PillBackingBuilder:CreateRight(gui, options)
-	options = self:_configureOptions(gui, options)
+function PillBackingBuilder.CreateRight(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
+	local options = self:_configureOptions(gui, inputOptions)
 	local right = self:_createRight(options)
 	right.Parent = gui
 	return right
 end
 
-function PillBackingBuilder:CreateTop(gui, options)
-	options = self:_configureOptions(gui, options)
+function PillBackingBuilder.CreateTop(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
+	local options = self:_configureOptions(gui, inputOptions)
 	local top = self:_createTop(options)
 	top.Parent = gui
 	return top
 end
 
-function PillBackingBuilder:CreateBottom(gui, options)
-	options = self:_configureOptions(gui, options)
+function PillBackingBuilder.CreateBottom(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ImageLabel
+	local options = self:_configureOptions(gui, inputOptions)
 	local bottom = self:_createBottom(options)
 	bottom.Parent = gui
 	return bottom
 end
 
-function PillBackingBuilder:_createTop(options)
+function PillBackingBuilder._createTop(self: PillBackingBuilder, options: ConfiguredOptions): ImageLabel
 	local top = self:_createCircle(options)
 	top.SizeConstraint = Enum.SizeConstraint.RelativeXX
 	top.AnchorPoint = Vector2.new(0.5, 1)
@@ -247,7 +306,7 @@ function PillBackingBuilder:_createTop(options)
 	return top
 end
 
-function PillBackingBuilder:_createBottom(options)
+function PillBackingBuilder._createBottom(self: PillBackingBuilder, options: ConfiguredOptions): ImageLabel
 	local bottom = self:_createCircle(options)
 	bottom.SizeConstraint = Enum.SizeConstraint.RelativeXX
 	bottom.AnchorPoint = Vector2.new(0.5, 0)
@@ -260,7 +319,7 @@ function PillBackingBuilder:_createBottom(options)
 	return bottom
 end
 
-function PillBackingBuilder:_createLeft(options)
+function PillBackingBuilder._createLeft(self: PillBackingBuilder, options: ConfiguredOptions): ImageLabel
 	local left = self:_createCircle(options)
 	left.AnchorPoint = Vector2.new(1, 0.5)
 	left.ImageRectSize = self.CIRCLE_SIZE * Vector2.new(0.5, 1)
@@ -271,8 +330,8 @@ function PillBackingBuilder:_createLeft(options)
 	return left
 end
 
-function PillBackingBuilder:_createRight(options)
-	options = self:_configureOptions(options)
+function PillBackingBuilder._createRight(self: PillBackingBuilder, inputOptions: ConfiguredOptions): ImageLabel
+	local options = self:_configureOptions(inputOptions :: any)
 
 	local right = self:_createCircle(options)
 	right.AnchorPoint = Vector2.new(0, 0.5)
@@ -285,7 +344,7 @@ function PillBackingBuilder:_createRight(options)
 	return right
 end
 
-function PillBackingBuilder:_createLeftShadow(options)
+function PillBackingBuilder._createLeftShadow(self: PillBackingBuilder, options: ConfiguredOptions): ImageLabel
 	local left = self:_createPillShadow(options)
 	left.AnchorPoint = Vector2.new(1, 0.5)
 	left.ImageRectSize = self.PILL_SHADOW_SIZE * Vector2.new(0.25, 1)
@@ -296,7 +355,7 @@ function PillBackingBuilder:_createLeftShadow(options)
 	return left
 end
 
-function PillBackingBuilder:_createRightShadow(options)
+function PillBackingBuilder._createRightShadow(self: PillBackingBuilder, options: ConfiguredOptions): ImageLabel
 	local right = self:_createPillShadow(options)
 	right.AnchorPoint = Vector2.new(0, 0.5)
 	right.ImageRectOffset = self.PILL_SHADOW_SIZE * Vector2.new(0.75, 0)
@@ -308,7 +367,7 @@ function PillBackingBuilder:_createRightShadow(options)
 	return right
 end
 
-function PillBackingBuilder:_createCircle(options)
+function PillBackingBuilder._createCircle(self: PillBackingBuilder, options: ConfiguredOptions): ImageLabel
 	local circle = Instance.new("ImageLabel")
 	circle.BackgroundTransparency = 1
 	circle.Image = self.CIRCLE_IMAGE_ID
@@ -323,7 +382,7 @@ function PillBackingBuilder:_createCircle(options)
 	return circle
 end
 
-function PillBackingBuilder:_createPillShadow(options)
+function PillBackingBuilder._createPillShadow(self: PillBackingBuilder, options: ConfiguredOptions): ImageLabel
 	local shadow = Instance.new("ImageLabel")
 	shadow.BackgroundTransparency = 1
 	shadow.Image = self.PILL_SHADOW_IMAGE_ID
@@ -337,15 +396,20 @@ function PillBackingBuilder:_createPillShadow(options)
 	return shadow
 end
 
-function PillBackingBuilder:_configureOptions(gui, options)
+function PillBackingBuilder._configureOptions(
+	self: PillBackingBuilder,
+	gui: GuiObject,
+	inputOptions: PillBackingOptions?
+): ConfiguredOptions
 	assert(gui, "Must pass in GUI")
 
-	options = table.clone(options or self._options)
-	options.ZIndex = options.ZIndex or gui.ZIndex
-	options.ShadowZIndex = options.ShadowZIndex or options.ZIndex - 1
-	options.BackgroundColor3 = options.BackgroundColor3 or gui.BackgroundColor3
+	local merged = table.clone(inputOptions or self._options)
+	local zIndex = merged.ZIndex or gui.ZIndex
+	merged.ZIndex = zIndex
+	merged.ShadowZIndex = merged.ShadowZIndex or (zIndex - 1)
+	merged.BackgroundColor3 = merged.BackgroundColor3 or gui.BackgroundColor3
 
-	return options
+	return merged :: ConfiguredOptions
 end
 
 return PillBackingBuilder

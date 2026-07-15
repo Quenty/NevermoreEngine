@@ -1,3 +1,122 @@
+# (Wed Jul 15 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/octree@11.14.2`
+  - test(octree): Add unit tests for Octree, OctreeNode, and OctreeRegionUtils [#728](https://github.com/Quenty/NevermoreEngine/pull/728) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 15 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/characterutils@12.33.0`, `@quenty/clienttranslator@14.39.0`, `@quenty/sounds@10.22.0`
+  - feat: Localize numbers for new locales [#729](https://github.com/Quenty/NevermoreEngine/pull/729) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 14 2026)
+
+#### 🚀 Enhancement
+
+- feat: Upgrade lune to latest version [#727](https://github.com/Quenty/NevermoreEngine/pull/727) ([@Quenty](https://github.com/Quenty))
+- `@quenty/actionmanager@13.34.0`, `@quenty/animations@8.33.0`, `@quenty/animationtrackutils@2.4.0`, `@quenty/avatareditorutils@7.40.0`, `@quenty/binder@14.37.0`, `@quenty/bindtocloseservice@8.33.0`, `@quenty/bodycolorsutils@7.37.0`, `@quenty/boundlinkutils@14.38.0`, `@quenty/brine@1.6.0`, `@quenty/camera@14.43.0`, `@quenty/characterparticleplayer@2.4.0`, `@quenty/chatproviderservice@9.54.0`, `@quenty/clienttranslator@14.38.0`, `@quenty/clipcharacters@12.41.0`, `@quenty/cmdrservice@13.46.0`, `@quenty/colorpalette@10.40.0`, `@quenty/colorpicker@10.38.0`, `@quenty/conditions@10.41.0`, `@quenty/contentproviderutils@12.32.0`, `@quenty/cooldown@11.39.0`, `@quenty/cubicspline@10.13.0`, `@quenty/deathreport@10.46.0`, `@quenty/ellipticcurvecryptography@1.13.0`, `@quenty/enabledmixin@11.27.0`, `@quenty/equippedtracker@13.34.0`, `@quenty/fakeskybox@11.19.0`, `@quenty/firstpersoncharactertransparency@14.35.0`, `@quenty/flipbook@9.33.0`, `@quenty/gameconfig@12.50.0`, `@quenty/gameproductservice@14.53.0`, `@quenty/generatewithmixin@11.12.0`, `@quenty/genericscreenguiprovider@13.40.0`, `@quenty/humanoidspeed@12.50.0`, `@quenty/idleservice@13.53.0`, `@quenty/ik@15.54.0`, `@quenty/inputkeymaputils@14.44.0`, `@quenty/inputmode@13.35.0`, `@quenty/isamixin@2.4.0`, `@quenty/linearsystemssolver@2.4.0`, `@quenty/linkutils@13.31.0`, `@quenty/localizedtextutils@12.31.0`, `@quenty/lrucache@1.10.0`, `@quenty/markdownrender@2.5.0`, `@quenty/marketplaceutils@11.21.0`, `@quenty/modeltransparencyeffect@11.18.0`, `@quenty/motor6d@7.43.0`, `@quenty/mouseovermixin@10.14.0`, `@quenty/mouseshiftlockservice@11.19.0`, `@quenty/networkownerservice@5.9.0`, `@quenty/observablecollection@12.39.0`, `@quenty/overriddenproperty@10.15.0`, `@quenty/particleengine@13.34.0`, `@quenty/parttouchingcalculator@14.41.0`, `@quenty/permissionprovider@14.39.0`, `@quenty/pillbacking@10.14.0`, `@quenty/playerbinder@14.37.0`, `@quenty/playerhumanoidbinder@14.38.0`, `@quenty/playerinputmode@9.39.0`, `@quenty/qgui@2.5.0`, `@quenty/quaternion@2.7.0`, `@quenty/racketingropeconstraint@12.44.0`, `@quenty/radial-image@9.38.0`, `@quenty/ragdoll@15.53.0`, `@quenty/rodux-actions@9.14.0`, `@quenty/rodux-undo@8.14.0`, `@quenty/rogue-humanoid@10.50.0`, `@quenty/rogue-properties@11.47.0`, `@quenty/roundedbackingbuilder@2.4.0`, `@quenty/rxbinderutils@14.37.0`, `@quenty/scoredactionservice@16.45.0`, `@quenty/screenshothudservice@7.35.0`, `@quenty/scrollingframe@12.19.0`, `@quenty/secrets@7.51.0`, `@quenty/settings-inputkeymap@10.57.0`, `@quenty/settings@11.54.0`, `@quenty/snackbar@11.43.0`, `@quenty/softshutdown@9.49.0`, `@quenty/soundplayer@7.42.0`, `@quenty/spawning@10.48.0`, `@quenty/sprites@13.30.0`, `@quenty/templateprovider@11.39.0`, `@quenty/tie@10.41.0`, `@quenty/time@2.5.0`, `@quenty/nevermore-cli@4.35.0`, `@quenty/studio-bridge@0.17.0`
+  - feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jul 12 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/studio-bridge@0.16.0`
+  - feat: Launch with placeId + universeId options [#723](https://github.com/Quenty/NevermoreEngine/pull/723) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/soundplayer@7.41.0`
+  - fix: Prevent redundant emission [#726](https://github.com/Quenty/NevermoreEngine/pull/726) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/camera@14.42.0`
+  - fix: Ensure valid camera state [#724](https://github.com/Quenty/NevermoreEngine/pull/724) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 02 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/gameproductservice@14.52.0`
+  - feat: Add server-only purchasing mode to GameProductService [#721](https://github.com/Quenty/NevermoreEngine/pull/721) ([@unrooot](https://github.com/unrooot))
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameproductservice@14.52.0`
+  - fix: Fix attribute replication for server-only prompting [#722](https://github.com/Quenty/NevermoreEngine/pull/722) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Wed Jun 24 2026)
+
+#### 🚀 Enhancement
+
+- feat: Automate Luau strict typing with conversion skill and eval harness [#717](https://github.com/Quenty/NevermoreEngine/pull/717) ([@Quenty](https://github.com/Quenty))
+- `@quenty/deathreport@10.45.0`
+  - feat(deathreport): convert package to --!strict [#719](https://github.com/Quenty/NevermoreEngine/pull/719) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jun 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/chatproviderservice@9.53.0`
+  - feat(chatproviderservice): convert package to --!strict typing [#718](https://github.com/Quenty/NevermoreEngine/pull/718) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Jun 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@1.2.1`
+  - fix: Flush save slot deletions [#714](https://github.com/Quenty/NevermoreEngine/pull/714) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Mon Jun 15 2026)
 
 #### 🐛 Bug Fix

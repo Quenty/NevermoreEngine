@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class PlayerKillTracker
 ]=]
@@ -16,22 +16,24 @@ PlayerKillTracker.__index = PlayerKillTracker
 export type PlayerKillTracker =
 	typeof(setmetatable(
 		{} :: {
+			_obj: IntValue,
 			_serviceBag: ServiceBag.ServiceBag,
-			_deathReportService: any,
+			_deathReportService: DeathReportService.DeathReportService,
 			_player: Player,
 		},
 		{} :: typeof({ __index = PlayerKillTracker })
 	))
 	& BaseObject.BaseObject
 
-function PlayerKillTracker.new(scoreObject, serviceBag: ServiceBag.ServiceBag): PlayerKillTracker
+function PlayerKillTracker.new(scoreObject: IntValue, serviceBag: ServiceBag.ServiceBag): PlayerKillTracker
 	local self: PlayerKillTracker = setmetatable(BaseObject.new(scoreObject) :: any, PlayerKillTracker)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._deathReportService = self._serviceBag:GetService(DeathReportService)
+	self._deathReportService = self._serviceBag:GetService(DeathReportService) :: any
 
-	self._player = self._obj.Parent
-	assert(self._player and self._player:IsA("Player"), "Bad player")
+	local player = self._obj.Parent
+	assert(player and player:IsA("Player"), "Bad player")
+	self._player = player
 
 	self._maid:GiveTask(
 		self._deathReportService:ObservePlayerKillerReports(self._player):Subscribe(function(deathReport)
@@ -43,15 +45,15 @@ function PlayerKillTracker.new(scoreObject, serviceBag: ServiceBag.ServiceBag): 
 	return self
 end
 
-function PlayerKillTracker:GetKillValue()
+function PlayerKillTracker.GetKillValue(self: PlayerKillTracker): IntValue
 	return self._obj
 end
 
-function PlayerKillTracker:GetPlayer(): Player
-	return self._obj.Parent
+function PlayerKillTracker.GetPlayer(self: PlayerKillTracker): Player
+	return self._player
 end
 
-function PlayerKillTracker:GetKills(): number
+function PlayerKillTracker.GetKills(self: PlayerKillTracker): number
 	return self._obj.Value
 end
 

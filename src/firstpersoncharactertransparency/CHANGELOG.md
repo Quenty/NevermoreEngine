@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.34.1...@quenty/firstpersoncharactertransparency@14.35.0) (2026-07-14)
+
+### Features
+
+- **firstpersoncharactertransparency:** convert package to --!strict ([9c18471](https://github.com/Quenty/NevermoreEngine/commit/9c18471c74105c75985b6845a42029d49e28bbd1))
+
 ## [14.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@14.34.0...@quenty/firstpersoncharactertransparency@14.34.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/firstpersoncharactertransparency

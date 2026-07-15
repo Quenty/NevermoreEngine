@@ -51,8 +51,13 @@ function GameConfigService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._binders = self._serviceBag:GetService(require("GameConfigBindersServer"))
 
 	-- Setup picker
-	self._configPicker =
-		self._maid:Add(GameConfigPicker.new(self._serviceBag, self._binders.GameConfig, self._binders.GameConfigAsset))
+	self._configPicker = self._maid:Add(
+		GameConfigPicker.new(
+			self._serviceBag,
+			(self._binders :: any).GameConfig,
+			(self._binders :: any).GameConfigAsset
+		)
+	)
 
 	self._getPreferredParent = PreferredParentUtils.createPreferredParentRetriever(ReplicatedStorage, "GameConfigs")
 

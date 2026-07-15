@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.45.0...@quenty/scoredactionservice@16.46.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+# [16.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.44.1...@quenty/scoredactionservice@16.45.0) (2026-07-14)
+
+### Features
+
+- **scoredactionservice:** convert package to --!strict ([db2a234](https://github.com/Quenty/NevermoreEngine/commit/db2a23465b7ef38735fabad5cc6cf80e218e264c))
+
 ## [16.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.44.0...@quenty/scoredactionservice@16.44.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/scoredactionservice

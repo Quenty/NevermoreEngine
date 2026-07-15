@@ -42,11 +42,13 @@ function RxBinderUtils.observeLinkedBoundClassBrio<T>(
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(Binder.isBinder(binder), "Bad binder")
 
-	return RxLinkUtils.observeValidLinksBrio(linkName, parent):Pipe({
-		RxBrioUtils.flatMapBrio(function(_, linkValue)
-			return binder:ObserveBrio(linkValue)
-		end),
-	})
+	return (
+		RxLinkUtils.observeValidLinksBrio(linkName, parent):Pipe({
+			RxBrioUtils.flatMapBrio(function(_, linkValue)
+				return binder:ObserveBrio(linkValue)
+			end) :: any,
+		}) :: any
+	) :: Observable.Observable<Brio.Brio<T>>
 end
 
 --[=[

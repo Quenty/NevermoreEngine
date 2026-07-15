@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.42.2...@quenty/motor6d@7.43.0) (2026-07-14)
+
+### Features
+
+- **motor6d:** convert package to --!strict ([404bd2c](https://github.com/Quenty/NevermoreEngine/commit/404bd2ceb2e41b67c1d5537bc8210d46dd093787))
+
 ## [7.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@7.42.1...@quenty/motor6d@7.42.2) (2026-06-02)
 
 ### Bug Fixes

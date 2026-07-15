@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class DeathTrackedHumanoid
 ]=]
@@ -14,11 +14,22 @@ local DeathTrackedHumanoid = setmetatable({}, BaseObject)
 DeathTrackedHumanoid.ClassName = "DeathTrackedHumanoid"
 DeathTrackedHumanoid.__index = DeathTrackedHumanoid
 
-function DeathTrackedHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(humanoid), DeathTrackedHumanoid)
+export type DeathTrackedHumanoid =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Humanoid,
+			_serviceBag: ServiceBag.ServiceBag,
+			_deathReportService: DeathReportService.DeathReportService,
+		},
+		{} :: typeof({ __index = DeathTrackedHumanoid })
+	))
+	& BaseObject.BaseObject
+
+function DeathTrackedHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): DeathTrackedHumanoid
+	local self: DeathTrackedHumanoid = setmetatable(BaseObject.new(humanoid) :: any, DeathTrackedHumanoid)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._deathReportService = self._serviceBag:GetService(DeathReportService)
+	self._deathReportService = self._serviceBag:GetService(DeathReportService) :: any
 
 	self._maid._diedEvent = self._obj:GetPropertyChangedSignal("Health"):Connect(function()
 		self:_handleDeath()
@@ -27,7 +38,7 @@ function DeathTrackedHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.Ser
 	return self
 end
 
-function DeathTrackedHumanoid:_handleDeath()
+function DeathTrackedHumanoid._handleDeath(self: DeathTrackedHumanoid)
 	-- make sure we haven't already reported and this is a deferred event.
 	if not self._maid._diedEvent then
 		return
@@ -39,4 +50,4 @@ function DeathTrackedHumanoid:_handleDeath()
 	end
 end
 
-return PlayerHumanoidBinder.new("DeathTrackedHumanoid", DeathTrackedHumanoid)
+return PlayerHumanoidBinder.new("DeathTrackedHumanoid", DeathTrackedHumanoid :: any)

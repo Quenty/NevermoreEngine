@@ -711,6 +711,7 @@ function TieDefinition.Implement<T>(
 	assert(TieRealmUtils.isTieRealm(tieRealm) or tieRealm == nil, "Bad tieRealm")
 
 	tieRealm = tieRealm or self._defaultTieRealm
+	assert(tieRealm, "Typechecking assertion")
 
 	return TieImplementation.new(self, adornee, implementer, tieRealm)
 end

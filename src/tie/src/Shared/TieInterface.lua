@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Tie interfaces can be retrieved from an implementation and allow access to a specific call into the interface
 
@@ -57,7 +57,7 @@ end
 function TieInterface.IsImplemented<T>(self: TieInterface<T>): boolean
 	local implParent = rawget(self :: any, "_implParent")
 	local adornee = rawget(self :: any, "_adornee")
-	local definition = rawget(self :: any, "_definition")
+	local definition = rawget(self :: any, "_definition") :: any
 	local interfaceTieRealm = rawget(self :: any, "_interfaceTieRealm")
 
 	if implParent then
@@ -104,7 +104,7 @@ end
 function TieInterface.ObserveIsImplemented<T>(self: TieInterface<T>): Observable.Observable<boolean>
 	local implParent = rawget(self :: any, "_implParent")
 	local adornee = rawget(self :: any, "_adornee")
-	local definition = rawget(self :: any, "_definition")
+	local definition = rawget(self :: any, "_definition") :: any
 	local interfaceTieRealm = rawget(self :: any, "_interfaceTieRealm")
 
 	if implParent then
@@ -118,22 +118,22 @@ function TieInterface.ObserveIsImplemented<T>(self: TieInterface<T>): Observable
 	return definition:ObserveIsImplemented(adornee, interfaceTieRealm)
 end
 
-function TieInterface.__index<T>(self: TieInterface<T>, index)
-	local interfaceTieRealm = rawget(self :: any, "_interfaceTieRealm")
+(TieInterface :: any).__index = function(self, index)
+	local interfaceTieRealm = rawget(self :: any, "_interfaceTieRealm") :: any
 
 	local member = (rawget(self :: any, "_memberDefinitionMap") :: any)[index]
-	local definition = rawget(self :: any, "_definition")
-	local adornee = rawget(self :: any, "_adornee")
-	local implParent = rawget(self :: any, "_implParent")
+	local definition = rawget(self :: any, "_definition") :: any
+	local adornee = rawget(self :: any, "_adornee") :: any
+	local implParent = rawget(self :: any, "_implParent") :: any
 
 	if member then
 		if member:IsAllowedOnInterface(interfaceTieRealm) then
 			if member.ClassName == "TieMethodDefinition" then
 				return TieMethodInterfaceUtils.get(self, member, implParent, adornee, interfaceTieRealm)
 			elseif member.ClassName == "TieSignalDefinition" then
-				return TieSignalInterface.new(implParent, adornee, member, interfaceTieRealm)
+				return (TieSignalInterface :: any).new(implParent, adornee, member, interfaceTieRealm)
 			elseif member.ClassName == "TiePropertyDefinition" then
-				return TiePropertyInterface.new(implParent, adornee, member, interfaceTieRealm)
+				return (TiePropertyInterface :: any).new(implParent, adornee, member, interfaceTieRealm)
 			else
 				error(string.format("Unknown member definition %q", tostring(member.ClassName)))
 			end

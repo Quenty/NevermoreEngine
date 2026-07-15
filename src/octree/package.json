@@ -1,6 +1,6 @@
 {
   "name": "@quenty/octree",
-  "version": "11.14.1",
+  "version": "11.14.2",
   "description": "Octree implementation for Roblox - fast spatial queries",
   "keywords": [
     "Roblox",
@@ -30,7 +30,9 @@
   ],
   "dependencies": {
     "@quenty/draw": "workspace:*",
-    "@quenty/loader": "workspace:*"
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

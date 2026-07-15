@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Utility methods to track public player input mode
 
@@ -8,8 +8,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local AttributeUtils = require("AttributeUtils")
+local Observable = require("Observable")
 local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
 local PlayerInputModeTypes = require("PlayerInputModeTypes")
+local Promise = require("Promise")
 local Rx = require("Rx")
 local RxAttributeUtils = require("RxAttributeUtils")
 
@@ -28,7 +30,7 @@ function PlayerInputModeUtils.getPlayerInputModeType(player: Player): PlayerInpu
 
 	local result = player:GetAttribute(PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE)
 	if PlayerInputModeUtils.isInputModeType(result) then
-		return result
+		return result :: PlayerInputModeType
 	else
 		return nil
 	end
@@ -40,18 +42,20 @@ end
 	@param player Player
 	@return Observable<PlayerInputModeType?>
 ]=]
-function PlayerInputModeUtils.observePlayerInputModeType(player: Player): PlayerInputModeType?
+function PlayerInputModeUtils.observePlayerInputModeType(player: Player): Observable.Observable<PlayerInputModeType?>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return RxAttributeUtils.observeAttribute(player, PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE):Pipe({
-		Rx.map(function(value)
-			if PlayerInputModeUtils.isInputModeType(value) then
-				return value
-			else
-				return nil
-			end
-		end),
-	})
+	return (
+			RxAttributeUtils.observeAttribute(player, PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE) :: any
+		):Pipe({
+			Rx.map(function(value)
+				if PlayerInputModeUtils.isInputModeType(value) then
+					return value
+				else
+					return nil
+				end
+			end),
+		}) :: any
 end
 
 --[=[
@@ -61,15 +65,18 @@ end
 	@param cancelToken CancelToken?
 	@return Promise<string?>
 ]=]
-function PlayerInputModeUtils.promisePlayerInputMode(player: Player, cancelToken)
+function PlayerInputModeUtils.promisePlayerInputMode(
+	player: Player,
+	cancelToken: any?
+): Promise.Promise<PlayerInputModeType?>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return AttributeUtils.promiseAttribute(
 		player,
 		PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE,
-		PlayerInputModeUtils.isInputModeType,
+		PlayerInputModeUtils.isInputModeType :: any,
 		cancelToken
-	)
+	) :: any
 end
 
 --[=[
@@ -93,7 +100,7 @@ end
 	@param player Player
 	@param playerInputModeType string
 ]=]
-function PlayerInputModeUtils.setPlayerInputModeType(player: Player, playerInputModeType: PlayerInputModeType)
+function PlayerInputModeUtils.setPlayerInputModeType(player: Player, playerInputModeType: PlayerInputModeType): ()
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(PlayerInputModeUtils.isInputModeType(playerInputModeType), "Bad playerInputModeType")
 

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Adds Enabled/Disabled state to class
 	@class EnabledMixin
@@ -13,7 +13,17 @@ local ValueObject = require("ValueObject")
 
 local EnabledMixin = {}
 
-function EnabledMixin:Add(class)
+export type EnabledMixin = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_enabledMaidReference: Maid.Maid,
+		_enabledState: ValueObject.ValueObject<boolean>,
+		EnabledChanged: Signal.Signal<(boolean, boolean?)>,
+	},
+	{} :: typeof({ __index = EnabledMixin })
+))
+
+function EnabledMixin.Add(self: EnabledMixin, class: any): ()
 	assert(class, "Bad class")
 	assert(not class.Enable, "class.Enable already defined")
 	assert(not class.Disable, "class.Disable already defined")
@@ -32,38 +42,38 @@ function EnabledMixin:Add(class)
 end
 
 -- Initialize EnabledMixin
-function EnabledMixin:InitEnabledMixin(maid: Maid.Maid?)
-	maid = maid or self._maid
-	assert(maid, "Must have maid")
+function EnabledMixin.InitEnabledMixin(self: EnabledMixin, maid: Maid.Maid?): ()
+	local resolvedMaid: Maid.Maid = (maid or self._maid) :: any
+	assert(resolvedMaid, "Must have maid")
 
-	self._enabledMaidReference = maid
+	self._enabledMaidReference = resolvedMaid
 
-	self._enabledState = maid:Add(ValueObject.new(false, "boolean"))
+	self._enabledState = (resolvedMaid :: any):Add(ValueObject.new(false, "boolean"))
 
-	self.EnabledChanged = maid:Add(Signal.new()) -- :Fire(isEnabled, doNotAnimate)
+	self.EnabledChanged = (resolvedMaid :: any):Add(Signal.new()) -- :Fire(isEnabled, doNotAnimate)
 
-	self._maid:GiveTask(self._enabledState.Changed:Connect(function(isEnabled, _, doNotAnimate)
+	self._maid:GiveTask((self._enabledState :: any).Changed:Connect(function(isEnabled, _, doNotAnimate)
 		self.EnabledChanged:Fire(isEnabled, doNotAnimate)
 	end))
 end
 
-function EnabledMixin:IsEnabled(): boolean
+function EnabledMixin.IsEnabled(self: EnabledMixin): boolean
 	return self._enabledState.Value
 end
 
-function EnabledMixin:Enable(doNotAnimate: boolean?)
+function EnabledMixin.Enable(self: EnabledMixin, doNotAnimate: boolean?): ()
 	self:SetEnabled(true, doNotAnimate)
 end
 
-function EnabledMixin:Disable(doNotAnimate: boolean?)
+function EnabledMixin.Disable(self: EnabledMixin, doNotAnimate: boolean?): ()
 	self:SetEnabled(false, doNotAnimate)
 end
 
-function EnabledMixin:ObserveIsEnabled(): Observable.Observable<boolean>
+function EnabledMixin.ObserveIsEnabled(self: EnabledMixin): Observable.Observable<boolean>
 	return self._enabledState:Observe()
 end
 
-function EnabledMixin:SetEnabled(isEnabled: boolean, doNotAnimate: boolean?)
+function EnabledMixin.SetEnabled(self: EnabledMixin, isEnabled: boolean, doNotAnimate: boolean?): ()
 	assert(type(isEnabled) == "boolean", "Bad isEnabled")
 
 	self._enabledState:SetValue(isEnabled, doNotAnimate)

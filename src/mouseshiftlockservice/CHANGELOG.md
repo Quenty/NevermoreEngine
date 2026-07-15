@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@11.18.1...@quenty/mouseshiftlockservice@11.19.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **mouseshiftlockservice:** convert package to --!strict ([e99a28f](https://github.com/Quenty/NevermoreEngine/commit/e99a28f5acfba27b5c48516e5f6f0dc2fb78700a))
+
 ## [11.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@11.18.0...@quenty/mouseshiftlockservice@11.18.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/mouseshiftlockservice

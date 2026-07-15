@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Centralized provider so Hoarcekat stories can bootstrap in a fake PlayerGui
 
@@ -20,13 +20,22 @@ local ScreenGuiService = {}
 ScreenGuiService.ServiceName = "ScreenGuiService"
 ScreenGuiService._hackPlayerGui = nil :: any?
 
+export type ScreenGuiService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_guiParent: ValueObject.ValueObject<Instance?>,
+	},
+	{} :: typeof({ __index = ScreenGuiService })
+))
+
 --[=[
 	Initializes the ScreenGuiService
 
 	@param serviceBag ServiceBag
 ]=]
-function ScreenGuiService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function ScreenGuiService.Init(self: ScreenGuiService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self:_ensureInit()
@@ -37,7 +46,7 @@ end
 
 	return ScreenGui?
 ]=]
-function ScreenGuiService:GetGuiParent(): Instance?
+function ScreenGuiService.GetGuiParent(self: ScreenGuiService): Instance?
 	self:_ensureInit()
 
 	return self._guiParent.Value
@@ -49,7 +58,7 @@ end
 	@param playerGui PlayerGui | Instance
 	return MaidTask
 ]=]
-function ScreenGuiService:SetGuiParent(playerGui: Instance?)
+function ScreenGuiService.SetGuiParent(self: ScreenGuiService, playerGui: Instance?): () -> ()
 	self:_ensureInit()
 
 	self._guiParent.Value = playerGui
@@ -66,18 +75,19 @@ end
 
 	return Observable<ScreenGui?>
 ]=]
-function ScreenGuiService:ObservePlayerGui(): Observable.Observable<ScreenGui?>
+function ScreenGuiService.ObservePlayerGui(self: ScreenGuiService): Observable.Observable<ScreenGui?>
 	self:_ensureInit()
 
-	return self._guiParent:Observe()
+	return (self._guiParent :: any):Observe()
 end
 
-function ScreenGuiService:_ensureInit()
-	assert(self ~= ScreenGuiService, "Cannot call directly, use serviceBag")
+function ScreenGuiService._ensureInit(self: ScreenGuiService): ()
+	assert(self :: any ~= ScreenGuiService, "Cannot call directly, use serviceBag")
 
 	if not self._maid then
-		self._maid = Maid.new()
-		self._guiParent = self._maid:Add(ValueObject.new(PlayerGuiUtils.findPlayerGui()))
+		local maid = Maid.new()
+		self._maid = maid
+		self._guiParent = maid:Add(ValueObject.new(PlayerGuiUtils.findPlayerGui() :: Instance?))
 
 		-- TODO: Don't do this? But what's the alternative..
 		if not RunService:IsRunning() then
@@ -93,7 +103,7 @@ end
 --[=[
 	Cleans up the ScreenGuiService
 ]=]
-function ScreenGuiService:Destroy()
+function ScreenGuiService.Destroy(self: ScreenGuiService): ()
 	self._maid:DoCleaning()
 end
 

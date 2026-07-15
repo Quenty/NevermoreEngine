@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.14.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.14.1...@quenty/octree@11.14.2) (2026-07-15)
+
+### Bug Fixes
+
+- **octree:** Provision test place and fix spec expect calls ([938a8e2](https://github.com/Quenty/NevermoreEngine/commit/938a8e217017570b50868faf4668985ea09d1dc5))
+
 ## [11.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.14.0...@quenty/octree@11.14.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/octree

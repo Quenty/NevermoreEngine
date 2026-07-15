@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RadialImage
 ]=]
@@ -16,8 +16,25 @@ local RadialImage = setmetatable({}, BaseObject)
 RadialImage.ClassName = "RadialImage"
 RadialImage.__index = RadialImage
 
-function RadialImage.new()
-	local self = setmetatable(BaseObject.new(), RadialImage)
+export type RadialImage =
+	typeof(setmetatable(
+		{} :: {
+			Gui: Frame,
+			_image: ValueObject.ValueObject<string>,
+			_percent: ValueObject.ValueObject<number>,
+			_transparency: ValueObject.ValueObject<number>,
+			_enabledTransparency: ValueObject.ValueObject<number>,
+			_disabledTransparency: ValueObject.ValueObject<number>,
+			_enabledColor: ValueObject.ValueObject<Color3>,
+			_disabledColor: ValueObject.ValueObject<Color3>,
+			_absoluteSize: ValueObject.ValueObject<Vector2>,
+		},
+		{} :: typeof({ __index = RadialImage })
+	))
+	& BaseObject.BaseObject
+
+function RadialImage.new(): RadialImage
+	local self: RadialImage = setmetatable(BaseObject.new() :: any, RadialImage)
 
 	self._image = self._maid:Add(ValueObject.new("", "string"))
 	self._percent = self._maid:Add(ValueObject.new(1, "number"))
@@ -29,13 +46,13 @@ function RadialImage.new()
 	self._absoluteSize = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
-		self.Gui = gui
+		self.Gui = gui :: Frame
 	end))
 
 	return self
 end
 
-function RadialImage.blend(props)
+function RadialImage.blend(props): Observable.Observable<Frame>
 	assert(type(props) == "table", "Bad props")
 
 	return Observable.new(function(sub)
@@ -43,7 +60,7 @@ function RadialImage.blend(props)
 
 		local viewport = RadialImage.new()
 
-		local function bindObservable(propName, callback)
+		local function bindObservable(propName: string, callback: (any) -> ())
 			if props[propName] then
 				local observe = Blend.toPropertyObservable(props[propName])
 				if observe then
@@ -92,14 +109,14 @@ function RadialImage.blend(props)
 		sub:Fire(viewport.Gui)
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
 	Sets the image to use for this radial image
 	@param image string
 ]=]
-function RadialImage:SetImage(image: string)
+function RadialImage.SetImage(self: RadialImage, image: string): ()
 	assert(type(image) == "string", "Bad image")
 
 	self._image.Value = image
@@ -109,7 +126,7 @@ end
 	Sets the percent we're at
 	@param percent number
 ]=]
-function RadialImage:SetPercent(percent: number)
+function RadialImage.SetPercent(self: RadialImage, percent: number): ()
 	assert(type(percent) == "number", "Bad percent")
 
 	self._percent.Value = percent
@@ -119,7 +136,7 @@ end
 	Sets the total transparency of the radial image
 	@param transparency number
 ]=]
-function RadialImage:SetTransparency(transparency: number)
+function RadialImage.SetTransparency(self: RadialImage, transparency: number): ()
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
@@ -129,7 +146,7 @@ end
 	Sets the enabled transparency for the radial image
 	@param transparency number
 ]=]
-function RadialImage:SetEnabledTransparency(transparency: number)
+function RadialImage.SetEnabledTransparency(self: RadialImage, transparency: number): ()
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._enabledTransparency.Value = transparency
@@ -139,7 +156,7 @@ end
 	Sets the disabled transparency
 	@param transparency number
 ]=]
-function RadialImage:SetDisabledTransparency(transparency: number)
+function RadialImage.SetDisabledTransparency(self: RadialImage, transparency: number): ()
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._disabledTransparency.Value = transparency
@@ -149,7 +166,7 @@ end
 	Sets the enabled color
 	@param enabledColor Color3
 ]=]
-function RadialImage:SetEnabledColor(enabledColor)
+function RadialImage.SetEnabledColor(self: RadialImage, enabledColor: Color3): ()
 	assert(typeof(enabledColor) == "Color3", "Bad enabledColor")
 
 	self._enabledColor.Value = enabledColor
@@ -159,13 +176,13 @@ end
 	Sets the disabled color
 	@param disabledColor Color3
 ]=]
-function RadialImage:SetDisabledColor(disabledColor)
+function RadialImage.SetDisabledColor(self: RadialImage, disabledColor: Color3): ()
 	assert(typeof(disabledColor) == "Color3", "Bad disabledColor")
 
 	self._disabledColor.Value = disabledColor
 end
 
-function RadialImage:_render()
+function RadialImage._render(self: RadialImage): Observable.Observable<Instance>
 	return Blend.New "Frame" {
 		Name = "RadialImage",
 		Size = UDim2.fromScale(1, 1),
@@ -178,12 +195,12 @@ function RadialImage:_render()
 
 		Blend.New "Frame" {
 			Name = "LeftFrame",
-			Size = Blend.Computed(self._absoluteSize, function(size)
+			Size = Blend.Computed(self._absoluteSize, function(size: Vector2)
 				-- hack: ensures when we're 24.5 wide or something we don't end
 				-- up with a split in the middle.
 				-- this is an issue because clips descendants tends towards floor
 				-- pixel clipping.
-				if size.x % 2 ~= 0 then
+				if size.X % 2 ~= 0 then
 					return UDim2.new(0.5, 1, 1, 0)
 				else
 					return UDim2.fromScale(0.5, 1)

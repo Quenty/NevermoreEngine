@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.5.0...@quenty/brine@1.6.0) (2026-07-14)
+
+### Features
+
+- **brine:** convert package to --!strict ([39ab066](https://github.com/Quenty/NevermoreEngine/commit/39ab066e031734fe54ad149217300d2e9f1c04f5))
+
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.4.1...@quenty/brine@1.5.0) (2026-07-12)
+
+**Note:** Version bump only for package @quenty/brine
+
 ## [1.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.4.0...@quenty/brine@1.4.1) (2026-06-05)
 
 **Note:** Version bump only for package @quenty/brine

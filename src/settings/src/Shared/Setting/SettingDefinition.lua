@@ -81,7 +81,9 @@ function SettingDefinition.Init<T>(self: SettingDefinition<T>, serviceBag: Servi
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	local settingsDataService = self._serviceBag:GetService(SettingsDataService)
-	self._maid:GiveTask(settingsDataService:RegisterSettingDefinition(self))
+	-- Same SettingsDataService type resolved via two symlink require paths reads as
+	-- nominally distinct to the old solver; cast the receiver to dodge the false mismatch.
+	self._maid:GiveTask((settingsDataService :: any):RegisterSettingDefinition(self))
 end
 
 --[=[

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@5.8.1...@quenty/networkownerservice@5.9.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **networkownerservice:** convert package to --!strict ([ec1edbf](https://github.com/Quenty/NevermoreEngine/commit/ec1edbf2cc06fba398d0300e100801a4c746e8ef))
+
 ## [5.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@5.8.0...@quenty/networkownerservice@5.8.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/networkownerservice

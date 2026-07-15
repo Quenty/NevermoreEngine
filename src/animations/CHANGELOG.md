@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.32.2...@quenty/animations@8.33.0) (2026-07-14)
+
+### Features
+
+- **animations:** convert package to --!strict ([a9ea746](https://github.com/Quenty/NevermoreEngine/commit/a9ea74632046e14dc221165a4be472f92543a582))
+
 ## [8.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.32.1...@quenty/animations@8.32.2) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/animations

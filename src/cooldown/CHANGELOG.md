@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.38.1...@quenty/cooldown@11.39.0) (2026-07-14)
+
+### Features
+
+- **cooldown:** convert package to --!strict ([f5ea8a9](https://github.com/Quenty/NevermoreEngine/commit/f5ea8a95563c51e8ed49d8c6817562a989bcfe66))
+
 ## [11.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.38.0...@quenty/cooldown@11.38.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/cooldown

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Handles spawning stuff in the game
 	@class SpawnService
@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local Binder = require("Binder")
 local Maid = require("Maid")
 local RandomUtils = require("RandomUtils")
 local ServiceBag = require("ServiceBag")
@@ -21,7 +22,16 @@ local TOTAL_BUDGET_BEFORE_WARN = 0.1
 local SpawnService = {}
 SpawnService.ServiceName = "SpawnService"
 
-function SpawnService:Init(serviceBag: ServiceBag.ServiceBag)
+export type SpawnService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid?,
+		_spawnBinderGroupsServer: any,
+	},
+	{} :: typeof({ __index = SpawnService })
+))
+
+function SpawnService.Init(self: SpawnService, serviceBag: ServiceBag.ServiceBag): ()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -33,11 +43,12 @@ function SpawnService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag:GetService(require("SpawnCmdrService"))
 end
 
-function SpawnService:Start()
+function SpawnService.Start(self: SpawnService): ()
 	local lastUpdateTime = (os.clock() - UPDATE_PERIOD_SEC + SPAWN_AFTER_GAME_START)
+	local maid = assert(self._maid, "Not initialized")
 
 	-- TODO: Smear across update pipeline
-	self._maid:GiveTask(RunService.Stepped:Connect(function()
+	maid:GiveTask(RunService.Stepped:Connect(function()
 		if (lastUpdateTime + UPDATE_PERIOD_SEC) <= os.clock() then
 			lastUpdateTime = os.clock()
 			self:Update()
@@ -45,11 +56,11 @@ function SpawnService:Start()
 	end))
 end
 
-function SpawnService:AddSpawnerBinder(spawnerBinder)
+function SpawnService.AddSpawnerBinder(self: SpawnService, spawnerBinder: Binder.Binder<any>): ()
 	self._spawnBinderGroupsServer.Spawners:Add(spawnerBinder)
 end
 
-function SpawnService:Regenerate()
+function SpawnService.Regenerate(self: SpawnService): ()
 	local startTime = os.clock()
 
 	for _, binder in self._spawnBinderGroupsServer.Spawners:GetBinders() do
@@ -63,7 +74,7 @@ function SpawnService:Regenerate()
 	end
 end
 
-function SpawnService:Update()
+function SpawnService.Update(self: SpawnService): ()
 	debug.profilebegin("spawnService")
 
 	local startTime = os.clock()
@@ -106,8 +117,10 @@ function SpawnService:Update()
 	debug.profileend()
 end
 
-function SpawnService:Destroy()
-	self._maid:DoCleaning()
+function SpawnService.Destroy(self: SpawnService): ()
+	if self._maid then
+		self._maid:DoCleaning()
+	end
 	self._maid = nil
 end
 

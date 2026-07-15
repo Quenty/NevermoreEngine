@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Reports back the player input mode to the server which allows for displaying what
 	mode the uesr is using.
@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 local InputModeTypeSelector = require("InputModeTypeSelector")
 local InputModeTypes = require("InputModeTypes")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
 local PlayerInputModeTypes = require("PlayerInputModeTypes")
 local PlayerInputModeUtils = require("PlayerInputModeUtils")
@@ -24,8 +25,17 @@ local ServiceBag = require("ServiceBag")
 local PlayerInputModeServiceClient = {}
 PlayerInputModeServiceClient.ServiceName = "PlayerInputModeServiceClient"
 
-function PlayerInputModeServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type PlayerInputModeServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_selector: any,
+	},
+	{} :: typeof({ __index = PlayerInputModeServiceClient })
+))
+
+function PlayerInputModeServiceClient.Init(self: PlayerInputModeServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._serviceBag:GetService(require("InputModeServiceClient"))
@@ -33,7 +43,7 @@ function PlayerInputModeServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	self._maid = Maid.new()
 end
 
-function PlayerInputModeServiceClient:Start()
+function PlayerInputModeServiceClient.Start(self: PlayerInputModeServiceClient): ()
 	self._selector = self._maid:Add(InputModeTypeSelector.new(self._serviceBag, {
 		InputModeTypes.Gamepads,
 		InputModeTypes.Keyboard,
@@ -41,15 +51,15 @@ function PlayerInputModeServiceClient:Start()
 	}))
 
 	self:_promiseRemoteEvent():Then(function(remoteEvent)
-		self._maid:GiveTask(RxBrioUtils.flatCombineLatest({
+		self._maid:GiveTask((RxBrioUtils.flatCombineLatest({
 			activeMode = self._selector:ObserveActiveInputType(),
 			localPlayer = RxPlayerUtils.observeLocalPlayerBrio(),
-		})
+		}) :: any)
 			:Pipe({
 				Rx.throttleTime(1, { leading = true, trailing = true }),
 			})
-			:Subscribe(function(state)
-				local modeType
+			:Subscribe(function(state: any)
+				local modeType: any
 				if state.activeMode == InputModeTypes.Gamepads then
 					modeType = PlayerInputModeTypes.GAMEPAD
 				elseif state.activeMode == InputModeTypes.Keyboard then
@@ -74,7 +84,12 @@ end
 	@param player Player
 	@return Observable<PlayerInputModeType>
 ]=]
-function PlayerInputModeServiceClient:ObservePlayerInputType(player: Player)
+function PlayerInputModeServiceClient.ObservePlayerInputType(
+	_self: PlayerInputModeServiceClient,
+	player: Player
+): Observable.Observable<
+	PlayerInputModeUtils.PlayerInputModeType?
+>
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerInputModeUtils.observePlayerInputModeType(player)
@@ -86,17 +101,20 @@ end
 	@param player Player
 	@return PlayerInputModeType
 ]=]
-function PlayerInputModeServiceClient:GetPlayerInputModeType(player: Player)
+function PlayerInputModeServiceClient.GetPlayerInputModeType(
+	_self: PlayerInputModeServiceClient,
+	player: Player
+): PlayerInputModeUtils.PlayerInputModeType?
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return PlayerInputModeUtils.getPlayerInputModeType(player)
 end
 
-function PlayerInputModeServiceClient:_promiseRemoteEvent()
+function PlayerInputModeServiceClient._promiseRemoteEvent(self: PlayerInputModeServiceClient): any
 	return self._maid:GivePromise(PromiseGetRemoteEvent(PlayerInputModeServiceConstants.REMOTE_EVENT_NAME))
 end
 
-function PlayerInputModeServiceClient:Destroy()
+function PlayerInputModeServiceClient.Destroy(self: PlayerInputModeServiceClient): ()
 	self._maid:DoCleaning()
 end
 

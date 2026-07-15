@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class ImageLabelLoaded
 ]=]
@@ -18,8 +18,21 @@ local ImageLabelLoaded = setmetatable({}, BaseObject)
 ImageLabelLoaded.ClassName = "ImageLabelLoaded"
 ImageLabelLoaded.__index = ImageLabelLoaded
 
-function ImageLabelLoaded.new()
-	local self = setmetatable(BaseObject.new(), ImageLabelLoaded)
+export type ImageLabelLoaded =
+	typeof(setmetatable(
+		{} :: {
+			_isLoaded: ValueObject.ValueObject<boolean>,
+			_preloadImage: ValueObject.ValueObject<boolean>,
+			_defaultTimeout: number?,
+			_imageLabel: ImageLabel?,
+			ImageChanged: Signal.Signal<boolean?>,
+		},
+		{} :: typeof({ __index = ImageLabelLoaded })
+	))
+	& BaseObject.BaseObject
+
+function ImageLabelLoaded.new(): ImageLabelLoaded
+	local self: ImageLabelLoaded = setmetatable(BaseObject.new() :: any, ImageLabelLoaded)
 
 	self._isLoaded = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._preloadImage = self._maid:Add(ValueObject.new(true, "boolean"))
@@ -31,23 +44,23 @@ function ImageLabelLoaded.new()
 	return self
 end
 
-function ImageLabelLoaded:SetDefaultTimeout(defaultTimeout: number?)
+function ImageLabelLoaded.SetDefaultTimeout(self: ImageLabelLoaded, defaultTimeout: number?): ()
 	assert(type(defaultTimeout) == "number" or defaultTimeout == nil, "Bad defaultTimeout")
 
 	self._defaultTimeout = defaultTimeout
 end
 
-function ImageLabelLoaded:IsLoaded(): boolean
+function ImageLabelLoaded.IsLoaded(self: ImageLabelLoaded): boolean
 	return self._isLoaded.Value
 end
 
-function ImageLabelLoaded:SetPreloadImage(preloadImage: boolean)
+function ImageLabelLoaded.SetPreloadImage(self: ImageLabelLoaded, preloadImage: boolean): ()
 	assert(type(preloadImage) == "boolean", "Bad preloadImage")
 
 	self._preloadImage.Value = preloadImage
 end
 
-function ImageLabelLoaded:PromiseLoaded(timeout: number?)
+function ImageLabelLoaded.PromiseLoaded(self: ImageLabelLoaded, timeout: number?): Promise.Promise<()>
 	assert(type(timeout) == "number" or timeout == nil, "Bad timeout")
 
 	local originalTimeout = timeout
@@ -91,7 +104,7 @@ function ImageLabelLoaded:PromiseLoaded(timeout: number?)
 	return promise
 end
 
-function ImageLabelLoaded:SetImageLabel(imageLabel: ImageLabel?)
+function ImageLabelLoaded.SetImageLabel(self: ImageLabelLoaded, imageLabel: ImageLabel?): ()
 	assert(typeof(imageLabel) == "Instance" and imageLabel:IsA("ImageLabel") or imageLabel == nil, "Bad imageLabel")
 	if self._imageLabel == imageLabel then
 		return
@@ -105,14 +118,14 @@ function ImageLabelLoaded:SetImageLabel(imageLabel: ImageLabel?)
 		self._isLoaded.Value = self._imageLabel.IsLoaded
 
 		maid:GiveTask(self._imageLabel:GetPropertyChangedSignal("IsLoaded"):Connect(function()
-			self._isLoaded.Value = self._imageLabel.IsLoaded
+			self._isLoaded.Value = (self._imageLabel :: ImageLabel).IsLoaded
 		end))
 
 		-- Setup preloading as necessary
-		maid:GiveTask(self._preloadImage
+		maid:GiveTask((self._preloadImage :: any)
 			:Observe()
 			:Pipe({
-				Rx.switchMap(function(preload)
+				Rx.switchMap(function(preload): any
 					if preload then
 						return Rx.combineLatest({
 							isLoaded = self._isLoaded:Observe(),

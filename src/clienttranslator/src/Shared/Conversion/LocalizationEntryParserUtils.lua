@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Utility to build a localization table from json, intended to be used with rojo. Can also handle Rojo json
 	objects turned into tables!
@@ -15,11 +15,23 @@ local PseudoLocalize = require("PseudoLocalize")
 
 local LocalizationEntryParserUtils = {}
 
-function LocalizationEntryParserUtils.decodeFromInstance(tableName: string, sourceLocaleId: string, folder: Instance)
+type LocalizationEntry = {
+	Example: string,
+	Key: string,
+	Context: string,
+	Source: string,
+	Values: { [string]: string },
+}
+
+function LocalizationEntryParserUtils.decodeFromInstance(
+	tableName: string,
+	sourceLocaleId: string,
+	folder: Instance
+): { LocalizationEntry }
 	assert(type(tableName) == "string", "Bad tableName")
 	assert(typeof(folder) == "Instance", "Bad folder")
 
-	local lookupTable = {}
+	local lookupTable: { [string]: LocalizationEntry } = {}
 	local baseKey = ""
 
 	for _, descendant in folder:GetDescendants() do
@@ -37,7 +49,7 @@ function LocalizationEntryParserUtils.decodeFromInstance(tableName: string, sour
 			)
 		elseif descendant:IsA("ModuleScript") then
 			local localeId = LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)
-			local decodedTable = require(descendant)
+			local decodedTable = (require :: any)(descendant)
 
 			LocalizationEntryParserUtils._parseTableToResultsList(
 				lookupTable,
@@ -50,19 +62,23 @@ function LocalizationEntryParserUtils.decodeFromInstance(tableName: string, sour
 		end
 	end
 
-	local results = {}
+	local results: { LocalizationEntry } = {}
 	for _, item in lookupTable do
 		table.insert(results, item)
 	end
 	return results
 end
 
-function LocalizationEntryParserUtils.decodeFromTable(tableName: string, localeId: string, dataTable)
+function LocalizationEntryParserUtils.decodeFromTable(
+	tableName: string,
+	localeId: string,
+	dataTable: { [string]: any }
+): { LocalizationEntry }
 	assert(type(tableName) == "string", "Bad tableName")
 	assert(type(localeId) == "string", "Bad localeId")
 	assert(type(dataTable) == "table", "Bad dataTable")
 
-	local lookupTable = {}
+	local lookupTable: { [string]: LocalizationEntry } = {}
 
 	local baseKey = ""
 	LocalizationEntryParserUtils._parseTableToResultsList(
@@ -74,14 +90,14 @@ function LocalizationEntryParserUtils.decodeFromTable(tableName: string, localeI
 		tableName
 	)
 
-	local results = {}
+	local results: { LocalizationEntry } = {}
 	for _, item in lookupTable do
 		table.insert(results, item)
 	end
 	return results
 end
 
-function LocalizationEntryParserUtils._parseLocaleFromName(name: string)
+function LocalizationEntryParserUtils._parseLocaleFromName(name: string): string
 	if string.sub(name, -5) == ".json" then
 		return string.sub(name, 1, #name - 5)
 	else
@@ -90,11 +106,11 @@ function LocalizationEntryParserUtils._parseLocaleFromName(name: string)
 end
 
 function LocalizationEntryParserUtils._parseTableToResultsList(
-	lookupTable,
+	lookupTable: { [string]: LocalizationEntry },
 	sourceLocaleId: string,
 	localeId: string,
 	baseKey: string,
-	dataTable,
+	dataTable: { [string]: any },
 	tableName: string
 )
 	assert(type(lookupTable) == "table", "Bad lookupTable")

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cubicspline@10.12.1...@quenty/cubicspline@10.13.0) (2026-07-14)
+
+### Bug Fixes
+
+- **cubicspline:** type numeric diagonals for strict LinearSystemsSolverUtils ([a062853](https://github.com/Quenty/NevermoreEngine/commit/a06285351a5126fbec184e0b7dc308211aa92029))
+
 ## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cubicspline@10.12.0...@quenty/cubicspline@10.12.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/cubicspline

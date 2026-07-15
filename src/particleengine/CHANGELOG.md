@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@13.33.1...@quenty/particleengine@13.34.0) (2026-07-14)
+
+### Features
+
+- **particleengine:** convert package to --!strict ([8140733](https://github.com/Quenty/NevermoreEngine/commit/8140733549712d162714c2093773ff93a11dadd9))
+
 ## [13.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@13.33.0...@quenty/particleengine@13.33.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/particleengine

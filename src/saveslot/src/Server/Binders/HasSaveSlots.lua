@@ -207,9 +207,10 @@ function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData
 
 		-- Wipe default slot
 		local slotIndex = SaveSlotData.SlotIndex:Get(slot)
+		local deletePromise = nil
 
 		if slotIndex == SaveSlotConstants.DEFAULT_SLOT_INDEX then
-			return self._dataStore:PromiseKeyList():Then(function(keys)
+			deletePromise = self._dataStore:PromiseKeyList():Then(function(keys)
 				for _, key in keys do
 					if key ~= SaveSlotConstants.SYSTEM_STORE_KEY then
 						self._dataStore:Delete(key)
@@ -217,11 +218,17 @@ function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData
 				end
 				self._metadataStore:Delete(slotId)
 			end)
+		else
+			-- Or delete slot from substore
+			self._systemStore:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY):Delete(slotId)
+			self._metadataStore:Delete(slotId)
+			deletePromise = (Promise :: any).resolved()
 		end
 
-		-- Or delete slot from substore
-		self._systemStore:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY):Delete(slotId)
-		self._metadataStore:Delete(slotId)
+		-- Flush the deletion to prevent stale reads
+		return deletePromise:Then(function()
+			return self._dataStore:Save()
+		end)
 	end)
 end
 

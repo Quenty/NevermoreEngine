@@ -7,6 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local Brio = require("Brio")
 local Maid = require("Maid")
@@ -67,7 +68,7 @@ function RxCharacterUtils.observeIsOfLocalCharacter(instance: Instance): Observa
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local localPlayer = Players.LocalPlayer
-	if not localPlayer then
+	if not localPlayer and RunService:IsClient() then
 		warn("[RxCharacterUtils] - No localPlayer")
 		return Rx.EMPTY :: any
 	end
