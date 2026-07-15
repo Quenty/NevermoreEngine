@@ -118,6 +118,8 @@ function SoundUtils.applyPropertiesFromId(sound: Sound, id: SoundId): ()
 		if properties.Parent then
 			sound.Parent = properties.Parent
 		end
+	elseif typeof(id) == "Instance" and id:IsA("Sound") then
+		sound.Volume = id.Volume
 	end
 end
 

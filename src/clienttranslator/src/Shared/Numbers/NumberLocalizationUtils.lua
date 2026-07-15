@@ -24,6 +24,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local RoundingBehaviourTypes = require("RoundingBehaviourTypes")
 
 local NumberLocalizationUtils = {}
@@ -186,10 +187,56 @@ localeInfos["tr-tr"] = {
 	{ 1e9, " Mr" },
 }
 
--- Aliases for languages that use the same mappings.
-localeInfos["en"] = localeInfos["en-us"]
-localeInfos["en-gb"] = localeInfos["en-us"]
-localeInfos["es-mx"] = localeInfos["es-es"]
+localeInfos["pl-pl"] = {
+	decimalSeparator = ",",
+	groupDelimiter = " ",
+	{ 1, "" },
+	{ 1e3, " tys." },
+	{ 1e6, " mln" },
+	{ 1e9, " mld" },
+}
+
+-- Arabic. tostring(number) emits Western (Latin) digits, so Western separators are paired with the
+-- Arabic compact-scale words. (CLDR `ar` defaults to Arabic-Indic digits + "٬"/"٫" grouping; that
+-- digit shaping isn't modeled here, so we keep the Latin-digit convention the rest of this file uses.)
+localeInfos["ar"] = {
+	decimalSeparator = ".",
+	groupDelimiter = ",",
+	{ 1, "" },
+	{ 1e3, " ألف" },
+	{ 1e6, " مليون" },
+	{ 1e9, " مليار" },
+}
+
+-- Resolve a locale id to its formatting info. The runtime passes a full Roblox locale id (e.g.
+-- "es-es", "pt-br", "zh-hant"); when there's no exact entry, fall back to the language subtag so a
+-- regional variant lands on its closest same-language match ("es-mx" -> "es-es", "fr-ca" -> "fr-fr",
+-- "en-gb" -> "en-us") instead of the wrong-language default. Chinese is script-sensitive (Simplified
+-- and Traditional abbreviate differently), so its variant is chosen explicitly. Returns nil only when
+-- no entry shares the language — callers then fall back to DEFAULT_LOCALE.
+local function resolveLocaleInfo(locale: string?): LocaleInfo?
+	local key = ResolveLocaleUtils.resolveClosestKey(locale, localeInfos)
+	return if key then localeInfos[key] else nil
+end
+
+-- Resolve to a usable LocaleInfo, warning and falling back to the default locale
+-- when the requested one is unknown. Always returns a value, so callers do not
+-- have to nil-check.
+local function resolveLocaleInfoOrDefault(locale: string?): LocaleInfo
+	local localeInfo = resolveLocaleInfo(locale)
+	if localeInfo then
+		return localeInfo
+	end
+
+	warn(
+		string.format(
+			"[NumberLocalizationUtils] - Locale not found: '%s', reverting to '%s' instead.",
+			tostring(locale),
+			DEFAULT_LOCALE
+		)
+	)
+	return localeInfos[DEFAULT_LOCALE]
+end
 
 local function findDecimalPointIndex(numberStr: string): number
 	return string.find(numberStr, "%.") or #numberStr + 1
@@ -264,17 +311,7 @@ function NumberLocalizationUtils.localize(number: number, locale: string): strin
 		return "0"
 	end
 
-	local localeInfo: LocaleInfo = localeInfos[locale]
-	if not localeInfo then
-		localeInfo = localeInfos[DEFAULT_LOCALE]
-		warn(
-			string.format(
-				"[NumberLocalizationUtils] - Locale not found: '%s', reverting to '%s' instead.",
-				tostring(locale),
-				DEFAULT_LOCALE
-			)
-		)
-	end
+	local localeInfo = resolveLocaleInfoOrDefault(locale)
 
 	if localeInfo.groupDelimiter then
 		return addGroupDelimiters(tostring(number), localeInfo.groupDelimiter)
@@ -317,17 +354,7 @@ function NumberLocalizationUtils.abbreviate(
 		return "0"
 	end
 
-	local localeInfo: LocaleInfo = localeInfos[locale]
-	if not localeInfo then
-		localeInfo = localeInfos[DEFAULT_LOCALE]
-		warn(
-			string.format(
-				"[NumberLocalizationUtils] - Locale not found: '%s', reverting to '%s' instead.",
-				tostring(locale),
-				DEFAULT_LOCALE
-			)
-		)
-	end
+	local localeInfo = resolveLocaleInfoOrDefault(locale)
 
 	-- select which denomination we are going to use
 	local denominationEntry: any = findDenominationEntry(localeInfo, number, roundingBehavior)
