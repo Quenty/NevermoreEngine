@@ -24,6 +24,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local RoundingBehaviourTypes = require("RoundingBehaviourTypes")
 
 local NumberLocalizationUtils = {}
@@ -214,35 +215,27 @@ localeInfos["ar"] = {
 -- and Traditional abbreviate differently), so its variant is chosen explicitly. Returns nil only when
 -- no entry shares the language — callers then fall back to DEFAULT_LOCALE.
 local function resolveLocaleInfo(locale: string?): LocaleInfo?
-	if type(locale) ~= "string" or locale == "" then
-		return nil
-	end
-	locale = string.lower(locale)
+	local key = ResolveLocaleUtils.resolveClosestKey(locale, localeInfos)
+	return if key then localeInfos[key] else nil
+end
 
-	local exact = localeInfos[locale]
-	if exact then
-		return exact
-	end
-
-	local lang = string.match(locale, "^%a+") or locale
-
-	-- Chinese: hant / tw / hk / mo are Traditional; hans / cn / sg / bare zh are Simplified.
-	if lang == "zh" then
-		local traditional = string.find(locale, "hant", 1, true)
-			or string.find(locale, "-tw", 1, true)
-			or string.find(locale, "-hk", 1, true)
-			or string.find(locale, "-mo", 1, true)
-		return if traditional then localeInfos["zh-tw"] else localeInfos["zh-cn"]
+-- Resolve to a usable LocaleInfo, warning and falling back to the default locale
+-- when the requested one is unknown. Always returns a value, so callers do not
+-- have to nil-check.
+local function resolveLocaleInfoOrDefault(locale: string?): LocaleInfo
+	local localeInfo = resolveLocaleInfo(locale)
+	if localeInfo then
+		return localeInfo
 	end
 
-	-- Closest entry sharing the language subtag (smallest key, so the pick is deterministic).
-	local closest: string? = nil
-	for key in localeInfos do
-		if string.match(key, "^%a+") == lang and (closest == nil or key < closest) then
-			closest = key
-		end
-	end
-	return if closest then localeInfos[closest] else nil
+	warn(
+		string.format(
+			"[NumberLocalizationUtils] - Locale not found: '%s', reverting to '%s' instead.",
+			tostring(locale),
+			DEFAULT_LOCALE
+		)
+	)
+	return localeInfos[DEFAULT_LOCALE]
 end
 
 local function findDecimalPointIndex(numberStr: string): number
@@ -318,17 +311,7 @@ function NumberLocalizationUtils.localize(number: number, locale: string): strin
 		return "0"
 	end
 
-	local localeInfo: LocaleInfo? = resolveLocaleInfo(locale)
-	if not localeInfo then
-		localeInfo = localeInfos[DEFAULT_LOCALE]
-		warn(
-			string.format(
-				"[NumberLocalizationUtils] - Locale not found: '%s', reverting to '%s' instead.",
-				tostring(locale),
-				DEFAULT_LOCALE
-			)
-		)
-	end
+	local localeInfo = resolveLocaleInfoOrDefault(locale)
 
 	if localeInfo.groupDelimiter then
 		return addGroupDelimiters(tostring(number), localeInfo.groupDelimiter)
@@ -371,17 +354,7 @@ function NumberLocalizationUtils.abbreviate(
 		return "0"
 	end
 
-	local localeInfo: LocaleInfo? = resolveLocaleInfo(locale)
-	if not localeInfo then
-		localeInfo = localeInfos[DEFAULT_LOCALE]
-		warn(
-			string.format(
-				"[NumberLocalizationUtils] - Locale not found: '%s', reverting to '%s' instead.",
-				tostring(locale),
-				DEFAULT_LOCALE
-			)
-		)
-	end
+	local localeInfo = resolveLocaleInfoOrDefault(locale)
 
 	-- select which denomination we are going to use
 	local denominationEntry: any = findDenominationEntry(localeInfo, number, roundingBehavior)
