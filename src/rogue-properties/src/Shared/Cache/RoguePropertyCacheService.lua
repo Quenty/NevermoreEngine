@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Constructing a new rogue property/rogue property table can be expensive.
 	This caches it so frame-usage is cheap.
@@ -17,27 +17,44 @@ RoguePropertyCacheService.ServiceName = "RoguePropertyCacheService"
 
 local WEAK_K_TABLE = { __mode = "k" }
 
-function RoguePropertyCacheService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type RoguePropertyDefinitionLike = {
+	GetName: (self: RoguePropertyDefinitionLike) -> string,
+}
+
+export type RoguePropertyCacheService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_cache: { [RoguePropertyDefinitionLike]: RoguePropertyCache.RoguePropertyCache<any> }?,
+	},
+	{} :: typeof({ __index = RoguePropertyCacheService })
+))
+
+function RoguePropertyCacheService.Init(self: RoguePropertyCacheService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._cache = setmetatable({}, WEAK_K_TABLE)
+	self._cache = setmetatable({}, WEAK_K_TABLE) :: any
 end
 
-function RoguePropertyCacheService:GetCache(roguePropertyDefinition)
-	if not self._cache then
+function RoguePropertyCacheService.GetCache(
+	self: RoguePropertyCacheService,
+	roguePropertyDefinition: RoguePropertyDefinitionLike
+): RoguePropertyCache.RoguePropertyCache<any>
+	local cache = self._cache
+	if not cache then
 		assert(not RunService:IsRunning(), "Not in test mode")
 		-- Test mode
 		return RoguePropertyCache.new(roguePropertyDefinition:GetName())
 	end
 
-	if self._cache[roguePropertyDefinition] then
-		return self._cache[roguePropertyDefinition]
+	local existing = cache[roguePropertyDefinition]
+	if existing then
+		return existing
 	end
 
-	local cache = RoguePropertyCache.new(roguePropertyDefinition:GetName())
-	self._cache[roguePropertyDefinition] = cache
-	return cache
+	local newCache = RoguePropertyCache.new(roguePropertyDefinition:GetName())
+	cache[roguePropertyDefinition] = newCache
+	return newCache
 end
 
 return RoguePropertyCacheService

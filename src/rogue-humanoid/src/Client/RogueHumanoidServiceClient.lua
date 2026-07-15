@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RogueHumanoidServiceClient
 ]=]
@@ -10,8 +10,15 @@ local ServiceBag = require("ServiceBag")
 local RogueHumanoidServiceClient = {}
 RogueHumanoidServiceClient.ServiceName = "RogueHumanoidServiceClient"
 
-function RogueHumanoidServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type RogueHumanoidServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+	},
+	{} :: typeof({ __index = RogueHumanoidServiceClient })
+))
+
+function RogueHumanoidServiceClient.Init(self: RogueHumanoidServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	-- External

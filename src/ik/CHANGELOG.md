@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.54.0...@quenty/ik@15.55.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.53.0...@quenty/ik@15.54.0) (2026-07-14)
+
+### Bug Fixes
+
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **ik:** convert package to --!strict ([8728c25](https://github.com/Quenty/NevermoreEngine/commit/8728c25c8bcead4107630e2edd8d2cd7d1d06d65))
+
 # [15.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.52.1...@quenty/ik@15.53.0) (2026-07-12)
 
 **Note:** Version bump only for package @quenty/ik

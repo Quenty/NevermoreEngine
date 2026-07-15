@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SecretsService
 ]=]
@@ -18,8 +18,28 @@ local ServiceBag = require("ServiceBag")
 local SecretsService = {}
 SecretsService.ServiceName = "SecretsService"
 
-function SecretsService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type SecretsData = {
+	encrypted: { number },
+	signature: { number },
+}
+
+export type SecretsService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_gameDataStoreService: any,
+		_permissionsService: any,
+		_publicKey: any,
+		_privateKey: any,
+		_warningRequired: boolean,
+		_remoteFunction: RemoteFunction,
+		_substorePromise: any,
+	},
+	{} :: typeof({ __index = SecretsService })
+))
+
+function SecretsService.Init(self: SecretsService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -43,7 +63,7 @@ end
 
 	@param seed number
 ]=]
-function SecretsService:SetPublicKeySeed(seed: number): ()
+function SecretsService.SetPublicKeySeed(self: SecretsService, seed: number): ()
 	assert(type(seed) == "number", "Bad seed")
 
 	local private, public = EllipticCurveCryptography.keypair(seed or EllipticCurveCryptography.random.random())
@@ -55,7 +75,7 @@ end
 --[=[
 	Starts the secret service. Should be done via [ServiceBag].
 ]=]
-function SecretsService:Start()
+function SecretsService.Start(self: SecretsService): ()
 	self._remoteFunction = GetRemoteFunction(SecretsServiceConstants.REMOTE_FUNCTION_NAME)
 	self._remoteFunction.OnServerInvoke = function(...)
 		return self:_handleServerInvoke(...)
@@ -68,7 +88,7 @@ end
 	@param secretKey string
 	@return Promise<string>
 ]=]
-function SecretsService:PromiseSecret(secretKey: string): Promise.Promise<string | Secret>
+function SecretsService.PromiseSecret(self: SecretsService, secretKey: string): Promise.Promise<string | Secret>
 	assert(type(secretKey) == "string", "Bad secretKey")
 
 	local found
@@ -79,14 +99,14 @@ function SecretsService:PromiseSecret(secretKey: string): Promise.Promise<string
 		return Promise.resolved(found)
 	end
 
-	return self:_promiseSubstore():Then(function(substore)
-		return self._maid:GivePromise(substore:Load(secretKey)):Then(function(data)
+	return (self :: any):_promiseSubstore():Then(function(substore)
+		return (self._maid :: any):GivePromise(substore:Load(secretKey)):Then(function(data)
 			if type(data) ~= "table" then
 				return Promise.resolved(nil)
 			else
 				local ok, value = self:_decrypt(data)
 				if ok then
-					return value
+					return value :: any
 				else
 					return Promise.rejected(value or "Failed to decrypt result")
 				end
@@ -100,9 +120,9 @@ end
 
 	@return @return Promise<{string}>
 ]=]
-function SecretsService:PromiseAllSecrets(): Promise.Promise<{ string }>
-	return self:_promiseSubstore():Then(function(substore)
-		return self._maid:GivePromise(substore:LoadAll()):Then(function(secretsList)
+function SecretsService.PromiseAllSecrets(self: SecretsService): Promise.Promise<{ string }>
+	return (self :: any):_promiseSubstore():Then(function(substore)
+		return (self._maid :: any):GivePromise(substore:LoadAll()):Then(function(secretsList)
 			local secretMap = {}
 
 			for key, secretData in secretsList do
@@ -125,13 +145,13 @@ end
 	@param secretKey string
 	@return Observable<string>
 ]=]
-function SecretsService:ObserveSecret(secretKey: string): Observable.Observable<string>
+function SecretsService.ObserveSecret(self: SecretsService, secretKey: string): Observable.Observable<string>
 	assert(type(secretKey) == "string", "Bad secretKey")
 
-	return Observable.new(function(sub)
-		local maid = Maid.new()
+	return Observable.new(function(sub: any)
+		local maid: any = Maid.new()
 
-		maid:GivePromise(self:_promiseSubstore():Then(function(substore)
+		maid:GivePromise((self :: any):_promiseSubstore():Then(function(substore)
 			maid:GivePromise(
 				substore:Observe(secretKey):Subscribe(function(data)
 					if type(data) ~= "table" then
@@ -153,7 +173,7 @@ function SecretsService:ObserveSecret(secretKey: string): Observable.Observable<
 		end))
 
 		return maid
-	end)
+	end) :: any
 end
 
 --[=[
@@ -161,10 +181,10 @@ end
 
 	@param secretKey string
 ]=]
-function SecretsService:DeleteSecret(secretKey: string): Promise.Promise<()>
+function SecretsService.DeleteSecret(self: SecretsService, secretKey: string): Promise.Promise<()>
 	assert(type(secretKey) == "string", "Bad secretKey")
 
-	return self:_promiseSubstore():Then(function(substore)
+	return (self :: any):_promiseSubstore():Then(function(substore)
 		substore:Delete(secretKey)
 	end)
 end
@@ -175,20 +195,19 @@ end
 	@param secretKey string
 	@param value string
 ]=]
-function SecretsService:StoreSecret(secretKey: string, value: string): ()
+function SecretsService.StoreSecret(self: SecretsService, secretKey: string, value: string): ()
 	assert(type(secretKey) == "string", "Bad secretKey")
 	assert(type(value) == "string", "Bad value")
 
-	self:_warnAboutNoPublicKeyStoredInSourceCode()
-
-	self:_promiseSubstore():Then(function(substore)
+	self:_warnAboutNoPublicKeyStoredInSourceCode();
+	(self :: any):_promiseSubstore():Then(function(substore)
 		local encrypted = EllipticCurveCryptography.encrypt(value, self._privateKey)
 		local signature = EllipticCurveCryptography.sign(self._privateKey, value)
 
 		-- TODO: Encode byte array in more efficient structure for JSON
 		local toStore = {
-			encrypted = setmetatable(table.clone(encrypted), nil), -- remove metatable
-			signature = setmetatable(table.clone(signature), nil), -- remove metatable
+			encrypted = setmetatable(table.clone(encrypted) :: any, nil), -- remove metatable
+			signature = setmetatable(table.clone(signature) :: any, nil), -- remove metatable
 		}
 
 		substore:Store(secretKey, toStore)
@@ -200,8 +219,8 @@ end
 
 	@return Promise<()>
 ]=]
-function SecretsService:ClearAllSecrets(): Promise.Promise<()>
-	return self:_promiseSubstore():Then(function(substore)
+function SecretsService.ClearAllSecrets(self: SecretsService): Promise.Promise<()>
+	return (self :: any):_promiseSubstore():Then(function(substore)
 		return substore:Wipe()
 	end)
 end
@@ -211,20 +230,20 @@ end
 
 	@return Promise<{ string }>
 ]=]
-function SecretsService:PromiseSecretKeyNamesList(): Promise.Promise<{ string }>
-	return self:_promiseSubstore():Then(function(substore)
+function SecretsService.PromiseSecretKeyNamesList(self: SecretsService): Promise.Promise<{ string }>
+	return (self :: any):_promiseSubstore():Then(function(substore)
 		return substore:PromiseKeyList()
 	end)
 end
 
-function SecretsService:_warnAboutNoPublicKeyStoredInSourceCode(): ()
+function SecretsService._warnAboutNoPublicKeyStoredInSourceCode(self: SecretsService): ()
 	if self._warningRequired then
 		self._warningRequired = false
 		warn(self:_getInstructions())
 	end
 end
 
-function SecretsService:_getInstructions(): string
+function SecretsService._getInstructions(_self: SecretsService): string
 	local instructions =
 		"[SecretsService.StoreSecret] - Security - Current private key seed is GameId, which is guessable."
 	instructions = instructions .. "\n\tTIP: This is only applicable if we're storing API keys for use in here."
@@ -236,12 +255,7 @@ function SecretsService:_getInstructions(): string
 	return instructions
 end
 
-export type SecretsData = {
-	encrypted: { number },
-	signature: { number },
-}
-
-function SecretsService:_decrypt(data: SecretsData): (boolean?, string)
+function SecretsService._decrypt(self: SecretsService, data: SecretsData): (boolean?, string)
 	assert(type(data) == "table", "Bad data")
 	assert(data.encrypted ~= nil, "Bad data.encrypted")
 	assert(data.signature ~= nil, "Bad data.signature")
@@ -259,15 +273,15 @@ function SecretsService:_decrypt(data: SecretsData): (boolean?, string)
 	return true, tostring(decrypted)
 end
 
-function SecretsService:_handleServerInvoke(player: Player, request)
+function SecretsService._handleServerInvoke(self: SecretsService, player: Player, request: any): any
 	if request == SecretsServiceConstants.REQUEST_SECRET_KEY_NAMES_LIST then
-		return self:_promiseHandleList(player):Yield()
+		return (self :: any):_promiseHandleList(player):Yield()
 	else
 		error(string.format("Bad request %q", tostring(request)))
 	end
 end
 
-function SecretsService:_promiseHandleList(player: Player)
+function SecretsService._promiseHandleList(self: SecretsService, player: Player): any
 	return self._permissionsService
 		:PromisePermissionProvider()
 		:Then(function(provider)
@@ -282,7 +296,7 @@ function SecretsService:_promiseHandleList(player: Player)
 		end)
 end
 
-function SecretsService:_promiseSubstore()
+function SecretsService._promiseSubstore(self: SecretsService): any
 	if self._substorePromise then
 		return self._substorePromise
 	end
@@ -296,7 +310,7 @@ function SecretsService:_promiseSubstore()
 	return self._substorePromise
 end
 
-function SecretsService:Destroy()
+function SecretsService.Destroy(self: SecretsService): ()
 	self._maid:DoCleaning()
 end
 

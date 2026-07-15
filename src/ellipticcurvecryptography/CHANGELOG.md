@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.12.0...@quenty/ellipticcurvecryptography@1.13.0) (2026-07-14)
+
+### Features
+
+- **ellipticcurvecryptography:** convert package to --!strict ([48e814a](https://github.com/Quenty/NevermoreEngine/commit/48e814abb5f01f54627dd4f827a287fb98f405bc))
+
 # [1.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.11.0...@quenty/ellipticcurvecryptography@1.12.0) (2026-05-29)
 
 **Note:** Version bump only for package @quenty/ellipticcurvecryptography

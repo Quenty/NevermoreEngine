@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.20.1...@quenty/marketplaceutils@11.21.0) (2026-07-14)
+
+### Features
+
+- **marketplaceutils:** convert package to --!strict ([13671ec](https://github.com/Quenty/NevermoreEngine/commit/13671ec4352370464ddce6f2e0ee8bf815e8e01f))
+
 ## [11.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.20.0...@quenty/marketplaceutils@11.20.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/marketplaceutils

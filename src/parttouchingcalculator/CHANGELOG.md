@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/parttouchingcalculator@14.41.0...@quenty/parttouchingcalculator@14.42.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/parttouchingcalculator
+
+# [14.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/parttouchingcalculator@14.40.1...@quenty/parttouchingcalculator@14.41.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **parttouchingcalculator:** convert package to --!strict ([0ec2478](https://github.com/Quenty/NevermoreEngine/commit/0ec2478e41ad9c4eeae331cbc00485e10e2ef8fe))
+
 ## [14.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/parttouchingcalculator@14.40.0...@quenty/parttouchingcalculator@14.40.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/parttouchingcalculator

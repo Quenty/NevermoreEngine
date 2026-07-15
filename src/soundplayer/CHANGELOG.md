@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.42.0...@quenty/soundplayer@7.43.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.41.0...@quenty/soundplayer@7.42.0) (2026-07-14)
+
+### Features
+
+- **soundplayer:** convert package to --!strict ([a71d19c](https://github.com/Quenty/NevermoreEngine/commit/a71d19c3d408204ccd2b2a04a91516b2bdb21ba6))
+
 # [7.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.40.1...@quenty/soundplayer@7.41.0) (2026-07-12)
 
 ### Bug Fixes

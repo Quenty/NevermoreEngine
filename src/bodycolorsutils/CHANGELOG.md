@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.36.1...@quenty/bodycolorsutils@7.37.0) (2026-07-14)
+
+### Features
+
+- **bodycolorsutils:** convert package to --!strict ([0f48453](https://github.com/Quenty/NevermoreEngine/commit/0f48453fa448b6c59930da9e20e859745d34d744))
+
 ## [7.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@7.36.0...@quenty/bodycolorsutils@7.36.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/bodycolorsutils

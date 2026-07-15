@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Provides ScreenGuis with a given display order for easy use.
 
@@ -40,22 +40,33 @@ local GenericScreenGuiProvider = {}
 GenericScreenGuiProvider.ClassName = "GenericScreenGuiProvider"
 GenericScreenGuiProvider.ServiceName = "GenericScreenGuiProvider"
 
+export type GenericScreenGuiProvider = typeof(setmetatable(
+	{} :: {
+		_defaultOrders: { [string]: number },
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_screenGuiService: any,
+		_orderValues: { [string]: ValueObject.ValueObject<number> },
+	},
+	{} :: typeof({ __index = GenericScreenGuiProvider })
+))
+
 --[=[
 	Constructs a new screen gui provider.
 	@param orders { [string]: number }
 	@return GenericScreenGuiProvider
 ]=]
-function GenericScreenGuiProvider.new(orders: { [string]: number })
+function GenericScreenGuiProvider.new(orders: { [string]: number }): GenericScreenGuiProvider
 	assert(type(orders) == "table", "Bad orders")
 
-	local self = setmetatable({
+	local self: GenericScreenGuiProvider = setmetatable({
 		_defaultOrders = orders,
-	}, GenericScreenGuiProvider)
+	}, GenericScreenGuiProvider) :: any
 
 	return self
 end
 
-function GenericScreenGuiProvider:Init(serviceBag: ServiceBag.ServiceBag)
+function GenericScreenGuiProvider.Init(self: GenericScreenGuiProvider, serviceBag: ServiceBag.ServiceBag): ()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -67,9 +78,9 @@ function GenericScreenGuiProvider:Init(serviceBag: ServiceBag.ServiceBag)
 	end
 end
 
-function GenericScreenGuiProvider:Start() end
+function GenericScreenGuiProvider.Start(_self: GenericScreenGuiProvider): () end
 
-function GenericScreenGuiProvider:__index(index)
+(GenericScreenGuiProvider :: any).__index = function(self, index)
 	if GenericScreenGuiProvider[index] then
 		return GenericScreenGuiProvider[index]
 	elseif index == "_screenGuiService" or index == "_serviceBag" or index == "_maid" then
@@ -79,7 +90,7 @@ function GenericScreenGuiProvider:__index(index)
 	end
 end
 
-function GenericScreenGuiProvider:__newindex(index, value)
+(GenericScreenGuiProvider :: any).__newindex = function(self, index, value)
 	if index == "_screenGuiService" or index == "_serviceBag" or index == "_maid" then
 		rawset(self, index, value)
 	else
@@ -92,7 +103,10 @@ end
 	@param orderName string
 	@return Observable<Instance>
 ]=]
-function GenericScreenGuiProvider:ObserveScreenGui(orderName: string): Observable.Observable<Instance>
+function GenericScreenGuiProvider.ObserveScreenGui(
+	self: GenericScreenGuiProvider,
+	orderName: string
+): Observable.Observable<Instance>
 	assert(type(orderName) == "string", "Bad orderName")
 
 	if not RunService:IsRunning() then
@@ -115,7 +129,7 @@ function GenericScreenGuiProvider:ObserveScreenGui(orderName: string): Observabl
 	})
 end
 
-function GenericScreenGuiProvider:SetDisplayOrder(orderName, order)
+function GenericScreenGuiProvider.SetDisplayOrder(self: GenericScreenGuiProvider, orderName: string, order: any)
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 
@@ -127,7 +141,7 @@ end
 	@param orderName string -- Order name of display order
 	@return ScreenGui
 ]=]
-function GenericScreenGuiProvider:Get(orderName: string): ScreenGui
+function GenericScreenGuiProvider.Get(self: GenericScreenGuiProvider, orderName: string): ScreenGui
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 
@@ -140,7 +154,7 @@ function GenericScreenGuiProvider:Get(orderName: string): ScreenGui
 		frame.BackgroundTransparency = 1
 		frame.BackgroundColor3 = Color3.new(1, 1, 1)
 		frame.Parent = self:_getScreenGuiService():GetGuiParent()
-		return frame
+		return (frame :: any) :: ScreenGui
 	end
 
 	local screenGui = Instance.new("ScreenGui")
@@ -160,7 +174,7 @@ end
 	@param orderName string -- Order name of display order
 	@return number
 ]=]
-function GenericScreenGuiProvider:GetDisplayOrder(orderName: string): number
+function GenericScreenGuiProvider.GetDisplayOrder(self: GenericScreenGuiProvider, orderName: string): number
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 
@@ -172,14 +186,17 @@ end
 	@param orderName string -- Order name of display order
 	@return Observable<number>
 ]=]
-function GenericScreenGuiProvider:ObserveDisplayOrder(orderName: string): Observable.Observable<number>
+function GenericScreenGuiProvider.ObserveDisplayOrder(
+	self: GenericScreenGuiProvider,
+	orderName: string
+): Observable.Observable<number>
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 
 	return self._orderValues[orderName]:Observe()
 end
 
-function GenericScreenGuiProvider:_assertOrderExists(orderName: string): ()
+function GenericScreenGuiProvider._assertOrderExists(self: GenericScreenGuiProvider, orderName: string): ()
 	assert(type(orderName) == "string", "Bad orderName")
 
 	if not self._defaultOrders[orderName] then
@@ -187,7 +204,7 @@ function GenericScreenGuiProvider:_assertOrderExists(orderName: string): ()
 	end
 end
 
-function GenericScreenGuiProvider:_getScreenGuiService()
+function GenericScreenGuiProvider._getScreenGuiService(self: GenericScreenGuiProvider): any
 	if self._screenGuiService then
 		return self._screenGuiService
 	end
@@ -203,7 +220,7 @@ function GenericScreenGuiProvider:_getScreenGuiService()
 	error("Not initialized")
 end
 
-function GenericScreenGuiProvider:Destroy()
+function GenericScreenGuiProvider.Destroy(self: GenericScreenGuiProvider): ()
 	self._maid:DoCleaning()
 end
 

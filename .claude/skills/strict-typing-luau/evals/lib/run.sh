@@ -8,7 +8,7 @@
 #   run.sh place <id>     Worker loop primitive: put the pre-conversion (nonstrict) INPUT at
 #                         the file's real path so an agent can convert it in place.
 #   run.sh score <id>     Score whatever is at the file's path now, vs gold.
-#   run.sh restore <id>   Restore the file's package back to main (undo place/convert).
+#   run.sh restore <id>   Restore the file's package back to its committed state (HEAD, undo place/convert).
 #   run.sh plan <pkg>     Print the INTRA-PACKAGE conversion order (dependency-first, cyclic
 #                         clusters collapsed). The orchestration artifact a driver walks. Add
 #                         `json` for machine-readable output. Intra-package only — see plan.js.
@@ -27,6 +27,9 @@
 #                         single-file workers over-orchestrating). One claude -p call.
 #   run.sh parallelism    Judge the execution STRATEGY — fan out parallel sub-agents for a package
 #                         (> ~3 files) vs sequential for a single file/handful. One claude -p call.
+#   run.sh routing        Mechanical (no-LLM, ~instant): assert plan.js's model heuristic routes a
+#                         ServiceBag service (.ServiceName, no setmetatable) to opus, a plain util to
+#                         sonnet. Reads plan.js's real predicate so it can't drift. See routing.js.
 #
 # Files are laid down at PACKAGE granularity (src/<pkg>) because a package is the unit of
 # type-consistency: a cyclic file scored against nonstrict siblings would error falsely.
@@ -42,8 +45,10 @@ pkg_of(){ echo "$1" | cut -d/ -f1-3 | sed -E 's#(src/[^/]+)/.*#\1#'; }
 place_gold(){ local p; p="$(field "$1" path)"; git checkout "$(field "$1" gold)"  -- "$(pkg_of "$p")"; }
 place_in()  { local p; p="$(field "$1" path)"; git checkout "$(field "$1" input)" -- "$(pkg_of "$p")"; }
 restore()   { local p pk; p="$(field "$1" path)"; pk="$(pkg_of "$p")";
-              # back to main, unstage, and remove gold-only NEW files (e.g. a new *Types.lua)
-              git checkout main -- "$pk" 2>/dev/null || true
+              # back to the current branch's committed state (HEAD), unstage, and remove gold-only
+              # NEW files (e.g. a new *Types.lua). HEAD not main: on main they're identical, but on a
+              # feature branch `git checkout main` would revert the branch's own work in this package.
+              git checkout HEAD -- "$pk" 2>/dev/null || true
               git reset -q HEAD -- "$pk"; git clean -fdq -- "$pk"; }
 score()     { bash "$HERE/score.sh" "$(field "$1" path)" "$(field "$1" gold)"; }
 
@@ -57,8 +62,9 @@ case "${1:-}" in
   triggers) bash "$HERE/triggers.sh" ;;
   tooling)  bash "$HERE/tooling.sh" ;;
   parallelism) bash "$HERE/parallelism.sh" ;;
+  routing)  node "$HERE/routing.js" ;;
   gold)
-    printf '%-22s %-8s %-6s %-8s %-5s %s\n' CASE POLARITY STRICT ANALYZE ANY VERDICT
+    printf '%-22s %-8s %-6s %-8s %-7s %-5s %-7s %s\n' CASE POLARITY STRICT ANALYZE SELENE ANY RAW VERDICT
     fails=0
     for id in $(ids); do
       pol="$(field "$id" polarity)"
@@ -67,15 +73,20 @@ case "${1:-}" in
       restore "$id"
       strict="$(node -e "console.log(JSON.parse(process.argv[1]).strict)" "$row")"
       errs="$(node -e "console.log(JSON.parse(process.argv[1]).analyze_errors)" "$row")"
+      selene="$(node -e "console.log(JSON.parse(process.argv[1]).selene)" "$row")"
       any="$(node -e "console.log(JSON.parse(process.argv[1]).any)" "$row")"
-      # gold expectation: positive => strict & 0 errors; negative => nonstrict (reverted)
+      raw="$(node -e "console.log(JSON.parse(process.argv[1]).raw)" "$row")"
+      raw_gold="$(node -e "console.log(JSON.parse(process.argv[1]).raw_gold)" "$row")"
+      # gold expectation: positive => strict & 0 analyze errors & 0 selene findings & no raw-access
+      # regression (raw >= raw_gold, tautological on gold — proves the check doesn't false-positive);
+      # negative => nonstrict (reverted)
       verdict=PASS
       if [ "$pol" = positive ]; then
-        { [ "$strict" = true ] && [ "$errs" -eq 0 ]; } || { verdict=FAIL; fails=$((fails+1)); }
+        { [ "$strict" = true ] && [ "$errs" -eq 0 ] && [ "$selene" -eq 0 ] && [ "$raw" -ge "$raw_gold" ]; } || { verdict=FAIL; fails=$((fails+1)); }
       else
         [ "$strict" = false ] || { verdict=FAIL; fails=$((fails+1)); }
       fi
-      printf '%-22s %-8s %-6s %-8s %-5s %s\n' "$id" "$pol" "$strict" "$errs" "$any" "$verdict"
+      printf '%-22s %-8s %-6s %-8s %-7s %-5s %-7s %s\n' "$id" "$pol" "$strict" "$errs" "$selene" "$any" "$raw/$raw_gold" "$verdict"
     done
     echo
     [ "$fails" -eq 0 ] && echo "GOLD SMOKE TEST: all cases passed" || { echo "GOLD SMOKE TEST: $fails FAILED"; exit 1; }

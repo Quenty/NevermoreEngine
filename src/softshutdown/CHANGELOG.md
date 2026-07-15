@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.49.0...@quenty/softshutdown@9.50.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.48.1...@quenty/softshutdown@9.49.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **softshutdown:** convert package to --!strict ([91f7bfa](https://github.com/Quenty/NevermoreEngine/commit/91f7bfa6518461761599d492d83cd3dc6ecb0d4f))
+
 ## [9.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.48.0...@quenty/softshutdown@9.48.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/softshutdown

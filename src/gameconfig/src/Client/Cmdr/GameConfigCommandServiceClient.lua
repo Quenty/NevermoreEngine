@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class GameConfigCommandServiceClient
 ]=]
@@ -14,8 +14,21 @@ local ServiceBag = require("ServiceBag")
 local GameConfigCommandServiceClient = {}
 GameConfigCommandServiceClient.ServiceName = "GameConfigCommandServiceClient"
 
-function GameConfigCommandServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type GameConfigCommandServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_cmdrService: any,
+		_gameConfigServiceClient: any,
+	},
+	{} :: typeof({ __index = GameConfigCommandServiceClient })
+))
+
+function GameConfigCommandServiceClient.Init(
+	self: GameConfigCommandServiceClient,
+	serviceBag: ServiceBag.ServiceBag
+): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -23,11 +36,11 @@ function GameConfigCommandServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	self._gameConfigServiceClient = self._serviceBag:GetService(require("GameConfigServiceClient"))
 end
 
-function GameConfigCommandServiceClient:Start()
+function GameConfigCommandServiceClient.Start(self: GameConfigCommandServiceClient): ()
 	self:_setupCommands()
 end
 
-function GameConfigCommandServiceClient:_setupCommands()
+function GameConfigCommandServiceClient._setupCommands(self: GameConfigCommandServiceClient): ()
 	local picker = self._gameConfigServiceClient:GetConfigPicker()
 	-- TODO: Determine production vs. staging and set cmdr annotation accordingly.
 
@@ -37,10 +50,10 @@ function GameConfigCommandServiceClient:_setupCommands()
 		local latestConfig = RxStateStackUtils.createStateStack(picker:ObserveActiveConfigsBrio())
 		self._maid:GiveTask(latestConfig)
 
-		self._maid:GiveTask(latestConfig
+		self._maid:GiveTask((latestConfig :: any)
 			:Observe()
 			:Pipe({
-				Rx.switchMap(function(config)
+				Rx.switchMap(function(config): any
 					if config then
 						return config:ObserveConfigName()
 					else
@@ -59,7 +72,7 @@ function GameConfigCommandServiceClient:_setupCommands()
 	end)
 end
 
-function GameConfigCommandServiceClient:Destroy()
+function GameConfigCommandServiceClient.Destroy(self: GameConfigCommandServiceClient): ()
 	self._maid:DoCleaning()
 end
 

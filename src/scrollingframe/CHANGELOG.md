@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.18.1...@quenty/scrollingframe@12.19.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **scrollingframe:** convert package to --!strict ([bd5908a](https://github.com/Quenty/NevermoreEngine/commit/bd5908afefafaaa181cb1d72a85176d1838adcfa))
+
 ## [12.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scrollingframe@12.18.0...@quenty/scrollingframe@12.18.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/scrollingframe

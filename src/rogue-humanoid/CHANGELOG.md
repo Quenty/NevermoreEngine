@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.50.0...@quenty/rogue-humanoid@10.51.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+# [10.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.49.1...@quenty/rogue-humanoid@10.50.0) (2026-07-14)
+
+### Bug Fixes
+
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+
+### Features
+
+- **rogue-humanoid:** convert package to --!strict ([5d67ebc](https://github.com/Quenty/NevermoreEngine/commit/5d67ebc6fe7f3ce2b3d643fb1bbb39b33b670ee8))
+
 ## [10.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.49.0...@quenty/rogue-humanoid@10.49.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/rogue-humanoid

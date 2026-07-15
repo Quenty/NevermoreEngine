@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.44.0...@quenty/inputkeymaputils@14.45.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.43.1...@quenty/inputkeymaputils@14.44.0) (2026-07-14)
+
+### Bug Fixes
+
+- **inputkeymaputils:** supply [@type](https://github.com/type) value so moonwave-extractor passes ([8f6d832](https://github.com/Quenty/NevermoreEngine/commit/8f6d8324ac613a39e31cdb317b9fdd796749fe01))
+
+### Features
+
+- **inputkeymaputils:** convert package to --!strict ([6eb30a3](https://github.com/Quenty/NevermoreEngine/commit/6eb30a34f76212e77326a5aa3310f3d6579e0de2))
+
 ## [14.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.43.0...@quenty/inputkeymaputils@14.43.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/inputkeymaputils

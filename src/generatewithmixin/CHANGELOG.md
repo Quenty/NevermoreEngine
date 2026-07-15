@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.11.1...@quenty/generatewithmixin@11.12.0) (2026-07-14)
+
+### Features
+
+- **generatewithmixin:** convert package to --!strict ([c19e081](https://github.com/Quenty/NevermoreEngine/commit/c19e0812e24c719e433622aac883511d909cf1fb))
+
 ## [11.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/generatewithmixin@11.11.0...@quenty/generatewithmixin@11.11.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/generatewithmixin

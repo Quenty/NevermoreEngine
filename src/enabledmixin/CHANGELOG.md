@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.26.1...@quenty/enabledmixin@11.27.0) (2026-07-14)
+
+### Features
+
+- **enabledmixin:** convert package to --!strict ([221965e](https://github.com/Quenty/NevermoreEngine/commit/221965ea0255cbd8fede74f7bc0cfe72d7ce8041))
+
 ## [11.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.26.0...@quenty/enabledmixin@11.26.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/enabledmixin

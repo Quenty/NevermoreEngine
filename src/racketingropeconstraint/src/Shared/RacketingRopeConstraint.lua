@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Tries to racket a rope constraint back down to a reasonable length. Use [RopeConstraint.WinchEnabled]
 	@class RacketingRopeConstraint
@@ -10,6 +10,7 @@ local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local Binder = require("Binder")
+local Observable = require("Observable")
 local OverriddenProperty = require("OverriddenProperty")
 local Promise = require("Promise")
 local RacketingRopeConstraintInterface = require("RacketingRopeConstraintInterface")
@@ -23,8 +24,26 @@ local RacketingRopeConstraint = setmetatable({}, BaseObject)
 RacketingRopeConstraint.ClassName = "RacketingRopeConstraint"
 RacketingRopeConstraint.__index = RacketingRopeConstraint
 
-function RacketingRopeConstraint.new(ropeConstraint: RopeConstraint, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(ropeConstraint), RacketingRopeConstraint)
+export type RacketingRopeConstraint =
+	typeof(setmetatable(
+		{} :: {
+			_obj: RopeConstraint,
+			_serviceBag: ServiceBag.ServiceBag,
+			_tieRealmService: any,
+			_smallestDistance: number,
+			_targetDistance: number,
+			_isConstrained: ValueObject.ValueObject<boolean>,
+			_overriddenLength: OverriddenProperty.OverriddenProperty<number>?,
+		},
+		{} :: typeof({ __index = RacketingRopeConstraint })
+	))
+	& BaseObject.BaseObject
+
+function RacketingRopeConstraint.new(
+	ropeConstraint: RopeConstraint,
+	serviceBag: ServiceBag.ServiceBag
+): RacketingRopeConstraint
+	local self: RacketingRopeConstraint = setmetatable(BaseObject.new(ropeConstraint) :: any, RacketingRopeConstraint)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
@@ -57,7 +76,7 @@ function RacketingRopeConstraint.new(ropeConstraint: RopeConstraint, serviceBag:
 	return self
 end
 
-function RacketingRopeConstraint:PromiseConstrained()
+function RacketingRopeConstraint.PromiseConstrained(self: RacketingRopeConstraint): Promise.Promise<()>
 	if self:_isValid() and self:_queryIsConstrained() then
 		return Promise.resolved()
 	end
@@ -71,19 +90,19 @@ function RacketingRopeConstraint:PromiseConstrained()
 	return promise
 end
 
-function RacketingRopeConstraint:ObserveIsConstrained()
+function RacketingRopeConstraint.ObserveIsConstrained(self: RacketingRopeConstraint): Observable.Observable<boolean>
 	return self._isConstrained:Observe()
 end
 
-function RacketingRopeConstraint:_queryIsConstrained()
+function RacketingRopeConstraint._queryIsConstrained(self: RacketingRopeConstraint): boolean
 	return self._obj.Length <= self._targetDistance
 end
 
-function RacketingRopeConstraint:_isValid()
-	return self._obj.Attachment0 and self._obj.Attachment1 and self._obj.Enabled
+function RacketingRopeConstraint._isValid(self: RacketingRopeConstraint): boolean
+	return self._obj.Attachment0 ~= nil and self._obj.Attachment1 ~= nil and self._obj.Enabled
 end
 
-function RacketingRopeConstraint:_handleActiveChanged()
+function RacketingRopeConstraint._handleActiveChanged(self: RacketingRopeConstraint): ()
 	if self:_isValid() then
 		if self._maid._updateHeartbeat and self._maid._updateHeartbeat.Connected then
 			return
@@ -105,10 +124,13 @@ function RacketingRopeConstraint:_handleActiveChanged()
 	end
 end
 
-function RacketingRopeConstraint:_update()
+function RacketingRopeConstraint._update(self: RacketingRopeConstraint): ()
 	assert(self:_isValid(), "Not valid state")
 
-	local currentDistance = (self._obj.Attachment0.WorldPosition - self._obj.Attachment1.WorldPosition).magnitude
+	local attachment0 = assert(self._obj.Attachment0, "No Attachment0")
+	local attachment1 = assert(self._obj.Attachment1, "No Attachment1")
+
+	local currentDistance = (attachment0.WorldPosition - attachment1.WorldPosition).Magnitude
 	self._smallestDistance = math.clamp(currentDistance, self._targetDistance, self._smallestDistance)
 
 	self:_setLength(self._smallestDistance)
@@ -129,7 +151,7 @@ function RacketingRopeConstraint:_update()
 	end
 end
 
-function RacketingRopeConstraint:_setLength(length)
+function RacketingRopeConstraint._setLength(self: RacketingRopeConstraint, length: number): ()
 	if self._overriddenLength then
 		self._overriddenLength:Set(length)
 	else
@@ -137,4 +159,4 @@ function RacketingRopeConstraint:_setLength(length)
 	end
 end
 
-return Binder.new("RacketingRopeConstraint", RacketingRopeConstraint)
+return Binder.new("RacketingRopeConstraint", RacketingRopeConstraint :: any) :: Binder.Binder<RacketingRopeConstraint>

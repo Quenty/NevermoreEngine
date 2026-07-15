@@ -28,7 +28,7 @@ export type GameConfig =
 	& GameConfigBase.GameConfigBase
 
 function GameConfig.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): GameConfig
-	local self: GameConfig = setmetatable(GameConfigBase.new(obj) :: any, GameConfig)
+	local self: GameConfig = setmetatable(GameConfigBase.new(obj :: Folder) :: any, GameConfig)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/markdownrender@2.4.5...@quenty/markdownrender@2.5.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **markdownrender:** convert package to --!strict ([0184224](https://github.com/Quenty/NevermoreEngine/commit/0184224d2b6f79a28778eb8648fb45d5d7c67d1b))
+
 ## [2.4.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/markdownrender@2.4.4...@quenty/markdownrender@2.4.5) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/markdownrender

@@ -1,11 +1,11 @@
---!nonstrict
+--!strict
 --[=[
 	@class SnackbarOptionUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local t = require("t")
+local t: any = require("t")
 
 local SnackbarOptionUtils = {}
 

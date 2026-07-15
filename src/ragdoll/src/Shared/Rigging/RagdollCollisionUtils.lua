@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RagdollCollisionUtils
 ]=]
@@ -12,7 +12,7 @@ local RxR15Utils = require("RxR15Utils")
 
 local RagdollCollisionUtils = {}
 
-local R15_NO_COLLIDES = {
+local R15_NO_COLLIDES: { { string } } = {
 	{ "LowerTorso", "LeftUpperArm" },
 	{ "LeftUpperArm", "LeftHand" },
 
@@ -57,7 +57,7 @@ local R15_NO_COLLIDES = {
 	{ "HumanoidRootPart", "LowerTorso" },
 }
 
-local R15_PARTS = {
+local R15_PARTS: { string } = {
 	"LeftUpperArm",
 	"RightUpperArm",
 	"LeftLowerArm",
@@ -75,7 +75,7 @@ local R15_PARTS = {
 	"LowerTorso",
 }
 
-local R6_NO_COLLIDES = {
+local R6_NO_COLLIDES: { { string } } = {
 	{ "Left Leg", "Right Leg" },
 	{ "Head", "Right Arm" },
 	{ "Head", "Left Arm" },
@@ -87,7 +87,7 @@ local R6_NO_COLLIDES = {
 	{ "HumanoidRootPart", "Left Arm" },
 }
 
-function RagdollCollisionUtils.getCollisionData(rigType: Enum.HumanoidRigType)
+function RagdollCollisionUtils.getCollisionData(rigType: Enum.HumanoidRigType): { { string } }
 	if rigType == Enum.HumanoidRigType.R15 then
 		return R15_NO_COLLIDES
 	elseif rigType == Enum.HumanoidRigType.R6 then
@@ -97,11 +97,11 @@ function RagdollCollisionUtils.getCollisionData(rigType: Enum.HumanoidRigType)
 	end
 end
 
-function RagdollCollisionUtils.preventCollisionAmongOthers(character: Model, part: BasePart)
+function RagdollCollisionUtils.preventCollisionAmongOthers(character: Model, part: BasePart): Maid.Maid
 	local topMaid = Maid.new()
 
 	for _, partName in R15_PARTS do
-		topMaid:GiveTask(RxR15Utils.observeCharacterPartBrio(character, partName):Subscribe(function(brio)
+		topMaid:GiveTask((RxR15Utils.observeCharacterPartBrio(character, partName) :: any):Subscribe(function(brio: any)
 			if brio:IsDead() then
 				return
 			end
@@ -121,7 +121,7 @@ function RagdollCollisionUtils.preventCollisionAmongOthers(character: Model, par
 	return topMaid
 end
 
-function RagdollCollisionUtils.ensureNoCollides(character: Model, rigType: Enum.HumanoidRigType)
+function RagdollCollisionUtils.ensureNoCollides(character: Model, rigType: Enum.HumanoidRigType): Maid.Maid
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
@@ -133,9 +133,9 @@ function RagdollCollisionUtils.ensureNoCollides(character: Model, rigType: Enum.
 		local observable = RxBrioUtils.flatCombineLatest({
 			part0 = RxR15Utils.observeCharacterPartBrio(character, part0Name),
 			part1 = RxR15Utils.observeCharacterPartBrio(character, part1Name),
-		})
+		}) :: any
 
-		topMaid:GiveTask(observable:Subscribe(function(state)
+		topMaid:GiveTask(observable:Subscribe(function(state: any)
 			if state.part0 and state.part1 then
 				local maid = Maid.new()
 

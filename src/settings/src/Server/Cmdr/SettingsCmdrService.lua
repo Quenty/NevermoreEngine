@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Provides commands involving player settings
 
@@ -15,8 +15,18 @@ local SettingsCmdrUtils = require("SettingsCmdrUtils")
 local SettingsCmdrService = {}
 SettingsCmdrService.ServiceName = "SettingsCmdrService"
 
-function SettingsCmdrService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type SettingsCmdrService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_cmdrService: any,
+		_settingService: any,
+	},
+	{} :: typeof({ __index = SettingsCmdrService })
+))
+
+function SettingsCmdrService.Init(self: SettingsCmdrService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -24,11 +34,11 @@ function SettingsCmdrService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._settingService = self._serviceBag:GetService(require("SettingsService"))
 end
 
-function SettingsCmdrService:Start()
+function SettingsCmdrService.Start(self: SettingsCmdrService): ()
 	self:_setupCommands()
 end
 
-function SettingsCmdrService:_setupCommands()
+function SettingsCmdrService._setupCommands(self: SettingsCmdrService): ()
 	self._maid:GivePromise(self._cmdrService:PromiseCmdr()):Then(function(cmdr)
 		SettingsCmdrUtils.registerSettingDefinition(cmdr, self._serviceBag)
 	end)
@@ -65,7 +75,7 @@ function SettingsCmdrService:_setupCommands()
 	end)
 end
 
-function SettingsCmdrService:Destroy()
+function SettingsCmdrService.Destroy(self: SettingsCmdrService): ()
 	self._maid:DoCleaning()
 end
 

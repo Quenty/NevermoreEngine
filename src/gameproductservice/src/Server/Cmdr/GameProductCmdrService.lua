@@ -1,13 +1,11 @@
---!nonstrict
+--!strict
 --[=[
 	@class GameProductCmdrService
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local CmdrService = require("CmdrService")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
-local GameProductService = require("GameProductService")
 local PlayerUtils = require("PlayerUtils")
 local ServiceBag = require("ServiceBag")
 
@@ -17,13 +15,13 @@ GameProductCmdrService.ServiceName = "GameProductCmdrService"
 export type GameProductCmdrService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
-		_cmdrService: CmdrService.CmdrService,
-		_gameProductService: GameProductService.GameProductService,
+		_cmdrService: any,
+		_gameProductService: any,
 	},
 	{} :: typeof({ __index = GameProductCmdrService })
 ))
 
-function GameProductCmdrService.Init(self: GameProductCmdrService, serviceBag: ServiceBag.ServiceBag)
+function GameProductCmdrService.Init(self: GameProductCmdrService, serviceBag: ServiceBag.ServiceBag): ()
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -31,11 +29,11 @@ function GameProductCmdrService.Init(self: GameProductCmdrService, serviceBag: S
 	self._gameProductService = self._serviceBag:GetService(require("GameProductService"))
 end
 
-function GameProductCmdrService.Start(self: GameProductCmdrService)
+function GameProductCmdrService.Start(self: GameProductCmdrService): ()
 	self:_registerCommands()
 end
 
-function GameProductCmdrService._registerCommands(self: GameProductCmdrService)
+function GameProductCmdrService._registerCommands(self: GameProductCmdrService): ()
 	self._cmdrService:RegisterCommand({
 		Name = "prompt-product",
 		Description = "Prompts the player to make a product purchase game-product-service.",

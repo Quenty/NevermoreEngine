@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SpawnCmdrService
 ]=]
@@ -10,8 +10,17 @@ local ServiceBag = require("ServiceBag")
 local SpawnCmdrService = {}
 SpawnCmdrService.ServiceName = "SpawnCmdrService"
 
-function SpawnCmdrService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type SpawnCmdrService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_spawnService: any,
+		_cmdrService: any,
+	},
+	{} :: typeof({ __index = SpawnCmdrService })
+))
+
+function SpawnCmdrService.Init(self: SpawnCmdrService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._spawnService = self._serviceBag:GetService((require :: any)("SpawnService"))

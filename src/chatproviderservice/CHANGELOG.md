@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.54.0...@quenty/chatproviderservice@9.55.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.53.0...@quenty/chatproviderservice@9.54.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **chatproviderservice:** convert package to --!strict ([3edae04](https://github.com/Quenty/NevermoreEngine/commit/3edae04e44a9bcda2cf43367719d67fb08769fa4))
+
 # [9.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.52.2...@quenty/chatproviderservice@9.53.0) (2026-06-24)
 
 ### Features

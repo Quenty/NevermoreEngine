@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Loads cmdr on the client. See [CmdrService] for the server equivalent.
 
@@ -23,19 +23,29 @@ local promiseChild = require("promiseChild")
 local CmdrServiceClient = {}
 CmdrServiceClient.ServiceName = "CmdrServiceClient"
 
+export type CmdrServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_permissionServiceClient: any,
+		_cmdrPromise: Promise.Promise<any>?,
+	},
+	{} :: typeof({ __index = CmdrServiceClient })
+))
+
 --[=[
 	Starts the cmdr service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function CmdrServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function CmdrServiceClient.Init(self: CmdrServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	self._permissionServiceClient = self._serviceBag:GetService(PermissionServiceClient)
 
 	self:PromiseCmdr():Then(function(cmdr)
-		cmdr.Registry:RegisterHook("BeforeRun", function(context)
+		cmdr.Registry:RegisterHook("BeforeRun", function(context): string?
 			-- allow!
 			if context.Executor == nil then
 				return nil
@@ -78,26 +88,23 @@ end
 --[=[
 	Starts the service. Should be done via [ServiceBag].
 ]=]
-function CmdrServiceClient:Start()
-	assert(self._serviceBag, "Not initialized")
-
-	self._maid
-		:GivePromise(PromiseUtils.all({
-			self:PromiseCmdr(),
-			self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider()):Then(function(provider)
-				return provider:PromiseIsAdmin()
-			end),
-		}))
-		:Then(function(cmdr, isAdmin)
-			if isAdmin then
-				self:_setBindings(cmdr)
-			else
-				cmdr:SetActivationKeys({})
-			end
-		end)
+function CmdrServiceClient.Start(self: CmdrServiceClient): ()
+	assert(self._serviceBag, "Not initialized");
+	(self._maid:GivePromise(PromiseUtils.all({
+		self:PromiseCmdr(),
+		self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider()):Then(function(provider)
+			return provider:PromiseIsAdmin()
+		end),
+	})) :: any):Then(function(cmdr: any, isAdmin: any)
+		if isAdmin then
+			self:_setBindings(cmdr)
+		else
+			cmdr:SetActivationKeys({})
+		end
+	end)
 end
 
-function CmdrServiceClient:_setBindings(cmdr)
+function CmdrServiceClient._setBindings(self: CmdrServiceClient, cmdr: any): ()
 	cmdr:SetActivationUnlocksMouse(true)
 	cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
 
@@ -119,7 +126,7 @@ end
 	Retrieves the cmdr for the client.
 	@return Promise<CmdrClient>
 ]=]
-function CmdrServiceClient:PromiseCmdr()
+function CmdrServiceClient.PromiseCmdr(self: CmdrServiceClient): Promise.Promise<any>
 	assert(self._serviceBag, "Not initialized")
 
 	if self._cmdrPromise then
@@ -132,20 +139,21 @@ function CmdrServiceClient:PromiseCmdr()
 		timeout = 1e10
 	end
 
-	self._cmdrPromise = self._maid
+	local cmdrPromise = self._maid
 		:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient", timeout))
 		:Then(function(cmdClient)
-			return Promise.spawn(function(resolve, _reject)
+			return (Promise :: any).spawn(function(resolve: any, _reject: any)
 				-- Requiring cmdr can yield
-				return resolve(require(cmdClient))
+				return resolve((require :: any)(cmdClient))
 			end)
 		end)
-	self._maid:GiveTask(self._cmdrPromise)
+	self._cmdrPromise = cmdrPromise
+	self._maid:GiveTask(cmdrPromise)
 
-	return self._cmdrPromise
+	return cmdrPromise
 end
 
-function CmdrServiceClient:Destroy()
+function CmdrServiceClient.Destroy(self: CmdrServiceClient): ()
 	self._maid:DoCleaning()
 end
 

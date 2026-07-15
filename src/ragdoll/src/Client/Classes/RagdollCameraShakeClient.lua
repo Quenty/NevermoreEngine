@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RagdollCameraShakeClient
 ]=]
@@ -27,8 +27,20 @@ local RagdollCameraShakeClient = setmetatable({}, BaseObject)
 RagdollCameraShakeClient.ClassName = "RagdollCameraShakeClient"
 RagdollCameraShakeClient.__index = RagdollCameraShakeClient
 
-function RagdollCameraShakeClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(humanoid), RagdollCameraShakeClient)
+export type RagdollCameraShakeClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_ragdollServiceClient: any,
+			_cameraStackService: any,
+			_ragdollBinder: any,
+		},
+		{} :: typeof({ __index = RagdollCameraShakeClient })
+	))
+	& BaseObject.BaseObject
+
+function RagdollCameraShakeClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): RagdollCameraShakeClient
+	local self: RagdollCameraShakeClient = setmetatable(BaseObject.new(humanoid) :: any, RagdollCameraShakeClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._ragdollServiceClient = self._serviceBag:GetService(RagdollServiceClient)
@@ -36,13 +48,13 @@ function RagdollCameraShakeClient.new(humanoid: Humanoid, serviceBag: ServiceBag
 	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
 
 	-- While we've got a charater and we're ragdolled
-	self._maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacterBrio(self._obj)
+	self._maid:GiveTask((RxCharacterUtils.observeIsOfLocalCharacterBrio(self._obj :: any) :: any)
 		:Pipe({
 			RxBrioUtils.switchMapBrio(function()
 				return self._ragdollBinder:ObserveBrio(self._obj)
 			end),
 		})
-		:Subscribe(function(brio)
+		:Subscribe(function(brio: any)
 			if brio:IsDead() then
 				return
 			end
@@ -61,7 +73,7 @@ function RagdollCameraShakeClient.new(humanoid: Humanoid, serviceBag: ServiceBag
 	return self
 end
 
-function RagdollCameraShakeClient:_setupCameraShake(impulseCamera)
+function RagdollCameraShakeClient._setupCameraShake(self: RagdollCameraShakeClient, impulseCamera: any): Maid.Maid
 	local topMaid = Maid.new()
 
 	-- TODO: Move out of this open source module
@@ -69,20 +81,20 @@ function RagdollCameraShakeClient:_setupCameraShake(impulseCamera)
 	-- Use the upper torso instead of the head because the upper torso shakes a lot less so
 	-- we get a stronger response to full character movement.
 
-	topMaid:GiveTask(RxInstanceUtils.observePropertyBrio(self._obj, "Parent", function(character)
+	topMaid:GiveTask((RxInstanceUtils.observePropertyBrio(self._obj :: any, "Parent", function(character)
 		return character ~= nil
-	end)
+	end) :: any)
 		:Pipe({
 			RxBrioUtils.switchMapBrio(function(character)
 				return RxBrioUtils.flatCombineLatestBrio({
 					upperTorso = RxR15Utils.observeCharacterPartBrio(character, "UpperTorso"),
 					head = RxR15Utils.observeCharacterPartBrio(character, "Head"),
-				}, function(state)
+				}, function(state: any)
 					return state.upperTorso and state.head
 				end)
 			end),
 		})
-		:Subscribe(function(brio)
+		:Subscribe(function(brio: any)
 			if brio:IsDead() then
 				return
 			end
@@ -132,7 +144,7 @@ function RagdollCameraShakeClient:_setupCameraShake(impulseCamera)
 	return topMaid
 end
 
-function RagdollCameraShakeClient:_setupHapticFeedback()
+function RagdollCameraShakeClient._setupHapticFeedback(_self: RagdollCameraShakeClient): Maid.Maid
 	local maid = Maid.new()
 
 	local lastInputType = UserInputService:GetLastInputType()
@@ -149,11 +161,11 @@ function RagdollCameraShakeClient:_setupHapticFeedback()
 		HapticFeedbackUtils.setSmallVibration(lastInputType, 0)
 
 		maid:GiveTask(function()
-			HapticFeedbackUtils.smallVibrate(lastInputType)
+			(HapticFeedbackUtils :: any).smallVibrate(lastInputType)
 		end)
 	end))
 
 	return maid
 end
 
-return Binder.new("RagdollCameraShake", RagdollCameraShakeClient)
+return Binder.new("RagdollCameraShake", RagdollCameraShakeClient :: any) :: Binder.Binder<RagdollCameraShakeClient>

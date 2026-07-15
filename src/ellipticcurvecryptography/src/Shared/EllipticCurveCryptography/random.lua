@@ -1,15 +1,16 @@
---!nonstrict
+--!strict
 --!native
 
 -- random.lua - Random Byte Generator
 local sha256 = require(script.Parent.sha256)
 
-local entropy = ""
-local accumulator, accumulator_len = {}, 0
+local entropy: string = ""
+local accumulator: { string } = {}
+local accumulator_len: number = 0
 
 local random = {}
 
-local function feed(data)
+local function feed(data: any)
 	accumulator_len += 1
 	accumulator[accumulator_len] = tostring(data or "")
 end
@@ -21,7 +22,7 @@ local function digest()
 	accumulator_len = 0
 end
 
-local entropyInitialized = false
+local entropyInitialized: boolean = false
 
 -- Defer this initialization until requested
 local function ensureEntropyInit()
@@ -55,7 +56,7 @@ local function ensureEntropyInit()
 	-- TODO: Suppress this warning
 	warn(
 		string.format(
-			"[EllipticCurveCryptography.random] - Generating entropy took %s ms",
+			"[EllipticCurveCryptography.random] - Generating entropy took %g ms",
 			1000 * (os.clock() - startTime)
 		)
 	)
@@ -72,7 +73,7 @@ function random.save()
 	entropy = tostring(sha256.digest(entropy))
 end
 
-function random.seed(data)
+function random.seed(data: any)
 	ensureEntropyInit()
 
 	feed("seed")
@@ -83,7 +84,7 @@ function random.seed(data)
 	random.save()
 end
 
-function random.random()
+function random.random(): any
 	ensureEntropyInit()
 
 	feed("random")

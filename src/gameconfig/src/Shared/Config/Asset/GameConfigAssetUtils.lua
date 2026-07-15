@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class GameConfigAssetUtils
 ]=]
@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AttributeUtils = require("AttributeUtils")
 local BadgeUtils = require("BadgeUtils")
+local Binder = require("Binder")
 local GameConfigAssetConstants = require("GameConfigAssetConstants")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local MarketplaceServiceCache = require("MarketplaceServiceCache")
@@ -24,7 +25,7 @@ local GameConfigAssetUtils = {}
 	@return Instance
 ]=]
 function GameConfigAssetUtils.create(
-	binder,
+	binder: Binder.Binder<any>, -- GameConfigAssetBase.GameConfigAssetBase (require cycle: GameConfigAssetBase requires this module)
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	assetKey: string,
 	assetId: number
@@ -56,7 +57,8 @@ function GameConfigAssetUtils.promiseCloudDataForAssetType(
 	assert(type(assetType) == "string", "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
-	local marketplaceServiceCache = serviceBag:GetService(MarketplaceServiceCache)
+	local marketplaceServiceCache: MarketplaceServiceCache.MarketplaceServiceCache =
+		serviceBag:GetService(MarketplaceServiceCache) :: any
 
 	-- We really hope this stuff is cached
 	if assetType == GameConfigAssetTypes.BADGE then

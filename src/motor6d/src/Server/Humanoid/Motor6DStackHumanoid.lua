@@ -46,4 +46,4 @@ function Motor6DStackHumanoid.new(humanoid: Humanoid, serviceBag: ServiceBag.Ser
 	return self
 end
 
-return PlayerHumanoidBinder.new("Motor6DStackHumanoid", Motor6DStackHumanoid)
+return PlayerHumanoidBinder.new("Motor6DStackHumanoid", Motor6DStackHumanoid :: any)

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SoftShutdownServiceClient
 ]=]
@@ -22,6 +22,19 @@ local ValueObject = require("ValueObject")
 local SoftShutdownServiceClient = {}
 SoftShutdownServiceClient.ServiceName = "SoftShutdownServiceClient"
 
+export type SoftShutdownServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_translator: any,
+		_isLobby: AttributeValue.AttributeValue<boolean>,
+		_isUpdating: AttributeValue.AttributeValue<boolean>,
+		_localTeleportDataSaysIsLobby: ValueObject.ValueObject<boolean>,
+		_isArrivingAfterShutdown: ValueObject.ValueObject<boolean>,
+	},
+	{} :: typeof({ __index = SoftShutdownServiceClient })
+))
+
 local DISABLE_CORE_GUI_TYPES = {
 	Enum.CoreGuiType.PlayerList,
 	Enum.CoreGuiType.Health,
@@ -31,8 +44,8 @@ local DISABLE_CORE_GUI_TYPES = {
 	Enum.CoreGuiType.All,
 }
 
-function SoftShutdownServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function SoftShutdownServiceClient.Init(self: SoftShutdownServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
@@ -58,7 +71,7 @@ function SoftShutdownServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 		isShuttingDown = self._isUpdating:Observe(),
 		localTeleportDataSaysIsLobby = self._localTeleportDataSaysIsLobby:Observe(),
 		isArrivingAfterShutdown = self._isArrivingAfterShutdown:Observe(),
-	}):Subscribe(function(state)
+	}):Subscribe(function(state: any)
 		if state.isLobby or state.localTeleportDataSaysIsLobby then
 			self._maid._shutdownUI = nil
 			if not self._maid._lobbyUI then
@@ -95,7 +108,7 @@ function SoftShutdownServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	end))
 end
 
-function SoftShutdownServiceClient:_queryIsArrivingAfterShutdown()
+function SoftShutdownServiceClient._queryIsArrivingAfterShutdown(_self: SoftShutdownServiceClient): boolean
 	local data = TeleportService:GetLocalPlayerTeleportData()
 	if type(data) == "table" and data.isSoftShutdownArrivingIntoUpdatedServer then
 		return true
@@ -104,7 +117,7 @@ function SoftShutdownServiceClient:_queryIsArrivingAfterShutdown()
 	end
 end
 
-function SoftShutdownServiceClient:_queryLocalTeleportInfo()
+function SoftShutdownServiceClient._queryLocalTeleportInfo(_self: SoftShutdownServiceClient): boolean
 	local data = TeleportService:GetLocalPlayerTeleportData()
 	if type(data) == "table" and data.isSoftShutdownReserveServer then
 		return true
@@ -113,7 +126,12 @@ function SoftShutdownServiceClient:_queryLocalTeleportInfo()
 	end
 end
 
-function SoftShutdownServiceClient:_showSoftShutdownUI(titleKey, subtitleKey, doNotAnimateShow)
+function SoftShutdownServiceClient._showSoftShutdownUI(
+	self: SoftShutdownServiceClient,
+	titleKey: string,
+	subtitleKey: string,
+	doNotAnimateShow: boolean?
+): (Maid.Maid, ScreenGui)
 	local maid = Maid.new()
 
 	local renderMaid = Maid.new()
@@ -152,19 +170,24 @@ function SoftShutdownServiceClient:_showSoftShutdownUI(titleKey, subtitleKey, do
 
 	softShutdownUI:Show(doNotAnimateShow)
 
-	softShutdownUI.Gui.Parent = screenGui
+	local gui = softShutdownUI.Gui :: GuiObject
+	gui.Parent = screenGui
 
 	return maid, screenGui
 end
 
-function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
+function SoftShutdownServiceClient._hideCoreGuiUI(
+	_self: SoftShutdownServiceClient,
+	maid: Maid.Maid,
+	ignoreScreenGui: ScreenGui
+): ()
 	maid:GiveTask(CoreGuiEnabler:PushDisable("ModalEnabled"))
 
 	local playerGui = PlayerGuiUtils.getPlayerGui()
 
-	local enabledScreenGuis = {}
+	local enabledScreenGuis: { [ScreenGui]: ScreenGui } = {}
 
-	local function handleChild(child)
+	local function handleChild(child: Instance)
 		if child:IsA("ScreenGui") and child ~= ignoreScreenGui and child.Enabled then
 			enabledScreenGuis[child] = child
 			child.Enabled = false
@@ -180,7 +203,7 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 	end))
 
 	maid:GiveTask(playerGui.ChildRemoved:Connect(function(child)
-		enabledScreenGuis[child] = nil
+		enabledScreenGuis[child :: ScreenGui] = nil
 	end))
 
 	maid:GiveTask(function()
@@ -194,7 +217,7 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 	end
 end
 
-function SoftShutdownServiceClient:Destroy()
+function SoftShutdownServiceClient.Destroy(self: SoftShutdownServiceClient): ()
 	self._maid:DoCleaning()
 end
 

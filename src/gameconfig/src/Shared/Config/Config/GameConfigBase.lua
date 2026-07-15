@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class GameConfigBase
 ]=]
@@ -68,7 +68,7 @@ function GameConfigBase.new(folder: Folder): GameConfigBase
 	self._assetTypeToAssetIdMappings = {}
 
 	-- Setup assetType mappings to key mapping observations
-	for _, assetType in GameConfigAssetTypes do
+	for _, assetType in GameConfigAssetTypes:GetMap() do
 		self._assetTypeToAssetKeyMappings[assetType] = ObservableMapSet.new()
 		self._maid:GiveTask(self._assetTypeToAssetKeyMappings[assetType])
 
@@ -226,10 +226,10 @@ function GameConfigBase.InitObservation(self: GameConfigBase)
 	self._setupObservation = true
 
 	local observables = {}
-	for _, assetType in GameConfigAssetTypes do
+	for _, assetType in GameConfigAssetTypes:GetMap() do
 		table.insert(
 			observables,
-			self:_observeAssetFolderBrio(assetType):Pipe({
+			self:_observeAssetFolderBrio(assetType :: GameConfigAssetType):Pipe({
 				RxBrioUtils.switchMapBrio(function(folder)
 					return RxBinderUtils.observeBoundChildClassBrio(self:GetGameConfigAssetBinder(), folder)
 				end),

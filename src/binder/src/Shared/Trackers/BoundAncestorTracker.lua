@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Tracks a parent bound to a specific binder
 	@class BoundAncestorTracker
@@ -7,12 +7,24 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Binder = require("Binder")
 local BinderUtils = require("BinderUtils")
 local ValueObject = require("ValueObject")
 
 local BoundAncestorTracker = setmetatable({}, BaseObject)
 BoundAncestorTracker.ClassName = "BoundAncestorTracker"
 BoundAncestorTracker.__index = BoundAncestorTracker
+
+export type BoundAncestorTracker<T> =
+	typeof(setmetatable(
+		{} :: {
+			_child: Instance,
+			_binder: Binder.Binder<T>,
+			Class: ValueObject.ValueObject<T?>,
+		},
+		{} :: typeof({ __index = BoundAncestorTracker })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 Constructs a new BoundAncestorTracker
@@ -21,8 +33,8 @@ Constructs a new BoundAncestorTracker
 @param child Instance
 @return BoundAncestorTracker
 ]=]
-function BoundAncestorTracker.new(binder, child)
-	local self = setmetatable(BaseObject.new(), BoundAncestorTracker)
+function BoundAncestorTracker.new<T>(binder: Binder.Binder<T>, child: Instance): BoundAncestorTracker<T>
+	local self: BoundAncestorTracker<T> = setmetatable(BaseObject.new() :: any, BoundAncestorTracker)
 
 	self._child = child or error("No child")
 	self._binder = binder or error("No binder")
@@ -33,7 +45,7 @@ function BoundAncestorTracker.new(binder, child)
 	@within BoundAncestorTracker
 	Bound value
 ]=]
-	self.Class = ValueObject.new()
+	self.Class = ValueObject.new() :: ValueObject.ValueObject<T?>
 	self._maid:GiveTask(self.Class)
 
 	-- Handle instance removing
@@ -58,7 +70,7 @@ function BoundAncestorTracker.new(binder, child)
 	return self
 end
 
-function BoundAncestorTracker:_update()
+function BoundAncestorTracker._update<T>(self: BoundAncestorTracker<T>): ()
 	local parent = self._child.Parent
 	if not parent then
 		self.Class.Value = nil

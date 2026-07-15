@@ -1,6 +1,6 @@
 {
   "name": "@quenty/racketingropeconstraint",
-  "version": "12.43.1",
+  "version": "12.44.0",
   "description": "Tries to racket a rope constraint back down to a reasonable length",
   "keywords": [
     "Roblox",
@@ -35,6 +35,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/overriddenproperty": "workspace:*",
     "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/tie": "workspace:*",
     "@quenty/valueobject": "workspace:*"

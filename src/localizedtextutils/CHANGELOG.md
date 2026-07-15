@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.30.1...@quenty/localizedtextutils@12.31.0) (2026-07-14)
+
+### Features
+
+- **localizedtextutils:** convert package to --!strict ([7b4144d](https://github.com/Quenty/NevermoreEngine/commit/7b4144da5e2b1597c8b23844119f9077b1e63235))
+
 ## [12.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@12.30.0...@quenty/localizedtextutils@12.30.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/localizedtextutils

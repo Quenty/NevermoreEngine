@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Torso resources for IK
 	@class TorsoIKBase
@@ -35,19 +35,12 @@ export type TorsoIKBase =
 			_target: Vector3?,
 
 			Pointed: Signal.Signal<Vector3?>,
-
-			Update: (self: TorsoIKBase) -> (),
-			UpdateTransformOnly: (self: TorsoIKBase) -> (),
-			Point: (self: TorsoIKBase, position: Vector3?) -> (),
-			GetAimPosition: (self: TorsoIKBase) -> Vector3?,
-			GetTargetUpperTorsoCFrame: (self: TorsoIKBase) -> CFrame?,
-			GetUpperTorsoCFrame: (self: TorsoIKBase) -> CFrame?,
 		},
 		{} :: typeof({ __index = TorsoIKBase })
 	))
 	& BaseObject.BaseObject
 
-function TorsoIKBase.new(humanoid: Humanoid)
+function TorsoIKBase.new(humanoid: Humanoid): TorsoIKBase
 	local self: TorsoIKBase = setmetatable(BaseObject.new() :: any, TorsoIKBase)
 
 	self._humanoid = humanoid or error("No humanoid")
@@ -112,7 +105,7 @@ function TorsoIKBase.new(humanoid: Humanoid)
 	return self
 end
 
-function TorsoIKBase:UpdateTransformOnly()
+function TorsoIKBase.UpdateTransformOnly(self: TorsoIKBase): ()
 	if not self._relWaistTransform or not self._relNeckTransform then
 		return
 	end
@@ -120,8 +113,8 @@ function TorsoIKBase:UpdateTransformOnly()
 		return
 	end
 
-	local waist = self._resources:Get("Waist")
-	local neck = self._resources:Get("Neck")
+	local waist = self._resources:Get("Waist") :: Motor6D
+	local neck = self._resources:Get("Neck") :: Motor6D
 
 	-- Waist:
 	local currentWaistTransform = waist.Transform
@@ -140,10 +133,10 @@ function TorsoIKBase:UpdateTransformOnly()
 	self._lastNeckTransform = neck.Transform -- NOTE: Have to read this from the weld, otherwise comparison is off
 end
 
-function TorsoIKBase:_recordLastValidTransforms()
+function TorsoIKBase._recordLastValidTransforms(self: TorsoIKBase): ()
 	assert(self._resources:IsReady())
-	local waist = self._resources:Get("Waist")
-	local neck = self._resources:Get("Neck")
+	local waist = self._resources:Get("Waist") :: Motor6D
+	local neck = self._resources:Get("Neck") :: Motor6D
 
 	self._lastValidWaistTransform = waist.Transform
 	self._lastWaistTransform = waist.Transform
@@ -152,18 +145,18 @@ function TorsoIKBase:_recordLastValidTransforms()
 	self._lastNeckTransform = neck.Transform
 end
 
-function TorsoIKBase:Update()
+function TorsoIKBase.Update(self: TorsoIKBase): ()
 	self._relWaistTransform = CFrame.Angles(0, self._waistY.p, 0) * CFrame.Angles(self._waistZ.p, 0, 0)
 	self._relNeckTransform = CFrame.Angles(0, self._headY.p, 0) * CFrame.Angles(self._headZ.p, 0, 0)
 
 	self:UpdateTransformOnly()
 end
 
-function TorsoIKBase:GetAimPosition()
+function TorsoIKBase.GetAimPosition(self: TorsoIKBase): Vector3?
 	return self._target -- May return nil
 end
 
-function TorsoIKBase:Point(position)
+function TorsoIKBase.Point(self: TorsoIKBase, position: Vector3?): ()
 	self._target = position
 
 	if self._resources:IsReady() then
@@ -173,11 +166,11 @@ function TorsoIKBase:Point(position)
 	self.Pointed:Fire(self._target)
 end
 
-function TorsoIKBase:_updatePoint()
+function TorsoIKBase._updatePoint(self: TorsoIKBase): ()
 	assert(self._resources:IsReady())
 
 	if self._target then
-		local rootPart = self._resources:Get("RootPart")
+		local rootPart = self._resources:Get("RootPart") :: BasePart
 		local waistY, headY, waistZ, headZ = TorsoIKUtils.getTargetAngles(rootPart, self._target)
 
 		self._waistY.t = waistY
@@ -196,27 +189,27 @@ end
 	Helper method used for other IK
 	@return CFrame?
 ]=]
-function TorsoIKBase:GetTargetUpperTorsoCFrame()
+function TorsoIKBase.GetTargetUpperTorsoCFrame(self: TorsoIKBase): CFrame?
 	if not self._resources:IsReady() then
 		return nil
 	end
 
-	local waist = self._resources:Get("Waist")
-	local lowerTorso = self._resources:Get("LowerTorso")
+	local waist = self._resources:Get("Waist") :: Motor6D
+	local lowerTorso = self._resources:Get("LowerTorso") :: BasePart
 
 	local estimated_transform = self._lastValidWaistTransform
 		* CFrame.Angles(0, self._waistY.t, 0)
 		* CFrame.Angles(self._waistZ.t, 0, 0)
 
-	return lowerTorso.CFrame * waist.C0 * estimated_transform * waist.C1:inverse()
+	return lowerTorso.CFrame * waist.C0 * estimated_transform * waist.C1:Inverse()
 end
 
-function TorsoIKBase:GetUpperTorsoCFrame()
+function TorsoIKBase.GetUpperTorsoCFrame(self: TorsoIKBase): CFrame?
 	if not self._resources:IsReady() then
 		return nil
 	end
 
-	local lowerTorso = self._resources:Get("LowerTorso")
+	local lowerTorso = self._resources:Get("LowerTorso") :: BasePart
 
 	return lowerTorso.CFrame
 end

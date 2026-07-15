@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.50.0...@quenty/humanoidspeed@12.51.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.49.1...@quenty/humanoidspeed@12.50.0) (2026-07-14)
+
+### Features
+
+- **humanoidspeed:** convert package to --!strict ([b37508d](https://github.com/Quenty/NevermoreEngine/commit/b37508dde19f2d8191e28a1e4d44bf09ffe63319))
+
 ## [12.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.49.0...@quenty/humanoidspeed@12.49.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/humanoidspeed

@@ -1,10 +1,12 @@
---!nonstrict
+--!strict
 --[=[
 	@class InputKeyMapServiceClient
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
+local InputKeyMapList = require("InputKeyMapList")
+local InputKeyMapRegistryServiceShared = require("InputKeyMapRegistryServiceShared")
 local Maid = require("Maid")
 local PseudoLocalize = require("PseudoLocalize")
 local ServiceBag = require("ServiceBag")
@@ -12,8 +14,18 @@ local ServiceBag = require("ServiceBag")
 local InputKeyMapServiceClient = {}
 InputKeyMapServiceClient.ServiceName = "InputKeyMapServiceClient"
 
-function InputKeyMapServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type InputKeyMapServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_translator: any,
+		_registryService: InputKeyMapRegistryServiceShared.InputKeyMapRegistryServiceShared,
+	},
+	{} :: typeof({ __index = InputKeyMapServiceClient })
+))
+
+function InputKeyMapServiceClient.Init(self: InputKeyMapServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -22,16 +34,20 @@ function InputKeyMapServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 
 	-- Internal
 	self._translator = self._serviceBag:GetService(require("InputKeyMapTranslator"))
-	self._registryService = self._serviceBag:GetService(require("InputKeyMapRegistryServiceShared"))
+	self._registryService = self._serviceBag:GetService(require("InputKeyMapRegistryServiceShared")) :: any
 
 	self:_ensureLocalizationEntries()
 end
 
-function InputKeyMapServiceClient:FindInputKeyMapList(providerName, listName)
+function InputKeyMapServiceClient.FindInputKeyMapList(
+	self: InputKeyMapServiceClient,
+	providerName: string,
+	listName: string
+): InputKeyMapList.InputKeyMapList?
 	return self._registryService:FindInputKeyMapList(providerName, listName)
 end
 
-function InputKeyMapServiceClient:_ensureLocalizationEntries()
+function InputKeyMapServiceClient._ensureLocalizationEntries(self: InputKeyMapServiceClient): ()
 	self._maid:GiveTask(self._registryService:ObserveInputKeyMapListsBrio():Subscribe(function(brio)
 		if brio:IsDead() then
 			return
@@ -59,7 +75,7 @@ function InputKeyMapServiceClient:_ensureLocalizationEntries()
 	end))
 end
 
-function InputKeyMapServiceClient:Destroy()
+function InputKeyMapServiceClient.Destroy(self: InputKeyMapServiceClient): ()
 	self._maid:DoCleaning()
 end
 

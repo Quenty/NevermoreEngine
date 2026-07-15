@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.39.1...@quenty/genericscreenguiprovider@13.40.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **genericscreenguiprovider:** convert package to --!strict ([4228844](https://github.com/Quenty/NevermoreEngine/commit/422884487c74eba827300a01e64661d39972580a))
+
 ## [13.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.39.0...@quenty/genericscreenguiprovider@13.39.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/genericscreenguiprovider

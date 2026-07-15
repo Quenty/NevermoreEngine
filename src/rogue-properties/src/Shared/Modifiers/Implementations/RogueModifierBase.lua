@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RogueModifierBase
 ]=]
@@ -14,13 +14,26 @@ local RogueModifierBase = setmetatable({}, BaseObject)
 RogueModifierBase.ClassName = "RogueModifierBase"
 RogueModifierBase.__index = RogueModifierBase
 
-function RogueModifierBase.new(obj, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(obj), RogueModifierBase)
+export type RogueModifierBase =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_tieRealmService: any,
+			_data: any,
+			Order: any,
+			Source: any,
+		},
+		{} :: typeof({ __index = RogueModifierBase })
+	))
+	& BaseObject.BaseObject
+
+function RogueModifierBase.new(obj: Instance, serviceBag: ServiceBag.ServiceBag): RogueModifierBase
+	local self: RogueModifierBase = setmetatable(BaseObject.new(obj) :: any, RogueModifierBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
 
-	self._data = RoguePropertyModifierData:Create(self._obj)
+	self._data = (RoguePropertyModifierData :: any):Create(self._obj)
 
 	self.Order = self._data.Order
 	self.Source = self._data.RoguePropertySourceLink
@@ -28,11 +41,11 @@ function RogueModifierBase.new(obj, serviceBag: ServiceBag.ServiceBag)
 	return self
 end
 
-function RogueModifierBase:GetModifiedVersion(_value)
+function RogueModifierBase.GetModifiedVersion(_self: RogueModifierBase, _value: any): any
 	error("Not implemented")
 end
 
-function RogueModifierBase:ObserveModifiedVersion(_value)
+function RogueModifierBase.ObserveModifiedVersion(_self: RogueModifierBase, _value: any): any
 	error("Not implemented")
 end
 
