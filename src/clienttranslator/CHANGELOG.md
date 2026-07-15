@@ -1,21 +1,14 @@
-# v14.39.0 (Wed Jul 15 2026)
-
-#### 🚀 Enhancement
-
-- feat: Localize numbers for new locales [#729](https://github.com/Quenty/NevermoreEngine/pull/729) ([@Quenty](https://github.com/Quenty))
-- feat: More localization support ([@Quenty](https://github.com/Quenty))
-- feat: Localize numbers for new locales ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.38.0...@quenty/clienttranslator@14.39.0) (2026-07-15)
+
+### Features
+
+- Localize numbers for new locales ([1778b49](https://github.com/Quenty/NevermoreEngine/commit/1778b493c04e185517d3a79b5997345e47536705))
+- More localization support ([02f2505](https://github.com/Quenty/NevermoreEngine/commit/02f2505fb1c5073b266bcf126ab131037e8af091))
 
 # [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.37.1...@quenty/clienttranslator@14.38.0) (2026-07-14)
 

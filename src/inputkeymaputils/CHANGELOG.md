@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.44.0...@quenty/inputkeymaputils@14.45.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
 # [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.43.1...@quenty/inputkeymaputils@14.44.0) (2026-07-14)
 
 ### Bug Fixes
