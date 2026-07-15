@@ -1,3 +1,17 @@
+# v12.32.2 (Wed Jul 15 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Fix error messages [#715](https://github.com/Quenty/NevermoreEngine/pull/715) ([@Quenty](https://github.com/Quenty))
+- Merge branch 'main' into users/quenty/fix-error-messages ([@Quenty](https://github.com/Quenty))
+- fix: Fix error messages ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

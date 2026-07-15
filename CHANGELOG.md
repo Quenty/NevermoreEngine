@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/remoting@12.32.2`
+  - fix: Fix error messages [#715](https://github.com/Quenty/NevermoreEngine/pull/715) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 15 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/octree@11.14.2`
   - test(octree): Add unit tests for Octree, OctreeNode, and OctreeRegionUtils [#728](https://github.com/Quenty/NevermoreEngine/pull/728) ([@Quenty](https://github.com/Quenty))
 
