@@ -1,5 +1,18 @@
 # (Wed Jul 15 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/octree@11.14.2`
+  - test(octree): Add unit tests for Octree, OctreeNode, and OctreeRegionUtils [#728](https://github.com/Quenty/NevermoreEngine/pull/728) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 15 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/characterutils@12.33.0`, `@quenty/clienttranslator@14.39.0`, `@quenty/sounds@10.22.0`

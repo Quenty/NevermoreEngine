@@ -1,3 +1,18 @@
+# v11.14.2 (Wed Jul 15 2026)
+
+#### 🐛 Bug Fix
+
+- test(octree): Add unit tests for Octree, OctreeNode, and OctreeRegionUtils [#728](https://github.com/Quenty/NevermoreEngine/pull/728) ([@Quenty](https://github.com/Quenty))
+- fix(octree): Provision test place and fix spec expect calls ([@Quenty](https://github.com/Quenty))
+- Merge branch 'main' into users/quenty/octree-unit-tests ([@Quenty](https://github.com/Quenty))
+- test(octree): Add unit tests for Octree, OctreeNode, and OctreeRegionUtils ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
