@@ -1,19 +1,11 @@
-# v12.51.1 (Wed Jul 15 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/fix-error-messages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.51.0...@quenty/humanoidspeed@12.51.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
 
 # [12.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.50.0...@quenty/humanoidspeed@12.51.0) (2026-07-15)
 

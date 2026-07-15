@@ -1,21 +1,13 @@
-# v12.32.2 (Wed Jul 15 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Fix error messages [#715](https://github.com/Quenty/NevermoreEngine/pull/715) ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/fix-error-messages ([@Quenty](https://github.com/Quenty))
-- fix: Fix error messages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.32.1...@quenty/remoting@12.32.2) (2026-07-15)
+
+### Bug Fixes
+
+- Fix error messages ([8eb1f23](https://github.com/Quenty/NevermoreEngine/commit/8eb1f23ffc77208f71d7b2717c9229ece328439d))
 
 ## [12.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.32.0...@quenty/remoting@12.32.1) (2026-05-30)
 
