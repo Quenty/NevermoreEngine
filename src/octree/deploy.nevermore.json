@@ -2,7 +2,7 @@
   "targets": {
     "test": {
       "universeId": 9716264427,
-      "placeId": 0,
+      "placeId": 97463009412110,
       "project": "test/default.project.json",
       "scriptTemplate": "test/scripts/Server/ServerMain.server.lua"
     }

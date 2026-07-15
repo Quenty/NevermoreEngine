@@ -163,12 +163,12 @@ end)
 
 describe("OctreeRegionUtils.getTopLevelRegionCellIndex", function()
 	it("rounds to the nearest cell", function()
-		expect(select(1, OctreeRegionUtils.getTopLevelRegionCellIndex(MAX_REGION_SIZE, 0, 0, 0))).toBe(0)
-		expect(select(1, OctreeRegionUtils.getTopLevelRegionCellIndex(MAX_REGION_SIZE, 255, 0, 0))).toBe(0)
+		expect((OctreeRegionUtils.getTopLevelRegionCellIndex(MAX_REGION_SIZE, 0, 0, 0))).toBe(0)
+		expect((OctreeRegionUtils.getTopLevelRegionCellIndex(MAX_REGION_SIZE, 255, 0, 0))).toBe(0)
 	end)
 
 	it("rounds up at the half-size boundary", function()
-		expect(select(1, OctreeRegionUtils.getTopLevelRegionCellIndex(MAX_REGION_SIZE, 256, 0, 0))).toBe(1)
+		expect((OctreeRegionUtils.getTopLevelRegionCellIndex(MAX_REGION_SIZE, 256, 0, 0))).toBe(1)
 	end)
 
 	it("handles negative coordinates", function()
