@@ -32,8 +32,9 @@ When you run `nevermore deploy run`:
 
 1. Reads `deploy.nevermore.json` in your current directory and resolves the target you asked for (default: `test`).
 2. Runs `rojo build` on the target's `project` file to produce an `.rbxl` place file in a temp directory.
-3. Uploads the `.rbxl` to the configured `universeId` / `placeId` over Open Cloud.
-4. Saves the new version as a draft. If `--publish` is passed, it is also published as the live version.
+3. Injects deploy metadata (commit, target, timestamp, place/universe IDs) into the built place if it includes the [`nevermore-cli-manifest`](#reading-deploy-metadata-at-runtime) package.
+4. Uploads the `.rbxl` to the configured `universeId` / `placeId` over Open Cloud.
+5. Saves the new version as a draft. If `--publish` is passed, it is also published as the live version.
 
 That's the whole pipeline. There are no deploy hooks or post-processing steps to register.
 
@@ -234,6 +235,29 @@ The `project` field in `deploy.nevermore.json` is ignored when `--place-file` is
 If you want to deploy every game affected by a code change (for example, on every PR), use `nevermore batch deploy` instead. It scans the pnpm workspace for packages with a matching deploy target, uses `pnpm ls --filter` to figure out which ones changed since `origin/main`, and runs them in parallel.
 
 See [Integration Testing → Batch deploy](testing/integration-testing.md#batch-deploy) for the full flag list and CI usage.
+
+## Reading deploy metadata at runtime
+
+`nevermore deploy` and `nevermore batch deploy` can stamp each build with the deployment that produced it — which commit, which target, when, and whether it was published — so the running game can report its own provenance. This is opt-in by package: a place only gets stamped if it depends on the [`nevermore-cli-manifest`](https://github.com/Quenty/NevermoreEngine/tree/main/src/nevermore-cli-manifest) package.
+
+That package ships a `NevermoreCLIManifestUtils` ModuleScript. Between the rojo build and the upload, the CLI finds that module in the built place and writes the metadata onto it as attributes (via a Lune transform, the same way `basePlace` merges work). Because the data lives on the package's own instance, it replicates to clients automatically. If the module isn't present, the deploy proceeds unchanged.
+
+Read it from either the client or the server:
+
+```lua
+local NevermoreCLIManifestUtils = require("NevermoreCLIManifestUtils")
+
+local metadata = NevermoreCLIManifestUtils.getGameMetadata()
+if metadata.deployed then
+	print(string.format("%s @ %s (%s)", metadata.target, metadata.commit, metadata.timestamp))
+else
+	print("Undeployed build (Studio)")
+end
+```
+
+`metadata.deployed` is the source of truth for "is this a real deploy?" — it's only ever `true` when the CLI injected it, so it stays `false` in Studio and in any place that wasn't deployed through the CLI. The full field list (`commit`, `version`, `branch`, `target`, `timestamp`, `published`, `placeId`, `universeId`) is documented in the [package README](https://github.com/Quenty/NevermoreEngine/tree/main/src/nevermore-cli-manifest). Consumers like `GameConfig`, `GameVersionUtils`, and PlayerMetrics read from this module rather than reaching for the raw attributes.
+
+The attribute names the CLI writes (`Commit`, `Version`, `Target`, …) live in two places that must agree: `buildDeployMetadataAttributes` in `tools/nevermore-cli/src/utils/deploy/deploy-metadata.ts` (the write side) and the `ATTRIBUTE` table in `NevermoreCLIManifestUtils.lua` (the read side). The Lune transform itself is generic — it writes whatever keys it's handed — so adding a field is just those two edits. Note place/universe IDs are written as strings on purpose (Lune serializes number attributes as float32, which corrupts large IDs); the reader converts them back with `tonumber`.
 
 ## Common workflows
 
