@@ -1,3 +1,20 @@
+# v4.37.0 (Thu Jul 16 2026)
+
+#### 🚀 Enhancement
+
+- feat(nevermore-claude): add Claude Code plugin with strict-typing-luau skill [#731](https://github.com/Quenty/NevermoreEngine/pull/731) ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-claude): add Claude Code plugin with strict-typing-luau skill ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/nevermore-claude-plugin ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
