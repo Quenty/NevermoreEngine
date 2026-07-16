@@ -180,7 +180,7 @@ export class RateLimiter {
           transportError = err;
         }
 
-        if (response && !_isRetryableStatus(response.status)) {
+        if (response && !_isRetryableResponse(response)) {
           return response;
         }
 
@@ -217,8 +217,25 @@ export class RateLimiter {
   }
 }
 
-function _isRetryableStatus(status: number): boolean {
-  return status === 429 || RETRYABLE_SERVER_ERROR_STATUSES.has(status);
+function _isRetryableResponse(response: Response): boolean {
+  const { status } = response;
+  if (status === 429 || RETRYABLE_SERVER_ERROR_STATUSES.has(status)) {
+    return true;
+  }
+  // 408 Request Timeout is transient by definition.
+  if (status === 408) {
+    return true;
+  }
+  // A large upload occasionally trips an edge/proxy that answers 400 with an
+  // HTML body ("Your browser sent an invalid request") — transient framing
+  // noise, not the API rejecting the payload. A genuine Open Cloud 400 comes
+  // back as a structured JSON error and must NOT be retried, so gate on the
+  // content type: retry a 400 only when it isn't application/json.
+  if (status === 400) {
+    const contentType = response.headers.get('content-type') ?? '';
+    return !contentType.toLowerCase().includes('application/json');
+  }
+  return false;
 }
 
 function _computeWaitSeconds(

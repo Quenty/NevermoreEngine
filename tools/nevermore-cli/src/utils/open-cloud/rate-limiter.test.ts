@@ -197,4 +197,34 @@ describe('RateLimiter', () => {
     expect(response.status).toBe(404);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('retries a transient HTML edge 400 but not a structured JSON API 400', async () => {
+    // A large upload can trip an edge proxy that answers 400 with an HTML body
+    // — transient framing noise we should ride out. A genuine Open Cloud 400 is
+    // a JSON error and must be returned immediately, not retried.
+    vi.useFakeTimers();
+    const limiter = new RateLimiter();
+
+    // Edge 400 (text/html) then success — must retry.
+    fetchMock
+      .mockResolvedValueOnce(makeResponse(400, { 'content-type': 'text/html' }))
+      .mockResolvedValueOnce(makeResponse(200));
+
+    const edge = limiter.fetchAsync('https://apis.roblox.com/cloud/v2/a');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1000); // 2^0 = 1s backoff
+    expect((await edge).status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    fetchMock.mockClear();
+
+    // API 400 (application/json) — must NOT retry.
+    fetchMock.mockResolvedValueOnce(
+      makeResponse(400, { 'content-type': 'application/json' })
+    );
+    const api = await limiter.fetchAsync('https://apis.roblox.com/cloud/v2/b');
+    expect(api.status).toBe(400);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });
