@@ -28,6 +28,16 @@ When a section grows to 10+ items, graduate it to its own doc.
 - **CI annotations**: The `linting.yml` workflow emits GitHub Actions annotations via `nevermore tools post-lint-results`. For the luau-lsp job (which already has pnpm), annotations run in-job. For stylua/selene/moonwave (lightweight Aftman-only jobs), output is uploaded as artifacts and a separate `lint-annotations` job processes them. GitHub caps annotations at 10 per step and 50 per run — the job summary serves as a fallback for large lint failures.
 - **Template CI annotations**: Game and plugin templates use a simpler pattern — every linter job posts annotations inline via `npx @quenty/nevermore-cli tools post-lint-results`. No artifact relay or separate `lint-annotations` job needed, since `setup-node` is sufficient to run `npx` (no pnpm install required in the annotation step).
 
+## Claude Code hooks
+
+Committed Claude Code hooks live in `.claude/settings.json`, backed by scripts in `.claude/hooks/`. They run only for contributors using Claude Code — not for manual `git` usage or CI.
+
+- **stylua auto-format on edit** (`PostToolUse` → `stylua-format.mjs`): after any `.lua`/`.luau` edit, the file is formatted in place with `stylua.toml`.
+- **prettier auto-format on edit** (`PostToolUse` → `prettier-format.mjs`): after editing a `.ts`/`.tsx`/`.js`/`.jsx` file under `tools/`, it is formatted in place, matching `npm run format:ts` (root prettier config, `--ignore-path .gitignore`).
+- **luau type check before push** (`PreToolUse(Bash)` → `luau-lint-before-push.mjs`): a `git push` runs `npm run lint:luau` first and is blocked if it fails. The matcher only fires on a push in command position (start of line or after `;`/`&&`/`||`/`|`/`(`).
+
+The push hook blocks on any non-zero exit from `lint:luau`, including luau-lsp lint warnings like `LocalShadow` — so the tree must stay lint-clean for Claude-driven pushes to succeed.
+
 ## Rojo
 
 - Nevermore uses a custom fork of Rojo that understands symlinks and turns them into ObjectValues. This is required for development but not for consuming packages.

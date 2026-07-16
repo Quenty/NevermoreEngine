@@ -1,4 +1,32 @@
 {
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/stylua-format.mjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/prettier-format.mjs"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/luau-lint-before-push.mjs"
+          }
+        ]
+      }
+    ]
+  },
   "extraKnownMarketplaces": {
     "nevermore": {
       "source": {
