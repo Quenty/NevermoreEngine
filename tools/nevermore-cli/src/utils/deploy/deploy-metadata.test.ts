@@ -1,9 +1,31 @@
 import { describe, it, expect } from 'vitest';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
 import {
   buildDeployMetadataAttributes,
+  packageUsesManifestAsync,
   type GitDeployInfo,
   type DeployPlaceInfo,
 } from './deploy-metadata.js';
+
+async function withPackageJsonAsync(
+  contents: unknown,
+  fn: (dir: string) => Promise<void>
+): Promise<void> {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'manifest-gate-'));
+  try {
+    if (contents !== undefined) {
+      await fs.writeFile(
+        path.join(dir, 'package.json'),
+        JSON.stringify(contents)
+      );
+    }
+    await fn(dir);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+}
 
 const PLACE: DeployPlaceInfo = {
   target: 'integration',
@@ -23,11 +45,14 @@ describe('buildDeployMetadataAttributes', () => {
   });
 
   it('stringifies place/universe IDs so Lune float32 does not corrupt them', () => {
-    const attributes = buildDeployMetadataAttributes({}, {
-      ...PLACE,
-      placeId: 123456789,
-      universeId: 987654321,
-    });
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      {
+        ...PLACE,
+        placeId: 123456789,
+        universeId: 987654321,
+      }
+    );
     // Must be exact strings — as numbers these round to 123456792 / 987654336.
     expect(attributes.PlaceId).toBe('123456789');
     expect(attributes.UniverseId).toBe('987654321');
@@ -58,5 +83,46 @@ describe('buildDeployMetadataAttributes', () => {
       { ...PLACE, published: false }
     );
     expect(attributes.Published).toBe(false);
+  });
+});
+
+describe('packageUsesManifestAsync', () => {
+  it('is true for the manifest package itself', async () => {
+    await withPackageJsonAsync(
+      { name: '@quenty/nevermoreclimanifest' },
+      async (dir) => {
+        expect(await packageUsesManifestAsync(dir)).toBe(true);
+      }
+    );
+  });
+
+  it('is true for a direct dependent', async () => {
+    await withPackageJsonAsync(
+      {
+        name: '@quenty/somepackage',
+        dependencies: { '@quenty/nevermoreclimanifest': 'workspace:*' },
+      },
+      async (dir) => {
+        expect(await packageUsesManifestAsync(dir)).toBe(true);
+      }
+    );
+  });
+
+  it('is false for an unrelated package', async () => {
+    await withPackageJsonAsync(
+      {
+        name: '@quenty/maid',
+        dependencies: { '@quenty/loader': 'workspace:*' },
+      },
+      async (dir) => {
+        expect(await packageUsesManifestAsync(dir)).toBe(false);
+      }
+    );
+  });
+
+  it('is false when there is no package.json', async () => {
+    await withPackageJsonAsync(undefined, async (dir) => {
+      expect(await packageUsesManifestAsync(dir)).toBe(false);
+    });
   });
 });

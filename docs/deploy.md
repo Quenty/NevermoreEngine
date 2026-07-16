@@ -242,6 +242,8 @@ See [Integration Testing → Batch deploy](testing/integration-testing.md#batch-
 
 That package ships a `NevermoreCLIManifestUtils` ModuleScript. Between the rojo build and the upload, the CLI finds that module in the built place and writes the metadata onto it as attributes (via a Lune transform, the same way `basePlace` merges work). Because the data lives on the package's own instance, it replicates to clients automatically. If the module isn't present, the deploy proceeds unchanged.
 
+`nevermore test` and `nevermore batch test` apply the same stamp — but only for packages that ship or directly depend on `nevermore-cli-manifest`, so unrelated packages don't pay for a Lune pass. This is what lets that package's own spec assert the injection actually ran (`getGameMetadata().deployed` is `true`, with a real commit and the `test` target) rather than checking a synthetic fixture. Note the consequence: for those packages, `deployed` is `true` during a test run too, since the test place really was built and uploaded by the CLI.
+
 Read it from either the client or the server:
 
 ```lua

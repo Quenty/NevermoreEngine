@@ -1,10 +1,15 @@
 import { execSync } from 'child_process';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import {
   BuildContext,
   resolvePackagePath,
 } from '@quenty/nevermore-template-helpers';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { type BuiltPlace } from '../build/build.js';
+
+/** npm name of the package that ships the manifest module. */
+export const MANIFEST_PACKAGE_NAME = '@quenty/nevermoreclimanifest';
 
 /**
  * Attribute map written onto the built place's NevermoreCLIManifestUtils module.
@@ -130,4 +135,60 @@ export async function injectDeployMetadataAsync(
     builtPlace: { ...builtPlace, rbxlPath: outputPath },
     cleanupAsync: () => context.cleanupAsync(),
   };
+}
+
+/**
+ * Inject `attributes` by rewriting `rbxlPath` in place. Only safe when the
+ * caller owns the file exclusively (e.g. a per-session test build); deploys use
+ * {@link injectDeployMetadataAsync} instead because they can share one rojo
+ * build across multiple places.
+ */
+export async function injectDeployMetadataInPlaceAsync(
+  rbxlPath: string,
+  attributes: DeployMetadataAttributes
+): Promise<void> {
+  const context = await BuildContext.createAsync({ prefix: 'deploy-meta-' });
+  try {
+    OutputHelper.verbose('Injecting deploy metadata into test build...');
+    // The transform reads the whole input before writing, so input === output
+    // rewrites the file safely.
+    await context.executeLuneTransformScriptAsync(
+      INJECT_SCRIPT_PATH,
+      rbxlPath,
+      rbxlPath,
+      JSON.stringify(attributes)
+    );
+  } finally {
+    await context.cleanupAsync();
+  }
+}
+
+/**
+ * True when the package at `packagePath` ships or directly depends on the
+ * manifest package, so its built place will contain the module to inject into.
+ * Gates injection during tests so unrelated packages don't pay for a Lune pass.
+ */
+export async function packageUsesManifestAsync(
+  packagePath: string
+): Promise<boolean> {
+  try {
+    const raw = await fs.readFile(
+      path.join(packagePath, 'package.json'),
+      'utf-8'
+    );
+    const pkg = JSON.parse(raw) as {
+      name?: string;
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+    };
+    if (pkg.name === MANIFEST_PACKAGE_NAME) {
+      return true;
+    }
+    return Boolean(
+      pkg.dependencies?.[MANIFEST_PACKAGE_NAME] ??
+        pkg.devDependencies?.[MANIFEST_PACKAGE_NAME]
+    );
+  } catch {
+    return false;
+  }
 }
