@@ -1,6 +1,6 @@
 ---
 name: strict-typing-luau
-description: Convert a Nevermore Luau file from --!nonstrict (or untyped/--!nocheck) to --!strict, adding the project's explicit type annotations and fixing every type error the checker reports. Use this whenever the user asks to "strictly type", "add types to", "make strict", "type-annotate", "convert to --!strict", or clean up the typing on a .lua/.luau file in this repo — including when they just select a file with a `--!nonstrict` header and say "type this" or point you at a legacy module. Also use it when a strict file is throwing luau-lsp type errors and the user wants them resolved following Nevermore conventions.
+description: Convert a Luau file (or an entire package) from --!nonstrict (or untyped/--!nocheck) to --!strict, adding the project's explicit type annotations and fixing every type error the checker reports. Use this whenever the user asks to "strictly type", "strict type this package", "add types to", "make strict", "type-annotate", "convert to --!strict", or clean up the typing on a .lua/.luau file — including when they just select a file with a `--!nonstrict` header and say "type this" or point you at a legacy module. Also use it when a strict file is throwing luau-lsp type errors and the user wants them resolved following the project's typing conventions.
 ---
 
 # Strictly typing Luau files
@@ -235,19 +235,24 @@ user tighten later; a run that loosened things silently is not done.
   cyclic clusters to convert together:
 
   ```bash
-  # from the repo root (the script cd's to the repo top itself, so CWD doesn't matter):
-  .claude/skills/strict-typing-luau/evals/lib/run.sh plan src/<package>     # e.g. src/settings
+  nevermore-strict-plan src/<package>     # e.g. src/settings
   ```
+
+  `nevermore-strict-plan` ships in this plugin's `bin/`, so it's on your PATH whenever the plugin
+  is enabled — run it by name from anywhere in the repo (it anchors to the git top level itself).
 
   It defaults to **real mode** (targets the files that aren't `--!strict` yet); convert leaves-first
   in the order it prints. (`--eval-gold` switches it to the harness's gold-bearing view.)
-- **Parallelize at scale.** Files in the same dependency layer of the plan are independent — they
-  don't require each other, so they can convert concurrently. When a package has **more than ~3
-  files to convert**, fan out **one sub-agent per file within a layer** (launch them in a single
-  message so they run in parallel), wait for the layer, then move to the next. Each sub-agent
-  converts ONE file against its already-converted deps. This makes wall-clock ≈ the slowest file per
-  layer instead of the sum, and keeps each context small. At ≤3 files, just convert sequentially —
+- **Parallelize at scale.** The planner groups the units into numbered **dependency layers** and
+  prints them (`Layer 1 — N units in parallel`, …); the `json` output carries the same as a
+  `layers` array. Every unit in a layer is independent of the others — its deps sit in earlier
+  layers — so the whole layer converts concurrently. When a package has **more than ~3 files to
+  convert**, fan out **one sub-agent per unit in the current layer** (launch them in a single
+  message so they run in parallel), wait for the layer to finish, then start the next. Each
+  sub-agent converts ONE unit against its already-converted deps. Wall-clock ≈ the slowest unit per
+  layer instead of the sum, and each context stays small. At ≤3 files, just convert sequentially —
   the fan-out overhead isn't worth it.
-- That same **`run.sh`** with no arguments lists every command. `plan` is the one generally useful
-  for real conversions; the rest (`gold`, `convert`, `place`/`score`/`restore`, `triggers`) *evaluate*
-  the skill — see `evals/README.md` for those workflows.
+- *Repo maintainers only:* the skill's mechanical eval harness lives in `evals/` (`run.sh gold`,
+  `triggers`, `tooling`, `parallelism`, `routing`, …). It scores this skill against gold fixtures
+  that exist only in the Nevermore monorepo, so it's a development tool — never part of a
+  conversion. See `evals/README.md`.

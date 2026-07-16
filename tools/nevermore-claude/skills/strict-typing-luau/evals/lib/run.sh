@@ -57,7 +57,7 @@ case "${1:-}" in
   score)   score "$2" ;;
   restore) restore "$2" ;;
   sync)    npm run build:sourcemap >/dev/null 2>&1 && echo "sourcemap rebuilt to current tree" ;;
-  plan)    shift; node "$HERE/plan.js" "$@" ;;
+  plan)    shift; node "$HERE/../../../../bin/nevermore-strict-plan" "$@" ;;
   convert) shift; bash "$HERE/convert.sh" "$@" ;;
   triggers) bash "$HERE/triggers.sh" ;;
   tooling)  bash "$HERE/tooling.sh" ;;

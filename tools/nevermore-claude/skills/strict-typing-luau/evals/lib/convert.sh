@@ -30,7 +30,7 @@ SLACK=2   # any_nonrx may exceed gold_nonrx by this much before the gate escalat
 units_tsv() {
   node -e '
     const {execSync}=require("child_process");
-    const p=JSON.parse(execSync(`node '"$HERE"'/plan.js '"$PKG"' json --eval-gold`).toString());
+    const p=JSON.parse(execSync(`node '"$HERE"'/../../../../bin/nevermore-strict-plan '"$PKG"' json --eval-gold`).toString());
     let u=p.units.filter(x=>x.targets.length);
     const lim='"$LIMIT"'; if(lim>0) u=u.slice(0,lim);
     for(const x of u) console.log([x.step,x.model,x.kind,x.targets.join(",")].join("\t"));
