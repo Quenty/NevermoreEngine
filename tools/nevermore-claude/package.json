@@ -1,0 +1,32 @@
+{
+  "name": "nevermore-claude",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Nevermore's Claude Code plugin (strict-typing-luau skill)",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Luau",
+    "Claude Code",
+    "plugin"
+  ],
+  "license": "MIT",
+  "author": "James Onnen <rbxquenty@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "tools/nevermore-claude"
+  },
+  "scripts": {
+    "version": "node scripts/sync-plugin-version.mjs && git add .claude-plugin/plugin.json",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "files": [
+    ".claude-plugin/",
+    "bin/",
+    "skills/",
+    "README.md",
+    "LICENSE.md",
+    "CHANGELOG.md"
+  ]
+}

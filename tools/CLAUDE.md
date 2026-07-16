@@ -12,6 +12,9 @@ The `tools/` directory holds the CLI tools that drive Nevermore's development wo
 | `nevermore-cli-helpers` | Shared utilities (VersionChecker, semver handling) |
 | `nevermore-template-helpers` | Scaffolding and template substitution for `init package` |
 | `nevermore-vscode` | VS Code extension (snippets, integration) |
+| `nevermore-claude` | Claude Code plugin (ships the `strict-typing-luau` skill). Not TypeScript — see below. |
+
+`nevermore-claude` is not a TypeScript tool. It's a Claude Code plugin (Markdown skills + JSON manifests). The monorepo is its marketplace: `.claude-plugin/marketplace.json` at the repo root lists the plugin (`source: ./tools/nevermore-claude`). Projects register it via a `github` source with `sparsePaths` to avoid cloning the whole monorepo. Merging to `main` publishes it — no separate publish action. (The catalog must stay at the repo root: a source `path` field to a nested catalog exists but breaks `marketplace update` on Claude Code 2.1.211.) See `tools/nevermore-claude/README.md`.
 
 ## Command Pattern
 

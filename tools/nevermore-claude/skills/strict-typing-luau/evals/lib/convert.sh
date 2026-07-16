@@ -30,10 +30,10 @@ SLACK=2   # any_nonrx may exceed gold_nonrx by this much before the gate escalat
 units_tsv() {
   node -e '
     const {execSync}=require("child_process");
-    const p=JSON.parse(execSync(`node '"$HERE"'/plan.js '"$PKG"' json --eval-gold`).toString());
-    let u=p.units.filter(x=>x.targets.length);
-    const lim='"$LIMIT"'; if(lim>0) u=u.slice(0,lim);
-    for(const x of u) console.log([x.step,x.model,x.kind,x.targets.join(",")].join("\t"));
+    const plan=JSON.parse(execSync(`node '"$HERE"'/plan.js '"$PKG"' json --eval-gold`).toString());
+    let units=plan.units.filter(unit=>unit.targets.length);
+    const limit='"$LIMIT"'; if(limit>0) units=units.slice(0,limit);
+    for(const unit of units) console.log([unit.step,unit.model,unit.kind,unit.targets.join(",")].join("\t"));
   '
 }
 all_targets() { units_tsv | cut -f4 | tr ',' '\n' | sed '/^$/d'; }
@@ -76,9 +76,9 @@ fi
 # ---- REAL RUN ----
 echo ">> placing $(all_targets | wc -l | tr -d ' ') target file(s) at $INPUT (non-targets stay at main)"
 git checkout main -- "$PKG"; git reset -q HEAD -- "$PKG"; git clean -fdq -- "$PKG"
-while read -r t; do
-  full="$PKG/src/$t"
-  git show "$INPUT:$full" > "$full" 2>/dev/null || { echo "  !! $t missing at $INPUT — aborting"; git checkout main -- "$PKG"; exit 1; }
+while read -r target; do
+  full="$PKG/src/$target"
+  git show "$INPUT:$full" > "$full" 2>/dev/null || { echo "  !! $target missing at $INPUT — aborting"; git checkout main -- "$PKG"; exit 1; }
 done < <(all_targets)
 npm run build:sourcemap >/dev/null 2>&1
 
@@ -88,15 +88,15 @@ while IFS=$'\t' read -r step model kind targets; do
   npm run build:sourcemap >/dev/null 2>&1   # sync before scoring — a worker may have shifted the
                                             # tree; a stale sourcemap yields phantom analyze errors
   for rel in ${targets//,/ }; do
-    f="$PKG/src/$rel"
-    row="$(bash "$HERE/score.sh" "$f" main)"
+    file="$PKG/src/$rel"
+    row="$(bash "$HERE/score.sh" "$file" main)"
     get() { node -e "process.stdout.write(String(JSON.parse(process.argv[1]).$1))" "$row"; }
     strict="$(get strict)"; errs="$(get analyze_errors)"; anr="$(get any_nonrx)"; gnr="$(get any_gold_nonrx)"
     gate=""
     if [ "$model" = sonnet ] && { [ "$strict" != true ] || [ "$errs" -ne 0 ] || [ "$anr" -gt $((gnr + SLACK)) ]; }; then
       gate="-> escalated opus"
       run_worker opus "$targets"
-      row="$(bash "$HERE/score.sh" "$f" main)"; strict="$(get strict)"; errs="$(get analyze_errors)"; anr="$(get any_nonrx)"
+      row="$(bash "$HERE/score.sh" "$file" main)"; strict="$(get strict)"; errs="$(get analyze_errors)"; anr="$(get any_nonrx)"
     fi
     printf '%-4s %-7s %-7s %-7s %-11s %s %s\n' "$step" "$model" "$strict" "$errs" "$anr/$gnr" "$rel" "$gate"
   done
