@@ -59,7 +59,7 @@ to return the sourcemap to main. (Single-file conversions that add nothing don't
 ### 3. Triggering test (~5s, one judge call) — validates the `description`
 
 ```bash
-bash evals/lib/triggers.sh
+bash evals/lib/run.sh triggers
 ```
 
 Does the skill's frontmatter `description` fire on the right prompts and stay quiet on near-misses?

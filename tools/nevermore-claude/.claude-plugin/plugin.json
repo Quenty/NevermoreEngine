@@ -1,0 +1,18 @@
+{
+  "name": "nevermore-claude",
+  "description": "Nevermore's Claude Code plugin. Ships the strict-typing-luau skill for converting Luau files to --!strict following Nevermore's typing conventions.",
+  "version": "0.1.0",
+  "author": {
+    "name": "James Onnen (Quenty)",
+    "url": "https://github.com/Quenty"
+  },
+  "homepage": "https://github.com/Quenty/NevermoreEngine/tree/main/tools/nevermore-claude",
+  "repository": "https://github.com/Quenty/NevermoreEngine.git",
+  "license": "MIT",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Luau",
+    "Claude Code"
+  ]
+}

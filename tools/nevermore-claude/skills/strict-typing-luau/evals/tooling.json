@@ -1,5 +1,5 @@
 {
-  "_doc": "Action-scoping tests for the skill's Tooling guidance. Now that SKILL.md surfaces the package planner (run.sh plan) and the eval harness, a worker could over-apply it: a SINGLE-file or scoped-node task must convert directly and must NOT run the planner or any eval-harness command (gold/convert/place/score). Only a genuine WHOLE-PACKAGE task should reach for the planner. A judge reads the live SKILL.md and decides, per task, whether the right action is 'planner' or 'direct'; we score against expect. Run via lib/tooling.sh — one batched claude -p call.",
+  "_doc": "Action-scoping tests for the skill's Tooling guidance. Now that SKILL.md surfaces the package planner (run.sh plan) and the eval harness, a worker could over-apply it: a SINGLE-file or scoped-node task must convert directly and must NOT run the planner or any eval-harness command (gold/convert/place/score). Only a genuine WHOLE-PACKAGE task should reach for the planner. A judge reads the live SKILL.md and decides, per task, whether the right action is 'planner' or 'direct'; we score against expect. Run via run.sh tooling — one batched claude -p call.",
   "skill_name": "strict-typing-luau",
   "cases": [
     { "expect": "direct",  "tag": "one-util",        "prompt": "Strictly type src/animationtrackutils/src/Shared/AnimationTrackUtils.lua" },

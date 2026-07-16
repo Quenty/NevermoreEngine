@@ -5839,6 +5839,8 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)
 
+  tools/nevermore-claude: {}
+
   tools/nevermore-cli:
     dependencies:
       '@quenty/cli-output-helpers':

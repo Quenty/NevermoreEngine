@@ -38,18 +38,18 @@ ROOT="$(git rev-parse --show-toplevel)"; cd "$ROOT"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANIFEST="$HERE/../manifest.json"
 
-field() { node -e "const m=require('$MANIFEST');const c=m.cases.find(c=>c.id==='$1');if(!c){process.exit(3)}process.stdout.write(c['$2']||'')"; }
-ids()   { node -e "const m=require('$MANIFEST');console.log(m.cases.map(c=>c.id).join(' '))"; }
-pkg_of(){ echo "$1" | cut -d/ -f1-3 | sed -E 's#(src/[^/]+)/.*#\1#'; }
+field() { node -e "const manifest=require('$MANIFEST');const found=manifest.cases.find(c=>c.id==='$1');if(!found){process.exit(3)}process.stdout.write(found['$2']||'')"; }
+ids()   { node -e "const manifest=require('$MANIFEST');console.log(manifest.cases.map(caseItem=>caseItem.id).join(' '))"; }
+pkg_of(){ echo "$1" | sed -E 's#(src/[^/]+)/.*#\1#'; }
 
-place_gold(){ local p; p="$(field "$1" path)"; git checkout "$(field "$1" gold)"  -- "$(pkg_of "$p")"; }
-place_in()  { local p; p="$(field "$1" path)"; git checkout "$(field "$1" input)" -- "$(pkg_of "$p")"; }
-restore()   { local p pk; p="$(field "$1" path)"; pk="$(pkg_of "$p")";
+place_gold(){ local filePath; filePath="$(field "$1" path)"; git checkout "$(field "$1" gold)"  -- "$(pkg_of "$filePath")"; }
+place_in()  { local filePath; filePath="$(field "$1" path)"; git checkout "$(field "$1" input)" -- "$(pkg_of "$filePath")"; }
+restore()   { local filePath pkgDir; filePath="$(field "$1" path)"; pkgDir="$(pkg_of "$filePath")";
               # back to the current branch's committed state (HEAD), unstage, and remove gold-only
               # NEW files (e.g. a new *Types.lua). HEAD not main: on main they're identical, but on a
               # feature branch `git checkout main` would revert the branch's own work in this package.
-              git checkout HEAD -- "$pk" 2>/dev/null || true
-              git reset -q HEAD -- "$pk"; git clean -fdq -- "$pk"; }
+              git checkout HEAD -- "$pkgDir" 2>/dev/null || true
+              git reset -q HEAD -- "$pkgDir"; git clean -fdq -- "$pkgDir"; }
 score()     { bash "$HERE/score.sh" "$(field "$1" path)" "$(field "$1" gold)"; }
 
 case "${1:-}" in
@@ -59,24 +59,21 @@ case "${1:-}" in
   sync)    npm run build:sourcemap >/dev/null 2>&1 && echo "sourcemap rebuilt to current tree" ;;
   plan)    shift; node "$HERE/plan.js" "$@" ;;
   convert) shift; bash "$HERE/convert.sh" "$@" ;;
-  triggers) bash "$HERE/triggers.sh" ;;
-  tooling)  bash "$HERE/tooling.sh" ;;
-  parallelism) bash "$HERE/parallelism.sh" ;;
+  triggers)    bash "$HERE/judge.sh" triggers prompts ;;
+  tooling)     bash "$HERE/judge.sh" tooling tasks ;;
+  parallelism) bash "$HERE/judge.sh" parallelism tasks ;;
   routing)  node "$HERE/routing.js" ;;
   gold)
     printf '%-22s %-8s %-6s %-8s %-7s %-5s %-7s %s\n' CASE POLARITY STRICT ANALYZE SELENE ANY RAW VERDICT
     fails=0
+    get() { node -e "process.stdout.write(String(JSON.parse(process.argv[1]).$1))" "$row"; }  # one field of the score row
     for id in $(ids); do
       pol="$(field "$id" polarity)"
       place_gold "$id"
       row="$(score "$id")"
       restore "$id"
-      strict="$(node -e "console.log(JSON.parse(process.argv[1]).strict)" "$row")"
-      errs="$(node -e "console.log(JSON.parse(process.argv[1]).analyze_errors)" "$row")"
-      selene="$(node -e "console.log(JSON.parse(process.argv[1]).selene)" "$row")"
-      any="$(node -e "console.log(JSON.parse(process.argv[1]).any)" "$row")"
-      raw="$(node -e "console.log(JSON.parse(process.argv[1]).raw)" "$row")"
-      raw_gold="$(node -e "console.log(JSON.parse(process.argv[1]).raw_gold)" "$row")"
+      strict="$(get strict)"; errs="$(get analyze_errors)"; selene="$(get selene)"
+      any="$(get any)"; raw="$(get raw)"; raw_gold="$(get raw_gold)"
       # gold expectation: positive => strict & 0 analyze errors & 0 selene findings & no raw-access
       # regression (raw >= raw_gold, tautological on gold — proves the check doesn't false-positive);
       # negative => nonstrict (reverted)

@@ -1,5 +1,5 @@
 {
-  "_doc": "Triggering tests for the skill's frontmatter `description`. A judge model is shown ONLY the skill's name+description and each user message, and decides whether the skill should fire. We score `fire` against `expect`. Positives are real ways users ask for the conversion; negatives are near-misses that an over-broad description would wrongly capture (TypeScript strict, tsconfig, formatting, feature work, wrong language). Run via lib/triggers.sh — one batched claude -p call.",
+  "_doc": "Triggering tests for the skill's frontmatter `description`. A judge model is shown ONLY the skill's name+description and each user message, and decides whether the skill should fire. We score `fire` against `expect`. Positives are real ways users ask for the conversion; negatives are near-misses that an over-broad description would wrongly capture (TypeScript strict, tsconfig, formatting, feature work, wrong language). Run via run.sh triggers — one batched claude -p call.",
   "cases": [
     { "expect": true,  "tag": "explicit-strict",   "prompt": "src/ragdoll/src/Server/Classes/RagdollCameraShake.lua is still --!nonstrict. Can you strictly type it?" },
     { "expect": true,  "tag": "convert-strict",     "prompt": "convert this file to --!strict please" },
