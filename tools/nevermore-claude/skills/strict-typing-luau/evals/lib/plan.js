@@ -2,13 +2,9 @@
 // Compute the INTRA-PACKAGE conversion plan for a Nevermore package: the order in which to
 // strict-type its files so every file is converted only after the siblings it requires.
 //
-//   nevermore-strict-plan <pkg> [json]
+//   plan.js <pkg> [json]
 //     <pkg>   package dir, e.g. src/settings
 //     json    emit a machine-readable plan (for a workflow driver) instead of the human table
-//
-// Ships in the nevermore-claude plugin's bin/, so it's on PATH whenever the plugin is enabled;
-// run it by name from anywhere in a Nevermore repo. It chdir's to the git top level itself, so
-// the working directory doesn't matter.
 //
 // Method: edges = require("X") where X resolves to a sibling file in THIS package. Tarjan's SCC
 // collapses cycles into clusters; the condensation is a DAG; Tarjan emits it in dependency-first
@@ -25,16 +21,11 @@ const fs = require("fs");
 const cp = require("child_process");
 const path = require("path");
 
-// On PATH (plugin bin/), so it may be invoked from any subdirectory. Anchor at the git top
-// level: git ls-tree returns repo-root-relative paths that the file reads below assume as CWD.
-try { process.chdir(cp.execSync("git rev-parse --show-toplevel").toString().trim()); }
-catch { console.error("not inside a git repository"); process.exit(2); }
-
 const pkg = process.argv[2];
 const rest = process.argv.slice(3);
 const asJson = rest.includes("json");
 const evalGold = rest.includes("--eval-gold"); // eval harness only — see isTarget below
-if (!pkg) { console.error("usage: nevermore-strict-plan <pkg> [json] [--eval-gold]"); process.exit(2); }
+if (!pkg) { console.error("usage: plan.js <pkg> [json] [--eval-gold]"); process.exit(2); }
 
 const listRef = evalGold ? "main" : "HEAD";
 const files = cp.execSync(`git ls-tree -r --name-only ${listRef} -- ${pkg}`).toString().trim().split("\n")
@@ -117,44 +108,22 @@ const units = sccs.map((comp, i) => ({
   needs: [...new Set(comp.flatMap((f) => adj[f]).filter((d) => compIndex[d] !== i).map(rel))],
 }));
 
-// Dependency LAYERS — the parallelization structure, and the whole point of the planner. A
-// convertible unit can start once the units it requires are converted; an already-strict (skipped)
-// dep is pre-satisfied and does NOT gate. So a unit's layer = 0 if it has no convertible dep, else
-// 1 + max(layer of its convertible deps). Components are emitted deps-first (Tarjan), so one forward
-// pass suffices. Every unit in the same layer is mutually independent — convert them CONCURRENTLY.
-const depComps = sccs.map((comp, i) =>
-  [...new Set(comp.flatMap((f) => adj[f]).map((d) => compIndex[d]).filter((c) => c !== i))]);
-for (let i = 0; i < units.length; i++) {
-  const convDeps = depComps[i].filter((c) => units[c].targets.length);
-  units[i].layer = convDeps.length ? 1 + Math.max(...convDeps.map((c) => units[c].layer)) : 0;
-}
+if (asJson) { process.stdout.write(JSON.stringify({ pkg, units }, null, 2) + "\n"); process.exit(0); }
+
+const mark = (r, u) => u.targets.includes(r) ? r : `${r}  (${skipReason} — skipped)`;
 const convertUnits = units.filter((u) => u.targets.length);
-const layerCount = convertUnits.length ? Math.max(...convertUnits.map((u) => u.layer)) + 1 : 0;
-// layers[L] = the step numbers convertible in layer L. All independent — fan out one worker each.
-const layers = Array.from({ length: layerCount }, (_, L) =>
-  convertUnits.filter((u) => u.layer === L).map((u) => u.step));
-
-if (asJson) { process.stdout.write(JSON.stringify({ pkg, layerCount, layers, units }, null, 2) + "\n"); process.exit(0); }
-
-const mark = (r, u) => (u.targets.includes(r) ? r : `${r}  (${skipReason} — skipped)`);
-const skipped = units.filter((u) => !u.targets.length);
-console.log(`${pkg}: ${files.length} source files -> ${convertUnits.length} convertible units in ${layerCount} dependency layer(s) ` +
-  `(${skipped.length} skipped: ${skipReason}).`);
-console.log(`Convert LAYER BY LAYER. Within a layer the units are mutually independent — fan out one`);
-console.log(`sub-agent per unit in parallel, wait for the whole layer, then start the next.\n`);
-const unitLine = (u) => {
+console.log(`${pkg}: ${files.length} source files -> ${convertUnits.length} convertible units ` +
+  `(${units.length - convertUnits.length} units skipped: ${skipReason}). Dependency order:\n`);
+for (const u of units) {
+  if (!u.targets.length) { console.log(`${String(u.step).padStart(2)}. [skip       ] ${u.files.join(", ")}  (${skipReason})`); continue; }
   const tag = `${u.kind === "single" ? "single " : "cluster"} · ${u.model.padEnd(6)}`;
-  if (u.kind === "single") return `    [${tag}] ${mark(u.files[0], u)}`;
-  return `    [${tag}] CLUSTER (${u.targets.length}/${u.files.length}, cyclic-types playbook): ${u.files.map((f) => mark(f, u)).join(", ")}`;
-};
-for (let L = 0; L < layerCount; L++) {
-  const inLayer = convertUnits.filter((u) => u.layer === L);
-  console.log(`Layer ${L + 1} — ${inLayer.length} unit${inLayer.length === 1 ? "" : "s"} in parallel:`);
-  for (const u of inLayer) console.log(unitLine(u));
+  if (u.kind === "single") console.log(`${String(u.step).padStart(2)}. [${tag}] ${mark(u.files[0], u)}`);
+  else {
+    console.log(`${String(u.step).padStart(2)}. [${tag}] CLUSTER — convert ${u.targets.length}/${u.files.length} (cyclic-types playbook)`);
+    u.files.forEach((f) => console.log(`                      ${mark(f, u)}`));
+  }
 }
-if (skipped.length) console.log(`\nSkipped (${skipped.length}, ${skipReason}): ${skipped.map((u) => u.files.join("+")).join(", ")}`);
 const onOpus = convertUnits.filter((u) => u.model === "opus").length;
-const widest = convertUnits.length ? Math.max(...layers.map((l) => l.length)) : 0;
-console.log(`\nConvert ${convertUnits.length} units across ${layerCount} layer(s): ${onOpus} opus (class/cyclic/Rx), ${convertUnits.length - onOpus} sonnet (mechanical). Widest layer = ${widest} parallel.`);
+console.log(`\nConvert ${convertUnits.length} units: ${onOpus} opus (class/cyclic/Rx), ${convertUnits.length - onOpus} sonnet (mechanical).`);
 console.log(`Intra-package only; cross-package deps assumed already strict; ${skipReason} files left as-is.` +
   (evalGold ? "" : "  [real mode: targets = not-yet-strict files; pass --eval-gold for the harness view]"));

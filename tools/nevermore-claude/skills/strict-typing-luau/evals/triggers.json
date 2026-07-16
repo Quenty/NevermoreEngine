@@ -9,7 +9,6 @@
     { "expect": true,  "tag": "resolve-strict-errs","prompt": "this --!strict file is throwing a bunch of luau-lsp type errors, fix the typing following our conventions" },
     { "expect": true,  "tag": "type-annotate",      "prompt": "type-annotate RoguePropertyTable.lua for me" },
     { "expect": true,  "tag": "legacy-cleanup",     "prompt": "clean up the typing on this legacy nonstrict module" },
-    { "expect": true,  "tag": "package-strict",     "prompt": "strict type this package" },
 
     { "expect": false, "tag": "format",             "prompt": "format this file with stylua" },
     { "expect": false, "tag": "bugfix",             "prompt": "fix the off-by-one bug in this loop" },

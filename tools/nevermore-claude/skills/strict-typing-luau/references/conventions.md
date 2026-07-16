@@ -1,8 +1,8 @@
 # Strict typing — canonical examples & error table
 
-Full, copyable shapes drawn from real strict Nevermore files. They mirror the Nevermore VS Code
-snippets (`class`, `binder`, `service`, `classtype`, `lib`, `pane`) — reproduce them verbatim for
-minimal diffs.
+Full, copyable shapes drawn from real strict files in this repo. The shapes match the project's
+VS Code snippets (`tools/nevermore-vscode/snippets/luau.code-snippets`: `class`, `binder`,
+`service`, `classtype`, `lib`, `pane`) — reproduce them verbatim for minimal diffs.
 
 ## Plain util / library module (no metatable)
 
