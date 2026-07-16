@@ -1,3 +1,22 @@
+# v4.36.0 (Thu Jul 16 2026)
+
+#### 🚀 Enhancement
+
+- Users/quenty/deploy improvements [#730](https://github.com/Quenty/NevermoreEngine/pull/730) ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli-manifest): stamp deployed places with deploy metadata ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): retry transient edge 400/408 on Open Cloud requests ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test(nevermore-cli-manifest): assert real injected metadata in specs ([@Quenty](https://github.com/Quenty))
+- fix(nevermore-cli): stream Open Cloud uploads via node-fetch ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
