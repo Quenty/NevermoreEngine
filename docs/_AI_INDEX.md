@@ -37,6 +37,7 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 |-----|-------------|
 | [intro.md](intro.md) | Getting started with Nevermore, why use it, key packages |
 | [install.md](install.md) | Installation methods: NPM + CLI, existing Rojo projects, plugins |
+| [cli.md](cli.md) | `nevermore` CLI command reference: every command and flag (`init`, `install`, `login`, `test`, `deploy`, `batch`, `tools`), global options, command tree |
 | [deploy.md](deploy.md) | `nevermore deploy`: login, `deploy init`, `deploy run`, config schema, flag reference, common workflows |
 | [architecture/](architecture/index.md) | Architecture: workspace layout, design philosophy, ServiceBag, dependency injection |
 | [architecture/patterns.md](architecture/patterns.md) | Core patterns: Maid, BaseObject, Binder, Rx, Brio, Blend, AdorneeData, TieDefinition |

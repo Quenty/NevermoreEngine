@@ -6,11 +6,11 @@ The `tools/` directory holds the CLI tools that drive Nevermore's development wo
 
 | Package | Purpose |
 |---------|---------|
-| `nevermore-cli` | Main CLI (`nevermore test`, `nevermore deploy`, `nevermore init-package`, `nevermore batch`) |
+| `nevermore-cli` | Main CLI (`nevermore test`, `nevermore deploy`, `nevermore init package`, `nevermore batch`) |
 | `studio-bridge` | WebSocket bridge for running Luau scripts in Roblox Studio (`studio-bridge exec`) |
 | `cli-output-helpers` | Shared formatting and reporting (chalk, OutputHelper, Reporter) |
 | `nevermore-cli-helpers` | Shared utilities (VersionChecker, semver handling) |
-| `nevermore-template-helpers` | Scaffolding and template substitution for `init-package` |
+| `nevermore-template-helpers` | Scaffolding and template substitution for `init package` |
 | `nevermore-vscode` | VS Code extension (snippets, integration) |
 
 ## Command Pattern
