@@ -88,7 +88,7 @@ Key rules (full guide with examples in `docs/conventions/luau.md`):
 
 ## Testing & Deployment
 
-- `nevermore init-package` scaffolds new packages. It can also fill in missing standard files on existing packages.
+- `nevermore init package` scaffolds new packages. It can also fill in missing standard files on existing packages.
 - `nevermore deploy run` builds and uploads; pass `--publish` for Published.
 - `nevermore ci post-test-results` posts or updates a PR comment with test results.
 

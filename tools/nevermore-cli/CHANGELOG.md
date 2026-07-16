@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.36.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.35.0...@quenty/nevermore-cli@4.36.0) (2026-07-16)
+
+### Bug Fixes
+
+- **nevermore-cli:** stream Open Cloud uploads via node-fetch ([559601f](https://github.com/Quenty/Nevermore/commit/559601f4270141d67cc4cb32e37c473552d3ced1))
+
+### Features
+
+- **nevermore-cli-manifest:** stamp deployed places with deploy metadata ([ae632b2](https://github.com/Quenty/Nevermore/commit/ae632b2335636648275ff14a79285ba6e6dec2b7))
+- **nevermore-cli:** retry transient edge 400/408 on Open Cloud requests ([da826bf](https://github.com/Quenty/Nevermore/commit/da826bf691917ff7fec02d60551d4b5392748d22))
+
 # [4.35.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.34.0...@quenty/nevermore-cli@4.35.0) (2026-07-14)
 
 **Note:** Version bump only for package @quenty/nevermore-cli

@@ -1,0 +1,39 @@
+{
+  "name": "@quenty/nevermoreclimanifest",
+  "version": "1.1.0",
+  "description": "Manifest of nevermore CLI-injected deploy metadata (commit, target, version, timestamp)",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "nevermoreclimanifest"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/nevermore-cli-manifest/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

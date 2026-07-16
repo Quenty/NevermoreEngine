@@ -1,3 +1,16 @@
+# (Thu Jul 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.1.0`, `@quenty/nevermore-cli@4.36.0`
+  - Users/quenty/deploy improvements [#730](https://github.com/Quenty/NevermoreEngine/pull/730) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jul 15 2026)
 
 #### 🐛 Bug Fix

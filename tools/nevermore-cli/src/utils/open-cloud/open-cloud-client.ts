@@ -1,6 +1,8 @@
 import * as fs from 'fs/promises';
+import { Readable, Transform } from 'node:stream';
+import nodeFetch from 'node-fetch';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { RateLimiter } from './rate-limiter.js';
+import { RateLimiter, type FetchLike } from './rate-limiter.js';
 import {
   parseTestLogs,
   type ParsedTestLogs,
@@ -130,40 +132,35 @@ export class OpenCloudClient {
       'X-API-Key': apiKey,
     };
 
-    let response: Response;
-
-    if (onProgress) {
-      // Wrap the buffer in a ReadableStream that reports bytes as each chunk
-      // is consumed by the transport, giving real-time upload progress.
-      const CHUNK_SIZE = 64 * 1024;
-      let offset = 0;
-      const stream = new ReadableStream<Uint8Array>({
-        pull(controller) {
-          if (offset >= totalBytes) {
-            controller.close();
-            return;
-          }
-          const end = Math.min(offset + CHUNK_SIZE, totalBytes);
-          controller.enqueue(fileBuffer.subarray(offset, end));
-          offset = end;
-          onProgress(offset, totalBytes);
+    // Stream the place binary so we can report byte-level upload progress. We
+    // pin node-fetch here: undici (global fetch) cannot send a streaming request
+    // body to the Open Cloud versions endpoint on Node 24 — it throws "expected
+    // non-null body source" — whereas node-fetch's Node http stack accepts it.
+    // Content-Length is set so the upload isn't chunked. The rate limiter
+    // rebuilds this init per attempt, so each retry gets a fresh, un-disturbed
+    // stream (and progress restarts, correctly mirroring the re-sent bytes).
+    onProgress?.(0, totalBytes);
+    const makeUploadInit = (): RequestInit => {
+      let counted = 0;
+      const counter = new Transform({
+        transform(chunk, _enc, cb) {
+          counted += chunk.length;
+          onProgress?.(counted, totalBytes);
+          cb(null, chunk);
         },
       });
+      // Node stream body: valid for node-fetch, but outside the DOM RequestInit
+      // type, so cast through unknown.
+      return {
+        method: 'POST',
+        headers: { ...headers, 'Content-Length': String(totalBytes) },
+        body: Readable.from(fileBuffer).pipe(counter),
+      } as unknown as RequestInit;
+    };
 
-      // fetch with ReadableStream body requires duplex: 'half' in Node
-      response = await this._rateLimiter.fetchAsync(url, {
-        method: 'POST',
-        headers,
-        body: stream,
-        duplex: 'half',
-      } as RequestInit);
-    } else {
-      response = await this._rateLimiter.fetchAsync(url, {
-        method: 'POST',
-        headers,
-        body: new Uint8Array(fileBuffer),
-      });
-    }
+    const response = await this._rateLimiter.fetchAsync(url, makeUploadInit, {
+      fetchImpl: nodeFetch as unknown as FetchLike,
+    });
 
     if (!response.ok) {
       const text = await response.text();

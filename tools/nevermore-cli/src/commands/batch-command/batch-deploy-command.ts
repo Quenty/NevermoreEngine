@@ -20,6 +20,11 @@ import {
   type BatchDeployResult,
   createDeployCommentConfig,
 } from '../../utils/deploy/deploy-github-columns.js';
+import {
+  buildDeployMetadataAttributes,
+  gatherGitDeployInfo,
+  injectDeployMetadataAsync,
+} from '../../utils/deploy/deploy-metadata.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
@@ -208,6 +213,10 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   });
   const context = new CloudJobContext(reporter, client);
 
+  // Gathered once so every deployed package shares one timestamp and commit.
+  const deployGitInfo = gatherGitDeployInfo();
+  const deployTimestamp = new Date().toISOString();
+
   await reporter.startAsync();
 
   let exitCode = 0;
@@ -225,13 +234,29 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           packageName: buildTarget.name,
         });
 
-        const { version } = await uploadPlaceAsync({
+        const injected = await injectDeployMetadataAsync(
           builtPlace,
-          args: { apiKey, publish },
-          client,
-          reporter: pkgReporter,
-          packageName: buildTarget.name,
-        });
+          buildDeployMetadataAttributes(deployGitInfo, {
+            target: targetName,
+            published: publish,
+            timestamp: deployTimestamp,
+            universeId: buildTarget.target.universeId,
+            placeId: buildTarget.target.placeId,
+          })
+        );
+
+        let version: number;
+        try {
+          ({ version } = await uploadPlaceAsync({
+            builtPlace: injected.builtPlace,
+            args: { apiKey, publish },
+            client,
+            reporter: pkgReporter,
+            packageName: buildTarget.name,
+          }));
+        } finally {
+          await injected.cleanupAsync();
+        }
 
         // Eagerly release build artifacts after upload
         await context.releaseBuiltPlaceAsync(builtPlace);
