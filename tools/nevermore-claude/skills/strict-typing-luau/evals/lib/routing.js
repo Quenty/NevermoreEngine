@@ -15,12 +15,12 @@ const planPath = path.join(__dirname, "plan.js");
 const src = fs.readFileSync(planPath, "utf8");
 
 // Pull the real `isClass:` expression straight out of plan.js (single source of truth).
-const m = src.match(/isClass:\s*([^\n]+?),\s*\n/);
-if (!m) {
+const isClassMatch = src.match(/isClass:\s*([^\n]+?),\s*\n/);
+if (!isClassMatch) {
   console.error("FAIL: could not locate the `isClass:` predicate in plan.js — did its shape change?");
   process.exit(1);
 }
-const isClass = new Function("src", `return (${m[1]});`);
+const isClass = new Function("src", `return (${isClassMatch[1]});`);
 // plan.js model rule (kept in sync with modelFor): a unit is opus if any target isClass/usesRx, or
 // the unit is a cyclic cluster (>1 file). For a single-file, non-Rx node, model is decided by isClass.
 const modelOf = (text, usesRx = false, clusterSize = 1) =>
@@ -60,13 +60,13 @@ const cases = [
 ];
 
 let fails = 0;
-for (const c of cases) {
-  const gotClass = isClass(c.src);
-  const gotModel = modelOf(c.src);
-  const ok = gotClass === c.isClass && gotModel === c.model;
+for (const testCase of cases) {
+  const gotClass = isClass(testCase.src);
+  const gotModel = modelOf(testCase.src);
+  const ok = gotClass === testCase.isClass && gotModel === testCase.model;
   if (!ok) fails++;
-  console.log(`${ok ? "PASS" : "FAIL"}  ${c.name}`);
-  if (!ok) console.log(`        isClass: got ${gotClass} want ${c.isClass} | model: got ${gotModel} want ${c.model}`);
+  console.log(`${ok ? "PASS" : "FAIL"}  ${testCase.name}`);
+  if (!ok) console.log(`        isClass: got ${gotClass} want ${testCase.isClass} | model: got ${gotModel} want ${testCase.model}`);
 }
 console.log("");
 if (fails) {

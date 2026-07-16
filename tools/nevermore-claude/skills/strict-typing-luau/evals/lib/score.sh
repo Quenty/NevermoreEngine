@@ -22,7 +22,7 @@ ANALYZE_OUT="$(luau-lsp analyze \
 # Counting every "error" line over-counts pre-existing dependency noise (node_modules, nonstrict
 # siblings) and stale-sourcemap "Unknown require" churn that isn't the conversion's fault; the final
 # lint:luau gate catches genuine cross-file breakage separately. awk is pipefail-safe.
-ERRORS="$(printf '%s\n' "$ANALYZE_OUT" | awk -v f="$FILE(" 'substr($0,1,length(f))==f{c++} END{print c+0}')"
+ERRORS="$(printf '%s\n' "$ANALYZE_OUT" | awk -v prefix="$FILE(" 'substr($0,1,length(prefix))==prefix{count++} END{print count+0}')"
 
 # --- looseness: `any` casts/annotations vs the gold (lower-or-equal is good).
 # `any`      = total anys.  `any_nonrx` = anys EXCLUDING sanctioned Rx-chain lines (casting Rx

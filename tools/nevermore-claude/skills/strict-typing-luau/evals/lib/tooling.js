@@ -4,15 +4,10 @@
 // convert directly (single file / scoped node), and never run the eval harness as part of a job?
 //   tooling.js prompt            -> print the batched judge prompt (full SKILL.md + cases)
 //   tooling.js score <respFile>  -> parse judge reply, score vs expected, print table, exit 1 on fail
-const fs = require("fs");
-const path = require("path");
-const HERE = __dirname;
-const SKILL = path.join(HERE, "..", "..", "SKILL.md");
-const MANIFEST = path.join(HERE, "..", "tooling.json");
-const cases = JSON.parse(fs.readFileSync(MANIFEST, "utf8")).cases;
+const judge = require("./judge.js");
+const cases = judge.loadCases("tooling");
 
 if (process.argv[2] === "prompt") {
-  const numbered = cases.map((c, i) => `${i + 1}. ${c.prompt}`).join("\n");
   process.stdout.write(
 `You simulate an agent that has loaded the strict-typing-luau skill (full text below) and is handed a
 task. For each task, decide what the skill directs the agent to do:
@@ -28,11 +23,11 @@ over-orchestrating a single file is the failure we are guarding against.
 
 SKILL.md:
 -----
-${fs.readFileSync(SKILL, "utf8")}
+${judge.readSkill()}
 -----
 
 Tasks:
-${numbered}
+${judge.numbered(cases)}
 
 Output ONLY a compact JSON array, one object per task, no prose, no code fences:
 [{"n":1,"action":"direct"},{"n":2,"action":"planner"}, ...]
@@ -41,22 +36,12 @@ Output ONLY a compact JSON array, one object per task, no prose, no code fences:
 }
 
 if (process.argv[2] === "score") {
-  const raw = fs.readFileSync(process.argv[3], "utf8");
-  const arr = JSON.parse(raw.slice(raw.indexOf("["), raw.lastIndexOf("]") + 1));
-  const got = new Map(arr.map((o) => [o.n, String(o.action || "").toLowerCase()]));
-  let fails = 0;
-  const pad = (s, n) => String(s).padEnd(n);
-  console.log(pad("#", 3) + pad("TAG", 18) + pad("EXPECT", 9) + pad("GOT", 9) + "VERDICT  PROMPT");
-  cases.forEach((c, i) => {
-    const n = i + 1, g = got.get(n), ok = g === c.expect;
-    if (!ok) fails++;
-    console.log(pad(n, 3) + pad(c.tag, 18) + pad(c.expect, 9) + pad(g || "?", 9) +
-      (ok ? "ok      " : "MISS    ") + c.prompt.slice(0, 50));
-  });
-  console.log("");
-  if (fails === 0) console.log(`TOOLING-SCOPE TEST: all ${cases.length} cases correct`);
-  else { console.log(`TOOLING-SCOPE TEST: ${fails}/${cases.length} MISCLASSIFIED`); process.exit(1); }
-  process.exit(0);
+  const answers = judge.parseReply(process.argv[3], (reply) => String(reply.action || "").toLowerCase() || undefined);
+  process.exit(judge.runScore({
+    cases, answers, label: "TOOLING-SCOPE TEST",
+    cols: { tag: 18, exp: 9, got: 9 }, slice: 50,
+    show: (value) => value,
+  }));
 }
 
 console.error("usage: tooling.js prompt | score <respFile>");
