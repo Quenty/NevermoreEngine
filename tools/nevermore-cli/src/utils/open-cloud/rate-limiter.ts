@@ -18,6 +18,17 @@ function _extractRoute(url: string | URL | Request): string {
   }
 }
 
+/**
+ * Minimal fetch shape the limiter drives. Defaults to the global `fetch`
+ * (undici). Callers can inject an alternative — e.g. node-fetch, whose Node
+ * `http` stack accepts a streaming request body against the Open Cloud upload
+ * endpoint where undici throws "expected non-null body source".
+ */
+export type FetchLike = (
+  url: string | URL | Request,
+  init?: RequestInit
+) => Promise<Response>;
+
 const DEFAULT_MAX_CONCURRENCY = 4;
 const DEFAULT_MAX_RETRIES = 6;
 const RETRY_JITTER_FRACTION = 0.3;
@@ -138,11 +149,13 @@ export class RateLimiter {
    */
   async fetchAsync(
     url: string | URL | Request,
-    init?: RequestInit
+    init?: RequestInit | (() => RequestInit),
+    options?: { fetchImpl?: FetchLike }
   ): Promise<Response> {
     await this._acquireAsync();
 
     const route = _extractRoute(url);
+    const doFetch = options?.fetchImpl ?? fetch;
 
     try {
       let lastResponse: Response | null = null;
@@ -155,13 +168,19 @@ export class RateLimiter {
         let transportError: unknown = null;
 
         try {
-          response = await fetch(url, init);
+          // Resolve init per attempt so a caller streaming a one-shot body
+          // (e.g. a progress-reporting upload) hands us a fresh, un-disturbed
+          // stream on every retry; a reused stream throws "body ... disturbed
+          // or locked". Plain-object inits (Uint8Array/string bodies) are just
+          // returned as-is and replay safely.
+          const resolvedInit = typeof init === 'function' ? init() : init;
+          response = await doFetch(url, resolvedInit);
           this._updateFromHeaders(response.headers);
         } catch (err) {
           transportError = err;
         }
 
-        if (response && !_isRetryableStatus(response.status)) {
+        if (response && !_isRetryableResponse(response)) {
           return response;
         }
 
@@ -198,8 +217,25 @@ export class RateLimiter {
   }
 }
 
-function _isRetryableStatus(status: number): boolean {
-  return status === 429 || RETRYABLE_SERVER_ERROR_STATUSES.has(status);
+function _isRetryableResponse(response: Response): boolean {
+  const { status } = response;
+  if (status === 429 || RETRYABLE_SERVER_ERROR_STATUSES.has(status)) {
+    return true;
+  }
+  // 408 Request Timeout is transient by definition.
+  if (status === 408) {
+    return true;
+  }
+  // A large upload occasionally trips an edge/proxy that answers 400 with an
+  // HTML body ("Your browser sent an invalid request") — transient framing
+  // noise, not the API rejecting the payload. A genuine Open Cloud 400 comes
+  // back as a structured JSON error and must NOT be retried, so gate on the
+  // content type: retry a 400 only when it isn't application/json.
+  if (status === 400) {
+    const contentType = response.headers.get('content-type') ?? '';
+    return !contentType.toLowerCase().includes('application/json');
+  }
+  return false;
 }
 
 function _computeWaitSeconds(

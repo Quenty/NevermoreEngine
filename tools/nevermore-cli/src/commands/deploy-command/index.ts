@@ -19,6 +19,11 @@ import {
   type BatchDeployResult,
   createDeployCommentConfig,
 } from '../../utils/deploy/deploy-github-columns.js';
+import {
+  buildDeployMetadataAttributes,
+  gatherGitDeployInfo,
+  injectDeployMetadataAsync,
+} from '../../utils/deploy/deploy-metadata.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
@@ -216,6 +221,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
     const publish = args.publish ?? false;
     const showLogs = args.logs ?? false;
+
+    // Gathered once so every place in a multi-place deploy shares one timestamp
+    // and commit.
+    const deployGitInfo = gatherGitDeployInfo();
+    const deployTimestamp = new Date().toISOString();
     const useSpinner = process.stdout.isTTY && !args.verbose;
     const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
     const deployLabels = {
@@ -319,13 +329,30 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             overrides: isMultiPlace ? undefined : args,
           });
 
-          const { version, target: uploadedTarget } = await uploadPlaceAsync({
+          const injected = await injectDeployMetadataAsync(
             builtPlace,
-            args,
-            client,
-            reporter: pkgReporter,
-            packageName: buildTarget.name,
-          });
+            buildDeployMetadataAttributes(deployGitInfo, {
+              target: targetName,
+              published: publish,
+              timestamp: deployTimestamp,
+              universeId: args.universeId ?? buildTarget.target.universeId,
+              placeId: args.placeId ?? buildTarget.target.placeId,
+            })
+          );
+
+          let uploadResult: Awaited<ReturnType<typeof uploadPlaceAsync>>;
+          try {
+            uploadResult = await uploadPlaceAsync({
+              builtPlace: injected.builtPlace,
+              args,
+              client,
+              reporter: pkgReporter,
+              packageName: buildTarget.name,
+            });
+          } finally {
+            await injected.cleanupAsync();
+          }
+          const { version, target: uploadedTarget } = uploadResult;
 
           await context.releaseBuiltPlaceAsync(builtPlace);
 

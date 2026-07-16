@@ -8,6 +8,12 @@ import {
   parseTestLogs,
   parseTestCounts,
 } from '../test-log-parser.js';
+import {
+  buildDeployMetadataAttributes,
+  gatherGitDeployInfo,
+  injectDeployMetadataInPlaceAsync,
+  packageUsesManifestAsync,
+} from '../../deploy/deploy-metadata.js';
 
 export interface SingleTestResult {
   success: boolean;
@@ -59,6 +65,22 @@ export async function runSingleTestAsync(
     packagePath,
     packageName,
   });
+
+  // Packages that ship or use the manifest get the same deploy-metadata stamp a
+  // real deploy would apply, so their specs can assert the injection actually
+  // ran. The per-session build is exclusively ours, so rewrite it in place.
+  if (await packageUsesManifestAsync(packagePath)) {
+    await injectDeployMetadataInPlaceAsync(
+      builtPlace.rbxlPath,
+      buildDeployMetadataAttributes(gatherGitDeployInfo(), {
+        target: 'test',
+        published: false,
+        timestamp: new Date().toISOString(),
+        placeId: builtPlace.target.placeId,
+        universeId: builtPlace.target.universeId,
+      })
+    );
+  }
 
   const scriptContent =
     scriptText ??
