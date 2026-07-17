@@ -299,10 +299,9 @@ end)
 
 describe("JSONTranslator:ToTranslationKey", function()
 	it("derives a stable translation key from a prefix and text", function()
-		-- Whitespace is stripped and the first ~20 chars are lower-camel-cased. With no
-		-- word boundaries left after stripping spaces, "Play Now" collapses to "playnow".
+		-- Text is lower-camel-cased (spaces are word boundaries) and capped at 20 chars.
 		local translator = makeTranslator({})
-		expect(translator:ToTranslationKey("button", "Play Now")).toBe("button.playnow")
+		expect(translator:ToTranslationKey("button", "Play Now")).toBe("button.playNow")
 	end)
 
 	-- PIN: ToTranslationKey has a write side effect (its own TODO calls this out).

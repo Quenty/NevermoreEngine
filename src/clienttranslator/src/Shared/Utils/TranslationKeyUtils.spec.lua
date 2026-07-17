@@ -2,13 +2,9 @@
 --[[
 	@class TranslationKeyUtils.spec.lua
 
-	Pins the *current* behavior of [TranslationKeyUtils.getTranslationKey].
-
-	Note the space-collapse behavior below: because the implementation strips all
-	whitespace *before* camel-casing, spaced source text loses its word boundaries
-	("Play Now" -> "playnow"), while underscore-separated text keeps them
-	("hello_world" -> "helloWorld"). That inconsistency is a bug; a follow-up commit
-	fixes it and updates the expectations here.
+	Covers [TranslationKeyUtils.getTranslationKey]. Spaced and underscore-separated
+	source text both camelCase consistently ("Play Now" / "hello_world" ->
+	"playNow" / "helloWorld"), and the derived key is capped at 20 characters.
 ]]
 
 local require = (require :: any)(
@@ -28,14 +24,11 @@ describe("TranslationKeyUtils.getTranslationKey", function()
 		expect(TranslationKeyUtils.getTranslationKey("menu", "Settings")).toBe("menu.settings")
 	end)
 
-	-- PIN (bug): whitespace is stripped before camel-casing, so spaced text collapses
-	-- to all-lowercase instead of camelCase. The word boundary is lost with the space.
-	it("collapses spaced text to lowercase (loses camelCase word boundaries)", function()
-		expect(TranslationKeyUtils.getTranslationKey("button", "Play Now")).toBe("button.playnow")
-		expect(TranslationKeyUtils.getTranslationKey("hint", "Press E")).toBe("hint.presse")
+	it("camelCases spaced text (spaces are treated as word boundaries)", function()
+		expect(TranslationKeyUtils.getTranslationKey("button", "Play Now")).toBe("button.playNow")
+		expect(TranslationKeyUtils.getTranslationKey("hint", "Press E")).toBe("hint.pressE")
 	end)
 
-	-- PIN: underscores survive the whitespace strip, so they DO produce camelCase.
 	it("camelCases underscore-separated text", function()
 		expect(TranslationKeyUtils.getTranslationKey("x", "hello_world")).toBe("x.helloWorld")
 	end)
