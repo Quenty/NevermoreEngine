@@ -25,6 +25,7 @@ export type GameDataStoreService = typeof(setmetatable(
 		_dataStorePromise: Promise.Promise<DataStore.DataStore>?,
 		_robloxDataStorePromise: Promise.Promise<any>?,
 		_bindToCloseService: any,
+		_key: string?,
 	},
 	{} :: typeof({ __index = GameDataStoreService })
 ))
@@ -81,8 +82,15 @@ function GameDataStoreService._promiseRobloxDataStore(self: GameDataStoreService
 	return self._robloxDataStorePromise
 end
 
-function GameDataStoreService._getKey(_self: GameDataStoreService): string
-	return "version1"
+function GameDataStoreService.SetDataStoreKey(self: GameDataStoreService, key: string): ()
+	assert(type(key) == "string", "Bad key")
+	assert(not self._dataStorePromise, "Cannot set key after datastore has been promised")
+
+	self._key = key
+end
+
+function GameDataStoreService._getKey(self: GameDataStoreService): string
+	return self._key or "version1"
 end
 
 function GameDataStoreService.Destroy(self: GameDataStoreService)
