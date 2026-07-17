@@ -18,7 +18,6 @@ local ServiceBag = require("ServiceBag")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
 -- Asserts the promise settled within the timeout and returns whether it is now safe to :Yield(), so
 -- a hung promise fails the test instead of freezing the runner.
@@ -32,69 +31,71 @@ local function keyGenerator(userId)
 	return "user_" .. tostring(userId)
 end
 
--- Every manager (and the session-locked stores it owns) is torn down in afterEach so an auto-save
--- loop can never outlive the test. These specs share one Roblox place across all packages, so a
--- leaked background task throws in a later package's window.
-local maid = Maid.new()
+-- Builds a real ServiceBag plus a session-locked manager wired to a fresh mock. Everything is owned by
+-- a Maid, so destroy() tears down the manager (and the loaded stores whose auto-save loops it owns)
+-- along with the bag, and nothing keeps running after the test.
+local function setup()
+	local maid = Maid.new()
 
-afterEach(function()
-	maid:DoCleaning()
-end)
-
--- Builds a real ServiceBag plus a manager wired to a fresh mock. Returns the manager and mock; the
--- manager is destroyed before the bag it borrows PlaceMessagingService from.
-local function newManager()
-	local serviceBag = ServiceBag.new()
 	-- The manager enables session messaging on each DataStore, which pulls PlaceMessagingService
 	-- off the bag. Services must be registered before Start, so register it up front.
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("PlaceMessagingService"))
 	serviceBag:Init()
 	serviceBag:Start()
 
 	local mock = DataStoreMock.new()
-	local manager = PlayerDataStoreManager.new(serviceBag, mock, keyGenerator, true)
+	local manager = maid:Add(PlayerDataStoreManager.new(serviceBag, mock, keyGenerator, true))
 
-	maid:GiveTask(function()
-		manager:Destroy()
-		serviceBag:Destroy()
-	end)
-
-	return manager, mock
+	return {
+		manager = manager,
+		mock = mock,
+		destroy = function()
+			maid:DoCleaning()
+		end,
+	}
 end
 
 describe("PlayerDataStoreManager.GetDataStore", function()
 	it("should return a datastore for a fresh user", function()
-		local manager = newManager()
+		local controller = setup()
 
-		local dataStore = manager:GetDataStore(1)
+		local dataStore = controller.manager:GetDataStore(1)
 		expect(dataStore).never.toBeNil()
+
+		controller:destroy()
 	end)
 
 	it("should cache the datastore per user", function()
-		local manager = newManager()
+		local controller = setup()
 
-		local first = manager:GetDataStore(1)
-		local second = manager:GetDataStore(1)
+		local first = controller.manager:GetDataStore(1)
+		local second = controller.manager:GetDataStore(1)
 		expect(first).toEqual(second)
 
-		local other = manager:GetDataStore(2)
+		local other = controller.manager:GetDataStore(2)
 		expect((first == other)).toEqual(false)
+
+		controller:destroy()
 	end)
 
 	it("should apply the key generator", function()
-		local manager = newManager()
+		local controller = setup()
 
-		local dataStore = manager:GetDataStore(1)
+		local dataStore = controller.manager:GetDataStore(1)
 		expect((dataStore:GetKey())).toEqual("user_1")
+
+		controller:destroy()
 	end)
 end)
 
 describe("PlayerDataStoreManager.PromiseDataStore", function()
 	it("should resolve the datastore and load successfully against a healthy mock", function()
-		local manager = newManager()
+		local controller = setup()
 
-		local promise = manager:PromiseDataStore(1)
+		local promise = controller.manager:PromiseDataStore(1)
 		if not expectSettled(promise, 10) then
+			controller:destroy()
 			return
 		end
 
@@ -104,26 +105,30 @@ describe("PlayerDataStoreManager.PromiseDataStore", function()
 
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not expectSettled(loadPromise, 10) then
+			controller:destroy()
 			return
 		end
 		expect((select(2, loadPromise:Yield()))).toEqual(true)
+
+		controller:destroy()
 	end)
 end)
 
 describe("PlayerDataStoreManager persistence", function()
 	it("should round-trip a stored value across a removal/reload", function()
-		local manager = newManager()
+		local controller = setup()
 
-		local dataStore = manager:GetDataStore(1)
+		local dataStore = controller.manager:GetDataStore(1)
 		dataStore:Store("coins", 5)
 
 		-- Removal saves (SaveAndCloseSession) then closes the session, asynchronously.
-		manager:RemovePlayerDataStore(1)
+		controller.manager:RemovePlayerDataStore(1)
 
 		-- PromiseDataStore waits for the in-progress removal to finish before handing back a
 		-- fresh datastore for the same user.
-		local promise = manager:PromiseDataStore(1)
+		local promise = controller.manager:PromiseDataStore(1)
 		if not expectSettled(promise, 10) then
+			controller:destroy()
 			return
 		end
 
@@ -132,48 +137,57 @@ describe("PlayerDataStoreManager persistence", function()
 
 		local loadPromise = reloaded:Load("coins")
 		if not expectSettled(loadPromise, 10) then
+			controller:destroy()
 			return
 		end
 
 		local loadOk, value = loadPromise:Yield()
 		expect(loadOk).toEqual(true)
 		expect(value).toEqual(5)
+
+		controller:destroy()
 	end)
 end)
 
 describe("PlayerDataStoreManager.AddRemovingCallback", function()
 	it("should invoke the removing callback when a user's datastore is removed", function()
-		local manager = newManager()
+		local controller = setup()
 
 		local ran = false
-		manager:AddRemovingCallback(function()
+		controller.manager:AddRemovingCallback(function()
 			ran = true
 		end)
 
-		manager:GetDataStore(1)
+		controller.manager:GetDataStore(1)
 
 		-- Drain the removal to be sure the callback fired.
-		local promise = manager:PromiseAllSaves()
+		local promise = controller.manager:PromiseAllSaves()
 		if not expectSettled(promise, 10) then
+			controller:destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
 
 		expect(ran).toEqual(true)
+
+		controller:destroy()
 	end)
 end)
 
 describe("PlayerDataStoreManager.PromiseAllSaves", function()
 	it("should resolve after removing all datastores and flushing pending saves", function()
-		local manager = newManager()
+		local controller = setup()
 
-		manager:GetDataStore(1):Store("coins", 1)
-		manager:GetDataStore(2):Store("coins", 2)
+		controller.manager:GetDataStore(1):Store("coins", 1)
+		controller.manager:GetDataStore(2):Store("coins", 2)
 
-		local promise = manager:PromiseAllSaves()
+		local promise = controller.manager:PromiseAllSaves()
 		if not expectSettled(promise, 10) then
+			controller:destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
+
+		controller:destroy()
 	end)
 end)

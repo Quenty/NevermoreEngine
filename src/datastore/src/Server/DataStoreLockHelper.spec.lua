@@ -18,28 +18,39 @@ local PromiseTestUtils = require("PromiseTestUtils")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
--- Every DataStore a test creates is tracked here and torn down in afterEach, so its auto-save loop
--- can never outlive the test. These specs share one Roblox place across all packages, so a leaked
--- background task throws in a later package's window.
-local maid = Maid.new()
+-- Builds session-locked DataStores over a shared mock and owns them with a Maid, so destroy() tears
+-- down every store (and the auto-save loop each starts once loaded) the test created. Read
+-- controller.mock to seed or fail the datastore before creating a store.
+local function setup(mock)
+	local maid = Maid.new()
+	mock = mock or DataStoreMock.new()
 
-afterEach(function()
-	maid:DoCleaning()
-end)
+	local function newDataStore()
+		return maid:Add(DataStore.new(mock, "player_1"))
+	end
+
+	return {
+		mock = mock,
+		newDataStore = newDataStore,
+		destroy = function()
+			maid:DoCleaning()
+		end,
+	}
+end
 
 describe("DataStore session locking", function()
 	it("wraps the stored profile in a lock envelope on a healthy acquire", function()
-		local mock = DataStoreMock.new()
+		local controller = setup()
 
-		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
+		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
 		local promise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 
@@ -47,23 +58,26 @@ describe("DataStore session locking", function()
 		expect(ok).toEqual(true)
 		expect(loadedOk).toEqual(true)
 
-		local raw = mock:GetRaw("player_1")
+		local raw = controller.mock:GetRaw("player_1")
 		expect(type(raw)).toEqual("table")
 		expect(type(raw.lock)).toEqual("table")
 		expect(raw.lock.ActiveSession).never.toBeNil()
 		expect(raw.lock.ActiveSession.SessionId).toEqual(dataStore:GetSessionId())
+
+		controller:destroy()
 	end)
 
 	it("releases the lock on SaveAndCloseSession so a new session can load", function()
-		local mock = DataStoreMock.new()
+		local controller = setup()
 
-		local sessionA = maid:Add(DataStore.new(mock, "player_1"))
+		local sessionA = controller.newDataStore()
 		sessionA:SetSessionLockingEnabled(true)
 		sessionA:SetUserIdList({ 1 })
 
 		local loadA = sessionA:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadA, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((loadA:Yield())).toEqual(true)
@@ -71,31 +85,35 @@ describe("DataStore session locking", function()
 		local closePromise = sessionA:SaveAndCloseSession()
 		if not PromiseTestUtils.awaitSettled(closePromise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((closePromise:Yield())).toEqual(true)
 
 		-- Closing strips the lock envelope back off the stored value.
-		local raw = mock:GetRaw("player_1")
+		local raw = controller.mock:GetRaw("player_1")
 		expect(type(raw)).toEqual("table")
 		expect(raw.lock).toEqual(nil)
 
-		local sessionB = maid:Add(DataStore.new(mock, "player_1"))
+		local sessionB = controller.newDataStore()
 		sessionB:SetSessionLockingEnabled(true)
 		sessionB:SetUserIdList({ 1 })
 
 		local loadB = sessionB:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadB, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((loadB:Yield())).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("preserves user data across a lock/unlock round-trip", function()
-		local mock = DataStoreMock.new()
+		local controller = setup()
 
-		local sessionA = maid:Add(DataStore.new(mock, "player_1"))
+		local sessionA = controller.newDataStore()
 		sessionA:SetSessionLockingEnabled(true)
 		sessionA:SetUserIdList({ 1 })
 		sessionA:Store("coins", 5)
@@ -103,33 +121,37 @@ describe("DataStore session locking", function()
 		local closePromise = sessionA:SaveAndCloseSession()
 		if not PromiseTestUtils.awaitSettled(closePromise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((closePromise:Yield())).toEqual(true)
 
-		local sessionB = maid:Add(DataStore.new(mock, "player_1"))
+		local sessionB = controller.newDataStore()
 		sessionB:SetSessionLockingEnabled(true)
 		sessionB:SetUserIdList({ 1 })
 
 		local loadPromise = sessionB:Load("coins")
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 
 		local ok, value = loadPromise:Yield()
 		expect(ok).toEqual(true)
 		expect(value).toEqual(5)
+
+		controller:destroy()
 	end)
 
 	it("steals a stale lock left by a dead session", function()
-		local mock = DataStoreMock.new()
+		local controller = setup()
 
 		-- Seed a lock owned by a long-dead session. LastUpdateTime is far enough in the past that
 		-- os.time() - LastUpdateTime exceeds GetAutoSaveTimeSeconds() * 2.1 (default 300 * 2.1 = 630s),
 		-- so the lock is stolen on the first acquire attempt (no retry backoff). Seed user data too,
 		-- to prove it survives the steal.
-		mock:SetRaw("player_1", {
+		controller.mock:SetRaw("player_1", {
 			coins = 7,
 			lock = {
 				LastUpdateTime = os.time() - 1000000,
@@ -141,45 +163,50 @@ describe("DataStore session locking", function()
 			},
 		})
 
-		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
+		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
 		local promise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
 
-		local raw = mock:GetRaw("player_1")
+		local raw = controller.mock:GetRaw("player_1")
 		expect(raw.lock.ActiveSession.SessionId).toEqual(dataStore:GetSessionId())
 
 		-- The dead session's user data survived the steal.
 		local loadPromise = dataStore:Load("coins")
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((select(2, loadPromise:Yield()))).toEqual(7)
+
+		controller:destroy()
 	end)
 
 	it("fires SessionStolen when saving over a lock held by another session", function()
-		local mock = DataStoreMock.new()
+		local controller = setup()
 
-		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
+		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((loadPromise:Yield())).toEqual(true)
 
 		-- Another session steals the lock out from under us directly in the datastore.
-		mock:SetRaw("player_1", {
+		controller.mock:SetRaw("player_1", {
 			coins = 1,
 			lock = {
 				LastUpdateTime = os.time(),
@@ -200,29 +227,35 @@ describe("DataStore session locking", function()
 		local savePromise = dataStore:Save()
 		if not PromiseTestUtils.awaitSettled(savePromise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 
 		expect(stolenBy).never.toBeNil()
 		expect(stolenBy.SessionId).toEqual("thief-session-id")
+
+		controller:destroy()
 	end)
 
 	it("surfaces a locked-load datastore failure fast instead of hanging", function()
-		local mock = DataStoreMock.new()
-		mock:FailAllRequests()
+		local controller = setup()
+		controller.mock:FailAllRequests()
 
-		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
+		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
 		local promise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(promise, 5) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 
 		local ok, loadedOk = promise:Yield()
 		expect(ok).toEqual(true)
 		expect(loadedOk).toEqual(false)
+
+		controller:destroy()
 	end)
 end)

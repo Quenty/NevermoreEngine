@@ -18,31 +18,37 @@ local PromiseTestUtils = require("PromiseTestUtils")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
--- Every DataStore a test creates is tracked here and torn down in afterEach, so its auto-save loop
--- can never outlive the test. Tests that destroy a store mid-test (the cancellation under test) stay
--- as-is; the maid simply skips an already-destroyed store. These specs share one Roblox place across
--- all packages, so a leaked background task throws in a later package's window.
-local maid = Maid.new()
+-- Builds session-locked DataStores over a shared mock and owns them with a Maid, so destroy() tears
+-- down every store the test created. A test that destroys a store mid-test (the cancellation under
+-- test) stays as-is; the maid simply skips an already-destroyed store. Read controller.mock to
+-- block/unblock requests before creating a store.
+local function setup(mock)
+	local maid = Maid.new()
+	mock = mock or DataStoreMock.new()
 
-afterEach(function()
-	maid:DoCleaning()
-end)
+	local function newSessionLockedStore()
+		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
+		dataStore:SetSessionLockingEnabled(true)
+		dataStore:SetUserIdList({ 1 })
+		return dataStore
+	end
 
-local function newSessionLockedStore(mock)
-	local dataStore = DataStore.new(mock, "player_1")
-	dataStore:SetSessionLockingEnabled(true)
-	dataStore:SetUserIdList({ 1 })
-	return maid:Add(dataStore)
+	return {
+		mock = mock,
+		newSessionLockedStore = newSessionLockedStore,
+		destroy = function()
+			maid:DoCleaning()
+		end,
+	}
 end
 
 describe("in-flight request cancellation (maid teardown)", function()
 	it("cancels a yielding load thread when the DataStore is destroyed (no leaked thread)", function()
-		local mock = DataStoreMock.new()
-		mock:BlockRequests() -- the lock-acquire request hangs, so the load is stuck in flight
+		local controller = setup()
+		controller.mock:BlockRequests() -- the lock-acquire request hangs, so the load is stuck in flight
 
-		local dataStore = newSessionLockedStore(mock)
+		local dataStore = controller.newSessionLockedStore()
 		local promise = dataStore:PromiseLoadSuccessful()
 
 		expect(PromiseTestUtils.awaitSettled(promise, 1)).toEqual(false)
@@ -52,77 +58,88 @@ describe("in-flight request cancellation (maid teardown)", function()
 
 		-- A properly cancelled thread never resumes, so the lock is never written. A leaked thread
 		-- would resume on unblock and write the lock envelope.
-		mock:UnblockRequests()
+		controller.mock:UnblockRequests()
 		local everWrote = PromiseTestUtils.awaitValue(function()
-			return mock:GetRaw("player_1") ~= nil
+			return controller.mock:GetRaw("player_1") ~= nil
 		end, 2)
 		expect(everWrote).toEqual(false)
+
+		controller:destroy()
 	end)
 
 	it("cancels a yielding save thread when the DataStore is destroyed", function()
-		local mock = DataStoreMock.new()
+		local controller = setup()
 
 		-- Load cleanly first (acquires the lock), then block so the SAVE request hangs in flight.
-		local dataStore = newSessionLockedStore(mock)
+		local dataStore = controller.newSessionLockedStore()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("load hung").toEqual("load settled")
+			controller:destroy()
 			return
 		end
 
-		mock:BlockRequests()
+		controller.mock:BlockRequests()
 		dataStore:Store("coins", 5)
 		local savePromise = dataStore:Save()
 		expect(PromiseTestUtils.awaitSettled(savePromise, 1)).toEqual(false)
 
-		local versionsBefore = mock:GetCallCount("UpdateAsync")
+		local versionsBefore = controller.mock:GetCallCount("UpdateAsync")
 		dataStore:Destroy()
-		mock:UnblockRequests()
+		controller.mock:UnblockRequests()
 
 		-- The cancelled save thread must not resume and perform another UpdateAsync write.
 		local extraWrites = PromiseTestUtils.awaitValue(function()
-			return mock:GetCallCount("UpdateAsync") > versionsBefore + 1
+			return controller.mock:GetCallCount("UpdateAsync") > versionsBefore + 1
 		end, 2)
 		expect(extraWrites).toEqual(false)
+
+		controller:destroy()
 	end)
 end)
 
 describe("lock command that does not settle", function()
 	it("keeps the load pending while the lock command is outstanding, then completes when it settles", function()
-		local mock = DataStoreMock.new()
-		mock:BlockRequests() -- simulate a lock command that hasn't propagated yet (up to ~30s)
+		local controller = setup()
+		controller.mock:BlockRequests() -- simulate a lock command that hasn't propagated yet (up to ~30s)
 
-		local dataStore = newSessionLockedStore(mock)
+		local dataStore = controller.newSessionLockedStore()
 		local promise = dataStore:PromiseLoadSuccessful()
 
 		-- Must NOT spuriously resolve or error while the lock command is outstanding.
 		expect(PromiseTestUtils.awaitSettled(promise, 2)).toEqual(false)
 
-		mock:UnblockRequests()
+		controller.mock:UnblockRequests()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung after unblock").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((select(2, promise:Yield()))).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("re-loads cleanly on a fresh session after a cancelled in-flight lock command", function()
-		local mock = DataStoreMock.new()
-		mock:BlockRequests()
+		local controller = setup()
+		controller.mock:BlockRequests()
 
-		local first = newSessionLockedStore(mock)
+		local first = controller.newSessionLockedStore()
 		local firstPromise = first:PromiseLoadSuccessful()
 		expect(PromiseTestUtils.awaitSettled(firstPromise, 1)).toEqual(false)
 		first:Destroy() -- cancel the in-flight lock command
-		mock:UnblockRequests()
+		controller.mock:UnblockRequests()
 
 		-- The cancelled attempt left no lock, so a fresh session acquires cleanly.
-		local second = newSessionLockedStore(mock)
+		local second = controller.newSessionLockedStore()
 		local secondPromise = second:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
 			expect("hung").toEqual("settled")
+			controller:destroy()
 			return
 		end
 		expect((select(2, secondPromise:Yield()))).toEqual(true)
+
+		controller:destroy()
 	end)
 end)

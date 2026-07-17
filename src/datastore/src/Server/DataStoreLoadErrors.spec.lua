@@ -18,22 +18,32 @@ local PromiseTestUtils = require("PromiseTestUtils")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
--- Every DataStore a test creates is tracked here and torn down in afterEach, so its auto-save loop
--- can never outlive the test. These specs share one Roblox place across all packages, so a leaked
--- background task throws in a later package's window.
-local maid = Maid.new()
+-- Builds DataStores over a shared mock and owns them with a Maid, so destroy() tears down every store
+-- (and the auto-save loop each starts once loaded) the test created. Read controller.mock to
+-- configure it before creating a store.
+local function setup(mock)
+	local maid = Maid.new()
+	mock = mock or DataStoreMock.new()
 
-afterEach(function()
-	maid:DoCleaning()
-end)
+	local function newDataStore()
+		return maid:Add(DataStore.new(mock, "key"))
+	end
+
+	return {
+		mock = mock,
+		newDataStore = newDataStore,
+		destroy = function()
+			maid:DoCleaning()
+		end,
+	}
+end
 
 describe("shared load promise fan-out", function()
 	it("delivers the resolution to every consumer of the shared load", function()
-		local mock = DataStoreMock.new()
-		mock:SetRaw("key", { a = 1, b = 2 })
-		local dataStore = maid:Add(DataStore.new(mock, "key"))
+		local controller = setup()
+		controller.mock:SetRaw("key", { a = 1, b = 2 })
+		local dataStore = controller.newDataStore()
 
 		local valueA, valueB, all
 		dataStore:Load("a"):Then(function(value)
@@ -52,13 +62,15 @@ describe("shared load promise fan-out", function()
 		expect(valueA).toEqual(1)
 		expect(valueB).toEqual(2)
 		expect(all).toEqual({ a = 1, b = 2 })
+
+		controller:destroy()
 	end)
 
 	it("resolves all consumers of a slow (yielding) load attached during the yield", function()
-		local mock = DataStoreMock.new()
-		mock:SetRaw("key", { a = 1 })
-		mock:SetYieldTime(0.3)
-		local dataStore = maid:Add(DataStore.new(mock, "key"))
+		local controller = setup()
+		controller.mock:SetRaw("key", { a = 1 })
+		controller.mock:SetYieldTime(0.3)
+		local dataStore = controller.newDataStore()
 
 		local results = {}
 		for i = 1, 3 do
@@ -73,12 +85,14 @@ describe("shared load promise fan-out", function()
 		expect(results[1]).toEqual(1)
 		expect(results[2]).toEqual(1)
 		expect(results[3]).toEqual(1)
+
+		controller:destroy()
 	end)
 
 	it("delivers the rejection to every consumer when the shared load fails", function()
-		local mock = DataStoreMock.new()
-		mock:FailAllRequests()
-		local dataStore = maid:Add(DataStore.new(mock, "key"))
+		local controller = setup()
+		controller.mock:FailAllRequests()
+		local dataStore = controller.newDataStore()
 
 		local aRejected, bRejected = false, false
 		dataStore:Load("a"):Then(nil, function()
@@ -91,33 +105,37 @@ describe("shared load promise fan-out", function()
 		expect(PromiseTestUtils.awaitValue(function()
 			return aRejected and bRejected
 		end, 5)).toEqual(true)
+
+		controller:destroy()
 	end)
 end)
 
 describe("auto-save loop", function()
 	it("persists staged data on the auto-save schedule without an explicit Save", function()
-		local mock = DataStoreMock.new()
-		local dataStore = maid:Add(DataStore.new(mock, "key"))
+		local controller = setup()
+		local dataStore = controller.newDataStore()
 		dataStore:SetAutoSaveTimeSeconds(0.2)
 
 		-- Store triggers the initial load; once loaded, the auto-save loop starts and flushes.
 		dataStore:Store("coins", 5)
 
 		local saved = PromiseTestUtils.awaitValue(function()
-			local raw = mock:GetRaw("key")
+			local raw = controller.mock:GetRaw("key")
 			return raw ~= nil and raw.coins == 5
 		end, 6)
 		expect(saved).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("stops auto-saving after the datastore is destroyed", function()
-		local mock = DataStoreMock.new()
-		local dataStore = maid:Add(DataStore.new(mock, "key"))
+		local controller = setup()
+		local dataStore = controller.newDataStore()
 		dataStore:SetAutoSaveTimeSeconds(0.2)
 		dataStore:Store("coins", 5)
 
 		expect(PromiseTestUtils.awaitValue(function()
-			local raw = mock:GetRaw("key")
+			local raw = controller.mock:GetRaw("key")
 			return raw ~= nil and raw.coins == 5
 		end, 6)).toEqual(true)
 
@@ -125,11 +143,13 @@ describe("auto-save loop", function()
 
 		-- After destroy the loop is gone: record the call count, wait past several auto-save
 		-- intervals, and confirm no new saves land.
-		local before = mock:GetCallCount("UpdateAsync")
+		local before = controller.mock:GetCallCount("UpdateAsync")
 		local settled = PromiseTestUtils.awaitValue(function()
 			return false
 		end, 1)
 		expect(settled).toEqual(false)
-		expect(mock:GetCallCount("UpdateAsync")).toEqual(before)
+		expect(controller.mock:GetCallCount("UpdateAsync")).toEqual(before)
+
+		controller:destroy()
 	end)
 end)

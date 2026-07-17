@@ -20,46 +20,36 @@ local ServiceBag = require("ServiceBag")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
--- Every object a test creates is tracked here and torn down in afterEach, so a DataStore's auto-save
--- loop (or a manager's session-locked stores) can never outlive the test. These specs share one
--- Roblox place across all packages, so a leaked background task throws in a later package's window.
-local maid = Maid.new()
+-- Builds a real ServiceBag plus a session-locked manager wired to a fresh mock. Everything is owned by
+-- a Maid, so destroy() tears down the manager (and the loaded stores whose auto-save loops it owns)
+-- along with the bag, and nothing keeps running after the test.
+local function setup()
+	local maid = Maid.new()
 
-afterEach(function()
-	maid:DoCleaning()
-end)
-
-local function newDataStore(mock)
-	return maid:Add(DataStore.new(mock, "key"))
-end
-
-local function newManager()
-	local serviceBag = ServiceBag.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("PlaceMessagingService"))
 	serviceBag:Init()
 	serviceBag:Start()
 
 	local mock = DataStoreMock.new()
-	local manager = PlayerDataStoreManager.new(serviceBag, mock, function(userId)
+	local manager = maid:Add(PlayerDataStoreManager.new(serviceBag, mock, function(userId)
 		return "user_" .. tostring(userId)
-	end, true)
+	end, true))
 
-	-- Destroy the manager (and its loaded, session-locked stores) before the bag it borrows
-	-- PlaceMessagingService from, matching the manager -> serviceBag teardown order elsewhere.
-	maid:GiveTask(function()
-		manager:Destroy()
-		serviceBag:Destroy()
-	end)
-
-	return manager, mock, serviceBag
+	return {
+		manager = manager,
+		mock = mock,
+		destroy = function()
+			maid:DoCleaning()
+		end,
+	}
 end
 
 describe("DataStore saving callbacks that misbehave", function()
 	it("runs a well-behaved saving callback and completes the save", function()
 		local mock = DataStoreMock.new()
-		local dataStore = newDataStore(mock)
+		local dataStore = DataStore.new(mock, "key")
 
 		local ran = false
 		dataStore:AddSavingCallback(function()
@@ -70,15 +60,18 @@ describe("DataStore saving callbacks that misbehave", function()
 		local promise = dataStore:Save()
 		if not PromiseTestUtils.awaitSettled(promise, 5) then
 			expect("hung").toEqual("settled")
+			dataStore:Destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
 		expect(ran).toEqual(true)
+
+		dataStore:Destroy()
 	end)
 
 	it("isolates a throwing saving callback into a clean save rejection, preserving the stack trace", function()
 		local mock = DataStoreMock.new()
-		local dataStore = newDataStore(mock)
+		local dataStore = DataStore.new(mock, "key")
 
 		dataStore:AddSavingCallback(function()
 			error("saving callback boom")
@@ -91,11 +84,13 @@ describe("DataStore saving callbacks that misbehave", function()
 		-- The rejection preserves the original message and the invoking frame, so the failure stays debuggable.
 		expect(string.find(tostring(err), "saving callback boom", 1, true) ~= nil).toEqual(true)
 		expect(string.find(tostring(err), "PromiseInvokeSavingCallbacks", 1, true) ~= nil).toEqual(true)
+
+		dataStore:Destroy()
 	end)
 
 	it("rejects the save when a saving callback returns a rejected promise (and does not persist)", function()
 		local mock = DataStoreMock.new()
-		local dataStore = newDataStore(mock)
+		local dataStore = DataStore.new(mock, "key")
 
 		dataStore:AddSavingCallback(function()
 			return Promise.rejected("nope")
@@ -104,11 +99,13 @@ describe("DataStore saving callbacks that misbehave", function()
 
 		expect((PromiseTestUtils.awaitOutcome(dataStore:Save(), 5))).toEqual("rejected")
 		expect(mock:GetRaw("key")).toEqual(nil)
+
+		dataStore:Destroy()
 	end)
 
 	it("blocks the save while a saving callback yields (never resolves)", function()
 		local mock = DataStoreMock.new()
-		local dataStore = newDataStore(mock)
+		local dataStore = DataStore.new(mock, "key")
 
 		dataStore:AddSavingCallback(function()
 			return Promise.new()
@@ -117,6 +114,8 @@ describe("DataStore saving callbacks that misbehave", function()
 
 		local promise = dataStore:Save()
 		expect(PromiseTestUtils.awaitSettled(promise, 2)).toEqual(false)
+
+		dataStore:Destroy()
 	end)
 end)
 
@@ -135,70 +134,78 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 	end
 
 	it("well-behaved callback: saves the data AND releases the lock", function()
-		local manager, mock = newManager()
-		manager:AddRemovingCallback(function()
+		local controller = setup()
+		controller.manager:AddRemovingCallback(function()
 			return Promise.resolved()
 		end)
 
-		expect(storeAndAwaitLock(manager, mock)).toEqual(true)
-		manager:RemovePlayerDataStore(1)
+		expect(storeAndAwaitLock(controller.manager, controller.mock)).toEqual(true)
+		controller.manager:RemovePlayerDataStore(1)
 
 		expect(PromiseTestUtils.awaitValue(function()
-			local raw = mock:GetRaw("user_1")
+			local raw = controller.mock:GetRaw("user_1")
 			return raw ~= nil and raw.coins == 5
 		end, 10)).toEqual(true)
 		-- SaveAndCloseSession stripped the lock as it wrote.
-		expect(mock:GetRaw("user_1").lock).toEqual(nil)
+		expect(controller.mock:GetRaw("user_1").lock).toEqual(nil)
+
+		controller:destroy()
 	end)
 
 	it("[FAILURE MODE] rejecting callback: skips the save (data loss) AND leaves the lock held", function()
-		local manager, mock = newManager()
-		manager:AddRemovingCallback(function()
+		local controller = setup()
+		controller.manager:AddRemovingCallback(function()
 			return Promise.rejected("removing callback failed")
 		end)
 
-		expect(storeAndAwaitLock(manager, mock)).toEqual(true)
-		manager:RemovePlayerDataStore(1)
+		expect(storeAndAwaitLock(controller.manager, controller.mock)).toEqual(true)
+		controller.manager:RemovePlayerDataStore(1)
 
 		-- The rejected callback short-circuits PromiseUtils.all before SaveAndCloseSession: coins are
 		-- never persisted, and the lock is never released.
 		expect(PromiseTestUtils.awaitValue(function()
-			local raw = mock:GetRaw("user_1")
+			local raw = controller.mock:GetRaw("user_1")
 			return raw ~= nil and raw.coins == 5
 		end, 3)).toEqual(false)
-		expect(mock:GetRaw("user_1").lock ~= nil).toEqual(true)
+		expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("[FAILURE MODE] throwing callback: the synchronous throw escapes removal (lock held, stuck)", function()
-		local manager, mock = newManager()
-		manager:AddRemovingCallback(function()
+		local controller = setup()
+		controller.manager:AddRemovingCallback(function()
 			error("removing callback boom")
 		end)
 
-		expect(storeAndAwaitLock(manager, mock)).toEqual(true)
+		expect(storeAndAwaitLock(controller.manager, controller.mock)).toEqual(true)
 
 		-- There is no pcall around removing callbacks, so a synchronous throw escapes removal entirely.
 		expect(function()
-			manager:RemovePlayerDataStore(1)
+			controller.manager:RemovePlayerDataStore(1)
 		end).toThrow("removing callback boom")
-		expect(mock:GetRaw("user_1").lock ~= nil).toEqual(true)
+		expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("[FAILURE MODE] yielding callback: removal blocks forever (no save, lock held)", function()
-		local manager, mock = newManager()
-		manager:AddRemovingCallback(function()
+		local controller = setup()
+		controller.manager:AddRemovingCallback(function()
 			return Promise.new()
 		end)
 
-		expect(storeAndAwaitLock(manager, mock)).toEqual(true)
-		manager:RemovePlayerDataStore(1)
+		expect(storeAndAwaitLock(controller.manager, controller.mock)).toEqual(true)
+		controller.manager:RemovePlayerDataStore(1)
 
 		-- SaveAndCloseSession is gated behind the yielding callback, so neither the save nor the lock
 		-- release ever happen.
 		expect(PromiseTestUtils.awaitValue(function()
-			local raw = mock:GetRaw("user_1")
+			local raw = controller.mock:GetRaw("user_1")
 			return raw ~= nil and raw.coins == 5
 		end, 2)).toEqual(false)
-		expect(mock:GetRaw("user_1").lock ~= nil).toEqual(true)
+		expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
+
+		controller:destroy()
 	end)
 end)

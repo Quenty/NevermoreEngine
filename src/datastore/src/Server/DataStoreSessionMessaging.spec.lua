@@ -22,46 +22,48 @@ local ServiceBag = require("ServiceBag")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
--- Every object a test creates is tracked here and torn down in afterEach, so a DataStore's auto-save
--- loop (or a helper's subscription) can never outlive the test. These specs share one Roblox place
--- across all packages, so a leaked background task throws in a later package's window.
-local maid = Maid.new()
+-- Builds a ServiceBag with an in-process MessagingServiceMock plus sessions and helpers over a shared
+-- DataStoreMock, all owned by a Maid, so destroy() tears down every object the test created.
+-- newSession() builds a session store; newHelper(session) wires a message helper to it off the bag.
+local function setup()
+	local maid = Maid.new()
 
-afterEach(function()
-	maid:DoCleaning()
-end)
-
-local function newServiceBag(messagingService)
-	local serviceBag = ServiceBag.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	local placeMessagingService = serviceBag:GetService(require("PlaceMessagingService"))
 	serviceBag:Init()
-	placeMessagingService:SetRobloxMessagingService(messagingService)
+	placeMessagingService:SetRobloxMessagingService(MessagingServiceMock.new())
 	serviceBag:Start()
-	return serviceBag
+
+	local dataStoreMock = DataStoreMock.new()
+
+	local function newSession()
+		return maid:Add(DataStore.new(dataStoreMock, "player_1"))
+	end
+
+	local function newHelper(session)
+		return maid:Add(DataStoreMessageHelper.new(serviceBag, session))
+	end
+
+	return {
+		newSession = newSession,
+		newHelper = newHelper,
+		destroy = function()
+			maid:DoCleaning()
+		end,
+	}
 end
 
 describe("cross-server session messaging (close-session kick-out)", function()
 	it("fires SessionCloseRequested on the session that receives a close-session message", function()
-		local serviceBag = newServiceBag(MessagingServiceMock.new())
-		local dataStoreMock = DataStoreMock.new()
+		local controller = setup()
 
 		-- Two sessions on the same key, each with its own message helper (subscribes to its own topic).
-		local sessionA = DataStore.new(dataStoreMock, "player_1")
-		local sessionB = DataStore.new(dataStoreMock, "player_1")
+		local sessionA = controller.newSession()
+		local sessionB = controller.newSession()
 
-		local helperA = DataStoreMessageHelper.new(serviceBag, sessionA)
-		local helperB = DataStoreMessageHelper.new(serviceBag, sessionB)
-
-		-- Helpers and sessions are torn down before the bag they borrow PlaceMessagingService from.
-		maid:GiveTask(function()
-			helperA:Destroy()
-			helperB:Destroy()
-			sessionA:Destroy()
-			sessionB:Destroy()
-			serviceBag:Destroy()
-		end)
+		local _helperA = controller.newHelper(sessionA)
+		local helperB = controller.newHelper(sessionB)
 
 		local closeRequested = false
 		sessionA.SessionCloseRequested:Connect(function()
@@ -76,6 +78,7 @@ describe("cross-server session messaging (close-session kick-out)", function()
 
 		if not PromiseTestUtils.awaitSettled(sendPromise, 10) then
 			expect("message send hung").toEqual("message send settled")
+			controller:destroy()
 			return
 		end
 
@@ -83,19 +86,14 @@ describe("cross-server session messaging (close-session kick-out)", function()
 			return closeRequested
 		end, 15)
 		expect(received).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("rejects sending a message to our own session", function()
-		local serviceBag = newServiceBag(MessagingServiceMock.new())
-		local dataStoreMock = DataStoreMock.new()
-		local sessionA = DataStore.new(dataStoreMock, "player_1")
-		local helperA = DataStoreMessageHelper.new(serviceBag, sessionA)
-
-		maid:GiveTask(function()
-			helperA:Destroy()
-			sessionA:Destroy()
-			serviceBag:Destroy()
-		end)
+		local controller = setup()
+		local sessionA = controller.newSession()
+		local helperA = controller.newHelper(sessionA)
 
 		expect(function()
 			helperA:PromiseSendSessionMessage(game.PlaceId, game.JobId, sessionA:GetSessionId(), {
@@ -103,5 +101,7 @@ describe("cross-server session messaging (close-session kick-out)", function()
 				requesterSessionId = sessionA:GetSessionId(),
 			})
 		end).toThrow("Cannot message self")
+
+		controller:destroy()
 	end)
 end)

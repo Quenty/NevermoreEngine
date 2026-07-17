@@ -45,31 +45,51 @@ leaves running keeps executing after the test ends and can throw during a *later
 which the runner reports as that innocent later package failing. A leaked `DataStore` auto-save loop
 throwing during the `secrets` suite is a real example we hit.
 
-So every object a test constructs must be torn down, on every path — including when an assertion
-throws or a promise hangs mid-test. A trailing `object:Destroy()` after the assertions does **not**
-run when an earlier `expect` throws. Route teardown through a file-level `Maid` cleaned in an
-`afterEach` instead:
+So every object a test constructs must be torn down. Use the **`setup()` / `destroy()` controller
+pattern** — the standard across the codebase (see the `rogue-properties` specs and
+`saveslot/.../HasSaveSlots.spec.lua`). A local `setup()` builds the `ServiceBag` and any objects and
+returns a controller: named fields plus factory functions, and a `destroy` that tears everything
+down. Each test calls `setup()`, does its work, and calls `controller:destroy()` at the end.
 
 ```luau
-local Maid = require("Maid")
-local afterEach = Jest.Globals.afterEach
+local function setup()
+	local serviceBag = ServiceBag.new()
+	serviceBag:GetService(require("SomeService"))
+	serviceBag:Init()
+	serviceBag:Start()
 
-local maid = Maid.new()
-afterEach(function()
-	maid:DoCleaning()
-end)
+	local thing = SomeClass.new(serviceBag)
+
+	return {
+		thing = thing,
+		destroy = function()
+			-- Destroy children before the ServiceBag they borrowed services from.
+			thing:Destroy()
+			serviceBag:Destroy()
+		end,
+	}
+end
 
 it("does a thing", function()
-	local store = maid:Add(DataStore.new(mock, "player_1")) -- destroyed in afterEach no matter what
-	-- ... assertions that may throw ...
+	local controller = setup()
+	expect(controller.thing:DoSomething()).toEqual(true)
+	controller:destroy()
 end)
 ```
 
-`maid:Add` returns the object and is safe even if the test also destroys it mid-test (the behavior
-under test): a destroyed `BaseObject` has its metatable nil'd, so `Maid:DoCleaning` skips it — no
-double-destroy. When destroy order matters (a helper/manager/store that borrowed a service off a
-`ServiceBag`), give the maid a closure that destroys the child before the bag:
-`maid:GiveTask(function() child:Destroy(); serviceBag:Destroy() end)`.
+Guidelines:
+
+- `destroy` must tear down **every** object `setup()` created, not just the `ServiceBag`. A standalone
+  object the bag does not own — a manager, a `DataStore`, a bound class — keeps its background work
+  (an auto-save loop, a subscription) running otherwise. This is the exact bug that leaked into the
+  `secrets` suite.
+- Destroy children **before** the `ServiceBag` they pulled services off of.
+- In a hung-promise guard that returns early, call `controller:destroy()` before the `return` so the
+  early exit still cleans up.
+- When a test deliberately destroys an object mid-test (that teardown *is* the behavior under test),
+  don't also destroy it in `destroy` — a second `:Destroy()` on the same object throws.
+- A plain object with no `ServiceBag` can skip the controller: create it in the test and
+  `object:Destroy()` at the end (and in any early-return guard).
 
 ### jest.config.lua
 
