@@ -37,6 +37,40 @@ describe("MyUtils", function()
 end)
 ```
 
+### Clean up everything a test creates
+
+Batch runs (and CI) execute every package's specs in **one shared place**, sequentially, under
+`ServerScriptService.<package>`. There is no per-package isolation, so any background work a spec
+leaves running keeps executing after the test ends and can throw during a *later* package's window —
+which the runner reports as that innocent later package failing. A leaked `DataStore` auto-save loop
+throwing during the `secrets` suite is a real example we hit.
+
+So every object a test constructs must be torn down, on every path — including when an assertion
+throws or a promise hangs mid-test. A trailing `object:Destroy()` after the assertions does **not**
+run when an earlier `expect` throws. Route teardown through a file-level `Maid` cleaned in an
+`afterEach` instead:
+
+```luau
+local Maid = require("Maid")
+local afterEach = Jest.Globals.afterEach
+
+local maid = Maid.new()
+afterEach(function()
+	maid:DoCleaning()
+end)
+
+it("does a thing", function()
+	local store = maid:Add(DataStore.new(mock, "player_1")) -- destroyed in afterEach no matter what
+	-- ... assertions that may throw ...
+end)
+```
+
+`maid:Add` returns the object and is safe even if the test also destroys it mid-test (the behavior
+under test): a destroyed `BaseObject` has its metatable nil'd, so `Maid:DoCleaning` skips it — no
+double-destroy. When destroy order matters (a helper/manager/store that borrowed a service off a
+`ServiceBag`), give the maid a closure that destroys the child before the bag:
+`maid:GiveTask(function() child:Destroy(); serviceBag:Destroy() end)`.
+
 ### jest.config.lua
 
 Every testable package needs a `jest.config.lua` in its `src/` directory. This tells the test runner to discover `.spec` files:
