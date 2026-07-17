@@ -36,6 +36,7 @@ import {
   resolveDeployTargetPlaces,
 } from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
+import { handleVersionUpgradeAsync } from './version-command.js';
 import { selectTargetAsync } from './select-target.js';
 
 const MULTI_PLACE_CONCURRENCY = 10;
@@ -107,6 +108,44 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           process.exit(1);
         }
       }
+    );
+
+    args.command(
+      'version',
+      'Manage pinned base place versions in deploy.nevermore.json',
+      (yargs) => {
+        return yargs
+          .command(
+            'upgrade [target]',
+            'Re-pin every basePlace to its latest published version',
+            (upgradeYargs) => {
+              return upgradeYargs
+                .positional('target', {
+                  describe:
+                    'Only upgrade this target (default: all targets in the config)',
+                  type: 'string',
+                })
+                .option('api-key', {
+                  describe: 'Roblox Open Cloud API key',
+                  type: 'string',
+                });
+            },
+            async (upgradeArgs) => {
+              try {
+                await handleVersionUpgradeAsync(
+                  upgradeArgs as unknown as DeployArgs
+                );
+              } catch (err) {
+                OutputHelper.error(
+                  err instanceof Error ? err.message : String(err)
+                );
+                process.exit(1);
+              }
+            }
+          )
+          .demandCommand(1, 'Specify a version action, e.g. "upgrade".');
+      },
+      () => {}
     );
 
     args.command(

@@ -390,17 +390,26 @@ export class OpenCloudClient {
    * Requires the `legacy-asset:manage` scope on the API key.
    *
    * Two-step process: fetch a temporary CDN URL, then download the binary.
+   *
+   * Pass `version` to fetch a specific published version instead of the latest.
+   * This is how deploys pin a `basePlace` so a broken Studio edit can't leak in.
    */
   async downloadPlaceAsync(
     universeId: number,
     placeId: number,
-    onProgress?: (transferredBytes: number, totalBytes: number) => void
+    onProgress?: (transferredBytes: number, totalBytes: number) => void,
+    version?: number
   ): Promise<Buffer> {
     const apiKey = await this._resolveApiKeyAsync();
-    const url = `https://apis.roblox.com/asset-delivery-api/v1/assetId/${placeId}`;
+    const url =
+      version != null
+        ? `https://apis.roblox.com/asset-delivery-api/v1/assetId/${placeId}/version/${version}`
+        : `https://apis.roblox.com/asset-delivery-api/v1/assetId/${placeId}`;
 
     OutputHelper.verbose(
-      `Downloading base place from https://www.roblox.com/games/${placeId}/place ...`
+      `Downloading base place${
+        version != null ? ` v${version}` : ''
+      } from https://www.roblox.com/games/${placeId}/place ...`
     );
 
     const response = await this._rateLimiter.fetchAsync(url, {
@@ -432,13 +441,83 @@ export class OpenCloudClient {
       );
     }
 
-    const data = (await response.json()) as { location: string };
+    // The Asset Delivery API reports a missing asset/version as HTTP 200 with an
+    // `errors` array rather than an error status, so a bad `version` pin lands
+    // here instead of the block above.
+    const data = (await response.json()) as {
+      location?: string;
+      errors?: Array<{ code?: number; message?: string }>;
+    };
     if (!data.location) {
-      throw new Error('Download place failed: no CDN location in response');
+      const apiMessage = data.errors?.[0]?.message;
+      if (version != null) {
+        throw new Error(
+          `Base place ${placeId} has no version ${version}` +
+            (apiMessage ? ` (${apiMessage})` : '') +
+            `. Run "nevermore deploy version upgrade" to re-pin, or check the pinned version in deploy.nevermore.json.`
+        );
+      }
+      throw new Error(
+        `Download place failed: no CDN location in response` +
+          (apiMessage ? `: ${apiMessage}` : '')
+      );
     }
 
     OutputHelper.verbose('Fetching place binary from CDN...');
     return _fetchCdnBinaryAsync(data.location, onProgress);
+  }
+
+  /**
+   * Resolve the current latest published version number of a place, via the
+   * Open Cloud Assets API (`asset:read` scope; `legacy-asset:manage` also
+   * grants it). The returned number is the same value the Asset Delivery API's
+   * `/version/{n}` route expects, so it can be written straight into a
+   * `basePlace.version` pin.
+   */
+  async getLatestPlaceVersionAsync(
+    universeId: number,
+    placeId: number
+  ): Promise<number> {
+    const apiKey = await this._resolveApiKeyAsync();
+    const url = `https://apis.roblox.com/assets/v1/assets/${placeId}`;
+
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(
+          formatAuthError(
+            'Read place version',
+            'asset:read',
+            universeId,
+            placeId,
+            response.status,
+            response.statusText,
+            text,
+            'GET',
+            url
+          )
+        );
+      }
+      throw new Error(
+        `Read place version failed: ${response.status} ${response.statusText}: ${text}`
+      );
+    }
+
+    const data = (await response.json()) as { revisionId?: string };
+    const version = Number(data.revisionId);
+    if (!data.revisionId || !Number.isFinite(version)) {
+      throw new Error(
+        `Read place version failed: no revisionId for place ${placeId}`
+      );
+    }
+    return version;
   }
 }
 

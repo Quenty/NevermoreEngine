@@ -193,7 +193,11 @@ export abstract class BaseJobContext implements JobContext {
     const resolvedName = options.packageName ?? '';
 
     this._reporter.onPackagePhaseChange(resolvedName, 'downloading');
-    OutputHelper.verbose('Downloading base place for merge...');
+    OutputHelper.verbose(
+      basePlace.version != null
+        ? `Downloading base place (pinned v${basePlace.version}) for merge...`
+        : 'Downloading base place (latest) for merge...'
+    );
     const buffer = await this._openCloudClient.downloadPlaceAsync(
       basePlace.universeId,
       basePlace.placeId,
@@ -203,7 +207,8 @@ export abstract class BaseJobContext implements JobContext {
           transferredBytes: transferred,
           totalBytes: total,
         });
-      }
+      },
+      basePlace.version
     );
     const basePath = mergeContext.resolvePath('base.rbxl');
     await fs.writeFile(basePath, buffer);

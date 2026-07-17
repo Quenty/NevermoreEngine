@@ -155,6 +155,7 @@ Other flags:
 | `targets.<name>.project` | yes | Path to the Rojo project file, relative to the package directory. |
 | `targets.<name>.scriptTemplate` | no | Luau file `nevermore test` executes via Open Cloud after upload. Not used by `nevermore deploy` itself. |
 | `targets.<name>.basePlace` | no | Universe/place to download and merge with the rojo build before uploading. See [Merging with an existing place](testing/integration-testing.md#merging-with-an-existing-place-baseplace). |
+| `targets.<name>.basePlace.version` | no | Pin the base place to a specific published version instead of pulling the latest. See [Pinning base place versions](#pinning-base-place-versions). |
 
 You can declare any number of targets. A common setup is one `test` target for CI and a separate `production` or `staging` target for live deploys:
 
@@ -229,6 +230,52 @@ nevermore deploy run --place-file ./build/my-place.rbxl
 ```
 
 The `project` field in `deploy.nevermore.json` is ignored when `--place-file` is set, but `universeId` and `placeId` are still required.
+
+## Pinning base place versions
+
+If a target uses a [`basePlace`](testing/integration-testing.md#merging-with-an-existing-place-baseplace), `nevermore deploy` downloads that place and merges your rojo build into it. By default it pulls **the latest published version** of the base place — so a broken Studio edit to the base place ships on the very next deploy, even when your code hasn't changed.
+
+To make deploys reproducible, pin the base place to a specific version with an optional `version` field:
+
+```json
+{
+  "targets": {
+    "production": {
+      "universeId": 12345,
+      "placeId": 67890,
+      "project": "default.project.json",
+      "basePlace": {
+        "universeId": 12345,
+        "placeId": 11111,
+        "version": 42
+      }
+    }
+  }
+}
+```
+
+With `version` set, the deploy downloads exactly that version of the base place. Omit it to keep pulling the latest (the previous behaviour — nothing changes for configs that don't opt in).
+
+### Bumping the pin
+
+When you actually want to roll base places forward, run:
+
+```bash
+# Re-pin every basePlace in the config to its current latest published version
+nevermore deploy version upgrade
+
+# Only upgrade one target
+nevermore deploy version upgrade production
+
+# Preview the change set without writing
+nevermore deploy version upgrade --dryrun
+```
+
+`upgrade` walks every `basePlace` in `deploy.nevermore.json` (or just the named target), resolves each place's current latest published version, prints an old → new table, and — after a confirmation prompt — writes the new `version` values back into the file. Base places shared by several targets are resolved once. Pass `--yes` to skip the prompt (for scripting), or `--dryrun` to preview only.
+
+Commit the updated `deploy.nevermore.json`, then deploy as usual. This gives you a reviewable, git-tracked record of exactly which base-place content each deploy shipped.
+
+Resolving the latest version uses the same `legacy-asset:manage` scope already required for `basePlace` downloads, so no extra credentials are needed.
 
 ## Batch deploys
 
