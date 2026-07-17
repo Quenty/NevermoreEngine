@@ -1,0 +1,25 @@
+{
+  "name": "PromiseTest",
+  "globIgnorePaths": [
+    "**/.package-lock.json",
+    "**/.pnpm",
+    "**/.pnpm-workspace-state-v1.json",
+    "**/.modules.yaml",
+    "**/.ignored",
+    "**/.ignored_*"
+  ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
+      "promise": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    }
+  }
+}
