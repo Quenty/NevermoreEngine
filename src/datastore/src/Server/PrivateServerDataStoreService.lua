@@ -77,6 +77,20 @@ function PrivateServerDataStoreService.SetCustomKey(self: PrivateServerDataStore
 	self._customKey = customKey
 end
 
+--[=[
+	Injects the underlying datastore to use instead of resolving a real one. Accepts a real
+	datastore or a [DataStoreMock]. Intended for testing; must be called before the datastore
+	is first resolved.
+
+	@param robloxDataStore DataStore | DataStoreMock
+]=]
+function PrivateServerDataStoreService.SetRobloxDataStore(self: PrivateServerDataStoreService, robloxDataStore: any): ()
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
+	assert(not self._robloxDataStorePromise, "Already resolved robloxDataStore, cannot override")
+
+	self._robloxDataStorePromise = Promise.resolved(robloxDataStore)
+end
+
 function PrivateServerDataStoreService._promiseRobloxDataStore(
 	self: PrivateServerDataStoreService
 ): Promise.Promise<any>

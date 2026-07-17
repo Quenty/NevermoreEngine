@@ -38,6 +38,20 @@ function GameDataStoreService.Init(self: GameDataStoreService, serviceBag: Servi
 end
 
 --[=[
+	Injects the underlying datastore to use instead of resolving a real one. Accepts a real
+	datastore or a [DataStoreMock]. Intended for testing; must be called before the datastore
+	is first resolved.
+
+	@param robloxDataStore DataStore | DataStoreMock
+]=]
+function GameDataStoreService.SetRobloxDataStore(self: GameDataStoreService, robloxDataStore: any): ()
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
+	assert(not self._robloxDataStorePromise, "Already resolved robloxDataStore, cannot override")
+
+	self._robloxDataStorePromise = Promise.resolved(robloxDataStore)
+end
+
+--[=[
 	Promises a DataStore for the current game that is synchronized every 5 seconds.
 
 	@return Promise<DataStore>

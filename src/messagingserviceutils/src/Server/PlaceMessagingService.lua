@@ -26,6 +26,7 @@ export type PlaceMessagingService = typeof(setmetatable(
 		_serviceBag: ServiceBag.ServiceBag,
 		_subscriptionTable: ObservableSubscriptionTable.ObservableSubscriptionTable<(any, PlacePacketMetadata)>,
 		_connectionRequire: StateStack.StateStack<boolean>,
+		_robloxMessagingService: any,
 		_maid: Maid.Maid,
 	},
 	{} :: typeof({ __index = PlaceMessagingService })
@@ -53,8 +54,22 @@ function PlaceMessagingService.Init(self: PlaceMessagingService, serviceBag: Ser
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
+	self._robloxMessagingService = game:GetService("MessagingService")
 	self._connectionRequire = self._maid:Add(StateStack.new(false, "boolean"))
 	self._subscriptionTable = self._maid:Add(ObservableSubscriptionTable.new() :: any)
+end
+
+--[=[
+	Injects the underlying MessagingService to use instead of the real Roblox one. Accepts a real
+	`MessagingService` or a [MessagingServiceMock]. Intended for testing; must be called before the
+	service starts subscribing (i.e. before the first `ObserveMessages` subscriber activates).
+
+	@param robloxMessagingService MessagingService | MessagingServiceMock
+]=]
+function PlaceMessagingService.SetRobloxMessagingService(self: PlaceMessagingService, robloxMessagingService: any): ()
+	assert(robloxMessagingService, "No robloxMessagingService")
+
+	self._robloxMessagingService = robloxMessagingService
 end
 
 function PlaceMessagingService.Start(self: PlaceMessagingService): ()
@@ -79,7 +94,7 @@ function PlaceMessagingService.Start(self: PlaceMessagingService): ()
 			maid:GiveTask(
 				MessagingServiceUtils.promiseSubscribe(topic, function(data: MessagingServiceUtils.SubscriptionData)
 					self:_handleIncomingPacket(data)
-				end):Then(function(connection: RBXScriptConnection)
+				end, self._robloxMessagingService):Then(function(connection: RBXScriptConnection)
 					maid:GiveTask(connection)
 				end)
 			)
@@ -199,7 +214,9 @@ function PlaceMessagingService.SendMessageToAddress(
 		print(`[PlaceMessagingService] - To {addressString} sending {MessagingServiceUtils.toHumanReadable(packet)}`)
 	end
 
-	return self._maid:GivePromise(MessagingServiceUtils.promisePublish(addressString, packet))
+	return self._maid:GivePromise(
+		MessagingServiceUtils.promisePublish(addressString, packet, self._robloxMessagingService)
+	)
 end
 
 --[=[
